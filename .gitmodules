@@ -1,0 +1,3 @@
+[submodule "sdk/thirdparty/poco"]
+	path = sdk/thirdparty/poco
+	url = git@code.hq.twilio.com:client/yb-poco-ios-xcode.git
