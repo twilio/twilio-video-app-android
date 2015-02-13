@@ -4,3 +4,6 @@
 [submodule "sdk/external/twilio-jni"]
 	path = sdk/external/twilio-jni
 	url = git@code.hq.twilio.com:twilio/twilio-jni.git
+[submodule "sdk/thirdparty/openssl-stock-android"]
+	path = sdk/thirdparty/openssl-stock-android
+	url = git@code.hq.twilio.com:client/openssl-stock-android.git
