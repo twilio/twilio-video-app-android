@@ -78,6 +78,8 @@ LOCAL_LDLIBS := \
 	twilio-jni
 LOCAL_STATIC_LIBRARIES := \
 	poco-foundation \
-	poco-util
+	poco-net \
+	poco-util \
+	poco-xml
 
 include $(BUILD_SHARED_LIBRARY)
