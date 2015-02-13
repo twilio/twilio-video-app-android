@@ -77,6 +77,7 @@ LOCAL_LDLIBS := \
 	$(OPENSSL_STATIC_LIBS) \
 	twilio-jni
 LOCAL_STATIC_LIBRARIES := \
-	poco-foundation
+	poco-foundation \
+	poco-util
 
 include $(BUILD_SHARED_LIBRARY)
