@@ -16,9 +16,8 @@ endif
 #endif
 
 #include $(TWSDK_JNI_PATH)/../thirdparty/pjproject/Android.mk
-$(info $(TWSDK_JNI_PATH)/../thirdparty/poco/Android.mk)
 include $(TWSDK_JNI_PATH)/../thirdparty/poco/Android.mk
-#include $(TWSDK_JNI_PATH)/../external/twilio-jni/Android.mk
+include $(TWSDK_JNI_PATH)/../external/twilio-jni/Android.mk
 
 LOCAL_PATH := $(TWSDK_JNI_PATH)
 include $(CLEAR_VARS)
@@ -80,6 +79,7 @@ LOCAL_STATIC_LIBRARIES := \
 	poco-foundation \
 	poco-net \
 	poco-util \
-	poco-xml
+	poco-xml \
+	twilio-jni
 
 include $(BUILD_SHARED_LIBRARY)
