@@ -7,3 +7,6 @@
 [submodule "sdk/thirdparty/openssl-stock-android"]
 	path = sdk/thirdparty/openssl-stock-android
 	url = git@code.hq.twilio.com:client/openssl-stock-android.git
+[submodule "sdk/thirdparty/yb-pjproject"]
+	path = sdk/thirdparty/yb-pjproject
+	url = git@code.hq.twilio.com:client/yb-pjproject.git
