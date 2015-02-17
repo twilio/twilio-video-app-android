@@ -4,18 +4,12 @@ ifneq ($(ENABLE_PROFILING),)
 include $(TWSDK_JNI_PATH)/../thirdparty/android-ndk-profiler/jni/Android.mk
 endif
 
-#ifdef USE_ANDROID_OPENSSL
-#include $(TWSDK_JNI_PATH)/../thirdparty/openssl/Android.mk
-#OPENSSL_STATIC_LIBS :=
-#	libssl_static \
-#	libcrypto_static
-#else
-#OPENSSL_LIBS := \
-#	$(TWSDK_JNI_PATH)/../thirdparty/openssl-stock-android/lib/$(TARGET_ARCH_ABI)/libssl.a \
-#	$(TWSDK_JNI_PATH)/../thirdparty/openssl-stock-android/lib/$(TARGET_ARCH_ABI)/libcrypto.a
-#endif
+OPENSSL_LIBS := \
+	$(TWSDK_JNI_PATH)/../thirdparty/openssl-stock-android/lib/$(TARGET_ARCH_ABI)/libssl.a \
+	$(TWSDK_JNI_PATH)/../thirdparty/openssl-stock-android/lib/$(TARGET_ARCH_ABI)/libcrypto.a
 
-#include $(TWSDK_JNI_PATH)/../thirdparty/pjproject/Android.mk
+
+include $(TWSDK_JNI_PATH)/../thirdparty/yb-pjproject/Android.mk
 include $(TWSDK_JNI_PATH)/../thirdparty/poco/Android.mk
 include $(TWSDK_JNI_PATH)/../external/twilio-jni/Android.mk
 
@@ -41,7 +35,7 @@ LOCAL_CFLAGS := \
 	-DTW_EXPORT='__attribute__((visibility("default")))' \
 	$(debug_cflags)
 
-#pj_includes := $(addsuffix /include,$(addprefix $(LOCAL_PATH)/../thirdparty/pjproject/,pjlib pjlib-util pjmedia pjnath pjsip))
+pj_includes := $(addsuffix /include,$(addprefix $(LOCAL_PATH)/../yb-thirdparty/pjproject/,pjlib pjlib-util pjnath pjsip))
 
 LOCAL_C_INCLUDES := \
 	$(LOCAL_PATH)/../external/twilio-jni
@@ -51,7 +45,7 @@ LOCAL_C_INCLUDES := \
 LOCAL_LDLIBS := \
 	-llog \
 	-lz \
-	-ldl \
+	-ldl #\
 	$(OPENSSL_LIBS)
 
 # pjmedia is in here twice because there's a circular dependency
@@ -80,6 +74,15 @@ LOCAL_STATIC_LIBRARIES := \
 	poco-net \
 	poco-util \
 	poco-xml \
+	pjsua-lib \
+	pjnath \
+	pjsip \
+	pjsip-simple \
+	pjsip-ua \
+	milenage \
+	pjlib-util \
+	pj \
+	$(OPENSSL_STATIC_LIBS) \
 	twilio-jni
 
 include $(BUILD_SHARED_LIBRARY)
