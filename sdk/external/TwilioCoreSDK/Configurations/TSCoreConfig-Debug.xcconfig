@@ -1,0 +1,23 @@
+//
+//  TSConfig-Debug.xcconfig
+//  Twilio
+//
+//
+
+#include "TSCoreConfig-Common.xcconfig"
+
+// Architectures.
+ONLY_ACTIVE_ARCH = YES
+
+// Code Signing.
+CODE_SIGN_IDENTITY = iPhone Developer
+
+// Deployment.
+COPY_PHASE_STRIP = NO
+
+// Compiler - Code Generation.
+GCC_OPTIMIZATION_LEVEL = 0
+GCC_SYMBOLS_PRIVATE_EXTERN = NO
+
+// Compiler - Preprocessing.
+GCC_PREPROCESSOR_DEFINITIONS = DEBUG=1 $(inherited)

@@ -7,11 +7,15 @@ endif
 OPENSSL_LIBS := \
 	$(TWSDK_JNI_PATH)/../thirdparty/openssl-stock-android/lib/$(TARGET_ARCH_ABI)/libssl.a \
 	$(TWSDK_JNI_PATH)/../thirdparty/openssl-stock-android/lib/$(TARGET_ARCH_ABI)/libcrypto.a
+	
+WEBRTC_LIBS := \
+	$(TWSDK_JNI_PATH)/../thirdparty/webrtc-355/lib/$(TARGET_ARCH_ABI)/libwebrtc.a
 
 
 include $(TWSDK_JNI_PATH)/../thirdparty/yb-pjproject/Android.mk
 include $(TWSDK_JNI_PATH)/../thirdparty/poco/Android.mk
 include $(TWSDK_JNI_PATH)/../external/twilio-jni/Android.mk
+include $(TWSDK_JNI_PATH)/../external/TwilioCoreSDK/Android.mk
 
 LOCAL_PATH := $(TWSDK_JNI_PATH)
 include $(CLEAR_VARS)
@@ -31,22 +35,27 @@ LOCAL_CFLAGS := \
 	-Wall \
 	-DPJ_IS_BIG_ENDIAN=0 \
 	-DPJ_IS_LITTLE_ENDIAN=1 \
+	-DPJSIP_SIGNALLING_ONLY=1 \
 	-fvisibility=hidden \
 	-DTW_EXPORT='__attribute__((visibility("default")))' \
 	$(debug_cflags)
 
-pj_includes := $(addsuffix /include,$(addprefix $(LOCAL_PATH)/../yb-thirdparty/pjproject/,pjlib pjlib-util pjnath pjsip))
+pj_includes := $(addsuffix /include,$(addprefix $(LOCAL_PATH)/../yb-thirdparty/pjproject/,pjlib pjlib-util pjmedia pjnath pjsip))
+webrtc_includes := $(LOCAL_PATH)/../yb-thirdparty/webrtc-355/include
 
 LOCAL_C_INCLUDES := \
-	$(LOCAL_PATH)/../external/twilio-jni
-	#$(pj_includes) \
+	$(LOCAL_PATH)/../external/twilio-jni \
+	$(pj_includes) \
+	$(LOCAL_PATH)/../thirdparty/webrtc-355/include
 	
 
 LOCAL_LDLIBS := \
 	-llog \
 	-lz \
 	-ldl #\
-	$(OPENSSL_LIBS)
+	$(OPENSSL_LIBS) \
+	$(WEBRTC_LIBS)
+	
 
 # pjmedia is in here twice because there's a circular dependency
 # between pjmedia and pjmedia-codec (the g711_init func)
@@ -75,6 +84,7 @@ LOCAL_STATIC_LIBRARIES := \
 	poco-util \
 	poco-xml \
 	pjsua-lib \
+	pjmedia \
 	pjnath \
 	pjsip \
 	pjsip-simple \
@@ -82,6 +92,8 @@ LOCAL_STATIC_LIBRARIES := \
 	milenage \
 	pjlib-util \
 	pj \
+	SignalCoreSDK \
+	$(WEBRTC_LIBS) \
 	$(OPENSSL_STATIC_LIBS) \
 	twilio-jni
 

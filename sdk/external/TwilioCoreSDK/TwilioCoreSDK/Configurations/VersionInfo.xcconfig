@@ -1,0 +1,8 @@
+//
+//  VersionInfo.xcconfig
+//
+//
+
+TS_CORE_SDK_VERSION = 2.0.0
+TS_CORE_SDK_BUILD_NUMBER = 1
+TS_CORE_SDK_COPYRIGHT_YEARS = 2014

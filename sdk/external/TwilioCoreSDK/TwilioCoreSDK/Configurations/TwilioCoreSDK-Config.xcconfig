@@ -1,0 +1,34 @@
+//
+//  TwilioSDK-Config.xcconfig
+//
+//
+
+#include "VersionInfo.xcconfig"
+
+ARCHS = i386 armv7
+ARCHS[sdk=iphoneos*] = armv7
+
+// Code Signing.
+CODE_SIGN_ENTITLEMENTS =
+
+// Linking.
+// LD_RUNPATH_SEARCH_PATHS = $(inherited) @executable_path/Frameworks
+
+// Packaging.
+INFOPLIST_FILE = TwilioCoreSDK/TwilioCoreSDK-Info.plist
+PRODUCT_NAME = TwilioCore
+
+// Compiler - Language.
+GCC_PRECOMPILE_PREFIX_HEADER = YES
+GCC_PREFIX_HEADER = TwilioCoreSDK/TwilioCoreSDK-Prefix.pch
+
+OTHER_CFLAGS = -DPJSIP_SIGNALLING_ONLY=1 -DPJ_IS_BIG_ENDIAN=0 -DPJ_IS_LITTLE_ENDIAN=1 -Wall -DTWILIO_CORE_VERSION="$(TS_CORE_SDK_VERSION)"
+
+COMMON_LIBTOOLFLAGS = $(inherited) -lwebrtc -lwebrtc_base -lwebrtc_common -lwebrtc_i420 -lwebrtc_opus -lwebrtc_utility -lwebrtc_video_coding -lwebrtc_vp8 -lyuv -lopus -lpaced_sender -lrbe_components -lremote_bitrate_estimator -lrtp_rtcp -lsqlite_regexp -lsrtp -lsystem_wrappers -lvideo_capture_module -lvideo_coding_utility -lvideo_engine_core -lvideo_processing -lvideo_render_module -lvoice_engine -lvpx -lCNG -lG711 -lG722 -lPCM16B -laudio_coding_module -laudio_conference_mixer -laudio_device -laudio_processing -lbitrate_controller -lcommon_audio -lcommon_video -lcrnspr -lcrnss -lcrnssckbi -lcrssl -lexpat -lfield_trial_default -liLBC -liSAC -liSACFix -licudata -licui18n -licuuc -ljingle -ljingle_media -ljingle_p2p -ljingle_peerconnection -ljingle_peerconnection_objc -ljingle_sound -ljsoncpp -lmedia_file -lneteq -lnss_static -lvpx_asm_offsets_vp8
+
+OTHER_LIBTOOLFLAGS = $(COMMON_LIBTOOLFLAGS) -laudio_processing_sse2 -lcommon_audio_sse2 -lvideo_processing_sse2 -lvpx_intrinsics_sse2 -lvpx_intrinsics_ssse3 -lvpx_intrinsics_mmx
+OTHER_LIBTOOLFLAGS[sdk=iphoneos*] = $(COMMON_LIBTOOLFLAGS) -lyuv_neon -l_core_neon_offsets -laudio_processing_neon -lcommon_audio_neon -lisac_neon -lvpx_asm_offsets_vpx_scale
+
+HEADER_SEARCH_PATHS = $(inherited) $(EXT_SDKS)/PJSIP/build-ios/PJSIP/PJSIP/Sources/prefix-header $(EXT_SDKS)/PJSIP/pjsip/include $(EXT_SDKS)/PJSIP/pjlib/include $(EXT_SDKS)/PJSIP/pjlib-util/include $(EXT_SDKS)/PJSIP/pjmedia/include $(EXT_SDKS)/PJSIP/pjnath/include $(EXT_SDKS)/POCO/POCO/Foundation/include $(EXT_SDKS)/POCO/POCO/Net/include $(EXT_SDKS)/POCO/POCO/Util/include $(EXT_SDKS)/POCO/POCO/XML/include $(EXT_SDKS)/PJSIP/build-ios/PJSIP/SDKs/openssl/source/include-ios $(EXT_SDKS)/WebRTC/build-ios/prebuild/include $(SRCROOT)/TwilioCoreSDK/Sources/Core
+
+LIBRARY_SEARCH_PATHS = $(inherited) $(EXT_SDKS)/WebRTC/build-ios/prebuild/libs/$(CURRENT_ARCH)

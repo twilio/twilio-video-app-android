@@ -1,0 +1,22 @@
+//
+//  TwilioCoreSDKTests-Config.xcconfig
+//
+
+ARCHS = i386 armv7
+ARCHS[sdk=iphoneos*] = armv7
+
+// Packaging.
+INFOPLIST_FILE = TwilioCoreSDKTests/TwilioCoreSDKTests-Info.plist
+PRODUCT_NAME = $(TARGET_NAME)
+
+// Compiler - Language.
+GCC_PRECOMPILE_PREFIX_HEADER = YES
+GCC_PREFIX_HEADER = TwilioCoreSDK/TwilioCoreSDK-Prefix.pch
+
+OTHER_LDFLAGS = $(inherited) -framework XCTest -read_only_relocs suppress -lgtest
+
+OTHER_CFLAGS = -DPJSIP_SIGNALLING_ONLY=1 -DPJ_IS_BIG_ENDIAN=0 -DPJ_IS_LITTLE_ENDIAN=1 -DTWILIO_CORE_VERSION="$(TS_CORE_SDK_VERSION)" -DGTEST_RELATIVE_PATH=1
+
+HEADER_SEARCH_PATHS = $(inherited) $(EXT_SDKS)/PJSIP/build-ios/PJSIP/PJSIP/Sources/prefix-header $(EXT_SDKS)/PJSIP/pjsip/include $(EXT_SDKS)/PJSIP/pjlib/include $(EXT_SDKS)/PJSIP/pjlib-util/include $(EXT_SDKS)/PJSIP/pjmedia/include $(EXT_SDKS)/PJSIP/pjnath/include $(EXT_SDKS)/POCO/POCO/Foundation/include $(EXT_SDKS)/POCO/POCO/Net/include $(EXT_SDKS)/POCO/POCO/Util/include $(EXT_SDKS)/POCO/POCO/XML/include $(EXT_SDKS)/PJSIP/build-ios/PJSIP/SDKs/openssl/source/include-ios $(EXT_SDKS)/WebRTC/build-ios/prebuild/include $(EXT_SDKS)/WebRTC/build-ios/prebuild/include/testing/gtest/include $(SRCROOT)/TwilioCoreSDK/Sources/Core
+
+LIBRARY_SEARCH_PATHS = $(inherited) $(EXT_SDKS)/WebRTC/build-ios/prebuild/libs/$(CURRENT_ARCH)

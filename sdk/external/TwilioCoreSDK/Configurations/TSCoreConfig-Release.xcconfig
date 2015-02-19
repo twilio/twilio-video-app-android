@@ -1,0 +1,16 @@
+//
+//  TSConfig-Release.xcconfig
+//  Twilio
+//
+//
+
+#include "TSCoreConfig-Common.xcconfig"
+
+// Build Options.
+VALIDATE_PRODUCT = YES
+
+// Code Signing.
+CODE_SIGN_IDENTITY = iPhone Distribution
+
+// Compiler - Preprocessing.
+ENABLE_NS_ASSERTIONS = NO
