@@ -164,7 +164,5 @@ LOCAL_SRC_FILES := \
 	TSCoreError.cpp \
 	TSCoreSDK.cpp
 
-$(info Joja je kod kuce, $(LOCAL_C_INCLUDES))
-$(info Joja je kod mlad, $(webrtc_includes), $(pj_includes))
 
 include $(BUILD_STATIC_LIBRARY)
