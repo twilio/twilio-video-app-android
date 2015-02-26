@@ -13,7 +13,6 @@ include $(TWSDK_JNI_PATH)/../external/twilio-jni/Android.mk
 include $(TWSDK_JNI_PATH)/../external/TwilioCoreSDK/Android.mk
 
 LOCAL_PATH := $(TWSDK_JNI_PATH)
-$(info "joja", $(LOCAL_PATH), $(call my-dir))
 include $(CLEAR_VARS)
 
 LOCAL_MODULE := twilio-native
@@ -36,7 +35,7 @@ LOCAL_CFLAGS := \
 	-fvisibility=hidden \
 	-DTW_EXPORT='__attribute__((visibility("default")))' \
 	$(debug_cflags)
-LOCAL_CPPFLAGS := -std=c++11
+LOCAL_CPPFLAGS := -std=c++11 -fno-rtti
 
 pj_includes := $(addsuffix /include,$(addprefix $(LOCAL_PATH)/../yb-thirdparty/pjproject/,pjlib pjlib-util pjmedia pjnath pjsip))
 webrtc_includes := $(LOCAL_PATH)/../yb-thirdparty/webrtc-355/include
@@ -53,8 +52,11 @@ LOCAL_LDLIBS := \
 	-llog \
 	-lz \
 	-ldl \
-	$(OPENSSL_LIBS) \
-	$(WEBRTC_LDLIBS)
+	-lGLESv2 \
+	-ljnigraphics \
+	-lOpenSLES \
+	$(WEBRTC_LDLIBS)# \
+	$(OPENSSL_LIBS)
 	
 
 # pjmedia is in here twice because there's a circular dependency
@@ -97,7 +99,6 @@ LOCAL_STATIC_LIBRARIES := \
 	milenage \
 	resample \
 	speex \
-	srtp \
 	pjlib-util \
 	pj \
 	twilio-jni

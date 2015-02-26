@@ -6,7 +6,8 @@ OPENSSL_LIBS := \
 WEBRTC_LIB_DIR := $(TWSDK_JNI_PATH)/../thirdparty/webrtc-355/lib/$(TARGET_ARCH_ABI)
 	
 WEBRTC_LIBS := \
-	-lCNG \
+	-lwebrtc-full
+	#-lCNG \
 	-lG711 \
 	-lG722 \
 	-lPCM16B \
@@ -79,6 +80,14 @@ WEBRTC_LIBS := \
 	-lwebrtc_vp8 \
 	-lwebrtc_vp9 \
 	-lyuv \
-	-lyuv_neon
+	-lyuv_neon \
+	-lcore_neon_offsets \
+	-ljingle \
+	-ljingle_sound \
+	-lopenssl \
+	-lrbe_components \
+	-lvpx_asm_offsets_vp8 \
+	-lvpx_asm_offsets_vpx_scale \
+	-lwebrtc_base
 	
 WEBRTC_LDLIBS := -L$(WEBRTC_LIB_DIR) $(WEBRTC_LIBS)
