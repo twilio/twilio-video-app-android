@@ -1,3 +1,5 @@
 sdk/local.properties
 sdk/libs
 sdk/obj
+TestCore/bin
+TestCore/gen
