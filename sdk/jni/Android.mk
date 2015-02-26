@@ -4,13 +4,8 @@ ifneq ($(ENABLE_PROFILING),)
 include $(TWSDK_JNI_PATH)/../thirdparty/android-ndk-profiler/jni/Android.mk
 endif
 
-OPENSSL_LIBS := \
-	$(TWSDK_JNI_PATH)/../thirdparty/openssl-stock-android/lib/$(TARGET_ARCH_ABI)/libssl.a \
-	$(TWSDK_JNI_PATH)/../thirdparty/openssl-stock-android/lib/$(TARGET_ARCH_ABI)/libcrypto.a
-	
-WEBRTC_LIBS := \
-	$(TWSDK_JNI_PATH)/../thirdparty/webrtc-355/lib/$(TARGET_ARCH_ABI)/libwebrtc.a
-
+#Include build variables first
+include $(TWSDK_JNI_PATH)/build-variables.mk
 
 include $(TWSDK_JNI_PATH)/../thirdparty/yb-pjproject/Android.mk
 include $(TWSDK_JNI_PATH)/../thirdparty/poco/Android.mk
@@ -36,25 +31,32 @@ LOCAL_CFLAGS := \
 	-DPJ_IS_BIG_ENDIAN=0 \
 	-DPJ_IS_LITTLE_ENDIAN=1 \
 	-DPJSIP_SIGNALLING_ONLY=1 \
+	-DPOSIX \
 	-fvisibility=hidden \
 	-DTW_EXPORT='__attribute__((visibility("default")))' \
 	$(debug_cflags)
+LOCAL_CPPFLAGS := -std=c++11 -fno-rtti
 
 pj_includes := $(addsuffix /include,$(addprefix $(LOCAL_PATH)/../yb-thirdparty/pjproject/,pjlib pjlib-util pjmedia pjnath pjsip))
 webrtc_includes := $(LOCAL_PATH)/../yb-thirdparty/webrtc-355/include
+twilio_signal_includes := $(TWSDK_JNI_PATH)/../external/TwilioCoreSDK/TwilioCoreSDK/Sources/Core
 
 LOCAL_C_INCLUDES := \
 	$(LOCAL_PATH)/../external/twilio-jni \
 	$(pj_includes) \
+	$(twilio_signal_includes) \
 	$(LOCAL_PATH)/../thirdparty/webrtc-355/include
 	
 
 LOCAL_LDLIBS := \
 	-llog \
 	-lz \
-	-ldl #\
-	$(OPENSSL_LIBS) \
-	$(WEBRTC_LIBS)
+	-ldl \
+	-lGLESv2 \
+	-ljnigraphics \
+	-lOpenSLES \
+	$(WEBRTC_LDLIBS)# \
+	$(OPENSSL_LIBS)
 	
 
 # pjmedia is in here twice because there's a circular dependency
@@ -79,22 +81,26 @@ LOCAL_LDLIBS := \
 	$(OPENSSL_STATIC_LIBS) \
 	twilio-jni
 LOCAL_STATIC_LIBRARIES := \
+	SignalCoreSDK \
 	poco-foundation \
 	poco-net \
 	poco-util \
 	poco-xml \
 	pjsua-lib \
 	pjmedia \
+	pjmedia-audiodev \
+	pjmedia-videodev \
+	pjmedia-codec \
+	pjmedia \
 	pjnath \
 	pjsip \
 	pjsip-simple \
 	pjsip-ua \
 	milenage \
+	resample \
+	speex \
 	pjlib-util \
 	pj \
-	SignalCoreSDK \
-	$(WEBRTC_LIBS) \
-	$(OPENSSL_STATIC_LIBS) \
 	twilio-jni
 
 include $(BUILD_SHARED_LIBRARY)
