@@ -3,3 +3,4 @@ sdk/libs
 sdk/obj
 TestCore/bin
 TestCore/gen
+.vagrant
