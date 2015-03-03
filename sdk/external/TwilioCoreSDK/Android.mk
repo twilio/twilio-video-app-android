@@ -7,7 +7,8 @@ include $(CLEAR_VARS)
 LOCAL_MODULE := SignalCoreSDK
 
 pj_includes := $(addsuffix /include,$(addprefix $(PROJECT_ROOT)/thirdparty/yb-pjproject/,pjlib pjlib-util pjmedia pjnath pjsip))
-webrtc_includes := $(PROJECT_ROOT)/thirdparty/webrtc-355/include
+#webrtc_includes := $(PROJECT_ROOT)/thirdparty/webrtc-355/include
+webrtc_includes := $(PROJECT_ROOT)/thirdparty/webrtc/build-android/prebuild/local/release/include
 openssl_includes := \
 	$(PROJECT_ROOT)/thirdparty/openssl-stock-android/include \
 	$(PROJECT_ROOT)/thirdparty/openssl-stock-android/include/openssl

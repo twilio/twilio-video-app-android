@@ -4,3 +4,4 @@ sdk/obj
 TestCore/bin
 TestCore/gen
 .vagrant
+depot_tools
