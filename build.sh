@@ -50,7 +50,8 @@ install_dependencies() {
     rm install-build-deps-android.sh
 
     sudo apt-get -y install libglib2.0-dev libgtk2.0-dev libxtst-dev libxss-dev libnss3-dev libdbus-1-dev libdrm-dev libgconf2-dev libgnome-keyring-dev libgcrypt11-dev
-    sudo apt-get -y install libpci-dev libudev-dev
+    sudo apt-get -y install libpci-dev libudev-dev ruby-dev
+    sudo gem install -r aws-sdk-v1 plist
 }
 
 # Update/Get/Ensure the Gclient Depot Tools

@@ -14,7 +14,7 @@ if [ "$1" == "local" ]; then
         popd >/dev/null
         exit 1
     fi
-    #"$SCRIPT_DIR"/select-webrtc-mode.sh local
+    "$SCRIPT_DIR"/select-webrtc-mode.sh local $2
 elif [ "$1" == "remote" ]; then
     "$SCRIPT_DIR"/download-prebuild-package.sh $2
     if [ "$?" -ne "0" ]; then

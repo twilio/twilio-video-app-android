@@ -39,7 +39,7 @@ LOCAL_CPPFLAGS := -std=c++11 -fno-rtti
 
 pj_includes := $(addsuffix /include,$(addprefix $(LOCAL_PATH)/../yb-thirdparty/pjproject/,pjlib pjlib-util pjmedia pjnath pjsip))
 #webrtc_includes := $(LOCAL_PATH)/../yb-thirdparty/webrtc-355/include
-webrtc_includes := $(LOCAL_PATH)/../thirdparty/webrtc/build-android/prebuild/local/release/include/
+webrtc_includes := $(LOCAL_PATH)/../thirdparty/webrtc/build-android/prebuild/include/
 twilio_signal_includes := $(TWSDK_JNI_PATH)/../external/TwilioCoreSDK/TwilioCoreSDK/Sources/Core
 
 LOCAL_C_INCLUDES := \
@@ -48,6 +48,7 @@ LOCAL_C_INCLUDES := \
 	$(twilio_signal_includes) \
 	$(LOCAL_PATH)/../thirdparty/webrtc-355/include
 	
+
 
 LOCAL_LDLIBS := \
 	-llog \
