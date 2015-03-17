@@ -22,7 +22,7 @@ elif [ "$1" == "remote" ]; then
         popd >/dev/null
         exit 1
     fi
-    "$SCRIPT_DIR"/select-webrtc-mode.sh remote
+    "$SCRIPT_DIR"/select-webrtc-mode.sh remote $2
 elif [ "$1" == "help" ]; then
     echo "Usage: ./select-webrtc-build-mode.sh local|remote [debug|release]"
     popd >/dev/null
