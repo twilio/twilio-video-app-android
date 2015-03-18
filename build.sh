@@ -27,6 +27,7 @@ PROJECT_ROOT="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
 #}
 
 DEPOT_TOOLS="$PROJECT_ROOT/depot_tools"
+export DEPOTTOOLS="/vagrant/depot_tools"
 WEBRTC_ROOT="$PROJECT_ROOT/webrtc-manual-gclient"
 #create_directory_if_not_found $WEBRTC_ROOT
 BUILD="$WEBRTC_ROOT/libjingle_peerconnection_builds"
@@ -50,7 +51,17 @@ install_dependencies() {
     rm install-build-deps-android.sh
 
     sudo apt-get -y install libglib2.0-dev libgtk2.0-dev libxtst-dev libxss-dev libnss3-dev libdbus-1-dev libdrm-dev libgconf2-dev libgnome-keyring-dev libgcrypt11-dev
-    sudo apt-get -y install libpci-dev libudev-dev ruby-dev
+    sudo apt-get -y install libpci-dev libudev-dev 
+    install_ruby
+   # sudo apt-get install ruby2.0 ruby2.0-dev
+    
+
+}
+
+install_ruby() {
+    sudo apt-add-repository -y ppa:brightbox/ruby-ng
+    apt-get update
+    apt-get install -y ruby2.2 ruby2.2-dev
     sudo gem install -r aws-sdk-v1 plist
 }
 
@@ -60,22 +71,22 @@ pull_depot_tools() {
 	WORKING_DIR=`pwd`
 
     # Either clone or get latest depot tools
-	if [ ! -d "$DEPOT_TOOLS" ]
+	if [ ! -d "$DEPOTTOOLS" ]
 	then
 	    echo Make directory for gclient called Depot Tools
-	    mkdir -p $DEPOT_TOOLS
+	    mkdir -p $DEPOTTOOLS
 
 	    echo Pull the depo tools project from chromium source into the depot tools directory
-	    git clone https://chromium.googlesource.com/chromium/tools/depot_tools.git $DEPOT_TOOLS
+	    git clone https://chromium.googlesource.com/chromium/tools/depot_tools.git $DEPOTTOOLS
 
 	else
 		echo Change directory into the depot tools
-		cd $DEPOT_TOOLS
+		cd $DEPOTTOOLS
 
 		echo Pull the depot tools down to the latest
 		git pull
 	fi
-	PATH="$PATH:$DEPOT_TOOLS"
+	PATH="$PATH:$DEPOTTOOLS"
 
     # Navigate back
 	cd $WORKING_DIR

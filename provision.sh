@@ -4,5 +4,6 @@ echo "export JAVA_HOME=/usr/lib/jvm/java-7-openjdk-amd64" >> .bashrc
 source /vagrant/build.sh
 
 install_dependencies
+pull_depot_tools
 
 echo "source /vagrant/build.sh" >> /home/vagrant/.bashrc
