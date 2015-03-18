@@ -46,7 +46,7 @@ LOCAL_C_INCLUDES := \
 	$(LOCAL_PATH)/../external/twilio-jni \
 	$(pj_includes) \
 	$(twilio_signal_includes) \
-	$(LOCAL_PATH)/../thirdparty/webrtc-355/include
+	$(webrtc_includes)
 	
 
 
