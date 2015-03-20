@@ -1,5 +1,5 @@
 
-OPENSSL_LIBS := \
+#OPENSSL_LIBS := \
 	$(TWSDK_JNI_PATH)/../thirdparty/openssl-stock-android/lib/$(TARGET_ARCH_ABI)/libssl.a \
 	$(TWSDK_JNI_PATH)/../thirdparty/openssl-stock-android/lib/$(TARGET_ARCH_ABI)/libcrypto.a
 	

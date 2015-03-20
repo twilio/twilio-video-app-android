@@ -7,6 +7,7 @@ endif
 #Include build variables first
 include $(TWSDK_JNI_PATH)/build-variables.mk
 
+include $(TWSDK_JNI_PATH)/../thirdparty/openssl-stock-android/Android.mk
 include $(TWSDK_JNI_PATH)/../thirdparty/yb-pjproject/Android.mk
 include $(TWSDK_JNI_PATH)/../thirdparty/poco/Android.mk
 include $(TWSDK_JNI_PATH)/../external/twilio-jni/Android.mk
@@ -40,7 +41,7 @@ LOCAL_CPPFLAGS := -std=c++11 -fno-rtti
 
 pj_includes := $(addsuffix /include,$(addprefix $(LOCAL_PATH)/../yb-thirdparty/pjproject/,pjlib pjlib-util pjmedia pjnath pjsip))
 #webrtc_includes := $(LOCAL_PATH)/../yb-thirdparty/webrtc-355/include
-webrtc_includes := $(LOCAL_PATH)/../thirdparty/webrtc/build-android/prebuild/include/
+#webrtc_includes := $(LOCAL_PATH)/../thirdparty/webrtc/build-android/prebuild/include/
 twilio_signal_includes := $(TWSDK_JNI_PATH)/../external/TwilioCoreSDK/TwilioCoreSDK/Sources/Core
 
 LOCAL_C_INCLUDES := \
@@ -57,8 +58,7 @@ LOCAL_LDLIBS := \
 	-ldl \
 	-lGLESv2 \
 	-ljnigraphics \
-	-lOpenSLES \
-	$(OPENSSL_LIBS)#\
+	-lOpenSLES #\
 	$(WEBRTC_LDLIBS)# \
 	$(OPENSSL_LIBS)
 	
@@ -87,6 +87,8 @@ LOCAL_STATIC_LIBRARIES := \
 	speex \
 	pjlib-util \
 	pj \
+	openssl-crypto \
+	openssl \
 	twilio-jni
 
 include $(BUILD_SHARED_LIBRARY)
