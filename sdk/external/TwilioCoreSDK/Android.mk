@@ -7,10 +7,7 @@ include $(CLEAR_VARS)
 LOCAL_MODULE := SignalCoreSDK
 
 pj_includes := $(addsuffix /include,$(addprefix $(PROJECT_ROOT)/thirdparty/yb-pjproject/,pjlib pjlib-util pjmedia pjnath pjsip))
-webrtc_includes := $(PROJECT_ROOT)/thirdparty/webrtc-355/include
-openssl_includes := \
-	$(PROJECT_ROOT)/thirdparty/openssl-stock-android/include \
-	$(PROJECT_ROOT)/thirdparty/openssl-stock-android/include/openssl
+
 poco_includes := $(addsuffix /include,$(addprefix $(PROJECT_ROOT)/thirdparty/poco/POCO/,Foundation Net Util XML))
 
 pjproject_cppflags = \
@@ -101,11 +98,8 @@ LOCAL_CPPFLAGS := \
 
 LOCAL_C_INCLUDES := \
 	$(LOCAL_PATH) \
-	$(webrtc_includes) \
-	$(openssl_includes) \
 	$(poco_includes) \
 	$(pj_includes)
-	
 
 LOCAL_SRC_FILES := \
 	TSCAudioInputController.cpp \
@@ -163,6 +157,11 @@ LOCAL_SRC_FILES := \
 	TSCoreConstants.cpp \
 	TSCoreError.cpp \
 	TSCoreSDK.cpp
+	
+LOCAL_STATIC_LIBRARIES := \
+	webrtc \
+	openssl-crypto \
+	openssl
 
 
 include $(BUILD_STATIC_LIBRARY)

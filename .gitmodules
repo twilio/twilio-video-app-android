@@ -10,3 +10,6 @@
 [submodule "sdk/thirdparty/yb-pjproject"]
 	path = sdk/thirdparty/yb-pjproject
 	url = git@code.hq.twilio.com:client/yb-pjproject.git
+[submodule "sdk/thirdparty/webrtc"]
+	path = sdk/thirdparty/webrtc
+	url = git@code.hq.twilio.com:client/webrtc-build.git
