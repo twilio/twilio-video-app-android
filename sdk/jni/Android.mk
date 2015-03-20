@@ -10,6 +10,7 @@ include $(TWSDK_JNI_PATH)/build-variables.mk
 include $(TWSDK_JNI_PATH)/../thirdparty/yb-pjproject/Android.mk
 include $(TWSDK_JNI_PATH)/../thirdparty/poco/Android.mk
 include $(TWSDK_JNI_PATH)/../external/twilio-jni/Android.mk
+include $(TWSDK_JNI_PATH)/../thirdparty/webrtc/build-android/Android.mk
 include $(TWSDK_JNI_PATH)/../external/TwilioCoreSDK/Android.mk
 
 LOCAL_PATH := $(TWSDK_JNI_PATH)
@@ -45,7 +46,7 @@ twilio_signal_includes := $(TWSDK_JNI_PATH)/../external/TwilioCoreSDK/TwilioCore
 LOCAL_C_INCLUDES := \
 	$(LOCAL_PATH)/../external/twilio-jni \
 	$(pj_includes) \
-	$(twilio_signal_includes) \
+	$(twilio_signal_includes) #\
 	$(webrtc_includes)
 	
 
@@ -57,33 +58,16 @@ LOCAL_LDLIBS := \
 	-lGLESv2 \
 	-ljnigraphics \
 	-lOpenSLES \
+	$(OPENSSL_LIBS)#\
 	$(WEBRTC_LDLIBS)# \
 	$(OPENSSL_LIBS)
 	
 
 # pjmedia is in here twice because there's a circular dependency
 # between pjmedia and pjmedia-codec (the g711_init func)
-#LOCAL_STATIC_LIBRARIES := \
-	pjsua-lib \
-	pjmedia \
-	pjmedia-audiodev \
-	pjmedia-videodev \
-	pjmedia-codec \
-	pjmedia \
-	pjnath \
-	pjsip \
-	pjsip-simple \
-	pjsip-ua \
-	milenage \
-	resample \
-	speex \
-	srtp \
-	pjlib-util \
-	pj \
-	$(OPENSSL_STATIC_LIBS) \
-	twilio-jni
 LOCAL_STATIC_LIBRARIES := \
 	SignalCoreSDK \
+	webrtc \
 	poco-foundation \
 	poco-net \
 	poco-util \
