@@ -8,7 +8,7 @@ LOCAL_MODULE := SignalCoreSDK
 
 pj_includes := $(addsuffix /include,$(addprefix $(PROJECT_ROOT)/thirdparty/yb-pjproject/,pjlib pjlib-util pjmedia pjnath pjsip))
 
-poco_includes := $(addsuffix /include,$(addprefix $(PROJECT_ROOT)/thirdparty/poco/POCO/,Foundation Net Util XML))
+#poco_includes := $(addsuffix /include,$(addprefix $(PROJECT_ROOT)/thirdparty/poco/POCO/,Foundation Net Util XML))
 
 pjproject_cppflags = \
 	-DPJ_LINUX=1 \
@@ -161,7 +161,12 @@ LOCAL_SRC_FILES := \
 LOCAL_STATIC_LIBRARIES := \
 	webrtc \
 	openssl-crypto \
-	openssl
+	openssl \
+	poco-foundation \
+	poco-net \
+	poco-util \
+	poco-xml
+	
 
 
 include $(BUILD_STATIC_LIBRARY)
