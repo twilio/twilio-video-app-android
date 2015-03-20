@@ -32,21 +32,8 @@ LOCAL_CFLAGS := \
 	-fvisibility=hidden \
 	-DTW_EXPORT='__attribute__((visibility("default")))' \
 	$(debug_cflags)
-	#-DPJ_IS_BIG_ENDIAN=0 \
-	-DPJ_IS_LITTLE_ENDIAN=1 \
-	-DPJSIP_SIGNALLING_ONLY=1 \
 	
 LOCAL_CPPFLAGS := -std=c++11 -fno-rtti
-
-#pj_includes := $(addsuffix /include,$(addprefix $(LOCAL_PATH)/../yb-thirdparty/pjproject/,pjlib pjlib-util pjmedia pjnath pjsip))
-
-#twilio_signal_includes := $(TWSDK_JNI_PATH)/../external/TwilioCoreSDK/TwilioCoreSDK/Sources/Core
-
-LOCAL_C_INCLUDES := #\
-	$(LOCAL_PATH)/../external/twilio-jni #\
-	$(twilio_signal_includes)
-	
-
 
 LOCAL_LDLIBS := \
 	-llog \
