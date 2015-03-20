@@ -6,11 +6,11 @@ include $(CLEAR_VARS)
 
 LOCAL_MODULE := SignalCoreSDK
 
-pj_includes := $(addsuffix /include,$(addprefix $(PROJECT_ROOT)/thirdparty/yb-pjproject/,pjlib pjlib-util pjmedia pjnath pjsip))
+#pj_includes := $(addsuffix /include,$(addprefix $(PROJECT_ROOT)/thirdparty/yb-pjproject/,pjlib pjlib-util pjmedia pjnath pjsip))
 
 #poco_includes := $(addsuffix /include,$(addprefix $(PROJECT_ROOT)/thirdparty/poco/POCO/,Foundation Net Util XML))
 
-pjproject_cppflags = \
+#pjproject_cppflags = \
 	-DPJ_LINUX=1 \
 	-DPJ_ANDROID=1 \
 	-DPJ_HAS_ANDROID_API_LEVEL_H=1 \
@@ -90,17 +90,16 @@ pjproject_cppflags = \
 
 
 LOCAL_CFLAGS := \
-	-DPOSIX=1 \
+	-DPOSIX=1 #\
 	$(pjproject_cppflags)
 
 LOCAL_CPPFLAGS := \
 	 -std=c++11
 
 LOCAL_C_INCLUDES := \
-	$(LOCAL_PATH) \
-	$(poco_includes) \
-	$(pj_includes)
-
+	$(LOCAL_PATH)
+LOCAL_EXPORT_C_INCLUDES := $(LOCAL_PATH)
+	
 LOCAL_SRC_FILES := \
 	TSCAudioInputController.cpp \
 	TSCAudioInputControllerImpl.cpp \
@@ -165,7 +164,22 @@ LOCAL_STATIC_LIBRARIES := \
 	poco-foundation \
 	poco-net \
 	poco-util \
-	poco-xml
+	poco-xml \
+	pjsua-lib \
+	pjmedia \
+	pjmedia-audiodev \
+	pjmedia-videodev \
+	pjmedia-codec \
+	pjmedia \
+	pjnath \
+	pjsip \
+	pjsip-simple \
+	pjsip-ua \
+	milenage \
+	resample \
+	speex \
+	pjlib-util \
+	pjlib
 	
 
 

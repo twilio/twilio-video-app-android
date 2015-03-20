@@ -37,13 +37,12 @@ LOCAL_CFLAGS := \
 	$(debug_cflags)
 LOCAL_CPPFLAGS := -std=c++11 -fno-rtti
 
-pj_includes := $(addsuffix /include,$(addprefix $(LOCAL_PATH)/../yb-thirdparty/pjproject/,pjlib pjlib-util pjmedia pjnath pjsip))
+#pj_includes := $(addsuffix /include,$(addprefix $(LOCAL_PATH)/../yb-thirdparty/pjproject/,pjlib pjlib-util pjmedia pjnath pjsip))
 
-twilio_signal_includes := $(TWSDK_JNI_PATH)/../external/TwilioCoreSDK/TwilioCoreSDK/Sources/Core
+#twilio_signal_includes := $(TWSDK_JNI_PATH)/../external/TwilioCoreSDK/TwilioCoreSDK/Sources/Core
 
 LOCAL_C_INCLUDES := \
-	$(LOCAL_PATH)/../external/twilio-jni \
-	$(pj_includes) \
+	$(LOCAL_PATH)/../external/twilio-jni #\
 	$(twilio_signal_includes)
 	
 
@@ -79,7 +78,7 @@ LOCAL_STATIC_LIBRARIES := \
 	resample \
 	speex \
 	pjlib-util \
-	pj \
+	pjlib \
 	openssl-crypto \
 	openssl \
 	twilio-jni
