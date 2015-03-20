@@ -4,9 +4,7 @@ ifneq ($(ENABLE_PROFILING),)
 include $(TWSDK_JNI_PATH)/../thirdparty/android-ndk-profiler/jni/Android.mk
 endif
 
-#Include build variables first
-include $(TWSDK_JNI_PATH)/build-variables.mk
-
+#Include all libraries
 include $(TWSDK_JNI_PATH)/../thirdparty/openssl-stock-android/Android.mk
 include $(TWSDK_JNI_PATH)/../thirdparty/yb-pjproject/Android.mk
 include $(TWSDK_JNI_PATH)/../thirdparty/poco/Android.mk
@@ -40,15 +38,13 @@ LOCAL_CFLAGS := \
 LOCAL_CPPFLAGS := -std=c++11 -fno-rtti
 
 pj_includes := $(addsuffix /include,$(addprefix $(LOCAL_PATH)/../yb-thirdparty/pjproject/,pjlib pjlib-util pjmedia pjnath pjsip))
-#webrtc_includes := $(LOCAL_PATH)/../yb-thirdparty/webrtc-355/include
-#webrtc_includes := $(LOCAL_PATH)/../thirdparty/webrtc/build-android/prebuild/include/
+
 twilio_signal_includes := $(TWSDK_JNI_PATH)/../external/TwilioCoreSDK/TwilioCoreSDK/Sources/Core
 
 LOCAL_C_INCLUDES := \
 	$(LOCAL_PATH)/../external/twilio-jni \
 	$(pj_includes) \
-	$(twilio_signal_includes) #\
-	$(webrtc_includes)
+	$(twilio_signal_includes)
 	
 
 
@@ -58,10 +54,7 @@ LOCAL_LDLIBS := \
 	-ldl \
 	-lGLESv2 \
 	-ljnigraphics \
-	-lOpenSLES #\
-	$(WEBRTC_LDLIBS)# \
-	$(OPENSSL_LIBS)
-	
+	-lOpenSLES 
 
 # pjmedia is in here twice because there's a circular dependency
 # between pjmedia and pjmedia-codec (the g711_init func)
