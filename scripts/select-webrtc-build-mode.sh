@@ -5,7 +5,8 @@ pushd "$BASE_DIR"/.. >/dev/null
 
 # TODO:
 MAIN_PROJECT_DIR=`pwd`
-SCRIPT_DIR="$MAIN_PROJECT_DIR"/sdk/thirdparty/webrtc/build-android/scripts
+#SCRIPT_DIR="$MAIN_PROJECT_DIR"/sdk/thirdparty/webrtc/build-android/scripts
+SCRIPT_DIR="$MAIN_PROJECT_DIR"/sdk/external/signal-sdk-core/SDKs/WebRTC/build-android/scripts
 
 if [ "$1" == "local" ]; then
     "$SCRIPT_DIR"/build-webrtc.sh $2
