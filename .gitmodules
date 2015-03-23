@@ -13,3 +13,6 @@
 [submodule "sdk/thirdparty/webrtc"]
 	path = sdk/thirdparty/webrtc
 	url = git@code.hq.twilio.com:client/webrtc-build.git
+[submodule "sdk/external/signal-sdk-core"]
+	path = sdk/external/signal-sdk-core
+	url = git@code.hq.twilio.com:client/signal-sdk-core.git
