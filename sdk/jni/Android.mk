@@ -5,12 +5,20 @@ include $(TWSDK_JNI_PATH)/../thirdparty/android-ndk-profiler/jni/Android.mk
 endif
 
 #Include all libraries
+#include $(TWSDK_JNI_PATH)/../thirdparty/openssl-stock-android/Android.mk
+#include $(TWSDK_JNI_PATH)/../thirdparty/yb-pjproject/Android.mk
+#include $(TWSDK_JNI_PATH)/../thirdparty/poco/Android.mk
+#include $(TWSDK_JNI_PATH)/../external/twilio-jni/Android.mk
+#include $(TWSDK_JNI_PATH)/../thirdparty/webrtc/build-android/Android.mk
+#include $(TWSDK_JNI_PATH)/../external/TwilioCoreSDK/Android.mk
+
 include $(TWSDK_JNI_PATH)/../thirdparty/openssl-stock-android/Android.mk
-include $(TWSDK_JNI_PATH)/../thirdparty/yb-pjproject/Android.mk
-include $(TWSDK_JNI_PATH)/../thirdparty/poco/Android.mk
+include $(TWSDK_JNI_PATH)/../external/signal-sdk-core/SDKs/PJSIP/Android.mk
+include $(TWSDK_JNI_PATH)/../external/signal-sdk-core/SDKs/POCO/Android.mk
+include $(TWSDK_JNI_PATH)/../external/signal-sdk-core/SDKs/WebRTC/build-android/Android.mk
+include $(TWSDK_JNI_PATH)/../external/signal-sdk-core/TwilioCoreSDK/Android.mk
 include $(TWSDK_JNI_PATH)/../external/twilio-jni/Android.mk
-include $(TWSDK_JNI_PATH)/../thirdparty/webrtc/build-android/Android.mk
-include $(TWSDK_JNI_PATH)/../external/TwilioCoreSDK/Android.mk
+
 
 LOCAL_PATH := $(TWSDK_JNI_PATH)
 include $(CLEAR_VARS)
