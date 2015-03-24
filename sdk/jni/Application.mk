@@ -1,5 +1,5 @@
 NDK_TOOLCHAIN_VERSION := 4.8
-#NDK_TOOLCHAIN_VARSION := clang
+#NDK_TOOLCHAIN_VERSION := clang
 APP_PLATFORM := android-9
 APP_STL := stlport_static
 #APP_ABI := armeabi armeabi-v7a x86 mips
