@@ -62,7 +62,7 @@ function main {
     #setup_examples
     #pull_helper_lib
     #pull_server_code
-    #archive
+    archive
 
 }
 
@@ -128,29 +128,29 @@ function build_library {
     tarname="${SDK_NAME_STEM}"
 
     # save intermediates for later debugging
-    #linkname="${tarname}_INTERMEDIATES"
-    #ln -sfn obj "${linkname}"
-    #tar --version 2>&1 | grep -q GNU && follow_opt="h" || follow_opt="H"
-    #tar c${follow_opt}vjf "${buildroot}/${linkname}.tar.bz2" "${linkname}"
-    #rm "${linkname}"
+    linkname="${tarname}_INTERMEDIATES"
+    ln -sfn obj "${linkname}"
+    tar --version 2>&1 | grep -q GNU && follow_opt="h" || follow_opt="H"
+    tar c${follow_opt}vjf "${buildroot}/${linkname}.tar.bz2" "${linkname}"
+    rm "${linkname}"
 
     # move intermediates archive to folder
-    #intermediates="${buildroot}/intermediates"
-    #mkdir ${intermediates}
-    #mv "${buildroot}/${linkname}.tar.bz2" "${intermediates}/${linkname}.tar.bz2"
+    intermediates="${buildroot}/intermediates"
+    mkdir ${intermediates}
+    mv "${buildroot}/${linkname}.tar.bz2" "${intermediates}/${linkname}.tar.bz2"
 
-    #tarroot="${buildroot}/${tarname}"
-    #mkdir "${tarroot}"
+    tarroot="${buildroot}/${tarname}"
+    mkdir "${tarroot}"
 
     # jar and native libs
-    #mkdir "${tarroot}/libs"
-    #cp "${twsdkroot}/sdk/bin/classes.jar" "${tarroot}/libs/${tarname}.jar"
-    #abis=$(sed -ne '/^APP_ABI/s/^APP_ABI :=//p' ${twsdkroot}/sdk/jni/Application.mk)
-    #for abi in $abis; do
-    #if [ -d "${twsdkroot}/sdk/libs/${abi}" ]; then
-    #cp -PR "${twsdkroot}/sdk/libs/${abi}" "${tarroot}/libs"
-    #fi
-    #done
+    mkdir "${tarroot}/libs"
+    cp "${twsdkroot}/sdk/bin/classes.jar" "${tarroot}/libs/${tarname}.jar"
+    abis=$(sed -ne '/^APP_ABI/s/^APP_ABI :=//p' ${twsdkroot}/sdk/jni/Application.mk)
+    for abi in $abis; do
+    if [ -d "${twsdkroot}/sdk/libs/${abi}" ]; then
+    cp -PR "${twsdkroot}/sdk/libs/${abi}" "${tarroot}/libs"
+    fi
+    done
 
 }
 

@@ -2,6 +2,7 @@ sdk/local.properties
 sdk/libs
 sdk/obj
 sdk/gen
+output
 
 TestCore/bin
 TestCore/gen
