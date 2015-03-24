@@ -10,6 +10,7 @@ public class Test {
 	
 	private native String initCore();
 	private native boolean isCoreInitialized();
+	private native boolean login();
 	
 	private static Test instance;
 	
@@ -30,5 +31,9 @@ public class Test {
 	
 	public boolean isSignalCoreInitialized() {
 		return isCoreInitialized();
+	}
+	
+	public boolean loginUser() {
+		return login();
 	}
 }
