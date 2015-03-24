@@ -1,6 +1,8 @@
 sdk/local.properties
 sdk/libs
 sdk/obj
+sdk/gen
+
 TestCore/bin
 TestCore/gen
 .vagrant
