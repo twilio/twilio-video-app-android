@@ -1,40 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context="${relativePackage}.${activityClass}" >
+    android:id="@+id/RelativeLayout1"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent" >
 
-    <TextView
-        android:id="@+id/text1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/hello_world" />
+    <ImageButton
+        android:id="@+id/main_button"
+        android:layout_width="150dp"
+        android:layout_height="150dp"
+        android:layout_centerHorizontal="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="22dp"
+        android:background="#000"
+        android:padding="0dp"
+        android:gravity="center"
+        android:src="@drawable/idle"
+        android:scaleType="centerInside" />
+
+ 
     
-     <EditText 
+    <EditText
         android:id="@+id/client_name"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/text1"
-        android:layout_marginRight="10dp"
-        android:layout_marginLeft="20dp"
-        android:inputType="text"
-        android:hint="@string/client_name"/>
-    
-    
-    <Button 
-        android:id="@+id/load"
+        android:layout_centerVertical="@+id/register"
+        android:layout_below="@+id/main_button"
+        android:layout_marginTop="20dp"
+        android:ems="10"
+        android:hint="@string/client_name"
+        android:inputType="text" >
+
+        <requestFocus />
+    </EditText>
+
+    <Button
+        android:id="@+id/register"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_toRightOf="@+id/client_name"
-        android:layout_alignTop="@+id/client_name"
-        android:layout_below="@id/text1"
-        android:text="Load"/>
+        android:layout_centerVertical="@+id/main_button"
+        android:layout_below="@+id/client_name"
+        android:layout_marginRight="16dp"
+        android:layout_marginTop="30dp"
+        android:text="@string/register" />
+
     
-    <Button 
-        android:id="@+id/button2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/load"
-        android:text="Register"/>
 
 </RelativeLayout>
