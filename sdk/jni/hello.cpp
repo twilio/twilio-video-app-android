@@ -21,7 +21,7 @@ extern "C" {
 		TSCSDK* tscSdk = TSCSDK::instance();
 		if (tscSdk->isInitialized())
 		{
-			return JNI_FALSE;
+			return JNI_TRUE;
 		}
 		return JNI_FALSE;
 	}
