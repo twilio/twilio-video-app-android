@@ -1,11 +1,14 @@
 package com.twilio.signal.impl;
 
+import java.lang.ref.WeakReference;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
+
 import android.content.Context;
-import android.content.ServiceConnection;
 
 import com.twilio.signal.Endpoint;
 import com.twilio.signal.EndpointListener;
-import com.twilio.signal.Test;
 import com.twilio.signal.TwilioSignal;
 import com.twilio.signal.impl.logging.Logger;
 
@@ -14,6 +17,9 @@ public class TwilioSignalImpl
 	static final Logger logger = Logger.getLogger(TwilioSignal.class);
 
 	private static volatile TwilioSignalImpl instance;
+	protected Context context;
+	protected final Map<UUID, WeakReference<EndpointImpl>> endpoints = new HashMap<UUID, WeakReference<EndpointImpl>>();
+
 	
 	public static TwilioSignalImpl getInstance()
 	{
@@ -29,20 +35,12 @@ public class TwilioSignalImpl
 		return instance;
 	}
 	
-	// application context from which we can obtain system services
-	protected Context context;
-	private ServiceConnection serviceConn;
-
-	
-	TwilioSignalImpl()
-	{
-
-	}
+	TwilioSignalImpl() {}
 	
 	public void initialize(Context inContext, final TwilioSignal.InitListener inListener)
 	{
 		context = inContext;
-		Test test = Test.getInstance();
+		TwilioCore test = TwilioCore.getInstance();
 		if (!test.isSignalCoreInitialized()) {
 			test.initSignalCore();
 		} else {
@@ -52,7 +50,19 @@ public class TwilioSignalImpl
 
 	public Endpoint createEndpoint(String inCapabilityToken, EndpointListener inListener)
 	{
-		return null;
+		if (!TwilioCore.isSignalCoreInitialized())
+		{
+			logger.e("Twilio.createDevice() called without a successful call to Twilio.initialize()");
+			return null;
+		}
+
+		final EndpointImpl endpoint = new EndpointImpl(this, inCapabilityToken, inListener);
+		synchronized (endpoints)
+		{
+			endpoints.put(endpoint.getUuid(), new WeakReference<EndpointImpl>(endpoint));
+		}
+		
+		return endpoint;
 	}
 
 	public void setLogLevel(int level)
@@ -62,7 +72,7 @@ public class TwilioSignalImpl
 	}
 
 	public String getVersion() {
-		
-		return null;//Version.SDK_VERSION;
+		//TODO - Version.SDK_VERSION;
+		return null;
 	}
 }
