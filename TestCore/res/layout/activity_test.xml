@@ -9,10 +9,24 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/hello_world" />
+    
+     <EditText 
+        android:id="@+id/client_name"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/text1"
+        android:layout_marginRight="10dp"
+        android:layout_marginLeft="20dp"
+        android:inputType="text"
+        android:hint="@string/client_name"/>
+    
+    
     <Button 
-        android:id="@+id/button1"
+        android:id="@+id/load"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_toRightOf="@+id/client_name"
+        android:layout_alignTop="@+id/client_name"
         android:layout_below="@id/text1"
         android:text="Load"/>
     
@@ -20,7 +34,7 @@
         android:id="@+id/button2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/button1"
+        android:layout_below="@id/load"
         android:text="Register"/>
 
 </RelativeLayout>

@@ -1,6 +1,8 @@
 package com.twilio.signal;
 
 
+import com.twilio.signal.impl.TwilioSignalImpl;
+
 import android.content.Context;
 
 public class TwilioSignal {
@@ -44,6 +46,18 @@ public class TwilioSignal {
 	 */
 	public static void initialize(Context inContext,
 			TwilioSignal.InitListener inListener) {
+		if (inContext == null)
+		{
+			throw new IllegalArgumentException("Context cannot be null");
+		}
+		
+		if ( inListener == null )
+		{
+			throw new IllegalArgumentException("Listener cannot be null");
+		}
+		
+		TwilioSignalImpl.getInstance().initialize(inContext, inListener);
+
 
 	}
 
@@ -55,8 +69,7 @@ public class TwilioSignal {
 	public static void setLogLevel(int level) {
 
 	}
-	
-	
+		
 	/** 
 	 * Create and initialize a new Endpoint object.
 	 * 
@@ -67,6 +80,17 @@ public class TwilioSignal {
 	public static Endpoint createEndpoint(String inCapabilityToken, EndpointListener listener)
 	{
 		return null;
+	}
+	
+	
+	/**
+	 * Returns the version of the TwilioSignal SDK.
+	 * 
+	 *@return The version of the SDK.
+	 */
+	public static String getVersion()
+	{
+		return TwilioSignalImpl.getInstance().getVersion();
 	}
 
 

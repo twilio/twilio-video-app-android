@@ -11,43 +11,19 @@ import android.widget.Button;
 import android.widget.TextView;
 
 public class TestActivity extends Activity {
+	
+	SignalPhone phone;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_test);
-		Button button = (Button)findViewById(R.id.button1);
-		button.setOnClickListener(new View.OnClickListener() {
-			
+		Button button = (Button)findViewById(R.id.load);
+		phone = SignalPhone.getInstance(getApplicationContext());
+		button.setOnClickListener(new View.OnClickListener() {		
 			@Override
-			public void onClick(View v) {
-				TextView text1 = (TextView)findViewById(R.id.text1);
-				Test test = Test.getInstance();
-				if (!test.isSignalCoreInitialized()) {
-					text1.setText("Initializing");
-					test.initSignalCore();
-				} else {
-					text1.setText("IT WORKS !!!!!");
-				}
-				
-			}
-		});
-		
-		Button login = (Button)findViewById(R.id.button2);
-		button.setOnClickListener(new View.OnClickListener() {
-			
-			@Override
-			public void onClick(View v) {
-				TextView text1 = (TextView)findViewById(R.id.text1);
-				Test test = Test.getInstance();
-				if (!test.isSignalCoreInitialized()) {
-					text1.setText("Initializing");
-					test.initSignalCore();
-					test.loginUser();
-				} else {
-					text1.setText("IT WORKS !!!!!");
-				}
-				
+			public void onClick(View v) {		
+				TestActivity.this.phone.login("Kumkum");
 			}
 		});
 	}
