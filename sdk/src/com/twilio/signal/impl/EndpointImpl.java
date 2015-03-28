@@ -4,6 +4,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import android.app.PendingIntent;
+import android.content.Context;
 
 import com.twilio.signal.Capability;
 import com.twilio.signal.Conversation;
@@ -14,6 +15,10 @@ import com.twilio.signal.EndpointListener;
 public class EndpointImpl implements Endpoint{
 	
 	private final UUID uuid = UUID.randomUUID();
+	private SignalCore sigalCore;
+	private Context context;
+	private EndpointListener listener;
+	private native Endpoint createEndpoint();
 
 
 	public UUID getUuid() {
@@ -23,7 +28,9 @@ public class EndpointImpl implements Endpoint{
 
 	public EndpointImpl(TwilioSignalImpl twilioSignalImpl,
 			String inCapabilityToken, EndpointListener inListener) {
-		// TODO Auto-generated constructor stub
+		this.context = twilioSignalImpl.getContext();
+		this.listener = inListener;
+		this.sigalCore = SignalCore.getInstance();
 	}
 
 
@@ -42,14 +49,14 @@ public class EndpointImpl implements Endpoint{
 
 
 	@Override
-	public void listen() {
+	public void register() {
 		// TODO Auto-generated method stub
-		
+		SignalCore.getInstance().register();
 	}
 
 
 	@Override
-	public void unlisten() {
+	public void unregister() {
 		// TODO Auto-generated method stub
 		
 	}
@@ -123,6 +130,13 @@ public class EndpointImpl implements Endpoint{
 			Map<String, String> options, ConversationListener linstener) {
 		// TODO Auto-generated method stub
 		
+	}
+
+
+	@Override
+	public State getState() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

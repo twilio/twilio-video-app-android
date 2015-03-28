@@ -36,6 +36,7 @@ public class SignalPhone implements EndpointListener, ConversationListener
 
     // TODO: change this to point to the script on your public server
     private static final String AUTH_PHP_SCRIPT = "http://webrtc-phone.appspot.com/token?client=kumkum&realm=prod";
+    private Endpoint endpoint;
 
     public interface LoginListener
     {
@@ -122,6 +123,10 @@ public class SignalPhone implements EndpointListener, ConversationListener
                 {
                     twilioSdkInited = true;
                     twilioSdkInitInProgress = false;
+                    SignalPhone.this.endpoint = TwilioSignal.createEndpoint("", SignalPhone.this);
+                    if(SignalPhone.this.endpoint != null) {
+                    	SignalPhone.this.endpoint.register();
+                    }
                 }
 
                 @Override

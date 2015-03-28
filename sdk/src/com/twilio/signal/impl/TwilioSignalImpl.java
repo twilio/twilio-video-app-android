@@ -17,6 +17,7 @@ public class TwilioSignalImpl
 	static final Logger logger = Logger.getLogger(TwilioSignal.class);
 
 	private static volatile TwilioSignalImpl instance;
+	private SignalCore signalCore;
 	protected Context context;
 	protected final Map<UUID, WeakReference<EndpointImpl>> endpoints = new HashMap<UUID, WeakReference<EndpointImpl>>();
 
@@ -35,14 +36,27 @@ public class TwilioSignalImpl
 		return instance;
 	}
 	
+	public Context getContext() {
+		return context;
+	}
+
+	public static void setInstance(TwilioSignalImpl instance) {
+		TwilioSignalImpl.instance = instance;
+	}
+
 	TwilioSignalImpl() {}
 	
 	public void initialize(Context inContext, final TwilioSignal.InitListener inListener)
 	{
-		context = inContext;
-		TwilioCore test = TwilioCore.getInstance();
-		if (!test.isSignalCoreInitialized()) {
-			test.initSignalCore();
+		this.context = inContext;
+		this.signalCore = SignalCore.getInstance();
+		if (!signalCore.isSignalCoreInitialized()) {
+			boolean ret = signalCore.initSignalCore();
+			if(ret) {
+				inListener.onInitialized();
+			} else {
+				inListener.onError(null);
+			}
 		} else {
 			inListener.onInitialized();
 		}
@@ -50,13 +64,8 @@ public class TwilioSignalImpl
 
 	public Endpoint createEndpoint(String inCapabilityToken, EndpointListener inListener)
 	{
-		if (!TwilioCore.isSignalCoreInitialized())
-		{
-			logger.e("Twilio.createDevice() called without a successful call to Twilio.initialize()");
-			return null;
-		}
-
 		final EndpointImpl endpoint = new EndpointImpl(this, inCapabilityToken, inListener);
+		this.signalCore.createEndpoint();
 		synchronized (endpoints)
 		{
 			endpoints.put(endpoint.getUuid(), new WeakReference<EndpointImpl>(endpoint));

@@ -6,7 +6,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 
-public class TestActivity extends Activity {
+public class SignalPhoneActivity extends Activity {
 	
 	SignalPhone phone;
 	private EditText clientNameTextBox;
@@ -25,7 +25,7 @@ public class TestActivity extends Activity {
 		this.register.setOnClickListener(new View.OnClickListener() {		
 			@Override
 			public void onClick(View v) {		
-				TestActivity.this.phone.login(clientNameTextBox.getText().toString());
+				SignalPhoneActivity.this.phone.login(clientNameTextBox.getText().toString());
 			}
 		});
 	}

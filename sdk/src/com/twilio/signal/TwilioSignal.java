@@ -1,6 +1,5 @@
 package com.twilio.signal;
 
-
 import com.twilio.signal.impl.TwilioSignalImpl;
 
 import android.content.Context;
@@ -67,7 +66,7 @@ public class TwilioSignal {
 	 * @param level - The logging level
 	 */
 	public static void setLogLevel(int level) {
-
+		TwilioSignalImpl.getInstance().setLogLevel(level);
 	}
 		
 	/** 
@@ -79,7 +78,7 @@ public class TwilioSignal {
 	 */
 	public static Endpoint createEndpoint(String inCapabilityToken, EndpointListener listener)
 	{
-		return null;
+		return TwilioSignalImpl.getInstance().createEndpoint(inCapabilityToken, listener);
 	}
 	
 	
