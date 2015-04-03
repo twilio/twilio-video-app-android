@@ -12,12 +12,15 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 
 import org.apache.http.HttpResponse;
+import org.apache.http.auth.AuthScope;
+import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.conn.scheme.PlainSocketFactory;
 import org.apache.http.conn.scheme.Scheme;
 import org.apache.http.conn.scheme.SchemeRegistry;
 import org.apache.http.conn.ssl.SSLSocketFactory;
+import org.apache.http.impl.client.AbstractHttpClient;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.impl.conn.tsccm.ThreadSafeClientConnManager;
 import org.apache.http.params.BasicHttpParams;
@@ -50,6 +53,7 @@ public abstract class HttpHelper
 
         ThreadSafeClientConnManager connManager = new ThreadSafeClientConnManager(params, registry);
         httpClient = new DefaultHttpClient(connManager, params);
+        ((AbstractHttpClient) httpClient).getCredentialsProvider().setCredentials(new AuthScope(AuthScope.ANY_HOST,AuthScope.ANY_PORT),new UsernamePasswordCredentials("client","chunder"));
     }
 
     private static String stringFromInputStream(InputStream is) throws IOException

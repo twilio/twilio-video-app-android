@@ -31,7 +31,7 @@ JNIEXPORT jboolean JNICALL Java_com_twilio_signal_impl_SignalCore_isCoreInitiali
  * Signature: ()Z
  */
 JNIEXPORT jboolean JNICALL Java_com_twilio_signal_impl_SignalCore_login
-  (JNIEnv *, jobject);
+  (JNIEnv *, jobject, jobject);
 
 #ifdef __cplusplus
 }

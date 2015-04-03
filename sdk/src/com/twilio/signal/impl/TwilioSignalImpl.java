@@ -62,10 +62,10 @@ public class TwilioSignalImpl
 		}
 	}
 
-	public Endpoint createEndpoint(String inCapabilityToken, EndpointListener inListener)
+	public Endpoint createEndpoint(Map<String, String> options, String inCapabilityToken, EndpointListener inListener)
 	{
 		final EndpointImpl endpoint = new EndpointImpl(this, inCapabilityToken, inListener);
-		this.signalCore.createEndpoint();
+		this.signalCore.createEndpoint(options);
 		synchronized (endpoints)
 		{
 			endpoints.put(endpoint.getUuid(), new WeakReference<EndpointImpl>(endpoint));

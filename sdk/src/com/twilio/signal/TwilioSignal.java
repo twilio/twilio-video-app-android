@@ -1,5 +1,7 @@
 package com.twilio.signal;
 
+import java.util.Map;
+
 import com.twilio.signal.impl.TwilioSignalImpl;
 
 import android.content.Context;
@@ -76,9 +78,9 @@ public class TwilioSignal {
 	 *
 	 * @return The initialized Endpoint object, or null if the SDK was not initialized
 	 */
-	public static Endpoint createEndpoint(String inCapabilityToken, EndpointListener listener)
+	public static Endpoint createEndpointWithToken(Map<String, String> options, String inCapabilityToken, EndpointListener listener)
 	{
-		return TwilioSignalImpl.getInstance().createEndpoint(inCapabilityToken, listener);
+		return TwilioSignalImpl.getInstance().createEndpoint(options, inCapabilityToken, listener);
 	}
 	
 	

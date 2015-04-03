@@ -2,7 +2,6 @@ package com.twilio.signal;
 
 import java.util.Map;
 
-
 import android.app.PendingIntent;
 
 
@@ -182,7 +181,7 @@ public interface Endpoint {
 	 * @param linstener Callback Listener object for handling conversation related events.
 	 */
 	
-	public void createConversationWithRemoteEndpoint(String remoteEndpoint, Map<String, String> options, ConversationListener linstener);
+	public Conversation createConversation(String remoteEndpoint, Map<String, String> options, ConversationListener linstener);
 	
 	
 	/**

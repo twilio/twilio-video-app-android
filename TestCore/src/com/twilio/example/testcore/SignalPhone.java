@@ -7,18 +7,16 @@
 
 package com.twilio.example.testcore;
 
-import java.sql.Connection;
+import java.util.HashMap;
 import java.util.Map;
 
-import android.app.PendingIntent;
-import android.bluetooth.BluetoothClass.Device;
+import org.json.JSONObject;
+
 import android.content.Context;
-import android.content.Intent;
 import android.media.AudioManager;
 import android.os.AsyncTask;
 import android.util.Log;
 
-import com.twilio.signal.Capability;
 import com.twilio.signal.Conversation;
 import com.twilio.signal.ConversationListener;
 import com.twilio.signal.Endpoint;
@@ -28,6 +26,7 @@ import com.twilio.signal.RemoteEndpoint;
 import com.twilio.signal.Stream;
 import com.twilio.signal.Track.TrackId;
 import com.twilio.signal.TwilioSignal;
+import com.twilio.signal.impl.TwilioConstants;
 
 
 public class SignalPhone implements EndpointListener, ConversationListener
@@ -35,8 +34,16 @@ public class SignalPhone implements EndpointListener, ConversationListener
     private static final String TAG = "SIgnalPhone";
 
     // TODO: change this to point to the script on your public server
-    private static final String AUTH_PHP_SCRIPT = "http://webrtc-phone.appspot.com/token?client=kumkum&realm=prod";
-    private Endpoint endpoint;
+    private static final String AUTH_PHP_SCRIPT = "http://chunder-interactive.appspot.com/token?realm=prod&clientName=kumkum";
+    
+    private static final String ICE_TOKEN_URL_STRING = "http://client:chunder@chunder-interactive.appspot.com/iceToken?realm=prod";
+    private static final String CAPABILITY_TOKEN_URL_STRING = "http://client:chunder@chunder-interactive.appspot.com/token?realm=prod";
+
+    
+    private Endpoint alice;
+    private String token = "";
+    
+    private Map<String, String> options = new HashMap<String, String>();
 
     public interface LoginListener
     {
@@ -44,7 +51,7 @@ public class SignalPhone implements EndpointListener, ConversationListener
         public void onLoginFinished();
         public void onLoginError(Exception error);
     }
-
+    
     private static SignalPhone instance;
     public static final SignalPhone getInstance(Context context)
     {
@@ -72,30 +79,25 @@ public class SignalPhone implements EndpointListener, ConversationListener
         this.loginListener = loginListener;
     }
 
-    private void obtainCapabilityToken(String clientName, 
-    								  boolean allowOutgoing, 
-    								  boolean allowIncoming)
+    private void obtainCapabilityToken(String clientName)
     {
     	StringBuilder url = new StringBuilder();
-    	url.append(AUTH_PHP_SCRIPT);
-    	url.append("?allowOutgoing=").append(allowOutgoing);
-    	if (allowIncoming && (clientName != null)) {
-    		url.append("&&client=").append(clientName);
-    	}
+    	url.append(SignalPhone.CAPABILITY_TOKEN_URL_STRING);
+    	//url.append("?allowOutgoing=").append(allowOutgoing);
+    	//if (allowIncoming && (clientName != null)) {
+    	url.append("&&clientName=").append(clientName);
+    	//}
     	
         // This runs asynchronously!
     	new GetAuthTokenAsyncTask().execute(url.toString());
     }
-
-    private boolean isCapabilityTokenValid()
-    {
-       /* if (device == null || device.getCapabilities() == null)
-            return false;
-        long expTime = (Long)device.getCapabilities().get(Capability.EXPIRATION);
-        return expTime - System.currentTimeMillis() / 1000 > 0;
-        */
-    	return true;
-    }
+    
+	private void obtainIceToken() {
+		StringBuilder url = new StringBuilder();
+		url.append(SignalPhone.ICE_TOKEN_URL_STRING);
+		// This runs asynchronously!
+		new GetIceTokenAsyncTask().execute(url.toString());
+	}
 
     private void updateAudioRoute()
     {
@@ -115,33 +117,27 @@ public class SignalPhone implements EndpointListener, ConversationListener
             twilioSdkInitInProgress = true;
             TwilioSignal.setLogLevel(Log.DEBUG);
             String versionText = TwilioSignal.getVersion();
-           
-            TwilioSignal.initialize(context, new TwilioSignal.InitListener()
-            {
-                @Override
-                public void onInitialized()
-                {
-                    twilioSdkInited = true;
-                    twilioSdkInitInProgress = false;
-                    SignalPhone.this.endpoint = TwilioSignal.createEndpoint("", SignalPhone.this);
-                    if(SignalPhone.this.endpoint != null) {
-                    	SignalPhone.this.endpoint.register();
-                    }
-                }
+   
+			TwilioSignal.initialize(context, new TwilioSignal.InitListener() {
+				@Override
+				public void onInitialized() {
+					twilioSdkInited = true;
+					twilioSdkInitInProgress = false;
+					
+					obtainCapabilityToken(clientName);
+				}
 
-                @Override
-                public void onError(Exception error)
-                {
-                    twilioSdkInitInProgress = false;
-                    if (loginListener != null)
-                        loginListener.onLoginError(error);
-                }
-            });
-        } else {
-        	//TODO
-        }
-    }
-
+				@Override
+				public void onError(Exception error) {
+					twilioSdkInitInProgress = false;
+					if (loginListener != null)
+						loginListener.onLoginError(error);
+				}
+			});
+		} else {
+			// TODO
+		}
+	}
    
     public void setSpeakerEnabled(boolean speakerEnabled)
     {
@@ -177,6 +173,8 @@ public class SignalPhone implements EndpointListener, ConversationListener
 		@Override
 		protected void onPostExecute(String result) {
 			super.onPostExecute(result);
+			
+			obtainIceToken();
 			//BasicPhone.this.reallyLogin(result);
 		}
 
@@ -184,13 +182,50 @@ public class SignalPhone implements EndpointListener, ConversationListener
 		protected String doInBackground(String... params) {
 			String capabilityToken = null;
 			try {
-				capabilityToken = HttpHelper.httpGet(params[0]);;
+				capabilityToken = HttpHelper.httpGet(params[0]);
+				options.put(TwilioConstants.EndpointOptionCapabilityTokenKey, capabilityToken);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
 			return capabilityToken;
 		}
     }
+    
+    private class GetIceTokenAsyncTask extends AsyncTask<String, Void, String> {
+
+		@Override
+		protected void onPostExecute(String result) {
+			super.onPostExecute(result);
+			//BasicPhone.this.reallyLogin(result);
+			SignalPhone.this.alice = TwilioSignal.createEndpointWithToken(options, token,
+					SignalPhone.this);
+		}
+
+		@Override
+		protected String doInBackground(String... params) {
+			String capabilityToken = null;
+			try {
+				String response = HttpHelper.httpGet(params[0]).replace('[', ' ').replace(']', ' ');
+				String [] tempBuf = response.split(",",2);
+				JSONObject stunJson = new JSONObject(tempBuf[0]);
+				JSONObject turnJson = new JSONObject(tempBuf[1]);
+				String stunUrl = (String) stunJson.get("url");
+				String credential = (String) turnJson.get("credential");
+				String username = (String) turnJson.get("username");
+				String turnUrl = (String) turnJson.get("url");
+				
+				options.put(TwilioConstants.EndpointOptionStunURLKey, stunUrl);
+				options.put(TwilioConstants.EndpointOptionTurnURLKey, turnUrl);
+				options.put(TwilioConstants.EndpointOptionUserNameKey, username);
+				options.put(TwilioConstants.EndpointOptionPasswordKey, credential);
+				
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			return capabilityToken;
+		}
+    }
+
 
 
 	@Override

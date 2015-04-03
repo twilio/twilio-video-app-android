@@ -1,5 +1,7 @@
 package com.twilio.signal.impl;
 
+import java.util.Map;
+
 import android.annotation.SuppressLint;
 
 import com.twilio.signal.Endpoint;
@@ -15,7 +17,7 @@ public class SignalCore implements SignalCoreCallBacks {
 	private native boolean isCoreInitialized();
 	private native boolean setLogLevel();
 	private native void registerEndpoint(Endpoint endopoint);
-	private native boolean login();
+	private native boolean login(Map<String,String> options);
 	private static SignalCore instance;
 	
 	public static SignalCore getInstance() {
@@ -38,12 +40,13 @@ public class SignalCore implements SignalCoreCallBacks {
 		return isCoreInitialized();
 	}
 	
-	public Endpoint createEndpoint() {
+	public Endpoint createEndpoint(Map<String,String> options) {
+		login(options);
 		return null;
 	}
 	
 	public boolean register() {
-		login();
+		login(null);
 		return true;
 	}
 

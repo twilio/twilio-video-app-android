@@ -126,10 +126,10 @@ public class EndpointImpl implements Endpoint{
 
 
 	@Override
-	public void createConversationWithRemoteEndpoint(String remoteEndpoint,
+	public Conversation createConversation(String remoteEndpoint,
 			Map<String, String> options, ConversationListener linstener) {
 		// TODO Auto-generated method stub
-		
+		return null;
 	}
 
 
