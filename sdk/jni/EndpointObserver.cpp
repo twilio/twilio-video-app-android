@@ -1,54 +1,49 @@
-#include <android/log.h>
-#include "TSCoreSDKTypes.h"
-#include "TSCEndpoint.h"
-#include "TSCEndpointObserver.h"
-
+#include "EndpointObserver.h"
 #include "com_twilio_signal_impl_SignalCore.h"
-
 
 using namespace twiliosdk;
 
-
-class EndpointObserver: public TSCEndpointObserverObject
+EndpointObserver::EndpointObserver(JNIEnv* env, jobject config)
 {
-public:
-    EndpointObserver()
-    {};
-
-    virtual ~EndpointObserver()
-    {};
-
-protected:
-
-    void onRegistrationDidComplete(TSCErrorObject* error)
-    {
-		__android_log_print(ANDROID_LOG_VERBOSE, "JNI SIGNAL", "Received notification: onRegistrationDidComplete", 1);
-
-		/*jobject callbacks = tw_jni_fetch_object(env, mainUserAgent, "callbacks",
-							"Lcom/twilio/client/impl/useragent/config/UserAgentConfig$Callbacks;");
-
-		if (!callbacks) {
-			return;
-		}
-
-		jmethodID meth = tw_jni_get_method(env, callbacks, "onRegistrationState",
-						"(Lcom/twilio/client/impl/session/Account;Lcom/twilio/client/impl/session/Account$RegistrationInfo;)V");
-		if (!meth) {
-			return;
-		}
-
-		LOG_D(TAG, "Forwarding Registration status to JAVA");
-
-		jobject account = (jobject) pjsua_acc_get_user_data(acc_id);
-		jobject regInfo = tw_reg_info_wrap(env, info);
-		env->CallVoidMethod(callbacks, meth, account, regInfo);
-		*/
-
-    }
-
-    void onUnregistrationDidComplete(TSCErrorObject* error)
-    {
-    	__android_log_print(ANDROID_LOG_VERBOSE, "JNI SIGNAL", "onUnregistrationDidComplete", 1);
-    }
-
+	this->m_config = env->NewGlobalRef(config);
 };
+
+EndpointObserver::~EndpointObserver(){
+	assert(this->m_config == NULL);
+};
+
+void EndpointObserver::destroy(JNIEnv* env) {
+     env->DeleteGlobalRef(this->m_config);
+     this->m_config = NULL;
+   }
+
+void EndpointObserver::onRegistrationDidComplete(TSCErrorObject* error)
+{
+	__android_log_print(ANDROID_LOG_VERBOSE, "JNI SIGNAL", "Received notification: onRegistrationDidComplete", 1);
+
+	JNIEnvAttacher attacher;
+	JNIEnv *g_env = attacher.get();
+
+	jobject callbacks = tw_jni_fetch_object(g_env, m_config, "callbacks", "Lcom/twilio/signal/impl/SignalCoreConfig$Callbacks;");
+	jmethodID meth = tw_jni_get_method(g_env, callbacks, "onRegistrationComplete","()V");
+	g_env->CallVoidMethod(callbacks, meth);
+
+}
+
+void EndpointObserver::onUnregistrationDidComplete(TSCErrorObject* error)
+{
+	__android_log_print(ANDROID_LOG_VERBOSE, "JNI SIGNAL", "onUnregistrationDidComplete", 1);
+}
+
+void EndpointObserver::onStateDidChange(TSCEndpointState state) {
+	__android_log_print(ANDROID_LOG_VERBOSE, "JNI SIGNAL", "onStateDidChange", 1);
+}
+
+
+void EndpointObserver::onIncomingCallDidReceive(TSCIncomingSession* session) {
+	__android_log_print(ANDROID_LOG_VERBOSE, "JNI SIGNAL", "onIncomingCallDidReceive", 1);
+}
+
+
+
+

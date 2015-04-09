@@ -1,44 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-
     <string name="app_name">QuickStart</string>
-    <string name="hello_world">Hello world!</string>
-     <string name="logging_in">Logging in...</string>
-    <string name="outgoing_ok">Outgoing calls allowed</string>
-    <string name="incoming_ok">Incoming calls allowed</string>
-    <string name="no_outgoing_capability">Unable to make outgoing calls with current capabilities</string>
-    <string name="no_incoming_capability">Unable to make incoming calls with current capabilities</string>
-    <string name="login_error_fmt">Error logging in: %s</string>
-    <string name="login_error_unknown">Unknown error logging in</string>
-    <string name="attempting_to_connect">Attempting to connect</string>
-    <string name="connected">Connected</string>
-    <string name="disconnect_attempt">Attempting to disconnect</string>
-    <string name="disconnected">Disconnected</string>
-    <string name="couldnt_establish_outgoing">Couldn\'t establish outgoing call</string>
-    <string name="couldnt_establish_outgoing_fmt">Couldn\'t establish outgoing call: %s</string>
-    <string name="device_listening">Device is listening for incoming connections</string>
-    <string name="device_not_listening">Device is no longer listening for incoming connections</string>
-    <string name="device_listening_error_fmt">Device is no longer listening for incoming connections due to error: %s</string>
-    <string name="got_incoming">Received incoming connection</string>
-    <string name="incoming_disconnected">Pending incoming connection disconnected</string>
-    <string name="connection_error_fmt">Connection error: %s</string>
-    <string name="connection_error">Connection error</string>
-    <string name="incoming_call">Incoming Call</string>
-    <string name="incoming_call_message">You have a new incoming call. Answer it?</string>
-    <string name="answer">Answer</string>
-    <string name="ignore">Ignore</string>
-    <string name="speaker_off">Speakerphone off</string>
-    <string name="speaker_on">Speakerphone on</string>
-    <string name="speaker">Speaker</string>
-    <string name="mute">Mute</string>
-    <string name="register">Register</string>
-    <string name="incoming">Incoming</string>
-    <string name="outgoing">Outgoing</string>
     <string name="client_name">Client Name</string>
-    <string name="client_name_text">Client Name</string>
-    <string name="input_text">Text</string>
-    <string name="input_number">Number</string>
-    <string name="outgoing_client">BPOutgoingClient</string>
-    <string name="outgoing_number">+14151112233</string>
-
+    <string name="login">Log In</string>
+    <string name="logout">Log Out</string>
+     <string name="invite_participant">Invite Participant</string>
 </resources>

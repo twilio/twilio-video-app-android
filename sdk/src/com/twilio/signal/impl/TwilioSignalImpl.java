@@ -1,11 +1,14 @@
 package com.twilio.signal.impl;
 
 import java.lang.ref.WeakReference;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
 import android.content.Context;
+import android.provider.SyncStateContract.Constants;
 
 import com.twilio.signal.Endpoint;
 import com.twilio.signal.EndpointListener;
@@ -62,16 +65,26 @@ public class TwilioSignalImpl
 		}
 	}
 
-	public Endpoint createEndpoint(Map<String, String> options, String inCapabilityToken, EndpointListener inListener)
+	public EndpointImpl createEndpoint(Map<String, String> options, String inCapabilityToken, EndpointListener inListener)
 	{
-		final EndpointImpl endpoint = new EndpointImpl(this, inCapabilityToken, inListener);
-		this.signalCore.createEndpoint(options);
-		synchronized (endpoints)
-		{
-			endpoints.put(endpoint.getUuid(), new WeakReference<EndpointImpl>(endpoint));
+		if(options != null) {
+			String authToken = options.get(TwilioConstants.EndpointOptionCapabilityTokenKey);
+			String sURL = options.get(TwilioConstants.EndpointOptionStunURLKey);
+			String tURL = options.get(TwilioConstants.EndpointOptionTurnURLKey);
+			String userName = options.get(TwilioConstants.EndpointOptionUserNameKey);
+			String password = options.get(TwilioConstants.EndpointOptionPasswordKey);
+			
+			final List<CredentialInfo> credentialInfo = new ArrayList<CredentialInfo>(1);
+			credentialInfo.add(new CredentialInfo(authToken, sURL, tURL, userName, password, SignalCore.getInstance()));
+
+			final EndpointImpl endpoint  = this.signalCore.createEndpoint(credentialInfo, inListener);
+			synchronized (endpoints)
+			{
+				endpoints.put(endpoint.getUuid(), new WeakReference<EndpointImpl>(endpoint));
+			}
+			return endpoint;
 		}
-		
-		return endpoint;
+		return null;
 	}
 
 	public void setLogLevel(int level)

@@ -2,8 +2,8 @@
 #include <jni.h>
 /* Header for class com_twilio_signal_impl_TwilioCore */
 
-#ifndef _Included_com_twilio_signal_impl_TwilioCore
-#define _Included_com_twilio_signal_impl_TwilioCore
+#ifndef _Included_com_twilio_signal_impl_SignalCore
+#define _Included_com_twilio_signal_impl_SignalCore
 
 
 #ifdef __cplusplus
@@ -28,10 +28,19 @@ JNIEXPORT jboolean JNICALL Java_com_twilio_signal_impl_SignalCore_isCoreInitiali
 /*
  * Class:     com_twilio_signal_impl_TwilioCore
  * Method:    login
- * Signature: ()Z
+ * Signature: ([Lcom/twilio/signal/impl/CredentialInfo;Lcom/twilio/signal/impl/SignalCoreConfig;)Z
  */
 JNIEXPORT jboolean JNICALL Java_com_twilio_signal_impl_SignalCore_login
-  (JNIEnv *, jobject, jobject);
+  (JNIEnv *, jobject, jobjectArray, jobject);
+
+
+/*
+ * Class:     com_twilio_signal_impl_TwilioCore
+ * Method:    logout
+ * Signature: (Ljava/lang/String;)Z
+ */
+JNIEXPORT jboolean JNICALL Java_com_twilio_signal_impl_SignalCore_logout
+  (JNIEnv *, jobject, jstring);
 
 #ifdef __cplusplus
 }

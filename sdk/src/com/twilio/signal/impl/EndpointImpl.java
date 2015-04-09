@@ -12,12 +12,14 @@ import com.twilio.signal.ConversationListener;
 import com.twilio.signal.Endpoint;
 import com.twilio.signal.EndpointListener;
 
-public class EndpointImpl implements Endpoint{
+public class EndpointImpl implements Endpoint, SignalCoreConfig.Callbacks{
 	
 	private final UUID uuid = UUID.randomUUID();
 	private SignalCore sigalCore;
 	private Context context;
 	private EndpointListener listener;
+	private String userName;
+	
 	private native Endpoint createEndpoint();
 
 
@@ -49,16 +51,14 @@ public class EndpointImpl implements Endpoint{
 
 
 	@Override
-	public void register() {
-		// TODO Auto-generated method stub
+	public void listen() {
 		SignalCore.getInstance().register();
 	}
 
 
 	@Override
-	public void unregister() {
-		// TODO Auto-generated method stub
-		
+	public void unlisten() {
+		SignalCore.getInstance().unregister(this.userName);	
 	}
 
 
@@ -139,4 +139,21 @@ public class EndpointImpl implements Endpoint{
 		return null;
 	}
 
+
+	@Override
+	public void onRegistrationComplete() {
+		if(this.listener != null) {
+		    this.listener.onEndpointStartListeningForInvites(this);
+		}
+	}
+
+	
+	public String getUserName() {
+		return userName;
+	}
+
+
+	public void setUserName(String userName) {
+		this.userName = userName;
+	}
 }

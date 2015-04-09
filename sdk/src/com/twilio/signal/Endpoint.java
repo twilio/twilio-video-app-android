@@ -61,15 +61,16 @@ public interface Endpoint {
 	 * Registers this Endpoint with a given token. Endpoint is ready to receive Conversation invite once it registers. 
 	 *
 	 */
-	public void register();
+	public void listen();
 	
 	/**
+	 * 
 	 * Stop listening for incoming Conversations.
 	 * 
 	 * Unregisters this Endpoint. Once this method is called Endpoint will not be able to receive any Conversation invite
 	 * until Endpoint registers again. {@link EndpointListener#onStopListening(Endpoint)} is called after unregistration completes.
 	 */
-	public void unregister();
+	public void unlisten();
 
 	
 	/**
