@@ -28,6 +28,13 @@ public class EndpointImpl implements Endpoint, SignalCoreConfig.Callbacks{
 	}
 
 
+	@Override
+	public int hashCode() {
+		// TODO Auto-generated method stub
+		return super.hashCode();
+	}
+
+
 	public EndpointImpl(TwilioSignalImpl twilioSignalImpl,
 			String inCapabilityToken, EndpointListener inListener) {
 		this.context = twilioSignalImpl.getContext();
@@ -58,7 +65,7 @@ public class EndpointImpl implements Endpoint, SignalCoreConfig.Callbacks{
 
 	@Override
 	public void unlisten() {
-		SignalCore.getInstance().unregister(this.userName);	
+		SignalCore.getInstance().unregister(this);	
 	}
 
 
@@ -155,5 +162,13 @@ public class EndpointImpl implements Endpoint, SignalCoreConfig.Callbacks{
 
 	public void setUserName(String userName) {
 		this.userName = userName;
+	}
+
+
+	@Override
+	public void onUnRegistrationComplete() {
+		if(this.listener != null) {
+		    this.listener.onEndpointStopListeningForInvites(this);
+		}
 	}
 }

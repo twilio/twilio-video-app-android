@@ -22,8 +22,8 @@ public class SignalCore {
 	private native boolean isCoreInitialized();
 	private native boolean setLogLevel();
 	private native void registerEndpoint(Endpoint endopoint);
-	private native boolean login(CredentialInfo[] creadInfo, SignalCoreConfig config);
-	private native boolean logout(String userName);
+	private native boolean login(CredentialInfo[] creadInfo, SignalCoreConfig config, Endpoint endpoint);
+	private native boolean logout(Endpoint endpoint);
 	
 	public static SignalCore getInstance() {
 		if (singleton == null) {
@@ -62,17 +62,17 @@ public class SignalCore {
 		endpoint.setUserName(credInfo.get(0).getUserName());
 		SignalCoreConfig signalCoreCfg = new SignalCoreConfig(endpoint);
 		
-		login(credInfoArray, signalCoreCfg);
+		login(credInfoArray, signalCoreCfg, endpoint);
 		return endpoint;
 	}
 	
 	public boolean register() {
-		login(null, null);
+		login(null, null, null);
 		return true;
 	}
 	
-	public boolean unregister(String userName) {
-		logout(userName);
+	public boolean unregister(Endpoint endpoint) {
+		logout(endpoint);
 		return true;
 	}
 	

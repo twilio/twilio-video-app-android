@@ -16,7 +16,7 @@ using namespace twiliosdk;
 
 static jobject mainSignalCore = NULL;
 static JavaVM * cachedJVM = NULL;
-static std::map<const char* , TSCEndpointObjectRef> endpoints;
+static std::map<jint , TSCEndpointObjectRef> endpoints;
 
 TSCSDK* tscSdk = NULL;
 
@@ -50,7 +50,7 @@ Java_com_twilio_signal_impl_SignalCore_isCoreInitialized(JNIEnv *env, jobject ob
 
 
 JNIEXPORT jboolean JNICALL
-Java_com_twilio_signal_impl_SignalCore_login(JNIEnv *env, jobject obj, jobjectArray credInfo, jobject config)
+Java_com_twilio_signal_impl_SignalCore_login(JNIEnv *env, jobject obj, jobjectArray credInfo, jobject config,jobject endpointObj)
 {
 	if(tscSdk != NULL) {
 
@@ -58,7 +58,6 @@ Java_com_twilio_signal_impl_SignalCore_login(JNIEnv *env, jobject obj, jobjectAr
 			LOG_W("SIGNAL", "Creating endpoint but no credentials specified");
 			return true;
 		 }
-		__android_log_print(ANDROID_LOG_VERBOSE, TAG, "tscSdk  initialized hashmap", 1);
 
 		jobject cred = env->GetObjectArrayElement(credInfo, 0);
 
@@ -89,7 +88,13 @@ Java_com_twilio_signal_impl_SignalCore_login(JNIEnv *env, jobject obj, jobjectAr
 			return JNI_FALSE;
 		}
 		LOG_D(TAG, "Log createEndPoint  succeeded");
-		endpoints.insert(std::make_pair(userNameStr, endpoint));
+		//endpoints.insert(std::make_pair(userNameStr, endpoint));
+		//register endpoint
+		jclass classToAdd = env->GetObjectClass(endpointObj);
+		jmethodID id = env->GetMethodID(classToAdd, "hashCode", "()I");
+		jint val = env->CallIntMethod(endpointObj, id);
+		endpoints[val] = endpoint;
+
 		endpoint->registerEndpoint();
 
 	}
@@ -98,20 +103,25 @@ Java_com_twilio_signal_impl_SignalCore_login(JNIEnv *env, jobject obj, jobjectAr
 
 
 JNIEXPORT jboolean JNICALL Java_com_twilio_signal_impl_SignalCore_logout
-  (JNIEnv *env, jobject obj, jstring userName) {
+  (JNIEnv *env, jobject obj, jobject endpointObj) {
 
-	__android_log_print(ANDROID_LOG_VERBOSE, TAG, "KUMKUMM ::::::::SignalCore.logout() called", 1);
+	__android_log_print(ANDROID_LOG_VERBOSE, TAG, "SignalCore.logout()", 1);
 
-	const char *nativeString = (env)->GetStringUTFChars(userName, 0);
+	jclass classToAdd = env->GetObjectClass(endpointObj);
+	jmethodID id = env->GetMethodID(classToAdd, "hashCode", "()I");
+	jint val = env->CallIntMethod(endpointObj, id);
 
-	TSCEndpointObjectRef endpoint = endpoints[nativeString];
+	TSCEndpointObjectRef endpoint = endpoints[val];
+
 	if(endpoint) {
-		__android_log_print(ANDROID_LOG_VERBOSE, TAG, "KUMKUMM ::::::::SignalCore.logout() endpoint found", 1);
+		__android_log_print(ANDROID_LOG_VERBOSE, TAG, "Unregistering Endpoint with hashCode %d", val, 1);
+		endpoint->unregisterEndpoint();
+		endpoints[val] = NULL;
 	} else
 	{
-		__android_log_print(ANDROID_LOG_VERBOSE, TAG, "KUMKUMM ::::::::SignalCore.logout() endpoint not found", 1);
+		__android_log_print(ANDROID_LOG_VERBOSE, TAG, "Endpoint not found", 1);
 	}
-	(env)->ReleaseStringUTFChars(userName, nativeString);
+
 
 	return JNI_TRUE;
 }

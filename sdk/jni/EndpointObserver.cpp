@@ -33,6 +33,13 @@ void EndpointObserver::onRegistrationDidComplete(TSCErrorObject* error)
 void EndpointObserver::onUnregistrationDidComplete(TSCErrorObject* error)
 {
 	__android_log_print(ANDROID_LOG_VERBOSE, "JNI SIGNAL", "onUnregistrationDidComplete", 1);
+	JNIEnvAttacher attacher;
+	JNIEnv *g_env = attacher.get();
+
+	jobject callbacks = tw_jni_fetch_object(g_env, m_config, "callbacks", "Lcom/twilio/signal/impl/SignalCoreConfig$Callbacks;");
+	jmethodID meth = tw_jni_get_method(g_env, callbacks, "onUnRegistrationComplete","()V");
+	g_env->CallVoidMethod(callbacks, meth);
+
 }
 
 void EndpointObserver::onStateDidChange(TSCEndpointState state) {

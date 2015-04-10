@@ -90,7 +90,6 @@ public class TwilioSignalImpl
 	public void setLogLevel(int level)
 	{
 		Logger.setLogLevel(level);
-		//TODO - set the lower layer loglevel
 	}
 
 	public String getVersion() {
