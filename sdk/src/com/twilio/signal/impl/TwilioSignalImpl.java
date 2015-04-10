@@ -92,8 +92,8 @@ public class TwilioSignalImpl
 		Logger.setLogLevel(level);
 	}
 
-	public String getVersion() {
-		//TODO - Version.SDK_VERSION;
-		return null;
+	public String getVersion() 
+	{
+		return "2.0";
 	}
 }
