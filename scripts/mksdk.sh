@@ -6,14 +6,18 @@ ANDROID_API=19
 
 # need to specify source files manually to avoid having TwilioClientService in there
 #JAVADOC_SOURCE_FILES="
-#    Connection.java
-#    ConnectionListener.java
-#    Device.java
-#    DeviceListener.java
-#    PresenceEvent.java
-#    Twilio.java"
+#    Conversation.java
+#    ConversationListener.java
+#    Endpoint.java
+#   EndpointListener.java
+#    Invite.java
+#    RemoteEndpoint.java
+#	Stream.java
+#	StreamListener.java
+#	Track.java
+#	TwilioSignal.java"
 #TWILIO_HOWTOS="
-#    BasicPhone"
+#    QuickStart"
 #TWILIO_HELPER_LIBS="
 #    twilio-java:java
 #    twilio-php:php

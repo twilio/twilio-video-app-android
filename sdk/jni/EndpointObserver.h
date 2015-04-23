@@ -1,0 +1,37 @@
+//
+//  TSCEndpointObserver.h
+//  Twilio Signal Android SDK
+//
+
+#include <twilio-jni/twilio-jni.h>
+#include <string.h>
+#include <jni.h>
+#include <android/log.h>
+#include "TSCoreSDK.h"
+#include "TSCoreSDKTypes.h"
+#include "TSCEndpoint.h"
+#include "TSCEndpointObserver.h"
+
+
+using namespace twiliosdk;
+
+#define TAG  "SignalCore(native)"
+
+class EndpointObserver: public TSCEndpointObserverObject
+{
+public:
+    EndpointObserver(JNIEnv* env, jobject config);
+    virtual ~EndpointObserver();
+    void destroy(JNIEnv* env);
+
+protected:
+    virtual void onRegistrationDidComplete(TSCErrorObject* error);
+    virtual void onUnregistrationDidComplete(TSCErrorObject* error);
+    virtual void onStateDidChange(TSCEndpointState state);
+    virtual void onIncomingCallDidReceive(TSCIncomingSession* session);
+
+
+private:
+    jobject m_config;
+};
+

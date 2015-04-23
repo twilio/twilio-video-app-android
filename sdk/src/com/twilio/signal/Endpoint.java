@@ -17,6 +17,24 @@ import android.app.PendingIntent;
 
 public interface Endpoint {
 	
+	
+	/** 
+	 * The Endpoint.State enum represents the various states of the endpoint's ability to listen for incoming connections and make outgoing connections. 
+	 * 
+	 * @see Endpoint#getState()
+	 */ 
+	public enum State
+	{
+		/** The endpoint is created */
+		INITIALIZED,
+		REGISTERING,
+		REGISTERED,
+		REGISTRATION_FAILED,
+		UNREGISTERING,
+		UnREGISTERED,
+		UNREGISTRATION_FAILED
+	};
+	
 	/**
 	 * Constructs a new Endpoint from a token string.
 	 * 
@@ -46,6 +64,7 @@ public interface Endpoint {
 	public void listen();
 	
 	/**
+	 * 
 	 * Stop listening for incoming Conversations.
 	 * 
 	 * Unregisters this Endpoint. Once this method is called Endpoint will not be able to receive any Conversation invite
@@ -163,7 +182,15 @@ public interface Endpoint {
 	 * @param linstener Callback Listener object for handling conversation related events.
 	 */
 	
-	public void createConversationWithRemoteEndpoint(String remoteEndpoint, Map<String, String> options, ConversationListener linstener);
+	public Conversation createConversation(String remoteEndpoint, Map<String, String> options, ConversationListener linstener);
 	
+	
+	/**
+	 * Retrieves the current state of the Endpoint.
+	 * 
+	 * 
+	 * @see State
+	 */
+	public Endpoint.State getState();
 
 }

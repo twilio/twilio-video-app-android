@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-
-    <string name="app_name">TestCore</string>
-    <string name="hello_world">Hello world!</string>
-
+    <string name="app_name">QuickStart</string>
+    <string name="client_name">Client Name</string>
+    <string name="login">Log In</string>
+    <string name="logout">Log Out</string>
+     <string name="invite_participant">Invite Participant</string>
 </resources>
