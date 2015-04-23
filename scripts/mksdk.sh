@@ -2,7 +2,7 @@
 
 set -ex
 
-ANDROID_API=9
+ANDROID_API=19
 
 # need to specify source files manually to avoid having TwilioClientService in there
 #JAVADOC_SOURCE_FILES="
@@ -29,6 +29,8 @@ function main {
     elif [ "${mydir:0:1}" != "/" ]; then
         mydir="$(pwd)/${mydir}"
     fi
+
+    twsdkroot=${mydir}/..
 
     . ${mydir}/functions.sh
 
@@ -92,9 +94,18 @@ function check_tools {
     #fi
 }
 
-function build_library {
+function generate_version_file {
+    if [ -z "${TS_CORE_SDK_BUILD_NUMBER}" ]; then
+        TS_CORE_SDK_BUILD_NUMBER="0"
+    fi
+    signalcoreroot="${twsdkroot}"/sdk/external/signal-sdk-core
+    TSC_VERSION_DEFINE="TSC_CORE_SDK_VERSION"
+    TSC_VERSION_FILE="${signalcoreroot}"/TwilioCoreSDK/TwilioCoreSDK/Sources/Core/TSCVersion.h
 
-    twsdkroot=${mydir}/..
+    "${signalcoreroot}"/Scripts/mk-version-header.sh -d "${TSC_VERSION_DEFINE}" -f "${TSC_VERSION_FILE}" -v "${TS_CORE_SDK_VERSION}" -b "${TS_CORE_SDK_BUILD_NUMBER}"
+}
+
+function build_library {
 
     # check our submodules, make sure fetched and up-to-date
     pushd "${twsdkroot}"
@@ -114,6 +125,7 @@ function build_library {
 
     new_sdk_version="$(get_sdk_version ${target})"
     ./mk-version-class.sh ${new_sdk_version}
+    generate_version_file
 
     # force the requested build type since ndk-build will otherwise look at AndroidManifest
     [ "$target" = "release" ] && ndk_build_opts="NDK_DEBUG=0" || ndk_build_opts="NDK_DEBUG=1"
