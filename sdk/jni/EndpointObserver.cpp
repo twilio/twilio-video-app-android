@@ -13,13 +13,16 @@ EndpointObserver::~EndpointObserver(){
 };
 
 void EndpointObserver::destroy(JNIEnv* env) {
+
+	__android_log_print(ANDROID_LOG_VERBOSE, "JNI SIGNAL", "EndpointObserver::destroy() called", 1);
+
      env->DeleteGlobalRef(this->m_config);
      this->m_config = NULL;
    }
 
 void EndpointObserver::onRegistrationDidComplete(TSCErrorObject* error)
 {
-	__android_log_print(ANDROID_LOG_VERBOSE, "JNI SIGNAL", "Received notification: onRegistrationDidComplete", 1);
+	__android_log_print(ANDROID_LOG_VERBOSE, "JNI SIGNAL", "Received notification:onRegistrationDidComplete", 1);
 
 	JNIEnvAttacher attacher;
 	JNIEnv *g_env = attacher.get();
@@ -32,7 +35,7 @@ void EndpointObserver::onRegistrationDidComplete(TSCErrorObject* error)
 
 void EndpointObserver::onUnregistrationDidComplete(TSCErrorObject* error)
 {
-	__android_log_print(ANDROID_LOG_VERBOSE, "JNI SIGNAL", "onUnregistrationDidComplete", 1);
+	__android_log_print(ANDROID_LOG_VERBOSE, "JNI SIGNAL", "Received notification:onUnregistrationDidComplete", 1);
 	JNIEnvAttacher attacher;
 	JNIEnv *g_env = attacher.get();
 
@@ -43,12 +46,12 @@ void EndpointObserver::onUnregistrationDidComplete(TSCErrorObject* error)
 }
 
 void EndpointObserver::onStateDidChange(TSCEndpointState state) {
-	__android_log_print(ANDROID_LOG_VERBOSE, "JNI SIGNAL", "onStateDidChange", 1);
+	__android_log_print(ANDROID_LOG_VERBOSE, "JNI SIGNAL", "Received notification:onStateDidChange", 1);
 }
 
 
 void EndpointObserver::onIncomingCallDidReceive(TSCIncomingSession* session) {
-	__android_log_print(ANDROID_LOG_VERBOSE, "JNI SIGNAL", "onIncomingCallDidReceive", 1);
+	__android_log_print(ANDROID_LOG_VERBOSE, "JNI SIGNAL", "Received notification:onIncomingCallDidReceive", 1);
 }
 
 

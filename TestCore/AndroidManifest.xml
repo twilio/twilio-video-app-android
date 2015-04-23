@@ -25,9 +25,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".ConversationActivity"></activity>
-        
-        
-        <service android:name="com.twilio.client.TwilioClientService" android:exported="false"/>
+        <service android:name="com.twilio.signal.TwilioSignalService" android:exported="false"/>
     </application>
 </manifest>

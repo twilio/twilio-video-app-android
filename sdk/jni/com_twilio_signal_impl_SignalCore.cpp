@@ -17,6 +17,8 @@ using namespace twiliosdk;
 static jobject mainSignalCore = NULL;
 static JavaVM * cachedJVM = NULL;
 static std::map<jint , TSCEndpointObjectRef> endpoints;
+static EndpointObserver* eObserver;
+jlong eObserverPointer;
 
 TSCSDK* tscSdk = NULL;
 
@@ -54,6 +56,8 @@ Java_com_twilio_signal_impl_SignalCore_login(JNIEnv *env, jobject obj, jobjectAr
 {
 	if(tscSdk != NULL) {
 
+		__android_log_print(ANDROID_LOG_VERBOSE, TAG, "SignalCore.login()", 1);
+
 		if (!credInfo) {
 			LOG_W("SIGNAL", "Creating endpoint but no credentials specified");
 			return true;
@@ -80,15 +84,20 @@ Java_com_twilio_signal_impl_SignalCore_login(JNIEnv *env, jobject obj, jobjectAr
 		coreOptions.insert(std::make_pair("turn-url", turlStr));
 		coreOptions.insert(std::make_pair("user-name", userNameStr));
 
+		eObserver = new EndpointObserver(env, config);
+		eObserverPointer = (jlong)eObserver;
 
-		TSCEndpointObjectRef endpoint = tscSdk->createEndpoint(coreOptions, TSCEndpointObserverObjectRef(new EndpointObserver(env, config)));
+		TSCEndpointObserverObjectRef eObserverRef = TSCEndpointObserverObjectRef(eObserver);
+
+		__android_log_print(ANDROID_LOG_VERBOSE, TAG, "eObserverPointer = %p", &eObserver, 1);
+		__android_log_print(ANDROID_LOG_VERBOSE, TAG, "eObserverRef = %p", &eObserverRef, 1);
+		TSCEndpointObjectRef endpoint = tscSdk->createEndpoint(coreOptions, eObserverRef);
 
 		if(endpoint == NULL) {
 			LOG_W(TAG, "createEndPoint  failed");
 			return JNI_FALSE;
 		}
 		LOG_D(TAG, "Log createEndPoint  succeeded");
-		//endpoints.insert(std::make_pair(userNameStr, endpoint));
 		//register endpoint
 		jclass classToAdd = env->GetObjectClass(endpointObj);
 		jmethodID id = env->GetMethodID(classToAdd, "hashCode", "()I");

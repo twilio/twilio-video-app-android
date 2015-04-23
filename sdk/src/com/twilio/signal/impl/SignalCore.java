@@ -76,4 +76,14 @@ public class SignalCore {
 		return true;
 	}
 	
+	
+	public void onNetworkChanged() {
+		// TODO Auto-generated method stub
+		
+	}
+	public static void destroy() {
+		// TODO Auto-generated method stub
+		
+	}
+	
 }
