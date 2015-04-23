@@ -28,6 +28,15 @@ debug_cflags := \
 	-DENABLE_JNI_DEBUG_LOGGING
 endif
 
+#This exists due to bug in ndk in resolving circular dependencies. Techincally we should just name module
+#in LOCAL_STATIC_LIBRARIES, however ndk doesn't respect order of the module named.
+OPENSSL_LIBS := \
+	$(TWSDK_JNI_PATH)/../thirdparty/openssl-stock-android/lib/$(TARGET_ARCH_ABI)/libssl.a \
+	$(TWSDK_JNI_PATH)/../thirdparty/openssl-stock-android/lib/$(TARGET_ARCH_ABI)/libcrypto.a
+
+OPUS_LIB := \
+	$(TWSDK_JNI_PATH)/../external/signal-sdk-core/SDKs/WebRTC/build-android/prebuild/libs/$(TARGET_ARCH_ABI)/libopus.a
+
 LOCAL_CFLAGS := \
 	-Wall \
 	-DPOSIX \
@@ -37,9 +46,14 @@ LOCAL_CFLAGS := \
 	
 LOCAL_CPPFLAGS := -std=c++11 -fno-rtti
 
+#Putting openssl libs and opus libs like this will give the warning, but as of today
+#I can't find better way to resolve circular dependency (it is broken in ndk). 
 LOCAL_LDLIBS := \
+	$(OPENSSL_LIBS) \
+	$(OPUS_LIB) \
 	-llog \
 	-lz \
+    -lm \
 	-ldl \
 	-lGLESv2 \
 	-ljnigraphics \
@@ -61,16 +75,17 @@ LOCAL_STATIC_LIBRARIES := \
 	pjmedia-codec \
 	pjmedia \
 	pjnath \
+	pjsip-ua \
 	pjsip \
 	pjsip-simple \
-	pjsip-ua \
 	milenage \
 	resample \
 	speex \
 	pjlib-util \
 	pjlib \
-	openssl-crypto \
-	openssl \
 	twilio-jni
+	
+	
+	
 
 include $(BUILD_SHARED_LIBRARY)
