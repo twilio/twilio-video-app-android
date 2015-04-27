@@ -11,6 +11,7 @@
 #include "TSCoreSDKTypes.h"
 #include "TSCEndpoint.h"
 #include "TSCEndpointObserver.h"
+#include "TSCIncomingSession.h"
 
 
 using namespace twiliosdk;

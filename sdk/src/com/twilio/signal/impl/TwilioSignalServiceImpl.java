@@ -186,11 +186,6 @@ public class TwilioSignalServiceImpl
 		signalCore.onNetworkChanged();
 	}
 
-	public Exception getCallManagerError()
-	{
-		return callManagerError;
-	}
-
 	public SignalCore getSignalCore() {
 		return this.signalCore;
 	}

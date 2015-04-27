@@ -3,6 +3,8 @@ package com.twilio.signal.impl;
 import java.util.List;
 
 import android.annotation.SuppressLint;
+import android.os.Handler;
+import android.os.Looper;
 
 import com.twilio.signal.Endpoint;
 import com.twilio.signal.EndpointListener;
@@ -17,6 +19,7 @@ public class SignalCore {
 	private static final Object singletonLock = new Object();
 	private static SignalCore singleton;
 	private SignalCoreConfig.Callbacks callbacks;
+	private Object callCommandHandler;
 	
 	private native boolean initCore();
 	private native boolean isCoreInitialized();
@@ -30,6 +33,7 @@ public class SignalCore {
 			synchronized (singletonLock) {
 				if (singleton == null) {
 					singleton = new SignalCore();
+					singleton.initSignalCore();
 				}
 			}
 		}	
@@ -62,7 +66,12 @@ public class SignalCore {
 		endpoint.setUserName(credInfo.get(0).getUserName());
 		SignalCoreConfig signalCoreCfg = new SignalCoreConfig(endpoint);
 		
-		login(credInfoArray, signalCoreCfg, endpoint);
+		//login(credInfoArray, signalCoreCfg, endpoint);
+		
+		if (this.callCommandHandler == null) {
+			this.callCommandHandler = new CallCommandHandlerImpl(credInfoArray, signalCoreCfg, endpoint);
+		}
+		
 		return endpoint;
 	}
 	
@@ -85,5 +94,62 @@ public class SignalCore {
 		// TODO Auto-generated method stub
 		
 	}
+	
+	
+	class CallCommandHandlerImpl extends Thread implements CallCommandHandler {
+		
+
+		Handler callHandler = null;
+		Looper looper = null;
+		CredentialInfo[] credInfoArray;
+		SignalCoreConfig signalCoreCfg;
+		Endpoint endpoint;
+		
+
+		public CallCommandHandlerImpl(CredentialInfo[] credInfo,SignalCoreConfig config, Endpoint endpoint) {
+			// just call start immediately
+			this.credInfoArray = credInfo;
+			this.signalCoreCfg = config;
+			this.endpoint = endpoint;
+			this.start();
+		}
+
+		public void postCommand(Runnable command) {
+			if (callHandler != null) {
+				callHandler.post(command);
+			}
+		}
+
+		public void run() {
+			try {
+				login(credInfoArray, signalCoreCfg, endpoint);
+				Looper.prepare(); // bind to this thread
+				looper = Looper.myLooper();
+
+				callHandler = new Handler(); // bind the handler to the looper for
+												// this thread
+
+				Looper.loop(); // run until we're shut down
+			} catch (Throwable t) {
+				
+			} finally {
+				
+			}
+		}
+
+		public void destroy() {
+			if (looper != null)
+				looper.quit();
+
+			this.interrupt(); // TODO: is this necessary?
+		}
+	}
+	
+	
+	interface CallCommandHandler {
+		public void destroy();
+	}
+	
+	
 	
 }

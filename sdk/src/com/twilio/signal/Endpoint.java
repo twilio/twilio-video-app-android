@@ -17,7 +17,11 @@ import android.app.PendingIntent;
 
 public interface Endpoint {
 	
-	
+	/**
+	 * Key into an Intent's extras data that points to a {@link EndpointImpl} object.
+	 */
+	public static final String EXTRA_DEVICE = "com.twilio.signal.EndpointImpl";
+
 	/** 
 	 * The Endpoint.State enum represents the various states of the endpoint's ability to listen for incoming connections and make outgoing connections. 
 	 * 

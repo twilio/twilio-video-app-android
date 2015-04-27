@@ -6,6 +6,7 @@ public class SignalCoreConfig {
 	{
 		public void onRegistrationComplete();
 		public void onUnRegistrationComplete();
+		public void onIncomingCall();
 	}
 	
 	private Callbacks callbacks;	

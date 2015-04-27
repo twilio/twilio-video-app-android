@@ -5,4 +5,8 @@
     <string name="login">Log In</string>
     <string name="logout">Log Out</string>
      <string name="invite_participant">Invite Participant</string>
+     <string name="incoming_call_message">You have a new incoming call. Answer it?</string>
+    <string name="answer">Answer</string>
+    <string name="ignore">Ignore</string>
+    <string name="incoming_call">Incoming Call</string>
 </resources>
