@@ -196,5 +196,12 @@ public interface Endpoint {
 	 * @see State
 	 */
 	public Endpoint.State getState();
+	
+	/**
+	 * 
+	 * TODO:: remove later
+	 */
+	public void accept();
+	
 
 }

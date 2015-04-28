@@ -18,7 +18,15 @@ void EndpointObserver::destroy(JNIEnv* env) {
 
      env->DeleteGlobalRef(this->m_config);
      this->m_config = NULL;
-   }
+}
+
+
+void EndpointObserver::setEndpoint(TSCEndpointObjectRef endpointObj) {
+
+	this->endpoint = endpointObj;
+}
+
+
 
 void EndpointObserver::onRegistrationDidComplete(TSCErrorObject* error)
 {
@@ -29,6 +37,7 @@ void EndpointObserver::onRegistrationDidComplete(TSCErrorObject* error)
 
 	jobject callbacks = tw_jni_fetch_object(g_env, m_config, "callbacks", "Lcom/twilio/signal/impl/SignalCoreConfig$Callbacks;");
 	jmethodID meth = tw_jni_get_method(g_env, callbacks, "onRegistrationComplete","()V");
+	//jmethodID meth = tw_jni_get_method(g_env, callbacks, "onRegistrationComplete","(Lcom/twilio/signal/Endpoint;)V");
 	g_env->CallVoidMethod(callbacks, meth);
 
 }
@@ -41,6 +50,7 @@ void EndpointObserver::onUnregistrationDidComplete(TSCErrorObject* error)
 
 	jobject callbacks = tw_jni_fetch_object(g_env, m_config, "callbacks", "Lcom/twilio/signal/impl/SignalCoreConfig$Callbacks;");
 	jmethodID meth = tw_jni_get_method(g_env, callbacks, "onUnRegistrationComplete","()V");
+	//jmethodID meth = tw_jni_get_method(g_env, callbacks, "onUnRegistrationComplete","(Lcom/twilio/signal/Endpoint;)V");
 	g_env->CallVoidMethod(callbacks, meth);
 
 }
@@ -60,9 +70,22 @@ void EndpointObserver::onIncomingCallDidReceive(TSCIncomingSession* session) {
 
 	__android_log_print(ANDROID_LOG_VERBOSE, "JNI SIGNAL", "callbacks is not null notification:onIncomingCallDidReceive", 1);
 	jmethodID meth = tw_jni_get_method(g_env, callbacks, "onIncomingCall","()V");
+	//jmethodID meth = tw_jni_get_method(g_env, callbacks, "onIncomingCall","(Lcom/twilio/signal/Endpoint;)V");
+
+
 	__android_log_print(ANDROID_LOG_VERBOSE, "JNI SIGNAL", "meth is not null notification:onIncomingCallDidReceive", 1);
 
 	g_env->CallVoidMethod(callbacks, meth);
+
+	__android_log_print(ANDROID_LOG_VERBOSE, "JNI SIGNAL", "accepting the call", 1);
+
+
+	TSCIncomingSessionObjectRef incomingSession = dynamic_cast<TSCIncomingSessionObject*>(session);
+	this->endpoint.get()->accept(incomingSession);
+
+	//TSCIncomingSessionObjectRef sessionRef;
+	//sessionRef.reset(session);
+	//this->endpoint.get()->accept(TSCIncomingSessionObjectRef(session));
 }
 
 

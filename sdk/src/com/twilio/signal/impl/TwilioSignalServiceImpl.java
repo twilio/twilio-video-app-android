@@ -151,7 +151,7 @@ public class TwilioSignalServiceImpl
 
 		try
 		{
-			signalCore = SignalCore.getInstance();
+			signalCore = SignalCore.getInstance(context);
 		}
 		catch (Exception e)
 		{

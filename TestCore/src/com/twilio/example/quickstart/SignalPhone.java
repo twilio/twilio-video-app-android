@@ -155,9 +155,9 @@ public class SignalPhone implements EndpointListener
         
     }
 
-    public void acceptConnection()
+    public void accept()
     {
-       
+       this.alice.accept();
     }
 
     public void ignoreIncomingConnection()

@@ -24,6 +24,7 @@ public:
     EndpointObserver(JNIEnv* env, jobject config);
     virtual ~EndpointObserver();
     void destroy(JNIEnv* env);
+    void setEndpoint(TSCEndpointObjectRef endpoint);
 
 protected:
     virtual void onRegistrationDidComplete(TSCErrorObject* error);
@@ -34,5 +35,6 @@ protected:
 
 private:
     jobject m_config;
+    TSCEndpointObjectRef endpoint;
 };
 

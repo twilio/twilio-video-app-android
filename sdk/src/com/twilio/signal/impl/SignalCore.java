@@ -3,6 +3,7 @@ package com.twilio.signal.impl;
 import java.util.List;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.os.Handler;
 import android.os.Looper;
 
@@ -18,22 +19,22 @@ public class SignalCore {
 	
 	private static final Object singletonLock = new Object();
 	private static SignalCore singleton;
-	private SignalCoreConfig.Callbacks callbacks;
 	private Object callCommandHandler;
 	
-	private native boolean initCore();
+	private native boolean initCore(Context context);
 	private native boolean isCoreInitialized();
 	private native boolean setLogLevel();
 	private native void registerEndpoint(Endpoint endopoint);
 	private native boolean login(CredentialInfo[] creadInfo, SignalCoreConfig config, Endpoint endpoint);
 	private native boolean logout(Endpoint endpoint);
+	private native boolean acceptNative(Endpoint endpoint);
 	
-	public static SignalCore getInstance() {
+	public static SignalCore getInstance(Context context) {
 		if (singleton == null) {
 			synchronized (singletonLock) {
 				if (singleton == null) {
 					singleton = new SignalCore();
-					singleton.initSignalCore();
+					singleton.initSignalCore(context);
 				}
 			}
 		}	
@@ -45,8 +46,8 @@ public class SignalCore {
 	}
 	
 	@SuppressLint("NewApi")
-	public boolean initSignalCore() {
-		return initCore();
+	public boolean initSignalCore(Context context) {
+		return initCore(context);
 	}
 	
 	public boolean isSignalCoreInitialized() {
@@ -66,8 +67,6 @@ public class SignalCore {
 		endpoint.setUserName(credInfo.get(0).getUserName());
 		SignalCoreConfig signalCoreCfg = new SignalCoreConfig(endpoint);
 		
-		//login(credInfoArray, signalCoreCfg, endpoint);
-		
 		if (this.callCommandHandler == null) {
 			this.callCommandHandler = new CallCommandHandlerImpl(credInfoArray, signalCoreCfg, endpoint);
 		}
@@ -82,6 +81,11 @@ public class SignalCore {
 	
 	public boolean unregister(Endpoint endpoint) {
 		logout(endpoint);
+		return true;
+	}
+	
+	public boolean accept(Endpoint endpoint) {
+		acceptNative(endpoint);
 		return true;
 	}
 	

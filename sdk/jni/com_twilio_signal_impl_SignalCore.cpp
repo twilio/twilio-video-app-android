@@ -7,6 +7,8 @@
 #include "TSCoreSDKTypes.h"
 #include "TSCEndpoint.h"
 #include "EndpointObserver.h"
+#include "webrtc/video_engine/include/vie_base.h"
+#include "webrtc/voice_engine/include/voe_base.h"
 
 #include "com_twilio_signal_impl_SignalCore.h"
 
@@ -23,8 +25,10 @@ jlong eObserverPointer;
 TSCSDK* tscSdk = NULL;
 
 JNIEXPORT jstring JNICALL
-Java_com_twilio_signal_impl_SignalCore_initCore(JNIEnv *env, jobject obj)
+Java_com_twilio_signal_impl_SignalCore_initCore(JNIEnv *env, jobject obj, jobject context)
 {
+	bool failure = false;
+
 	if (mainSignalCore) {
 		LOG_W(TAG, "SignalCore.initCore() double-called");
 		__android_log_print(ANDROID_LOG_VERBOSE, TAG, "SignalCore.initCore() double-called", 1);
@@ -35,10 +39,55 @@ Java_com_twilio_signal_impl_SignalCore_initCore(JNIEnv *env, jobject obj)
 		tscSdk = TSCSDK::instance();
 		__android_log_print(ANDROID_LOG_VERBOSE, TAG, "SignalCore.initCore() called", 1);
 		LOG_W(TAG, "SignalCore.initCore() called");
+
+
+		//
+		//vp8_hw_acceleration_enabled = vp8_hw_acceleration;
+		//  if (!factory_static_initialized) {
+		//    if (initialize_video) {
+		     // failure |= webrtc::SetCaptureAndroidVM(cachedJVM, context);
+		     // failure |= webrtc::SetRenderAndroidVM(cachedJVM);
+		//    }
+		//    if (initialize_audio)
+		    failure |= webrtc::VoiceEngine::SetAndroidObjects(cachedJVM, env, context);
+		//    factory_static_initialized = true;
+		//  }
+		//  if (initialize_video)
+		 //   failure |= MediaCodecVideoDecoder::SetAndroidObjects(jni, render_egl_context);
+
+
+		//
 	}
 
 	return env->NewStringUTF("SignalCore initialized!");
 }
+
+
+
+
+/*initWebRTC(
+    JNIEnv* jni, jclass, jobject context,
+    jboolean initialize_audio, jboolean initialize_video,
+    jboolean vp8_hw_acceleration, jobject render_egl_context) {
+  CHECK(g_jvm) << "JNI_OnLoad failed to run?";
+  bool failure = false;
+  vp8_hw_acceleration_enabled = vp8_hw_acceleration;
+  if (!factory_static_initialized) {
+    if (initialize_video) {
+      failure |= webrtc::SetCaptureAndroidVM(g_jvm, context);
+      failure |= webrtc::SetRenderAndroidVM(g_jvm);
+    }
+    if (initialize_audio)
+      failure |= webrtc::VoiceEngine::SetAndroidObjects(g_jvm, jni, context);
+    factory_static_initialized = true;
+  }
+  if (initialize_video)
+    failure |= MediaCodecVideoDecoder::SetAndroidObjects(jni,
+        render_egl_context);
+  return !failure;
+}
+
+*/
 
 JNIEXPORT jboolean JNICALL
 Java_com_twilio_signal_impl_SignalCore_isCoreInitialized(JNIEnv *env, jobject obj)
@@ -93,6 +142,8 @@ Java_com_twilio_signal_impl_SignalCore_login(JNIEnv *env, jobject obj, jobjectAr
 		__android_log_print(ANDROID_LOG_VERBOSE, TAG, "eObserverRef = %p", &eObserverRef, 1);
 		TSCEndpointObjectRef endpoint = tscSdk->createEndpoint(coreOptions, eObserverRef);
 
+		eObserver->setEndpoint(endpoint);
+
 		if(endpoint == NULL) {
 			LOG_W(TAG, "createEndPoint  failed");
 			return JNI_FALSE;
@@ -135,3 +186,27 @@ JNIEXPORT jboolean JNICALL Java_com_twilio_signal_impl_SignalCore_logout
 	return JNI_TRUE;
 }
 
+
+JNIEXPORT jboolean JNICALL Java_com_twilio_signal_impl_SignalCore_acceptNative
+  (JNIEnv *env, jobject obj, jobject endpointObj) {
+
+	__android_log_print(ANDROID_LOG_VERBOSE, TAG, "SignalCore.acceptNative()", 1);
+
+	jclass classToAdd = env->GetObjectClass(endpointObj);
+	jmethodID id = env->GetMethodID(classToAdd, "hashCode", "()I");
+	jint val = env->CallIntMethod(endpointObj, id);
+
+	TSCEndpointObjectRef endpoint = endpoints[val];
+
+	if(endpoint) {
+		__android_log_print(ANDROID_LOG_VERBOSE, TAG, "acceptNative for Endpoint with hashCode %d", val, 1);
+		endpoint->unregisterEndpoint();
+		endpoints[val] = NULL;
+	} else
+	{
+		__android_log_print(ANDROID_LOG_VERBOSE, TAG, "Endpoint not found", 1);
+	}
+
+
+	return JNI_TRUE;
+}

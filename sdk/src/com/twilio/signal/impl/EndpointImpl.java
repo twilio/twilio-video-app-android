@@ -48,7 +48,7 @@ public class EndpointImpl implements Endpoint, SignalCoreConfig.Callbacks, Parce
 			String inCapabilityToken, EndpointListener inListener) {
 		this.context = twilioSignalImpl.getContext();
 		this.listener = inListener;
-		this.sigalCore = SignalCore.getInstance();
+		this.sigalCore = SignalCore.getInstance(this.context);
 	}
 
 
@@ -68,13 +68,13 @@ public class EndpointImpl implements Endpoint, SignalCoreConfig.Callbacks, Parce
 
 	@Override
 	public void listen() {
-		SignalCore.getInstance().register();
+		SignalCore.getInstance(this.context).register();
 	}
 
 
 	@Override
 	public void unlisten() {
-		SignalCore.getInstance().unregister(this);	
+		SignalCore.getInstance(this.context).unregister(this);	
 	}
 
 
@@ -230,4 +230,18 @@ public class EndpointImpl implements Endpoint, SignalCoreConfig.Callbacks, Parce
             throw new UnsupportedOperationException();
         }
     };
+
+
+	@Override
+	public void accept() {
+		SignalCore.getInstance(context).accept(this);			
+	}
+
+
+	@Override
+	public void onRegistrationComplete(Endpoint endpoint) {
+		if(this.listener != null) {
+		    this.listener.onEndpointStartListeningForInvites(this);
+		}
+	}
 }

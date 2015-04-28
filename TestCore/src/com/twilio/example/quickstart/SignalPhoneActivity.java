@@ -13,7 +13,6 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 
-import android.graphics.Point;
 
 import com.twilio.example.quickstart.SignalPhone.LoginListener;
 import com.twilio.signal.Endpoint;
@@ -155,7 +154,7 @@ public class SignalPhoneActivity extends Activity implements LoginListener {
 	                            @Override
 	                            public void onClick(DialogInterface dialog, int which)
 	                            {
-	                                phone.acceptConnection();
+	                                phone.accept();
 	                                incomingAlert = null;
 	                            }
 	                        })

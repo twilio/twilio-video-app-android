@@ -204,7 +204,7 @@ public class TwilioSignalImpl
 			String password = options.get(TwilioConstants.EndpointOptionPasswordKey);
 			
 			final List<CredentialInfo> credentialInfo = new ArrayList<CredentialInfo>(1);
-			credentialInfo.add(new CredentialInfo(authToken, sURL, tURL, userName, password, SignalCore.getInstance()));
+			credentialInfo.add(new CredentialInfo(authToken, sURL, tURL, userName, password, SignalCore.getInstance(this.context)));
 
 			final EndpointImpl endpoint  = this.signalCore.createEndpoint(credentialInfo, inListener);
 			synchronized (endpoints)
