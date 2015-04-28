@@ -10,10 +10,9 @@ public class SignalCoreConfig {
 		public void onUnRegistrationComplete(Endpoint endpoint);
 		public void onIncomingCall(Endpoint endpoint); */
 		
-		public void onRegistrationComplete(Endpoint endpoint);
-		public void onRegistrationComplete();
-		public void onUnRegistrationComplete();
-		public void onIncomingCall();
+		public void onRegistrationComplete(EndpointImpl endpoint);
+		public void onUnRegistrationComplete(EndpointImpl endpoint);
+		public void onIncomingCall(EndpointImpl endpoint);
 	}
 	
 	private Callbacks callbacks;	

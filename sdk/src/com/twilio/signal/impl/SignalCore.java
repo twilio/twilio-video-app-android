@@ -65,7 +65,8 @@ public class SignalCore {
 		
 		EndpointImpl endpoint = new EndpointImpl(TwilioSignalImpl.getInstance(), credInfo.get(0).getCapabilityToken(), inListener);
 		endpoint.setUserName(credInfo.get(0).getUserName());
-		SignalCoreConfig signalCoreCfg = new SignalCoreConfig(endpoint);
+		//SignalCoreConfig signalCoreCfg = new SignalCoreConfig(endpoint);
+		SignalCoreConfig signalCoreCfg = new SignalCoreConfig(CoreCallbackManager.getInstance());
 		
 		if (this.callCommandHandler == null) {
 			this.callCommandHandler = new CallCommandHandlerImpl(credInfoArray, signalCoreCfg, endpoint);

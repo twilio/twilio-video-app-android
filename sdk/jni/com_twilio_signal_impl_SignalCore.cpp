@@ -49,7 +49,7 @@ Java_com_twilio_signal_impl_SignalCore_initCore(JNIEnv *env, jobject obj, jobjec
 		     // failure |= webrtc::SetRenderAndroidVM(cachedJVM);
 		//    }
 		//    if (initialize_audio)
-		    failure |= webrtc::VoiceEngine::SetAndroidObjects(cachedJVM, env, context);
+		//    failure |= webrtc::VoiceEngine::SetAndroidObjects(cachedJVM, env, context);
 		//    factory_static_initialized = true;
 		//  }
 		//  if (initialize_video)
@@ -133,7 +133,7 @@ Java_com_twilio_signal_impl_SignalCore_login(JNIEnv *env, jobject obj, jobjectAr
 		coreOptions.insert(std::make_pair("turn-url", turlStr));
 		coreOptions.insert(std::make_pair("user-name", userNameStr));
 
-		eObserver = new EndpointObserver(env, config);
+		eObserver = new EndpointObserver(env, config, endpointObj);
 		eObserverPointer = (jlong)eObserver;
 
 		TSCEndpointObserverObjectRef eObserverRef = TSCEndpointObserverObjectRef(eObserver);

@@ -17,7 +17,7 @@ import com.twilio.signal.Endpoint;
 import com.twilio.signal.EndpointListener;
 import com.twilio.signal.impl.logging.Logger;
 
-public class EndpointImpl implements Endpoint, SignalCoreConfig.Callbacks, Parcelable{
+public class EndpointImpl implements Endpoint, Parcelable{
 	
 	static final Logger logger = Logger.getLogger(EndpointImpl.class);
 
@@ -154,13 +154,6 @@ public class EndpointImpl implements Endpoint, SignalCoreConfig.Callbacks, Parce
 	}
 
 
-	@Override
-	public void onRegistrationComplete() {
-		if(this.listener != null) {
-		    this.listener.onEndpointStartListeningForInvites(this);
-		}
-	}
-
 	
 	public String getUserName() {
 		return userName;
@@ -172,33 +165,7 @@ public class EndpointImpl implements Endpoint, SignalCoreConfig.Callbacks, Parce
 	}
 
 
-	@Override
-	public void onUnRegistrationComplete() {
-		if(this.listener != null) {
-		    this.listener.onEndpointStopListeningForInvites(this);
-		}
-	}
-
-
-	@Override
-	public void onIncomingCall() {
-		logger.d("Received Incoming notification");
-		if (incomingIntent != null) {
-			logger.d("Received Incoming notification, calling intent");
-			Intent intent = new Intent();
-			intent.putExtra(Endpoint.EXTRA_DEVICE, this);
-			if (intent.hasExtra(Endpoint.EXTRA_DEVICE)) {
-				logger.d("Received Incoming notification, calling intent has extra");
-			} else {
-				logger.d("Received Incoming notification, calling intent do not have extra");
-			}
-			try {
-				incomingIntent.send(context, 0, intent);
-			} catch (final CanceledException e) {
-
-			}
-		}
-	}
+	
 
 
 	@Override /* Parcelable */
@@ -238,10 +205,36 @@ public class EndpointImpl implements Endpoint, SignalCoreConfig.Callbacks, Parce
 	}
 
 
-	@Override
-	public void onRegistrationComplete(Endpoint endpoint) {
+	public void onRegistration() {
 		if(this.listener != null) {
 		    this.listener.onEndpointStartListeningForInvites(this);
 		}
 	}
+	
+
+	public void onUnRegistration() {
+		if(this.listener != null) {
+		    this.listener.onEndpointStopListeningForInvites(this);
+		}
+	}
+
+	public void onIncomingInvite() {
+		logger.d("Received Incoming notification");
+		if (incomingIntent != null) {
+			logger.d("Received Incoming notification, calling intent");
+			Intent intent = new Intent();
+			intent.putExtra(Endpoint.EXTRA_DEVICE, this);
+			if (intent.hasExtra(Endpoint.EXTRA_DEVICE)) {
+				logger.d("Received Incoming notification, calling intent has extra");
+			} else {
+				logger.d("Received Incoming notification, calling intent do not have extra");
+			}
+			try {
+				incomingIntent.send(context, 0, intent);
+			} catch (final CanceledException e) {
+
+			}
+		}
+	}
+	
 }

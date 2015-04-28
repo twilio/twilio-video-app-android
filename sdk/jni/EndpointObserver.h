@@ -21,7 +21,7 @@ using namespace twiliosdk;
 class EndpointObserver: public TSCEndpointObserverObject
 {
 public:
-    EndpointObserver(JNIEnv* env, jobject config);
+    EndpointObserver(JNIEnv* env, jobject config, jobject target);
     virtual ~EndpointObserver();
     void destroy(JNIEnv* env);
     void setEndpoint(TSCEndpointObjectRef endpoint);
@@ -36,5 +36,6 @@ protected:
 private:
     jobject m_config;
     TSCEndpointObjectRef endpoint;
+    jobject m_target;
 };
 
