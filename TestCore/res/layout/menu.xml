@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/menufrag"
+    android:layout_width="wrap_content"
+    android:layout_height="match_parent"
+    android:layout_gravity="center"
+    android:orientation="horizontal" >
+    
+	<ImageButton
+	    android:id="@+id/cameratoggleIB"
+	    android:background="@drawable/camera"
+	    android:layout_width="48dp"
+        android:layout_height="48dp"
+	    />
+	
+	<ImageButton
+	    android:id="@+id/videotoggleIB"
+	    android:background="@drawable/video"
+	    android:layout_width="48dp"
+        android:layout_height="48dp"
+	    />
+	
+	<ImageButton
+	    android:id="@+id/mutetoggleIB"
+	    android:background="@drawable/mute"
+	    android:layout_width="48dp"
+        android:layout_height="48dp"
+	    />
+	
+	<ImageButton
+	    android:id="@+id/hangupIB"
+	    android:background="@drawable/hangup"
+	    android:layout_width="48dp"
+        android:layout_height="48dp"
+	    />
+	    s
+</LinearLayout>

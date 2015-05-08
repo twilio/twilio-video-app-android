@@ -33,6 +33,7 @@ public class SignalPhoneActivity extends Activity implements LoginListener {
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
+		
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.login);
 		this.loginUser = (LinearLayout)findViewById(R.id.loginUser);	
@@ -44,7 +45,12 @@ public class SignalPhoneActivity extends Activity implements LoginListener {
 		this.login.setOnClickListener(new View.OnClickListener() {		
 			@Override
 			public void onClick(View v) {
-				new LoginAsyncTask().execute();
+//				new LoginAsyncTask().execute();
+				
+//				Intent intent = new Intent(v.getContext(), ConversationActivity.class);
+//				startActivity(intent);
+				showIncomingAlert(); 
+				
 			}
 		});
 		this.invite = (LinearLayout)findViewById(R.id.inviteParticipant);	
@@ -149,16 +155,18 @@ public class SignalPhoneActivity extends Activity implements LoginListener {
 	                    incomingAlert = new AlertDialog.Builder(SignalPhoneActivity.this)
 	                        .setTitle(R.string.incoming_call)
 	                        .setMessage(R.string.incoming_call_message)
-	                        .setPositiveButton(R.string.answer, new DialogInterface.OnClickListener()
+	                        .setPositiveButton(R.string.accept, new DialogInterface.OnClickListener()
 	                        {
 	                            @Override
 	                            public void onClick(DialogInterface dialog, int which)
 	                            {
-	                                phone.accept();
-	                                incomingAlert = null;
+//	                                phone.accept();
+//	                                incomingAlert = null;
+	                            	
+	                            	startActivity(new Intent(getBaseContext(), ConversationActivity.class));
 	                            }
 	                        })
-	                        .setNegativeButton(R.string.ignore, new DialogInterface.OnClickListener()
+	                        .setNegativeButton(R.string.reject, new DialogInterface.OnClickListener()
 	                        {
 	                            @Override
 	                            public void onClick(DialogInterface dialog, int which)

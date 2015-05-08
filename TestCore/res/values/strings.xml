@@ -1,12 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+
     <string name="app_name">QuickStart</string>
     <string name="client_name">Client Name</string>
     <string name="login">Log In</string>
     <string name="logout">Log Out</string>
-     <string name="invite_participant">Invite Participant</string>
-     <string name="incoming_call_message">You have a new incoming call. Answer it?</string>
-    <string name="answer">Answer</string>
-    <string name="ignore">Ignore</string>
+    <string name="invite_participant">Invite Participant</string>
+    <string name="incoming_call_message">You have a new incoming call. Answer it?</string>
+    <string name="accept">Accept</string>
+    <string name="reject">Reject</string>
     <string name="incoming_call">Incoming Call</string>
+    <string name="conversation">Conversation</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">Settings</string>
+
 </resources>
