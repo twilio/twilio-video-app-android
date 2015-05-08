@@ -151,7 +151,7 @@ public class TwilioSignalServiceImpl
 
 		try
 		{
-			signalCore = SignalCore.getInstance();
+			signalCore = SignalCore.getInstance(context);
 		}
 		catch (Exception e)
 		{
@@ -184,11 +184,6 @@ public class TwilioSignalServiceImpl
 	{
 		logger.i("Network change; doing reconnect");
 		signalCore.onNetworkChanged();
-	}
-
-	public Exception getCallManagerError()
-	{
-		return callManagerError;
 	}
 
 	public SignalCore getSignalCore() {

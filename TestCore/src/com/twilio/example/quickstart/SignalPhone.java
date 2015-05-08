@@ -12,8 +12,9 @@ import java.util.Map;
 
 import org.json.JSONObject;
 
-import android.app.ProgressDialog;
+import android.app.PendingIntent;
 import android.content.Context;
+import android.content.Intent;
 import android.media.AudioManager;
 import android.os.AsyncTask;
 import android.util.Log;
@@ -154,9 +155,9 @@ public class SignalPhone implements EndpointListener
         
     }
 
-    public void acceptConnection()
+    public void accept()
     {
-       
+       this.alice.accept();
     }
 
     public void ignoreIncomingConnection()
@@ -196,6 +197,9 @@ public class SignalPhone implements EndpointListener
 			}
 			SignalPhone.this.alice = TwilioSignal.createEndpointWithToken(
 					options, token, SignalPhone.this);
+			Intent intent = new Intent(context, SignalPhoneActivity.class);
+            PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+            alice.setIncomingIntent(pendingIntent);
 			/*} else {
 				SignalPhone.this.alice.listen();
 			}*/
@@ -266,7 +270,7 @@ public class SignalPhone implements EndpointListener
 
 	@Override
 	public void onReceivedConversationInvite(Invite invite) {
-		// TODO Auto-generated method stub
+		
 		
 	}
 

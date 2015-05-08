@@ -11,6 +11,7 @@
 #include "TSCoreSDKTypes.h"
 #include "TSCEndpoint.h"
 #include "TSCEndpointObserver.h"
+#include "TSCIncomingSession.h"
 
 
 using namespace twiliosdk;
@@ -20,9 +21,10 @@ using namespace twiliosdk;
 class EndpointObserver: public TSCEndpointObserverObject
 {
 public:
-    EndpointObserver(JNIEnv* env, jobject config);
+    EndpointObserver(JNIEnv* env, jobject config, jobject target);
     virtual ~EndpointObserver();
     void destroy(JNIEnv* env);
+    void setEndpoint(TSCEndpointObjectRef endpoint);
 
 protected:
     virtual void onRegistrationDidComplete(TSCErrorObject* error);
@@ -33,5 +35,7 @@ protected:
 
 private:
     jobject m_config;
+    TSCEndpointObjectRef endpoint;
+    jobject m_target;
 };
 

@@ -1,15 +1,21 @@
 package com.twilio.example.quickstart;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 
+
 import com.twilio.example.quickstart.SignalPhone.LoginListener;
+import com.twilio.signal.Endpoint;
 
 public class SignalPhoneActivity extends Activity implements LoginListener {
 	
@@ -21,6 +27,8 @@ public class SignalPhoneActivity extends Activity implements LoginListener {
 	private LinearLayout invite;
 	private LinearLayout loginUser;
 	private ProgressDialog progressDialog;
+	private static final Handler handler = new Handler();
+	private AlertDialog incomingAlert;
 
 
 	@Override
@@ -103,6 +111,15 @@ public class SignalPhoneActivity extends Activity implements LoginListener {
 		});
 	}
 	
+	@Override
+	public void onResume() {
+		super.onResume();
+		Intent intent = getIntent();
+		if(intent != null && getIntent().getParcelableExtra(Endpoint.EXTRA_DEVICE) != null) {
+			showIncomingAlert();
+		}
+	}
+	
 	private class LoginAsyncTask extends AsyncTask<String, Void, String> {
 		
 		@Override
@@ -119,4 +136,49 @@ public class SignalPhoneActivity extends Activity implements LoginListener {
 		}
 
 	}
+	
+	
+	 private void showIncomingAlert()
+	    {
+	        handler.post(new Runnable()
+	        {
+	            @Override
+	            public void run()
+	            {
+	                if (incomingAlert == null) {
+	                    incomingAlert = new AlertDialog.Builder(SignalPhoneActivity.this)
+	                        .setTitle(R.string.incoming_call)
+	                        .setMessage(R.string.incoming_call_message)
+	                        .setPositiveButton(R.string.answer, new DialogInterface.OnClickListener()
+	                        {
+	                            @Override
+	                            public void onClick(DialogInterface dialog, int which)
+	                            {
+	                                phone.accept();
+	                                incomingAlert = null;
+	                            }
+	                        })
+	                        .setNegativeButton(R.string.ignore, new DialogInterface.OnClickListener()
+	                        {
+	                            @Override
+	                            public void onClick(DialogInterface dialog, int which)
+	                            {
+	                                phone.ignoreIncomingConnection();
+	                                incomingAlert = null;
+	                            }
+	                        })
+	                        .setOnCancelListener(new DialogInterface.OnCancelListener()
+	                        {
+	                            @Override
+	                            public void onCancel(DialogInterface dialog)
+	                            {
+	                                phone.ignoreIncomingConnection();
+	                            }
+	                        })
+	                        .create();
+	                    incomingAlert.show();
+	                }
+	            }
+	        });
+	    }
 }

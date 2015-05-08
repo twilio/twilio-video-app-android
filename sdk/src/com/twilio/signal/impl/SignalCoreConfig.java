@@ -1,11 +1,18 @@
 package com.twilio.signal.impl;
 
+import com.twilio.signal.Endpoint;
+
 public class SignalCoreConfig {	
 	
 	public interface Callbacks
 	{
-		public void onRegistrationComplete();
-		public void onUnRegistrationComplete();
+		/*public void onRegistrationComplete(Endpoint endpoint);
+		public void onUnRegistrationComplete(Endpoint endpoint);
+		public void onIncomingCall(Endpoint endpoint); */
+		
+		public void onRegistrationComplete(EndpointImpl endpoint);
+		public void onUnRegistrationComplete(EndpointImpl endpoint);
+		public void onIncomingCall(EndpointImpl endpoint);
 	}
 	
 	private Callbacks callbacks;	

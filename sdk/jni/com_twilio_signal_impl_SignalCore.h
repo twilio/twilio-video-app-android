@@ -15,7 +15,7 @@ extern "C" {
  * Signature: ()Ljava/lang/String;
  */
 JNIEXPORT jstring JNICALL Java_com_twilio_signal_impl_SignalCore_initCore
-  (JNIEnv *, jobject);
+  (JNIEnv *, jobject, jobject);
 
 /*
  * Class:     com_twilio_signal_impl_TwilioCore
@@ -40,6 +40,15 @@ JNIEXPORT jboolean JNICALL Java_com_twilio_signal_impl_SignalCore_login
  * Signature: (Ljava/lang/String;)Z
  */
 JNIEXPORT jboolean JNICALL Java_com_twilio_signal_impl_SignalCore_logout
+  (JNIEnv *, jobject, jobject);
+
+
+/*
+ * Class:     com_twilio_signal_impl_TwilioCore
+ * Method:    accept
+ * Signature: (Ljava/lang/String;)Z
+ */
+JNIEXPORT jboolean JNICALL Java_com_twilio_signal_impl_SignalCore_acceptNative
   (JNIEnv *, jobject, jobject);
 
 #ifdef __cplusplus

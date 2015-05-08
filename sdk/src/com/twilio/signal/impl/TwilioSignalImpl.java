@@ -25,7 +25,7 @@ import com.twilio.signal.impl.logging.Logger;
 
 public class TwilioSignalImpl
 {
-	static final Logger logger = Logger.getLogger(TwilioSignal.class);
+	static final Logger logger = Logger.getLogger(TwilioSignalImpl.class);
 	
 	private static final String TWILIO_SIGNAL_SERVICE_NAME = "com.twilio.signal.TwilioSignalService";
 
@@ -149,18 +149,14 @@ public class TwilioSignalImpl
 				
 				// we must never die!
 				context.startService(service);
-				
 				twBinder = (TwilioBinder)binder;
 				signalCore = twBinder.getSignalCore();
 				if (signalCore != null)
 				{
 					inListener.onInitialized();
-				}
-				else
-				{
-					Exception error = twBinder.getError();
-					onServiceDisconnected(name);  // nulls out twBinder
-					inListener.onError(error);
+				} else {
+					onServiceDisconnected(name); 
+					inListener.onError(null);
 				}
 			}
 
@@ -183,7 +179,7 @@ public class TwilioSignalImpl
 			inListener.onError(new RuntimeException("Failed to start TwilioClientService.  Please ensure it is declared in AndroidManifest.xml"));
 		}
 	
-		this.context = inContext;
+		/*this.context = inContext;
 		this.signalCore = SignalCore.getInstance();
 		if (!signalCore.isSignalCoreInitialized()) {
 			boolean ret = signalCore.initSignalCore();
@@ -193,8 +189,8 @@ public class TwilioSignalImpl
 				inListener.onError(null);
 			}
 		} else {
-			inListener.onInitialized();
-		}
+			inListener.onInitialized(); 
+		}*/
 		
 	}
 
@@ -208,7 +204,7 @@ public class TwilioSignalImpl
 			String password = options.get(TwilioConstants.EndpointOptionPasswordKey);
 			
 			final List<CredentialInfo> credentialInfo = new ArrayList<CredentialInfo>(1);
-			credentialInfo.add(new CredentialInfo(authToken, sURL, tURL, userName, password, SignalCore.getInstance()));
+			credentialInfo.add(new CredentialInfo(authToken, sURL, tURL, userName, password, SignalCore.getInstance(this.context)));
 
 			final EndpointImpl endpoint  = this.signalCore.createEndpoint(credentialInfo, inListener);
 			synchronized (endpoints)
@@ -247,6 +243,24 @@ public class TwilioSignalImpl
 		
 		Intent intent = new Intent(context, TwilioSignalService.class);
 		context.startService(intent);
+	}
+	
+	
+	EndpointImpl findDeviceByUUID(UUID uuid)
+	{
+        synchronized (endpoints)
+        {
+        	WeakReference<EndpointImpl> deviceRef = endpoints.get(uuid);
+        	if (deviceRef != null) {
+        		EndpointImpl device = deviceRef.get();
+        		if (device != null)
+        			return device;
+        		else
+        			endpoints.remove(uuid);
+        	}
+        }
+        
+        return null;
 	}
 	
 	

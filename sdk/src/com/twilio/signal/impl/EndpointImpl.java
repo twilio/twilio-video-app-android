@@ -4,21 +4,31 @@ import java.util.Map;
 import java.util.UUID;
 
 import android.app.PendingIntent;
+import android.app.PendingIntent.CanceledException;
 import android.content.Context;
+import android.content.Intent;
+import android.os.Parcel;
+import android.os.Parcelable;
 
 import com.twilio.signal.Capability;
 import com.twilio.signal.Conversation;
 import com.twilio.signal.ConversationListener;
 import com.twilio.signal.Endpoint;
 import com.twilio.signal.EndpointListener;
+import com.twilio.signal.impl.logging.Logger;
 
-public class EndpointImpl implements Endpoint, SignalCoreConfig.Callbacks{
+public class EndpointImpl implements Endpoint, Parcelable{
+	
+	static final Logger logger = Logger.getLogger(EndpointImpl.class);
+
 	
 	private final UUID uuid = UUID.randomUUID();
 	private SignalCore sigalCore;
 	private Context context;
 	private EndpointListener listener;
 	private String userName;
+	private PendingIntent incomingIntent = null;
+
 	
 	private native Endpoint createEndpoint();
 
@@ -30,7 +40,6 @@ public class EndpointImpl implements Endpoint, SignalCoreConfig.Callbacks{
 
 	@Override
 	public int hashCode() {
-		// TODO Auto-generated method stub
 		return super.hashCode();
 	}
 
@@ -39,7 +48,7 @@ public class EndpointImpl implements Endpoint, SignalCoreConfig.Callbacks{
 			String inCapabilityToken, EndpointListener inListener) {
 		this.context = twilioSignalImpl.getContext();
 		this.listener = inListener;
-		this.sigalCore = SignalCore.getInstance();
+		this.sigalCore = SignalCore.getInstance(this.context);
 	}
 
 
@@ -59,13 +68,13 @@ public class EndpointImpl implements Endpoint, SignalCoreConfig.Callbacks{
 
 	@Override
 	public void listen() {
-		SignalCore.getInstance().register();
+		SignalCore.getInstance(this.context).register();
 	}
 
 
 	@Override
 	public void unlisten() {
-		SignalCore.getInstance().unregister(this);	
+		SignalCore.getInstance(this.context).unregister(this);	
 	}
 
 
@@ -126,11 +135,9 @@ public class EndpointImpl implements Endpoint, SignalCoreConfig.Callbacks{
 
 
 	@Override
-	public void setIncomingIntent(PendingIntent intent) {
-		// TODO Auto-generated method stub
-		
+	public void setIncomingIntent(PendingIntent inIntent) {
+		incomingIntent = inIntent;
 	}
-
 
 	@Override
 	public Conversation createConversation(String remoteEndpoint,
@@ -147,13 +154,6 @@ public class EndpointImpl implements Endpoint, SignalCoreConfig.Callbacks{
 	}
 
 
-	@Override
-	public void onRegistrationComplete() {
-		if(this.listener != null) {
-		    this.listener.onEndpointStartListeningForInvites(this);
-		}
-	}
-
 	
 	public String getUserName() {
 		return userName;
@@ -165,10 +165,76 @@ public class EndpointImpl implements Endpoint, SignalCoreConfig.Callbacks{
 	}
 
 
+	
+
+
+	@Override /* Parcelable */
+	public int describeContents()
+	{
+        return 0; 
+    }
+
+	@Override /* Parcelable */
+    public void writeToParcel(Parcel out, int flags)
+	{
+        out.writeSerializable(uuid);
+    }
+	
+	/* Parcelable */
+    public static final Parcelable.Creator<EndpointImpl> CREATOR = new Parcelable.Creator<EndpointImpl>()
+    {
+    	@Override
+        public EndpointImpl createFromParcel(Parcel in)
+        {
+            UUID uuid = (UUID)in.readSerializable();
+            TwilioSignalImpl twImpl = TwilioSignalImpl.getInstance();
+            return twImpl.findDeviceByUUID(uuid);
+        }
+
+    	@Override
+        public EndpointImpl[] newArray(int size)
+        {
+            throw new UnsupportedOperationException();
+        }
+    };
+
+
 	@Override
-	public void onUnRegistrationComplete() {
+	public void accept() {
+		SignalCore.getInstance(context).accept(this);			
+	}
+
+
+	public void onRegistration() {
+		if(this.listener != null) {
+		    this.listener.onEndpointStartListeningForInvites(this);
+		}
+	}
+	
+
+	public void onUnRegistration() {
 		if(this.listener != null) {
 		    this.listener.onEndpointStopListeningForInvites(this);
 		}
 	}
+
+	public void onIncomingInvite() {
+		logger.d("Received Incoming notification");
+		if (incomingIntent != null) {
+			logger.d("Received Incoming notification, calling intent");
+			Intent intent = new Intent();
+			intent.putExtra(Endpoint.EXTRA_DEVICE, this);
+			if (intent.hasExtra(Endpoint.EXTRA_DEVICE)) {
+				logger.d("Received Incoming notification, calling intent has extra");
+			} else {
+				logger.d("Received Incoming notification, calling intent do not have extra");
+			}
+			try {
+				incomingIntent.send(context, 0, intent);
+			} catch (final CanceledException e) {
+
+			}
+		}
+	}
+	
 }

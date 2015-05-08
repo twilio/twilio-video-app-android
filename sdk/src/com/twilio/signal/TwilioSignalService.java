@@ -23,13 +23,6 @@ public class TwilioSignalService extends Service
 		{
 			return serviceImpl.getSignalCore();
 		}
-		
-		public Exception getError()
-		{
-			return serviceImpl.getCallManagerError();
-		}
-		
-		
 	}
 	
 	private final TwilioBinder binder = new TwilioBinder();
