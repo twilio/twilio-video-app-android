@@ -53,7 +53,7 @@ public abstract class HttpHelper
 
         ThreadSafeClientConnManager connManager = new ThreadSafeClientConnManager(params, registry);
         httpClient = new DefaultHttpClient(connManager, params);
-        ((AbstractHttpClient) httpClient).getCredentialsProvider().setCredentials(new AuthScope(AuthScope.ANY_HOST,AuthScope.ANY_PORT),new UsernamePasswordCredentials("client","chunder"));
+        ((AbstractHttpClient) httpClient).getCredentialsProvider().setCredentials(new AuthScope(AuthScope.ANY_HOST,AuthScope.ANY_PORT),new UsernamePasswordCredentials("twilio","video"));
     }
 
     private static String stringFromInputStream(InputStream is) throws IOException

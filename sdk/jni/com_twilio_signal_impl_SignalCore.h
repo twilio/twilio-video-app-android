@@ -14,7 +14,7 @@ extern "C" {
  * Method:    initCore
  * Signature: ()Ljava/lang/String;
  */
-JNIEXPORT jstring JNICALL Java_com_twilio_signal_impl_SignalCore_initCore
+JNIEXPORT jboolean JNICALL Java_com_twilio_signal_impl_SignalCore_initCore
   (JNIEnv *, jobject, jobject);
 
 /*

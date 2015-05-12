@@ -194,7 +194,7 @@ public class TwilioSignalImpl
 		
 	}
 
-	public EndpointImpl createEndpoint(Map<String, String> options, String inCapabilityToken, EndpointListener inListener)
+	public EndpointImpl createEndpoint(Map<String, String> options, EndpointListener inListener)
 	{
 		if(options != null) {
 			String authToken = options.get(TwilioConstants.EndpointOptionCapabilityTokenKey);

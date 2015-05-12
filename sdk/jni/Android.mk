@@ -66,6 +66,8 @@ LOCAL_STATIC_LIBRARIES := \
 	webrtc \
 	poco-foundation \
 	poco-net \
+	poco-net-ssl \
+	poco-crypto \
 	poco-util \
 	poco-xml \
 	pjsua-lib \
