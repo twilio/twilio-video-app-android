@@ -44,7 +44,7 @@ LOCAL_CFLAGS := \
 	-DTW_EXPORT='__attribute__((visibility("default")))' \
 	$(debug_cflags)
 	
-LOCAL_CPPFLAGS := -std=c++11 -fno-rtti
+LOCAL_CPPFLAGS := -std=gnu++11 -fno-rtti
 
 #Putting openssl libs and opus libs like this will give the warning, but as of today
 #I can't find better way to resolve circular dependency (it is broken in ndk). 
