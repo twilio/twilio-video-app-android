@@ -45,11 +45,10 @@ public class SignalPhoneActivity extends Activity implements LoginListener {
 		this.login.setOnClickListener(new View.OnClickListener() {		
 			@Override
 			public void onClick(View v) {
-//				new LoginAsyncTask().execute();
+				new LoginAsyncTask().execute();
 				
-//				Intent intent = new Intent(v.getContext(), ConversationActivity.class);
-//				startActivity(intent);
-				showIncomingAlert(); 
+				Intent intent = new Intent(v.getContext(), ConversationActivity.class);
+				startActivity(intent);
 				
 			}
 		});
