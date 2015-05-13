@@ -18,8 +18,8 @@ include $(CLEAR_VARS)
 
 LOCAL_MODULE := twilio-native
 LOCAL_SRC_FILES := \
-com_twilio_signal_impl_SignalCore.cpp \
-EndpointObserver.cpp
+	com_twilio_signal_impl_SignalCore.cpp \
+	EndpointObserver.cpp
 
 #ifeq ($(APP_DEBUGGABLE),true)
 ifeq ($(shell test "$(APP_DEBUGGABLE)" = "true" -o "$(NDK_DEBUG)" = "1" && echo true || echo false),true)
