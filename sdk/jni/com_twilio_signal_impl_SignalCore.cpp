@@ -9,6 +9,8 @@
 #include "EndpointObserver.h"
 #include "webrtc/video_engine/include/vie_base.h"
 #include "webrtc/voice_engine/include/voe_base.h"
+#include "webrtc/modules/video_capture/video_capture_internal.h"
+#include "webrtc/modules/video_render/video_render_internal.h"
 
 #include "com_twilio_signal_impl_SignalCore.h"
 
@@ -24,7 +26,7 @@ jlong eObserverPointer;
 
 TSCSDK* tscSdk = NULL;
 
-JNIEXPORT jstring JNICALL
+JNIEXPORT jboolean JNICALL
 Java_com_twilio_signal_impl_SignalCore_initCore(JNIEnv *env, jobject obj, jobject context)
 {
 	bool failure = false;
@@ -45,11 +47,12 @@ Java_com_twilio_signal_impl_SignalCore_initCore(JNIEnv *env, jobject obj, jobjec
 		//vp8_hw_acceleration_enabled = vp8_hw_acceleration;
 		//  if (!factory_static_initialized) {
 		//    if (initialize_video) {
-		     // failure |= webrtc::SetCaptureAndroidVM(cachedJVM, context);
-		     // failure |= webrtc::SetRenderAndroidVM(cachedJVM);
+		     failure |= webrtc::SetCaptureAndroidVM(cachedJVM, context);
+		     failure |= webrtc::SetRenderAndroidVM(cachedJVM);
 		//    }
 		//    if (initialize_audio)
-		//    failure |= webrtc::VoiceEngine::SetAndroidObjects(cachedJVM, env, context);
+		LOG_W(TAG, "Calling DA Magic formula");
+		    failure |= webrtc::VoiceEngine::SetAndroidObjects(cachedJVM, env, context);
 		//    factory_static_initialized = true;
 		//  }
 		//  if (initialize_video)
@@ -59,7 +62,7 @@ Java_com_twilio_signal_impl_SignalCore_initCore(JNIEnv *env, jobject obj, jobjec
 		//
 	}
 
-	return env->NewStringUTF("SignalCore initialized!");
+	return JNI_TRUE;
 }
 
 
@@ -119,19 +122,22 @@ Java_com_twilio_signal_impl_SignalCore_login(JNIEnv *env, jobject obj, jobjectAr
 
 		if (cred) {
 			tokenStr = tw_jni_fetch_string(env, cred, "capabilityToken", &tokenObj);
-			surlStr = tw_jni_fetch_string(env, cred, "stunURL", &surlObj);
+			//userNameStr = tw_jni_fetch_string(env, cred, "userName", &userNameObj);
+			/*surlStr = tw_jni_fetch_string(env, cred, "stunURL", &surlObj);
 			turlStr = tw_jni_fetch_string(env, cred, "turnURL", &turlObj);
 			userNameStr = tw_jni_fetch_string(env, cred, "userName", &userNameObj);
-			passwordStr = tw_jni_fetch_string(env, cred, "password", &passwordObj);
+			passwordStr = tw_jni_fetch_string(env, cred, "password", &passwordObj); */
 		}
 
 		TSCOptions coreOptions;
 
+		__android_log_print(ANDROID_LOG_VERBOSE, TAG, "Capability token", 1);
 		coreOptions.insert(std::make_pair("capability-token", tokenStr));
-		coreOptions.insert(std::make_pair("password", passwordStr));
+		/*coreOptions.insert(std::make_pair("password", passwordStr));
 		coreOptions.insert(std::make_pair("stun-url", surlStr));
 		coreOptions.insert(std::make_pair("turn-url", turlStr));
-		coreOptions.insert(std::make_pair("user-name", userNameStr));
+		coreOptions.insert(std::make_pair("user-name", userNameStr));*/
+
 
 		eObserver = new EndpointObserver(env, config, endpointObj);
 		eObserverPointer = (jlong)eObserver;

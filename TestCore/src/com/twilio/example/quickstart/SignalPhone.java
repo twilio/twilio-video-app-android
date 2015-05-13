@@ -33,8 +33,8 @@ public class SignalPhone implements EndpointListener
 
     // TODO: change this to point to the script on your public server
     private static final String ICE_TOKEN_URL_STRING = "http://client:chunder@chunder-interactive.appspot.com/iceToken?realm=prod";
-    private static final String CAPABILITY_TOKEN_URL_STRING = "http://client:chunder@chunder-interactive.appspot.com/token?realm=prod";
-
+    //private static final String CAPABILITY_TOKEN_URL_STRING = "https://sat-token-generator.herokuapp.com/sat-token?EndpointName=evan";
+    private static final String CAPABILITY_TOKEN_URL_STRING =  "http://simple-signaling.appspot.com/token?realm=prod";
     
     private Endpoint alice = null;
     private String token = "";
@@ -80,7 +80,7 @@ public class SignalPhone implements EndpointListener
     {
     	StringBuilder url = new StringBuilder();
     	url.append(SignalPhone.CAPABILITY_TOKEN_URL_STRING);
-    	url.append("&&clientName=").append(clientName);
+    	url.append("&&name=").append(clientName);
     	
         // This runs asynchronously!
     	new GetAuthTokenAsyncTask().execute(url.toString());
@@ -164,13 +164,29 @@ public class SignalPhone implements EndpointListener
     {
         
     }
+    
+    private void createEndpoint() {
+    	if (loginListener != null) {
+			loginListener.onLoginStarted();
+		}
+		SignalPhone.this.alice = TwilioSignal.createEndpoint(
+				options, SignalPhone.this);
+		Intent intent = new Intent(context, SignalPhoneActivity.class);
+        PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        alice.setIncomingIntent(pendingIntent);
+		/*} else {
+			SignalPhone.this.alice.listen();
+		}*/
+		 Log.i(TAG, "Created Endpoint With Token");
+    }
    
     
     private class GetAuthTokenAsyncTask extends AsyncTask<String, Void, String> {
 		@Override
 		protected void onPostExecute(String result) {
 			super.onPostExecute(result);
-			obtainIceToken();	
+			//obtainIceToken();
+			createEndpoint();
 		}
 
 		@Override
@@ -192,6 +208,7 @@ public class SignalPhone implements EndpointListener
 		protected void onPostExecute(String result) {
 			super.onPostExecute(result);
 			//if (SignalPhone.this.alice == null) {
+			/*
 			if (loginListener != null) {
 				loginListener.onLoginStarted();
 			}

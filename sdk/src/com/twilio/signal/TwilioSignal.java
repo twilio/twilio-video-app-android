@@ -78,9 +78,9 @@ public class TwilioSignal {
 	 *
 	 * @return The initialized Endpoint object, or null if the SDK was not initialized
 	 */
-	public static Endpoint createEndpointWithToken(Map<String, String> options, String inCapabilityToken, EndpointListener listener)
+	public static Endpoint createEndpoint(Map<String, String> options, EndpointListener listener)
 	{
-		return TwilioSignalImpl.getInstance().createEndpoint(options, inCapabilityToken, listener);
+		return TwilioSignalImpl.getInstance().createEndpoint(options, listener);
 	}
 	
 	
