@@ -64,27 +64,6 @@ LOCAL_LDLIBS := \
 LOCAL_STATIC_LIBRARIES := \
 	SignalCoreSDK \
 	webrtc \
-	poco-foundation \
-	poco-net \
-	poco-net-ssl \
-	poco-crypto \
-	poco-util \
-	poco-xml \
-	pjsua-lib \
-	pjmedia \
-	pjmedia-audiodev \
-	pjmedia-videodev \
-	pjmedia-codec \
-	pjmedia \
-	pjnath \
-	pjsip-ua \
-	pjsip \
-	pjsip-simple \
-	milenage \
-	resample \
-	speex \
-	pjlib-util \
-	pjlib \
 	twilio-jni
 	
 	
