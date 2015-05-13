@@ -46,10 +46,6 @@ public class SignalPhoneActivity extends Activity implements LoginListener {
 			@Override
 			public void onClick(View v) {
 				new LoginAsyncTask().execute();
-				
-				Intent intent = new Intent(v.getContext(), ConversationActivity.class);
-				startActivity(intent);
-				
 			}
 		});
 		this.invite = (LinearLayout)findViewById(R.id.inviteParticipant);	
