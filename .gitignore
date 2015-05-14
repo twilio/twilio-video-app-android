@@ -5,6 +5,8 @@ sdk/gen
 output
 
 TestCore/bin
+TestCore/obj
 TestCore/gen
+TestCore/local.properties
 .vagrant
 depot_tools

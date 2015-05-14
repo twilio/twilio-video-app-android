@@ -33,13 +33,13 @@ Java_com_twilio_signal_impl_SignalCore_initCore(JNIEnv *env, jobject obj, jobjec
 
 	if (mainSignalCore) {
 		LOG_W(TAG, "SignalCore.initCore() double-called");
-		__android_log_print(ANDROID_LOG_VERBOSE, TAG, "SignalCore.initCore() double-called", 1);
+		__android_log_print(ANDROID_LOG_VERBOSE, TAG, "SignalCore.initCore() double-called");
 		tw_jni_throw(env, "java/lang/IllegalArgumentException", "SignalCore is already initialized");
 	} else {
 		mainSignalCore = env->NewGlobalRef(obj);
 		env->GetJavaVM(&cachedJVM);
 		tscSdk = TSCSDK::instance();
-		__android_log_print(ANDROID_LOG_VERBOSE, TAG, "SignalCore.initCore() called", 1);
+		__android_log_print(ANDROID_LOG_VERBOSE, TAG, "SignalCore.initCore() called");
 		LOG_W(TAG, "SignalCore.initCore() called");
 
 
@@ -108,7 +108,7 @@ Java_com_twilio_signal_impl_SignalCore_login(JNIEnv *env, jobject obj, jobjectAr
 {
 	if(tscSdk != NULL) {
 
-		__android_log_print(ANDROID_LOG_VERBOSE, TAG, "SignalCore.login()", 1);
+		__android_log_print(ANDROID_LOG_VERBOSE, TAG, "SignalCore.login()");
 
 		if (!credInfo) {
 			LOG_W("SIGNAL", "Creating endpoint but no credentials specified");
@@ -131,7 +131,7 @@ Java_com_twilio_signal_impl_SignalCore_login(JNIEnv *env, jobject obj, jobjectAr
 
 		TSCOptions coreOptions;
 
-		__android_log_print(ANDROID_LOG_VERBOSE, TAG, "Capability token", 1);
+		__android_log_print(ANDROID_LOG_VERBOSE, TAG, "Capability token");
 		coreOptions.insert(std::make_pair("capability-token", tokenStr));
 		/*coreOptions.insert(std::make_pair("password", passwordStr));
 		coreOptions.insert(std::make_pair("stun-url", surlStr));
@@ -144,8 +144,8 @@ Java_com_twilio_signal_impl_SignalCore_login(JNIEnv *env, jobject obj, jobjectAr
 
 		TSCEndpointObserverObjectRef eObserverRef = TSCEndpointObserverObjectRef(eObserver);
 
-		__android_log_print(ANDROID_LOG_VERBOSE, TAG, "eObserverPointer = %p", &eObserver, 1);
-		__android_log_print(ANDROID_LOG_VERBOSE, TAG, "eObserverRef = %p", &eObserverRef, 1);
+		__android_log_print(ANDROID_LOG_VERBOSE, TAG, "eObserverPointer = %p", &eObserver);
+		__android_log_print(ANDROID_LOG_VERBOSE, TAG, "eObserverRef = %p", &eObserverRef);
 		TSCEndpointObjectRef endpoint = tscSdk->createEndpoint(coreOptions, eObserverRef);
 
 		eObserver->setEndpoint(endpoint);
@@ -171,7 +171,7 @@ Java_com_twilio_signal_impl_SignalCore_login(JNIEnv *env, jobject obj, jobjectAr
 JNIEXPORT jboolean JNICALL Java_com_twilio_signal_impl_SignalCore_logout
   (JNIEnv *env, jobject obj, jobject endpointObj) {
 
-	__android_log_print(ANDROID_LOG_VERBOSE, TAG, "SignalCore.logout()", 1);
+	__android_log_print(ANDROID_LOG_VERBOSE, TAG, "SignalCore.logout()");
 
 	jclass classToAdd = env->GetObjectClass(endpointObj);
 	jmethodID id = env->GetMethodID(classToAdd, "hashCode", "()I");
@@ -180,12 +180,12 @@ JNIEXPORT jboolean JNICALL Java_com_twilio_signal_impl_SignalCore_logout
 	TSCEndpointObjectRef endpoint = endpoints[val];
 
 	if(endpoint) {
-		__android_log_print(ANDROID_LOG_VERBOSE, TAG, "Unregistering Endpoint with hashCode %d", val, 1);
+		__android_log_print(ANDROID_LOG_VERBOSE, TAG, "Unregistering Endpoint with hashCode %d", val);
 		endpoint->unregisterEndpoint();
 		endpoints[val] = NULL;
 	} else
 	{
-		__android_log_print(ANDROID_LOG_VERBOSE, TAG, "Endpoint not found", 1);
+		__android_log_print(ANDROID_LOG_VERBOSE, TAG, "Endpoint not found");
 	}
 
 
@@ -196,7 +196,7 @@ JNIEXPORT jboolean JNICALL Java_com_twilio_signal_impl_SignalCore_logout
 JNIEXPORT jboolean JNICALL Java_com_twilio_signal_impl_SignalCore_acceptNative
   (JNIEnv *env, jobject obj, jobject endpointObj) {
 
-	__android_log_print(ANDROID_LOG_VERBOSE, TAG, "SignalCore.acceptNative()", 1);
+	__android_log_print(ANDROID_LOG_VERBOSE, TAG, "SignalCore.acceptNative()");
 
 	jclass classToAdd = env->GetObjectClass(endpointObj);
 	jmethodID id = env->GetMethodID(classToAdd, "hashCode", "()I");
@@ -205,12 +205,12 @@ JNIEXPORT jboolean JNICALL Java_com_twilio_signal_impl_SignalCore_acceptNative
 	TSCEndpointObjectRef endpoint = endpoints[val];
 
 	if(endpoint) {
-		__android_log_print(ANDROID_LOG_VERBOSE, TAG, "acceptNative for Endpoint with hashCode %d", val, 1);
+		__android_log_print(ANDROID_LOG_VERBOSE, TAG, "acceptNative for Endpoint with hashCode %d", val);
 		endpoint->unregisterEndpoint();
 		endpoints[val] = NULL;
 	} else
 	{
-		__android_log_print(ANDROID_LOG_VERBOSE, TAG, "Endpoint not found", 1);
+		__android_log_print(ANDROID_LOG_VERBOSE, TAG, "Endpoint not found");
 	}
 
 

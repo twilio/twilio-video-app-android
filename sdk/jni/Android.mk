@@ -18,8 +18,8 @@ include $(CLEAR_VARS)
 
 LOCAL_MODULE := twilio-native
 LOCAL_SRC_FILES := \
-com_twilio_signal_impl_SignalCore.cpp \
-EndpointObserver.cpp
+	com_twilio_signal_impl_SignalCore.cpp \
+	EndpointObserver.cpp
 
 #ifeq ($(APP_DEBUGGABLE),true)
 ifeq ($(shell test "$(APP_DEBUGGABLE)" = "true" -o "$(NDK_DEBUG)" = "1" && echo true || echo false),true)
@@ -64,27 +64,6 @@ LOCAL_LDLIBS := \
 LOCAL_STATIC_LIBRARIES := \
 	SignalCoreSDK \
 	webrtc \
-	poco-foundation \
-	poco-net \
-	poco-net-ssl \
-	poco-crypto \
-	poco-util \
-	poco-xml \
-	pjsua-lib \
-	pjmedia \
-	pjmedia-audiodev \
-	pjmedia-videodev \
-	pjmedia-codec \
-	pjmedia \
-	pjnath \
-	pjsip-ua \
-	pjsip \
-	pjsip-simple \
-	milenage \
-	resample \
-	speex \
-	pjlib-util \
-	pjlib \
 	twilio-jni
 	
 	
