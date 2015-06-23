@@ -2,6 +2,10 @@ package com.twilio.signal;
 
 public interface Invite {
 	
+	public String from();
+	
+	public Endpoint to();
+	
 	/**
 	 * Invoking this method allows the Endpoint to reject the invitation for joining the conversation.
 	 */
@@ -12,7 +16,7 @@ public interface Invite {
 	 * conversation related events.
 	 * 
 	 */
-	public void accept();
+	public Conversation acceptWithLocalMedia(Media localMedia, ConversationListener listener);
 	
 
 }

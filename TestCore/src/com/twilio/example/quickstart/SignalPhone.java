@@ -23,7 +23,7 @@ import com.twilio.signal.Conversation;
 import com.twilio.signal.Endpoint;
 import com.twilio.signal.EndpointListener;
 import com.twilio.signal.Invite;
-import com.twilio.signal.TwilioSignal;
+import com.twilio.signal.TwilioRTC;
 import com.twilio.signal.impl.TwilioConstants;
 
 
@@ -113,10 +113,10 @@ public class SignalPhone implements EndpointListener
 				loginListener.onLoginStarted();
             }
             
-            TwilioSignal.setLogLevel(Log.DEBUG);
-            String versionText = TwilioSignal.getVersion();
+            TwilioRTC.setLogLevel(Log.DEBUG);
+            String versionText = TwilioRTC.getVersion();
    
-			TwilioSignal.initialize(context, new TwilioSignal.InitListener() {
+            TwilioRTC.initialize(context, new TwilioRTC.InitListener() {
 				@Override
 				public void onInitialized() {
 					twilioSdkInited = true;
@@ -169,7 +169,7 @@ public class SignalPhone implements EndpointListener
     	if (loginListener != null) {
 			loginListener.onLoginStarted();
 		}
-		SignalPhone.this.alice = TwilioSignal.createEndpoint(
+		SignalPhone.this.alice = TwilioRTC.createEndpoint(
 				options, SignalPhone.this);
 		Intent intent = new Intent(context, SignalPhoneActivity.class);
         PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);

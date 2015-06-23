@@ -18,10 +18,10 @@ import android.content.pm.ServiceInfo;
 import android.os.IBinder;
 
 import com.twilio.signal.EndpointListener;
-import com.twilio.signal.TwilioSignalService;
-import com.twilio.signal.TwilioSignalService.TwilioBinder;
-import com.twilio.signal.TwilioSignal;
+import com.twilio.signal.TwilioRTC;
 import com.twilio.signal.impl.logging.Logger;
+import com.twilio.signal.service.TwilioRTCService;
+import com.twilio.signal.service.TwilioRTCService.TwilioBinder;
 
 public class TwilioSignalImpl
 {
@@ -71,7 +71,7 @@ public class TwilioSignalImpl
 
 	TwilioSignalImpl() {}
 	
-	public void initialize(Context inContext, final TwilioSignal.InitListener inListener)
+	public void initialize(Context inContext, final TwilioRTC.InitListener inListener)
 	{
 		
 		if (isInitialized() || isInitializing())
@@ -137,7 +137,7 @@ public class TwilioSignalImpl
 		
 		
 		context = inContext;
-		final Intent service = new Intent(context, TwilioSignalService.class);
+		final Intent service = new Intent(context, TwilioRTCService.class);
 
 		serviceConn = new ServiceConnection()
 		{
@@ -241,7 +241,7 @@ public class TwilioSignalImpl
 		if (context == null || twBinder == null)
 			return;
 		
-		Intent intent = new Intent(context, TwilioSignalService.class);
+		Intent intent = new Intent(context, TwilioRTCService.class);
 		context.startService(intent);
 	}
 	
@@ -261,6 +261,11 @@ public class TwilioSignalImpl
         }
         
         return null;
+	}
+
+	public int getLogLevel() {
+		// TODO Auto-generated method stub
+		return Logger.getLogLevel();
 	}
 	
 	

@@ -10,7 +10,6 @@ import android.content.Intent;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import com.twilio.signal.Capability;
 import com.twilio.signal.Conversation;
 import com.twilio.signal.ConversationListener;
 import com.twilio.signal.Endpoint;
@@ -214,7 +213,7 @@ public class EndpointImpl implements Endpoint, Parcelable{
 
 	public void onUnRegistration() {
 		if(this.listener != null) {
-		    this.listener.onEndpointStopListeningForInvites(this);
+		    this.listener.onStopListeningForInvites(this);
 		}
 	}
 

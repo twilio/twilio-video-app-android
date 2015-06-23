@@ -10,13 +10,13 @@ import android.net.NetworkInfo;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 
-import com.twilio.signal.TwilioSignalService;
-import com.twilio.signal.TwilioSignalService.TwilioBinder;
 import com.twilio.signal.impl.logging.Logger;
+import com.twilio.signal.service.TwilioRTCService;
+import com.twilio.signal.service.TwilioRTCService.TwilioBinder;
 
 public class TwilioSignalServiceImpl
 {
-	private static final Logger logger = Logger.getLogger(TwilioSignalService.class);
+	private static final Logger logger = Logger.getLogger(TwilioRTCService.class);
 	
 	private Context context;
 	private SignalCore signalCore;
