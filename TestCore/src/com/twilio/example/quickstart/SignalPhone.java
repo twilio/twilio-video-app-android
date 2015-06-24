@@ -157,7 +157,7 @@ public class SignalPhone implements EndpointListener
 
     public void accept()
     {
-       this.alice.accept();
+       //this.alice.accept();
     }
 
     public void ignoreIncomingConnection()
@@ -169,11 +169,11 @@ public class SignalPhone implements EndpointListener
     	if (loginListener != null) {
 			loginListener.onLoginStarted();
 		}
-		SignalPhone.this.alice = TwilioRTC.createEndpoint(
+		SignalPhone.this.alice = TwilioRTC.createEndpoint(null,
 				options, SignalPhone.this);
 		Intent intent = new Intent(context, SignalPhoneActivity.class);
         PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-        alice.setIncomingIntent(pendingIntent);
+        //alice.setIncomingIntent(pendingIntent);
 		/*} else {
 			SignalPhone.this.alice.listen();
 		}*/
@@ -249,14 +249,14 @@ public class SignalPhone implements EndpointListener
     }
 
 
-	@Override
+	
 	public void onEndpointStartListeningForInvites(Endpoint endpoint) {
 		if (loginListener != null) {
 			loginListener.onLoginFinished();
 		}
 	}
 
-	@Override
+	
 	public void onEndpointStopListeningForInvites(Endpoint endpoint) {
 		if (loginListener != null) {
 			loginListener.onLogoutFinished();
@@ -272,33 +272,27 @@ public class SignalPhone implements EndpointListener
 		
 	}
 
-	@Override
-	public void onCreatedConversation(Conversation conversation) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void onCreateConversationFailedWithError(int errorCode,
-			String errorMessage) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void onReceivedConversationInvite(Invite invite) {
-		
-		
-	}
-
-	@Override
-	public void onLeftConversation(Conversation conversation) {
-		// TODO Auto-generated method stub
-		
-	}
 
 	public void logout() {
 		SignalPhone.this.alice.unlisten();
+	}
+
+	@Override
+	public void onStartListeningForInvites(Endpoint endpoint) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onStopListeningForInvites(Endpoint endpoint) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onReceiveConversationInvite(Endpoint endpoint, Invite invite) {
+		// TODO Auto-generated method stub
+		
 	}
 
 }
