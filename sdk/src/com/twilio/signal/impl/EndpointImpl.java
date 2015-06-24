@@ -1,6 +1,7 @@
 package com.twilio.signal.impl;
 
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 import android.app.PendingIntent;
@@ -14,6 +15,7 @@ import com.twilio.signal.Conversation;
 import com.twilio.signal.ConversationListener;
 import com.twilio.signal.Endpoint;
 import com.twilio.signal.EndpointListener;
+import com.twilio.signal.Media;
 import com.twilio.signal.impl.logging.Logger;
 
 public class EndpointImpl implements Endpoint, Parcelable{
@@ -52,20 +54,6 @@ public class EndpointImpl implements Endpoint, Parcelable{
 
 
 	@Override
-	public Endpoint initWithToken(String token, EndpointListener listener) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-
-	@Override
-	public Endpoint initWithToken(String token, Map<String, String> params) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-
-	@Override
 	public void listen() {
 		SignalCore.getInstance(this.context).register();
 	}
@@ -76,54 +64,7 @@ public class EndpointImpl implements Endpoint, Parcelable{
 		SignalCore.getInstance(this.context).unregister(this);	
 	}
 
-
-	@Override
-	public void leaveConversaton(Conversation conversation) {
-		// TODO Auto-generated method stub
-		
-	}
-
-
-	@Override
-	public void setMuted(boolean muted) {
-		// TODO Auto-generated method stub
-		
-	}
-
-
-	@Override
-	public void setMuted(boolean muted, Conversation conversation) {
-		// TODO Auto-generated method stub
-		
-	}
-
-
-	@Override
-	public boolean isMuted() {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-
-	@Override
-	public boolean isMuted(Conversation conversation) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-
-	@Override
-	public Map<Capability, Object> getCapabilities() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-
-	@Override
-	public void updateCapabilityToken(String token) {
-		// TODO Auto-generated method stub
-		
-	}
+	
 
 
 	@Override
@@ -131,27 +72,6 @@ public class EndpointImpl implements Endpoint, Parcelable{
 		// TODO Auto-generated method stub
 		
 	}
-
-
-	@Override
-	public void setIncomingIntent(PendingIntent inIntent) {
-		incomingIntent = inIntent;
-	}
-
-	@Override
-	public Conversation createConversation(String remoteEndpoint,
-			Map<String, String> options, ConversationListener linstener) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-
-	@Override
-	public State getState() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
 
 	
 	public String getUserName() {
@@ -162,9 +82,6 @@ public class EndpointImpl implements Endpoint, Parcelable{
 	public void setUserName(String userName) {
 		this.userName = userName;
 	}
-
-
-	
 
 
 	@Override /* Parcelable */
@@ -198,15 +115,9 @@ public class EndpointImpl implements Endpoint, Parcelable{
     };
 
 
-	@Override
-	public void accept() {
-		SignalCore.getInstance(context).accept(this);			
-	}
-
-
 	public void onRegistration() {
 		if(this.listener != null) {
-		    this.listener.onEndpointStartListeningForInvites(this);
+		    this.listener.onStartListeningForInvites(this);
 		}
 	}
 	
@@ -234,6 +145,28 @@ public class EndpointImpl implements Endpoint, Parcelable{
 
 			}
 		}
+	}
+
+
+	@Override
+	public String getAddress() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+
+	@Override
+	public boolean isListening() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+
+	@Override
+	public Conversation createConversation(Set<String> participants,
+			Media localMedia, ConversationListener listener) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 	
 }
