@@ -49,6 +49,10 @@ JNIEXPORT jlong JNICALL Java_com_twilio_signal_impl_TwilioRTCImpl_createEndpoint
 
 	TSCOptions coreOptions;
 
+	if (token == NULL) {
+		__android_log_print(ANDROID_LOG_ERROR, TAG, "token is null");
+		return 0;
+	}
 	const char *tokenStr = env->GetStringUTFChars(token, 0);
 
 	//__android_log_print(ANDROID_LOG_VERBOSE, TAG, "Capability token");

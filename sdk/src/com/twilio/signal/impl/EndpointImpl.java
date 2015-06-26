@@ -1,6 +1,5 @@
 package com.twilio.signal.impl;
 
-import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
@@ -19,11 +18,9 @@ import com.twilio.signal.Media;
 import com.twilio.signal.impl.logging.Logger;
 
 public class EndpointImpl implements Endpoint, NativeHandleInterface, Parcelable{
-	
+
 	static final Logger logger = Logger.getLogger(EndpointImpl.class);
-	
-	private native void listen(long nativeEndpoint);
-	
+
 	private final UUID uuid = UUID.randomUUID();
 	private Context context;
 	private EndpointListenerInternal listener;
@@ -55,23 +52,26 @@ public class EndpointImpl implements Endpoint, NativeHandleInterface, Parcelable
 	@Override
 	public void listen() {
 		//SignalCore.getInstance(this.context).register();
+		if (nativeEndpointHandle != 0) {
+			listen(nativeEndpointHandle);
+		}
 	}
 
 
 	@Override
 	public void unlisten() {
-		SignalCore.getInstance(this.context).unregister(this);	
+		SignalCore.getInstance(this.context).unregister(this);
 	}
 
-	
+
 
 
 	@Override
 	public void setEndpointListener(EndpointListener listener) {
 		// TODO Auto-generated method stub
-		
+
 	}
-	
+
 	@Override
 	public String getAddress() {
 		// TODO Auto-generated method stub
@@ -92,12 +92,12 @@ public class EndpointImpl implements Endpoint, NativeHandleInterface, Parcelable
 		// TODO Auto-generated method stub
 		return null;
 	}
-	
+
 
 	@Override /* Parcelable */
 	public int describeContents()
 	{
-        return 0; 
+        return 0;
     }
 
 	@Override /* Parcelable */
@@ -105,7 +105,7 @@ public class EndpointImpl implements Endpoint, NativeHandleInterface, Parcelable
 	{
         out.writeSerializable(uuid);
     }
-	
+
 	/* Parcelable */
     public static final Parcelable.Creator<EndpointImpl> CREATOR = new Parcelable.Creator<EndpointImpl>()
     {
@@ -150,6 +150,8 @@ public class EndpointImpl implements Endpoint, NativeHandleInterface, Parcelable
 		return nativeEndpointHandle;
 	}
 
+	//Native implementation
+	private native void listen(long nativeEndpoint);
 
-	
+
 }

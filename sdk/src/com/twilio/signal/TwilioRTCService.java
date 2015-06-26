@@ -1,4 +1,4 @@
-package com.twilio.signal.service;
+package com.twilio.signal;
 
 import android.app.Service;
 import android.content.Intent;
@@ -6,7 +6,7 @@ import android.os.Binder;
 import android.os.IBinder;
 
 import com.twilio.signal.impl.SignalCore;
-import com.twilio.signal.impl.TwilioSignalServiceImpl;
+import com.twilio.signal.impl.TwilioRTCServiceImpl;
 import com.twilio.signal.impl.logging.Logger;
 
 
@@ -14,7 +14,7 @@ public class TwilioRTCService extends Service
 {
 	private static final Logger logger = Logger.getLogger(TwilioRTCService.class);
 	
-	private TwilioSignalServiceImpl serviceImpl;
+	private TwilioRTCServiceImpl serviceImpl;
 	
 	public class TwilioBinder extends Binder
 	{
@@ -31,7 +31,7 @@ public class TwilioRTCService extends Service
 	@Override
 	public void onCreate()
 	{
-		serviceImpl = new TwilioSignalServiceImpl();
+		serviceImpl = new TwilioRTCServiceImpl();
 		serviceImpl.initialize(this);
 	}
 	
