@@ -12,10 +12,10 @@ import com.twilio.signal.EndpointListener;
 
 public class SignalCore {
 	
-	static
+	/*static
 	{
 		System.loadLibrary("twilio-native");
-	}
+	} */
 	
 	private static final Object singletonLock = new Object();
 	private static SignalCore singleton;
@@ -24,7 +24,7 @@ public class SignalCore {
 	private native boolean initCore(Context context);
 	private native boolean isCoreInitialized();
 	private native boolean setLogLevel();
-	private native void registerEndpoint(Endpoint endopoint);
+	//private native void registerEndpoint(Endpoint endopoint);
 	private native boolean login(CredentialInfo[] creadInfo, SignalCoreConfig config, Endpoint endpoint);
 	private native boolean logout(Endpoint endpoint);
 	private native boolean acceptNative(Endpoint endpoint);
@@ -33,46 +33,19 @@ public class SignalCore {
 		if (singleton == null) {
 			synchronized (singletonLock) {
 				if (singleton == null) {
-					singleton = new SignalCore();
-					singleton.initSignalCore(context);
+					singleton = new SignalCore(context);
 				}
 			}
 		}	
 		return singleton;
 	}
 	
-	public SignalCore() {
-		
+	public SignalCore(Context context) {
+		initCore(context);
 	}
-	
-	@SuppressLint("NewApi")
-	public boolean initSignalCore(Context context) {
-		return initCore(context);
-	}
-	
+
 	public boolean isSignalCoreInitialized() {
 		return isCoreInitialized();
-	}
-	
-	public EndpointImpl createEndpoint(List<CredentialInfo> credInfo, EndpointListener inListener) {
-		
-		CredentialInfo[] credInfoArray = new CredentialInfo[credInfo != null ? credInfo.size() : 0];
-		if (credInfoArray != null) {
-			int nCreds = credInfo.size();
-			for (int i = 0; i < nCreds; ++i)
-				credInfoArray[i] = credInfo.get(i);
-		}
-		
-		EndpointImpl endpoint = new EndpointImpl(TwilioSignalImpl.getInstance(), credInfo.get(0).getCapabilityToken(), inListener);
-		endpoint.setUserName(credInfo.get(0).getUserName());
-		//SignalCoreConfig signalCoreCfg = new SignalCoreConfig(endpoint);
-		SignalCoreConfig signalCoreCfg = new SignalCoreConfig(CoreCallbackManager.getInstance());
-		
-		if (this.callCommandHandler == null) {
-			this.callCommandHandler = new CallCommandHandlerImpl(credInfoArray, signalCoreCfg, endpoint);
-		}
-		
-		return endpoint;
 	}
 	
 	public boolean register() {

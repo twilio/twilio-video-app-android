@@ -23,13 +23,23 @@ import com.twilio.signal.impl.logging.Logger;
 import com.twilio.signal.service.TwilioRTCService;
 import com.twilio.signal.service.TwilioRTCService.TwilioBinder;
 
-public class TwilioSignalImpl
+public class TwilioRTCImpl
 {
-	static final Logger logger = Logger.getLogger(TwilioSignalImpl.class);
+	
+	static
+	{
+		System.loadLibrary("twilio-native");
+	}
+	
+	//native methods
+	private native boolean initCore(Context context);
+	private native long createEndpoint(String token, long nativeEndpointObserver);
+	
+	static final Logger logger = Logger.getLogger(TwilioRTCImpl.class);
 	
 	private static final String TWILIO_SIGNAL_SERVICE_NAME = "com.twilio.signal.TwilioSignalService";
 
-	private static volatile TwilioSignalImpl instance;
+	private static volatile TwilioRTCImpl instance;
 	private SignalCore signalCore;
 	protected Context context;
 	private boolean sdkInited;
@@ -47,14 +57,14 @@ public class TwilioSignalImpl
 		"android.permission.ACCESS_WIFI_STATE",
 	};
 	
-	public static TwilioSignalImpl getInstance()
+	public static TwilioRTCImpl getInstance()
 	{
 		if (instance == null)
 		{
-			synchronized (TwilioSignalImpl.class)
+			synchronized (TwilioRTCImpl.class)
 			{
 				if (instance == null)
-					instance = new TwilioSignalImpl();
+					instance = new TwilioRTCImpl();
 			}
 		}
 		
@@ -65,11 +75,11 @@ public class TwilioSignalImpl
 		return context;
 	}
 
-	public static void setInstance(TwilioSignalImpl instance) {
-		TwilioSignalImpl.instance = instance;
+	public static void setInstance(TwilioRTCImpl instance) {
+		TwilioRTCImpl.instance = instance;
 	}
 
-	TwilioSignalImpl() {}
+	TwilioRTCImpl() {}
 	
 	public void initialize(Context inContext, final TwilioRTC.InitListener inListener)
 	{
@@ -178,35 +188,15 @@ public class TwilioSignalImpl
 			context = null;
 			inListener.onError(new RuntimeException("Failed to start TwilioClientService.  Please ensure it is declared in AndroidManifest.xml"));
 		}
-	
-		/*this.context = inContext;
-		this.signalCore = SignalCore.getInstance();
-		if (!signalCore.isSignalCoreInitialized()) {
-			boolean ret = signalCore.initSignalCore();
-			if(ret) {
-				inListener.onInitialized();
-			} else {
-				inListener.onError(null);
-			}
-		} else {
-			inListener.onInitialized(); 
-		}*/
 		
 	}
 
-	public EndpointImpl createEndpoint(Map<String, String> options, EndpointListener inListener)
+	public EndpointImpl createEndpoint(String token, Map<String, String> options, EndpointListener inListener)
 	{
 		if(options != null) {
-			String authToken = options.get(TwilioConstants.EndpointOptionCapabilityTokenKey);
-			String sURL = options.get(TwilioConstants.EndpointOptionStunURLKey);
-			String tURL = options.get(TwilioConstants.EndpointOptionTurnURLKey);
-			String userName = options.get(TwilioConstants.EndpointOptionUserNameKey);
-			String password = options.get(TwilioConstants.EndpointOptionPasswordKey);
-			
-			final List<CredentialInfo> credentialInfo = new ArrayList<CredentialInfo>(1);
-			credentialInfo.add(new CredentialInfo(authToken, sURL, tURL, userName, password, SignalCore.getInstance(this.context)));
-
-			final EndpointImpl endpoint  = this.signalCore.createEndpoint(credentialInfo, inListener);
+			EndpointListenerInternal listener = new EndpointListenerInternal(inListener);
+			final long nativeEndpointHandle = createEndpoint(token, listener.getNativeHandle());
+			final EndpointImpl endpoint = new EndpointImpl(context, listener, nativeEndpointHandle);
 			synchronized (endpoints)
 			{
 				endpoints.put(endpoint.getUuid(), new WeakReference<EndpointImpl>(endpoint));

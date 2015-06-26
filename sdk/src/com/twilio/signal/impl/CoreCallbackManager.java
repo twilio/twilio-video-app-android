@@ -19,7 +19,7 @@ public class CoreCallbackManager implements SignalCoreConfig.Callbacks {
 	@Override
 	public void onUnRegistrationComplete(EndpointImpl endpoint) {
 		if(endpoint != null) {
-			endpoint.onUnRegistration();
+			//endpoint.onUnRegistration();
 		}
 		
 	}
@@ -35,7 +35,7 @@ public class CoreCallbackManager implements SignalCoreConfig.Callbacks {
 	@Override
 	public void onRegistrationComplete(EndpointImpl endpoint) {
 		if(endpoint != null) {
-			endpoint.onRegistration();
+		//	endpoint.onRegistration();
 		}
 	}
 

@@ -1,10 +1,11 @@
 package com.twilio.signal;
 
+import java.util.HashMap;
 import java.util.Map;
 
-import com.twilio.signal.impl.TwilioSignalImpl;
-
 import android.content.Context;
+
+import com.twilio.signal.impl.TwilioRTCImpl;
 
 public class TwilioRTC {
 
@@ -57,7 +58,7 @@ public class TwilioRTC {
 			throw new IllegalArgumentException("Listener cannot be null");
 		}
 		
-		TwilioSignalImpl.getInstance().initialize(inContext, inListener);
+		TwilioRTCImpl.getInstance().initialize(inContext, inListener);
 	}
 
 	/**
@@ -66,7 +67,7 @@ public class TwilioRTC {
 	 * @return level - The logging level
 	 */
 	public static int getLogLevel(int level) {
-		return TwilioSignalImpl.getInstance().getLogLevel();
+		return TwilioRTCImpl.getInstance().getLogLevel();
 	}
 	
 	
@@ -76,7 +77,7 @@ public class TwilioRTC {
 	 * @param level - The logging level
 	 */
 	public static void setLogLevel(int level) {
-		TwilioSignalImpl.getInstance().setLogLevel(level);
+		TwilioRTCImpl.getInstance().setLogLevel(level);
 	}
 		
 		
@@ -89,7 +90,7 @@ public class TwilioRTC {
 	 */
 	public static Endpoint createEndpoint(String token, EndpointListener listener)
 	{
-		return null;//TwilioSignalImpl.getInstance().createEndpoint(token, listener);
+		return TwilioRTCImpl.getInstance().createEndpoint(token, new HashMap<String, String>(), listener);
 	}
 	
 	/** 
@@ -101,7 +102,7 @@ public class TwilioRTC {
 	 */
 	public static Endpoint createEndpoint(String token, Map<String, String> options, EndpointListener listener)
 	{
-		return TwilioSignalImpl.getInstance().createEndpoint(options, listener);
+		return TwilioRTCImpl.getInstance().createEndpoint(token, options, listener);
 	}
 	
 	
@@ -112,7 +113,7 @@ public class TwilioRTC {
 	 */
 	public static String getVersion()
 	{
-		return TwilioSignalImpl.getInstance().getVersion();
+		return TwilioRTCImpl.getInstance().getVersion();
 	}
 
 

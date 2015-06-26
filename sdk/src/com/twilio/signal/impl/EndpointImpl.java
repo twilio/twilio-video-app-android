@@ -18,20 +18,18 @@ import com.twilio.signal.EndpointListener;
 import com.twilio.signal.Media;
 import com.twilio.signal.impl.logging.Logger;
 
-public class EndpointImpl implements Endpoint, Parcelable{
+public class EndpointImpl implements Endpoint, NativeHandleInterface, Parcelable{
 	
 	static final Logger logger = Logger.getLogger(EndpointImpl.class);
-
+	
+	private native void listen(long nativeEndpoint);
 	
 	private final UUID uuid = UUID.randomUUID();
-	private SignalCore sigalCore;
 	private Context context;
-	private EndpointListener listener;
+	private EndpointListenerInternal listener;
 	private String userName;
 	private PendingIntent incomingIntent = null;
-
-	
-	private native Endpoint createEndpoint();
+	private long nativeEndpointHandle;
 
 
 	public UUID getUuid() {
@@ -45,17 +43,18 @@ public class EndpointImpl implements Endpoint, Parcelable{
 	}
 
 
-	public EndpointImpl(TwilioSignalImpl twilioSignalImpl,
-			String inCapabilityToken, EndpointListener inListener) {
-		this.context = twilioSignalImpl.getContext();
+	public EndpointImpl(Context context,
+						EndpointListenerInternal inListener,
+						long nativeEndpointHandle) {
+		this.context = context;
 		this.listener = inListener;
-		this.sigalCore = SignalCore.getInstance(this.context);
+		this.nativeEndpointHandle = nativeEndpointHandle;
 	}
 
 
 	@Override
 	public void listen() {
-		SignalCore.getInstance(this.context).register();
+		//SignalCore.getInstance(this.context).register();
 	}
 
 
@@ -72,17 +71,28 @@ public class EndpointImpl implements Endpoint, Parcelable{
 		// TODO Auto-generated method stub
 		
 	}
-
 	
-	public String getUserName() {
-		return userName;
+	@Override
+	public String getAddress() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 
-	public void setUserName(String userName) {
-		this.userName = userName;
+	@Override
+	public boolean isListening() {
+		// TODO Auto-generated method stub
+		return false;
 	}
 
+
+	@Override
+	public Conversation createConversation(Set<String> participants,
+			Media localMedia, ConversationListener listener) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	
 
 	@Override /* Parcelable */
 	public int describeContents()
@@ -103,7 +113,7 @@ public class EndpointImpl implements Endpoint, Parcelable{
         public EndpointImpl createFromParcel(Parcel in)
         {
             UUID uuid = (UUID)in.readSerializable();
-            TwilioSignalImpl twImpl = TwilioSignalImpl.getInstance();
+            TwilioRTCImpl twImpl = TwilioRTCImpl.getInstance();
             return twImpl.findDeviceByUUID(uuid);
         }
 
@@ -114,19 +124,6 @@ public class EndpointImpl implements Endpoint, Parcelable{
         }
     };
 
-
-	public void onRegistration() {
-		if(this.listener != null) {
-		    this.listener.onStartListeningForInvites(this);
-		}
-	}
-	
-
-	public void onUnRegistration() {
-		if(this.listener != null) {
-		    this.listener.onStopListeningForInvites(this);
-		}
-	}
 
 	public void onIncomingInvite() {
 		logger.d("Received Incoming notification");
@@ -149,24 +146,10 @@ public class EndpointImpl implements Endpoint, Parcelable{
 
 
 	@Override
-	public String getAddress() {
-		// TODO Auto-generated method stub
-		return null;
+	public long getNativeHandle() {
+		return nativeEndpointHandle;
 	}
 
 
-	@Override
-	public boolean isListening() {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-
-	@Override
-	public Conversation createConversation(Set<String> participants,
-			Media localMedia, ConversationListener listener) {
-		// TODO Auto-generated method stub
-		return null;
-	}
 	
 }
