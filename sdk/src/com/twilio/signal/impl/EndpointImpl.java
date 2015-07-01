@@ -20,15 +20,36 @@ import com.twilio.signal.impl.logging.Logger;
 public class EndpointImpl implements Endpoint, NativeHandleInterface, Parcelable{
 
 	static final Logger logger = Logger.getLogger(EndpointImpl.class);
+	
+	class EndpointObserverInternal implements NativeHandleInterface {
+		
+		private long nativeEndpointObserver;
+		
+		public EndpointObserverInternal(EndpointListener listener) {
+			//this.listener = listener;
+			this.nativeEndpointObserver = wrapNativeObserver(listener);
+		}
+		
+		private native long wrapNativeObserver(EndpointListener listener);
+		//::TODO figure out when to call this - may be Endpoint.release() ??
+		private native void freeNativeObserver(long nativeEndpointObserver);
+
+		@Override
+		public long getNativeHandle() {
+			return nativeEndpointObserver;
+		}
+		
+	}
 
 	private final UUID uuid = UUID.randomUUID();
 	private Context context;
-	private EndpointListenerInternal listener;
+	private EndpointListener listener;
 	private String userName;
 	private PendingIntent incomingIntent = null;
+	private EndpointObserverInternal endpointObserver;
 	private long nativeEndpointHandle;
-
-
+	
+	
 	public UUID getUuid() {
 		return uuid;
 	}
@@ -39,13 +60,30 @@ public class EndpointImpl implements Endpoint, NativeHandleInterface, Parcelable
 		return super.hashCode();
 	}
 
-
+/*
 	public EndpointImpl(Context context,
-						EndpointListenerInternal inListener,
+						EndpointListener inListener,
 						long nativeEndpointHandle) {
 		this.context = context;
 		this.listener = inListener;
 		this.nativeEndpointHandle = nativeEndpointHandle;
+	}
+*/
+
+	EndpointImpl(Context context,
+			EndpointListener inListener) {
+		this.context = context;
+		this.listener = inListener;
+		//this.nativeEndpointHandle = nativeEndpointHandle;
+		this.endpointObserver = new EndpointObserverInternal(inListener);
+	}
+	
+	void setNativeHandle(long nativeEndpointHandle) {
+		this.nativeEndpointHandle = nativeEndpointHandle;
+	}
+	
+	long getEndpointObserverHandle() {
+		return this.endpointObserver.getNativeHandle();
 	}
 
 

@@ -15,7 +15,6 @@ extern "C" {
 JNIEXPORT void JNICALL Java_com_twilio_signal_impl_EndpointImpl_listen
   (JNIEnv *, jobject, jlong);
 
-
 #ifdef __cplusplus
 }
 #endif

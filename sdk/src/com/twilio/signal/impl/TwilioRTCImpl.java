@@ -15,7 +15,6 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.ServiceInfo;
 import android.os.IBinder;
-import android.util.Log;
 
 import com.twilio.signal.EndpointListener;
 import com.twilio.signal.TwilioRTC;
@@ -190,11 +189,17 @@ public class TwilioRTCImpl
 	public EndpointImpl createEndpoint(String token, Map<String, String> options, EndpointListener inListener)
 	{
 		if(options != null && token != null) {
-			Log.d("!nn!", "Token:"+token);
-			EndpointListenerInternal listener = new EndpointListenerInternal(inListener);
-			final long nativeEndpointHandle = createEndpoint(token, listener.getNativeHandle());
-			final EndpointImpl endpoint = new EndpointImpl(context, listener, nativeEndpointHandle);
-			synchronized (endpoints)
+			final EndpointImpl endpoint = new EndpointImpl(context, inListener);
+			long nativeObserverHandle = endpoint.getEndpointObserverHandle();
+			if (nativeObserverHandle == 0) {
+				return null;
+			}
+			final long nativeEndpointHandle = createEndpoint(token, nativeObserverHandle);
+			if (nativeEndpointHandle == 0) {
+				return null;
+			}
+			endpoint.setNativeHandle(nativeEndpointHandle);
+ 			synchronized (endpoints)
 			{
 				endpoints.put(endpoint.getUuid(), new WeakReference<EndpointImpl>(endpoint));
 			}
