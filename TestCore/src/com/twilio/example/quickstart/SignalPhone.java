@@ -285,6 +285,7 @@ public class SignalPhone implements EndpointListener
 	@Override
 	public void onFailedToStartListening(Endpoint endPoint, int errorCode,
 			String errorMessage) {
+		Log.d(TAG, "onFailedToStartListening code:"+errorCode+" message:"+errorMessage);
 		if (loginListener != null)
 			loginListener.onLoginError(errorMessage);
 

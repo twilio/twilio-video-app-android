@@ -1,5 +1,6 @@
 #include "com_twilio_signal_impl_EndpointImpl_EndpointObserverInternal.h"
 #include "TSCoreSDKTypes.h"
+#include "TSCoreError.h"
 #include "TSCEndpoint.h"
 #include "TSCEndpointObserver.h"
 #include <twilio-jni/twilio-jni.h>
@@ -39,6 +40,11 @@ protected:
     virtual void onRegistrationDidComplete(TSCErrorObject* error) {
     	JNIEnvAttacher jniAttacher;
     	__android_log_print(ANDROID_LOG_VERBOSE, TAG, "onRegistrationDidComplete");
+    	if (error != NULL) {
+    		jstring str = stringToJString(jniAttacher.get(), error->getMessage());
+    		jniAttacher.get()->CallVoidMethod(j_endpoint_listener_, j_failed_to_start_id_, j_endpoint_, (jint)error->getCode(), str);
+    		return;
+    	}
     	jniAttacher.get()->CallVoidMethod(j_endpoint_listener_, j_start_listening_id_, j_endpoint_);
 
     }
@@ -58,6 +64,11 @@ protected:
 
 
 private:
+
+    jstring stringToJString(JNIEnv * env, const std::string & nativeString) {
+        return env->NewStringUTF(nativeString.c_str());
+    }
+
     //TODO - find better way to track life time of global reference
     jobject j_endpoint_listener_;
     jobject j_endpoint_;
