@@ -297,8 +297,10 @@ public class SignalPhone implements EndpointListener
 
 	@Override
 	public void onStartListeningForInvites(Endpoint endpoint) {
-		// TODO Auto-generated method stub
-
+		Log.d(TAG, "onStartListeningForInvites");
+		if (loginListener != null) {
+			loginListener.onLoginFinished();
+		}
 	}
 
 	@Override

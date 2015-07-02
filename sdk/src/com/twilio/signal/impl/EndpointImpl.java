@@ -27,10 +27,10 @@ public class EndpointImpl implements Endpoint, NativeHandleInterface, Parcelable
 		
 		public EndpointObserverInternal(EndpointListener listener) {
 			//this.listener = listener;
-			this.nativeEndpointObserver = wrapNativeObserver(listener);
+			this.nativeEndpointObserver = wrapNativeObserver(listener, EndpointImpl.this);
 		}
-		
-		private native long wrapNativeObserver(EndpointListener listener);
+
+		private native long wrapNativeObserver(EndpointListener listener, Endpoint endpoint);
 		//::TODO figure out when to call this - may be Endpoint.release() ??
 		private native void freeNativeObserver(long nativeEndpointObserver);
 
