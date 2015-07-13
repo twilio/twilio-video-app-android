@@ -12,16 +12,20 @@ public interface Conversation {
 	
 	
 	/**
-	 * An enum describing the current state of the Conversation.
+	 * An enum describing the current status of the Conversation.
 	 */
-	public enum State
+	public enum Status
 	{
-		/** The Conversation has been initiated (outgoing). */
+		/** Local Endpoint's connection to Conversation has an unknown status */
+		UNKNOWN,
+		/** Local Endpoint is connecting to the Conversation */
 		CONNECTING,
-		/** The conversation is connected and active. There is at least one RemoteEndpoint in the conversation.*/
+		/** Local Endpoint is connected to the Conversation.*/
 		CONNECTED,
-		/** The conversation has ended, either due to an explicit removal of all RemoteEndpoints command or an error. */
-		DISCONNECTED
+		/** Local Endpoint is disconnected from the Conversation */
+		DISCONNECTED,
+		/** Local Endpoint failed to connect to Conversation */
+		FAILED
 	};
 	
 	/**
@@ -31,23 +35,8 @@ public interface Conversation {
 	 * 
 	 * @see State
 	 */
-	public Conversation.State getState();
+	public Conversation.Status getStatus();
 		
-	/**
-	 * Invite a set of remote endpoints to a conversation.
-	 *
-	 * @param participants A set of strings representing the names of the remote endpoints.
-	 */
-	public void inviteRemoteEndpoints(Set<String> remoteEndpoints);
-	
-	
-	/**
-	 * Invite one Participants to join the Session.
-	 *
-	 * @param remoteEndpoint -  A string representing the name of the remote endpoint.
-	 *  
-	 */
-	public void inviteRemoteEndpoint(String remoteEndpoint);
 	
 	/**
 	 * Returns the list of Participants in an active Session.
@@ -56,12 +45,41 @@ public interface Conversation {
 	 */	
 	public Set<String> getParticipants();
 	
+	
 	/**
 	 * Get a remote endpointâ€™s media stream.
 	 * 
 	 * @param endpoint The remote endpoint whose stream we are fetching.
 	 * @return
 	 */
-	public Stream getStreamFromEndpoint(String endpoint);
+	public Media getLocalMedia();
+	
+	
+	/**
+	 * Get a remote endpointâ €™s media stream.
+	 * 
+	 * @param endpoint The remote endpoint whose stream we are fetching.
+	 * @return
+	 */
+	public ConversationListener getConversationListener();
+	
+	/**
+	 *
+	 */
+	public void setConversationListener(ConversationListener listener);
+	
+	
+	/**
+	 * Invite a set of remote participantAddresses.
+	 *
+	 * @param participants A set of strings representing the names of the remote endpoints.
+	 */
+	public void invite(Set<String> participantAddresses);
+	
+	/**
+	 *
+	 */
+	public String getConversationSid();
+
 
 }

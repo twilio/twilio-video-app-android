@@ -1,4 +1,5 @@
-package com.twilio.signal;
+package com.twilio.signal.impl;
+
 
 public interface RemoteEndpoint {
 	

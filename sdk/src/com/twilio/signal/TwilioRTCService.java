@@ -6,15 +6,15 @@ import android.os.Binder;
 import android.os.IBinder;
 
 import com.twilio.signal.impl.SignalCore;
-import com.twilio.signal.impl.TwilioSignalServiceImpl;
+import com.twilio.signal.impl.TwilioRTCServiceImpl;
 import com.twilio.signal.impl.logging.Logger;
 
 
-public class TwilioSignalService extends Service
+public class TwilioRTCService extends Service
 {
-	private static final Logger logger = Logger.getLogger(TwilioSignalService.class);
+	private static final Logger logger = Logger.getLogger(TwilioRTCService.class);
 	
-	private TwilioSignalServiceImpl serviceImpl;
+	private TwilioRTCServiceImpl serviceImpl;
 	
 	public class TwilioBinder extends Binder
 	{
@@ -31,7 +31,7 @@ public class TwilioSignalService extends Service
 	@Override
 	public void onCreate()
 	{
-		serviceImpl = new TwilioSignalServiceImpl();
+		serviceImpl = new TwilioRTCServiceImpl();
 		serviceImpl.initialize(this);
 	}
 	

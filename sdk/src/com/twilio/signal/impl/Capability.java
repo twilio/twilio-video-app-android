@@ -1,4 +1,6 @@
-package com.twilio.signal;
+package com.twilio.signal.impl;
+
+import com.twilio.signal.Endpoint;
 
 
 

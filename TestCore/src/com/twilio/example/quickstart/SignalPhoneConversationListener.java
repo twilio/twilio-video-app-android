@@ -1,52 +1,67 @@
 package com.twilio.example.quickstart;
 
+import com.twilio.signal.Conversation;
+import com.twilio.signal.Conversation.Status;
 import com.twilio.signal.ConversationListener;
-import com.twilio.signal.RemoteEndpoint;
-import com.twilio.signal.Stream;
-import com.twilio.signal.Track.TrackId;
+import com.twilio.signal.Participant;
+
 
 public class SignalPhoneConversationListener implements ConversationListener{
 
 	@Override
-	public void onRemoteEndpointJoined(RemoteEndpoint endpoint) {
+	public void onConnectParticipant(Conversation conversation,
+			Participant participant) {
 		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
-	public void onRemoteEndpointLeftConversation(RemoteEndpoint endpoint) {
+	public void onFailToConnectParticipant(Conversation conversation,
+			Participant participant, int error, String errorMessage) {
 		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
-	public void onRemoteEndpointRejectedInvite(RemoteEndpoint endpoint) {
+	public void onDisconnectParticipant(Conversation conversation,
+			Participant participant) {
 		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
-	public void onAddTrackWithId(RemoteEndpoint endpoint, TrackId trackId) {
+	public void onVideoAddedForParticipant(Conversation conversation,
+			Participant participant) {
 		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
-	public void onRemoveTrackWithId(RemoteEndpoint endpoint, TrackId trackId) {
+	public void onVideoRemovedForParticipant(Conversation conversation,
+			Participant participant) {
 		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
-	public void onPauseVideo(RemoteEndpoint endpoint, Stream stream) {
+	public void onLocalStatusChanged(Conversation conversation, Status status) {
 		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
-	public void onMuteAudio(RemoteEndpoint endpoint, Stream stream) {
+	public void onConversationEndedt(Conversation conversation) {
 		// TODO Auto-generated method stub
 		
 	}
+
+	@Override
+	public void onConversationEndedt(Conversation conversation, int error,
+			String errorMessage) {
+		// TODO Auto-generated method stub
+		
+	}
+
+
 
 }

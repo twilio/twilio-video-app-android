@@ -1,10 +1,10 @@
-package com.twilio.signal;
+package com.twilio.signal.impl;
 
 import java.util.Set;
 
 import android.view.View;
 
-import com.twilio.signal.Track.TrackId;
+import com.twilio.signal.impl.Track.TrackId;
 
 public interface Stream {
 	/**

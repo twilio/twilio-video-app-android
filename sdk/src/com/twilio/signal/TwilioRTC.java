@@ -1,20 +1,21 @@
 package com.twilio.signal;
 
+import java.util.HashMap;
 import java.util.Map;
-
-import com.twilio.signal.impl.TwilioSignalImpl;
 
 import android.content.Context;
 
-public class TwilioSignal {
+import com.twilio.signal.impl.TwilioRTCImpl;
+
+public class TwilioRTC {
 
 	/**
 	 * Interface for the listener object to pass to
-	 * {@link TwilioSignal#initialize(Context, InitListener)}.
+	 * {@link TwilioRTC#initialize(Context, InitListener)}.
 	 */
 	public interface InitListener {
 		/**
-		 * Callback to report when TwilioSignal Client SDK has been successfully
+		 * Callback to report when TwilioRTC Client SDK has been successfully
 		 * initialized.
 		 */
 		public void onInitialized();
@@ -28,7 +29,7 @@ public class TwilioSignal {
 		public void onError(Exception error);
 	}
 
-	private TwilioSignal() {}
+	private TwilioRTC() {}
 
 	/**
 	 * Initialize the TwilioSignal Client SDK.
@@ -40,13 +41,13 @@ public class TwilioSignal {
 	 *            Activity. Cannot be null.
 	 * 
 	 * @param inListener
-	 *            A {@link TwilioSignal.InitListener} that will notify you when the
+	 *            A {@link TwilioRTC.InitListener} that will notify you when the
 	 *            service is ready. Cannot be null.
 	 * 
 	 * @throws IllegalArgumentException
 	 */
 	public static void initialize(Context inContext,
-			TwilioSignal.InitListener inListener) {
+			TwilioRTC.InitListener inListener) {
 		if (inContext == null)
 		{
 			throw new IllegalArgumentException("Context cannot be null");
@@ -57,19 +58,28 @@ public class TwilioSignal {
 			throw new IllegalArgumentException("Listener cannot be null");
 		}
 		
-		TwilioSignalImpl.getInstance().initialize(inContext, inListener);
-
-
+		TwilioRTCImpl.getInstance().initialize(inContext, inListener);
 	}
 
+	/**
+	 * Gets the logging level for messages logged by the TwilioSignal SDK.
+	 * 
+	 * @return level - The logging level
+	 */
+	public static int getLogLevel(int level) {
+		return TwilioRTCImpl.getInstance().getLogLevel();
+	}
+	
+	
 	/**
 	 * Sets the logging level for messages logged by the TwilioSignal SDK.
 	 * 
 	 * @param level - The logging level
 	 */
 	public static void setLogLevel(int level) {
-		TwilioSignalImpl.getInstance().setLogLevel(level);
+		TwilioRTCImpl.getInstance().setLogLevel(level);
 	}
+		
 		
 	/** 
 	 * Create and initialize a new Endpoint object.
@@ -78,9 +88,21 @@ public class TwilioSignal {
 	 *
 	 * @return The initialized Endpoint object, or null if the SDK was not initialized
 	 */
-	public static Endpoint createEndpoint(Map<String, String> options, EndpointListener listener)
+	public static Endpoint createEndpoint(String token, EndpointListener listener)
 	{
-		return TwilioSignalImpl.getInstance().createEndpoint(options, listener);
+		return TwilioRTCImpl.getInstance().createEndpoint(token, new HashMap<String, String>(), listener);
+	}
+	
+	/** 
+	 * Create and initialize a new Endpoint object.
+	 * 
+	 * @param listener - listener object which will receive events from a Endpoint object.
+	 *
+	 * @return The initialized Endpoint object, or null if the SDK was not initialized
+	 */
+	public static Endpoint createEndpoint(String token, Map<String, String> options, EndpointListener listener)
+	{
+		return TwilioRTCImpl.getInstance().createEndpoint(token, options, listener);
 	}
 	
 	
@@ -91,7 +113,7 @@ public class TwilioSignal {
 	 */
 	public static String getVersion()
 	{
-		return TwilioSignalImpl.getInstance().getVersion();
+		return TwilioRTCImpl.getInstance().getVersion();
 	}
 
 

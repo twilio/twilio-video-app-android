@@ -1,4 +1,5 @@
-package com.twilio.signal;
+package com.twilio.signal.impl;
+
 
 /**
  * This interface describes the events that the Stream’s listener should handle.

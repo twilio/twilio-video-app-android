@@ -18,7 +18,6 @@
 
 using namespace twiliosdk;
 
-static jobject mainSignalCore = NULL;
 static JavaVM * cachedJVM = NULL;
 static std::map<jint , TSCEndpointObjectRef> endpoints;
 static EndpointObserver* eObserver;
@@ -26,74 +25,32 @@ jlong eObserverPointer;
 
 TSCSDK* tscSdk = NULL;
 
-JNIEXPORT jboolean JNICALL
-Java_com_twilio_signal_impl_SignalCore_initCore(JNIEnv *env, jobject obj, jobject context)
+JNIEXPORT jboolean JNICALL Java_com_twilio_signal_impl_SignalCore_initCore(JNIEnv *env, jobject obj, jobject context)
 {
 	bool failure = false;
 
-	if (mainSignalCore) {
-		LOG_W(TAG, "SignalCore.initCore() double-called");
-		__android_log_print(ANDROID_LOG_VERBOSE, TAG, "SignalCore.initCore() double-called");
-		tw_jni_throw(env, "java/lang/IllegalArgumentException", "SignalCore is already initialized");
-	} else {
-		mainSignalCore = env->NewGlobalRef(obj);
-		env->GetJavaVM(&cachedJVM);
-		tscSdk = TSCSDK::instance();
-		__android_log_print(ANDROID_LOG_VERBOSE, TAG, "SignalCore.initCore() called");
-		LOG_W(TAG, "SignalCore.initCore() called");
+
+	env->GetJavaVM(&cachedJVM);
+	tscSdk = TSCSDK::instance();
+	__android_log_print(ANDROID_LOG_VERBOSE, TAG, "SignalCore.initCore() called");
+	LOG_W(TAG, "SignalCore.initCore() called");
 
 
-		//
-		//vp8_hw_acceleration_enabled = vp8_hw_acceleration;
-		//  if (!factory_static_initialized) {
-		//    if (initialize_video) {
-		     failure |= webrtc::SetCaptureAndroidVM(cachedJVM, context);
-		     failure |= webrtc::SetRenderAndroidVM(cachedJVM);
-		//    }
-		//    if (initialize_audio)
-		LOG_W(TAG, "Calling DA Magic formula");
-		    failure |= webrtc::VoiceEngine::SetAndroidObjects(cachedJVM, env, context);
-		//    factory_static_initialized = true;
-		//  }
-		//  if (initialize_video)
-		 //   failure |= MediaCodecVideoDecoder::SetAndroidObjects(jni, render_egl_context);
+	failure |= webrtc::SetCaptureAndroidVM(cachedJVM, context);
+	failure |= webrtc::SetRenderAndroidVM(cachedJVM);
 
+	LOG_W(TAG, "Calling DA Magic formula");
+	failure |= webrtc::VoiceEngine::SetAndroidObjects(cachedJVM, env, context);
 
-		//
+	if (tscSdk != NULL && tscSdk->isInitialized())
+	{
+		return JNI_TRUE;
 	}
 
-	return JNI_TRUE;
+	return JNI_FALSE;
 }
 
-
-
-
-/*initWebRTC(
-    JNIEnv* jni, jclass, jobject context,
-    jboolean initialize_audio, jboolean initialize_video,
-    jboolean vp8_hw_acceleration, jobject render_egl_context) {
-  CHECK(g_jvm) << "JNI_OnLoad failed to run?";
-  bool failure = false;
-  vp8_hw_acceleration_enabled = vp8_hw_acceleration;
-  if (!factory_static_initialized) {
-    if (initialize_video) {
-      failure |= webrtc::SetCaptureAndroidVM(g_jvm, context);
-      failure |= webrtc::SetRenderAndroidVM(g_jvm);
-    }
-    if (initialize_audio)
-      failure |= webrtc::VoiceEngine::SetAndroidObjects(g_jvm, jni, context);
-    factory_static_initialized = true;
-  }
-  if (initialize_video)
-    failure |= MediaCodecVideoDecoder::SetAndroidObjects(jni,
-        render_egl_context);
-  return !failure;
-}
-
-*/
-
-JNIEXPORT jboolean JNICALL
-Java_com_twilio_signal_impl_SignalCore_isCoreInitialized(JNIEnv *env, jobject obj)
+JNIEXPORT jboolean JNICALL Java_com_twilio_signal_impl_SignalCore_isCoreInitialized(JNIEnv *env, jobject obj)
 {
 	if (tscSdk != NULL && tscSdk->isInitialized())
 	{
@@ -103,8 +60,7 @@ Java_com_twilio_signal_impl_SignalCore_isCoreInitialized(JNIEnv *env, jobject ob
 }
 
 
-JNIEXPORT jboolean JNICALL
-Java_com_twilio_signal_impl_SignalCore_login(JNIEnv *env, jobject obj, jobjectArray credInfo, jobject config,jobject endpointObj)
+JNIEXPORT jboolean JNICALL Java_com_twilio_signal_impl_SignalCore_login(JNIEnv *env, jobject obj, jobjectArray credInfo, jobject config,jobject endpointObj)
 {
 	if(tscSdk != NULL) {
 
@@ -122,21 +78,13 @@ Java_com_twilio_signal_impl_SignalCore_login(JNIEnv *env, jobject obj, jobjectAr
 
 		if (cred) {
 			tokenStr = tw_jni_fetch_string(env, cred, "capabilityToken", &tokenObj);
-			//userNameStr = tw_jni_fetch_string(env, cred, "userName", &userNameObj);
-			/*surlStr = tw_jni_fetch_string(env, cred, "stunURL", &surlObj);
-			turlStr = tw_jni_fetch_string(env, cred, "turnURL", &turlObj);
-			userNameStr = tw_jni_fetch_string(env, cred, "userName", &userNameObj);
-			passwordStr = tw_jni_fetch_string(env, cred, "password", &passwordObj); */
+
 		}
 
 		TSCOptions coreOptions;
 
 		__android_log_print(ANDROID_LOG_VERBOSE, TAG, "Capability token");
 		coreOptions.insert(std::make_pair("capability-token", tokenStr));
-		/*coreOptions.insert(std::make_pair("password", passwordStr));
-		coreOptions.insert(std::make_pair("stun-url", surlStr));
-		coreOptions.insert(std::make_pair("turn-url", turlStr));
-		coreOptions.insert(std::make_pair("user-name", userNameStr));*/
 
 
 		eObserver = new EndpointObserver(env, config, endpointObj);

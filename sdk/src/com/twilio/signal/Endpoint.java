@@ -1,7 +1,9 @@
 package com.twilio.signal;
 
 import java.util.Map;
+import java.util.Set;
 
+import android.R.bool;
 import android.app.PendingIntent;
 
 
@@ -21,43 +23,27 @@ public interface Endpoint {
 	 * Key into an Intent's extras data that points to a {@link EndpointImpl} object.
 	 */
 	public static final String EXTRA_DEVICE = "com.twilio.signal.EndpointImpl";
-
-	/** 
-	 * The Endpoint.State enum represents the various states of the endpoint's ability to listen for incoming connections and make outgoing connections. 
-	 * 
-	 * @see Endpoint#getState()
-	 */ 
-	public enum State
-	{
-		/** The endpoint is created */
-		INITIALIZED,
-		REGISTERING,
-		REGISTERED,
-		REGISTRATION_FAILED,
-		UNREGISTERING,
-		UnREGISTERED,
-		UNREGISTRATION_FAILED
-	};
 	
 	/**
-	 * Constructs a new Endpoint from a token string.
+	 * Sets a new {@link EndpointListener} object to respond to device events.
 	 * 
-	 * @param token  capability token for this Endpoint.
 	 * @param listener A {@link EndpointListener}, or null
-	 * 
 	 */
-	public Endpoint initWithToken(String token, EndpointListener listener);
-	
+	public void setEndpointListener(EndpointListener listener);
 	
 	/**
-	 * Constructs a new Endpoint from a Map of parameters
+	 * Gets address of this endpoint on the network for incoming calls
 	 * 
-	 * @param token  capability token for this Endpoint.
-	 * @param params - list of media stream constraints.
-	 * @param listener A {@link EndpointListener}, or null
+	 * @return address of this endpoint
+ 	 */
+	public String getAddress();
+	
+	/**
+	 * Reflects current listening state of the endpoint
 	 * 
-	 */
-	public Endpoint initWithToken(String token, Map<String, String> params);	
+	 * @return @return <code>true</code> if endpoint is listening, </code>false</code> otherwise.
+ 	 */
+	public boolean isListening();
 	
 	/**
 	 * Start listening for incoming Conversation.
@@ -75,133 +61,17 @@ public interface Endpoint {
 	 * until Endpoint registers again. {@link EndpointListener#onStopListening(Endpoint)} is called after unregistration completes.
 	 */
 	public void unlisten();
-
 	
 	/**
-	 * Leave a Conversation.
+	 * Create conversation object which represents outgoing call
 	 * 
-	 * @param Conversation - The {@link Conversation} to leave.
-	 * 
-	 */
-	public void leaveConversaton(Conversation conversation);
-	
-	
-	/**
-	 * Mutes or unmutes the microphone's audio for all the Conversations for this Endpoint.
-	 * 
-	 * @param muted <code>true</code> to mute, <code>false</code> to un-mute
-	 * 
-	 * @see Endpoint#isMuted()
-	 */
-	public void setMuted(boolean muted);
-	
-
-	/**
-	 * Mutes or unmutes the microphone's audio for a given Conversations for this Endpoint.
-	 * 
-	 * @param muted <code>true</code> to mute, <code>false</code> to un-mute
-	 * 
-	 * @see Endpoint#isMuted()
-	 */
-	public void setMuted(boolean muted, Conversation conversation);
-	
-	
-	/**
-	 * Reports whether the microphone's audio is muted for all the Conversations for this Endpoint.
-	 * 
-	 * @return <code>true</code> if the audio is muted, </code>false</code> otherwise.
-	 * 
-	 * @see Endpoint#setMuted(boolean)
-	 */
-	public boolean isMuted();
-	
-	/**
-	 * Reports whether the microphone's audio is muted for a given Conversations for this Endpoint.
-	 * 
-	 * @return <code>true</code> if the audio is muted, </code>false</code> otherwise.
-	 * 
-	 * @see Endpoint#setMuted(boolean)
-	 */
-	public boolean isMuted(Conversation conversation);
-
-
-	/**
-	 * Pause or un-pause video for a given Conversation.
-	 * 
-	 * @param Conversation - suspend video for this {@link Conversation}
-	 * @param paused <code>true</code> to pause, <code>false</code> to un-pause
-	 * 
-	 */
-	//public void pauseVideo(Conversation conversation, boolean paused);
-
-	/**
-	 * Pause or un-pause video for all Conversations for this Endpoint.
-	 * 
-	 * @param paused <code>true</code> to pause, <code>false</code> to un-pause
-	 * 
-	 */
-	//public void pauseVideo(boolean paused);
-	
-	/**
-	 * Current capabilities of the Endpoint.
-	 * 
-	 * The keys are defined by the {@link Capability} enum.
-	 * 
-	 * @return A key/value mapping of capabilities
-	 */
-	public Map<Capability, Object> getCapabilities();
-	
-	/**
-	 * Updates the capabilities of the Endpoint.
-	 *
-	 * @param token The new capability token string.
-	 *
-	 */
-	public void updateCapabilityToken(String token);
-	
-	
-	/**
-	 * Sets a new {@link EndpointListener} object to respond to device events.
-	 * 
-	 * @param listener A {@link EndpointListener}, or null
-	 */
-	public void setEndpointListener(EndpointListener listener);
-	
-	/**
-	 * Sets a PendingIntent that will be sent when an incoming Conversation invite is received.
-	 * 
-	 * The PendingIntent passed may be a reference to an Activity, Service, or
-	 * BroadcastReceiver. Your component receives the intent, act (accept, ignore, or reject)
-	 * on the incoming Conversation invite.
-	 * 
-	 * @param intent A PendingIntent to call when this Endpoint receives a Conversation invite.
-	 */
-	public void setIncomingIntent(PendingIntent intent);
-	
-	/**
-	 * This is a convenience method for creating a conversation with a single remote endpoint.
-	 * 
-	 * @param remoteEndpoint Remote endpoint name of type String.
-	 * @param options Dictionary of options with media constraints (audio only, audio & video, etc.)
-	 * @param linstener Callback Listener object for handling conversation related events.
+	 * @param participants Set of participant names as Strings
+	 * @param localMedia Media you would like to use when setting up the new conversation
+	 * @param listener for Conversation events
 	 */
 	
-	public Conversation createConversation(String remoteEndpoint, Map<String, String> options, ConversationListener linstener);
-	
-	
-	/**
-	 * Retrieves the current state of the Endpoint.
-	 * 
-	 * 
-	 * @see State
-	 */
-	public Endpoint.State getState();
-	
-	/**
-	 * 
-	 * TODO:: remove later
-	 */
-	public void accept();
-	
+	public Conversation createConversation(Set<String> participants,
+										   Media localMedia,
+										   ConversationListener listener);
 
 }

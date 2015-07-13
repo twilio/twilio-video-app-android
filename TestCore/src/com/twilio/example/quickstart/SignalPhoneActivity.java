@@ -8,22 +8,25 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 
-
 import com.twilio.example.quickstart.SignalPhone.LoginListener;
 import com.twilio.signal.Endpoint;
 
 public class SignalPhoneActivity extends Activity implements LoginListener {
-	
+
+	private static final String DEFAULT_CLIENT_NAME = "alice";
+	private static final String TAG = "SignalPhoneActivity";
+
 	SignalPhone phone;
 	private EditText clientNameTextBox;
 	private Button login;
 	private Button logout;
-	private static final String DEFAULT_CLIENT_NAME = "alice";
+
 	private LinearLayout invite;
 	private LinearLayout loginUser;
 	private ProgressDialog progressDialog;
@@ -33,26 +36,26 @@ public class SignalPhoneActivity extends Activity implements LoginListener {
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
-		
+
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.login);
-		this.loginUser = (LinearLayout)findViewById(R.id.loginUser);	
+		this.loginUser = (LinearLayout)findViewById(R.id.loginUser);
 		this.clientNameTextBox = (EditText)findViewById(R.id.client_name);
 		this.clientNameTextBox.setText(DEFAULT_CLIENT_NAME);
 		this.login = (Button)findViewById(R.id.register);
 		this.phone = SignalPhone.getInstance(getApplicationContext());
 		this.phone.setListeners(this);
-		this.login.setOnClickListener(new View.OnClickListener() {		
+		this.login.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
 				new LoginAsyncTask().execute();
 			}
 		});
-		this.invite = (LinearLayout)findViewById(R.id.inviteParticipant);	
+		this.invite = (LinearLayout)findViewById(R.id.inviteParticipant);
 		this.logout = (Button)findViewById(R.id.logout);
-		this.logout.setOnClickListener(new View.OnClickListener() {	
+		this.logout.setOnClickListener(new View.OnClickListener() {
 			@Override
-			public void onClick(View v) {		
+			public void onClick(View v) {
 				SignalPhoneActivity.this.phone.logout();
 			}
 		});
@@ -97,7 +100,8 @@ public class SignalPhoneActivity extends Activity implements LoginListener {
 
 	@Override
 	public void onLoginError(String error) {
-		this.onResume();
+		//this.onResume();
+		Log.e(TAG, "Login failed:"+error);
 	}
 
 
@@ -111,7 +115,7 @@ public class SignalPhoneActivity extends Activity implements LoginListener {
 			}
 		});
 	}
-	
+
 	@Override
 	public void onResume() {
 		super.onResume();
@@ -120,9 +124,9 @@ public class SignalPhoneActivity extends Activity implements LoginListener {
 			showIncomingAlert();
 		}
 	}
-	
+
 	private class LoginAsyncTask extends AsyncTask<String, Void, String> {
-		
+
 		@Override
 	    protected void onPreExecute() {
 	        super.onPreExecute();
@@ -137,8 +141,8 @@ public class SignalPhoneActivity extends Activity implements LoginListener {
 		}
 
 	}
-	
-	
+
+
 	 private void showIncomingAlert()
 	    {
 	        handler.post(new Runnable()
@@ -157,7 +161,7 @@ public class SignalPhoneActivity extends Activity implements LoginListener {
 	                            {
 //	                                phone.accept();
 //	                                incomingAlert = null;
-	                            	
+
 	                            	startActivity(new Intent(getBaseContext(), ConversationActivity.class));
 	                            }
 	                        })

@@ -1,6 +1,6 @@
 package com.twilio.signal.impl;
 
-import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 import android.app.PendingIntent;
@@ -10,29 +10,46 @@ import android.content.Intent;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import com.twilio.signal.Capability;
 import com.twilio.signal.Conversation;
 import com.twilio.signal.ConversationListener;
 import com.twilio.signal.Endpoint;
 import com.twilio.signal.EndpointListener;
+import com.twilio.signal.Media;
 import com.twilio.signal.impl.logging.Logger;
 
-public class EndpointImpl implements Endpoint, Parcelable{
-	
-	static final Logger logger = Logger.getLogger(EndpointImpl.class);
+public class EndpointImpl implements Endpoint, NativeHandleInterface, Parcelable{
 
+	static final Logger logger = Logger.getLogger(EndpointImpl.class);
 	
+	class EndpointObserverInternal implements NativeHandleInterface {
+		
+		private long nativeEndpointObserver;
+		
+		public EndpointObserverInternal(EndpointListener listener) {
+			//this.listener = listener;
+			this.nativeEndpointObserver = wrapNativeObserver(listener, EndpointImpl.this);
+		}
+
+		private native long wrapNativeObserver(EndpointListener listener, Endpoint endpoint);
+		//::TODO figure out when to call this - may be Endpoint.release() ??
+		private native void freeNativeObserver(long nativeEndpointObserver);
+
+		@Override
+		public long getNativeHandle() {
+			return nativeEndpointObserver;
+		}
+		
+	}
+
 	private final UUID uuid = UUID.randomUUID();
-	private SignalCore sigalCore;
 	private Context context;
 	private EndpointListener listener;
 	private String userName;
 	private PendingIntent incomingIntent = null;
-
+	private EndpointObserverInternal endpointObserver;
+	private long nativeEndpointHandle;
 	
-	private native Endpoint createEndpoint();
-
-
+	
 	public UUID getUuid() {
 		return uuid;
 	}
@@ -43,135 +60,82 @@ public class EndpointImpl implements Endpoint, Parcelable{
 		return super.hashCode();
 	}
 
-
-	public EndpointImpl(TwilioSignalImpl twilioSignalImpl,
-			String inCapabilityToken, EndpointListener inListener) {
-		this.context = twilioSignalImpl.getContext();
+/*
+	public EndpointImpl(Context context,
+						EndpointListener inListener,
+						long nativeEndpointHandle) {
+		this.context = context;
 		this.listener = inListener;
-		this.sigalCore = SignalCore.getInstance(this.context);
+		this.nativeEndpointHandle = nativeEndpointHandle;
 	}
+*/
 
-
-	@Override
-	public Endpoint initWithToken(String token, EndpointListener listener) {
-		// TODO Auto-generated method stub
-		return null;
+	EndpointImpl(Context context,
+			EndpointListener inListener) {
+		this.context = context;
+		this.listener = inListener;
+		//this.nativeEndpointHandle = nativeEndpointHandle;
+		this.endpointObserver = new EndpointObserverInternal(inListener);
 	}
-
-
-	@Override
-	public Endpoint initWithToken(String token, Map<String, String> params) {
-		// TODO Auto-generated method stub
-		return null;
+	
+	void setNativeHandle(long nativeEndpointHandle) {
+		this.nativeEndpointHandle = nativeEndpointHandle;
+	}
+	
+	long getEndpointObserverHandle() {
+		return this.endpointObserver.getNativeHandle();
 	}
 
 
 	@Override
 	public void listen() {
-		SignalCore.getInstance(this.context).register();
+		//SignalCore.getInstance(this.context).register();
+		if (nativeEndpointHandle != 0) {
+			listen(nativeEndpointHandle);
+		}
 	}
 
 
 	@Override
 	public void unlisten() {
-		SignalCore.getInstance(this.context).unregister(this);	
+		SignalCore.getInstance(this.context).unregister(this);
 	}
 
 
-	@Override
-	public void leaveConversaton(Conversation conversation) {
-		// TODO Auto-generated method stub
-		
-	}
-
-
-	@Override
-	public void setMuted(boolean muted) {
-		// TODO Auto-generated method stub
-		
-	}
-
-
-	@Override
-	public void setMuted(boolean muted, Conversation conversation) {
-		// TODO Auto-generated method stub
-		
-	}
-
-
-	@Override
-	public boolean isMuted() {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-
-	@Override
-	public boolean isMuted(Conversation conversation) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-
-	@Override
-	public Map<Capability, Object> getCapabilities() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-
-	@Override
-	public void updateCapabilityToken(String token) {
-		// TODO Auto-generated method stub
-		
-	}
 
 
 	@Override
 	public void setEndpointListener(EndpointListener listener) {
 		// TODO Auto-generated method stub
-		
-	}
 
-
-	@Override
-	public void setIncomingIntent(PendingIntent inIntent) {
-		incomingIntent = inIntent;
 	}
 
 	@Override
-	public Conversation createConversation(String remoteEndpoint,
-			Map<String, String> options, ConversationListener linstener) {
+	public String getAddress() {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 
 	@Override
-	public State getState() {
+	public boolean isListening() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+
+	@Override
+	public Conversation createConversation(Set<String> participants,
+			Media localMedia, ConversationListener listener) {
 		// TODO Auto-generated method stub
 		return null;
 	}
-
-
-	
-	public String getUserName() {
-		return userName;
-	}
-
-
-	public void setUserName(String userName) {
-		this.userName = userName;
-	}
-
-
-	
 
 
 	@Override /* Parcelable */
 	public int describeContents()
 	{
-        return 0; 
+        return 0;
     }
 
 	@Override /* Parcelable */
@@ -179,7 +143,7 @@ public class EndpointImpl implements Endpoint, Parcelable{
 	{
         out.writeSerializable(uuid);
     }
-	
+
 	/* Parcelable */
     public static final Parcelable.Creator<EndpointImpl> CREATOR = new Parcelable.Creator<EndpointImpl>()
     {
@@ -187,7 +151,7 @@ public class EndpointImpl implements Endpoint, Parcelable{
         public EndpointImpl createFromParcel(Parcel in)
         {
             UUID uuid = (UUID)in.readSerializable();
-            TwilioSignalImpl twImpl = TwilioSignalImpl.getInstance();
+            TwilioRTCImpl twImpl = TwilioRTCImpl.getInstance();
             return twImpl.findDeviceByUUID(uuid);
         }
 
@@ -198,25 +162,6 @@ public class EndpointImpl implements Endpoint, Parcelable{
         }
     };
 
-
-	@Override
-	public void accept() {
-		SignalCore.getInstance(context).accept(this);			
-	}
-
-
-	public void onRegistration() {
-		if(this.listener != null) {
-		    this.listener.onEndpointStartListeningForInvites(this);
-		}
-	}
-	
-
-	public void onUnRegistration() {
-		if(this.listener != null) {
-		    this.listener.onEndpointStopListeningForInvites(this);
-		}
-	}
 
 	public void onIncomingInvite() {
 		logger.d("Received Incoming notification");
@@ -236,5 +181,15 @@ public class EndpointImpl implements Endpoint, Parcelable{
 			}
 		}
 	}
-	
+
+
+	@Override
+	public long getNativeHandle() {
+		return nativeEndpointHandle;
+	}
+
+	//Native implementation
+	private native void listen(long nativeEndpoint);
+
+
 }
