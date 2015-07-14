@@ -127,8 +127,8 @@ public class EndpointImpl implements Endpoint, NativeHandleInterface, Parcelable
 	@Override
 	public Conversation createConversation(Set<String> participants,
 			Media localMedia, ConversationListener listener) {
-		// TODO Auto-generated method stub
-		return null;
+		Conversation conv = ConversationImpl.create(this, participants, localMedia, listener);
+		return conv;
 	}
 
 
