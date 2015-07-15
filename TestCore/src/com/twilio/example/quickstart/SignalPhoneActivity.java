@@ -15,17 +15,22 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 
 import com.twilio.example.quickstart.SignalPhone.LoginListener;
+import com.twilio.signal.Conversation;
 import com.twilio.signal.Endpoint;
 
 public class SignalPhoneActivity extends Activity implements LoginListener {
 
 	private static final String DEFAULT_CLIENT_NAME = "alice";
 	private static final String TAG = "SignalPhoneActivity";
+	
+	public static final String CONVERSATION_SID = "conversation_sid";
 
 	SignalPhone phone;
 	private EditText clientNameTextBox;
+	private EditText inviteText;
 	private Button login;
 	private Button logout;
+	private Button addParticipant;
 
 	private LinearLayout invite;
 	private LinearLayout loginUser;
@@ -43,6 +48,7 @@ public class SignalPhoneActivity extends Activity implements LoginListener {
 		this.clientNameTextBox = (EditText)findViewById(R.id.client_name);
 		this.clientNameTextBox.setText(DEFAULT_CLIENT_NAME);
 		this.login = (Button)findViewById(R.id.register);
+		this.inviteText = (EditText)findViewById(R.id.invite);
 		this.phone = SignalPhone.getInstance(getApplicationContext());
 		this.phone.setListeners(this);
 		this.login.setOnClickListener(new View.OnClickListener() {
@@ -52,6 +58,15 @@ public class SignalPhoneActivity extends Activity implements LoginListener {
 			}
 		});
 		this.invite = (LinearLayout)findViewById(R.id.inviteParticipant);
+		this.addParticipant = (Button)findViewById(R.id.plus);
+		this.addParticipant.setOnClickListener(new View.OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				String participant = inviteText.getText().toString();
+				SignalPhoneActivity.this.call(participant);
+			}
+		});
 		this.logout = (Button)findViewById(R.id.logout);
 		this.logout.setOnClickListener(new View.OnClickListener() {
 			@Override
@@ -60,7 +75,7 @@ public class SignalPhoneActivity extends Activity implements LoginListener {
 			}
 		});
 	}
-
+	
 
 	@Override
 	public void onLoginStarted() {
@@ -140,6 +155,15 @@ public class SignalPhoneActivity extends Activity implements LoginListener {
 			return null;
 		}
 
+	}
+	
+	private void call(String participant) {
+		Conversation conv = phone.call(participant);
+		if (conv != null) {
+			Intent intent = new Intent(getBaseContext(), ConversationActivity.class);
+			intent.putExtra(CONVERSATION_SID, conv.getConversationSid());
+			startActivity(intent);
+		}
 	}
 
 

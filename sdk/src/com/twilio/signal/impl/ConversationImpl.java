@@ -40,10 +40,11 @@ public class ConversationImpl implements Conversation, NativeHandleInterface {
 			   Media localMedia,
 			   ConversationListener listener) {
 		//this.endpoint = endpoint;
+		String[] partArary = participants.toArray(new String[participants.size()]);
 		sessionObserverInternal = new SessionObserverInternal(listener, endpoint);
 		nativeHandle = wrapOutgoingSession(endpoint.getNativeHandle(),
 				sessionObserverInternal.getNativeHandle(),
-				(String[])participants.toArray());
+				partArary);
 	}
 	
 	public static Conversation create(EndpointImpl endpoint, Set<String> participants,

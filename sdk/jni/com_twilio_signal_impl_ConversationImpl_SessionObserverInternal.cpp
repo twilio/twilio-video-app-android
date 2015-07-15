@@ -12,7 +12,7 @@ using namespace twiliosdk;
 
 class SessionObserverInternalWrapper : public TSCSessionObserverObject {
 public:
-	SessionObserverInternalWrapper(JNIEnv* env,jobject obj) {
+	SessionObserverInternalWrapper(JNIEnv* env, jobject obj, jobject listener, jobject endpoint) {
 
 	}
 protected:
@@ -60,8 +60,10 @@ protected:
  * Signature: (Lcom/twilio/signal/ConversationListener;Lcom/twilio/signal/Endpoint;)J
  */
 JNIEXPORT jlong JNICALL Java_com_twilio_signal_impl_ConversationImpl_00024SessionObserverInternal_wrapNativeObserver
-  (JNIEnv *, jobject obj, jobject listener, jobject endpoint) {
-
+  (JNIEnv *env, jobject obj, jobject listener, jobject endpoint) {
+	TSCSessionObserverObjectRef sessionObserver =
+				TSCSessionObserverObjectRef(new SessionObserverInternalWrapper(env, obj, listener, endpoint));
+	return (jlong)sessionObserver.release();
 }
 
 /*
