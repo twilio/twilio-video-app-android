@@ -14,7 +14,7 @@
 
 using namespace twiliosdk;
 
-#define TAG  "SignalCore(native)"
+#define TAG  "TwilioSDK(native)"
 
 JNIEXPORT jlong JNICALL Java_com_twilio_signal_impl_ConversationImpl_wrapOutgoingSession
   (JNIEnv *env, jobject obj, jlong nativeEndpoint, jlong nativeSessionObserver, jobjectArray participantList)
@@ -48,7 +48,7 @@ JNIEXPORT jlong JNICALL Java_com_twilio_signal_impl_ConversationImpl_wrapOutgoin
 		__android_log_print(ANDROID_LOG_DEBUG, TAG, "wrapOutgoingSession 9");
 		const char *nativeString = env->GetStringUTFChars(value, 0);
 		std::string participantStr(nativeString);
-		__android_log_print(ANDROID_LOG_DEBUG, TAG, "wrapOutgoingSession 10");
+		__android_log_print(ANDROID_LOG_DEBUG, TAG, "wrapOutgoingSession 10: %s",nativeString);
 		env->ReleaseStringUTFChars(value, nativeString);
 		TSCParticipant participant(participantStr);
 		participants.push_back(participant);

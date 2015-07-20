@@ -35,7 +35,6 @@ public class TwilioRTCImpl
 	private static final String TWILIO_SIGNAL_SERVICE_NAME = "com.twilio.signal.TwilioRTCService";
 
 	private static volatile TwilioRTCImpl instance;
-	private SignalCore signalCore;
 	protected Context context;
 	private boolean sdkInited;
 	private boolean sdkIniting;
@@ -88,6 +87,7 @@ public class TwilioRTCImpl
 		sdkIniting = true;
 
 		try {
+			initCore(inContext);
 			PackageManager pm = inContext.getPackageManager();
 			PackageInfo pinfo = pm.getPackageInfo(inContext.getPackageName(),
 					PackageManager.GET_PERMISSIONS
@@ -155,8 +155,10 @@ public class TwilioRTCImpl
 				// we must never die!
 				context.startService(service);
 				twBinder = (TwilioBinder)binder;
-				signalCore = twBinder.getSignalCore();
-				if (signalCore != null)
+				TwilioRTCImpl twilioRtc = twBinder.getTwiloRtc();
+				//signalCore = twBinder.getSignalCore();
+				//if (signalCore != null)
+				if (twilioRtc != null)
 				{
 					inListener.onInitialized();
 				} else {

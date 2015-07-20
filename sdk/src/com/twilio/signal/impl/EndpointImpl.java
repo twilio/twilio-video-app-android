@@ -98,7 +98,7 @@ public class EndpointImpl implements Endpoint, NativeHandleInterface, Parcelable
 
 	@Override
 	public void unlisten() {
-		SignalCore.getInstance(this.context).unregister(this);
+		//SignalCore.getInstance(this.context).unregister(this);
 	}
 
 

@@ -8,7 +8,7 @@
 
 using namespace twiliosdk;
 
-#define TAG  "SignalCore(native)"
+#define TAG  "TwilioSDK(native)"
 
 class SessionObserverInternalWrapper : public TSCSessionObserverObject {
 public:
