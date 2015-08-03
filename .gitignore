@@ -1,5 +1,5 @@
 sdk/local.properties
-sdk/libs
+sdk/libs/armeabi-v7a
 sdk/obj
 sdk/gen
 output
