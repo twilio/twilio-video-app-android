@@ -4,6 +4,3 @@
 [submodule "sdk/thirdparty/openssl-stock-android"]
 	path = sdk/thirdparty/openssl-stock-android
 	url = git@code.hq.twilio.com:client/openssl-stock-android.git
-[submodule "sdk/external/signal-sdk-core"]
-	path = sdk/external/signal-sdk-core
-	url = git@code.hq.twilio.com:client/signal-sdk-core.git
