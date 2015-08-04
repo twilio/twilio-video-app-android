@@ -23,12 +23,12 @@ public abstract class Version
 }
 EOF
 
-cat >external/signal-sdk-core/TwilioCoreSDK/TwilioCoreSDK/Sources/Core/TSCVersion.h <<EOF
-/* this file is auto-generated; do not edit! */
+#cat >external/signal-sdk-core/TwilioCoreSDK/TwilioCoreSDK/Sources/Core/TSCVersion.h <<EOF
+#/* this file is auto-generated; do not edit! */
 
 #ifdef DEBUG
 #define TSC_CORE_SDK_VERSION "${sdk_version}"
 #else
 #define TSC_CORE_SDK_VERSION "${sdk_version}"
 #endif
-EOF
+#EOF
