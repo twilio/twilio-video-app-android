@@ -8,7 +8,9 @@
 package com.twilio.example.quickstart;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -21,14 +23,20 @@ import android.media.AudioManager;
 import android.os.AsyncTask;
 import android.util.Log;
 
+import com.twilio.signal.Conversation;
+import com.twilio.signal.Conversation.Status;
+import com.twilio.signal.ConversationListener;
 import com.twilio.signal.Endpoint;
 import com.twilio.signal.EndpointListener;
 import com.twilio.signal.Invite;
+import com.twilio.signal.LocalMedia;
+import com.twilio.signal.LocalMediaImpl;
+import com.twilio.signal.Participant;
 import com.twilio.signal.TwilioRTC;
 import com.twilio.signal.impl.TwilioConstants;
 
 
-public class SignalPhone implements EndpointListener
+public class SignalPhone implements EndpointListener, ConversationListener
 {
     private static final String TAG = "SIgnalPhone";
 
@@ -65,6 +73,7 @@ public class SignalPhone implements EndpointListener
 
     private static boolean twilioSdkInited;
     private static boolean twilioSdkInitInProgress;
+    private Map<String, Conversation> conversations;
 
     private boolean speakerEnabled;
 
@@ -73,6 +82,7 @@ public class SignalPhone implements EndpointListener
     {
         this.context = context;
         threadPool = Executors.newFixedThreadPool(2);
+        conversations = new HashMap<String, Conversation>();
     }
 
     public void setListeners(LoginListener loginListener)
@@ -152,6 +162,24 @@ public class SignalPhone implements EndpointListener
     public void connect(Map<String, String> inParams)
     {
 
+    }
+    
+    public Conversation call(String participant) {
+    	if (participant == null && participant == "") {
+    		return null;
+    	}
+    	if (!twilioSdkInited || (SignalPhone.this.alice == null)) {
+    		return null;
+    	}
+    	LocalMedia localMedia = new LocalMediaImpl();
+    	Set<String> partSet = new HashSet<String>();
+    	partSet.add(participant);
+    	Conversation conv = SignalPhone.this.alice.createConversation(
+    			partSet, localMedia, this);
+    	if (conv != null) {
+    		conversations.put(conv.getConversationSid(), conv);
+    	}
+    	return conv;
     }
 
     public void disconnect()
@@ -314,6 +342,63 @@ public class SignalPhone implements EndpointListener
 	public void onReceiveConversationInvite(Endpoint endpoint, Invite invite) {
 		// TODO Auto-generated method stub
 
+	}
+
+	/*
+	 * ConversationListener
+	 */
+	@Override
+	public void onConnectParticipant(Conversation conversation,
+			Participant participant) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onFailToConnectParticipant(Conversation conversation,
+			Participant participant, int error, String errorMessage) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onDisconnectParticipant(Conversation conversation,
+			Participant participant) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onVideoAddedForParticipant(Conversation conversation,
+			Participant participant) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onVideoRemovedForParticipant(Conversation conversation,
+			Participant participant) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onLocalStatusChanged(Conversation conversation, Status status) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onConversationEndedt(Conversation conversation) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onConversationEndedt(Conversation conversation, int error,
+			String errorMessage) {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

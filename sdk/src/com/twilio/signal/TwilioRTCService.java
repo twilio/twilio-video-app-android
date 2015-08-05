@@ -5,7 +5,7 @@ import android.content.Intent;
 import android.os.Binder;
 import android.os.IBinder;
 
-import com.twilio.signal.impl.SignalCore;
+import com.twilio.signal.impl.TwilioRTCImpl;
 import com.twilio.signal.impl.TwilioRTCServiceImpl;
 import com.twilio.signal.impl.logging.Logger;
 
@@ -19,9 +19,9 @@ public class TwilioRTCService extends Service
 	public class TwilioBinder extends Binder
 	{
 		
-		public SignalCore getSignalCore()
+		public TwilioRTCImpl getTwiloRtc()
 		{
-			return serviceImpl.getSignalCore();
+			return serviceImpl.getTwilioRtc();
 		}
 	}
 	

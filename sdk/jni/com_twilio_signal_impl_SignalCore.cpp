@@ -7,7 +7,7 @@
 #include "TSCoreSDKTypes.h"
 #include "TSCEndpoint.h"
 #include "EndpointObserver.h"
-#include "webrtc/video_engine/include/vie_base.h"
+//#include "webrtc/video_engine/include/vie_base.h"
 #include "webrtc/voice_engine/include/voe_base.h"
 #include "webrtc/modules/video_capture/video_capture_internal.h"
 #include "webrtc/modules/video_render/video_render_internal.h"
@@ -36,11 +36,11 @@ JNIEXPORT jboolean JNICALL Java_com_twilio_signal_impl_SignalCore_initCore(JNIEn
 	LOG_W(TAG, "SignalCore.initCore() called");
 
 
-	failure |= webrtc::SetCaptureAndroidVM(cachedJVM, context);
-	failure |= webrtc::SetRenderAndroidVM(cachedJVM);
+	//failure |= webrtc::SetCaptureAndroidVM(cachedJVM, context);
+	//failure |= webrtc::SetRenderAndroidVM(cachedJVM);
 
 	LOG_W(TAG, "Calling DA Magic formula");
-	failure |= webrtc::VoiceEngine::SetAndroidObjects(cachedJVM, env, context);
+	//failure |= webrtc::VoiceEngine::SetAndroidObjects(cachedJVM, env, context);
 
 	if (tscSdk != NULL && tscSdk->isInitialized())
 	{

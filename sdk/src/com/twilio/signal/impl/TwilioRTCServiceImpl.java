@@ -19,7 +19,8 @@ public class TwilioRTCServiceImpl
 	private static final Logger logger = Logger.getLogger(TwilioRTCService.class);
 	
 	private Context context;
-	private SignalCore signalCore;
+	//private SignalCore signalCore;
+	private TwilioRTCImpl twilioRtc;
 	private Exception callManagerError;
 	
 	private ConnectivityReceiver connectivityReceiver;
@@ -151,7 +152,8 @@ public class TwilioRTCServiceImpl
 
 		try
 		{
-			signalCore = SignalCore.getInstance(context);
+			//signalCore = SignalCore.getInstance(context);
+			twilioRtc = TwilioRTCImpl.getInstance();
 		}
 		catch (Exception e)
 		{
@@ -173,8 +175,12 @@ public class TwilioRTCServiceImpl
 		context.unregisterReceiver(connectivityReceiver);
 		connectivityReceiver = null;
 		
-		SignalCore.destroy();
-		signalCore = null;
+		//SignalCore.destroy();
+
+		//TODO - create destroy method
+		//TwilioRTCImpl.destroy();
+		//signalCore = null;
+		twilioRtc = null;
 		callManagerError = null;
 		
 		context = null;
@@ -183,11 +189,13 @@ public class TwilioRTCServiceImpl
 	private void needsReconnect()
 	{
 		logger.i("Network change; doing reconnect");
-		signalCore.onNetworkChanged();
+		//TODO - What is this event? Do we need to handle it in twilioRtc ?
+		//signalCore.onNetworkChanged();
 	}
 
-	public SignalCore getSignalCore() {
-		return this.signalCore;
+	public TwilioRTCImpl getTwilioRtc() {
+		return this.twilioRtc;
+		//return this.signalCore;
 	}
 
 }

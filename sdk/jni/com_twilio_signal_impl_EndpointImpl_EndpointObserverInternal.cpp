@@ -3,12 +3,14 @@
 #include "TSCoreError.h"
 #include "TSCEndpoint.h"
 #include "TSCEndpointObserver.h"
+#include "TSCSession.h"
+#include "TSCIncomingSession.h"
 #include <twilio-jni/twilio-jni.h>
 #include <android/log.h>
 
 using namespace twiliosdk;
 
-#define TAG  "SignalCore(native)"
+#define TAG  "TwilioSDK(native)"
 
 class EndpointObserverInternalWrapper: public TSCEndpointObserverObject
 {
@@ -57,9 +59,12 @@ protected:
     	JNIEnvAttacher jniAttacher;
     	__android_log_print(ANDROID_LOG_VERBOSE, TAG, "onStateDidChange");
     }
-    virtual void onIncomingCallDidReceive(TSCIncomingSession* session) {
+    virtual void onIncomingCallDidReceive(TSCSession* session) {
     	JNIEnvAttacher jniAttacher;
     	__android_log_print(ANDROID_LOG_VERBOSE, TAG, "onIncomingCallDidReceive");
+    	//TSCIncomingSessionObjectRef incomingSession = dynamic_cast<TSCIncomingSessionObject*>(session);
+    	//TSCOptions constraints;
+    	//session->start(constraints);
     }
 
 
