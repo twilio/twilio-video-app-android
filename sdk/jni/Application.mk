@@ -5,6 +5,6 @@ APP_PLATFORM := android-16
 APP_STL := c++_static
 #APP_ABI := armeabi armeabi-v7a x86 mips
 APP_ABI := armeabi-v7a
-APP_OPTIM := release
+APP_OPTIM := debug 
 #APP_CPPFLAGS := -fexceptions
 APP_CPPFLAGS += -std=gnu++11 -fexceptions
