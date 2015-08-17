@@ -62,9 +62,10 @@ protected:
     virtual void onIncomingCallDidReceive(TSCSession* session) {
     	JNIEnvAttacher jniAttacher;
     	__android_log_print(ANDROID_LOG_VERBOSE, TAG, "onIncomingCallDidReceive");
-    	//TSCIncomingSessionObjectRef incomingSession = dynamic_cast<TSCIncomingSessionObject*>(session);
-    	//TSCOptions constraints;
-    	//session->start(constraints);
+    	TSCIncomingSessionObjectRef incomingSession = reinterpret_cast<TSCIncomingSessionObject*>(session);
+    	TSCOptions options;
+
+    	incomingSession->start(options);
     }
 
 
