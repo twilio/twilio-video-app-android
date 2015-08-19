@@ -24,7 +24,8 @@ LOCAL_SRC_FILES := \
 	com_twilio_signal_impl_EndpointImpl_EndpointObserverInternal.cpp \
 	com_twilio_signal_impl_ConversationImpl.cpp \
 	com_twilio_signal_impl_ConversationImpl_SessionObserverInternal.cpp \
-	renderer.cpp
+	renderer.cpp \
+	callback_converter.cpp
 	#com_twilio_signal_impl_SignalCore.cpp \
 	EndpointObserver.cpp
 
@@ -63,9 +64,13 @@ LOCAL_LDLIBS := \
 	-lGLESv2 \
 	-ljnigraphics \
 	-lOpenSLES \
-	-landroid
+	-lEGL \
+	-lGLESv1_CM
 	#$(OPENSSL_LIBS) \
 	$(OPUS_LIB) \
+
+# To use android native window api
+LOCAL_LDLIBS += -landroid
 
 # pjmedia is in here twice because there's a circular dependency
 # between pjmedia and pjmedia-codec (the g711_init func)

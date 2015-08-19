@@ -34,7 +34,9 @@ protected:
 	virtual void onParticipantDidConnect(const TSCParticipantObjectRef& participant,
 										 const TSCErrorObjectRef& error) {
 		__android_log_print(ANDROID_LOG_VERBOSE, TAG, "onParticipantDidConnect");
+    		// jniAttacher.get()->CallVoidMethod(listener, endpoint, j_endpoint_);
 	}
+
 	virtual void onParticipantDidDisconect(const TSCParticipantObjectRef& participant,
 										   TSCDisconnectReason reason) {
 		__android_log_print(ANDROID_LOG_VERBOSE, TAG, "onParticipantDidDisconect");
