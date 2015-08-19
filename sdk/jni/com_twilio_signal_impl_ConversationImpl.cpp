@@ -7,6 +7,8 @@
 #include "TSCParticipant.h"
 #include <twilio-jni/twilio-jni.h>
 #include <android/log.h>
+#include <android/native_window.h>
+#include <android/native_window_jni.h>
 
 #include <string>
 #include <map>
@@ -16,9 +18,21 @@ using namespace twiliosdk;
 
 #define TAG  "TwilioSDK(native)"
 
+static ANativeWindow *window = 0;
+
 JNIEXPORT jlong JNICALL Java_com_twilio_signal_impl_ConversationImpl_wrapOutgoingSession
   (JNIEnv *env, jobject obj, jlong nativeEndpoint, jlong nativeSessionObserver, jobjectArray participantList, jobject surface)
 {
+
+	if (surface != 0) {
+        	window = ANativeWindow_fromSurface(env, surface);
+		__android_log_print(ANDROID_LOG_DEBUG, TAG, "Got window %p", window);
+        	// renderer->setWindow(window);
+    	} else {
+		__android_log_print(ANDROID_LOG_DEBUG, TAG, "Releasing window");
+        	ANativeWindow_release(window);
+    	}
+
 	__android_log_print(ANDROID_LOG_DEBUG, TAG, "wrapOutgoingSession");
 	TSCEndpointObject* endpoint = reinterpret_cast<TSCEndpointObject*>(nativeEndpoint);
 	__android_log_print(ANDROID_LOG_DEBUG, TAG, "wrapOutgoingSession 1");

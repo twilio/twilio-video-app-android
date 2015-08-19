@@ -23,7 +23,8 @@ LOCAL_SRC_FILES := \
 	com_twilio_signal_impl_EndpointImpl.cpp \
 	com_twilio_signal_impl_EndpointImpl_EndpointObserverInternal.cpp \
 	com_twilio_signal_impl_ConversationImpl.cpp \
-	com_twilio_signal_impl_ConversationImpl_SessionObserverInternal.cpp
+	com_twilio_signal_impl_ConversationImpl_SessionObserverInternal.cpp \
+	renderer.cpp
 	#com_twilio_signal_impl_SignalCore.cpp \
 	EndpointObserver.cpp
 
@@ -61,7 +62,8 @@ LOCAL_LDLIBS := \
 	-ldl \
 	-lGLESv2 \
 	-ljnigraphics \
-	-lOpenSLES
+	-lOpenSLES \
+	-landroid
 	#$(OPENSSL_LIBS) \
 	$(OPUS_LIB) \
 
