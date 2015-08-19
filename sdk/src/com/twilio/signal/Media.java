@@ -1,13 +1,12 @@
 package com.twilio.signal;
 
-import android.view.TextureView;
+import android.graphics.SurfaceTexture;
 
 public interface Media {
 	
-	
 	/** Read-only representation of the current UIView video container. */
-	public TextureView getView();
+	public SurfaceTexture getView();
 	
-	public void attachView(TextureView view);
+	public void attachView(SurfaceTexture view);
 
 }

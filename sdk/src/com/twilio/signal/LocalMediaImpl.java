@@ -1,21 +1,20 @@
 package com.twilio.signal;
 
-import android.view.TextureView;
+import android.graphics.SurfaceTexture;
 
 public class LocalMediaImpl implements LocalMedia {
-	
+	private SurfaceTexture view;
+
 	public LocalMediaImpl() {}
 
 	@Override
-	public TextureView getView() {
-		// TODO Auto-generated method stub
-		return null;
+	public SurfaceTexture getView() {
+		return view;
 	}
 
 	@Override
-	public void attachView(TextureView view) {
-		// TODO Auto-generated method stub
-
+	public void attachView(SurfaceTexture view) {
+		this.view = view;
 	}
 
 	@Override

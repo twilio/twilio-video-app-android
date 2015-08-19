@@ -2,6 +2,9 @@ package com.twilio.signal.impl;
 
 import java.util.Set;
 
+import android.view.Surface;
+import android.graphics.SurfaceTexture;
+
 import com.twilio.signal.Conversation;
 import com.twilio.signal.ConversationListener;
 import com.twilio.signal.Endpoint;
@@ -9,7 +12,9 @@ import com.twilio.signal.Media;
 import com.twilio.signal.impl.logging.Logger;
 
 public class ConversationImpl implements Conversation, NativeHandleInterface {
-	
+
+	private Surface localSurface;
+
 	static final Logger logger = Logger.getLogger(ConversationImpl.class);
 	
 	class SessionObserverInternal implements NativeHandleInterface {
@@ -40,11 +45,18 @@ public class ConversationImpl implements Conversation, NativeHandleInterface {
 			   Media localMedia,
 			   ConversationListener listener) {
 		//this.endpoint = endpoint;
-		String[] partArary = participants.toArray(new String[participants.size()]);
+		String[] participantArray = participants.toArray(new String[participants.size()]);
 		sessionObserverInternal = new SessionObserverInternal(listener, endpoint);
+
+		/*
+		 * Create a Surface from the SurfaceTexture
+		 * http://stackoverflow.com/questions/24312632/how-do-you-get-anativewindow-from-a-surfacetexture-in-the-ndk
+		 */
+		localSurface = new Surface(localMedia.getView());
 		nativeHandle = wrapOutgoingSession(endpoint.getNativeHandle(),
 				sessionObserverInternal.getNativeHandle(),
-				partArary);
+				participantArray,
+				localSurface);
 	}
 	
 	public static Conversation create(EndpointImpl endpoint, Set<String> participants,
@@ -100,7 +112,7 @@ public class ConversationImpl implements Conversation, NativeHandleInterface {
 		return null;
 	}
 	
-	private native long wrapOutgoingSession(long nativeEndpoint, long nativeSessionObserver, String[] participants);
+	private native long wrapOutgoingSession(long nativeEndpoint, long nativeSessionObserver, String[] participants, Surface localView);
 
 	@Override
 	public long getNativeHandle() {

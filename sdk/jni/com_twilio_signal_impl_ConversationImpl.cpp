@@ -17,7 +17,7 @@ using namespace twiliosdk;
 #define TAG  "TwilioSDK(native)"
 
 JNIEXPORT jlong JNICALL Java_com_twilio_signal_impl_ConversationImpl_wrapOutgoingSession
-  (JNIEnv *env, jobject obj, jlong nativeEndpoint, jlong nativeSessionObserver, jobjectArray participantList)
+  (JNIEnv *env, jobject obj, jlong nativeEndpoint, jlong nativeSessionObserver, jobjectArray participantList, jobject surface)
 {
 	__android_log_print(ANDROID_LOG_DEBUG, TAG, "wrapOutgoingSession");
 	TSCEndpointObject* endpoint = reinterpret_cast<TSCEndpointObject*>(nativeEndpoint);
