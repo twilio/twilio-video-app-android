@@ -19,14 +19,19 @@ using namespace twiliosdk;
 
 #define TAG  "TwilioSDK(native)"
 
+static ANativeWindow *localWindow = 0;
 
 JNIEXPORT jlong JNICALL Java_com_twilio_signal_impl_ConversationImpl_wrapOutgoingSession
   (JNIEnv *env, jobject obj, jlong nativeEndpoint, jlong nativeSessionObserver, jobjectArray participantList, jobjectArray surfaces)
 {
 
+	/*
+	 * Test to see if using OpenGL with multiple Surfaces would still render correctly.
+	 */
 	if (surfaces != 0) {
 		jsize len = env->GetArrayLength(surfaces);
-		for(int i = 0; i < len; i++) {
+	 	// Intentionally skipping the first window to use it inside the core. 
+		for(int i = 1; i < len; i++) {
 			ANativeWindow* window = ANativeWindow_fromSurface(env, env->GetObjectArrayElement(surfaces, i));
 			__android_log_print(ANDROID_LOG_DEBUG, TAG, "Got window %p", window);
 			Renderer* renderer = new Renderer();
@@ -34,8 +39,9 @@ JNIEXPORT jlong JNICALL Java_com_twilio_signal_impl_ConversationImpl_wrapOutgoin
 			renderer->start();
 		}
     	} else {
-		__android_log_print(ANDROID_LOG_DEBUG, TAG, "windows did not work");
+		__android_log_print(ANDROID_LOG_DEBUG, TAG, "windows are null");
     	}
+
 
 	__android_log_print(ANDROID_LOG_DEBUG, TAG, "wrapOutgoingSession");
 	TSCEndpointObject* endpoint = reinterpret_cast<TSCEndpointObject*>(nativeEndpoint);
@@ -73,6 +79,10 @@ JNIEXPORT jlong JNICALL Java_com_twilio_signal_impl_ConversationImpl_wrapOutgoin
 		__android_log_print(ANDROID_LOG_DEBUG, TAG, "wrapOutgoingSession 11");
 
 	}
+
+	localWindow = ANativeWindow_fromSurface(env, env->GetObjectArrayElement(surfaces, 0));
+	__android_log_print(ANDROID_LOG_DEBUG, TAG, "Got local window %p", localWindow);
+	outgoingSession->setWindow(localWindow);
 	__android_log_print(ANDROID_LOG_DEBUG, TAG, "wrapOutgoingSession 12");
 	outgoingSession->setParticipants(participants);
 	TSCOptions options2;
