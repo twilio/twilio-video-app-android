@@ -24,6 +24,10 @@ public class ConversationActivity extends Activity {
 	private SignalPhone phone;
 	private Conversation conv;
 	private TextureView localView;
+	private TextureView remoteView;
+	private final Object syncObject = new Object();
+
+	private SurfaceTexture[] surfaceViews = new SurfaceTexture[2];
 
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -31,11 +35,15 @@ public class ConversationActivity extends Activity {
 		setContentView(R.layout.conversation);
 
 		localView = (TextureView)findViewById(R.id.localView);
+		remoteView = (TextureView)findViewById(R.id.remoteView);
 
 		localView.setSurfaceTextureListener(new TextureView.SurfaceTextureListener() {
 
 			public void onSurfaceTextureAvailable(SurfaceTexture surface, int width, int height) {
-				makeCall(surface);
+				synchronized(syncObject) {
+					surfaceViews[0] = surface;
+					attemptCall();
+				}
 			}
 
 			public void onSurfaceTextureSizeChanged(SurfaceTexture surface, int width, int height) {
@@ -52,13 +60,43 @@ public class ConversationActivity extends Activity {
 
 		});
 
+		remoteView.setSurfaceTextureListener(new TextureView.SurfaceTextureListener() {
+
+			public void onSurfaceTextureAvailable(SurfaceTexture surface, int width, int height) {
+				synchronized(syncObject) {
+					surfaceViews[1] = surface;
+					attemptCall();
+				}
+			}
+
+			public void onSurfaceTextureSizeChanged(SurfaceTexture surface, int width, int height) {
+
+			}
+
+			public boolean onSurfaceTextureDestroyed(SurfaceTexture surface) {
+				return true;	
+			}
+
+			public void onSurfaceTextureUpdated(SurfaceTexture surface) {
+				
+			}
+
+		});
+
+
 	}
 
-	private void makeCall(SurfaceTexture localSurface) {
+	private void attemptCall() {
+		if(surfaceViews[0] != null && surfaceViews[1] != null) {
+			makeCall();
+		}
+	}
+
+	private void makeCall() {
 		String participant = getIntent().getStringExtra(SignalPhoneActivity.CONVERSATION_PARTICIPANT);
 
 		phone = SignalPhone.getInstance(getApplicationContext());
-		conv = phone.call(participant, localSurface);
+		conv = phone.call(participant, surfaceViews);
 		if(conv != null) {
 			// do stuff
 		}

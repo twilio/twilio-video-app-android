@@ -13,7 +13,7 @@ extern "C" {
  * Signature: (JJ[Ljava/lang/String;)J
  */
 JNIEXPORT jlong JNICALL Java_com_twilio_signal_impl_ConversationImpl_wrapOutgoingSession
-  (JNIEnv *, jobject, jlong, jlong, jobjectArray, jobject);
+  (JNIEnv *, jobject, jlong, jlong, jobjectArray, jobjectArray);
 
 #ifdef __cplusplus
 }

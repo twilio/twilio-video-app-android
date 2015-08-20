@@ -13,7 +13,7 @@ import com.twilio.signal.impl.logging.Logger;
 
 public class ConversationImpl implements Conversation, NativeHandleInterface {
 
-	private Surface localSurface;
+	private Surface[] surfaces;
 
 	static final Logger logger = Logger.getLogger(ConversationImpl.class);
 	
@@ -52,11 +52,14 @@ public class ConversationImpl implements Conversation, NativeHandleInterface {
 		 * Create a Surface from the SurfaceTexture
 		 * http://stackoverflow.com/questions/24312632/how-do-you-get-anativewindow-from-a-surfacetexture-in-the-ndk
 		 */
-		localSurface = new Surface(localMedia.getView());
+		surfaces = new Surface[localMedia.getViews().length];		
+		for(int i = 0; i < surfaces.length; i++) {
+			surfaces[i] = new Surface(localMedia.getViews()[i]);
+		}
 		nativeHandle = wrapOutgoingSession(endpoint.getNativeHandle(),
 				sessionObserverInternal.getNativeHandle(),
 				participantArray,
-				localSurface);
+				surfaces);
 	}
 	
 	public static Conversation create(EndpointImpl endpoint, Set<String> participants,
@@ -112,7 +115,7 @@ public class ConversationImpl implements Conversation, NativeHandleInterface {
 		return null;
 	}
 	
-	private native long wrapOutgoingSession(long nativeEndpoint, long nativeSessionObserver, String[] participants, Surface localView);
+	private native long wrapOutgoingSession(long nativeEndpoint, long nativeSessionObserver, String[] participants, Surface[] views);
 
 	@Override
 	public long getNativeHandle() {

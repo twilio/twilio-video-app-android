@@ -3,18 +3,18 @@ package com.twilio.signal;
 import android.graphics.SurfaceTexture;
 
 public class LocalMediaImpl implements LocalMedia {
-	private SurfaceTexture view;
+	private SurfaceTexture[] views;
 
 	public LocalMediaImpl() {}
 
 	@Override
-	public SurfaceTexture getView() {
-		return view;
+	public SurfaceTexture[] getViews() {
+		return views;
 	}
 
 	@Override
-	public void attachView(SurfaceTexture view) {
-		this.view = view;
+	public void attachViews(SurfaceTexture[] views) {
+		this.views = views;
 	}
 
 	@Override

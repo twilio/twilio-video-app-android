@@ -19,22 +19,22 @@ using namespace twiliosdk;
 
 #define TAG  "TwilioSDK(native)"
 
-static Renderer *renderer = 0;
-static ANativeWindow *window = 0;
 
 JNIEXPORT jlong JNICALL Java_com_twilio_signal_impl_ConversationImpl_wrapOutgoingSession
-  (JNIEnv *env, jobject obj, jlong nativeEndpoint, jlong nativeSessionObserver, jobjectArray participantList, jobject surface)
+  (JNIEnv *env, jobject obj, jlong nativeEndpoint, jlong nativeSessionObserver, jobjectArray participantList, jobjectArray surfaces)
 {
 
-	if (surface != 0) {
-        	window = ANativeWindow_fromSurface(env, surface);
-		__android_log_print(ANDROID_LOG_DEBUG, TAG, "Got window %p", window);
-   		renderer = new Renderer();
-	     	renderer->setWindow(window);
-		renderer->start();
+	if (surfaces != 0) {
+		jsize len = env->GetArrayLength(surfaces);
+		for(int i = 0; i < len; i++) {
+			ANativeWindow* window = ANativeWindow_fromSurface(env, env->GetObjectArrayElement(surfaces, i));
+			__android_log_print(ANDROID_LOG_DEBUG, TAG, "Got window %p", window);
+			Renderer* renderer = new Renderer();
+			renderer->setWindow(window);
+			renderer->start();
+		}
     	} else {
-		__android_log_print(ANDROID_LOG_DEBUG, TAG, "Releasing window");
-        	ANativeWindow_release(window);
+		__android_log_print(ANDROID_LOG_DEBUG, TAG, "windows did not work");
     	}
 
 	__android_log_print(ANDROID_LOG_DEBUG, TAG, "wrapOutgoingSession");

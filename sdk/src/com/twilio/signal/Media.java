@@ -5,8 +5,8 @@ import android.graphics.SurfaceTexture;
 public interface Media {
 	
 	/** Read-only representation of the current UIView video container. */
-	public SurfaceTexture getView();
+	public SurfaceTexture[] getViews();
 	
-	public void attachView(SurfaceTexture view);
+	public void attachViews(SurfaceTexture[] views);
 
 }

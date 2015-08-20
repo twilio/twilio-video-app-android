@@ -165,7 +165,7 @@ public class SignalPhone implements EndpointListener, ConversationListener
 
     }
 
-    public Conversation call(String participant, SurfaceTexture localView) {
+    public Conversation call(String participant, SurfaceTexture[] views) {
     	if (participant == null && participant == "") {
     		return null;
     	}
@@ -173,7 +173,7 @@ public class SignalPhone implements EndpointListener, ConversationListener
     		return null;
     	}
     	LocalMedia localMedia = new LocalMediaImpl();
-	localMedia.attachView(localView);
+	localMedia.attachViews(views);
     	Set<String> partSet = new HashSet<String>();
     	partSet.add(participant);
     	Conversation conv = SignalPhone.this.alice.createConversation(
