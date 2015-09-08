@@ -79,6 +79,8 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Vi
 			return null;
 		}
 
+		videoSurface.attachLocalView(new Surface(localMedia.getViews()[0]));
+
 		conv.setVideoSurface(conv.getNativeHandle(), videoSurface.getNativeHandle());
 
 		return conv;
@@ -136,12 +138,18 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Vi
 	}
 	
 	@Override
-	public void onDidAddVideoTrack() { }
+	public void onDidAddVideoTrack() {
+
+	}
 
 	@Override
-	public void onDidRemoveVideoTrack() { } 
+	public void onDidRemoveVideoTrack() {
+
+	} 
 
 	@Override
-	public void onDidReceiveVideoTrackEvent() { }
+	public void onDidReceiveVideoTrackEvent() {
+
+	}
 
 }
