@@ -41,7 +41,6 @@ class VideoSurfaceObserverJava : public TSCVideoSurfaceObserverObject {
                                          const TSCVideoTrackEventDataObjectRef& data) {
 		TS_CORE_LOG_DEBUG("onDidReceiveVideoTrackEvent");
 	}
-    
 
 	private:
 
@@ -54,8 +53,10 @@ JNIEXPORT jlong JNICALL Java_com_twilio_signal_impl_VideoSurfaceFactory_nativeCr
   (JNIEnv *jni, jclass, jobject j_observer)
 {
 	TS_CORE_LOG_DEBUG("nativeCreateVideoSurfaceObserver");
-
-	return (jlong)new VideoSurfaceObserverJava(jni, j_observer);
+  	rtc::scoped_ptr<VideoSurfaceObserverJava> vso(
+		new VideoSurfaceObserverJava(jni, j_observer)
+	);
+  	return (jlong)vso.release();
 }
 
 
@@ -67,7 +68,9 @@ JNIEXPORT jlong JNICALL Java_com_twilio_signal_impl_VideoSurfaceFactory_nativeCr
  	TSCVideoSurfaceObserverObjectRef observerObjectRef =
                         TSCVideoSurfaceObserverObjectRef(reinterpret_cast<TSCVideoSurfaceObserverObject*>(observer_p));
 
-	return (jlong)new TSCVideoSurface(observerObjectRef);
+	TSCVideoSurfaceObjectRef vs = new TSCVideoSurfaceObject(observerObjectRef);
+
+	return (jlong)vs.release();
 }
 
 
@@ -79,8 +82,9 @@ JNIEXPORT void JNICALL Java_com_twilio_signal_impl_VideoSurface_freeVideoSurface
 
 
 JNIEXPORT void JNICALL Java_com_twilio_signal_impl_VideoSurface_freeObserver
-  (JNIEnv *, jclass, jlong)
+  (JNIEnv *, jclass, jlong observer_p)
 {
 	TS_CORE_LOG_DEBUG("freeObserver");
+	delete reinterpret_cast<VideoSurfaceObserverJava*>(observer_p);
 }
 

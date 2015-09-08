@@ -75,8 +75,11 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Vi
 		VideoSurface videoSurface = VideoSurfaceFactory.createVideoSurface(conv);
 
 		if(videoSurface == null) {
-			logger.i("video surface object is null");	
+			logger.i("video surface object is null");
+			return null;
 		}
+
+		conv.setVideoSurface(conv.getNativeHandle(), videoSurface.getNativeHandle());
 
 		return conv;
 	}
@@ -124,6 +127,8 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Vi
 	}
 	
 	private native long wrapOutgoingSession(long nativeEndpoint, long nativeSessionObserver, String[] participants, Surface[] views);
+
+	private native void setVideoSurface(long nativeSession, long nativeVideoSurface);
 
 	@Override
 	public long getNativeHandle() {
