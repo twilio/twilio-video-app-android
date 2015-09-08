@@ -9,6 +9,7 @@
 #include "com_twilio_signal_impl_VideoSurface_Observer.h"
 #include "com_twilio_signal_impl_VideoSurfaceFactory.h"
 
+#include "TSCVideoSurface.h"
 #include "TSCVideoSurfaceObserver.h"
 #include "TSCMediaTrackInfo.h"
 #include "TSCVideoTrackEventData.h"
@@ -16,7 +17,7 @@
 using namespace webrtc;
 using namespace twiliosdk;
 
-class VideoSurfaceObserverJava : public TSCVideoSurfaceObserver {
+class VideoSurfaceObserverJava : public TSCVideoSurfaceObserverObject {
 	public:
 		VideoSurfaceObserverJava(JNIEnv* jni, jobject j_observer)
 			: j_observer_global_(jni, j_observer),	
@@ -59,10 +60,14 @@ JNIEXPORT jlong JNICALL Java_com_twilio_signal_impl_VideoSurfaceFactory_nativeCr
 
 
 JNIEXPORT jlong JNICALL Java_com_twilio_signal_impl_VideoSurfaceFactory_nativeCreateVideoSurface
-  (JNIEnv *jni, jclass, jlong nativeObserver)
+  (JNIEnv *jni, jclass, jlong observer_p)
 {
 	TS_CORE_LOG_DEBUG("nativeCreateVideoSurface");
-	return 0;
+
+ 	TSCVideoSurfaceObserverObjectRef observerObjectRef =
+                        TSCVideoSurfaceObserverObjectRef(reinterpret_cast<TSCVideoSurfaceObserverObject*>(observer_p));
+
+	return (jlong)new TSCVideoSurface(observerObjectRef);
 }
 
 
