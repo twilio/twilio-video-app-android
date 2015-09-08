@@ -1,9 +1,9 @@
-#include <jni.h>
-
+#include <twilio-jni/twilio-jni.h>
 #include "webrtc/modules/utility/interface/helpers_android.h"
 
 #include "TSCoreSDKTypes.h"
 #include "TSCLogger.h"
+
 
 #include "com_twilio_signal_impl_VideoSurface.h"
 #include "com_twilio_signal_impl_VideoSurface_Observer.h"
@@ -20,7 +20,10 @@ using namespace twiliosdk;
 class VideoSurfaceObserverJava : public TSCVideoSurfaceObserverObject {
 	public:
 		VideoSurfaceObserverJava(JNIEnv* jni, jobject j_observer)
-			: j_observer_global_(jni, j_observer),	
+		  	: j_add_track_id_(tw_jni_get_method(jni, j_observer, "onDidAddVideoTrack", "()V")),
+		  	  j_remove_track_id_(tw_jni_get_method(jni, j_observer, "onDidRemoveVideoTrack", "()V")),
+		  	  j_video_track_event_id_(tw_jni_get_method(jni, j_observer, "onDidReceiveVideoTrackEvent", "()V")),
+			  j_observer_global_(jni, j_observer),	
 			  j_observer_class_(jni, jni->GetObjectClass(*j_observer_global_)) {
 
 		}
@@ -31,19 +34,28 @@ class VideoSurfaceObserverJava : public TSCVideoSurfaceObserverObject {
 
 	void onDidAddVideoTrack(const TSCVideoTrackInfoObjectRef& trackInfo) {
 		TS_CORE_LOG_DEBUG("onDidAddVideoTrack");
+	    	JNIEnvAttacher jniAttacher;
+    		jniAttacher.get()->CallVoidMethod(*j_observer_global_, j_add_track_id_);
 	}
 
 	void onDidRemoveVideoTrack(const TSCVideoTrackInfoObjectRef& trackInfo) {
 		TS_CORE_LOG_DEBUG("onDidRemoveVideoTrack");
+	    	JNIEnvAttacher jniAttacher;
+    		jniAttacher.get()->CallVoidMethod(*j_observer_global_, j_remove_track_id_);
 	}
     
 	void onDidReceiveVideoTrackEvent(const TSCVideoTrackInfoObjectRef& trackInfo,
                                          const TSCVideoTrackEventDataObjectRef& data) {
 		TS_CORE_LOG_DEBUG("onDidReceiveVideoTrackEvent");
+	    	JNIEnvAttacher jniAttacher;
+    		jniAttacher.get()->CallVoidMethod(*j_observer_global_, j_video_track_event_id_);
 	}
 
 	private:
 
+    	const jmethodID j_add_track_id_;
+    	const jmethodID j_remove_track_id_;
+    	const jmethodID j_video_track_event_id_;
 	const ScopedGlobalRef<jobject> j_observer_global_;
 	const ScopedGlobalRef<jclass> j_observer_class_;
 };

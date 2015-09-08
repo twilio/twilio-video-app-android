@@ -139,17 +139,17 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Vi
 	
 	@Override
 	public void onDidAddVideoTrack() {
-
+		logger.i("onDidAddVideoTrack");
 	}
 
 	@Override
 	public void onDidRemoveVideoTrack() {
-
+		logger.i("onDidRemoveVideoTrack");
 	} 
 
 	@Override
 	public void onDidReceiveVideoTrackEvent() {
-
+		logger.i("onDidReceiveVideoTrackEvent");
 	}
 
 }
