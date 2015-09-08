@@ -12,6 +12,7 @@ import com.twilio.signal.Media;
 import com.twilio.signal.impl.VideoSurface;
 import com.twilio.signal.impl.VideoSurfaceFactory;
 import com.twilio.signal.impl.logging.Logger;
+import org.webrtc.VideoRenderer;
 
 public class ConversationImpl implements Conversation, NativeHandleInterface, VideoSurface.Observer {
 
@@ -148,7 +149,7 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Vi
 	} 
 
 	@Override
-	public void onDidReceiveVideoTrackEvent() {
+	public void onDidReceiveVideoTrackEvent(VideoRenderer.I420Frame frame) {
 		logger.i("onDidReceiveVideoTrackEvent");
 	}
 

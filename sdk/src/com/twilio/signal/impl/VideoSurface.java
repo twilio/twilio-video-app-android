@@ -4,6 +4,8 @@ import org.webrtc.VideoRenderer;
 import android.view.Surface;
 import java.util.Map;
 import java.util.HashMap;
+import org.webrtc.VideoRenderer.I420Frame;
+import org.webrtc.VideoRenderer;
 
 import com.twilio.signal.Participant;
 
@@ -12,7 +14,7 @@ public class VideoSurface {
 	public static interface Observer {
 		public void onDidAddVideoTrack();
 		public void onDidRemoveVideoTrack();
-		public void onDidReceiveVideoTrackEvent();
+		public void onDidReceiveVideoTrackEvent(VideoRenderer.I420Frame frame);
 	}
 
 	private final long nativeVideoSurface;
