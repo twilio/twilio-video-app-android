@@ -2,6 +2,8 @@ sdk/local.properties
 sdk/libs/armeabi-v7a
 sdk/obj
 sdk/gen
+sdk/.settings
+sdk/bin
 output
 
 TestCore/bin

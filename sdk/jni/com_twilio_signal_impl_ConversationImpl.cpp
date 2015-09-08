@@ -73,11 +73,11 @@ JNIEXPORT jlong JNICALL Java_com_twilio_signal_impl_ConversationImpl_wrapOutgoin
 
 	}
 
-	outgoingSession->setWindows(windows);
+	//outgoingSession->setWindows(windows);
 	__android_log_print(ANDROID_LOG_DEBUG, TAG, "wrapOutgoingSession 12");
 	outgoingSession->setParticipants(participants);
 	TSCOptions options2;
-	outgoingSession->start(options2);
+	outgoingSession->start();
 	__android_log_print(ANDROID_LOG_DEBUG, TAG, "wrapOutgoingSession 13");
 	return (jlong)outgoingSession.release();
 }

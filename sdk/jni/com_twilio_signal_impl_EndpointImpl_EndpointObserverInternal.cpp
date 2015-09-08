@@ -65,7 +65,7 @@ protected:
     	TSCIncomingSessionObjectRef incomingSession = reinterpret_cast<TSCIncomingSessionObject*>(session);
     	TSCOptions options;
 
-    	incomingSession->start(options);
+    	incomingSession->start();
     }
 
 

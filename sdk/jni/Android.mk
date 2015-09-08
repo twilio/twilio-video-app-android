@@ -20,6 +20,7 @@ include $(CLEAR_VARS)
 LOCAL_MODULE := twilio-native
 LOCAL_SRC_FILES := \
 	com_twilio_signal_impl_TwilioRTCImpl.cpp \
+	com_twilio_signal_impl_VideoSurface.cpp \
 	com_twilio_signal_impl_EndpointImpl.cpp \
 	com_twilio_signal_impl_EndpointImpl_EndpointObserverInternal.cpp \
 	com_twilio_signal_impl_ConversationImpl.cpp \

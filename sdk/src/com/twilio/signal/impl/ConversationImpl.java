@@ -9,9 +9,11 @@ import com.twilio.signal.Conversation;
 import com.twilio.signal.ConversationListener;
 import com.twilio.signal.Endpoint;
 import com.twilio.signal.Media;
+import com.twilio.signal.impl.VideoSurface;
+import com.twilio.signal.impl.VideoSurfaceFactory;
 import com.twilio.signal.impl.logging.Logger;
 
-public class ConversationImpl implements Conversation, NativeHandleInterface {
+public class ConversationImpl implements Conversation, NativeHandleInterface, VideoSurface.Observer {
 
 	private Surface[] surfaces;
 
@@ -70,6 +72,12 @@ public class ConversationImpl implements Conversation, NativeHandleInterface {
 			//notify listener?
 			return null;
 		}
+		VideoSurface videoSurface = VideoSurfaceFactory.createVideoSurface(conv);
+
+		if(videoSurface == null) {
+			logger.i("video surface object is null");	
+		}
+
 		return conv;
 	}
 
@@ -122,5 +130,13 @@ public class ConversationImpl implements Conversation, NativeHandleInterface {
 		return nativeHandle;
 	}
 	
+	@Override
+	public void onDidAddVideoTrack() { }
+
+	@Override
+	public void onDidRemoveVideoTrack() { } 
+
+	@Override
+	public void onDidReceiveVideoTrackEvent() { }
 
 }
