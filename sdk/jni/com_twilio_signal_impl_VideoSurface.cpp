@@ -19,7 +19,10 @@
 using namespace webrtc;
 using namespace twiliosdk;
 
+
+
 class VideoSurfaceObserverJava : public TSCVideoSurfaceObserverObject {
+
 	public:
 		VideoSurfaceObserverJava(JNIEnv* jni, jobject j_observer)
 			: j_add_track_id_(tw_jni_get_method(jni, j_observer, "onDidAddVideoTrack", "()V")),

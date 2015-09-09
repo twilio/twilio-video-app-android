@@ -1,19 +1,19 @@
 package com.twilio.signal;
 
-import android.graphics.SurfaceTexture;
+import android.opengl.GLSurfaceView;
 
 public class LocalMediaImpl implements LocalMedia {
-	private SurfaceTexture[] views;
+	private GLSurfaceView[] views;
 
 	public LocalMediaImpl() {}
 
 	@Override
-	public SurfaceTexture[] getViews() {
+	public GLSurfaceView[] getViews() {
 		return views;
 	}
 
 	@Override
-	public void attachViews(SurfaceTexture[] views) {
+	public void attachViews(GLSurfaceView[] views) {
 		this.views = views;
 	}
 

@@ -11,13 +11,13 @@ android:orientation="vertical">
     	android:layout_width="match_parent"
     	android:layout_height="match_parent">
 
-		<android.view.TextureView
+		<android.opengl.GLSurfaceView
 		android:id="@+id/localView"
 		android:layout_width="match_parent"
 		android:layout_height="match_parent"
 		android:layout_weight="1" />
 
-		<android.view.TextureView
+		<android.view.View
 		android:id="@+id/remoteView"
 		android:layout_width="match_parent"
 		android:layout_height="match_parent"

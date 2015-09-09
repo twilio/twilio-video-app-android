@@ -22,7 +22,7 @@ import android.content.Intent;
 import android.media.AudioManager;
 import android.os.AsyncTask;
 import android.util.Log;
-import android.graphics.SurfaceTexture;
+import android.opengl.GLSurfaceView;
 
 import com.twilio.signal.Conversation;
 import com.twilio.signal.Conversation.Status;
@@ -165,7 +165,7 @@ public class SignalPhone implements EndpointListener, ConversationListener
 
     }
 
-    public Conversation call(String participant, SurfaceTexture[] views) {
+    public Conversation call(String participant, GLSurfaceView[] views) {
     	if (participant == null && participant == "") {
     		return null;
     	}

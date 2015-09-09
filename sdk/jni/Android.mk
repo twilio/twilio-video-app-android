@@ -26,9 +26,15 @@ LOCAL_SRC_FILES := \
 	com_twilio_signal_impl_ConversationImpl.cpp \
 	com_twilio_signal_impl_ConversationImpl_SessionObserverInternal.cpp \
 	renderer.cpp \
-	callback_converter.cpp
+	callback_converter.cpp \
+androidmediadecoder_jni.cc androidmediaencoder_jni.cc androidvideocapturer_jni.cc classreferenceholder.cc jni_helpers.cc peerconnection_jni.cc
+
 	#com_twilio_signal_impl_SignalCore.cpp \
 	EndpointObserver.cpp
+
+#LOCAL_EXPORT_C_INCLUDES := /usr/local/twilio-sdk/core/android/armeabiv7a/include/third_party/libyuv/include
+#LOCAL_EXPORT_C_INCLUDES := /usr/local/twilio-sdk/webrtc/android/armeabiv7a/include/third_party/icu/source/common
+LOCAL_C_INCLUDES := /usr/local/twilio-sdk/webrtc/android/armeabiv7a/include/third_party/icu/source/common
 
 #ifeq ($(APP_DEBUGGABLE),true)
 ifeq ($(shell test "$(APP_DEBUGGABLE)" = "true" -o "$(NDK_DEBUG)" = "1" && echo true || echo false),true)
@@ -45,6 +51,9 @@ endif
 
 #OPUS_LIB := \
 	$(TWSDK_JNI_PATH)/../external/signal-sdk-core/SDKs/WebRTC/build-android/prebuild/libs/$(TARGET_ARCH_ABI)/libopus.a
+
+
+LIBYUV := -l/usr/local/twilio-sdk/webrtc/android/armeabiv7a/Debug/libyuv.a
 
 LOCAL_CFLAGS += \
 	-Wall \
@@ -66,22 +75,19 @@ LOCAL_LDLIBS := \
 	-ljnigraphics \
 	-lOpenSLES \
 	-lEGL \
-	-lGLESv1_CM
-	#$(OPENSSL_LIBS) \
-	$(OPUS_LIB) \
+	-lGLESv1_CM \
+	$(LIBYUV)
+	#$(OPUS_LIB) \
 
 # To use android native window api
 LOCAL_LDLIBS += -landroid
 
+# LOCAL_LDFLAGS += -z muldefs
+
 # pjmedia is in here twice because there's a circular dependency
 # between pjmedia and pjmedia-codec (the g711_init func)
 LOCAL_STATIC_LIBRARIES := \
-	twilio-sdk-core \
-	twilio-jni
-	#webrtc \
-	twilio-jni
-	
-	
-	
+	twilio-jni \
+	twilio-sdk-core
 
 include $(BUILD_SHARED_LIBRARY)

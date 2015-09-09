@@ -16,6 +16,8 @@ import org.webrtc.VideoRenderer;
 
 public class ConversationImpl implements Conversation, NativeHandleInterface, VideoSurface.Observer {
 
+	// TODO: Make this private 
+	public VideoSurface videoSurface;
 	private Surface[] surfaces;
 
 	static final Logger logger = Logger.getLogger(ConversationImpl.class);
@@ -55,10 +57,12 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Vi
 		 * Create a Surface from the SurfaceTexture
 		 * http://stackoverflow.com/questions/24312632/how-do-you-get-anativewindow-from-a-surfacetexture-in-the-ndk
 		 */
+		/*
 		surfaces = new Surface[localMedia.getViews().length];		
 		for(int i = 0; i < surfaces.length; i++) {
 			surfaces[i] = new Surface(localMedia.getViews()[i]);
 		}
+		*/
 		nativeHandle = wrapOutgoingSession(endpoint.getNativeHandle(),
 				sessionObserverInternal.getNativeHandle(),
 				participantArray,
@@ -73,16 +77,16 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Vi
 			//notify listener?
 			return null;
 		}
-		VideoSurface videoSurface = VideoSurfaceFactory.createVideoSurface(conv);
+		conv.videoSurface = VideoSurfaceFactory.createVideoSurface(conv);
 
-		if(videoSurface == null) {
+		if(conv.videoSurface == null) {
 			logger.i("video surface object is null");
 			return null;
 		}
 
-		videoSurface.attachLocalView(new Surface(localMedia.getViews()[0]));
+		conv.videoSurface.attachLocalView(localMedia.getViews()[0]);
 
-		conv.setVideoSurface(conv.getNativeHandle(), videoSurface.getNativeHandle());
+		conv.setVideoSurface(conv.getNativeHandle(), conv.videoSurface.getNativeHandle());
 
 		return conv;
 	}
@@ -151,6 +155,19 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Vi
 	@Override
 	public void onDidReceiveVideoTrackEvent(VideoRenderer.I420Frame frame) {
 		logger.i("onDidReceiveVideoTrackEvent");
+		if(videoSurface == null) {
+			logger.i("video surface null");
+			return;
+		}
+		if(videoSurface.getLocalVideoRendererCallbacks() == null) {
+			videoSurface.createLocalVideoRenderer();
+		}
+		if(frame == null) {
+			logger.i("frame is null");
+			return;
+		} else {
+			videoSurface.getLocalVideoRendererCallbacks().renderFrame(frame);
+		}
 	}
 
 }

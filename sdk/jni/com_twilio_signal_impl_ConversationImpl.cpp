@@ -26,6 +26,7 @@ JNIEXPORT jlong JNICALL Java_com_twilio_signal_impl_ConversationImpl_wrapOutgoin
   (JNIEnv *env, jobject obj, jlong nativeEndpoint, jlong nativeSessionObserver, jobjectArray participantList, jobjectArray surfaces)
 {
 
+	/**
 	jsize len = env->GetArrayLength(surfaces);
 	ANativeWindow **windows = new ANativeWindow*[len];
 
@@ -37,6 +38,7 @@ JNIEXPORT jlong JNICALL Java_com_twilio_signal_impl_ConversationImpl_wrapOutgoin
 			windows[i] = window;		
 		}
     	}
+	**/
 
 	__android_log_print(ANDROID_LOG_DEBUG, TAG, "wrapOutgoingSession");
 	TSCEndpointObject* endpoint = reinterpret_cast<TSCEndpointObject*>(nativeEndpoint);
