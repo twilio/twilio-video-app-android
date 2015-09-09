@@ -4,12 +4,6 @@ ifneq ($(ENABLE_PROFILING),)
 include $(TWSDK_JNI_PATH)/../thirdparty/android-ndk-profiler/jni/Android.mk
 endif
 
-
-#include $(TWSDK_JNI_PATH)/../thirdparty/openssl-stock-android/Android.mk
-#include $(TWSDK_JNI_PATH)/../external/signal-sdk-core/SDKs/PJSIP/Android.mk
-#include $(TWSDK_JNI_PATH)/../external/signal-sdk-core/SDKs/POCO/Android.mk
-#include $(TWSDK_JNI_PATH)/../external/signal-sdk-core/SDKs/WebRTC/build-android/Android.mk
-#include $(TWSDK_JNI_PATH)/../external/signal-sdk-core/TwilioCoreSDK/Android.mk
 include $(TWSDK_JNI_PATH)/signal-core.mk
 include $(TWSDK_JNI_PATH)/../external/twilio-jni/Android.mk
 
@@ -25,33 +19,20 @@ LOCAL_SRC_FILES := \
 	com_twilio_signal_impl_EndpointImpl_EndpointObserverInternal.cpp \
 	com_twilio_signal_impl_ConversationImpl.cpp \
 	com_twilio_signal_impl_ConversationImpl_SessionObserverInternal.cpp \
-	renderer.cpp \
-	callback_converter.cpp \
-androidmediadecoder_jni.cc androidmediaencoder_jni.cc androidvideocapturer_jni.cc classreferenceholder.cc jni_helpers.cc peerconnection_jni.cc
+	peerconnection_jni/androidmediadecoder_jni.cc \
+	peerconnection_jni/androidmediaencoder_jni.cc \
+	peerconnection_jni/androidvideocapturer_jni.cc \
+	peerconnection_jni/classreferenceholder.cc \
+ 	peerconnection_jni/jni_helpers.cc \
+	peerconnection_jni/peerconnection_jni.cc
 
-	#com_twilio_signal_impl_SignalCore.cpp \
-	EndpointObserver.cpp
-
-#LOCAL_EXPORT_C_INCLUDES := /usr/local/twilio-sdk/core/android/armeabiv7a/include/third_party/libyuv/include
-#LOCAL_EXPORT_C_INCLUDES := /usr/local/twilio-sdk/webrtc/android/armeabiv7a/include/third_party/icu/source/common
 LOCAL_C_INCLUDES := /usr/local/twilio-sdk/webrtc/android/armeabiv7a/include/third_party/icu/source/common
 
-#ifeq ($(APP_DEBUGGABLE),true)
 ifeq ($(shell test "$(APP_DEBUGGABLE)" = "true" -o "$(NDK_DEBUG)" = "1" && echo true || echo false),true)
 debug_cflags := \
 	-DENABLE_PJSIP_LOGGING \
 	-DENABLE_JNI_DEBUG_LOGGING
 endif
-
-#This exists due to bug in ndk in resolving circular dependencies. Techincally we should just name module
-#in LOCAL_STATIC_LIBRARIES, however ndk doesn't respect order of the module named.
-#OPENSSL_LIBS := \
-	$(TWSDK_JNI_PATH)/../thirdparty/openssl-stock-android/lib/$(TARGET_ARCH_ABI)/libssl.a \
-	$(TWSDK_JNI_PATH)/../thirdparty/openssl-stock-android/lib/$(TARGET_ARCH_ABI)/libcrypto.a
-
-#OPUS_LIB := \
-	$(TWSDK_JNI_PATH)/../external/signal-sdk-core/SDKs/WebRTC/build-android/prebuild/libs/$(TARGET_ARCH_ABI)/libopus.a
-
 
 LIBYUV := -l/usr/local/twilio-sdk/webrtc/android/armeabiv7a/Debug/libyuv.a
 
@@ -64,28 +45,18 @@ LOCAL_CFLAGS += \
 	
 LOCAL_CPPFLAGS := -std=gnu++11 -fno-rtti
 
-#Putting openssl libs and opus libs like this will give the warning, but as of today
-#I can't find better way to resolve circular dependency (it is broken in ndk). 
 LOCAL_LDLIBS := \
 	-llog \
 	-lz \
-    -lm \
+	-lm \
 	-ldl \
 	-lGLESv2 \
 	-ljnigraphics \
 	-lOpenSLES \
 	-lEGL \
 	-lGLESv1_CM \
-	$(LIBYUV)
-	#$(OPUS_LIB) \
+	-landroid
 
-# To use android native window api
-LOCAL_LDLIBS += -landroid
-
-# LOCAL_LDFLAGS += -z muldefs
-
-# pjmedia is in here twice because there's a circular dependency
-# between pjmedia and pjmedia-codec (the g711_init func)
 LOCAL_STATIC_LIBRARIES := \
 	twilio-jni \
 	twilio-sdk-core
