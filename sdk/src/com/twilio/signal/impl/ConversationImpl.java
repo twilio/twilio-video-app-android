@@ -53,22 +53,25 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Vi
 		String[] participantArray = participants.toArray(new String[participants.size()]);
 		sessionObserverInternal = new SessionObserverInternal(listener, endpoint);
 
-		/*
-		 * Create a Surface from the SurfaceTexture
-		 * http://stackoverflow.com/questions/24312632/how-do-you-get-anativewindow-from-a-surfacetexture-in-the-ndk
-		 */
-		/*
-		surfaces = new Surface[localMedia.getViews().length];		
-		for(int i = 0; i < surfaces.length; i++) {
-			surfaces[i] = new Surface(localMedia.getViews()[i]);
-		}
-		*/
+		// TODO: remove surfaces in nativeHandle constructor
 		nativeHandle = wrapOutgoingSession(endpoint.getNativeHandle(),
 				sessionObserverInternal.getNativeHandle(),
 				participantArray,
 				surfaces);
+		videoSurface = VideoSurfaceFactory.createVideoSurface(this);
+
+		if(videoSurface == null) {
+			logger.i("video surface object is null");
+		}
+
+		videoSurface.attachLocalView(localMedia.getViews()[0]);
+		videoSurface.attachRemoteView(localMedia.getViews()[1]);
+
+		setVideoSurface(nativeHandle, videoSurface.getNativeHandle());
+
+		start(nativeHandle);
 	}
-	
+
 	public static Conversation create(EndpointImpl endpoint, Set<String> participants,
 			   Media localMedia,
 			   ConversationListener listener) {
@@ -77,17 +80,6 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Vi
 			//notify listener?
 			return null;
 		}
-		conv.videoSurface = VideoSurfaceFactory.createVideoSurface(conv);
-
-		if(conv.videoSurface == null) {
-			logger.i("video surface object is null");
-			return null;
-		}
-
-		conv.videoSurface.attachLocalView(localMedia.getViews()[0]);
-
-		conv.setVideoSurface(conv.getNativeHandle(), conv.videoSurface.getNativeHandle());
-
 		return conv;
 	}
 
@@ -137,6 +129,8 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Vi
 
 	private native void setVideoSurface(long nativeSession, long nativeVideoSurface);
 
+	private native void start(long nativeSession);
+
 	@Override
 	public long getNativeHandle() {
 		return nativeHandle;
@@ -153,20 +147,23 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Vi
 	} 
 
 	@Override
-	public void onDidReceiveVideoTrackEvent(VideoRenderer.I420Frame frame) {
-		logger.i("onDidReceiveVideoTrackEvent");
+	public void onDidReceiveVideoTrackEvent(VideoRenderer.I420Frame frame, String participant) {
+		logger.i("onDidReceiveVideoTrackEvent " + participant);
 		if(videoSurface == null) {
 			logger.i("video surface null");
 			return;
 		}
-		if(videoSurface.getLocalVideoRendererCallbacks() == null) {
-			videoSurface.createLocalVideoRenderer();
-		}
 		if(frame == null) {
 			logger.i("frame is null");
 			return;
-		} else {
+		}
+		// TODO: map participants to views
+		if(participant.equals("alice")) {
+			logger.i("local" + participant);
 			videoSurface.getLocalVideoRendererCallbacks().renderFrame(frame);
+		} else {
+			logger.i("remote" + participant);
+			videoSurface.getRemoteVideoRendererCallbacks().renderFrame(frame);
 		}
 	}
 

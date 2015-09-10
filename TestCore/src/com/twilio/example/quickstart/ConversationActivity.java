@@ -35,10 +35,10 @@ public class ConversationActivity extends Activity {
 		setContentView(R.layout.conversation);
 
 		localView = (GLSurfaceView)findViewById(R.id.localView);
-		//remoteView = (GLSurfaceView)findViewById(R.id.remoteView);
+		remoteView = (GLSurfaceView)findViewById(R.id.remoteView);
 
 		views[0] = localView;
-		views[1] = localView;
+		views[1] = remoteView;
 
 		attemptCall();
 	}

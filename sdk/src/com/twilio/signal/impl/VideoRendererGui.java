@@ -50,6 +50,14 @@ import org.webrtc.VideoRenderer;
 import org.webrtc.VideoRenderer.I420Frame;
 
 /**
+ * The original VideoRendererGui.java in webrtc uses a static singleton pattern allowing
+ * multiple renderers to draw to a single context.
+ *
+ * This class is modified to allow a renderer to draw
+ * to a GLSurfaceView with its own unique context.
+ */ 
+
+/**
  * Efficiently renders YUV frames using the GPU for CSC.
  * Clients will want first to call setView() to pass GLSurfaceView
  * and then for each video stream either create instance of VideoRenderer using
@@ -63,14 +71,13 @@ public class VideoRendererGui implements GLSurfaceView.Renderer {
   private GLSurfaceView surface;
   private static EGLContext eglContext = null;
   // Indicates if SurfaceView.Renderer.onSurfaceCreated was called.
-  // If true then for every newly created yuv image renderer createTexture()
-  // should be called. The variable is accessed on multiple threads and
-  // all accesses are synchronized on yuvImageRenderers' object lock.
+  // If true then for a newly created yuv image renderer createTexture()
+  // should be called.
   private boolean onSurfaceCreatedCalled;
   private int screenWidth;
   private int screenHeight;
-  // List of yuv renderers.
-  private ArrayList<YuvImageRenderer> yuvImageRenderers;
+  // Yuv Renderer 
+  private YuvImageRenderer yuvImageRenderer;
   private int yuvProgram;
   private int oesProgram;
   // Types of video scaling:
@@ -130,15 +137,22 @@ public class VideoRendererGui implements GLSurfaceView.Renderer {
       "}\n";
 
 
-  private VideoRendererGui(GLSurfaceView surface) {
+  public VideoRendererGui(GLSurfaceView surface, Runnable eglContextReadyCallback) {
     this.surface = surface;
+    this.eglContextReady = eglContextReadyCallback;
     // Create an OpenGL ES 2.0 context.
     surface.setPreserveEGLContextOnPause(true);
     surface.setEGLContextClientVersion(2);
     surface.setRenderer(this);
     surface.setRenderMode(GLSurfaceView.RENDERMODE_WHEN_DIRTY);
 
-    yuvImageRenderers = new ArrayList<YuvImageRenderer>();
+    instance = this;
+  }
+
+  public VideoRenderer.Callbacks createRenderer(
+      int x, int y, int width, int height,
+      ScalingType scalingType, boolean mirror) {
+    return create(x, y, width, height, scalingType, mirror);
   }
 
   // Poor-man's assert(): die with |msg| unless |condition| is true.
@@ -712,33 +726,8 @@ public class VideoRendererGui implements GLSurfaceView.Renderer {
     }
   }
 
-  /** Passes GLSurfaceView to video renderer. */
-  public static void setView(GLSurfaceView surface,
-      Runnable eglContextReadyCallback) {
-    Log.d(TAG, "VideoRendererGui.setView");
-    instance = new VideoRendererGui(surface);
-    eglContextReady = eglContextReadyCallback;
-  }
-
-  public static EGLContext getEGLContext() {
+  public EGLContext getEGLContext() {
     return eglContext;
-  }
-
-  /**
-   * Creates VideoRenderer with top left corner at (x, y) and resolution
-   * (width, height). All parameters are in percentage of screen resolution.
-   */
-  public static VideoRenderer createGui(int x, int y, int width, int height,
-      ScalingType scalingType, boolean mirror) throws Exception {
-    YuvImageRenderer javaGuiRenderer = create(
-        x, y, width, height, scalingType, mirror);
-    return new VideoRenderer(javaGuiRenderer);
-  }
-
-  public static VideoRenderer.Callbacks createGuiRenderer(
-      int x, int y, int width, int height,
-      ScalingType scalingType, boolean mirror) {
-    return create(x, y, width, height, scalingType, mirror);
   }
 
   /**
@@ -746,7 +735,7 @@ public class VideoRendererGui implements GLSurfaceView.Renderer {
    * resolution (width, height). All parameters are in percentage of
    * screen resolution.
    */
-  public static YuvImageRenderer create(int x, int y, int width, int height,
+  private YuvImageRenderer create(int x, int y, int width, int height,
       ScalingType scalingType, boolean mirror) {
     // Check display region parameters.
     if (x < 0 || x > 100 || y < 0 || y > 100 ||
@@ -759,10 +748,10 @@ public class VideoRendererGui implements GLSurfaceView.Renderer {
       throw new RuntimeException(
           "Attempt to create yuv renderer before setting GLSurfaceView");
     }
-    final YuvImageRenderer yuvImageRenderer = new YuvImageRenderer(
-        instance.surface, instance.yuvImageRenderers.size(),
-        x, y, width, height, scalingType, mirror);
-    synchronized (instance.yuvImageRenderers) {
+    synchronized(instance) {
+      instance.yuvImageRenderer = new YuvImageRenderer(
+        instance.surface, instance.surface.hashCode(), x, y, width, height, scalingType, mirror);
+
       if (instance.onSurfaceCreatedCalled) {
         // onSurfaceCreated has already been called for VideoRendererGui -
         // need to create texture for new image and add image to the
@@ -770,9 +759,9 @@ public class VideoRendererGui implements GLSurfaceView.Renderer {
         final CountDownLatch countDownLatch = new CountDownLatch(1);
         instance.surface.queueEvent(new Runnable() {
           public void run() {
-            yuvImageRenderer.createTextures(
+            instance.yuvImageRenderer.createTextures(
                 instance.yuvProgram, instance.oesProgram);
-            yuvImageRenderer.setScreenSize(
+            instance.yuvImageRenderer.setScreenSize(
                 instance.screenWidth, instance.screenHeight);
             countDownLatch.countDown();
           }
@@ -784,13 +773,12 @@ public class VideoRendererGui implements GLSurfaceView.Renderer {
           throw new RuntimeException(e);
         }
       }
-      // Add yuv renderer to rendering list.
-      instance.yuvImageRenderers.add(yuvImageRenderer);
     }
-    return yuvImageRenderer;
+
+    return instance.yuvImageRenderer;
   }
 
-  public static void update(
+  public void update(
       VideoRenderer.Callbacks renderer,
       int x, int y, int width, int height, ScalingType scalingType, boolean mirror) {
     Log.d(TAG, "VideoRendererGui.update");
@@ -798,24 +786,22 @@ public class VideoRendererGui implements GLSurfaceView.Renderer {
       throw new RuntimeException(
           "Attempt to update yuv renderer before setting GLSurfaceView");
     }
-    synchronized (instance.yuvImageRenderers) {
-      for (YuvImageRenderer yuvImageRenderer : instance.yuvImageRenderers) {
-        if (yuvImageRenderer == renderer) {
-          yuvImageRenderer.setPosition(x, y, width, height, scalingType, mirror);
-        }
+    synchronized(instance) {
+      if (yuvImageRenderer == renderer) {
+        instance.yuvImageRenderer.setPosition(x, y, width, height, scalingType, mirror);
       }
     }
   }
 
-  public static void remove(VideoRenderer.Callbacks renderer) {
+  public void remove(VideoRenderer.Callbacks renderer) {
     Log.d(TAG, "VideoRendererGui.remove");
     if (instance == null) {
       throw new RuntimeException(
           "Attempt to remove yuv renderer before setting GLSurfaceView");
     }
-    synchronized (instance.yuvImageRenderers) {
-      if (!instance.yuvImageRenderers.remove(renderer)) {
-        Log.w(TAG, "Couldn't remove renderer (not present in current list)");
+    synchronized(instance) {
+      if (instance.yuvImageRenderer != null) {
+            instance.yuvImageRenderer = null;	
       }
     }
   }
@@ -836,13 +822,14 @@ public class VideoRendererGui implements GLSurfaceView.Renderer {
     oesProgram = createProgram(VERTEX_SHADER_STRING,
         OES_FRAGMENT_SHADER_STRING);
 
-    synchronized (yuvImageRenderers) {
-      // Create textures for all images.
-      for (YuvImageRenderer yuvImageRenderer : yuvImageRenderers) {
+    synchronized(instance) {
+      if(yuvImageRenderer != null) {
         yuvImageRenderer.createTextures(yuvProgram, oesProgram);
       }
-      onSurfaceCreatedCalled = true;
     }
+
+    onSurfaceCreatedCalled = true;
+
     checkNoGLES2Error();
     GLES20.glClearColor(0.15f, 0.15f, 0.15f, 1.0f);
 
@@ -859,8 +846,8 @@ public class VideoRendererGui implements GLSurfaceView.Renderer {
     screenWidth = width;
     screenHeight = height;
     GLES20.glViewport(0, 0, width, height);
-    synchronized (yuvImageRenderers) {
-      for (YuvImageRenderer yuvImageRenderer : yuvImageRenderers) {
+    synchronized(instance) {
+      if(yuvImageRenderer != null) {
         yuvImageRenderer.setScreenSize(screenWidth, screenHeight);
       }
     }
@@ -869,8 +856,8 @@ public class VideoRendererGui implements GLSurfaceView.Renderer {
   @Override
   public void onDrawFrame(GL10 unused) {
     GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
-    synchronized (yuvImageRenderers) {
-      for (YuvImageRenderer yuvImageRenderer : yuvImageRenderers) {
+    synchronized(instance) {
+      if(yuvImageRenderer != null) {
         yuvImageRenderer.draw();
       }
     }
