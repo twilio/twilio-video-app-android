@@ -1,8 +1,3 @@
-#
-# For now manually run this command to remove JNI_OnLoad from libwebrtc-jni.a
-# $(NDK_ROOT)/toolchains/aarch64-linux-android-4.9/prebuilt/linux-x86_64/aarch64-linux-android/bin/objcopy --localize-symbol JNI_OnLoad /usr/local/twilio-sdk/webrtc/android/armeabiv7a/lib/libwebrtc-jni.a
-#
-
 TWSDK_JNI_PATH := $(call my-dir)
 
 ifneq ($(ENABLE_PROFILING),)
