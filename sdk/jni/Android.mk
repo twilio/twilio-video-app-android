@@ -1,3 +1,8 @@
+#
+# For now manually run this command to remove JNI_OnLoad from libwebrtc-jni.a
+# $(NDK_ROOT)/toolchains/aarch64-linux-android-4.9/prebuilt/linux-x86_64/aarch64-linux-android/bin/objcopy --localize-symbol JNI_OnLoad /usr/local/twilio-sdk/webrtc/android/armeabiv7a/lib/libwebrtc-jni.a
+#
+
 TWSDK_JNI_PATH := $(call my-dir)
 
 ifneq ($(ENABLE_PROFILING),)
@@ -19,12 +24,6 @@ LOCAL_SRC_FILES := \
 	com_twilio_signal_impl_EndpointImpl_EndpointObserverInternal.cpp \
 	com_twilio_signal_impl_ConversationImpl.cpp \
 	com_twilio_signal_impl_ConversationImpl_SessionObserverInternal.cpp \
-	peerconnection_jni/androidmediadecoder_jni.cc \
-	peerconnection_jni/androidmediaencoder_jni.cc \
-	peerconnection_jni/androidvideocapturer_jni.cc \
-	peerconnection_jni/classreferenceholder.cc \
- 	peerconnection_jni/jni_helpers.cc \
-	peerconnection_jni/peerconnection_jni.cc
 
 LOCAL_C_INCLUDES := /usr/local/twilio-sdk/webrtc/android/armeabiv7a/include/third_party/icu/source/common
 
@@ -34,7 +33,6 @@ debug_cflags := \
 	-DENABLE_JNI_DEBUG_LOGGING
 endif
 
-LIBYUV := -l/usr/local/twilio-sdk/webrtc/android/armeabiv7a/Debug/libyuv.a
 
 LOCAL_CFLAGS += \
 	-Wall \
@@ -55,10 +53,16 @@ LOCAL_LDLIBS := \
 	-lOpenSLES \
 	-lEGL \
 	-lGLESv1_CM \
-	-landroid
+	-landroid \
 
 LOCAL_STATIC_LIBRARIES := \
+	twilio-sdk-core \
 	twilio-jni \
-	twilio-sdk-core
+
+
+# Manually link the libwebrtc-jni static library. LOCAL_WHOLE_STATIC_LIBRARIES is not working.
+WEBRTC_JNI_STATIC_LIBRARY := -Wl,--whole-archive /usr/local/twilio-sdk/webrtc/android/armeabiv7a/lib/libwebrtc-jni.a -Wl,--no-whole-archive
+LOCAL_LDFLAGS := \
+	$(WEBRTC_JNI_STATIC_LIBRARY)
 
 include $(BUILD_SHARED_LIBRARY)

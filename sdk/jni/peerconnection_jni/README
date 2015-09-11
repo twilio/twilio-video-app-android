@@ -1,1 +1,0 @@
-This source is copied from webrtc 44. This is a workaround because the current libtwilio-core does include the peerconnection symbols.
