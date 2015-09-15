@@ -6,7 +6,6 @@
 
 
 #include "com_twilio_signal_impl_VideoSurface.h"
-#include "com_twilio_signal_impl_VideoSurface_Observer.h"
 #include "com_twilio_signal_impl_VideoSurfaceFactory.h"
 
 #include "talk/media/base/videorenderer.h"
