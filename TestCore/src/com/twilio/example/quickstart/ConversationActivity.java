@@ -29,6 +29,7 @@ public class ConversationActivity extends Activity implements ConversationListen
 	private ViewGroup localContainer;
 	private ViewGroup participantContainer;
 	private final Object syncObject = new Object();
+	private String participantAddress;
 
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -38,7 +39,7 @@ public class ConversationActivity extends Activity implements ConversationListen
 		localContainer = (ViewGroup)findViewById(R.id.localContainer);
 		participantContainer = (ViewGroup)findViewById(R.id.participantContainer);
 
-		String participantAddress = getIntent().getStringExtra(SignalPhoneActivity.CONVERSATION_PARTICIPANT);
+		participantAddress = getIntent().getStringExtra(SignalPhoneActivity.CONVERSATION_PARTICIPANT);
 
 		callParticipant(participantAddress);
 	}
@@ -77,7 +78,11 @@ public class ConversationActivity extends Activity implements ConversationListen
 	@Override
 	public void onVideoAddedForParticipant(Conversation conversation,
 			Participant participant) {
-		participant.getMedia().attachContainerView(participantContainer);
+		if(!participant.getAddress().equals(participantAddress)) {
+			participant.getMedia().attachContainerView(localContainer);
+		} else {
+			participant.getMedia().attachContainerView(participantContainer);
+		}
 	}
 
 	@Override

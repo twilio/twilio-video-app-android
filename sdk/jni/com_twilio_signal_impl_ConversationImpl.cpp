@@ -29,9 +29,14 @@ JNIEXPORT jlong JNICALL Java_com_twilio_signal_impl_ConversationImpl_wrapOutgoin
 	options.insert(std::pair<std::string,std::string>("audio","yes"));
 	options.insert(std::pair<std::string,std::string>("video","yes"));
 
-	TSCSessionObserverObjectRef observer =
+	TSCSessionObserverObjectRef sessionObserver =
 			TSCSessionObserverObjectRef(reinterpret_cast<TSCSessionObserverObject*>(nativeSessionObserver));
-	TSCOutgoingSessionObjectRef outgoingSession = endpoint->createSession(options, observer);
+	if (sessionObserver.get() == NULL) {
+		__android_log_print(ANDROID_LOG_DEBUG, TAG, "sessionObserver was null. Exiting");
+		return 0;
+	}
+
+	TSCOutgoingSessionObjectRef outgoingSession = endpoint->createSession(options, sessionObserver);
 
 	if (outgoingSession.get() == NULL) {
 		__android_log_print(ANDROID_LOG_DEBUG, TAG, "outgoingSession was null. Exiting");
