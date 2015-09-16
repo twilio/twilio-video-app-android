@@ -2,73 +2,80 @@ package com.twilio.signal.impl;
 
 import org.webrtc.VideoRenderer;
 import android.opengl.GLSurfaceView;
+import android.view.ViewGroup;
+import android.content.Context;
 import java.util.Map;
 import java.util.HashMap;
+import java.util.Set;
+import java.util.HashSet;
 import org.webrtc.VideoRenderer.I420Frame;
 import org.webrtc.VideoRenderer;
 
 import com.twilio.signal.Participant;
 import com.twilio.signal.impl.VideoRendererGui;
+import com.twilio.signal.impl.TrackInfo;
+import com.twilio.signal.impl.logging.Logger;
 
+/*
+ * The VideoSurface creates a video renderer for any container that requires frame rendering 
+ */
 public class VideoSurface {
 
 	public static interface Observer {
-		public void onDidAddVideoTrack();
-		public void onDidRemoveVideoTrack();
-		public void onDidReceiveVideoTrackEvent(VideoRenderer.I420Frame frame, String participant);
+		public void onDidAddVideoTrack(TrackInfo trackInfo);
+		public void onDidRemoveVideoTrack(TrackInfo trackInfo);
+		public void onDidReceiveVideoTrackEvent(VideoRenderer.I420Frame frame, TrackInfo trackInfo);
 	}
 
+	static final Logger logger = Logger.getLogger(VideoSurface.class);
+
+	private final Context context;
 	private final long nativeVideoSurface;
 	private final long nativeObserver;
 
-	private GLSurfaceView localView;
-	private VideoRendererGui localVideoRendererGui;
-	private GLSurfaceView remoteView;
-	private VideoRendererGui remoteVideoRendererGui;
+	private volatile Map<ViewGroup, VideoRenderer.Callbacks> rendererCallbacks;
+	private volatile Set<ViewGroup> creatingRenderer;
 
-	private VideoRenderer.Callbacks localRendererCallbacks;
-	private VideoRenderer.Callbacks remoteRendererCallbacks;
-
-	private Map<Participant, GLSurfaceView> views;
-
-	VideoSurface(long nativeVideoSurface, long nativeObserver) {
+	VideoSurface(Context context, long nativeVideoSurface, long nativeObserver) {
+		this.context = context;
     		this.nativeVideoSurface = nativeVideoSurface;
     		this.nativeObserver = nativeObserver;
-		this.views = new HashMap<Participant, GLSurfaceView>();
+		this.rendererCallbacks = new HashMap<ViewGroup, VideoRenderer.Callbacks>();
+		this.creatingRenderer = new HashSet<ViewGroup>();
   	}
 
-	/*
-	 * Provide a GLSurfaceView to display the local video using the default OpenGL renderer 
-	 */
-	public void attachLocalView(GLSurfaceView localView) {
-		this.localView = localView;
-		localVideoRendererGui = new VideoRendererGui(localView, null);	
-		localRendererCallbacks = localVideoRendererGui.createRenderer(0, 0, 100, 100, VideoRendererGui.ScalingType.SCALE_ASPECT_FIT, true);
+	private void createRenderer(final ViewGroup container) {
+		creatingRenderer.add(container);
+		// GLSurfaceView must be created on the UI Thread. 
+		container.post(new Runnable() {
+			@Override
+			public void run() {
+				GLSurfaceView view = new GLSurfaceView(context);
+				container.addView(view);
+				final VideoRendererGui videoRendererGui = new VideoRendererGui(view, null);
+				VideoRenderer.Callbacks rendererCallback = videoRendererGui.createRenderer(0, 0, 100, 100, VideoRendererGui.ScalingType.SCALE_ASPECT_FIT, true);
+				rendererCallbacks.put(container, rendererCallback);
+			}
+		});
 	}
 
-	public void attachRemoteView(GLSurfaceView remoteView) {
-		this.remoteView = remoteView;
-		remoteVideoRendererGui = new VideoRendererGui(remoteView, null);	
-		remoteRendererCallbacks = remoteVideoRendererGui.createRenderer(0, 0, 100, 100, VideoRendererGui.ScalingType.SCALE_ASPECT_FIT, true);
-	}
-
-	/*
-	 * Provide a GLSurfaceView to display video from a participant using the default OpenGL renderer 
-	 */
-	public void attachView(Participant participant, GLSurfaceView view) {
-		views.put(participant, view);
-	}
-
-	public VideoRenderer.Callbacks getLocalVideoRendererCallbacks() {
-		if(localRendererCallbacks == null) {
+	public void renderFrame(VideoRenderer.I420Frame frame, ViewGroup container) {
+		logger.i("renderFrame");
+		if(frame == null) {
+			logger.i("Frame is null");
+			return;
 		}
-		return localRendererCallbacks;
-	}
-
-	public VideoRenderer.Callbacks getRemoteVideoRendererCallbacks() {
-		if(remoteRendererCallbacks == null) {
+		if(container == null) {
+			logger.i("View is null");
+			return;
 		}
-		return remoteRendererCallbacks;
+
+		VideoRenderer.Callbacks rendererCallback = rendererCallbacks.get(container);
+		if(rendererCallback != null) {
+			rendererCallback.renderFrame(frame);
+		} else if(rendererCallback == null && !creatingRenderer.contains(container)) {
+			createRenderer(container);
+		}
 	}
 
 	public void dispose() {

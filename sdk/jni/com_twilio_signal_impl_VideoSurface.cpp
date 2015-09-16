@@ -24,9 +24,9 @@ class VideoSurfaceObserverJava : public TSCVideoSurfaceObserverObject {
 
 	public:
 		VideoSurfaceObserverJava(JNIEnv* jni, jobject j_observer)
-			: j_add_track_id_(tw_jni_get_method(jni, j_observer, "onDidAddVideoTrack", "()V")),
-			j_remove_track_id_(tw_jni_get_method(jni, j_observer, "onDidRemoveVideoTrack", "()V")),
-			j_video_track_event_id_(tw_jni_get_method(jni, j_observer, "onDidReceiveVideoTrackEvent", "(Lorg/webrtc/VideoRenderer$I420Frame;Ljava/lang/String;)V")),
+			: j_add_track_id_(tw_jni_get_method(jni, j_observer, "onDidAddVideoTrack", "(Lcom/twilio/signal/impl/TrackInfo;)V")),
+			j_remove_track_id_(tw_jni_get_method(jni, j_observer, "onDidRemoveVideoTrack", "(Lcom/twilio/signal/impl/TrackInfo;)V")),
+			j_video_track_event_id_(tw_jni_get_method(jni, j_observer, "onDidReceiveVideoTrackEvent", "(Lorg/webrtc/VideoRenderer$I420Frame;Lcom/twilio/signal/impl/TrackInfo;)V")),
 			j_frame_class_(jni, FindClass(jni, "org/webrtc/VideoRenderer$I420Frame")),
 			j_frame_ctor_id_(GetMethodID(jni, *j_frame_class_, "<init>", "(III[I[Ljava/nio/ByteBuffer;)V")),
 			j_byte_buffer_class_(jni, FindClass(jni, "java/nio/ByteBuffer")),
@@ -42,22 +42,22 @@ class VideoSurfaceObserverJava : public TSCVideoSurfaceObserverObject {
 	void onDidAddVideoTrack(const TSCVideoTrackInfoObjectRef& trackInfo) {
 		TS_CORE_LOG_DEBUG("onDidAddVideoTrack");
 	    	JNIEnvAttacher jniAttacher;
-    		jniAttacher.get()->CallVoidMethod(*j_observer_global_, j_add_track_id_);
+    		jniAttacher.get()->CallVoidMethod(*j_observer_global_, j_add_track_id_, nullptr);
 	}
 
 	void onDidRemoveVideoTrack(const TSCVideoTrackInfoObjectRef& trackInfo) {
 		TS_CORE_LOG_DEBUG("onDidRemoveVideoTrack");
 	    	JNIEnvAttacher jniAttacher;
-    		jniAttacher.get()->CallVoidMethod(*j_observer_global_, j_remove_track_id_);
+    		jniAttacher.get()->CallVoidMethod(*j_observer_global_, j_remove_track_id_, nullptr);
 	}
-    
+
 	void onDidReceiveVideoTrackEvent(const TSCVideoTrackInfoObjectRef& trackInfo,
                                          const TSCVideoTrackEventDataObjectRef& data) {
 		TS_CORE_LOG_DEBUG("onDidReceiveVideoTrackEvent");
 	    	JNIEnvAttacher jniAttacher;
 		jobject j_frame = CricketToJavaFrame(data.get()->getFrame());
-    		jstring j_participant_address = stringToJString(jniAttacher.get(), trackInfo->getParticipantAddress());
-    		jniAttacher.get()->CallVoidMethod(*j_observer_global_, j_video_track_event_id_, j_frame, j_participant_address);
+    		// jstring j_participant_address = stringToJString(jniAttacher.get(), trackInfo->getParticipantAddress());
+    		jniAttacher.get()->CallVoidMethod(*j_observer_global_, j_video_track_event_id_, j_frame, nullptr);
 	}
 
 	private:

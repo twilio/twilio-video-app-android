@@ -10,5 +10,7 @@ TestCore/bin
 TestCore/obj
 TestCore/gen
 TestCore/local.properties
+TestCore/.settings
+
 .vagrant
 depot_tools

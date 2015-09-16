@@ -4,7 +4,6 @@ import com.twilio.signal.impl.Track.TrackId;
 
 public interface ConversationListener {
 
-	
 	/**
 	 * 
 	 */
@@ -41,11 +40,11 @@ public interface ConversationListener {
 	/**
 	 * 
 	 */
-	void onConversationEndedt(Conversation conversation);
+	void onConversationEnded(Conversation conversation);
 	
 	/**
 	 * 
 	 */
-	void onConversationEndedt(Conversation conversation, int error, String errorMessage);
+	void onConversationEnded(Conversation conversation, int error, String errorMessage);
 
 }

@@ -15,50 +15,38 @@ import android.graphics.PixelFormat;
 import android.view.WindowManager;
 import android.view.ViewGroup.LayoutParams;
 
+import com.twilio.signal.Participant;
 import com.twilio.signal.Conversation;
+import com.twilio.signal.Conversation.Status;
+import com.twilio.signal.ConversationListener;
 
-public class ConversationActivity extends Activity {
+public class ConversationActivity extends Activity implements ConversationListener {
 
 	private static final String TAG = "ConversationActivity";
 	
 	private SignalPhone phone;
 	private Conversation conv;
-	private GLSurfaceView localView;
-	private GLSurfaceView remoteView;
+	private ViewGroup localContainer;
+	private ViewGroup participantContainer;
 	private final Object syncObject = new Object();
-
-	private GLSurfaceView[] views = new GLSurfaceView[2];
 
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
 		setContentView(R.layout.conversation);
 
-		localView = (GLSurfaceView)findViewById(R.id.localView);
-		remoteView = (GLSurfaceView)findViewById(R.id.remoteView);
+		localContainer = (ViewGroup)findViewById(R.id.localContainer);
+		participantContainer = (ViewGroup)findViewById(R.id.participantContainer);
 
-		views[0] = localView;
-		views[1] = remoteView;
+		String participantAddress = getIntent().getStringExtra(SignalPhoneActivity.CONVERSATION_PARTICIPANT);
 
-		attemptCall();
+		callParticipant(participantAddress);
 	}
 
-	private void attemptCall() {
-		if(views[0] != null && views[1] != null) {
-			makeCall();
-		}
-	}
-
-	private void makeCall() {
-		String participant = getIntent().getStringExtra(SignalPhoneActivity.CONVERSATION_PARTICIPANT);
-
+	private void callParticipant(String participantAddress) {
 		phone = SignalPhone.getInstance(getApplicationContext());
-		conv = phone.call(participant, views);
-		if(conv != null) {
-			// do stuff
-		}
+		conv = phone.call(this, participantAddress, localContainer, this);
 	}
-
 
 	public static class MenuFragment extends Fragment {
 		@Override
@@ -67,4 +55,49 @@ public class ConversationActivity extends Activity {
 			return inflater.inflate(R.layout.menu, container, false);
 		}
 	}
+
+	@Override
+	public void onConnectParticipant(Conversation conversation,
+			Participant participant) {
+		
+	}
+
+	@Override
+	public void onFailToConnectParticipant(Conversation conversation,
+			Participant participant, int error, String errorMessage) {
+
+	}
+
+	@Override
+	public void onDisconnectParticipant(Conversation conversation,
+			Participant participant) {
+
+	}
+
+	@Override
+	public void onVideoAddedForParticipant(Conversation conversation,
+			Participant participant) {
+		participant.getMedia().attachContainerView(participantContainer);
+	}
+
+	@Override
+	public void onVideoRemovedForParticipant(Conversation conversation, Participant participant) {
+
+	}
+
+	@Override
+	public void onLocalStatusChanged(Conversation conversation, Status status) {
+
+	}
+
+	@Override
+	public void onConversationEnded(Conversation conversation) {
+
+	}
+
+	@Override
+	public void onConversationEnded(Conversation conversation, int error, String errorMessage) {
+
+	}
+
 }

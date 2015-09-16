@@ -1,12 +1,13 @@
 package com.twilio.signal;
 
+import android.view.ViewGroup;
 import android.opengl.GLSurfaceView;
 
 public interface Media {
-	
-	/** Read-only representation of the current UIView video container. */
-	public GLSurfaceView[] getViews();
-	
-	public void attachViews(GLSurfaceView[] views);
+
+	/** Read-only representation of the current video container. */
+	public ViewGroup getContainerView();
+
+	public void attachContainerView(ViewGroup container);
 
 }

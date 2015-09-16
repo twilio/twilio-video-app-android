@@ -1,20 +1,21 @@
 package com.twilio.signal;
 
+import android.view.ViewGroup;
 import android.opengl.GLSurfaceView;
 
 public class LocalMediaImpl implements LocalMedia {
-	private GLSurfaceView[] views;
+	private ViewGroup container;
 
 	public LocalMediaImpl() {}
 
 	@Override
-	public GLSurfaceView[] getViews() {
-		return views;
+	public ViewGroup getContainerView() {
+		return container;
 	}
 
 	@Override
-	public void attachViews(GLSurfaceView[] views) {
-		this.views = views;
+	public void attachContainerView(ViewGroup container) {
+		this.container = container;
 	}
 
 	@Override

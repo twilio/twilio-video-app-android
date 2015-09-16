@@ -1,5 +1,7 @@
 package com.twilio.signal.impl;
 
+import android.content.Context;
+
 import com.twilio.signal.impl.VideoSurface;
 import com.twilio.signal.impl.logging.Logger;
 
@@ -7,7 +9,7 @@ public class VideoSurfaceFactory {
 
 	static final Logger logger = Logger.getLogger(VideoSurfaceFactory.class);
 
-	public static VideoSurface createVideoSurface(
+	public static VideoSurface createVideoSurface(Context context,
 		VideoSurface.Observer observer) {
 		long nativeObserver = nativeCreateVideoSurfaceObserver(observer);
 		if(nativeObserver == 0) {
@@ -24,7 +26,7 @@ public class VideoSurfaceFactory {
 			logger.i("Video surface not null");
 		}
 
-		return new VideoSurface(nativeVideoSurface, nativeObserver);
+		return new VideoSurface(context, nativeVideoSurface, nativeObserver);
 	}
 
 	private static native long nativeCreateVideoSurfaceObserver(

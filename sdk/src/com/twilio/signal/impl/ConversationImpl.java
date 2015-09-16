@@ -1,11 +1,14 @@
 package com.twilio.signal.impl;
 
 import java.util.Set;
+import java.util.HashSet;
 
 import android.view.Surface;
 import android.graphics.SurfaceTexture;
+import android.content.Context;
 
 import com.twilio.signal.Conversation;
+import com.twilio.signal.Participant;
 import com.twilio.signal.ConversationListener;
 import com.twilio.signal.Endpoint;
 import com.twilio.signal.Media;
@@ -14,11 +17,13 @@ import com.twilio.signal.impl.VideoSurfaceFactory;
 import com.twilio.signal.impl.logging.Logger;
 import org.webrtc.VideoRenderer;
 
-public class ConversationImpl implements Conversation, NativeHandleInterface, VideoSurface.Observer {
+public class ConversationImpl implements Conversation, NativeHandleInterface, VideoSurface.Observer, ConversationListener {
 
-	// TODO: Make this private 
-	public VideoSurface videoSurface;
-	private Surface[] surfaces;
+	private ConversationListener conversationListener;
+	private Set<Participant> participants = new HashSet<Participant>();
+	private Media localMedia;
+	private VideoSurface videoSurface;
+
 
 	static final Logger logger = Logger.getLogger(ConversationImpl.class);
 	
@@ -41,43 +46,38 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Vi
 		}
 		
 	}
-	
-	//private EndpointImpl endpoint;
+
 	private SessionObserverInternal sessionObserverInternal;
 	private long nativeHandle;
-	
-	private ConversationImpl(EndpointImpl endpoint, Set<String> participants,
-			   Media localMedia,
-			   ConversationListener listener) {
-		//this.endpoint = endpoint;
-		String[] participantArray = participants.toArray(new String[participants.size()]);
-		sessionObserverInternal = new SessionObserverInternal(listener, endpoint);
 
-		// TODO: remove surfaces in nativeHandle constructor
+	private ConversationImpl(Context context, EndpointImpl endpoint, Set<String> participants, Media localMedia, ConversationListener conversationListener) {
+		String[] participantAddressArray = new String[participants.size()];
+		int i = 0;
+		for(String participant : participants) {
+			participantAddressArray[i++] = participant;
+		}
+	
+		this.localMedia = localMedia;
+		this.conversationListener = conversationListener;
+
+		sessionObserverInternal = new SessionObserverInternal(this, endpoint);
+
 		nativeHandle = wrapOutgoingSession(endpoint.getNativeHandle(),
 				sessionObserverInternal.getNativeHandle(),
-				participantArray,
-				surfaces);
-		videoSurface = VideoSurfaceFactory.createVideoSurface(this);
+				participantAddressArray);
 
-		if(videoSurface == null) {
-			logger.i("video surface object is null");
-		}
-
-		videoSurface.attachLocalView(localMedia.getViews()[0]);
-		videoSurface.attachRemoteView(localMedia.getViews()[1]);
+		videoSurface = VideoSurfaceFactory.createVideoSurface(context, this);
 
 		setVideoSurface(nativeHandle, videoSurface.getNativeHandle());
 
 		start(nativeHandle);
 	}
 
-	public static Conversation create(EndpointImpl endpoint, Set<String> participants,
+	public static Conversation create(Context context, EndpointImpl endpoint, Set<String> participants,
 			   Media localMedia,
 			   ConversationListener listener) {
-		ConversationImpl conv = new ConversationImpl(endpoint, participants, localMedia, listener);
+		ConversationImpl conv = new ConversationImpl(context, endpoint, participants, localMedia, listener);
 		if (conv.getNativeHandle() == 0) {
-			//notify listener?
 			return null;
 		}
 		return conv;
@@ -124,8 +124,76 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Vi
 		// TODO Auto-generated method stub
 		return null;
 	}
+
+	/*
+	 * ConversationListener events
+	 */
+
+	@Override
+	public void onConnectParticipant(Conversation conversation, Participant participant) {
+		conversationListener.onConnectParticipant(conversation, participant);
+	}
+
+	@Override
+	public void onFailToConnectParticipant(Conversation conversation, Participant participant, int error, String errorMessage) {
+		conversationListener.onFailToConnectParticipant(conversation, participant, error, errorMessage);
+	}
+
+	@Override
+	public void onDisconnectParticipant(Conversation conversation, Participant participant) {
+		conversationListener.onDisconnectParticipant(conversation, participant);
+	}
+
+	@Override
+	public void onVideoAddedForParticipant(Conversation conversation, Participant participant) {
+		participants.add(participant);
+		conversationListener.onVideoAddedForParticipant(conversation, participant);
+	}
+
+	@Override
+	public void onVideoRemovedForParticipant(Conversation conversation, Participant participant) {
+		conversationListener.onVideoRemovedForParticipant(conversation, participant);
+	}
+
+	@Override
+	public void onLocalStatusChanged(Conversation conversation, Conversation.Status status) {
+		conversationListener.onLocalStatusChanged(conversation, status);
+	}
 	
-	private native long wrapOutgoingSession(long nativeEndpoint, long nativeSessionObserver, String[] participants, Surface[] views);
+	@Override
+	public void onConversationEnded(Conversation conversation) {
+		conversationListener.onConversationEnded(conversation);
+	}
+	
+	@Override
+	public void onConversationEnded(Conversation conversation, int error, String errorMessage) {
+		conversationListener.onConversationEnded(conversation, error, errorMessage);
+	}
+
+	/*
+	 *
+	 * VideoSurface.Observer Events
+	 */
+	@Override
+	public void onDidAddVideoTrack(TrackInfo trackInfo) {
+
+	}
+
+	@Override
+	public void onDidRemoveVideoTrack(TrackInfo trackInfo) {
+
+	}
+
+	@Override
+	public void onDidReceiveVideoTrackEvent(VideoRenderer.I420Frame frame, TrackInfo trackInfo) {
+		if(localMedia.getContainerView() == null) {
+			logger.i("localMedia View is null");
+			return;
+		}
+		videoSurface.renderFrame(frame, localMedia.getContainerView());
+	}
+
+	private native long wrapOutgoingSession(long nativeEndpoint, long nativeSessionObserver, String[] participants);
 
 	private native void setVideoSurface(long nativeSession, long nativeVideoSurface);
 
@@ -135,36 +203,4 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Vi
 	public long getNativeHandle() {
 		return nativeHandle;
 	}
-	
-	@Override
-	public void onDidAddVideoTrack() {
-		logger.i("onDidAddVideoTrack");
-	}
-
-	@Override
-	public void onDidRemoveVideoTrack() {
-		logger.i("onDidRemoveVideoTrack");
-	} 
-
-	@Override
-	public void onDidReceiveVideoTrackEvent(VideoRenderer.I420Frame frame, String participant) {
-		logger.i("onDidReceiveVideoTrackEvent " + participant);
-		if(videoSurface == null) {
-			logger.i("video surface null");
-			return;
-		}
-		if(frame == null) {
-			logger.i("frame is null");
-			return;
-		}
-		// TODO: map participants to views
-		if(participant.equals("alice")) {
-			logger.i("local" + participant);
-			videoSurface.getLocalVideoRendererCallbacks().renderFrame(frame);
-		} else {
-			logger.i("remote" + participant);
-			videoSurface.getRemoteVideoRendererCallbacks().renderFrame(frame);
-		}
-	}
-
 }

@@ -6,23 +6,23 @@ android:layout_width="match_parent"
 android:layout_height="match_parent"
 android:orientation="vertical">
 
-	<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	<LinearLayout
     	android:orientation="vertical"
     	android:layout_width="match_parent"
     	android:layout_height="match_parent">
 
-		<android.opengl.GLSurfaceView
-		android:id="@+id/localView"
+		<RelativeLayout
+		android:id="@+id/localContainer"
 		android:layout_width="match_parent"
 		android:layout_height="match_parent"
 		android:layout_weight="1" />
 
-		<android.opengl.GLSurfaceView
-		android:id="@+id/remoteView"
+		<RelativeLayout
+		android:id="@+id/participantContainer"
 		android:layout_width="match_parent"
 		android:layout_height="match_parent"
 		android:layout_weight="1" />
-
+		-->
 	</LinearLayout>
 
 	<fragment

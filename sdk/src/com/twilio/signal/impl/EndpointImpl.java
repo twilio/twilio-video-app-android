@@ -14,6 +14,7 @@ import com.twilio.signal.Conversation;
 import com.twilio.signal.ConversationListener;
 import com.twilio.signal.Endpoint;
 import com.twilio.signal.EndpointListener;
+import com.twilio.signal.Participant;
 import com.twilio.signal.Media;
 import com.twilio.signal.impl.logging.Logger;
 
@@ -125,9 +126,9 @@ public class EndpointImpl implements Endpoint, NativeHandleInterface, Parcelable
 
 
 	@Override
-	public Conversation createConversation(Set<String> participants,
+	public Conversation createConversation(Context context, Set<String> participants,
 			Media localMedia, ConversationListener listener) {
-		Conversation conv = ConversationImpl.create(this, participants, localMedia, listener);
+		Conversation conv = ConversationImpl.create(context, this, participants, localMedia, listener);
 		return conv;
 	}
 
