@@ -190,6 +190,12 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Vi
 			logger.i("localMedia View is null");
 			return;
 		}
+		if(trackInfo != null) {
+			logger.i("trackInfo is not null");
+			logger.i(trackInfo.getParticipantAddress());
+			logger.i(trackInfo.getTrackId());
+		}
+
 		videoSurface.renderFrame(frame, localMedia.getContainerView());
 	}
 

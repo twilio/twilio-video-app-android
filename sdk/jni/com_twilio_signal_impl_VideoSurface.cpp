@@ -27,6 +27,8 @@ class VideoSurfaceObserverJava : public TSCVideoSurfaceObserverObject {
 			: j_add_track_id_(tw_jni_get_method(jni, j_observer, "onDidAddVideoTrack", "(Lcom/twilio/signal/impl/TrackInfo;)V")),
 			j_remove_track_id_(tw_jni_get_method(jni, j_observer, "onDidRemoveVideoTrack", "(Lcom/twilio/signal/impl/TrackInfo;)V")),
 			j_video_track_event_id_(tw_jni_get_method(jni, j_observer, "onDidReceiveVideoTrackEvent", "(Lorg/webrtc/VideoRenderer$I420Frame;Lcom/twilio/signal/impl/TrackInfo;)V")),
+			j_trackinfo_class_(jni, FindClass(jni, "com/twilio/signal/impl/TrackInfoImpl")),
+			j_trackinfo_ctor_id_(GetMethodID(jni, *j_trackinfo_class_, "<init>", "(Ljava/lang/String;Ljava/lang/String;)V")),
 			j_frame_class_(jni, FindClass(jni, "org/webrtc/VideoRenderer$I420Frame")),
 			j_frame_ctor_id_(GetMethodID(jni, *j_frame_class_, "<init>", "(III[I[Ljava/nio/ByteBuffer;)V")),
 			j_byte_buffer_class_(jni, FindClass(jni, "java/nio/ByteBuffer")),
@@ -56,14 +58,26 @@ class VideoSurfaceObserverJava : public TSCVideoSurfaceObserverObject {
 		TS_CORE_LOG_DEBUG("onDidReceiveVideoTrackEvent");
 	    	JNIEnvAttacher jniAttacher;
 		jobject j_frame = CricketToJavaFrame(data.get()->getFrame());
-    		// jstring j_participant_address = stringToJString(jniAttacher.get(), trackInfo->getParticipantAddress());
-    		jniAttacher.get()->CallVoidMethod(*j_observer_global_, j_video_track_event_id_, j_frame, nullptr);
+		jobject j_trackinfo = TrackInfoToJavaTrackInfoImpl(trackInfo);
+
+    		jniAttacher.get()->CallVoidMethod(*j_observer_global_, j_video_track_event_id_, j_frame, j_trackinfo);
 	}
 
 	private:
 
 	jstring stringToJString(JNIEnv * env, const std::string & nativeString) {
 		return env->NewStringUTF(nativeString.c_str());
+	}
+
+	// Return a TrackInfoImpl
+	jobject TrackInfoToJavaTrackInfoImpl(const TSCVideoTrackInfoObjectRef& trackInfo) {
+	    	JNIEnvAttacher jniAttacher;
+    		jstring j_participant_address = stringToJString(jniAttacher.get(), trackInfo->getParticipantAddress());
+    		jstring j_track_id = stringToJString(jniAttacher.get(), trackInfo->getTrackId());
+
+		return jniAttacher.get()->NewObject(
+				*j_trackinfo_class_, j_trackinfo_ctor_id_,
+				j_participant_address, j_track_id);
 	}
 
 	// Return a VideoRenderer.I420Frame referring to the data in |frame|.
@@ -96,6 +110,8 @@ class VideoSurfaceObserverJava : public TSCVideoSurfaceObserverObject {
 	const jmethodID j_add_track_id_;
 	const jmethodID j_remove_track_id_;
 	const jmethodID j_video_track_event_id_;
+	const ScopedGlobalRef<jclass> j_trackinfo_class_;
+	const jmethodID j_trackinfo_ctor_id_;
 	const ScopedGlobalRef<jclass> j_frame_class_;
 	const jmethodID j_frame_ctor_id_;
 	const ScopedGlobalRef<jclass> j_byte_buffer_class_;
