@@ -4,7 +4,6 @@
 #include "TSCEndpoint.h"
 #include "TSCEndpointObserver.h"
 #include "TSCSession.h"
-#include "TSCIncomingSession.h"
 #include <twilio-jni/twilio-jni.h>
 #include <android/log.h>
 

@@ -5,13 +5,11 @@
 #include "TSCSessionObserver.h"
 #include "TSCSession.h"
 #include "TSCVideoSurface.h"
-#include "TSCOutgoingSession.h"
 #include "TSCParticipant.h"
 #include <twilio-jni/twilio-jni.h>
 #include <android/log.h>
 #include <android/native_window.h>
 #include <android/native_window_jni.h>
-#include <renderer.h>
 
 #include <string>
 #include <map>
