@@ -61,7 +61,7 @@ LOCALIZE_SYMBOL := $(LOCAL_PATH)/dummy.cpp
 
 $(LOCALIZE_SYMBOL):
 	@echo "Localizing JNI_OnLoad symbol in libwebrtc.a to prevent a conflict with libtwilio-jni.a"
-	$(ANDROID_NDK_ROOT)/toolchains/aarch64-linux-android-4.9/prebuilt/linux-x86_64/aarch64-linux-android/bin/objcopy --localize-symbol JNI_OnLoad /usr/local/twilio-sdk/webrtc/android/armeabiv7a/lib/libwebrtc-jni.a
+	$(ANDROID_NDK_HOME)/toolchains/aarch64-linux-android-4.9/prebuilt/linux-x86_64/aarch64-linux-android/bin/objcopy --localize-symbol JNI_OnLoad /usr/local/twilio-sdk/webrtc/android/armeabiv7a/lib/libwebrtc-jni.a
 	touch $(LOCALIZE_SYMBOL)
 
 .INTERMEDIATE: $(LOCALIZE_SYMBOL)
