@@ -1,55 +1,84 @@
+#include <twilio-jni/twilio-jni.h>
+#include "webrtc/modules/utility/interface/helpers_android.h"
+
 #include "com_twilio_signal_impl_ConversationImpl_SessionObserverInternal.h"
 #include "TSCoreSDKTypes.h"
 #include "TSCoreError.h"
 #include "TSCSession.h"
+#include "TSCLogger.h"
 #include "TSCSessionObserver.h"
-#include <twilio-jni/twilio-jni.h>
-#include <android/log.h>
+#include "TSCMediaStreamInfo.h"
 
+using namespace webrtc;
 using namespace twiliosdk;
 
-#define TAG  "TwilioSDK(native)"
 
 class SessionObserverInternalWrapper : public TSCSessionObserverObject {
 public:
-	SessionObserverInternalWrapper(JNIEnv* env, jobject obj, jobject listener, jobject endpoint) {
+	SessionObserverInternalWrapper(JNIEnv* jni, jobject obj, jobject j_observer, jobject conversation)
+			: j_participant_did_connect_id(tw_jni_get_method(jni, j_observer, "onConnectParticipant", "(Ljava/lang/String;)V")),
+			j_video_added_for_participant_id(tw_jni_get_method(jni, j_observer, "onVideoAddedForParticipant", "(Ljava/lang/String;)V")),
+			j_observer_global_(jni, j_observer),	
+			j_observer_class_(jni, jni->GetObjectClass(*j_observer_global_)) {
 
 	}
 protected:
 	virtual void onDidReceiveEvent(const TSCEventObjectRef& event) {
-		__android_log_print(ANDROID_LOG_VERBOSE, TAG, "onDidReceiveEvent");
+		TS_CORE_LOG_DEBUG("onDidReceiveEvent");
 	}
 
 	virtual void onStateDidChange(TSCSessionState state) {
-		__android_log_print(ANDROID_LOG_VERBOSE, TAG, "onStateDidChange");
+		TS_CORE_LOG_DEBUG("onStateDidChange");
 	}
 
 	virtual void onStartDidComplete(const TSCErrorObjectRef& error) {
-		__android_log_print(ANDROID_LOG_VERBOSE, TAG, "onStartDidComplete");
+		TS_CORE_LOG_DEBUG("onStartDidComplete");
 	}
 	virtual void onStopDidComplete(const TSCErrorObjectRef& error) {
-		__android_log_print(ANDROID_LOG_VERBOSE, TAG, "onStopDidComplete");
+		TS_CORE_LOG_DEBUG("onStopDidComplete");
 	}
 
 	virtual void onParticipantDidConnect(const TSCParticipantObjectRef& participant,
 										 const TSCErrorObjectRef& error) {
-		__android_log_print(ANDROID_LOG_VERBOSE, TAG, "onParticipantDidConnect");
+		TS_CORE_LOG_DEBUG("onParticipantDidConnect");
+	    	JNIEnvAttacher jniAttacher;
+    		jstring j_participant_address = stringToJString(jniAttacher.get(), participant->getAddress());
+    		jniAttacher.get()->CallVoidMethod(*j_observer_global_, j_participant_did_connect_id, j_participant_address);
 	}
+
 	virtual void onParticipantDidDisconect(const TSCParticipantObjectRef& participant,
 										   TSCDisconnectReason reason) {
-		__android_log_print(ANDROID_LOG_VERBOSE, TAG, "onParticipantDidDisconect");
+		TS_CORE_LOG_DEBUG("onParticipantDidDisconect");
 	}
 
 	virtual void onMediaStreamDidAdd(TSCMediaStreamInfoObject* stream) {
-		__android_log_print(ANDROID_LOG_VERBOSE, TAG, "onMediaStreamDidAdd");
+		TS_CORE_LOG_DEBUG("onMediaStreamDidAdd");
+	    	JNIEnvAttacher jniAttacher;
+
+    		jstring j_participant_address = stringToJString(jniAttacher.get(), stream->getParticipantAddress());
+    		jniAttacher.get()->CallVoidMethod(*j_observer_global_, j_video_added_for_participant_id, j_participant_address);
 	}
+
 	virtual void onMediaStreamDidRemove(TSCMediaStreamInfoObject* stream) {
-		__android_log_print(ANDROID_LOG_VERBOSE, TAG, "onMediaStreamDidRemove");
+		TS_CORE_LOG_DEBUG("onMediaStreamDidRemove");
 	}
 
 	virtual void onDidReceiveSessionStatistics(TSCSessionStatisticsObject* statistics) {
-		__android_log_print(ANDROID_LOG_VERBOSE, TAG, "onDidReceiveSessionStatistics");
+		TS_CORE_LOG_DEBUG("onDidReceiveSessionStatistics");
 	}
+
+private:
+
+	jstring stringToJString(JNIEnv * env, const std::string & nativeString) {
+		return env->NewStringUTF(nativeString.c_str());
+	}
+
+
+
+	const jmethodID j_participant_did_connect_id;
+	const jmethodID j_video_added_for_participant_id;
+	const ScopedGlobalRef<jobject> j_observer_global_;
+	const ScopedGlobalRef<jclass> j_observer_class_;
 };
 
 
@@ -57,13 +86,15 @@ protected:
 /*
  * Class:     com_twilio_signal_impl_ConversationImpl_SessionObserverInternal
  * Method:    wrapNativeObserver
- * Signature: (Lcom/twilio/signal/ConversationListener;Lcom/twilio/signal/Endpoint;)J
+ * Signature: (Lcom/twilio/signal/ConversationObserver;Lcom/twilio/signal/Conversation;)J
  */
 JNIEXPORT jlong JNICALL Java_com_twilio_signal_impl_ConversationImpl_00024SessionObserverInternal_wrapNativeObserver
-  (JNIEnv *env, jobject obj, jobject listener, jobject endpoint) {
-	TSCSessionObserverObjectRef sessionObserver =
-				TSCSessionObserverObjectRef(new SessionObserverInternalWrapper(env, obj, listener, endpoint));
-	return (jlong)sessionObserver.release();
+  (JNIEnv *env, jobject obj, jobject observer, jobject conversation) {
+	TS_CORE_LOG_DEBUG("wrapNativeObserver");
+  	rtc::scoped_ptr<SessionObserverInternalWrapper> so(
+		new SessionObserverInternalWrapper(env, obj, observer, conversation)
+	);
+  	return (jlong)so.release();
 }
 
 /*

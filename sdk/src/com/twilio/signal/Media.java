@@ -1,13 +1,12 @@
 package com.twilio.signal;
 
-import android.view.TextureView;
+import android.view.ViewGroup;
 
 public interface Media {
-	
-	
-	/** Read-only representation of the current UIView video container. */
-	public TextureView getView();
-	
-	public void attachView(TextureView view);
+
+	/** Read-only representation of the current video container. */
+	public ViewGroup getContainerView();
+
+	public void attachContainerView(ViewGroup container);
 
 }

@@ -9,8 +9,7 @@ import java.util.Set;
  */
 
 public interface Conversation {
-	
-	
+
 	/**
 	 * An enum describing the current status of the Conversation.
 	 */

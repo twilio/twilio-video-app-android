@@ -13,7 +13,10 @@ LOCAL_SRC_FILES         := $(PREFIX)/core/android/armeabiv7a/lib/libtwilio-sdk-c
 LOCAL_EXPORT_C_INCLUDES := $(PREFIX)/core/android/armeabiv7a/include \
                            $(PREFIX)/webrtc/android/armeabiv7a/include \
                            $(PREFIX)/pjsip/android/armeabiv7a/include
+
+
 LOCAL_EXPORT_CFLAGS := -Wall -DARM -DPJ_IS_LITTLE_ENDIAN=1 -DPJ_IS_BIG_ENDIAN=0 -DWEBRTC_POSIX -DWEBRTC_ANDROID -DWEBRTC_ANDROID_OPENSLES -DPOCO_ANDROID
 include $(PREBUILT_STATIC_LIBRARY)
 
 endif  # TARGET_SIMULATOR != true
+

@@ -5,7 +5,7 @@ import java.util.Set;
 
 import android.R.bool;
 import android.app.PendingIntent;
-
+import android.content.Context;
 
 /** 
  * An instance of Endpoint is an object that knows how to interface with Twilio SIGNAL Services.
@@ -70,8 +70,6 @@ public interface Endpoint {
 	 * @param listener for Conversation events
 	 */
 	
-	public Conversation createConversation(Set<String> participants,
-										   Media localMedia,
-										   ConversationListener listener);
+	public Conversation createConversation(Context context, Set<String> participants, Media localMedia, ConversationListener listener);
 
 }

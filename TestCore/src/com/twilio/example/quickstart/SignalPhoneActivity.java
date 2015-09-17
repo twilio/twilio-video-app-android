@@ -23,7 +23,7 @@ public class SignalPhoneActivity extends Activity implements LoginListener {
 	private static final String DEFAULT_CLIENT_NAME = "alice";
 	private static final String TAG = "SignalPhoneActivity";
 	
-	public static final String CONVERSATION_SID = "conversation_sid";
+	public static final String CONVERSATION_PARTICIPANT = "conversation_participant";
 
 	SignalPhone phone;
 	private EditText clientNameTextBox;
@@ -158,12 +158,9 @@ public class SignalPhoneActivity extends Activity implements LoginListener {
 	}
 	
 	private void call(String participant) {
-		Conversation conv = phone.call(participant);
-		if (conv != null) {
-			Intent intent = new Intent(getBaseContext(), ConversationActivity.class);
-			intent.putExtra(CONVERSATION_SID, conv.getConversationSid());
-			startActivity(intent);
-		}
+		Intent intent = new Intent(this, ConversationActivity.class);
+		intent.putExtra(CONVERSATION_PARTICIPANT, participant);
+		startActivity(intent);
 	}
 
 

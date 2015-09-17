@@ -22,6 +22,7 @@ import android.content.Intent;
 import android.media.AudioManager;
 import android.os.AsyncTask;
 import android.util.Log;
+import android.view.ViewGroup;
 
 import com.twilio.signal.Conversation;
 import com.twilio.signal.Conversation.Status;
@@ -36,7 +37,7 @@ import com.twilio.signal.TwilioRTC;
 import com.twilio.signal.impl.TwilioConstants;
 
 
-public class SignalPhone implements EndpointListener, ConversationListener
+public class SignalPhone implements EndpointListener
 {
     private static final String TAG = "SIgnalPhone";
 
@@ -163,19 +164,20 @@ public class SignalPhone implements EndpointListener, ConversationListener
     {
 
     }
-    
-    public Conversation call(String participant) {
-    	if (participant == null && participant == "") {
+
+    public Conversation call(Context context, String participant, ViewGroup localContainer, ConversationListener conversationListener) {
+    	if (participant == null || participant == "") {
     		return null;
     	}
     	if (!twilioSdkInited || (SignalPhone.this.alice == null)) {
     		return null;
     	}
     	LocalMedia localMedia = new LocalMediaImpl();
-    	Set<String> partSet = new HashSet<String>();
-    	partSet.add(participant);
+	localMedia.attachContainerView(localContainer);
+    	Set<String> participants = new HashSet<String>();
+    	participants.add(participant);
     	Conversation conv = SignalPhone.this.alice.createConversation(
-    			partSet, localMedia, this);
+    			context, participants, localMedia, conversationListener);
     	if (conv != null) {
     		conversations.put(conv.getConversationSid(), conv);
     	}
@@ -342,63 +344,6 @@ public class SignalPhone implements EndpointListener, ConversationListener
 	public void onReceiveConversationInvite(Endpoint endpoint, Invite invite) {
 		// TODO Auto-generated method stub
 
-	}
-
-	/*
-	 * ConversationListener
-	 */
-	@Override
-	public void onConnectParticipant(Conversation conversation,
-			Participant participant) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void onFailToConnectParticipant(Conversation conversation,
-			Participant participant, int error, String errorMessage) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void onDisconnectParticipant(Conversation conversation,
-			Participant participant) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void onVideoAddedForParticipant(Conversation conversation,
-			Participant participant) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void onVideoRemovedForParticipant(Conversation conversation,
-			Participant participant) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void onLocalStatusChanged(Conversation conversation, Status status) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void onConversationEndedt(Conversation conversation) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void onConversationEndedt(Conversation conversation, int error,
-			String errorMessage) {
-		// TODO Auto-generated method stub
-		
 	}
 
 }

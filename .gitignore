@@ -2,11 +2,15 @@ sdk/local.properties
 sdk/libs/armeabi-v7a
 sdk/obj
 sdk/gen
+sdk/.settings
+sdk/bin
 output
 
 TestCore/bin
 TestCore/obj
 TestCore/gen
 TestCore/local.properties
+TestCore/.settings
+
 .vagrant
 depot_tools

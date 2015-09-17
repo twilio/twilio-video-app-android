@@ -4,12 +4,6 @@ ifneq ($(ENABLE_PROFILING),)
 include $(TWSDK_JNI_PATH)/../thirdparty/android-ndk-profiler/jni/Android.mk
 endif
 
-
-#include $(TWSDK_JNI_PATH)/../thirdparty/openssl-stock-android/Android.mk
-#include $(TWSDK_JNI_PATH)/../external/signal-sdk-core/SDKs/PJSIP/Android.mk
-#include $(TWSDK_JNI_PATH)/../external/signal-sdk-core/SDKs/POCO/Android.mk
-#include $(TWSDK_JNI_PATH)/../external/signal-sdk-core/SDKs/WebRTC/build-android/Android.mk
-#include $(TWSDK_JNI_PATH)/../external/signal-sdk-core/TwilioCoreSDK/Android.mk
 include $(TWSDK_JNI_PATH)/signal-core.mk
 include $(TWSDK_JNI_PATH)/../external/twilio-jni/Android.mk
 
@@ -19,29 +13,22 @@ include $(CLEAR_VARS)
 
 LOCAL_MODULE := twilio-native
 LOCAL_SRC_FILES := \
+	dummy.cpp \
 	com_twilio_signal_impl_TwilioRTCImpl.cpp \
+	com_twilio_signal_impl_VideoSurface.cpp \
 	com_twilio_signal_impl_EndpointImpl.cpp \
 	com_twilio_signal_impl_EndpointImpl_EndpointObserverInternal.cpp \
 	com_twilio_signal_impl_ConversationImpl.cpp \
-	com_twilio_signal_impl_ConversationImpl_SessionObserverInternal.cpp
-	#com_twilio_signal_impl_SignalCore.cpp \
-	EndpointObserver.cpp
+	com_twilio_signal_impl_ConversationImpl_SessionObserverInternal.cpp \
 
-#ifeq ($(APP_DEBUGGABLE),true)
+LOCAL_C_INCLUDES := /usr/local/twilio-sdk/webrtc/android/armeabiv7a/include/third_party/icu/source/common
+
 ifeq ($(shell test "$(APP_DEBUGGABLE)" = "true" -o "$(NDK_DEBUG)" = "1" && echo true || echo false),true)
 debug_cflags := \
 	-DENABLE_PJSIP_LOGGING \
 	-DENABLE_JNI_DEBUG_LOGGING
 endif
 
-#This exists due to bug in ndk in resolving circular dependencies. Techincally we should just name module
-#in LOCAL_STATIC_LIBRARIES, however ndk doesn't respect order of the module named.
-#OPENSSL_LIBS := \
-	$(TWSDK_JNI_PATH)/../thirdparty/openssl-stock-android/lib/$(TARGET_ARCH_ABI)/libssl.a \
-	$(TWSDK_JNI_PATH)/../thirdparty/openssl-stock-android/lib/$(TARGET_ARCH_ABI)/libcrypto.a
-
-#OPUS_LIB := \
-	$(TWSDK_JNI_PATH)/../external/signal-sdk-core/SDKs/WebRTC/build-android/prebuild/libs/$(TARGET_ARCH_ABI)/libopus.a
 
 LOCAL_CFLAGS += \
 	-Wall \
@@ -52,28 +39,36 @@ LOCAL_CFLAGS += \
 	
 LOCAL_CPPFLAGS := -std=gnu++11 -fno-rtti
 
-#Putting openssl libs and opus libs like this will give the warning, but as of today
-#I can't find better way to resolve circular dependency (it is broken in ndk). 
 LOCAL_LDLIBS := \
 	-llog \
 	-lz \
-    -lm \
+	-lm \
 	-ldl \
 	-lGLESv2 \
 	-ljnigraphics \
-	-lOpenSLES
-	#$(OPENSSL_LIBS) \
-	$(OPUS_LIB) \
+	-lOpenSLES \
+	-lEGL \
+	-lGLESv1_CM \
+	-landroid \
 
-# pjmedia is in here twice because there's a circular dependency
-# between pjmedia and pjmedia-codec (the g711_init func)
 LOCAL_STATIC_LIBRARIES := \
 	twilio-sdk-core \
-	twilio-jni
-	#webrtc \
-	twilio-jni
-	
-	
-	
+	twilio-jni \
+
+# Make JNI_OnLoad a local symbol in libwebrtc-jni.a since it is already defined by libtwilio-jni.a
+# dummy.cpp is a fake depedency that causes this command to run prior to linking
+LOCALIZE_SYMBOL := $(LOCAL_PATH)/dummy.cpp
+
+$(LOCALIZE_SYMBOL):
+	@echo "Localizing JNI_OnLoad symbol in libwebrtc.a to prevent a conflict with libtwilio-jni.a"
+	$(ANDROID_NDK_ROOT)/toolchains/aarch64-linux-android-4.9/prebuilt/linux-x86_64/aarch64-linux-android/bin/objcopy --localize-symbol JNI_OnLoad /usr/local/twilio-sdk/webrtc/android/armeabiv7a/lib/libwebrtc-jni.a
+	touch $(LOCALIZE_SYMBOL)
+
+.INTERMEDIATE: $(LOCALIZE_SYMBOL)
+
+# Manually link the libwebrtc-jni static library. Using LOCAL_WHOLE_STATIC_LIBRARIES does not link the library
+WEBRTC_JNI_STATIC_LIBRARY := -Wl,--whole-archive /usr/local/twilio-sdk/webrtc/android/armeabiv7a/lib/libwebrtc-jni.a -Wl,--no-whole-archive
+LOCAL_LDFLAGS := \
+	$(WEBRTC_JNI_STATIC_LIBRARY)
 
 include $(BUILD_SHARED_LIBRARY)
