@@ -1,7 +1,6 @@
 package com.twilio.signal;
 
 import android.view.ViewGroup;
-import android.opengl.GLSurfaceView;
 
 public class LocalMediaImpl implements LocalMedia {
 	private ViewGroup container;

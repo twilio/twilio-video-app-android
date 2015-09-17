@@ -10,7 +10,7 @@ extern "C" {
 /*
  * Class:     com_twilio_signal_impl_VideoSurfaceFactory
  * Method:    nativeCreateVideoSurfaceObserver
- * Signature: (Lcom/twilio/signal/impl/VideoSurface/Observer;)J
+ * Signature: (Lcom/twilio/signal/impl/VideoSurfaceObserver;)J
  */
 JNIEXPORT jlong JNICALL Java_com_twilio_signal_impl_VideoSurfaceFactory_nativeCreateVideoSurfaceObserver
   (JNIEnv *, jclass, jobject);

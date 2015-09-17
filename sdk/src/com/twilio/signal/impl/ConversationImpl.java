@@ -3,17 +3,15 @@ package com.twilio.signal.impl;
 import java.util.Set;
 import java.util.HashSet;
 
-import android.view.Surface;
-import android.graphics.SurfaceTexture;
 import android.content.Context;
 
 import com.twilio.signal.Conversation;
 import com.twilio.signal.Participant;
-import com.twilio.signal.impl.ParticipantImpl;
 import com.twilio.signal.ConversationListener;
-import com.twilio.signal.impl.ConversationObserver;
 import com.twilio.signal.Endpoint;
 import com.twilio.signal.Media;
+import com.twilio.signal.impl.ParticipantImpl;
+import com.twilio.signal.impl.ConversationObserver;
 import com.twilio.signal.impl.VideoSurface;
 import com.twilio.signal.impl.VideoSurfaceFactory;
 import com.twilio.signal.impl.logging.Logger;
@@ -134,12 +132,6 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Vi
 	@Override
 	public void onConnectParticipant(String participantAddress) {
 		logger.i("onConnectParticipant " + participantAddress);
-		for(Participant participant : participants) {
-			if(participant.getAddress().equals(participantAddress)) {
-				conversationListener.onConnectParticipant(this, participant);
-				break;
-			}
-		}
 	}
 
 	@Override
@@ -194,7 +186,6 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Vi
 	}
 
 	/*
-	 *
 	 * VideoSurface.Observer Events
 	 */
 	@Override
@@ -209,15 +200,6 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Vi
 
 	@Override
 	public void onDidReceiveVideoTrackEvent(VideoRenderer.I420Frame frame, TrackInfo trackInfo) {
-		if(localMedia.getContainerView() == null) {
-			logger.i("localMedia View is null");
-			return;
-		}
-		if(trackInfo != null) {
-			logger.i("trackInfo is not null");
-			logger.i(trackInfo.getParticipantAddress());
-			logger.i(trackInfo.getTrackId());
-		}
 		for(Participant participant : participants) {
 			if(participant.getAddress().equals(trackInfo.getParticipantAddress())) {
 				videoSurface.renderFrame(frame, participant.getMedia().getContainerView());

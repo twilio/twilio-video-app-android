@@ -1,6 +1,7 @@
 #include "com_twilio_signal_impl_ConversationImpl.h"
 #include "TSCoreSDKTypes.h"
 #include "TSCoreError.h"
+#include "TSCLogger.h"
 #include "TSCEndpoint.h"
 #include "TSCSessionObserver.h"
 #include "TSCSession.h"
@@ -8,12 +9,11 @@
 #include "TSCParticipant.h"
 #include <twilio-jni/twilio-jni.h>
 #include <android/log.h>
-#include <android/native_window.h>
-#include <android/native_window_jni.h>
 
 #include <string>
 #include <map>
 #include <vector>
+
 
 using namespace twiliosdk;
 
@@ -32,20 +32,20 @@ JNIEXPORT jlong JNICALL Java_com_twilio_signal_impl_ConversationImpl_wrapOutgoin
 	TSCSessionObserverObjectRef sessionObserver =
 			TSCSessionObserverObjectRef(reinterpret_cast<TSCSessionObserverObject*>(nativeSessionObserver));
 	if (sessionObserver.get() == NULL) {
-		__android_log_print(ANDROID_LOG_DEBUG, TAG, "sessionObserver was null. Exiting");
+		TS_CORE_LOG_DEBUG("sessionObserver was null. Exiting");
 		return 0;
 	}
 
 	TSCOutgoingSessionObjectRef outgoingSession = endpoint->createSession(options, sessionObserver);
 
 	if (outgoingSession.get() == NULL) {
-		__android_log_print(ANDROID_LOG_DEBUG, TAG, "outgoingSession was null. Exiting");
+		TS_CORE_LOG_DEBUG("outgoingSession was null. Exiting");
 		return 0;
 	}
 
 	int size = env->GetArrayLength(participantList);
 	if (size == 0) {
-		__android_log_print(ANDROID_LOG_DEBUG, TAG, "no participants were provided");
+		TS_CORE_LOG_DEBUG("no participants were provided");
 		return 0;
 	}
 
@@ -67,7 +67,7 @@ JNIEXPORT jlong JNICALL Java_com_twilio_signal_impl_ConversationImpl_wrapOutgoin
 JNIEXPORT void JNICALL Java_com_twilio_signal_impl_ConversationImpl_setVideoSurface
   (JNIEnv *env, jobject obj, jlong nativeSession, jlong nativeVideoSurface)
 {
-	__android_log_print(ANDROID_LOG_DEBUG, TAG, "setVideoSurface");
+	TS_CORE_LOG_DEBUG("setVideoSurface");
 	TSCSessionObject* session = reinterpret_cast<TSCSessionObject*>(nativeSession);
 	TSCVideoSurfaceObject* videoSurface = reinterpret_cast<TSCVideoSurfaceObject*>(nativeVideoSurface);
 	session->setVideoSurface(videoSurface);	
@@ -77,7 +77,7 @@ JNIEXPORT void JNICALL Java_com_twilio_signal_impl_ConversationImpl_setVideoSurf
 JNIEXPORT void JNICALL Java_com_twilio_signal_impl_ConversationImpl_start
   (JNIEnv *env, jobject obj, jlong nativeSession)
 {
-	__android_log_print(ANDROID_LOG_DEBUG, TAG, "start");
+	TS_CORE_LOG_DEBUG("start");
 	TSCSessionObject* session = reinterpret_cast<TSCSessionObject*>(nativeSession);
 	session->start();	
 }

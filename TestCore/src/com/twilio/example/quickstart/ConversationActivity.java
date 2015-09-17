@@ -2,18 +2,11 @@ package com.twilio.example.quickstart;
 
 import android.app.Activity;
 import android.app.Fragment;
-import android.graphics.SurfaceTexture;
-import android.opengl.GLSurfaceView;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageButton;
-import android.graphics.Point;
-import android.graphics.PixelFormat;
-import android.view.WindowManager;
-import android.view.ViewGroup.LayoutParams;
 
 import com.twilio.signal.Participant;
 import com.twilio.signal.Conversation;
@@ -79,8 +72,10 @@ public class ConversationActivity extends Activity implements ConversationListen
 	public void onVideoAddedForParticipant(Conversation conversation,
 			Participant participant) {
 		if(!participant.getAddress().equals(participantAddress)) {
+			// Host participant 
 			participant.getMedia().attachContainerView(localContainer);
 		} else {
+			// Remote participant
 			participant.getMedia().attachContainerView(participantContainer);
 		}
 	}

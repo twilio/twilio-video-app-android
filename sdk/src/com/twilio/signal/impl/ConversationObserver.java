@@ -2,7 +2,7 @@ package com.twilio.signal.impl;
 
 import com.twilio.signal.Conversation;
 
-public interface ConversationObserver {
+interface ConversationObserver {
 
 	void onConnectParticipant(String participant);
 

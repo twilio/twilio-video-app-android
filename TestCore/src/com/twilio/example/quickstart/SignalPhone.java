@@ -22,7 +22,6 @@ import android.content.Intent;
 import android.media.AudioManager;
 import android.os.AsyncTask;
 import android.util.Log;
-import android.opengl.GLSurfaceView;
 import android.view.ViewGroup;
 
 import com.twilio.signal.Conversation;
@@ -167,7 +166,7 @@ public class SignalPhone implements EndpointListener
     }
 
     public Conversation call(Context context, String participant, ViewGroup localContainer, ConversationListener conversationListener) {
-    	if (participant == null && participant == "") {
+    	if (participant == null || participant == "") {
     		return null;
     	}
     	if (!twilioSdkInited || (SignalPhone.this.alice == null)) {
