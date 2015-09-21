@@ -7,7 +7,6 @@ endif
 include $(TWSDK_JNI_PATH)/signal-core.mk
 include $(TWSDK_JNI_PATH)/../external/twilio-jni/Android.mk
 
-
 LOCAL_PATH := $(TWSDK_JNI_PATH)
 include $(CLEAR_VARS)
 
@@ -21,7 +20,7 @@ LOCAL_SRC_FILES := \
 	com_twilio_signal_impl_ConversationImpl.cpp \
 	com_twilio_signal_impl_ConversationImpl_SessionObserverInternal.cpp \
 
-LOCAL_C_INCLUDES := /usr/local/twilio-sdk/webrtc/android/armeabiv7a/include/third_party/icu/source/common
+LOCAL_C_INCLUDES := $(PREFIX)/webrtc/android/armeabiv7a/include/third_party/icu/source/common
 
 ifeq ($(shell test "$(APP_DEBUGGABLE)" = "true" -o "$(NDK_DEBUG)" = "1" && echo true || echo false),true)
 debug_cflags := \
@@ -61,13 +60,13 @@ LOCALIZE_SYMBOL := $(LOCAL_PATH)/dummy.cpp
 
 $(LOCALIZE_SYMBOL):
 	@echo "Localizing JNI_OnLoad symbol in libwebrtc.a to prevent a conflict with libtwilio-jni.a"
-	$(ANDROID_NDK_HOME)/toolchains/aarch64-linux-android-4.9/prebuilt/linux-x86_64/aarch64-linux-android/bin/objcopy --localize-symbol JNI_OnLoad /usr/local/twilio-sdk/webrtc/android/armeabiv7a/lib/libwebrtc-jni.a
+	$(ANDROID_NDK_HOME)/toolchains/aarch64-linux-android-4.9/prebuilt/linux-x86_64/aarch64-linux-android/bin/objcopy --localize-symbol JNI_OnLoad $(PREFIX)/webrtc/android/armeabiv7a/lib/libwebrtc-jni.a
 	touch $(LOCALIZE_SYMBOL)
 
 .INTERMEDIATE: $(LOCALIZE_SYMBOL)
 
 # Manually link the libwebrtc-jni static library. Using LOCAL_WHOLE_STATIC_LIBRARIES does not link the library
-WEBRTC_JNI_STATIC_LIBRARY := -Wl,--whole-archive /usr/local/twilio-sdk/webrtc/android/armeabiv7a/lib/libwebrtc-jni.a -Wl,--no-whole-archive
+WEBRTC_JNI_STATIC_LIBRARY := -Wl,--whole-archive $(PREFIX)/webrtc/android/armeabiv7a/lib/libwebrtc-jni.a -Wl,--no-whole-archive
 LOCAL_LDFLAGS := \
 	$(WEBRTC_JNI_STATIC_LIBRARY)
 
