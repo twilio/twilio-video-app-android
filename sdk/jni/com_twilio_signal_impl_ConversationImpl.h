@@ -11,9 +11,6 @@ extern "C" {
 JNIEXPORT jlong JNICALL Java_com_twilio_signal_impl_ConversationImpl_wrapOutgoingSession
   (JNIEnv *, jobject, jlong, jlong, jobjectArray);
 
-JNIEXPORT void JNICALL Java_com_twilio_signal_impl_ConversationImpl_setVideoSurface
-  (JNIEnv *, jobject, jlong, jlong);
-
 JNIEXPORT void JNICALL Java_com_twilio_signal_impl_ConversationImpl_start
   (JNIEnv *, jobject, jlong);
 

@@ -12,18 +12,15 @@ import com.twilio.signal.Endpoint;
 import com.twilio.signal.Media;
 import com.twilio.signal.impl.ParticipantImpl;
 import com.twilio.signal.impl.ConversationObserver;
-import com.twilio.signal.impl.VideoSurface;
-import com.twilio.signal.impl.VideoSurfaceFactory;
 import com.twilio.signal.impl.logging.Logger;
 import org.webrtc.VideoRenderer;
+import org.webrtc.VideoTrack;
 
-public class ConversationImpl implements Conversation, NativeHandleInterface, VideoSurface.Observer, ConversationObserver {
+public class ConversationImpl implements Conversation, NativeHandleInterface, ConversationObserver {
 
 	private ConversationListener conversationListener;
 	private Set<Participant> participants = new HashSet<Participant>();
 	private Media localMedia;
-	private VideoSurface videoSurface;
-
 
 	static final Logger logger = Logger.getLogger(ConversationImpl.class);
 	
@@ -65,10 +62,6 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Vi
 		nativeHandle = wrapOutgoingSession(endpoint.getNativeHandle(),
 				sessionObserverInternal.getNativeHandle(),
 				participantAddressArray);
-
-		videoSurface = VideoSurfaceFactory.createVideoSurface(context, this);
-
-		setVideoSurface(nativeHandle, videoSurface.getNativeHandle());
 
 		start(nativeHandle);
 	}
@@ -151,23 +144,10 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Vi
 
 	@Override
 	public void onVideoAddedForParticipant(String participantAddress) {
-		logger.i("onVideoAddedForParticipant " + participantAddress);
-
-		Participant participant = new ParticipantImpl(this, participantAddress);
-		participants.add(participant);
-
-		conversationListener.onVideoAddedForParticipant(this, participant);
 	}
 
 	@Override
 	public void onVideoRemovedForParticipant(String participantAddress) {
-		logger.i("onVideoRemovedForParticipant " + participantAddress);
-		for(Participant participant : participants) {
-			if(participant.getAddress().equals(participantAddress)) {
-				conversationListener.onVideoRemovedForParticipant(this, participant);
-				break;
-			}
-		}
 	}
 
 	@Override
@@ -185,32 +165,30 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Vi
 		conversationListener.onConversationEnded(this, error, errorMessage);
 	}
 
-	/*
-	 * VideoSurface.Observer Events
-	 */
 	@Override
-	public void onDidAddVideoTrack(TrackInfo trackInfo) {
+	public void onVideoTrackAdded(TrackInfo trackInfo, VideoTrack videoTrack) {
+		logger.i("onVideoTrackAdded " + trackInfo.getParticipantAddress() + " " + videoTrack.id());
+
+		Participant participant = new ParticipantImpl(this, trackInfo.getParticipantAddress());
+		participants.add(participant);
+
+		conversationListener.onVideoAddedForParticipant(this, participant, videoTrack);
 
 	}
 
 	@Override
-	public void onDidRemoveVideoTrack(TrackInfo trackInfo) {
-
-	}
-
-	@Override
-	public void onDidReceiveVideoTrackEvent(VideoRenderer.I420Frame frame, TrackInfo trackInfo) {
+	public void onVideoTrackRemoved(TrackInfo trackInfo) {
+		logger.i("onVideoTrackRemoved " + trackInfo.getParticipantAddress());
 		for(Participant participant : participants) {
 			if(participant.getAddress().equals(trackInfo.getParticipantAddress())) {
-				videoSurface.renderFrame(frame, participant.getMedia().getContainerView());
-				return;
+				conversationListener.onVideoRemovedForParticipant(this, participant);
+				break;
 			}
 		}
+
 	}
 
 	private native long wrapOutgoingSession(long nativeEndpoint, long nativeSessionObserver, String[] participants);
-
-	private native void setVideoSurface(long nativeSession, long nativeVideoSurface);
 
 	private native void start(long nativeSession);
 

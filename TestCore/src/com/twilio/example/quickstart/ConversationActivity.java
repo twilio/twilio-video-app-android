@@ -7,11 +7,16 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.opengl.GLSurfaceView;
 
 import com.twilio.signal.Participant;
 import com.twilio.signal.Conversation;
 import com.twilio.signal.Conversation.Status;
 import com.twilio.signal.ConversationListener;
+
+import org.webrtc.VideoTrack;
+import org.webrtc.VideoRenderer;
+import org.webrtc.VideoRendererGui;
 
 public class ConversationActivity extends Activity implements ConversationListener {
 
@@ -19,9 +24,7 @@ public class ConversationActivity extends Activity implements ConversationListen
 	
 	private SignalPhone phone;
 	private Conversation conv;
-	private ViewGroup localContainer;
-	private ViewGroup participantContainer;
-	private final Object syncObject = new Object();
+	private GLSurfaceView videoView;
 	private String participantAddress;
 
 	public void onCreate(Bundle savedInstanceState) {
@@ -29,17 +32,21 @@ public class ConversationActivity extends Activity implements ConversationListen
 
 		setContentView(R.layout.conversation);
 
-		localContainer = (ViewGroup)findViewById(R.id.localContainer);
-		participantContainer = (ViewGroup)findViewById(R.id.participantContainer);
+		videoView = (GLSurfaceView)findViewById(R.id.surface);
+
+		VideoRendererGui.setView(videoView, new Runnable() {
+			@Override
+			public void run() {
+				callParticipant(participantAddress);
+			}
+		});
 
 		participantAddress = getIntent().getStringExtra(SignalPhoneActivity.CONVERSATION_PARTICIPANT);
-
-		callParticipant(participantAddress);
 	}
 
 	private void callParticipant(String participantAddress) {
 		phone = SignalPhone.getInstance(getApplicationContext());
-		conv = phone.call(this, participantAddress, localContainer, this);
+		conv = phone.call(this, participantAddress, null, this);
 	}
 
 	public static class MenuFragment extends Fragment {
@@ -70,15 +77,37 @@ public class ConversationActivity extends Activity implements ConversationListen
 
 	@Override
 	public void onVideoAddedForParticipant(Conversation conversation,
-			Participant participant) {
-		if(!participant.getAddress().equals(participantAddress)) {
-			// Host participant 
-			participant.getMedia().attachContainerView(localContainer);
-		} else {
-			// Remote participant
-			participant.getMedia().attachContainerView(participantContainer);
+			Participant participant, VideoTrack videoTrack) {
+
+		VideoRenderer renderer;
+		try {
+			if(!participant.getAddress().equals(participantAddress)) {
+				// Host participant
+				Log.i(TAG, "Adding local renderer");
+				renderer = VideoRendererGui.createGui(70, 70, 28, 28, VideoRendererGui.ScalingType.SCALE_ASPECT_FIT, true);
+				videoTrack.addRenderer(renderer);
+			} else {
+				// Remote participant
+				Log.i(TAG, "Adding remote renderer");
+				renderer = VideoRendererGui.createGui(0, 0, 100, 100, VideoRendererGui.ScalingType.SCALE_ASPECT_FIT, true);
+				//videoTrack.addRenderer(renderer);
+			}
+		} catch(Exception e) {
+			Log.e(TAG, e.toString());
 		}
 	}
+
+	/*
+	private VideoRenderer createVideoRenderer(ViewGroup container) {
+		GLSurfaceView view = new GLSurfaceView(ConversationActivity.this);
+		container.addView(view);
+
+		final VideoRendererGui videoRendererGui = new VideoRendererGui(view, null);
+		//return videoRendererGui.createRenderer(0, 0, 100, 100, VideoRendererGui.ScalingType.SCALE_ASPECT_FIT, true);
+		return null;
+	}
+	*/
+
 
 	@Override
 	public void onVideoRemovedForParticipant(Conversation conversation, Participant participant) {

@@ -5,7 +5,6 @@
 #include "TSCEndpoint.h"
 #include "TSCSessionObserver.h"
 #include "TSCSession.h"
-#include "TSCVideoSurface.h"
 #include "TSCParticipant.h"
 #include <twilio-jni/twilio-jni.h>
 #include <android/log.h>
@@ -61,16 +60,6 @@ JNIEXPORT jlong JNICALL Java_com_twilio_signal_impl_ConversationImpl_wrapOutgoin
 
 	outgoingSession->setParticipants(participants);
 	return (jlong)outgoingSession.release();
-}
-
-
-JNIEXPORT void JNICALL Java_com_twilio_signal_impl_ConversationImpl_setVideoSurface
-  (JNIEnv *env, jobject obj, jlong nativeSession, jlong nativeVideoSurface)
-{
-	TS_CORE_LOG_DEBUG("setVideoSurface");
-	TSCSessionObject* session = reinterpret_cast<TSCSessionObject*>(nativeSession);
-	TSCVideoSurfaceObject* videoSurface = reinterpret_cast<TSCVideoSurfaceObject*>(nativeVideoSurface);
-	session->setVideoSurface(videoSurface);	
 }
 
 

@@ -1,5 +1,6 @@
 package com.twilio.signal;
 
+import org.webrtc.VideoTrack;
 import com.twilio.signal.impl.Track.TrackId;
 
 public interface ConversationListener {
@@ -24,7 +25,7 @@ public interface ConversationListener {
 	/**
 	 * 
 	 */
-	void onVideoAddedForParticipant(Conversation conversation, Participant participant);
+	void onVideoAddedForParticipant(Conversation conversation, Participant participant, VideoTrack videoTrack);
 	
 	/**
 	 * 
