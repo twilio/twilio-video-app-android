@@ -20,6 +20,9 @@
 #include <string.h>
 #include "com_twilio_signal_impl_TwilioRTCImpl.h"
 
+#include "talk/app/webrtc/java/jni/jni_helpers.h"
+#include "talk/app/webrtc/java/jni/classreferenceholder.h"
+
 #define TAG  "TwilioSDK(native)"
 
 using namespace twiliosdk;
@@ -37,6 +40,20 @@ JNIEXPORT jboolean JNICALL Java_com_twilio_signal_impl_TwilioRTCImpl_initCore(JN
 	JavaVM * cachedJVM = NULL;
 
 	env->GetJavaVM(&cachedJVM);
+
+	// Perform webrtc_jni initialization to enable JNI bindings from peerconnection_jni.cc.
+	jint ret = webrtc_jni::InitGlobalJniVariables(cachedJVM);
+	if(ret < 0) {
+		__android_log_print(ANDROID_LOG_VERBOSE, TAG, "TwilioSDK.InitGlobalJniVariables() failed");
+		return failure;
+	} else {
+		webrtc_jni::LoadGlobalClassReferenceHolder();
+	}
+
+	__android_log_print(ANDROID_LOG_VERBOSE, TAG, "TwilioSDK.initCore() called");
+
+
+
 	TSCSDK* tscSdk = TSCSDK::instance();
 	__android_log_print(ANDROID_LOG_VERBOSE, TAG, "TwilioSDK.initCore() called");
 

@@ -90,7 +90,7 @@ public class ConversationActivity extends Activity implements ConversationListen
 				// Remote participant
 				Log.i(TAG, "Adding remote renderer");
 				renderer = VideoRendererGui.createGui(0, 0, 100, 100, VideoRendererGui.ScalingType.SCALE_ASPECT_FIT, true);
-				//videoTrack.addRenderer(renderer);
+				videoTrack.addRenderer(renderer);
 			}
 		} catch(Exception e) {
 			Log.e(TAG, e.toString());
