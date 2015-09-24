@@ -33,12 +33,13 @@ public class VideoRendererGuiAdapter implements VideoRenderer {
 
 	@Override
 	public void setSize(int width, int height) {
-		Log.i("VideoRendererGuiAdapter", "setSize " + width + " " + height);
+		if(videoRenderer != null) {
+			videoRenderer.setSize(width, height);
+		}
 	}
 
 	@Override
 	public void renderFrame(I420Frame frame) {
-		Log.i("VideoRendererGuiAdapter", "renderFrame");
 		if(videoRenderer != null) {
 			videoRenderer.renderFrame(frame);
 		}
