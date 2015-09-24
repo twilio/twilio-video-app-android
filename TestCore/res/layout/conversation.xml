@@ -6,10 +6,24 @@ android:layout_width="match_parent"
 android:layout_height="match_parent"
 android:orientation="vertical">
 
-	<android.opengl.GLSurfaceView
-	android:id="@+id/surface"
+	<LinearLayout
+    	android:orientation="vertical"
     	android:layout_width="match_parent"
-    	android:layout_height="match_parent" />
+    	android:layout_height="match_parent">
+
+		<RelativeLayout
+		android:id="@+id/localContainer"
+		android:layout_width="match_parent"
+		android:layout_height="match_parent"
+		android:layout_weight="1" />
+
+		<RelativeLayout
+		android:id="@+id/participantContainer"
+		android:layout_width="match_parent"
+		android:layout_height="match_parent"
+		android:layout_weight="1" />
+		-->
+	</LinearLayout>
 
 	<fragment
 	android:name="com.twilio.example.quickstart.ConversationActivity$MenuFragment"

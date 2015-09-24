@@ -172,7 +172,7 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Co
 		Participant participant = new ParticipantImpl(this, trackInfo.getParticipantAddress());
 		participants.add(participant);
 
-		conversationListener.onVideoAddedForParticipant(this, participant, videoTrack);
+		conversationListener.onVideoAddedForParticipant(this, participant, VideoTrackImpl.create(videoTrack));
 
 	}
 
