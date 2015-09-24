@@ -6,22 +6,22 @@ import com.twilio.signal.I420Frame;
 
 public class VideoTrackImpl implements VideoTrack {
 
-	org.webrtc.VideoTrack _videoTrack;
+	org.webrtc.VideoTrack videoTrack;
 
-	private VideoTrackImpl(org.webrtc.VideoTrack _videoTrack) {
-		this._videoTrack = _videoTrack;
+	private VideoTrackImpl(org.webrtc.VideoTrack videoTrack) {
+		this.videoTrack = videoTrack;
 	}
 
-	public static VideoTrack create(org.webrtc.VideoTrack _videoTrack) {
-		return new VideoTrackImpl(_videoTrack);
+	public static VideoTrack create(org.webrtc.VideoTrack videoTrack) {
+		return new VideoTrackImpl(videoTrack);
 	}
 
 	public void addRenderer(VideoRenderer videoRenderer) {
-		_videoTrack.addRenderer(createWebRtcVideoRenderer(videoRenderer));
+		videoTrack.addRenderer(createWebRtcVideoRenderer(videoRenderer));
 	}
 
 	public void removeRenderer(VideoRenderer videoRenderer) {
-		_videoTrack.removeRenderer(createWebRtcVideoRenderer(videoRenderer));
+		videoTrack.removeRenderer(createWebRtcVideoRenderer(videoRenderer));
 	}
 
 	private org.webrtc.VideoRenderer createWebRtcVideoRenderer(VideoRenderer videoRenderer) {
@@ -31,7 +31,7 @@ public class VideoTrackImpl implements VideoTrack {
 	private class VideoRendererCallbackAdapter implements org.webrtc.VideoRenderer.Callbacks {
 		private VideoRenderer videoRenderer;
 		private int width = 0;
-		private int height = 0;	
+		private int height = 0;
 	
 		public VideoRendererCallbackAdapter(VideoRenderer videoRenderer) {
 			this.videoRenderer = videoRenderer;
@@ -39,13 +39,13 @@ public class VideoTrackImpl implements VideoTrack {
 
 		@Override
 		public boolean canApplyRotation() {
-			return false;	
+			return false;
 		}
 
 		@Override
 		public void renderFrame(org.webrtc.VideoRenderer.I420Frame frame) {
 			if(width != frame.width || height != frame.height) {
-				// update size
+				// Update size
 				width = frame.width;
 				height = frame.height;
 				videoRenderer.setSize(width, height);

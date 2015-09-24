@@ -13,22 +13,6 @@
 using namespace webrtc;
 using namespace twiliosdk;
 
-// Abort the process if |x| is false, emitting |msg|.
-#define CHECK(x, msg)                                                          \
-  if (x) {} else {                                                             \
-    abort();                                                                   \
-  }
-
-// Abort the process if |jni| has a Java exception pending, emitting |msg|.
-#define CHECK_EXCEPTION(jni, msg)                                              \
-  if (0) {} else {                                                             \
-    if (jni->ExceptionCheck()) {                                               \
-      jni->ExceptionDescribe();                                                \
-      jni->ExceptionClear();                                                   \
-      CHECK(0, msg);                                                           \
-    }                                                                          \
-  }
-
 
 class SessionObserverInternalWrapper : public TSCSessionObserverObject {
 public:
@@ -94,9 +78,7 @@ protected:
 		jstring id = stringToJString(jniAttacher.get(), videoTrack->id());
 		jobject j_track = jniAttacher.get()->NewObject(
 				*j_video_track_class_, j_video_track_ctor_, (jlong)videoTrack, id);
-		CHECK_EXCEPTION(jniAttacher.get(), "error during VideoTrack NewObject");
 		jobject j_trackinfo = TrackInfoToJavaTrackInfoImpl(trackInfo);
-		CHECK_EXCEPTION(jniAttacher.get(), "error during TrackInfo NewObject");
     		jniAttacher.get()->CallVoidMethod(*j_observer_global_, j_add_track_id_, j_trackinfo, j_track);
 	}
 
