@@ -1,6 +1,5 @@
 package com.twilio.example.quickstart;
 
-import com.twilio.signal.VideoRendererGui;
 import com.twilio.signal.VideoRenderer;
 import com.twilio.signal.I420Frame;
 
@@ -11,7 +10,7 @@ import android.util.Log;
 
 
 public class VideoRendererGuiAdapter implements VideoRenderer {
-	private org.webrtc.VideoRenderer.Callbacks rendererCallbacks;
+	private VideoRenderer videoRenderer;
 
 	public VideoRendererGuiAdapter(Context context, ViewGroup container) {
 		createRenderer(context, container);
@@ -25,7 +24,7 @@ public class VideoRendererGuiAdapter implements VideoRenderer {
 				GLSurfaceView view = new GLSurfaceView(context);
 				container.addView(view);
 				final VideoRendererGui videoRendererGui = new VideoRendererGui(view, null);
-				rendererCallbacks = videoRendererGui.createRenderer(0,0,100,100, VideoRendererGui.ScalingType.SCALE_ASPECT_FIT, true);
+				videoRenderer = videoRendererGui.createRenderer(0,0,100,100, VideoRendererGui.ScalingType.SCALE_ASPECT_FIT, true);
 			}
 
 		});
@@ -35,16 +34,13 @@ public class VideoRendererGuiAdapter implements VideoRenderer {
 	@Override
 	public void setSize(int width, int height) {
 		Log.i("VideoRendererGuiAdapter", "setSize " + width + " " + height);
-		if(rendererCallbacks != null) {
-
-		}
 	}
 
 	@Override
 	public void renderFrame(I420Frame frame) {
 		Log.i("VideoRendererGuiAdapter", "renderFrame");
-		if(rendererCallbacks != null) {
-			rendererCallbacks.renderFrame(frame.getRawFrame());
+		if(videoRenderer != null) {
+			videoRenderer.renderFrame(frame);
 		}
 	}
 

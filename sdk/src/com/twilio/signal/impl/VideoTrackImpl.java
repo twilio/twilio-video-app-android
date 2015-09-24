@@ -2,6 +2,7 @@ package com.twilio.signal.impl;
 
 import com.twilio.signal.VideoTrack;
 import com.twilio.signal.VideoRenderer;
+import com.twilio.signal.I420Frame;
 
 public class VideoTrackImpl implements VideoTrack {
 
@@ -50,7 +51,7 @@ public class VideoTrackImpl implements VideoTrack {
 				videoRenderer.setSize(width, height);
 			}
 
-			videoRenderer.renderFrame(new I420FrameImpl(frame));
+			videoRenderer.renderFrame(new I420Frame(frame.width, frame.height, frame.rotationDegree, frame.yuvStrides, frame.yuvPlanes));
 		}
 
 	}
