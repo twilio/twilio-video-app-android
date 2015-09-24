@@ -73,11 +73,11 @@ public class ConversationActivity extends Activity implements ConversationListen
 	public void onVideoAddedForParticipant(Conversation conversation,
 			Participant participant, VideoTrack videoTrack) {
 		if(!participant.getAddress().equals(participantAddress)) {
-			// Host participant 
-			videoTrack.addRenderer(new DummyRenderer(participant.getAddress()));	
+			// Host participant
+			videoTrack.addRenderer(new VideoRendererGuiAdapter(this, localContainer));
 		} else {
 			// Remote participant
-			videoTrack.addRenderer(new DummyRenderer(participant.getAddress()));	
+			videoTrack.addRenderer(new VideoRendererGuiAdapter(this, participantContainer));
 		}
 	}
 

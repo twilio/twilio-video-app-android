@@ -11,10 +11,12 @@ public class DummyRenderer implements VideoRenderer {
 		this.name = name;
 	}
 
+	@Override
 	public void setSize(int width, int height) {
 		Log.i("Dummy", name + " setSize " + width + " " + height);
 	}
 
+	@Override
 	public void renderFrame(I420Frame frame) {
 		Log.i("Dummy", name + " renderFrame");
 	}

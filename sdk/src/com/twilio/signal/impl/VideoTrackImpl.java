@@ -50,9 +50,9 @@ public class VideoTrackImpl implements VideoTrack {
 				videoRenderer.setSize(width, height);
 			}
 
-			videoRenderer.renderFrame(new I420FrameImpl(frame.height, frame.width, frame.yuvStrides, frame.yuvPlanes));
+			videoRenderer.renderFrame(new I420FrameImpl(frame));
 		}
-	
+
 	}
 
 }

@@ -25,7 +25,7 @@
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package com.twilio.signal.impl;
+package com.twilio.signal;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;

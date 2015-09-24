@@ -4,32 +4,13 @@ import com.twilio.signal.I420Frame;
 import java.nio.ByteBuffer;
 
 public class I420FrameImpl implements I420Frame {
-	protected int width;
-	protected int height;
-	protected int[] yuvStrides;
-	protected ByteBuffer[] yuvPlanes;
+	org.webrtc.VideoRenderer.I420Frame frame;
 
-	public I420FrameImpl(int width, int height, int[] yuvStrides, ByteBuffer[] yuvPlanes) {
-		this.width = width;
-		this.height = height;
-		this.yuvStrides = yuvStrides;
-		this.yuvPlanes = yuvPlanes;
+	public I420FrameImpl(org.webrtc.VideoRenderer.I420Frame frame) {
+		this.frame = frame;
 	} 
 
-	public int getWidth() {
-		return width;
+	public org.webrtc.VideoRenderer.I420Frame getRawFrame() {
+		return frame;
 	}
-
-	public int getHeight() {
-		return height;
-	}
-
-	public int[] getYuvStrides() {
-		return yuvStrides;
-	}
-
-	public ByteBuffer[] getYuvPlanes() {
-		return yuvPlanes;
-	}
-
 }
