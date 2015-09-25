@@ -14,12 +14,11 @@ function main {
 
     #. ${mydir}/functions.sh
     #check_android_tiools $ANDROID_API
+    #twsdkroot="${mydir}/.."
 
-    twsdkroot="${mydir}/.."
-    buildroot="${twsdkroot}/output"
-    echo "twsdkroot: " ${twsdkroot}  
-    echo "buildRoot: " ${buildroot}
-    build_project "/TestCore"
+    workspaceroot="${mydir}/.."
+    
+    build_project "${workspaceroot}/TestCore"
 }
 
 function build_project {
