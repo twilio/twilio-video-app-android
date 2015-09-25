@@ -25,7 +25,7 @@
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package com.twilio.example.quickstart;
+package com.twilio.signal.impl;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -47,6 +47,7 @@ import android.opengl.GLSurfaceView;
 import android.util.Log;
 
 import com.twilio.signal.VideoRenderer;
+import com.twilio.signal.VideoRendererObserver;
 import com.twilio.signal.I420Frame;
 
 /**
@@ -224,6 +225,8 @@ public class VideoRendererGui implements GLSurfaceView.Renderer {
    * call.
    */
   private static class YuvImageRenderer implements VideoRenderer {
+
+    private VideoRendererObserver videoRendererObserver;
     private GLSurfaceView surface;
     private int id;
     private int yuvProgram;
@@ -643,6 +646,10 @@ public class VideoRendererGui implements GLSurfaceView.Renderer {
       if (videoWidth == this.videoWidth && videoHeight == this.videoHeight
           && rotation == rotationDegree) {
         return;
+      } else {
+        if(videoRendererObserver != null) {
+          videoRendererObserver.onFrameSizeChanged(videoWidth, videoHeight);
+        }
       }
 
       // Frame re-allocation need to be synchronized with copying
@@ -718,12 +725,20 @@ public class VideoRendererGui implements GLSurfaceView.Renderer {
         frameToRenderQueue.offer(textureFrameToRender);
       }
       copyTimeNs += (System.nanoTime() - now);
+      if(seenFrame == false && videoRendererObserver != null) {
+        videoRendererObserver.onFirstFrame();
+      }
       seenFrame = true;
 
       // Request rendering.
       surface.requestRender();
     }
 
+    @Override
+    public synchronized void setObserver(VideoRendererObserver videoRendererObserver) {
+	this.videoRendererObserver = videoRendererObserver;
+    }
+ 
   }
 
   public EGLContext getEGLContext() {

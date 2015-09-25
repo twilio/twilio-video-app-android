@@ -6,5 +6,7 @@ public interface VideoRenderer {
 
 	public void renderFrame(I420Frame frame);
 
+	public void setObserver(VideoRendererObserver observer);
+
 }
 

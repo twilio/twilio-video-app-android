@@ -1,7 +1,9 @@
-package com.twilio.example.quickstart;
+package com.twilio.signal;
 
 import com.twilio.signal.VideoRenderer;
+import com.twilio.signal.VideoViewRenderer;
 import com.twilio.signal.I420Frame;
+import com.twilio.signal.impl.VideoRendererGui;
 
 import android.content.Context;
 import android.opengl.GLSurfaceView;
@@ -9,14 +11,15 @@ import android.view.ViewGroup;
 import android.util.Log;
 
 
-public class VideoRendererGuiAdapter implements VideoRenderer {
+public class VideoViewRenderer implements VideoRenderer {
 	private VideoRenderer videoRenderer;
+	private VideoRendererObserver observer;
 
-	public VideoRendererGuiAdapter(Context context, ViewGroup container) {
-		createRenderer(context, container);
+	public VideoViewRenderer(Context context, ViewGroup container) {
+		setupRenderer(context, container);
 	}
 
-	private void createRenderer(final Context context, final ViewGroup container) {
+	private void setupRenderer(final Context context, final ViewGroup container) {
 		container.post(new Runnable() {
 
 			@Override
@@ -25,6 +28,7 @@ public class VideoRendererGuiAdapter implements VideoRenderer {
 				container.addView(view);
 				final VideoRendererGui videoRendererGui = new VideoRendererGui(view, null);
 				videoRenderer = videoRendererGui.createRenderer(0,0,100,100, VideoRendererGui.ScalingType.SCALE_ASPECT_FIT, true);
+				videoRenderer.setObserver(observer);
 			}
 
 		});
@@ -45,4 +49,12 @@ public class VideoRendererGuiAdapter implements VideoRenderer {
 		}
 	}
 
+	@Override
+	public void setObserver(VideoRendererObserver observer) {
+		this.observer = observer;
+		if(videoRenderer != null) {
+			videoRenderer.setObserver(observer);
+		}
+	}
+ 
 }
