@@ -17,8 +17,9 @@ function main {
 
     twsdkroot="${mydir}/.."
     buildroot="${twsdkroot}/output"
-    echo "BuildRoot: " ${twsdkroot}  ${buildroot}
-    # build_project "/TestCore"
+    echo "twsdkroot: " ${twsdkroot}  
+    echo "buildRoot: " ${buildroot}
+    build_project "/TestCore"
 }
 
 function build_project {
