@@ -1,5 +1,6 @@
 #include <twilio-jni/twilio-jni.h>
 #include "webrtc/modules/utility/interface/helpers_android.h"
+#include "talk/app/webrtc/mediastreaminterface.h"
 
 #include "com_twilio_signal_impl_ConversationImpl_SessionObserverInternal.h"
 #include "TSCoreSDKTypes.h"
