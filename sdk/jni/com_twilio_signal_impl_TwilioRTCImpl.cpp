@@ -76,8 +76,8 @@ JNIEXPORT jlong JNICALL Java_com_twilio_signal_impl_TwilioRTCImpl_createEndpoint
 	}
 	const char *tokenStr = env->GetStringUTFChars(token, 0);
 
-	TSCOptions options = TSCConfiguration::getDefaults();
-	options[kTSCTokenKey] = tokenStr;
+	TSCOptions options;
+	options.insert(std::make_pair(kTSCTokenKey, tokenStr));
 
 	if (!nativeEndpointObserver)
 	{
