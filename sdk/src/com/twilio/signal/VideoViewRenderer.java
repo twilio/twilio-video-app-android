@@ -14,6 +14,7 @@ import android.util.Log;
 public class VideoViewRenderer implements VideoRenderer {
 	private VideoRenderer videoRenderer;
 	private VideoRendererObserver observer;
+	private GLSurfaceView videoView;
 
 	public VideoViewRenderer(Context context, ViewGroup container) {
 		setupRenderer(context, container);
@@ -24,9 +25,9 @@ public class VideoViewRenderer implements VideoRenderer {
 
 			@Override
 			public void run() {
-				GLSurfaceView view = new GLSurfaceView(context);
-				container.addView(view);
-				final VideoRendererGui videoRendererGui = new VideoRendererGui(view, null);
+				GLSurfaceView videoView = new GLSurfaceView(context);
+				container.addView(videoView);
+				final VideoRendererGui videoRendererGui = new VideoRendererGui(videoView, null);
 				videoRenderer = videoRendererGui.createRenderer(0,0,100,100, VideoRendererGui.ScalingType.SCALE_ASPECT_FIT, true);
 				videoRenderer.setObserver(observer);
 			}
@@ -56,5 +57,17 @@ public class VideoViewRenderer implements VideoRenderer {
 			videoRenderer.setObserver(observer);
 		}
 	}
+
+       public void onResume() {
+               if(videoView != null) {
+                       videoView.onResume();
+               }
+       }
+
+       public void onPause() {
+               if(videoView != null) {
+                       videoView.onPause();
+               }
+       }
  
 }

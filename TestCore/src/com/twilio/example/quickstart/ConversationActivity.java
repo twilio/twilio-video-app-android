@@ -7,6 +7,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.os.Handler;
 
 import com.twilio.signal.Participant;
 import com.twilio.signal.Conversation;
@@ -73,28 +74,44 @@ public class ConversationActivity extends Activity implements ConversationListen
 	}
 
 	@Override
-	public void onVideoAddedForParticipant(Conversation conversation,
-			Participant participant, VideoTrack videoTrack) {
-		// TODO: Provide an API mechanism to pass a VideoRendererObserver to the Host via LocalMedia 
-		if(!participant.getAddress().equals(participantAddress)) {
-			// Host participant
-			hostVideoRenderer = new VideoViewRenderer(this, localContainer);
-			hostVideoRenderer.setObserver(new VideoRendererObserver() {
+		public void onVideoAddedForParticipant(final Conversation conversation,
+				final Participant participant, final VideoTrack videoTrack) {
+			// TODO: Provide an API mechanism to pass a VideoRendererObserver to the Host via LocalMedia 
+			if(!participant.getAddress().equals(participantAddress)) {
+				/*
+				 * TODO: Investigate GLSurfaceView surface creation issue.
+				 * GLSurfaceView onSurfaceCreated is not called in some cases.
+				 * Delaying the creation of the VideoRenderer seems to alleviate the problem.
+				 */
+				new Thread(new Runnable() {
+						@Override
+						public void run() {
+						try {
+							Thread.sleep(1000);
+						} catch(Exception e) {
 
-				@Override
-				public void onFirstFrame() {
-					Log.i(TAG, "Host onFirstFrame");
-				}
+						}
+						Log.i(TAG, "Host Adding Renderer");
+						hostVideoRenderer = new VideoViewRenderer(ConversationActivity.this, localContainer);
+						hostVideoRenderer.setObserver(new VideoRendererObserver() {
 
-				@Override
-				public void onFrameSizeChanged(int width, int height) {
-					Log.i(TAG, "Host onFrameSizeChanged " + width + " " + height);
-				}
+							@Override
+							public void onFirstFrame() {
+							Log.i(TAG, "Host onFirstFrame");
+							}
 
-			});
-			videoTrack.addRenderer(hostVideoRenderer);
-		} else {
+							@Override
+							public void onFrameSizeChanged(int width, int height) {
+							Log.i(TAG, "Host onFrameSizeChanged " + width + " " + height);
+							}
+
+							});
+						videoTrack.addRenderer(hostVideoRenderer);
+						}
+						}).start();
+			} else {
 			// Remote participant
+			Log.i(TAG, "Participant Adding Renderer");
 			participantVideoRenderer = new VideoViewRenderer(this, participantContainer);
 			participantVideoRenderer.setObserver(new VideoRendererObserver() {
 
@@ -130,6 +147,29 @@ public class ConversationActivity extends Activity implements ConversationListen
 
 	@Override
 	public void onConversationEnded(Conversation conversation, int error, String errorMessage) {
+
+	}
+
+	@Override
+	public void onResume() {
+		super.onResume();
+		if(hostVideoRenderer != null) {
+			hostVideoRenderer.onResume();
+		}
+		if(participantVideoRenderer != null) {
+			participantVideoRenderer.onResume();
+		}
+	}
+
+	@Override
+	public void onPause() {
+		super.onPause();
+		if(hostVideoRenderer != null) {
+			hostVideoRenderer.onPause();
+		}
+		if(participantVideoRenderer != null) {
+			participantVideoRenderer.onPause();
+		}
 
 	}
 
