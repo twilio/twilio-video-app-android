@@ -13,7 +13,6 @@ import android.util.Log;
 
 public class VideoViewRenderer implements VideoRenderer {
 	private VideoRenderer videoRenderer;
-	private VideoRendererObserver observer;
 	private GLSurfaceView videoView;
 
 	public VideoViewRenderer(Context context, ViewGroup container) {
@@ -21,19 +20,10 @@ public class VideoViewRenderer implements VideoRenderer {
 	}
 
 	private void setupRenderer(final Context context, final ViewGroup container) {
-		container.post(new Runnable() {
-
-			@Override
-			public void run() {
-				GLSurfaceView videoView = new GLSurfaceView(context);
-				container.addView(videoView);
-				final VideoRendererGui videoRendererGui = new VideoRendererGui(videoView, null);
-				videoRenderer = videoRendererGui.createRenderer(0,0,100,100, VideoRendererGui.ScalingType.SCALE_ASPECT_FIT, true);
-				videoRenderer.setObserver(observer);
-			}
-
-		});
-
+		GLSurfaceView videoView = new GLSurfaceView(context);
+		container.addView(videoView);
+		VideoRendererGui videoRendererGui = new VideoRendererGui(videoView, null);
+		videoRenderer = videoRendererGui.createRenderer(0,0,100,100, VideoRendererGui.ScalingType.SCALE_ASPECT_FIT, true);
 	}
 
 	@Override
@@ -52,7 +42,6 @@ public class VideoViewRenderer implements VideoRenderer {
 
 	@Override
 	public void setObserver(VideoRendererObserver observer) {
-		this.observer = observer;
 		if(videoRenderer != null) {
 			videoRenderer.setObserver(observer);
 		}

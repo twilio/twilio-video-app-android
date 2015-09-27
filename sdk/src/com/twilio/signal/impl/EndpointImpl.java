@@ -5,6 +5,7 @@ import java.util.UUID;
 
 import android.app.PendingIntent;
 import android.app.PendingIntent.CanceledException;
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Parcel;
@@ -61,16 +62,6 @@ public class EndpointImpl implements Endpoint, NativeHandleInterface, Parcelable
 		return super.hashCode();
 	}
 
-/*
-	public EndpointImpl(Context context,
-						EndpointListener inListener,
-						long nativeEndpointHandle) {
-		this.context = context;
-		this.listener = inListener;
-		this.nativeEndpointHandle = nativeEndpointHandle;
-	}
-*/
-
 	EndpointImpl(Context context,
 			EndpointListener inListener) {
 		this.context = context;
@@ -126,9 +117,9 @@ public class EndpointImpl implements Endpoint, NativeHandleInterface, Parcelable
 
 
 	@Override
-	public Conversation createConversation(Context context, Set<String> participants,
+	public Conversation createConversation(Activity activity, Set<String> participants,
 			LocalMediaImpl localMediaImpl, ConversationListener listener) {
-		Conversation conv = ConversationImpl.create(context, this, participants, localMediaImpl, listener);
+		Conversation conv = ConversationImpl.create(activity, this, participants, localMediaImpl, listener);
 		return conv;
 	}
 

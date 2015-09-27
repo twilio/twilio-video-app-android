@@ -1,5 +1,6 @@
 package com.twilio.signal.impl;
 
+import android.app.Activity;
 import android.content.Context;
 import android.util.Log;
 
@@ -26,7 +27,7 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 	private ConversationListener conversationListener;
 	private LocalMediaImpl localMediaImpl;
 	private VideoViewRenderer localVideoRenderer;
-	private Context context;
+	private Activity activity;
 
 	private Map<String,ParticipantImpl> participantMap = new HashMap<String,ParticipantImpl>();
 
@@ -57,8 +58,8 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 	private SessionObserverInternal sessionObserverInternal;
 	private long nativeHandle;
 
-	private ConversationImpl(Context context, EndpointImpl endpoint, Set<String> participants, LocalMediaImpl localMediaImpl, ConversationListener conversationListener) {
-		this.context = context;
+	private ConversationImpl(Activity activity, EndpointImpl endpoint, Set<String> participants, LocalMediaImpl localMediaImpl, ConversationListener conversationListener) {
+		this.activity = activity;
 		String[] participantAddressArray = new String[participants.size()];
 		int i = 0;
 		for(String participant : participants) {
@@ -77,10 +78,10 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 		start(nativeHandle);
 	}
 
-	public static Conversation create(Context context, EndpointImpl endpoint, Set<String> participants,
+	public static Conversation create(Activity activity, EndpointImpl endpoint, Set<String> participants,
 			   LocalMediaImpl localMediaImpl,
 			   ConversationListener listener) {
-		ConversationImpl conv = new ConversationImpl(context, endpoint, participants, localMediaImpl, listener);
+		ConversationImpl conv = new ConversationImpl(activity, endpoint, participants, localMediaImpl, listener);
 		if (conv.getNativeHandle() == 0) {
 			return null;
 		}
@@ -149,41 +150,69 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 	}
 
 	@Override
-	public void onFailToConnectParticipant(String participant, int error, String errorMessage) {
-		conversationListener.onFailToConnectParticipant(this, new ParticipantImpl(participant), error, errorMessage);
+	public void onFailToConnectParticipant(final String participant, final int error, final String errorMessage) {
+		activity.runOnUiThread(new Runnable() {
+			@Override
+			public void run() {
+				conversationListener.onFailToConnectParticipant(ConversationImpl.this, new ParticipantImpl(participant), error, errorMessage);
+			}
+		});
 	}
 
 	@Override
-	public void onDisconnectParticipant(String participantAddress) {
-		ParticipantImpl participant = participantMap.remove(participantAddress);
+	public void onDisconnectParticipant(final String participantAddress) {
+		final ParticipantImpl participant = participantMap.remove(participantAddress);
 		if(participant == null) {
 			logger.i("participant removed but was never in list");
 		} else {
-			conversationListener.onDisconnectParticipant(this, participant);
+			activity.runOnUiThread(new Runnable() {
+				@Override
+				public void run() {
+					conversationListener.onDisconnectParticipant(ConversationImpl.this, participant);
+				}
+			});
 		}
 	}
 
 	@Override
 	public void onVideoAddedForParticipant(String participantAddress) {
+
 	}
 
 	@Override
 	public void onVideoRemovedForParticipant(String participantAddress) {
+
 	}
 
 	@Override
-	public void onLocalStatusChanged(Status status) {
-		conversationListener.onLocalStatusChanged(this, status);
+	public void onLocalStatusChanged(final Status status) {
+		activity.runOnUiThread(new Runnable() {
+			@Override
+			public void run() {
+				conversationListener.onLocalStatusChanged(ConversationImpl.this, status);
+			}
+		});
 	}
 	
 	@Override
 	public void onConversationEnded() {
-		conversationListener.onConversationEnded(this);
+		activity.runOnUiThread(new Runnable() {
+			@Override
+			public void run() {
+				conversationListener.onConversationEnded(ConversationImpl.this);
+			}
+		});
 	}
 
 	@Override
-	public void onConversationEnded(int error, String errorMessage) {
-		conversationListener.onConversationEnded(this, error, errorMessage);
+	public void onConversationEnded(final int error, final String errorMessage) {
+		activity.runOnUiThread(new Runnable() {
+			@Override
+			public void run() {
+				conversationListener.onConversationEnded(ConversationImpl.this, error, errorMessage);
+			}
+		});
+
 	}
 
 	@Override
@@ -205,26 +234,43 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 
 					}
 					Log.i(TAG, "Local Adding Renderer");
-					VideoTrackImpl videoTrackImpl = VideoTrackImpl.create(webRtcVideoTrack, trackInfo);
+					final VideoTrackImpl videoTrackImpl = VideoTrackImpl.create(webRtcVideoTrack, trackInfo);
 					localMediaImpl.addVideoTrack(videoTrackImpl);
-					localVideoRenderer = new VideoViewRenderer(context, localMediaImpl.getContainerView());
-					videoTrackImpl.addRenderer(localVideoRenderer);
+
+					activity.runOnUiThread(new Runnable() {
+						@Override
+						public void run() {
+							localVideoRenderer = new VideoViewRenderer(activity, localMediaImpl.getContainerView());
+							videoTrackImpl.addRenderer(localVideoRenderer);
+						}
+					});
 				}
 			}).start();
 		} else {
-			ParticipantImpl participant = retrieveParticipant(trackInfo.getParticipantAddress());
-			VideoTrackImpl videoTrackImpl = VideoTrackImpl.create(webRtcVideoTrack, trackInfo);
+			final ParticipantImpl participant = retrieveParticipant(trackInfo.getParticipantAddress());
+			final VideoTrackImpl videoTrackImpl = VideoTrackImpl.create(webRtcVideoTrack, trackInfo);
 			participant.getMediaImpl().addVideoTrack(videoTrackImpl);
-			conversationListener.onVideoAddedForParticipant(this, participant, videoTrackImpl); 
+
+			activity.runOnUiThread(new Runnable() {
+        			@Override
+        			public void run() {
+					conversationListener.onVideoAddedForParticipant(ConversationImpl.this, participant, videoTrackImpl); 
+        			}
+			});
 		}
 	}
 
 	@Override
 	public void onVideoTrackRemoved(TrackInfo trackInfo) {
 		logger.i("onVideoTrackRemoved " + trackInfo.getParticipantAddress());
-		ParticipantImpl participant = retrieveParticipant(trackInfo.getParticipantAddress());
-		VideoTrack videoTrack = participant.getMediaImpl().removeVideoTrack(trackInfo);
-		conversationListener.onVideoRemovedForParticipant(this, participant, videoTrack);
+		final ParticipantImpl participant = retrieveParticipant(trackInfo.getParticipantAddress());
+		final VideoTrack videoTrack = participant.getMediaImpl().removeVideoTrack(trackInfo);
+		activity.runOnUiThread(new Runnable() {
+			@Override
+			public void run() {
+				conversationListener.onVideoRemovedForParticipant(ConversationImpl.this, participant, videoTrack);
+			}
+		});
 	}
 
 	private native long wrapOutgoingSession(long nativeEndpoint, long nativeSessionObserver, String[] participants);

@@ -16,6 +16,7 @@ import java.util.concurrent.Executors;
 
 import org.json.JSONObject;
 
+import android.app.Activity;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
@@ -165,7 +166,7 @@ public class SignalPhone implements EndpointListener
 
     }
 
-    public Conversation call(Context context, String participant, ViewGroup localContainer, ConversationListener conversationListener) {
+    public Conversation call(Activity activity, String participant, ViewGroup localContainer, ConversationListener conversationListener) {
     	if (participant == null || participant == "") {
     		return null;
     	}
@@ -177,7 +178,7 @@ public class SignalPhone implements EndpointListener
     	Set<String> participants = new HashSet<String>();
     	participants.add(participant);
     	Conversation conv = SignalPhone.this.alice.createConversation(
-    			context, participants, localMediaImpl, conversationListener);
+    			activity, participants, localMediaImpl, conversationListener);
     	if (conv != null) {
     		conversations.put(conv.getConversationSid(), conv);
     	}
