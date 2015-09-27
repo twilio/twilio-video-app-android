@@ -9,6 +9,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.os.Handler;
 
+import java.util.Map;
+import java.util.HashMap;
+
 import com.twilio.signal.Participant;
 import com.twilio.signal.Conversation;
 import com.twilio.signal.Conversation.Status;
@@ -27,7 +30,6 @@ public class ConversationActivity extends Activity implements ConversationListen
 	private ViewGroup participantContainer;
 	private String participantAddress;
 	private VideoViewRenderer participantVideoRenderer;
-	private VideoViewRenderer hostVideoRenderer;
 
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -118,9 +120,6 @@ public class ConversationActivity extends Activity implements ConversationListen
 	@Override
 	public void onResume() {
 		super.onResume();
-		if(hostVideoRenderer != null) {
-			hostVideoRenderer.onResume();
-		}
 		if(participantVideoRenderer != null) {
 			participantVideoRenderer.onResume();
 		}
@@ -129,9 +128,6 @@ public class ConversationActivity extends Activity implements ConversationListen
 	@Override
 	public void onPause() {
 		super.onPause();
-		if(hostVideoRenderer != null) {
-			hostVideoRenderer.onPause();
-		}
 		if(participantVideoRenderer != null) {
 			participantVideoRenderer.onPause();
 		}

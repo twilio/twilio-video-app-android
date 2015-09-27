@@ -1,31 +1,28 @@
 package com.twilio.signal.impl;
 
 import com.twilio.signal.Participant;
-import com.twilio.signal.Conversation;
 import com.twilio.signal.Media;
-import com.twilio.signal.LocalMediaImpl;
 
 public class ParticipantImpl implements Participant {
 	private String address;
-	private Conversation conversation;
-	private Media media;
+	private MediaImpl media;
 
-
-	public ParticipantImpl(Conversation conversation, String address) {
-		this.conversation = conversation;
+	public ParticipantImpl(String address) {
 		this.address = address;
-		this.media = new LocalMediaImpl();
+		this.media = new MediaImpl();
 	}
 
+	@Override
 	public String getAddress() {
 		return address;
 	}
 
-	public Conversation getConversation() {
-		return conversation;
+	@Override
+	public Media getMedia() {
+		return media;
 	}
 
-	public Media getMedia() {
+	public MediaImpl getMediaImpl() {
 		return media;
 	}
 

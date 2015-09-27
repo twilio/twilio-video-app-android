@@ -1,12 +1,9 @@
 package com.twilio.signal;
 
-import android.view.ViewGroup;
+import java.util.List;
 
 public interface Media {
 
-	/** Read-only representation of the current video container. */
-	public ViewGroup getContainerView();
-
-	public void attachContainerView(ViewGroup container);
+	public List<VideoTrack> getVideoTracks();
 
 }

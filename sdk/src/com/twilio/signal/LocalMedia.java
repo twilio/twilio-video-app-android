@@ -1,6 +1,14 @@
 package com.twilio.signal;
 
+import android.view.ViewGroup;
+
 public interface LocalMedia extends Media {
+
+	/** Read-only representation of the local video container. */
+	public ViewGroup getContainerView();
+
+	/** Local video view container */
+	public void attachContainerView(ViewGroup container);
 
 	/** Video Capture Source */
 	public static enum VideoCaptureSource {

@@ -66,10 +66,10 @@ public interface Endpoint {
 	 * Create conversation object which represents outgoing call
 	 * 
 	 * @param participants Set of participant names as Strings
-	 * @param localMedia Media you would like to use when setting up the new conversation
+	 * @param localMedia Local Media you would like to use when setting up the new conversation
 	 * @param listener for Conversation events
 	 */
 	
-	public Conversation createConversation(Context context, Set<String> participants, Media localMedia, ConversationListener listener);
+	public Conversation createConversation(Context context, Set<String> participants, LocalMedia localMedia, ConversationListener listener);
 
 }
