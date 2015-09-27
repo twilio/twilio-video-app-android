@@ -10,17 +10,24 @@ import com.twilio.signal.Participant;
 import com.twilio.signal.ConversationListener;
 import com.twilio.signal.Endpoint;
 import com.twilio.signal.Media;
+import com.twilio.signal.TrackOrigin;
+import com.twilio.signal.VideoViewRenderer;
 import com.twilio.signal.impl.ParticipantImpl;
 import com.twilio.signal.impl.ConversationObserver;
 import com.twilio.signal.impl.logging.Logger;
 import org.webrtc.VideoRenderer;
 import org.webrtc.VideoTrack;
+import android.util.Log;
 
 public class ConversationImpl implements Conversation, NativeHandleInterface, ConversationObserver {
 
 	private ConversationListener conversationListener;
 	private Set<Participant> participants = new HashSet<Participant>();
 	private Media localMedia;
+	private VideoViewRenderer localVideoRenderer;
+	private Context context;
+
+	private static String TAG = "ConversationImpl"; 
 
 	static final Logger logger = Logger.getLogger(ConversationImpl.class);
 	
@@ -48,6 +55,7 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Co
 	private long nativeHandle;
 
 	private ConversationImpl(Context context, EndpointImpl endpoint, Set<String> participants, Media localMedia, ConversationListener conversationListener) {
+		this.context = context;
 		String[] participantAddressArray = new String[participants.size()];
 		int i = 0;
 		for(String participant : participants) {
@@ -166,14 +174,34 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Co
 	}
 
 	@Override
-	public void onVideoTrackAdded(TrackInfo trackInfo, VideoTrack videoTrack) {
-		logger.i("onVideoTrackAdded " + trackInfo.getParticipantAddress() + " " + videoTrack.id());
+	public void onVideoTrackAdded(final TrackInfo trackInfo, final VideoTrack videoTrack) {
+		logger.i("onVideoTrackAdded " + trackInfo.getParticipantAddress() + " " + trackInfo.getTrackOrigin() + " " + videoTrack.id());
 
-		Participant participant = new ParticipantImpl(this, trackInfo.getParticipantAddress());
-		participants.add(participant);
+		if(trackInfo.getTrackOrigin() == TrackOrigin.LOCAL) {
+			/*
+			 * TODO: Investigate GLSurfaceView surface creation issue.
+			 * GLSurfaceView onSurfaceCreated is not called in some cases.
+			 * Delaying the creation of the local video renderer alleviates the problem.
+			 */
+			new Thread(new Runnable() {
+				@Override
+				public void run() {
+					try {
+						Thread.sleep(1000);
+					} catch(Exception e) {
 
-		conversationListener.onVideoAddedForParticipant(this, participant, VideoTrackImpl.create(videoTrack));
+					}
+					Log.i(TAG, "Local Adding Renderer");
+					localVideoRenderer = new VideoViewRenderer(context, localMedia.getContainerView());
+					VideoTrackImpl.create(videoTrack).addRenderer(localVideoRenderer);
+				}
+			}).start();
+		} else {
+			Participant participant = new ParticipantImpl(this, trackInfo.getParticipantAddress());
+			participants.add(participant);
 
+			conversationListener.onVideoAddedForParticipant(this, participant, VideoTrackImpl.create(videoTrack));
+		}
 	}
 
 	@Override
