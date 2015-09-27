@@ -4,9 +4,13 @@ import com.twilio.signal.VideoTrack;
 import com.twilio.signal.VideoRenderer;
 import com.twilio.signal.I420Frame;
 
+import java.util.List;
+import java.util.ArrayList;
+
 public class VideoTrackImpl implements VideoTrack {
 
-	org.webrtc.VideoTrack videoTrack;
+	private org.webrtc.VideoTrack videoTrack;
+	private List<VideoRenderer> videoRenderers = new ArrayList<VideoRenderer>();
 
 	private VideoTrackImpl(org.webrtc.VideoTrack videoTrack) {
 		this.videoTrack = videoTrack;
@@ -16,12 +20,21 @@ public class VideoTrackImpl implements VideoTrack {
 		return new VideoTrackImpl(videoTrack);
 	}
 
+	@Override
 	public void addRenderer(VideoRenderer videoRenderer) {
+		videoRenderers.add(videoRenderer);
 		videoTrack.addRenderer(createWebRtcVideoRenderer(videoRenderer));
 	}
 
+	@Override
 	public void removeRenderer(VideoRenderer videoRenderer) {
+		videoRenderers.remove(videoRenderer);
 		videoTrack.removeRenderer(createWebRtcVideoRenderer(videoRenderer));
+	}
+
+	@Override
+	public List<VideoRenderer> getRenderers() {
+		return videoRenderers;
 	}
 
 	private org.webrtc.VideoRenderer createWebRtcVideoRenderer(VideoRenderer videoRenderer) {

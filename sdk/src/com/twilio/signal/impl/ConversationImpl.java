@@ -13,13 +13,13 @@ import com.twilio.signal.Media;
 import com.twilio.signal.TrackOrigin;
 import com.twilio.signal.VideoViewRenderer;
 import com.twilio.signal.impl.ParticipantImpl;
-import com.twilio.signal.impl.ConversationObserver;
+import com.twilio.signal.impl.SessionObserver;
 import com.twilio.signal.impl.logging.Logger;
 import org.webrtc.VideoRenderer;
 import org.webrtc.VideoTrack;
 import android.util.Log;
 
-public class ConversationImpl implements Conversation, NativeHandleInterface, ConversationObserver {
+public class ConversationImpl implements Conversation, NativeHandleInterface, SessionObserver {
 
 	private ConversationListener conversationListener;
 	private Set<Participant> participants = new HashSet<Participant>();
@@ -35,12 +35,12 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Co
 		
 		private long nativeSessionObserver;
 		
-		public SessionObserverInternal(ConversationObserver conversationObserver, Conversation conversation) {
+		public SessionObserverInternal(SessionObserver sessionObserver, Conversation conversation) {
 			//this.listener = listener;
-			this.nativeSessionObserver = wrapNativeObserver(conversationObserver, conversation);
+			this.nativeSessionObserver = wrapNativeObserver(sessionObserver, conversation);
 		}
 
-		private native long wrapNativeObserver(ConversationObserver conversationObserver, Conversation conversation);
+		private native long wrapNativeObserver(SessionObserver sessionObserver, Conversation conversation);
 		//::TODO figure out when to call this - may be Endpoint.release() ??
 		private native void freeNativeObserver(long nativeSessionObserver);
 

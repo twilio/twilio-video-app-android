@@ -134,7 +134,7 @@ private:
 /*
  * Class:     com_twilio_signal_impl_ConversationImpl_SessionObserverInternal
  * Method:    wrapNativeObserver
- * Signature: (Lcom/twilio/signal/ConversationObserver;Lcom/twilio/signal/Conversation;)J
+ * Signature: (Lcom/twilio/signal/SessionObserver;Lcom/twilio/signal/Conversation;)J
  */
 JNIEXPORT jlong JNICALL Java_com_twilio_signal_impl_ConversationImpl_00024SessionObserverInternal_wrapNativeObserver
   (JNIEnv *env, jobject obj, jobject observer, jobject conversation) {
