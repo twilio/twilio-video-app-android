@@ -3,6 +3,7 @@ package com.twilio.signal.impl;
 import com.twilio.signal.VideoTrack;
 import com.twilio.signal.VideoRenderer;
 import com.twilio.signal.I420Frame;
+import com.twilio.signal.impl.TrackInfo;
 
 import java.util.List;
 import java.util.ArrayList;
@@ -10,14 +11,20 @@ import java.util.ArrayList;
 public class VideoTrackImpl implements VideoTrack {
 
 	private org.webrtc.VideoTrack videoTrack;
+	private TrackInfo trackInfo; 
 	private List<VideoRenderer> videoRenderers = new ArrayList<VideoRenderer>();
 
-	private VideoTrackImpl(org.webrtc.VideoTrack videoTrack) {
+	private VideoTrackImpl(org.webrtc.VideoTrack videoTrack, TrackInfo trackInfo) {
 		this.videoTrack = videoTrack;
+		this.trackInfo = trackInfo;
 	}
 
-	public static VideoTrack create(org.webrtc.VideoTrack videoTrack) {
-		return new VideoTrackImpl(videoTrack);
+	public static VideoTrackImpl create(org.webrtc.VideoTrack videoTrack, TrackInfo trackInfo) {
+		return new VideoTrackImpl(videoTrack, trackInfo);
+	}
+
+	public TrackInfo getTrackInfo() {
+		return trackInfo;
 	}
 
 	@Override

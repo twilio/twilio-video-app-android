@@ -3,7 +3,9 @@ package com.twilio.signal;
 import android.view.ViewGroup;
 import java.util.List;
 
-public class LocalMediaImpl implements LocalMedia {
+import com.twilio.signal.impl.MediaImpl;
+
+public class LocalMediaImpl extends MediaImpl implements LocalMedia {
 	private ViewGroup container;
 
 	public LocalMediaImpl() {}

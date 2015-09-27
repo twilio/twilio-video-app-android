@@ -79,7 +79,7 @@ public class ConversationActivity extends Activity implements ConversationListen
 	public void onVideoAddedForParticipant(final Conversation conversation,
 				final Participant participant, final VideoTrack videoTrack) {
 		// Remote participant
-		Log.i(TAG, "Participant Adding Renderer");
+		Log.i(TAG, "Participant adding video track");
 		participantVideoRenderer = new VideoViewRenderer(this, participantContainer);
 		participantVideoRenderer.setObserver(new VideoRendererObserver() {
 
@@ -98,8 +98,14 @@ public class ConversationActivity extends Activity implements ConversationListen
 	}
 
 	@Override
-	public void onVideoRemovedForParticipant(Conversation conversation, Participant participant) {
-		// TODO: Properly dispose of the participant renderer
+	public void onVideoRemovedForParticipant(Conversation conversation, Participant participant, VideoTrack videoTrack) {
+		Log.i(TAG, "Participant removing video track");
+		participantContainer.post(new Runnable() {
+			public void run() {
+				participantContainer.removeAllViews();
+			}
+
+		});
 	}
 
 	@Override

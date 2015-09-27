@@ -12,17 +12,19 @@ import com.twilio.signal.ConversationListener;
 import com.twilio.signal.Endpoint;
 import com.twilio.signal.Media;
 import com.twilio.signal.LocalMedia;
+import com.twilio.signal.LocalMediaImpl;
 import com.twilio.signal.TrackOrigin;
 import com.twilio.signal.VideoViewRenderer;
 import com.twilio.signal.VideoTrack;
 import com.twilio.signal.impl.ParticipantImpl;
 import com.twilio.signal.impl.SessionObserver;
+import com.twilio.signal.impl.TrackInfo;
 import com.twilio.signal.impl.logging.Logger;
 
 public class ConversationImpl implements Conversation, NativeHandleInterface, SessionObserver {
 
 	private ConversationListener conversationListener;
-	private LocalMedia localMedia;
+	private LocalMediaImpl localMediaImpl;
 	private VideoViewRenderer localVideoRenderer;
 	private Context context;
 
@@ -55,7 +57,7 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 	private SessionObserverInternal sessionObserverInternal;
 	private long nativeHandle;
 
-	private ConversationImpl(Context context, EndpointImpl endpoint, Set<String> participants, LocalMedia localMedia, ConversationListener conversationListener) {
+	private ConversationImpl(Context context, EndpointImpl endpoint, Set<String> participants, LocalMediaImpl localMediaImpl, ConversationListener conversationListener) {
 		this.context = context;
 		String[] participantAddressArray = new String[participants.size()];
 		int i = 0;
@@ -63,7 +65,7 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 			participantAddressArray[i++] = participant;
 		}
 	
-		this.localMedia = localMedia;
+		this.localMediaImpl = localMediaImpl;
 		this.conversationListener = conversationListener;
 
 		sessionObserverInternal = new SessionObserverInternal(this, this);
@@ -76,9 +78,9 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 	}
 
 	public static Conversation create(Context context, EndpointImpl endpoint, Set<String> participants,
-			   LocalMedia localMedia,
+			   LocalMediaImpl localMediaImpl,
 			   ConversationListener listener) {
-		ConversationImpl conv = new ConversationImpl(context, endpoint, participants, localMedia, listener);
+		ConversationImpl conv = new ConversationImpl(context, endpoint, participants, localMediaImpl, listener);
 		if (conv.getNativeHandle() == 0) {
 			return null;
 		}
@@ -203,15 +205,17 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 
 					}
 					Log.i(TAG, "Local Adding Renderer");
-					localVideoRenderer = new VideoViewRenderer(context, localMedia.getContainerView());
-					VideoTrackImpl.create(webRtcVideoTrack).addRenderer(localVideoRenderer);
+					VideoTrackImpl videoTrackImpl = VideoTrackImpl.create(webRtcVideoTrack, trackInfo);
+					localMediaImpl.addVideoTrack(videoTrackImpl);
+					localVideoRenderer = new VideoViewRenderer(context, localMediaImpl.getContainerView());
+					videoTrackImpl.addRenderer(localVideoRenderer);
 				}
 			}).start();
 		} else {
 			ParticipantImpl participant = retrieveParticipant(trackInfo.getParticipantAddress());
-			VideoTrack videoTrack = VideoTrackImpl.create(webRtcVideoTrack);
-			participant.getMediaImpl().addVideoTrack(videoTrack);
-			conversationListener.onVideoAddedForParticipant(this, participant, videoTrack); 
+			VideoTrackImpl videoTrackImpl = VideoTrackImpl.create(webRtcVideoTrack, trackInfo);
+			participant.getMediaImpl().addVideoTrack(videoTrackImpl);
+			conversationListener.onVideoAddedForParticipant(this, participant, videoTrackImpl); 
 		}
 	}
 
@@ -219,8 +223,8 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 	public void onVideoTrackRemoved(TrackInfo trackInfo) {
 		logger.i("onVideoTrackRemoved " + trackInfo.getParticipantAddress());
 		ParticipantImpl participant = retrieveParticipant(trackInfo.getParticipantAddress());
-		// TODO: remove track from participant media
-		conversationListener.onVideoRemovedForParticipant(this, participant);
+		VideoTrack videoTrack = participant.getMediaImpl().removeVideoTrack(trackInfo);
+		conversationListener.onVideoRemovedForParticipant(this, participant, videoTrack);
 	}
 
 	private native long wrapOutgoingSession(long nativeEndpoint, long nativeSessionObserver, String[] participants);

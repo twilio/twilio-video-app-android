@@ -70,6 +70,6 @@ public interface Endpoint {
 	 * @param listener for Conversation events
 	 */
 	
-	public Conversation createConversation(Context context, Set<String> participants, LocalMedia localMedia, ConversationListener listener);
+	public Conversation createConversation(Context context, Set<String> participants, LocalMediaImpl localMediaImpl, ConversationListener listener);
 
 }

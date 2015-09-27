@@ -27,7 +27,7 @@ public interface ConversationListener {
 	/**
 	 * 
 	 */
-	void onVideoRemovedForParticipant(Conversation conversation, Participant participant);
+	void onVideoRemovedForParticipant(Conversation conversation, Participant participant, VideoTrack videoTrack);
 
 
 	/**

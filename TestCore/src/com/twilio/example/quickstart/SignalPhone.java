@@ -172,12 +172,12 @@ public class SignalPhone implements EndpointListener
     	if (!twilioSdkInited || (SignalPhone.this.alice == null)) {
     		return null;
     	}
-    	LocalMedia localMedia = new LocalMediaImpl();
-	localMedia.attachContainerView(localContainer);
+    	LocalMediaImpl localMediaImpl = new LocalMediaImpl();
+	localMediaImpl.attachContainerView(localContainer);
     	Set<String> participants = new HashSet<String>();
     	participants.add(participant);
     	Conversation conv = SignalPhone.this.alice.createConversation(
-    			context, participants, localMedia, conversationListener);
+    			context, participants, localMediaImpl, conversationListener);
     	if (conv != null) {
     		conversations.put(conv.getConversationSid(), conv);
     	}
