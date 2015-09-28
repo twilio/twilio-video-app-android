@@ -45,7 +45,7 @@ public class SignalPhone implements EndpointListener
     // TODO: change this to point to the script on your public server
     private static final String ICE_TOKEN_URL_STRING = "http://client:chunder@chunder-interactive.appspot.com/iceToken?realm=prod";
     //private static final String CAPABILITY_TOKEN_URL_STRING = "https://sat-token-generator.herokuapp.com/sat-token?EndpointName=evan";
-    private static final String CAPABILITY_TOKEN_URL_STRING =  "http://simple-signaling.appspot.com/token?realm=prod";
+    private static final String CAPABILITY_TOKEN_URL_STRING =  "https://simple-signaling.appspot.com/token?realm=prod";
 
     private Endpoint alice = null;
     private String token = "";
