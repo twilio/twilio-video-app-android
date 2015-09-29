@@ -7,11 +7,18 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.os.Handler;
+
+import java.util.Map;
+import java.util.HashMap;
 
 import com.twilio.signal.Participant;
 import com.twilio.signal.Conversation;
 import com.twilio.signal.Conversation.Status;
 import com.twilio.signal.ConversationListener;
+import com.twilio.signal.VideoTrack;
+import com.twilio.signal.VideoViewRenderer;
+import com.twilio.signal.VideoRendererObserver;
 
 public class ConversationActivity extends Activity implements ConversationListener {
 
@@ -21,8 +28,8 @@ public class ConversationActivity extends Activity implements ConversationListen
 	private Conversation conv;
 	private ViewGroup localContainer;
 	private ViewGroup participantContainer;
-	private final Object syncObject = new Object();
 	private String participantAddress;
+	private VideoViewRenderer participantVideoRenderer;
 
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -69,20 +76,36 @@ public class ConversationActivity extends Activity implements ConversationListen
 	}
 
 	@Override
-	public void onVideoAddedForParticipant(Conversation conversation,
-			Participant participant) {
-		if(!participant.getAddress().equals(participantAddress)) {
-			// Host participant 
-			participant.getMedia().attachContainerView(localContainer);
-		} else {
-			// Remote participant
-			participant.getMedia().attachContainerView(participantContainer);
-		}
+	public void onVideoAddedForParticipant(final Conversation conversation,
+				final Participant participant, final VideoTrack videoTrack) {
+		// Remote participant
+		Log.i(TAG, "Participant adding video track");
+		participantVideoRenderer = new VideoViewRenderer(this, participantContainer);
+		participantVideoRenderer.setObserver(new VideoRendererObserver() {
+
+			@Override
+			public void onFirstFrame() {
+				Log.i(TAG, "Participant onFirstFrame");
+			}
+
+			@Override
+			public void onFrameSizeChanged(int width, int height) {
+				Log.i(TAG, "Participant onFrameSizeChanged " + width + " " + height);
+			}
+
+		});
+		videoTrack.addRenderer(participantVideoRenderer);
 	}
 
 	@Override
-	public void onVideoRemovedForParticipant(Conversation conversation, Participant participant) {
+	public void onVideoRemovedForParticipant(Conversation conversation, Participant participant, VideoTrack videoTrack) {
+		Log.i(TAG, "Participant removing video track");
+		participantContainer.post(new Runnable() {
+			public void run() {
+				participantContainer.removeAllViews();
+			}
 
+		});
 	}
 
 	@Override
@@ -97,6 +120,23 @@ public class ConversationActivity extends Activity implements ConversationListen
 
 	@Override
 	public void onConversationEnded(Conversation conversation, int error, String errorMessage) {
+
+	}
+
+	@Override
+	public void onResume() {
+		super.onResume();
+		if(participantVideoRenderer != null) {
+			participantVideoRenderer.onResume();
+		}
+	}
+
+	@Override
+	public void onPause() {
+		super.onPause();
+		if(participantVideoRenderer != null) {
+			participantVideoRenderer.onPause();
+		}
 
 	}
 

@@ -1,29 +1,37 @@
 package com.twilio.signal.impl;
 
-import java.util.Set;
-import java.util.HashSet;
-
+import android.app.Activity;
 import android.content.Context;
+import android.util.Log;
+
+import java.util.Map;
+import java.util.Set;
+import java.util.HashMap;
 
 import com.twilio.signal.Conversation;
-import com.twilio.signal.Participant;
 import com.twilio.signal.ConversationListener;
 import com.twilio.signal.Endpoint;
 import com.twilio.signal.Media;
+import com.twilio.signal.LocalMedia;
+import com.twilio.signal.LocalMediaImpl;
+import com.twilio.signal.TrackOrigin;
+import com.twilio.signal.VideoViewRenderer;
+import com.twilio.signal.VideoTrack;
 import com.twilio.signal.impl.ParticipantImpl;
-import com.twilio.signal.impl.ConversationObserver;
-import com.twilio.signal.impl.VideoSurface;
-import com.twilio.signal.impl.VideoSurfaceFactory;
+import com.twilio.signal.impl.SessionObserver;
+import com.twilio.signal.impl.TrackInfo;
 import com.twilio.signal.impl.logging.Logger;
-import org.webrtc.VideoRenderer;
 
-public class ConversationImpl implements Conversation, NativeHandleInterface, VideoSurface.Observer, ConversationObserver {
+public class ConversationImpl implements Conversation, NativeHandleInterface, SessionObserver {
 
 	private ConversationListener conversationListener;
-	private Set<Participant> participants = new HashSet<Participant>();
-	private Media localMedia;
-	private VideoSurface videoSurface;
+	private LocalMediaImpl localMediaImpl;
+	private VideoViewRenderer localVideoRenderer;
+	private Activity activity;
 
+	private Map<String,ParticipantImpl> participantMap = new HashMap<String,ParticipantImpl>();
+
+	private static String TAG = "ConversationImpl"; 
 
 	static final Logger logger = Logger.getLogger(ConversationImpl.class);
 	
@@ -31,12 +39,12 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Vi
 		
 		private long nativeSessionObserver;
 		
-		public SessionObserverInternal(ConversationObserver conversationObserver, Conversation conversation) {
+		public SessionObserverInternal(SessionObserver sessionObserver, Conversation conversation) {
 			//this.listener = listener;
-			this.nativeSessionObserver = wrapNativeObserver(conversationObserver, conversation);
+			this.nativeSessionObserver = wrapNativeObserver(sessionObserver, conversation);
 		}
 
-		private native long wrapNativeObserver(ConversationObserver conversationObserver, Conversation conversation);
+		private native long wrapNativeObserver(SessionObserver sessionObserver, Conversation conversation);
 		//::TODO figure out when to call this - may be Endpoint.release() ??
 		private native void freeNativeObserver(long nativeSessionObserver);
 
@@ -50,14 +58,15 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Vi
 	private SessionObserverInternal sessionObserverInternal;
 	private long nativeHandle;
 
-	private ConversationImpl(Context context, EndpointImpl endpoint, Set<String> participants, Media localMedia, ConversationListener conversationListener) {
+	private ConversationImpl(Activity activity, EndpointImpl endpoint, Set<String> participants, LocalMediaImpl localMediaImpl, ConversationListener conversationListener) {
+		this.activity = activity;
 		String[] participantAddressArray = new String[participants.size()];
 		int i = 0;
 		for(String participant : participants) {
 			participantAddressArray[i++] = participant;
 		}
 	
-		this.localMedia = localMedia;
+		this.localMediaImpl = localMediaImpl;
 		this.conversationListener = conversationListener;
 
 		sessionObserverInternal = new SessionObserverInternal(this, this);
@@ -66,17 +75,13 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Vi
 				sessionObserverInternal.getNativeHandle(),
 				participantAddressArray);
 
-		videoSurface = VideoSurfaceFactory.createVideoSurface(context, this);
-
-		setVideoSurface(nativeHandle, videoSurface.getNativeHandle());
-
 		start(nativeHandle);
 	}
 
-	public static Conversation create(Context context, EndpointImpl endpoint, Set<String> participants,
-			   Media localMedia,
+	public static Conversation create(Activity activity, EndpointImpl endpoint, Set<String> participants,
+			   LocalMediaImpl localMediaImpl,
 			   ConversationListener listener) {
-		ConversationImpl conv = new ConversationImpl(context, endpoint, participants, localMedia, listener);
+		ConversationImpl conv = new ConversationImpl(activity, endpoint, participants, localMediaImpl, listener);
 		if (conv.getNativeHandle() == 0) {
 			return null;
 		}
@@ -125,6 +130,15 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Vi
 		return null;
 	}
 
+	private ParticipantImpl retrieveParticipant(String participantAddress) {
+		ParticipantImpl participant = participantMap.get(participantAddress);
+		if(participant == null) {
+			participant = new ParticipantImpl(participantAddress);
+			participantMap.put(participantAddress, participant);
+		}
+		return participant;
+	}
+
 	/*
 	 * ConversationListener events
 	 */
@@ -132,85 +146,134 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Vi
 	@Override
 	public void onConnectParticipant(String participantAddress) {
 		logger.i("onConnectParticipant " + participantAddress);
+		retrieveParticipant(participantAddress);
 	}
 
 	@Override
-	public void onFailToConnectParticipant(String participant, int error, String errorMessage) {
-		conversationListener.onFailToConnectParticipant(this, new ParticipantImpl(this, participant), error, errorMessage);
-	}
-
-	@Override
-	public void onDisconnectParticipant(String participantAddress) {
-		for(Participant participant : participants) {
-			if(participant.getAddress().equals(participantAddress)) {
-				conversationListener.onDisconnectParticipant(this, participant);
-				break;
+	public void onFailToConnectParticipant(final String participant, final int error, final String errorMessage) {
+		activity.runOnUiThread(new Runnable() {
+			@Override
+			public void run() {
+				conversationListener.onFailToConnectParticipant(ConversationImpl.this, new ParticipantImpl(participant), error, errorMessage);
 			}
+		});
+	}
+
+	@Override
+	public void onDisconnectParticipant(final String participantAddress) {
+		final ParticipantImpl participant = participantMap.remove(participantAddress);
+		if(participant == null) {
+			logger.i("participant removed but was never in list");
+		} else {
+			activity.runOnUiThread(new Runnable() {
+				@Override
+				public void run() {
+					conversationListener.onDisconnectParticipant(ConversationImpl.this, participant);
+				}
+			});
 		}
 	}
 
 	@Override
 	public void onVideoAddedForParticipant(String participantAddress) {
-		logger.i("onVideoAddedForParticipant " + participantAddress);
 
-		Participant participant = new ParticipantImpl(this, participantAddress);
-		participants.add(participant);
-
-		conversationListener.onVideoAddedForParticipant(this, participant);
 	}
 
 	@Override
 	public void onVideoRemovedForParticipant(String participantAddress) {
-		logger.i("onVideoRemovedForParticipant " + participantAddress);
-		for(Participant participant : participants) {
-			if(participant.getAddress().equals(participantAddress)) {
-				conversationListener.onVideoRemovedForParticipant(this, participant);
-				break;
-			}
-		}
+
 	}
 
 	@Override
-	public void onLocalStatusChanged(Status status) {
-		conversationListener.onLocalStatusChanged(this, status);
+	public void onLocalStatusChanged(final Status status) {
+		activity.runOnUiThread(new Runnable() {
+			@Override
+			public void run() {
+				conversationListener.onLocalStatusChanged(ConversationImpl.this, status);
+			}
+		});
 	}
 	
 	@Override
 	public void onConversationEnded() {
-		conversationListener.onConversationEnded(this);
-	}
-
-	@Override
-	public void onConversationEnded(int error, String errorMessage) {
-		conversationListener.onConversationEnded(this, error, errorMessage);
-	}
-
-	/*
-	 * VideoSurface.Observer Events
-	 */
-	@Override
-	public void onDidAddVideoTrack(TrackInfo trackInfo) {
-
-	}
-
-	@Override
-	public void onDidRemoveVideoTrack(TrackInfo trackInfo) {
-
-	}
-
-	@Override
-	public void onDidReceiveVideoTrackEvent(VideoRenderer.I420Frame frame, TrackInfo trackInfo) {
-		for(Participant participant : participants) {
-			if(participant.getAddress().equals(trackInfo.getParticipantAddress())) {
-				videoSurface.renderFrame(frame, participant.getMedia().getContainerView());
-				return;
+		activity.runOnUiThread(new Runnable() {
+			@Override
+			public void run() {
+				conversationListener.onConversationEnded(ConversationImpl.this);
 			}
+		});
+	}
+
+	@Override
+	public void onConversationEnded(final int error, final String errorMessage) {
+		activity.runOnUiThread(new Runnable() {
+			@Override
+			public void run() {
+				conversationListener.onConversationEnded(ConversationImpl.this, error, errorMessage);
+			}
+		});
+
+	}
+
+	@Override
+	public void onVideoTrackAdded(final TrackInfo trackInfo, final org.webrtc.VideoTrack webRtcVideoTrack) {
+		logger.i("onVideoTrackAdded " + trackInfo.getParticipantAddress() + " " + trackInfo.getTrackOrigin() + " " + webRtcVideoTrack.id());
+
+		if(trackInfo.getTrackOrigin() == TrackOrigin.LOCAL) {
+			/*
+			 * TODO: Investigate GLSurfaceView surface creation issue.
+			 * GLSurfaceView onSurfaceCreated is not called in some cases.
+			 * Delaying the creation of the local video renderer alleviates the problem.
+			 */
+			new Thread(new Runnable() {
+				@Override
+				public void run() {
+					try {
+						Thread.sleep(1000);
+					} catch(Exception e) {
+
+					}
+					Log.i(TAG, "Local Adding Renderer");
+					final VideoTrackImpl videoTrackImpl = VideoTrackImpl.create(webRtcVideoTrack, trackInfo);
+					localMediaImpl.addVideoTrack(videoTrackImpl);
+
+					activity.runOnUiThread(new Runnable() {
+						@Override
+						public void run() {
+							localVideoRenderer = new VideoViewRenderer(activity, localMediaImpl.getContainerView());
+							videoTrackImpl.addRenderer(localVideoRenderer);
+						}
+					});
+				}
+			}).start();
+		} else {
+			final ParticipantImpl participant = retrieveParticipant(trackInfo.getParticipantAddress());
+			final VideoTrackImpl videoTrackImpl = VideoTrackImpl.create(webRtcVideoTrack, trackInfo);
+			participant.getMediaImpl().addVideoTrack(videoTrackImpl);
+
+			activity.runOnUiThread(new Runnable() {
+        			@Override
+        			public void run() {
+					conversationListener.onVideoAddedForParticipant(ConversationImpl.this, participant, videoTrackImpl); 
+        			}
+			});
 		}
 	}
 
-	private native long wrapOutgoingSession(long nativeEndpoint, long nativeSessionObserver, String[] participants);
+	@Override
+	public void onVideoTrackRemoved(TrackInfo trackInfo) {
+		logger.i("onVideoTrackRemoved " + trackInfo.getParticipantAddress());
+		final ParticipantImpl participant = retrieveParticipant(trackInfo.getParticipantAddress());
+		final VideoTrack videoTrack = participant.getMediaImpl().removeVideoTrack(trackInfo);
+		activity.runOnUiThread(new Runnable() {
+			@Override
+			public void run() {
+				conversationListener.onVideoRemovedForParticipant(ConversationImpl.this, participant, videoTrack);
+			}
+		});
+	}
 
-	private native void setVideoSurface(long nativeSession, long nativeVideoSurface);
+	private native long wrapOutgoingSession(long nativeEndpoint, long nativeSessionObserver, String[] participants);
 
 	private native void start(long nativeSession);
 

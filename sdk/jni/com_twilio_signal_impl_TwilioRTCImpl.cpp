@@ -6,8 +6,7 @@
 #include "TSCEndpoint.h"
 #include "TSCEndpointObserver.h"
 #include "TSCConfiguration.h"
-//#include "EndpointObserver.h"
-//#include "webrtc/video_engine/include/vie_base.h"
+#include "TSCLogger.h"
 #include "webrtc/voice_engine/include/voe_base.h"
 #include "webrtc/modules/video_capture/video_capture_internal.h"
 #include "webrtc/modules/video_render/video_render_internal.h"
@@ -16,9 +15,11 @@
 #include "webrtc/modules/audio_device/android/opensles_output.h"
 #include "webrtc/modules/video_capture/android/device_info_android.h"
 
-#include <android/log.h>
 #include <string.h>
 #include "com_twilio_signal_impl_TwilioRTCImpl.h"
+
+#include "talk/app/webrtc/java/jni/jni_helpers.h"
+#include "talk/app/webrtc/java/jni/classreferenceholder.h"
 
 #define TAG  "TwilioSDK(native)"
 
@@ -29,27 +30,32 @@ using namespace twiliosdk;
  * Method:    initCore
  * Signature: (Landroid/content/Context;)Z
  */
-
-
 JNIEXPORT jboolean JNICALL Java_com_twilio_signal_impl_TwilioRTCImpl_initCore(JNIEnv *env, jobject obj, jobject context) {
 
 	bool failure = false;
 	JavaVM * cachedJVM = NULL;
 
 	env->GetJavaVM(&cachedJVM);
+
+	// Perform webrtc_jni initialization to enable peerconnection_jni.cc JNI bindings.
+	jint ret = webrtc_jni::InitGlobalJniVariables(cachedJVM);
+	if(ret < 0) {
+		TS_CORE_LOG_ERROR("TwilioSDK.InitGlobalJniVariables() failed");
+		return failure;
+	} else {
+		webrtc_jni::LoadGlobalClassReferenceHolder();
+	}
+
 	TSCSDK* tscSdk = TSCSDK::instance();
-	__android_log_print(ANDROID_LOG_VERBOSE, TAG, "TwilioSDK.initCore() called");
 
 	webrtc::videocapturemodule::DeviceInfoAndroid::Initialize(env);
 	webrtc::AudioManager::SetAndroidAudioDeviceObjects(cachedJVM, context);
 	webrtc::OpenSlesOutput::SetAndroidAudioDeviceObjects(cachedJVM, context);
-	//LOG_W(TAG, "SignalCore.initCore() called");
 
 	failure |= webrtc::SetCaptureAndroidVM(cachedJVM, context);
 	failure |= webrtc::SetRenderAndroidVM(cachedJVM);
 
-	//LOG_W(TAG, "Calling DA Magic formula");
-	__android_log_print(ANDROID_LOG_VERBOSE, TAG, "Calling DA Magic formula");
+	TS_CORE_LOG_DEBUG("Calling DA Magic formula");
 	failure |= webrtc::VoiceEngine::SetAndroidObjects(cachedJVM, context);
 
 	if (tscSdk != NULL && tscSdk->isInitialized())
@@ -64,30 +70,24 @@ JNIEXPORT jboolean JNICALL Java_com_twilio_signal_impl_TwilioRTCImpl_initCore(JN
 JNIEXPORT jlong JNICALL Java_com_twilio_signal_impl_TwilioRTCImpl_createEndpoint
   (JNIEnv *env, jobject obj, jstring token, jlong nativeEndpointObserver) {
 
-	//TSCOptions coreOptions;
-
 	if (token == NULL) {
-		__android_log_print(ANDROID_LOG_ERROR, TAG, "token is null");
+		TS_CORE_LOG_ERROR("token is null");
 		return 0;
 	}
 	const char *tokenStr = env->GetStringUTFChars(token, 0);
 
-	//__android_log_print(ANDROID_LOG_VERBOSE, TAG, "Capability token");
-	//coreOptions.insert(std::make_pair("capability-token", tokenStr));
-	TSCOptions options = TSCConfiguration::getDefaults();
-	options[kTSCTokenKey] = tokenStr;
+	TSCOptions options;
+	options.insert(std::make_pair(kTSCTokenKey, tokenStr));
 
 	if (!nativeEndpointObserver)
 	{
-		__android_log_print(ANDROID_LOG_ERROR, TAG, "nativeEndpointObserver is null");
+		TS_CORE_LOG_ERROR("nativeEndpointObserver is null");
 		return 0;
 	}
 
 	TSCEndpointObserverObjectRef eObserverRef =
 			TSCEndpointObserverObjectRef(reinterpret_cast<TSCEndpointObserverObject*>(nativeEndpointObserver));
 
-	//__android_log_print(ANDROID_LOG_VERBOSE, TAG, "eObserverPointer = %p", &eObserver);
-	//__android_log_print(ANDROID_LOG_VERBOSE, TAG, "eObserverRef = %p", &eObserverRef);
 	TSCEndpointObjectRef endpoint = TSCSDK::instance()->createEndpoint(options, eObserverRef);
 
 	return (jlong) endpoint.release();

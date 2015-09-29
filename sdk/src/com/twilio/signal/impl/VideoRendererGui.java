@@ -46,8 +46,9 @@ import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
 import android.util.Log;
 
-import org.webrtc.VideoRenderer;
-import org.webrtc.VideoRenderer.I420Frame;
+import com.twilio.signal.VideoRenderer;
+import com.twilio.signal.VideoRendererObserver;
+import com.twilio.signal.I420Frame;
 
 /**
  * The original VideoRendererGui.java in webrtc uses a static singleton pattern allowing
@@ -61,7 +62,7 @@ import org.webrtc.VideoRenderer.I420Frame;
  * Efficiently renders YUV frames using the GPU for CSC.
  * Clients will want first to call setView() to pass GLSurfaceView
  * and then for each video stream either create instance of VideoRenderer using
- * createGui() call or VideoRenderer.Callbacks interface using create() call.
+ * createGui() call or VideoRenderer interface using create() call.
  * Only one instance of the class can be created.
  */
 public class VideoRendererGui implements GLSurfaceView.Renderer {
@@ -149,7 +150,7 @@ public class VideoRendererGui implements GLSurfaceView.Renderer {
     instance = this;
   }
 
-  public VideoRenderer.Callbacks createRenderer(
+  public VideoRenderer createRenderer(
       int x, int y, int width, int height,
       ScalingType scalingType, boolean mirror) {
     return create(x, y, width, height, scalingType, mirror);
@@ -223,7 +224,9 @@ public class VideoRendererGui implements GLSurfaceView.Renderer {
    * on a screen. New video frames are sent to display using renderFrame()
    * call.
    */
-  private static class YuvImageRenderer implements VideoRenderer.Callbacks {
+  private static class YuvImageRenderer implements VideoRenderer {
+
+    private VideoRendererObserver videoRendererObserver;
     private GLSurfaceView surface;
     private int id;
     private int yuvProgram;
@@ -643,6 +646,10 @@ public class VideoRendererGui implements GLSurfaceView.Renderer {
       if (videoWidth == this.videoWidth && videoHeight == this.videoHeight
           && rotation == rotationDegree) {
         return;
+      } else {
+        if(videoRendererObserver != null) {
+          videoRendererObserver.onFrameSizeChanged(videoWidth, videoHeight);
+        }
       }
 
       // Frame re-allocation need to be synchronized with copying
@@ -667,6 +674,11 @@ public class VideoRendererGui implements GLSurfaceView.Renderer {
         updateTextureProperties = true;
         Log.d(TAG, "  YuvImageRenderer.setSize done.");
       }
+    }
+
+    @Override
+    public synchronized void setSize(int width, int height) {
+	// Do nothing. The renderFrame method calls setSize for us 
     }
 
     @Override
@@ -713,17 +725,20 @@ public class VideoRendererGui implements GLSurfaceView.Renderer {
         frameToRenderQueue.offer(textureFrameToRender);
       }
       copyTimeNs += (System.nanoTime() - now);
+      if(seenFrame == false && videoRendererObserver != null) {
+        videoRendererObserver.onFirstFrame();
+      }
       seenFrame = true;
 
       // Request rendering.
       surface.requestRender();
     }
 
-    // TODO(guoweis): Remove this once chrome code base is updated.
     @Override
-    public boolean canApplyRotation() {
-      return true;
+    public synchronized void setObserver(VideoRendererObserver videoRendererObserver) {
+	this.videoRendererObserver = videoRendererObserver;
     }
+ 
   }
 
   public EGLContext getEGLContext() {
@@ -731,7 +746,7 @@ public class VideoRendererGui implements GLSurfaceView.Renderer {
   }
 
   /**
-   * Creates VideoRenderer.Callbacks with top left corner at (x, y) and
+   * Creates VideoRenderer with top left corner at (x, y) and
    * resolution (width, height). All parameters are in percentage of
    * screen resolution.
    */
@@ -779,7 +794,7 @@ public class VideoRendererGui implements GLSurfaceView.Renderer {
   }
 
   public void update(
-      VideoRenderer.Callbacks renderer,
+      VideoRenderer renderer,
       int x, int y, int width, int height, ScalingType scalingType, boolean mirror) {
     Log.d(TAG, "VideoRendererGui.update");
     if (instance == null) {
@@ -793,7 +808,7 @@ public class VideoRendererGui implements GLSurfaceView.Renderer {
     }
   }
 
-  public void remove(VideoRenderer.Callbacks renderer) {
+  public void remove(VideoRenderer renderer) {
     Log.d(TAG, "VideoRendererGui.remove");
     if (instance == null) {
       throw new RuntimeException(

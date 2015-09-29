@@ -1,8 +1,9 @@
 package com.twilio.signal.impl;
 
 import com.twilio.signal.Conversation;
+import org.webrtc.VideoTrack;
 
-interface ConversationObserver {
+interface SessionObserver {
 
 	void onConnectParticipant(String participant);
 
@@ -19,6 +20,10 @@ interface ConversationObserver {
 	void onConversationEnded();
 
 	void onConversationEnded(int error, String errorMessage);
+
+	void onVideoTrackAdded(TrackInfo trackInfo, VideoTrack videoTrack);
+
+	void onVideoTrackRemoved(TrackInfo trackInfo);
 
 }
 

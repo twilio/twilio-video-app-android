@@ -46,7 +46,7 @@ public interface Conversation {
 	
 	
 	/**
-	 * Get a remote endpointâ€™s media stream.
+	 * Get a remote endpoint's media stream.
 	 * 
 	 * @param endpoint The remote endpoint whose stream we are fetching.
 	 * @return
@@ -55,7 +55,7 @@ public interface Conversation {
 	
 	
 	/**
-	 * Get a remote endpointâ €™s media stream.
+	 * Get a remote endpoint's media stream.
 	 * 
 	 * @param endpoint The remote endpoint whose stream we are fetching.
 	 * @return

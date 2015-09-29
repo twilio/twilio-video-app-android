@@ -16,6 +16,7 @@ import java.util.concurrent.Executors;
 
 import org.json.JSONObject;
 
+import android.app.Activity;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
@@ -44,7 +45,7 @@ public class SignalPhone implements EndpointListener
     // TODO: change this to point to the script on your public server
     private static final String ICE_TOKEN_URL_STRING = "http://client:chunder@chunder-interactive.appspot.com/iceToken?realm=prod";
     //private static final String CAPABILITY_TOKEN_URL_STRING = "https://sat-token-generator.herokuapp.com/sat-token?EndpointName=evan";
-    private static final String CAPABILITY_TOKEN_URL_STRING =  "http://simple-signaling.appspot.com/token?realm=prod";
+    private static final String CAPABILITY_TOKEN_URL_STRING =  "https://simple-signaling.appspot.com/token?realm=prod";
 
     private Endpoint alice = null;
     private String token = "";
@@ -165,19 +166,19 @@ public class SignalPhone implements EndpointListener
 
     }
 
-    public Conversation call(Context context, String participant, ViewGroup localContainer, ConversationListener conversationListener) {
+    public Conversation call(Activity activity, String participant, ViewGroup localContainer, ConversationListener conversationListener) {
     	if (participant == null || participant == "") {
     		return null;
     	}
     	if (!twilioSdkInited || (SignalPhone.this.alice == null)) {
     		return null;
     	}
-    	LocalMedia localMedia = new LocalMediaImpl();
-	localMedia.attachContainerView(localContainer);
+    	LocalMediaImpl localMediaImpl = new LocalMediaImpl();
+	localMediaImpl.attachContainerView(localContainer);
     	Set<String> participants = new HashSet<String>();
     	participants.add(participant);
     	Conversation conv = SignalPhone.this.alice.createConversation(
-    			context, participants, localMedia, conversationListener);
+    			activity, participants, localMediaImpl, conversationListener);
     	if (conv != null) {
     		conversations.put(conv.getConversationSid(), conv);
     	}

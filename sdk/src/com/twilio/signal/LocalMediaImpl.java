@@ -1,8 +1,11 @@
 package com.twilio.signal;
 
 import android.view.ViewGroup;
+import java.util.List;
 
-public class LocalMediaImpl implements LocalMedia {
+import com.twilio.signal.impl.MediaImpl;
+
+public class LocalMediaImpl extends MediaImpl implements LocalMedia {
 	private ViewGroup container;
 
 	public LocalMediaImpl() {}
@@ -81,6 +84,11 @@ public class LocalMediaImpl implements LocalMedia {
 	public void flipCamera() {
 		// TODO Auto-generated method stub
 
+	}
+
+	@Override
+	public List<VideoTrack> getVideoTracks() {
+		return null;
 	}
 
 }

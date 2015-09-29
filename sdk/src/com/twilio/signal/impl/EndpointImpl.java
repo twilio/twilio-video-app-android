@@ -5,6 +5,7 @@ import java.util.UUID;
 
 import android.app.PendingIntent;
 import android.app.PendingIntent.CanceledException;
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Parcel;
@@ -15,7 +16,7 @@ import com.twilio.signal.ConversationListener;
 import com.twilio.signal.Endpoint;
 import com.twilio.signal.EndpointListener;
 import com.twilio.signal.Participant;
-import com.twilio.signal.Media;
+import com.twilio.signal.LocalMediaImpl;
 import com.twilio.signal.impl.logging.Logger;
 
 public class EndpointImpl implements Endpoint, NativeHandleInterface, Parcelable{
@@ -60,16 +61,6 @@ public class EndpointImpl implements Endpoint, NativeHandleInterface, Parcelable
 	public int hashCode() {
 		return super.hashCode();
 	}
-
-/*
-	public EndpointImpl(Context context,
-						EndpointListener inListener,
-						long nativeEndpointHandle) {
-		this.context = context;
-		this.listener = inListener;
-		this.nativeEndpointHandle = nativeEndpointHandle;
-	}
-*/
 
 	EndpointImpl(Context context,
 			EndpointListener inListener) {
@@ -126,9 +117,9 @@ public class EndpointImpl implements Endpoint, NativeHandleInterface, Parcelable
 
 
 	@Override
-	public Conversation createConversation(Context context, Set<String> participants,
-			Media localMedia, ConversationListener listener) {
-		Conversation conv = ConversationImpl.create(context, this, participants, localMedia, listener);
+	public Conversation createConversation(Activity activity, Set<String> participants,
+			LocalMediaImpl localMediaImpl, ConversationListener listener) {
+		Conversation conv = ConversationImpl.create(activity, this, participants, localMediaImpl, listener);
 		return conv;
 	}
 
