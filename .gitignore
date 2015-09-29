@@ -14,3 +14,10 @@ TestCore/.settings
 
 .vagrant
 depot_tools
+
+.gradle
+local.properties
+.idea
+*.iml
+build
+.DS_Store
