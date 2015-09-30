@@ -20,7 +20,13 @@ class SessionObserverInternalWrapper : public TSCSessionObserverObject {
 public:
 	SessionObserverInternalWrapper(JNIEnv* jni, jobject obj, jobject j_observer, jobject conversation)
 			: j_participant_did_connect_id(tw_jni_get_method(jni, j_observer, "onConnectParticipant", "(Ljava/lang/String;)V")),
+			  j_participant_fail_connect_id(tw_jni_get_method(jni, j_observer, "onFailToConnectParticipant", "(Ljava/lang/String;ILjava/lang/String;)V")),
+			  j_participant_disconnect_id(tw_jni_get_method(jni, j_observer, "onDisconnectParticipant", "(Ljava/lang/String;)V")),
 			j_video_added_for_participant_id(tw_jni_get_method(jni, j_observer, "onVideoAddedForParticipant", "(Ljava/lang/String;)V")),
+			j_video_removed_for_participant_id(tw_jni_get_method(jni, j_observer, "onVideoRemovedForParticipant", "(Ljava/lang/String;)V")),
+			j_local_status_changed_id(tw_jni_get_method(jni, j_observer, "onLocalStatusChanged", "(Lcom/twilio/signal/Conversation$Status;)V")),
+			j_conversation_ended_id(tw_jni_get_method(jni, j_observer, "onConversationEnded", "()V")),
+			j_conversation_ended_id2(tw_jni_get_method(jni, j_observer, "onConversationEnded", "(ILjava/lang/String;)V")),
 			j_add_track_id_(tw_jni_get_method(jni, j_observer, "onVideoTrackAdded", "(Lcom/twilio/signal/impl/TrackInfo;Lorg/webrtc/VideoTrack;)V")),
 			j_remove_track_id_(tw_jni_get_method(jni, j_observer, "onVideoTrackRemoved", "(Lcom/twilio/signal/impl/TrackInfo;)V")),
 			j_trackinfo_class_(jni, FindClass(jni, "com/twilio/signal/impl/TrackInfoImpl")),
@@ -127,6 +133,12 @@ private:
 	const jmethodID j_video_track_ctor_;
 	const ScopedGlobalRef<jobject> j_observer_global_;
 	const ScopedGlobalRef<jclass> j_observer_class_;
+	const jmethodID j_participant_fail_connect_id;
+	const jmethodID j_participant_disconnect_id;
+	const jmethodID j_video_removed_for_participant_id;
+	const jmethodID j_local_status_changed_id;
+	const jmethodID j_conversation_ended_id;
+	const jmethodID j_conversation_ended_id2;
 };
 
 
