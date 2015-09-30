@@ -1,6 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project name="TwilioSignal" default="help">
 
+    <!-- Copy the libjingle jar from webrtc to build with the twilio sdk -->
+    <property environment="env"/>
+    <condition property="prefix" value="${env.PREFIX}" else="/usr/local/twilio-sdk">
+        <isset property="env.PREFIX" />
+    </condition>
+    <copy file="${prefix}/webrtc/android/armeabiv7a/lib/libjingle_peerconnection_java.jar" todir="libs" />
+
     <!-- The local.properties file is created and updated by the 'android' tool.
          It contains the path to the SDK. It should *NOT* be checked into
          Version Control Systems. -->
