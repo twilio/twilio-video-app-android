@@ -1,25 +1,19 @@
 package com.twilio.signal.impl;
 
-import android.app.Activity;
-import android.content.Context;
-import android.util.Log;
-
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
-import java.util.HashMap;
+
+import android.app.Activity;
+import android.util.Log;
 
 import com.twilio.signal.Conversation;
 import com.twilio.signal.ConversationListener;
-import com.twilio.signal.Endpoint;
-import com.twilio.signal.Media;
-import com.twilio.signal.LocalMedia;
 import com.twilio.signal.LocalMediaImpl;
+import com.twilio.signal.Media;
 import com.twilio.signal.TrackOrigin;
-import com.twilio.signal.VideoViewRenderer;
 import com.twilio.signal.VideoTrack;
-import com.twilio.signal.impl.ParticipantImpl;
-import com.twilio.signal.impl.SessionObserver;
-import com.twilio.signal.impl.TrackInfo;
+import com.twilio.signal.VideoViewRenderer;
 import com.twilio.signal.impl.logging.Logger;
 
 public class ConversationImpl implements Conversation, NativeHandleInterface, SessionObserver {
@@ -31,7 +25,7 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 
 	private Map<String,ParticipantImpl> participantMap = new HashMap<String,ParticipantImpl>();
 
-	private static String TAG = "ConversationImpl"; 
+	private static String TAG = "ConversationImpl";
 
 	static final Logger logger = Logger.getLogger(ConversationImpl.class);
 	
@@ -146,7 +140,13 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 	@Override
 	public void onConnectParticipant(String participantAddress) {
 		logger.i("onConnectParticipant " + participantAddress);
-		retrieveParticipant(participantAddress);
+		final ParticipantImpl participant = retrieveParticipant(participantAddress);
+		activity.runOnUiThread(new Runnable() {
+			@Override
+			public void run() {
+				conversationListener.onConnectParticipant(ConversationImpl.this, participant);
+			}
+		});
 	}
 
 	@Override
@@ -254,7 +254,7 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 			activity.runOnUiThread(new Runnable() {
         			@Override
         			public void run() {
-					conversationListener.onVideoAddedForParticipant(ConversationImpl.this, participant, videoTrackImpl); 
+					conversationListener.onVideoAddedForParticipant(ConversationImpl.this, participant, videoTrackImpl);
         			}
 			});
 		}

@@ -18,26 +18,42 @@ using namespace twiliosdk;
 
 class SessionObserverInternalWrapper : public TSCSessionObserverObject {
 public:
-	SessionObserverInternalWrapper(JNIEnv* jni, jobject obj, jobject j_observer, jobject conversation)
-			: j_participant_did_connect_id(tw_jni_get_method(jni, j_observer, "onConnectParticipant", "(Ljava/lang/String;)V")),
-			  j_participant_fail_connect_id(tw_jni_get_method(jni, j_observer, "onFailToConnectParticipant", "(Ljava/lang/String;ILjava/lang/String;)V")),
-			  j_participant_disconnect_id(tw_jni_get_method(jni, j_observer, "onDisconnectParticipant", "(Ljava/lang/String;)V")),
-			j_video_added_for_participant_id(tw_jni_get_method(jni, j_observer, "onVideoAddedForParticipant", "(Ljava/lang/String;)V")),
-			j_video_removed_for_participant_id(tw_jni_get_method(jni, j_observer, "onVideoRemovedForParticipant", "(Ljava/lang/String;)V")),
-			j_local_status_changed_id(tw_jni_get_method(jni, j_observer, "onLocalStatusChanged", "(Lcom/twilio/signal/Conversation$Status;)V")),
-			j_conversation_ended_id(tw_jni_get_method(jni, j_observer, "onConversationEnded", "()V")),
-			j_conversation_ended_id2(tw_jni_get_method(jni, j_observer, "onConversationEnded", "(ILjava/lang/String;)V")),
-			j_add_track_id_(tw_jni_get_method(jni, j_observer, "onVideoTrackAdded", "(Lcom/twilio/signal/impl/TrackInfo;Lorg/webrtc/VideoTrack;)V")),
-			j_remove_track_id_(tw_jni_get_method(jni, j_observer, "onVideoTrackRemoved", "(Lcom/twilio/signal/impl/TrackInfo;)V")),
-			j_trackinfo_class_(jni, FindClass(jni, "com/twilio/signal/impl/TrackInfoImpl")),
-			j_trackorigin_class_(jni, FindClass(jni, "com/twilio/signal/TrackOrigin")),
-			j_trackinfo_ctor_id_(GetMethodID(jni, *j_trackinfo_class_, "<init>", "(Ljava/lang/String;Ljava/lang/String;Lcom/twilio/signal/TrackOrigin;)V")),
-			j_video_track_class_(jni, FindClass(jni, "org/webrtc/VideoTrack")),
-        		j_video_track_ctor_(GetMethodID( jni, *j_video_track_class_, "<init>", "(J)V")),
-			j_observer_global_(jni, j_observer),	
-			j_observer_class_(jni, jni->GetObjectClass(*j_observer_global_)) {
+	SessionObserverInternalWrapper(JNIEnv* jni, jobject obj, jobject j_observer, jobject conversation) :
+		j_participant_did_connect_id(
+				tw_jni_get_method(jni, j_observer, "onConnectParticipant", "(Ljava/lang/String;)V")),
+		j_participant_fail_connect_id(
+				tw_jni_get_method(jni, j_observer, "onFailToConnectParticipant", "(Ljava/lang/String;ILjava/lang/String;)V")),
+		j_participant_disconnect_id(
+				tw_jni_get_method(jni, j_observer, "onDisconnectParticipant", "(Ljava/lang/String;)V")),
+		j_video_added_for_participant_id(
+				tw_jni_get_method(jni, j_observer, "onVideoAddedForParticipant", "(Ljava/lang/String;)V")),
+		j_video_removed_for_participant_id(
+				tw_jni_get_method(jni, j_observer, "onVideoRemovedForParticipant", "(Ljava/lang/String;)V")),
+		j_local_status_changed_id(
+				tw_jni_get_method(jni, j_observer, "onLocalStatusChanged", "(Lcom/twilio/signal/Conversation$Status;)V")),
+		j_conversation_ended_id(
+				tw_jni_get_method(jni, j_observer, "onConversationEnded", "()V")),
+		j_conversation_ended_id2(
+				tw_jni_get_method(jni, j_observer, "onConversationEnded", "(ILjava/lang/String;)V")),
+		j_add_track_id_(
+				tw_jni_get_method(jni, j_observer, "onVideoTrackAdded", "(Lcom/twilio/signal/impl/TrackInfo;Lorg/webrtc/VideoTrack;)V")),
+		j_remove_track_id_(
+				tw_jni_get_method(jni, j_observer, "onVideoTrackRemoved", "(Lcom/twilio/signal/impl/TrackInfo;)V")),
+		j_trackinfo_class_(
+				jni, FindClass(jni, "com/twilio/signal/impl/TrackInfoImpl")),
+		j_trackorigin_class_(
+				jni, FindClass(jni, "com/twilio/signal/TrackOrigin")),
+		j_trackinfo_ctor_id_(
+				GetMethodID(jni, *j_trackinfo_class_, "<init>", "(Ljava/lang/String;Ljava/lang/String;Lcom/twilio/signal/TrackOrigin;)V")),
+		j_video_track_class_(
+				jni, FindClass(jni, "org/webrtc/VideoTrack")),
+		j_video_track_ctor_(
+				GetMethodID( jni, *j_video_track_class_, "<init>", "(J)V")),
+		j_observer_global_(
+				jni, j_observer),
+		j_observer_class_(
+				jni, jni->GetObjectClass(*j_observer_global_)) {}
 
-	}
 protected:
 	virtual void onDidReceiveEvent(const TSCEventObjectRef& event) {
 		TS_CORE_LOG_DEBUG("onDidReceiveEvent");
@@ -57,22 +73,31 @@ protected:
 	virtual void onParticipantDidConnect(const TSCParticipantObjectRef& participant,
 										 const TSCErrorObjectRef& error) {
 		TS_CORE_LOG_DEBUG("onParticipantDidConnect");
-	    	JNIEnvAttacher jniAttacher;
-    		jstring j_participant_address = stringToJString(jniAttacher.get(), participant->getAddress());
-    		jniAttacher.get()->CallVoidMethod(*j_observer_global_, j_participant_did_connect_id, j_participant_address);
+	    JNIEnvAttacher jniAttacher;
+    	jstring j_participant_address =
+    			stringToJString(jniAttacher.get(), participant->getAddress());
+    	jniAttacher.get()->CallVoidMethod(
+    			*j_observer_global_, j_participant_did_connect_id, j_participant_address);
 	}
 
 	virtual void onParticipantDidDisconect(const TSCParticipantObjectRef& participant,
 										   TSCDisconnectReason reason) {
 		TS_CORE_LOG_DEBUG("onParticipantDidDisconect");
+		JNIEnvAttacher jniAttacher;
+		jstring j_participant_address =
+				stringToJString(jniAttacher.get(), participant->getAddress());
+		jniAttacher.get()->CallVoidMethod(
+				*j_observer_global_, j_participant_disconnect_id, j_participant_address);
 	}
 
 	virtual void onMediaStreamDidAdd(TSCMediaStreamInfoObject* stream) {
 		TS_CORE_LOG_DEBUG("onMediaStreamDidAdd");
-	    	JNIEnvAttacher jniAttacher;
+	    JNIEnvAttacher jniAttacher;
 
-    		jstring j_participant_address = stringToJString(jniAttacher.get(), stream->getParticipantAddress());
-    		jniAttacher.get()->CallVoidMethod(*j_observer_global_, j_video_added_for_participant_id, j_participant_address);
+    	jstring j_participant_address =
+    			stringToJString(jniAttacher.get(), stream->getParticipantAddress());
+    	jniAttacher.get()->CallVoidMethod(
+    			*j_observer_global_, j_video_added_for_participant_id, j_participant_address);
 	}
 
 	virtual void onMediaStreamDidRemove(TSCMediaStreamInfoObject* stream) {
@@ -117,6 +142,7 @@ private:
 				*j_trackinfo_class_, j_trackinfo_ctor_id_,
 				j_participant_address, j_track_id, j_origin);
 	}
+
 
 	jstring stringToJString(JNIEnv* env, const std::string& nativeString) {
 		return env->NewStringUTF(nativeString.c_str());
