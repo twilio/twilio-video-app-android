@@ -3,9 +3,7 @@ package com.twilio.rtc.conversations.sdktests;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
-import com.twilio.signal.TwilioRTC;
-
-public class TwilioActivity extends AppCompatActivity implements TwilioRTC.InitListener {
+public class TwilioRTCInitActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -14,13 +12,4 @@ public class TwilioActivity extends AppCompatActivity implements TwilioRTC.InitL
 
     }
 
-    @Override
-    public void onInitialized() {
-
-    }
-
-    @Override
-    public void onError(Exception e) {
-
-    }
 }

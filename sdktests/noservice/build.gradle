@@ -4,7 +4,7 @@ apply from: "../common.gradle"
 android {
 
     defaultConfig {
-        applicationId "com.twilio.rtc.conversations.sdktests"
+        applicationId "com.twilio.rtc.conversations.noservice"
     }
 
 }
@@ -12,4 +12,5 @@ android {
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     compile 'com.android.support:appcompat-v7:23.0.1'
+
 }

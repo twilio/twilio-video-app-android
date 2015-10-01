@@ -1,14 +1,14 @@
-package com.twilio.rtc.conversations.sdktests;
-
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+package com.twilio.rtc.conversations.noservice;
 
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
 import android.support.test.runner.AndroidJUnitRunner;
 
 import com.twilio.signal.TwilioRTC;
+
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.runner.RunWith;
 
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
@@ -18,7 +18,7 @@ import java.util.concurrent.TimeUnit;
  * This class uses the JUnit4 syntax for tests.
  */
 @RunWith(AndroidJUnit4.class)
-public class TwilioActivityManifestServiceTest {
+public class TwilioActivityNoServiceTest {
 
     private static int TIMEOUT = 10;
 
