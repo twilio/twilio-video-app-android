@@ -8,13 +8,13 @@ interface SessionObserver {
 
 	void onConnectParticipant(String participant, CoreError error);
 
-	void onFailToConnectParticipant(String participant, int error, String errorMessage);
+	//void onFailToConnectParticipant(String participant, int error, String errorMessage);
 
-	void onDisconnectParticipant(String participant);
+	void onDisconnectParticipant(String participant, int reason);
 
-	void onVideoAddedForParticipant(String participant);
+	void onMediaStreamAdded(String participant);
 
-	void onVideoRemovedForParticipant(String participant);
+	void onMediaStreamRemoved(String participant);
 
 	void onLocalStatusChanged(Conversation.Status status);
 

@@ -149,6 +149,7 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 		});
 	}
 
+	/*
 	@Override
 	public void onFailToConnectParticipant(final String participant, final int error, final String errorMessage) {
 		activity.runOnUiThread(new Runnable() {
@@ -157,10 +158,10 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 				conversationListener.onFailToConnectParticipant(ConversationImpl.this, new ParticipantImpl(participant), error, errorMessage);
 			}
 		});
-	}
+	}*/
 
 	@Override
-	public void onDisconnectParticipant(final String participantAddress) {
+	public void onDisconnectParticipant(final String participantAddress, final int reason) {
 		final ParticipantImpl participant = participantMap.remove(participantAddress);
 		if(participant == null) {
 			logger.i("participant removed but was never in list");
@@ -175,12 +176,12 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 	}
 
 	@Override
-	public void onVideoAddedForParticipant(String participantAddress) {
+	public void onMediaStreamAdded(String participantAddress) {
 
 	}
 
 	@Override
-	public void onVideoRemovedForParticipant(String participantAddress) {
+	public void onMediaStreamRemoved(String participantAddress) {
 
 	}
 
