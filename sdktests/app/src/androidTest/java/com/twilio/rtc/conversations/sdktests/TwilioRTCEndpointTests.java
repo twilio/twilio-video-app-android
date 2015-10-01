@@ -7,7 +7,6 @@ import org.junit.runner.RunWith;
 import android.content.Context;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
-import android.support.test.runner.AndroidJUnitRunner;
 
 import com.twilio.signal.Endpoint;
 import com.twilio.signal.EndpointListener;
@@ -19,7 +18,7 @@ import java.util.concurrent.TimeUnit;
 
 
 @RunWith(AndroidJUnit4.class)
-public class TwilioRTCInitTest {
+public class TwilioRTCEndpointTests {
 
     /*
      * TwilioRTC is a singleton and can only be initialized once. As a result we must track
@@ -30,8 +29,8 @@ public class TwilioRTCInitTest {
     private static int TIMEOUT = 10;
 
     @Rule
-    public ActivityTestRule<TwilioRTCInitActivity> mActivityRule = new ActivityTestRule<>(
-            TwilioRTCInitActivity.class);
+    public ActivityTestRule<TwilioRTCEndpointActivity> mActivityRule = new ActivityTestRule<>(
+            TwilioRTCEndpointActivity.class);
 
     @Test
     public void testTwilioInitialize() {
@@ -98,7 +97,7 @@ public class TwilioRTCInitTest {
     }
 
     @Test
-    public void testTwilioCreateEndpointWithGarbageToken() {
+    public void testTwilioCreateEndpointWithInvalidToken() {
         CountDownLatch waitLatch = new CountDownLatch(1);
         initialize(mActivityRule.getActivity(), initListener(waitLatch));
         wait(waitLatch, TIMEOUT, TimeUnit.SECONDS);
