@@ -138,7 +138,7 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 	 */
 
 	@Override
-	public void onConnectParticipant(String participantAddress) {
+	public void onConnectParticipant(String participantAddress, CoreError error) {
 		logger.i("onConnectParticipant " + participantAddress);
 		final ParticipantImpl participant = retrieveParticipant(participantAddress);
 		activity.runOnUiThread(new Runnable() {

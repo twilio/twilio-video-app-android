@@ -1,11 +1,12 @@
 package com.twilio.signal.impl;
 
-import com.twilio.signal.Conversation;
 import org.webrtc.VideoTrack;
+
+import com.twilio.signal.Conversation;
 
 interface SessionObserver {
 
-	void onConnectParticipant(String participant);
+	void onConnectParticipant(String participant, CoreError error);
 
 	void onFailToConnectParticipant(String participant, int error, String errorMessage);
 

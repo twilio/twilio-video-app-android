@@ -20,7 +20,7 @@ class SessionObserverInternalWrapper : public TSCSessionObserverObject {
 public:
 	SessionObserverInternalWrapper(JNIEnv* jni, jobject obj, jobject j_observer, jobject conversation) :
 		j_participant_did_connect_id(
-				tw_jni_get_method(jni, j_observer, "onConnectParticipant", "(Ljava/lang/String;)V")),
+				tw_jni_get_method(jni, j_observer, "onConnectParticipant", "(Ljava/lang/String;Lcom/twilio/signal/impl/CoreError;)V")),
 		j_participant_fail_connect_id(
 				tw_jni_get_method(jni, j_observer, "onFailToConnectParticipant", "(Ljava/lang/String;ILjava/lang/String;)V")),
 		j_participant_disconnect_id(
@@ -52,7 +52,12 @@ public:
 		j_observer_global_(
 				jni, j_observer),
 		j_observer_class_(
-				jni, jni->GetObjectClass(*j_observer_global_)) {}
+				jni, jni->GetObjectClass(*j_observer_global_)),
+		j_errorimpl_class_(
+				jni, FindClass(jni, "com/twilio/signal/impl/CoreErrorImpl")),
+		j_errorimpl_ctor_id_(
+				GetMethodID( jni, *j_errorimpl_class_, "<init>", "(Ljava/lang/String;ILjava/lang/String;)V"))
+		{}
 
 protected:
 	virtual void onDidReceiveEvent(const TSCEventObjectRef& event) {
@@ -76,8 +81,9 @@ protected:
 	    JNIEnvAttacher jniAttacher;
     	jstring j_participant_address =
     			stringToJString(jniAttacher.get(), participant->getAddress());
+    	jobject j_error_obj = errorToJavaCoreErrorImpl(error.get());
     	jniAttacher.get()->CallVoidMethod(
-    			*j_observer_global_, j_participant_did_connect_id, j_participant_address);
+    			*j_observer_global_, j_participant_did_connect_id, j_participant_address, j_error_obj);
 	}
 
 	virtual void onParticipantDidDisconect(const TSCParticipantObjectRef& participant,
@@ -143,6 +149,20 @@ private:
 				j_participant_address, j_track_id, j_origin);
 	}
 
+	// Return a ErrorImpl
+	jobject errorToJavaCoreErrorImpl(const TSCErrorObjectRef& error) {
+		JNIEnvAttacher jniAttacher;
+		if (!error) {
+			return NULL;
+		}
+		jstring j_domain = stringToJString(jniAttacher.get(), error->getDomain());
+		jint j_error_id = (jint)error->getCode();
+		jstring j_message = stringToJString(jniAttacher.get(), error->getMessage());
+		return jniAttacher.get()->NewObject(
+				*j_errorimpl_class_, j_errorimpl_ctor_id_,
+				j_domain, j_error_id, j_message);
+	}
+
 
 	jstring stringToJString(JNIEnv* env, const std::string& nativeString) {
 		return env->NewStringUTF(nativeString.c_str());
@@ -165,6 +185,8 @@ private:
 	const jmethodID j_local_status_changed_id;
 	const jmethodID j_conversation_ended_id;
 	const jmethodID j_conversation_ended_id2;
+	const ScopedGlobalRef<jclass> j_errorimpl_class_;
+	const jmethodID j_errorimpl_ctor_id_;
 };
 
 
