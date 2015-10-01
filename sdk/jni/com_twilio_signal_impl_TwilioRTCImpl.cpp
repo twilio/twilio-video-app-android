@@ -12,7 +12,7 @@
 #include "webrtc/modules/video_render/video_render_internal.h"
 
 #include "webrtc/modules/audio_device/android/audio_manager.h"
-#include "webrtc/modules/audio_device/android/opensles_output.h"
+#include "webrtc/modules/audio_device/android/opensles_player.h"
 #include "webrtc/modules/video_capture/android/device_info_android.h"
 
 #include <string.h>
@@ -49,8 +49,8 @@ JNIEXPORT jboolean JNICALL Java_com_twilio_signal_impl_TwilioRTCImpl_initCore(JN
 	TSCSDK* tscSdk = TSCSDK::instance();
 
 	webrtc::videocapturemodule::DeviceInfoAndroid::Initialize(env);
-	webrtc::AudioManager::SetAndroidAudioDeviceObjects(cachedJVM, context);
-	webrtc::OpenSlesOutput::SetAndroidAudioDeviceObjects(cachedJVM, context);
+
+	webrtc::OpenSLESPlayer::SetAndroidAudioDeviceObjects(cachedJVM, context);
 
 	failure |= webrtc::SetCaptureAndroidVM(cachedJVM, context);
 	failure |= webrtc::SetRenderAndroidVM(cachedJVM);
