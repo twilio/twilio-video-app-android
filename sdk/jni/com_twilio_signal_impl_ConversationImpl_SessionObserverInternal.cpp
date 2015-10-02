@@ -25,9 +25,9 @@ public:
 		j_participant_disconnect_id(
 				tw_jni_get_method(jni, j_observer, "onDisconnectParticipant", "(Ljava/lang/String;Lcom/twilio/signal/impl/core/DisconnectReason;)V")),
 		j_media_stream_add_id(
-				tw_jni_get_method(jni, j_observer, "onMediaStreamAdded", "(Ljava/lang/String;)V")),
+				tw_jni_get_method(jni, j_observer, "onMediaStreamAdded", "(Lcom/twilio/signal/impl/core/MediaStreamInfo;)V")),
 		j_media_stream_remove_id(
-				tw_jni_get_method(jni, j_observer, "onMediaStreamRemoved", "(Ljava/lang/String;)V")),
+				tw_jni_get_method(jni, j_observer, "onMediaStreamRemoved", "(Lcom/twilio/signal/impl/core/MediaStreamInfo;)V")),
 		j_local_status_changed_id(
 				tw_jni_get_method(jni, j_observer, "onLocalStatusChanged", "(Lcom/twilio/signal/impl/core/SessionState;)V")),
 		j_conversation_ended_id(
@@ -63,7 +63,13 @@ public:
 		j_stop_completed_id(
 				tw_jni_get_method(jni, j_observer, "onStopCompleted", "(Lcom/twilio/signal/impl/CoreError;)V")),
 		j_disreason_enum_(
-				jni, FindClass(jni, "com/twilio/signal/impl/core/DisconnectReason"))
+				jni, FindClass(jni, "com/twilio/signal/impl/core/DisconnectReason")),
+		j_media_stream_info_class_(
+				jni, FindClass(jni, "com/twilio/signal/impl/core/MediaStreamInfoImpl")),
+		j_media_stream_info_ctor_(
+				GetMethodID( jni, *j_media_stream_info_class_, "<init>", "(IILjava/lang/String;)V"))
+
+
 		{}
 
 protected:
@@ -121,7 +127,6 @@ protected:
 		jobject j_reason = webrtc_jni::JavaEnumFromIndex(
 						jniAttacher.get(), *j_disreason_enum_, dis_reason_class, reason);
 
-		//jint j_reason = (jint)reason;
 		jniAttacher.get()->CallVoidMethod(
 				*j_observer_global_, j_participant_disconnect_id, j_participant_address, j_reason);
 	}
@@ -130,20 +135,18 @@ protected:
 		TS_CORE_LOG_DEBUG("onMediaStreamDidAdd");
 	    JNIEnvAttacher jniAttacher;
 
-    	jstring j_participant_address =
-    			stringToJString(jniAttacher.get(), stream->getParticipantAddress());
+	    jobject j_media_info = mediaStrInfoJavaMediaStrInfoImpl(stream);
     	jniAttacher.get()->CallVoidMethod(
-    			*j_observer_global_, j_media_stream_add_id, j_participant_address);
+    			*j_observer_global_, j_media_stream_add_id, j_media_info);
 	}
 
 	virtual void onMediaStreamDidRemove(TSCMediaStreamInfoObject* stream) {
 		TS_CORE_LOG_DEBUG("onMediaStreamDidRemove");
 		JNIEnvAttacher jniAttacher;
 
-		jstring j_participant_address =
-				stringToJString(jniAttacher.get(), stream->getParticipantAddress());
+		jobject j_media_info = mediaStrInfoJavaMediaStrInfoImpl(stream);
 		jniAttacher.get()->CallVoidMethod(
-				*j_observer_global_, j_media_stream_remove_id, j_participant_address);
+				*j_observer_global_, j_media_stream_remove_id, j_media_info);
 	}
 
 
@@ -199,6 +202,20 @@ private:
 				j_domain, j_error_id, j_message);
 	}
 
+	// Return a MediaStreamInfoImpl
+	jobject mediaStrInfoJavaMediaStrInfoImpl(const TSCMediaStreamInfoObjectRef& stream) {
+		JNIEnvAttacher jniAttacher;
+		if (!stream) {
+			return NULL;
+		}
+		jstring j_address = stringToJString(jniAttacher.get(), stream->getParticipantAddress());
+		jint j_streamId = (jint)stream->getStreamId();
+		jint j_sessionId = (jint)stream->getSessionId();
+		return jniAttacher.get()->NewObject(
+				*j_media_stream_info_class_, j_media_stream_info_ctor_,
+				j_sessionId, j_streamId, j_address);
+	}
+
 
 	jstring stringToJString(JNIEnv* env, const std::string& nativeString) {
 		return env->NewStringUTF(nativeString.c_str());
@@ -227,6 +244,8 @@ private:
 	const jmethodID j_start_completed_id;
 	const jmethodID j_stop_completed_id;
 	const ScopedGlobalRef<jclass> j_disreason_enum_;
+	const ScopedGlobalRef<jclass> j_media_stream_info_class_;
+	const jmethodID j_media_stream_info_ctor_;
 };
 
 

@@ -15,6 +15,7 @@ import com.twilio.signal.TrackOrigin;
 import com.twilio.signal.VideoTrack;
 import com.twilio.signal.VideoViewRenderer;
 import com.twilio.signal.impl.core.DisconnectReason;
+import com.twilio.signal.impl.core.MediaStreamInfo;
 import com.twilio.signal.impl.core.SessionState;
 import com.twilio.signal.impl.logging.Logger;
 
@@ -189,13 +190,13 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 	}
 
 	@Override
-	public void onMediaStreamAdded(String participantAddress) {
-
+	public void onMediaStreamAdded(MediaStreamInfo stream) {
+		logger.i("onMediaStreamAdded");
 	}
 
 	@Override
-	public void onMediaStreamRemoved(String participantAddress) {
-
+	public void onMediaStreamRemoved(MediaStreamInfo stream) {
+		logger.i("onMediaStreamRemoved");
 	}
 
 	@Override

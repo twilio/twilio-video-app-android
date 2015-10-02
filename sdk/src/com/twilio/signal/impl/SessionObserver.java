@@ -3,6 +3,7 @@ package com.twilio.signal.impl;
 import org.webrtc.VideoTrack;
 
 import com.twilio.signal.impl.core.DisconnectReason;
+import com.twilio.signal.impl.core.MediaStreamInfo;
 import com.twilio.signal.impl.core.SessionState;
 
 interface SessionObserver {
@@ -17,9 +18,9 @@ interface SessionObserver {
 
 	void onDisconnectParticipant(String participant, DisconnectReason reason);
 
-	void onMediaStreamAdded(String participant);
+	void onMediaStreamAdded(MediaStreamInfo stream);
 
-	void onMediaStreamRemoved(String participant);
+	void onMediaStreamRemoved(MediaStreamInfo stream);
 
 	void onLocalStatusChanged(SessionState status);
 
