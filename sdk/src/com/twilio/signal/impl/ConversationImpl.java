@@ -14,6 +14,7 @@ import com.twilio.signal.Media;
 import com.twilio.signal.TrackOrigin;
 import com.twilio.signal.VideoTrack;
 import com.twilio.signal.VideoViewRenderer;
+import com.twilio.signal.impl.core.SessionState;
 import com.twilio.signal.impl.logging.Logger;
 
 public class ConversationImpl implements Conversation, NativeHandleInterface, SessionObserver {
@@ -186,11 +187,13 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 	}
 
 	@Override
-	public void onLocalStatusChanged(final Status status) {
+	public void onLocalStatusChanged(final SessionState status) {
+		logger.i("state changed to:"+status.name());
+		
 		activity.runOnUiThread(new Runnable() {
 			@Override
 			public void run() {
-				conversationListener.onLocalStatusChanged(ConversationImpl.this, status);
+				//conversationListener.onLocalStatusChanged(ConversationImpl.this, status);
 			}
 		});
 	}

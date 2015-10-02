@@ -4,6 +4,7 @@
 #include "talk/app/webrtc/mediastreaminterface.h"
 
 #include "com_twilio_signal_impl_ConversationImpl_SessionObserverInternal.h"
+
 #include "TSCoreSDKTypes.h"
 #include "TSCoreError.h"
 #include "TSCSession.h"
@@ -28,7 +29,7 @@ public:
 		j_media_stream_remove_id(
 				tw_jni_get_method(jni, j_observer, "onMediaStreamRemoved", "(Ljava/lang/String;)V")),
 		j_local_status_changed_id(
-				tw_jni_get_method(jni, j_observer, "onLocalStatusChanged", "(Lcom/twilio/signal/Conversation$Status;)V")),
+				tw_jni_get_method(jni, j_observer, "onLocalStatusChanged", "(Lcom/twilio/signal/impl/core/SessionState;)V")),
 		j_conversation_ended_id(
 				tw_jni_get_method(jni, j_observer, "onConversationEnded", "()V")),
 		j_conversation_ended_id2(
@@ -41,6 +42,8 @@ public:
 				jni, FindClass(jni, "com/twilio/signal/impl/TrackInfoImpl")),
 		j_trackorigin_class_(
 				jni, FindClass(jni, "com/twilio/signal/TrackOrigin")),
+		j_sessionstate_enum_(
+				jni, FindClass(jni, "com/twilio/signal/impl/core/SessionState")),
 		j_trackinfo_ctor_id_(
 				GetMethodID(jni, *j_trackinfo_class_, "<init>", "(Ljava/lang/String;Ljava/lang/String;Lcom/twilio/signal/TrackOrigin;)V")),
 		j_video_track_class_(
@@ -64,6 +67,12 @@ protected:
 
 	virtual void onStateDidChange(TSCSessionState state) {
 		TS_CORE_LOG_DEBUG("onStateDidChange");
+		JNIEnvAttacher jniAttacher;
+
+		const std::string session_state_class = "com/twilio/signal/impl/core/SessionState";
+		jobject j_session_state = webrtc_jni::JavaEnumFromIndex(jniAttacher.get(), *j_sessionstate_enum_, session_state_class, state);
+
+		jniAttacher.get()->CallVoidMethod(*j_observer_global_, j_local_status_changed_id, j_session_state);
 	}
 
 	virtual void onStartDidComplete(const TSCErrorObjectRef& error) {
@@ -185,6 +194,7 @@ private:
 
 	const ScopedGlobalRef<jclass> j_trackinfo_class_;
 	const ScopedGlobalRef<jclass> j_trackorigin_class_;
+	const ScopedGlobalRef<jclass> j_sessionstate_enum_;
 	const jmethodID j_trackinfo_ctor_id_;
 	const ScopedGlobalRef<jclass> j_video_track_class_;
 	const jmethodID j_video_track_ctor_;

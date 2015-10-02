@@ -2,10 +2,10 @@ package com.twilio.signal.impl;
 
 import org.webrtc.VideoTrack;
 
-import com.twilio.signal.Conversation;
+import com.twilio.signal.impl.core.SessionState;
 
 interface SessionObserver {
-
+	
 	void onConnectParticipant(String participant, CoreError error);
 
 	//void onFailToConnectParticipant(String participant, int error, String errorMessage);
@@ -16,7 +16,7 @@ interface SessionObserver {
 
 	void onMediaStreamRemoved(String participant);
 
-	void onLocalStatusChanged(Conversation.Status status);
+	void onLocalStatusChanged(SessionState status);
 
 	void onConversationEnded();
 
