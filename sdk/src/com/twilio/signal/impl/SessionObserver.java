@@ -2,6 +2,7 @@ package com.twilio.signal.impl;
 
 import org.webrtc.VideoTrack;
 
+import com.twilio.signal.impl.core.DisconnectReason;
 import com.twilio.signal.impl.core.SessionState;
 
 interface SessionObserver {
@@ -14,7 +15,7 @@ interface SessionObserver {
 
 	//void onFailToConnectParticipant(String participant, int error, String errorMessage);
 
-	void onDisconnectParticipant(String participant, int reason);
+	void onDisconnectParticipant(String participant, DisconnectReason reason);
 
 	void onMediaStreamAdded(String participant);
 

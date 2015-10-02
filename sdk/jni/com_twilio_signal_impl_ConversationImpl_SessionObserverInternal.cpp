@@ -23,7 +23,7 @@ public:
 	    j_participant_did_connect_id(
 				tw_jni_get_method(jni, j_observer, "onConnectParticipant", "(Ljava/lang/String;Lcom/twilio/signal/impl/CoreError;)V")),
 		j_participant_disconnect_id(
-				tw_jni_get_method(jni, j_observer, "onDisconnectParticipant", "(Ljava/lang/String;I)V")),
+				tw_jni_get_method(jni, j_observer, "onDisconnectParticipant", "(Ljava/lang/String;Lcom/twilio/signal/impl/core/DisconnectReason;)V")),
 		j_media_stream_add_id(
 				tw_jni_get_method(jni, j_observer, "onMediaStreamAdded", "(Ljava/lang/String;)V")),
 		j_media_stream_remove_id(
@@ -61,7 +61,9 @@ public:
 		j_start_completed_id(
 				tw_jni_get_method(jni, j_observer, "onStartCompleted", "(Lcom/twilio/signal/impl/CoreError;)V")),
 		j_stop_completed_id(
-				tw_jni_get_method(jni, j_observer, "onStopCompleted", "(Lcom/twilio/signal/impl/CoreError;)V"))
+				tw_jni_get_method(jni, j_observer, "onStopCompleted", "(Lcom/twilio/signal/impl/CoreError;)V")),
+		j_disreason_enum_(
+				jni, FindClass(jni, "com/twilio/signal/impl/core/DisconnectReason"))
 		{}
 
 protected:
@@ -74,9 +76,11 @@ protected:
 		JNIEnvAttacher jniAttacher;
 
 		const std::string session_state_class = "com/twilio/signal/impl/core/SessionState";
-		jobject j_session_state = webrtc_jni::JavaEnumFromIndex(jniAttacher.get(), *j_sessionstate_enum_, session_state_class, state);
+		jobject j_session_state = webrtc_jni::JavaEnumFromIndex(
+				jniAttacher.get(), *j_sessionstate_enum_, session_state_class, state);
 
-		jniAttacher.get()->CallVoidMethod(*j_observer_global_, j_local_status_changed_id, j_session_state);
+		jniAttacher.get()->CallVoidMethod(
+				*j_observer_global_, j_local_status_changed_id, j_session_state);
 	}
 
 	virtual void onStartDidComplete(const TSCErrorObjectRef& error) {
@@ -111,7 +115,13 @@ protected:
 		JNIEnvAttacher jniAttacher;
 		jstring j_participant_address =
 				stringToJString(jniAttacher.get(), participant->getAddress());
-		jint j_reason = (jint)reason;
+
+		const std::string dis_reason_class =
+				"com/twilio/signal/impl/core/DisconnectReason";
+		jobject j_reason = webrtc_jni::JavaEnumFromIndex(
+						jniAttacher.get(), *j_disreason_enum_, dis_reason_class, reason);
+
+		//jint j_reason = (jint)reason;
 		jniAttacher.get()->CallVoidMethod(
 				*j_observer_global_, j_participant_disconnect_id, j_participant_address, j_reason);
 	}
@@ -216,6 +226,7 @@ private:
 	const jmethodID j_errorimpl_ctor_id_;
 	const jmethodID j_start_completed_id;
 	const jmethodID j_stop_completed_id;
+	const ScopedGlobalRef<jclass> j_disreason_enum_;
 };
 
 

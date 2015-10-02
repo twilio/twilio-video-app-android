@@ -14,6 +14,7 @@ import com.twilio.signal.Media;
 import com.twilio.signal.TrackOrigin;
 import com.twilio.signal.VideoTrack;
 import com.twilio.signal.VideoViewRenderer;
+import com.twilio.signal.impl.core.DisconnectReason;
 import com.twilio.signal.impl.core.SessionState;
 import com.twilio.signal.impl.logging.Logger;
 
@@ -173,7 +174,7 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 	}*/
 
 	@Override
-	public void onDisconnectParticipant(final String participantAddress, final int reason) {
+	public void onDisconnectParticipant(final String participantAddress, final DisconnectReason reason) {
 		final ParticipantImpl participant = participantMap.remove(participantAddress);
 		if(participant == null) {
 			logger.i("participant removed but was never in list");
