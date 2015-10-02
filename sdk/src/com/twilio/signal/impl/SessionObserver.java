@@ -6,6 +6,10 @@ import com.twilio.signal.impl.core.SessionState;
 
 interface SessionObserver {
 	
+	void onStartCompleted(CoreError error);
+	
+	void onStopCompleted(CoreError error);
+	
 	void onConnectParticipant(String participant, CoreError error);
 
 	//void onFailToConnectParticipant(String participant, int error, String errorMessage);
@@ -25,6 +29,8 @@ interface SessionObserver {
 	void onVideoTrackAdded(TrackInfo trackInfo, VideoTrack videoTrack);
 
 	void onVideoTrackRemoved(TrackInfo trackInfo);
+	
+	//void onReceiveSessionStatistics();
 
 }
 

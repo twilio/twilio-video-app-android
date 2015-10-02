@@ -139,6 +139,17 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 	 */
 
 	@Override
+	public void onStartCompleted(CoreError error) {
+		logger.i("onStartCompleted");
+		
+	}
+
+	@Override
+	public void onStopCompleted(CoreError error) {
+		logger.i("onStartCompleted");
+	}
+
+	@Override
 	public void onConnectParticipant(String participantAddress, CoreError error) {
 		logger.i("onConnectParticipant " + participantAddress);
 		final ParticipantImpl participant = retrieveParticipant(participantAddress);
@@ -285,4 +296,5 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 	public long getNativeHandle() {
 		return nativeHandle;
 	}
+
 }

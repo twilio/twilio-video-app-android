@@ -57,7 +57,11 @@ public:
 		j_errorimpl_class_(
 				jni, FindClass(jni, "com/twilio/signal/impl/CoreErrorImpl")),
 		j_errorimpl_ctor_id_(
-				GetMethodID( jni, *j_errorimpl_class_, "<init>", "(Ljava/lang/String;ILjava/lang/String;)V"))
+				GetMethodID( jni, *j_errorimpl_class_, "<init>", "(Ljava/lang/String;ILjava/lang/String;)V")),
+		j_start_completed_id(
+				tw_jni_get_method(jni, j_observer, "onStartCompleted", "(Lcom/twilio/signal/impl/CoreError;)V")),
+		j_stop_completed_id(
+				tw_jni_get_method(jni, j_observer, "onStopCompleted", "(Lcom/twilio/signal/impl/CoreError;)V"))
 		{}
 
 protected:
@@ -77,9 +81,17 @@ protected:
 
 	virtual void onStartDidComplete(const TSCErrorObjectRef& error) {
 		TS_CORE_LOG_DEBUG("onStartDidComplete");
+		JNIEnvAttacher jniAttacher;
+		jobject j_error_obj = errorToJavaCoreErrorImpl(error.get());
+		jniAttacher.get()->CallVoidMethod(
+		    		*j_observer_global_, j_start_completed_id, j_error_obj);
 	}
 	virtual void onStopDidComplete(const TSCErrorObjectRef& error) {
 		TS_CORE_LOG_DEBUG("onStopDidComplete");
+		JNIEnvAttacher jniAttacher;
+		jobject j_error_obj = errorToJavaCoreErrorImpl(error.get());
+		jniAttacher.get()->CallVoidMethod(
+				    *j_observer_global_, j_stop_completed_id, j_error_obj);
 	}
 
 	virtual void onParticipantDidConnect(const TSCParticipantObjectRef& participant,
@@ -202,6 +214,8 @@ private:
 	const ScopedGlobalRef<jclass> j_observer_class_;
 	const ScopedGlobalRef<jclass> j_errorimpl_class_;
 	const jmethodID j_errorimpl_ctor_id_;
+	const jmethodID j_start_completed_id;
+	const jmethodID j_stop_completed_id;
 };
 
 
