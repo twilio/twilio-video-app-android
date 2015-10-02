@@ -1,0 +1,49 @@
+apply plugin: 'com.android.application'
+
+
+android {
+    compileSdkVersion 23
+    buildToolsVersion "22.0.1"
+
+    defaultConfig {
+        minSdkVersion 16
+        targetSdkVersion 23
+        versionCode 1
+        versionName "1.0"
+
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    sourceSets.main {
+        jni.srcDirs = [] //disable automatic ndk-build call
+        // twilio android sdk jni library
+        jniLibs.srcDir '../../sdk/libs'
+    }
+}
+
+repositories {
+    flatDir {
+        // twilio android sdk library paths
+        dirs '../../sdk/libs'
+        dirs '../../sdk/bin'
+    }
+}
+
+dependencies {
+    // twilio android sdk library dependencies
+    compile name: 'libjingle_peerconnection_java'
+    compile name: 'classes'
+
+    // Testing-only dependencies
+    androidTestCompile 'com.android.support:support-annotations:23.0.1'
+    androidTestCompile 'com.android.support.test:runner:0.4'
+    androidTestCompile 'com.android.support.test:rules:0.4'
+    androidTestCompile 'com.android.support.test.espresso:espresso-core:2.2.1'
+}
