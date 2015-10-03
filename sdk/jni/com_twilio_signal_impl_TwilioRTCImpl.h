@@ -23,6 +23,31 @@ JNIEXPORT jboolean JNICALL Java_com_twilio_signal_impl_TwilioRTCImpl_initCore
 JNIEXPORT jlong JNICALL Java_com_twilio_signal_impl_TwilioRTCImpl_createEndpoint
   (JNIEnv *, jobject, jstring, jlong);
 
+/*
+ * Class:     com_twilio_signal_impl_TwilioRTCImpl
+ * Method:    createEndpoint
+ * Signature: (Ljava/lang/String;J)J
+ */
+JNIEXPORT jlong JNICALL Java_com_twilio_signal_impl_TwilioRTCImpl_createEndpoint
+  (JNIEnv *, jobject, jstring, jlong);
+
+/*
+ * Class:     com_twilio_signal_impl_TwilioRTCImpl
+ * Method:    setCoreLogLevel 
+ * Signature: (I)J
+ */
+JNIEXPORT void JNICALL Java_com_twilio_signal_impl_TwilioRTCImpl_setCoreLogLevel
+  (JNIEnv *, jobject, jint);
+
+/*
+ * Class:     com_twilio_signal_impl_TwilioRTCImpl
+ * Method:    getCoreLogLevel 
+ * Signature: ()J
+ */
+JNIEXPORT jint JNICALL Java_com_twilio_signal_impl_TwilioRTCImpl_getCoreLogLevel
+  (JNIEnv *, jobject);
+
+
 #ifdef __cplusplus
 }
 #endif

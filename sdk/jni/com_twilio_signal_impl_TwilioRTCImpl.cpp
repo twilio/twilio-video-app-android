@@ -93,3 +93,17 @@ JNIEXPORT jlong JNICALL Java_com_twilio_signal_impl_TwilioRTCImpl_createEndpoint
 	return (jlong) endpoint.release();
 }
 
+
+JNIEXPORT void JNICALL Java_com_twilio_signal_impl_TwilioRTCImpl_setCoreLogLevel
+  (JNIEnv *env, jobject obj, jint level) {
+	TS_CORE_LOG_DEBUG("setCoreLogLevel");
+	TSCoreLogLevel coreLogLevel = static_cast<TSCoreLogLevel>(level);
+        TSCLogger::instance()->setLogLevel(coreLogLevel);
+}
+
+
+JNIEXPORT jint JNICALL Java_com_twilio_signal_impl_TwilioRTCImpl_getCoreLogLevel
+  (JNIEnv *env, jobject obj) {
+	TS_CORE_LOG_DEBUG("getCoreLogLevel");
+        return TSCLogger::instance()->getLogLevel();
+}

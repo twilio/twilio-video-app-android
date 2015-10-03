@@ -15,10 +15,11 @@ import com.twilio.signal.TwilioRTC;
 
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
+import java.util.regex.Pattern;
 
 
 @RunWith(AndroidJUnit4.class)
-public class TwilioRTCEndpointTests {
+public class TwilioRTCTests {
 
     /*
      * TwilioRTC is a singleton and can only be initialized once. As a result we must track
@@ -29,8 +30,8 @@ public class TwilioRTCEndpointTests {
     private static int TIMEOUT = 10;
 
     @Rule
-    public ActivityTestRule<TwilioRTCEndpointActivity> mActivityRule = new ActivityTestRule<>(
-            TwilioRTCEndpointActivity.class);
+    public ActivityTestRule<TwilioRTCActivity> mActivityRule = new ActivityTestRule<>(
+            TwilioRTCActivity.class);
 
     @Test
     public void testTwilioInitialize() {
@@ -77,27 +78,93 @@ public class TwilioRTCEndpointTests {
     }
 
     @Test
-    public void testTwilioCreateNullEndpoint() {
+    public void testTwilioCreateEndpointWithNullParams() {
         final CountDownLatch waitLatch = new CountDownLatch(1);
         initialize(mActivityRule.getActivity(), initListener(waitLatch));
         wait(waitLatch, TIMEOUT, TimeUnit.SECONDS);
 
-        Endpoint endpoint = TwilioRTC.createEndpoint(null,null);
-        org.junit.Assert.assertNull(endpoint);
+        boolean npeSeen = false;
+
+        try {
+            TwilioRTC.createEndpoint(null, null);
+        } catch(NullPointerException e) {
+            npeSeen = true;
+        } finally {
+            org.junit.Assert.assertTrue(npeSeen);
+            npeSeen = false;
+        }
+
+        try {
+            TwilioRTC.createEndpoint("foo", null);
+        } catch(NullPointerException e) {
+            npeSeen = true;
+        } finally {
+            org.junit.Assert.assertTrue(npeSeen);
+            npeSeen = false;
+        }
+
+        try {
+            TwilioRTC.createEndpoint(null, new EndpointListener() {
+                @Override
+                public void onStartListeningForInvites(Endpoint endpoint) {
+
+                }
+
+                @Override
+                public void onStopListeningForInvites(Endpoint endpoint) {
+
+                }
+
+                @Override
+                public void onFailedToStartListening(Endpoint endpoint, int i, String s) {
+
+                }
+
+                @Override
+                public void onReceiveConversationInvite(Endpoint endpoint, Invite invite) {
+
+                }
+            });
+        } catch(NullPointerException e) {
+            npeSeen = true;
+        } finally {
+            org.junit.Assert.assertTrue(npeSeen);
+            npeSeen = false;
+        }
+
+        try {
+            TwilioRTC.createEndpoint("foo", null, new EndpointListener() {
+                @Override
+                public void onStartListeningForInvites(Endpoint endpoint) {
+
+                }
+
+                @Override
+                public void onStopListeningForInvites(Endpoint endpoint) {
+
+                }
+
+                @Override
+                public void onFailedToStartListening(Endpoint endpoint, int i, String s) {
+
+                }
+
+                @Override
+                public void onReceiveConversationInvite(Endpoint endpoint, Invite invite) {
+
+                }
+            });
+        } catch(NullPointerException e) {
+            npeSeen = true;
+        } finally {
+            org.junit.Assert.assertTrue(npeSeen);
+            npeSeen = false;
+        }
+
     }
 
     @Test
-    public void testTwilioCreateEndpoinWithNullListener() {
-        final CountDownLatch waitLatch = new CountDownLatch(1);
-        initialize(mActivityRule.getActivity(), initListener(waitLatch));
-        wait(waitLatch, TIMEOUT, TimeUnit.SECONDS);
-
-        Endpoint endpoint = TwilioRTC.createEndpoint(null,null);
-        org.junit.Assert.assertNull(endpoint);
-    }
-
-    @Test
-    public void testTwilioCreateEndpointWithInvalidToken() {
+    public void testTwilioCreateEndpointWithToken() {
         CountDownLatch waitLatch = new CountDownLatch(1);
         initialize(mActivityRule.getActivity(), initListener(waitLatch));
         wait(waitLatch, TIMEOUT, TimeUnit.SECONDS);
@@ -127,6 +194,39 @@ public class TwilioRTCEndpointTests {
 
         wait(waitLatch, TIMEOUT, TimeUnit.SECONDS);
         org.junit.Assert.assertNotNull(endpoint);
+    }
+
+    @Test
+    public void testTwilioSetAndGetLogLevel() {
+        verifySetAndGetLogLevel(TwilioRTC.LogLevel.DEBUG);
+        verifySetAndGetLogLevel(TwilioRTC.LogLevel.DISABLED);
+        verifySetAndGetLogLevel(TwilioRTC.LogLevel.ERROR);
+        verifySetAndGetLogLevel(TwilioRTC.LogLevel.INFO);
+        verifySetAndGetLogLevel(TwilioRTC.LogLevel.VERBOSE);
+        verifySetAndGetLogLevel(TwilioRTC.LogLevel.WARNING);
+    }
+
+    private void verifySetAndGetLogLevel(int level) {
+        TwilioRTC.setLogLevel(level);
+        org.junit.Assert.assertEquals(level, TwilioRTC.getLogLevel());
+    }
+
+    @Test
+    public void testTwilioEnsureInvalidLevelSetsLevelToDisabled() {
+        int invalidLevel = 100;
+        TwilioRTC.setLogLevel(invalidLevel);
+        org.junit.Assert.assertEquals(TwilioRTC.LogLevel.DISABLED, TwilioRTC.getLogLevel());
+    }
+
+    @Test
+    public void testTwilioGetVersion() {
+        String version = TwilioRTC.getVersion();
+        org.junit.Assert.assertNotNull(version);
+    }
+
+    @Test
+    public void testTwilioVersionUsesSemanticVersioning() {
+       // TODO: get semantic version regex and validate version from SDK
     }
 
     private void initialize(Context context, TwilioRTC.InitListener initListener) {

@@ -15,106 +15,125 @@ public class TwilioRTC {
 	 */
 	public interface InitListener {
 		/**
-		 * Callback to report when TwilioRTC Client SDK has been successfully
-		 * initialized.
+		 * Callback to report when Twilio RTC Conversations Client
+		 * has been successfully initialized.
 		 */
 		public void onInitialized();
 
 		/**
-		 * Called if there is an error initializing the TwilioSignal Client SDK.
+		 * Called if there is an error initializing the Twilio RTC
+		 * Conversations Client.
 		 * 
 		 * @param error
 		 *            An exception describing the error that occurred
 		 */
-		public void onError(Exception error);
+		public void onError(Exception e);
+	}
+
+	/**
+	 * Log levels for the Twilio RTC Conversations Client 
+	 */
+	public final class LogLevel {
+		public static final int DISABLED = 0; 
+		public static final int ERROR = 3;
+		public static final int WARNING= 4;
+		public static final int INFO = 6;
+		public static final int DEBUG = 7;
+		public static final int VERBOSE = 8;
 	}
 
 	private TwilioRTC() {}
 
 	/**
-	 * Initialize the TwilioSignal Client SDK.
+	 * Initialize the Twilio RTC Conversations Client.
 	 * 
-	 * @param inContext
-	 *            The Application Context from your Android application. Make
-	 *            sure you don't pass an Activity Context. You can retrieve the
-	 *            Application Context by calling getApplicationContext() on your
-	 *            Activity. Cannot be null.
+	 * @param applicationContext
+	 *            The application context of your Android application
 	 * 
-	 * @param inListener
-	 *            A {@link TwilioRTC.InitListener} that will notify you when the
-	 *            service is ready. Cannot be null.
+	 * @param initListener
+	 *            A {@link TwilioRTC.InitListener} that will notify you
+	 *            when the service is ready
 	 * 
-	 * @throws IllegalArgumentException
+	 * @throws NullPointerException 
 	 */
-	public static void initialize(Context inContext,
-			TwilioRTC.InitListener inListener) {
-		if (inContext == null)
-		{
-			throw new IllegalArgumentException("Context cannot be null");
+	public static void initialize(Context applicationContext,
+			TwilioRTC.InitListener initListener) {
+		if (applicationContext == null) {
+			throw new NullPointerException("applicationContext must not be null");
 		}
-		
-		if ( inListener == null )
-		{
-			throw new IllegalArgumentException("Listener cannot be null");
+		if (initListener == null) {
+			throw new NullPointerException("initListener must not be null");
 		}
-		
-		TwilioRTCImpl.getInstance().initialize(inContext, inListener);
+
+		TwilioRTCImpl.getInstance().initialize(applicationContext, initListener);
 	}
 
 	/**
-	 * Gets the logging level for messages logged by the TwilioSignal SDK.
+	 * Gets the logging level for messages logged by the Twilio RTC Conversations SDK.
 	 * 
-	 * @return level - The logging level
+	 * @return the logging level
 	 */
-	public static int getLogLevel(int level) {
+	public static int getLogLevel() {
 		return TwilioRTCImpl.getInstance().getLogLevel();
 	}
-	
-	
+
 	/**
-	 * Sets the logging level for messages logged by the TwilioSignal SDK.
+	 * Sets the logging level for messages logged by the Twilio RTC Conversations SDK.
 	 * 
-	 * @param level - The logging level
+	 * @param level - the logging level
 	 */
 	public static void setLogLevel(int level) {
 		TwilioRTCImpl.getInstance().setLogLevel(level);
 	}
-		
-		
+
 	/** 
-	 * Create and initialize a new Endpoint object.
+	 * Creates a new Endpoint.
 	 * 
-	 * @param listener - listener object which will receive events from a Endpoint object.
+	 * @param listener - a listener that receive events from the Endpoint.
 	 *
-	 * @return The initialized Endpoint object, or null if the SDK was not initialized
+	 * @return the initialized Endpoint, or null if the Twilio RTC Conversations Client
+         *         was not initialized
 	 */
-	public static Endpoint createEndpoint(String token, EndpointListener listener)
-	{
+	public static Endpoint createEndpoint(String token, EndpointListener listener) {
+		if (token == null) {
+			throw new NullPointerException("token must not be null");
+		}
+		if (listener == null) {
+			throw new NullPointerException("listener must not be null");
+		}
+
 		return TwilioRTCImpl.getInstance().createEndpoint(token, new HashMap<String, String>(), listener);
 	}
 	
 	/** 
-	 * Create and initialize a new Endpoint object.
+	 * Creates a new Endpoint.
 	 * 
-	 * @param listener - listener object which will receive events from a Endpoint object.
+	 * @param listener - a listener that receive events from the Endpoint.
 	 *
-	 * @return The initialized Endpoint object, or null if the SDK was not initialized
+	 * @return the initialized Endpoint, or null if the Twilio RTC Conversations Client
+         *         was not initialized
 	 */
-	public static Endpoint createEndpoint(String token, Map<String, String> options, EndpointListener listener)
-	{
+	public static Endpoint createEndpoint(String token, Map<String, String> options, EndpointListener listener) {
+		if (token == null) {
+			throw new NullPointerException("token must not be null");
+		}
+		if (options == null) {
+			throw new NullPointerException("options must not be null");
+		}
+		if (listener == null) {
+			throw new NullPointerException("listener must not be null");
+		}
+
 		return TwilioRTCImpl.getInstance().createEndpoint(token, options, listener);
 	}
-	
-	
-	/**
-	 * Returns the version of the TwilioSignal SDK.
-	 * 
-	 *@return The version of the SDK.
-	 */
-	public static String getVersion()
-	{
-		return TwilioRTCImpl.getInstance().getVersion();
-	}
 
+	/**
+	 * Returns the version of the Twilio RTC Conversations SDK.
+	 * 
+	 * @return the version of the SDK
+	 */
+	public static String getVersion() {
+		return Version.SDK_VERSION; 
+	}
 
 }

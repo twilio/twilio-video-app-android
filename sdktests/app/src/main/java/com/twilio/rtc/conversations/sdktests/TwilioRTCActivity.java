@@ -3,7 +3,7 @@ package com.twilio.rtc.conversations.sdktests;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
-public class TwilioRTCEndpointActivity extends AppCompatActivity {
+public class TwilioRTCActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

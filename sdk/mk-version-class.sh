@@ -2,33 +2,23 @@
 
 set -e
 
-. ../scripts/functions.sh
+. ../tools/functions.sh
 
 [ "$1" ] && sdk_version=$1 || sdk_version=$(get_sdk_version)
 [ "$sdk_version" ]
 
-mkdir -p gen/com/twilio/client
+mkdir -p gen/com/twilio/signal
 
 echo "New SDK version is ${sdk_version}"
 
-cat >gen/com/twilio/client/Version.java <<EOF
-package com.twilio.client;
+cat >gen/com/twilio/signal/Version.java <<EOF
+package com.twilio.signal;
 
 public abstract class Version
 {
     /**
-     * The current version of the Twilio Client SDK.
+     * The current version of the Twilio RTC Conversations SDK.
      */
     public static final String SDK_VERSION = "${sdk_version}";
 }
 EOF
-
-#cat >external/signal-sdk-core/TwilioCoreSDK/TwilioCoreSDK/Sources/Core/TSCVersion.h <<EOF
-#/* this file is auto-generated; do not edit! */
-
-#ifdef DEBUG
-#define TSC_CORE_SDK_VERSION "${sdk_version}"
-#else
-#define TSC_CORE_SDK_VERSION "${sdk_version}"
-#endif
-#EOF
