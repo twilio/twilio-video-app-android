@@ -5,7 +5,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import android.content.Context;
-import android.media.AudioManager;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
 
@@ -17,7 +16,6 @@ import com.twilio.signal.TwilioRTC;
 import java.util.HashMap;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
-import java.util.regex.Pattern;
 
 
 @RunWith(AndroidJUnit4.class)
@@ -27,7 +25,7 @@ public class TwilioRTCTests {
      * TwilioRTC is a singleton and can only be initialized once. As a result we must track
      * if TwilioRTC has ever been initialized.
      */
-    private static boolean INITIALIZED = false;
+    private static boolean initialized = false;
 
     private static int TIMEOUT = 10;
 
@@ -45,14 +43,11 @@ public class TwilioRTCTests {
     @Test
     public void testTwilioInitializeRepeatedly() {
         int attempts = 10;
-        final CountDownLatch initLatch = INITIALIZED ? new CountDownLatch(0) : new CountDownLatch(1);
-        final CountDownLatch errorLatch = INITIALIZED ? new CountDownLatch(attempts) : new CountDownLatch(attempts - 1);
+        final CountDownLatch initLatch = initialized ? new CountDownLatch(0) : new CountDownLatch(1);
+        final CountDownLatch errorLatch = initialized ? new CountDownLatch(attempts) : new CountDownLatch(attempts - 1);
 
         for(int i = 0; i < attempts; i++) {
             TwilioRTC.initialize(mActivityRule.getActivity(), countDownInitListenerCallback(initLatch, errorLatch));
-            if(!INITIALIZED) {
-                INITIALIZED = true;
-            }
         }
 
         try {
@@ -69,6 +64,7 @@ public class TwilioRTCTests {
             @Override
             public void onInitialized() {
                 initCountDownLatch.countDown();
+                initialized = true;
             }
 
             @Override
@@ -218,25 +214,23 @@ public class TwilioRTCTests {
 
     private void initialize(Context context, TwilioRTC.InitListener initListener) {
         TwilioRTC.initialize(context, initListener);
-        if(!INITIALIZED) {
-            INITIALIZED = true;
-        }
     }
 
     private TwilioRTC.InitListener initListener(final CountDownLatch wait) {
         return new TwilioRTC.InitListener() {
             @Override
             public void onInitialized() {
-                if(INITIALIZED) {
-                    org.junit.Assert.fail("initialized but initialize was called");
-                } else {
+                if(!initialized) {
+                    initialized = true;
                     wait.countDown();
+                } else {
+                    org.junit.Assert.fail("initalized but initialize was already called");
                 }
             }
 
             @Override
             public void onError(Exception e) {
-                if(!INITIALIZED) {
+                if(!initialized) {
                     org.junit.Assert.fail(e.getMessage());
                 } else {
                     wait.countDown();
