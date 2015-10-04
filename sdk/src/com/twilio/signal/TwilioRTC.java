@@ -74,7 +74,7 @@ public class TwilioRTC {
 	 * @return the logging level
 	 */
 	public static int getLogLevel() {
-		return TwilioRTCImpl.getInstance().getLogLevel();
+		return TwilioRTCImpl.getLogLevel();
 	}
 
 	/**
@@ -83,7 +83,7 @@ public class TwilioRTC {
 	 * @param level - the logging level
 	 */
 	public static void setLogLevel(int level) {
-		TwilioRTCImpl.getInstance().setLogLevel(level);
+		TwilioRTCImpl.setLogLevel(level);
 	}
 
 	/** 
@@ -125,6 +125,13 @@ public class TwilioRTC {
 		}
 
 		return TwilioRTCImpl.getInstance().createEndpoint(token, options, listener);
+	}
+
+	/**
+	 * Turn the speakerphone on or off.
+	 */
+	public static void setSpeakerphoneOn(boolean on, Context context) {
+		TwilioRTCImpl.setSpeakerphoneOn(on, context);
 	}
 
 	/**

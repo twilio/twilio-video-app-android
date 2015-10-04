@@ -5,6 +5,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import android.content.Context;
+import android.media.AudioManager;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
 
@@ -219,6 +220,11 @@ public class TwilioRTCTests {
     }
 
     @Test
+    public void testTwilioEnsureLogLevelSetBeforeAndAfterInit() {
+        // TODO: implement me
+    }
+
+    @Test
     public void testTwilioGetVersion() {
         String version = TwilioRTC.getVersion();
         org.junit.Assert.assertNotNull(version);
@@ -229,6 +235,16 @@ public class TwilioRTCTests {
         String semVerRegex = "^([0-9]+)\\.([0-9]+)\\.([0-9]+)(?:-([0-9A-Za-z-]+(?:\\.[0-9A-Za-z-]+)*))?(?:\\+[0-9A-Za-z-]+)?$";
         String version = TwilioRTC.getVersion();
         org.junit.Assert.assertTrue(version.matches(semVerRegex));
+    }
+
+    @Test
+    public void testSetSpeakerphoneOff() {
+        // TODO: validate speakerphone is off
+    }
+
+    @Test
+    public void testSetSpeakerphoneOn() {
+        // TODO: validate speakerphone is on
     }
 
     private void initialize(Context context, TwilioRTC.InitListener initListener) {

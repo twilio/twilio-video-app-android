@@ -16,6 +16,7 @@ import android.content.pm.PackageManager;
 import android.content.pm.ServiceInfo;
 import android.os.IBinder;
 import android.util.Log;
+import android.media.AudioManager;
 
 import com.twilio.signal.EndpointListener;
 import com.twilio.signal.TwilioRTC;
@@ -36,11 +37,11 @@ public class TwilioRTCImpl {
 	private static final String TWILIO_SIGNAL_SERVICE_NAME = "com.twilio.signal.TwilioRTCService";
 
 	private static volatile TwilioRTCImpl instance;
+	private static int level = 0;
 	protected Context context;
 	private boolean sdkInited;
 	private boolean sdkIniting;
 	private ServiceConnection serviceConn;
-	private LogLevel level;
 
 	protected TwilioBinder twBinder;
 
@@ -60,6 +61,11 @@ public class TwilioRTCImpl {
 				if (instance == null)
 					instance = new TwilioRTCImpl();
 			}
+		}
+
+		if(level != 0) {
+			// Re-apply the log level. Initialization sets a default log level.
+			setLogLevel(level);
 		}
 
 		return instance;
@@ -206,7 +212,7 @@ public class TwilioRTCImpl {
 		return null;
 	}
 
-	public void setLogLevel(int level) {
+	public static void setLogLevel(int level) {
 		boolean validLevel = true;
 		/*
 		 * The Twilio RTC Log Levels are defined differently in the Twilio Logger
@@ -232,20 +238,18 @@ public class TwilioRTCImpl {
 				Logger.setLogLevel(Log.VERBOSE);
 				break;
 			default:
-				// Set the log level to highest level if it is unknown 
+				// Set the log level to assert/disabled if the value passed in is unknown
 				Logger.setLogLevel(Log.ASSERT);
-				validLevel = false;
+				level = TwilioRTC.LogLevel.DISABLED;
 				break;
 		}
-		if(validLevel) {
-			setCoreLogLevel(level);
-		} else {
-			setCoreLogLevel(TwilioRTC.LogLevel.DISABLED);
-		}
+		setCoreLogLevel(level);
+		// Save the log level
+		TwilioRTCImpl.level = level;
 	}
 
-	public String getVersion() {
-		return  null; //Version.SDK_VERSION;;
+	public static int getLogLevel() {
+		return getCoreLogLevel();
 	}
 
 	public boolean isInitialized() {
@@ -280,13 +284,19 @@ public class TwilioRTCImpl {
         	return null;
 	}
 
-	public int getLogLevel() {
-		return getCoreLogLevel(); 
+	public static void setSpeakerphoneOn(boolean on, Context context) {
+		AudioManager audioManager = (AudioManager)context.getSystemService(Context.AUDIO_SERVICE);
+		if(on) {
+			audioManager.setMode(AudioManager.MODE_IN_CALL);
+		} else {
+			audioManager.setMode(AudioManager.MODE_NORMAL);
+		}
+		audioManager.setSpeakerphoneOn(on);
 	}
 
 	private native boolean initCore(Context context);
 	private native long createEndpoint(String token, long nativeEndpointObserver);
-	private native void setCoreLogLevel(int level);
-	private native int getCoreLogLevel();
+	private native static void setCoreLogLevel(int level);
+	private native static int getCoreLogLevel();
 
 }
