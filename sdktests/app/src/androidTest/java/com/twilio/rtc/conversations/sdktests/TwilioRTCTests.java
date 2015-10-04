@@ -14,6 +14,7 @@ import com.twilio.signal.EndpointListener;
 import com.twilio.signal.Invite;
 import com.twilio.signal.TwilioRTC;
 
+import java.util.HashMap;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
@@ -105,27 +106,7 @@ public class TwilioRTCTests {
         }
 
         try {
-            TwilioRTC.createEndpoint(null, new EndpointListener() {
-                @Override
-                public void onStartListeningForInvites(Endpoint endpoint) {
-
-                }
-
-                @Override
-                public void onStopListeningForInvites(Endpoint endpoint) {
-
-                }
-
-                @Override
-                public void onFailedToStartListening(Endpoint endpoint, int i, String s) {
-
-                }
-
-                @Override
-                public void onReceiveConversationInvite(Endpoint endpoint, Invite invite) {
-
-                }
-            });
+            TwilioRTC.createEndpoint(null, endpointListener());
         } catch(NullPointerException e) {
             npeSeen = true;
         } finally {
@@ -134,27 +115,7 @@ public class TwilioRTCTests {
         }
 
         try {
-            TwilioRTC.createEndpoint("foo", null, new EndpointListener() {
-                @Override
-                public void onStartListeningForInvites(Endpoint endpoint) {
-
-                }
-
-                @Override
-                public void onStopListeningForInvites(Endpoint endpoint) {
-
-                }
-
-                @Override
-                public void onFailedToStartListening(Endpoint endpoint, int i, String s) {
-
-                }
-
-                @Override
-                public void onReceiveConversationInvite(Endpoint endpoint, Invite invite) {
-
-                }
-            });
+            TwilioRTC.createEndpoint("foo", null, endpointListener());
         } catch(NullPointerException e) {
             npeSeen = true;
         } finally {
@@ -171,27 +132,35 @@ public class TwilioRTCTests {
         wait(waitLatch, TIMEOUT, TimeUnit.SECONDS);
 
         waitLatch = new CountDownLatch(1);
-        Endpoint endpoint = TwilioRTC.createEndpoint("DEADBEEF", new EndpointListener() {
-            @Override
-            public void onStartListeningForInvites(Endpoint endpoint) {
+        Endpoint endpoint = TwilioRTC.createEndpoint("DEADBEEF", endpointListener());
 
-            }
+        wait(waitLatch, TIMEOUT, TimeUnit.SECONDS);
+        org.junit.Assert.assertNotNull(endpoint);
+    }
 
-            @Override
-            public void onStopListeningForInvites(Endpoint endpoint) {
+    @Test
+    public void testTwilioCreateEndpointWithTokenAndEmptyOptionsMap() {
+        CountDownLatch waitLatch = new CountDownLatch(1);
+        initialize(mActivityRule.getActivity(), initListener(waitLatch));
+        wait(waitLatch, TIMEOUT, TimeUnit.SECONDS);
 
-            }
+        waitLatch = new CountDownLatch(1);
+        Endpoint endpoint = TwilioRTC.createEndpoint("DEADBEEF", new HashMap<String, String>(), endpointListener());
 
-            @Override
-            public void onFailedToStartListening(Endpoint endpoint, int i, String s) {
+        wait(waitLatch, TIMEOUT, TimeUnit.SECONDS);
+        org.junit.Assert.assertNotNull(endpoint);
+    }
 
-            }
+    @Test
+    public void testTwilioCreateEndpointWithTokenAndRandomOption() {
+        CountDownLatch waitLatch = new CountDownLatch(1);
+        initialize(mActivityRule.getActivity(), initListener(waitLatch));
+        wait(waitLatch, TIMEOUT, TimeUnit.SECONDS);
 
-            @Override
-            public void onReceiveConversationInvite(Endpoint endpoint, Invite invite) {
-
-            }
-        });
+        waitLatch = new CountDownLatch(1);
+        HashMap optionsMap = new HashMap<String, String>();
+        optionsMap.put("foo", "bar");
+        Endpoint endpoint = TwilioRTC.createEndpoint("DEADBEEF", optionsMap, endpointListener());
 
         wait(waitLatch, TIMEOUT, TimeUnit.SECONDS);
         org.junit.Assert.assertNotNull(endpoint);
@@ -284,5 +253,28 @@ public class TwilioRTCTests {
         }
     }
 
+    private EndpointListener endpointListener() {
+        return new EndpointListener() {
+            @Override
+            public void onStartListeningForInvites(Endpoint endpoint) {
+
+            }
+
+            @Override
+            public void onStopListeningForInvites(Endpoint endpoint) {
+
+            }
+
+            @Override
+            public void onFailedToStartListening(Endpoint endpoint, int i, String s) {
+
+            }
+
+            @Override
+            public void onReceiveConversationInvite(Endpoint endpoint, Invite invite) {
+
+            }
+        };
+    }
 
 }
