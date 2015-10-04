@@ -226,7 +226,9 @@ public class TwilioRTCTests {
 
     @Test
     public void testTwilioVersionUsesSemanticVersioning() {
-       // TODO: get semantic version regex and validate version from SDK
+        String semVerRegex = "^([0-9]+)\\.([0-9]+)\\.([0-9]+)(?:-([0-9A-Za-z-]+(?:\\.[0-9A-Za-z-]+)*))?(?:\\+[0-9A-Za-z-]+)?$";
+        String version = TwilioRTC.getVersion();
+        org.junit.Assert.assertTrue(version.matches(semVerRegex));
     }
 
     private void initialize(Context context, TwilioRTC.InitListener initListener) {
