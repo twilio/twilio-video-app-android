@@ -3,7 +3,7 @@ package com.twilio.signal.impl;
 import com.twilio.signal.VideoTrack;
 import com.twilio.signal.VideoRenderer;
 import com.twilio.signal.I420Frame;
-import com.twilio.signal.impl.TrackInfo;
+import com.twilio.signal.impl.core.TrackInfo;
 
 import java.util.List;
 import java.util.ArrayList;

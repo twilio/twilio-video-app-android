@@ -1,4 +1,4 @@
-package com.twilio.signal.impl;
+package com.twilio.signal.impl.core;
 
 public interface Track {
 	

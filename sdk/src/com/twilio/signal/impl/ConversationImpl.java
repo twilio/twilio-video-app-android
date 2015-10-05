@@ -19,6 +19,7 @@ import com.twilio.signal.impl.core.DisconnectReason;
 import com.twilio.signal.impl.core.Event;
 import com.twilio.signal.impl.core.MediaStreamInfo;
 import com.twilio.signal.impl.core.SessionState;
+import com.twilio.signal.impl.core.TrackInfo;
 import com.twilio.signal.impl.logging.Logger;
 
 public class ConversationImpl implements Conversation, NativeHandleInterface, SessionObserver {

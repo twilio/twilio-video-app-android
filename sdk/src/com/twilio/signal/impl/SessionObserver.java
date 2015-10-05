@@ -7,6 +7,7 @@ import com.twilio.signal.impl.core.DisconnectReason;
 import com.twilio.signal.impl.core.Event;
 import com.twilio.signal.impl.core.MediaStreamInfo;
 import com.twilio.signal.impl.core.SessionState;
+import com.twilio.signal.impl.core.TrackInfo;
 
 interface SessionObserver {
 	
@@ -17,8 +18,6 @@ interface SessionObserver {
 	void onStopCompleted(CoreError error);
 	
 	void onConnectParticipant(String participant, CoreError error);
-
-	//void onFailToConnectParticipant(String participant, int error, String errorMessage);
 
 	void onDisconnectParticipant(String participant, DisconnectReason reason);
 
@@ -36,7 +35,6 @@ interface SessionObserver {
 
 	void onVideoTrackRemoved(TrackInfo trackInfo);
 	
-	//void onReceiveSessionStatistics();
 
 }
 

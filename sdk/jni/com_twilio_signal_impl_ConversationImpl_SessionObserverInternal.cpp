@@ -36,11 +36,11 @@ public:
 		j_conversation_ended_id2(
 				tw_jni_get_method(jni, j_observer, "onConversationEnded", "(ILjava/lang/String;)V")),
 		j_add_track_id_(
-				tw_jni_get_method(jni, j_observer, "onVideoTrackAdded", "(Lcom/twilio/signal/impl/TrackInfo;Lorg/webrtc/VideoTrack;)V")),
+				tw_jni_get_method(jni, j_observer, "onVideoTrackAdded", "(Lcom/twilio/signal/impl/core/TrackInfo;Lorg/webrtc/VideoTrack;)V")),
 		j_remove_track_id_(
-				tw_jni_get_method(jni, j_observer, "onVideoTrackRemoved", "(Lcom/twilio/signal/impl/TrackInfo;)V")),
+				tw_jni_get_method(jni, j_observer, "onVideoTrackRemoved", "(Lcom/twilio/signal/impl/core/TrackInfo;)V")),
 		j_trackinfo_class_(
-				jni, FindClass(jni, "com/twilio/signal/impl/TrackInfoImpl")),
+				jni, FindClass(jni, "com/twilio/signal/impl/core/TrackInfoImpl")),
 		j_trackorigin_class_(
 				jni, FindClass(jni, "com/twilio/signal/TrackOrigin")),
 		j_sessionstate_enum_(
