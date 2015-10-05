@@ -1,6 +1,7 @@
-package com.twilio.signal.impl;
+package com.twilio.signal.impl.core;
 
-public class CoreErrorImpl implements CoreError {
+
+class CoreErrorImpl implements CoreError {
 	
 	private String errorDomain;
 	private int errorCode;

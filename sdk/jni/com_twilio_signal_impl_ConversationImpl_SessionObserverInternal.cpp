@@ -22,7 +22,7 @@ class SessionObserverInternalWrapper : public TSCSessionObserverObject {
 public:
 	SessionObserverInternalWrapper(JNIEnv* jni, jobject obj, jobject j_observer, jobject conversation) :
 	    j_participant_did_connect_id(
-				tw_jni_get_method(jni, j_observer, "onConnectParticipant", "(Ljava/lang/String;Lcom/twilio/signal/impl/CoreError;)V")),
+				tw_jni_get_method(jni, j_observer, "onConnectParticipant", "(Ljava/lang/String;Lcom/twilio/signal/impl/core/CoreError;)V")),
 		j_participant_disconnect_id(
 				tw_jni_get_method(jni, j_observer, "onDisconnectParticipant", "(Ljava/lang/String;Lcom/twilio/signal/impl/core/DisconnectReason;)V")),
 		j_media_stream_add_id(
@@ -56,13 +56,13 @@ public:
 		j_observer_class_(
 				jni, jni->GetObjectClass(*j_observer_global_)),
 		j_errorimpl_class_(
-				jni, FindClass(jni, "com/twilio/signal/impl/CoreErrorImpl")),
+				jni, FindClass(jni, "com/twilio/signal/impl/core/CoreErrorImpl")),
 		j_errorimpl_ctor_id_(
 				GetMethodID( jni, *j_errorimpl_class_, "<init>", "(Ljava/lang/String;ILjava/lang/String;)V")),
 		j_start_completed_id(
-				tw_jni_get_method(jni, j_observer, "onStartCompleted", "(Lcom/twilio/signal/impl/CoreError;)V")),
+				tw_jni_get_method(jni, j_observer, "onStartCompleted", "(Lcom/twilio/signal/impl/core/CoreError;)V")),
 		j_stop_completed_id(
-				tw_jni_get_method(jni, j_observer, "onStopCompleted", "(Lcom/twilio/signal/impl/CoreError;)V")),
+				tw_jni_get_method(jni, j_observer, "onStopCompleted", "(Lcom/twilio/signal/impl/core/CoreError;)V")),
 		j_disreason_enum_(
 				jni, FindClass(jni, "com/twilio/signal/impl/core/DisconnectReason")),
 		j_media_stream_info_class_(

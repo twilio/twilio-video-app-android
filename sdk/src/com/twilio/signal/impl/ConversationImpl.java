@@ -14,6 +14,7 @@ import com.twilio.signal.Media;
 import com.twilio.signal.TrackOrigin;
 import com.twilio.signal.VideoTrack;
 import com.twilio.signal.VideoViewRenderer;
+import com.twilio.signal.impl.core.CoreError;
 import com.twilio.signal.impl.core.DisconnectReason;
 import com.twilio.signal.impl.core.Event;
 import com.twilio.signal.impl.core.MediaStreamInfo;
