@@ -1,6 +1,6 @@
 package com.twilio.signal.impl.core;
 
-public class EventImpl implements Event {
+class EventImpl implements Event {
 	
 	private EventType eventType;
 	private String payload;
