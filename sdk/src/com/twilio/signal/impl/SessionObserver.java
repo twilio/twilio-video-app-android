@@ -3,10 +3,13 @@ package com.twilio.signal.impl;
 import org.webrtc.VideoTrack;
 
 import com.twilio.signal.impl.core.DisconnectReason;
+import com.twilio.signal.impl.core.Event;
 import com.twilio.signal.impl.core.MediaStreamInfo;
 import com.twilio.signal.impl.core.SessionState;
 
 interface SessionObserver {
+	
+	void onReceivedEvent(Event event);
 	
 	void onStartCompleted(CoreError error);
 	

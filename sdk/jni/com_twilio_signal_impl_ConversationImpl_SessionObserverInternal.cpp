@@ -12,6 +12,7 @@
 #include "TSCSessionObserver.h"
 #include "TSCMediaStreamInfo.h"
 #include "TSCMediaTrackInfo.h"
+#include "TSCEvent.h"
 
 using namespace webrtc;
 using namespace twiliosdk;
@@ -67,14 +68,25 @@ public:
 		j_media_stream_info_class_(
 				jni, FindClass(jni, "com/twilio/signal/impl/core/MediaStreamInfoImpl")),
 		j_media_stream_info_ctor_(
-				GetMethodID( jni, *j_media_stream_info_class_, "<init>", "(IILjava/lang/String;)V"))
-
-
+				GetMethodID( jni, *j_media_stream_info_class_, "<init>", "(IILjava/lang/String;)V")),
+		j_eventtype_enum_(
+				jni, FindClass(jni, "com/twilio/signal/impl/core/Event$EventType")),
+		j_eventimpl_class_(
+				jni, FindClass(jni, "com/twilio/signal/impl/core/EventImpl")),
+		j_eventimpl_ctor_id_(
+				GetMethodID( jni, *j_eventimpl_class_, "<init>", "(Lcom/twilio/signal/impl/core/Event$EventType;Ljava/lang/String;)V")),
+		j_event_received_id(
+				tw_jni_get_method(jni, j_observer, "onReceivedEvent", "(Lcom/twilio/signal/impl/core/Event;)V"))
 		{}
 
 protected:
 	virtual void onDidReceiveEvent(const TSCEventObjectRef& event) {
 		TS_CORE_LOG_DEBUG("onDidReceiveEvent");
+		JNIEnvAttacher jniAttacher;
+		jobject jevent = eventToJavaEventImpl(event.get());
+
+		jniAttacher.get()->CallVoidMethod(
+				*j_observer_global_, j_event_received_id, jevent);
 	}
 
 	virtual void onStateDidChange(TSCSessionState state) {
@@ -216,6 +228,22 @@ private:
 				j_sessionId, j_streamId, j_address);
 	}
 
+	// Return a EventImpl
+	jobject eventToJavaEventImpl(const TSCEventObjectRef& event) {
+		JNIEnvAttacher jniAttacher;
+		if (!event) {
+			return NULL;
+		}
+		jstring j_payload = stringToJString(jniAttacher.get(), event->getPayload());
+
+		const std::string event_type_enum = "com/twilio/signal/impl/core/Event$EventType";
+		jobject j_event_type = webrtc_jni::JavaEnumFromIndex(jniAttacher.get(), *j_eventtype_enum_, event_type_enum, event->getType());
+
+		return jniAttacher.get()->NewObject(
+				*j_eventimpl_class_, j_eventimpl_ctor_id_,
+				j_event_type, j_payload);
+	}
+
 
 	jstring stringToJString(JNIEnv* env, const std::string& nativeString) {
 		return env->NewStringUTF(nativeString.c_str());
@@ -246,6 +274,10 @@ private:
 	const ScopedGlobalRef<jclass> j_disreason_enum_;
 	const ScopedGlobalRef<jclass> j_media_stream_info_class_;
 	const jmethodID j_media_stream_info_ctor_;
+	const ScopedGlobalRef<jclass> j_eventtype_enum_;
+	const ScopedGlobalRef<jclass> j_eventimpl_class_;
+	const jmethodID j_eventimpl_ctor_id_;
+	const jmethodID j_event_received_id;
 };
 
 
