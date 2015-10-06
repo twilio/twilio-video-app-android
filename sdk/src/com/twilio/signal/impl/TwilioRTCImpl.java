@@ -15,18 +15,20 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.ServiceInfo;
 import android.os.IBinder;
+import android.util.Log;
+import android.media.AudioManager;
 
 import com.twilio.signal.EndpointListener;
 import com.twilio.signal.TwilioRTC;
+import com.twilio.signal.TwilioRTC.LogLevel;
 import com.twilio.signal.TwilioRTCService;
 import com.twilio.signal.TwilioRTCService.TwilioBinder;
 import com.twilio.signal.impl.logging.Logger;
 
-public class TwilioRTCImpl
-{
 
-	static
-	{
+public class TwilioRTCImpl {
+
+	static {
 		System.loadLibrary("twilio-native");
 	}
 
@@ -35,10 +37,12 @@ public class TwilioRTCImpl
 	private static final String TWILIO_SIGNAL_SERVICE_NAME = "com.twilio.signal.TwilioRTCService";
 
 	private static volatile TwilioRTCImpl instance;
+	private static int level = 0;
 	protected Context context;
 	private boolean sdkInited;
 	private boolean sdkIniting;
 	private ServiceConnection serviceConn;
+
 	protected TwilioBinder twBinder;
 
 	protected final Map<UUID, WeakReference<EndpointImpl>> endpoints = new HashMap<UUID, WeakReference<EndpointImpl>>();
@@ -51,15 +55,17 @@ public class TwilioRTCImpl
 		"android.permission.ACCESS_WIFI_STATE",
 	};
 
-	public static TwilioRTCImpl getInstance()
-	{
-		if (instance == null)
-		{
-			synchronized (TwilioRTCImpl.class)
-			{
+	public static TwilioRTCImpl getInstance() {
+		if (instance == null) {
+			synchronized (TwilioRTCImpl.class) {
 				if (instance == null)
 					instance = new TwilioRTCImpl();
 			}
+		}
+
+		if(level != 0) {
+			// Re-apply the log level. Initialization sets a default log level.
+			setLogLevel(level);
 		}
 
 		return instance;
@@ -75,8 +81,7 @@ public class TwilioRTCImpl
 
 	TwilioRTCImpl() {}
 
-	public void initialize(Context inContext, final TwilioRTC.InitListener inListener)
-	{
+	public void initialize(Context inContext, final TwilioRTC.InitListener inListener) {
 
 		if (isInitialized() || isInitializing())
 		{
@@ -144,11 +149,10 @@ public class TwilioRTCImpl
 		context = inContext;
 		final Intent service = new Intent(context, TwilioRTCService.class);
 
-		serviceConn = new ServiceConnection()
-		{
+		serviceConn = new ServiceConnection() {
+
 			@Override
-			public void onServiceConnected(ComponentName name, IBinder binder)
-			{
+			public void onServiceConnected(ComponentName name, IBinder binder) {
 				sdkIniting = false;
 				sdkInited = true;
 
@@ -168,28 +172,26 @@ public class TwilioRTCImpl
 			}
 
 			@Override
-			public void onServiceDisconnected(ComponentName name)
-			{
+			public void onServiceDisconnected(ComponentName name) {
 				sdkIniting = sdkInited = false;
 				twBinder = null;
 				context = null;
 			}
+
 		};
 
 		// We need to both startService() and bindService() here.  The startService() call
 		// will ensure that the Service keeps running even if the calling Activity gets
 		// destroyed and recreated.  The bindService() gives us the IBinder instance.
 
-		if (!context.bindService(service, serviceConn, Context.BIND_AUTO_CREATE))
-		{
+		if (!context.bindService(service, serviceConn, Context.BIND_AUTO_CREATE)) {
 			context = null;
 			inListener.onError(new RuntimeException("Failed to start TwiloRTCService.  Please ensure it is declared in AndroidManifest.xml"));
 		}
 
 	}
 
-	public EndpointImpl createEndpoint(String token, Map<String, String> options, EndpointListener inListener)
-	{
+	public EndpointImpl createEndpoint(String token, Map<String, String> options, EndpointListener inListener) {
 		if(options != null && token != null) {
 			final EndpointImpl endpoint = new EndpointImpl(context, inListener);
 			long nativeObserverHandle = endpoint.getEndpointObserverHandle();
@@ -210,28 +212,55 @@ public class TwilioRTCImpl
 		return null;
 	}
 
-	public void setLogLevel(int level)
-	{
-		Logger.setLogLevel(level);
+	public static void setLogLevel(int level) {
+		boolean validLevel = true;
+		/*
+		 * The Twilio RTC Log Levels are defined differently in the Twilio Logger
+		 * which is based off android.util.Log.
+		 */ 
+		switch(level) {
+			case LogLevel.DISABLED:
+				Logger.setLogLevel(Log.ASSERT);
+				break;
+			case LogLevel.ERROR:
+				Logger.setLogLevel(Log.ERROR);
+				break;
+			case LogLevel.WARNING:
+				Logger.setLogLevel(Log.WARN);
+				break;
+			case LogLevel.INFO:
+				Logger.setLogLevel(Log.INFO);
+				break;
+			case LogLevel.DEBUG:
+				Logger.setLogLevel(Log.DEBUG);
+				break;
+			case LogLevel.VERBOSE:
+				Logger.setLogLevel(Log.VERBOSE);
+				break;
+			default:
+				// Set the log level to assert/disabled if the value passed in is unknown
+				Logger.setLogLevel(Log.ASSERT);
+				level = TwilioRTC.LogLevel.DISABLED;
+				break;
+		}
+		setCoreLogLevel(level);
+		// Save the log level
+		TwilioRTCImpl.level = level;
 	}
 
-	public String getVersion()
-	{
-		return  null;//Version.SDK_VERSION;;
+	public static int getLogLevel() {
+		return getCoreLogLevel();
 	}
 
-	public boolean isInitialized()
-	{
+	public boolean isInitialized() {
 		return sdkInited;
 	}
 
-	boolean isInitializing()
-	{
+	boolean isInitializing() {
 		return sdkIniting;
 	}
 
-	private void updateServiceState()
-	{
+	private void updateServiceState() {
 		if (context == null || twBinder == null)
 			return;
 
@@ -239,32 +268,25 @@ public class TwilioRTCImpl
 		context.startService(intent);
 	}
 
-
-	EndpointImpl findDeviceByUUID(UUID uuid)
-	{
-        synchronized (endpoints)
-        {
-        	WeakReference<EndpointImpl> deviceRef = endpoints.get(uuid);
-        	if (deviceRef != null) {
-        		EndpointImpl device = deviceRef.get();
-        		if (device != null)
-        			return device;
-        		else
-        			endpoints.remove(uuid);
-        	}
-        }
-
-        return null;
+	public EndpointImpl findDeviceByUUID(UUID uuid) {
+		synchronized (endpoints)
+		{
+			WeakReference<EndpointImpl> deviceRef = endpoints.get(uuid);
+			if (deviceRef != null) {
+				EndpointImpl device = deviceRef.get();
+				if (device != null) {
+					return device;
+				} else {
+					endpoints.remove(uuid);
+				}
+			}
+		}
+        	return null;
 	}
 
-	public int getLogLevel() {
-		// TODO Auto-generated method stub
-		return Logger.getLogLevel();
-	}
-
-	//native methods
 	private native boolean initCore(Context context);
 	private native long createEndpoint(String token, long nativeEndpointObserver);
-
+	private native static void setCoreLogLevel(int level);
+	private native static int getCoreLogLevel();
 
 }

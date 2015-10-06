@@ -8,6 +8,12 @@
     </condition>
     <copy file="${prefix}/webrtc/android/armeabiv7a/lib/libjingle_peerconnection_java.jar" todir="libs" />
 
+    <target name="-pre-compile">
+        <exec executable="/bin/bash">
+            <arg value="mk-version-class.sh"/>
+        </exec>
+    </target>
+
     <!-- The local.properties file is created and updated by the 'android' tool.
          It contains the path to the SDK. It should *NOT* be checked into
          Version Control Systems. -->
