@@ -128,13 +128,6 @@ public class TwilioRTC {
 	}
 
 	/**
-	 * Turn the speakerphone on or off.
-	 */
-	public static void setSpeakerphoneOn(boolean on, Context context) {
-		TwilioRTCImpl.setSpeakerphoneOn(on, context);
-	}
-
-	/**
 	 * Returns the version of the Twilio RTC Conversations SDK.
 	 * 
 	 * @return the version of the SDK

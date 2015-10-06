@@ -284,16 +284,6 @@ public class TwilioRTCImpl {
         	return null;
 	}
 
-	public static void setSpeakerphoneOn(boolean on, Context context) {
-		AudioManager audioManager = (AudioManager)context.getSystemService(Context.AUDIO_SERVICE);
-		if(on) {
-			audioManager.setMode(AudioManager.MODE_IN_CALL);
-		} else {
-			audioManager.setMode(AudioManager.MODE_NORMAL);
-		}
-		audioManager.setSpeakerphoneOn(on);
-	}
-
 	private native boolean initCore(Context context);
 	private native long createEndpoint(String token, long nativeEndpointObserver);
 	private native static void setCoreLogLevel(int level);
