@@ -178,7 +178,7 @@ public class SignalPhone implements EndpointListener
     	Set<String> participants = new HashSet<String>();
     	participants.add(participant);
     	Conversation conv = SignalPhone.this.alice.createConversation(
-    			activity, participants, localMediaImpl, conversationListener);
+    			participants, localMediaImpl, conversationListener);
     	if (conv != null) {
     		conversations.put(conv.getConversationSid(), conv);
     	}

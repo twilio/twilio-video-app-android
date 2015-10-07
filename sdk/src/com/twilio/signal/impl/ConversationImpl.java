@@ -4,7 +4,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import android.app.Activity;
 import android.util.Log;
 
 import com.twilio.signal.Conversation;
@@ -27,7 +26,6 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 	private ConversationListener conversationListener;
 	private LocalMediaImpl localMediaImpl;
 	private VideoViewRenderer localVideoRenderer;
-	private Activity activity;
 
 	private Map<String,ParticipantImpl> participantMap = new HashMap<String,ParticipantImpl>();
 
@@ -58,8 +56,7 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 	private SessionObserverInternal sessionObserverInternal;
 	private long nativeHandle;
 
-	private ConversationImpl(Activity activity, EndpointImpl endpoint, Set<String> participants, LocalMediaImpl localMediaImpl, ConversationListener conversationListener) {
-		this.activity = activity;
+	private ConversationImpl(EndpointImpl endpoint, Set<String> participants, LocalMediaImpl localMediaImpl, ConversationListener conversationListener) {
 		String[] participantAddressArray = new String[participants.size()];
 		int i = 0;
 		for(String participant : participants) {
@@ -78,10 +75,10 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 		start(nativeHandle);
 	}
 
-	public static Conversation create(Activity activity, EndpointImpl endpoint, Set<String> participants,
+	public static Conversation create(EndpointImpl endpoint, Set<String> participants,
 			   LocalMediaImpl localMediaImpl,
 			   ConversationListener listener) {
-		ConversationImpl conv = new ConversationImpl(activity, endpoint, participants, localMediaImpl, listener);
+		ConversationImpl conv = new ConversationImpl(endpoint, participants, localMediaImpl, listener);
 		if (conv.getNativeHandle() == 0) {
 			return null;
 		}
@@ -169,25 +166,9 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 	@Override
 	public void onConnectParticipant(String participantAddress, CoreError error) {
 		logger.i("onConnectParticipant " + participantAddress);
-		final ParticipantImpl participant = retrieveParticipant(participantAddress);
-		activity.runOnUiThread(new Runnable() {
-			@Override
-			public void run() {
-				conversationListener.onConnectParticipant(ConversationImpl.this, participant);
-			}
-		});
+		ParticipantImpl participant = retrieveParticipant(participantAddress);
+		conversationListener.onConnectParticipant(this, participant);
 	}
-
-	/*
-	@Override
-	public void onFailToConnectParticipant(final String participant, final int error, final String errorMessage) {
-		activity.runOnUiThread(new Runnable() {
-			@Override
-			public void run() {
-				conversationListener.onFailToConnectParticipant(ConversationImpl.this, new ParticipantImpl(participant), error, errorMessage);
-			}
-		});
-	}*/
 
 	@Override
 	public void onDisconnectParticipant(final String participantAddress, final DisconnectReason reason) {
@@ -195,12 +176,7 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 		if(participant == null) {
 			logger.i("participant removed but was never in list");
 		} else {
-			activity.runOnUiThread(new Runnable() {
-				@Override
-				public void run() {
-					conversationListener.onDisconnectParticipant(ConversationImpl.this, participant);
-				}
-			});
+			conversationListener.onDisconnectParticipant(this, participant);
 		}
 	}
 
@@ -216,35 +192,19 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 
 	@Override
 	public void onLocalStatusChanged(final SessionState status) {
-		logger.i("state changed to:"+status.name());
-		
-		activity.runOnUiThread(new Runnable() {
-			@Override
-			public void run() {
-				//conversationListener.onLocalStatusChanged(ConversationImpl.this, status);
-			}
-		});
+		logger.i("state changed to "+ status.name());
 	}
 	
 	@Override
 	public void onConversationEnded() {
-		activity.runOnUiThread(new Runnable() {
-			@Override
-			public void run() {
-				conversationListener.onConversationEnded(ConversationImpl.this);
-			}
-		});
+		logger.i("onConversationEnded");
+		conversationListener.onConversationEnded(this);
 	}
 
 	@Override
 	public void onConversationEnded(final int error, final String errorMessage) {
-		activity.runOnUiThread(new Runnable() {
-			@Override
-			public void run() {
-				conversationListener.onConversationEnded(ConversationImpl.this, error, errorMessage);
-			}
-		});
-
+		logger.i("onConversationEnded " + error + " " + errorMessage);
+		conversationListener.onConversationEnded(this, error, errorMessage);
 	}
 
 	@Override
@@ -268,41 +228,29 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 					Log.i(TAG, "Local Adding Renderer");
 					final VideoTrackImpl videoTrackImpl = VideoTrackImpl.create(webRtcVideoTrack, trackInfo);
 					localMediaImpl.addVideoTrack(videoTrackImpl);
-
-					activity.runOnUiThread(new Runnable() {
+					localMediaImpl.getContainerView().post(new Runnable() {
 						@Override
 						public void run() {
-							localVideoRenderer = new VideoViewRenderer(activity, localMediaImpl.getContainerView());
+							localVideoRenderer = new VideoViewRenderer(localMediaImpl.getContainerView().getContext(), localMediaImpl.getContainerView());
 							videoTrackImpl.addRenderer(localVideoRenderer);
 						}
 					});
 				}
 			}).start();
 		} else {
-			final ParticipantImpl participant = retrieveParticipant(trackInfo.getParticipantAddress());
-			final VideoTrackImpl videoTrackImpl = VideoTrackImpl.create(webRtcVideoTrack, trackInfo);
+			ParticipantImpl participant = retrieveParticipant(trackInfo.getParticipantAddress());
+			VideoTrackImpl videoTrackImpl = VideoTrackImpl.create(webRtcVideoTrack, trackInfo);
 			participant.getMediaImpl().addVideoTrack(videoTrackImpl);
-
-			activity.runOnUiThread(new Runnable() {
-        			@Override
-        			public void run() {
-					conversationListener.onVideoAddedForParticipant(ConversationImpl.this, participant, videoTrackImpl);
-        			}
-			});
+			conversationListener.onVideoAddedForParticipant(this, participant, videoTrackImpl);
 		}
 	}
 
 	@Override
 	public void onVideoTrackRemoved(TrackInfo trackInfo) {
 		logger.i("onVideoTrackRemoved " + trackInfo.getParticipantAddress());
-		final ParticipantImpl participant = retrieveParticipant(trackInfo.getParticipantAddress());
-		final VideoTrack videoTrack = participant.getMediaImpl().removeVideoTrack(trackInfo);
-		activity.runOnUiThread(new Runnable() {
-			@Override
-			public void run() {
-				conversationListener.onVideoRemovedForParticipant(ConversationImpl.this, participant, videoTrack);
-			}
-		});
+		ParticipantImpl participant = retrieveParticipant(trackInfo.getParticipantAddress());
+		VideoTrack videoTrack = participant.getMediaImpl().removeVideoTrack(trackInfo);
+		conversationListener.onVideoRemovedForParticipant(this, participant, videoTrack);
 	}
 
 	@Override

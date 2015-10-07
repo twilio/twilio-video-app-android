@@ -78,23 +78,28 @@ public class ConversationActivity extends Activity implements ConversationListen
 	@Override
 	public void onVideoAddedForParticipant(final Conversation conversation,
 				final Participant participant, final VideoTrack videoTrack) {
-		// Remote participant
-		Log.i(TAG, "Participant adding video track");
-		participantVideoRenderer = new VideoViewRenderer(this, participantContainer);
-		participantVideoRenderer.setObserver(new VideoRendererObserver() {
+		runOnUiThread(new Runnable() {
 
-			@Override
-			public void onFirstFrame() {
-				Log.i(TAG, "Participant onFirstFrame");
+			public void run() {
+				// Remote participant
+				Log.i(TAG, "Participant adding video track");
+				participantVideoRenderer = new VideoViewRenderer(ConversationActivity.this, participantContainer);
+				participantVideoRenderer.setObserver(new VideoRendererObserver() {
+
+					@Override
+					public void onFirstFrame() {
+						Log.i(TAG, "Participant onFirstFrame");
+					}
+
+					@Override
+					public void onFrameSizeChanged(int width, int height) {
+						Log.i(TAG, "Participant onFrameSizeChanged " + width + " " + height);
+					}
+
+				});
+				videoTrack.addRenderer(participantVideoRenderer);
 			}
-
-			@Override
-			public void onFrameSizeChanged(int width, int height) {
-				Log.i(TAG, "Participant onFrameSizeChanged " + width + " " + height);
-			}
-
 		});
-		videoTrack.addRenderer(participantVideoRenderer);
 	}
 
 	@Override
