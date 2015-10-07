@@ -1,25 +1,25 @@
 package com.twilio.signal.impl;
 
-import android.app.Activity;
-import android.content.Context;
-import android.util.Log;
-
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
-import java.util.HashMap;
+
+import android.app.Activity;
+import android.util.Log;
 
 import com.twilio.signal.Conversation;
 import com.twilio.signal.ConversationListener;
-import com.twilio.signal.Endpoint;
-import com.twilio.signal.Media;
-import com.twilio.signal.LocalMedia;
 import com.twilio.signal.LocalMediaImpl;
+import com.twilio.signal.Media;
 import com.twilio.signal.TrackOrigin;
-import com.twilio.signal.VideoViewRenderer;
 import com.twilio.signal.VideoTrack;
-import com.twilio.signal.impl.ParticipantImpl;
-import com.twilio.signal.impl.SessionObserver;
-import com.twilio.signal.impl.TrackInfo;
+import com.twilio.signal.VideoViewRenderer;
+import com.twilio.signal.impl.core.CoreError;
+import com.twilio.signal.impl.core.DisconnectReason;
+import com.twilio.signal.impl.core.Event;
+import com.twilio.signal.impl.core.MediaStreamInfo;
+import com.twilio.signal.impl.core.SessionState;
+import com.twilio.signal.impl.core.TrackInfo;
 import com.twilio.signal.impl.logging.Logger;
 
 public class ConversationImpl implements Conversation, NativeHandleInterface, SessionObserver {
@@ -31,7 +31,7 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 
 	private Map<String,ParticipantImpl> participantMap = new HashMap<String,ParticipantImpl>();
 
-	private static String TAG = "ConversationImpl"; 
+	private static String TAG = "ConversationImpl";
 
 	static final Logger logger = Logger.getLogger(ConversationImpl.class);
 	
@@ -143,12 +143,37 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 	 * ConversationListener events
 	 */
 
+
 	@Override
-	public void onConnectParticipant(String participantAddress) {
-		logger.i("onConnectParticipant " + participantAddress);
-		retrieveParticipant(participantAddress);
+	public void onReceivedEvent(Event event) {
+		logger.i("onReceivedEvent");
+		
 	}
 
+	@Override
+	public void onStartCompleted(CoreError error) {
+		logger.i("onStartCompleted");
+		
+	}
+
+	@Override
+	public void onStopCompleted(CoreError error) {
+		logger.i("onStartCompleted");
+	}
+
+	@Override
+	public void onConnectParticipant(String participantAddress, CoreError error) {
+		logger.i("onConnectParticipant " + participantAddress);
+		final ParticipantImpl participant = retrieveParticipant(participantAddress);
+		activity.runOnUiThread(new Runnable() {
+			@Override
+			public void run() {
+				conversationListener.onConnectParticipant(ConversationImpl.this, participant);
+			}
+		});
+	}
+
+	/*
 	@Override
 	public void onFailToConnectParticipant(final String participant, final int error, final String errorMessage) {
 		activity.runOnUiThread(new Runnable() {
@@ -157,10 +182,10 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 				conversationListener.onFailToConnectParticipant(ConversationImpl.this, new ParticipantImpl(participant), error, errorMessage);
 			}
 		});
-	}
+	}*/
 
 	@Override
-	public void onDisconnectParticipant(final String participantAddress) {
+	public void onDisconnectParticipant(final String participantAddress, final DisconnectReason reason) {
 		final ParticipantImpl participant = participantMap.remove(participantAddress);
 		if(participant == null) {
 			logger.i("participant removed but was never in list");
@@ -175,21 +200,23 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 	}
 
 	@Override
-	public void onVideoAddedForParticipant(String participantAddress) {
-
+	public void onMediaStreamAdded(MediaStreamInfo stream) {
+		logger.i("onMediaStreamAdded");
 	}
 
 	@Override
-	public void onVideoRemovedForParticipant(String participantAddress) {
-
+	public void onMediaStreamRemoved(MediaStreamInfo stream) {
+		logger.i("onMediaStreamRemoved");
 	}
 
 	@Override
-	public void onLocalStatusChanged(final Status status) {
+	public void onLocalStatusChanged(final SessionState status) {
+		logger.i("state changed to:"+status.name());
+		
 		activity.runOnUiThread(new Runnable() {
 			@Override
 			public void run() {
-				conversationListener.onLocalStatusChanged(ConversationImpl.this, status);
+				//conversationListener.onLocalStatusChanged(ConversationImpl.this, status);
 			}
 		});
 	}
@@ -254,7 +281,7 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 			activity.runOnUiThread(new Runnable() {
         			@Override
         			public void run() {
-					conversationListener.onVideoAddedForParticipant(ConversationImpl.this, participant, videoTrackImpl); 
+					conversationListener.onVideoAddedForParticipant(ConversationImpl.this, participant, videoTrackImpl);
         			}
 			});
 		}
@@ -281,4 +308,5 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 	public long getNativeHandle() {
 		return nativeHandle;
 	}
+
 }

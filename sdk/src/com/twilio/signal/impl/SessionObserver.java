@@ -1,21 +1,31 @@
 package com.twilio.signal.impl;
 
-import com.twilio.signal.Conversation;
 import org.webrtc.VideoTrack;
 
+import com.twilio.signal.impl.core.CoreError;
+import com.twilio.signal.impl.core.DisconnectReason;
+import com.twilio.signal.impl.core.Event;
+import com.twilio.signal.impl.core.MediaStreamInfo;
+import com.twilio.signal.impl.core.SessionState;
+import com.twilio.signal.impl.core.TrackInfo;
+
 interface SessionObserver {
+	
+	void onReceivedEvent(Event event);
+	
+	void onStartCompleted(CoreError error);
+	
+	void onStopCompleted(CoreError error);
+	
+	void onConnectParticipant(String participant, CoreError error);
 
-	void onConnectParticipant(String participant);
+	void onDisconnectParticipant(String participant, DisconnectReason reason);
 
-	void onFailToConnectParticipant(String participant, int error, String errorMessage);
+	void onMediaStreamAdded(MediaStreamInfo stream);
 
-	void onDisconnectParticipant(String participant);
+	void onMediaStreamRemoved(MediaStreamInfo stream);
 
-	void onVideoAddedForParticipant(String participant);
-
-	void onVideoRemovedForParticipant(String participant);
-
-	void onLocalStatusChanged(Conversation.Status status);
+	void onLocalStatusChanged(SessionState status);
 
 	void onConversationEnded();
 
@@ -24,6 +34,7 @@ interface SessionObserver {
 	void onVideoTrackAdded(TrackInfo trackInfo, VideoTrack videoTrack);
 
 	void onVideoTrackRemoved(TrackInfo trackInfo);
+	
 
 }
 

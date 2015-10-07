@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import com.twilio.signal.Media;
 import com.twilio.signal.VideoTrack;
 import com.twilio.signal.impl.VideoTrackImpl;
+import com.twilio.signal.impl.core.TrackInfo;
 
 
 public class MediaImpl implements Media {

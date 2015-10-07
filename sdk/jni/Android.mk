@@ -30,7 +30,7 @@ LOCAL_SRC_FILES := \
 	com_twilio_signal_impl_EndpointImpl.cpp \
 	com_twilio_signal_impl_EndpointImpl_EndpointObserverInternal.cpp \
 	com_twilio_signal_impl_ConversationImpl.cpp \
-	com_twilio_signal_impl_ConversationImpl_SessionObserverInternal.cpp \
+	com_twilio_signal_impl_ConversationImpl_SessionObserverInternal.cpp
 
 LOCAL_C_INCLUDES := $(PREFIX)/webrtc/android/armeabiv7a/include/third_party/icu/source/common
 

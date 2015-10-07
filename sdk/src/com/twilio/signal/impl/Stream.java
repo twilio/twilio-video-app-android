@@ -4,7 +4,8 @@ import java.util.Set;
 
 import android.view.View;
 
-import com.twilio.signal.impl.Track.TrackId;
+import com.twilio.signal.impl.core.Track;
+import com.twilio.signal.impl.core.Track.TrackId;
 
 public interface Stream {
 	/**
