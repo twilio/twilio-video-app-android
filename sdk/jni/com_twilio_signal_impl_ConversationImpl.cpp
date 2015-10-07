@@ -71,3 +71,12 @@ JNIEXPORT void JNICALL Java_com_twilio_signal_impl_ConversationImpl_start
 	session->start();	
 }
 
+
+JNIEXPORT void JNICALL Java_com_twilio_signal_impl_ConversationImpl_stop
+  (JNIEnv *env, jobject obj, jlong nativeSession)
+{
+	TS_CORE_LOG_DEBUG("stop");
+	TSCSessionObject* session = reinterpret_cast<TSCSessionObject*>(nativeSession);
+	session->stop();
+}
+

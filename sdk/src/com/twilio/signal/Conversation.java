@@ -74,7 +74,12 @@ public interface Conversation {
 	 * @param participants A set of strings representing the names of the remote endpoints.
 	 */
 	public void invite(Set<String> participantAddresses);
-	
+
+	/**
+	 * Disconnect from this conversation
+	 */
+	public void disconnect();
+
 	/**
 	 *
 	 */

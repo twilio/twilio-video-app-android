@@ -125,6 +125,11 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 	}
 
 	@Override
+	public void disconnect() {
+		stop(nativeHandle);
+	}
+
+	@Override
 	public String getConversationSid() {
 		// TODO Auto-generated method stub
 		return null;
@@ -300,13 +305,13 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 		});
 	}
 
-	private native long wrapOutgoingSession(long nativeEndpoint, long nativeSessionObserver, String[] participants);
-
-	private native void start(long nativeSession);
-
 	@Override
 	public long getNativeHandle() {
 		return nativeHandle;
 	}
+
+	private native long wrapOutgoingSession(long nativeEndpoint, long nativeSessionObserver, String[] participants);
+	private native void start(long nativeSession);
+	private native void stop(long nativeSession);
 
 }
