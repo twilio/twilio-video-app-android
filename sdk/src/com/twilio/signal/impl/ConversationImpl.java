@@ -7,6 +7,7 @@ import java.util.Set;
 import android.util.Log;
 
 import com.twilio.signal.Conversation;
+import com.twilio.signal.ConversationException;
 import com.twilio.signal.ConversationListener;
 import com.twilio.signal.LocalMediaImpl;
 import com.twilio.signal.Media;
@@ -166,8 +167,15 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 	@Override
 	public void onConnectParticipant(String participantAddress, CoreError error) {
 		logger.i("onConnectParticipant " + participantAddress);
+
 		ParticipantImpl participant = retrieveParticipant(participantAddress);
-		conversationListener.onConnectParticipant(this, participant);
+		if (error == null) {
+			conversationListener.onConnectParticipant(this, participant);
+		} else {
+			ConversationException e =
+					new ConversationException(error.getDomain(), error.getCode(), error.getMessage());
+			conversationListener.onFailToConnectParticipant(this, participant, e);
+		}
 	}
 
 	@Override

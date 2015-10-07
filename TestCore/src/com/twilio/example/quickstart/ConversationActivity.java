@@ -7,18 +7,15 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.os.Handler;
 
-import java.util.Map;
-import java.util.HashMap;
-
-import com.twilio.signal.Participant;
 import com.twilio.signal.Conversation;
 import com.twilio.signal.Conversation.Status;
+import com.twilio.signal.ConversationException;
 import com.twilio.signal.ConversationListener;
+import com.twilio.signal.Participant;
+import com.twilio.signal.VideoRendererObserver;
 import com.twilio.signal.VideoTrack;
 import com.twilio.signal.VideoViewRenderer;
-import com.twilio.signal.VideoRendererObserver;
 
 public class ConversationActivity extends Activity implements ConversationListener {
 
@@ -31,6 +28,7 @@ public class ConversationActivity extends Activity implements ConversationListen
 	private String participantAddress;
 	private VideoViewRenderer participantVideoRenderer;
 
+	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
@@ -65,8 +63,8 @@ public class ConversationActivity extends Activity implements ConversationListen
 
 	@Override
 	public void onFailToConnectParticipant(Conversation conversation,
-			Participant participant, int error, String errorMessage) {
-
+			Participant participant, ConversationException e) {
+		Log.w(TAG, "Failed to connect participant: "+e.getMessage());
 	}
 
 	@Override
@@ -106,6 +104,7 @@ public class ConversationActivity extends Activity implements ConversationListen
 	public void onVideoRemovedForParticipant(Conversation conversation, Participant participant, VideoTrack videoTrack) {
 		Log.i(TAG, "Participant removing video track");
 		participantContainer.post(new Runnable() {
+			@Override
 			public void run() {
 				participantContainer.removeAllViews();
 			}
