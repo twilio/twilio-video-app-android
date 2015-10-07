@@ -8,6 +8,7 @@ import android.app.Activity;
 import android.util.Log;
 
 import com.twilio.signal.Conversation;
+import com.twilio.signal.ConversationException;
 import com.twilio.signal.ConversationListener;
 import com.twilio.signal.LocalMediaImpl;
 import com.twilio.signal.Media;
@@ -165,24 +166,24 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 	public void onConnectParticipant(String participantAddress, CoreError error) {
 		logger.i("onConnectParticipant " + participantAddress);
 		final ParticipantImpl participant = retrieveParticipant(participantAddress);
-		activity.runOnUiThread(new Runnable() {
-			@Override
-			public void run() {
-				conversationListener.onConnectParticipant(ConversationImpl.this, participant);
-			}
-		});
+		if (error == null) {
+			activity.runOnUiThread(new Runnable() {
+				@Override
+				public void run() {
+					conversationListener.onConnectParticipant(ConversationImpl.this, participant);
+				}
+			});
+		} else {
+			final ConversationException e =
+					new ConversationException(error.getDomain(), error.getCode(), error.getMessage());
+			activity.runOnUiThread(new Runnable() {
+				@Override
+				public void run() {
+					conversationListener.onFailToConnectParticipant(ConversationImpl.this, participant, e);
+				}
+			});
+		}
 	}
-
-	/*
-	@Override
-	public void onFailToConnectParticipant(final String participant, final int error, final String errorMessage) {
-		activity.runOnUiThread(new Runnable() {
-			@Override
-			public void run() {
-				conversationListener.onFailToConnectParticipant(ConversationImpl.this, new ParticipantImpl(participant), error, errorMessage);
-			}
-		});
-	}*/
 
 	@Override
 	public void onDisconnectParticipant(final String participantAddress, final DisconnectReason reason) {
