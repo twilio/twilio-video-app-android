@@ -117,9 +117,9 @@ public class EndpointImpl implements Endpoint, NativeHandleInterface, Parcelable
 
 
 	@Override
-	public Conversation createConversation(Activity activity, Set<String> participants,
+	public Conversation createConversation(Set<String> participants,
 			LocalMediaImpl localMediaImpl, ConversationListener listener) {
-		Conversation conv = ConversationImpl.create(activity, this, participants, localMediaImpl, listener);
+		Conversation conv = ConversationImpl.create(this, participants, localMediaImpl, listener);
 		return conv;
 	}
 
