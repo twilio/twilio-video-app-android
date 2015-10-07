@@ -14,6 +14,9 @@ JNIEXPORT jlong JNICALL Java_com_twilio_signal_impl_ConversationImpl_wrapOutgoin
 JNIEXPORT void JNICALL Java_com_twilio_signal_impl_ConversationImpl_start
   (JNIEnv *, jobject, jlong);
 
+JNIEXPORT void JNICALL Java_com_twilio_signal_impl_ConversationImpl_stop
+  (JNIEnv *, jobject, jlong);
+
 #ifdef __cplusplus
 }
 #endif
