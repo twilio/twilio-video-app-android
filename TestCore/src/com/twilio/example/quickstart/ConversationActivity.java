@@ -70,6 +70,7 @@ public class ConversationActivity extends Activity implements ConversationListen
 	@Override
 	public void onDisconnectParticipant(Conversation conversation,
 			Participant participant) {
+		Log.i(TAG, "onDisconnectedParticipant:"+participant.getAddress());
 
 	}
 
@@ -114,17 +115,17 @@ public class ConversationActivity extends Activity implements ConversationListen
 
 	@Override
 	public void onLocalStatusChanged(Conversation conversation, Status status) {
-
+		Log.i(TAG, "onLocalStatusChanged "+status.name());
 	}
 
 	@Override
 	public void onConversationEnded(Conversation conversation) {
-
+		Log.i(TAG, "onConversationEnded");
 	}
 
 	@Override
-	public void onConversationEnded(Conversation conversation, int error, String errorMessage) {
-
+	public void onConversationEnded(Conversation conversation, ConversationException e) {
+		Log.i(TAG, "onConversationEnded error:"+e.getMessage());
 	}
 
 	@Override

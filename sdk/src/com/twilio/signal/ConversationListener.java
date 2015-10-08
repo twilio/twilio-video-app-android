@@ -43,6 +43,6 @@ public interface ConversationListener {
 	/**
 	 * 
 	 */
-	void onConversationEnded(Conversation conversation, int error, String errorMessage);
+	void onConversationEnded(Conversation conversation, ConversationException e);
 
 }
