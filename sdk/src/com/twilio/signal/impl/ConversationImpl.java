@@ -160,6 +160,14 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 	@Override
 	public void onStopCompleted(CoreError error) {
 		logger.i("onStartCompleted");
+		if (error == null) {
+			conversationListener.onConversationEnded(ConversationImpl.this);
+		} else {
+			final ConversationException e =
+					new ConversationException(error.getDomain(), error.getCode(),
+							error.getMessage());
+			conversationListener.onConversationEnded(ConversationImpl.this, e);
+		}
 	}
 
 	@Override
@@ -213,34 +221,8 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 	@Override
 	public void onLocalStatusChanged(final SessionState status) {
 		logger.i("state changed to:"+status.name());
-		
-		activity.runOnUiThread(new Runnable() {
-			@Override
-			public void run() {
-				//conversationListener.onLocalStatusChanged(ConversationImpl.this, status);
-			}
-		});
-	}
-	
-	@Override
-	public void onConversationEnded() {
-		activity.runOnUiThread(new Runnable() {
-			@Override
-			public void run() {
-				conversationListener.onConversationEnded(ConversationImpl.this);
-			}
-		});
-	}
-
-	@Override
-	public void onConversationEnded(final int error, final String errorMessage) {
-		activity.runOnUiThread(new Runnable() {
-			@Override
-			public void run() {
-				conversationListener.onConversationEnded(ConversationImpl.this, error, errorMessage);
-			}
-		});
-
+		final Conversation.Status convStatus = sessionStateToStatus(status);
+		conversationListener.onLocalStatusChanged(ConversationImpl.this, convStatus);
 	}
 
 	@Override
@@ -308,6 +290,24 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 	@Override
 	public long getNativeHandle() {
 		return nativeHandle;
+	}
+	
+	private Conversation.Status sessionStateToStatus(SessionState state) {
+		switch(state) {
+			case INITIALIZED:
+			case STARTING:
+				return Status.CONNECTING;
+			case IN_PROGRESS:
+			case STOPPING:
+			case STOP_FAILED:
+				return Status.CONNECTED;
+			case STOPPED:
+				return Status.DISCONNECTED;
+			case START_FAILED:
+				return Status.FAILED;
+			default:
+				return Status.UNKNOWN;
+		}
 	}
 
 }

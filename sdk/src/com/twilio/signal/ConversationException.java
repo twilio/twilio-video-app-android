@@ -4,6 +4,9 @@ import java.util.Locale;
 
 public class ConversationException extends Exception {
 	
+
+	private static final long serialVersionUID = 8881301848720707153L;
+	
 	private int errorCode;
 	private String errorMessage;
 	private String domain;
@@ -16,11 +19,6 @@ public class ConversationException extends Exception {
 
 	@Override
 	public String getMessage() {
-		return errorMessage;
-	}
-
-	@Override
-	public String toString() {
 		return String.format(Locale.getDefault(),"domain:%s, code:%d, message:%s", domain, errorCode, errorMessage);
 	}
 
