@@ -27,10 +27,6 @@ interface SessionObserver {
 
 	void onLocalStatusChanged(SessionState status);
 
-	void onConversationEnded();
-
-	void onConversationEnded(int error, String errorMessage);
-
 	void onVideoTrackAdded(TrackInfo trackInfo, VideoTrack videoTrack);
 
 	void onVideoTrackRemoved(TrackInfo trackInfo);

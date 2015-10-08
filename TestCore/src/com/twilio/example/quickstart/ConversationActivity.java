@@ -7,18 +7,15 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.os.Handler;
 
-import java.util.Map;
-import java.util.HashMap;
-
-import com.twilio.signal.Participant;
 import com.twilio.signal.Conversation;
 import com.twilio.signal.Conversation.Status;
+import com.twilio.signal.ConversationException;
 import com.twilio.signal.ConversationListener;
+import com.twilio.signal.Participant;
+import com.twilio.signal.VideoRendererObserver;
 import com.twilio.signal.VideoTrack;
 import com.twilio.signal.VideoViewRenderer;
-import com.twilio.signal.VideoRendererObserver;
 
 public class ConversationActivity extends Activity implements ConversationListener {
 
@@ -31,6 +28,7 @@ public class ConversationActivity extends Activity implements ConversationListen
 	private String participantAddress;
 	private VideoViewRenderer participantVideoRenderer;
 
+	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
@@ -60,18 +58,19 @@ public class ConversationActivity extends Activity implements ConversationListen
 	@Override
 	public void onConnectParticipant(Conversation conversation,
 			Participant participant) {
-		
+		Log.i(TAG, "onConnect participant: "+participant.getAddress());
 	}
 
 	@Override
 	public void onFailToConnectParticipant(Conversation conversation,
-			Participant participant, int error, String errorMessage) {
-
+			Participant participant, ConversationException e) {
+		Log.w(TAG, "Failed to connect participant: "+e.getMessage());
 	}
 
 	@Override
 	public void onDisconnectParticipant(Conversation conversation,
 			Participant participant) {
+		Log.i(TAG, "onDisconnectedParticipant:"+participant.getAddress());
 
 	}
 
@@ -80,6 +79,7 @@ public class ConversationActivity extends Activity implements ConversationListen
 				final Participant participant, final VideoTrack videoTrack) {
 		runOnUiThread(new Runnable() {
 
+			@Override
 			public void run() {
 				// Remote participant
 				Log.i(TAG, "Participant adding video track");
@@ -106,6 +106,7 @@ public class ConversationActivity extends Activity implements ConversationListen
 	public void onVideoRemovedForParticipant(Conversation conversation, Participant participant, VideoTrack videoTrack) {
 		Log.i(TAG, "Participant removing video track");
 		participantContainer.post(new Runnable() {
+			@Override
 			public void run() {
 				participantContainer.removeAllViews();
 			}
@@ -115,17 +116,17 @@ public class ConversationActivity extends Activity implements ConversationListen
 
 	@Override
 	public void onLocalStatusChanged(Conversation conversation, Status status) {
-
+		Log.i(TAG, "onLocalStatusChanged "+status.name());
 	}
 
 	@Override
 	public void onConversationEnded(Conversation conversation) {
-
+		Log.i(TAG, "onConversationEnded");
 	}
 
 	@Override
-	public void onConversationEnded(Conversation conversation, int error, String errorMessage) {
-
+	public void onConversationEnded(Conversation conversation, ConversationException e) {
+		Log.i(TAG, "onConversationEnded error:"+e.getMessage());
 	}
 
 	@Override

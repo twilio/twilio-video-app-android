@@ -10,7 +10,7 @@ public interface ConversationListener {
 	/**
 	 * 
 	 */
-	void onFailToConnectParticipant(Conversation conversation, Participant participant, int error, String errorMessage);
+	void onFailToConnectParticipant(Conversation conversation, Participant participant, ConversationException e);
 	
 	
 	/**
@@ -43,6 +43,6 @@ public interface ConversationListener {
 	/**
 	 * 
 	 */
-	void onConversationEnded(Conversation conversation, int error, String errorMessage);
+	void onConversationEnded(Conversation conversation, ConversationException e);
 
 }

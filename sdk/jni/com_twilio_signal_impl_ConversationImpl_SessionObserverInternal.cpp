@@ -31,10 +31,6 @@ public:
 				tw_jni_get_method(jni, j_observer, "onMediaStreamRemoved", "(Lcom/twilio/signal/impl/core/MediaStreamInfo;)V")),
 		j_local_status_changed_id(
 				tw_jni_get_method(jni, j_observer, "onLocalStatusChanged", "(Lcom/twilio/signal/impl/core/SessionState;)V")),
-		j_conversation_ended_id(
-				tw_jni_get_method(jni, j_observer, "onConversationEnded", "()V")),
-		j_conversation_ended_id2(
-				tw_jni_get_method(jni, j_observer, "onConversationEnded", "(ILjava/lang/String;)V")),
 		j_add_track_id_(
 				tw_jni_get_method(jni, j_observer, "onVideoTrackAdded", "(Lcom/twilio/signal/impl/core/TrackInfo;Lorg/webrtc/VideoTrack;)V")),
 		j_remove_track_id_(
@@ -254,8 +250,6 @@ private:
 	const jmethodID j_media_stream_add_id;
 	const jmethodID j_media_stream_remove_id;
 	const jmethodID j_local_status_changed_id;
-	const jmethodID j_conversation_ended_id;
-	const jmethodID j_conversation_ended_id2;
 	const jmethodID j_add_track_id_;
 	const jmethodID j_remove_track_id_;
 
