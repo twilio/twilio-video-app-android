@@ -58,7 +58,7 @@ public class ConversationActivity extends Activity implements ConversationListen
 	@Override
 	public void onConnectParticipant(Conversation conversation,
 			Participant participant) {
-		
+		Log.i(TAG, "onConnect participant: "+participant.getAddress());
 	}
 
 	@Override
@@ -79,6 +79,7 @@ public class ConversationActivity extends Activity implements ConversationListen
 				final Participant participant, final VideoTrack videoTrack) {
 		runOnUiThread(new Runnable() {
 
+			@Override
 			public void run() {
 				// Remote participant
 				Log.i(TAG, "Participant adding video track");
