@@ -12,6 +12,7 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 import com.twilio.signal.Conversation;
+import com.twilio.signal.ConversationException;
 import com.twilio.signal.ConversationListener;
 import com.twilio.signal.Endpoint;
 import com.twilio.signal.EndpointListener;
@@ -55,6 +56,7 @@ public class EndpointImpl implements Endpoint, NativeHandleInterface, Parcelable
 	private long nativeEndpointHandle;
 
 	private Handler handler;
+	private EndpointState coreState;
 	
 	public UUID getUuid() {
 		return uuid;
@@ -193,29 +195,40 @@ public class EndpointImpl implements Endpoint, NativeHandleInterface, Parcelable
 	 */
 	@Override
 	public void onRegistrationDidComplete(CoreError error) {
-		
-		
+		logger.d("onRegistrationDidComplete");
+		if (error != null) {
+			ConversationException e =
+					new ConversationException(error.getDomain(),
+							error.getCode(), error.getMessage());
+			listener.onFailedToStartListening(this, e);
+		} else {
+			listener.onStartListeningForInvites(this);
+		}
 	}
 
 
 	@Override
 	public void onUnregistrationDidComplete(CoreError error) {
-		// TODO Auto-generated method stub
-		
+		logger.d("onUnregistrationDidComplete");
+		listener.onStopListeningForInvites(this);
 	}
 
 
 	@Override
 	public void onStateDidChange(EndpointState state) {
-		// TODO Auto-generated method stub
-		
+		logger.d("onStateDidChange");
+		coreState = state;
 	}
 
 
 	@Override
 	public void onIncomingCallDidReceive(long nativeSession,
 			String[] participants) {
-		// TODO Auto-generated method stub
+		logger.d("onIncomingCallDidReceive");
+		
+		//TODO - Create incoming Conversation
+		//TODO - Create Invite with that Conversation
+		//TODO - notify consumer with Invite
 		
 	}
 

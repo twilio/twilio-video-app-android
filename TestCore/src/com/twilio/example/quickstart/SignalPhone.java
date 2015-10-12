@@ -26,14 +26,12 @@ import android.util.Log;
 import android.view.ViewGroup;
 
 import com.twilio.signal.Conversation;
-import com.twilio.signal.Conversation.Status;
+import com.twilio.signal.ConversationException;
 import com.twilio.signal.ConversationListener;
 import com.twilio.signal.Endpoint;
 import com.twilio.signal.EndpointListener;
 import com.twilio.signal.Invite;
-import com.twilio.signal.LocalMedia;
 import com.twilio.signal.LocalMediaImpl;
-import com.twilio.signal.Participant;
 import com.twilio.signal.TwilioRTC;
 import com.twilio.signal.impl.TwilioConstants;
 
@@ -314,11 +312,10 @@ public class SignalPhone implements EndpointListener
 	}
 
 	@Override
-	public void onFailedToStartListening(Endpoint endPoint, int errorCode,
-			String errorMessage) {
-		Log.d(TAG, "onFailedToStartListening code:"+errorCode+" message:"+errorMessage);
+	public void onFailedToStartListening(Endpoint endPoint, ConversationException e) {
+		Log.d(TAG, "onFailedToStartListening msg:"+e.getMessage());
 		if (loginListener != null)
-			loginListener.onLoginError(errorMessage);
+			loginListener.onLoginError(e.getMessage());
 
 	}
 
