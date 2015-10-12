@@ -10,7 +10,7 @@ extern "C" {
 /*
  * Class:     com_twilio_signal_impl_EndpointImpl_EndpointObserverInternal
  * Method:    wrapNativeObserver
- * Signature: (Lcom/twilio/signal/EndpointListener;Lcom/twilio/signal/Endpoint;)J
+ * Signature: (Lcom/twilio/signal/impl/core/EndpointObserver;Lcom/twilio/signal/Endpoint;)J
  */
 JNIEXPORT jlong JNICALL Java_com_twilio_signal_impl_EndpointImpl_00024EndpointObserverInternal_wrapNativeObserver
   (JNIEnv *, jobject, jobject, jobject);

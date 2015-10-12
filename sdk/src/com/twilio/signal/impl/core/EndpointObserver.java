@@ -1,13 +1,13 @@
 package com.twilio.signal.impl.core;
 
-interface EndpointObserver {
+public interface EndpointObserver {
 
-	void onRegistrationDidComplete(CoreError error);
+	public void onRegistrationDidComplete(CoreError error);
 
-	void onUnregistrationDidComplete(CoreError error);
+	public void onUnregistrationDidComplete(CoreError error);
 
-	void onStateDidChange(EndpointState state);
+	public void onStateDidChange(EndpointState state);
 
-	void onIncomingCallDidReceive(long nativeSession, String[] participants);
+	public void onIncomingCallDidReceive(long nativeSession, String[] participants);
 
 }
