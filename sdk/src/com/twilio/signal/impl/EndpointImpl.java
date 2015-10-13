@@ -4,7 +4,6 @@ import java.util.Set;
 import java.util.UUID;
 
 import android.os.Handler;
-import android.os.Looper;
 import android.app.PendingIntent;
 import android.app.PendingIntent.CanceledException;
 import android.app.Activity;
@@ -20,6 +19,7 @@ import com.twilio.signal.Endpoint;
 import com.twilio.signal.EndpointListener;
 import com.twilio.signal.Participant;
 import com.twilio.signal.LocalMediaImpl;
+import com.twilio.signal.impl.util.CallbackHandler;
 import com.twilio.signal.impl.logging.Logger;
 
 public class EndpointImpl implements Endpoint, EndpointListener, NativeHandleInterface, Parcelable {
@@ -71,22 +71,7 @@ public class EndpointImpl implements Endpoint, EndpointListener, NativeHandleInt
 		this.context = context;
 		this.listener = inListener;
 		this.endpointObserver = new EndpointObserverInternal(this);
-		setupListenerHandler();
-	}
-
-	/*
-	 * Use the thread looper or the main thread looper if the thread does not
-	 * provide one to callback on the thread that provided the event listener.
-	 */
-	private void setupListenerHandler() {
-		Looper looper;
-		if((looper = Looper.myLooper()) != null) {
-			handler = new Handler(looper);
-		} else if((looper = Looper.getMainLooper()) != null) {
-			handler = new Handler(looper);
-		} else {
-			handler = null;
-		}
+		handler = CallbackHandler.create();
 	}
 
 	@Override

@@ -21,6 +21,7 @@ import com.twilio.signal.impl.core.DisconnectReason;
 import com.twilio.signal.impl.core.MediaStreamInfo;
 import com.twilio.signal.impl.core.SessionState;
 import com.twilio.signal.impl.core.TrackInfo;
+import com.twilio.signal.impl.util.CallbackHandler;
 import com.twilio.signal.impl.logging.Logger;
 
 public class ConversationImpl implements Conversation, NativeHandleInterface, SessionObserver {
@@ -70,7 +71,7 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 		this.localMediaImpl = localMediaImpl;
 		this.conversationListener = conversationListener;
 
-		setupListenerHandler();
+		handler = CallbackHandler.create();
 
 		sessionObserverInternal = new SessionObserverInternal(this, this);
 
@@ -79,21 +80,6 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 				participantAddressArray);
 
 		start(nativeHandle);
-	}
-
-	/*
-	 * Use the thread looper or the main thread looper if the thread does not
-	 * provide one to callback on the thread that provided the event listener.
-	 */
-	private void setupListenerHandler() {
-		Looper looper;
-		if((looper = Looper.myLooper()) != null) {
-			handler = new Handler(looper);
-		} else if((looper = Looper.getMainLooper()) != null) {
-			handler = new Handler(looper);
-		} else {
-			handler = null;
-		}
 	}
 
 	public static Conversation create(EndpointImpl endpoint, Set<String> participants,
