@@ -8,22 +8,22 @@ import com.twilio.signal.Media;
 
 public class InviteImpl implements Invite {
 	
-	private Conversation conversation;
-	private Endpoint endpoint;
+	private ConversationImpl conversation;
+	private EndpointImpl toEndpoint;
 	private String fromAddr;
 	
-	private InviteImpl(Conversation conversation,
-					Endpoint endpoint,
+	private InviteImpl(ConversationImpl conversation,
+					EndpointImpl endpoint,
 					String[] participants) {
 		this.conversation = conversation;
-		this.endpoint = endpoint;
+		this.toEndpoint = endpoint;
 		if (participants.length > 0) {
 			fromAddr = participants[0];
 		}
 	}
 	
-	public static Invite create(Conversation conversation,
-					Endpoint endpoint,
+	public static Invite create(ConversationImpl conversation,
+					EndpointImpl endpoint,
 					String[] participants) {
 		if (conversation == null) {
 			return null;
@@ -39,20 +39,20 @@ public class InviteImpl implements Invite {
 
 	@Override
 	public String from() {
-		
-		return null;
+		return fromAddr;
 	}
 
 	@Override
 	public Endpoint to() {
-		// TODO Auto-generated method stub
-		return null;
+		return toEndpoint;
 	}
 
 	@Override
 	public void reject() {
-		// TODO Auto-generated method stub
-
+		if (conversation != null) {
+			toEndpoint.reject(conversation);
+			conversation = null;
+		}
 	}
 
 	@Override

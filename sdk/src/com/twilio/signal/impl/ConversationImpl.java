@@ -131,7 +131,7 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 		sessionObserverInternal = new SessionObserverInternal(this, this);
 	}
 	
-	public static Conversation createOutgoingConversation(EndpointImpl endpoint, Set<String> participants,
+	public static ConversationImpl createOutgoingConversation(EndpointImpl endpoint, Set<String> participants,
 			   LocalMediaImpl localMediaImpl,
 			   ConversationListener listener) {
 		ConversationImpl conv = new ConversationImpl(endpoint, participants, localMediaImpl, listener);
@@ -141,7 +141,7 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 		return conv;
 	}
 	
-	public static Conversation createIncomingConversation(
+	public static ConversationImpl createIncomingConversation(
 			long nativeSession,
 			String[] participantsAddr) {
 		if (nativeSession == 0) {

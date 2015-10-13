@@ -18,13 +18,19 @@ import com.twilio.signal.Endpoint;
 import com.twilio.signal.EndpointListener;
 import com.twilio.signal.Invite;
 import com.twilio.signal.LocalMediaImpl;
+import com.twilio.signal.impl.core.CoreEndpoint;
 import com.twilio.signal.impl.core.CoreError;
 import com.twilio.signal.impl.core.EndpointObserver;
 import com.twilio.signal.impl.core.EndpointState;
 import com.twilio.signal.impl.logging.Logger;
 import com.twilio.signal.impl.util.CallbackHandler;
 
-public class EndpointImpl implements Endpoint, NativeHandleInterface, Parcelable, EndpointObserver{
+public class EndpointImpl implements
+						Endpoint,
+						NativeHandleInterface,
+						Parcelable,
+						EndpointObserver,
+						CoreEndpoint{
 
 	static final Logger logger = Logger.getLogger(EndpointImpl.class);
 	
@@ -189,9 +195,6 @@ public class EndpointImpl implements Endpoint, NativeHandleInterface, Parcelable
 		return nativeEndpointHandle;
 	}
 
-	//Native implementation
-	private native void listen(long nativeEndpoint);
-
 	/**
 	 * EndpointObserver methods
 	 */
@@ -228,19 +231,46 @@ public class EndpointImpl implements Endpoint, NativeHandleInterface, Parcelable
 			String[] participants) {
 		logger.d("onIncomingCallDidReceive");
 		
-		//TODO - Create incoming Conversation
-		Conversation conv =
+		ConversationImpl conv =
 				ConversationImpl.createIncomingConversation(nativeSession, participants);
 		if (conv == null) {
 			logger.e("Failed to create conversation");
 		}
-		//TODO - Create Invite with that Conversation
+		
 		Invite invite = InviteImpl.create(conv,this, participants);
 		if (invite == null) {
 			logger.e("Failed to create Conversation Invite");
 		}
 		listener.onReceiveConversationInvite(this, invite);
 	}
+
+
+	/*
+	 * CoreEndpoint methods
+	 */
+	@Override
+	public void accept(ConversationImpl conv) {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+	@Override
+	public void reject(ConversationImpl conv) {
+		reject(getNativeHandle(), conv.getNativeHandle());
+	}
+
+
+	@Override
+	public void ignore(ConversationImpl conv) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	
+	//Native implementation
+	private native void listen(long nativeEndpoint);
+	private native void reject(long nativeEndpoint, long nativeSession);
 
 
 }

@@ -5,6 +5,7 @@
 #include "com_twilio_signal_impl_EndpointImpl.h"
 #include "TSCoreSDKTypes.h"
 #include "TSCEndpoint.h"
+#include "TSCSession.h"
 
 using namespace twiliosdk;
 /*
@@ -16,5 +17,17 @@ JNIEXPORT void JNICALL Java_com_twilio_signal_impl_EndpointImpl_listen
   (JNIEnv *env, jobject obj, jlong nativeEndpoint) {
 
 	reinterpret_cast<TSCEndpointObject*>(nativeEndpoint)->registerEndpoint();
+}
+
+/*
+ * Class:     com_twilio_signal_impl_EndpointImpl
+ * Method:    reject
+ * Signature: (JJ)V
+ */
+JNIEXPORT void JNICALL Java_com_twilio_signal_impl_EndpointImpl_reject
+  (JNIEnv *env, jobject obj, jlong nativeEndpoint, jlong nativeSession) {
+
+	TSCSessionObject* session = reinterpret_cast<TSCSessionObject*>(nativeSession);
+	reinterpret_cast<TSCEndpointObject*>(nativeEndpoint)->reject(session);
 }
 
