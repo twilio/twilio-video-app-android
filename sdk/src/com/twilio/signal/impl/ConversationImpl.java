@@ -6,7 +6,7 @@ import java.util.Set;
 
 import android.util.Log;
 import android.os.Handler;
-import android.os.Looper;
+import android.hardware.Camera;
 
 import com.twilio.signal.Conversation;
 import com.twilio.signal.ConversationException;
@@ -23,6 +23,12 @@ import com.twilio.signal.impl.core.SessionState;
 import com.twilio.signal.impl.core.TrackInfo;
 import com.twilio.signal.impl.util.CallbackHandler;
 import com.twilio.signal.impl.logging.Logger;
+
+import org.webrtc.VideoCapturerAndroid;
+import org.webrtc.VideoCapturer;
+import org.webrtc.VideoCapturerAndroid.CaptureFormat;
+
+import java.lang.reflect.Field;
 
 public class ConversationImpl implements Conversation, NativeHandleInterface, SessionObserver {
 
@@ -67,7 +73,25 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 		for(String participant : participants) {
 			participantAddressArray[i++] = participant;
 		}
-	
+
+		// Use the front-facing camera. If one isn't available use the first availbale device
+		String deviceName = VideoCapturerAndroid.getNameOfFrontFacingDevice();
+		if(deviceName == null) {
+			deviceName = VideoCapturerAndroid.getDeviceName(0);
+		}
+
+		VideoCapturerAndroid capturer = VideoCapturerAndroid.create(deviceName, null);
+
+		// Use reflection to obtain the native video capturer
+		long nativeVideoCapturer = 0;
+		try {
+			Field field = capturer.getClass().getSuperclass().getDeclaredField("nativeVideoCapturer");
+			field.setAccessible(true);
+			nativeVideoCapturer = field.getLong(capturer);
+		} catch (Exception e) {
+			logger.i(e.toString());
+		}
+
 		this.localMediaImpl = localMediaImpl;
 		this.conversationListener = conversationListener;
 
@@ -78,6 +102,8 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 		nativeHandle = wrapOutgoingSession(endpoint.getNativeHandle(),
 				sessionObserverInternal.getNativeHandle(),
 				participantAddressArray);
+
+		setExternalCapturer(nativeHandle, nativeVideoCapturer);
 
 		start(nativeHandle);
 	}
@@ -339,6 +365,7 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 
 	private native long wrapOutgoingSession(long nativeEndpoint, long nativeSessionObserver, String[] participants);
 	private native void start(long nativeSession);
+	private native void setExternalCapturer(long nativeSession, long nativeCapturer);
 	private native void stop(long nativeSession);
 
 }
