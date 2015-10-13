@@ -340,7 +340,7 @@ public class SignalPhone implements EndpointListener
 
 	@Override
 	public void onReceiveConversationInvite(Endpoint endpoint, Invite invite) {
-		// TODO Auto-generated method stub
+		Log.d(TAG, "onReceiveConversationInvite");
 
 	}
 

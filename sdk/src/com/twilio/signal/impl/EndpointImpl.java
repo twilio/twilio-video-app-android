@@ -16,6 +16,7 @@ import com.twilio.signal.ConversationException;
 import com.twilio.signal.ConversationListener;
 import com.twilio.signal.Endpoint;
 import com.twilio.signal.EndpointListener;
+import com.twilio.signal.Invite;
 import com.twilio.signal.LocalMediaImpl;
 import com.twilio.signal.impl.core.CoreError;
 import com.twilio.signal.impl.core.EndpointObserver;
@@ -127,7 +128,8 @@ public class EndpointImpl implements Endpoint, NativeHandleInterface, Parcelable
 	@Override
 	public Conversation createConversation(Set<String> participants,
 			LocalMediaImpl localMediaImpl, ConversationListener listener) {
-		Conversation conv = ConversationImpl.create(this, participants, localMediaImpl, listener);
+		Conversation conv = ConversationImpl.createOutgoingConversation(
+				this, participants, localMediaImpl, listener);
 		return conv;
 	}
 
@@ -227,9 +229,17 @@ public class EndpointImpl implements Endpoint, NativeHandleInterface, Parcelable
 		logger.d("onIncomingCallDidReceive");
 		
 		//TODO - Create incoming Conversation
+		Conversation conv =
+				ConversationImpl.createIncomingConversation(nativeSession, participants);
+		if (conv == null) {
+			logger.e("Failed to create conversation");
+		}
 		//TODO - Create Invite with that Conversation
-		//TODO - notify consumer with Invite
-		
+		Invite invite = InviteImpl.create(conv,this, participants);
+		if (invite == null) {
+			logger.e("Failed to create Conversation Invite");
+		}
+		listener.onReceiveConversationInvite(this, invite);
 	}
 
 

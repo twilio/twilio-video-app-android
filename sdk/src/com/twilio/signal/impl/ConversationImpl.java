@@ -1,18 +1,22 @@
 package com.twilio.signal.impl;
 
+import java.lang.reflect.Field;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import android.util.Log;
+import org.webrtc.VideoCapturerAndroid;
+
 import android.os.Handler;
-import android.hardware.Camera;
+import android.util.Log;
 
 import com.twilio.signal.Conversation;
 import com.twilio.signal.ConversationException;
 import com.twilio.signal.ConversationListener;
 import com.twilio.signal.LocalMediaImpl;
 import com.twilio.signal.Media;
+import com.twilio.signal.Participant;
 import com.twilio.signal.TrackOrigin;
 import com.twilio.signal.VideoTrack;
 import com.twilio.signal.VideoViewRenderer;
@@ -21,14 +25,8 @@ import com.twilio.signal.impl.core.DisconnectReason;
 import com.twilio.signal.impl.core.MediaStreamInfo;
 import com.twilio.signal.impl.core.SessionState;
 import com.twilio.signal.impl.core.TrackInfo;
-import com.twilio.signal.impl.util.CallbackHandler;
 import com.twilio.signal.impl.logging.Logger;
-
-import org.webrtc.VideoCapturerAndroid;
-import org.webrtc.VideoCapturer;
-import org.webrtc.VideoCapturerAndroid.CaptureFormat;
-
-import java.lang.reflect.Field;
+import com.twilio.signal.impl.util.CallbackHandler;
 
 public class ConversationImpl implements Conversation, NativeHandleInterface, SessionObserver {
 
@@ -66,7 +64,7 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 
 	private SessionObserverInternal sessionObserverInternal;
 	private long nativeHandle;
-
+	
 	private ConversationImpl(EndpointImpl endpoint, Set<String> participants, LocalMediaImpl localMediaImpl, ConversationListener conversationListener) {
 		String[] participantAddressArray = new String[participants.size()];
 		int i = 0;
@@ -74,7 +72,7 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 			participantAddressArray[i++] = participant;
 		}
 
-		// TODO: throw an exception if the handler returns null 
+		// TODO: throw an exception if the handler returns null
 		handler = CallbackHandler.create();
 
 		this.localMediaImpl = localMediaImpl;
@@ -88,7 +86,7 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 
 		String deviceName = getPreferredDeviceName();
 		if(deviceName != null) {
-			// TODO: pass an error handler and callback on the listener to propagate camera errors 
+			// TODO: pass an error handler and callback on the listener to propagate camera errors
 			VideoCapturerAndroid capturer = VideoCapturerAndroid.create(deviceName, null);
 			long nativeVideoCapturer = getNativeVideoCapturer(capturer);
 			setExternalCapturer(nativeHandle, nativeVideoCapturer);
@@ -112,7 +110,7 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 	}
 
 	private long getNativeVideoCapturer(VideoCapturerAndroid capturer) {
-		// TODO: throw exceptions to callee 
+		// TODO: throw exceptions to callee
 		// Use reflection to obtain the native video capturer handle
 		long nativeVideoCapturer = 0;
 		try {
@@ -124,8 +122,16 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 		}
 		return nativeVideoCapturer;
 	}
-
-	public static Conversation create(EndpointImpl endpoint, Set<String> participants,
+	
+	private ConversationImpl(long nativeSession, String[] participantsAddr) {
+		nativeHandle = nativeSession;
+		for (String participant : participantsAddr) {
+			addParticipant(participant);
+		}
+		sessionObserverInternal = new SessionObserverInternal(this, this);
+	}
+	
+	public static Conversation createOutgoingConversation(EndpointImpl endpoint, Set<String> participants,
 			   LocalMediaImpl localMediaImpl,
 			   ConversationListener listener) {
 		ConversationImpl conv = new ConversationImpl(endpoint, participants, localMediaImpl, listener);
@@ -133,6 +139,18 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 			return null;
 		}
 		return conv;
+	}
+	
+	public static Conversation createIncomingConversation(
+			long nativeSession,
+			String[] participantsAddr) {
+		if (nativeSession == 0) {
+			return null;
+		}
+		if (participantsAddr == null || participantsAddr.length == 0) {
+			return null;
+		}
+		return new ConversationImpl(nativeSession, participantsAddr);
 	}
 
 	@Override
@@ -143,8 +161,11 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 
 	@Override
 	public Set<String> getParticipants() {
-		// TODO Auto-generated method stub
-		return null;
+		Set<String> participants =  new HashSet<String>();
+		for (Participant participant : participantMap.values()) {
+			participants.add(participant.getAddress());
+		}
+		return participants;
 	}
 
 	@Override
@@ -182,7 +203,7 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 		return null;
 	}
 
-	private ParticipantImpl retrieveParticipant(String participantAddress) {
+	private ParticipantImpl addParticipant(String participantAddress) {
 		ParticipantImpl participant = participantMap.get(participantAddress);
 		if(participant == null) {
 			participant = new ParticipantImpl(participantAddress);
@@ -232,8 +253,7 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 	@Override
 	public void onConnectParticipant(String participantAddress, CoreError error) {
 		logger.i("onConnectParticipant " + participantAddress);
-
-		final ParticipantImpl participant = retrieveParticipant(participantAddress);
+		final ParticipantImpl participant = addParticipant(participantAddress);
 		if (error == null) {
 			if(handler != null) {
 				handler.post(new Runnable() {
@@ -328,7 +348,7 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 				}
 			}).start();
 		} else {
-			final ParticipantImpl participant = retrieveParticipant(trackInfo.getParticipantAddress());
+			final ParticipantImpl participant = addParticipant(trackInfo.getParticipantAddress());
 			final VideoTrackImpl videoTrackImpl = VideoTrackImpl.create(webRtcVideoTrack, trackInfo);
 			participant.getMediaImpl().addVideoTrack(videoTrackImpl);
 			if(handler != null) {
@@ -345,7 +365,7 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 	@Override
 	public void onVideoTrackRemoved(TrackInfo trackInfo) {
 		logger.i("onVideoTrackRemoved " + trackInfo.getParticipantAddress());
-		final ParticipantImpl participant = retrieveParticipant(trackInfo.getParticipantAddress());
+		final ParticipantImpl participant = addParticipant(trackInfo.getParticipantAddress());
 		final VideoTrack videoTrack = participant.getMediaImpl().removeVideoTrack(trackInfo);
 		if(handler != null) {
 			handler.post(new Runnable() {
