@@ -18,7 +18,6 @@ import com.twilio.signal.VideoTrack;
 import com.twilio.signal.VideoViewRenderer;
 import com.twilio.signal.impl.core.CoreError;
 import com.twilio.signal.impl.core.DisconnectReason;
-import com.twilio.signal.impl.core.Event;
 import com.twilio.signal.impl.core.MediaStreamInfo;
 import com.twilio.signal.impl.core.SessionState;
 import com.twilio.signal.impl.core.TrackInfo;
@@ -167,12 +166,6 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 	 * ConversationListener events
 	 */
 
-
-	@Override
-	public void onReceivedEvent(Event event) {
-		logger.i("onReceivedEvent");
-		
-	}
 
 	@Override
 	public void onStartCompleted(CoreError error) {
