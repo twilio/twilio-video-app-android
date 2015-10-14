@@ -71,6 +71,7 @@ public class EndpointImpl implements Endpoint, EndpointListener, NativeHandleInt
 		this.context = context;
 		this.listener = inListener;
 		this.endpointObserver = new EndpointObserverInternal(this);
+		// TODO: throw an exception if the handler returns null 
 		handler = CallbackHandler.create();
 	}
 

@@ -61,6 +61,8 @@ JNIEXPORT jboolean JNICALL Java_com_twilio_signal_impl_TwilioRTCImpl_initCore(JN
 	TS_CORE_LOG_DEBUG("Calling DA Magic formula");
 	success |= webrtc::VoiceEngine::SetAndroidObjects(cachedJVM, context);
 
+	// TODO: check success and return appropriately 
+
 	if (tscSdk != NULL && tscSdk->isInitialized())
 	{
 		return JNI_TRUE;

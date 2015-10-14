@@ -74,28 +74,11 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 			participantAddressArray[i++] = participant;
 		}
 
-		// Use the front-facing camera. If one isn't available use the first availbale device
-		String deviceName = VideoCapturerAndroid.getNameOfFrontFacingDevice();
-		if(deviceName == null) {
-			deviceName = VideoCapturerAndroid.getDeviceName(0);
-		}
-
-		VideoCapturerAndroid capturer = VideoCapturerAndroid.create(deviceName, null);
-
-		// Use reflection to obtain the native video capturer
-		long nativeVideoCapturer = 0;
-		try {
-			Field field = capturer.getClass().getSuperclass().getDeclaredField("nativeVideoCapturer");
-			field.setAccessible(true);
-			nativeVideoCapturer = field.getLong(capturer);
-		} catch (Exception e) {
-			logger.i(e.toString());
-		}
+		// TODO: throw an exception if the handler returns null 
+		handler = CallbackHandler.create();
 
 		this.localMediaImpl = localMediaImpl;
 		this.conversationListener = conversationListener;
-
-		handler = CallbackHandler.create();
 
 		sessionObserverInternal = new SessionObserverInternal(this, this);
 
@@ -103,9 +86,43 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 				sessionObserverInternal.getNativeHandle(),
 				participantAddressArray);
 
-		setExternalCapturer(nativeHandle, nativeVideoCapturer);
+		String deviceName = getPreferredDeviceName();
+		if(deviceName != null) {
+			// TODO: pass an error handler and callback on the listener to propagate camera errors 
+			VideoCapturerAndroid capturer = VideoCapturerAndroid.create(deviceName, null);
+			long nativeVideoCapturer = getNativeVideoCapturer(capturer);
+			setExternalCapturer(nativeHandle, nativeVideoCapturer);
+		} else {
+			// TODO: disable video or throw an exception notifying the user that there is no camera available
+		}
 
 		start(nativeHandle);
+	}
+
+	private String getPreferredDeviceName() {
+		if(VideoCapturerAndroid.getDeviceCount() == 0) {
+			return null;
+		}
+		// Use the front-facing camera if one is available otherwise use the first available device
+		String deviceName = VideoCapturerAndroid.getNameOfFrontFacingDevice();
+		if(deviceName == null) {
+			deviceName = VideoCapturerAndroid.getDeviceName(0);
+		}
+		return deviceName;
+	}
+
+	private long getNativeVideoCapturer(VideoCapturerAndroid capturer) {
+		// TODO: throw exceptions to callee 
+		// Use reflection to obtain the native video capturer handle
+		long nativeVideoCapturer = 0;
+		try {
+			Field field = capturer.getClass().getSuperclass().getDeclaredField("nativeVideoCapturer");
+			field.setAccessible(true);
+			nativeVideoCapturer = field.getLong(capturer);
+		} catch (Exception e) {
+			logger.e(e.toString());
+		}
+		return nativeVideoCapturer;
 	}
 
 	public static Conversation create(EndpointImpl endpoint, Set<String> participants,
