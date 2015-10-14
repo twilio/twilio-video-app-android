@@ -87,7 +87,7 @@ JNIEXPORT void JNICALL Java_com_twilio_signal_impl_ConversationImpl_setExternalC
 {
 	TS_CORE_LOG_DEBUG("setExternalCapturer");
 	TSCSessionObject* session = reinterpret_cast<TSCSessionObject*>(nativeSession);
-	IVideoCaptureControllerInterface *videoCaptureController = session->getVideoCaptureController();
+	TSCVideoCaptureController* videoCaptureController = session->getVideoCaptureController();
 	if(videoCaptureController != nullptr) {
 		videoCaptureController->setExternalVideoCapturer(reinterpret_cast<cricket::VideoCapturer*>(nativeCapturer));
 	} else {
