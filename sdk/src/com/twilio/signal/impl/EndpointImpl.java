@@ -3,6 +3,7 @@ package com.twilio.signal.impl;
 import java.util.Set;
 import java.util.UUID;
 
+import android.os.Handler;
 import android.app.PendingIntent;
 import android.app.PendingIntent.CanceledException;
 import android.app.Activity;
@@ -12,14 +13,16 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 import com.twilio.signal.Conversation;
+import com.twilio.signal.Invite;
 import com.twilio.signal.ConversationListener;
 import com.twilio.signal.Endpoint;
 import com.twilio.signal.EndpointListener;
 import com.twilio.signal.Participant;
 import com.twilio.signal.LocalMediaImpl;
+import com.twilio.signal.impl.util.CallbackHandler;
 import com.twilio.signal.impl.logging.Logger;
 
-public class EndpointImpl implements Endpoint, NativeHandleInterface, Parcelable{
+public class EndpointImpl implements Endpoint, EndpointListener, NativeHandleInterface, Parcelable {
 
 	static final Logger logger = Logger.getLogger(EndpointImpl.class);
 	
@@ -50,7 +53,8 @@ public class EndpointImpl implements Endpoint, NativeHandleInterface, Parcelable
 	private PendingIntent incomingIntent = null;
 	private EndpointObserverInternal endpointObserver;
 	private long nativeEndpointHandle;
-	
+
+	private Handler handler;
 	
 	public UUID getUuid() {
 		return uuid;
@@ -66,10 +70,59 @@ public class EndpointImpl implements Endpoint, NativeHandleInterface, Parcelable
 			EndpointListener inListener) {
 		this.context = context;
 		this.listener = inListener;
-		//this.nativeEndpointHandle = nativeEndpointHandle;
-		this.endpointObserver = new EndpointObserverInternal(inListener);
+		this.endpointObserver = new EndpointObserverInternal(this);
+		// TODO: throw an exception if the handler returns null 
+		handler = CallbackHandler.create();
 	}
-	
+
+	@Override
+	public void onStartListeningForInvites(final Endpoint endpoint) {
+		if(handler != null) {
+			handler.post(new Runnable() {
+				@Override
+				public void run() {
+					listener.onStartListeningForInvites(endpoint);
+				}
+			});
+		}
+	}
+
+	@Override
+	public void onStopListeningForInvites(final Endpoint endpoint) {
+		if(handler != null) {
+			handler.post(new Runnable() {
+				@Override
+				public void run() {
+					listener.onStopListeningForInvites(endpoint);
+				}
+			});
+		}
+	}
+
+	@Override
+	public void onFailedToStartListening(final Endpoint endpoint, final int errorCode, final String errorMessage) {
+		if(handler != null) {
+			handler.post(new Runnable() {
+				@Override
+				public void run() {
+					listener.onFailedToStartListening(endpoint, errorCode, errorMessage);
+				}
+			});
+		}
+	}
+
+	@Override		
+	public void onReceiveConversationInvite(final Endpoint endpoint, final Invite invite) {
+		if(handler != null) {
+			handler.post(new Runnable() {
+				@Override
+				public void run() {
+					listener.onReceiveConversationInvite(endpoint, invite);
+				}
+			});
+		}
+	}
+
 	void setNativeHandle(long nativeEndpointHandle) {
 		this.nativeEndpointHandle = nativeEndpointHandle;
 	}

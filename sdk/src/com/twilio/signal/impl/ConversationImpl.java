@@ -5,6 +5,8 @@ import java.util.Map;
 import java.util.Set;
 
 import android.util.Log;
+import android.os.Handler;
+import android.hardware.Camera;
 
 import com.twilio.signal.Conversation;
 import com.twilio.signal.ConversationException;
@@ -19,13 +21,22 @@ import com.twilio.signal.impl.core.DisconnectReason;
 import com.twilio.signal.impl.core.MediaStreamInfo;
 import com.twilio.signal.impl.core.SessionState;
 import com.twilio.signal.impl.core.TrackInfo;
+import com.twilio.signal.impl.util.CallbackHandler;
 import com.twilio.signal.impl.logging.Logger;
+
+import org.webrtc.VideoCapturerAndroid;
+import org.webrtc.VideoCapturer;
+import org.webrtc.VideoCapturerAndroid.CaptureFormat;
+
+import java.lang.reflect.Field;
 
 public class ConversationImpl implements Conversation, NativeHandleInterface, SessionObserver {
 
 	private ConversationListener conversationListener;
 	private LocalMediaImpl localMediaImpl;
 	private VideoViewRenderer localVideoRenderer;
+
+	private Handler handler;
 
 	private Map<String,ParticipantImpl> participantMap = new HashMap<String,ParticipantImpl>();
 
@@ -62,7 +73,10 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 		for(String participant : participants) {
 			participantAddressArray[i++] = participant;
 		}
-	
+
+		// TODO: throw an exception if the handler returns null 
+		handler = CallbackHandler.create();
+
 		this.localMediaImpl = localMediaImpl;
 		this.conversationListener = conversationListener;
 
@@ -72,7 +86,43 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 				sessionObserverInternal.getNativeHandle(),
 				participantAddressArray);
 
+		String deviceName = getPreferredDeviceName();
+		if(deviceName != null) {
+			// TODO: pass an error handler and callback on the listener to propagate camera errors 
+			VideoCapturerAndroid capturer = VideoCapturerAndroid.create(deviceName, null);
+			long nativeVideoCapturer = getNativeVideoCapturer(capturer);
+			setExternalCapturer(nativeHandle, nativeVideoCapturer);
+		} else {
+			// TODO: disable video or throw an exception notifying the user that there is no camera available
+		}
+
 		start(nativeHandle);
+	}
+
+	private String getPreferredDeviceName() {
+		if(VideoCapturerAndroid.getDeviceCount() == 0) {
+			return null;
+		}
+		// Use the front-facing camera if one is available otherwise use the first available device
+		String deviceName = VideoCapturerAndroid.getNameOfFrontFacingDevice();
+		if(deviceName == null) {
+			deviceName = VideoCapturerAndroid.getDeviceName(0);
+		}
+		return deviceName;
+	}
+
+	private long getNativeVideoCapturer(VideoCapturerAndroid capturer) {
+		// TODO: throw exceptions to callee 
+		// Use reflection to obtain the native video capturer handle
+		long nativeVideoCapturer = 0;
+		try {
+			Field field = capturer.getClass().getSuperclass().getDeclaredField("nativeVideoCapturer");
+			field.setAccessible(true);
+			nativeVideoCapturer = field.getLong(capturer);
+		} catch (Exception e) {
+			logger.e(e.toString());
+		}
+		return nativeVideoCapturer;
 	}
 
 	public static Conversation create(EndpointImpl endpoint, Set<String> participants,
@@ -154,14 +204,28 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 
 	@Override
 	public void onStopCompleted(CoreError error) {
-		logger.i("onStartCompleted");
+		logger.i("onStopCompleted");
 		if (error == null) {
-			conversationListener.onConversationEnded(ConversationImpl.this);
+			if(handler != null) {
+				handler.post(new Runnable() {
+					@Override
+					public void run() {
+						conversationListener.onConversationEnded(ConversationImpl.this);
+					}
+				});
+			}
 		} else {
 			final ConversationException e =
 					new ConversationException(error.getDomain(), error.getCode(),
 							error.getMessage());
-			conversationListener.onConversationEnded(ConversationImpl.this, e);
+			if(handler != null) {
+				handler.post(new Runnable() {
+					@Override
+					public void run() {
+						conversationListener.onConversationEnded(ConversationImpl.this, e);
+					}
+				});
+			}
 		}
 	}
 
@@ -169,13 +233,26 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 	public void onConnectParticipant(String participantAddress, CoreError error) {
 		logger.i("onConnectParticipant " + participantAddress);
 
-		ParticipantImpl participant = retrieveParticipant(participantAddress);
+		final ParticipantImpl participant = retrieveParticipant(participantAddress);
 		if (error == null) {
-			conversationListener.onConnectParticipant(this, participant);
+			if(handler != null) {
+				handler.post(new Runnable() {
+					@Override
+					public void run() {
+						conversationListener.onConnectParticipant(ConversationImpl.this, participant);
+					}
+				});
+			}
 		} else {
-			ConversationException e =
-					new ConversationException(error.getDomain(), error.getCode(), error.getMessage());
-			conversationListener.onFailToConnectParticipant(this, participant, e);
+			final ConversationException e = new ConversationException(error.getDomain(), error.getCode(), error.getMessage());
+			if(handler != null) {
+				handler.post(new Runnable() {
+					@Override
+					public void run() {
+						conversationListener.onFailToConnectParticipant(ConversationImpl.this, participant, e);
+					}
+				});
+			}
 		}
 	}
 
@@ -185,7 +262,14 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 		if(participant == null) {
 			logger.i("participant removed but was never in list");
 		} else {
-			conversationListener.onDisconnectParticipant(this, participant);
+			if(handler != null) {
+				handler.post(new Runnable() {
+					@Override
+					public void run() {
+						conversationListener.onDisconnectParticipant(ConversationImpl.this, participant);
+					}
+				});
+			}
 		}
 	}
 
@@ -202,8 +286,15 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 	@Override
 	public void onLocalStatusChanged(final SessionState status) {
 		logger.i("state changed to:"+status.name());
-		Conversation.Status convStatus = sessionStateToStatus(status);
-		conversationListener.onLocalStatusChanged(this, convStatus);
+		final Conversation.Status convStatus = sessionStateToStatus(status);
+		if(handler != null) {
+			handler.post(new Runnable() {
+				@Override
+				public void run() {
+					conversationListener.onLocalStatusChanged(ConversationImpl.this, convStatus);
+				}
+			});
+		}
 	}
 
 	@Override
@@ -237,19 +328,33 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 				}
 			}).start();
 		} else {
-			ParticipantImpl participant = retrieveParticipant(trackInfo.getParticipantAddress());
-			VideoTrackImpl videoTrackImpl = VideoTrackImpl.create(webRtcVideoTrack, trackInfo);
+			final ParticipantImpl participant = retrieveParticipant(trackInfo.getParticipantAddress());
+			final VideoTrackImpl videoTrackImpl = VideoTrackImpl.create(webRtcVideoTrack, trackInfo);
 			participant.getMediaImpl().addVideoTrack(videoTrackImpl);
-			conversationListener.onVideoAddedForParticipant(this, participant, videoTrackImpl);
+			if(handler != null) {
+				handler.post(new Runnable() {
+					@Override
+					public void run() {
+						conversationListener.onVideoAddedForParticipant(ConversationImpl.this, participant, videoTrackImpl);
+					}
+				});
+			}
 		}
 	}
 
 	@Override
 	public void onVideoTrackRemoved(TrackInfo trackInfo) {
 		logger.i("onVideoTrackRemoved " + trackInfo.getParticipantAddress());
-		ParticipantImpl participant = retrieveParticipant(trackInfo.getParticipantAddress());
-		VideoTrack videoTrack = participant.getMediaImpl().removeVideoTrack(trackInfo);
-		conversationListener.onVideoRemovedForParticipant(this, participant, videoTrack);
+		final ParticipantImpl participant = retrieveParticipant(trackInfo.getParticipantAddress());
+		final VideoTrack videoTrack = participant.getMediaImpl().removeVideoTrack(trackInfo);
+		if(handler != null) {
+			handler.post(new Runnable() {
+				@Override
+				public void run() {
+					conversationListener.onVideoRemovedForParticipant(ConversationImpl.this, participant, videoTrack);
+				}
+			});
+		}
 	}
 
 	@Override
@@ -277,6 +382,7 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 
 	private native long wrapOutgoingSession(long nativeEndpoint, long nativeSessionObserver, String[] participants);
 	private native void start(long nativeSession);
+	private native void setExternalCapturer(long nativeSession, long nativeCapturer);
 	private native void stop(long nativeSession);
 
 }

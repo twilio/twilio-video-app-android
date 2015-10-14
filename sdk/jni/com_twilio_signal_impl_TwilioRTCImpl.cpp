@@ -11,7 +11,7 @@
 #include "webrtc/voice_engine/include/voe_base.h"
 #include "webrtc/modules/video_capture/video_capture_internal.h"
 #include "webrtc/modules/video_render/video_render_internal.h"
-
+#include "talk/app/webrtc/java/jni/androidvideocapturer_jni.h"
 #include "webrtc/modules/audio_device/android/audio_manager.h"
 #include "webrtc/modules/audio_device/android/opensles_player.h"
 #include "webrtc/modules/video_capture/android/device_info_android.h"
@@ -33,7 +33,7 @@ using namespace twiliosdk;
  */
 JNIEXPORT jboolean JNICALL Java_com_twilio_signal_impl_TwilioRTCImpl_initCore(JNIEnv *env, jobject obj, jobject context) {
 
-	bool failure = false;
+	bool success = false;
 	JavaVM * cachedJVM = NULL;
 
 	env->GetJavaVM(&cachedJVM);
@@ -42,7 +42,7 @@ JNIEXPORT jboolean JNICALL Java_com_twilio_signal_impl_TwilioRTCImpl_initCore(JN
 	jint ret = webrtc_jni::InitGlobalJniVariables(cachedJVM);
 	if(ret < 0) {
 		TS_CORE_LOG_ERROR("TwilioSDK.InitGlobalJniVariables() failed");
-		return failure;
+		return success;
 	} else {
 		webrtc_jni::LoadGlobalClassReferenceHolder();
 	}
@@ -50,14 +50,18 @@ JNIEXPORT jboolean JNICALL Java_com_twilio_signal_impl_TwilioRTCImpl_initCore(JN
 	TSCSDK* tscSdk = TSCSDK::instance();
 
 	webrtc::videocapturemodule::DeviceInfoAndroid::Initialize(env);
-
 	webrtc::OpenSLESPlayer::SetAndroidAudioDeviceObjects(cachedJVM, context);
 
-	failure |= webrtc::SetCaptureAndroidVM(cachedJVM, context);
-	failure |= webrtc::SetRenderAndroidVM(cachedJVM);
+	success |= webrtc::SetCaptureAndroidVM(cachedJVM, context);
+	success |= webrtc::SetRenderAndroidVM(cachedJVM);
+
+	// Required to setup an external capturer
+	success |= webrtc_jni::AndroidVideoCapturerJni::SetAndroidObjects(env, context);
 
 	TS_CORE_LOG_DEBUG("Calling DA Magic formula");
-	failure |= webrtc::VoiceEngine::SetAndroidObjects(cachedJVM, context);
+	success |= webrtc::VoiceEngine::SetAndroidObjects(cachedJVM, context);
+
+	// TODO: check success and return appropriately 
 
 	if (tscSdk != NULL && tscSdk->isInitialized())
 	{

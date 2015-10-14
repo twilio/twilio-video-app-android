@@ -4,6 +4,7 @@
 #include "TSCLogger.h"
 #include "TSCEndpoint.h"
 #include "TSCSessionObserver.h"
+#include "TSCVideoCaptureController.h"
 #include "TSCSession.h"
 #include "TSCParticipant.h"
 #include <twilio-jni/twilio-jni.h>
@@ -68,7 +69,7 @@ JNIEXPORT void JNICALL Java_com_twilio_signal_impl_ConversationImpl_start
 {
 	TS_CORE_LOG_DEBUG("start");
 	TSCSessionObject* session = reinterpret_cast<TSCSessionObject*>(nativeSession);
-	session->start();	
+	session->start();
 }
 
 
@@ -79,4 +80,19 @@ JNIEXPORT void JNICALL Java_com_twilio_signal_impl_ConversationImpl_stop
 	TSCSessionObject* session = reinterpret_cast<TSCSessionObject*>(nativeSession);
 	session->stop();
 }
+
+
+JNIEXPORT void JNICALL Java_com_twilio_signal_impl_ConversationImpl_setExternalCapturer
+  (JNIEnv *env, jobject obj, jlong nativeSession, jlong nativeCapturer)
+{
+	TS_CORE_LOG_DEBUG("setExternalCapturer");
+	TSCSessionObject* session = reinterpret_cast<TSCSessionObject*>(nativeSession);
+	IVideoCaptureControllerInterface *videoCaptureController = session->getVideoCaptureController();
+	if(videoCaptureController != nullptr) {
+		videoCaptureController->setExternalVideoCapturer(reinterpret_cast<cricket::VideoCapturer*>(nativeCapturer));
+	} else {
+		TS_CORE_LOG_DEBUG("videoCapturerController was null");
+	}
+}
+
 
