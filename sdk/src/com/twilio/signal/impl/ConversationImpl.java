@@ -127,6 +127,8 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 	
 	private ConversationImpl(long nativeSession, String[] participantsAddr) {
 		nativeHandle = nativeSession;
+		// TODO: throw an exception if the handler returns null
+		handler = CallbackHandler.create();
 		for (String participant : participantsAddr) {
 			addParticipant(participant);
 		}
