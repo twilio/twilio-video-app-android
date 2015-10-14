@@ -95,7 +95,8 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 			// TODO: disable video or throw an exception notifying the user that there is no camera available
 		}
 
-		start(nativeHandle);
+		start();
+
 	}
 
 	private String getPreferredDeviceName() {
@@ -194,7 +195,7 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 
 	@Override
 	public void disconnect() {
-		stop(nativeHandle);
+		stop();
 	}
 
 	@Override
@@ -418,7 +419,7 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 
 	@Override
 	public void stop() {
-		// TODO Auto-generated method stub
+		stop(getNativeHandle());
 		
 	}
 
