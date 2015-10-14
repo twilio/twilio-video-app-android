@@ -113,7 +113,7 @@ public class EndpointImpl implements
 
 	@Override
 	public void setEndpointListener(EndpointListener listener) {
-		// TODO Auto-generated method stub
+		this.listener = listener;
 
 	}
 
@@ -202,12 +202,26 @@ public class EndpointImpl implements
 	public void onRegistrationDidComplete(CoreError error) {
 		logger.d("onRegistrationDidComplete");
 		if (error != null) {
-			ConversationException e =
+			final ConversationException e =
 					new ConversationException(error.getDomain(),
 							error.getCode(), error.getMessage());
-			listener.onFailedToStartListening(this, e);
+			if (handler != null) {
+				handler.post(new Runnable() {
+					@Override
+					public void run() {
+						listener.onFailedToStartListening(EndpointImpl.this, e);
+					}
+				});
+			}
 		} else {
-			listener.onStartListeningForInvites(this);
+			if (handler != null) {
+				handler.post(new Runnable() {
+					@Override
+					public void run() {
+						listener.onStartListeningForInvites(EndpointImpl.this);
+					}
+				});
+			}
 		}
 	}
 
@@ -215,7 +229,15 @@ public class EndpointImpl implements
 	@Override
 	public void onUnregistrationDidComplete(CoreError error) {
 		logger.d("onUnregistrationDidComplete");
-		listener.onStopListeningForInvites(this);
+		if (handler != null) {
+			handler.post(new Runnable() {
+				@Override
+				public void run() {
+					listener.onStopListeningForInvites(EndpointImpl.this);
+				}
+			});
+		}
+		
 	}
 
 
@@ -237,11 +259,18 @@ public class EndpointImpl implements
 			logger.e("Failed to create conversation");
 		}
 		
-		Invite invite = InviteImpl.create(conv,this, participants);
+		final Invite invite = InviteImpl.create(conv,this, participants);
 		if (invite == null) {
 			logger.e("Failed to create Conversation Invite");
 		}
-		listener.onReceiveConversationInvite(this, invite);
+		if (handler != null) {
+			handler.post(new Runnable() {
+				@Override
+				public void run() {
+					listener.onReceiveConversationInvite(EndpointImpl.this, invite);
+				}
+			});
+		}
 	}
 
 
