@@ -21,6 +21,7 @@ import com.twilio.signal.TrackOrigin;
 import com.twilio.signal.VideoTrack;
 import com.twilio.signal.VideoViewRenderer;
 import com.twilio.signal.impl.core.CoreError;
+import com.twilio.signal.impl.core.CoreSession;
 import com.twilio.signal.impl.core.DisconnectReason;
 import com.twilio.signal.impl.core.MediaStreamInfo;
 import com.twilio.signal.impl.core.SessionState;
@@ -28,7 +29,7 @@ import com.twilio.signal.impl.core.TrackInfo;
 import com.twilio.signal.impl.logging.Logger;
 import com.twilio.signal.impl.util.CallbackHandler;
 
-public class ConversationImpl implements Conversation, NativeHandleInterface, SessionObserver {
+public class ConversationImpl implements Conversation, NativeHandleInterface, SessionObserver, CoreSession {
 
 	private ConversationListener conversationListener;
 	private LocalMediaImpl localMediaImpl;
@@ -129,6 +130,7 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 			addParticipant(participant);
 		}
 		sessionObserverInternal = new SessionObserverInternal(this, this);
+		setSessionObserver(nativeSession, sessionObserverInternal.getNativeHandle());
 	}
 	
 	public static ConversationImpl createOutgoingConversation(EndpointImpl endpoint, Set<String> participants,
@@ -176,14 +178,12 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 
 	@Override
 	public ConversationListener getConversationListener() {
-		// TODO Auto-generated method stub
-		return null;
+		return conversationListener;
 	}
 
 	@Override
 	public void setConversationListener(ConversationListener listener) {
-		// TODO Auto-generated method stub
-
+		this.conversationListener = listener;
 	}
 
 	@Override
@@ -382,6 +382,10 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 		return nativeHandle;
 	}
 	
+	public void setLocalMedia(LocalMediaImpl media) {
+		localMediaImpl = media;
+	}
+	
 	private Conversation.Status sessionStateToStatus(SessionState state) {
 		switch(state) {
 			case INITIALIZED:
@@ -404,5 +408,18 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 	private native void start(long nativeSession);
 	private native void setExternalCapturer(long nativeSession, long nativeCapturer);
 	private native void stop(long nativeSession);
+	private native void setSessionObserver(long nativeSession, long nativeSessionObserver);
+
+	@Override
+	public void start() {
+		start(getNativeHandle());
+		
+	}
+
+	@Override
+	public void stop() {
+		// TODO Auto-generated method stub
+		
+	}
 
 }

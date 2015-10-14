@@ -8,7 +8,7 @@ import com.twilio.signal.impl.core.MediaStreamInfo;
 import com.twilio.signal.impl.core.SessionState;
 import com.twilio.signal.impl.core.TrackInfo;
 
-interface SessionObserver {
+public interface SessionObserver {
 	
 	void onStartCompleted(CoreError error);
 	

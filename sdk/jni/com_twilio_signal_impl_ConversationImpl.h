@@ -20,6 +20,10 @@ JNIEXPORT void JNICALL Java_com_twilio_signal_impl_ConversationImpl_stop
 JNIEXPORT void JNICALL Java_com_twilio_signal_impl_ConversationImpl_setExternalCapturer
   (JNIEnv *, jobject, jlong, jlong);
 
+JNIEXPORT void JNICALL Java_com_twilio_signal_impl_ConversationImpl_setSessionObserver
+  (JNIEnv *, jobject, jlong, jlong);
+
+
 #ifdef __cplusplus
 }
 #endif

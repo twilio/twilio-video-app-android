@@ -49,6 +49,7 @@ public class SignalPhone implements EndpointListener
     private String token = "";
 
     private Map<String, String> options = new HashMap<String, String>();
+    private Map<String, Invite> invites = new HashMap<String, Invite>();
 
     private ExecutorService threadPool;
 
@@ -58,6 +59,10 @@ public class SignalPhone implements EndpointListener
         public void onLoginFinished();
         public void onLoginError(String errorMessage);
         public void onLogoutFinished();
+        //TODO - !nn! - this is temporary callback
+        //we need to figure out how invite will be sent in future
+        //(intent, broadcast receiver or something else).
+        public void onIncomingCall(String from);
     }
 
     private static SignalPhone instance;
@@ -188,9 +193,28 @@ public class SignalPhone implements EndpointListener
 
     }
 
-    public void accept()
-    {
-       //this.alice.accept();
+    public Conversation accept(String from, ViewGroup localContainer, ConversationListener listener) {
+       Invite invite = invites.remove(from);
+       if (!twilioSdkInited || invite == null || invite.to() == null) {
+    	   return null;
+       }
+       LocalMediaImpl localMediaImpl = new LocalMediaImpl();
+       localMediaImpl.attachContainerView(localContainer);
+       return invite.acceptWithLocalMedia(localMediaImpl, listener);
+    }
+    
+    public void reject(String from) {
+    	Invite invite = invites.remove(from);
+    	if (invite != null) {
+    		invite.reject();
+    	}
+    }
+    
+    public void ignore(String from) {
+    	Invite invite = invites.remove(from);
+    	if (invite != null) {
+    		//TODO - !nn! - how do we ignore?
+    	}
     }
 
     public void ignoreIncomingConnection()
@@ -341,7 +365,11 @@ public class SignalPhone implements EndpointListener
 	@Override
 	public void onReceiveConversationInvite(Endpoint endpoint, Invite invite) {
 		Log.d(TAG, "onReceiveConversationInvite");
-
+		if (loginListener != null) {
+			invites.put(invite.from(), invite);
+			loginListener.onIncomingCall(invite.from());
+		}
+		
 	}
 
 }

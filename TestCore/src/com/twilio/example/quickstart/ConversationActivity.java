@@ -2,6 +2,7 @@ package com.twilio.example.quickstart;
 
 import android.app.Activity;
 import android.app.Fragment;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -36,15 +37,28 @@ public class ConversationActivity extends Activity implements ConversationListen
 
 		localContainer = (ViewGroup)findViewById(R.id.localContainer);
 		participantContainer = (ViewGroup)findViewById(R.id.participantContainer);
+		Intent intent = getIntent();
+		phone = SignalPhone.getInstance(getApplicationContext());
 
-		participantAddress = getIntent().getStringExtra(SignalPhoneActivity.CONVERSATION_PARTICIPANT);
+		participantAddress = intent.getStringExtra(SignalPhoneActivity.CONVERSATION_PARTICIPANT);
+		String action = intent.getStringExtra(SignalPhoneActivity.CONVERSATION_ACTION);
+		if (action.equalsIgnoreCase(SignalPhoneActivity.CONVERSATION_ACTION_CALL)) {
+			callParticipant(participantAddress);
+		} else if (action.equalsIgnoreCase(SignalPhoneActivity.CONVERSATION_ACTION_ACCEPT_INCOMING)){
+			acceptIncoming(participantAddress);
+		} else {
+			Log.e(TAG, "Unspecified action");
+		}
 
-		callParticipant(participantAddress);
+		
 	}
 
 	private void callParticipant(String participantAddress) {
-		phone = SignalPhone.getInstance(getApplicationContext());
 		conv = phone.call(this, participantAddress, localContainer, this);
+	}
+	
+	private void acceptIncoming(String participantAddress) {
+		conv = phone.accept(participantAddress, localContainer, this);
 	}
 
 	public static class MenuFragment extends Fragment {
