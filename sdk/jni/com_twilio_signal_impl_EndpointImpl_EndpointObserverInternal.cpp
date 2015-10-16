@@ -42,12 +42,6 @@ protected:
     virtual void onRegistrationDidComplete(TSCErrorObject* error) {
 
     	TS_CORE_LOG_DEBUG("onRegistrationDidComplete");
-    	/*
-    	if (error != NULL) {
-    		jstring str = stringToJString(jni(), error->getMessage());
-    		jni()->CallVoidMethod(j_endpoint_observer_, j_state_change_, j_endpoint_, (jint)error->getCode(), str);
-    		return;
-    	}*/
     	jobject j_error = errorToJavaCoreErrorImpl(error);
     	jni()->CallVoidMethod(*j_endpoint_observer_, j_registration_complete_, j_error);
 
