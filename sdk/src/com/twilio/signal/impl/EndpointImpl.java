@@ -3,26 +3,34 @@ package com.twilio.signal.impl;
 import java.util.Set;
 import java.util.UUID;
 
-import android.os.Handler;
 import android.app.PendingIntent;
 import android.app.PendingIntent.CanceledException;
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Handler;
 import android.os.Parcel;
 import android.os.Parcelable;
 
 import com.twilio.signal.Conversation;
-import com.twilio.signal.Invite;
+import com.twilio.signal.ConversationException;
 import com.twilio.signal.ConversationListener;
 import com.twilio.signal.Endpoint;
 import com.twilio.signal.EndpointListener;
-import com.twilio.signal.Participant;
+import com.twilio.signal.Invite;
 import com.twilio.signal.LocalMediaImpl;
-import com.twilio.signal.impl.util.CallbackHandler;
+import com.twilio.signal.impl.core.CoreEndpoint;
+import com.twilio.signal.impl.core.CoreError;
+import com.twilio.signal.impl.core.EndpointObserver;
+import com.twilio.signal.impl.core.EndpointState;
 import com.twilio.signal.impl.logging.Logger;
+import com.twilio.signal.impl.util.CallbackHandler;
 
-public class EndpointImpl implements Endpoint, EndpointListener, NativeHandleInterface, Parcelable {
+public class EndpointImpl implements
+						Endpoint,
+						NativeHandleInterface,
+						Parcelable,
+						EndpointObserver,
+						CoreEndpoint{
 
 	static final Logger logger = Logger.getLogger(EndpointImpl.class);
 	
@@ -30,12 +38,12 @@ public class EndpointImpl implements Endpoint, EndpointListener, NativeHandleInt
 		
 		private long nativeEndpointObserver;
 		
-		public EndpointObserverInternal(EndpointListener listener) {
+		public EndpointObserverInternal(EndpointObserver observer) {
 			//this.listener = listener;
-			this.nativeEndpointObserver = wrapNativeObserver(listener, EndpointImpl.this);
+			this.nativeEndpointObserver = wrapNativeObserver(observer, EndpointImpl.this);
 		}
 
-		private native long wrapNativeObserver(EndpointListener listener, Endpoint endpoint);
+		private native long wrapNativeObserver(EndpointObserver observer, Endpoint endpoint);
 		//::TODO figure out when to call this - may be Endpoint.release() ??
 		private native void freeNativeObserver(long nativeEndpointObserver);
 
@@ -55,6 +63,7 @@ public class EndpointImpl implements Endpoint, EndpointListener, NativeHandleInt
 	private long nativeEndpointHandle;
 
 	private Handler handler;
+	private EndpointState coreState;
 	
 	public UUID getUuid() {
 		return uuid;
@@ -70,57 +79,10 @@ public class EndpointImpl implements Endpoint, EndpointListener, NativeHandleInt
 			EndpointListener inListener) {
 		this.context = context;
 		this.listener = inListener;
+
 		this.endpointObserver = new EndpointObserverInternal(this);
-		// TODO: throw an exception if the handler returns null 
+		// TODO: throw an exception if the handler returns null
 		handler = CallbackHandler.create();
-	}
-
-	@Override
-	public void onStartListeningForInvites(final Endpoint endpoint) {
-		if(handler != null) {
-			handler.post(new Runnable() {
-				@Override
-				public void run() {
-					listener.onStartListeningForInvites(endpoint);
-				}
-			});
-		}
-	}
-
-	@Override
-	public void onStopListeningForInvites(final Endpoint endpoint) {
-		if(handler != null) {
-			handler.post(new Runnable() {
-				@Override
-				public void run() {
-					listener.onStopListeningForInvites(endpoint);
-				}
-			});
-		}
-	}
-
-	@Override
-	public void onFailedToStartListening(final Endpoint endpoint, final int errorCode, final String errorMessage) {
-		if(handler != null) {
-			handler.post(new Runnable() {
-				@Override
-				public void run() {
-					listener.onFailedToStartListening(endpoint, errorCode, errorMessage);
-				}
-			});
-		}
-	}
-
-	@Override		
-	public void onReceiveConversationInvite(final Endpoint endpoint, final Invite invite) {
-		if(handler != null) {
-			handler.post(new Runnable() {
-				@Override
-				public void run() {
-					listener.onReceiveConversationInvite(endpoint, invite);
-				}
-			});
-		}
 	}
 
 	void setNativeHandle(long nativeEndpointHandle) {
@@ -151,7 +113,7 @@ public class EndpointImpl implements Endpoint, EndpointListener, NativeHandleInt
 
 	@Override
 	public void setEndpointListener(EndpointListener listener) {
-		// TODO Auto-generated method stub
+		this.listener = listener;
 
 	}
 
@@ -172,7 +134,8 @@ public class EndpointImpl implements Endpoint, EndpointListener, NativeHandleInt
 	@Override
 	public Conversation createConversation(Set<String> participants,
 			LocalMediaImpl localMediaImpl, ConversationListener listener) {
-		Conversation conv = ConversationImpl.create(this, participants, localMediaImpl, listener);
+		Conversation conv = ConversationImpl.createOutgoingConversation(
+				this, participants, localMediaImpl, listener);
 		return conv;
 	}
 
@@ -227,14 +190,116 @@ public class EndpointImpl implements Endpoint, EndpointListener, NativeHandleInt
 		}
 	}
 
-
 	@Override
 	public long getNativeHandle() {
 		return nativeEndpointHandle;
 	}
 
+	/**
+	 * EndpointObserver methods
+	 */
+	@Override
+	public void onRegistrationDidComplete(CoreError error) {
+		logger.d("onRegistrationDidComplete");
+		if (error != null) {
+			final ConversationException e =
+					new ConversationException(error.getDomain(),
+							error.getCode(), error.getMessage());
+			if (handler != null) {
+				handler.post(new Runnable() {
+					@Override
+					public void run() {
+						listener.onFailedToStartListening(EndpointImpl.this, e);
+					}
+				});
+			}
+		} else {
+			if (handler != null) {
+				handler.post(new Runnable() {
+					@Override
+					public void run() {
+						listener.onStartListeningForInvites(EndpointImpl.this);
+					}
+				});
+			}
+		}
+	}
+
+
+	@Override
+	public void onUnregistrationDidComplete(CoreError error) {
+		logger.d("onUnregistrationDidComplete");
+		if (handler != null) {
+			handler.post(new Runnable() {
+				@Override
+				public void run() {
+					listener.onStopListeningForInvites(EndpointImpl.this);
+				}
+			});
+		}
+		
+	}
+
+
+	@Override
+	public void onStateDidChange(EndpointState state) {
+		logger.d("onStateDidChange");
+		coreState = state;
+	}
+
+
+	@Override
+	public void onIncomingCallDidReceive(long nativeSession,
+			String[] participants) {
+		logger.d("onIncomingCallDidReceive");
+		
+		ConversationImpl conv =
+				ConversationImpl.createIncomingConversation(nativeSession, participants);
+		if (conv == null) {
+			logger.e("Failed to create conversation");
+		}
+		
+		final Invite invite = InviteImpl.create(conv,this, participants);
+		if (invite == null) {
+			logger.e("Failed to create Conversation Invite");
+		}
+		if (handler != null) {
+			handler.post(new Runnable() {
+				@Override
+				public void run() {
+					listener.onReceiveConversationInvite(EndpointImpl.this, invite);
+				}
+			});
+		}
+	}
+
+
+	/*
+	 * CoreEndpoint methods
+	 */
+	@Override
+	public void accept(ConversationImpl conv) {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+	@Override
+	public void reject(ConversationImpl conv) {
+		reject(getNativeHandle(), conv.getNativeHandle());
+	}
+
+
+	@Override
+	public void ignore(ConversationImpl conv) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	
 	//Native implementation
 	private native void listen(long nativeEndpoint);
+	private native void reject(long nativeEndpoint, long nativeSession);
 
 
 }

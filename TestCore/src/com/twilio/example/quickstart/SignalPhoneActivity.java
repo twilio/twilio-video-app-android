@@ -15,7 +15,6 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 
 import com.twilio.example.quickstart.SignalPhone.LoginListener;
-import com.twilio.signal.Conversation;
 import com.twilio.signal.Endpoint;
 
 public class SignalPhoneActivity extends Activity implements LoginListener {
@@ -24,6 +23,9 @@ public class SignalPhoneActivity extends Activity implements LoginListener {
 	private static final String TAG = "SignalPhoneActivity";
 	
 	public static final String CONVERSATION_PARTICIPANT = "conversation_participant";
+	public static final String CONVERSATION_ACTION = "conversation_action";
+	public static final String CONVERSATION_ACTION_CALL = "call";
+	public static final String CONVERSATION_ACTION_ACCEPT_INCOMING = "accept_incoming";
 
 	SignalPhone phone;
 	private EditText clientNameTextBox;
@@ -136,7 +138,7 @@ public class SignalPhoneActivity extends Activity implements LoginListener {
 		super.onResume();
 		Intent intent = getIntent();
 		if(intent != null && getIntent().getParcelableExtra(Endpoint.EXTRA_DEVICE) != null) {
-			showIncomingAlert();
+			//showIncomingAlert();
 		}
 	}
 
@@ -160,11 +162,19 @@ public class SignalPhoneActivity extends Activity implements LoginListener {
 	private void call(String participant) {
 		Intent intent = new Intent(this, ConversationActivity.class);
 		intent.putExtra(CONVERSATION_PARTICIPANT, participant);
+		intent.putExtra(CONVERSATION_ACTION, CONVERSATION_ACTION_CALL);
+		startActivity(intent);
+	}
+	
+	private void accept(String from) {
+		Intent intent = new Intent(this, ConversationActivity.class);
+		intent.putExtra(CONVERSATION_ACTION, CONVERSATION_ACTION_ACCEPT_INCOMING);
+		intent.putExtra(CONVERSATION_PARTICIPANT, from);
 		startActivity(intent);
 	}
 
 
-	 private void showIncomingAlert()
+	 private void showIncomingAlert(final String from)
 	    {
 	        handler.post(new Runnable()
 	        {
@@ -182,8 +192,8 @@ public class SignalPhoneActivity extends Activity implements LoginListener {
 	                            {
 //	                                phone.accept();
 //	                                incomingAlert = null;
-
-	                            	startActivity(new Intent(getBaseContext(), ConversationActivity.class));
+	                            	accept(from);
+	                            	//startActivity(new Intent(getBaseContext(), ConversationActivity.class));
 	                            }
 	                        })
 	                        .setNegativeButton(R.string.reject, new DialogInterface.OnClickListener()
@@ -191,7 +201,8 @@ public class SignalPhoneActivity extends Activity implements LoginListener {
 	                            @Override
 	                            public void onClick(DialogInterface dialog, int which)
 	                            {
-	                                phone.ignoreIncomingConnection();
+	                                //phone.ignoreIncomingConnection();
+	                            	phone.reject(from);
 	                                incomingAlert = null;
 	                            }
 	                        })
@@ -200,7 +211,7 @@ public class SignalPhoneActivity extends Activity implements LoginListener {
 	                            @Override
 	                            public void onCancel(DialogInterface dialog)
 	                            {
-	                                phone.ignoreIncomingConnection();
+	                                phone.ignore(from);
 	                            }
 	                        })
 	                        .create();
@@ -209,4 +220,11 @@ public class SignalPhoneActivity extends Activity implements LoginListener {
 	            }
 	        });
 	    }
+
+
+	@Override
+	public void onIncomingCall(String from) {
+		showIncomingAlert(from);
+		
+	}
 }

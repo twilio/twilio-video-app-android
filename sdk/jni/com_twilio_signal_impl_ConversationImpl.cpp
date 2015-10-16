@@ -81,7 +81,6 @@ JNIEXPORT void JNICALL Java_com_twilio_signal_impl_ConversationImpl_stop
 	session->stop();
 }
 
-
 JNIEXPORT void JNICALL Java_com_twilio_signal_impl_ConversationImpl_setExternalCapturer
   (JNIEnv *env, jobject obj, jlong nativeSession, jlong nativeCapturer)
 {
@@ -95,4 +94,13 @@ JNIEXPORT void JNICALL Java_com_twilio_signal_impl_ConversationImpl_setExternalC
 	}
 }
 
+JNIEXPORT void JNICALL Java_com_twilio_signal_impl_ConversationImpl_setSessionObserver
+  (JNIEnv *, jobject, jlong nativeSession, jlong nativeSessionObserver)
+{
+	TS_CORE_LOG_DEBUG("setSessionObserver");
+	TSCSessionObject* session = reinterpret_cast<TSCSessionObject*>(nativeSession);
+	TSCSessionObserverObjectRef sessionObserver =
+				TSCSessionObserverObjectRef(reinterpret_cast<TSCSessionObserverObject*>(nativeSessionObserver));
+	session->setSessionObserver(sessionObserver);
+}
 

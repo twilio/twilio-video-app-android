@@ -26,14 +26,12 @@ import android.util.Log;
 import android.view.ViewGroup;
 
 import com.twilio.signal.Conversation;
-import com.twilio.signal.Conversation.Status;
+import com.twilio.signal.ConversationException;
 import com.twilio.signal.ConversationListener;
 import com.twilio.signal.Endpoint;
 import com.twilio.signal.EndpointListener;
 import com.twilio.signal.Invite;
-import com.twilio.signal.LocalMedia;
 import com.twilio.signal.LocalMediaImpl;
-import com.twilio.signal.Participant;
 import com.twilio.signal.TwilioRTC;
 import com.twilio.signal.impl.TwilioConstants;
 
@@ -51,6 +49,7 @@ public class SignalPhone implements EndpointListener
     private String token = "";
 
     private Map<String, String> options = new HashMap<String, String>();
+    private Map<String, Invite> invites = new HashMap<String, Invite>();
 
     private ExecutorService threadPool;
 
@@ -60,6 +59,10 @@ public class SignalPhone implements EndpointListener
         public void onLoginFinished();
         public void onLoginError(String errorMessage);
         public void onLogoutFinished();
+        //TODO - !nn! - this is temporary callback
+        //we need to figure out how invite will be sent in future
+        //(intent, broadcast receiver or something else).
+        public void onIncomingCall(String from);
     }
 
     private static SignalPhone instance;
@@ -190,9 +193,28 @@ public class SignalPhone implements EndpointListener
 
     }
 
-    public void accept()
-    {
-       //this.alice.accept();
+    public Conversation accept(String from, ViewGroup localContainer, ConversationListener listener) {
+       Invite invite = invites.remove(from);
+       if (!twilioSdkInited || invite == null || invite.to() == null) {
+    	   return null;
+       }
+       LocalMediaImpl localMediaImpl = new LocalMediaImpl();
+       localMediaImpl.attachContainerView(localContainer);
+       return invite.acceptWithLocalMedia(localMediaImpl, listener);
+    }
+    
+    public void reject(String from) {
+    	Invite invite = invites.remove(from);
+    	if (invite != null) {
+    		invite.reject();
+    	}
+    }
+    
+    public void ignore(String from) {
+    	Invite invite = invites.remove(from);
+    	if (invite != null) {
+    		//TODO - !nn! - how do we ignore?
+    	}
     }
 
     public void ignoreIncomingConnection()
@@ -314,11 +336,10 @@ public class SignalPhone implements EndpointListener
 	}
 
 	@Override
-	public void onFailedToStartListening(Endpoint endPoint, int errorCode,
-			String errorMessage) {
-		Log.d(TAG, "onFailedToStartListening code:"+errorCode+" message:"+errorMessage);
+	public void onFailedToStartListening(Endpoint endPoint, ConversationException e) {
+		Log.d(TAG, "onFailedToStartListening msg:"+e.getMessage());
 		if (loginListener != null)
-			loginListener.onLoginError(errorMessage);
+			loginListener.onLoginError(e.getMessage());
 
 	}
 
@@ -343,8 +364,12 @@ public class SignalPhone implements EndpointListener
 
 	@Override
 	public void onReceiveConversationInvite(Endpoint endpoint, Invite invite) {
-		// TODO Auto-generated method stub
-
+		Log.d(TAG, "onReceiveConversationInvite");
+		if (loginListener != null) {
+			invites.put(invite.from(), invite);
+			loginListener.onIncomingCall(invite.from());
+		}
+		
 	}
 
 }
