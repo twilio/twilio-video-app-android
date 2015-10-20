@@ -68,6 +68,7 @@ function main {
 
     check_tools
     build_library
+    build_quickstart
     #copy_resources
     copy_javadocs
     #copy_docs
@@ -163,6 +164,22 @@ function build_library {
     fi
     done
 
+}
+
+function build_quickstart {
+    PROJECT_DIR="${twsdkroot}"/TestCore
+
+    pushd $PROJECT_DIR
+    echo "Building project at ${PROJECT_DIR}..."
+
+    rm -f build.xml
+    android update project -p ${PROJECT_DIR}
+
+    ant clean
+    ant debug
+
+    echo "Project built succesffully."
+    popd
 }
 
 function copy_resources {
@@ -292,7 +309,7 @@ function archive {
     # CI_BUILD_NUMBER is Jenkins build number
     if [ -z ${CI_BUILD_NUMBER} ]; then
         buildname="${SDK_NAME_STEM}-${SDK_VERSION}-${GIT_COMMIT}"
-    else 
+    else
         buildname="${SDK_NAME_STEM}-${SDK_VERSION}-b${CI_BUILD_NUMBER}-${GIT_COMMIT}"
         # if build is done from Jenkins, write build version string to file, later used when uploading to S3
         echo "${SDK_VERSION}-b${CI_BUILD_NUMBER}-${GIT_COMMIT}" > ci_sdk_version.txt
