@@ -1,6 +1,6 @@
 #!/bin/bash
 
-export SDK_NAME_STEM="signal-android-sdk"
+export SDK_NAME_STEM="twilio-android-sdk"
 
 get_sdk_version_prefix() {
     version_prefix=$(cat sdk-version.txt)

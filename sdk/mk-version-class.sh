@@ -2,7 +2,7 @@
 
 set -e
 
-. ../tools/functions.sh
+. ../scripts/functions.sh
 
 [ "$1" ] && sdk_version=$1 || sdk_version=$(get_sdk_version)
 [ "$sdk_version" ]
