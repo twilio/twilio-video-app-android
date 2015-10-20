@@ -5,19 +5,26 @@ set -ex
 ANDROID_API=19
 
 # need to specify source files manually to avoid having TwilioClientService in there
-#JAVADOC_SOURCE_FILES="
-#    Conversation.java
-#    ConversationListener.java
-#    Endpoint.java
-#   EndpointListener.java
-#    Invite.java
-#    RemoteEndpoint.java
-#	Stream.java
-#	StreamListener.java
-#	Track.java
-#	TwilioSignal.java"
-#TWILIO_HOWTOS="
-#    QuickStart"
+JAVADOC_SOURCE_FILES="
+	Conversation.java
+    ConversationException.java
+    ConversationListener.java
+    Endpoint.java
+    EndpointListener.java
+    I420Frame.java
+    Invite.java
+    LocalMedia.java
+    LocalMediaImpl.java
+    Media.java
+    Participant.java
+    TrackOrigin.java
+    TwilioRTC.java
+    VideoRenderer.java
+    VideoRendererObserver.java
+    VideoTrack.java
+    VideoViewRenderer.java"
+TWILIO_HOWTOS="
+    QuickStart"
 #TWILIO_HELPER_LIBS="
 #    twilio-java:java
 #    twilio-php:php
@@ -62,7 +69,7 @@ function main {
     check_tools
     build_library
     #copy_resources
-    #copy_javadocs
+    copy_javadocs
     #copy_docs
     #copy_files
     #setup_examples
@@ -170,7 +177,7 @@ function copy_javadocs {
     mkdir "${docdest}"
 
     for f in $JAVADOC_SOURCE_FILES; do
-        jd_source_paths="${jd_source_paths} ${twsdkroot}/sdk/src/com/twilio/client/$f"
+        jd_source_paths="${jd_source_paths} ${twsdkroot}/sdk/src/com/twilio/signal/$f"
     done
 
 
@@ -190,7 +197,7 @@ function copy_javadocs {
     -charset UTF-8 \
     -docencoding UTF-8 \
     -linkoffline http://developer.android.com/reference/  "$mydir" \
-    -stylesheetfile "${twsdkroot}/tools/javadoc-style.css" \
+    -stylesheetfile "${twsdkroot}/scripts/javadoc-style.css" \
     ${DOCLINT_DISABLE} ${jd_source_paths}
 }
 
