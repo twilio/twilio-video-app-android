@@ -1,21 +1,18 @@
-#include <twilio-jni/twilio-jni.h>
-#include "webrtc/modules/utility/interface/helpers_android.h"
+#include "talk/app/webrtc/java/jni/jni_helpers.h"
+#include "talk/media/base/videorenderer.h"
 
 #include "TSCoreSDKTypes.h"
 #include "TSCLogger.h"
-
-
-#include "com_twilio_signal_impl_VideoSurface.h"
-#include "com_twilio_signal_impl_VideoSurfaceFactory.h"
-
-#include "talk/media/base/videorenderer.h"
-
 #include "TSCVideoSurface.h"
 #include "TSCVideoSurfaceObserver.h"
 #include "TSCMediaTrackInfo.h"
 #include "TSCVideoTrackEventData.h"
 
+#include "com_twilio_signal_impl_VideoSurface.h"
+#include "com_twilio_signal_impl_VideoSurfaceFactory.h"
+
 using namespace webrtc;
+using namespace webrtc_jni;
 using namespace twiliosdk;
 
 
@@ -24,18 +21,27 @@ class VideoSurfaceObserverJava : public TSCVideoSurfaceObserverObject {
 
 	public:
 		VideoSurfaceObserverJava(JNIEnv* jni, jobject j_observer)
-			: j_add_track_id_(tw_jni_get_method(jni, j_observer, "onDidAddVideoTrack", "(Lcom/twilio/signal/impl/TrackInfo;)V")),
-			j_remove_track_id_(tw_jni_get_method(jni, j_observer, "onDidRemoveVideoTrack", "(Lcom/twilio/signal/impl/TrackInfo;)V")),
-			j_video_track_event_id_(tw_jni_get_method(jni, j_observer, "onDidReceiveVideoTrackEvent", "(Lorg/webrtc/VideoRenderer$I420Frame;Lcom/twilio/signal/impl/TrackInfo;)V")),
-			j_trackinfo_class_(jni, FindClass(jni, "com/twilio/signal/impl/TrackInfoImpl")),
-			j_trackinfo_ctor_id_(GetMethodID(jni, *j_trackinfo_class_, "<init>", "(Ljava/lang/String;Ljava/lang/String;)V")),
-			j_frame_class_(jni, FindClass(jni, "org/webrtc/VideoRenderer$I420Frame")),
-			j_frame_ctor_id_(GetMethodID(jni, *j_frame_class_, "<init>", "(III[I[Ljava/nio/ByteBuffer;)V")),
-			j_byte_buffer_class_(jni, FindClass(jni, "java/nio/ByteBuffer")),
-			j_observer_global_(jni, j_observer),	
-			j_observer_class_(jni, jni->GetObjectClass(*j_observer_global_)) {
-
-			}
+			: j_observer_global_(
+					jni, j_observer),
+			j_observer_class_(
+					jni, GetObjectClass(jni, j_observer)),
+			j_add_track_id_(
+					GetMethodID(jni, *j_observer_class_, "onDidAddVideoTrack", "(Lcom/twilio/signal/impl/TrackInfo;)V")),
+			j_remove_track_id_(
+					GetMethodID(jni, *j_observer_class_, "onDidRemoveVideoTrack", "(Lcom/twilio/signal/impl/TrackInfo;)V")),
+			j_video_track_event_id_(
+					GetMethodID(jni, *j_observer_class_, "onDidReceiveVideoTrackEvent", "(Lorg/webrtc/VideoRenderer$I420Frame;Lcom/twilio/signal/impl/TrackInfo;)V")),
+			j_trackinfo_class_(
+					jni, jni->FindClass("com/twilio/signal/impl/TrackInfoImpl")),
+			j_trackinfo_ctor_id_(
+					GetMethodID(jni, *j_trackinfo_class_, "<init>", "(Ljava/lang/String;Ljava/lang/String;)V")),
+			j_frame_class_(
+					jni, jni->FindClass("org/webrtc/VideoRenderer$I420Frame")),
+			j_frame_ctor_id_(
+					GetMethodID(jni, *j_frame_class_, "<init>", "(III[I[Ljava/nio/ByteBuffer;)V")),
+			j_byte_buffer_class_(
+					jni, jni->FindClass("java/nio/ByteBuffer"))
+			{}
 
 	virtual ~VideoSurfaceObserverJava() {
 
@@ -43,27 +49,31 @@ class VideoSurfaceObserverJava : public TSCVideoSurfaceObserverObject {
 
 	void onDidAddVideoTrack(const TSCVideoTrackInfoObjectRef& trackInfo) {
 		TS_CORE_LOG_DEBUG("onDidAddVideoTrack");
-	    	JNIEnvAttacher jniAttacher;
-    		jniAttacher.get()->CallVoidMethod(*j_observer_global_, j_add_track_id_, nullptr);
+
+    		jni()->CallVoidMethod(*j_observer_global_, j_add_track_id_, nullptr);
 	}
 
 	void onDidRemoveVideoTrack(const TSCVideoTrackInfoObjectRef& trackInfo) {
 		TS_CORE_LOG_DEBUG("onDidRemoveVideoTrack");
-	    	JNIEnvAttacher jniAttacher;
-    		jniAttacher.get()->CallVoidMethod(*j_observer_global_, j_remove_track_id_, nullptr);
+
+    		jni()->CallVoidMethod(*j_observer_global_, j_remove_track_id_, nullptr);
 	}
 
 	void onDidReceiveVideoTrackEvent(const TSCVideoTrackInfoObjectRef& trackInfo,
                                          const TSCVideoTrackEventDataObjectRef& data) {
 		TS_CORE_LOG_DEBUG("onDidReceiveVideoTrackEvent");
-	    	JNIEnvAttacher jniAttacher;
+
 		jobject j_frame = CricketToJavaFrame(data.get()->getFrame());
 		jobject j_trackinfo = TrackInfoToJavaTrackInfoImpl(trackInfo);
 
-    		jniAttacher.get()->CallVoidMethod(*j_observer_global_, j_video_track_event_id_, j_frame, j_trackinfo);
+    		jni()->CallVoidMethod(*j_observer_global_, j_video_track_event_id_, j_frame, j_trackinfo);
 	}
 
 	private:
+
+	JNIEnv* jni() {
+		    	return AttachCurrentThreadIfNeeded();
+	}
 
 	jstring stringToJString(JNIEnv * env, const std::string & nativeString) {
 		return env->NewStringUTF(nativeString.c_str());
@@ -71,36 +81,36 @@ class VideoSurfaceObserverJava : public TSCVideoSurfaceObserverObject {
 
 	// Return a TrackInfoImpl
 	jobject TrackInfoToJavaTrackInfoImpl(const TSCVideoTrackInfoObjectRef& trackInfo) {
-	    	JNIEnvAttacher jniAttacher;
-    		jstring j_participant_address = stringToJString(jniAttacher.get(), trackInfo->getParticipantAddress());
-    		jstring j_track_id = stringToJString(jniAttacher.get(), trackInfo->getTrackId());
 
-		return jniAttacher.get()->NewObject(
+    		jstring j_participant_address = stringToJString(jni(), trackInfo->getParticipantAddress());
+    		jstring j_track_id = stringToJString(jni(), trackInfo->getTrackId());
+
+		return jni()->NewObject(
 				*j_trackinfo_class_, j_trackinfo_ctor_id_,
 				j_participant_address, j_track_id);
 	}
 
 	// Return a VideoRenderer.I420Frame referring to the data in |frame|.
 	jobject CricketToJavaFrame(const cricket::VideoFrame* frame) {
-	    	JNIEnvAttacher jniAttacher;
-		jintArray strides = jniAttacher.get()->NewIntArray(3);
-		jint* strides_array = jniAttacher.get()->GetIntArrayElements(strides, NULL);
+
+		jintArray strides = jni()->NewIntArray(3);
+		jint* strides_array = jni()->GetIntArrayElements(strides, NULL);
 		strides_array[0] = frame->GetYPitch();
 		strides_array[1] = frame->GetUPitch();
 		strides_array[2] = frame->GetVPitch();
-		jniAttacher.get()->ReleaseIntArrayElements(strides, strides_array, 0);
-		jobjectArray planes = jniAttacher.get()->NewObjectArray(3, *j_byte_buffer_class_, NULL);
-		jobject y_buffer = jniAttacher.get()->NewDirectByteBuffer(
+		jni()->ReleaseIntArrayElements(strides, strides_array, 0);
+		jobjectArray planes = jni()->NewObjectArray(3, *j_byte_buffer_class_, NULL);
+		jobject y_buffer = jni()->NewDirectByteBuffer(
 				const_cast<uint8*>(frame->GetYPlane()),
 				frame->GetYPitch() * frame->GetHeight());
-		jobject u_buffer = jniAttacher.get()->NewDirectByteBuffer(
+		jobject u_buffer = jni()->NewDirectByteBuffer(
 				const_cast<uint8*>(frame->GetUPlane()), frame->GetChromaSize());
-		jobject v_buffer = jniAttacher.get()->NewDirectByteBuffer(
+		jobject v_buffer = jni()->NewDirectByteBuffer(
 				const_cast<uint8*>(frame->GetVPlane()), frame->GetChromaSize());
-		jniAttacher.get()->SetObjectArrayElement(planes, 0, y_buffer);
-		jniAttacher.get()->SetObjectArrayElement(planes, 1, u_buffer);
-		jniAttacher.get()->SetObjectArrayElement(planes, 2, v_buffer);
-		return jniAttacher.get()->NewObject(
+		jni()->SetObjectArrayElement(planes, 0, y_buffer);
+		jni()->SetObjectArrayElement(planes, 1, u_buffer);
+		jni()->SetObjectArrayElement(planes, 2, v_buffer);
+		return jni()->NewObject(
 				*j_frame_class_, j_frame_ctor_id_,
 				frame->GetWidth(), frame->GetHeight(),
 				static_cast<int>(frame->GetVideoRotation()),

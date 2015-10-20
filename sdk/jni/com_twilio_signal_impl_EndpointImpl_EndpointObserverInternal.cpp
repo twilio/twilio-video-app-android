@@ -8,7 +8,6 @@
 #include "TSCLogger.h"
 #include <android/log.h>
 
-//using namespace webrtc;
 using namespace webrtc_jni;
 using namespace twiliosdk;
 

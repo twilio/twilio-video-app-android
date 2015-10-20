@@ -1,5 +1,4 @@
 #include "TSCoreSDK.h"
-#include <twilio-jni/twilio-jni.h>
 #include <string.h>
 #include <jni.h>
 #include <android/log.h>
