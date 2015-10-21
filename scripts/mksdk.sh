@@ -80,11 +80,6 @@ function check_tools {
 
 function build_library {
 
-    # check our submodules, make sure fetched and up-to-date
-    pushd "${twsdkroot}"
-    ./git-update-submodules.sh
-    popd
-
     pushd "${twsdkroot}"/sdk
 
     #rm -f build.xml
