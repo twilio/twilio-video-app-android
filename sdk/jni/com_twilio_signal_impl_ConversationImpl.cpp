@@ -7,8 +7,6 @@
 #include "TSCVideoCaptureController.h"
 #include "TSCSession.h"
 #include "TSCParticipant.h"
-#include <twilio-jni/twilio-jni.h>
-#include <android/log.h>
 
 #include <string>
 #include <map>
