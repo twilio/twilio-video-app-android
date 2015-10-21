@@ -17,13 +17,14 @@ else
    else
      $(error Host platform not supported)
    endif
-endif 
+endif
 
 LOCAL_PATH := $(TWSDK_JNI_PATH)
 include $(CLEAR_VARS)
 
 LOCAL_MODULE := twilio-native
 LOCAL_SRC_FILES := \
+    dummy.cpp \
 	com_twilio_signal_impl_TwilioRTCImpl.cpp \
 	com_twilio_signal_impl_EndpointImpl.cpp \
 	com_twilio_signal_impl_EndpointImpl_EndpointObserverInternal.cpp \
@@ -45,7 +46,7 @@ LOCAL_CFLAGS += \
 	-fvisibility=hidden \
 	-DTW_EXPORT='__attribute__((visibility("default")))' \
 	$(debug_cflags)
-	
+
 LOCAL_CPPFLAGS := -std=gnu++11 -fno-rtti
 
 LOCAL_LDLIBS := \
@@ -61,7 +62,18 @@ LOCAL_LDLIBS := \
 	-landroid \
 
 LOCAL_STATIC_LIBRARIES := \
-	twilio-sdk-core
+	twilio-sdk-core \
+
+# Make JNI_OnLoad a local symbol in libwebrtc-jni.a since it is already defined by libtwilio-jni.a
+# dummy.cpp is a fake depedency that causes this command to run prior to linking
+LOCALIZE_SYMBOL := $(LOCAL_PATH)/dummy.cpp
+
+$(LOCALIZE_SYMBOL):
+	@echo "Localizing JNI_OnLoad symbol in libwebrtc.a to prevent a conflict with libtwilio-jni.a"
+	$(ANDROID_NDK_HOME)/toolchains/aarch64-linux-android-4.9/prebuilt/$(TOOLCHAIN_PLAT)/aarch64-linux-android/bin/objcopy --localize-symbol JNI_OnLoad $(PREFIX)/webrtc/android/armeabiv7a/lib/libwebrtc-jni.a
+	touch $(LOCALIZE_SYMBOL)
+
+.INTERMEDIATE: $(LOCALIZE_SYMBOL)
 
 
 # Manually link the libwebrtc-jni static library. Using LOCAL_WHOLE_STATIC_LIBRARIES does not link the library
