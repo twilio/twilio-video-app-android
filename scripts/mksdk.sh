@@ -169,8 +169,8 @@ function copy_javadocs {
     -classpath "${ANDROID_SDK_HOME}/platforms/android-${ANDROID_API}/android.jar" \
     -d "${docdest}" \
     -version \
-    -top '<h1>Twilio Client for Android</h1>' \
-    -windowtitle 'Twilio Client for Android' \
+    -top '<h1>Twilio Conversations SDK for Android</h1>' \
+    -windowtitle 'Twilio Conversations SDK for Android' \
     -charset UTF-8 \
     -docencoding UTF-8 \
     -linkoffline http://developer.android.com/reference/  "$mydir" \
