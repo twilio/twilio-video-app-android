@@ -195,7 +195,7 @@ function archive {
         echo "${SDK_VERSION}-b${CI_BUILD_NUMBER}-${GIT_COMMIT}" > ci_sdk_version.txt
     fi
 
-    tarname="twilio-sdk-android"
+    tarname="${SDK_NAME_STEM}"
     #if [ "$target" = "debug" ]; then
     #    # be very clear to ourselves that we just did a debug build
     #    tarname="${buildname}_DEBUG"

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-export SDK_NAME_STEM="twilio-sdk-android"
+export SDK_NAME_STEM="twilio-rtc-conversations"
 
 get_sdk_version_prefix() {
     version_prefix=$(cat sdk-version.txt)
