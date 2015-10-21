@@ -1,6 +1,6 @@
 #!/bin/bash
 
-export SDK_NAME_STEM="signal-android-sdk"
+export SDK_NAME_STEM="twilio-sdk-android"
 
 get_sdk_version_prefix() {
     version_prefix=$(cat sdk-version.txt)
@@ -28,7 +28,7 @@ get_sdk_version() {
 
 function check_android_tools {
     ANDROID_API=$1
-    
+
     if [ -z "${ANDROID_SDK_HOME}" ]; then
         echo "Please set the ANDROID_SDK_HOME env var to the root of the Android SDK." >&2
         exit 1
@@ -75,7 +75,7 @@ function check_java_8 {
     JAVA_VERSION=$(java -version 2>&1 | awk -F '"' '/version/ {print $2}')
     if [[ "$JAVA_VERSION" < "1.8" ]]; then
         return 1
-    else         
+    else
         return 0
     fi
 }
