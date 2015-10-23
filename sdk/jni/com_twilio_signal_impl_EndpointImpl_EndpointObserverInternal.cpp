@@ -13,7 +13,7 @@ using namespace twiliosdk;
 
 #define TAG  "TwilioSDK(native)"
 
-class EndpointObserverInternalWrapper: public TSCEndpointObserverObject
+class EndpointObserverInternalWrapper: public TSCEndpointObserver
 {
 public:
 	EndpointObserverInternalWrapper(JNIEnv* env,jobject obj, jobject j_endpoint_observer, jobject j_endpoint)
@@ -38,18 +38,20 @@ public:
 
 
 protected:
-    virtual void onRegistrationDidComplete(TSCErrorObject* error) {
+    virtual void onRegistrationDidComplete(TSCoreErrorCode code, const std::string &message) {
 
     	TS_CORE_LOG_DEBUG("onRegistrationDidComplete");
-    	jobject j_error = errorToJavaCoreErrorImpl(error);
+        jobject j_error = errorToJavaCoreErrorImpl(code, message);
     	jni()->CallVoidMethod(*j_endpoint_observer_, j_registration_complete_, j_error);
 
     }
-    virtual void onUnregistrationDidComplete(TSCErrorObject* error) {
+
+    virtual void onUnregistrationDidComplete(TSCoreErrorCode code, const std::string &message) {
 
     	TS_CORE_LOG_DEBUG("onUnregistrationDidComplete");
-    	jobject j_error = errorToJavaCoreErrorImpl(error);
-		jni()->CallVoidMethod(*j_endpoint_observer_, j_unreg_complete_, j_error);
+        jobject j_error = errorToJavaCoreErrorImpl(code, message);
+        jni()->CallVoidMethod(*j_endpoint_observer_, j_unreg_complete_, j_error);
+
     }
     virtual void onStateDidChange(TSCEndpointState state){
 
@@ -59,6 +61,7 @@ protected:
 				webrtc_jni::JavaEnumFromIndex(jni(),
 						*j_statetype_enum_, state_type_enum, state);
 		jni()->CallVoidMethod(*j_endpoint_observer_, j_state_change_, j_state_type);
+
     }
     virtual void onIncomingCallDidReceive(TSCSession* session) {
 
@@ -71,6 +74,7 @@ protected:
 
     	jni()->CallVoidMethod(
     			*j_endpoint_observer_, j_incoming_call_, j_session_id, j_participants);
+
     }
 
 
@@ -84,40 +88,34 @@ private:
     }
 
     // Return a ErrorImpl
-	jobject errorToJavaCoreErrorImpl(const TSCErrorObject* error) {
+    jobject errorToJavaCoreErrorImpl(TSCoreErrorCode code, const std::string &message) {
+        jstring j_domain = stringToJString(jni(), "signal.coresdk.domain.error");
+        jint j_error_id = (jint)code;
+        jstring j_message = stringToJString(jni(), message);
+        return jni()->NewObject(
+		*j_errorimpl_class_, j_errorimpl_ctor_id_, j_domain, j_error_id, j_message);
+    }
 
-		if (!error) {
-			return NULL;
-		}
-		jstring j_domain = stringToJString(jni(), error->getDomain());
-		jint j_error_id = (jint)error->getCode();
-		jstring j_message = stringToJString(jni(), error->getMessage());
-		return jni()->NewObject(
-				*j_errorimpl_class_, j_errorimpl_ctor_id_,
-				j_domain, j_error_id, j_message);
-	}
+    // Return Java array of participants
+    jobjectArray partToJavaPart(JNIEnv *env, const std::vector<TSCParticipant> participants) {
+        int size = participants.size();
+        if (size == 0) {
+            return NULL;
+        }
+        jobjectArray j_participants = (jobjectArray)env->NewObjectArray(
+                            size,
+                            env->FindClass("java/lang/String"),
+                            env->NewStringUTF(""));
+        for (int i=0; i<size; i++) {
+            env->SetObjectArrayElement(
+                            j_participants, i, stringToJString(env, participants[i].getAddress()));
+        }
+        return j_participants;
+    }
 
-	// Return Java array of participants
-	jobjectArray partToJavaPart(JNIEnv *env, const std::vector<TSCParticipant> participants) {
-		int size = participants.size();
-		if (size == 0) {
-			return NULL;
-		}
-		jobjectArray j_participants = (jobjectArray)env->NewObjectArray(
-				size,
-		        env->FindClass("java/lang/String"),
-		        env->NewStringUTF(""));
-		for (int i=0; i<size; i++) {
-			env->SetObjectArrayElement(
-					j_participants, i, stringToJString(env, participants[i].getAddress()));
-		}
-		return j_participants;
-	}
-
-    //TODO - find better way to track life time of global reference
-	const ScopedGlobalRef<jobject> j_endpoint_observer_;
-	const ScopedGlobalRef<jobject> j_endpoint_;
-	const ScopedGlobalRef<jclass> j_observer_class_;
+    const ScopedGlobalRef<jobject> j_endpoint_observer_;
+    const ScopedGlobalRef<jobject> j_endpoint_;
+    const ScopedGlobalRef<jclass> j_observer_class_;
     jmethodID j_registration_complete_;
     jmethodID j_unreg_complete_;
     jmethodID j_state_change_;
@@ -136,9 +134,9 @@ private:
  */
 JNIEXPORT jlong JNICALL Java_com_twilio_signal_impl_EndpointImpl_00024EndpointObserverInternal_wrapNativeObserver
   (JNIEnv *env, jobject obj, jobject j_endpoint_observer, jobject j_endpoint) {
-	TSCEndpointObserverObjectRef endpointObserver =
-				TSCEndpointObserverObjectRef(new EndpointObserverInternalWrapper(env, obj, j_endpoint_observer, j_endpoint));
-		return (jlong)endpointObserver.release();
+	TSCEndpointObserver* endpointObserver =
+				new EndpointObserverInternalWrapper(env, obj, j_endpoint_observer, j_endpoint);
+		return (jlong)endpointObserver;
 }
 
 /*

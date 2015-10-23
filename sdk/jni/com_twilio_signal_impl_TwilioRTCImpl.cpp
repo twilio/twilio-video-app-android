@@ -89,12 +89,12 @@ JNIEXPORT jlong JNICALL Java_com_twilio_signal_impl_TwilioRTCImpl_createEndpoint
 		return 0;
 	}
 
-	TSCEndpointObserverObjectRef eObserverRef =
-			TSCEndpointObserverObjectRef(reinterpret_cast<TSCEndpointObserverObject*>(nativeEndpointObserver));
+	TSCEndpointObserverPtr eObserverPtr =
+			TSCEndpointObserverPtr(reinterpret_cast<TSCEndpointObserver*>(nativeEndpointObserver));
 
-	TSCEndpointObjectRef endpoint = TSCSDK::instance()->createEndpoint(options, eObserverRef);
+	TSCEndpointPtr endpoint = TSCSDK::instance()->createEndpoint(options, eObserverPtr);
 
-	return (jlong) endpoint.release();
+	return (jlong) endpoint.get();
 }
 
 
