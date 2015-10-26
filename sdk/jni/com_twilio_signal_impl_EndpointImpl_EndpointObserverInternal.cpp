@@ -41,6 +41,7 @@ protected:
     virtual void onRegistrationDidComplete(TSCoreErrorCode code, const std::string &message) {
 
     	TS_CORE_LOG_DEBUG("onRegistrationDidComplete");
+	
         jobject j_error = errorToJavaCoreErrorImpl(code, message);
     	jni()->CallVoidMethod(*j_endpoint_observer_, j_registration_complete_, j_error);
 
@@ -89,11 +90,15 @@ private:
 
     // Return a ErrorImpl
     jobject errorToJavaCoreErrorImpl(TSCoreErrorCode code, const std::string &message) {
-        jstring j_domain = stringToJString(jni(), "signal.coresdk.domain.error");
-        jint j_error_id = (jint)code;
-        jstring j_message = stringToJString(jni(), message);
-        return jni()->NewObject(
+        if(code == kTSCoreSuccess) {
+            return nullptr;
+        } else {
+            jstring j_domain = stringToJString(jni(), "signal.coresdk.domain.error");
+            jint j_error_id = (jint)code;
+            jstring j_message = stringToJString(jni(), message);
+            return jni()->NewObject(
 		*j_errorimpl_class_, j_errorimpl_ctor_id_, j_domain, j_error_id, j_message);
+        }
     }
 
     // Return Java array of participants
