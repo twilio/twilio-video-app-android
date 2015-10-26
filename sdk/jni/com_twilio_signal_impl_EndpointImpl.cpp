@@ -16,7 +16,7 @@ using namespace twiliosdk;
 JNIEXPORT void JNICALL Java_com_twilio_signal_impl_EndpointImpl_listen
   (JNIEnv *env, jobject obj, jlong nativeEndpoint) {
 
-	reinterpret_cast<TSCEndpointObject*>(nativeEndpoint)->registerEndpoint();
+	reinterpret_cast<TSCEndpoint*>(nativeEndpoint)->registerEndpoint();
 }
 
 /*
@@ -28,6 +28,6 @@ JNIEXPORT void JNICALL Java_com_twilio_signal_impl_EndpointImpl_reject
   (JNIEnv *env, jobject obj, jlong nativeEndpoint, jlong nativeSession) {
 
 	TSCSessionObject* session = reinterpret_cast<TSCSessionObject*>(nativeSession);
-	reinterpret_cast<TSCEndpointObject*>(nativeEndpoint)->reject(session);
+	reinterpret_cast<TSCEndpoint*>(nativeEndpoint)->reject(session);
 }
 
