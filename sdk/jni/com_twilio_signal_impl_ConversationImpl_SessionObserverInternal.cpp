@@ -255,5 +255,4 @@ JNIEXPORT void JNICALL Java_com_twilio_signal_impl_ConversationImpl_00024Session
 
 	//Observer is self-destructing. Once Core sends event that session has stopped it will call Release.
 	//All we need to do is set nativeSessionObserver to NULL....for now...
-
 }
