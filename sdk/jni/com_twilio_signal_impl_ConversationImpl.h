@@ -23,6 +23,9 @@ JNIEXPORT void JNICALL Java_com_twilio_signal_impl_ConversationImpl_setExternalC
 JNIEXPORT void JNICALL Java_com_twilio_signal_impl_ConversationImpl_setSessionObserver
   (JNIEnv *, jobject, jlong, jlong);
 
+JNIEXPORT void JNICALL Java_com_twilio_signal_impl_ConversationImpl_freeNativeHandle
+  (JNIEnv *, jobject, jlong);
+
 
 #ifdef __cplusplus
 }

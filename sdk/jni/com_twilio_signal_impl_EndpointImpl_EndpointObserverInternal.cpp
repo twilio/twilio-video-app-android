@@ -150,7 +150,10 @@ JNIEXPORT jlong JNICALL Java_com_twilio_signal_impl_EndpointImpl_00024EndpointOb
  * Signature: (J)V
  */
 JNIEXPORT void JNICALL Java_com_twilio_signal_impl_EndpointImpl_00024EndpointObserverInternal_freeNativeObserver
-  (JNIEnv *, jobject, jlong){
+  (JNIEnv *env, jobject obj, jlong nativeEndpointObserver){
+	EndpointObserverInternalWrapper* nativeObserver =
+				reinterpret_cast<EndpointObserverInternalWrapper*>(nativeEndpointObserver);
+		delete nativeObserver;
 
 }
 

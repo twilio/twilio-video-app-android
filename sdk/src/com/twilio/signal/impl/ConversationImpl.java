@@ -60,6 +60,14 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 		public long getNativeHandle() {
 			return nativeSessionObserver;
 		}
+
+		public void dispose() {
+			if (nativeSessionObserver != 0) {
+				freeNativeObserver(nativeSessionObserver);
+				nativeSessionObserver = 0;
+			}
+			
+		}
 		
 	}
 
@@ -157,7 +165,7 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 		}
 		return new ConversationImpl(nativeSession, participantsAddr);
 	}
-
+	
 	@Override
 	public Status getStatus() {
 		// TODO Auto-generated method stub
@@ -229,11 +237,14 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 	@Override
 	public void onStopCompleted(CoreError error) {
 		logger.i("onStopCompleted");
+		participantMap.clear();
 		if (error == null) {
 			if(handler != null) {
 				handler.post(new Runnable() {
 					@Override
 					public void run() {
+						//we should free our object since we can't reuse session
+						dispose();
 						conversationListener.onConversationEnded(ConversationImpl.this);
 					}
 				});
@@ -246,6 +257,8 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 				handler.post(new Runnable() {
 					@Override
 					public void run() {
+						//we should free our object since we can't reuse session
+						dispose();
 						conversationListener.onConversationEnded(ConversationImpl.this, e);
 					}
 				});
@@ -380,9 +393,20 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 		}
 	}
 
+	/**
+	 * NativeHandleInterface
+	 */
 	@Override
 	public long getNativeHandle() {
 		return nativeHandle;
+	}
+	
+	private void dispose() {
+		sessionObserverInternal.dispose();
+		sessionObserverInternal = null;
+		if (nativeHandle != 0) {
+			freeNativeHandle(nativeHandle);
+		}
 	}
 	
 	public void setLocalMedia(LocalMediaImpl media) {
@@ -406,13 +430,7 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 				return Status.UNKNOWN;
 		}
 	}
-
-	private native long wrapOutgoingSession(long nativeEndpoint, long nativeSessionObserver, String[] participants);
-	private native void start(long nativeSession);
-	private native void setExternalCapturer(long nativeSession, long nativeCapturer);
-	private native void stop(long nativeSession);
-	private native void setSessionObserver(long nativeSession, long nativeSessionObserver);
-
+	
 	@Override
 	public void start() {
 		start(getNativeHandle());
@@ -424,5 +442,17 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 		stop(getNativeHandle());
 		
 	}
+	
+	/**
+	 * Native methods
+	 */
+	private native long wrapOutgoingSession(long nativeEndpoint, long nativeSessionObserver, String[] participants);
+	private native void start(long nativeSession);
+	private native void setExternalCapturer(long nativeSession, long nativeCapturer);
+	private native void stop(long nativeSession);
+	private native void setSessionObserver(long nativeSession, long nativeSessionObserver);
+	private native void freeNativeHandle(long nativeHandle);
+
+	
 
 }

@@ -253,6 +253,8 @@ JNIEXPORT jlong JNICALL Java_com_twilio_signal_impl_ConversationImpl_00024Sessio
  * Signature: (J)V
  */
 JNIEXPORT void JNICALL Java_com_twilio_signal_impl_ConversationImpl_00024SessionObserverInternal_freeNativeObserver
-  (JNIEnv *, jobject obj, jlong nativeSession){
+  (JNIEnv *, jobject obj, jlong nativeSessionObserver){
+
+	CHECK_RELEASE(reinterpret_cast<SessionObserverInternalWrapper*>(nativeSessionObserver));
 
 }
