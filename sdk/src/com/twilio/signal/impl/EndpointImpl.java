@@ -42,6 +42,8 @@ public class EndpointImpl implements
 			//this.listener = listener;
 			this.nativeEndpointObserver = wrapNativeObserver(observer, EndpointImpl.this);
 		}
+		
+		
 
 		private native long wrapNativeObserver(EndpointObserver observer, Endpoint endpoint);
 		//::TODO figure out when to call this - may be Endpoint.release() ??
@@ -50,6 +52,15 @@ public class EndpointImpl implements
 		@Override
 		public long getNativeHandle() {
 			return nativeEndpointObserver;
+		}
+
+
+
+		public void dispose() {
+			if (nativeEndpointHandle != 0) {
+				freeNativeObserver(nativeEndpointHandle);
+				nativeEndpointHandle = 0;
+			}
 		}
 		
 	}
@@ -190,9 +201,16 @@ public class EndpointImpl implements
 		}
 	}
 
+	/**
+	 * NativeHandleInterface
+	 */
 	@Override
 	public long getNativeHandle() {
 		return nativeEndpointHandle;
+	}
+	
+	public void dispose() {
+		
 	}
 
 	/**
