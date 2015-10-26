@@ -229,6 +229,11 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 	@Override
 	public void onStopCompleted(CoreError error) {
 		logger.i("onStopCompleted");
+		// Conversations that are rejected do not have a listener
+		if(conversationListener == null) {
+			return;
+		}
+
 		if (error == null) {
 			if(handler != null) {
 				handler.post(new Runnable() {

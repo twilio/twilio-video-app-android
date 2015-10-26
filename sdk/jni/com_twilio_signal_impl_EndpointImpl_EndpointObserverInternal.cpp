@@ -41,7 +41,6 @@ protected:
     virtual void onRegistrationDidComplete(TSCoreErrorCode code, const std::string &message) {
 
     	TS_CORE_LOG_DEBUG("onRegistrationDidComplete");
-	
         jobject j_error = errorToJavaCoreErrorImpl(code, message);
     	jni()->CallVoidMethod(*j_endpoint_observer_, j_registration_complete_, j_error);
 
