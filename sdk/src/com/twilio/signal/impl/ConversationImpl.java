@@ -239,18 +239,19 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 	@Override
 	public void onStopCompleted(CoreError error) {
 		logger.i("onStopCompleted");
+		//we should free our object since we can't reuse session
 		dispose();
 		// Conversations that are rejected do not have a listener
 		if(conversationListener == null) {
 			return;
 		}
 		participantMap.clear();
+		dispose();
 		if (error == null) {
 			if(handler != null) {
 				handler.post(new Runnable() {
 					@Override
 					public void run() {
-						//we should free our object since we can't reuse session
 						conversationListener.onConversationEnded(ConversationImpl.this);
 					}
 				});
@@ -263,7 +264,6 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 				handler.post(new Runnable() {
 					@Override
 					public void run() {
-						//we should free our object since we can't reuse session
 						conversationListener.onConversationEnded(ConversationImpl.this, e);
 					}
 				});
