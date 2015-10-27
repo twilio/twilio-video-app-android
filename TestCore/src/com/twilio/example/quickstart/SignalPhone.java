@@ -329,9 +329,7 @@ public class SignalPhone implements EndpointListener
 
 
 	public void onEndpointStopListeningForInvites(Endpoint endpoint) {
-		if (loginListener != null) {
-			loginListener.onLogoutFinished();
-		}
+		
 
 	}
 
@@ -358,8 +356,18 @@ public class SignalPhone implements EndpointListener
 
 	@Override
 	public void onStopListeningForInvites(Endpoint endpoint) {
-		// TODO Auto-generated method stub
-
+		if (loginListener != null) {
+			loginListener.onLogoutFinished();
+		}
+		if (SignalPhone.this.alice == null) {
+			Log.w(TAG, "Alice is null");
+		}
+		if (SignalPhone.this.alice != endpoint) {
+			Log.w(TAG, "Alice is different then endpoing from callback");
+		}
+		//Get rid of endpoint
+		SignalPhone.this.alice.dispose();
+		SignalPhone.this.alice = null;
 	}
 
 	@Override
