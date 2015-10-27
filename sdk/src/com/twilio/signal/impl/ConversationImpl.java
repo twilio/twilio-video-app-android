@@ -63,6 +63,8 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 
 		public void dispose() {
 			if (nativeSessionObserver != 0) {
+				//Observer is self-destructing. Once it sends event that session has stopped it will call Release.
+				//All we need to do is set nativeSessionObserver to NULL....for now...
 				freeNativeObserver(nativeSessionObserver);
 				nativeSessionObserver = 0;
 			}
@@ -242,13 +244,12 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 			return;
 		}
 		participantMap.clear();
+		dispose();
 		if (error == null) {
 			if(handler != null) {
 				handler.post(new Runnable() {
 					@Override
 					public void run() {
-						//we should free our object since we can't reuse session
-						dispose();
 						conversationListener.onConversationEnded(ConversationImpl.this);
 					}
 				});
@@ -261,8 +262,6 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 				handler.post(new Runnable() {
 					@Override
 					public void run() {
-						//we should free our object since we can't reuse session
-						dispose();
 						conversationListener.onConversationEnded(ConversationImpl.this, e);
 					}
 				});
@@ -409,6 +408,8 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 		sessionObserverInternal.dispose();
 		sessionObserverInternal = null;
 		if (nativeHandle != 0) {
+			//Session is self-destructing. Once Core sends event that session has stopped it will call Release.
+			//All we need to do is set nativeSession to NULL....for now...
 			freeNativeHandle(nativeHandle);
 		}
 	}
