@@ -23,6 +23,7 @@
 
 #define TAG  "TwilioSDK(native)"
 
+using namespace webrtc_jni;
 using namespace twiliosdk;
 
 /*
@@ -94,7 +95,7 @@ JNIEXPORT jlong JNICALL Java_com_twilio_signal_impl_TwilioRTCImpl_createEndpoint
 
 	TSCEndpointPtr endpoint = TSCSDK::instance()->createEndpoint(options, eObserverPtr);
 
-	return (jlong) endpoint.get();
+	return jlongFromPointer(endpoint.get());
 }
 
 

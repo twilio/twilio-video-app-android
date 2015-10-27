@@ -21,6 +21,18 @@ JNIEXPORT void JNICALL Java_com_twilio_signal_impl_EndpointImpl_listen
 
 /*
  * Class:     com_twilio_signal_impl_EndpointImpl
+ * Method:    unlisten
+ * Signature: (J)V
+ */
+JNIEXPORT void JNICALL Java_com_twilio_signal_impl_EndpointImpl_unlisten
+  (JNIEnv *env, jobject obj, jlong nativeEndpoint) {
+
+	reinterpret_cast<TSCEndpoint*>(nativeEndpoint)->unregisterEndpoint();
+}
+
+
+/*
+ * Class:     com_twilio_signal_impl_EndpointImpl
  * Method:    reject
  * Signature: (JJ)V
  */
@@ -31,3 +43,17 @@ JNIEXPORT void JNICALL Java_com_twilio_signal_impl_EndpointImpl_reject
 	reinterpret_cast<TSCEndpoint*>(nativeEndpoint)->reject(session);
 }
 
+/*
+ * Class:     com_twilio_signal_impl_EndpointImpl
+ * Method:    freeNativeHandle
+ * Signature: (J)V
+ */
+JNIEXPORT void JNICALL Java_com_twilio_signal_impl_EndpointImpl_freeNativeHandle
+  (JNIEnv *env, jobject obj, jlong nativeEndpoint) {
+	TSCEndpoint* endpoint = reinterpret_cast<TSCEndpoint*>(nativeEndpoint);
+	if (endpoint != NULL) {
+		delete endpoint;
+		endpoint = NULL;
+	}
+
+}
