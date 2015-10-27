@@ -57,10 +57,9 @@ public class EndpointImpl implements
 
 
 		public void dispose() {
-
-			if (nativeEndpointHandle != 0) {
-				freeNativeObserver(nativeEndpointHandle);
-				nativeEndpointHandle = 0;
+			if (nativeEndpointObserver != 0) {
+				freeNativeObserver(nativeEndpointObserver);
+				nativeEndpointObserver = 0;
 			}
 		}
 		
