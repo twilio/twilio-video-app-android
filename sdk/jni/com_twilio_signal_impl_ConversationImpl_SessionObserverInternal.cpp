@@ -241,10 +241,8 @@ private:
 JNIEXPORT jlong JNICALL Java_com_twilio_signal_impl_ConversationImpl_00024SessionObserverInternal_wrapNativeObserver
   (JNIEnv *env, jobject obj, jobject observer, jobject conversation) {
 	TS_CORE_LOG_DEBUG("wrapNativeObserver");
-  	rtc::scoped_ptr<SessionObserverInternalWrapper> so(
-		new SessionObserverInternalWrapper(env, obj, observer, conversation)
-	);
-  	return (jlong)so.release();
+	return jlongFromPointer(
+			new SessionObserverInternalWrapper(env, obj, observer, conversation));
 }
 
 /*
@@ -253,8 +251,9 @@ JNIEXPORT jlong JNICALL Java_com_twilio_signal_impl_ConversationImpl_00024Sessio
  * Signature: (J)V
  */
 JNIEXPORT void JNICALL Java_com_twilio_signal_impl_ConversationImpl_00024SessionObserverInternal_freeNativeObserver
-  (JNIEnv *, jobject obj, jlong nativeSessionObserver){
+  (JNIEnv *env, jobject obj, jlong nativeSessionObserver){
 
-	CHECK_RELEASE(reinterpret_cast<SessionObserverInternalWrapper*>(nativeSessionObserver));
+	//Observer is self-destructing. Once Core sends event that session has stopped it will call Release.
+	//All we need to do is set nativeSessionObserver to NULL....for now...
 
 }
