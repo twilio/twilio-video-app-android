@@ -17,11 +17,27 @@ JNIEXPORT void JNICALL Java_com_twilio_signal_impl_EndpointImpl_listen
 
 /*
  * Class:     com_twilio_signal_impl_EndpointImpl
+ * Method:    unlisten
+ * Signature: (J)V
+ */
+JNIEXPORT void JNICALL Java_com_twilio_signal_impl_EndpointImpl_unlisten
+  (JNIEnv *, jobject, jlong);
+
+/*
+ * Class:     com_twilio_signal_impl_EndpointImpl
  * Method:    reject
  * Signature: (JJ)V
  */
 JNIEXPORT void JNICALL Java_com_twilio_signal_impl_EndpointImpl_reject
   (JNIEnv *, jobject, jlong, jlong);
+
+/*
+ * Class:     com_twilio_signal_impl_EndpointImpl
+ * Method:    freeNativeHandle
+ * Signature: (J)V
+ */
+JNIEXPORT void JNICALL Java_com_twilio_signal_impl_EndpointImpl_freeNativeHandle
+  (JNIEnv *, jobject, jlong);
 
 #ifdef __cplusplus
 }

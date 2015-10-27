@@ -57,9 +57,9 @@ public class EndpointImpl implements
 
 
 		public void dispose() {
-			if (nativeEndpointHandle != 0) {
-				freeNativeObserver(nativeEndpointHandle);
-				nativeEndpointHandle = 0;
+			if (nativeEndpointObserver != 0) {
+				freeNativeObserver(nativeEndpointObserver);
+				nativeEndpointObserver = 0;
 			}
 		}
 		
@@ -72,6 +72,7 @@ public class EndpointImpl implements
 	private PendingIntent incomingIntent = null;
 	private EndpointObserverInternal endpointObserver;
 	private long nativeEndpointHandle;
+	private boolean isDisposed;
 
 	private Handler handler;
 	private EndpointState coreState;
@@ -108,15 +109,16 @@ public class EndpointImpl implements
 	@Override
 	public void listen() {
 		//SignalCore.getInstance(this.context).register();
-		if (nativeEndpointHandle != 0) {
-			listen(nativeEndpointHandle);
-		}
+		checkDisposed("Can't perform listen if native object is disposed.");
+		listen(nativeEndpointHandle);
 	}
 
 
 	@Override
 	public void unlisten() {
 		//SignalCore.getInstance(this.context).unregister(this);
+		checkDisposed("Can't perform unlisten if native object is disposed.");
+		unlisten(nativeEndpointHandle);
 	}
 
 
@@ -145,10 +147,23 @@ public class EndpointImpl implements
 	@Override
 	public Conversation createConversation(Set<String> participants,
 			LocalMediaImpl localMediaImpl, ConversationListener listener) {
+		checkDisposed("Can't create conversation if native object is disposed.");
 		Conversation conv = ConversationImpl.createOutgoingConversation(
 				this, participants, localMediaImpl, listener);
 		return conv;
 	}
+	
+	@Override
+	public void dispose() {
+		if (!isDisposed && nativeEndpointHandle != 0) {
+			endpointObserver.dispose();
+			endpointObserver = null;
+			freeNativeHandle(nativeEndpointHandle);
+			nativeEndpointHandle = 0;
+			isDisposed = true;
+		}
+	}
+
 
 
 	@Override /* Parcelable */
@@ -209,10 +224,6 @@ public class EndpointImpl implements
 		return nativeEndpointHandle;
 	}
 	
-	public void dispose() {
-		
-	}
-
 	/**
 	 * EndpointObserver methods
 	 */
@@ -311,13 +322,21 @@ public class EndpointImpl implements
 	@Override
 	public void ignore(ConversationImpl conv) {
 		// TODO Auto-generated method stub
-		
+	}
+	
+	private void checkDisposed(String errorMessage) {
+		if (isDisposed || nativeEndpointHandle == 0) {
+			throw new IllegalStateException(errorMessage);
+		}
 	}
 
 	
+	
 	//Native implementation
 	private native void listen(long nativeEndpoint);
+	private native void unlisten(long nativeEndpoint);
 	private native void reject(long nativeEndpoint, long nativeSession);
+	private native void freeNativeHandle(long nativeEndpoint);
 
 
 }

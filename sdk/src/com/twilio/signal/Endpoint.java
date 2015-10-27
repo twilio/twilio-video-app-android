@@ -1,15 +1,13 @@
 package com.twilio.signal;
 
-import java.util.Map;
 import java.util.Set;
 
-import android.R.bool;
-import android.app.PendingIntent;
+import com.twilio.signal.impl.EndpointImpl;
 
-/** 
+/**
  * An instance of Endpoint is an object that knows how to interface with Twilio SIGNAL Services.
  *
- * A Endpoint is the primary entry point for Twilio SIGNAL Client. An Android application should initialize a Endpoint 
+ * A Endpoint is the primary entry point for Twilio SIGNAL Client. An Android application should initialize a Endpoint
  * with a Capability Token to talk to Twilio SIGNAL services.
  *
  * @see EndpointListener
@@ -47,7 +45,7 @@ public interface Endpoint {
 	/**
 	 * Start listening for incoming Conversation.
 	 * 
-	 * Registers this Endpoint with a given token. Endpoint is ready to receive Conversation invite once it registers. 
+	 * Registers this Endpoint with a given token. Endpoint is ready to receive Conversation invite once it registers.
 	 *
 	 */
 	public void listen();
@@ -70,5 +68,13 @@ public interface Endpoint {
 	 */
 	
 	public Conversation createConversation(Set<String> participants, LocalMediaImpl localMediaImpl, ConversationListener listener);
+	
+	/**
+	 * Free native object associated with this Endpoint
+	 * 
+	 * This will mark Endpoint as disposed and will throw exception in future if any method is called.
+	 * After this call you should loose any reference to this object and let it be garbage collected.
+	 */
+	public void dispose();
 
 }
