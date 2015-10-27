@@ -106,6 +106,8 @@ JNIEXPORT void JNICALL Java_com_twilio_signal_impl_ConversationImpl_setSessionOb
 JNIEXPORT void JNICALL Java_com_twilio_signal_impl_ConversationImpl_freeNativeHandle
   (JNIEnv *env, jobject obj, jlong nativeSession)
 {
-	CHECK_RELEASE(reinterpret_cast<TSCSessionObject*>(nativeSession));
+	//CHECK_RELEASE(reinterpret_cast<TSCSessionObject*>(nativeSession));
+	//Session is self-destructing. Once Core sends event that session has stopped it will call Release.
+	//All we need to do is set nativeSession to NULL....for now...
 }
 
