@@ -230,7 +230,7 @@ public class EndpointImpl implements
 	public long getNativeHandle() {
 		return nativeEndpointHandle;
 	}
-
+	
 	/**
 	 * EndpointObserver methods
 	 */
