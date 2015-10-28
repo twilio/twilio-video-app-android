@@ -142,7 +142,7 @@ protected:
 
 		jstring id = stringToJString(jni(), videoTrack->id());
 		jobject j_track = jni()->NewObject(
-				*j_video_track_class_, j_video_track_ctor_, (jlong)videoTrack, id);
+				*j_video_track_class_, j_video_track_ctor_, jlongFromPointer(videoTrack), id);
 		jobject j_trackinfo = TrackInfoToJavaTrackInfoImpl(trackInfo);
 		jni()->CallVoidMethod(*j_observer_global_, j_add_track_id_, j_trackinfo, j_track);
 	}
