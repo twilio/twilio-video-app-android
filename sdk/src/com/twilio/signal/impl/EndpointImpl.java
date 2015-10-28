@@ -35,15 +35,13 @@ public class EndpointImpl implements
 	static final Logger logger = Logger.getLogger(EndpointImpl.class);
 	
 	class EndpointObserverInternal implements NativeHandleInterface {
-		
+
 		private long nativeEndpointObserver;
 		
 		public EndpointObserverInternal(EndpointObserver observer) {
 			//this.listener = listener;
 			this.nativeEndpointObserver = wrapNativeObserver(observer, EndpointImpl.this);
 		}
-		
-		
 
 		private native long wrapNativeObserver(EndpointObserver observer, Endpoint endpoint);
 		//::TODO figure out when to call this - may be Endpoint.release() ??
@@ -86,6 +84,15 @@ public class EndpointImpl implements
 	public int hashCode() {
 		return super.hashCode();
 	}
+	
+	@Override
+	protected void finalize() throws Throwable {
+		if (isDisposed || nativeEndpointHandle == 0) {
+			logger.e("YOU FORGOT TO DISPOSE NATIVE RESOURCES!");
+			dispose();
+		}
+	}
+
 
 	EndpointImpl(Context context,
 			EndpointListener inListener) {
@@ -154,7 +161,7 @@ public class EndpointImpl implements
 	}
 	
 	@Override
-	public void dispose() {
+	public synchronized void dispose() {
 		if (!isDisposed && nativeEndpointHandle != 0) {
 			endpointObserver.dispose();
 			endpointObserver = null;
@@ -324,7 +331,7 @@ public class EndpointImpl implements
 		// TODO Auto-generated method stub
 	}
 	
-	private void checkDisposed(String errorMessage) {
+	private synchronized void checkDisposed(String errorMessage) {
 		if (isDisposed || nativeEndpointHandle == 0) {
 			throw new IllegalStateException(errorMessage);
 		}

@@ -63,8 +63,8 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 
 		public void dispose() {
 			if (nativeSessionObserver != 0) {
-				//Observer is self-destructing. Once it sends event that session has stopped it will call Release.
-				//All we need to do is set nativeSessionObserver to NULL....for now...
+				//NOTE: The core destroys the SessionObserver once it has stopped.
+				//We do not need to call Release() in this case.
 				freeNativeObserver(nativeSessionObserver);
 				nativeSessionObserver = 0;
 			}
@@ -75,6 +75,7 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 
 	private SessionObserverInternal sessionObserverInternal;
 	private long nativeHandle;
+	private boolean isDisposed;
 	
 	private ConversationImpl(EndpointImpl endpoint, Set<String> participants, LocalMediaImpl localMediaImpl, ConversationListener conversationListener) {
 		String[] participantAddressArray = new String[participants.size()];
@@ -176,6 +177,7 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 
 	@Override
 	public Set<String> getParticipants() {
+		checkDisposed("You can't get participants list when native resources are disposed");
 		Set<String> participants =  new HashSet<String>();
 		for (Participant participant : participantMap.values()) {
 			participants.add(participant.getAddress());
@@ -185,6 +187,7 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 
 	@Override
 	public Media getLocalMedia() {
+		checkDisposed("You can't get local media when native resources are disposed");
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -202,18 +205,29 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 	@Override
 	public void invite(Set<String> participantAddresses) {
 		// TODO Auto-generated method stub
+		checkDisposed("You can't invite participants when native resources are disposed");
 
 	}
 
 	@Override
 	public void disconnect() {
+		checkDisposed("You can't disconnect when native resources are disposed");
 		stop();
 	}
 
 	@Override
 	public String getConversationSid() {
 		// TODO Auto-generated method stub
+		checkDisposed("You can't get conversation sid when native resources are disposed");
 		return null;
+	}
+	
+	@Override
+	protected void finalize() throws Throwable {
+		if (isDisposed || nativeHandle == 0) {
+			logger.e("YOU FORGOT TO DISPOSE NATIVE RESOURCES!");
+			dispose();
+		}
 	}
 
 	private ParticipantImpl addParticipant(String participantAddress) {
@@ -239,14 +253,11 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 	@Override
 	public void onStopCompleted(CoreError error) {
 		logger.i("onStopCompleted");
-		//we should free our object since we can't reuse session
-		dispose();
 		// Conversations that are rejected do not have a listener
 		if(conversationListener == null) {
 			return;
 		}
 		participantMap.clear();
-		dispose();
 		if (error == null) {
 			if(handler != null) {
 				handler.post(new Runnable() {
@@ -406,17 +417,20 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 		return nativeHandle;
 	}
 	
-	private void dispose() {
+	@Override
+	public synchronized void dispose() {
 		sessionObserverInternal.dispose();
 		sessionObserverInternal = null;
 		if (nativeHandle != 0) {
-			//Session is self-destructing. Once Core sends event that session has stopped it will call Release.
-			//All we need to do is set nativeSession to NULL....for now...
+			//NOTE: The core destroys the Session once it has stopped.
+			//We do not need to call Release() in this case.
 			freeNativeHandle(nativeHandle);
+			nativeHandle = 0;
 		}
 	}
 	
 	public void setLocalMedia(LocalMediaImpl media) {
+		checkDisposed("You can't set local media when native resources are disposed");
 		localMediaImpl = media;
 	}
 	
@@ -448,6 +462,12 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 	public void stop() {
 		stop(getNativeHandle());
 		
+	}
+	
+	private synchronized void checkDisposed(String errorMessage) {
+		if (isDisposed || nativeHandle == 0) {
+			throw new IllegalStateException(errorMessage);
+		}
 	}
 	
 	/**
