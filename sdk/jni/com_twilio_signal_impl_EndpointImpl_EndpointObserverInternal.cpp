@@ -150,7 +150,7 @@ JNIEXPORT jlong JNICALL Java_com_twilio_signal_impl_EndpointImpl_00024EndpointOb
  */
 JNIEXPORT void JNICALL Java_com_twilio_signal_impl_EndpointImpl_00024EndpointObserverInternal_freeNativeObserver
   (JNIEnv *env, jobject obj, jlong nativeEndpointObserver){
-	// Native observer should be automatically deleted by Core when we delete Endpoint
+	// NOTE: Native observer should be automatically deleted by Core when we delete Endpoint
 }
 
 

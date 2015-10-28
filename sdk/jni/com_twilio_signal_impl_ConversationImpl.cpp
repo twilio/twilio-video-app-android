@@ -106,7 +106,7 @@ JNIEXPORT void JNICALL Java_com_twilio_signal_impl_ConversationImpl_setSessionOb
 JNIEXPORT void JNICALL Java_com_twilio_signal_impl_ConversationImpl_freeNativeHandle
   (JNIEnv *env, jobject obj, jlong nativeSession)
 {
-	//NOTE: The core destroys the Session once it has stopped.
-	//We do not need to call Release() in this case.
+	// NOTE: The core destroys the Session once it has stopped.
+	// We do not need to call Release() in this case.
 }
 

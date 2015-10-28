@@ -252,5 +252,5 @@ JNIEXPORT jlong JNICALL Java_com_twilio_signal_impl_ConversationImpl_00024Sessio
  */
 JNIEXPORT void JNICALL Java_com_twilio_signal_impl_ConversationImpl_00024SessionObserverInternal_freeNativeObserver
   (JNIEnv *env, jobject obj, jlong nativeSessionObserver){
-	//NOTE: Native observer should be automatically deleted by Core when we delete Conversation
+	// NOTE: Native observer should be automatically deleted by Core when we delete Conversation
 }

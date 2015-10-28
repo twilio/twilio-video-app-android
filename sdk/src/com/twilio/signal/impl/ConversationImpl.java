@@ -63,8 +63,8 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 
 		public void dispose() {
 			if (nativeSessionObserver != 0) {
-				//NOTE: The core destroys the SessionObserver once it has stopped.
-				//We do not need to call Release() in this case.
+				// NOTE: The core destroys the SessionObserver once it has stopped.
+				// We do not need to call Release() in this case.
 				freeNativeObserver(nativeSessionObserver);
 				nativeSessionObserver = 0;
 			}
@@ -422,8 +422,8 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 		sessionObserverInternal.dispose();
 		sessionObserverInternal = null;
 		if (nativeHandle != 0) {
-			//NOTE: The core destroys the Session once it has stopped.
-			//We do not need to call Release() in this case.
+			// NOTE: The core destroys the Session once it has stopped.
+			// We do not need to call Release() in this case.
 			freeNativeHandle(nativeHandle);
 			nativeHandle = 0;
 		}
