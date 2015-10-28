@@ -36,7 +36,8 @@ LOCAL_C_INCLUDES := $(PREFIX)/webrtc/android/armeabiv7a/include/third_party/icu/
 ifeq ($(shell test "$(APP_DEBUGGABLE)" = "true" -o "$(NDK_DEBUG)" = "1" && echo true || echo false),true)
 debug_cflags := \
 	-DENABLE_PJSIP_LOGGING \
-	-DENABLE_JNI_DEBUG_LOGGING
+	-DENABLE_JNI_DEBUG_LOGGING \
+	-D_DEBUG
 endif
 
 
