@@ -135,6 +135,7 @@ public class ConversationActivity extends Activity implements ConversationListen
 	
 	private void endConversation(Conversation conversation) {
 		if (conv == conversation) {
+			conv.dispose();
 			conv = null;
 		} else {
 			Log.w(TAG, "conversation local reference is different then the one from callback");
