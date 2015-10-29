@@ -8,6 +8,7 @@ import android.content.Context;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
 
+import com.twilio.signal.ConversationException;
 import com.twilio.signal.Endpoint;
 import com.twilio.signal.EndpointListener;
 import com.twilio.signal.Invite;
@@ -260,7 +261,7 @@ public class TwilioRTCTests {
             }
 
             @Override
-            public void onFailedToStartListening(Endpoint endpoint, int i, String s) {
+            public void onFailedToStartListening(Endpoint endpoint, ConversationException e) {
 
             }
 
