@@ -133,7 +133,7 @@ public class ConversationActivity extends Activity implements ConversationListen
 		Log.i(TAG, "onLocalStatusChanged "+status.name());
 	}
 	
-	private void endConversation(Conversation conversation) {
+	private void releaseConversation(Conversation conversation) {
 		if (conv == conversation) {
 			conv.dispose();
 			conv = null;
@@ -146,13 +146,13 @@ public class ConversationActivity extends Activity implements ConversationListen
 	@Override
 	public void onConversationEnded(Conversation conversation) {
 		Log.i(TAG, "onConversationEnded");
-		endConversation(conversation);
+		releaseConversation(conversation);
 	}
 
 	@Override
 	public void onConversationEnded(Conversation conversation, ConversationException e) {
 		Log.i(TAG, "onConversationEnded error:"+e.getMessage());
-		endConversation(conversation);
+		releaseConversation(conversation);
 	}
 
 	@Override

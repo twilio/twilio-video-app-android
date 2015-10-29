@@ -34,6 +34,9 @@ public class EndpointImpl implements
 
 	static final Logger logger = Logger.getLogger(EndpointImpl.class);
 	
+	private static final String DISPOSE_MESSAGE = "The Endpoint has been disposed. This operation is no longer valid";
+	private static final String FINALIZE_MESSAGE = "Endpoints must be released by calling dispose(). Failure to do so may result in leaked resources.";
+	
 	class EndpointObserverInternal implements NativeHandleInterface {
 
 		private long nativeEndpointObserver;
@@ -88,7 +91,7 @@ public class EndpointImpl implements
 	@Override
 	protected void finalize() throws Throwable {
 		if (isDisposed || nativeEndpointHandle == 0) {
-			logger.e("YOU FORGOT TO DISPOSE NATIVE RESOURCES!");
+			logger.e(FINALIZE_MESSAGE);
 			dispose();
 		}
 	}
@@ -116,7 +119,7 @@ public class EndpointImpl implements
 	@Override
 	public void listen() {
 		//SignalCore.getInstance(this.context).register();
-		checkDisposed("Can't perform listen if native object is disposed.");
+		checkDisposed();
 		listen(nativeEndpointHandle);
 	}
 
@@ -124,7 +127,7 @@ public class EndpointImpl implements
 	@Override
 	public void unlisten() {
 		//SignalCore.getInstance(this.context).unregister(this);
-		checkDisposed("Can't perform unlisten if native object is disposed.");
+		checkDisposed();
 		unlisten(nativeEndpointHandle);
 	}
 
@@ -154,7 +157,7 @@ public class EndpointImpl implements
 	@Override
 	public Conversation createConversation(Set<String> participants,
 			LocalMediaImpl localMediaImpl, ConversationListener listener) {
-		checkDisposed("Can't create conversation if native object is disposed.");
+		checkDisposed();
 		Conversation conv = ConversationImpl.createOutgoingConversation(
 				this, participants, localMediaImpl, listener);
 		return conv;
@@ -162,9 +165,11 @@ public class EndpointImpl implements
 	
 	@Override
 	public synchronized void dispose() {
-		if (!isDisposed && nativeEndpointHandle != 0) {
+		if (endpointObserver != null) {
 			endpointObserver.dispose();
 			endpointObserver = null;
+		}
+		if (!isDisposed && nativeEndpointHandle != 0) {
 			freeNativeHandle(nativeEndpointHandle);
 			nativeEndpointHandle = 0;
 			isDisposed = true;
@@ -331,9 +336,9 @@ public class EndpointImpl implements
 		// TODO Auto-generated method stub
 	}
 	
-	private synchronized void checkDisposed(String errorMessage) {
+	private synchronized void checkDisposed() {
 		if (isDisposed || nativeEndpointHandle == 0) {
-			throw new IllegalStateException(errorMessage);
+			throw new IllegalStateException(DISPOSE_MESSAGE);
 		}
 	}
 

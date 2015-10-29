@@ -31,6 +31,9 @@ import com.twilio.signal.impl.util.CallbackHandler;
 
 public class ConversationImpl implements Conversation, NativeHandleInterface, SessionObserver, CoreSession {
 
+	private static final String DISPOSE_MESSAGE = "The conversation has been disposed. This operation is no longer valid";
+	private static final String FINALIZE_MESSAGE = "Conversations must be released by calling dispose(). Failure to do so may result in leaked resources.";
+	
 	private ConversationListener conversationListener;
 	private LocalMediaImpl localMediaImpl;
 	private VideoViewRenderer localVideoRenderer;
@@ -177,7 +180,7 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 
 	@Override
 	public Set<String> getParticipants() {
-		checkDisposed("You can't get participants list when native resources are disposed");
+		checkDisposed();
 		Set<String> participants =  new HashSet<String>();
 		for (Participant participant : participantMap.values()) {
 			participants.add(participant.getAddress());
@@ -187,7 +190,7 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 
 	@Override
 	public Media getLocalMedia() {
-		checkDisposed("You can't get local media when native resources are disposed");
+		checkDisposed();
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -205,20 +208,20 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 	@Override
 	public void invite(Set<String> participantAddresses) {
 		// TODO Auto-generated method stub
-		checkDisposed("You can't invite participants when native resources are disposed");
+		checkDisposed();
 
 	}
 
 	@Override
 	public void disconnect() {
-		checkDisposed("You can't disconnect when native resources are disposed");
+		checkDisposed();
 		stop();
 	}
 
 	@Override
 	public String getConversationSid() {
 		// TODO Auto-generated method stub
-		checkDisposed("You can't get conversation sid when native resources are disposed");
+		checkDisposed();
 		return null;
 	}
 	
@@ -419,8 +422,10 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 	
 	@Override
 	public synchronized void dispose() {
-		sessionObserverInternal.dispose();
-		sessionObserverInternal = null;
+		if (sessionObserverInternal != null) {
+			sessionObserverInternal.dispose();
+			sessionObserverInternal = null;
+		}
 		if (nativeHandle != 0) {
 			// NOTE: The core destroys the Session once it has stopped.
 			// We do not need to call Release() in this case.
@@ -430,7 +435,7 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 	}
 	
 	public void setLocalMedia(LocalMediaImpl media) {
-		checkDisposed("You can't set local media when native resources are disposed");
+		checkDisposed();
 		localMediaImpl = media;
 	}
 	
@@ -464,9 +469,9 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 		
 	}
 	
-	private synchronized void checkDisposed(String errorMessage) {
+	private synchronized void checkDisposed() {
 		if (isDisposed || nativeHandle == 0) {
-			throw new IllegalStateException(errorMessage);
+			throw new IllegalStateException(DISPOSE_MESSAGE);
 		}
 	}
 	

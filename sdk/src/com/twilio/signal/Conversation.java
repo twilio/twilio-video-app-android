@@ -86,10 +86,9 @@ public interface Conversation {
 	public String getConversationSid();
 	
 	/**
-	 * Free native object associated with this Conversation
+	 * Releases resources associated with this Conversation object.
 	 * 
-	 * This will mark Conversation as disposed and will throw exception in future if any method is called.
-	 * After this call you should loose any reference to this object and let it be garbage collected.
+	 * Attempts to use this Conversation object after disposal will result in an IllegalStateException.
 	 */
 	public void dispose();
 
