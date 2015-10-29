@@ -1,4 +1,5 @@
 #include "com_twilio_signal_impl_ConversationImpl.h"
+#include "talk/app/webrtc/java/jni/jni_helpers.h"
 #include "TSCoreSDKTypes.h"
 #include "TSCoreError.h"
 #include "TSCLogger.h"
@@ -100,5 +101,12 @@ JNIEXPORT void JNICALL Java_com_twilio_signal_impl_ConversationImpl_setSessionOb
 	TSCSessionObserverObjectRef sessionObserver =
 				TSCSessionObserverObjectRef(reinterpret_cast<TSCSessionObserverObject*>(nativeSessionObserver));
 	session->setSessionObserver(sessionObserver);
+}
+
+JNIEXPORT void JNICALL Java_com_twilio_signal_impl_ConversationImpl_freeNativeHandle
+  (JNIEnv *env, jobject obj, jlong nativeSession)
+{
+	// NOTE: The core destroys the Session once it has stopped.
+	// We do not need to call Release() in this case.
 }
 

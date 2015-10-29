@@ -140,7 +140,7 @@ JNIEXPORT jlong JNICALL Java_com_twilio_signal_impl_EndpointImpl_00024EndpointOb
   (JNIEnv *env, jobject obj, jobject j_endpoint_observer, jobject j_endpoint) {
 	TSCEndpointObserver* endpointObserver =
 				new EndpointObserverInternalWrapper(env, obj, j_endpoint_observer, j_endpoint);
-		return (jlong)endpointObserver;
+		return jlongFromPointer(endpointObserver);
 }
 
 /*
@@ -149,8 +149,8 @@ JNIEXPORT jlong JNICALL Java_com_twilio_signal_impl_EndpointImpl_00024EndpointOb
  * Signature: (J)V
  */
 JNIEXPORT void JNICALL Java_com_twilio_signal_impl_EndpointImpl_00024EndpointObserverInternal_freeNativeObserver
-  (JNIEnv *, jobject, jlong){
-
+  (JNIEnv *env, jobject obj, jlong nativeEndpointObserver){
+	// NOTE: Native observer should be automatically deleted by Core when we delete Endpoint
 }
 
 

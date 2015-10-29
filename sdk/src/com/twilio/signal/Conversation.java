@@ -3,7 +3,7 @@ package com.twilio.signal;
 import java.util.Set;
 
 /**
- * A Conversation represents a communication from one Endpoint to one or more RemoteEndpoint. 
+ * A Conversation represents a communication from one Endpoint to one or more RemoteEndpoint.
  * You should not call Conversation's constructor directly; instead, call Endpoint#createSession.
  *
  */
@@ -41,7 +41,7 @@ public interface Conversation {
 	 * Returns the list of Participants in an active Session.
 	 * 
 	 * @return participants - list of {@link Participant} in this Session.
-	 */	
+	 */
 	public Set<String> getParticipants();
 	
 	
@@ -84,6 +84,13 @@ public interface Conversation {
 	 *
 	 */
 	public String getConversationSid();
+	
+	/**
+	 * Releases resources associated with this Conversation object.
+	 * 
+	 * Attempts to use this Conversation object after disposal will result in an IllegalStateException.
+	 */
+	public void dispose();
 
 
 }

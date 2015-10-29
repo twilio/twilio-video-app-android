@@ -142,7 +142,7 @@ protected:
 
 		jstring id = stringToJString(jni(), videoTrack->id());
 		jobject j_track = jni()->NewObject(
-				*j_video_track_class_, j_video_track_ctor_, (jlong)videoTrack, id);
+				*j_video_track_class_, j_video_track_ctor_, jlongFromPointer(videoTrack), id);
 		jobject j_trackinfo = TrackInfoToJavaTrackInfoImpl(trackInfo);
 		jni()->CallVoidMethod(*j_observer_global_, j_add_track_id_, j_trackinfo, j_track);
 	}
@@ -241,10 +241,8 @@ private:
 JNIEXPORT jlong JNICALL Java_com_twilio_signal_impl_ConversationImpl_00024SessionObserverInternal_wrapNativeObserver
   (JNIEnv *env, jobject obj, jobject observer, jobject conversation) {
 	TS_CORE_LOG_DEBUG("wrapNativeObserver");
-  	rtc::scoped_ptr<SessionObserverInternalWrapper> so(
-		new SessionObserverInternalWrapper(env, obj, observer, conversation)
-	);
-  	return (jlong)so.release();
+	return jlongFromPointer(
+			new SessionObserverInternalWrapper(env, obj, observer, conversation));
 }
 
 /*
@@ -253,6 +251,6 @@ JNIEXPORT jlong JNICALL Java_com_twilio_signal_impl_ConversationImpl_00024Sessio
  * Signature: (J)V
  */
 JNIEXPORT void JNICALL Java_com_twilio_signal_impl_ConversationImpl_00024SessionObserverInternal_freeNativeObserver
-  (JNIEnv *, jobject obj, jlong nativeSession){
-
+  (JNIEnv *env, jobject obj, jlong nativeSessionObserver){
+	// NOTE: Native observer should be automatically deleted by Core when we delete Conversation
 }

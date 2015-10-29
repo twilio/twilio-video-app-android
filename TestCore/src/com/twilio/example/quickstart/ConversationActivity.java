@@ -132,15 +132,27 @@ public class ConversationActivity extends Activity implements ConversationListen
 	public void onLocalStatusChanged(Conversation conversation, Status status) {
 		Log.i(TAG, "onLocalStatusChanged "+status.name());
 	}
+	
+	private void releaseConversation(Conversation conversation) {
+		if (conv == conversation) {
+			conv.dispose();
+			conv = null;
+		} else {
+			Log.w(TAG, "conversation local reference is different then the one from callback");
+		}
+		finish();
+	}
 
 	@Override
 	public void onConversationEnded(Conversation conversation) {
 		Log.i(TAG, "onConversationEnded");
+		releaseConversation(conversation);
 	}
 
 	@Override
 	public void onConversationEnded(Conversation conversation, ConversationException e) {
 		Log.i(TAG, "onConversationEnded error:"+e.getMessage());
+		releaseConversation(conversation);
 	}
 
 	@Override

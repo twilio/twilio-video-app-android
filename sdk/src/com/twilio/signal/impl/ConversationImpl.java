@@ -31,6 +31,9 @@ import com.twilio.signal.impl.util.CallbackHandler;
 
 public class ConversationImpl implements Conversation, NativeHandleInterface, SessionObserver, CoreSession {
 
+	private static final String DISPOSE_MESSAGE = "The conversation has been disposed. This operation is no longer valid";
+	private static final String FINALIZE_MESSAGE = "Conversations must be released by calling dispose(). Failure to do so may result in leaked resources.";
+	
 	private ConversationListener conversationListener;
 	private LocalMediaImpl localMediaImpl;
 	private VideoViewRenderer localVideoRenderer;
@@ -60,11 +63,22 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 		public long getNativeHandle() {
 			return nativeSessionObserver;
 		}
+
+		public void dispose() {
+			if (nativeSessionObserver != 0) {
+				// NOTE: The core destroys the SessionObserver once it has stopped.
+				// We do not need to call Release() in this case.
+				freeNativeObserver(nativeSessionObserver);
+				nativeSessionObserver = 0;
+			}
+			
+		}
 		
 	}
 
 	private SessionObserverInternal sessionObserverInternal;
 	private long nativeHandle;
+	private boolean isDisposed;
 	
 	private ConversationImpl(EndpointImpl endpoint, Set<String> participants, LocalMediaImpl localMediaImpl, ConversationListener conversationListener) {
 		String[] participantAddressArray = new String[participants.size()];
@@ -157,7 +171,7 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 		}
 		return new ConversationImpl(nativeSession, participantsAddr);
 	}
-
+	
 	@Override
 	public Status getStatus() {
 		// TODO Auto-generated method stub
@@ -166,6 +180,7 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 
 	@Override
 	public Set<String> getParticipants() {
+		checkDisposed();
 		Set<String> participants =  new HashSet<String>();
 		for (Participant participant : participantMap.values()) {
 			participants.add(participant.getAddress());
@@ -175,6 +190,7 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 
 	@Override
 	public Media getLocalMedia() {
+		checkDisposed();
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -192,18 +208,29 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 	@Override
 	public void invite(Set<String> participantAddresses) {
 		// TODO Auto-generated method stub
+		checkDisposed();
 
 	}
 
 	@Override
 	public void disconnect() {
+		checkDisposed();
 		stop();
 	}
 
 	@Override
 	public String getConversationSid() {
 		// TODO Auto-generated method stub
+		checkDisposed();
 		return null;
+	}
+	
+	@Override
+	protected void finalize() throws Throwable {
+		if (isDisposed || nativeHandle == 0) {
+			logger.e("YOU FORGOT TO DISPOSE NATIVE RESOURCES!");
+			dispose();
+		}
 	}
 
 	private ParticipantImpl addParticipant(String participantAddress) {
@@ -233,7 +260,7 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 		if(conversationListener == null) {
 			return;
 		}
-
+		participantMap.clear();
 		if (error == null) {
 			if(handler != null) {
 				handler.post(new Runnable() {
@@ -385,12 +412,30 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 		}
 	}
 
+	/**
+	 * NativeHandleInterface
+	 */
 	@Override
 	public long getNativeHandle() {
 		return nativeHandle;
 	}
 	
+	@Override
+	public synchronized void dispose() {
+		if (sessionObserverInternal != null) {
+			sessionObserverInternal.dispose();
+			sessionObserverInternal = null;
+		}
+		if (nativeHandle != 0) {
+			// NOTE: The core destroys the Session once it has stopped.
+			// We do not need to call Release() in this case.
+			freeNativeHandle(nativeHandle);
+			nativeHandle = 0;
+		}
+	}
+	
 	public void setLocalMedia(LocalMediaImpl media) {
+		checkDisposed();
 		localMediaImpl = media;
 	}
 	
@@ -411,13 +456,7 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 				return Status.UNKNOWN;
 		}
 	}
-
-	private native long wrapOutgoingSession(long nativeEndpoint, long nativeSessionObserver, String[] participants);
-	private native void start(long nativeSession);
-	private native void setExternalCapturer(long nativeSession, long nativeCapturer);
-	private native void stop(long nativeSession);
-	private native void setSessionObserver(long nativeSession, long nativeSessionObserver);
-
+	
 	@Override
 	public void start() {
 		start(getNativeHandle());
@@ -429,5 +468,23 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 		stop(getNativeHandle());
 		
 	}
+	
+	private synchronized void checkDisposed() {
+		if (isDisposed || nativeHandle == 0) {
+			throw new IllegalStateException(DISPOSE_MESSAGE);
+		}
+	}
+	
+	/**
+	 * Native methods
+	 */
+	private native long wrapOutgoingSession(long nativeEndpoint, long nativeSessionObserver, String[] participants);
+	private native void start(long nativeSession);
+	private native void setExternalCapturer(long nativeSession, long nativeCapturer);
+	private native void stop(long nativeSession);
+	private native void setSessionObserver(long nativeSession, long nativeSessionObserver);
+	private native void freeNativeHandle(long nativeHandle);
+
+	
 
 }

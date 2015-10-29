@@ -34,8 +34,11 @@ public class EndpointImpl implements
 
 	static final Logger logger = Logger.getLogger(EndpointImpl.class);
 	
+	private static final String DISPOSE_MESSAGE = "The Endpoint has been disposed. This operation is no longer valid";
+	private static final String FINALIZE_MESSAGE = "Endpoints must be released by calling dispose(). Failure to do so may result in leaked resources.";
+	
 	class EndpointObserverInternal implements NativeHandleInterface {
-		
+
 		private long nativeEndpointObserver;
 		
 		public EndpointObserverInternal(EndpointObserver observer) {
@@ -51,6 +54,15 @@ public class EndpointImpl implements
 		public long getNativeHandle() {
 			return nativeEndpointObserver;
 		}
+
+
+
+		public void dispose() {
+			if (nativeEndpointObserver != 0) {
+				freeNativeObserver(nativeEndpointObserver);
+				nativeEndpointObserver = 0;
+			}
+		}
 		
 	}
 
@@ -61,6 +73,7 @@ public class EndpointImpl implements
 	private PendingIntent incomingIntent = null;
 	private EndpointObserverInternal endpointObserver;
 	private long nativeEndpointHandle;
+	private boolean isDisposed;
 
 	private Handler handler;
 	private EndpointState coreState;
@@ -74,6 +87,15 @@ public class EndpointImpl implements
 	public int hashCode() {
 		return super.hashCode();
 	}
+	
+	@Override
+	protected void finalize() throws Throwable {
+		if (isDisposed || nativeEndpointHandle == 0) {
+			logger.e(FINALIZE_MESSAGE);
+			dispose();
+		}
+	}
+
 
 	EndpointImpl(Context context,
 			EndpointListener inListener) {
@@ -97,15 +119,16 @@ public class EndpointImpl implements
 	@Override
 	public void listen() {
 		//SignalCore.getInstance(this.context).register();
-		if (nativeEndpointHandle != 0) {
-			listen(nativeEndpointHandle);
-		}
+		checkDisposed();
+		listen(nativeEndpointHandle);
 	}
 
 
 	@Override
 	public void unlisten() {
 		//SignalCore.getInstance(this.context).unregister(this);
+		checkDisposed();
+		unlisten(nativeEndpointHandle);
 	}
 
 
@@ -134,10 +157,25 @@ public class EndpointImpl implements
 	@Override
 	public Conversation createConversation(Set<String> participants,
 			LocalMediaImpl localMediaImpl, ConversationListener listener) {
+		checkDisposed();
 		Conversation conv = ConversationImpl.createOutgoingConversation(
 				this, participants, localMediaImpl, listener);
 		return conv;
 	}
+	
+	@Override
+	public synchronized void dispose() {
+		if (endpointObserver != null) {
+			endpointObserver.dispose();
+			endpointObserver = null;
+		}
+		if (!isDisposed && nativeEndpointHandle != 0) {
+			freeNativeHandle(nativeEndpointHandle);
+			nativeEndpointHandle = 0;
+			isDisposed = true;
+		}
+	}
+
 
 
 	@Override /* Parcelable */
@@ -190,11 +228,14 @@ public class EndpointImpl implements
 		}
 	}
 
+	/**
+	 * NativeHandleInterface
+	 */
 	@Override
 	public long getNativeHandle() {
 		return nativeEndpointHandle;
 	}
-
+	
 	/**
 	 * EndpointObserver methods
 	 */
@@ -293,13 +334,21 @@ public class EndpointImpl implements
 	@Override
 	public void ignore(ConversationImpl conv) {
 		// TODO Auto-generated method stub
-		
+	}
+	
+	private synchronized void checkDisposed() {
+		if (isDisposed || nativeEndpointHandle == 0) {
+			throw new IllegalStateException(DISPOSE_MESSAGE);
+		}
 	}
 
 	
+	
 	//Native implementation
 	private native void listen(long nativeEndpoint);
+	private native void unlisten(long nativeEndpoint);
 	private native void reject(long nativeEndpoint, long nativeSession);
+	private native void freeNativeHandle(long nativeEndpoint);
 
 
 }
