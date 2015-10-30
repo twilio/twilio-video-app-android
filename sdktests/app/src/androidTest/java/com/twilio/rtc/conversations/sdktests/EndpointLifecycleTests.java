@@ -20,19 +20,36 @@ import java.util.concurrent.TimeUnit;
 @RunWith(AndroidJUnit4.class)
 public class EndpointLifecycleTests {
 
+    private static String token = "jtestic";
+
     @Rule
     public ActivityTestRule<TwilioRTCActivity> mActivityRule = new ActivityTestRule<>(
             TwilioRTCActivity.class);
 
     @Test
     public void testTwilioCreateEndpointWithToken() {
+        Endpoint endpoint = createEndpoint();
+        org.junit.Assert.assertNotNull(endpoint);
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void testTwilioDisposeEndpointCallListen() {
+        Endpoint endpoint = createEndpoint();
+        org.junit.Assert.assertNotNull(endpoint);
+
+        endpoint.dispose();
+        endpoint.listen();
+
+    }
+
+    private Endpoint createEndpoint() {
         TestTools.initializeTwilioSDK(mActivityRule.getActivity());
 
         CountDownLatch waitLatch = new CountDownLatch(1);
-        Endpoint endpoint = TwilioRTC.createEndpoint("DEADBEEF", endpointListener());
-
+        Endpoint endpoint = TwilioRTC.createEndpoint(token, endpointListener());
         TestTools.wait(waitLatch, TestTools.TIMEOUT, TimeUnit.SECONDS);
-        org.junit.Assert.assertNotNull(endpoint);
+        return endpoint;
+
     }
 
     private EndpointListener endpointListener() {
