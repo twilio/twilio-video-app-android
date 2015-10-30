@@ -154,7 +154,7 @@ protected:
 		jni()->CallVoidMethod(*j_observer_global_, j_remove_track_id_, j_trackinfo);
 	}
 
-	virtual void onDidReceiveSessionStatistics(TSCSessionStatisticsObject* statistics) {
+	virtual void onDidReceiveSessionStatistics(TSCSessionStatisticsPtr statistics) {
 		TS_CORE_LOG_DEBUG("onDidReceiveSessionStatistics");
 	}
 
