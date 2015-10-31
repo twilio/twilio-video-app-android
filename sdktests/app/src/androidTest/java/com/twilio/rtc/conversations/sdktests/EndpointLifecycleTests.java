@@ -27,7 +27,7 @@ import java.util.concurrent.TimeUnit;
 @RunWith(AndroidJUnit4.class)
 public class EndpointLifecycleTests {
 
-    private static String token = "jtestic";
+    private static String token = "deadbee";
 
     @Rule
     public ActivityTestRule<TwilioRTCActivity> mActivityRule = new ActivityTestRule<>(
