@@ -40,7 +40,7 @@ public class ConversationLifecycleTests {
 
     @Test
     public void testTwilioCreateConversation() {
-        // Note: Disabled until endpoint registration problem is fixed GSDK-26
+        // Note: Disabled until endpoint registration problem is fixed GSDK-261
         // We are not receiving any EndpoinListener events when we createEndpoint
 
         /*
