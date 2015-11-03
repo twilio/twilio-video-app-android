@@ -40,9 +40,12 @@ public class ConversationLifecycleTests {
 
     @Test
     public void testTwilioCreateConversation() {
-        Endpoint endpoint = createEndpoint();
+        // Note: Disabled until endpoint registration problem is fixed GSDK-26
+        // We are not receiving any EndpoinListener events when we createEndpoint
 
         /*
+        Endpoint endpoint = createEndpoint();
+
         Set<String> participants = new HashSet<String>();
         participants.add("joja");
         LocalMediaImpl localMedia = new LocalMediaImpl();

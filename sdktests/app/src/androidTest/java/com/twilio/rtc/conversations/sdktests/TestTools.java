@@ -23,7 +23,7 @@ public class TestTools {
 
     public static void initializeTwilioSDK(Activity activity) {
         CountDownLatch waitLatch = new CountDownLatch(1);
-        initialize(activity, initListener(waitLatch));
+        initialize(activity.getApplicationContext(), initListener(waitLatch));
         wait(waitLatch, TIMEOUT, TimeUnit.SECONDS);
     }
 
