@@ -23,16 +23,12 @@ public class TestTools {
 
     public static void initializeTwilioSDK(Activity activity) {
         CountDownLatch waitLatch = new CountDownLatch(1);
-        initialize(activity.getApplicationContext(), initListener(waitLatch));
+        TwilioRTC.initialize(activity.getApplicationContext(), initListener(waitLatch));
         wait(waitLatch, TIMEOUT, TimeUnit.SECONDS);
     }
 
     public static boolean isInitialized() {
         return initialized;
-    }
-
-    private static void initialize(Context context, TwilioRTC.InitListener initListener) {
-        TwilioRTC.initialize(context, initListener);
     }
 
     public static TwilioRTC.InitListener initListener(final CountDownLatch wait) {
