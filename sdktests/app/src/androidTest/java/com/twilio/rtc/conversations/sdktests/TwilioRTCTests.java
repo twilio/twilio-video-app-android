@@ -28,7 +28,7 @@ public class TwilioRTCTests {
 
     @Test
     public void testTwilioInitialize() {
-        TestTools.initializeTwilioSDK(mActivityRule.getActivity());
+        TestTools.initializeTwilioSDK(mActivityRule.getActivity().getApplicationContext());
     }
 
     @Test
@@ -38,7 +38,7 @@ public class TwilioRTCTests {
         final CountDownLatch errorLatch = TestTools.isInitialized() ? new CountDownLatch(attempts) : new CountDownLatch(attempts - 1);
 
         for(int i = 0; i < attempts; i++) {
-            TwilioRTC.initialize(mActivityRule.getActivity(), TestTools.countDownInitListenerCallback(initLatch, errorLatch));
+            TwilioRTC.initialize(mActivityRule.getActivity().getApplicationContext(), TestTools.countDownInitListenerCallback(initLatch, errorLatch));
         }
 
         try {

@@ -1,6 +1,5 @@
 package com.twilio.rtc.conversations.sdktests;
 
-import android.content.Context;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
 
@@ -21,13 +20,13 @@ import org.junit.runner.RunWith;
 
 import java.util.HashSet;
 import java.util.Set;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
+
 
 @RunWith(AndroidJUnit4.class)
 public class EndpointLifecycleTests {
 
-    private static String token = "deadbee";
+    private static String TOKEN = "deadbeef";
+    private static String CLIENT = "deedee";
 
     @Rule
     public ActivityTestRule<TwilioRTCActivity> mActivityRule = new ActivityTestRule<>(
@@ -40,7 +39,7 @@ public class EndpointLifecycleTests {
     }
 
     @Test(expected = IllegalStateException.class)
-    public void testTwilioDisposeEndpointCallListen() {
+    public void testTwilioCannotListenAfterEndpointDisposal() {
         Endpoint endpoint = createEndpoint();
         org.junit.Assert.assertNotNull(endpoint);
 
@@ -49,7 +48,7 @@ public class EndpointLifecycleTests {
     }
 
     @Test(expected = IllegalStateException.class)
-    public void testTwilioDisposeEndpointCallUnlisten() {
+    public void testTwilioCannotUnlistenAfterEndpointDisposal() {
         Endpoint endpoint = createEndpoint();
         org.junit.Assert.assertNotNull(endpoint);
 
@@ -58,15 +57,15 @@ public class EndpointLifecycleTests {
     }
 
     @Test(expected = IllegalStateException.class)
-    public void testTwilioDisposeEndpointCallCreateConversation() {
+    public void testTwilioCannotCreateConversationAfterEndpointDisposal() {
         Endpoint endpoint = createEndpoint();
         org.junit.Assert.assertNotNull(endpoint);
 
         endpoint.dispose();
-        Set<String> setStr = new HashSet<>();
-        setStr.add("joja");
+        Set<String> participants = new HashSet<>();
+        participants.add(CLIENT);
         LocalMediaImpl localMedia = new LocalMediaImpl();
-        Conversation conv = endpoint.createConversation(setStr, localMedia, conversationListener());
+        Conversation conv = endpoint.createConversation(participants, localMedia, conversationListener());
     }
 
     @Test
@@ -79,11 +78,9 @@ public class EndpointLifecycleTests {
     }
 
     private Endpoint createEndpoint() {
-        TestTools.initializeTwilioSDK(mActivityRule.getActivity());
+        TestTools.initializeTwilioSDK(mActivityRule.getActivity().getApplicationContext());
 
-        //CountDownLatch waitLatch = new CountDownLatch(1);
-        Endpoint endpoint = TwilioRTC.createEndpoint(token, endpointListener());
-        //TestTools.wait(waitLatch, TestTools.TIMEOUT, TimeUnit.SECONDS);
+        Endpoint endpoint = TwilioRTC.createEndpoint(TOKEN, endpointListener());
         return endpoint;
 
     }

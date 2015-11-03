@@ -1,6 +1,5 @@
 package com.twilio.rtc.conversations.sdktests;
 
-import android.app.Activity;
 import android.content.Context;
 
 import com.twilio.signal.TwilioRTC;
@@ -21,9 +20,9 @@ public class TestTools {
 
     public static int TIMEOUT = 10;
 
-    public static void initializeTwilioSDK(Activity activity) {
+    public static void initializeTwilioSDK(Context applicationContext) {
         CountDownLatch waitLatch = new CountDownLatch(1);
-        TwilioRTC.initialize(activity.getApplicationContext(), initListener(waitLatch));
+        TwilioRTC.initialize(applicationContext, initListener(waitLatch));
         wait(waitLatch, TIMEOUT, TimeUnit.SECONDS);
     }
 
@@ -72,9 +71,11 @@ public class TestTools {
 
     public static void wait(CountDownLatch wait, int timeout, TimeUnit timeUnit) {
         try {
-            wait.await(timeout, timeUnit);
+            if (!wait.await(timeout, timeUnit)) {
+                org.junit.Assert.fail("timed out after" + TIMEOUT);
+            }
         } catch (InterruptedException e) {
-            org.junit.Assert.fail("timed out after" + TIMEOUT);
+            org.junit.Assert.fail("Thread interrupted");
         }
     }
 
