@@ -99,15 +99,7 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 				sessionObserverInternal.getNativeHandle(),
 				participantAddressArray);
 
-		String deviceName = getPreferredDeviceName();
-		if(deviceName != null) {
-			// TODO: pass an error handler and callback on the listener to propagate camera errors
-			VideoCapturerAndroid capturer = VideoCapturerAndroid.create(deviceName, null);
-			long nativeVideoCapturer = getNativeVideoCapturer(capturer);
-			setExternalCapturer(nativeHandle, nativeVideoCapturer);
-		} else {
-			// TODO: disable video or throw an exception notifying the user that there is no camera available
-		}
+		
 
 		start();
 
@@ -459,6 +451,16 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 	
 	@Override
 	public void start() {
+		logger.d("starting call");
+		String deviceName = getPreferredDeviceName();
+		if(deviceName != null) {
+			// TODO: pass an error handler and callback on the listener to propagate camera errors
+			VideoCapturerAndroid capturer = VideoCapturerAndroid.create(deviceName, null);
+			long nativeVideoCapturer = getNativeVideoCapturer(capturer);
+			setExternalCapturer(nativeHandle, nativeVideoCapturer);
+		} else {
+			// TODO: disable video or throw an exception notifying the user that there is no camera available
+		}
 		start(getNativeHandle());
 		
 	}
