@@ -22,7 +22,7 @@ JNIEXPORT jlong JNICALL Java_com_twilio_signal_impl_ConversationImpl_wrapOutgoin
   (JNIEnv *env, jobject obj, jlong nativeEndpoint, jlong nativeSessionObserver, jobjectArray participantList)
 {
 
-	TSCEndpointPtr endpoint = TSCEndpointPtr(reinterpret_cast<TSCEndpoint*>(nativeEndpoint));
+	TSCEndpoint* endpoint = reinterpret_cast<TSCEndpoint*>(nativeEndpoint);
 	TSCOptions options;
 	options.insert(std::pair<std::string,std::string>("audio","yes"));
 	options.insert(std::pair<std::string,std::string>("video","yes"));

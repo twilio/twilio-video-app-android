@@ -92,7 +92,10 @@ public class TwilioRTCImpl {
 		sdkIniting = true;
 
 		try {
-			initCore(inContext);
+			boolean success = initCore(inContext);
+			if(!success) {
+				throw new RuntimeException("Twilio failed to initialized");
+			}
 			PackageManager pm = inContext.getPackageManager();
 			PackageInfo pinfo = pm.getPackageInfo(inContext.getPackageName(),
 					PackageManager.GET_PERMISSIONS
