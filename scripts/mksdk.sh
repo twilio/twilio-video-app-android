@@ -120,9 +120,9 @@ function build_library {
     mkdir "${tarroot}"
 
     # jar and native libs
+    SDK_VERSION=$(sed -n '/android:versionName=/s/.*"\(.*\)"[^"]*/\1/p' AndroidManifest.xml)
     mkdir "${tarroot}/libs"
-    cp "${twsdkroot}/sdk/bin/classes.jar" "${tarroot}/libs/${tarname}.jar"
-    cp "${twsdkroot}/sdk/libs/libjingle_peerconnection_java.jar" "${tarroot}/libs/"
+    cp "${twsdkroot}/sdk/bin/${tarname}.jar" "${tarroot}/libs/${tarname}-${SDK_VERSION}.jar"
     abis=$(sed -ne '/^APP_ABI/s/^APP_ABI :=//p' ${twsdkroot}/sdk/jni/Application.mk)
     for abi in $abis; do
     if [ -d "${twsdkroot}/sdk/libs/${abi}" ]; then

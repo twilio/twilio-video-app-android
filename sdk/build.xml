@@ -14,6 +14,14 @@
         </exec>
     </target>
 
+    <!-- Combine the twilio sdk and the webrtc artifact into a single jar -->
+    <target name="-post-compile">
+        <jar id="files" jarfile="bin/twilio-rtc-conversations-android.jar">
+            <zipfileset src="bin/classes.jar" includes="**/*.java **/*.class"/>
+            <zipfileset src="libs/libjingle_peerconnection_java.jar" includes="**/*.java **/*.class"/>
+        </jar>
+    </target>
+
     <!-- The local.properties file is created and updated by the 'android' tool.
          It contains the path to the SDK. It should *NOT* be checked into
          Version Control Systems. -->
