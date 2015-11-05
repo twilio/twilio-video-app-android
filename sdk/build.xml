@@ -19,6 +19,7 @@
         <jar id="files" jarfile="bin/twilio-rtc-conversations-android.jar">
             <zipfileset src="bin/classes.jar" includes="**/*.java **/*.class"/>
             <zipfileset src="libs/libjingle_peerconnection_java.jar" includes="**/*.java **/*.class"/>
+            <zipfileset dir="libs" includes="**/libtwilio-native.so" prefix="lib/"/>
         </jar>
     </target>
 
