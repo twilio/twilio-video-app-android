@@ -1,27 +1,38 @@
 package com.twilio.signal.impl;
 
-import com.twilio.signal.VideoTrack;
-import com.twilio.signal.VideoRenderer;
-import com.twilio.signal.I420Frame;
-import com.twilio.signal.impl.core.TrackInfo;
-
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
+
+import com.twilio.signal.I420Frame;
+import com.twilio.signal.VideoRenderer;
+import com.twilio.signal.VideoTrack;
+import com.twilio.signal.impl.core.TrackInfo;
 
 public class VideoTrackImpl implements VideoTrack {
 
 	private org.webrtc.VideoTrack videoTrack;
-	private TrackInfo trackInfo; 
+	private TrackInfo trackInfo;
 	private List<VideoRenderer> videoRenderers = new ArrayList<VideoRenderer>();
 
-	private VideoTrackImpl(org.webrtc.VideoTrack videoTrack, TrackInfo trackInfo) {
+	public VideoTrackImpl(org.webrtc.VideoTrack videoTrack, TrackInfo trackInfo) {
 		this.videoTrack = videoTrack;
 		this.trackInfo = trackInfo;
 	}
+	
+	public VideoTrackImpl() {}
+	
+	public void setWebrtcVideoTrack(org.webrtc.VideoTrack videoTrack) {
+		this.videoTrack = videoTrack;
+	}
+	
+	public void setTrackInfo(TrackInfo trackInfo) {
+		this.trackInfo = trackInfo;
+	}
 
+	/*
 	public static VideoTrackImpl create(org.webrtc.VideoTrack videoTrack, TrackInfo trackInfo) {
 		return new VideoTrackImpl(videoTrack, trackInfo);
-	}
+	}*/
 
 	public TrackInfo getTrackInfo() {
 		return trackInfo;

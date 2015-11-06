@@ -17,7 +17,7 @@ import com.twilio.signal.ConversationListener;
 import com.twilio.signal.Endpoint;
 import com.twilio.signal.EndpointListener;
 import com.twilio.signal.Invite;
-import com.twilio.signal.LocalMediaImpl;
+import com.twilio.signal.LocalMedia;
 import com.twilio.signal.impl.core.CoreEndpoint;
 import com.twilio.signal.impl.core.CoreError;
 import com.twilio.signal.impl.core.EndpointObserver;
@@ -156,10 +156,10 @@ public class EndpointImpl implements
 
 	@Override
 	public Conversation createConversation(Set<String> participants,
-			LocalMediaImpl localMediaImpl, ConversationListener listener) {
+			LocalMedia localMedia, ConversationListener listener) {
 		checkDisposed();
 		Conversation conv = ConversationImpl.createOutgoingConversation(
-				this, participants, localMediaImpl, listener);
+				this, participants, localMedia, listener);
 		return conv;
 	}
 	
