@@ -12,11 +12,11 @@ public interface Invite {
 	public void reject();
 	
 	/**
-	 * Invoking this method allows the Endpoint to accept the invitation to join the conversation and set the delegate for handling 
+	 * Invoking this method allows the Endpoint to accept the invitation to join the conversation and set the delegate for handling
 	 * conversation related events.
 	 * 
 	 */
-	public Conversation acceptWithLocalMedia(Media localMedia, ConversationListener listener);
+	public Conversation acceptWithLocalMedia(LocalMedia localMedia, ConversationListener listener);
 	
 
 }

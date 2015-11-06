@@ -4,8 +4,7 @@ import com.twilio.signal.Conversation;
 import com.twilio.signal.ConversationListener;
 import com.twilio.signal.Endpoint;
 import com.twilio.signal.Invite;
-import com.twilio.signal.LocalMediaImpl;
-import com.twilio.signal.Media;
+import com.twilio.signal.LocalMedia;
 
 public class InviteImpl implements Invite {
 	
@@ -57,11 +56,11 @@ public class InviteImpl implements Invite {
 	}
 
 	@Override
-	public Conversation acceptWithLocalMedia(Media localMedia,
+	public Conversation acceptWithLocalMedia(LocalMedia localMedia,
 			ConversationListener listener) {
 		
 		//TODO - danger, danger - we should change type to local media instead of media
-		conversation.setLocalMedia((LocalMediaImpl)localMedia);
+		conversation.setLocalMedia(localMedia);
 		conversation.setConversationListener(listener);
 		conversation.start();
 		return conversation;

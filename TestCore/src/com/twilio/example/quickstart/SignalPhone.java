@@ -31,7 +31,7 @@ import com.twilio.signal.ConversationListener;
 import com.twilio.signal.Endpoint;
 import com.twilio.signal.EndpointListener;
 import com.twilio.signal.Invite;
-import com.twilio.signal.LocalMediaImpl;
+import com.twilio.signal.LocalMedia;
 import com.twilio.signal.TwilioRTC;
 import com.twilio.signal.impl.TwilioConstants;
 
@@ -176,12 +176,12 @@ public class SignalPhone implements EndpointListener
     	if (!twilioSdkInited || (SignalPhone.this.alice == null)) {
     		return null;
     	}
-    	LocalMediaImpl localMediaImpl = new LocalMediaImpl();
-	localMediaImpl.attachContainerView(localContainer);
+    	LocalMedia localMedia = new LocalMedia();
+    	localMedia.attachContainerView(localContainer);
     	Set<String> participants = new HashSet<String>();
     	participants.add(participant);
     	Conversation conv = SignalPhone.this.alice.createConversation(
-    			participants, localMediaImpl, conversationListener);
+    			participants, localMedia, conversationListener);
     	if (conv != null) {
     		conversations.put(conv.getConversationSid(), conv);
     	}
@@ -198,9 +198,9 @@ public class SignalPhone implements EndpointListener
        if (!twilioSdkInited || invite == null || invite.to() == null) {
     	   return null;
        }
-       LocalMediaImpl localMediaImpl = new LocalMediaImpl();
-       localMediaImpl.attachContainerView(localContainer);
-       return invite.acceptWithLocalMedia(localMediaImpl, listener);
+       LocalMedia localMedia = new LocalMedia();
+       localMedia.attachContainerView(localContainer);
+       return invite.acceptWithLocalMedia(localMedia, listener);
     }
     
     public void reject(String from) {

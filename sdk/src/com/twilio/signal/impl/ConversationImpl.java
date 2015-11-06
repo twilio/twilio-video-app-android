@@ -1,12 +1,10 @@
 package com.twilio.signal.impl;
 
-import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import org.webrtc.VideoCapturerAndroid;
 
 import android.os.Handler;
 import android.util.Log;
@@ -14,7 +12,7 @@ import android.util.Log;
 import com.twilio.signal.Conversation;
 import com.twilio.signal.ConversationException;
 import com.twilio.signal.ConversationListener;
-import com.twilio.signal.LocalMediaImpl;
+import com.twilio.signal.LocalMedia;
 import com.twilio.signal.Media;
 import com.twilio.signal.Participant;
 import com.twilio.signal.TrackOrigin;
@@ -35,7 +33,7 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 	private static final String FINALIZE_MESSAGE = "Conversations must be released by calling dispose(). Failure to do so may result in leaked resources.";
 	
 	private ConversationListener conversationListener;
-	private LocalMediaImpl localMediaImpl;
+	private LocalMedia localMedia;
 	private VideoViewRenderer localVideoRenderer;
 
 	private Handler handler;
@@ -80,7 +78,7 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 	private long nativeHandle;
 	private boolean isDisposed;
 	
-	private ConversationImpl(EndpointImpl endpoint, Set<String> participants, LocalMediaImpl localMediaImpl, ConversationListener conversationListener) {
+	private ConversationImpl(EndpointImpl endpoint, Set<String> participants, LocalMedia localMediaImpl, ConversationListener conversationListener) {
 		String[] participantAddressArray = new String[participants.size()];
 		int i = 0;
 		for(String participant : participants) {
@@ -90,7 +88,7 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 		// TODO: throw an exception if the handler returns null
 		handler = CallbackHandler.create();
 
-		this.localMediaImpl = localMediaImpl;
+		this.localMedia = localMediaImpl;
 		this.conversationListener = conversationListener;
 
 		sessionObserverInternal = new SessionObserverInternal(this, this);
@@ -103,32 +101,6 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 
 		start();
 
-	}
-
-	private String getPreferredDeviceName() {
-		if(VideoCapturerAndroid.getDeviceCount() == 0) {
-			return null;
-		}
-		// Use the front-facing camera if one is available otherwise use the first available device
-		String deviceName = VideoCapturerAndroid.getNameOfFrontFacingDevice();
-		if(deviceName == null) {
-			deviceName = VideoCapturerAndroid.getDeviceName(0);
-		}
-		return deviceName;
-	}
-
-	private long getNativeVideoCapturer(VideoCapturerAndroid capturer) {
-		// TODO: throw exceptions to callee
-		// Use reflection to obtain the native video capturer handle
-		long nativeVideoCapturer = 0;
-		try {
-			Field field = capturer.getClass().getSuperclass().getDeclaredField("nativeVideoCapturer");
-			field.setAccessible(true);
-			nativeVideoCapturer = field.getLong(capturer);
-		} catch (Exception e) {
-			logger.e(e.toString());
-		}
-		return nativeVideoCapturer;
 	}
 	
 	private ConversationImpl(long nativeSession, String[] participantsAddr) {
@@ -143,7 +115,7 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 	}
 	
 	public static ConversationImpl createOutgoingConversation(EndpointImpl endpoint, Set<String> participants,
-			   LocalMediaImpl localMediaImpl,
+			   LocalMedia localMediaImpl,
 			   ConversationListener listener) {
 		ConversationImpl conv = new ConversationImpl(endpoint, participants, localMediaImpl, listener);
 		if (conv.getNativeHandle() == 0) {
@@ -363,12 +335,19 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 
 					}
 					Log.i(TAG, "Local Adding Renderer");
-					final VideoTrackImpl videoTrackImpl = VideoTrackImpl.create(webRtcVideoTrack, trackInfo);
-					localMediaImpl.addVideoTrack(videoTrackImpl);
-					localMediaImpl.getContainerView().post(new Runnable() {
+					//final VideoTrackImpl videoTrackImpl = VideoTrackImpl.create(webRtcVideoTrack, trackInfo);
+					//localMedia.addVideoTrack(videoTrackImpl);
+					List<VideoTrack> tracksList = localMedia.getVideoTracks();
+					if (tracksList.size() == 0) {
+						// TODO: throw error to the user
+					}
+					final VideoTrackImpl videoTrackImpl = (VideoTrackImpl)tracksList.get(0);
+					videoTrackImpl.setWebrtcVideoTrack(webRtcVideoTrack);
+					videoTrackImpl.setTrackInfo(trackInfo);
+					localMedia.getContainerView().post(new Runnable() {
 						@Override
 						public void run() {
-							localVideoRenderer = new VideoViewRenderer(localMediaImpl.getContainerView().getContext(), localMediaImpl.getContainerView());
+							localVideoRenderer = new VideoViewRenderer(localMedia.getContainerView().getContext(), localMedia.getContainerView());
 							videoTrackImpl.addRenderer(localVideoRenderer);
 						}
 					});
@@ -376,7 +355,7 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 			}).start();
 		} else {
 			final ParticipantImpl participant = addParticipant(trackInfo.getParticipantAddress());
-			final VideoTrackImpl videoTrackImpl = VideoTrackImpl.create(webRtcVideoTrack, trackInfo);
+			final VideoTrackImpl videoTrackImpl = new VideoTrackImpl(webRtcVideoTrack, trackInfo);
 			participant.getMediaImpl().addVideoTrack(videoTrackImpl);
 			if(handler != null) {
 				handler.post(new Runnable() {
@@ -426,9 +405,9 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 		}
 	}
 	
-	public void setLocalMedia(LocalMediaImpl media) {
+	public void setLocalMedia(LocalMedia media) {
 		checkDisposed();
-		localMediaImpl = media;
+		localMedia = media;
 	}
 	
 	private Conversation.Status sessionStateToStatus(SessionState state) {
@@ -452,15 +431,13 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 	@Override
 	public void start() {
 		logger.d("starting call");
-		String deviceName = getPreferredDeviceName();
-		if(deviceName != null) {
-			// TODO: pass an error handler and callback on the listener to propagate camera errors
-			VideoCapturerAndroid capturer = VideoCapturerAndroid.create(deviceName, null);
-			long nativeVideoCapturer = getNativeVideoCapturer(capturer);
-			setExternalCapturer(nativeHandle, nativeVideoCapturer);
+		if (localMedia != null && localMedia.getCamera() != null) {
+			setExternalCapturer(nativeHandle,
+					localMedia.getCamera().getNativeVideoCapturer());
 		} else {
-			// TODO: disable video or throw an exception notifying the user that there is no camera available
+			// TODO: Notify user about error in case this is video call
 		}
+		
 		start(getNativeHandle());
 		
 	}
