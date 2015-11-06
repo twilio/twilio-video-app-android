@@ -9,10 +9,12 @@ import java.util.Set;
 import android.os.Handler;
 import android.util.Log;
 
+import com.twilio.signal.CameraCapturer;
 import com.twilio.signal.Conversation;
 import com.twilio.signal.ConversationException;
 import com.twilio.signal.ConversationListener;
 import com.twilio.signal.LocalMedia;
+import com.twilio.signal.LocalVideoTrack;
 import com.twilio.signal.Media;
 import com.twilio.signal.Participant;
 import com.twilio.signal.TrackOrigin;
@@ -155,8 +157,7 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 	@Override
 	public Media getLocalMedia() {
 		checkDisposed();
-		// TODO Auto-generated method stub
-		return null;
+		return localMedia;
 	}
 
 	@Override
@@ -431,11 +432,14 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 	@Override
 	public void start() {
 		logger.d("starting call");
-		if (localMedia != null && localMedia.getCamera() != null) {
-			setExternalCapturer(nativeHandle,
-					localMedia.getCamera().getNativeVideoCapturer());
-		} else {
-			// TODO: Notify user about error in case this is video call
+		try {
+			CameraCapturer camera =
+					((LocalVideoTrack)localMedia.getVideoTracks().get(0)).getCameraCapturer();
+			setExternalCapturer(nativeHandle, camera.getNativeVideoCapturer());
+		} catch (NullPointerException e) {
+			logger.e("Failed to initialize external capturer");
+		} catch (IndexOutOfBoundsException e) {
+			logger.e("Failed to initialize external capturer");
 		}
 		
 		start(getNativeHandle());
