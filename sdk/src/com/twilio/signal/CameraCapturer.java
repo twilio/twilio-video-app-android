@@ -116,8 +116,6 @@ public class CameraCapturer implements VideoCapturer {
 		return nativeVideoCapturer;
 	}
 	
-	
-	
 	private String getPreferredDeviceName() {
 		if(VideoCapturerAndroid.getDeviceCount() == 0) {
 			return null;
