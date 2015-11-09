@@ -11,6 +11,11 @@ public class LocalVideoTrack extends VideoTrackImpl {
 		this.cameraCapturer = cameraCapturer;
 	}
 	
+	/**
+	 * Gets the camera that is being shared.
+	 *
+	 * @return camera
+	 */
 	public CameraCapturer getCameraCapturer() {
 		return cameraCapturer;
 	}

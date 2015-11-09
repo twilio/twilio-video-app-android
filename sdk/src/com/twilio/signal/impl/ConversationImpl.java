@@ -80,7 +80,7 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 	private long nativeHandle;
 	private boolean isDisposed;
 	
-	private ConversationImpl(EndpointImpl endpoint, Set<String> participants, LocalMedia localMediaImpl, ConversationListener conversationListener) {
+	private ConversationImpl(EndpointImpl endpoint, Set<String> participants, LocalMedia localMedia, ConversationListener conversationListener) {
 		String[] participantAddressArray = new String[participants.size()];
 		int i = 0;
 		for(String participant : participants) {
@@ -90,7 +90,7 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 		// TODO: throw an exception if the handler returns null
 		handler = CallbackHandler.create();
 
-		this.localMedia = localMediaImpl;
+		this.localMedia = localMedia;
 		this.conversationListener = conversationListener;
 
 		sessionObserverInternal = new SessionObserverInternal(this, this);
@@ -117,9 +117,9 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 	}
 	
 	public static ConversationImpl createOutgoingConversation(EndpointImpl endpoint, Set<String> participants,
-			   LocalMedia localMediaImpl,
+			   LocalMedia localMedia,
 			   ConversationListener listener) {
-		ConversationImpl conv = new ConversationImpl(endpoint, participants, localMediaImpl, listener);
+		ConversationImpl conv = new ConversationImpl(endpoint, participants, localMedia, listener);
 		if (conv.getNativeHandle() == 0) {
 			return null;
 		}
