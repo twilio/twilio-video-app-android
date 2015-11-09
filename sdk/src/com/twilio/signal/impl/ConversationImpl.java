@@ -9,7 +9,6 @@ import java.util.Set;
 import android.os.Handler;
 import android.util.Log;
 
-import com.twilio.signal.CameraCapturer;
 import com.twilio.signal.Conversation;
 import com.twilio.signal.ConversationException;
 import com.twilio.signal.ConversationListener;
@@ -433,8 +432,8 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 	public void start() {
 		logger.d("starting call");
 		try {
-			CameraCapturer camera =
-					((LocalVideoTrack)localMedia.getVideoTracks().get(0)).getCameraCapturer();
+			LocalVideoTrack localVideoTrack = (LocalVideoTrack)localMedia.getVideoTracks().get(0);
+			CameraCapturerImpl camera = (CameraCapturerImpl)localVideoTrack.getCameraCapturer();
 			setExternalCapturer(nativeHandle, camera.getNativeVideoCapturer());
 		} catch (NullPointerException e) {
 			logger.e("Failed to initialize external capturer");
