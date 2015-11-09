@@ -14,25 +14,20 @@ public class VideoTrackImpl implements VideoTrack {
 	private TrackInfo trackInfo;
 	private List<VideoRenderer> videoRenderers = new ArrayList<VideoRenderer>();
 
-	public VideoTrackImpl(org.webrtc.VideoTrack videoTrack, TrackInfo trackInfo) {
+	VideoTrackImpl(org.webrtc.VideoTrack videoTrack, TrackInfo trackInfo) {
 		this.videoTrack = videoTrack;
 		this.trackInfo = trackInfo;
 	}
 	
 	public VideoTrackImpl() {}
 	
-	public void setWebrtcVideoTrack(org.webrtc.VideoTrack videoTrack) {
+	void setWebrtcVideoTrack(org.webrtc.VideoTrack videoTrack) {
 		this.videoTrack = videoTrack;
 	}
 	
-	public void setTrackInfo(TrackInfo trackInfo) {
+	void setTrackInfo(TrackInfo trackInfo) {
 		this.trackInfo = trackInfo;
 	}
-
-	/*
-	public static VideoTrackImpl create(org.webrtc.VideoTrack videoTrack, TrackInfo trackInfo) {
-		return new VideoTrackImpl(videoTrack, trackInfo);
-	}*/
 
 	public TrackInfo getTrackInfo() {
 		return trackInfo;
