@@ -14,7 +14,6 @@ import com.twilio.signal.ConversationException;
 import com.twilio.signal.ConversationListener;
 import com.twilio.signal.LocalMedia;
 import com.twilio.signal.LocalVideoTrack;
-import com.twilio.signal.Media;
 import com.twilio.signal.Participant;
 import com.twilio.signal.TrackOrigin;
 import com.twilio.signal.VideoTrack;
@@ -154,7 +153,7 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 	}
 
 	@Override
-	public Media getLocalMedia() {
+	public LocalMedia getLocalMedia() {
 		checkDisposed();
 		return localMedia;
 	}
@@ -337,7 +336,7 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 					Log.i(TAG, "Local Adding Renderer");
 					//final VideoTrackImpl videoTrackImpl = VideoTrackImpl.create(webRtcVideoTrack, trackInfo);
 					//localMedia.addVideoTrack(videoTrackImpl);
-					List<VideoTrack> tracksList = localMedia.getVideoTracks();
+					List<LocalVideoTrack> tracksList = localMedia.getLocalVideoTracks();
 					if (tracksList.size() == 0) {
 						// TODO: throw error to the user
 					}
@@ -428,18 +427,32 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 		}
 	}
 	
+	private void setExternalCapturer() {
+		try {
+			LocalVideoTrack localVideoTrack = localMedia.getLocalVideoTracks().get(0);
+			CameraCapturerImpl camera = (CameraCapturerImpl)localVideoTrack.getCameraCapturer();
+			if (camera != null) {
+				setExternalCapturer(nativeHandle, camera.getNativeVideoCapturer());
+			} else {
+				// TODO : throw custom exception
+			}
+			
+		} catch (NullPointerException e) {
+			logger.e("Failed to obtain camera capturer");
+			// TODO : throw custom exception
+		} catch (IndexOutOfBoundsException e) {
+			logger.e("Failed to obtain camera capturer");
+			// TODO : throw custom exception
+		}
+	}
+	
 	@Override
 	public void start() {
 		logger.d("starting call");
-		try {
-			LocalVideoTrack localVideoTrack = (LocalVideoTrack)localMedia.getVideoTracks().get(0);
-			CameraCapturerImpl camera = (CameraCapturerImpl)localVideoTrack.getCameraCapturer();
-			setExternalCapturer(nativeHandle, camera.getNativeVideoCapturer());
-		} catch (NullPointerException e) {
-			logger.e("Failed to initialize external capturer");
-		} catch (IndexOutOfBoundsException e) {
-			logger.e("Failed to initialize external capturer");
-		}
+		
+		// TODO : In case of audio only call,
+		// we shouldn't set external capturer
+		setExternalCapturer();
 		
 		start(getNativeHandle());
 		

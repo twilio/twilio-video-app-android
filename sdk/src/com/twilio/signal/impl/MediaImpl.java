@@ -1,16 +1,15 @@
 package com.twilio.signal.impl;
 
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
 
 import com.twilio.signal.Media;
 import com.twilio.signal.VideoTrack;
-import com.twilio.signal.impl.VideoTrackImpl;
 import com.twilio.signal.impl.core.TrackInfo;
 
 
 public class MediaImpl implements Media {
-	List<VideoTrackImpl> videoTracksImpl = new ArrayList<VideoTrackImpl>();	
+	protected List<VideoTrackImpl> videoTracksImpl = new ArrayList<VideoTrackImpl>();
 
 	@Override
 	public List<VideoTrack> getVideoTracks() {
@@ -34,4 +33,4 @@ public class MediaImpl implements Media {
 		}
 		return null;
 	}
-} 
+}

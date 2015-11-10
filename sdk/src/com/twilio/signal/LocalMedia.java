@@ -1,40 +1,33 @@
 package com.twilio.signal;
 
+import java.util.List;
+
 import android.view.ViewGroup;
 
-import com.twilio.signal.impl.MediaImpl;
+public interface LocalMedia extends Media{
+	
+	public List<LocalVideoTrack> getLocalVideoTracks();
+	
+	public void addLocalVideoTrack(LocalVideoTrack track);
 
-public class LocalMedia extends MediaImpl {
-	
-	private ViewGroup container;
-	private CameraCapturer camera;
-	
-	
 	/** Read-only representation of the local video container. */
-	public ViewGroup getContainerView() {
-		return container;
-	}
+	public abstract ViewGroup getContainerView();
 
 	/** Local video view container */
-	public void attachContainerView(ViewGroup container) {
-		this.container = container;
-	}
+	public abstract void attachContainerView(ViewGroup container);
 
 	/**
 	 * Specifies whether or not your local audio should be muted
 	 *
 	 * @param on <code>true</code> if local audio should be muted, false otherwise
 	 */
-	public void mute(boolean on) {
-		
-	}
+	public abstract void mute(boolean on);
 
 	/**
 	 * Indicates whether your local audio is muted.
 	 *
 	 * @return <code>true</code> if local audio is muted, false otherwise
 	 */
-	public boolean isMuted() {
-		return false;
-	}
+	public abstract boolean isMuted();
+
 }
