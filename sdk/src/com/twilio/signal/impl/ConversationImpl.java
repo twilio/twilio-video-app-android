@@ -98,10 +98,6 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 				sessionObserverInternal.getNativeHandle(),
 				participantAddressArray);
 
-		
-
-		//start();
-
 	}
 	
 	private ConversationImpl(long nativeSession, String[] participantsAddr) {

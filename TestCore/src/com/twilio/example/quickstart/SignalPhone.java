@@ -27,6 +27,8 @@ import android.view.ViewGroup;
 
 import com.twilio.signal.CameraCapturer;
 import com.twilio.signal.CameraCapturerFactory;
+import com.twilio.signal.CameraErrorListener;
+import com.twilio.signal.CameraException;
 import com.twilio.signal.Conversation;
 import com.twilio.signal.ConversationException;
 import com.twilio.signal.ConversationListener;
@@ -35,9 +37,9 @@ import com.twilio.signal.EndpointListener;
 import com.twilio.signal.Invite;
 import com.twilio.signal.LocalMedia;
 import com.twilio.signal.LocalVideoTrack;
+import com.twilio.signal.LocalVideoTrackFactory;
 import com.twilio.signal.MediaFactory;
 import com.twilio.signal.TwilioRTC;
-import com.twilio.signal.VideoTrackFactory;
 import com.twilio.signal.impl.TwilioConstants;
 
 
@@ -182,17 +184,23 @@ public class SignalPhone implements EndpointListener
     		return null;
     	}
     	LocalMedia localMedia = MediaFactory.createLocalMedia();
-    	CameraCapturer camera = CameraCapturerFactory.createCameraCapturer(
-                CameraCapturer.CameraSource.CAMERA_SOURCE_FRONT_CAMERA, localContainer);
-    	LocalVideoTrack videoTrack = VideoTrackFactory.createLocalVideoTrack(camera);
-    	localMedia.attachContainerView(localContainer);
-    	localMedia.addLocalVideoTrack(videoTrack);
-    	Set<String> participants = new HashSet<String>();
-    	participants.add(participant);
-    	Conversation conv = SignalPhone.this.alice.createConversation(
-    			participants, localMedia, conversationListener);
-    	if (conv != null) {
-    		conversations.put(conv.getConversationSid(), conv);
+    	Conversation conv = null;
+    	try {
+	    	CameraCapturer camera = CameraCapturerFactory.createCameraCapturer(
+	                CameraCapturer.CameraSource.CAMERA_SOURCE_FRONT_CAMERA,
+	                localContainer, cameraErrorListener());
+	    	LocalVideoTrack videoTrack = LocalVideoTrackFactory.createLocalVideoTrack(camera);
+	    	localMedia.attachContainerView(localContainer);
+	    	localMedia.addLocalVideoTrack(videoTrack);
+	    	Set<String> participants = new HashSet<String>();
+	    	participants.add(participant);
+	    	conv = SignalPhone.this.alice.createConversation(
+	    			participants, localMedia, conversationListener);
+	    	if (conv != null) {
+	    		conversations.put(conv.getConversationSid(), conv);
+	    	}
+    	} catch (CameraException e) {
+    		
     	}
     	return conv;
     }
@@ -201,6 +209,17 @@ public class SignalPhone implements EndpointListener
     {
 
     }
+    
+    private CameraErrorListener cameraErrorListener () {
+    	return new CameraErrorListener() {
+			
+			@Override
+			public void onError(CameraException e) {
+				// TODO Auto-generated method stub
+				
+			}
+		};
+    }
 
     public Conversation accept(String from, ViewGroup localContainer, ConversationListener listener) {
        Invite invite = invites.remove(from);
@@ -208,13 +227,19 @@ public class SignalPhone implements EndpointListener
     	   return null;
        }
        LocalMedia localMedia = MediaFactory.createLocalMedia();
-       CameraCapturer camera = CameraCapturerFactory.createCameraCapturer(
-               CameraCapturer.CameraSource.CAMERA_SOURCE_FRONT_CAMERA, localContainer);
-       LocalVideoTrack videoTrack = VideoTrackFactory.createLocalVideoTrack(camera);
-       localMedia.attachContainerView(localContainer);
-       localMedia.addLocalVideoTrack(videoTrack);
-       localMedia.attachContainerView(localContainer);
-       return invite.acceptWithLocalMedia(localMedia, listener);
+       Conversation conv = null;
+       try {
+	       CameraCapturer camera = CameraCapturerFactory.createCameraCapturer(
+	               CameraCapturer.CameraSource.CAMERA_SOURCE_FRONT_CAMERA,
+	               localContainer, cameraErrorListener());
+	       LocalVideoTrack videoTrack = LocalVideoTrackFactory.createLocalVideoTrack(camera);
+	       localMedia.addLocalVideoTrack(videoTrack);
+	       localMedia.attachContainerView(localContainer);
+	       conv = invite.accept(localMedia, listener);
+       } catch (CameraException e) {
+    	   
+       }
+       return conv;
     }
     
     public void reject(String from) {
