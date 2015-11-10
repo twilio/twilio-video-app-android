@@ -7,10 +7,14 @@ import android.view.ViewGroup;
 
 import com.twilio.signal.LocalMedia;
 import com.twilio.signal.LocalVideoTrack;
+import com.twilio.signal.VideoTrack;
 
-public class LocalMediaImpl extends MediaImpl implements LocalMedia {
+public class LocalMediaImpl implements LocalMedia {
 	
 	private ViewGroup container;
+	private List<LocalVideoTrackImpl> videoTracksImpl = new ArrayList<LocalVideoTrackImpl>();
+	
+	private static int MAX_LOCAL_VIDEO_TRACKS = 1;
 	
 	
 	/* (non-Javadoc)
@@ -51,14 +55,30 @@ public class LocalMediaImpl extends MediaImpl implements LocalMedia {
 	}
 
 	@Override
-	public void addLocalVideoTrack(LocalVideoTrack track) {
-		if (track instanceof VideoTrackImpl) {
-			addVideoTrack((VideoTrackImpl)track);
+	public void addLocalVideoTrack(LocalVideoTrack track)
+			throws IllegalArgumentException, UnsupportedOperationException {
+		if (track instanceof LocalVideoTrackImpl) {
+			if (videoTracksImpl.size() < MAX_LOCAL_VIDEO_TRACKS) {
+				videoTracksImpl.add((LocalVideoTrackImpl)track);
+			} else {
+				throw new UnsupportedOperationException("Maximum size " + MAX_LOCAL_VIDEO_TRACKS + " of LocalVideoTracks reached.");
+			}
 		} else {
-			// TODO : probably throw exception,
-			// we don't support custom video tracks for now
+			throw new IllegalArgumentException("Only TwilioSDK LocalVideoTrack implementation is supported");
 		}
 		
+	}
+	
+	public void removeVideoTrack(LocalVideoTrackImpl videoTrackImpl) {
+		videoTracksImpl.remove(videoTrackImpl);
+	}
+
+	/*
+	 * Media interface
+	 */
+	@Override
+	public List<VideoTrack> getVideoTracks() {
+		return new ArrayList<VideoTrack>(videoTracksImpl);
 	}
 	
 	

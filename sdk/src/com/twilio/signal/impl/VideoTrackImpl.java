@@ -3,27 +3,22 @@ package com.twilio.signal.impl;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.twilio.signal.CameraCapturer;
 import com.twilio.signal.I420Frame;
-import com.twilio.signal.LocalVideoTrack;
 import com.twilio.signal.VideoRenderer;
 import com.twilio.signal.VideoTrack;
 import com.twilio.signal.impl.core.TrackInfo;
 
-public class VideoTrackImpl implements VideoTrack, LocalVideoTrack {
+public class VideoTrackImpl implements VideoTrack {
 
 	private org.webrtc.VideoTrack videoTrack;
 	private TrackInfo trackInfo;
 	private List<VideoRenderer> videoRenderers = new ArrayList<VideoRenderer>();
-	private CameraCapturer cameraCapturer;
 
+	VideoTrackImpl() {}
+	
 	VideoTrackImpl(org.webrtc.VideoTrack videoTrack, TrackInfo trackInfo) {
 		this.videoTrack = videoTrack;
 		this.trackInfo = trackInfo;
-	}
-	
-	public VideoTrackImpl(CameraCapturer cameraCapturer) {
-		this.cameraCapturer = cameraCapturer;
 	}
 	
 	void setWebrtcVideoTrack(org.webrtc.VideoTrack videoTrack) {
@@ -55,13 +50,7 @@ public class VideoTrackImpl implements VideoTrack, LocalVideoTrack {
 		return videoRenderers;
 	}
 	
-	/* (non-Javadoc)
-	 * @see com.twilio.signal.LocalVideoTrack#getCameraCapturer()
-	 */
-	@Override
-	public CameraCapturer getCameraCapturer() {
-		return cameraCapturer;
-	}
+	
 
 	private org.webrtc.VideoRenderer createWebRtcVideoRenderer(VideoRenderer videoRenderer) {
 		return new org.webrtc.VideoRenderer(new VideoRendererCallbackAdapter(videoRenderer));

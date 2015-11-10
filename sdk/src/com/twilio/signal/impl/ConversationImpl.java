@@ -9,6 +9,7 @@ import java.util.Set;
 import android.os.Handler;
 import android.util.Log;
 
+import com.twilio.signal.CameraException;
 import com.twilio.signal.Conversation;
 import com.twilio.signal.ConversationException;
 import com.twilio.signal.ConversationListener;
@@ -99,7 +100,7 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 
 		
 
-		start();
+		//start();
 
 	}
 	
@@ -116,11 +117,12 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 	
 	public static ConversationImpl createOutgoingConversation(EndpointImpl endpoint, Set<String> participants,
 			   LocalMedia localMedia,
-			   ConversationListener listener) {
+			   ConversationListener listener) throws CameraException {
 		ConversationImpl conv = new ConversationImpl(endpoint, participants, localMedia, listener);
 		if (conv.getNativeHandle() == 0) {
 			return null;
 		}
+		conv.start();
 		return conv;
 	}
 	
@@ -334,8 +336,6 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 
 					}
 					Log.i(TAG, "Local Adding Renderer");
-					//final VideoTrackImpl videoTrackImpl = VideoTrackImpl.create(webRtcVideoTrack, trackInfo);
-					//localMedia.addVideoTrack(videoTrackImpl);
 					List<LocalVideoTrack> tracksList = localMedia.getLocalVideoTracks();
 					if (tracksList.size() == 0) {
 						// TODO: throw error to the user
@@ -427,7 +427,7 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 		}
 	}
 	
-	private void setExternalCapturer() {
+	private void setExternalCapturer() throws CameraException {
 		try {
 			LocalVideoTrack localVideoTrack = localMedia.getLocalVideoTracks().get(0);
 			CameraCapturerImpl camera = (CameraCapturerImpl)localVideoTrack.getCameraCapturer();
@@ -447,7 +447,7 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 	}
 	
 	@Override
-	public void start() {
+	public void start() throws CameraException {
 		logger.d("starting call");
 		
 		// TODO : In case of audio only call,

@@ -9,7 +9,7 @@ import com.twilio.signal.impl.core.TrackInfo;
 
 
 public class MediaImpl implements Media {
-	protected List<VideoTrackImpl> videoTracksImpl = new ArrayList<VideoTrackImpl>();
+	private List<VideoTrackImpl> videoTracksImpl = new ArrayList<VideoTrackImpl>();
 
 	@Override
 	public List<VideoTrack> getVideoTracks() {

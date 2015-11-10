@@ -8,6 +8,8 @@ import org.webrtc.VideoCapturerAndroid.CameraErrorHandler;
 import android.view.ViewGroup;
 
 import com.twilio.signal.CameraCapturer;
+import com.twilio.signal.CameraErrorListener;
+import com.twilio.signal.CameraException;
 import com.twilio.signal.impl.logging.Logger;
 
 public class CameraCapturerImpl implements CameraCapturer {
@@ -20,11 +22,24 @@ public class CameraCapturerImpl implements CameraCapturer {
 	private CameraSource source;
 	private ViewGroup captureView;
 	private VideoCapturerAndroid webrtcCapturer;
+	private CameraErrorListener listener;
 	
-	public CameraCapturerImpl(CameraSource source, ViewGroup previewContainerView) {
+	private CameraCapturerImpl(CameraSource source,
+			ViewGroup previewContainerView, CameraErrorListener listener) {
 		this.source = source;
 		this.captureView = previewContainerView;
-		createWebrtcVideoCapturer();
+		this.listener = listener;
+		
+	}
+	
+	public static CameraCapturerImpl create(
+			CameraSource source,
+			ViewGroup previewContainerView,
+			CameraErrorListener listener) throws CameraException {
+		CameraCapturerImpl camera =
+				new CameraCapturerImpl(source, previewContainerView, listener);
+		camera.createWebrtcVideoCapturer();
+		return camera;
 	}
 	
 	/* (non-Javadoc)
@@ -40,38 +55,6 @@ public class CameraCapturerImpl implements CameraCapturer {
 	 */
 	@Override
 	public boolean stopPreview() {
-		return false;
-	}
-	
-	/* (non-Javadoc)
-	 * @see com.twilio.signal.CameraCapturer#enableCamera(boolean)
-	 */
-	@Override
-	public void enableCamera(boolean enabled) {
-		
-	}
-
-	/* (non-Javadoc)
-	 * @see com.twilio.signal.CameraCapturer#isCameraEnabled()
-	 */
-	@Override
-	public boolean isCameraEnabled() {
-		return false;
-	}
-	
-	/* (non-Javadoc)
-	 * @see com.twilio.signal.CameraCapturer#pauseVideo(boolean)
-	 */
-	@Override
-	public void pauseVideo(boolean paused) {
-		
-	}
-
-	/* (non-Javadoc)
-	 * @see com.twilio.signal.CameraCapturer#isPaused()
-	 */
-	@Override
-	public boolean isPaused() {
 		return false;
 	}
 	
@@ -93,20 +76,21 @@ public class CameraCapturerImpl implements CameraCapturer {
 	 * @see com.twilio.signal.CameraCapturer#getCapturerView()
 	 */
 	@Override
-	public ViewGroup getCapturerView() {
+	public ViewGroup getPreviewContainerView() {
 		return captureView;
 	}
 	
-	long getNativeVideoCapturer() {
-		// TODO: throw exceptions to callee
+	long getNativeVideoCapturer() throws CameraException {
 		// Use reflection to obtain the native video capturer handle
 		long nativeVideoCapturer = 0;
 		try {
 			Field field = webrtcCapturer.getClass().getSuperclass().getDeclaredField("nativeVideoCapturer");
 			field.setAccessible(true);
 			nativeVideoCapturer = field.getLong(webrtcCapturer);
-		} catch (Exception e) {
-			logger.e(e.toString());
+		} catch (NoSuchFieldException e) {
+			throw new CameraException("Unable to find webrtc video capturer");
+		} catch (IllegalAccessException e) {
+			throw new CameraException("Unable to access webrtc video capturer");
 		}
 		return nativeVideoCapturer;
 	}
@@ -126,20 +110,20 @@ public class CameraCapturerImpl implements CameraCapturer {
 		return deviceName;
 	}
 	
-	private void createWebrtcVideoCapturer() {
+	private void createWebrtcVideoCapturer() throws CameraException {
 		String deviceName = getPreferredDeviceName();
 		if(deviceName != null) {
 			webrtcCapturer = VideoCapturerAndroid.create(deviceName, cameraErrorHandler);
+		} else {
+			throw new CameraException("Camera device not found");
 		}
-		
 	}
 	
 	private CameraErrorHandler cameraErrorHandler = new CameraErrorHandler() {
 		
 		@Override
-		public void onCameraError(String arg0) {
-			// TODO notify user about camera error, but how? which listener?
-			
+		public void onCameraError(String errorMsg) {
+			CameraCapturerImpl.this.listener.onError(new CameraException(errorMsg));
 		}
 	};
 

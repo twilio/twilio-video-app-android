@@ -67,7 +67,7 @@ public interface Endpoint {
 	 * @param listener for Conversation events
 	 */
 	
-	public Conversation createConversation(Set<String> participants, LocalMedia localMedia, ConversationListener listener);
+	public Conversation createConversation(Set<String> participants, LocalMedia localMedia, ConversationListener listener) throws CameraException;
 	
 	/**
 	 * Releases resources associated with this Endpoint object.

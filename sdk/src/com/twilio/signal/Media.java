@@ -5,7 +5,7 @@ import java.util.List;
 public interface Media {
 
 	/**
-	 * Retrieves video tracks
+	 * Retrieves list of video tracks
 	 * 
 	 * @return
 	 */

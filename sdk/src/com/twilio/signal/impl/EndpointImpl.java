@@ -11,6 +11,7 @@ import android.os.Handler;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.twilio.signal.CameraException;
 import com.twilio.signal.Conversation;
 import com.twilio.signal.ConversationException;
 import com.twilio.signal.ConversationListener;
@@ -156,7 +157,7 @@ public class EndpointImpl implements
 
 	@Override
 	public Conversation createConversation(Set<String> participants,
-			LocalMedia localMedia, ConversationListener listener) {
+			LocalMedia localMedia, ConversationListener listener) throws CameraException  {
 		checkDisposed();
 		Conversation conv = ConversationImpl.createOutgoingConversation(
 				this, participants, localMedia, listener);

@@ -1,5 +1,6 @@
 package com.twilio.signal.impl;
 
+import com.twilio.signal.CameraException;
 import com.twilio.signal.Conversation;
 import com.twilio.signal.ConversationListener;
 import com.twilio.signal.Endpoint;
@@ -56,10 +57,8 @@ public class InviteImpl implements Invite {
 	}
 
 	@Override
-	public Conversation acceptWithLocalMedia(LocalMedia localMedia,
-			ConversationListener listener) {
-		
-		//TODO - danger, danger - we should change type to local media instead of media
+	public Conversation accept(LocalMedia localMedia,
+			ConversationListener listener) throws CameraException {
 		conversation.setLocalMedia(localMedia);
 		conversation.setConversationListener(listener);
 		conversation.start();
