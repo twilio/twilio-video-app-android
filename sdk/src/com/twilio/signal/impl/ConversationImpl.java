@@ -430,14 +430,15 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 			if (camera != null) {
 				setExternalCapturer(nativeHandle, camera.getNativeVideoCapturer());
 			} else {
-				// TODO : throw custom exception
+				//TODO : we should throw exception only in case when local video is selected and
+				// camera is not present GSDK-272
 			}
 			
 		} catch (NullPointerException e) {
-			logger.e("Failed to obtain camera capturer");
+			logger.e("Failed to obtain local video track");
 			// TODO : throw custom exception
 		} catch (IndexOutOfBoundsException e) {
-			logger.e("Failed to obtain camera capturer");
+			logger.e("Failed to obtain local video track");
 			// TODO : throw custom exception
 		}
 	}
@@ -447,7 +448,7 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 		logger.d("starting call");
 		
 		// TODO : In case of audio only call,
-		// we shouldn't set external capturer
+		// we shouldn't set external capturer GSDK-272
 		setExternalCapturer();
 		
 		start(getNativeHandle());
