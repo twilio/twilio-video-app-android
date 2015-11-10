@@ -6,8 +6,18 @@ import android.view.ViewGroup;
 
 public interface LocalMedia extends Media{
 	
+	/**
+	 * Retrieves local video tracks
+	 * 
+	 * @return list of local video tracks
+	 */
 	public List<LocalVideoTrack> getLocalVideoTracks();
 	
+	/**
+	 * Add local video track to list of tracks.
+	 * 
+	 * @param track
+	 */
 	public void addLocalVideoTrack(LocalVideoTrack track);
 
 	/** Read-only representation of the local video container. */
