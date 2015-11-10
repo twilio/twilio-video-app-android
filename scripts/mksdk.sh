@@ -174,7 +174,6 @@ function copy_javadocs {
     -charset UTF-8 \
     -docencoding UTF-8 \
     -linkoffline http://developer.android.com/reference/  "$mydir" \
-    -stylesheetfile "${twsdkroot}/scripts/javadoc-style.css" \
     ${DOCLINT_DISABLE} ${jd_source_paths}
 }
 
