@@ -84,7 +84,7 @@ private:
     }
 
     jstring stringToJString(JNIEnv * env, const std::string & nativeString) {
-        return env->NewStringUTF(nativeString.c_str());
+        return JavaStringFromStdString(env, nativeString);
     }
 
     // Return a ErrorImpl
@@ -109,7 +109,7 @@ private:
         jobjectArray j_participants = (jobjectArray)env->NewObjectArray(
                             size,
                             env->FindClass("java/lang/String"),
-                            env->NewStringUTF(""));
+                            stringToJString(jni(), ""));
         for (int i=0; i<size; i++) {
             env->SetObjectArrayElement(
                             j_participants, i, stringToJString(env, participants[i].getAddress()));
