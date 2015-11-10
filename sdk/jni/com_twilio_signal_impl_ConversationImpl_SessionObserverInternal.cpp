@@ -203,7 +203,7 @@ private:
 	}
 
 	jstring stringToJString(JNIEnv* env, const std::string& nativeString) {
-		return env->NewStringUTF(nativeString.c_str());
+		return JavaStringFromStdString(env, nativeString);
 	}
 
 	const ScopedGlobalRef<jobject> j_observer_global_;
