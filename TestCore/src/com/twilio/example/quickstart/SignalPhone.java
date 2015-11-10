@@ -25,6 +25,8 @@ import android.os.AsyncTask;
 import android.util.Log;
 import android.view.ViewGroup;
 
+import com.twilio.signal.CameraCapturer;
+import com.twilio.signal.CameraCapturerFactory;
 import com.twilio.signal.Conversation;
 import com.twilio.signal.ConversationException;
 import com.twilio.signal.ConversationListener;
@@ -32,7 +34,10 @@ import com.twilio.signal.Endpoint;
 import com.twilio.signal.EndpointListener;
 import com.twilio.signal.Invite;
 import com.twilio.signal.LocalMedia;
+import com.twilio.signal.LocalVideoTrack;
+import com.twilio.signal.MediaFactory;
 import com.twilio.signal.TwilioRTC;
+import com.twilio.signal.VideoTrackFactory;
 import com.twilio.signal.impl.TwilioConstants;
 
 
@@ -176,8 +181,12 @@ public class SignalPhone implements EndpointListener
     	if (!twilioSdkInited || (SignalPhone.this.alice == null)) {
     		return null;
     	}
-    	LocalMedia localMedia = new LocalMedia();
+    	LocalMedia localMedia = MediaFactory.createLocalMedia();
+    	CameraCapturer camera = CameraCapturerFactory.createCameraCapturer(
+                CameraCapturer.CameraSource.CAMERA_SOURCE_FRONT_CAMERA, localContainer);
+    	LocalVideoTrack videoTrack = VideoTrackFactory.createLocalVideoTrack(camera);
     	localMedia.attachContainerView(localContainer);
+    	localMedia.addLocalVideoTrack(videoTrack);
     	Set<String> participants = new HashSet<String>();
     	participants.add(participant);
     	Conversation conv = SignalPhone.this.alice.createConversation(
@@ -198,7 +207,12 @@ public class SignalPhone implements EndpointListener
        if (!twilioSdkInited || invite == null || invite.to() == null) {
     	   return null;
        }
-       LocalMedia localMedia = new LocalMedia();
+       LocalMedia localMedia = MediaFactory.createLocalMedia();
+       CameraCapturer camera = CameraCapturerFactory.createCameraCapturer(
+               CameraCapturer.CameraSource.CAMERA_SOURCE_FRONT_CAMERA, localContainer);
+       LocalVideoTrack videoTrack = VideoTrackFactory.createLocalVideoTrack(camera);
+       localMedia.attachContainerView(localContainer);
+       localMedia.addLocalVideoTrack(videoTrack);
        localMedia.attachContainerView(localContainer);
        return invite.acceptWithLocalMedia(localMedia, listener);
     }
