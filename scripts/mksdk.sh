@@ -8,6 +8,8 @@ ANDROID_API=19
 JAVADOC_SOURCE_FILES="
 	CameraCapturer.java
     CameraCapturerFactory.java
+    CameraErrorListener.java
+    CapturerException.java
     Conversation.java
     ConversationException.java
     ConversationListener.java
@@ -17,17 +19,16 @@ JAVADOC_SOURCE_FILES="
     Invite.java
     LocalMedia.java
     LocalVideoTrack.java
+    LocalVideoTrackFactory.java
     Media.java
     MediaFactory.java
     Participant.java
     TrackOrigin.java
     TwilioRTC.java
     TwilioRTCService.java
-    VideoCapturer.java
     VideoRenderer.java
     VideoRendererObserver.java
     VideoTrack.java
-    VideoTrackFactory.java
     VideoViewRenderer.java"
 TWILIO_HOWTOS="
     QuickStart"
