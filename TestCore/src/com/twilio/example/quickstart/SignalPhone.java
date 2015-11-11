@@ -25,13 +25,20 @@ import android.os.AsyncTask;
 import android.util.Log;
 import android.view.ViewGroup;
 
+import com.twilio.signal.CameraCapturer;
+import com.twilio.signal.CameraCapturerFactory;
+import com.twilio.signal.CameraErrorListener;
+import com.twilio.signal.CapturerException;
 import com.twilio.signal.Conversation;
 import com.twilio.signal.ConversationException;
 import com.twilio.signal.ConversationListener;
 import com.twilio.signal.Endpoint;
 import com.twilio.signal.EndpointListener;
 import com.twilio.signal.Invite;
-import com.twilio.signal.LocalMediaImpl;
+import com.twilio.signal.LocalMedia;
+import com.twilio.signal.LocalVideoTrack;
+import com.twilio.signal.LocalVideoTrackFactory;
+import com.twilio.signal.MediaFactory;
 import com.twilio.signal.TwilioRTC;
 import com.twilio.signal.impl.TwilioConstants;
 
@@ -176,15 +183,24 @@ public class SignalPhone implements EndpointListener
     	if (!twilioSdkInited || (SignalPhone.this.alice == null)) {
     		return null;
     	}
-    	LocalMediaImpl localMediaImpl = new LocalMediaImpl();
-	localMediaImpl.attachContainerView(localContainer);
-    	Set<String> participants = new HashSet<String>();
-    	participants.add(participant);
-    	Conversation conv = SignalPhone.this.alice.createConversation(
-    			participants, localMediaImpl, conversationListener);
-    	if (conv != null) {
-    		conversations.put(conv.getConversationSid(), conv);
+    	LocalMedia localMedia = MediaFactory.createLocalMedia();
+    	Conversation conv = null;
+    	CameraCapturer camera = CameraCapturerFactory.createCameraCapturer(
+                CameraCapturer.CameraSource.CAMERA_SOURCE_FRONT_CAMERA,
+                localContainer, cameraErrorListener());
+    	if (camera != null) {
+	    	LocalVideoTrack videoTrack = LocalVideoTrackFactory.createLocalVideoTrack(camera);
+	    	localMedia.attachContainerView(localContainer);
+	    	localMedia.addLocalVideoTrack(videoTrack);
+	    	Set<String> participants = new HashSet<String>();
+	    	participants.add(participant);
+	    	conv = SignalPhone.this.alice.createConversation(
+	    			participants, localMedia, conversationListener);
+	    	if (conv != null) {
+	    		conversations.put(conv.getConversationSid(), conv);
+	    	}
     	}
+    	
     	return conv;
     }
 
@@ -192,15 +208,36 @@ public class SignalPhone implements EndpointListener
     {
 
     }
+    
+    private CameraErrorListener cameraErrorListener () {
+    	return new CameraErrorListener() {
+			
+			@Override
+			public void onError(CapturerException e) {
+				Log.e(TAG, e.getMessage());
+				
+			}
+		};
+    }
 
     public Conversation accept(String from, ViewGroup localContainer, ConversationListener listener) {
        Invite invite = invites.remove(from);
        if (!twilioSdkInited || invite == null || invite.to() == null) {
     	   return null;
        }
-       LocalMediaImpl localMediaImpl = new LocalMediaImpl();
-       localMediaImpl.attachContainerView(localContainer);
-       return invite.acceptWithLocalMedia(localMediaImpl, listener);
+       LocalMedia localMedia = MediaFactory.createLocalMedia();
+       Conversation conv = null;
+       CameraCapturer camera = CameraCapturerFactory.createCameraCapturer(
+               CameraCapturer.CameraSource.CAMERA_SOURCE_FRONT_CAMERA,
+               localContainer, cameraErrorListener());
+       if (camera != null) {
+	       LocalVideoTrack videoTrack = LocalVideoTrackFactory.createLocalVideoTrack(camera);
+	       localMedia.addLocalVideoTrack(videoTrack);
+	       localMedia.attachContainerView(localContainer);
+	       conv = invite.accept(localMedia, listener);
+	       return conv;
+       }
+       return null;
     }
     
     public void reject(String from) {

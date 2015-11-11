@@ -1,26 +1,32 @@
 package com.twilio.signal.impl;
 
-import com.twilio.signal.VideoTrack;
-import com.twilio.signal.VideoRenderer;
-import com.twilio.signal.I420Frame;
-import com.twilio.signal.impl.core.TrackInfo;
-
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
+
+import com.twilio.signal.I420Frame;
+import com.twilio.signal.VideoRenderer;
+import com.twilio.signal.VideoTrack;
+import com.twilio.signal.impl.core.TrackInfo;
 
 public class VideoTrackImpl implements VideoTrack {
 
 	private org.webrtc.VideoTrack videoTrack;
-	private TrackInfo trackInfo; 
+	private TrackInfo trackInfo;
 	private List<VideoRenderer> videoRenderers = new ArrayList<VideoRenderer>();
 
-	private VideoTrackImpl(org.webrtc.VideoTrack videoTrack, TrackInfo trackInfo) {
+	VideoTrackImpl() {}
+	
+	VideoTrackImpl(org.webrtc.VideoTrack videoTrack, TrackInfo trackInfo) {
 		this.videoTrack = videoTrack;
 		this.trackInfo = trackInfo;
 	}
-
-	public static VideoTrackImpl create(org.webrtc.VideoTrack videoTrack, TrackInfo trackInfo) {
-		return new VideoTrackImpl(videoTrack, trackInfo);
+	
+	void setWebrtcVideoTrack(org.webrtc.VideoTrack videoTrack) {
+		this.videoTrack = videoTrack;
+	}
+	
+	void setTrackInfo(TrackInfo trackInfo) {
+		this.trackInfo = trackInfo;
 	}
 
 	public TrackInfo getTrackInfo() {
@@ -43,6 +49,8 @@ public class VideoTrackImpl implements VideoTrack {
 	public List<VideoRenderer> getRenderers() {
 		return videoRenderers;
 	}
+	
+	
 
 	private org.webrtc.VideoRenderer createWebRtcVideoRenderer(VideoRenderer videoRenderer) {
 		return new org.webrtc.VideoRenderer(new VideoRendererCallbackAdapter(videoRenderer));

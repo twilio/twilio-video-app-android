@@ -6,7 +6,11 @@ ANDROID_API=19
 
 # need to specify source files manually to avoid having TwilioClientService in there
 JAVADOC_SOURCE_FILES="
-	Conversation.java
+	CameraCapturer.java
+    CameraCapturerFactory.java
+    CameraErrorListener.java
+    CapturerException.java
+    Conversation.java
     ConversationException.java
     ConversationListener.java
     Endpoint.java
@@ -14,11 +18,14 @@ JAVADOC_SOURCE_FILES="
     I420Frame.java
     Invite.java
     LocalMedia.java
-    LocalMediaImpl.java
+    LocalVideoTrack.java
+    LocalVideoTrackFactory.java
     Media.java
+    MediaFactory.java
     Participant.java
     TrackOrigin.java
     TwilioRTC.java
+    TwilioRTCService.java
     VideoRenderer.java
     VideoRendererObserver.java
     VideoTrack.java
