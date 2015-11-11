@@ -1,11 +1,11 @@
 package com.twilio.signal.impl.core;
 
-import com.twilio.signal.CameraException;
+import com.twilio.signal.CapturerException;
 
 
 public interface CoreSession {
 	
-	public void start() throws CameraException;
+	public void start() throws CapturerException;
 	
 	public void stop();
 

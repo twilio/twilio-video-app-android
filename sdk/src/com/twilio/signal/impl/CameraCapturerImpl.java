@@ -9,7 +9,8 @@ import android.view.ViewGroup;
 
 import com.twilio.signal.CameraCapturer;
 import com.twilio.signal.CameraErrorListener;
-import com.twilio.signal.CameraException;
+import com.twilio.signal.CapturerException;
+import com.twilio.signal.CapturerException.ExceptionDomain;
 import com.twilio.signal.impl.logging.Logger;
 
 public class CameraCapturerImpl implements CameraCapturer {
@@ -91,18 +92,18 @@ public class CameraCapturerImpl implements CameraCapturer {
 	private boolean obtainNativeVideoCapturer() {
 		// Use reflection to obtain the native video capturer handle
 		nativeWebrtcVideoCapturer = 0;
-		CameraException exception = null;
+		CapturerException exception = null;
 		try {
 			Field field = webrtcCapturer.getClass().getSuperclass().getDeclaredField("nativeVideoCapturer");
 			field.setAccessible(true);
 			nativeWebrtcVideoCapturer = field.getLong(webrtcCapturer);
 		} catch (NoSuchFieldException e) {
 			logger.d("Unable to find webrtc video capturer");
-			exception = new CameraException("Unable to find webrtc video capturer: "+e.getMessage());
+			exception = new CapturerException(ExceptionDomain.WEBRTC, "Unable to find webrtc video capturer: "+e.getMessage());
 			
 		} catch (IllegalAccessException e) {
 			logger.e("Unable to access webrtc video capturer");
-			exception = new CameraException("Unable to access webrtc video capturer");
+			exception = new CapturerException(ExceptionDomain.WEBRTC, "Unable to access webrtc video capturer");
 		}
 		if ((exception != null) && (listener != null)) {
 			listener.onError(exception);
@@ -136,7 +137,7 @@ public class CameraCapturerImpl implements CameraCapturer {
 			}
 		} else {
 			if (listener != null) {
-				CameraException exception = new CameraException("Camera device not found");
+				CapturerException exception = new CapturerException(ExceptionDomain.CAMERA, "Camera device not found");
 				listener.onError(exception);
 				return false;
 			}
@@ -148,7 +149,7 @@ public class CameraCapturerImpl implements CameraCapturer {
 		
 		@Override
 		public void onCameraError(String errorMsg) {
-			CameraCapturerImpl.this.listener.onError(new CameraException(errorMsg));
+			CameraCapturerImpl.this.listener.onError(new CapturerException(ExceptionDomain.CAMERA, errorMsg));
 		}
 	};
 
