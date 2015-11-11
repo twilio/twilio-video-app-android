@@ -28,7 +28,7 @@ import android.view.ViewGroup;
 import com.twilio.signal.CameraCapturer;
 import com.twilio.signal.CameraCapturerFactory;
 import com.twilio.signal.CameraErrorListener;
-import com.twilio.signal.CameraException;
+import com.twilio.signal.CapturerException;
 import com.twilio.signal.Conversation;
 import com.twilio.signal.ConversationException;
 import com.twilio.signal.ConversationListener;
@@ -185,10 +185,10 @@ public class SignalPhone implements EndpointListener
     	}
     	LocalMedia localMedia = MediaFactory.createLocalMedia();
     	Conversation conv = null;
-    	try {
-	    	CameraCapturer camera = CameraCapturerFactory.createCameraCapturer(
-	                CameraCapturer.CameraSource.CAMERA_SOURCE_FRONT_CAMERA,
-	                localContainer, cameraErrorListener());
+    	CameraCapturer camera = CameraCapturerFactory.createCameraCapturer(
+                CameraCapturer.CameraSource.CAMERA_SOURCE_FRONT_CAMERA,
+                localContainer, cameraErrorListener());
+    	if (camera != null) {
 	    	LocalVideoTrack videoTrack = LocalVideoTrackFactory.createLocalVideoTrack(camera);
 	    	localMedia.attachContainerView(localContainer);
 	    	localMedia.addLocalVideoTrack(videoTrack);
@@ -199,9 +199,8 @@ public class SignalPhone implements EndpointListener
 	    	if (conv != null) {
 	    		conversations.put(conv.getConversationSid(), conv);
 	    	}
-    	} catch (CameraException e) {
-    		
     	}
+    	
     	return conv;
     }
 
@@ -214,8 +213,8 @@ public class SignalPhone implements EndpointListener
     	return new CameraErrorListener() {
 			
 			@Override
-			public void onError(CameraException e) {
-				// TODO Auto-generated method stub
+			public void onError(CapturerException e) {
+				Log.e(TAG, e.getMessage());
 				
 			}
 		};
@@ -228,18 +227,17 @@ public class SignalPhone implements EndpointListener
        }
        LocalMedia localMedia = MediaFactory.createLocalMedia();
        Conversation conv = null;
-       try {
-	       CameraCapturer camera = CameraCapturerFactory.createCameraCapturer(
-	               CameraCapturer.CameraSource.CAMERA_SOURCE_FRONT_CAMERA,
-	               localContainer, cameraErrorListener());
+       CameraCapturer camera = CameraCapturerFactory.createCameraCapturer(
+               CameraCapturer.CameraSource.CAMERA_SOURCE_FRONT_CAMERA,
+               localContainer, cameraErrorListener());
+       if (camera != null) {
 	       LocalVideoTrack videoTrack = LocalVideoTrackFactory.createLocalVideoTrack(camera);
 	       localMedia.addLocalVideoTrack(videoTrack);
 	       localMedia.attachContainerView(localContainer);
 	       conv = invite.accept(localMedia, listener);
-       } catch (CameraException e) {
-    	   
+	       return conv;
        }
-       return conv;
+       return null;
     }
     
     public void reject(String from) {
