@@ -9,7 +9,8 @@ import com.twilio.signal.ConversationListener;
 import com.twilio.signal.Endpoint;
 import com.twilio.signal.EndpointListener;
 import com.twilio.signal.Invite;
-import com.twilio.signal.LocalMediaImpl;
+import com.twilio.signal.LocalMedia;
+import com.twilio.signal.MediaFactory;
 import com.twilio.signal.Participant;
 import com.twilio.signal.TwilioRTC;
 import com.twilio.signal.VideoTrack;
@@ -64,7 +65,7 @@ public class EndpointLifecycleTests {
         endpoint.dispose();
         Set<String> participants = new HashSet<>();
         participants.add(CLIENT);
-        LocalMediaImpl localMedia = new LocalMediaImpl();
+        LocalMedia localMedia = MediaFactory.createLocalMedia();
         Conversation conv = endpoint.createConversation(participants, localMedia, conversationListener());
     }
 
