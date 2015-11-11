@@ -51,7 +51,7 @@ public interface Conversation {
 	 * @param endpoint The remote endpoint whose stream we are fetching.
 	 * @return
 	 */
-	public Media getLocalMedia();
+	public LocalMedia getLocalMedia();
 	
 	
 	/**

@@ -1,48 +1,30 @@
 package com.twilio.signal;
 
+import java.util.List;
+
 import android.view.ViewGroup;
 
 public interface LocalMedia extends Media {
+	
+	/**
+	 * Retrieves local video tracks
+	 * 
+	 * @return list of local video tracks
+	 */
+	public List<LocalVideoTrack> getLocalVideoTracks();
+	
+	/**
+	 * Add local video track to list of tracks.
+	 * 
+	 * @param track
+	 */
+	public void addLocalVideoTrack(LocalVideoTrack track);
 
-	/** Read-only representation of the local video container. */
+	/** Get local video view container. */
 	public ViewGroup getContainerView();
 
-	/** Local video view container */
+	/** Attach local video view container */
 	public void attachContainerView(ViewGroup container);
-
-	/** Video Capture Source */
-	public static enum VideoCaptureSource {
-		VIDEO_CAPTYRE_SOURCE_FRONT_CAMERA, ///< Front facing device camera
-		VIDEO_CAPTURE_SOURCE_BACK_CAMERA ///< Back facing device camera
-	};
-
-	/**
-	 * Sets the camera that is being shared.
-	 *
-	 * @param camera
-	 */
-	public void setCamera(VideoCaptureSource camera);
-
-	/**
-	 * Gets the camera that is being shared.
-	 *
-	 * @return camera
-	 */
-	public VideoCaptureSource getCamera();
-
-	/**
-	 * Specifies whether or not your camera video is being shared
-	 *
-	 * @param enabled <code>true</code> if camera should be shared, false otherwise
-	 */
-	public void enableCamera(boolean enabled);
-
-	/**
-	 * Gets whether or not your camera video is being shared
-	 *
-	 * @return <code>true</code> if camera is being shared, false otherwise
-	 */
-	public boolean isCameraEnabled();
 
 	/**
 	 * Specifies whether or not your local audio should be muted
@@ -57,37 +39,5 @@ public interface LocalMedia extends Media {
 	 * @return <code>true</code> if local audio is muted, false otherwise
 	 */
 	public boolean isMuted();
-
-	/**
-	 * Specifies whether or not your local vido should be paused
-	 *
-	 * @param paused <code>true</code> if local video should be paused, false otherwise
-	 */
-	public void pauseVideo(boolean paused);
-
-	/**
-	 * Indicates whether your local video is paused.
-	 *
-	 * @return <code>true</code> if local video is paused, false otherwise
-	 */
-	public boolean isPaused();
-
-	/**
-	 * Start previewing the local camera.
-	 *
-	 */
-	public void startCameraPreview();
-
-	/**
-	 * Stop previewing the local camera.
-	 *
-	 */
-	public void endCameraPreview();
-
-	/**
-	 * Flips the camera that is being shared.
-	 *
-	 */
-	public void flipCamera();
 
 }
