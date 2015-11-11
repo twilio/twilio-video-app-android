@@ -23,6 +23,7 @@ public class CameraCapturerImpl implements CameraCapturer {
 	private ViewGroup captureView;
 	private VideoCapturerAndroid webrtcCapturer;
 	private CameraErrorListener listener;
+	private long nativeWebrtcVideoCapturer;
 	
 	private CameraCapturerImpl(CameraSource source,
 			ViewGroup previewContainerView, CameraErrorListener listener) {
@@ -35,10 +36,13 @@ public class CameraCapturerImpl implements CameraCapturer {
 	public static CameraCapturerImpl create(
 			CameraSource source,
 			ViewGroup previewContainerView,
-			CameraErrorListener listener) throws CameraException {
+			CameraErrorListener listener) {
 		CameraCapturerImpl camera =
 				new CameraCapturerImpl(source, previewContainerView, listener);
-		camera.createWebrtcVideoCapturer();
+		boolean success = camera.createWebrtcVideoCapturer();
+		if (!success) {
+			return null;
+		}
 		return camera;
 	}
 	
@@ -80,19 +84,32 @@ public class CameraCapturerImpl implements CameraCapturer {
 		return captureView;
 	}
 	
-	long getNativeVideoCapturer() throws CameraException {
+	long getNativeVideoCapturer()  {
+		return nativeWebrtcVideoCapturer;
+	}
+	
+	private boolean obtainNativeVideoCapturer() {
 		// Use reflection to obtain the native video capturer handle
-		long nativeVideoCapturer = 0;
+		nativeWebrtcVideoCapturer = 0;
+		CameraException exception = null;
 		try {
 			Field field = webrtcCapturer.getClass().getSuperclass().getDeclaredField("nativeVideoCapturer");
 			field.setAccessible(true);
-			nativeVideoCapturer = field.getLong(webrtcCapturer);
+			nativeWebrtcVideoCapturer = field.getLong(webrtcCapturer);
 		} catch (NoSuchFieldException e) {
-			throw new CameraException("Unable to find webrtc video capturer");
+			logger.d("Unable to find webrtc video capturer");
+			exception = new CameraException("Unable to find webrtc video capturer: "+e.getMessage());
+			
 		} catch (IllegalAccessException e) {
-			throw new CameraException("Unable to access webrtc video capturer");
+			logger.e("Unable to access webrtc video capturer");
+			exception = new CameraException("Unable to access webrtc video capturer");
 		}
-		return nativeVideoCapturer;
+		if ((exception != null) && (listener != null)) {
+			listener.onError(exception);
+			nativeWebrtcVideoCapturer = 0;
+			return false;
+		}
+		return true;
 	}
 	
 	private String getPreferredDeviceName() {
@@ -110,13 +127,21 @@ public class CameraCapturerImpl implements CameraCapturer {
 		return deviceName;
 	}
 	
-	private void createWebrtcVideoCapturer() throws CameraException {
+	private boolean createWebrtcVideoCapturer() {
 		String deviceName = getPreferredDeviceName();
 		if(deviceName != null) {
 			webrtcCapturer = VideoCapturerAndroid.create(deviceName, cameraErrorHandler);
+			if (!obtainNativeVideoCapturer()) {
+				return false;
+			}
 		} else {
-			throw new CameraException("Camera device not found");
+			if (listener != null) {
+				CameraException exception = new CameraException("Camera device not found");
+				listener.onError(exception);
+				return false;
+			}
 		}
+		return true;
 	}
 	
 	private CameraErrorHandler cameraErrorHandler = new CameraErrorHandler() {

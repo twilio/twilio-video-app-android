@@ -16,7 +16,7 @@ public interface Invite {
 	 * conversation related events.
 	 * 
 	 */
-	public Conversation accept(LocalMedia localMedia, ConversationListener listener) throws CameraException ;
+	public Conversation accept(LocalMedia localMedia, ConversationListener listener);
 	
 
 }

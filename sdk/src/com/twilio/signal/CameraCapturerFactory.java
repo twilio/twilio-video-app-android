@@ -17,7 +17,7 @@ public class CameraCapturerFactory {
 	public static CameraCapturer createCameraCapturer (
 			CameraSource source,
 			ViewGroup previewContainerView,
-			CameraErrorListener listener) throws CameraException {
+			CameraErrorListener listener) {
 		return CameraCapturerImpl.create(source, previewContainerView, listener);
 	}
 

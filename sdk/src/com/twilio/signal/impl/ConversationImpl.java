@@ -9,7 +9,6 @@ import java.util.Set;
 import android.os.Handler;
 import android.util.Log;
 
-import com.twilio.signal.CameraException;
 import com.twilio.signal.Conversation;
 import com.twilio.signal.ConversationException;
 import com.twilio.signal.ConversationListener;
@@ -113,7 +112,7 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 	
 	public static ConversationImpl createOutgoingConversation(EndpointImpl endpoint, Set<String> participants,
 			   LocalMedia localMedia,
-			   ConversationListener listener) throws CameraException {
+			   ConversationListener listener) {
 		ConversationImpl conv = new ConversationImpl(endpoint, participants, localMedia, listener);
 		if (conv.getNativeHandle() == 0) {
 			return null;
@@ -423,11 +422,11 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 		}
 	}
 	
-	private void setExternalCapturer() throws CameraException {
+	private void setExternalCapturer()  {
 		try {
 			LocalVideoTrack localVideoTrack = localMedia.getLocalVideoTracks().get(0);
 			CameraCapturerImpl camera = (CameraCapturerImpl)localVideoTrack.getCameraCapturer();
-			if (camera != null) {
+			if (camera != null && camera.getNativeVideoCapturer() != 0) {
 				setExternalCapturer(nativeHandle, camera.getNativeVideoCapturer());
 			} else {
 				//TODO : we should throw exception only in case when local video is selected and
@@ -444,7 +443,7 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 	}
 	
 	@Override
-	public void start() throws CameraException {
+	public void start() {
 		logger.d("starting call");
 		
 		// TODO : In case of audio only call,
