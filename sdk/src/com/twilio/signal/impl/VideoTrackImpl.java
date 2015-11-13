@@ -28,6 +28,10 @@ public class VideoTrackImpl implements VideoTrack {
 	void setTrackInfo(TrackInfo trackInfo) {
 		this.trackInfo = trackInfo;
 	}
+	
+	org.webrtc.VideoTrack getWebrtcVideoTrack() {
+		return videoTrack;
+	}
 
 	public TrackInfo getTrackInfo() {
 		return trackInfo;
