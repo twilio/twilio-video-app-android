@@ -1,6 +1,7 @@
 package com.twilio.signal;
 
-import android.view.ViewGroup;
+import android.widget.FrameLayout;
+import android.content.Context;
 
 import com.twilio.signal.CameraCapturer.CameraSource;
 import com.twilio.signal.impl.CameraCapturerImpl;
@@ -15,10 +16,11 @@ public class CameraCapturerFactory {
 	 * @return CameraCapturer
 	 */
 	public static CameraCapturer createCameraCapturer (
+			Context context,
 			CameraSource source,
-			ViewGroup previewContainerView,
+			FrameLayout previewContainerView,
 			CameraErrorListener listener) {
-		return CameraCapturerImpl.create(source, previewContainerView, listener);
+		return CameraCapturerImpl.create(context, source, previewContainerView, listener);
 	}
 
 }

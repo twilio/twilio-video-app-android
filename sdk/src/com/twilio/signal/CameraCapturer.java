@@ -21,12 +21,15 @@ public interface CameraCapturer {
 	 */
 	public boolean stopPreview();
 
+	/*
+	 * Returns whether the camera capturer is previewing the camera
+	 */
+	public boolean isPreviewing();
+
 	/**
 	 * Switches the camera to the next available device.
 	 *
 	 */
 	public boolean switchCamera(Runnable switchDoneEvent);
-
-	public  ViewGroup getPreviewContainerView();
 
 }
