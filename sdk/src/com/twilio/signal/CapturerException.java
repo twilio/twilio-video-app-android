@@ -5,9 +5,8 @@ public class CapturerException extends Exception {
 	private static final long serialVersionUID = 853004373043422260L;
 	
 	public static enum ExceptionDomain {
-		CAMERA,
-		WEBRTC,
-		OTHER
+		CAPTURER,
+		CAMERA
 	}
 	
 	private String errorMessage;

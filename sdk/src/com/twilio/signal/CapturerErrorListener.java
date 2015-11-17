@@ -1,6 +1,6 @@
 package com.twilio.signal;
 
-public interface CameraErrorListener {
+public interface CapturerErrorListener {
 	
 	public void onError(CapturerException e);
 

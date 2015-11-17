@@ -19,7 +19,7 @@ public class CameraCapturerFactory {
 			Context context,
 			CameraSource source,
 			ViewGroup previewContainer,
-			CameraErrorListener listener) {
+			CapturerErrorListener listener) {
 		return CameraCapturerImpl.create(context, source, previewContainer, listener);
 	}
 

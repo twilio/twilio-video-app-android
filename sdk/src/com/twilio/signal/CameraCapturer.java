@@ -12,13 +12,13 @@ public interface CameraCapturer {
 	 * Start previewing the local camera.
 	 *
 	 */
-	public boolean startPreview();
+	public void startPreview();
 
 	/**
 	 * Stop previewing the local camera.
 	 *
 	 */
-	public boolean stopPreview();
+	public void stopPreview();
 
 	/*
 	 * Returns whether the camera capturer is previewing the camera
@@ -29,6 +29,6 @@ public interface CameraCapturer {
 	 * Switches the camera to the next available device.
 	 *
 	 */
-	public boolean switchCamera(Runnable switchDoneEvent);
+	public boolean switchCamera();
 
 }
