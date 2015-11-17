@@ -43,22 +43,16 @@ public class LocalVideoTrackImpl extends VideoTrackImpl implements  LocalVideoTr
 		return false;
 	}
 	
-	/* (non-Javadoc)
-	 * @see com.twilio.signal.CameraCapturer#pauseVideo(boolean)
-	 */
 	@Override
-	public void pauseVideo(boolean paused) {
-		
+	void dispose() {
+		if (cameraCapturer != null) {
+			CameraCapturerImpl cameraCapturerImpl =
+					(CameraCapturerImpl)cameraCapturer;
+			cameraCapturerImpl.dispose();
+			cameraCapturer = null;
+		}
+		super.dispose();
 	}
-
-	/* (non-Javadoc)
-	 * @see com.twilio.signal.CameraCapturer#isPaused()
-	 */
-	@Override
-	public boolean isPaused() {
-		return false;
-	}
-	
 	
 	
 }

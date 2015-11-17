@@ -103,6 +103,14 @@ JNIEXPORT void JNICALL Java_com_twilio_signal_impl_ConversationImpl_setSessionOb
 	session->setSessionObserver(sessionObserver);
 }
 
+JNIEXPORT jboolean JNICALL Java_com_twilio_signal_impl_ConversationImpl_enableVideo
+  (JNIEnv *, jobject, jlong nativeSession, jboolean enabled, jboolean paused)
+{
+	TS_CORE_LOG_DEBUG("enableVideo");
+	TSCSessionObject* session = reinterpret_cast<TSCSessionObject*>(nativeSession);
+	return (session->enableVideo((bool)enabled, (bool)paused) ? JNI_TRUE : JNI_FALSE);
+}
+
 JNIEXPORT void JNICALL Java_com_twilio_signal_impl_ConversationImpl_freeNativeHandle
   (JNIEnv *env, jobject obj, jlong nativeSession)
 {

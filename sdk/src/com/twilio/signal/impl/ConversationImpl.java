@@ -9,6 +9,7 @@ import java.util.Set;
 import android.os.Handler;
 import android.util.Log;
 
+import com.twilio.signal.CameraCapturer;
 import com.twilio.signal.Conversation;
 import com.twilio.signal.ConversationException;
 import com.twilio.signal.ConversationListener;
@@ -89,6 +90,8 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 		handler = CallbackHandler.create();
 
 		this.localMedia = localMedia;
+		((LocalMediaImpl)localMedia).setConversation(this);
+		
 		this.conversationListener = conversationListener;
 
 		sessionObserverInternal = new SessionObserverInternal(this, this);
@@ -403,6 +406,16 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 	public void setLocalMedia(LocalMedia media) {
 		checkDisposed();
 		localMedia = media;
+		((LocalMediaImpl)localMedia).setConversation(this);
+	}
+
+	boolean enableVideo(boolean enabled, CameraCapturer cameraCapturer) {
+		logger.d("enavleVideo");
+		LocalVideoTrack videoTrack = (LocalVideoTrack)localMedia.getVideoTracks().get(0);
+		//enableVideo(enabled, !videoTrack.isCameraEnabled());
+		enableVideo(enabled, false);
+		
+		return false;
 	}
 	
 	private Conversation.Status sessionStateToStatus(SessionState state) {
@@ -462,6 +475,12 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 		
 	}
 	
+
+	@Override
+	public boolean enableVideo(boolean enabled, boolean paused) {
+		return enableVideo(getNativeHandle(), enabled, paused);
+	}
+	
 	private synchronized void checkDisposed() {
 		if (isDisposed || nativeHandle == 0) {
 			throw new IllegalStateException(DISPOSE_MESSAGE);
@@ -477,6 +496,8 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 	private native void stop(long nativeSession);
 	private native void setSessionObserver(long nativeSession, long nativeSessionObserver);
 	private native void freeNativeHandle(long nativeHandle);
+	private native boolean enableVideo(long nativeHandle, boolean enabled, boolean paused);
+
 
 	
 
