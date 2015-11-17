@@ -186,6 +186,7 @@ public class SignalPhone implements EndpointListener
     	LocalMedia localMedia = MediaFactory.createLocalMedia();
     	Conversation conv = null;
     	CameraCapturer camera = CameraCapturerFactory.createCameraCapturer(
+                activity,
                 CameraCapturer.CameraSource.CAMERA_SOURCE_FRONT_CAMERA,
                 localContainer, cameraErrorListener());
     	if (camera != null) {
@@ -220,7 +221,7 @@ public class SignalPhone implements EndpointListener
 		};
     }
 
-    public Conversation accept(String from, ViewGroup localContainer, ConversationListener listener) {
+    public Conversation accept(Context context, String from, ViewGroup localContainer, ConversationListener listener) {
        Invite invite = invites.remove(from);
        if (!twilioSdkInited || invite == null || invite.to() == null) {
     	   return null;
@@ -228,6 +229,7 @@ public class SignalPhone implements EndpointListener
        LocalMedia localMedia = MediaFactory.createLocalMedia();
        Conversation conv = null;
        CameraCapturer camera = CameraCapturerFactory.createCameraCapturer(
+               context,
                CameraCapturer.CameraSource.CAMERA_SOURCE_FRONT_CAMERA,
                localContainer, cameraErrorListener());
        if (camera != null) {

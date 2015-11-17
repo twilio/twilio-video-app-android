@@ -1,6 +1,5 @@
 package com.twilio.signal;
 
-import android.view.ViewGroup;
 
 public interface CameraCapturer {
 	

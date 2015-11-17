@@ -7,8 +7,8 @@ import org.webrtc.VideoCapturerAndroid;
 import org.webrtc.VideoCapturerAndroid.CameraErrorHandler;
 import org.webrtc.videoengine.VideoCaptureAndroid;
 
+import android.view.View;
 import android.view.ViewGroup;
-import android.widget.FrameLayout;
 import android.content.Context;
 import android.hardware.Camera;
 import android.view.Display;
@@ -33,7 +33,7 @@ public class CameraCapturerImpl implements CameraCapturer {
 	private CameraSource source;
 
 	/* Preview capturer members */
-    private final FrameLayout previewLayout;
+    private final ViewGroup previewContainer;
     private Camera camera;
     private int cameraId;
     private CameraPreview cameraPreview;
@@ -46,10 +46,10 @@ public class CameraCapturerImpl implements CameraCapturer {
 	private long nativeWebrtcVideoCapturer;
 
 	private CameraCapturerImpl(Context context, CameraSource source,
-			FrameLayout previewLayout, CameraErrorListener listener) {
+			ViewGroup previewContainer, CameraErrorListener listener) {
 		this.context = context;
 		this.source = source;
-		this.previewLayout = previewLayout;
+		this.previewContainer= previewContainer;
 		this.listener = listener;
 		determineCameraId();
 	}
@@ -57,10 +57,10 @@ public class CameraCapturerImpl implements CameraCapturer {
 	public static CameraCapturerImpl create(
 			Context context,
 			CameraSource source,
-			FrameLayout previewContainerView,
+			ViewGroup previewContainer,
 			CameraErrorListener listener) {
 		CameraCapturerImpl cameraCapturer =
-				new CameraCapturerImpl(context, source, previewContainerView, listener);
+				new CameraCapturerImpl(context, source, previewContainer, listener);
 
 		return cameraCapturer;
 	}
@@ -114,8 +114,8 @@ public class CameraCapturerImpl implements CameraCapturer {
         camera.setParameters(params);
 
         cameraPreview = new CameraPreview(context, camera);
-        previewLayout.removeAllViews();
-        previewLayout.addView(cameraPreview);
+        previewContainer.removeAllViews();
+        previewContainer.addView(cameraPreview);
 
         previewing = true;
         return true;
@@ -124,7 +124,7 @@ public class CameraCapturerImpl implements CameraCapturer {
     @Override
     public boolean stopPreview() {
         if(previewing) {
-            previewLayout.removeAllViews();
+            previewContainer.removeAllViews();
             cameraPreview = null;
             camera.release();
             camera = null;
