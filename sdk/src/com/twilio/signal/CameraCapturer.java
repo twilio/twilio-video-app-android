@@ -1,6 +1,5 @@
 package com.twilio.signal;
 
-import android.view.ViewGroup;
 
 public interface CameraCapturer {
 	
@@ -13,20 +12,23 @@ public interface CameraCapturer {
 	 * Start previewing the local camera.
 	 *
 	 */
-	public boolean startPreview();
+	public void startPreview();
 
 	/**
 	 * Stop previewing the local camera.
 	 *
 	 */
-	public boolean stopPreview();
+	public void stopPreview();
+
+	/*
+	 * Returns whether the camera capturer is previewing the camera
+	 */
+	public boolean isPreviewing();
 
 	/**
 	 * Switches the camera to the next available device.
 	 *
 	 */
-	public boolean switchCamera(Runnable switchDoneEvent);
-
-	public  ViewGroup getPreviewContainerView();
+	public boolean switchCamera();
 
 }

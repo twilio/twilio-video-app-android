@@ -14,14 +14,33 @@
         </exec>
     </target>
 
-    <!-- Combine the twilio sdk and the webrtc artifact into a single jar -->
-    <target name="-post-compile">
+    <!-- Combine the twilio sdk and the webrtc artifacts into a single jar -->
+    <target name="-jar-debug-postcompile" if="${build.is.packaging.debug}">
+        <!-- This is executed for any "debug" build ("ant debug") -->
+        <jar id="files" jarfile="bin/twilio-rtc-conversations-android.jar">
+            <zipfileset src="bin/classes.jar" includes="**/*.java **/*.class"/>
+            <zipfileset src="libs/libjingle_peerconnection_java.jar" includes="**/*.java **/*.class"/>
+            <zipfileset dir="libs" includes="**/libtwilio-native.so" prefix="lib/"/>
+            <!-- Add gdb debug binaries to jar -->
+            <zipfileset dir="libs" includes="*/gdbserver" prefix="lib/"/>
+            <zipfileset dir="libs" includes="*/gdb.setup" prefix="lib/"/>
+        </jar>
+    </target>
+
+    <!-- Combine the twilio sdk and the webrtc artifacts into a single jar -->
+    <target name="-jar-release-postcompile" unless="${build.is.packaging.debug}">
+        <!-- This is executed for any non-"debug" build (e.g., "ant release",
+             regardless of the @debuggable attribute in AndroidManifest.xml) -->
         <jar id="files" jarfile="bin/twilio-rtc-conversations-android.jar">
             <zipfileset src="bin/classes.jar" includes="**/*.java **/*.class"/>
             <zipfileset src="libs/libjingle_peerconnection_java.jar" includes="**/*.java **/*.class"/>
             <zipfileset dir="libs" includes="**/libtwilio-native.so" prefix="lib/"/>
         </jar>
     </target>
+
+    <!-- This is called automatically by Android's ant tasks, and delegates the
+         task to one of the above two targets: -->
+    <target name="-post-compile" depends="-jar-debug-postcompile,-jar-release-postcompile" />
 
     <!-- The local.properties file is created and updated by the 'android' tool.
          It contains the path to the SDK. It should *NOT* be checked into

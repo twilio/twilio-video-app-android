@@ -27,7 +27,7 @@ import android.view.ViewGroup;
 
 import com.twilio.signal.CameraCapturer;
 import com.twilio.signal.CameraCapturerFactory;
-import com.twilio.signal.CameraErrorListener;
+import com.twilio.signal.CapturerErrorListener;
 import com.twilio.signal.CapturerException;
 import com.twilio.signal.Conversation;
 import com.twilio.signal.ConversationException;
@@ -186,8 +186,9 @@ public class SignalPhone implements EndpointListener
     	LocalMedia localMedia = MediaFactory.createLocalMedia();
     	Conversation conv = null;
     	CameraCapturer camera = CameraCapturerFactory.createCameraCapturer(
+                activity,
                 CameraCapturer.CameraSource.CAMERA_SOURCE_FRONT_CAMERA,
-                localContainer, cameraErrorListener());
+                localContainer, capturerErrorListener());
     	if (camera != null) {
 	    	LocalVideoTrack videoTrack = LocalVideoTrackFactory.createLocalVideoTrack(camera);
 	    	localMedia.attachContainerView(localContainer);
@@ -209,8 +210,8 @@ public class SignalPhone implements EndpointListener
 
     }
     
-    private CameraErrorListener cameraErrorListener () {
-    	return new CameraErrorListener() {
+    private CapturerErrorListener capturerErrorListener () {
+    	return new CapturerErrorListener() {
 			
 			@Override
 			public void onError(CapturerException e) {
@@ -220,7 +221,7 @@ public class SignalPhone implements EndpointListener
 		};
     }
 
-    public Conversation accept(String from, ViewGroup localContainer, ConversationListener listener) {
+    public Conversation accept(Context context, String from, ViewGroup localContainer, ConversationListener listener) {
        Invite invite = invites.remove(from);
        if (!twilioSdkInited || invite == null || invite.to() == null) {
     	   return null;
@@ -228,8 +229,9 @@ public class SignalPhone implements EndpointListener
        LocalMedia localMedia = MediaFactory.createLocalMedia();
        Conversation conv = null;
        CameraCapturer camera = CameraCapturerFactory.createCameraCapturer(
+               context,
                CameraCapturer.CameraSource.CAMERA_SOURCE_FRONT_CAMERA,
-               localContainer, cameraErrorListener());
+               localContainer, capturerErrorListener());
        if (camera != null) {
 	       LocalVideoTrack videoTrack = LocalVideoTrackFactory.createLocalVideoTrack(camera);
 	       localMedia.addLocalVideoTrack(videoTrack);

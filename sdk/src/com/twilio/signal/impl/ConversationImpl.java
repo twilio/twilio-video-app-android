@@ -130,7 +130,8 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 		if (participantsAddr == null || participantsAddr.length == 0) {
 			return null;
 		}
-		return new ConversationImpl(nativeSession, participantsAddr);
+		ConversationImpl conversationImpl = new ConversationImpl(nativeSession, participantsAddr);
+		return conversationImpl;
 	}
 	
 	@Override
@@ -422,12 +423,13 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 		}
 	}
 	
-	private void setExternalCapturer()  {
+	void setupExternalCapturer()  {
 		try {
 			LocalVideoTrack localVideoTrack = localMedia.getLocalVideoTracks().get(0);
-			CameraCapturerImpl camera = (CameraCapturerImpl)localVideoTrack.getCameraCapturer();
-			if (camera != null && camera.getNativeVideoCapturer() != 0) {
-				setExternalCapturer(nativeHandle, camera.getNativeVideoCapturer());
+			CameraCapturerImpl cameraCapturer = (CameraCapturerImpl)localVideoTrack.getCameraCapturer();
+			if (cameraCapturer != null) {
+				cameraCapturer.startConversationCapturer();
+				setExternalCapturer(nativeHandle, cameraCapturer.getNativeVideoCapturer());
 			} else {
 				//TODO : we should throw exception only in case when local video is selected and
 				// camera is not present GSDK-272
@@ -445,11 +447,11 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 	@Override
 	public void start() {
 		logger.d("starting call");
-		
-		// TODO : In case of audio only call,
-		// we shouldn't set external capturer GSDK-272
-		setExternalCapturer();
-		
+	
+		// TODO: Call only when video is enabled 
+		setupExternalCapturer();
+
+
 		start(getNativeHandle());
 		
 	}

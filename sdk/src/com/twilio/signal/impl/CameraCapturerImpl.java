@@ -1,14 +1,24 @@
 package com.twilio.signal.impl;
 
 import java.lang.reflect.Field;
+import java.io.IOException;
 
 import org.webrtc.VideoCapturerAndroid;
 import org.webrtc.VideoCapturerAndroid.CameraErrorHandler;
+import org.webrtc.videoengine.VideoCaptureAndroid;
 
+import android.view.View;
 import android.view.ViewGroup;
+import android.content.Context;
+import android.hardware.Camera;
+import android.view.Display;
+import android.view.Surface;
+import android.view.SurfaceHolder;
+import android.view.SurfaceView;
+import android.view.WindowManager;
 
 import com.twilio.signal.CameraCapturer;
-import com.twilio.signal.CameraErrorListener;
+import com.twilio.signal.CapturerErrorListener;
 import com.twilio.signal.CapturerException;
 import com.twilio.signal.CapturerException.ExceptionDomain;
 import com.twilio.signal.impl.logging.Logger;
@@ -19,138 +29,273 @@ public class CameraCapturerImpl implements CameraCapturer {
 
 	static final Logger logger = Logger.getLogger(CameraCapturerImpl.class);
 
-	
+	private final Context context;
 	private CameraSource source;
+
+	/* Preview capturer members */
+    private final ViewGroup previewContainer;
+    private Camera camera;
+    private int cameraId;
+    private CameraPreview cameraPreview;
+	// TODO: Use states to track idle, previewing, and broadcasting
+    private boolean previewing = false;
+
+	/* Conversation capturer members */
 	private ViewGroup captureView;
-	private VideoCapturerAndroid webrtcCapturer;
-	private CameraErrorListener listener;
-	private long nativeWebrtcVideoCapturer;
-	
-	private CameraCapturerImpl(CameraSource source,
-			ViewGroup previewContainerView, CameraErrorListener listener) {
+	private VideoCapturerAndroid videoCapturerAndroid;
+	private CapturerErrorListener listener;
+	private long nativeVideoCapturerAndroid;
+
+	private CameraCapturerImpl(Context context, CameraSource source,
+			ViewGroup previewContainer, CapturerErrorListener listener) {
+		this.context = context;
 		this.source = source;
-		this.captureView = previewContainerView;
+		this.previewContainer = previewContainer;
 		this.listener = listener;
-		
-	}
-	
-	public static CameraCapturerImpl create(
-			CameraSource source,
-			ViewGroup previewContainerView,
-			CameraErrorListener listener) {
-		CameraCapturerImpl camera =
-				new CameraCapturerImpl(source, previewContainerView, listener);
-		boolean success = camera.createWebrtcVideoCapturer();
-		if (!success) {
-			return null;
+		cameraId = getCameraId();
+		if(cameraId < 0 && listener != null) {
+			listener.onError(new CapturerException(ExceptionDomain.CAMERA, "Invalid camera source."));
 		}
-		return camera;
 	}
-	
-	/* (non-Javadoc)
-	 * @see com.twilio.signal.CameraCapturer#startPreview()
-	 */
-	@Override
-	public boolean startPreview() {
-		return false;
+
+	public static CameraCapturerImpl create(
+			Context context,
+			CameraSource source,
+			ViewGroup previewContainer,
+			CapturerErrorListener listener) {
+		CameraCapturerImpl cameraCapturer =
+				new CameraCapturerImpl(context, source, previewContainer, listener);
+
+		return cameraCapturer;
 	}
-	
-	/* (non-Javadoc)
-	 * @see com.twilio.signal.CameraCapturer#stopPreview()
+
+	/*
+	 * Use VideoCapturerAndroid to determine the camera id of the specified source.
 	 */
-	@Override
-	public boolean stopPreview() {
-		return false;
+	private int getCameraId() {
+		String deviceName;
+		if(source == CameraSource.CAMERA_SOURCE_BACK_CAMERA) {
+			 deviceName = VideoCapturerAndroid.getNameOfBackFacingDevice();
+		} else {
+			deviceName = VideoCapturerAndroid.getNameOfFrontFacingDevice();
+		}
+		if(deviceName == null) {
+			cameraId = -1;
+		} else {
+			String[] deviceNames = VideoCapturerAndroid.getDeviceNames();
+			for(int i = 0; i < deviceNames.length; i++) {
+				if(deviceName.equals(deviceNames[i])) {
+					cameraId = i;
+					break;
+				}
+			}
+		}
+		return cameraId;
 	}
-	
-	/* (non-Javadoc)
-	 * @see com.twilio.signal.CameraCapturer#switchCamera(java.lang.Runnable)
-	 */
+
+    @Override
+    public synchronized void startPreview() {
+        if(previewing) {
+            return;
+        }
+
+        if (camera == null) {
+            try {
+                camera = Camera.open(cameraId);
+            } catch (Exception e) {
+				if(listener != null) {
+                    listener.onError(new CapturerException(ExceptionDomain.CAMERA, "Unable to open camera " + VideoCapturerAndroid.getDeviceName(cameraId) + ":" + e.getMessage()));
+				}
+				return;
+            }
+
+            if (camera == null && listener != null) {
+               	listener.onError(new CapturerException(ExceptionDomain.CAMERA, "Unable to open camera " + VideoCapturerAndroid.getDeviceName(cameraId)));
+				return;
+            }
+        }
+
+        // Set camera to continually auto-focus
+        Camera.Parameters params = camera.getParameters();
+        if (params.getSupportedFocusModes().contains(Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE)) {
+            params.setFocusMode(Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE);
+        }
+        camera.setParameters(params);
+
+        cameraPreview = new CameraPreview(context, camera, listener);
+        previewContainer.removeAllViews();
+        previewContainer.addView(cameraPreview);
+
+        previewing = true;
+    }
+
+    @Override
+    public synchronized void stopPreview() {
+        if(previewing) {
+            previewContainer.removeAllViews();
+            cameraPreview = null;
+			if(camera != null) {
+				camera.release();
+				camera = null;
+			}
+            previewing = false;
+        }
+    }
+
 	@Override
-	public boolean switchCamera(Runnable switchDoneEvent) {
-		if (webrtcCapturer.switchCamera(switchDoneEvent)) {
-			source = (source == CameraSource.CAMERA_SOURCE_FRONT_CAMERA) ?
-					CameraSource.CAMERA_SOURCE_BACK_CAMERA :
-					CameraSource.CAMERA_SOURCE_FRONT_CAMERA;
+	public synchronized boolean isPreviewing() {
+		return previewing;
+	}
+
+	/*
+	 * Called internally prior to a session being started to setup
+	 * the capturer used during a Conversation.
+	 */
+	synchronized void startConversationCapturer() {
+		if(isPreviewing()) {
+			stopPreview();
+		}
+		createVideoCapturerAndroid();
+	}
+
+	@Override
+	public synchronized boolean switchCamera() {
+        if(previewing) {
+            stopPreview();
+			cameraId = (cameraId + 1) % Camera.getNumberOfCameras();
+			startPreview();
+			return true;
+        } else if (videoCapturerAndroid.switchCamera(null)) {
 			return true;
 		}
 		return false;
 	}
 	
-	/* (non-Javadoc)
-	 * @see com.twilio.signal.CameraCapturer#getCapturerView()
-	 */
-	@Override
-	public ViewGroup getPreviewContainerView() {
-		return captureView;
-	}
-	
 	long getNativeVideoCapturer()  {
-		return nativeWebrtcVideoCapturer;
+		return nativeVideoCapturerAndroid;
 	}
 	
-	private boolean obtainNativeVideoCapturer() {
-		// Use reflection to obtain the native video capturer handle
-		nativeWebrtcVideoCapturer = 0;
-		CapturerException exception = null;
+	private long retrieveNativeVideoCapturerAndroid(VideoCapturerAndroid videoCapturerAndroid) {
+		// Use reflection to retrieve the native video capturer handle
+		long nativeHandle = 0;
 		try {
-			Field field = webrtcCapturer.getClass().getSuperclass().getDeclaredField("nativeVideoCapturer");
+			Field field = videoCapturerAndroid.getClass().getSuperclass().getDeclaredField("nativeVideoCapturer");
 			field.setAccessible(true);
-			nativeWebrtcVideoCapturer = field.getLong(webrtcCapturer);
+			nativeHandle = field.getLong(videoCapturerAndroid);
 		} catch (NoSuchFieldException e) {
-			logger.d("Unable to find webrtc video capturer");
-			exception = new CapturerException(ExceptionDomain.WEBRTC, "Unable to find webrtc video capturer: "+e.getMessage());
-			
+			if(listener != null) {
+				listener.onError(new CapturerException(ExceptionDomain.CAPTURER, "Unable to setup video capturer: " + e.getMessage()));
+			}
 		} catch (IllegalAccessException e) {
-			logger.e("Unable to access webrtc video capturer");
-			exception = new CapturerException(ExceptionDomain.WEBRTC, "Unable to access webrtc video capturer");
-		}
-		if ((exception != null) && (listener != null)) {
-			listener.onError(exception);
-			nativeWebrtcVideoCapturer = 0;
-			return false;
-		}
-		return true;
-	}
-	
-	private String getPreferredDeviceName() {
-		if(VideoCapturerAndroid.getDeviceCount() == 0) {
-			return null;
-		}
-		// Use the front-facing camera if one is available otherwise use the first available device
-		String deviceName =
-				(source == CameraSource.CAMERA_SOURCE_FRONT_CAMERA) ?
-						VideoCapturerAndroid.getNameOfFrontFacingDevice() :
-						VideoCapturerAndroid.getNameOfBackFacingDevice();
-		if(deviceName == null) {
-			deviceName = VideoCapturerAndroid.getDeviceName(0);
-		}
-		return deviceName;
-	}
-	
-	private boolean createWebrtcVideoCapturer() {
-		String deviceName = getPreferredDeviceName();
-		if(deviceName != null) {
-			webrtcCapturer = VideoCapturerAndroid.create(deviceName, cameraErrorHandler);
-			if (!obtainNativeVideoCapturer()) {
-				return false;
-			}
-		} else {
-			if (listener != null) {
-				CapturerException exception = new CapturerException(ExceptionDomain.CAMERA, "Camera device not found");
-				listener.onError(exception);
-				return false;
+			if(listener != null) {
+				listener.onError(new CapturerException(ExceptionDomain.CAPTURER, "Unable to access video capturer: " + e.getMessage()));
 			}
 		}
-		return true;
+		return nativeHandle;
+	}
+	
+	private void createVideoCapturerAndroid() {
+		String deviceName = VideoCapturerAndroid.getDeviceName(cameraId);
+		if(deviceName == null && listener != null) {
+			listener.onError(new CapturerException(ExceptionDomain.CAMERA, "Camera device not found"));
+			return;
+		}
+		videoCapturerAndroid = VideoCapturerAndroid.create(deviceName, cameraErrorHandler);
+		nativeVideoCapturerAndroid = retrieveNativeVideoCapturerAndroid(videoCapturerAndroid);
 	}
 	
 	private CameraErrorHandler cameraErrorHandler = new CameraErrorHandler() {
-		
+
 		@Override
 		public void onCameraError(String errorMsg) {
-			CameraCapturerImpl.this.listener.onError(new CapturerException(ExceptionDomain.CAMERA, errorMsg));
+			if(CameraCapturerImpl.this.listener != null) {
+				CameraCapturerImpl.this.listener.onError(new CapturerException(ExceptionDomain.CAMERA, errorMsg));
+			}
 		}
+
 	};
 
+	private class CameraPreview extends SurfaceView implements SurfaceHolder.Callback {
+		private Context context;
+		private SurfaceHolder holder;
+		private Camera camera;
+		private CapturerErrorListener listener;
+
+		public CameraPreview(Context context, Camera camera, CapturerErrorListener listener) {
+			super(context);
+			this.context = context;
+			this.camera = camera;
+			this.listener = listener;
+
+			holder = getHolder();
+			holder.addCallback(this);
+		}
+
+		public void surfaceCreated(SurfaceHolder holder) {
+			try {
+				if (camera != null) {
+					camera.setPreviewDisplay(holder);
+					camera.startPreview();
+				}
+
+			} catch (IOException e) {
+				if(listener != null) {
+					listener.onError(new CapturerException(ExceptionDomain.CAMERA, "Unable to start preview: " + e.getMessage()));
+				}
+			}
+		}
+
+		public void surfaceDestroyed(SurfaceHolder holder) {
+			if(camera != null) {
+				camera.stopPreview();
+
+				try {
+					camera.setPreviewDisplay(null);
+				} catch(IOException e) {
+					if(listener != null) {
+						listener.onError(new CapturerException(ExceptionDomain.CAMERA, "Unable to reset preview: " + e.getMessage()));
+					}
+				}
+			}
+		}
+
+		public void surfaceChanged(SurfaceHolder holder, int format, int w, int h) {
+			if (this.holder.getSurface() == null) {
+				return;
+			}
+
+			if(camera != null) {
+				try {
+					camera.stopPreview();
+					camera.setPreviewDisplay(this.holder);
+					updatePreviewOrientation(w, h);
+					camera.startPreview();
+				} catch (Exception e) {
+					if(listener != null) {
+						listener.onError(new CapturerException(ExceptionDomain.CAMERA, "Unable to restart preview: " + e.getMessage()));
+					}
+				}
+			}
+		}
+
+		private void updatePreviewOrientation(int width, int height) {
+			Camera.Parameters parameters = camera.getParameters();
+			Display display = ((WindowManager)context.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
+
+			if(display.getRotation() == Surface.ROTATION_0) {
+				parameters.setPreviewSize(height, width);
+				camera.setDisplayOrientation(90);
+			} else if(display.getRotation() == Surface.ROTATION_90) {
+				parameters.setPreviewSize(width, height);
+				camera.setDisplayOrientation(0);
+			} else if(display.getRotation() == Surface.ROTATION_180) {
+				parameters.setPreviewSize(height, width);
+				camera.setDisplayOrientation(270);
+			} else if(display.getRotation() == Surface.ROTATION_270) {
+				parameters.setPreviewSize(width, height);
+				camera.setDisplayOrientation(180);
+			}
+		}
+
+	}
 }

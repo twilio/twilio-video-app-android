@@ -58,7 +58,7 @@ public class ConversationActivity extends Activity implements ConversationListen
 	}
 	
 	private void acceptIncoming(String participantAddress) {
-		conv = phone.accept(participantAddress, localContainer, this);
+		conv = phone.accept(this, participantAddress, localContainer, this);
 	}
 
 	public static class MenuFragment extends Fragment {

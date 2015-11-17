@@ -320,8 +320,7 @@ public class EndpointImpl implements
 	 */
 	@Override
 	public void accept(ConversationImpl conv) {
-		// TODO Auto-generated method stub
-		
+		// Accept is handled in InviteImpl
 	}
 
 

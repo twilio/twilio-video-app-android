@@ -8,7 +8,7 @@ ANDROID_API=19
 JAVADOC_SOURCE_FILES="
 	CameraCapturer.java
     CameraCapturerFactory.java
-    CameraErrorListener.java
+    CapturerErrorListener.java
     CapturerException.java
     Conversation.java
     ConversationException.java
