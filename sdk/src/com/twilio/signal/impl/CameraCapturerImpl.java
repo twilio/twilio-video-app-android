@@ -37,6 +37,7 @@ public class CameraCapturerImpl implements CameraCapturer {
     private Camera camera;
     private int cameraId;
     private CameraPreview cameraPreview;
+	// TODO: Use states to track idle, previewing, and broadcasting
     private boolean previewing = false;
 
 	/* Conversation capturer members */
