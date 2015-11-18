@@ -128,6 +128,16 @@ public class EndpointLifecycleTests {
             }
 
             @Override
+            public void onLocalVideoAdded(Conversation conversation, VideoTrack videoTrack) {
+                
+            }
+
+            @Override
+            public void onLocalVideoRemoved(Conversation conversation, VideoTrack videoTrack) {
+
+            }
+
+            @Override
             public void onVideoAddedForParticipant(Conversation conversation, Participant participant, VideoTrack videoTrack) {
 
             }
