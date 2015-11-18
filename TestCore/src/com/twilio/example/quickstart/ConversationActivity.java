@@ -172,4 +172,18 @@ public class ConversationActivity extends Activity implements ConversationListen
 
 	}
 
+	@Override
+	public void onLocalVideoAdded(Conversation conversation,
+			VideoTrack videoTrack) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onLocalVideoRemoved(Conversation conversation,
+			VideoTrack videoTrack) {
+		// TODO Auto-generated method stub
+		
+	}
+
 }
