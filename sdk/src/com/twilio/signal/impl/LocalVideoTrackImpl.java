@@ -43,16 +43,8 @@ public class LocalVideoTrackImpl extends VideoTrackImpl implements  LocalVideoTr
 		return false;
 	}
 	
-	@Override
-	void dispose() {
-		if (cameraCapturer != null) {
-			CameraCapturerImpl cameraCapturerImpl =
-					(CameraCapturerImpl)cameraCapturer;
-			cameraCapturerImpl.dispose();
-			cameraCapturer = null;
-		}
-		super.dispose();
+	void removeCameraCapturer() {
+		cameraCapturer = null;
 	}
-	
 	
 }

@@ -54,13 +54,6 @@ public class VideoTrackImpl implements VideoTrack {
 		return videoRenderers;
 	}
 	
-	void dispose() {
-		if (videoTrack != null) {
-			//videoTrack.dispose();
-			videoTrack = null;
-		}
-	}
-	
 	void invalidateRenderers() {
 		for (VideoRenderer renderer : new ArrayList<VideoRenderer>(videoRenderers) ) {
 			videoTrack.removeRenderer(createWebRtcVideoRenderer(renderer));

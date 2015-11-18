@@ -379,19 +379,16 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 		logger.i("onVideoTrackRemoved " + trackInfo.getParticipantAddress());
 		final TrackInfo info = trackInfo;
 		if (info.getTrackOrigin() == TrackOrigin.LOCAL) {
-			// localMedia.removeLocalVideoTrack(videoTrack);
 			LocalMediaImpl localMediaImpl = (LocalMediaImpl)localMedia;
 			final LocalVideoTrackImpl videoTrack =
 					localMediaImpl.removeLocalVideoTrack(trackInfo);
-			// TODO: change state
-			// TODO: invalidate capturer
+			videoTrack.removeCameraCapturer();
 			if(handler != null) {
 				handler.post(new Runnable() {
 					@Override
 					public void run() {
 						conversationListener.onLocalVideoRemoved(ConversationImpl.this, videoTrack);
 						videoTrack.invalidateRenderers();
-						videoTrack.dispose();
 					}
 				});
 			}
