@@ -18,6 +18,19 @@ public interface ConversationListener {
 	 */
 	void onDisconnectParticipant(Conversation conversation, Participant participant);
 	
+	/**
+	 * 
+	 * @param conversation
+	 * @param videoTrack
+	 */
+	void onLocalVideoAdded(Conversation conversation, VideoTrack videoTrack);
+	
+	/**
+	 * 
+	 * @param conversation
+	 * @param videoTrack
+	 */
+	void onLocalVideoRemoved(Conversation conversation, VideoTrack videoTrack);
 	
 	/**
 	 * 

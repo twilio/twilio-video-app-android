@@ -9,6 +9,7 @@ import android.view.ViewGroup;
 import com.twilio.signal.LocalMedia;
 import com.twilio.signal.LocalVideoTrack;
 import com.twilio.signal.VideoTrack;
+import com.twilio.signal.impl.core.TrackInfo;
 import com.twilio.signal.impl.logging.Logger;
 
 public class LocalMediaImpl implements LocalMedia {
@@ -73,7 +74,7 @@ public class LocalMediaImpl implements LocalMedia {
 			if ((convWeak != null) &&  (convWeak.get() != null) &&
 					(localVideoTrackImpl.getCameraCapturer() != null)) {
 				// LocalVideoTrack is added during conversation
-				convWeak.get().enableVideo(true, localVideoTrackImpl.getCameraCapturer());
+				convWeak.get().enableVideo(true, false);
 			}
 		} else {
 			throw new IllegalArgumentException("Only TwilioSDK LocalVideoTrack implementation is supported");
@@ -105,25 +106,22 @@ public class LocalMediaImpl implements LocalMedia {
 			return false;
 		}
 		LocalVideoTrackImpl videoTrackImpl = (LocalVideoTrackImpl)track;
-		logger.d("removeVideoTrack2");
-		ConversationImpl conv = convWeak.get();
-		logger.d("removeVideoTrack3");
-		if (conv == null) {
-			logger.d("removeVideoTrack4");
-			// TODO: throw exception? conversation might be done?
+		if (convWeak == null || convWeak.get() != null) {
+			// TODO: no conversation error
 		}
-		logger.d("removeVideoTrack5");
-		boolean success = conv.enableVideo(false, videoTrackImpl.getCameraCapturer());
-		logger.d("removeVideoTrack6");
-		videoTracksImpl.remove(videoTrackImpl);
-		videoTrackImpl.dispose();
-		videoTrackImpl = null;
+		ConversationImpl conv = convWeak.get();
+		return conv.enableVideo(false, false);
 		
-		logger.d("removeVideoTrack7");
-		// TODO: invalidate renderers
-		// TODO: change state ?
-		// TODO: destroy track
-		return success;
+	}
+	
+	LocalVideoTrackImpl removeLocalVideoTrack(TrackInfo trackInfo) {
+		for(LocalVideoTrackImpl videoTrackImpl : new ArrayList<LocalVideoTrackImpl>(videoTracksImpl)) {
+			if(trackInfo.getTrackId().equals(videoTrackImpl.getTrackInfo().getTrackId())) {
+				videoTracksImpl.remove(videoTrackImpl);
+				return videoTrackImpl;
+			}
+		}
+		return null;
 	}
 	
 	void setConversation(ConversationImpl conversation) {

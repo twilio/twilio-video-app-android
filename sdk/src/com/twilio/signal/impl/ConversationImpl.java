@@ -9,7 +9,6 @@ import java.util.Set;
 import android.os.Handler;
 import android.util.Log;
 
-import com.twilio.signal.CameraCapturer;
 import com.twilio.signal.Conversation;
 import com.twilio.signal.ConversationException;
 import com.twilio.signal.ConversationListener;
@@ -349,6 +348,15 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 							videoTrackImpl.addRenderer(localVideoRenderer);
 						}
 					});
+					if (handler != null) {
+						handler.post(new Runnable() {
+							@Override
+							public void run() {
+								conversationListener.onLocalVideoAdded(
+										ConversationImpl.this, videoTrackImpl);
+							}
+						});
+					}
 				}
 			}).start();
 		} else {
@@ -369,16 +377,39 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 	@Override
 	public void onVideoTrackRemoved(TrackInfo trackInfo) {
 		logger.i("onVideoTrackRemoved " + trackInfo.getParticipantAddress());
-		final ParticipantImpl participant = addParticipant(trackInfo.getParticipantAddress());
-		final VideoTrack videoTrack = participant.getMediaImpl().removeVideoTrack(trackInfo);
-		if(handler != null) {
-			handler.post(new Runnable() {
-				@Override
-				public void run() {
-					conversationListener.onVideoRemovedForParticipant(ConversationImpl.this, participant, videoTrack);
-				}
-			});
+		final TrackInfo info = trackInfo;
+		if (info.getTrackOrigin() == TrackOrigin.LOCAL) {
+			// localMedia.removeLocalVideoTrack(videoTrack);
+			LocalMediaImpl localMediaImpl = (LocalMediaImpl)localMedia;
+			final LocalVideoTrackImpl videoTrack =
+					localMediaImpl.removeLocalVideoTrack(trackInfo);
+			// TODO: change state
+			// TODO: invalidate capturer
+			if(handler != null) {
+				handler.post(new Runnable() {
+					@Override
+					public void run() {
+						conversationListener.onLocalVideoRemoved(ConversationImpl.this, videoTrack);
+						videoTrack.invalidateRenderers();
+						videoTrack.dispose();
+					}
+				});
+			}
+			
+		} else {
+			final ParticipantImpl participant = addParticipant(trackInfo.getParticipantAddress());
+			final VideoTrack videoTrack = participant.getMediaImpl().removeVideoTrack(trackInfo);
+			if(handler != null) {
+				handler.post(new Runnable() {
+					@Override
+					public void run() {
+						conversationListener.onVideoRemovedForParticipant(ConversationImpl.this, participant, videoTrack);
+					}
+				});
+			}
 		}
+		
+		
 	}
 
 	/**
@@ -407,15 +438,6 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 		checkDisposed();
 		localMedia = media;
 		((LocalMediaImpl)localMedia).setConversation(this);
-	}
-
-	boolean enableVideo(boolean enabled, CameraCapturer cameraCapturer) {
-		logger.d("enavleVideo");
-		LocalVideoTrack videoTrack = (LocalVideoTrack)localMedia.getVideoTracks().get(0);
-		//enableVideo(enabled, !videoTrack.isCameraEnabled());
-		enableVideo(enabled, false);
-		
-		return false;
 	}
 	
 	private Conversation.Status sessionStateToStatus(SessionState state) {
