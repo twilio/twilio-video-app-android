@@ -54,7 +54,7 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 		}
 
 		private native long wrapNativeObserver(SessionObserver sessionObserver, Conversation conversation);
-		//::TODO figure out when to call this - may be Endpoint.release() ??
+		
 		private native void freeNativeObserver(long nativeSessionObserver);
 
 		@Override
@@ -338,7 +338,7 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 					if (tracksList.size() == 0) {
 						// TODO: throw error to the user
 					}
-					final VideoTrackImpl videoTrackImpl = (VideoTrackImpl)tracksList.get(0);
+					final LocalVideoTrackImpl videoTrackImpl = (LocalVideoTrackImpl)tracksList.get(0);
 					videoTrackImpl.setWebrtcVideoTrack(webRtcVideoTrack);
 					videoTrackImpl.setTrackInfo(trackInfo);
 					localMedia.getContainerView().post(new Runnable() {
@@ -480,7 +480,7 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 	public void start() {
 		logger.d("starting call");
 	
-		// TODO: Call only when video is enabled 
+		// TODO: Call only when video is enabled
 		setupExternalCapturer();
 
 

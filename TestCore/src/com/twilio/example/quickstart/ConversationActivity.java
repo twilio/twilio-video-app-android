@@ -13,6 +13,7 @@ import com.twilio.signal.Conversation;
 import com.twilio.signal.Conversation.Status;
 import com.twilio.signal.ConversationException;
 import com.twilio.signal.ConversationListener;
+import com.twilio.signal.LocalVideoTrack;
 import com.twilio.signal.Participant;
 import com.twilio.signal.VideoRendererObserver;
 import com.twilio.signal.VideoTrack;
@@ -174,14 +175,14 @@ public class ConversationActivity extends Activity implements ConversationListen
 
 	@Override
 	public void onLocalVideoAdded(Conversation conversation,
-			VideoTrack videoTrack) {
+			LocalVideoTrack videoTrack) {
 		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
 	public void onLocalVideoRemoved(Conversation conversation,
-			VideoTrack videoTrack) {
+			LocalVideoTrack videoTrack) {
 		// TODO Auto-generated method stub
 		
 	}

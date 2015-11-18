@@ -21,12 +21,12 @@ public interface ConversationListener {
 	/**
 	 * 
 	 */
-	void onLocalVideoAdded(Conversation conversation, VideoTrack videoTrack);
+	void onLocalVideoAdded(Conversation conversation, LocalVideoTrack videoTrack);
 	
 	/**
 	 * 
 	 */
-	void onLocalVideoRemoved(Conversation conversation, VideoTrack videoTrack);
+	void onLocalVideoRemoved(Conversation conversation, LocalVideoTrack videoTrack);
 	
 	/**
 	 * 
