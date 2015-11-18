@@ -20,15 +20,11 @@ public interface ConversationListener {
 	
 	/**
 	 * 
-	 * @param conversation
-	 * @param videoTrack
 	 */
 	void onLocalVideoAdded(Conversation conversation, VideoTrack videoTrack);
 	
 	/**
 	 * 
-	 * @param conversation
-	 * @param videoTrack
 	 */
 	void onLocalVideoRemoved(Conversation conversation, VideoTrack videoTrack);
 	

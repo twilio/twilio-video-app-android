@@ -92,22 +92,20 @@ public class LocalMediaImpl implements LocalMedia {
 	}
 
 	@Override
-	public boolean removeLocalVideoTrack(LocalVideoTrack track) {
+	public boolean removeLocalVideoTrack(LocalVideoTrack track) throws IllegalArgumentException{
 		if (!(track instanceof LocalVideoTrackImpl)) {
-			// TODO: return error
-			return false;
+			throw new IllegalArgumentException("Only TwilioSDK LocalVideoTrack implementation is supported");
 		}
 		if (videoTracksImpl.size() == 0) {
-			// TODO: return error
+			logger.d("LocalVideoTracks list is empty");
 			return false;
 		} else if (!videoTracksImpl.contains(track)) {
-			// We only have 1 local video track for now
-			// TODO: return error
+			logger.d("LocalVideoTrack is not found!");
 			return false;
 		}
-		LocalVideoTrackImpl videoTrackImpl = (LocalVideoTrackImpl)track;
-		if (convWeak == null || convWeak.get() != null) {
-			// TODO: no conversation error
+		if (convWeak == null || convWeak.get() == null) {
+			logger.d("Conversation is null");
+			return false;
 		}
 		ConversationImpl conv = convWeak.get();
 		return conv.enableVideo(false, false);
