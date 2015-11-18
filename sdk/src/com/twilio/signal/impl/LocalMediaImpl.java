@@ -50,6 +50,8 @@ public class LocalMediaImpl implements LocalMedia {
 	public void mute(boolean on) {
 		if (convWeak != null && convWeak.get() != null) {
 			convWeak.get().mute(on);
+		} else {
+			// TODO: throw exception
 		}
 	}
 
@@ -58,6 +60,10 @@ public class LocalMediaImpl implements LocalMedia {
 	 */
 	@Override
 	public boolean isMuted() {
+		if (convWeak != null && convWeak.get() != null) {
+			return convWeak.get().isMuted();
+		}
+		// TODO: throw exception
 		return false;
 	}
 

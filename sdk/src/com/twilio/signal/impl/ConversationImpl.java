@@ -502,6 +502,10 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 		return mute(getNativeHandle(), on);
 	}
 	
+	boolean isMuted() {
+		return isMuted(getNativeHandle());
+	}
+	
 
 	@Override
 	public boolean enableVideo(boolean enabled, boolean paused) {
@@ -525,6 +529,7 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 	private native void freeNativeHandle(long nativeHandle);
 	private native boolean enableVideo(long nativeHandle, boolean enabled, boolean paused);
 	private native boolean mute(long nativeSession, boolean on);
+	private native boolean isMuted(long nativeSession);
 
 	
 

@@ -32,6 +32,9 @@ JNIEXPORT jboolean JNICALL Java_com_twilio_signal_impl_ConversationImpl_enableVi
 JNIEXPORT jboolean JNICALL Java_com_twilio_signal_impl_ConversationImpl_mute
   (JNIEnv *, jobject, jlong, jboolean);
 
+JNIEXPORT jboolean JNICALL Java_com_twilio_signal_impl_ConversationImpl_isMuted
+  (JNIEnv *, jobject, jlong);
+
 
 #ifdef __cplusplus
 }

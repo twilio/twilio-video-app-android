@@ -131,3 +131,15 @@ JNIEXPORT jboolean JNICALL Java_com_twilio_signal_impl_ConversationImpl_mute
 	return JNI_FALSE;
 }
 
+JNIEXPORT jboolean JNICALL Java_com_twilio_signal_impl_ConversationImpl_isMuted
+  (JNIEnv *, jobject, jlong nativeSession)
+{
+	TS_CORE_LOG_DEBUG("isMuted");
+	TSCSessionObject* session = reinterpret_cast<TSCSessionObject*>(nativeSession);
+	TSCAudioInputControllerPtr audioInputCtrl = session->getAudioInputController();
+	if (audioInputCtrl != nullptr) {
+		return audioInputCtrl->isMuted() ? JNI_TRUE : JNI_FALSE;
+	}
+	return JNI_FALSE;
+}
+
