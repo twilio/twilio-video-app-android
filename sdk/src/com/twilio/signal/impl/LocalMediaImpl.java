@@ -48,7 +48,9 @@ public class LocalMediaImpl implements LocalMedia {
 	 */
 	@Override
 	public void mute(boolean on) {
-		
+		if (convWeak != null && convWeak.get() != null) {
+			convWeak.get().mute(on);
+		}
 	}
 
 	/* (non-Javadoc)

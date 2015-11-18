@@ -8,6 +8,7 @@
 #include "TSCVideoCaptureController.h"
 #include "TSCSession.h"
 #include "TSCParticipant.h"
+#include "TSCAudioInputController.h"
 
 #include <string>
 #include <map>
@@ -116,5 +117,17 @@ JNIEXPORT void JNICALL Java_com_twilio_signal_impl_ConversationImpl_freeNativeHa
 {
 	// NOTE: The core destroys the Session once it has stopped.
 	// We do not need to call Release() in this case.
+}
+
+JNIEXPORT jboolean JNICALL Java_com_twilio_signal_impl_ConversationImpl_mute
+  (JNIEnv *, jobject, jlong nativeSession, jboolean on)
+{
+	TS_CORE_LOG_DEBUG("mute");
+	TSCSessionObject* session = reinterpret_cast<TSCSessionObject*>(nativeSession);
+	TSCAudioInputControllerPtr audioInputCtrl = session->getAudioInputController();
+	if (audioInputCtrl != nullptr) {
+		return audioInputCtrl->setMuted(on) ? JNI_TRUE : JNI_FALSE;
+	}
+	return JNI_FALSE;
 }
 
