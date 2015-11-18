@@ -10,6 +10,7 @@ import com.twilio.signal.Endpoint;
 import com.twilio.signal.EndpointListener;
 import com.twilio.signal.Invite;
 import com.twilio.signal.LocalMedia;
+import com.twilio.signal.LocalVideoTrack;
 import com.twilio.signal.MediaFactory;
 import com.twilio.signal.Participant;
 import com.twilio.signal.TwilioRTC;
@@ -128,12 +129,12 @@ public class EndpointLifecycleTests {
             }
 
             @Override
-            public void onLocalVideoAdded(Conversation conversation, VideoTrack videoTrack) {
+            public void onLocalVideoAdded(Conversation conversation, LocalVideoTrack videoTrack) {
                 
             }
 
             @Override
-            public void onLocalVideoRemoved(Conversation conversation, VideoTrack videoTrack) {
+            public void onLocalVideoRemoved(Conversation conversation, LocalVideoTrack videoTrack) {
 
             }
 
