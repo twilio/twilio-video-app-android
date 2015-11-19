@@ -172,7 +172,11 @@ public class CameraCapturerImpl implements CameraCapturer {
 	long getNativeVideoCapturer()  {
 		return nativeVideoCapturerAndroid;
 	}
-	
+
+	void resetNativeVideoCapturer() {
+		nativeVideoCapturerAndroid = 0;
+	}
+
 	private long retrieveNativeVideoCapturerAndroid(VideoCapturerAndroid videoCapturerAndroid) {
 		// Use reflection to retrieve the native video capturer handle
 		long nativeHandle = 0;

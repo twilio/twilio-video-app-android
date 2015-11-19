@@ -6,9 +6,12 @@ import java.util.List;
 
 import android.view.ViewGroup;
 
+import com.twilio.signal.CameraCapturer;
 import com.twilio.signal.LocalMedia;
 import com.twilio.signal.LocalVideoTrack;
 import com.twilio.signal.VideoTrack;
+import com.twilio.signal.impl.CameraCapturerImpl;
+import com.twilio.signal.impl.LocalVideoTrackImpl;
 import com.twilio.signal.impl.core.TrackInfo;
 import com.twilio.signal.impl.logging.Logger;
 
@@ -74,14 +77,20 @@ public class LocalMediaImpl implements LocalMedia {
 			} else {
 				throw new UnsupportedOperationException("Maximum size " + MAX_LOCAL_VIDEO_TRACKS + " of LocalVideoTracks reached.");
 			}
-			if ((convWeak != null) &&  (convWeak.get() != null) &&
-					(localVideoTrackImpl.getCameraCapturer() != null)) {
+			if ((convWeak != null) &&  (convWeak.get() != null) && (localVideoTrackImpl.getCameraCapturer() != null)) {
 				// LocalVideoTrack is added during conversation
 				// TODO: we should use localVideoTrackImpl.isCameraEnabled() as second param here,
 				// it is hard coded as false for now until we resolve issue with CameraCapturer starting in disabled mode.
 				// This leaves responsibility to a user to unpause the capturer, which user doesn't have to do
 				// during initial creation. This is inconsistent behavior and it should be more investigated.
-				convWeak.get().enableVideo(true, false);
+				CameraCapturerImpl cameraCapturerImpl = (CameraCapturerImpl)localVideoTrackImpl.getCameraCapturer();
+				long nativeVideoCapturer = cameraCapturerImpl.getNativeVideoCapturer();
+				if(nativeVideoCapturer == 0) {
+					logger.d("Create a new external capturer since the nativeVideoCapturer is no longer valid");
+					convWeak.get().setupExternalCapturer();
+				}
+				boolean enabledVideo = convWeak.get().enableVideo(true, false);
+				// TODO: return enableVideo if true
 			}
 		} else {
 			throw new IllegalArgumentException("Only TwilioSDK LocalVideoTrack implementation is supported");
@@ -116,7 +125,6 @@ public class LocalMediaImpl implements LocalMedia {
 		}
 		ConversationImpl conv = convWeak.get();
 		return conv.enableVideo(false, false);
-		
 	}
 	
 	LocalVideoTrackImpl removeLocalVideoTrack(TrackInfo trackInfo) {
