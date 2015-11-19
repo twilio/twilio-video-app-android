@@ -23,18 +23,4 @@ public interface LocalVideoTrack extends VideoTrack {
 	 */
 	public boolean isCameraEnabled();
 
-	/**
-	 * Specifies whether or not your local video should be paused
-	 *
-	 * @param paused <code>true</code> if local video should be paused, false otherwise
-	 */
-	public void pauseVideo(boolean paused);
-
-	/**
-	 * Indicates whether your local video is paused.
-	 *
-	 * @return <code>true</code> if local video is paused, false otherwise
-	 */
-	public boolean isPaused();
-
 }

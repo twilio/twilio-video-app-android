@@ -19,6 +19,13 @@ public interface LocalMedia extends Media {
 	 * @param track
 	 */
 	public void addLocalVideoTrack(LocalVideoTrack track);
+	
+	/**
+	 * Remove local video track from list of tracks.
+	 * 
+	 * @param track
+	 */
+	public boolean removeLocalVideoTrack(LocalVideoTrack track);
 
 	/** Get local video view container. */
 	public ViewGroup getContainerView();

@@ -26,6 +26,10 @@ JNIEXPORT void JNICALL Java_com_twilio_signal_impl_ConversationImpl_setSessionOb
 JNIEXPORT void JNICALL Java_com_twilio_signal_impl_ConversationImpl_freeNativeHandle
   (JNIEnv *, jobject, jlong);
 
+JNIEXPORT jboolean JNICALL Java_com_twilio_signal_impl_ConversationImpl_enableVideo
+  (JNIEnv *, jobject, jlong, jboolean, jboolean);
+
+
 
 #ifdef __cplusplus
 }

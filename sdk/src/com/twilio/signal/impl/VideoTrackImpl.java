@@ -1,7 +1,9 @@
 package com.twilio.signal.impl;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import com.twilio.signal.I420Frame;
 import com.twilio.signal.VideoRenderer;
@@ -12,7 +14,9 @@ public class VideoTrackImpl implements VideoTrack {
 
 	private org.webrtc.VideoTrack videoTrack;
 	private TrackInfo trackInfo;
-	private List<VideoRenderer> videoRenderers = new ArrayList<VideoRenderer>();
+	private Map<VideoRenderer, org.webrtc.VideoRenderer> videoRenderersMap =
+			new HashMap<VideoRenderer, org.webrtc.VideoRenderer>();
+	
 
 	VideoTrackImpl() {}
 	
@@ -39,23 +43,37 @@ public class VideoTrackImpl implements VideoTrack {
 
 	@Override
 	public void addRenderer(VideoRenderer videoRenderer) {
-		videoRenderers.add(videoRenderer);
-		videoTrack.addRenderer(createWebRtcVideoRenderer(videoRenderer));
+		org.webrtc.VideoRenderer webrtcVideoRenderer =
+				createWebRtcVideoRenderer(videoRenderer);
+		videoRenderersMap.put(videoRenderer, webrtcVideoRenderer);
+		videoTrack.addRenderer(webrtcVideoRenderer);
 	}
 
 	@Override
 	public void removeRenderer(VideoRenderer videoRenderer) {
-		videoRenderers.remove(videoRenderer);
-		videoTrack.removeRenderer(createWebRtcVideoRenderer(videoRenderer));
+		org.webrtc.VideoRenderer webrtcVideoRenderer =
+				videoRenderersMap.remove(videoRenderer);
+		if (webrtcVideoRenderer != null) {
+			videoTrack.removeRenderer(webrtcVideoRenderer);
+		}
 	}
 
 	@Override
 	public List<VideoRenderer> getRenderers() {
-		return videoRenderers;
+		return new ArrayList<VideoRenderer>(videoRenderersMap.keySet());
 	}
 	
+	void invalidateRenderers() {
+		for (VideoRenderer renderer : new ArrayList<VideoRenderer>(videoRenderersMap.keySet()) ) {
+			org.webrtc.VideoRenderer webrtcVideoRenderer =
+					videoRenderersMap.remove(renderer);
+			if (webrtcVideoRenderer != null) {
+				videoTrack.removeRenderer(webrtcVideoRenderer);
+			}
+		}
+		videoRenderersMap.clear();
+	}
 	
-
 	private org.webrtc.VideoRenderer createWebRtcVideoRenderer(VideoRenderer videoRenderer) {
 		return new org.webrtc.VideoRenderer(new VideoRendererCallbackAdapter(videoRenderer));
 	}

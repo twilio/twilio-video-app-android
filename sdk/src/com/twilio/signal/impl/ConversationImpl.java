@@ -54,7 +54,7 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 		}
 
 		private native long wrapNativeObserver(SessionObserver sessionObserver, Conversation conversation);
-		//::TODO figure out when to call this - may be Endpoint.release() ??
+		
 		private native void freeNativeObserver(long nativeSessionObserver);
 
 		@Override
@@ -89,6 +89,8 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 		handler = CallbackHandler.create();
 
 		this.localMedia = localMedia;
+		((LocalMediaImpl)localMedia).setConversation(this);
+		
 		this.conversationListener = conversationListener;
 
 		sessionObserverInternal = new SessionObserverInternal(this, this);
@@ -336,7 +338,7 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 					if (tracksList.size() == 0) {
 						// TODO: throw error to the user
 					}
-					final VideoTrackImpl videoTrackImpl = (VideoTrackImpl)tracksList.get(0);
+					final LocalVideoTrackImpl videoTrackImpl = (LocalVideoTrackImpl)tracksList.get(0);
 					videoTrackImpl.setWebrtcVideoTrack(webRtcVideoTrack);
 					videoTrackImpl.setTrackInfo(trackInfo);
 					localMedia.getContainerView().post(new Runnable() {
@@ -346,6 +348,17 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 							videoTrackImpl.addRenderer(localVideoRenderer);
 						}
 					});
+					if (handler != null) {
+						handler.post(new Runnable() {
+							@Override
+							public void run() {
+								if (conversationListener != null) {
+									conversationListener.onLocalVideoAdded(
+											ConversationImpl.this, videoTrackImpl);
+								}
+							}
+						});
+					}
 				}
 			}).start();
 		} else {
@@ -356,7 +369,10 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 				handler.post(new Runnable() {
 					@Override
 					public void run() {
-						conversationListener.onVideoAddedForParticipant(ConversationImpl.this, participant, videoTrackImpl);
+						if (conversationListener != null) {
+							conversationListener.onVideoAddedForParticipant(
+									ConversationImpl.this, participant, videoTrackImpl);
+						}
 					}
 				});
 			}
@@ -366,16 +382,36 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 	@Override
 	public void onVideoTrackRemoved(TrackInfo trackInfo) {
 		logger.i("onVideoTrackRemoved " + trackInfo.getParticipantAddress());
-		final ParticipantImpl participant = addParticipant(trackInfo.getParticipantAddress());
-		final VideoTrack videoTrack = participant.getMediaImpl().removeVideoTrack(trackInfo);
-		if(handler != null) {
-			handler.post(new Runnable() {
-				@Override
-				public void run() {
-					conversationListener.onVideoRemovedForParticipant(ConversationImpl.this, participant, videoTrack);
-				}
-			});
+		final TrackInfo info = trackInfo;
+		if (info.getTrackOrigin() == TrackOrigin.LOCAL) {
+			LocalMediaImpl localMediaImpl = (LocalMediaImpl)localMedia;
+			final LocalVideoTrackImpl videoTrack =
+					localMediaImpl.removeLocalVideoTrack(trackInfo);
+			videoTrack.removeCameraCapturer();
+			if(handler != null) {
+				handler.post(new Runnable() {
+					@Override
+					public void run() {
+						conversationListener.onLocalVideoRemoved(ConversationImpl.this, videoTrack);
+						videoTrack.invalidateRenderers();
+					}
+				});
+			}
+			
+		} else {
+			final ParticipantImpl participant = addParticipant(trackInfo.getParticipantAddress());
+			final VideoTrack videoTrack = participant.getMediaImpl().removeVideoTrack(trackInfo);
+			if(handler != null) {
+				handler.post(new Runnable() {
+					@Override
+					public void run() {
+						conversationListener.onVideoRemovedForParticipant(ConversationImpl.this, participant, videoTrack);
+					}
+				});
+			}
 		}
+		
+		
 	}
 
 	/**
@@ -403,6 +439,7 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 	public void setLocalMedia(LocalMedia media) {
 		checkDisposed();
 		localMedia = media;
+		((LocalMediaImpl)localMedia).setConversation(this);
 	}
 	
 	private Conversation.Status sessionStateToStatus(SessionState state) {
@@ -448,7 +485,7 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 	public void start() {
 		logger.d("starting call");
 	
-		// TODO: Call only when video is enabled 
+		// TODO: Call only when video is enabled
 		setupExternalCapturer();
 
 
@@ -460,6 +497,12 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 	public void stop() {
 		stop(getNativeHandle());
 		
+	}
+	
+
+	@Override
+	public boolean enableVideo(boolean enabled, boolean paused) {
+		return enableVideo(getNativeHandle(), enabled, paused);
 	}
 	
 	private synchronized void checkDisposed() {
@@ -477,6 +520,8 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 	private native void stop(long nativeSession);
 	private native void setSessionObserver(long nativeSession, long nativeSessionObserver);
 	private native void freeNativeHandle(long nativeHandle);
+	private native boolean enableVideo(long nativeHandle, boolean enabled, boolean paused);
+
 
 	
 

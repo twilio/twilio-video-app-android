@@ -1,20 +1,18 @@
 package com.twilio.signal.impl;
 
-import java.lang.reflect.Field;
 import java.io.IOException;
+import java.lang.reflect.Field;
 
 import org.webrtc.VideoCapturerAndroid;
 import org.webrtc.VideoCapturerAndroid.CameraErrorHandler;
-import org.webrtc.videoengine.VideoCaptureAndroid;
 
-import android.view.View;
-import android.view.ViewGroup;
 import android.content.Context;
 import android.hardware.Camera;
 import android.view.Display;
 import android.view.Surface;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
+import android.view.ViewGroup;
 import android.view.WindowManager;
 
 import com.twilio.signal.CameraCapturer;
@@ -174,7 +172,11 @@ public class CameraCapturerImpl implements CameraCapturer {
 	long getNativeVideoCapturer()  {
 		return nativeVideoCapturerAndroid;
 	}
-	
+
+	void resetNativeVideoCapturer() {
+		nativeVideoCapturerAndroid = 0;
+	}
+
 	private long retrieveNativeVideoCapturerAndroid(VideoCapturerAndroid videoCapturerAndroid) {
 		// Use reflection to retrieve the native video capturer handle
 		long nativeHandle = 0;
@@ -204,6 +206,7 @@ public class CameraCapturerImpl implements CameraCapturer {
 		nativeVideoCapturerAndroid = retrieveNativeVideoCapturerAndroid(videoCapturerAndroid);
 	}
 	
+	
 	private CameraErrorHandler cameraErrorHandler = new CameraErrorHandler() {
 
 		@Override
@@ -231,6 +234,7 @@ public class CameraCapturerImpl implements CameraCapturer {
 			holder.addCallback(this);
 		}
 
+		@Override
 		public void surfaceCreated(SurfaceHolder holder) {
 			try {
 				if (camera != null) {
@@ -245,6 +249,7 @@ public class CameraCapturerImpl implements CameraCapturer {
 			}
 		}
 
+		@Override
 		public void surfaceDestroyed(SurfaceHolder holder) {
 			if(camera != null) {
 				camera.stopPreview();
@@ -259,6 +264,7 @@ public class CameraCapturerImpl implements CameraCapturer {
 			}
 		}
 
+		@Override
 		public void surfaceChanged(SurfaceHolder holder, int format, int w, int h) {
 			if (this.holder.getSurface() == null) {
 				return;
