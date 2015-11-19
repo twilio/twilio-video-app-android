@@ -44,6 +44,7 @@ public class LocalVideoTrackImpl extends VideoTrackImpl implements  LocalVideoTr
 	}
 	
 	void removeCameraCapturer() {
+		((CameraCapturerImpl)cameraCapturer).resetNativeVideoCapturer();
 		cameraCapturer = null;
 	}
 	
