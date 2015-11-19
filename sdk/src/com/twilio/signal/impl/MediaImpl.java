@@ -17,6 +17,9 @@ public class MediaImpl implements Media {
 	}
 
 	public void addVideoTrack(VideoTrackImpl videoTrackImpl) {
+		if (videoTrackImpl == null) {
+			throw new NullPointerException("VideoTrack can't be null");
+		}
 		videoTracksImpl.add(videoTrackImpl);
 	}
 

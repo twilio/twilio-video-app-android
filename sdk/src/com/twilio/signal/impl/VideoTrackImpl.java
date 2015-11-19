@@ -1,7 +1,9 @@
 package com.twilio.signal.impl;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import com.twilio.signal.I420Frame;
 import com.twilio.signal.VideoRenderer;
@@ -13,6 +15,9 @@ public class VideoTrackImpl implements VideoTrack {
 	private org.webrtc.VideoTrack videoTrack;
 	private TrackInfo trackInfo;
 	private List<VideoRenderer> videoRenderers = new ArrayList<VideoRenderer>();
+	private Map<Integer, org.webrtc.VideoRenderer> webrtcVideoRenderers =
+			new HashMap<Integer, org.webrtc.VideoRenderer>();
+	
 
 	VideoTrackImpl() {}
 	
@@ -40,13 +45,20 @@ public class VideoTrackImpl implements VideoTrack {
 	@Override
 	public void addRenderer(VideoRenderer videoRenderer) {
 		videoRenderers.add(videoRenderer);
-		videoTrack.addRenderer(createWebRtcVideoRenderer(videoRenderer));
+		org.webrtc.VideoRenderer webrtcVideoRenderer =
+				createWebRtcVideoRenderer(videoRenderer);
+		webrtcVideoRenderers.put(videoRenderer.hashCode(), webrtcVideoRenderer);
+		videoTrack.addRenderer(webrtcVideoRenderer);
 	}
 
 	@Override
 	public void removeRenderer(VideoRenderer videoRenderer) {
 		videoRenderers.remove(videoRenderer);
-		videoTrack.removeRenderer(createWebRtcVideoRenderer(videoRenderer));
+		org.webrtc.VideoRenderer webrtcVideoRenderer =
+				webrtcVideoRenderers.remove(videoRenderer.hashCode());
+		if (webrtcVideoRenderer != null) {
+			videoTrack.removeRenderer(webrtcVideoRenderer);
+		}
 	}
 
 	@Override
@@ -57,6 +69,11 @@ public class VideoTrackImpl implements VideoTrack {
 	void invalidateRenderers() {
 		for (VideoRenderer renderer : new ArrayList<VideoRenderer>(videoRenderers) ) {
 			videoTrack.removeRenderer(createWebRtcVideoRenderer(renderer));
+			org.webrtc.VideoRenderer webrtcVideoRenderer =
+					webrtcVideoRenderers.remove(renderer.hashCode());
+			if (webrtcVideoRenderer != null) {
+				videoTrack.removeRenderer(webrtcVideoRenderer);
+			}
 		}
 		videoRenderers.clear();
 	}

@@ -64,6 +64,9 @@ public class LocalMediaImpl implements LocalMedia {
 	@Override
 	public void addLocalVideoTrack(LocalVideoTrack track)
 			throws IllegalArgumentException, UnsupportedOperationException {
+		if (track == null) {
+			throw new NullPointerException("LocalVideoTrack can't be null");
+		}
 		if (track instanceof LocalVideoTrackImpl) {
 			LocalVideoTrackImpl localVideoTrackImpl = (LocalVideoTrackImpl)track;
 			if (videoTracksImpl.size() < MAX_LOCAL_VIDEO_TRACKS) {
