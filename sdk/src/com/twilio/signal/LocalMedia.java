@@ -37,8 +37,9 @@ public interface LocalMedia extends Media {
 	 * Specifies whether or not your local audio should be muted
 	 *
 	 * @param on <code>true</code> if local audio should be muted, false otherwise
+	 * @return <code>true</code> if mute operation is successful
 	 */
-	public void mute(boolean on);
+	public boolean mute(boolean on);
 
 	/**
 	 * Indicates whether your local audio is muted.
