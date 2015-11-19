@@ -74,6 +74,10 @@ public class LocalMediaImpl implements LocalMedia {
 			if ((convWeak != null) &&  (convWeak.get() != null) &&
 					(localVideoTrackImpl.getCameraCapturer() != null)) {
 				// LocalVideoTrack is added during conversation
+				// TODO: we should use localVideoTrackImpl.isCameraEnabled() as second param here,
+				// it is hard coded as false for now until we resolve issue with CameraCapturer starting in disabled mode.
+				// This leaves responsibility to a user to unpause the capturer, which user doesn't have to do
+				// during initial creation. This is inconsistent behavior and it should be more investigated.
 				convWeak.get().enableVideo(true, false);
 			}
 		} else {

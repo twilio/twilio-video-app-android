@@ -352,8 +352,10 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 						handler.post(new Runnable() {
 							@Override
 							public void run() {
-								conversationListener.onLocalVideoAdded(
-										ConversationImpl.this, videoTrackImpl);
+								if (conversationListener != null) {
+									conversationListener.onLocalVideoAdded(
+											ConversationImpl.this, videoTrackImpl);
+								}
 							}
 						});
 					}
@@ -367,7 +369,10 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 				handler.post(new Runnable() {
 					@Override
 					public void run() {
-						conversationListener.onVideoAddedForParticipant(ConversationImpl.this, participant, videoTrackImpl);
+						if (conversationListener != null) {
+							conversationListener.onVideoAddedForParticipant(
+									ConversationImpl.this, participant, videoTrackImpl);
+						}
 					}
 				});
 			}
