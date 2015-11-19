@@ -14,9 +14,8 @@ public class VideoTrackImpl implements VideoTrack {
 
 	private org.webrtc.VideoTrack videoTrack;
 	private TrackInfo trackInfo;
-	private List<VideoRenderer> videoRenderers = new ArrayList<VideoRenderer>();
-	private Map<Integer, org.webrtc.VideoRenderer> webrtcVideoRenderers =
-			new HashMap<Integer, org.webrtc.VideoRenderer>();
+	private Map<VideoRenderer, org.webrtc.VideoRenderer> videoRenderersMap =
+			new HashMap<VideoRenderer, org.webrtc.VideoRenderer>();
 	
 
 	VideoTrackImpl() {}
@@ -44,18 +43,16 @@ public class VideoTrackImpl implements VideoTrack {
 
 	@Override
 	public void addRenderer(VideoRenderer videoRenderer) {
-		videoRenderers.add(videoRenderer);
 		org.webrtc.VideoRenderer webrtcVideoRenderer =
 				createWebRtcVideoRenderer(videoRenderer);
-		webrtcVideoRenderers.put(videoRenderer.hashCode(), webrtcVideoRenderer);
+		videoRenderersMap.put(videoRenderer, webrtcVideoRenderer);
 		videoTrack.addRenderer(webrtcVideoRenderer);
 	}
 
 	@Override
 	public void removeRenderer(VideoRenderer videoRenderer) {
-		videoRenderers.remove(videoRenderer);
 		org.webrtc.VideoRenderer webrtcVideoRenderer =
-				webrtcVideoRenderers.remove(videoRenderer.hashCode());
+				videoRenderersMap.remove(videoRenderer);
 		if (webrtcVideoRenderer != null) {
 			videoTrack.removeRenderer(webrtcVideoRenderer);
 		}
@@ -63,19 +60,18 @@ public class VideoTrackImpl implements VideoTrack {
 
 	@Override
 	public List<VideoRenderer> getRenderers() {
-		return videoRenderers;
+		return new ArrayList<VideoRenderer>(videoRenderersMap.keySet());
 	}
 	
 	void invalidateRenderers() {
-		for (VideoRenderer renderer : new ArrayList<VideoRenderer>(videoRenderers) ) {
-			videoTrack.removeRenderer(createWebRtcVideoRenderer(renderer));
+		for (VideoRenderer renderer : new ArrayList<VideoRenderer>(videoRenderersMap.keySet()) ) {
 			org.webrtc.VideoRenderer webrtcVideoRenderer =
-					webrtcVideoRenderers.remove(renderer.hashCode());
+					videoRenderersMap.remove(renderer);
 			if (webrtcVideoRenderer != null) {
 				videoTrack.removeRenderer(webrtcVideoRenderer);
 			}
 		}
-		videoRenderers.clear();
+		videoRenderersMap.clear();
 	}
 	
 	private org.webrtc.VideoRenderer createWebRtcVideoRenderer(VideoRenderer videoRenderer) {
