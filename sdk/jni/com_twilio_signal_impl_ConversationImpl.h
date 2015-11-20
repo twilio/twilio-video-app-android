@@ -29,6 +29,11 @@ JNIEXPORT void JNICALL Java_com_twilio_signal_impl_ConversationImpl_freeNativeHa
 JNIEXPORT jboolean JNICALL Java_com_twilio_signal_impl_ConversationImpl_enableVideo
   (JNIEnv *, jobject, jlong, jboolean, jboolean);
 
+JNIEXPORT jboolean JNICALL Java_com_twilio_signal_impl_ConversationImpl_mute
+  (JNIEnv *, jobject, jlong, jboolean);
+
+JNIEXPORT jboolean JNICALL Java_com_twilio_signal_impl_ConversationImpl_isMuted
+  (JNIEnv *, jobject, jlong);
 
 
 #ifdef __cplusplus

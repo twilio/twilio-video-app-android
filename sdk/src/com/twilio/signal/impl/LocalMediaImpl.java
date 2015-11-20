@@ -6,12 +6,9 @@ import java.util.List;
 
 import android.view.ViewGroup;
 
-import com.twilio.signal.CameraCapturer;
 import com.twilio.signal.LocalMedia;
 import com.twilio.signal.LocalVideoTrack;
 import com.twilio.signal.VideoTrack;
-import com.twilio.signal.impl.CameraCapturerImpl;
-import com.twilio.signal.impl.LocalVideoTrackImpl;
 import com.twilio.signal.impl.core.TrackInfo;
 import com.twilio.signal.impl.logging.Logger;
 
@@ -47,8 +44,12 @@ public class LocalMediaImpl implements LocalMedia {
 	 * @see com.twilio.signal.LocalMedia#mute(boolean)
 	 */
 	@Override
-	public void mute(boolean on) {
-		
+	public boolean mute(boolean on) {
+		if (convWeak != null && convWeak.get() != null) {
+			return convWeak.get().mute(on);
+		} else {
+			throw new UnsupportedOperationException("There is no active conversation to mute!");
+		}
 	}
 
 	/* (non-Javadoc)
@@ -56,7 +57,11 @@ public class LocalMediaImpl implements LocalMedia {
 	 */
 	@Override
 	public boolean isMuted() {
-		return false;
+		if (convWeak != null && convWeak.get() != null) {
+			return convWeak.get().isMuted();
+		} else {
+			throw new UnsupportedOperationException("There is no active conversation!");
+		}
 	}
 
 	@Override
