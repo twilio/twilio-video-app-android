@@ -1,4 +1,4 @@
-package com.twilio.rtc.conversations.sdktests;
+package com.twilio.rtc.conversations.sdktests.utils;
 
 import android.content.Context;
 
@@ -10,7 +10,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * Common tools used in tests
  */
-public class TestTools {
+public class TwilioRTCUtils {
 
     /*
      * TwilioRTC is a singleton and can only be initialized once. As a result we must track
@@ -72,7 +72,7 @@ public class TestTools {
     public static void wait(CountDownLatch wait, int timeout, TimeUnit timeUnit) {
         try {
             if (!wait.await(timeout, timeUnit)) {
-                org.junit.Assert.fail("timed out after" + TIMEOUT);
+                org.junit.Assert.fail("timed out after " + TIMEOUT);
             }
         } catch (InterruptedException e) {
             org.junit.Assert.fail("Thread interrupted");
