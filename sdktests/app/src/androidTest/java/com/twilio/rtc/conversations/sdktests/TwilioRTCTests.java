@@ -7,6 +7,7 @@ import org.junit.runner.RunWith;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
 
+import com.twilio.rtc.conversations.sdktests.utils.TwilioRTCUtils;
 import com.twilio.signal.ConversationException;
 import com.twilio.signal.Endpoint;
 import com.twilio.signal.EndpointListener;
@@ -28,24 +29,24 @@ public class TwilioRTCTests {
 
     @Test
     public void testTwilioInitialize() {
-        TestTools.initializeTwilioSDK(mActivityRule.getActivity().getApplicationContext());
+        TwilioRTCUtils.initializeTwilioSDK(mActivityRule.getActivity().getApplicationContext());
     }
 
     @Test
     public void testTwilioInitializeRepeatedly() {
         int attempts = 10;
-        final CountDownLatch initLatch = TestTools.isInitialized() ? new CountDownLatch(0) : new CountDownLatch(1);
-        final CountDownLatch errorLatch = TestTools.isInitialized() ? new CountDownLatch(attempts) : new CountDownLatch(attempts - 1);
+        final CountDownLatch initLatch = TwilioRTCUtils.isInitialized() ? new CountDownLatch(0) : new CountDownLatch(1);
+        final CountDownLatch errorLatch = TwilioRTCUtils.isInitialized() ? new CountDownLatch(attempts) : new CountDownLatch(attempts - 1);
 
         for(int i = 0; i < attempts; i++) {
-            TwilioRTC.initialize(mActivityRule.getActivity().getApplicationContext(), TestTools.countDownInitListenerCallback(initLatch, errorLatch));
+            TwilioRTC.initialize(mActivityRule.getActivity().getApplicationContext(), TwilioRTCUtils.countDownInitListenerCallback(initLatch, errorLatch));
         }
 
         try {
-            initLatch.await(TestTools.TIMEOUT, TimeUnit.SECONDS);
-            errorLatch.await(TestTools.TIMEOUT, TimeUnit.SECONDS);
+            initLatch.await(TwilioRTCUtils.TIMEOUT, TimeUnit.SECONDS);
+            errorLatch.await(TwilioRTCUtils.TIMEOUT, TimeUnit.SECONDS);
         } catch (InterruptedException e) {
-            org.junit.Assert.fail("test timed out after" + TestTools.TIMEOUT);
+            org.junit.Assert.fail("test timed out after" + TwilioRTCUtils.TIMEOUT);
         }
 
     }
@@ -54,7 +55,7 @@ public class TwilioRTCTests {
 
     @Test
     public void testTwilioCreateEndpointWithNullParams() {
-        TestTools.initializeTwilioSDK(mActivityRule.getActivity());
+        TwilioRTCUtils.initializeTwilioSDK(mActivityRule.getActivity());
 
         boolean npeSeen = false;
 
@@ -98,7 +99,7 @@ public class TwilioRTCTests {
 
     @Test
     public void testTwilioCreateEndpointWithToken() {
-        TestTools.initializeTwilioSDK(mActivityRule.getActivity());
+        TwilioRTCUtils.initializeTwilioSDK(mActivityRule.getActivity());
 
         CountDownLatch waitLatch = new CountDownLatch(1);
         Endpoint endpoint = TwilioRTC.createEndpoint("DEADBEEF", endpointListener());
@@ -109,7 +110,7 @@ public class TwilioRTCTests {
 
     @Test
     public void testTwilioCreateEndpointWithTokenAndEmptyOptionsMap() {
-        TestTools.initializeTwilioSDK(mActivityRule.getActivity());
+        TwilioRTCUtils.initializeTwilioSDK(mActivityRule.getActivity());
 
         CountDownLatch waitLatch = new CountDownLatch(1);
         Endpoint endpoint = TwilioRTC.createEndpoint("DEADBEEF", new HashMap<String, String>(), endpointListener());
@@ -120,7 +121,7 @@ public class TwilioRTCTests {
 
     @Test
     public void testTwilioCreateEndpointWithTokenAndRandomOption() {
-        TestTools.initializeTwilioSDK(mActivityRule.getActivity());
+        TwilioRTCUtils.initializeTwilioSDK(mActivityRule.getActivity());
 
         CountDownLatch waitLatch = new CountDownLatch(1);
         HashMap optionsMap = new HashMap<String, String>();
