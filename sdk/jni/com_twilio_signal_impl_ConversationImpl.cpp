@@ -143,3 +143,23 @@ JNIEXPORT jboolean JNICALL Java_com_twilio_signal_impl_ConversationImpl_isMuted
 	return JNI_FALSE;
 }
 
+JNIEXPORT void JNICALL Java_com_twilio_signal_impl_ConversationImpl_inviteParticipants
+  (JNIEnv *env, jobject obj, jlong nativeSession, jobjectArray participantList)
+{
+	TSCSessionObject* session = reinterpret_cast<TSCSessionObject*>(nativeSession);
+	int size = env->GetArrayLength(participantList);
+	if (size == 0) {
+		TS_CORE_LOG_DEBUG("no participants were provided");
+		return;
+	}
+
+	std::vector<TSCParticipant> participants;
+	for (int i=0; i < size; i++) {
+		jstring value = (jstring)env->GetObjectArrayElement(participantList, i);
+		std::string participantStr = webrtc_jni::JavaToStdString(env, value);
+		TSCParticipant participant(participantStr);
+		participants.push_back(participant);
+	}
+	session->inviteParticipants(participants);
+}
+
