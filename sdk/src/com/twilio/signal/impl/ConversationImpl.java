@@ -169,9 +169,11 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 	}
 
 	@Override
-	public void invite(Set<String> participantAddresses) {
+	public void invite(Set<String> participantAddresses) throws IllegalArgumentException {
 		checkDisposed();
-		// TODO: check everything
+		if ((participantAddresses == null) || (participantAddresses.size() == 0)) {
+			throw new IllegalArgumentException("participantAddresses cannot be null or empty");
+		}
 		inviteParticipants(participantAddresses);
 	}
 
@@ -517,7 +519,6 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 
 	@Override
 	public void inviteParticipants(Set<String> participants) {
-		//String[] participantAddressArray = new String[participants.size()];
 		String[] participantAddressArray =
 				participants.toArray(new String[participants.size()]);
 		inviteParticipants(getNativeHandle(), participantAddressArray);
