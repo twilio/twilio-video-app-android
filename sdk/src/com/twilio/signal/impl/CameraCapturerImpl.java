@@ -27,6 +27,12 @@ public class CameraCapturerImpl implements CameraCapturer {
 
 	static final Logger logger = Logger.getLogger(CameraCapturerImpl.class);
 
+	private enum CapturerState {
+		IDLE,
+		PREVIEWING,
+		BROADCASTING
+	}
+
 	private final Context context;
 	private CameraSource source;
 
@@ -35,8 +41,7 @@ public class CameraCapturerImpl implements CameraCapturer {
     private Camera camera;
     private int cameraId;
     private CameraPreview cameraPreview;
-	// TODO: Use states to track idle, previewing, and broadcasting
-    private boolean previewing = false;
+    private CapturerState capturerState = CapturerState.IDLE;
 
 	/* Conversation capturer members */
 	private ViewGroup captureView;
@@ -93,7 +98,7 @@ public class CameraCapturerImpl implements CameraCapturer {
 
     @Override
     public synchronized void startPreview() {
-        if(previewing) {
+        if(capturerState.equals(CapturerState.PREVIEWING) || capturerState.equals(CapturerState.BROADCASTING)) {
             return;
         }
 
@@ -124,25 +129,25 @@ public class CameraCapturerImpl implements CameraCapturer {
         previewContainer.removeAllViews();
         previewContainer.addView(cameraPreview);
 
-        previewing = true;
+        capturerState = CapturerState.PREVIEWING;
     }
 
     @Override
     public synchronized void stopPreview() {
-        if(previewing) {
+        if(capturerState.equals(CapturerState.PREVIEWING)) {
             previewContainer.removeAllViews();
             cameraPreview = null;
 			if(camera != null) {
 				camera.release();
 				camera = null;
 			}
-            previewing = false;
+           	capturerState = CapturerState.IDLE;
         }
     }
 
 	@Override
 	public synchronized boolean isPreviewing() {
-		return previewing;
+		return capturerState.equals(CapturerState.PREVIEWING);
 	}
 
 	/*
@@ -154,19 +159,21 @@ public class CameraCapturerImpl implements CameraCapturer {
 			stopPreview();
 		}
 		createVideoCapturerAndroid();
+		capturerState = CapturerState.BROADCASTING;
 	}
 
 	@Override
 	public synchronized boolean switchCamera() {
-        if(previewing) {
+        if(capturerState.equals(CapturerState.PREVIEWING)) {
             stopPreview();
 			cameraId = (cameraId + 1) % Camera.getNumberOfCameras();
 			startPreview();
 			return true;
-        } else if (videoCapturerAndroid.switchCamera(null)) {
-			return true;
+        } else if (capturerState.equals(CapturerState.BROADCASTING)) {
+			return videoCapturerAndroid.switchCamera(null);
+		} else {
+			return false;
 		}
-		return false;
 	}
 	
 	long getNativeVideoCapturer()  {
@@ -175,6 +182,7 @@ public class CameraCapturerImpl implements CameraCapturer {
 
 	void resetNativeVideoCapturer() {
 		nativeVideoCapturerAndroid = 0;
+		capturerState = CapturerState.IDLE;
 	}
 
 	private long retrieveNativeVideoCapturerAndroid(VideoCapturerAndroid videoCapturerAndroid) {

@@ -145,6 +145,7 @@ protected:
 				*j_video_track_class_, j_video_track_ctor_, jlongFromPointer(videoTrack), id);
 		jobject j_trackinfo = TrackInfoToJavaTrackInfoImpl(trackInfo);
 		jni()->CallVoidMethod(*j_observer_global_, j_add_track_id_, j_trackinfo, j_track);
+		videoTrack->AddRef();
 	}
 
 	virtual void onVideoTrackDidRemove(TSCVideoTrackInfoObject* trackInfo) {
