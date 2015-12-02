@@ -395,7 +395,6 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 					@Override
 					public void run() {
 						conversationListener.onLocalVideoRemoved(ConversationImpl.this, videoTrack);
-						videoTrack.invalidateRenderers();
 					}
 				});
 			}
