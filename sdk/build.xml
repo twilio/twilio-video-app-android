@@ -21,9 +21,6 @@
             <zipfileset src="bin/classes.jar" includes="**/*.java **/*.class"/>
             <zipfileset src="libs/libjingle_peerconnection_java.jar" includes="**/*.java **/*.class"/>
             <zipfileset dir="libs" includes="**/libtwilio-native.so" prefix="lib/"/>
-            <!-- Add gdb debug binaries to jar -->
-            <zipfileset dir="libs" includes="*/gdbserver" prefix="lib/"/>
-            <zipfileset dir="libs" includes="*/gdb.setup" prefix="lib/"/>
         </jar>
     </target>
 

@@ -21,6 +21,7 @@ import com.twilio.signal.CapturerException;
 import com.twilio.signal.CapturerException.ExceptionDomain;
 import com.twilio.signal.impl.logging.Logger;
 
+
 public class CameraCapturerImpl implements CameraCapturer {
 
 	private static String TAG = "CameraCapturerImpl";
@@ -282,8 +283,8 @@ public class CameraCapturerImpl implements CameraCapturer {
 				try {
 					camera.stopPreview();
 					camera.setPreviewDisplay(this.holder);
-					updatePreviewOrientation(w, h);
 					camera.startPreview();
+					updatePreviewOrientation(w, h);
 				} catch (Exception e) {
 					if(listener != null) {
 						listener.onError(new CapturerException(ExceptionDomain.CAMERA, "Unable to restart preview: " + e.getMessage()));
@@ -296,19 +297,38 @@ public class CameraCapturerImpl implements CameraCapturer {
 			Camera.Parameters parameters = camera.getParameters();
 			Display display = ((WindowManager)context.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
 
-			if(display.getRotation() == Surface.ROTATION_0) {
-				parameters.setPreviewSize(height, width);
-				camera.setDisplayOrientation(90);
-			} else if(display.getRotation() == Surface.ROTATION_90) {
-				parameters.setPreviewSize(width, height);
-				camera.setDisplayOrientation(0);
-			} else if(display.getRotation() == Surface.ROTATION_180) {
-				parameters.setPreviewSize(height, width);
-				camera.setDisplayOrientation(270);
-			} else if(display.getRotation() == Surface.ROTATION_270) {
-				parameters.setPreviewSize(width, height);
-				camera.setDisplayOrientation(180);
+			Camera.CameraInfo info = new Camera.CameraInfo();
+			Camera.getCameraInfo(cameraId, info);
+
+			int rotation = getDeviceOrientation();
+			if (info.facing == Camera.CameraInfo.CAMERA_FACING_BACK) {
+				rotation = (info.orientation + rotation - 180) % 360;
+			} else {
+				rotation = (info.orientation + rotation) % 360;
 			}
+			camera.setDisplayOrientation(rotation);
+		}
+
+		private int getDeviceOrientation() {
+			int orientation = 0;
+
+			WindowManager wm = (WindowManager)context.getSystemService(Context.WINDOW_SERVICE);
+			switch(wm.getDefaultDisplay().getRotation()) {
+				case Surface.ROTATION_90:
+					orientation = 90;
+					break;
+				case Surface.ROTATION_180:
+					orientation = 0;
+					break;
+				case Surface.ROTATION_270:
+					orientation = 270;
+					break;
+				case Surface.ROTATION_0:
+				default:
+					orientation = 180;
+					break;
+			}
+			return orientation;
 		}
 
 	}
