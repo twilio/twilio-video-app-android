@@ -29,7 +29,7 @@ JNIEXPORT jlong JNICALL Java_com_twilio_signal_impl_TwilioRTCImpl_createEndpoint
  * Signature: (Ljava/lang/String;J)J
  */
 JNIEXPORT jlong JNICALL Java_com_twilio_signal_impl_TwilioRTCImpl_createEndpoint
-  (JNIEnv *, jobject, jstring, jlong);
+  (JNIEnv *, jobject, jobject, jlong);
 
 /*
  * Class:     com_twilio_signal_impl_TwilioRTCImpl

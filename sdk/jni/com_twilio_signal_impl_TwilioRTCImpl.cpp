@@ -26,6 +26,13 @@
 using namespace webrtc_jni;
 using namespace twiliosdk;
 
+static TwilioCommon::AccessManager* extractNativeAccessMgr(JNIEnv* jni, jobject j_am) {
+  jfieldID native_am_id = GetFieldID(jni,
+      GetObjectClass(jni, j_am), "nativeDataChannel", "J");
+  jlong j_d = GetLongField(jni, j_an, native_am_id);
+  return reinterpret_cast<TwilioCommon::AccessManager*>(j_d);
+}
+
 /*
  * Class:     com_twilio_signal_impl_TwilioRTCImpl
  * Method:    initCore
@@ -73,16 +80,16 @@ JNIEXPORT jboolean JNICALL Java_com_twilio_signal_impl_TwilioRTCImpl_initCore(JN
 
 
 JNIEXPORT jlong JNICALL Java_com_twilio_signal_impl_TwilioRTCImpl_createEndpoint
-  (JNIEnv *env, jobject obj, jstring token, jlong nativeEndpointObserver) {
+  (JNIEnv *env, jobject obj, jobject j_am, jlong nativeEndpointObserver) {
 
 	if (token == NULL) {
 		TS_CORE_LOG_ERROR("token is null");
 		return 0;
 	}
-	const char *tokenStr = env->GetStringUTFChars(token, 0);
+	//const char *tokenStr = env->GetStringUTFChars(token, 0);
 
 	TSCOptions options;
-	options.insert(std::make_pair(kTSCTokenKey, tokenStr));
+	//options.insert(std::make_pair(kTSCTokenKey, tokenStr));
 
 	if (!nativeEndpointObserver)
 	{
@@ -93,7 +100,9 @@ JNIEXPORT jlong JNICALL Java_com_twilio_signal_impl_TwilioRTCImpl_createEndpoint
 	TSCEndpointObserverPtr eObserverPtr =
 			TSCEndpointObserverPtr(reinterpret_cast<TSCEndpointObserver*>(nativeEndpointObserver));
 
-	TSCEndpointPtr endpoint = TSCSDK::instance()->createEndpoint(options, eObserverPtr);
+	TwilioCommon::AccessManager* accessManager = extractNativeAccessMgr(env, j_am);
+
+	TSCEndpointPtr endpoint = TSCSDK::instance()->createEndpoint(options, accessManager, eObserverPtr);
 
 	return jlongFromPointer(endpoint.get());
 }
