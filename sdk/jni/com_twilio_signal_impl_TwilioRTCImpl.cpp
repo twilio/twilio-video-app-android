@@ -7,6 +7,7 @@
 #include "TSCEndpointObserver.h"
 #include "TSCConfiguration.h"
 #include "TSCLogger.h"
+#include "AccessManager/AccessManager.h"
 #include "webrtc/voice_engine/include/voe_base.h"
 #include "webrtc/modules/video_capture/video_capture_internal.h"
 #include "webrtc/modules/video_render/video_render_internal.h"
@@ -28,8 +29,8 @@ using namespace twiliosdk;
 
 static TwilioCommon::AccessManager* extractNativeAccessMgr(JNIEnv* jni, jobject j_am) {
   jfieldID native_am_id = GetFieldID(jni,
-      GetObjectClass(jni, j_am), "nativeDataChannel", "J");
-  jlong j_d = GetLongField(jni, j_an, native_am_id);
+      GetObjectClass(jni, j_am), "nativeContextHandle", "J");
+  jlong j_d = GetLongField(jni, j_am, native_am_id);
   return reinterpret_cast<TwilioCommon::AccessManager*>(j_d);
 }
 
@@ -82,10 +83,11 @@ JNIEXPORT jboolean JNICALL Java_com_twilio_signal_impl_TwilioRTCImpl_initCore(JN
 JNIEXPORT jlong JNICALL Java_com_twilio_signal_impl_TwilioRTCImpl_createEndpoint
   (JNIEnv *env, jobject obj, jobject j_am, jlong nativeEndpointObserver) {
 
+	/*
 	if (token == NULL) {
 		TS_CORE_LOG_ERROR("token is null");
 		return 0;
-	}
+	}*/
 	//const char *tokenStr = env->GetStringUTFChars(token, 0);
 
 	TSCOptions options;

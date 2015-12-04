@@ -64,6 +64,8 @@ LOCAL_LDLIBS := \
 
 LOCAL_STATIC_LIBRARIES := \
 	twilio-sdk-core \
+	twilio-common \
+	
 
 # Make JNI_OnLoad a local symbol in libwebrtc-jni.a since it is already defined by libtwilio-jni.a
 # dummy.cpp is a fake depedency that causes this command to run prior to linking
