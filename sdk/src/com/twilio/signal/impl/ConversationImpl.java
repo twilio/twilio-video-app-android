@@ -169,10 +169,12 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 	}
 
 	@Override
-	public void invite(Set<String> participantAddresses) {
-		// TODO Auto-generated method stub
+	public void invite(Set<String> participantAddresses) throws IllegalArgumentException {
 		checkDisposed();
-
+		if ((participantAddresses == null) || (participantAddresses.size() == 0)) {
+			throw new IllegalArgumentException("participantAddresses cannot be null or empty");
+		}
+		inviteParticipants(participantAddresses);
 	}
 
 	@Override
@@ -393,7 +395,6 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 					@Override
 					public void run() {
 						conversationListener.onLocalVideoRemoved(ConversationImpl.this, videoTrack);
-						videoTrack.invalidateRenderers();
 					}
 				});
 			}
@@ -481,6 +482,17 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 		}
 	}
 	
+	boolean mute(boolean on) {
+		return mute(getNativeHandle(), on);
+	}
+	
+	boolean isMuted() {
+		return isMuted(getNativeHandle());
+	}
+	
+	/**
+	 * CoreSession
+	 */
 	@Override
 	public void start() {
 		logger.d("starting call");
@@ -498,19 +510,19 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 		stop(getNativeHandle());
 	}
 	
-	boolean mute(boolean on) {
-		return mute(getNativeHandle(), on);
-	}
-	
-	boolean isMuted() {
-		return isMuted(getNativeHandle());
-	}
-	
-
 	@Override
 	public boolean enableVideo(boolean enabled, boolean paused) {
 		return enableVideo(getNativeHandle(), enabled, paused);
 	}
+	
+
+	@Override
+	public void inviteParticipants(Set<String> participants) {
+		String[] participantAddressArray =
+				participants.toArray(new String[participants.size()]);
+		inviteParticipants(getNativeHandle(), participantAddressArray);
+	}
+
 	
 	private synchronized void checkDisposed() {
 		if (isDisposed || nativeHandle == 0) {
@@ -530,6 +542,7 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 	private native boolean enableVideo(long nativeHandle, boolean enabled, boolean paused);
 	private native boolean mute(long nativeSession, boolean on);
 	private native boolean isMuted(long nativeSession);
+	private native void inviteParticipants(long nativeHandle, String[] participants);
 
 	
 

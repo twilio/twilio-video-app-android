@@ -73,7 +73,7 @@ public interface Conversation {
 	 *
 	 * @param participants A set of strings representing the names of the remote endpoints.
 	 */
-	public void invite(Set<String> participantAddresses);
+	public void invite(Set<String> participantAddresses) throws IllegalArgumentException;
 
 	/**
 	 * Disconnect from this conversation
