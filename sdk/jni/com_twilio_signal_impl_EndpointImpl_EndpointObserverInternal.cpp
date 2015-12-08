@@ -38,24 +38,24 @@ public:
 
 
 protected:
-    virtual void onRegistrationDidComplete(TSCoreErrorCode code, const std::string &message) {
+    virtual void onRegistrationDidComplete(TSCoreErrorCode code, const std::string message) {
 
-    	TS_CORE_LOG_DEBUG("onRegistrationDidComplete");
+    	TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK, kTSCoreLogLevelDebug, "onRegistrationDidComplete");
         jobject j_error = errorToJavaCoreErrorImpl(code, message);
     	jni()->CallVoidMethod(*j_endpoint_observer_, j_registration_complete_, j_error);
 
     }
 
-    virtual void onUnregistrationDidComplete(TSCoreErrorCode code, const std::string &message) {
+    virtual void onUnregistrationDidComplete(TSCoreErrorCode code, const std::string message) {
 
-    	TS_CORE_LOG_DEBUG("onUnregistrationDidComplete");
+    	TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK, kTSCoreLogLevelDebug, "onUnregistrationDidComplete");
         jobject j_error = errorToJavaCoreErrorImpl(code, message);
         jni()->CallVoidMethod(*j_endpoint_observer_, j_unreg_complete_, j_error);
 
     }
     virtual void onStateDidChange(TSCEndpointState state){
 
-    	TS_CORE_LOG_DEBUG("onStateDidChange");
+    	TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK, kTSCoreLogLevelDebug, "onStateDidChange");
     	const std::string state_type_enum = "com/twilio/signal/impl/core/EndpointState";
 		jobject j_state_type =
 				webrtc_jni::JavaEnumFromIndex(jni(),
@@ -63,10 +63,12 @@ protected:
 		jni()->CallVoidMethod(*j_endpoint_observer_, j_state_change_, j_state_type);
 
     }
-    virtual void onIncomingCallDidReceive(TSCSession* session) {
+    virtual void onIncomingCallDidReceive(const TSCSessionPtr &session) {
 
-    	TS_CORE_LOG_DEBUG("onIncomingCallDidReceive");
-    	jlong j_session_id = webrtc_jni::jlongFromPointer(session);
+    	TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK, kTSCoreLogLevelDebug, "onIncomingCallDidReceive");
+    	TSCSessionPtr *newSession = new TSCSessionPtr();
+    	*newSession = session;
+    	jlong j_session_id = webrtc_jni::jlongFromPointer(newSession);
 
     	//Get participants from session and put them into java string array
     	jobjectArray j_participants =
@@ -101,7 +103,7 @@ private:
     }
 
     // Return Java array of participants
-    jobjectArray partToJavaPart(JNIEnv *env, const std::vector<TSCParticipant> participants) {
+    jobjectArray partToJavaPart(JNIEnv *env, const std::vector<std::pair<std::string, std::string>> participants) {
         int size = participants.size();
         if (size == 0) {
             return NULL;
@@ -112,7 +114,7 @@ private:
                             stringToJString(jni(), ""));
         for (int i=0; i<size; i++) {
             env->SetObjectArrayElement(
-                            j_participants, i, stringToJString(env, participants[i].getAddress()));
+                            j_participants, i, stringToJString(env, participants[i].first));
         }
         return j_participants;
     }
@@ -138,9 +140,10 @@ private:
  */
 JNIEXPORT jlong JNICALL Java_com_twilio_signal_impl_EndpointImpl_00024EndpointObserverInternal_wrapNativeObserver
   (JNIEnv *env, jobject obj, jobject j_endpoint_observer, jobject j_endpoint) {
-	TSCEndpointObserver* endpointObserver =
-				new EndpointObserverInternalWrapper(env, obj, j_endpoint_observer, j_endpoint);
-		return jlongFromPointer(endpointObserver);
+	TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK, kTSCoreLogLevelDebug, "wrapNativeObserver: Endpoint");
+	TSCEndpointObserverPtr *endpointObserver = new TSCEndpointObserverPtr();
+	endpointObserver->reset(new EndpointObserverInternalWrapper(env, obj, j_endpoint_observer, j_endpoint));
+	return jlongFromPointer(endpointObserver);
 }
 
 /*
@@ -150,7 +153,12 @@ JNIEXPORT jlong JNICALL Java_com_twilio_signal_impl_EndpointImpl_00024EndpointOb
  */
 JNIEXPORT void JNICALL Java_com_twilio_signal_impl_EndpointImpl_00024EndpointObserverInternal_freeNativeObserver
   (JNIEnv *env, jobject obj, jlong nativeEndpointObserver){
-	// NOTE: Native observer should be automatically deleted by Core when we delete Endpoint
+	TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK, kTSCoreLogLevelDebug, "freeNativeObserver: Endpoint");
+	TSCEndpointObserverPtr *endpointObserver = reinterpret_cast<TSCEndpointObserverPtr *>(nativeEndpointObserver);
+	if (endpointObserver != nullptr) {
+	    endpointObserver->reset();
+	    delete endpointObserver;
+	}
 }
 
 

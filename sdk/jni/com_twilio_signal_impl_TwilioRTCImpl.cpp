@@ -41,7 +41,7 @@ JNIEXPORT jboolean JNICALL Java_com_twilio_signal_impl_TwilioRTCImpl_initCore(JN
 	// Perform webrtc_jni initialization to enable peerconnection_jni.cc JNI bindings.
 	jint ret = webrtc_jni::InitGlobalJniVariables(cachedJVM);
 	if(ret < 0) {
-		TS_CORE_LOG_ERROR("TwilioSDK.InitGlobalJniVariables() failed");
+		TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK, kTSCoreLogLevelError, "TwilioSDK.InitGlobalJniVariables() failed");
 		return success;
 	} else {
 		webrtc_jni::LoadGlobalClassReferenceHolder();
@@ -58,13 +58,12 @@ JNIEXPORT jboolean JNICALL Java_com_twilio_signal_impl_TwilioRTCImpl_initCore(JN
 	// Required to setup an external capturer
 	success |= webrtc_jni::AndroidVideoCapturerJni::SetAndroidObjects(env, context);
 
-	TS_CORE_LOG_DEBUG("Calling DA Magic formula");
+	TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK, kTSCoreLogLevelDebug, "Calling DA Magic formula");
 	success |= webrtc::VoiceEngine::SetAndroidObjects(cachedJVM, context);
 
 	// TODO: check success and return appropriately 
-
-	if (tscSdk != NULL && tscSdk->isInitialized())
-	{
+	if (tscSdk != NULL && tscSdk->isInitialized()) {
+	    tscSdk->enableStackTracing();
 		return JNI_TRUE;
 	}
 
@@ -74,9 +73,9 @@ JNIEXPORT jboolean JNICALL Java_com_twilio_signal_impl_TwilioRTCImpl_initCore(JN
 
 JNIEXPORT jlong JNICALL Java_com_twilio_signal_impl_TwilioRTCImpl_createEndpoint
   (JNIEnv *env, jobject obj, jstring token, jlong nativeEndpointObserver) {
-
+    TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK, kTSCoreLogLevelDebug, "createEndpoint");
 	if (token == NULL) {
-		TS_CORE_LOG_ERROR("token is null");
+		TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK, kTSCoreLogLevelError, "token is null");
 		return 0;
 	}
 	const char *tokenStr = env->GetStringUTFChars(token, 0);
@@ -84,31 +83,29 @@ JNIEXPORT jlong JNICALL Java_com_twilio_signal_impl_TwilioRTCImpl_createEndpoint
 	TSCOptions options;
 	options.insert(std::make_pair(kTSCTokenKey, tokenStr));
 
-	if (!nativeEndpointObserver)
-	{
-		TS_CORE_LOG_ERROR("nativeEndpointObserver is null");
+	if (!nativeEndpointObserver) {
+		TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK, kTSCoreLogLevelError, "nativeEndpointObserver is null");
 		return 0;
 	}
 
-	TSCEndpointObserverPtr eObserverPtr =
-			TSCEndpointObserverPtr(reinterpret_cast<TSCEndpointObserver*>(nativeEndpointObserver));
+	TSCEndpointObserverPtr *endpointObserver = reinterpret_cast<TSCEndpointObserverPtr *>(nativeEndpointObserver);
+	TSCEndpointPtr *endpoint = new TSCEndpointPtr();
+	*endpoint = TSCSDK::instance()->createEndpoint(options, *endpointObserver);
 
-	TSCEndpointPtr endpoint = TSCSDK::instance()->createEndpoint(options, eObserverPtr);
-
-	return jlongFromPointer(endpoint.get());
+	return jlongFromPointer(endpoint);
 }
 
 
 JNIEXPORT void JNICALL Java_com_twilio_signal_impl_TwilioRTCImpl_setCoreLogLevel
   (JNIEnv *env, jobject obj, jint level) {
-	TS_CORE_LOG_DEBUG("setCoreLogLevel");
+	TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK, kTSCoreLogLevelDebug, "setCoreLogLevel");
 	TSCoreLogLevel coreLogLevel = static_cast<TSCoreLogLevel>(level);
-        TSCLogger::instance()->setLogLevel(coreLogLevel);
+	TSCLogger::instance()->setLogLevel(coreLogLevel);
 }
 
 
 JNIEXPORT jint JNICALL Java_com_twilio_signal_impl_TwilioRTCImpl_getCoreLogLevel
   (JNIEnv *env, jobject obj) {
-	TS_CORE_LOG_DEBUG("getCoreLogLevel");
+	TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK, kTSCoreLogLevelDebug, "getCoreLogLevel");
         return TSCLogger::instance()->getLogLevel();
 }
