@@ -63,7 +63,6 @@ JNIEXPORT jboolean JNICALL Java_com_twilio_signal_impl_TwilioRTCImpl_initCore(JN
 
 	// TODO: check success and return appropriately 
 	if (tscSdk != NULL && tscSdk->isInitialized()) {
-	    tscSdk->enableStackTracing();
 		return JNI_TRUE;
 	}
 
