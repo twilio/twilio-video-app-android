@@ -16,8 +16,8 @@ import android.content.pm.PackageManager;
 import android.content.pm.ServiceInfo;
 import android.os.IBinder;
 import android.util.Log;
-import android.media.AudioManager;
 
+import com.twilio.common.TwilioAccessManager;
 import com.twilio.signal.EndpointListener;
 import com.twilio.signal.TwilioRTC;
 import com.twilio.signal.TwilioRTC.LogLevel;
@@ -194,14 +194,14 @@ public class TwilioRTCImpl {
 
 	}
 
-	public EndpointImpl createEndpoint(String token, Map<String, String> options, EndpointListener inListener) {
-		if(options != null && token != null) {
-			final EndpointImpl endpoint = new EndpointImpl(context, inListener);
+	public EndpointImpl createEndpoint(TwilioAccessManager accessManager, Map<String, String> options, EndpointListener inListener) {
+		if(options != null && accessManager != null) {
+			final EndpointImpl endpoint = new EndpointImpl(context, accessManager, inListener);
 			long nativeObserverHandle = endpoint.getEndpointObserverHandle();
 			if (nativeObserverHandle == 0) {
 				return null;
 			}
-			final long nativeEndpointHandle = createEndpoint(token, nativeObserverHandle);
+			final long nativeEndpointHandle = createEndpoint(accessManager, nativeObserverHandle);
 			if (nativeEndpointHandle == 0) {
 				return null;
 			}
@@ -220,7 +220,7 @@ public class TwilioRTCImpl {
 		/*
 		 * The Twilio RTC Log Levels are defined differently in the Twilio Logger
 		 * which is based off android.util.Log.
-		 */ 
+		 */
 		switch(level) {
 			case LogLevel.DISABLED:
 				Logger.setLogLevel(Log.ASSERT);
@@ -288,7 +288,7 @@ public class TwilioRTCImpl {
 	}
 
 	private native boolean initCore(Context context);
-	private native long createEndpoint(String token, long nativeEndpointObserver);
+	private native long createEndpoint(TwilioAccessManager accessManager, long nativeEndpointObserver);
 	private native static void setCoreLogLevel(int level);
 	private native static int getCoreLogLevel();
 

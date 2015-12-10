@@ -11,6 +11,7 @@ import android.os.Handler;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.twilio.common.TwilioAccessManager;
 import com.twilio.signal.Conversation;
 import com.twilio.signal.ConversationException;
 import com.twilio.signal.ConversationListener;
@@ -74,6 +75,7 @@ public class EndpointImpl implements
 	private EndpointObserverInternal endpointObserver;
 	private long nativeEndpointHandle;
 	private boolean isDisposed;
+	private TwilioAccessManager accessManager;
 
 	private Handler handler;
 	private EndpointState coreState;
@@ -98,9 +100,11 @@ public class EndpointImpl implements
 
 
 	EndpointImpl(Context context,
+			TwilioAccessManager accessManager,
 			EndpointListener inListener) {
 		this.context = context;
 		this.listener = inListener;
+		this.accessManager = accessManager;
 
 		this.endpointObserver = new EndpointObserverInternal(this);
 		// TODO: throw an exception if the handler returns null

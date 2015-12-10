@@ -7,6 +7,7 @@
 #include "TSCEndpointObserver.h"
 #include "TSCConfiguration.h"
 #include "TSCLogger.h"
+#include "AccessManager/AccessManager.h"
 #include "webrtc/voice_engine/include/voe_base.h"
 #include "webrtc/modules/video_capture/video_capture_internal.h"
 #include "webrtc/modules/video_render/video_render_internal.h"
@@ -25,6 +26,15 @@
 
 using namespace webrtc_jni;
 using namespace twiliosdk;
+
+
+static TwilioCommon::AccessManager* getNativeAccessMgrFromJava(JNIEnv* jni, jobject j_accessMgr) {
+  jclass j_accessManagerClass = GetObjectClass(jni, j_accessMgr);
+  jmethodID getNativeHandleId = GetMethodID(jni, j_accessManagerClass, "getNativeHandle", "()J");
+
+  jlong j_am = jni->CallLongMethod(j_accessMgr, getNativeHandleId);
+  return reinterpret_cast<TwilioCommon::AccessManager*>(j_am);
+}
 
 /*
  * Class:     com_twilio_signal_impl_TwilioRTCImpl
@@ -71,16 +81,10 @@ JNIEXPORT jboolean JNICALL Java_com_twilio_signal_impl_TwilioRTCImpl_initCore(JN
 
 
 JNIEXPORT jlong JNICALL Java_com_twilio_signal_impl_TwilioRTCImpl_createEndpoint
-  (JNIEnv *env, jobject obj, jstring token, jlong nativeEndpointObserver) {
-    TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK, kTSCoreLogLevelDebug, "createEndpoint");
-	if (token == NULL) {
-		TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK, kTSCoreLogLevelError, "token is null");
-		return 0;
-	}
-	const char *tokenStr = env->GetStringUTFChars(token, 0);
+  (JNIEnv *env, jobject obj, jobject j_accessMgr, jlong nativeEndpointObserver) {
+	TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK, kTSCoreLogLevelDebug, "createEndpoint");
 
 	TSCOptions options;
-	options.insert(std::make_pair(kTSCTokenKey, tokenStr));
 
 	if (!nativeEndpointObserver) {
 		TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK, kTSCoreLogLevelError, "nativeEndpointObserver is null");
@@ -88,6 +92,20 @@ JNIEXPORT jlong JNICALL Java_com_twilio_signal_impl_TwilioRTCImpl_createEndpoint
 	}
 
 	TSCEndpointObserverPtr *endpointObserver = reinterpret_cast<TSCEndpointObserverPtr *>(nativeEndpointObserver);
+	TwilioCommon::AccessManager* accessManager = getNativeAccessMgrFromJava(env, j_accessMgr);
+
+	if (accessManager == NULL) {
+		TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK, kTSCoreLogLevelError, "AccessManager is null");
+		return 0;
+	}
+
+	if (accessManager->getToken().empty()) {
+		TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK, kTSCoreLogLevelError, "token is null");
+		return 0;
+	}
+
+	TS_CORE_LOG_DEBUG("access token is:%s", accessManager->getToken().c_str());
+
 	TSCEndpointPtr *endpoint = new TSCEndpointPtr();
 	*endpoint = TSCSDK::instance()->createEndpoint(options, *endpointObserver);
 
