@@ -278,8 +278,7 @@ public class SignalPhone implements EndpointListener
     	if (loginListener != null) {
 			loginListener.onLoginStarted();
 		}
-		SignalPhone.this.alice = TwilioRTC.createEndpoint(capabilityToken,
-				options, SignalPhone.this);
+		SignalPhone.this.alice = TwilioRTC.createEndpoint(capabilityToken, SignalPhone.this);
 		listen();
 		Intent intent = new Intent(context, SignalPhoneActivity.class);
         PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);

@@ -74,11 +74,19 @@ function main {
     done
 
     check_tools
+    combine_dependency
     build_library
     build_testcore
     copy_javadocs
     archive
 
+}
+
+function combine_dependency {
+    pushd "${twsdkroot}"/sdk
+    mvn clean
+    mvn -Dbuild.platform=android initialize || 1
+    popd
 }
 
 function check_tools {
