@@ -22,3 +22,4 @@ local.properties
 build
 .DS_Store
 sdk/target/*
+sdk/libs/
