@@ -22,6 +22,10 @@ endif
 LOCAL_PATH := $(TWSDK_JNI_PATH)
 include $(CLEAR_VARS)
 
+ifeq ($(PREFIX),)
+PREFIX:= /usr/local/twilio-sdk
+endif
+
 LOCAL_MODULE := twilio-native
 LOCAL_SRC_FILES := \
     dummy.cpp \
@@ -64,7 +68,15 @@ LOCAL_LDLIBS := \
 
 LOCAL_STATIC_LIBRARIES := \
 	twilio-sdk-core \
-	twilio-common \
+	access-manager \
+	PocoNetSSL \
+	PocoCrypto \
+	PocoNet \
+	PocoUtil \
+	PocoXML \
+	PocoJSON \
+	PocoFoundation \
+	boringssl \
 	
 
 # Make JNI_OnLoad a local symbol in libwebrtc-jni.a since it is already defined by libtwilio-jni.a

@@ -85,11 +85,7 @@ function main {
 function combine_dependency {
     pushd "${twsdkroot}"/sdk
     mvn clean
-    mvn -Dbuild.platform=android || 1
-    if [ -z "libs" ]; then
-        mkdir "libs"
-    fi
-    tar xvf ./target/android/twilio-common-android.tar -C libs/
+    mvn -Dbuild.platform=android initialize || 1
     popd
 }
 
