@@ -7,6 +7,8 @@ import org.junit.runner.RunWith;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
 
+import com.twilio.common.TwilioAccessManager;
+import com.twilio.common.TwilioAccessManagerFactory;
 import com.twilio.rtc.conversations.sdktests.utils.TwilioRTCUtils;
 import com.twilio.signal.ConversationException;
 import com.twilio.signal.Endpoint;
@@ -60,13 +62,32 @@ public class TwilioRTCTests {
         boolean npeSeen = false;
 
         try {
-            TwilioRTC.createEndpoint(null, null);
+            TwilioRTC.createEndpoint((String)null, null);
         } catch(NullPointerException e) {
             npeSeen = true;
         } finally {
             org.junit.Assert.assertTrue(npeSeen);
             npeSeen = false;
         }
+
+        try {
+            TwilioRTC.createEndpoint((TwilioAccessManager)null, null);
+        } catch(NullPointerException e) {
+            npeSeen = true;
+        } finally {
+            org.junit.Assert.assertTrue(npeSeen);
+            npeSeen = false;
+        }
+
+        try {
+            TwilioRTC.createEndpoint(null, null, null);
+        } catch(NullPointerException e) {
+            npeSeen = true;
+        } finally {
+            org.junit.Assert.assertTrue(npeSeen);
+            npeSeen = false;
+        }
+
 
         try {
             TwilioRTC.createEndpoint("foo", null);
@@ -78,7 +99,8 @@ public class TwilioRTCTests {
         }
 
         try {
-            TwilioRTC.createEndpoint(null, endpointListener());
+            TwilioRTC.createEndpoint(
+                    TwilioAccessManagerFactory.createAccessManager("foo", null), null);
         } catch(NullPointerException e) {
             npeSeen = true;
         } finally {
@@ -86,8 +108,9 @@ public class TwilioRTCTests {
             npeSeen = false;
         }
 
+
         try {
-            TwilioRTC.createEndpoint("foo", null, endpointListener());
+            TwilioRTC.createEndpoint(null, null, endpointListener());
         } catch(NullPointerException e) {
             npeSeen = true;
         } finally {
@@ -109,24 +132,26 @@ public class TwilioRTCTests {
     }
 
     @Test
-    public void testTwilioCreateEndpointWithTokenAndEmptyOptionsMap() {
+    public void testTwilioCreateEndpointWithAccessManagerAndEmptyOptionsMap() {
         TwilioRTCUtils.initializeTwilioSDK(mActivityRule.getActivity());
 
         CountDownLatch waitLatch = new CountDownLatch(1);
-        Endpoint endpoint = TwilioRTC.createEndpoint("DEADBEEF", new HashMap<String, String>(), endpointListener());
+        TwilioAccessManager accessManager = TwilioAccessManagerFactory.createAccessManager("DEADBEEF", null);
+        Endpoint endpoint = TwilioRTC.createEndpoint(accessManager, new HashMap<String, String>(), endpointListener());
 
         // TODO: check start listening once callback issue is resolved
         org.junit.Assert.assertNotNull(endpoint);
     }
 
     @Test
-    public void testTwilioCreateEndpointWithTokenAndRandomOption() {
+    public void testTwilioCreateEndpointWithAccessManagerAndRandomOption() {
         TwilioRTCUtils.initializeTwilioSDK(mActivityRule.getActivity());
 
         CountDownLatch waitLatch = new CountDownLatch(1);
         HashMap optionsMap = new HashMap<String, String>();
         optionsMap.put("foo", "bar");
-        Endpoint endpoint = TwilioRTC.createEndpoint("DEADBEEF", optionsMap, endpointListener());
+        TwilioAccessManager accessManager = TwilioAccessManagerFactory.createAccessManager("DEADBEEF", null);
+        Endpoint endpoint = TwilioRTC.createEndpoint(accessManager, optionsMap, endpointListener());
 
         // TODO: check start listening once callback issue is resolved
         org.junit.Assert.assertNotNull(endpoint);
