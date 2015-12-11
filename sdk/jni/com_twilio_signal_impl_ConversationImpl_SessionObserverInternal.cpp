@@ -78,14 +78,14 @@ protected:
 				*j_observer_global_, j_local_status_changed_id, j_session_state);
 	}
 
-	virtual void onStartDidComplete(TSCoreErrorCode code, const std::string &message) {
+	virtual void onStartDidComplete(TSCoreErrorCode code, const std::string message) {
 		TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK, kTSCoreLogLevelDebug, "onStartDidComplete");
 
 		jobject j_error_obj = errorToJavaCoreErrorImpl(code, message);
 		jni()->CallVoidMethod(*j_observer_global_, j_start_completed_id, j_error_obj);
 	}
 
-	virtual void onStopDidComplete(TSCoreErrorCode code, const std::string &message) {
+	virtual void onStopDidComplete(TSCoreErrorCode code, const std::string message) {
 		TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK, kTSCoreLogLevelDebug, "onStopDidComplete");
 
 		jobject j_error_obj = errorToJavaCoreErrorImpl(code, message);
@@ -95,7 +95,7 @@ protected:
 	virtual void onParticipantDidConnect(const std::string participant,
 	                                     const std::string participantSid,
 	                                     TSCoreErrorCode code,
-	                                     const std::string &message) {
+	                                     const std::string message) {
 		TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK, kTSCoreLogLevelDebug, "onParticipantDidConnect");
 
     	jstring j_participant_address = stringToJString(jni(), participant);
@@ -147,6 +147,10 @@ protected:
 		videoTrack->AddRef();
 	}
 
+	virtual void onVideoTrackStateDidChange(TSCVideoTrackInfoObject* trackInfo) {
+		// TODO
+	}
+
 	virtual void onVideoTrackDidRemove(TSCVideoTrackInfoObject* trackInfo) {
 		TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK, kTSCoreLogLevelDebug, "onVideoTrackDidRemove");
 
@@ -156,6 +160,10 @@ protected:
 
 	virtual void onAudioTrackDidAdd(TSCAudioTrackInfoObject *trackInfo, webrtc::AudioTrackInterface* videoTrack) {
 	    TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK, kTSCoreLogLevelDebug, "onAudioTrackDidAdd");
+	}
+
+	virtual void onAudioTrackStateDidChange(TSCAudioTrackInfoObject* trackInfo) {
+		// TODO
 	}
 
 	virtual void onAudioTrackDidRemove(TSCAudioTrackInfoObject *trackInfo) {

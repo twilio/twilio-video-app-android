@@ -107,7 +107,7 @@ JNIEXPORT jlong JNICALL Java_com_twilio_signal_impl_TwilioRTCImpl_createEndpoint
 	TS_CORE_LOG_DEBUG("access token is:%s", accessManager->getToken().c_str());
 
 	TSCEndpointPtr *endpoint = new TSCEndpointPtr();
-	*endpoint = TSCSDK::instance()->createEndpoint(options, *endpointObserver);
+	*endpoint = TSCSDK::instance()->createEndpoint(options, accessManager, *endpointObserver);
 
 	return jlongFromPointer(endpoint);
 }
