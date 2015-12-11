@@ -3,9 +3,12 @@
 /* Header for class com_twilio_signal_impl_EndpointImpl */
 
 #include "com_twilio_signal_impl_EndpointImpl.h"
+
+#include "TSCoreSDK.h"
 #include "TSCoreSDKTypes.h"
 #include "TSCEndpoint.h"
 #include "TSCSession.h"
+#include "TSCLogger.h"
 
 using namespace twiliosdk;
 /*
@@ -15,8 +18,8 @@ using namespace twiliosdk;
  */
 JNIEXPORT void JNICALL Java_com_twilio_signal_impl_EndpointImpl_listen
   (JNIEnv *env, jobject obj, jlong nativeEndpoint) {
-
-	reinterpret_cast<TSCEndpoint*>(nativeEndpoint)->registerEndpoint();
+	TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK, kTSCoreLogLevelDebug, "listen");
+	reinterpret_cast<TSCEndpointPtr *>(nativeEndpoint)->get()->registerEndpoint(true, true);
 }
 
 /*
@@ -26,8 +29,8 @@ JNIEXPORT void JNICALL Java_com_twilio_signal_impl_EndpointImpl_listen
  */
 JNIEXPORT void JNICALL Java_com_twilio_signal_impl_EndpointImpl_unlisten
   (JNIEnv *env, jobject obj, jlong nativeEndpoint) {
-
-	reinterpret_cast<TSCEndpoint*>(nativeEndpoint)->unregisterEndpoint();
+	TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK, kTSCoreLogLevelDebug, "unlisten");
+	reinterpret_cast<TSCEndpointPtr *>(nativeEndpoint)->get()->unregisterEndpoint();
 }
 
 
@@ -38,9 +41,9 @@ JNIEXPORT void JNICALL Java_com_twilio_signal_impl_EndpointImpl_unlisten
  */
 JNIEXPORT void JNICALL Java_com_twilio_signal_impl_EndpointImpl_reject
   (JNIEnv *env, jobject obj, jlong nativeEndpoint, jlong nativeSession) {
-
-	TSCSessionObject* session = reinterpret_cast<TSCSessionObject*>(nativeSession);
-	reinterpret_cast<TSCEndpoint*>(nativeEndpoint)->reject(session);
+	TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK, kTSCoreLogLevelDebug, "reject");
+	TSCSessionPtr *session = reinterpret_cast<TSCSessionPtr *>(nativeSession);
+	reinterpret_cast<TSCEndpointPtr *>(nativeEndpoint)->get()->reject(*session);
 }
 
 /*
@@ -50,10 +53,12 @@ JNIEXPORT void JNICALL Java_com_twilio_signal_impl_EndpointImpl_reject
  */
 JNIEXPORT void JNICALL Java_com_twilio_signal_impl_EndpointImpl_freeNativeHandle
   (JNIEnv *env, jobject obj, jlong nativeEndpoint) {
-	TSCEndpoint* endpoint = reinterpret_cast<TSCEndpoint*>(nativeEndpoint);
-	if (endpoint != NULL) {
+	TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK, kTSCoreLogLevelDebug, "freeNativeHandle: Endpoint");
+	TSCEndpointPtr *endpoint = reinterpret_cast<TSCEndpointPtr *>(nativeEndpoint);
+	if (endpoint != nullptr) {
+	    TSCSDK::instance()->destroyEndpoint(*endpoint);
+	    endpoint->reset();
 		delete endpoint;
-		endpoint = NULL;
 	}
 
 }

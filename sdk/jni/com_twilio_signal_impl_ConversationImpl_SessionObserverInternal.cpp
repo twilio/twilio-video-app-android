@@ -16,7 +16,7 @@ using namespace webrtc_jni;
 using namespace twiliosdk;
 
 
-class SessionObserverInternalWrapper : public TSCSessionObserverObject {
+class SessionObserverInternalWrapper : public TSCSessionObserver {
 public:
 	SessionObserverInternalWrapper(JNIEnv* jni, jobject obj, jobject j_observer, jobject conversation) :
 		j_observer_global_(
@@ -68,7 +68,7 @@ public:
 protected:
 
 	virtual void onStateDidChange(TSCSessionState state) {
-		TS_CORE_LOG_DEBUG("onStateDidChange");
+		TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK, kTSCoreLogLevelDebug, "onStateDidChange");
 
 		const std::string session_state_class = "com/twilio/signal/impl/core/SessionState";
 		jobject j_session_state = webrtc_jni::JavaEnumFromIndex(
@@ -78,38 +78,37 @@ protected:
 				*j_observer_global_, j_local_status_changed_id, j_session_state);
 	}
 
-	virtual void onStartDidComplete(const TSCErrorObjectRef& error) {
-		TS_CORE_LOG_DEBUG("onStartDidComplete");
+	virtual void onStartDidComplete(TSCoreErrorCode code, const std::string message) {
+		TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK, kTSCoreLogLevelDebug, "onStartDidComplete");
 
-		jobject j_error_obj = errorToJavaCoreErrorImpl(error.get());
-		jni()->CallVoidMethod(
-		    		*j_observer_global_, j_start_completed_id, j_error_obj);
-	}
-	virtual void onStopDidComplete(const TSCErrorObjectRef& error) {
-		TS_CORE_LOG_DEBUG("onStopDidComplete");
-
-		jobject j_error_obj = errorToJavaCoreErrorImpl(error.get());
-		jni()->CallVoidMethod(
-				    *j_observer_global_, j_stop_completed_id, j_error_obj);
+		jobject j_error_obj = errorToJavaCoreErrorImpl(code, message);
+		jni()->CallVoidMethod(*j_observer_global_, j_start_completed_id, j_error_obj);
 	}
 
-	virtual void onParticipantDidConnect(const TSCParticipantObjectRef& participant,
-										 const TSCErrorObjectRef& error) {
-		TS_CORE_LOG_DEBUG("onParticipantDidConnect");
+	virtual void onStopDidComplete(TSCoreErrorCode code, const std::string message) {
+		TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK, kTSCoreLogLevelDebug, "onStopDidComplete");
 
-    	jstring j_participant_address =
-    			stringToJString(jni(), participant->getAddress());
-    	jobject j_error_obj = errorToJavaCoreErrorImpl(error.get());
-    	jni()->CallVoidMethod(
-    			*j_observer_global_, j_participant_did_connect_id, j_participant_address, j_error_obj);
+		jobject j_error_obj = errorToJavaCoreErrorImpl(code, message);
+		jni()->CallVoidMethod(*j_observer_global_, j_stop_completed_id, j_error_obj);
 	}
 
-	virtual void onParticipantDidDisconect(const TSCParticipantObjectRef& participant,
-										   TSCDisconnectReason reason) {
-		TS_CORE_LOG_DEBUG("onParticipantDidDisconect");
+	virtual void onParticipantDidConnect(const std::string participant,
+	                                     const std::string participantSid,
+	                                     TSCoreErrorCode code,
+	                                     const std::string message) {
+		TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK, kTSCoreLogLevelDebug, "onParticipantDidConnect");
 
-		jstring j_participant_address =
-				stringToJString(jni(), participant->getAddress());
+    	jstring j_participant_address = stringToJString(jni(), participant);
+    	jobject j_error_obj = errorToJavaCoreErrorImpl(code, message);
+    	jni()->CallVoidMethod(*j_observer_global_, j_participant_did_connect_id, j_participant_address, j_error_obj);
+	}
+
+	virtual void onParticipantDidDisconnect(const std::string participant,
+	                                        const std::string participantSid,
+										    TSCDisconnectReason reason) {
+		TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK, kTSCoreLogLevelDebug, "onParticipantDidDisconect");
+
+		jstring j_participant_address = stringToJString(jni(), participant);
 
 		const std::string dis_reason_class =
 				"com/twilio/signal/impl/core/DisconnectReason";
@@ -121,7 +120,7 @@ protected:
 	}
 
 	virtual void onMediaStreamDidAdd(TSCMediaStreamInfoObject* stream) {
-		TS_CORE_LOG_DEBUG("onMediaStreamDidAdd");
+		TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK, kTSCoreLogLevelDebug, "onMediaStreamDidAdd");
 
 	    jobject j_media_info = mediaStrInfoJavaMediaStrInfoImpl(stream);
 	    jni()->CallVoidMethod(
@@ -129,7 +128,7 @@ protected:
 	}
 
 	virtual void onMediaStreamDidRemove(TSCMediaStreamInfoObject* stream) {
-		TS_CORE_LOG_DEBUG("onMediaStreamDidRemove");
+		TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK, kTSCoreLogLevelDebug, "onMediaStreamDidRemove");
 
 		jobject j_media_info = mediaStrInfoJavaMediaStrInfoImpl(stream);
 		jni()->CallVoidMethod(
@@ -138,7 +137,7 @@ protected:
 
 
 	virtual void onVideoTrackDidAdd(TSCVideoTrackInfoObject* trackInfo, VideoTrackInterface* videoTrack) {
-		TS_CORE_LOG_DEBUG("onVideoTrackDidAdd");
+		TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK, kTSCoreLogLevelDebug, "onVideoTrackDidAdd");
 
 		jstring id = stringToJString(jni(), videoTrack->id());
 		jobject j_track = jni()->NewObject(
@@ -148,15 +147,35 @@ protected:
 		videoTrack->AddRef();
 	}
 
+	virtual void onVideoTrackStateDidChange(TSCVideoTrackInfoObject* trackInfo) {
+		// TODO
+	}
+
 	virtual void onVideoTrackDidRemove(TSCVideoTrackInfoObject* trackInfo) {
-		TS_CORE_LOG_DEBUG("onVideoTrackDidRemove");
+		TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK, kTSCoreLogLevelDebug, "onVideoTrackDidRemove");
 
 		jobject j_trackinfo = TrackInfoToJavaTrackInfoImpl(trackInfo);
 		jni()->CallVoidMethod(*j_observer_global_, j_remove_track_id_, j_trackinfo);
 	}
 
-	virtual void onDidReceiveSessionStatistics(TSCSessionStatisticsPtr statistics) {
-		TS_CORE_LOG_DEBUG("onDidReceiveSessionStatistics");
+	virtual void onAudioTrackDidAdd(TSCAudioTrackInfoObject *trackInfo, webrtc::AudioTrackInterface* videoTrack) {
+	    TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK, kTSCoreLogLevelDebug, "onAudioTrackDidAdd");
+	}
+
+	virtual void onAudioTrackStateDidChange(TSCAudioTrackInfoObject* trackInfo) {
+		// TODO
+	}
+
+	virtual void onAudioTrackDidRemove(TSCAudioTrackInfoObject *trackInfo) {
+	    TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK, kTSCoreLogLevelDebug, "onAudioTrackDidRemove");
+	}
+
+    virtual void onDidReceiveSessionStatistics(TSCSessionStatisticsPtr statistics) {
+		TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK, kTSCoreLogLevelDebug, "onDidReceiveSessionStatistics");
+	}
+
+	virtual void onDidReceiveConversationEvent(ConversationEvent *event) {
+	    TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK, kTSCoreLogLevelDebug, "onDidReceiveConversationEvent");
 	}
 
 private:
@@ -166,7 +185,7 @@ private:
 	}
 
 	// Return a TrackInfoImpl
-	jobject TrackInfoToJavaTrackInfoImpl(const TSCVideoTrackInfoObjectRef& trackInfo) {
+	jobject TrackInfoToJavaTrackInfoImpl(const TSCVideoTrackInfoObject *trackInfo) {
     		jstring j_participant_address = stringToJString(jni(), trackInfo->getParticipantAddress());
     		jstring j_track_id = stringToJString(jni(), trackInfo->getTrackId());
 		const std::string state_class = "com/twilio/signal/TrackOrigin";
@@ -178,20 +197,21 @@ private:
 	}
 
 	// Return a ErrorImpl
-	jobject errorToJavaCoreErrorImpl(const TSCErrorObjectRef& error) {
-		if (!error) {
-			return NULL;
+	jobject errorToJavaCoreErrorImpl(TSCoreErrorCode code, const std::string &message) {
+		if (code == kTSCoreSuccess) {
+			return nullptr;
 		}
-		jstring j_domain = stringToJString(jni(), error->getDomain());
-		jint j_error_id = (jint)error->getCode();
-		jstring j_message = stringToJString(jni(), error->getMessage());
+
+		jstring j_domain = stringToJString(jni(), "signal.coresdk.domain.error");
+		jint j_error_id = (jint) code;
+		jstring j_message = stringToJString(jni(), message);
 		return jni()->NewObject(
 				*j_errorimpl_class_, j_errorimpl_ctor_id_,
 				j_domain, j_error_id, j_message);
 	}
 
 	// Return a MediaStreamInfoImpl
-	jobject mediaStrInfoJavaMediaStrInfoImpl(const TSCMediaStreamInfoObjectRef& stream) {
+	jobject mediaStrInfoJavaMediaStrInfoImpl(const TSCMediaStreamInfoObject *stream) {
 		if (!stream) {
 			return NULL;
 		}
@@ -241,9 +261,10 @@ private:
  */
 JNIEXPORT jlong JNICALL Java_com_twilio_signal_impl_ConversationImpl_00024SessionObserverInternal_wrapNativeObserver
   (JNIEnv *env, jobject obj, jobject observer, jobject conversation) {
-	TS_CORE_LOG_DEBUG("wrapNativeObserver");
-	return jlongFromPointer(
-			new SessionObserverInternalWrapper(env, obj, observer, conversation));
+	TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK, kTSCoreLogLevelDebug, "wrapNativeObserver: Session");
+	TSCSessionObserverPtr *sessionObserver = new TSCSessionObserverPtr();
+	sessionObserver->reset(new SessionObserverInternalWrapper(env, obj, observer, conversation));
+	return jlongFromPointer(sessionObserver);
 }
 
 /*
@@ -253,5 +274,10 @@ JNIEXPORT jlong JNICALL Java_com_twilio_signal_impl_ConversationImpl_00024Sessio
  */
 JNIEXPORT void JNICALL Java_com_twilio_signal_impl_ConversationImpl_00024SessionObserverInternal_freeNativeObserver
   (JNIEnv *env, jobject obj, jlong nativeSessionObserver){
-	// NOTE: Native observer should be automatically deleted by Core when we delete Conversation
+	TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK, kTSCoreLogLevelDebug, "freeNativeObserver: Session");
+	TSCSessionObserverPtr *sessionObserver = reinterpret_cast<TSCSessionObserverPtr *>(nativeSessionObserver);
+	if (sessionObserver != nullptr) {
+	    sessionObserver->reset();
+	    delete sessionObserver;
+	}
 }
