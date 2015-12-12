@@ -20,6 +20,7 @@ import com.twilio.signal.VideoTrack;
 import com.twilio.signal.VideoViewRenderer;
 import com.twilio.signal.impl.core.CoreError;
 import com.twilio.signal.impl.core.CoreSession;
+import com.twilio.signal.impl.core.CoreSessionMediaConstrains;
 import com.twilio.signal.impl.core.DisconnectReason;
 import com.twilio.signal.impl.core.MediaStreamInfo;
 import com.twilio.signal.impl.core.SessionState;
@@ -119,7 +120,15 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 		if (conv.getNativeHandle() == 0) {
 			return null;
 		}
-		conv.start();
+		boolean enableVideo = !localMedia.getLocalVideoTracks().isEmpty();
+		boolean pauseVideo = false;
+		if (enableVideo) {
+			pauseVideo = localMedia.getLocalVideoTracks().get(0).isCameraEnabled();
+		}
+		CoreSessionMediaConstrains mediaContext =
+				new CoreSessionMediaConstrains(localMedia.isMicrophoneAdded(),
+							localMedia.isMuted(), enableVideo, pauseVideo);
+		conv.start(mediaContext);
 		return conv;
 	}
 	
@@ -498,14 +507,18 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 	 * CoreSession
 	 */
 	@Override
-	public void start() {
+	public void start(CoreSessionMediaConstrains mediaConstraints) {
 		logger.d("starting call");
 	
 		// TODO: Call only when video is enabled
 		setupExternalCapturer();
 
 
-		start(getNativeHandle());
+		start(getNativeHandle(),
+				mediaConstraints.isAudioEnabled(),
+				mediaConstraints.isAudioMuted(),
+				mediaConstraints.isVideoEnabled(),
+				mediaConstraints.isVideoPaused());
 		
 	}
 
@@ -535,7 +548,7 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 	}
 	
 	private native long wrapOutgoingSession(long nativeEndpoint, long nativeSessionObserver, String[] participants);
-	private native void start(long nativeSession);
+	private native void start(long nativeSession, boolean enableAudio, boolean muteAudio, boolean enableVideo, boolean pauseVideo);
 	private native void setExternalCapturer(long nativeSession, long nativeCapturer);
 	private native void stop(long nativeSession);
 	private native void setSessionObserver(long nativeSession, long nativeSessionObserver);

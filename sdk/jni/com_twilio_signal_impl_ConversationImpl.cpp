@@ -63,11 +63,19 @@ JNIEXPORT jlong JNICALL Java_com_twilio_signal_impl_ConversationImpl_wrapOutgoin
 
 
 JNIEXPORT void JNICALL Java_com_twilio_signal_impl_ConversationImpl_start
-  (JNIEnv *env, jobject obj, jlong nativeSession)
+  (JNIEnv *env, jobject obj, jlong nativeSession, jboolean j_enableAudio, jboolean j_muteAudio, jboolean j_enableVideo, jboolean j_pauseVideo)
 {
 	TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK, kTSCoreLogLevelDebug, "start");
 	TSCSessionPtr *session = reinterpret_cast<TSCSessionPtr *>(nativeSession);
-	session->get()->start();
+
+	bool enableAudio = j_enableAudio == JNI_TRUE ? true : false;
+	bool muteAudio = j_muteAudio == JNI_TRUE ? true : false;
+	bool enableVideo = j_enableVideo == JNI_TRUE ? true : false;
+	bool pauseVideo = j_pauseVideo == JNI_TRUE ? true : false;
+
+	TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK, kTSCoreLogLevelDebug, "local media config %d %d %d %d", enableAudio, muteAudio, enableVideo, pauseVideo);
+
+	session->get()->start(new TSCSessionMediaConstrainsObject(enableAudio, muteAudio, enableVideo, pauseVideo));
 }
 
 

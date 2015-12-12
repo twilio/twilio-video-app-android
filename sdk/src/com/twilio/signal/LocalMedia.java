@@ -47,5 +47,10 @@ public interface LocalMedia extends Media {
 	 * @return <code>true</code> if local audio is muted, false otherwise
 	 */
 	public boolean isMuted();
+	
+	public boolean addMicrophone();
+	public boolean removeMicrophone();
+	
+	public boolean isMicrophoneAdded();
 
 }
