@@ -107,8 +107,8 @@ public class ConversationActivity extends Activity implements ConversationListen
 					}
 
 					@Override
-					public void onFrameSizeChanged(int width, int height) {
-						Log.i(TAG, "Participant onFrameSizeChanged " + width + " " + height);
+					public void onFrameDimensionsChanged(int width, int height) {
+						Log.i(TAG, "Participant onFrameDimensionsChanged " + width + " " + height);
 					}
 
 				});
