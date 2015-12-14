@@ -5,18 +5,18 @@ public interface ConversationListener {
 	/**
 	 * 
 	 */
-	void onConnectParticipant(Conversation conversation, Participant participant);
+	void onParticipantConnected(Conversation conversation, Participant participant);
 	
 	/**
 	 * 
 	 */
-	void onFailToConnectParticipant(Conversation conversation, Participant participant, ConversationException e);
+	void onFailedToConnectParticipant(Conversation conversation, Participant participant, ConversationException e);
 	
 	
 	/**
 	 * 
 	 */
-	void onDisconnectParticipant(Conversation conversation, Participant participant);
+	void onParticipantDisconnected(Conversation conversation, Participant participant);
 	
 	/**
 	 * 
@@ -38,17 +38,11 @@ public interface ConversationListener {
 	 */
 	void onVideoRemovedForParticipant(Conversation conversation, Participant participant, VideoTrack videoTrack);
 
-
 	/**
 	 * 
 	 */
 	void onLocalStatusChanged(Conversation conversation, Conversation.Status status);
-	
-	/**
-	 * 
-	 */
-	void onConversationEnded(Conversation conversation);
-	
+
 	/**
 	 * 
 	 */

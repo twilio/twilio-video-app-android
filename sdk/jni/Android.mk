@@ -28,10 +28,10 @@ endif
 
 LOCAL_MODULE := twilio-native
 LOCAL_SRC_FILES := \
-    dummy.cpp \
+	dummy.cpp \
 	com_twilio_signal_impl_TwilioRTCImpl.cpp \
-	com_twilio_signal_impl_EndpointImpl.cpp \
-	com_twilio_signal_impl_EndpointImpl_EndpointObserverInternal.cpp \
+	com_twilio_signal_impl_ConversationsClientImpl.cpp \
+	com_twilio_signal_impl_ConversationsClientImpl_EndpointObserverInternal.cpp \
 	com_twilio_signal_impl_ConversationImpl.cpp \
 	com_twilio_signal_impl_ConversationImpl_SessionObserverInternal.cpp
 

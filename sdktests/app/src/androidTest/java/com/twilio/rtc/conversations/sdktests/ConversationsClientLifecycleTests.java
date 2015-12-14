@@ -8,8 +8,8 @@ import com.twilio.rtc.conversations.sdktests.utils.TwilioRTCUtils;
 import com.twilio.signal.Conversation;
 import com.twilio.signal.ConversationException;
 import com.twilio.signal.ConversationListener;
-import com.twilio.signal.Endpoint;
-import com.twilio.signal.EndpointListener;
+import com.twilio.signal.ConversationsClient;
+import com.twilio.signal.ConversationsClientListener;
 import com.twilio.signal.Invite;
 import com.twilio.signal.LocalMedia;
 import com.twilio.signal.LocalVideoTrack;
@@ -29,7 +29,7 @@ import java.util.concurrent.TimeUnit;
 
 
 @RunWith(AndroidJUnit4.class)
-public class EndpointLifecycleTests {
+public class ConversationsClientLifecycleTests {
 
     private static String TOKEN = "token";
     private static String PARTICIPANT = "janne";
@@ -39,54 +39,54 @@ public class EndpointLifecycleTests {
             TwilioRTCActivity.class);
 
     @Test
-    public void testTwilioCreateEndpointWithToken() {
-        Endpoint endpoint = createEndpoint();
-        org.junit.Assert.assertNotNull(endpoint);
+    public void testTwilioCreateConversationsClientWithToken() {
+        ConversationsClient conversationsClient = createConversationsClient();
+        org.junit.Assert.assertNotNull(conversationsClient);
     }
 
     @Test(expected = IllegalStateException.class)
-    public void testTwilioCannotListenAfterEndpointDisposal() {
-        Endpoint endpoint = createEndpoint();
-        org.junit.Assert.assertNotNull(endpoint);
+    public void testTwilioCannotListenAfterConversationsClientDisposal() {
+        ConversationsClient conversationsClient = createConversationsClient();
+        org.junit.Assert.assertNotNull(conversationsClient);
 
-        endpoint.dispose();
-        endpoint.listen();
+        conversationsClient.dispose();
+        conversationsClient.listen();
     }
 
     @Test(expected = IllegalStateException.class)
-    public void testTwilioCannotUnlistenAfterEndpointDisposal() {
-        Endpoint endpoint = createEndpoint();
-        org.junit.Assert.assertNotNull(endpoint);
+    public void testTwilioCannotUnlistenAfterConversationsClientDisposal() {
+        ConversationsClient conversationsClient = createConversationsClient();
+        org.junit.Assert.assertNotNull(conversationsClient);
 
-        endpoint.dispose();
-        endpoint.unlisten();
+        conversationsClient.dispose();
+        conversationsClient.unlisten();
     }
 
     @Test(expected = IllegalStateException.class)
-    public void testTwilioCannotCreateConversationAfterEndpointDisposal() {
-        Endpoint endpoint = createEndpoint();
-        org.junit.Assert.assertNotNull(endpoint);
+    public void testTwilioCannotCreateConversationAfterConversationsClientDisposal() {
+        ConversationsClient conversationsClient = createConversationsClient();
+        org.junit.Assert.assertNotNull(conversationsClient);
 
-        endpoint.dispose();
+        conversationsClient.dispose();
         Set<String> participants = new HashSet<>();
         participants.add(PARTICIPANT);
         LocalMedia localMedia = MediaFactory.createLocalMedia();
-        Conversation conv = endpoint.createConversation(participants, localMedia, conversationListener());
+        Conversation conv = conversationsClient.createConversation(participants, localMedia, conversationListener());
     }
 
     @Test
-    public void testTwilioMultiDisposeEndpoint() {
+    public void testTwilioMultiDisposeConversationsClient() {
         for (int i= 1; i < 50; i++) {
-            Endpoint endpoint = createEndpoint();
-            org.junit.Assert.assertNotNull(endpoint);
-            endpoint.dispose();
+            ConversationsClient conversationsClient = createConversationsClient();
+            org.junit.Assert.assertNotNull(conversationsClient);
+            conversationsClient.dispose();
         }
     }
 
-    private Endpoint createEndpoint() {
+    private ConversationsClient createConversationsClient() {
         TwilioRTCUtils.initializeTwilioSDK(mActivityRule.getActivity().getApplicationContext());
-        Endpoint endpoint = TwilioRTC.createEndpoint(TOKEN, endpointListener());
-        return endpoint;
+        ConversationsClient conversationsClient = TwilioRTC.createConversationsClient(TOKEN, conversationsClientListener());
+        return conversationsClient;
     }
 
     @Test
@@ -94,58 +94,58 @@ public class EndpointLifecycleTests {
         final CountDownLatch wait = new CountDownLatch(1);
         /*
          * The test thread cannot create new handlers. Use the main
-         * thread to ensure we can receive callbacks on the Endpoint which
+         * thread to ensure we can receive callbacks on the ConversationsClient which
          * uses a handler to callback on the thread that created it.
          */
         InstrumentationRegistry.getInstrumentation().runOnMainSync(new Runnable() {
             @Override
             public void run() {
-                Endpoint endpoint = TwilioRTC.createEndpoint(TOKEN, new EndpointListener() {
+                ConversationsClient conversationsClient = TwilioRTC.createConversationsClient(TOKEN, new ConversationsClientListener() {
                     @Override
-                    public void onStartListeningForInvites(Endpoint endpoint) {
+                    public void onStartListeningForInvites(ConversationsClient conversationsClient) {
                         org.junit.Assert.fail();
                     }
 
                     @Override
-                    public void onStopListeningForInvites(Endpoint endpoint) {
+                    public void onStopListeningForInvites(ConversationsClient conversationsClient) {
                         org.junit.Assert.fail();
                     }
 
                     @Override
-                    public void onFailedToStartListening(Endpoint endpoint, ConversationException e) {
+                    public void onFailedToStartListening(ConversationsClient conversationsClient, ConversationException e) {
                         wait.countDown();
                     }
 
                     @Override
-                    public void onReceiveConversationInvite(Endpoint endpoint, Invite invite) {
+                    public void onReceiveConversationInvite(ConversationsClient conversationsClient, Invite invite) {
                         org.junit.Assert.fail();
                     }
                 });
-                endpoint.listen();
+                conversationsClient.listen();
             }
         });
         TwilioRTCUtils.wait(wait, 10, TimeUnit.SECONDS);
     }
 
-    private EndpointListener endpointListener() {
-        return new EndpointListener() {
+    private ConversationsClientListener conversationsClientListener() {
+        return new ConversationsClientListener() {
             @Override
-            public void onStartListeningForInvites(Endpoint endpoint) {
+            public void onStartListeningForInvites(ConversationsClient conversationsClient) {
 
             }
 
             @Override
-            public void onStopListeningForInvites(Endpoint endpoint) {
+            public void onStopListeningForInvites(ConversationsClient conversationsClient) {
 
             }
 
             @Override
-            public void onFailedToStartListening(Endpoint endpoint, ConversationException e) {
+            public void onFailedToStartListening(ConversationsClient conversationsClient, ConversationException e) {
 
             }
 
             @Override
-            public void onReceiveConversationInvite(Endpoint endpoint, Invite invite) {
+            public void onReceiveConversationInvite(ConversationsClient conversationsClient, Invite invite) {
 
             }
         };
@@ -153,18 +153,19 @@ public class EndpointLifecycleTests {
 
     private ConversationListener conversationListener() {
         return new ConversationListener() {
+
             @Override
-            public void onConnectParticipant(Conversation conversation, Participant participant) {
+            public void onParticipantConnected(Conversation conversation, Participant participant) {
 
             }
 
             @Override
-            public void onFailToConnectParticipant(Conversation conversation, Participant participant, ConversationException e) {
+            public void onFailedToConnectParticipant(Conversation conversation, Participant participant, ConversationException e) {
 
             }
 
             @Override
-            public void onDisconnectParticipant(Conversation conversation, Participant participant) {
+            public void onParticipantDisconnected(Conversation conversation, Participant participant) {
 
             }
 
@@ -190,11 +191,6 @@ public class EndpointLifecycleTests {
 
             @Override
             public void onLocalStatusChanged(Conversation conversation, Conversation.Status status) {
-
-            }
-
-            @Override
-            public void onConversationEnded(Conversation conversation) {
 
             }
 

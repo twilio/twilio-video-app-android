@@ -13,8 +13,8 @@ JAVADOC_SOURCE_FILES="
     Conversation.java
     ConversationException.java
     ConversationListener.java
-    Endpoint.java
-    EndpointListener.java
+    ConversationsClient.java
+    ConversationsClientListener.java
     I420Frame.java
     Invite.java
     LocalMedia.java

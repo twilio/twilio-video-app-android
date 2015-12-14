@@ -71,21 +71,21 @@ public class ConversationActivity extends Activity implements ConversationListen
 	}
 
 	@Override
-	public void onConnectParticipant(Conversation conversation,
+	public void onParticipantConnected(Conversation conversation,
 			Participant participant) {
-		Log.i(TAG, "onConnect participant: "+participant.getAddress());
+		Log.i(TAG, "Participant connected: "+participant.getAddress());
 	}
 
 	@Override
-	public void onFailToConnectParticipant(Conversation conversation,
+	public void onFailedToConnectParticipant(Conversation conversation,
 			Participant participant, ConversationException e) {
 		Log.w(TAG, "Failed to connect participant: "+e.getMessage());
 	}
 
 	@Override
-	public void onDisconnectParticipant(Conversation conversation,
+	public void onParticipantDisconnected(Conversation conversation,
 			Participant participant) {
-		Log.i(TAG, "onDisconnectedParticipant:"+participant.getAddress());
+		Log.i(TAG, "onParticipantDisconncted: "+participant.getAddress());
 
 	}
 
@@ -145,14 +145,10 @@ public class ConversationActivity extends Activity implements ConversationListen
 	}
 
 	@Override
-	public void onConversationEnded(Conversation conversation) {
-		Log.i(TAG, "onConversationEnded");
-		releaseConversation(conversation);
-	}
-
-	@Override
 	public void onConversationEnded(Conversation conversation, ConversationException e) {
-		Log.i(TAG, "onConversationEnded error:"+e.getMessage());
+		if(e != null) {
+			Log.i(TAG, "onConversationEnded error:"+e.getMessage());
+		}
 		releaseConversation(conversation);
 	}
 

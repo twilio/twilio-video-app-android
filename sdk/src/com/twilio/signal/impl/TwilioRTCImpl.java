@@ -18,7 +18,7 @@ import android.os.IBinder;
 import android.util.Log;
 
 import com.twilio.common.TwilioAccessManager;
-import com.twilio.signal.EndpointListener;
+import com.twilio.signal.ConversationsClientListener;
 import com.twilio.signal.TwilioRTC;
 import com.twilio.signal.TwilioRTC.LogLevel;
 import com.twilio.signal.TwilioRTCService;
@@ -45,7 +45,7 @@ public class TwilioRTCImpl {
 
 	protected TwilioBinder twBinder;
 
-	protected final Map<UUID, WeakReference<EndpointImpl>> endpoints = new HashMap<UUID, WeakReference<EndpointImpl>>();
+	protected final Map<UUID, WeakReference<ConversationsClientImpl>> conversationsClientMap = new HashMap<UUID, WeakReference<ConversationsClientImpl>>();
 
 	private static final String[] requiredPermissions = {
 		"android.permission.INTERNET",
@@ -194,23 +194,23 @@ public class TwilioRTCImpl {
 
 	}
 
-	public EndpointImpl createEndpoint(TwilioAccessManager accessManager, Map<String, String> options, EndpointListener inListener) {
+	public ConversationsClientImpl createConversationsClient(TwilioAccessManager accessManager, Map<String, String> options, ConversationsClientListener inListener) {
 		if(options != null && accessManager != null) {
-			final EndpointImpl endpoint = new EndpointImpl(context, accessManager, inListener);
-			long nativeObserverHandle = endpoint.getEndpointObserverHandle();
-			if (nativeObserverHandle == 0) {
+			final ConversationsClientImpl conversationsClient = new ConversationsClientImpl(context, accessManager, inListener);
+			long nativeEndpointObserverHandle = conversationsClient.getEndpointObserverHandle();
+			if (nativeEndpointObserverHandle == 0) {
 				return null;
 			}
-			final long nativeEndpointHandle = createEndpoint(accessManager, nativeObserverHandle);
+			final long nativeEndpointHandle = createEndpoint(accessManager, nativeEndpointObserverHandle);
 			if (nativeEndpointHandle == 0) {
 				return null;
 			}
-			endpoint.setNativeHandle(nativeEndpointHandle);
- 			synchronized (endpoints)
+			conversationsClient.setNativeHandle(nativeEndpointHandle);
+ 			synchronized (conversationsClientMap)
 			{
-				endpoints.put(endpoint.getUuid(), new WeakReference<EndpointImpl>(endpoint));
+				conversationsClientMap.put(conversationsClient.getUuid(), new WeakReference<ConversationsClientImpl>(conversationsClient));
 			}
-			return endpoint;
+			return conversationsClient;
 		}
 		return null;
 	}
@@ -271,16 +271,16 @@ public class TwilioRTCImpl {
 		context.startService(intent);
 	}
 
-	public EndpointImpl findDeviceByUUID(UUID uuid) {
-		synchronized (endpoints)
+	public ConversationsClientImpl findDeviceByUUID(UUID uuid) {
+		synchronized (conversationsClientMap)
 		{
-			WeakReference<EndpointImpl> deviceRef = endpoints.get(uuid);
+			WeakReference<ConversationsClientImpl> deviceRef = conversationsClientMap.get(uuid);
 			if (deviceRef != null) {
-				EndpointImpl device = deviceRef.get();
+				ConversationsClientImpl device = deviceRef.get();
 				if (device != null) {
 					return device;
 				} else {
-					endpoints.remove(uuid);
+					conversationsClientMap.remove(uuid);
 				}
 			}
 		}

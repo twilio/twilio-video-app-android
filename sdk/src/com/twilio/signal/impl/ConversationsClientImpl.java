@@ -15,8 +15,8 @@ import com.twilio.common.TwilioAccessManager;
 import com.twilio.signal.Conversation;
 import com.twilio.signal.ConversationException;
 import com.twilio.signal.ConversationListener;
-import com.twilio.signal.Endpoint;
-import com.twilio.signal.EndpointListener;
+import com.twilio.signal.ConversationsClient;
+import com.twilio.signal.ConversationsClientListener;
 import com.twilio.signal.Invite;
 import com.twilio.signal.LocalMedia;
 import com.twilio.signal.impl.core.CoreEndpoint;
@@ -26,29 +26,27 @@ import com.twilio.signal.impl.core.EndpointState;
 import com.twilio.signal.impl.logging.Logger;
 import com.twilio.signal.impl.util.CallbackHandler;
 
-public class EndpointImpl implements
-						Endpoint,
+public class ConversationsClientImpl implements
+		ConversationsClient,
 						NativeHandleInterface,
 						Parcelable,
 						EndpointObserver,
 						CoreEndpoint{
 
-	static final Logger logger = Logger.getLogger(EndpointImpl.class);
+	static final Logger logger = Logger.getLogger(ConversationsClientImpl.class);
 	
-	private static final String DISPOSE_MESSAGE = "The Endpoint has been disposed. This operation is no longer valid";
-	private static final String FINALIZE_MESSAGE = "Endpoints must be released by calling dispose(). Failure to do so may result in leaked resources.";
+	private static final String DISPOSE_MESSAGE = "The ConversationsClient has been disposed. This operation is no longer valid";
+	private static final String FINALIZE_MESSAGE = "The ConversationsClient must be released by calling dispose(). Failure to do so may result in leaked resources.";
 	
 	class EndpointObserverInternal implements NativeHandleInterface {
 
 		private long nativeEndpointObserver;
 		
 		public EndpointObserverInternal(EndpointObserver observer) {
-			//this.listener = listener;
-			this.nativeEndpointObserver = wrapNativeObserver(observer, EndpointImpl.this);
+			this.nativeEndpointObserver = wrapNativeObserver(observer, ConversationsClientImpl.this);
 		}
 
-		private native long wrapNativeObserver(EndpointObserver observer, Endpoint endpoint);
-		//::TODO figure out when to call this - may be Endpoint.release() ??
+		private native long wrapNativeObserver(EndpointObserver observer, ConversationsClient conversationsClient);
 		private native void freeNativeObserver(long nativeEndpointObserver);
 
 		@Override
@@ -69,12 +67,12 @@ public class EndpointImpl implements
 
 	private final UUID uuid = UUID.randomUUID();
 	private Context context;
-	private EndpointListener listener;
-	private String userName;
+	private ConversationsClientListener listener;
 	private PendingIntent incomingIntent = null;
 	private EndpointObserverInternal endpointObserver;
 	private long nativeEndpointHandle;
 	private boolean isDisposed;
+	private boolean listening = false;
 	private TwilioAccessManager accessManager;
 
 	private Handler handler;
@@ -99,9 +97,9 @@ public class EndpointImpl implements
 	}
 
 
-	EndpointImpl(Context context,
-			TwilioAccessManager accessManager,
-			EndpointListener inListener) {
+	ConversationsClientImpl(Context context,
+							TwilioAccessManager accessManager,
+							ConversationsClientListener inListener) {
 		this.context = context;
 		this.listener = inListener;
 		this.accessManager = accessManager;
@@ -122,7 +120,6 @@ public class EndpointImpl implements
 
 	@Override
 	public void listen() {
-		//SignalCore.getInstance(this.context).register();
 		checkDisposed();
 		listen(nativeEndpointHandle);
 	}
@@ -130,7 +127,6 @@ public class EndpointImpl implements
 
 	@Override
 	public void unlisten() {
-		//SignalCore.getInstance(this.context).unregister(this);
 		checkDisposed();
 		unlisten(nativeEndpointHandle);
 	}
@@ -139,24 +135,20 @@ public class EndpointImpl implements
 
 
 	@Override
-	public void setEndpointListener(EndpointListener listener) {
+	public void setConversationsClientListener(ConversationsClientListener listener) {
 		this.listener = listener;
 
 	}
 
 	@Override
-	public String getAddress() {
-		// TODO Auto-generated method stub
-		return null;
+	public String getIdentity() {
+		return new String(accessManager.getIdentity());
 	}
-
 
 	@Override
 	public boolean isListening() {
-		// TODO Auto-generated method stub
-		return false;
+		return listening;
 	}
-
 
 	@Override
 	public Conversation createConversation(Set<String> participants,
@@ -195,10 +187,10 @@ public class EndpointImpl implements
     }
 
 	/* Parcelable */
-    public static final Parcelable.Creator<EndpointImpl> CREATOR = new Parcelable.Creator<EndpointImpl>()
+    public static final Parcelable.Creator<ConversationsClientImpl> CREATOR = new Parcelable.Creator<ConversationsClientImpl>()
     {
     	@Override
-        public EndpointImpl createFromParcel(Parcel in)
+        public ConversationsClientImpl createFromParcel(Parcel in)
         {
             UUID uuid = (UUID)in.readSerializable();
             TwilioRTCImpl twImpl = TwilioRTCImpl.getInstance();
@@ -206,7 +198,7 @@ public class EndpointImpl implements
         }
 
     	@Override
-        public EndpointImpl[] newArray(int size)
+        public ConversationsClientImpl[] newArray(int size)
         {
             throw new UnsupportedOperationException();
         }
@@ -218,8 +210,8 @@ public class EndpointImpl implements
 		if (incomingIntent != null) {
 			logger.d("Received Incoming notification, calling intent");
 			Intent intent = new Intent();
-			intent.putExtra(Endpoint.EXTRA_DEVICE, this);
-			if (intent.hasExtra(Endpoint.EXTRA_DEVICE)) {
+			intent.putExtra(ConversationsClient.EXTRA_DEVICE, this);
+			if (intent.hasExtra(ConversationsClient.EXTRA_DEVICE)) {
 				logger.d("Received Incoming notification, calling intent has extra");
 			} else {
 				logger.d("Received Incoming notification, calling intent do not have extra");
@@ -247,6 +239,7 @@ public class EndpointImpl implements
 	public void onRegistrationDidComplete(CoreError error) {
 		logger.d("onRegistrationDidComplete");
 		if (error != null) {
+			listening = false;
 			final ConversationException e =
 					new ConversationException(error.getDomain(),
 							error.getCode(), error.getMessage());
@@ -254,16 +247,17 @@ public class EndpointImpl implements
 				handler.post(new Runnable() {
 					@Override
 					public void run() {
-						listener.onFailedToStartListening(EndpointImpl.this, e);
+						listener.onFailedToStartListening(ConversationsClientImpl.this, e);
 					}
 				});
 			}
 		} else {
+			listening = true;
 			if (handler != null) {
 				handler.post(new Runnable() {
 					@Override
 					public void run() {
-						listener.onStartListeningForInvites(EndpointImpl.this);
+						listener.onStartListeningForInvites(ConversationsClientImpl.this);
 					}
 				});
 			}
@@ -274,11 +268,12 @@ public class EndpointImpl implements
 	@Override
 	public void onUnregistrationDidComplete(CoreError error) {
 		logger.d("onUnregistrationDidComplete");
+		listening = false;
 		if (handler != null) {
 			handler.post(new Runnable() {
 				@Override
 				public void run() {
-					listener.onStopListeningForInvites(EndpointImpl.this);
+					listener.onStopListeningForInvites(ConversationsClientImpl.this);
 				}
 			});
 		}
@@ -312,7 +307,7 @@ public class EndpointImpl implements
 			handler.post(new Runnable() {
 				@Override
 				public void run() {
-					listener.onReceiveConversationInvite(EndpointImpl.this, invite);
+					listener.onReceiveConversationInvite(ConversationsClientImpl.this, invite);
 				}
 			});
 		}
