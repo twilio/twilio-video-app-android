@@ -15,6 +15,7 @@
 
 
 using namespace twiliosdk;
+using namespace webrtc_jni;
 
 #define TAG  "TwilioSDK(native)"
 
@@ -160,4 +161,14 @@ JNIEXPORT void JNICALL Java_com_twilio_signal_impl_ConversationImpl_invitePartic
 		participants.push_back(participantStr);
 	}
 	session->get()->inviteParticipants(participants);
+}
+
+
+JNIEXPORT jstring JNICALL Java_com_twilio_signal_impl_ConversationImpl_getConversationSid
+  (JNIEnv *env, jobject obj, jlong nativeSession)
+{
+	TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK, kTSCoreLogLevelDebug, "getConversationSid");
+	TSCSessionPtr *session = reinterpret_cast<TSCSessionPtr *>(nativeSession);
+
+	return JavaStringFromStdString(env, session->get()->getConversationSid());
 }

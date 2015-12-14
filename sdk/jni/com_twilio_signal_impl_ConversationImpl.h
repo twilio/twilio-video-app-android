@@ -38,6 +38,8 @@ JNIEXPORT jboolean JNICALL Java_com_twilio_signal_impl_ConversationImpl_isMuted
 JNIEXPORT void JNICALL Java_com_twilio_signal_impl_ConversationImpl_inviteParticipants
   (JNIEnv *, jobject, jlong, jobjectArray);
 
+JNIEXPORT jstring JNICALL Java_com_twilio_signal_impl_ConversationImpl_getConversationSid
+  (JNIEnv *, jobject, jlong);
 
 #ifdef __cplusplus
 }
