@@ -73,7 +73,11 @@ JNIEXPORT void JNICALL Java_com_twilio_signal_impl_ConversationImpl_start
 	bool enableVideo = j_enableVideo == JNI_TRUE ? true : false;
 	bool pauseVideo = j_pauseVideo == JNI_TRUE ? true : false;
 
-	TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK, kTSCoreLogLevelDebug, "local media config %d %d %d %d", enableAudio, muteAudio, enableVideo, pauseVideo);
+	TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK, kTSCoreLogLevelDebug, "local media config: %s, %s, %s, %s",
+			(enableAudio ? "enabledAudio = true":"enabledAudio = false"),
+			 (muteAudio ? "muteAudio = true":"muteAudio = false"),
+			 (enableVideo ? "enableVideo = true":"enableVideo=false"),
+			 (pauseVideo ? "pauseVideo=true":"pauseVideo=false"));
 
 	session->get()->start(new TSCSessionMediaConstrainsObject(enableAudio, muteAudio, enableVideo, pauseVideo));
 }

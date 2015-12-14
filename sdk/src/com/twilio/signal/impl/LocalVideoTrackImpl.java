@@ -11,6 +11,7 @@ public class LocalVideoTrackImpl extends VideoTrackImpl implements  LocalVideoTr
 	public LocalVideoTrackImpl(CameraCapturer cameraCapturer) {
 		super();
 		this.cameraCapturer = cameraCapturer;
+		enableVideo = true;
 	}
 	
 	/* (non-Javadoc)
