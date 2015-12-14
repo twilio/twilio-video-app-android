@@ -6,7 +6,7 @@ public interface VideoRendererObserver {
 
 	public void onFirstFrame();
 
-	public void onFrameSizeChanged(int width, int height);
+	public void onFrameDimensionsChanged(int width, int height);
 
 }
 
