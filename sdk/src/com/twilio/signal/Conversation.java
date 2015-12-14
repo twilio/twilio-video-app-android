@@ -36,9 +36,9 @@ public interface Conversation {
 		
 	
 	/**
-	 * Returns the list of Participants in an active Session.
+	 * Returns the list of Participants in a Conversation.
 	 * 
-	 * @return participants - list of {@link Participant} in this Session.
+	 * @return participants - list of {@link Participant} in this Conversation.
 	 */
 	public Set<String> getParticipants();
 	

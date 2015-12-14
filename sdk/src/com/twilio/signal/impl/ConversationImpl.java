@@ -185,9 +185,13 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 
 	@Override
 	public String getConversationSid() {
-		// TODO Auto-generated method stub
 		checkDisposed();
-		return null;
+		String conversationSid = getConversationSid(nativeHandle);
+		if(conversationSid == null || conversationSid.length() == 0) {
+			return null;
+		} else {
+			return conversationSid;
+		}
 	}
 	
 	@Override
@@ -530,9 +534,6 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 		}
 	}
 	
-	/**
-	 * Native methods
-	 */
 	private native long wrapOutgoingSession(long nativeEndpoint, long nativeSessionObserver, String[] participants);
 	private native void start(long nativeSession);
 	private native void setExternalCapturer(long nativeSession, long nativeCapturer);
@@ -543,7 +544,6 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 	private native boolean mute(long nativeSession, boolean on);
 	private native boolean isMuted(long nativeSession);
 	private native void inviteParticipants(long nativeHandle, String[] participants);
-
-	
+	private native String getConversationSid(long nativeHandle);
 
 }
