@@ -68,11 +68,11 @@ public class ConversationsClientImpl implements
 	private final UUID uuid = UUID.randomUUID();
 	private Context context;
 	private ConversationsClientListener listener;
-	private String userName;
 	private PendingIntent incomingIntent = null;
 	private EndpointObserverInternal endpointObserver;
 	private long nativeEndpointHandle;
 	private boolean isDisposed;
+	private boolean listening = false;
 	private TwilioAccessManager accessManager;
 
 	private Handler handler;
@@ -120,7 +120,6 @@ public class ConversationsClientImpl implements
 
 	@Override
 	public void listen() {
-		//SignalCore.getInstance(this.context).register();
 		checkDisposed();
 		listen(nativeEndpointHandle);
 	}
@@ -128,7 +127,6 @@ public class ConversationsClientImpl implements
 
 	@Override
 	public void unlisten() {
-		//SignalCore.getInstance(this.context).unregister(this);
 		checkDisposed();
 		unlisten(nativeEndpointHandle);
 	}
@@ -143,18 +141,14 @@ public class ConversationsClientImpl implements
 	}
 
 	@Override
-	public String getAddress() {
-		// TODO Auto-generated method stub
-		return null;
+	public String getIdentity() {
+		return new String(accessManager.getIdentity());
 	}
-
 
 	@Override
 	public boolean isListening() {
-		// TODO Auto-generated method stub
-		return false;
+		return listening;
 	}
-
 
 	@Override
 	public Conversation createConversation(Set<String> participants,
@@ -245,6 +239,7 @@ public class ConversationsClientImpl implements
 	public void onRegistrationDidComplete(CoreError error) {
 		logger.d("onRegistrationDidComplete");
 		if (error != null) {
+			listening = false;
 			final ConversationException e =
 					new ConversationException(error.getDomain(),
 							error.getCode(), error.getMessage());
@@ -257,6 +252,7 @@ public class ConversationsClientImpl implements
 				});
 			}
 		} else {
+			listening = true;
 			if (handler != null) {
 				handler.post(new Runnable() {
 					@Override
@@ -272,6 +268,7 @@ public class ConversationsClientImpl implements
 	@Override
 	public void onUnregistrationDidComplete(CoreError error) {
 		logger.d("onUnregistrationDidComplete");
+		listening = false;
 		if (handler != null) {
 			handler.post(new Runnable() {
 				@Override

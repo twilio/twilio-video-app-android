@@ -29,11 +29,11 @@ public interface ConversationsClient {
 	public void setConversationsClientListener(ConversationsClientListener listener);
 	
 	/**
-	 * Gets address of this conversations client on the network for incoming calls
-	 * 
-	 * @return address of this conversations client
+	 * Identity of this conversationsClient on the network for incoming calls.
+	 *
+	 * @return identity of this conversationsClient
  	 */
-	public String getAddress();
+	public String getIdentity();
 	
 	/**
 	 * Reflects current listening state of the conversations client
