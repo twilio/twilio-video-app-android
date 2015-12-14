@@ -231,7 +231,7 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 				handler.post(new Runnable() {
 					@Override
 					public void run() {
-						conversationListener.onConversationEnded(ConversationImpl.this);
+						conversationListener.onConversationEnded(ConversationImpl.this, null);
 					}
 				});
 			}
@@ -252,14 +252,14 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 
 	@Override
 	public void onConnectParticipant(String participantAddress, CoreError error) {
-		logger.i("onConnectParticipant " + participantAddress);
+		logger.i("onParticipantConnected " + participantAddress);
 		final ParticipantImpl participant = addParticipant(participantAddress);
 		if (error == null) {
 			if(handler != null) {
 				handler.post(new Runnable() {
 					@Override
 					public void run() {
-						conversationListener.onConnectParticipant(ConversationImpl.this, participant);
+						conversationListener.onParticipantConnected(ConversationImpl.this, participant);
 					}
 				});
 			}
@@ -269,7 +269,7 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 				handler.post(new Runnable() {
 					@Override
 					public void run() {
-						conversationListener.onFailToConnectParticipant(ConversationImpl.this, participant, e);
+						conversationListener.onFailedToConnectParticipant(ConversationImpl.this, participant, e);
 					}
 				});
 			}
@@ -286,7 +286,7 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 				handler.post(new Runnable() {
 					@Override
 					public void run() {
-						conversationListener.onDisconnectParticipant(ConversationImpl.this, participant);
+						conversationListener.onParticipantDisconnected(ConversationImpl.this, participant);
 					}
 				});
 			}

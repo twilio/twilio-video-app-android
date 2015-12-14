@@ -153,18 +153,19 @@ public class ConversationsClientLifecycleTests {
 
     private ConversationListener conversationListener() {
         return new ConversationListener() {
+
             @Override
-            public void onConnectParticipant(Conversation conversation, Participant participant) {
+            public void onParticipantConnected(Conversation conversation, Participant participant) {
 
             }
 
             @Override
-            public void onFailToConnectParticipant(Conversation conversation, Participant participant, ConversationException e) {
+            public void onFailedToConnectParticipant(Conversation conversation, Participant participant, ConversationException e) {
 
             }
 
             @Override
-            public void onDisconnectParticipant(Conversation conversation, Participant participant) {
+            public void onParticipantDisconnected(Conversation conversation, Participant participant) {
 
             }
 
@@ -190,11 +191,6 @@ public class ConversationsClientLifecycleTests {
 
             @Override
             public void onLocalStatusChanged(Conversation conversation, Conversation.Status status) {
-
-            }
-
-            @Override
-            public void onConversationEnded(Conversation conversation) {
 
             }
 

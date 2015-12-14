@@ -26,10 +26,9 @@ public class TwilioRTC {
 		 * Called if there is an error initializing the Twilio RTC
 		 * Conversations Client.
 		 * 
-		 * @param error
-		 *            An exception describing the error that occurred
+		 * @param exception An exception describing the error that occurred
 		 */
-		public void onError(Exception e);
+		public void onError(Exception exception);
 	}
 
 	/**
