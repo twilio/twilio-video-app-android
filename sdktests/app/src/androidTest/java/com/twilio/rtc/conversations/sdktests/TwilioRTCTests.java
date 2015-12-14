@@ -11,8 +11,8 @@ import com.twilio.common.TwilioAccessManager;
 import com.twilio.common.TwilioAccessManagerFactory;
 import com.twilio.rtc.conversations.sdktests.utils.TwilioRTCUtils;
 import com.twilio.signal.ConversationException;
-import com.twilio.signal.Endpoint;
-import com.twilio.signal.EndpointListener;
+import com.twilio.signal.ConversationsClient;
+import com.twilio.signal.ConversationsClientListener;
 import com.twilio.signal.Invite;
 import com.twilio.signal.TwilioRTC;
 
@@ -56,13 +56,13 @@ public class TwilioRTCTests {
 
 
     @Test
-    public void testTwilioCreateEndpointWithNullParams() {
+    public void testTwilioCreateConversationsClientWithNullParams() {
         TwilioRTCUtils.initializeTwilioSDK(mActivityRule.getActivity());
 
         boolean npeSeen = false;
 
         try {
-            TwilioRTC.createEndpoint((String)null, null);
+            TwilioRTC.createConversationsClient((String)null, null);
         } catch(NullPointerException e) {
             npeSeen = true;
         } finally {
@@ -71,7 +71,7 @@ public class TwilioRTCTests {
         }
 
         try {
-            TwilioRTC.createEndpoint((TwilioAccessManager)null, null);
+            TwilioRTC.createConversationsClient((TwilioAccessManager)null, null);
         } catch(NullPointerException e) {
             npeSeen = true;
         } finally {
@@ -80,7 +80,7 @@ public class TwilioRTCTests {
         }
 
         try {
-            TwilioRTC.createEndpoint(null, null, null);
+            TwilioRTC.createConversationsClient(null, null, null);
         } catch(NullPointerException e) {
             npeSeen = true;
         } finally {
@@ -90,7 +90,7 @@ public class TwilioRTCTests {
 
 
         try {
-            TwilioRTC.createEndpoint("foo", null);
+            TwilioRTC.createConversationsClient("foo", null);
         } catch(NullPointerException e) {
             npeSeen = true;
         } finally {
@@ -99,7 +99,7 @@ public class TwilioRTCTests {
         }
 
         try {
-            TwilioRTC.createEndpoint(
+            TwilioRTC.createConversationsClient(
                     TwilioAccessManagerFactory.createAccessManager("foo", null), null);
         } catch(NullPointerException e) {
             npeSeen = true;
@@ -110,7 +110,7 @@ public class TwilioRTCTests {
 
 
         try {
-            TwilioRTC.createEndpoint(null, null, endpointListener());
+            TwilioRTC.createConversationsClient(null, null, conversationsClientListener());
         } catch(NullPointerException e) {
             npeSeen = true;
         } finally {
@@ -121,40 +121,40 @@ public class TwilioRTCTests {
     }
 
     @Test
-    public void testTwilioCreateEndpointWithToken() {
+    public void testTwilioCreateConversationsClientWithToken() {
         TwilioRTCUtils.initializeTwilioSDK(mActivityRule.getActivity());
 
         CountDownLatch waitLatch = new CountDownLatch(1);
-        Endpoint endpoint = TwilioRTC.createEndpoint("DEADBEEF", endpointListener());
+        ConversationsClient conversationsClient = TwilioRTC.createConversationsClient("DEADBEEF", conversationsClientListener());
 
         // TODO: check start listening once callback issue is resolved
-        org.junit.Assert.assertNotNull(endpoint);
+        org.junit.Assert.assertNotNull(conversationsClient);
     }
 
     @Test
-    public void testTwilioCreateEndpointWithAccessManagerAndEmptyOptionsMap() {
+    public void testTwilioCreateConversationsClientWithAccessManagerAndEmptyOptionsMap() {
         TwilioRTCUtils.initializeTwilioSDK(mActivityRule.getActivity());
 
         CountDownLatch waitLatch = new CountDownLatch(1);
         TwilioAccessManager accessManager = TwilioAccessManagerFactory.createAccessManager("DEADBEEF", null);
-        Endpoint endpoint = TwilioRTC.createEndpoint(accessManager, new HashMap<String, String>(), endpointListener());
+        ConversationsClient conversationsClient = TwilioRTC.createConversationsClient(accessManager, new HashMap<String, String>(), conversationsClientListener());
 
         // TODO: check start listening once callback issue is resolved
-        org.junit.Assert.assertNotNull(endpoint);
+        org.junit.Assert.assertNotNull(conversationsClient);
     }
 
     @Test
-    public void testTwilioCreateEndpointWithAccessManagerAndRandomOption() {
+    public void testTwilioCreateConversationsClientWithAccessManagerAndRandomOption() {
         TwilioRTCUtils.initializeTwilioSDK(mActivityRule.getActivity());
 
         CountDownLatch waitLatch = new CountDownLatch(1);
         HashMap optionsMap = new HashMap<String, String>();
         optionsMap.put("foo", "bar");
         TwilioAccessManager accessManager = TwilioAccessManagerFactory.createAccessManager("DEADBEEF", null);
-        Endpoint endpoint = TwilioRTC.createEndpoint(accessManager, optionsMap, endpointListener());
+        ConversationsClient conversationsClient = TwilioRTC.createConversationsClient(accessManager, optionsMap, conversationsClientListener());
 
         // TODO: check start listening once callback issue is resolved
-        org.junit.Assert.assertNotNull(endpoint);
+        org.junit.Assert.assertNotNull(conversationsClient);
     }
 
     @Test
@@ -208,25 +208,25 @@ public class TwilioRTCTests {
     }
 
 
-    private EndpointListener endpointListener() {
-        return new EndpointListener() {
+    private ConversationsClientListener conversationsClientListener() {
+        return new ConversationsClientListener() {
             @Override
-            public void onStartListeningForInvites(Endpoint endpoint) {
+            public void onStartListeningForInvites(ConversationsClient conversationsClient) {
 
             }
 
             @Override
-            public void onStopListeningForInvites(Endpoint endpoint) {
+            public void onStopListeningForInvites(ConversationsClient conversationsClient) {
 
             }
 
             @Override
-            public void onFailedToStartListening(Endpoint endpoint, ConversationException e) {
+            public void onFailedToStartListening(ConversationsClient conversationsClient, ConversationException e) {
 
             }
 
             @Override
-            public void onReceiveConversationInvite(Endpoint endpoint, Invite invite) {
+            public void onReceiveConversationInvite(ConversationsClient conversationsClient, Invite invite) {
 
             }
         };

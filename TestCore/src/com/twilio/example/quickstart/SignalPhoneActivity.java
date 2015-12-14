@@ -15,7 +15,7 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 
 import com.twilio.example.quickstart.SignalPhone.LoginListener;
-import com.twilio.signal.Endpoint;
+import com.twilio.signal.ConversationsClient;
 
 public class SignalPhoneActivity extends Activity implements LoginListener {
 
@@ -137,7 +137,7 @@ public class SignalPhoneActivity extends Activity implements LoginListener {
 	public void onResume() {
 		super.onResume();
 		Intent intent = getIntent();
-		if(intent != null && getIntent().getParcelableExtra(Endpoint.EXTRA_DEVICE) != null) {
+		if(intent != null && getIntent().getParcelableExtra(ConversationsClient.EXTRA_DEVICE) != null) {
 			//showIncomingAlert();
 		}
 	}

@@ -32,8 +32,8 @@ import com.twilio.signal.CapturerException;
 import com.twilio.signal.Conversation;
 import com.twilio.signal.ConversationException;
 import com.twilio.signal.ConversationListener;
-import com.twilio.signal.Endpoint;
-import com.twilio.signal.EndpointListener;
+import com.twilio.signal.ConversationsClient;
+import com.twilio.signal.ConversationsClientListener;
 import com.twilio.signal.Invite;
 import com.twilio.signal.LocalMedia;
 import com.twilio.signal.LocalVideoTrack;
@@ -43,16 +43,16 @@ import com.twilio.signal.TwilioRTC;
 import com.twilio.signal.impl.TwilioConstants;
 
 
-public class SignalPhone implements EndpointListener
+public class SignalPhone implements ConversationsClientListener
 {
     private static final String TAG = "SIgnalPhone";
 
     // TODO: change this to point to the script on your public server
     private static final String ICE_TOKEN_URL_STRING = "http://client:chunder@chunder-interactive.appspot.com/iceToken?realm=prod";
-    //private static final String CAPABILITY_TOKEN_URL_STRING = "https://sat-token-generator.herokuapp.com/sat-token?EndpointName=evan";
+    //private static final String CAPABILITY_TOKEN_URL_STRING = "https://sat-token-generator.herokuapp.com/sat-token?ConversationsClientName=evan";
     private static final String CAPABILITY_TOKEN_URL_STRING =  "https://simple-signaling.appspot.com/token?realm=prod";
 
-    private Endpoint alice = null;
+    private ConversationsClient alice = null;
     private String token = "";
 
     private Map<String, String> options = new HashMap<String, String>();
@@ -274,11 +274,11 @@ public class SignalPhone implements EndpointListener
 
     }
 
-    private void createEndpoint(String capabilityToken) {
+    private void createConversationsClient(String capabilityToken) {
     	if (loginListener != null) {
 			loginListener.onLoginStarted();
 		}
-		SignalPhone.this.alice = TwilioRTC.createEndpoint(capabilityToken, SignalPhone.this);
+		SignalPhone.this.alice = TwilioRTC.createConversationsClient(capabilityToken, SignalPhone.this);
 		listen();
 		Intent intent = new Intent(context, SignalPhoneActivity.class);
         PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
@@ -286,7 +286,7 @@ public class SignalPhone implements EndpointListener
 		/*} else {
 			SignalPhone.this.alice.listen();
 		}*/
-		 Log.i(TAG, "Created Endpoint With Token");
+		 Log.i(TAG, "Created ConversationsClient With Token");
     }
 
 
@@ -295,7 +295,7 @@ public class SignalPhone implements EndpointListener
 		protected void onPostExecute(String result) {
 			super.onPostExecute(result);
 			//obtainIceToken();
-			createEndpoint(result);
+			createConversationsClient(result);
 		}
 
 		@Override
@@ -303,7 +303,7 @@ public class SignalPhone implements EndpointListener
 			String capabilityToken = null;
 			try {
 				capabilityToken = HttpHelper.httpGet(params[0]);
-				options.put(TwilioConstants.EndpointOptionCapabilityTokenKey, capabilityToken);
+				options.put(TwilioConstants.ConversationsClientOptionCapabilityTokenKey, capabilityToken);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -321,7 +321,7 @@ public class SignalPhone implements EndpointListener
 			if (loginListener != null) {
 				loginListener.onLoginStarted();
 			}
-			SignalPhone.this.alice = TwilioSignal.createEndpointWithToken(
+			SignalPhone.this.alice = TwilioSignal.createConversationsClientWithToken(
 					options, token, SignalPhone.this);
 			Intent intent = new Intent(context, SignalPhoneActivity.class);
             PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
@@ -329,7 +329,7 @@ public class SignalPhone implements EndpointListener
 			/*} else {
 				SignalPhone.this.alice.listen();
 			}*/
-			 Log.i(TAG, "Created Endpoint With Token");
+			 Log.i(TAG, "Created ConversationsClient With Token");
 		}
 
 		@Override
@@ -345,10 +345,10 @@ public class SignalPhone implements EndpointListener
 				String username = (String) turnJson.get("username");
 				String turnUrl = (String) turnJson.get("url");
 
-				options.put(TwilioConstants.EndpointOptionStunURLKey, stunUrl);
-				options.put(TwilioConstants.EndpointOptionTurnURLKey, turnUrl);
-				options.put(TwilioConstants.EndpointOptionUserNameKey, username);
-				options.put(TwilioConstants.EndpointOptionPasswordKey, credential);
+				options.put(TwilioConstants.ConversationsClientOptionStunURLKey, stunUrl);
+				options.put(TwilioConstants.ConversationsClientOptionTurnURLKey, turnUrl);
+				options.put(TwilioConstants.ConversationsClientOptionUserNameKey, username);
+				options.put(TwilioConstants.ConversationsClientOptionPasswordKey, credential);
 
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -359,20 +359,20 @@ public class SignalPhone implements EndpointListener
 
 
 
-	public void onEndpointStartListeningForInvites(Endpoint endpoint) {
+	public void onConversationsClientStartListeningForInvites(ConversationsClient conversationsClient) {
 		if (loginListener != null) {
 			loginListener.onLoginFinished();
 		}
 	}
 
 
-	public void onEndpointStopListeningForInvites(Endpoint endpoint) {
+	public void onConversationsClientStopListeningForInvites(ConversationsClient conversationsClient) {
 		
 
 	}
 
 	@Override
-	public void onFailedToStartListening(Endpoint endPoint, ConversationException e) {
+	public void onFailedToStartListening(ConversationsClient endPoint, ConversationException e) {
 		Log.d(TAG, "onFailedToStartListening msg:"+e.getMessage());
 		if (loginListener != null)
 			loginListener.onLoginError(e.getMessage());
@@ -385,7 +385,7 @@ public class SignalPhone implements EndpointListener
 	}
 
 	@Override
-	public void onStartListeningForInvites(Endpoint endpoint) {
+	public void onStartListeningForInvites(ConversationsClient conversationsClient) {
 		Log.d(TAG, "onStartListeningForInvites");
 		if (loginListener != null) {
 			loginListener.onLoginFinished();
@@ -393,23 +393,23 @@ public class SignalPhone implements EndpointListener
 	}
 
 	@Override
-	public void onStopListeningForInvites(Endpoint endpoint) {
+	public void onStopListeningForInvites(ConversationsClient conversationsClient) {
 		if (loginListener != null) {
 			loginListener.onLogoutFinished();
 		}
 		if (SignalPhone.this.alice == null) {
 			Log.w(TAG, "Alice is null");
 		}
-		if (SignalPhone.this.alice != endpoint) {
+		if (SignalPhone.this.alice != conversationsClient) {
 			Log.w(TAG, "Alice is different then endpoing from callback");
 		}
-		//Get rid of endpoint
+		//Get rid of conversationsClient
 		SignalPhone.this.alice.dispose();
 		SignalPhone.this.alice = null;
 	}
 
 	@Override
-	public void onReceiveConversationInvite(Endpoint endpoint, Invite invite) {
+	public void onReceiveConversationInvite(ConversationsClient conversationsClient, Invite invite) {
 		Log.d(TAG, "onReceiveConversationInvite");
 		if (loginListener != null) {
 			invites.put(invite.from(), invite);
