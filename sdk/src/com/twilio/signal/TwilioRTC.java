@@ -89,15 +89,15 @@ public class TwilioRTC {
 	}
 
 	/**
-	 * Creates a new Endpoint.
+	 * Creates a new ConversationsClient.
 	 * 
 	 * @param token - Access token
-	 * @param listener - a listener that receive events from the Endpoint.
+	 * @param listener - a listener that receive events from the ConversationsClient.
 	 *
-	 * @return the initialized Endpoint, or null if the Twilio RTC Conversations Client
+	 * @return the initialized ConversationsClient, or null if the Twilio RTC Conversations Client
          *         was not initialized
 	 */
-	public static Endpoint createEndpoint(String token, EndpointListener listener) {
+	public static ConversationsClient createConversationsClient(String token, ConversationsClientListener listener) {
 		if (token == null) {
 			throw new NullPointerException("token must not be null");
 		}
@@ -106,19 +106,19 @@ public class TwilioRTC {
 		}
 		TwilioAccessManager manager = TwilioAccessManagerFactory.createAccessManager(token, null);
 		Map<String, String> options = new HashMap<String, String>();
-		return TwilioRTCImpl.getInstance().createEndpoint(manager, options, listener);
+		return TwilioRTCImpl.getInstance().createConversationsClient(manager, options, listener);
 	}
 	
 	/**
-	 * Creates a new Endpoint.
+	 * Creates a new ConversationsClient.
 	 * 
 	 * @param accessManager - instance of TwilioAccessManager that is handling token lifetime
-	 * @param listener - a listener that receive events from the Endpoint.
+	 * @param listener - a listener that receive events from the ConversationsClient.
 	 *
-	 * @return the initialized Endpoint, or null if the Twilio RTC Conversations Client
+	 * @return the initialized ConversationsClient, or null if the Twilio RTC Conversations Client
          *         was not initialized
 	 */
-	public static Endpoint createEndpoint(TwilioAccessManager accessManager, EndpointListener listener) {
+	public static ConversationsClient createConversationsClient(TwilioAccessManager accessManager, ConversationsClientListener listener) {
 		if (accessManager == null) {
 			throw new NullPointerException("access manager must not be null");
 		}
@@ -126,20 +126,20 @@ public class TwilioRTC {
 			throw new NullPointerException("listener must not be null");
 		}
 		Map<String, String> options = new HashMap<String, String>();
-		return TwilioRTCImpl.getInstance().createEndpoint(accessManager, options, listener);
+		return TwilioRTCImpl.getInstance().createConversationsClient(accessManager, options, listener);
 	}
 	
 	/**
-	 * Creates a new Endpoint.
+	 * Creates a new ConversationsClient.
 	 * 
 	 * @param accessManager - instance of TwilioAccessManager that is handling token lifetime
 	 * @param options - options map <key, value>
-	 * @param listener - a listener that receive events from the Endpoint.
+	 * @param listener - a listener that receive events from the ConversationsClient.
 	 *
-	 * @return the initialized Endpoint, or null if the Twilio RTC Conversations Client
+	 * @return the initialized ConversationsClient, or null if the Twilio RTC Conversations Client
          *         was not initialized
 	 */
-	public static Endpoint createEndpoint(TwilioAccessManager accessManager, Map<String, String> options, EndpointListener listener) {
+	public static ConversationsClient createConversationsClient(TwilioAccessManager accessManager, Map<String, String> options, ConversationsClientListener listener) {
 		if (accessManager == null) {
 			throw new NullPointerException("access manager must not be null");
 		}
@@ -150,7 +150,7 @@ public class TwilioRTC {
 			throw new NullPointerException("listener must not be null");
 		}
 
-		return TwilioRTCImpl.getInstance().createEndpoint(accessManager, options, listener);
+		return TwilioRTCImpl.getInstance().createConversationsClient(accessManager, options, listener);
 	}
 
 	/**

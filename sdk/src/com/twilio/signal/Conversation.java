@@ -3,9 +3,7 @@ package com.twilio.signal;
 import java.util.Set;
 
 /**
- * A Conversation represents a communication from one Endpoint to one or more RemoteEndpoint.
- * You should not call Conversation's constructor directly; instead, call Endpoint#createSession.
- *
+ * A Conversation represents a communication from one ConversationsClient to one or more conversation clients.
  */
 
 public interface Conversation {
@@ -15,15 +13,15 @@ public interface Conversation {
 	 */
 	public enum Status
 	{
-		/** Local Endpoint's connection to Conversation has an unknown status */
+		/** Local ConversationsClient's connection to Conversation has an unknown status */
 		UNKNOWN,
-		/** Local Endpoint is connecting to the Conversation */
+		/** Local ConversationsClient is connecting to the Conversation */
 		CONNECTING,
-		/** Local Endpoint is connected to the Conversation.*/
+		/** Local ConversationsClient is connected to the Conversation.*/
 		CONNECTED,
-		/** Local Endpoint is disconnected from the Conversation */
+		/** Local ConversationsClient is disconnected from the Conversation */
 		DISCONNECTED,
-		/** Local Endpoint failed to connect to Conversation */
+		/** Local ConversationsClient failed to connect to Conversation */
 		FAILED
 	};
 	
@@ -46,18 +44,16 @@ public interface Conversation {
 	
 	
 	/**
-	 * Get a remote endpoint's media stream.
+	 * Get a conversation's local media
 	 * 
-	 * @param endpoint The remote endpoint whose stream we are fetching.
 	 * @return
 	 */
 	public LocalMedia getLocalMedia();
 	
 	
 	/**
-	 * Get a remote endpoint's media stream.
+	 * Get the conversation's listener
 	 * 
-	 * @param endpoint The remote endpoint whose stream we are fetching.
 	 * @return
 	 */
 	public ConversationListener getConversationListener();
@@ -69,9 +65,9 @@ public interface Conversation {
 	
 	
 	/**
-	 * Invite a set of remote participantAddresses.
+	 * Invite a set of participants.
 	 *
-	 * @param participants A set of strings representing the names of the remote endpoints.
+	 * @param participantAddresses A set of strings representing the names of the participants.
 	 */
 	public void invite(Set<String> participantAddresses) throws IllegalArgumentException;
 

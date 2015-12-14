@@ -2,39 +2,39 @@ package com.twilio.signal.impl;
 
 import com.twilio.signal.Conversation;
 import com.twilio.signal.ConversationListener;
-import com.twilio.signal.Endpoint;
+import com.twilio.signal.ConversationsClient;
 import com.twilio.signal.Invite;
 import com.twilio.signal.LocalMedia;
 
 public class InviteImpl implements Invite {
 	
 	private ConversationImpl conversation;
-	private EndpointImpl toEndpoint;
+	private ConversationsClientImpl conversationsClient;
 	private String fromAddr;
 	
 	private InviteImpl(ConversationImpl conversation,
-					EndpointImpl endpoint,
+					ConversationsClientImpl conversationsClient,
 					String[] participants) {
 		this.conversation = conversation;
-		this.toEndpoint = endpoint;
+		this.conversationsClient = conversationsClient;
 		if (participants.length > 0) {
 			fromAddr = participants[0];
 		}
 	}
 	
 	public static Invite create(ConversationImpl conversation,
-					EndpointImpl endpoint,
+					ConversationsClientImpl conversationsClient,
 					String[] participants) {
 		if (conversation == null) {
 			return null;
 		}
-		if (endpoint == null) {
+		if (conversationsClient == null) {
 			return null;
 		}
 		if (participants.length == 0) {
 			return null;
 		}
-		return new InviteImpl(conversation, endpoint, participants);
+		return new InviteImpl(conversation, conversationsClient, participants);
 	}
 
 	@Override
@@ -43,14 +43,14 @@ public class InviteImpl implements Invite {
 	}
 
 	@Override
-	public Endpoint to() {
-		return toEndpoint;
+	public ConversationsClient to() {
+		return conversationsClient;
 	}
 
 	@Override
 	public void reject() {
 		if (conversation != null) {
-			toEndpoint.reject(conversation);
+			conversationsClient.reject(conversation);
 			conversation = null;
 		}
 	}

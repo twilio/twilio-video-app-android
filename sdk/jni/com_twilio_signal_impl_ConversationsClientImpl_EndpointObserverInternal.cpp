@@ -1,4 +1,4 @@
-#include "com_twilio_signal_impl_EndpointImpl_EndpointObserverInternal.h"
+#include "com_twilio_signal_impl_ConversationsClientImpl_EndpointObserverInternal.h"
 #include "talk/app/webrtc/java/jni/jni_helpers.h"
 #include "TSCoreSDKTypes.h"
 #include "TSCoreError.h"
@@ -134,11 +134,11 @@ private:
 };
 
 /*
- * Class:     com_twilio_signal_impl_EndpointImpl_EndpointObserverInternal
+ * Class:     com_twilio_signal_impl_ConversationsClientImpl_EndpointObserverInternal
  * Method:    wrapNativeObserver
  * Signature: (Lcom/twilio/signal/impl/core/EndpointObserver;Lcom/twilio/signal/Endpoint;)J
  */
-JNIEXPORT jlong JNICALL Java_com_twilio_signal_impl_EndpointImpl_00024EndpointObserverInternal_wrapNativeObserver
+JNIEXPORT jlong JNICALL Java_com_twilio_signal_impl_ConversationsClientImpl_00024EndpointObserverInternal_wrapNativeObserver
   (JNIEnv *env, jobject obj, jobject j_endpoint_observer, jobject j_endpoint) {
 	TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK, kTSCoreLogLevelDebug, "wrapNativeObserver: Endpoint");
 	TSCEndpointObserverPtr *endpointObserver = new TSCEndpointObserverPtr();
@@ -147,11 +147,11 @@ JNIEXPORT jlong JNICALL Java_com_twilio_signal_impl_EndpointImpl_00024EndpointOb
 }
 
 /*
- * Class:     com_twilio_signal_impl_EndpointImpl_EndpointObserverInternal
+ * Class:     com_twilio_signal_impl_ConversationsClientImpl_EndpointObserverInternal
  * Method:    freeNativeObserver
  * Signature: (J)V
  */
-JNIEXPORT void JNICALL Java_com_twilio_signal_impl_EndpointImpl_00024EndpointObserverInternal_freeNativeObserver
+JNIEXPORT void JNICALL Java_com_twilio_signal_impl_ConversationsClientImpl_00024EndpointObserverInternal_freeNativeObserver
   (JNIEnv *env, jobject obj, jlong nativeEndpointObserver){
 	TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK, kTSCoreLogLevelDebug, "freeNativeObserver: Endpoint");
 	TSCEndpointObserverPtr *endpointObserver = reinterpret_cast<TSCEndpointObserverPtr *>(nativeEndpointObserver);

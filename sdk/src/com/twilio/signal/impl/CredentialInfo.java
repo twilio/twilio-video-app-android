@@ -1,17 +1,17 @@
 package com.twilio.signal.impl;
 
-import com.twilio.signal.Endpoint;
+import com.twilio.signal.ConversationsClient;
 
 public class CredentialInfo
 {
 
 	private String capabilityToken;
-	private Endpoint endpoint;
+	private ConversationsClient conversationsClient;
 	
-	public CredentialInfo(String token,Endpoint endpoint )
+	public CredentialInfo(String token,ConversationsClient conversationsClient)
 	{
 		this.capabilityToken = token;
-		this.endpoint = endpoint;
+		this.conversationsClient = conversationsClient;
 	}
 	
 	
@@ -25,8 +25,8 @@ public class CredentialInfo
 		return capabilityToken;
 	}
 	
-	public Endpoint getEndpoint() {
-		return endpoint;
+	public ConversationsClient getConversationsClient() {
+		return conversationsClient;
 	}
 
 }
