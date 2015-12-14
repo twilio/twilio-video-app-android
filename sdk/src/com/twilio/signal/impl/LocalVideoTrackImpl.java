@@ -6,6 +6,7 @@ import com.twilio.signal.LocalVideoTrack;
 public class LocalVideoTrackImpl extends VideoTrackImpl implements  LocalVideoTrack  {
 	
 	private CameraCapturer cameraCapturer;
+	private boolean enableVideo;
 	
 	public LocalVideoTrackImpl(CameraCapturer cameraCapturer) {
 		super();
@@ -29,6 +30,7 @@ public class LocalVideoTrackImpl extends VideoTrackImpl implements  LocalVideoTr
 		if (videoTrack != null) {
 			videoTrack.setEnabled(enabled);
 		}
+		enableVideo = enabled;
 	}
 
 	/* (non-Javadoc)
@@ -38,9 +40,9 @@ public class LocalVideoTrackImpl extends VideoTrackImpl implements  LocalVideoTr
 	public boolean isCameraEnabled() {
 		org.webrtc.VideoTrack videoTrack = getWebrtcVideoTrack();
 		if (videoTrack != null) {
-			return videoTrack.enabled();
+			enableVideo = videoTrack.enabled();
 		}
-		return false;
+		return enableVideo;
 	}
 	
 	void removeCameraCapturer() {
