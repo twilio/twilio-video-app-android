@@ -648,7 +648,7 @@ public class VideoRendererGui implements GLSurfaceView.Renderer {
         return;
       } else {
         if(videoRendererObserver != null) {
-          videoRendererObserver.onFrameSizeChanged(videoWidth, videoHeight);
+          videoRendererObserver.onFrameDimensionsChanged(videoWidth, videoHeight);
         }
       }
 
