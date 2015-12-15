@@ -17,7 +17,7 @@
 #include "webrtc/modules/video_capture/android/device_info_android.h"
 
 #include <string.h>
-#include "com_twilio_signal_impl_TwilioRTCImpl.h"
+#include "com_twilio_signal_impl_TwilioConversationsImpl.h"
 
 #include "talk/app/webrtc/java/jni/jni_helpers.h"
 #include "talk/app/webrtc/java/jni/classreferenceholder.h"
@@ -37,11 +37,11 @@ static TwilioCommon::AccessManager* getNativeAccessMgrFromJava(JNIEnv* jni, jobj
 }
 
 /*
- * Class:     com_twilio_signal_impl_TwilioRTCImpl
+ * Class:     com_twilio_signal_impl_TwilioConversationsImpl
  * Method:    initCore
  * Signature: (Landroid/content/Context;)Z
  */
-JNIEXPORT jboolean JNICALL Java_com_twilio_signal_impl_TwilioRTCImpl_initCore(JNIEnv *env, jobject obj, jobject context) {
+JNIEXPORT jboolean JNICALL Java_com_twilio_signal_impl_TwilioConversationsImpl_initCore(JNIEnv *env, jobject obj, jobject context) {
 
 	bool success = false;
 	JavaVM * cachedJVM = NULL;
@@ -80,7 +80,7 @@ JNIEXPORT jboolean JNICALL Java_com_twilio_signal_impl_TwilioRTCImpl_initCore(JN
 }
 
 
-JNIEXPORT jlong JNICALL Java_com_twilio_signal_impl_TwilioRTCImpl_createEndpoint
+JNIEXPORT jlong JNICALL Java_com_twilio_signal_impl_TwilioConversationsImpl_createEndpoint
   (JNIEnv *env, jobject obj, jobject j_accessMgr, jlong nativeEndpointObserver) {
 	TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK, kTSCoreLogLevelDebug, "createEndpoint");
 
@@ -113,7 +113,7 @@ JNIEXPORT jlong JNICALL Java_com_twilio_signal_impl_TwilioRTCImpl_createEndpoint
 }
 
 
-JNIEXPORT void JNICALL Java_com_twilio_signal_impl_TwilioRTCImpl_setCoreLogLevel
+JNIEXPORT void JNICALL Java_com_twilio_signal_impl_TwilioConversationsImpl_setCoreLogLevel
   (JNIEnv *env, jobject obj, jint level) {
 	TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK, kTSCoreLogLevelDebug, "setCoreLogLevel");
 	TSCoreLogLevel coreLogLevel = static_cast<TSCoreLogLevel>(level);
@@ -121,7 +121,7 @@ JNIEXPORT void JNICALL Java_com_twilio_signal_impl_TwilioRTCImpl_setCoreLogLevel
 }
 
 
-JNIEXPORT jint JNICALL Java_com_twilio_signal_impl_TwilioRTCImpl_getCoreLogLevel
+JNIEXPORT jint JNICALL Java_com_twilio_signal_impl_TwilioConversationsImpl_getCoreLogLevel
   (JNIEnv *env, jobject obj) {
 	TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK, kTSCoreLogLevelDebug, "getCoreLogLevel");
         return TSCLogger::instance()->getLogLevel();

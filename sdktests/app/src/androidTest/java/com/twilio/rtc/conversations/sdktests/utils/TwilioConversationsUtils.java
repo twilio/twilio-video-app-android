@@ -2,7 +2,7 @@ package com.twilio.rtc.conversations.sdktests.utils;
 
 import android.content.Context;
 
-import com.twilio.signal.TwilioRTC;
+import com.twilio.signal.TwilioConversations;
 
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
@@ -10,11 +10,11 @@ import java.util.concurrent.TimeUnit;
 /**
  * Common tools used in tests
  */
-public class TwilioRTCUtils {
+public class TwilioConversationsUtils {
 
     /*
-     * TwilioRTC is a singleton and can only be initialized once. As a result we must track
-     * if TwilioRTC has ever been initialized.
+     * TwilioConversations is a singleton and can only be initialized once. As a result we must track
+     * if TwilioConversations has ever been initialized.
      */
     private static boolean initialized = false;
 
@@ -22,7 +22,7 @@ public class TwilioRTCUtils {
 
     public static void initializeTwilioSDK(Context applicationContext) {
         CountDownLatch waitLatch = new CountDownLatch(1);
-        TwilioRTC.initialize(applicationContext, initListener(waitLatch));
+        TwilioConversations.initialize(applicationContext, initListener(waitLatch));
         wait(waitLatch, TIMEOUT, TimeUnit.SECONDS);
     }
 
@@ -30,8 +30,8 @@ public class TwilioRTCUtils {
         return initialized;
     }
 
-    public static TwilioRTC.InitListener initListener(final CountDownLatch wait) {
-        return new TwilioRTC.InitListener() {
+    public static TwilioConversations.InitListener initListener(final CountDownLatch wait) {
+        return new TwilioConversations.InitListener() {
             @Override
             public void onInitialized() {
                 if(!initialized) {
@@ -53,8 +53,8 @@ public class TwilioRTCUtils {
         };
     }
 
-    public static TwilioRTC.InitListener countDownInitListenerCallback(final CountDownLatch initCountDownLatch, final CountDownLatch errorCountDownLatch) {
-        return new TwilioRTC.InitListener() {
+    public static TwilioConversations.InitListener countDownInitListenerCallback(final CountDownLatch initCountDownLatch, final CountDownLatch errorCountDownLatch) {
+        return new TwilioConversations.InitListener() {
             @Override
             public void onInitialized() {
                 initCountDownLatch.countDown();
@@ -63,7 +63,7 @@ public class TwilioRTCUtils {
 
             @Override
             public void onError(Exception e) {
-                org.junit.Assert.assertEquals("Twilio.initialize() already called", e.getMessage());
+                org.junit.Assert.assertEquals("Initialize already called", e.getMessage());
                 errorCountDownLatch.countDown();
             }
         };

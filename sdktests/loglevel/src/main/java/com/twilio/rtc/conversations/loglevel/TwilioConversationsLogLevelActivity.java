@@ -3,7 +3,7 @@ package com.twilio.rtc.conversations.loglevel;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
-public class TwilioRTCLogLevelActivity extends AppCompatActivity {
+public class TwilioConversationsLogLevelActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

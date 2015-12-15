@@ -39,7 +39,7 @@ import com.twilio.signal.LocalMedia;
 import com.twilio.signal.LocalVideoTrack;
 import com.twilio.signal.LocalVideoTrackFactory;
 import com.twilio.signal.MediaFactory;
-import com.twilio.signal.TwilioRTC;
+import com.twilio.signal.TwilioConversations;
 import com.twilio.signal.impl.TwilioConstants;
 
 
@@ -139,10 +139,10 @@ public class SignalPhone implements ConversationsClientListener
 				loginListener.onLoginStarted();
             }
 
-            TwilioRTC.setLogLevel(Log.DEBUG);
-            String versionText = TwilioRTC.getVersion();
+            TwilioConversations.setLogLevel(Log.DEBUG);
+            String versionText = TwilioConversations.getVersion();
 
-            TwilioRTC.initialize(context, new TwilioRTC.InitListener() {
+            TwilioConversations.initialize(context, new TwilioConversations.InitListener() {
 				@Override
 				public void onInitialized() {
 					twilioSdkInited = true;
@@ -278,7 +278,7 @@ public class SignalPhone implements ConversationsClientListener
     	if (loginListener != null) {
 			loginListener.onLoginStarted();
 		}
-		SignalPhone.this.alice = TwilioRTC.createConversationsClient(capabilityToken, SignalPhone.this);
+		SignalPhone.this.alice = TwilioConversations.createConversationsClient(capabilityToken, SignalPhone.this);
 		listen();
 		Intent intent = new Intent(context, SignalPhoneActivity.class);
         PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);

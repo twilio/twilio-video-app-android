@@ -3,10 +3,7 @@ package com.twilio.signal.impl;
 import java.util.Set;
 import java.util.UUID;
 
-import android.app.PendingIntent;
-import android.app.PendingIntent.CanceledException;
 import android.content.Context;
-import android.content.Intent;
 import android.os.Handler;
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -28,10 +25,10 @@ import com.twilio.signal.impl.util.CallbackHandler;
 
 public class ConversationsClientImpl implements
 		ConversationsClient,
-						NativeHandleInterface,
-						Parcelable,
-						EndpointObserver,
-						CoreEndpoint{
+		NativeHandleInterface,
+		Parcelable,
+		EndpointObserver,
+		CoreEndpoint {
 
 	static final Logger logger = Logger.getLogger(ConversationsClientImpl.class);
 	
@@ -54,8 +51,6 @@ public class ConversationsClientImpl implements
 			return nativeEndpointObserver;
 		}
 
-
-
 		public void dispose() {
 			if (nativeEndpointObserver != 0) {
 				freeNativeObserver(nativeEndpointObserver);
@@ -67,21 +62,18 @@ public class ConversationsClientImpl implements
 
 	private final UUID uuid = UUID.randomUUID();
 	private Context context;
-	private ConversationsClientListener listener;
-	private PendingIntent incomingIntent = null;
+	private ConversationsClientListener conversationsClientListener;
 	private EndpointObserverInternal endpointObserver;
 	private long nativeEndpointHandle;
 	private boolean isDisposed;
 	private boolean listening = false;
 	private TwilioAccessManager accessManager;
-
 	private Handler handler;
 	private EndpointState coreState;
 	
 	public UUID getUuid() {
 		return uuid;
 	}
-
 
 	@Override
 	public int hashCode() {
@@ -99,17 +91,20 @@ public class ConversationsClientImpl implements
 
 	ConversationsClientImpl(Context context,
 							TwilioAccessManager accessManager,
-							ConversationsClientListener inListener) {
+							ConversationsClientListener conversationsClientListener) {
 		this.context = context;
-		this.listener = inListener;
+		this.conversationsClientListener = conversationsClientListener;
 		this.accessManager = accessManager;
 
 		this.endpointObserver = new EndpointObserverInternal(this);
-		// TODO: throw an exception if the handler returns null
+
 		handler = CallbackHandler.create();
+		if(handler == null) {
+			throw new IllegalThreadStateException("This thread must be able to obtain a Looper");
+		}
 	}
 
-	void setNativeHandle(long nativeEndpointHandle) {
+	void setNativeEndpointHandle(long nativeEndpointHandle) {
 		this.nativeEndpointHandle = nativeEndpointHandle;
 	}
 	
@@ -117,13 +112,11 @@ public class ConversationsClientImpl implements
 		return this.endpointObserver.getNativeHandle();
 	}
 
-
 	@Override
 	public void listen() {
 		checkDisposed();
 		listen(nativeEndpointHandle);
 	}
-
 
 	@Override
 	public void unlisten() {
@@ -131,13 +124,9 @@ public class ConversationsClientImpl implements
 		unlisten(nativeEndpointHandle);
 	}
 
-
-
-
 	@Override
 	public void setConversationsClientListener(ConversationsClientListener listener) {
-		this.listener = listener;
-
+		this.conversationsClientListener = listener;
 	}
 
 	@Override
@@ -154,9 +143,9 @@ public class ConversationsClientImpl implements
 	public Conversation createConversation(Set<String> participants,
 			LocalMedia localMedia, ConversationListener listener) {
 		checkDisposed();
-		Conversation conv = ConversationImpl.createOutgoingConversation(
+		Conversation outgoingConversation = ConversationImpl.createOutgoingConversation(
 				this, participants, localMedia, listener);
-		return conv;
+		return outgoingConversation;
 	}
 	
 	@Override
@@ -172,29 +161,23 @@ public class ConversationsClientImpl implements
 		}
 	}
 
-
-
 	@Override /* Parcelable */
-	public int describeContents()
-	{
+	public int describeContents() {
         return 0;
     }
 
 	@Override /* Parcelable */
-    public void writeToParcel(Parcel out, int flags)
-	{
+    public void writeToParcel(Parcel out, int flags) {
         out.writeSerializable(uuid);
     }
 
 	/* Parcelable */
-    public static final Parcelable.Creator<ConversationsClientImpl> CREATOR = new Parcelable.Creator<ConversationsClientImpl>()
-    {
+    public static final Parcelable.Creator<ConversationsClientImpl> CREATOR = new Parcelable.Creator<ConversationsClientImpl>() {
     	@Override
-        public ConversationsClientImpl createFromParcel(Parcel in)
-        {
+        public ConversationsClientImpl createFromParcel(Parcel in) {
             UUID uuid = (UUID)in.readSerializable();
-            TwilioRTCImpl twImpl = TwilioRTCImpl.getInstance();
-            return twImpl.findDeviceByUUID(uuid);
+            TwilioConversationsImpl twilioConversations = TwilioConversationsImpl.getInstance();
+            return twilioConversations.findDeviceByUUID(uuid);
         }
 
     	@Override
@@ -203,26 +186,6 @@ public class ConversationsClientImpl implements
             throw new UnsupportedOperationException();
         }
     };
-
-
-	public void onIncomingInvite() {
-		logger.d("Received Incoming notification");
-		if (incomingIntent != null) {
-			logger.d("Received Incoming notification, calling intent");
-			Intent intent = new Intent();
-			intent.putExtra(ConversationsClient.EXTRA_DEVICE, this);
-			if (intent.hasExtra(ConversationsClient.EXTRA_DEVICE)) {
-				logger.d("Received Incoming notification, calling intent has extra");
-			} else {
-				logger.d("Received Incoming notification, calling intent do not have extra");
-			}
-			try {
-				incomingIntent.send(context, 0, intent);
-			} catch (final CanceledException e) {
-
-			}
-		}
-	}
 
 	/**
 	 * NativeHandleInterface
@@ -247,7 +210,7 @@ public class ConversationsClientImpl implements
 				handler.post(new Runnable() {
 					@Override
 					public void run() {
-						listener.onFailedToStartListening(ConversationsClientImpl.this, e);
+						conversationsClientListener.onFailedToStartListening(ConversationsClientImpl.this, e);
 					}
 				});
 			}
@@ -257,13 +220,12 @@ public class ConversationsClientImpl implements
 				handler.post(new Runnable() {
 					@Override
 					public void run() {
-						listener.onStartListeningForInvites(ConversationsClientImpl.this);
+						conversationsClientListener.onStartListeningForInvites(ConversationsClientImpl.this);
 					}
 				});
 			}
 		}
 	}
-
 
 	@Override
 	public void onUnregistrationDidComplete(CoreError error) {
@@ -273,13 +235,12 @@ public class ConversationsClientImpl implements
 			handler.post(new Runnable() {
 				@Override
 				public void run() {
-					listener.onStopListeningForInvites(ConversationsClientImpl.this);
+					conversationsClientListener.onStopListeningForInvites(ConversationsClientImpl.this);
 				}
 			});
 		}
-		
-	}
 
+	}
 
 	@Override
 	public void onStateDidChange(EndpointState state) {
@@ -287,19 +248,17 @@ public class ConversationsClientImpl implements
 		coreState = state;
 	}
 
-
 	@Override
 	public void onIncomingCallDidReceive(long nativeSession,
 			String[] participants) {
 		logger.d("onIncomingCallDidReceive");
-		
-		ConversationImpl conv =
-				ConversationImpl.createIncomingConversation(nativeSession, participants);
-		if (conv == null) {
+
+		ConversationImpl incomingConversation = ConversationImpl.createIncomingConversation(nativeSession, participants);
+		if (incomingConversation == null) {
 			logger.e("Failed to create conversation");
 		}
-		
-		final Invite invite = InviteImpl.create(conv,this, participants);
+
+		final Invite invite = InviteImpl.create(incomingConversation,this, participants);
 		if (invite == null) {
 			logger.e("Failed to create Conversation Invite");
 		}
@@ -307,31 +266,28 @@ public class ConversationsClientImpl implements
 			handler.post(new Runnable() {
 				@Override
 				public void run() {
-					listener.onReceiveConversationInvite(ConversationsClientImpl.this, invite);
+					conversationsClientListener.onReceiveConversationInvite(ConversationsClientImpl.this, invite);
 				}
 			});
 		}
 	}
-
 
 	/*
 	 * CoreEndpoint methods
 	 */
 	@Override
 	public void accept(ConversationImpl conv) {
-		// Accept is handled in InviteImpl
+		// Do nothing. This is handled in InviteImpl.
 	}
-
 
 	@Override
 	public void reject(ConversationImpl conv) {
 		reject(getNativeHandle(), conv.getNativeHandle());
 	}
 
-
 	@Override
 	public void ignore(ConversationImpl conv) {
-		// TODO Auto-generated method stub
+		// Do nothing.
 	}
 	
 	private synchronized void checkDisposed() {
@@ -340,9 +296,6 @@ public class ConversationsClientImpl implements
 		}
 	}
 
-	
-	
-	//Native implementation
 	private native void listen(long nativeEndpoint);
 	private native void unlisten(long nativeEndpoint);
 	private native void reject(long nativeEndpoint, long nativeSession);

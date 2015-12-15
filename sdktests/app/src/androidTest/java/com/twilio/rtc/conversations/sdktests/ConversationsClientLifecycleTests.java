@@ -4,7 +4,7 @@ import android.support.test.InstrumentationRegistry;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
 
-import com.twilio.rtc.conversations.sdktests.utils.TwilioRTCUtils;
+import com.twilio.rtc.conversations.sdktests.utils.TwilioConversationsUtils;
 import com.twilio.signal.Conversation;
 import com.twilio.signal.ConversationException;
 import com.twilio.signal.ConversationListener;
@@ -15,7 +15,7 @@ import com.twilio.signal.LocalMedia;
 import com.twilio.signal.LocalVideoTrack;
 import com.twilio.signal.MediaFactory;
 import com.twilio.signal.Participant;
-import com.twilio.signal.TwilioRTC;
+import com.twilio.signal.TwilioConversations;
 import com.twilio.signal.VideoTrack;
 
 import org.junit.Rule;
@@ -35,8 +35,8 @@ public class ConversationsClientLifecycleTests {
     private static String PARTICIPANT = "janne";
 
     @Rule
-    public ActivityTestRule<TwilioRTCActivity> mActivityRule = new ActivityTestRule<>(
-            TwilioRTCActivity.class);
+    public ActivityTestRule<TwilioConversationsActivity> mActivityRule = new ActivityTestRule<>(
+            TwilioConversationsActivity.class);
 
     @Test
     public void testTwilioCreateConversationsClientWithToken() {
@@ -84,8 +84,8 @@ public class ConversationsClientLifecycleTests {
     }
 
     private ConversationsClient createConversationsClient() {
-        TwilioRTCUtils.initializeTwilioSDK(mActivityRule.getActivity().getApplicationContext());
-        ConversationsClient conversationsClient = TwilioRTC.createConversationsClient(TOKEN, conversationsClientListener());
+        TwilioConversationsUtils.initializeTwilioSDK(mActivityRule.getActivity().getApplicationContext());
+        ConversationsClient conversationsClient = TwilioConversations.createConversationsClient(TOKEN, conversationsClientListener());
         return conversationsClient;
     }
 
@@ -100,7 +100,7 @@ public class ConversationsClientLifecycleTests {
         InstrumentationRegistry.getInstrumentation().runOnMainSync(new Runnable() {
             @Override
             public void run() {
-                ConversationsClient conversationsClient = TwilioRTC.createConversationsClient(TOKEN, new ConversationsClientListener() {
+                ConversationsClient conversationsClient = TwilioConversations.createConversationsClient(TOKEN, new ConversationsClientListener() {
                     @Override
                     public void onStartListeningForInvites(ConversationsClient conversationsClient) {
                         org.junit.Assert.fail();
@@ -124,7 +124,7 @@ public class ConversationsClientLifecycleTests {
                 conversationsClient.listen();
             }
         });
-        TwilioRTCUtils.wait(wait, 10, TimeUnit.SECONDS);
+        TwilioConversationsUtils.wait(wait, 10, TimeUnit.SECONDS);
     }
 
     private ConversationsClientListener conversationsClientListener() {

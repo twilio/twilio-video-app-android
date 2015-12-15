@@ -86,8 +86,10 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 			participantAddressArray[i++] = participant;
 		}
 
-		// TODO: throw an exception if the handler returns null
 		handler = CallbackHandler.create();
+		if(handler == null) {
+			throw new IllegalThreadStateException("This thread must be able to obtain a Looper");
+		}
 
 		this.localMedia = localMedia;
 		((LocalMediaImpl)localMedia).setConversation(this);
@@ -104,8 +106,12 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 	
 	private ConversationImpl(long nativeSession, String[] participantsAddr) {
 		nativeHandle = nativeSession;
-		// TODO: throw an exception if the handler returns null
+
 		handler = CallbackHandler.create();
+		if(handler == null) {
+			throw new IllegalThreadStateException("This thread must be able to obtain a Looper");
+		}
+
 		for (String participant : participantsAddr) {
 			addParticipant(participant);
 		}

@@ -3,7 +3,7 @@ package com.twilio.rtc.conversations.noservice;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
 
-import com.twilio.signal.TwilioRTC;
+import com.twilio.signal.TwilioConversations;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -14,28 +14,31 @@ import java.util.concurrent.TimeUnit;
 
 
 @RunWith(AndroidJUnit4.class)
-public class TwilioRTCNoServiceTest {
+public class TwilioConversationsNoServiceTest {
 
     private static int TIMEOUT = 10;
 
     @Rule
-    public ActivityTestRule<TwilioRTCNoServiceActivity> mActivityRule = new ActivityTestRule<>(
-            TwilioRTCNoServiceActivity.class);
+    public ActivityTestRule<TwilioConversationsNoServiceActivity> mActivityRule = new ActivityTestRule<>(
+            TwilioConversationsNoServiceActivity.class);
 
     @Test
     public void testTwilioInitializeWithoutServiceInManifest() {
         final CountDownLatch wait = new CountDownLatch(1);
 
-        TwilioRTC.initialize(mActivityRule.getActivity(), new TwilioRTC.InitListener() {
+        /*
+         * NOTE: The service has been removed from the SDK. When the service is added back this test
+         * must be refactored.
+         */
+        TwilioConversations.initialize(mActivityRule.getActivity(), new TwilioConversations.InitListener() {
             @Override
             public void onInitialized() {
-                org.junit.Assert.fail("twilio service missing from manifest exception did not occur");
+                wait.countDown();
             }
 
             @Override
             public void onError(Exception e) {
-                org.junit.Assert.assertEquals("com.twilio.signal.TwilioRTCService is not declared in AndroidManifest.xml", e.getMessage());
-                wait.countDown();
+                org.junit.Assert.fail("twilio initialization failed");
             }
         });
 
