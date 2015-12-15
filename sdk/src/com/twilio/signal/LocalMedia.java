@@ -48,9 +48,25 @@ public interface LocalMedia extends Media {
 	 */
 	public boolean isMuted();
 	
+	/**
+	 * Add local audio track to media session
+	 * @return true if local audio track is added
+	 */
 	public boolean addMicrophone();
+	
+	/**
+	 * Remove local audio track from media session
+	 * 
+	 * @return true if local audio track is removed
+	 */
 	public boolean removeMicrophone();
 	
+	/**
+	 * Indicates whether or not your local
+	 * audio track is added to media sessio
+	 * 
+	 * @return true if local audio track is added
+	 */
 	public boolean isMicrophoneAdded();
 
 }
