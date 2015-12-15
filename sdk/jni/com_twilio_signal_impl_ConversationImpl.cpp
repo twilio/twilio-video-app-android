@@ -63,11 +63,23 @@ JNIEXPORT jlong JNICALL Java_com_twilio_signal_impl_ConversationImpl_wrapOutgoin
 
 
 JNIEXPORT void JNICALL Java_com_twilio_signal_impl_ConversationImpl_start
-  (JNIEnv *env, jobject obj, jlong nativeSession)
+  (JNIEnv *env, jobject obj, jlong nativeSession, jboolean j_enableAudio, jboolean j_muteAudio, jboolean j_enableVideo, jboolean j_pauseVideo)
 {
 	TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK, kTSCoreLogLevelDebug, "start");
 	TSCSessionPtr *session = reinterpret_cast<TSCSessionPtr *>(nativeSession);
-	session->get()->start();
+
+	bool enableAudio = j_enableAudio == JNI_TRUE ? true : false;
+	bool muteAudio = j_muteAudio == JNI_TRUE ? true : false;
+	bool enableVideo = j_enableVideo == JNI_TRUE ? true : false;
+	bool pauseVideo = j_pauseVideo == JNI_TRUE ? true : false;
+
+	TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK, kTSCoreLogLevelDebug, "local media config: %s, %s, %s, %s",
+			(enableAudio ? "enabledAudio = true":"enabledAudio = false"),
+			 (muteAudio ? "muteAudio = true":"muteAudio = false"),
+			 (enableVideo ? "enableVideo = true":"enableVideo=false"),
+			 (pauseVideo ? "pauseVideo=true":"pauseVideo=false"));
+
+	session->get()->start(new TSCSessionMediaConstrainsObject(enableAudio, muteAudio, enableVideo, pauseVideo));
 }
 
 
@@ -163,7 +175,6 @@ JNIEXPORT void JNICALL Java_com_twilio_signal_impl_ConversationImpl_invitePartic
 	session->get()->inviteParticipants(participants);
 }
 
-
 JNIEXPORT jstring JNICALL Java_com_twilio_signal_impl_ConversationImpl_getConversationSid
   (JNIEnv *env, jobject obj, jlong nativeSession)
 {
@@ -171,4 +182,17 @@ JNIEXPORT jstring JNICALL Java_com_twilio_signal_impl_ConversationImpl_getConver
 	TSCSessionPtr *session = reinterpret_cast<TSCSessionPtr *>(nativeSession);
 
 	return JavaStringFromStdString(env, session->get()->getConversationSid());
+}
+
+JNIEXPORT jboolean JNICALL Java_com_twilio_signal_impl_ConversationImpl_enableAudio
+  (JNIEnv *, jobject, jlong nativeSession, jboolean j_enabled, jboolean j_muted)
+{
+	TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK, kTSCoreLogLevelDebug, "enableAudio");
+	TSCSessionPtr *session = reinterpret_cast<TSCSessionPtr *>(nativeSession);
+	bool enabled = (j_enabled == JNI_TRUE) ? true : false;
+	bool muted = (j_muted) ? true : false;
+	if (session) {
+		return session->get()->enableAudio(enabled, muted) ? JNI_TRUE : JNI_FALSE;
+	}
+	return JNI_FALSE;
 }

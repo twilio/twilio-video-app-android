@@ -17,11 +17,18 @@ public class LocalMediaImpl implements LocalMedia {
 	private ViewGroup container;
 	private List<LocalVideoTrackImpl> videoTracksImpl = new ArrayList<LocalVideoTrackImpl>();
 	private WeakReference<ConversationImpl> convWeak;
+	private boolean microphoneAdded;
+	private boolean microphoneMuted;
 	
 	private static int MAX_LOCAL_VIDEO_TRACKS = 1;
 	
 	private static String TAG = "LocalMediaImpl";
 	static final Logger logger = Logger.getLogger(LocalMediaImpl.class);
+	
+	public LocalMediaImpl() {
+		microphoneAdded = true;
+		microphoneMuted = false;
+	}
 	
 	
 	/* (non-Javadoc)
@@ -46,10 +53,13 @@ public class LocalMediaImpl implements LocalMedia {
 	@Override
 	public boolean mute(boolean on) {
 		if (convWeak != null && convWeak.get() != null) {
+			microphoneMuted = on;
 			return convWeak.get().mute(on);
-		} else {
-			throw new UnsupportedOperationException("There is no active conversation to mute!");
+		} else if (microphoneMuted != on){
+			microphoneMuted = on;
+			return true;
 		}
+		return false;
 	}
 
 	/* (non-Javadoc)
@@ -57,11 +67,7 @@ public class LocalMediaImpl implements LocalMedia {
 	 */
 	@Override
 	public boolean isMuted() {
-		if (convWeak != null && convWeak.get() != null) {
-			return convWeak.get().isMuted();
-		} else {
-			throw new UnsupportedOperationException("There is no active conversation!");
-		}
+		return microphoneMuted;
 	}
 
 	@Override
@@ -144,6 +150,41 @@ public class LocalMediaImpl implements LocalMedia {
 	
 	void setConversation(ConversationImpl conversation) {
 		this.convWeak = new WeakReference<ConversationImpl>(conversation);
+	}
+
+	@Override
+	public boolean addMicrophone() {
+		if (!microphoneAdded) {
+			if (convWeak != null && convWeak.get() != null) {
+				// enable conversation audio
+				microphoneAdded = true;
+				return convWeak.get().enableAudio(true, false);
+			} else {
+				microphoneAdded = true;
+				return true;
+			}
+		}
+		return false;
+	}
+
+	@Override
+	public boolean removeMicrophone() {
+		if (microphoneAdded) {
+			if (convWeak != null && convWeak.get() != null) {
+				// disable conversation audio
+				microphoneAdded = false;
+				return convWeak.get().enableAudio(false, false);
+			} else {
+				microphoneAdded = false;
+				return true;
+			}
+		}
+		return false;
+	}
+
+	@Override
+	public boolean isMicrophoneAdded() {
+		return microphoneAdded;
 	}
 	
 	

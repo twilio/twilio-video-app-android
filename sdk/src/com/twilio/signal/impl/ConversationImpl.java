@@ -20,6 +20,7 @@ import com.twilio.signal.VideoTrack;
 import com.twilio.signal.VideoViewRenderer;
 import com.twilio.signal.impl.core.CoreError;
 import com.twilio.signal.impl.core.CoreSession;
+import com.twilio.signal.impl.core.CoreSessionMediaConstraints;
 import com.twilio.signal.impl.core.DisconnectReason;
 import com.twilio.signal.impl.core.MediaStreamInfo;
 import com.twilio.signal.impl.core.SessionState;
@@ -119,7 +120,15 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 		if (conv.getNativeHandle() == 0) {
 			return null;
 		}
-		conv.start();
+		boolean enableVideo = !localMedia.getLocalVideoTracks().isEmpty();
+		boolean pauseVideo = false;
+		if (enableVideo) {
+			pauseVideo = !localMedia.getLocalVideoTracks().get(0).isCameraEnabled();
+		}
+		CoreSessionMediaConstraints mediaContext =
+				new CoreSessionMediaConstraints(localMedia.isMicrophoneAdded(),
+							localMedia.isMuted(), enableVideo, pauseVideo);
+		conv.start(mediaContext);
 		return conv;
 	}
 	
@@ -398,7 +407,9 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 				handler.post(new Runnable() {
 					@Override
 					public void run() {
-						conversationListener.onLocalVideoRemoved(ConversationImpl.this, videoTrack);
+						if (conversationListener != null) {
+							conversationListener.onLocalVideoRemoved(ConversationImpl.this, videoTrack);
+						}
 					}
 				});
 			}
@@ -410,7 +421,9 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 				handler.post(new Runnable() {
 					@Override
 					public void run() {
-						conversationListener.onVideoRemovedForParticipant(ConversationImpl.this, participant, videoTrack);
+						if (conversationListener != null) {
+							conversationListener.onVideoRemovedForParticipant(ConversationImpl.this, participant, videoTrack);
+						}
 					}
 				});
 			}
@@ -498,14 +511,18 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 	 * CoreSession
 	 */
 	@Override
-	public void start() {
+	public void start(CoreSessionMediaConstraints mediaConstraints) {
 		logger.d("starting call");
 	
 		// TODO: Call only when video is enabled
 		setupExternalCapturer();
 
 
-		start(getNativeHandle());
+		start(getNativeHandle(),
+				mediaConstraints.isAudioEnabled(),
+				mediaConstraints.isAudioMuted(),
+				mediaConstraints.isVideoEnabled(),
+				mediaConstraints.isVideoPaused());
 		
 	}
 
@@ -526,6 +543,11 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 				participants.toArray(new String[participants.size()]);
 		inviteParticipants(getNativeHandle(), participantAddressArray);
 	}
+	
+	@Override
+	public boolean enableAudio(boolean enabled, boolean muted) {
+		return enableAudio(getNativeHandle(), enabled, muted);
+	}
 
 	
 	private synchronized void checkDisposed() {
@@ -535,7 +557,7 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 	}
 	
 	private native long wrapOutgoingSession(long nativeEndpoint, long nativeSessionObserver, String[] participants);
-	private native void start(long nativeSession);
+	private native void start(long nativeSession, boolean enableAudio, boolean muteAudio, boolean enableVideo, boolean pauseVideo);
 	private native void setExternalCapturer(long nativeSession, long nativeCapturer);
 	private native void stop(long nativeSession);
 	private native void setSessionObserver(long nativeSession, long nativeSessionObserver);
@@ -545,5 +567,6 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 	private native boolean isMuted(long nativeSession);
 	private native void inviteParticipants(long nativeHandle, String[] participants);
 	private native String getConversationSid(long nativeHandle);
+	private native boolean enableAudio(long nativeHandle, boolean enabled, boolean muted);
 
 }
