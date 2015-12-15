@@ -108,7 +108,7 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 
 		handler = CallbackHandler.create();
 		if(handler == null) {
-			throw new IllegalThreadStateException("This thread must have access to a Looper");
+			throw new IllegalThreadStateException("This thread must be able to obtain a Looper");
 		}
 
 		for (String participant : participantsAddr) {
