@@ -5,7 +5,7 @@ import com.twilio.signal.ConversationListener;
 import com.twilio.signal.ConversationsClient;
 import com.twilio.signal.Invite;
 import com.twilio.signal.LocalMedia;
-import com.twilio.signal.impl.core.CoreSessionMediaConstrains;
+import com.twilio.signal.impl.core.CoreSessionMediaConstraints;
 
 public class InviteImpl implements Invite {
 	
@@ -58,10 +58,7 @@ public class InviteImpl implements Invite {
 
 	@Override
 	public Conversation accept(LocalMedia localMedia,
-			ConversationListener listener) throws IllegalArgumentException {
-		if (localMedia == null) {
-			throw new IllegalArgumentException("LocalMedia can't be null");
-		}
+			ConversationListener listener) {
 		conversation.setLocalMedia(localMedia);
 		conversation.setConversationListener(listener);
 		boolean enableVideo = !localMedia.getLocalVideoTracks().isEmpty();
@@ -69,8 +66,8 @@ public class InviteImpl implements Invite {
 		if (enableVideo) {
 			pauseVideo = !localMedia.getLocalVideoTracks().get(0).isCameraEnabled();
 		}
-		CoreSessionMediaConstrains mediaContext =
-				new CoreSessionMediaConstrains(localMedia.isMicrophoneAdded(),
+		CoreSessionMediaConstraints mediaContext =
+				new CoreSessionMediaConstraints(localMedia.isMicrophoneAdded(),
 							localMedia.isMuted(), enableVideo, pauseVideo);
 		conversation.start(mediaContext);
 		return conversation;

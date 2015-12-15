@@ -6,7 +6,7 @@ import java.util.Set;
 
 public interface CoreSession {
 	
-	public void start(CoreSessionMediaConstrains mediaConstraints);
+	public void start(CoreSessionMediaConstraints mediaConstraints);
 	
 	public void stop();
 	

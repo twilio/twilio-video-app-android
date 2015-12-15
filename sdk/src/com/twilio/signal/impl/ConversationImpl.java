@@ -20,7 +20,7 @@ import com.twilio.signal.VideoTrack;
 import com.twilio.signal.VideoViewRenderer;
 import com.twilio.signal.impl.core.CoreError;
 import com.twilio.signal.impl.core.CoreSession;
-import com.twilio.signal.impl.core.CoreSessionMediaConstrains;
+import com.twilio.signal.impl.core.CoreSessionMediaConstraints;
 import com.twilio.signal.impl.core.DisconnectReason;
 import com.twilio.signal.impl.core.MediaStreamInfo;
 import com.twilio.signal.impl.core.SessionState;
@@ -125,8 +125,8 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 		if (enableVideo) {
 			pauseVideo = !localMedia.getLocalVideoTracks().get(0).isCameraEnabled();
 		}
-		CoreSessionMediaConstrains mediaContext =
-				new CoreSessionMediaConstrains(localMedia.isMicrophoneAdded(),
+		CoreSessionMediaConstraints mediaContext =
+				new CoreSessionMediaConstraints(localMedia.isMicrophoneAdded(),
 							localMedia.isMuted(), enableVideo, pauseVideo);
 		conv.start(mediaContext);
 		return conv;
@@ -511,7 +511,7 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 	 * CoreSession
 	 */
 	@Override
-	public void start(CoreSessionMediaConstrains mediaConstraints) {
+	public void start(CoreSessionMediaConstraints mediaConstraints) {
 		logger.d("starting call");
 	
 		// TODO: Call only when video is enabled

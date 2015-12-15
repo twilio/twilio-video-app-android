@@ -1,12 +1,12 @@
 package com.twilio.signal.impl.core;
 
-public class CoreSessionMediaConstrains {
+public class CoreSessionMediaConstraints {
 	private boolean enableAudio;
 	private boolean muteAudio;
 	private boolean enableVideo;
 	private boolean pauseVideo;
 	
-	public CoreSessionMediaConstrains(
+	public CoreSessionMediaConstraints(
 			boolean enableAudio, boolean muteAudio,
 			boolean enableVideo, boolean pauseVideo) {
 		this.enableAudio = enableAudio;
