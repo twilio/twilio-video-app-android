@@ -175,7 +175,6 @@ JNIEXPORT void JNICALL Java_com_twilio_signal_impl_ConversationImpl_invitePartic
 	session->get()->inviteParticipants(participants);
 }
 
-
 JNIEXPORT jstring JNICALL Java_com_twilio_signal_impl_ConversationImpl_getConversationSid
   (JNIEnv *env, jobject obj, jlong nativeSession)
 {
@@ -183,4 +182,17 @@ JNIEXPORT jstring JNICALL Java_com_twilio_signal_impl_ConversationImpl_getConver
 	TSCSessionPtr *session = reinterpret_cast<TSCSessionPtr *>(nativeSession);
 
 	return JavaStringFromStdString(env, session->get()->getConversationSid());
+}
+
+JNIEXPORT jboolean JNICALL Java_com_twilio_signal_impl_ConversationImpl_enableAudio
+  (JNIEnv *, jobject, jlong nativeSession, jboolean j_enabled, jboolean j_muted)
+{
+	TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK, kTSCoreLogLevelDebug, "enableAudio");
+	TSCSessionPtr *session = reinterpret_cast<TSCSessionPtr *>(nativeSession);
+	bool enabled = (j_enabled == JNI_TRUE) ? true : false;
+	bool muted = (j_muted) ? true : false;
+	if (session) {
+		return session->get()->enableAudio(enabled, muted) ? JNI_TRUE : JNI_FALSE;
+	}
+	return JNI_FALSE;
 }

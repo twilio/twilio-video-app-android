@@ -67,7 +67,7 @@ public class InviteImpl implements Invite {
 		boolean enableVideo = !localMedia.getLocalVideoTracks().isEmpty();
 		boolean pauseVideo = false;
 		if (enableVideo) {
-			pauseVideo = localMedia.getLocalVideoTracks().get(0).isCameraEnabled();
+			pauseVideo = !localMedia.getLocalVideoTracks().get(0).isCameraEnabled();
 		}
 		CoreSessionMediaConstrains mediaContext =
 				new CoreSessionMediaConstrains(localMedia.isMicrophoneAdded(),

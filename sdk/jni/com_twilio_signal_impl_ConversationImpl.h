@@ -41,6 +41,10 @@ JNIEXPORT void JNICALL Java_com_twilio_signal_impl_ConversationImpl_invitePartic
 JNIEXPORT jstring JNICALL Java_com_twilio_signal_impl_ConversationImpl_getConversationSid
   (JNIEnv *, jobject, jlong);
 
+JNIEXPORT jboolean JNICALL Java_com_twilio_signal_impl_ConversationImpl_enableAudio
+  (JNIEnv *, jobject, jlong, jboolean, jboolean);
+
+
 #ifdef __cplusplus
 }
 #endif

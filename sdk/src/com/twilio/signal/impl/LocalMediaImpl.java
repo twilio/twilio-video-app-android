@@ -52,11 +52,14 @@ public class LocalMediaImpl implements LocalMedia {
 	 */
 	@Override
 	public boolean mute(boolean on) {
-		microphoneMuted = on;
 		if (convWeak != null && convWeak.get() != null) {
-			microphoneMuted = convWeak.get().mute(on);
+			microphoneMuted = on;
+			return convWeak.get().mute(on);
+		} else if (microphoneMuted != on){
+			microphoneMuted = on;
+			return true;
 		}
-		return microphoneMuted;
+		return false;
 	}
 
 	/* (non-Javadoc)
@@ -154,10 +157,12 @@ public class LocalMediaImpl implements LocalMedia {
 		if (!microphoneAdded) {
 			if (convWeak != null && convWeak.get() != null) {
 				// enable conversation audio
+				microphoneAdded = true;
+				return convWeak.get().enableAudio(true, false);
 			} else {
 				microphoneAdded = true;
+				return true;
 			}
-			return microphoneAdded;
 		}
 		return false;
 	}
@@ -167,10 +172,12 @@ public class LocalMediaImpl implements LocalMedia {
 		if (microphoneAdded) {
 			if (convWeak != null && convWeak.get() != null) {
 				// disable conversation audio
+				microphoneAdded = false;
+				return convWeak.get().enableAudio(false, false);
 			} else {
 				microphoneAdded = false;
+				return true;
 			}
-			return !microphoneAdded;
 		}
 		return false;
 	}

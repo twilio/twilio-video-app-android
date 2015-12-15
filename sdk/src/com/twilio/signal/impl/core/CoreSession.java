@@ -13,5 +13,7 @@ public interface CoreSession {
 	public boolean enableVideo(boolean enabled, boolean paused);
 	
 	public void inviteParticipants(Set<String> participants);
+	
+	public boolean enableAudio(boolean enabled, boolean muted);
 
 }

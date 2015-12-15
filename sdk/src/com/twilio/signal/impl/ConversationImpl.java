@@ -407,7 +407,9 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 				handler.post(new Runnable() {
 					@Override
 					public void run() {
-						conversationListener.onLocalVideoRemoved(ConversationImpl.this, videoTrack);
+						if (conversationListener != null) {
+							conversationListener.onLocalVideoRemoved(ConversationImpl.this, videoTrack);
+						}
 					}
 				});
 			}
@@ -419,7 +421,9 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 				handler.post(new Runnable() {
 					@Override
 					public void run() {
-						conversationListener.onVideoRemovedForParticipant(ConversationImpl.this, participant, videoTrack);
+						if (conversationListener != null) {
+							conversationListener.onVideoRemovedForParticipant(ConversationImpl.this, participant, videoTrack);
+						}
 					}
 				});
 			}
@@ -539,6 +543,11 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 				participants.toArray(new String[participants.size()]);
 		inviteParticipants(getNativeHandle(), participantAddressArray);
 	}
+	
+	@Override
+	public boolean enableAudio(boolean enabled, boolean muted) {
+		return enableAudio(getNativeHandle(), enabled, muted);
+	}
 
 	
 	private synchronized void checkDisposed() {
@@ -558,5 +567,6 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 	private native boolean isMuted(long nativeSession);
 	private native void inviteParticipants(long nativeHandle, String[] participants);
 	private native String getConversationSid(long nativeHandle);
+	private native boolean enableAudio(long nativeHandle, boolean enabled, boolean muted);
 
 }
