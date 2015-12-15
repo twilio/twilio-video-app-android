@@ -12,7 +12,7 @@ JNIEXPORT jlong JNICALL Java_com_twilio_signal_impl_ConversationImpl_wrapOutgoin
   (JNIEnv *, jobject, jlong, jlong, jobjectArray);
 
 JNIEXPORT void JNICALL Java_com_twilio_signal_impl_ConversationImpl_start
-  (JNIEnv *, jobject, jlong);
+  (JNIEnv *, jobject, jlong, jboolean, jboolean, jboolean, jboolean);
 
 JNIEXPORT void JNICALL Java_com_twilio_signal_impl_ConversationImpl_stop
   (JNIEnv *, jobject, jlong);
@@ -40,6 +40,10 @@ JNIEXPORT void JNICALL Java_com_twilio_signal_impl_ConversationImpl_invitePartic
 
 JNIEXPORT jstring JNICALL Java_com_twilio_signal_impl_ConversationImpl_getConversationSid
   (JNIEnv *, jobject, jlong);
+
+JNIEXPORT jboolean JNICALL Java_com_twilio_signal_impl_ConversationImpl_enableAudio
+  (JNIEnv *, jobject, jlong, jboolean, jboolean);
+
 
 #ifdef __cplusplus
 }
