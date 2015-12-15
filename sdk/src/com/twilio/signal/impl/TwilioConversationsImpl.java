@@ -115,7 +115,8 @@ public class TwilioConversationsImpl {
 		}
 
 		/*
-		 * Initialize the core in a new thread since it may otherwise block the UI thread
+		 * Initialize the core in a new thread since it may otherwise block the calling thread.
+		 * The calling thread may often be the UI thread which should never be blocked.
 		 */
 		new Thread(new Runnable() {
 
