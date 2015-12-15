@@ -63,7 +63,7 @@ public class TwilioConversationsUtils {
 
             @Override
             public void onError(Exception e) {
-                org.junit.Assert.assertEquals("Twilio.initialize() already called", e.getMessage());
+                org.junit.Assert.assertEquals("Initialize already called", e.getMessage());
                 errorCountDownLatch.countDown();
             }
         };
