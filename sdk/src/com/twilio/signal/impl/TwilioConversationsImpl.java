@@ -7,43 +7,33 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import android.content.ComponentName;
 import android.content.Context;
-import android.content.Intent;
-import android.content.ServiceConnection;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
-import android.content.pm.ServiceInfo;
-import android.os.IBinder;
+import android.os.Handler;
 import android.util.Log;
 
 import com.twilio.common.TwilioAccessManager;
 import com.twilio.signal.ConversationsClientListener;
-import com.twilio.signal.TwilioRTC;
-import com.twilio.signal.TwilioRTC.LogLevel;
-import com.twilio.signal.TwilioRTCService;
-import com.twilio.signal.TwilioRTCService.TwilioBinder;
+import com.twilio.signal.TwilioConversations;
+import com.twilio.signal.TwilioConversations.LogLevel;
 import com.twilio.signal.impl.logging.Logger;
+import com.twilio.signal.impl.util.CallbackHandler;
 
 
-public class TwilioRTCImpl {
+public class TwilioConversationsImpl {
 
 	static {
 		System.loadLibrary("twilio-native");
 	}
 
-	static final Logger logger = Logger.getLogger(TwilioRTCImpl.class);
+	static final Logger logger = Logger.getLogger(TwilioConversationsImpl.class);
 
-	private static final String TWILIO_SIGNAL_SERVICE_NAME = "com.twilio.signal.TwilioRTCService";
-
-	private static volatile TwilioRTCImpl instance;
+	private static volatile TwilioConversationsImpl instance;
 	private static int level = 0;
 	protected Context context;
-	private boolean sdkInited;
-	private boolean sdkIniting;
-	private ServiceConnection serviceConn;
-
-	protected TwilioBinder twBinder;
+	private boolean initialized;
+	private boolean initializing;
 
 	protected final Map<UUID, WeakReference<ConversationsClientImpl>> conversationsClientMap = new HashMap<UUID, WeakReference<ConversationsClientImpl>>();
 
@@ -55,11 +45,11 @@ public class TwilioRTCImpl {
 		"android.permission.ACCESS_WIFI_STATE",
 	};
 
-	public static TwilioRTCImpl getInstance() {
+	public static TwilioConversationsImpl getInstance() {
 		if (instance == null) {
-			synchronized (TwilioRTCImpl.class) {
+			synchronized (TwilioConversationsImpl.class) {
 				if (instance == null)
-					instance = new TwilioRTCImpl();
+					instance = new TwilioConversationsImpl();
 			}
 		}
 
@@ -71,37 +61,24 @@ public class TwilioRTCImpl {
 		return instance;
 	}
 
-	public Context getContext() {
-		return context;
-	}
+	TwilioConversationsImpl() {}
 
-	public static void setInstance(TwilioRTCImpl instance) {
-		TwilioRTCImpl.instance = instance;
-	}
+	public void initialize(final Context applicationContext, final TwilioConversations.InitListener initListener) {
 
-	TwilioRTCImpl() {}
-
-	public void initialize(Context inContext, final TwilioRTC.InitListener inListener) {
-
-		if (isInitialized() || isInitializing())
-		{
-			inListener.onError(new RuntimeException("Twilio.initialize() already called"));
+		if (isInitialized() || isInitializing()) {
+			initListener.onError(new RuntimeException("Initialize already called"));
 			return;
 		}
 
-		sdkIniting = true;
+		initializing = true;
 
 		try {
-			boolean success = initCore(inContext);
-			if(!success) {
-				throw new RuntimeException("Twilio failed to initialize");
-			}
-			PackageManager pm = inContext.getPackageManager();
-			PackageInfo pinfo = pm.getPackageInfo(inContext.getPackageName(),
+			PackageManager pm = applicationContext.getPackageManager();
+			PackageInfo pinfo = pm.getPackageInfo(applicationContext.getPackageName(),
 					PackageManager.GET_PERMISSIONS
 							| PackageManager.GET_SERVICES);
 
-			// check application permissions
+			// Check application permissions
 			Map<String, Boolean> appPermissions = new HashMap<String, Boolean>(
 					pinfo.requestedPermissions != null ? pinfo.requestedPermissions.length
 							: 0);
@@ -125,72 +102,42 @@ public class TwilioRTCImpl {
 				throw new RuntimeException(builder.toString());
 			}
 
-			// check that the service is declared properly
-			boolean serviceFound = false;
-			if (pinfo.services != null)
-			{
-				for (ServiceInfo service : pinfo.services)
-				{
-					if (service.name.equals(TWILIO_SIGNAL_SERVICE_NAME))
-					{
-						serviceFound = true;
-						if (service.exported)
-							throw new RuntimeException(TWILIO_SIGNAL_SERVICE_NAME+" is exported.  You must add android:exported=\"false\" to the <service> declaration in AndroidManifest.xml");
-					}
-				}
-			}
-
-			if (!serviceFound)
-				throw new RuntimeException(TWILIO_SIGNAL_SERVICE_NAME + " is not declared in AndroidManifest.xml");
 		} catch (Exception e) {
-			inListener.onError(e);
-			sdkIniting = false;
+			initializing = false;
+			initialized = false;
+			initListener.onError(e);
 			return;
 		}
 
+		final Handler handler = CallbackHandler.create();
+		if(handler == null) {
+			throw new IllegalThreadStateException("This thread must be able to obtain a Looper");
+		}
 
-		context = inContext;
-		final Intent service = new Intent(context, TwilioRTCService.class);
+		/*
+		 * Initialize the core in a new thread since it may otherwise block the UI thread
+		 */
+		new Thread(new Runnable() {
 
-		serviceConn = new ServiceConnection() {
-
-			@Override
-			public void onServiceConnected(ComponentName name, IBinder binder) {
-				sdkIniting = false;
-				sdkInited = true;
-
-				// we must never die!
-				context.startService(service);
-				twBinder = (TwilioBinder)binder;
-				TwilioRTCImpl twilioRtc = twBinder.getTwiloRtc();
-				//signalCore = twBinder.getSignalCore();
-				//if (signalCore != null)
-				if (twilioRtc != null)
-				{
-					inListener.onInitialized();
+			public void run() {
+				boolean success = initCore(applicationContext);
+				if (!success) {
+					initializing = false;
+					initialized = false;
+					handler.post(new Runnable() {
+						@Override
+						public void run() {
+							initListener.onError(new RuntimeException("Twilio conversations failed to initialize."));
+						}
+					});
 				} else {
-					onServiceDisconnected(name);
-					inListener.onError(null);
+					initialized = true;
+					initializing = false;
+					initListener.onInitialized();
 				}
 			}
 
-			@Override
-			public void onServiceDisconnected(ComponentName name) {
-				sdkIniting = sdkInited = false;
-				twBinder = null;
-				context = null;
-			}
-
-		};
-
-		// We need to both startService() and bindService() here.  The startService() call
-		// will ensure that the Service keeps running even if the calling Activity gets
-		// destroyed and recreated.  The bindService() gives us the IBinder instance.
-
-		if (!context.bindService(service, serviceConn, Context.BIND_AUTO_CREATE)) {
-			context = null;
-			inListener.onError(new RuntimeException("Failed to start TwiloRTCService.  Please ensure it is declared in AndroidManifest.xml"));
-		}
+		}).start();
 
 	}
 
@@ -205,7 +152,7 @@ public class TwilioRTCImpl {
 			if (nativeEndpointHandle == 0) {
 				return null;
 			}
-			conversationsClient.setNativeHandle(nativeEndpointHandle);
+			conversationsClient.setNativeEndpointHandle(nativeEndpointHandle);
  			synchronized (conversationsClientMap)
 			{
 				conversationsClientMap.put(conversationsClient.getUuid(), new WeakReference<ConversationsClientImpl>(conversationsClient));
@@ -216,9 +163,8 @@ public class TwilioRTCImpl {
 	}
 
 	public static void setLogLevel(int level) {
-		boolean validLevel = true;
 		/*
-		 * The Twilio RTC Log Levels are defined differently in the Twilio Logger
+		 * The Log Levels are defined differently in the Twilio Logger
 		 * which is based off android.util.Log.
 		 */
 		switch(level) {
@@ -243,12 +189,12 @@ public class TwilioRTCImpl {
 			default:
 				// Set the log level to assert/disabled if the value passed in is unknown
 				Logger.setLogLevel(Log.ASSERT);
-				level = TwilioRTC.LogLevel.DISABLED;
+				level = TwilioConversations.LogLevel.DISABLED;
 				break;
 		}
 		setCoreLogLevel(level);
 		// Save the log level
-		TwilioRTCImpl.level = level;
+		TwilioConversationsImpl.level = level;
 	}
 
 	public static int getLogLevel() {
@@ -256,19 +202,11 @@ public class TwilioRTCImpl {
 	}
 
 	public boolean isInitialized() {
-		return sdkInited;
+		return initialized;
 	}
 
 	boolean isInitializing() {
-		return sdkIniting;
-	}
-
-	private void updateServiceState() {
-		if (context == null || twBinder == null)
-			return;
-
-		Intent intent = new Intent(context, TwilioRTCService.class);
-		context.startService(intent);
+		return initializing;
 	}
 
 	public ConversationsClientImpl findDeviceByUUID(UUID uuid) {

@@ -7,13 +7,13 @@ import android.content.Context;
 
 import com.twilio.common.TwilioAccessManager;
 import com.twilio.common.TwilioAccessManagerFactory;
-import com.twilio.signal.impl.TwilioRTCImpl;
+import com.twilio.signal.impl.TwilioConversationsImpl;
 
-public class TwilioRTC {
+public class TwilioConversations {
 
 	/**
 	 * Interface for the listener object to pass to
-	 * {@link TwilioRTC#initialize(Context, InitListener)}.
+	 * {@link TwilioConversations#initialize(Context, InitListener)}.
 	 */
 	public interface InitListener {
 		/**
@@ -43,7 +43,7 @@ public class TwilioRTC {
 		public static final int VERBOSE = 8;
 	}
 
-	private TwilioRTC() {}
+	private TwilioConversations() {}
 
 	/**
 	 * Initialize the Twilio RTC Conversations Client.
@@ -52,13 +52,13 @@ public class TwilioRTC {
 	 *            The application context of your Android application
 	 * 
 	 * @param initListener
-	 *            A {@link TwilioRTC.InitListener} that will notify you
+	 *            A {@link TwilioConversations.InitListener} that will notify you
 	 *            when the service is ready
 	 * 
 	 * @throws NullPointerException
 	 */
 	public static void initialize(Context applicationContext,
-			TwilioRTC.InitListener initListener) {
+			TwilioConversations.InitListener initListener) {
 		if (applicationContext == null) {
 			throw new NullPointerException("applicationContext must not be null");
 		}
@@ -66,7 +66,11 @@ public class TwilioRTC {
 			throw new NullPointerException("initListener must not be null");
 		}
 
-		TwilioRTCImpl.getInstance().initialize(applicationContext, initListener);
+		TwilioConversationsImpl.getInstance().initialize(applicationContext, initListener);
+	}
+
+	public static boolean isInitialized() {
+		return TwilioConversationsImpl.getInstance().isInitialized();
 	}
 
 	/**
@@ -75,7 +79,7 @@ public class TwilioRTC {
 	 * @return the logging level
 	 */
 	public static int getLogLevel() {
-		return TwilioRTCImpl.getLogLevel();
+		return TwilioConversationsImpl.getLogLevel();
 	}
 
 	/**
@@ -84,7 +88,7 @@ public class TwilioRTC {
 	 * @param level - the logging level
 	 */
 	public static void setLogLevel(int level) {
-		TwilioRTCImpl.setLogLevel(level);
+		TwilioConversationsImpl.setLogLevel(level);
 	}
 
 	/**
@@ -105,7 +109,7 @@ public class TwilioRTC {
 		}
 		TwilioAccessManager manager = TwilioAccessManagerFactory.createAccessManager(token, null);
 		Map<String, String> options = new HashMap<String, String>();
-		return TwilioRTCImpl.getInstance().createConversationsClient(manager, options, listener);
+		return TwilioConversationsImpl.getInstance().createConversationsClient(manager, options, listener);
 	}
 	
 	/**
@@ -125,7 +129,7 @@ public class TwilioRTC {
 			throw new NullPointerException("listener must not be null");
 		}
 		Map<String, String> options = new HashMap<String, String>();
-		return TwilioRTCImpl.getInstance().createConversationsClient(accessManager, options, listener);
+		return TwilioConversationsImpl.getInstance().createConversationsClient(accessManager, options, listener);
 	}
 	
 	/**
@@ -149,7 +153,7 @@ public class TwilioRTC {
 			throw new NullPointerException("listener must not be null");
 		}
 
-		return TwilioRTCImpl.getInstance().createConversationsClient(accessManager, options, listener);
+		return TwilioConversationsImpl.getInstance().createConversationsClient(accessManager, options, listener);
 	}
 
 	/**

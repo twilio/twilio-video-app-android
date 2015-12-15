@@ -4,7 +4,7 @@ import android.content.Context;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
 
-import com.twilio.signal.TwilioRTC;
+import com.twilio.signal.TwilioConversations;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -15,37 +15,37 @@ import java.util.concurrent.TimeUnit;
 
 
 /*
- * Adding other tests to this test module that call initialize may invalidate this test since TwilioRTC
+ * Adding other tests to this test module that call initialize may invalidate this test since TwilioConversations
  * is a singleton and can only be initialized once.
  */
 @RunWith(AndroidJUnit4.class)
-public class TwilioRTCLogLevelTests {
+public class TwilioConversationsLogLevelTests {
 
     private static int TIMEOUT = 10;
 
     @Rule
-    public ActivityTestRule<TwilioRTCLogLevelActivity> mActivityRule = new ActivityTestRule<>(
-            TwilioRTCLogLevelActivity.class);
+    public ActivityTestRule<TwilioConversationsLogLevelActivity> mActivityRule = new ActivityTestRule<>(
+            TwilioConversationsLogLevelActivity.class);
 
     @Test
     public void testTwilioEnsureLogLevelSetBeforeAndAfterInit() {
-        int level = TwilioRTC.LogLevel.VERBOSE;
-        TwilioRTC.setLogLevel(level);
-        org.junit.Assert.assertEquals(level, TwilioRTC.getLogLevel());
+        int level = TwilioConversations.LogLevel.VERBOSE;
+        TwilioConversations.setLogLevel(level);
+        org.junit.Assert.assertEquals(level, TwilioConversations.getLogLevel());
 
         final CountDownLatch waitLatch = new CountDownLatch(1);
         initialize(mActivityRule.getActivity(), initListener(waitLatch));
         wait(waitLatch, TIMEOUT, TimeUnit.SECONDS);
 
-        org.junit.Assert.assertEquals(level, TwilioRTC.getLogLevel());
+        org.junit.Assert.assertEquals(level, TwilioConversations.getLogLevel());
     }
 
-    private void initialize(Context context, TwilioRTC.InitListener initListener) {
-        TwilioRTC.initialize(context, initListener);
+    private void initialize(Context context, TwilioConversations.InitListener initListener) {
+        TwilioConversations.initialize(context, initListener);
     }
 
-    private TwilioRTC.InitListener initListener(final CountDownLatch wait) {
-        return new TwilioRTC.InitListener() {
+    private TwilioConversations.InitListener initListener(final CountDownLatch wait) {
+        return new TwilioConversations.InitListener() {
             @Override
             public void onInitialized() {
                 wait.countDown();
