@@ -24,8 +24,7 @@ JAVADOC_SOURCE_FILES="
     MediaFactory.java
     Participant.java
     TrackOrigin.java
-    TwilioRTC.java
-    TwilioRTCService.java
+    TwilioConversations.java
     VideoRenderer.java
     VideoRendererObserver.java
     VideoTrack.java
