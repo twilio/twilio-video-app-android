@@ -303,6 +303,14 @@ public class ConversationsClientImpl implements
 		
 	}
 	
+	@Override
+	public AudioOutput getAudioOutput(Context context) {
+		logger.d("getAudioOutput");
+		AudioManager audioManager = (AudioManager)context.getSystemService(Context.AUDIO_SERVICE);
+		return audioManager.isSpeakerphoneOn() ? AudioOutput.SPEAKERPHONE : AudioOutput.HEADSET;
+	}
+
+	
 	private synchronized void checkDisposed() {
 		if (isDisposed || nativeEndpointHandle == 0) {
 			throw new IllegalStateException(DISPOSE_MESSAGE);
@@ -314,6 +322,7 @@ public class ConversationsClientImpl implements
 	private native void reject(long nativeEndpoint, long nativeSession);
 	private native void freeNativeHandle(long nativeEndpoint);
 
+	
 	
 
 

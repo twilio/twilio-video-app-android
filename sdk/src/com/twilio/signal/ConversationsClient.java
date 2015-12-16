@@ -89,5 +89,13 @@ public interface ConversationsClient {
 	 * @param audioOutput that should be used by the system
 	 */
 	public void setAudioOutput(Context context, AudioOutput audioOutput);
+	
+	/**
+	 * Audio output speaker for the current client device
+	 * 
+	 * @param context Application context
+	 * @return audio output speaker
+	 */
+	public AudioOutput getAudioOutput(Context context);
 
 }
