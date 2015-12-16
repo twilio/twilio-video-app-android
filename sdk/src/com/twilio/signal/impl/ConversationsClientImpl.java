@@ -4,11 +4,13 @@ import java.util.Set;
 import java.util.UUID;
 
 import android.content.Context;
+import android.media.AudioManager;
 import android.os.Handler;
 import android.os.Parcel;
 import android.os.Parcelable;
 
 import com.twilio.common.TwilioAccessManager;
+import com.twilio.signal.AudioOutput;
 import com.twilio.signal.Conversation;
 import com.twilio.signal.ConversationCallback;
 import com.twilio.signal.ConversationException;
@@ -312,6 +314,26 @@ public class ConversationsClientImpl implements
 		// Do nothing.
 	}
 	
+	@Override
+	public void setAudioOutput(AudioOutput audioOutput) {
+		logger.d("setAudioOutput");
+		AudioManager audioManager = (AudioManager)context.getSystemService(Context.AUDIO_SERVICE);
+		if (audioOutput == AudioOutput.SPEAKERPHONE) {
+			audioManager.setSpeakerphoneOn(true);
+		} else {
+			audioManager.setSpeakerphoneOn(false);
+		}
+		
+	}
+	
+	@Override
+	public AudioOutput getAudioOutput() {
+		logger.d("getAudioOutput");
+		AudioManager audioManager = (AudioManager)context.getSystemService(Context.AUDIO_SERVICE);
+		return audioManager.isSpeakerphoneOn() ? AudioOutput.SPEAKERPHONE : AudioOutput.HEADSET;
+	}
+
+	
 	private synchronized void checkDisposed() {
 		if (isDisposed || nativeEndpointHandle == 0) {
 			throw new IllegalStateException(DISPOSE_MESSAGE);
@@ -322,6 +344,9 @@ public class ConversationsClientImpl implements
 	private native void unlisten(long nativeEndpoint);
 	private native void reject(long nativeEndpoint, long nativeSession);
 	private native void freeNativeHandle(long nativeEndpoint);
+
+	
+	
 
 
 }
