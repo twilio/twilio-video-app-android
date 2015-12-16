@@ -37,7 +37,7 @@ public class VideoTrackImpl implements VideoTrack {
 		return videoTrack;
 	}
 
-	public TrackInfo getTrackInfo() {
+	TrackInfo getTrackInfo() {
 		return trackInfo;
 	}
 
@@ -63,19 +63,17 @@ public class VideoTrackImpl implements VideoTrack {
 		return new ArrayList<VideoRenderer>(videoRenderersMap.keySet());
 	}
 	
-	void invalidateRenderers() {
-		for (VideoRenderer renderer : new ArrayList<VideoRenderer>(videoRenderersMap.keySet()) ) {
-			org.webrtc.VideoRenderer webrtcVideoRenderer =
-					videoRenderersMap.remove(renderer);
-			if (webrtcVideoRenderer != null) {
-				videoTrack.removeRenderer(webrtcVideoRenderer);
-			}
-		}
-		videoRenderersMap.clear();
-	}
-	
 	private org.webrtc.VideoRenderer createWebRtcVideoRenderer(VideoRenderer videoRenderer) {
 		return new org.webrtc.VideoRenderer(new VideoRendererCallbackAdapter(videoRenderer));
+	}
+
+	@Override
+	public String getTrackId() {
+		return trackInfo != null ? trackInfo.getTrackId() : null;
+	}
+
+	void updateTrackInfo(TrackInfo trackInfo) {
+		this.trackInfo = trackInfo;
 	}
 
 	private class VideoRendererCallbackAdapter implements org.webrtc.VideoRenderer.Callbacks {

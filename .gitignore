@@ -6,6 +6,9 @@ sdk/.settings
 sdk/bin
 output
 
+tags
+obj
+
 TestCore/bin
 TestCore/obj
 TestCore/gen

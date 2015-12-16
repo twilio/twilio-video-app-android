@@ -4,19 +4,21 @@ import com.twilio.signal.TrackOrigin;
 
 
 public class TrackInfoImpl implements TrackInfo {
-	private String participantAddress;
+	private String participantIdentity;
 	private String trackId;
 	private TrackOrigin trackOrigin;
+	private boolean enabled;
 
-	public TrackInfoImpl(String participantAddress, String trackId, TrackOrigin trackOrigin) {
-		this.participantAddress = participantAddress;
+	public TrackInfoImpl(String participantIdentity, String trackId, TrackOrigin trackOrigin, boolean enabled) {
+		this.participantIdentity = participantIdentity;
 		this.trackId = trackId;
 		this.trackOrigin = trackOrigin;
+		this.enabled = enabled;
 	}
 
 	@Override
-	public String getParticipantAddress() {
-		return participantAddress;
+	public String getParticipantIdentity() {
+		return participantIdentity;
 	}
 
 	@Override
@@ -27,5 +29,10 @@ public class TrackInfoImpl implements TrackInfo {
 	@Override
 	public TrackOrigin getTrackOrigin() {
 		return trackOrigin;
+	}
+
+	@Override
+	public boolean isEnabled() {
+		return enabled;
 	}
 }
