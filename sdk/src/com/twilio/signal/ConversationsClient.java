@@ -2,6 +2,8 @@ package com.twilio.signal;
 
 import java.util.Set;
 
+import android.content.Context;
+
 import com.twilio.signal.impl.ConversationsClientImpl;
 
 /**
@@ -15,6 +17,15 @@ import com.twilio.signal.impl.ConversationsClientImpl;
 
 
 public interface ConversationsClient {
+	
+	/**
+	 * Different audio output lines
+	 *
+	 */
+	public static enum AudioOutput {
+		SPEAKERPHONE,
+		HEADSET
+	}
 	
 	/**
 	 * Key into an Intent's extras data that points to a {@link ConversationsClientImpl} object.
@@ -70,5 +81,13 @@ public interface ConversationsClient {
 	 * Attempts to use this ConversationsClient object after disposal will result in an IllegalStateException.
 	 */
 	public void dispose();
+	
+	/**
+	 * Set the audio output speaker for current client device.
+	 * 
+	 * @param context Application context
+	 * @param audioOutput that should be used by the system
+	 */
+	public void setAudioOutput(Context context, AudioOutput audioOutput);
 
 }
