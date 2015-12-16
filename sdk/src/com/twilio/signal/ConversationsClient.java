@@ -70,5 +70,21 @@ public interface ConversationsClient {
 	 * Attempts to use this ConversationsClient object after disposal will result in an IllegalStateException.
 	 */
 	public void dispose();
+	
+	/**
+	 * Set the audio output speaker for current client device.
+	 * Bluetooth is currently not supported.
+	 * In order to use volume up/down keys, you need to call 'setVolumeControlStream(AudioManager.STREAM_VOICE_CALL);' inside activity.
+	 * 
+	 * @param audioOutput that should be used by the system
+	 */
+	public void setAudioOutput(AudioOutput audioOutput);
+	
+	/**
+	 * Audio output speaker for the current client device
+	 * 
+	 * @return audio output speaker
+	 */
+	public AudioOutput getAudioOutput();
 
 }

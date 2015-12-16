@@ -71,6 +71,7 @@ public class TwilioConversationsImpl {
 		}
 
 		initializing = true;
+		context = applicationContext;
 
 		try {
 			PackageManager pm = applicationContext.getPackageManager();
@@ -120,6 +121,7 @@ public class TwilioConversationsImpl {
 		 */
 		new Thread(new Runnable() {
 
+			@Override
 			public void run() {
 				boolean success = initCore(applicationContext);
 				if (!success) {
