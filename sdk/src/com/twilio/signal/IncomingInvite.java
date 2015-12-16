@@ -1,38 +1,44 @@
 package com.twilio.signal;
 
-import java.util.List;
+import java.util.Set;
 
-public interface IncomingInvite extends Invite {
+public interface IncomingInvite {
 
 	/**
 	 * Accept this invitation
 	 */
-	public void accept(LocalMedia localMedia, ConversationCallback conversationCallback);
+	void accept(LocalMedia localMedia, ConversationCallback conversationCallback);
 
 	/**
 	 * Reject this invitation
 	 */
-	public void reject();
+	void reject();
 
 	/**
 	 * Returns the SID of the conversation you are invited to
 	 * 
 	 * @return conversation SID 
 	 */
-	public String getConversationSid();
-	
+	String getConversationSid();
+
 	/**
 	 * Returns the identity of the invitee
 	 * 
 	 * @return invitee identity
 	 */
-	public String from();
-	
+	String getInvitee();
+
 	/**
 	 * Returns the list of participants already in the conversation 
 	 * 
 	 * @return list of participants 
 	 */
-	public List<String> getParticipants();
+	Set<String> getParticipants();
 
+	/**
+	 * The status of this invite
+	 *
+	 * @return invite status
+	 */
+	InviteStatus getInviteStatus();
 }

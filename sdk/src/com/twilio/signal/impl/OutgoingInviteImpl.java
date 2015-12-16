@@ -11,36 +11,35 @@ public class OutgoingInviteImpl implements OutgoingInvite {
 
 	static final Logger logger = Logger.getLogger(OutgoingInviteImpl.class);
 
+	private ConversationsClientImpl conversationsClientImpl;
 	private ConversationImpl conversation;
-	private EndpointImpl endpointImpl;
 	private ConversationCallback conversationCallback;
 	private InviteStatus inviteStatus;
 
-	private OutgoingInviteImpl(ConversationImpl conversation,
-					EndpointImpl endpointImpl,
-					ConversationCallback conversationCallback) {
+	private OutgoingInviteImpl(ConversationsClientImpl conversationsClientImpl,
+							   ConversationImpl conversation,
+							   ConversationCallback conversationCallback) {
 		this.conversation = conversation;
-		this.endpointImpl = endpointImpl;
+		this.conversationsClientImpl = conversationsClientImpl;
 		this.conversationCallback = conversationCallback;
 		this.inviteStatus = InviteStatus.PENDING;
 	}
 
-	static OutgoingInviteImpl create(EndpointImpl endpointImpl,
+	static OutgoingInviteImpl create(ConversationsClientImpl conversationsClientImpl,
 								 ConversationImpl conversationImpl,
 								 ConversationCallback conversationCallback) {
-		if(conversationImpl == null) {
+		if(conversationsClientImpl == null) {
 			return null;
 		}
-		if(endpointImpl == null) {
+		if(conversationImpl == null) {
 			return null;
 		}
 		if(conversationCallback == null) {
 			return null;
 		}
-		return new OutgoingInviteImpl(conversationImpl, endpointImpl, conversationCallback);
+		return new OutgoingInviteImpl(conversationsClientImpl, conversationImpl, conversationCallback);
 	}
 
-	// Update the invite status
 	void updateInviteStatus(InviteStatus inviteStatus) {
 		this.inviteStatus = inviteStatus;
 	}
@@ -57,7 +56,7 @@ public class OutgoingInviteImpl implements OutgoingInvite {
 	}
 
 	@Override
-	public Set<String> to() {
+	public Set<String> getInvitedParticipants() {
 		return conversation.getParticipants(); 
 	}
 

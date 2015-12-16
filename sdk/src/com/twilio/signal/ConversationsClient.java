@@ -15,55 +15,55 @@ import com.twilio.signal.impl.ConversationsClientImpl;
 
 
 public interface ConversationsClient {
-	
+
 	/**
 	 * Key into an Intent's extras data that points to a {@link ConversationsClientImpl} object.
 	 */
 	public static final String EXTRA_DEVICE = "com.twilio.signal.ConversationsClientImpl";
-	
+
 	/**
 	 * Sets a new {@link ConversationsClientListener} object to respond to device events.
 	 * 
 	 * @param listener A {@link ConversationsClientListener}, or null
 	 */
 	public void setConversationsClientListener(ConversationsClientListener listener);
-	
+
 	/**
 	 * Identity of this conversationsClient on the network for incoming calls.
 	 *
 	 * @return identity of this conversationsClient
  	 */
 	public String getIdentity();
-	
+
 	/**
 	 * Reflects current listening state of the conversations client
 	 * 
 	 * @return @return <code>true</code> if conversations client is listening, </code>false</code> otherwise.
  	 */
 	public boolean isListening();
-	
+
 	/**
 	 * Start listening for incoming Conversation.
 	 * 
 	 */
 	public void listen();
-	
+
 	/**
 	 * 
 	 * Stop listening for incoming Conversations.
 	 * 
 	 */
 	public void unlisten();
-	
+
 	/**
-	 * Create conversation object which represents outgoing call
+	 * Send an invitation to start a conversation with the following participants and local media configuration
 	 * 
 	 * @param participants Set of participant names as Strings
 	 * @param localMedia Local Media you would like to use when setting up the new conversation
-	 * @param listener for Conversation events
+	 * @param conversationCallback The callback that will provide the conversation once it's been created
 	 */
-	public Conversation createConversation(Set<String> participants, LocalMedia localMedia, ConversationListener listener);
-	
+	public OutgoingInvite sendConversationInvite(Set<String> participants, LocalMedia localMedia, ConversationCallback conversationCallback);
+
 	/**
 	 * Releases resources associated with this ConversationsClient object.
 	 * 

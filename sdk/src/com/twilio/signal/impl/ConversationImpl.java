@@ -645,23 +645,35 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 	 * CoreSession
 	 */
 	@Override
-	public void start(CoreSessionMediaConstraints mediaConstraints) {
+	public void start(final CoreSessionMediaConstraints mediaConstraints) {
 		logger.d("starting call");
-	
-		// TODO: Call only when video is enabled
-		setupExternalCapturer();
 
-		start(getNativeHandle(),
-				mediaConstraints.isAudioEnabled(),
-				mediaConstraints.isAudioMuted(),
-				mediaConstraints.isVideoEnabled(),
-				mediaConstraints.isVideoPaused());
+		// Call start on a new thread to avoid blocking the calling thread
+		new Thread(new Runnable() {
+			@Override
+			public void run() {
+				setupExternalCapturer();
+
+				start(getNativeHandle(),
+						mediaConstraints.isAudioEnabled(),
+						mediaConstraints.isAudioMuted(),
+						mediaConstraints.isVideoEnabled(),
+						mediaConstraints.isVideoPaused());
+
+			}
+		}).start();
 
 	}
 
 	@Override
 	public void stop() {
-		stop(getNativeHandle());
+		// Call stop on a new thread to avoid blocking the calling thread
+		new Thread(new Runnable() {
+			@Override
+			public void run() {
+				stop(getNativeHandle());
+			}
+		}).start();
 	}
 
 	@Override

@@ -10,12 +10,15 @@ import android.os.Parcelable;
 
 import com.twilio.common.TwilioAccessManager;
 import com.twilio.signal.Conversation;
+import com.twilio.signal.ConversationCallback;
 import com.twilio.signal.ConversationException;
 import com.twilio.signal.ConversationListener;
 import com.twilio.signal.ConversationsClient;
 import com.twilio.signal.ConversationsClientListener;
 import com.twilio.signal.Invite;
 import com.twilio.signal.LocalMedia;
+import com.twilio.signal.OutgoingInvite;
+import com.twilio.signal.Participant;
 import com.twilio.signal.impl.core.CoreEndpoint;
 import com.twilio.signal.impl.core.CoreError;
 import com.twilio.signal.impl.core.EndpointObserver;
@@ -28,13 +31,13 @@ public class ConversationsClientImpl implements
 		NativeHandleInterface,
 		Parcelable,
 		EndpointObserver,
-		CoreEndpoint {
+		CoreEndpoint, ConversationListener {
 
 	static final Logger logger = Logger.getLogger(ConversationsClientImpl.class);
 	
 	private static final String DISPOSE_MESSAGE = "The ConversationsClient has been disposed. This operation is no longer valid";
 	private static final String FINALIZE_MESSAGE = "The ConversationsClient must be released by calling dispose(). Failure to do so may result in leaked resources.";
-	
+
 	class EndpointObserverInternal implements NativeHandleInterface {
 
 		private long nativeEndpointObserver;
@@ -140,14 +143,33 @@ public class ConversationsClientImpl implements
 	}
 
 	@Override
-	public Conversation createConversation(Set<String> participants,
-			LocalMedia localMedia, ConversationListener listener) {
+	public OutgoingInvite sendConversationInvite(Set<String> participants, LocalMedia localMedia, ConversationCallback conversationCallback) {
 		checkDisposed();
-		Conversation outgoingConversation = ConversationImpl.createOutgoingConversation(
-				this, participants, localMedia, listener);
-		return outgoingConversation;
+		ConversationImpl outgoingConversationImpl = ConversationImpl.createOutgoingConversation(
+				this, participants, localMedia, this);
+		return OutgoingInviteImpl.create(this, outgoingConversationImpl, conversationCallback);
 	}
-	
+
+	@Override
+	public void onParticipantConnected(Conversation conversation, Participant participant) {
+
+	}
+
+	@Override
+	public void onFailedToConnectParticipant(Conversation conversation, Participant participant, ConversationException e) {
+
+	}
+
+	@Override
+	public void onParticipantDisconnected(Conversation conversation, Participant participant) {
+
+	}
+
+	@Override
+	public void onConversationEnded(Conversation conversation, ConversationException e) {
+
+	}
+
 	@Override
 	public synchronized void dispose() {
 		if (endpointObserver != null) {

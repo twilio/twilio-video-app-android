@@ -3,7 +3,7 @@ package com.twilio.signal;
 import java.util.List;
 import java.util.Set;
 
-public interface OutgoingInvite extends Invite {
+public interface OutgoingInvite {
 
 	/**
 	 * Cancel this invitation
@@ -11,10 +11,17 @@ public interface OutgoingInvite extends Invite {
 	public void cancel();
 
 	/**
-	 * Returns the identities of the participants being invited to the conversation 
+	 * Returns the identities of the participants invited to the conversation
 	 * 
 	 * @return list of participant identities invited to conversation 
 	 */
-	public Set<String> to();
+	public Set<String> getInvitedParticipants();
+
+	/**
+	 * The status of this invitation
+	 *
+	 * @return invite status
+	 */
+	public InviteStatus getStatus();
 
 }
