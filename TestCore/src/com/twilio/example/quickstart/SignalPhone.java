@@ -38,7 +38,8 @@ import com.twilio.signal.Invite;
 import com.twilio.signal.LocalMedia;
 import com.twilio.signal.LocalVideoTrack;
 import com.twilio.signal.LocalVideoTrackFactory;
-import com.twilio.signal.MediaFactory;
+import com.twilio.signal.LocalMediaFactory;
+import com.twilio.signal.LocalMediaListener;
 import com.twilio.signal.TwilioConversations;
 import com.twilio.signal.impl.TwilioConstants;
 
@@ -176,14 +177,14 @@ public class SignalPhone implements ConversationsClientListener
 
     }
 
-    public Conversation call(Activity activity, String participant, ViewGroup localContainer, ConversationListener conversationListener) {
+    public Conversation call(Activity activity, String participant, ViewGroup localContainer, ConversationListener conversationListener, LocalMediaListener localMediaListener) {
     	if (participant == null || participant == "") {
     		return null;
     	}
     	if (!twilioSdkInited || (SignalPhone.this.alice == null)) {
     		return null;
     	}
-    	LocalMedia localMedia = MediaFactory.createLocalMedia();
+    	LocalMedia localMedia = LocalMediaFactory.createLocalMedia(localMediaListener);
     	Conversation conv = null;
     	CameraCapturer camera = CameraCapturerFactory.createCameraCapturer(
                 activity,
@@ -191,7 +192,6 @@ public class SignalPhone implements ConversationsClientListener
                 localContainer, capturerErrorListener());
     	if (camera != null) {
 	    	LocalVideoTrack videoTrack = LocalVideoTrackFactory.createLocalVideoTrack(camera);
-	    	localMedia.attachContainerView(localContainer);
 	    	localMedia.addLocalVideoTrack(videoTrack);
 	    	Set<String> participants = new HashSet<String>();
 	    	participants.add(participant);
@@ -221,12 +221,12 @@ public class SignalPhone implements ConversationsClientListener
 		};
     }
 
-    public Conversation accept(Context context, String from, ViewGroup localContainer, ConversationListener listener) {
+    public Conversation accept(Context context, String from, ViewGroup localContainer, ConversationListener listener, LocalMediaListener localMediaListener) {
        Invite invite = invites.remove(from);
        if (!twilioSdkInited || invite == null || invite.to() == null) {
     	   return null;
        }
-       LocalMedia localMedia = MediaFactory.createLocalMedia();
+       LocalMedia localMedia = LocalMediaFactory.createLocalMedia(localMediaListener);
        Conversation conv = null;
        CameraCapturer camera = CameraCapturerFactory.createCameraCapturer(
                context,
@@ -235,7 +235,6 @@ public class SignalPhone implements ConversationsClientListener
        if (camera != null) {
 	       LocalVideoTrack videoTrack = LocalVideoTrackFactory.createLocalVideoTrack(camera);
 	       localMedia.addLocalVideoTrack(videoTrack);
-	       localMedia.attachContainerView(localContainer);
 	       conv = invite.accept(localMedia, listener);
 	       return conv;
        }

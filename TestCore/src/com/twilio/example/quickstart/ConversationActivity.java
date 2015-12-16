@@ -13,13 +13,20 @@ import com.twilio.signal.Conversation;
 import com.twilio.signal.Conversation.Status;
 import com.twilio.signal.ConversationException;
 import com.twilio.signal.ConversationListener;
+import com.twilio.signal.LocalMediaListener;
 import com.twilio.signal.LocalVideoTrack;
+import com.twilio.signal.AudioTrack;
+import com.twilio.signal.MediaTrack;
 import com.twilio.signal.Participant;
+import com.twilio.signal.ParticipantListener;
 import com.twilio.signal.VideoRendererObserver;
 import com.twilio.signal.VideoTrack;
 import com.twilio.signal.VideoViewRenderer;
 
-public class ConversationActivity extends Activity implements ConversationListener {
+public class ConversationActivity extends Activity implements
+		ConversationListener,
+		LocalMediaListener,
+		ParticipantListener {
 
 	private static final String TAG = "ConversationActivity";
 	
@@ -55,11 +62,11 @@ public class ConversationActivity extends Activity implements ConversationListen
 	}
 
 	private void callParticipant(String participantAddress) {
-		conv = phone.call(this, participantAddress, localContainer, this);
+		conv = phone.call(this, participantAddress, localContainer, this, this);
 	}
 	
 	private void acceptIncoming(String participantAddress) {
-		conv = phone.accept(this, participantAddress, localContainer, this);
+		conv = phone.accept(this, participantAddress, localContainer, this, this);
 	}
 
 	public static class MenuFragment extends Fragment {
@@ -73,7 +80,8 @@ public class ConversationActivity extends Activity implements ConversationListen
 	@Override
 	public void onParticipantConnected(Conversation conversation,
 			Participant participant) {
-		Log.i(TAG, "Participant connected: "+participant.getAddress());
+		Log.i(TAG, "Participant connected: "+participant.getIdentity());
+		participant.setParticipantListener(this);
 	}
 
 	@Override
@@ -85,55 +93,10 @@ public class ConversationActivity extends Activity implements ConversationListen
 	@Override
 	public void onParticipantDisconnected(Conversation conversation,
 			Participant participant) {
-		Log.i(TAG, "onParticipantDisconncted: "+participant.getAddress());
+		Log.i(TAG, "onParticipantDisconncted: "+participant.getIdentity());
 
 	}
 
-	@Override
-	public void onVideoAddedForParticipant(final Conversation conversation,
-				final Participant participant, final VideoTrack videoTrack) {
-		runOnUiThread(new Runnable() {
-
-			@Override
-			public void run() {
-				// Remote participant
-				Log.i(TAG, "Participant adding video track");
-				participantVideoRenderer = new VideoViewRenderer(ConversationActivity.this, participantContainer);
-				participantVideoRenderer.setObserver(new VideoRendererObserver() {
-
-					@Override
-					public void onFirstFrame() {
-						Log.i(TAG, "Participant onFirstFrame");
-					}
-
-					@Override
-					public void onFrameDimensionsChanged(int width, int height) {
-						Log.i(TAG, "Participant onFrameDimensionsChanged " + width + " " + height);
-					}
-
-				});
-				videoTrack.addRenderer(participantVideoRenderer);
-			}
-		});
-	}
-
-	@Override
-	public void onVideoRemovedForParticipant(Conversation conversation, Participant participant, VideoTrack videoTrack) {
-		Log.i(TAG, "Participant removing video track");
-		participantContainer.post(new Runnable() {
-			@Override
-			public void run() {
-				participantContainer.removeAllViews();
-			}
-
-		});
-	}
-
-	@Override
-	public void onLocalStatusChanged(Conversation conversation, Status status) {
-		Log.i(TAG, "onLocalStatusChanged "+status.name());
-	}
-	
 	private void releaseConversation(Conversation conversation) {
 		if (conv == conversation) {
 			conv.dispose();
@@ -170,17 +133,70 @@ public class ConversationActivity extends Activity implements ConversationListen
 	}
 
 	@Override
-	public void onLocalVideoAdded(Conversation conversation,
-			LocalVideoTrack videoTrack) {
-		// TODO Auto-generated method stub
-		
+	public void onVideoTrackAdded(final Conversation conversation,
+			final Participant participant, final VideoTrack videoTrack) {
+		// Remote participant
+		Log.i(TAG, "Participant adding video track");
+		participantVideoRenderer = new VideoViewRenderer(ConversationActivity.this, participantContainer);
+		participantVideoRenderer.setObserver(new VideoRendererObserver() {
+
+			@Override
+			public void onFirstFrame() {
+				Log.i(TAG, "Participant onFirstFrame");
+			}
+
+			@Override
+			public void onFrameDimensionsChanged(int width, int height) {
+				Log.i(TAG, "Participant onFrameDimensionsChanged " + width + " " + height);
+			}
+
+		});
+		videoTrack.addRenderer(participantVideoRenderer);
 	}
 
 	@Override
-	public void onLocalVideoRemoved(Conversation conversation,
-			LocalVideoTrack videoTrack) {
-		// TODO Auto-generated method stub
-		
+	public void onVideoTrackRemoved(Conversation conversation, Participant participant, VideoTrack videoTrack) {
+		Log.i(TAG, "Participant removing video track");
+		participantContainer.post(new Runnable() {
+			@Override
+			public void run() {
+				participantContainer.removeAllViews();
+			}
+
+		});
+	}
+
+	@Override
+	public void onAudioTrackAdded(Conversation conversation, Participant participant, AudioTrack audioTrack) {
+		Log.i(TAG, "onAudioTrackAdded " + participant.getIdentity());
+	}
+
+	@Override
+	public void onAudioTrackRemoved(Conversation conversation, Participant participant, AudioTrack audioTrack) {
+		Log.i(TAG, "onAudioTrackRemoved " + participant.getIdentity());
+	}
+
+	@Override
+	public void onTrackEnabled(Conversation conversation, Participant participant, MediaTrack mediaTrack) {
+		Log.i(TAG, "onTrackEnabled " + participant.getIdentity());
+	}
+
+	@Override
+	public void onTrackDisabled(Conversation conversation, Participant participant, MediaTrack mediaTrack) {
+		Log.i(TAG, "onTrackDisabled " + participant.getIdentity());
+	}
+
+
+	@Override
+	public void onLocalVideoTrackAdded(Conversation conversation,
+			LocalVideoTrack localVideoTrack) {
+		localVideoTrack.addRenderer(new VideoViewRenderer(this, localContainer));	
+	}
+
+	@Override
+	public void onLocalVideoTrackRemoved(Conversation conversation,
+			LocalVideoTrack localVideoTrack) {
+		localContainer.removeAllViews();	
 	}
 
 }
