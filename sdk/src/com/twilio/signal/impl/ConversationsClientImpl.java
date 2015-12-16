@@ -10,6 +10,7 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 import com.twilio.common.TwilioAccessManager;
+import com.twilio.signal.AudioOutput;
 import com.twilio.signal.Conversation;
 import com.twilio.signal.ConversationException;
 import com.twilio.signal.ConversationListener;
@@ -292,7 +293,7 @@ public class ConversationsClientImpl implements
 	}
 	
 	@Override
-	public void setAudioOutput(Context context, AudioOutput audioOutput) {
+	public void setAudioOutput(AudioOutput audioOutput) {
 		logger.d("setAudioOutput");
 		AudioManager audioManager = (AudioManager)context.getSystemService(Context.AUDIO_SERVICE);
 		if (audioOutput == AudioOutput.SPEAKERPHONE) {
@@ -304,7 +305,7 @@ public class ConversationsClientImpl implements
 	}
 	
 	@Override
-	public AudioOutput getAudioOutput(Context context) {
+	public AudioOutput getAudioOutput() {
 		logger.d("getAudioOutput");
 		AudioManager audioManager = (AudioManager)context.getSystemService(Context.AUDIO_SERVICE);
 		return audioManager.isSpeakerphoneOn() ? AudioOutput.SPEAKERPHONE : AudioOutput.HEADSET;

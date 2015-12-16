@@ -2,8 +2,6 @@ package com.twilio.signal;
 
 import java.util.Set;
 
-import android.content.Context;
-
 import com.twilio.signal.impl.ConversationsClientImpl;
 
 /**
@@ -17,15 +15,6 @@ import com.twilio.signal.impl.ConversationsClientImpl;
 
 
 public interface ConversationsClient {
-	
-	/**
-	 * Different audio output lines
-	 *
-	 */
-	public static enum AudioOutput {
-		SPEAKERPHONE,
-		HEADSET
-	}
 	
 	/**
 	 * Key into an Intent's extras data that points to a {@link ConversationsClientImpl} object.
@@ -84,18 +73,18 @@ public interface ConversationsClient {
 	
 	/**
 	 * Set the audio output speaker for current client device.
+	 * Bluetooth is currently not supported.
+	 * In order to use volume up/down keys, you need to call 'setVolumeControlStream(AudioManager.STREAM_VOICE_CALL);' inside activity.
 	 * 
-	 * @param context Application context
 	 * @param audioOutput that should be used by the system
 	 */
-	public void setAudioOutput(Context context, AudioOutput audioOutput);
+	public void setAudioOutput(AudioOutput audioOutput);
 	
 	/**
 	 * Audio output speaker for the current client device
 	 * 
-	 * @param context Application context
 	 * @return audio output speaker
 	 */
-	public AudioOutput getAudioOutput(Context context);
+	public AudioOutput getAudioOutput();
 
 }
