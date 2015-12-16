@@ -4,7 +4,7 @@ import java.util.List;
 
 import android.view.ViewGroup;
 
-public interface LocalMedia extends Media {
+public interface LocalMedia {
 	
 	/**
 	 * Retrieves local video tracks
@@ -26,12 +26,6 @@ public interface LocalMedia extends Media {
 	 * @param track
 	 */
 	public boolean removeLocalVideoTrack(LocalVideoTrack track);
-
-	/** Get local video view container. */
-	public ViewGroup getContainerView();
-
-	/** Attach local video view container */
-	public void attachContainerView(ViewGroup container);
 
 	/**
 	 * Specifies whether or not your local audio should be muted

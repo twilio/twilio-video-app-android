@@ -1,11 +1,17 @@
 package com.twilio.signal;
 
 public interface Participant {
-	
-	/** Callee address */
-	public String getAddress();
-	
-	/** Reference to Media for this participant */
-	public Media getMedia();
+
+	/** Participant identity */
+	String getIdentity();
+
+	/** This participants media */
+	Media getMedia();
+
+	void setParticipantListener(ParticipantListener participantListener);
+
+	ParticipantListener getParticipantListener();
+
+	String getSid();
 
 }

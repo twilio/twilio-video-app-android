@@ -1,20 +1,28 @@
 package com.twilio.signal.impl;
 
+import android.os.Handler;
+
 import com.twilio.signal.Participant;
 import com.twilio.signal.Media;
+import com.twilio.signal.ParticipantListener;
+import com.twilio.signal.impl.util.CallbackHandler;
 
 public class ParticipantImpl implements Participant {
-	private String address;
+	private String identity;
+	private String sid;
 	private MediaImpl media;
+	private ParticipantListener participantListener;
+	private Handler handler;
 
-	public ParticipantImpl(String address) {
-		this.address = address;
+	public ParticipantImpl(String identity, String sid) {
+		this.identity = identity;
+		this.sid = sid;
 		this.media = new MediaImpl();
 	}
 
 	@Override
-	public String getAddress() {
-		return address;
+	public String getIdentity() {
+		return identity;
 	}
 
 	@Override
@@ -22,8 +30,30 @@ public class ParticipantImpl implements Participant {
 		return media;
 	}
 
-	public MediaImpl getMediaImpl() {
+	@Override
+	public void setParticipantListener(ParticipantListener participantListener) {
+		this.handler = CallbackHandler.create();
+		if(handler == null) {
+			throw new IllegalThreadStateException("This thread must be able to obtain a Looper");
+		}
+		this.participantListener = participantListener;
+	}
+
+	@Override
+	public ParticipantListener getParticipantListener() {
+		return participantListener;
+	}
+
+	@Override
+	public String getSid() {
+		return sid;
+	}
+
+	MediaImpl getMediaImpl() {
 		return media;
 	}
 
+	Handler getHandler() {
+		return handler;
+	}
 }

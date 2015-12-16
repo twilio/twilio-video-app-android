@@ -2,7 +2,7 @@ package com.twilio.signal;
 
 import java.util.List;
 
-public interface VideoTrack {
+public interface VideoTrack extends MediaTrack {
 
 	public void addRenderer(VideoRenderer videoRenderer);
 

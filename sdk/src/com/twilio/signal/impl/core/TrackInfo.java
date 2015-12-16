@@ -4,9 +4,12 @@ import com.twilio.signal.TrackOrigin;
 
 public interface TrackInfo {
 
-	public String getParticipantAddress();
+	String getParticipantIdentity();
 
-	public String getTrackId();
+	String getTrackId();
 
-	public TrackOrigin getTrackOrigin();
+	TrackOrigin getTrackOrigin();
+
+	boolean isEnabled();
+
 }

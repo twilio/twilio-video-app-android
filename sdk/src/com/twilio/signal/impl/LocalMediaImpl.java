@@ -4,52 +4,48 @@ import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 
-import android.view.ViewGroup;
+import android.os.Handler;
 
 import com.twilio.signal.LocalMedia;
+import com.twilio.signal.LocalMediaListener;
 import com.twilio.signal.LocalVideoTrack;
-import com.twilio.signal.VideoTrack;
 import com.twilio.signal.impl.core.TrackInfo;
 import com.twilio.signal.impl.logging.Logger;
+import com.twilio.signal.impl.util.CallbackHandler;
 
 public class LocalMediaImpl implements LocalMedia {
 	
-	private ViewGroup container;
 	private List<LocalVideoTrackImpl> videoTracksImpl = new ArrayList<LocalVideoTrackImpl>();
 	private WeakReference<ConversationImpl> convWeak;
 	private boolean microphoneAdded;
 	private boolean microphoneMuted;
+	private Handler handler;
+	private LocalMediaListener localMediaListener;
 	
 	private static int MAX_LOCAL_VIDEO_TRACKS = 1;
 	
 	private static String TAG = "LocalMediaImpl";
 	static final Logger logger = Logger.getLogger(LocalMediaImpl.class);
 	
-	public LocalMediaImpl() {
+	public LocalMediaImpl(LocalMediaListener localMediaListener) {
+		this.localMediaListener = localMediaListener;
 		microphoneAdded = true;
 		microphoneMuted = false;
-	}
-	
-	
-	/* (non-Javadoc)
-	 * @see com.twilio.signal.LocalMedia#getContainerView()
-	 */
-	@Override
-	public ViewGroup getContainerView() {
-		return container;
+
+		handler = CallbackHandler.create();
+		if(handler == null) {
+			throw new IllegalThreadStateException("This thread must be able to obtain a Looper");
+		}
 	}
 
-	/* (non-Javadoc)
-	 * @see com.twilio.signal.LocalMedia#attachContainerView(android.view.ViewGroup)
-	 */
-	@Override
-	public void attachContainerView(ViewGroup container) {
-		this.container = container;
+	Handler getHandler() {
+		return handler;
 	}
 
-	/* (non-Javadoc)
-	 * @see com.twilio.signal.LocalMedia#mute(boolean)
-	 */
+	LocalMediaListener getLocalMediaListener() {
+		return localMediaListener;
+	}
+
 	@Override
 	public boolean mute(boolean on) {
 		if (convWeak != null && convWeak.get() != null) {
@@ -62,9 +58,6 @@ public class LocalMediaImpl implements LocalMedia {
 		return false;
 	}
 
-	/* (non-Javadoc)
-	 * @see com.twilio.signal.LocalMedia#isMuted()
-	 */
 	@Override
 	public boolean isMuted() {
 		return microphoneMuted;
@@ -106,16 +99,6 @@ public class LocalMediaImpl implements LocalMedia {
 		} else {
 			throw new IllegalArgumentException("Only TwilioSDK LocalVideoTrack implementation is supported");
 		}
-		
-	}
-	
-
-	/*
-	 * Media interface
-	 */
-	@Override
-	public List<VideoTrack> getVideoTracks() {
-		return new ArrayList<VideoTrack>(videoTracksImpl);
 	}
 
 	@Override

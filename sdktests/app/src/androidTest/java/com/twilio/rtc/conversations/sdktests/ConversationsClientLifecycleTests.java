@@ -12,8 +12,9 @@ import com.twilio.signal.ConversationsClient;
 import com.twilio.signal.ConversationsClientListener;
 import com.twilio.signal.Invite;
 import com.twilio.signal.LocalMedia;
+import com.twilio.signal.LocalMediaFactory;
+import com.twilio.signal.LocalMediaListener;
 import com.twilio.signal.LocalVideoTrack;
-import com.twilio.signal.MediaFactory;
 import com.twilio.signal.Participant;
 import com.twilio.signal.TwilioConversations;
 import com.twilio.signal.VideoTrack;
@@ -70,7 +71,17 @@ public class ConversationsClientLifecycleTests {
         conversationsClient.dispose();
         Set<String> participants = new HashSet<>();
         participants.add(PARTICIPANT);
-        LocalMedia localMedia = MediaFactory.createLocalMedia();
+        LocalMedia localMedia = LocalMediaFactory.createLocalMedia(new LocalMediaListener() {
+            @Override
+            public void onLocalVideoTrackAdded(Conversation conversation, LocalVideoTrack localVideoTrack) {
+
+            }
+
+            @Override
+            public void onLocalVideoTrackRemoved(Conversation conversation, LocalVideoTrack localVideoTrack) {
+
+            }
+        });
         Conversation conv = conversationsClient.createConversation(participants, localMedia, conversationListener());
     }
 
@@ -166,31 +177,6 @@ public class ConversationsClientLifecycleTests {
 
             @Override
             public void onParticipantDisconnected(Conversation conversation, Participant participant) {
-
-            }
-
-            @Override
-            public void onLocalVideoAdded(Conversation conversation, LocalVideoTrack videoTrack) {
-                
-            }
-
-            @Override
-            public void onLocalVideoRemoved(Conversation conversation, LocalVideoTrack videoTrack) {
-
-            }
-
-            @Override
-            public void onVideoAddedForParticipant(Conversation conversation, Participant participant, VideoTrack videoTrack) {
-
-            }
-
-            @Override
-            public void onVideoRemovedForParticipant(Conversation conversation, Participant participant, VideoTrack videoTrack) {
-
-            }
-
-            @Override
-            public void onLocalStatusChanged(Conversation conversation, Conversation.Status status) {
 
             }
 

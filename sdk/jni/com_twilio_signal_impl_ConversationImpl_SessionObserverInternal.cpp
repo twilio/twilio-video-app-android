@@ -10,6 +10,7 @@
 #include "TSCSessionObserver.h"
 #include "TSCMediaStreamInfo.h"
 #include "TSCMediaTrackInfo.h"
+#include "com_twilio_signal_impl_ConversationImpl.h"
 
 using namespace webrtc;
 using namespace webrtc_jni;
@@ -23,20 +24,32 @@ public:
 						jni, j_observer),
 		j_observer_class_(
 						jni, GetObjectClass(jni, j_observer)),
-		j_participant_did_connect_id(
-				GetMethodID(jni, *j_observer_class_, "onConnectParticipant", "(Ljava/lang/String;Lcom/twilio/signal/impl/core/CoreError;)V")),
-		j_participant_disconnect_id(
-				GetMethodID(jni, *j_observer_class_, "onDisconnectParticipant", "(Ljava/lang/String;Lcom/twilio/signal/impl/core/DisconnectReason;)V")),
-		j_media_stream_add_id(
+		j_session_state_changed_id(
+				GetMethodID(jni, *j_observer_class_, "onSessionStateChanged", "(Lcom/twilio/signal/impl/core/SessionState;)V")),
+		j_start_completed_id(
+				GetMethodID(jni, *j_observer_class_, "onStartCompleted", "(Lcom/twilio/signal/impl/core/CoreError;)V")),
+		j_stop_completed_id(
+				GetMethodID(jni, *j_observer_class_, "onStopCompleted", "(Lcom/twilio/signal/impl/core/CoreError;)V")),
+		j_participant_connected_id(
+				GetMethodID(jni, *j_observer_class_, "onParticipantConnected", "(Ljava/lang/String;Ljava/lang/String;Lcom/twilio/signal/impl/core/CoreError;)V")),
+		j_participant_disconnected_id(
+				GetMethodID(jni, *j_observer_class_, "onParticipantDisconnected", "(Ljava/lang/String;Ljava/lang/String;Lcom/twilio/signal/impl/core/DisconnectReason;)V")),
+		j_media_stream_added_id(
 				GetMethodID(jni, *j_observer_class_, "onMediaStreamAdded", "(Lcom/twilio/signal/impl/core/MediaStreamInfo;)V")),
-		j_media_stream_remove_id(
+		j_media_stream_removed_id(
 				GetMethodID(jni, *j_observer_class_, "onMediaStreamRemoved", "(Lcom/twilio/signal/impl/core/MediaStreamInfo;)V")),
-		j_local_status_changed_id(
-				GetMethodID(jni, *j_observer_class_, "onLocalStatusChanged", "(Lcom/twilio/signal/impl/core/SessionState;)V")),
-		j_add_track_id_(
+		j_video_track_added_id_(
 				GetMethodID(jni, *j_observer_class_, "onVideoTrackAdded", "(Lcom/twilio/signal/impl/core/TrackInfo;Lorg/webrtc/VideoTrack;)V")),
-		j_remove_track_id_(
+		j_video_track_removed_id_(
 				GetMethodID(jni, *j_observer_class_, "onVideoTrackRemoved", "(Lcom/twilio/signal/impl/core/TrackInfo;)V")),
+		j_video_track_state_changed_id_(
+				GetMethodID(jni, *j_observer_class_, "onVideoTrackStateChanged", "(Lcom/twilio/signal/impl/core/TrackInfo;)V")),
+		j_audio_track_added_id_(
+				GetMethodID(jni, *j_observer_class_, "onAudioTrackAdded", "(Lcom/twilio/signal/impl/core/TrackInfo;Lorg/webrtc/AudioTrack;)V")),
+		j_audio_track_removed_id_(
+				GetMethodID(jni, *j_observer_class_, "onAudioTrackRemoved", "(Lcom/twilio/signal/impl/core/TrackInfo;)V")),
+		j_audio_track_state_changed_id_(
+				GetMethodID(jni, *j_observer_class_, "onAudioTrackStateChanged", "(Lcom/twilio/signal/impl/core/TrackInfo;)V")),
 		j_trackinfo_class_(
 				jni, jni->FindClass( "com/twilio/signal/impl/core/TrackInfoImpl")),
 		j_trackorigin_class_(
@@ -44,19 +57,19 @@ public:
 		j_sessionstate_enum_(
 				jni, jni->FindClass( "com/twilio/signal/impl/core/SessionState")),
 		j_trackinfo_ctor_id_(
-				GetMethodID(jni, *j_trackinfo_class_, "<init>", "(Ljava/lang/String;Ljava/lang/String;Lcom/twilio/signal/TrackOrigin;)V")),
+				GetMethodID(jni, *j_trackinfo_class_, "<init>", "(Ljava/lang/String;Ljava/lang/String;Lcom/twilio/signal/TrackOrigin;Z)V")),
 		j_video_track_class_(
 				jni, jni->FindClass( "org/webrtc/VideoTrack")),
 		j_video_track_ctor_(
 				GetMethodID( jni, *j_video_track_class_, "<init>", "(J)V")),
+		j_audio_track_class_(
+				jni, jni->FindClass( "org/webrtc/AudioTrack")),
+		j_audio_track_ctor_(
+				GetMethodID( jni, *j_audio_track_class_, "<init>", "(J)V")),
 		j_errorimpl_class_(
 				jni, jni->FindClass( "com/twilio/signal/impl/core/CoreErrorImpl")),
 		j_errorimpl_ctor_id_(
 				GetMethodID( jni, *j_errorimpl_class_, "<init>", "(Ljava/lang/String;ILjava/lang/String;)V")),
-		j_start_completed_id(
-				GetMethodID(jni, *j_observer_class_, "onStartCompleted", "(Lcom/twilio/signal/impl/core/CoreError;)V")),
-		j_stop_completed_id(
-				GetMethodID(jni, *j_observer_class_, "onStopCompleted", "(Lcom/twilio/signal/impl/core/CoreError;)V")),
 		j_disreason_enum_(
 				jni, jni->FindClass( "com/twilio/signal/impl/core/DisconnectReason")),
 		j_media_stream_info_class_(
@@ -75,7 +88,7 @@ protected:
 				jni(), *j_sessionstate_enum_, session_state_class, state);
 
 		jni()->CallVoidMethod(
-				*j_observer_global_, j_local_status_changed_id, j_session_state);
+				*j_observer_global_, j_session_state_changed_id, j_session_state);
 	}
 
 	virtual void onStartDidComplete(TSCoreErrorCode code, const std::string message) {
@@ -98,9 +111,12 @@ protected:
 	                                     const std::string message) {
 		TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK, kTSCoreLogLevelDebug, "onParticipantDidConnect");
 
-    	jstring j_participant_address = stringToJString(jni(), participant);
+    	jstring j_participant_identity = stringToJString(jni(), participant);
+		jstring j_participant_sid = stringToJString(jni(), participantSid);
+
     	jobject j_error_obj = errorToJavaCoreErrorImpl(code, message);
-    	jni()->CallVoidMethod(*j_observer_global_, j_participant_did_connect_id, j_participant_address, j_error_obj);
+    	jni()->CallVoidMethod(*j_observer_global_, j_participant_connected_id,
+							  j_participant_identity, j_participant_sid, j_error_obj);
 	}
 
 	virtual void onParticipantDidDisconnect(const std::string participant,
@@ -108,15 +124,16 @@ protected:
 										    TSCDisconnectReason reason) {
 		TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK, kTSCoreLogLevelDebug, "onParticipantDidDisconect");
 
-		jstring j_participant_address = stringToJString(jni(), participant);
+		jstring j_participant_identity = stringToJString(jni(), participant);
+		jstring j_participant_sid = stringToJString(jni(), participantSid);
 
 		const std::string dis_reason_class =
 				"com/twilio/signal/impl/core/DisconnectReason";
 		jobject j_reason = webrtc_jni::JavaEnumFromIndex(
 						jni(), *j_disreason_enum_, dis_reason_class, reason);
 
-		jni()->CallVoidMethod(
-				*j_observer_global_, j_participant_disconnect_id, j_participant_address, j_reason);
+		jni()->CallVoidMethod(*j_observer_global_, j_participant_disconnected_id,
+							  j_participant_identity, j_participant_sid, j_reason);
 	}
 
 	virtual void onMediaStreamDidAdd(TSCMediaStreamInfoObject* stream) {
@@ -124,7 +141,7 @@ protected:
 
 	    jobject j_media_info = mediaStrInfoJavaMediaStrInfoImpl(stream);
 	    jni()->CallVoidMethod(
-    			*j_observer_global_, j_media_stream_add_id, j_media_info);
+    			*j_observer_global_, j_media_stream_added_id, j_media_info);
 	}
 
 	virtual void onMediaStreamDidRemove(TSCMediaStreamInfoObject* stream) {
@@ -132,7 +149,7 @@ protected:
 
 		jobject j_media_info = mediaStrInfoJavaMediaStrInfoImpl(stream);
 		jni()->CallVoidMethod(
-				*j_observer_global_, j_media_stream_remove_id, j_media_info);
+				*j_observer_global_, j_media_stream_removed_id, j_media_info);
 	}
 
 
@@ -143,39 +160,57 @@ protected:
 		jobject j_track = jni()->NewObject(
 				*j_video_track_class_, j_video_track_ctor_, jlongFromPointer(videoTrack), id);
 		jobject j_trackinfo = TrackInfoToJavaTrackInfoImpl(trackInfo);
-		jni()->CallVoidMethod(*j_observer_global_, j_add_track_id_, j_trackinfo, j_track);
+		jni()->CallVoidMethod(*j_observer_global_, j_video_track_added_id_, j_trackinfo, j_track);
 		videoTrack->AddRef();
-	}
-
-	virtual void onVideoTrackStateDidChange(TSCVideoTrackInfoObject* trackInfo) {
-		// TODO
 	}
 
 	virtual void onVideoTrackDidRemove(TSCVideoTrackInfoObject* trackInfo) {
 		TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK, kTSCoreLogLevelDebug, "onVideoTrackDidRemove");
 
 		jobject j_trackinfo = TrackInfoToJavaTrackInfoImpl(trackInfo);
-		jni()->CallVoidMethod(*j_observer_global_, j_remove_track_id_, j_trackinfo);
+		jni()->CallVoidMethod(*j_observer_global_, j_video_track_removed_id_, j_trackinfo);
 	}
 
-	virtual void onAudioTrackDidAdd(TSCAudioTrackInfoObject *trackInfo, webrtc::AudioTrackInterface* videoTrack) {
+	virtual void onVideoTrackStateDidChange(TSCVideoTrackInfoObject* trackInfo) {
+		TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK, kTSCoreLogLevelDebug, "onVideoTrackStateDidChange");
+
+		jobject j_trackinfo = TrackInfoToJavaTrackInfoImpl(trackInfo);
+		jni()->CallVoidMethod(*j_observer_global_, j_video_track_state_changed_id_, j_trackinfo);
+	}
+
+	virtual void onAudioTrackDidAdd(TSCAudioTrackInfoObject *trackInfo, webrtc::AudioTrackInterface* audioTrack) {
 	    TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK, kTSCoreLogLevelDebug, "onAudioTrackDidAdd");
-	}
 
-	virtual void onAudioTrackStateDidChange(TSCAudioTrackInfoObject* trackInfo) {
-		// TODO
+		jstring id = stringToJString(jni(), audioTrack->id());
+		jobject j_track = jni()->NewObject(
+				*j_audio_track_class_, j_audio_track_ctor_, jlongFromPointer(audioTrack), id);
+		jobject j_trackinfo = TrackInfoToJavaTrackInfoImpl(trackInfo);
+		jni()->CallVoidMethod(*j_observer_global_, j_audio_track_added_id_, j_trackinfo, j_track);
+		audioTrack->AddRef();
 	}
 
 	virtual void onAudioTrackDidRemove(TSCAudioTrackInfoObject *trackInfo) {
 	    TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK, kTSCoreLogLevelDebug, "onAudioTrackDidRemove");
+
+		jobject j_trackinfo = TrackInfoToJavaTrackInfoImpl(trackInfo);
+		jni()->CallVoidMethod(*j_observer_global_, j_audio_track_removed_id_, j_trackinfo);
+	}
+
+	virtual void onAudioTrackStateDidChange(TSCAudioTrackInfoObject* trackInfo) {
+		TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK, kTSCoreLogLevelDebug, "onAudioTrackStateDidChange");
+
+		jobject j_trackinfo = TrackInfoToJavaTrackInfoImpl(trackInfo);
+		jni()->CallVoidMethod(*j_observer_global_, j_audio_track_state_changed_id_, j_trackinfo);
 	}
 
     virtual void onDidReceiveSessionStatistics(TSCSessionStatisticsPtr statistics) {
 		TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK, kTSCoreLogLevelDebug, "onDidReceiveSessionStatistics");
+		// TODO: implement me
 	}
 
 	virtual void onDidReceiveConversationEvent(ConversationEvent *event) {
 	    TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK, kTSCoreLogLevelDebug, "onDidReceiveConversationEvent");
+		// TODO: implement me
 	}
 
 private:
@@ -184,16 +219,30 @@ private:
 	    	return AttachCurrentThreadIfNeeded();
 	}
 
-	// Return a TrackInfoImpl
+	// Return a TrackInfoImpl for the VideoTrack
 	jobject TrackInfoToJavaTrackInfoImpl(const TSCVideoTrackInfoObject *trackInfo) {
     		jstring j_participant_address = stringToJString(jni(), trackInfo->getParticipantAddress());
     		jstring j_track_id = stringToJString(jni(), trackInfo->getTrackId());
 		const std::string state_class = "com/twilio/signal/TrackOrigin";
 		jobject j_origin = JavaEnumFromIndex(jni(), *j_trackorigin_class_, state_class, trackInfo->getStreamOrigin());
+		jboolean enabled = trackInfo->isEnabled() ? JNI_TRUE : JNI_FALSE;
 
 		return jni()->NewObject(
 				*j_trackinfo_class_, j_trackinfo_ctor_id_,
-				j_participant_address, j_track_id, j_origin);
+				j_participant_address, j_track_id, j_origin, enabled);
+	}
+
+	// Return a TrackInfoImpl for the AudioTrack
+	jobject TrackInfoToJavaTrackInfoImpl(const TSCAudioTrackInfoObject *trackInfo) {
+    		jstring j_participant_address = stringToJString(jni(), trackInfo->getParticipantAddress());
+    		jstring j_track_id = stringToJString(jni(), trackInfo->getTrackId());
+		const std::string state_class = "com/twilio/signal/TrackOrigin";
+		jobject j_origin = JavaEnumFromIndex(jni(), *j_trackorigin_class_, state_class, trackInfo->getStreamOrigin());
+		jboolean enabled = trackInfo->isEnabled() ? JNI_TRUE : JNI_FALSE;
+
+		return jni()->NewObject(
+				*j_trackinfo_class_, j_trackinfo_ctor_id_,
+				j_participant_address, j_track_id, j_origin, enabled);
 	}
 
 	// Return a ErrorImpl
@@ -229,13 +278,20 @@ private:
 
 	const ScopedGlobalRef<jobject> j_observer_global_;
 	const ScopedGlobalRef<jclass> j_observer_class_;
-	const jmethodID j_participant_did_connect_id;
-	const jmethodID j_participant_disconnect_id;
-	const jmethodID j_media_stream_add_id;
-	const jmethodID j_media_stream_remove_id;
-	const jmethodID j_local_status_changed_id;
-	const jmethodID j_add_track_id_;
-	const jmethodID j_remove_track_id_;
+
+	const jmethodID j_session_state_changed_id;
+	const jmethodID j_start_completed_id;
+	const jmethodID j_stop_completed_id;
+	const jmethodID j_participant_connected_id;
+	const jmethodID j_participant_disconnected_id;
+	const jmethodID j_media_stream_added_id;
+	const jmethodID j_media_stream_removed_id;
+	const jmethodID j_video_track_added_id_;
+	const jmethodID j_video_track_removed_id_;
+	const jmethodID j_video_track_state_changed_id_;
+	const jmethodID j_audio_track_added_id_;
+	const jmethodID j_audio_track_removed_id_;
+	const jmethodID j_audio_track_state_changed_id_;
 
 	const ScopedGlobalRef<jclass> j_trackinfo_class_;
 	const ScopedGlobalRef<jclass> j_trackorigin_class_;
@@ -243,10 +299,10 @@ private:
 	const jmethodID j_trackinfo_ctor_id_;
 	const ScopedGlobalRef<jclass> j_video_track_class_;
 	const jmethodID j_video_track_ctor_;
+	const ScopedGlobalRef<jclass> j_audio_track_class_;
+	const jmethodID j_audio_track_ctor_;
 	const ScopedGlobalRef<jclass> j_errorimpl_class_;
 	const jmethodID j_errorimpl_ctor_id_;
-	const jmethodID j_start_completed_id;
-	const jmethodID j_stop_completed_id;
 	const ScopedGlobalRef<jclass> j_disreason_enum_;
 	const ScopedGlobalRef<jclass> j_media_stream_info_class_;
 	const jmethodID j_media_stream_info_ctor_;
