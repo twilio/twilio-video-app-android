@@ -13,7 +13,7 @@ import com.twilio.rtc.conversations.sdktests.utils.TwilioConversationsUtils;
 import com.twilio.signal.ConversationException;
 import com.twilio.signal.ConversationsClient;
 import com.twilio.signal.ConversationsClientListener;
-import com.twilio.signal.Invite;
+import com.twilio.signal.IncomingInvite;
 import com.twilio.signal.TwilioConversations;
 
 import java.util.HashMap;
@@ -226,9 +226,15 @@ public class TwilioConversationsTests {
             }
 
             @Override
-            public void onReceiveConversationInvite(ConversationsClient conversationsClient, Invite invite) {
+            public void onIncomingInvite(ConversationsClient conversationsClient, IncomingInvite incomingInvite) {
 
             }
+
+            @Override
+            public void onIncomingInviteCancelled(ConversationsClient conversationsClient, IncomingInvite incomingInvite) {
+
+            }
+
         };
     }
 
