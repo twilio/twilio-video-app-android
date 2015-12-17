@@ -3,13 +3,11 @@ package com.twilio.conversations;
 import java.util.HashMap;
 import java.util.Map;
 
-import junit.runner.Version;
 import android.content.Context;
 
 import com.twilio.common.TwilioAccessManager;
 import com.twilio.common.TwilioAccessManagerFactory;
 import com.twilio.conversations.impl.TwilioConversationsImpl;
-import com.twilio.conversations.Version;
 
 public class TwilioConversations {
 
