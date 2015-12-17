@@ -31,7 +31,7 @@ public interface Conversation {
 	public Conversation.Status getStatus();
 			
 	/**
-	 * Returns the list of participants in conversation.
+	 * Returns the list of participants in a conversation.
 	 * 
 	 * @return participants list of {@link Participant} in this conversation.
 	 */
