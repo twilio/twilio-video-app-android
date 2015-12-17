@@ -79,7 +79,6 @@ function main {
     check_tools
     combine_dependency
     build_library
-    build_testcore
     copy_javadocs
     archive
 
@@ -148,22 +147,6 @@ function build_library {
     fi
     done
 
-}
-
-function build_testcore {
-    PROJECT_DIR="${twsdkroot}"/TestCore
-
-    pushd $PROJECT_DIR
-    echo "Building project at ${PROJECT_DIR}..."
-
-    rm -f build.xml
-    android update project -p ${PROJECT_DIR}
-
-    ant clean
-    ant debug
-
-    echo "Project built succesffully."
-    popd
 }
 
 function copy_javadocs {
