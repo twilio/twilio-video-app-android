@@ -70,10 +70,10 @@ public class TwilioConversations {
 	}
 
 	/**
-	 * 
-	 * 
-	 * @return
-	 */
+     * Informs if {@link TwilioConversations} is initialized or not.g
+     * 
+     * @return <code>true</code> if Twilio RTC Conversations client is initialized, <code>false</code> otherwise.
+     */
 	public static boolean isInitialized() {
 		return TwilioConversationsImpl.getInstance().isInitialized();
 	}
