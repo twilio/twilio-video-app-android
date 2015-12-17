@@ -39,7 +39,7 @@ public interface Conversation {
 	
 	
 	/**
-	 * Get representation of the local video and audio stream
+	 * Get access to this conversations local media tracks and state
 	 * 
 	 * @return local media
 	 */
