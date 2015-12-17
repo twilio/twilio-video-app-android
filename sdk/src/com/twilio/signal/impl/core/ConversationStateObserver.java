@@ -1,7 +1,7 @@
-package com.twilio.signal.impl.core;
+package com.twilio.conversations.impl.core;
 
-import com.twilio.signal.Conversation;
-import com.twilio.signal.ConversationException;
+import com.twilio.conversations.Conversation;
+import com.twilio.conversations.ConversationException;
 
 public interface ConversationStateObserver {
 

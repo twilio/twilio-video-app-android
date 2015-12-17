@@ -11,8 +11,8 @@ mkdir -p gen/com/twilio/signal
 
 echo "New SDK version is ${sdk_version}"
 
-cat >gen/com/twilio/signal/Version.java <<EOF
-package com.twilio.signal;
+cat >gen/com/twilio/conversations/Version.java <<EOF
+package com.twilio.conversations;
 
 public abstract class Version
 {
