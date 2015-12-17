@@ -19,7 +19,7 @@ import com.twilio.signal.Media;
 import com.twilio.signal.Participant;
 import com.twilio.signal.TrackOrigin;
 import com.twilio.signal.VideoTrack;
-import com.twilio.signal.VideoViewRenderer;
+import com.twilio.signal.impl.core.ConversationStateObserver;
 import com.twilio.signal.impl.core.CoreError;
 import com.twilio.signal.impl.core.CoreSession;
 import com.twilio.signal.impl.core.CoreSessionMediaConstraints;
@@ -35,19 +35,19 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 
 	private static final String DISPOSE_MESSAGE = "The conversation has been disposed. This operation is no longer valid";
 	private static final String FINALIZE_MESSAGE = "Conversations must be released by calling dispose(). Failure to do so may result in leaked resources.";
-	
+	private ConversationsClientImpl conversationsClient;
 	private ConversationListener conversationListener;
-	private LocalMediaImpl localMediaImpl;
-	private VideoViewRenderer localVideoRenderer;
-
-	private Handler handler;
-
+	private ConversationStateObserver conversationStateObserver;
 	private Map<String,ParticipantImpl> participantMap = new HashMap<String,ParticipantImpl>();
+	private LocalMediaImpl localMediaImpl;
+	private Handler handler;
 
 	private static String TAG = "ConversationImpl";
 
 	static final Logger logger = Logger.getLogger(ConversationImpl.class);
-	
+	private SessionState state;
+	private Status conversationStatus;
+
 	class SessionObserverInternal implements NativeHandleInterface {
 		
 		private long nativeSessionObserver;
@@ -78,7 +78,12 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 	private long nativeHandle;
 	private boolean isDisposed;
 	
-	private ConversationImpl(ConversationsClientImpl conversationsClient, Set<String> participants, LocalMedia localMedia, ConversationListener conversationListener) {
+	private ConversationImpl(ConversationsClientImpl conversationsClient,
+							 Set<String> participants,
+							 LocalMedia localMedia,
+							 ConversationListener conversationListener,
+							 ConversationStateObserver conversationStateObserver) {
+		this.conversationsClient = conversationsClient;
 		String[] participantIdentityArray = new String[participants.size()];
 		int i = 0;
 		for(String participant : participants) {
@@ -94,6 +99,7 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 		localMediaImpl.setConversation(this);
 		
 		this.conversationListener = conversationListener;
+		this.conversationStateObserver = conversationStateObserver;
 
 		sessionObserverInternal = new SessionObserverInternal(this, this);
 
@@ -118,10 +124,12 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 		setSessionObserver(nativeSession, sessionObserverInternal.getNativeHandle());
 	}
 	
-	public static ConversationImpl createOutgoingConversation(ConversationsClientImpl conversationsClient, Set<String> participants,
-			   LocalMedia localMedia,
-			   ConversationListener listener) {
-		ConversationImpl conv = new ConversationImpl(conversationsClient, participants, localMedia, listener);
+	public static ConversationImpl createOutgoingConversation(ConversationsClientImpl conversationsClient,
+															  Set<String> participants,
+															  LocalMedia localMedia,
+			   												  ConversationListener listener,
+															  ConversationStateObserver conversationStateObserver) {
+		ConversationImpl conv = new ConversationImpl(conversationsClient, participants, localMedia, listener, conversationStateObserver);
 		if (conv.getNativeHandle() == 0) {
 			return null;
 		}
@@ -149,11 +157,10 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 		ConversationImpl conversationImpl = new ConversationImpl(nativeSession, participantsAddr);
 		return conversationImpl;
 	}
-	
+
 	@Override
 	public Status getStatus() {
-		// TODO Auto-generated method stub
-		return null;
+		return conversationStatus;
 	}
 
 	@Override
@@ -230,28 +237,76 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 	 * SessionObserver events
 	 */
 	@Override
-	public void onSessionStateChanged(SessionState status) {
-		logger.i("state changed to: " + status.name());
-		final Conversation.Status conversationStatus = sessionStateToStatus(status);
+	public void onSessionStateChanged(SessionState state) {
+		logger.i("state changed to: " + state.name());
+		this.state = state;
+		this.conversationStatus = sessionStateToStatus(state);
+		conversationStateObserver.onConversationStatusChanged(ConversationImpl.this, conversationStatus);
+	}
+
+	SessionState getSessionState() {
+		return state;
 	}
 
 	@Override
 	public void onStartCompleted(CoreError error) {
-		logger.i("onStartCompleted");
+		if(error == null) {
+			logger.i("onStartCompleted");
+		} else {
+			logger.i("onStartCompleted error: " + error.getDomain() + " " + error.getMessage());
+			// Block this thread until the handler has completed its work.
+			final CountDownLatch waitLatch = new CountDownLatch(1);
+			// Remove this conversation from the client
+			if(conversationsClient != null) {
+				conversationsClient.removeConversation(this);
+			}
+			// Conversations that are rejected do not have a listener
+			if(conversationListener == null) {
+				return;
+			}
+			participantMap.clear();
+			final ConversationException e =
+					new ConversationException(error.getDomain(), error.getCode(),
+							error.getMessage());
+			if(handler != null && conversationListener != null) {
+				handler.post(new Runnable() {
+					@Override
+					public void run() {
+						conversationListener.onConversationEnded(ConversationImpl.this, e);
+						waitLatch.countDown();
+					}
+				});
+			} else {
+				waitLatch.countDown();
+			}
+			try {
+				waitLatch.await();
+			} catch (InterruptedException interruptedException) {
+				interruptedException.printStackTrace();
+			}
+		}
 	}
 
 	@Override
 	public void onStopCompleted(CoreError error) {
+		if(error == null) {
+			logger.i("onStopCompleted");
+		} else {
+			logger.i("onStopCompleted error: " + error.getDomain() + " " + error.getMessage());
+		}
 		// Block this thread until the handler has completed its work.
 		final CountDownLatch waitLatch = new CountDownLatch(1);
-		logger.i("onStopCompleted");
+		// Remove this conversation from the client
+		if(conversationsClient != null) {
+			conversationsClient.removeConversation(this);
+		}
 		// Conversations that are rejected do not have a listener
 		if(conversationListener == null) {
 			return;
 		}
 		participantMap.clear();
 		if (error == null) {
-			if(handler != null) {
+			if(handler != null && conversationListener != null) {
 				handler.post(new Runnable() {
 					@Override
 					public void run() {
@@ -266,7 +321,7 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 			final ConversationException e =
 					new ConversationException(error.getDomain(), error.getCode(),
 							error.getMessage());
-			if(handler != null) {
+			if(handler != null && conversationListener != null) {
 				handler.post(new Runnable() {
 					@Override
 					public void run() {
@@ -287,12 +342,16 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 
 	@Override
 	public void onParticipantConnected(String participantIdentity, String participantSid, CoreError error) {
+		if(error == null) {
+			logger.i("onParticipantConnected " + participantIdentity);
+		} else {
+			logger.i("onParticipantConnected " + participantIdentity + " error: " + error.getDomain() + " " + error.getMessage());
+		}
 		// Block this thread until the handler has completed its work.
 		final CountDownLatch waitLatch = new CountDownLatch(1);
-		logger.i("onParticipantConnected " + participantIdentity);
 		final ParticipantImpl participantImpl = findOrCreateParticipant(participantIdentity, participantSid);
 		if (error == null) {
-			if(handler != null) {
+			if(handler != null && conversationListener != null) {
 				handler.post(new Runnable() {
 					@Override
 					public void run() {
@@ -323,7 +382,7 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 			}
 		} else {
 			final ConversationException e = new ConversationException(error.getDomain(), error.getCode(), error.getMessage());
-			if(handler != null) {
+			if(handler != null && conversationListener != null) {
 				handler.post(new Runnable() {
 					@Override
 					public void run() {
@@ -352,7 +411,7 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 			logger.i("participant removed but was never in list");
 			waitLatch.countDown();
 		} else {
-			if(handler != null) {
+			if(handler != null && conversationListener != null) {
 				handler.post(new Runnable() {
 					@Override
 					public void run() {
@@ -648,11 +707,12 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 	public void start(final CoreSessionMediaConstraints mediaConstraints) {
 		logger.d("starting call");
 
+		setupExternalCapturer();
+
 		// Call start on a new thread to avoid blocking the calling thread
 		new Thread(new Runnable() {
 			@Override
 			public void run() {
-				setupExternalCapturer();
 
 				start(getNativeHandle(),
 						mediaConstraints.isAudioEnabled(),

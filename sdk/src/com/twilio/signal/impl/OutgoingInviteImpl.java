@@ -1,15 +1,20 @@
 package com.twilio.signal.impl;
 
+import android.os.Handler;
+
+import com.twilio.signal.Conversation;
 import com.twilio.signal.ConversationCallback;
 import com.twilio.signal.OutgoingInvite;
 import com.twilio.signal.InviteStatus;
 import com.twilio.signal.impl.logging.Logger;
+import com.twilio.signal.impl.util.CallbackHandler;
 
 import java.util.Set;
 
 public class OutgoingInviteImpl implements OutgoingInvite {
 
 	static final Logger logger = Logger.getLogger(OutgoingInviteImpl.class);
+	private final Handler handler;
 
 	private ConversationsClientImpl conversationsClientImpl;
 	private ConversationImpl conversation;
@@ -23,6 +28,10 @@ public class OutgoingInviteImpl implements OutgoingInvite {
 		this.conversationsClientImpl = conversationsClientImpl;
 		this.conversationCallback = conversationCallback;
 		this.inviteStatus = InviteStatus.PENDING;
+		this.handler = CallbackHandler.create();
+		if(handler == null) {
+			throw new IllegalThreadStateException("This thread must be able to obtain a Looper");
+		}
 	}
 
 	static OutgoingInviteImpl create(ConversationsClientImpl conversationsClientImpl,
@@ -40,8 +49,20 @@ public class OutgoingInviteImpl implements OutgoingInvite {
 		return new OutgoingInviteImpl(conversationsClientImpl, conversationImpl, conversationCallback);
 	}
 
-	void updateInviteStatus(InviteStatus inviteStatus) {
+	Handler getHandler() {
+		return handler;
+	}
+
+	void setStatus(InviteStatus inviteStatus) {
 		this.inviteStatus = inviteStatus;
+	}
+
+	Conversation getConversation() {
+		return conversation;
+	}
+
+	ConversationCallback getConversationCallback() {
+		return conversationCallback;
 	}
 
 	@Override
