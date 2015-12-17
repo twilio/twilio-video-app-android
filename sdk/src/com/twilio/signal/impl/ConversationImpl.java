@@ -149,12 +149,6 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 		ConversationImpl conversationImpl = new ConversationImpl(nativeSession, participantsAddr);
 		return conversationImpl;
 	}
-	
-	@Override
-	public Status getStatus() {
-		// TODO Auto-generated method stub
-		return null;
-	}
 
 	@Override
 	public Set<String> getParticipants() {
@@ -232,7 +226,6 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 	@Override
 	public void onSessionStateChanged(SessionState status) {
 		logger.i("state changed to: " + status.name());
-		final Conversation.Status conversationStatus = sessionStateToStatus(status);
 	}
 
 	@Override
@@ -592,24 +585,6 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 		checkDisposed();
 		localMediaImpl = (LocalMediaImpl)media;
 		localMediaImpl.setConversation(this);
-	}
-
-	private Conversation.Status sessionStateToStatus(SessionState state) {
-		switch(state) {
-			case INITIALIZED:
-			case STARTING:
-				return Status.CONNECTING;
-			case IN_PROGRESS:
-			case STOPPING:
-			case STOP_FAILED:
-				return Status.CONNECTED;
-			case STOPPED:
-				return Status.DISCONNECTED;
-			case START_FAILED:
-				return Status.FAILED;
-			default:
-				return Status.UNKNOWN;
-		}
 	}
 	
 	void setupExternalCapturer()  {

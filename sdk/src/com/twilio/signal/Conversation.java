@@ -7,34 +7,7 @@ import java.util.Set;
  */
 
 public interface Conversation {
-
-	/**
-	 * An enum describing the current status of the Conversation.
-	 */
-	public enum Status
-	{
-		/** Local ConversationsClient's connection to Conversation has an unknown status */
-		UNKNOWN,
-		/** Local ConversationsClient is connecting to the Conversation */
-		CONNECTING,
-		/** Local ConversationsClient is connected to the Conversation.*/
-		CONNECTED,
-		/** Local ConversationsClient is disconnected from the Conversation */
-		DISCONNECTED,
-		/** Local ConversationsClient failed to connect to Conversation */
-		FAILED
-	};
-	
-	/**
-	 * Retrieves the current state of the connection.
-	 * 
-	 * @return The connection state, as a {@link State} enum value
-	 * 
-	 * @see State
-	 */
-	public Conversation.Status getStatus();
-		
-	
+			
 	/**
 	 * Returns the list of Participants in a Conversation.
 	 * 
@@ -44,7 +17,7 @@ public interface Conversation {
 	
 	
 	/**
-	 * Get a conversation's local media
+	 * Get representation of the local video and audio stream
 	 * 
 	 * @return
 	 */
@@ -52,14 +25,16 @@ public interface Conversation {
 	
 	
 	/**
-	 * Get the conversation's listener
+	 * Get listener for this Conversation
 	 * 
-	 * @return
+	 * @return Conversation listener
 	 */
 	public ConversationListener getConversationListener();
 	
 	/**
-	 *
+	 * Set listener for this Conversation
+	 * 
+	 * @param ConversationListener
 	 */
 	public void setConversationListener(ConversationListener listener);
 	
