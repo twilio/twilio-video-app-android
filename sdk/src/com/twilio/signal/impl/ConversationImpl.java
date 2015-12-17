@@ -11,6 +11,7 @@ import android.os.Handler;
 
 import com.twilio.signal.AudioTrack;
 import com.twilio.signal.Conversation;
+import com.twilio.signal.ConversationCallback;
 import com.twilio.signal.ConversationException;
 import com.twilio.signal.ConversationListener;
 import com.twilio.signal.LocalMedia;
@@ -35,6 +36,8 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 
 	private static final String DISPOSE_MESSAGE = "The conversation has been disposed. This operation is no longer valid";
 	private static final String FINALIZE_MESSAGE = "Conversations must be released by calling dispose(). Failure to do so may result in leaked resources.";
+	private Set<String> invitedParticipants = new HashSet<String>();
+	private String invitee;
 	private ConversationsClientImpl conversationsClient;
 	private ConversationListener conversationListener;
 	private ConversationStateObserver conversationStateObserver;
@@ -83,6 +86,7 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 							 LocalMedia localMedia,
 							 ConversationListener conversationListener,
 							 ConversationStateObserver conversationStateObserver) {
+		this.invitedParticipants = participants;
 		this.conversationsClient = conversationsClient;
 		String[] participantIdentityArray = new String[participants.size()];
 		int i = 0;
@@ -109,8 +113,11 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 
 	}
 	
-	private ConversationImpl(long nativeSession, String[] participantsIdentities) {
+	private ConversationImpl(long nativeSession, String[] participantsIdentities, ConversationStateObserver conversationStateObserver) {
+		this.conversationStateObserver = conversationStateObserver;
 		nativeHandle = nativeSession;
+
+		invitee = participantsIdentities[0];
 
 		handler = CallbackHandler.create();
 		if(handler == null) {
@@ -119,6 +126,7 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 
 		for (String participantIdentity : participantsIdentities) {
 			findOrCreateParticipant(participantIdentity, null);
+			invitedParticipants.add(participantIdentity);
 		}
 		sessionObserverInternal = new SessionObserverInternal(this, this);
 		setSessionObserver(nativeSession, sessionObserverInternal.getNativeHandle());
@@ -147,14 +155,15 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 	
 	public static ConversationImpl createIncomingConversation(
 			long nativeSession,
-			String[] participantsAddr) {
+			String[] participantsAddr,
+			ConversationStateObserver conversationStateObserver) {
 		if (nativeSession == 0) {
 			return null;
 		}
 		if (participantsAddr == null || participantsAddr.length == 0) {
 			return null;
 		}
-		ConversationImpl conversationImpl = new ConversationImpl(nativeSession, participantsAddr);
+		ConversationImpl conversationImpl = new ConversationImpl(nativeSession, participantsAddr, conversationStateObserver);
 		return conversationImpl;
 	}
 
@@ -171,6 +180,14 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 			participants.add(participant.getIdentity());
 		}
 		return participants;
+	}
+
+	Set<String> getInvitedParticipants() {
+		return invitedParticipants;
+	}
+
+	String getInvitee() {
+		return invitee;
 	}
 
 	@Override
@@ -241,7 +258,7 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 		logger.i("state changed to: " + state.name());
 		this.state = state;
 		this.conversationStatus = sessionStateToStatus(state);
-		conversationStateObserver.onConversationStatusChanged(ConversationImpl.this, conversationStatus);
+		this.conversationStateObserver.onConversationStatusChanged(ConversationImpl.this, conversationStatus);
 	}
 
 	SessionState getSessionState() {

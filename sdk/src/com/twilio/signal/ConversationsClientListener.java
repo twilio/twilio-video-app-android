@@ -35,8 +35,15 @@ public interface ConversationsClientListener {
 	/**
 	 * This method notifies the listener that the conversationsClient has a pending invitation for a conversation.
 	 *
-	 * @param invite The invitation object.
+	 * @param incomingInvite The invitation object.
 	 */
-	public void onReceiveConversationInvite(ConversationsClient conversationsClient, Invite invite);
-	
+	public void onIncomingInvite(ConversationsClient conversationsClient, IncomingInvite incomingInvite);
+
+	/**
+	 * This method notifies the listener that the incoming invite was cancelled.
+	 *
+	 * @param incomingInvite The invitation object.
+	 */
+	public void onIncomingInviteCancelled(ConversationsClient conversationsClient, IncomingInvite incomingInvite);
+
 }

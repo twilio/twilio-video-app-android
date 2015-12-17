@@ -21,7 +21,7 @@ import com.twilio.signal.ConversationException;
 import com.twilio.signal.ConversationListener;
 import com.twilio.signal.ConversationsClient;
 import com.twilio.signal.ConversationsClientListener;
-import com.twilio.signal.Invite;
+import com.twilio.signal.IncomingInvite;
 import com.twilio.signal.InviteStatus;
 import com.twilio.signal.LocalMedia;
 import com.twilio.signal.OutgoingInvite;
@@ -50,6 +50,10 @@ public class ConversationsClientImpl implements
 
 	void removeConversation(ConversationImpl conversationImpl) {
 		conversations.remove(conversationImpl);
+	}
+
+	void clearIncoming() {
+		incomingInvites.clear();
 	}
 
 	class EndpointObserverInternal implements NativeHandleInterface {
@@ -89,6 +93,7 @@ public class ConversationsClientImpl implements
 	private EndpointState coreState;
 	private Set<ConversationImpl> conversations = new HashSet<ConversationImpl>();
 	private Map<ConversationImpl, OutgoingInviteImpl> outgoingInvites = new HashMap<ConversationImpl, OutgoingInviteImpl>();
+	private Map<ConversationImpl, IncomingInviteImpl> incomingInvites = new HashMap<ConversationImpl, IncomingInviteImpl>();
 
 	public UUID getUuid() {
 		return uuid;
@@ -161,6 +166,9 @@ public class ConversationsClientImpl implements
 	@Override
 	public OutgoingInvite sendConversationInvite(Set<String> participants, LocalMedia localMedia, ConversationCallback conversationCallback) {
 		checkDisposed();
+		if(incomingInvites.size() > 0) {
+			throw new IllegalStateException("Sending an outgoing invite while an incoming invite is being serviced is not supported");
+		}
 		if(participants == null || participants.size() == 0) {
 			throw new IllegalStateException("Invite at least one participant");
 		}
@@ -195,40 +203,82 @@ public class ConversationsClientImpl implements
 
 	private void handleConversationStarted(final ConversationImpl conversationImpl) {
 		final OutgoingInviteImpl outgoingInviteImpl = outgoingInvites.get(conversationImpl);
-		conversationImpl.setConversationListener(null);
-		outgoingInviteImpl.setStatus(InviteStatus.ACCEPTED);
-		outgoingInvites.remove(conversationImpl);
-		if(outgoingInviteImpl.getHandler() != null && outgoingInviteImpl.getConversationCallback() != null) {
-			final CountDownLatch waitLatch = new CountDownLatch(1);
-			outgoingInviteImpl.getHandler().post(new Runnable() {
-				@Override
-				public void run() {
-					outgoingInviteImpl.getConversationCallback().onConversation(conversationImpl, null);
-					waitLatch.countDown();
+		final IncomingInviteImpl incomingInviteImpl = incomingInvites.get(conversationImpl);
+		if(outgoingInviteImpl != null) {
+			conversationImpl.setConversationListener(null);
+			outgoingInviteImpl.setStatus(InviteStatus.ACCEPTED);
+			outgoingInvites.remove(conversationImpl);
+			if (outgoingInviteImpl.getHandler() != null && outgoingInviteImpl.getConversationCallback() != null) {
+				final CountDownLatch waitLatch = new CountDownLatch(1);
+				outgoingInviteImpl.getHandler().post(new Runnable() {
+					@Override
+					public void run() {
+						outgoingInviteImpl.getConversationCallback().onConversation(conversationImpl, null);
+						waitLatch.countDown();
+					}
+				});
+				try {
+					waitLatch.await();
+				} catch (InterruptedException e) {
+					e.printStackTrace();
 				}
-			});
-			try {
-				waitLatch.await();
-			} catch (InterruptedException e) {
-				e.printStackTrace();
+			}
+		}
+
+		if(incomingInviteImpl != null) {
+			conversationImpl.setConversationListener(null);
+			incomingInviteImpl.setStatus(InviteStatus.ACCEPTED);
+			incomingInvites.remove(conversationImpl);
+			if (incomingInviteImpl.getHandler() != null && incomingInviteImpl.getConversationCallback() != null) {
+				final CountDownLatch waitLatch = new CountDownLatch(1);
+				incomingInviteImpl.getHandler().post(new Runnable() {
+					@Override
+					public void run() {
+						incomingInviteImpl.getConversationCallback().onConversation(conversationImpl, null);
+						waitLatch.countDown();
+					}
+				});
+				try {
+					waitLatch.await();
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
 			}
 		}
 	}
 
 	private void handleConversationFailed(final ConversationImpl conversationImpl) {
 		final OutgoingInviteImpl outgoingInviteImpl = outgoingInvites.get(conversationImpl);
-		InviteStatus status = outgoingInviteImpl.getStatus() == InviteStatus.CANCELLED ? InviteStatus.CANCELLED : InviteStatus.FAILED;
-		outgoingInviteImpl.setStatus(status);
-		outgoingInvites.remove(conversationImpl);
-		if(outgoingInviteImpl.getHandler() != null && outgoingInviteImpl.getConversationCallback() != null) {
-			outgoingInviteImpl.getHandler().post(new Runnable() {
-				@Override
-				public void run() {
-					outgoingInviteImpl.getConversationCallback().onConversation(conversationImpl, new ConversationException("a", 100, "Failed to start conversation."));
-				}
-			});
+		final IncomingInviteImpl incomingInviteImpl = incomingInvites.get(conversationImpl);
+		if(outgoingInviteImpl != null) {
+			InviteStatus status = outgoingInviteImpl.getStatus() == InviteStatus.CANCELLED ? InviteStatus.CANCELLED : InviteStatus.FAILED;
+			outgoingInviteImpl.setStatus(status);
+			outgoingInvites.remove(conversationImpl);
+			if (outgoingInviteImpl.getHandler() != null && outgoingInviteImpl.getConversationCallback() != null) {
+				outgoingInviteImpl.getHandler().post(new Runnable() {
+					@Override
+					public void run() {
+						outgoingInviteImpl.getConversationCallback().onConversation(conversationImpl, new ConversationException("core", 10, "Failed to join conversation."));
+					}
+				});
+			}
+			removeConversation(conversationImpl);
 		}
-		removeConversation(conversationImpl);
+
+		if(incomingInviteImpl != null) {
+			InviteStatus status = incomingInviteImpl.getStatus() == InviteStatus.CANCELLED ? InviteStatus.CANCELLED : InviteStatus.FAILED;
+			incomingInviteImpl.setStatus(status);
+			incomingInvites.remove(conversationImpl);
+			if (incomingInviteImpl.getHandler() != null && incomingInviteImpl.getConversationCallback() != null) {
+				incomingInviteImpl.getHandler().post(new Runnable() {
+					@Override
+					public void run() {
+						incomingInviteImpl.getConversationCallback().onConversation(conversationImpl, new ConversationException("core", 11, "Failed to join conversation."));
+					}
+				});
+			}
+			removeConversation(conversationImpl);
+		}
 	}
 
 	@Override
@@ -359,24 +409,29 @@ public class ConversationsClientImpl implements
 	}
 
 	@Override
-	public void onIncomingCallDidReceive(long nativeSession,
-			String[] participants) {
+	public void onIncomingCallDidReceive(long nativeSession, String[] participants) {
 		logger.d("onIncomingCallDidReceive");
 
-		ConversationImpl incomingConversation = ConversationImpl.createIncomingConversation(nativeSession, participants);
+		if(outgoingInvites.size() > 0) {
+			logger.e("Receiving an incoming invite while an outgoing invite is being serviced is not supported");
+			return;
+		}
+
+		ConversationImpl incomingConversation = ConversationImpl.createIncomingConversation(nativeSession, participants, this);
 		if (incomingConversation == null) {
 			logger.e("Failed to create conversation");
 		}
 
-		final Invite invite = InviteImpl.create(incomingConversation,this, participants);
-		if (invite == null) {
-			logger.e("Failed to create Conversation Invite");
-		}
-		if (handler != null) {
+		final IncomingInviteImpl incomingInviteImpl = IncomingInviteImpl.create(this, incomingConversation);
+		incomingInvites.put(incomingConversation, incomingInviteImpl);
+
+		if (incomingInviteImpl == null) {
+			logger.e("Failed to create IncomingInvite");
+		} else if (handler != null) {
 			handler.post(new Runnable() {
 				@Override
 				public void run() {
-					conversationsClientListener.onReceiveConversationInvite(ConversationsClientImpl.this, invite);
+					conversationsClientListener.onIncomingInvite(ConversationsClientImpl.this, incomingInviteImpl);
 				}
 			});
 		}
@@ -387,7 +442,7 @@ public class ConversationsClientImpl implements
 	 */
 	@Override
 	public void accept(ConversationImpl conv) {
-		// Do nothing. This is handled in InviteImpl.
+		// Do nothing. This is handled in IncomingInviteImpl.
 	}
 
 	@Override

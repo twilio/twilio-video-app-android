@@ -17,14 +17,14 @@ public class OutgoingInviteImpl implements OutgoingInvite {
 	private final Handler handler;
 
 	private ConversationsClientImpl conversationsClientImpl;
-	private ConversationImpl conversation;
+	private ConversationImpl conversationImpl;
 	private ConversationCallback conversationCallback;
 	private InviteStatus inviteStatus;
 
 	private OutgoingInviteImpl(ConversationsClientImpl conversationsClientImpl,
-							   ConversationImpl conversation,
+							   ConversationImpl conversationImpl,
 							   ConversationCallback conversationCallback) {
-		this.conversation = conversation;
+		this.conversationImpl = conversationImpl;
 		this.conversationsClientImpl = conversationsClientImpl;
 		this.conversationCallback = conversationCallback;
 		this.inviteStatus = InviteStatus.PENDING;
@@ -58,7 +58,7 @@ public class OutgoingInviteImpl implements OutgoingInvite {
 	}
 
 	Conversation getConversation() {
-		return conversation;
+		return conversationImpl;
 	}
 
 	ConversationCallback getConversationCallback() {
@@ -70,7 +70,7 @@ public class OutgoingInviteImpl implements OutgoingInvite {
 		if(inviteStatus == InviteStatus.PENDING) {
 			logger.i("Cancelling pending invite");
 			inviteStatus = InviteStatus.CANCELLED;
-			conversation.disconnect();
+			conversationImpl.disconnect();
 		} else {
 			logger.w("The invite was not cancelled. Invites can only be cancelled in the pending state");
 		}
@@ -78,7 +78,7 @@ public class OutgoingInviteImpl implements OutgoingInvite {
 
 	@Override
 	public Set<String> getInvitedParticipants() {
-		return conversation.getParticipants(); 
+		return conversationImpl.getInvitedParticipants();
 	}
 
 	@Override
