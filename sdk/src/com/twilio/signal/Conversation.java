@@ -34,15 +34,16 @@ public interface Conversation {
 	/**
 	 * Set listener for this Conversation
 	 * 
-	 * @param ConversationListener
+	 * @param ConversationListener listener
 	 */
 	public void setConversationListener(ConversationListener listener);
 	
 	
 	/**
-	 * Invite a set of participants.
+	 * Invite participant(s) to conversation
 	 *
 	 * @param participantAddresses A set of strings representing the names of the participants.
+	 * @throws IllegalArgumentException is thrown if participantAddresses is null or empty.
 	 */
 	public void invite(Set<String> participantAddresses) throws IllegalArgumentException;
 
@@ -52,7 +53,9 @@ public interface Conversation {
 	public void disconnect();
 
 	/**
-	 *
+	 * Get conversation SID
+	 * 
+	 * @return String conversation SID
 	 */
 	public String getConversationSid();
 	
