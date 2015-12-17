@@ -41,7 +41,7 @@ public interface Conversation {
 	/**
 	 * Get representation of the local video and audio stream
 	 * 
-	 * @return
+	 * @return local media
 	 */
 	public LocalMedia getLocalMedia();
 	
@@ -49,24 +49,24 @@ public interface Conversation {
 	/**
 	 * Get listener for this conversation
 	 * 
-	 * @return Conversation listener
+	 * @return listener to this conversation
 	 */
 	public ConversationListener getConversationListener();
 	
 	/**
 	 * Set listener for this conversation
 	 * 
-	 * @param ConversationListener listener
+	 * @param listener A listener to this conversation
 	 */
 	public void setConversationListener(ConversationListener listener);
 	
 	
 	/**
-	 * Invite participant identities to this conversation
+	 * Invite participant(s) to this conversation
 	 *
-	 * @param participantAddresses A set of strings representing the names of the participants.
+	 * @param participantIdentities A set of strings representing the names of the participants.
 	 */
-	public void invite(Set<String> participantAddresses) throws IllegalArgumentException;
+	public void invite(Set<String> participantIdentities) throws IllegalArgumentException;
 
 	/**
 	 * Disconnect from this conversation
@@ -76,7 +76,7 @@ public interface Conversation {
 	/**
 	 * Get conversation SID
 	 * 
-	 * @return String conversation SID
+	 * @return conversation SID
 	 */
 	public String getConversationSid();
 	
