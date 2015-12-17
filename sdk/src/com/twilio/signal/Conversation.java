@@ -7,11 +7,33 @@ import java.util.Set;
  */
 
 public interface Conversation {
+	
+	/**
+	 * An enum describing the current status of the conversation.
+	 */
+	public enum Status
+	{
+		/** Local ConversationsClient's connection to Conversation has an unknown status */
+		UNKNOWN,
+		/** Local ConversationsClient is connecting to the Conversation */
+		CONNECTING,
+		/** Local ConversationsClient is connected to the Conversation.*/
+		CONNECTED,
+		/** Local ConversationsClient is disconnected from the Conversation */
+		DISCONNECTED,
+		/** Local ConversationsClient failed to connect to Conversation */
+		FAILED
+	};
+
+	/**
+	 * TODO: Remove from public interface
+	 */
+	public Conversation.Status getStatus();
 			
 	/**
-	 * Returns the list of Participants in a Conversation.
+	 * Returns the list of participants in conversation.
 	 * 
-	 * @return participants - list of {@link Participant} in this Conversation.
+	 * @return participants list of {@link Participant} in this conversation.
 	 */
 	public Set<Participant> getParticipants();
 	
@@ -25,14 +47,14 @@ public interface Conversation {
 	
 	
 	/**
-	 * Get listener for this Conversation
+	 * Get listener for this conversation
 	 * 
 	 * @return Conversation listener
 	 */
 	public ConversationListener getConversationListener();
 	
 	/**
-	 * Set listener for this Conversation
+	 * Set listener for this conversation
 	 * 
 	 * @param ConversationListener listener
 	 */
@@ -40,10 +62,9 @@ public interface Conversation {
 	
 	
 	/**
-	 * Invite participant(s) to conversation
+	 * Invite participant identities to this conversation
 	 *
 	 * @param participantAddresses A set of strings representing the names of the participants.
-	 * @throws IllegalArgumentException is thrown if participantAddresses is null or empty.
 	 */
 	public void invite(Set<String> participantAddresses) throws IllegalArgumentException;
 
@@ -60,9 +81,9 @@ public interface Conversation {
 	public String getConversationSid();
 	
 	/**
-	 * Releases resources associated with this Conversation object.
+	 * Releases resources associated with this conversation object.
 	 * 
-	 * Attempts to use this Conversation object after disposal will result in an IllegalStateException.
+	 * Attempts to use this conversation object after disposal will result in an IllegalStateException.
 	 */
 	public void dispose();
 
