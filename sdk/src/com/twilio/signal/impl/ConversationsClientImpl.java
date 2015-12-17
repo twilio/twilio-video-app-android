@@ -1,7 +1,11 @@
 package com.twilio.signal.impl;
 
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.CountDownLatch;
 
 import android.content.Context;
 import android.media.AudioManager;
@@ -12,16 +16,22 @@ import android.os.Parcelable;
 import com.twilio.common.TwilioAccessManager;
 import com.twilio.signal.AudioOutput;
 import com.twilio.signal.Conversation;
+import com.twilio.signal.ConversationCallback;
 import com.twilio.signal.ConversationException;
 import com.twilio.signal.ConversationListener;
 import com.twilio.signal.ConversationsClient;
 import com.twilio.signal.ConversationsClientListener;
-import com.twilio.signal.Invite;
+import com.twilio.signal.IncomingInvite;
+import com.twilio.signal.InviteStatus;
 import com.twilio.signal.LocalMedia;
+import com.twilio.signal.OutgoingInvite;
+import com.twilio.signal.Participant;
+import com.twilio.signal.impl.core.ConversationStateObserver;
 import com.twilio.signal.impl.core.CoreEndpoint;
 import com.twilio.signal.impl.core.CoreError;
 import com.twilio.signal.impl.core.EndpointObserver;
 import com.twilio.signal.impl.core.EndpointState;
+import com.twilio.signal.impl.core.SessionState;
 import com.twilio.signal.impl.logging.Logger;
 import com.twilio.signal.impl.util.CallbackHandler;
 
@@ -30,13 +40,22 @@ public class ConversationsClientImpl implements
 		NativeHandleInterface,
 		Parcelable,
 		EndpointObserver,
-		CoreEndpoint {
+		CoreEndpoint, ConversationListener, ConversationStateObserver {
 
 	static final Logger logger = Logger.getLogger(ConversationsClientImpl.class);
-	
+
+	private static final int MAX_CONVERSATIONS = 1;
 	private static final String DISPOSE_MESSAGE = "The ConversationsClient has been disposed. This operation is no longer valid";
 	private static final String FINALIZE_MESSAGE = "The ConversationsClient must be released by calling dispose(). Failure to do so may result in leaked resources.";
-	
+
+	void removeConversation(ConversationImpl conversationImpl) {
+		conversations.remove(conversationImpl);
+	}
+
+	void clearIncoming() {
+		incomingInvites.clear();
+	}
+
 	class EndpointObserverInternal implements NativeHandleInterface {
 
 		private long nativeEndpointObserver;
@@ -72,7 +91,10 @@ public class ConversationsClientImpl implements
 	private TwilioAccessManager accessManager;
 	private Handler handler;
 	private EndpointState coreState;
-	
+	private Set<ConversationImpl> conversations = new HashSet<ConversationImpl>();
+	private Map<ConversationImpl, OutgoingInviteImpl> outgoingInvites = new HashMap<ConversationImpl, OutgoingInviteImpl>();
+	private Map<ConversationImpl, IncomingInviteImpl> incomingInvites = new HashMap<ConversationImpl, IncomingInviteImpl>();
+
 	public UUID getUuid() {
 		return uuid;
 	}
@@ -142,14 +164,150 @@ public class ConversationsClientImpl implements
 	}
 
 	@Override
-	public Conversation createConversation(Set<String> participants,
-			LocalMedia localMedia, ConversationListener listener) {
+	public OutgoingInvite sendConversationInvite(Set<String> participants, LocalMedia localMedia, ConversationCallback conversationCallback) {
 		checkDisposed();
-		Conversation outgoingConversation = ConversationImpl.createOutgoingConversation(
-				this, participants, localMedia, listener);
-		return outgoingConversation;
+		if(incomingInvites.size() > 0) {
+			throw new IllegalStateException("Sending an outgoing invite while an incoming invite is being serviced is not supported");
+		}
+		if(participants == null || participants.size() == 0) {
+			throw new IllegalStateException("Invite at least one participant");
+		}
+		if(localMedia == null) {
+			throw new IllegalStateException("Local media is required to create a conversation");
+		}
+		if(conversationCallback == null) {
+			throw new IllegalStateException("A ConversationCallback is required to retrieve the conversation");
+		}
+		if(conversations.size() == MAX_CONVERSATIONS) {
+			throw new IllegalStateException("Only " + MAX_CONVERSATIONS + " is allowed at this time.");
+		}
+		ConversationImpl outgoingConversationImpl = ConversationImpl.createOutgoingConversation(
+				this, participants, localMedia, this, this);
+
+		conversations.add(outgoingConversationImpl);
+
+		OutgoingInviteImpl outgoingInviteImpl = OutgoingInviteImpl.create(this, outgoingConversationImpl, conversationCallback);
+		outgoingInvites.put(outgoingConversationImpl, outgoingInviteImpl);
+
+		return outgoingInviteImpl;
 	}
-	
+
+	@Override
+	public void onConversationStatusChanged(Conversation conversation, Conversation.Status status) {
+		ConversationImpl conversationImpl = (ConversationImpl)conversation;
+		if(status.equals(Conversation.Status.CONNECTED) &&
+				conversationImpl.getSessionState().equals(SessionState.IN_PROGRESS)) {
+			handleConversationStarted(conversationImpl);
+		}
+	}
+
+	private void handleConversationStarted(final ConversationImpl conversationImpl) {
+		final OutgoingInviteImpl outgoingInviteImpl = outgoingInvites.get(conversationImpl);
+		final IncomingInviteImpl incomingInviteImpl = incomingInvites.get(conversationImpl);
+		if(outgoingInviteImpl != null) {
+			conversationImpl.setConversationListener(null);
+			outgoingInviteImpl.setStatus(InviteStatus.ACCEPTED);
+			outgoingInvites.remove(conversationImpl);
+			if (outgoingInviteImpl.getHandler() != null && outgoingInviteImpl.getConversationCallback() != null) {
+				final CountDownLatch waitLatch = new CountDownLatch(1);
+				outgoingInviteImpl.getHandler().post(new Runnable() {
+					@Override
+					public void run() {
+						outgoingInviteImpl.getConversationCallback().onConversation(conversationImpl, null);
+						waitLatch.countDown();
+					}
+				});
+				try {
+					waitLatch.await();
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+
+		if(incomingInviteImpl != null) {
+			conversationImpl.setConversationListener(null);
+			incomingInviteImpl.setStatus(InviteStatus.ACCEPTED);
+			incomingInvites.remove(conversationImpl);
+			if (incomingInviteImpl.getHandler() != null && incomingInviteImpl.getConversationCallback() != null) {
+				final CountDownLatch waitLatch = new CountDownLatch(1);
+				incomingInviteImpl.getHandler().post(new Runnable() {
+					@Override
+					public void run() {
+						incomingInviteImpl.getConversationCallback().onConversation(conversationImpl, null);
+						waitLatch.countDown();
+					}
+				});
+				try {
+					waitLatch.await();
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+	}
+
+	private void handleConversationFailed(final ConversationImpl conversationImpl) {
+		final OutgoingInviteImpl outgoingInviteImpl = outgoingInvites.get(conversationImpl);
+		final IncomingInviteImpl incomingInviteImpl = incomingInvites.get(conversationImpl);
+		if(outgoingInviteImpl != null) {
+			InviteStatus status = outgoingInviteImpl.getStatus() == InviteStatus.CANCELLED ? InviteStatus.CANCELLED : InviteStatus.FAILED;
+			outgoingInviteImpl.setStatus(status);
+			outgoingInvites.remove(conversationImpl);
+			if (outgoingInviteImpl.getHandler() != null && outgoingInviteImpl.getConversationCallback() != null) {
+				outgoingInviteImpl.getHandler().post(new Runnable() {
+					@Override
+					public void run() {
+						outgoingInviteImpl.getConversationCallback().onConversation(conversationImpl, new ConversationException("core", 10, "Failed to join conversation."));
+					}
+				});
+			}
+			removeConversation(conversationImpl);
+		}
+
+		if(incomingInviteImpl != null) {
+			InviteStatus status = incomingInviteImpl.getStatus() == InviteStatus.CANCELLED ? InviteStatus.CANCELLED : InviteStatus.FAILED;
+			incomingInviteImpl.setStatus(status);
+			incomingInvites.remove(conversationImpl);
+			if (incomingInviteImpl.getHandler() != null && incomingInviteImpl.getConversationCallback() != null) {
+				incomingInviteImpl.getHandler().post(new Runnable() {
+					@Override
+					public void run() {
+						incomingInviteImpl.getConversationCallback().onConversation(conversationImpl, new ConversationException("core", 11, "Failed to join conversation."));
+					}
+				});
+			}
+			removeConversation(conversationImpl);
+		}
+	}
+
+	@Override
+	public void onParticipantConnected(Conversation conversation, Participant participant) {
+		logger.w("Not expecting a connected participant " + participant + " while inviting.");
+	}
+
+	@Override
+	public void onFailedToConnectParticipant(Conversation conversation, Participant participant, ConversationException e) {
+		ConversationImpl conversationImpl = (ConversationImpl)conversation;
+		handleConversationStarting(conversationImpl);
+	}
+
+	private void handleConversationStarting(ConversationImpl conversationImpl) {
+		// TODO: record error in invite
+	}
+
+	@Override
+	public void onParticipantDisconnected(Conversation conversation, Participant participant) {
+		ConversationImpl conversationImpl = (ConversationImpl)conversation;
+		handleConversationFailed(conversationImpl);
+	}
+
+	@Override
+	public void onConversationEnded(Conversation conversation, ConversationException e) {
+		ConversationImpl conversationImpl = (ConversationImpl)conversation;
+		handleConversationFailed(conversationImpl);
+	}
+
 	@Override
 	public synchronized void dispose() {
 		if (endpointObserver != null) {
@@ -251,24 +409,29 @@ public class ConversationsClientImpl implements
 	}
 
 	@Override
-	public void onIncomingCallDidReceive(long nativeSession,
-			String[] participants) {
+	public void onIncomingCallDidReceive(long nativeSession, String[] participants) {
 		logger.d("onIncomingCallDidReceive");
 
-		ConversationImpl incomingConversation = ConversationImpl.createIncomingConversation(nativeSession, participants);
+		if(outgoingInvites.size() > 0) {
+			logger.e("Receiving an incoming invite while an outgoing invite is being serviced is not supported");
+			return;
+		}
+
+		ConversationImpl incomingConversation = ConversationImpl.createIncomingConversation(nativeSession, participants, this);
 		if (incomingConversation == null) {
 			logger.e("Failed to create conversation");
 		}
 
-		final Invite invite = InviteImpl.create(incomingConversation,this, participants);
-		if (invite == null) {
-			logger.e("Failed to create Conversation Invite");
-		}
-		if (handler != null) {
+		final IncomingInviteImpl incomingInviteImpl = IncomingInviteImpl.create(this, incomingConversation);
+		incomingInvites.put(incomingConversation, incomingInviteImpl);
+
+		if (incomingInviteImpl == null) {
+			logger.e("Failed to create IncomingInvite");
+		} else if (handler != null) {
 			handler.post(new Runnable() {
 				@Override
 				public void run() {
-					conversationsClientListener.onReceiveConversationInvite(ConversationsClientImpl.this, invite);
+					conversationsClientListener.onIncomingInvite(ConversationsClientImpl.this, incomingInviteImpl);
 				}
 			});
 		}
@@ -279,7 +442,7 @@ public class ConversationsClientImpl implements
 	 */
 	@Override
 	public void accept(ConversationImpl conv) {
-		// Do nothing. This is handled in InviteImpl.
+		// Do nothing. This is handled in IncomingInviteImpl.
 	}
 
 	@Override

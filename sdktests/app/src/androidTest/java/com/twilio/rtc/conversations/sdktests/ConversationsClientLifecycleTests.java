@@ -6,18 +6,19 @@ import android.support.test.runner.AndroidJUnit4;
 
 import com.twilio.rtc.conversations.sdktests.utils.TwilioConversationsUtils;
 import com.twilio.signal.Conversation;
+import com.twilio.signal.ConversationCallback;
 import com.twilio.signal.ConversationException;
 import com.twilio.signal.ConversationListener;
 import com.twilio.signal.ConversationsClient;
 import com.twilio.signal.ConversationsClientListener;
-import com.twilio.signal.Invite;
+import com.twilio.signal.IncomingInvite;
 import com.twilio.signal.LocalMedia;
 import com.twilio.signal.LocalMediaFactory;
 import com.twilio.signal.LocalMediaListener;
 import com.twilio.signal.LocalVideoTrack;
+import com.twilio.signal.OutgoingInvite;
 import com.twilio.signal.Participant;
 import com.twilio.signal.TwilioConversations;
-import com.twilio.signal.VideoTrack;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -82,7 +83,12 @@ public class ConversationsClientLifecycleTests {
 
             }
         });
-        Conversation conv = conversationsClient.createConversation(participants, localMedia, conversationListener());
+        OutgoingInvite outgoingInvite = conversationsClient.sendConversationInvite(participants, localMedia, new ConversationCallback() {
+            @Override
+            public void onConversation(Conversation conversation, ConversationException e) {
+
+            }
+        });
     }
 
     @Test
@@ -128,9 +134,16 @@ public class ConversationsClientLifecycleTests {
                     }
 
                     @Override
-                    public void onReceiveConversationInvite(ConversationsClient conversationsClient, Invite invite) {
+                    public void onIncomingInvite(ConversationsClient conversationsClient, IncomingInvite incomingInvite) {
+                        org.junit.Assert.fail();
+
+                    }
+
+                    @Override
+                    public void onIncomingInviteCancelled(ConversationsClient conversationsClient, IncomingInvite incomingInvite) {
                         org.junit.Assert.fail();
                     }
+
                 });
                 conversationsClient.listen();
             }
@@ -156,9 +169,15 @@ public class ConversationsClientLifecycleTests {
             }
 
             @Override
-            public void onReceiveConversationInvite(ConversationsClient conversationsClient, Invite invite) {
+            public void onIncomingInvite(ConversationsClient conversationsClient, IncomingInvite incomingInvite) {
 
             }
+
+            @Override
+            public void onIncomingInviteCancelled(ConversationsClient conversationsClient, IncomingInvite incomingInvite) {
+
+            }
+
         };
     }
 

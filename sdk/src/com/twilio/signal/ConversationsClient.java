@@ -10,50 +10,50 @@ import java.util.Set;
 
 
 public interface ConversationsClient {
-	
+
 	/**
 	 * Set a new {@link ConversationsClientListener} object to respond to client events.
-	 * 
+	 *
 	 * @param listener A listener for client events.
 	 */
 	public void setConversationsClientListener(ConversationsClientListener listener);
-	
+
 	/**
 	 * Get identity of this conversations client on the network.
 	 *
 	 * @return identity of this conversations client
  	 */
 	public String getIdentity();
-	
+
 	/**
 	 * Reflects current listening state of the conversations client
 	 * 
 	 * @return <code>true</code> if conversations client is listening, </code>false</code> otherwise.
  	 */
 	public boolean isListening();
-	
+
 	/**
 	 * Start listening for incoming conversations.
 	 * 
 	 */
 	public void listen();
-	
+
 	/**
 	 * 
 	 * Stop listening for incoming conversations.
 	 * 
 	 */
 	public void unlisten();
-	
+
 	/**
-	 * Create conversation object which represents outgoing call
+	 * Send an invitation to start a conversation with the following participants and local media configuration
 	 * 
 	 * @param participants Set of participant names as Strings
-	 * @param localMedia Local media you would like to use when setting up the new conversation
-	 * @param listener for conversation events
+	 * @param localMedia Local Media you would like to use when setting up the new conversation
+	 * @param conversationCallback The callback that will provide the conversation once it's been created
 	 */
-	public Conversation createConversation(Set<String> participants, LocalMedia localMedia, ConversationListener listener);
-	
+	public OutgoingInvite sendConversationInvite(Set<String> participants, LocalMedia localMedia, ConversationCallback conversationCallback);
+
 	/**
 	 * Releases resources associated with this ConversationsClient object.
 	 * 
