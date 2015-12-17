@@ -7,9 +7,9 @@ import java.util.Set;
  */
 
 public interface Conversation {
-
+	
 	/**
-	 * An enum describing the current status of the Conversation.
+	 * An enum describing the current status of the conversation.
 	 */
 	public enum Status
 	{
@@ -24,52 +24,49 @@ public interface Conversation {
 		/** Local ConversationsClient failed to connect to Conversation */
 		FAILED
 	};
-	
+
 	/**
-	 * Retrieves the current state of the connection.
-	 * 
-	 * @return The connection state, as a {@link State} enum value
-	 * 
-	 * @see State
+	 * TODO: Remove from public interface
 	 */
 	public Conversation.Status getStatus();
-		
-	
+			
 	/**
-	 * Returns the list of Participants in a Conversation.
+	 * Returns the list of participants in a conversation.
 	 * 
-	 * @return participants - list of {@link Participant} in this Conversation.
+	 * @return participants list of {@link Participant} in this conversation.
 	 */
-	public Set<String> getParticipants();
+	public Set<Participant> getParticipants();
 	
 	
 	/**
-	 * Get a conversation's local media
+	 * Get access to this conversations local media tracks and state
 	 * 
-	 * @return
+	 * @return local media
 	 */
 	public LocalMedia getLocalMedia();
 	
 	
 	/**
-	 * Get the conversation's listener
+	 * Get listener for this conversation
 	 * 
-	 * @return
+	 * @return listener to this conversation
 	 */
 	public ConversationListener getConversationListener();
 	
 	/**
-	 *
+	 * Set listener for this conversation
+	 * 
+	 * @param listener A listener to this conversation
 	 */
 	public void setConversationListener(ConversationListener listener);
 	
 	
 	/**
-	 * Invite a set of participants.
+	 * Invite participant(s) to this conversation
 	 *
-	 * @param participantAddresses A set of strings representing the names of the participants.
+	 * @param participantIdentities A set of strings representing the names of the participants.
 	 */
-	public void invite(Set<String> participantAddresses) throws IllegalArgumentException;
+	public void invite(Set<String> participantIdentities) throws IllegalArgumentException;
 
 	/**
 	 * Disconnect from this conversation
@@ -77,14 +74,16 @@ public interface Conversation {
 	public void disconnect();
 
 	/**
-	 *
+	 * Get conversation SID
+	 * 
+	 * @return conversation SID
 	 */
 	public String getConversationSid();
 	
 	/**
-	 * Releases resources associated with this Conversation object.
+	 * Releases resources associated with this conversation object.
 	 * 
-	 * Attempts to use this Conversation object after disposal will result in an IllegalStateException.
+	 * Attempts to use this conversation object after disposal will result in an IllegalStateException.
 	 */
 	public void dispose();
 

@@ -157,12 +157,10 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 	}
 
 	@Override
-	public Set<String> getParticipants() {
+	public Set<Participant> getParticipants() {
 		checkDisposed();
-		Set<String> participants =  new HashSet<String>();
-		for (Participant participant : participantMap.values()) {
-			participants.add(participant.getIdentity());
-		}
+		Set<Participant> participants =
+				new HashSet<Participant>(participantMap.values());
 		return participants;
 	}
 
@@ -232,7 +230,6 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 	@Override
 	public void onSessionStateChanged(SessionState status) {
 		logger.i("state changed to: " + status.name());
-		final Conversation.Status conversationStatus = sessionStateToStatus(status);
 	}
 
 	@Override
@@ -593,22 +590,22 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 		localMediaImpl = (LocalMediaImpl)media;
 		localMediaImpl.setConversation(this);
 	}
-
+	
 	private Conversation.Status sessionStateToStatus(SessionState state) {
 		switch(state) {
-			case INITIALIZED:
-			case STARTING:
-				return Status.CONNECTING;
-			case IN_PROGRESS:
-			case STOPPING:
-			case STOP_FAILED:
-				return Status.CONNECTED;
-			case STOPPED:
-				return Status.DISCONNECTED;
-			case START_FAILED:
-				return Status.FAILED;
-			default:
-				return Status.UNKNOWN;
+		case INITIALIZED:
+		case STARTING:
+			return Status.CONNECTING;
+		case IN_PROGRESS:
+		case STOPPING:
+		case STOP_FAILED:
+			return Status.CONNECTED;
+		case STOPPED:
+			return Status.DISCONNECTED;
+		case START_FAILED:
+			return Status.FAILED;
+		default:
+			return Status.UNKNOWN;
 		}
 	}
 	

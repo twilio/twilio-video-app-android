@@ -9,13 +9,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.twilio.signal.AudioTrack;
 import com.twilio.signal.Conversation;
-import com.twilio.signal.Conversation.Status;
 import com.twilio.signal.ConversationException;
 import com.twilio.signal.ConversationListener;
 import com.twilio.signal.LocalMediaListener;
 import com.twilio.signal.LocalVideoTrack;
-import com.twilio.signal.AudioTrack;
 import com.twilio.signal.MediaTrack;
 import com.twilio.signal.Participant;
 import com.twilio.signal.ParticipantListener;
@@ -190,13 +189,13 @@ public class ConversationActivity extends Activity implements
 	@Override
 	public void onLocalVideoTrackAdded(Conversation conversation,
 			LocalVideoTrack localVideoTrack) {
-		localVideoTrack.addRenderer(new VideoViewRenderer(this, localContainer));	
+		localVideoTrack.addRenderer(new VideoViewRenderer(this, localContainer));
 	}
 
 	@Override
 	public void onLocalVideoTrackRemoved(Conversation conversation,
 			LocalVideoTrack localVideoTrack) {
-		localContainer.removeAllViews();	
+		localContainer.removeAllViews();
 	}
 
 }
