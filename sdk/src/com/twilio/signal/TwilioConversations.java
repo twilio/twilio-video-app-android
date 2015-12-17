@@ -69,6 +69,11 @@ public class TwilioConversations {
 		TwilioConversationsImpl.getInstance().initialize(applicationContext, initListener);
 	}
 
+	/**
+     * Informs if {@link TwilioConversations} is initialized or not.g
+     * 
+     * @return <code>true</code> if Twilio RTC Conversations client is initialized, <code>false</code> otherwise.
+     */
 	public static boolean isInitialized() {
 		return TwilioConversationsImpl.getInstance().isInitialized();
 	}
@@ -85,7 +90,7 @@ public class TwilioConversations {
 	/**
 	 * Sets the logging level for messages logged by the Twilio RTC Conversations SDK.
 	 * 
-	 * @param level - the logging level
+	 * @param level The logging level
 	 */
 	public static void setLogLevel(int level) {
 		TwilioConversationsImpl.setLogLevel(level);
@@ -94,11 +99,11 @@ public class TwilioConversations {
 	/**
 	 * Creates a new ConversationsClient.
 	 * 
-	 * @param token - Access token
-	 * @param listener - a listener that receive events from the ConversationsClient.
+	 * @param token The access token.
+	 * @param listener A listener that receives events from the conversations client.
 	 *
-	 * @return the initialized ConversationsClient, or null if the Twilio RTC Conversations Client
-         *         was not initialized
+	 * @return the initialized {@link ConversationsClient}, or null if the Twilio RTC Conversations Client
+     *         was not initialized
 	 */
 	public static ConversationsClient createConversationsClient(String token, ConversationsClientListener listener) {
 		if (token == null) {
@@ -113,13 +118,13 @@ public class TwilioConversations {
 	}
 	
 	/**
-	 * Creates a new ConversationsClient.
+	 * Creates a new {@link ConversationsClient}.
 	 * 
-	 * @param accessManager - instance of TwilioAccessManager that is handling token lifetime
-	 * @param listener - a listener that receive events from the ConversationsClient.
+	 * @param accessManager The instance of {@link TwilioAccessManager} that is handling token lifetime
+	 * @param listener A listener that receive events from the ConversationsClient.
 	 *
-	 * @return the initialized ConversationsClient, or null if the Twilio RTC Conversations Client
-         *         was not initialized
+	 * @return the initialized {@link ConversationsClient}, or null if the Twilio RTC Conversations Client
+     *         was not initialized
 	 */
 	public static ConversationsClient createConversationsClient(TwilioAccessManager accessManager, ConversationsClientListener listener) {
 		if (accessManager == null) {
@@ -135,12 +140,13 @@ public class TwilioConversations {
 	/**
 	 * Creates a new ConversationsClient.
 	 * 
-	 * @param accessManager - instance of TwilioAccessManager that is handling token lifetime
-	 * @param options - options map <key, value>
-	 * @param listener - a listener that receive events from the ConversationsClient.
+	 * @param accessManager The instance of {@link TwilioAccessManager} that is handling token lifetime
+	 * @param options Map of options that override the default options.
+	 * 				  Currently only one key is supported: ice_servers
+	 * @param listener A listener that receive events from the ConversationsClient.
 	 *
-	 * @return the initialized ConversationsClient, or null if the Twilio RTC Conversations Client
-         *         was not initialized
+	 * @return the initialized {@link ConversationsClient}, or null if the Twilio RTC Conversations Client
+     *         was not initialized
 	 */
 	public static ConversationsClient createConversationsClient(TwilioAccessManager accessManager, Map<String, String> options, ConversationsClientListener listener) {
 		if (accessManager == null) {

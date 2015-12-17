@@ -2,13 +2,8 @@ package com.twilio.signal;
 
 import java.util.Set;
 
-import com.twilio.signal.impl.ConversationsClientImpl;
-
 /**
- * An instance of ConversationsClient is an object that knows how to interface with Twilio SIGNAL Services.
- *
- * An ConversationsClient allows users to create or participate in conversations. An Android application should initialize a ConversationsClient
- * with a Capability Token to talk to Twilio SIGNAL services.
+ * ConversationsClient allows user to create or participate in conversations.
  *
  * @see ConversationsClientListener
  */
@@ -17,40 +12,35 @@ import com.twilio.signal.impl.ConversationsClientImpl;
 public interface ConversationsClient {
 
 	/**
-	 * Key into an Intent's extras data that points to a {@link ConversationsClientImpl} object.
-	 */
-	public static final String EXTRA_DEVICE = "com.twilio.signal.ConversationsClientImpl";
-
-	/**
-	 * Sets a new {@link ConversationsClientListener} object to respond to device events.
-	 * 
-	 * @param ConversationsClientListener A {@link ConversationsClientListener}, or null
+	 * Set a new {@link ConversationsClientListener} object to respond to client events.
+	 *
+	 * @param listener A listener for client events.
 	 */
 	public void setConversationsClientListener(ConversationsClientListener listener);
 
 	/**
-	 * Identity of this conversationsClient on the network for incoming calls.
+	 * Get identity of this conversations client on the network.
 	 *
-	 * @return identity of this conversationsClient
+	 * @return identity of this conversations client
  	 */
 	public String getIdentity();
 
 	/**
 	 * Reflects current listening state of the conversations client
 	 * 
-	 * @return @return <code>true</code> if conversations client is listening, </code>false</code> otherwise.
+	 * @return <code>true</code> if conversations client is listening, </code>false</code> otherwise.
  	 */
 	public boolean isListening();
 
 	/**
-	 * Start listening for incoming Conversation.
+	 * Start listening for incoming conversations.
 	 * 
 	 */
 	public void listen();
 
 	/**
 	 * 
-	 * Stop listening for incoming Conversations.
+	 * Stop listening for incoming conversations.
 	 * 
 	 */
 	public void unlisten();
@@ -73,8 +63,10 @@ public interface ConversationsClient {
 	
 	/**
 	 * Set the audio output speaker for current client device.
-	 * Bluetooth is currently not supported.
-	 * In order to use volume up/down keys, you need to call 'setVolumeControlStream(AudioManager.STREAM_VOICE_CALL);' inside activity.
+	 * 
+	 * Bluetooth headset is not supported.
+	 * In order to use volume up/down keys, you need to call
+	 * 'setVolumeControlStream(AudioManager.STREAM_VOICE_CALL);' inside application activity.
 	 * 
 	 * @param audioOutput that should be used by the system
 	 */
