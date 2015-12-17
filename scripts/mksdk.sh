@@ -10,9 +10,12 @@ JAVADOC_SOURCE_FILES="
     ConversationsClient.java
     ConversationsClientListener.java
     Conversation.java
+    ConversationCallback.java
     ConversationListener.java
     ConversationException.java
-    Invite.java
+    IncomingInvite.java
+    OutgoingInvite.java
+    InviteStatus.java
     Participant.java
     ParticipantListener.java
     LocalMediaFactory.java
