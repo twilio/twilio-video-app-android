@@ -151,12 +151,10 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 	}
 
 	@Override
-	public Set<String> getParticipants() {
+	public Set<Participant> getParticipants() {
 		checkDisposed();
-		Set<String> participants =  new HashSet<String>();
-		for (Participant participant : participantMap.values()) {
-			participants.add(participant.getIdentity());
-		}
+		Set<Participant> participants =
+				new HashSet<Participant>(participantMap.values());
 		return participants;
 	}
 

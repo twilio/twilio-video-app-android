@@ -13,7 +13,7 @@ public interface Conversation {
 	 * 
 	 * @return participants - list of {@link Participant} in this Conversation.
 	 */
-	public Set<String> getParticipants();
+	public Set<Participant> getParticipants();
 	
 	
 	/**
