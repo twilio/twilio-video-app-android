@@ -24,7 +24,7 @@ public interface ConversationsClient {
 	/**
 	 * Sets a new {@link ConversationsClientListener} object to respond to device events.
 	 * 
-	 * @param listener A {@link ConversationsClientListener}, or null
+	 * @param ConversationsClientListener A {@link ConversationsClientListener}, or null
 	 */
 	public void setConversationsClientListener(ConversationsClientListener listener);
 
