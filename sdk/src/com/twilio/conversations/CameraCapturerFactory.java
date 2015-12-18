@@ -6,13 +6,17 @@ import android.content.Context;
 import com.twilio.conversations.CameraCapturer.CameraSource;
 import com.twilio.conversations.impl.CameraCapturerImpl;
 
+/**
+ * A factory for creating an instance of {@link CameraCapturer}
+ *
+ */
 public class CameraCapturerFactory {
-	
+
 	/**
-	 * Creates instance of CameraCapturer
+	 * Creates an instance of CameraCapturer
 	 * 
-	 * @param source
-	 * @param previewContainer
+	 * @param source the camera source
+	 * @param previewContainer the view where the preview will be shown
 	 * @return CameraCapturer
 	 */
 	public static CameraCapturer createCameraCapturer (

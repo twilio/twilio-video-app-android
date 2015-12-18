@@ -2,15 +2,18 @@ package com.twilio.conversations;
 
 import java.util.Set;
 
+/**
+ * An IncomingInvite represents an invitation from a client to a Conversation An IncomingInvite represents an invitation from a client to a {@link Conversation}
+ */
 public interface IncomingInvite {
 
 	/**
-	 * Accept this invitation
+	 * Accepts this invitation
 	 */
 	void accept(LocalMedia localMedia, ConversationCallback conversationCallback);
 
 	/**
-	 * Reject this invitation
+	 * Rejects this invitation
 	 */
 	void reject();
 
@@ -36,7 +39,7 @@ public interface IncomingInvite {
 	Set<String> getParticipants();
 
 	/**
-	 * The status of this invite
+	 * Gets the status of this invite
 	 *
 	 * @return invite status
 	 */

@@ -1,91 +1,69 @@
 package com.twilio.conversations;
 
+import com.twilio.conversations.impl.core.ConversationStatus;
+
 import java.util.Set;
 
 /**
- * A Conversation represents a communication from one ConversationsClient to one or more conversation clients.
+ * A Conversation represents communication between the client and one or more participants.
+ *
  */
-
 public interface Conversation {
-	
-	/**
-	 * An enum describing the current status of the conversation.
-	 */
-	public enum Status
-	{
-		/** Local ConversationsClient's connection to Conversation has an unknown status */
-		UNKNOWN,
-		/** Local ConversationsClient is connecting to the Conversation */
-		CONNECTING,
-		/** Local ConversationsClient is connected to the Conversation.*/
-		CONNECTED,
-		/** Local ConversationsClient is disconnected from the Conversation */
-		DISCONNECTED,
-		/** Local ConversationsClient failed to connect to Conversation */
-		FAILED
-	};
 
 	/**
-	 * TODO: Remove from public interface
-	 */
-	public Conversation.Status getStatus();
-			
-	/**
-	 * Returns the list of participants in a conversation.
+	 * Returns the list of participants in this conversation.
 	 * 
 	 * @return participants list of {@link Participant} in this conversation.
 	 */
 	public Set<Participant> getParticipants();
-	
-	
+
 	/**
-	 * Get access to this conversations local media tracks and state
+	 * Returns the {@link LocalMedia} for this conversation
 	 * 
 	 * @return local media
 	 */
 	public LocalMedia getLocalMedia();
-	
-	
+
 	/**
-	 * Get listener for this conversation
+	 * Gets the {@link ConversationListener} of this conversation
 	 * 
-	 * @return listener to this conversation
+	 * @return listener of this conversation
 	 */
 	public ConversationListener getConversationListener();
-	
+
 	/**
-	 * Set listener for this conversation
+	 * Sets the {@link ConversationListener} of this conversation
 	 * 
-	 * @param listener A listener to this conversation
+	 * @param listener A listener of this conversation
 	 */
 	public void setConversationListener(ConversationListener listener);
 	
 	
 	/**
-	 * Invite participant(s) to this conversation
+	 * Invites one or more participants to this conversation
 	 *
-	 * @param participantIdentities A set of strings representing the names of the participants.
+	 * @param participantIdentities A set of strings representing the identities of these participants.
 	 */
 	public void invite(Set<String> participantIdentities) throws IllegalArgumentException;
 
 	/**
-	 * Disconnect from this conversation
+	 * Disconnects from this conversation
+	 *
 	 */
 	public void disconnect();
 
 	/**
-	 * Get conversation SID
+	 * Gets the conversation SID
 	 * 
 	 * @return conversation SID
 	 */
 	public String getConversationSid();
-	
+
 	/**
-	 * Releases resources associated with this conversation object.
+	 * Releases resources associated with this conversation.
 	 * 
 	 * Attempts to use this conversation object after disposal will result in an IllegalStateException.
 	 */
 	public void dispose();
-
 
 }

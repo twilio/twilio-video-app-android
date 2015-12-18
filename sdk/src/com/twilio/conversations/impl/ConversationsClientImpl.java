@@ -21,7 +21,6 @@ import com.twilio.conversations.ConversationException;
 import com.twilio.conversations.ConversationListener;
 import com.twilio.conversations.ConversationsClient;
 import com.twilio.conversations.ConversationsClientListener;
-import com.twilio.conversations.IncomingInvite;
 import com.twilio.conversations.InviteStatus;
 import com.twilio.conversations.LocalMedia;
 import com.twilio.conversations.OutgoingInvite;
@@ -32,6 +31,7 @@ import com.twilio.conversations.impl.core.CoreError;
 import com.twilio.conversations.impl.core.EndpointObserver;
 import com.twilio.conversations.impl.core.EndpointState;
 import com.twilio.conversations.impl.core.SessionState;
+import com.twilio.conversations.impl.core.ConversationStatus;
 import com.twilio.conversations.impl.logging.Logger;
 import com.twilio.conversations.impl.util.CallbackHandler;
 
@@ -193,9 +193,9 @@ public class ConversationsClientImpl implements
 	}
 
 	@Override
-	public void onConversationStatusChanged(Conversation conversation, Conversation.Status status) {
+	public void onConversationStatusChanged(Conversation conversation, ConversationStatus conversationStatus) {
 		ConversationImpl conversationImpl = (ConversationImpl)conversation;
-		if(status.equals(Conversation.Status.CONNECTED) &&
+		if(conversationStatus.equals(ConversationStatus.CONNECTED) &&
 				conversationImpl.getSessionState().equals(SessionState.IN_PROGRESS)) {
 			handleConversationStarted(conversationImpl);
 		}

@@ -11,7 +11,6 @@ import android.os.Handler;
 
 import com.twilio.conversations.AudioTrack;
 import com.twilio.conversations.Conversation;
-import com.twilio.conversations.ConversationCallback;
 import com.twilio.conversations.ConversationException;
 import com.twilio.conversations.ConversationListener;
 import com.twilio.conversations.LocalMedia;
@@ -28,6 +27,7 @@ import com.twilio.conversations.impl.core.DisconnectReason;
 import com.twilio.conversations.impl.core.MediaStreamInfo;
 import com.twilio.conversations.impl.core.SessionObserver;
 import com.twilio.conversations.impl.core.SessionState;
+import com.twilio.conversations.impl.core.ConversationStatus;
 import com.twilio.conversations.impl.core.TrackInfo;
 import com.twilio.conversations.impl.logging.Logger;
 import com.twilio.conversations.impl.util.CallbackHandler;
@@ -49,7 +49,7 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 
 	static final Logger logger = Logger.getLogger(ConversationImpl.class);
 	private SessionState state;
-	private Status conversationStatus;
+	private ConversationStatus conversationStatus;
 
 	class SessionObserverInternal implements NativeHandleInterface {
 		
@@ -165,11 +165,6 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 		}
 		ConversationImpl conversationImpl = new ConversationImpl(nativeSession, participantsAddr, conversationStateObserver);
 		return conversationImpl;
-	}
-
-	@Override
-	public Status getStatus() {
-		return conversationStatus;
 	}
 
 	@Override
@@ -668,21 +663,21 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 		localMediaImpl.setConversation(this);
 	}
 	
-	private Conversation.Status sessionStateToStatus(SessionState state) {
+	private ConversationStatus sessionStateToStatus(SessionState state) {
 		switch(state) {
 		case INITIALIZED:
 		case STARTING:
-			return Status.CONNECTING;
+			return ConversationStatus.CONNECTING;
 		case IN_PROGRESS:
 		case STOPPING:
 		case STOP_FAILED:
-			return Status.CONNECTED;
+			return ConversationStatus.CONNECTED;
 		case STOPPED:
-			return Status.DISCONNECTED;
+			return ConversationStatus.DISCONNECTED;
 		case START_FAILED:
-			return Status.FAILED;
+			return ConversationStatus.FAILED;
 		default:
-			return Status.UNKNOWN;
+			return ConversationStatus.UNKNOWN;
 		}
 	}
 	

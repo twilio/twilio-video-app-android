@@ -1,12 +1,16 @@
 package com.twilio.conversations;
 
+/**
+ * This callback returns information about the conversation initiated by an {@link IncomingInvite} or {@link OutgoingInvite}
+ *
+ */
 public interface ConversationCallback {
 
 	/**
-	 *  A callback which is fired when conversation creation completes.
+	 *  Called when a conversation is successfully started.
 	 *
-	 *  @param conversation The conversation that was created. Populated on success.
-	 *  @param exception	An error describing why the conversation was not created. Populated on failure.
+	 *  @param conversation The conversation that was created.
+	 *  @param exception	An error describing why the conversation was not created.
 	 */
 	void onConversation(Conversation conversation, ConversationException exception);
 

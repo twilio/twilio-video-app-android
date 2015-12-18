@@ -1,9 +1,14 @@
 package com.twilio.conversations;
 
+/**
+ * ConversationListener interface defines a set of callbacks for events related to a
+ * {@link Conversation}.
+ *
+ */
 public interface ConversationListener {
 
 	/**
-	 * Called when participant is connected to conversation.
+	 * This method notifies the listener when participant has connected to the conversation.
 	 * 
 	 * @param conversation The conversation.
 	 * @param participant The participant.
@@ -11,16 +16,16 @@ public interface ConversationListener {
 	void onParticipantConnected(Conversation conversation, Participant participant);
 
 	/**
-	 * Called when participant is not connected due to an error.
+	 * This method notifies the listener when a participant was unable to connect to the conversation.
 	 * 
 	 * @param conversation The conversation.
 	 * @param participant The participant.
-	 * @param e Exception encountered in adding participant to conversation.
+	 * @param exception Exception encountered in adding participant to conversation.
 	 */
-	void onFailedToConnectParticipant(Conversation conversation, Participant participant, ConversationException e);
+	void onFailedToConnectParticipant(Conversation conversation, Participant participant, ConversationException exception);
 
 	/**
-	 * Called when specified participant is disconnected from conversation either by request or due to an error.
+	 * This method notifies the listener when a participant has disconnected from a conversation by request or due to an error.
 	 * 
 	 * @param conversation The conversation.
 	 * @param participant The participant.
@@ -28,11 +33,11 @@ public interface ConversationListener {
 	void onParticipantDisconnected(Conversation conversation, Participant participant);
 
 	/**
-	 * Called when the conversation ends after the last participant leaves.
+	 * This method notifies the listener when the conversation has ended.
 	 * 
 	 * @param conversation The conversation
-	 * @param e Exception (if any) encountered when conversation ends.
+	 * @param exception Exception (if any) encountered when conversation ends.
 	 */
-	void onConversationEnded(Conversation conversation, ConversationException e);
+	void onConversationEnded(Conversation conversation, ConversationException exception);
 
 }

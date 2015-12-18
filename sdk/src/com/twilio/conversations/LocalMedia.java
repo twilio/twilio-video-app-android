@@ -2,26 +2,25 @@ package com.twilio.conversations;
 
 import java.util.List;
 
-import android.view.ViewGroup;
 
 public interface LocalMedia {
-	
+
 	/**
-	 * Retrieves local video tracks
+	 * Returns the local video tracks
 	 * 
 	 * @return list of local video tracks
 	 */
 	public List<LocalVideoTrack> getLocalVideoTracks();
-	
+
 	/**
-	 * Add local video track to list of tracks.
+	 * Adds a local video track to list of tracks.
 	 * 
 	 * @param track
 	 */
 	public void addLocalVideoTrack(LocalVideoTrack track);
-	
+
 	/**
-	 * Remove local video track from list of tracks.
+	 * Removes the local video track from list of tracks.
 	 * 
 	 * @param track
 	 */
@@ -41,25 +40,26 @@ public interface LocalMedia {
 	 * @return <code>true</code> if local audio is muted, false otherwise
 	 */
 	public boolean isMuted();
-	
+
 	/**
-	 * Add local audio track to media session
-	 * @return true if local audio track is added
+	 * Enables local audio to media session.
+	 *
+	 * @return true if local audio is enabled
 	 */
 	public boolean addMicrophone();
-	
+
 	/**
-	 * Remove local audio track from media session
+	 * Disables local audio from the media session.
 	 * 
-	 * @return true if local audio track is removed
+	 * @return true if local audio is disabled
 	 */
 	public boolean removeMicrophone();
-	
+
 	/**
 	 * Indicates whether or not your local
-	 * audio track is added to media sessio
+	 * audio is enabled in the media session
 	 * 
-	 * @return true if local audio track is added
+	 * @return true if local audio is enabled
 	 */
 	public boolean isMicrophoneAdded();
 

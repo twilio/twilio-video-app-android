@@ -2,10 +2,15 @@ package com.twilio.conversations;
 
 import com.twilio.conversations.impl.LocalMediaImpl;
 
+
+/**
+ * A factory for creating an instance of {@link LocalMedia}
+ *
+ */
 public class LocalMediaFactory {
-	
+
 	/**
-	 * Create new instance of local media
+	 * Creates a new instance of the {@link LocalMedia}
 	 * 
 	 * @return instance of local media
 	 */
