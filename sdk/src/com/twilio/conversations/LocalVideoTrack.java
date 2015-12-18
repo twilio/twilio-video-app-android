@@ -1,9 +1,13 @@
 package com.twilio.conversations;
 
+/**
+ * A local video track that gets camera video from a {@link CameraCapturer}
+ *
+ */
 public interface LocalVideoTrack extends VideoTrack {
 
 	/**
-	 * Retrieves the camera that is being shared.
+	 * Retrieves the {@link CameraCapturer} associated with this video track
 	 *
 	 * @return camera
 	 */
@@ -17,7 +21,7 @@ public interface LocalVideoTrack extends VideoTrack {
 	public void enableCamera(boolean enabled);
 
 	/**
-	 * Gets whether or not your camera video is being shared
+	 * Returns whether or not your camera video is being shared
 	 *
 	 * @return <code>true</code> if camera is being shared, false otherwise
 	 */

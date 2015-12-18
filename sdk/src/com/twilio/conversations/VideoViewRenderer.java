@@ -1,26 +1,32 @@
 package com.twilio.conversations;
 
-import com.twilio.conversations.I420Frame;
-import com.twilio.conversations.VideoRenderer;
-import com.twilio.conversations.VideoViewRenderer;
 import com.twilio.conversations.impl.VideoRendererGui;
 
 import android.content.Context;
 import android.opengl.GLSurfaceView;
 import android.view.ViewGroup;
-import android.util.Log;
 
-
+/**
+ * A VideoViewRenderer receives frames from a {@link VideoTrack} and
+ * renders them to a view.
+ *
+ */
 public class VideoViewRenderer implements VideoRenderer {
 	private VideoRenderer videoRenderer;
 	private GLSurfaceView videoView;
 
+	/**
+	 * Create a video view renderer that will display frames in
+	 * the provided container
+	 * @param context Activity context
+	 * @param container The view where the frames should be rendered
+	 */
 	public VideoViewRenderer(Context context, ViewGroup container) {
 		setupRenderer(context, container);
 	}
 
 	private void setupRenderer(final Context context, final ViewGroup container) {
-		GLSurfaceView videoView = new GLSurfaceView(context);
+		videoView = new GLSurfaceView(context);
 		container.addView(videoView);
 		VideoRendererGui videoRendererGui = new VideoRendererGui(videoView, null);
 		videoRenderer = videoRendererGui.createRenderer(0,0,100,100, VideoRendererGui.ScalingType.SCALE_ASPECT_FIT, true);
@@ -47,16 +53,24 @@ public class VideoViewRenderer implements VideoRenderer {
 		}
 	}
 
-       public void onResume() {
-               if(videoView != null) {
-                       videoView.onResume();
-               }
-       }
+	/**
+	 * Resumes rendering to the view
+	 *
+	 */
+	public void onResume() {
+		if(videoView != null) {
+			videoView.onResume();
+		}
+	}
 
-       public void onPause() {
-               if(videoView != null) {
-                       videoView.onPause();
-               }
-       }
- 
+	/**
+	 * Pauses rendering to the view
+	 *
+	 */
+	public void onPause() {
+		if(videoView != null) {
+			videoView.onPause();
+		}
+	}
+
 }

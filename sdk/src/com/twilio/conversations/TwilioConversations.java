@@ -17,14 +17,14 @@ public class TwilioConversations {
 	 */
 	public interface InitListener {
 		/**
-		 * Callback to report when Twilio RTC Conversations Client
+		 * Callback to report when Twilio Conversations SDK
 		 * has been successfully initialized.
 		 */
 		public void onInitialized();
 
 		/**
-		 * Called if there is an error initializing the Twilio RTC
-		 * Conversations Client.
+		 * Called if there is an error initializing the Twilio
+		 * Conversations SDK.
 		 * 
 		 * @param exception An exception describing the error that occurred
 		 */
@@ -32,7 +32,7 @@ public class TwilioConversations {
 	}
 
 	/**
-	 * Log levels for the Twilio RTC Conversations Client
+	 * Log levels for the Twilio Conversations SDK
 	 */
 	public final class LogLevel {
 		public static final int DISABLED = 0;
@@ -46,7 +46,7 @@ public class TwilioConversations {
 	private TwilioConversations() {}
 
 	/**
-	 * Initialize the Twilio RTC Conversations Client.
+	 * Initialize the Twilio Conversations SDK.
 	 * 
 	 * @param applicationContext
 	 *            The application context of your Android application
@@ -55,7 +55,6 @@ public class TwilioConversations {
 	 *            A {@link TwilioConversations.InitListener} that will notify you
 	 *            when the service is ready
 	 * 
-	 * @throws NullPointerException
 	 */
 	public static void initialize(Context applicationContext,
 			TwilioConversations.InitListener initListener) {
@@ -70,16 +69,16 @@ public class TwilioConversations {
 	}
 
 	/**
-     * Informs if {@link TwilioConversations} is initialized or not.g
+     * Informs whether {@link TwilioConversations} is initialized or not.
      * 
-     * @return <code>true</code> if Twilio RTC Conversations client is initialized, <code>false</code> otherwise.
+     * @return <code>true</code> if Twilio Conversations client is initialized, <code>false</code> otherwise.
      */
 	public static boolean isInitialized() {
 		return TwilioConversationsImpl.getInstance().isInitialized();
 	}
 
 	/**
-	 * Gets the logging level for messages logged by the Twilio RTC Conversations SDK.
+	 * Gets the logging level for messages logged by the Twilio Conversations SDK.
 	 * 
 	 * @return the logging level
 	 */
@@ -88,7 +87,7 @@ public class TwilioConversations {
 	}
 
 	/**
-	 * Sets the logging level for messages logged by the Twilio RTC Conversations SDK.
+	 * Sets the logging level for messages logged by the Twilio Conversations SDK.
 	 * 
 	 * @param level The logging level
 	 */
@@ -102,7 +101,7 @@ public class TwilioConversations {
 	 * @param token The access token.
 	 * @param listener A listener that receives events from the conversations client.
 	 *
-	 * @return the initialized {@link ConversationsClient}, or null if the Twilio RTC Conversations Client
+	 * @return the initialized {@link ConversationsClient}, or null if the Twilio Conversations Client
      *         was not initialized
 	 */
 	public static ConversationsClient createConversationsClient(String token, ConversationsClientListener listener) {
@@ -123,7 +122,7 @@ public class TwilioConversations {
 	 * @param accessManager The instance of {@link TwilioAccessManager} that is handling token lifetime
 	 * @param listener A listener that receive events from the ConversationsClient.
 	 *
-	 * @return the initialized {@link ConversationsClient}, or null if the Twilio RTC Conversations Client
+	 * @return the initialized {@link ConversationsClient}, or null if the Twilio Conversations Client
      *         was not initialized
 	 */
 	public static ConversationsClient createConversationsClient(TwilioAccessManager accessManager, ConversationsClientListener listener) {
@@ -145,7 +144,7 @@ public class TwilioConversations {
 	 * 				  Currently only one key is supported: ice_servers
 	 * @param listener A listener that receive events from the ConversationsClient.
 	 *
-	 * @return the initialized {@link ConversationsClient}, or null if the Twilio RTC Conversations Client
+	 * @return the initialized {@link ConversationsClient}, or null if the Twilio Conversations Client
      *         was not initialized
 	 */
 	public static ConversationsClient createConversationsClient(TwilioAccessManager accessManager, Map<String, String> options, ConversationsClientListener listener) {
@@ -163,7 +162,7 @@ public class TwilioConversations {
 	}
 
 	/**
-	 * Returns the version of the Twilio RTC Conversations SDK.
+	 * Returns the version of the Twilio Conversations SDK.
 	 * 
 	 * @return the version of the SDK
 	 */

@@ -7,8 +7,6 @@ import java.util.Set;
  *
  * @see ConversationsClientListener
  */
-
-
 public interface ConversationsClient {
 
 	/**
@@ -33,20 +31,20 @@ public interface ConversationsClient {
 	public boolean isListening();
 
 	/**
-	 * Start listening for incoming conversations.
+	 * Starts listening for incoming conversations.
 	 * 
 	 */
 	public void listen();
 
 	/**
 	 * 
-	 * Stop listening for incoming conversations.
+	 * Stops listening for incoming conversations.
 	 * 
 	 */
 	public void unlisten();
 
 	/**
-	 * Send an invitation to start a conversation with the following participants and local media configuration
+	 * Sends an invitation to start a conversation with the following participants and local media configuration
 	 * 
 	 * @param participants Set of participant names as Strings
 	 * @param localMedia Local Media you would like to use when setting up the new conversation
@@ -60,18 +58,19 @@ public interface ConversationsClient {
 	 * Attempts to use this ConversationsClient object after disposal will result in an IllegalStateException.
 	 */
 	public void dispose();
-	
+
 	/**
-	 * Set the audio output speaker for current client device.
+	 * Sets the audio output speaker for the device.
 	 * 
 	 * Bluetooth headset is not supported.
-	 * In order to use volume up/down keys, you need to call
-	 * 'setVolumeControlStream(AudioManager.STREAM_VOICE_CALL);' inside application activity.
+	 *
+	 * To use volume up/down keys call
+	 * 'setVolumeControlStream(AudioManager.STREAM_VOICE_CALL);' in your Android Activity.
 	 * 
 	 * @param audioOutput that should be used by the system
 	 */
 	public void setAudioOutput(AudioOutput audioOutput);
-	
+
 	/**
 	 * Audio output speaker for the current client device
 	 * 

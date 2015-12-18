@@ -2,6 +2,10 @@ package com.twilio.conversations;
 
 import java.util.Locale;
 
+/**
+ * A class that provides information about a {@link Conversation} error.
+ *
+ */
 public class ConversationException extends Exception {
 	
 

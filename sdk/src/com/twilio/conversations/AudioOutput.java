@@ -1,7 +1,7 @@
 package com.twilio.conversations;
 
 /**
- * Different audio output lines
+ * Audio output types
  *
  */
 public enum AudioOutput {

@@ -1,9 +1,11 @@
 package com.twilio.conversations;
 
 import java.nio.ByteBuffer;
-import java.util.Arrays;
 
-  /** Java version of cricket::VideoFrame. */
+  /**
+   * A YUV frame in the I420 format
+   *
+   */
   public class I420Frame {
     public final int width;
     public final int height;

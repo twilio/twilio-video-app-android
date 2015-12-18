@@ -1,12 +1,16 @@
 package com.twilio.conversations;
 
-import java.util.List;
 import java.util.Set;
 
+/**
+ * An OutgoingInvite represents an invitation to a list of {@link Participant} to start a conversation.
+ *
+ */
 public interface OutgoingInvite {
 
 	/**
-	 * Cancel this invitation
+	 * Cancels this invitation
+	 *
 	 */
 	public void cancel();
 
