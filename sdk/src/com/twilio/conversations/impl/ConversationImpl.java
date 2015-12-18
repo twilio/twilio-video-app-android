@@ -260,9 +260,8 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 
 	@Override
 	public void onStartCompleted(CoreError error) {
-		if(error == null) {
-			logger.i("onStartCompleted");
-		} else {
+		log("onStartCompleted", error);
+		if(error != null) {
 			logger.i("onStartCompleted error: " + error.getDomain() + " " + error.getMessage());
 			// Block this thread until the handler has completed its work.
 			final CountDownLatch waitLatch = new CountDownLatch(1);
@@ -299,11 +298,8 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 
 	@Override
 	public void onStopCompleted(CoreError error) {
-		if(error == null) {
-			logger.i("onStopCompleted");
-		} else {
-			logger.i("onStopCompleted error: " + error.getDomain() + " " + error.getMessage());
-		}
+		log("onStopCompleted", error);
+
 		// Block this thread until the handler has completed its work.
 		final CountDownLatch waitLatch = new CountDownLatch(1);
 		// Remove this conversation from the client
@@ -352,11 +348,7 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 
 	@Override
 	public void onParticipantConnected(String participantIdentity, String participantSid, CoreError error) {
-		if(error == null) {
-			logger.i("onParticipantConnected " + participantIdentity);
-		} else {
-			logger.i("onParticipantConnected " + participantIdentity + " error: " + error.getDomain() + " " + error.getMessage());
-		}
+		log("onParticipantConnected",  participantIdentity, error);
 		// Block this thread until the handler has completed its work.
 		final CountDownLatch waitLatch = new CountDownLatch(1);
 		final ParticipantImpl participantImpl = findOrCreateParticipant(participantIdentity, participantSid);
@@ -413,9 +405,9 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 
 	@Override
 	public void onParticipantDisconnected(final String participantIdentity, String participantSid, final DisconnectReason reason) {
+		log("onParticipantDisconnected", participantIdentity, reason);
 		// Block this thread until the handler has completed its work.
 		final CountDownLatch waitLatch = new CountDownLatch(1);
-		logger.i("onParticipantDisconnected " + participantIdentity);
 		final ParticipantImpl participant = participantMap.remove(participantIdentity);
 		if(participant == null) {
 			logger.i("participant removed but was never in list");
@@ -442,17 +434,17 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 
 	@Override
 	public void onMediaStreamAdded(MediaStreamInfo stream) {
-		logger.i("onMediaStreamAdded");
+		log("onMediaStreamAdded", stream.getParticipantAddress() + " " + stream.getStreamId());
 	}
 
 	@Override
 	public void onMediaStreamRemoved(MediaStreamInfo stream) {
-		logger.i("onMediaStreamRemoved");
+		log("onMediaStreamRemoved", stream.getParticipantAddress() + " " + stream.getStreamId());
 	}
 
 	@Override
 	public void onVideoTrackAdded(final TrackInfo trackInfo, final org.webrtc.VideoTrack webRtcVideoTrack) {
-		logger.i("onVideoTrackAdded " + trackInfo.getParticipantIdentity() + " " + trackInfo.getTrackOrigin() + " " + webRtcVideoTrack.id());
+		log("onVideoTrackAdded", trackInfo.getParticipantIdentity() + " " + trackInfo.getTrackId());
 
 		if(trackInfo.getTrackOrigin() == TrackOrigin.LOCAL) {
 			List<LocalVideoTrack> tracksList = localMediaImpl.getLocalVideoTracks();
@@ -491,7 +483,7 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 
 	@Override
 	public void onVideoTrackRemoved(final TrackInfo trackInfo) {
-		logger.i("onVideoTrackRemoved " + trackInfo.getParticipantIdentity());
+		log("onVideoTrackRemoved", trackInfo.getParticipantIdentity() + " " + trackInfo.getTrackId());
 		if (trackInfo.getTrackOrigin() == TrackOrigin.LOCAL) {
 			final LocalVideoTrackImpl videoTrack =
 					localMediaImpl.removeLocalVideoTrack(trackInfo);
@@ -525,7 +517,7 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 
 	@Override
 	public void onVideoTrackStateChanged(final TrackInfo trackInfo) {
-		logger.i("onVideoTrackStateChanged " + trackInfo.getParticipantIdentity() + " " + trackInfo.getTrackId());
+		log("onVideoTrackStateChanged", trackInfo.getParticipantIdentity() + " " + trackInfo.getTrackId());
 		if(trackInfo.getTrackOrigin() == TrackOrigin.LOCAL) {
 			return;
 		} else {
@@ -557,7 +549,7 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 
 	@Override
 	public void onAudioTrackAdded(TrackInfo trackInfo, final org.webrtc.AudioTrack webRtcAudioTrack) {
-		logger.i("onAudioTrackAdded " + trackInfo.getParticipantIdentity() + " " + trackInfo.getTrackOrigin() + " " + webRtcAudioTrack.id());
+		log("onAudioTrackAdded", trackInfo.getParticipantIdentity() + " " + trackInfo.getTrackId());
 
 		if(trackInfo.getTrackOrigin() == TrackOrigin.LOCAL) {
 			// TODO: expose audio tracks in local media
@@ -582,7 +574,7 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 
 	@Override
 	public void onAudioTrackRemoved(TrackInfo trackInfo) {
-		logger.i("onAudioTrackRemoved " + trackInfo.getParticipantIdentity());
+		log("onAudioTrackRemoved", trackInfo.getParticipantIdentity() + " " + trackInfo.getTrackId());
 
 		if(trackInfo.getTrackOrigin() == TrackOrigin.LOCAL) {
 			// TODO: remove audio track from local media once audio tracks are exposed
@@ -605,7 +597,7 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 
 	@Override
 	public void onAudioTrackStateChanged(final TrackInfo trackInfo) {
-		logger.i("onAudioTrackStateChanged " + trackInfo.getParticipantIdentity() + " " + trackInfo.getTrackId());
+		log("onAudioTrackStateChanged", trackInfo.getParticipantIdentity() + " " + trackInfo.getTrackId());
 		if(trackInfo.getTrackOrigin() == TrackOrigin.LOCAL) {
 			return;
 		} else {
@@ -633,6 +625,30 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 				}
 			}
 
+		}
+	}
+
+	void log(String method, String message, CoreError coreError) {
+		logger.d("session(" + method + ":" + getCoreError(coreError) + ")" + message);
+	}
+
+	void log(String method, String message, DisconnectReason reason) {
+		logger.d("session(" + method + ":disconnect:" + String.valueOf(reason) + ")" + message);
+	}
+
+	void log(String method, String message) {
+		logger.d("session(" + method + ")" + message);
+	}
+
+	void log(String method, CoreError coreError) {
+		logger.d("session(" + method + ")" + getCoreError(coreError));
+	}
+
+	String getCoreError(CoreError coreError) {
+		if(coreError != null) {
+			return coreError.getDomain() + ":" + coreError.getCode() + ":" + coreError.getMessage();
+		} else {
+			return "";
 		}
 	}
 
