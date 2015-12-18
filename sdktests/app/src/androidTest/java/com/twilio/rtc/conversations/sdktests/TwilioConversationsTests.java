@@ -10,11 +10,11 @@ import android.support.test.runner.AndroidJUnit4;
 import com.twilio.common.TwilioAccessManager;
 import com.twilio.common.TwilioAccessManagerFactory;
 import com.twilio.rtc.conversations.sdktests.utils.TwilioConversationsUtils;
-import com.twilio.signal.ConversationException;
-import com.twilio.signal.ConversationsClient;
-import com.twilio.signal.ConversationsClientListener;
-import com.twilio.signal.IncomingInvite;
-import com.twilio.signal.TwilioConversations;
+import com.twilio.conversations.ConversationException;
+import com.twilio.conversations.ConversationsClient;
+import com.twilio.conversations.ConversationsClientListener;
+import com.twilio.conversations.IncomingInvite;
+import com.twilio.conversations.TwilioConversations;
 
 import java.util.HashMap;
 import java.util.concurrent.CountDownLatch;

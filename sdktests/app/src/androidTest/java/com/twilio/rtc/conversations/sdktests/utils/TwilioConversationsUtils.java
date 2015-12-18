@@ -2,7 +2,7 @@ package com.twilio.rtc.conversations.sdktests.utils;
 
 import android.content.Context;
 
-import com.twilio.signal.TwilioConversations;
+import com.twilio.conversations.TwilioConversations;
 
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
