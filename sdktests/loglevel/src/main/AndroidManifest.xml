@@ -24,7 +24,7 @@
 
 
         <service
-            android:name="com.twilio.signal.TwilioRTCService"
+            android:name="com.twilio.conversations.TwilioRTCService"
             android:exported="false" />
 
     </application>

@@ -3,7 +3,7 @@ package com.twilio.rtc.conversations.noservice;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
 
-import com.twilio.signal.TwilioConversations;
+import com.twilio.conversations.TwilioConversations;
 
 import org.junit.Rule;
 import org.junit.Test;

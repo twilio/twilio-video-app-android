@@ -4,7 +4,7 @@ ifneq ($(ENABLE_PROFILING),)
 include $(TWSDK_JNI_PATH)/../thirdparty/android-ndk-profiler/jni/Android.mk
 endif
 
-include $(TWSDK_JNI_PATH)/signal-core.mk
+include $(TWSDK_JNI_PATH)/conversations-core.mk
 
 HPTEMP = $(shell uname -s)
 HOST_PLATFORM = $(shell echo $(HPTEMP) | tr A-Z a-z)
@@ -29,11 +29,11 @@ endif
 LOCAL_MODULE := twilio-native
 LOCAL_SRC_FILES := \
 	dummy.cpp \
-	com_twilio_signal_impl_TwilioConversationsImpl.cpp \
-	com_twilio_signal_impl_ConversationsClientImpl.cpp \
-	com_twilio_signal_impl_ConversationsClientImpl_EndpointObserverInternal.cpp \
-	com_twilio_signal_impl_ConversationImpl.cpp \
-	com_twilio_signal_impl_ConversationImpl_SessionObserverInternal.cpp
+	com_twilio_conversations_impl_TwilioConversationsImpl.cpp \
+	com_twilio_conversations_impl_ConversationsClientImpl.cpp \
+	com_twilio_conversations_impl_ConversationsClientImpl_EndpointObserverInternal.cpp \
+	com_twilio_conversations_impl_ConversationImpl.cpp \
+	com_twilio_conversations_impl_ConversationImpl_SessionObserverInternal.cpp
 
 LOCAL_C_INCLUDES := $(PREFIX)/webrtc/android/armeabiv7a/include/third_party/icu/source/common
 

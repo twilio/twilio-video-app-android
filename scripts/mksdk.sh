@@ -158,7 +158,7 @@ function copy_javadocs {
     mkdir "${docdest}"
 
     for f in $JAVADOC_SOURCE_FILES; do
-        jd_source_paths="${jd_source_paths} ${twsdkroot}/sdk/src/com/twilio/signal/$f"
+        jd_source_paths="${jd_source_paths} ${twsdkroot}/sdk/src/com/twilio/conversations/$f"
     done
 
 

@@ -7,12 +7,12 @@ set -e
 [ "$1" ] && sdk_version=$1 || sdk_version=$(get_sdk_version)
 [ "$sdk_version" ]
 
-mkdir -p gen/com/twilio/signal
+mkdir -p gen/com/twilio/conversations
 
 echo "New SDK version is ${sdk_version}"
 
-cat >gen/com/twilio/signal/Version.java <<EOF
-package com.twilio.signal;
+cat >gen/com/twilio/conversations/Version.java <<EOF
+package com.twilio.conversations;
 
 public abstract class Version
 {
