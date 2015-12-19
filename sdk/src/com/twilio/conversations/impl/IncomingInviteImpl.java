@@ -7,7 +7,6 @@ import com.twilio.conversations.ConversationCallback;
 import com.twilio.conversations.IncomingInvite;
 import com.twilio.conversations.InviteStatus;
 import com.twilio.conversations.LocalMedia;
-import com.twilio.conversations.impl.core.CoreSessionMediaConstraints;
 import com.twilio.conversations.impl.logging.Logger;
 import com.twilio.conversations.impl.util.CallbackHandler;
 
@@ -67,26 +66,22 @@ public class IncomingInviteImpl implements IncomingInvite {
 
 	@Override
 	public void accept(LocalMedia localMedia, ConversationCallback conversationCallback) {
+		if(localMedia == null) {
+			throw new IllegalStateException("LocalMedia must not be null");
+		}
+		if(conversationCallback == null) {
+			throw new IllegalStateException("ConversationCallback must not be null");
+		}
 		inviteStatus = InviteStatus.ACCEPTING;
 		this.conversationCallback = conversationCallback;
 		conversationImpl.setLocalMedia(localMedia);
-		boolean enableVideo = !localMedia.getLocalVideoTracks().isEmpty();
-		boolean pauseVideo = false;
-		if (enableVideo) {
-			pauseVideo = !localMedia.getLocalVideoTracks().get(0).isCameraEnabled();
-		}
-		CoreSessionMediaConstraints mediaContext =
-				new CoreSessionMediaConstraints(localMedia.isMicrophoneAdded(),
-							localMedia.isMuted(), enableVideo, pauseVideo);
-		conversationImpl.start(mediaContext);
+		conversationsClientImpl.accept(conversationImpl);
 	}
 
 	@Override
 	public void reject() {
 		inviteStatus = InviteStatus.REJECTED;
 		conversationsClientImpl.reject(conversationImpl);
-		conversationsClientImpl.removeConversation(conversationImpl);
-		conversationsClientImpl.clearIncoming();
 	}
 
 	@Override

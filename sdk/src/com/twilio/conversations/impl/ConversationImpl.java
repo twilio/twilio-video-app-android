@@ -13,11 +13,14 @@ import com.twilio.conversations.AudioTrack;
 import com.twilio.conversations.Conversation;
 import com.twilio.conversations.ConversationException;
 import com.twilio.conversations.ConversationListener;
+import com.twilio.conversations.IncomingInvite;
 import com.twilio.conversations.LocalMedia;
 import com.twilio.conversations.LocalVideoTrack;
 import com.twilio.conversations.Media;
+import com.twilio.conversations.OutgoingInvite;
 import com.twilio.conversations.Participant;
 import com.twilio.conversations.TrackOrigin;
+import com.twilio.conversations.TwilioConversations;
 import com.twilio.conversations.VideoTrack;
 import com.twilio.conversations.impl.core.ConversationStateObserver;
 import com.twilio.conversations.impl.core.CoreError;
@@ -44,6 +47,9 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 	private Map<String,ParticipantImpl> participantMap = new HashMap<String,ParticipantImpl>();
 	private LocalMediaImpl localMediaImpl;
 	private Handler handler;
+	private IncomingInviteImpl incomingInviteImpl;
+	private OutgoingInviteImpl outgoingInviteImpl;
+
 
 	private static String TAG = "ConversationImpl";
 
@@ -86,8 +92,9 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 							 LocalMedia localMedia,
 							 ConversationListener conversationListener,
 							 ConversationStateObserver conversationStateObserver) {
-		this.invitedParticipants = participants;
 		this.conversationsClient = conversationsClient;
+		this.invitedParticipants = participants;
+
 		String[] participantIdentityArray = new String[participants.size()];
 		int i = 0;
 		for(String participant : participants) {
@@ -113,7 +120,11 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 
 	}
 	
-	private ConversationImpl(long nativeSession, String[] participantsIdentities, ConversationStateObserver conversationStateObserver) {
+	private ConversationImpl(ConversationsClientImpl conversationsClient,
+							 long nativeSession,
+							 String[] participantsIdentities,
+							 ConversationStateObserver conversationStateObserver) {
+		this.conversationsClient = conversationsClient;
 		this.conversationStateObserver = conversationStateObserver;
 		nativeHandle = nativeSession;
 
@@ -131,39 +142,31 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 		sessionObserverInternal = new SessionObserverInternal(this, this);
 		setSessionObserver(nativeSession, sessionObserverInternal.getNativeHandle());
 	}
-	
+
 	public static ConversationImpl createOutgoingConversation(ConversationsClientImpl conversationsClient,
 															  Set<String> participants,
 															  LocalMedia localMedia,
 			   												  ConversationListener listener,
 															  ConversationStateObserver conversationStateObserver) {
-		ConversationImpl conv = new ConversationImpl(conversationsClient, participants, localMedia, listener, conversationStateObserver);
-		if (conv.getNativeHandle() == 0) {
+		ConversationImpl conversationImpl = new ConversationImpl(conversationsClient, participants, localMedia, listener, conversationStateObserver);
+		if (conversationImpl.getNativeHandle() == 0) {
 			return null;
 		}
-		boolean enableVideo = !localMedia.getLocalVideoTracks().isEmpty();
-		boolean pauseVideo = false;
-		if (enableVideo) {
-			pauseVideo = !localMedia.getLocalVideoTracks().get(0).isCameraEnabled();
-		}
-		CoreSessionMediaConstraints mediaContext =
-				new CoreSessionMediaConstraints(localMedia.isMicrophoneAdded(),
-							localMedia.isMuted(), enableVideo, pauseVideo);
-		conv.start(mediaContext);
-		return conv;
+		conversationImpl.start();
+		return conversationImpl;
 	}
-	
-	public static ConversationImpl createIncomingConversation(
-			long nativeSession,
-			String[] participantsAddr,
-			ConversationStateObserver conversationStateObserver) {
+
+	public static ConversationImpl createIncomingConversation(ConversationsClientImpl conversationsClientImpl,
+															  long nativeSession,
+															  String[] participantIdentities,
+															  ConversationStateObserver conversationStateObserver) {
 		if (nativeSession == 0) {
 			return null;
 		}
-		if (participantsAddr == null || participantsAddr.length == 0) {
+		if (participantIdentities == null || participantIdentities.length == 0) {
 			return null;
 		}
-		ConversationImpl conversationImpl = new ConversationImpl(nativeSession, participantsAddr, conversationStateObserver);
+		ConversationImpl conversationImpl = new ConversationImpl(conversationsClientImpl, nativeSession, participantIdentities, conversationStateObserver);
 		return conversationImpl;
 	}
 
@@ -261,23 +264,20 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 	@Override
 	public void onStartCompleted(CoreError error) {
 		log("onStartCompleted", error);
+
 		if(error != null) {
-			logger.i("onStartCompleted error: " + error.getDomain() + " " + error.getMessage());
-			// Block this thread until the handler has completed its work.
-			final CountDownLatch waitLatch = new CountDownLatch(1);
 			// Remove this conversation from the client
-			if(conversationsClient != null) {
-				conversationsClient.removeConversation(this);
-			}
-			// Conversations that are rejected do not have a listener
-			if(conversationListener == null) {
-				return;
-			}
+			conversationsClient.removeConversation(this);
 			participantMap.clear();
+
 			final ConversationException e =
-					new ConversationException(error.getDomain(), error.getCode(),
-							error.getMessage());
-			if(handler != null && conversationListener != null) {
+					new ConversationException(error.getDomain(), error.getCode(), error.getMessage());
+			if(conversationListener == null) {
+				if(e.getErrorCode() == TwilioConversations.CONVERSATION_TERMINATED) {
+					conversationsClient.onConversationTerminated(this, e);
+				}
+			} else if(handler != null && conversationListener != null) {
+				final CountDownLatch waitLatch = new CountDownLatch(1);
 				handler.post(new Runnable() {
 					@Override
 					public void run() {
@@ -285,13 +285,11 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 						waitLatch.countDown();
 					}
 				});
-			} else {
-				waitLatch.countDown();
-			}
-			try {
-				waitLatch.await();
-			} catch (InterruptedException interruptedException) {
-				interruptedException.printStackTrace();
+				try {
+					waitLatch.await();
+				} catch (InterruptedException interruptedException) {
+					interruptedException.printStackTrace();
+				}
 			}
 		}
 	}
@@ -303,9 +301,7 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 		// Block this thread until the handler has completed its work.
 		final CountDownLatch waitLatch = new CountDownLatch(1);
 		// Remove this conversation from the client
-		if(conversationsClient != null) {
-			conversationsClient.removeConversation(this);
-		}
+		conversationsClient.removeConversation(this);
 		// Conversations that are rejected do not have a listener
 		if(conversationListener == null) {
 			return;
@@ -652,6 +648,23 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 		}
 	}
 
+	IncomingInviteImpl getIncomingInviteImpl() {
+		return incomingInviteImpl;
+	}
+
+	OutgoingInviteImpl getOutgoingInviteImpl() {
+		return outgoingInviteImpl;
+	}
+
+	void setIncomingInviteImpl(IncomingInviteImpl incomingInviteImpl) {
+		this.incomingInviteImpl = incomingInviteImpl;
+	}
+
+	void setOutgoingInviteImpl(OutgoingInviteImpl outgoingInviteImpl) {
+		this.outgoingInviteImpl = outgoingInviteImpl;
+	}
+
+
 	/**
 	 * NativeHandleInterface
 	 */
@@ -730,8 +743,21 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 	 * CoreSession
 	 */
 	@Override
-	public void start(final CoreSessionMediaConstraints mediaConstraints) {
+	public void start() {
 		logger.d("starting call");
+
+		/*
+		 * Determine the media constraints
+		 */
+		LocalMedia localMedia = getLocalMedia();
+		boolean enableVideo = !localMedia.getLocalVideoTracks().isEmpty();
+		boolean pauseVideo = false;
+		if (enableVideo) {
+			pauseVideo = !localMedia.getLocalVideoTracks().get(0).isCameraEnabled();
+		}
+		final CoreSessionMediaConstraints mediaConstraints =
+				new CoreSessionMediaConstraints(localMedia.isMicrophoneAdded(),
+							localMedia.isMuted(), enableVideo, pauseVideo);
 
 		setupExternalCapturer();
 
