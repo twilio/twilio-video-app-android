@@ -25,6 +25,7 @@ import com.twilio.conversations.InviteStatus;
 import com.twilio.conversations.LocalMedia;
 import com.twilio.conversations.OutgoingInvite;
 import com.twilio.conversations.Participant;
+import com.twilio.conversations.TwilioConversations;
 import com.twilio.conversations.impl.core.ConversationStateObserver;
 import com.twilio.conversations.impl.core.CoreEndpoint;
 import com.twilio.conversations.impl.core.CoreError;
@@ -272,7 +273,13 @@ public class ConversationsClientImpl implements
 				outgoingInviteImpl.getHandler().post(new Runnable() {
 					@Override
 					public void run() {
-						outgoingInviteImpl.getConversationCallback().onConversation(conversationImpl, e);
+						if(e != null) {
+							outgoingInviteImpl.getConversationCallback().onConversation(conversationImpl, e);
+						} else {
+							// The call ended by the user
+							outgoingInviteImpl.getConversationCallback().onConversation(conversationImpl, e);
+							conversationImpl.getConversationListener().onConversationEnded(conversationImpl, null);
+						}
 					}
 				});
 			}
