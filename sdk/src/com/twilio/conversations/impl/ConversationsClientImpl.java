@@ -262,9 +262,8 @@ public class ConversationsClientImpl implements
 
 	}
 
-	private void handleConversationFailed(final ConversationImpl conversationImpl) {
+	private void handleConversationFailed(final ConversationImpl conversationImpl, final ConversationException e) {
 		final OutgoingInviteImpl outgoingInviteImpl = pendingOutgoingInvites.get(conversationImpl);
-		final IncomingInviteImpl incomingInviteImpl = pendingIncomingInvites.get(conversationImpl);
 		if(outgoingInviteImpl != null) {
 			InviteStatus status = outgoingInviteImpl.getStatus() == InviteStatus.CANCELLED ? InviteStatus.CANCELLED : InviteStatus.FAILED;
 			outgoingInviteImpl.setStatus(status);
@@ -273,25 +272,12 @@ public class ConversationsClientImpl implements
 				outgoingInviteImpl.getHandler().post(new Runnable() {
 					@Override
 					public void run() {
-						outgoingInviteImpl.getConversationCallback().onConversation(conversationImpl, new ConversationException("core", 10, "Failed to join conversation."));
+						outgoingInviteImpl.getConversationCallback().onConversation(conversationImpl, e);
 					}
 				});
 			}
 		}
 
-		if(incomingInviteImpl != null) {
-			InviteStatus status = incomingInviteImpl.getStatus() == InviteStatus.CANCELLED ? InviteStatus.CANCELLED : InviteStatus.FAILED;
-			incomingInviteImpl.setStatus(status);
-			pendingIncomingInvites.remove(conversationImpl);
-			if (incomingInviteImpl.getHandler() != null && incomingInviteImpl.getConversationCallback() != null) {
-				incomingInviteImpl.getHandler().post(new Runnable() {
-					@Override
-					public void run() {
-						incomingInviteImpl.getConversationCallback().onConversation(conversationImpl, new ConversationException("core", 11, "Failed to join conversation."));
-					}
-				});
-			}
-		}
 		conversations.remove(conversationImpl);
 	}
 
@@ -313,13 +299,12 @@ public class ConversationsClientImpl implements
 	@Override
 	public void onParticipantDisconnected(Conversation conversation, Participant participant) {
 		ConversationImpl conversationImpl = (ConversationImpl)conversation;
-		handleConversationFailed(conversationImpl);
 	}
 
 	@Override
 	public void onConversationEnded(Conversation conversation, ConversationException e) {
 		ConversationImpl conversationImpl = (ConversationImpl)conversation;
-		handleConversationFailed(conversationImpl);
+		handleConversationFailed(conversationImpl, e);
 	}
 
 	@Override
