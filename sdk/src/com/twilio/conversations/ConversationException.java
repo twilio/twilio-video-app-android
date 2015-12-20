@@ -26,4 +26,7 @@ public class ConversationException extends Exception {
 		return String.format(Locale.getDefault(),"domain:%s, code:%d, message:%s", domain, errorCode, errorMessage);
 	}
 
+	public int getErrorCode() {
+		return errorCode;
+	}
 }

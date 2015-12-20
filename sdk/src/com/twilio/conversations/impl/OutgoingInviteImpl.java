@@ -57,7 +57,7 @@ public class OutgoingInviteImpl implements OutgoingInvite {
 		this.inviteStatus = inviteStatus;
 	}
 
-	Conversation getConversation() {
+	ConversationImpl getConversation() {
 		return conversationImpl;
 	}
 
