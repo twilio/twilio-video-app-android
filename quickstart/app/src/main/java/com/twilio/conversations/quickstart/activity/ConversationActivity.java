@@ -53,7 +53,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-public class ConversationActivity extends AppCompatActivity {
+public class  ConversationActivity extends AppCompatActivity {
 
     private static final String TAG = ConversationActivity.class.getName();
 
@@ -672,7 +672,11 @@ public class ConversationActivity extends AppCompatActivity {
             @Override
             public void onIncomingInvite(ConversationsClient conversationsClient, IncomingInvite incomingInvite) {
                 conversationStatusTextView.setText("onIncomingInvite");
-                showInviteDialog(incomingInvite);
+                if (conversation == null) {
+                    showInviteDialog(incomingInvite);
+                } else {
+                    Log.w(TAG, String.format("Conversation in progress. Invite from %s ignored", incomingInvite.getInvitee()));
+                }
             }
 
             @Override
