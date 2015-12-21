@@ -194,6 +194,12 @@ function copy_quickstart {
     git clean -d -x -f .
     popd
     rsync -avz ${quickdest} ${tarroot}/
+
+    # copy libraries to quickstart
+    quickdest="${tarroot}/quickstart"
+    mkdir "${quickdest}/app/libs"
+    cp "${tarroot}/libs/twilio-common-android.jar"  "${quickdest}/app/libs/"
+    cp "${tarroot}/libs/twilio-rtc-conversations-android-${SDK_VERSION}.jar"  "${quickdest}/app/libs/"
 }
 
 

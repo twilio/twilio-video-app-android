@@ -15,12 +15,6 @@ buildscript {
 
 allprojects {
     repositories {
-        maven {
-            url "http://nexus.corp.twilio.com/content/repositories/releases/"
-        }
-        maven {
-            url "http://nexus.corp.twilio.com/content/repositories/artifact-staging/"
-        }
         jcenter()
     }
 }
