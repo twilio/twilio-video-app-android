@@ -149,6 +149,10 @@ function build_library {
     if [ -d "${twsdkroot}/sdk/libs/${abi}" ]; then
     cp -PR "${twsdkroot}/sdk/libs/${abi}" "${tarroot}/libs"
     fi
+
+    #copy twilio-common.jar
+    cp "${twsdkroot}/sdk/target/android/twilio-common-android.jar" "${tarroot}/libs"
+
     done
 
 }

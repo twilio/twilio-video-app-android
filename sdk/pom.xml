@@ -15,7 +15,7 @@
     <dependencies.twiliocommon.version>0.0.10</dependencies.twiliocommon.version>
     <dependencies.twilio-common-android.version>0.1.10</dependencies.twilio-common-android.version>
   </properties>
-  
+
   <build>
     <defaultGoal>initialize</defaultGoal>
     <plugins>
@@ -50,6 +50,14 @@
                             <overWrite>false</overWrite>
                             <destFileName>twilio-common-android.tar</destFileName>
                         </artifactItem>
+                        <artifactItem>
+                            <groupId>com.twilio.sdk</groupId>
+                            <artifactId>twilio-common-android</artifactId>
+                            <version>${dependencies.twilio-common-android.version}</version>
+                            <type>jar</type>
+                            <overWrite>false</overWrite>
+                            <destFileName>twilio-common-android.jar</destFileName>
+                        </artifactItem>
                     </artifactItems>
                     <outputDirectory>${project.build.directory}/${build.platform}</outputDirectory>
                     <overWriteReleases>false</overWriteReleases>
@@ -77,7 +85,7 @@
       </plugin>
     </plugins>
   </build>
-  
+
  <dependencies>
     <dependency>
       <groupId>com.twilio.sdk</groupId>
@@ -86,7 +94,7 @@
       <classifier>${build.platform}</classifier>
       <type>zip</type>
     </dependency>
-  
+
     <dependency>
 	   <groupId>com.twilio.sdk</groupId>
 	   <artifactId>twilio-common-android</artifactId>
@@ -94,7 +102,7 @@
 	   <type>tar</type>
 	</dependency>
   </dependencies>
-  
+
   <repositories>
     <repository>
       <id>twilio.nexus.staging</id>
