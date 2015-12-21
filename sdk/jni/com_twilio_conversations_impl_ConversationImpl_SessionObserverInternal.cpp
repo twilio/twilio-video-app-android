@@ -57,7 +57,7 @@ public:
 		j_sessionstate_enum_(
 				jni, jni->FindClass( "com/twilio/conversations/impl/core/SessionState")),
 		j_trackinfo_ctor_id_(
-				GetMethodID(jni, *j_trackinfo_class_, "<init>", "(Ljava/lang/String;Ljava/lang/String;Lcom/twilio/conversations/TrackOrigin;Z)V")),
+				GetMethodID(jni, *j_trackinfo_class_, "<init>", "(Ljava/lang/String;Ljava/lang/String;Lcom/twilio/conversations/TrackOrigin;I)V")),
 		j_video_track_class_(
 				jni, jni->FindClass( "org/webrtc/VideoTrack")),
 		j_video_track_ctor_(
@@ -225,8 +225,7 @@ private:
     		jstring j_track_id = stringToJString(jni(), trackInfo->getTrackId());
 		const std::string state_class = "com/twilio/conversations/TrackOrigin";
 		jobject j_origin = JavaEnumFromIndex(jni(), *j_trackorigin_class_, state_class, trackInfo->getStreamOrigin());
-		jboolean enabled = trackInfo->isEnabled() ? JNI_TRUE : JNI_FALSE;
-
+		int enabled = trackInfo->isEnabled() ? 1 : 0;
 		return jni()->NewObject(
 				*j_trackinfo_class_, j_trackinfo_ctor_id_,
 				j_participant_address, j_track_id, j_origin, enabled);
@@ -238,8 +237,7 @@ private:
     		jstring j_track_id = stringToJString(jni(), trackInfo->getTrackId());
 		const std::string state_class = "com/twilio/conversations/TrackOrigin";
 		jobject j_origin = JavaEnumFromIndex(jni(), *j_trackorigin_class_, state_class, trackInfo->getStreamOrigin());
-		jboolean enabled = trackInfo->isEnabled() ? JNI_TRUE : JNI_FALSE;
-
+		int enabled = trackInfo->isEnabled() ? 1 : 0;
 		return jni()->NewObject(
 				*j_trackinfo_class_, j_trackinfo_ctor_id_,
 				j_participant_address, j_track_id, j_origin, enabled);

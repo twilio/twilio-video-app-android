@@ -9,11 +9,15 @@ public class TrackInfoImpl implements TrackInfo {
 	private TrackOrigin trackOrigin;
 	private boolean enabled;
 
-	public TrackInfoImpl(String participantIdentity, String trackId, TrackOrigin trackOrigin, boolean enabled) {
+	/*
+	 * Workaround for GSDK-339 - Return an integer from JNI. Release builds were crashing with bad data
+	 * when returning a boolean for enabled.
+	 */
+	public TrackInfoImpl(String participantIdentity, String trackId, TrackOrigin trackOrigin, int enabled) {
 		this.participantIdentity = participantIdentity;
 		this.trackId = trackId;
 		this.trackOrigin = trackOrigin;
-		this.enabled = enabled;
+		this.enabled = enabled != 0;
 	}
 
 	@Override
