@@ -440,7 +440,7 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 
 	@Override
 	public void onVideoTrackAdded(final TrackInfo trackInfo, final org.webrtc.VideoTrack webRtcVideoTrack) {
-		log("onVideoTrackAdded", trackInfo.getParticipantIdentity() + " " + trackInfo.getTrackId());
+		log("onVideoTrackAdded", trackInfo.getParticipantIdentity() + " " + trackInfo.getTrackId() + trackInfo.isEnabled());
 
 		if(trackInfo.getTrackOrigin() == TrackOrigin.LOCAL) {
 			List<LocalVideoTrack> tracksList = localMediaImpl.getLocalVideoTracks();
@@ -479,7 +479,7 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 
 	@Override
 	public void onVideoTrackRemoved(final TrackInfo trackInfo) {
-		log("onVideoTrackRemoved", trackInfo.getParticipantIdentity() + " " + trackInfo.getTrackId());
+		log("onVideoTrackRemoved", trackInfo.getParticipantIdentity() + " " + trackInfo.getTrackId() + " " + trackInfo.isEnabled());
 		if (trackInfo.getTrackOrigin() == TrackOrigin.LOCAL) {
 			final LocalVideoTrackImpl videoTrack =
 					localMediaImpl.removeLocalVideoTrack(trackInfo);
@@ -513,7 +513,7 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 
 	@Override
 	public void onVideoTrackStateChanged(final TrackInfo trackInfo) {
-		log("onVideoTrackStateChanged", trackInfo.getParticipantIdentity() + " " + trackInfo.getTrackId());
+		log("onVideoTrackStateChanged", trackInfo.getParticipantIdentity() + " " + trackInfo.getTrackId() + " " + trackInfo.isEnabled());
 		if(trackInfo.getTrackOrigin() == TrackOrigin.LOCAL) {
 			return;
 		} else {
@@ -545,7 +545,7 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 
 	@Override
 	public void onAudioTrackAdded(TrackInfo trackInfo, final org.webrtc.AudioTrack webRtcAudioTrack) {
-		log("onAudioTrackAdded", trackInfo.getParticipantIdentity() + " " + trackInfo.getTrackId());
+		log("onAudioTrackAdded", trackInfo.getParticipantIdentity() + " " + trackInfo.getTrackId() + " " + trackInfo.isEnabled());
 
 		if(trackInfo.getTrackOrigin() == TrackOrigin.LOCAL) {
 			// TODO: expose audio tracks in local media
@@ -570,7 +570,7 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 
 	@Override
 	public void onAudioTrackRemoved(TrackInfo trackInfo) {
-		log("onAudioTrackRemoved", trackInfo.getParticipantIdentity() + " " + trackInfo.getTrackId());
+		log("onAudioTrackRemoved", trackInfo.getParticipantIdentity() + " " + trackInfo.getTrackId() + " " + trackInfo.isEnabled());
 
 		if(trackInfo.getTrackOrigin() == TrackOrigin.LOCAL) {
 			// TODO: remove audio track from local media once audio tracks are exposed
@@ -593,7 +593,7 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 
 	@Override
 	public void onAudioTrackStateChanged(final TrackInfo trackInfo) {
-		log("onAudioTrackStateChanged", trackInfo.getParticipantIdentity() + " " + trackInfo.getTrackId());
+		log("onAudioTrackStateChanged", trackInfo.getParticipantIdentity() + " " + trackInfo.getTrackId() + " " + trackInfo.isEnabled());
 		if(trackInfo.getTrackOrigin() == TrackOrigin.LOCAL) {
 			return;
 		} else {
