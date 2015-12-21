@@ -38,6 +38,7 @@ public class TwilioConversationsImpl {
 	protected final Map<UUID, WeakReference<ConversationsClientImpl>> conversationsClientMap = new HashMap<UUID, WeakReference<ConversationsClientImpl>>();
 
 	private static final String[] requiredPermissions = {
+		"android.permission.CAMERA",
 		"android.permission.INTERNET",
 		"android.permission.RECORD_AUDIO",
 		"android.permission.MODIFY_AUDIO_SETTINGS",
