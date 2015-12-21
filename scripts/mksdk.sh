@@ -83,6 +83,7 @@ function main {
     combine_dependency
     build_library
     copy_javadocs
+    copy_quickstart
     archive
 
 }
@@ -179,6 +180,16 @@ function copy_javadocs {
     -docencoding UTF-8 \
     -linkoffline http://developer.android.com/reference/  "$mydir" \
     ${DOCLINT_DISABLE} ${jd_source_paths}
+}
+
+function copy_quickstart {
+    # quickstart
+    echo "Copy quickstart..."
+    quickdest="${twsdkroot}"/quickstart
+    pushd ${quickdest}
+    git clean -d -x -f .
+    popd
+    rsync -avz ${quickdest} ${tarroot}/
 }
 
 
