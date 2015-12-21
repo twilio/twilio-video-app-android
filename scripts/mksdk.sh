@@ -149,6 +149,10 @@ function build_library {
     if [ -d "${twsdkroot}/sdk/libs/${abi}" ]; then
     cp -PR "${twsdkroot}/sdk/libs/${abi}" "${tarroot}/libs"
     fi
+
+    #copy twilio-common.jar
+    cp "${twsdkroot}/sdk/target/android/twilio-common-android.jar" "${tarroot}/libs"
+
     done
 
 }
@@ -190,6 +194,12 @@ function copy_quickstart {
     git clean -d -x -f .
     popd
     rsync -avz ${quickdest} ${tarroot}/
+
+    # copy libraries to quickstart
+    quickdest="${tarroot}/quickstart"
+    mkdir "${quickdest}/app/libs"
+    cp "${tarroot}/libs/twilio-common-android.jar"  "${quickdest}/app/libs/"
+    cp "${tarroot}/libs/twilio-rtc-conversations-android-${SDK_VERSION}.jar"  "${quickdest}/app/libs/"
 }
 
 
