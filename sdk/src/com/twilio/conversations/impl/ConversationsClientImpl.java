@@ -150,7 +150,9 @@ public class ConversationsClientImpl implements
 	@Override
 	public void unlisten() {
 		checkDisposed();
-		unlisten(nativeEndpointHandle);
+		if(listening) {
+			unlisten(nativeEndpointHandle);
+		}
 	}
 
 	@Override
