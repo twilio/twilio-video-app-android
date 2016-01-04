@@ -5,7 +5,7 @@ pushd "$BASE_DIR"/.. >/dev/null
 
 if [ -z "$CI_TARBALL_NAME" ]; then
 	echo "CI_TARBALL_NAME not specified. Using \"package.tar.bz2\" as artifact filename."
-    CI_TARBALL_NAME=package.tar.bz2
+    CI_TARBALL_NAME=twilio-rtc-conversations-android.tar.bz2
 fi
 
 # reading the arguments
