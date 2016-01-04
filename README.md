@@ -32,9 +32,9 @@ When the build is complete the library archive is stored in the `output` directo
 
 The Android Conversations SDK project contains the following:
 
-* `sdk`: Java and JNI implementations provided to developers
+* `sdk`: API implementation including Java and JNI code 
 * `sdktests`: Instrumentation tests that run on connected devices
-* `quickstart`: The gradle based example application provided to customers
+* `quickstart`: The gradle based example application provided to developers 
 
 Currently, the Android Conversations SDK is an ant based project. You can leverage *Android Studio* to do development on the Android Conversations SDK with a few tricks.
 
