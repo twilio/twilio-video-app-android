@@ -1,42 +1,44 @@
-Twilio SDK for Android
+Android Conversations SDK
 =============================
 
-# Getting Started
-=
-**NB:** We will refer $PROJECT_ROOT to project folder where you cloned twiliosignal-android-sdk repo. Whenever you see $PROJECT_ROOT, just replace it with project path.
+##Getting Started
 
-1.  Download and install Eclipse, Android SDK and Android NDK.
-1.  Install dependency libraries (follow instruction in [Build dependency](##Build-dependency))
-	* [twilio-sdk-build-tools](https://code.hq.twilio.com/client/twilio-sdk-build-tools)
-1.  Install the following Ruby gems:
-    * 'plist'
-    * 'aws-sdk'
-1.  Clone this repo and `cd $PROJECT_ROOT`
+1.  Install the Android SDK
+    * Define `$ANROID_HOME`, `$ANDROID_SDK_HOME`, and `$ANDROID_SDK_ROOT`
+1.  Install the Android NDK
+    * Define `$NDK_ROOT`, `$ANDROID_NDK_HOME`, and `$ANDROID_NDK_ROOT`
+1.  Add the following to your `$PATH`
+    * `$ANDROID_HOME/tools`
+    * `$ANDROID_HOME/platform-tools`
+    * `$ANDROID_NDK_ROOT`
 
-## Build dependency
-In order to build native code you will need to build dependency libs first. That includes OpenSSL, POCO, PJSIP, WebRTC and Twilio SDK Core. You can check instructions on building dependency libs in their repo [twilio-sdk-build-tools](https://code.hq.twilio.com/client/twilio-sdk-build-tools). Unfortunatelly, as of this writing dependency libraries for Android can only be built in Linux. They are all installed by default in `/usr/local/twilio-sdk`. If you installed them on another location, you need to set PREFIX variable with that location. For example: `$ export PREFIX=/location/of/buildtools`.
+## Dependencies
 
-## Build Twilio SDK from eclipse
-1.  [Build native code](###Bulid-native-code)
-1.  import `sdk` project in eclipse
-1.  Build `TwilioSDK`.
+In order to build the Android Conversations SDK you will need to obtain the dependency libraries. This includes *BoringSSL*, *ReSIP*, *WebRTC*, and the *Core*. To build these dependencies please checkout [twilio-sdk-build-tools](https://code.hq.twilio.com/client/twilio-sdk-build-tools). Each dependency should be installed to `/usr/local/twilio-sdk`
 
-### Build native code
-If you have all dependency installed, you can proceed on building native sdk code All you need todo is cd into $PROJECT_ROOT/sdk and build native code by executing ndk-build:
-	`$ ndk-build`
-or in case of debug version
-	`$ ndk-build NDK_DEBUG=1`
-that's it :-) After this step be sure to refresh sdk project in Eclipse. 
+Alternatively, dependencies can be obtained from the workspace of the latest `twilio-sdk-android-multi` Jenkins build.
 
+## Build
 
-## Build Twilio SDK from command line
-If you have all dependency installed, you can proceed on builiding sdk. All you need to do is cd into $PROJECT_ROOT and run:
-	`$ ./script/mksdk.sh release` for release version or
-    `$ ./script/mksdk.sh debug` for debug version
-Once finished you can find library archive in $PROJECT_ROOT/output.
+If you have all the dependencies installed, you can proceed with building the SDK. Run the following from the root directory:
+
+* `$ ./script/mksdk.sh release` for release version
+* `$ ./script/mksdk.sh debug` for debug version
+
+When the build is complete the library archive is stored in the `output` directory.
 
 
-Developing
--
+## Developing
 
+The Android Conversations SDK project contains the following:
+
+* `sdk`: API implementation including Java and JNI code 
+* `sdktests`: Instrumentation tests that run on connected devices
+* `quickstart`: The gradle based example application provided to developers 
+
+Currently, the Android Conversations SDK is an ant based project. You can leverage *Android Studio* to do development on the Android Conversations SDK with a few tricks.
+
+* Make an empty Android Studio project
+* Create a symbolic link to the Android Conversations SDK JNI sources `ln -s app/src/main/jni $SDK_ROOT/sdk/jni`
+* Create a symbolic link to the Android Conversations SDK Java sources `ln -s app/src/main/java/com $SDK_ROOT/sdk/src/com`
 
