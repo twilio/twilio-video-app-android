@@ -36,3 +36,9 @@ The Android Conversations SDK project contains the following:
 * `sdktests`: Instrumentation tests that run on connected devices
 * `quickstart`: The gradle based example application provided to customers
 
+Currently, the Android Conversations SDK is an ant based project. You can leverage *Android Studio* to do development on the Android Conversations SDK with a few tricks.
+
+* Make an empty Android Studio project
+* Create a symbolic link to the Android Conversations SDK JNI sources `ln -s app/src/main/jni $SDK_ROOT/sdk/jni`
+* Create a symbolic link to the Android Conversations SDK Java sources `ln -s app/src/main/java/com $SDK_ROOT/sdk/src/com`
+
