@@ -4,18 +4,17 @@ BASE_DIR=`dirname $0`
 pushd "$BASE_DIR"/.. >/dev/null
 
 if [ -z "$CI_TARBALL_NAME" ]; then
-	echo "CI_TARBALL_NAME not specified. Using \"package.tar.bz2\" as artifact filename."
+	echo "CI_TARBALL_NAME not specified. Using \"twilio-rtc-conversations-android.tar.bz2\" as artifact filename."
     CI_TARBALL_NAME=twilio-rtc-conversations-android.tar.bz2
 fi
 
 # reading the arguments
-if [ "$#" -ne 2 ]; then
-	echo "Error: Expecting 2 arguments: release-version and public-version"
+if [ "$#" -ne 1 ]; then
+	echo "Error: Expecting 1 argument: release-version"
 	exit 1
 fi
 # RELEASE_VERSION and PUBLIC_VERSION should be like "0.8.3.b54-deadbee" & "v0.8", respectively
 RELEASE_VERSION="$1"
-PUBLIC_VERSION="$2"
 
 
 # paths
@@ -59,8 +58,8 @@ cp "${PACKAGE_DIR}/${CI_TARBALL_NAME}" "${RELEASE_VERSION_PATH}/${RELEASE_VERSIO
 
 
 # creating symlinks to comply with the schema
-ln -s "${RELEASE_VERSION_PATH}/${RELEASE_VERSION}" "${PRODUCT_PATH}/${PUBLIC_VERSION}"
-ln -s "${PRODUCT_PATH}/${PUBLIC_VERSION}" "${PRODUCT_PATH}/latest"
+#ln -s "${RELEASE_VERSION_PATH}/${RELEASE_VERSION}" "${PRODUCT_PATH}/${PUBLIC_VERSION}"
+#ln -s "${PRODUCT_PATH}/${PUBLIC_VERSION}" "${PRODUCT_PATH}/latest"
 
 
 popd >/dev/null
