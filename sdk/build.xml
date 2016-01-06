@@ -17,7 +17,7 @@
     <!-- Combine the twilio sdk and the webrtc artifacts into a single jar -->
     <target name="-jar-debug-postcompile" if="${build.is.packaging.debug}">
         <!-- This is executed for any "debug" build ("ant debug") -->
-        <jar id="files" jarfile="bin/twilio-rtc-conversations-android.jar">
+        <jar id="files" jarfile="bin/twilio-conversations-android.jar">
             <zipfileset src="bin/classes.jar" includes="**/*.java **/*.class"/>
             <zipfileset src="libs/libjingle_peerconnection_java.jar" includes="**/*.java **/*.class"/>
             <zipfileset dir="libs" includes="**/libtwilio-native.so" prefix="lib/"/>
@@ -28,7 +28,7 @@
     <target name="-jar-release-postcompile" unless="${build.is.packaging.debug}">
         <!-- This is executed for any non-"debug" build (e.g., "ant release",
              regardless of the @debuggable attribute in AndroidManifest.xml) -->
-        <jar id="files" jarfile="bin/twilio-rtc-conversations-android.jar">
+        <jar id="files" jarfile="bin/twilio-conversations-android.jar">
             <zipfileset src="bin/classes.jar" includes="**/*.java **/*.class"/>
             <zipfileset src="libs/libjingle_peerconnection_java.jar" includes="**/*.java **/*.class"/>
             <zipfileset dir="libs" includes="**/libtwilio-native.so" prefix="lib/"/>
