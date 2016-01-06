@@ -8,7 +8,9 @@ import org.webrtc.VideoCapturerAndroid.CameraErrorHandler;
 
 import android.content.Context;
 import android.hardware.Camera;
+import android.util.Log;
 import android.view.Display;
+import android.view.OrientationEventListener;
 import android.view.Surface;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
@@ -232,6 +234,7 @@ public class CameraCapturerImpl implements CameraCapturer {
 		private SurfaceHolder holder;
 		private Camera camera;
 		private CapturerErrorListener listener;
+		private OrientationEventListener orientationEventListener;
 
 		public CameraPreview(Context context, Camera camera, CapturerErrorListener listener) {
 			super(context);
@@ -241,6 +244,12 @@ public class CameraCapturerImpl implements CameraCapturer {
 
 			holder = getHolder();
 			holder.addCallback(this);
+			orientationEventListener = new OrientationEventListener(context) {
+				@Override
+				public void onOrientationChanged(int orientation) {
+					updatePreviewOrientation();
+				}
+			};
 		}
 
 		@Override
@@ -249,6 +258,7 @@ public class CameraCapturerImpl implements CameraCapturer {
 				if (camera != null) {
 					camera.setPreviewDisplay(holder);
 					camera.startPreview();
+					orientationEventListener.enable();
 				}
 
 			} catch (IOException e) {
@@ -261,8 +271,8 @@ public class CameraCapturerImpl implements CameraCapturer {
 		@Override
 		public void surfaceDestroyed(SurfaceHolder holder) {
 			if(camera != null) {
+				orientationEventListener.disable();
 				camera.stopPreview();
-
 				try {
 					camera.setPreviewDisplay(null);
 				} catch(IOException e) {
@@ -284,7 +294,7 @@ public class CameraCapturerImpl implements CameraCapturer {
 					camera.stopPreview();
 					camera.setPreviewDisplay(this.holder);
 					camera.startPreview();
-					updatePreviewOrientation(w, h);
+					updatePreviewOrientation();
 				} catch (Exception e) {
 					if(listener != null) {
 						listener.onError(new CapturerException(ExceptionDomain.CAMERA, "Unable to restart preview: " + e.getMessage()));
@@ -293,20 +303,19 @@ public class CameraCapturerImpl implements CameraCapturer {
 			}
 		}
 
-		private void updatePreviewOrientation(int width, int height) {
-			Camera.Parameters parameters = camera.getParameters();
-			Display display = ((WindowManager)context.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
-
+		private void updatePreviewOrientation() {
 			Camera.CameraInfo info = new Camera.CameraInfo();
 			Camera.getCameraInfo(cameraId, info);
+			int degrees = getDeviceOrientation();
+			int resultOrientation;
 
-			int rotation = getDeviceOrientation();
-			if (info.facing == Camera.CameraInfo.CAMERA_FACING_BACK) {
-				rotation = (info.orientation + rotation - 180) % 360;
+			if (info.facing == Camera.CameraInfo.CAMERA_FACING_FRONT) {
+				resultOrientation = (info.orientation + degrees) % 360;
+				resultOrientation = (360 - resultOrientation) % 360;
 			} else {
-				rotation = (info.orientation + rotation) % 360;
+				resultOrientation = (info.orientation - degrees + 360) % 360;
 			}
-			camera.setDisplayOrientation(rotation);
+			camera.setDisplayOrientation(resultOrientation);
 		}
 
 		private int getDeviceOrientation() {
@@ -318,14 +327,14 @@ public class CameraCapturerImpl implements CameraCapturer {
 					orientation = 90;
 					break;
 				case Surface.ROTATION_180:
-					orientation = 0;
+					orientation = 180;
 					break;
 				case Surface.ROTATION_270:
 					orientation = 270;
 					break;
 				case Surface.ROTATION_0:
 				default:
-					orientation = 180;
+					orientation = 0;
 					break;
 			}
 			return orientation;
