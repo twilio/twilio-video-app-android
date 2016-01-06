@@ -284,7 +284,7 @@ public class CameraCapturerImpl implements CameraCapturer {
 					camera.stopPreview();
 					camera.setPreviewDisplay(this.holder);
 					camera.startPreview();
-					updatePreviewOrientation(w, h);
+					updatePreviewOrientation();
 				} catch (Exception e) {
 					if(listener != null) {
 						listener.onError(new CapturerException(ExceptionDomain.CAMERA, "Unable to restart preview: " + e.getMessage()));
@@ -293,19 +293,16 @@ public class CameraCapturerImpl implements CameraCapturer {
 			}
 		}
 
-		private void updatePreviewOrientation(int width, int height) {
+		private void updatePreviewOrientation() {
 			Camera.Parameters parameters = camera.getParameters();
-			Display display = ((WindowManager)context.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
-
 			Camera.CameraInfo info = new Camera.CameraInfo();
 			Camera.getCameraInfo(cameraId, info);
-
 			int rotation = getDeviceOrientation();
-			if (info.facing == Camera.CameraInfo.CAMERA_FACING_BACK) {
-				rotation = (info.orientation + rotation - 180) % 360;
-			} else {
-				rotation = (info.orientation + rotation) % 360;
-			}
+
+                        if (info.facing == android.hardware.Camera.CameraInfo.CAMERA_FACING_BACK) {
+                          rotation = 360 - rotation;
+                        }
+                        rotation = (info.orientation + rotation) % 360;
 			camera.setDisplayOrientation(rotation);
 		}
 
@@ -318,14 +315,14 @@ public class CameraCapturerImpl implements CameraCapturer {
 					orientation = 90;
 					break;
 				case Surface.ROTATION_180:
-					orientation = 0;
+					orientation = 180;
 					break;
 				case Surface.ROTATION_270:
 					orientation = 270;
 					break;
 				case Surface.ROTATION_0:
 				default:
-					orientation = 180;
+					orientation = 0;
 					break;
 			}
 			return orientation;
