@@ -8,15 +8,6 @@ if [ ! -d $SDK_RELEASE_TOOLS_PATH ]; then
     exit 1
 fi
 
-# reading the arguments
-if [ "$#" -ne 2 ]; then
-    echo "Error: Expecting 2 argument: RELEASE_VERSION and RC_BUILD_NUMBER"
-    exit 1
-fi
-
-RELEASE_VERSION="$1"
-RC_BUILD_NUMBER="$2"
-
 if [ ! -z "$RELEASE_VERSION" ]; then
     export CDN_JSON_REALM="stage"
 else
@@ -39,6 +30,10 @@ echo "Prepping directory structure for release schema..."
 export CI_SOURCE_CODE_REVISION=$(git rev-parse --short HEAD);
 export CI_TARBALL_NAME=twilio-conversations-android.tar.bz2
 if [ ! -z "$RELEASE_VERSION" ]; then
+    if [ -z "$RC_BUILD_NUMBER" ]; then
+        echo "Error: missing RC_BUILD_NUMBER"
+        exit 1
+    fi
     export SDK_RELEASE_VERSION=${RELEASE_VERSION}-rc${RC_BUILD_NUMBER}
 else
     export SDK_RELEASE_VERSION=${CI_BUILD_VERSION}-SNAPSHOT+${CI_SOURCE_CODE_REVISION}
