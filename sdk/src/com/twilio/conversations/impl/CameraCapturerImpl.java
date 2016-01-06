@@ -299,10 +299,10 @@ public class CameraCapturerImpl implements CameraCapturer {
 			Camera.getCameraInfo(cameraId, info);
 			int rotation = getDeviceOrientation();
 
-                        if (info.facing == Camera.CameraInfo.CAMERA_FACING_BACK) {
-                          rotation = 360 - rotation;
-                        }
-                        rotation = (info.orientation + rotation) % 360;
+			if (info.facing == Camera.CameraInfo.CAMERA_FACING_BACK) {
+				rotation = 360 - rotation;
+			}
+			rotation = (info.orientation + rotation) % 360;
 			camera.setDisplayOrientation(rotation);
 		}
 
