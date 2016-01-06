@@ -79,7 +79,7 @@ JNIEXPORT void JNICALL Java_com_twilio_conversations_impl_ConversationImpl_start
 			 (enableVideo ? "enableVideo = true":"enableVideo=false"),
 			 (pauseVideo ? "pauseVideo=true":"pauseVideo=false"));
 
-	session->get()->start(new TSCSessionMediaConstrainsObject(enableAudio, muteAudio, enableVideo, pauseVideo));
+	session->get()->start(new TSCSessionMediaConstraintsObject(enableAudio, muteAudio, enableVideo, pauseVideo));
 }
 
 
