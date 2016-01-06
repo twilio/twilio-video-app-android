@@ -199,7 +199,7 @@ function copy_quickstart {
     quickdest="${tarroot}/quickstart"
     mkdir "${quickdest}/app/libs"
     cp "${tarroot}/libs/twilio-common-android.jar"  "${quickdest}/app/libs/"
-    cp "${tarroot}/libs/twilio-rtc-conversations-android-${SDK_VERSION}.jar"  "${quickdest}/app/libs/"
+    cp "${tarroot}/libs/twilio-conversations-android-${SDK_VERSION}.jar"  "${quickdest}/app/libs/"
 }
 
 

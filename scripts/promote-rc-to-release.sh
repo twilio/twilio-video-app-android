@@ -8,11 +8,17 @@ export SDK_RELEASE_TOOLS_PATH="/usr/local/sbin/sdk-release-tools-ng";
 export SDK_PACKAGE_PATH="$WORKSPACE_ROOT_DIR/package"
 
 if [ ! -z "$RELEASE_VERSION" ]; then
-    #export SDK_RELEASE_VERSION=${RELEASE_VERSION}.b${RC_BUILD_NUMBER}-${RC_COMMIT_HASH}
     export SDK_RELEASE_VERSION=${RELEASE_VERSION}
 else
     exit 0;
 fi
+
+if [ ! -z "$RC_BUILD_NUMBER" ]; then
+    export SDK_RC_BUILD_NUMBER=${RC_BUILD_NUMBER}
+else
+    exit 0;
+fi
+
 
 echo "Prepping sdk-release-tool..."
 if [ ! -d $SDK_RELEASE_TOOLS_PATH ]; then
@@ -36,11 +42,17 @@ mkdir -p ${SDK_PACKAGE_PATH}
 pushd "$SDK_RELEASE_TOOLS_PATH/sdk-release-tool/"
 
 echo "sdk-release-tool: downloading..."
-./sdk-release-tool download --stage twilio-conversations-android ${SDK_RELEASE_VERSION} ${SDK_PACKAGE_PATH}
+./sdk-release-tool download --stage twilio-conversations-android ${SDK_RELEASE_VERSION}-rc${SDK_RC_BUILD_NUMBER} ${SDK_PACKAGE_PATH}
 if [ "$?" -ne "0" ]; then
     echo "Error: failed to execute sdk-release-tool upload"
     exit 1
 fi
+
+echo "copy release candidate to release folder"
+if [ ! -d "${SDK_PACKAGE_PATH}/dist/${SDK_RELEASE_VERSION}" ]; then
+    mkdir "${SDK_PACKAGE_PATH}/dist/${SDK_RELEASE_VERSION}"
+fi
+rsync -av "${SDK_PACKAGE_PATH}/dist/${SDK_RELEASE_VERSION}-rc${SDK_RC_BUILD_NUMBER}/" "${SDK_PACKAGE_PATH}/dist/${SDK_RELEASE_VERSION}/"
 
 echo "sdk-release-tool: uploading..."
 ./sdk-release-tool upload --prod twilio-conversations-android ${SDK_RELEASE_VERSION} ${SDK_PACKAGE_PATH}
