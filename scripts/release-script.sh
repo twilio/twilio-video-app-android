@@ -39,7 +39,7 @@ else
     export SDK_RELEASE_VERSION=${CI_BUILD_VERSION}-SNAPSHOT+${CI_SOURCE_CODE_REVISION}
 fi
 
-./scripts/prepare-for-sdk-relesae-tools.sh ${SDK_RELEASE_VERSION}
+./scripts/prepare-for-sdk-release-tools.sh ${SDK_RELEASE_VERSION}
 
 if [ "$?" -ne "0" ]; then
     exit 1
