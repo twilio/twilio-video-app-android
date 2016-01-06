@@ -8,7 +8,9 @@ import org.webrtc.VideoCapturerAndroid.CameraErrorHandler;
 
 import android.content.Context;
 import android.hardware.Camera;
+import android.util.Log;
 import android.view.Display;
+import android.view.OrientationEventListener;
 import android.view.Surface;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
@@ -232,6 +234,7 @@ public class CameraCapturerImpl implements CameraCapturer {
 		private SurfaceHolder holder;
 		private Camera camera;
 		private CapturerErrorListener listener;
+		private OrientationEventListener orientationEventListener;
 
 		public CameraPreview(Context context, Camera camera, CapturerErrorListener listener) {
 			super(context);
@@ -241,6 +244,12 @@ public class CameraCapturerImpl implements CameraCapturer {
 
 			holder = getHolder();
 			holder.addCallback(this);
+			orientationEventListener = new OrientationEventListener(context) {
+				@Override
+				public void onOrientationChanged(int orientation) {
+					updatePreviewOrientation();
+				}
+			};
 		}
 
 		@Override
@@ -249,6 +258,7 @@ public class CameraCapturerImpl implements CameraCapturer {
 				if (camera != null) {
 					camera.setPreviewDisplay(holder);
 					camera.startPreview();
+					orientationEventListener.enable();
 				}
 
 			} catch (IOException e) {
@@ -261,8 +271,8 @@ public class CameraCapturerImpl implements CameraCapturer {
 		@Override
 		public void surfaceDestroyed(SurfaceHolder holder) {
 			if(camera != null) {
+				orientationEventListener.disable();
 				camera.stopPreview();
-
 				try {
 					camera.setPreviewDisplay(null);
 				} catch(IOException e) {
