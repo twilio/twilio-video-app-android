@@ -13,16 +13,15 @@ import com.twilio.conversations.AudioTrack;
 import com.twilio.conversations.Conversation;
 import com.twilio.conversations.ConversationException;
 import com.twilio.conversations.ConversationListener;
-import com.twilio.conversations.IncomingInvite;
 import com.twilio.conversations.LocalMedia;
 import com.twilio.conversations.LocalVideoTrack;
 import com.twilio.conversations.Media;
-import com.twilio.conversations.OutgoingInvite;
 import com.twilio.conversations.Participant;
 import com.twilio.conversations.TrackOrigin;
 import com.twilio.conversations.TwilioConversations;
 import com.twilio.conversations.VideoTrack;
 import com.twilio.conversations.impl.core.ConversationStateObserver;
+import com.twilio.conversations.impl.core.ConversationStatus;
 import com.twilio.conversations.impl.core.CoreError;
 import com.twilio.conversations.impl.core.CoreSession;
 import com.twilio.conversations.impl.core.CoreSessionMediaConstraints;
@@ -30,7 +29,6 @@ import com.twilio.conversations.impl.core.DisconnectReason;
 import com.twilio.conversations.impl.core.MediaStreamInfo;
 import com.twilio.conversations.impl.core.SessionObserver;
 import com.twilio.conversations.impl.core.SessionState;
-import com.twilio.conversations.impl.core.ConversationStatus;
 import com.twilio.conversations.impl.core.TrackInfo;
 import com.twilio.conversations.impl.logging.Logger;
 import com.twilio.conversations.impl.util.CallbackHandler;
@@ -710,25 +708,13 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 		}
 	}
 	
-	void setupExternalCapturer()  {
-		try {
-			LocalVideoTrack localVideoTrack = localMediaImpl.getLocalVideoTracks().get(0);
-			CameraCapturerImpl cameraCapturer = (CameraCapturerImpl)localVideoTrack.getCameraCapturer();
-			if (cameraCapturer != null) {
-				cameraCapturer.startConversationCapturer();
-				setExternalCapturer(nativeHandle, cameraCapturer.getNativeVideoCapturer());
-			} else {
-				//TODO : we should throw exception only in case when local video is selected and
-				// camera is not present GSDK-272
-			}
-			
-		} catch (NullPointerException e) {
-			logger.e("Failed to obtain local video track");
-			// TODO : throw custom exception
-		} catch (IndexOutOfBoundsException e) {
-			logger.e("Failed to obtain local video track");
-			// TODO : throw custom exception
-		}
+	void setupExternalCapturer() {
+		LocalVideoTrack localVideoTrack = localMediaImpl.getLocalVideoTracks().get(0);
+		// TODO: Camera capture is the only supported local video stream for now.
+		// Once we start supporting screen share or etc, we should modify this method.
+		CameraCapturerImpl cameraCapturer = (CameraCapturerImpl)localVideoTrack.getCameraCapturer();
+		cameraCapturer.startConversationCapturer();
+		setExternalCapturer(nativeHandle, cameraCapturer.getNativeVideoCapturer());
 	}
 	
 	boolean mute(boolean on) {
@@ -753,13 +739,13 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 		boolean enableVideo = !localMedia.getLocalVideoTracks().isEmpty();
 		boolean pauseVideo = false;
 		if (enableVideo) {
+			setupExternalCapturer();
 			pauseVideo = !localMedia.getLocalVideoTracks().get(0).isCameraEnabled();
 		}
 		final CoreSessionMediaConstraints mediaConstraints =
 				new CoreSessionMediaConstraints(localMedia.isMicrophoneAdded(),
 							localMedia.isMuted(), enableVideo, pauseVideo);
 
-		setupExternalCapturer();
 
 		// Call start on a new thread to avoid blocking the calling thread
 		new Thread(new Runnable() {

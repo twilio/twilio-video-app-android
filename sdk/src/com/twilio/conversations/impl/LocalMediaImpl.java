@@ -81,7 +81,10 @@ public class LocalMediaImpl implements LocalMedia {
 			} else {
 				throw new UnsupportedOperationException("Maximum size " + MAX_LOCAL_VIDEO_TRACKS + " of LocalVideoTracks reached.");
 			}
-			if ((convWeak != null) &&  (convWeak.get() != null) && (localVideoTrackImpl.getCameraCapturer() != null)) {
+			if (localVideoTrackImpl.getCameraCapturer() == null) {
+				throw new IllegalArgumentException("LocalVideoTrack must have camera capturer associated with the track");
+			}
+			if ((convWeak != null) &&  (convWeak.get() != null) ) {
 				// LocalVideoTrack is added during conversation
 				// TODO: we should use localVideoTrackImpl.isCameraEnabled() as second param here,
 				// it is hard coded as false for now until we resolve issue with CameraCapturer starting in disabled mode.
