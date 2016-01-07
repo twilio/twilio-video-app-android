@@ -14,15 +14,10 @@ get_version_date() {
 }
 
 get_sdk_version() {
-    [ "$1" != "debug" ] || date_tag=".$(get_version_date)"
-
     version_prefix=$(get_sdk_version_prefix)
     [ $? -eq 0 ] || return 1
 
-    git_rev=$(git rev-parse --short HEAD)
-    [ -n "$git_rev" ] || return 1
-
-    echo "${version_prefix}${date_tag}-${git_rev}"
+    echo "${version_prefix}"
     return 0
 }
 
