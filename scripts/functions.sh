@@ -17,7 +17,15 @@ get_sdk_version() {
     version_prefix=$(get_sdk_version_prefix)
     [ $? -eq 0 ] || return 1
 
-    echo "${version_prefix}"
+    git_rev=$(git rev-parse --short HEAD)
+    [ -n "$git_rev" ] || return 1
+
+    if [ ! -z "$RELEASE_VERSION" ]; then
+        echo "${version_prefix}"
+    else
+        echo "${version_prefix}-SNAPSHOT+${git_rev}"
+    fi
+
     return 0
 }
 
