@@ -13,7 +13,7 @@
     <mavenVersion>2.0.9</mavenVersion>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <dependencies.twiliocommon.version>0.0.10</dependencies.twiliocommon.version>
-    <dependencies.twilio-common-android.version>0.1.10</dependencies.twilio-common-android.version>
+    <dependencies.twilio-common-android.version>0.1.12</dependencies.twilio-common-android.version>
   </properties>
 
   <build>
@@ -43,15 +43,7 @@
                 <configuration>
                     <artifactItems>
                         <artifactItem>
-                            <groupId>com.twilio.sdk</groupId>
-                            <artifactId>twilio-common-android</artifactId>
-                            <version>${dependencies.twilio-common-android.version}</version>
-                            <type>tar</type>
-                            <overWrite>false</overWrite>
-                            <destFileName>twilio-common-android.tar</destFileName>
-                        </artifactItem>
-                        <artifactItem>
-                            <groupId>com.twilio.sdk</groupId>
+                            <groupId>com.twilio.rtd.android</groupId>
                             <artifactId>twilio-common-android</artifactId>
                             <version>${dependencies.twilio-common-android.version}</version>
                             <type>jar</type>
@@ -66,23 +58,6 @@
             </execution>
         </executions>
       </plugin>
-      <plugin>
-        <artifactId>maven-antrun-plugin</artifactId>
-        <version>1.8</version>
-        <executions>
-          <execution>
-            <phase>initialize</phase>
-            <configuration>
-              <target>
-                <untar src="${project.build.directory}/${build.platform}/twilio-common-android.tar" dest="libs/" compression="gzip"/>
-              </target>
-            </configuration>
-            <goals>
-              <goal>run</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
     </plugins>
   </build>
 
@@ -95,15 +70,28 @@
       <type>zip</type>
     </dependency>
 
+
     <dependency>
-	   <groupId>com.twilio.sdk</groupId>
+	   <groupId>com.twilio.rtd.android</groupId>
 	   <artifactId>twilio-common-android</artifactId>
 	   <version>${dependencies.twilio-common-android.version}</version>
 	   <type>tar</type>
-	</dependency>
+     </dependency>
   </dependencies>
 
   <repositories>
+
+    <repository>
+      <id>twilio.nexus.releases</id>
+      <url>http://nexus.corp.twilio.com/content/repositories/releases</url>
+      <releases>
+        <enabled>true</enabled>
+      </releases>
+      <snapshots>
+        <enabled>true</enabled>
+      </snapshots>
+    </repository>
+
     <repository>
       <id>twilio.nexus.staging</id>
       <url>http://nexus.corp.twilio.com/content/repositories/artifact-staging</url>
