@@ -58,6 +58,23 @@
             </execution>
         </executions>
       </plugin>
+      <plugin>
+        <artifactId>maven-antrun-plugin</artifactId>
+        <version>1.8</version>
+        <executions>
+          <execution>
+            <phase>initialize</phase>
+            <configuration>
+              <target>
+ 		<copy file="${project.build.directory}/${build.platform}/twilio-common-android.jar" tofile="libs/twilio-common-android.jar"/>
+              </target>
+            </configuration>
+            <goals>
+              <goal>run</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
     </plugins>
   </build>
 
