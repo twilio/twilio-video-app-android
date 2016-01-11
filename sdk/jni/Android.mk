@@ -46,6 +46,7 @@ endif
 
 
 LOCAL_CFLAGS += \
+	-D__STDC_CONSTANT_MACROS \
 	-Wall \
 	-DPOSIX \
 	-fvisibility=hidden \

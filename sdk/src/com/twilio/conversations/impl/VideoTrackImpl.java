@@ -86,11 +86,6 @@ public class VideoTrackImpl implements VideoTrack {
 		}
 
 		@Override
-		public boolean canApplyRotation() {
-			return false;
-		}
-
-		@Override
 		public void renderFrame(org.webrtc.VideoRenderer.I420Frame frame) {
 			if(width != frame.width || height != frame.height) {
 				// Update size
