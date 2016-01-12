@@ -25,14 +25,13 @@ import com.twilio.conversations.InviteStatus;
 import com.twilio.conversations.LocalMedia;
 import com.twilio.conversations.OutgoingInvite;
 import com.twilio.conversations.Participant;
-import com.twilio.conversations.TwilioConversations;
 import com.twilio.conversations.impl.core.ConversationStateObserver;
+import com.twilio.conversations.impl.core.ConversationStatus;
 import com.twilio.conversations.impl.core.CoreEndpoint;
 import com.twilio.conversations.impl.core.CoreError;
 import com.twilio.conversations.impl.core.EndpointObserver;
 import com.twilio.conversations.impl.core.EndpointState;
 import com.twilio.conversations.impl.core.SessionState;
-import com.twilio.conversations.impl.core.ConversationStatus;
 import com.twilio.conversations.impl.logging.Logger;
 import com.twilio.conversations.impl.util.CallbackHandler;
 
@@ -185,6 +184,9 @@ public class ConversationsClientImpl implements
 
 		ConversationImpl outgoingConversationImpl = ConversationImpl.createOutgoingConversation(
 				this, participants, localMedia, this, this);
+		if (outgoingConversationImpl == null) {
+			return null;
+		}
 
 		conversations.add(outgoingConversationImpl);
 		logger.i("Conversations size is now " + conversations.size());
@@ -413,7 +415,28 @@ public class ConversationsClientImpl implements
 	@Override
 	public void onStateDidChange(EndpointState state) {
 		logger.d("onStateDidChange");
+		EndpointState oldState = coreState;
 		coreState = state;
+		if ((oldState == EndpointState.RECONNECTING) && (coreState == EndpointState.REGISTERED)) {
+			if (handler != null) {
+				handler.post(new Runnable() {
+					@Override
+					public void run() {
+						conversationsClientListener.onStartListeningForInvites(ConversationsClientImpl.this);
+					}
+				});
+			}
+			
+		} else if (coreState == EndpointState.RECONNECTING) {
+			if (handler != null) {
+				handler.post(new Runnable() {
+					@Override
+					public void run() {
+						conversationsClientListener.onStopListeningForInvites(ConversationsClientImpl.this);
+					}
+				});
+			}
+		}
 	}
 
 	@Override
