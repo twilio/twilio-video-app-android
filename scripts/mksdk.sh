@@ -140,20 +140,13 @@ function build_library {
     tarroot="${buildroot}/${tarname}"
     mkdir "${tarroot}"
 
-    # jar and native libs
+    # jar libs
     SDK_VERSION=$(sed -n '/android:versionName=/s/.*"\(.*\)"[^"]*/\1/p' AndroidManifest.xml)
     mkdir "${tarroot}/libs"
     cp "${twsdkroot}/sdk/bin/${tarname}.jar" "${tarroot}/libs/${tarname}-${SDK_VERSION}.jar"
-    abis=$(sed -ne '/^APP_ABI/s/^APP_ABI :=//p' ${twsdkroot}/sdk/jni/Application.mk)
-    for abi in $abis; do
-    if [ -d "${twsdkroot}/sdk/libs/${abi}" ]; then
-    cp -PR "${twsdkroot}/sdk/libs/${abi}" "${tarroot}/libs"
-    fi
 
     #copy twilio-common.jar
     cp "${twsdkroot}/sdk/target/android/twilio-common-android.jar" "${tarroot}/libs"
-
-    done
 
 }
 
