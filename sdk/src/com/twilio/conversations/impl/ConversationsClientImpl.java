@@ -171,7 +171,7 @@ public class ConversationsClientImpl implements
 	}
 
 	@Override
-	public OutgoingInvite sendConversationInvite(Set<String> participants, LocalMedia localMedia, ConversationCallback conversationCallback) throws ConversationException {
+	public OutgoingInvite sendConversationInvite(Set<String> participants, LocalMedia localMedia, ConversationCallback conversationCallback) {
 		checkDisposed();
 		if(participants == null || participants.size() == 0) {
 			throw new IllegalStateException("Invite at least one participant");
@@ -185,9 +185,12 @@ public class ConversationsClientImpl implements
 
 		ConversationImpl outgoingConversationImpl = ConversationImpl.createOutgoingConversation(
 				this, participants, localMedia, this, this);
+		
 		if (outgoingConversationImpl == null || outgoingConversationImpl.getNativeHandle() == 0) {
-			throw new ConversationException( TwilioConversations.CLIENT_DISCONNECTED,
+			ConversationException exception = new ConversationException( TwilioConversations.CLIENT_DISCONNECTED,
 					"Cannot create conversation while reconnecting. Wait for conversations client to reconnect and try again.");
+			conversationCallback.onConversation(null, exception);
+			return null;
 		}
 
 		conversations.add(outgoingConversationImpl);

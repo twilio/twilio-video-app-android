@@ -51,7 +51,7 @@ public interface ConversationsClient {
 	 * @param conversationCallback The callback that will provide the conversation once it's been created
 	 * @throws ConversationClientException
 	 */
-	public OutgoingInvite sendConversationInvite(Set<String> participants, LocalMedia localMedia, ConversationCallback conversationCallback) throws ConversationException;
+	public OutgoingInvite sendConversationInvite(Set<String> participants, LocalMedia localMedia, ConversationCallback conversationCallback);
 
 	/**
 	 * Releases resources associated with this ConversationsClient object.
