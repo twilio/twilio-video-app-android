@@ -17,6 +17,8 @@ import com.twilio.common.TwilioAccessManager;
 import com.twilio.conversations.AudioOutput;
 import com.twilio.conversations.Conversation;
 import com.twilio.conversations.ConversationCallback;
+import com.twilio.conversations.ConversationClientException;
+import com.twilio.conversations.ConversationClientException.ErrorType;
 import com.twilio.conversations.ConversationException;
 import com.twilio.conversations.ConversationListener;
 import com.twilio.conversations.ConversationsClient;
@@ -94,7 +96,7 @@ public class ConversationsClientImpl implements
 	private boolean listening = false;
 	private TwilioAccessManager accessManager;
 	private Handler handler;
-	private EndpointState coreState;
+	private EndpointState endpointState;
 	private Set<ConversationImpl> conversations = new HashSet<ConversationImpl>();
 	private Map<ConversationImpl, OutgoingInviteImpl> pendingOutgoingInvites = new HashMap<ConversationImpl, OutgoingInviteImpl>();
 	private Map<ConversationImpl, IncomingInviteImpl> pendingIncomingInvites = new HashMap<ConversationImpl, IncomingInviteImpl>();
@@ -170,7 +172,7 @@ public class ConversationsClientImpl implements
 	}
 
 	@Override
-	public OutgoingInvite sendConversationInvite(Set<String> participants, LocalMedia localMedia, ConversationCallback conversationCallback) {
+	public OutgoingInvite sendConversationInvite(Set<String> participants, LocalMedia localMedia, ConversationCallback conversationCallback) throws ConversationClientException {
 		checkDisposed();
 		if(participants == null || participants.size() == 0) {
 			throw new IllegalStateException("Invite at least one participant");
@@ -184,8 +186,10 @@ public class ConversationsClientImpl implements
 
 		ConversationImpl outgoingConversationImpl = ConversationImpl.createOutgoingConversation(
 				this, participants, localMedia, this, this);
-		if (outgoingConversationImpl == null) {
-			return null;
+		if (outgoingConversationImpl == null || outgoingConversationImpl.getNativeHandle() == 0) {
+			throw new ConversationClientException(
+					ErrorType.CLIENT_DISCONNECTED,
+					"Cannot create conversation while reconnecting. Wait for conversations client to reconnect and try again.");
 		}
 
 		conversations.add(outgoingConversationImpl);
@@ -415,9 +419,9 @@ public class ConversationsClientImpl implements
 	@Override
 	public void onStateDidChange(EndpointState state) {
 		logger.d("onStateDidChange");
-		EndpointState oldState = coreState;
-		coreState = state;
-		if ((oldState == EndpointState.RECONNECTING) && (coreState == EndpointState.REGISTERED)) {
+		EndpointState oldEndpointState = endpointState;
+		endpointState = state;
+		if ((oldEndpointState == EndpointState.RECONNECTING) && (endpointState == EndpointState.REGISTERED)) {
 			if (handler != null) {
 				handler.post(new Runnable() {
 					@Override
@@ -427,7 +431,7 @@ public class ConversationsClientImpl implements
 				});
 			}
 			
-		} else if (coreState == EndpointState.RECONNECTING) {
+		} else if (endpointState == EndpointState.RECONNECTING) {
 			if (handler != null) {
 				handler.post(new Runnable() {
 					@Override
