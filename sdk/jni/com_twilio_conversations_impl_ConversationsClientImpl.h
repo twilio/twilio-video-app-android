@@ -37,7 +37,7 @@ JNIEXPORT void JNICALL Java_com_twilio_conversations_impl_ConversationsClientImp
  * Signature: ()V
  */
 JNIEXPORT void JNICALL Java_com_twilio_conversations_impl_ConversationsClientImpl_freeNativeHandle
-  (JNIEnv *, jobject);
+  (JNIEnv *, jobject, jlong);
 
 #ifdef __cplusplus
 }
