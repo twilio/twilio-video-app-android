@@ -40,6 +40,14 @@ JNIEXPORT void JNICALL Java_com_twilio_conversations_impl_TwilioConversationsImp
 JNIEXPORT jint JNICALL Java_com_twilio_conversations_impl_TwilioConversationsImpl_getCoreLogLevel
   (JNIEnv *, jobject);
 
+/*
+ * Class:     com_twilio_conversations_impl_TwilioConversationsImpl
+ * Method:    refreshRegistrations
+ * Signature: (J)V
+ */
+JNIEXPORT void JNICALL Java_com_twilio_conversations_impl_TwilioConversationsImpl_refreshRegistrations
+  (JNIEnv *, jobject);
+
 
 #ifdef __cplusplus
 }

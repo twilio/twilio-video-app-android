@@ -55,7 +55,7 @@ protected:
     }
     virtual void onStateDidChange(TSCEndpointState state){
 
-    	TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK, kTSCoreLogLevelDebug, "onStateDidChange");
+    	TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK, kTSCoreLogLevelDebug, "onStateDidChange, new state:%d", state);
     	const std::string state_type_enum = "com/twilio/conversations/impl/core/EndpointState";
 		jobject j_state_type =
 				webrtc_jni::JavaEnumFromIndex(jni(),

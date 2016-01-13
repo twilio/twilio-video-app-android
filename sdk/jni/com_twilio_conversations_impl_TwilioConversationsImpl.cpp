@@ -126,3 +126,8 @@ JNIEXPORT jint JNICALL Java_com_twilio_conversations_impl_TwilioConversationsImp
 	TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK, kTSCoreLogLevelDebug, "getCoreLogLevel");
         return TSCLogger::instance()->getLogLevel();
 }
+
+JNIEXPORT void JNICALL Java_com_twilio_conversations_impl_TwilioConversationsImpl_refreshRegistrations
+  (JNIEnv *, jobject) {
+	TSCSDK::instance()->refreshRegistrations();
+}
