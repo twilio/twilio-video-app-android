@@ -21,12 +21,29 @@
 
 #include "talk/app/webrtc/java/jni/jni_helpers.h"
 #include "talk/app/webrtc/java/jni/classreferenceholder.h"
+#include "talk/app/webrtc/java/jni/androidnetworkmonitor_jni.h"
 
 #define TAG  "TwilioSDK(native)"
 
 using namespace webrtc_jni;
 using namespace twiliosdk;
 
+extern "C" jint JNIEXPORT JNICALL JNI_OnLoad(JavaVM *jvm, void *reserved) {
+    TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK, kTSCoreLogLevelDebug, "JNI_OnLoad");
+    jint ret = InitGlobalJniVariables(jvm);
+    if (ret < 0) {
+		TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK, kTSCoreLogLevelError, "InitGlobalJniVariables() failed");
+        return -1;
+    }
+    LoadGlobalClassReferenceHolder();
+
+    return ret;
+}
+
+extern "C" void JNIEXPORT JNICALL JNI_OnUnLoad(JavaVM *jvm, void *reserved) {
+    TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK, kTSCoreLogLevelDebug, "JNI_OnUnload");
+    FreeGlobalClassReferenceHolder();
+}
 
 static TwilioCommon::AccessManager* getNativeAccessMgrFromJava(JNIEnv* jni, jobject j_accessMgr) {
   jclass j_accessManagerClass = GetObjectClass(jni, j_accessMgr);
@@ -42,38 +59,20 @@ static TwilioCommon::AccessManager* getNativeAccessMgrFromJava(JNIEnv* jni, jobj
  * Signature: (Landroid/content/Context;)Z
  */
 JNIEXPORT jboolean JNICALL Java_com_twilio_conversations_impl_TwilioConversationsImpl_initCore(JNIEnv *env, jobject obj, jobject context) {
-
-	bool success = false;
-	JavaVM * cachedJVM = NULL;
-
-	env->GetJavaVM(&cachedJVM);
-
-	// Perform webrtc_jni initialization to enable peerconnection_jni.cc JNI bindings.
-	jint ret = webrtc_jni::InitGlobalJniVariables(cachedJVM);
-	if(ret < 0) {
-		TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK, kTSCoreLogLevelError, "TwilioSDK.InitGlobalJniVariables() failed");
-		return success;
-	} else {
-		webrtc_jni::LoadGlobalClassReferenceHolder();
-	}
+	bool failure = false;
 
 	TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK, kTSCoreLogLevelDebug, "Initialized globals and classes");
 	TSCSDK* tscSdk = TSCSDK::instance();
-
 	TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK, kTSCoreLogLevelDebug, "Initialized tscsdk");
 
-	success |= webrtc::SetRenderAndroidVM(cachedJVM);
+    AndroidNetworkMonitor::SetAndroidContext(env, context);
+	failure |= webrtc::SetRenderAndroidVM(GetJVM());
+	failure |= webrtc_jni::AndroidVideoCapturerJni::SetAndroidObjects(env, context);
+	failure |= webrtc::VoiceEngine::SetAndroidObjects(GetJVM(), context);
 
-	webrtc::OpenSLESPlayer::SetAndroidAudioDeviceObjects(cachedJVM, context);
-
-	// Required to setup an external capturer
-	success |= webrtc_jni::AndroidVideoCapturerJni::SetAndroidObjects(env, context);
-
-	TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK, kTSCoreLogLevelDebug, "Calling DA Magic formula");
-	success |= webrtc::VoiceEngine::SetAndroidObjects(cachedJVM, context);
-
-	// TODO: check success and return appropriately
-	if (tscSdk != NULL && tscSdk->isInitialized()) {
+	if (tscSdk != NULL &&
+            tscSdk->isInitialized() &&
+            !failure) {
 		return JNI_TRUE;
 	}
 
