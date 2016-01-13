@@ -26,7 +26,8 @@ ifeq ($(PREFIX),)
 PREFIX:= /usr/local/twilio-sdk
 endif
 
-LOCAL_MODULE := twilio-native
+# We rename this so that webrtc source loading native code does not crash
+LOCAL_MODULE := jingle_peerconnection_so
 LOCAL_SRC_FILES := \
 	dummy.cpp \
 	com_twilio_conversations_impl_TwilioConversationsImpl.cpp \

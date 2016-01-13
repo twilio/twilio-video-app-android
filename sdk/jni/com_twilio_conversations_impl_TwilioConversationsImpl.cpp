@@ -64,10 +64,7 @@ JNIEXPORT jboolean JNICALL Java_com_twilio_conversations_impl_TwilioConversation
 
 	success |= webrtc::SetRenderAndroidVM(cachedJVM);
 
-	/**
 	webrtc::OpenSLESPlayer::SetAndroidAudioDeviceObjects(cachedJVM, context);
-
-	success |= webrtc::SetCaptureAndroidVM(cachedJVM, context);
 
 	// Required to setup an external capturer
 	success |= webrtc_jni::AndroidVideoCapturerJni::SetAndroidObjects(env, context);
@@ -75,11 +72,10 @@ JNIEXPORT jboolean JNICALL Java_com_twilio_conversations_impl_TwilioConversation
 	TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK, kTSCoreLogLevelDebug, "Calling DA Magic formula");
 	success |= webrtc::VoiceEngine::SetAndroidObjects(cachedJVM, context);
 
-	// TODO: check success and return appropriately 
+	// TODO: check success and return appropriately
 	if (tscSdk != NULL && tscSdk->isInitialized()) {
 		return JNI_TRUE;
 	}
-	**/
 
 	return JNI_FALSE;
 }
