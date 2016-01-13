@@ -17,8 +17,6 @@ import com.twilio.common.TwilioAccessManager;
 import com.twilio.conversations.AudioOutput;
 import com.twilio.conversations.Conversation;
 import com.twilio.conversations.ConversationCallback;
-import com.twilio.conversations.ConversationClientException;
-import com.twilio.conversations.ConversationClientException.ErrorType;
 import com.twilio.conversations.ConversationException;
 import com.twilio.conversations.ConversationListener;
 import com.twilio.conversations.ConversationsClient;
@@ -27,6 +25,7 @@ import com.twilio.conversations.InviteStatus;
 import com.twilio.conversations.LocalMedia;
 import com.twilio.conversations.OutgoingInvite;
 import com.twilio.conversations.Participant;
+import com.twilio.conversations.TwilioConversations;
 import com.twilio.conversations.impl.core.ConversationStateObserver;
 import com.twilio.conversations.impl.core.ConversationStatus;
 import com.twilio.conversations.impl.core.CoreEndpoint;
@@ -172,7 +171,7 @@ public class ConversationsClientImpl implements
 	}
 
 	@Override
-	public OutgoingInvite sendConversationInvite(Set<String> participants, LocalMedia localMedia, ConversationCallback conversationCallback) throws ConversationClientException {
+	public OutgoingInvite sendConversationInvite(Set<String> participants, LocalMedia localMedia, ConversationCallback conversationCallback) throws ConversationException {
 		checkDisposed();
 		if(participants == null || participants.size() == 0) {
 			throw new IllegalStateException("Invite at least one participant");
@@ -187,8 +186,7 @@ public class ConversationsClientImpl implements
 		ConversationImpl outgoingConversationImpl = ConversationImpl.createOutgoingConversation(
 				this, participants, localMedia, this, this);
 		if (outgoingConversationImpl == null || outgoingConversationImpl.getNativeHandle() == 0) {
-			throw new ConversationClientException(
-					ErrorType.CLIENT_DISCONNECTED,
+			throw new ConversationException( TwilioConversations.CLIENT_DISCONNECTED,
 					"Cannot create conversation while reconnecting. Wait for conversations client to reconnect and try again.");
 		}
 
@@ -378,8 +376,7 @@ public class ConversationsClientImpl implements
 		if (error != null) {
 			listening = false;
 			final ConversationException e =
-					new ConversationException(error.getDomain(),
-							error.getCode(), error.getMessage());
+					new ConversationException(error.getCode(), error.getMessage());
 			if (handler != null) {
 				handler.post(new Runnable() {
 					@Override
