@@ -26,7 +26,7 @@ if [ ! -d $SDK_RELEASE_TOOLS_PATH ]; then
     exit 1
 fi
 
-if [ ! -f "$SDK_RELEASE_TOOLS_PATH/sdk-release-tool/cdn-sdki.dev.json" ] || [ ! -f "$SDK_RELEASE_TOOLS_PATH/sdk-release-tool/cdn-sdki.prod.json" ]; then
+if [ ! -f "$SDK_RELEASE_TOOLS_PATH/sdk-release-tool/cdn-sdki.stage.json" ] || [ ! -f "$SDK_RELEASE_TOOLS_PATH/sdk-release-tool/cdn-sdki.prod.json" ]; then
     echo "Error: creds json not found"
     exit 1
 fi
