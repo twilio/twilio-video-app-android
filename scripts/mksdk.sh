@@ -144,10 +144,6 @@ function build_library {
     SDK_VERSION=$(sed -n '/android:versionName=/s/.*"\(.*\)"[^"]*/\1/p' AndroidManifest.xml)
     mkdir "${tarroot}/libs"
     cp "${twsdkroot}/sdk/bin/${tarname}.jar" "${tarroot}/libs/${tarname}-${SDK_VERSION}.jar"
-
-    #copy twilio-common.jar
-    cp "${twsdkroot}/sdk/target/android/twilio-common-android.jar" "${tarroot}/libs"
-
 }
 
 function copy_javadocs {
@@ -191,7 +187,7 @@ function copy_quickstart {
     # copy libraries to quickstart
     quickdest="${tarroot}/quickstart"
     mkdir "${quickdest}/app/libs"
-    cp "${tarroot}/libs/twilio-common-android.jar"  "${quickdest}/app/libs/"
+    cp "${twsdkroot}/sdk/target/android/twilio-common-android.jar" "${quickdest}/app/libs/"
     cp "${tarroot}/libs/twilio-conversations-android-${SDK_VERSION}.jar"  "${quickdest}/app/libs/"
 }
 
