@@ -79,8 +79,14 @@ LOCAL_STATIC_LIBRARIES := \
 	PocoJSON \
 	PocoFoundation \
 	boringssl \
-	webrtc-jni \
 
+# Several webrtc classes use native webrtc-jni objects that are only
+# called from Java classes. The compiler will incorrectly strip some
+# of these native webrtc-jni objects during linking because it believes
+# they are unused by the native library. Using whole static libraries
+# ensures that all native webrtc-jni objects are included in the library.
+LOCAL_WHOLE_STATIC_LIBRARIES := \
+	webrtc-jni \
 
 # Make JNI_OnLoad a local symbol in libwebrtc-jni.a since it is already defined by libtwilio-jni.a
 # dummy.cpp is a fake depedency that causes this command to run prior to linking
