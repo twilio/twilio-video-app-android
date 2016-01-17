@@ -80,10 +80,11 @@ LOCAL_STATIC_LIBRARIES := \
 	PocoFoundation \
 	boringssl \
 
-# Several webrtc classes use library objects in webrtc-jni that are only referenced
-# in Java classes. The compiler will incorrectly strip these objects during linking
-# concluding they are unused by the library. Using whole static libraries ensures
-# that all library are included.
+# Several webrtc classes use native webrtc-jni objects that are only
+# called from Java classes. The compiler will incorrectly strip some
+# of these native webrtc-jni objects during linking because it believes
+# they are unused by the native library. Using whole static libraries
+# ensures that all native webrtc-jni objects are included in the library.
 LOCAL_WHOLE_STATIC_LIBRARIES := \
 	webrtc-jni \
 
