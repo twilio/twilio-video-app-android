@@ -5,34 +5,31 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.twilio.conversations.I420Frame;
 import com.twilio.conversations.VideoRenderer;
 import com.twilio.conversations.VideoTrack;
 import com.twilio.conversations.impl.core.TrackInfo;
 
 public class VideoTrackImpl implements VideoTrack {
-
 	private org.webrtc.VideoTrack videoTrack;
 	private TrackInfo trackInfo;
 	private Map<VideoRenderer, org.webrtc.VideoRenderer> videoRenderersMap =
 			new HashMap<VideoRenderer, org.webrtc.VideoRenderer>();
-	
 
 	VideoTrackImpl() {}
-	
+
 	VideoTrackImpl(org.webrtc.VideoTrack videoTrack, TrackInfo trackInfo) {
 		this.videoTrack = videoTrack;
 		this.trackInfo = trackInfo;
 	}
-	
+
 	void setWebrtcVideoTrack(org.webrtc.VideoTrack videoTrack) {
 		this.videoTrack = videoTrack;
 	}
-	
+
 	void setTrackInfo(TrackInfo trackInfo) {
 		this.trackInfo = trackInfo;
 	}
-	
+
 	org.webrtc.VideoTrack getWebrtcVideoTrack() {
 		return videoTrack;
 	}
@@ -62,7 +59,7 @@ public class VideoTrackImpl implements VideoTrack {
 	public List<VideoRenderer> getRenderers() {
 		return new ArrayList<VideoRenderer>(videoRenderersMap.keySet());
 	}
-	
+
 	private org.webrtc.VideoRenderer createWebRtcVideoRenderer(VideoRenderer videoRenderer) {
 		return new org.webrtc.VideoRenderer(new VideoRendererCallbackAdapter(videoRenderer));
 	}
@@ -77,26 +74,15 @@ public class VideoTrackImpl implements VideoTrack {
 	}
 
 	private class VideoRendererCallbackAdapter implements org.webrtc.VideoRenderer.Callbacks {
-		private VideoRenderer videoRenderer;
-		private int width = 0;
-		private int height = 0;
-	
+		private final VideoRenderer videoRenderer;
+
 		public VideoRendererCallbackAdapter(VideoRenderer videoRenderer) {
 			this.videoRenderer = videoRenderer;
 		}
 
 		@Override
 		public void renderFrame(org.webrtc.VideoRenderer.I420Frame frame) {
-			if(width != frame.width || height != frame.height) {
-				// Update size
-				width = frame.width;
-				height = frame.height;
-				videoRenderer.setSize(width, height);
-			}
-
-			videoRenderer.renderFrame(new I420Frame(frame.width, frame.height, frame.rotationDegree, frame.yuvStrides, frame.yuvPlanes));
+			videoRenderer.renderFrame(new I420Frame(frame));
 		}
-
 	}
-
 }

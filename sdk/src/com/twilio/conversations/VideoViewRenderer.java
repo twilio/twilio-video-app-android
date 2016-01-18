@@ -1,10 +1,15 @@
 package com.twilio.conversations;
 
-import com.twilio.conversations.impl.VideoRendererGui;
-
 import android.content.Context;
-import android.opengl.GLSurfaceView;
+import android.os.Handler;
+import android.os.Looper;
 import android.view.ViewGroup;
+
+import com.twilio.conversations.impl.I420Frame;
+
+import org.webrtc.SurfaceViewRenderer;
+import org.webrtc.EglBase;
+import org.webrtc.RendererCommon.ScalingType;
 
 /**
  * A VideoViewRenderer receives frames from a {@link VideoTrack} and
@@ -12,8 +17,11 @@ import android.view.ViewGroup;
  *
  */
 public class VideoViewRenderer implements VideoRenderer {
-	private VideoRenderer videoRenderer;
-	private GLSurfaceView videoView;
+    // TODO aalaniz - I am not a huge fan of this but trying to just get something off the ground
+    private static final EglBase rootEglBase = new EglBase();
+
+    private SurfaceViewRenderer surfaceViewRenderer;
+    private boolean firstFrameRendered = false;
 
 	/**
 	 * Create a video view renderer that will display frames in
@@ -26,51 +34,27 @@ public class VideoViewRenderer implements VideoRenderer {
 	}
 
 	private void setupRenderer(final Context context, final ViewGroup container) {
-		videoView = new GLSurfaceView(context);
-		container.addView(videoView);
-		VideoRendererGui videoRendererGui = new VideoRendererGui(videoView, null);
-		videoRenderer = videoRendererGui.createRenderer(0,0,100,100, VideoRendererGui.ScalingType.SCALE_ASPECT_FIT, true);
+		surfaceViewRenderer = new SurfaceViewRenderer(context);
+		container.addView(surfaceViewRenderer);
+        surfaceViewRenderer.init(rootEglBase.getContext(), null);
+        surfaceViewRenderer.setScalingType(ScalingType.SCALE_ASPECT_FIT);
+        surfaceViewRenderer.requestLayout();
 	}
 
 	@Override
-	public void setSize(int width, int height) {
-		if(videoRenderer != null) {
-			videoRenderer.setSize(width, height);
+	public void renderFrame(I420Frame i420) {
+		if(surfaceViewRenderer != null) {
+            if (!firstFrameRendered) {
+                new Handler(Looper.getMainLooper()).post(new Runnable() {
+                    @Override
+                    public void run() {
+                        surfaceViewRenderer.invalidate();
+                        surfaceViewRenderer.requestLayout();
+                    }
+                });
+            }
+			surfaceViewRenderer.renderFrame(i420.frame);
+            firstFrameRendered = true;
 		}
 	}
-
-	@Override
-	public void renderFrame(I420Frame frame) {
-		if(videoRenderer != null) {
-			videoRenderer.renderFrame(frame);
-		}
-	}
-
-	@Override
-	public void setObserver(VideoRendererObserver observer) {
-		if(videoRenderer != null) {
-			videoRenderer.setObserver(observer);
-		}
-	}
-
-	/**
-	 * Resumes rendering to the view
-	 *
-	 */
-	public void onResume() {
-		if(videoView != null) {
-			videoView.onResume();
-		}
-	}
-
-	/**
-	 * Pauses rendering to the view
-	 *
-	 */
-	public void onPause() {
-		if(videoView != null) {
-			videoView.onPause();
-		}
-	}
-
 }

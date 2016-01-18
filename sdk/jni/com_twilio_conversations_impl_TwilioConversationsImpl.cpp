@@ -66,6 +66,7 @@ JNIEXPORT jboolean JNICALL Java_com_twilio_conversations_impl_TwilioConversation
 	TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK, kTSCoreLogLevelDebug, "Initialized tscsdk");
 
     AndroidNetworkMonitor::SetAndroidContext(env, context);
+    webrtc::OpenSLESPlayer::SetAndroidAudioDeviceObjects(GetJVM(), context);
 	failure |= webrtc::SetRenderAndroidVM(GetJVM());
 	failure |= webrtc_jni::AndroidVideoCapturerJni::SetAndroidObjects(env, context);
 	failure |= webrtc::VoiceEngine::SetAndroidObjects(GetJVM(), context);
@@ -78,7 +79,6 @@ JNIEXPORT jboolean JNICALL Java_com_twilio_conversations_impl_TwilioConversation
 
 	return JNI_FALSE;
 }
-
 
 JNIEXPORT jlong JNICALL Java_com_twilio_conversations_impl_TwilioConversationsImpl_createEndpoint
   (JNIEnv *env, jobject obj, jobject j_accessMgr, jlong nativeEndpointObserver) {
@@ -119,7 +119,6 @@ JNIEXPORT void JNICALL Java_com_twilio_conversations_impl_TwilioConversationsImp
 	TSCoreLogLevel coreLogLevel = static_cast<TSCoreLogLevel>(level);
 	TSCLogger::instance()->setLogLevel(coreLogLevel);
 }
-
 
 JNIEXPORT jint JNICALL Java_com_twilio_conversations_impl_TwilioConversationsImpl_getCoreLogLevel
   (JNIEnv *env, jobject obj) {

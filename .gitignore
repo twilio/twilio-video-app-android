@@ -43,4 +43,5 @@ sdk/target/*
 sdk/libs/
 *~
 *.swp
+*.swo
 
