@@ -20,6 +20,8 @@ import java.util.HashMap;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
+import static org.junit.Assert.*;
+
 
 @RunWith(AndroidJUnit4.class)
 public class TwilioConversationsTests {
@@ -30,12 +32,12 @@ public class TwilioConversationsTests {
             TwilioConversationsActivity.class);
 
     @Test
-    public void testInitialize() {
+    public void shouldInitialize() {
         TwilioConversationsUtils.initializeTwilioSDK(mActivityRule.getActivity().getApplicationContext());
     }
 
     @Test
-    public void testInitializeRepeatedly() {
+    public void canInitializeRepeatedly() {
         int attempts = 10;
         final CountDownLatch initLatch = TwilioConversationsUtils.isInitialized() ? new CountDownLatch(0) : new CountDownLatch(1);
         final CountDownLatch errorLatch = TwilioConversationsUtils.isInitialized() ? new CountDownLatch(attempts) : new CountDownLatch(attempts - 1);
@@ -48,15 +50,13 @@ public class TwilioConversationsTests {
             initLatch.await(TwilioConversationsUtils.TIMEOUT, TimeUnit.SECONDS);
             errorLatch.await(TwilioConversationsUtils.TIMEOUT, TimeUnit.SECONDS);
         } catch (InterruptedException e) {
-            org.junit.Assert.fail("test timed out after" + TwilioConversationsUtils.TIMEOUT);
+            fail("test timed out after" + TwilioConversationsUtils.TIMEOUT);
         }
 
     }
 
-
-
     @Test
-    public void testCreateConversationsClientWithNullParams() {
+    public void canCreateConversationsClientWithNullParams() {
         TwilioConversationsUtils.initializeTwilioSDK(mActivityRule.getActivity());
 
         boolean npeSeen = false;
@@ -66,7 +66,7 @@ public class TwilioConversationsTests {
         } catch(NullPointerException e) {
             npeSeen = true;
         } finally {
-            org.junit.Assert.assertTrue(npeSeen);
+            assertTrue(npeSeen);
             npeSeen = false;
         }
 
@@ -75,7 +75,7 @@ public class TwilioConversationsTests {
         } catch(NullPointerException e) {
             npeSeen = true;
         } finally {
-            org.junit.Assert.assertTrue(npeSeen);
+            assertTrue(npeSeen);
             npeSeen = false;
         }
 
@@ -84,7 +84,7 @@ public class TwilioConversationsTests {
         } catch(NullPointerException e) {
             npeSeen = true;
         } finally {
-            org.junit.Assert.assertTrue(npeSeen);
+            assertTrue(npeSeen);
             npeSeen = false;
         }
 
@@ -94,7 +94,7 @@ public class TwilioConversationsTests {
         } catch(NullPointerException e) {
             npeSeen = true;
         } finally {
-            org.junit.Assert.assertTrue(npeSeen);
+            assertTrue(npeSeen);
             npeSeen = false;
         }
 
@@ -104,7 +104,7 @@ public class TwilioConversationsTests {
         } catch(NullPointerException e) {
             npeSeen = true;
         } finally {
-            org.junit.Assert.assertTrue(npeSeen);
+            assertTrue(npeSeen);
             npeSeen = false;
         }
 
@@ -114,25 +114,25 @@ public class TwilioConversationsTests {
         } catch(NullPointerException e) {
             npeSeen = true;
         } finally {
-            org.junit.Assert.assertTrue(npeSeen);
+            assertTrue(npeSeen);
             npeSeen = false;
         }
 
     }
 
     @Test
-    public void testCreateConversationsClientWithToken() {
+    public void canCreateConversationsClientWithToken() {
         TwilioConversationsUtils.initializeTwilioSDK(mActivityRule.getActivity());
 
         CountDownLatch waitLatch = new CountDownLatch(1);
         ConversationsClient conversationsClient = TwilioConversations.createConversationsClient("DEADBEEF", conversationsClientListener());
 
         // TODO: check start listening once callback issue is resolved
-        org.junit.Assert.assertNotNull(conversationsClient);
+        assertNotNull(conversationsClient);
     }
 
     @Test
-    public void testCreateConversationsClientWithAccessManagerAndEmptyOptionsMap() {
+    public void canCreateConversationsClientWithAccessManagerAndEmptyOptionsMap() {
         TwilioConversationsUtils.initializeTwilioSDK(mActivityRule.getActivity());
 
         CountDownLatch waitLatch = new CountDownLatch(1);
@@ -140,11 +140,11 @@ public class TwilioConversationsTests {
         ConversationsClient conversationsClient = TwilioConversations.createConversationsClient(accessManager, new HashMap<String, String>(), conversationsClientListener());
 
         // TODO: check start listening once callback issue is resolved
-        org.junit.Assert.assertNotNull(conversationsClient);
+        assertNotNull(conversationsClient);
     }
 
     @Test
-    public void testCreateConversationsClientWithAccessManagerAndRandomOption() {
+    public void canCreateConversationsClientWithAccessManagerAndRandomOption() {
         TwilioConversationsUtils.initializeTwilioSDK(mActivityRule.getActivity());
 
         HashMap optionsMap = new HashMap<String, String>();
@@ -153,47 +153,42 @@ public class TwilioConversationsTests {
         ConversationsClient conversationsClient = TwilioConversations.createConversationsClient(accessManager, optionsMap, conversationsClientListener());
 
         // TODO: check start listening once callback issue is resolved
-        org.junit.Assert.assertNotNull(conversationsClient);
+        assertNotNull(conversationsClient);
     }
 
     @Test
-    public void testSetAndGetLogLevel() {
-        verifySetAndGetLogLevel(TwilioConversations.LogLevel.DEBUG);
-        verifySetAndGetLogLevel(TwilioConversations.LogLevel.DISABLED);
-        verifySetAndGetLogLevel(TwilioConversations.LogLevel.ERROR);
-        verifySetAndGetLogLevel(TwilioConversations.LogLevel.INFO);
-        verifySetAndGetLogLevel(TwilioConversations.LogLevel.VERBOSE);
-        verifySetAndGetLogLevel(TwilioConversations.LogLevel.WARNING);
+    public void canSetAndGetLogLevel() {
+        setAndGetLogLevelShouldMatch(TwilioConversations.LogLevel.DEBUG);
+        setAndGetLogLevelShouldMatch(TwilioConversations.LogLevel.DISABLED);
+        setAndGetLogLevelShouldMatch(TwilioConversations.LogLevel.ERROR);
+        setAndGetLogLevelShouldMatch(TwilioConversations.LogLevel.INFO);
+        setAndGetLogLevelShouldMatch(TwilioConversations.LogLevel.VERBOSE);
+        setAndGetLogLevelShouldMatch(TwilioConversations.LogLevel.WARNING);
     }
 
-    private void verifySetAndGetLogLevel(int level) {
+    private void setAndGetLogLevelShouldMatch(int level) {
         TwilioConversations.setLogLevel(level);
-        org.junit.Assert.assertEquals(level, TwilioConversations.getLogLevel());
+        assertEquals(level, TwilioConversations.getLogLevel());
     }
 
     @Test
-    public void testEnsureInvalidLevelSetsLevelToDisabled() {
+    public void shouldSetDisabledIfInvalidLogLevelProvided() {
         int invalidLevel = 100;
         TwilioConversations.setLogLevel(invalidLevel);
-        org.junit.Assert.assertEquals(TwilioConversations.LogLevel.DISABLED, TwilioConversations.getLogLevel());
+        assertEquals(TwilioConversations.LogLevel.DISABLED, TwilioConversations.getLogLevel());
     }
 
     @Test
-    public void testEnsureLogLevelSetBeforeAndAfterInit() {
-        // TODO: implement me
-    }
-
-    @Test
-    public void testGetVersion() {
+    public void canGetVersion() {
         String version = TwilioConversations.getVersion();
-        org.junit.Assert.assertNotNull(version);
+        assertNotNull(version);
     }
 
     @Test
-    public void testVersionUsesSemanticVersioning() {
+    public void versionShouldBeSemVer() {
         String semVerRegex = "^([0-9]+)\\.([0-9]+)\\.([0-9]+)(?:-([0-9A-Za-z-]+(?:\\.[0-9A-Za-z-]+)*))?(?:\\+[0-9A-Za-z-]+)?$";
         String version = TwilioConversations.getVersion();
-        org.junit.Assert.assertTrue(version.matches(semVerRegex));
+        assertTrue(version.matches(semVerRegex));
     }
 
     @Test
@@ -205,7 +200,6 @@ public class TwilioConversationsTests {
     public void testSetSpeakerphoneOn() {
         // TODO: validate speakerphone is on
     }
-
 
     private ConversationsClientListener conversationsClientListener() {
         return new ConversationsClientListener() {

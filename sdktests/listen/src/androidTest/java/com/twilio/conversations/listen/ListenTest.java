@@ -18,7 +18,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import java.util.HashMap;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
@@ -26,19 +25,21 @@ import retrofit.Callback;
 import retrofit.RetrofitError;
 import retrofit.client.Response;
 
+import static org.junit.Assert.*;
+
 
 @RunWith(AndroidJUnit4.class)
 public class ListenTest {
-
+    private final static String TEST_USER = "TEST_USER";
 
     @Rule
     public ActivityTestRule<TwilioListenActivity> mActivityRule = new ActivityTestRule<>(
             TwilioListenActivity.class);
 
     @Test
-    public void testListenRightAfterClientCreation() {
+    public void canListenAfterClientCreation() {
         final CountDownLatch waitLatch = new CountDownLatch(1);
-        TCCapabilityTokenProvider.obtainTwilioCapabilityToken("TEST", new Callback<String>() {
+        TCCapabilityTokenProvider.obtainTwilioCapabilityToken(TEST_USER, new Callback<String>() {
             @Override
             public void success(final String token, Response response) {
 
@@ -48,13 +49,13 @@ public class ListenTest {
                         TwilioAccessManagerFactory.createAccessManager(token, new TwilioAccessManagerListener() {
                                     @Override
                                     public void onAccessManagerTokenExpire(TwilioAccessManager twilioAccessManager) {
-                                        org.junit.Assert.fail();
+                                        fail();
                                     }
 
                                     @Override
                                     public void onTokenUpdated(final TwilioAccessManager twilioAccessManager) {
-                                        org.junit.Assert.assertNotNull(twilioAccessManager);
-                                        org.junit.Assert.assertEquals(token, twilioAccessManager.getToken());
+                                        assertNotNull(twilioAccessManager);
+                                        assertEquals(token, twilioAccessManager.getToken());
 
                                         ConversationsClient client = TwilioConversations.createConversationsClient(twilioAccessManager, new ConversationsClientListener() {
                                             @Override
@@ -64,31 +65,31 @@ public class ListenTest {
 
                                             @Override
                                             public void onStopListeningForInvites(ConversationsClient conversationsClient) {
-                                                org.junit.Assert.fail();
+                                                fail();
                                             }
 
                                             @Override
                                             public void onFailedToStartListening(ConversationsClient conversationsClient, ConversationException e) {
-                                                org.junit.Assert.fail();
+                                                fail();
                                             }
 
                                             @Override
                                             public void onIncomingInvite(ConversationsClient conversationsClient, IncomingInvite incomingInvite) {
-                                                org.junit.Assert.fail();
+                                                fail();
                                             }
 
                                             @Override
                                             public void onIncomingInviteCancelled(ConversationsClient conversationsClient, IncomingInvite incomingInvite) {
-                                                org.junit.Assert.fail();
+                                                fail();
                                             }
                                         });
-                                        org.junit.Assert.assertNotNull(client);
+                                        assertNotNull(client);
                                         client.listen();
                                     }
 
                                     @Override
                                     public void onError (TwilioAccessManager twilioAccessManager, String s){
-                                        org.junit.Assert.fail();
+                                        fail();
                                     }
                                 }
                         );
@@ -96,14 +97,14 @@ public class ListenTest {
 
                     @Override
                     public void onError(Exception e) {
-                        org.junit.Assert.fail();
+                        fail();
                     }
                 });
             }
 
             @Override
             public void failure(RetrofitError error) {
-                org.junit.Assert.fail();
+                fail();
             }
         });
 

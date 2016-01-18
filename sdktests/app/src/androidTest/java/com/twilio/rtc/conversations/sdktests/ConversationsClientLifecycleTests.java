@@ -29,6 +29,8 @@ import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
+import static org.junit.Assert.*;
+
 
 @RunWith(AndroidJUnit4.class)
 public class ConversationsClientLifecycleTests {
@@ -43,13 +45,13 @@ public class ConversationsClientLifecycleTests {
     @Test
     public void testTwilioCreateConversationsClientWithToken() {
         ConversationsClient conversationsClient = createConversationsClient();
-        org.junit.Assert.assertNotNull(conversationsClient);
+        assertNotNull(conversationsClient);
     }
 
     @Test(expected = IllegalStateException.class)
     public void testTwilioCannotListenAfterConversationsClientDisposal() {
         ConversationsClient conversationsClient = createConversationsClient();
-        org.junit.Assert.assertNotNull(conversationsClient);
+        assertNotNull(conversationsClient);
 
         conversationsClient.dispose();
         conversationsClient.listen();
@@ -58,7 +60,7 @@ public class ConversationsClientLifecycleTests {
     @Test(expected = IllegalStateException.class)
     public void testTwilioCannotUnlistenAfterConversationsClientDisposal() {
         ConversationsClient conversationsClient = createConversationsClient();
-        org.junit.Assert.assertNotNull(conversationsClient);
+        assertNotNull(conversationsClient);
 
         conversationsClient.dispose();
         conversationsClient.unlisten();
@@ -67,7 +69,7 @@ public class ConversationsClientLifecycleTests {
     @Test(expected = IllegalStateException.class)
     public void testTwilioCannotCreateConversationAfterConversationsClientDisposal() {
         ConversationsClient conversationsClient = createConversationsClient();
-        org.junit.Assert.assertNotNull(conversationsClient);
+        assertNotNull(conversationsClient);
 
         conversationsClient.dispose();
         Set<String> participants = new HashSet<>();
@@ -95,7 +97,7 @@ public class ConversationsClientLifecycleTests {
     public void testTwilioMultiDisposeConversationsClient() {
         for (int i= 1; i < 50; i++) {
             ConversationsClient conversationsClient = createConversationsClient();
-            org.junit.Assert.assertNotNull(conversationsClient);
+            assertNotNull(conversationsClient);
             conversationsClient.dispose();
         }
     }
@@ -120,12 +122,12 @@ public class ConversationsClientLifecycleTests {
                 ConversationsClient conversationsClient = TwilioConversations.createConversationsClient(TOKEN, new ConversationsClientListener() {
                     @Override
                     public void onStartListeningForInvites(ConversationsClient conversationsClient) {
-                        org.junit.Assert.fail();
+                        fail();
                     }
 
                     @Override
                     public void onStopListeningForInvites(ConversationsClient conversationsClient) {
-                        org.junit.Assert.fail();
+                        fail();
                     }
 
                     @Override
@@ -135,13 +137,13 @@ public class ConversationsClientLifecycleTests {
 
                     @Override
                     public void onIncomingInvite(ConversationsClient conversationsClient, IncomingInvite incomingInvite) {
-                        org.junit.Assert.fail();
+                        fail();
 
                     }
 
                     @Override
                     public void onIncomingInviteCancelled(ConversationsClient conversationsClient, IncomingInvite incomingInvite) {
-                        org.junit.Assert.fail();
+                        fail();
                     }
 
                 });
