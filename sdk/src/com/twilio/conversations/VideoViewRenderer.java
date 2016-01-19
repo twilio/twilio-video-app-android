@@ -11,7 +11,6 @@ import android.view.ViewGroup;
 import com.twilio.conversations.impl.I420Frame;
 
 import org.webrtc.SurfaceViewRenderer;
-import org.webrtc.EglBase;
 import org.webrtc.RendererCommon.ScalingType;
 import org.webrtc.RendererCommon.RendererEvents;
 
@@ -21,9 +20,6 @@ import org.webrtc.RendererCommon.RendererEvents;
  *
  */
 public class VideoViewRenderer implements VideoRenderer {
-    // TODO aalaniz - I am not a huge fan of this but trying to just get something off the ground
-    private static final EglBase rootEglBase = new EglBase();
-
     // Used to ensure that our renderer has a means to post to main thread
     // for renderering events
     private final Handler uiThreadHandler = new Handler(Looper.getMainLooper());
@@ -73,7 +69,8 @@ public class VideoViewRenderer implements VideoRenderer {
 
     private void setupRenderer(final Context context, final ViewGroup container) {
 		container.addView(surfaceViewRenderer);
-        surfaceViewRenderer.init(rootEglBase.getContext(), internalEventListener);
+        surfaceViewRenderer.init(EglBaseProvider.provideEglBase().getContext(),
+                internalEventListener);
                 surfaceViewRenderer.setScalingType(ScalingType.SCALE_ASPECT_FIT);
         surfaceViewRenderer.setMirror(isMirror);
 	}

@@ -13,6 +13,7 @@ import com.twilio.conversations.AudioTrack;
 import com.twilio.conversations.Conversation;
 import com.twilio.conversations.ConversationException;
 import com.twilio.conversations.ConversationListener;
+import com.twilio.conversations.EglBaseProvider;
 import com.twilio.conversations.LocalMedia;
 import com.twilio.conversations.LocalVideoTrack;
 import com.twilio.conversations.Media;
@@ -681,6 +682,7 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 			freeNativeHandle(nativeHandle);
 			nativeHandle = 0;
 		}
+        EglBaseProvider.releaseEglBase();
 		isDisposed = true;
 	}
 
@@ -751,7 +753,6 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 		new Thread(new Runnable() {
 			@Override
 			public void run() {
-
 				start(getNativeHandle(),
 						mediaConstraints.isAudioEnabled(),
 						mediaConstraints.isAudioMuted(),
