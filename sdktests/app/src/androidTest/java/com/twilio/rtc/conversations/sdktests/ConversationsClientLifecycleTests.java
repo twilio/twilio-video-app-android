@@ -192,7 +192,7 @@ public class ConversationsClientLifecycleTests {
     }
 
     @Test
-    public void muteShouldBeSafeToCallOnTheConversation() {
+    public void muteShouldBeSafeToCallAnytimeOnTheConversation() {
         final CountDownLatch initWait = new CountDownLatch(1);
 
         if(!TwilioConversations.isInitialized()) {
