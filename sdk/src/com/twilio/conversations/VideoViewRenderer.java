@@ -3,9 +3,6 @@ package com.twilio.conversations;
 import android.content.Context;
 import android.os.Handler;
 import android.os.Looper;
-import android.provider.MediaStore;
-import android.util.Log;
-import android.view.View;
 import android.view.ViewGroup;
 
 import com.twilio.conversations.impl.I420Frame;
@@ -43,7 +40,7 @@ public class VideoViewRenderer implements VideoRenderer {
     };
 
     private final SurfaceViewRenderer surfaceViewRenderer;
-    private final boolean isMirror;
+    private final boolean mirror;
     private VideoRendererObserver rendererObserver;
 
     public VideoViewRenderer(Context context, ViewGroup container) {
@@ -57,9 +54,9 @@ public class VideoViewRenderer implements VideoRenderer {
 	 */
 	public VideoViewRenderer(Context context,
                              ViewGroup container,
-                             boolean isMirror) {
+                             boolean mirror) {
         this.surfaceViewRenderer = new SurfaceViewRenderer(context);
-        this.isMirror = isMirror;
+        this.mirror = mirror;
         setupRenderer(context, container);
 	}
 
@@ -72,7 +69,7 @@ public class VideoViewRenderer implements VideoRenderer {
         surfaceViewRenderer.init(EglBaseProvider.provideEglBase().getContext(),
                 internalEventListener);
                 surfaceViewRenderer.setScalingType(ScalingType.SCALE_ASPECT_FIT);
-        surfaceViewRenderer.setMirror(isMirror);
+        surfaceViewRenderer.setMirror(mirror);
 	}
 
 	@Override
