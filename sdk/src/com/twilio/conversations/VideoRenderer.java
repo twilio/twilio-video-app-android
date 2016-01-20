@@ -12,6 +12,6 @@ public interface VideoRenderer {
 	 *
 	 * @param frame I420 YUV frame
 	 */
-	public void renderFrame(I420Frame frame);
+	void renderFrame(I420Frame frame);
 }
 
