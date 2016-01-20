@@ -40,12 +40,9 @@ public class VideoViewRenderer implements VideoRenderer {
     };
 
     private final SurfaceViewRenderer surfaceViewRenderer;
-    private final boolean mirror;
+    private boolean mirror;
     private VideoRendererObserver rendererObserver;
 
-    public VideoViewRenderer(Context context, ViewGroup container) {
-        this(context, container, false);
-    }
 	/**
 	 * Create a video view renderer that will display frames in
 	 * the provided container
@@ -53,12 +50,20 @@ public class VideoViewRenderer implements VideoRenderer {
 	 * @param container The view where the frames should be rendered
 	 */
 	public VideoViewRenderer(Context context,
-                             ViewGroup container,
-                             boolean mirror) {
+                             ViewGroup container) {
         this.surfaceViewRenderer = new SurfaceViewRenderer(context);
-        this.mirror = mirror;
         setupRenderer(context, container);
 	}
+
+    public boolean getMirror() {
+        return mirror;
+    }
+
+    public void setMirror(boolean mirror) {
+        this.mirror = mirror;
+        surfaceViewRenderer.setMirror(mirror);
+        refreshRenderer();
+    }
 
     public void setObserver(VideoRendererObserver rendererObserver) {
         this.rendererObserver = rendererObserver;
@@ -69,7 +74,6 @@ public class VideoViewRenderer implements VideoRenderer {
         surfaceViewRenderer.init(EglBaseProvider.provideEglBase().getContext(),
                 internalEventListener);
                 surfaceViewRenderer.setScalingType(ScalingType.SCALE_ASPECT_FIT);
-        surfaceViewRenderer.setMirror(mirror);
 	}
 
 	@Override
