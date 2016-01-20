@@ -13,7 +13,6 @@ import com.twilio.conversations.AudioTrack;
 import com.twilio.conversations.Conversation;
 import com.twilio.conversations.ConversationException;
 import com.twilio.conversations.ConversationListener;
-import com.twilio.conversations.EglBaseProvider;
 import com.twilio.conversations.LocalMedia;
 import com.twilio.conversations.LocalVideoTrack;
 import com.twilio.conversations.Media;
