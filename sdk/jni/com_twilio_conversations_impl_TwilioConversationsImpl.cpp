@@ -32,7 +32,7 @@ extern "C" jint JNIEXPORT JNICALL JNI_OnLoad(JavaVM *jvm, void *reserved) {
     TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK, kTSCoreLogLevelDebug, "JNI_OnLoad");
     jint ret = InitGlobalJniVariables(jvm);
     if (ret < 0) {
-		TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK, kTSCoreLogLevelError, "InitGlobalJniVariables() failed");
+        TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK, kTSCoreLogLevelError, "InitGlobalJniVariables() failed");
         return -1;
     }
     LoadGlobalClassReferenceHolder();
@@ -46,11 +46,11 @@ extern "C" void JNIEXPORT JNICALL JNI_OnUnLoad(JavaVM *jvm, void *reserved) {
 }
 
 static TwilioCommon::AccessManager* getNativeAccessMgrFromJava(JNIEnv* jni, jobject j_accessMgr) {
-  jclass j_accessManagerClass = GetObjectClass(jni, j_accessMgr);
-  jmethodID getNativeHandleId = GetMethodID(jni, j_accessManagerClass, "getNativeHandle", "()J");
+    jclass j_accessManagerClass = GetObjectClass(jni, j_accessMgr);
+    jmethodID getNativeHandleId = GetMethodID(jni, j_accessManagerClass, "getNativeHandle", "()J");
 
-  jlong j_am = jni->CallLongMethod(j_accessMgr, getNativeHandleId);
-  return reinterpret_cast<TwilioCommon::AccessManager*>(j_am);
+    jlong j_am = jni->CallLongMethod(j_accessMgr, getNativeHandleId);
+    return reinterpret_cast<TwilioCommon::AccessManager*>(j_am);
 }
 
 /*
@@ -59,68 +59,68 @@ static TwilioCommon::AccessManager* getNativeAccessMgrFromJava(JNIEnv* jni, jobj
  * Signature: (Landroid/content/Context;)Z
  */
 JNIEXPORT jboolean JNICALL Java_com_twilio_conversations_impl_TwilioConversationsImpl_initCore(JNIEnv *env, jobject obj, jobject context) {
-	bool failure = false;
+    bool failure = false;
 
-	TSCSDK* tscSdk = TSCSDK::instance();
-	TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK, kTSCoreLogLevelDebug, "Initialized tscsdk");
+    TSCSDK* tscSdk = TSCSDK::instance();
+    TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK, kTSCoreLogLevelDebug, "Initialized tscsdk");
 
     AndroidNetworkMonitor::SetAndroidContext(env, context);
     webrtc::OpenSLESPlayer::SetAndroidAudioDeviceObjects(GetJVM(), context);
-	failure |= webrtc::SetRenderAndroidVM(GetJVM());
-	failure |= webrtc_jni::AndroidVideoCapturerJni::SetAndroidObjects(env, context);
-	failure |= webrtc::VoiceEngine::SetAndroidObjects(GetJVM(), context);
+    failure |= webrtc::SetRenderAndroidVM(GetJVM());
+    failure |= webrtc_jni::AndroidVideoCapturerJni::SetAndroidObjects(env, context);
+    failure |= webrtc::VoiceEngine::SetAndroidObjects(GetJVM(), context);
 
-	if (tscSdk != NULL &&
+    if (tscSdk != NULL &&
             tscSdk->isInitialized() &&
             !failure) {
-		return JNI_TRUE;
-	}
+        return JNI_TRUE;
+    }
 
-	return JNI_FALSE;
+    return JNI_FALSE;
 }
 
 JNIEXPORT jlong JNICALL Java_com_twilio_conversations_impl_TwilioConversationsImpl_createEndpoint
-  (JNIEnv *env, jobject obj, jobject j_accessMgr, jlong nativeEndpointObserver) {
-	TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK, kTSCoreLogLevelDebug, "createEndpoint");
+(JNIEnv *env, jobject obj, jobject j_accessMgr, jlong nativeEndpointObserver) {
+    TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK, kTSCoreLogLevelDebug, "createEndpoint");
 
-	TSCOptions options;
+    TSCOptions options;
 
-	if (!nativeEndpointObserver) {
-		TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK, kTSCoreLogLevelError, "nativeEndpointObserver is null");
-		return 0;
-	}
+    if (!nativeEndpointObserver) {
+        TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK, kTSCoreLogLevelError, "nativeEndpointObserver is null");
+        return 0;
+    }
 
-	TSCEndpointObserverPtr *endpointObserver = reinterpret_cast<TSCEndpointObserverPtr *>(nativeEndpointObserver);
-	TwilioCommon::AccessManager* accessManager = getNativeAccessMgrFromJava(env, j_accessMgr);
+    TSCEndpointObserverPtr *endpointObserver = reinterpret_cast<TSCEndpointObserverPtr *>(nativeEndpointObserver);
+    TwilioCommon::AccessManager* accessManager = getNativeAccessMgrFromJava(env, j_accessMgr);
 
-	if (accessManager == NULL) {
-		TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK, kTSCoreLogLevelError, "AccessManager is null");
-		return 0;
-	}
+    if (accessManager == NULL) {
+        TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK, kTSCoreLogLevelError, "AccessManager is null");
+        return 0;
+    }
 
-	if (accessManager->getToken().empty()) {
-		TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK, kTSCoreLogLevelError, "token is null");
-		return 0;
-	}
+    if (accessManager->getToken().empty()) {
+        TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK, kTSCoreLogLevelError, "token is null");
+        return 0;
+    }
 
-	TS_CORE_LOG_DEBUG("access token is:%s", accessManager->getToken().c_str());
+    TS_CORE_LOG_DEBUG("access token is:%s", accessManager->getToken().c_str());
 
-	TSCEndpointPtr *endpoint = new TSCEndpointPtr();
-	*endpoint = TSCSDK::instance()->createEndpoint(options, accessManager, *endpointObserver);
+    TSCEndpointPtr *endpoint = new TSCEndpointPtr();
+    *endpoint = TSCSDK::instance()->createEndpoint(options, accessManager, *endpointObserver);
 
-	return jlongFromPointer(endpoint);
+    return jlongFromPointer(endpoint);
 }
 
 
 JNIEXPORT void JNICALL Java_com_twilio_conversations_impl_TwilioConversationsImpl_setCoreLogLevel
-  (JNIEnv *env, jobject obj, jint level) {
-	TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK, kTSCoreLogLevelDebug, "setCoreLogLevel");
-	TSCoreLogLevel coreLogLevel = static_cast<TSCoreLogLevel>(level);
-	TSCLogger::instance()->setLogLevel(coreLogLevel);
+(JNIEnv *env, jobject obj, jint level) {
+    TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK, kTSCoreLogLevelDebug, "setCoreLogLevel");
+    TSCoreLogLevel coreLogLevel = static_cast<TSCoreLogLevel>(level);
+    TSCLogger::instance()->setLogLevel(coreLogLevel);
 }
 
 JNIEXPORT jint JNICALL Java_com_twilio_conversations_impl_TwilioConversationsImpl_getCoreLogLevel
-  (JNIEnv *env, jobject obj) {
-	TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK, kTSCoreLogLevelDebug, "getCoreLogLevel");
-        return TSCLogger::instance()->getLogLevel();
+(JNIEnv *env, jobject obj) {
+    TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK, kTSCoreLogLevelDebug, "getCoreLogLevel");
+    return TSCLogger::instance()->getLogLevel();
 }
