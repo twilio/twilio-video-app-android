@@ -61,7 +61,6 @@ static TwilioCommon::AccessManager* getNativeAccessMgrFromJava(JNIEnv* jni, jobj
 JNIEXPORT jboolean JNICALL Java_com_twilio_conversations_impl_TwilioConversationsImpl_initCore(JNIEnv *env, jobject obj, jobject context) {
 	bool failure = false;
 
-	TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK, kTSCoreLogLevelDebug, "Initialized globals and classes");
 	TSCSDK* tscSdk = TSCSDK::instance();
 	TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK, kTSCoreLogLevelDebug, "Initialized tscsdk");
 
