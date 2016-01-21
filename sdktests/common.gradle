@@ -43,7 +43,7 @@ dependencies {
 
     // Support library dependency
     compile 'com.android.support:appcompat-v7:23.1.0'
-    compile 'com.twilio.sdk:twilio-common-android:0.1.7'
+    compile 'com.twilio.sdk:twilio-common-android:0.1.17'
 
     // Testing-only dependencies
     androidTestCompile 'com.android.support:support-annotations:23.1.0'
