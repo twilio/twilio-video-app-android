@@ -68,7 +68,7 @@ public class ConversationTests {
 
                 @Override
                 public void onError(Exception e) {
-                    fail();
+                    fail(e.getMessage());
                 }
             });
         } else {
@@ -179,7 +179,7 @@ public class ConversationTests {
 
             @Override
             public void failure(RetrofitError error) {
-                fail();
+                fail(error.getMessage());
             }
         });
 
