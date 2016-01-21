@@ -19,6 +19,7 @@ import com.twilio.conversations.Participant;
 import com.twilio.conversations.TwilioConversations;
 import com.twilio.rtc.conversations.sdktests.utils.TwilioConversationsUtils;
 
+import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -39,7 +40,7 @@ public class ConversationsClientSendInviteTests {
     @Test(expected = IllegalStateException.class)
     public void testTwilioCannotSendInviteWithNullParticipantSet() {
         ConversationsClient conversationsClient = createConversationsClient();
-        org.junit.Assert.assertNotNull(conversationsClient);
+        Assert.assertNotNull(conversationsClient);
 
         LocalMedia localMedia = LocalMediaFactory.createLocalMedia(localMediaListener());
 
@@ -49,7 +50,7 @@ public class ConversationsClientSendInviteTests {
     @Test(expected = IllegalStateException.class)
     public void testTwilioCannotSendInviteWithNullLocalMedia() {
         ConversationsClient conversationsClient = createConversationsClient();
-        org.junit.Assert.assertNotNull(conversationsClient);
+        Assert.assertNotNull(conversationsClient);
 
         Set<String> participants = new HashSet<>();
         participants.add(PARTICIPANT);
@@ -60,7 +61,7 @@ public class ConversationsClientSendInviteTests {
     @Test(expected = IllegalStateException.class)
     public void testTwilioCannotSendInviteWithNullConversationCallback() {
         ConversationsClient conversationsClient = createConversationsClient();
-        org.junit.Assert.assertNotNull(conversationsClient);
+        Assert.assertNotNull(conversationsClient);
 
         LocalMedia localMedia = LocalMediaFactory.createLocalMedia(localMediaListener());
 
@@ -73,7 +74,7 @@ public class ConversationsClientSendInviteTests {
     @Test(expected = IllegalStateException.class)
     public void testTwilioCannotSendInviteWithEmptyParticipantSet() {
         ConversationsClient conversationsClient = createConversationsClient();
-        org.junit.Assert.assertNotNull(conversationsClient);
+        Assert.assertNotNull(conversationsClient);
 
         LocalMedia localMedia = LocalMediaFactory.createLocalMedia(localMediaListener());
 
@@ -85,7 +86,7 @@ public class ConversationsClientSendInviteTests {
     @Test(expected = IllegalArgumentException.class)
     public void testTwilioCannotSendInviteIfOneOfParticipantsIsNull() {
         ConversationsClient conversationsClient = createConversationsClient();
-        org.junit.Assert.assertNotNull(conversationsClient);
+        Assert.assertNotNull(conversationsClient);
 
         LocalMedia localMedia = LocalMediaFactory.createLocalMedia(localMediaListener());
 
@@ -99,7 +100,7 @@ public class ConversationsClientSendInviteTests {
     @Test(expected = IllegalArgumentException.class)
     public void testTwilioCannotSendInviteIfOneOfParticipantsIsEmptyString() {
         ConversationsClient conversationsClient = createConversationsClient();
-        org.junit.Assert.assertNotNull(conversationsClient);
+        Assert.assertNotNull(conversationsClient);
 
         LocalMedia localMedia = LocalMediaFactory.createLocalMedia(localMediaListener());
 
