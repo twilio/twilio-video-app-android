@@ -182,6 +182,11 @@ public class ConversationsClientImpl implements
 		if(conversationCallback == null) {
 			throw new IllegalStateException("A ConversationCallback is required to retrieve the conversation");
 		}
+		for (String participant : participants) {
+			if (participant == null || participant.isEmpty() ) {
+				throw new IllegalArgumentException("Participant cannot be an empty string");
+			}
+		}
 
 		ConversationImpl outgoingConversationImpl = ConversationImpl.createOutgoingConversation(
 				this, participants, localMedia, this, this);
