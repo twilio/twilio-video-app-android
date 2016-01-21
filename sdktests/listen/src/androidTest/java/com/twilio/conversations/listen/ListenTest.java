@@ -97,14 +97,14 @@ public class ListenTest {
 
                     @Override
                     public void onError(Exception e) {
-                        fail();
+                        fail(e.getMessage());
                     }
                 });
             }
 
             @Override
             public void failure(RetrofitError error) {
-                fail();
+                fail(error.getMessage());
             }
         });
 
