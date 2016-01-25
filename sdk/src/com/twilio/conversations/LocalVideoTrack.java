@@ -14,7 +14,7 @@ public interface LocalVideoTrack extends VideoTrack {
 	public CameraCapturer getCameraCapturer();
 
 	/**
-	 * Specifies whether or not your camera video is being shared
+	 * Specifies whether or not your camera video is shared
 	 *
 	 * @param enabled <code>true</code> if camera should be shared, false otherwise
 	 * @return true if the operation succeeded.
