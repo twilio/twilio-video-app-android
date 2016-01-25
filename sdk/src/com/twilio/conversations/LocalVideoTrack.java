@@ -17,8 +17,9 @@ public interface LocalVideoTrack extends VideoTrack {
 	 * Specifies whether or not your camera video is being shared
 	 *
 	 * @param enabled <code>true</code> if camera should be shared, false otherwise
+	 * @return true if the operation succeeded.
 	 */
-	public void enableCamera(boolean enabled);
+	public boolean enableCamera(boolean enabled);
 
 	/**
 	 * Returns whether or not your camera video is being shared
