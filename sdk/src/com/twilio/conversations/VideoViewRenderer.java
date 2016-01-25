@@ -6,11 +6,14 @@ import android.os.Looper;
 import android.view.ViewGroup;
 
 import com.twilio.conversations.impl.EglBaseProvider;
-import com.twilio.conversations.impl.I420Frame;
 
 import org.webrtc.SurfaceViewRenderer;
 import org.webrtc.RendererCommon.ScalingType;
 import org.webrtc.RendererCommon.RendererEvents;
+
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+import java.nio.ByteBuffer;
 
 /**
  * A VideoViewRenderer receives frames from a {@link VideoTrack} and
@@ -44,17 +47,17 @@ public class VideoViewRenderer implements VideoRenderer {
     private boolean mirror;
     private VideoRendererObserver rendererObserver;
 
-	/**
-	 * Create a video view renderer that will display frames in
-	 * the provided container
-	 * @param context Activity context
-	 * @param container The view where the frames should be rendered
-	 */
-	public VideoViewRenderer(Context context,
+    /**
+     * Create a video view renderer that will display frames in
+     * the provided container
+     * @param context Activity context
+     * @param container The view where the frames should be rendered
+     */
+    public VideoViewRenderer(Context context,
                              ViewGroup container) {
         this.surfaceViewRenderer = new SurfaceViewRenderer(context);
         setupRenderer(context, container);
-	}
+    }
 
     public boolean getMirror() {
         return mirror;
@@ -71,16 +74,16 @@ public class VideoViewRenderer implements VideoRenderer {
     }
 
     private void setupRenderer(final Context context, final ViewGroup container) {
-		container.addView(surfaceViewRenderer);
+        container.addView(surfaceViewRenderer);
         surfaceViewRenderer.init(EglBaseProvider.provideEglBase().getContext(),
                 internalEventListener);
-                surfaceViewRenderer.setScalingType(ScalingType.SCALE_ASPECT_FIT);
-	}
+        surfaceViewRenderer.setScalingType(ScalingType.SCALE_ASPECT_FIT);
+    }
 
-	@Override
-	public void renderFrame(I420Frame i420) {
-        surfaceViewRenderer.renderFrame(i420.frame);
-	}
+    @Override
+    public void renderFrame(I420Frame frame) {
+        surfaceViewRenderer.renderFrame(convertToWebRtcFrame(frame));
+    }
 
     private void refreshRenderer() {
         uiThreadHandler.post(new Runnable() {
@@ -91,5 +94,33 @@ public class VideoViewRenderer implements VideoRenderer {
                 }
             }
         });
+    }
+
+    private org.webrtc.VideoRenderer.I420Frame convertToWebRtcFrame(I420Frame frame) {
+        try {
+            Constructor<org.webrtc.VideoRenderer.I420Frame> i420FrameConstructor =
+                    org.webrtc.VideoRenderer.I420Frame.class
+                            .getDeclaredConstructor(int.class,
+                                    int.class,
+                                    int.class,
+                                    int[].class,
+                                    ByteBuffer[].class,
+                                    long.class);
+            i420FrameConstructor.setAccessible(true);
+            return i420FrameConstructor.newInstance(frame.width,
+                    frame.height,
+                    frame.rotationDegree,
+                    frame.yuvStrides,
+                    frame.yuvPlanes,
+                    frame.nativeFramePointer);
+        } catch (InvocationTargetException e) {
+            throw new RuntimeException("Unable to transform I420 frame");
+        } catch (NoSuchMethodException e) {
+            throw new RuntimeException("Unable to transform I420 frame");
+        } catch (InstantiationException e) {
+            throw new RuntimeException("Unable to transform I420 frame");
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException("Unable to transform I420 frame");
+        }
     }
 }

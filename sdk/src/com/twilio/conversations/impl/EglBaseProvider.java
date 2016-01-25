@@ -1,4 +1,4 @@
-package com.twilio.conversations;
+package com.twilio.conversations.impl;
 
 import org.webrtc.EglBase;
 

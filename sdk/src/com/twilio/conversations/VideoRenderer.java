@@ -1,7 +1,5 @@
 package com.twilio.conversations;
 
-import com.twilio.conversations.impl.I420Frame;
-
 /**
  * A VideoRenderer is used to receive frames from a {@link VideoTrack}
  *
