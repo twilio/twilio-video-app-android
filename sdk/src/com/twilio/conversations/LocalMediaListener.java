@@ -9,20 +9,20 @@ public interface LocalMediaListener {
 
 	/**
 	 * This method notifies the listener when a {@link LocalVideoTrack} has been added
-	 * to the {@link Conversation}
+	 * to the {@link LocalMedia}
 	 *
-	 * @param conversation The conversation.
+	 * @param localMedia The local media associated with this track.
 	 * @param videoTrack The local video track that was added to the conversation.
 	 */
-	void onLocalVideoTrackAdded(Conversation conversation, LocalVideoTrack videoTrack);
+	void onLocalVideoTrackAdded(LocalMedia localMedia, LocalVideoTrack videoTrack);
 
 	/**
 	 * This method notifies the listener when a {@link LocalVideoTrack} has been removed
-	 * from the {@link Conversation}
+	 * from the {@link LocalMedia}
 	 *
-	 * @param conversation The conversation.
+	 * @param localMedia The local media associated with this track.
 	 * @param videoTrack The local video track that was removed from the conversation.
 	 */
-	void onLocalVideoTrackRemoved(Conversation conversation, LocalVideoTrack videoTrack);
+	void onLocalVideoTrackRemoved(LocalMedia localMedia, LocalVideoTrack videoTrack);
 
 }
