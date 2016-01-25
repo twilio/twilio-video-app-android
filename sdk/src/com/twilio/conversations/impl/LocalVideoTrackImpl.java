@@ -23,7 +23,7 @@ public class LocalVideoTrackImpl extends VideoTrackImpl implements  LocalVideoTr
 		if (videoTrack != null) {
 			return videoTrack.setEnabled(enabled);
 		}
-		return false;
+		return cameraCapturer != null;
 	}
 
 	@Override
@@ -32,7 +32,7 @@ public class LocalVideoTrackImpl extends VideoTrackImpl implements  LocalVideoTr
 		if (videoTrack != null) {
 			return videoTrack.enabled();
 		}
-		return false;
+		return cameraCapturer != null;
 	}
 
 	void removeCameraCapturer() {
