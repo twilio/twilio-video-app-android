@@ -69,21 +69,20 @@ public class LocalMediaImpl implements LocalMedia {
 	}
 
 	@Override
-	public void addLocalVideoTrack(LocalVideoTrack track)
+	public boolean addLocalVideoTrack(LocalVideoTrack track)
 			throws IllegalArgumentException, UnsupportedOperationException {
 		if (track == null) {
 			throw new NullPointerException("LocalVideoTrack can't be null");
 		}
 		if (track instanceof LocalVideoTrackImpl) {
 			LocalVideoTrackImpl localVideoTrackImpl = (LocalVideoTrackImpl)track;
-			if (videoTracksImpl.size() < MAX_LOCAL_VIDEO_TRACKS) {
-				videoTracksImpl.add(localVideoTrackImpl);
-			} else {
+			if (videoTracksImpl.size() >= MAX_LOCAL_VIDEO_TRACKS) {
 				throw new UnsupportedOperationException("Maximum size " + MAX_LOCAL_VIDEO_TRACKS + " of LocalVideoTracks reached.");
 			}
 			if (localVideoTrackImpl.getCameraCapturer() == null) {
-				throw new IllegalArgumentException("LocalVideoTrack must have camera capturer associated with the track");
+				throw new IllegalArgumentException("LocalVideoTrack must have a camera capturer associated with the track");
 			}
+            videoTracksImpl.add(localVideoTrackImpl);
 			if ((convWeak != null) &&  (convWeak.get() != null) ) {
 				// LocalVideoTrack is added during conversation
 				// TODO: we should use localVideoTrackImpl.isCameraEnabled() as second param here,
@@ -97,7 +96,14 @@ public class LocalMediaImpl implements LocalMedia {
 					convWeak.get().setupExternalCapturer();
 				}
 				boolean enabledVideo = convWeak.get().enableVideo(true, false);
-				// TODO: return enableVideo if true
+				if(!enabledVideo) {
+                    // Remove the video track since it failed to be added
+                    videoTracksImpl.remove(localVideoTrackImpl);
+				}
+				return enabledVideo;
+			} else {
+				// The LocalVideoTrack is always added when a conversation is not active
+				return true;
 			}
 		} else {
 			throw new IllegalArgumentException("Only TwilioSDK LocalVideoTrack implementation is supported");
