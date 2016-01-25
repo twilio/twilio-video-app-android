@@ -14,19 +14,19 @@ import com.twilio.conversations.impl.logging.Logger;
 import com.twilio.conversations.impl.util.CallbackHandler;
 
 public class LocalMediaImpl implements LocalMedia {
-	
+
 	private List<LocalVideoTrackImpl> videoTracksImpl = new ArrayList<LocalVideoTrackImpl>();
 	private WeakReference<ConversationImpl> convWeak;
 	private boolean audioEnabled;
 	private boolean audioMuted;
 	private Handler handler;
 	private LocalMediaListener localMediaListener;
-	
+
 	private static int MAX_LOCAL_VIDEO_TRACKS = 1;
-	
+
 	private static String TAG = "LocalMediaImpl";
 	static final Logger logger = Logger.getLogger(LocalMediaImpl.class);
-	
+
 	public LocalMediaImpl(LocalMediaListener localMediaListener) {
 		this.localMediaListener = localMediaListener;
 		audioEnabled = true;
@@ -82,7 +82,7 @@ public class LocalMediaImpl implements LocalMedia {
 			if (localVideoTrackImpl.getCameraCapturer() == null) {
 				throw new IllegalArgumentException("LocalVideoTrack must have a camera capturer associated with the track");
 			}
-            videoTracksImpl.add(localVideoTrackImpl);
+			videoTracksImpl.add(localVideoTrackImpl);
 			if ((convWeak != null) &&  (convWeak.get() != null) ) {
 				// LocalVideoTrack is added during conversation
 				// TODO: we should use localVideoTrackImpl.isCameraEnabled() as second param here,
@@ -97,8 +97,8 @@ public class LocalMediaImpl implements LocalMedia {
 				}
 				boolean enabledVideo = convWeak.get().enableVideo(true, false);
 				if(!enabledVideo) {
-                    // Remove the video track since it failed to be added
-                    videoTracksImpl.remove(localVideoTrackImpl);
+					// Remove the video track since it failed to be added
+					videoTracksImpl.remove(localVideoTrackImpl);
 				}
 				return enabledVideo;
 			} else {
@@ -129,7 +129,7 @@ public class LocalMediaImpl implements LocalMedia {
 		ConversationImpl conv = convWeak.get();
 		return conv.enableVideo(false, false);
 	}
-	
+
 	LocalVideoTrackImpl removeLocalVideoTrack(TrackInfo trackInfo) {
 		for(LocalVideoTrackImpl videoTrackImpl : new ArrayList<LocalVideoTrackImpl>(videoTracksImpl)) {
 			if(trackInfo.getTrackId().equals(videoTrackImpl.getTrackInfo().getTrackId())) {
