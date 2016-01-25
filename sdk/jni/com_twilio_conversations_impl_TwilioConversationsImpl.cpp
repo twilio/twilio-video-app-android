@@ -64,6 +64,7 @@ JNIEXPORT jboolean JNICALL Java_com_twilio_conversations_impl_TwilioConversation
     TSCSDK* tscSdk = TSCSDK::instance();
     TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK, kTSCoreLogLevelDebug, "Initialized tscsdk");
 
+    // TODO investigate relocating some of these calls to more timely locations
     AndroidNetworkMonitor::SetAndroidContext(env, context);
     webrtc::OpenSLESPlayer::SetAndroidAudioDeviceObjects(GetJVM(), context);
     failure |= webrtc::SetRenderAndroidVM(GetJVM());
