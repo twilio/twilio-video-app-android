@@ -15,6 +15,13 @@ extern "C" {
 JNIEXPORT jboolean JNICALL Java_com_twilio_conversations_impl_TwilioConversationsImpl_initCore
   (JNIEnv *, jobject, jobject);
 
+/*
+ * Class:     com_twilio_conversations_impl_TwilioConversationsImpl
+ * Method:    destroyCore
+ * Signature: ()Z
+ */
+JNIEXPORT jboolean JNICALL Java_com_twilio_conversations_impl_TwilioConversationsImpl_destroyCore
+  (JNIEnv *, jobject);
 
 /*
  * Class:     com_twilio_conversations_impl_TwilioConversationsImpl

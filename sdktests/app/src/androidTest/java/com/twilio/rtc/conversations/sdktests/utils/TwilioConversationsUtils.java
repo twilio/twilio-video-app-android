@@ -26,6 +26,12 @@ public class TwilioConversationsUtils {
         wait(waitLatch, TIMEOUT, TimeUnit.SECONDS);
     }
 
+    public static void disposeTwilioSDK() {
+        CountDownLatch waitLatch = new CountDownLatch(1);
+        TwilioConversations.dispose(destroyListener(waitLatch));
+        wait(waitLatch, TIMEOUT, TimeUnit.SECONDS);
+    }
+
     public static boolean isInitialized() {
         return initialized;
     }
@@ -38,13 +44,36 @@ public class TwilioConversationsUtils {
                     initialized = true;
                     wait.countDown();
                 } else {
-                    org.junit.Assert.fail("initalized but initialize was already called");
+                    org.junit.Assert.fail("initialized but initialize was already called");
                 }
             }
 
             @Override
             public void onError(Exception e) {
                 if(!initialized) {
+                    org.junit.Assert.fail(e.getMessage());
+                } else {
+                    wait.countDown();
+                }
+            }
+        };
+    }
+
+    public static TwilioConversations.DestroyListener destroyListener(final CountDownLatch wait) {
+        return new TwilioConversations.DestroyListener() {
+            @Override
+            public void onDestroyed() {
+                if(initialized) {
+                    initialized = false;
+                    wait.countDown();
+                } else {
+                    org.junit.Assert.fail("not intialized by destroyed was called");
+                }
+            }
+
+            @Override
+            public void onError(Exception e) {
+                if(initialized) {
                     org.junit.Assert.fail(e.getMessage());
                 } else {
                     wait.countDown();

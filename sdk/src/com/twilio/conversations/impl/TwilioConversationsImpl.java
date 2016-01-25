@@ -42,6 +42,7 @@ public class TwilioConversationsImpl {
 	protected Context context;
 	private boolean initialized;
 	private boolean initializing;
+    private boolean destroying;
 	private ExecutorService refreshRegExecutor = Executors.newSingleThreadExecutor();
 
 	private class ConnectivityChangeReceiver extends BroadcastReceiver {
@@ -176,6 +177,45 @@ public class TwilioConversationsImpl {
 
 	}
 
+    public void dispose(final TwilioConversations.DestroyListener destroyListener) {
+        // TODO is this too strict? Maybe we should consider allowing multiple dispose calls
+        if (!isInitialized() || isDestroying()) {
+            destroyListener.onError(new RuntimeException("Dispose already called"));
+            return;
+        }
+
+        final Handler handler = CallbackHandler.create();
+        destroying = true;
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                boolean success = destroyCore();
+                destroying = false;
+                if (!success) {
+                    if (handler != null && destroyListener != null) {
+                        handler.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                destroyListener.onError(new RuntimeException("Twilio conversations failed to dispose."));
+                            }
+                        });
+                    }
+                } else {
+                    initialized = false;
+                    if (handler != null && destroyListener != null) {
+                        handler.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                destroyListener.onDestroyed();
+                            }
+                        });
+                    }
+                }
+            }
+
+        }).start();
+    }
+
 	public ConversationsClientImpl createConversationsClient(TwilioAccessManager accessManager, Map<String, String> options, ConversationsClientListener inListener) {
 		if(options != null && accessManager != null) {
 			final ConversationsClientImpl conversationsClient = new ConversationsClientImpl(context, accessManager, inListener);
@@ -247,6 +287,10 @@ public class TwilioConversationsImpl {
 		return initializing;
 	}
 
+    boolean isDestroying() {
+        return destroying;
+    }
+
 	public ConversationsClientImpl findDeviceByUUID(UUID uuid) {
 		synchronized (conversationsClientMap)
 		{
@@ -272,7 +316,7 @@ public class TwilioConversationsImpl {
 	private void registerConnectivityBroadcastReceiver() {
 		if (context != null) {
 			context.registerReceiver(connectivityChangeReceiver,
-					new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
+                    new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
 		}
 	}
 	
@@ -284,6 +328,7 @@ public class TwilioConversationsImpl {
 	}
 
 	private native boolean initCore(Context context);
+    private native boolean destroyCore();
 	private native long createEndpoint(TwilioAccessManager accessManager, long nativeEndpointObserver);
 	private native static void setCoreLogLevel(int level);
 	private native static int getCoreLogLevel();
