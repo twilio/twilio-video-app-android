@@ -152,6 +152,7 @@ public class ConversationsClientImpl implements
 		checkDisposed();
 		if(listening) {
 			unlisten(nativeEndpointHandle);
+			listening = false;
 		}
 	}
 
