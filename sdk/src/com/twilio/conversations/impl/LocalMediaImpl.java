@@ -141,7 +141,7 @@ public class LocalMediaImpl implements LocalMedia {
 	@Override
 	public boolean addMicrophone() {
 		if (!audioEnabled) {
-			enableAudio(true);
+			return enableAudio(true);
 		}
 		return false;
 	}
@@ -149,7 +149,7 @@ public class LocalMediaImpl implements LocalMedia {
 	@Override
 	public boolean removeMicrophone() {
 		if (audioEnabled) {
-			enableAudio(false);
+			return enableAudio(false);
 		}
 		return false;
 	}
