@@ -269,7 +269,7 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 			participantMap.clear();
 
 			final ConversationException e =
-					new ConversationException(error.getDomain(), error.getCode(), error.getMessage());
+					new ConversationException(error.getCode(), error.getMessage());
 			if(conversationListener == null) {
 				if(e.getErrorCode() == TwilioConversations.CONVERSATION_TERMINATED) {
 					conversationsClient.onConversationTerminated(this, e);
@@ -319,7 +319,7 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 			}
 		} else {
 			final ConversationException e =
-					new ConversationException(error.getDomain(), error.getCode(),
+					new ConversationException(error.getCode(),
 							error.getMessage());
 			if(handler != null && conversationListener != null) {
 				handler.post(new Runnable() {
@@ -377,7 +377,7 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 				waitLatch.countDown();
 			}
 		} else {
-			final ConversationException e = new ConversationException(error.getDomain(), error.getCode(), error.getMessage());
+			final ConversationException e = new ConversationException(error.getCode(), error.getMessage());
 			if(handler != null && conversationListener != null) {
 				handler.post(new Runnable() {
 					@Override

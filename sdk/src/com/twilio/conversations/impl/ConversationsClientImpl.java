@@ -27,12 +27,12 @@ import com.twilio.conversations.OutgoingInvite;
 import com.twilio.conversations.Participant;
 import com.twilio.conversations.TwilioConversations;
 import com.twilio.conversations.impl.core.ConversationStateObserver;
+import com.twilio.conversations.impl.core.ConversationStatus;
 import com.twilio.conversations.impl.core.CoreEndpoint;
 import com.twilio.conversations.impl.core.CoreError;
 import com.twilio.conversations.impl.core.EndpointObserver;
 import com.twilio.conversations.impl.core.EndpointState;
 import com.twilio.conversations.impl.core.SessionState;
-import com.twilio.conversations.impl.core.ConversationStatus;
 import com.twilio.conversations.impl.logging.Logger;
 import com.twilio.conversations.impl.util.CallbackHandler;
 
@@ -95,7 +95,7 @@ public class ConversationsClientImpl implements
 	private boolean listening = false;
 	private TwilioAccessManager accessManager;
 	private Handler handler;
-	private EndpointState coreState;
+	private EndpointState endpointState;
 	private Set<ConversationImpl> conversations = new HashSet<ConversationImpl>();
 	private Map<ConversationImpl, OutgoingInviteImpl> pendingOutgoingInvites = new HashMap<ConversationImpl, OutgoingInviteImpl>();
 	private Map<ConversationImpl, IncomingInviteImpl> pendingIncomingInvites = new HashMap<ConversationImpl, IncomingInviteImpl>();
@@ -182,9 +182,21 @@ public class ConversationsClientImpl implements
 		if(conversationCallback == null) {
 			throw new IllegalStateException("A ConversationCallback is required to retrieve the conversation");
 		}
+		for (String participant : participants) {
+			if (participant == null || participant.isEmpty() ) {
+				throw new IllegalArgumentException("Participant cannot be an empty string");
+			}
+		}
 
 		ConversationImpl outgoingConversationImpl = ConversationImpl.createOutgoingConversation(
 				this, participants, localMedia, this, this);
+		
+		if (outgoingConversationImpl == null || outgoingConversationImpl.getNativeHandle() == 0) {
+			ConversationException exception = new ConversationException( TwilioConversations.CLIENT_DISCONNECTED,
+					"Cannot create conversation while reconnecting. Wait for conversations client to reconnect and try again.");
+			conversationCallback.onConversation(null, exception);
+			return null;
+		}
 
 		conversations.add(outgoingConversationImpl);
 		logger.i("Conversations size is now " + conversations.size());
@@ -372,8 +384,7 @@ public class ConversationsClientImpl implements
 		if (error != null) {
 			listening = false;
 			final ConversationException e =
-					new ConversationException(error.getDomain(),
-							error.getCode(), error.getMessage());
+					new ConversationException(error.getCode(), error.getMessage());
 			if (handler != null) {
 				handler.post(new Runnable() {
 					@Override
@@ -413,7 +424,28 @@ public class ConversationsClientImpl implements
 	@Override
 	public void onStateDidChange(EndpointState state) {
 		logger.d("onStateDidChange");
-		coreState = state;
+		EndpointState oldEndpointState = endpointState;
+		endpointState = state;
+		if ((oldEndpointState == EndpointState.RECONNECTING) && (endpointState == EndpointState.REGISTERED)) {
+			if (handler != null) {
+				handler.post(new Runnable() {
+					@Override
+					public void run() {
+						conversationsClientListener.onStartListeningForInvites(ConversationsClientImpl.this);
+					}
+				});
+			}
+			
+		} else if (endpointState == EndpointState.RECONNECTING) {
+			if (handler != null) {
+				handler.post(new Runnable() {
+					@Override
+					public void run() {
+						conversationsClientListener.onStopListeningForInvites(ConversationsClientImpl.this);
+					}
+				});
+			}
+		}
 	}
 
 	@Override

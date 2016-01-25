@@ -6,10 +6,16 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.net.ConnectivityManager;
 import android.os.Handler;
 import android.util.Log;
 
@@ -36,6 +42,24 @@ public class TwilioConversationsImpl {
 	protected Context context;
 	private boolean initialized;
 	private boolean initializing;
+	private ExecutorService refreshRegExecutor = Executors.newSingleThreadExecutor();
+
+	private class ConnectivityChangeReceiver extends BroadcastReceiver {
+
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			if (intent.getAction().equalsIgnoreCase(ConnectivityManager.CONNECTIVITY_ACTION)) {
+					refreshRegExecutor.execute( new Runnable() {
+						@Override
+						public void run() {
+							onNetworkChange();
+						}
+					});
+			}
+		}
+		
+	}
+	private ConnectivityChangeReceiver connectivityChangeReceiver = new ConnectivityChangeReceiver();
 
 	protected final Map<UUID, WeakReference<ConversationsClientImpl>> conversationsClientMap = new HashMap<UUID, WeakReference<ConversationsClientImpl>>();
 
@@ -139,7 +163,12 @@ public class TwilioConversationsImpl {
 				} else {
 					initialized = true;
 					initializing = false;
-					initListener.onInitialized();
+					handler.post(new Runnable() {
+						@Override
+						public void run() {
+							initListener.onInitialized();
+						}
+					});
 				}
 			}
 
@@ -161,6 +190,9 @@ public class TwilioConversationsImpl {
 			conversationsClient.setNativeEndpointHandle(nativeEndpointHandle);
  			synchronized (conversationsClientMap)
 			{
+ 				if (conversationsClientMap.size() == 0) {
+ 					registerConnectivityBroadcastReceiver();
+ 				}
 				conversationsClientMap.put(conversationsClient.getUuid(), new WeakReference<ConversationsClientImpl>(conversationsClient));
 			}
 			return conversationsClient;
@@ -230,10 +262,31 @@ public class TwilioConversationsImpl {
 		}
         	return null;
 	}
+	
+	private void onNetworkChange() {
+		if (initialized && (conversationsClientMap.size() > 0)) {
+			refreshRegistrations();
+		}
+	}
+	
+	private void registerConnectivityBroadcastReceiver() {
+		if (context != null) {
+			context.registerReceiver(connectivityChangeReceiver,
+					new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
+		}
+	}
+	
+	// TODO: We need to call this method once we implement destroy() for TwilioConversations
+	private void unregisterConnectivityBroadcastReceiver() {
+		if (context != null && connectivityChangeReceiver != null) {
+			context.unregisterReceiver(connectivityChangeReceiver);
+		}
+	}
 
 	private native boolean initCore(Context context);
 	private native long createEndpoint(TwilioAccessManager accessManager, long nativeEndpointObserver);
 	private native static void setCoreLogLevel(int level);
 	private native static int getCoreLogLevel();
+	private native void refreshRegistrations();
 
 }
