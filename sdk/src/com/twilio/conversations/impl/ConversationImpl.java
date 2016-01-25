@@ -451,7 +451,7 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 					public void run() {
 						if (localMediaImpl.getLocalMediaListener() != null) {
 							localMediaImpl.getLocalMediaListener().onLocalVideoTrackAdded(
-									ConversationImpl.this, videoTrackImpl);
+									localMediaImpl, videoTrackImpl);
 						}
 					}
 				});
@@ -487,7 +487,7 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 					@Override
 					public void run() {
 						if (localMediaImpl.getLocalMediaListener() != null) {
-							localMediaImpl.getLocalMediaListener().onLocalVideoTrackRemoved(ConversationImpl.this, videoTrack);
+							localMediaImpl.getLocalMediaListener().onLocalVideoTrackRemoved(localMediaImpl, videoTrack);
 						}
 					}
 				});

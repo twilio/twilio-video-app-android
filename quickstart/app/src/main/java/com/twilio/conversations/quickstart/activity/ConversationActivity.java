@@ -576,14 +576,14 @@ public class  ConversationActivity extends AppCompatActivity {
     private LocalMediaListener localMediaListener(){
         return new LocalMediaListener() {
             @Override
-            public void onLocalVideoTrackAdded(Conversation conversation, LocalVideoTrack localVideoTrack) {
+            public void onLocalVideoTrackAdded(LocalMedia localMedia, LocalVideoTrack localVideoTrack) {
                 conversationStatusTextView.setText("onLocalVideoTrackAdded");
                 localVideoRenderer = new VideoViewRenderer(ConversationActivity.this, localContainer);
                 localVideoTrack.addRenderer(localVideoRenderer);
             }
 
             @Override
-            public void onLocalVideoTrackRemoved(Conversation conversation, LocalVideoTrack localVideoTrack) {
+            public void onLocalVideoTrackRemoved(LocalMedia localMedia, LocalVideoTrack localVideoTrack) {
                 conversationStatusTextView.setText("onLocalVideoTrackRemoved");
                 localContainer.removeAllViews();
             }

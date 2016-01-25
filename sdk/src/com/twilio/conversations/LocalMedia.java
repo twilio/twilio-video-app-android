@@ -17,7 +17,7 @@ public interface LocalMedia {
 	 * 
 	 * @param track
 	 */
-	public void addLocalVideoTrack(LocalVideoTrack track);
+	public boolean addLocalVideoTrack(LocalVideoTrack track);
 
 	/**
 	 * Removes the local video track from list of tracks.
