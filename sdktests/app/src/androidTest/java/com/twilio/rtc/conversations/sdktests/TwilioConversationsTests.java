@@ -41,6 +41,13 @@ public class TwilioConversationsTests {
     }
 
     @Test
+    public void testTwilioInitializationAfterDispose() {
+        TwilioConversationsUtils.initializeTwilioSDK(mActivityRule.getActivity().getApplicationContext());
+        TwilioConversationsUtils.disposeTwilioSDK();
+        TwilioConversationsUtils.initializeTwilioSDK(mActivityRule.getActivity().getApplicationContext());
+    }
+
+    @Test
     public void testTwilioInitializeRepeatedly() {
         int attempts = 10;
         final CountDownLatch initLatch = TwilioConversationsUtils.isInitialized() ? new CountDownLatch(0) : new CountDownLatch(1);
