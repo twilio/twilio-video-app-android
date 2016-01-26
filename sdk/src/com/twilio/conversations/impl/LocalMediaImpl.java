@@ -14,23 +14,23 @@ import com.twilio.conversations.impl.logging.Logger;
 import com.twilio.conversations.impl.util.CallbackHandler;
 
 public class LocalMediaImpl implements LocalMedia {
-	
+
 	private List<LocalVideoTrackImpl> videoTracksImpl = new ArrayList<LocalVideoTrackImpl>();
 	private WeakReference<ConversationImpl> convWeak;
-	private boolean microphoneAdded;
-	private boolean microphoneMuted;
+	private boolean audioEnabled;
+	private boolean audioMuted;
 	private Handler handler;
 	private LocalMediaListener localMediaListener;
-	
+
 	private static int MAX_LOCAL_VIDEO_TRACKS = 1;
-	
+
 	private static String TAG = "LocalMediaImpl";
 	static final Logger logger = Logger.getLogger(LocalMediaImpl.class);
-	
+
 	public LocalMediaImpl(LocalMediaListener localMediaListener) {
 		this.localMediaListener = localMediaListener;
-		microphoneAdded = true;
-		microphoneMuted = false;
+		audioEnabled = true;
+		audioMuted = false;
 
 		handler = CallbackHandler.create();
 		if(handler == null) {
@@ -49,10 +49,10 @@ public class LocalMediaImpl implements LocalMedia {
 	@Override
 	public boolean mute(boolean on) {
 		if (convWeak != null && convWeak.get() != null) {
-			microphoneMuted = on;
+			audioMuted = on;
 			return convWeak.get().mute(on);
-		} else if (microphoneMuted != on){
-			microphoneMuted = on;
+		} else if (audioMuted != on){
+			audioMuted = on;
 			return true;
 		}
 		return false;
@@ -60,7 +60,7 @@ public class LocalMediaImpl implements LocalMedia {
 
 	@Override
 	public boolean isMuted() {
-		return microphoneMuted;
+		return audioMuted;
 	}
 
 	@Override
@@ -69,21 +69,20 @@ public class LocalMediaImpl implements LocalMedia {
 	}
 
 	@Override
-	public void addLocalVideoTrack(LocalVideoTrack track)
+	public boolean addLocalVideoTrack(LocalVideoTrack track)
 			throws IllegalArgumentException, UnsupportedOperationException {
 		if (track == null) {
 			throw new NullPointerException("LocalVideoTrack can't be null");
 		}
 		if (track instanceof LocalVideoTrackImpl) {
 			LocalVideoTrackImpl localVideoTrackImpl = (LocalVideoTrackImpl)track;
-			if (videoTracksImpl.size() < MAX_LOCAL_VIDEO_TRACKS) {
-				videoTracksImpl.add(localVideoTrackImpl);
-			} else {
+			if (videoTracksImpl.size() >= MAX_LOCAL_VIDEO_TRACKS) {
 				throw new UnsupportedOperationException("Maximum size " + MAX_LOCAL_VIDEO_TRACKS + " of LocalVideoTracks reached.");
 			}
 			if (localVideoTrackImpl.getCameraCapturer() == null) {
-				throw new IllegalArgumentException("LocalVideoTrack must have camera capturer associated with the track");
+				throw new IllegalArgumentException("LocalVideoTrack must have a camera capturer associated with the track");
 			}
+			videoTracksImpl.add(localVideoTrackImpl);
 			if ((convWeak != null) &&  (convWeak.get() != null) ) {
 				// LocalVideoTrack is added during conversation
 				// TODO: we should use localVideoTrackImpl.isCameraEnabled() as second param here,
@@ -97,7 +96,14 @@ public class LocalMediaImpl implements LocalMedia {
 					convWeak.get().setupExternalCapturer();
 				}
 				boolean enabledVideo = convWeak.get().enableVideo(true, false);
-				// TODO: return enableVideo if true
+				if(!enabledVideo) {
+					// Remove the video track since it failed to be added
+					videoTracksImpl.remove(localVideoTrackImpl);
+				}
+				return enabledVideo;
+			} else {
+				// The LocalVideoTrack is always added when a conversation is not active
+				return true;
 			}
 		} else {
 			throw new IllegalArgumentException("Only TwilioSDK LocalVideoTrack implementation is supported");
@@ -123,7 +129,7 @@ public class LocalMediaImpl implements LocalMedia {
 		ConversationImpl conv = convWeak.get();
 		return conv.enableVideo(false, false);
 	}
-	
+
 	LocalVideoTrackImpl removeLocalVideoTrack(TrackInfo trackInfo) {
 		for(LocalVideoTrackImpl videoTrackImpl : new ArrayList<LocalVideoTrackImpl>(videoTracksImpl)) {
 			if(trackInfo.getTrackId().equals(videoTrackImpl.getTrackInfo().getTrackId())) {
@@ -133,45 +139,45 @@ public class LocalMediaImpl implements LocalMedia {
 		}
 		return null;
 	}
-	
+
 	void setConversation(ConversationImpl conversation) {
 		this.convWeak = new WeakReference<ConversationImpl>(conversation);
 	}
 
 	@Override
 	public boolean addMicrophone() {
-		if (!microphoneAdded) {
-			if (convWeak != null && convWeak.get() != null) {
-				// enable conversation audio
-				microphoneAdded = true;
-				return convWeak.get().enableAudio(true, false);
-			} else {
-				microphoneAdded = true;
-				return true;
-			}
+		if (!audioEnabled) {
+			return enableAudio(true);
 		}
 		return false;
 	}
 
 	@Override
 	public boolean removeMicrophone() {
-		if (microphoneAdded) {
-			if (convWeak != null && convWeak.get() != null) {
-				// disable conversation audio
-				microphoneAdded = false;
-				return convWeak.get().enableAudio(false, false);
-			} else {
-				microphoneAdded = false;
-				return true;
-			}
+		if (audioEnabled) {
+			return enableAudio(false);
 		}
 		return false;
 	}
 
+	private boolean enableAudio(boolean enable) {
+		if (convWeak != null && convWeak.get() != null) {
+			audioEnabled = enable;
+			boolean set = convWeak.get().enableAudio(enable, false);
+			if(set) {
+				// Reset mute to false whenever the microphone state is changed
+				audioMuted = false;
+			}
+			return set;
+		} else {
+			audioEnabled = enable;
+			return true;
+		}
+	}
+
 	@Override
 	public boolean isMicrophoneAdded() {
-		return microphoneAdded;
+		return audioEnabled;
 	}
-	
-	
+
 }

@@ -175,12 +175,12 @@ public class ConversationsClientSendInviteTests {
     private LocalMediaListener localMediaListener(){
         return new LocalMediaListener() {
             @Override
-            public void onLocalVideoTrackAdded(Conversation conversation, LocalVideoTrack localVideoTrack) {
+            public void onLocalVideoTrackAdded(LocalMedia localMedia, LocalVideoTrack localVideoTrack) {
 
             }
 
             @Override
-            public void onLocalVideoTrackRemoved(Conversation conversation, LocalVideoTrack localVideoTrack) {
+            public void onLocalVideoTrackRemoved(LocalMedia localMedia, LocalVideoTrack localVideoTrack) {
 
             }
         };
