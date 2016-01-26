@@ -183,6 +183,9 @@ public class TwilioConversationsImpl {
             return;
         }
 
+        // No need to monitor network changes anymore
+        unregisterConnectivityBroadcastReceiver();
+
         final Handler handler = CallbackHandler.create();
         destroying = true;
         new Thread(new Runnable() {
@@ -319,7 +322,6 @@ public class TwilioConversationsImpl {
         }
     }
 
-    // TODO: We need to call this method once we implement destroy() for TwilioConversations
     private void unregisterConnectivityBroadcastReceiver() {
         if (context != null && connectivityChangeReceiver != null) {
             context.unregisterReceiver(connectivityChangeReceiver);
