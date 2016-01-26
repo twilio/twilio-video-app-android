@@ -145,24 +145,27 @@ public class LocalMediaImpl implements LocalMedia {
 	}
 
 	@Override
-	public boolean addMicrophone() {
+	public synchronized boolean addMicrophone() {
 		if (!audioEnabled) {
-			return enableAudio(true);
+			audioEnabled = enableAudio(true);
+			return audioEnabled;
+		} else {
+			return false;
 		}
-		return false;
 	}
 
 	@Override
-	public boolean removeMicrophone() {
+	public synchronized boolean removeMicrophone() {
 		if (audioEnabled) {
-			return enableAudio(false);
+			audioEnabled = !enableAudio(false);
+			return !audioEnabled;
+		} else {
+			return false;
 		}
-		return false;
 	}
 
 	private boolean enableAudio(boolean enable) {
 		if (convWeak != null && convWeak.get() != null) {
-			audioEnabled = enable;
 			boolean set = convWeak.get().enableAudio(enable, false);
 			if(set) {
 				// Reset mute to false whenever the microphone state is changed
@@ -170,7 +173,7 @@ public class LocalMediaImpl implements LocalMedia {
 			}
 			return set;
 		} else {
-			audioEnabled = enable;
+			// No conversation is active. Always return true
 			return true;
 		}
 	}
