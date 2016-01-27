@@ -14,34 +14,34 @@ public interface ConversationsClient {
 	 *
 	 * @param listener A listener for client events.
 	 */
-	public void setConversationsClientListener(ConversationsClientListener listener);
+	void setConversationsClientListener(ConversationsClientListener listener);
 
 	/**
 	 * Get identity of this conversations client on the network.
 	 *
 	 * @return identity of this conversations client
  	 */
-	public String getIdentity();
+	String getIdentity();
 
 	/**
 	 * Reflects current listening state of the conversations client
 	 * 
 	 * @return <code>true</code> if conversations client is listening, </code>false</code> otherwise.
  	 */
-	public boolean isListening();
+	boolean isListening();
 
 	/**
 	 * Starts listening for incoming conversations.
 	 * 
 	 */
-	public void listen();
+	void listen();
 
 	/**
 	 * 
 	 * Stops listening for incoming conversations.
 	 * 
 	 */
-	public void unlisten();
+	void unlisten();
 
 	/**
 	 * Sends an invitation to start a conversation with the following participants and local media configuration
@@ -51,14 +51,14 @@ public interface ConversationsClient {
 	 * @param conversationCallback The callback that will provide the conversation once it's been created
 	 * @throws ConversationClientException
 	 */
-	public OutgoingInvite sendConversationInvite(Set<String> participants, LocalMedia localMedia, ConversationCallback conversationCallback);
+	OutgoingInvite sendConversationInvite(Set<String> participants, LocalMedia localMedia, ConversationCallback conversationCallback);
 
 	/**
 	 * Releases resources associated with this ConversationsClient object.
 	 * 
 	 * Attempts to use this ConversationsClient object after disposal will result in an IllegalStateException.
 	 */
-	public void dispose();
+	void dispose();
 
 	/**
 	 * Sets the audio output speaker for the device.
@@ -70,13 +70,12 @@ public interface ConversationsClient {
 	 * 
 	 * @param audioOutput that should be used by the system
 	 */
-	public void setAudioOutput(AudioOutput audioOutput);
+	void setAudioOutput(AudioOutput audioOutput);
 
 	/**
 	 * Audio output speaker for the current client device
 	 * 
 	 * @return audio output speaker
 	 */
-	public AudioOutput getAudioOutput();
-
+	AudioOutput getAudioOutput();
 }
