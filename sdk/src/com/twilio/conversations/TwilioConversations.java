@@ -149,8 +149,8 @@ public class TwilioConversations {
      * Dispose the Twilio Conversations SDK
      *
      */
-    public static boolean destroy() {
-        return TwilioConversationsImpl.getInstance().destroy();
+    public static void destroy() {
+        TwilioConversationsImpl.getInstance().destroy();
     }
 
     /**

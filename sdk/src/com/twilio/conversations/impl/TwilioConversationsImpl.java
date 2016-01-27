@@ -181,14 +181,14 @@ public class TwilioConversationsImpl {
 
     }
 
-    public boolean destroy() {
+    public void destroy() {
         if (observingConnectivity) {
             // No need to monitor network changes anymore
             unregisterConnectivityBroadcastReceiver();
         }
 
         // TODO destroy investigate making this asynchronous
-        return destroyCore();
+        destroyCore();
     }
 
     public ConversationsClientImpl createConversationsClient(TwilioAccessManager accessManager, Map<String, String> options, ConversationsClientListener inListener) {
@@ -300,7 +300,7 @@ public class TwilioConversationsImpl {
     }
 
     private native boolean initCore(Context context);
-    private native boolean destroyCore();
+    private native void destroyCore();
     private native long createEndpoint(TwilioAccessManager accessManager, long nativeEndpointObserver);
     private native static void setCoreLogLevel(int level);
     private native static int getCoreLogLevel();

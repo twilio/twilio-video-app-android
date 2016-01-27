@@ -18,9 +18,9 @@ JNIEXPORT jboolean JNICALL Java_com_twilio_conversations_impl_TwilioConversation
 /*
  * Class:     com_twilio_conversations_impl_TwilioConversationsImpl
  * Method:    destroyCore
- * Signature: ()Z
+ * Signature: ()J
  */
-JNIEXPORT jboolean JNICALL Java_com_twilio_conversations_impl_TwilioConversationsImpl_destroyCore
+JNIEXPORT void JNICALL Java_com_twilio_conversations_impl_TwilioConversationsImpl_destroyCore
   (JNIEnv *, jobject);
 
 /*
