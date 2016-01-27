@@ -145,7 +145,7 @@ public class LocalMediaImpl implements LocalMedia {
 	}
 
 	@Override
-	public synchronized boolean addMicrophone() {
+	public boolean addMicrophone() {
 		if (!audioEnabled) {
 			audioEnabled = enableAudio(true);
 			return audioEnabled;
@@ -155,7 +155,7 @@ public class LocalMediaImpl implements LocalMedia {
 	}
 
 	@Override
-	public synchronized boolean removeMicrophone() {
+	public boolean removeMicrophone() {
 		if (audioEnabled) {
 			audioEnabled = !enableAudio(false);
 			return !audioEnabled;
