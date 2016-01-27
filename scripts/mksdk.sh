@@ -32,7 +32,6 @@ JAVADOC_SOURCE_FILES="
     VideoTrack.java
     MediaTrack.java
     TrackOrigin.java
-    I420Frame.java
     VideoRenderer.java
     VideoViewRenderer.java
     VideoRendererObserver.java"

@@ -4,7 +4,8 @@ import java.io.IOException;
 import java.lang.reflect.Field;
 
 import org.webrtc.VideoCapturerAndroid;
-import org.webrtc.VideoCapturerAndroid.CameraErrorHandler;
+import org.webrtc.VideoCapturerAndroid.CameraEventsHandler;
+import org.webrtc.CameraEnumerationAndroid;
 
 import android.content.Context;
 import android.hardware.Camera;
@@ -81,14 +82,14 @@ public class CameraCapturerImpl implements CameraCapturer {
 	private int getCameraId() {
 		String deviceName;
 		if(source == CameraSource.CAMERA_SOURCE_BACK_CAMERA) {
-			 deviceName = VideoCapturerAndroid.getNameOfBackFacingDevice();
+			 deviceName = CameraEnumerationAndroid.getNameOfBackFacingDevice();
 		} else {
-			deviceName = VideoCapturerAndroid.getNameOfFrontFacingDevice();
+			deviceName = CameraEnumerationAndroid.getNameOfFrontFacingDevice();
 		}
 		if(deviceName == null) {
 			cameraId = -1;
 		} else {
-			String[] deviceNames = VideoCapturerAndroid.getDeviceNames();
+			String[] deviceNames = CameraEnumerationAndroid.getDeviceNames();
 			for(int i = 0; i < deviceNames.length; i++) {
 				if(deviceName.equals(deviceNames[i])) {
 					cameraId = i;
@@ -110,13 +111,13 @@ public class CameraCapturerImpl implements CameraCapturer {
                 camera = Camera.open(cameraId);
             } catch (Exception e) {
 				if(listener != null) {
-                    listener.onError(new CapturerException(ExceptionDomain.CAMERA, "Unable to open camera " + VideoCapturerAndroid.getDeviceName(cameraId) + ":" + e.getMessage()));
+                    listener.onError(new CapturerException(ExceptionDomain.CAMERA, "Unable to open camera " + CameraEnumerationAndroid.getDeviceName(cameraId) + ":" + e.getMessage()));
 				}
 				return;
             }
 
             if (camera == null && listener != null) {
-               	listener.onError(new CapturerException(ExceptionDomain.CAMERA, "Unable to open camera " + VideoCapturerAndroid.getDeviceName(cameraId)));
+               	listener.onError(new CapturerException(ExceptionDomain.CAMERA, "Unable to open camera " + CameraEnumerationAndroid.getDeviceName(cameraId)));
 				return;
             }
         }
@@ -167,13 +168,15 @@ public class CameraCapturerImpl implements CameraCapturer {
 
 	@Override
 	public synchronized boolean switchCamera() {
-        if(capturerState.equals(CapturerState.PREVIEWING)) {
-            stopPreview();
+		if(capturerState.equals(CapturerState.PREVIEWING)) {
+			stopPreview();
 			cameraId = (cameraId + 1) % Camera.getNumberOfCameras();
 			startPreview();
 			return true;
-        } else if (capturerState.equals(CapturerState.BROADCASTING)) {
-			return videoCapturerAndroid.switchCamera(null);
+		} else if (capturerState.equals(CapturerState.BROADCASTING)) {
+			// TODO: propagate error
+			videoCapturerAndroid.switchCamera(null);
+			return true;
 		} else {
 			return false;
 		}
@@ -208,17 +211,17 @@ public class CameraCapturerImpl implements CameraCapturer {
 	}
 	
 	private void createVideoCapturerAndroid() {
-		String deviceName = VideoCapturerAndroid.getDeviceName(cameraId);
+		String deviceName = CameraEnumerationAndroid.getDeviceName(cameraId);
 		if(deviceName == null && listener != null) {
 			listener.onError(new CapturerException(ExceptionDomain.CAMERA, "Camera device not found"));
 			return;
 		}
-		videoCapturerAndroid = VideoCapturerAndroid.create(deviceName, cameraErrorHandler);
+		videoCapturerAndroid = VideoCapturerAndroid.create(deviceName, cameraEventsHandler);
 		nativeVideoCapturerAndroid = retrieveNativeVideoCapturerAndroid(videoCapturerAndroid);
 	}
 	
 	
-	private CameraErrorHandler cameraErrorHandler = new CameraErrorHandler() {
+	private final CameraEventsHandler cameraEventsHandler = new CameraEventsHandler() {
 
 		@Override
 		public void onCameraError(String errorMsg) {
@@ -227,6 +230,20 @@ public class CameraCapturerImpl implements CameraCapturer {
 			}
 		}
 
+		@Override
+		public void onCameraOpening(int cameraId) {
+
+		}
+
+		@Override
+		public void onFirstFrameAvailable() {
+
+		}
+
+		@Override
+		public void onCameraClosed() {
+
+		} 
 	};
 
 	private class CameraPreview extends SurfaceView implements SurfaceHolder.Callback {
