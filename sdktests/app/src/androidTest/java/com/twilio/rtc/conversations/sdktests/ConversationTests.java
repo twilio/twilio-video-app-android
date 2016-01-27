@@ -95,19 +95,19 @@ public class ConversationTests {
                     public void onStartListeningForInvites(ConversationsClient conversationsClient) {
                         LocalMedia localMedia = LocalMediaFactory.createLocalMedia(new LocalMediaListener() {
                             @Override
-                            public void onLocalVideoTrackAdded(final Conversation conversation, LocalVideoTrack localVideoTrack) {
+                            public void onLocalVideoTrackAdded(final LocalMedia localMedia, LocalVideoTrack localVideoTrack) {
                                 final Handler handler = new Handler();
                                 handler.post(new Runnable() {
                                     @Override
                                     public void run() {
-                                        conversation.getLocalMedia().mute(!conversation.getLocalMedia().isMuted());
+                                        localMedia.mute(!localMedia.isMuted());
                                         handler.postDelayed(this, 100);
                                     }
                                 });
                             }
 
                             @Override
-                            public void onLocalVideoTrackRemoved(Conversation conversation, LocalVideoTrack localVideoTrack) {
+                            public void onLocalVideoTrackRemoved(LocalMedia localMedia, LocalVideoTrack localVideoTrack) {
                                 // do nothing
                             }
                         });
