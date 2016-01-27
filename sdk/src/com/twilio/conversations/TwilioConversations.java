@@ -109,25 +109,6 @@ public class TwilioConversations {
     }
 
     /**
-     * Interface for the listener object to pass to
-     * {@link TwilioConversations#initialize(Context, InitListener)}.
-     */
-    public interface DestroyListener {
-        /**
-         * Callback to report the successful destruction of Twilio Conversations SDK
-         */
-        void onDestroyed();
-
-        /**
-         * Called if there is an error destroying the Twilio
-         * Conversations SDK.
-         *
-         * @param exception An exception describing the error that occurred
-         */
-        void onError(Exception exception);
-    }
-
-    /**
      * Log levels for the Twilio Conversations SDK
      */
     public final class LogLevel {
@@ -168,8 +149,8 @@ public class TwilioConversations {
      * Dispose the Twilio Conversations SDK
      *
      */
-    public static void dispose(TwilioConversations.DestroyListener destroyListener) {
-        TwilioConversationsImpl.getInstance().dispose(destroyListener);
+    public static boolean destroy() {
+        return TwilioConversationsImpl.getInstance().destroy();
     }
 
     /**

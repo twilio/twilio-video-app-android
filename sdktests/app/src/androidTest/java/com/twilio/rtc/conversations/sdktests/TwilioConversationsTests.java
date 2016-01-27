@@ -23,8 +23,6 @@ import java.util.concurrent.TimeUnit;
 
 @RunWith(AndroidJUnit4.class)
 public class TwilioConversationsTests {
-
-
     @Rule
     public ActivityTestRule<TwilioConversationsActivity> mActivityRule = new ActivityTestRule<>(
             TwilioConversationsActivity.class);
@@ -37,13 +35,13 @@ public class TwilioConversationsTests {
     @Test
     public void testTwilioDispose() {
         TwilioConversationsUtils.initializeTwilioSDK(mActivityRule.getActivity().getApplicationContext());
-        TwilioConversationsUtils.disposeTwilioSDK();
+        org.junit.Assert.assertTrue(TwilioConversations.destroy());
     }
 
     @Test
     public void testTwilioInitializationAfterDispose() {
         TwilioConversationsUtils.initializeTwilioSDK(mActivityRule.getActivity().getApplicationContext());
-        TwilioConversationsUtils.disposeTwilioSDK();
+        org.junit.Assert.assertTrue(TwilioConversations.destroy());
         TwilioConversationsUtils.initializeTwilioSDK(mActivityRule.getActivity().getApplicationContext());
     }
 
@@ -65,8 +63,6 @@ public class TwilioConversationsTests {
         }
 
     }
-
-
 
     @Test
     public void testTwilioCreateConversationsClientWithNullParams() {

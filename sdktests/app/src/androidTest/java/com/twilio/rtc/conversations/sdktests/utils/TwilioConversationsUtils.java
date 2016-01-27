@@ -11,7 +11,6 @@ import java.util.concurrent.TimeUnit;
  * Common tools used in tests
  */
 public class TwilioConversationsUtils {
-
     /*
      * TwilioConversations is a singleton and can only be initialized once. As a result we must track
      * if TwilioConversations has ever been initialized.
@@ -23,12 +22,6 @@ public class TwilioConversationsUtils {
     public static void initializeTwilioSDK(Context applicationContext) {
         CountDownLatch waitLatch = new CountDownLatch(1);
         TwilioConversations.initialize(applicationContext, initListener(waitLatch));
-        wait(waitLatch, TIMEOUT, TimeUnit.SECONDS);
-    }
-
-    public static void disposeTwilioSDK() {
-        CountDownLatch waitLatch = new CountDownLatch(1);
-        TwilioConversations.dispose(destroyListener(waitLatch));
         wait(waitLatch, TIMEOUT, TimeUnit.SECONDS);
     }
 
@@ -51,29 +44,6 @@ public class TwilioConversationsUtils {
             @Override
             public void onError(Exception e) {
                 if(!initialized) {
-                    org.junit.Assert.fail(e.getMessage());
-                } else {
-                    wait.countDown();
-                }
-            }
-        };
-    }
-
-    public static TwilioConversations.DestroyListener destroyListener(final CountDownLatch wait) {
-        return new TwilioConversations.DestroyListener() {
-            @Override
-            public void onDestroyed() {
-                if(initialized) {
-                    initialized = false;
-                    wait.countDown();
-                } else {
-                    org.junit.Assert.fail("not intialized by destroyed was called");
-                }
-            }
-
-            @Override
-            public void onError(Exception e) {
-                if(initialized) {
                     org.junit.Assert.fail(e.getMessage());
                 } else {
                     wait.countDown();
@@ -107,6 +77,4 @@ public class TwilioConversationsUtils {
             org.junit.Assert.fail("Thread interrupted");
         }
     }
-
-
 }
