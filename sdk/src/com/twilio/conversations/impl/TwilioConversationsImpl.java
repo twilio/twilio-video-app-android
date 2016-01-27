@@ -30,7 +30,9 @@ import com.twilio.conversations.impl.util.CallbackHandler;
 public class TwilioConversationsImpl {
 
 	static {
-		System.loadLibrary("twilio-native");
+        // We rename this artifact so we do not clash with
+        // webrtc java classes expecting this native so
+		System.loadLibrary("jingle_peerconnection_so");
 	}
 
 	static final Logger logger = Logger.getLogger(TwilioConversationsImpl.class);

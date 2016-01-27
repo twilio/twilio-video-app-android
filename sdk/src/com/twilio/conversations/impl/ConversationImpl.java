@@ -681,6 +681,7 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 			freeNativeHandle(nativeHandle);
 			nativeHandle = 0;
 		}
+        EglBaseProvider.releaseEglBase();
 		isDisposed = true;
 	}
 
@@ -751,7 +752,6 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 		new Thread(new Runnable() {
 			@Override
 			public void run() {
-
 				start(getNativeHandle(),
 						mediaConstraints.isAudioEnabled(),
 						mediaConstraints.isAudioMuted(),

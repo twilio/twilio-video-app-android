@@ -28,8 +28,9 @@ endif
 
 LOCAL_PATH := $(TWSDK_JNI_PATH)
 
+# We rename this so that webrtc source loading native code does not crash
 include $(CLEAR_VARS)
-LOCAL_MODULE := twilio-native
+LOCAL_MODULE := jingle_peerconnection_so
 LOCAL_SRC_FILES := \
 	dummy.cpp \
 	com_twilio_conversations_impl_TwilioConversationsImpl.cpp \
@@ -47,6 +48,7 @@ endif
 
 
 LOCAL_CFLAGS += \
+	-D__STDC_CONSTANT_MACROS \
 	-Wall \
 	-DPOSIX \
 	-fvisibility=hidden \
@@ -95,6 +97,7 @@ LOCALIZE_SYMBOL := $(LOCAL_PATH)/dummy.cpp
 $(LOCALIZE_SYMBOL):
 	@echo "Localize the JNI_OnLoad symbol in libwebrtc.a to prevent conflicts with initialization in initCore"
 	$(ANDROID_NDK_HOME)/toolchains/aarch64-linux-android-4.9/prebuilt/$(TOOLCHAIN_PLAT)/aarch64-linux-android/bin/objcopy --localize-symbol JNI_OnLoad $(PREFIX)/webrtc/android/armeabiv7a/lib/libwebrtc-jni.a
+	$(ANDROID_NDK_HOME)/toolchains/aarch64-linux-android-4.9/prebuilt/$(TOOLCHAIN_PLAT)/aarch64-linux-android/bin/objcopy --localize-symbol JNI_OnUnLoad $(PREFIX)/webrtc/android/armeabiv7a/lib/libwebrtc-jni.a
 	touch $(LOCALIZE_SYMBOL)
 
 .INTERMEDIATE: $(LOCALIZE_SYMBOL)
