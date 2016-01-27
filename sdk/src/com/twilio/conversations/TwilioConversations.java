@@ -100,7 +100,7 @@ public class TwilioConversations {
         void onInitialized();
 
         /**
-         * Called if there is an error initializing or destroying the Twilio
+         * Called if there is an error initializing the Twilio
          * Conversations SDK.
          * 
          * @param exception An exception describing the error that occurred
@@ -119,7 +119,7 @@ public class TwilioConversations {
         void onDestroyed();
 
         /**
-         * Called if there is an error initializing or destroying the Twilio
+         * Called if there is an error destroying the Twilio
          * Conversations SDK.
          *
          * @param exception An exception describing the error that occurred
