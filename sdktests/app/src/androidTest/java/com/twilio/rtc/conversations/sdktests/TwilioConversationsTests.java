@@ -33,13 +33,13 @@ public class TwilioConversationsTests {
     }
 
     @Test
-    public void testTwilioDispose() {
+    public void testTwilioDestroy() {
         TwilioConversationsUtils.initializeTwilioSDK(mActivityRule.getActivity().getApplicationContext());
         org.junit.Assert.assertTrue(TwilioConversations.destroy());
     }
 
     @Test
-    public void testTwilioInitializationAfterDispose() {
+    public void testTwilioInitializationAfterDestroy() {
         TwilioConversationsUtils.initializeTwilioSDK(mActivityRule.getActivity().getApplicationContext());
         org.junit.Assert.assertTrue(TwilioConversations.destroy());
         TwilioConversationsUtils.initializeTwilioSDK(mActivityRule.getActivity().getApplicationContext());
