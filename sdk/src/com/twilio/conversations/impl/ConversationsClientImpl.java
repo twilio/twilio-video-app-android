@@ -152,6 +152,7 @@ public class ConversationsClientImpl implements
 		checkDisposed();
 		if(listening) {
 			unlisten(nativeEndpointHandle);
+			listening = false;
 		}
 	}
 
@@ -330,6 +331,9 @@ public class ConversationsClientImpl implements
 
 	@Override
 	public synchronized void dispose() {
+                if (listening) {
+                    unlisten();
+                }
 		if (endpointObserver != null) {
 			endpointObserver.dispose();
 			endpointObserver = null;
@@ -542,9 +546,4 @@ public class ConversationsClientImpl implements
 	private native void unlisten(long nativeEndpoint);
 	private native void reject(long nativeEndpoint, long nativeSession);
 	private native void freeNativeHandle(long nativeEndpoint);
-
-	
-	
-
-
 }

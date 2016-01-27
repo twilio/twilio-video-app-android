@@ -28,6 +28,8 @@
 using namespace webrtc_jni;
 using namespace twiliosdk;
 
+static bool media_jvm_set = false;
+
 extern "C" jint JNIEXPORT JNICALL JNI_OnLoad(JavaVM *jvm, void *reserved) {
     TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK, kTSCoreLogLevelDebug, "JNI_OnLoad");
     jint ret = InitGlobalJniVariables(jvm);
@@ -59,17 +61,18 @@ static TwilioCommon::AccessManager* getNativeAccessMgrFromJava(JNIEnv* jni, jobj
  * Signature: (Landroid/content/Context;)Z
  */
 JNIEXPORT jboolean JNICALL Java_com_twilio_conversations_impl_TwilioConversationsImpl_initCore(JNIEnv *env, jobject obj, jobject context) {
+    TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK, kTSCoreLogLevelDebug, "initCore");
     bool failure = false;
-
     TSCSDK* tscSdk = TSCSDK::instance();
-    TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK, kTSCoreLogLevelDebug, "Initialized tscsdk");
 
     // TODO investigate relocating some of these calls to more timely locations
-    AndroidNetworkMonitor::SetAndroidContext(env, context);
-    webrtc::OpenSLESPlayer::SetAndroidAudioDeviceObjects(GetJVM(), context);
-    failure |= webrtc::SetRenderAndroidVM(GetJVM());
-    failure |= webrtc_jni::AndroidVideoCapturerJni::SetAndroidObjects(env, context);
-    failure |= webrtc::VoiceEngine::SetAndroidObjects(GetJVM(), context);
+    if (!media_jvm_set) {
+        failure |= webrtc::OpenSLESPlayer::SetAndroidAudioDeviceObjects(GetJVM(), context);
+        failure |= webrtc::VoiceEngine::SetAndroidObjects(GetJVM(), context);
+        failure |= webrtc::SetRenderAndroidVM(GetJVM());
+        failure |= webrtc_jni::AndroidVideoCapturerJni::SetAndroidObjects(env, context);
+        media_jvm_set = true;
+    }
 
     if (tscSdk != NULL &&
             tscSdk->isInitialized() &&
@@ -78,6 +81,16 @@ JNIEXPORT jboolean JNICALL Java_com_twilio_conversations_impl_TwilioConversation
     }
 
     return JNI_FALSE;
+}
+
+/*
+ * Class:     com_twilio_conversations_impl_TwilioConversationsImpl
+ * Method:    destroyCore
+ * Signature: ()J
+ */
+JNIEXPORT void JNICALL Java_com_twilio_conversations_impl_TwilioConversationsImpl_destroyCore(JNIEnv *env, jobject obj) {
+    TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK, kTSCoreLogLevelDebug, "destroyCore");
+    TSCSDK::destroy();
 }
 
 JNIEXPORT jlong JNICALL Java_com_twilio_conversations_impl_TwilioConversationsImpl_createEndpoint
