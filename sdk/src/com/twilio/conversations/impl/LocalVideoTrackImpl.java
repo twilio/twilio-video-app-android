@@ -2,8 +2,9 @@ package com.twilio.conversations.impl;
 
 import com.twilio.conversations.CameraCapturer;
 import com.twilio.conversations.LocalVideoTrack;
+import com.twilio.conversations.MediaTrackState;
 
-public class LocalVideoTrackImpl extends VideoTrackImpl implements  LocalVideoTrack  {
+public class LocalVideoTrackImpl extends VideoTrackImpl implements LocalVideoTrack  {
 
 	private CameraCapturer cameraCapturer;
 	private boolean enabledVideo = true;

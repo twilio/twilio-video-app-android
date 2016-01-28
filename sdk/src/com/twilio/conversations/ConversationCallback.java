@@ -12,6 +12,6 @@ public interface ConversationCallback {
 	 *  @param conversation The conversation that was created.
 	 *  @param exception	An error describing why the conversation was not created.
 	 */
-	void onConversation(Conversation conversation, ConversationException exception);
+	void onConversation(Conversation conversation, TwilioConversationsException exception);
 
 }
