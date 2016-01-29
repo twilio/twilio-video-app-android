@@ -45,6 +45,16 @@ public class ConversationsClientLifecycleTests {
         org.junit.Assert.assertNotNull(conversationsClient);
     }
 
+    @Test
+    public void testTwilioNotListeningAfterDisposal() {
+        ConversationsClient conversationsClient = createConversationsClient();
+        org.junit.Assert.assertNotNull(conversationsClient);
+
+        conversationsClient.dispose();
+
+        org.junit.Assert.assertFalse(conversationsClient.isListening());
+    }
+
     @Test(expected = IllegalStateException.class)
     public void testTwilioCannotListenAfterConversationsClientDisposal() {
         ConversationsClient conversationsClient = createConversationsClient();
