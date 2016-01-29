@@ -16,13 +16,12 @@ public interface LocalMedia {
 	 * Adds a local video track to list of tracks.
 	 * 
 	 * @param track
-	 * @throws TwilioConversationsException Adding a local video track can result
-	 * in TOO_MANY_TRACKS, or INVALID_VIDEO_CAPTURER error condition.
-	 * @return true if the local video track was successfully added or false
-	 * if the local video track could not be added because a track operation is in
-	 * progress.
+	 *
+	 * @note TwilioConversationsException Adding a local video track can result
+	 * in TOO_MANY_TRACKS, TRACK_OPERATION_IN_PROGRESS, INVALID_VIDEO_CAPTURER
+	 * errors {@link LocalMediaListener}.onLocalVideoTrackError(...) callback.
 	 */
-	boolean addLocalVideoTrack(LocalVideoTrack track) throws TwilioConversationsException;
+	void addLocalVideoTrack(LocalVideoTrack track);
 
 	/**
 	 * Removes the local video track from list of tracks.
@@ -34,7 +33,7 @@ public interface LocalMedia {
 	 * if the local video track could not be removed because a track operation is in
 	 * progress.
 	 */
-	boolean removeLocalVideoTrack(LocalVideoTrack track) throws TwilioConversationsException;
+	void removeLocalVideoTrack(LocalVideoTrack track);
 
 	/**
 	 * Specifies whether or not your local audio should be muted

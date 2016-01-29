@@ -72,29 +72,35 @@ public class LocalMediaImpl implements LocalMedia {
 	}
 
 	@Override
-	public boolean addLocalVideoTrack(LocalVideoTrack track)
-			throws IllegalArgumentException, UnsupportedOperationException, TwilioConversationsException {
+	public void addLocalVideoTrack(final LocalVideoTrack track)
+			throws IllegalArgumentException, UnsupportedOperationException {
 		if (track == null) {
 			throw new NullPointerException("LocalVideoTrack can't be null");
 		}
 		LocalVideoTrackImpl localVideoTrackImpl = (LocalVideoTrackImpl)track;
 		if(!localVideoTrackImpl.getState().equals(MediaTrackState.IDLE)) {
-			/*
-			 * To be consistent with add/remove Microphone we return false if
-			 * the track state is not idle implying the track is in progress.
-			 */
-			return false;
+			postVideoTrackException(localVideoTrackImpl, new TwilioConversationsException(TwilioConversations.TRACK_OPERATION_IN_PROGRESS, " A track operation is already in progress."));
 		}
 		if (videoTracksImpl.size() >= MAX_LOCAL_VIDEO_TRACKS) {
-			throw new TwilioConversationsException(TwilioConversations.TOO_MANY_TRACKS, "Unable to add the local video track. Only " + MAX_LOCAL_VIDEO_TRACKS + " local video track is supported.");
+				postVideoTrackException(localVideoTrackImpl, new TwilioConversationsException(TwilioConversations.TOO_MANY_TRACKS, "Unable to add the local video track. Only " + MAX_LOCAL_VIDEO_TRACKS + " local video track is supported."));
 		}
 		if (localVideoTrackImpl.getCameraCapturer() == null) {
-			throw new TwilioConversationsException(TwilioConversations.INVALID_VIDEO_CAPTURER, "LocalVideoTrack must have a camera capturer associated with the track");
+			if (handler != null) {
+				handler.post(new Runnable() {
+					@Override
+					public void run() {
+						if (localMediaListener != null) {
+							localMediaListener.onLocalVideoTrackError(
+									LocalMediaImpl.this, track, new TwilioConversationsException(TwilioConversations.INVALID_VIDEO_CAPTURER, "The LocalVideoTrack must be associated with a camera capturer"));
+						}
+					}
+				});
+			}
 		}
 		videoTracksImpl.add(localVideoTrackImpl);
 		if ((convWeak != null) &&  (convWeak.get() != null) ) {
 			// LocalVideoTrack is added during conversation
-			// TODO: we should use localVideoTrackImpl.isCameraEnabled() as second param here,
+			// TODO: we should use localVideoTrackImpl.isEnabled() as second param here,
 			// it is hard coded as false for now until we resolve issue with CameraCapturer starting in disabled mode.
 			// This leaves responsibility to a user to unpause the capturer, which user doesn't have to do
 			// during initial creation. This is inconsistent behavior and it should be more investigated.
@@ -104,48 +110,54 @@ public class LocalMediaImpl implements LocalMedia {
 				logger.d("Create a new external capturer since the nativeVideoCapturer is no longer valid");
 				convWeak.get().setupExternalCapturer();
 			}
-			boolean enabledVideo = convWeak.get().enableVideo(true, false);
+			boolean enabledVideo = convWeak.get().enableVideo(true, !localVideoTrackImpl.isEnabled());
 			if(!enabledVideo) {
 				// Remove the video track since it failed to be added
 				videoTracksImpl.remove(localVideoTrackImpl);
+				postVideoTrackException(localVideoTrackImpl, new TwilioConversationsException(TwilioConversations.TRACK_OPERATION_IN_PROGRESS, " A track operation is already in progress."));
 			} else {
 				localVideoTrackImpl.setTrackState(MediaTrackState.STARTING);
 			}
-			return enabledVideo;
-		} else {
-			// The LocalVideoTrack is always added when a conversation is not active
-			return true;
 		}
 	}
 
 	@Override
-	public boolean removeLocalVideoTrack(LocalVideoTrack track) throws IllegalArgumentException, TwilioConversationsException {
+	public void removeLocalVideoTrack(LocalVideoTrack track) throws IllegalArgumentException {
 		if (videoTracksImpl.size() == 0) {
 			logger.d("LocalVideoTracks list is empty");
-			return false;
+			return;
 		} else if (!videoTracksImpl.contains(track)) {
 			logger.d("LocalVideoTrack is not found!");
-			return false;
+			return;
 		}
 		if(track.getState().equals(MediaTrackState.ENDED)) {
-			throw new TwilioConversationsException(TwilioConversations.INVALID_VIDEO_TRACK_STATE, "The provided video track is not in a valid state");
+			postVideoTrackException(track, new TwilioConversationsException(TwilioConversations.INVALID_VIDEO_TRACK_STATE, "The provided video track is not in a valid state"));
 		} else if(!track.getState().equals(MediaTrackState.STARTED)) {
-			/*
-			 * To be consistent with add/remove Microphone we return false if
-			 * the track state is not idle implying the track is in progress.
-			 */
-			return false;
+			postVideoTrackException(track, new TwilioConversationsException(TwilioConversations.TRACK_OPERATION_IN_PROGRESS, " A track operation is already in progress."));
 		}
 		if (convWeak == null || convWeak.get() == null) {
 			logger.d("Conversation is null");
-			return false;
+			return;
 		}
 		ConversationImpl conv = convWeak.get();
-		boolean enabled = conv.enableVideo(false, false);
+		boolean enabled = conv.enableVideo(false, !track.isEnabled());
 		if(enabled) {
 			((LocalVideoTrackImpl) track).setTrackState(MediaTrackState.ENDING);
 		}
-		return enabled;
+	}
+
+	private void postVideoTrackException(final LocalVideoTrack localVideoTrack, final TwilioConversationsException trackException) {
+		if (handler != null) {
+			handler.post(new Runnable() {
+				@Override
+				public void run() {
+					if (localMediaListener != null) {
+						localMediaListener.onLocalVideoTrackError(
+								LocalMediaImpl.this, localVideoTrack, trackException);
+					}
+				}
+			});
+		}
 	}
 
 	LocalVideoTrackImpl removeLocalVideoTrack(TrackInfo trackInfo) {
@@ -184,7 +196,7 @@ public class LocalMediaImpl implements LocalMedia {
 
 	private boolean enableAudio(boolean enable) {
 		if (convWeak != null && convWeak.get() != null) {
-			return convWeak.get().enableAudio(enable, false);
+			return convWeak.get().enableAudio(enable, audioMuted);
 		} else {
 			// The conversation is not ongoing. Always return true
 			return true;

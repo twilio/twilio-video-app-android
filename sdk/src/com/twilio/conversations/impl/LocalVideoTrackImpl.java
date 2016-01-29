@@ -20,7 +20,7 @@ public class LocalVideoTrackImpl extends VideoTrackImpl implements LocalVideoTra
 	}
 
 	@Override
-	public boolean enableCamera(boolean enabled) {
+	public boolean enable(boolean enabled) {
 		org.webrtc.VideoTrack videoTrack = getWebrtcVideoTrack();
 		if (videoTrack != null) {
 			enabledVideo = videoTrack.setEnabled(enabled);
@@ -31,7 +31,7 @@ public class LocalVideoTrackImpl extends VideoTrackImpl implements LocalVideoTra
 	}
 
 	@Override
-	public boolean isCameraEnabled() {
+	public boolean isEnabled() {
 		org.webrtc.VideoTrack videoTrack = getWebrtcVideoTrack();
 		if (videoTrack != null) {
 			return videoTrack.enabled();

@@ -25,4 +25,14 @@ public interface LocalMediaListener {
 	 */
 	void onLocalVideoTrackRemoved(LocalMedia localMedia, LocalVideoTrack videoTrack);
 
+	/**
+	 * This method notifies the listener when an error occurred when
+	 * attempting to add or remove a {@link LocalVideoTrack}
+	 * @param localMedia The {@link LocalMedia} associated with the {@link LocalVideoTrack}
+	 * @param track The {@link LocalVideoTrack} that was requested to be added or removed to the {@link LocalMedia}
+	 * @param exception The error that occurred while attempting to add or remove this {@link LocalVideoTrack} to
+	 *                  this {@link LocalMedia}
+	 */
+	void onLocalVideoTrackError(LocalMedia localMedia, LocalVideoTrack track, TwilioConversationsException exception);
+
 }

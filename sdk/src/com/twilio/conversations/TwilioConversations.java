@@ -95,7 +95,7 @@ public class TwilioConversations {
     public final static int TRACK_OPERATION_IN_PROGRESS = 303;
 
     /**
-     *  An attempt was made to remove a track that has already ended
+     *  An attempt was made to remove a track that has already ended.
      *  @note: The video track is in the {@link MediaTrackState} ENDED state.
      */
     public final static int INVALID_VIDEO_TRACK_STATE = 305;

@@ -745,7 +745,7 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 		boolean pauseVideo = false;
 		if (enableVideo) {
 			setupExternalCapturer();
-			pauseVideo = !localMedia.getLocalVideoTracks().get(0).isCameraEnabled();
+			pauseVideo = !localMedia.getLocalVideoTracks().get(0).isEnabled();
 		}
 		final CoreSessionMediaConstraints mediaConstraints =
 				new CoreSessionMediaConstraints(localMedia.isMicrophoneAdded(),
