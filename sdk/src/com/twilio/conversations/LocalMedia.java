@@ -17,9 +17,10 @@ public interface LocalMedia {
 	 * 
 	 * @param track
 	 * @throws TwilioConversationsException Adding a local video track can result
-	 * in TRACK_OPERATION_IN_PROGRESS, TOO_MANY_TRACKS, or INVALID_VIDEO_CAPTURER
-	 * error condition.
-	 * @return the local video track was successfully added
+	 * in TOO_MANY_TRACKS, or INVALID_VIDEO_CAPTURER error condition.
+	 * @return true if the local video track was successfully added or false
+	 * if the local video track could not be added because a track operation is in
+	 * progress.
 	 */
 	boolean addLocalVideoTrack(LocalVideoTrack track) throws TwilioConversationsException;
 
@@ -27,8 +28,11 @@ public interface LocalMedia {
 	 * Removes the local video track from list of tracks.
 	 * 
 	 * @param track
-	 * @throws TwilioConversationsException
-	 * @return the local video track was successfully removed
+	 * @throws TwilioConversationsException Removing a local video track that has
+	 * already been removed will result in a INVALID_VIDEO_TRACK_STATE error condition.
+	 * @return true if the local video track was successfully removed or false
+	 * if the local video track could not be removed because a track operation is in
+	 * progress.
 	 */
 	boolean removeLocalVideoTrack(LocalVideoTrack track) throws TwilioConversationsException;
 

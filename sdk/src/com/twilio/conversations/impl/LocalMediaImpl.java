@@ -79,7 +79,11 @@ public class LocalMediaImpl implements LocalMedia {
 		}
 		LocalVideoTrackImpl localVideoTrackImpl = (LocalVideoTrackImpl)track;
 		if(!localVideoTrackImpl.getState().equals(MediaTrackState.IDLE)) {
-			throw new TwilioConversationsException(TwilioConversations.TRACK_OPERATION_IN_PROGRESS, "Unable to add the local video track. An operation on this local video track is already in progress");
+			/*
+			 * To be consistent with add/remove Microphone we return false if
+			 * the track state is not idle implying the track is in progress.
+			 */
+			return false;
 		}
 		if (videoTracksImpl.size() >= MAX_LOCAL_VIDEO_TRACKS) {
 			throw new TwilioConversationsException(TwilioConversations.TOO_MANY_TRACKS, "Unable to add the local video track. Only " + MAX_LOCAL_VIDEO_TRACKS + " local video track is supported.");
@@ -123,8 +127,14 @@ public class LocalMediaImpl implements LocalMedia {
 			logger.d("LocalVideoTrack is not found!");
 			return false;
 		}
-		if(!track.getState().equals(MediaTrackState.STARTED)) {
-			throw new TwilioConversationsException(TwilioConversations.TRACK_OPERATION_IN_PROGRESS, "Unable to remove the local video track. An operation on this local video track is already in progress");
+		if(track.getState().equals(MediaTrackState.ENDED)) {
+			throw new TwilioConversationsException(TwilioConversations.INVALID_VIDEO_TRACK_STATE, "The provided video track is not in a valid state");
+		} else if(!track.getState().equals(MediaTrackState.STARTED)) {
+			/*
+			 * To be consistent with add/remove Microphone we return false if
+			 * the track state is not idle implying the track is in progress.
+			 */
+			return false;
 		}
 		if (convWeak == null || convWeak.get() == null) {
 			logger.d("Conversation is null");
