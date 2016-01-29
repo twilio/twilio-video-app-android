@@ -124,10 +124,10 @@ public class LocalMediaImpl implements LocalMedia {
 	@Override
 	public void removeLocalVideoTrack(LocalVideoTrack track) throws IllegalArgumentException {
 		if (videoTracksImpl.size() == 0) {
-			logger.d("LocalVideoTracks list is empty");
+			logger.e("There are no local video tracks in the list");
 			return;
 		} else if (!videoTracksImpl.contains(track)) {
-			logger.d("LocalVideoTrack is not found!");
+			logger.e("The specified local video track was not found");
 			return;
 		}
 		if(track.getState().equals(MediaTrackState.ENDED)) {
