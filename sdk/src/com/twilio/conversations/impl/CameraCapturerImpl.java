@@ -2,15 +2,19 @@ package com.twilio.conversations.impl;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.lang.reflect.Type;
 
 import org.webrtc.VideoCapturerAndroid;
 import org.webrtc.VideoCapturerAndroid.CameraEventsHandler;
 import org.webrtc.CameraEnumerationAndroid;
 
+import android.app.Activity;
+import android.app.Application;
 import android.content.Context;
 import android.hardware.Camera;
-import android.util.Log;
-import android.view.Display;
+import android.os.Bundle;
 import android.view.OrientationEventListener;
 import android.view.Surface;
 import android.view.SurfaceHolder;
@@ -25,7 +29,7 @@ import com.twilio.conversations.CapturerException.ExceptionDomain;
 import com.twilio.conversations.impl.logging.Logger;
 
 
-public class CameraCapturerImpl implements CameraCapturer {
+public class CameraCapturerImpl implements CameraCapturer, Application.ActivityLifecycleCallbacks {
 
 	private static String TAG = "CameraCapturerImpl";
 
@@ -37,8 +41,9 @@ public class CameraCapturerImpl implements CameraCapturer {
 		BROADCASTING
 	}
 
-	private final Context context;
+	private final Activity activity;
 	private CameraSource source;
+	private CapturerState lastCapturerState;
 
 	/* Preview capturer members */
     private final ViewGroup previewContainer;
@@ -53,9 +58,9 @@ public class CameraCapturerImpl implements CameraCapturer {
 	private CapturerErrorListener listener;
 	private long nativeVideoCapturerAndroid;
 
-	private CameraCapturerImpl(Context context, CameraSource source,
+	private CameraCapturerImpl(Activity activity, CameraSource source,
 			ViewGroup previewContainer, CapturerErrorListener listener) {
-		this.context = context;
+		this.activity = activity;
 		this.source = source;
 		this.previewContainer = previewContainer;
 		this.listener = listener;
@@ -63,15 +68,16 @@ public class CameraCapturerImpl implements CameraCapturer {
 		if(cameraId < 0 && listener != null) {
 			listener.onError(new CapturerException(ExceptionDomain.CAMERA, "Invalid camera source."));
 		}
+		activity.getApplication().registerActivityLifecycleCallbacks(this);
 	}
 
 	public static CameraCapturerImpl create(
-			Context context,
+			Activity activity,
 			CameraSource source,
 			ViewGroup previewContainer,
 			CapturerErrorListener listener) {
 		CameraCapturerImpl cameraCapturer =
-				new CameraCapturerImpl(context, source, previewContainer, listener);
+				new CameraCapturerImpl(activity, source, previewContainer, listener);
 
 		return cameraCapturer;
 	}
@@ -129,7 +135,7 @@ public class CameraCapturerImpl implements CameraCapturer {
         }
         camera.setParameters(params);
 
-        cameraPreview = new CameraPreview(context, camera, listener);
+        cameraPreview = new CameraPreview(activity, camera, listener);
         previewContainer.removeAllViews();
         previewContainer.addView(cameraPreview);
 
@@ -181,7 +187,29 @@ public class CameraCapturerImpl implements CameraCapturer {
 			return false;
 		}
 	}
-	
+
+	@Override
+	public void pause() {
+		lastCapturerState = capturerState;
+		if(capturerState.equals(CapturerState.PREVIEWING)) {
+			stopPreview();
+		} else if(capturerState.equals(CapturerState.BROADCASTING)) {
+			stopCapture();
+		}
+	}
+
+	@Override
+	public void resume() {
+		if(lastCapturerState != null) {
+			if(lastCapturerState.equals(CapturerState.PREVIEWING)) {
+				startPreview();
+			} else if(lastCapturerState.equals(CapturerState.BROADCASTING)) {
+				startCapture();
+			}
+			lastCapturerState = null;
+		}
+	}
+
 	long getNativeVideoCapturer()  {
 		return nativeVideoCapturerAndroid;
 	}
@@ -199,13 +227,9 @@ public class CameraCapturerImpl implements CameraCapturer {
 			field.setAccessible(true);
 			nativeHandle = field.getLong(videoCapturerAndroid);
 		} catch (NoSuchFieldException e) {
-			if(listener != null) {
-				listener.onError(new CapturerException(ExceptionDomain.CAPTURER, "Unable to setup video capturer: " + e.getMessage()));
-			}
+			throw new RuntimeException("Unable to get nativeVideoCapturer field: " + e.getMessage());
 		} catch (IllegalAccessException e) {
-			if(listener != null) {
-				listener.onError(new CapturerException(ExceptionDomain.CAPTURER, "Unable to access video capturer: " + e.getMessage()));
-			}
+			throw new RuntimeException("Unable to access nativeVideoCapturer field: " + e.getMessage());
 		}
 		return nativeHandle;
 	}
@@ -358,4 +382,94 @@ public class CameraCapturerImpl implements CameraCapturer {
 		}
 
 	}
+
+	private void startCapture() {
+		/*
+		 * Get requestedWidth, requestedHeight, requestedFramerate, frameObserver, applicationContext
+		 * using reflection.
+		 */
+		try {
+			Field requestedWidthField = videoCapturerAndroid.getClass().getDeclaredField("requestedWidth");
+			requestedWidthField.setAccessible(true);
+			int requestedWidth = requestedWidthField.getInt(videoCapturerAndroid);
+
+			Field requestedHeightField = videoCapturerAndroid.getClass().getDeclaredField("requestedHeight");
+			requestedHeightField.setAccessible(true);
+			int requestedHeight = requestedHeightField.getInt(videoCapturerAndroid);
+
+			Field requestedFramerateField = videoCapturerAndroid.getClass().getDeclaredField("requestedFramerate");
+			requestedFramerateField.setAccessible(true);
+			int requestedFramerate = requestedFramerateField.getInt(videoCapturerAndroid);
+
+			Field applicationContextField = videoCapturerAndroid.getClass().getDeclaredField("applicationContext");
+			applicationContextField.setAccessible(true);
+			Context applicationContext = (Context) applicationContextField.get(videoCapturerAndroid);
+
+			Field frameObserverField = videoCapturerAndroid.getClass().getDeclaredField("frameObserver");
+			frameObserverField.setAccessible(true);
+
+			Method startCaptureMethod = videoCapturerAndroid.getClass().getDeclaredMethod("startCapture", int.class, int.class, int.class, Context.class, frameObserverField.getType());
+			startCaptureMethod.setAccessible(true);
+			startCaptureMethod.invoke(videoCapturerAndroid, requestedWidth, requestedHeight, requestedFramerate, applicationContext, frameObserverField.get(videoCapturerAndroid));
+
+		} catch (NoSuchFieldException e) {
+			throw new RuntimeException("Unable to get startCapture field: " + e.getMessage());
+		} catch (IllegalAccessException e) {
+			throw new RuntimeException("Unable to access startCapture field: " + e.getMessage());
+		} catch (NoSuchMethodException e) {
+			throw new RuntimeException("Unable to access get startCapture method: " + e.getMessage());
+		} catch (InvocationTargetException e) {
+			throw new RuntimeException("Unable to invoke startCapture method: " + e.getMessage());
+		}
+	}
+
+	private void stopCapture() {
+		try {
+			Method stopCaptureMethod = videoCapturerAndroid.getClass().getDeclaredMethod("stopCapture");
+			stopCaptureMethod.setAccessible(true);
+			stopCaptureMethod.invoke(videoCapturerAndroid);
+		} catch (NoSuchMethodException e) {
+			throw new RuntimeException("Unable to get stopCapture method: " + e.getMessage());
+		} catch (InvocationTargetException e) {
+			throw new RuntimeException("Unable to invoke stopCapture method: " + e.getMessage());
+		} catch (IllegalAccessException e) {
+			throw new RuntimeException("Unable to access stopCapture method: " + e.getMessage());
+		}
+	}
+
+	@Override
+	public void onActivityCreated(Activity activity, Bundle savedInstanceState) {
+
+	}
+
+	@Override
+	public void onActivityStarted(Activity activity) {
+
+	}
+
+	@Override
+	public void onActivityResumed(Activity activity) {
+		resume();
+	}
+
+	@Override
+	public void onActivityPaused(Activity activity) {
+		pause();
+	}
+
+	@Override
+	public void onActivityStopped(Activity activity) {
+
+	}
+
+	@Override
+	public void onActivitySaveInstanceState(Activity activity, Bundle outState) {
+
+	}
+
+	@Override
+	public void onActivityDestroyed(Activity activity) {
+
+	}
+
 }

@@ -1,5 +1,6 @@
 package com.twilio.conversations;
 
+import android.app.Activity;
 import android.view.ViewGroup;
 import android.content.Context;
 
@@ -20,11 +21,11 @@ public class CameraCapturerFactory {
 	 * @return CameraCapturer
 	 */
 	public static CameraCapturer createCameraCapturer (
-			Context context,
+			Activity activity,
 			CameraSource source,
 			ViewGroup previewContainer,
 			CapturerErrorListener listener) {
-		return CameraCapturerImpl.create(context, source, previewContainer, listener);
+		return CameraCapturerImpl.create(activity, source, previewContainer, listener);
 	}
 
 }
