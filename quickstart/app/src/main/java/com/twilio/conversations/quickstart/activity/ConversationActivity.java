@@ -28,7 +28,6 @@ import com.twilio.conversations.CapturerErrorListener;
 import com.twilio.conversations.CapturerException;
 import com.twilio.conversations.Conversation;
 import com.twilio.conversations.ConversationCallback;
-import com.twilio.conversations.ConversationException;
 import com.twilio.conversations.ConversationListener;
 import com.twilio.conversations.ConversationsClient;
 import com.twilio.conversations.ConversationsClientListener;
@@ -43,6 +42,7 @@ import com.twilio.conversations.OutgoingInvite;
 import com.twilio.conversations.Participant;
 import com.twilio.conversations.ParticipantListener;
 import com.twilio.conversations.TwilioConversations;
+import com.twilio.conversations.TwilioConversationsException;
 import com.twilio.conversations.VideoRendererObserver;
 import com.twilio.conversations.VideoTrack;
 import com.twilio.conversations.VideoViewRenderer;
@@ -150,14 +150,6 @@ public class  ConversationActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        if (participantVideoRenderer != null) {
-            participantVideoRenderer.onResume();
-        }
-
-        if (localVideoRenderer != null) {
-            localVideoRenderer.onResume();
-        }
-
         if (TwilioConversations.isInitialized() &&
                 conversationsClient != null &&
                 !conversationsClient.isListening()) {
@@ -168,15 +160,10 @@ public class  ConversationActivity extends AppCompatActivity {
     @Override
     public void onPause() {
         super.onPause();
-        if(participantVideoRenderer != null) {
-            participantVideoRenderer.onPause();
-        }
-        if (localVideoRenderer != null) {
-            localVideoRenderer.onPause();
-        }
         if (TwilioConversations.isInitialized() &&
                 conversationsClient != null  &&
-                conversationsClient.isListening()) {
+                conversationsClient.isListening() &&
+                conversation == null) {
             conversationsClient.unlisten();
         }
     }
@@ -224,7 +211,6 @@ public class  ConversationActivity extends AppCompatActivity {
         alertDialog = Dialog.createInviteDialog(incomingInvite.getInvitee(), acceptCallClickListener(incomingInvite), rejectCallClickListener(incomingInvite), this);
         alertDialog.show();
     }
-
 
     /*
      * Initialize the Twilio Conversations SDK
@@ -303,7 +289,6 @@ public class  ConversationActivity extends AppCompatActivity {
      */
     private void reset() {
         if(participantVideoRenderer != null) {
-            participantVideoRenderer.onPause();
             participantVideoRenderer = null;
         }
         localContainer.removeAllViews();
@@ -354,7 +339,7 @@ public class  ConversationActivity extends AppCompatActivity {
                     outgoingInvite = conversationsClient.sendConversationInvite(participants,
                             localMedia, new ConversationCallback() {
                                 @Override
-                                public void onConversation(Conversation conversation, ConversationException e) {
+                                public void onConversation(Conversation conversation, TwilioConversationsException e) {
                                     if (e == null) {
                                         // Participant has accepted invite, we are in active conversation
                                         ConversationActivity.this.conversation = conversation;
@@ -398,7 +383,7 @@ public class  ConversationActivity extends AppCompatActivity {
 
                 invite.accept(localMedia, new ConversationCallback() {
                     @Override
-                    public void onConversation(Conversation conversation, ConversationException e) {
+                    public void onConversation(Conversation conversation, TwilioConversationsException e) {
                         Log.e(TAG, "sendConversationInvite onConversation");
                         if (e == null) {
                             ConversationActivity.this.conversation = conversation;
@@ -460,7 +445,7 @@ public class  ConversationActivity extends AppCompatActivity {
                             conversation.getLocalMedia().getLocalVideoTracks();
                     if (videoTrackList.size() > 0) {
                         LocalVideoTrack videoTrack = videoTrackList.get(0);
-                        videoTrack.enableCamera(!pauseVideo);
+                        videoTrack.enable(!pauseVideo);
                     } else {
                         Log.w(TAG, "LocalVideoTrack is not present, unable to pause");
                     }
@@ -552,7 +537,7 @@ public class  ConversationActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onFailedToConnectParticipant(Conversation conversation, Participant participant, ConversationException e) {
+            public void onFailedToConnectParticipant(Conversation conversation, Participant participant, TwilioConversationsException e) {
                 Log.e(TAG, e.getMessage());
                 conversationStatusTextView.setText("onFailedToConnectParticipant " + participant.getIdentity());
             }
@@ -563,7 +548,7 @@ public class  ConversationActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onConversationEnded(Conversation conversation, ConversationException e) {
+            public void onConversationEnded(Conversation conversation, TwilioConversationsException e) {
                 conversationStatusTextView.setText("onConversationEnded");
                 reset();
             }
@@ -586,6 +571,11 @@ public class  ConversationActivity extends AppCompatActivity {
             public void onLocalVideoTrackRemoved(LocalMedia localMedia, LocalVideoTrack localVideoTrack) {
                 conversationStatusTextView.setText("onLocalVideoTrackRemoved");
                 localContainer.removeAllViews();
+            }
+
+            @Override
+            public void onLocalVideoTrackError(LocalMedia localMedia, LocalVideoTrack localVideoTrack, TwilioConversationsException e) {
+                Log.e(TAG, "LocalVideoTrackError: " + e.getMessage());
             }
         };
     }
@@ -610,8 +600,8 @@ public class  ConversationActivity extends AppCompatActivity {
                     }
 
                     @Override
-                    public void onFrameDimensionsChanged(int width, int height) {
-                        Log.i(TAG, "Participant onFrameDimensionsChanged " + width + " " + height);
+                    public void onFrameDimensionsChanged(int width, int height, int rotation) {
+                        Log.i(TAG, "Participant onFrameDimensionsChanged " + width + " " + height + " " + rotation);
                     }
 
                 });
@@ -665,7 +655,7 @@ public class  ConversationActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onFailedToStartListening(ConversationsClient conversationsClient, ConversationException e) {
+            public void onFailedToStartListening(ConversationsClient conversationsClient, TwilioConversationsException e) {
                 conversationStatusTextView.setText("onFailedToStartListening");
             }
 
@@ -693,7 +683,7 @@ public class  ConversationActivity extends AppCompatActivity {
         return new CapturerErrorListener() {
             @Override
             public void onError(CapturerException e) {
-                Log.e(TAG, "Camera capturer error:"+e.getMessage());
+                Log.e(TAG, "Camera capturer error: " + e.getMessage());
             }
         };
     }
@@ -731,7 +721,7 @@ public class  ConversationActivity extends AppCompatActivity {
         LocalMedia localMedia = LocalMediaFactory.createLocalMedia(localMediaListener());
         LocalVideoTrack localVideoTrack = LocalVideoTrackFactory.createLocalVideoTrack(cameraCapturer);
         if (pauseVideo) {
-            localVideoTrack.enableCamera(false);
+            localVideoTrack.enable(false);
         }
         localMedia.addLocalVideoTrack(localVideoTrack);
         if (muteMicrophone) {
@@ -764,7 +754,5 @@ public class  ConversationActivity extends AppCompatActivity {
                     CAMERA_MIC_PERMISSION_REQUEST_CODE);
         }
     }
-
-
 
 }

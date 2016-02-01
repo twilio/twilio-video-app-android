@@ -2,8 +2,9 @@ package com.twilio.conversations.impl;
 
 import com.twilio.conversations.CameraCapturer;
 import com.twilio.conversations.LocalVideoTrack;
+import com.twilio.conversations.MediaTrackState;
 
-public class LocalVideoTrackImpl extends VideoTrackImpl implements  LocalVideoTrack  {
+public class LocalVideoTrackImpl extends VideoTrackImpl implements LocalVideoTrack  {
 
 	private CameraCapturer cameraCapturer;
 	private boolean enabledVideo = true;
@@ -19,7 +20,7 @@ public class LocalVideoTrackImpl extends VideoTrackImpl implements  LocalVideoTr
 	}
 
 	@Override
-	public boolean enableCamera(boolean enabled) {
+	public boolean enable(boolean enabled) {
 		org.webrtc.VideoTrack videoTrack = getWebrtcVideoTrack();
 		if (videoTrack != null) {
 			enabledVideo = videoTrack.setEnabled(enabled);
@@ -30,7 +31,7 @@ public class LocalVideoTrackImpl extends VideoTrackImpl implements  LocalVideoTr
 	}
 
 	@Override
-	public boolean isCameraEnabled() {
+	public boolean isEnabled() {
 		org.webrtc.VideoTrack videoTrack = getWebrtcVideoTrack();
 		if (videoTrack != null) {
 			return videoTrack.enabled();

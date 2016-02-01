@@ -83,10 +83,22 @@ public class TwilioConversations {
     public final static int TOO_MANY_TRACKS = 300;
 
     /**
+     *  An invalid video capturer was added to the local media
+     *  @note: At the moment, only {@link CameraCapturer} is supported.
+     */
+    public final static int INVALID_VIDEO_CAPTURER = 301;
+
+    /**
      *  An attempt was made to add or remove a track that is already being operated on.
      *  @note: Retry your request at a later time.
      */
     public final static int TRACK_OPERATION_IN_PROGRESS = 303;
+
+    /**
+     *  An attempt was made to remove a track that has already ended.
+     *  @note: The video track is in the {@link MediaTrackState} ENDED state.
+     */
+    public final static int INVALID_VIDEO_TRACK_STATE = 305;
 
     /**
      * Interface for the listener object to pass to
