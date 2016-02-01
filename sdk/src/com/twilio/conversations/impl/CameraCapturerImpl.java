@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.lang.reflect.Type;
 
 import org.webrtc.VideoCapturerAndroid;
 import org.webrtc.VideoCapturerAndroid.CameraEventsHandler;
@@ -34,8 +33,9 @@ public class CameraCapturerImpl implements CameraCapturer, Application.ActivityL
 	private static String TAG = "CameraCapturerImpl";
 
 	static final Logger logger = Logger.getLogger(CameraCapturerImpl.class);
+    private long session;
 
-	private enum CapturerState {
+    private enum CapturerState {
 		IDLE,
 		PREVIEWING,
 		BROADCASTING
@@ -164,7 +164,9 @@ public class CameraCapturerImpl implements CameraCapturer, Application.ActivityL
 	 * Called internally prior to a session being started to setup
 	 * the capturer used during a Conversation.
 	 */
-	synchronized void startConversationCapturer() {
+	synchronized void startConversationCapturer(long session) {
+        this.session = session;
+
 		if(isPreviewing()) {
 			stopPreview();
 		}
@@ -194,7 +196,7 @@ public class CameraCapturerImpl implements CameraCapturer, Application.ActivityL
 		if(capturerState.equals(CapturerState.PREVIEWING)) {
 			stopPreview();
 		} else if(capturerState.equals(CapturerState.BROADCASTING)) {
-			stopCapture();
+		    stopVideoSource(session);
 		}
 	}
 
@@ -204,7 +206,7 @@ public class CameraCapturerImpl implements CameraCapturer, Application.ActivityL
 			if(lastCapturerState.equals(CapturerState.PREVIEWING)) {
 				startPreview();
 			} else if(lastCapturerState.equals(CapturerState.BROADCASTING)) {
-				startCapture();
+			    restartVideoSource(session);
 			}
 			lastCapturerState = null;
 		}
@@ -471,5 +473,8 @@ public class CameraCapturerImpl implements CameraCapturer, Application.ActivityL
 	public void onActivityDestroyed(Activity activity) {
 
 	}
+
+    private native void stopVideoSource(long nativeSession);
+    private native void restartVideoSource(long nativeSession);
 
 }

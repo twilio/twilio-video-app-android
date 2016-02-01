@@ -714,7 +714,7 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 		// TODO: Camera capture is the only supported local video stream for now.
 		// Once we start supporting screen share or etc, we should modify this method.
 		CameraCapturerImpl cameraCapturer = (CameraCapturerImpl)localVideoTrack.getCameraCapturer();
-		cameraCapturer.startConversationCapturer();
+		cameraCapturer.startConversationCapturer(getNativeHandle());
 		setExternalCapturer(nativeHandle, cameraCapturer.getNativeVideoCapturer());
 	}
 	
