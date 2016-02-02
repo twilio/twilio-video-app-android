@@ -1,7 +1,10 @@
 package com.twilio.rtc.conversations.sdktests;
 
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 
 import android.support.test.rule.ActivityTestRule;
@@ -26,6 +29,17 @@ public class TwilioConversationsTests {
     @Rule
     public ActivityTestRule<TwilioConversationsActivity> mActivityRule = new ActivityTestRule<>(
             TwilioConversationsActivity.class);
+
+    @Rule
+    public final ExpectedException exception = ExpectedException.none();
+
+    /**
+     * We only teardown because not every test will want the sdk initialized
+     */
+    @After
+    public void teardown() {
+        TwilioConversations.destroy();
+    }
 
     @Test
     public void testTwilioInitialize() {
@@ -62,6 +76,42 @@ public class TwilioConversationsTests {
             org.junit.Assert.fail("test timed out after" + TwilioConversationsUtils.TIMEOUT);
         }
 
+    }
+
+    @Test
+    public void testClientCreationBeforeInitialize() {
+        exception.expect(IllegalStateException.class);
+        String bogusToken = "1234";
+        TwilioConversations.createConversationsClient(bogusToken,
+                new ConversationsClientListener() {
+            @Override
+            public void onStartListeningForInvites(ConversationsClient conversationsClient) {
+
+            }
+
+            @Override
+            public void onStopListeningForInvites(ConversationsClient conversationsClient) {
+
+            }
+
+            @Override
+            public void onFailedToStartListening(ConversationsClient conversationsClient,
+                                                 TwilioConversationsException e) {
+
+            }
+
+            @Override
+            public void onIncomingInvite(ConversationsClient conversationsClient,
+                                         IncomingInvite incomingInvite) {
+
+            }
+
+            @Override
+            public void onIncomingInviteCancelled(ConversationsClient conversationsClient,
+                                                  IncomingInvite incomingInvite) {
+
+            }
+        });
     }
 
     @Test

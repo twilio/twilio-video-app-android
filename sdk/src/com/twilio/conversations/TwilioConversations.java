@@ -205,12 +205,9 @@ public class TwilioConversations {
         if (token == null) {
             throw new NullPointerException("token must not be null");
         }
-        if (listener == null) {
-            throw new NullPointerException("listener must not be null");
-        }
         TwilioAccessManager manager = TwilioAccessManagerFactory.createAccessManager(token, null);
-        Map<String, String> options = new HashMap<String, String>();
-        return TwilioConversationsImpl.getInstance().createConversationsClient(manager, options, listener);
+
+        return createConversationsClient(manager, listener);
     }
 
     /**
@@ -223,14 +220,7 @@ public class TwilioConversations {
      *         was not initialized
      */
     public static ConversationsClient createConversationsClient(TwilioAccessManager accessManager, ConversationsClientListener listener) {
-        if (accessManager == null) {
-            throw new NullPointerException("access manager must not be null");
-        }
-        if (listener == null) {
-            throw new NullPointerException("listener must not be null");
-        }
-        Map<String, String> options = new HashMap<String, String>();
-        return TwilioConversationsImpl.getInstance().createConversationsClient(accessManager, options, listener);
+        return createConversationsClient(accessManager, new HashMap<String, String>(), listener);
     }
 
     /**
@@ -254,8 +244,13 @@ public class TwilioConversations {
         if (listener == null) {
             throw new NullPointerException("listener must not be null");
         }
+        TwilioConversationsImpl conversationsSdk = TwilioConversationsImpl.getInstance();
 
-        return TwilioConversationsImpl.getInstance().createConversationsClient(accessManager, options, listener);
+        if (!conversationsSdk.isInitialized()) {
+            throw new IllegalStateException("Cannot create client before initialize is called");
+        }
+
+        return conversationsSdk.createConversationsClient(accessManager, options, listener);
     }
 
     /**
