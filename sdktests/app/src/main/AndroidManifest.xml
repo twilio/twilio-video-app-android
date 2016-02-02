@@ -24,11 +24,6 @@
             </intent-filter>
         </activity>
 
-        <service
-            android:name="com.twilio.conversations.TwilioRTCService"
-            android:exported="false" />
-
-
     </application>
 
 </manifest>

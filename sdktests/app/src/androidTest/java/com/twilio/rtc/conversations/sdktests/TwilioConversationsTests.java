@@ -10,7 +10,7 @@ import android.support.test.runner.AndroidJUnit4;
 import com.twilio.common.TwilioAccessManager;
 import com.twilio.common.TwilioAccessManagerFactory;
 import com.twilio.rtc.conversations.sdktests.utils.TwilioConversationsUtils;
-import com.twilio.conversations.ConversationException;
+import com.twilio.conversations.TwilioConversationsException;
 import com.twilio.conversations.ConversationsClient;
 import com.twilio.conversations.ConversationsClientListener;
 import com.twilio.conversations.IncomingInvite;
@@ -230,7 +230,7 @@ public class TwilioConversationsTests {
             }
 
             @Override
-            public void onFailedToStartListening(ConversationsClient conversationsClient, ConversationException e) {
+            public void onFailedToStartListening(ConversationsClient conversationsClient, TwilioConversationsException e) {
 
             }
 

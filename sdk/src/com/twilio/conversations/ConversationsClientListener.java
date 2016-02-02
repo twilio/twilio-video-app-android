@@ -30,7 +30,7 @@ public interface ConversationsClientListener {
 	 * @param conversationsClient The conversations client that failed to start listening for incoming invitations.
 	 * @param exception Exception containing information that caused the failure.
 	 */
-	public void onFailedToStartListening(ConversationsClient conversationsClient, ConversationException exception);
+	public void onFailedToStartListening(ConversationsClient conversationsClient, TwilioConversationsException exception);
 		
 	/**
 	 * This method notifies the listener that the client has a pending invitation for a conversation.

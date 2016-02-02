@@ -10,21 +10,27 @@ public interface LocalMedia {
 	 * 
 	 * @return list of local video tracks
 	 */
-	public List<LocalVideoTrack> getLocalVideoTracks();
+	List<LocalVideoTrack> getLocalVideoTracks();
 
 	/**
 	 * Adds a local video track to list of tracks.
 	 * 
 	 * @param track
+	 *
+	 * @note This operation may not always succeed. If a failure occurs the error
+	 * is reported in {@link LocalMediaListener}.onLocalVideoTrackError(...)
 	 */
-	public boolean addLocalVideoTrack(LocalVideoTrack track);
+	void addLocalVideoTrack(LocalVideoTrack track);
 
 	/**
 	 * Removes the local video track from list of tracks.
 	 * 
 	 * @param track
+	 *
+	 * @note This operation may not always succeed. If a failure occurs the error
+	 * is reported in {@link LocalMediaListener}.onLocalVideoTrackError(...)
 	 */
-	public boolean removeLocalVideoTrack(LocalVideoTrack track);
+	void removeLocalVideoTrack(LocalVideoTrack track);
 
 	/**
 	 * Specifies whether or not your local audio should be muted
@@ -32,28 +38,28 @@ public interface LocalMedia {
 	 * @param on <code>true</code> if local audio should be muted, false otherwise
 	 * @return <code>true</code> if mute operation is successful
 	 */
-	public boolean mute(boolean on);
+	boolean mute(boolean on);
 
 	/**
 	 * Indicates whether your local audio is muted.
 	 *
 	 * @return <code>true</code> if local audio is muted, false otherwise
 	 */
-	public boolean isMuted();
+	boolean isMuted();
 
 	/**
 	 * Enables local audio to media session.
 	 *
 	 * @return true if local audio is enabled
 	 */
-	public boolean addMicrophone();
+	boolean addMicrophone();
 
 	/**
 	 * Disables local audio from the media session.
 	 * 
 	 * @return true if local audio is disabled
 	 */
-	public boolean removeMicrophone();
+	boolean removeMicrophone();
 
 	/**
 	 * Indicates whether or not your local
@@ -61,6 +67,6 @@ public interface LocalMedia {
 	 * 
 	 * @return true if local audio is enabled
 	 */
-	public boolean isMicrophoneAdded();
+	boolean isMicrophoneAdded();
 
 }

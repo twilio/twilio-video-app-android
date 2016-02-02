@@ -7,7 +7,7 @@ import android.support.test.runner.AndroidJUnit4;
 import com.twilio.rtc.conversations.sdktests.utils.TwilioConversationsUtils;
 import com.twilio.conversations.Conversation;
 import com.twilio.conversations.ConversationCallback;
-import com.twilio.conversations.ConversationException;
+import com.twilio.conversations.TwilioConversationsException;
 import com.twilio.conversations.ConversationListener;
 import com.twilio.conversations.ConversationsClient;
 import com.twilio.conversations.ConversationsClientListener;
@@ -92,10 +92,15 @@ public class ConversationsClientLifecycleTests {
             public void onLocalVideoTrackRemoved(LocalMedia localMedia, LocalVideoTrack localVideoTrack) {
 
             }
+
+            @Override
+            public void onLocalVideoTrackError(LocalMedia localMedia, LocalVideoTrack localVideoTrack, TwilioConversationsException e) {
+
+            }
         });
         OutgoingInvite outgoingInvite = conversationsClient.sendConversationInvite(participants, localMedia, new ConversationCallback() {
             @Override
-            public void onConversation(Conversation conversation, ConversationException e) {
+            public void onConversation(Conversation conversation, TwilioConversationsException e) {
 
             }
         });
@@ -139,7 +144,7 @@ public class ConversationsClientLifecycleTests {
                     }
 
                     @Override
-                    public void onFailedToStartListening(ConversationsClient conversationsClient, ConversationException e) {
+                    public void onFailedToStartListening(ConversationsClient conversationsClient, TwilioConversationsException e) {
                         wait.countDown();
                     }
 
@@ -174,7 +179,7 @@ public class ConversationsClientLifecycleTests {
             }
 
             @Override
-            public void onFailedToStartListening(ConversationsClient conversationsClient, ConversationException e) {
+            public void onFailedToStartListening(ConversationsClient conversationsClient, TwilioConversationsException e) {
 
             }
 
@@ -200,7 +205,7 @@ public class ConversationsClientLifecycleTests {
             }
 
             @Override
-            public void onFailedToConnectParticipant(Conversation conversation, Participant participant, ConversationException e) {
+            public void onFailedToConnectParticipant(Conversation conversation, Participant participant, TwilioConversationsException e) {
 
             }
 
@@ -210,7 +215,7 @@ public class ConversationsClientLifecycleTests {
             }
 
             @Override
-            public void onConversationEnded(Conversation conversation, ConversationException e) {
+            public void onConversationEnded(Conversation conversation, TwilioConversationsException e) {
 
             }
         };

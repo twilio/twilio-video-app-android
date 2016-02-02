@@ -17,7 +17,7 @@ import com.twilio.common.TwilioAccessManager;
 import com.twilio.conversations.AudioOutput;
 import com.twilio.conversations.Conversation;
 import com.twilio.conversations.ConversationCallback;
-import com.twilio.conversations.ConversationException;
+import com.twilio.conversations.TwilioConversationsException;
 import com.twilio.conversations.ConversationListener;
 import com.twilio.conversations.ConversationsClient;
 import com.twilio.conversations.ConversationsClientListener;
@@ -54,7 +54,7 @@ public class ConversationsClientImpl implements
 		conversations.remove(conversationImpl);
 	}
 
-	void onConversationTerminated(ConversationImpl conversationImpl, ConversationException e) {
+	void onConversationTerminated(ConversationImpl conversationImpl, TwilioConversationsException e) {
 		conversations.remove(conversationImpl);
 		pendingIncomingInvites.remove(conversationImpl.getIncomingInviteImpl());
 		conversationImpl.getIncomingInviteImpl().setStatus(InviteStatus.CANCELLED);
@@ -193,7 +193,7 @@ public class ConversationsClientImpl implements
 				this, participants, localMedia, this, this);
 		
 		if (outgoingConversationImpl == null || outgoingConversationImpl.getNativeHandle() == 0) {
-			ConversationException exception = new ConversationException( TwilioConversations.CLIENT_DISCONNECTED,
+			TwilioConversationsException exception = new TwilioConversationsException( TwilioConversations.CLIENT_DISCONNECTED,
 					"Cannot create conversation while reconnecting. Wait for conversations client to reconnect and try again.");
 			conversationCallback.onConversation(null, exception);
 			return null;
@@ -278,7 +278,7 @@ public class ConversationsClientImpl implements
 
 	}
 
-	private void handleConversationFailed(final ConversationImpl conversationImpl, final ConversationException e) {
+	private void handleConversationFailed(final ConversationImpl conversationImpl, final TwilioConversationsException e) {
 		final OutgoingInviteImpl outgoingInviteImpl = pendingOutgoingInvites.get(conversationImpl);
 		if(outgoingInviteImpl != null) {
 			InviteStatus status = outgoingInviteImpl.getStatus() == InviteStatus.CANCELLED ? InviteStatus.CANCELLED : InviteStatus.FAILED;
@@ -309,7 +309,7 @@ public class ConversationsClientImpl implements
 	}
 
 	@Override
-	public void onFailedToConnectParticipant(Conversation conversation, Participant participant, ConversationException e) {
+	public void onFailedToConnectParticipant(Conversation conversation, Participant participant, TwilioConversationsException e) {
 		ConversationImpl conversationImpl = (ConversationImpl)conversation;
 		handleConversationStarting(conversationImpl);
 	}
@@ -324,7 +324,7 @@ public class ConversationsClientImpl implements
 	}
 
 	@Override
-	public void onConversationEnded(Conversation conversation, ConversationException e) {
+	public void onConversationEnded(Conversation conversation, TwilioConversationsException e) {
 		ConversationImpl conversationImpl = (ConversationImpl)conversation;
 		handleConversationFailed(conversationImpl, e);
 	}
@@ -387,8 +387,8 @@ public class ConversationsClientImpl implements
 		logger.d("onRegistrationDidComplete");
 		if (error != null) {
 			listening = false;
-			final ConversationException e =
-					new ConversationException(error.getCode(), error.getMessage());
+			final TwilioConversationsException e =
+					new TwilioConversationsException(error.getCode(), error.getMessage());
 			if (handler != null) {
 				handler.post(new Runnable() {
 					@Override

@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.twilio.conversations.I420Frame;
+import com.twilio.conversations.MediaTrackState;
 import com.twilio.conversations.VideoRenderer;
 import com.twilio.conversations.VideoTrack;
 import com.twilio.conversations.impl.core.TrackInfo;
@@ -14,18 +15,25 @@ import com.twilio.conversations.impl.core.TrackInfo;
 public class VideoTrackImpl implements VideoTrack {
 	private org.webrtc.VideoTrack videoTrack;
 	private TrackInfo trackInfo;
+	private MediaTrackState trackState;
 	private Map<VideoRenderer, org.webrtc.VideoRenderer> videoRenderersMap =
 			new HashMap<VideoRenderer, org.webrtc.VideoRenderer>();
 
-	VideoTrackImpl() {}
+	VideoTrackImpl() {
+		trackState = MediaTrackState.IDLE;
+	}
 
 	VideoTrackImpl(org.webrtc.VideoTrack videoTrack, TrackInfo trackInfo) {
 		this.videoTrack = videoTrack;
 		this.trackInfo = trackInfo;
+
+		trackState = MediaTrackState.STARTED;
 	}
 
 	void setWebrtcVideoTrack(org.webrtc.VideoTrack videoTrack) {
 		this.videoTrack = videoTrack;
+
+		trackState = MediaTrackState.STARTED;
 	}
 
 	void setTrackInfo(TrackInfo trackInfo) {
@@ -71,8 +79,17 @@ public class VideoTrackImpl implements VideoTrack {
 		return trackInfo != null ? trackInfo.getTrackId() : null;
 	}
 
+	@Override
+	public MediaTrackState getState() {
+		return trackState;
+	}
+
 	void updateTrackInfo(TrackInfo trackInfo) {
 		this.trackInfo = trackInfo;
+	}
+
+	void setTrackState(MediaTrackState trackState) {
+		this.trackState = trackState;
 	}
 
 	private class VideoRendererCallbackAdapter implements org.webrtc.VideoRenderer.Callbacks {
