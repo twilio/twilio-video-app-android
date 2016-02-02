@@ -122,8 +122,7 @@ public class TwilioConversationsImpl {
                     PackageManager.GET_PERMISSIONS
                     | PackageManager.GET_SERVICES);
         } catch (NameNotFoundException e) {
-            throw new RuntimeException("Unable to resolve permissions of package. " +
-                    "Something is really wrong");
+            throw new RuntimeException("Unable to resolve permissions. " + e.getMessage());
         }
 
         // Check application permissions
