@@ -71,9 +71,9 @@ public class TwilioConversationsImpl {
 
     /**
      * TODO 
-     * Technically the SDK should be able to work even without
-     * these permissions. With Android 23 and up, the user could 
-     * opt out of these permissions at any time. The SDK should 
+     * Technically the SDK should be able to work with all
+     * normal permissions. With Android 23 and up, the user could
+     * opt out of dangerous permissions at any time. The SDK should
      * adjust accordingly. 
      **/
     private static final String[] requiredPermissions = {
