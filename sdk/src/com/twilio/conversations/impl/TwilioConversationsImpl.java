@@ -15,6 +15,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.content.pm.PackageManager.NameNotFoundException;
 import android.net.ConnectivityManager;
 import android.os.Handler;
 import android.util.Log;
@@ -68,13 +69,23 @@ public class TwilioConversationsImpl {
 
     protected final Map<UUID, WeakReference<ConversationsClientImpl>> conversationsClientMap = new HashMap<UUID, WeakReference<ConversationsClientImpl>>();
 
+    /**
+     * TODO 
+     * Technically the SDK should be able to work with all
+     * normal permissions. With Android 23 and up, the user could
+     * opt out of dangerous permissions at any time. The SDK should
+     * adjust accordingly. 
+     **/
     private static final String[] requiredPermissions = {
+        // Dangerous permissions (require permission)
         "android.permission.CAMERA",
-        "android.permission.INTERNET",
         "android.permission.RECORD_AUDIO",
+
+        // Normal permissions (granted upon install)
+        "android.permission.INTERNET",
         "android.permission.MODIFY_AUDIO_SETTINGS",
         "android.permission.ACCESS_NETWORK_STATE",
-        "android.permission.ACCESS_WIFI_STATE",
+        "android.permission.ACCESS_WIFI_STATE"
     };
 
     public static TwilioConversationsImpl getInstance() {
@@ -96,7 +107,6 @@ public class TwilioConversationsImpl {
     TwilioConversationsImpl() {}
 
     public void initialize(final Context applicationContext, final TwilioConversations.InitListener initListener) {
-
         if (isInitialized() || isInitializing()) {
             initListener.onError(new RuntimeException("Initialize already called"));
             return;
@@ -105,41 +115,38 @@ public class TwilioConversationsImpl {
         initializing = true;
         context = applicationContext;
 
+        PackageManager pm = applicationContext.getPackageManager();
+        PackageInfo pinfo = null;
         try {
-            PackageManager pm = applicationContext.getPackageManager();
-            PackageInfo pinfo = pm.getPackageInfo(applicationContext.getPackageName(),
+            pinfo = pm.getPackageInfo(applicationContext.getPackageName(),
                     PackageManager.GET_PERMISSIONS
                     | PackageManager.GET_SERVICES);
+        } catch (NameNotFoundException e) {
+            throw new RuntimeException("Unable to resolve permissions. " + e.getMessage());
+        }
 
-            // Check application permissions
-            Map<String, Boolean> appPermissions = new HashMap<String, Boolean>(
-                    pinfo.requestedPermissions != null ? pinfo.requestedPermissions.length
-                    : 0);
-            if (pinfo.requestedPermissions != null) {
-                for (String permission : pinfo.requestedPermissions)
-                    appPermissions.put(permission, true);
-            }
+        // Check application permissions
+        Map<String, Boolean> appPermissions = new HashMap<String, Boolean>(
+                pinfo.requestedPermissions != null ? pinfo.requestedPermissions.length
+                : 0);
+        if (pinfo.requestedPermissions != null) {
+            for (String permission : pinfo.requestedPermissions)
+                appPermissions.put(permission, true);
+        }
 
-            List<String> missingPermissions = new LinkedList<String>();
-            for (String permission : requiredPermissions) {
-                if (!appPermissions.containsKey(permission))
-                    missingPermissions.add(permission);
-            }
+        List<String> missingPermissions = new LinkedList<String>();
+        for (String permission : requiredPermissions) {
+            if (!appPermissions.containsKey(permission))
+                missingPermissions.add(permission);
+        }
 
-            if (!missingPermissions.isEmpty()) {
-                StringBuilder builder = new StringBuilder(
-                        "Your app is missing the following required permissions:");
-                for (String permission : missingPermissions)
-                    builder.append(' ').append(permission);
+        if (!missingPermissions.isEmpty()) {
+            StringBuilder builder = new StringBuilder(
+                    "Your app is missing the following required permissions:");
+            for (String permission : missingPermissions)
+                builder.append(' ').append(permission);
 
-                throw new RuntimeException(builder.toString());
-            }
-
-        } catch (Exception e) {
-            initializing = false;
-            initialized = false;
-            initListener.onError(e);
-            return;
+            throw new RuntimeException(builder.toString());
         }
 
         final Handler handler = CallbackHandler.create();

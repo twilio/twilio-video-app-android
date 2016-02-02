@@ -21,7 +21,7 @@
             <zipfileset src="bin/classes.jar" includes="**/*.java **/*.class"/>
             <zipfileset src="libs/libjingle_peerconnection_java.jar" includes="**/*.java **/*.class"/>
             <!-- We need to rename the .so artifact to this in order to comply with webrtc files referencing it -->
-            <zipfileset dir="libs" includes="**/libjingle_peerconnection_so.so" prefix="lib/"/>
+            <zipfileset dir="obj/local" includes="**/libjingle_peerconnection_so.so" prefix="lib/"/>
         </jar>
     </target>
 
