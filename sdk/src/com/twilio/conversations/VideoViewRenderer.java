@@ -44,7 +44,8 @@ public class VideoViewRenderer implements VideoRenderer {
     };
 
     private final SurfaceViewRenderer surfaceViewRenderer;
-    private boolean mirror;
+    private boolean mirror = false;
+    private VideoScaleType videoScaleType = VideoScaleType.ASPECT_FIT;
     private VideoRendererObserver rendererObserver;
 
     /**
@@ -69,6 +70,16 @@ public class VideoViewRenderer implements VideoRenderer {
         refreshRenderer();
     }
 
+    public VideoScaleType getVideoScaleType() {
+        return videoScaleType;
+    }
+
+    public void setVideoScaleType(VideoScaleType videoScaleType) {
+        this.videoScaleType = videoScaleType;
+        surfaceViewRenderer.setScalingType(convertToWebRtcScaleType(videoScaleType));
+        refreshRenderer();
+    }
+
     public void setObserver(VideoRendererObserver rendererObserver) {
         this.rendererObserver = rendererObserver;
     }
@@ -77,7 +88,7 @@ public class VideoViewRenderer implements VideoRenderer {
         container.addView(surfaceViewRenderer);
         surfaceViewRenderer.init(EglBaseProvider.provideEglBase().getContext(),
                 internalEventListener);
-        surfaceViewRenderer.setScalingType(ScalingType.SCALE_ASPECT_FIT);
+        surfaceViewRenderer.setScalingType(convertToWebRtcScaleType(videoScaleType));
     }
 
     @Override
@@ -94,6 +105,19 @@ public class VideoViewRenderer implements VideoRenderer {
                 }
             }
         });
+    }
+
+    private ScalingType convertToWebRtcScaleType(VideoScaleType videoScaleType) {
+        switch (videoScaleType) {
+            case ASPECT_FIT:
+                return ScalingType.SCALE_ASPECT_FIT;
+            case ASPECT_FILL:
+                return ScalingType.SCALE_ASPECT_FILL;
+            case ASPECT_BALANCED:
+                return ScalingType.SCALE_ASPECT_BALANCED;
+            default:
+                return ScalingType.SCALE_ASPECT_FIT;
+        }
     }
 
     private org.webrtc.VideoRenderer.I420Frame convertToWebRtcFrame(I420Frame frame) {
