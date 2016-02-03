@@ -1,5 +1,7 @@
 package com.twilio.conversations.impl;
 
+import java.util.Set;
+
 import android.os.Handler;
 
 import com.twilio.conversations.Conversation;
@@ -7,10 +9,10 @@ import com.twilio.conversations.ConversationCallback;
 import com.twilio.conversations.IncomingInvite;
 import com.twilio.conversations.InviteStatus;
 import com.twilio.conversations.LocalMedia;
+import com.twilio.conversations.TwilioConversations;
+import com.twilio.conversations.TwilioConversationsException;
 import com.twilio.conversations.impl.logging.Logger;
 import com.twilio.conversations.impl.util.CallbackHandler;
-
-import java.util.Set;
 
 public class IncomingInviteImpl implements IncomingInvite {
 
@@ -65,16 +67,22 @@ public class IncomingInviteImpl implements IncomingInvite {
 	}
 
 	@Override
-	public void accept(LocalMedia localMedia, ConversationCallback conversationCallback) {
+	public void accept(LocalMedia localMedia, final ConversationCallback conversationCallback) {
 		if(localMedia == null) {
 			throw new IllegalStateException("LocalMedia must not be null");
 		}
 		if(conversationCallback == null) {
 			throw new IllegalStateException("ConversationCallback must not be null");
 		}
-		inviteStatus = InviteStatus.ACCEPTING;
+
 		this.conversationCallback = conversationCallback;
 		conversationImpl.setLocalMedia(localMedia);
+
+		if (checkIfMaxConversationsReached()) {
+			return;
+		}
+
+		inviteStatus = InviteStatus.ACCEPTING;
 		conversationsClientImpl.accept(conversationImpl);
 	}
 
@@ -106,5 +114,25 @@ public class IncomingInviteImpl implements IncomingInvite {
 
 	InviteStatus getStatus() {
 		return inviteStatus;
+	}
+
+	private boolean checkIfMaxConversationsReached() {
+		if (conversationsClientImpl.getActiveConversationsCount() >= TwilioConstants.MAX_CONVERSATIONS) {
+			final TwilioConversationsException e = new TwilioConversationsException(
+							TwilioConversations.TOO_MANY_ACTIVE_CONVERSATIONS,
+							"Maximum number of active conversations has reached. Max conversations limit is: "+
+									TwilioConstants.MAX_CONVERSATIONS);
+			if (handler != null) {
+				handler.post(new Runnable() {
+					@Override
+					public void run() {
+						conversationCallback.onConversation(conversationImpl, e);
+					}
+				});
+			}
+			inviteStatus = InviteStatus.FAILED;
+			return true;
+		}
+		return false;
 	}
 }

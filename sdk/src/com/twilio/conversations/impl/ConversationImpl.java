@@ -11,7 +11,6 @@ import android.os.Handler;
 
 import com.twilio.conversations.AudioTrack;
 import com.twilio.conversations.Conversation;
-import com.twilio.conversations.TwilioConversationsException;
 import com.twilio.conversations.ConversationListener;
 import com.twilio.conversations.LocalMedia;
 import com.twilio.conversations.LocalVideoTrack;
@@ -20,6 +19,7 @@ import com.twilio.conversations.MediaTrackState;
 import com.twilio.conversations.Participant;
 import com.twilio.conversations.TrackOrigin;
 import com.twilio.conversations.TwilioConversations;
+import com.twilio.conversations.TwilioConversationsException;
 import com.twilio.conversations.VideoTrack;
 import com.twilio.conversations.impl.core.ConversationStateObserver;
 import com.twilio.conversations.impl.core.ConversationStatus;
@@ -167,6 +167,13 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 		}
 		ConversationImpl conversationImpl = new ConversationImpl(conversationsClientImpl, nativeSession, participantIdentities, conversationStateObserver);
 		return conversationImpl;
+	}
+
+	public boolean isActive() {
+		return ((state == SessionState.STARTING) ||
+				(state == SessionState.STOPPING) ||
+				(state == SessionState.IN_PROGRESS) ||
+				(state == SessionState.STOP_FAILED));
 	}
 
 	@Override

@@ -17,7 +17,6 @@ import com.twilio.common.TwilioAccessManager;
 import com.twilio.conversations.AudioOutput;
 import com.twilio.conversations.Conversation;
 import com.twilio.conversations.ConversationCallback;
-import com.twilio.conversations.TwilioConversationsException;
 import com.twilio.conversations.ConversationListener;
 import com.twilio.conversations.ConversationsClient;
 import com.twilio.conversations.ConversationsClientListener;
@@ -26,6 +25,7 @@ import com.twilio.conversations.LocalMedia;
 import com.twilio.conversations.OutgoingInvite;
 import com.twilio.conversations.Participant;
 import com.twilio.conversations.TwilioConversations;
+import com.twilio.conversations.TwilioConversationsException;
 import com.twilio.conversations.impl.core.ConversationStateObserver;
 import com.twilio.conversations.impl.core.ConversationStatus;
 import com.twilio.conversations.impl.core.CoreEndpoint;
@@ -46,7 +46,6 @@ public class ConversationsClientImpl implements
 	static final Logger logger = Logger.getLogger(ConversationsClientImpl.class);
 
 	// Current support is limited to one conversation
-	private static final int MAX_CONVERSATIONS = 1;
 	private static final String DISPOSE_MESSAGE = "The ConversationsClient has been disposed. This operation is no longer valid";
 	private static final String FINALIZE_MESSAGE = "The ConversationsClient must be released by calling dispose(). Failure to do so may result in leaked resources.";
 
@@ -139,6 +138,16 @@ public class ConversationsClientImpl implements
 	
 	long getEndpointObserverHandle() {
 		return this.endpointObserver.getNativeHandle();
+	}
+
+	public int getActiveConversationsCount() {
+		int activeConversations = 0;
+		for (ConversationImpl conv : conversations) {
+			if (conv.isActive()) {
+				activeConversations++;
+			}
+		}
+		return activeConversations;
 	}
 
 	@Override
@@ -455,11 +464,6 @@ public class ConversationsClientImpl implements
 	@Override
 	public void onIncomingCallDidReceive(long nativeSession, String[] participants) {
 		logger.d("onIncomingCallDidReceive");
-
-		if(conversations.size() >= MAX_CONVERSATIONS) {
-			logger.w("An invite was ignored because a conversation is already active.");
-			return;
-		}
 
 		ConversationImpl incomingConversationImpl = ConversationImpl.createIncomingConversation(this, nativeSession, participants, this);
 		if (incomingConversationImpl == null) {
