@@ -385,60 +385,6 @@ public class CameraCapturerImpl implements CameraCapturer, Application.ActivityL
 
 	}
 
-	private void startCapture() {
-		/*
-		 * Get requestedWidth, requestedHeight, requestedFramerate, frameObserver, applicationContext
-		 * using reflection.
-		 */
-		try {
-			Field requestedWidthField = videoCapturerAndroid.getClass().getDeclaredField("requestedWidth");
-			requestedWidthField.setAccessible(true);
-			int requestedWidth = requestedWidthField.getInt(videoCapturerAndroid);
-
-			Field requestedHeightField = videoCapturerAndroid.getClass().getDeclaredField("requestedHeight");
-			requestedHeightField.setAccessible(true);
-			int requestedHeight = requestedHeightField.getInt(videoCapturerAndroid);
-
-			Field requestedFramerateField = videoCapturerAndroid.getClass().getDeclaredField("requestedFramerate");
-			requestedFramerateField.setAccessible(true);
-			int requestedFramerate = requestedFramerateField.getInt(videoCapturerAndroid);
-
-			Field applicationContextField = videoCapturerAndroid.getClass().getDeclaredField("applicationContext");
-			applicationContextField.setAccessible(true);
-			Context applicationContext = (Context) applicationContextField.get(videoCapturerAndroid);
-
-			Field frameObserverField = videoCapturerAndroid.getClass().getDeclaredField("frameObserver");
-			frameObserverField.setAccessible(true);
-
-			Method startCaptureMethod = videoCapturerAndroid.getClass().getDeclaredMethod("startCapture", int.class, int.class, int.class, Context.class, frameObserverField.getType());
-			startCaptureMethod.setAccessible(true);
-			startCaptureMethod.invoke(videoCapturerAndroid, requestedWidth, requestedHeight, requestedFramerate, applicationContext, frameObserverField.get(videoCapturerAndroid));
-
-		} catch (NoSuchFieldException e) {
-			throw new RuntimeException("Unable to get startCapture field: " + e.getMessage());
-		} catch (IllegalAccessException e) {
-			throw new RuntimeException("Unable to access startCapture field: " + e.getMessage());
-		} catch (NoSuchMethodException e) {
-			throw new RuntimeException("Unable to access get startCapture method: " + e.getMessage());
-		} catch (InvocationTargetException e) {
-			throw new RuntimeException("Unable to invoke startCapture method: " + e.getMessage());
-		}
-	}
-
-	private void stopCapture() {
-		try {
-			Method stopCaptureMethod = videoCapturerAndroid.getClass().getDeclaredMethod("stopCapture");
-			stopCaptureMethod.setAccessible(true);
-			stopCaptureMethod.invoke(videoCapturerAndroid);
-		} catch (NoSuchMethodException e) {
-			throw new RuntimeException("Unable to get stopCapture method: " + e.getMessage());
-		} catch (InvocationTargetException e) {
-			throw new RuntimeException("Unable to invoke stopCapture method: " + e.getMessage());
-		} catch (IllegalAccessException e) {
-			throw new RuntimeException("Unable to access stopCapture method: " + e.getMessage());
-		}
-	}
-
 	@Override
 	public void onActivityCreated(Activity activity, Bundle savedInstanceState) {
 
