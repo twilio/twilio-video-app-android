@@ -1,10 +1,11 @@
 package com.twilio.conversations.impl;
 
+import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CountDownLatch;
 
 import android.content.Context;
@@ -95,7 +96,7 @@ public class ConversationsClientImpl implements
 	private TwilioAccessManager accessManager;
 	private Handler handler;
 	private EndpointState endpointState;
-	private Set<ConversationImpl> conversations = new HashSet<ConversationImpl>();
+	private Set<ConversationImpl> conversations = Collections.newSetFromMap(new ConcurrentHashMap<ConversationImpl, Boolean>());
 	private Map<ConversationImpl, OutgoingInviteImpl> pendingOutgoingInvites = new HashMap<ConversationImpl, OutgoingInviteImpl>();
 	private Map<ConversationImpl, IncomingInviteImpl> pendingIncomingInvites = new HashMap<ConversationImpl, IncomingInviteImpl>();
 
