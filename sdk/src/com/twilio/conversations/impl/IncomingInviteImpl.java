@@ -28,7 +28,7 @@ public class IncomingInviteImpl implements IncomingInvite {
 							   ConversationImpl conversationImpl) {
 		this.conversationImpl = conversationImpl;
 		this.conversationsClientImpl = conversationsClientImpl;
-		this.inviteStatus = InviteStatus.PENDING;
+		setStatus(InviteStatus.PENDING);
 		this.handler = CallbackHandler.create();
 		if(handler == null) {
 			throw new IllegalThreadStateException("This thread must be able to obtain a Looper");
@@ -75,20 +75,30 @@ public class IncomingInviteImpl implements IncomingInvite {
 			throw new IllegalStateException("ConversationCallback must not be null");
 		}
 
+		if (getStatus() != InviteStatus.PENDING) {
+			setStatus(InviteStatus.FAILED);
+			throw new IllegalStateException("Invite status must be PENDING");
+		}
+
 		this.conversationCallback = conversationCallback;
 		conversationImpl.setLocalMedia(localMedia);
 
-		if (checkIfMaxConversationsReached()) {
+		if (maxConversationsReached()) {
+			setStatus(InviteStatus.FAILED);
 			return;
 		}
 
-		inviteStatus = InviteStatus.ACCEPTING;
+		setStatus(InviteStatus.ACCEPTING);
 		conversationsClientImpl.accept(conversationImpl);
 	}
 
 	@Override
 	public void reject() {
-		inviteStatus = InviteStatus.REJECTED;
+		if (getStatus() != InviteStatus.PENDING) {
+			logger.w("Rejecting invite that is no longer pending");
+			return;
+		}
+		setStatus(InviteStatus.REJECTED);
 		conversationsClientImpl.reject(conversationImpl);
 	}
 
@@ -116,7 +126,7 @@ public class IncomingInviteImpl implements IncomingInvite {
 		return inviteStatus;
 	}
 
-	private boolean checkIfMaxConversationsReached() {
+	private boolean maxConversationsReached() {
 		if (conversationsClientImpl.getActiveConversationsCount() >= TwilioConstants.MAX_CONVERSATIONS) {
 			final TwilioConversationsException e = new TwilioConversationsException(
 							TwilioConversations.TOO_MANY_ACTIVE_CONVERSATIONS,
@@ -130,7 +140,6 @@ public class IncomingInviteImpl implements IncomingInvite {
 					}
 				});
 			}
-			inviteStatus = InviteStatus.FAILED;
 			return true;
 		}
 		return false;

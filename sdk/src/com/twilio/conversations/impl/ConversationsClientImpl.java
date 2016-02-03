@@ -141,7 +141,7 @@ public class ConversationsClientImpl implements
 		return this.endpointObserver.getNativeHandle();
 	}
 
-	public int getActiveConversationsCount() {
+	int getActiveConversationsCount() {
 		int activeConversations = 0;
 		for (ConversationImpl conv : conversations) {
 			if (conv.isActive()) {
