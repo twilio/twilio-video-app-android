@@ -2,8 +2,6 @@ package com.twilio.conversations.impl;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 
 import org.webrtc.VideoCapturerAndroid;
 import org.webrtc.VideoCapturerAndroid.CameraEventsHandler;
@@ -60,6 +58,13 @@ public class CameraCapturerImpl implements CameraCapturer, Application.ActivityL
 
 	private CameraCapturerImpl(Activity activity, CameraSource source,
 			ViewGroup previewContainer, CapturerErrorListener listener) {
+		if(activity == null) {
+			throw new NullPointerException("activity must not be null");
+		}
+		if(source == null) {
+			throw new NullPointerException("source must not be null");
+		}
+
 		this.activity = activity;
 		this.source = source;
 		this.previewContainer = previewContainer;
