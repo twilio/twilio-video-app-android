@@ -28,7 +28,7 @@ public class IncomingInviteImpl implements IncomingInvite {
 							   ConversationImpl conversationImpl) {
 		this.conversationImpl = conversationImpl;
 		this.conversationsClientImpl = conversationsClientImpl;
-		setStatus(InviteStatus.PENDING);
+		inviteStatus = InviteStatus.PENDING;
 		this.handler = CallbackHandler.create();
 		if(handler == null) {
 			throw new IllegalThreadStateException("This thread must be able to obtain a Looper");
@@ -75,8 +75,8 @@ public class IncomingInviteImpl implements IncomingInvite {
 			throw new IllegalStateException("ConversationCallback must not be null");
 		}
 
-		if (getStatus() != InviteStatus.PENDING) {
-			setStatus(InviteStatus.FAILED);
+		if (inviteStatus != InviteStatus.PENDING) {
+			inviteStatus = InviteStatus.FAILED;
 			throw new IllegalStateException("Invite status must be PENDING");
 		}
 
@@ -84,21 +84,21 @@ public class IncomingInviteImpl implements IncomingInvite {
 		conversationImpl.setLocalMedia(localMedia);
 
 		if (maxConversationsReached()) {
-			setStatus(InviteStatus.FAILED);
+			inviteStatus = InviteStatus.FAILED;
 			return;
 		}
 
-		setStatus(InviteStatus.ACCEPTING);
+		inviteStatus = InviteStatus.ACCEPTING;
 		conversationsClientImpl.accept(conversationImpl);
 	}
 
 	@Override
 	public void reject() {
-		if (getStatus() != InviteStatus.PENDING) {
+		if (inviteStatus != InviteStatus.PENDING) {
 			logger.w("Rejecting invite that is no longer pending");
 			return;
 		}
-		setStatus(InviteStatus.REJECTED);
+		inviteStatus = InviteStatus.REJECTED;
 		conversationsClientImpl.reject(conversationImpl);
 	}
 
@@ -122,10 +122,6 @@ public class IncomingInviteImpl implements IncomingInvite {
 		return inviteStatus;
 	}
 
-	InviteStatus getStatus() {
-		return inviteStatus;
-	}
-
 	private boolean maxConversationsReached() {
 		if (conversationsClientImpl.getActiveConversationsCount() >= TwilioConstants.MAX_CONVERSATIONS) {
 			final TwilioConversationsException e = new TwilioConversationsException(
@@ -136,7 +132,7 @@ public class IncomingInviteImpl implements IncomingInvite {
 				handler.post(new Runnable() {
 					@Override
 					public void run() {
-						conversationCallback.onConversation(conversationImpl, e);
+						conversationCallback.onConversation(null, e);
 					}
 				});
 			}
