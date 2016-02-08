@@ -41,16 +41,4 @@ public interface CameraCapturer {
 	 */
 	boolean switchCamera();
 
-	/**
-	 * Pauses the capturer when previewing or sharing the camera during a conversation
-	 *
-	 */
-	void pause();
-
-	/**
-	 * Resumes the capturer to preview or share the camera during a conversation
-	 *
-	 */
-	void resume();
-
 }

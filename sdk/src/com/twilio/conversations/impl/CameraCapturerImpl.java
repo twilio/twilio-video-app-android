@@ -8,10 +8,8 @@ import org.webrtc.VideoCapturerAndroid.CameraEventsHandler;
 import org.webrtc.CameraEnumerationAndroid;
 
 import android.app.Activity;
-import android.app.Application;
 import android.content.Context;
 import android.hardware.Camera;
-import android.os.Bundle;
 import android.view.OrientationEventListener;
 import android.view.Surface;
 import android.view.SurfaceHolder;
@@ -26,7 +24,7 @@ import com.twilio.conversations.CapturerException.ExceptionDomain;
 import com.twilio.conversations.impl.logging.Logger;
 
 
-public class CameraCapturerImpl implements CameraCapturer, Application.ActivityLifecycleCallbacks {
+public class CameraCapturerImpl implements CameraCapturer {
 
 	private static String TAG = "CameraCapturerImpl";
 
@@ -39,7 +37,7 @@ public class CameraCapturerImpl implements CameraCapturer, Application.ActivityL
 		BROADCASTING
 	}
 
-	private final Activity activity;
+	private final Context context;
 	private CameraSource source;
 	private CapturerState lastCapturerState;
 
@@ -51,21 +49,20 @@ public class CameraCapturerImpl implements CameraCapturer, Application.ActivityL
     private CapturerState capturerState = CapturerState.IDLE;
 
 	/* Conversation capturer members */
-	private ViewGroup captureView;
 	private VideoCapturerAndroid videoCapturerAndroid;
 	private CapturerErrorListener listener;
 	private long nativeVideoCapturerAndroid;
 
-	private CameraCapturerImpl(Activity activity, CameraSource source,
+	private CameraCapturerImpl(Activity context, CameraSource source,
 			ViewGroup previewContainer, CapturerErrorListener listener) {
-		if(activity == null) {
-			throw new NullPointerException("activity must not be null");
+		if(context == null) {
+			throw new NullPointerException("context must not be null");
 		}
 		if(source == null) {
 			throw new NullPointerException("source must not be null");
 		}
 
-		this.activity = activity;
+		this.context = context;
 		this.source = source;
 		this.previewContainer = previewContainer;
 		this.listener = listener;
@@ -73,7 +70,6 @@ public class CameraCapturerImpl implements CameraCapturer, Application.ActivityL
 		if(cameraId < 0 && listener != null) {
 			listener.onError(new CapturerException(ExceptionDomain.CAMERA, "Invalid camera source."));
 		}
-		activity.getApplication().registerActivityLifecycleCallbacks(this);
 	}
 
 	public static CameraCapturerImpl create(
@@ -140,7 +136,7 @@ public class CameraCapturerImpl implements CameraCapturer, Application.ActivityL
         }
         camera.setParameters(params);
 
-        cameraPreview = new CameraPreview(activity, camera, listener);
+        cameraPreview = new CameraPreview(context, camera, listener);
         previewContainer.removeAllViews();
         previewContainer.addView(cameraPreview);
 
@@ -195,22 +191,16 @@ public class CameraCapturerImpl implements CameraCapturer, Application.ActivityL
 		}
 	}
 
-	@Override
-	public void pause() {
+	void pause() {
 		lastCapturerState = capturerState;
-		if(capturerState.equals(CapturerState.PREVIEWING)) {
-			stopPreview();
-		} else if(capturerState.equals(CapturerState.BROADCASTING)) {
+		if(capturerState.equals(CapturerState.BROADCASTING)) {
 		    stopVideoSource(session);
 		}
 	}
 
-	@Override
-	public void resume() {
+	void resume() {
 		if(lastCapturerState != null) {
-			if(lastCapturerState.equals(CapturerState.PREVIEWING)) {
-				startPreview();
-			} else if(lastCapturerState.equals(CapturerState.BROADCASTING)) {
+			if(lastCapturerState.equals(CapturerState.BROADCASTING)) {
 			    restartVideoSource(session);
 			}
 			lastCapturerState = null;
@@ -387,41 +377,6 @@ public class CameraCapturerImpl implements CameraCapturer, Application.ActivityL
 			}
 			return orientation;
 		}
-
-	}
-
-	@Override
-	public void onActivityCreated(Activity activity, Bundle savedInstanceState) {
-
-	}
-
-	@Override
-	public void onActivityStarted(Activity activity) {
-
-	}
-
-	@Override
-	public void onActivityResumed(Activity activity) {
-		resume();
-	}
-
-	@Override
-	public void onActivityPaused(Activity activity) {
-		pause();
-	}
-
-	@Override
-	public void onActivityStopped(Activity activity) {
-
-	}
-
-	@Override
-	public void onActivitySaveInstanceState(Activity activity, Bundle outState) {
-
-	}
-
-	@Override
-	public void onActivityDestroyed(Activity activity) {
 
 	}
 
