@@ -1,0 +1,81 @@
+apply plugin: 'com.android.model.application'
+
+//def nexusReleaseVersion = project.VERSION_NAME + "-" + project.VERSION_CODE
+//def nexusDebugVersion = project.VERSION_NAME + "-" + project.VERSION_CODE + "-SNAPSHOT"
+
+//// Generate the version name and version code
+//ext {
+//    generateVersionName = {
+//        def version = project.VERSION_NAME
+//        def build = project.VERSION_CODE
+////        return version + "-" + build
+//        return "1.0.0"
+//    }
+//
+//    generateVersionCode = {
+//        def version = project.VERSION_NAME.toString().replace(".", "") as int
+//        def build = project.VERSION_CODE as int
+//        return 100
+////        return version * 1000 + build
+//    }
+//}
+
+model {
+    android {
+        compileSdkVersion 23
+        buildToolsVersion "23.0.2"
+
+        defaultConfig.with {
+            applicationId "com.twilio.rtc.conversations.testapp"
+            minSdkVersion.apiLevel = 16
+            targetSdkVersion.apiLevel = 23
+            // versionName generateVersionName()
+//            versionName "1.0.0"
+//            versionCode 100
+        }
+    }
+
+    /*
+     * Use the debug keystore to sign all variants of the test app
+     * since this is only used internally.
+     */
+//    android.signingConfigs {
+//        debug {
+//            storeFile file("${System.env.HOME}/.android/debug.keystore")
+//        }
+//    }
+    android.sources {
+        main {
+            jni {
+                dependencies {
+                    project ":conversations"
+                }
+            }
+        }
+    }
+
+    android.buildTypes {
+        release {
+            minifyEnabled false
+//            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+        debug {
+            applicationIdSuffix ".debug"
+            versionNameSuffix "-debug"
+            ndk {
+                debuggable true
+            }
+        }
+    }
+}
+
+dependencies {
+    compile project(':conversations')
+
+    compile 'net.hockeyapp.android:HockeySDK:3.5.0'
+    compile 'com.android.support:appcompat-v7:23.1.1'
+    compile 'com.android.support:design:23.1.1'
+    compile 'com.squareup.retrofit:retrofit:1.9.0'
+    compile 'com.jakewharton.timber:timber:4.1.0'
+}
+

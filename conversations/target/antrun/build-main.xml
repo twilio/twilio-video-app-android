@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<project name="maven-antrun-" default="main"  >
+<target name="main">
+  <copy file="/Users/aalaniz/development/twilio/signal-sdk-android/sdk/target/android/twilio-common-android.jar" tofile="libs/twilio-common-android.jar"/>
+</target>
+</project>

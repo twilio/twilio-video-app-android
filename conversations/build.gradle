@@ -1,0 +1,217 @@
+apply plugin: 'com.android.model.library'
+
+def twilioSdkHome = "/usr/local/twilio-sdk"
+// TODO use targetPlatform
+// def coreHome = "${twilioSdkHome}/core/android/${targetPlatform.getName()}"
+def coreHome = "${twilioSdkHome}/core/android/armeabiv7a"
+// def twilioCommonHome = "${twilioSdkHome}/twilio-common/android/${targetPlatform.getName()}"
+def twilioCommonHome = "${twilioSdkHome}/twilio-common/android/armeabiv7a"
+// TODO use targetPlatform
+// def pocoFoundationHome = "${twilioSdkHome}/poco/android/${targetPlatform.getName()}"
+def pocoFoundationHome = "${twilioSdkHome}/poco/android/armeabiv7a"
+// TODO use targetPlatform
+// def pocoNetHome = "${twilioSdkHome}/poco/android/${targetPlatform.getName()}"
+def pocoNetHome = "${twilioSdkHome}/poco/android/armeabiv7a"
+// TODO use targetPlatform
+// def pocoCryptoHome = "${twilioSdkHome}/poco/android/${targetPlatform.getName()}"
+def pocoCryptoHome = "${twilioSdkHome}/poco/android/armeabiv7a"
+// TODO use targetPlatform
+// def pocoNetSslHome = "${twilioSdkHome}/poco/android/${targetPlatform.getName()}"
+def pocoNetSslHome = "${twilioSdkHome}/poco/android/armeabiv7a"
+// TODO use targetPlatform
+// def pocoUtilHome = "${twilioSdkHome}/poco/android/${targetPlatform.getName()}"
+def pocoUtilHome = "${twilioSdkHome}/poco/android/armeabiv7a"
+// TODO use targetPlatform
+// def pocoXmlHome = "${twilioSdkHome}/poco/android/${targetPlatform.getName()}"
+def pocoXmlHome = "${twilioSdkHome}/poco/android/armeabiv7a"
+// TODO use targetPlatform
+// def pocoJsonHome = "${twilioSdkHome}/poco/android/${targetPlatform.getName()}"
+def pocoJsonHome = "${twilioSdkHome}/poco/android/armeabiv7a"
+// TODO use targetPlatform
+// def boringSslHome = "${twilioSdkHome}/poco/android/${targetPlatform.getName()}"
+def boringSslHome = "${twilioSdkHome}/boringssl/android/armeabiv7a"
+// TODO use targetPlatform
+// def webRtcHome = "${twilioSdkHome}/poco/android/${targetPlatform.getName()}"
+def webRtcHome = "${twilioSdkHome}/webrtc/android/armeabiv7a"
+
+model {
+    repositories {
+        libs(PrebuiltLibraries) {
+            twilioSdkCore {
+                headers.srcDir "${coreHome}/include"
+                binaries.withType(StaticLibraryBinary) {
+                    staticLibraryFile = file("${coreHome}/lib/libtwilio-sdk-core-full.a")
+                }
+            }
+            twilioCommon {
+                headers.srcDir "${twilioCommonHome}/include"
+                binaries.withType(StaticLibraryBinary) {
+                    staticLibraryFile = file("${twilioCommonHome}/lib/libtwilio-common.a")
+                }
+            }
+            pocoFoundation {
+                headers.srcDir "${pocoFoundationHome}/include"
+                binaries.withType(StaticLibraryBinary) {
+                    staticLibraryFile = file("${pocoFoundationHome}/lib/libPocoFoundation.a")
+                }
+            }
+            pocoNet {
+                headers.srcDir "${pocoNetHome}/include"
+                binaries.withType(StaticLibraryBinary) {
+                    staticLibraryFile = file("${pocoNetHome}/lib/libPocoNet.a")
+                }
+            }
+            pocoCrypto {
+                headers.srcDir "${pocoCryptoHome}/include/Crypto"
+                binaries.withType(StaticLibraryBinary) {
+                    staticLibraryFile = file("${pocoCryptoHome}/lib/libPocoCrypto.a")
+                }
+            }
+            pocoNetSsl {
+                headers.srcDir "${pocoNetSslHome}/include"
+                binaries.withType(StaticLibraryBinary) {
+                    staticLibraryFile = file("${pocoNetSslHome}/lib/libPocoNetSSL.a")
+                }
+            }
+            pocoUtil {
+                headers.srcDir "${pocoUtilHome}/include"
+                binaries.withType(StaticLibraryBinary) {
+                    staticLibraryFile = file("${pocoUtilHome}/lib/libPocoUtil.a")
+                }
+            }
+            pocoXml {
+                headers.srcDir "${pocoXmlHome}/include"
+                binaries.withType(StaticLibraryBinary) {
+                    staticLibraryFile = file("${pocoXmlHome}/lib/libPocoXML.a")
+                }
+            }
+            pocoJson {
+                headers.srcDir "${pocoJsonHome}/include"
+                binaries.withType(StaticLibraryBinary) {
+                    staticLibraryFile = file("${pocoJsonHome}/lib/libPocoJSON.a")
+                }
+            }
+            boringssl {
+                headers.srcDir "${boringSslHome}/include"
+                binaries.withType(StaticLibraryBinary) {
+                    staticLibraryFile = file("${boringSslHome}/lib/libboringssl.a")
+                }
+            }
+            webrtc {
+                headers.srcDir "${webRtcHome}/include"
+                binaries.withType(StaticLibraryBinary) {
+                    staticLibraryFile = file("${webRtcHome}/lib/libwebrtc.a")
+                }
+            }
+            webrtcJni {
+                headers.srcDir "${webRtcHome}/include"
+                binaries.withType(StaticLibraryBinary) {
+                    staticLibraryFile = file("${webRtcHome}/lib/libwebrtc-jni.a")
+                }
+            }
+            jniHelpers {
+                headers.srcDir "${webRtcHome}/include"
+                binaries.withType(StaticLibraryBinary) {
+                    staticLibraryFile = file("${webRtcHome}/lib/libjni-helpers.a")
+                }
+            }
+        }
+    }
+
+    android {
+        compileSdkVersion 23
+        buildToolsVersion "23.0.2"
+
+        defaultConfig.with {
+            minSdkVersion.apiLevel 16 
+            targetSdkVersion.apiLevel 23
+
+            testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        }
+    }
+
+    android.ndk {
+        moduleName "jingle_peerconnection_so"
+        toolchainVersion "4.9"
+        platformVersion 16
+        stl "c++_static"
+        cppFlags.add("-DWEBRTC_POSIX -DTWILIO_SDK_2_0 -DWEBRTC_ANDROID -DWEBRTC_ANDROID_OPENSLES -DPOCO_ANDROID -DPJ_IS_BIG_ENDIAN=0 -DPJ_IS_LITTLE_ENDIAN=1 -DARM -Wall")
+        cppFlags.add("-std=gnu++11")
+        cppFlags.add("-fexceptions")
+        ldLibs.addAll(["log",
+                       "z",
+                       "m",
+                       "dl",
+                       "GLESv2",
+                       "jnigraphics",
+                       "OpenSLES",
+                       "EGL",
+                       "GLESv1_CM",
+                       "android",
+                       "${coreHome}/lib/libtwilio-sdk-core-full.a".toString(),
+                       "${twilioCommonHome}/lib/libtwilio-common.a".toString(),
+                       "${pocoFoundationHome}/lib/libPocoFoundation.a".toString(),
+                       "${pocoNetHome}/lib/libPocoNet.a".toString(),
+                       "${pocoCryptoHome}/lib/libPocoCrypto.a".toString(),
+                       "${pocoNetSslHome}/lib/libPocoNetSSL.a".toString(),
+                       "${pocoUtilHome}/lib/libPocoUtil.a".toString(),
+                       "${pocoXmlHome}/lib/libPocoXML.a".toString(),
+                       "${pocoJsonHome}/lib/libPocoJSON.a".toString(),
+                       "${boringSslHome}/lib/libboringssl.a".toString(),
+                       "${webRtcHome}/lib/libwebrtc.a".toString(),
+                       "${webRtcHome}/lib/libwebrtc-jni.a".toString(),
+                       "${webRtcHome}/lib/libjni-helpers.a".toString()
+        ])
+        abiFilters.addAll(["armeabi-v7a"])
+    }
+
+    android.sources {
+        main {
+            jni {
+                exportedHeaders {
+                    srcDir "src/main/jni"
+                }
+                dependencies {
+                    library "twilioSdkCore" linkage "static"
+                    library "twilioCommon" linkage "static"
+                    library "pocoFoundation" linkage "static"
+                    library "pocoNet" linkage "static"
+                    library "pocoCrypto" linkage "static"
+                    library "pocoNetSsl" linkage "static"
+                    library "pocoUtil" linkage "static"
+                    library "pocoXml" linkage "static"
+                    library "pocoJson" linkage "static"
+                    library "boringssl" linkage "static"
+                    library "webrtc" linkage "static"
+                    library "webrtcJni" linkage "static"
+                    library "jniHelpers" linkage "static"
+                }
+            }
+        }
+    }
+
+    android.buildTypes {
+        debug {
+            ndk {
+                debuggable true
+            }
+        }
+        release {
+            minifyEnabled false
+        }
+    }
+}
+
+dependencies {
+    androidTestCompile 'com.android.support:support-annotations:23.1.1'
+    androidTestCompile 'com.android.support.test:runner:0.4'
+    androidTestCompile 'com.android.support.test:rules:0.4'
+
+    compile files("${twilioSdkHome}/webrtc/android/armeabiv7a/lib/libjingle_peerconnection_java.jar")
+    compile 'com.twilio.sdk:twilio-common-android:0.1.17'
+}
+
+task localizeWebRtcJniLoadOnUnLoad(type: Exec, dependsOn: assemble) {
+    commandLine '/Users/aalaniz/Library/Android/sdk/ndk-bundle/toolchains/aarch64-linux-android-4.9/prebuilt/darwin-x86_64/bin/aarch64-linux-android-objcopy', '--localize-symbol', 'JNI_OnLoad', '/usr/local/twilio-sdk/webrtc/android/armeabiv7a/lib/libwebrtc-jni.a'
+    commandLine '/Users/aalaniz/Library/Android/sdk/ndk-bundle/toolchains/aarch64-linux-android-4.9/prebuilt/darwin-x86_64/bin/aarch64-linux-android-objcopy', '--localize-symbol', 'JNI_OnUnLoad', '/usr/local/twilio-sdk/webrtc/android/armeabiv7a/lib/libwebrtc-jni.a'
+}
