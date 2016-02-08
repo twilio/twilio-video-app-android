@@ -6,30 +6,15 @@ def twilioSdkHome = "/usr/local/twilio-sdk"
 def coreHome = "${twilioSdkHome}/core/android/armeabiv7a"
 // def twilioCommonHome = "${twilioSdkHome}/twilio-common/android/${targetPlatform.getName()}"
 def twilioCommonHome = "${twilioSdkHome}/twilio-common/android/armeabiv7a"
+
 // TODO use targetPlatform
 // def pocoFoundationHome = "${twilioSdkHome}/poco/android/${targetPlatform.getName()}"
-def pocoFoundationHome = "${twilioSdkHome}/poco/android/armeabiv7a"
-// TODO use targetPlatform
-// def pocoNetHome = "${twilioSdkHome}/poco/android/${targetPlatform.getName()}"
-def pocoNetHome = "${twilioSdkHome}/poco/android/armeabiv7a"
-// TODO use targetPlatform
-// def pocoCryptoHome = "${twilioSdkHome}/poco/android/${targetPlatform.getName()}"
-def pocoCryptoHome = "${twilioSdkHome}/poco/android/armeabiv7a"
-// TODO use targetPlatform
-// def pocoNetSslHome = "${twilioSdkHome}/poco/android/${targetPlatform.getName()}"
-def pocoNetSslHome = "${twilioSdkHome}/poco/android/armeabiv7a"
-// TODO use targetPlatform
-// def pocoUtilHome = "${twilioSdkHome}/poco/android/${targetPlatform.getName()}"
-def pocoUtilHome = "${twilioSdkHome}/poco/android/armeabiv7a"
-// TODO use targetPlatform
-// def pocoXmlHome = "${twilioSdkHome}/poco/android/${targetPlatform.getName()}"
-def pocoXmlHome = "${twilioSdkHome}/poco/android/armeabiv7a"
-// TODO use targetPlatform
-// def pocoJsonHome = "${twilioSdkHome}/poco/android/${targetPlatform.getName()}"
-def pocoJsonHome = "${twilioSdkHome}/poco/android/armeabiv7a"
+def pocoHome = "${twilioSdkHome}/poco/android/armeabiv7a"
+
 // TODO use targetPlatform
 // def boringSslHome = "${twilioSdkHome}/poco/android/${targetPlatform.getName()}"
 def boringSslHome = "${twilioSdkHome}/boringssl/android/armeabiv7a"
+
 // TODO use targetPlatform
 // def webRtcHome = "${twilioSdkHome}/poco/android/${targetPlatform.getName()}"
 def webRtcHome = "${twilioSdkHome}/webrtc/android/armeabiv7a"
@@ -50,45 +35,45 @@ model {
                 }
             }
             pocoFoundation {
-                headers.srcDir "${pocoFoundationHome}/include"
+                headers.srcDir "${pocoHome}/include"
                 binaries.withType(StaticLibraryBinary) {
-                    staticLibraryFile = file("${pocoFoundationHome}/lib/libPocoFoundation.a")
+                    staticLibraryFile = file("${pocoHome}/lib/libPocoFoundation.a")
                 }
             }
             pocoNet {
-                headers.srcDir "${pocoNetHome}/include"
+                headers.srcDir "${pocoHome}/include"
                 binaries.withType(StaticLibraryBinary) {
-                    staticLibraryFile = file("${pocoNetHome}/lib/libPocoNet.a")
+                    staticLibraryFile = file("${pocoHome}/lib/libPocoNet.a")
                 }
             }
             pocoCrypto {
-                headers.srcDir "${pocoCryptoHome}/include/Crypto"
+                headers.srcDir "${pocoHome}/include/Crypto"
                 binaries.withType(StaticLibraryBinary) {
-                    staticLibraryFile = file("${pocoCryptoHome}/lib/libPocoCrypto.a")
+                    staticLibraryFile = file("${pocoHome}/lib/libPocoCrypto.a")
                 }
             }
             pocoNetSsl {
-                headers.srcDir "${pocoNetSslHome}/include"
+                headers.srcDir "${pocoHome}/include"
                 binaries.withType(StaticLibraryBinary) {
-                    staticLibraryFile = file("${pocoNetSslHome}/lib/libPocoNetSSL.a")
+                    staticLibraryFile = file("${pocoHome}/lib/libPocoNetSSL.a")
                 }
             }
             pocoUtil {
-                headers.srcDir "${pocoUtilHome}/include"
+                headers.srcDir "${pocoHome}/include"
                 binaries.withType(StaticLibraryBinary) {
-                    staticLibraryFile = file("${pocoUtilHome}/lib/libPocoUtil.a")
+                    staticLibraryFile = file("${pocoHome}/lib/libPocoUtil.a")
                 }
             }
             pocoXml {
-                headers.srcDir "${pocoXmlHome}/include"
+                headers.srcDir "${pocoHome}/include"
                 binaries.withType(StaticLibraryBinary) {
-                    staticLibraryFile = file("${pocoXmlHome}/lib/libPocoXML.a")
+                    staticLibraryFile = file("${pocoHome}/lib/libPocoXML.a")
                 }
             }
             pocoJson {
-                headers.srcDir "${pocoJsonHome}/include"
+                headers.srcDir "${pocoHome}/include"
                 binaries.withType(StaticLibraryBinary) {
-                    staticLibraryFile = file("${pocoJsonHome}/lib/libPocoJSON.a")
+                    staticLibraryFile = file("${pocoHome}/lib/libPocoJSON.a")
                 }
             }
             boringssl {
@@ -101,18 +86,6 @@ model {
                 headers.srcDir "${webRtcHome}/include"
                 binaries.withType(StaticLibraryBinary) {
                     staticLibraryFile = file("${webRtcHome}/lib/libwebrtc.a")
-                }
-            }
-            webrtcJni {
-                headers.srcDir "${webRtcHome}/include"
-                binaries.withType(StaticLibraryBinary) {
-                    staticLibraryFile = file("${webRtcHome}/lib/libwebrtc-jni.a")
-                }
-            }
-            jniHelpers {
-                headers.srcDir "${webRtcHome}/include"
-                binaries.withType(StaticLibraryBinary) {
-                    staticLibraryFile = file("${webRtcHome}/lib/libjni-helpers.a")
                 }
             }
         }
@@ -148,20 +121,23 @@ model {
                        "EGL",
                        "GLESv1_CM",
                        "android",
-                       "${coreHome}/lib/libtwilio-sdk-core-full.a".toString(),
-                       "${twilioCommonHome}/lib/libtwilio-common.a".toString(),
-                       "${pocoFoundationHome}/lib/libPocoFoundation.a".toString(),
-                       "${pocoNetHome}/lib/libPocoNet.a".toString(),
-                       "${pocoCryptoHome}/lib/libPocoCrypto.a".toString(),
-                       "${pocoNetSslHome}/lib/libPocoNetSSL.a".toString(),
-                       "${pocoUtilHome}/lib/libPocoUtil.a".toString(),
-                       "${pocoXmlHome}/lib/libPocoXML.a".toString(),
-                       "${pocoJsonHome}/lib/libPocoJSON.a".toString(),
-                       "${boringSslHome}/lib/libboringssl.a".toString(),
-                       "${webRtcHome}/lib/libwebrtc.a".toString(),
-                       "${webRtcHome}/lib/libwebrtc-jni.a".toString(),
-                       "${webRtcHome}/lib/libjni-helpers.a".toString()
+                       "${pocoHome}/lib/libPocoFoundation.a".toString(),
+                       "${pocoHome}/lib/libPocoCrypto.a".toString(),
         ])
+
+        /**
+         * Several webrtc classes use native webrtc-jni objects that are only
+         * called from Java classes. The compiler will incorrectly strip some
+         * of these native webrtc-jni objects during linking because it believes
+         * they are unused by the native library. Here we tell the linker to keep
+         * the whole archive to prevent this stripping and then we specify in the
+         * dependency after we are not using whole archive anymore because the linker
+         * applies this option to every library after the option is specified.
+         */
+        ldFlags.addAll(["-Wl,--whole-archive,-l${webRtcHome}/lib/libwebrtc-jni.a".toString(),
+                       "-Wl,--no-whole-archive,-l${webRtcHome}/lib/libjni-helpers.a".toString()
+        ])
+
         abiFilters.addAll(["armeabi-v7a"])
     }
 
@@ -183,8 +159,6 @@ model {
                     library "pocoJson" linkage "static"
                     library "boringssl" linkage "static"
                     library "webrtc" linkage "static"
-                    library "webrtcJni" linkage "static"
-                    library "jniHelpers" linkage "static"
                 }
             }
         }

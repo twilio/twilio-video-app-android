@@ -44,15 +44,6 @@ model {
 //            storeFile file("${System.env.HOME}/.android/debug.keystore")
 //        }
 //    }
-    android.sources {
-        main {
-            jni {
-                dependencies {
-                    project ":conversations"
-                }
-            }
-        }
-    }
 
     android.buildTypes {
         release {
