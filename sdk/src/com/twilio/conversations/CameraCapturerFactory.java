@@ -1,6 +1,5 @@
 package com.twilio.conversations;
 
-import android.app.Activity;
 import android.view.ViewGroup;
 import android.content.Context;
 
