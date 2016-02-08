@@ -21,11 +21,11 @@ public class CameraCapturerFactory {
 	 * @return CameraCapturer
 	 */
 	public static CameraCapturer createCameraCapturer (
-			Activity activity,
+			Context context,
 			CameraSource source,
 			ViewGroup previewContainer,
 			CapturerErrorListener listener) {
-		return CameraCapturerImpl.create(activity, source, previewContainer, listener);
+		return CameraCapturerImpl.create(context, source, previewContainer, listener);
 	}
 
 }
