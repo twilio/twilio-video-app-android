@@ -1,24 +1,5 @@
 apply plugin: 'com.android.model.application'
-
-//def nexusReleaseVersion = project.VERSION_NAME + "-" + project.VERSION_CODE
-//def nexusDebugVersion = project.VERSION_NAME + "-" + project.VERSION_CODE + "-SNAPSHOT"
-
-//// Generate the version name and version code
-//ext {
-//    generateVersionName = {
-//        def version = project.VERSION_NAME
-//        def build = project.VERSION_CODE
-////        return version + "-" + build
-//        return "1.0.0"
-//    }
-//
-//    generateVersionCode = {
-//        def version = project.VERSION_NAME.toString().replace(".", "") as int
-//        def build = project.VERSION_CODE as int
-//        return 100
-////        return version * 1000 + build
-//    }
-//}
+apply from: '../gradle.properties'
 
 model {
     android {
@@ -29,9 +10,8 @@ model {
             applicationId "com.twilio.rtc.conversations.testapp"
             minSdkVersion.apiLevel 16
             targetSdkVersion.apiLevel 23
-            // versionName generateVersionName()
-//            versionName "1.0.0"
-//            versionCode 100
+            versionName generateVersionName()
+            versionCode generateVersionCode()
         }
     }
 
@@ -71,3 +51,16 @@ dependencies {
     compile 'com.jakewharton.timber:timber:4.1.0'
 }
 
+def generateVersionName() {
+    def version = "${versionMajor}.${versionMinor}.${versionPatch}"
+    def build = version.toString().replace(".", "") as int
+
+    return version + "-" + build
+}
+
+def generateVersionCode() {
+    def version = "${versionMajor}.${versionMinor}.${versionPatch}"
+    def build = version.toString().replace(".", "") as int
+
+    return build
+}
