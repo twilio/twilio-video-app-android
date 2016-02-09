@@ -31,4 +31,5 @@ allprojects {
             url "http://nexus.corp.twilio.com/content/repositories/artifact-staging/"
         }
     }
+    apply from: "$rootProject.projectDir/common.gradle"
 }

@@ -121,6 +121,8 @@ model {
         defaultConfig.with {
             minSdkVersion.apiLevel 16 
             targetSdkVersion.apiLevel 23
+            versionName generateVersionName()
+            versionCode generateVersionCode()
 
             testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         }

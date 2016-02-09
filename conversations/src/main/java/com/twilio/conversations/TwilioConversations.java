@@ -10,7 +10,6 @@ import com.twilio.common.TwilioAccessManagerFactory;
 import com.twilio.conversations.impl.TwilioConversationsImpl;
 
 public class TwilioConversations {
-
     /**
      *  Authenticating your Client failed due to invalid auth credentials.
      */
@@ -259,8 +258,6 @@ public class TwilioConversations {
      * @return the version of the SDK
      */
     public static String getVersion() {
-        // return Version.SDK_VERSION;
-        return "0.0.0";
+        return BuildConfig.VERSION_NAME;
     }
-
 }
