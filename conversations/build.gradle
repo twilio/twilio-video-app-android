@@ -1,8 +1,23 @@
 apply plugin: 'com.android.model.library'
 
 def currentToolchainVersion = "4.9"
-
 def twilioSdkHome = "/usr/local/twilio-sdk"
+def supportedAbis = [
+        "armeabi-v7a",
+        // TODO add multi arch support
+//        "arm64-v8a",
+//        "x86",
+//        "x86_64"
+]
+
+/**
+ * TODO
+ * Technically we should be able to support multiple archs once we have all the dependencies
+ * built. However, due to limitations in the current NDK support with experimental Android plugin
+ * we have to hardlink deps according to this arch variable. If you have other archs you want to
+ * compile the SDK for you can, but you have to update this variable first.
+ */
+def currentArch = "armeabiv7a"
 
 def coreHome = "${twilioSdkHome}/core/android"
 /**
@@ -175,7 +190,7 @@ model {
                 "GLESv1_CM",
                 "android",
                 // FIXME need to set this according to correct architecture!!
-                "${pocoHome}/armeabiv7a/${pocoFoundationStaticLib}".toString(),
+                "${pocoHome}/${currentArch}/${pocoFoundationStaticLib}".toString(),
         ])
 
         /**
@@ -188,11 +203,11 @@ model {
          * applies this option to every library after the option is specified.
          */
         // FIXME need to set this according to correct architecture!!
-        ldFlags.addAll(["-Wl,--whole-archive,-l${webRtcHome}/armeabiv7a/${webRtcJniStaticLib}".toString(),
-                       "-Wl,--no-whole-archive,-l${pocoHome}/armeabiv7a/${pocoCryptoStaticLib}".toString()
+        ldFlags.addAll(["-Wl,--whole-archive,-l${webRtcHome}/${currentArch}/${webRtcJniStaticLib}".toString(),
+                       "-Wl,--no-whole-archive,-l${pocoHome}/${currentArch}/${pocoCryptoStaticLib}".toString()
         ])
 
-        abiFilters.addAll(["armeabi-v7a"])
+        abiFilters.addAll(supportedAbis)
     }
 
     android.sources {
