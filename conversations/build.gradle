@@ -1,5 +1,7 @@
 apply plugin: 'com.android.model.library'
 
+def currentToolchainVersion = "4.9"
+
 def twilioSdkHome = "/usr/local/twilio-sdk"
 
 // TODO use targetPlatform
@@ -126,7 +128,7 @@ model {
 
     android.ndk {
         moduleName "jingle_peerconnection_so"
-        toolchainVersion "4.9"
+        toolchainVersion "${currentToolchainVersion}"
         platformVersion 16
         stl "c++_static"
         cppFlags.addAll([
@@ -220,12 +222,46 @@ dependencies {
 }
 
 task localizeWebRtcJniLoadUnLoad(type: Exec, dependsOn: assemble) {
-    commandLine '/Users/aalaniz/Library/Android/sdk/ndk-bundle/toolchains/aarch64-linux-android-4.9/prebuilt/darwin-x86_64/bin/aarch64-linux-android-objcopy',
-            '--localize-symbol',
-            'JNI_OnLoad',
-            "/usr/local/twilio-sdk/webrtc/android/armeabiv7a/lib/libwebrtc-jni.a"
-    commandLine '/Users/aalaniz/Library/Android/sdk/ndk-bundle/toolchains/aarch64-linux-android-4.9/prebuilt/darwin-x86_64/bin/aarch64-linux-android-objcopy',
-            '--localize-symbol',
-            'JNI_OnUnLoad',
-            "/usr/local/twilio-sdk/webrtc/android/armeabiv7a/lib/libwebrtc-jni.a"
+    def webRtcHomeNoArch = "${twilioSdkHome}/webrtc/android"
+    def ndkDir = getNdkDir()
+    def ndkToolchains = "${ndkDir}/toolchains"
+    def toolchainMap = [
+            "arm-linux-androideabi" : "arm-linux-androideabi",
+            "aarch64-linux-android" : "aarch64-linux-android",
+            "x86" : "i686-linux-android",
+            "x86_64" : "x86_64-linux-android"
+    ]
+    def supportedHosts = [
+            "darwin",
+            "linux"
+    ]
+    def supportedArchs = [
+            "armeabiv7a",
+            "arm64v8a",
+            "x86",
+            "x86_64"
+    ]
+    toolchainMap.each{ toolchainPrefix, toolChainPrebuiltPrefix ->
+        supportedArchs.each { arch ->
+            supportedHosts.each{ host ->
+                commandLine "${ndkToolchains}/${toolchainPrefix}-${currentToolchainVersion}" +
+                        "/prebuilt/${host}-x86_64/bin/${toolChainPrebuiltPrefix}-objcopy",
+                        '--localize-symbol',
+                        'JNI_OnLoad',
+                        "${webRtcHomeNoArch}/${arch}/lib/libwebrtc-jni.a"
+                commandLine "${ndkToolchains}/${toolchainPrefix}-${currentToolchainVersion}" +
+                        "/prebuilt/${host}-x86_64/bin/${toolChainPrebuiltPrefix}-objcopy",
+                        '--localize-symbol',
+                        'JNI_OnUnLoad',
+                        "${webRtcHomeNoArch}/${arch}/lib/libwebrtc-jni.a"
+            }
+        }
+    }
+}
+
+def getNdkDir() {
+    Properties properties = new Properties()
+    properties.load(project.rootProject.file('local.properties').newDataInputStream())
+
+    return properties.getProperty('ndk.dir')
 }
