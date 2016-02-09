@@ -45,6 +45,16 @@ model {
 //        }
 //    }
 
+    android.sources {
+        main {
+            jniLibs {
+                dependencies {
+                    project ":conversations" buildType "debug"
+                }
+            }
+        }
+    }
+
     android.buildTypes {
         release {
             minifyEnabled false
