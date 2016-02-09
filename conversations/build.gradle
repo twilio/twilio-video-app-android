@@ -233,24 +233,26 @@ task localizeWebRtcJniLoadUnLoad(type: Exec, dependsOn: assemble) {
             "x86" : "i686-linux-android",
             "x86_64" : "x86_64-linux-android"
     ]
+    def supportedArchs = [
+            "armeabiv7a" : "arm-linux-androideabi",
+            "arm64v8a" : "aarch64-linux-android",
+            "x86" : "i686-linux-android",
+            "x86_64" : "x86_64-linux-android"
+    ]
     def supportedHosts = [
             "darwin",
             "linux"
     ]
-    def supportedArchs = [
-            "armeabiv7a",
-            "arm64v8a",
-            "x86",
-            "x86_64"
-    ]
     toolchainMap.each{ toolchainPrefix, toolChainPrebuiltPrefix ->
-        supportedArchs.each { arch ->
+        supportedArchs.each { arch, archToolChain ->
             supportedHosts.each{ host ->
                 def objCopy = "${ndkToolchains}/${toolchainPrefix}-${currentToolchainVersion}" +
                         "/prebuilt/${host}-x86_64/bin/${toolChainPrebuiltPrefix}-objcopy"
                 def libWebRtcStaticLib = "${webRtcHomeNoArch}/${arch}/lib/libwebrtc-jni.a"
 
-                if (file("${objCopy}").exists() && file("${libWebRtcStaticLib}").exists()) {
+                if (file("${objCopy}").exists() &&
+                        file("${libWebRtcStaticLib}").exists() &&
+                        archToolChain == toolChainPrebuiltPrefix) {
                     exec {
                         executable "${objCopy}"
                         args '--localize-symbol',
@@ -270,8 +272,5 @@ task localizeWebRtcJniLoadUnLoad(type: Exec, dependsOn: assemble) {
 }
 
 def getNdkDir() {
-    Properties properties = new Properties()
-    properties.load(project.rootProject.file('local.properties').newDataInputStream())
-
-    return properties.getProperty('ndk.dir')
+    return "$System.env.ANDROID_NDK_HOME"
 }
