@@ -295,6 +295,14 @@ task localizeWebRtcJniLoadUnLoad(type: Exec, dependsOn: assemble) {
     }
 }
 
+/**
+ * This looks strange but the archs built by our build scripts do not support
+ * dashes ('-') so when we build they are removed. Here we just convert the target
+ * abi to conform to our standard
+ *
+ * @param abi Normal android abi
+ * @return Twilio version of android abi without dashes ('-')
+ */
 def convertAbiToArch(abi) {
     return abi.replaceAll("-", "")
 }
