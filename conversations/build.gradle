@@ -4,43 +4,39 @@ def currentToolchainVersion = "4.9"
 
 def twilioSdkHome = "/usr/local/twilio-sdk"
 
-// TODO use targetPlatform
-// def coreHome = "${twilioSdkHome}/core/android/${targetPlatform.getName()}"
-def coreHome = "${twilioSdkHome}/core/android/armeabiv7a"
-def coreHeaders = "${coreHome}/include"
-def coreStaticLib = "${coreHome}/lib/libtwilio-sdk-core-full.a"
+def coreHome = "${twilioSdkHome}/core/android"
+/**
+ * FIXME
+ * This is dumb but we know we support armeabiv7a so we will set the headers directory
+ * for each static library to this include directory. The header files should not change
+ * across architectures.
+ */
+def coreHeaders = "${coreHome}/armeabiv7a/include"
+def coreStaticLib = "lib/libtwilio-sdk-core-full.a"
 
-// TODO use targetPlatform
-// def twilioCommonHome = "${twilioSdkHome}/twilio-common/android/${targetPlatform.getName()}"
-def twilioCommonHome = "${twilioSdkHome}/twilio-common/android/armeabiv7a"
-def twilioCommonHeaders = "${twilioCommonHome}/include"
-def twilioCommonStaticLib = "${twilioCommonHome}/lib/libtwilio-common.a"
+def twilioCommonHome = "${twilioSdkHome}/twilio-common/android"
+def twilioCommonHeaders = "${twilioCommonHome}/armeabiv7a/include"
+def twilioCommonStaticLib = "lib/libtwilio-common.a"
 
-// TODO use targetPlatform
-// def pocoFoundationHome = "${twilioSdkHome}/poco/android/${targetPlatform.getName()}"
-def pocoHome = "${twilioSdkHome}/poco/android/armeabiv7a"
-def pocoHeaders = "${pocoHome}/include"
+def pocoHome = "${twilioSdkHome}/poco/android"
+def pocoHeaders = "${pocoHome}/armeabiv7a/include"
 def pocoCryptoHeaders = "${pocoHeaders}/Crypto"
-def pocoFoundationStaticLib = "${pocoHome}/lib/libPocoFoundation.a"
-def pocoNetStaticLib = "${pocoHome}/lib/libPocoNet.a"
-def pocoCryptoStaticLib = "${pocoHome}/lib/libPocoCrypto.a"
-def pocoNetSslStaticLib = "${pocoHome}/lib/libPocoNetSSL.a"
-def pocoUtilStaticLib = "${pocoHome}/lib/libPocoUtil.a"
-def pocoXmlStaticLib = "${pocoHome}/lib/libPocoXML.a"
-def pocoJsonStaticLib = "${pocoHome}/lib/libPocoJSON.a"
+def pocoFoundationStaticLib = "lib/libPocoFoundation.a"
+def pocoNetStaticLib = "lib/libPocoNet.a"
+def pocoCryptoStaticLib = "lib/libPocoCrypto.a"
+def pocoNetSslStaticLib = "lib/libPocoNetSSL.a"
+def pocoUtilStaticLib = "lib/libPocoUtil.a"
+def pocoXmlStaticLib = "lib/libPocoXML.a"
+def pocoJsonStaticLib = "lib/libPocoJSON.a"
 
-// TODO use targetPlatform
-// def boringSslHome = "${twilioSdkHome}/poco/android/${targetPlatform.getName()}"
-def boringSslHome = "${twilioSdkHome}/boringssl/android/armeabiv7a"
-def boringSslHeaders = "${boringSslHome}/include"
-def boringSslStaticLib = "${boringSslHome}/lib/libboringssl.a"
+def boringSslHome = "${twilioSdkHome}/boringssl/android"
+def boringSslHeaders = "${boringSslHome}/armeabiv7a/include"
+def boringSslStaticLib = "lib/libboringssl.a"
 
-// TODO use targetPlatform
-// def webRtcHome = "${twilioSdkHome}/poco/android/${targetPlatform.getName()}"
-def webRtcHome = "${twilioSdkHome}/webrtc/android/armeabiv7a"
-def webRtcHeaders = "${webRtcHome}/include"
-def webRtcStaticLib = "${webRtcHome}/lib/libwebrtc.a"
-def webRtcJniStaticLib = "${webRtcHome}/lib/libwebrtc-jni.a"
+def webRtcHome = "${twilioSdkHome}/webrtc/android"
+def webRtcHeaders = "${webRtcHome}/armeabiv7a/include"
+def webRtcStaticLib = "lib/libwebrtc.a"
+def webRtcJniStaticLib = "lib/libwebrtc-jni.a"
 
 model {
     repositories {
@@ -48,67 +44,89 @@ model {
             twilioSdkCore {
                 headers.srcDir "${coreHeaders}"
                 binaries.withType(StaticLibraryBinary) {
-                    staticLibraryFile = file("${coreStaticLib}")
+                    def coreStaticLibPath = "${coreHome}/" +
+                            "${convertAbiToArch(targetPlatform.getName())}/${coreStaticLib}"
+                    staticLibraryFile = file("${coreStaticLibPath}")
                 }
             }
             twilioCommon {
                 headers.srcDir "${twilioCommonHeaders}"
                 binaries.withType(StaticLibraryBinary) {
-                    staticLibraryFile = file("${twilioCommonStaticLib}")
+                    def twilioCommonStaticLibPath = "${twilioCommonHome}/" +
+                            "${convertAbiToArch(targetPlatform.getName())}/${twilioCommonStaticLib}"
+                    staticLibraryFile = file("${twilioCommonStaticLibPath}")
                 }
             }
             pocoFoundation {
                 headers.srcDir "${pocoHeaders}"
                 binaries.withType(StaticLibraryBinary) {
-                    staticLibraryFile = file("${pocoFoundationStaticLib}")
+                    def pocoFoundationStaticLibPath = "${pocoHome}/" +
+                            "${convertAbiToArch(targetPlatform.getName())}/${pocoFoundationStaticLib}"
+                    staticLibraryFile = file("${pocoFoundationStaticLibPath}")
                 }
             }
             pocoNet {
                 headers.srcDir "${pocoHeaders}"
                 binaries.withType(StaticLibraryBinary) {
-                    staticLibraryFile = file("${pocoNetStaticLib}")
+                    def pocoNetStaticLibPath = "${pocoHome}/" +
+                            "${convertAbiToArch(targetPlatform.getName())}/${pocoNetStaticLib}"
+                    staticLibraryFile = file("${pocoNetStaticLibPath}")
                 }
             }
             pocoCrypto {
                 headers.srcDir "${pocoCryptoHeaders}"
                 binaries.withType(StaticLibraryBinary) {
-                    staticLibraryFile = file("${pocoCryptoStaticLib}")
+                    def pocoCryptoStaticLibPath = "${pocoHome}/" +
+                            "${convertAbiToArch(targetPlatform.getName())}/${pocoCryptoStaticLib}"
+                    staticLibraryFile = file("${pocoCryptoStaticLibPath}")
                 }
             }
             pocoNetSsl {
                 headers.srcDir "${pocoHeaders}"
                 binaries.withType(StaticLibraryBinary) {
-                    staticLibraryFile = file("${pocoNetSslStaticLib}")
+                    def pocoNetSslStaticLibPath = "${pocoHome}/" +
+                            "${convertAbiToArch(targetPlatform.getName())}/${pocoNetSslStaticLib}"
+                    staticLibraryFile = file("${pocoNetSslStaticLibPath}")
                 }
             }
             pocoUtil {
                 headers.srcDir "${pocoHeaders}"
                 binaries.withType(StaticLibraryBinary) {
-                    staticLibraryFile = file("${pocoUtilStaticLib}")
+                    def pocoUtilStaticLibPath = "${pocoHome}/" +
+                            "${convertAbiToArch(targetPlatform.getName())}/${pocoUtilStaticLib}"
+                    staticLibraryFile = file("${pocoUtilStaticLibPath}")
                 }
             }
             pocoXml {
                 headers.srcDir "${pocoHeaders}"
                 binaries.withType(StaticLibraryBinary) {
-                    staticLibraryFile = file("${pocoXmlStaticLib}")
+                    def pocoXmlStaticLibPath = "${pocoHome}/" +
+                            "${convertAbiToArch(targetPlatform.getName())}/${pocoXmlStaticLib}"
+                    staticLibraryFile = file("${pocoXmlStaticLibPath}")
                 }
             }
             pocoJson {
                 headers.srcDir "${pocoHeaders}"
                 binaries.withType(StaticLibraryBinary) {
-                    staticLibraryFile = file("${pocoJsonStaticLib}")
+                    def pocoJsonStaticLibPath = "${pocoHome}/" +
+                            "${convertAbiToArch(targetPlatform.getName())}/${pocoJsonStaticLib}"
+                    staticLibraryFile = file("${pocoJsonStaticLibPath}")
                 }
             }
             boringssl {
                 headers.srcDir "${boringSslHeaders}"
                 binaries.withType(StaticLibraryBinary) {
-                    staticLibraryFile = file("${boringSslStaticLib}")
+                    def boringSslStaticLibPath = "${boringSslHome}/" +
+                            "${convertAbiToArch(targetPlatform.getName())}/${boringSslStaticLib}"
+                    staticLibraryFile = file("${boringSslStaticLibPath}")
                 }
             }
             webrtc {
                 headers.srcDir "${webRtcHeaders}"
                 binaries.withType(StaticLibraryBinary) {
-                    staticLibraryFile = file("${webRtcStaticLib}")
+                    def webRtcStaticLibPath = "${webRtcHome}/" +
+                            "${convertAbiToArch(targetPlatform.getName())}/${webRtcStaticLib}"
+                    staticLibraryFile = file("${webRtcStaticLibPath}")
                 }
             }
         }
@@ -156,7 +174,8 @@ model {
                 "EGL",
                 "GLESv1_CM",
                 "android",
-                "${pocoFoundationStaticLib}".toString()
+                // FIXME need to set this according to correct architecture!!
+                "${pocoHome}/armeabiv7a/${pocoFoundationStaticLib}".toString(),
         ])
 
         /**
@@ -168,8 +187,9 @@ model {
          * dependency after we are not using whole archive anymore because the linker
          * applies this option to every library after the option is specified.
          */
-        ldFlags.addAll(["-Wl,--whole-archive,-l${webRtcJniStaticLib}".toString(),
-                       "-Wl,--no-whole-archive,-l${pocoCryptoStaticLib}".toString()
+        // FIXME need to set this according to correct architecture!!
+        ldFlags.addAll(["-Wl,--whole-archive,-l${webRtcHome}/armeabiv7a/${webRtcJniStaticLib}".toString(),
+                       "-Wl,--no-whole-archive,-l${pocoHome}/armeabiv7a/${pocoCryptoStaticLib}".toString()
         ])
 
         abiFilters.addAll(["armeabi-v7a"])
@@ -269,6 +289,10 @@ task localizeWebRtcJniLoadUnLoad(type: Exec, dependsOn: assemble) {
             }
         }
     }
+}
+
+def convertAbiToArch(abi) {
+    return abi.replaceAll("-", "")
 }
 
 def getNdkDir() {
