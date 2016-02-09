@@ -27,23 +27,13 @@ model {
 
         defaultConfig.with {
             applicationId "com.twilio.rtc.conversations.testapp"
-            minSdkVersion.apiLevel = 16
-            targetSdkVersion.apiLevel = 23
+            minSdkVersion.apiLevel 16
+            targetSdkVersion.apiLevel 23
             // versionName generateVersionName()
 //            versionName "1.0.0"
 //            versionCode 100
         }
     }
-
-    /*
-     * Use the debug keystore to sign all variants of the test app
-     * since this is only used internally.
-     */
-//    android.signingConfigs {
-//        debug {
-//            storeFile file("${System.env.HOME}/.android/debug.keystore")
-//        }
-//    }
 
     android.sources {
         main {
@@ -58,7 +48,8 @@ model {
     android.buildTypes {
         release {
             minifyEnabled false
-//            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            proguardFiles.add(file('proguard-android.txt'))
+            proguardFiles.add(file("proguard-rules.pro"))
         }
         debug {
             applicationIdSuffix ".debug"
