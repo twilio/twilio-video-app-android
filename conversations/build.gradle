@@ -229,33 +229,38 @@ task localizeWebRtcJniLoadUnLoad(type: Exec, dependsOn: assemble) {
     def ndkToolchains = "${ndkDir}/toolchains"
     def toolchainMap = [
             "arm-linux-androideabi" : "arm-linux-androideabi",
-            "aarch64-linux-android" : "aarch64-linux-android",
-            "x86" : "i686-linux-android",
-            "x86_64" : "x86_64-linux-android"
+//            "aarch64-linux-android" : "aarch64-linux-android",
+//            "x86" : "i686-linux-android",
+//            "x86_64" : "x86_64-linux-android"
     ]
     def supportedHosts = [
             "darwin",
-            "linux"
+//            "linux"
     ]
     def supportedArchs = [
             "armeabiv7a",
-            "arm64v8a",
-            "x86",
-            "x86_64"
+//            "arm64v8a",
+//            "x86",
+//            "x86_64"
     ]
     toolchainMap.each{ toolchainPrefix, toolChainPrebuiltPrefix ->
         supportedArchs.each { arch ->
             supportedHosts.each{ host ->
-                commandLine "${ndkToolchains}/${toolchainPrefix}-${currentToolchainVersion}" +
-                        "/prebuilt/${host}-x86_64/bin/${toolChainPrebuiltPrefix}-objcopy",
-                        '--localize-symbol',
-                        'JNI_OnLoad',
-                        "${webRtcHomeNoArch}/${arch}/lib/libwebrtc-jni.a"
-                commandLine "${ndkToolchains}/${toolchainPrefix}-${currentToolchainVersion}" +
-                        "/prebuilt/${host}-x86_64/bin/${toolChainPrebuiltPrefix}-objcopy",
-                        '--localize-symbol',
-                        'JNI_OnUnLoad',
-                        "${webRtcHomeNoArch}/${arch}/lib/libwebrtc-jni.a"
+                def objCopy = "${ndkToolchains}/${toolchainPrefix}-${currentToolchainVersion}" +
+                        "/prebuilt/${host}-x86_64/bin/${toolChainPrebuiltPrefix}-objcopy"
+                def libWebRtcStaticLib = "${webRtcHomeNoArch}/${arch}/lib/libwebrtc-jni.a"
+                exec {
+                    executable "${objCopy}"
+                    args '--localize-symbol',
+                            'JNI_OnLoad',
+                            "${libWebRtcStaticLib}"
+                }
+                exec {
+                    executable "${objCopy}"
+                    args '--localize-symbol',
+                            'JNI_OnUnLoad',
+                            "${libWebRtcStaticLib}"
+                }
             }
         }
     }
