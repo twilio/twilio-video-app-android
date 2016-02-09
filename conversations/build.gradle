@@ -191,6 +191,7 @@ model {
                 "android",
                 // FIXME need to set this according to correct architecture!!
                 "${pocoHome}/${currentArch}/${pocoFoundationStaticLib}".toString(),
+                "${pocoHome}/${currentArch}/${pocoCryptoStaticLib}".toString()
         ])
 
         /**
@@ -203,9 +204,11 @@ model {
          * applies this option to every library after the option is specified.
          */
         // FIXME need to set this according to correct architecture!!
-        ldFlags.addAll(["-Wl,--whole-archive,-l${webRtcHome}/${currentArch}/${webRtcJniStaticLib}".toString(),
-                       "-Wl,--no-whole-archive,-l${pocoHome}/${currentArch}/${pocoCryptoStaticLib}".toString()
-        ])
+        ldFlags.add("-Wl," +
+                "--whole-archive," +
+                "-l${webRtcHome}/${currentArch}/${webRtcJniStaticLib},".toString() +
+                "--no-whole-archive".toString()
+        )
 
         abiFilters.addAll(supportedAbis)
     }
