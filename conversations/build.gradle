@@ -243,6 +243,10 @@ dependencies {
     compile 'com.twilio.sdk:twilio-common-android:0.1.17'
 }
 
+/**
+ * Localize the JNI_OnLoad and JNI_OnUnLoad symbol in libwebrtc-jni.a to prevent conflicts with
+ * initialization
+ */
 task localizeWebRtcJniLoadUnLoad(type: Exec, dependsOn: assemble) {
     def webRtcHomeNoArch = "${twilioSdkHome}/webrtc/android"
     def ndkDir = getNdkDir()
