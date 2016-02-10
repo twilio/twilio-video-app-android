@@ -213,13 +213,14 @@ public class TwilioConversationsImpl {
                                 if (!client.isDisposing) {
                                     client.dispose();
                                 }
+                                // Add clients that are not disposed to ensure they are disposed later
                                 clientsDisposing.add(client);
                             }
                         }
                     }
                 }
 
-                // Now validate clients that need closing
+                // Wait until all clients are disposed.
                 while (!clientsDisposing.isEmpty()) {
                     ConversationsClientImpl clientPendingDispose = clientsDisposing.poll();
 

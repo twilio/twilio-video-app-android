@@ -345,9 +345,10 @@ public class ConversationsClientImpl implements
         public synchronized void dispose() {
             isDisposing = true;
             if (listening) {
+                // The client must stop listening before the ConversationsClient can be disposed
                 unlisten();
             } else {
-                continueDispose();
+                disposeClient();
             }
         }
 
@@ -421,7 +422,8 @@ public class ConversationsClientImpl implements
 		logger.d("onUnregistrationDidComplete");
 		listening = false;
                 if (isDisposing) {
-                    continueDispose();
+                    // If the client was listening, dispose() will call unlisten() to properly dispose of the client
+                    disposeClient();
                 }
 		if (handler != null) {
 			handler.post(new Runnable() {
@@ -539,7 +541,7 @@ public class ConversationsClientImpl implements
 		return audioManager.isSpeakerphoneOn() ? AudioOutput.SPEAKERPHONE : AudioOutput.HEADSET;
 	}
 
-        private void continueDispose() {
+        private void disposeClient() {
             if (endpointObserver != null) {
                 endpointObserver.dispose();
                 endpointObserver = null;
