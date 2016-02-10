@@ -1,10 +1,12 @@
 package com.twilio.conversations.impl;
 
 import java.lang.ref.WeakReference;
+import java.util.ArrayDeque;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Queue;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -194,8 +196,43 @@ public class TwilioConversationsImpl {
             unregisterConnectivityBroadcastReceiver();
         }
 
-        // TODO destroy investigate making this asynchronous
-        destroyCore();
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                // Process clients and determine which ones need to be closed
+                Queue<ConversationsClientImpl> clientsDisposing = new ArrayDeque<ConversationsClientImpl>();
+                for (Map.Entry<UUID, WeakReference<ConversationsClientImpl>> entry :
+                        conversationsClientMap.entrySet()) {
+                    WeakReference<ConversationsClientImpl> weakClientRef =
+                            conversationsClientMap.remove(entry.getKey());
+
+                    if (weakClientRef != null) {
+                        ConversationsClientImpl client = weakClientRef.get();
+                        if (client != null) {
+                            if (!client.isDisposed) {
+                                if (!client.isDisposing) {
+                                    client.dispose();
+                                }
+                                clientsDisposing.add(client);
+                            }
+                        }
+                    }
+                }
+
+                // Now validate clients that need closing
+                while (!clientsDisposing.isEmpty()) {
+                    ConversationsClientImpl clientPendingDispose = clientsDisposing.poll();
+
+                    if (!clientPendingDispose.isDisposed) {
+                        clientsDisposing.add(clientPendingDispose);
+                    }
+                }
+
+                // Now we can teardown the sdk
+                // TODO destroy investigate making this asynchronous with callbacks
+                destroyCore();
+            }
+        }).start();
     }
 
     public ConversationsClientImpl createConversationsClient(TwilioAccessManager accessManager, Map<String, String> options, ConversationsClientListener inListener) {
