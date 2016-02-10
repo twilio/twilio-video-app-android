@@ -22,18 +22,18 @@ public:
 		 j_observer_class_(env, GetObjectClass(env, *j_endpoint_observer_)),
 		 j_registration_complete_(
 				 GetMethodID(env, *j_observer_class_, "onRegistrationDidComplete", "(Lcom/twilio/conversations/impl/core/CoreError;)V")),
-		  j_unreg_complete_(
+		 j_unreg_complete_(
 				 GetMethodID(env, *j_observer_class_, "onUnregistrationDidComplete", "(Lcom/twilio/conversations/impl/core/CoreError;)V")),
-		  j_state_change_(
+		 j_state_change_(
 				 GetMethodID(env, *j_observer_class_, "onStateDidChange", "(Lcom/twilio/conversations/impl/core/EndpointState;)V")),
-		  j_incoming_call_(
-				 GetMethodID(env, *j_observer_class_, "onIncomingCallDidReceive", "(J[Ljava/lang/String;)V")),
-		  j_statetype_enum_(
-				env, env->FindClass("com/twilio/conversations/impl/core/EndpointState")),
-		j_errorimpl_class_(
-				env, env->FindClass("com/twilio/conversations/impl/core/CoreErrorImpl")),
-		j_errorimpl_ctor_id_(
-				GetMethodID( env, *j_errorimpl_class_, "<init>", "(Ljava/lang/String;ILjava/lang/String;)V"))
+		 j_incoming_call_(
+                 GetMethodID(env, *j_observer_class_, "onIncomingCallDidReceive", "(J[Ljava/lang/String;)V")),
+		 j_statetype_enum_(
+				 env, env->FindClass("com/twilio/conversations/impl/core/EndpointState")),
+		 j_errorimpl_class_(
+				 env, env->FindClass("com/twilio/conversations/impl/core/CoreErrorImpl")),
+		 j_errorimpl_ctor_id_(
+				 GetMethodID( env, *j_errorimpl_class_, "<init>", "(Ljava/lang/String;ILjava/lang/String;)V"))
 		{}
 
 
@@ -42,7 +42,9 @@ protected:
 
     	TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK, kTSCoreLogLevelDebug, "onRegistrationDidComplete");
         jobject j_error = errorToJavaCoreErrorImpl(code, message);
+        CHECK_EXCEPTION(jni()) << "error during NewObject";
     	jni()->CallVoidMethod(*j_endpoint_observer_, j_registration_complete_, j_error);
+        CHECK_EXCEPTION(jni()) << "error during CallVoidMethod";
 
     }
 
@@ -50,17 +52,20 @@ protected:
 
     	TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK, kTSCoreLogLevelDebug, "onUnregistrationDidComplete");
         jobject j_error = errorToJavaCoreErrorImpl(code, message);
+        CHECK_EXCEPTION(jni()) << "error during NewObject";
         jni()->CallVoidMethod(*j_endpoint_observer_, j_unreg_complete_, j_error);
+        CHECK_EXCEPTION(jni()) << "error during CallVoidMethod";
 
     }
     virtual void onStateDidChange(TSCEndpointState state){
 
     	TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK, kTSCoreLogLevelDebug, "onStateDidChange, new state:%d", state);
-    	const std::string state_type_enum = "com/twilio/conversations/impl/core/EndpointState";
-		jobject j_state_type =
-				webrtc_jni::JavaEnumFromIndex(jni(),
-						*j_statetype_enum_, state_type_enum, state);
-		jni()->CallVoidMethod(*j_endpoint_observer_, j_state_change_, j_state_type);
+        const std::string state_type_enum = "com/twilio/conversations/impl/core/EndpointState";
+        jobject j_state_type =
+                webrtc_jni::JavaEnumFromIndex(jni(), *j_statetype_enum_, state_type_enum, state);
+        CHECK_EXCEPTION(jni()) << "error during NewObject";
+        jni()->CallVoidMethod(*j_endpoint_observer_, j_state_change_, j_state_type);
+        CHECK_EXCEPTION(jni()) << "error during CallVoidMethod";
 
     }
     virtual void onIncomingCallDidReceive(const TSCSessionPtr &session) {
@@ -73,9 +78,11 @@ protected:
     	//Get participants from session and put them into java string array
     	jobjectArray j_participants =
     			partToJavaPart(jni(), session->getParticipants());
+        CHECK_EXCEPTION(jni()) << "error during NewObject";
 
     	jni()->CallVoidMethod(
     			*j_endpoint_observer_, j_incoming_call_, j_session_id, j_participants);
+        CHECK_EXCEPTION(jni()) << "error during CallVoidMethod";
 
     }
 
@@ -112,6 +119,7 @@ private:
                             size,
                             env->FindClass("java/lang/String"),
                             stringToJString(jni(), ""));
+        CHECK_EXCEPTION(jni()) << "error during NewObject";
         for (int i=0; i<size; i++) {
             env->SetObjectArrayElement(
                             j_participants, i, stringToJString(env, participants[i].first));
