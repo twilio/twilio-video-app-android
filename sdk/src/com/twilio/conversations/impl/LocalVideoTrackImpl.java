@@ -2,7 +2,6 @@ package com.twilio.conversations.impl;
 
 import com.twilio.conversations.CameraCapturer;
 import com.twilio.conversations.LocalVideoTrack;
-import com.twilio.conversations.MediaTrackState;
 
 public class LocalVideoTrackImpl extends VideoTrackImpl implements LocalVideoTrack  {
 
@@ -24,6 +23,11 @@ public class LocalVideoTrackImpl extends VideoTrackImpl implements LocalVideoTra
 		org.webrtc.VideoTrack videoTrack = getWebrtcVideoTrack();
 		if (videoTrack != null) {
 			enabledVideo = videoTrack.setEnabled(enabled);
+			if(enabledVideo && enabled) {
+				((CameraCapturerImpl)cameraCapturer).resume();
+			} else if(enabledVideo && !enabled){
+				((CameraCapturerImpl)cameraCapturer).pause();
+			}
 		} else {
 			enabledVideo = enabled;
 		}

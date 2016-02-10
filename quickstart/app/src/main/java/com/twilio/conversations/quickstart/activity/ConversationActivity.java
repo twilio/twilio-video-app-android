@@ -104,6 +104,9 @@ public class  ConversationActivity extends AppCompatActivity {
     private boolean muteMicrophone;
     private boolean pauseVideo;
 
+    private boolean wasPreviewing;
+    private boolean wasLive;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -155,6 +158,16 @@ public class  ConversationActivity extends AppCompatActivity {
                 !conversationsClient.isListening()) {
             conversationsClient.listen();
         }
+        // Resume preview
+        if(cameraCapturer != null && wasPreviewing) {
+            cameraCapturer.startPreview();
+            wasPreviewing = false;
+        }
+        // Resume live video
+        if(conversation != null && wasLive) {
+            pauseVideo(false);
+            wasLive = false;
+        }
     }
 
     @Override
@@ -165,6 +178,16 @@ public class  ConversationActivity extends AppCompatActivity {
                 conversationsClient.isListening() &&
                 conversation == null) {
             conversationsClient.unlisten();
+        }
+        // Stop preview before going to the background
+        if(cameraCapturer != null && cameraCapturer.isPreviewing()) {
+            cameraCapturer.stopPreview();
+            wasPreviewing = true;
+        }
+        // Pause live video before going to the background
+        if(conversation != null && !pauseVideo) {
+            pauseVideo(true);
+            wasLive = true;
         }
     }
 
@@ -310,6 +333,9 @@ public class  ConversationActivity extends AppCompatActivity {
         localVideoActionFab.setImageDrawable(
                 ContextCompat.getDrawable(ConversationActivity.this,
                         R.drawable.ic_videocam_green_24px));
+        speakerActionFab.setImageDrawable(
+                ContextCompat.getDrawable( ConversationActivity.this,
+                        R.drawable.ic_volume_down_green_24px));
         if (conversationsClient != null) {
             conversationsClient.setAudioOutput(AudioOutput.HEADSET);
         }
@@ -436,20 +462,8 @@ public class  ConversationActivity extends AppCompatActivity {
         return new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                /*
-                 * Enable/disable local video track
-                 */
-                pauseVideo = !pauseVideo;
-                if (conversation != null) {
-                    List<LocalVideoTrack> videoTrackList =
-                            conversation.getLocalMedia().getLocalVideoTracks();
-                    if (videoTrackList.size() > 0) {
-                        LocalVideoTrack videoTrack = videoTrackList.get(0);
-                        videoTrack.enable(!pauseVideo);
-                    } else {
-                        Log.w(TAG, "LocalVideoTrack is not present, unable to pause");
-                    }
-                }
+                // Update pause video if it succeeds
+                pauseVideo = pauseVideo(!pauseVideo) ? !pauseVideo : pauseVideo;
 
                 if (pauseVideo) {
                     switchCameraActionFab.hide();
@@ -464,6 +478,20 @@ public class  ConversationActivity extends AppCompatActivity {
                 }
             }
         };
+    }
+
+    private boolean pauseVideo(boolean pauseVideo) {
+        /*
+         * Enable/disable local video track
+         */
+        if (conversation != null) {
+            LocalVideoTrack videoTrack =
+                    conversation.getLocalMedia().getLocalVideoTracks().get(0);
+            if(videoTrack != null) {
+                return videoTrack.enable(!pauseVideo);
+            }
+        }
+        return false;
     }
 
     private View.OnClickListener muteClickListener() {
