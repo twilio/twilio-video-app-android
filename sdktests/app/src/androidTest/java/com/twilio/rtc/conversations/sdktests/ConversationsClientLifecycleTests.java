@@ -32,7 +32,6 @@ import java.util.concurrent.TimeUnit;
 
 @RunWith(AndroidJUnit4.class)
 public class ConversationsClientLifecycleTests {
-
     private static String TOKEN = "token";
     private static String PARTICIPANT = "janne";
 
@@ -132,7 +131,8 @@ public class ConversationsClientLifecycleTests {
         InstrumentationRegistry.getInstrumentation().runOnMainSync(new Runnable() {
             @Override
             public void run() {
-                ConversationsClient conversationsClient = TwilioConversations.createConversationsClient(TOKEN, new ConversationsClientListener() {
+                ConversationsClient conversationsClient = TwilioConversations
+                        .createConversationsClient(TOKEN, new ConversationsClientListener() {
                     @Override
                     public void onStartListeningForInvites(ConversationsClient conversationsClient) {
                         org.junit.Assert.fail();
@@ -144,21 +144,23 @@ public class ConversationsClientLifecycleTests {
                     }
 
                     @Override
-                    public void onFailedToStartListening(ConversationsClient conversationsClient, TwilioConversationsException e) {
+                    public void onFailedToStartListening(ConversationsClient conversationsClient,
+                                                         TwilioConversationsException e) {
                         wait.countDown();
                     }
 
                     @Override
-                    public void onIncomingInvite(ConversationsClient conversationsClient, IncomingInvite incomingInvite) {
+                    public void onIncomingInvite(ConversationsClient conversationsClient,
+                                                 IncomingInvite incomingInvite) {
                         org.junit.Assert.fail();
 
                     }
 
                     @Override
-                    public void onIncomingInviteCancelled(ConversationsClient conversationsClient, IncomingInvite incomingInvite) {
+                    public void onIncomingInviteCancelled(ConversationsClient conversationsClient,
+                                                          IncomingInvite incomingInvite) {
                         org.junit.Assert.fail();
                     }
-
                 });
                 conversationsClient.listen();
             }

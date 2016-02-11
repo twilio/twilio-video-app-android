@@ -25,6 +25,12 @@ public class TwilioConversationsUtils {
         wait(waitLatch, TIMEOUT, TimeUnit.SECONDS);
     }
 
+    public static void destroyTwilioSDK() {
+        TwilioConversations.destroy();
+        while (TwilioConversations.isInitialized());
+        initialized = false;
+    }
+
     public static boolean isInitialized() {
         return initialized;
     }
