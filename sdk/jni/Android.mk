@@ -38,7 +38,7 @@ LOCAL_SRC_FILES := \
 	com_twilio_conversations_impl_ConversationsClientImpl_EndpointObserverInternal.cpp \
 	com_twilio_conversations_impl_ConversationImpl.cpp \
 	com_twilio_conversations_impl_CameraCapturerImpl.cpp \
-	com_twilio_conversations_impl_ConversationImpl_SessionObserverInternal.cpp\
+	com_twilio_conversations_impl_ConversationImpl_SessionObserverInternal.cpp \
 	TCPlatformDataProviderImpl.cpp
 
 ifeq ($(shell test "$(APP_DEBUGGABLE)" = "true" -o "$(NDK_DEBUG)" = "1" && echo true || echo false),true)
