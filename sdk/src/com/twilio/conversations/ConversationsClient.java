@@ -54,7 +54,8 @@ public interface ConversationsClient {
 	OutgoingInvite sendConversationInvite(Set<String> participants, LocalMedia localMedia, ConversationCallback conversationCallback);
 
 	/**
-	 * Releases resources associated with this ConversationsClient object.
+	 * Releases resources associated with this ConversationsClient object. Note that once this operation completes
+         * the conversations client will no longer be listening for conversations.
 	 * 
 	 * Attempts to use this ConversationsClient object after disposal will result in an IllegalStateException.
 	 */
