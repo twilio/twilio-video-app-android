@@ -1,7 +1,6 @@
 package com.twilio.rtc.conversations.sdktests;
 
 import org.junit.After;
-import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -38,7 +37,9 @@ public class TwilioConversationsTests {
      */
     @After
     public void teardown() {
-        TwilioConversations.destroy();
+        if (TwilioConversationsUtils.isInitialized()) {
+            TwilioConversationsUtils.destroyTwilioSDK();
+        }
     }
 
     @Test
@@ -49,12 +50,36 @@ public class TwilioConversationsTests {
     @Test
     public void testTwilioDestroy() {
         TwilioConversationsUtils.initializeTwilioSDK(mActivityRule.getActivity().getApplicationContext());
+        TwilioConversationsUtils.destroyTwilioSDK();
+    }
+
+    @Test
+    public void testTwilioDestroyWithActiveClient() {
+        TwilioConversationsUtils.initializeTwilioSDK(mActivityRule.getActivity().getApplicationContext());
+        TwilioConversations.createConversationsClient("token",
+                        conversationsClientListener());
+        TwilioConversationsUtils.destroyTwilioSDK();
+    }
+
+    @Test
+    public void testTwilioDestroyWithDisposingClient() {
+        TwilioConversationsUtils.initializeTwilioSDK(mActivityRule.getActivity().getApplicationContext());
+        ConversationsClient conversationsClient =
+                TwilioConversations.createConversationsClient("token",
+                        conversationsClientListener());
+        conversationsClient.dispose();
         TwilioConversations.destroy();
     }
 
     @Test
     public void testTwilioInitializationAfterDestroy() {
-        TwilioConversationsUtils.initializeTwilioSDK(mActivityRule.getActivity().getApplicationContext());
+        final CountDownLatch initLatch = TwilioConversationsUtils.isInitialized() ? new CountDownLatch(0) : new CountDownLatch(1);
+        TwilioConversations.initialize(mActivityRule.getActivity().getApplicationContext(), TwilioConversationsUtils.countDownInitListenerCallback(initLatch, new CountDownLatch(1)));
+        try {
+            initLatch.await(TwilioConversationsUtils.TIMEOUT, TimeUnit.SECONDS);
+        } catch (InterruptedException e) {
+            org.junit.Assert.fail("test timed out after" + TwilioConversationsUtils.TIMEOUT);
+        }
         TwilioConversations.destroy();
         TwilioConversationsUtils.initializeTwilioSDK(mActivityRule.getActivity().getApplicationContext());
     }
@@ -75,7 +100,6 @@ public class TwilioConversationsTests {
         } catch (InterruptedException e) {
             org.junit.Assert.fail("test timed out after" + TwilioConversationsUtils.TIMEOUT);
         }
-
     }
 
     @Test
@@ -176,7 +200,6 @@ public class TwilioConversationsTests {
             org.junit.Assert.assertTrue(npeSeen);
             npeSeen = false;
         }
-
     }
 
     @Test
@@ -226,11 +249,6 @@ public class TwilioConversationsTests {
         verifySetAndGetLogLevel(TwilioConversations.LogLevel.WARNING);
     }
 
-    private void verifySetAndGetLogLevel(int level) {
-        TwilioConversations.setLogLevel(level);
-        org.junit.Assert.assertEquals(level, TwilioConversations.getLogLevel());
-    }
-
     @Test
     public void testTwilioEnsureInvalidLevelSetsLevelToDisabled() {
         int invalidLevel = 100;
@@ -266,6 +284,10 @@ public class TwilioConversationsTests {
         // TODO: validate speakerphone is on
     }
 
+    private void verifySetAndGetLogLevel(int level) {
+        TwilioConversations.setLogLevel(level);
+        org.junit.Assert.assertEquals(level, TwilioConversations.getLogLevel());
+    }
 
     private ConversationsClientListener conversationsClientListener() {
         return new ConversationsClientListener() {
@@ -296,5 +318,4 @@ public class TwilioConversationsTests {
 
         };
     }
-
 }

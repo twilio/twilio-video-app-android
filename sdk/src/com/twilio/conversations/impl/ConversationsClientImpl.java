@@ -86,12 +86,14 @@ public class ConversationsClientImpl implements
 		
 	}
 
+	boolean isDisposed;
+	boolean isDisposing;
+
 	private final UUID uuid = UUID.randomUUID();
 	private Context context;
 	private ConversationsClientListener conversationsClientListener;
 	private EndpointObserverInternal endpointObserver;
 	private long nativeEndpointHandle;
-	private boolean isDisposed;
 	private boolean listening = false;
 	private TwilioAccessManager accessManager;
 	private Handler handler;
@@ -339,21 +341,16 @@ public class ConversationsClientImpl implements
 		handleConversationFailed(conversationImpl, e);
 	}
 
-	@Override
-	public synchronized void dispose() {
-                if (listening) {
-                    unlisten();
-                }
-		if (endpointObserver != null) {
-			endpointObserver.dispose();
-			endpointObserver = null;
-		}
-		if (!isDisposed && nativeEndpointHandle != 0) {
-			freeNativeHandle(nativeEndpointHandle);
-			nativeEndpointHandle = 0;
-			isDisposed = true;
-		}
-	}
+        @Override
+        public synchronized void dispose() {
+            isDisposing = true;
+            if (listening) {
+                // The client must stop listening before the ConversationsClient can be disposed
+                unlisten();
+            } else {
+                disposeClient();
+            }
+        }
 
 	@Override /* Parcelable */
 	public int describeContents() {
@@ -424,6 +421,10 @@ public class ConversationsClientImpl implements
 	public void onUnregistrationDidComplete(CoreError error) {
 		logger.d("onUnregistrationDidComplete");
 		listening = false;
+                if (isDisposing) {
+                    // If the client was listening, dispose() will call unlisten() to properly dispose of the client
+                    disposeClient();
+                }
 		if (handler != null) {
 			handler.post(new Runnable() {
 				@Override
@@ -540,6 +541,18 @@ public class ConversationsClientImpl implements
 		return audioManager.isSpeakerphoneOn() ? AudioOutput.SPEAKERPHONE : AudioOutput.HEADSET;
 	}
 
+        private void disposeClient() {
+            if (endpointObserver != null) {
+                endpointObserver.dispose();
+                endpointObserver = null;
+            }
+            if (!isDisposed && nativeEndpointHandle != 0) {
+                freeNativeHandle(nativeEndpointHandle);
+                nativeEndpointHandle = 0;
+                isDisposing = false;
+                isDisposed = true;
+            }
+        }
 	
 	private synchronized void checkDisposed() {
 		if (isDisposed || nativeEndpointHandle == 0) {
