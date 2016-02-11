@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -69,7 +70,7 @@ public class TwilioConversationsImpl {
      */
     private boolean observingConnectivity = false;
 
-    protected final Map<UUID, WeakReference<ConversationsClientImpl>> conversationsClientMap = new HashMap<UUID, WeakReference<ConversationsClientImpl>>();
+    protected final Map<UUID, WeakReference<ConversationsClientImpl>> conversationsClientMap = new ConcurrentHashMap<UUID, WeakReference<ConversationsClientImpl>>();
 
     /**
      * TODO 
@@ -232,6 +233,7 @@ public class TwilioConversationsImpl {
                 // Now we can teardown the sdk
                 // TODO destroy investigate making this asynchronous with callbacks
                 destroyCore();
+                initialized = false;
             }
         }).start();
     }
