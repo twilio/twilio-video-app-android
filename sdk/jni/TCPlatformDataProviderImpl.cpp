@@ -13,7 +13,7 @@ TCPlatformDataProviderImpl::TCPlatformDataProviderImpl(JNIEnv* jni, jobject cont
 	j_getHwDeviceModel_id(
 		GetStaticMethodID(jni, *j_platform_info_class_, "getHwDeviceModel", "()Ljava/lang/String;")),
 	j_getHwDeviceUUID_id(
-		GetStaticMethodID(jni, *j_platform_info_class_, "getHwDeviceUUID", "()Ljava/lang/String;")),
+		GetStaticMethodID(jni, *j_platform_info_class_, "getHwDeviceUUID", "(Landroid/content/Context;)Ljava/lang/String;")),
 	j_getHwDeviceConnectionType_id(
 		GetStaticMethodID(jni, *j_platform_info_class_, "getHwDeviceConnectionType", "(Landroid/content/Context;)Ljava/lang/String;")),
 	j_getHwDeviceNumCores_id(
@@ -23,17 +23,55 @@ TCPlatformDataProviderImpl::TCPlatformDataProviderImpl(JNIEnv* jni, jobject cont
 	j_getRtcPlatformSdkVersion_id(
 		GetStaticMethodID(jni, *j_platform_info_class_, "getRtcPlatformSdkVersion", "()Ljava/lang/String;")),
 	j_getOsArch_id(
-		GetStaticMethodID(jni, *j_platform_info_class_, "getOsArch", "()Ljava/lang/String;"))
+		GetStaticMethodID(jni, *j_platform_info_class_, "getOsArch", "()Ljava/lang/String;")),
+	j_getHwDeviceIPAddress_id(
+		GetStaticMethodID(jni, *j_platform_info_class_, "getHwDeviceIPAddress", "()Ljava/lang/String;"))
 {}
 
 const TSCPlatformInfoReport TCPlatformDataProviderImpl::getReport() const {
-	JNIEnv* jni = AttachCurrentThreadIfNeeded();
 	TSCPlatformInfoReport report;
-	jstring rezObj = (jstring)jni->CallStaticObjectMethod(*j_platform_info_class_, j_getPlatfomName_id);
-	if (IsNull(jni, rezObj)) {
-		report.platformName = "";
-	} else {
-		report.platformName = JavaToStdString(jni, rezObj);
-	}
+	report.platformName = this->callStringMethod(j_getPlatfomName_id);
+	report.platformVersion = this->callStringMethod(j_getPlatformVersion_id);
+	report.hwDeviceManufacturer = this->callStringMethod(j_getHwDeviceManufacturer_id);
+	report.hwDeviceModel = this->callStringMethod(j_getHwDeviceModel_id);
+	report.hwDeviceUUID = this->callStringMethod(j_getHwDeviceUUID_id, true);
+	report.hwDeviceConnectionType = this->callStringMethod(j_getHwDeviceConnectionType_id, true);
+	report.rtcPlatformSdkVersion = this->callStringMethod(j_getRtcPlatformSdkVersion_id);
+	report.hwDeviceIPAddress = this->callStringMethod(j_getHwDeviceIPAddress_id);
+
+	report.hwDeviceNumCores = this->callUnsignedIntMethod(j_getHwDeviceNumCores_id);
+	report.timestamp = this->callDoubleMethod(j_getTimeStamp_id);
+
 	return report;
 }
+
+std::string TCPlatformDataProviderImpl::callStringMethod(jmethodID methodId, bool useContext) const {
+	JNIEnv* jni = AttachCurrentThreadIfNeeded();
+	jstring rezObj;
+	if (useContext) {
+		rezObj = (jstring)jni->CallStaticObjectMethod(*j_platform_info_class_, methodId, *j_context_global_);
+	} else {
+		rezObj = (jstring)jni->CallStaticObjectMethod(*j_platform_info_class_, methodId);
+	}
+	std::string result = "";
+	if (IsNull(jni, rezObj)) {
+		result = "";
+	} else {
+		result = JavaToStdString(jni, rezObj);
+	}
+	return result;
+}
+
+// Let's hope we have less then 2^31 processors :-)
+unsigned int TCPlatformDataProviderImpl::callUnsignedIntMethod(jmethodID methodId) const {
+	JNIEnv* jni = AttachCurrentThreadIfNeeded();
+	jint result = (jint)jni->CallStaticIntMethod(*j_platform_info_class_, methodId);
+	return (unsigned int)result;
+}
+
+double TCPlatformDataProviderImpl::callDoubleMethod(jmethodID methodId) const {
+	JNIEnv* jni = AttachCurrentThreadIfNeeded();
+	jdouble result = (jdouble)jni->CallStaticDoubleMethod(*j_platform_info_class_, methodId);
+	return (double)result;
+}
+

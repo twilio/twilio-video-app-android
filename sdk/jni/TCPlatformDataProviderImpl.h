@@ -22,6 +22,12 @@ public:
     virtual const TSCPlatformInfoReport getReport() const;
 
 private:
+    std::string callStringMethod(jmethodID methodId, bool useContext = false) const;
+    unsigned int callUnsignedIntMethod(jmethodID methodId) const;
+    double callDoubleMethod(jmethodID methodId) const;
+
+
+private:
     const ScopedGlobalRef<jobject> j_context_global_;
     const ScopedGlobalRef<jclass> j_platform_info_class_;
     const jmethodID j_getPlatfomName_id;
@@ -34,7 +40,7 @@ private:
     const jmethodID j_getTimeStamp_id;
     const jmethodID j_getRtcPlatformSdkVersion_id;
     const jmethodID j_getOsArch_id;
-
+    const jmethodID j_getHwDeviceIPAddress_id;
 
 };
 

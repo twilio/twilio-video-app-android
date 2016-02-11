@@ -10,6 +10,7 @@ import org.apache.http.conn.util.InetAddressUtils;
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.provider.Settings.Secure;
 
 import com.twilio.conversations.TwilioConversations;
 
@@ -37,8 +38,8 @@ public final class PlatformInfo {
         	return android.os.Build.MODEL;
         }
 
-        public static String getHwDeviceUUID() {
-        	return android.provider.Settings.Secure.ANDROID_ID;
+        public static String getHwDeviceUUID(Context context) {
+        	return Secure.getString(context.getContentResolver(), Secure.ANDROID_ID);
         }
 
         public static String getHwDeviceIPAddress() {
