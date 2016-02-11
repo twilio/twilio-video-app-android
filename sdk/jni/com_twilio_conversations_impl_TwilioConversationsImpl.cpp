@@ -9,6 +9,7 @@
 #include "TSCEndpointObserver.h"
 #include "TSCConfiguration.h"
 #include "TSCLogger.h"
+#include "TSCPlatformDataProvider.h"
 #include "AccessManager/AccessManager.h"
 #include "webrtc/voice_engine/include/voe_base.h"
 #include "webrtc/modules/video_capture/video_capture_internal.h"
@@ -143,3 +144,59 @@ JNIEXPORT void JNICALL Java_com_twilio_conversations_impl_TwilioConversationsImp
   (JNIEnv *, jobject) {
 	TSCSDK::instance()->refreshRegistrations();
 }
+
+
+class TCPlatformDataProviderImpl : public TSCPlatformDataProvider {
+
+public:
+	TCPlatformDataProviderImpl(JNIEnv* jni, jobject context):
+		j_context_global_(jni, context),
+		j_platform_info_class_(jni,
+			FindClass(jni, "com/twilio/conversations/impl/core/PlatformInfo")),
+		j_getPlatfomName_id(
+			GetMethodID(jni, *j_platform_info_class_, "getPlatfomName", "()Ljava/lang/String;")),
+		j_getPlatformVersion_id(
+			GetMethodID(jni, *j_platform_info_class_, "getPlatformVersion", "()Ljava/lang/String;")),
+		j_getHwDeviceManufacturer_id(
+			GetMethodID(jni, *j_platform_info_class_, "getHwDeviceManufacturer", "()Ljava/lang/String;")),
+		j_getHwDeviceModel_id(
+			GetMethodID(jni, *j_platform_info_class_, "getHwDeviceModel", "()Ljava/lang/String;")),
+		j_getHwDeviceUUID_id(
+			GetMethodID(jni, *j_platform_info_class_, "getHwDeviceUUID", "()Ljava/lang/String;")),
+		j_getHwDeviceConnectionType_id(
+			GetMethodID(jni, *j_platform_info_class_, "getHwDeviceConnectionType", "(Landroid/content/Context;)Ljava/lang/String;")),
+		j_getHwDeviceNumCores_id(
+			GetMethodID(jni, *j_platform_info_class_, "getHwDeviceNumCores", "()I")),
+		j_getTimeStamp_id(
+			GetMethodID(jni, *j_platform_info_class_, "getTimeStamp", "()D")),
+		j_getRtcPlatformSdkVersion_id(
+			GetMethodID(jni, *j_platform_info_class_, "getRtcPlatformSdkVersion", "()Ljava/lang/String;")),
+		j_getOsArch_id(
+			GetMethodID(jni, *j_platform_info_class_, "getOsArch", "()Ljava/lang/String;"))
+	{}
+
+
+	virtual ~TCPlatformDataProviderImpl() {}
+
+    virtual const TSCPlatformInfoReport getReport() const {
+    	TSCPlatformInfoReport report;
+		return report;
+    }
+
+private:
+    const ScopedGlobalRef<jobject> j_context_global_;
+    const ScopedGlobalRef<jclass> j_platform_info_class_;
+    const jmethodID j_getPlatfomName_id;
+    const jmethodID j_getPlatformVersion_id;
+    const jmethodID j_getHwDeviceManufacturer_id;
+    const jmethodID j_getHwDeviceModel_id;
+    const jmethodID j_getHwDeviceUUID_id;
+    const jmethodID j_getHwDeviceConnectionType_id;
+    const jmethodID j_getHwDeviceNumCores_id;
+    const jmethodID j_getTimeStamp_id;
+    const jmethodID j_getRtcPlatformSdkVersion_id;
+    const jmethodID j_getOsArch_id;
+
+
+};
+
