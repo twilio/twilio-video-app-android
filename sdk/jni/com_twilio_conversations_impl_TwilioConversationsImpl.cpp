@@ -29,6 +29,7 @@
 using namespace webrtc_jni;
 using namespace twiliosdk;
 
+
 static bool media_jvm_set = false;
 
 extern "C" jint JNIEXPORT JNICALL JNI_OnLoad(JavaVM *jvm, void *reserved) {
@@ -65,6 +66,9 @@ JNIEXPORT jboolean JNICALL Java_com_twilio_conversations_impl_TwilioConversation
     TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK, kTSCoreLogLevelDebug, "initCore");
     bool failure = false;
     TSCSDK* tscSdk = TSCSDK::instance();
+
+    TSCPlatformDataProviderRef provider = new rtc::RefCountedObject<TCPlatformDataProviderImpl>(env, context);
+    tscSdk->setPlatformDataProvider(provider);
 
     // TODO investigate relocating some of these calls to more timely locations
     if (!media_jvm_set) {
