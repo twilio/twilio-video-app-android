@@ -12,12 +12,12 @@
 using namespace webrtc_jni;
 using namespace twiliosdk;
 
-class TCPlatformDataProviderImpl : public TSCPlatformDataProvider {
+class AndroidPlatformInfoProvider : public TSCPlatformDataProvider {
 
 public:
-	TCPlatformDataProviderImpl(JNIEnv* jni, jobject context);
+	AndroidPlatformInfoProvider(JNIEnv* jni, jobject context);
 
-	virtual ~TCPlatformDataProviderImpl() {}
+	virtual ~AndroidPlatformInfoProvider() {}
 
     virtual const TSCPlatformInfoReport getReport() const;
 

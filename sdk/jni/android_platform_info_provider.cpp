@@ -1,6 +1,6 @@
-#include "TCPlatformDataProviderImpl.h"
+#include "android_platform_info_provider.h"
 
-TCPlatformDataProviderImpl::TCPlatformDataProviderImpl(JNIEnv* jni, jobject context):
+AndroidPlatformInfoProvider::AndroidPlatformInfoProvider(JNIEnv* jni, jobject context):
 	j_context_global_(jni, context),
 	j_platform_info_class_(jni,
 		jni->FindClass("com/twilio/conversations/impl/core/PlatformInfo")),
@@ -28,7 +28,7 @@ TCPlatformDataProviderImpl::TCPlatformDataProviderImpl(JNIEnv* jni, jobject cont
 		GetStaticMethodID(jni, *j_platform_info_class_, "getHwDeviceIPAddress", "()Ljava/lang/String;"))
 {}
 
-const TSCPlatformInfoReport TCPlatformDataProviderImpl::getReport() const {
+const TSCPlatformInfoReport AndroidPlatformInfoProvider::getReport() const {
 	TSCPlatformInfoReport report;
 	report.platformName = this->callStringMethod(j_getPlatfomName_id);
 	report.platformVersion = this->callStringMethod(j_getPlatformVersion_id);
@@ -45,7 +45,7 @@ const TSCPlatformInfoReport TCPlatformDataProviderImpl::getReport() const {
 	return report;
 }
 
-std::string TCPlatformDataProviderImpl::callStringMethod(jmethodID methodId, bool useContext) const {
+std::string AndroidPlatformInfoProvider::callStringMethod(jmethodID methodId, bool useContext) const {
 	JNIEnv* jni = AttachCurrentThreadIfNeeded();
 	jstring rezObj;
 	if (useContext) {
@@ -63,13 +63,13 @@ std::string TCPlatformDataProviderImpl::callStringMethod(jmethodID methodId, boo
 }
 
 // Let's hope we have less then 2^31 processors :-)
-unsigned int TCPlatformDataProviderImpl::callUnsignedIntMethod(jmethodID methodId) const {
+unsigned int AndroidPlatformInfoProvider::callUnsignedIntMethod(jmethodID methodId) const {
 	JNIEnv* jni = AttachCurrentThreadIfNeeded();
 	jint result = (jint)jni->CallStaticIntMethod(*j_platform_info_class_, methodId);
 	return (unsigned int)result;
 }
 
-double TCPlatformDataProviderImpl::callDoubleMethod(jmethodID methodId) const {
+double AndroidPlatformInfoProvider::callDoubleMethod(jmethodID methodId) const {
 	JNIEnv* jni = AttachCurrentThreadIfNeeded();
 	jdouble result = (jdouble)jni->CallStaticDoubleMethod(*j_platform_info_class_, methodId);
 	return (double)result;

@@ -9,7 +9,7 @@
 #include "TSCEndpointObserver.h"
 #include "TSCConfiguration.h"
 #include "TSCLogger.h"
-#include "TCPlatformDataProviderImpl.h"
+#include "android_platform_info_provider.h"
 #include "AccessManager/AccessManager.h"
 #include "webrtc/voice_engine/include/voe_base.h"
 #include "webrtc/modules/video_capture/video_capture_internal.h"
@@ -67,7 +67,7 @@ JNIEXPORT jboolean JNICALL Java_com_twilio_conversations_impl_TwilioConversation
     bool failure = false;
     TSCSDK* tscSdk = TSCSDK::instance();
 
-    TSCPlatformDataProviderRef provider = new rtc::RefCountedObject<TCPlatformDataProviderImpl>(env, context);
+    TSCPlatformDataProviderRef provider = new rtc::RefCountedObject<AndroidPlatformInfoProvider>(env, context);
     tscSdk->setPlatformDataProvider(provider);
 
     // TODO investigate relocating some of these calls to more timely locations
