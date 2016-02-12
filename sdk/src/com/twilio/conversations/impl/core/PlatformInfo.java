@@ -17,82 +17,82 @@ import com.twilio.conversations.TwilioConversations;
 
 public final class PlatformInfo {
 
-        private static final String PLATFORM_NAME = "Android";
-
-        private PlatformInfo(){
-        }
-
-        public static String getPlatfomName() {
-            return PLATFORM_NAME;
-        }
-
-        public static String getPlatformVersion() {
-        	return android.os.Build.VERSION.RELEASE;
-        }
-
-        public static String getHwDeviceManufacturer() {
-        	return android.os.Build.MANUFACTURER;
-        }
-
-        public static String getHwDeviceModel() {
-        	return android.os.Build.MODEL;
-        }
-
-        public static String getHwDeviceUUID(Context context) {
-        	return Secure.getString(context.getContentResolver(), Secure.ANDROID_ID);
-        }
-
-        public static String getHwDeviceIPAddress() {
-        	try {
-        		for (Enumeration<NetworkInterface> en =
-        				NetworkInterface.getNetworkInterfaces(); en.hasMoreElements();) {
-        			NetworkInterface intf = en.nextElement();
-        			for (Enumeration<InetAddress> enumIpAddr =
-        					intf.getInetAddresses(); enumIpAddr.hasMoreElements();) {
-        				InetAddress inetAddress = enumIpAddr.nextElement();
-        				if (!inetAddress.isLoopbackAddress() &&
-        						InetAddressUtils.isIPv4Address(inetAddress.getHostAddress())) {
-        					String ipaddress = inetAddress .getHostAddress().toString();
-        					return ipaddress;
-        				}
-        			}
-        		}
-        	} catch (SocketException ex) {
-        		// TODO: Ignoring exception for now
-        	}
-        	return "";
-        }
-
-        public static String getHwDeviceConnectionType(Context context) {
-        	ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
-        	NetworkInfo info = cm.getActiveNetworkInfo();
-        	String connType = "";
-        	if(info==null || !info.isConnected()) {
-        		connType = "No connection"; //not connected
-        	} else if(info.getType() == ConnectivityManager.TYPE_WIFI) {
-        		connType = info.getTypeName();
-        	} else if(info.getType() == ConnectivityManager.TYPE_MOBILE){
-        		connType = info.getSubtypeName();
-        	} else {
-        		connType = "Unable to detect connection type";
-        	}
-        	return connType;
-        }
-
-        public static int getHwDeviceNumCores() {
-        	return Runtime.getRuntime().availableProcessors();
-        }
-
-        public static double getTimeStamp() {
-        	return System.currentTimeMillis() / 1000L;
-        }
-
-        public static String getRtcPlatformSdkVersion() {
-        	return TwilioConversations.getVersion();
-        }
-
-        public static String getOsArch() {
-        	return System.getProperty("os.arch");
-        }
+	private static final String PLATFORM_NAME = "Android";
+	
+	private PlatformInfo(){
+	}
+	
+	static String getPlatfomName() {
+	    return PLATFORM_NAME;
+	}
+	
+	static String getPlatformVersion() {
+		return android.os.Build.VERSION.RELEASE;
+	}
+	
+	static String getHwDeviceManufacturer() {
+		return android.os.Build.MANUFACTURER;
+	}
+	
+	static String getHwDeviceModel() {
+		return android.os.Build.MODEL;
+	}
+	
+	static String getHwDeviceUUID(Context context) {
+		return Secure.getString(context.getContentResolver(), Secure.ANDROID_ID);
+	}
+	
+	static String getHwDeviceIPAddress() {
+		try {
+			for (Enumeration<NetworkInterface> en =
+					NetworkInterface.getNetworkInterfaces(); en.hasMoreElements();) {
+				NetworkInterface intf = en.nextElement();
+				for (Enumeration<InetAddress> enumIpAddr =
+						intf.getInetAddresses(); enumIpAddr.hasMoreElements();) {
+					InetAddress inetAddress = enumIpAddr.nextElement();
+					if (!inetAddress.isLoopbackAddress() &&
+							InetAddressUtils.isIPv4Address(inetAddress.getHostAddress())) {
+						String ipaddress = inetAddress .getHostAddress().toString();
+						return ipaddress;
+					}
+				}
+			}
+		} catch (SocketException ex) {
+			// TODO: Ignoring exception for now
+		}
+		return "";
+	}
+	
+	static String getHwDeviceConnectionType(Context context) {
+		ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+		NetworkInfo info = cm.getActiveNetworkInfo();
+		String connType = "";
+		if(info==null || !info.isConnected()) {
+			connType = "No connection"; //not connected
+		} else if(info.getType() == ConnectivityManager.TYPE_WIFI) {
+			connType = info.getTypeName();
+		} else if(info.getType() == ConnectivityManager.TYPE_MOBILE){
+			connType = info.getSubtypeName();
+		} else {
+			connType = "Unable to detect connection type";
+		}
+		return connType;
+	}
+	
+	static int getHwDeviceNumCores() {
+		return Runtime.getRuntime().availableProcessors();
+	}
+	
+	static double getTimeStamp() {
+		return System.currentTimeMillis() / 1000L;
+	}
+	
+	static String getRtcPlatformSdkVersion() {
+		return TwilioConversations.getVersion();
+	}
+	
+	static String getOsArch() {
+		return System.getProperty("os.arch");
+	}
 
 }
