@@ -74,7 +74,7 @@ public class ConversationTests {
         } else {
             initWait.countDown();
         }
-        TwilioConversationsUtils.wait(initWait, 5, TimeUnit.SECONDS);
+        TwilioConversationsUtils.wait(initWait, 20, TimeUnit.SECONDS);
 
         // Intentionally obtaining the token with a latch to remain on the test thread.
         final String token = obtainCapabilityToken(USER);
@@ -164,7 +164,7 @@ public class ConversationTests {
             }
         });
 
-        TwilioConversationsUtils.wait(wait, 10, TimeUnit.SECONDS);
+        TwilioConversationsUtils.wait(wait, 30, TimeUnit.SECONDS);
     }
 
     private String obtainCapabilityToken(final String username) {
