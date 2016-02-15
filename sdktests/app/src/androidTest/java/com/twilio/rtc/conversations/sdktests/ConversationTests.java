@@ -12,7 +12,7 @@ import com.twilio.conversations.CapturerErrorListener;
 import com.twilio.conversations.CapturerException;
 import com.twilio.conversations.Conversation;
 import com.twilio.conversations.ConversationCallback;
-import com.twilio.conversations.ConversationException;
+import com.twilio.conversations.TwilioConversationsException;
 import com.twilio.conversations.ConversationsClient;
 import com.twilio.conversations.ConversationsClientListener;
 import com.twilio.conversations.IncomingInvite;
@@ -110,6 +110,11 @@ public class ConversationTests {
                             public void onLocalVideoTrackRemoved(LocalMedia localMedia, LocalVideoTrack localVideoTrack) {
                                 // do nothing
                             }
+
+                            @Override
+                            public void onLocalVideoTrackError(LocalMedia localMedia, LocalVideoTrack localVideoTrack, TwilioConversationsException e) {
+
+                            }
                         });
 
                         CameraCapturer cameraCapturer = CameraCapturerFactory.createCameraCapturer(mActivityRule.getActivity(), CameraCapturer.CameraSource.CAMERA_SOURCE_FRONT_CAMERA, null, new CapturerErrorListener() {
@@ -125,7 +130,7 @@ public class ConversationTests {
                         participants.add(NON_EXISTANT_PARTICIPANT);
                         conversationsClient.sendConversationInvite(participants, localMedia, new ConversationCallback() {
                             @Override
-                            public void onConversation(Conversation conversation, ConversationException e) {
+                            public void onConversation(Conversation conversation, TwilioConversationsException e) {
                                 assertNotNull(e);
                                 wait.countDown();
                             }
@@ -139,7 +144,7 @@ public class ConversationTests {
                     }
 
                     @Override
-                    public void onFailedToStartListening(ConversationsClient conversationsClient, ConversationException e) {
+                    public void onFailedToStartListening(ConversationsClient conversationsClient, TwilioConversationsException e) {
                         fail();
                     }
 

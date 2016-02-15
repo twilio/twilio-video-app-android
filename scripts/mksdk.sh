@@ -7,12 +7,12 @@ ANDROID_API=19
 # need to specify source files manually to avoid having TwilioClientService in there
 JAVADOC_SOURCE_FILES="
     TwilioConversations.java
+    TwilioConversationsException.java
     ConversationsClient.java
     ConversationsClientListener.java
     Conversation.java
     ConversationCallback.java
     ConversationListener.java
-    ConversationException.java
     IncomingInvite.java
     OutgoingInvite.java
     InviteStatus.java
@@ -31,6 +31,7 @@ JAVADOC_SOURCE_FILES="
     AudioTrack.java
     VideoTrack.java
     MediaTrack.java
+    MediaTrackState.java
     TrackOrigin.java
     VideoRenderer.java
     VideoViewRenderer.java

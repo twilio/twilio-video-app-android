@@ -1,7 +1,7 @@
 package com.twilio.conversations;
 
 /**
- * A media track can either be an {@link VideoTrack} or {@link AudioTrack}
+ * A media track can either be a {@link VideoTrack} or {@link AudioTrack}
  *
  */
 public interface MediaTrack {
@@ -11,5 +11,13 @@ public interface MediaTrack {
      *
      * @return media track id
      */
-    public String getTrackId();
+    String getTrackId();
+
+    /**
+     * The state associated with this media track
+     *
+     * @return state of media track
+     */
+    MediaTrackState getState();
+
 }

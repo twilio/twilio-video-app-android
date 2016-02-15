@@ -83,10 +83,22 @@ public class TwilioConversations {
     public final static int TOO_MANY_TRACKS = 300;
 
     /**
+     *  An invalid video capturer was added to the local media
+     *  @note: At the moment, only {@link CameraCapturer} is supported.
+     */
+    public final static int INVALID_VIDEO_CAPTURER = 301;
+
+    /**
      *  An attempt was made to add or remove a track that is already being operated on.
      *  @note: Retry your request at a later time.
      */
     public final static int TRACK_OPERATION_IN_PROGRESS = 303;
+
+    /**
+     *  An attempt was made to remove a track that has already ended.
+     *  @note: The video track is in the {@link MediaTrackState} ENDED state.
+     */
+    public final static int INVALID_VIDEO_TRACK_STATE = 305;
 
     /**
      * Interface for the listener object to pass to
@@ -146,7 +158,8 @@ public class TwilioConversations {
     }
 
     /**
-     * Dispose the Twilio Conversations SDK
+     * Dispose the Twilio Conversations SDK. Note that once this completes
+     * all {@link ConversationsClient} are destroyed and are no longer usable.
      *
      */
     public static void destroy() {
@@ -193,12 +206,9 @@ public class TwilioConversations {
         if (token == null) {
             throw new NullPointerException("token must not be null");
         }
-        if (listener == null) {
-            throw new NullPointerException("listener must not be null");
-        }
         TwilioAccessManager manager = TwilioAccessManagerFactory.createAccessManager(token, null);
-        Map<String, String> options = new HashMap<String, String>();
-        return TwilioConversationsImpl.getInstance().createConversationsClient(manager, options, listener);
+
+        return createConversationsClient(manager, listener);
     }
 
     /**
@@ -211,14 +221,7 @@ public class TwilioConversations {
      *         was not initialized
      */
     public static ConversationsClient createConversationsClient(TwilioAccessManager accessManager, ConversationsClientListener listener) {
-        if (accessManager == null) {
-            throw new NullPointerException("access manager must not be null");
-        }
-        if (listener == null) {
-            throw new NullPointerException("listener must not be null");
-        }
-        Map<String, String> options = new HashMap<String, String>();
-        return TwilioConversationsImpl.getInstance().createConversationsClient(accessManager, options, listener);
+        return createConversationsClient(accessManager, new HashMap<String, String>(), listener);
     }
 
     /**
@@ -242,8 +245,13 @@ public class TwilioConversations {
         if (listener == null) {
             throw new NullPointerException("listener must not be null");
         }
+        TwilioConversationsImpl conversationsSdk = TwilioConversationsImpl.getInstance();
 
-        return TwilioConversationsImpl.getInstance().createConversationsClient(accessManager, options, listener);
+        if (!conversationsSdk.isInitialized()) {
+            throw new IllegalStateException("Cannot create client before initialize is called");
+        }
+
+        return conversationsSdk.createConversationsClient(accessManager, options, listener);
     }
 
     /**

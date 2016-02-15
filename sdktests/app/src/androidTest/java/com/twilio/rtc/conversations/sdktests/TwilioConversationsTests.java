@@ -1,7 +1,9 @@
 package com.twilio.rtc.conversations.sdktests;
 
+import org.junit.After;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 
 import android.support.test.rule.ActivityTestRule;
@@ -10,7 +12,7 @@ import android.support.test.runner.AndroidJUnit4;
 import com.twilio.common.TwilioAccessManager;
 import com.twilio.common.TwilioAccessManagerFactory;
 import com.twilio.rtc.conversations.sdktests.utils.TwilioConversationsUtils;
-import com.twilio.conversations.ConversationException;
+import com.twilio.conversations.TwilioConversationsException;
 import com.twilio.conversations.ConversationsClient;
 import com.twilio.conversations.ConversationsClientListener;
 import com.twilio.conversations.IncomingInvite;
@@ -27,6 +29,19 @@ public class TwilioConversationsTests {
     public ActivityTestRule<TwilioConversationsActivity> mActivityRule = new ActivityTestRule<>(
             TwilioConversationsActivity.class);
 
+    @Rule
+    public final ExpectedException exception = ExpectedException.none();
+
+    /**
+     * We only teardown because not every test will want the sdk initialized
+     */
+    @After
+    public void teardown() {
+        if (TwilioConversationsUtils.isInitialized()) {
+            TwilioConversationsUtils.destroyTwilioSDK();
+        }
+    }
+
     @Test
     public void testTwilioInitialize() {
         TwilioConversationsUtils.initializeTwilioSDK(mActivityRule.getActivity().getApplicationContext());
@@ -35,12 +50,36 @@ public class TwilioConversationsTests {
     @Test
     public void testTwilioDestroy() {
         TwilioConversationsUtils.initializeTwilioSDK(mActivityRule.getActivity().getApplicationContext());
+        TwilioConversationsUtils.destroyTwilioSDK();
+    }
+
+    @Test
+    public void testTwilioDestroyWithActiveClient() {
+        TwilioConversationsUtils.initializeTwilioSDK(mActivityRule.getActivity().getApplicationContext());
+        TwilioConversations.createConversationsClient("token",
+                        conversationsClientListener());
+        TwilioConversationsUtils.destroyTwilioSDK();
+    }
+
+    @Test
+    public void testTwilioDestroyWithDisposingClient() {
+        TwilioConversationsUtils.initializeTwilioSDK(mActivityRule.getActivity().getApplicationContext());
+        ConversationsClient conversationsClient =
+                TwilioConversations.createConversationsClient("token",
+                        conversationsClientListener());
+        conversationsClient.dispose();
         TwilioConversations.destroy();
     }
 
     @Test
     public void testTwilioInitializationAfterDestroy() {
-        TwilioConversationsUtils.initializeTwilioSDK(mActivityRule.getActivity().getApplicationContext());
+        final CountDownLatch initLatch = TwilioConversationsUtils.isInitialized() ? new CountDownLatch(0) : new CountDownLatch(1);
+        TwilioConversations.initialize(mActivityRule.getActivity().getApplicationContext(), TwilioConversationsUtils.countDownInitListenerCallback(initLatch, new CountDownLatch(1)));
+        try {
+            initLatch.await(TwilioConversationsUtils.TIMEOUT, TimeUnit.SECONDS);
+        } catch (InterruptedException e) {
+            org.junit.Assert.fail("test timed out after" + TwilioConversationsUtils.TIMEOUT);
+        }
         TwilioConversations.destroy();
         TwilioConversationsUtils.initializeTwilioSDK(mActivityRule.getActivity().getApplicationContext());
     }
@@ -61,7 +100,42 @@ public class TwilioConversationsTests {
         } catch (InterruptedException e) {
             org.junit.Assert.fail("test timed out after" + TwilioConversationsUtils.TIMEOUT);
         }
+    }
 
+    @Test
+    public void testClientCreationBeforeInitialize() {
+        exception.expect(IllegalStateException.class);
+        String bogusToken = "1234";
+        TwilioConversations.createConversationsClient(bogusToken,
+                new ConversationsClientListener() {
+            @Override
+            public void onStartListeningForInvites(ConversationsClient conversationsClient) {
+
+            }
+
+            @Override
+            public void onStopListeningForInvites(ConversationsClient conversationsClient) {
+
+            }
+
+            @Override
+            public void onFailedToStartListening(ConversationsClient conversationsClient,
+                                                 TwilioConversationsException e) {
+
+            }
+
+            @Override
+            public void onIncomingInvite(ConversationsClient conversationsClient,
+                                         IncomingInvite incomingInvite) {
+
+            }
+
+            @Override
+            public void onIncomingInviteCancelled(ConversationsClient conversationsClient,
+                                                  IncomingInvite incomingInvite) {
+
+            }
+        });
     }
 
     @Test
@@ -126,7 +200,6 @@ public class TwilioConversationsTests {
             org.junit.Assert.assertTrue(npeSeen);
             npeSeen = false;
         }
-
     }
 
     @Test
@@ -176,11 +249,6 @@ public class TwilioConversationsTests {
         verifySetAndGetLogLevel(TwilioConversations.LogLevel.WARNING);
     }
 
-    private void verifySetAndGetLogLevel(int level) {
-        TwilioConversations.setLogLevel(level);
-        org.junit.Assert.assertEquals(level, TwilioConversations.getLogLevel());
-    }
-
     @Test
     public void testTwilioEnsureInvalidLevelSetsLevelToDisabled() {
         int invalidLevel = 100;
@@ -216,6 +284,10 @@ public class TwilioConversationsTests {
         // TODO: validate speakerphone is on
     }
 
+    private void verifySetAndGetLogLevel(int level) {
+        TwilioConversations.setLogLevel(level);
+        org.junit.Assert.assertEquals(level, TwilioConversations.getLogLevel());
+    }
 
     private ConversationsClientListener conversationsClientListener() {
         return new ConversationsClientListener() {
@@ -230,7 +302,7 @@ public class TwilioConversationsTests {
             }
 
             @Override
-            public void onFailedToStartListening(ConversationsClient conversationsClient, ConversationException e) {
+            public void onFailedToStartListening(ConversationsClient conversationsClient, TwilioConversationsException e) {
 
             }
 
@@ -246,5 +318,4 @@ public class TwilioConversationsTests {
 
         };
     }
-
 }

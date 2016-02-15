@@ -12,7 +12,7 @@ public interface CameraCapturer {
      * Camera source types
 	 *
 	 */
-	public static enum CameraSource {
+	enum CameraSource {
 		CAMERA_SOURCE_FRONT_CAMERA,
 		CAMERA_SOURCE_BACK_CAMERA
 	};
@@ -21,24 +21,24 @@ public interface CameraCapturer {
 	 * Starts previewing the camera.
 	 *
 	 */
-	public void startPreview();
+	void startPreview();
 
 	/**
 	 * Stops previewing the camera.
 	 *
 	 */
-	public void stopPreview();
+	void stopPreview();
 
 	/**
 	 * Returns whether the camera capturer is previewing the camera
 	 *
 	 */
-	public boolean isPreviewing();
+	boolean isPreviewing();
 
 	/**
 	 * Switches the camera to the next available camera source.
 	 *
 	 */
-	public boolean switchCamera();
+	boolean switchCamera();
 
 }

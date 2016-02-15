@@ -7,7 +7,7 @@ import android.support.test.runner.AndroidJUnit4;
 import com.twilio.rtc.conversations.sdktests.utils.TwilioConversationsUtils;
 import com.twilio.conversations.Conversation;
 import com.twilio.conversations.ConversationCallback;
-import com.twilio.conversations.ConversationException;
+import com.twilio.conversations.TwilioConversationsException;
 import com.twilio.conversations.ConversationsClient;
 import com.twilio.conversations.ConversationsClientListener;
 import com.twilio.conversations.IncomingInvite;
@@ -30,8 +30,6 @@ import java.util.concurrent.TimeUnit;
 
 @RunWith(AndroidJUnit4.class)
 public class ConversationsClientLifecycleTests {
-
-    private static final String TEST_USER = "john";
     private static String TOKEN = "token";
     private static String PARTICIPANT = "janne";
 
@@ -91,10 +89,15 @@ public class ConversationsClientLifecycleTests {
             public void onLocalVideoTrackRemoved(LocalMedia localMedia, LocalVideoTrack localVideoTrack) {
 
             }
+
+            @Override
+            public void onLocalVideoTrackError(LocalMedia localMedia, LocalVideoTrack localVideoTrack, TwilioConversationsException e) {
+
+            }
         });
         OutgoingInvite outgoingInvite = conversationsClient.sendConversationInvite(participants, localMedia, new ConversationCallback() {
             @Override
-            public void onConversation(Conversation conversation, ConversationException e) {
+            public void onConversation(Conversation conversation, TwilioConversationsException e) {
 
             }
         });
@@ -126,7 +129,8 @@ public class ConversationsClientLifecycleTests {
         InstrumentationRegistry.getInstrumentation().runOnMainSync(new Runnable() {
             @Override
             public void run() {
-                ConversationsClient conversationsClient = TwilioConversations.createConversationsClient(TOKEN, new ConversationsClientListener() {
+                ConversationsClient conversationsClient = TwilioConversations
+                        .createConversationsClient(TOKEN, new ConversationsClientListener() {
                     @Override
                     public void onStartListeningForInvites(ConversationsClient conversationsClient) {
                         org.junit.Assert.fail();
@@ -138,21 +142,23 @@ public class ConversationsClientLifecycleTests {
                     }
 
                     @Override
-                    public void onFailedToStartListening(ConversationsClient conversationsClient, ConversationException e) {
+                    public void onFailedToStartListening(ConversationsClient conversationsClient,
+                                                         TwilioConversationsException e) {
                         wait.countDown();
                     }
 
                     @Override
-                    public void onIncomingInvite(ConversationsClient conversationsClient, IncomingInvite incomingInvite) {
+                    public void onIncomingInvite(ConversationsClient conversationsClient,
+                                                 IncomingInvite incomingInvite) {
                         org.junit.Assert.fail();
 
                     }
 
                     @Override
-                    public void onIncomingInviteCancelled(ConversationsClient conversationsClient, IncomingInvite incomingInvite) {
+                    public void onIncomingInviteCancelled(ConversationsClient conversationsClient,
+                                                          IncomingInvite incomingInvite) {
                         org.junit.Assert.fail();
                     }
-
                 });
                 conversationsClient.listen();
             }
@@ -173,7 +179,7 @@ public class ConversationsClientLifecycleTests {
             }
 
             @Override
-            public void onFailedToStartListening(ConversationsClient conversationsClient, ConversationException e) {
+            public void onFailedToStartListening(ConversationsClient conversationsClient, TwilioConversationsException e) {
 
             }
 
