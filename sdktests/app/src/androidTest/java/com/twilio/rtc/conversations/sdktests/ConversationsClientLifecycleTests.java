@@ -8,7 +8,6 @@ import com.twilio.rtc.conversations.sdktests.utils.TwilioConversationsUtils;
 import com.twilio.conversations.Conversation;
 import com.twilio.conversations.ConversationCallback;
 import com.twilio.conversations.TwilioConversationsException;
-import com.twilio.conversations.ConversationListener;
 import com.twilio.conversations.ConversationsClient;
 import com.twilio.conversations.ConversationsClientListener;
 import com.twilio.conversations.IncomingInvite;
@@ -17,7 +16,6 @@ import com.twilio.conversations.LocalMediaFactory;
 import com.twilio.conversations.LocalMediaListener;
 import com.twilio.conversations.LocalVideoTrack;
 import com.twilio.conversations.OutgoingInvite;
-import com.twilio.conversations.Participant;
 import com.twilio.conversations.TwilioConversations;
 
 import org.junit.Rule;
@@ -195,31 +193,6 @@ public class ConversationsClientLifecycleTests {
 
             }
 
-        };
-    }
-
-    private ConversationListener conversationListener() {
-        return new ConversationListener() {
-
-            @Override
-            public void onParticipantConnected(Conversation conversation, Participant participant) {
-
-            }
-
-            @Override
-            public void onFailedToConnectParticipant(Conversation conversation, Participant participant, TwilioConversationsException e) {
-
-            }
-
-            @Override
-            public void onParticipantDisconnected(Conversation conversation, Participant participant) {
-
-            }
-
-            @Override
-            public void onConversationEnded(Conversation conversation, TwilioConversationsException e) {
-
-            }
         };
     }
 
