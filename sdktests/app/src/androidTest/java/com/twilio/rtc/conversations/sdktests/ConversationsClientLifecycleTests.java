@@ -7,8 +7,7 @@ import android.support.test.runner.AndroidJUnit4;
 import com.twilio.rtc.conversations.sdktests.utils.TwilioConversationsUtils;
 import com.twilio.conversations.Conversation;
 import com.twilio.conversations.ConversationCallback;
-import com.twilio.conversations.ConversationException;
-import com.twilio.conversations.ConversationListener;
+import com.twilio.conversations.TwilioConversationsException;
 import com.twilio.conversations.ConversationsClient;
 import com.twilio.conversations.ConversationsClientListener;
 import com.twilio.conversations.IncomingInvite;
@@ -17,7 +16,6 @@ import com.twilio.conversations.LocalMediaFactory;
 import com.twilio.conversations.LocalMediaListener;
 import com.twilio.conversations.LocalVideoTrack;
 import com.twilio.conversations.OutgoingInvite;
-import com.twilio.conversations.Participant;
 import com.twilio.conversations.TwilioConversations;
 
 import org.junit.Rule;
@@ -34,7 +32,6 @@ import static org.junit.Assert.*;
 
 @RunWith(AndroidJUnit4.class)
 public class ConversationsClientLifecycleTests {
-
     private static String TOKEN = "token";
     private static String PARTICIPANT = "janne";
 
@@ -46,6 +43,16 @@ public class ConversationsClientLifecycleTests {
     public void testTwilioCreateConversationsClientWithToken() {
         ConversationsClient conversationsClient = createConversationsClient();
         assertNotNull(conversationsClient);
+    }
+
+    @Test
+    public void testTwilioNotListeningAfterDisposal() {
+        ConversationsClient conversationsClient = createConversationsClient();
+        org.junit.Assert.assertNotNull(conversationsClient);
+
+        conversationsClient.dispose();
+
+        org.junit.Assert.assertFalse(conversationsClient.isListening());
     }
 
     @Test(expected = IllegalStateException.class)
@@ -84,10 +91,16 @@ public class ConversationsClientLifecycleTests {
             public void onLocalVideoTrackRemoved(LocalMedia localMedia, LocalVideoTrack localVideoTrack) {
 
             }
+
+            @Override
+            public void onLocalVideoTrackError(LocalMedia localMedia, LocalVideoTrack localVideoTrack, TwilioConversationsException e) {
+
+            }
         });
+
         OutgoingInvite outgoingInvite = conversationsClient.sendConversationInvite(participants, localMedia, new ConversationCallback() {
             @Override
-            public void onConversation(Conversation conversation, ConversationException e) {
+            public void onConversation(Conversation conversation, TwilioConversationsException e) {
 
             }
         });
@@ -119,37 +132,39 @@ public class ConversationsClientLifecycleTests {
         InstrumentationRegistry.getInstrumentation().runOnMainSync(new Runnable() {
             @Override
             public void run() {
-                ConversationsClient conversationsClient = TwilioConversations.createConversationsClient(TOKEN, new ConversationsClientListener() {
-                    @Override
-                    public void onStartListeningForInvites(ConversationsClient conversationsClient) {
-                        fail();
-                    }
+                ConversationsClient conversationsClient = TwilioConversations
+                        .createConversationsClient(TOKEN, new ConversationsClientListener() {
+                            @Override
+                            public void onStartListeningForInvites(ConversationsClient conversationsClient) {
+                                fail();
+                            }
 
-                    @Override
-                    public void onStopListeningForInvites(ConversationsClient conversationsClient) {
-                        fail();
-                    }
+                            @Override
+                            public void onStopListeningForInvites(ConversationsClient conversationsClient) {
+                                fail();
+                            }
 
-                    @Override
-                    public void onFailedToStartListening(ConversationsClient conversationsClient, ConversationException e) {
-                        wait.countDown();
-                    }
+                            @Override
+                            public void onFailedToStartListening(ConversationsClient conversationsClient,
+                                                                 TwilioConversationsException e) {
+                                wait.countDown();
+                            }
 
-                    @Override
-                    public void onIncomingInvite(ConversationsClient conversationsClient, IncomingInvite incomingInvite) {
-                        fail();
+                            @Override
+                            public void onIncomingInvite(ConversationsClient conversationsClient, IncomingInvite incomingInvite) {
+                                fail();
+                            }
 
-                    }
+                            @Override
+                            public void onIncomingInviteCancelled(ConversationsClient conversationsClient, IncomingInvite incomingInvite) {
+                                fail();
+                            }
 
-                    @Override
-                    public void onIncomingInviteCancelled(ConversationsClient conversationsClient, IncomingInvite incomingInvite) {
-                        fail();
-                    }
-
-                });
+                        });
                 conversationsClient.listen();
             }
         });
+
         TwilioConversationsUtils.wait(wait, 10, TimeUnit.SECONDS);
     }
 
@@ -166,7 +181,7 @@ public class ConversationsClientLifecycleTests {
             }
 
             @Override
-            public void onFailedToStartListening(ConversationsClient conversationsClient, ConversationException e) {
+            public void onFailedToStartListening(ConversationsClient conversationsClient, TwilioConversationsException e) {
 
             }
 
@@ -180,31 +195,6 @@ public class ConversationsClientLifecycleTests {
 
             }
 
-        };
-    }
-
-    private ConversationListener conversationListener() {
-        return new ConversationListener() {
-
-            @Override
-            public void onParticipantConnected(Conversation conversation, Participant participant) {
-
-            }
-
-            @Override
-            public void onFailedToConnectParticipant(Conversation conversation, Participant participant, ConversationException e) {
-
-            }
-
-            @Override
-            public void onParticipantDisconnected(Conversation conversation, Participant participant) {
-
-            }
-
-            @Override
-            public void onConversationEnded(Conversation conversation, ConversationException e) {
-
-            }
         };
     }
 

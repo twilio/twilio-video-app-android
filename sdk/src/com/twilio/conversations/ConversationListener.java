@@ -22,7 +22,7 @@ public interface ConversationListener {
 	 * @param participant The participant.
 	 * @param exception Exception encountered in adding participant to conversation.
 	 */
-	void onFailedToConnectParticipant(Conversation conversation, Participant participant, ConversationException exception);
+	void onFailedToConnectParticipant(Conversation conversation, Participant participant, TwilioConversationsException exception);
 
 	/**
 	 * This method notifies the listener when a participant has disconnected from a conversation by request or due to an error.
@@ -38,6 +38,6 @@ public interface ConversationListener {
 	 * @param conversation The conversation
 	 * @param exception Exception (if any) encountered when conversation ends.
 	 */
-	void onConversationEnded(Conversation conversation, ConversationException exception);
+	void onConversationEnded(Conversation conversation, TwilioConversationsException exception);
 
 }

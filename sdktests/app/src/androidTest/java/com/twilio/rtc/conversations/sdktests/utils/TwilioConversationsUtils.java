@@ -11,7 +11,6 @@ import java.util.concurrent.TimeUnit;
  * Common tools used in tests
  */
 public class TwilioConversationsUtils {
-
     /*
      * TwilioConversations is a singleton and can only be initialized once. As a result we must track
      * if TwilioConversations has ever been initialized.
@@ -26,6 +25,12 @@ public class TwilioConversationsUtils {
         wait(waitLatch, TIMEOUT, TimeUnit.SECONDS);
     }
 
+    public static void destroyTwilioSDK() {
+        TwilioConversations.destroy();
+        while (TwilioConversations.isInitialized());
+        initialized = false;
+    }
+
     public static boolean isInitialized() {
         return initialized;
     }
@@ -38,7 +43,7 @@ public class TwilioConversationsUtils {
                     initialized = true;
                     wait.countDown();
                 } else {
-                    org.junit.Assert.fail("initalized but initialize was already called");
+                    org.junit.Assert.fail("initialized but initialize was already called");
                 }
             }
 
@@ -78,6 +83,4 @@ public class TwilioConversationsUtils {
             org.junit.Assert.fail("Thread interrupted");
         }
     }
-
-
 }

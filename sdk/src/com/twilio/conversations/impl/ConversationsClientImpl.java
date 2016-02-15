@@ -1,10 +1,11 @@
 package com.twilio.conversations.impl;
 
+import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CountDownLatch;
 
 import android.content.Context;
@@ -17,7 +18,6 @@ import com.twilio.common.TwilioAccessManager;
 import com.twilio.conversations.AudioOutput;
 import com.twilio.conversations.Conversation;
 import com.twilio.conversations.ConversationCallback;
-import com.twilio.conversations.ConversationException;
 import com.twilio.conversations.ConversationListener;
 import com.twilio.conversations.ConversationsClient;
 import com.twilio.conversations.ConversationsClientListener;
@@ -26,6 +26,7 @@ import com.twilio.conversations.LocalMedia;
 import com.twilio.conversations.OutgoingInvite;
 import com.twilio.conversations.Participant;
 import com.twilio.conversations.TwilioConversations;
+import com.twilio.conversations.TwilioConversationsException;
 import com.twilio.conversations.impl.core.ConversationStateObserver;
 import com.twilio.conversations.impl.core.ConversationStatus;
 import com.twilio.conversations.impl.core.CoreEndpoint;
@@ -46,7 +47,6 @@ public class ConversationsClientImpl implements
 	static final Logger logger = Logger.getLogger(ConversationsClientImpl.class);
 
 	// Current support is limited to one conversation
-	private static final int MAX_CONVERSATIONS = 1;
 	private static final String DISPOSE_MESSAGE = "The ConversationsClient has been disposed. This operation is no longer valid";
 	private static final String FINALIZE_MESSAGE = "The ConversationsClient must be released by calling dispose(). Failure to do so may result in leaked resources.";
 
@@ -54,7 +54,7 @@ public class ConversationsClientImpl implements
 		conversations.remove(conversationImpl);
 	}
 
-	void onConversationTerminated(ConversationImpl conversationImpl, ConversationException e) {
+	void onConversationTerminated(ConversationImpl conversationImpl, TwilioConversationsException e) {
 		conversations.remove(conversationImpl);
 		pendingIncomingInvites.remove(conversationImpl.getIncomingInviteImpl());
 		conversationImpl.getIncomingInviteImpl().setStatus(InviteStatus.CANCELLED);
@@ -86,17 +86,19 @@ public class ConversationsClientImpl implements
 		
 	}
 
+	boolean isDisposed;
+	boolean isDisposing;
+
 	private final UUID uuid = UUID.randomUUID();
 	private Context context;
 	private ConversationsClientListener conversationsClientListener;
 	private EndpointObserverInternal endpointObserver;
 	private long nativeEndpointHandle;
-	private boolean isDisposed;
 	private boolean listening = false;
 	private TwilioAccessManager accessManager;
 	private Handler handler;
 	private EndpointState endpointState;
-	private Set<ConversationImpl> conversations = new HashSet<ConversationImpl>();
+	private Set<ConversationImpl> conversations = Collections.newSetFromMap(new ConcurrentHashMap<ConversationImpl, Boolean>());
 	private Map<ConversationImpl, OutgoingInviteImpl> pendingOutgoingInvites = new HashMap<ConversationImpl, OutgoingInviteImpl>();
 	private Map<ConversationImpl, IncomingInviteImpl> pendingIncomingInvites = new HashMap<ConversationImpl, IncomingInviteImpl>();
 
@@ -141,6 +143,16 @@ public class ConversationsClientImpl implements
 		return this.endpointObserver.getNativeHandle();
 	}
 
+	int getActiveConversationsCount() {
+		int activeConversations = 0;
+		for (ConversationImpl conv : conversations) {
+			if (conv.isActive()) {
+				activeConversations++;
+			}
+		}
+		return activeConversations;
+	}
+
 	@Override
 	public void listen() {
 		checkDisposed();
@@ -152,6 +164,7 @@ public class ConversationsClientImpl implements
 		checkDisposed();
 		if(listening) {
 			unlisten(nativeEndpointHandle);
+			listening = false;
 		}
 	}
 
@@ -192,7 +205,7 @@ public class ConversationsClientImpl implements
 				this, participants, localMedia, this, this);
 		
 		if (outgoingConversationImpl == null || outgoingConversationImpl.getNativeHandle() == 0) {
-			ConversationException exception = new ConversationException( TwilioConversations.CLIENT_DISCONNECTED,
+			TwilioConversationsException exception = new TwilioConversationsException( TwilioConversations.CLIENT_DISCONNECTED,
 					"Cannot create conversation while reconnecting. Wait for conversations client to reconnect and try again.");
 			conversationCallback.onConversation(null, exception);
 			return null;
@@ -277,7 +290,7 @@ public class ConversationsClientImpl implements
 
 	}
 
-	private void handleConversationFailed(final ConversationImpl conversationImpl, final ConversationException e) {
+	private void handleConversationFailed(final ConversationImpl conversationImpl, final TwilioConversationsException e) {
 		final OutgoingInviteImpl outgoingInviteImpl = pendingOutgoingInvites.get(conversationImpl);
 		if(outgoingInviteImpl != null) {
 			InviteStatus status = outgoingInviteImpl.getStatus() == InviteStatus.CANCELLED ? InviteStatus.CANCELLED : InviteStatus.FAILED;
@@ -308,7 +321,7 @@ public class ConversationsClientImpl implements
 	}
 
 	@Override
-	public void onFailedToConnectParticipant(Conversation conversation, Participant participant, ConversationException e) {
+	public void onFailedToConnectParticipant(Conversation conversation, Participant participant, TwilioConversationsException e) {
 		ConversationImpl conversationImpl = (ConversationImpl)conversation;
 		handleConversationStarting(conversationImpl);
 	}
@@ -323,23 +336,21 @@ public class ConversationsClientImpl implements
 	}
 
 	@Override
-	public void onConversationEnded(Conversation conversation, ConversationException e) {
+	public void onConversationEnded(Conversation conversation, TwilioConversationsException e) {
 		ConversationImpl conversationImpl = (ConversationImpl)conversation;
 		handleConversationFailed(conversationImpl, e);
 	}
 
-	@Override
-	public synchronized void dispose() {
-		if (endpointObserver != null) {
-			endpointObserver.dispose();
-			endpointObserver = null;
-		}
-		if (!isDisposed && nativeEndpointHandle != 0) {
-			freeNativeHandle(nativeEndpointHandle);
-			nativeEndpointHandle = 0;
-			isDisposed = true;
-		}
-	}
+        @Override
+        public synchronized void dispose() {
+            isDisposing = true;
+            if (listening) {
+                // The client must stop listening before the ConversationsClient can be disposed
+                unlisten();
+            } else {
+                disposeClient();
+            }
+        }
 
 	@Override /* Parcelable */
 	public int describeContents() {
@@ -383,8 +394,8 @@ public class ConversationsClientImpl implements
 		logger.d("onRegistrationDidComplete");
 		if (error != null) {
 			listening = false;
-			final ConversationException e =
-					new ConversationException(error.getCode(), error.getMessage());
+			final TwilioConversationsException e =
+					new TwilioConversationsException(error.getCode(), error.getMessage());
 			if (handler != null) {
 				handler.post(new Runnable() {
 					@Override
@@ -410,6 +421,10 @@ public class ConversationsClientImpl implements
 	public void onUnregistrationDidComplete(CoreError error) {
 		logger.d("onUnregistrationDidComplete");
 		listening = false;
+                if (isDisposing) {
+                    // If the client was listening, dispose() will call unlisten() to properly dispose of the client
+                    disposeClient();
+                }
 		if (handler != null) {
 			handler.post(new Runnable() {
 				@Override
@@ -451,11 +466,6 @@ public class ConversationsClientImpl implements
 	@Override
 	public void onIncomingCallDidReceive(long nativeSession, String[] participants) {
 		logger.d("onIncomingCallDidReceive");
-
-		if(conversations.size() >= MAX_CONVERSATIONS) {
-			logger.w("An invite was ignored because a conversation is already active.");
-			return;
-		}
 
 		ConversationImpl incomingConversationImpl = ConversationImpl.createIncomingConversation(this, nativeSession, participants, this);
 		if (incomingConversationImpl == null) {
@@ -531,6 +541,18 @@ public class ConversationsClientImpl implements
 		return audioManager.isSpeakerphoneOn() ? AudioOutput.SPEAKERPHONE : AudioOutput.HEADSET;
 	}
 
+        private void disposeClient() {
+            if (endpointObserver != null) {
+                endpointObserver.dispose();
+                endpointObserver = null;
+            }
+            if (!isDisposed && nativeEndpointHandle != 0) {
+                freeNativeHandle(nativeEndpointHandle);
+                nativeEndpointHandle = 0;
+                isDisposing = false;
+                isDisposed = true;
+            }
+        }
 	
 	private synchronized void checkDisposed() {
 		if (isDisposed || nativeEndpointHandle == 0) {
@@ -542,9 +564,4 @@ public class ConversationsClientImpl implements
 	private native void unlisten(long nativeEndpoint);
 	private native void reject(long nativeEndpoint, long nativeSession);
 	private native void freeNativeHandle(long nativeEndpoint);
-
-	
-	
-
-
 }
