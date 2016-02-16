@@ -13,6 +13,8 @@ import org.junit.runner.RunWith;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
+import static org.junit.Assert.*;
+
 
 /*
  * Adding other tests to this test module that call initialize may invalidate this test since TwilioConversations
@@ -28,16 +30,16 @@ public class TwilioConversationsLogLevelTests {
             TwilioConversationsLogLevelActivity.class);
 
     @Test
-    public void testTwilioEnsureLogLevelSetBeforeAndAfterInit() {
+    public void canSetLogLevelBeforeAndAfterInit() {
         int level = TwilioConversations.LogLevel.VERBOSE;
         TwilioConversations.setLogLevel(level);
-        org.junit.Assert.assertEquals(level, TwilioConversations.getLogLevel());
+        assertEquals(level, TwilioConversations.getLogLevel());
 
         final CountDownLatch waitLatch = new CountDownLatch(1);
         initialize(mActivityRule.getActivity(), initListener(waitLatch));
         wait(waitLatch, TIMEOUT, TimeUnit.SECONDS);
 
-        org.junit.Assert.assertEquals(level, TwilioConversations.getLogLevel());
+        assertEquals(level, TwilioConversations.getLogLevel());
     }
 
     private void initialize(Context context, TwilioConversations.InitListener initListener) {
@@ -53,7 +55,7 @@ public class TwilioConversationsLogLevelTests {
 
             @Override
             public void onError(Exception e) {
-                org.junit.Assert.fail(e.getMessage());
+                fail(e.getMessage());
             }
         };
     }
@@ -62,7 +64,7 @@ public class TwilioConversationsLogLevelTests {
         try {
             wait.await(timeout, timeUnit);
         } catch (InterruptedException e) {
-            org.junit.Assert.fail("timed out after" + TIMEOUT);
+            fail("timed out after" + TIMEOUT);
         }
     }
 

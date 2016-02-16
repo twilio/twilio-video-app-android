@@ -11,6 +11,7 @@ import android.os.Handler;
 
 import com.twilio.conversations.AudioTrack;
 import com.twilio.conversations.Conversation;
+import com.twilio.conversations.TwilioConversationsException;
 import com.twilio.conversations.ConversationListener;
 import com.twilio.conversations.LocalMedia;
 import com.twilio.conversations.LocalVideoTrack;
@@ -19,7 +20,6 @@ import com.twilio.conversations.MediaTrackState;
 import com.twilio.conversations.Participant;
 import com.twilio.conversations.TrackOrigin;
 import com.twilio.conversations.TwilioConversations;
-import com.twilio.conversations.TwilioConversationsException;
 import com.twilio.conversations.VideoTrack;
 import com.twilio.conversations.impl.core.ConversationStateObserver;
 import com.twilio.conversations.impl.core.ConversationStatus;
@@ -83,7 +83,7 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 	}
 
 	private SessionObserverInternal sessionObserverInternal;
-	private long nativeHandle;
+	private long nativeSession;
 	private boolean isDisposed;
 	
 	private ConversationImpl(ConversationsClientImpl conversationsClient,
@@ -113,7 +113,7 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 
 		sessionObserverInternal = new SessionObserverInternal(this, this);
 
-		nativeHandle = wrapOutgoingSession(conversationsClient.getNativeHandle(),
+		nativeSession = wrapOutgoingSession(conversationsClient.getNativeHandle(),
 				sessionObserverInternal.getNativeHandle(),
 				participantIdentityArray);
 
@@ -125,7 +125,7 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 							 ConversationStateObserver conversationStateObserver) {
 		this.conversationsClient = conversationsClient;
 		this.conversationStateObserver = conversationStateObserver;
-		nativeHandle = nativeSession;
+		this.nativeSession = nativeSession;
 
 		invitee = participantsIdentities[0];
 
@@ -148,9 +148,6 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 			   												  ConversationListener listener,
 															  ConversationStateObserver conversationStateObserver) {
 		ConversationImpl conversationImpl = new ConversationImpl(conversationsClient, participants, localMedia, listener, conversationStateObserver);
-		if (conversationImpl.getNativeHandle() == 0) {
-			return null;
-		}
 		conversationImpl.start();
 		return conversationImpl;
 	}
@@ -226,7 +223,7 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 	@Override
 	public String getConversationSid() {
 		checkDisposed();
-		String conversationSid = getConversationSid(nativeHandle);
+		String conversationSid = getConversationSid(nativeSession);
 		if(conversationSid == null || conversationSid.length() == 0) {
 			return null;
 		} else {
@@ -236,7 +233,7 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 	
 	@Override
 	protected void finalize() throws Throwable {
-		if (isDisposed || nativeHandle == 0) {
+		if (isDisposed || nativeSession == 0) {
 			logger.e(FINALIZE_MESSAGE);
 			dispose();
 		}
@@ -673,13 +670,12 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 		this.outgoingInviteImpl = outgoingInviteImpl;
 	}
 
-
 	/**
 	 * NativeHandleInterface
 	 */
 	@Override
 	public long getNativeHandle() {
-		return nativeHandle;
+		return nativeSession;
 	}
 
 	@Override
@@ -688,9 +684,9 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 			sessionObserverInternal.dispose();
 			sessionObserverInternal = null;
 		}
-		if (nativeHandle != 0) {
-			freeNativeHandle(nativeHandle);
-			nativeHandle = 0;
+		if (nativeSession != 0) {
+			freeNativeHandle(nativeSession);
+			nativeSession = 0;
 		}
         EglBaseProvider.releaseEglBase();
 		isDisposed = true;
@@ -725,16 +721,16 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 		// TODO: Camera capture is the only supported local video stream for now.
 		// Once we start supporting screen share or etc, we should modify this method.
 		CameraCapturerImpl cameraCapturer = (CameraCapturerImpl)localVideoTrack.getCameraCapturer();
-		cameraCapturer.startConversationCapturer(getNativeHandle());
-		setExternalCapturer(nativeHandle, cameraCapturer.getNativeVideoCapturer());
+		cameraCapturer.startConversationCapturer(nativeSession);
+		setExternalCapturer(nativeSession, cameraCapturer.getNativeVideoCapturer());
 	}
 	
 	boolean mute(boolean on) {
-		return mute(getNativeHandle(), on);
+		return mute(nativeSession, on);
 	}
 	
 	boolean isMuted() {
-		return isMuted(getNativeHandle());
+		return isMuted(nativeSession);
 	}
 	
 	/**
@@ -758,12 +754,16 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 				new CoreSessionMediaConstraints(localMedia.isMicrophoneAdded(),
 							localMedia.isMuted(), enableVideo, pauseVideo);
 
-
+		/*
+		 * Retain the session pointer since it can be reset before the
+		 * new thread references it.
+		 */
+		final long retainedNativeSession = nativeSession;
 		// Call start on a new thread to avoid blocking the calling thread
 		new Thread(new Runnable() {
 			@Override
 			public void run() {
-				start(getNativeHandle(),
+				start(retainedNativeSession,
 						mediaConstraints.isAudioEnabled(),
 						mediaConstraints.isAudioMuted(),
 						mediaConstraints.isVideoEnabled(),
@@ -776,34 +776,39 @@ public class ConversationImpl implements Conversation, NativeHandleInterface, Se
 
 	@Override
 	public void stop() {
+		/*
+		 * Retain the session pointer since it can be reset before the
+		 * new thread references it.
+		 */
+		final long retainNativeSession = nativeSession;
 		// Call stop on a new thread to avoid blocking the calling thread
 		new Thread(new Runnable() {
 			@Override
 			public void run() {
-				stop(getNativeHandle());
+				stop(retainNativeSession);
 			}
 		}).start();
 	}
 
 	@Override
 	public boolean enableVideo(boolean enabled, boolean paused) {
-		return enableVideo(getNativeHandle(), enabled, paused);
+		return enableVideo(nativeSession, enabled, paused);
 	}
 
 	@Override
 	public void inviteParticipants(Set<String> participants) {
 		String[] participantIdentityArray =
 				participants.toArray(new String[participants.size()]);
-		inviteParticipants(getNativeHandle(), participantIdentityArray);
+		inviteParticipants(nativeSession, participantIdentityArray);
 	}
 
 	@Override
 	public boolean enableAudio(boolean enabled, boolean muted) {
-		return enableAudio(getNativeHandle(), enabled, muted);
+		return enableAudio(nativeSession, enabled, muted);
 	}
 
 	private synchronized void checkDisposed() {
-		if (isDisposed || nativeHandle == 0) {
+		if (isDisposed || nativeSession == 0) {
 			throw new IllegalStateException(DISPOSE_MESSAGE);
 		}
 	}
