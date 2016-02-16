@@ -79,24 +79,6 @@ public class TwilioConversationsTest {
     }
 
     @Test
-    public void testTwilioInitializeRepeatedly() {
-        int attempts = 10;
-        final CountDownLatch initLatch = TwilioConversationsUtils.isInitialized() ? new CountDownLatch(0) : new CountDownLatch(1);
-        final CountDownLatch errorLatch = TwilioConversationsUtils.isInitialized() ? new CountDownLatch(attempts) : new CountDownLatch(attempts - 1);
-
-        for(int i = 0; i < attempts; i++) {
-            TwilioConversations.initialize(mActivityRule.getActivity().getApplicationContext(), TwilioConversationsUtils.countDownInitListenerCallback(initLatch, errorLatch));
-        }
-
-        try {
-            initLatch.await(TwilioConversationsUtils.TIMEOUT, TimeUnit.SECONDS);
-            errorLatch.await(TwilioConversationsUtils.TIMEOUT, TimeUnit.SECONDS);
-        } catch (InterruptedException e) {
-            org.junit.Assert.fail("test timed out after" + TwilioConversationsUtils.TIMEOUT);
-        }
-    }
-
-    @Test
     public void testClientCreationBeforeInitialize() {
         exception.expect(IllegalStateException.class);
         String bogusToken = "1234";

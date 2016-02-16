@@ -38,6 +38,7 @@ public class TwilioConversationsLogLevelTests {
         wait(waitLatch, TIMEOUT, TimeUnit.SECONDS);
 
         assertEquals(level, TwilioConversations.getLogLevel());
+        TwilioConversations.destroy();
     }
 
     private void initialize(Context context, TwilioConversations.InitListener initListener) {

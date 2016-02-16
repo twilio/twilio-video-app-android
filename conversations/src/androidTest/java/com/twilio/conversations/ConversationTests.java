@@ -10,6 +10,7 @@ import com.twilio.conversations.provider.TCCapabilityTokenProvider;
 import com.twilio.conversations.utils.TwilioConversationsUtils;
 
 import org.junit.After;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -26,6 +27,7 @@ import retrofit.client.Response;
 import static org.junit.Assert.*;
 
 @RunWith(AndroidJUnit4.class)
+@Ignore
 public class ConversationTests {
 
     private static String USER = "john";
