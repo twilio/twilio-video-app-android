@@ -11,8 +11,8 @@ PREFIX:= /usr/local/twilio-sdk
 endif
 
 LOCAL_MODULE            := twilio-sdk-core
-LOCAL_SRC_FILES         := $(PREFIX)/core/android/armeabiv7a/lib/libtwilio-sdk-core-full.a
-LOCAL_EXPORT_C_INCLUDES := $(PREFIX)/core/android/armeabiv7a/include \
+LOCAL_SRC_FILES         := $(PREFIX)/conversations/android/armeabiv7a/lib/libtwilio-conversations.a
+LOCAL_EXPORT_C_INCLUDES := $(PREFIX)/conversations/android/armeabiv7a/include \
                            $(PREFIX)/webrtc/android/armeabiv7a/include \
                            $(PREFIX)/pjsip/android/armeabiv7a/include
 
