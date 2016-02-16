@@ -1,1 +1,1 @@
-include ':app', ':noservice', ':loglevel'
+include ':app', ':loglevel', ':listen'

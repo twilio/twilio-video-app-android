@@ -19,6 +19,7 @@ import com.twilio.conversations.Participant;
 import com.twilio.conversations.TwilioConversations;
 import com.twilio.rtc.conversations.sdktests.utils.TwilioConversationsUtils;
 
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -36,6 +37,16 @@ public class ConversationsClientSendInviteTests {
     @Rule
     public ActivityTestRule<TwilioConversationsActivity> mActivityRule = new ActivityTestRule<>(
             TwilioConversationsActivity.class);
+
+    /**
+     * We only teardown because not every test will want the sdk initialized
+     */
+    @After
+    public void teardown() {
+        if (TwilioConversationsUtils.isInitialized()) {
+            TwilioConversationsUtils.destroyTwilioSDK();
+        }
+    }
 
     @Test(expected = IllegalStateException.class)
     public void testTwilioCannotSendInviteWithNullParticipantSet() {
