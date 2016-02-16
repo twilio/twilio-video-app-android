@@ -6,14 +6,15 @@ import android.support.test.runner.AndroidJUnit4;
 import com.twilio.common.TwilioAccessManager;
 import com.twilio.common.TwilioAccessManagerFactory;
 import com.twilio.common.TwilioAccessManagerListener;
-import com.twilio.conversations.ConversationException;
 import com.twilio.conversations.ConversationsClient;
 import com.twilio.conversations.ConversationsClientListener;
 import com.twilio.conversations.IncomingInvite;
 import com.twilio.conversations.TwilioConversations;
+import com.twilio.conversations.TwilioConversationsException;
 import com.twilio.conversations.listen.provider.TCCapabilityTokenProvider;
 import com.twilio.conversations.listen.utils.TwilioConversationsUtils;
 
+import org.junit.After;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -35,6 +36,16 @@ public class ListenTest {
     @Rule
     public ActivityTestRule<TwilioListenActivity> mActivityRule = new ActivityTestRule<>(
             TwilioListenActivity.class);
+
+    /**
+     * We only teardown because not every test will want the sdk initialized
+     */
+    @After
+    public void teardown() {
+        if (TwilioConversationsUtils.isInitialized()) {
+            TwilioConversationsUtils.destroyTwilioSDK();
+        }
+    }
 
     @Test
     public void canListenAfterClientCreation() {
@@ -69,7 +80,7 @@ public class ListenTest {
                                             }
 
                                             @Override
-                                            public void onFailedToStartListening(ConversationsClient conversationsClient, ConversationException e) {
+                                            public void onFailedToStartListening(ConversationsClient conversationsClient, TwilioConversationsException e) {
                                                 fail();
                                             }
 

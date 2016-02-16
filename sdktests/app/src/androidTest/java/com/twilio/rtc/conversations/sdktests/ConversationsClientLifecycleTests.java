@@ -18,6 +18,7 @@ import com.twilio.conversations.LocalVideoTrack;
 import com.twilio.conversations.OutgoingInvite;
 import com.twilio.conversations.TwilioConversations;
 
+import org.junit.After;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -38,6 +39,16 @@ public class ConversationsClientLifecycleTests {
     @Rule
     public ActivityTestRule<TwilioConversationsActivity> mActivityRule = new ActivityTestRule<>(
             TwilioConversationsActivity.class);
+
+    /**
+     * We only teardown because not every test will want the sdk initialized
+     */
+    @After
+    public void teardown() {
+        if (TwilioConversationsUtils.isInitialized()) {
+            TwilioConversationsUtils.destroyTwilioSDK();
+        }
+    }
 
     @Test
     public void testTwilioCreateConversationsClientWithToken() {
@@ -123,6 +134,8 @@ public class ConversationsClientLifecycleTests {
 
     @Test
     public void testTwilioFailsToListenWithDummyToken() {
+        TwilioConversationsUtils.initializeTwilioSDK(mActivityRule.getActivity().getApplicationContext());
+
         final CountDownLatch wait = new CountDownLatch(1);
         /*
          * The test thread cannot create new handlers. Use the main
@@ -132,6 +145,7 @@ public class ConversationsClientLifecycleTests {
         InstrumentationRegistry.getInstrumentation().runOnMainSync(new Runnable() {
             @Override
             public void run() {
+
                 ConversationsClient conversationsClient = TwilioConversations
                         .createConversationsClient(TOKEN, new ConversationsClientListener() {
                             @Override
@@ -165,7 +179,7 @@ public class ConversationsClientLifecycleTests {
             }
         });
 
-        TwilioConversationsUtils.wait(wait, 10, TimeUnit.SECONDS);
+        TwilioConversationsUtils.wait(wait, 30, TimeUnit.SECONDS);
     }
 
     private ConversationsClientListener conversationsClientListener() {

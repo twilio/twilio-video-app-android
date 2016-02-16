@@ -30,6 +30,12 @@ public class TwilioConversationsUtils {
         return initialized;
     }
 
+    public static void destroyTwilioSDK() {
+        TwilioConversations.destroy();
+        while (TwilioConversations.isInitialized());
+        initialized = false;
+    }
+
     public static TwilioConversations.InitListener initListener(final CountDownLatch wait) {
         return new TwilioConversations.InitListener() {
             @Override
