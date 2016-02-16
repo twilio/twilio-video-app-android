@@ -135,7 +135,6 @@ public class ConversationTests {
 
                     @Override
                     public void onStopListeningForInvites(ConversationsClient conversationsClient) {
-                        fail();
                     }
 
                     @Override
