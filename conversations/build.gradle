@@ -326,5 +326,20 @@ def convertAbiToArch(abi) {
 }
 
 def getNdkDir() {
-    return "$System.env.ANDROID_NDK_HOME"
+    // Checking environment variable for ndk home first
+    def ndkHome = System.env.ANDROID_NDK_HOME
+
+    // Android Studio does not see this environment but will generate a
+    // local.properties file with the ndk path set
+    if (ndkHome == null) {
+        println "Could not locate NDK home in environment variable. Trying local.properties"
+        Properties properties = new Properties()
+        properties.load(project.rootProject.file('local.properties').newDataInputStream())
+        ndkHome = properties.getProperty('ndk.dir')
+    }
+
+    // Fail the build for not ndk detected
+    assert ndkHome != null : "Could not find Android NDK!"
+
+    return ndkHome
 }
