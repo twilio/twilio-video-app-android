@@ -1,11 +1,14 @@
 package com.twilio.conversations.impl;
 
 import java.lang.ref.WeakReference;
+import java.util.ArrayDeque;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Queue;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -67,7 +70,7 @@ public class TwilioConversationsImpl {
      */
     private boolean observingConnectivity = false;
 
-    protected final Map<UUID, WeakReference<ConversationsClientImpl>> conversationsClientMap = new HashMap<UUID, WeakReference<ConversationsClientImpl>>();
+    protected final Map<UUID, WeakReference<ConversationsClientImpl>> conversationsClientMap = new ConcurrentHashMap<UUID, WeakReference<ConversationsClientImpl>>();
 
     /**
      * TODO 
@@ -194,8 +197,45 @@ public class TwilioConversationsImpl {
             unregisterConnectivityBroadcastReceiver();
         }
 
-        // TODO destroy investigate making this asynchronous
-        destroyCore();
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                // Process clients and determine which ones need to be closed
+                Queue<ConversationsClientImpl> clientsDisposing = new ArrayDeque<ConversationsClientImpl>();
+                for (Map.Entry<UUID, WeakReference<ConversationsClientImpl>> entry :
+                        conversationsClientMap.entrySet()) {
+                    WeakReference<ConversationsClientImpl> weakClientRef =
+                            conversationsClientMap.remove(entry.getKey());
+
+                    if (weakClientRef != null) {
+                        ConversationsClientImpl client = weakClientRef.get();
+                        if (client != null) {
+                            if (!client.isDisposed) {
+                                if (!client.isDisposing) {
+                                    client.dispose();
+                                }
+                                // Add clients that are not disposed to ensure they are disposed later
+                                clientsDisposing.add(client);
+                            }
+                        }
+                    }
+                }
+
+                // Wait until all clients are disposed.
+                while (!clientsDisposing.isEmpty()) {
+                    ConversationsClientImpl clientPendingDispose = clientsDisposing.poll();
+
+                    if (!clientPendingDispose.isDisposed) {
+                        clientsDisposing.add(clientPendingDispose);
+                    }
+                }
+
+                // Now we can teardown the sdk
+                // TODO destroy investigate making this asynchronous with callbacks
+                destroyCore();
+                initialized = false;
+            }
+        }).start();
     }
 
     public ConversationsClientImpl createConversationsClient(TwilioAccessManager accessManager, Map<String, String> options, ConversationsClientListener inListener) {

@@ -152,7 +152,7 @@ model {
         buildToolsVersion "23.0.2"
 
         defaultConfig.with {
-            minSdkVersion.apiLevel 16 
+            minSdkVersion.apiLevel 16
             targetSdkVersion.apiLevel 23
             versionName generateVersionName()
             versionCode generateVersionCode()
@@ -252,6 +252,7 @@ dependencies {
     testCompile 'junit:junit:4.12'
     testCompile 'org.mockito:mockito-core:1.10.19'
 
+    androidTestCompile 'com.squareup.retrofit:retrofit:1.9.0'
     androidTestCompile 'com.android.support:support-annotations:23.1.1'
     androidTestCompile 'com.android.support.test:runner:0.4'
     androidTestCompile 'com.android.support.test:rules:0.4'

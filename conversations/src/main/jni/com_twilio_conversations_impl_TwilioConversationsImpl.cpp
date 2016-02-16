@@ -9,6 +9,7 @@
 #include "TSCEndpointObserver.h"
 #include "TSCConfiguration.h"
 #include "TSCLogger.h"
+#include "android_platform_info_provider.h"
 #include "AccessManager/AccessManager.h"
 #include "webrtc/voice_engine/include/voe_base.h"
 #include "webrtc/modules/video_capture/video_capture_internal.h"
@@ -27,6 +28,7 @@
 
 using namespace webrtc_jni;
 using namespace twiliosdk;
+
 
 static bool media_jvm_set = false;
 
@@ -64,6 +66,9 @@ JNIEXPORT jboolean JNICALL Java_com_twilio_conversations_impl_TwilioConversation
     TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK, kTSCoreLogLevelDebug, "initCore");
     bool failure = false;
     TSCSDK* tscSdk = TSCSDK::instance();
+
+    TSCPlatformDataProviderRef provider = new rtc::RefCountedObject<AndroidPlatformInfoProvider>(env, context);
+    tscSdk->setPlatformDataProvider(provider);
 
     // TODO investigate relocating some of these calls to more timely locations
     if (!media_jvm_set) {
@@ -143,3 +148,5 @@ JNIEXPORT void JNICALL Java_com_twilio_conversations_impl_TwilioConversationsImp
   (JNIEnv *, jobject) {
 	TSCSDK::instance()->refreshRegistrations();
 }
+
+

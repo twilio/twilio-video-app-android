@@ -53,7 +53,7 @@ JNIEXPORT void JNICALL Java_com_twilio_conversations_impl_ConversationsClientImp
  */
 JNIEXPORT void JNICALL Java_com_twilio_conversations_impl_ConversationsClientImpl_freeNativeHandle
   (JNIEnv *env, jobject obj, jlong nativeEndpoint) {
-	TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK, kTSCoreLogLevelDebug, "freeNativeHandle: Endpoint");
+	TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK, kTSCoreLogLevelDebug, "freeNativeHandle");
 	TSCEndpointPtr *endpoint = reinterpret_cast<TSCEndpointPtr *>(nativeEndpoint);
 	if (endpoint != nullptr) {
 	    TSCSDK::instance()->destroyEndpoint(*endpoint);

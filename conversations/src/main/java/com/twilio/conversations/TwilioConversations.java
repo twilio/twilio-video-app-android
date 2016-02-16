@@ -157,7 +157,8 @@ public class TwilioConversations {
     }
 
     /**
-     * Dispose the Twilio Conversations SDK
+     * Dispose the Twilio Conversations SDK. Note that once this completes
+     * all {@link ConversationsClient} are destroyed and are no longer usable.
      *
      */
     public static void destroy() {

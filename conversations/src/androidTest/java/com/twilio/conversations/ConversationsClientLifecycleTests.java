@@ -6,6 +6,7 @@ import android.support.test.runner.AndroidJUnit4;
 
 import com.twilio.conversations.utils.TwilioConversationsUtils;
 
+import org.junit.After;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -15,10 +16,11 @@ import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
+import static org.junit.Assert.*;
+
 
 @RunWith(AndroidJUnit4.class)
 public class ConversationsClientLifecycleTests {
-
     private static String TOKEN = "token";
     private static String PARTICIPANT = "janne";
 
@@ -26,10 +28,20 @@ public class ConversationsClientLifecycleTests {
     public ActivityTestRule<TwilioConversationsActivity> mActivityRule = new ActivityTestRule<>(
             TwilioConversationsActivity.class);
 
+    /**
+     * We only teardown because not every test will want the sdk initialized
+     */
+    @After
+    public void teardown() {
+        if (TwilioConversationsUtils.isInitialized()) {
+            TwilioConversationsUtils.destroyTwilioSDK();
+        }
+    }
+
     @Test
     public void testTwilioCreateConversationsClientWithToken() {
         ConversationsClient conversationsClient = createConversationsClient();
-        org.junit.Assert.assertNotNull(conversationsClient);
+        assertNotNull(conversationsClient);
     }
 
     @Test
@@ -45,7 +57,7 @@ public class ConversationsClientLifecycleTests {
     @Test(expected = IllegalStateException.class)
     public void testTwilioCannotListenAfterConversationsClientDisposal() {
         ConversationsClient conversationsClient = createConversationsClient();
-        org.junit.Assert.assertNotNull(conversationsClient);
+        assertNotNull(conversationsClient);
 
         conversationsClient.dispose();
         conversationsClient.listen();
@@ -54,7 +66,7 @@ public class ConversationsClientLifecycleTests {
     @Test(expected = IllegalStateException.class)
     public void testTwilioCannotUnlistenAfterConversationsClientDisposal() {
         ConversationsClient conversationsClient = createConversationsClient();
-        org.junit.Assert.assertNotNull(conversationsClient);
+        assertNotNull(conversationsClient);
 
         conversationsClient.dispose();
         conversationsClient.unlisten();
@@ -63,7 +75,7 @@ public class ConversationsClientLifecycleTests {
     @Test(expected = IllegalStateException.class)
     public void testTwilioCannotCreateConversationAfterConversationsClientDisposal() {
         ConversationsClient conversationsClient = createConversationsClient();
-        org.junit.Assert.assertNotNull(conversationsClient);
+        assertNotNull(conversationsClient);
 
         conversationsClient.dispose();
         Set<String> participants = new HashSet<>();
@@ -84,6 +96,7 @@ public class ConversationsClientLifecycleTests {
 
             }
         });
+
         OutgoingInvite outgoingInvite = conversationsClient.sendConversationInvite(participants, localMedia, new ConversationCallback() {
             @Override
             public void onConversation(Conversation conversation, TwilioConversationsException e) {
@@ -96,7 +109,7 @@ public class ConversationsClientLifecycleTests {
     public void testTwilioMultiDisposeConversationsClient() {
         for (int i= 1; i < 50; i++) {
             ConversationsClient conversationsClient = createConversationsClient();
-            org.junit.Assert.assertNotNull(conversationsClient);
+            assertNotNull(conversationsClient);
             conversationsClient.dispose();
         }
     }
@@ -109,6 +122,8 @@ public class ConversationsClientLifecycleTests {
 
     @Test
     public void testTwilioFailsToListenWithDummyToken() {
+        TwilioConversationsUtils.initializeTwilioSDK(mActivityRule.getActivity().getApplicationContext());
+
         final CountDownLatch wait = new CountDownLatch(1);
         /*
          * The test thread cannot create new handlers. Use the main
@@ -118,38 +133,41 @@ public class ConversationsClientLifecycleTests {
         InstrumentationRegistry.getInstrumentation().runOnMainSync(new Runnable() {
             @Override
             public void run() {
-                ConversationsClient conversationsClient = TwilioConversations.createConversationsClient(TOKEN, new ConversationsClientListener() {
-                    @Override
-                    public void onStartListeningForInvites(ConversationsClient conversationsClient) {
-                        org.junit.Assert.fail();
-                    }
 
-                    @Override
-                    public void onStopListeningForInvites(ConversationsClient conversationsClient) {
-                        org.junit.Assert.fail();
-                    }
+                ConversationsClient conversationsClient = TwilioConversations
+                        .createConversationsClient(TOKEN, new ConversationsClientListener() {
+                            @Override
+                            public void onStartListeningForInvites(ConversationsClient conversationsClient) {
+                                fail();
+                            }
 
-                    @Override
-                    public void onFailedToStartListening(ConversationsClient conversationsClient, TwilioConversationsException e) {
-                        wait.countDown();
-                    }
+                            @Override
+                            public void onStopListeningForInvites(ConversationsClient conversationsClient) {
+                                fail();
+                            }
 
-                    @Override
-                    public void onIncomingInvite(ConversationsClient conversationsClient, IncomingInvite incomingInvite) {
-                        org.junit.Assert.fail();
+                            @Override
+                            public void onFailedToStartListening(ConversationsClient conversationsClient,
+                                                                 TwilioConversationsException e) {
+                                wait.countDown();
+                            }
 
-                    }
+                            @Override
+                            public void onIncomingInvite(ConversationsClient conversationsClient, IncomingInvite incomingInvite) {
+                                fail();
+                            }
 
-                    @Override
-                    public void onIncomingInviteCancelled(ConversationsClient conversationsClient, IncomingInvite incomingInvite) {
-                        org.junit.Assert.fail();
-                    }
+                            @Override
+                            public void onIncomingInviteCancelled(ConversationsClient conversationsClient, IncomingInvite incomingInvite) {
+                                fail();
+                            }
 
-                });
+                        });
                 conversationsClient.listen();
             }
         });
-        TwilioConversationsUtils.wait(wait, 10, TimeUnit.SECONDS);
+
+        TwilioConversationsUtils.wait(wait, 30, TimeUnit.SECONDS);
     }
 
     private ConversationsClientListener conversationsClientListener() {
@@ -179,31 +197,6 @@ public class ConversationsClientLifecycleTests {
 
             }
 
-        };
-    }
-
-    private ConversationListener conversationListener() {
-        return new ConversationListener() {
-
-            @Override
-            public void onParticipantConnected(Conversation conversation, Participant participant) {
-
-            }
-
-            @Override
-            public void onFailedToConnectParticipant(Conversation conversation, Participant participant, TwilioConversationsException e) {
-
-            }
-
-            @Override
-            public void onParticipantDisconnected(Conversation conversation, Participant participant) {
-
-            }
-
-            @Override
-            public void onConversationEnded(Conversation conversation, TwilioConversationsException e) {
-
-            }
         };
     }
 

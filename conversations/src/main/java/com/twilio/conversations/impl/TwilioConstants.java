@@ -17,4 +17,7 @@ public final class TwilioConstants {
 	public static final String ConversationsClientOptionSIPTransportPortKey = "sip-transport-port";
 	public static final String ConversationsClientOptionSIPClientVersionKey = "sip-client-version";
 
+	// Maximum number of active conversations
+	public static final int MAX_CONVERSATIONS = 1;
+
 }
