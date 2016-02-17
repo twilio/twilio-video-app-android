@@ -253,8 +253,13 @@ model {
     }
 
     tasks {
+        /**
+         * Here we create a javadoc tasks that depeonds on the
+         * the current android model configuration
+         */
         createJavadocs(Javadoc) {
             def androidConfig = $.android
+
             source = androidConfig.sources.main.java.source
             classpath += project.files("${getSdkDir()}/platforms/${androidConfig.compileSdkVersion}/android.jar");
         }
@@ -275,7 +280,10 @@ dependencies {
     provided 'com.twilio.sdk:twilio-common-android:0.2.0'
 }
 
-task unpackAar(type: Copy) {
+/**
+ * Will unzip release aar so we can transform accordingly
+ */
+task unpackReleaseAar(type: Copy, dependsOn: 'assembleRelease') {
     def aarFile = file("${buildDir}/outputs/aar/conversations-release.aar")
     def outputDir = file("${buildDir}/unpacked/conversations")
 
@@ -283,7 +291,10 @@ task unpackAar(type: Copy) {
     into outputDir
 }
 
-task prepareJar(type: Copy, dependsOn: 'unpackAar') {
+/**
+ * Dives into the unpacked aar and creates a directory structure for a fat jar
+ */
+task prepareReleaseJar(type: Copy, dependsOn: 'unpackReleaseAar') {
     def classesJar = file("${buildDir}/unpacked/conversations/classes.jar")
     def libjingleJar = file("${buildDir}/unpacked/conversations/libs/libjingle_peerconnection_java.jar")
     def jniLibs = file("${buildDir}/unpacked/conversations/jni")
@@ -304,14 +315,23 @@ task prepareJar(type: Copy, dependsOn: 'unpackAar') {
     }
 }
 
-task createJar(type: Jar, dependsOn: 'prepareJar') {
+/**
+ * Creates jar from from release jar intermediate directory
+ */
+task createReleaseJar(type: Jar, dependsOn: 'prepareReleaseJar') {
+    def jarHome = file("${buildDir}/intermediates/jar")
+
     archiveName = "twilio-conversations-android.jar"
     destinationDir = file("${buildDir}/outputs/jar")
-    def jarHome = file("${buildDir}/intermediates/jar")
     from jarHome
 }
 
-task prepareTarBz2(type: Copy, dependsOn: 'createJar') {
+/**
+ * Aggragates the quickstart app, javadoc, and release jar into
+ * intermediate directory for packaging. Note that the jars will be suffixed with
+ * the current version
+ */
+task prepareReleaseTarBz2(type: Copy, dependsOn: 'createReleaseJar') {
     def quickstart = file("../quickstart")
     def javadocHome = file("${buildDir}/docs/javadoc")
     def jarHome = file("${buildDir}/outputs/jar/twilio-conversations-android.jar")
@@ -340,12 +360,23 @@ task prepareTarBz2(type: Copy, dependsOn: 'createJar') {
     }
 }
 
-task createTarBz2(type: Tar, dependsOn: 'prepareTarBz2') {
+/**
+ * Creates the tarbz2 file from the intermediate directory
+ */
+task createReleaseTarBz2(type: Tar, dependsOn: 'prepareReleaseTarBz2') {
     from fileTree(file("${buildDir}/intermediates/tar"))
     baseName = 'twilio-conversations-android'
     destinationDir = file("${buildDir}/outputs/tar")
     extension = 'tar.bz2'
     compression = Compression.BZIP2
+}
+
+/**
+ * Generates the current javadocs, assembles the project as release, and packages
+ * artifacts into tar
+ */
+task packageRelease(type: GradleBuild){
+    tasks = ['createJavadocs', 'createReleaseTarBz2']
 }
 
 /**
