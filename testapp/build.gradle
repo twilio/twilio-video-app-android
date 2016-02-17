@@ -18,6 +18,7 @@ model {
         main {
             jniLibs {
                 dependencies {
+                    // TODO provide way to specify debug and release buildType
                     project ":conversations" buildType "debug"
                 }
             }
