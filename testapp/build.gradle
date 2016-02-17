@@ -41,6 +41,7 @@ model {
 }
 
 dependencies {
+    compile 'com.twilio.sdk:twilio-common-android:0.2.0'
     compile project(':conversations')
 
     compile 'net.hockeyapp.android:HockeySDK:3.5.0'

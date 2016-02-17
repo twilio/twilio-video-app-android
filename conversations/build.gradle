@@ -1,4 +1,5 @@
 apply plugin: 'com.android.model.library'
+apply plugin: 'nebula.provided-base'
 
 def currentToolchainVersion = "4.9"
 def twilioSdkHome = "/usr/local/twilio-sdk"
@@ -52,6 +53,10 @@ def webRtcHome = "${twilioSdkHome}/webrtc/android"
 def webRtcHeaders = "${webRtcHome}/armeabiv7a/include"
 def webRtcStaticLib = "lib/libwebrtc.a"
 def webRtcJniStaticLib = "lib/libwebrtc-jni.a"
+
+configurations {
+    provided
+}
 
 model {
     repositories {
@@ -259,7 +264,7 @@ dependencies {
 
     // TODO this jar does not need to be behind an arch directory structure
     compile files("${twilioSdkHome}/webrtc/android/armeabiv7a/lib/libjingle_peerconnection_java.jar")
-    compile 'com.twilio.sdk:twilio-common-android:0.1.17'
+    provided 'com.twilio.sdk:twilio-common-android:0.2.0'
 }
 
 /**
