@@ -251,6 +251,14 @@ model {
             minifyEnabled false
         }
     }
+
+    tasks {
+        createJavadocs(Javadoc) {
+            def androidConfig = $.android
+            source = androidConfig.sources.main.java.source
+            classpath += project.files("${getSdkDir()}/platforms/${androidConfig.compileSdkVersion}/android.jar");
+        }
+    }
 }
 
 dependencies {
@@ -305,10 +313,14 @@ task createJar(type: Jar, dependsOn: 'prepareJar') {
 
 task prepareTarBz2(type: Copy, dependsOn: 'createJar') {
     def quickstart = file("../quickstart")
+    def javadocHome = file("${buildDir}/docs/javadoc")
     def jarHome = file("${buildDir}/outputs/jar/twilio-conversations-android.jar")
     def tarHome = file("${buildDir}/intermediates/tar")
 
     into tarHome
+    into('javadoc') {
+        from javadocHome
+    }
     into('quickstart') {
         from quickstart
     }
@@ -398,6 +410,25 @@ task localizeWebRtcJniLoadUnLoad(type: Exec, dependsOn: assemble) {
  */
 def convertAbiToArch(abi) {
     return abi.replaceAll("-", "")
+}
+
+def getSdkDir() {
+    // Checking environment variable for ndk home first
+    def sdkHome = System.env.ANDROID_SDK_HOME
+
+    // Android Studio does not see this environment but will generate a
+    // local.properties file with the ndk path set
+    if (sdkHome == null) {
+        println "Could not locate NDK home in environment variable. Trying local.properties"
+        Properties properties = new Properties()
+        properties.load(project.rootProject.file('local.properties').newDataInputStream())
+        sdkHome = properties.getProperty('sdk.dir')
+    }
+
+    // Fail the build for not ndk detected
+    assert sdkHome != null : "Could not find Android SDK!"
+
+    return sdkHome
 }
 
 def getNdkDir() {
