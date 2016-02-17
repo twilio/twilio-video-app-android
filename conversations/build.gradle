@@ -320,7 +320,7 @@ task prepareReleaseJar(type: Copy, dependsOn: 'unpackReleaseAar') {
 }
 
 /**
- * Creates jar from from release jar intermediate directory
+ * Create a jar from the release jar intermediate directory
  */
 task createReleaseJar(type: Jar, dependsOn: 'prepareReleaseJar') {
     def jarHome = file("${buildDir}/intermediates/jar")
