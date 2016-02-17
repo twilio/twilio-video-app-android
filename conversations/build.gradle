@@ -27,15 +27,15 @@ def coreHome = "${twilioSdkHome}/core/android"
  * for each static library to this include directory. The header files should not change
  * across architectures.
  */
-def coreHeaders = "${coreHome}/armeabiv7a/include"
+def coreHeaders = "${coreHome}/${currentArch}/include"
 def coreStaticLib = "lib/libtwilio-sdk-core-full.a"
 
 def twilioCommonHome = "${twilioSdkHome}/twilio-common/android"
-def twilioCommonHeaders = "${twilioCommonHome}/armeabiv7a/include"
+def twilioCommonHeaders = "${twilioCommonHome}/${currentArch}/include"
 def twilioCommonStaticLib = "lib/libtwilio-common.a"
 
 def pocoHome = "${twilioSdkHome}/poco/android"
-def pocoHeaders = "${pocoHome}/armeabiv7a/include"
+def pocoHeaders = "${pocoHome}/${currentArch}/include"
 def pocoCryptoHeaders = "${pocoHeaders}/Crypto"
 def pocoFoundationStaticLib = "lib/libPocoFoundation.a"
 def pocoNetStaticLib = "lib/libPocoNet.a"
@@ -46,11 +46,11 @@ def pocoXmlStaticLib = "lib/libPocoXML.a"
 def pocoJsonStaticLib = "lib/libPocoJSON.a"
 
 def boringSslHome = "${twilioSdkHome}/boringssl/android"
-def boringSslHeaders = "${boringSslHome}/armeabiv7a/include"
+def boringSslHeaders = "${boringSslHome}/${currentArch}/include"
 def boringSslStaticLib = "lib/libboringssl.a"
 
 def webRtcHome = "${twilioSdkHome}/webrtc/android"
-def webRtcHeaders = "${webRtcHome}/armeabiv7a/include"
+def webRtcHeaders = "${webRtcHome}/${currentArch}/include"
 def webRtcStaticLib = "lib/libwebrtc.a"
 def webRtcJniStaticLib = "lib/libwebrtc-jni.a"
 
@@ -280,7 +280,7 @@ dependencies {
     androidTestCompile 'com.android.support.test:rules:0.4'
 
     // TODO this jar does not need to be behind an arch directory structure
-    compile files("${twilioSdkHome}/webrtc/android/armeabiv7a/lib/libjingle_peerconnection_java.jar")
+    compile files("${twilioSdkHome}/webrtc/android/${currentArch}/lib/libjingle_peerconnection_java.jar")
     provided 'com.twilio.sdk:twilio-common-android:0.2.0'
 }
 
