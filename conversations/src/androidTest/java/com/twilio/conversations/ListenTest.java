@@ -37,9 +37,6 @@ public class ListenTest {
      */
     @After
     public void teardown() {
-//        if (TwilioConversationsUtils.isInitialized()) {
-//            TwilioConversationsUtils.destroyTwilioSDK();
-//        }
         TwilioConversationsUtils.destroyTwilioSDK();
     }
 
