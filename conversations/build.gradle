@@ -460,7 +460,7 @@ def getSdkDir() {
         sdkHome = properties.getProperty('sdk.dir')
     }
 
-    // Fail the build for not ndk detected
+    // Fail the build for no sdk detected
     assert sdkHome != null : "Could not find Android SDK!"
 
     return sdkHome
@@ -479,7 +479,7 @@ def getNdkDir() {
         ndkHome = properties.getProperty('ndk.dir')
     }
 
-    // Fail the build for not ndk detected
+    // Fail the build for no ndk detected
     assert ndkHome != null : "Could not find Android NDK!"
 
     return ndkHome
