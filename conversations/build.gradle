@@ -262,6 +262,10 @@ model {
 
             source = androidConfig.sources.main.java.source
             classpath += project.files("${getSdkDir()}/platforms/${androidConfig.compileSdkVersion}/android.jar");
+            options.links("http://docs.oracle.com/javase/7/docs/api/");
+            options.links("http://d.android.com/reference/");
+            exclude '**/BuildConfig.java'
+            exclude '**/R.java'
         }
     }
 }
@@ -444,7 +448,7 @@ def convertAbiToArch(abi) {
 }
 
 def getSdkDir() {
-    // Checking environment variable for ndk home first
+    // Checking environment variable for sdk home first
     def sdkHome = System.env.ANDROID_SDK_HOME
 
     // Android Studio does not see this environment but will generate a
