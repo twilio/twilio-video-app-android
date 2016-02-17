@@ -13,7 +13,7 @@
     <mavenVersion>2.0.9</mavenVersion>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <dependencies.twiliocommon.version>0.0.10</dependencies.twiliocommon.version>
-    <dependencies.twilio-common-android.version>0.2.0-rc1</dependencies.twilio-common-android.version>
+    <dependencies.twilio-common-android.version>0.2.0</dependencies.twilio-common-android.version>
   </properties>
 
   <build>
