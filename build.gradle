@@ -14,7 +14,7 @@ buildscript {
     }
 
     dependencies {
-        classpath "com.android.tools.build:gradle-experimental:0.6.0-beta4"
+        classpath "com.android.tools.build:gradle-experimental:0.6.0-beta5"
         classpath 'com.netflix.nebula:gradle-extra-configurations-plugin:3.0.3'
     }
 }

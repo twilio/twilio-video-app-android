@@ -267,6 +267,75 @@ dependencies {
     provided 'com.twilio.sdk:twilio-common-android:0.2.0'
 }
 
+task unpackAar(type: Copy) {
+    def aarFile = file("${buildDir}/outputs/aar/conversations-release.aar")
+    def outputDir = file("${buildDir}/unpacked/conversations")
+
+    from zipTree(aarFile)
+    into outputDir
+}
+
+task prepareJar(type: Copy, dependsOn: 'unpackAar') {
+    def classesJar = file("${buildDir}/unpacked/conversations/classes.jar")
+    def libjingleJar = file("${buildDir}/unpacked/conversations/libs/libjingle_peerconnection_java.jar")
+    def jniLibs = file("${buildDir}/unpacked/conversations/jni")
+    def jarHome = file("${buildDir}/intermediates/jar")
+
+    from zipTree(classesJar)
+    include '**/*.class'
+    include '**/*.java'
+
+    from zipTree(libjingleJar)
+    include '**/*.class'
+    include '**/*.java'
+
+    into jarHome
+    into('lib') {
+        from fileTree(jniLibs)
+        include '**/*.so'
+    }
+}
+
+task createJar(type: Jar, dependsOn: 'prepareJar') {
+    archiveName = "twilio-conversations-android.jar"
+    destinationDir = file("${buildDir}/outputs/jar")
+    def jarHome = file("${buildDir}/intermediates/jar")
+    from jarHome
+}
+
+task prepareTarBz2(type: Copy, dependsOn: 'createJar') {
+    def quickstart = file("../quickstart")
+    def jarHome = file("${buildDir}/outputs/jar/twilio-conversations-android.jar")
+    def tarHome = file("${buildDir}/intermediates/tar")
+
+    into tarHome
+    into('quickstart') {
+        from quickstart
+    }
+    into('quickstart/app/libs') {
+        from jarHome
+        rename { String fileName ->
+            fileName.replace('twilio-conversations-android.jar',
+                    "twilio-conversations-android-${getVersionName()}.jar")
+        }
+    }
+    into('libs') {
+        from jarHome
+        rename { String fileName ->
+            fileName.replace('twilio-conversations-android.jar',
+                    "twilio-conversations-android-${getVersionName()}.jar")
+        }
+    }
+}
+
+task createTarBz2(type: Tar, dependsOn: 'prepareTarBz2') {
+    from fileTree(file("${buildDir}/intermediates/tar"))
+    baseName = 'twilio-conversations-android'
+    destinationDir = file("${buildDir}/outputs/tar")
+    extension = 'tar.bz2'
+    compression = Compression.BZIP2
+}
+
 /**
  * Localize the JNI_OnLoad and JNI_OnUnLoad symbol in libwebrtc-jni.a to prevent conflicts with
  * initialization
