@@ -23,11 +23,11 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.tw.conv.testapp.R;
 import com.twilio.common.TwilioAccessManager;
 import com.twilio.common.TwilioAccessManagerFactory;
 import com.twilio.common.TwilioAccessManagerListener;
 import com.twilio.conversations.TwilioConversationsException;
+import com.tw.conv.testapp.R;
 import com.tw.conv.testapp.dialog.Dialog;
 import com.tw.conv.testapp.provider.TCCapabilityTokenProvider;
 import com.tw.conv.testapp.util.ParticipantParser;
@@ -75,6 +75,8 @@ public class TCClientActivity extends AppCompatActivity {
     private ConversationsClient conversationsClient;
     private OutgoingInvite outgoingInvite;
     private LocalMedia localMedia;
+    private boolean wasPreviewing = false;
+    private boolean wasLive = false;
 
     private enum AudioState {
         ENABLED,
@@ -205,10 +207,8 @@ public class TCClientActivity extends AppCompatActivity {
 
                 // Teardown our client and sdk instance
                 disposeConversationsClient();
-                returnToRegistration();
-
-                // FIXME this causes intermittant issues
                 destroyConversationsSdk();
+                returnToRegistration();
 
                 return true;
             default:
@@ -286,12 +286,32 @@ public class TCClientActivity extends AppCompatActivity {
         if (conversationsClient != null && !conversationsClient.isListening()) {
             conversationsClient.listen();
         }
+        if(cameraCapturer != null && wasPreviewing) {
+            wasPreviewing = false;
+            startPreview();
+        } else if(isConversationOngoing()) {
+            LocalVideoTrack localVideoTrack = localMedia.getLocalVideoTracks().get(0);
+            if(localVideoTrack != null && wasLive) {
+                localVideoTrack.enable(true);
+                wasLive = false;
+            }
+        }
     }
 
     public void onPause() {
         super.onPause();
         if (conversationsClient != null && conversationsClient.isListening() && !isConversationOngoing()) {
             conversationsClient.unlisten();
+        }
+        if(cameraCapturer != null && cameraCapturer.isPreviewing()) {
+            wasPreviewing = true;
+            stopPreview();
+        } else if(isConversationOngoing()) {
+            LocalVideoTrack localVideoTrack = localMedia.getLocalVideoTracks().get(0);
+            if(localVideoTrack != null && localVideoTrack.isEnabled()) {
+                localVideoTrack.enable(false);
+                wasLive = true;
+            }
         }
     }
 
@@ -678,6 +698,9 @@ public class TCClientActivity extends AppCompatActivity {
                             if (e == null) {
                                 TCClientActivity.this.conversation = conversation;
                                 conversation.setConversationListener(conversationListener());
+                            } else if (e.getErrorCode() == TwilioConversations.TOO_MANY_ACTIVE_CONVERSATIONS) {
+                                Timber.w(e.getMessage());
+                                conversationsClientStatusTextView.setText("Unable to accept call. Too many active conversations.");
                             } else {
                                 hangup();
                                 reset();
