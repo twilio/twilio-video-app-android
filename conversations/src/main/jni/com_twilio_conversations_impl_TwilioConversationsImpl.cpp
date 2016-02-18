@@ -91,6 +91,44 @@ JNIEXPORT jboolean JNICALL Java_com_twilio_conversations_impl_TwilioConversation
 }
 
 /*
+* Class:     com_twilio_conversations_impl_TwilioConversationsImpl
+* Method:    onApplicationForeground
+* Signature: ()J
+*/
+JNIEXPORT void JNICALL Java_com_twilio_conversations_impl_TwilioConversationsImpl_onApplicationForeground
+        (JNIEnv *env, jobject) {
+    TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK, kTSCoreLogLevelDebug, "onApplicationForeground");
+    TSCSDK* tscSdk = TSCSDK::instance();
+
+    if (tscSdk != NULL) {
+        TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK,
+                           kTSCoreLogLevelDebug,
+                           "onCompleteWakeUp");
+        tscSdk->onCompleteWakeUp();
+        CHECK_EXCEPTION(env) << "error during onCompleteWakeUp";
+    }
+}
+
+/*
+ * Class:     com_twilio_conversations_impl_TwilioConversationsImpl
+ * Method:    onApplicationBackground
+ * Signature: ()J
+ */
+JNIEXPORT void JNICALL Java_com_twilio_conversations_impl_TwilioConversationsImpl_onApplicationBackground
+        (JNIEnv *env, jobject) {
+    TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK, kTSCoreLogLevelDebug, "onApplicationBackground");
+    TSCSDK* tscSdk = TSCSDK::instance();
+
+    if (tscSdk != NULL) {
+        TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK,
+                           kTSCoreLogLevelDebug,
+                           "onGoingToSleep");
+        tscSdk->onGoingToSleep();
+        CHECK_EXCEPTION(env) << "error during onGoingToSleep";
+    }
+}
+
+/*
  * Class:     com_twilio_conversations_impl_TwilioConversationsImpl
  * Method:    destroyCore
  * Signature: ()J
