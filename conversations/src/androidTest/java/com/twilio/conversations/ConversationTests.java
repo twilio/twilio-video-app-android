@@ -29,7 +29,6 @@ import static org.junit.Assert.*;
 @RunWith(AndroidJUnit4.class)
 @Ignore
 public class ConversationTests {
-
     private static String USER = "john";
     private static String NON_EXISTANT_PARTICIPANT ="non-existant-paritcipant";
 
@@ -51,7 +50,7 @@ public class ConversationTests {
     public void muteShouldBeSafeToCallAnytimeDuringAConversation() {
         // TODO: support enabling runtime permissions on Android 6.0+
         if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
-           return;
+            return;
         }
 
         final CountDownLatch initWait = new CountDownLatch(1);
@@ -187,5 +186,4 @@ public class ConversationTests {
         TwilioConversationsUtils.wait(tokenLatch, 5, TimeUnit.SECONDS);
         return token[0];
     }
-
 }

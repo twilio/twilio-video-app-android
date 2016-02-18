@@ -153,15 +153,16 @@ public class ConversationsClientLifecycleTests {
                             }
 
                             @Override
-                            public void onIncomingInvite(ConversationsClient conversationsClient, IncomingInvite incomingInvite) {
+                            public void onIncomingInvite(ConversationsClient conversationsClient,
+                                                         IncomingInvite incomingInvite) {
                                 fail();
                             }
 
                             @Override
-                            public void onIncomingInviteCancelled(ConversationsClient conversationsClient, IncomingInvite incomingInvite) {
+                            public void onIncomingInviteCancelled(ConversationsClient conversationsClient,
+                                                                  IncomingInvite incomingInvite) {
                                 fail();
                             }
-
                         });
                 conversationsClient.listen();
             }
@@ -183,21 +184,22 @@ public class ConversationsClientLifecycleTests {
             }
 
             @Override
-            public void onFailedToStartListening(ConversationsClient conversationsClient, TwilioConversationsException e) {
+            public void onFailedToStartListening(ConversationsClient conversationsClient,
+                                                 TwilioConversationsException e) {
 
             }
 
             @Override
-            public void onIncomingInvite(ConversationsClient conversationsClient, IncomingInvite incomingInvite) {
+            public void onIncomingInvite(ConversationsClient conversationsClient,
+                                         IncomingInvite incomingInvite) {
 
             }
 
             @Override
-            public void onIncomingInviteCancelled(ConversationsClient conversationsClient, IncomingInvite incomingInvite) {
+            public void onIncomingInviteCancelled(ConversationsClient conversationsClient,
+                                                  IncomingInvite incomingInvite) {
 
             }
-
         };
     }
-
 }

@@ -16,7 +16,6 @@ import java.util.Set;
 
 @RunWith(AndroidJUnit4.class)
 public class ConversationsClientSendInviteTests {
-
     private static String TOKEN = "token";
     private static String PARTICIPANT = "janne";
 
@@ -196,5 +195,4 @@ public class ConversationsClientSendInviteTests {
             }
         };
     }
-
 }

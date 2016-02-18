@@ -8,10 +8,10 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 public class TwilioConversationsUtils {
-    /*
- * TwilioConversations is a singleton and can only be initialized once. As a result we must track
- * if TwilioConversations has ever been initialized.
- */
+    /**
+     * TwilioConversations is a singleton and can only be initialized once.
+     * As a result we must track if TwilioConversations has ever been initialized.
+     */
     private static boolean initialized = false;
 
     public static int TIMEOUT = 10;
@@ -55,7 +55,9 @@ public class TwilioConversationsUtils {
         };
     }
 
-    public static TwilioConversations.InitListener countDownInitListenerCallback(final CountDownLatch initCountDownLatch, final CountDownLatch errorCountDownLatch) {
+    public static TwilioConversations.InitListener
+    countDownInitListenerCallback(final CountDownLatch initCountDownLatch,
+                                  final CountDownLatch errorCountDownLatch) {
         return new TwilioConversations.InitListener() {
             @Override
             public void onInitialized() {

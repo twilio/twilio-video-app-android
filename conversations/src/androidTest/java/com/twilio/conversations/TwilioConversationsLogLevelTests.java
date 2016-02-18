@@ -14,13 +14,12 @@ import java.util.concurrent.TimeUnit;
 import static org.junit.Assert.*;
 
 
-/*
- * Adding other tests to this test module that call initialize may invalidate this test since TwilioConversations
- * is a singleton and can only be initialized once.
+/**
+ * Adding other tests to this test module that call initialize may invalidate this
+ * test since TwilioConversationsis a singleton and can only be initialized once.
  */
 @RunWith(AndroidJUnit4.class)
 public class TwilioConversationsLogLevelTests {
-
     private static int TIMEOUT = 10;
 
     @Rule
@@ -66,5 +65,4 @@ public class TwilioConversationsLogLevelTests {
             fail("timed out after" + TIMEOUT);
         }
     }
-
 }

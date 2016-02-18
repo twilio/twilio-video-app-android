@@ -115,5 +115,4 @@ public class ListenTest {
 
         TwilioConversationsUtils.wait(waitLatch, 30, TimeUnit.SECONDS);
     }
-
 }

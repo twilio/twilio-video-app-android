@@ -12,12 +12,15 @@ import retrofit.http.GET;
 import retrofit.http.QueryMap;
 
 public class TCCapabilityTokenProvider {
-    public static final String TTL = "300"; //The default is usually 30 minutes. We are intentionally setting it to 5 minutes to validate expiration.
+    //The default is usually 30 minutes.
+    // We are intentionally setting it to 5 minutes to validate expiration.
+    public static final String TTL = "300";
 
-    /* Define the Retrofit Token Service */
+    // Define the Retrofit Token Service
     interface TokenService {
         @GET("/access-token")
-        void obtainTwilioCapabilityToken(@QueryMap Map<String, String> options, Callback<String> tokenCallback);
+        void obtainTwilioCapabilityToken(@QueryMap Map<String, String> options,
+                                         Callback<String> tokenCallback);
     }
 
     private static class TwilioAuthorizationInterceptor implements RequestInterceptor {
@@ -36,10 +39,10 @@ public class TCCapabilityTokenProvider {
     }
 
     private static TokenService tokenService = new RestAdapter.Builder()
-                .setEndpoint("https://simple-signaling.appspot.com")
-                .setRequestInterceptor(new TwilioAuthorizationInterceptor())
-                .build()
-                .create(TokenService.class);
+            .setEndpoint("https://simple-signaling.appspot.com")
+            .setRequestInterceptor(new TwilioAuthorizationInterceptor())
+            .build()
+            .create(TokenService.class);
 
     public static void obtainTwilioCapabilityToken(String username, Callback<String> callback) {
         HashMap<String,String> options = new HashMap<>();

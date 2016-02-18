@@ -51,7 +51,7 @@ public class TwilioConversationsTest {
     public void testTwilioDestroyWithActiveClient() {
         TwilioConversationsUtils.initializeTwilioSDK(mActivityRule.getActivity().getApplicationContext());
         TwilioConversations.createConversationsClient("token",
-                        conversationsClientListener());
+                conversationsClientListener());
         TwilioConversationsUtils.destroyTwilioSDK();
     }
 
@@ -278,20 +278,22 @@ public class TwilioConversationsTest {
             }
 
             @Override
-            public void onFailedToStartListening(ConversationsClient conversationsClient, TwilioConversationsException e) {
+            public void onFailedToStartListening(ConversationsClient conversationsClient,
+                                                 TwilioConversationsException e) {
 
             }
 
             @Override
-            public void onIncomingInvite(ConversationsClient conversationsClient, IncomingInvite incomingInvite) {
+            public void onIncomingInvite(ConversationsClient conversationsClient,
+                                         IncomingInvite incomingInvite) {
 
             }
 
             @Override
-            public void onIncomingInviteCancelled(ConversationsClient conversationsClient, IncomingInvite incomingInvite) {
+            public void onIncomingInviteCancelled(ConversationsClient conversationsClient,
+                                                  IncomingInvite incomingInvite) {
 
             }
-
         };
     }
 }
