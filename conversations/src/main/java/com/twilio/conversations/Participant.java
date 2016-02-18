@@ -1,17 +1,15 @@
 package com.twilio.conversations;
 
 public interface Participant {
+    /** Participant identity */
+    String getIdentity();
 
-	/** Participant identity */
-	String getIdentity();
+    /** This participants media */
+    Media getMedia();
 
-	/** This participants media */
-	Media getMedia();
+    void setParticipantListener(ParticipantListener participantListener);
 
-	void setParticipantListener(ParticipantListener participantListener);
+    ParticipantListener getParticipantListener();
 
-	ParticipantListener getParticipantListener();
-
-	String getSid();
-
+    String getSid();
 }

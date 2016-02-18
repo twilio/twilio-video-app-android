@@ -55,7 +55,7 @@ public class I420Frame {
      * Construct a texture frame of the given dimensions with data in SurfaceTexture
      */
     public I420Frame(int width, int height, int rotationDegree,
-              int textureId, float[] samplingMatrix, long nativeFramePointer) {
+                     int textureId, float[] samplingMatrix, long nativeFramePointer) {
         this.width = width;
         this.height = height;
         this.yuvStrides = null;

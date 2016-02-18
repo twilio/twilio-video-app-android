@@ -113,7 +113,7 @@ public class TwilioConversations {
         /**
          * Called if there is an error initializing the Twilio
          * Conversations SDK.
-         * 
+         *
          * @param exception An exception describing the error that occurred
          */
         void onError(Exception exception);
@@ -135,17 +135,17 @@ public class TwilioConversations {
 
     /**
      * Initialize the Twilio Conversations SDK.
-     * 
+     *
      * @param applicationContext
      *            The application context of your Android application
-     * 
+     *
      * @param initListener
      *            A {@link TwilioConversations.InitListener} that will notify you
      *            when the service is ready
-     * 
+     *
      */
     public static void initialize(Context applicationContext,
-            TwilioConversations.InitListener initListener) {
+                                  TwilioConversations.InitListener initListener) {
         if (applicationContext == null) {
             throw new NullPointerException("applicationContext must not be null");
         }
@@ -167,7 +167,7 @@ public class TwilioConversations {
 
     /**
      * Informs whether {@link TwilioConversations} is initialized or not.
-     * 
+     *
      * @return <code>true</code> if Twilio Conversations client is initialized, <code>false</code> otherwise.
      */
     public static boolean isInitialized() {
@@ -176,7 +176,7 @@ public class TwilioConversations {
 
     /**
      * Gets the logging level for messages logged by the Twilio Conversations SDK.
-     * 
+     *
      * @return the logging level
      */
     public static int getLogLevel() {
@@ -185,7 +185,7 @@ public class TwilioConversations {
 
     /**
      * Sets the logging level for messages logged by the Twilio Conversations SDK.
-     * 
+     *
      * @param level The logging level
      */
     public static void setLogLevel(int level) {
@@ -194,7 +194,7 @@ public class TwilioConversations {
 
     /**
      * Creates a new ConversationsClient.
-     * 
+     *
      * @param token The access token.
      * @param listener A listener that receives events from the conversations client.
      *
@@ -212,7 +212,7 @@ public class TwilioConversations {
 
     /**
      * Creates a new {@link ConversationsClient}.
-     * 
+     *
      * @param accessManager The instance of {@link TwilioAccessManager} that is handling token lifetime
      * @param listener A listener that receive events from the ConversationsClient.
      *
@@ -225,7 +225,7 @@ public class TwilioConversations {
 
     /**
      * Creates a new ConversationsClient.
-     * 
+     *
      * @param accessManager The instance of {@link TwilioAccessManager} that is handling token lifetime
      * @param options Map of options that override the default options.
      * Currently only one key is supported: ice_servers
@@ -255,7 +255,7 @@ public class TwilioConversations {
 
     /**
      * Returns the version of the Twilio Conversations SDK.
-     * 
+     *
      * @return the version of the SDK
      */
     public static String getVersion() {

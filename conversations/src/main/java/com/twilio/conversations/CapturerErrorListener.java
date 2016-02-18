@@ -5,10 +5,8 @@ package com.twilio.conversations;
  *
  */
 public interface CapturerErrorListener {
-
-	/**
-	 * Reports runtime errors that can occur in the {@link CameraCapturer}
-	 */
-	public void onError(CapturerException e);
-
+    /**
+     * Reports runtime errors that can occur in the {@link CameraCapturer}
+     */
+    void onError(CapturerException e);
 }

@@ -5,7 +5,6 @@ package com.twilio.conversations;
  *
  */
 public interface MediaTrack {
-
     /**
      * The track id associated with this media track
      *
@@ -19,5 +18,4 @@ public interface MediaTrack {
      * @return state of media track
      */
     MediaTrackState getState();
-
 }

@@ -8,13 +8,12 @@ import com.twilio.conversations.impl.LocalMediaImpl;
  *
  */
 public class LocalMediaFactory {
-
-	/**
-	 * Creates a new instance of the {@link LocalMedia}
-	 * 
-	 * @return instance of local media
-	 */
-	public static LocalMedia createLocalMedia(LocalMediaListener localMediaListener) {
-		return new LocalMediaImpl(localMediaListener);
-	}
+    /**
+     * Creates a new instance of the {@link LocalMedia}
+     *
+     * @return instance of local media
+     */
+    public static LocalMedia createLocalMedia(LocalMediaListener localMediaListener) {
+        return new LocalMediaImpl(localMediaListener);
+    }
 }

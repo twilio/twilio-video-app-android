@@ -7,19 +7,17 @@ import java.util.List;
  *
  */
 public interface Media {
+    /**
+     * Retrieves the list of video tracks
+     *
+     * @return list of video tracks
+     */
+    List<VideoTrack> getVideoTracks();
 
-	/**
-	 * Retrieves the list of video tracks
-	 * 
-	 * @return list of video tracks
-	 */
-	public List<VideoTrack> getVideoTracks();
-
-	/**
-	 * Retrieves the list of audio tracks
-	 *
-	 * @return list of audio tracks
-	 */
-	public List<AudioTrack> getAudioTracks();
-
+    /**
+     * Retrieves the list of audio tracks
+     *
+     * @return list of audio tracks
+     */
+    List<AudioTrack> getAudioTracks();
 }

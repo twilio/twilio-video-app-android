@@ -5,6 +5,6 @@ package com.twilio.conversations;
  *
  */
 public enum AudioOutput {
-	SPEAKERPHONE,
-	HEADSET
+    SPEAKERPHONE,
+    HEADSET
 }
