@@ -238,7 +238,7 @@ public class TCClientActivity extends AppCompatActivity {
             cameraCapturer = null;
         }
 
-        // Teardown our client and sdk instance
+        // Teardown our conversation, client, and sdk instance
         disposeConversation();
         disposeConversationsClient();
         destroyConversationsSdk();
