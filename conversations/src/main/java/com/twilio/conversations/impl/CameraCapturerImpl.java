@@ -24,7 +24,6 @@ import com.twilio.conversations.impl.logging.Logger;
 
 
 public class CameraCapturerImpl implements CameraCapturer {
-
     private static String TAG = "CameraCapturerImpl";
 
     static final Logger logger = Logger.getLogger(CameraCapturerImpl.class);
@@ -300,7 +299,8 @@ public class CameraCapturerImpl implements CameraCapturer {
 
             } catch (IOException e) {
                 if(listener != null) {
-                    listener.onError(new CapturerException(ExceptionDomain.CAMERA, "Unable to start preview: " + e.getMessage()));
+                    listener.onError(new CapturerException(ExceptionDomain.CAMERA,
+                            "Unable to start preview: " + e.getMessage()));
                 }
             }
         }
@@ -314,7 +314,8 @@ public class CameraCapturerImpl implements CameraCapturer {
                     camera.setPreviewDisplay(null);
                 } catch(IOException e) {
                     if(listener != null) {
-                        listener.onError(new CapturerException(ExceptionDomain.CAMERA, "Unable to reset preview: " + e.getMessage()));
+                        listener.onError(new CapturerException(ExceptionDomain.CAMERA,
+                                "Unable to reset preview: " + e.getMessage()));
                     }
                 }
             }
@@ -376,10 +377,8 @@ public class CameraCapturerImpl implements CameraCapturer {
             }
             return orientation;
         }
-
     }
 
     private native void stopVideoSource(long nativeSession);
     private native void restartVideoSource(long nativeSession);
-
 }

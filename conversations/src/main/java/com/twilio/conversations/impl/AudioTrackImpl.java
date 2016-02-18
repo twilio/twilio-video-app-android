@@ -5,7 +5,6 @@ import com.twilio.conversations.MediaTrackState;
 import com.twilio.conversations.impl.core.TrackInfo;
 
 public class AudioTrackImpl implements AudioTrack {
-
     private org.webrtc.AudioTrack audioTrack;
     private TrackInfo trackInfo;
     private MediaTrackState trackState;
@@ -16,9 +15,9 @@ public class AudioTrackImpl implements AudioTrack {
         trackState = MediaTrackState.STARTED;
     }
 
-	TrackInfo getTrackInfo() {
-		return trackInfo;
-	}
+    TrackInfo getTrackInfo() {
+        return trackInfo;
+    }
 
     @Override
     public String getTrackId() {
@@ -37,5 +36,4 @@ public class AudioTrackImpl implements AudioTrack {
     void setTrackState(MediaTrackState trackState) {
         this.trackState = trackState;
     }
-
 }

@@ -13,96 +13,96 @@ import com.twilio.conversations.VideoTrack;
 import com.twilio.conversations.impl.core.TrackInfo;
 
 public class VideoTrackImpl implements VideoTrack {
-	private org.webrtc.VideoTrack videoTrack;
-	private TrackInfo trackInfo;
-	private MediaTrackState trackState;
-	private Map<VideoRenderer, org.webrtc.VideoRenderer> videoRenderersMap =
-			new HashMap<VideoRenderer, org.webrtc.VideoRenderer>();
+    private org.webrtc.VideoTrack videoTrack;
+    private TrackInfo trackInfo;
+    private MediaTrackState trackState;
+    private Map<VideoRenderer, org.webrtc.VideoRenderer> videoRenderersMap =
+            new HashMap<VideoRenderer, org.webrtc.VideoRenderer>();
 
-	VideoTrackImpl() {
-		trackState = MediaTrackState.IDLE;
-	}
+    VideoTrackImpl() {
+        trackState = MediaTrackState.IDLE;
+    }
 
-	VideoTrackImpl(org.webrtc.VideoTrack videoTrack, TrackInfo trackInfo) {
-		this.videoTrack = videoTrack;
-		this.trackInfo = trackInfo;
+    VideoTrackImpl(org.webrtc.VideoTrack videoTrack, TrackInfo trackInfo) {
+        this.videoTrack = videoTrack;
+        this.trackInfo = trackInfo;
 
-		trackState = MediaTrackState.STARTED;
-	}
+        trackState = MediaTrackState.STARTED;
+    }
 
-	void setWebrtcVideoTrack(org.webrtc.VideoTrack videoTrack) {
-		this.videoTrack = videoTrack;
+    void setWebrtcVideoTrack(org.webrtc.VideoTrack videoTrack) {
+        this.videoTrack = videoTrack;
 
-		trackState = MediaTrackState.STARTED;
-	}
+        trackState = MediaTrackState.STARTED;
+    }
 
-	void setTrackInfo(TrackInfo trackInfo) {
-		this.trackInfo = trackInfo;
-	}
+    void setTrackInfo(TrackInfo trackInfo) {
+        this.trackInfo = trackInfo;
+    }
 
-	org.webrtc.VideoTrack getWebrtcVideoTrack() {
-		return videoTrack;
-	}
+    org.webrtc.VideoTrack getWebrtcVideoTrack() {
+        return videoTrack;
+    }
 
-	TrackInfo getTrackInfo() {
-		return trackInfo;
-	}
+    TrackInfo getTrackInfo() {
+        return trackInfo;
+    }
 
-	@Override
-	public void addRenderer(VideoRenderer videoRenderer) {
-		org.webrtc.VideoRenderer webrtcVideoRenderer =
-				createWebRtcVideoRenderer(videoRenderer);
-		videoRenderersMap.put(videoRenderer, webrtcVideoRenderer);
-		videoTrack.addRenderer(webrtcVideoRenderer);
-	}
+    @Override
+    public void addRenderer(VideoRenderer videoRenderer) {
+        org.webrtc.VideoRenderer webrtcVideoRenderer =
+                createWebRtcVideoRenderer(videoRenderer);
+        videoRenderersMap.put(videoRenderer, webrtcVideoRenderer);
+        videoTrack.addRenderer(webrtcVideoRenderer);
+    }
 
-	@Override
-	public void removeRenderer(VideoRenderer videoRenderer) {
-		org.webrtc.VideoRenderer webrtcVideoRenderer =
-				videoRenderersMap.remove(videoRenderer);
-		if (webrtcVideoRenderer != null) {
-			videoTrack.removeRenderer(webrtcVideoRenderer);
-		}
-	}
+    @Override
+    public void removeRenderer(VideoRenderer videoRenderer) {
+        org.webrtc.VideoRenderer webrtcVideoRenderer =
+                videoRenderersMap.remove(videoRenderer);
+        if (webrtcVideoRenderer != null) {
+            videoTrack.removeRenderer(webrtcVideoRenderer);
+        }
+    }
 
-	@Override
-	public List<VideoRenderer> getRenderers() {
-		return new ArrayList<VideoRenderer>(videoRenderersMap.keySet());
-	}
+    @Override
+    public List<VideoRenderer> getRenderers() {
+        return new ArrayList<VideoRenderer>(videoRenderersMap.keySet());
+    }
 
-	private org.webrtc.VideoRenderer createWebRtcVideoRenderer(VideoRenderer videoRenderer) {
-		return new org.webrtc.VideoRenderer(new VideoRendererCallbackAdapter(videoRenderer));
-	}
+    private org.webrtc.VideoRenderer createWebRtcVideoRenderer(VideoRenderer videoRenderer) {
+        return new org.webrtc.VideoRenderer(new VideoRendererCallbackAdapter(videoRenderer));
+    }
 
-	@Override
-	public String getTrackId() {
-		return trackInfo != null ? trackInfo.getTrackId() : null;
-	}
+    @Override
+    public String getTrackId() {
+        return trackInfo != null ? trackInfo.getTrackId() : null;
+    }
 
-	@Override
-	public MediaTrackState getState() {
-		return trackState;
-	}
+    @Override
+    public MediaTrackState getState() {
+        return trackState;
+    }
 
-	void updateTrackInfo(TrackInfo trackInfo) {
-		this.trackInfo = trackInfo;
-	}
+    void updateTrackInfo(TrackInfo trackInfo) {
+        this.trackInfo = trackInfo;
+    }
 
-	void setTrackState(MediaTrackState trackState) {
-		this.trackState = trackState;
-	}
+    void setTrackState(MediaTrackState trackState) {
+        this.trackState = trackState;
+    }
 
-	private class VideoRendererCallbackAdapter implements org.webrtc.VideoRenderer.Callbacks {
-		private final VideoRenderer videoRenderer;
+    private class VideoRendererCallbackAdapter implements org.webrtc.VideoRenderer.Callbacks {
+        private final VideoRenderer videoRenderer;
 
-		public VideoRendererCallbackAdapter(VideoRenderer videoRenderer) {
-			this.videoRenderer = videoRenderer;
-		}
+        public VideoRendererCallbackAdapter(VideoRenderer videoRenderer) {
+            this.videoRenderer = videoRenderer;
+        }
 
-		@Override
-		public void renderFrame(org.webrtc.VideoRenderer.I420Frame frame) {
-			videoRenderer.renderFrame(transformWebRtcFrame(frame));
-		}
+        @Override
+        public void renderFrame(org.webrtc.VideoRenderer.I420Frame frame) {
+            videoRenderer.renderFrame(transformWebRtcFrame(frame));
+        }
 
         private I420Frame transformWebRtcFrame(org.webrtc.VideoRenderer.I420Frame frame) {
             long frameNativePointer;
@@ -122,5 +122,5 @@ public class VideoTrackImpl implements VideoTrack {
                     frame.yuvPlanes,
                     frameNativePointer);
         }
-	}
+    }
 }

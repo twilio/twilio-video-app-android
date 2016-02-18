@@ -49,16 +49,16 @@ public class TwilioConversationsImpl {
 
     private class ConnectivityChangeReceiver extends BroadcastReceiver {
         @Override
-            public void onReceive(Context context, Intent intent) {
-                if (intent.getAction().equalsIgnoreCase(ConnectivityManager.CONNECTIVITY_ACTION)) {
-                    refreshRegExecutor.execute( new Runnable() {
-                        @Override
-                        public void run() {
-                            onNetworkChange();
-                        }
-                    });
-                }
+        public void onReceive(Context context, Intent intent) {
+            if (intent.getAction().equalsIgnoreCase(ConnectivityManager.CONNECTIVITY_ACTION)) {
+                refreshRegExecutor.execute( new Runnable() {
+                    @Override
+                    public void run() {
+                        onNetworkChange();
+                    }
+                });
             }
+        }
     }
     private ConnectivityChangeReceiver connectivityChangeReceiver = new ConnectivityChangeReceiver();
 
@@ -80,15 +80,15 @@ public class TwilioConversationsImpl {
      * adjust accordingly. 
      **/
     private static final String[] requiredPermissions = {
-        // Dangerous permissions (require permission)
-        "android.permission.CAMERA",
-        "android.permission.RECORD_AUDIO",
+            // Dangerous permissions (require permission)
+            "android.permission.CAMERA",
+            "android.permission.RECORD_AUDIO",
 
-        // Normal permissions (granted upon install)
-        "android.permission.INTERNET",
-        "android.permission.MODIFY_AUDIO_SETTINGS",
-        "android.permission.ACCESS_NETWORK_STATE",
-        "android.permission.ACCESS_WIFI_STATE"
+            // Normal permissions (granted upon install)
+            "android.permission.INTERNET",
+            "android.permission.MODIFY_AUDIO_SETTINGS",
+            "android.permission.ACCESS_NETWORK_STATE",
+            "android.permission.ACCESS_WIFI_STATE"
     };
 
     public static TwilioConversationsImpl getInstance() {
@@ -123,7 +123,7 @@ public class TwilioConversationsImpl {
         try {
             pinfo = pm.getPackageInfo(applicationContext.getPackageName(),
                     PackageManager.GET_PERMISSIONS
-                    | PackageManager.GET_SERVICES);
+                            | PackageManager.GET_SERVICES);
         } catch (NameNotFoundException e) {
             throw new RuntimeException("Unable to resolve permissions. " + e.getMessage());
         }
@@ -131,7 +131,7 @@ public class TwilioConversationsImpl {
         // Check application permissions
         Map<String, Boolean> appPermissions = new HashMap<String, Boolean>(
                 pinfo.requestedPermissions != null ? pinfo.requestedPermissions.length
-                : 0);
+                        : 0);
         if (pinfo.requestedPermissions != null) {
             for (String permission : pinfo.requestedPermissions)
                 appPermissions.put(permission, true);
@@ -348,7 +348,8 @@ public class TwilioConversationsImpl {
 
     private native boolean initCore(Context context);
     private native void destroyCore();
-    private native long createEndpoint(TwilioAccessManager accessManager, long nativeEndpointObserver);
+    private native long createEndpoint(TwilioAccessManager accessManager,
+                                       long nativeEndpointObserver);
     private native static void setCoreLogLevel(int level);
     private native static int getCoreLogLevel();
     private native void refreshRegistrations();
