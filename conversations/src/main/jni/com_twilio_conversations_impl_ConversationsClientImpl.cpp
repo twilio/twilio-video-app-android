@@ -17,9 +17,9 @@ using namespace twiliosdk;
  * Signature: (J)V
  */
 JNIEXPORT void JNICALL Java_com_twilio_conversations_impl_ConversationsClientImpl_listen
-  (JNIEnv *env, jobject obj, jlong nativeEndpoint) {
-	TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK, kTSCoreLogLevelDebug, "listen");
-	reinterpret_cast<TSCEndpointPtr *>(nativeEndpoint)->get()->registerEndpoint(true, true);
+        (JNIEnv *env, jobject obj, jlong nativeEndpoint) {
+    TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK, kTSCoreLogLevelDebug, "listen");
+    reinterpret_cast<TSCEndpointPtr *>(nativeEndpoint)->get()->registerEndpoint(true, true);
 }
 
 /*
@@ -28,9 +28,9 @@ JNIEXPORT void JNICALL Java_com_twilio_conversations_impl_ConversationsClientImp
  * Signature: (J)V
  */
 JNIEXPORT void JNICALL Java_com_twilio_conversations_impl_ConversationsClientImpl_unlisten
-  (JNIEnv *env, jobject obj, jlong nativeEndpoint) {
-	TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK, kTSCoreLogLevelDebug, "unlisten");
-	reinterpret_cast<TSCEndpointPtr *>(nativeEndpoint)->get()->unregisterEndpoint();
+        (JNIEnv *env, jobject obj, jlong nativeEndpoint) {
+    TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK, kTSCoreLogLevelDebug, "unlisten");
+    reinterpret_cast<TSCEndpointPtr *>(nativeEndpoint)->get()->unregisterEndpoint();
 }
 
 
@@ -40,10 +40,10 @@ JNIEXPORT void JNICALL Java_com_twilio_conversations_impl_ConversationsClientImp
  * Signature: (JJ)V
  */
 JNIEXPORT void JNICALL Java_com_twilio_conversations_impl_ConversationsClientImpl_reject
-  (JNIEnv *env, jobject obj, jlong nativeEndpoint, jlong nativeSession) {
-	TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK, kTSCoreLogLevelDebug, "reject");
-	TSCSessionPtr *session = reinterpret_cast<TSCSessionPtr *>(nativeSession);
-	reinterpret_cast<TSCEndpointPtr *>(nativeEndpoint)->get()->reject(*session);
+        (JNIEnv *env, jobject obj, jlong nativeEndpoint, jlong nativeSession) {
+    TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK, kTSCoreLogLevelDebug, "reject");
+    TSCSessionPtr *session = reinterpret_cast<TSCSessionPtr *>(nativeSession);
+    reinterpret_cast<TSCEndpointPtr *>(nativeEndpoint)->get()->reject(*session);
 }
 
 /*
@@ -52,13 +52,12 @@ JNIEXPORT void JNICALL Java_com_twilio_conversations_impl_ConversationsClientImp
  * Signature: (J)V
  */
 JNIEXPORT void JNICALL Java_com_twilio_conversations_impl_ConversationsClientImpl_freeNativeHandle
-  (JNIEnv *env, jobject obj, jlong nativeEndpoint) {
-	TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK, kTSCoreLogLevelDebug, "freeNativeHandle");
-	TSCEndpointPtr *endpoint = reinterpret_cast<TSCEndpointPtr *>(nativeEndpoint);
-	if (endpoint != nullptr) {
-	    TSCSDK::instance()->destroyEndpoint(*endpoint);
-	    endpoint->reset();
-		delete endpoint;
-	}
-
+        (JNIEnv *env, jobject obj, jlong nativeEndpoint) {
+    TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK, kTSCoreLogLevelDebug, "freeNativeHandle");
+    TSCEndpointPtr *endpoint = reinterpret_cast<TSCEndpointPtr *>(nativeEndpoint);
+    if (endpoint != nullptr) {
+        TSCSDK::instance()->destroyEndpoint(*endpoint);
+        endpoint->reset();
+        delete endpoint;
+    }
 }

@@ -13,19 +13,19 @@ using namespace webrtc_jni;
 
 
 JNIEXPORT void JNICALL Java_com_twilio_conversations_impl_CameraCapturerImpl_stopVideoSource
-  (JNIEnv *env, jobject obj, jlong nativeSession)
+        (JNIEnv *env, jobject obj, jlong nativeSession)
 {
-	TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK, kTSCoreLogLevelDebug, "stopVideoSource");
-	TSCSessionPtr *session = reinterpret_cast<TSCSessionPtr *>(nativeSession);
-	session->get()->stopVideoSource();
+    TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK, kTSCoreLogLevelDebug, "stopVideoSource");
+    TSCSessionPtr *session = reinterpret_cast<TSCSessionPtr *>(nativeSession);
+    session->get()->stopVideoSource();
 }
 
 
 JNIEXPORT void JNICALL Java_com_twilio_conversations_impl_CameraCapturerImpl_restartVideoSource
-  (JNIEnv *env, jobject obj, jlong nativeSession)
+        (JNIEnv *env, jobject obj, jlong nativeSession)
 {
-	TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK, kTSCoreLogLevelDebug, "stopVideoSource");
-	TSCSessionPtr *session = reinterpret_cast<TSCSessionPtr *>(nativeSession);
-	session->get()->restartVideoSource();
+    TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK, kTSCoreLogLevelDebug, "stopVideoSource");
+    TSCSessionPtr *session = reinterpret_cast<TSCSessionPtr *>(nativeSession);
+    session->get()->restartVideoSource();
 }
 

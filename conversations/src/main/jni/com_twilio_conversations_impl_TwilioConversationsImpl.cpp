@@ -36,7 +36,9 @@ extern "C" jint JNIEXPORT JNICALL JNI_OnLoad(JavaVM *jvm, void *reserved) {
     TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK, kTSCoreLogLevelDebug, "JNI_OnLoad");
     jint ret = InitGlobalJniVariables(jvm);
     if (ret < 0) {
-        TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK, kTSCoreLogLevelError, "InitGlobalJniVariables() failed");
+        TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK,
+                           kTSCoreLogLevelError,
+                           "InitGlobalJniVariables() failed");
         return -1;
     }
     LoadGlobalClassReferenceHolder();
@@ -80,8 +82,8 @@ JNIEXPORT jboolean JNICALL Java_com_twilio_conversations_impl_TwilioConversation
     }
 
     if (tscSdk != NULL &&
-            tscSdk->isInitialized() &&
-            !failure) {
+        tscSdk->isInitialized() &&
+        !failure) {
         return JNI_TRUE;
     }
 
@@ -99,7 +101,7 @@ JNIEXPORT void JNICALL Java_com_twilio_conversations_impl_TwilioConversationsImp
 }
 
 JNIEXPORT jlong JNICALL Java_com_twilio_conversations_impl_TwilioConversationsImpl_createEndpoint
-(JNIEnv *env, jobject obj, jobject j_accessMgr, jlong nativeEndpointObserver) {
+        (JNIEnv *env, jobject obj, jobject j_accessMgr, jlong nativeEndpointObserver) {
     TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK, kTSCoreLogLevelDebug, "createEndpoint");
 
     TSCOptions options;
@@ -132,21 +134,21 @@ JNIEXPORT jlong JNICALL Java_com_twilio_conversations_impl_TwilioConversationsIm
 
 
 JNIEXPORT void JNICALL Java_com_twilio_conversations_impl_TwilioConversationsImpl_setCoreLogLevel
-(JNIEnv *env, jobject obj, jint level) {
+        (JNIEnv *env, jobject obj, jint level) {
     TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK, kTSCoreLogLevelDebug, "setCoreLogLevel");
     TSCoreLogLevel coreLogLevel = static_cast<TSCoreLogLevel>(level);
     TSCLogger::instance()->setLogLevel(coreLogLevel);
 }
 
 JNIEXPORT jint JNICALL Java_com_twilio_conversations_impl_TwilioConversationsImpl_getCoreLogLevel
-(JNIEnv *env, jobject obj) {
+        (JNIEnv *env, jobject obj) {
     TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK, kTSCoreLogLevelDebug, "getCoreLogLevel");
     return TSCLogger::instance()->getLogLevel();
 }
 
 JNIEXPORT void JNICALL Java_com_twilio_conversations_impl_TwilioConversationsImpl_refreshRegistrations
-  (JNIEnv *, jobject) {
-	TSCSDK::instance()->refreshRegistrations();
+        (JNIEnv *, jobject) {
+    TSCSDK::instance()->refreshRegistrations();
 }
 
 

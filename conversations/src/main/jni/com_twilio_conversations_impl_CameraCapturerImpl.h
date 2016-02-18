@@ -9,10 +9,10 @@ extern "C" {
 #endif
 
 JNIEXPORT void JNICALL Java_com_twilio_conversations_impl_CameraCapturerImpl_stopVideoSource
-  (JNIEnv *, jobject, jlong);
+        (JNIEnv *, jobject, jlong);
 
 JNIEXPORT void JNICALL Java_com_twilio_conversations_impl_CameraCapturerImpl_restartVideoSource
-  (JNIEnv *, jobject, jlong);
+        (JNIEnv *, jobject, jlong);
 
 #ifdef __cplusplus
 }

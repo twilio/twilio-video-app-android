@@ -15,9 +15,9 @@ using namespace twiliosdk;
 class AndroidPlatformInfoProvider : public TSCPlatformDataProvider {
 
 public:
-	AndroidPlatformInfoProvider(JNIEnv* jni, jobject context);
+    AndroidPlatformInfoProvider(JNIEnv* jni, jobject context);
 
-	virtual ~AndroidPlatformInfoProvider() {}
+    virtual ~AndroidPlatformInfoProvider() {}
 
     virtual const TSCPlatformInfoReport getReport() const;
 
