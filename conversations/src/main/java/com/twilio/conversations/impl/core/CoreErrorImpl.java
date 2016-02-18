@@ -2,11 +2,10 @@ package com.twilio.conversations.impl.core;
 
 
 class CoreErrorImpl implements CoreError {
-	
 	private String errorDomain;
 	private int errorCode;
 	private String errorMesage;
-	
+
 	public CoreErrorImpl(String errorDomain, int errorCode, String errorMessage) {
 		this.errorDomain = errorDomain;
 		this.errorCode = errorCode;
@@ -27,5 +26,4 @@ class CoreErrorImpl implements CoreError {
 	public String getMessage() {
 		return errorMesage;
 	}
-
 }

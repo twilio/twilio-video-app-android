@@ -1,10 +1,9 @@
 package com.twilio.conversations.impl.core;
 
 public interface MediaStreamInfo {
+    long getSessionId();
 
-	public long getSessionId();
-	
-	public long getStreamId();
-	
-	public String getParticipantAddress();
+    long getStreamId();
+
+    String getParticipantAddress();
 }

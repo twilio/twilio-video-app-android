@@ -3,13 +3,11 @@ package com.twilio.conversations.impl.core;
 import com.twilio.conversations.TrackOrigin;
 
 public interface TrackInfo {
+    String getParticipantIdentity();
 
-	String getParticipantIdentity();
+    String getTrackId();
 
-	String getTrackId();
+    TrackOrigin getTrackOrigin();
 
-	TrackOrigin getTrackOrigin();
-
-	boolean isEnabled();
-
+    boolean isEnabled();
 }

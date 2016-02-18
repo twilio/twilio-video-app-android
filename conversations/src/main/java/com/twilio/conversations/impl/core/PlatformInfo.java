@@ -19,8 +19,7 @@ public final class PlatformInfo {
             Pattern.compile(
                     "^(25[0-5]|2[0-4]\\d|[0-1]?\\d?\\d)(\\.(25[0-5]|2[0-4]\\d|[0-1]?\\d?\\d)){3}$");
 
-    private PlatformInfo(){
-    }
+    private PlatformInfo(){}
 
     static String getPlatfomName() {
         return PLATFORM_NAME;
@@ -45,10 +44,10 @@ public final class PlatformInfo {
     static String getHwDeviceIPAddress() {
         try {
             for (Enumeration<NetworkInterface> en =
-                    NetworkInterface.getNetworkInterfaces(); en.hasMoreElements();) {
+                 NetworkInterface.getNetworkInterfaces(); en.hasMoreElements();) {
                 NetworkInterface intf = en.nextElement();
                 for (Enumeration<InetAddress> enumIpAddr =
-                        intf.getInetAddresses(); enumIpAddr.hasMoreElements();) {
+                     intf.getInetAddresses(); enumIpAddr.hasMoreElements();) {
                     InetAddress inetAddress = enumIpAddr.nextElement();
                     if (!inetAddress.isLoopbackAddress() &&
                             isIPv4Address(inetAddress.getHostAddress())) {

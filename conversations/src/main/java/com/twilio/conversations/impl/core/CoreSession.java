@@ -2,18 +2,14 @@ package com.twilio.conversations.impl.core;
 
 import java.util.Set;
 
-
-
 public interface CoreSession {
-	
-	public void start();
-	
-	public void stop();
-	
-	public boolean enableVideo(boolean enabled, boolean paused);
-	
-	public void inviteParticipants(Set<String> participants);
-	
-	public boolean enableAudio(boolean enabled, boolean muted);
+    void start();
 
+    void stop();
+
+    boolean enableVideo(boolean enabled, boolean paused);
+
+    void inviteParticipants(Set<String> participants);
+
+    boolean enableAudio(boolean enabled, boolean muted);
 }
