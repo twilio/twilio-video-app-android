@@ -71,7 +71,6 @@ import retrofit.client.Response;
 import timber.log.Timber;
 
 public class TCClientActivity extends AppCompatActivity {
-
     private ConversationsClient conversationsClient;
     private OutgoingInvite outgoingInvite;
     private LocalMedia localMedia;
@@ -274,7 +273,7 @@ public class TCClientActivity extends AppCompatActivity {
         addParticipantActionFab.setOnClickListener(addClickListener());
         speakerActionFab.show();
         speakerActionFab.setOnClickListener(speakerClickListener());
-   }
+    }
 
     private void hideAction() {
         callActionFab.hide();
@@ -452,27 +451,27 @@ public class TCClientActivity extends AppCompatActivity {
     }
 
     public void pauseVideo() {
-            List<LocalVideoTrack> videoTracks =
-                    localMedia.getLocalVideoTracks();
-            if (videoTracks.size() > 0) {
-                LocalVideoTrack videoTrack = videoTracks.get(0);
-                boolean enable = !videoTrack.isEnabled();
-                boolean set = videoTrack.enable(enable);
-                if(set) {
-                    if (videoTrack.isEnabled()) {
-                        pauseActionFab.setImageDrawable(
-                                ContextCompat.getDrawable(TCClientActivity.this, R.drawable.ic_pause_green_24px));
-                    } else {
-                        pauseActionFab.setImageDrawable(
-                                ContextCompat.getDrawable(TCClientActivity.this, R.drawable.ic_pause_red_24px));
-                    }
+        List<LocalVideoTrack> videoTracks =
+                localMedia.getLocalVideoTracks();
+        if (videoTracks.size() > 0) {
+            LocalVideoTrack videoTrack = videoTracks.get(0);
+            boolean enable = !videoTrack.isEnabled();
+            boolean set = videoTrack.enable(enable);
+            if(set) {
+                if (videoTrack.isEnabled()) {
+                    pauseActionFab.setImageDrawable(
+                            ContextCompat.getDrawable(TCClientActivity.this, R.drawable.ic_pause_green_24px));
                 } else {
-                    Snackbar.make(conversationStatusTextView, "Pause action failed", Snackbar.LENGTH_LONG)
-                            .setAction("Action", null).show();
+                    pauseActionFab.setImageDrawable(
+                            ContextCompat.getDrawable(TCClientActivity.this, R.drawable.ic_pause_red_24px));
                 }
             } else {
-                Timber.w("Camera is not present. Unable to pause");
+                Snackbar.make(conversationStatusTextView, "Pause action failed", Snackbar.LENGTH_LONG)
+                        .setAction("Action", null).show();
             }
+        } else {
+            Timber.w("Camera is not present. Unable to pause");
+        }
     }
 
     private void setVideoStateIcon() {
@@ -517,7 +516,7 @@ public class TCClientActivity extends AppCompatActivity {
                     } else {
                         audioState = AudioState.ENABLED;
                     }
-               } else {
+                } else {
                     if (localMedia != null) {
                         boolean microphoneRemoved = localMedia.removeMicrophone();
                         if(microphoneRemoved) {
@@ -606,33 +605,33 @@ public class TCClientActivity extends AppCompatActivity {
                 if(participants.size() > 0) {
 
                     localMedia = createLocalMedia();
-                        outgoingInvite = conversationsClient.sendConversationInvite(participants,
-                                localMedia, new ConversationCallback() {
-                                    @Override
-                                    public void onConversation(Conversation conversation, TwilioConversationsException e) {
-                                        Timber.e("sendConversationInvite onConversation");
-                                        if (e == null) {
-                                            TCClientActivity.this.conversation = conversation;
-                                            conversation.setConversationListener(conversationListener());
-                                        } else {
-                                            if (e.getErrorCode() == TwilioConversations.CONVERSATION_REJECTED) {
-                                                Snackbar.make(conversationStatusTextView, "Invite rejected", Snackbar.LENGTH_LONG)
-                                                        .setAction("Action", null).show();
-                                            } else if (e.getErrorCode() == TwilioConversations.CONVERSATION_IGNORED) {
-                                                Snackbar.make(conversationStatusTextView, "Invite ignored", Snackbar.LENGTH_LONG)
-                                                        .setAction("Action", null).show();
-                                            } else  {
-                                                Snackbar.make(conversationStatusTextView, e.getMessage(), Snackbar.LENGTH_LONG)
-                                                        .setAction("Action", null).show();
-                                            }
-                                            hangup();
-                                            reset();
+                    outgoingInvite = conversationsClient.sendConversationInvite(participants,
+                            localMedia, new ConversationCallback() {
+                                @Override
+                                public void onConversation(Conversation conversation, TwilioConversationsException e) {
+                                    Timber.e("sendConversationInvite onConversation");
+                                    if (e == null) {
+                                        TCClientActivity.this.conversation = conversation;
+                                        conversation.setConversationListener(conversationListener());
+                                    } else {
+                                        if (e.getErrorCode() == TwilioConversations.CONVERSATION_REJECTED) {
+                                            Snackbar.make(conversationStatusTextView, "Invite rejected", Snackbar.LENGTH_LONG)
+                                                    .setAction("Action", null).show();
+                                        } else if (e.getErrorCode() == TwilioConversations.CONVERSATION_IGNORED) {
+                                            Snackbar.make(conversationStatusTextView, "Invite ignored", Snackbar.LENGTH_LONG)
+                                                    .setAction("Action", null).show();
+                                        } else  {
+                                            Snackbar.make(conversationStatusTextView, e.getMessage(), Snackbar.LENGTH_LONG)
+                                                    .setAction("Action", null).show();
                                         }
+                                        hangup();
+                                        reset();
                                     }
-                                });
-                        if (outgoingInvite != null) {
-                            setHangupAction();
-                        }
+                                }
+                            });
+                    if (outgoingInvite != null) {
+                        setHangupAction();
+                    }
 
                 } else {
                     participantEditText.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS);
@@ -690,24 +689,24 @@ public class TCClientActivity extends AppCompatActivity {
         return new DialogInterface.OnClickListener() {
             @Override
             public void onClick(final DialogInterface dialogInterface, int i) {
-                    localMedia = createLocalMedia();
-                    invite.accept(localMedia, new ConversationCallback() {
-                        @Override
-                        public void onConversation(Conversation conversation, TwilioConversationsException e) {
-                            Timber.e("onConversationInvite onConversation");
-                            if (e == null) {
-                                TCClientActivity.this.conversation = conversation;
-                                conversation.setConversationListener(conversationListener());
-                            } else if (e.getErrorCode() == TwilioConversations.TOO_MANY_ACTIVE_CONVERSATIONS) {
-                                Timber.w(e.getMessage());
-                                conversationsClientStatusTextView.setText("Unable to accept call. Too many active conversations.");
-                            } else {
-                                hangup();
-                                reset();
-                            }
+                localMedia = createLocalMedia();
+                invite.accept(localMedia, new ConversationCallback() {
+                    @Override
+                    public void onConversation(Conversation conversation, TwilioConversationsException e) {
+                        Timber.e("onConversationInvite onConversation");
+                        if (e == null) {
+                            TCClientActivity.this.conversation = conversation;
+                            conversation.setConversationListener(conversationListener());
+                        } else if (e.getErrorCode() == TwilioConversations.TOO_MANY_ACTIVE_CONVERSATIONS) {
+                            Timber.w(e.getMessage());
+                            conversationsClientStatusTextView.setText("Unable to accept call. Too many active conversations.");
+                        } else {
+                            hangup();
+                            reset();
                         }
-                    });
-                    setHangupAction();
+                    }
+                });
+                setHangupAction();
             }
         };
     }
@@ -738,7 +737,7 @@ public class TCClientActivity extends AppCompatActivity {
             return;
         }
         conversationsClient.setAudioOutput(on ? AudioOutput.SPEAKERPHONE :
-                                                AudioOutput.HEADSET);
+                AudioOutput.HEADSET);
 
         if (on == true) {
             Drawable drawable = ContextCompat.getDrawable(TCClientActivity.this, R.drawable.ic_volume_down_white_24px);
@@ -850,8 +849,8 @@ public class TCClientActivity extends AppCompatActivity {
                     @Override
                     public void onFrameDimensionsChanged(int width, int height, int rotation) {
                         Timber.i("Participant onFrameDimensionsChanged [ width: " + width +
-                                    ", height: " + height +
-                                    ", rotation: " + rotation +
+                                ", height: " + height +
+                                ", rotation: " + rotation +
                                 " ]");
                     }
                 });
@@ -1081,5 +1080,4 @@ public class TCClientActivity extends AppCompatActivity {
         }
         return localMedia;
     }
-
 }

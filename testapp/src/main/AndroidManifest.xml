@@ -38,5 +38,4 @@
 
         <activity android:name="net.hockeyapp.android.UpdateActivity" />
     </application>
-
 </manifest>

@@ -72,7 +72,7 @@ public class TCRegistrationActivity extends AppCompatActivity {
     public void requestPermissions(){
         if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.CAMERA) ||
                 ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.RECORD_AUDIO) ||
-            ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+                ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
             Toast.makeText(this,
                     "Camera, Microphone, and Writing to External Storage permissions are requested. Please enabled them in App Settings.",
                     Toast.LENGTH_LONG).show();
@@ -192,5 +192,4 @@ public class TCRegistrationActivity extends AppCompatActivity {
         startActivity(intent);
         finish();
     }
-
 }

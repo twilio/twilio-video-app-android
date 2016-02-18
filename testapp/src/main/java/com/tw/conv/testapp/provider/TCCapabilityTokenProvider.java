@@ -38,11 +38,10 @@ public class TCCapabilityTokenProvider {
     }
 
     private static TokenService tokenService = new RestAdapter.Builder()
-                .setEndpoint("https://simple-signaling.appspot.com")
-                .setRequestInterceptor(new TwilioAuthorizationInterceptor())
-                .build()
-                .create(TokenService.class);
-
+            .setEndpoint("https://simple-signaling.appspot.com")
+            .setRequestInterceptor(new TwilioAuthorizationInterceptor())
+            .build()
+            .create(TokenService.class);
 
 
     public static void obtainTwilioCapabilityToken(String username, Callback<String> callback) {
