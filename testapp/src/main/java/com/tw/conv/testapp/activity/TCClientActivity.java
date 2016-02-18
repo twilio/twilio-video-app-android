@@ -237,8 +237,10 @@ public class TCClientActivity extends AppCompatActivity {
     }
 
     private void disposeConversationsClient() {
-        conversationsClient.dispose();
-        conversationsClient = null;
+        if (conversationsClient != null) {
+            conversationsClient.dispose();
+            conversationsClient = null;
+        }
     }
 
     private void destroyConversationsSdk() {
