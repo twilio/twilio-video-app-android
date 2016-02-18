@@ -1,4 +1,4 @@
-package com.twilio.rtc.conversations.testapp.activity;
+package com.tw.conv.testapp.activity;
 
 import android.Manifest;
 import android.app.ProgressDialog;
@@ -18,10 +18,10 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.twilio.rtc.conversations.testapp.BuildConfig;
-import com.twilio.rtc.conversations.testapp.R;
-import com.twilio.rtc.conversations.testapp.TestAppApplication;
-import com.twilio.rtc.conversations.testapp.provider.TCCapabilityTokenProvider;
+import com.tw.conv.testapp.BuildConfig;
+import com.tw.conv.testapp.R;
+import com.tw.conv.testapp.TestAppApplication;
+import com.tw.conv.testapp.provider.TCCapabilityTokenProvider;
 import com.twilio.conversations.TwilioConversations;
 
 import net.hockeyapp.android.CrashManager;

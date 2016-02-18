@@ -1,4 +1,4 @@
-package com.twilio.rtc.conversations.testapp.provider;
+package com.tw.conv.testapp.provider;
 
 import android.util.Base64;
 

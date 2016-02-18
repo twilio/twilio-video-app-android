@@ -1,4 +1,4 @@
-package com.twilio.rtc.conversations.testapp.activity;
+package com.tw.conv.testapp.activity;
 
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -23,14 +23,14 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.tw.conv.testapp.R;
 import com.twilio.common.TwilioAccessManager;
 import com.twilio.common.TwilioAccessManagerFactory;
 import com.twilio.common.TwilioAccessManagerListener;
 import com.twilio.conversations.TwilioConversationsException;
-import com.twilio.rtc.conversations.testapp.R;
-import com.twilio.rtc.conversations.testapp.dialog.Dialog;
-import com.twilio.rtc.conversations.testapp.provider.TCCapabilityTokenProvider;
-import com.twilio.rtc.conversations.testapp.util.ParticipantParser;
+import com.tw.conv.testapp.dialog.Dialog;
+import com.tw.conv.testapp.provider.TCCapabilityTokenProvider;
+import com.tw.conv.testapp.util.ParticipantParser;
 import com.twilio.conversations.AudioTrack;
 import com.twilio.conversations.AudioOutput;
 import com.twilio.conversations.CameraCapturer;

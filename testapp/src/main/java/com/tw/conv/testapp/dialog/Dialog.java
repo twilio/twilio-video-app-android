@@ -1,11 +1,11 @@
-package com.twilio.rtc.conversations.testapp.dialog;
+package com.tw.conv.testapp.dialog;
 
 import android.content.Context;
 import android.content.DialogInterface;
 import android.support.v7.app.AlertDialog;
 import android.widget.EditText;
 
-import com.twilio.rtc.conversations.testapp.R;
+import com.tw.conv.testapp.R;
 
 public class Dialog {
 

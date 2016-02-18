@@ -1,4 +1,4 @@
-package com.twilio.rtc.conversations.testapp.util;
+package com.tw.conv.testapp.util;
 
 import java.util.HashSet;
 import java.util.Set;
