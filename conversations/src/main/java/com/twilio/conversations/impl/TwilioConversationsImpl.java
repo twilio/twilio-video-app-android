@@ -50,7 +50,7 @@ public class TwilioConversationsImpl {
 
     private static volatile TwilioConversationsImpl instance;
     private static int level = 0;
-    protected Context context;
+    protected Context applicationContext;
     private boolean initialized;
     private boolean initializing;
     private ExecutorService refreshRegExecutor = Executors.newSingleThreadExecutor();
@@ -176,7 +176,7 @@ public class TwilioConversationsImpl {
         }
 
         initializing = true;
-        this.context = context;
+        this.applicationContext = context.getApplicationContext();
 
         PackageManager pm = context.getPackageManager();
         PackageInfo pinfo = null;
@@ -224,7 +224,7 @@ public class TwilioConversationsImpl {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                boolean success = initCore(context);
+                boolean success = initCore(applicationContext);
                 if (!success) {
                     initializing = false;
                     initialized = false;
@@ -236,7 +236,7 @@ public class TwilioConversationsImpl {
                     });
                 } else {
                     Application application = (Application)
-                            TwilioConversationsImpl.this.context.getApplicationContext();
+                            TwilioConversationsImpl.this.applicationContext;
                     AlarmManager alarmManager = (AlarmManager) context
                             .getSystemService(Context.ALARM_SERVICE);
 
@@ -278,8 +278,8 @@ public class TwilioConversationsImpl {
             public void run() {
                 Queue<ConversationsClientImpl> clientsDisposing = new ArrayDeque<>();
                 Application application = (Application)
-                        TwilioConversationsImpl.this.context.getApplicationContext();
-                AlarmManager alarmManager = (AlarmManager) context
+                        TwilioConversationsImpl.this.applicationContext.getApplicationContext();
+                AlarmManager alarmManager = (AlarmManager) applicationContext
                         .getSystemService(Context.ALARM_SERVICE);
 
                 alarmManager.cancel(wakeUpPendingIntent);
@@ -326,7 +326,7 @@ public class TwilioConversationsImpl {
                                                              Map<String, String> options,
                                                              ConversationsClientListener inListener) {
         if(options != null && accessManager != null) {
-            final ConversationsClientImpl conversationsClient = new ConversationsClientImpl(context,
+            final ConversationsClientImpl conversationsClient = new ConversationsClientImpl(applicationContext,
                     accessManager, inListener);
             long nativeEndpointObserverHandle = conversationsClient.getEndpointObserverHandle();
             if (nativeEndpointObserverHandle == 0) {
@@ -416,16 +416,16 @@ public class TwilioConversationsImpl {
     }
 
     private void registerConnectivityBroadcastReceiver() {
-        if (context != null) {
-            context.registerReceiver(connectivityChangeReceiver,
+        if (applicationContext != null) {
+            applicationContext.registerReceiver(connectivityChangeReceiver,
                     new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
             observingConnectivity = true;
         }
     }
 
     private void unregisterConnectivityBroadcastReceiver() {
-        if (context != null && connectivityChangeReceiver != null) {
-            context.unregisterReceiver(connectivityChangeReceiver);
+        if (applicationContext != null && connectivityChangeReceiver != null) {
+            applicationContext.unregisterReceiver(connectivityChangeReceiver);
             observingConnectivity = false;
         }
     }
