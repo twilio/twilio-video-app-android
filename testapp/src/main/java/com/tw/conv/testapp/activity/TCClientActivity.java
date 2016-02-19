@@ -140,7 +140,7 @@ public class TCClientActivity extends AppCompatActivity {
     /**
      * FIXME
      * This is a result of not being able to use explicit intents with dynamically registered
-     * receives. So what we do is have this receiver rebroadcast via the LocalBroadcastManager
+     * receivers. So what we do is have this receiver rebroadcast via the LocalBroadcastManager
      * so that that explicit intent can reach our dynamically registered receiver that
      * performs the rejection. This is pretty bad and would be avoidable if the IncomingInvite
      * was parcelable. If this were true we could just pass the invite in a bundle.
@@ -170,10 +170,11 @@ public class TCClientActivity extends AppCompatActivity {
         @Override
         public void onReceive(Context context, Intent intent) {
             if (incomingInvite != null) {
-                rejectInvite(incomingInvite);
-                NotificationManager mNotificationManager =
+                NotificationManager notificationManager =
                         (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-                mNotificationManager.cancel(INCOMING_CALL_NOTIFICATION_ID);
+
+                rejectInvite(incomingInvite);
+                notificationManager.cancel(INCOMING_CALL_NOTIFICATION_ID);
             }
         }
     }
@@ -259,6 +260,8 @@ public class TCClientActivity extends AppCompatActivity {
     @Override
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
+        NotificationManager notificationManager  =
+                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
         /**
          * FIXME
@@ -269,9 +272,7 @@ public class TCClientActivity extends AppCompatActivity {
         localMedia = createLocalMedia();
         acceptInvite(incomingInvite);
         setHangupAction();
-        NotificationManager mNotificationManager =
-                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-        mNotificationManager.cancel(INCOMING_CALL_NOTIFICATION_ID);
+        notificationManager.cancel(INCOMING_CALL_NOTIFICATION_ID);
     }
 
     @Override
@@ -475,6 +476,9 @@ public class TCClientActivity extends AppCompatActivity {
                             .setText("onIncomingInvite" + incomingInvite.getInvitee());
                     showInviteDialog(incomingInvite);
                 } else {
+                    NotificationManager notificationManager =
+                            (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+
                     /**
                      * Pending intents are often reused and this results in some not being
                      * triggered correctly so we explicitly cancel any existing intents first.
@@ -498,9 +502,8 @@ public class TCClientActivity extends AppCompatActivity {
                                     .addAction(0, "Accept", getAcceptPendingIntent())
                                     .setContentText(getString(R.string.incoming_call));
 
-                    NotificationManager mNotificationManager =
-                            (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-                    mNotificationManager.notify(INCOMING_CALL_NOTIFICATION_ID,
+
+                    notificationManager.notify(INCOMING_CALL_NOTIFICATION_ID,
                             mBuilder.build());
                 }
             }
@@ -515,9 +518,9 @@ public class TCClientActivity extends AppCompatActivity {
                             incomingInvite.getInvitee() + " terminated", Snackbar.LENGTH_LONG)
                             .setAction("Action", null).show();
                 } else {
-                    NotificationManager mNotificationManager =
+                    NotificationManager notificationManager =
                             (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-                    mNotificationManager.cancel(INCOMING_CALL_NOTIFICATION_ID);
+                    notificationManager.cancel(INCOMING_CALL_NOTIFICATION_ID);
                 }
             }
         };
