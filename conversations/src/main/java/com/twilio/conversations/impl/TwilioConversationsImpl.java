@@ -13,7 +13,9 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import android.app.Activity;
+import android.app.AlarmManager;
 import android.app.Application;
+import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -35,6 +37,9 @@ import com.twilio.conversations.impl.util.CallbackHandler;
 
 
 public class TwilioConversationsImpl {
+    private static final int REQUEST_CODE_WAKEUP = 100;
+    private static final long BACKGROUND_WAKEUP_INTERVAL = 10 * 60 * 1000;
+
     static {
         // We rename this artifact so we do not clash with
         // webrtc java classes expecting this native so
@@ -50,6 +55,13 @@ public class TwilioConversationsImpl {
     private boolean initializing;
     private ExecutorService refreshRegExecutor = Executors.newSingleThreadExecutor();
 
+    public static class WakeUpReceiver extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            getInstance().onApplicationWakeUp();
+        }
+    }
+    private PendingIntent wakeUpPendingIntent;
     private class ApplicationForegroundTracker implements Application.ActivityLifecycleCallbacks {
         private Activity currentActivity;
         @Override
@@ -225,8 +237,22 @@ public class TwilioConversationsImpl {
                 } else {
                     Application application = (Application)
                             TwilioConversationsImpl.this.context.getApplicationContext();
+                    AlarmManager alarmManager = (AlarmManager) context
+                            .getSystemService(Context.ALARM_SERVICE);
 
+                    // Wake up periodically to refresh connections
+                    wakeUpPendingIntent = PendingIntent.getBroadcast(context,
+                            REQUEST_CODE_WAKEUP,
+                            new Intent(context, WakeUpReceiver.class),
+                            PendingIntent.FLAG_UPDATE_CURRENT);
+                    alarmManager.setInexactRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP,
+                            BACKGROUND_WAKEUP_INTERVAL,
+                            BACKGROUND_WAKEUP_INTERVAL,
+                            wakeUpPendingIntent);
+
+                    // Give hints to the core on application visibility events
                     application.registerActivityLifecycleCallbacks(applicationForegroundTracker);
+
                     initialized = true;
                     initializing = false;
                     handler.post(new Runnable() {
@@ -253,7 +279,10 @@ public class TwilioConversationsImpl {
                 Queue<ConversationsClientImpl> clientsDisposing = new ArrayDeque<>();
                 Application application = (Application)
                         TwilioConversationsImpl.this.context.getApplicationContext();
+                AlarmManager alarmManager = (AlarmManager) context
+                        .getSystemService(Context.ALARM_SERVICE);
 
+                alarmManager.cancel(wakeUpPendingIntent);
                 application.unregisterActivityLifecycleCallbacks(applicationForegroundTracker);
 
                 // Process clients and determine which ones need to be closed
@@ -403,6 +432,7 @@ public class TwilioConversationsImpl {
 
     private native boolean initCore(Context context);
     private native void onApplicationForeground();
+    private native void onApplicationWakeUp();
     private native void onApplicationBackground();
     private native void destroyCore();
     private native long createEndpoint(TwilioAccessManager accessManager,

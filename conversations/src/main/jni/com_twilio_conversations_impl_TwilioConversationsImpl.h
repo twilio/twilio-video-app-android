@@ -25,6 +25,14 @@ JNIEXPORT void JNICALL Java_com_twilio_conversations_impl_TwilioConversationsImp
 
 /*
  * Class:     com_twilio_conversations_impl_TwilioConversationsImpl
+ * Method:    onApplicationWakeUp
+ * Signature: ()J
+ */
+JNIEXPORT void JNICALL Java_com_twilio_conversations_impl_TwilioConversationsImpl_onApplicationWakeUp
+        (JNIEnv *, jobject);
+
+/*
+ * Class:     com_twilio_conversations_impl_TwilioConversationsImpl
  * Method:    onApplicationBackground
  * Signature: ()J
  */
