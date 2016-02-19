@@ -33,7 +33,8 @@
         <activity
             android:name="com.tw.conv.testapp.activity.TCClientActivity"
             android:label="@string/title_activity_client"
-            android:configChanges="orientation|screenSize" >
+            android:configChanges="orientation|screenSize"
+            android:launchMode="singleTop">
         </activity>
 
         <activity android:name="net.hockeyapp.android.UpdateActivity" />
