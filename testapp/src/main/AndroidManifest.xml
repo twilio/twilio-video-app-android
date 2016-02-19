@@ -37,6 +37,8 @@
             android:launchMode="singleTop">
         </activity>
 
+        <receiver android:name=".activity.TCClientActivity$Rebroadcaster" />
+
         <activity android:name="net.hockeyapp.android.UpdateActivity" />
     </application>
 </manifest>

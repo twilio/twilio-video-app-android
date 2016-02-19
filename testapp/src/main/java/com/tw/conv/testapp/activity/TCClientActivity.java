@@ -13,8 +13,8 @@ import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.NotificationCompat;
-import android.support.v4.app.TaskStackBuilder;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.view.HapticFeedbackConstants;
@@ -70,7 +70,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
-import java.util.Random;
 import java.util.Set;
 
 import retrofit.Callback;
@@ -79,9 +78,13 @@ import retrofit.client.Response;
 import timber.log.Timber;
 
 public class TCClientActivity extends AppCompatActivity {
-    private static final int INCOMING_CALL_NOTIFICATION_ID = 1000;
+    private static final int REQUEST_CODE_REJECT_INCOMING_CALL = 1000;
+    private static final int REQUEST_CODE_ACCEPT_INCOMING_CALL = 1001;
+    private static final int INCOMING_CALL_NOTIFICATION_ID = 1002;
     private static final String ACTION_REJECT_INCOMING_CALL =
-            "com.tw.conv.testapp.action.REJET_INCOMING_CALL";
+            "com.tw.conv.testapp.action.REJECT_INCOMING_CALL";
+    private static final String ACTION_ACCEPT_INCOMING_CALL =
+            "com.tw.conv.testapp.action.ACCEPT_INCOMING_CALL";
 
     private ConversationsClient conversationsClient;
     private OutgoingInvite outgoingInvite;
@@ -130,7 +133,36 @@ public class TCClientActivity extends AppCompatActivity {
     private String capabilityToken;
     private TwilioAccessManager accessManager;
 
-    class RejectIncomingCallReceiver extends BroadcastReceiver {
+    /**
+     * FIXME
+     * This is a result of not being able to use explicit intents with dynamically registered
+     * receives. So what we do is have this receiver rebroadcast via the LocalBroadcastManager
+     * so that that explicit intent can reach our dynamically registered receiver that
+     * performs the rejection. This is pretty bad and would be avoidable if the IncomingInvite
+     * was parcelable. If this were true we could just pass the invite in a bundle.
+     *
+     * For documentation on this hack see...
+     *
+     * http://streamingcon.blogspot.com/2014/04/dynamic-broadcastreceiver-registration.html
+     */
+    public static class Rebroadcaster extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Timber.d("Received broadcast from notification");
+            LocalBroadcastManager manager = LocalBroadcastManager.getInstance(context);
+            if (manager == null)
+                return;
+            Intent modifiedIntent = new Intent(intent);
+            modifiedIntent.setAction(ACTION_REJECT_INCOMING_CALL);
+            modifiedIntent.setComponent(null);
+            manager.sendBroadcast(modifiedIntent);
+        }
+    }
+
+    /**
+     * Here is the actual receiver that performs the reject when the app is in the background
+     */
+    public class RejectIncomingCallReceiver extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
             if (incomingInvite != null) {
@@ -141,7 +173,8 @@ public class TCClientActivity extends AppCompatActivity {
             }
         }
     }
-    private final BroadcastReceiver rejectIncomingInviteReceiver = new RejectIncomingCallReceiver();
+    private final RejectIncomingCallReceiver rejectIncomingInviteReceiver =
+            new RejectIncomingCallReceiver();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -182,8 +215,10 @@ public class TCClientActivity extends AppCompatActivity {
             capabilityToken = savedInstanceState.getString(TCCapabilityTokenProvider.CAPABILITY_TOKEN);
         }
 
-        accessManager = TwilioAccessManagerFactory.createAccessManager(capabilityToken, accessManagerListener());
-        conversationsClient = TwilioConversations.createConversationsClient(accessManager, conversationsClientListener());
+        accessManager = TwilioAccessManagerFactory.createAccessManager(capabilityToken,
+                accessManagerListener());
+        conversationsClient = TwilioConversations.createConversationsClient(accessManager,
+                conversationsClientListener());
 
 
         cameraCapturer = CameraCapturerFactory.createCameraCapturer(
@@ -202,11 +237,7 @@ public class TCClientActivity extends AppCompatActivity {
         setSpeakerphoneOn(true);
         setCallAction();
         startPreview();
-
-        IntentFilter intentFilter = new IntentFilter();
-        intentFilter.addAction(ACTION_REJECT_INCOMING_CALL);
-        intentFilter.addCategory(getPackageName());
-        registerReceiver(rejectIncomingInviteReceiver, intentFilter);
+        registerRejectReceiver();
     }
 
     @Override
@@ -214,10 +245,10 @@ public class TCClientActivity extends AppCompatActivity {
         super.onNewIntent(intent);
 
         /**
-         * TODO
-         * This will only occur when new invite has been accepted. However, this is a little
-         * bit of a hack. We need to make the IncomingInvite Parcelable so the developer
-         * does not have to maintain so much state
+         * FIXME
+         * This will only occur when new invite has been accepted in the background.
+         * However, this is a little bit of a hack. We need to make the IncomingInvite
+         * Parcelable so the developer does not have to maintain so much state
          */
         localMedia = createLocalMedia();
         acceptInvite(incomingInvite);
@@ -319,7 +350,7 @@ public class TCClientActivity extends AppCompatActivity {
 
     @Override
     protected void onDestroy() {
-        unregisterReceiver(rejectIncomingInviteReceiver);
+        unregisterRejectReceiver();
         super.onDestroy();
     }
 
@@ -397,9 +428,11 @@ public class TCClientActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onFailedToStartListening(ConversationsClient conversationsClient, TwilioConversationsException e) {
+            public void onFailedToStartListening(ConversationsClient conversationsClient,
+                                                 TwilioConversationsException e) {
                 Timber.e(e.getMessage());
-                conversationsClientStatusTextView.setText("onFailedToStartListening: " + e.getMessage());
+                conversationsClientStatusTextView
+                        .setText("onFailedToStartListening: " + e.getMessage());
             }
 
             @Override
@@ -411,7 +444,13 @@ public class TCClientActivity extends AppCompatActivity {
                             .setText("onIncomingInvite" + incomingInvite.getInvitee());
                     showInviteDialog(incomingInvite);
                 } else {
-                    // XXX workaround for this crap
+                    /**
+                     * Pending intents are often reused and this results in some not being
+                     * triggered correctly so we explicitely cancel any existing intents first.
+                     * This is a known bug and workaround seen at
+                     *
+                     * https://code.google.com/p/android/issues/detail?id=61850
+                     */
                     getRejectPendingIntent().cancel();
                     getAcceptPendingIntent().cancel();
 
@@ -424,17 +463,12 @@ public class TCClientActivity extends AppCompatActivity {
                                     .setDefaults(NotificationCompat.DEFAULT_ALL)
                                     .setCategory(NotificationCompat.CATEGORY_CALL)
                                     .setShowWhen(true)
-                                    .addAction(R.drawable.ic_call_black_24dp,
-                                            "Decline",
-                                            getRejectPendingIntent())
-                                    .addAction(R.drawable.ic_call_white_24px,
-                                            "Accept",
-                                            getAcceptPendingIntent())
+                                    .addAction(0, "Decline", getRejectPendingIntent())
+                                    .addAction(0, "Accept", getAcceptPendingIntent())
                                     .setContentText(getString(R.string.incoming_call));
 
                     NotificationManager mNotificationManager =
                             (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-                    // mId allows you to update the notification later on.
                     mNotificationManager.notify(INCOMING_CALL_NOTIFICATION_ID,
                             mBuilder.build());
                 }
@@ -444,7 +478,8 @@ public class TCClientActivity extends AppCompatActivity {
             public void onIncomingInviteCancelled(ConversationsClient conversationsClient, IncomingInvite incomingInvite) {
                 if (!inBackground) {
                     alertDialog.dismiss();
-                    Snackbar.make(conversationStatusTextView, "Invite from " + incomingInvite.getInvitee() + " terminated", Snackbar.LENGTH_LONG)
+                    Snackbar.make(conversationStatusTextView, "Invite from " +
+                            incomingInvite.getInvitee() + " terminated", Snackbar.LENGTH_LONG)
                             .setAction("Action", null).show();
                 } else {
                     NotificationManager mNotificationManager =
@@ -452,7 +487,6 @@ public class TCClientActivity extends AppCompatActivity {
                     mNotificationManager.cancel(INCOMING_CALL_NOTIFICATION_ID);
                 }
             }
-
         };
     }
 
@@ -1206,25 +1240,41 @@ public class TCClientActivity extends AppCompatActivity {
     }
 
     private PendingIntent getRejectPendingIntent() {
-        Intent incomingCallRejectIntent = new Intent(this,
-                RejectIncomingCallReceiver.class);
-        incomingCallRejectIntent.setAction(ACTION_REJECT_INCOMING_CALL);
-        incomingCallRejectIntent.addCategory(getPackageName());
+        Intent incomingCallRejectIntent = new Intent();
+        incomingCallRejectIntent.setClass(this, Rebroadcaster.class);
 
         return PendingIntent.getBroadcast(this,
-                new Random().nextInt(),
+                REQUEST_CODE_REJECT_INCOMING_CALL,
                 incomingCallRejectIntent,
                 PendingIntent.FLAG_UPDATE_CURRENT);
     }
 
     private PendingIntent getAcceptPendingIntent() {
         Intent incomingCallAcceptIntent = new Intent(this, TCClientActivity.class);
+        incomingCallAcceptIntent.setAction(ACTION_ACCEPT_INCOMING_CALL);
         incomingCallAcceptIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP |
                 Intent.FLAG_ACTIVITY_SINGLE_TOP);
 
         return PendingIntent.getActivity(this,
-                2,
+                REQUEST_CODE_ACCEPT_INCOMING_CALL,
                 incomingCallAcceptIntent,
                 PendingIntent.FLAG_UPDATE_CURRENT);
+    }
+
+    private void registerRejectReceiver() {
+        LocalBroadcastManager manager = LocalBroadcastManager.getInstance(this);
+
+        if (manager != null) {
+            manager.registerReceiver(rejectIncomingInviteReceiver,
+                    new IntentFilter(ACTION_REJECT_INCOMING_CALL));
+        }
+    }
+
+    private void unregisterRejectReceiver() {
+        LocalBroadcastManager manager = LocalBroadcastManager.getInstance(this);
+
+        if (manager != null) {
+            manager.unregisterReceiver(rejectIncomingInviteReceiver);
+        }
     }
 }
