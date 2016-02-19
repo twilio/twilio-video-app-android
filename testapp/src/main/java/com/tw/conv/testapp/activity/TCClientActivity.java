@@ -477,7 +477,7 @@ public class TCClientActivity extends AppCompatActivity {
                 } else {
                     /**
                      * Pending intents are often reused and this results in some not being
-                     * triggered correctly so we explicitely cancel any existing intents first.
+                     * triggered correctly so we explicitly cancel any existing intents first.
                      * This is a known bug and workaround seen at
                      *
                      * https://code.google.com/p/android/issues/detail?id=61850
@@ -506,7 +506,9 @@ public class TCClientActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onIncomingInviteCancelled(ConversationsClient conversationsClient, IncomingInvite incomingInvite) {
+            public void onIncomingInviteCancelled(ConversationsClient conversationsClient,
+                                                  IncomingInvite incomingInvite) {
+                TCClientActivity.this.incomingInvite = null;
                 if (!inBackground) {
                     alertDialog.dismiss();
                     Snackbar.make(conversationStatusTextView, "Invite from " +
@@ -908,6 +910,7 @@ public class TCClientActivity extends AppCompatActivity {
 
     private void rejectInvite(IncomingInvite incomingInvite) {
         incomingInvite.reject();
+        this.incomingInvite = null;
         setCallAction();
     }
 
