@@ -189,7 +189,9 @@ public class ConversationsClientImpl implements
     }
 
     @Override
-    public OutgoingInvite sendConversationInvite(Set<String> participants, LocalMedia localMedia, ConversationCallback conversationCallback) {
+    public OutgoingInvite sendConversationInvite(Set<String> participants,
+                                                 LocalMedia localMedia,
+                                                 ConversationCallback conversationCallback) {
         checkDisposed();
         if(participants == null || participants.size() == 0) {
             throw new IllegalStateException("Invite at least one participant");
@@ -210,8 +212,10 @@ public class ConversationsClientImpl implements
                 this, participants, localMedia, this, this);
 
         if (outgoingConversationImpl == null || outgoingConversationImpl.getNativeHandle() == 0) {
-            TwilioConversationsException exception = new TwilioConversationsException( TwilioConversations.CLIENT_DISCONNECTED,
-                    "Cannot create conversation while reconnecting. Wait for conversations client to reconnect and try again.");
+            TwilioConversationsException exception =
+                    new TwilioConversationsException(TwilioConversations.CLIENT_DISCONNECTED,
+                            "Cannot create conversation while reconnecting. " +
+                                    "Wait for conversations client to reconnect and try again.");
             conversationCallback.onConversation(null, exception);
             return null;
         }
@@ -472,7 +476,11 @@ public class ConversationsClientImpl implements
     public void onIncomingCallDidReceive(long nativeSession, String[] participants) {
         logger.d("onIncomingCallDidReceive");
 
-        ConversationImpl incomingConversationImpl = ConversationImpl.createIncomingConversation(this, nativeSession, participants, this);
+        ConversationImpl incomingConversationImpl =
+                ConversationImpl.createIncomingConversation(this,
+                        nativeSession,
+                        participants,
+                        this);
         if (incomingConversationImpl == null) {
             logger.e("Failed to create conversation");
             return;
@@ -480,7 +488,8 @@ public class ConversationsClientImpl implements
 
         conversations.add(incomingConversationImpl);
 
-        final IncomingInviteImpl incomingInviteImpl = IncomingInviteImpl.create(this, incomingConversationImpl);
+        final IncomingInviteImpl incomingInviteImpl = IncomingInviteImpl.create(this,
+                incomingConversationImpl);
         if (incomingInviteImpl == null) {
             logger.e("Failed to create IncomingInvite");
             return;
@@ -493,7 +502,8 @@ public class ConversationsClientImpl implements
             handler.post(new Runnable() {
                 @Override
                 public void run() {
-                    conversationsClientListener.onIncomingInvite(ConversationsClientImpl.this, incomingInviteImpl);
+                    conversationsClientListener.onIncomingInvite(ConversationsClientImpl.this,
+                            incomingInviteImpl);
                 }
             });
         }

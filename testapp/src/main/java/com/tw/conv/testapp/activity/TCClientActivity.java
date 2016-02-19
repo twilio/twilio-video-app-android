@@ -1,13 +1,20 @@
 package com.tw.conv.testapp.activity;
 
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.drawable.Drawable;
 import android.media.AudioManager;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.view.HapticFeedbackConstants;
@@ -16,6 +23,8 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
@@ -71,11 +80,20 @@ import retrofit.client.Response;
 import timber.log.Timber;
 
 public class TCClientActivity extends AppCompatActivity {
+    private static final int REQUEST_CODE_REJECT_INCOMING_CALL = 1000;
+    private static final int REQUEST_CODE_ACCEPT_INCOMING_CALL = 1001;
+    private static final int INCOMING_CALL_NOTIFICATION_ID = 1002;
+    private static final String ACTION_REJECT_INCOMING_CALL =
+            "com.tw.conv.testapp.action.REJECT_INCOMING_CALL";
+    private static final String ACTION_ACCEPT_INCOMING_CALL =
+            "com.tw.conv.testapp.action.ACCEPT_INCOMING_CALL";
+
     private ConversationsClient conversationsClient;
     private OutgoingInvite outgoingInvite;
     private LocalMedia localMedia;
     private boolean wasPreviewing = false;
     private boolean wasLive = false;
+    private boolean inBackground = false;
     private boolean loggingOut = false;
 
     private enum AudioState {
@@ -105,6 +123,7 @@ public class TCClientActivity extends AppCompatActivity {
     private FloatingActionButton muteActionFab;
     private FloatingActionButton addParticipantActionFab;
     private FloatingActionButton speakerActionFab;
+    private IncomingInvite incomingInvite;
     private Conversation conversation;
     private FrameLayout previewFrameLayout;
     private ViewGroup localContainer;
@@ -117,6 +136,50 @@ public class TCClientActivity extends AppCompatActivity {
     private AudioState audioState;
     private String capabilityToken;
     private TwilioAccessManager accessManager;
+
+    /**
+     * FIXME
+     * This is a result of not being able to use explicit intents with dynamically registered
+     * receivers. So what we do is have this receiver rebroadcast via the LocalBroadcastManager
+     * so that that explicit intent can reach our dynamically registered receiver that
+     * performs the rejection. This is pretty bad and would be avoidable if the IncomingInvite
+     * was parcelable. If this were true we could just pass the invite in a bundle.
+     *
+     * For documentation on this hack see...
+     *
+     * http://streamingcon.blogspot.com/2014/04/dynamic-broadcastreceiver-registration.html
+     */
+    public static class Rebroadcaster extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Timber.d("Received broadcast from notification");
+            LocalBroadcastManager manager = LocalBroadcastManager.getInstance(context);
+            if (manager == null)
+                return;
+            Intent modifiedIntent = new Intent(intent);
+            modifiedIntent.setAction(ACTION_REJECT_INCOMING_CALL);
+            modifiedIntent.setComponent(null);
+            manager.sendBroadcast(modifiedIntent);
+        }
+    }
+
+    /**
+     * Here is the actual receiver that performs the reject when the app is in the background
+     */
+    public class RejectIncomingCallReceiver extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (incomingInvite != null) {
+                NotificationManager notificationManager =
+                        (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+
+                rejectInvite(incomingInvite);
+                notificationManager.cancel(INCOMING_CALL_NOTIFICATION_ID);
+            }
+        }
+    }
+    private final RejectIncomingCallReceiver rejectIncomingInviteReceiver =
+            new RejectIncomingCallReceiver();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -157,8 +220,10 @@ public class TCClientActivity extends AppCompatActivity {
             capabilityToken = savedInstanceState.getString(TCCapabilityTokenProvider.CAPABILITY_TOKEN);
         }
 
-        accessManager = TwilioAccessManagerFactory.createAccessManager(capabilityToken, accessManagerListener());
-        conversationsClient = TwilioConversations.createConversationsClient(accessManager, conversationsClientListener());
+        accessManager = TwilioAccessManagerFactory.createAccessManager(capabilityToken,
+                accessManagerListener());
+        conversationsClient = TwilioConversations.createConversationsClient(accessManager,
+                conversationsClientListener());
 
 
         cameraCapturer = CameraCapturerFactory.createCameraCapturer(
@@ -177,6 +242,37 @@ public class TCClientActivity extends AppCompatActivity {
         setSpeakerphoneOn(true);
         setCallAction();
         startPreview();
+        registerRejectReceiver();
+    }
+
+    @Override
+    public Window getWindow() {
+        Window window = super.getWindow();
+
+        // So calls can be answered when screen is locked
+        window.addFlags(WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD);
+        window.addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED);
+        window.addFlags(WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON);
+
+        return window;
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        NotificationManager notificationManager  =
+                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+
+        /**
+         * FIXME
+         * This will only occur when new invite has been accepted in the background.
+         * However, this is a little bit of a hack. We need to make the IncomingInvite
+         * Parcelable so the developer does not have to maintain so much state
+         */
+        localMedia = createLocalMedia();
+        acceptInvite(incomingInvite);
+        setHangupAction();
+        notificationManager.cancel(INCOMING_CALL_NOTIFICATION_ID);
     }
 
     @Override
@@ -212,6 +308,59 @@ public class TCClientActivity extends AppCompatActivity {
     public void onSaveInstanceState(Bundle bundle) {
         super.onSaveInstanceState(bundle);
         bundle.putString(TCCapabilityTokenProvider.CAPABILITY_TOKEN, capabilityToken);
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+        inBackground = false;
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (conversationsClient != null && !conversationsClient.isListening()) {
+            conversationsClient.listen();
+        }
+        if(cameraCapturer != null && wasPreviewing) {
+            wasPreviewing = false;
+            startPreview();
+        } else if(isConversationOngoing()) {
+            LocalVideoTrack localVideoTrack = localMedia.getLocalVideoTracks().get(0);
+            if(localVideoTrack != null && wasLive) {
+                localVideoTrack.enable(true);
+                wasLive = false;
+            }
+        }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if(cameraCapturer != null && cameraCapturer.isPreviewing()) {
+            wasPreviewing = true;
+            stopPreview();
+        } else if(isConversationOngoing() && !localMedia.getLocalVideoTracks().isEmpty()) {
+            LocalVideoTrack localVideoTrack = localMedia.getLocalVideoTracks().get(0);
+            if(localVideoTrack != null && localVideoTrack.isEnabled()) {
+                localVideoTrack.enable(false);
+                wasLive = true;
+            }
+        }
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+
+        inBackground = true;
+    }
+
+    @Override
+    protected void onDestroy() {
+        unregisterRejectReceiver();
+        super.onDestroy();
     }
 
     private void startPreview() {
@@ -298,43 +447,8 @@ public class TCClientActivity extends AppCompatActivity {
         speakerActionFab.hide();
     }
 
-    public void onResume() {
-        super.onResume();
-        if (conversationsClient != null && !conversationsClient.isListening()) {
-            conversationsClient.listen();
-        }
-        if(cameraCapturer != null && wasPreviewing) {
-            wasPreviewing = false;
-            startPreview();
-        } else if(isConversationOngoing()) {
-            LocalVideoTrack localVideoTrack = localMedia.getLocalVideoTracks().get(0);
-            if(localVideoTrack != null && wasLive) {
-                localVideoTrack.enable(true);
-                wasLive = false;
-            }
-        }
-    }
-
-    public void onPause() {
-        super.onPause();
-        if (conversationsClient != null && conversationsClient.isListening() && !isConversationOngoing()) {
-            conversationsClient.unlisten();
-        }
-        if(cameraCapturer != null && cameraCapturer.isPreviewing()) {
-            wasPreviewing = true;
-            stopPreview();
-        } else if(isConversationOngoing() && !localMedia.getLocalVideoTracks().isEmpty()) {
-            LocalVideoTrack localVideoTrack = localMedia.getLocalVideoTracks().get(0);
-            if(localVideoTrack != null && localVideoTrack.isEnabled()) {
-                localVideoTrack.enable(false);
-                wasLive = true;
-            }
-        }
-    }
-
     private ConversationsClientListener conversationsClientListener() {
         return new ConversationsClientListener() {
-
             @Override
             public void onStartListeningForInvites(ConversationsClient conversationsClient) {
                 conversationsClientStatusTextView.setText("onStartListeningForInvites");
@@ -346,24 +460,69 @@ public class TCClientActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onFailedToStartListening(ConversationsClient conversationsClient, TwilioConversationsException e) {
+            public void onFailedToStartListening(ConversationsClient conversationsClient,
+                                                 TwilioConversationsException e) {
                 Timber.e(e.getMessage());
-                conversationsClientStatusTextView.setText("onFailedToStartListening: " + e.getMessage());
+                conversationsClientStatusTextView
+                        .setText("onFailedToStartListening: " + e.getMessage());
             }
 
             @Override
-            public void onIncomingInvite(ConversationsClient conversationsClient, IncomingInvite incomingInvite) {
-                conversationsClientStatusTextView.setText("onIncomingInvite" + incomingInvite.getInvitee());
-                showInviteDialog(incomingInvite);
+            public void onIncomingInvite(ConversationsClient conversationsClient,
+                                         IncomingInvite incomingInvite) {
+                TCClientActivity.this.incomingInvite = incomingInvite;
+                if (!inBackground) {
+                    conversationsClientStatusTextView
+                            .setText("onIncomingInvite" + incomingInvite.getInvitee());
+                    showInviteDialog(incomingInvite);
+                } else {
+                    NotificationManager notificationManager =
+                            (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+
+                    /**
+                     * Pending intents are often reused and this results in some not being
+                     * triggered correctly so we explicitly cancel any existing intents first.
+                     * This is a known bug and workaround seen at
+                     *
+                     * https://code.google.com/p/android/issues/detail?id=61850
+                     */
+                    getRejectPendingIntent().cancel();
+                    getAcceptPendingIntent().cancel();
+
+                    NotificationCompat.Builder mBuilder =
+                            new NotificationCompat.Builder(TCClientActivity.this)
+                                    .setSmallIcon(R.drawable.ic_videocam_green_24px)
+                                    .setOngoing(true)
+                                    .setContentTitle(incomingInvite.getInvitee())
+                                    .setPriority(NotificationCompat.PRIORITY_MAX)
+                                    .setDefaults(NotificationCompat.DEFAULT_ALL)
+                                    .setCategory(NotificationCompat.CATEGORY_CALL)
+                                    .setShowWhen(true)
+                                    .addAction(0, "Decline", getRejectPendingIntent())
+                                    .addAction(0, "Accept", getAcceptPendingIntent())
+                                    .setContentText(getString(R.string.incoming_call));
+
+
+                    notificationManager.notify(INCOMING_CALL_NOTIFICATION_ID,
+                            mBuilder.build());
+                }
             }
 
             @Override
-            public void onIncomingInviteCancelled(ConversationsClient conversationsClient, IncomingInvite incomingInvite) {
-                alertDialog.dismiss();
-                Snackbar.make(conversationStatusTextView, "Invite from " + incomingInvite.getInvitee() + " terminated", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+            public void onIncomingInviteCancelled(ConversationsClient conversationsClient,
+                                                  IncomingInvite incomingInvite) {
+                TCClientActivity.this.incomingInvite = null;
+                if (!inBackground) {
+                    alertDialog.dismiss();
+                    Snackbar.make(conversationStatusTextView, "Invite from " +
+                            incomingInvite.getInvitee() + " terminated", Snackbar.LENGTH_LONG)
+                            .setAction("Action", null).show();
+                } else {
+                    NotificationManager notificationManager =
+                            (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+                    notificationManager.cancel(INCOMING_CALL_NOTIFICATION_ID);
+                }
             }
-
         };
     }
 
@@ -595,13 +754,19 @@ public class TCClientActivity extends AppCompatActivity {
 
     private void showAddParticipantsDialog() {
         participantEditText = new EditText(this);
-        alertDialog = Dialog.createAddParticipantsDialog(participantEditText, addParticipantsClickListener(participantEditText), cancelAddParticipantsClickListener(), this);
+        alertDialog = Dialog.createAddParticipantsDialog(participantEditText,
+                addParticipantsClickListener(participantEditText),
+                cancelAddParticipantsClickListener(),
+                this);
         alertDialog.show();
     }
 
     private void showCallDialog() {
         participantEditText = new EditText(this);
-        alertDialog = Dialog.createCallParticipantsDialog(participantEditText, callParticipantClickListener(participantEditText), cancelCallClickListener(), this);
+        alertDialog = Dialog.createCallParticipantsDialog(participantEditText,
+                callParticipantClickListener(participantEditText),
+                cancelCallClickListener(),
+                this);
         alertDialog.show();
     }
 
@@ -660,7 +825,6 @@ public class TCClientActivity extends AppCompatActivity {
 
     private DialogInterface.OnClickListener cancelCallClickListener() {
         return new DialogInterface.OnClickListener() {
-
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
                 setCallAction();
@@ -698,7 +862,10 @@ public class TCClientActivity extends AppCompatActivity {
     }
 
     private void showInviteDialog(final IncomingInvite incomingInvite) {
-        alertDialog = Dialog.createInviteDialog(incomingInvite.getInvitee(), acceptCallClickListener(incomingInvite), rejectCallClickListener(incomingInvite), this);
+        alertDialog = Dialog.createInviteDialog(incomingInvite.getInvitee(),
+                acceptCallClickListener(incomingInvite),
+                rejectCallClickListener(incomingInvite),
+                this);
         alertDialog.show();
     }
 
@@ -708,25 +875,30 @@ public class TCClientActivity extends AppCompatActivity {
             @Override
             public void onClick(final DialogInterface dialogInterface, int i) {
                 localMedia = createLocalMedia();
-                invite.accept(localMedia, new ConversationCallback() {
-                    @Override
-                    public void onConversation(Conversation conversation, TwilioConversationsException e) {
-                        Timber.e("onConversationInvite onConversation");
-                        if (e == null) {
-                            TCClientActivity.this.conversation = conversation;
-                            conversation.setConversationListener(conversationListener());
-                        } else if (e.getErrorCode() == TwilioConversations.TOO_MANY_ACTIVE_CONVERSATIONS) {
-                            Timber.w(e.getMessage());
-                            conversationsClientStatusTextView.setText("Unable to accept call. Too many active conversations.");
-                        } else {
-                            hangup();
-                            reset();
-                        }
-                    }
-                });
+                acceptInvite(incomingInvite);
                 setHangupAction();
             }
         };
+    }
+
+    private void acceptInvite(IncomingInvite incomingInvite) {
+        incomingInvite.accept(localMedia, new ConversationCallback() {
+            @Override
+            public void onConversation(Conversation conversation, TwilioConversationsException e) {
+                Timber.e("onConversationInvite onConversation");
+                if (e == null) {
+                    TCClientActivity.this.conversation = conversation;
+                    conversation.setConversationListener(conversationListener());
+                } else if (e.getErrorCode() == TwilioConversations.TOO_MANY_ACTIVE_CONVERSATIONS) {
+                    Timber.w(e.getMessage());
+                    conversationsClientStatusTextView
+                            .setText("Unable to accept call. Too many active conversations.");
+                } else {
+                    hangup();
+                    reset();
+                }
+            }
+        });
     }
 
     private DialogInterface.OnClickListener rejectCallClickListener(
@@ -734,10 +906,15 @@ public class TCClientActivity extends AppCompatActivity {
         return new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                incomingInvite.reject();
-                setCallAction();
+                rejectInvite(incomingInvite);
             }
         };
+    }
+
+    private void rejectInvite(IncomingInvite incomingInvite) {
+        incomingInvite.reject();
+        this.incomingInvite = null;
+        setCallAction();
     }
 
     private CapturerErrorListener capturerErrorListener() {
@@ -1104,5 +1281,44 @@ public class TCClientActivity extends AppCompatActivity {
             localMedia.removeMicrophone();
         }
         return localMedia;
+    }
+
+    private PendingIntent getRejectPendingIntent() {
+        Intent incomingCallRejectIntent = new Intent();
+        incomingCallRejectIntent.setClass(this, Rebroadcaster.class);
+
+        return PendingIntent.getBroadcast(this,
+                REQUEST_CODE_REJECT_INCOMING_CALL,
+                incomingCallRejectIntent,
+                PendingIntent.FLAG_UPDATE_CURRENT);
+    }
+
+    private PendingIntent getAcceptPendingIntent() {
+        Intent incomingCallAcceptIntent = new Intent(this, TCClientActivity.class);
+        incomingCallAcceptIntent.setAction(ACTION_ACCEPT_INCOMING_CALL);
+        incomingCallAcceptIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP |
+                Intent.FLAG_ACTIVITY_SINGLE_TOP);
+
+        return PendingIntent.getActivity(this,
+                REQUEST_CODE_ACCEPT_INCOMING_CALL,
+                incomingCallAcceptIntent,
+                PendingIntent.FLAG_UPDATE_CURRENT);
+    }
+
+    private void registerRejectReceiver() {
+        LocalBroadcastManager manager = LocalBroadcastManager.getInstance(this);
+
+        if (manager != null) {
+            manager.registerReceiver(rejectIncomingInviteReceiver,
+                    new IntentFilter(ACTION_REJECT_INCOMING_CALL));
+        }
+    }
+
+    private void unregisterRejectReceiver() {
+        LocalBroadcastManager manager = LocalBroadcastManager.getInstance(this);
+
+        if (manager != null) {
+            manager.unregisterReceiver(rejectIncomingInviteReceiver);
+        }
     }
 }
