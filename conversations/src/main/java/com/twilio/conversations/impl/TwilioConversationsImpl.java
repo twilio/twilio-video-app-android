@@ -58,7 +58,9 @@ public class TwilioConversationsImpl {
     public static class WakeUpReceiver extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
-            getInstance().onApplicationWakeUp();
+            if (getInstance().isInitialized()) {
+                getInstance().onApplicationWakeUp();
+            }
         }
     }
     private PendingIntent wakeUpPendingIntent;
