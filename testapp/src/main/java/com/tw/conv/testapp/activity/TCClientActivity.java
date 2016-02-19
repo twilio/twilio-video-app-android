@@ -93,6 +93,8 @@ public class TCClientActivity extends AppCompatActivity {
     private LocalMedia localMedia;
     private boolean wasPreviewing = false;
     private boolean wasLive = false;
+    private boolean inBackground = false;
+    private boolean loggingOut = false;
 
     private enum AudioState {
         ENABLED,
@@ -285,23 +287,15 @@ public class TCClientActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_log_out:
+                // Will continue logout once the conversation has ended
+                loggingOut = true;
 
                 // End any current call
                 if (isConversationOngoing()) {
                     hangup();
-                    reset();
+                } else {
+                    logout();
                 }
-
-                // Teardown preview
-                if (cameraCapturer != null && cameraCapturer.isPreviewing()) {
-                    stopPreview();
-                    cameraCapturer = null;
-                }
-
-                // Teardown our client and sdk instance
-                disposeConversationsClient();
-                destroyConversationsSdk();
-                returnToRegistration();
 
                 return true;
             default:
@@ -346,7 +340,7 @@ public class TCClientActivity extends AppCompatActivity {
         if(cameraCapturer != null && cameraCapturer.isPreviewing()) {
             wasPreviewing = true;
             stopPreview();
-        } else if(isConversationOngoing()) {
+        } else if(isConversationOngoing() && !localMedia.getLocalVideoTracks().isEmpty()) {
             LocalVideoTrack localVideoTrack = localMedia.getLocalVideoTracks().get(0);
             if(localVideoTrack != null && localVideoTrack.isEnabled()) {
                 localVideoTrack.enable(false);
@@ -369,7 +363,9 @@ public class TCClientActivity extends AppCompatActivity {
     }
 
     private void startPreview() {
-        cameraCapturer.startPreview();
+        if (cameraCapturer != null) {
+            cameraCapturer.startPreview();
+        }
     }
 
     private void stopPreview() {
@@ -383,9 +379,32 @@ public class TCClientActivity extends AppCompatActivity {
                 outgoingInvite != null;
     }
 
+    private void logout() {
+        // Teardown preview
+        if (cameraCapturer != null && cameraCapturer.isPreviewing()) {
+            stopPreview();
+            cameraCapturer = null;
+        }
+
+        // Teardown our conversation, client, and sdk instance
+        disposeConversation();
+        disposeConversationsClient();
+        destroyConversationsSdk();
+        returnToRegistration();
+    }
+
+    private void disposeConversation() {
+        if (conversation != null) {
+            conversation.dispose();
+            conversation = null;
+        }
+    }
+
     private void disposeConversationsClient() {
-        conversationsClient.dispose();
-        conversationsClient = null;
+        if (conversationsClient != null) {
+            conversationsClient.dispose();
+            conversationsClient = null;
+        }
     }
 
     private void destroyConversationsSdk() {
@@ -426,8 +445,6 @@ public class TCClientActivity extends AppCompatActivity {
         callActionFab.hide();
         speakerActionFab.hide();
     }
-
-    private boolean inBackground = false;
 
     private ConversationsClientListener conversationsClientListener() {
         return new ConversationsClientListener() {
@@ -990,7 +1007,14 @@ public class TCClientActivity extends AppCompatActivity {
                     }
                 }
                 conversationStatusTextView.setText(status);
-                reset();
+
+                // If user is logging out we need to finish that process otherwise we just reset
+                if (loggingOut) {
+                    logout();
+                    loggingOut = false;
+                } else {
+                    reset();
+                }
             }
 
         };
