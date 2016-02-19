@@ -2,4 +2,8 @@
 <manifest
     xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.twilio.conversations">
+
+    <application>
+        <receiver android:name=".impl.TwilioConversationsImpl$WakeUpReceiver" />
+    </application>
 </manifest>

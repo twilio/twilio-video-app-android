@@ -12,6 +12,10 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import android.app.Activity;
+import android.app.AlarmManager;
+import android.app.Application;
+import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -20,6 +24,7 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.net.ConnectivityManager;
+import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
 
@@ -32,6 +37,9 @@ import com.twilio.conversations.impl.util.CallbackHandler;
 
 
 public class TwilioConversationsImpl {
+    private static final int REQUEST_CODE_WAKEUP = 100;
+    private static final long BACKGROUND_WAKEUP_INTERVAL = 10 * 60 * 1000;
+
     static {
         // We rename this artifact so we do not clash with
         // webrtc java classes expecting this native so
@@ -42,11 +50,63 @@ public class TwilioConversationsImpl {
 
     private static volatile TwilioConversationsImpl instance;
     private static int level = 0;
-    protected Context context;
+    protected Context applicationContext;
     private boolean initialized;
     private boolean initializing;
     private ExecutorService refreshRegExecutor = Executors.newSingleThreadExecutor();
 
+    public static class WakeUpReceiver extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (getInstance().isInitialized()) {
+                getInstance().onApplicationWakeUp();
+            }
+        }
+    }
+    private PendingIntent wakeUpPendingIntent;
+    private class ApplicationForegroundTracker implements Application.ActivityLifecycleCallbacks {
+        private Activity currentActivity;
+        @Override
+        public void onActivityCreated(Activity activity, Bundle savedInstanceState) {
+
+        }
+
+        @Override
+        public void onActivityStarted(Activity activity) {
+            currentActivity = activity;
+            onApplicationForeground();
+        }
+
+        @Override
+        public void onActivityResumed(Activity activity) {
+
+        }
+
+        @Override
+        public void onActivityPaused(Activity activity) {
+
+        }
+
+        @Override
+        public void onActivityStopped(Activity activity) {
+            if (currentActivity == null ||
+                    currentActivity == activity) {
+                onApplicationBackground();
+            }
+        }
+
+        @Override
+        public void onActivitySaveInstanceState(Activity activity, Bundle outState) {
+
+        }
+
+        @Override
+        public void onActivityDestroyed(Activity activity) {
+
+        }
+    }
+    private final ApplicationForegroundTracker applicationForegroundTracker =
+            new ApplicationForegroundTracker();
     private class ConnectivityChangeReceiver extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -60,7 +120,8 @@ public class TwilioConversationsImpl {
             }
         }
     }
-    private ConnectivityChangeReceiver connectivityChangeReceiver = new ConnectivityChangeReceiver();
+    private final ConnectivityChangeReceiver connectivityChangeReceiver =
+            new ConnectivityChangeReceiver();
 
     /**
      * TODO
@@ -70,7 +131,7 @@ public class TwilioConversationsImpl {
      */
     private boolean observingConnectivity = false;
 
-    protected final Map<UUID, WeakReference<ConversationsClientImpl>> conversationsClientMap = new ConcurrentHashMap<UUID, WeakReference<ConversationsClientImpl>>();
+    protected final Map<UUID, WeakReference<ConversationsClientImpl>> conversationsClientMap = new ConcurrentHashMap<>();
 
     /**
      * TODO 
@@ -109,19 +170,20 @@ public class TwilioConversationsImpl {
 
     TwilioConversationsImpl() {}
 
-    public void initialize(final Context applicationContext, final TwilioConversations.InitListener initListener) {
+    public void initialize(final Context context,
+                           final TwilioConversations.InitListener initListener) {
         if (isInitialized() || isInitializing()) {
             initListener.onError(new RuntimeException("Initialize already called"));
             return;
         }
 
         initializing = true;
-        context = applicationContext;
+        this.applicationContext = context.getApplicationContext();
 
-        PackageManager pm = applicationContext.getPackageManager();
+        PackageManager pm = context.getPackageManager();
         PackageInfo pinfo = null;
         try {
-            pinfo = pm.getPackageInfo(applicationContext.getPackageName(),
+            pinfo = pm.getPackageInfo(context.getPackageName(),
                     PackageManager.GET_PERMISSIONS
                             | PackageManager.GET_SERVICES);
         } catch (NameNotFoundException e) {
@@ -162,7 +224,6 @@ public class TwilioConversationsImpl {
          * The calling thread may often be the UI thread which should never be blocked.
          */
         new Thread(new Runnable() {
-
             @Override
             public void run() {
                 boolean success = initCore(applicationContext);
@@ -176,6 +237,24 @@ public class TwilioConversationsImpl {
                         }
                     });
                 } else {
+                    Application application = (Application)
+                            TwilioConversationsImpl.this.applicationContext;
+                    AlarmManager alarmManager = (AlarmManager) context
+                            .getSystemService(Context.ALARM_SERVICE);
+
+                    // Wake up periodically to refresh connections
+                    wakeUpPendingIntent = PendingIntent.getBroadcast(context,
+                            REQUEST_CODE_WAKEUP,
+                            new Intent(context, WakeUpReceiver.class),
+                            PendingIntent.FLAG_UPDATE_CURRENT);
+                    alarmManager.setInexactRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP,
+                            BACKGROUND_WAKEUP_INTERVAL,
+                            BACKGROUND_WAKEUP_INTERVAL,
+                            wakeUpPendingIntent);
+
+                    // Give hints to the core on application visibility events
+                    application.registerActivityLifecycleCallbacks(applicationForegroundTracker);
+
                     initialized = true;
                     initializing = false;
                     handler.post(new Runnable() {
@@ -186,7 +265,6 @@ public class TwilioConversationsImpl {
                     });
                 }
             }
-
         }).start();
 
     }
@@ -200,8 +278,16 @@ public class TwilioConversationsImpl {
         new Thread(new Runnable() {
             @Override
             public void run() {
+                Queue<ConversationsClientImpl> clientsDisposing = new ArrayDeque<>();
+                Application application = (Application)
+                        TwilioConversationsImpl.this.applicationContext.getApplicationContext();
+                AlarmManager alarmManager = (AlarmManager) applicationContext
+                        .getSystemService(Context.ALARM_SERVICE);
+
+                alarmManager.cancel(wakeUpPendingIntent);
+                application.unregisterActivityLifecycleCallbacks(applicationForegroundTracker);
+
                 // Process clients and determine which ones need to be closed
-                Queue<ConversationsClientImpl> clientsDisposing = new ArrayDeque<ConversationsClientImpl>();
                 for (Map.Entry<UUID, WeakReference<ConversationsClientImpl>> entry :
                         conversationsClientMap.entrySet()) {
                     WeakReference<ConversationsClientImpl> weakClientRef =
@@ -238,25 +324,27 @@ public class TwilioConversationsImpl {
         }).start();
     }
 
-    public ConversationsClientImpl createConversationsClient(TwilioAccessManager accessManager, Map<String, String> options, ConversationsClientListener inListener) {
+    public ConversationsClientImpl createConversationsClient(TwilioAccessManager accessManager,
+                                                             Map<String, String> options,
+                                                             ConversationsClientListener inListener) {
         if(options != null && accessManager != null) {
-            final ConversationsClientImpl conversationsClient = new ConversationsClientImpl(context, accessManager, inListener);
+            final ConversationsClientImpl conversationsClient = new ConversationsClientImpl(applicationContext,
+                    accessManager, inListener);
             long nativeEndpointObserverHandle = conversationsClient.getEndpointObserverHandle();
             if (nativeEndpointObserverHandle == 0) {
                 return null;
             }
-            final long nativeEndpointHandle = createEndpoint(accessManager, nativeEndpointObserverHandle);
+            final long nativeEndpointHandle = createEndpoint(accessManager,
+                    nativeEndpointObserverHandle);
             if (nativeEndpointHandle == 0) {
                 return null;
             }
             conversationsClient.setNativeEndpointHandle(nativeEndpointHandle);
-            synchronized (conversationsClientMap)
-            {
-                if (conversationsClientMap.size() == 0) {
-                    registerConnectivityBroadcastReceiver();
-                }
-                conversationsClientMap.put(conversationsClient.getUuid(), new WeakReference<ConversationsClientImpl>(conversationsClient));
+            if (conversationsClientMap.size() == 0) {
+                registerConnectivityBroadcastReceiver();
             }
+            conversationsClientMap.put(conversationsClient.getUuid(),
+                    new WeakReference<>(conversationsClient));
             return conversationsClient;
         }
         return null;
@@ -310,18 +398,16 @@ public class TwilioConversationsImpl {
     }
 
     public ConversationsClientImpl findDeviceByUUID(UUID uuid) {
-        synchronized (conversationsClientMap)
-        {
-            WeakReference<ConversationsClientImpl> deviceRef = conversationsClientMap.get(uuid);
-            if (deviceRef != null) {
-                ConversationsClientImpl device = deviceRef.get();
-                if (device != null) {
-                    return device;
-                } else {
-                    conversationsClientMap.remove(uuid);
-                }
+        WeakReference<ConversationsClientImpl> deviceRef = conversationsClientMap.get(uuid);
+        if (deviceRef != null) {
+            ConversationsClientImpl device = deviceRef.get();
+            if (device != null) {
+                return device;
+            } else {
+                conversationsClientMap.remove(uuid);
             }
         }
+
         return null;
     }
 
@@ -332,21 +418,24 @@ public class TwilioConversationsImpl {
     }
 
     private void registerConnectivityBroadcastReceiver() {
-        if (context != null) {
-            context.registerReceiver(connectivityChangeReceiver,
+        if (applicationContext != null) {
+            applicationContext.registerReceiver(connectivityChangeReceiver,
                     new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
             observingConnectivity = true;
         }
     }
 
     private void unregisterConnectivityBroadcastReceiver() {
-        if (context != null && connectivityChangeReceiver != null) {
-            context.unregisterReceiver(connectivityChangeReceiver);
+        if (applicationContext != null && connectivityChangeReceiver != null) {
+            applicationContext.unregisterReceiver(connectivityChangeReceiver);
             observingConnectivity = false;
         }
     }
 
     private native boolean initCore(Context context);
+    private native void onApplicationForeground();
+    private native void onApplicationWakeUp();
+    private native void onApplicationBackground();
     private native void destroyCore();
     private native long createEndpoint(TwilioAccessManager accessManager,
                                        long nativeEndpointObserver);

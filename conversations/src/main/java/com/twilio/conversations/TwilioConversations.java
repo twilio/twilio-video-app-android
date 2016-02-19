@@ -3,7 +3,10 @@ package com.twilio.conversations;
 import java.util.HashMap;
 import java.util.Map;
 
+import android.app.Activity;
+import android.app.Application;
 import android.content.Context;
+import android.os.Bundle;
 
 import com.twilio.common.TwilioAccessManager;
 import com.twilio.common.TwilioAccessManagerFactory;
@@ -136,7 +139,7 @@ public class TwilioConversations {
     /**
      * Initialize the Twilio Conversations SDK.
      *
-     * @param applicationContext
+     * @param context
      *            The application context of your Android application
      *
      * @param initListener
@@ -144,16 +147,16 @@ public class TwilioConversations {
      *            when the service is ready
      *
      */
-    public static void initialize(Context applicationContext,
+    public static void initialize(Context context,
                                   TwilioConversations.InitListener initListener) {
-        if (applicationContext == null) {
+        if (context == null) {
             throw new NullPointerException("applicationContext must not be null");
         }
         if (initListener == null) {
             throw new NullPointerException("initListener must not be null");
         }
 
-        TwilioConversationsImpl.getInstance().initialize(applicationContext, initListener);
+        TwilioConversationsImpl.getInstance().initialize(context, initListener);
     }
 
     /**
@@ -201,7 +204,8 @@ public class TwilioConversations {
      * @return the initialized {@link ConversationsClient}, or null if the Twilio Conversations Client
      *         was not initialized
      */
-    public static ConversationsClient createConversationsClient(String token, ConversationsClientListener listener) {
+    public static ConversationsClient createConversationsClient(String token,
+                                                                ConversationsClientListener listener) {
         if (token == null) {
             throw new NullPointerException("token must not be null");
         }
@@ -219,7 +223,8 @@ public class TwilioConversations {
      * @return the initialized {@link ConversationsClient}, or null if the Twilio Conversations Client
      *         was not initialized
      */
-    public static ConversationsClient createConversationsClient(TwilioAccessManager accessManager, ConversationsClientListener listener) {
+    public static ConversationsClient createConversationsClient(TwilioAccessManager accessManager,
+                                                                ConversationsClientListener listener) {
         return createConversationsClient(accessManager, new HashMap<String, String>(), listener);
     }
 
@@ -234,7 +239,9 @@ public class TwilioConversations {
      * @return the initialized {@link ConversationsClient}, or null if the Twilio Conversations Client
      *         was not initialized
      */
-    public static ConversationsClient createConversationsClient(TwilioAccessManager accessManager, Map<String, String> options, ConversationsClientListener listener) {
+    public static ConversationsClient createConversationsClient(TwilioAccessManager accessManager,
+                                                                Map<String, String> options,
+                                                                ConversationsClientListener listener) {
         if (accessManager == null) {
             throw new NullPointerException("access manager must not be null");
         }
