@@ -49,18 +49,22 @@ def boringSslHome = "${twilioSdkHome}/boringssl/android"
 def boringSslHeaders = "${boringSslHome}/${currentArch}/include"
 def boringSslStaticLib = "lib/libboringssl.a"
 
+def webRtcJniStaticLib = "lib/libwebrtc-jni.a"
+def webRtcStaticLib = "libwebrtc.a"
+//if(getBuildType().name.equals("development")) {
+//webRtcHome = "${buildDir}/sdkdeps/twilio-webrtc/lib/release"
 def webRtcHome = "${twilioSdkHome}/webrtc/android"
 def webRtcHeaders = "${webRtcHome}/${currentArch}/include"
-def webRtcStaticLib = "lib/libwebrtc.a"
-def webRtcJniStaticLib = "lib/libwebrtc-jni.a"
 
 configurations {
     provided
+    sdkdeps
 }
 
 model {
     repositories {
         libs(PrebuiltLibraries) {
+
             twilioSdkCore {
                 headers.srcDir "${coreHeaders}"
                 binaries.withType(StaticLibraryBinary) {
@@ -142,10 +146,11 @@ model {
                 }
             }
             webrtc {
+
                 headers.srcDir "${webRtcHeaders}"
                 binaries.withType(StaticLibraryBinary) {
                     def webRtcStaticLibPath = "${webRtcHome}/" +
-                            "${convertAbiToArch(targetPlatform.getName())}/${webRtcStaticLib}"
+                            "${targetPlatform.getName()}/${webRtcStaticLib}"
                     staticLibraryFile = file("${webRtcStaticLibPath}")
                 }
             }
@@ -208,6 +213,7 @@ model {
          * dependency after we are not using whole archive anymore because the linker
          * applies this option to every library after the option is specified.
          */
+
         // FIXME need to set this according to correct architecture!!
         ldFlags.add("-Wl," +
                 "--whole-archive," +
@@ -247,6 +253,11 @@ model {
                 debuggable true
             }
         }
+        create("development") {
+            ndk {
+                debuggable true
+            }
+        }
         release {
             minifyEnabled false
         }
@@ -281,7 +292,17 @@ dependencies {
 
     // TODO this jar does not need to be behind an arch directory structure
     compile files("${twilioSdkHome}/webrtc/android/${currentArch}/lib/libjingle_peerconnection_java.jar")
+
+    sdkdeps group: 'com.twilio.sdk', name: 'twilio-webrtc', version: '48.3', classifier: 'android', ext: 'tar.bz2'
+
     provided 'com.twilio.sdk:twilio-common-android:0.2.0'
+}
+
+task unpackSDKDeps(type: Copy, dependsOn: 'assemble') {
+    def target = file("${buildDir}/sdkdeps")
+    onlyIf { !target.exists() }
+    from tarTree(configurations.sdkdeps.singleFile)
+    into target
 }
 
 /**
