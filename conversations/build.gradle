@@ -500,15 +500,35 @@ class LinkerFlagsRuleSource extends RuleSource {
     void injectArmeabiV7aDebugLinkerFlags(
             @Path('tasks.linkJingle_peerconnection_soArmeabi-v7aDebugSharedLibrary')
                     Task linkTask) {
-        injectLinkerFlags(linkTask, twilioSdkHome, 'armeabiv7a')
+        injectLinkerFlags(linkTask, twilioSdkHome, 'armeabi-v7a')
     }
 
     @Mutate
     void injectArmeabiV7aReleaseLinkerFlags(
             @Path('tasks.linkJingle_peerconnection_soArmeabi-v7aReleaseSharedLibrary')
                     Task linkTask) {
-        injectLinkerFlags(linkTask, twilioSdkHome, 'armeabiv7a')
+        injectLinkerFlags(linkTask, twilioSdkHome, 'armeabi-v7a')
     }
+
+    /**
+     * Currently the plugin does not generate link tasks for 64 bit architectures. A bug
+     * has been filed and once resolved we can uncomment
+     *
+     * https://code.google.com/p/android/issues/detail?id=201561
+     */
+//    @Mutate
+//    void injectArm64v8aDebugLinkerFlags(
+//            @Path('tasks.linkJingle_peerconnection_soArm64-v8aDebugSharedLibrary')
+//                    Task linkTask) {
+//        injectLinkerFlags(linkTask, twilioSdkHome, 'arm64-v8a')
+//    }
+//
+//    @Mutate
+//    void injectArm64v8aReleaseLinkerFlags(
+//            @Path('tasks.linkJingle_peerconnection_soArm64-v8aReleaseSharedLibrary')
+//                    Task linkTask) {
+//        injectLinkerFlags(linkTask, twilioSdkHome, 'arm64-v8a')
+//    }
 
     @Mutate
     void injectX86DebugLinkerFlags(
@@ -523,6 +543,20 @@ class LinkerFlagsRuleSource extends RuleSource {
                     Task linkTask) {
         injectLinkerFlags(linkTask, twilioSdkHome, 'x86')
     }
+
+//    @Mutate
+//    void injectX86_64DebugLinkerFlags(
+//            @Path('tasks.linkJingle_peerconnection_soX86_64DebugSharedLibrary')
+//                    Task linkTask) {
+//        injectLinkerFlags(linkTask, twilioSdkHome, 'x86_64')
+//    }
+//
+//    @Mutate
+//    void injectX86_64ReleaseLinkerFlags(
+//            @Path('tasks.linkJingle_peerconnection_soX86_64ReleaseSharedLibrary')
+//                    Task linkTask) {
+//        injectLinkerFlags(linkTask, twilioSdkHome, 'x86_64')
+//    }
 
     private void injectLinkerFlags(linkTask, sdkHome, arch) {
         def pocoHome = "${sdkHome}/poco/android"
