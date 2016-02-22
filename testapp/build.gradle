@@ -25,11 +25,22 @@ model {
         }
     }
 
+    /*
+     * Use the debug keystore to sign all variants of the test app
+     * since this is only used internally.
+     */
+    android.signingConfigs {
+        debug {
+            storeFile file("${System.env.HOME}/.android/debug.keystore")
+        }
+    }
+
     android.buildTypes {
         release {
             minifyEnabled false
             proguardFiles.add(file('proguard-android.txt'))
             proguardFiles.add(file("proguard-rules.pro"))
+            signingConfig = $("android.signingConfigs.debug")
         }
         debug {
             applicationIdSuffix ".debug"
