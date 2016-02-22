@@ -13,6 +13,7 @@
         <mavenVersion>2.0.9</mavenVersion>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <dependencies.twiliocommon.version>0.1.11</dependencies.twiliocommon.version>
+        <dependencies.twilio-webrtc.version>48.3</dependencies.twilio-webrtc.version>
     </properties>
     
     <build>
@@ -45,6 +46,14 @@
             <classifier>${build.platform}</classifier>
             <type>tar.bz2</type>
         </dependency>
+        
+        <dependency>
+            <groupId>com.twilio.sdk</groupId>
+            <artifactId>twilio-webrtc</artifactId>
+            <version>${dependencies.twilio-webrtc.version}</version>
+            <classifier>${build.platform}</classifier>
+            <type>tar.bz2</type>
+        </dependency>
     </dependencies>
     
 
@@ -59,5 +68,5 @@
                     <enabled>false</enabled>
                 </snapshots>
         </repository>
-    ls</repositories>
+    </repositories>
 </project>
