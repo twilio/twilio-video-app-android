@@ -10,6 +10,9 @@
 #include "TSCSessionObserver.h"
 #include "TSCMediaStreamInfo.h"
 #include "TSCMediaTrackInfo.h"
+#include "TSCSessionStatistics.h"
+#include "TSCConnectionStatsReport.h"
+#include "TSCTrackStatsReport.h"
 #include "com_twilio_conversations_impl_ConversationImpl.h"
 
 using namespace webrtc;
@@ -24,6 +27,8 @@ public:
                     jni, j_observer),
             j_observer_class_(
                     jni, GetObjectClass(jni, j_observer)),
+            j_track_stats_report_class_(
+                    jni, jni->FindClass("com/twilio/conversations/impl/core/TrackStatsReport")),
             j_session_state_changed_id(
                     GetMethodID(jni,
                                 *j_observer_class_,
@@ -89,6 +94,11 @@ public:
                                 *j_observer_class_,
                                 "onAudioTrackStateChanged",
                                 "(Lcom/twilio/conversations/impl/core/TrackInfo;)V")),
+            j_receive_track_statistics_id_(
+                    GetMethodID(jni, *j_observer_class_, "onReceiveTrackStatistics", "(Lcom/twilio/conversations/impl/core/TrackStatsReport;)V")),
+            j_track_stats_report_ctor_id_(
+                    GetMethodID(jni, *j_track_stats_report_class_, "<init>",
+                                "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;D[Ljava/lang/String;[Ljava/lang/String;)V")),
             j_trackinfo_class_(
                     jni, jni->FindClass("com/twilio/conversations/impl/core/TrackInfoImpl")),
             j_trackorigin_class_(
@@ -303,7 +313,61 @@ protected:
         TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK,
                            kTSCoreLogLevelDebug,
                            "onDidReceiveSessionStatistics");
-        // TODO: implement me
+        JNIEnv* jni = AttachCurrentThreadIfNeeded();
+
+        TSCConnectionStatsReport report = statistics->getReport();
+        jstring participantAddress = JavaStringFromStdString(jni, statistics->getParticipantAddress());
+        jstring participantSid = JavaStringFromStdString(jni, report.participantSid);
+        for (auto &pair: report.tracks) {
+            TSCTrackStatsReport trackReport = pair.second;
+            jstring trackId = JavaStringFromStdString(jni, trackReport.trackId);
+            jstring mediaType = JavaStringFromStdString(jni, trackReport.mediaType);
+            jstring direction = JavaStringFromStdString(jni, trackReport.direction);
+            jstring codecName = JavaStringFromStdString(jni, trackReport.codecName);
+            jstring ssrc = JavaStringFromStdString(jni, trackReport.ssrc);
+            jstring activeConnectionId = JavaStringFromStdString(jni, trackReport.activeConnectionId);
+            jdouble timestamp = (jdouble)trackReport.timestamp;
+            // create arrays to hold map values
+            jobjectArray keys =
+                    (jobjectArray)jni->NewObjectArray(trackReport.values.size(),
+                                                      jni->FindClass("java/lang/String"), NULL);
+            jobjectArray values =
+                    (jobjectArray)jni->NewObjectArray(trackReport.values.size(),
+                                                      jni->FindClass("java/lang/String"), NULL);
+            int i=0;
+            for (auto &pair: trackReport.values) {
+                jni->SetObjectArrayElement(keys, i, JavaStringFromStdString(jni, pair.first));
+                jni->SetObjectArrayElement(values, i, JavaStringFromStdString(jni, pair.second));
+                i++;
+            }
+
+            jobject j_track_stats_report =
+                    jni->NewObject( *j_track_stats_report_class_, j_track_stats_report_ctor_id_,
+                                    participantAddress, participantSid, trackId, mediaType,
+                                    direction, codecName, ssrc, activeConnectionId, timestamp,
+                                    keys, values);
+            jni->CallVoidMethod(*j_observer_global_,
+                                j_receive_track_statistics_id_, j_track_stats_report);
+
+            //Cleanup
+            for (unsigned int i=0; i<trackReport.values.size(); i++) {
+                jobject tmp = jni->GetObjectArrayElement(keys, i);
+                jobject tmp2 = jni->GetObjectArrayElement(values, i);
+                jni->DeleteLocalRef(tmp);
+                jni->DeleteLocalRef(tmp2);
+            }
+
+            jni->DeleteLocalRef(trackId);
+            jni->DeleteLocalRef(mediaType);
+            jni->DeleteLocalRef(direction);
+            jni->DeleteLocalRef(codecName);
+            jni->DeleteLocalRef(ssrc);
+            jni->DeleteLocalRef(activeConnectionId);
+
+            jni->DeleteLocalRef(keys);
+            jni->DeleteLocalRef(values);
+            jni->DeleteLocalRef(j_track_stats_report);
+        }
     }
 
     virtual void onDidReceiveConversationEvent(ConversationEvent *event) {
@@ -384,6 +448,7 @@ private:
 
     const ScopedGlobalRef<jobject> j_observer_global_;
     const ScopedGlobalRef<jclass> j_observer_class_;
+    const ScopedGlobalRef<jclass> j_track_stats_report_class_;
 
     const jmethodID j_session_state_changed_id;
     const jmethodID j_start_completed_id;
@@ -398,6 +463,8 @@ private:
     const jmethodID j_audio_track_added_id_;
     const jmethodID j_audio_track_removed_id_;
     const jmethodID j_audio_track_state_changed_id_;
+    const jmethodID j_receive_track_statistics_id_;
+    const jmethodID j_track_stats_report_ctor_id_;
 
     const ScopedGlobalRef<jclass> j_trackinfo_class_;
     const ScopedGlobalRef<jclass> j_trackorigin_class_;

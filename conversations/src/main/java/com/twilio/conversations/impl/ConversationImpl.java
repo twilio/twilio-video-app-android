@@ -31,6 +31,7 @@ import com.twilio.conversations.impl.core.MediaStreamInfo;
 import com.twilio.conversations.impl.core.SessionObserver;
 import com.twilio.conversations.impl.core.SessionState;
 import com.twilio.conversations.impl.core.TrackInfo;
+import com.twilio.conversations.impl.core.TrackStatsReport;
 import com.twilio.conversations.impl.logging.Logger;
 import com.twilio.conversations.impl.util.CallbackHandler;
 
@@ -241,6 +242,11 @@ public class ConversationImpl implements Conversation,
             logger.e(FINALIZE_MESSAGE);
             dispose();
         }
+    }
+
+    @Override
+    public void onReceiveTrackStatistics(TrackStatsReport report) {
+        logger.d("onReceiveTrackStatistics: "+report.participantAddress);
     }
 
     private ParticipantImpl findOrCreateParticipant(String participantIdentity, String participantSid) {
