@@ -405,8 +405,6 @@ task localizeWebRtcJniLoadUnLoad(type: Exec, dependsOn: assemble) {
                 if (file("${objCopy}").exists() &&
                         file("${libWebRtcStaticLib}").exists() &&
                         archToolChain == toolChainPrebuiltPrefix) {
-                    println(objCopy)
-                    println(libWebRtcStaticLib)
                     exec {
                         executable "${objCopy}"
                         args '--localize-symbol',
