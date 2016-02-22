@@ -14,6 +14,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <dependencies.twiliocommon.version>0.1.11</dependencies.twiliocommon.version>
         <dependencies.twilio-webrtc.version>48.3</dependencies.twilio-webrtc.version>
+        <dependencies.twilio-conversations.version>0.10.10</dependencies.twilio-conversations.version>
     </properties>
     
     <build>
@@ -43,6 +44,14 @@
             <groupId>com.twilio.sdk</groupId>
             <artifactId>twilio-common</artifactId>
             <version>${dependencies.twiliocommon.version}</version>
+            <classifier>${build.platform}</classifier>
+            <type>tar.bz2</type>
+        </dependency>
+ 
+        <dependency>
+            <groupId>com.twilio.sdk</groupId>
+            <artifactId>twilio-conversations</artifactId>
+            <version>${dependencies.twilio-conversations.version}</version>
             <classifier>${build.platform}</classifier>
             <type>tar.bz2</type>
         </dependency>
