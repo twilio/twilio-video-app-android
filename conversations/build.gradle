@@ -20,7 +20,7 @@ def supportedAbis = [
  */
 def currentArch = "armeabiv7a"
 
-def coreHome = "${twilioSdkHome}/core/android"
+def coreHome = "${twilioSdkHome}/conversations/android"
 /**
  * FIXME
  * This is dumb but we know we support armeabiv7a so we will set the headers directory
@@ -28,7 +28,7 @@ def coreHome = "${twilioSdkHome}/core/android"
  * across architectures.
  */
 def coreHeaders = "${coreHome}/${currentArch}/include"
-def coreStaticLib = "lib/libtwilio-sdk-core-full.a"
+def coreStaticLib = "lib/libtwilio-conversations.a"
 
 def twilioCommonHome = "${twilioSdkHome}/twilio-common/android"
 def twilioCommonHeaders = "${twilioCommonHome}/${currentArch}/include"
