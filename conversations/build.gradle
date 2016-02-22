@@ -55,6 +55,7 @@ def webRtcJniStaticLib = "lib/libwebrtc-jni.a"
 
 configurations {
     provided
+    sdkdeps
 }
 
 model {
@@ -238,9 +239,11 @@ model {
          */
         createJavadocs(Javadoc) {
             def androidConfig = $.android
+            def androidJar = "${getSdkDir()}/platforms/${androidConfig.compileSdkVersion}/" +
+            "android.jar"
 
             source = androidConfig.sources.main.java.source
-            classpath += project.files("${getSdkDir()}/platforms/${androidConfig.compileSdkVersion}/android.jar");
+            classpath += project.files(androidJar);
             options.links("http://docs.oracle.com/javase/7/docs/api/");
             options.links("http://d.android.com/reference/");
             exclude '**/BuildConfig.java'
@@ -258,9 +261,28 @@ dependencies {
     androidTestCompile 'com.android.support.test:runner:0.4'
     androidTestCompile 'com.android.support.test:rules:0.4'
 
+    sdkdeps group: 'org.pocoproject.twilio', name: 'twilio-poco', version: '1.6.12', classifier: 'android', ext: 'tar.bz2'
+    sdkdeps group: 'com.googlesource.boringssl.twilio', name: 'twilio-boringssl', version: '1.0.11', classifier: 'android', ext: 'tar.bz2'
+    sdkdeps group: 'com.twilio.sdk', name: 'twilio-common', version: '0.1.11', classifier: 'android', ext: 'tar.bz2'
+    sdkdeps group: 'com.twilio.sdk', name: 'twilio-webrtc', version: '48.3', classifier: 'android', ext: 'tar.bz2'
+    sdkdeps group: 'com.twilio.sdk', name: 'twilio-conversations', version: '0.10.10', classifier: 'android', ext: 'tar.bz2'
+
     // TODO this jar does not need to be behind an arch directory structure
     compile files("${twilioSdkHome}/webrtc/android/${currentArch}/lib/libjingle_peerconnection_java.jar")
     provided 'com.twilio.sdk:twilio-common-android:0.2.0'
+}
+
+/**
+ * Iterates over conversations dependencies and ensures they are downloaded
+ */
+task unpackSdkDeps(type: Copy) {
+    def target = file("${buildDir}/sdkdeps")
+    onlyIf { !target.exists() }
+
+    configurations.sdkdeps.each { sdkdep ->
+        from tarTree(sdkdep)
+        into target
+    }
 }
 
 /**
@@ -488,20 +510,6 @@ class LinkerFlagsRuleSource extends RuleSource {
         injectLinkerFlags(linkTask, twilioSdkHome, 'armeabiv7a')
     }
 
-//    @Mutate
-//    void injectArm64V8aDebugLinkerFlags(
-//            @Path('tasks.linkJingle_peerconnection_soArm64-v8aDebugSharedLibrary')
-//                    Task linkTask) {
-//        injectLinkerFlags(linkTask, twilioSdkHome, 'arm64v8a')
-//    }
-//
-//    @Mutate
-//    void injectArm64V8aReleaseLinkerFlags(
-//            @Path('tasks.linkJingle_peerconnection_soArm64-v8aReleaseSharedLibrary')
-//                    Task linkTask) {
-//        injectLinkerFlags(linkTask, twilioSdkHome, 'arm64v8a')
-//    }
-
     @Mutate
     void injectX86DebugLinkerFlags(
             @Path('tasks.linkJingle_peerconnection_soX86DebugSharedLibrary')
@@ -515,20 +523,6 @@ class LinkerFlagsRuleSource extends RuleSource {
                     Task linkTask) {
         injectLinkerFlags(linkTask, twilioSdkHome, 'x86')
     }
-
-//    @Mutate
-//    void injectX86_64DebugLinkerFlags(
-//            @Path('tasks.linkJingle_peerconnection_soX86_64DebugSharedLibrary')
-//                    Task linkTask) {
-//        injectLinkerFlags(linkTask, twilioSdkHome, 'x86_64')
-//    }
-//
-//    @Mutate
-//    void injectX86_64ReleaseLinkerFlags(
-//            @Path('tasks.linkJingle_peerconnection_soX86_64ReleaseSharedLibrary')
-//                    Task linkTask) {
-//        injectLinkerFlags(linkTask, twilioSdkHome, 'x86_64')
-//    }
 
     private void injectLinkerFlags(linkTask, sdkHome, arch) {
         def pocoHome = "${sdkHome}/poco/android"
