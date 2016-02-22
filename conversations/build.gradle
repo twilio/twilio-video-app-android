@@ -5,9 +5,9 @@ def currentToolchainVersion = "4.9"
 def twilioSdkHome = "/usr/local/twilio-sdk"
 def supportedAbis = [
         "armeabi-v7a",
-        "arm64-v8a",
+//        "arm64-v8a",
         "x86",
-        "x86_64"
+//        "x86_64"
 ]
 
 /**
