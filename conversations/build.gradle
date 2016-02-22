@@ -5,10 +5,9 @@ def currentToolchainVersion = "4.9"
 def twilioSdkHome = "/usr/local/twilio-sdk"
 def supportedAbis = [
         "armeabi-v7a",
-        // TODO add multi arch support
-//        "arm64-v8a",
-//        "x86",
-//        "x86_64"
+        "arm64-v8a",
+        "x86",
+        "x86_64"
 ]
 
 /**
@@ -193,28 +192,8 @@ model {
                 "OpenSLES",
                 "EGL",
                 "GLESv1_CM",
-                "android",
-                // FIXME need to set this according to correct architecture!!
-                "${pocoHome}/${currentArch}/${pocoFoundationStaticLib}".toString(),
-                "${pocoHome}/${currentArch}/${pocoCryptoStaticLib}".toString()
+                "android"
         ])
-
-        /**
-         * Several webrtc classes use native webrtc-jni objects that are only
-         * called from Java classes. The compiler will incorrectly strip some
-         * of these native webrtc-jni objects during linking because it believes
-         * they are unused by the native library. Here we tell the linker to keep
-         * the whole archive to prevent this stripping and then we specify in the
-         * dependency after we are not using whole archive anymore because the linker
-         * applies this option to every library after the option is specified.
-         */
-        // FIXME need to set this according to correct architecture!!
-        ldFlags.add("-Wl," +
-                "--whole-archive," +
-                "-l${webRtcHome}/${currentArch}/${webRtcJniStaticLib},".toString() +
-                "--no-whole-archive".toString()
-        )
-
         abiFilters.addAll(supportedAbis)
     }
 
@@ -484,3 +463,96 @@ def getNdkDir() {
 
     return ndkHome
 }
+
+/**
+ * Mangles linker flags so we can get this puppy to compile and run
+ * for all archs and all build types. It's about to get real.
+ */
+class LinkerFlagsRuleSource extends RuleSource {
+    static final def twilioSdkHome = "/usr/local/twilio-sdk"
+    static final def pocoFoundationStaticLib = "lib/libPocoFoundation.a"
+    static final def pocoCryptoStaticLib = "lib/libPocoCrypto.a"
+    static final def webRtcJniStaticLib = "lib/libwebrtc-jni.a"
+
+    @Mutate
+    void injectArmeabiV7aDebugLinkerFlags(
+            @Path('tasks.linkJingle_peerconnection_soArmeabi-v7aDebugSharedLibrary')
+                    Task linkTask) {
+        injectLinkerFlags(linkTask, twilioSdkHome, 'armeabiv7a')
+    }
+
+    @Mutate
+    void injectArmeabiV7aReleaseLinkerFlags(
+            @Path('tasks.linkJingle_peerconnection_soArmeabi-v7aReleaseSharedLibrary')
+                    Task linkTask) {
+        injectLinkerFlags(linkTask, twilioSdkHome, 'armeabiv7a')
+    }
+
+//    @Mutate
+//    void injectArm64V8aDebugLinkerFlags(
+//            @Path('tasks.linkJingle_peerconnection_soArm64-v8aDebugSharedLibrary')
+//                    Task linkTask) {
+//        injectLinkerFlags(linkTask, twilioSdkHome, 'arm64v8a')
+//    }
+//
+//    @Mutate
+//    void injectArm64V8aReleaseLinkerFlags(
+//            @Path('tasks.linkJingle_peerconnection_soArm64-v8aReleaseSharedLibrary')
+//                    Task linkTask) {
+//        injectLinkerFlags(linkTask, twilioSdkHome, 'arm64v8a')
+//    }
+
+    @Mutate
+    void injectX86DebugLinkerFlags(
+            @Path('tasks.linkJingle_peerconnection_soX86DebugSharedLibrary')
+                    Task linkTask) {
+        injectLinkerFlags(linkTask, twilioSdkHome, 'x86')
+    }
+
+    @Mutate
+    void injectX86ReleaseLinkerFlags(
+            @Path('tasks.linkJingle_peerconnection_soX86ReleaseSharedLibrary')
+                    Task linkTask) {
+        injectLinkerFlags(linkTask, twilioSdkHome, 'x86')
+    }
+
+//    @Mutate
+//    void injectX86_64DebugLinkerFlags(
+//            @Path('tasks.linkJingle_peerconnection_soX86_64DebugSharedLibrary')
+//                    Task linkTask) {
+//        injectLinkerFlags(linkTask, twilioSdkHome, 'x86_64')
+//    }
+//
+//    @Mutate
+//    void injectX86_64ReleaseLinkerFlags(
+//            @Path('tasks.linkJingle_peerconnection_soX86_64ReleaseSharedLibrary')
+//                    Task linkTask) {
+//        injectLinkerFlags(linkTask, twilioSdkHome, 'x86_64')
+//    }
+
+    private void injectLinkerFlags(linkTask, sdkHome, arch) {
+        def pocoHome = "${sdkHome}/poco/android"
+        def webRtcHome = "${sdkHome}/webrtc/android"
+
+        linkTask.doFirst {
+            properties["linkerArgs"].addAll([
+                    "-l${pocoHome}/${arch}/${pocoFoundationStaticLib}".toString(),
+                    "-l${pocoHome}/${arch}/${pocoCryptoStaticLib}".toString(),
+
+                    /**
+                     * Several webrtc classes use native webrtc-jni objects that are only
+                     * called from Java classes. The compiler will incorrectly strip some
+                     * of these native webrtc-jni objects during linking because it believes
+                     * they are unused by the native library. Here we tell the linker to keep
+                     * the whole archive to prevent this stripping and then we specify in the
+                     * dependency after we are not using whole archive anymore because the linker
+                     * applies this option to every library after the option is specified.
+                     */
+                    "-Wl,--whole-archive,-l${webRtcHome}/${arch}/${webRtcJniStaticLib},"
+                            .toString() + "--no-whole-archive"
+            ])
+        }
+    }
+}
+
+apply plugin: LinkerFlagsRuleSource
