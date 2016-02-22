@@ -247,31 +247,11 @@ dependencies {
     androidTestCompile 'com.android.support.test:runner:0.4'
     androidTestCompile 'com.android.support.test:rules:0.4'
 
-    sdkdeps group: 'org.pocoproject.twilio',
-            name: 'twilio-poco',
-            version: '1.6.12',
-            classifier: 'android',
-            ext: 'tar.bz2'
-    sdkdeps group: 'com.googlesource.boringssl.twilio',
-            name: 'twilio-boringssl',
-            version: '1.0.11',
-            classifier: 'android',
-            ext: 'tar.bz2'
-    sdkdeps group: 'com.twilio.sdk',
-            name: 'twilio-common',
-            version: '0.1.11',
-            classifier: 'android',
-            ext: 'tar.bz2'
-    sdkdeps group: 'com.twilio.sdk',
-            name: 'twilio-webrtc',
-            version: '48.3',
-            classifier: 'android',
-            ext: 'tar.bz2'
-    sdkdeps group: 'com.twilio.sdk',
-            name: 'twilio-conversations',
-            version: '0.10.10',
-            classifier: 'android',
-            ext: 'tar.bz2'
+    sdkdeps 'org.pocoproject.twilio:twilio-poco:1.6.12:android@tar.bz2'
+    sdkdeps 'com.googlesource.boringssl.twilio:twilio-boringssl:1.0.11:android@tar.bz2'
+    sdkdeps 'com.twilio.sdk:twilio-common:0.1.11:android@tar.bz2'
+    sdkdeps 'com.twilio.sdk:twilio-webrtc:48.3:android@tar.bz2'
+    sdkdeps 'com.twilio.sdk:twilio-conversations:0.10.10:android@tar.bz2'
 
     // TODO this really should be on nexus as a jar and not local
     compile files("${twilioSdkHome}/twilio-webrtc/lib/release/libjingle_peerconnection_java.jar")
