@@ -239,9 +239,6 @@ public class ConversationsClientImpl implements
         if(conversationStatus.equals(ConversationStatus.CONNECTED) &&
                 conversationImpl.getSessionState().equals(SessionState.IN_PROGRESS)) {
             handleConversationStarted(conversationImpl);
-        } else if (conversationStatus.equals(ConversationStatus.DISCONNECTED) &&
-                conversationImpl.getSessionState().equals(SessionState.STOPPED)) {
-            onConversationTerminated(conversationImpl, null);
         }
     }
 
