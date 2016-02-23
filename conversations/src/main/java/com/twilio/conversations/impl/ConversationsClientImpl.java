@@ -305,16 +305,23 @@ public class ConversationsClientImpl implements
             InviteStatus status = outgoingInviteImpl.getStatus() == InviteStatus.CANCELLED ? InviteStatus.CANCELLED : InviteStatus.FAILED;
             outgoingInviteImpl.setStatus(status);
             pendingOutgoingInvites.remove(conversationImpl);
-            if (outgoingInviteImpl.getHandler() != null && outgoingInviteImpl.getConversationCallback() != null) {
+            if (outgoingInviteImpl.getHandler() != null &&
+                    outgoingInviteImpl.getConversationCallback() != null) {
                 outgoingInviteImpl.getHandler().post(new Runnable() {
                     @Override
                     public void run() {
+                        // The call ended by the user
+                        if (conversationImpl != null) {
+                            conversationImpl.dispose();
+                        }
                         if(e != null) {
-                            outgoingInviteImpl.getConversationCallback().onConversation(conversationImpl, e);
+                            outgoingInviteImpl.getConversationCallback()
+                                    .onConversation(conversationImpl, e);
                         } else {
-                            // The call ended by the user
-                            outgoingInviteImpl.getConversationCallback().onConversation(conversationImpl, e);
-                            conversationImpl.getConversationListener().onConversationEnded(conversationImpl, null);
+                            outgoingInviteImpl.getConversationCallback()
+                                    .onConversation(conversationImpl, e);
+                            conversationImpl.getConversationListener()
+                                    .onConversationEnded(conversationImpl, null);
                         }
                     }
                 });
