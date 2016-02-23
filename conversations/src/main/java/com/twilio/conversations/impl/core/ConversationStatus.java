@@ -1,7 +1,7 @@
 package com.twilio.conversations.impl.core;
 
 public enum ConversationStatus {
-    UNKNOWN,
+    INITIALIZED,
     CONNECTING,
     CONNECTED,
     DISCONNECTED,
