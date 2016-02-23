@@ -313,13 +313,36 @@ protected:
         TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK,
                            kTSCoreLogLevelDebug,
                            "onDidReceiveSessionStatistics");
+
+        // NOTE: This callback is called from same thread every time, which prevents automatic
+        // destruction of local JNI references. Every allocated local reference
+        // needs to be deleted manually or using PushLocalFrame/PopLocalFrame.
+
         JNIEnv* jni = AttachCurrentThreadIfNeeded();
 
         TSCConnectionStatsReport report = statistics->getReport();
-        jstring participantAddress = JavaStringFromStdString(jni, statistics->getParticipantAddress());
-        jstring participantSid = JavaStringFromStdString(jni, report.participantSid);
+
         for (auto &pair: report.tracks) {
             TSCTrackStatsReport trackReport = pair.second;
+
+            // We have to know in advance how many local java references we will allocate
+            // in this loop. We have 2 arrays to hold values from map, plus couple of more local
+            // variables used.
+            // If in some case we need more, we should change the constant.
+            int numOfLocalRef = pair.second.values.size() * 2 + 20;
+            if (jni->PushLocalFrame(numOfLocalRef) < 0) {
+                TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK,
+                                   kTSCoreLogLevelWarning,
+                                   "Unable to reserve enough memory for local references: %d",
+                                   numOfLocalRef);
+                // FIXME: In case where we can't allocate enough local references, application will
+                // still crash with OutOfMemory error.
+                return;
+            }
+
+            jstring participantAddress = JavaStringFromStdString(jni, statistics->getParticipantAddress());
+            jstring participantSid = JavaStringFromStdString(jni, report.participantSid);
+
             jstring trackId = JavaStringFromStdString(jni, trackReport.trackId);
             jstring mediaType = JavaStringFromStdString(jni, trackReport.mediaType);
             jstring direction = JavaStringFromStdString(jni, trackReport.direction);
@@ -349,24 +372,7 @@ protected:
             jni->CallVoidMethod(*j_observer_global_,
                                 j_receive_track_statistics_id_, j_track_stats_report);
 
-            //Cleanup
-            for (unsigned int i=0; i<trackReport.values.size(); i++) {
-                jobject tmp = jni->GetObjectArrayElement(keys, i);
-                jobject tmp2 = jni->GetObjectArrayElement(values, i);
-                jni->DeleteLocalRef(tmp);
-                jni->DeleteLocalRef(tmp2);
-            }
-
-            jni->DeleteLocalRef(trackId);
-            jni->DeleteLocalRef(mediaType);
-            jni->DeleteLocalRef(direction);
-            jni->DeleteLocalRef(codecName);
-            jni->DeleteLocalRef(ssrc);
-            jni->DeleteLocalRef(activeConnectionId);
-
-            jni->DeleteLocalRef(keys);
-            jni->DeleteLocalRef(values);
-            jni->DeleteLocalRef(j_track_stats_report);
+            jni->PopLocalFrame(NULL);
         }
     }
 
