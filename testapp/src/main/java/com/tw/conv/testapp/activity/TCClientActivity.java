@@ -392,6 +392,7 @@ public class TCClientActivity extends AppCompatActivity {
         disposeConversationsClient();
         destroyConversationsSdk();
         returnToRegistration();
+        loggingOut = false;
     }
 
     private void disposeConversation() {
@@ -807,8 +808,13 @@ public class TCClientActivity extends AppCompatActivity {
                                             Snackbar.make(conversationStatusTextView, e.getMessage(), Snackbar.LENGTH_LONG)
                                                     .setAction("Action", null).show();
                                         }
-                                        hangup();
-                                        reset();
+
+                                        if (!loggingOut) {
+                                            hangup();
+                                            reset();
+                                        } else {
+                                            logout();
+                                        }
                                     }
                                 }
                             });
@@ -1017,7 +1023,6 @@ public class TCClientActivity extends AppCompatActivity {
                 // If user is logging out we need to finish that process otherwise we just reset
                 if (loggingOut) {
                     logout();
-                    loggingOut = false;
                 } else {
                     reset();
                 }
