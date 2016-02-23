@@ -263,6 +263,7 @@ dependencies {
  */
 task unpackPrebuilts(type: Copy) {
     def target = file("${buildDir}/prebuilt")
+
     onlyIf { !target.exists() }
 
     configurations.preCompile.each { dependency ->
@@ -374,7 +375,7 @@ task packageRelease(type: GradleBuild){
  * Localize the JNI_OnLoad and JNI_OnUnLoad symbol in libwebrtc-jni.a to prevent conflicts with
  * initialization
  */
-task localizeWebRtcJniLoadUnLoad(type: Exec, dependsOn: assemble) {
+task localizeWebRtcJniLoadUnLoad(type: Exec, dependsOn: 'unpackPrebuilts') {
     def ndkDir = getNdkDir()
     def ndkToolchains = "${ndkDir}/toolchains"
     def toolchainMap = [
@@ -393,9 +394,9 @@ task localizeWebRtcJniLoadUnLoad(type: Exec, dependsOn: assemble) {
             "darwin",
             "linux"
     ]
-    toolchainMap.each{ toolchainPrefix, toolChainPrebuiltPrefix ->
+    toolchainMap.each { toolchainPrefix, toolChainPrebuiltPrefix ->
         supportedArchs.each { arch, archToolChain ->
-            supportedHosts.each{ host ->
+            supportedHosts.each { host ->
                 def objCopy = "${ndkToolchains}/${toolchainPrefix}-${currentToolchainVersion}" +
                         "/prebuilt/${host}-x86_64/bin/${toolChainPrebuiltPrefix}-objcopy"
                 def libWebRtcStaticLib = "${webRtcHome}/lib/release/${arch}/libwebrtc-jni.a"
@@ -459,10 +460,11 @@ def getNdkDir() {
 }
 
 /**
- * Mangles linker flags so we can get this puppy to compile and run
- * for all archs and all build types. It's about to get real.
+ * TODO move to separate file
+ *
+ * Set of rules to ensure that tasks and flags are set correctly
  */
-class LinkerFlagsRuleSource extends RuleSource {
+class ConversationsRuleSource extends RuleSource {
     static final def projectDir = new File("conversations").absolutePath
     // TODO Add back ability to do local builds
 //    static final def twilioSdkHome = "/usr/local/twilio-sdk"
@@ -470,6 +472,69 @@ class LinkerFlagsRuleSource extends RuleSource {
     static final def pocoFoundationStaticLib = "libPocoFoundation.a"
     static final def pocoCryptoStaticLib = "libPocoCrypto.a"
     static final def webRtcJniStaticLib = "libwebrtc-jni.a"
+
+    /**
+     * Currently the plugin does not generate compile and link tasks for 64 bit architectures. A bug
+     * has been filed and once resolved we can uncomment all mutation related to 64 bit arch tasks.
+     *
+     * https://code.google.com/p/android/issues/detail?id=201561
+     */
+
+    @Mutate
+    void validatePreCompileDebugEnvironmentArmeabiV7a(
+            @Path('tasks.compileJingle_peerconnection_soArmeabi-v7aDebugSharedLibraryJingle_peerconnection_soMainCpp')
+                    Task compileTask) {
+        validatePreCompileEnvironment(compileTask)
+    }
+
+    @Mutate
+    void validatePreCompileReleaseEnvironmentArmeabiV7a(
+            @Path('tasks.compileJingle_peerconnection_soArmeabi-v7aReleaseSharedLibraryJingle_peerconnection_soMainCpp')
+                    Task compileTask) {
+        validatePreCompileEnvironment(compileTask)
+    }
+
+//    @Mutate
+//    void validatePreCompileDebugEnvironmentArm64V8a(
+//            @Path('tasks.compileJingle_peerconnection_soArm64-v8aDebugSharedLibraryJingle_peerconnection_soMainCpp')
+//                    Task compileTask) {
+//        validatePreCompileEnvironment(compileTask)
+//    }
+//
+//    @Mutate
+//    void validatePreCompileReleaseEnvironmentArm64V8a(
+//            @Path('tasks.compileJingle_peerconnection_soArm64-v8aReleaseSharedLibraryJingle_peerconnection_soMainCpp')
+//                    Task compileTask) {
+//        validatePreCompileEnvironment(compileTask)
+//    }
+
+    @Mutate
+    void validatePreCompileDebugEnvironmentX86(
+            @Path('tasks.compileJingle_peerconnection_soX86DebugSharedLibraryJingle_peerconnection_soMainCpp')
+                    Task compileTask) {
+        validatePreCompileEnvironment(compileTask)
+    }
+
+    @Mutate
+    void validatePreCompileReleaseEnvironmentX86(
+            @Path('tasks.compileJingle_peerconnection_soX86ReleaseSharedLibraryJingle_peerconnection_soMainCpp')
+                    Task compileTask) {
+        validatePreCompileEnvironment(compileTask)
+    }
+
+//    @Mutate
+//    void validatePreCompileDebugEnvironmentX86_64(
+//            @Path('tasks.compileJingle_peerconnection_soX86_64DebugSharedLibraryJingle_peerconnection_soMainCpp')
+//                    Task compileTask) {
+//        validatePreCompileEnvironment(compileTask)
+//    }
+//
+//    @Mutate
+//    void validatePreCompileReleaseEnvironmentX86_64(
+//            @Path('tasks.compileJingle_peerconnection_soX86_64ReleaseSharedLibraryJingle_peerconnection_soMainCpp')
+//                    Task compileTask) {
+//        validatePreCompileEnvironment(compileTask)
+//    }
 
     @Mutate
     void injectArmeabiV7aDebugLinkerFlags(
@@ -485,12 +550,6 @@ class LinkerFlagsRuleSource extends RuleSource {
         injectLinkerFlags(linkTask, twilioSdkHome, 'armeabi-v7a')
     }
 
-    /**
-     * Currently the plugin does not generate link tasks for 64 bit architectures. A bug
-     * has been filed and once resolved we can uncomment
-     *
-     * https://code.google.com/p/android/issues/detail?id=201561
-     */
 //    @Mutate
 //    void injectArm64v8aDebugLinkerFlags(
 //            @Path('tasks.linkJingle_peerconnection_soArm64-v8aDebugSharedLibrary')
@@ -533,6 +592,10 @@ class LinkerFlagsRuleSource extends RuleSource {
 //        injectLinkerFlags(linkTask, twilioSdkHome, 'x86_64')
 //    }
 
+    private void validatePreCompileEnvironment(compileTask) {
+        compileTask.dependsOn("localizeWebRtcJniLoadUnLoad")
+    }
+
     private void injectLinkerFlags(linkTask, sdkHome, arch) {
         def pocoHome = "${sdkHome}/twilio-poco/lib/release"
         def webRtcHome = "${sdkHome}/twilio-webrtc/lib/release"
@@ -558,4 +621,4 @@ class LinkerFlagsRuleSource extends RuleSource {
     }
 }
 
-apply plugin: LinkerFlagsRuleSource
+apply plugin: ConversationsRuleSource
