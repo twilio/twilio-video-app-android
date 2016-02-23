@@ -259,9 +259,17 @@ public class ConversationImpl implements Conversation,
     @Override
     public void onSessionStateChanged(SessionState state) {
         logger.i("state changed to: " + state.name());
+
+        ConversationStatus newConversationStatus = sessionStateToStatus(state, conversationStatus);
         this.state = state;
-        this.conversationStatus = sessionStateToStatus(state);
-        this.conversationStateObserver.onConversationStatusChanged(ConversationImpl.this, conversationStatus);
+
+        if(conversationStatus != newConversationStatus) {
+            conversationStatus = newConversationStatus;
+            conversationStateObserver.onConversationStatusChanged(ConversationImpl.this, conversationStatus);
+
+            // TODO GSDK-492 multi-invite behavior
+        }
+
     }
 
     SessionState getSessionState() {
@@ -702,21 +710,24 @@ public class ConversationImpl implements Conversation,
         localMediaImpl.setConversation(this);
     }
 
-    private ConversationStatus sessionStateToStatus(SessionState state) {
+    private ConversationStatus sessionStateToStatus(SessionState state, ConversationStatus conversationStatus) {
         switch(state) {
             case INITIALIZED:
+                return ConversationStatus.INITIALIZED;
             case STARTING:
                 return ConversationStatus.CONNECTING;
             case IN_PROGRESS:
-            case STOPPING:
             case STOP_FAILED:
                 return ConversationStatus.CONNECTED;
+            case STOPPING:
+                // Keep the existing status
+                return conversationStatus;
             case STOPPED:
                 return ConversationStatus.DISCONNECTED;
             case START_FAILED:
                 return ConversationStatus.FAILED;
             default:
-                return ConversationStatus.UNKNOWN;
+                return ConversationStatus.INITIALIZED;
         }
     }
 

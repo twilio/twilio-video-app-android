@@ -14,9 +14,10 @@ Android Conversations SDK
 
 ## Dependencies
 
-In order to build the Android Conversations SDK you will need to obtain the dependency libraries. This includes *BoringSSL*, *ReSIP*, *WebRTC*, and the *Core*. To build these dependencies please checkout [twilio-sdk-build-tools](https://code.hq.twilio.com/client/twilio-sdk-build-tools). Each dependency should be installed to `/usr/local/twilio-sdk`
+In order to build the Android Conversations SDK you will need to obtain its dependencies. Run the folllowing maven command:
 
-Alternatively, dependencies can be obtained from the workspace of the latest [twilio-sdk-android-multi](http://172.16.25.60:8080/job/twilio-sdk-android-multi/) Jenkins build.
+mvn clean
+mvn -Dbuild.platform=android initialize
 
 ## Developing
 

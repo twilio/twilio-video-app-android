@@ -447,7 +447,7 @@ public class ConversationsClientImpl implements
 
     @Override
     public void onStateDidChange(EndpointState state) {
-        logger.d("onStateDidChange");
+        logger.d("onStateDidChange " + state.toString());
         EndpointState oldEndpointState = endpointState;
         endpointState = state;
         if ((oldEndpointState == EndpointState.RECONNECTING) && (endpointState == EndpointState.REGISTERED)) {
