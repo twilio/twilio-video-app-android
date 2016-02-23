@@ -394,26 +394,33 @@ task localizeWebRtcJniLoadUnLoad(type: Exec, dependsOn: 'unpackPrebuilts') {
             "darwin",
             "linux"
     ]
-    toolchainMap.each { toolchainPrefix, toolChainPrebuiltPrefix ->
-        supportedArchs.each { arch, archToolChain ->
-            supportedHosts.each { host ->
-                def objCopy = "${ndkToolchains}/${toolchainPrefix}-${currentToolchainVersion}" +
-                        "/prebuilt/${host}-x86_64/bin/${toolChainPrebuiltPrefix}-objcopy"
-                def libWebRtcStaticLib = "${webRtcHome}/lib/release/${arch}/libwebrtc-jni.a"
-                if (file("${objCopy}").exists() &&
-                        file("${libWebRtcStaticLib}").exists() &&
-                        archToolChain == toolChainPrebuiltPrefix) {
-                    exec {
-                        executable "${objCopy}"
-                        args '--localize-symbol',
-                                'JNI_OnLoad',
-                                "${libWebRtcStaticLib}"
-                    }
-                    exec {
-                        executable "${objCopy}"
-                        args '--localize-symbol',
-                                'JNI_OnUnLoad',
-                                "${libWebRtcStaticLib}"
+
+    // For some reason I have to have something set for
+    // command line in order for this task to not complain just ignore this
+    // the real work follows in the loops below
+    commandLine 'true'
+    doLast {
+        toolchainMap.each { toolchainPrefix, toolChainPrebuiltPrefix ->
+            supportedArchs.each { arch, archToolChain ->
+                supportedHosts.each { host ->
+                    def objCopy = "${ndkToolchains}/${toolchainPrefix}-${currentToolchainVersion}" +
+                            "/prebuilt/${host}-x86_64/bin/${toolChainPrebuiltPrefix}-objcopy"
+                    def libWebRtcStaticLib = "${webRtcHome}/lib/release/${arch}/libwebrtc-jni.a"
+                    if (file("${objCopy}").exists() &&
+                            file("${libWebRtcStaticLib}").exists() &&
+                            archToolChain == toolChainPrebuiltPrefix) {
+                        exec {
+                            executable "${objCopy}"
+                            args '--localize-symbol',
+                                    'JNI_OnLoad',
+                                    "${libWebRtcStaticLib}"
+                        }
+                        exec {
+                            executable "${objCopy}"
+                            args '--localize-symbol',
+                                    'JNI_OnUnLoad',
+                                    "${libWebRtcStaticLib}"
+                        }
                     }
                 }
             }
