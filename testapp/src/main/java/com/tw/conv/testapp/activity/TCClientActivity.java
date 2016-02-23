@@ -489,17 +489,18 @@ public class TCClientActivity extends AppCompatActivity {
                      */
                     getRejectPendingIntent().cancel();
                     getAcceptPendingIntent().cancel();
+                    PendingIntent rejectPendingIntent = getRejectPendingIntent();
 
                     NotificationCompat.Builder mBuilder =
                             new NotificationCompat.Builder(TCClientActivity.this)
                                     .setSmallIcon(R.drawable.ic_videocam_green_24px)
-                                    .setOngoing(true)
+                                    .setDeleteIntent(rejectPendingIntent)
                                     .setContentTitle(incomingInvite.getInvitee())
                                     .setPriority(NotificationCompat.PRIORITY_MAX)
                                     .setDefaults(NotificationCompat.DEFAULT_ALL)
                                     .setCategory(NotificationCompat.CATEGORY_CALL)
                                     .setShowWhen(true)
-                                    .addAction(0, "Decline", getRejectPendingIntent())
+                                    .addAction(0, "Decline", rejectPendingIntent)
                                     .addAction(0, "Accept", getAcceptPendingIntent())
                                     .setContentText(getString(R.string.incoming_call));
 
