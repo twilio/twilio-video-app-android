@@ -12,13 +12,6 @@ Android Conversations SDK
     * `$ANDROID_HOME/platform-tools`
     * `$ANDROID_NDK_ROOT`
 
-## Dependencies
-
-In order to build the Android Conversations SDK you will need to obtain its dependencies. Run the folllowing maven command:
-
-mvn clean
-mvn -Dbuild.platform=android initialize
-
 ## Developing
 
 If you have all the dependencies installed, you can proceed with development. The SDK is built with gradle and can be imported into Android Studio. For first time users, just import the top level build.gradle file into Android Studio.
