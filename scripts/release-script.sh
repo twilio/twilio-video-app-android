@@ -48,7 +48,7 @@ fi
 echo "sdk-release-tool: uploading..."
 # check out https://code.hq.twilio.com/client/sdk-release-tool for how to use sdk-release-tool
 PWD=`pwd`
-export SDK_PACKAGE_PATH="${PWD}/output"
+export SDK_PACKAGE_PATH="${PWD}/conversations/build/outputs/tar"
 pushd "$SDK_RELEASE_TOOLS_PATH/sdk-release-tool/"
 ./upload --${CDN_JSON_REALM} twilio-conversations-android ${SDK_RELEASE_VERSION} ${SDK_PACKAGE_PATH}
 popd

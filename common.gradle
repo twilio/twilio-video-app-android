@@ -15,5 +15,5 @@ ext.generateVersionCode = {
     def version = getVersionName()
     def build = version.toString().replace(".", "") as int
 
-    return build
+    return build * 1000
 }

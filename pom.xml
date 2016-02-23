@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>com.twilio.sdk</groupId>
+    <artifactId>sdk-twilio-conversations</artifactId>
+    <version>0.0.1</version>
+    <description>Script to resolve and retrieve Twilo Conversations SDK for Android dependencies.</description>
+    <url>http://www.twilio.com</url>
+    
+    <properties>
+        <mavenVersion>2.0.9</mavenVersion>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <dependencies.twiliocommon.version>0.1.11</dependencies.twiliocommon.version>
+        <dependencies.twilio-webrtc.version>48.3</dependencies.twilio-webrtc.version>
+        <dependencies.twilio-conversations.version>0.10.10</dependencies.twilio-conversations.version>
+    </properties>
+    
+    <build>
+        <defaultGoal>initialize</defaultGoal>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>maven-unpack-dependencies</id>
+                        <goals>
+                            <goal>unpack-dependencies</goal>
+                        </goals>
+                        <phase>initialize</phase>
+                        <configuration>
+                            <outputDirectory>${project.build.directory}/${build.platform}</outputDirectory>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+    
+    <dependencies>
+        <dependency>
+            <groupId>com.twilio.sdk</groupId>
+            <artifactId>twilio-common</artifactId>
+            <version>${dependencies.twiliocommon.version}</version>
+            <classifier>${build.platform}</classifier>
+            <type>tar.bz2</type>
+        </dependency>
+ 
+        <dependency>
+            <groupId>com.twilio.sdk</groupId>
+            <artifactId>twilio-conversations</artifactId>
+            <version>${dependencies.twilio-conversations.version}</version>
+            <classifier>${build.platform}</classifier>
+            <type>tar.bz2</type>
+        </dependency>
+        
+        <dependency>
+            <groupId>com.twilio.sdk</groupId>
+            <artifactId>twilio-webrtc</artifactId>
+            <version>${dependencies.twilio-webrtc.version}</version>
+            <classifier>${build.platform}</classifier>
+            <type>tar.bz2</type>
+        </dependency>
+    </dependencies>
+    
+
+    <repositories>
+        <repository>
+                <id>twilio.nexus.releases</id>
+                <url>http://nexus.corp.twilio.com/content/repositories/releases</url>
+                <releases>
+                    <enabled>true</enabled>
+                </releases>
+                <snapshots>
+                    <enabled>false</enabled>
+                </snapshots>
+        </repository>
+    </repositories>
+</project>

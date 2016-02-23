@@ -399,7 +399,6 @@ task localizeWebRtcJniLoadUnLoad(type: Exec, dependsOn: assemble) {
                 def objCopy = "${ndkToolchains}/${toolchainPrefix}-${currentToolchainVersion}" +
                         "/prebuilt/${host}-x86_64/bin/${toolChainPrebuiltPrefix}-objcopy"
                 def libWebRtcStaticLib = "${webRtcHome}/lib/release/${arch}/libwebrtc-jni.a"
-
                 if (file("${objCopy}").exists() &&
                         file("${libWebRtcStaticLib}").exists() &&
                         archToolChain == toolChainPrebuiltPrefix) {
