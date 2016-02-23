@@ -4,7 +4,7 @@ apply plugin: 'nebula.provided-base'
 def currentToolchainVersion = "4.9"
 // TODO add back ability for local builds
 //def twilioSdkHome = "/usr/local/twilio-sdk"
-def twilioSdkHome = "${buildDir}/sdkdeps"
+def twilioSdkHome = "${buildDir}/prebuilt"
 def supportedAbis = [
         "armeabi-v7a",
 //        "arm64-v8a",
@@ -41,7 +41,7 @@ def webRtcStaticLib = "libwebrtc.a"
 
 configurations {
     provided
-    sdkdeps
+    preCompile
 }
 
 model {
@@ -239,6 +239,12 @@ model {
 }
 
 dependencies {
+    preCompile 'org.pocoproject.twilio:twilio-poco:1.6.12:android@tar.bz2'
+    preCompile 'com.googlesource.boringssl.twilio:twilio-boringssl:1.0.11:android@tar.bz2'
+    preCompile 'com.twilio.sdk:twilio-common:0.1.11:android@tar.bz2'
+    preCompile 'com.twilio.sdk:twilio-webrtc:48.3:android@tar.bz2'
+    preCompile 'com.twilio.sdk:twilio-conversations:0.10.10:android@tar.bz2'
+
     testCompile 'junit:junit:4.12'
     testCompile 'org.mockito:mockito-core:1.10.19'
 
@@ -246,12 +252,6 @@ dependencies {
     androidTestCompile 'com.android.support:support-annotations:23.1.1'
     androidTestCompile 'com.android.support.test:runner:0.4'
     androidTestCompile 'com.android.support.test:rules:0.4'
-
-    sdkdeps 'org.pocoproject.twilio:twilio-poco:1.6.12:android@tar.bz2'
-    sdkdeps 'com.googlesource.boringssl.twilio:twilio-boringssl:1.0.11:android@tar.bz2'
-    sdkdeps 'com.twilio.sdk:twilio-common:0.1.11:android@tar.bz2'
-    sdkdeps 'com.twilio.sdk:twilio-webrtc:48.3:android@tar.bz2'
-    sdkdeps 'com.twilio.sdk:twilio-conversations:0.10.10:android@tar.bz2'
 
     // TODO this really should be on nexus as a jar and not local
     compile files("${twilioSdkHome}/twilio-webrtc/lib/release/libjingle_peerconnection_java.jar")
@@ -261,12 +261,12 @@ dependencies {
 /**
  * Iterates over conversations dependencies and ensures they are downloaded
  */
-task unpackSdkDeps(type: Copy) {
-    def target = file("${buildDir}/sdkdeps")
+task unpackPrebuilts(type: Copy) {
+    def target = file("${buildDir}/prebuilt")
     onlyIf { !target.exists() }
 
-    configurations.sdkdeps.each { sdkdep ->
-        from tarTree(sdkdep)
+    configurations.preCompile.each { dependency ->
+        from tarTree(dependency)
         into target
     }
 }
@@ -467,7 +467,7 @@ class LinkerFlagsRuleSource extends RuleSource {
     static final def projectDir = new File("conversations").absolutePath
     // TODO Add back ability to do local builds
 //    static final def twilioSdkHome = "/usr/local/twilio-sdk"
-    static final def twilioSdkHome = "${projectDir}/build/sdkdeps"
+    static final def twilioSdkHome = "${projectDir}/build/prebuilt"
     static final def pocoFoundationStaticLib = "libPocoFoundation.a"
     static final def pocoCryptoStaticLib = "libPocoCrypto.a"
     static final def webRtcJniStaticLib = "libwebrtc-jni.a"
