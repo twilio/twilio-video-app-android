@@ -213,13 +213,16 @@ public class ConversationsClientImpl implements
         ConversationImpl outgoingConversationImpl = ConversationImpl.createOutgoingConversation(
                 this, participants, localMedia, this, this);
 
-        if (outgoingConversationImpl == null || outgoingConversationImpl.getNativeHandle() == 0) {
+        if (outgoingConversationImpl == null ||
+                outgoingConversationImpl.getNativeHandle() == 0) {
             TwilioConversationsException exception =
                     new TwilioConversationsException(TwilioConversations.CLIENT_DISCONNECTED,
                             "Cannot create conversation while reconnecting. " +
                                     "Wait for conversations client to reconnect and try again.");
             conversationCallback.onConversation(null, exception);
             return null;
+        } else {
+            outgoingConversationImpl.start();
         }
 
         conversations.add(outgoingConversationImpl);
