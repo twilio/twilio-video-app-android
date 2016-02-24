@@ -1,0 +1,64 @@
+apply plugin: 'com.android.model.application'
+
+model {
+    android {
+        compileSdkVersion 23
+        buildToolsVersion "23.0.2"
+
+        defaultConfig.with {
+            applicationId "com.tw.conv.testapp"
+            minSdkVersion.apiLevel 16
+            targetSdkVersion.apiLevel 23
+            versionName generateVersionName()
+            versionCode generateVersionCode()
+        }
+    }
+
+    android.sources {
+        main {
+            jniLibs {
+                dependencies {
+                    // TODO provide way to specify debug and release buildType
+                    project ":conversations" buildType "debug"
+                }
+            }
+        }
+    }
+
+    /*
+     * Use the debug keystore to sign all variants of the test app
+     * since this is only used internally.
+     */
+    android.signingConfigs {
+        debug {
+            storeFile file("${System.env.HOME}/.android/debug.keystore")
+        }
+    }
+
+    android.buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles.add(file('proguard-android.txt'))
+            proguardFiles.add(file("proguard-rules.pro"))
+            signingConfig = $("android.signingConfigs.debug")
+        }
+        debug {
+            applicationIdSuffix ".debug"
+            versionNameSuffix "-debug"
+            ndk {
+                debuggable true
+            }
+        }
+    }
+}
+
+dependencies {
+    compile 'com.twilio.sdk:twilio-common-android:0.2.0'
+    compile project(':conversations')
+
+    compile 'net.hockeyapp.android:HockeySDK:3.5.0'
+    compile 'com.android.support:appcompat-v7:23.1.1'
+    compile 'com.android.support:design:23.1.1'
+    compile 'com.squareup.retrofit:retrofit:1.9.0'
+    compile 'com.jakewharton.timber:timber:4.1.0'
+}

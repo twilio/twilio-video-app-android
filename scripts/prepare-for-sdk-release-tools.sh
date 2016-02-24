@@ -19,9 +19,8 @@ RELEASE_VERSION="$1"
 
 # paths
 WORKSPACE_ROOT_DIR=`pwd`
-PACKAGE_DIR="$WORKSPACE_ROOT_DIR/output"
-DOCS_DIR="$PACKAGE_DIR/docs"
-# The path should look like this: output/dist/{RELEASE_VERSION}/twilio-conversations-android.tar.bz2
+PACKAGE_DIR="$WORKSPACE_ROOT_DIR/conversations/build/outputs/tar"
+DOCS_DIR="$WORKSPACE_ROOT_DIR/conversations/build/docs/javadoc"
 PLATFORM_NAME="android"
 PRODUCT_NAME="conversations"
 RELEASE_VERSION_PATH="$PACKAGE_DIR/dist"

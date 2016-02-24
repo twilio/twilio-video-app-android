@@ -1,0 +1,19 @@
+apply from: "$rootProject.projectDir/gradle.properties"
+
+ext.getVersionName = {
+    return "${versionMajor}.${versionMinor}.${versionPatch}"
+}
+
+ext.generateVersionName = {
+    def version = getVersionName()
+    def build = version.toString().replace(".", "") as int
+
+    return version + "-" + build
+}
+
+ext.generateVersionCode = {
+    def version = getVersionName()
+    def build = version.toString().replace(".", "") as int
+
+    return build * 1000
+}
