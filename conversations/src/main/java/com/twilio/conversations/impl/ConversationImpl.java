@@ -399,8 +399,11 @@ public class ConversationImpl implements Conversation,
             if (conversationListener == null) {
                 if(e.getErrorCode() == TwilioConversations.CONVERSATION_TERMINATED) {
                     conversationsClient.onConversationTerminated(this, e);
-                    waitLatch.countDown();
+                } else {
+                    logger.e("onParticipantConnected -> received unexpected error code -> " +
+                            e.getErrorCode());
                 }
+                waitLatch.countDown();
             } else if(handler != null) {
                 handler.post(new Runnable() {
                     @Override
