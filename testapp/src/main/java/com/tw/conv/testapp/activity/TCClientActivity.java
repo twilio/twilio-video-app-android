@@ -1035,7 +1035,8 @@ public class TCClientActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onReceiveTrackStatistics(MediaTrackStatsRecord stats) {
+            public void onReceiveTrackStatistics(Conversation conversation,
+                                                 MediaTrackStatsRecord stats) {
                 StringBuilder strBld = new StringBuilder();
                 strBld.append(
                         String.format("Receiving stats for sid: %s, trackId: %s, direction: %s ",

@@ -1,29 +1,33 @@
 package com.twilio.conversations.impl.core;
 
+import com.twilio.conversations.impl.logging.Logger;
+
 import java.util.HashMap;
 import java.util.Map;
 
 public class TrackStatsReport {
 
-    public static String DIRECTION_SENDING = "sending";
-    public static String DIRECTION_RECEIVING = "receiving";
-    public static String MEDIA_OPTION_AUDIO_KEY = "audio";
-    public static String MEDIA_OPTION_VIDEO_KEY = "video";
+    public static final String DIRECTION_SENDING = "sending";
+    public static final String DIRECTION_RECEIVING = "receiving";
+    public static final String MEDIA_OPTION_AUDIO_KEY = "audio";
+    public static final String MEDIA_OPTION_VIDEO_KEY = "video";
 
-    public String participantAddress;
-    public String participantSid;
-    public String trackId;
-    public String mediaType; // audio or video
-    public String direction; // incoming or outgoing
+    public final String participantAddress;
+    public final String participantSid;
+    public final String trackId;
+    public final String mediaType; // audio or video
+    public final String direction; // incoming or outgoing
 
-    public String codecName;
-    public String ssrc;
+    public final String codecName;
+    public final String ssrc;
 
-    public String activeConnectionId;
+    public final String activeConnectionId;
 
-    public long timestamp;  // time since 1970-01-01T00:00:00Z in milliseconds
+    public final long timestamp;  // time since 1970-01-01T00:00:00Z in milliseconds
 
-    public Map<String, String> data = new HashMap<String, String>();
+    private final Map<String, String> data = new HashMap<String, String>();
+
+    static final Logger logger = Logger.getLogger(TrackStatsReport.class);
 
     public enum KeyEnum {
         BYTES_SENT("bytesSent"),
@@ -100,7 +104,8 @@ public class TrackStatsReport {
         try {
             result = Integer.valueOf(data.get(key.getKey()));
         } catch (NumberFormatException e) {
-            // TODO: log it
+            logger.w("Unexpected value type for: "+key.getKey() +
+                    " value:"+data.get(key.getKey()));
         }
         return result;
     }
@@ -110,7 +115,8 @@ public class TrackStatsReport {
         try {
             result = Long.valueOf(data.get(key.getKey()));
         } catch (NumberFormatException e) {
-            // TODO: log it
+            logger.w("Unexpected value type for: "+key.getKey() +
+                    " value:"+data.get(key.getKey()));
         }
         return result;
     }

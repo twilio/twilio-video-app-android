@@ -245,21 +245,6 @@ public class ConversationImpl implements Conversation,
         }
     }
 
-    @Override
-    public void onReceiveTrackStatistics(TrackStatsReport report) {
-        logger.d("onReceiveTrackStatistics: "+report.participantAddress);
-        if (handler != null && conversationListener != null) {
-            final MediaTrackStatsRecord stats = MediaTrackStatsRecordFactory.create(report);
-            handler.post(new Runnable() {
-                @Override
-                public void run() {
-                    conversationListener.onReceiveTrackStatistics(stats);
-                }
-            });
-        }
-
-    }
-
     private ParticipantImpl findOrCreateParticipant(String participantIdentity, String participantSid) {
         ParticipantImpl participant = participantMap.get(participantIdentity);
         if(participant == null) {
@@ -667,6 +652,20 @@ public class ConversationImpl implements Conversation,
             }
 
         }
+    }
+
+    @Override
+    public void onReceiveTrackStatistics(TrackStatsReport report) {
+        if (handler != null && conversationListener != null) {
+            final MediaTrackStatsRecord stats = MediaTrackStatsRecordFactory.create(report);
+            handler.post(new Runnable() {
+                @Override
+                public void run() {
+                    conversationListener.onReceiveTrackStatistics(ConversationImpl.this, stats);
+                }
+            });
+        }
+
     }
 
     void log(String method, String message, CoreError coreError) {

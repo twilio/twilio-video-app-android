@@ -167,7 +167,8 @@ public class ConversationsClientSendInviteTests {
             }
 
             @Override
-            public void onReceiveTrackStatistics(MediaTrackStatsRecord stats) {
+            public void onReceiveTrackStatistics(Conversation conversation,
+                                                 MediaTrackStatsRecord stats) {
 
             }
         };
