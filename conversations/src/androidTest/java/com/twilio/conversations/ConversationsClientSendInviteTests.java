@@ -165,6 +165,11 @@ public class ConversationsClientSendInviteTests {
             public void onConversationEnded(Conversation conversation, TwilioConversationsException e) {
 
             }
+
+            @Override
+            public void onReceiveTrackStatistics(MediaTrackStatsRecord stats) {
+
+            }
         };
     }
 

@@ -38,4 +38,6 @@ public interface ConversationListener {
      * @param exception Exception (if any) encountered when conversation ends.
      */
     void onConversationEnded(Conversation conversation, TwilioConversationsException exception);
+
+    void onReceiveTrackStatistics(MediaTrackStatsRecord stats);
 }

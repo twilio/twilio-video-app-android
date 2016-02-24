@@ -23,6 +23,7 @@ import com.twilio.conversations.ConversationsClient;
 import com.twilio.conversations.ConversationsClientListener;
 import com.twilio.conversations.InviteStatus;
 import com.twilio.conversations.LocalMedia;
+import com.twilio.conversations.MediaTrackStatsRecord;
 import com.twilio.conversations.OutgoingInvite;
 import com.twilio.conversations.Participant;
 import com.twilio.conversations.TwilioConversations;
@@ -363,6 +364,11 @@ public class ConversationsClientImpl implements
     public void onConversationEnded(Conversation conversation, TwilioConversationsException e) {
         ConversationImpl conversationImpl = (ConversationImpl)conversation;
         handleConversationFailed(conversationImpl, e);
+    }
+
+    @Override
+    public void onReceiveTrackStatistics(MediaTrackStatsRecord stats) {
+
     }
 
     @Override

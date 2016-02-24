@@ -5,6 +5,11 @@ import java.util.Map;
 
 public class TrackStatsReport {
 
+    public static String DIRECTION_SENDING = "sending";
+    public static String DIRECTION_RECEIVING = "receiving";
+    public static String MEDIA_OPTION_AUDIO_KEY = "audio";
+    public static String MEDIA_OPTION_VIDEO_KEY = "video";
+
     public String participantAddress;
     public String participantSid;
     public String trackId;
@@ -83,7 +88,7 @@ public class TrackStatsReport {
     }
 
     public String getStringValue(KeyEnum key) {
-        String result = data.get(key);
+        String result = data.get(key.getKey());
         if (result == null) {
             result = "";
         }
@@ -93,7 +98,7 @@ public class TrackStatsReport {
     public int getIntValue(KeyEnum key) {
         int result = 0;
         try {
-            result = Integer.valueOf(data.get(key));
+            result = Integer.valueOf(data.get(key.getKey()));
         } catch (NumberFormatException e) {
             // TODO: log it
         }
@@ -103,7 +108,7 @@ public class TrackStatsReport {
     public long getLongValue(KeyEnum key) {
         long result = 0;
         try {
-            result = Long.valueOf(data.get(key));
+            result = Long.valueOf(data.get(key.getKey()));
         } catch (NumberFormatException e) {
             // TODO: log it
         }
