@@ -58,7 +58,8 @@ public class ConversationsClientImpl implements
     void onConversationTerminated(ConversationImpl conversationImpl,
                                   TwilioConversationsException e) {
         conversations.remove(conversationImpl);
-        pendingIncomingInvites.remove(conversationImpl.getIncomingInviteImpl());
+        IncomingInviteImpl incomingInvite = pendingIncomingInvites
+                .remove(conversationImpl.getIncomingInviteImpl());
         conversationImpl.getIncomingInviteImpl().setStatus(InviteStatus.CANCELLED);
         conversationsClientListener.onIncomingInviteCancelled(this,
                 conversationImpl.getIncomingInviteImpl());
@@ -103,9 +104,10 @@ public class ConversationsClientImpl implements
     private TwilioAccessManager accessManager;
     private Handler handler;
     private EndpointState endpointState;
-    private Set<ConversationImpl> conversations = Collections.newSetFromMap(new ConcurrentHashMap<ConversationImpl, Boolean>());
-    private Map<ConversationImpl, OutgoingInviteImpl> pendingOutgoingInvites = new HashMap<ConversationImpl, OutgoingInviteImpl>();
-    private Map<ConversationImpl, IncomingInviteImpl> pendingIncomingInvites = new HashMap<ConversationImpl, IncomingInviteImpl>();
+    private Set<ConversationImpl> conversations = Collections
+            .newSetFromMap(new ConcurrentHashMap<ConversationImpl, Boolean>());
+    private Map<ConversationImpl, OutgoingInviteImpl> pendingOutgoingInvites = new HashMap<>();
+    private Map<ConversationImpl, IncomingInviteImpl> pendingIncomingInvites = new HashMap<>();
 
     public UUID getUuid() {
         return uuid;
@@ -231,7 +233,8 @@ public class ConversationsClientImpl implements
     }
 
     @Override
-    public void onConversationStatusChanged(Conversation conversation, ConversationStatus conversationStatus) {
+    public void onConversationStatusChanged(Conversation conversation,
+                                            ConversationStatus conversationStatus) {
         ConversationImpl conversationImpl = (ConversationImpl)conversation;
         if(conversationStatus.equals(ConversationStatus.CONNECTED) &&
                 conversationImpl.getSessionState().equals(SessionState.IN_PROGRESS)) {
@@ -249,10 +252,10 @@ public class ConversationsClientImpl implements
             conversationImpl.setConversationListener(null);
             // Notify the developer that the conversation is active
             if (incomingInviteImpl.getHandler() != null && incomingInviteImpl.getConversationCallback() != null) {
-				/*
-				 * Block the thread to ensure no other callbacks are called until the developer handles
-				 * this callback.
-				 */
+                /**
+                 * Block the thread to ensure no other callbacks are called until the developer
+                 * handles this callback.
+                 */
                 final CountDownLatch waitLatch = new CountDownLatch(1);
                 incomingInviteImpl.getHandler().post(new Runnable() {
                     @Override
@@ -277,10 +280,10 @@ public class ConversationsClientImpl implements
             // Stop listening to ConversationListener. The developer should provide their own listener
             conversationImpl.setConversationListener(null);
             if (outgoingInviteImpl.getHandler() != null && outgoingInviteImpl.getConversationCallback() != null) {
-				/*
-				 * Block the thread to ensure no other callbacks are called until the developer handles
-				 * this callback.
-				 */
+                /**
+                 * Block the thread to ensure no other callbacks are called until the developer handles
+                 * this callback.
+                 */
                 final CountDownLatch waitLatch = new CountDownLatch(1);
                 outgoingInviteImpl.getHandler().post(new Runnable() {
                     @Override
@@ -299,10 +302,13 @@ public class ConversationsClientImpl implements
 
     }
 
-    private void handleConversationFailed(final ConversationImpl conversationImpl, final TwilioConversationsException e) {
+    private void handleConversationFailed(final ConversationImpl conversationImpl,
+                                          final TwilioConversationsException e) {
         final OutgoingInviteImpl outgoingInviteImpl = pendingOutgoingInvites.get(conversationImpl);
         if(outgoingInviteImpl != null) {
-            InviteStatus status = outgoingInviteImpl.getStatus() == InviteStatus.CANCELLED ? InviteStatus.CANCELLED : InviteStatus.FAILED;
+            InviteStatus status = outgoingInviteImpl.getStatus() == InviteStatus.CANCELLED ?
+                    InviteStatus.CANCELLED :
+                    InviteStatus.FAILED;
             outgoingInviteImpl.setStatus(status);
             pendingOutgoingInvites.remove(conversationImpl);
             if (outgoingInviteImpl.getHandler() != null &&
@@ -320,8 +326,10 @@ public class ConversationsClientImpl implements
                         } else {
                             outgoingInviteImpl.getConversationCallback()
                                     .onConversation(conversationImpl, e);
-                            conversationImpl.getConversationListener()
-                                    .onConversationEnded(conversationImpl, null);
+                            if (conversationImpl != null) {
+                                conversationImpl.getConversationListener()
+                                        .onConversationEnded(conversationImpl, null);
+                            }
                         }
                     }
                 });

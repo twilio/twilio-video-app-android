@@ -291,7 +291,7 @@ public class ConversationImpl implements Conversation,
                 if(e.getErrorCode() == TwilioConversations.CONVERSATION_TERMINATED) {
                     conversationsClient.onConversationTerminated(this, e);
                 }
-            } else if(handler != null && conversationListener != null) {
+            } else if(handler != null) {
                 final CountDownLatch waitLatch = new CountDownLatch(1);
                 handler.post(new Runnable() {
                     @Override
@@ -370,9 +370,9 @@ public class ConversationImpl implements Conversation,
                     public void run() {
                         conversationListener.onParticipantConnected(ConversationImpl.this, participantImpl);
                         waitLatch.countDown();
-						/*
-						 * Workaround for CSDK-225. MediaTracks are added before onParticipantConnected is called.
-						 */
+                        /**
+                         * Workaround for CSDK-225. MediaTracks are added before onParticipantConnected is called.
+                         */
                         Media media = participantImpl.getMediaImpl();
                         for(final VideoTrack videoTrack : media.getVideoTracks()) {
                             final Handler participantHandler = participantImpl.getHandler();
@@ -394,12 +394,19 @@ public class ConversationImpl implements Conversation,
                 waitLatch.countDown();
             }
         } else {
-            final TwilioConversationsException e = new TwilioConversationsException(error.getCode(), error.getMessage());
-            if(handler != null && conversationListener != null) {
+            final TwilioConversationsException e = new TwilioConversationsException(error.getCode(),
+                    error.getMessage());
+            if (conversationListener == null) {
+                if(e.getErrorCode() == TwilioConversations.CONVERSATION_TERMINATED) {
+                    conversationsClient.onConversationTerminated(this, e);
+                    waitLatch.countDown();
+                }
+            } else if(handler != null) {
                 handler.post(new Runnable() {
                     @Override
                     public void run() {
-                        conversationListener.onFailedToConnectParticipant(ConversationImpl.this, participantImpl, e);
+                        conversationListener.onFailedToConnectParticipant(ConversationImpl.this,
+                                participantImpl, e);
                         waitLatch.countDown();
                     }
                 });
