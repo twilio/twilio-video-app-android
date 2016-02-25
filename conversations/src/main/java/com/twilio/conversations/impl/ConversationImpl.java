@@ -675,7 +675,7 @@ public class ConversationImpl implements Conversation,
     @Override
     public void onReceiveTrackStatistics(CoreTrackStatsReport report) {
         if (statsHandler != null && statsListener != null) {
-            final MediaTrackStatsRecord stats = TrackStatsRecordFactory.create(report);
+            final MediaTrackStatsRecord stats = MediaTrackStatsRecordFactory.create(report);
             statsHandler.post(new Runnable() {
                 @Override
                 public void run() {
