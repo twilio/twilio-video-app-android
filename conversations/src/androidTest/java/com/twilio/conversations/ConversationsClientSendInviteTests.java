@@ -166,11 +166,6 @@ public class ConversationsClientSendInviteTests {
 
             }
 
-            @Override
-            public void onReceiveTrackStatistics(Conversation conversation,
-                                                 TrackStatsRecord stats) {
-
-            }
         };
     }
 

@@ -367,11 +367,6 @@ public class ConversationsClientImpl implements
     }
 
     @Override
-    public void onReceiveTrackStatistics(Conversation conversation, TrackStatsRecord stats) {
-
-    }
-
-    @Override
     public synchronized void dispose() {
         isDisposing = true;
         if (listening) {

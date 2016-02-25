@@ -38,6 +38,7 @@ import com.twilio.common.TwilioAccessManagerListener;
 import com.twilio.conversations.LocalAudioStatsRecord;
 import com.twilio.conversations.LocalVideoStatsRecord;
 import com.twilio.conversations.RemoteVideoStatsRecord;
+import com.twilio.conversations.StatsListener;
 import com.twilio.conversations.TrackStatsRecord;
 import com.twilio.conversations.RemoteAudioStatsRecord;
 import com.twilio.conversations.TwilioConversationsException;
@@ -803,6 +804,7 @@ public class TCClientActivity extends AppCompatActivity {
                                     if (e == null) {
                                         TCClientActivity.this.conversation = conversation;
                                         conversation.setConversationListener(conversationListener());
+                                        conversation.setStatsListener(statsListener());
                                     } else {
                                         if (e.getErrorCode() == TwilioConversations.CONVERSATION_REJECTED) {
                                             Snackbar.make(conversationStatusTextView, "Invite rejected", Snackbar.LENGTH_LONG)
@@ -901,6 +903,7 @@ public class TCClientActivity extends AppCompatActivity {
                 if (e == null) {
                     TCClientActivity.this.conversation = conversation;
                     conversation.setConversationListener(conversationListener());
+                    conversation.setStatsListener(statsListener());
                 } else if (e.getErrorCode() == TwilioConversations.TOO_MANY_ACTIVE_CONVERSATIONS) {
                     Timber.w(e.getMessage());
                     conversationsClientStatusTextView
@@ -1034,13 +1037,17 @@ public class TCClientActivity extends AppCompatActivity {
                 }
             }
 
+        };
+    }
+
+    private StatsListener statsListener() {
+        return new StatsListener() {
             @Override
-            public void onReceiveTrackStatistics(Conversation conversation,
-                                                 TrackStatsRecord stats) {
+            public void onTrackStatsRecord(Conversation conversation, TrackStatsRecord stats) {
                 StringBuilder strBld = new StringBuilder();
                 strBld.append(
                         String.format("Receiving stats for sid: %s, trackId: %s, direction: %s ",
-                        stats.getParticipantSid(), stats.getTrackId(), stats.getDirection()));
+                                stats.getParticipantSid(), stats.getTrackId(), stats.getDirection()));
                 if (stats instanceof LocalAudioStatsRecord) {
                     strBld.append(
                             String.format("media type: audio, bytes sent %d",

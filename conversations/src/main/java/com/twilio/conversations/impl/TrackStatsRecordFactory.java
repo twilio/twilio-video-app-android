@@ -3,7 +3,7 @@ package com.twilio.conversations.impl;
 import com.twilio.conversations.TrackStatsRecord;
 import com.twilio.conversations.impl.core.CoreTrackStatsReport;
 
-class MediaTrackStatsRecordFactory {
+class TrackStatsRecordFactory {
 
     public static TrackStatsRecord create(CoreTrackStatsReport report) {
         TrackStatsRecord record = null;

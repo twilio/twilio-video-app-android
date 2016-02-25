@@ -11,6 +11,7 @@ import android.os.Handler;
 
 import com.twilio.conversations.AudioTrack;
 import com.twilio.conversations.Conversation;
+import com.twilio.conversations.StatsListener;
 import com.twilio.conversations.TrackStatsRecord;
 import com.twilio.conversations.TwilioConversationsException;
 import com.twilio.conversations.ConversationListener;
@@ -52,6 +53,8 @@ public class ConversationImpl implements Conversation,
     private Handler handler;
     private IncomingInviteImpl incomingInviteImpl;
     private OutgoingInviteImpl outgoingInviteImpl;
+    private StatsListener statsListener;
+    private Handler statsHandler;
 
 
     private static String TAG = "ConversationImpl";
@@ -234,6 +237,21 @@ public class ConversationImpl implements Conversation,
             return null;
         } else {
             return conversationSid;
+        }
+    }
+
+    @Override
+    public StatsListener getStatsListener() {
+        return statsListener;
+    }
+
+    @Override
+    public void setStatsListener(StatsListener listener) {
+        statsListener = listener;
+        if (listener != null) {
+            statsHandler = CallbackHandler.create();
+        } else {
+            statsHandler = null;
         }
     }
 
@@ -656,12 +674,12 @@ public class ConversationImpl implements Conversation,
 
     @Override
     public void onReceiveTrackStatistics(CoreTrackStatsReport report) {
-        if (handler != null && conversationListener != null) {
-            final TrackStatsRecord stats = MediaTrackStatsRecordFactory.create(report);
-            handler.post(new Runnable() {
+        if (statsHandler != null && statsListener != null) {
+            final TrackStatsRecord stats = TrackStatsRecordFactory.create(report);
+            statsHandler.post(new Runnable() {
                 @Override
                 public void run() {
-                    conversationListener.onReceiveTrackStatistics(ConversationImpl.this, stats);
+                    statsListener.onTrackStatsRecord(ConversationImpl.this, stats);
                 }
             });
         }
