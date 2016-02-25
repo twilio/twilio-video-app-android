@@ -23,7 +23,7 @@ import com.twilio.conversations.ConversationsClient;
 import com.twilio.conversations.ConversationsClientListener;
 import com.twilio.conversations.InviteStatus;
 import com.twilio.conversations.LocalMedia;
-import com.twilio.conversations.TrackStatsReport;
+import com.twilio.conversations.TrackStatsRecord;
 import com.twilio.conversations.OutgoingInvite;
 import com.twilio.conversations.Participant;
 import com.twilio.conversations.TwilioConversations;
@@ -367,7 +367,7 @@ public class ConversationsClientImpl implements
     }
 
     @Override
-    public void onReceiveTrackStatistics(Conversation conversation, TrackStatsReport stats) {
+    public void onReceiveTrackStatistics(Conversation conversation, TrackStatsRecord stats) {
 
     }
 

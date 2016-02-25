@@ -1,10 +1,10 @@
 package com.twilio.conversations.impl;
 
-import com.twilio.conversations.RemoteAudioStatsReport;
+import com.twilio.conversations.RemoteAudioStatsRecord;
 import com.twilio.conversations.impl.core.CoreTrackStatsReport;
 
-public class RemoteAudioStatsReportImpl extends TrackStatsReportImpl
-        implements RemoteAudioStatsReport {
+public class RemoteAudioStatsRecordImpl extends TrackStatsRecordImpl
+        implements RemoteAudioStatsRecord {
 
     private final long bytesReceived;
     private final long packetsReceived;
@@ -12,7 +12,7 @@ public class RemoteAudioStatsReportImpl extends TrackStatsReportImpl
     private final int jitterBuffer;
     private final int jitterReceived;
 
-    public RemoteAudioStatsReportImpl(CoreTrackStatsReport report) {
+    public RemoteAudioStatsRecordImpl(CoreTrackStatsReport report) {
         super(report);
         bytesReceived = report.getLongValue(CoreTrackStatsReport.KeyEnum.BYTES_RECEIVED);
         packetsReceived = report.getLongValue(CoreTrackStatsReport.KeyEnum.PACKETS_RECEIVED);

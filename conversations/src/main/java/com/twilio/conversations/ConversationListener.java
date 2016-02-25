@@ -45,5 +45,5 @@ public interface ConversationListener {
      * @param conversation The conversation
      * @param stats Media track statistics.
      */
-    void onReceiveTrackStatistics(Conversation conversation, TrackStatsReport stats);
+    void onReceiveTrackStatistics(Conversation conversation, TrackStatsRecord stats);
 }

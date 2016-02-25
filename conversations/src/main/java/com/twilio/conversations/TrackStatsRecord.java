@@ -1,6 +1,6 @@
 package com.twilio.conversations;
 
-public interface TrackStatsReport {
+public interface TrackStatsRecord {
 
     String getTrackId();
 

@@ -1,23 +1,23 @@
 package com.twilio.conversations.impl;
 
-import com.twilio.conversations.TrackStatsReport;
+import com.twilio.conversations.TrackStatsRecord;
 import com.twilio.conversations.impl.core.CoreTrackStatsReport;
 
 class MediaTrackStatsRecordFactory {
 
-    public static TrackStatsReport create(CoreTrackStatsReport report) {
-        TrackStatsReport record = null;
+    public static TrackStatsRecord create(CoreTrackStatsReport report) {
+        TrackStatsRecord record = null;
         if (report.direction.equalsIgnoreCase(CoreTrackStatsReport.DIRECTION_SENDING)) {
             if (report.mediaType.equalsIgnoreCase(CoreTrackStatsReport.MEDIA_OPTION_AUDIO_KEY)) {
-                record = new LocalAudioStatsReportImpl(report);
+                record = new LocalAudioStatsRecordImpl(report);
             } else if (report.mediaType.equalsIgnoreCase(CoreTrackStatsReport.MEDIA_OPTION_VIDEO_KEY)) {
-                record = new LocalVideoStatsReportImpl(report);
+                record = new LocalVideoStatsRecordImpl(report);
             }
         } else if (report.direction.equalsIgnoreCase(CoreTrackStatsReport.DIRECTION_RECEIVING)){
             if (report.mediaType.equalsIgnoreCase(CoreTrackStatsReport.MEDIA_OPTION_AUDIO_KEY)) {
-                record = new RemoteAudioStatsReportImpl(report);
+                record = new RemoteAudioStatsRecordImpl(report);
             } else if (report.mediaType.equalsIgnoreCase(CoreTrackStatsReport.MEDIA_OPTION_VIDEO_KEY)) {
-                record = new RemoteVideoStatsReportImpl(report);
+                record = new RemoteVideoStatsRecordImpl(report);
             }
         }
         return record;

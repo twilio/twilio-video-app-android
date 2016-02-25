@@ -1,16 +1,17 @@
 package com.twilio.conversations;
 
 
-public interface RemoteAudioStatsReport extends TrackStatsReport {
+public interface RemoteVideoStatsRecord extends TrackStatsRecord {
 
     long getBytesReceived();
 
     long getPacketsReceived();
 
-    int getAudioOutputLevel();
+    VideoDimensions getDimensions();
+
+    int getFrameRate();
 
     int getJitterBuffer();
 
-    int getJitterReceived();
 
 }

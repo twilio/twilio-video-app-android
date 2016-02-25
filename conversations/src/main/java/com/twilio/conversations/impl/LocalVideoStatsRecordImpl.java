@@ -1,12 +1,12 @@
 package com.twilio.conversations.impl;
 
-import com.twilio.conversations.LocalVideoStatsReport;
+import com.twilio.conversations.LocalVideoStatsRecord;
 import com.twilio.conversations.VideoDimensions;
 import com.twilio.conversations.impl.core.CoreTrackStatsReport;
 
 
-public class LocalVideoStatsReportImpl extends TrackStatsReportImpl
-        implements LocalVideoStatsReport {
+public class LocalVideoStatsRecordImpl extends TrackStatsRecordImpl
+        implements LocalVideoStatsRecord {
 
     private final long bytesSent;
     private final long packetsSent;
@@ -15,7 +15,7 @@ public class LocalVideoStatsReportImpl extends TrackStatsReportImpl
     private final int frameRate;
     private final int roundTripTime;
 
-    public LocalVideoStatsReportImpl(CoreTrackStatsReport report) {
+    public LocalVideoStatsRecordImpl(CoreTrackStatsReport report) {
         super(report);
         this.bytesSent = report.getLongValue(CoreTrackStatsReport.KeyEnum.BYTES_SENT);
         this.packetsSent = report.getLongValue(CoreTrackStatsReport.KeyEnum.PACKETS_SENT);

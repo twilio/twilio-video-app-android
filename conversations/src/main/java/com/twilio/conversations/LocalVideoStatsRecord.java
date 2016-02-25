@@ -1,7 +1,7 @@
 package com.twilio.conversations;
 
 
-public interface LocalVideoStatsReport extends TrackStatsReport {
+public interface LocalVideoStatsRecord extends TrackStatsRecord {
 
     long getBytesSent();
 

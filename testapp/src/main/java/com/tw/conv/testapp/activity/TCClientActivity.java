@@ -35,11 +35,11 @@ import android.widget.TextView;
 import com.twilio.common.TwilioAccessManager;
 import com.twilio.common.TwilioAccessManagerFactory;
 import com.twilio.common.TwilioAccessManagerListener;
-import com.twilio.conversations.LocalAudioStatsReport;
-import com.twilio.conversations.LocalVideoStatsReport;
-import com.twilio.conversations.RemoteVideoStatsReport;
-import com.twilio.conversations.TrackStatsReport;
-import com.twilio.conversations.RemoteAudioStatsReport;
+import com.twilio.conversations.LocalAudioStatsRecord;
+import com.twilio.conversations.LocalVideoStatsRecord;
+import com.twilio.conversations.RemoteVideoStatsRecord;
+import com.twilio.conversations.TrackStatsRecord;
+import com.twilio.conversations.RemoteAudioStatsRecord;
 import com.twilio.conversations.TwilioConversationsException;
 import com.tw.conv.testapp.R;
 import com.tw.conv.testapp.dialog.Dialog;
@@ -1036,27 +1036,27 @@ public class TCClientActivity extends AppCompatActivity {
 
             @Override
             public void onReceiveTrackStatistics(Conversation conversation,
-                                                 TrackStatsReport stats) {
+                                                 TrackStatsRecord stats) {
                 StringBuilder strBld = new StringBuilder();
                 strBld.append(
                         String.format("Receiving stats for sid: %s, trackId: %s, direction: %s ",
                         stats.getParticipantSid(), stats.getTrackId(), stats.getDirection()));
-                if (stats instanceof LocalAudioStatsReport) {
+                if (stats instanceof LocalAudioStatsRecord) {
                     strBld.append(
                             String.format("media type: audio, bytes sent %d",
-                                    ((LocalAudioStatsReport) stats).getBytesSent()));
-                } else if (stats instanceof LocalVideoStatsReport) {
+                                    ((LocalAudioStatsRecord) stats).getBytesSent()));
+                } else if (stats instanceof LocalVideoStatsRecord) {
                     strBld.append(
                             String.format("media type: video, bytes sent %d",
-                                    ((LocalVideoStatsReport) stats).getBytesSent()));
-                } else if (stats instanceof RemoteAudioStatsReport) {
+                                    ((LocalVideoStatsRecord) stats).getBytesSent()));
+                } else if (stats instanceof RemoteAudioStatsRecord) {
                     strBld.append(
                             String.format("media type: audio, bytes received %d",
-                                    ((RemoteAudioStatsReport) stats).getBytesReceived()));
-                } else if (stats instanceof RemoteVideoStatsReport) {
+                                    ((RemoteAudioStatsRecord) stats).getBytesReceived()));
+                } else if (stats instanceof RemoteVideoStatsRecord) {
                     strBld.append(
                             String.format("media type: video, bytes received %d",
-                                    ((RemoteVideoStatsReport) stats).getBytesReceived()));
+                                    ((RemoteVideoStatsRecord) stats).getBytesReceived()));
                 } else {
                     strBld.append("Unknown media type");
                 }

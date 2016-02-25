@@ -1,11 +1,11 @@
 package com.twilio.conversations.impl;
 
-import com.twilio.conversations.LocalAudioStatsReport;
+import com.twilio.conversations.LocalAudioStatsRecord;
 import com.twilio.conversations.impl.core.CoreTrackStatsReport;
 
 
-public class LocalAudioStatsReportImpl extends TrackStatsReportImpl
-        implements LocalAudioStatsReport {
+public class LocalAudioStatsRecordImpl extends TrackStatsRecordImpl
+        implements LocalAudioStatsRecord {
 
     private final long bytesSent;
     private final long packetsSent;
@@ -14,7 +14,7 @@ public class LocalAudioStatsReportImpl extends TrackStatsReportImpl
     private final int jitter;
     private final int roundTripTime;
 
-    public LocalAudioStatsReportImpl(CoreTrackStatsReport report) {
+    public LocalAudioStatsRecordImpl(CoreTrackStatsReport report) {
         super(report);
         this.bytesSent = report.getLongValue(CoreTrackStatsReport.KeyEnum.BYTES_SENT);
         this.packetsSent = report.getLongValue(CoreTrackStatsReport.KeyEnum.PACKETS_SENT);
