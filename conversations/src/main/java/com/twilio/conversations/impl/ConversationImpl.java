@@ -89,6 +89,7 @@ public class ConversationImpl implements Conversation,
     private SessionObserverInternal sessionObserverInternal;
     private long nativeSession;
     private boolean isDisposed;
+    private boolean isDisposing;
 
     private ConversationImpl(ConversationsClientImpl conversationsClient,
                              Set<String> participants,
@@ -252,7 +253,7 @@ public class ConversationImpl implements Conversation,
         return participant;
     }
 
-    /*
+    /**
      * SessionObserver events
      */
     @Override
@@ -269,6 +270,12 @@ public class ConversationImpl implements Conversation,
             // TODO GSDK-492 multi-invite behavior
         }
 
+        if (conversationStatus == ConversationStatus.DISCONNECTED &&
+                isDisposing) {
+            // If the conversation was active, dispose will disconnect the conversation
+            // now we must complete the disposal
+            disposeConversation();
+        }
     }
 
     SessionState getSessionState() {
@@ -701,16 +708,13 @@ public class ConversationImpl implements Conversation,
 
     @Override
     public synchronized void dispose() {
-        if (sessionObserverInternal != null) {
-            sessionObserverInternal.dispose();
-            sessionObserverInternal = null;
+        isDisposing = true;
+        if (isActive()) {
+            // We should disconnect the conversation before disposing
+            stop();
+        } else {
+            disposeConversation();
         }
-        if (nativeSession != 0) {
-            freeNativeHandle(nativeSession);
-            nativeSession = 0;
-        }
-        EglBaseProvider.releaseEglBase();
-        isDisposed = true;
     }
 
     public void setLocalMedia(LocalMedia media) {
@@ -719,7 +723,8 @@ public class ConversationImpl implements Conversation,
         localMediaImpl.setConversation(this);
     }
 
-    private ConversationStatus sessionStateToStatus(SessionState state, ConversationStatus conversationStatus) {
+    private ConversationStatus sessionStateToStatus(SessionState state,
+                                                    ConversationStatus conversationStatus) {
         switch(state) {
             case INITIALIZED:
                 return ConversationStatus.INITIALIZED;
@@ -829,6 +834,20 @@ public class ConversationImpl implements Conversation,
     @Override
     public boolean enableAudio(boolean enabled, boolean muted) {
         return enableAudio(nativeSession, enabled, muted);
+    }
+
+    private void disposeConversation() {
+        if (sessionObserverInternal != null) {
+            sessionObserverInternal.dispose();
+            sessionObserverInternal = null;
+        }
+        if (nativeSession != 0) {
+            freeNativeHandle(nativeSession);
+            nativeSession = 0;
+        }
+        EglBaseProvider.releaseEglBase();
+        isDisposed = true;
+        isDisposing = false;
     }
 
     private synchronized void checkDisposed() {

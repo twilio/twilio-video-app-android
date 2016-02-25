@@ -1222,10 +1222,7 @@ public class TCClientActivity extends AppCompatActivity {
         participantContainers.clear();
         localContainer = (ViewGroup)findViewById(R.id.localContainer);
 
-        if(conversation != null) {
-            conversation.dispose();
-            conversation = null;
-        }
+        disposeConversation();
         localMedia = null;
         outgoingInvite = null;
 
