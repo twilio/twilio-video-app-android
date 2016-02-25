@@ -7,7 +7,10 @@ public interface StatsListener {
      *
      * @param conversation The conversation
      * @param stats Media track statistics.
+     *
+     * @note: Each media track will report a statistics record once per second.
+     *        We suggest using a separate thread to obtain stats
      */
-    void onTrackStatsRecord(Conversation conversation, TrackStatsRecord stats);
+    void onMediaTrackStatsRecord(Conversation conversation, MediaTrackStatsRecord stats);
 
 }

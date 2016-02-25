@@ -1,11 +1,11 @@
 package com.twilio.conversations.impl;
 
-import com.twilio.conversations.RemoteVideoStatsRecord;
+import com.twilio.conversations.RemoteVideoTrackStatsRecord;
 import com.twilio.conversations.VideoDimensions;
 import com.twilio.conversations.impl.core.CoreTrackStatsReport;
 
-public class RemoteVideoStatsRecordImpl extends TrackStatsRecordImpl
-        implements RemoteVideoStatsRecord {
+public class RemoteVideoTrackStatsRecordImpl extends MediaTrackStatsRecordImpl
+        implements RemoteVideoTrackStatsRecord {
 
     private final long bytesReceived;
     private final long packetsReceived;
@@ -13,7 +13,7 @@ public class RemoteVideoStatsRecordImpl extends TrackStatsRecordImpl
     private final int frameRate;
     private final int jitterBuffer;
 
-    public RemoteVideoStatsRecordImpl(CoreTrackStatsReport report) {
+    public RemoteVideoTrackStatsRecordImpl(CoreTrackStatsReport report) {
         super(report);
         bytesReceived = report.getLongValue(CoreTrackStatsReport.KeyEnum.BYTES_RECEIVED);
         packetsReceived = report.getLongValue(CoreTrackStatsReport.KeyEnum.PACKETS_RECEIVED);

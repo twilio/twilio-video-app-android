@@ -1,9 +1,9 @@
 package com.twilio.conversations.impl;
 
-import com.twilio.conversations.TrackStatsRecord;
+import com.twilio.conversations.MediaTrackStatsRecord;
 import com.twilio.conversations.impl.core.CoreTrackStatsReport;
 
-public class TrackStatsRecordImpl implements TrackStatsRecord {
+public class MediaTrackStatsRecordImpl implements MediaTrackStatsRecord {
 
     private final String trackId;
     private final int packetsLost;
@@ -13,7 +13,7 @@ public class TrackStatsRecordImpl implements TrackStatsRecord {
     private final String participantSid;
     private final long unixTimestamp;
 
-    public TrackStatsRecordImpl(CoreTrackStatsReport report) {
+    public MediaTrackStatsRecordImpl(CoreTrackStatsReport report) {
         trackId = report.trackId;
         packetsLost = report.getIntValue(CoreTrackStatsReport.KeyEnum.PACKETS_LOST);
         direction = report.direction;
