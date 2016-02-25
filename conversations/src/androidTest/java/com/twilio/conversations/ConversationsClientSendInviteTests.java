@@ -165,6 +165,7 @@ public class ConversationsClientSendInviteTests {
             public void onConversationEnded(Conversation conversation, TwilioConversationsException e) {
 
             }
+
         };
     }
 

@@ -29,4 +29,6 @@ public interface SessionObserver {
     void onAudioTrackRemoved(TrackInfo trackInfo);
 
     void onAudioTrackStateChanged(TrackInfo trackInfo);
+
+    void onReceiveTrackStatistics(CoreTrackStatsReport report);
 }

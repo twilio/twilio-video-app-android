@@ -35,6 +35,12 @@ import android.widget.TextView;
 import com.twilio.common.TwilioAccessManager;
 import com.twilio.common.TwilioAccessManagerFactory;
 import com.twilio.common.TwilioAccessManagerListener;
+import com.twilio.conversations.LocalAudioTrackStatsRecord;
+import com.twilio.conversations.LocalVideoTrackStatsRecord;
+import com.twilio.conversations.RemoteVideoTrackStatsRecord;
+import com.twilio.conversations.StatsListener;
+import com.twilio.conversations.MediaTrackStatsRecord;
+import com.twilio.conversations.RemoteAudioTrackStatsRecord;
 import com.twilio.conversations.TwilioConversationsException;
 import com.tw.conv.testapp.R;
 import com.tw.conv.testapp.dialog.Dialog;
@@ -73,6 +79,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import retrofit.Callback;
 import retrofit.RetrofitError;
@@ -136,6 +144,7 @@ public class TCClientActivity extends AppCompatActivity {
     private AudioState audioState;
     private String capabilityToken;
     private TwilioAccessManager accessManager;
+    private ExecutorService statsExecutorService;
 
     /**
      * FIXME
@@ -798,6 +807,17 @@ public class TCClientActivity extends AppCompatActivity {
                                     if (e == null) {
                                         TCClientActivity.this.conversation = conversation;
                                         conversation.setConversationListener(conversationListener());
+                                        if (statsExecutorService != null) {
+                                            statsExecutorService.shutdown();
+                                        }
+                                        statsExecutorService = Executors.newFixedThreadPool(1);
+                                        statsExecutorService.submit(new Runnable() {
+                                            @Override
+                                            public void run() {
+                                                TCClientActivity.this.conversation.setStatsListener(statsListener());
+                                            }
+                                        });
+
                                     } else {
                                         if (e.getErrorCode() == TwilioConversations.CONVERSATION_REJECTED) {
                                             Snackbar.make(conversationStatusTextView, "Invite rejected", Snackbar.LENGTH_LONG)
@@ -896,6 +916,16 @@ public class TCClientActivity extends AppCompatActivity {
                 if (e == null) {
                     TCClientActivity.this.conversation = conversation;
                     conversation.setConversationListener(conversationListener());
+                    if (statsExecutorService != null) {
+                        statsExecutorService.shutdown();
+                    }
+                    statsExecutorService = Executors.newFixedThreadPool(1);
+                    statsExecutorService.submit(new Runnable() {
+                        @Override
+                        public void run() {
+                            TCClientActivity.this.conversation.setStatsListener(statsListener());
+                        }
+                    });
                 } else if (e.getErrorCode() == TwilioConversations.TOO_MANY_ACTIVE_CONVERSATIONS) {
                     Timber.w(e.getMessage());
                     conversationsClientStatusTextView
@@ -1020,6 +1050,11 @@ public class TCClientActivity extends AppCompatActivity {
                     }
                 }
                 conversationStatusTextView.setText(status);
+                conversation.setStatsListener(null);
+                if (statsExecutorService != null) {
+                    statsExecutorService.shutdownNow();
+                    statsExecutorService = null;
+                }
 
                 // If user is logging out we need to finish that process otherwise we just reset
                 if (loggingOut) {
@@ -1029,6 +1064,38 @@ public class TCClientActivity extends AppCompatActivity {
                 }
             }
 
+        };
+    }
+
+    private StatsListener statsListener() {
+        return new StatsListener() {
+            @Override
+            public void onMediaTrackStatsRecord(Conversation conversation, MediaTrackStatsRecord stats) {
+                StringBuilder strBld = new StringBuilder();
+                strBld.append(
+                        String.format("Receiving stats for sid: %s, trackId: %s, direction: %s ",
+                                stats.getParticipantSid(), stats.getTrackId(), stats.getDirection()));
+                if (stats instanceof LocalAudioTrackStatsRecord) {
+                    strBld.append(
+                            String.format("media type: audio, bytes sent %d",
+                                    ((LocalAudioTrackStatsRecord) stats).getBytesSent()));
+                } else if (stats instanceof LocalVideoTrackStatsRecord) {
+                    strBld.append(
+                            String.format("media type: video, bytes sent %d",
+                                    ((LocalVideoTrackStatsRecord) stats).getBytesSent()));
+                } else if (stats instanceof RemoteAudioTrackStatsRecord) {
+                    strBld.append(
+                            String.format("media type: audio, bytes received %d",
+                                    ((RemoteAudioTrackStatsRecord) stats).getBytesReceived()));
+                } else if (stats instanceof RemoteVideoTrackStatsRecord) {
+                    strBld.append(
+                            String.format("media type: video, bytes received %d",
+                                    ((RemoteVideoTrackStatsRecord) stats).getBytesReceived()));
+                } else {
+                    strBld.append("Unknown media type");
+                }
+                Timber.i(strBld.toString());
+            }
         };
     }
 

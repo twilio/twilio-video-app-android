@@ -61,4 +61,18 @@ public interface Conversation {
      * Attempts to use this conversation object after disposal will result in an IllegalStateException.
      */
     void dispose();
+
+    /**
+     * Gets the {@link StatsListener} of this conversation
+     *
+     * @return listener of this conversation media tracks stats
+     */
+    StatsListener getStatsListener();
+
+    /**
+     * Sets the {@link StatsListener} of this conversation
+     *
+     * @param listener A listener of this conversation media tracks stats
+     */
+    void setStatsListener(StatsListener listener);
 }

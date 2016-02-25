@@ -10,6 +10,9 @@
 #include "TSCSessionObserver.h"
 #include "TSCMediaStreamInfo.h"
 #include "TSCMediaTrackInfo.h"
+#include "TSCSessionStatistics.h"
+#include "TSCConnectionStatsReport.h"
+#include "TSCTrackStatsReport.h"
 #include "com_twilio_conversations_impl_ConversationImpl.h"
 
 using namespace webrtc;
@@ -24,6 +27,8 @@ public:
                     jni, j_observer),
             j_observer_class_(
                     jni, GetObjectClass(jni, j_observer)),
+            j_track_stats_report_class_(
+                    jni, jni->FindClass("com/twilio/conversations/impl/core/CoreTrackStatsReport")),
             j_session_state_changed_id(
                     GetMethodID(jni,
                                 *j_observer_class_,
@@ -89,6 +94,11 @@ public:
                                 *j_observer_class_,
                                 "onAudioTrackStateChanged",
                                 "(Lcom/twilio/conversations/impl/core/TrackInfo;)V")),
+            j_receive_track_statistics_id_(
+                    GetMethodID(jni, *j_observer_class_, "onReceiveTrackStatistics", "(Lcom/twilio/conversations/impl/core/CoreTrackStatsReport;)V")),
+            j_track_stats_report_ctor_id_(
+                    GetMethodID(jni, *j_track_stats_report_class_, "<init>",
+                                "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;D[Ljava/lang/String;[Ljava/lang/String;)V")),
             j_trackinfo_class_(
                     jni, jni->FindClass("com/twilio/conversations/impl/core/TrackInfoImpl")),
             j_trackorigin_class_(
@@ -135,6 +145,8 @@ public:
 protected:
 
     virtual void onStateDidChange(TSCSessionState state) {
+        ScopedLocalRefFrame local_ref_frame(jni());
+
         TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK, kTSCoreLogLevelDebug, "onStateDidChange");
 
         const std::string session_state_class = "com/twilio/conversations/impl/core/SessionState";
@@ -147,6 +159,8 @@ protected:
     }
 
     virtual void onStartDidComplete(TSCoreErrorCode code, const std::string message) {
+        ScopedLocalRefFrame local_ref_frame(jni());
+
         TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK, kTSCoreLogLevelDebug, "onStartDidComplete");
 
         jobject j_error_obj = errorToJavaCoreErrorImpl(code, message);
@@ -156,6 +170,8 @@ protected:
     }
 
     virtual void onStopDidComplete(TSCoreErrorCode code, const std::string message) {
+        ScopedLocalRefFrame local_ref_frame(jni());
+
         TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK, kTSCoreLogLevelDebug, "onStopDidComplete");
 
         jobject j_error_obj = errorToJavaCoreErrorImpl(code, message);
@@ -168,6 +184,8 @@ protected:
                                          const std::string participantSid,
                                          TSCoreErrorCode code,
                                          const std::string message) {
+        ScopedLocalRefFrame local_ref_frame(jni());
+
         TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK,
                            kTSCoreLogLevelDebug,
                            "onParticipantDidConnect");
@@ -185,6 +203,8 @@ protected:
     virtual void onParticipantDidDisconnect(const std::string participant,
                                             const std::string participantSid,
                                             TSCDisconnectReason reason) {
+        ScopedLocalRefFrame local_ref_frame(jni());
+
         TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK,
                            kTSCoreLogLevelDebug,
                            "onParticipantDidDisconect");
@@ -204,6 +224,8 @@ protected:
     }
 
     virtual void onMediaStreamDidAdd(TSCMediaStreamInfoObject* stream) {
+        ScopedLocalRefFrame local_ref_frame(jni());
+
         TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK, kTSCoreLogLevelDebug, "onMediaStreamDidAdd");
 
         jobject j_media_info = mediaStrInfoJavaMediaStrInfoImpl(stream);
@@ -214,6 +236,8 @@ protected:
     }
 
     virtual void onMediaStreamDidRemove(TSCMediaStreamInfoObject* stream) {
+        ScopedLocalRefFrame local_ref_frame(jni());
+
         TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK,
                            kTSCoreLogLevelDebug,
                            "onMediaStreamDidRemove");
@@ -227,6 +251,8 @@ protected:
 
     virtual void onVideoTrackDidAdd(TSCVideoTrackInfoObject* trackInfo,
                                     VideoTrackInterface* videoTrack) {
+        ScopedLocalRefFrame local_ref_frame(jni());
+
         TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK, kTSCoreLogLevelDebug, "onVideoTrackDidAdd");
 
         jstring id = stringToJString(jni(), videoTrack->id());
@@ -241,6 +267,8 @@ protected:
     }
 
     virtual void onVideoTrackDidRemove(TSCVideoTrackInfoObject* trackInfo) {
+        ScopedLocalRefFrame local_ref_frame(jni());
+
         TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK,
                            kTSCoreLogLevelDebug,
                            "onVideoTrackDidRemove");
@@ -252,6 +280,8 @@ protected:
     }
 
     virtual void onVideoTrackStateDidChange(TSCVideoTrackInfoObject* trackInfo) {
+        ScopedLocalRefFrame local_ref_frame(jni());
+
         TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK,
                            kTSCoreLogLevelDebug,
                            "onVideoTrackStateDidChange");
@@ -264,6 +294,8 @@ protected:
 
     virtual void onAudioTrackDidAdd(TSCAudioTrackInfoObject *trackInfo,
                                     webrtc::AudioTrackInterface* audioTrack) {
+        ScopedLocalRefFrame local_ref_frame(jni());
+
         TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK, kTSCoreLogLevelDebug, "onAudioTrackDidAdd");
 
         jstring id = stringToJString(jni(), audioTrack->id());
@@ -278,6 +310,8 @@ protected:
     }
 
     virtual void onAudioTrackDidRemove(TSCAudioTrackInfoObject *trackInfo) {
+        ScopedLocalRefFrame local_ref_frame(jni());
+
         TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK,
                            kTSCoreLogLevelDebug,
                            "onAudioTrackDidRemove");
@@ -289,6 +323,8 @@ protected:
     }
 
     virtual void onAudioTrackStateDidChange(TSCAudioTrackInfoObject* trackInfo) {
+        ScopedLocalRefFrame local_ref_frame(jni());
+
         TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK,
                            kTSCoreLogLevelDebug,
                            "onAudioTrackStateDidChange");
@@ -300,13 +336,56 @@ protected:
     }
 
     virtual void onDidReceiveSessionStatistics(TSCSessionStatisticsPtr statistics) {
+        ScopedLocalRefFrame local_ref_frame(jni());
+
         TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK,
                            kTSCoreLogLevelDebug,
                            "onDidReceiveSessionStatistics");
-        // TODO: implement me
+
+        TSCConnectionStatsReport report = statistics->getReport();
+
+        jstring participantAddress = JavaStringFromStdString(jni(), statistics->getParticipantAddress());
+        jstring participantSid = JavaStringFromStdString(jni(), report.participantSid);
+
+        for (auto &pair: report.tracks) {
+            TSCTrackStatsReport trackReport = pair.second;
+            ScopedLocalRefFrame local_ref_frame2(jni());
+
+            jstring trackId = JavaStringFromStdString(jni(), trackReport.trackId);
+            jstring mediaType = JavaStringFromStdString(jni(), trackReport.mediaType);
+            jstring direction = JavaStringFromStdString(jni(), trackReport.direction);
+            jstring codecName = JavaStringFromStdString(jni(), trackReport.codecName);
+            jstring ssrc = JavaStringFromStdString(jni(), trackReport.ssrc);
+            jstring activeConnectionId = JavaStringFromStdString(jni(), trackReport.activeConnectionId);
+            jdouble timestamp = (jdouble)trackReport.timestamp;
+            // create arrays to hold map values
+            jobjectArray keys =
+                    (jobjectArray)jni()->NewObjectArray(trackReport.values.size(),
+                                                      jni()->FindClass("java/lang/String"), NULL);
+            jobjectArray values =
+                    (jobjectArray)jni()->NewObjectArray(trackReport.values.size(),
+                                                      jni()->FindClass("java/lang/String"), NULL);
+            int i=0;
+            for (auto &pair: trackReport.values) {
+                jni()->SetObjectArrayElement(keys, i, JavaStringFromStdString(jni(), pair.first));
+                jni()->SetObjectArrayElement(values, i, JavaStringFromStdString(jni(), pair.second));
+                i++;
+            }
+
+            jobject j_track_stats_report =
+                    jni()->NewObject( *j_track_stats_report_class_, j_track_stats_report_ctor_id_,
+                                    participantAddress, participantSid, trackId, mediaType,
+                                    direction, codecName, ssrc, activeConnectionId, timestamp,
+                                    keys, values);
+            jni()->CallVoidMethod(*j_observer_global_,
+                                j_receive_track_statistics_id_, j_track_stats_report);
+
+        }
     }
 
     virtual void onDidReceiveConversationEvent(ConversationEvent *event) {
+        ScopedLocalRefFrame local_ref_frame(jni());
+
         TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK,
                            kTSCoreLogLevelDebug,
                            "onDidReceiveConversationEvent");
@@ -384,6 +463,7 @@ private:
 
     const ScopedGlobalRef<jobject> j_observer_global_;
     const ScopedGlobalRef<jclass> j_observer_class_;
+    const ScopedGlobalRef<jclass> j_track_stats_report_class_;
 
     const jmethodID j_session_state_changed_id;
     const jmethodID j_start_completed_id;
@@ -398,6 +478,8 @@ private:
     const jmethodID j_audio_track_added_id_;
     const jmethodID j_audio_track_removed_id_;
     const jmethodID j_audio_track_state_changed_id_;
+    const jmethodID j_receive_track_statistics_id_;
+    const jmethodID j_track_stats_report_ctor_id_;
 
     const ScopedGlobalRef<jclass> j_trackinfo_class_;
     const ScopedGlobalRef<jclass> j_trackorigin_class_;

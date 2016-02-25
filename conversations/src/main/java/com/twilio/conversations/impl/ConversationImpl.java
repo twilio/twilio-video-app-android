@@ -11,6 +11,8 @@ import android.os.Handler;
 
 import com.twilio.conversations.AudioTrack;
 import com.twilio.conversations.Conversation;
+import com.twilio.conversations.StatsListener;
+import com.twilio.conversations.MediaTrackStatsRecord;
 import com.twilio.conversations.TwilioConversationsException;
 import com.twilio.conversations.ConversationListener;
 import com.twilio.conversations.LocalMedia;
@@ -31,6 +33,7 @@ import com.twilio.conversations.impl.core.MediaStreamInfo;
 import com.twilio.conversations.impl.core.SessionObserver;
 import com.twilio.conversations.impl.core.SessionState;
 import com.twilio.conversations.impl.core.TrackInfo;
+import com.twilio.conversations.impl.core.CoreTrackStatsReport;
 import com.twilio.conversations.impl.logging.Logger;
 import com.twilio.conversations.impl.util.CallbackHandler;
 
@@ -50,6 +53,8 @@ public class ConversationImpl implements Conversation,
     private Handler handler;
     private IncomingInviteImpl incomingInviteImpl;
     private OutgoingInviteImpl outgoingInviteImpl;
+    private StatsListener statsListener;
+    private Handler statsHandler;
 
 
     private static String TAG = "ConversationImpl";
@@ -232,6 +237,21 @@ public class ConversationImpl implements Conversation,
             return null;
         } else {
             return conversationSid;
+        }
+    }
+
+    @Override
+    public StatsListener getStatsListener() {
+        return statsListener;
+    }
+
+    @Override
+    public void setStatsListener(StatsListener listener) {
+        statsListener = listener;
+        if (listener != null) {
+            statsHandler = CallbackHandler.create();
+        } else {
+            statsHandler = null;
         }
     }
 
@@ -656,6 +676,20 @@ public class ConversationImpl implements Conversation,
             }
 
         }
+    }
+
+    @Override
+    public void onReceiveTrackStatistics(CoreTrackStatsReport report) {
+        if (statsHandler != null && statsListener != null) {
+            final MediaTrackStatsRecord stats = MediaTrackStatsRecordFactory.create(report);
+            statsHandler.post(new Runnable() {
+                @Override
+                public void run() {
+                    statsListener.onMediaTrackStatsRecord(ConversationImpl.this, stats);
+                }
+            });
+        }
+
     }
 
     void log(String method, String message, CoreError coreError) {

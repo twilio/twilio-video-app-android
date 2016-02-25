@@ -54,6 +54,8 @@ public:
 
 protected:
     virtual void onRegistrationDidComplete(TSCoreErrorCode code, const std::string message) {
+        ScopedLocalRefFrame local_ref_frame(jni());
+
         TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK,
                            kTSCoreLogLevelDebug,
                            "onRegistrationDidComplete");
@@ -64,6 +66,8 @@ protected:
     }
 
     virtual void onUnregistrationDidComplete(TSCoreErrorCode code, const std::string message) {
+        ScopedLocalRefFrame local_ref_frame(jni());
+
         TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK,
                            kTSCoreLogLevelDebug,
                            "onUnregistrationDidComplete");
@@ -74,6 +78,8 @@ protected:
     }
 
     virtual void onStateDidChange(TSCEndpointState state){
+        ScopedLocalRefFrame local_ref_frame(jni());
+
         TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK,
                            kTSCoreLogLevelDebug,
                            "onStateDidChange, new state:%d",
@@ -87,6 +93,8 @@ protected:
     }
 
     virtual void onIncomingCallDidReceive(const TSCSessionPtr &session) {
+        ScopedLocalRefFrame local_ref_frame(jni());
+
         TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK,
                            kTSCoreLogLevelDebug,
                            "onIncomingCallDidReceive");
