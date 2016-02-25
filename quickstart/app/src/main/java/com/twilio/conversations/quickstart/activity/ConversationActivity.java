@@ -580,12 +580,6 @@ public class  ConversationActivity extends AppCompatActivity {
                 conversationStatusTextView.setText("onConversationEnded");
                 reset();
             }
-
-            @Override
-            public void onReceiveTrackStatistics(Conversation conversation,
-                                                 MediaTrackStatsRecord stats) {
-
-            }
         };
     }
 
