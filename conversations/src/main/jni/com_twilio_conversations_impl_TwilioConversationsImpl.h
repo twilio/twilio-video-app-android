@@ -53,7 +53,7 @@ JNIEXPORT void JNICALL Java_com_twilio_conversations_impl_TwilioConversationsImp
  * Signature: (Ljava/lang/String;J)J
  */
 JNIEXPORT jlong JNICALL Java_com_twilio_conversations_impl_TwilioConversationsImpl_createEndpoint
-  (JNIEnv *, jobject, jobject, jlong);
+  (JNIEnv *, jobject, jobject, jobjectArray, jlong);
 
 /*
  * Class:     com_twilio_conversations_impl_TwilioConversationsImpl
