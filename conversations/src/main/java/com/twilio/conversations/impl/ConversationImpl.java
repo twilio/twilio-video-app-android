@@ -152,7 +152,6 @@ public class ConversationImpl implements Conversation,
                                                               ConversationListener listener,
                                                               ConversationStateObserver conversationStateObserver) {
         ConversationImpl conversationImpl = new ConversationImpl(conversationsClient, participants, localMedia, listener, conversationStateObserver);
-        conversationImpl.start();
         return conversationImpl;
     }
 
