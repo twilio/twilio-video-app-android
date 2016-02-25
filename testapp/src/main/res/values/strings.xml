@@ -20,4 +20,10 @@
     <string name="conversationStatus">Conversation Status</string>
     <string name="log_out">Log Out</string>
 
+    <string-array name="realm_array">
+        <item>Prod</item>
+        <item>Stage</item>
+        <item>Dev</item>
+    </string-array>
+
 </resources>
