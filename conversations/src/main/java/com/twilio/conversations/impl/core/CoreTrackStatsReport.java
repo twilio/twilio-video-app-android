@@ -5,7 +5,7 @@ import com.twilio.conversations.impl.logging.Logger;
 import java.util.HashMap;
 import java.util.Map;
 
-public class TrackStatsReport {
+public class CoreTrackStatsReport {
 
     public static final String DIRECTION_SENDING = "sending";
     public static final String DIRECTION_RECEIVING = "receiving";
@@ -27,7 +27,7 @@ public class TrackStatsReport {
 
     private final Map<String, String> data = new HashMap<String, String>();
 
-    static final Logger logger = Logger.getLogger(TrackStatsReport.class);
+    static final Logger logger = Logger.getLogger(CoreTrackStatsReport.class);
 
     public enum KeyEnum {
         BYTES_SENT("bytesSent"),
@@ -62,10 +62,10 @@ public class TrackStatsReport {
         }
     }
 
-    public TrackStatsReport(String participantAddress, String participantSid,
-            String trackId, String mediaType, String direction, String codecName,
-            String ssrc, String activeConnectionId, double timestamp,
-            String[] keys, String[] values) {
+    public CoreTrackStatsReport(String participantAddress, String participantSid,
+                                String trackId, String mediaType, String direction, String codecName,
+                                String ssrc, String activeConnectionId, double timestamp,
+                                String[] keys, String[] values) {
         this.participantAddress = participantAddress;
         this.participantSid = participantSid;
         this.trackId = trackId;

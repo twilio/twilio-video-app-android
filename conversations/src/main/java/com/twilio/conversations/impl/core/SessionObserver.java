@@ -30,5 +30,5 @@ public interface SessionObserver {
 
     void onAudioTrackStateChanged(TrackInfo trackInfo);
 
-    void onReceiveTrackStatistics(TrackStatsReport report);
+    void onReceiveTrackStatistics(CoreTrackStatsReport report);
 }

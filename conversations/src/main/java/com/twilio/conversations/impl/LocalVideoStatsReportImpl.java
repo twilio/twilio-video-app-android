@@ -1,12 +1,12 @@
 package com.twilio.conversations.impl;
 
-import com.twilio.conversations.LocalVideoMediaStatsRecord;
+import com.twilio.conversations.LocalVideoStatsReport;
 import com.twilio.conversations.VideoDimensions;
-import com.twilio.conversations.impl.core.TrackStatsReport;
+import com.twilio.conversations.impl.core.CoreTrackStatsReport;
 
 
-public class LocalVideoMediaStatsRecordImpl extends MediaTrackStatsRecordImpl
-        implements LocalVideoMediaStatsRecord {
+public class LocalVideoStatsReportImpl extends TrackStatsReportImpl
+        implements LocalVideoStatsReport {
 
     private final long bytesSent;
     private final long packetsSent;
@@ -15,18 +15,18 @@ public class LocalVideoMediaStatsRecordImpl extends MediaTrackStatsRecordImpl
     private final int frameRate;
     private final int roundTripTime;
 
-    public LocalVideoMediaStatsRecordImpl(TrackStatsReport report) {
+    public LocalVideoStatsReportImpl(CoreTrackStatsReport report) {
         super(report);
-        this.bytesSent = report.getLongValue(TrackStatsReport.KeyEnum.BYTES_SENT);
-        this.packetsSent = report.getLongValue(TrackStatsReport.KeyEnum.PACKETS_SENT);
-        int width = report.getIntValue(TrackStatsReport.KeyEnum.FRAME_WIDTH_INPUT);
-        int height = report.getIntValue(TrackStatsReport.KeyEnum.FRAME_HEIGHT_INPUT);
+        this.bytesSent = report.getLongValue(CoreTrackStatsReport.KeyEnum.BYTES_SENT);
+        this.packetsSent = report.getLongValue(CoreTrackStatsReport.KeyEnum.PACKETS_SENT);
+        int width = report.getIntValue(CoreTrackStatsReport.KeyEnum.FRAME_WIDTH_INPUT);
+        int height = report.getIntValue(CoreTrackStatsReport.KeyEnum.FRAME_HEIGHT_INPUT);
         captureDimensions = new VideoDimensions(width, height);
-        width = report.getIntValue(TrackStatsReport.KeyEnum.FRAME_WIDTH_SENT);
-        height = report.getIntValue(TrackStatsReport.KeyEnum.FRAME_HEIGHT_SENT);
+        width = report.getIntValue(CoreTrackStatsReport.KeyEnum.FRAME_WIDTH_SENT);
+        height = report.getIntValue(CoreTrackStatsReport.KeyEnum.FRAME_HEIGHT_SENT);
         sentDimensions = new VideoDimensions(width, height);
-        frameRate = report.getIntValue(TrackStatsReport.KeyEnum.FRAME_RATE_SENT);
-        roundTripTime = report.getIntValue(TrackStatsReport.KeyEnum.RTT);
+        frameRate = report.getIntValue(CoreTrackStatsReport.KeyEnum.FRAME_RATE_SENT);
+        roundTripTime = report.getIntValue(CoreTrackStatsReport.KeyEnum.RTT);
 
     }
     @Override

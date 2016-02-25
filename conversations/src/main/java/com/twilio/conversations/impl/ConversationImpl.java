@@ -11,7 +11,7 @@ import android.os.Handler;
 
 import com.twilio.conversations.AudioTrack;
 import com.twilio.conversations.Conversation;
-import com.twilio.conversations.MediaTrackStatsRecord;
+import com.twilio.conversations.TrackStatsReport;
 import com.twilio.conversations.TwilioConversationsException;
 import com.twilio.conversations.ConversationListener;
 import com.twilio.conversations.LocalMedia;
@@ -32,7 +32,7 @@ import com.twilio.conversations.impl.core.MediaStreamInfo;
 import com.twilio.conversations.impl.core.SessionObserver;
 import com.twilio.conversations.impl.core.SessionState;
 import com.twilio.conversations.impl.core.TrackInfo;
-import com.twilio.conversations.impl.core.TrackStatsReport;
+import com.twilio.conversations.impl.core.CoreTrackStatsReport;
 import com.twilio.conversations.impl.logging.Logger;
 import com.twilio.conversations.impl.util.CallbackHandler;
 
@@ -655,9 +655,9 @@ public class ConversationImpl implements Conversation,
     }
 
     @Override
-    public void onReceiveTrackStatistics(TrackStatsReport report) {
+    public void onReceiveTrackStatistics(CoreTrackStatsReport report) {
         if (handler != null && conversationListener != null) {
-            final MediaTrackStatsRecord stats = MediaTrackStatsRecordFactory.create(report);
+            final TrackStatsReport stats = MediaTrackStatsRecordFactory.create(report);
             handler.post(new Runnable() {
                 @Override
                 public void run() {

@@ -28,7 +28,7 @@ public:
             j_observer_class_(
                     jni, GetObjectClass(jni, j_observer)),
             j_track_stats_report_class_(
-                    jni, jni->FindClass("com/twilio/conversations/impl/core/TrackStatsReport")),
+                    jni, jni->FindClass("com/twilio/conversations/impl/core/CoreTrackStatsReport")),
             j_session_state_changed_id(
                     GetMethodID(jni,
                                 *j_observer_class_,
@@ -95,7 +95,7 @@ public:
                                 "onAudioTrackStateChanged",
                                 "(Lcom/twilio/conversations/impl/core/TrackInfo;)V")),
             j_receive_track_statistics_id_(
-                    GetMethodID(jni, *j_observer_class_, "onReceiveTrackStatistics", "(Lcom/twilio/conversations/impl/core/TrackStatsReport;)V")),
+                    GetMethodID(jni, *j_observer_class_, "onReceiveTrackStatistics", "(Lcom/twilio/conversations/impl/core/CoreTrackStatsReport;)V")),
             j_track_stats_report_ctor_id_(
                     GetMethodID(jni, *j_track_stats_report_class_, "<init>",
                                 "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;D[Ljava/lang/String;[Ljava/lang/String;)V")),
