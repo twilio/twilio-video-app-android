@@ -26,6 +26,13 @@
             android:layout_height="wrap_content"
             android:hint="@string/username"/>
 
+        <Spinner
+            android:id="@+id/realm_spinner"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/activity_vertical_margin"
+            android:layout_gravity="center_horizontal" />
+
         <Button
             android:id="@+id/registration_button"
             android:layout_margin="@dimen/activity_horizontal_margin"
@@ -33,7 +40,9 @@
             android:layout_height="wrap_content"
             android:text="@string/register" />
 
+
     </LinearLayout>
+
 
     <TextView
         android:id="@+id/version_textview"

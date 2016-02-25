@@ -14,6 +14,7 @@ import retrofit.http.QueryMap;
 public class TCCapabilityTokenProvider {
     public static final String CAPABILITY_TOKEN = "capability_token";
     public static final String USERNAME = "username";
+    public static final String REALM = "realm";
     public static final String TTL = "300"; //The default is usually 30 minutes. We are intentionally setting it to 5 minutes to validate expiration.
 
     /* Define the Retrofit Token Service */

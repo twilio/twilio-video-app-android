@@ -3,4 +3,10 @@
 
     <string name="app_name">TC Debug</string>
 
+    <string-array name="realm_array">
+        <item>Prod</item>
+        <item>Stage</item>
+        <item>Dev</item>
+    </string-array>
+
 </resources>

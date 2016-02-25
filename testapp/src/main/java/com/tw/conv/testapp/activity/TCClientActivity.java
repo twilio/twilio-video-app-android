@@ -30,6 +30,7 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.twilio.common.TwilioAccessManager;
@@ -96,6 +97,13 @@ public class TCClientActivity extends AppCompatActivity {
     private static final String ACTION_ACCEPT_INCOMING_CALL =
             "com.tw.conv.testapp.action.ACCEPT_INCOMING_CALL";
 
+    private static final String OPTION_DEV_REGISTRAR = "endpoint.dev.twilio.com";
+    private static final String OPTION_DEV_STATS_URL = "https://eventgw.dev.twilio.com";
+    private static final String OPTION_STAGE_REGISTRAR = "endpoint.stage.twilio.com";
+    private static final String OPTION_STAGE_STATS_URL = "https://eventgw.stage.twilio.com";
+    private static final String OPTION_REGISTRAR_KEY = "registrar";
+    private static final String OPTION_STATS_KEY = "stats-server-url";
+
     private ConversationsClient conversationsClient;
     private OutgoingInvite outgoingInvite;
     private LocalMedia localMedia;
@@ -145,6 +153,7 @@ public class TCClientActivity extends AppCompatActivity {
     private String capabilityToken;
     private TwilioAccessManager accessManager;
     private ExecutorService statsExecutorService;
+
 
     /**
      * FIXME
@@ -219,9 +228,12 @@ public class TCClientActivity extends AppCompatActivity {
 
         addParticipantActionFab = (FloatingActionButton)findViewById(R.id.add_participant_action_fab);
         speakerActionFab = (FloatingActionButton)findViewById(R.id.speaker_action_fab);
-
+        
         String username = getIntent().getExtras().getString(TCCapabilityTokenProvider.USERNAME);
         getSupportActionBar().setTitle(username);
+
+        String realm = getIntent().getExtras().getString(TCCapabilityTokenProvider.REALM);
+        Map<String, String> options = createOptions(realm);
 
         // Get the capability token
         capabilityToken = getIntent().getExtras().getString(TCCapabilityTokenProvider.CAPABILITY_TOKEN);
@@ -231,7 +243,8 @@ public class TCClientActivity extends AppCompatActivity {
 
         accessManager = TwilioAccessManagerFactory.createAccessManager(capabilityToken,
                 accessManagerListener());
-        conversationsClient = TwilioConversations.createConversationsClient(accessManager,
+
+        conversationsClient = TwilioConversations.createConversationsClient(accessManager, options,
                 conversationsClientListener());
 
 
@@ -370,6 +383,18 @@ public class TCClientActivity extends AppCompatActivity {
     protected void onDestroy() {
         unregisterRejectReceiver();
         super.onDestroy();
+    }
+
+    private Map<String, String> createOptions(String realm) {
+        Map<String, String> options = new HashMap<>();
+        if (realm.equalsIgnoreCase("dev")) {
+            options.put(OPTION_REGISTRAR_KEY, OPTION_DEV_REGISTRAR);
+            options.put(OPTION_STATS_KEY, OPTION_DEV_STATS_URL);
+        } else if (realm.equalsIgnoreCase("stage")) {
+            options.put(OPTION_REGISTRAR_KEY, OPTION_STAGE_REGISTRAR);
+            options.put(OPTION_STATS_KEY, OPTION_STAGE_STATS_URL);
+        }
+        return options;
     }
 
     private void startPreview() {
