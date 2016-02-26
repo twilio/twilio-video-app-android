@@ -111,6 +111,7 @@ public class TCClientActivity extends AppCompatActivity {
     private boolean wasLive = false;
     private boolean inBackground = false;
     private boolean loggingOut = false;
+    private String realm;
 
     private enum AudioState {
         ENABLED,
@@ -232,7 +233,7 @@ public class TCClientActivity extends AppCompatActivity {
         String username = getIntent().getExtras().getString(TCCapabilityTokenProvider.USERNAME);
         getSupportActionBar().setTitle(username);
 
-        String realm = getIntent().getExtras().getString(TCCapabilityTokenProvider.REALM);
+        realm = getIntent().getExtras().getString(TCCapabilityTokenProvider.REALM);
         Map<String, String> options = createOptions(realm);
 
         // Get the capability token
@@ -1352,7 +1353,7 @@ public class TCClientActivity extends AppCompatActivity {
             return;
         }
         TCCapabilityTokenProvider.obtainTwilioCapabilityToken(
-                accessManager.getIdentity(), new Callback<String>() {
+                accessManager.getIdentity(), realm, new Callback<String>() {
 
                     @Override
                     public void success(final String capabilityToken, Response response) {
