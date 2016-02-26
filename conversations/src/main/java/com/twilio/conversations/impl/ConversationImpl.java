@@ -72,9 +72,15 @@ public class ConversationImpl implements Conversation,
             this.nativeSessionObserver = wrapNativeObserver(sessionObserver, conversation);
         }
 
+        public void enableStats(boolean enable) {
+            enableStats(nativeSessionObserver, enable);
+        }
+
         private native long wrapNativeObserver(SessionObserver sessionObserver,
                                                Conversation conversation);
         private native void freeNativeObserver(long nativeSessionObserver);
+
+        private native void enableStats(long nativeSessionObserver, boolean enable);
 
         @Override
         public long getNativeHandle() {
@@ -250,8 +256,14 @@ public class ConversationImpl implements Conversation,
         statsListener = listener;
         if (listener != null) {
             statsHandler = CallbackHandler.create();
+            if (sessionObserverInternal != null) {
+                sessionObserverInternal.enableStats(true);
+            }
         } else {
             statsHandler = null;
+            if (sessionObserverInternal != null) {
+                sessionObserverInternal.enableStats(false);
+            }
         }
     }
 

@@ -13,8 +13,10 @@ import android.os.Bundle;
 import android.view.HapticFeedbackConstants;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -38,6 +40,7 @@ public class TCRegistrationActivity extends AppCompatActivity {
     private Button registrationButton;
     private ProgressDialog progressDialog;
     private TextView versionText;
+    private Spinner realmSpinner;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,6 +52,13 @@ public class TCRegistrationActivity extends AppCompatActivity {
         versionText = (TextView)findViewById(R.id.version_textview);
 
         versionText.setText(BuildConfig.VERSION_NAME);
+
+        realmSpinner = (Spinner)findViewById(R.id.realm_spinner);
+        ArrayAdapter<CharSequence> spinnerAdapter = ArrayAdapter.createFromResource(this,
+                        R.array.realm_array, android.R.layout.simple_spinner_dropdown_item);
+        spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        realmSpinner.setAdapter(spinnerAdapter);
+
 
         registrationButton.setOnClickListener(registrationClickListener());
 
@@ -167,7 +177,9 @@ public class TCRegistrationActivity extends AppCompatActivity {
             @Override
             public void success(String capabilityToken, Response response) {
                 if (response.getStatus() == 200) {
-                    startClient(username, capabilityToken);
+                    String realm =
+                            TCRegistrationActivity.this.realmSpinner.getSelectedItem().toString();
+                    startClient(username, capabilityToken, realm);
                 } else {
                     progressDialog.dismiss();
                     Snackbar.make(registrationButton, "Registration failed. Status: " + response.getStatus(), Snackbar.LENGTH_LONG)
@@ -185,10 +197,11 @@ public class TCRegistrationActivity extends AppCompatActivity {
 
     }
 
-    private void startClient(String username, String capabilityToken) {
+    private void startClient(String username, String capabilityToken, String realm) {
         Intent intent = new Intent(this, TCClientActivity.class);
         intent.putExtra(TCCapabilityTokenProvider.USERNAME, username);
         intent.putExtra(TCCapabilityTokenProvider.CAPABILITY_TOKEN, capabilityToken);
+        intent.putExtra(TCCapabilityTokenProvider.REALM, realm);
         startActivity(intent);
         finish();
     }

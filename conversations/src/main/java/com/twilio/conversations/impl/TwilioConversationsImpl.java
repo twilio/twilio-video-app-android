@@ -7,6 +7,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
@@ -328,13 +329,22 @@ public class TwilioConversationsImpl {
                                                              Map<String, String> options,
                                                              ConversationsClientListener inListener) {
         if(options != null && accessManager != null) {
+            // Let's simplify options map by using array instead,
+            // for easier passing data to jni layer
+            String[] optionsArray = new String[options.size() * 2];
+            int i = 0;
+            for (Map.Entry<String, String> entrySet : options.entrySet()) {
+                optionsArray[i++] = entrySet.getKey();
+                optionsArray[i++] = entrySet.getValue();
+            }
+
             final ConversationsClientImpl conversationsClient = new ConversationsClientImpl(applicationContext,
                     accessManager, inListener);
             long nativeEndpointObserverHandle = conversationsClient.getEndpointObserverHandle();
             if (nativeEndpointObserverHandle == 0) {
                 return null;
             }
-            final long nativeEndpointHandle = createEndpoint(accessManager,
+            final long nativeEndpointHandle = createEndpoint(accessManager, optionsArray,
                     nativeEndpointObserverHandle);
             if (nativeEndpointHandle == 0) {
                 return null;
@@ -438,6 +448,7 @@ public class TwilioConversationsImpl {
     private native void onApplicationBackground();
     private native void destroyCore();
     private native long createEndpoint(TwilioAccessManager accessManager,
+                                       String[] optionsArray,
                                        long nativeEndpointObserver);
     private native static void setCoreLogLevel(int level);
     private native static int getCoreLogLevel();
