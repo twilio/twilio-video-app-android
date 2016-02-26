@@ -139,8 +139,13 @@ public:
                     GetMethodID(jni,
                                 *j_media_stream_info_class_,
                                 "<init>",
-                                "(IILjava/lang/String;)V"))
+                                "(IILjava/lang/String;)V")),
+            enableStats_(false)
     {}
+
+    void enableStats(bool enabled) {
+        enableStats_ = enabled;
+    }
 
 protected:
 
@@ -341,6 +346,9 @@ protected:
         TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK,
                            kTSCoreLogLevelDebug,
                            "onDidReceiveSessionStatistics");
+        if (!enableStats_) {
+            return;
+        }
 
         TSCConnectionStatsReport report = statistics->getReport();
 
@@ -494,6 +502,8 @@ private:
     const ScopedGlobalRef<jclass> j_disreason_enum_;
     const ScopedGlobalRef<jclass> j_media_stream_info_class_;
     const jmethodID j_media_stream_info_ctor_;
+
+    bool enableStats_;
 };
 
 /*
@@ -521,5 +531,16 @@ JNIEXPORT void JNICALL Java_com_twilio_conversations_impl_ConversationImpl_00024
     if (sessionObserver != nullptr) {
         sessionObserver->reset();
         delete sessionObserver;
+    }
+}
+
+JNIEXPORT void JNICALL Java_com_twilio_conversations_impl_ConversationImpl_00024SessionObserverInternal_enableStats
+        (JNIEnv *, jobject, jlong nativeSessionObserver, jboolean enable) {
+    TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK, kTSCoreLogLevelDebug, "enableStats");
+    TSCSessionObserverPtr *sessionObserver = reinterpret_cast<TSCSessionObserverPtr *>(nativeSessionObserver);
+    if (sessionObserver != nullptr) {
+        SessionObserverInternalWrapper* wrapper = static_cast<SessionObserverInternalWrapper*>(sessionObserver->get());
+        wrapper->enableStats((bool)enable);
+
     }
 }

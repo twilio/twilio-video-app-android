@@ -23,6 +23,14 @@ JNIEXPORT jlong JNICALL Java_com_twilio_conversations_impl_ConversationImpl_0002
 JNIEXPORT void JNICALL Java_com_twilio_conversations_impl_ConversationImpl_00024SessionObserverInternal_freeNativeObserver
   (JNIEnv *, jobject, jlong);
 
+/*
+ * Class:     com_twilio_conversations_impl_ConversationImpl_SessionObserverInternal
+ * Method:    enableStats
+ * Signature: (JZ)V
+ */
+JNIEXPORT void JNICALL Java_com_twilio_conversations_impl_ConversationImpl_00024SessionObserverInternal_enableStats
+        (JNIEnv *, jobject, jlong, jboolean);
+
 #ifdef __cplusplus
 }
 #endif
