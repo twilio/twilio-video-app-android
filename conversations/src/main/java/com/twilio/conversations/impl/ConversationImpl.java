@@ -694,12 +694,14 @@ public class ConversationImpl implements Conversation,
     public void onReceiveTrackStatistics(CoreTrackStatsReport report) {
         if (statsHandler != null && statsListener != null) {
             final MediaTrackStatsRecord stats = MediaTrackStatsRecordFactory.create(report);
-            statsHandler.post(new Runnable() {
-                @Override
-                public void run() {
-                    statsListener.onMediaTrackStatsRecord(ConversationImpl.this, stats);
-                }
-            });
+            if (stats != null) {
+                statsHandler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        statsListener.onMediaTrackStatsRecord(ConversationImpl.this, stats);
+                    }
+                });
+            }
         }
 
     }
