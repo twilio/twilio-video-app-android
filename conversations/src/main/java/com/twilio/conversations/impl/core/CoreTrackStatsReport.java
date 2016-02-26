@@ -66,14 +66,14 @@ public class CoreTrackStatsReport {
                                 String trackId, String mediaType, String direction, String codecName,
                                 String ssrc, String activeConnectionId, double timestamp,
                                 String[] keys, String[] values) {
-        this.participantAddress = participantAddress;
-        this.participantSid = participantSid;
-        this.trackId = trackId;
-        this.mediaType = mediaType;
-        this.direction = direction;
-        this.codecName = codecName;
-        this.ssrc = ssrc;
-        this.activeConnectionId = activeConnectionId;
+        this.participantAddress = (participantAddress != null) ? participantAddress : "";
+        this.participantSid = (participantSid != null) ? participantSid : "";
+        this.trackId = (trackId != null) ? trackId : "";
+        this.mediaType = (mediaType != null) ? mediaType : "";
+        this.direction = (direction != null) ? direction : "";
+        this.codecName = (codecName != null) ? codecName : "";
+        this.ssrc = (ssrc != null) ? ssrc : null;
+        this.activeConnectionId = (activeConnectionId != null) ? activeConnectionId : "";
         this.timestamp = (long)timestamp;
         setMapValues(keys, values);
     }
