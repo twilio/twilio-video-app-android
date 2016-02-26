@@ -156,7 +156,8 @@ public class TCRegistrationActivity extends AppCompatActivity {
             TwilioConversations.initialize(getApplicationContext(), new TwilioConversations.InitListener() {
                 @Override
                 public void onInitialized() {
-                    obtainCapabilityToken(username);
+                    obtainCapabilityToken(username,
+                            TCRegistrationActivity.this.realmSpinner.getSelectedItem().toString().toLowerCase());
                 }
 
                 @Override
@@ -167,22 +168,24 @@ public class TCRegistrationActivity extends AppCompatActivity {
                 }
             });
         } else {
-            obtainCapabilityToken(username);
+            obtainCapabilityToken(username,
+                    TCRegistrationActivity.this.realmSpinner.getSelectedItem().toString().toLowerCase());
         }
     }
 
-    private void obtainCapabilityToken(final String username) {
-        TCCapabilityTokenProvider.obtainTwilioCapabilityToken(username, new Callback<String>() {
+    private void obtainCapabilityToken(final String username, final String realm) {
+        TCCapabilityTokenProvider.obtainTwilioCapabilityToken(username,
+                realm, new Callback<String>() {
 
             @Override
             public void success(String capabilityToken, Response response) {
                 if (response.getStatus() == 200) {
-                    String realm =
-                            TCRegistrationActivity.this.realmSpinner.getSelectedItem().toString();
                     startClient(username, capabilityToken, realm);
                 } else {
                     progressDialog.dismiss();
-                    Snackbar.make(registrationButton, "Registration failed. Status: " + response.getStatus(), Snackbar.LENGTH_LONG)
+                    Snackbar.make(registrationButton,
+                            "Registration failed. Status: " + response.getStatus(),
+                            Snackbar.LENGTH_LONG)
                             .setAction("Action", null).show();
                 }
             }
@@ -190,7 +193,9 @@ public class TCRegistrationActivity extends AppCompatActivity {
             @Override
             public void failure(RetrofitError error) {
                 progressDialog.dismiss();
-                Snackbar.make(registrationButton, "Registration failed. Error: " + error.getMessage(), Snackbar.LENGTH_LONG)
+                Snackbar.make(registrationButton,
+                        "Registration failed. Error: " + error.getMessage(),
+                        Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
             }
         });

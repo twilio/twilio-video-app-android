@@ -16,7 +16,7 @@ public class TCCapabilityTokenProvider {
     public static final String USERNAME = "username";
     public static final String REALM = "realm";
     public static final String TTL = "300"; //The default is usually 30 minutes. We are intentionally setting it to 5 minutes to validate expiration.
-
+    
     /* Define the Retrofit Token Service */
     interface TokenService {
         @GET("/access-token")
@@ -45,9 +45,9 @@ public class TCCapabilityTokenProvider {
             .create(TokenService.class);
 
 
-    public static void obtainTwilioCapabilityToken(String username, Callback<String> callback) {
+    public static void obtainTwilioCapabilityToken(String username, String realm, Callback<String> callback) {
         HashMap<String,String> options = new HashMap<>();
-        options.put("realm", "prod");
+        options.put(REALM, realm);
         options.put("identity", username);
         options.put("ttl", TTL);
         tokenService.obtainTwilioCapabilityToken(options, callback);
