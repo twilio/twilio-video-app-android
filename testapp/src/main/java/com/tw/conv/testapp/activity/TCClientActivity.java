@@ -280,6 +280,17 @@ public class TCClientActivity extends AppCompatActivity {
     }
 
     @Override
+    public void onBackPressed() {
+        /**
+         * FIXME
+         * Again another hack for the fact that there is so much state in this
+         * activity. Need to have invites be parcelable so that activities and services
+         * can use bundles to pass data around
+         */
+        moveTaskToBack(true);
+    }
+
+    @Override
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
         NotificationManager notificationManager  =
