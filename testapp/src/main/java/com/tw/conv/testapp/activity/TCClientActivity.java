@@ -975,8 +975,10 @@ public class TCClientActivity extends AppCompatActivity {
 
     private void rejectInvite(IncomingInvite incomingInvite) {
         incomingInvite.reject();
-        this.incomingInvite = null;
-        setCallAction();
+        if (!isConversationOngoing()) {
+            this.incomingInvite = null;
+            setCallAction();
+        }
     }
 
     private CapturerErrorListener capturerErrorListener() {
