@@ -25,7 +25,7 @@ model {
         }
     }
 
-    /*
+    /**
      * Use the debug keystore to sign all variants of the test app
      * since this is only used internally.
      */
@@ -37,8 +37,9 @@ model {
 
     android.buildTypes {
         release {
-            minifyEnabled false
-            proguardFiles.add(file('proguard-android.txt'))
+            minifyEnabled true
+            proguardFiles.add(file('android-proguard-rules.pro'))
+            proguardFiles.add(file("${project(':conversations').projectDir}/proguard-rules.pro"))
             proguardFiles.add(file("proguard-rules.pro"))
             signingConfig = $("android.signingConfigs.debug")
         }
