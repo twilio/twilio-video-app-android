@@ -19,7 +19,6 @@ public class VideoTrackImpl implements VideoTrack {
     private Map<VideoRenderer, org.webrtc.VideoRenderer> videoRenderersMap =
             new HashMap<VideoRenderer, org.webrtc.VideoRenderer>();
 
-    private boolean enabledVideo = true;
 
     VideoTrackImpl() {
         trackState = MediaTrackState.IDLE;
@@ -86,23 +85,13 @@ public class VideoTrackImpl implements VideoTrack {
         return trackState;
     }
 
-    @Override
-    public boolean enable(boolean enabled) {
-        if (videoTrack != null) {
-            enabledVideo = videoTrack.setEnabled(enabled);
-        } else {
-            enabledVideo = enabled;
-        }
-        return enabledVideo;
-    }
 
     @Override
     public boolean isEnabled() {
         if (videoTrack != null) {
             return videoTrack.enabled();
-        } else {
-            return enabledVideo;
         }
+        return false;
     }
 
     void updateTrackInfo(TrackInfo trackInfo) {
