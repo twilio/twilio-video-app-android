@@ -44,8 +44,14 @@ public class LocalMediaImpl implements LocalMedia {
         return handler;
     }
 
-    LocalMediaListener getLocalMediaListener() {
+    @Override
+    public LocalMediaListener getLocalMediaListener() {
         return localMediaListener;
+    }
+
+    @Override
+    public void setLocalMediaListener(LocalMediaListener listener) {
+        localMediaListener = listener;
     }
 
     @Override
