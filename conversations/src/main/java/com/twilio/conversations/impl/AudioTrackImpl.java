@@ -8,6 +8,7 @@ public class AudioTrackImpl implements AudioTrack {
     private org.webrtc.AudioTrack audioTrack;
     private TrackInfo trackInfo;
     private MediaTrackState trackState;
+    private boolean enabledAudio = true;
 
     AudioTrackImpl(org.webrtc.AudioTrack audioTrack, TrackInfo trackInfo) {
         this.audioTrack = audioTrack;
@@ -27,6 +28,24 @@ public class AudioTrackImpl implements AudioTrack {
     @Override
     public MediaTrackState getState() {
         return trackState;
+    }
+
+    @Override
+    public boolean enable(boolean enabled) {
+        if (audioTrack != null) {
+            enabledAudio = audioTrack.setEnabled(enabled);
+        } else {
+            enabledAudio = enabled;
+        }
+        return enabledAudio;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        if (audioTrack != null) {
+            return audioTrack.enabled();
+        }
+        return enabledAudio;
     }
 
     void updateTrackInfo(TrackInfo trackInfo) {
