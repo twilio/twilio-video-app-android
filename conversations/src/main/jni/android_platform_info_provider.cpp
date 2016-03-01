@@ -70,6 +70,7 @@ const TSCPlatformInfoReport AndroidPlatformInfoProvider::getReport() const {
     report.hwDeviceConnectionType = this->callStringMethod(j_getHwDeviceConnectionType_id, true);
     report.rtcPlatformSdkVersion = this->callStringMethod(j_getRtcPlatformSdkVersion_id);
     report.hwDeviceIPAddress = this->callStringMethod(j_getHwDeviceIPAddress_id);
+    report.hwDeviceArch = this->callStringMethod(j_getOsArch_id);
 
     report.hwDeviceNumCores = this->callUnsignedIntMethod(j_getHwDeviceNumCores_id);
     report.timestamp = this->callDoubleMethod(j_getTimeStamp_id);
