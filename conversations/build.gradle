@@ -372,6 +372,33 @@ task packageRelease(type: GradleBuild){
 }
 
 /**
+ * Maven upload configuration
+ */
+uploadArchives {
+    repositories {
+        mavenDeployer {
+            repository(url: "${project.property('bintray.repo')};publish=1") {
+                authentication(
+                        userName: project.property('bintray.user'),
+                        password: project.property('bintray.apikey')
+                )
+            }
+            pom.version = getVersionName()
+            pom.groupId = 'com.twilio'
+            pom.artifactId = 'conversations-android'
+            pom.packaging = 'aar'
+        }
+    }
+}
+
+/**
+ * Publishes release to jcenter according to project properties
+ */
+task publishRelease(type: GradleBuild){
+    tasks = ['uploadArchives']
+}
+
+/**
  * Localize the JNI_OnLoad and JNI_OnUnLoad symbol in libwebrtc-jni.a to prevent conflicts with
  * initialization
  */
@@ -629,20 +656,3 @@ class ConversationsRuleSource extends RuleSource {
 }
 
 apply plugin: ConversationsRuleSource
-
-uploadArchives {
-    repositories {
-        mavenDeployer {
-            repository(url: "https://api.bintray.com/maven/twilio/android/conversations-android/;publish=1") {
-                authentication(
-                        userName: project.property('bintray.user'),
-                        password: project.property('bintray.apikey')
-                )
-            }
-            pom.version = getVersionName()
-            pom.groupId = 'com.twilio'
-            pom.artifactId = 'conversations-android'
-            pom.packaging = 'aar'
-        }
-    }
-}
