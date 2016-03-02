@@ -29,6 +29,14 @@ public class AudioTrackImpl implements AudioTrack {
         return trackState;
     }
 
+    @Override
+    public boolean isEnabled() {
+        if (audioTrack != null) {
+            return audioTrack.enabled();
+        }
+        return false;
+    }
+
     void updateTrackInfo(TrackInfo trackInfo) {
         this.trackInfo = trackInfo;
     }
