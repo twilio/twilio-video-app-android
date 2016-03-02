@@ -20,10 +20,4 @@ public interface LocalVideoTrack extends VideoTrack {
      */
     boolean enable(boolean enabled);
 
-    /**
-     * Returns whether or not your camera video is being shared
-     *
-     * @return <code>true</code> if camera is being shared, false otherwise
-     */
-    boolean isEnabled();
 }

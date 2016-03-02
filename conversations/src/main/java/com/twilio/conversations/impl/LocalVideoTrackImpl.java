@@ -17,6 +17,7 @@ public class LocalVideoTrackImpl extends VideoTrackImpl implements LocalVideoTra
         return cameraCapturer;
     }
 
+
     @Override
     public boolean enable(boolean enabled) {
         org.webrtc.VideoTrack videoTrack = getWebrtcVideoTrack();
