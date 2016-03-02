@@ -395,7 +395,7 @@ uploadArchives {
  * Publishes release to jcenter according to project properties
  */
 task publishRelease(type: GradleBuild){
-    tasks = ['uploadArchives']
+    tasks = ['assembleRelease', 'uploadArchives']
 }
 
 /**
