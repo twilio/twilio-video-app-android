@@ -221,7 +221,7 @@ model {
 
     tasks {
         /**
-         * Here we create a javadoc tasks that depeonds on the
+         * Here we create a javadoc tasks that depends on the
          * the current android model configuration
          */
         createJavadocs(Javadoc) {
@@ -235,6 +235,8 @@ model {
             options.links("http://d.android.com/reference/");
             exclude '**/BuildConfig.java'
             exclude '**/R.java'
+            exclude 'com/twilio/conversations/internal/*'
+            exclude 'com/twilio/conversations/impl/*'
         }
     }
 }
