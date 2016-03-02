@@ -377,10 +377,10 @@ task packageRelease(type: GradleBuild){
 uploadArchives {
     repositories {
         mavenDeployer {
-            repository(url: "${project.property('bintray.repo')};publish=1") {
+            repository(url: "${project.property('maven.repo')};publish=1") {
                 authentication(
-                        userName: project.property('bintray.user'),
-                        password: project.property('bintray.apikey')
+                        userName: project.property('maven.username'),
+                        password: project.property('maven.password')
                 )
             }
             pom.version = getVersionName()
