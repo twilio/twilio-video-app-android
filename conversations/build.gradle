@@ -1,4 +1,5 @@
 apply plugin: 'com.android.model.library'
+apply plugin: 'maven'
 
 def currentToolchainVersion = "4.9"
 // TODO add back ability for local builds
@@ -628,14 +629,15 @@ class ConversationsRuleSource extends RuleSource {
 }
 
 apply plugin: ConversationsRuleSource
-apply plugin: 'maven'
 
 uploadArchives {
     repositories {
         mavenDeployer {
             repository(url: "https://api.bintray.com/maven/twilio/android/conversations-android/;publish=1") {
-                authentication(userName: project.property('bintray.user'),
-                        password: project.property('bintray.apikey'))
+                authentication(
+                        userName: project.property('bintray.user'),
+                        password: project.property('bintray.apikey')
+                )
             }
             pom.version = getVersionName()
             pom.groupId = 'com.twilio'
