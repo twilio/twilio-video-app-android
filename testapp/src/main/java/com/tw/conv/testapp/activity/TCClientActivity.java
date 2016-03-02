@@ -72,6 +72,7 @@ import com.twilio.conversations.TwilioConversations;
 import com.twilio.conversations.VideoRendererObserver;
 import com.twilio.conversations.VideoTrack;
 import com.twilio.conversations.VideoViewRenderer;
+import com.twilio.conversations.internal.TwilioConversationsInternal;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -245,7 +246,7 @@ public class TCClientActivity extends AppCompatActivity {
         accessManager = TwilioAccessManagerFactory.createAccessManager(capabilityToken,
                 accessManagerListener());
 
-        conversationsClient = TwilioConversations.createConversationsClient(accessManager, options,
+        conversationsClient = TwilioConversationsInternal.createConversationsClient(accessManager, options,
                 conversationsClientListener());
 
 
