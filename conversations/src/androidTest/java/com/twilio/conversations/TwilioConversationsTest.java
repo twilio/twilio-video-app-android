@@ -6,6 +6,7 @@ import android.support.test.runner.AndroidJUnit4;
 
 import com.twilio.common.TwilioAccessManager;
 import com.twilio.common.TwilioAccessManagerFactory;
+import com.twilio.conversations.internal.TwilioConversationsInternal;
 import com.twilio.conversations.utils.TwilioConversationsUtils;
 
 import org.junit.After;
@@ -139,7 +140,7 @@ public class TwilioConversationsTest {
         }
 
         try {
-            TwilioConversations.createConversationsClient(null, null, null);
+            TwilioConversationsInternal.createConversationsClient(null, null, null);
         } catch(NullPointerException e) {
             npeSeen = true;
         } finally {
@@ -169,7 +170,7 @@ public class TwilioConversationsTest {
 
 
         try {
-            TwilioConversations.createConversationsClient(null, null, conversationsClientListener());
+            TwilioConversationsInternal.createConversationsClient(null, null, conversationsClientListener());
         } catch(NullPointerException e) {
             npeSeen = true;
         } finally {
@@ -195,7 +196,7 @@ public class TwilioConversationsTest {
 
         CountDownLatch waitLatch = new CountDownLatch(1);
         TwilioAccessManager accessManager = TwilioAccessManagerFactory.createAccessManager("DEADBEEF", null);
-        ConversationsClient conversationsClient = TwilioConversations.createConversationsClient(accessManager, new HashMap<String, String>(), conversationsClientListener());
+        ConversationsClient conversationsClient = TwilioConversationsInternal.createConversationsClient(accessManager, new HashMap<String, String>(), conversationsClientListener());
 
         // TODO: check start listening once callback issue is resolved
         org.junit.Assert.assertNotNull(conversationsClient);
@@ -209,7 +210,7 @@ public class TwilioConversationsTest {
         HashMap optionsMap = new HashMap<String, String>();
         optionsMap.put("foo", "bar");
         TwilioAccessManager accessManager = TwilioAccessManagerFactory.createAccessManager("DEADBEEF", null);
-        ConversationsClient conversationsClient = TwilioConversations.createConversationsClient(accessManager, optionsMap, conversationsClientListener());
+        ConversationsClient conversationsClient = TwilioConversationsInternal.createConversationsClient(accessManager, optionsMap, conversationsClientListener());
 
         // TODO: check start listening once callback issue is resolved
         org.junit.Assert.assertNotNull(conversationsClient);
