@@ -1,5 +1,4 @@
 apply plugin: 'com.android.model.library'
-apply plugin: 'nebula.provided-base'
 
 def currentToolchainVersion = "4.9"
 // TODO add back ability for local builds
@@ -41,7 +40,6 @@ def webRtcHeaders = "${webRtcHome}/include"
 def webRtcStaticLib = "libwebrtc.a"
 
 configurations {
-    provided
     preCompile
 }
 
@@ -221,7 +219,7 @@ model {
 
     tasks {
         /**
-         * Here we create a javadoc tasks that depeonds on the
+         * Here we create a javadoc tasks that depends on the
          * the current android model configuration
          */
         createJavadocs(Javadoc) {
@@ -255,8 +253,8 @@ dependencies {
     androidTestCompile 'com.android.support.test:rules:0.4'
 
     // TODO this really should be on nexus as a jar and not local
+    compile 'com.twilio.sdk:twilio-common-android:0.2.0'
     compile files("${twilioSdkHome}/twilio-webrtc/lib/release/libjingle_peerconnection_java.jar")
-    provided 'com.twilio.sdk:twilio-common-android:0.2.0'
 }
 
 /**
@@ -630,3 +628,19 @@ class ConversationsRuleSource extends RuleSource {
 }
 
 apply plugin: ConversationsRuleSource
+apply plugin: 'maven'
+
+uploadArchives {
+    repositories {
+        mavenDeployer {
+            repository(url: "https://api.bintray.com/maven/twilio/android/conversations-android/;publish=1") {
+                authentication(userName: project.property('bintray.user'),
+                        password: project.property('bintray.apikey'))
+            }
+            pom.version = getVersionName()
+            pom.groupId = 'com.twilio'
+            pom.artifactId = 'conversations-android'
+            pom.packaging = 'aar'
+        }
+    }
+}
