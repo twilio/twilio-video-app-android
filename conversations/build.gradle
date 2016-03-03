@@ -658,5 +658,4 @@ class ConversationsRuleSource extends RuleSource {
         }
     }
 }
-
 apply plugin: ConversationsRuleSource
