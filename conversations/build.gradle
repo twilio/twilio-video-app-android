@@ -221,7 +221,7 @@ model {
     tasks {
         /**
          * Here we create a javadoc tasks that depends on the
-         * the current android model configuration
+         * the current android model
          */
         createJavadocs(Javadoc) {
             def androidConfig = $.android
