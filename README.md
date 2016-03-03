@@ -30,3 +30,17 @@ Upon completion twilio-conversations-android.tar.bz2 will be located in `convers
 The pom-release-candidate.xml is used to move artifacts from the snapshots to releases. The task itself
 is managed in Jenkins and should NOT be run manually.
 
+## Bintray Publishing
+
+These are executed from Jenkins, but these are a reference for building and uploading release artifacts
+
+### Uploading a Release Candidate
+```
+./gradlew -PreleaseCandidate=true -Pmaven.repo=https://api.bintray.com/maven/twilio/internal-releases/conversations-android/ conversations:uploadArchives
+```
+
+### Uploading Regular Archive
+```
+./gradlew conversations:uploadArchives
+```
+
