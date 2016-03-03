@@ -237,6 +237,7 @@ model {
             exclude '**/R.java'
             exclude 'com/twilio/conversations/internal/*'
             exclude 'com/twilio/conversations/impl/*'
+            failOnError false
         }
     }
 }
