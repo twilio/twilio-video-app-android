@@ -38,11 +38,11 @@ rm -rf ${SCRIPTS_DIR}/downloads
 mkdir ${SCRIPTS_DIR}/downloads
 
 MAJORMINOR=$(echo $SDK_RELEASE_VERSION| cut -d'.' -f-2)
-DIRECT_URL="https://media.twiliocdn.com/sdk/android/conversations/releases/${SDK_RELEASE_VERSION}/twilio-conversations-android-${SDK_RELEASE_VERSION}.tar.bz2"
-MAJORMINOR_URL="https://media.twiliocdn.com/sdk/android/conversations/v${MAJORMINOR}/twilio-conversations-android.tar.bz2"
-LATEST_URL="https://media.twiliocdn.com/sdk/android/conversations/latest/twilio-conversations-android.tar.bz2"
+DIRECT_URL="https://media.twiliocdn.com/sdk/android/conversations/releases/${SDK_RELEASE_VERSION}/twilio-conversations-android-${SDK_RELEASE_VERSION}.aar"
+MAJORMINOR_URL="https://media.twiliocdn.com/sdk/android/conversations/v${MAJORMINOR}/twilio-conversations-android.aar"
+LATEST_URL="https://media.twiliocdn.com/sdk/android/conversations/latest/twilio-conversations-android.aar"
 
-curl $DIRECT_URL --output ${SCRIPTS_DIR}/downloads/twilio-conversations-direct.tar.bz2
+curl $DIRECT_URL --output ${SCRIPTS_DIR}/downloads/twilio-conversations-direct.aar
 
 echo "sdk-release-tool: updating..."
 ./sdk-release-tool pin --prod twilio-conversations-android ${SDK_RELEASE_VERSION}
@@ -59,10 +59,10 @@ if [ "$?" -ne "0" ]; then
 fi
 
 echo "Testing whether versions are same..."
-curl -L $MAJORMINOR_URL --output ${SCRIPTS_DIR}/downloads/twilio-conversations-majorminor.tar.bz2
-curl -L $LATEST_URL --output ${SCRIPTS_DIR}/downloads/twilio-conversations-latest.tar.bz2
+curl -L $MAJORMINOR_URL --output ${SCRIPTS_DIR}/downloads/twilio-conversations-majorminor.aar
+curl -L $LATEST_URL --output ${SCRIPTS_DIR}/downloads/twilio-conversations-latest.aar
 
-md5 ${SCRIPTS_DIR}/downloads/twilio-conversations-direct.tar.bz2 ${SCRIPTS_DIR}/downloads/twilio-conversations-majorminor.tar.bz2 ${SCRIPTS_DIR}/downloads/twilio-conversations-latest.tar.bz2
+md5 ${SCRIPTS_DIR}/downloads/twilio-conversations-direct.aar ${SCRIPTS_DIR}/downloads/twilio-conversations-majorminor.aar ${SCRIPTS_DIR}/downloads/twilio-conversations-latest.aar
 popd
 
 echo "Major minor version: $MAJORMINOR"
