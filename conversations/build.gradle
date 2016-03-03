@@ -388,19 +388,15 @@ uploadArchives {
                         password: project.property('maven.password')
                 )
             }
-            pom.version = getVersionName()
+            pom.version = getVersionName() + ((project.hasProperty("releaseCandidate") &&
+                    project.property("releaseCandidate").toBoolean() == true) ?
+                    "-rc${project.property("versionRc")}" :
+                    '')
             pom.groupId = 'com.twilio'
             pom.artifactId = 'conversations-android'
             pom.packaging = 'aar'
         }
     }
-}
-
-/**
- * Publishes release to jcenter according to project properties
- */
-task publishRelease(type: GradleBuild){
-    tasks = ['assembleRelease', 'uploadArchives']
 }
 
 /**
