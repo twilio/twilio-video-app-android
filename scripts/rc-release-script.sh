@@ -54,3 +54,11 @@ if [ "$?" -ne "0" ]; then
     exit 1
 fi
 
+echo "sdk-release-tool: pinning latest..."
+pushd "$SDK_RELEASE_TOOLS_PATH/sdk-release-tool/"
+./sdk-release-tool pin-latest -f --${CDN_JSON_REALM} twilio-conversations-android ${SDK_VERSION}-rc${SDK_RC}
+popd
+if [ "$?" -ne "0" ]; then
+    echo "Error: failed to execute sdk-release-tool update"
+    exit 1
+fi
