@@ -24,3 +24,9 @@ The Conversations SDK is built and consumed with Android Studio as an aar. Howev
 ```
 
 Upon completion twilio-conversations-android.tar.bz2 will be located in `conversations/build/outputs/tar`
+
+## Build Pipeline
+
+The pom-release-candidate.xml is used to move artifacts from the snapshots to releases. The task itself
+is managed in Jenkins and should NOT be run manually.
+

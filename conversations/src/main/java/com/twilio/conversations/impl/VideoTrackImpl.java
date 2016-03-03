@@ -19,6 +19,7 @@ public class VideoTrackImpl implements VideoTrack {
     private Map<VideoRenderer, org.webrtc.VideoRenderer> videoRenderersMap =
             new HashMap<VideoRenderer, org.webrtc.VideoRenderer>();
 
+
     VideoTrackImpl() {
         trackState = MediaTrackState.IDLE;
     }
@@ -82,6 +83,15 @@ public class VideoTrackImpl implements VideoTrack {
     @Override
     public MediaTrackState getState() {
         return trackState;
+    }
+
+
+    @Override
+    public boolean isEnabled() {
+        if (videoTrack != null) {
+            return videoTrack.enabled();
+        }
+        return false;
     }
 
     void updateTrackInfo(TrackInfo trackInfo) {

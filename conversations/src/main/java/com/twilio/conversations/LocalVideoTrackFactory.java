@@ -2,6 +2,10 @@ package com.twilio.conversations;
 
 import com.twilio.conversations.impl.LocalVideoTrackImpl;
 
+/**
+ * A factory for creating an instance of {@link LocalVideoTrack}
+ *
+ */
 public class LocalVideoTrackFactory {
     /**
      * Create new instance of local video track

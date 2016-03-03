@@ -2,7 +2,10 @@ package com.twilio.conversations;
 
 import java.util.List;
 
-
+/**
+ * Provides local video and audio tracks associated with a {@link Participant}
+ *
+ */
 public interface LocalMedia {
     /**
      * Returns the local video tracks
@@ -67,4 +70,18 @@ public interface LocalMedia {
      * @return true if local audio is enabled
      */
     boolean isMicrophoneAdded();
+
+    /**
+     * Gets the {@link LocalMediaListener}
+     *
+     * @return media events listener
+     */
+    LocalMediaListener getLocalMediaListener();
+
+    /**
+     * Sets the {@link LocalMediaListener}
+     *
+     * @param listener A media events listener
+     */
+    void setLocalMediaListener(LocalMediaListener listener);
 }

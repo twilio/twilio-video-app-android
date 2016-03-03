@@ -18,4 +18,12 @@ public interface MediaTrack {
      * @return state of media track
      */
     MediaTrackState getState();
+
+
+    /**
+     * Returns whether or not media track is enabled
+     *
+     * @return <code>true</code> if media track is enabled, false otherwise
+     */
+    boolean isEnabled();
 }
