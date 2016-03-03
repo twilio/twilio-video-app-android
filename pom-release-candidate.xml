@@ -1,0 +1,190 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>com.twilio.sdk</groupId>
+    <artifactId>twilio-conversations-android</artifactId>
+
+    <name>Twilio Common Android</name>
+        <version>${tca.build.version}-rc${rc.version}</version>
+    <description>
+        Download the latest Twilio Conversations Android snapshot and push it to nexus releases
+    </description>
+    <url>https://code.hq.twilio.com/client/twilio-conversations-android</url>
+    <scm>
+        <connection>scm:git:code.hq.twilio.com:client/signal-sdk-android.git</connection>
+        <developerConnection>scm:git:code.hq.twilio.com:client/signal-sdk-android.git</developerConnection>
+    </scm>
+
+    <properties>
+        <dependencies.twilio-conversations-android.version>${tca.build.version}-SNAPSHOT</dependencies.twilio-conversations-android.version>
+    </properties>
+
+    <build>
+        <defaultGoal>initialize</defaultGoal>
+        <!-- pulling down latest snapshot -->
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>copy</id>
+                        <phase>initialize</phase>
+                        <goals>
+                            <goal>copy</goal>
+                        </goals>
+                        <configuration>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>com.twilio.sdk</groupId>
+                                    <artifactId>twilio-conversations-android</artifactId>
+                                    <version>${dependencies.twilio-conversations-android.version}</version>
+                                    <type>tar.bz2</type>
+                                    <overWrite>false</overWrite>
+                                    <!-- renaming file without version -->
+                                    <destFileName>twilio-conversations-android.tar.bz2</destFileName>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>com.twilio.sdk</groupId>
+                                    <artifactId>twilio-conversations-android</artifactId>
+                                    <version>${dependencies.twilio-conversations-android.version}</version>
+                                    <type>aar</type>
+                                    <overWrite>false</overWrite>
+                                    <!-- renaming file without version -->
+                                    <destFileName>twilio-conversations-android.aar</destFileName>
+                                </artifactItem>
+                            </artifactItems>
+                            <outputDirectory>${project.build.directory}/</outputDirectory>
+                            <overWriteReleases>false</overWriteReleases>
+                            <overWriteSnapshots>true</overWriteSnapshots>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>maven-unpack-dependencies</id>
+                        <goals>
+                            <goal>unpack-dependencies</goal>
+                        </goals>
+                        <phase>initialize</phase>
+                        <configuration>
+                            <outputDirectory>${project.build.directory}/</outputDirectory>
+                            <excludeTypes>aar</excludeTypes>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <!-- deploying during the packaging phase so parameters don't have to supplied on cli-->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-deploy-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>deploy-artifacts</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>deploy-file</goal>
+                        </goals>
+                        <configuration>
+                            <file>${project.build.directory}/twilio-conversations-android.tar.bz2</file>
+                            <repositoryId>twilio.nexus.releases</repositoryId>
+                            <url>http://nexus.corp.twilio.com/content/repositories/releases</url>
+                            <groupId>${project.groupId}</groupId>
+                            <artifactId>${project.artifactId}</artifactId>
+                            <version>${project.version}</version>
+                            <generatePom>false</generatePom>
+                            <packaging>tar.bz2</packaging>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>deploy-artifacts-aar</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>deploy-file</goal>
+                        </goals>
+                        <configuration>
+                            <file>${project.build.directory}/twilio-conversations-android.aar</file>
+                            <repositoryId>twilio.nexus.releases</repositoryId>
+                            <url>http://nexus.corp.twilio.com/content/repositories/releases</url>
+                            <groupId>${project.groupId}</groupId>
+                            <artifactId>${project.artifactId}</artifactId>
+                            <version>${project.version}</version>
+                            <generatePom>true</generatePom>
+                            <packaging>aar</packaging>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <!-- tagging git repo -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-scm-plugin</artifactId>
+                <version>1.9.4</version>
+                <executions>
+                    <execution>
+                        <id>tag-repo</id>
+                        <phase>package</phase>
+                        <goals>
+                        <goal>tag</goal>
+                        </goals>
+                        <configuration>
+                            <tag>${project.version}</tag>
+                            <username>git</username>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>2.4</version>
+                <executions>
+                    <execution>
+                        <id>default-jar</id>
+                        <phase/>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.twilio.sdk</groupId>
+            <artifactId>twilio-conversations-android</artifactId>
+            <version>${dependencies.twilio-conversations-android.version}</version>
+            <type>tar.bz2</type>
+        </dependency>
+        <dependency>
+            <groupId>com.twilio.sdk</groupId>
+            <artifactId>twilio-conversations-android</artifactId>
+            <version>${dependencies.twilio-conversations-android.version}</version>
+            <type>aar</type>
+        </dependency>
+    </dependencies>
+
+    <distributionManagement>
+        <repository>
+            <id>twilio.nexus.releases</id>
+            <name>twilio.internal.releases</name>
+            <url>http://nexus.corp.twilio.com/content/repositories/releases</url>
+        </repository>
+    </distributionManagement>
+
+    <repositories>
+        <repository>
+            <id>twilio.nexus.snapshots</id>
+            <url>http://nexus.corp.twilio.com/content/repositories/snapshots</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </repository>
+    </repositories>
+
+</project>
