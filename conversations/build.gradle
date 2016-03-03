@@ -1,6 +1,17 @@
 apply plugin: 'com.android.model.library'
 apply plugin: 'maven'
 
+/**
+ * These are only needed if we are publishing artifacts so we conditionally
+ * set them based on properties
+  */
+def mavenRepo = (project.hasProperty('maven.repo') ?
+        project.property("maven.repo") : '')
+def mavenUsername = (project.hasProperty('maven.username') ?
+        project.property("maven.username") : '')
+def mavenPassword = (project.hasProperty('maven.password') ?
+        project.property("maven.password") : '')
+
 def currentToolchainVersion = "4.9"
 // TODO add back ability for local builds
 //def twilioSdkHome = "/usr/local/twilio-sdk"
@@ -382,10 +393,10 @@ task packageRelease(type: GradleBuild){
 uploadArchives {
     repositories {
         mavenDeployer {
-            repository(url: "${project.property('maven.repo')};publish=1") {
+            repository(url: "${mavenRepo};publish=1") {
                 authentication(
-                        userName: project.property('maven.username'),
-                        password: project.property('maven.password')
+                        userName: mavenUsername,
+                        password: mavenPassword
                 )
             }
             pom.version = getVersionName() + ((project.hasProperty("releaseCandidate") &&
