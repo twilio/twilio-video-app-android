@@ -400,13 +400,6 @@ uploadArchives {
 }
 
 /**
- * Publishes release to jcenter according to project properties
- */
-task publishRelease(type: GradleBuild){
-    tasks = ['assembleRelease', 'uploadArchives']
-}
-
-/**
  * Localize the JNI_OnLoad and JNI_OnUnLoad symbol in libwebrtc-jni.a to prevent conflicts with
  * initialization
  */
