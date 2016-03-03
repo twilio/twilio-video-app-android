@@ -13,6 +13,11 @@ import com.twilio.common.TwilioAccessManagerFactory;
 import com.twilio.conversations.impl.TwilioConversationsImpl;
 import com.twilio.conversations.internal.TwilioConversationsInternal;
 
+
+/**
+ * Twilio Conversations SDK
+ *
+ */
 public class TwilioConversations {
     /**
      *  Authenticating your Client failed due to invalid auth credentials.
