@@ -1,5 +1,5 @@
 apply plugin: 'com.android.model.library'
-apply plugin: 'nebula.provided-base'
+apply plugin: 'maven'
 
 def currentToolchainVersion = "4.9"
 // TODO add back ability for local builds
@@ -41,7 +41,6 @@ def webRtcHeaders = "${webRtcHome}/include"
 def webRtcStaticLib = "libwebrtc.a"
 
 configurations {
-    provided
     preCompile
 }
 
@@ -238,6 +237,7 @@ model {
             exclude '**/R.java'
             exclude 'com/twilio/conversations/internal/*'
             exclude 'com/twilio/conversations/impl/*'
+            failOnError false
         }
     }
 }
@@ -258,8 +258,8 @@ dependencies {
     androidTestCompile 'com.android.support.test:rules:0.4'
 
     // TODO this really should be on nexus as a jar and not local
+    compile 'com.twilio.sdk:twilio-common-android:0.2.0'
     compile files("${twilioSdkHome}/twilio-webrtc/lib/release/libjingle_peerconnection_java.jar")
-    provided 'com.twilio.sdk:twilio-common-android:0.2.0'
 }
 
 /**
@@ -373,6 +373,34 @@ task createReleaseTarBz2(type: Tar, dependsOn: 'prepareReleaseTarBz2') {
  */
 task packageRelease(type: GradleBuild){
     tasks = ['createJavadocs', 'createReleaseTarBz2']
+}
+
+/**
+ * Maven upload configuration that can be used for any maven repo
+ *
+ */
+uploadArchives {
+    repositories {
+        mavenDeployer {
+            repository(url: "${project.property('maven.repo')};publish=1") {
+                authentication(
+                        userName: project.property('maven.username'),
+                        password: project.property('maven.password')
+                )
+            }
+            pom.version = getVersionName()
+            pom.groupId = 'com.twilio'
+            pom.artifactId = 'conversations-android'
+            pom.packaging = 'aar'
+        }
+    }
+}
+
+/**
+ * Publishes release to jcenter according to project properties
+ */
+task publishRelease(type: GradleBuild){
+    tasks = ['assembleRelease', 'uploadArchives']
 }
 
 /**
@@ -631,5 +659,4 @@ class ConversationsRuleSource extends RuleSource {
         }
     }
 }
-
 apply plugin: ConversationsRuleSource
