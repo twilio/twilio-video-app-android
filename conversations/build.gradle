@@ -375,7 +375,7 @@ task packageRelease(type: GradleBuild){
 }
 
 /**
- * Maven upload configuration. Can be used for any maven repo.
+ * Maven upload configuration that can be used for any maven repo
  */
 uploadArchives {
     repositories {
