@@ -2,7 +2,10 @@ package com.twilio.conversations;
 
 import java.util.List;
 
-
+/**
+ * Provides local video and audio tracks associated with a {@link Participant}
+ *
+ */
 public interface LocalMedia {
     /**
      * Returns the local video tracks
