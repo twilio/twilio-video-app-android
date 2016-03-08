@@ -61,6 +61,14 @@ protected:
                            "onRegistrationDidComplete");
         jobject j_error = errorToJavaCoreErrorImpl(code, message);
         CHECK_EXCEPTION(jni()) << "error during NewObject";
+
+        if (IsNull(jni(), *j_endpoint_observer_)) {
+            TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK,
+                               kTSCoreLogLevelWarning,
+                               "observer reference has been destroyed");
+            return;
+        }
+
         jni()->CallVoidMethod(*j_endpoint_observer_, j_registration_complete_, j_error);
         CHECK_EXCEPTION(jni()) << "error during CallVoidMethod";
     }
@@ -73,6 +81,14 @@ protected:
                            "onUnregistrationDidComplete");
         jobject j_error = errorToJavaCoreErrorImpl(code, message);
         CHECK_EXCEPTION(jni()) << "error during NewObject";
+
+        if (IsNull(jni(), *j_endpoint_observer_)) {
+            TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK,
+                               kTSCoreLogLevelWarning,
+                               "observer reference has been destroyed");
+            return;
+        }
+
         jni()->CallVoidMethod(*j_endpoint_observer_, j_unreg_complete_, j_error);
         CHECK_EXCEPTION(jni()) << "error during CallVoidMethod";
     }
@@ -88,6 +104,14 @@ protected:
         jobject j_state_type =
                 webrtc_jni::JavaEnumFromIndex(jni(), *j_statetype_enum_, state_type_enum, state);
         CHECK_EXCEPTION(jni()) << "error during NewObject";
+
+        if (IsNull(jni(), *j_endpoint_observer_)) {
+            TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK,
+                               kTSCoreLogLevelWarning,
+                               "observer reference has been destroyed");
+            return;
+        }
+
         jni()->CallVoidMethod(*j_endpoint_observer_, j_state_change_, j_state_type);
         CHECK_EXCEPTION(jni()) << "error during CallVoidMethod";
     }
@@ -106,6 +130,13 @@ protected:
         jobjectArray j_participants =
                 partToJavaPart(jni(), session->getParticipants());
         CHECK_EXCEPTION(jni()) << "error during NewObject";
+
+        if (IsNull(jni(), *j_endpoint_observer_)) {
+            TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK,
+                               kTSCoreLogLevelWarning,
+                               "observer reference has been destroyed");
+            return;
+        }
 
         jni()->CallVoidMethod(
                 *j_endpoint_observer_, j_incoming_call_, j_session_id, j_participants);
