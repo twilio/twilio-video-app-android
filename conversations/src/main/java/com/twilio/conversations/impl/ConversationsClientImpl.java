@@ -575,15 +575,15 @@ public class ConversationsClientImpl implements
     }
 
     private void disposeClient() {
-        if (endpointObserver != null) {
-            endpointObserver.dispose();
-            endpointObserver = null;
-        }
         if (!isDisposed && nativeEndpointHandle != 0) {
             freeNativeHandle(nativeEndpointHandle);
             nativeEndpointHandle = 0;
             isDisposing = false;
             isDisposed = true;
+        }
+        if (endpointObserver != null) {
+            endpointObserver.dispose();
+            endpointObserver = null;
         }
     }
 
