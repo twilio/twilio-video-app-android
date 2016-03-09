@@ -99,8 +99,8 @@ public class ConversationImpl implements Conversation,
 
     private SessionObserverInternal sessionObserverInternal;
     private long nativeSession;
-    private boolean isDisposed;
-    private boolean isDisposing;
+    private boolean isConvDisposed;
+    private boolean isConvDisposing;
 
     private ConversationImpl(ConversationsClientImpl conversationsClient,
                              Set<String> participants,
@@ -269,7 +269,7 @@ public class ConversationImpl implements Conversation,
 
     @Override
     protected void finalize() throws Throwable {
-        if (isDisposed || nativeSession == 0) {
+        if (isConvDisposed || nativeSession == 0) {
             logger.e(FINALIZE_MESSAGE);
             dispose();
         }
@@ -303,7 +303,7 @@ public class ConversationImpl implements Conversation,
         }
 
         if (conversationStatus == ConversationStatus.DISCONNECTED &&
-                isDisposing) {
+                isConvDisposing) {
             // If the conversation was active, dispose will disconnect the conversation
             // now we must complete the disposal
             disposeConversation();
@@ -756,13 +756,18 @@ public class ConversationImpl implements Conversation,
 
     @Override
     public synchronized void dispose() {
-        isDisposing = true;
+        isConvDisposing = true;
         if (isActive()) {
             // We should disconnect the conversation before disposing
             stop();
         } else {
             disposeConversation();
         }
+    }
+
+    @Override
+    public boolean isDisposed() {
+        return (isConvDisposed || isConvDisposing);
     }
 
     public void setLocalMedia(LocalMedia media) {
@@ -894,12 +899,12 @@ public class ConversationImpl implements Conversation,
             nativeSession = 0;
         }
         EglBaseProvider.releaseEglBase();
-        isDisposed = true;
-        isDisposing = false;
+        isConvDisposed = true;
+        isConvDisposing = false;
     }
 
     private synchronized void checkDisposed() {
-        if (isDisposed || nativeSession == 0) {
+        if (isConvDisposed || nativeSession == 0) {
             throw new IllegalStateException(DISPOSE_MESSAGE);
         }
     }

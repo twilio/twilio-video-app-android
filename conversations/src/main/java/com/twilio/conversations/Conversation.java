@@ -63,6 +63,12 @@ public interface Conversation {
     void dispose();
 
     /**
+     * Returns true if this object has been disposed
+     *
+     */
+    boolean isDisposed();
+
+    /**
      * Gets the {@link StatsListener} of this conversation
      *
      * @return listener of this conversation media tracks stats
