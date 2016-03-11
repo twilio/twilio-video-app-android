@@ -369,10 +369,12 @@ public class ConversationsClientImpl implements
 
     @Override
     public synchronized void dispose() {
+        checkDisposed();
         disposalState = DisposalState.DISPOSING;
         if (listening) {
             // The client must stop listening before the ConversationsClient can be disposed
-            unlisten();
+            unlisten(nativeEndpointHandle);
+            listening = false;
         } else {
             disposeClient();
         }
@@ -591,7 +593,7 @@ public class ConversationsClientImpl implements
     }
 
     private synchronized void checkDisposed() {
-        if (disposalState == DisposalState.DISPOSED || nativeEndpointHandle == 0) {
+        if (disposalState != DisposalState.NOT_DISPOSED || nativeEndpointHandle == 0) {
             throw new IllegalStateException(DISPOSE_MESSAGE);
         }
     }

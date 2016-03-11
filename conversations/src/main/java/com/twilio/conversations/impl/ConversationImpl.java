@@ -755,6 +755,7 @@ public class ConversationImpl implements Conversation,
 
     @Override
     public synchronized void dispose() {
+        checkDisposed();
         disposalState = DisposalState.DISPOSING;
         if (isActive()) {
             // We should disconnect the conversation before disposing
@@ -901,7 +902,7 @@ public class ConversationImpl implements Conversation,
     }
 
     private synchronized void checkDisposed() {
-        if (disposalState == DisposalState.DISPOSED || nativeSession == 0) {
+        if (disposalState != DisposalState.NOT_DISPOSED || nativeSession == 0) {
             throw new IllegalStateException(DISPOSE_MESSAGE);
         }
     }
