@@ -55,6 +55,7 @@ public class ConversationImpl implements Conversation,
     private OutgoingInviteImpl outgoingInviteImpl;
     private StatsListener statsListener;
     private Handler statsHandler;
+    private ObjectState objectState = ObjectState.ACTIVE;
 
 
     private static String TAG = "ConversationImpl";
@@ -99,8 +100,6 @@ public class ConversationImpl implements Conversation,
 
     private SessionObserverInternal sessionObserverInternal;
     private long nativeSession;
-    private boolean isConvDisposed;
-    private boolean isConvDisposing;
 
     private ConversationImpl(ConversationsClientImpl conversationsClient,
                              Set<String> participants,
@@ -269,7 +268,7 @@ public class ConversationImpl implements Conversation,
 
     @Override
     protected void finalize() throws Throwable {
-        if (isConvDisposed || nativeSession == 0) {
+        if (objectState == ObjectState.ACTIVE || nativeSession != 0) {
             logger.e(FINALIZE_MESSAGE);
             dispose();
         }
@@ -303,7 +302,7 @@ public class ConversationImpl implements Conversation,
         }
 
         if (conversationStatus == ConversationStatus.DISCONNECTED &&
-                isConvDisposing) {
+                objectState == ObjectState.DISPOSING) {
             // If the conversation was active, dispose will disconnect the conversation
             // now we must complete the disposal
             disposeConversation();
@@ -756,7 +755,7 @@ public class ConversationImpl implements Conversation,
 
     @Override
     public synchronized void dispose() {
-        isConvDisposing = true;
+        objectState = ObjectState.DISPOSING;
         if (isActive()) {
             // We should disconnect the conversation before disposing
             stop();
@@ -765,9 +764,8 @@ public class ConversationImpl implements Conversation,
         }
     }
 
-    @Override
-    public boolean isDisposed() {
-        return (isConvDisposed || isConvDisposing);
+    public ObjectState getObjectState() {
+        return objectState;
     }
 
     public void setLocalMedia(LocalMedia media) {
@@ -899,12 +897,11 @@ public class ConversationImpl implements Conversation,
             nativeSession = 0;
         }
         EglBaseProvider.releaseEglBase();
-        isConvDisposed = true;
-        isConvDisposing = false;
+        objectState = ObjectState.DISPOSED;
     }
 
     private synchronized void checkDisposed() {
-        if (isConvDisposed || nativeSession == 0) {
+        if (objectState != ObjectState.ACTIVE || nativeSession == 0) {
             throw new IllegalStateException(DISPOSE_MESSAGE);
         }
     }
