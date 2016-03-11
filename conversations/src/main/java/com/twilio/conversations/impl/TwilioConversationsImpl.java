@@ -7,7 +7,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
-import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
@@ -297,10 +296,8 @@ public class TwilioConversationsImpl {
                     if (weakClientRef != null) {
                         ConversationsClientImpl client = weakClientRef.get();
                         if (client != null) {
-                            if (!client.isDisposed) {
-                                if (!client.isDisposing) {
-                                    client.dispose();
-                                }
+                            if (client.getDisposalState() == DisposalState.NOT_DISPOSED) {
+                                client.dispose();
                                 // Add clients that are not disposed to ensure they are disposed later
                                 clientsDisposing.add(client);
                             }
@@ -312,7 +309,7 @@ public class TwilioConversationsImpl {
                 while (!clientsDisposing.isEmpty()) {
                     ConversationsClientImpl clientPendingDispose = clientsDisposing.poll();
 
-                    if (!clientPendingDispose.isDisposed) {
+                    if (clientPendingDispose.getDisposalState() != DisposalState.DISPOSED) {
                         clientsDisposing.add(clientPendingDispose);
                     }
                 }
