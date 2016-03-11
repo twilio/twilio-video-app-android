@@ -1,8 +1,8 @@
 package com.twilio.conversations.impl;
 
 
-public enum ObjectState {
-    ACTIVE,
+public enum DisposalState {
+    NOT_DISPOSED,
     DISPOSING,
     DISPOSED
 }

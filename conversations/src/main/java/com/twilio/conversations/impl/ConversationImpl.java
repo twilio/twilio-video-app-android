@@ -55,7 +55,7 @@ public class ConversationImpl implements Conversation,
     private OutgoingInviteImpl outgoingInviteImpl;
     private StatsListener statsListener;
     private Handler statsHandler;
-    private ObjectState objectState = ObjectState.ACTIVE;
+    private DisposalState disposalState = DisposalState.NOT_DISPOSED;
 
 
     private static String TAG = "ConversationImpl";
@@ -268,7 +268,7 @@ public class ConversationImpl implements Conversation,
 
     @Override
     protected void finalize() throws Throwable {
-        if (objectState == ObjectState.ACTIVE || nativeSession != 0) {
+        if (disposalState == DisposalState.NOT_DISPOSED || nativeSession != 0) {
             logger.e(FINALIZE_MESSAGE);
             dispose();
         }
@@ -302,7 +302,7 @@ public class ConversationImpl implements Conversation,
         }
 
         if (conversationStatus == ConversationStatus.DISCONNECTED &&
-                objectState == ObjectState.DISPOSING) {
+                disposalState == DisposalState.DISPOSING) {
             // If the conversation was active, dispose will disconnect the conversation
             // now we must complete the disposal
             disposeConversation();
@@ -755,7 +755,7 @@ public class ConversationImpl implements Conversation,
 
     @Override
     public synchronized void dispose() {
-        objectState = ObjectState.DISPOSING;
+        disposalState = DisposalState.DISPOSING;
         if (isActive()) {
             // We should disconnect the conversation before disposing
             stop();
@@ -764,8 +764,8 @@ public class ConversationImpl implements Conversation,
         }
     }
 
-    public ObjectState getObjectState() {
-        return objectState;
+    public DisposalState getDisposalState() {
+        return disposalState;
     }
 
     public void setLocalMedia(LocalMedia media) {
@@ -897,11 +897,11 @@ public class ConversationImpl implements Conversation,
             nativeSession = 0;
         }
         EglBaseProvider.releaseEglBase();
-        objectState = ObjectState.DISPOSED;
+        disposalState = DisposalState.DISPOSED;
     }
 
     private synchronized void checkDisposed() {
-        if (objectState != ObjectState.ACTIVE || nativeSession == 0) {
+        if (disposalState == DisposalState.DISPOSED || nativeSession == 0) {
             throw new IllegalStateException(DISPOSE_MESSAGE);
         }
     }

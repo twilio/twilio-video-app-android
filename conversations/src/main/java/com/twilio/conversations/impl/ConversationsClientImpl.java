@@ -92,8 +92,7 @@ public class ConversationsClientImpl implements
 
     }
 
-    boolean isDisposed;
-    boolean isDisposing;
+    private DisposalState disposalState = DisposalState.NOT_DISPOSED;
 
     private final UUID uuid = UUID.randomUUID();
     private Context context;
@@ -120,7 +119,7 @@ public class ConversationsClientImpl implements
 
     @Override
     protected void finalize() throws Throwable {
-        if (isDisposed || nativeEndpointHandle == 0) {
+        if (disposalState == DisposalState.NOT_DISPOSED || nativeEndpointHandle != 0) {
             logger.e(FINALIZE_MESSAGE);
             dispose();
         }
@@ -370,7 +369,7 @@ public class ConversationsClientImpl implements
 
     @Override
     public synchronized void dispose() {
-        isDisposing = true;
+        disposalState = DisposalState.DISPOSING;
         if (listening) {
             // The client must stop listening before the ConversationsClient can be disposed
             unlisten();
@@ -448,7 +447,7 @@ public class ConversationsClientImpl implements
     public void onUnregistrationDidComplete(CoreError error) {
         logger.d("onUnregistrationDidComplete");
         listening = false;
-        if (isDisposing) {
+        if (disposalState == DisposalState.DISPOSING) {
             // If the client was listening, dispose() will call unlisten() to properly dispose of the client
             disposeClient();
         }
@@ -574,12 +573,16 @@ public class ConversationsClientImpl implements
         return audioManager.isSpeakerphoneOn() ? AudioOutput.SPEAKERPHONE : AudioOutput.HEADSET;
     }
 
+
+    public DisposalState getDisposalState() {
+        return disposalState;
+    }
+
     private void disposeClient() {
-        if (!isDisposed && nativeEndpointHandle != 0) {
+        if (disposalState != DisposalState.DISPOSED || nativeEndpointHandle != 0) {
             freeNativeHandle(nativeEndpointHandle);
             nativeEndpointHandle = 0;
-            isDisposing = false;
-            isDisposed = true;
+            disposalState = DisposalState.DISPOSED;
         }
         if (endpointObserver != null) {
             endpointObserver.dispose();
@@ -588,7 +591,7 @@ public class ConversationsClientImpl implements
     }
 
     private synchronized void checkDisposed() {
-        if (isDisposed || nativeEndpointHandle == 0) {
+        if (disposalState == DisposalState.DISPOSED || nativeEndpointHandle == 0) {
             throw new IllegalStateException(DISPOSE_MESSAGE);
         }
     }
