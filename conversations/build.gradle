@@ -18,10 +18,9 @@ def currentToolchainVersion = "4.9"
 def twilioSdkHome = "${buildDir}/prebuilt"
 def supportedAbis = [
         "armeabi-v7a",
-        // TODO multi arch support
-//        "arm64-v8a",
-//        "x86",
-//        "x86_64"
+        "arm64-v8a",
+        "x86",
+        "x86_64"
 ]
 
 def coreHome = "${twilioSdkHome}/twilio-conversations"
@@ -61,7 +60,7 @@ model {
             twilioSdkCore {
                 headers.srcDir "${coreHeaders}"
                 binaries.withType(StaticLibraryBinary) {
-                    def coreStaticLibPath = "${coreHome}/lib/release/" +
+                    def coreStaticLibPath = "${coreHome}/lib/${buildType.getName()}/" +
                             "${targetPlatform.getName()}/${coreStaticLib}"
                     staticLibraryFile = file("${coreStaticLibPath}")
                 }
@@ -69,7 +68,8 @@ model {
             twilioCommon {
                 headers.srcDir "${twilioCommonHeaders}"
                 binaries.withType(StaticLibraryBinary) {
-                    def twilioCommonStaticLibPath = "${twilioCommonHome}/lib/release/" +
+                    def twilioCommonStaticLibPath = "${twilioCommonHome}/lib/" +
+                            "${buildType.getName()}/" +
                             "${targetPlatform.getName()}/${twilioCommonStaticLib}"
                     staticLibraryFile = file("${twilioCommonStaticLibPath}")
                 }
@@ -77,7 +77,7 @@ model {
             pocoFoundation {
                 headers.srcDir "${pocoHeaders}"
                 binaries.withType(StaticLibraryBinary) {
-                    def pocoFoundationStaticLibPath = "${pocoHome}/lib/release/" +
+                    def pocoFoundationStaticLibPath = "${pocoHome}/lib/${buildType.getName()}/" +
                             "${targetPlatform.getName()}/${pocoFoundationStaticLib}"
                     staticLibraryFile = file("${pocoFoundationStaticLibPath}")
                 }
@@ -85,7 +85,7 @@ model {
             pocoNet {
                 headers.srcDir "${pocoHeaders}"
                 binaries.withType(StaticLibraryBinary) {
-                    def pocoNetStaticLibPath = "${pocoHome}/lib/release/" +
+                    def pocoNetStaticLibPath = "${pocoHome}/lib/${buildType.getName()}/" +
                             "${targetPlatform.getName()}/${pocoNetStaticLib}"
                     staticLibraryFile = file("${pocoNetStaticLibPath}")
                 }
@@ -93,7 +93,7 @@ model {
             pocoCrypto {
                 headers.srcDir "${pocoCryptoHeaders}"
                 binaries.withType(StaticLibraryBinary) {
-                    def pocoCryptoStaticLibPath = "${pocoHome}/lib/release/" +
+                    def pocoCryptoStaticLibPath = "${pocoHome}/lib/${buildType.getName()}/" +
                             "${targetPlatform.getName()}/${pocoCryptoStaticLib}"
                     staticLibraryFile = file("${pocoCryptoStaticLibPath}")
                 }
@@ -101,7 +101,7 @@ model {
             pocoNetSsl {
                 headers.srcDir "${pocoHeaders}"
                 binaries.withType(StaticLibraryBinary) {
-                    def pocoNetSslStaticLibPath = "${pocoHome}/lib/release/" +
+                    def pocoNetSslStaticLibPath = "${pocoHome}/lib/${buildType.getName()}/" +
                             "${targetPlatform.getName()}/${pocoNetSslStaticLib}"
                     staticLibraryFile = file("${pocoNetSslStaticLibPath}")
                 }
@@ -109,7 +109,7 @@ model {
             pocoUtil {
                 headers.srcDir "${pocoHeaders}"
                 binaries.withType(StaticLibraryBinary) {
-                    def pocoUtilStaticLibPath = "${pocoHome}/lib/release/" +
+                    def pocoUtilStaticLibPath = "${pocoHome}/lib/${buildType.getName()}/" +
                             "${targetPlatform.getName()}/${pocoUtilStaticLib}"
                     staticLibraryFile = file("${pocoUtilStaticLibPath}")
                 }
@@ -117,7 +117,7 @@ model {
             pocoXml {
                 headers.srcDir "${pocoHeaders}"
                 binaries.withType(StaticLibraryBinary) {
-                    def pocoXmlStaticLibPath = "${pocoHome}/lib/release/" +
+                    def pocoXmlStaticLibPath = "${pocoHome}/lib/${buildType.getName()}/" +
                             "${targetPlatform.getName()}/${pocoXmlStaticLib}"
                     staticLibraryFile = file("${pocoXmlStaticLibPath}")
                 }
@@ -125,7 +125,7 @@ model {
             pocoJson {
                 headers.srcDir "${pocoHeaders}"
                 binaries.withType(StaticLibraryBinary) {
-                    def pocoJsonStaticLibPath = "${pocoHome}/lib/release/" +
+                    def pocoJsonStaticLibPath = "${pocoHome}/lib/${buildType.getName()}/" +
                             "${targetPlatform.getName()}/${pocoJsonStaticLib}"
                     staticLibraryFile = file("${pocoJsonStaticLibPath}")
                 }
@@ -268,8 +268,8 @@ dependencies {
     androidTestCompile 'com.android.support.test:runner:0.4'
     androidTestCompile 'com.android.support.test:rules:0.4'
 
+    compile 'com.twilio.sdk:twilio-common-android:0.2.1-rc1'
     // TODO this really should be on nexus as a jar and not local
-    compile 'com.twilio.sdk:twilio-common-android:0.2.0'
     compile files("${twilioSdkHome}/twilio-webrtc/lib/release/libjingle_peerconnection_java.jar")
 }
 
@@ -285,6 +285,43 @@ task unpackPrebuilts(type: Copy) {
         from tarTree(dependency)
         into target
     }
+}
+
+/**
+ * Ndk build tasks for 64 bit architectures. We manually inject these into the task chain as a
+ * workaround for the bug below
+ *
+ * https://code.google.com/p/android/issues/detail?id=201561
+ */
+
+task ndkBuildArm64v8aClean(type: Exec) {
+    commandLine 'ndk-build', '-C', file("${projectDir}/src/main/jni").absolutePath, 'clean',
+            '-e', 'APP_ABI=arm64-v8a'
+}
+
+task ndkBuildArm64v8a(type: Exec, dependsOn: 'ndkBuildArm64v8aClean') {
+    commandLine 'ndk-build', '-C', file("${projectDir}/src/main/jni").absolutePath,
+            '-e', 'APP_ABI=arm64-v8a'
+}
+
+task ndkDebugBuildArm64v8a(type: Exec, dependsOn: 'ndkBuildArm64v8aClean') {
+    commandLine 'ndk-build', '-C', file("${projectDir}/src/main/jni").absolutePath,
+            '-e', 'APP_ABI=arm64-v8a', 'NDK_DEBUG=1'
+}
+
+task ndkBuildX86_64Clean(type: Exec) {
+    commandLine 'ndk-build', '-C', file("${projectDir}/src/main/jni").absolutePath, 'clean',
+            '-e', 'APP_ABI=x86_64'
+}
+
+task ndkBuildX86_64(type: Exec, dependsOn: 'ndkBuildX86_64Clean') {
+    commandLine 'ndk-build', '-C', file("${projectDir}/src/main/jni").absolutePath,
+            '-e', 'APP_ABI=x86_64'
+}
+
+task ndkDebugBuildX86_64(type: Exec, dependsOn: 'ndkBuildX86_64Clean') {
+    commandLine 'ndk-build', '-C', file("${projectDir}/src/main/jni").absolutePath,
+            '-e', 'APP_ABI=arm64-v8a', 'NDK_DEBUG=1'
 }
 
 /**
@@ -554,19 +591,19 @@ class ConversationsRuleSource extends RuleSource {
 //        validatePreCompileEnvironment(compileTask)
 //    }
 
-//    @Mutate
-//    void validatePreCompileDebugEnvironmentX86(
-//            @Path('tasks.compileJingle_peerconnection_soX86DebugSharedLibraryJingle_peerconnection_soMainCpp')
-//                    Task compileTask) {
-//        validatePreCompileEnvironment(compileTask)
-//    }
-//
-//    @Mutate
-//    void validatePreCompileReleaseEnvironmentX86(
-//            @Path('tasks.compileJingle_peerconnection_soX86ReleaseSharedLibraryJingle_peerconnection_soMainCpp')
-//                    Task compileTask) {
-//        validatePreCompileEnvironment(compileTask)
-//    }
+    @Mutate
+    void validatePreCompileDebugEnvironmentX86(
+            @Path('tasks.compileJingle_peerconnection_soX86DebugSharedLibraryJingle_peerconnection_soMainCpp')
+                    Task compileTask) {
+        validatePreCompileEnvironment(compileTask)
+    }
+
+    @Mutate
+    void validatePreCompileReleaseEnvironmentX86(
+            @Path('tasks.compileJingle_peerconnection_soX86ReleaseSharedLibraryJingle_peerconnection_soMainCpp')
+                    Task compileTask) {
+        validatePreCompileEnvironment(compileTask)
+    }
 
 //    @Mutate
 //    void validatePreCompileDebugEnvironmentX86_64(
@@ -610,19 +647,19 @@ class ConversationsRuleSource extends RuleSource {
 //        injectLinkerFlags(linkTask, twilioSdkHome, 'arm64-v8a')
 //    }
 
-//    @Mutate
-//    void injectX86DebugLinkerFlags(
-//            @Path('tasks.linkJingle_peerconnection_soX86DebugSharedLibrary')
-//                    Task linkTask) {
-//        injectLinkerFlags(linkTask, twilioSdkHome, 'x86')
-//    }
-//
-//    @Mutate
-//    void injectX86ReleaseLinkerFlags(
-//            @Path('tasks.linkJingle_peerconnection_soX86ReleaseSharedLibrary')
-//                    Task linkTask) {
-//        injectLinkerFlags(linkTask, twilioSdkHome, 'x86')
-//    }
+    @Mutate
+    void injectX86DebugLinkerFlags(
+            @Path('tasks.linkJingle_peerconnection_soX86DebugSharedLibrary')
+                    Task linkTask) {
+        injectLinkerFlags(linkTask, twilioSdkHome, 'x86')
+    }
+
+    @Mutate
+    void injectX86ReleaseLinkerFlags(
+            @Path('tasks.linkJingle_peerconnection_soX86ReleaseSharedLibrary')
+                    Task linkTask) {
+        injectLinkerFlags(linkTask, twilioSdkHome, 'x86')
+    }
 
 //    @Mutate
 //    void injectX86_64DebugLinkerFlags(
