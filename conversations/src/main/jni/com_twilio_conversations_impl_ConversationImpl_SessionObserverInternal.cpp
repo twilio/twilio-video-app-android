@@ -69,6 +69,11 @@ public:
                                 *j_observer_class_,
                                 "onVideoTrackAdded",
                                 "(Lcom/twilio/conversations/impl/core/TrackInfo;Lorg/webrtc/VideoTrack;)V")),
+            j_video_track_failed_to_add_id_(
+                    GetMethodID(jni,
+                                *j_observer_class_,
+                                "onVideoTrackFailedToAdd",
+                                "(Lcom/twilio/conversations/impl/core/TrackInfo;Lcom/twilio/conversations/impl/core/CoreError;)V")),
             j_video_track_removed_id_(
                     GetMethodID(jni,
                                 *j_observer_class_,
@@ -481,6 +486,7 @@ private:
     const jmethodID j_media_stream_added_id;
     const jmethodID j_media_stream_removed_id;
     const jmethodID j_video_track_added_id_;
+    const jmethodID j_video_track_failed_to_add_id_;
     const jmethodID j_video_track_removed_id_;
     const jmethodID j_video_track_state_changed_id_;
     const jmethodID j_audio_track_added_id_;

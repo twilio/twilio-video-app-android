@@ -577,6 +577,11 @@ public class ConversationImpl implements Conversation,
     }
 
     @Override
+    public void onVideoTrackFailedToAdd(final TrackInfo trackInfo, CoreError error) {
+
+    }
+
+    @Override
     public void onVideoTrackStateChanged(final TrackInfo trackInfo) {
         log("onVideoTrackStateChanged", trackInfo.getParticipantIdentity() + " " + trackInfo.getTrackId() + " " + trackInfo.isEnabled());
         if(trackInfo.getTrackOrigin() == TrackOrigin.LOCAL) {
