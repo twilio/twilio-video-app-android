@@ -295,33 +295,78 @@ task unpackPrebuilts(type: Copy) {
  */
 
 task ndkBuildArm64v8aClean(type: Exec) {
-    commandLine 'ndk-build', '-C', file("${projectDir}/src/main/jni").absolutePath, 'clean',
-            '-e', 'APP_ABI=arm64-v8a'
+    commandLine "${getNdkDir()}/ndk-build", '-C', file("${projectDir}/src/main/jni").absolutePath,
+            'clean', '-e', 'APP_ABI=arm64-v8a'
 }
 
 task ndkBuildArm64v8a(type: Exec, dependsOn: 'ndkBuildArm64v8aClean') {
-    commandLine 'ndk-build', '-C', file("${projectDir}/src/main/jni").absolutePath,
+    commandLine "${getNdkDir()}/ndk-build", '-C', file("${projectDir}/src/main/jni").absolutePath,
             '-e', 'APP_ABI=arm64-v8a'
 }
 
 task ndkDebugBuildArm64v8a(type: Exec, dependsOn: 'ndkBuildArm64v8aClean') {
-    commandLine 'ndk-build', '-C', file("${projectDir}/src/main/jni").absolutePath,
+    commandLine "${getNdkDir()}/ndk-build", '-C', file("${projectDir}/src/main/jni").absolutePath,
             '-e', 'APP_ABI=arm64-v8a', 'NDK_DEBUG=1'
 }
 
 task ndkBuildX86_64Clean(type: Exec) {
-    commandLine 'ndk-build', '-C', file("${projectDir}/src/main/jni").absolutePath, 'clean',
-            '-e', 'APP_ABI=x86_64'
+    commandLine "${getNdkDir()}/ndk-build", '-C', file("${projectDir}/src/main/jni").absolutePath,
+            'clean', '-e', 'APP_ABI=x86_64'
 }
 
 task ndkBuildX86_64(type: Exec, dependsOn: 'ndkBuildX86_64Clean') {
-    commandLine 'ndk-build', '-C', file("${projectDir}/src/main/jni").absolutePath,
+    commandLine "${getNdkDir()}/ndk-build", '-C', file("${projectDir}/src/main/jni").absolutePath,
             '-e', 'APP_ABI=x86_64'
 }
 
 task ndkDebugBuildX86_64(type: Exec, dependsOn: 'ndkBuildX86_64Clean') {
-    commandLine 'ndk-build', '-C', file("${projectDir}/src/main/jni").absolutePath,
-            '-e', 'APP_ABI=arm64-v8a', 'NDK_DEBUG=1'
+    commandLine "${getNdkDir()}/ndk-build", '-C', file("${projectDir}/src/main/jni").absolutePath,
+            '-e', 'APP_ABI=x86_64', 'NDK_DEBUG=1'
+}
+
+/**
+ * Injects the result of our manual ndk build tasks into an intermediate directory that
+ * is packaged into the final aar
+ */
+
+task injectArm64v8aDebugArtifact(type: Copy, dependsOn: 'ndkDebugBuildArm64v8a') {
+    def arm64Dir = file("${projectDir}/src/main/libs/arm64-v8a")
+    def debugDir = file("${buildDir}/intermediates/binaries/debug/lib/arm64-v8a")
+
+    from fileTree(arm64Dir)
+    into debugDir
+    exclude "gdbserver"
+    exclude "gdb.setup"
+}
+
+task injectArm64v8aReleaseArtifact(type: Copy, dependsOn: 'ndkBuildArm64v8a') {
+    def arm64Dir = file("${projectDir}/src/main/libs/arm64-v8a")
+    def releaseDir = file("${buildDir}/intermediates/binaries/release/lib/arm64-v8a")
+
+    from fileTree(arm64Dir)
+    into releaseDir
+    exclude "gdbserver"
+    exclude "gdb.setup"
+}
+
+task injectX86_64DebugArtifact(type: Copy, dependsOn: 'ndkDebugBuildX86_64') {
+    def x86_64Dir = file("${projectDir}/src/main/libs/x86_64")
+    def debugDir = file("${buildDir}/intermediates/binaries/debug/lib/x86_64")
+
+    from fileTree(x86_64Dir)
+    into debugDir
+    exclude "gdbserver"
+    exclude "gdb.setup"
+}
+
+task injectX86_64ReleaseArtifact(type: Copy, dependsOn: 'ndkBuildX86_64') {
+    def x86_64Dir = file("${projectDir}/src/main/libs/x86_64")
+    def releaseDir = file("${buildDir}/intermediates/binaries/release/lib/x86_64")
+
+    from fileTree(x86_64Dir)
+    into releaseDir
+    exclude "gdbserver"
+    exclude "gdb.setup"
 }
 
 /**
@@ -627,10 +672,24 @@ class ConversationsRuleSource extends RuleSource {
     }
 
     @Mutate
+    void injectArm64v8aDebug(
+            @Path('tasks.stripSymbolsArmeabi-v7aDebugSharedLibrary')
+                    Task stripTask) {
+        stripTask.dependsOn("injectArm64v8aDebugArtifact")
+    }
+
+    @Mutate
     void injectArmeabiV7aReleaseLinkerFlags(
             @Path('tasks.linkJingle_peerconnection_soArmeabi-v7aReleaseSharedLibrary')
                     Task linkTask) {
         injectLinkerFlags(linkTask, twilioSdkHome, 'armeabi-v7a')
+    }
+
+    @Mutate
+    void injectArm64v8aRelease(
+            @Path('tasks.stripSymbolsArmeabi-v7aReleaseSharedLibrary')
+                    Task stripTask) {
+        stripTask.dependsOn("injectArm64v8aReleaseArtifact")
     }
 
 //    @Mutate
@@ -655,10 +714,24 @@ class ConversationsRuleSource extends RuleSource {
     }
 
     @Mutate
+    void injectX86_64Debug(
+            @Path('tasks.stripSymbolsX86DebugSharedLibrary')
+                    Task stripTask) {
+        stripTask.dependsOn("injectX86_64DebugArtifact")
+    }
+
+    @Mutate
     void injectX86ReleaseLinkerFlags(
             @Path('tasks.linkJingle_peerconnection_soX86ReleaseSharedLibrary')
                     Task linkTask) {
         injectLinkerFlags(linkTask, twilioSdkHome, 'x86')
+    }
+
+    @Mutate
+    void injectX86_64Release(
+            @Path('tasks.stripSymbolsX86ReleaseSharedLibrary')
+                    Task stripTask) {
+        stripTask.dependsOn("injectX86_64ReleaseArtifact")
     }
 
 //    @Mutate
