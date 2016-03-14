@@ -113,7 +113,6 @@ public class TwilioConversations {
      */
     public final static int INVALID_VIDEO_TRACK_STATE = 305;
 
-
     /**
      * Interface for the listener object to pass to
      * {@link TwilioConversations#initialize(Context, InitListener)}.
