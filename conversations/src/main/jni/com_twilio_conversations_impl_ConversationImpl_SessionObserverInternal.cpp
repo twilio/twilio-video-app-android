@@ -276,6 +276,23 @@ protected:
         videoTrack->AddRef();
     }
 
+    virtual void onVideoTrackDidFailToAdd(TSCVideoTrackInfoObject* trackInfo,
+                                          TSCoreErrorCode errorCode,
+                                          std::string errorMessage) {
+        ScopedLocalRefFrame local_ref_frame(jni());
+
+        TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK,
+                           kTSCoreLogLevelDebug,
+                           "onVideoTrackDidFailToAdd");
+
+        jobject j_trackinfo = TrackInfoToJavaTrackInfoImpl(trackInfo);
+        CHECK_EXCEPTION(jni()) << "error during NewObject";
+        jobject j_error_obj = errorToJavaCoreErrorImpl(errorCode, errorMessage);
+        CHECK_EXCEPTION(jni()) << "error during NewObject";
+        jni()->CallVoidMethod(*j_observer_global_, j_video_track_failed_to_add_id_, j_trackinfo, j_error_obj);
+        CHECK_EXCEPTION(jni()) << "error during CallVoidMethod";
+    }
+
     virtual void onVideoTrackDidRemove(TSCVideoTrackInfoObject* trackInfo) {
         ScopedLocalRefFrame local_ref_frame(jni());
 

@@ -85,6 +85,11 @@ public class TwilioConversations {
     public final static int TOO_MANY_ACTIVE_CONVERSATIONS = 201;
 
     /**
+     *  A track was created with constraints that could not be satisfied.
+     */
+    public final static int TRACK_CREATION_FAILED = 207;
+
+    /**
      *  Too many tracks were added to the local media.
      *  @note: The current maximum is one video track at a time.
      */
@@ -107,6 +112,7 @@ public class TwilioConversations {
      *  @note: The video track is in the {@link MediaTrackState} ENDED state.
      */
     public final static int INVALID_VIDEO_TRACK_STATE = 305;
+
 
     /**
      * Interface for the listener object to pass to
