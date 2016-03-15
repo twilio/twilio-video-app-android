@@ -78,8 +78,6 @@ public class ConversationsClientImpl implements
                                                ConversationsClient conversationsClient);
         private native void freeNativeObserver(long nativeEndpointObserver);
 
-        private native void markForDeletion(long nativeEndpointObserver);
-
         @Override
         public long getNativeHandle() {
             return nativeEndpointObserver;
@@ -90,10 +88,6 @@ public class ConversationsClientImpl implements
                 freeNativeObserver(nativeEndpointObserver);
                 nativeEndpointObserver = 0;
             }
-        }
-
-        public void markForDeletion() {
-            markForDeletion(nativeEndpointObserver);
         }
 
     }
@@ -587,9 +581,6 @@ public class ConversationsClientImpl implements
     }
 
     private void disposeClient() {
-        if (endpointObserver != null) {
-            endpointObserver.markForDeletion();
-        }
         if (disposalState != DisposalState.DISPOSED || nativeEndpointHandle != 0) {
             freeNativeHandle(nativeEndpointHandle);
             nativeEndpointHandle = 0;

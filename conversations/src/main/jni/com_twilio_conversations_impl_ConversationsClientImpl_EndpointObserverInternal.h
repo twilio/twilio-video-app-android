@@ -23,10 +23,6 @@ JNIEXPORT jlong JNICALL Java_com_twilio_conversations_impl_ConversationsClientIm
 JNIEXPORT void JNICALL Java_com_twilio_conversations_impl_ConversationsClientImpl_00024EndpointObserverInternal_freeNativeObserver
   (JNIEnv *, jobject, jlong);
 
-JNIEXPORT void JNICALL Java_com_twilio_conversations_impl_ConversationsClientImpl_00024EndpointObserverInternal_markForDeletion
-        (JNIEnv *, jobject, jlong);
-
-
 #ifdef __cplusplus
 }
 #endif
