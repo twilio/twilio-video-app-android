@@ -166,7 +166,7 @@ model {
     android.ndk {
         moduleName "jingle_peerconnection_so"
         toolchainVersion "${currentToolchainVersion}"
-        platformVersion 16
+        platformVersion 21
         stl "c++_static"
         cppFlags.addAll([
                 "-DWEBRTC_POSIX",
