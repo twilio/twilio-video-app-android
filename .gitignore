@@ -6,6 +6,8 @@ sdk/.settings
 sdk/bin
 output
 
+dist/
+target/
 
 # Files for the Dalvik VM
 *.dex

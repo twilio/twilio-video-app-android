@@ -69,6 +69,11 @@ public:
                                 *j_observer_class_,
                                 "onVideoTrackAdded",
                                 "(Lcom/twilio/conversations/impl/core/TrackInfo;Lorg/webrtc/VideoTrack;)V")),
+            j_video_track_failed_to_add_id_(
+                    GetMethodID(jni,
+                                *j_observer_class_,
+                                "onVideoTrackFailedToAdd",
+                                "(Lcom/twilio/conversations/impl/core/TrackInfo;Lcom/twilio/conversations/impl/core/CoreError;)V")),
             j_video_track_removed_id_(
                     GetMethodID(jni,
                                 *j_observer_class_,
@@ -269,6 +274,23 @@ protected:
         jni()->CallVoidMethod(*j_observer_global_, j_video_track_added_id_, j_trackinfo, j_track);
         CHECK_EXCEPTION(jni()) << "error during CallVoidMethod";
         videoTrack->AddRef();
+    }
+
+    virtual void onVideoTrackDidFailToAdd(TSCVideoTrackInfoObject* trackInfo,
+                                          TSCoreErrorCode errorCode,
+                                          std::string errorMessage) {
+        ScopedLocalRefFrame local_ref_frame(jni());
+
+        TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK,
+                           kTSCoreLogLevelDebug,
+                           "onVideoTrackDidFailToAdd");
+
+        jobject j_trackinfo = TrackInfoToJavaTrackInfoImpl(trackInfo);
+        CHECK_EXCEPTION(jni()) << "error during NewObject";
+        jobject j_error_obj = errorToJavaCoreErrorImpl(errorCode, errorMessage);
+        CHECK_EXCEPTION(jni()) << "error during NewObject";
+        jni()->CallVoidMethod(*j_observer_global_, j_video_track_failed_to_add_id_, j_trackinfo, j_error_obj);
+        CHECK_EXCEPTION(jni()) << "error during CallVoidMethod";
     }
 
     virtual void onVideoTrackDidRemove(TSCVideoTrackInfoObject* trackInfo) {
@@ -481,6 +503,7 @@ private:
     const jmethodID j_media_stream_added_id;
     const jmethodID j_media_stream_removed_id;
     const jmethodID j_video_track_added_id_;
+    const jmethodID j_video_track_failed_to_add_id_;
     const jmethodID j_video_track_removed_id_;
     const jmethodID j_video_track_state_changed_id_;
     const jmethodID j_audio_track_added_id_;

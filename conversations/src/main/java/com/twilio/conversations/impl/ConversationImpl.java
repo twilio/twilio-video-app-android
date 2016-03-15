@@ -1,5 +1,6 @@
 package com.twilio.conversations.impl;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -22,6 +23,7 @@ import com.twilio.conversations.MediaTrackState;
 import com.twilio.conversations.Participant;
 import com.twilio.conversations.TrackOrigin;
 import com.twilio.conversations.TwilioConversations;
+import com.twilio.conversations.VideoRenderer;
 import com.twilio.conversations.VideoTrack;
 import com.twilio.conversations.impl.core.ConversationStateObserver;
 import com.twilio.conversations.impl.core.ConversationStatus;
@@ -536,6 +538,37 @@ public class ConversationImpl implements Conversation,
                     }
                 });
             }
+        }
+    }
+
+    @Override
+    public void onVideoTrackFailedToAdd(final TrackInfo trackInfo, CoreError error) {
+        log("onVideoFailedToAdd", trackInfo.getParticipantIdentity() + " " + trackInfo.getTrackId() + trackInfo.isEnabled(), error);
+        if(trackInfo.getTrackOrigin().equals(TrackOrigin.LOCAL)) {
+            // Remove local video track
+            final LocalVideoTrackImpl localVideoTrackImpl = (LocalVideoTrackImpl)localMediaImpl.getLocalVideoTracks().remove(0);
+            List<VideoRenderer> renderers = new ArrayList<VideoRenderer>(localVideoTrackImpl.getRenderers());
+            // Remove renderers
+            for(VideoRenderer renderer: renderers) {
+                localVideoTrackImpl.removeRenderer(renderer);
+            }
+            localVideoTrackImpl.removeCameraCapturer();
+
+            final TwilioConversationsException e =
+                    new TwilioConversationsException(error.getCode(), error.getMessage());
+
+            if(localMediaImpl.getHandler() != null) {
+                localMediaImpl.getHandler().post(new Runnable() {
+                    @Override
+                    public void run() {
+                        if(localMediaImpl.getLocalMediaListener() != null) {
+                            localMediaImpl.getLocalMediaListener().onLocalVideoTrackError(localMediaImpl, localVideoTrackImpl, e);
+                        }
+                    }
+                });
+            }
+        } else {
+            logger.w("Remote track failed to add unexpectedly");
         }
     }
 

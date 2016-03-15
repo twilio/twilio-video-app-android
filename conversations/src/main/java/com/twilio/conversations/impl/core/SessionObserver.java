@@ -20,6 +20,8 @@ public interface SessionObserver {
 
     void onVideoTrackAdded(TrackInfo trackInfo, VideoTrack videoTrack);
 
+    void onVideoTrackFailedToAdd(TrackInfo trackInfo, CoreError error);
+
     void onVideoTrackRemoved(TrackInfo trackInfo);
 
     void onVideoTrackStateChanged(TrackInfo trackInfo);
