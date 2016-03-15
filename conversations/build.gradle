@@ -18,7 +18,7 @@ def currentToolchainVersion = "4.9"
 def twilioSdkHome = "${buildDir}/prebuilt"
 def supportedAbis = [
         "armeabi-v7a",
-//        "arm64-v8a",
+        "arm64-v8a",
         "x86",
         "x86_64"
 ]
@@ -588,21 +588,21 @@ class ConversationsRuleSource extends RuleSource {
                     Task linkTask) {
         injectLinkerFlags(linkTask, twilioSdkHome, 'armeabi-v7a', 'release')
     }
-//
-//    @Mutate
-//    void injectArm64v8aDebugLinkerFlags(
-//            @Path('tasks.linkJingle_peerconnection_soArm64-v8aDebugSharedLibrary')
-//                    Task linkTask) {
-//        injectLinkerFlags(linkTask, twilioSdkHome, 'arm64-v8a', 'debug')
-//    }
-//
-//    @Mutate
-//    void injectArm64v8aReleaseLinkerFlags(
-//            @Path('tasks.linkJingle_peerconnection_soArm64-v8aReleaseSharedLibrary')
-//                    Task linkTask) {
-//        injectLinkerFlags(linkTask, twilioSdkHome, 'arm64-v8a', 'release')
-//    }
-//
+
+    @Mutate
+    void injectArm64v8aDebugLinkerFlags(
+            @Path('tasks.linkJingle_peerconnection_soArm64-v8aDebugSharedLibrary')
+                    Task linkTask) {
+        injectLinkerFlags(linkTask, twilioSdkHome, 'arm64-v8a', 'debug')
+    }
+
+    @Mutate
+    void injectArm64v8aReleaseLinkerFlags(
+            @Path('tasks.linkJingle_peerconnection_soArm64-v8aReleaseSharedLibrary')
+                    Task linkTask) {
+        injectLinkerFlags(linkTask, twilioSdkHome, 'arm64-v8a', 'release')
+    }
+
     @Mutate
     void injectX86DebugLinkerFlags(
             @Path('tasks.linkJingle_peerconnection_soX86DebugSharedLibrary')
@@ -640,6 +640,9 @@ class ConversationsRuleSource extends RuleSource {
         def webRtcHome = "${sdkHome}/twilio-webrtc/lib/release"
 
         linkTask.doFirst {
+            if (arch.equals('arm64-v8a')) {
+                properties["linkerArgs"].add("-fuse-ld=gold")
+            }
             properties["linkerArgs"].addAll([
                     "-l${pocoHome}/${arch}/${pocoFoundationStaticLib}".toString(),
                     "-l${pocoHome}/${arch}/${pocoCryptoStaticLib}".toString(),
