@@ -7,6 +7,7 @@
 #include "TSCSession.h"
 #include "TSCLogger.h"
 #include <android/log.h>
+#include <webrtc/base/criticalsection.h>
 
 using namespace webrtc_jni;
 using namespace twiliosdk;
@@ -48,8 +49,19 @@ public:
                      GetMethodID( env,
                                   *j_errorimpl_class_,
                                   "<init>",
-                                  "(Ljava/lang/String;ILjava/lang/String;)V"))
+                                  "(Ljava/lang/String;ILjava/lang/String;)V")),
+             observer_deleted_(false)
     {}
+
+    virtual ~EndpointObserverInternalWrapper() { }
+
+    void setObserverDeleted() {
+        rtc::CritScope cs(&deletion_lock_);
+        observer_deleted_ = true;
+        TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK,
+                           kTSCoreLogLevelDebug,
+                           "observer deleted");
+    }
 
 
 protected:
@@ -62,15 +74,16 @@ protected:
         jobject j_error = errorToJavaCoreErrorImpl(code, message);
         CHECK_EXCEPTION(jni()) << "error during NewObject";
 
-        if (IsNull(jni(), *j_endpoint_observer_)) {
-            TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK,
-                               kTSCoreLogLevelWarning,
-                               "observer reference has been destroyed");
-            return;
-        }
+        {
+            rtc::CritScope cs(&deletion_lock_);
 
-        jni()->CallVoidMethod(*j_endpoint_observer_, j_registration_complete_, j_error);
-        CHECK_EXCEPTION(jni()) << "error during CallVoidMethod";
+            if (!isObserverValid(std::string("onRegistrationDidComplete"))) {
+                return;
+            }
+
+            jni()->CallVoidMethod(*j_endpoint_observer_, j_registration_complete_, j_error);
+            CHECK_EXCEPTION(jni()) << "error during CallVoidMethod";
+        }
     }
 
     virtual void onUnregistrationDidComplete(TSCoreErrorCode code, const std::string message) {
@@ -82,15 +95,15 @@ protected:
         jobject j_error = errorToJavaCoreErrorImpl(code, message);
         CHECK_EXCEPTION(jni()) << "error during NewObject";
 
-        if (IsNull(jni(), *j_endpoint_observer_)) {
-            TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK,
-                               kTSCoreLogLevelWarning,
-                               "observer reference has been destroyed");
-            return;
-        }
+        {
+            rtc::CritScope cs(&deletion_lock_);
 
-        jni()->CallVoidMethod(*j_endpoint_observer_, j_unreg_complete_, j_error);
-        CHECK_EXCEPTION(jni()) << "error during CallVoidMethod";
+            if (!isObserverValid(std::string("onUnregistrationDidComplete"))) {
+                return;
+            }
+            jni()->CallVoidMethod(*j_endpoint_observer_, j_unreg_complete_, j_error);
+            CHECK_EXCEPTION(jni()) << "error during CallVoidMethod";
+        }
     }
 
     virtual void onStateDidChange(TSCEndpointState state){
@@ -100,20 +113,22 @@ protected:
                            kTSCoreLogLevelDebug,
                            "onStateDidChange, new state:%d",
                            state);
+
         const std::string state_type_enum = "com/twilio/conversations/impl/core/EndpointState";
+
         jobject j_state_type =
                 webrtc_jni::JavaEnumFromIndex(jni(), *j_statetype_enum_, state_type_enum, state);
         CHECK_EXCEPTION(jni()) << "error during NewObject";
 
-        if (IsNull(jni(), *j_endpoint_observer_)) {
-            TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK,
-                               kTSCoreLogLevelWarning,
-                               "observer reference has been destroyed");
-            return;
-        }
+        {
+            rtc::CritScope cs(&deletion_lock_);
 
-        jni()->CallVoidMethod(*j_endpoint_observer_, j_state_change_, j_state_type);
-        CHECK_EXCEPTION(jni()) << "error during CallVoidMethod";
+            if (!isObserverValid(std::string("onStateDidChange"))) {
+                return;
+            }
+            jni()->CallVoidMethod(*j_endpoint_observer_, j_state_change_, j_state_type);
+            CHECK_EXCEPTION(jni()) << "error during CallVoidMethod";
+        }
     }
 
     virtual void onIncomingCallDidReceive(const TSCSessionPtr &session) {
@@ -131,16 +146,16 @@ protected:
                 partToJavaPart(jni(), session->getParticipants());
         CHECK_EXCEPTION(jni()) << "error during NewObject";
 
-        if (IsNull(jni(), *j_endpoint_observer_)) {
-            TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK,
-                               kTSCoreLogLevelWarning,
-                               "observer reference has been destroyed");
-            return;
-        }
+        {
+            rtc::CritScope cs(&deletion_lock_);
 
-        jni()->CallVoidMethod(
-                *j_endpoint_observer_, j_incoming_call_, j_session_id, j_participants);
-        CHECK_EXCEPTION(jni()) << "error during CallVoidMethod";
+            if (!isObserverValid(std::string("onIncomingCallDidReceive"))) {
+                return;
+            }
+            jni()->CallVoidMethod(
+                    *j_endpoint_observer_, j_incoming_call_, j_session_id, j_participants);
+            CHECK_EXCEPTION(jni()) << "error during CallVoidMethod";
+        }
     }
 
 private:
@@ -163,6 +178,22 @@ private:
             return jni()->NewObject(
                     *j_errorimpl_class_, j_errorimpl_ctor_id_, j_domain, j_error_id, j_message);
         }
+    }
+
+    bool isObserverValid(const std::string &callbackName) {
+        if (observer_deleted_) {
+            TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK,
+                               kTSCoreLogLevelWarning,
+                               "observer is marked for deletion, skipping %s callback", callbackName.c_str());
+            return false;
+        };
+        if (IsNull(jni(), *j_endpoint_observer_)) {
+            TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK,
+                               kTSCoreLogLevelWarning,
+                               "observer reference has been destroyed, skipping %s callback", callbackName.c_str());
+            return false;
+        }
+        return true;
     }
 
     // Return Java array of participants
@@ -194,6 +225,9 @@ private:
     const ScopedGlobalRef<jclass> j_statetype_enum_;
     const ScopedGlobalRef<jclass> j_errorimpl_class_;
     const jmethodID j_errorimpl_ctor_id_;
+
+    bool observer_deleted_;
+    mutable rtc::CriticalSection deletion_lock_;
 };
 
 /*
@@ -219,6 +253,8 @@ JNIEXPORT void JNICALL Java_com_twilio_conversations_impl_ConversationsClientImp
     TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK, kTSCoreLogLevelDebug, "freeNativeObserver: Endpoint");
     TSCEndpointObserverPtr *endpointObserver = reinterpret_cast<TSCEndpointObserverPtr *>(nativeEndpointObserver);
     if (endpointObserver != nullptr) {
+        EndpointObserverInternalWrapper* wrapper = static_cast<EndpointObserverInternalWrapper*>(endpointObserver->get());
+        wrapper->setObserverDeleted();
         endpointObserver->reset();
         delete endpointObserver;
     }
