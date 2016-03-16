@@ -50,14 +50,14 @@ public:
                                   *j_errorimpl_class_,
                                   "<init>",
                                   "(Ljava/lang/String;ILjava/lang/String;)V")),
-             deletion_in_progress_(false)
+             observer_deleted_(false)
     {}
 
     virtual ~EndpointObserverInternalWrapper() { }
 
     void markForDeletion() {
         rtc::CritScope cs(&deletion_lock_);
-        deletion_in_progress_ = true;
+        observer_deleted_ = true;
     }
 
 
@@ -74,7 +74,7 @@ protected:
         {
             rtc::CritScope cs(&deletion_lock_);
 
-            if (deletion_in_progress_) {
+            if (observer_deleted_) {
                 TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK,
                                    kTSCoreLogLevelWarning,
                                    "observer is marked for deletion, skipping callback");
@@ -104,7 +104,7 @@ protected:
         {
             rtc::CritScope cs(&deletion_lock_);
 
-            if (deletion_in_progress_) {
+            if (observer_deleted_) {
                 TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK,
                                    kTSCoreLogLevelWarning,
                                    "observer is marked for deletion, skipping callback");
@@ -138,7 +138,7 @@ protected:
         {
             rtc::CritScope cs(&deletion_lock_);
 
-            if (deletion_in_progress_) {
+            if (observer_deleted_) {
                 TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK,
                                    kTSCoreLogLevelWarning,
                                    "observer is marked for deletion, skipping callback");
@@ -173,7 +173,7 @@ protected:
         {
             rtc::CritScope cs(&deletion_lock_);
 
-            if (deletion_in_progress_) {
+            if (observer_deleted_) {
                 TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK,
                                    kTSCoreLogLevelWarning,
                                    "observer is marked for deletion, skipping callback");
@@ -243,7 +243,7 @@ private:
     const ScopedGlobalRef<jclass> j_errorimpl_class_;
     const jmethodID j_errorimpl_ctor_id_;
 
-    bool deletion_in_progress_;
+    bool observer_deleted_;
     mutable rtc::CriticalSection deletion_lock_;
 };
 
