@@ -46,4 +46,4 @@ sdk/libs/
 *~
 *.swp
 *.swo
-
+**/**/**/libs

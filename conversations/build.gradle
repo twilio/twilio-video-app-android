@@ -18,10 +18,9 @@ def currentToolchainVersion = "4.9"
 def twilioSdkHome = "${buildDir}/prebuilt"
 def supportedAbis = [
         "armeabi-v7a",
-        // TODO multi arch support
-//        "arm64-v8a",
-//        "x86",
-//        "x86_64"
+        "arm64-v8a",
+        "x86",
+        "x86_64"
 ]
 
 def coreHome = "${twilioSdkHome}/twilio-conversations"
@@ -61,7 +60,7 @@ model {
             twilioSdkCore {
                 headers.srcDir "${coreHeaders}"
                 binaries.withType(StaticLibraryBinary) {
-                    def coreStaticLibPath = "${coreHome}/lib/release/" +
+                    def coreStaticLibPath = "${coreHome}/lib/${buildType.getName()}/" +
                             "${targetPlatform.getName()}/${coreStaticLib}"
                     staticLibraryFile = file("${coreStaticLibPath}")
                 }
@@ -69,7 +68,8 @@ model {
             twilioCommon {
                 headers.srcDir "${twilioCommonHeaders}"
                 binaries.withType(StaticLibraryBinary) {
-                    def twilioCommonStaticLibPath = "${twilioCommonHome}/lib/release/" +
+                    def twilioCommonStaticLibPath = "${twilioCommonHome}/lib/" +
+                            "${buildType.getName()}/" +
                             "${targetPlatform.getName()}/${twilioCommonStaticLib}"
                     staticLibraryFile = file("${twilioCommonStaticLibPath}")
                 }
@@ -77,7 +77,7 @@ model {
             pocoFoundation {
                 headers.srcDir "${pocoHeaders}"
                 binaries.withType(StaticLibraryBinary) {
-                    def pocoFoundationStaticLibPath = "${pocoHome}/lib/release/" +
+                    def pocoFoundationStaticLibPath = "${pocoHome}/lib/${buildType.getName()}/" +
                             "${targetPlatform.getName()}/${pocoFoundationStaticLib}"
                     staticLibraryFile = file("${pocoFoundationStaticLibPath}")
                 }
@@ -85,7 +85,7 @@ model {
             pocoNet {
                 headers.srcDir "${pocoHeaders}"
                 binaries.withType(StaticLibraryBinary) {
-                    def pocoNetStaticLibPath = "${pocoHome}/lib/release/" +
+                    def pocoNetStaticLibPath = "${pocoHome}/lib/${buildType.getName()}/" +
                             "${targetPlatform.getName()}/${pocoNetStaticLib}"
                     staticLibraryFile = file("${pocoNetStaticLibPath}")
                 }
@@ -93,7 +93,7 @@ model {
             pocoCrypto {
                 headers.srcDir "${pocoCryptoHeaders}"
                 binaries.withType(StaticLibraryBinary) {
-                    def pocoCryptoStaticLibPath = "${pocoHome}/lib/release/" +
+                    def pocoCryptoStaticLibPath = "${pocoHome}/lib/${buildType.getName()}/" +
                             "${targetPlatform.getName()}/${pocoCryptoStaticLib}"
                     staticLibraryFile = file("${pocoCryptoStaticLibPath}")
                 }
@@ -101,7 +101,7 @@ model {
             pocoNetSsl {
                 headers.srcDir "${pocoHeaders}"
                 binaries.withType(StaticLibraryBinary) {
-                    def pocoNetSslStaticLibPath = "${pocoHome}/lib/release/" +
+                    def pocoNetSslStaticLibPath = "${pocoHome}/lib/${buildType.getName()}/" +
                             "${targetPlatform.getName()}/${pocoNetSslStaticLib}"
                     staticLibraryFile = file("${pocoNetSslStaticLibPath}")
                 }
@@ -109,7 +109,7 @@ model {
             pocoUtil {
                 headers.srcDir "${pocoHeaders}"
                 binaries.withType(StaticLibraryBinary) {
-                    def pocoUtilStaticLibPath = "${pocoHome}/lib/release/" +
+                    def pocoUtilStaticLibPath = "${pocoHome}/lib/${buildType.getName()}/" +
                             "${targetPlatform.getName()}/${pocoUtilStaticLib}"
                     staticLibraryFile = file("${pocoUtilStaticLibPath}")
                 }
@@ -117,7 +117,7 @@ model {
             pocoXml {
                 headers.srcDir "${pocoHeaders}"
                 binaries.withType(StaticLibraryBinary) {
-                    def pocoXmlStaticLibPath = "${pocoHome}/lib/release/" +
+                    def pocoXmlStaticLibPath = "${pocoHome}/lib/${buildType.getName()}/" +
                             "${targetPlatform.getName()}/${pocoXmlStaticLib}"
                     staticLibraryFile = file("${pocoXmlStaticLibPath}")
                 }
@@ -125,7 +125,7 @@ model {
             pocoJson {
                 headers.srcDir "${pocoHeaders}"
                 binaries.withType(StaticLibraryBinary) {
-                    def pocoJsonStaticLibPath = "${pocoHome}/lib/release/" +
+                    def pocoJsonStaticLibPath = "${pocoHome}/lib/${buildType.getName()}/" +
                             "${targetPlatform.getName()}/${pocoJsonStaticLib}"
                     staticLibraryFile = file("${pocoJsonStaticLibPath}")
                 }
@@ -166,7 +166,7 @@ model {
     android.ndk {
         moduleName "jingle_peerconnection_so"
         toolchainVersion "${currentToolchainVersion}"
-        platformVersion 16
+        platformVersion 21
         stl "c++_static"
         cppFlags.addAll([
                 "-DWEBRTC_POSIX",
@@ -254,11 +254,11 @@ model {
 }
 
 dependencies {
-    preCompile 'org.pocoproject.twilio:twilio-poco:1.6.13:android@tar.bz2'
-    preCompile 'com.googlesource.boringssl.twilio:twilio-boringssl:1.0.11:android@tar.bz2'
-    preCompile 'com.twilio.sdk:twilio-common:0.1.11:android@tar.bz2'
-    preCompile 'com.twilio.sdk:twilio-webrtc:48.4:android@tar.bz2'
-    preCompile 'com.twilio.sdk:twilio-conversations:0.10.14:android@tar.bz2'
+    preCompile 'org.pocoproject.twilio:twilio-poco:1.6.14:android@tar.bz2'
+    preCompile 'com.googlesource.boringssl.twilio:twilio-boringssl:1.0.12:android@tar.bz2'
+    preCompile 'com.twilio.sdk:twilio-common:0.1.12:android@tar.bz2'
+    preCompile 'com.twilio.sdk:twilio-webrtc:48.5:android@tar.bz2'
+    preCompile 'com.twilio.sdk:twilio-conversations:0.10.15:android@tar.bz2'
 
     testCompile 'junit:junit:4.12'
     testCompile 'org.mockito:mockito-core:1.10.19'
@@ -268,8 +268,8 @@ dependencies {
     androidTestCompile 'com.android.support.test:runner:0.4'
     androidTestCompile 'com.android.support.test:rules:0.4'
 
+    compile 'com.twilio.sdk:twilio-common-android:0.2.1-rc1'
     // TODO this really should be on nexus as a jar and not local
-    compile 'com.twilio.sdk:twilio-common-android:0.2.0'
     compile files("${twilioSdkHome}/twilio-webrtc/lib/release/libjingle_peerconnection_java.jar")
 }
 
@@ -519,13 +519,6 @@ class ConversationsRuleSource extends RuleSource {
     static final def pocoCryptoStaticLib = "libPocoCrypto.a"
     static final def webRtcJniStaticLib = "libwebrtc-jni.a"
 
-    /**
-     * Currently the plugin does not generate compile and link tasks for 64 bit architectures. A bug
-     * has been filed and once resolved we can uncomment all mutation related to 64 bit arch tasks.
-     *
-     * https://code.google.com/p/android/issues/detail?id=201561
-     */
-
     @Mutate
     void validatePreCompileDebugEnvironmentArmeabiV7a(
             @Path('tasks.compileJingle_peerconnection_soArmeabi-v7aDebugSharedLibraryJingle_peerconnection_soMainCpp')
@@ -540,113 +533,116 @@ class ConversationsRuleSource extends RuleSource {
         validatePreCompileEnvironment(compileTask)
     }
 
-//    @Mutate
-//    void validatePreCompileDebugEnvironmentArm64V8a(
-//            @Path('tasks.compileJingle_peerconnection_soArm64-v8aDebugSharedLibraryJingle_peerconnection_soMainCpp')
-//                    Task compileTask) {
-//        validatePreCompileEnvironment(compileTask)
-//    }
-//
-//    @Mutate
-//    void validatePreCompileReleaseEnvironmentArm64V8a(
-//            @Path('tasks.compileJingle_peerconnection_soArm64-v8aReleaseSharedLibraryJingle_peerconnection_soMainCpp')
-//                    Task compileTask) {
-//        validatePreCompileEnvironment(compileTask)
-//    }
+    @Mutate
+    void validatePreCompileDebugEnvironmentArm64V8a(
+            @Path('tasks.compileJingle_peerconnection_soArm64-v8aDebugSharedLibraryJingle_peerconnection_soMainCpp')
+                    Task compileTask) {
+        validatePreCompileEnvironment(compileTask)
+    }
 
-//    @Mutate
-//    void validatePreCompileDebugEnvironmentX86(
-//            @Path('tasks.compileJingle_peerconnection_soX86DebugSharedLibraryJingle_peerconnection_soMainCpp')
-//                    Task compileTask) {
-//        validatePreCompileEnvironment(compileTask)
-//    }
-//
-//    @Mutate
-//    void validatePreCompileReleaseEnvironmentX86(
-//            @Path('tasks.compileJingle_peerconnection_soX86ReleaseSharedLibraryJingle_peerconnection_soMainCpp')
-//                    Task compileTask) {
-//        validatePreCompileEnvironment(compileTask)
-//    }
+    @Mutate
+    void validatePreCompileReleaseEnvironmentArm64V8a(
+            @Path('tasks.compileJingle_peerconnection_soArm64-v8aReleaseSharedLibraryJingle_peerconnection_soMainCpp')
+                    Task compileTask) {
+        validatePreCompileEnvironment(compileTask)
+    }
 
-//    @Mutate
-//    void validatePreCompileDebugEnvironmentX86_64(
-//            @Path('tasks.compileJingle_peerconnection_soX86_64DebugSharedLibraryJingle_peerconnection_soMainCpp')
-//                    Task compileTask) {
-//        validatePreCompileEnvironment(compileTask)
-//    }
-//
-//    @Mutate
-//    void validatePreCompileReleaseEnvironmentX86_64(
-//            @Path('tasks.compileJingle_peerconnection_soX86_64ReleaseSharedLibraryJingle_peerconnection_soMainCpp')
-//                    Task compileTask) {
-//        validatePreCompileEnvironment(compileTask)
-//    }
+    @Mutate
+    void validatePreCompileDebugEnvironmentX86(
+            @Path('tasks.compileJingle_peerconnection_soX86DebugSharedLibraryJingle_peerconnection_soMainCpp')
+                    Task compileTask) {
+        validatePreCompileEnvironment(compileTask)
+    }
+
+    @Mutate
+    void validatePreCompileReleaseEnvironmentX86(
+            @Path('tasks.compileJingle_peerconnection_soX86ReleaseSharedLibraryJingle_peerconnection_soMainCpp')
+                    Task compileTask) {
+        validatePreCompileEnvironment(compileTask)
+    }
+
+    @Mutate
+    void validatePreCompileDebugEnvironmentX86_64(
+            @Path('tasks.compileJingle_peerconnection_soX86_64DebugSharedLibraryJingle_peerconnection_soMainCpp')
+                    Task compileTask) {
+        validatePreCompileEnvironment(compileTask)
+    }
+
+    @Mutate
+    void validatePreCompileReleaseEnvironmentX86_64(
+            @Path('tasks.compileJingle_peerconnection_soX86_64ReleaseSharedLibraryJingle_peerconnection_soMainCpp')
+                    Task compileTask) {
+        validatePreCompileEnvironment(compileTask)
+    }
 
     @Mutate
     void injectArmeabiV7aDebugLinkerFlags(
             @Path('tasks.linkJingle_peerconnection_soArmeabi-v7aDebugSharedLibrary')
                     Task linkTask) {
-        injectLinkerFlags(linkTask, twilioSdkHome, 'armeabi-v7a')
+        injectLinkerFlags(linkTask, twilioSdkHome, 'armeabi-v7a', 'debug')
     }
 
     @Mutate
     void injectArmeabiV7aReleaseLinkerFlags(
             @Path('tasks.linkJingle_peerconnection_soArmeabi-v7aReleaseSharedLibrary')
                     Task linkTask) {
-        injectLinkerFlags(linkTask, twilioSdkHome, 'armeabi-v7a')
+        injectLinkerFlags(linkTask, twilioSdkHome, 'armeabi-v7a', 'release')
     }
 
-//    @Mutate
-//    void injectArm64v8aDebugLinkerFlags(
-//            @Path('tasks.linkJingle_peerconnection_soArm64-v8aDebugSharedLibrary')
-//                    Task linkTask) {
-//        injectLinkerFlags(linkTask, twilioSdkHome, 'arm64-v8a')
-//    }
-//
-//    @Mutate
-//    void injectArm64v8aReleaseLinkerFlags(
-//            @Path('tasks.linkJingle_peerconnection_soArm64-v8aReleaseSharedLibrary')
-//                    Task linkTask) {
-//        injectLinkerFlags(linkTask, twilioSdkHome, 'arm64-v8a')
-//    }
+    @Mutate
+    void injectArm64v8aDebugLinkerFlags(
+            @Path('tasks.linkJingle_peerconnection_soArm64-v8aDebugSharedLibrary')
+                    Task linkTask) {
+        injectLinkerFlags(linkTask, twilioSdkHome, 'arm64-v8a', 'debug')
+    }
 
-//    @Mutate
-//    void injectX86DebugLinkerFlags(
-//            @Path('tasks.linkJingle_peerconnection_soX86DebugSharedLibrary')
-//                    Task linkTask) {
-//        injectLinkerFlags(linkTask, twilioSdkHome, 'x86')
-//    }
-//
-//    @Mutate
-//    void injectX86ReleaseLinkerFlags(
-//            @Path('tasks.linkJingle_peerconnection_soX86ReleaseSharedLibrary')
-//                    Task linkTask) {
-//        injectLinkerFlags(linkTask, twilioSdkHome, 'x86')
-//    }
+    @Mutate
+    void injectArm64v8aReleaseLinkerFlags(
+            @Path('tasks.linkJingle_peerconnection_soArm64-v8aReleaseSharedLibrary')
+                    Task linkTask) {
+        injectLinkerFlags(linkTask, twilioSdkHome, 'arm64-v8a', 'release')
+    }
 
-//    @Mutate
-//    void injectX86_64DebugLinkerFlags(
-//            @Path('tasks.linkJingle_peerconnection_soX86_64DebugSharedLibrary')
-//                    Task linkTask) {
-//        injectLinkerFlags(linkTask, twilioSdkHome, 'x86_64')
-//    }
-//
-//    @Mutate
-//    void injectX86_64ReleaseLinkerFlags(
-//            @Path('tasks.linkJingle_peerconnection_soX86_64ReleaseSharedLibrary')
-//                    Task linkTask) {
-//        injectLinkerFlags(linkTask, twilioSdkHome, 'x86_64')
-//    }
+    @Mutate
+    void injectX86DebugLinkerFlags(
+            @Path('tasks.linkJingle_peerconnection_soX86DebugSharedLibrary')
+                    Task linkTask) {
+        injectLinkerFlags(linkTask, twilioSdkHome, 'x86', 'debug')
+    }
+
+    @Mutate
+    void injectX86ReleaseLinkerFlags(
+            @Path('tasks.linkJingle_peerconnection_soX86ReleaseSharedLibrary')
+                    Task linkTask) {
+        injectLinkerFlags(linkTask, twilioSdkHome, 'x86', 'release')
+    }
+
+    @Mutate
+    void injectX86_64DebugLinkerFlags(
+            @Path('tasks.linkJingle_peerconnection_soX86_64DebugSharedLibrary')
+                    Task linkTask) {
+        injectLinkerFlags(linkTask, twilioSdkHome, 'x86_64', 'debug')
+    }
+
+    @Mutate
+    void injectX86_64ReleaseLinkerFlags(
+            @Path('tasks.linkJingle_peerconnection_soX86_64ReleaseSharedLibrary')
+                    Task linkTask) {
+        injectLinkerFlags(linkTask, twilioSdkHome, 'x86_64', 'release')
+    }
 
     private void validatePreCompileEnvironment(compileTask) {
         compileTask.dependsOn("localizeWebRtcJniLoadUnLoad")
     }
 
-    private void injectLinkerFlags(linkTask, sdkHome, arch) {
-        def pocoHome = "${sdkHome}/twilio-poco/lib/release"
+    private void injectLinkerFlags(linkTask, sdkHome, arch, buildType) {
+        def pocoHome = "${sdkHome}/twilio-poco/lib/${buildType}"
         def webRtcHome = "${sdkHome}/twilio-webrtc/lib/release"
 
         linkTask.doFirst {
+            if (arch.equals('arm64-v8a')) {
+                properties["linkerArgs"].add("-fuse-ld=gold")
+            }
             properties["linkerArgs"].addAll([
                     "-l${pocoHome}/${arch}/${pocoFoundationStaticLib}".toString(),
                     "-l${pocoHome}/${arch}/${pocoCryptoStaticLib}".toString(),
