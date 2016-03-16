@@ -55,9 +55,12 @@ public:
 
     virtual ~EndpointObserverInternalWrapper() { }
 
-    void markForDeletion() {
+    void setObserverDeleted() {
         rtc::CritScope cs(&deletion_lock_);
         observer_deleted_ = true;
+        TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK,
+                           kTSCoreLogLevelDebug,
+                           "observer deleted");
     }
 
 
@@ -74,16 +77,7 @@ protected:
         {
             rtc::CritScope cs(&deletion_lock_);
 
-            if (observer_deleted_) {
-                TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK,
-                                   kTSCoreLogLevelWarning,
-                                   "observer is marked for deletion, skipping callback");
-                return;
-            };
-            if (IsNull(jni(), *j_endpoint_observer_)) {
-                TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK,
-                                   kTSCoreLogLevelWarning,
-                                   "observer reference has been destroyed");
+            if (!isObserverValid(std::string("onRegistrationDidComplete"))) {
                 return;
             }
 
@@ -104,16 +98,7 @@ protected:
         {
             rtc::CritScope cs(&deletion_lock_);
 
-            if (observer_deleted_) {
-                TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK,
-                                   kTSCoreLogLevelWarning,
-                                   "observer is marked for deletion, skipping callback");
-                return;
-            };
-            if (IsNull(jni(), *j_endpoint_observer_)) {
-                TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK,
-                                   kTSCoreLogLevelWarning,
-                                   "observer reference has been destroyed");
+            if (!isObserverValid(std::string("onUnregistrationDidComplete"))) {
                 return;
             }
             jni()->CallVoidMethod(*j_endpoint_observer_, j_unreg_complete_, j_error);
@@ -138,16 +123,7 @@ protected:
         {
             rtc::CritScope cs(&deletion_lock_);
 
-            if (observer_deleted_) {
-                TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK,
-                                   kTSCoreLogLevelWarning,
-                                   "observer is marked for deletion, skipping callback");
-                return;
-            };
-            if (IsNull(jni(), *j_endpoint_observer_)) {
-                TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK,
-                                   kTSCoreLogLevelWarning,
-                                   "observer reference has been destroyed");
+            if (!isObserverValid(std::string("onStateDidChange"))) {
                 return;
             }
             jni()->CallVoidMethod(*j_endpoint_observer_, j_state_change_, j_state_type);
@@ -173,16 +149,7 @@ protected:
         {
             rtc::CritScope cs(&deletion_lock_);
 
-            if (observer_deleted_) {
-                TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK,
-                                   kTSCoreLogLevelWarning,
-                                   "observer is marked for deletion, skipping callback");
-                return;
-            };
-            if (IsNull(jni(), *j_endpoint_observer_)) {
-                TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK,
-                                   kTSCoreLogLevelWarning,
-                                   "observer reference has been destroyed");
+            if (!isObserverValid(std::string("onIncomingCallDidReceive"))) {
                 return;
             }
             jni()->CallVoidMethod(
@@ -211,6 +178,22 @@ private:
             return jni()->NewObject(
                     *j_errorimpl_class_, j_errorimpl_ctor_id_, j_domain, j_error_id, j_message);
         }
+    }
+
+    bool isObserverValid(const std::string &callbackName) {
+        if (observer_deleted_) {
+            TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK,
+                               kTSCoreLogLevelWarning,
+                               "observer is marked for deletion, skipping %s callback", callbackName.c_str());
+            return false;
+        };
+        if (IsNull(jni(), *j_endpoint_observer_)) {
+            TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK,
+                               kTSCoreLogLevelWarning,
+                               "observer reference has been destroyed, skipping %s callback", callbackName.c_str());
+            return false;
+        }
+        return true;
     }
 
     // Return Java array of participants
@@ -271,7 +254,7 @@ JNIEXPORT void JNICALL Java_com_twilio_conversations_impl_ConversationsClientImp
     TSCEndpointObserverPtr *endpointObserver = reinterpret_cast<TSCEndpointObserverPtr *>(nativeEndpointObserver);
     if (endpointObserver != nullptr) {
         EndpointObserverInternalWrapper* wrapper = static_cast<EndpointObserverInternalWrapper*>(endpointObserver->get());
-        wrapper->markForDeletion();
+        wrapper->setObserverDeleted();
         endpointObserver->reset();
         delete endpointObserver;
     }
