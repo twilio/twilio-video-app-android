@@ -52,7 +52,7 @@ public class ListenTest {
                     public void onInitialized() {
                         TwilioAccessManagerFactory.createAccessManager(token, new TwilioAccessManagerListener() {
                                     @Override
-                                    public void onAccessManagerTokenExpire(TwilioAccessManager twilioAccessManager) {
+                                    public void onTokenExpired(TwilioAccessManager twilioAccessManager) {
                                         fail();
                                     }
 
