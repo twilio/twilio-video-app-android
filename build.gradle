@@ -8,13 +8,6 @@ buildscript {
         maven {
             url "http://nexus.corp.twilio.com/content/repositories/releases/"
         }
-        maven {
-            url "http://twilio.bintray.com/internal-releases"
-            credentials {
-                username mavenUsername
-                password mavenPassword
-            }
-        }
     }
 
     dependencies {
@@ -31,13 +24,6 @@ allprojects {
         }
         maven {
             url "http://nexus.corp.twilio.com/content/repositories/releases/"
-        }
-        maven {
-            url "http://twilio.bintray.com/internal-releases"
-            credentials {
-                username mavenUsername
-                password mavenPassword
-            }
         }
     }
 }
