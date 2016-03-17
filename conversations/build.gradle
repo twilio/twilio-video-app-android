@@ -1,17 +1,6 @@
 apply plugin: 'com.android.model.library'
 apply plugin: 'maven'
 
-/**
- * These are only needed if we are publishing artifacts so we conditionally
- * set them based on properties
-  */
-def mavenRepo = (project.hasProperty('maven.repo') ?
-        project.property("maven.repo") : '')
-def mavenUsername = (project.hasProperty('maven.username') ?
-        project.property("maven.username") : '')
-def mavenPassword = (project.hasProperty('maven.password') ?
-        project.property("maven.password") : '')
-
 def currentToolchainVersion = "4.9"
 // TODO add back ability for local builds
 //def twilioSdkHome = "/usr/local/twilio-sdk"
@@ -268,7 +257,7 @@ dependencies {
     androidTestCompile 'com.android.support.test:runner:0.4'
     androidTestCompile 'com.android.support.test:rules:0.4'
 
-    compile 'com.twilio.sdk:twilio-common-android:0.2.1-rc1'
+    compile 'com.twilio:common-android:0.3.0-rc4'
     // TODO this really should be on nexus as a jar and not local
     compile files("${twilioSdkHome}/twilio-webrtc/lib/release/libjingle_peerconnection_java.jar")
 }

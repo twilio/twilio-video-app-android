@@ -1,5 +1,5 @@
-// Top-level build file where you can add configuration options common to all sub-projects/modules.
 buildscript {
+    apply from: "$rootProject.projectDir/common.gradle"
     repositories {
         jcenter()
         maven {
@@ -7,6 +7,13 @@ buildscript {
         }
         maven {
             url "http://nexus.corp.twilio.com/content/repositories/releases/"
+        }
+        maven {
+            url "http://twilio.bintray.com/internal-releases"
+            credentials {
+                username mavenUsername
+                password mavenPassword
+            }
         }
     }
 
@@ -16,6 +23,7 @@ buildscript {
 }
 
 allprojects {
+    apply from: "$rootProject.projectDir/common.gradle"
     repositories {
         jcenter()
         maven {
@@ -24,6 +32,12 @@ allprojects {
         maven {
             url "http://nexus.corp.twilio.com/content/repositories/releases/"
         }
+        maven {
+            url "http://twilio.bintray.com/internal-releases"
+            credentials {
+                username mavenUsername
+                password mavenPassword
+            }
+        }
     }
-    apply from: "$rootProject.projectDir/common.gradle"
 }

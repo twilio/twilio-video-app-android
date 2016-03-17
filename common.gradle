@@ -1,5 +1,16 @@
 apply from: "$rootProject.projectDir/gradle.properties"
 
+/**
+ * These are only needed if we are publishing artifacts so we conditionally
+ * set them based on properties
+ */
+ext.mavenRepo = (project.hasProperty('maven.repo') ?
+        project.property("maven.repo") : '')
+ext.mavenUsername = (project.hasProperty('maven.username') ?
+        project.property("maven.username") : '')
+ext.mavenPassword = (project.hasProperty('maven.password') ?
+        project.property("maven.password") : '')
+
 ext.getVersionName = {
     return "${versionMajor}.${versionMinor}.${versionPatch}"
 }

@@ -577,12 +577,12 @@ public class TCClientActivity extends AppCompatActivity {
 
     private TwilioAccessManagerListener accessManagerListener() {
         return new TwilioAccessManagerListener() {
-            /*
+            /**
              *  The token expiration event notifies the developer 3 minutes before
              *  token actually expires to allow the developer to request a new token
              */
             @Override
-            public void onAccessManagerTokenExpire(TwilioAccessManager twilioAccessManager) {
+            public void onTokenExpired(TwilioAccessManager twilioAccessManager) {
                 Timber.d("onAccessManagerTokenExpire");
                 conversationsClientStatusTextView.setText("onAccessManagerTokenExpire");
                 obtainCapabilityToken();
