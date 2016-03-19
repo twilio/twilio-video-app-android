@@ -11,15 +11,15 @@ public class VideoConstraintsTests {
     @Test
     public void createVideoConstraints() {
         VideoConstraints videoConstraints = new VideoConstraints.Builder()
-                .setMaxVideoDimensions(VideoConstraints.HD_VIDEO_DIMENSIONS)
-                .setMinFPS(10)
-                .setMaxFPS(VideoConstraints.MAX_VIDEO_FPS)
+                .setMaxVideoDimensions(VideoConstraints.HD_720P_VIDEO_DIMENSIONS)
+                .setMinFPS(VideoConstraints.BATTERY_SAVER_10_FPS)
+                .setMaxFPS(VideoConstraints.CINEMATIC_24_FPS)
                 .build();
 
-        videoConstraints.getMinVideoDimensions();
-        videoConstraints.getMaxVideoDimensions();
-        videoConstraints.getMinFPS();
-        videoConstraints.getMaxFPS();
+        VideoDimensions minVideoDimensions = videoConstraints.getMinVideoDimensions();
+        VideoDimensions maxVideoDimensions = videoConstraints.getMaxVideoDimensions();
+        int minFPS = videoConstraints.getMinFPS();
+        int maxFPS = videoConstraints.getMaxFPS();
     }
 
 }
