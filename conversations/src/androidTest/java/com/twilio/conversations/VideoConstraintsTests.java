@@ -1,5 +1,6 @@
 package com.twilio.conversations;
 
+import android.content.Context;
 import android.support.test.runner.AndroidJUnit4;
 
 import org.junit.Test;
@@ -22,4 +23,19 @@ public class VideoConstraintsTests {
         int maxFPS = videoConstraints.getMaxFPS();
     }
 
+    @Test
+    public void createLocalVideoTrackWithVideoConstraints() {
+        Context context = null;
+        CameraCapturer cameraCapturer = null;
+
+         VideoConstraints videoConstraints = new VideoConstraints.Builder()
+                 .setMinFPS(VideoConstraints.BATTERY_EFFICIENT_15_FPS)
+                 .setMaxFPS(VideoConstraints.BATTERY_EFFICIENT_20_FPS)
+                 .build();
+
+        LocalVideoTrack localVideoTrack = LocalVideoTrackFactory.createLocalVideoTrack(
+                cameraCapturer,
+                videoConstraints);
+
+    }
 }
