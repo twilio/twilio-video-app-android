@@ -45,9 +45,9 @@ public class VideoConstraints {
     // FPS setting options
     public static final int MIN_VIDEO_FPS = 1;
     public static final int BATTERY_SAVER_10_FPS = 10;
-    public static final int BATTERY_EFFICIENT_15_FPS = 10;
+    public static final int BATTERY_EFFICIENT_15_FPS = 15;
     public static final int BATTERY_EFFICIENT_20_FPS = 20;
-    public static final int CINEMATIC_24_FPS = 10;
+    public static final int CINEMATIC_24_FPS = 24;
     public static final int DEFAULT_FPS = 30;
     public static final int MAX_VIDEO_FPS = DEFAULT_FPS;
 
