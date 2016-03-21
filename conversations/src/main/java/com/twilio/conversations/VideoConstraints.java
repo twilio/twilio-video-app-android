@@ -53,14 +53,14 @@ public class VideoConstraints {
 
     private final VideoDimensions minVideoDimensions;
     private final VideoDimensions maxVideoDimensions;
-    private final int minFPS;
-    private final int maxFPS;
+    private final int minFps;
+    private final int maxFps;
 
-    private VideoConstraints(VideoDimensions minVideoDimensions, VideoDimensions maxVideoDimensions, int minFPS, int maxFPS) {
-        this.minVideoDimensions = minVideoDimensions;
-        this.maxVideoDimensions = maxVideoDimensions;
-        this.minFPS = minFPS;
-        this.maxFPS = maxFPS;
+    private VideoConstraints(Builder builder) {
+        this.minVideoDimensions = builder.minVideoDimensions;
+        this.maxVideoDimensions = builder.maxVideoDimensions;
+        this.minFps = builder.minFps;
+        this.maxFps = builder.maxFps;
     }
 
     public VideoDimensions getMinVideoDimensions() {
@@ -71,44 +71,44 @@ public class VideoConstraints {
         return maxVideoDimensions;
     }
 
-    public int getMinFPS() {
-        return minFPS;
+    public int getMinFps() {
+        return minFps;
     }
 
-    public int getMaxFPS() {
-        return maxFPS;
+    public int getMaxFps() {
+        return maxFps;
     }
 
     public static class Builder {
         private VideoDimensions minVideoDimensions = MIN_VIDEO_DIMENSIONS;
         private VideoDimensions maxVideoDimensions = MAX_VIDEO_DIMENSIONS;
-        private int minFPS = MIN_VIDEO_FPS;
-        private int maxFPS = MAX_VIDEO_FPS;
+        private int minFps = MIN_VIDEO_FPS;
+        private int maxFps = MAX_VIDEO_FPS;
 
         public Builder() { }
 
-        public Builder setMinVideoDimensions(VideoDimensions minVideoDimensions) {
+        public Builder minVideoDimensions(VideoDimensions minVideoDimensions) {
             this.minVideoDimensions = minVideoDimensions;
             return this;
         }
 
-        public Builder setMaxVideoDimensions(VideoDimensions maxVideoDimensions) {
+        public Builder maxVideoDimensions(VideoDimensions maxVideoDimensions) {
             this.maxVideoDimensions = maxVideoDimensions;
             return this;
         }
 
-        public Builder setMinFPS(int minFPS) {
-            this.minFPS = minFPS;
+        public Builder minFps(int minFps) {
+            this.minFps = minFps;
             return this;
         }
 
-        public Builder setMaxFPS(int maxFPS) {
-            this.maxFPS = maxFPS;
+        public Builder maxFps(int maxFps) {
+            this.maxFps = maxFps;
             return this;
         }
 
         public VideoConstraints build() {
-            return new VideoConstraints(minVideoDimensions, maxVideoDimensions, minFPS, maxFPS);
+            return new VideoConstraints(this);
         }
     }
 

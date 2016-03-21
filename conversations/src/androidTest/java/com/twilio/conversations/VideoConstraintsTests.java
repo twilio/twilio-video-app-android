@@ -12,15 +12,15 @@ public class VideoConstraintsTests {
     @Test
     public void createVideoConstraints() {
         VideoConstraints videoConstraints = new VideoConstraints.Builder()
-                .setMaxVideoDimensions(VideoConstraints.HD_720P_VIDEO_DIMENSIONS)
-                .setMinFPS(VideoConstraints.BATTERY_SAVER_10_FPS)
-                .setMaxFPS(VideoConstraints.CINEMATIC_24_FPS)
+                .maxVideoDimensions(VideoConstraints.HD_720P_VIDEO_DIMENSIONS)
+                .minFps(VideoConstraints.BATTERY_SAVER_10_FPS)
+                .maxFps(VideoConstraints.CINEMATIC_24_FPS)
                 .build();
 
         VideoDimensions minVideoDimensions = videoConstraints.getMinVideoDimensions();
         VideoDimensions maxVideoDimensions = videoConstraints.getMaxVideoDimensions();
-        int minFPS = videoConstraints.getMinFPS();
-        int maxFPS = videoConstraints.getMaxFPS();
+        int minFPS = videoConstraints.getMinFps();
+        int maxFPS = videoConstraints.getMaxFps();
     }
 
     @Test
@@ -28,14 +28,15 @@ public class VideoConstraintsTests {
         Context context = null;
         CameraCapturer cameraCapturer = null;
 
-         VideoConstraints videoConstraints = new VideoConstraints.Builder()
-                 .setMinFPS(VideoConstraints.BATTERY_EFFICIENT_15_FPS)
-                 .setMaxFPS(VideoConstraints.BATTERY_EFFICIENT_20_FPS)
-                 .build();
+        VideoConstraints videoConstraints = new VideoConstraints.Builder()
+                .minFps(VideoConstraints.BATTERY_EFFICIENT_15_FPS)
+                .maxFps(VideoConstraints.BATTERY_EFFICIENT_20_FPS)
+                .build();
 
         LocalVideoTrack localVideoTrack = LocalVideoTrackFactory.createLocalVideoTrack(
                 cameraCapturer,
                 videoConstraints);
 
     }
+
 }
