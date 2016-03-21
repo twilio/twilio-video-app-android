@@ -61,6 +61,15 @@ public class VideoConstraints {
         this.maxVideoDimensions = builder.maxVideoDimensions;
         this.minFps = builder.minFps;
         this.maxFps = builder.maxFps;
+        if(minFps > maxFps) {
+            throw new IllegalArgumentException("MinFPS " + minFps + " is greater than MaxFps " + maxFps);
+        }
+        if(minVideoDimensions.width > maxVideoDimensions.width) {
+            throw new IllegalArgumentException( "Min video dimensions width " + minVideoDimensions.width + " is greater than max video dimensions width " + maxVideoDimensions.width);
+        }
+        if(minVideoDimensions.height > maxVideoDimensions.height) {
+            throw new IllegalArgumentException( "Min video dimensions height " + minVideoDimensions.height+ " is greater than max video dimensions height " + maxVideoDimensions.height);
+        }
     }
 
     public VideoDimensions getMinVideoDimensions() {
