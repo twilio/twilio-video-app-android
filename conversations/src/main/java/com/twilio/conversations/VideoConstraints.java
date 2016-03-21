@@ -32,6 +32,16 @@ public class VideoConstraints {
     public static final int HD_960P_VIDEO_HEIGHT = 960;
     public static final VideoDimensions HD_960P_VIDEO_DIMENSIONS = new VideoDimensions(HD_960P_VIDEO_WIDTH, HD_960P_VIDEO_HEIGHT);
 
+    // HD Standard 1080P (1440 x 1080) resolution
+    public static final int HD_S1080P_VIDEO_WIDTH = 1440;
+    public static final int HD_S1080P_VIDEO_HEIGHT = 1080;
+    public static final VideoDimensions HD_S1080P_VIDEO_DIMENSIONS = new VideoDimensions(HD_S1080P_VIDEO_WIDTH, HD_S1080P_VIDEO_HEIGHT);
+
+    // HD Widescreen 1080P (1920 x 1080) resolution
+    public static final int HD_1080P_VIDEO_WIDTH = 1920;
+    public static final int HD_1080P_VIDEO_HEIGHT = 1080;
+    public static final VideoDimensions HD_1080P_VIDEO_DIMENSIONS = new VideoDimensions(HD_1080P_VIDEO_WIDTH, HD_1080P_VIDEO_HEIGHT);
+
     // Minimum resolution
     public static final int MIN_VIDEO_WIDTH = CIF_VIDEO_WIDTH;
     public static final int MIN_VIDEO_HEIGHT = CIF_VIDEO_HEIGHT;
@@ -42,14 +52,19 @@ public class VideoConstraints {
     public static final int MAX_VIDEO_HEIGHT = 1280;
     public static final VideoDimensions MAX_VIDEO_DIMENSIONS = new VideoDimensions(MAX_VIDEO_WIDTH, MAX_VIDEO_HEIGHT);
 
-    // FPS setting options
-    public static final int MIN_VIDEO_FPS = 1;
-    public static final int BATTERY_SAVER_10_FPS = 10;
-    public static final int BATTERY_EFFICIENT_15_FPS = 15;
-    public static final int BATTERY_EFFICIENT_20_FPS = 20;
-    public static final int CINEMATIC_24_FPS = 24;
-    public static final int DEFAULT_FPS = 30;
-    public static final int MAX_VIDEO_FPS = DEFAULT_FPS;
+    // Fps setting options
+    public static final int MIN_FRAME_RATE = 1;
+    // Battery saving 10 fps video
+    public static final int FRAME_RATE_10 = 10;
+    // Battery saving 15 fps video
+    public static final int FRAME_RATE_15 = 15;
+    // Battery efficient 20 fps video
+    public static final int FRAME_RATE_20 = 20;
+    // Cinematic 24 fps video
+    public static final int FRAME_RATE_24 = 24;
+    // Smooth 30 fps video
+    public static final int FRAME_RATE_30 = 30;
+    public static final int MAX_FRAME_RATE = FRAME_RATE_30;
 
     private final VideoDimensions minVideoDimensions;
     private final VideoDimensions maxVideoDimensions;
@@ -61,15 +76,6 @@ public class VideoConstraints {
         this.maxVideoDimensions = builder.maxVideoDimensions;
         this.minFps = builder.minFps;
         this.maxFps = builder.maxFps;
-        if(minFps > maxFps) {
-            throw new IllegalArgumentException("MinFPS " + minFps + " is greater than MaxFps " + maxFps);
-        }
-        if(minVideoDimensions.width > maxVideoDimensions.width) {
-            throw new IllegalArgumentException( "Min video dimensions width " + minVideoDimensions.width + " is greater than max video dimensions width " + maxVideoDimensions.width);
-        }
-        if(minVideoDimensions.height > maxVideoDimensions.height) {
-            throw new IllegalArgumentException( "Min video dimensions height " + minVideoDimensions.height+ " is greater than max video dimensions height " + maxVideoDimensions.height);
-        }
     }
 
     public VideoDimensions getMinVideoDimensions() {
@@ -91,8 +97,8 @@ public class VideoConstraints {
     public static class Builder {
         private VideoDimensions minVideoDimensions = MIN_VIDEO_DIMENSIONS;
         private VideoDimensions maxVideoDimensions = MAX_VIDEO_DIMENSIONS;
-        private int minFps = MIN_VIDEO_FPS;
-        private int maxFps = MAX_VIDEO_FPS;
+        private int minFps = MIN_FRAME_RATE;
+        private int maxFps = MAX_FRAME_RATE;
 
         public Builder() { }
 
@@ -117,6 +123,15 @@ public class VideoConstraints {
         }
 
         public VideoConstraints build() {
+            if(minFps > maxFps) {
+                throw new IllegalArgumentException("MinFPS " + minFps + " is greater than MaxFps " + maxFps);
+            }
+            if(minVideoDimensions.width > maxVideoDimensions.width) {
+                throw new IllegalArgumentException( "Min video dimensions width " + minVideoDimensions.width + " is greater than max video dimensions width " + maxVideoDimensions.width);
+            }
+            if(minVideoDimensions.height > maxVideoDimensions.height) {
+                throw new IllegalArgumentException( "Min video dimensions height " + minVideoDimensions.height+ " is greater than max video dimensions height " + maxVideoDimensions.height);
+            }
             return new VideoConstraints(this);
         }
     }

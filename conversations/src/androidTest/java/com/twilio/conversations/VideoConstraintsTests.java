@@ -10,11 +10,22 @@ import org.junit.runner.RunWith;
 public class VideoConstraintsTests {
 
     @Test
+    public void createCustomDimensions() {
+        int myMinResolutionWidth = 100;
+        int myMinResolutionHeight = 200;
+
+        VideoConstraints videoConstraints = new VideoConstraints.Builder()
+                .minVideoDimensions(new VideoDimensions(myMinResolutionWidth, myMinResolutionHeight))
+                .build();
+    }
+
+    @Test
     public void createVideoConstraints() {
         VideoConstraints videoConstraints = new VideoConstraints.Builder()
+                .minVideoDimensions(VideoConstraints.CIF_VIDEO_DIMENSIONS)
                 .maxVideoDimensions(VideoConstraints.HD_720P_VIDEO_DIMENSIONS)
-                .minFps(VideoConstraints.BATTERY_SAVER_10_FPS)
-                .maxFps(VideoConstraints.CINEMATIC_24_FPS)
+                .minFps(VideoConstraints.FRAME_RATE_10)
+                .maxFps(VideoConstraints.FRAME_RATE_24)
                 .build();
 
         VideoDimensions minVideoDimensions = videoConstraints.getMinVideoDimensions();
@@ -29,13 +40,9 @@ public class VideoConstraintsTests {
         CameraCapturer cameraCapturer = null;
 
         VideoConstraints videoConstraints = new VideoConstraints.Builder()
-                .minFps(VideoConstraints.BATTERY_EFFICIENT_15_FPS)
-                .maxFps(VideoConstraints.BATTERY_EFFICIENT_20_FPS)
+                .minFps(VideoConstraints.FRAME_RATE_15)
+                .maxFps(VideoConstraints.FRAME_RATE_20)
                 .build();
-
-        LocalVideoTrack localVideoTrack = LocalVideoTrackFactory.createLocalVideoTrack(
-                cameraCapturer,
-                videoConstraints);
 
     }
 
