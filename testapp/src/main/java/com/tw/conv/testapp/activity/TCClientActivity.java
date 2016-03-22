@@ -204,6 +204,11 @@ public class TCClientActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        // So calls can be answered when screen is locked
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD);
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED);
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON);
+
         setContentView(R.layout.activity_client);
 
         previewFrameLayout = (FrameLayout) findViewById(R.id.previewFrameLayout);
@@ -267,18 +272,6 @@ public class TCClientActivity extends AppCompatActivity {
         setCallAction();
         startPreview();
         registerRejectReceiver();
-    }
-
-    @Override
-    public Window getWindow() {
-        Window window = super.getWindow();
-
-        // So calls can be answered when screen is locked
-        window.addFlags(WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD);
-        window.addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED);
-        window.addFlags(WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON);
-
-        return window;
     }
 
     @Override
