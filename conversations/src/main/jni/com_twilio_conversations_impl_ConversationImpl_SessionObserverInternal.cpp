@@ -14,6 +14,8 @@
 #include "TSCConnectionStatsReport.h"
 #include "TSCTrackStatsReport.h"
 #include "com_twilio_conversations_impl_ConversationImpl.h"
+#include <android/log.h>
+#include <webrtc/base/criticalsection.h>
 
 using namespace webrtc;
 using namespace webrtc_jni;
@@ -145,11 +147,20 @@ public:
                                 *j_media_stream_info_class_,
                                 "<init>",
                                 "(IILjava/lang/String;)V")),
-            enableStats_(false)
+            enableStats_(false),
+            observer_deleted_(false)
     {}
 
     void enableStats(bool enabled) {
         enableStats_ = enabled;
+    }
+
+    void setObserverDeleted() {
+        rtc::CritScope cs(&deletion_lock_);
+        observer_deleted_ = true;
+        TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK,
+                           kTSCoreLogLevelDebug,
+                           "session observer deleted");
     }
 
 protected:
@@ -183,11 +194,18 @@ protected:
         ScopedLocalRefFrame local_ref_frame(jni());
 
         TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK, kTSCoreLogLevelDebug, "onStopDidComplete");
-
         jobject j_error_obj = errorToJavaCoreErrorImpl(code, message);
         CHECK_EXCEPTION(jni()) << "error during NewObject";
-        jni()->CallVoidMethod(*j_observer_global_, j_stop_completed_id, j_error_obj);
-        CHECK_EXCEPTION(jni()) << "error during CallVoidMethod";
+        {
+            rtc::CritScope cs(&deletion_lock_);
+
+            if (!isObserverValid(std::string("onStopDidComplete"))) {
+                return;
+            }
+
+            jni()->CallVoidMethod(*j_observer_global_, j_stop_completed_id, j_error_obj);
+            CHECK_EXCEPTION(jni()) << "error during CallVoidMethod";
+        }
     }
 
     virtual void onParticipantDidConnect(const std::string participant,
@@ -474,6 +492,22 @@ private:
                 j_domain, j_error_id, j_message);
     }
 
+    bool isObserverValid(const std::string &callbackName) {
+        if (observer_deleted_) {
+            TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK,
+                               kTSCoreLogLevelWarning,
+                               "session observer is marked for deletion, skipping %s callback", callbackName.c_str());
+            return false;
+        };
+        if (IsNull(jni(), *j_observer_global_)) {
+            TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK,
+                               kTSCoreLogLevelWarning,
+                               "session observer reference has been destroyed, skipping %s callback", callbackName.c_str());
+            return false;
+        }
+        return true;
+    }
+
     // Return a MediaStreamInfoImpl
     jobject mediaStrInfoJavaMediaStrInfoImpl(const TSCMediaStreamInfoObject *stream) {
         if (!stream) {
@@ -527,6 +561,9 @@ private:
     const jmethodID j_media_stream_info_ctor_;
 
     bool enableStats_;
+
+    bool observer_deleted_;
+    mutable rtc::CriticalSection deletion_lock_;
 };
 
 /*
@@ -536,7 +573,7 @@ private:
  */
 JNIEXPORT jlong JNICALL Java_com_twilio_conversations_impl_ConversationImpl_00024SessionObserverInternal_wrapNativeObserver
         (JNIEnv *env, jobject obj, jobject observer, jobject conversation) {
-    TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK, kTSCoreLogLevelDebug, "wrapNativeObserver");
+    TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK, kTSCoreLogLevelDebug, "wrapNativeObserver: Session");
     TSCSessionObserverPtr *sessionObserver = new TSCSessionObserverPtr();
     sessionObserver->reset(new SessionObserverInternalWrapper(env, obj, observer, conversation));
     return jlongFromPointer(sessionObserver);
@@ -549,9 +586,11 @@ JNIEXPORT jlong JNICALL Java_com_twilio_conversations_impl_ConversationImpl_0002
  */
 JNIEXPORT void JNICALL Java_com_twilio_conversations_impl_ConversationImpl_00024SessionObserverInternal_freeNativeObserver
         (JNIEnv *env, jobject obj, jlong nativeSessionObserver){
-    TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK, kTSCoreLogLevelDebug, "freeNativeObserver");
+    TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK, kTSCoreLogLevelDebug, "freeNativeObserver: Session");
     TSCSessionObserverPtr *sessionObserver = reinterpret_cast<TSCSessionObserverPtr *>(nativeSessionObserver);
     if (sessionObserver != nullptr) {
+        SessionObserverInternalWrapper* wrapper = static_cast<SessionObserverInternalWrapper*>(sessionObserver->get());
+        wrapper->setObserverDeleted();
         sessionObserver->reset();
         delete sessionObserver;
     }

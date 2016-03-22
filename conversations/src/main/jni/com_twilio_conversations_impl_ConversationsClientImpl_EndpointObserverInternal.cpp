@@ -60,7 +60,7 @@ public:
         observer_deleted_ = true;
         TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK,
                            kTSCoreLogLevelDebug,
-                           "observer deleted");
+                           "endpoint observer deleted");
     }
 
 
@@ -184,13 +184,13 @@ private:
         if (observer_deleted_) {
             TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK,
                                kTSCoreLogLevelWarning,
-                               "observer is marked for deletion, skipping %s callback", callbackName.c_str());
+                               "endpoint observer is marked for deletion, skipping %s callback", callbackName.c_str());
             return false;
         };
         if (IsNull(jni(), *j_endpoint_observer_)) {
             TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK,
                                kTSCoreLogLevelWarning,
-                               "observer reference has been destroyed, skipping %s callback", callbackName.c_str());
+                               "endpoint observer reference has been destroyed, skipping %s callback", callbackName.c_str());
             return false;
         }
         return true;
