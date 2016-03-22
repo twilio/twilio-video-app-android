@@ -429,10 +429,7 @@ public class TCClientActivity extends AppCompatActivity {
 
         // Teardown our conversation, client, and sdk instance
         disposeConversation();
-        disposeConversationsClient();
-        destroyConversationsSdk();
-        returnToRegistration();
-        loggingOut = false;
+        conversationsClient.unlisten();
     }
 
     private void disposeConversation() {
@@ -498,6 +495,10 @@ public class TCClientActivity extends AppCompatActivity {
             @Override
             public void onStopListeningForInvites(ConversationsClient conversationsClient) {
                 conversationsClientStatusTextView.setText("onStopListeningForInvites");
+                disposeConversationsClient();
+                destroyConversationsSdk();
+                returnToRegistration();
+                loggingOut = false;
             }
 
             @Override
