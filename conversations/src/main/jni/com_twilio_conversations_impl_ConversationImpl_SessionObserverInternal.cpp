@@ -114,7 +114,7 @@ public:
                     GetMethodID(jni,
                                 *j_trackinfo_class_,
                                 "<init>",
-                                "(Ljava/lang/String;Ljava/lang/String;Lcom/twilio/conversations/TrackOrigin;I)V")),
+                                "(Ljava/lang/String;Ljava/lang/String;Lcom/twilio/conversations/TrackOrigin;Z)V")),
             j_video_track_class_(
                     jni, jni->FindClass("org/webrtc/VideoTrack")),
             j_video_track_ctor_(
@@ -438,7 +438,7 @@ private:
                                              state_class,
                                              trackInfo->getStreamOrigin());
         CHECK_EXCEPTION(jni()) << "error during NewObject";
-        int enabled = trackInfo->isEnabled() ? 1 : 0;
+        jboolean enabled = trackInfo->isEnabled();
         return jni()->NewObject(
                 *j_trackinfo_class_, j_trackinfo_ctor_id_,
                 j_participant_address, j_track_id, j_origin, enabled);
@@ -454,7 +454,7 @@ private:
                                              state_class,
                                              trackInfo->getStreamOrigin());
         CHECK_EXCEPTION(jni()) << "error during NewObject";
-        int enabled = trackInfo->isEnabled() ? 1 : 0;
+        jboolean enabled = trackInfo->isEnabled();
         return jni()->NewObject(
                 *j_trackinfo_class_, j_trackinfo_ctor_id_,
                 j_participant_address, j_track_id, j_origin, enabled);
