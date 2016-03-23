@@ -429,8 +429,22 @@ public class TCClientActivity extends AppCompatActivity {
 
         // Teardown our conversation, client, and sdk instance
         disposeConversation();
-        conversationsClient.unlisten();
+
+        // Lets unlisten first otherwise complete logout
+        if (conversationsClient != null && conversationsClient.isListening()) {
+            conversationsClient.unlisten();
+        } else {
+            completeLogout();
+        }
     }
+
+    private void completeLogout() {
+        disposeConversationsClient();
+        destroyConversationsSdk();
+        returnToRegistration();
+        loggingOut = false;
+    }
+
 
     private void disposeConversation() {
         if (conversation != null) {
@@ -495,10 +509,10 @@ public class TCClientActivity extends AppCompatActivity {
             @Override
             public void onStopListeningForInvites(ConversationsClient conversationsClient) {
                 conversationsClientStatusTextView.setText("onStopListeningForInvites");
-                disposeConversationsClient();
-                destroyConversationsSdk();
-                returnToRegistration();
-                loggingOut = false;
+                // If we are logging out let us finish the teardown process
+                if (loggingOut) {
+                    completeLogout();
+                }
             }
 
             @Override
