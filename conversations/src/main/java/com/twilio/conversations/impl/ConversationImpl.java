@@ -350,10 +350,12 @@ public class ConversationImpl implements Conversation,
 
     @Override
     public void onStopCompleted(CoreError error) {
+        /**
+         * Note that we are not using a latch here because of deadlock situation revealed in
+         * GSDK-598
+         */
         log("onStopCompleted", error);
 
-        // Block this thread until the handler has completed its work.
-        final CountDownLatch waitLatch = new CountDownLatch(1);
         // Remove this conversation from the client
         conversationsClient.removeConversation(this);
         // Conversations that are rejected do not have a listener
@@ -367,11 +369,8 @@ public class ConversationImpl implements Conversation,
                     @Override
                     public void run() {
                         conversationListener.onConversationEnded(ConversationImpl.this, null);
-                        waitLatch.countDown();
                     }
                 });
-            } else {
-                waitLatch.countDown();
             }
         } else {
             final TwilioConversationsException e =
@@ -382,17 +381,9 @@ public class ConversationImpl implements Conversation,
                     @Override
                     public void run() {
                         conversationListener.onConversationEnded(ConversationImpl.this, e);
-                        waitLatch.countDown();
                     }
                 });
-            } else {
-                waitLatch.countDown();
             }
-        }
-        try {
-            waitLatch.await();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
         }
     }
 
