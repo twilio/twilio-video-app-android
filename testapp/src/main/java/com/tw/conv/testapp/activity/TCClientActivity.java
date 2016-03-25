@@ -23,14 +23,12 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.Window;
 import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
-import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.twilio.common.TwilioAccessManager;
@@ -529,7 +527,7 @@ public class TCClientActivity extends AppCompatActivity {
                 TCClientActivity.this.incomingInvite = incomingInvite;
                 if (!inBackground) {
                     conversationsClientStatusTextView
-                            .setText("onIncomingInvite" + incomingInvite.getInvitee());
+                            .setText("onIncomingInvite" + incomingInvite.getInviter());
                     showInviteDialog(incomingInvite);
                 } else {
                     NotificationManager notificationManager =
@@ -550,7 +548,7 @@ public class TCClientActivity extends AppCompatActivity {
                             new NotificationCompat.Builder(TCClientActivity.this)
                                     .setSmallIcon(R.drawable.ic_videocam_green_24px)
                                     .setDeleteIntent(rejectPendingIntent)
-                                    .setContentTitle(incomingInvite.getInvitee())
+                                    .setContentTitle(incomingInvite.getInviter())
                                     .setPriority(NotificationCompat.PRIORITY_MAX)
                                     .setDefaults(NotificationCompat.DEFAULT_ALL)
                                     .setCategory(NotificationCompat.CATEGORY_CALL)
@@ -572,7 +570,7 @@ public class TCClientActivity extends AppCompatActivity {
                 if (!inBackground) {
                     alertDialog.dismiss();
                     Snackbar.make(conversationStatusTextView, "Invite from " +
-                            incomingInvite.getInvitee() + " terminated", Snackbar.LENGTH_LONG)
+                            incomingInvite.getInviter() + " terminated", Snackbar.LENGTH_LONG)
                             .setAction("Action", null).show();
                 } else {
                     NotificationManager notificationManager =
@@ -935,7 +933,7 @@ public class TCClientActivity extends AppCompatActivity {
     }
 
     private void showInviteDialog(final IncomingInvite incomingInvite) {
-        alertDialog = Dialog.createInviteDialog(incomingInvite.getInvitee(),
+        alertDialog = Dialog.createInviteDialog(incomingInvite.getInviter(),
                 acceptCallClickListener(incomingInvite),
                 rejectCallClickListener(incomingInvite),
                 this);
@@ -1090,10 +1088,10 @@ public class TCClientActivity extends AppCompatActivity {
                 if (e != null) {
                     status += " " + e.getMessage();
                     if(e.getErrorCode() == TwilioConversations.CONVERSATION_FAILED) {
-                        Snackbar.make(conversationStatusTextView, "Invite failed " + conversation.getConversationSid(), Snackbar.LENGTH_LONG)
+                        Snackbar.make(conversationStatusTextView, "Invite failed " + conversation.getSid(), Snackbar.LENGTH_LONG)
                                 .setAction("Action", null).show();
                     } else if(e.getErrorCode() == TwilioConversations.CONVERSATION_REJECTED) {
-                        Snackbar.make(conversationStatusTextView, "Invite was rejected " + conversation.getConversationSid(), Snackbar.LENGTH_LONG)
+                        Snackbar.make(conversationStatusTextView, "Invite was rejected " + conversation.getSid(), Snackbar.LENGTH_LONG)
                                 .setAction("Action", null).show();
                     }
                 }
