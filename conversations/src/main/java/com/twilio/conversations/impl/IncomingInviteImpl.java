@@ -107,8 +107,8 @@ public class IncomingInviteImpl implements IncomingInvite {
     }
 
     @Override
-    public String getInvitee() {
-        return conversationImpl.getInvitee();
+    public String getInviter() {
+        return conversationImpl.getInviter();
     }
 
     @Override

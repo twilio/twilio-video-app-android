@@ -527,7 +527,7 @@ public class TCClientActivity extends AppCompatActivity {
                 TCClientActivity.this.incomingInvite = incomingInvite;
                 if (!inBackground) {
                     conversationsClientStatusTextView
-                            .setText("onIncomingInvite" + incomingInvite.getInvitee());
+                            .setText("onIncomingInvite" + incomingInvite.getInviter());
                     showInviteDialog(incomingInvite);
                 } else {
                     NotificationManager notificationManager =
@@ -548,7 +548,7 @@ public class TCClientActivity extends AppCompatActivity {
                             new NotificationCompat.Builder(TCClientActivity.this)
                                     .setSmallIcon(R.drawable.ic_videocam_green_24px)
                                     .setDeleteIntent(rejectPendingIntent)
-                                    .setContentTitle(incomingInvite.getInvitee())
+                                    .setContentTitle(incomingInvite.getInviter())
                                     .setPriority(NotificationCompat.PRIORITY_MAX)
                                     .setDefaults(NotificationCompat.DEFAULT_ALL)
                                     .setCategory(NotificationCompat.CATEGORY_CALL)
@@ -570,7 +570,7 @@ public class TCClientActivity extends AppCompatActivity {
                 if (!inBackground) {
                     alertDialog.dismiss();
                     Snackbar.make(conversationStatusTextView, "Invite from " +
-                            incomingInvite.getInvitee() + " terminated", Snackbar.LENGTH_LONG)
+                            incomingInvite.getInviter() + " terminated", Snackbar.LENGTH_LONG)
                             .setAction("Action", null).show();
                 } else {
                     NotificationManager notificationManager =
@@ -933,7 +933,7 @@ public class TCClientActivity extends AppCompatActivity {
     }
 
     private void showInviteDialog(final IncomingInvite incomingInvite) {
-        alertDialog = Dialog.createInviteDialog(incomingInvite.getInvitee(),
+        alertDialog = Dialog.createInviteDialog(incomingInvite.getInviter(),
                 acceptCallClickListener(incomingInvite),
                 rejectCallClickListener(incomingInvite),
                 this);

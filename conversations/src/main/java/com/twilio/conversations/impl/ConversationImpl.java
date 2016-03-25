@@ -46,7 +46,7 @@ public class ConversationImpl implements Conversation,
     private static final String FINALIZE_MESSAGE = "Conversations must be released by " +
             "calling dispose(). Failure to do so may result in leaked resources.";
     private Set<String> invitedParticipants = new HashSet<String>();
-    private String invitee;
+    private String inviter;
     private ConversationsClientImpl conversationsClient;
     private ConversationListener conversationListener;
     private ConversationStateObserver conversationStateObserver;
@@ -144,7 +144,7 @@ public class ConversationImpl implements Conversation,
         this.conversationStateObserver = conversationStateObserver;
         this.nativeSession = nativeSession;
 
-        invitee = participantsIdentities[0];
+        inviter = participantsIdentities[0];
 
         handler = CallbackHandler.create();
         if(handler == null) {
@@ -201,8 +201,8 @@ public class ConversationImpl implements Conversation,
         return invitedParticipants;
     }
 
-    String getInvitee() {
-        return invitee;
+    String getInviter() {
+        return inviter;
     }
 
     @Override

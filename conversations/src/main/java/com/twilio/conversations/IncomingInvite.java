@@ -24,11 +24,11 @@ public interface IncomingInvite {
     String getConversationSid();
 
     /**
-     * Returns the identity of the invitee
+     * Returns the identity of the inviter
      *
-     * @return invitee identity
+     * @return inviter identity
      */
-    String getInvitee();
+    String getInviter();
 
     /**
      * Returns the list of participants already in the conversation
