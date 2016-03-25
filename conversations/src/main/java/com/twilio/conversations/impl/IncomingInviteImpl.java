@@ -103,7 +103,7 @@ public class IncomingInviteImpl implements IncomingInvite {
 
     @Override
     public String getConversationSid() {
-        return conversationImpl.getConversationSid();
+        return conversationImpl.getSid();
     }
 
     @Override

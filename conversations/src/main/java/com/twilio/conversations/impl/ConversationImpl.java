@@ -237,7 +237,7 @@ public class ConversationImpl implements Conversation,
     }
 
     @Override
-    public String getConversationSid() {
+    public String getSid() {
         checkDisposed();
         String conversationSid = getConversationSid(nativeSession);
         if(conversationSid == null || conversationSid.length() == 0) {

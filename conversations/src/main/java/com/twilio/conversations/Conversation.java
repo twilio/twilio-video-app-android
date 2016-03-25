@@ -53,7 +53,7 @@ public interface Conversation {
      *
      * @return conversation SID
      */
-    String getConversationSid();
+    String getSid();
 
     /**
      * Releases resources associated with this conversation.

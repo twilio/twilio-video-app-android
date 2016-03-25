@@ -23,14 +23,12 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.Window;
 import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
-import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.twilio.common.TwilioAccessManager;
@@ -1090,10 +1088,10 @@ public class TCClientActivity extends AppCompatActivity {
                 if (e != null) {
                     status += " " + e.getMessage();
                     if(e.getErrorCode() == TwilioConversations.CONVERSATION_FAILED) {
-                        Snackbar.make(conversationStatusTextView, "Invite failed " + conversation.getConversationSid(), Snackbar.LENGTH_LONG)
+                        Snackbar.make(conversationStatusTextView, "Invite failed " + conversation.getSid(), Snackbar.LENGTH_LONG)
                                 .setAction("Action", null).show();
                     } else if(e.getErrorCode() == TwilioConversations.CONVERSATION_REJECTED) {
-                        Snackbar.make(conversationStatusTextView, "Invite was rejected " + conversation.getConversationSid(), Snackbar.LENGTH_LONG)
+                        Snackbar.make(conversationStatusTextView, "Invite was rejected " + conversation.getSid(), Snackbar.LENGTH_LONG)
                                 .setAction("Action", null).show();
                     }
                 }
