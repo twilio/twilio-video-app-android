@@ -2,8 +2,10 @@ package com.twilio.conversations.impl;
 
 import com.twilio.conversations.CameraCapturer;
 import com.twilio.conversations.LocalVideoTrack;
+import com.twilio.conversations.VideoConstraints;
 
 public class LocalVideoTrackImpl extends VideoTrackImpl implements LocalVideoTrack  {
+    private VideoConstraints videoConstraints;
     private CameraCapturer cameraCapturer;
     private boolean enabledVideo = true;
 
@@ -12,11 +14,16 @@ public class LocalVideoTrackImpl extends VideoTrackImpl implements LocalVideoTra
         this.cameraCapturer = cameraCapturer;
     }
 
+    public LocalVideoTrackImpl(CameraCapturer cameraCapturer, VideoConstraints videoConstraints) {
+        super();
+        this.cameraCapturer = cameraCapturer;
+        this.videoConstraints = videoConstraints;
+    }
+
     @Override
     public CameraCapturer getCameraCapturer() {
         return cameraCapturer;
     }
-
 
     @Override
     public boolean enable(boolean enabled) {

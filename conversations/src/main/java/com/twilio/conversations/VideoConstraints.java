@@ -123,14 +123,29 @@ public class VideoConstraints {
         }
 
         public VideoConstraints build() {
+            if(minVideoDimensions == null) {
+               throw new IllegalStateException("MinVideoDimensions cannot be null");
+            }
+            if(maxVideoDimensions == null) {
+                throw new IllegalStateException("MaxVideoDimensions cannot be null");
+            }
             if(minFps > maxFps) {
-                throw new IllegalArgumentException("MinFPS " + minFps + " is greater than MaxFps " + maxFps);
+                throw new IllegalStateException("MinFPS " + minFps + " is greater than MaxFps " + maxFps);
+            }
+            if(minFps < 0) {
+                throw new IllegalStateException("MinFps is less than 0");
+            }
+            if(maxFps < 0) {
+                throw new IllegalStateException("MaxFps is less than 0");
+            }
+            if(minFps > maxFps) {
+                throw new IllegalStateException("Minfps is greater than maxFps");
             }
             if(minVideoDimensions.width > maxVideoDimensions.width) {
-                throw new IllegalArgumentException( "Min video dimensions width " + minVideoDimensions.width + " is greater than max video dimensions width " + maxVideoDimensions.width);
+                throw new IllegalStateException("Min video dimensions width " + minVideoDimensions.width + " is greater than max video dimensions width " + maxVideoDimensions.width);
             }
             if(minVideoDimensions.height > maxVideoDimensions.height) {
-                throw new IllegalArgumentException( "Min video dimensions height " + minVideoDimensions.height+ " is greater than max video dimensions height " + maxVideoDimensions.height);
+                throw new IllegalStateException("Min video dimensions height " + minVideoDimensions.height+ " is greater than max video dimensions height " + maxVideoDimensions.height);
             }
             return new VideoConstraints(this);
         }

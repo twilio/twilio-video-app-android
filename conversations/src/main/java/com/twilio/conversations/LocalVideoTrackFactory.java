@@ -25,8 +25,7 @@ public class LocalVideoTrackFactory {
      * @return new instance of VideoTrack
      */
     public static LocalVideoTrack createLocalVideoTrack(CameraCapturer cameraCapturer, VideoConstraints videoConstraints) {
-        // TODO: implement me
-        return null;
+        return new LocalVideoTrackImpl(cameraCapturer, videoConstraints);
     }
 
 }
