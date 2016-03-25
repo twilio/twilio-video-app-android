@@ -204,6 +204,11 @@ public class TCClientActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        // So calls can be answered when screen is locked
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD);
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED);
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON);
+
         setContentView(R.layout.activity_client);
 
         previewFrameLayout = (FrameLayout) findViewById(R.id.previewFrameLayout);
@@ -267,18 +272,6 @@ public class TCClientActivity extends AppCompatActivity {
         setCallAction();
         startPreview();
         registerRejectReceiver();
-    }
-
-    @Override
-    public Window getWindow() {
-        Window window = super.getWindow();
-
-        // So calls can be answered when screen is locked
-        window.addFlags(WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD);
-        window.addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED);
-        window.addFlags(WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON);
-
-        return window;
     }
 
     @Override
@@ -436,11 +429,22 @@ public class TCClientActivity extends AppCompatActivity {
 
         // Teardown our conversation, client, and sdk instance
         disposeConversation();
+
+        // Lets unlisten first otherwise complete logout
+        if (conversationsClient != null && conversationsClient.isListening()) {
+            conversationsClient.unlisten();
+        } else {
+            completeLogout();
+        }
+    }
+
+    private void completeLogout() {
         disposeConversationsClient();
         destroyConversationsSdk();
         returnToRegistration();
         loggingOut = false;
     }
+
 
     private void disposeConversation() {
         if (conversation != null) {
@@ -505,6 +509,10 @@ public class TCClientActivity extends AppCompatActivity {
             @Override
             public void onStopListeningForInvites(ConversationsClient conversationsClient) {
                 conversationsClientStatusTextView.setText("onStopListeningForInvites");
+                // If we are logging out let us finish the teardown process
+                if (loggingOut) {
+                    completeLogout();
+                }
             }
 
             @Override
