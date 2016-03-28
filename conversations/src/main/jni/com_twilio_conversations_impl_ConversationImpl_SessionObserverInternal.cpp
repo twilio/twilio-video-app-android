@@ -147,12 +147,15 @@ public:
                                 *j_media_stream_info_class_,
                                 "<init>",
                                 "(IILjava/lang/String;)V")),
-            enableStats_(false),
             observer_deleted_(false)
     {}
 
-    void enableStats(bool enabled) {
-        enableStats_ = enabled;
+    void enableStats(TSCSessionPtr session, bool enabled) {
+        if (enabled) {
+            session->enableReceivingStats();
+        } else {
+            session->disableReceivingStats();
+        }
     }
 
     void setObserverDeleted() {
@@ -386,9 +389,6 @@ protected:
         TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK,
                            kTSCoreLogLevelDebug,
                            "onDidReceiveSessionStatistics");
-        if (!enableStats_) {
-            return;
-        }
 
         TSCConnectionStatsReport report = statistics->getReport();
 
@@ -560,7 +560,6 @@ private:
     const ScopedGlobalRef<jclass> j_media_stream_info_class_;
     const jmethodID j_media_stream_info_ctor_;
 
-    bool enableStats_;
 
     bool observer_deleted_;
     mutable rtc::CriticalSection deletion_lock_;
@@ -597,12 +596,13 @@ JNIEXPORT void JNICALL Java_com_twilio_conversations_impl_ConversationImpl_00024
 }
 
 JNIEXPORT void JNICALL Java_com_twilio_conversations_impl_ConversationImpl_00024SessionObserverInternal_enableStats
-        (JNIEnv *, jobject, jlong nativeSessionObserver, jboolean enable) {
+        (JNIEnv *, jobject, jlong nativeSessionObserver, jlong nativeSession, jboolean enable) {
     TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK, kTSCoreLogLevelDebug, "enableStats");
     TSCSessionObserverPtr *sessionObserver = reinterpret_cast<TSCSessionObserverPtr *>(nativeSessionObserver);
-    if (sessionObserver != nullptr) {
+    TSCSessionPtr *session = reinterpret_cast<TSCSessionPtr *>(nativeSession);
+    if (sessionObserver != nullptr && session != nullptr) {
         SessionObserverInternalWrapper* wrapper = static_cast<SessionObserverInternalWrapper*>(sessionObserver->get());
-        wrapper->enableStats((bool)enable);
+        wrapper->enableStats(*session, (bool)enable);
 
     }
 }

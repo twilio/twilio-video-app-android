@@ -26,10 +26,10 @@ JNIEXPORT void JNICALL Java_com_twilio_conversations_impl_ConversationImpl_00024
 /*
  * Class:     com_twilio_conversations_impl_ConversationImpl_SessionObserverInternal
  * Method:    enableStats
- * Signature: (JZ)V
+ * Signature: (JJZ)V
  */
 JNIEXPORT void JNICALL Java_com_twilio_conversations_impl_ConversationImpl_00024SessionObserverInternal_enableStats
-        (JNIEnv *, jobject, jlong, jboolean);
+        (JNIEnv *, jobject, jlong, jlong, jboolean);
 
 #ifdef __cplusplus
 }
