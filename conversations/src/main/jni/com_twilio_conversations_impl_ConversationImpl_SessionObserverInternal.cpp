@@ -161,7 +161,7 @@ public:
     void setObserverDeleted() {
         rtc::CritScope cs(&deletion_lock_);
         observer_deleted_ = true;
-        TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK,
+        TS_CORE_LOG_MODULE(kTSCoreLogModulePlatformSDK,
                            kTSCoreLogLevelDebug,
                            "session observer deleted");
     }
@@ -171,7 +171,7 @@ protected:
     virtual void onStateDidChange(TSCSessionState state) {
         ScopedLocalRefFrame local_ref_frame(jni());
 
-        TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK, kTSCoreLogLevelDebug, "onStateDidChange");
+        TS_CORE_LOG_MODULE(kTSCoreLogModulePlatformSDK, kTSCoreLogLevelDebug, "onStateDidChange");
 
         const std::string session_state_class = "com/twilio/conversations/impl/core/SessionState";
         jobject j_session_state = webrtc_jni::JavaEnumFromIndex(
@@ -185,7 +185,7 @@ protected:
     virtual void onStartDidComplete(TSCoreErrorCode code, const std::string message) {
         ScopedLocalRefFrame local_ref_frame(jni());
 
-        TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK, kTSCoreLogLevelDebug, "onStartDidComplete");
+        TS_CORE_LOG_MODULE(kTSCoreLogModulePlatformSDK, kTSCoreLogLevelDebug, "onStartDidComplete");
 
         jobject j_error_obj = errorToJavaCoreErrorImpl(code, message);
         CHECK_EXCEPTION(jni()) << "error during NewObject";
@@ -196,7 +196,7 @@ protected:
     virtual void onStopDidComplete(TSCoreErrorCode code, const std::string message) {
         ScopedLocalRefFrame local_ref_frame(jni());
 
-        TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK, kTSCoreLogLevelDebug, "onStopDidComplete");
+        TS_CORE_LOG_MODULE(kTSCoreLogModulePlatformSDK, kTSCoreLogLevelDebug, "onStopDidComplete");
         jobject j_error_obj = errorToJavaCoreErrorImpl(code, message);
         CHECK_EXCEPTION(jni()) << "error during NewObject";
         {
@@ -217,7 +217,7 @@ protected:
                                          const std::string message) {
         ScopedLocalRefFrame local_ref_frame(jni());
 
-        TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK,
+        TS_CORE_LOG_MODULE(kTSCoreLogModulePlatformSDK,
                            kTSCoreLogLevelDebug,
                            "onParticipantDidConnect");
 
@@ -236,7 +236,7 @@ protected:
                                             TSCDisconnectReason reason) {
         ScopedLocalRefFrame local_ref_frame(jni());
 
-        TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK,
+        TS_CORE_LOG_MODULE(kTSCoreLogModulePlatformSDK,
                            kTSCoreLogLevelDebug,
                            "onParticipantDidDisconect");
 
@@ -257,7 +257,7 @@ protected:
     virtual void onMediaStreamDidAdd(TSCMediaStreamInfoObject* stream) {
         ScopedLocalRefFrame local_ref_frame(jni());
 
-        TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK, kTSCoreLogLevelDebug, "onMediaStreamDidAdd");
+        TS_CORE_LOG_MODULE(kTSCoreLogModulePlatformSDK, kTSCoreLogLevelDebug, "onMediaStreamDidAdd");
 
         jobject j_media_info = mediaStrInfoJavaMediaStrInfoImpl(stream);
         CHECK_EXCEPTION(jni()) << "error during NewObject";
@@ -269,7 +269,7 @@ protected:
     virtual void onMediaStreamDidRemove(TSCMediaStreamInfoObject* stream) {
         ScopedLocalRefFrame local_ref_frame(jni());
 
-        TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK,
+        TS_CORE_LOG_MODULE(kTSCoreLogModulePlatformSDK,
                            kTSCoreLogLevelDebug,
                            "onMediaStreamDidRemove");
 
@@ -284,7 +284,7 @@ protected:
                                     VideoTrackInterface* videoTrack) {
         ScopedLocalRefFrame local_ref_frame(jni());
 
-        TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK, kTSCoreLogLevelDebug, "onVideoTrackDidAdd");
+        TS_CORE_LOG_MODULE(kTSCoreLogModulePlatformSDK, kTSCoreLogLevelDebug, "onVideoTrackDidAdd");
 
         jstring id = stringToJString(jni(), videoTrack->id());
         jobject j_track = jni()->NewObject(
@@ -302,7 +302,7 @@ protected:
                                           std::string errorMessage) {
         ScopedLocalRefFrame local_ref_frame(jni());
 
-        TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK,
+        TS_CORE_LOG_MODULE(kTSCoreLogModulePlatformSDK,
                            kTSCoreLogLevelDebug,
                            "onVideoTrackDidFailToAdd");
 
@@ -317,7 +317,7 @@ protected:
     virtual void onVideoTrackDidRemove(TSCVideoTrackInfoObject* trackInfo) {
         ScopedLocalRefFrame local_ref_frame(jni());
 
-        TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK,
+        TS_CORE_LOG_MODULE(kTSCoreLogModulePlatformSDK,
                            kTSCoreLogLevelDebug,
                            "onVideoTrackDidRemove");
 
@@ -330,7 +330,7 @@ protected:
     virtual void onVideoTrackStateDidChange(TSCVideoTrackInfoObject* trackInfo) {
         ScopedLocalRefFrame local_ref_frame(jni());
 
-        TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK,
+        TS_CORE_LOG_MODULE(kTSCoreLogModulePlatformSDK,
                            kTSCoreLogLevelDebug,
                            "onVideoTrackStateDidChange");
 
@@ -344,7 +344,7 @@ protected:
                                     webrtc::AudioTrackInterface* audioTrack) {
         ScopedLocalRefFrame local_ref_frame(jni());
 
-        TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK, kTSCoreLogLevelDebug, "onAudioTrackDidAdd");
+        TS_CORE_LOG_MODULE(kTSCoreLogModulePlatformSDK, kTSCoreLogLevelDebug, "onAudioTrackDidAdd");
 
         jstring id = stringToJString(jni(), audioTrack->id());
         jobject j_track = jni()->NewObject(
@@ -360,7 +360,7 @@ protected:
     virtual void onAudioTrackDidRemove(TSCAudioTrackInfoObject *trackInfo) {
         ScopedLocalRefFrame local_ref_frame(jni());
 
-        TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK,
+        TS_CORE_LOG_MODULE(kTSCoreLogModulePlatformSDK,
                            kTSCoreLogLevelDebug,
                            "onAudioTrackDidRemove");
 
@@ -373,7 +373,7 @@ protected:
     virtual void onAudioTrackStateDidChange(TSCAudioTrackInfoObject* trackInfo) {
         ScopedLocalRefFrame local_ref_frame(jni());
 
-        TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK,
+        TS_CORE_LOG_MODULE(kTSCoreLogModulePlatformSDK,
                            kTSCoreLogLevelDebug,
                            "onAudioTrackStateDidChange");
 
@@ -386,7 +386,7 @@ protected:
     virtual void onDidReceiveSessionStatistics(TSCSessionStatisticsPtr statistics) {
         ScopedLocalRefFrame local_ref_frame(jni());
 
-        TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK,
+        TS_CORE_LOG_MODULE(kTSCoreLogModulePlatformSDK,
                            kTSCoreLogLevelDebug,
                            "onDidReceiveSessionStatistics");
 
@@ -434,7 +434,7 @@ protected:
     virtual void onDidReceiveConversationEvent(ConversationEvent *event) {
         ScopedLocalRefFrame local_ref_frame(jni());
 
-        TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK,
+        TS_CORE_LOG_MODULE(kTSCoreLogModulePlatformSDK,
                            kTSCoreLogLevelDebug,
                            "onDidReceiveConversationEvent");
         // TODO: implement me
@@ -494,13 +494,13 @@ private:
 
     bool isObserverValid(const std::string &callbackName) {
         if (observer_deleted_) {
-            TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK,
+            TS_CORE_LOG_MODULE(kTSCoreLogModulePlatformSDK,
                                kTSCoreLogLevelWarning,
                                "session observer is marked for deletion, skipping %s callback", callbackName.c_str());
             return false;
         };
         if (IsNull(jni(), *j_observer_global_)) {
-            TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK,
+            TS_CORE_LOG_MODULE(kTSCoreLogModulePlatformSDK,
                                kTSCoreLogLevelWarning,
                                "session observer reference has been destroyed, skipping %s callback", callbackName.c_str());
             return false;
@@ -572,7 +572,7 @@ private:
  */
 JNIEXPORT jlong JNICALL Java_com_twilio_conversations_impl_ConversationImpl_00024SessionObserverInternal_wrapNativeObserver
         (JNIEnv *env, jobject obj, jobject observer, jobject conversation) {
-    TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK, kTSCoreLogLevelDebug, "wrapNativeObserver: Session");
+    TS_CORE_LOG_MODULE(kTSCoreLogModulePlatformSDK, kTSCoreLogLevelDebug, "wrapNativeObserver: Session");
     TSCSessionObserverPtr *sessionObserver = new TSCSessionObserverPtr();
     sessionObserver->reset(new SessionObserverInternalWrapper(env, obj, observer, conversation));
     return jlongFromPointer(sessionObserver);
@@ -585,7 +585,7 @@ JNIEXPORT jlong JNICALL Java_com_twilio_conversations_impl_ConversationImpl_0002
  */
 JNIEXPORT void JNICALL Java_com_twilio_conversations_impl_ConversationImpl_00024SessionObserverInternal_freeNativeObserver
         (JNIEnv *env, jobject obj, jlong nativeSessionObserver){
-    TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK, kTSCoreLogLevelDebug, "freeNativeObserver: Session");
+    TS_CORE_LOG_MODULE(kTSCoreLogModulePlatformSDK, kTSCoreLogLevelDebug, "freeNativeObserver: Session");
     TSCSessionObserverPtr *sessionObserver = reinterpret_cast<TSCSessionObserverPtr *>(nativeSessionObserver);
     if (sessionObserver != nullptr) {
         SessionObserverInternalWrapper* wrapper = static_cast<SessionObserverInternalWrapper*>(sessionObserver->get());
@@ -597,7 +597,7 @@ JNIEXPORT void JNICALL Java_com_twilio_conversations_impl_ConversationImpl_00024
 
 JNIEXPORT void JNICALL Java_com_twilio_conversations_impl_ConversationImpl_00024SessionObserverInternal_enableStats
         (JNIEnv *, jobject, jlong nativeSessionObserver, jlong nativeSession, jboolean enable) {
-    TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK, kTSCoreLogLevelDebug, "enableStats");
+    TS_CORE_LOG_MODULE(kTSCoreLogModulePlatformSDK, kTSCoreLogLevelDebug, "enableStats");
     TSCSessionObserverPtr *sessionObserver = reinterpret_cast<TSCSessionObserverPtr *>(nativeSessionObserver);
     TSCSessionPtr *session = reinterpret_cast<TSCSessionPtr *>(nativeSession);
     if (sessionObserver != nullptr && session != nullptr) {
