@@ -439,6 +439,7 @@ public class TCClientActivity extends AppCompatActivity {
     private void completeLogout() {
         disposeConversationsClient();
         destroyConversationsSdk();
+        disposeAccessManager();
         returnToRegistration();
         loggingOut = false;
     }
@@ -460,6 +461,13 @@ public class TCClientActivity extends AppCompatActivity {
 
     private void destroyConversationsSdk() {
         TwilioConversations.destroy();
+    }
+
+    private void disposeAccessManager() {
+        if (accessManager != null) {
+            accessManager.dispose();
+            accessManager = null;
+        }
     }
 
     private void returnToRegistration() {
