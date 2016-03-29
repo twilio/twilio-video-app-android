@@ -257,7 +257,7 @@ dependencies {
     androidTestCompile 'com.android.support.test:runner:0.4'
     androidTestCompile 'com.android.support.test:rules:0.4'
 
-    compile 'com.twilio.sdk:twilio-common-android:0.3.0-rc6'
+    compile 'com.twilio:common-android:0.3.0'
     // TODO this really should be on nexus as a jar and not local
     compile files("${twilioSdkHome}/twilio-webrtc/lib/release/libjingle_peerconnection_java.jar")
 }
