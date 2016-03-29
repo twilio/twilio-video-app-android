@@ -11,11 +11,20 @@ public class LocalVideoTrackImpl extends VideoTrackImpl implements LocalVideoTra
 
     public LocalVideoTrackImpl(CameraCapturer cameraCapturer) {
         super();
+        if(cameraCapturer == null) {
+            throw new NullPointerException("CameraCapturer must not be null");
+        }
         this.cameraCapturer = cameraCapturer;
     }
 
     public LocalVideoTrackImpl(CameraCapturer cameraCapturer, VideoConstraints videoConstraints) {
         super();
+        if(cameraCapturer == null) {
+            throw new NullPointerException("CameraCapturer must not be null");
+        }
+        if(videoConstraints == null) {
+            throw new NullPointerException("VideoConstraints must not be null");
+        }
         this.cameraCapturer = cameraCapturer;
         this.videoConstraints = videoConstraints;
     }

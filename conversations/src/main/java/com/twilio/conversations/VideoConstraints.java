@@ -124,10 +124,10 @@ public class VideoConstraints {
 
         public VideoConstraints build() {
             if(minVideoDimensions == null) {
-               throw new IllegalStateException("MinVideoDimensions cannot be null");
+               throw new NullPointerException("MinVideoDimensions must not be null");
             }
             if(maxVideoDimensions == null) {
-                throw new IllegalStateException("MaxVideoDimensions cannot be null");
+                throw new NullPointerException("MaxVideoDimensions must not be null");
             }
             if(minFps > maxFps) {
                 throw new IllegalStateException("MinFPS " + minFps + " is greater than MaxFps " + maxFps);
