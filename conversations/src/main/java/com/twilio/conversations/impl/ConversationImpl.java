@@ -46,7 +46,7 @@ public class ConversationImpl implements Conversation,
     private static final String FINALIZE_MESSAGE = "Conversations must be released by " +
             "calling dispose(). Failure to do so may result in leaked resources.";
     private Set<String> invitedParticipants = new HashSet<String>();
-    private String invitee;
+    private String inviter;
     private ConversationsClientImpl conversationsClient;
     private ConversationListener conversationListener;
     private ConversationStateObserver conversationStateObserver;
@@ -75,15 +75,15 @@ public class ConversationImpl implements Conversation,
             this.nativeSessionObserver = wrapNativeObserver(sessionObserver, conversation);
         }
 
-        public void enableStats(boolean enable) {
-            enableStats(nativeSessionObserver, enable);
+        public void enableStats(long nativeSession, boolean enable) {
+            enableStats(nativeSessionObserver, nativeSession, enable);
         }
 
         private native long wrapNativeObserver(SessionObserver sessionObserver,
                                                Conversation conversation);
         private native void freeNativeObserver(long nativeSessionObserver);
 
-        private native void enableStats(long nativeSessionObserver, boolean enable);
+        private native void enableStats(long nativeSessionObserver, long nativeSession, boolean enable);
 
         @Override
         public long getNativeHandle() {
@@ -144,7 +144,7 @@ public class ConversationImpl implements Conversation,
         this.conversationStateObserver = conversationStateObserver;
         this.nativeSession = nativeSession;
 
-        invitee = participantsIdentities[0];
+        inviter = participantsIdentities[0];
 
         handler = CallbackHandler.create();
         if(handler == null) {
@@ -201,8 +201,8 @@ public class ConversationImpl implements Conversation,
         return invitedParticipants;
     }
 
-    String getInvitee() {
-        return invitee;
+    String getInviter() {
+        return inviter;
     }
 
     @Override
@@ -237,7 +237,7 @@ public class ConversationImpl implements Conversation,
     }
 
     @Override
-    public String getConversationSid() {
+    public String getSid() {
         checkDisposed();
         String conversationSid = getConversationSid(nativeSession);
         if(conversationSid == null || conversationSid.length() == 0) {
@@ -258,12 +258,12 @@ public class ConversationImpl implements Conversation,
         if (listener != null) {
             statsHandler = CallbackHandler.create();
             if (sessionObserverInternal != null) {
-                sessionObserverInternal.enableStats(true);
+                sessionObserverInternal.enableStats(nativeSession, true);
             }
         } else {
             statsHandler = null;
             if (sessionObserverInternal != null) {
-                sessionObserverInternal.enableStats(false);
+                sessionObserverInternal.enableStats(nativeSession, false);
             }
         }
     }
