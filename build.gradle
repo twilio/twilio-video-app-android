@@ -9,9 +9,8 @@ buildscript {
             url "http://nexus.corp.twilio.com/content/repositories/releases/"
         }
     }
-
     dependencies {
-        classpath "com.android.tools.build:gradle-experimental:0.7.0-alpha1"
+        classpath "com.android.tools.build:gradle-experimental:0.7.0-alpha4"
     }
 }
 
