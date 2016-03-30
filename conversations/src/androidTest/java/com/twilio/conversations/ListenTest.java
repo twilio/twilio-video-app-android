@@ -6,7 +6,7 @@ import android.support.test.runner.AndroidJUnit4;
 import com.twilio.common.TwilioAccessManager;
 import com.twilio.common.TwilioAccessManagerFactory;
 import com.twilio.common.TwilioAccessManagerListener;
-import com.twilio.conversations.provider.TCCapabilityTokenProvider;
+import com.twilio.conversations.provider.AccessTokenProvider;
 import com.twilio.conversations.utils.TwilioConversationsUtils;
 
 import org.junit.After;
@@ -43,7 +43,7 @@ public class ListenTest {
     @Test
     public void canListenAfterClientCreation() {
         final CountDownLatch waitLatch = new CountDownLatch(1);
-        TCCapabilityTokenProvider.obtainTwilioCapabilityToken(TEST_USER, new Callback<String>() {
+        AccessTokenProvider.obtainTwilioCapabilityToken(TEST_USER, new Callback<String>() {
             @Override
             public void success(final String token, Response response) {
 

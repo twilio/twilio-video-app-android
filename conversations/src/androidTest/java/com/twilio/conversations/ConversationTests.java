@@ -6,7 +6,7 @@ import android.support.test.InstrumentationRegistry;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
 
-import com.twilio.conversations.provider.TCCapabilityTokenProvider;
+import com.twilio.conversations.provider.AccessTokenProvider;
 import com.twilio.conversations.utils.TwilioConversationsUtils;
 
 import org.junit.After;
@@ -165,7 +165,7 @@ public class ConversationTests {
     private String obtainCapabilityToken(final String username) {
         final CountDownLatch tokenLatch = new CountDownLatch(1);
         final String[] token = new String[1];
-        TCCapabilityTokenProvider.obtainTwilioCapabilityToken(username, new Callback<String>() {
+        AccessTokenProvider.obtainTwilioCapabilityToken(username, new Callback<String>() {
 
             @Override
             public void success(final String capabilityToken, Response response) {

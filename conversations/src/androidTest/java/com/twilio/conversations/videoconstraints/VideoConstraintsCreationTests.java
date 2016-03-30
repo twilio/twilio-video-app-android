@@ -11,7 +11,7 @@ import org.junit.runner.RunWith;
 import static junit.framework.Assert.*;
 
 @RunWith(AndroidJUnit4.class)
-public class VideoConstraintsTests {
+public class VideoConstraintsCreationTests {
 
     @Test
     public void createCustomMinAndMaxDimensions() {
@@ -46,8 +46,4 @@ public class VideoConstraintsTests {
         assertEquals(VideoConstraints.FRAME_RATE_24, videoConstraints.getMaxFps());
     }
 
-    @Test
-    public void startConversationWithVideoConstraints() {
-
-    }
 }

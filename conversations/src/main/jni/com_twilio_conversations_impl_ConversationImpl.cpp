@@ -63,7 +63,7 @@ JNIEXPORT jlong JNICALL Java_com_twilio_conversations_impl_ConversationImpl_wrap
 
 
 JNIEXPORT void JNICALL Java_com_twilio_conversations_impl_ConversationImpl_start
-        (JNIEnv *env, jobject obj, jlong nativeSession, jboolean j_enableAudio, jboolean j_muteAudio, jboolean j_enableVideo, jboolean j_pauseVideo)
+        (JNIEnv *env, jobject obj, jlong nativeSession, jboolean j_enableAudio, jboolean j_muteAudio, jboolean j_enableVideo, jboolean j_pauseVideo, jobject j_video_constraints)
 {
     TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK, kTSCoreLogLevelDebug, "start");
     TSCSessionPtr *session = reinterpret_cast<TSCSessionPtr *>(nativeSession);
@@ -79,7 +79,20 @@ JNIEXPORT void JNICALL Java_com_twilio_conversations_impl_ConversationImpl_start
                        (enableVideo ? "enableVideo = true":"enableVideo=false"),
                        (pauseVideo ? "pauseVideo=true":"pauseVideo=false"));
 
-    session->get()->start(new TSCSessionMediaConstraintsObject(enableAudio, muteAudio, enableVideo, pauseVideo));
+    if(webrtc_jni::IsNull(env, j_video_constraints)) {
+        session->get()->start(
+                new TSCSessionMediaConstraintsObject(enableAudio,
+                                                     muteAudio,
+                                                     enableVideo,
+                                                     pauseVideo));
+    } else {
+        // TODO: convert j video constraints to C++ video constraints
+        session->get()->start(
+                new TSCSessionMediaConstraintsObject(enableAudio,
+                                                     muteAudio,
+                                                     enableVideo,
+                                                     pauseVideo));
+    }
 }
 
 

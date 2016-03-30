@@ -64,4 +64,8 @@ public class LocalVideoTrackImpl extends VideoTrackImpl implements LocalVideoTra
         ((CameraCapturerImpl)cameraCapturer).resetNativeVideoCapturer();
         cameraCapturer = null;
     }
+
+    VideoConstraints getVideoConstraints() {
+        return videoConstraints;
+    }
 }
