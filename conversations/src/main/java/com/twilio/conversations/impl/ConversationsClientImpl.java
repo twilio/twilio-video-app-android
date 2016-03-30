@@ -55,14 +55,22 @@ public class ConversationsClientImpl implements
         conversations.remove(conversationImpl);
     }
 
-    void onConversationTerminated(ConversationImpl conversationImpl,
+    void onConversationTerminated(final ConversationImpl conversationImpl,
                                   TwilioConversationsException e) {
         conversations.remove(conversationImpl);
         IncomingInviteImpl incomingInvite = pendingIncomingInvites
                 .remove(conversationImpl.getIncomingInviteImpl());
         conversationImpl.getIncomingInviteImpl().setStatus(InviteStatus.CANCELLED);
-        conversationsClientListener.onIncomingInviteCancelled(this,
-                conversationImpl.getIncomingInviteImpl());
+
+        if (handler != null) {
+            handler.post(new Runnable() {
+                @Override
+                public void run() {
+                    conversationsClientListener.onIncomingInviteCancelled(ConversationsClientImpl.this,
+                            conversationImpl.getIncomingInviteImpl());
+                }
+            });
+        }
     }
 
     class EndpointObserverInternal implements NativeHandleInterface {
