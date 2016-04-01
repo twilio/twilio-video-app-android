@@ -58,7 +58,7 @@ public:
     void setObserverDeleted() {
         rtc::CritScope cs(&deletion_lock_);
         observer_deleted_ = true;
-        TS_CORE_LOG_MODULE(kTSCoreLogModulePlatformSDK,
+        TS_CORE_LOG_MODULE(kTSCoreLogModulePlatform,
                            kTSCoreLogLevelDebug,
                            "endpoint observer deleted");
     }
@@ -68,7 +68,7 @@ protected:
     virtual void onRegistrationDidComplete(TSCoreErrorCode code, const std::string message) {
         ScopedLocalRefFrame local_ref_frame(jni());
 
-        TS_CORE_LOG_MODULE(kTSCoreLogModulePlatformSDK,
+        TS_CORE_LOG_MODULE(kTSCoreLogModulePlatform,
                            kTSCoreLogLevelDebug,
                            "onRegistrationDidComplete");
         jobject j_error = errorToJavaCoreErrorImpl(code, message);
@@ -89,7 +89,7 @@ protected:
     virtual void onUnregistrationDidComplete(TSCoreErrorCode code, const std::string message) {
         ScopedLocalRefFrame local_ref_frame(jni());
 
-        TS_CORE_LOG_MODULE(kTSCoreLogModulePlatformSDK,
+        TS_CORE_LOG_MODULE(kTSCoreLogModulePlatform,
                            kTSCoreLogLevelDebug,
                            "onUnregistrationDidComplete");
         jobject j_error = errorToJavaCoreErrorImpl(code, message);
@@ -109,7 +109,7 @@ protected:
     virtual void onStateDidChange(TSCEndpointState state){
         ScopedLocalRefFrame local_ref_frame(jni());
 
-        TS_CORE_LOG_MODULE(kTSCoreLogModulePlatformSDK,
+        TS_CORE_LOG_MODULE(kTSCoreLogModulePlatform,
                            kTSCoreLogLevelDebug,
                            "onStateDidChange, new state:%d",
                            state);
@@ -134,7 +134,7 @@ protected:
     virtual void onIncomingCallDidReceive(const TSCSessionPtr &session) {
         ScopedLocalRefFrame local_ref_frame(jni());
 
-        TS_CORE_LOG_MODULE(kTSCoreLogModulePlatformSDK,
+        TS_CORE_LOG_MODULE(kTSCoreLogModulePlatform,
                            kTSCoreLogLevelDebug,
                            "onIncomingCallDidReceive");
         TSCSessionPtr *newSession = new TSCSessionPtr();
@@ -182,13 +182,13 @@ private:
 
     bool isObserverValid(const std::string &callbackName) {
         if (observer_deleted_) {
-            TS_CORE_LOG_MODULE(kTSCoreLogModulePlatformSDK,
+            TS_CORE_LOG_MODULE(kTSCoreLogModulePlatform,
                                kTSCoreLogLevelWarning,
                                "endpoint observer is marked for deletion, skipping %s callback", callbackName.c_str());
             return false;
         };
         if (IsNull(jni(), *j_endpoint_observer_)) {
-            TS_CORE_LOG_MODULE(kTSCoreLogModulePlatformSDK,
+            TS_CORE_LOG_MODULE(kTSCoreLogModulePlatform,
                                kTSCoreLogLevelWarning,
                                "endpoint observer reference has been destroyed, skipping %s callback", callbackName.c_str());
             return false;
@@ -237,7 +237,7 @@ private:
  */
 JNIEXPORT jlong JNICALL Java_com_twilio_conversations_impl_ConversationsClientImpl_00024EndpointObserverInternal_wrapNativeObserver
         (JNIEnv *env, jobject obj, jobject j_endpoint_observer, jobject j_endpoint) {
-    TS_CORE_LOG_MODULE(kTSCoreLogModulePlatformSDK, kTSCoreLogLevelDebug, "wrapNativeObserver: Endpoint");
+    TS_CORE_LOG_MODULE(kTSCoreLogModulePlatform, kTSCoreLogLevelDebug, "wrapNativeObserver: Endpoint");
     TSCEndpointObserverPtr *endpointObserver = new TSCEndpointObserverPtr();
     endpointObserver->reset(new EndpointObserverInternalWrapper(env, obj, j_endpoint_observer, j_endpoint));
     return jlongFromPointer(endpointObserver);
@@ -250,7 +250,7 @@ JNIEXPORT jlong JNICALL Java_com_twilio_conversations_impl_ConversationsClientIm
  */
 JNIEXPORT void JNICALL Java_com_twilio_conversations_impl_ConversationsClientImpl_00024EndpointObserverInternal_freeNativeObserver
         (JNIEnv *env, jobject obj, jlong nativeEndpointObserver){
-    TS_CORE_LOG_MODULE(kTSCoreLogModulePlatformSDK, kTSCoreLogLevelDebug, "freeNativeObserver: Endpoint");
+    TS_CORE_LOG_MODULE(kTSCoreLogModulePlatform, kTSCoreLogLevelDebug, "freeNativeObserver: Endpoint");
     TSCEndpointObserverPtr *endpointObserver = reinterpret_cast<TSCEndpointObserverPtr *>(nativeEndpointObserver);
     if (endpointObserver != nullptr) {
         EndpointObserverInternalWrapper* wrapper = static_cast<EndpointObserverInternalWrapper*>(endpointObserver->get());

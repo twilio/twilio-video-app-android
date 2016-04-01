@@ -28,7 +28,7 @@ public class TwilioConversationsLogLevelTests {
 
     @Test
     public void canSetLogLevelBeforeAndAfterInit() {
-        int level = TwilioConversations.LogLevel.VERBOSE;
+        int level = TwilioConversations.LogLevel.DEBUG;
         TwilioConversations.setLogLevel(level);
         assertEquals(level, TwilioConversations.getLogLevel());
 

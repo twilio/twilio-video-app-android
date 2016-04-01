@@ -137,12 +137,24 @@ public class TwilioConversations {
      * Log levels for the Twilio Conversations SDK
      */
     public final class LogLevel {
-        public static final int DISABLED = 0;
-        public static final int ERROR = 3;
-        public static final int WARNING= 4;
-        public static final int INFO = 6;
-        public static final int DEBUG = 7;
-        public static final int VERBOSE = 8;
+        public static final int OFF = 0;
+        public static final int FATAL = 1;
+        public static final int ERROR = 2;
+        public static final int WARNING = 3;
+        public static final int INFO = 4;
+        public static final int DEBUG = 5;
+        public static final int TRACE = 6;
+        public static final int ALL = 7;
+    }
+
+    /**
+     * Modules for the Twilio Conversations SDK
+     */
+    public final class LogModule {
+        public static final int Core = 0;
+        public static final int Platform = 1;
+        public static final int Signaling = 2;
+        public static final int WebRTC = 3;
     }
 
     private TwilioConversations() {}
@@ -204,6 +216,16 @@ public class TwilioConversations {
      */
     public static void setLogLevel(int level) {
         TwilioConversationsImpl.setLogLevel(level);
+    }
+
+    /**
+     * Sets the logging level for messages logged by a specific module.
+     *
+     * @param module The module for this log level
+     * @param level The logging level
+     */
+    public static void setModuleLogLevel(int module, int level) {
+        TwilioConversationsImpl.setModuleLogLevel(module, level);
     }
 
     /**

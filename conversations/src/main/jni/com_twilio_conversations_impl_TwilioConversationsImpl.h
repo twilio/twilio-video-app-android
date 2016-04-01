@@ -65,6 +65,14 @@ JNIEXPORT void JNICALL Java_com_twilio_conversations_impl_TwilioConversationsImp
 
 /*
  * Class:     com_twilio_conversations_impl_TwilioConversationsImpl
+ * Method:    setModuleLevel
+ * Signature: (II)J
+ */
+JNIEXPORT void JNICALL Java_com_twilio_conversations_impl_TwilioConversationsImpl_setModuleLevel
+        (JNIEnv *, jobject, jint, jint);
+
+/*
+ * Class:     com_twilio_conversations_impl_TwilioConversationsImpl
  * Method:    getCoreLogLevel 
  * Signature: ()J
  */

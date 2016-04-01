@@ -219,10 +219,12 @@ public class TwilioConversationsTest {
     @Test
     public void testTwilioSetAndGetLogLevel() {
         verifySetAndGetLogLevel(TwilioConversations.LogLevel.DEBUG);
-        verifySetAndGetLogLevel(TwilioConversations.LogLevel.DISABLED);
+        verifySetAndGetLogLevel(TwilioConversations.LogLevel.OFF);
+        verifySetAndGetLogLevel(TwilioConversations.LogLevel.FATAL);
         verifySetAndGetLogLevel(TwilioConversations.LogLevel.ERROR);
         verifySetAndGetLogLevel(TwilioConversations.LogLevel.INFO);
-        verifySetAndGetLogLevel(TwilioConversations.LogLevel.VERBOSE);
+        verifySetAndGetLogLevel(TwilioConversations.LogLevel.TRACE);
+        verifySetAndGetLogLevel(TwilioConversations.LogLevel.ALL);
         verifySetAndGetLogLevel(TwilioConversations.LogLevel.WARNING);
     }
 
@@ -230,7 +232,7 @@ public class TwilioConversationsTest {
     public void testTwilioEnsureInvalidLevelSetsLevelToDisabled() {
         int invalidLevel = 100;
         TwilioConversations.setLogLevel(invalidLevel);
-        org.junit.Assert.assertEquals(TwilioConversations.LogLevel.DISABLED, TwilioConversations.getLogLevel());
+        org.junit.Assert.assertEquals(TwilioConversations.LogLevel.OFF, TwilioConversations.getLogLevel());
     }
 
     @Test

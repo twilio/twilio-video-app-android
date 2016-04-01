@@ -55,6 +55,7 @@ public class TwilioConversationsImpl {
     private boolean initializing;
     private ExecutorService refreshRegExecutor = Executors.newSingleThreadExecutor();
 
+
     public static class WakeUpReceiver extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -358,13 +359,34 @@ public class TwilioConversationsImpl {
     }
 
     public static void setLogLevel(int level) {
-        /*
+        setSDKLogLevel(level);
+        setCoreLogLevel(level);
+        // Save the log level
+        TwilioConversationsImpl.level = level;
+    }
+
+    public static void setModuleLogLevel(int module, int level) {
+        if (module == TwilioConversations.LogModule.Platform) {
+            setSDKLogLevel(level);
+        }
+        setModuleLevel(module, level);
+    }
+
+    public static int getLogLevel() {
+        return getCoreLogLevel();
+    }
+
+    private static void setSDKLogLevel(int level) {
+         /*
          * The Log Levels are defined differently in the Twilio Logger
          * which is based off android.util.Log.
          */
         switch(level) {
-            case LogLevel.DISABLED:
+            case LogLevel.OFF:
                 Logger.setLogLevel(Log.ASSERT);
+                break;
+            case LogLevel.FATAL:
+                Logger.setLogLevel(Log.ERROR);
                 break;
             case LogLevel.ERROR:
                 Logger.setLogLevel(Log.ERROR);
@@ -378,24 +400,18 @@ public class TwilioConversationsImpl {
             case LogLevel.DEBUG:
                 Logger.setLogLevel(Log.DEBUG);
                 break;
-            case LogLevel.VERBOSE:
+            case LogLevel.TRACE:
+                Logger.setLogLevel(Log.VERBOSE);
+                break;
+            case LogLevel.ALL:
                 Logger.setLogLevel(Log.VERBOSE);
                 break;
             default:
                 // Set the log level to assert/disabled if the value passed in is unknown
                 Logger.setLogLevel(Log.ASSERT);
-                level = TwilioConversations.LogLevel.DISABLED;
                 break;
         }
-        setCoreLogLevel(level);
-        // Save the log level
-        TwilioConversationsImpl.level = level;
     }
-
-    public static int getLogLevel() {
-        return getCoreLogLevel();
-    }
-
     public boolean isInitialized() {
         return initialized;
     }
@@ -448,6 +464,7 @@ public class TwilioConversationsImpl {
                                        String[] optionsArray,
                                        long nativeEndpointObserver);
     private native static void setCoreLogLevel(int level);
+    private native static void setModuleLevel(int module, int level);
     private native static int getCoreLogLevel();
     private native void refreshRegistrations();
 }
