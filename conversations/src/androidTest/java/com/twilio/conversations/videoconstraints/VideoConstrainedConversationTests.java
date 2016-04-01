@@ -10,11 +10,14 @@ import com.twilio.conversations.CameraCapturer;
 import com.twilio.conversations.Conversation;
 import com.twilio.conversations.ConversationCallback;
 import com.twilio.conversations.ConversationsClient;
+import com.twilio.conversations.ConversationsClientListener;
+import com.twilio.conversations.IncomingInvite;
 import com.twilio.conversations.LocalMedia;
 import com.twilio.conversations.LocalMediaFactory;
 import com.twilio.conversations.LocalMediaListener;
 import com.twilio.conversations.LocalVideoTrack;
 import com.twilio.conversations.LocalVideoTrackFactory;
+import com.twilio.conversations.OutgoingInvite;
 import com.twilio.conversations.TwilioConversations;
 import com.twilio.conversations.TwilioConversationsActivity;
 import com.twilio.conversations.TwilioConversationsException;
@@ -33,6 +36,8 @@ import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
+import static junit.framework.Assert.assertNotNull;
+import static junit.framework.Assert.assertTrue;
 import static junit.framework.Assert.fail;
 
 @RunWith(AndroidJUnit4.class)
@@ -89,16 +94,156 @@ public class VideoConstrainedConversationTests {
         Set<String> participants = new HashSet<>();
         participants.add(SELF_TEST_USER);
 
-        conversationsClient.sendConversationInvite(participants, localMedia, new ConversationCallback() {
+        final CountDownLatch conversationEndsWhenInviteCancelled = new CountDownLatch(1);
+        final OutgoingInvite outgoingInvite = conversationsClient.sendConversationInvite(participants, localMedia, new ConversationCallback() {
             @Override
             public void onConversation(final Conversation conversation, TwilioConversationsException exception) {
-                // The invite from self is never accepted so this should not get called.
+                // The outgoing invite is cancelled and reported as an exception here
+                assertNotNull(exception);
+                conversationEndsWhenInviteCancelled.countDown();
+            }
+        });
+
+        /**
+         * Set a new conversations client listener to handle the stop listening for invites event here
+         */
+        conversationsClient.setConversationsClientListener(new ConversationsClientListener() {
+            @Override
+            public void onStartListeningForInvites(ConversationsClient conversationsClient) {
+
+            }
+
+            @Override
+            public void onStopListeningForInvites(ConversationsClient conversationsClient) {
+                outgoingInvite.cancel();
+            }
+
+            @Override
+            public void onFailedToStartListening(ConversationsClient conversationsClient, TwilioConversationsException exception) {
+
+            }
+
+            @Override
+            public void onIncomingInvite(ConversationsClient conversationsClient, IncomingInvite incomingInvite) {
+
+            }
+
+            @Override
+            public void onIncomingInviteCancelled(ConversationsClient conversationsClient, IncomingInvite incomingInvite) {
+
+            }
+        });
+
+        assertTrue(localVideoTrackFailedLatch.await(20, TimeUnit.SECONDS));
+
+        conversationsClient.unlisten();
+
+        assertTrue(conversationEndsWhenInviteCancelled.await(20, TimeUnit.SECONDS));
+
+        conversationsClient.dispose();
+        TwilioConversations.destroy();
+        while (TwilioConversations.isInitialized());
+    }
+
+    @Test
+    public void startConversationWithValidVideoConstraints() throws InterruptedException {
+        if(requiresRuntimePermissions()) {
+            return;
+        }
+
+        TwilioConversations.setLogLevel(TwilioConversations.LogLevel.DEBUG);
+
+        TwilioAccessManager twilioAccessManager = AccessTokenHelper.obtainTwilioAccessManager(SELF_TEST_USER);
+        ConversationsClient conversationsClient = ConversationsClientHelper.registerClient(activityRule.getActivity(), twilioAccessManager);
+
+        final CountDownLatch localVideoTrackAddedLatch = new CountDownLatch(1);
+        final CountDownLatch localVideoTrackRemovedLatch = new CountDownLatch(1);
+
+        LocalVideoTrack localVideoTrack = createLocalVideoTrackWithVideoConstraints(
+                activityRule.getActivity(),
+                new VideoConstraints.Builder()
+                        .minVideoDimensions(VideoConstraints.CIF_VIDEO_DIMENSIONS)
+                        .maxVideoDimensions(VideoConstraints.VGA_VIDEO_DIMENSIONS)
+                        .build());
+
+        LocalMedia localMedia = LocalMediaFactory.createLocalMedia(new LocalMediaListener() {
+            @Override
+            public void onLocalVideoTrackAdded(LocalMedia localMedia, LocalVideoTrack videoTrack) {
+                localVideoTrackAddedLatch.countDown();
+            }
+
+            @Override
+            public void onLocalVideoTrackRemoved(LocalMedia localMedia, LocalVideoTrack videoTrack) {
+                localVideoTrackRemovedLatch.countDown();
+            }
+
+            @Override
+            public void onLocalVideoTrackError(LocalMedia localMedia, LocalVideoTrack track, TwilioConversationsException exception) {
                 fail();
             }
         });
 
-        localVideoTrackFailedLatch.await(20, TimeUnit.SECONDS);
+        localMedia.addLocalVideoTrack(localVideoTrack);
 
+        /*
+         * Intentionally call the user registered to this client to allow the conversation
+         * to setup its local media without requiring a remote participant.
+         */
+        Set<String> participants = new HashSet<>();
+        participants.add(SELF_TEST_USER);
+
+        final CountDownLatch conversationEndsWhenInviteCancelled = new CountDownLatch(1);
+        final OutgoingInvite outgoingInvite = conversationsClient.sendConversationInvite(participants, localMedia, new ConversationCallback() {
+            @Override
+            public void onConversation(final Conversation conversation, TwilioConversationsException exception) {
+                // The outgoing invite is cancelled and reported as an exception here
+                assertNotNull(exception);
+                conversationEndsWhenInviteCancelled.countDown();
+            }
+        });
+
+        /**
+         * Set a new conversations client listener to handle the stop listening for invites event here
+         */
+        conversationsClient.setConversationsClientListener(new ConversationsClientListener() {
+            @Override
+            public void onStartListeningForInvites(ConversationsClient conversationsClient) {
+
+            }
+
+            @Override
+            public void onStopListeningForInvites(ConversationsClient conversationsClient) {
+                outgoingInvite.cancel();
+            }
+
+            @Override
+            public void onFailedToStartListening(ConversationsClient conversationsClient, TwilioConversationsException exception) {
+
+            }
+
+            @Override
+            public void onIncomingInvite(ConversationsClient conversationsClient, IncomingInvite incomingInvite) {
+
+            }
+
+            @Override
+            public void onIncomingInviteCancelled(ConversationsClient conversationsClient, IncomingInvite incomingInvite) {
+
+            }
+        });
+
+        assertTrue(localVideoTrackAddedLatch.await(20, TimeUnit.SECONDS));
+
+        conversationsClient.unlisten();
+
+        assertTrue(localVideoTrackRemovedLatch.await(20, TimeUnit.SECONDS));
+
+        assertTrue(conversationEndsWhenInviteCancelled.await(20, TimeUnit.SECONDS));
+
+        conversationsClient.dispose();
+        TwilioConversations.destroy();
+
+        while(TwilioConversations.isInitialized());
     }
 
     private LocalVideoTrack createLocalVideoTrackWithVideoConstraints(Context context, VideoConstraints videoConstraints) throws InterruptedException {

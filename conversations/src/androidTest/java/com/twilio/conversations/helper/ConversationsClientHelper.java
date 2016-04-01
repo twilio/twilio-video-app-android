@@ -28,7 +28,7 @@ public class ConversationsClientHelper {
 
                     @Override
                     public void onError(Exception exception) {
-                        fail();
+                        fail(exception.getMessage());
                     }
                 });
 
@@ -45,7 +45,7 @@ public class ConversationsClientHelper {
 
             @Override
             public void onStopListeningForInvites(ConversationsClient conversationsClient) {
-                fail();
+
             }
 
             @Override

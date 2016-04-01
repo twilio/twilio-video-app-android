@@ -48,7 +48,6 @@ public interface ConversationsClient {
      * @param participants Set of participant names as Strings
      * @param localMedia Local Media you would like to use when setting up the new conversation
      * @param conversationCallback The callback that will provide the conversation once it's been created
-     * @throws ConversationClientException
      */
     OutgoingInvite sendConversationInvite(Set<String> participants, LocalMedia localMedia, ConversationCallback conversationCallback);
 
