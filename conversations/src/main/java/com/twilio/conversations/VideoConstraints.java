@@ -95,10 +95,10 @@ public class VideoConstraints {
     }
 
     public static class Builder {
-        private VideoDimensions minVideoDimensions = MIN_VIDEO_DIMENSIONS;
-        private VideoDimensions maxVideoDimensions = MAX_VIDEO_DIMENSIONS;
-        private int minFps = MIN_FRAME_RATE;
-        private int maxFps = MAX_FRAME_RATE;
+        private VideoDimensions minVideoDimensions = new VideoDimensions(0,0);
+        private VideoDimensions maxVideoDimensions = new VideoDimensions(0,0);
+        private int minFps = 0;
+        private int maxFps = 0;
 
         public Builder() { }
 

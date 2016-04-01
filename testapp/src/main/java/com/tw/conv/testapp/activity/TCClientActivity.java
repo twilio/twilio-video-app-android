@@ -15,6 +15,7 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
+import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.view.HapticFeedbackConstants;
@@ -31,6 +32,8 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.appyvet.rangebar.IRangeBarFormatter;
+import com.appyvet.rangebar.RangeBar;
 import com.twilio.common.TwilioAccessManager;
 import com.twilio.common.TwilioAccessManagerFactory;
 import com.twilio.common.TwilioAccessManagerListener;
@@ -67,6 +70,8 @@ import com.twilio.conversations.OutgoingInvite;
 import com.twilio.conversations.Participant;
 import com.twilio.conversations.ParticipantListener;
 import com.twilio.conversations.TwilioConversations;
+import com.twilio.conversations.VideoConstraints;
+import com.twilio.conversations.VideoDimensions;
 import com.twilio.conversations.VideoRendererObserver;
 import com.twilio.conversations.VideoTrack;
 import com.twilio.conversations.VideoViewRenderer;
@@ -74,6 +79,7 @@ import com.twilio.conversations.internal.TwilioConversationsInternal;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -154,6 +160,27 @@ public class TCClientActivity extends AppCompatActivity {
     private TwilioAccessManager accessManager;
     private ExecutorService statsExecutorService;
 
+    private VideoConstraints videoConstraints;
+
+    private int minFps = 0;
+    private int maxFps = 0;
+    private VideoDimensions minVideoDimensions = null;
+    private VideoDimensions maxVideoDimensions = null;
+
+    private static final Map<Integer, VideoDimensions> videoDimensionsMap;
+    static {
+        Map<Integer, VideoDimensions> vdMap = new HashMap<>();
+        vdMap.put(1, VideoConstraints.CIF_VIDEO_DIMENSIONS);
+        vdMap.put(2, VideoConstraints.VGA_VIDEO_DIMENSIONS);
+        vdMap.put(3, VideoConstraints.WVGA_VIDEO_DIMENSIONS);
+        vdMap.put(4, VideoConstraints.HD_540P_VIDEO_DIMENSIONS);
+        vdMap.put(5, VideoConstraints.HD_720P_VIDEO_DIMENSIONS);
+        vdMap.put(6, VideoConstraints.HD_960P_VIDEO_DIMENSIONS);
+        vdMap.put(7, VideoConstraints.HD_S1080P_VIDEO_DIMENSIONS);
+        vdMap.put(8, VideoConstraints.HD_1080P_VIDEO_DIMENSIONS);
+        videoDimensionsMap = Collections.unmodifiableMap(vdMap);
+    }
+
 
     /**
      * FIXME
@@ -233,7 +260,68 @@ public class TCClientActivity extends AppCompatActivity {
 
         addParticipantActionFab = (FloatingActionButton)findViewById(R.id.add_participant_action_fab);
         speakerActionFab = (FloatingActionButton)findViewById(R.id.speaker_action_fab);
-        
+
+        DrawerLayout drawerLayout = (DrawerLayout)findViewById(R.id.navigation_drawer);
+
+        drawerLayout.setDrawerListener(new DrawerLayout.DrawerListener() {
+            @Override
+            public void onDrawerSlide(View drawerView, float slideOffset) {
+
+            }
+
+            @Override
+            public void onDrawerOpened(View drawerView) {
+
+            }
+
+            @Override
+            public void onDrawerClosed(View drawerView) {
+                // Update video constraints
+                videoConstraints = new VideoConstraints.Builder()
+                        .minFps(minFps)
+                        .maxFps(maxFps)
+                        .minVideoDimensions(minVideoDimensions)
+                        .maxVideoDimensions(maxVideoDimensions)
+                        .build();
+            }
+
+            @Override
+            public void onDrawerStateChanged(int newState) {
+
+            }
+        });
+
+        RangeBar fpsRangeBar = (RangeBar)findViewById(R.id.fps_rangebar);
+        RangeBar videoDimensionsRangeBar = (RangeBar)findViewById(R.id.video_dimensions_rangebar);
+
+        videoDimensionsRangeBar.setTickStart(1);
+        videoDimensionsRangeBar.setTickEnd(videoDimensionsMap.size());
+
+        fpsRangeBar.setOnRangeBarChangeListener(new RangeBar.OnRangeBarChangeListener() {
+            @Override
+            public void onRangeChangeListener(RangeBar rangeBar, int leftPinIndex, int rightPinIndex, String leftPinValue, String rightPinValue) {
+                minFps = leftPinIndex;
+                maxFps = rightPinIndex;
+            }
+        });
+
+        videoDimensionsRangeBar.setOnRangeBarChangeListener(new RangeBar.OnRangeBarChangeListener() {
+            @Override
+            public void onRangeChangeListener(RangeBar rangeBar, int leftPinIndex, int rightPinIndex, String leftPinValue, String rightPinValue) {
+                minVideoDimensions = videoDimensionsMap.get(leftPinIndex);
+                maxVideoDimensions = videoDimensionsMap.get(rightPinIndex);
+            }
+        });
+
+        videoDimensionsRangeBar.setFormatter(new IRangeBarFormatter() {
+            @Override
+            public String format(String value) {
+                int position = Integer.decode(value);
+                VideoDimensions videoDimensions = videoDimensionsMap.get(position);
+                return String.valueOf(videoDimensions.width) + ":"  + String.valueOf(videoDimensions.height);
+            }
+        });
+
         String username = getIntent().getExtras().getString(TCCapabilityTokenProvider.USERNAME);
         getSupportActionBar().setTitle(username);
 
@@ -660,7 +748,7 @@ public class TCClientActivity extends AppCompatActivity {
                     cameraCapturer.startPreview();
                     if (localMedia != null) {
                         localContainer = (ViewGroup)findViewById(R.id.localContainer);
-                        LocalVideoTrack videoTrack = LocalVideoTrackFactory.createLocalVideoTrack(cameraCapturer);
+                        LocalVideoTrack videoTrack = createLocalVideoTrack(cameraCapturer);
                         localMedia.addLocalVideoTrack(videoTrack);
                         switchCameraActionFab.hide();
                     } else {
@@ -1388,7 +1476,7 @@ public class TCClientActivity extends AppCompatActivity {
     private LocalMedia createLocalMedia() {
         LocalMedia localMedia = LocalMediaFactory.createLocalMedia(localMediaListener());
         if (videoState != VideoState.DISABLED) {
-            LocalVideoTrack videoTrack = LocalVideoTrackFactory.createLocalVideoTrack(cameraCapturer);
+            LocalVideoTrack videoTrack = createLocalVideoTrack(cameraCapturer);
             localMedia.addLocalVideoTrack(videoTrack);
         }
         if (audioState == AudioState.ENABLED) {
@@ -1399,6 +1487,13 @@ public class TCClientActivity extends AppCompatActivity {
         return localMedia;
     }
 
+    private LocalVideoTrack createLocalVideoTrack(CameraCapturer cameraCapturer) {
+        if(videoConstraints == null) {
+            return LocalVideoTrackFactory.createLocalVideoTrack(cameraCapturer);
+        } else {
+            return LocalVideoTrackFactory.createLocalVideoTrack(cameraCapturer, videoConstraints);
+        }
+    }
     private PendingIntent getRejectPendingIntent() {
         Intent incomingCallRejectIntent = new Intent();
         incomingCallRejectIntent.setClass(this, Rebroadcaster.class);
