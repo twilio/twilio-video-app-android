@@ -453,7 +453,6 @@ public class TCClientActivity extends AppCompatActivity {
 
     private void disposeConversationsClient() {
         if (conversationsClient != null) {
-            conversationsClient.dispose();
             conversationsClient = null;
         }
     }

@@ -6,6 +6,7 @@ import android.support.test.runner.AndroidJUnit4;
 
 import com.twilio.common.TwilioAccessManager;
 import com.twilio.common.TwilioAccessManagerFactory;
+import com.twilio.conversations.activity.TwilioConversationsActivity;
 import com.twilio.conversations.internal.TwilioConversationsInternal;
 import com.twilio.conversations.utils.TwilioConversationsUtils;
 

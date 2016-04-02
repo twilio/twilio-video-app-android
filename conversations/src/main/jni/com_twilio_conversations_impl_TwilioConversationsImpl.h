@@ -7,6 +7,11 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+
+JNIEXPORT jlong JNICALL Java_com_twilio_conversations_impl_ConversationsImpl_createEndpoint
+  (JNIEnv *, jobject, jobject, jobjectArray, jlong);
+
 /*
  * Class:     com_twilio_conversations_impl_TwilioConversationsImpl
  * Method:    initCore
@@ -46,14 +51,6 @@ JNIEXPORT void JNICALL Java_com_twilio_conversations_impl_TwilioConversationsImp
  */
 JNIEXPORT void JNICALL Java_com_twilio_conversations_impl_TwilioConversationsImpl_destroyCore
   (JNIEnv *, jobject);
-
-/*
- * Class:     com_twilio_conversations_impl_TwilioConversationsImpl
- * Method:    createEndpoint
- * Signature: (Ljava/lang/String;J)J
- */
-JNIEXPORT jlong JNICALL Java_com_twilio_conversations_impl_TwilioConversationsImpl_createEndpoint
-  (JNIEnv *, jobject, jobject, jobjectArray, jlong);
 
 /*
  * Class:     com_twilio_conversations_impl_TwilioConversationsImpl

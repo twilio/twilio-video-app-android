@@ -296,11 +296,9 @@ public class TwilioConversationsImpl {
                     if (weakClientRef != null) {
                         ConversationsClientImpl client = weakClientRef.get();
                         if (client != null) {
-                            if (client.getDisposalState() == DisposalState.NOT_DISPOSED) {
-                                client.dispose();
-                                // Add clients that are not disposed to ensure they are disposed later
-                                clientsDisposing.add(client);
-                            }
+                            client.unlisten();
+                            // Add clients that are not disposed to ensure they are disposed later
+                            clientsDisposing.add(client);
                         }
                     }
                 }
@@ -309,7 +307,7 @@ public class TwilioConversationsImpl {
                 while (!clientsDisposing.isEmpty()) {
                     ConversationsClientImpl clientPendingDispose = clientsDisposing.poll();
 
-                    if (clientPendingDispose.getDisposalState() != DisposalState.DISPOSED) {
+                    if (!clientPendingDispose.hasTerminated()) {
                         clientsDisposing.add(clientPendingDispose);
                     }
                 }
@@ -336,18 +334,8 @@ public class TwilioConversationsImpl {
             }
 
             final ConversationsClientImpl conversationsClient = new ConversationsClientImpl(applicationContext,
-                    accessManager, inListener);
-            long nativeEndpointObserverHandle = conversationsClient.getEndpointObserverHandle();
-            if (nativeEndpointObserverHandle == 0) {
-                return null;
-            }
-            final long nativeEndpointHandle = createEndpoint(accessManager, optionsArray,
-                    nativeEndpointObserverHandle);
-            if (nativeEndpointHandle == 0) {
-                return null;
-            }
-            conversationsClient.setNativeEndpointHandle(nativeEndpointHandle);
-            if (conversationsClientMap.size() == 0) {
+                    accessManager, inListener, optionsArray);
+           if (conversationsClientMap.size() == 0) {
                 registerConnectivityBroadcastReceiver();
             }
             conversationsClientMap.put(conversationsClient.getUuid(),
@@ -444,9 +432,6 @@ public class TwilioConversationsImpl {
     private native void onApplicationWakeUp();
     private native void onApplicationBackground();
     private native void destroyCore();
-    private native long createEndpoint(TwilioAccessManager accessManager,
-                                       String[] optionsArray,
-                                       long nativeEndpointObserver);
     private native static void setCoreLogLevel(int level);
     private native static int getCoreLogLevel();
     private native void refreshRegistrations();

@@ -4,6 +4,7 @@
 
 #ifndef _Included_com_twilio_conversations_impl_ConversationImpl
 #define _Included_com_twilio_conversations_impl_ConversationImpl
+
 #ifdef __cplusplus
 extern "C" {
 #endif

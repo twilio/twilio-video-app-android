@@ -4,6 +4,7 @@ import android.support.test.InstrumentationRegistry;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
 
+import com.twilio.conversations.activity.TwilioConversationsActivity;
 import com.twilio.conversations.utils.TwilioConversationsUtils;
 
 import org.junit.After;
@@ -11,8 +12,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import java.util.HashSet;
-import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
@@ -42,76 +41,6 @@ public class ConversationsClientLifecycleTests {
     public void testTwilioCreateConversationsClientWithToken() {
         ConversationsClient conversationsClient = createConversationsClient();
         assertNotNull(conversationsClient);
-    }
-
-    @Test
-    public void testTwilioNotListeningAfterDisposal() {
-        ConversationsClient conversationsClient = createConversationsClient();
-        org.junit.Assert.assertNotNull(conversationsClient);
-
-        conversationsClient.dispose();
-
-        org.junit.Assert.assertFalse(conversationsClient.isListening());
-    }
-
-    @Test(expected = IllegalStateException.class)
-    public void testTwilioCannotListenAfterConversationsClientDisposal() {
-        ConversationsClient conversationsClient = createConversationsClient();
-        assertNotNull(conversationsClient);
-
-        conversationsClient.dispose();
-        conversationsClient.listen();
-    }
-
-    @Test(expected = IllegalStateException.class)
-    public void testTwilioCannotUnlistenAfterConversationsClientDisposal() {
-        ConversationsClient conversationsClient = createConversationsClient();
-        assertNotNull(conversationsClient);
-
-        conversationsClient.dispose();
-        conversationsClient.unlisten();
-    }
-
-    @Test(expected = IllegalStateException.class)
-    public void testTwilioCannotCreateConversationAfterConversationsClientDisposal() {
-        ConversationsClient conversationsClient = createConversationsClient();
-        assertNotNull(conversationsClient);
-
-        conversationsClient.dispose();
-        Set<String> participants = new HashSet<>();
-        participants.add(PARTICIPANT);
-        LocalMedia localMedia = LocalMediaFactory.createLocalMedia(new LocalMediaListener() {
-            @Override
-            public void onLocalVideoTrackAdded(LocalMedia localMedia, LocalVideoTrack localVideoTrack) {
-
-            }
-
-            @Override
-            public void onLocalVideoTrackRemoved(LocalMedia localMedia, LocalVideoTrack localVideoTrack) {
-
-            }
-
-            @Override
-            public void onLocalVideoTrackError(LocalMedia localMedia, LocalVideoTrack localVideoTrack, TwilioConversationsException e) {
-
-            }
-        });
-
-        OutgoingInvite outgoingInvite = conversationsClient.sendConversationInvite(participants, localMedia, new ConversationCallback() {
-            @Override
-            public void onConversation(Conversation conversation, TwilioConversationsException e) {
-
-            }
-        });
-    }
-
-    @Test
-    public void testTwilioMultiDisposeConversationsClient() {
-        for (int i= 1; i < 50; i++) {
-            ConversationsClient conversationsClient = createConversationsClient();
-            assertNotNull(conversationsClient);
-            conversationsClient.dispose();
-        }
     }
 
     private ConversationsClient createConversationsClient() {

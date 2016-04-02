@@ -130,7 +130,9 @@ public class ConversationImpl implements Conversation,
         nativeSession = wrapOutgoingSession(conversationsClient.getNativeHandle(),
                 sessionObserverInternal.getNativeHandle(),
                 participantIdentityArray);
-        conversationSid = getConversationSid(nativeSession);
+        if(nativeSession != 0) {
+            conversationSid = getConversationSid(nativeSession);
+        }
     }
 
     private ConversationImpl(ConversationsClientImpl conversationsClient,
