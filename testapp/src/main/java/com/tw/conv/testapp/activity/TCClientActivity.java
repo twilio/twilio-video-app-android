@@ -265,6 +265,9 @@ public class TCClientActivity extends AppCompatActivity {
         final RangeBar fpsRangeBar = (RangeBar)findViewById(R.id.fps_rangebar);
         final RangeBar videoDimensionsRangeBar = (RangeBar)findViewById(R.id.video_dimensions_rangebar);
 
+        videoDimensionsRangeBar.setTickStart(1);
+        videoDimensionsRangeBar.setTickEnd(videoDimensionsMap.size());
+
         drawerLayout.setDrawerListener(new DrawerLayout.DrawerListener() {
             @Override
             public void onDrawerSlide(View drawerView, float slideOffset) {
@@ -274,7 +277,7 @@ public class TCClientActivity extends AppCompatActivity {
             @Override
             public void onDrawerOpened(View drawerView) {
                 minFps = Integer.valueOf(fpsRangeBar.getLeftPinValue());
-                maxFps = Integer.valueOf(fpsRangeBar.getRightIndex());
+                maxFps = Integer.valueOf(fpsRangeBar.getRightPinValue());
                 minVideoDimensions = videoDimensionsMap.get(videoDimensionsRangeBar.getLeftIndex());
                 maxVideoDimensions = videoDimensionsMap.get(videoDimensionsRangeBar.getRightIndex());
             }
@@ -292,12 +295,16 @@ public class TCClientActivity extends AppCompatActivity {
                 } catch(Exception e) {
                     Snackbar.make(
                             conversationStatusTextView,
-                            "Invalid video constraints specified",
+                            e.getMessage(),
                             Snackbar.LENGTH_LONG)
                             .setAction("Action", null)
                             .show();
                     videoConstraints = null;
                 }
+
+                Timber.i("Video Constraints Fps " + minFps + " " + maxFps);
+                Timber.i("Video Constraints MinVD " + minVideoDimensions.width + " " + minVideoDimensions.height);
+                Timber.i("Video Constraints MaxVD " + maxVideoDimensions.width + " " + maxVideoDimensions.height);
             }
 
             @Override
@@ -305,9 +312,6 @@ public class TCClientActivity extends AppCompatActivity {
 
             }
         });
-
-        videoDimensionsRangeBar.setTickStart(1);
-        videoDimensionsRangeBar.setTickEnd(videoDimensionsMap.size());
 
         fpsRangeBar.setOnRangeBarChangeListener(new RangeBar.OnRangeBarChangeListener() {
             @Override
@@ -328,7 +332,7 @@ public class TCClientActivity extends AppCompatActivity {
         videoDimensionsRangeBar.setFormatter(new IRangeBarFormatter() {
             @Override
             public String format(String value) {
-                int position = Integer.decode(value);
+                int position = Integer.decode(value) - 1;
                 VideoDimensions videoDimensions = videoDimensionsMap.get(position);
                 return String.valueOf(videoDimensions.width) + ":"  + String.valueOf(videoDimensions.height);
             }
