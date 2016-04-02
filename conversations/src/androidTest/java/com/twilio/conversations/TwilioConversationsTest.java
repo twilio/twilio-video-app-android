@@ -48,6 +48,7 @@ public class TwilioConversationsTest {
         TwilioConversationsUtils.destroyTwilioSDK();
     }
 
+    /*
     @Test
     public void testTwilioDestroyWithActiveClient() {
         TwilioConversationsUtils.initializeTwilioSDK(mActivityRule.getActivity().getApplicationContext());
@@ -55,7 +56,9 @@ public class TwilioConversationsTest {
                 conversationsClientListener());
         TwilioConversationsUtils.destroyTwilioSDK();
     }
+    */
 
+    /*
     @Test
     public void testTwilioDestroyWithDisposingClient() {
         TwilioConversationsUtils.initializeTwilioSDK(mActivityRule.getActivity().getApplicationContext());
@@ -65,6 +68,7 @@ public class TwilioConversationsTest {
         conversationsClient.dispose();
         TwilioConversations.destroy();
     }
+    */
 
     @Test
     public void testTwilioInitializationAfterDestroy() {
