@@ -22,6 +22,10 @@
     <string name="fps">Frames per second</string>
     <string name="video_dimensions">Video dimensions</string>
     <string name="video_constraints">Video Constraints</string>
+    <string name="stats">Statistics</string>
+    <string name="enable_stats">Enable Stats</string>
+    <string name="local">Local Media</string>
+    <string name="remote">Remote Media</string>
 
     <string-array name="realm_array">
         <item>Prod</item>

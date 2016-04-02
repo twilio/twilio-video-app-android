@@ -18,6 +18,7 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.text.Html;
 import android.view.HapticFeedbackConstants;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -25,6 +26,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
@@ -117,6 +120,9 @@ public class TCClientActivity extends AppCompatActivity {
     private boolean inBackground = false;
     private boolean loggingOut = false;
     private String realm;
+    private CheckBox statsCheckBox;
+    private LinearLayout statsLayout;
+    private TextView localVideoTrackStatsTextView;
 
     private enum AudioState {
         ENABLED,
@@ -170,14 +176,15 @@ public class TCClientActivity extends AppCompatActivity {
     private static final Map<Integer, VideoDimensions> videoDimensionsMap;
     static {
         Map<Integer, VideoDimensions> vdMap = new HashMap<>();
-        vdMap.put(0, VideoConstraints.CIF_VIDEO_DIMENSIONS);
-        vdMap.put(1, VideoConstraints.VGA_VIDEO_DIMENSIONS);
-        vdMap.put(2, VideoConstraints.WVGA_VIDEO_DIMENSIONS);
-        vdMap.put(3, VideoConstraints.HD_540P_VIDEO_DIMENSIONS);
-        vdMap.put(4, VideoConstraints.HD_720P_VIDEO_DIMENSIONS);
-        vdMap.put(5, VideoConstraints.HD_960P_VIDEO_DIMENSIONS);
-        vdMap.put(6, VideoConstraints.HD_S1080P_VIDEO_DIMENSIONS);
-        vdMap.put(7, VideoConstraints.HD_1080P_VIDEO_DIMENSIONS);
+        vdMap.put(0, new VideoDimensions(0,0));
+        vdMap.put(1, VideoConstraints.CIF_VIDEO_DIMENSIONS);
+        vdMap.put(2, VideoConstraints.VGA_VIDEO_DIMENSIONS);
+        vdMap.put(3, VideoConstraints.WVGA_VIDEO_DIMENSIONS);
+        vdMap.put(4, VideoConstraints.HD_540P_VIDEO_DIMENSIONS);
+        vdMap.put(5, VideoConstraints.HD_720P_VIDEO_DIMENSIONS);
+        vdMap.put(6, VideoConstraints.HD_960P_VIDEO_DIMENSIONS);
+        vdMap.put(7, VideoConstraints.HD_S1080P_VIDEO_DIMENSIONS);
+        vdMap.put(8, VideoConstraints.HD_1080P_VIDEO_DIMENSIONS);
         videoDimensionsMap = Collections.unmodifiableMap(vdMap);
     }
 
@@ -259,6 +266,25 @@ public class TCClientActivity extends AppCompatActivity {
 
         addParticipantActionFab = (FloatingActionButton)findViewById(R.id.add_participant_action_fab);
         speakerActionFab = (FloatingActionButton)findViewById(R.id.speaker_action_fab);
+
+        statsCheckBox = (CheckBox)findViewById(R.id.enable_stats_checkbox);
+        statsLayout = (LinearLayout)findViewById(R.id.stats_layout);
+        statsLayout.setVisibility(View.INVISIBLE);
+
+        localVideoTrackStatsTextView = (TextView)findViewById(R.id.local_video_track_stats_textview);
+
+        statsCheckBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if(conversation != null) {
+                    if(isChecked) {
+                        enableStats();
+                    } else {
+                        disableStats();
+                    }
+                }
+            }
+        });
 
         DrawerLayout drawerLayout = (DrawerLayout)findViewById(R.id.navigation_drawer);
 
@@ -955,17 +981,9 @@ public class TCClientActivity extends AppCompatActivity {
                                     if (e == null) {
                                         TCClientActivity.this.conversation = conversation;
                                         conversation.setConversationListener(conversationListener());
-                                        if (statsExecutorService != null) {
-                                            statsExecutorService.shutdown();
+                                        if(statsCheckBox.isChecked()) {
+                                            enableStats();
                                         }
-                                        statsExecutorService = Executors.newFixedThreadPool(1);
-                                        statsExecutorService.submit(new Runnable() {
-                                            @Override
-                                            public void run() {
-                                                TCClientActivity.this.conversation.setStatsListener(statsListener());
-                                            }
-                                        });
-
                                     } else {
                                         if (e.getErrorCode() == TwilioConversations.CONVERSATION_REJECTED) {
                                             Snackbar.make(conversationStatusTextView, "Invite rejected", Snackbar.LENGTH_LONG)
@@ -996,6 +1014,33 @@ public class TCClientActivity extends AppCompatActivity {
                 }
             }
         };
+    }
+
+    private void enableStats() {
+        if (statsExecutorService != null) {
+            statsExecutorService.shutdown();
+        }
+        statsExecutorService = Executors.newFixedThreadPool(1);
+        statsExecutorService.submit(new Runnable() {
+            @Override
+            public void run() {
+                if(conversation != null) {
+                    conversation.setStatsListener(statsListener());
+                }
+            }
+        });
+        statsLayout.setVisibility(View.VISIBLE);
+    }
+
+    private void disableStats() {
+        if(conversation != null) {
+            conversation.setStatsListener(null);
+            if (statsExecutorService != null) {
+                statsExecutorService.shutdownNow();
+                statsExecutorService = null;
+            }
+        }
+        statsLayout.setVisibility(View.INVISIBLE);
     }
 
     private DialogInterface.OnClickListener cancelCallClickListener() {
@@ -1064,16 +1109,9 @@ public class TCClientActivity extends AppCompatActivity {
                 if (e == null) {
                     TCClientActivity.this.conversation = conversation;
                     conversation.setConversationListener(conversationListener());
-                    if (statsExecutorService != null) {
-                        statsExecutorService.shutdown();
+                    if(statsCheckBox.isChecked()) {
+                        enableStats();
                     }
-                    statsExecutorService = Executors.newFixedThreadPool(1);
-                    statsExecutorService.submit(new Runnable() {
-                        @Override
-                        public void run() {
-                            TCClientActivity.this.conversation.setStatsListener(statsListener());
-                        }
-                    });
                 } else if (e.getErrorCode() == TwilioConversations.TOO_MANY_ACTIVE_CONVERSATIONS) {
                     Timber.w(e.getMessage());
                     conversationsClientStatusTextView
@@ -1200,11 +1238,7 @@ public class TCClientActivity extends AppCompatActivity {
                     }
                 }
                 conversationStatusTextView.setText(status);
-                conversation.setStatsListener(null);
-                if (statsExecutorService != null) {
-                    statsExecutorService.shutdownNow();
-                    statsExecutorService = null;
-                }
+                disableStats();
 
                 // If user is logging out we need to finish that process otherwise we just reset
                 if (loggingOut) {
@@ -1245,8 +1279,33 @@ public class TCClientActivity extends AppCompatActivity {
                     strBld.append("Unknown media type");
                 }
                 Timber.i(strBld.toString());
+
+                if(stats instanceof LocalVideoTrackStatsRecord) {
+                    showLocalVideoTrackStats((LocalVideoTrackStatsRecord)stats);
+                } else if(stats instanceof RemoteVideoTrackStatsRecord) {
+                    showRemoteVideoTrackStats((RemoteVideoTrackStatsRecord)stats);
+                }
             }
         };
+    }
+
+    private void showLocalVideoTrackStats(LocalVideoTrackStatsRecord localVideoTrackStatsRecord) {
+        String localVideoStats =
+                String.format("<b>SID</b> %s<br/>", localVideoTrackStatsRecord.getParticipantSid()) +
+                        '\n' +
+                        String.format("<b>Codec</b> %s<br/>", localVideoTrackStatsRecord.getCodecName()) +
+                        '\n' +
+                        String.format("<b>Capture Dimensions</b> %s<br/>", localVideoTrackStatsRecord.getCaptureDimensions().toString()) +
+                        '\n' +
+                        String.format("<b>Sent Dimensions</b> %s<br/>", localVideoTrackStatsRecord.getSentDimensions().toString()) +
+                        '\n' +
+                        String.format("<b>Fps</b> %d", localVideoTrackStatsRecord.getFrameRate());
+
+        localVideoTrackStatsTextView.setText(Html.fromHtml(localVideoStats));
+    }
+
+    private void showRemoteVideoTrackStats(RemoteVideoTrackStatsRecord remoteVideoTrackStatsRecord) {
+        // TODO: implement me
     }
 
     private ParticipantListener participantListener() {

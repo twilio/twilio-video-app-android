@@ -173,4 +173,72 @@
         </LinearLayout>
     </ScrollView>
 
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:layout_gravity="end"
+        android:background="?android:attr/windowBackground"
+        android:fitsSystemWindows="true" >
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical" >
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/stats"
+                android:textSize="20sp"
+                android:layout_marginTop="@dimen/activity_horizontal_margin"
+                android:layout_marginLeft="@dimen/activity_horizontal_margin" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/activity_horizontal_margin" >
+
+                <CheckBox
+                    android:id="@+id/enable_stats_checkbox"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/enable_stats"/>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/stats_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/local"
+                    android:textSize="16sp"
+                    android:layout_margin="@dimen/activity_horizontal_margin" />
+
+                <TextView
+                    android:id="@+id/local_video_track_stats_textview"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="@dimen/activity_horizontal_margin" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/remote"
+                    android:textSize="16sp"
+                    android:layout_margin="@dimen/activity_horizontal_margin" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </ScrollView>
 </android.support.v4.widget.DrawerLayout>
