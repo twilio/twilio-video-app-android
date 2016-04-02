@@ -226,9 +226,22 @@ protected:
 
         jobject j_error_obj = errorToJavaCoreErrorImpl(code, message);
         CHECK_EXCEPTION(jni()) << "error during NewObject";
-        jni()->CallVoidMethod(*j_observer_global_, j_participant_connected_id,
-                              j_participant_identity, j_participant_sid, j_error_obj);
-        CHECK_EXCEPTION(jni()) << "error during CallVoidMethod";
+        {
+            /*
+             * The core may not quiesce participant did connect error events
+             * even after onStopDidComplete has been called.
+             */
+            rtc::CritScope cs(&deletion_lock_);
+
+            if (!isObserverValid(std::string("onParticipantDidConnect"))) {
+                return;
+            }
+
+            jni()->CallVoidMethod(*j_observer_global_, j_participant_connected_id,
+                                  j_participant_identity, j_participant_sid, j_error_obj);
+            CHECK_EXCEPTION(jni()) << "error during CallVoidMethod";
+        }
+
     }
 
     virtual void onParticipantDidDisconnect(const std::string participant,

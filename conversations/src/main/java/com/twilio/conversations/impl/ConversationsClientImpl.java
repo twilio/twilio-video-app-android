@@ -327,9 +327,6 @@ public class ConversationsClientImpl implements
                     @Override
                     public void run() {
                         // The call ended by the user
-                        if (conversationImpl != null) {
-                            conversationImpl.dispose();
-                        }
                         if(e != null) {
                             outgoingInviteImpl.getConversationCallback()
                                     .onConversation(conversationImpl, e);

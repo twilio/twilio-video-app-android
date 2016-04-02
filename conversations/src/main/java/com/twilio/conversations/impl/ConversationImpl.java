@@ -43,8 +43,6 @@ public class ConversationImpl implements Conversation,
         NativeHandleInterface, SessionObserver, CoreSession {
     private static final String DISPOSE_MESSAGE = "The conversation has been disposed. " +
             "This operation is no longer valid";
-    private static final String FINALIZE_MESSAGE = "Conversations must be released by " +
-            "calling dispose(). Failure to do so may result in leaked resources.";
     private Set<String> invitedParticipants = new HashSet<String>();
     private String inviter;
     private ConversationsClientImpl conversationsClient;
@@ -268,14 +266,6 @@ public class ConversationImpl implements Conversation,
         }
     }
 
-    @Override
-    protected void finalize() throws Throwable {
-        if (disposalState == DisposalState.NOT_DISPOSED || nativeSession != 0) {
-            logger.e(FINALIZE_MESSAGE);
-            dispose();
-        }
-    }
-
     private ParticipantImpl findOrCreateParticipant(String participantIdentity, String participantSid) {
         ParticipantImpl participant = participantMap.get(participantIdentity);
         if(participant == null) {
@@ -303,12 +293,6 @@ public class ConversationImpl implements Conversation,
             // TODO GSDK-492 multi-invite behavior
         }
 
-        if (conversationStatus == ConversationStatus.DISCONNECTED &&
-                disposalState == DisposalState.DISPOSING) {
-            // If the conversation was active, dispose will disconnect the conversation
-            // now we must complete the disposal
-            disposeConversation();
-        }
     }
 
     SessionState getSessionState() {
@@ -345,6 +329,7 @@ public class ConversationImpl implements Conversation,
                     interruptedException.printStackTrace();
                 }
             }
+            disposeConversation();
         }
     }
 
@@ -359,32 +344,32 @@ public class ConversationImpl implements Conversation,
         // Remove this conversation from the client
         conversationsClient.removeConversation(this);
         // Conversations that are rejected do not have a listener
-        if(conversationListener == null) {
-            return;
-        }
-        participantMap.clear();
-        if (error == null) {
-            if(handler != null && conversationListener != null) {
-                handler.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        conversationListener.onConversationEnded(ConversationImpl.this, null);
-                    }
-                });
+        if(conversationListener != null) {
+            participantMap.clear();
+            if (error == null) {
+                if (handler != null && conversationListener != null) {
+                    handler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            conversationListener.onConversationEnded(ConversationImpl.this, null);
+                        }
+                    });
+                }
+            } else {
+                final TwilioConversationsException e =
+                        new TwilioConversationsException(error.getCode(),
+                                error.getMessage());
+                if (handler != null && conversationListener != null) {
+                    handler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            conversationListener.onConversationEnded(ConversationImpl.this, e);
+                        }
+                    });
+                }
             }
-        } else {
-            final TwilioConversationsException e =
-                    new TwilioConversationsException(error.getCode(),
-                            error.getMessage());
-            if(handler != null && conversationListener != null) {
-                handler.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        conversationListener.onConversationEnded(ConversationImpl.this, e);
-                    }
-                });
-            }
         }
+        disposeConversation();
     }
 
     @Override
@@ -777,20 +762,13 @@ public class ConversationImpl implements Conversation,
         return nativeSession;
     }
 
-    @Override
-    public synchronized void dispose() {
+    private synchronized void dispose() {
         checkDisposed();
         disposalState = DisposalState.DISPOSING;
         if (isActive()) {
             // We should disconnect the conversation before disposing
             stop();
-        } else {
-            disposeConversation();
         }
-    }
-
-    public DisposalState getDisposalState() {
-        return disposalState;
     }
 
     public void setLocalMedia(LocalMedia media) {
