@@ -108,8 +108,7 @@
 
     </android.support.design.widget.CoordinatorLayout>
 
-    <LinearLayout
-        android:id="@+id/navigation_view"
+    <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
@@ -117,55 +116,61 @@
         android:background="?android:attr/windowBackground"
         android:fitsSystemWindows="true" >
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/video_constraints"
-            android:textSize="20sp"
-            android:layout_marginTop="@dimen/activity_horizontal_margin"
-            android:layout_marginLeft="@dimen/activity_horizontal_margin" />
-
-        <TextView
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/fps"
-            android:textSize="16sp"
-            android:layout_margin="@dimen/activity_horizontal_margin" />
+            android:layout_height="match_parent"
+            android:orientation="vertical" >
 
-        <com.appyvet.rangebar.RangeBar
-            xmlns:custom="http://schemas.android.com/apk/res-auto"
-            android:id="@+id/fps_rangebar"
-            android:layout_width="match_parent"
-            android:layout_height="72dp"
-            custom:tickStart="1"
-            custom:tickInterval="1"
-            custom:tickEnd="30"
-            custom:pinMinFont="12sp"
-            custom:pinMaxFont="12sp"
-            custom:temporaryPins="false"
-            android:layout_marginLeft="@dimen/activity_horizontal_margin"
-            android:layout_marginRight="@dimen/activity_horizontal_margin" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/video_constraints"
+                android:textSize="20sp"
+                android:layout_marginTop="@dimen/activity_horizontal_margin"
+                android:layout_marginLeft="@dimen/activity_horizontal_margin" />
 
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/video_dimensions"
-            android:textSize="16sp"
-            android:layout_margin="@dimen/activity_horizontal_margin" />
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/fps"
+                android:textSize="16sp"
+                android:layout_margin="@dimen/activity_horizontal_margin" />
 
-        <com.appyvet.rangebar.RangeBar
-            xmlns:custom="http://schemas.android.com/apk/res-auto"
-            android:id="@+id/video_dimensions_rangebar"
-            android:layout_width="match_parent"
-            android:layout_height="100dp"
-            custom:tickInterval="1"
-            custom:pinRadius="30dp"
-            custom:pinMinFont="12sp"
-            custom:pinMaxFont="12sp"
-            custom:temporaryPins="false"
-            android:layout_marginLeft="@dimen/activity_horizontal_margin"
-            android:layout_marginRight="@dimen/activity_horizontal_margin" />
+            <com.appyvet.rangebar.RangeBar
+                xmlns:custom="http://schemas.android.com/apk/res-auto"
+                android:id="@+id/fps_rangebar"
+                android:layout_width="match_parent"
+                android:layout_height="72dp"
+                custom:tickStart="1"
+                custom:tickInterval="1"
+                custom:tickEnd="30"
+                custom:pinMinFont="12sp"
+                custom:pinMaxFont="12sp"
+                custom:temporaryPins="false"
+                android:layout_marginLeft="@dimen/activity_horizontal_margin"
+                android:layout_marginRight="@dimen/activity_horizontal_margin" />
 
-    </LinearLayout>
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/video_dimensions"
+                android:textSize="16sp"
+                android:layout_margin="@dimen/activity_horizontal_margin" />
+
+            <com.appyvet.rangebar.RangeBar
+                xmlns:custom="http://schemas.android.com/apk/res-auto"
+                android:id="@+id/video_dimensions_rangebar"
+                android:layout_width="match_parent"
+                android:layout_height="100dp"
+                custom:tickInterval="1"
+                custom:pinRadius="30dp"
+                custom:pinMinFont="12sp"
+                custom:pinMaxFont="12sp"
+                custom:temporaryPins="false"
+                android:layout_marginLeft="@dimen/activity_horizontal_margin"
+                android:layout_marginRight="@dimen/activity_horizontal_margin" />
+
+        </LinearLayout>
+    </ScrollView>
 
 </android.support.v4.widget.DrawerLayout>

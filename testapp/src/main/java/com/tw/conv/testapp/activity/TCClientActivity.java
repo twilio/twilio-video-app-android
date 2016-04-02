@@ -170,17 +170,16 @@ public class TCClientActivity extends AppCompatActivity {
     private static final Map<Integer, VideoDimensions> videoDimensionsMap;
     static {
         Map<Integer, VideoDimensions> vdMap = new HashMap<>();
-        vdMap.put(1, VideoConstraints.CIF_VIDEO_DIMENSIONS);
-        vdMap.put(2, VideoConstraints.VGA_VIDEO_DIMENSIONS);
-        vdMap.put(3, VideoConstraints.WVGA_VIDEO_DIMENSIONS);
-        vdMap.put(4, VideoConstraints.HD_540P_VIDEO_DIMENSIONS);
-        vdMap.put(5, VideoConstraints.HD_720P_VIDEO_DIMENSIONS);
-        vdMap.put(6, VideoConstraints.HD_960P_VIDEO_DIMENSIONS);
-        vdMap.put(7, VideoConstraints.HD_S1080P_VIDEO_DIMENSIONS);
-        vdMap.put(8, VideoConstraints.HD_1080P_VIDEO_DIMENSIONS);
+        vdMap.put(0, VideoConstraints.CIF_VIDEO_DIMENSIONS);
+        vdMap.put(1, VideoConstraints.VGA_VIDEO_DIMENSIONS);
+        vdMap.put(2, VideoConstraints.WVGA_VIDEO_DIMENSIONS);
+        vdMap.put(3, VideoConstraints.HD_540P_VIDEO_DIMENSIONS);
+        vdMap.put(4, VideoConstraints.HD_720P_VIDEO_DIMENSIONS);
+        vdMap.put(5, VideoConstraints.HD_960P_VIDEO_DIMENSIONS);
+        vdMap.put(6, VideoConstraints.HD_S1080P_VIDEO_DIMENSIONS);
+        vdMap.put(7, VideoConstraints.HD_1080P_VIDEO_DIMENSIONS);
         videoDimensionsMap = Collections.unmodifiableMap(vdMap);
     }
-
 
     /**
      * FIXME
@@ -263,6 +262,9 @@ public class TCClientActivity extends AppCompatActivity {
 
         DrawerLayout drawerLayout = (DrawerLayout)findViewById(R.id.navigation_drawer);
 
+        final RangeBar fpsRangeBar = (RangeBar)findViewById(R.id.fps_rangebar);
+        final RangeBar videoDimensionsRangeBar = (RangeBar)findViewById(R.id.video_dimensions_rangebar);
+
         drawerLayout.setDrawerListener(new DrawerLayout.DrawerListener() {
             @Override
             public void onDrawerSlide(View drawerView, float slideOffset) {
@@ -271,18 +273,31 @@ public class TCClientActivity extends AppCompatActivity {
 
             @Override
             public void onDrawerOpened(View drawerView) {
-
+                minFps = Integer.valueOf(fpsRangeBar.getLeftPinValue());
+                maxFps = Integer.valueOf(fpsRangeBar.getRightIndex());
+                minVideoDimensions = videoDimensionsMap.get(videoDimensionsRangeBar.getLeftIndex());
+                maxVideoDimensions = videoDimensionsMap.get(videoDimensionsRangeBar.getRightIndex());
             }
 
             @Override
             public void onDrawerClosed(View drawerView) {
                 // Update video constraints
-                videoConstraints = new VideoConstraints.Builder()
-                        .minFps(minFps)
-                        .maxFps(maxFps)
-                        .minVideoDimensions(minVideoDimensions)
-                        .maxVideoDimensions(maxVideoDimensions)
-                        .build();
+                try {
+                    videoConstraints = new VideoConstraints.Builder()
+                            .minFps(minFps)
+                            .maxFps(maxFps)
+                            .minVideoDimensions(minVideoDimensions)
+                            .maxVideoDimensions(maxVideoDimensions)
+                            .build();
+                } catch(Exception e) {
+                    Snackbar.make(
+                            conversationStatusTextView,
+                            "Invalid video constraints specified",
+                            Snackbar.LENGTH_LONG)
+                            .setAction("Action", null)
+                            .show();
+                    videoConstraints = null;
+                }
             }
 
             @Override
@@ -291,17 +306,14 @@ public class TCClientActivity extends AppCompatActivity {
             }
         });
 
-        RangeBar fpsRangeBar = (RangeBar)findViewById(R.id.fps_rangebar);
-        RangeBar videoDimensionsRangeBar = (RangeBar)findViewById(R.id.video_dimensions_rangebar);
-
         videoDimensionsRangeBar.setTickStart(1);
         videoDimensionsRangeBar.setTickEnd(videoDimensionsMap.size());
 
         fpsRangeBar.setOnRangeBarChangeListener(new RangeBar.OnRangeBarChangeListener() {
             @Override
             public void onRangeChangeListener(RangeBar rangeBar, int leftPinIndex, int rightPinIndex, String leftPinValue, String rightPinValue) {
-                minFps = leftPinIndex;
-                maxFps = rightPinIndex;
+                minFps = Integer.valueOf(leftPinValue);
+                maxFps = Integer.valueOf(rightPinValue);
             }
         });
 
