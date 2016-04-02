@@ -193,12 +193,6 @@ public class ConversationsClientImpl implements
     public OutgoingInvite sendConversationInvite(Set<String> participants,
                                                  LocalMedia localMedia,
                                                  ConversationCallback conversationCallback) {
-        if(endpointState != EndpointState.REGISTERED) {
-            TwilioConversationsException exception =
-                    new TwilioConversationsException(TwilioConversations.CLIENT_DISCONNECTED,
-                            "The ConversationsClient must be listening to invite.");
-            conversationCallback.onConversation(null, exception);
-        }
         if(participants == null || participants.size() == 0) {
             throw new IllegalStateException("Invite at least one participant");
         }
@@ -212,6 +206,12 @@ public class ConversationsClientImpl implements
             if (participant == null || participant.isEmpty() ) {
                 throw new IllegalArgumentException("Participant cannot be an empty string");
             }
+        }
+        if(endpointState != EndpointState.REGISTERED) {
+            TwilioConversationsException exception =
+                    new TwilioConversationsException(TwilioConversations.CLIENT_DISCONNECTED,
+                            "The ConversationsClient must be listening to invite.");
+            conversationCallback.onConversation(null, exception);
         }
 
         ConversationImpl outgoingConversationImpl = ConversationImpl.createOutgoingConversation(
