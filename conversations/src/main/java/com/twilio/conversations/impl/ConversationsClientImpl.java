@@ -64,6 +64,7 @@ public class ConversationsClientImpl implements
                 }
             });
         }
+
     }
 
     class EndpointObserverInternal implements NativeHandleInterface {
@@ -93,7 +94,6 @@ public class ConversationsClientImpl implements
 
     }
 
-    private final String[] optionsArray;
     private final UUID uuid = UUID.randomUUID();
     private Context context;
     private ConversationsClientListener conversationsClientListener;
@@ -106,6 +106,7 @@ public class ConversationsClientImpl implements
             .newSetFromMap(new ConcurrentHashMap<ConversationImpl, Boolean>());
     private Map<ConversationImpl, OutgoingInviteImpl> pendingOutgoingInvites = new HashMap<>();
     private Map<ConversationImpl, IncomingInviteImpl> pendingIncomingInvites = new HashMap<>();
+    private boolean listening = false;
 
     public UUID getUuid() {
         return uuid;
@@ -122,16 +123,19 @@ public class ConversationsClientImpl implements
         this.context = context;
         this.conversationsClientListener = conversationsClientListener;
         this.accessManager = accessManager;
-        this.optionsArray = optionsArray;
 
         handler = CallbackHandler.create();
         if(handler == null) {
             throw new IllegalThreadStateException("This thread must be able to obtain a Looper");
         }
-    }
 
-    long getEndpointObserverHandle() {
-        return this.endpointObserver.getNativeHandle();
+        endpointObserver = new EndpointObserverInternal(this);
+        nativeEndpointHandle = createEndpoint(accessManager, optionsArray,
+                endpointObserver.getNativeHandle());
+
+        if(nativeEndpointHandle == 0) {
+            throw new IllegalStateException("Native endpoint handle is null");
+        }
     }
 
     int getActiveConversationsCount() {
@@ -146,27 +150,16 @@ public class ConversationsClientImpl implements
 
     @Override
     public synchronized void listen() {
-        if(endpointObserver == null) {
-            endpointObserver = new EndpointObserverInternal(this);
-            nativeEndpointHandle = createEndpoint(accessManager, optionsArray,
-                    endpointObserver.getNativeHandle());
-
-        }
-        if(endpointState != EndpointState.RECONNECTING ||
-                endpointState != EndpointState.REGISTERING ||
-                endpointState != EndpointState.REGISTERED) {
+        if(nativeEndpointHandle != 0) {
+            listening = true;
             listen(nativeEndpointHandle);
-        } else {
-            logger.w("A ConversationsClient listening operation is already in progress");
         }
     }
 
     @Override
     public synchronized void unlisten() {
-        if(endpointState == endpointState.REGISTERED) {
+        if(nativeEndpointHandle != 0) {
             unlisten(nativeEndpointHandle);
-        } else {
-            logger.w("The ConversationsClient is not listening.");
         }
     }
 
@@ -410,7 +403,7 @@ public class ConversationsClientImpl implements
     public void onRegistrationDidComplete(CoreError error) {
         logger.d("onRegistrationDidComplete");
         if (error != null) {
-            disposeClient();
+            listening = false;
             final TwilioConversationsException e =
                     new TwilioConversationsException(error.getCode(), error.getMessage());
             if (handler != null) {
@@ -422,6 +415,7 @@ public class ConversationsClientImpl implements
                 });
             }
         } else {
+            listening = true;
             if (handler != null) {
                 handler.post(new Runnable() {
                     @Override
@@ -436,7 +430,7 @@ public class ConversationsClientImpl implements
     @Override
     public void onUnregistrationDidComplete(CoreError error) {
         logger.d("onUnregistrationDidComplete");
-        disposeClient();
+        listening = false;
         if (handler != null) {
             handler.post(new Runnable() {
                 @Override
@@ -560,11 +554,10 @@ public class ConversationsClientImpl implements
     }
 
     boolean hasTerminated() {
-        return endpointState == EndpointState.UNREGISTERED ||
-                endpointState == EndpointState.UNREGISTRATION_FAILED;
+        return !listening;
     }
 
-    private void disposeClient() {
+    void disposeClient() {
         if (nativeEndpointHandle != 0) {
             freeNativeHandle(nativeEndpointHandle);
             nativeEndpointHandle = 0;

@@ -23,6 +23,7 @@ import android.content.IntentFilter;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
+import android.graphics.Point;
 import android.net.ConnectivityManager;
 import android.os.Bundle;
 import android.os.Handler;
@@ -275,49 +276,52 @@ public class TwilioConversationsImpl {
             unregisterConnectivityBroadcastReceiver();
         }
 
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                Queue<ConversationsClientImpl> clientsDisposing = new ArrayDeque<>();
-                Application application = (Application)
-                        TwilioConversationsImpl.this.applicationContext.getApplicationContext();
-                AlarmManager alarmManager = (AlarmManager) applicationContext
-                        .getSystemService(Context.ALARM_SERVICE);
+        Queue<ConversationsClientImpl> clientsDisposing = new ArrayDeque<>();
+        Application application = (Application)
+                TwilioConversationsImpl.this.applicationContext.getApplicationContext();
+        AlarmManager alarmManager = (AlarmManager) applicationContext
+                .getSystemService(Context.ALARM_SERVICE);
 
-                alarmManager.cancel(wakeUpPendingIntent);
-                application.unregisterActivityLifecycleCallbacks(applicationForegroundTracker);
+        alarmManager.cancel(wakeUpPendingIntent);
+        application.unregisterActivityLifecycleCallbacks(applicationForegroundTracker);
 
-                // Process clients and determine which ones need to be closed
-                for (Map.Entry<UUID, WeakReference<ConversationsClientImpl>> entry :
-                        conversationsClientMap.entrySet()) {
-                    WeakReference<ConversationsClientImpl> weakClientRef =
-                            conversationsClientMap.remove(entry.getKey());
+        // Process clients and determine which ones need to be closed
+        for (Map.Entry<UUID, WeakReference<ConversationsClientImpl>> entry :
+                conversationsClientMap.entrySet()) {
+            WeakReference<ConversationsClientImpl> weakClientRef =
+                    conversationsClientMap.remove(entry.getKey());
 
-                    if (weakClientRef != null) {
-                        ConversationsClientImpl client = weakClientRef.get();
-                        if (client != null) {
-                            client.unlisten();
-                            // Add clients that are not disposed to ensure they are disposed later
-                            clientsDisposing.add(client);
-                        }
+            if (weakClientRef != null) {
+                ConversationsClientImpl client = weakClientRef.get();
+                if (client != null) {
+                    if(!client.hasTerminated()) {
+                        client.unlisten();
+                        // Add clients that are not disposed to ensure they are disposed later
+                        clientsDisposing.add(client);
+                    } else {
+                        client.disposeClient();
                     }
                 }
-
-                // Wait until all clients are disposed.
-                while (!clientsDisposing.isEmpty()) {
-                    ConversationsClientImpl clientPendingDispose = clientsDisposing.poll();
-
-                    if (!clientPendingDispose.hasTerminated()) {
-                        clientsDisposing.add(clientPendingDispose);
-                    }
-                }
-
-                // Now we can teardown the sdk
-                // TODO destroy investigate making this asynchronous with callbacks
-                destroyCore();
-                initialized = false;
             }
-        }).start();
+        }
+
+        // Wait until all clients are disposed.
+        while (!clientsDisposing.isEmpty()) {
+            ConversationsClientImpl clientPendingDispose = clientsDisposing.poll();
+
+            if (!clientPendingDispose.hasTerminated()) {
+                clientsDisposing.add(clientPendingDispose);
+            } else {
+                clientPendingDispose.disposeClient();
+            }
+        }
+
+        // Now we can teardown the sdk
+        // TODO destroy investigate making this asynchronous with callbacks
+        logger.i("Destroying Core");
+        destroyCore();
+        logger.i("Core destroyed");
+        initialized = false;
     }
 
     public ConversationsClientImpl createConversationsClient(TwilioAccessManager accessManager,
