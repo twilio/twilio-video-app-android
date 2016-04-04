@@ -134,7 +134,7 @@ public class ConversationsClientImpl implements
                 endpointObserver.getNativeHandle());
 
         if(nativeEndpointHandle == 0) {
-            throw new IllegalStateException("Native endpoint handle is null");
+            throw new IllegalStateException("Native endpoint handle must not be null");
         }
     }
 
