@@ -2,6 +2,7 @@
 #include <jni.h>
 #include <string.h>
 
+#include "TSCMediaCodecRegistry.h"
 #include "TSCoreSDKTypes.h"
 #include "TSCoreConstants.h"
 #include "TSCoreSDK.h"
@@ -23,9 +24,15 @@
 #include "talk/app/webrtc/java/jni/jni_helpers.h"
 #include "talk/app/webrtc/java/jni/classreferenceholder.h"
 #include "talk/app/webrtc/java/jni/androidnetworkmonitor_jni.h"
+#include "talk/media/webrtc/webrtcvideodecoderfactory.h"
+#include "talk/media/webrtc/webrtcvideoencoderfactory.h"
+#include "android_video_codec_manager.h"
+
 
 #define TAG  "TwilioSDK(native)"
 
+using cricket::WebRtcVideoDecoderFactory;
+using cricket::WebRtcVideoEncoderFactory;
 using namespace webrtc_jni;
 using namespace twiliosdk;
 
@@ -69,9 +76,6 @@ JNIEXPORT jboolean JNICALL Java_com_twilio_conversations_impl_TwilioConversation
     bool failure = false;
     TSCSDK* tscSdk = TSCSDK::instance();
 
-    TSCPlatformDataProviderRef provider = new rtc::RefCountedObject<AndroidPlatformInfoProvider>(env, context);
-    tscSdk->setPlatformDataProvider(provider);
-
     // TODO investigate relocating some of these calls to more timely locations
     if (!media_jvm_set) {
         failure |= webrtc::OpenSLESPlayer::SetAndroidAudioDeviceObjects(GetJVM(), context);
@@ -84,6 +88,15 @@ JNIEXPORT jboolean JNICALL Java_com_twilio_conversations_impl_TwilioConversation
     if (tscSdk != NULL &&
         tscSdk->isInitialized() &&
         !failure) {
+        TSCPlatformDataProviderRef provider =
+                new rtc::RefCountedObject<AndroidPlatformInfoProvider>(env, context);
+        TSCMediaCodecRegistry& codecManager = TSCMediaCodecRegistry::instance();
+        TSCVideoCodecRef androidVideoCodecManager =
+                new rtc::RefCountedObject<AndroidVideoCodecManager>();
+
+        tscSdk->setPlatformDataProvider(provider);
+        codecManager.registerVideoCodec(androidVideoCodecManager);
+
         return JNI_TRUE;
     }
 
