@@ -51,14 +51,6 @@ extern "C" void JNIEXPORT JNICALL JNI_OnUnLoad(JavaVM *jvm, void *reserved) {
     FreeGlobalClassReferenceHolder();
 }
 
-static TwilioCommon::AccessManager* getNativeAccessMgrFromJava(JNIEnv* jni, jobject j_accessMgr) {
-    jclass j_accessManagerClass = GetObjectClass(jni, j_accessMgr);
-    jmethodID getNativeHandleId = GetMethodID(jni, j_accessManagerClass, "getNativeHandle", "()J");
-
-    jlong j_am = jni->CallLongMethod(j_accessMgr, getNativeHandleId);
-    return reinterpret_cast<TwilioCommon::AccessManager*>(j_am);
-}
-
 /*
  * Class:     com_twilio_conversations_impl_TwilioConversationsImpl
  * Method:    initCore
@@ -155,50 +147,6 @@ JNIEXPORT void JNICALL Java_com_twilio_conversations_impl_TwilioConversationsImp
 JNIEXPORT void JNICALL Java_com_twilio_conversations_impl_TwilioConversationsImpl_destroyCore(JNIEnv *env, jobject obj) {
     TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK, kTSCoreLogLevelDebug, "destroyCore");
     TSCSDK::destroy();
-}
-
-JNIEXPORT jlong JNICALL Java_com_twilio_conversations_impl_TwilioConversationsImpl_createEndpoint
-        (JNIEnv *env, jobject obj, jobject j_accessMgr, jobjectArray optionsArray, jlong nativeEndpointObserver) {
-    TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK, kTSCoreLogLevelDebug, "createEndpoint");
-
-    TSCOptions options;
-
-    int size = env->GetArrayLength(optionsArray);
-    int i = 0;
-    while (i < size) {
-        jstring jKey = (jstring)env->GetObjectArrayElement(optionsArray, i); i++;
-        jstring jValue = (jstring)env->GetObjectArrayElement(optionsArray, i); i++;
-        std::string key = JavaToStdString(env, jKey);
-        std::string value = JavaToStdString(env, jValue);
-        options[key] = value;
-        env->DeleteLocalRef(jKey);
-        env->DeleteLocalRef(jValue);
-    }
-
-    if (!nativeEndpointObserver) {
-        TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK, kTSCoreLogLevelError, "nativeEndpointObserver is null");
-        return 0;
-    }
-
-    TSCEndpointObserverPtr *endpointObserver = reinterpret_cast<TSCEndpointObserverPtr *>(nativeEndpointObserver);
-    TwilioCommon::AccessManager* accessManager = getNativeAccessMgrFromJava(env, j_accessMgr);
-
-    if (accessManager == NULL) {
-        TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK, kTSCoreLogLevelError, "AccessManager is null");
-        return 0;
-    }
-
-    if (accessManager->getToken().empty()) {
-        TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK, kTSCoreLogLevelError, "token is null");
-        return 0;
-    }
-
-    TS_CORE_LOG_DEBUG("access token is:%s", accessManager->getToken().c_str());
-
-    TSCEndpointPtr *endpoint = new TSCEndpointPtr();
-    *endpoint = TSCSDK::instance()->createEndpoint(options, accessManager, *endpointObserver);
-
-    return jlongFromPointer(endpoint);
 }
 
 

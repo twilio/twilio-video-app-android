@@ -48,17 +48,8 @@ public interface ConversationsClient {
      * @param participants Set of participant names as Strings
      * @param localMedia Local Media you would like to use when setting up the new conversation
      * @param conversationCallback The callback that will provide the conversation once it's been created
-     * @throws ConversationClientException
      */
     OutgoingInvite sendConversationInvite(Set<String> participants, LocalMedia localMedia, ConversationCallback conversationCallback);
-
-    /**
-     * Releases resources associated with this ConversationsClient object. Note that once this operation completes
-     * the conversations client will no longer be listening for conversations.
-     *
-     * Attempts to use this ConversationsClient object after disposal will result in an IllegalStateException.
-     */
-    void dispose();
 
     /**
      * Sets the audio output speaker for the device.

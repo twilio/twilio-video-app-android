@@ -1,4 +1,4 @@
-package com.twilio.conversations;
+package com.twilio.conversations.activity;
 
 import android.app.Activity;
 import android.os.Bundle;
@@ -9,7 +9,7 @@ public class TwilioConversationsActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         TextView tv = new TextView(this);
-        tv.setText("Hello Android Studio!");
+        tv.setText("Hello Conversations!");
         setContentView(tv);
     }
 }

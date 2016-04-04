@@ -41,30 +41,27 @@ import com.twilio.conversations.impl.util.CallbackHandler;
 
 public class ConversationImpl implements Conversation,
         NativeHandleInterface, SessionObserver, CoreSession {
-    private static final String DISPOSE_MESSAGE = "The conversation has been disposed. " +
+    private static final String DISPOSED_MESSAGE = "The conversation has been destroyed. " +
             "This operation is no longer valid";
-    private static final String FINALIZE_MESSAGE = "Conversations must be released by " +
-            "calling dispose(). Failure to do so may result in leaked resources.";
-    private Set<String> invitedParticipants = new HashSet<String>();
+    private Set<String> invitedParticipants = new HashSet<>();
     private String inviter;
     private ConversationsClientImpl conversationsClient;
     private ConversationListener conversationListener;
     private ConversationStateObserver conversationStateObserver;
-    private Map<String,ParticipantImpl> participantMap = new HashMap<String,ParticipantImpl>();
+    private Map<String,ParticipantImpl> participantMap = new HashMap<>();
     private LocalMediaImpl localMediaImpl;
     private Handler handler;
     private IncomingInviteImpl incomingInviteImpl;
     private OutgoingInviteImpl outgoingInviteImpl;
     private StatsListener statsListener;
     private Handler statsHandler;
-    private DisposalState disposalState = DisposalState.NOT_DISPOSED;
-
 
     private static String TAG = "ConversationImpl";
 
     static final Logger logger = Logger.getLogger(ConversationImpl.class);
     private SessionState state;
     private ConversationStatus conversationStatus;
+    private String conversationSid;
 
     class SessionObserverInternal implements NativeHandleInterface {
 
@@ -133,7 +130,9 @@ public class ConversationImpl implements Conversation,
         nativeSession = wrapOutgoingSession(conversationsClient.getNativeHandle(),
                 sessionObserverInternal.getNativeHandle(),
                 participantIdentityArray);
-
+        if(nativeSession != 0) {
+            conversationSid = getConversationSid(nativeSession);
+        }
     }
 
     private ConversationImpl(ConversationsClientImpl conversationsClient,
@@ -143,6 +142,8 @@ public class ConversationImpl implements Conversation,
         this.conversationsClient = conversationsClient;
         this.conversationStateObserver = conversationStateObserver;
         this.nativeSession = nativeSession;
+
+        conversationSid = getConversationSid(nativeSession);
 
         inviter = participantsIdentities[0];
 
@@ -191,7 +192,6 @@ public class ConversationImpl implements Conversation,
 
     @Override
     public Set<Participant> getParticipants() {
-        checkDisposed();
         Set<Participant> participants =
                 new HashSet<Participant>(participantMap.values());
         return participants;
@@ -218,33 +218,32 @@ public class ConversationImpl implements Conversation,
 
     @Override
     public void setConversationListener(ConversationListener listener) {
+        handler = CallbackHandler.create();
+        if(handler == null) {
+            throw new IllegalThreadStateException("This thread must be able to obtain a Looper");
+        }
         this.conversationListener = listener;
     }
 
     @Override
-    public void invite(Set<String> participantIdentityes) throws IllegalArgumentException {
+    public void invite(Set<String> participantIdentities) throws IllegalArgumentException {
         checkDisposed();
-        if ((participantIdentityes == null) || (participantIdentityes.size() == 0)) {
-            throw new IllegalArgumentException("participantIdentityes cannot be null or empty");
+        if ((participantIdentities == null) || (participantIdentities.size() == 0)) {
+            throw new IllegalArgumentException("participantIdentities cannot be null or empty");
         }
-        inviteParticipants(participantIdentityes);
+        inviteParticipants(participantIdentities);
     }
 
     @Override
     public void disconnect() {
-        checkDisposed();
-        stop();
+        if(nativeSession != 0) {
+            stop();
+        }
     }
 
     @Override
     public String getSid() {
-        checkDisposed();
-        String conversationSid = getConversationSid(nativeSession);
-        if(conversationSid == null || conversationSid.length() == 0) {
-            return null;
-        } else {
-            return conversationSid;
-        }
+        return conversationSid;
     }
 
     @Override
@@ -265,14 +264,6 @@ public class ConversationImpl implements Conversation,
             if (sessionObserverInternal != null) {
                 sessionObserverInternal.enableStats(nativeSession, false);
             }
-        }
-    }
-
-    @Override
-    protected void finalize() throws Throwable {
-        if (disposalState == DisposalState.NOT_DISPOSED || nativeSession != 0) {
-            logger.e(FINALIZE_MESSAGE);
-            dispose();
         }
     }
 
@@ -303,12 +294,6 @@ public class ConversationImpl implements Conversation,
             // TODO GSDK-492 multi-invite behavior
         }
 
-        if (conversationStatus == ConversationStatus.DISCONNECTED &&
-                disposalState == DisposalState.DISPOSING) {
-            // If the conversation was active, dispose will disconnect the conversation
-            // now we must complete the disposal
-            disposeConversation();
-        }
     }
 
     SessionState getSessionState() {
@@ -345,6 +330,7 @@ public class ConversationImpl implements Conversation,
                     interruptedException.printStackTrace();
                 }
             }
+            disposeConversation();
         }
     }
 
@@ -359,32 +345,32 @@ public class ConversationImpl implements Conversation,
         // Remove this conversation from the client
         conversationsClient.removeConversation(this);
         // Conversations that are rejected do not have a listener
-        if(conversationListener == null) {
-            return;
-        }
-        participantMap.clear();
-        if (error == null) {
-            if(handler != null && conversationListener != null) {
-                handler.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        conversationListener.onConversationEnded(ConversationImpl.this, null);
-                    }
-                });
+        if(conversationListener != null) {
+            participantMap.clear();
+            if (error == null) {
+                if (handler != null && conversationListener != null) {
+                    handler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            conversationListener.onConversationEnded(ConversationImpl.this, null);
+                        }
+                    });
+                }
+            } else {
+                final TwilioConversationsException e =
+                        new TwilioConversationsException(error.getCode(),
+                                error.getMessage());
+                if (handler != null && conversationListener != null) {
+                    handler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            conversationListener.onConversationEnded(ConversationImpl.this, e);
+                        }
+                    });
+                }
             }
-        } else {
-            final TwilioConversationsException e =
-                    new TwilioConversationsException(error.getCode(),
-                            error.getMessage());
-            if(handler != null && conversationListener != null) {
-                handler.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        conversationListener.onConversationEnded(ConversationImpl.this, e);
-                    }
-                });
-            }
         }
+        disposeConversation();
     }
 
     @Override
@@ -777,22 +763,6 @@ public class ConversationImpl implements Conversation,
         return nativeSession;
     }
 
-    @Override
-    public synchronized void dispose() {
-        checkDisposed();
-        disposalState = DisposalState.DISPOSING;
-        if (isActive()) {
-            // We should disconnect the conversation before disposing
-            stop();
-        } else {
-            disposeConversation();
-        }
-    }
-
-    public DisposalState getDisposalState() {
-        return disposalState;
-    }
-
     public void setLocalMedia(LocalMedia media) {
         checkDisposed();
         localMediaImpl = (LocalMediaImpl)media;
@@ -922,12 +892,11 @@ public class ConversationImpl implements Conversation,
             nativeSession = 0;
         }
         EglBaseProvider.releaseEglBase();
-        disposalState = DisposalState.DISPOSED;
     }
 
     private synchronized void checkDisposed() {
-        if (disposalState != DisposalState.NOT_DISPOSED || nativeSession == 0) {
-            throw new IllegalStateException(DISPOSE_MESSAGE);
+        if (nativeSession == 0) {
+            throw new IllegalStateException(DISPOSED_MESSAGE);
         }
     }
 
