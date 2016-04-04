@@ -44,6 +44,7 @@ import com.tw.conv.testapp.adapter.RemoteVideoTrackStatsAdapter;
 import com.twilio.common.TwilioAccessManager;
 import com.twilio.common.TwilioAccessManagerFactory;
 import com.twilio.common.TwilioAccessManagerListener;
+import com.twilio.conversations.ClientOptions;
 import com.twilio.conversations.LocalAudioTrackStatsRecord;
 import com.twilio.conversations.LocalVideoTrackStatsRecord;
 import com.twilio.conversations.RemoteVideoTrackStatsRecord;
@@ -82,7 +83,7 @@ import com.twilio.conversations.VideoDimensions;
 import com.twilio.conversations.VideoRendererObserver;
 import com.twilio.conversations.VideoTrack;
 import com.twilio.conversations.VideoViewRenderer;
-import com.twilio.conversations.internal.TwilioConversationsInternal;
+import com.twilio.conversations.internal.ClientOptionsInternal;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -382,7 +383,8 @@ public class TCClientActivity extends AppCompatActivity {
         getSupportActionBar().setTitle(username);
 
         realm = getIntent().getExtras().getString(TCCapabilityTokenProvider.REALM);
-        Map<String, String> options = createOptions(realm);
+        Map<String, String> privateOptions = createPrivateOptions(realm);
+        ClientOptionsInternal options = new ClientOptionsInternal(privateOptions);
 
         // Get the capability token
         capabilityToken = getIntent().getExtras().getString(TCCapabilityTokenProvider.CAPABILITY_TOKEN);
@@ -393,7 +395,7 @@ public class TCClientActivity extends AppCompatActivity {
         accessManager = TwilioAccessManagerFactory.createAccessManager(capabilityToken,
                 accessManagerListener());
 
-        conversationsClient = TwilioConversationsInternal.createConversationsClient(accessManager, options,
+        conversationsClient = TwilioConversations.createConversationsClient(accessManager, options,
                 conversationsClientListener());
 
 
@@ -533,7 +535,7 @@ public class TCClientActivity extends AppCompatActivity {
         super.onDestroy();
     }
 
-    private Map<String, String> createOptions(String realm) {
+    private Map<String, String> createPrivateOptions(String realm) {
         Map<String, String> options = new HashMap<>();
         if (realm.equalsIgnoreCase("dev")) {
             options.put(OPTION_REGISTRAR_KEY, OPTION_DEV_REGISTRAR);

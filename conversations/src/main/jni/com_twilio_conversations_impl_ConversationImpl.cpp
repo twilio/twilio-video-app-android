@@ -58,9 +58,153 @@ JNIEXPORT jlong JNICALL Java_com_twilio_conversations_impl_ConversationImpl_wrap
     return webrtc_jni::jlongFromPointer(outgoingSession);
 }
 
+TSCConstraintsRef createVideoConstraints(JNIEnv *env, jobject j_video_constraints) {
+    TSCConstraintsRef constraints = new TSCConstraintsObject();
+
+    TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK, kTSCoreLogLevelDebug, "Parsing video constraints");
+
+    jclass video_constraints_class = env->GetObjectClass(j_video_constraints);
+    jfieldID min_fps_field =
+            env->GetFieldID(video_constraints_class, "minFps", "I");
+    jfieldID max_fps_field =
+            env->GetFieldID(video_constraints_class, "maxFps", "I");
+    int min_fps =
+            env->GetIntField(j_video_constraints, min_fps_field);
+    int max_fps =
+            env->GetIntField(j_video_constraints, max_fps_field);
+
+    TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK, kTSCoreLogLevelDebug,
+                       "Video constraints minFps %d maxFps %d",
+                       min_fps,
+                       max_fps);
+
+    jfieldID min_video_dimensions_field = GetFieldID(env,
+                                                     video_constraints_class,
+                                                     "minVideoDimensions",
+                                                     "Lcom/twilio/conversations/VideoDimensions;");
+    jfieldID max_video_dimensions_field = GetFieldID(env,
+                                                     video_constraints_class,
+                                                     "maxVideoDimensions",
+                                                     "Lcom/twilio/conversations/VideoDimensions;");
+
+    jobject j_min_video_dimensions = env->GetObjectField(j_video_constraints, min_video_dimensions_field);
+    jclass min_video_dimensions_class = env->GetObjectClass(j_min_video_dimensions);
+    jfieldID min_width_field =
+            env->GetFieldID(min_video_dimensions_class, "width", "I");
+    jfieldID min_height_field =
+            env->GetFieldID(min_video_dimensions_class, "height", "I");
+    int min_width =
+            env->GetIntField(j_min_video_dimensions, min_width_field);
+    int min_height =
+            env->GetIntField(j_min_video_dimensions, min_height_field);
+
+    TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK, kTSCoreLogLevelDebug,
+                       "Video constraints min width %d min height %d",
+                       min_width,
+                       min_height);
+
+    jobject j_max_video_dimensions = env->GetObjectField(j_video_constraints, max_video_dimensions_field);
+    jclass max_video_dimensions_class = env->GetObjectClass(j_max_video_dimensions);
+    jfieldID max_width_field =
+            env->GetFieldID(max_video_dimensions_class, "width", "I");
+    jfieldID max_height_field =
+            env->GetFieldID(max_video_dimensions_class, "height", "I");
+    int max_width =
+            env->GetIntField(j_max_video_dimensions, max_width_field);
+    int max_height =
+            env->GetIntField(j_max_video_dimensions, max_height_field);
+
+    TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK, kTSCoreLogLevelDebug,
+                       "Video constraints max width %d max height %d",
+                       max_width,
+                       max_height);
+
+
+    if (max_fps > 0) {
+        constraints->SetMandatory(twiliosdk::TSCConstraints::kMaxFrameRate, max_fps);
+    }
+    if (min_fps > 0) {
+        constraints->SetMandatory(twiliosdk::TSCConstraints::kMinFrameRate, min_fps);
+    }
+
+    if (max_width > 0 && max_height > 0) {
+        constraints->SetMandatory(twiliosdk::TSCConstraints::kMaxWidth, max_width);
+        constraints->SetMandatory(twiliosdk::TSCConstraints::kMaxHeight, max_height);
+    }
+    if (min_width > 0 && min_height > 0) {
+        constraints->SetMandatory(twiliosdk::TSCConstraints::kMinWidth, min_width);
+        constraints->SetMandatory(twiliosdk::TSCConstraints::kMinHeight, min_height);
+    }
+    return constraints;
+}
+
+twiliosdk::IceOptions createIceOptions(JNIEnv *env, jobjectArray j_iceServers,
+                                       jobject j_iceTransportPolicy) {
+    twiliosdk::IceOptions iceOptions;
+    twiliosdk::IceServers coreServers;
+    if (!webrtc_jni::IsNull(env, j_iceServers)) {
+        int size = env->GetArrayLength(j_iceServers);
+        if (size == 0) {
+            TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK, kTSCoreLogLevelDebug, "no ice servers were provided");
+        } else {
+            // Adding IceServers
+            for (int i=0; i<size; i++) {
+                twiliosdk::IceServer coreServer;
+
+                jobject ice_server = (jobject)env->GetObjectArrayElement(j_iceServers, i);
+                jclass ice_server_class = env->GetObjectClass(ice_server);
+                jfieldID server_url_field = env->GetFieldID(ice_server_class, "serverUrl", "Ljava/lang/String;");
+                jfieldID username_field = env->GetFieldID(ice_server_class, "username", "Ljava/lang/String;");
+                jfieldID password_field = env->GetFieldID(ice_server_class, "password", "Ljava/lang/String;");
+                jstring j_server_url = (jstring)env->GetObjectField(ice_server, server_url_field);
+                jstring j_username = (jstring)env->GetObjectField(ice_server, username_field);
+                jstring j_password = (jstring)env->GetObjectField(ice_server, password_field);
+                std::string server_url = webrtc_jni::JavaToStdString(env,j_server_url);
+                std::vector<std::string> urls;
+                urls.push_back(server_url);
+                coreServer.urls = urls;
+
+                if (!webrtc_jni::IsNull(env, j_username)) {
+                    std::string username  = webrtc_jni::JavaToStdString(env, j_username);
+                    if (username.length() > 0) {
+                        coreServer.username = username;
+                    }
+                }
+
+                if (!webrtc_jni::IsNull(env, j_password)) {
+                    std::string password  = webrtc_jni::JavaToStdString(env, j_password);
+                    if (password.length() > 0) {
+                        coreServer.password = password;
+                    }
+                }
+
+                coreServers.push_back(coreServer);
+            }
+            iceOptions.ice_servers = coreServers;
+        }
+    }
+
+    if (!webrtc_jni::IsNull(env, j_iceTransportPolicy)) {
+        //jclass enumClass = env->FindClass("com/twilio/conversations/IceTransportPolicy");
+        jclass ice_policy_class = env->GetObjectClass(j_iceTransportPolicy);
+        jmethodID name_id = env->GetMethodID(ice_policy_class, "name", "()Ljava/lang/String;");
+        jstring j_ice_policy = (jstring)env->CallObjectMethod(j_iceTransportPolicy, name_id);
+        std::string ice_policy = webrtc_jni::JavaToStdString(env, j_ice_policy);
+
+        if (ice_policy.compare("ICE_TRANSPORT_POLICY_RELAY") == 0) {
+            iceOptions.ice_transport_policy = IceTransportPolicy::kIceTransportPolicyRelay;
+        } else {
+            iceOptions.ice_transport_policy = IceTransportPolicy::kIceTransportPolicyAll;
+        }
+    }
+    return iceOptions;
+}
+
 
 JNIEXPORT void JNICALL Java_com_twilio_conversations_impl_ConversationImpl_start
-        (JNIEnv *env, jobject obj, jlong nativeSession, jboolean j_enableAudio, jboolean j_muteAudio, jboolean j_enableVideo, jboolean j_pauseVideo, jobject j_video_constraints)
+        (JNIEnv *env, jobject obj, jlong nativeSession, jboolean j_enableAudio,
+         jboolean j_muteAudio, jboolean j_enableVideo, jboolean j_pauseVideo,
+             jobject j_video_constraints, jobjectArray j_iceServers, jobject j_iceTransportPolicy)
 {
     TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK, kTSCoreLogLevelDebug, "start");
     TSCSessionPtr *session = reinterpret_cast<TSCSessionPtr *>(nativeSession);
@@ -70,101 +214,24 @@ JNIEXPORT void JNICALL Java_com_twilio_conversations_impl_ConversationImpl_start
     bool enableVideo = j_enableVideo == JNI_TRUE ? true : false;
     bool pauseVideo = j_pauseVideo == JNI_TRUE ? true : false;
 
+
+
     TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK, kTSCoreLogLevelDebug, "local media config: %s, %s, %s, %s",
                        (enableAudio ? "enabledAudio = true":"enabledAudio = false"),
                        (muteAudio ? "muteAudio = true":"muteAudio = false"),
                        (enableVideo ? "enableVideo = true":"enableVideo=false"),
                        (pauseVideo ? "pauseVideo=true":"pauseVideo=false"));
 
+    twiliosdk::IceOptions iceOptions = createIceOptions(env, j_iceServers, j_iceTransportPolicy);
+
+
+    twiliosdk::TSCSessionMediaConstraintsObject *mediaConstraints = new TSCSessionMediaConstraintsObject(
+            enableAudio, muteAudio, enableVideo, pauseVideo, true, true, iceOptions);
     if(webrtc_jni::IsNull(env, j_video_constraints)) {
-        session->get()->start(
-                new TSCSessionMediaConstraintsObject(enableAudio,
-                                                     muteAudio,
-                                                     enableVideo,
-                                                     pauseVideo));
+        session->get()->start(mediaConstraints);
     } else {
-        TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK, kTSCoreLogLevelDebug, "Parsing video constraints");
-
-        jclass video_constraints_class = env->GetObjectClass(j_video_constraints);
-        jfieldID min_fps_field =
-                env->GetFieldID(video_constraints_class, "minFps", "I");
-        jfieldID max_fps_field =
-                env->GetFieldID(video_constraints_class, "maxFps", "I");
-        int min_fps =
-                env->GetIntField(j_video_constraints, min_fps_field);
-        int max_fps =
-                env->GetIntField(j_video_constraints, max_fps_field);
-
-        TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK, kTSCoreLogLevelDebug,
-                           "Video constraints minFps %d maxFps %d",
-                            min_fps,
-                            max_fps);
-
-        jfieldID min_video_dimensions_field = GetFieldID(env,
-                                                         video_constraints_class,
-                                                         "minVideoDimensions",
-                                                         "Lcom/twilio/conversations/VideoDimensions;");
-        jfieldID max_video_dimensions_field = GetFieldID(env,
-                                                         video_constraints_class,
-                                                         "maxVideoDimensions",
-                                                         "Lcom/twilio/conversations/VideoDimensions;");
-
-        jobject j_min_video_dimensions = env->GetObjectField(j_video_constraints, min_video_dimensions_field);
-        jclass min_video_dimensions_class = env->GetObjectClass(j_min_video_dimensions);
-        jfieldID min_width_field =
-                env->GetFieldID(min_video_dimensions_class, "width", "I");
-        jfieldID min_height_field =
-                env->GetFieldID(min_video_dimensions_class, "height", "I");
-        int min_width =
-                env->GetIntField(j_min_video_dimensions, min_width_field);
-        int min_height =
-                env->GetIntField(j_min_video_dimensions, min_height_field);
-
-        TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK, kTSCoreLogLevelDebug,
-                           "Video constraints min width %d min height %d",
-                            min_width,
-                            min_height);
-
-        jobject j_max_video_dimensions = env->GetObjectField(j_video_constraints, max_video_dimensions_field);
-        jclass max_video_dimensions_class = env->GetObjectClass(j_max_video_dimensions);
-        jfieldID max_width_field =
-                env->GetFieldID(max_video_dimensions_class, "width", "I");
-        jfieldID max_height_field =
-                env->GetFieldID(max_video_dimensions_class, "height", "I");
-        int max_width =
-                env->GetIntField(j_max_video_dimensions, max_width_field);
-        int max_height =
-                env->GetIntField(j_max_video_dimensions, max_height_field);
-
-        TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK, kTSCoreLogLevelDebug,
-                           "Video constraints max width %d max height %d",
-                            max_width,
-                            max_height);
-
-        TSCConstraintsRef constraints = new TSCConstraintsObject();
-
-        if (max_fps > 0) {
-            constraints->SetMandatory(twiliosdk::TSCConstraints::kMaxFrameRate, max_fps);
-        }
-        if (min_fps > 0) {
-            constraints->SetMandatory(twiliosdk::TSCConstraints::kMinFrameRate, min_fps);
-        }
-
-        if (max_width > 0 && max_height > 0) {
-            constraints->SetMandatory(twiliosdk::TSCConstraints::kMaxWidth, max_width);
-            constraints->SetMandatory(twiliosdk::TSCConstraints::kMaxHeight, max_height);
-        }
-        if (min_width > 0 && min_height > 0) {
-            constraints->SetMandatory(twiliosdk::TSCConstraints::kMinWidth, min_width);
-            constraints->SetMandatory(twiliosdk::TSCConstraints::kMinHeight, min_height);
-        }
-
-        session->get()->start(
-                new TSCSessionMediaConstraintsObject(enableAudio,
-                                                     muteAudio,
-                                                     enableVideo,
-                                                     pauseVideo),
-                                                     constraints);
+        TSCConstraintsRef videoConstraints = createVideoConstraints(env, j_video_constraints);
+        session->get()->start(mediaConstraints, videoConstraints);
     }
 }
 
