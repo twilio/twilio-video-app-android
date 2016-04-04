@@ -1,33 +1,44 @@
-package com.twilio.conversations.videoconstraints;
+package com.twilio.conversations;
 
-import android.support.test.rule.ActivityTestRule;
-import android.support.test.runner.AndroidJUnit4;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.LinearLayout;
-
-import com.twilio.conversations.CameraCapturer;
-import com.twilio.conversations.CameraCapturerFactory;
-import com.twilio.conversations.CapturerErrorListener;
-import com.twilio.conversations.CapturerException;
-import com.twilio.conversations.LocalVideoTrack;
-import com.twilio.conversations.LocalVideoTrackFactory;
-import com.twilio.conversations.TwilioConversationsActivity;
-import com.twilio.conversations.VideoConstraints;
-
-import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import static junit.framework.Assert.assertEquals;
-import static junit.framework.Assert.assertNotNull;
+import static junit.framework.Assert.*;
 
-@RunWith(AndroidJUnit4.class)
-public class VideoConstraintsNegativeTests {
+public class VideoConstraintsUnitTests {
 
-    @Rule
-    public ActivityTestRule<TwilioConversationsActivity> mActivityRule = new ActivityTestRule<>(
-            TwilioConversationsActivity.class);
+    @Test
+    public void createCustomMinAndMaxDimensions() {
+        int dummyMinWidth = 100;
+        int dummyMinHeight = 200;
+        int dummyMaxWidth = 300;
+        int dummyMaxHeight = 400;
+
+        VideoConstraints videoConstraints = new VideoConstraints.Builder()
+                .minVideoDimensions(new VideoDimensions(dummyMinWidth, dummyMinHeight))
+                .maxVideoDimensions(new VideoDimensions(dummyMaxWidth, dummyMaxHeight))
+                .build();
+
+        assertEquals(dummyMinWidth, videoConstraints.getMinVideoDimensions().width);
+        assertEquals(dummyMinHeight, videoConstraints.getMinVideoDimensions().height);
+        assertEquals(dummyMaxWidth, videoConstraints.getMaxVideoDimensions().width);
+        assertEquals(dummyMaxHeight, videoConstraints.getMaxVideoDimensions().height);
+    }
+
+    @Test
+    public void createVideoConstraints() {
+        VideoConstraints videoConstraints = new VideoConstraints.Builder()
+                .minVideoDimensions(VideoConstraints.CIF_VIDEO_DIMENSIONS)
+                .maxVideoDimensions(VideoConstraints.HD_720P_VIDEO_DIMENSIONS)
+                .minFps(VideoConstraints.FRAME_RATE_10)
+                .maxFps(VideoConstraints.FRAME_RATE_24)
+                .build();
+
+        assertEquals(VideoConstraints.CIF_VIDEO_DIMENSIONS, videoConstraints.getMinVideoDimensions());
+        assertEquals(VideoConstraints.HD_720P_VIDEO_DIMENSIONS, videoConstraints.getMaxVideoDimensions());
+        assertEquals(VideoConstraints.FRAME_RATE_10, videoConstraints.getMinFps());
+        assertEquals(VideoConstraints.FRAME_RATE_24, videoConstraints.getMaxFps());
+    }
 
     @Test(expected = NullPointerException.class)
     public void useInvalidMinVideoDimensions() {
@@ -89,26 +100,6 @@ public class VideoConstraintsNegativeTests {
                 .build();
 
         LocalVideoTrackFactory.createLocalVideoTrack(cameraCapturer, videoConstraints);
-    }
-
-    @Test(expected = NullPointerException.class)
-    public void localVideoTrackWithNullVideoConstraints() {
-        ViewGroup viewGroup = new LinearLayout(mActivityRule.getActivity());
-        CameraCapturer cameraCapturer = CameraCapturerFactory.
-                createCameraCapturer(
-                        mActivityRule.getActivity(),
-                        CameraCapturer.CameraSource.CAMERA_SOURCE_FRONT_CAMERA,
-                        viewGroup,
-                        new CapturerErrorListener() {
-                            @Override
-                            public void onError(CapturerException e) {
-
-                            }
-                        });
-
-        assertNotNull(cameraCapturer);
-
-        LocalVideoTrackFactory.createLocalVideoTrack(cameraCapturer, null);
     }
 
 }

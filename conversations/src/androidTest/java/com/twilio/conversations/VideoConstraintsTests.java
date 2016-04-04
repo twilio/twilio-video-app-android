@@ -1,28 +1,13 @@
-package com.twilio.conversations.videoconstraints;
+package com.twilio.conversations;
 
 import android.content.Context;
 import android.os.Build;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
+import android.view.ViewGroup;
+import android.widget.LinearLayout;
 
 import com.twilio.common.TwilioAccessManager;
-import com.twilio.conversations.CameraCapturer;
-import com.twilio.conversations.Conversation;
-import com.twilio.conversations.ConversationCallback;
-import com.twilio.conversations.ConversationsClient;
-import com.twilio.conversations.ConversationsClientListener;
-import com.twilio.conversations.IncomingInvite;
-import com.twilio.conversations.LocalMedia;
-import com.twilio.conversations.LocalMediaFactory;
-import com.twilio.conversations.LocalMediaListener;
-import com.twilio.conversations.LocalVideoTrack;
-import com.twilio.conversations.LocalVideoTrackFactory;
-import com.twilio.conversations.OutgoingInvite;
-import com.twilio.conversations.TwilioConversations;
-import com.twilio.conversations.TwilioConversationsActivity;
-import com.twilio.conversations.TwilioConversationsException;
-import com.twilio.conversations.VideoConstraints;
-import com.twilio.conversations.VideoDimensions;
 import com.twilio.conversations.helper.AccessTokenHelper;
 import com.twilio.conversations.helper.CameraCapturerHelper;
 import com.twilio.conversations.helper.ConversationsClientHelper;
@@ -41,12 +26,32 @@ import static junit.framework.Assert.assertTrue;
 import static junit.framework.Assert.fail;
 
 @RunWith(AndroidJUnit4.class)
-public class VideoConstrainedConversationTests {
+public class VideoConstraintsTests {
     private static final String SELF_TEST_USER = "SELF_TEST_USER";
 
     @Rule
     public ActivityTestRule<TwilioConversationsActivity> activityRule = new ActivityTestRule<>(
             TwilioConversationsActivity.class);
+
+    @Test(expected = NullPointerException.class)
+    public void localVideoTrackWithNullVideoConstraints() {
+        ViewGroup viewGroup = new LinearLayout(activityRule.getActivity());
+        CameraCapturer cameraCapturer = CameraCapturerFactory.
+                createCameraCapturer(
+                        activityRule.getActivity(),
+                        CameraCapturer.CameraSource.CAMERA_SOURCE_FRONT_CAMERA,
+                        viewGroup,
+                        new CapturerErrorListener() {
+                            @Override
+                            public void onError(CapturerException e) {
+
+                            }
+                        });
+
+        assertNotNull(cameraCapturer);
+
+        LocalVideoTrackFactory.createLocalVideoTrack(cameraCapturer, null);
+    }
 
     @Test
     public void startConversationWithInvalidVideoConstraints() throws InterruptedException {
