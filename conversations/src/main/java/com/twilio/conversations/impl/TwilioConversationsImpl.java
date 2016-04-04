@@ -295,27 +295,9 @@ public class TwilioConversationsImpl {
             if (weakClientRef != null) {
                 ConversationsClientImpl client = weakClientRef.get();
                 if (client != null) {
-                    if(!client.hasTerminated()) {
-                        client.unlisten();
-                        // Add clients that are not disposed to ensure they are disposed later
-                        clientsDisposing.add(client);
-                    } else {
-                        client.disposeClient();
-                    }
+                    // Dispose of the client regardless of whether it is still listening.
+                    client.disposeClient();
                 }
-            }
-        }
-
-        // Wait until all clients are disposed.
-        while (!clientsDisposing.isEmpty()) {
-            ConversationsClientImpl clientPendingDispose = clientsDisposing.poll();
-
-            if (!clientPendingDispose.hasTerminated()) {
-                clientsDisposing.add(clientPendingDispose);
-                // Continue calling unlisten() until the client is terminated
-                clientPendingDispose.unlisten();
-            } else {
-                clientPendingDispose.disposeClient();
             }
         }
 

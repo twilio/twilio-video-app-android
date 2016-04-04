@@ -288,9 +288,21 @@ protected:
 
         jobject j_media_info = mediaStrInfoJavaMediaStrInfoImpl(stream);
         CHECK_EXCEPTION(jni()) << "error during NewObject";
-        jni()->CallVoidMethod(
-                *j_observer_global_, j_media_stream_removed_id, j_media_info);
-        CHECK_EXCEPTION(jni()) << "error during CallVoidMethod";
+        {
+            /*
+             * The core may not quiesce onMediaStreamDidRemove events
+             * even after onStopDidComplete has been called.
+             */
+            rtc::CritScope cs(&deletion_lock_);
+
+            if (!isObserverValid(std::string("onMediaStreamDidRemove"))) {
+                return;
+            }
+
+            jni()->CallVoidMethod(
+                    *j_observer_global_, j_media_stream_removed_id, j_media_info);
+            CHECK_EXCEPTION(jni()) << "error during CallVoidMethod";
+        }
     }
 
     virtual void onVideoTrackDidAdd(TSCVideoTrackInfoObject* trackInfo,
