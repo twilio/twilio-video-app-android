@@ -312,6 +312,8 @@ public class TwilioConversationsImpl {
 
             if (!clientPendingDispose.hasTerminated()) {
                 clientsDisposing.add(clientPendingDispose);
+                // Continue calling unlisten() until the client is terminated
+                clientPendingDispose.unlisten();
             } else {
                 clientPendingDispose.disposeClient();
             }
