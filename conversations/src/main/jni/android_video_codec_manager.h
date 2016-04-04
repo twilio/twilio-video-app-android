@@ -18,12 +18,15 @@ using namespace twiliosdk;
 class AndroidVideoCodecManager : public ITSCVideoCodec {
 
 public:
+    static const std::string videoCodecName;
+
     AndroidVideoCodecManager();
 
     virtual ~AndroidVideoCodecManager() {}
     virtual cricket::WebRtcVideoEncoderFactory* createVideoEncoderFactory();
     virtual cricket::WebRtcVideoDecoderFactory* createVideoDecoderFactory();
     virtual const std::string getName();
+
 };
 
 #endif //ANDROID_VIDEO_CODEC_MANAGER_H

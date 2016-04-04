@@ -90,7 +90,7 @@ JNIEXPORT jboolean JNICALL Java_com_twilio_conversations_impl_TwilioConversation
         !failure) {
         TSCPlatformDataProviderRef provider =
                 new rtc::RefCountedObject<AndroidPlatformInfoProvider>(env, context);
-        TSCMediaCodecRegistry& codecManager = TSCMediaCodecRegistry::instance();
+        TSCMediaCodecRegistry& codecManager = tscSdk->getMediaCodecRegistry();
         TSCVideoCodecRef androidVideoCodecManager =
                 new rtc::RefCountedObject<AndroidVideoCodecManager>();
 
@@ -167,6 +167,10 @@ JNIEXPORT void JNICALL Java_com_twilio_conversations_impl_TwilioConversationsImp
  */
 JNIEXPORT void JNICALL Java_com_twilio_conversations_impl_TwilioConversationsImpl_destroyCore(JNIEnv *env, jobject obj) {
     TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK, kTSCoreLogLevelDebug, "destroyCore");
+    TSCSDK* tscSdk = TSCSDK::instance();
+    TSCMediaCodecRegistry& codecManager = tscSdk->getMediaCodecRegistry();
+
+    codecManager.unregisterVideoCodecsForName(AndroidVideoCodecManager::videoCodecName);
     TSCSDK::destroy();
 }
 
