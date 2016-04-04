@@ -18,6 +18,9 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.text.Html;
 import android.view.HapticFeedbackConstants;
 import android.view.Menu;
@@ -37,6 +40,7 @@ import android.widget.TextView;
 
 import com.appyvet.rangebar.IRangeBarFormatter;
 import com.appyvet.rangebar.RangeBar;
+import com.tw.conv.testapp.adapter.RemoteVideoTrackStatsAdapter;
 import com.twilio.common.TwilioAccessManager;
 import com.twilio.common.TwilioAccessManagerFactory;
 import com.twilio.common.TwilioAccessManagerListener;
@@ -84,6 +88,7 @@ import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
@@ -123,6 +128,9 @@ public class TCClientActivity extends AppCompatActivity {
     private CheckBox statsCheckBox;
     private LinearLayout statsLayout;
     private TextView localVideoTrackStatsTextView;
+    private RemoteVideoTrackStatsAdapter remoteVideoTrackStatsAdapter;
+    private LinkedHashMap<String, RemoteVideoTrackStatsRecord> remoteVideoTrackStatsRecordMap = new LinkedHashMap<>();
+    private RecyclerView remoteStatsRecyclerView;
 
     private enum AudioState {
         ENABLED,
@@ -270,6 +278,13 @@ public class TCClientActivity extends AppCompatActivity {
         statsCheckBox = (CheckBox)findViewById(R.id.enable_stats_checkbox);
         statsLayout = (LinearLayout)findViewById(R.id.stats_layout);
         statsLayout.setVisibility(View.INVISIBLE);
+
+        remoteStatsRecyclerView = (RecyclerView) findViewById(R.id.stats_recycler_view);
+        remoteVideoTrackStatsAdapter = new RemoteVideoTrackStatsAdapter(remoteVideoTrackStatsRecordMap);
+        remoteStatsRecyclerView.setAdapter(remoteVideoTrackStatsAdapter);
+        remoteStatsRecyclerView.setHasFixedSize(false);
+        remoteStatsRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        remoteStatsRecyclerView.setItemAnimator(new DefaultItemAnimator());
 
         localVideoTrackStatsTextView = (TextView)findViewById(R.id.local_video_track_stats_textview);
 
@@ -1040,6 +1055,9 @@ public class TCClientActivity extends AppCompatActivity {
                 statsExecutorService = null;
             }
         }
+        if(remoteVideoTrackStatsRecordMap != null) {
+            remoteVideoTrackStatsRecordMap.clear();
+        }
         statsLayout.setVisibility(View.INVISIBLE);
     }
 
@@ -1283,7 +1301,7 @@ public class TCClientActivity extends AppCompatActivity {
                 if(stats instanceof LocalVideoTrackStatsRecord) {
                     showLocalVideoTrackStats((LocalVideoTrackStatsRecord)stats);
                 } else if(stats instanceof RemoteVideoTrackStatsRecord) {
-                    showRemoteVideoTrackStats((RemoteVideoTrackStatsRecord)stats);
+                    showRemoteVideoTrackStats(conversation, (RemoteVideoTrackStatsRecord)stats);
                 }
             }
         };
@@ -1304,8 +1322,14 @@ public class TCClientActivity extends AppCompatActivity {
         localVideoTrackStatsTextView.setText(Html.fromHtml(localVideoStats));
     }
 
-    private void showRemoteVideoTrackStats(RemoteVideoTrackStatsRecord remoteVideoTrackStatsRecord) {
-        // TODO: implement me
+    private void showRemoteVideoTrackStats(Conversation conversation, RemoteVideoTrackStatsRecord remoteVideoTrackStatsRecord) {
+        for(Participant participant: conversation.getParticipants()) {
+            if(participant.getSid().equals(remoteVideoTrackStatsRecord.getParticipantSid())) {
+                remoteVideoTrackStatsRecordMap.put(participant.getIdentity(), remoteVideoTrackStatsRecord);
+                remoteVideoTrackStatsAdapter.notifyDataSetChanged();
+                break;
+            }
+        }
     }
 
     private ParticipantListener participantListener() {
