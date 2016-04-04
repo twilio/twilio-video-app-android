@@ -13,7 +13,6 @@ import com.twilio.conversations.internal.TwilioConversationsInternal;
 import org.junit.After;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 
 import java.util.HashMap;
@@ -27,8 +26,6 @@ public class TwilioConversationsTest {
     @Rule
     public final ActivityTestRule<TwilioConversationsActivity> mActivityRule =
             new ActivityTestRule<>(TwilioConversationsActivity.class);
-    @Rule
-    public final ExpectedException exception = ExpectedException.none();
 
     @After
     public void teardown() {
@@ -44,26 +41,11 @@ public class TwilioConversationsTest {
     }
 
     @Test
-    public void testTwilioDestroy() throws InterruptedException {
+    public void testTwilioDestroyWithActiveClient() throws InterruptedException {
         TwilioConversationsHelper.initialize(mActivityRule.getActivity());
-        TwilioConversationsHelper.destroy();
+        TwilioConversations.createConversationsClient("token",
+                conversationsClientListener());
     }
-
-//    @Test
-//    public void testTwilioDestroyWithActiveClient() throws InterruptedException {
-//        TwilioConversationsHelper.initialize(mActivityRule.getActivity());
-//        TwilioConversations.createConversationsClient("token",
-//                conversationsClientListener());
-//        TwilioConversationsHelper.destroy();
-//    }
-//
-//    @Test
-//    public void testTwilioDestroyWithDisposingClient() throws InterruptedException {
-//        TwilioConversationsHelper.initialize(mActivityRule.getActivity());
-//        TwilioConversations.createConversationsClient("token",
-//                conversationsClientListener());
-//        TwilioConversations.destroy();
-//    }
 
     @Test
     public void testTwilioInitializationAfterDestroy() throws InterruptedException {
@@ -72,126 +54,123 @@ public class TwilioConversationsTest {
         TwilioConversationsHelper.initialize(mActivityRule.getActivity());
     }
 
-//    @Test
-//    public void testClientCreationBeforeInitialize() {
-//        exception.expect(IllegalStateException.class);
-//        String bogusToken = "1234";
-//        TwilioConversations.createConversationsClient(bogusToken,
-//                new ConversationsClientListener() {
-//                    @Override
-//                    public void onStartListeningForInvites(ConversationsClient conversationsClient) {
-//
-//                    }
-//
-//                    @Override
-//                    public void onStopListeningForInvites(ConversationsClient conversationsClient) {
-//
-//                    }
-//
-//                    @Override
-//                    public void onFailedToStartListening(ConversationsClient conversationsClient,
-//                                                         TwilioConversationsException e) {
-//
-//                    }
-//
-//                    @Override
-//                    public void onIncomingInvite(ConversationsClient conversationsClient,
-//                                                 IncomingInvite incomingInvite) {
-//
-//                    }
-//
-//                    @Override
-//                    public void onIncomingInviteCancelled(ConversationsClient conversationsClient,
-//                                                          IncomingInvite incomingInvite) {
-//
-//                    }
-//                });
-//    }
+    @Test(expected =  IllegalStateException.class)
+    public void testClientCreationBeforeInitialize() {
+        String bogusToken = "1234";
+        TwilioConversations.createConversationsClient(bogusToken,
+                new ConversationsClientListener() {
+                    @Override
+                    public void onStartListeningForInvites(ConversationsClient conversationsClient) {
 
-//    @Test
-//    public void testTwilioCreateConversationsClientWithNullParams() throws InterruptedException {
-//        TwilioConversationsHelper.initialize(mActivityRule.getActivity());
-//
-//        boolean npeSeen = false;
-//
-//        try {
-//            TwilioConversations.createConversationsClient((String) null, null);
-//        } catch(NullPointerException e) {
-//            npeSeen = true;
-//        } finally {
-//            org.junit.Assert.assertTrue(npeSeen);
-//            npeSeen = false;
-//        }
-//
-//        try {
-//            TwilioConversations.createConversationsClient((TwilioAccessManager) null, null);
-//        } catch(NullPointerException e) {
-//            npeSeen = true;
-//        } finally {
-//            org.junit.Assert.assertTrue(npeSeen);
-//            npeSeen = false;
-//        }
-//
-//        try {
-//            TwilioConversationsInternal.createConversationsClient(null, null, null);
-//        } catch(NullPointerException e) {
-//            npeSeen = true;
-//        } finally {
-//            org.junit.Assert.assertTrue(npeSeen);
-//            npeSeen = false;
-//        }
-//
-//
-//        try {
-//            TwilioConversations.createConversationsClient("foo", null);
-//        } catch(NullPointerException e) {
-//            npeSeen = true;
-//        } finally {
-//            org.junit.Assert.assertTrue(npeSeen);
-//            npeSeen = false;
-//        }
-//
-//        try {
-//            TwilioConversations.createConversationsClient(
-//                    TwilioAccessManagerFactory.createAccessManager("foo", null), null);
-//        } catch(NullPointerException e) {
-//            npeSeen = true;
-//        } finally {
-//            org.junit.Assert.assertTrue(npeSeen);
-//            npeSeen = false;
-//        }
-//
-//
-//        try {
-//            TwilioConversationsInternal.createConversationsClient(null, null, conversationsClientListener());
-//        } catch(NullPointerException e) {
-//            npeSeen = true;
-//        } finally {
-//            org.junit.Assert.assertTrue(npeSeen);
-//            npeSeen = false;
-//        }
-//    }
+                    }
 
-//    @Test
-//    public void testTwilioCreateConversationsClientWithToken() throws InterruptedException {
-//        TwilioConversationsHelper.initialize(mActivityRule.getActivity());
-//
-//        ConversationsClient conversationsClient = TwilioConversations.createConversationsClient("DEADBEEF", conversationsClientListener());
-//
-//        assertNotNull(conversationsClient);
-//    }
+                    @Override
+                    public void onStopListeningForInvites(ConversationsClient conversationsClient) {
 
-//    @Test
-//    public void testTwilioCreateConversationsClientWithAccessManagerAndEmptyOptionsMap() throws InterruptedException {
-//        TwilioConversationsHelper.initialize(mActivityRule.getActivity());
-//
-//        accessManager = TwilioAccessManagerFactory.createAccessManager("DEADBEEF", null);
-//        ConversationsClient conversationsClient = TwilioConversationsInternal.createConversationsClient(accessManager, new HashMap<String, String>(), conversationsClientListener());
-//
-//        assertNotNull(conversationsClient);
-//    }
+                    }
 
-    /**
+                    @Override
+                    public void onFailedToStartListening(ConversationsClient conversationsClient,
+                                                         TwilioConversationsException e) {
+
+                    }
+
+                    @Override
+                    public void onIncomingInvite(ConversationsClient conversationsClient,
+                                                 IncomingInvite incomingInvite) {
+
+                    }
+
+                    @Override
+                    public void onIncomingInviteCancelled(ConversationsClient conversationsClient,
+                                                          IncomingInvite incomingInvite) {
+
+                    }
+                });
+    }
+
+    @Test
+    public void testTwilioCreateConversationsClientWithNullParams() throws InterruptedException {
+        TwilioConversationsHelper.initialize(mActivityRule.getActivity());
+
+        boolean npeSeen = false;
+
+        try {
+            TwilioConversations.createConversationsClient((String) null, null);
+        } catch(NullPointerException e) {
+            npeSeen = true;
+        } finally {
+            org.junit.Assert.assertTrue(npeSeen);
+            npeSeen = false;
+        }
+
+        try {
+            TwilioConversations.createConversationsClient((TwilioAccessManager) null, null);
+        } catch(NullPointerException e) {
+            npeSeen = true;
+        } finally {
+            org.junit.Assert.assertTrue(npeSeen);
+            npeSeen = false;
+        }
+
+        try {
+            TwilioConversationsInternal.createConversationsClient(null, null, null);
+        } catch(NullPointerException e) {
+            npeSeen = true;
+        } finally {
+            org.junit.Assert.assertTrue(npeSeen);
+            npeSeen = false;
+        }
+
+
+        try {
+            TwilioConversations.createConversationsClient("foo", null);
+        } catch(NullPointerException e) {
+            npeSeen = true;
+        } finally {
+            org.junit.Assert.assertTrue(npeSeen);
+            npeSeen = false;
+        }
+
+        try {
+            TwilioConversations.createConversationsClient(
+                    TwilioAccessManagerFactory.createAccessManager("foo", null), null);
+        } catch(NullPointerException e) {
+            npeSeen = true;
+        } finally {
+            org.junit.Assert.assertTrue(npeSeen);
+            npeSeen = false;
+        }
+
+
+        try {
+            TwilioConversationsInternal.createConversationsClient(null, null, conversationsClientListener());
+        } catch(NullPointerException e) {
+            npeSeen = true;
+        } finally {
+            org.junit.Assert.assertTrue(npeSeen);
+        }
+    }
+
+    @Test
+    public void testTwilioCreateConversationsClientWithToken() throws InterruptedException {
+        TwilioConversationsHelper.initialize(mActivityRule.getActivity());
+
+        ConversationsClient conversationsClient = TwilioConversations.createConversationsClient("DEADBEEF", conversationsClientListener());
+
+        assertNotNull(conversationsClient);
+    }
+
+    @Test
+    public void testTwilioCreateConversationsClientWithAccessManagerAndEmptyOptionsMap() throws InterruptedException {
+        TwilioConversationsHelper.initialize(mActivityRule.getActivity());
+
+        accessManager = TwilioAccessManagerFactory.createAccessManager("DEADBEEF", null);
+        ConversationsClient conversationsClient = TwilioConversationsInternal.createConversationsClient(accessManager, new HashMap<String, String>(), conversationsClientListener());
+
+        assertNotNull(conversationsClient);
+    }
+
     @Test
     public void testTwilioCreateConversationsClientWithAccessManagerAndRandomOption() throws InterruptedException {
         TwilioConversationsHelper.initialize(mActivityRule.getActivity());
@@ -203,7 +182,6 @@ public class TwilioConversationsTest {
 
         assertNotNull(conversationsClient);
     }
-    **/
 
     @Test
     public void testTwilioSetAndGetLogLevel() {
