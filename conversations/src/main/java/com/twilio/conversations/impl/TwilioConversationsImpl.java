@@ -23,7 +23,6 @@ import android.content.IntentFilter;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
-import android.graphics.Point;
 import android.net.ConnectivityManager;
 import android.os.Bundle;
 import android.os.Handler;
@@ -276,6 +275,8 @@ public class TwilioConversationsImpl {
             unregisterConnectivityBroadcastReceiver();
         }
 
+        // TODO: make this async again after debugging
+
         Queue<ConversationsClientImpl> clientsDisposing = new ArrayDeque<>();
         Application application = (Application)
                 TwilioConversationsImpl.this.applicationContext.getApplicationContext();
@@ -318,9 +319,9 @@ public class TwilioConversationsImpl {
 
         // Now we can teardown the sdk
         // TODO destroy investigate making this asynchronous with callbacks
-        logger.i("Destroying Core");
+        logger.d("Destroying Core");
         destroyCore();
-        logger.i("Core destroyed");
+        logger.d("Core destroyed");
         initialized = false;
     }
 
