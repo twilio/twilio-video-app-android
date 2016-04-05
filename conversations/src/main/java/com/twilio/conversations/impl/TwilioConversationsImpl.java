@@ -28,25 +28,19 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
 
-import com.getkeepsafe.relinker.ReLinker;
 import com.twilio.common.TwilioAccessManager;
 import com.twilio.conversations.ConversationsClientListener;
 import com.twilio.conversations.TwilioConversations;
 import com.twilio.conversations.TwilioConversations.LogLevel;
 import com.twilio.conversations.impl.logging.Logger;
 import com.twilio.conversations.impl.util.CallbackHandler;
+import com.twilio.conversations.internal.ReLinker;
 
 public class TwilioConversationsImpl {
     private static final int REQUEST_CODE_WAKEUP = 100;
     private static final long BACKGROUND_WAKEUP_INTERVAL = 10 * 60 * 1000;
 
     static final Logger logger = Logger.getLogger(TwilioConversationsImpl.class);
-    static final ReLinker.Logger reLinkerLogger = new ReLinker.Logger() {
-        @Override
-        public void log(String message) {
-            logger.d(message);
-        }
-    };
 
     private static volatile TwilioConversationsImpl instance;
     private static volatile boolean libraryIsLoaded = false;
@@ -224,8 +218,7 @@ public class TwilioConversationsImpl {
          * With all the invariants satisfied we can now load the library if we have not done so
          */
         if (!libraryIsLoaded) {
-            ReLinker.log(reLinkerLogger)
-                    .loadLibrary(applicationContext, "jingle_peerconnection_so");
+            ReLinker.loadLibrary(applicationContext, "jingle_peerconnection_so");
             libraryIsLoaded = true;
         }
 
