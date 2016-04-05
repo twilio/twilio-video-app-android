@@ -8,9 +8,11 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 
 import com.twilio.common.TwilioAccessManager;
+import com.twilio.conversations.activity.TwilioConversationsActivity;
 import com.twilio.conversations.helper.AccessTokenHelper;
 import com.twilio.conversations.helper.CameraCapturerHelper;
 import com.twilio.conversations.helper.ConversationsClientHelper;
+import com.twilio.conversations.helper.TwilioConversationsHelper;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -145,9 +147,7 @@ public class VideoConstraintsTests {
 
         assertTrue(conversationEndsWhenInviteCancelled.await(20, TimeUnit.SECONDS));
 
-        conversationsClient.dispose();
-        TwilioConversations.destroy();
-        while (TwilioConversations.isInitialized());
+        TwilioConversationsHelper.destroy();
     }
 
     @Test
@@ -245,10 +245,7 @@ public class VideoConstraintsTests {
 
         assertTrue(conversationEndsWhenInviteCancelled.await(20, TimeUnit.SECONDS));
 
-        conversationsClient.dispose();
-        TwilioConversations.destroy();
-
-        while(TwilioConversations.isInitialized());
+        TwilioConversationsHelper.destroy();
     }
 
     private LocalVideoTrack createLocalVideoTrackWithVideoConstraints(Context context, VideoConstraints videoConstraints) throws InterruptedException {
