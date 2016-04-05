@@ -2,7 +2,7 @@
 #include "talk/app/webrtc/java/jni/androidmediadecoder_jni.h"
 #include "talk/app/webrtc/java/jni/androidmediaencoder_jni.h"
 
-const std::string AndroidVideoCodecManager::videoCodecName = "AndroidVideoCodec";
+const std::string AndroidVideoCodecManager::videoCodecManagerName = "AndroidVideoCodec";
 
 AndroidVideoCodecManager::AndroidVideoCodecManager() { }
 
@@ -15,5 +15,5 @@ cricket::WebRtcVideoDecoderFactory*AndroidVideoCodecManager::createVideoDecoderF
 }
 
 const std::string AndroidVideoCodecManager::getName() {
-    return videoCodecName;
+    return videoCodecManagerName;
 }

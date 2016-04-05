@@ -18,7 +18,7 @@ using namespace twiliosdk;
 class AndroidVideoCodecManager : public ITSCVideoCodec {
 
 public:
-    static const std::string videoCodecName;
+    static const std::string videoCodecManagerName;
 
     AndroidVideoCodecManager();
 

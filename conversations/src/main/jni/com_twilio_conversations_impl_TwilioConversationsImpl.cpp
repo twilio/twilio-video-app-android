@@ -170,7 +170,7 @@ JNIEXPORT void JNICALL Java_com_twilio_conversations_impl_TwilioConversationsImp
     TSCSDK* tscSdk = TSCSDK::instance();
     TSCMediaCodecRegistry& codecManager = tscSdk->getMediaCodecRegistry();
 
-    codecManager.unregisterVideoCodecsForName(AndroidVideoCodecManager::videoCodecName);
+    codecManager.unregisterVideoCodecsForName(AndroidVideoCodecManager::videoCodecManagerName);
     TSCSDK::destroy();
 }
 
