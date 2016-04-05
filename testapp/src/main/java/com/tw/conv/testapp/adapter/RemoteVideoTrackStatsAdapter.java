@@ -1,6 +1,7 @@
 package com.tw.conv.testapp.adapter;
 
 import android.support.v7.widget.RecyclerView;
+import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -39,7 +40,7 @@ public class RemoteVideoTrackStatsAdapter extends RecyclerView.Adapter<RemoteVid
             i++;
         }
 
-        holder.title.setText(name + " Remote Video");
+        holder.title.setText("Remote Media (" + name + ")");
 
         String remoteVideoTrackStats =
                 String.format("<b>SID</b> %s<br/>", remoteVideoTrackStatsRecord.getParticipantSid()) +
@@ -50,7 +51,7 @@ public class RemoteVideoTrackStatsAdapter extends RecyclerView.Adapter<RemoteVid
                         '\n' +
                         String.format("<b>Fps</b> %d", remoteVideoTrackStatsRecord.getFrameRate());
 
-        holder.stats.setText(remoteVideoTrackStats);
+        holder.stats.setText(Html.fromHtml(remoteVideoTrackStats));
     }
 
     @Override

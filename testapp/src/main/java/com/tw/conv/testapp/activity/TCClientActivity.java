@@ -282,7 +282,6 @@ public class TCClientActivity extends AppCompatActivity {
         remoteStatsRecyclerView = (RecyclerView) findViewById(R.id.stats_recycler_view);
         remoteVideoTrackStatsAdapter = new RemoteVideoTrackStatsAdapter(remoteVideoTrackStatsRecordMap);
         remoteStatsRecyclerView.setAdapter(remoteVideoTrackStatsAdapter);
-        remoteStatsRecyclerView.setHasFixedSize(false);
         remoteStatsRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         remoteStatsRecyclerView.setItemAnimator(new DefaultItemAnimator());
 
@@ -1050,7 +1049,6 @@ public class TCClientActivity extends AppCompatActivity {
                 }
             }
         });
-        statsLayout.setVisibility(View.VISIBLE);
     }
 
     private void disableStats() {
@@ -1064,7 +1062,8 @@ public class TCClientActivity extends AppCompatActivity {
         if(remoteVideoTrackStatsRecordMap != null) {
             remoteVideoTrackStatsRecordMap.clear();
         }
-        statsLayout.setVisibility(View.INVISIBLE);
+        statsLayout.setVisibility(View.GONE);
+        remoteStatsRecyclerView.setVisibility(View.GONE);
     }
 
     private DialogInterface.OnClickListener cancelCallClickListener() {
@@ -1305,9 +1304,30 @@ public class TCClientActivity extends AppCompatActivity {
                 Timber.i(strBld.toString());
 
                 if(stats instanceof LocalVideoTrackStatsRecord) {
-                    showLocalVideoTrackStats((LocalVideoTrackStatsRecord)stats);
+                    if(statsLayout.getVisibility() != View.VISIBLE) {
+                        statsLayout.setVisibility(View.VISIBLE);
+                    }
+                    if(conversation.getLocalMedia().getLocalVideoTracks().size() > 0) {
+                        showLocalVideoTrackStats((LocalVideoTrackStatsRecord) stats);
+                    } else {
+                        // Latent stats callbacks can be triggered even after a local track is removed.
+                        statsLayout.setVisibility(View.GONE);
+                    }
                 } else if(stats instanceof RemoteVideoTrackStatsRecord) {
-                    showRemoteVideoTrackStats(conversation, (RemoteVideoTrackStatsRecord)stats);
+                    if(remoteStatsRecyclerView.getVisibility() != View.VISIBLE) {
+                        remoteStatsRecyclerView.setVisibility(View.VISIBLE);
+                    }
+                    for(Participant participant: conversation.getParticipants()) {
+                       if(participant.getSid().equals(stats.getParticipantSid())) {
+                           if(participant.getMedia().getVideoTracks().size() > 0) {
+                               showRemoteVideoTrackStats(conversation, (RemoteVideoTrackStatsRecord)stats);
+                           } else {
+                                // Latent stats callbacks can be triggered even after a remote track is removed.
+                                remoteVideoTrackStatsRecordMap.clear();
+                                remoteVideoTrackStatsAdapter.notifyDataSetChanged();
+                           }
+                       }
+                    }
                 }
             }
         };
@@ -1381,6 +1401,7 @@ public class TCClientActivity extends AppCompatActivity {
                     videoLinearLayout.removeView(participantContainer);
                     availableContainers.add(participantContainer);
                 }
+                remoteVideoTrackStatsRecordMap.remove(participant.getIdentity());
             }
 
             @Override
@@ -1503,6 +1524,7 @@ public class TCClientActivity extends AppCompatActivity {
                 localContainer.removeAllViews();
                 setVideoStateIcon();
                 setAudioStateIcon();
+                statsLayout.setVisibility(View.GONE);
             }
 
             @Override

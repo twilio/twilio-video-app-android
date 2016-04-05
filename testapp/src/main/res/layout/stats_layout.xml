@@ -3,13 +3,14 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
+    android:layout_marginTop="@dimen/activity_horizontal_margin"
     xmlns:android="http://schemas.android.com/apk/res/android">
     <TextView
         android:id="@+id/video_track_title_textview"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textSize="16sp"
-        android:layout_margin="@dimen/activity_horizontal_margin" />
+        android:layout_marginLeft="@dimen/activity_horizontal_margin" />
 
     <TextView
         android:id="@+id/video_track_stats_textview"

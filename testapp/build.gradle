@@ -57,8 +57,8 @@ dependencies {
     compile project(':conversations')
 
     compile 'net.hockeyapp.android:HockeySDK:3.5.0'
-    compile 'com.android.support:appcompat-v7:23.1.1'
-    compile 'com.android.support:design:23.1.1'
+    compile 'com.android.support:appcompat-v7:23.2.1'
+    compile 'com.android.support:design:23.2.1'
     compile 'com.squareup.retrofit:retrofit:1.9.0'
     compile 'com.jakewharton.timber:timber:4.1.0'
     compile 'com.appyvet:materialrangebar:1.3'
