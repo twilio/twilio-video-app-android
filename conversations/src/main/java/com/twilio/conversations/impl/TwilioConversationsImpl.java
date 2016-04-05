@@ -275,51 +275,38 @@ public class TwilioConversationsImpl {
             unregisterConnectivityBroadcastReceiver();
         }
 
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                Queue<ConversationsClientImpl> clientsDisposing = new ArrayDeque<>();
-                Application application = (Application)
-                        TwilioConversationsImpl.this.applicationContext.getApplicationContext();
-                AlarmManager alarmManager = (AlarmManager) applicationContext
-                        .getSystemService(Context.ALARM_SERVICE);
+        // TODO: make this async again after debugging
 
-                alarmManager.cancel(wakeUpPendingIntent);
-                application.unregisterActivityLifecycleCallbacks(applicationForegroundTracker);
+        Queue<ConversationsClientImpl> clientsDisposing = new ArrayDeque<>();
+        Application application = (Application)
+                TwilioConversationsImpl.this.applicationContext.getApplicationContext();
+        AlarmManager alarmManager = (AlarmManager) applicationContext
+                .getSystemService(Context.ALARM_SERVICE);
 
-                // Process clients and determine which ones need to be closed
-                for (Map.Entry<UUID, WeakReference<ConversationsClientImpl>> entry :
-                        conversationsClientMap.entrySet()) {
-                    WeakReference<ConversationsClientImpl> weakClientRef =
-                            conversationsClientMap.remove(entry.getKey());
+        alarmManager.cancel(wakeUpPendingIntent);
+        application.unregisterActivityLifecycleCallbacks(applicationForegroundTracker);
 
-                    if (weakClientRef != null) {
-                        ConversationsClientImpl client = weakClientRef.get();
-                        if (client != null) {
-                            if (client.getDisposalState() == DisposalState.NOT_DISPOSED) {
-                                client.dispose();
-                                // Add clients that are not disposed to ensure they are disposed later
-                                clientsDisposing.add(client);
-                            }
-                        }
-                    }
+        // Process clients and determine which ones need to be closed
+        for (Map.Entry<UUID, WeakReference<ConversationsClientImpl>> entry :
+                conversationsClientMap.entrySet()) {
+            WeakReference<ConversationsClientImpl> weakClientRef =
+                    conversationsClientMap.remove(entry.getKey());
+
+            if (weakClientRef != null) {
+                ConversationsClientImpl client = weakClientRef.get();
+                if (client != null) {
+                    // Dispose of the client regardless of whether it is still listening.
+                    client.disposeClient();
                 }
-
-                // Wait until all clients are disposed.
-                while (!clientsDisposing.isEmpty()) {
-                    ConversationsClientImpl clientPendingDispose = clientsDisposing.poll();
-
-                    if (clientPendingDispose.getDisposalState() != DisposalState.DISPOSED) {
-                        clientsDisposing.add(clientPendingDispose);
-                    }
-                }
-
-                // Now we can teardown the sdk
-                // TODO destroy investigate making this asynchronous with callbacks
-                destroyCore();
-                initialized = false;
             }
-        }).start();
+        }
+
+        // Now we can teardown the sdk
+        // TODO destroy investigate making this asynchronous with callbacks
+        logger.d("Destroying Core");
+        destroyCore();
+        logger.d("Core destroyed");
+        initialized = false;
     }
 
     public ConversationsClientImpl createConversationsClient(TwilioAccessManager accessManager,
@@ -336,18 +323,8 @@ public class TwilioConversationsImpl {
             }
 
             final ConversationsClientImpl conversationsClient = new ConversationsClientImpl(applicationContext,
-                    accessManager, inListener);
-            long nativeEndpointObserverHandle = conversationsClient.getEndpointObserverHandle();
-            if (nativeEndpointObserverHandle == 0) {
-                return null;
-            }
-            final long nativeEndpointHandle = createEndpoint(accessManager, optionsArray,
-                    nativeEndpointObserverHandle);
-            if (nativeEndpointHandle == 0) {
-                return null;
-            }
-            conversationsClient.setNativeEndpointHandle(nativeEndpointHandle);
-            if (conversationsClientMap.size() == 0) {
+                    accessManager, inListener, optionsArray);
+           if (conversationsClientMap.size() == 0) {
                 registerConnectivityBroadcastReceiver();
             }
             conversationsClientMap.put(conversationsClient.getUuid(),
@@ -444,9 +421,6 @@ public class TwilioConversationsImpl {
     private native void onApplicationWakeUp();
     private native void onApplicationBackground();
     private native void destroyCore();
-    private native long createEndpoint(TwilioAccessManager accessManager,
-                                       String[] optionsArray,
-                                       long nativeEndpointObserver);
     private native static void setCoreLogLevel(int level);
     private native static int getCoreLogLevel();
     private native void refreshRegistrations();

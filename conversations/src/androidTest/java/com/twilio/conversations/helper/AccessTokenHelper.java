@@ -12,6 +12,7 @@ import retrofit.Callback;
 import retrofit.RetrofitError;
 import retrofit.client.Response;
 
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 public class AccessTokenHelper {
@@ -39,7 +40,7 @@ public class AccessTokenHelper {
             }
         });
 
-        tokenUpdatedLatch.await(10, TimeUnit.SECONDS);
+        assertTrue(tokenUpdatedLatch.await(10, TimeUnit.SECONDS));
 
         return twilioAccessManager;
     }
@@ -64,7 +65,8 @@ public class AccessTokenHelper {
                 fail();
             }
         });
-        tokenLatch.await(10, TimeUnit.SECONDS);
+
+        assertTrue(tokenLatch.await(10, TimeUnit.SECONDS));
 
         return capabilityToken[0];
     }

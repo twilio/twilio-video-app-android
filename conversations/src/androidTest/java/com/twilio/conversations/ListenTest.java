@@ -4,22 +4,15 @@ import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
 
 import com.twilio.common.TwilioAccessManager;
-import com.twilio.common.TwilioAccessManagerFactory;
-import com.twilio.common.TwilioAccessManagerListener;
-import com.twilio.conversations.provider.AccessTokenProvider;
-import com.twilio.conversations.utils.TwilioConversationsUtils;
+import com.twilio.conversations.activity.TwilioConversationsActivity;
+import com.twilio.conversations.helper.AccessTokenHelper;
+import com.twilio.conversations.helper.ConversationsClientHelper;
+import com.twilio.conversations.helper.TwilioConversationsHelper;
 
 import org.junit.After;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
-
-import retrofit.Callback;
-import retrofit.RetrofitError;
-import retrofit.client.Response;
 
 import static org.junit.Assert.*;
 
@@ -32,87 +25,16 @@ public class ListenTest {
     public ActivityTestRule<TwilioConversationsActivity> mActivityRule = new ActivityTestRule<>(
             TwilioConversationsActivity.class);
 
-    /**
-     * We only teardown because not every test will want the sdk initialized
-     */
     @After
     public void teardown() {
-        TwilioConversationsUtils.destroyTwilioSDK();
+        TwilioConversationsHelper.destroy();
     }
 
     @Test
-    public void canListenAfterClientCreation() {
-        final CountDownLatch waitLatch = new CountDownLatch(1);
-        AccessTokenProvider.obtainTwilioCapabilityToken(TEST_USER, new Callback<String>() {
-            @Override
-            public void success(final String token, Response response) {
-
-                TwilioConversations.initialize(mActivityRule.getActivity().getApplicationContext(), new TwilioConversations.InitListener() {
-                    @Override
-                    public void onInitialized() {
-                        TwilioAccessManagerFactory.createAccessManager(token, new TwilioAccessManagerListener() {
-                                    @Override
-                                    public void onTokenExpired(TwilioAccessManager twilioAccessManager) {
-                                        fail();
-                                    }
-
-                                    @Override
-                                    public void onTokenUpdated(final TwilioAccessManager twilioAccessManager) {
-                                        assertNotNull(twilioAccessManager);
-                                        assertEquals(token, twilioAccessManager.getToken());
-
-                                        ConversationsClient client = TwilioConversations.createConversationsClient(twilioAccessManager, new ConversationsClientListener() {
-                                            @Override
-                                            public void onStartListeningForInvites(ConversationsClient conversationsClient) {
-                                                waitLatch.countDown();
-                                            }
-
-                                            @Override
-                                            public void onStopListeningForInvites(ConversationsClient conversationsClient) {
-                                                // On teardown this will get called so do
-                                                // not fail fail
-                                            }
-
-                                            @Override
-                                            public void onFailedToStartListening(ConversationsClient conversationsClient, TwilioConversationsException e) {
-                                                fail();
-                                            }
-
-                                            @Override
-                                            public void onIncomingInvite(ConversationsClient conversationsClient, IncomingInvite incomingInvite) {
-                                                fail();
-                                            }
-
-                                            @Override
-                                            public void onIncomingInviteCancelled(ConversationsClient conversationsClient, IncomingInvite incomingInvite) {
-                                                fail();
-                                            }
-                                        });
-                                        assertNotNull(client);
-                                        client.listen();
-                                    }
-
-                                    @Override
-                                    public void onError (TwilioAccessManager twilioAccessManager, String s){
-                                        fail();
-                                    }
-                                }
-                        );
-                    }
-
-                    @Override
-                    public void onError(Exception e) {
-                        fail(e.getMessage());
-                    }
-                });
-            }
-
-            @Override
-            public void failure(RetrofitError error) {
-                fail(error.getMessage());
-            }
-        });
-
-        TwilioConversationsUtils.wait(waitLatch, 30, TimeUnit.SECONDS);
+    public void canListenAfterClientCreation() throws InterruptedException {
+        TwilioAccessManager accessManager = AccessTokenHelper.obtainTwilioAccessManager(TEST_USER);
+        ConversationsClient conversationsClient = ConversationsClientHelper.registerClient(mActivityRule.getActivity(), accessManager);
+        assertTrue(conversationsClient.isListening());
     }
+
 }

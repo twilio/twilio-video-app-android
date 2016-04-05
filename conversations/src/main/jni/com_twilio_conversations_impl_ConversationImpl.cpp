@@ -8,6 +8,7 @@
 #include "TSCVideoCaptureController.h"
 #include "TSCSession.h"
 #include "TSCAudioInputController.h"
+#include <TSCoreSDK.h>
 
 #include <string>
 #include <map>
@@ -16,8 +17,6 @@
 
 using namespace twiliosdk;
 using namespace webrtc_jni;
-
-#define TAG  "TwilioSDK(native)"
 
 
 JNIEXPORT jlong JNICALL Java_com_twilio_conversations_impl_ConversationImpl_wrapOutgoingSession

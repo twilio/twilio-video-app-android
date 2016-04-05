@@ -3,7 +3,11 @@ package com.twilio.conversations;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
 
-import com.twilio.conversations.utils.TwilioConversationsUtils;
+import com.twilio.common.TwilioAccessManager;
+import com.twilio.conversations.activity.TwilioConversationsActivity;
+import com.twilio.conversations.helper.AccessTokenHelper;
+import com.twilio.conversations.helper.ConversationsClientHelper;
+import com.twilio.conversations.helper.TwilioConversationsHelper;
 
 import org.junit.After;
 import org.junit.Assert;
@@ -19,44 +23,48 @@ public class ConversationsClientSendInviteTests {
     private static String TOKEN = "token";
     private static String PARTICIPANT = "janne";
 
+    private TwilioAccessManager accessManager;
+
     @Rule
     public ActivityTestRule<TwilioConversationsActivity> mActivityRule = new ActivityTestRule<>(
             TwilioConversationsActivity.class);
 
-    /**
-     * We only teardown because not every test will want the sdk initialized
-     */
     @After
     public void teardown() {
-        if (TwilioConversationsUtils.isInitialized()) {
-            TwilioConversationsUtils.destroyTwilioSDK();
+        TwilioConversationsHelper.destroy();
+        if(accessManager != null) {
+            accessManager.dispose();
         }
     }
 
     @Test(expected = IllegalStateException.class)
-    public void testTwilioCannotSendInviteWithNullParticipantSet() {
-        ConversationsClient conversationsClient = createConversationsClient();
+    public void cannotSendInviteWithNullParticipantSet() throws InterruptedException {
+        accessManager = AccessTokenHelper.obtainTwilioAccessManager(PARTICIPANT);
+        ConversationsClient conversationsClient = ConversationsClientHelper.registerClient(mActivityRule.getActivity(), accessManager);
         Assert.assertNotNull(conversationsClient);
 
         LocalMedia localMedia = LocalMediaFactory.createLocalMedia(localMediaListener());
+        Assert.assertNotNull(localMedia);
 
-        OutgoingInvite invite = conversationsClient.sendConversationInvite(null, localMedia, conversationCallback());
+        conversationsClient.sendConversationInvite(null, localMedia, conversationCallback());
     }
 
     @Test(expected = IllegalStateException.class)
-    public void testTwilioCannotSendInviteWithNullLocalMedia() {
-        ConversationsClient conversationsClient = createConversationsClient();
+    public void cannotSendInviteWithNullLocalMedia() throws InterruptedException {
+        accessManager = AccessTokenHelper.obtainTwilioAccessManager(PARTICIPANT);
+        ConversationsClient conversationsClient = ConversationsClientHelper.registerClient(mActivityRule.getActivity(), accessManager);
         Assert.assertNotNull(conversationsClient);
 
         Set<String> participants = new HashSet<>();
         participants.add(PARTICIPANT);
 
-        OutgoingInvite invite = conversationsClient.sendConversationInvite(participants, null, conversationCallback());
+        conversationsClient.sendConversationInvite(participants, null, conversationCallback());
     }
 
     @Test(expected = IllegalStateException.class)
-    public void testTwilioCannotSendInviteWithNullConversationCallback() {
-        ConversationsClient conversationsClient = createConversationsClient();
+    public void cannotSendInviteWithNullConversationCallback() throws InterruptedException {
+        accessManager = AccessTokenHelper.obtainTwilioAccessManager(PARTICIPANT);
+        ConversationsClient conversationsClient = ConversationsClientHelper.registerClient(mActivityRule.getActivity(), accessManager);
         Assert.assertNotNull(conversationsClient);
 
         LocalMedia localMedia = LocalMediaFactory.createLocalMedia(localMediaListener());
@@ -64,24 +72,26 @@ public class ConversationsClientSendInviteTests {
         Set<String> participants = new HashSet<>();
         participants.add(PARTICIPANT);
 
-        OutgoingInvite invite = conversationsClient.sendConversationInvite(participants, localMedia, null);
+        conversationsClient.sendConversationInvite(participants, localMedia, null);
     }
 
     @Test(expected = IllegalStateException.class)
-    public void testTwilioCannotSendInviteWithEmptyParticipantSet() {
-        ConversationsClient conversationsClient = createConversationsClient();
+    public void cannotSendInviteWithEmptyParticipantSet() throws InterruptedException {
+        accessManager = AccessTokenHelper.obtainTwilioAccessManager(PARTICIPANT);
+        ConversationsClient conversationsClient = ConversationsClientHelper.registerClient(mActivityRule.getActivity(), accessManager);
         Assert.assertNotNull(conversationsClient);
 
         LocalMedia localMedia = LocalMediaFactory.createLocalMedia(localMediaListener());
 
         Set<String> participants = new HashSet<>();
 
-        OutgoingInvite invite = conversationsClient.sendConversationInvite(participants, localMedia, conversationCallback());
+        conversationsClient.sendConversationInvite(participants, localMedia, conversationCallback());
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void testTwilioCannotSendInviteIfOneOfParticipantsIsNull() {
-        ConversationsClient conversationsClient = createConversationsClient();
+    public void cannotSendInviteIfOneOfParticipantsIsNull() throws InterruptedException {
+        accessManager = AccessTokenHelper.obtainTwilioAccessManager(PARTICIPANT);
+        ConversationsClient conversationsClient = ConversationsClientHelper.registerClient(mActivityRule.getActivity(), accessManager);
         Assert.assertNotNull(conversationsClient);
 
         LocalMedia localMedia = LocalMediaFactory.createLocalMedia(localMediaListener());
@@ -90,12 +100,13 @@ public class ConversationsClientSendInviteTests {
         participants.add(PARTICIPANT);
         participants.add(null);
 
-        OutgoingInvite invite = conversationsClient.sendConversationInvite(participants, localMedia, conversationCallback());
+        conversationsClient.sendConversationInvite(participants, localMedia, conversationCallback());
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void testTwilioCannotSendInviteIfOneOfParticipantsIsEmptyString() {
-        ConversationsClient conversationsClient = createConversationsClient();
+    public void cannotSendInviteIfOneOfParticipantsIsEmptyString() throws InterruptedException {
+        accessManager = AccessTokenHelper.obtainTwilioAccessManager(PARTICIPANT);
+        ConversationsClient conversationsClient = ConversationsClientHelper.registerClient(mActivityRule.getActivity(), accessManager);
         Assert.assertNotNull(conversationsClient);
 
         LocalMedia localMedia = LocalMediaFactory.createLocalMedia(localMediaListener());
@@ -104,69 +115,7 @@ public class ConversationsClientSendInviteTests {
         participants.add(PARTICIPANT);
         participants.add("");
 
-        OutgoingInvite invite = conversationsClient.sendConversationInvite(participants, localMedia, conversationCallback());
-    }
-
-    private ConversationsClient createConversationsClient() {
-        TwilioConversationsUtils.initializeTwilioSDK(mActivityRule.getActivity().getApplicationContext());
-        ConversationsClient conversationsClient = TwilioConversations.createConversationsClient(TOKEN, conversationsClientListener());
-        return conversationsClient;
-    }
-
-    private ConversationsClientListener conversationsClientListener() {
-        return new ConversationsClientListener() {
-            @Override
-            public void onStartListeningForInvites(ConversationsClient conversationsClient) {
-
-            }
-
-            @Override
-            public void onStopListeningForInvites(ConversationsClient conversationsClient) {
-
-            }
-
-            @Override
-            public void onFailedToStartListening(ConversationsClient conversationsClient, TwilioConversationsException e) {
-
-            }
-
-            @Override
-            public void onIncomingInvite(ConversationsClient conversationsClient, IncomingInvite incomingInvite) {
-
-            }
-
-            @Override
-            public void onIncomingInviteCancelled(ConversationsClient conversationsClient, IncomingInvite incomingInvite) {
-
-            }
-
-        };
-    }
-
-    private ConversationListener conversationListener() {
-        return new ConversationListener() {
-
-            @Override
-            public void onParticipantConnected(Conversation conversation, Participant participant) {
-
-            }
-
-            @Override
-            public void onFailedToConnectParticipant(Conversation conversation, Participant participant, TwilioConversationsException e) {
-
-            }
-
-            @Override
-            public void onParticipantDisconnected(Conversation conversation, Participant participant) {
-
-            }
-
-            @Override
-            public void onConversationEnded(Conversation conversation, TwilioConversationsException e) {
-
-            }
-
-        };
+        conversationsClient.sendConversationInvite(participants, localMedia, conversationCallback());
     }
 
     private LocalMediaListener localMediaListener(){

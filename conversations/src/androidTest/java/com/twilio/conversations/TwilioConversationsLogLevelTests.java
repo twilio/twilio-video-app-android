@@ -4,6 +4,8 @@ import android.content.Context;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
 
+import com.twilio.conversations.activity.TwilioConversationsActivity;
+
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -14,10 +16,6 @@ import java.util.concurrent.TimeUnit;
 import static org.junit.Assert.*;
 
 
-/**
- * Adding other tests to this test module that call initialize may invalidate this
- * test since TwilioConversationsis a singleton and can only be initialized once.
- */
 @RunWith(AndroidJUnit4.class)
 public class TwilioConversationsLogLevelTests {
     private static int TIMEOUT = 10;
