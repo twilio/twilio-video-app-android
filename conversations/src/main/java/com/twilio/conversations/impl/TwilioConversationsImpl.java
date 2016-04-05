@@ -36,9 +36,6 @@ import com.twilio.conversations.TwilioConversations.LogLevel;
 import com.twilio.conversations.impl.logging.Logger;
 import com.twilio.conversations.impl.util.CallbackHandler;
 
-import org.webrtc.Logging;
-
-
 public class TwilioConversationsImpl {
     private static final int REQUEST_CODE_WAKEUP = 100;
     private static final long BACKGROUND_WAKEUP_INTERVAL = 10 * 60 * 1000;
