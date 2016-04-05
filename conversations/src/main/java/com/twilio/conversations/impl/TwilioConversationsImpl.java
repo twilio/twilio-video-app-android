@@ -41,6 +41,12 @@ public class TwilioConversationsImpl {
     private static final long BACKGROUND_WAKEUP_INTERVAL = 10 * 60 * 1000;
 
     static final Logger logger = Logger.getLogger(TwilioConversationsImpl.class);
+    static final ReLinker.Logger reLinkerLogger = new ReLinker.Logger() {
+        @Override
+        public void log(String message) {
+            logger.d(message);
+        }
+    };
 
     private static volatile TwilioConversationsImpl instance;
     private static volatile boolean libraryIsLoaded = false;
@@ -218,7 +224,8 @@ public class TwilioConversationsImpl {
          * With all the invariants satisfied we can now load the library if we have not done so
          */
         if (!libraryIsLoaded) {
-            ReLinker.loadLibrary(applicationContext, "jingle_peerconnection_so");
+            ReLinker.log(reLinkerLogger)
+                    .loadLibrary(applicationContext, "jingle_peerconnection_so");
             libraryIsLoaded = true;
         }
 
