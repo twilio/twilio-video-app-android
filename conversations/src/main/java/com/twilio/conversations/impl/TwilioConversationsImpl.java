@@ -28,6 +28,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
 
+import com.getkeepsafe.relinker.ReLinker;
 import com.twilio.common.TwilioAccessManager;
 import com.twilio.conversations.ConversationsClientListener;
 import com.twilio.conversations.TwilioConversations;
@@ -35,20 +36,17 @@ import com.twilio.conversations.TwilioConversations.LogLevel;
 import com.twilio.conversations.impl.logging.Logger;
 import com.twilio.conversations.impl.util.CallbackHandler;
 
+import org.webrtc.Logging;
+
 
 public class TwilioConversationsImpl {
     private static final int REQUEST_CODE_WAKEUP = 100;
     private static final long BACKGROUND_WAKEUP_INTERVAL = 10 * 60 * 1000;
 
-    static {
-        // We rename this artifact so we do not clash with
-        // webrtc java classes expecting this native so
-        System.loadLibrary("jingle_peerconnection_so");
-    }
-
     static final Logger logger = Logger.getLogger(TwilioConversationsImpl.class);
 
     private static volatile TwilioConversationsImpl instance;
+    private static volatile boolean libraryIsLoaded = false;
     private static int level = 0;
     protected Context applicationContext;
     private boolean initialized;
@@ -219,6 +217,22 @@ public class TwilioConversationsImpl {
             throw new IllegalThreadStateException("This thread must be able to obtain a Looper");
         }
 
+        /**
+         * With all the invariants satisfied we can now load the library if we have not done so
+         */
+        if (!libraryIsLoaded) {
+            ReLinker.loadLibrary(applicationContext, "jingle_peerconnection_so");
+            libraryIsLoaded = true;
+        }
+
+        /**
+         * It is possible that the user has tried to set the log level before the native library
+         * has loaded. Here we apply the log level because we know the native library is available
+         */
+        if(level != 0) {
+            trySetCoreLogLevel(level);
+        }
+
         /*
          * Initialize the core in a new thread since it may otherwise block the calling thread.
          * The calling thread may often be the UI thread which should never be blocked.
@@ -335,7 +349,7 @@ public class TwilioConversationsImpl {
     }
 
     public static void setLogLevel(int level) {
-        /*
+        /**
          * The Log Levels are defined differently in the Twilio Logger
          * which is based off android.util.Log.
          */
@@ -364,13 +378,12 @@ public class TwilioConversationsImpl {
                 level = TwilioConversations.LogLevel.DISABLED;
                 break;
         }
-        setCoreLogLevel(level);
-        // Save the log level
+        trySetCoreLogLevel(level);
         TwilioConversationsImpl.level = level;
     }
 
     public static int getLogLevel() {
-        return getCoreLogLevel();
+        return tryGetCoreLogLevel();
     }
 
     public boolean isInitialized() {
@@ -393,6 +406,34 @@ public class TwilioConversationsImpl {
         }
 
         return null;
+    }
+
+    /**
+     * Convenience safety method for retrieving core log level.
+     * @return Core log level or current value that the user has set if the native library has not
+     * been loaded
+     */
+    private static int tryGetCoreLogLevel() {
+        try {
+            return getCoreLogLevel();
+        } catch (UnsatisfiedLinkError e) {
+            logger.w("Native log level not available before initialization. Returning currently" +
+                            "set log level");
+            return level;
+        }
+    }
+
+    /**
+     * This is a convenience safety method in the event that the core log level is attempted before
+     * initialization.
+     * @param level
+     */
+    private static void trySetCoreLogLevel(int level) {
+        try {
+            setCoreLogLevel(level);
+        } catch (UnsatisfiedLinkError e) {
+            logger.w("Native logger unavailable. Will set during initialization");
+        }
     }
 
     private void onNetworkChange() {
