@@ -903,7 +903,9 @@ public class ConversationImpl implements Conversation,
             freeNativeHandle(nativeSession);
             nativeSession = 0;
         }
-        EglBaseProvider.releaseEglBase();
+        if(conversationsClient.getActiveConversationsCount() == 0) {
+            EglBaseProvider.releaseEglBase();
+        }
     }
 
     private synchronized void checkDisposed() {
