@@ -130,7 +130,7 @@ public class VideoConstraints {
                 throw new NullPointerException("MaxVideoDimensions must not be null");
             }
             if(minFps > maxFps) {
-                throw new IllegalStateException("MinFPS " + minFps + " is greater than MaxFps " + maxFps);
+                throw new IllegalStateException("MinFps " + minFps + " is greater than maxFps " + maxFps);
             }
             if(minFps < 0) {
                 throw new IllegalStateException("MinFps is less than 0");
@@ -139,7 +139,7 @@ public class VideoConstraints {
                 throw new IllegalStateException("MaxFps is less than 0");
             }
             if(minFps > maxFps) {
-                throw new IllegalStateException("Minfps is greater than maxFps");
+                throw new IllegalStateException("MinFps is greater than maxFps");
             }
             if(minVideoDimensions.width > maxVideoDimensions.width) {
                 throw new IllegalStateException("Min video dimensions width " + minVideoDimensions.width + " is greater than max video dimensions width " + maxVideoDimensions.width);
