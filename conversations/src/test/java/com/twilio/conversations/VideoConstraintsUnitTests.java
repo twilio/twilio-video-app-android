@@ -1,7 +1,6 @@
 package com.twilio.conversations;
 
 import org.junit.Test;
-import org.junit.runner.RunWith;
 
 import static junit.framework.Assert.*;
 
@@ -28,14 +27,14 @@ public class VideoConstraintsUnitTests {
     @Test
     public void createVideoConstraints() {
         VideoConstraints videoConstraints = new VideoConstraints.Builder()
-                .minVideoDimensions(VideoConstraints.CIF_VIDEO_DIMENSIONS)
-                .maxVideoDimensions(VideoConstraints.HD_720P_VIDEO_DIMENSIONS)
+                .minVideoDimensions(VideoDimensions.CIF_VIDEO_DIMENSIONS)
+                .maxVideoDimensions(VideoDimensions.HD_720P_VIDEO_DIMENSIONS)
                 .minFps(VideoConstraints.FRAME_RATE_10)
                 .maxFps(VideoConstraints.FRAME_RATE_24)
                 .build();
 
-        assertEquals(VideoConstraints.CIF_VIDEO_DIMENSIONS, videoConstraints.getMinVideoDimensions());
-        assertEquals(VideoConstraints.HD_720P_VIDEO_DIMENSIONS, videoConstraints.getMaxVideoDimensions());
+        assertEquals(VideoDimensions.CIF_VIDEO_DIMENSIONS, videoConstraints.getMinVideoDimensions());
+        assertEquals(VideoDimensions.HD_720P_VIDEO_DIMENSIONS, videoConstraints.getMaxVideoDimensions());
         assertEquals(VideoConstraints.FRAME_RATE_10, videoConstraints.getMinFps());
         assertEquals(VideoConstraints.FRAME_RATE_24, videoConstraints.getMaxFps());
     }
@@ -80,8 +79,8 @@ public class VideoConstraintsUnitTests {
     @Test(expected = IllegalStateException.class)
     public void useInvalidDimensionsRange() {
         new VideoConstraints.Builder()
-                .minVideoDimensions(VideoConstraints.HD_1080P_VIDEO_DIMENSIONS)
-                .maxVideoDimensions(VideoConstraints.CIF_VIDEO_DIMENSIONS)
+                .minVideoDimensions(VideoDimensions.HD_1080P_VIDEO_DIMENSIONS)
+                .maxVideoDimensions(VideoDimensions.CIF_VIDEO_DIMENSIONS)
                 .build();
     }
 

@@ -185,14 +185,14 @@ public class TCClientActivity extends AppCompatActivity {
     static {
         Map<Integer, VideoDimensions> vdMap = new HashMap<>();
         vdMap.put(0, new VideoDimensions(0,0));
-        vdMap.put(1, VideoConstraints.CIF_VIDEO_DIMENSIONS);
-        vdMap.put(2, VideoConstraints.VGA_VIDEO_DIMENSIONS);
-        vdMap.put(3, VideoConstraints.WVGA_VIDEO_DIMENSIONS);
-        vdMap.put(4, VideoConstraints.HD_540P_VIDEO_DIMENSIONS);
-        vdMap.put(5, VideoConstraints.HD_720P_VIDEO_DIMENSIONS);
-        vdMap.put(6, VideoConstraints.HD_960P_VIDEO_DIMENSIONS);
-        vdMap.put(7, VideoConstraints.HD_S1080P_VIDEO_DIMENSIONS);
-        vdMap.put(8, VideoConstraints.HD_1080P_VIDEO_DIMENSIONS);
+        vdMap.put(1, VideoDimensions.CIF_VIDEO_DIMENSIONS);
+        vdMap.put(2, VideoDimensions.VGA_VIDEO_DIMENSIONS);
+        vdMap.put(3, VideoDimensions.WVGA_VIDEO_DIMENSIONS);
+        vdMap.put(4, VideoDimensions.HD_540P_VIDEO_DIMENSIONS);
+        vdMap.put(5, VideoDimensions.HD_720P_VIDEO_DIMENSIONS);
+        vdMap.put(6, VideoDimensions.HD_960P_VIDEO_DIMENSIONS);
+        vdMap.put(7, VideoDimensions.HD_S1080P_VIDEO_DIMENSIONS);
+        vdMap.put(8, VideoDimensions.HD_1080P_VIDEO_DIMENSIONS);
         videoDimensionsMap = Collections.unmodifiableMap(vdMap);
     }
 

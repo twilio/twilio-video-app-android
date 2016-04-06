@@ -167,8 +167,8 @@ public class VideoConstraintsTests {
         LocalVideoTrack localVideoTrack = createLocalVideoTrackWithVideoConstraints(
                 activityRule.getActivity(),
                 new VideoConstraints.Builder()
-                        .minVideoDimensions(VideoConstraints.CIF_VIDEO_DIMENSIONS)
-                        .maxVideoDimensions(VideoConstraints.VGA_VIDEO_DIMENSIONS)
+                        .minVideoDimensions(VideoDimensions.CIF_VIDEO_DIMENSIONS)
+                        .maxVideoDimensions(VideoDimensions.VGA_VIDEO_DIMENSIONS)
                         .build());
 
         LocalMedia localMedia = LocalMediaFactory.createLocalMedia(new LocalMediaListener() {
