@@ -718,12 +718,13 @@ public class ConversationImpl implements Conversation,
             final MediaTrackStatsRecord stats = MediaTrackStatsRecordFactory.create(report);
 
             /*
-             * Do not report stats until the participant sid of this participant is available.
+             * Do not report stats until the participant sid of this participant is available
+             * on both the conversation and the media stats record.
              * It will become available when the onParticipantConnected event is triggered.
              */
             boolean foundSid = false;
             for(Participant participant: getParticipants()) {
-                if(participant.getSid() != null && participant.getSid().equals(stats.getParticipantSid())) {
+                if(participant.getSid() != null && stats.getParticipantSid() != null && participant.getSid().equals(stats.getParticipantSid())) {
                     foundSid = true;
                     break;
                 }
