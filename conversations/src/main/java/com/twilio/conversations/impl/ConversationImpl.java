@@ -156,6 +156,8 @@ public class ConversationImpl implements Conversation,
         for (String participantIdentity : participantsIdentities) {
             findOrCreateParticipant(participantIdentity, null);
             invitedParticipants.add(participantIdentity);
+
+
         }
         sessionObserverInternal = new SessionObserverInternal(this, this);
         setSessionObserver(nativeSession, sessionObserverInternal.getNativeHandle());
@@ -272,8 +274,18 @@ public class ConversationImpl implements Conversation,
         ParticipantImpl participant = participantMap.get(participantIdentity);
         if(participant == null) {
             logger.d("Creating new participant" + participantIdentity);
+            if(participantSid == null) {
+                logger.w("Participant sid was null");
+            }
             participant = new ParticipantImpl(participantIdentity, participantSid);
             participantMap.put(participantIdentity, participant);
+        } else if(participant != null && participant.getSid() == null) {
+            /*
+             * Incoming invites do not provide the participant sid. The sid becomes
+             * available when the onParticipantConnect event is fired.
+             */
+            logger.d("Participant sid added for " + participantIdentity);
+            participant.setSid(participantSid);
         }
         return participant;
     }
@@ -482,7 +494,7 @@ public class ConversationImpl implements Conversation,
 
     @Override
     public void onVideoTrackAdded(final TrackInfo trackInfo, final org.webrtc.VideoTrack webRtcVideoTrack) {
-        log("onVideoTrackAdded", trackInfo.getParticipantIdentity() + " " + trackInfo.getTrackId() + trackInfo.isEnabled());
+        log("onVideoTrackAdded", trackInfo.getParticipantIdentity() + " " + trackInfo.getTrackId() + " " + trackInfo.isEnabled());
 
         if(trackInfo.getTrackOrigin() == TrackOrigin.LOCAL) {
             List<LocalVideoTrack> tracksList = localMediaImpl.getLocalVideoTracks();
@@ -704,6 +716,24 @@ public class ConversationImpl implements Conversation,
     public void onReceiveTrackStatistics(CoreTrackStatsReport report) {
         if (statsHandler != null && statsListener != null) {
             final MediaTrackStatsRecord stats = MediaTrackStatsRecordFactory.create(report);
+
+            /*
+             * Do not report stats until the participant sid of this participant is available.
+             * It will become available when the onParticipantConnected event is triggered.
+             */
+            boolean foundSid = false;
+            for(Participant participant: getParticipants()) {
+                if(participant.getSid() != null && participant.getSid().equals(stats.getParticipantSid())) {
+                    foundSid = true;
+                    break;
+                }
+            }
+
+            if(!foundSid) {
+                logger.d("stats report skipped since the participant sid has not been set yet");
+                return;
+            }
+
             if (stats != null) {
                 statsHandler.post(new Runnable() {
                     @Override
@@ -712,6 +742,7 @@ public class ConversationImpl implements Conversation,
                     }
                 });
             }
+
         }
 
     }
