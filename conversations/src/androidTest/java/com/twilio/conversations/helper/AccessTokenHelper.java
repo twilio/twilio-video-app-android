@@ -65,6 +65,7 @@ public class AccessTokenHelper {
                 fail();
             }
         });
+
         assertTrue(tokenLatch.await(10, TimeUnit.SECONDS));
 
         return capabilityToken[0];

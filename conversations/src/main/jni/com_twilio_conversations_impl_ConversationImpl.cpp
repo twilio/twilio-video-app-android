@@ -50,9 +50,7 @@ JNIEXPORT jlong JNICALL Java_com_twilio_conversations_impl_ConversationImpl_wrap
     std::vector<std::string> participants;
     for (int i=0; i < size; i++) {
         jstring value = (jstring)env->GetObjectArrayElement(participantList, i);
-        const char *nativeString = env->GetStringUTFChars(value, 0);
-        std::string participantStr(nativeString);
-        env->ReleaseStringUTFChars(value, nativeString);
+        std::string participantStr = JavaToStdString(env, value);
         participants.push_back(participantStr);
     }
 
@@ -62,7 +60,7 @@ JNIEXPORT jlong JNICALL Java_com_twilio_conversations_impl_ConversationImpl_wrap
 
 
 JNIEXPORT void JNICALL Java_com_twilio_conversations_impl_ConversationImpl_start
-        (JNIEnv *env, jobject obj, jlong nativeSession, jboolean j_enableAudio, jboolean j_muteAudio, jboolean j_enableVideo, jboolean j_pauseVideo)
+        (JNIEnv *env, jobject obj, jlong nativeSession, jboolean j_enableAudio, jboolean j_muteAudio, jboolean j_enableVideo, jboolean j_pauseVideo, jobject j_video_constraints)
 {
     TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK, kTSCoreLogLevelDebug, "start");
     TSCSessionPtr *session = reinterpret_cast<TSCSessionPtr *>(nativeSession);
@@ -78,7 +76,96 @@ JNIEXPORT void JNICALL Java_com_twilio_conversations_impl_ConversationImpl_start
                        (enableVideo ? "enableVideo = true":"enableVideo=false"),
                        (pauseVideo ? "pauseVideo=true":"pauseVideo=false"));
 
-    session->get()->start(new TSCSessionMediaConstraintsObject(enableAudio, muteAudio, enableVideo, pauseVideo));
+    if(webrtc_jni::IsNull(env, j_video_constraints)) {
+        session->get()->start(
+                new TSCSessionMediaConstraintsObject(enableAudio,
+                                                     muteAudio,
+                                                     enableVideo,
+                                                     pauseVideo));
+    } else {
+        TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK, kTSCoreLogLevelDebug, "Parsing video constraints");
+
+        jclass video_constraints_class = env->GetObjectClass(j_video_constraints);
+        jfieldID min_fps_field =
+                env->GetFieldID(video_constraints_class, "minFps", "I");
+        jfieldID max_fps_field =
+                env->GetFieldID(video_constraints_class, "maxFps", "I");
+        int min_fps =
+                env->GetIntField(j_video_constraints, min_fps_field);
+        int max_fps =
+                env->GetIntField(j_video_constraints, max_fps_field);
+
+        TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK, kTSCoreLogLevelDebug,
+                           "Video constraints minFps %d maxFps %d",
+                            min_fps,
+                            max_fps);
+
+        jfieldID min_video_dimensions_field = GetFieldID(env,
+                                                         video_constraints_class,
+                                                         "minVideoDimensions",
+                                                         "Lcom/twilio/conversations/VideoDimensions;");
+        jfieldID max_video_dimensions_field = GetFieldID(env,
+                                                         video_constraints_class,
+                                                         "maxVideoDimensions",
+                                                         "Lcom/twilio/conversations/VideoDimensions;");
+
+        jobject j_min_video_dimensions = env->GetObjectField(j_video_constraints, min_video_dimensions_field);
+        jclass min_video_dimensions_class = env->GetObjectClass(j_min_video_dimensions);
+        jfieldID min_width_field =
+                env->GetFieldID(min_video_dimensions_class, "width", "I");
+        jfieldID min_height_field =
+                env->GetFieldID(min_video_dimensions_class, "height", "I");
+        int min_width =
+                env->GetIntField(j_min_video_dimensions, min_width_field);
+        int min_height =
+                env->GetIntField(j_min_video_dimensions, min_height_field);
+
+        TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK, kTSCoreLogLevelDebug,
+                           "Video constraints min width %d min height %d",
+                            min_width,
+                            min_height);
+
+        jobject j_max_video_dimensions = env->GetObjectField(j_video_constraints, max_video_dimensions_field);
+        jclass max_video_dimensions_class = env->GetObjectClass(j_max_video_dimensions);
+        jfieldID max_width_field =
+                env->GetFieldID(max_video_dimensions_class, "width", "I");
+        jfieldID max_height_field =
+                env->GetFieldID(max_video_dimensions_class, "height", "I");
+        int max_width =
+                env->GetIntField(j_max_video_dimensions, max_width_field);
+        int max_height =
+                env->GetIntField(j_max_video_dimensions, max_height_field);
+
+        TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK, kTSCoreLogLevelDebug,
+                           "Video constraints max width %d max height %d",
+                            max_width,
+                            max_height);
+
+        TSCConstraintsRef constraints = new TSCConstraintsObject();
+
+        if (max_fps > 0) {
+            constraints->SetMandatory(twiliosdk::TSCConstraints::kMaxFrameRate, max_fps);
+        }
+        if (min_fps > 0) {
+            constraints->SetMandatory(twiliosdk::TSCConstraints::kMinFrameRate, min_fps);
+        }
+
+        if (max_width > 0 && max_height > 0) {
+            constraints->SetMandatory(twiliosdk::TSCConstraints::kMaxWidth, max_width);
+            constraints->SetMandatory(twiliosdk::TSCConstraints::kMaxHeight, max_height);
+        }
+        if (min_width > 0 && min_height > 0) {
+            constraints->SetMandatory(twiliosdk::TSCConstraints::kMinWidth, min_width);
+            constraints->SetMandatory(twiliosdk::TSCConstraints::kMinHeight, min_height);
+        }
+
+        session->get()->start(
+                new TSCSessionMediaConstraintsObject(enableAudio,
+                                                     muteAudio,
+                                                     enableVideo,
+                                                     pauseVideo),
+                                                     constraints);
+    }
 }
 
 

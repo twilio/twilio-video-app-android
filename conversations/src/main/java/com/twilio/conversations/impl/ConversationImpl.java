@@ -23,6 +23,7 @@ import com.twilio.conversations.MediaTrackState;
 import com.twilio.conversations.Participant;
 import com.twilio.conversations.TrackOrigin;
 import com.twilio.conversations.TwilioConversations;
+import com.twilio.conversations.VideoConstraints;
 import com.twilio.conversations.VideoRenderer;
 import com.twilio.conversations.VideoTrack;
 import com.twilio.conversations.impl.core.ConversationStateObserver;
@@ -155,6 +156,8 @@ public class ConversationImpl implements Conversation,
         for (String participantIdentity : participantsIdentities) {
             findOrCreateParticipant(participantIdentity, null);
             invitedParticipants.add(participantIdentity);
+
+
         }
         sessionObserverInternal = new SessionObserverInternal(this, this);
         setSessionObserver(nativeSession, sessionObserverInternal.getNativeHandle());
@@ -271,8 +274,18 @@ public class ConversationImpl implements Conversation,
         ParticipantImpl participant = participantMap.get(participantIdentity);
         if(participant == null) {
             logger.d("Creating new participant" + participantIdentity);
+            if(participantSid == null) {
+                logger.w("Participant sid was null");
+            }
             participant = new ParticipantImpl(participantIdentity, participantSid);
             participantMap.put(participantIdentity, participant);
+        } else if(participant != null && participant.getSid() == null) {
+            /*
+             * Incoming invites do not provide the participant sid. The sid becomes
+             * available when the onParticipantConnect event is fired.
+             */
+            logger.d("Participant sid added for " + participantIdentity);
+            participant.setSid(participantSid);
         }
         return participant;
     }
@@ -481,7 +494,7 @@ public class ConversationImpl implements Conversation,
 
     @Override
     public void onVideoTrackAdded(final TrackInfo trackInfo, final org.webrtc.VideoTrack webRtcVideoTrack) {
-        log("onVideoTrackAdded", trackInfo.getParticipantIdentity() + " " + trackInfo.getTrackId() + trackInfo.isEnabled());
+        log("onVideoTrackAdded", trackInfo.getParticipantIdentity() + " " + trackInfo.getTrackId() + " " + trackInfo.isEnabled());
 
         if(trackInfo.getTrackOrigin() == TrackOrigin.LOCAL) {
             List<LocalVideoTrack> tracksList = localMediaImpl.getLocalVideoTracks();
@@ -703,6 +716,25 @@ public class ConversationImpl implements Conversation,
     public void onReceiveTrackStatistics(CoreTrackStatsReport report) {
         if (statsHandler != null && statsListener != null) {
             final MediaTrackStatsRecord stats = MediaTrackStatsRecordFactory.create(report);
+
+            /*
+             * Do not report stats until the participant sid of this participant is available
+             * on both the conversation and the media stats record.
+             * It will become available when the onParticipantConnected event is triggered.
+             */
+            boolean foundSid = false;
+            for(Participant participant: getParticipants()) {
+                if(participant.getSid() != null && stats.getParticipantSid() != null && participant.getSid().equals(stats.getParticipantSid())) {
+                    foundSid = true;
+                    break;
+                }
+            }
+
+            if(!foundSid) {
+                logger.d("stats report skipped since the participant sid has not been set yet");
+                return;
+            }
+
             if (stats != null) {
                 statsHandler.post(new Runnable() {
                     @Override
@@ -711,6 +743,7 @@ public class ConversationImpl implements Conversation,
                     }
                 });
             }
+
         }
 
     }
@@ -829,6 +862,17 @@ public class ConversationImpl implements Conversation,
                 new CoreSessionMediaConstraints(localMedia.isMicrophoneAdded(),
                         localMedia.isMuted(), enableVideo, pauseVideo);
 
+        /*
+         * Determine whether video constraints were specified
+         */
+        final VideoConstraints videoConstraints;
+        if(enableVideo) {
+            LocalVideoTrackImpl localVideoTrackImpl = (LocalVideoTrackImpl)localMedia.getLocalVideoTracks().get(0);
+            videoConstraints = localVideoTrackImpl.getVideoConstraints();
+        } else {
+            videoConstraints = null;
+        }
+
 		/*
 		 * Retain the session pointer since it can be reset before the
 		 * new thread references it.
@@ -842,8 +886,8 @@ public class ConversationImpl implements Conversation,
                         mediaConstraints.isAudioEnabled(),
                         mediaConstraints.isAudioMuted(),
                         mediaConstraints.isVideoEnabled(),
-                        mediaConstraints.isVideoPaused());
-
+                        mediaConstraints.isVideoPaused(),
+                        videoConstraints);
             }
         }).start();
 
@@ -909,7 +953,8 @@ public class ConversationImpl implements Conversation,
                               boolean enableAudio,
                               boolean muteAudio,
                               boolean enableVideo,
-                              boolean pauseVideo);
+                              boolean pauseVideo,
+                              VideoConstraints videoConstraints);
     private native void setExternalCapturer(long nativeSession, long nativeCapturer);
     private native void stop(long nativeSession);
     private native void setSessionObserver(long nativeSession, long nativeSessionObserver);

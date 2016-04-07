@@ -18,7 +18,6 @@ import static org.junit.Assert.fail;
 public class ConversationsClientHelper {
 
     public static ConversationsClient registerClient(Context context, TwilioAccessManager twilioAccessManager) throws InterruptedException {
-
         TwilioConversationsHelper.initialize(context);
 
         final CountDownLatch listeningLatch = new CountDownLatch(1);
