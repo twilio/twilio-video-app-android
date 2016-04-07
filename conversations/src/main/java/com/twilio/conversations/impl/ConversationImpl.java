@@ -386,24 +386,6 @@ public class ConversationImpl implements Conversation,
                     public void run() {
                         conversationListener.onParticipantConnected(ConversationImpl.this, participantImpl);
                         waitLatch.countDown();
-                        /**
-                         * Workaround for CSDK-225. MediaTracks are added before onParticipantConnected is called.
-                         */
-                        Media media = participantImpl.getMediaImpl();
-                        for(final VideoTrack videoTrack : media.getVideoTracks()) {
-                            final Handler participantHandler = participantImpl.getHandler();
-                            if(participantHandler != null) {
-                                participantHandler.post(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        if (participantImpl.getParticipantListener() != null) {
-                                            participantImpl.getParticipantListener().onVideoTrackAdded(
-                                                    ConversationImpl.this, participantImpl, videoTrack);
-                                        }
-                                    }
-                                });
-                            }
-                        }
                     }
                 });
             } else {
