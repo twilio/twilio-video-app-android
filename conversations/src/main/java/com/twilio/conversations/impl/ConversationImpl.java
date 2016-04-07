@@ -699,25 +699,25 @@ public class ConversationImpl implements Conversation,
         if (statsHandler != null && statsListener != null) {
             final MediaTrackStatsRecord stats = MediaTrackStatsRecordFactory.create(report);
 
-            /*
-             * Do not report stats until the participant sid of this participant is available
-             * on both the conversation and the media stats record.
-             * It will become available when the onParticipantConnected event is triggered.
-             */
-            boolean foundSid = false;
-            for(Participant participant: getParticipants()) {
-                if(participant.getSid() != null && stats.getParticipantSid() != null && participant.getSid().equals(stats.getParticipantSid())) {
-                    foundSid = true;
-                    break;
-                }
-            }
-
-            if(!foundSid) {
-                logger.d("stats report skipped since the participant sid has not been set yet");
-                return;
-            }
-
             if (stats != null) {
+                /*
+                 * Do not report stats until the participant sid of this participant is available
+                 * on both the conversation and the media stats record.
+                 * It will become available when the onParticipantConnected event is triggered.
+                 */
+                boolean foundSid = false;
+                for(Participant participant: getParticipants()) {
+                    if(participant.getSid() != null && stats.getParticipantSid() != null && participant.getSid().equals(stats.getParticipantSid())) {
+                        foundSid = true;
+                        break;
+                    }
+                }
+
+                if(!foundSid) {
+                    logger.d("stats report skipped since the participant sid has not been set yet");
+                    return;
+                }
+
                 statsHandler.post(new Runnable() {
                     @Override
                     public void run() {
