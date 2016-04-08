@@ -245,7 +245,8 @@ public class TwilioConversationsImpl {
                     handler.post(new Runnable() {
                         @Override
                         public void run() {
-                            initListener.onError(new RuntimeException("Twilio conversations failed to initialize."));
+                            initListener.onError(new RuntimeException("Twilio conversations " +
+                                    "failed to initialize."));
                         }
                     });
                 } else {
