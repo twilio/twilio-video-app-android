@@ -10,6 +10,7 @@ import com.twilio.conversations.helper.ConversationsClientHelper;
 import com.twilio.conversations.helper.TwilioConversationsHelper;
 
 import org.junit.After;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -18,6 +19,7 @@ import static org.junit.Assert.*;
 
 
 @RunWith(AndroidJUnit4.class)
+@Ignore
 public class ListenTest {
     private final static String TEST_USER = "TEST_USER";
 
