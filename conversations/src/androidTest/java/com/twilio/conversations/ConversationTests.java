@@ -13,6 +13,7 @@ import com.twilio.conversations.helper.ConversationsClientHelper;
 import com.twilio.conversations.helper.TwilioConversationsHelper;
 
 import org.junit.After;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -39,6 +40,7 @@ public class ConversationTests {
     }
 
     @Test
+    @Ignore
     public void muteShouldBeSafeToCallAnytimeDuringAConversation() throws Throwable {
         if(android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
            return;

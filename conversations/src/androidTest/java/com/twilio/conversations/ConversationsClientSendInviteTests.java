@@ -2,6 +2,7 @@ package com.twilio.conversations;
 
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
+import android.test.suitebuilder.annotation.LargeTest;
 
 import com.twilio.common.TwilioAccessManager;
 import com.twilio.conversations.activity.TwilioConversationsActivity;
@@ -11,6 +12,7 @@ import com.twilio.conversations.helper.TwilioConversationsHelper;
 
 import org.junit.After;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -19,6 +21,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 @RunWith(AndroidJUnit4.class)
+@Ignore
 public class ConversationsClientSendInviteTests {
     private static String TOKEN = "token";
     private static String PARTICIPANT = "janne";

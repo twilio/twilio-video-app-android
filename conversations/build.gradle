@@ -150,6 +150,14 @@ model {
 
             testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         }
+
+        testOptions.unitTests.all {
+            ignoreFailures false
+
+            testLogging {
+                events 'passed', 'skipped', 'failed', 'standardOut', 'standardError'
+            }
+        }
     }
 
     android.ndk {
