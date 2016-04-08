@@ -31,6 +31,7 @@ import static junit.framework.Assert.fail;
 
 @RunWith(AndroidJUnit4.class)
 @LargeTest
+@Ignore
 public class VideoConstraintsTests {
     private static final String SELF_TEST_USER = "SELF_TEST_USER";
 
