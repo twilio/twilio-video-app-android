@@ -13,7 +13,7 @@ JNIEXPORT jlong JNICALL Java_com_twilio_conversations_impl_ConversationImpl_wrap
   (JNIEnv *, jobject, jlong, jlong, jobjectArray);
 
 JNIEXPORT void JNICALL Java_com_twilio_conversations_impl_ConversationImpl_start
-  (JNIEnv *, jobject, jlong, jboolean, jboolean, jboolean, jboolean, jobject);
+  (JNIEnv *, jobject, jlong, jboolean, jboolean, jboolean, jboolean, jobject, jobjectArray, jobject);
 
 JNIEXPORT void JNICALL Java_com_twilio_conversations_impl_ConversationImpl_stop
   (JNIEnv *, jobject, jlong);

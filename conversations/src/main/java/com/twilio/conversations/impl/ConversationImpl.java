@@ -12,6 +12,9 @@ import android.os.Handler;
 
 import com.twilio.conversations.AudioTrack;
 import com.twilio.conversations.Conversation;
+import com.twilio.conversations.IceOptions;
+import com.twilio.conversations.IceServer;
+import com.twilio.conversations.IceTransportPolicy;
 import com.twilio.conversations.StatsListener;
 import com.twilio.conversations.MediaTrackStatsRecord;
 import com.twilio.conversations.TwilioConversationsException;
@@ -823,37 +826,42 @@ public class ConversationImpl implements Conversation,
         return isMuted(nativeSession);
     }
 
+
+    CoreSessionMediaConstraints createMediaConstrains(IceOptions iceOptions) {
+        LocalMedia localMedia = getLocalMedia();
+        boolean enableVideo = !localMedia.getLocalVideoTracks().isEmpty();
+        boolean pauseVideo = false;
+        if (enableVideo) {
+            pauseVideo = !localMedia.getLocalVideoTracks().get(0).isEnabled();
+        }
+        return new CoreSessionMediaConstraints(localMedia.isMicrophoneAdded(),
+                        localMedia.isMuted(), enableVideo, pauseVideo, iceOptions);
+
+    }
+
     /**
      * CoreSession
      */
     @Override
-    public void start() {
+    public void start(final CoreSessionMediaConstraints mediaConstraints) {
         logger.d("starting call");
 
 		/*
 		 * Determine the media constraints
 		 */
-        LocalMedia localMedia = getLocalMedia();
-        boolean enableVideo = !localMedia.getLocalVideoTracks().isEmpty();
-        boolean pauseVideo = false;
-        if (enableVideo) {
-            setupExternalCapturer();
-            pauseVideo = !localMedia.getLocalVideoTracks().get(0).isEnabled();
-        }
-        final CoreSessionMediaConstraints mediaConstraints =
-                new CoreSessionMediaConstraints(localMedia.isMicrophoneAdded(),
-                        localMedia.isMuted(), enableVideo, pauseVideo);
-
-        /*
-         * Determine whether video constraints were specified
-         */
         final VideoConstraints videoConstraints;
-        if(enableVideo) {
+        LocalMedia localMedia = getLocalMedia();
+        if(mediaConstraints.isVideoEnabled()) {
+            setupExternalCapturer();
             LocalVideoTrackImpl localVideoTrackImpl = (LocalVideoTrackImpl)localMedia.getLocalVideoTracks().get(0);
             videoConstraints = localVideoTrackImpl.getVideoConstraints();
         } else {
             videoConstraints = null;
         }
+
+        IceOptions iceOptions = mediaConstraints.getIceOptions();
+        final IceTransportPolicy policy = (iceOptions != null) ?
+                iceOptions.iceTransportPolicy : IceTransportPolicy.ICE_TRANSPORT_POLICY_ALL;
 
 		/*
 		 * Retain the session pointer since it can be reset before the
@@ -869,7 +877,9 @@ public class ConversationImpl implements Conversation,
                         mediaConstraints.isAudioMuted(),
                         mediaConstraints.isVideoEnabled(),
                         mediaConstraints.isVideoPaused(),
-                        videoConstraints);
+                        videoConstraints,
+                        mediaConstraints.getIceServersArray(), policy);
+
             }
         }).start();
 
@@ -936,7 +946,10 @@ public class ConversationImpl implements Conversation,
                               boolean muteAudio,
                               boolean enableVideo,
                               boolean pauseVideo,
-                              VideoConstraints videoConstraints);
+                              VideoConstraints videoConstraints,
+                              IceServer[] iceServers,
+                              IceTransportPolicy iceTransportPolicy);
+
     private native void setExternalCapturer(long nativeSession, long nativeCapturer);
     private native void stop(long nativeSession);
     private native void setSessionObserver(long nativeSession, long nativeSessionObserver);

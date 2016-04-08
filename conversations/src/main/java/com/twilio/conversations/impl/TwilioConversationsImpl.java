@@ -29,6 +29,7 @@ import android.os.Handler;
 import android.util.Log;
 
 import com.twilio.common.TwilioAccessManager;
+import com.twilio.conversations.ClientOptions;
 import com.twilio.conversations.ConversationsClientListener;
 import com.twilio.conversations.TwilioConversations;
 import com.twilio.conversations.TwilioConversations.LogLevel;
@@ -321,20 +322,11 @@ public class TwilioConversationsImpl {
     }
 
     public ConversationsClientImpl createConversationsClient(TwilioAccessManager accessManager,
-                                                             Map<String, String> options,
+                                                             ClientOptions options,
                                                              ConversationsClientListener inListener) {
-        if(options != null && accessManager != null) {
-            // Let's simplify options map by using array instead,
-            // for easier passing data to jni layer
-            String[] optionsArray = new String[options.size() * 2];
-            int i = 0;
-            for (Map.Entry<String, String> entrySet : options.entrySet()) {
-                optionsArray[i++] = entrySet.getKey();
-                optionsArray[i++] = entrySet.getValue();
-            }
-
+        if(accessManager != null) {
             final ConversationsClientImpl conversationsClient = new ConversationsClientImpl(applicationContext,
-                    accessManager, inListener, optionsArray);
+                    accessManager, inListener, options);
            if (conversationsClientMap.size() == 0) {
                 registerConnectivityBroadcastReceiver();
             }

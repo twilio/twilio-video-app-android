@@ -6,6 +6,7 @@ import android.os.Handler;
 
 import com.twilio.conversations.Conversation;
 import com.twilio.conversations.ConversationCallback;
+import com.twilio.conversations.IceOptions;
 import com.twilio.conversations.IncomingInvite;
 import com.twilio.conversations.InviteStatus;
 import com.twilio.conversations.LocalMedia;
@@ -67,6 +68,11 @@ public class IncomingInviteImpl implements IncomingInvite {
 
     @Override
     public void accept(LocalMedia localMedia, final ConversationCallback conversationCallback) {
+        accept(localMedia, null, conversationCallback);
+    }
+
+    @Override
+    public void accept(LocalMedia localMedia, IceOptions iceOptions, final ConversationCallback conversationCallback) {
         if(localMedia == null) {
             throw new IllegalStateException("LocalMedia must not be null");
         }
@@ -88,7 +94,7 @@ public class IncomingInviteImpl implements IncomingInvite {
         }
 
         inviteStatus = InviteStatus.ACCEPTING;
-        conversationsClientImpl.accept(conversationImpl);
+        conversationsClientImpl.accept(conversationImpl, iceOptions);
     }
 
     @Override

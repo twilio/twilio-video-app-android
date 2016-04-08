@@ -8,7 +8,7 @@ import com.twilio.common.TwilioAccessManager;
 import com.twilio.common.TwilioAccessManagerFactory;
 import com.twilio.conversations.activity.TwilioConversationsActivity;
 import com.twilio.conversations.helper.TwilioConversationsHelper;
-import com.twilio.conversations.internal.TwilioConversationsInternal;
+import com.twilio.conversations.internal.ClientOptionsInternal;
 
 import org.junit.After;
 import org.junit.Rule;
@@ -114,7 +114,7 @@ public class TwilioConversationsTest {
         }
 
         try {
-            TwilioConversationsInternal.createConversationsClient(null, null, null);
+            TwilioConversations.createConversationsClient(null, null, null);
         } catch(NullPointerException e) {
             npeSeen = true;
         } finally {
@@ -144,7 +144,7 @@ public class TwilioConversationsTest {
 
 
         try {
-            TwilioConversationsInternal.createConversationsClient(null, null, conversationsClientListener());
+            TwilioConversations.createConversationsClient(null, null, conversationsClientListener());
         } catch(NullPointerException e) {
             npeSeen = true;
         } finally {
@@ -162,11 +162,11 @@ public class TwilioConversationsTest {
     }
 
     @Test
-    public void testTwilioCreateConversationsClientWithAccessManagerAndEmptyOptionsMap() throws InterruptedException {
+    public void testTwilioCreateConversationsClientWithAccessManagerAndEmptyOptions() throws InterruptedException {
         TwilioConversationsHelper.initialize(mActivityRule.getActivity());
 
         accessManager = TwilioAccessManagerFactory.createAccessManager("DEADBEEF", null);
-        ConversationsClient conversationsClient = TwilioConversationsInternal.createConversationsClient(accessManager, new HashMap<String, String>(), conversationsClientListener());
+        ConversationsClient conversationsClient = TwilioConversations.createConversationsClient(accessManager, null, conversationsClientListener());
 
         assertNotNull(conversationsClient);
     }
@@ -177,8 +177,9 @@ public class TwilioConversationsTest {
 
         HashMap optionsMap = new HashMap<>();
         optionsMap.put("foo", "bar");
+        ClientOptionsInternal options = new ClientOptionsInternal(optionsMap);
         accessManager = TwilioAccessManagerFactory.createAccessManager("DEADBEEF", null);
-        ConversationsClient conversationsClient = TwilioConversationsInternal.createConversationsClient(accessManager, optionsMap, conversationsClientListener());
+        ConversationsClient conversationsClient = TwilioConversations.createConversationsClient(accessManager, options, conversationsClientListener());
 
         assertNotNull(conversationsClient);
     }

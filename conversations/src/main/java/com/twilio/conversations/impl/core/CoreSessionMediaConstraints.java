@@ -1,14 +1,18 @@
 package com.twilio.conversations.impl.core;
 
+import com.twilio.conversations.IceOptions;
+import com.twilio.conversations.IceServer;
+
 public class CoreSessionMediaConstraints {
 	private boolean enableAudio;
 	private boolean muteAudio;
 	private boolean enableVideo;
 	private boolean pauseVideo;
+	private IceOptions iceOptions;
 
 	public CoreSessionMediaConstraints(
 			boolean enableAudio, boolean muteAudio,
-			boolean enableVideo, boolean pauseVideo) {
+			boolean enableVideo, boolean pauseVideo, IceOptions options) {
 		this.enableAudio = enableAudio;
 		this.muteAudio = muteAudio;
 		this.enableVideo = enableVideo;
@@ -30,4 +34,18 @@ public class CoreSessionMediaConstraints {
 	public boolean isVideoPaused() {
 		return pauseVideo;
 	}
+
+    public IceServer[] getIceServersArray() {
+        IceServer[] iceArray = null;
+        if ((iceOptions != null) && (iceOptions.iceServers != null)) {
+            iceArray = new IceServer[iceOptions.iceServers.size()];
+            int i = 0;
+            for (IceServer iceServer : iceOptions.iceServers) {
+                iceArray[i++] = iceServer;
+            }
+        }
+        return iceArray;
+    }
+
+    public IceOptions getIceOptions() { return iceOptions; }
 }

@@ -16,11 +16,13 @@ import android.os.Parcelable;
 
 import com.twilio.common.TwilioAccessManager;
 import com.twilio.conversations.AudioOutput;
+import com.twilio.conversations.ClientOptions;
 import com.twilio.conversations.Conversation;
 import com.twilio.conversations.ConversationCallback;
 import com.twilio.conversations.ConversationListener;
 import com.twilio.conversations.ConversationsClient;
 import com.twilio.conversations.ConversationsClientListener;
+import com.twilio.conversations.IceOptions;
 import com.twilio.conversations.InviteStatus;
 import com.twilio.conversations.LocalMedia;
 import com.twilio.conversations.OutgoingInvite;
@@ -36,6 +38,7 @@ import com.twilio.conversations.impl.core.EndpointState;
 import com.twilio.conversations.impl.core.SessionState;
 import com.twilio.conversations.impl.logging.Logger;
 import com.twilio.conversations.impl.util.CallbackHandler;
+import com.twilio.conversations.internal.ClientOptionsInternal;
 
 public class ConversationsClientImpl implements
         ConversationsClient,
@@ -107,6 +110,7 @@ public class ConversationsClientImpl implements
     private Map<ConversationImpl, OutgoingInviteImpl> pendingOutgoingInvites = new HashMap<>();
     private Map<ConversationImpl, IncomingInviteImpl> pendingIncomingInvites = new HashMap<>();
     private boolean listening = false;
+    private IceOptions iceOptions;
 
     public UUID getUuid() {
         return uuid;
@@ -119,7 +123,7 @@ public class ConversationsClientImpl implements
 
     ConversationsClientImpl(Context context,
                             TwilioAccessManager accessManager,
-                            ConversationsClientListener conversationsClientListener, String[] optionsArray) {
+                            ConversationsClientListener conversationsClientListener, ClientOptions options) {
         this.context = context;
         this.conversationsClientListener = conversationsClientListener;
         this.accessManager = accessManager;
@@ -128,6 +132,13 @@ public class ConversationsClientImpl implements
         if(handler == null) {
             throw new IllegalThreadStateException("This thread must be able to obtain a Looper");
         }
+        if (options != null) {
+            iceOptions = options.getIceOptions();
+        }
+
+        // Let's simplify options map by using array instead,
+        // for easier passing data to jni layer
+        String[] optionsArray = getOptionsArray(options);
 
         endpointObserver = new EndpointObserverInternal(this);
         nativeEndpointHandle = createEndpoint(accessManager, optionsArray,
@@ -136,6 +147,24 @@ public class ConversationsClientImpl implements
         if(nativeEndpointHandle == 0) {
             throw new IllegalStateException("Native endpoint handle must not be null");
         }
+    }
+
+    private String[] getOptionsArray(ClientOptions options) {
+        String[] optionsArray = new String[0];
+        if (options != null && (options instanceof ClientOptionsInternal)) {
+            Map<String, String> privateOptions =
+                    ((ClientOptionsInternal)options).getPrivateOptions();
+            if (privateOptions != null && privateOptions.size() >0) {
+                optionsArray = new String[privateOptions.size() * 2];
+                int i = 0;
+                for (Map.Entry<String, String> entrySet : privateOptions.entrySet()) {
+                    optionsArray[i++] = entrySet.getKey();
+                    optionsArray[i++] = entrySet.getValue();
+                }
+
+            }
+        }
+        return optionsArray;
     }
 
     int getActiveConversationsCount() {
@@ -186,6 +215,11 @@ public class ConversationsClientImpl implements
     public OutgoingInvite sendConversationInvite(Set<String> participants,
                                                  LocalMedia localMedia,
                                                  ConversationCallback conversationCallback) {
+        return sendConversationInvite(participants, localMedia, null, conversationCallback);
+    }
+
+    @Override
+    public OutgoingInvite sendConversationInvite(Set<String> participants, LocalMedia localMedia, IceOptions iceOptions, ConversationCallback conversationCallback) {
         if(participants == null || participants.size() == 0) {
             throw new IllegalStateException("Invite at least one participant");
         }
@@ -219,7 +253,9 @@ public class ConversationsClientImpl implements
             conversationCallback.onConversation(null, exception);
             return null;
         } else {
-            outgoingConversationImpl.start();
+            iceOptions = (iceOptions != null) ? iceOptions : this.iceOptions;
+            outgoingConversationImpl.start(
+                    outgoingConversationImpl.createMediaConstrains(iceOptions));
         }
 
         conversations.add(outgoingConversationImpl);
@@ -515,8 +551,9 @@ public class ConversationsClientImpl implements
      * Accept the incoming invite.
      */
     @Override
-    public void accept(ConversationImpl conversationImpl) {
-        conversationImpl.start();
+    public void accept(ConversationImpl conversationImpl, IceOptions options) {
+        IceOptions iceOptions = (options != null) ? options : this.iceOptions;
+        conversationImpl.start(conversationImpl.createMediaConstrains(iceOptions));
     }
 
     /*

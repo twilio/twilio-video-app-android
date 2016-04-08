@@ -52,6 +52,17 @@ public interface ConversationsClient {
     OutgoingInvite sendConversationInvite(Set<String> participants, LocalMedia localMedia, ConversationCallback conversationCallback);
 
     /**
+     * Sends an invitation to start a conversation with the following participants and local media configuration
+     *
+     * @param participants Set of participant names as Strings
+     * @param localMedia Local Media you would like to use when setting up the new conversation
+     * @param iceOptions Custom ICE (Interactive Connectivity Establishment) protocol options
+     * @param conversationCallback The callback that will provide the conversation once it's been created
+     * @throws ConversationClientException
+     */
+    OutgoingInvite sendConversationInvite(Set<String> participants, LocalMedia localMedia, IceOptions iceOptions, ConversationCallback conversationCallback);
+
+    /**
      * Sets the audio output speaker for the device.
      *
      * Bluetooth headset is not supported.
