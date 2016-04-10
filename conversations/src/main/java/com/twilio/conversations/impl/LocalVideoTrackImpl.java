@@ -3,6 +3,7 @@ package com.twilio.conversations.impl;
 import com.twilio.conversations.CameraCapturer;
 import com.twilio.conversations.LocalVideoTrack;
 import com.twilio.conversations.VideoConstraints;
+import com.twilio.conversations.VideoDimensions;
 
 public class LocalVideoTrackImpl extends VideoTrackImpl implements LocalVideoTrack  {
     private VideoConstraints videoConstraints;
@@ -65,7 +66,4 @@ public class LocalVideoTrackImpl extends VideoTrackImpl implements LocalVideoTra
         cameraCapturer = null;
     }
 
-    VideoConstraints getVideoConstraints() {
-        return videoConstraints;
-    }
 }

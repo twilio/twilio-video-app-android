@@ -44,14 +44,14 @@ public class VideoConstraintsUnitTests {
         VideoConstraints videoConstraints = new VideoConstraints.Builder()
                 .minVideoDimensions(VideoDimensions.CIF_VIDEO_DIMENSIONS)
                 .maxVideoDimensions(VideoDimensions.HD_720P_VIDEO_DIMENSIONS)
-                .minFps(VideoConstraints.FRAME_RATE_10)
-                .maxFps(VideoConstraints.FRAME_RATE_24)
+                .minFps(VideoConstraints.FPS_10)
+                .maxFps(VideoConstraints.FPS_24)
                 .build();
 
         assertEquals(VideoDimensions.CIF_VIDEO_DIMENSIONS, videoConstraints.getMinVideoDimensions());
         assertEquals(VideoDimensions.HD_720P_VIDEO_DIMENSIONS, videoConstraints.getMaxVideoDimensions());
-        assertEquals(VideoConstraints.FRAME_RATE_10, videoConstraints.getMinFps());
-        assertEquals(VideoConstraints.FRAME_RATE_24, videoConstraints.getMaxFps());
+        assertEquals(VideoConstraints.FPS_10, videoConstraints.getMinFps());
+        assertEquals(VideoConstraints.FPS_24, videoConstraints.getMaxFps());
     }
 
     @Test(expected = NullPointerException.class)

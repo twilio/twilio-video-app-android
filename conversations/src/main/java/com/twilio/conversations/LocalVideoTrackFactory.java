@@ -11,18 +11,18 @@ public class LocalVideoTrackFactory {
      * Create new instance of local video track
      *
      * @param cameraCapturer
-     * @return new instance of VideoTrack
+     * @return new instance of LocalVideoTrack
      */
     public static LocalVideoTrack createLocalVideoTrack(CameraCapturer cameraCapturer) {
         return new LocalVideoTrackImpl(cameraCapturer);
     }
 
     /**
-     * Create new instance of local video track
+     * Create new instance of local video track with {@link VideoConstraints}
      *
      * @param cameraCapturer
      * @param videoConstraints
-     * @return new instance of VideoTrack
+     * @return new instance of LocalVideoTrack
      */
     public static LocalVideoTrack createLocalVideoTrack(CameraCapturer cameraCapturer, VideoConstraints videoConstraints) {
         return new LocalVideoTrackImpl(cameraCapturer, videoConstraints);
