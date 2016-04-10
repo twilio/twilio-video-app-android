@@ -6,6 +6,21 @@ import static junit.framework.Assert.*;
 
 public class VideoConstraintsUnitTests {
 
+    @Test(expected = IllegalStateException.class)
+    public void negativeWidthVideoDimensions() {
+        new VideoDimensions(-1, 5);
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void negativeHeightVideoDimensions() {
+        new VideoDimensions(1, -1);
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void negativeWidthAndHeightVideoDimensions() {
+        new VideoDimensions(-1, -1);
+    }
+
     @Test
     public void createCustomMinAndMaxDimensions() {
         int dummyMinWidth = 100;
@@ -69,6 +84,14 @@ public class VideoConstraintsUnitTests {
     }
 
     @Test(expected = IllegalStateException.class)
+    public void localVideoTrackWithNegativeMinAndMaxFps() {
+        new VideoConstraints.Builder()
+                .minFps(-1)
+                .maxFps(-1)
+                .build();
+    }
+
+    @Test(expected = IllegalStateException.class)
     public void useInvalidFpsRange() {
         new VideoConstraints.Builder()
                 .minFps(20)
@@ -99,43 +122,6 @@ public class VideoConstraintsUnitTests {
                 .build();
 
         LocalVideoTrackFactory.createLocalVideoTrack(cameraCapturer, videoConstraints);
-    }
-
-    @Test(expected = IllegalStateException.class)
-    public void localVideoTrackWithNegativeMinFps() {
-        new VideoConstraints.Builder()
-                .minFps(-1)
-                .build();
-    }
-
-    @Test(expected = IllegalStateException.class)
-    public void localVideoTrackWithNegativeMaxFps() {
-        new VideoConstraints.Builder()
-                .maxFps(-1)
-                .build();
-    }
-
-    @Test(expected = IllegalStateException.class)
-    public void localVideoTrackWithNegativeMinAndMaxFps() {
-        new VideoConstraints.Builder()
-                .minFps(-1)
-                .maxFps(-1)
-                .build();
-    }
-
-    @Test(expected = IllegalStateException.class)
-    public void negativeWidthVideoDimensions() {
-        new VideoDimensions(-1, 5);
-    }
-
-    @Test(expected = IllegalStateException.class)
-    public void negativeHeightVideoDimensions() {
-        new VideoDimensions(1, -1);
-    }
-
-    @Test(expected = IllegalStateException.class)
-    public void negativeWidthAndHeightVideoDimensions() {
-        new VideoDimensions(-1, -1);
     }
 
 }
