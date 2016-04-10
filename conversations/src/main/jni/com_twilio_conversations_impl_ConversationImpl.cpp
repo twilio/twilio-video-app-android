@@ -267,11 +267,16 @@ JNIEXPORT void JNICALL Java_com_twilio_conversations_impl_ConversationImpl_setSe
 }
 
 JNIEXPORT jboolean JNICALL Java_com_twilio_conversations_impl_ConversationImpl_enableVideo
-        (JNIEnv *, jobject, jlong nativeSession, jboolean enabled, jboolean paused)
+        (JNIEnv *env, jobject, jlong nativeSession, jboolean enabled, jboolean paused, jobject j_video_constraints)
 {
     TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK, kTSCoreLogLevelDebug, "enableVideo");
     TSCSessionPtr *session = reinterpret_cast<TSCSessionPtr *>(nativeSession);
-    return (session->get()->enableVideo((bool)enabled, (bool)paused) ? JNI_TRUE : JNI_FALSE);
+    if(IsNull(env, j_video_constraints) || !((bool)enabled)) {
+        return (session->get()->enableVideo((bool) enabled, (bool) paused) ? JNI_TRUE : JNI_FALSE);
+    } else {
+        TSCConstraintsRef videoConstraints = createVideoConstraints(env, j_video_constraints);
+        return (session->get()->enableVideo((bool) enabled, (bool) paused, videoConstraints) ? JNI_TRUE : JNI_FALSE);
+    }
 }
 
 JNIEXPORT void JNICALL Java_com_twilio_conversations_impl_ConversationImpl_freeNativeHandle

@@ -115,7 +115,7 @@ public class LocalMediaImpl implements LocalMedia {
                 logger.d("Create a new external capturer since the nativeVideoCapturer is no longer valid");
                 convWeak.get().setupExternalCapturer();
             }
-            boolean enabledVideo = convWeak.get().enableVideo(true, !localVideoTrackImpl.isEnabled());
+            boolean enabledVideo = convWeak.get().enableVideo(true, !localVideoTrackImpl.isEnabled(), localVideoTrackImpl.getVideoConstraints());
             if(!enabledVideo) {
                 // Remove the video track since it failed to be added
                 videoTracksImpl.remove(localVideoTrackImpl);
@@ -145,7 +145,7 @@ public class LocalMediaImpl implements LocalMedia {
             return;
         }
         ConversationImpl conv = convWeak.get();
-        boolean enabled = conv.enableVideo(false, !track.isEnabled());
+        boolean enabled = conv.enableVideo(false, !track.isEnabled(), null);
         if(enabled) {
             ((LocalVideoTrackImpl) track).setTrackState(MediaTrackState.ENDING);
         }

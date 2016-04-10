@@ -902,8 +902,8 @@ public class ConversationImpl implements Conversation,
     }
 
     @Override
-    public boolean enableVideo(boolean enabled, boolean paused) {
-        return enableVideo(nativeSession, enabled, paused);
+    public boolean enableVideo(boolean enabled, boolean paused, VideoConstraints videoConstraints) {
+        return enableVideo(nativeSession, enabled, paused, videoConstraints);
     }
 
     @Override
@@ -954,7 +954,7 @@ public class ConversationImpl implements Conversation,
     private native void stop(long nativeSession);
     private native void setSessionObserver(long nativeSession, long nativeSessionObserver);
     private native void freeNativeHandle(long nativeHandle);
-    private native boolean enableVideo(long nativeHandle, boolean enabled, boolean paused);
+    private native boolean enableVideo(long nativeHandle, boolean enabled, boolean paused, VideoConstraints videoConstraints);
     private native boolean mute(long nativeSession, boolean on);
     private native boolean isMuted(long nativeSession);
     private native void inviteParticipants(long nativeHandle, String[] participants);

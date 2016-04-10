@@ -28,7 +28,7 @@ JNIEXPORT void JNICALL Java_com_twilio_conversations_impl_ConversationImpl_freeN
   (JNIEnv *, jobject, jlong);
 
 JNIEXPORT jboolean JNICALL Java_com_twilio_conversations_impl_ConversationImpl_enableVideo
-  (JNIEnv *, jobject, jlong, jboolean, jboolean);
+  (JNIEnv *, jobject, jlong, jboolean, jboolean, jobject);
 
 JNIEXPORT jboolean JNICALL Java_com_twilio_conversations_impl_ConversationImpl_mute
   (JNIEnv *, jobject, jlong, jboolean);

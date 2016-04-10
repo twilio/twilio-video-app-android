@@ -1,6 +1,7 @@
 package com.twilio.conversations.impl.core;
 
 import com.twilio.conversations.IceOptions;
+import com.twilio.conversations.VideoConstraints;
 
 import java.util.Set;
 
@@ -9,7 +10,7 @@ public interface CoreSession {
 
     void stop();
 
-    boolean enableVideo(boolean enabled, boolean paused);
+    boolean enableVideo(boolean enabled, boolean paused, VideoConstraints videoConstraints);
 
     void inviteParticipants(Set<String> participants);
 
