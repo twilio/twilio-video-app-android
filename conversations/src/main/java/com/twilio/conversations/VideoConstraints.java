@@ -6,8 +6,7 @@ package com.twilio.conversations;
  * video sent to Participants may be downscaled temporally or spatially in response to network
  * and device conditions.
  *
- * If you do not specify video constraints, default video constraints are applied with
- * maxVideoDimensions of 640x480 at a maxFps of 30 frames per second.
+
  */
 public class VideoConstraints {
 

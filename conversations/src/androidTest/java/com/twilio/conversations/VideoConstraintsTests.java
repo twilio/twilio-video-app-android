@@ -14,6 +14,7 @@ import com.twilio.conversations.helper.CameraCapturerHelper;
 import com.twilio.conversations.helper.ConversationsClientHelper;
 import com.twilio.conversations.helper.TwilioConversationsHelper;
 
+import org.junit.After;
 import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
@@ -35,6 +36,13 @@ public class VideoConstraintsTests {
     @Rule
     public ActivityTestRule<TwilioConversationsActivity> activityRule = new ActivityTestRule<>(
             TwilioConversationsActivity.class);
+
+    @After
+    public void teardown() throws InterruptedException {
+        TwilioConversationsHelper.destroy();
+        CountDownLatch giveTimeToDestroy = new CountDownLatch(1);
+        giveTimeToDestroy.await(5, TimeUnit.SECONDS);
+    }
 
     @Test(expected = NullPointerException.class)
     public void localVideoTrackWithNullVideoConstraints() {
@@ -149,7 +157,6 @@ public class VideoConstraintsTests {
 
         assertTrue(conversationEndsWhenInviteCancelled.await(20, TimeUnit.SECONDS));
 
-        TwilioConversationsHelper.destroy();
     }
 
     @Test
@@ -247,7 +254,6 @@ public class VideoConstraintsTests {
 
         assertTrue(conversationEndsWhenInviteCancelled.await(20, TimeUnit.SECONDS));
 
-        TwilioConversationsHelper.destroy();
     }
 
     private LocalVideoTrack createLocalVideoTrackWithVideoConstraints(Context context, VideoConstraints videoConstraints) throws InterruptedException {
