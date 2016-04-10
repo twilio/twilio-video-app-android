@@ -7,7 +7,7 @@ package com.twilio.conversations;
  * and device conditions.
  *
  * If you do not specify video constraints, default video constraints are applied with
- * {@link VideoDimensions} of 640x480 at 30 frames per second.
+ * maxVideoDimensions of 640x480 at a maxFps of 30 frames per second.
  */
 public class VideoConstraints {
 
