@@ -109,7 +109,8 @@ public class ConversationsClientSendInviteTests {
     @Test(expected = IllegalArgumentException.class)
     public void cannotSendInviteIfOneOfParticipantsIsEmptyString() throws InterruptedException {
         accessManager = AccessTokenHelper.obtainTwilioAccessManager(PARTICIPANT);
-        ConversationsClient conversationsClient = ConversationsClientHelper.registerClient(mActivityRule.getActivity(), accessManager);
+        ConversationsClient conversationsClient = ConversationsClientHelper
+                .registerClient(mActivityRule.getActivity(), accessManager);
         Assert.assertNotNull(conversationsClient);
 
         LocalMedia localMedia = LocalMediaFactory.createLocalMedia(localMediaListener());
@@ -124,17 +125,21 @@ public class ConversationsClientSendInviteTests {
     private LocalMediaListener localMediaListener(){
         return new LocalMediaListener() {
             @Override
-            public void onLocalVideoTrackAdded(LocalMedia localMedia, LocalVideoTrack localVideoTrack) {
+            public void onLocalVideoTrackAdded(LocalMedia localMedia,
+                                               LocalVideoTrack localVideoTrack) {
 
             }
 
             @Override
-            public void onLocalVideoTrackRemoved(LocalMedia localMedia, LocalVideoTrack localVideoTrack) {
+            public void onLocalVideoTrackRemoved(LocalMedia localMedia,
+                                                 LocalVideoTrack localVideoTrack) {
 
             }
 
             @Override
-            public void onLocalVideoTrackError(LocalMedia localMedia, LocalVideoTrack localVideoTrack, TwilioConversationsException e) {
+            public void onLocalVideoTrackError(LocalMedia localMedia,
+                                               LocalVideoTrack localVideoTrack,
+                                               TwilioConversationsException e) {
 
             }
         };
@@ -143,8 +148,8 @@ public class ConversationsClientSendInviteTests {
     private ConversationCallback conversationCallback() {
         return new ConversationCallback() {
             @Override
-            public void onConversation(Conversation conversation, TwilioConversationsException e) {
-
+            public void onConversation(Conversation conversation,
+                                       TwilioConversationsException e) {
             }
         };
     }
