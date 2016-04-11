@@ -18,6 +18,7 @@ import com.twilio.conversations.helper.TwilioConversationsHelper;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -76,6 +77,7 @@ public class VideoConstraintsTests {
     }
 
     @Test
+    @Ignore
     public void startConversationWithInvalidVideoConstraints() throws InterruptedException {
         if(requiresRuntimePermissions()) {
             return;
