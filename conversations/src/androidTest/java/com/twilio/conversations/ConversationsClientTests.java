@@ -46,6 +46,7 @@ public class ConversationsClientTests extends TwilioConversationsTestsBase {
     }
 
     @Test(expected = IllegalStateException.class)
+    @Ignore
     public void cannotSendInviteWithNullParticipantSet() throws InterruptedException {
         accessManager = AccessTokenHelper.obtainTwilioAccessManager(PARTICIPANT);
         ConversationsClient conversationsClient = ConversationsClientHelper
@@ -59,6 +60,7 @@ public class ConversationsClientTests extends TwilioConversationsTestsBase {
     }
 
     @Test(expected = IllegalStateException.class)
+    @Ignore
     public void cannotSendInviteWithNullLocalMedia() throws InterruptedException {
         accessManager = AccessTokenHelper.obtainTwilioAccessManager(PARTICIPANT);
         ConversationsClient conversationsClient = ConversationsClientHelper
