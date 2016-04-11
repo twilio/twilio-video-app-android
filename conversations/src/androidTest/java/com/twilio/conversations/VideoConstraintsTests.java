@@ -173,6 +173,7 @@ public class VideoConstraintsTests {
     }
 
     @Test
+    @Ignore
     public void startConversationWithValidVideoConstraints() throws InterruptedException {
         if(requiresRuntimePermissions()) {
             return;
