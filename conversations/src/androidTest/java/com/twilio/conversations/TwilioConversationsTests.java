@@ -32,7 +32,7 @@ import static org.junit.Assert.assertNotEquals;
 
 @RunWith(AndroidJUnit4.class)
 @LargeTest
-public class TwilioConversationsTest {
+public class TwilioConversationsTests {
     private TwilioAccessManager accessManager;
 
     private Context context;
