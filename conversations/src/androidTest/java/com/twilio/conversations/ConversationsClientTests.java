@@ -124,6 +124,7 @@ public class ConversationsClientTests extends TwilioConversationsTestsBase {
     }
 
     @Test(expected = IllegalArgumentException.class)
+    @Ignore
     public void cannotSendInviteIfOneOfParticipantsIsEmptyString() throws InterruptedException {
         accessManager = AccessTokenHelper.obtainTwilioAccessManager(PARTICIPANT);
         ConversationsClient conversationsClient = ConversationsClientHelper
