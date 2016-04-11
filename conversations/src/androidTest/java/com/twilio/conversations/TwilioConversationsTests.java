@@ -61,13 +61,13 @@ public class TwilioConversationsTests {
     }
 
     @Test(expected = NullPointerException.class)
-    public void initialize_shouldThrowNpeForNullContext() {
+    public void initialize_shouldNotAllowNullContext() {
         TwilioConversations.initialize(null,
                 TwilioConversationsHelper.createInitListener());
     }
 
     @Test(expected = NullPointerException.class)
-    public void initialize_shouldThrowNpeForNullInitListener() {
+    public void initialize_shouldNotAllowNullInitListener() {
         TwilioConversations.initialize(context, null);
     }
 
@@ -129,12 +129,12 @@ public class TwilioConversationsTests {
     }
 
     @Test(expected =  IllegalStateException.class)
-    public void createConversationsClient_shouldThrowIllegalStateExceptionBeforeInitialize() {
+    public void createConversationsClient_shouldBeAllowedBeforeInitialize() {
         TwilioConversations.createConversationsClient("bogus token", conversationsClientListener());
     }
 
     @Test(expected = NullPointerException.class)
-    public void createConversationsClient_shouldThrowNpeForNullAccessToken()
+    public void createConversationsClient_shouldNowAllowNullAcessToken()
             throws InterruptedException {
         TwilioConversationsHelper.initialize(context);
 
@@ -142,7 +142,7 @@ public class TwilioConversationsTests {
     }
 
     @Test(expected = NullPointerException.class)
-    public void createConversationsClient_shouldThrowNpeForNullAccessManager()
+    public void createConversationsClient_shouldNotAllowNullAccessManager()
             throws InterruptedException {
         TwilioConversationsHelper.initialize(context);
 
