@@ -32,6 +32,7 @@ import com.twilio.common.TwilioAccessManager;
 import com.twilio.conversations.ConversationsClientListener;
 import com.twilio.conversations.TwilioConversations;
 import com.twilio.conversations.TwilioConversations.LogLevel;
+import com.twilio.conversations.TwilioConversations.LogModule;
 import com.twilio.conversations.impl.logging.Logger;
 import com.twilio.conversations.impl.util.CallbackHandler;
 
@@ -49,7 +50,7 @@ public class TwilioConversationsImpl {
     static final Logger logger = Logger.getLogger(TwilioConversationsImpl.class);
 
     private static volatile TwilioConversationsImpl instance;
-    private static int level = 0;
+    private static LogLevel level = LogLevel.OFF;
     protected Context applicationContext;
     private boolean initialized;
     private boolean initializing;
@@ -161,7 +162,7 @@ public class TwilioConversationsImpl {
             }
         }
 
-        if(level != 0) {
+        if(level != LogLevel.OFF) {
             // Re-apply the log level. Initialization sets a default log level.
             setLogLevel(level);
         }
@@ -358,52 +359,52 @@ public class TwilioConversationsImpl {
         return null;
     }
 
-    public static void setLogLevel(int level) {
+    public static void setLogLevel(LogLevel level) {
         setSDKLogLevel(level);
-        setCoreLogLevel(level);
+        setCoreLogLevel(level.ordinal());
         // Save the log level
         TwilioConversationsImpl.level = level;
     }
 
-    public static void setModuleLogLevel(int module, int level) {
-        if (module == TwilioConversations.LogModule.Platform) {
+    public static void setModuleLogLevel(LogModule module, LogLevel level) {
+        if (module == LogModule.PLATFORM) {
             setSDKLogLevel(level);
         }
-        setModuleLevel(module, level);
+        setModuleLevel(module.ordinal(), level.ordinal());
     }
 
-    public static int getLogLevel() {
-        return getCoreLogLevel();
+    public static LogLevel getLogLevel() {
+        return TwilioConversationsImpl.level;
     }
 
-    private static void setSDKLogLevel(int level) {
+    private static void setSDKLogLevel(LogLevel level) {
          /*
          * The Log Levels are defined differently in the Twilio Logger
          * which is based off android.util.Log.
          */
         switch(level) {
-            case LogLevel.OFF:
+            case OFF:
                 Logger.setLogLevel(Log.ASSERT);
                 break;
-            case LogLevel.FATAL:
+            case FATAL:
                 Logger.setLogLevel(Log.ERROR);
                 break;
-            case LogLevel.ERROR:
+            case ERROR:
                 Logger.setLogLevel(Log.ERROR);
                 break;
-            case LogLevel.WARNING:
+            case WARNING:
                 Logger.setLogLevel(Log.WARN);
                 break;
-            case LogLevel.INFO:
+            case INFO:
                 Logger.setLogLevel(Log.INFO);
                 break;
-            case LogLevel.DEBUG:
+            case DEBUG:
                 Logger.setLogLevel(Log.DEBUG);
                 break;
-            case LogLevel.TRACE:
+            case TRACE:
                 Logger.setLogLevel(Log.VERBOSE);
                 break;
-            case LogLevel.ALL:
+            case ALL:
                 Logger.setLogLevel(Log.VERBOSE);
                 break;
             default:
