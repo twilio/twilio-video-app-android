@@ -113,6 +113,7 @@ public class ConversationsClientTests {
     }
 
     @Test(expected = IllegalArgumentException.class)
+    @Ignore
     public void cannotSendInviteIfOneOfParticipantsIsNull() throws InterruptedException {
         accessManager = AccessTokenHelper.obtainTwilioAccessManager(PARTICIPANT);
         ConversationsClient conversationsClient = ConversationsClientHelper
