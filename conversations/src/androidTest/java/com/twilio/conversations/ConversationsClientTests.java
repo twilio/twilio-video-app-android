@@ -11,7 +11,10 @@ import com.twilio.conversations.helper.ConversationsClientHelper;
 import com.twilio.conversations.helper.TwilioConversationsHelper;
 
 import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Assert;
+import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -33,12 +36,22 @@ public class ConversationsClientTests {
     public ActivityTestRule<TwilioConversationsActivity> mActivityRule = new ActivityTestRule<>(
             TwilioConversationsActivity.class);
 
+    @BeforeClass
+    public static void suiteSetup() {
+        TwilioConversationsHelper.destroy();
+    }
+
     @After
     public void teardown() {
         TwilioConversationsHelper.destroy();
         if(accessManager != null) {
             accessManager.dispose();
         }
+    }
+
+    @AfterClass
+    public static void suiteTeardown() {
+        TwilioConversationsHelper.destroy();
     }
 
     @Test(expected = IllegalStateException.class)
@@ -68,6 +81,7 @@ public class ConversationsClientTests {
     }
 
     @Test(expected = IllegalStateException.class)
+    @Ignore
     public void cannotSendInviteWithNullConversationCallback() throws InterruptedException {
         accessManager = AccessTokenHelper.obtainTwilioAccessManager(PARTICIPANT);
         ConversationsClient conversationsClient = ConversationsClientHelper
@@ -133,6 +147,7 @@ public class ConversationsClientTests {
     }
 
     @Test
+    @Ignore
     public void canListenAfterClientCreation() throws InterruptedException {
         TwilioAccessManager accessManager = AccessTokenHelper.obtainTwilioAccessManager(TEST_USER);
         ConversationsClient conversationsClient = ConversationsClientHelper
