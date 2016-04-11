@@ -44,7 +44,8 @@ public class ConversationsClientTests {
     @Test(expected = IllegalStateException.class)
     public void cannotSendInviteWithNullParticipantSet() throws InterruptedException {
         accessManager = AccessTokenHelper.obtainTwilioAccessManager(PARTICIPANT);
-        ConversationsClient conversationsClient = ConversationsClientHelper.registerClient(mActivityRule.getActivity(), accessManager);
+        ConversationsClient conversationsClient = ConversationsClientHelper
+                .registerClient(mActivityRule.getActivity(), accessManager);
         Assert.assertNotNull(conversationsClient);
 
         LocalMedia localMedia = LocalMediaFactory.createLocalMedia(localMediaListener());
@@ -56,7 +57,8 @@ public class ConversationsClientTests {
     @Test(expected = IllegalStateException.class)
     public void cannotSendInviteWithNullLocalMedia() throws InterruptedException {
         accessManager = AccessTokenHelper.obtainTwilioAccessManager(PARTICIPANT);
-        ConversationsClient conversationsClient = ConversationsClientHelper.registerClient(mActivityRule.getActivity(), accessManager);
+        ConversationsClient conversationsClient = ConversationsClientHelper
+                .registerClient(mActivityRule.getActivity(), accessManager);
         Assert.assertNotNull(conversationsClient);
 
         Set<String> participants = new HashSet<>();
@@ -68,7 +70,8 @@ public class ConversationsClientTests {
     @Test(expected = IllegalStateException.class)
     public void cannotSendInviteWithNullConversationCallback() throws InterruptedException {
         accessManager = AccessTokenHelper.obtainTwilioAccessManager(PARTICIPANT);
-        ConversationsClient conversationsClient = ConversationsClientHelper.registerClient(mActivityRule.getActivity(), accessManager);
+        ConversationsClient conversationsClient = ConversationsClientHelper
+                .registerClient(mActivityRule.getActivity(), accessManager);
         Assert.assertNotNull(conversationsClient);
 
         LocalMedia localMedia = LocalMediaFactory.createLocalMedia(localMediaListener());
@@ -82,20 +85,24 @@ public class ConversationsClientTests {
     @Test(expected = IllegalStateException.class)
     public void cannotSendInviteWithEmptyParticipantSet() throws InterruptedException {
         accessManager = AccessTokenHelper.obtainTwilioAccessManager(PARTICIPANT);
-        ConversationsClient conversationsClient = ConversationsClientHelper.registerClient(mActivityRule.getActivity(), accessManager);
+        ConversationsClient conversationsClient = ConversationsClientHelper
+                .registerClient(mActivityRule.getActivity(), accessManager);
         Assert.assertNotNull(conversationsClient);
 
         LocalMedia localMedia = LocalMediaFactory.createLocalMedia(localMediaListener());
 
         Set<String> participants = new HashSet<>();
 
-        conversationsClient.sendConversationInvite(participants, localMedia, conversationCallback());
+        conversationsClient.sendConversationInvite(participants,
+                localMedia,
+                conversationCallback());
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void cannotSendInviteIfOneOfParticipantsIsNull() throws InterruptedException {
         accessManager = AccessTokenHelper.obtainTwilioAccessManager(PARTICIPANT);
-        ConversationsClient conversationsClient = ConversationsClientHelper.registerClient(mActivityRule.getActivity(), accessManager);
+        ConversationsClient conversationsClient = ConversationsClientHelper
+                .registerClient(mActivityRule.getActivity(), accessManager);
         Assert.assertNotNull(conversationsClient);
 
         LocalMedia localMedia = LocalMediaFactory.createLocalMedia(localMediaListener());
@@ -104,7 +111,9 @@ public class ConversationsClientTests {
         participants.add(PARTICIPANT);
         participants.add(null);
 
-        conversationsClient.sendConversationInvite(participants, localMedia, conversationCallback());
+        conversationsClient.sendConversationInvite(participants,
+                localMedia,
+                conversationCallback());
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -126,7 +135,8 @@ public class ConversationsClientTests {
     @Test
     public void canListenAfterClientCreation() throws InterruptedException {
         TwilioAccessManager accessManager = AccessTokenHelper.obtainTwilioAccessManager(TEST_USER);
-        ConversationsClient conversationsClient = ConversationsClientHelper.registerClient(mActivityRule.getActivity(), accessManager);
+        ConversationsClient conversationsClient = ConversationsClientHelper
+                .registerClient(mActivityRule.getActivity(), accessManager);
         assertTrue(conversationsClient.isListening());
     }
 
