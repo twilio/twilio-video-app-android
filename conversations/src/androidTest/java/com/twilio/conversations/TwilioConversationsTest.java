@@ -151,42 +151,43 @@ public class TwilioConversationsTest {
                 conversationsClientListener());
     }
 
-//    @Test
-//    public void testTwilioCreateConversationsClientWithToken() throws InterruptedException {
-//        TwilioConversationsHelper.initialize(context);
-//
-//        ConversationsClient conversationsClient = TwilioConversations
-//                .createConversationsClient("DEADBEEF", conversationsClientListener());
-//
-//        assertNotNull(conversationsClient);
-//    }
-//
-//    @Test
-//    public void testTwilioCreateConversationsClientWithAccessManagerAndEmptyOptions()
-//            throws InterruptedException {
-//        TwilioConversationsHelper.initialize(context);
-//
-//        accessManager = TwilioAccessManagerFactory.createAccessManager("DEADBEEF", null);
-//        ConversationsClient conversationsClient = TwilioConversations
-//                .createConversationsClient(accessManager, null, conversationsClientListener());
-//
-//        assertNotNull(conversationsClient);
-//    }
-//
-//    @Test
-//    public void testTwilioCreateConversationsClientWithAccessManagerAndRandomOption()
-//            throws InterruptedException {
-//        TwilioConversationsHelper.initialize(context);
-//
-//        HashMap optionsMap = new HashMap<>();
-//        optionsMap.put("foo", "bar");
-//        ClientOptionsInternal options = new ClientOptionsInternal(optionsMap);
-//        accessManager = TwilioAccessManagerFactory.createAccessManager("DEADBEEF", null);
-//        ConversationsClient conversationsClient = TwilioConversations
-//                .createConversationsClient(accessManager, options, conversationsClientListener());
-//
-//        assertNotNull(conversationsClient);
-//    }
+    @Test
+    public void createConversationsClient_shouldReturnClientForValidToken()
+            throws InterruptedException {
+        TwilioConversationsHelper.initialize(context);
+
+        ConversationsClient conversationsClient = TwilioConversations
+                .createConversationsClient("DEADBEEF", conversationsClientListener());
+
+        assertNotNull(conversationsClient);
+    }
+
+    @Test
+    public void createConversationsClient_shouldAllowEmptyOptions()
+            throws InterruptedException {
+        TwilioConversationsHelper.initialize(context);
+
+        accessManager = TwilioAccessManagerFactory.createAccessManager("DEADBEEF", null);
+        ConversationsClient conversationsClient = TwilioConversations
+                .createConversationsClient(accessManager, null, conversationsClientListener());
+
+        assertNotNull(conversationsClient);
+    }
+
+    @Test
+    public void createConversationsClient_shouldAllowRandomOptions()
+            throws InterruptedException {
+        TwilioConversationsHelper.initialize(context);
+
+        HashMap optionsMap = new HashMap<>();
+        optionsMap.put("foo", "bar");
+        ClientOptionsInternal options = new ClientOptionsInternal(optionsMap);
+        accessManager = TwilioAccessManagerFactory.createAccessManager("DEADBEEF", null);
+        ConversationsClient conversationsClient = TwilioConversations
+                .createConversationsClient(accessManager, options, conversationsClientListener());
+
+        assertNotNull(conversationsClient);
+    }
 
     @Test
     public void setLogLevel_shouldSetLogLevelToDisabledForInvalidLevel() {
