@@ -97,6 +97,7 @@ public class ConversationsClientTests {
     }
 
     @Test(expected = IllegalStateException.class)
+    @Ignore
     public void cannotSendInviteWithEmptyParticipantSet() throws InterruptedException {
         accessManager = AccessTokenHelper.obtainTwilioAccessManager(PARTICIPANT);
         ConversationsClient conversationsClient = ConversationsClientHelper
