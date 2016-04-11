@@ -12,7 +12,6 @@ import com.twilio.conversations.helper.TwilioConversationsHelper;
 
 import org.junit.After;
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -20,10 +19,12 @@ import org.junit.runner.RunWith;
 import java.util.HashSet;
 import java.util.Set;
 
+import static org.junit.Assert.assertTrue;
+
 @RunWith(AndroidJUnit4.class)
-@Ignore
-public class ConversationsClientSendInviteTests {
-    private static String TOKEN = "token";
+@LargeTest
+public class ConversationsClientTests {
+    private final static String TEST_USER = "TEST_USER";
     private static String PARTICIPANT = "janne";
 
     private TwilioAccessManager accessManager;
@@ -120,6 +121,13 @@ public class ConversationsClientSendInviteTests {
         participants.add("");
 
         conversationsClient.sendConversationInvite(participants, localMedia, conversationCallback());
+    }
+
+    @Test
+    public void canListenAfterClientCreation() throws InterruptedException {
+        TwilioAccessManager accessManager = AccessTokenHelper.obtainTwilioAccessManager(TEST_USER);
+        ConversationsClient conversationsClient = ConversationsClientHelper.registerClient(mActivityRule.getActivity(), accessManager);
+        assertTrue(conversationsClient.isListening());
     }
 
     private LocalMediaListener localMediaListener(){
