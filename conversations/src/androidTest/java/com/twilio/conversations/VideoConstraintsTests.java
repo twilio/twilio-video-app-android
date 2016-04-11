@@ -14,6 +14,7 @@ import com.twilio.conversations.helper.AccessTokenHelper;
 import com.twilio.conversations.helper.CameraCapturerHelper;
 import com.twilio.conversations.helper.ConversationsClientHelper;
 import com.twilio.conversations.helper.TwilioConversationsHelper;
+import com.twilio.conversations.helper.TwilioConversationsTestsBase;
 
 import org.junit.After;
 import org.junit.AfterClass;
@@ -34,25 +35,15 @@ import static junit.framework.Assert.fail;
 
 @RunWith(AndroidJUnit4.class)
 @LargeTest
-public class VideoConstraintsTests {
+public class VideoConstraintsTests extends TwilioConversationsTestsBase {
     private static final String SELF_TEST_USER = "SELF_TEST_USER";
 
     @Rule
     public ActivityTestRule<TwilioConversationsActivity> activityRule = new ActivityTestRule<>(
             TwilioConversationsActivity.class);
 
-    @BeforeClass
-    public static void suiteSetup() {
-        TwilioConversationsHelper.destroy();
-    }
-
     @After
     public void teardown() {
-        TwilioConversationsHelper.destroy();
-    }
-
-    @AfterClass
-    public static void suiteTeardown() {
         TwilioConversationsHelper.destroy();
     }
 

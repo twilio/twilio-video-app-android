@@ -9,6 +9,7 @@ import com.twilio.conversations.activity.TwilioConversationsActivity;
 import com.twilio.conversations.helper.AccessTokenHelper;
 import com.twilio.conversations.helper.ConversationsClientHelper;
 import com.twilio.conversations.helper.TwilioConversationsHelper;
+import com.twilio.conversations.helper.TwilioConversationsTestsBase;
 
 import org.junit.After;
 import org.junit.AfterClass;
@@ -26,7 +27,7 @@ import static org.junit.Assert.assertTrue;
 
 @RunWith(AndroidJUnit4.class)
 @LargeTest
-public class ConversationsClientTests {
+public class ConversationsClientTests extends TwilioConversationsTestsBase {
     private final static String TEST_USER = "TEST_USER";
     private static String PARTICIPANT = "janne";
 
@@ -36,22 +37,12 @@ public class ConversationsClientTests {
     public ActivityTestRule<TwilioConversationsActivity> mActivityRule = new ActivityTestRule<>(
             TwilioConversationsActivity.class);
 
-    @BeforeClass
-    public static void suiteSetup() {
-        TwilioConversationsHelper.destroy();
-    }
-
     @After
     public void teardown() {
         TwilioConversationsHelper.destroy();
         if(accessManager != null) {
             accessManager.dispose();
         }
-    }
-
-    @AfterClass
-    public static void suiteTeardown() {
-        TwilioConversationsHelper.destroy();
     }
 
     @Test(expected = IllegalStateException.class)
