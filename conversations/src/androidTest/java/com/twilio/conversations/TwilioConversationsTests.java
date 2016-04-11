@@ -79,7 +79,7 @@ public class TwilioConversationsTests {
     }
 
     @Test
-    public void initialize_shouldNotifyWithErrorWhenAllreadyInitialized()
+    public void initialize_shouldNotifyWithErrorWhenAlreadyInitialized()
             throws InterruptedException {
         final CountDownLatch errorCallback = new CountDownLatch(1);
         TwilioConversationsHelper.initialize(context);
@@ -87,7 +87,7 @@ public class TwilioConversationsTests {
         TwilioConversations.initialize(context, new TwilioConversations.InitListener() {
             @Override
             public void onInitialized() {
-                fail("Should receive error because sdk is initialized all ready!");
+                fail("Should receive error because sdk is initialized already!");
             }
 
             @Override
@@ -105,7 +105,7 @@ public class TwilioConversationsTests {
     }
 
     @Test
-    public void initialize_shouldWorkRepeatidelyAfterDestroy() throws InterruptedException {
+    public void initialize_shouldWorkRepeatedlyAfterDestroy() throws InterruptedException {
         for (int i = 0 ; i < 10 ; i++) {
             TwilioConversationsHelper.initialize(context);
             assertTrue(TwilioConversations.isInitialized());
