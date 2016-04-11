@@ -32,11 +32,15 @@ import static org.junit.Assert.assertNotEquals;
 
 @RunWith(AndroidJUnit4.class)
 @LargeTest
-public class TwilioConversationsTest {
+public class TwilioConversationsTests {
     private TwilioAccessManager accessManager;
 
     private Context context;
 
+    /**
+     * Intentionally calling destroy in the test suite setup as a cautionary measure to ensure
+     * we start the test suite with the sdk completely torn down
+     */
     @BeforeClass
     public static void suiteSetup() {
         TwilioConversationsHelper.destroy();
@@ -55,19 +59,23 @@ public class TwilioConversationsTest {
         }
     }
 
+    /**
+     * Intentionally calling destroy in the test suite teardown as a cautionary measure to ensure
+     * we start the next test suite with the sdk completely torn down
+     */
     @AfterClass
     public static void suiteTeardown() {
         TwilioConversationsHelper.destroy();
     }
 
     @Test(expected = NullPointerException.class)
-    public void initialize_shouldThrowNpeForNullContext() {
+    public void initialize_shouldNotAllowNullContext() {
         TwilioConversations.initialize(null,
                 TwilioConversationsHelper.createInitListener());
     }
 
     @Test(expected = NullPointerException.class)
-    public void initialize_shouldThrowNpeForNullInitListener() {
+    public void initialize_shouldNotAllowNullInitListener() {
         TwilioConversations.initialize(context, null);
     }
 
@@ -79,7 +87,7 @@ public class TwilioConversationsTest {
     }
 
     @Test
-    public void initialize_shouldNotifyWithErrorWhenAllreadyInitialized()
+    public void initialize_shouldNotifyWithErrorWhenAlreadyInitialized()
             throws InterruptedException {
         final CountDownLatch errorCallback = new CountDownLatch(1);
         TwilioConversationsHelper.initialize(context);
@@ -87,7 +95,7 @@ public class TwilioConversationsTest {
         TwilioConversations.initialize(context, new TwilioConversations.InitListener() {
             @Override
             public void onInitialized() {
-                fail("Should receive error because sdk is initialized all ready!");
+                fail("Should receive error because sdk is initialized already!");
             }
 
             @Override
@@ -105,7 +113,7 @@ public class TwilioConversationsTest {
     }
 
     @Test
-    public void initialize_shouldWorkRepeatidelyAfterDestroy() throws InterruptedException {
+    public void initialize_shouldWorkRepeatedlyAfterDestroy() throws InterruptedException {
         for (int i = 0 ; i < 10 ; i++) {
             TwilioConversationsHelper.initialize(context);
             assertTrue(TwilioConversations.isInitialized());
@@ -129,12 +137,12 @@ public class TwilioConversationsTest {
     }
 
     @Test(expected =  IllegalStateException.class)
-    public void createConversationsClient_shouldThrowIllegalStateExceptionBeforeInitialize() {
+    public void createConversationsClient_shouldBeAllowedBeforeInitialize() {
         TwilioConversations.createConversationsClient("bogus token", conversationsClientListener());
     }
 
     @Test(expected = NullPointerException.class)
-    public void createConversationsClient_shouldThrowNpeForNullAccessToken()
+    public void createConversationsClient_shouldNowAllowNullAcessToken()
             throws InterruptedException {
         TwilioConversationsHelper.initialize(context);
 
@@ -142,7 +150,7 @@ public class TwilioConversationsTest {
     }
 
     @Test(expected = NullPointerException.class)
-    public void createConversationsClient_shouldThrowNpeForNullAccessManager()
+    public void createConversationsClient_shouldNotAllowNullAccessManager()
             throws InterruptedException {
         TwilioConversationsHelper.initialize(context);
 
