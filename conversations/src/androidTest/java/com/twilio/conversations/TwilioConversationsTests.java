@@ -8,6 +8,7 @@ import android.test.suitebuilder.annotation.LargeTest;
 import com.twilio.common.TwilioAccessManager;
 import com.twilio.common.TwilioAccessManagerFactory;
 import com.twilio.conversations.helper.TwilioConversationsHelper;
+import com.twilio.conversations.helper.TwilioConversationsTestsBase;
 import com.twilio.conversations.impl.ConversationsClientImpl;
 import com.twilio.conversations.internal.ClientOptionsInternal;
 
@@ -32,19 +33,10 @@ import static org.junit.Assert.assertNotEquals;
 
 @RunWith(AndroidJUnit4.class)
 @LargeTest
-public class TwilioConversationsTests {
+public class TwilioConversationsTests extends TwilioConversationsTestsBase {
     private TwilioAccessManager accessManager;
 
     private Context context;
-
-    /**
-     * Intentionally calling destroy in the test suite setup as a cautionary measure to ensure
-     * we start the test suite with the sdk completely torn down
-     */
-    @BeforeClass
-    public static void suiteSetup() {
-        TwilioConversationsHelper.destroy();
-    }
 
     @Before
     public void setup() {
@@ -57,15 +49,6 @@ public class TwilioConversationsTests {
         if(accessManager != null) {
             accessManager.dispose();
         }
-    }
-
-    /**
-     * Intentionally calling destroy in the test suite teardown as a cautionary measure to ensure
-     * we start the next test suite with the sdk completely torn down
-     */
-    @AfterClass
-    public static void suiteTeardown() {
-        TwilioConversationsHelper.destroy();
     }
 
     @Test(expected = NullPointerException.class)
