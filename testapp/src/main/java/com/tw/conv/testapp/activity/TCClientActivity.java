@@ -1279,7 +1279,7 @@ public class TCClientActivity extends AppCompatActivity {
     private StatsListener statsListener() {
         return new StatsListener() {
             @Override
-            public void onMediaTrackStatsRecord(Conversation conversation, MediaTrackStatsRecord stats) {
+            public void onMediaTrackStatsRecord(Conversation conversation, Participant participant, MediaTrackStatsRecord stats) {
                 StringBuilder strBld = new StringBuilder();
                 strBld.append(
                         String.format("Receiving stats for sid: %s, trackId: %s, direction: %s ",
@@ -1319,16 +1319,12 @@ public class TCClientActivity extends AppCompatActivity {
                     if(remoteStatsRecyclerView.getVisibility() != View.VISIBLE) {
                         remoteStatsRecyclerView.setVisibility(View.VISIBLE);
                     }
-                    for(Participant participant: conversation.getParticipants()) {
-                       if(participant.getSid().equals(stats.getParticipantSid())) {
-                           if(participant.getMedia().getVideoTracks().size() > 0) {
-                               showRemoteVideoTrackStats(conversation, (RemoteVideoTrackStatsRecord)stats);
-                           } else {
-                                // Latent stats callbacks can be triggered even after a remote track is removed.
-                                remoteVideoTrackStatsRecordMap.clear();
-                                remoteVideoTrackStatsAdapter.notifyDataSetChanged();
-                           }
-                       }
+                    if(participant.getMedia().getVideoTracks().size() > 0) {
+                        showRemoteVideoTrackStats(conversation, (RemoteVideoTrackStatsRecord)stats);
+                    } else {
+                        // Latent stats callbacks can be triggered even after a remote track is removed.
+                        remoteVideoTrackStatsRecordMap.clear();
+                        remoteVideoTrackStatsAdapter.notifyDataSetChanged();
                     }
                 }
             }

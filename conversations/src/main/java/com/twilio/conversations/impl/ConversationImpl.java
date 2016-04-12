@@ -708,29 +708,20 @@ public class ConversationImpl implements Conversation,
                  * on both the conversation and the media stats record.
                  * It will become available when the onParticipantConnected event is triggered.
                  */
-                boolean foundSid = false;
-                for(Participant participant: getParticipants()) {
+                for(final Participant participant: getParticipants()) {
                     if(participant.getSid() != null && stats.getParticipantSid() != null && participant.getSid().equals(stats.getParticipantSid())) {
-                        foundSid = true;
-                        break;
+                        statsHandler.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                statsListener.onMediaTrackStatsRecord(ConversationImpl.this, participant, stats);
+                            }
+                        });
+                        return;
                     }
                 }
-
-                if(!foundSid) {
-                    logger.d("stats report skipped since the participant sid has not been set yet");
-                    return;
-                }
-
-                statsHandler.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        statsListener.onMediaTrackStatsRecord(ConversationImpl.this, stats);
-                    }
-                });
+                logger.d("stats report skipped since the participant sid has not been set yet");
             }
-
         }
-
     }
 
     void log(String method, String message, CoreError coreError) {
