@@ -141,7 +141,7 @@
                 android:id="@+id/fps_rangebar"
                 android:layout_width="match_parent"
                 android:layout_height="72dp"
-                custom:tickStart="1"
+                custom:tickStart="0"
                 custom:tickInterval="1"
                 custom:tickEnd="30"
                 custom:pinMinFont="12sp"

@@ -13,7 +13,6 @@ buildscript {
         classpath "com.android.tools.build:gradle-experimental:0.7.0-alpha5"
     }
 }
-
 allprojects {
     apply from: "$rootProject.projectDir/common.gradle"
     repositories {

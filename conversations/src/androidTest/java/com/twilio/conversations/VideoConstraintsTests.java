@@ -17,8 +17,6 @@ import com.twilio.conversations.helper.TwilioConversationsHelper;
 import com.twilio.conversations.helper.TwilioConversationsTestsBase;
 
 import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
@@ -161,7 +159,6 @@ public class VideoConstraintsTests extends TwilioConversationsTestsBase {
 
         assertTrue(conversationEndsWhenInviteCancelled.await(20, TimeUnit.SECONDS));
 
-        TwilioConversationsHelper.destroy();
     }
 
     @Test
@@ -260,7 +257,6 @@ public class VideoConstraintsTests extends TwilioConversationsTestsBase {
 
         assertTrue(conversationEndsWhenInviteCancelled.await(20, TimeUnit.SECONDS));
 
-        TwilioConversationsHelper.destroy();
     }
 
     private LocalVideoTrack createLocalVideoTrackWithVideoConstraints(Context context, VideoConstraints videoConstraints) throws InterruptedException {

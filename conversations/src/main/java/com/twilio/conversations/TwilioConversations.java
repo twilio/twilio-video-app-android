@@ -224,25 +224,6 @@ public class TwilioConversations {
     }
 
     /**
-     * Creates a new ConversationsClient.
-     *
-     * @param token The access token.
-     * @param listener A listener that receives events from the conversations client.
-     *
-     * @return the initialized {@link ConversationsClient}, or null if the Twilio Conversations Client
-     *         was not initialized
-     */
-    public static ConversationsClient createConversationsClient(String token,
-                                                                ConversationsClientListener listener) {
-        if (token == null) {
-            throw new NullPointerException("token must not be null");
-        }
-        TwilioAccessManager manager = TwilioAccessManagerFactory.createAccessManager(token, null);
-
-        return createConversationsClient(manager, listener);
-    }
-
-    /**
      * Creates a new {@link ConversationsClient}.
      *
      * @param accessManager The instance of {@link TwilioAccessManager} that is handling token lifetime
