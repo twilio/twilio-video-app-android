@@ -2,6 +2,7 @@ package com.twilio.conversations.impl;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayDeque;
+import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -45,8 +46,11 @@ public class TwilioConversationsImpl {
     static final Logger logger = Logger.getLogger(TwilioConversationsImpl.class);
 
     private static volatile TwilioConversationsImpl instance;
-    private static LogLevel level = LogLevel.OFF;
+
     private static volatile boolean libraryIsLoaded = false;
+    private static LogLevel level = LogLevel.OFF;
+    private static Map<LogModule, LogLevel> moduleLogLevel = new EnumMap<LogModule, LogLevel>
+            (LogModule.class);
     protected Context applicationContext;
     private boolean initialized;
     private boolean initializing;
@@ -232,6 +236,14 @@ public class TwilioConversationsImpl {
             trySetCoreLogLevel(level.ordinal());
         }
 
+        /**
+         * It is possible that the user has tried to set the log level for a specific module
+         * before the library has loaded. Here we apply the log level for the module because we
+         * know the native library is available
+         */
+        for (LogModule module: moduleLogLevel.keySet()) {
+            trySetCoreModuleLogLevel(module.ordinal(), moduleLogLevel.get(module).ordinal());
+        }
         /*
          * Initialize the core in a new thread since it may otherwise block the calling thread.
          * The calling thread may often be the UI thread which should never be blocked.
@@ -350,7 +362,9 @@ public class TwilioConversationsImpl {
         if (module == LogModule.PLATFORM) {
             setSDKLogLevel(level);
         }
-        setModuleLevel(module.ordinal(), level.ordinal());
+        trySetCoreModuleLogLevel(module.ordinal(), level.ordinal());
+        //Save the module log level
+        TwilioConversationsImpl.moduleLogLevel.put(module, level);
     }
 
     private static void setSDKLogLevel(LogLevel level) {
@@ -433,6 +447,11 @@ public class TwilioConversationsImpl {
     private static void trySetCoreLogLevel(int level) {
         if (libraryIsLoaded) {
             setCoreLogLevel(level);
+        }
+    }
+    private static void trySetCoreModuleLogLevel(int module, int level){
+        if (libraryIsLoaded) {
+            setModuleLevel(module, level);
         }
     }
 
