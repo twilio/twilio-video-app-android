@@ -4,6 +4,7 @@ import android.content.Context;
 import android.os.Build;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
+import android.test.suitebuilder.annotation.LargeTest;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 
@@ -13,6 +14,7 @@ import com.twilio.conversations.helper.AccessTokenHelper;
 import com.twilio.conversations.helper.CameraCapturerHelper;
 import com.twilio.conversations.helper.ConversationsClientHelper;
 import com.twilio.conversations.helper.TwilioConversationsHelper;
+import com.twilio.conversations.helper.TwilioConversationsTestsBase;
 
 import org.junit.After;
 import org.junit.Ignore;
@@ -30,7 +32,9 @@ import static junit.framework.Assert.assertTrue;
 import static junit.framework.Assert.fail;
 
 @RunWith(AndroidJUnit4.class)
-public class VideoConstraintsTests {
+@LargeTest
+@Ignore
+public class VideoConstraintsTests extends TwilioConversationsTestsBase {
     private static final String SELF_TEST_USER = "SELF_TEST_USER";
 
     @Rule
@@ -38,10 +42,8 @@ public class VideoConstraintsTests {
             TwilioConversationsActivity.class);
 
     @After
-    public void teardown() throws InterruptedException {
+    public void teardown() {
         TwilioConversationsHelper.destroy();
-        CountDownLatch giveTimeToDestroy = new CountDownLatch(1);
-        giveTimeToDestroy.await(5, TimeUnit.SECONDS);
     }
 
     @Test(expected = NullPointerException.class)
@@ -104,7 +106,7 @@ public class VideoConstraintsTests {
 
         localMedia.addLocalVideoTrack(localVideoTrack);
 
-        /*
+        /**
          * Intentionally call the user registered to this client to allow the conversation
          * to setup its local media without requiring a remote participant.
          */
@@ -160,6 +162,7 @@ public class VideoConstraintsTests {
     }
 
     @Test
+    @Ignore
     public void startConversationWithValidVideoConstraints() throws InterruptedException {
         if(requiresRuntimePermissions()) {
             return;
@@ -261,11 +264,10 @@ public class VideoConstraintsTests {
         return LocalVideoTrackFactory.createLocalVideoTrack(cameraCapturer, videoConstraints);
     }
 
-    /*
+    /**
      * Runtime permissions to enable the camera are not enabled in this test
      */
     private boolean requiresRuntimePermissions() {
-        return android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M;
+        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.M;
     }
-
 }

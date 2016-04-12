@@ -11,6 +11,7 @@ import com.twilio.conversations.helper.AccessTokenHelper;
 import com.twilio.conversations.helper.CameraCapturerHelper;
 import com.twilio.conversations.helper.ConversationsClientHelper;
 import com.twilio.conversations.helper.TwilioConversationsHelper;
+import com.twilio.conversations.helper.TwilioConversationsTestsBase;
 
 import org.junit.After;
 import org.junit.Ignore;
@@ -26,7 +27,7 @@ import java.util.concurrent.TimeUnit;
 import static org.junit.Assert.*;
 
 @RunWith(AndroidJUnit4.class)
-public class ConversationTests {
+public class ConversationTests extends TwilioConversationsTestsBase {
     private static String USER = "john";
     private static String NON_EXISTANT_PARTICIPANT ="non-existant-paritcipant";
 
