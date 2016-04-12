@@ -6,7 +6,6 @@ package com.twilio.conversations;
  * video sent to Participants may be downscaled temporally or spatially in response to network
  * and device conditions.
  *
-
  */
 public class VideoConstraints {
 
