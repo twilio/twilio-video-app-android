@@ -7,6 +7,7 @@ import android.test.suitebuilder.annotation.LargeTest;
 
 import com.twilio.common.TwilioAccessManager;
 import com.twilio.common.TwilioAccessManagerFactory;
+import com.twilio.conversations.helper.AccessTokenHelper;
 import com.twilio.conversations.helper.TwilioConversationsHelper;
 import com.twilio.conversations.helper.TwilioConversationsTestsBase;
 import com.twilio.conversations.impl.ConversationsClientImpl;
@@ -35,7 +36,6 @@ import static org.junit.Assert.assertNotEquals;
 @LargeTest
 public class TwilioConversationsTests extends TwilioConversationsTestsBase {
     private TwilioAccessManager accessManager;
-
     private Context context;
 
     @Before
@@ -114,14 +114,18 @@ public class TwilioConversationsTests extends TwilioConversationsTestsBase {
     @Ignore
     public void destroy_shouldDestroyActiveConversationClients() throws InterruptedException {
         TwilioConversationsHelper.initialize(context);
+        accessManager = AccessTokenHelper.obtainTwilioAccessManager("username");
         ConversationsClientImpl conversationClient = (ConversationsClientImpl) TwilioConversations
-                .createConversationsClient("token",
+                .createConversationsClient(accessManager,
                         conversationsClientListener());
     }
 
     @Test(expected =  IllegalStateException.class)
-    public void createConversationsClient_shouldBeAllowedBeforeInitialize() {
-        TwilioConversations.createConversationsClient("bogus token", conversationsClientListener());
+    public void createConversationsClient_shouldBeAllowedBeforeInitialize()
+            throws InterruptedException {
+        accessManager = AccessTokenHelper.obtainTwilioAccessManager("username");
+        TwilioConversations.createConversationsClient(accessManager,
+                conversationsClientListener());
     }
 
     @Test(expected = NullPointerException.class)
@@ -129,7 +133,7 @@ public class TwilioConversationsTests extends TwilioConversationsTestsBase {
             throws InterruptedException {
         TwilioConversationsHelper.initialize(context);
 
-        TwilioConversations.createConversationsClient((String) null, conversationsClientListener());
+        TwilioConversations.createConversationsClient(accessManager, conversationsClientListener());
     }
 
     @Test(expected = NullPointerException.class)
@@ -147,8 +151,9 @@ public class TwilioConversationsTests extends TwilioConversationsTestsBase {
             throws InterruptedException {
         TwilioConversationsHelper.initialize(context);
 
+        accessManager = TwilioAccessManagerFactory.createAccessManager("DEADBEEF", null);
         ConversationsClient conversationsClient = TwilioConversations
-                .createConversationsClient("DEADBEEF", conversationsClientListener());
+                .createConversationsClient(accessManager, conversationsClientListener());
 
         assertNotNull(conversationsClient);
     }
