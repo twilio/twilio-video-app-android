@@ -52,7 +52,6 @@ public class TwilioConversationsImpl {
     private boolean initializing;
     private ExecutorService refreshRegExecutor = Executors.newSingleThreadExecutor();
 
-
     public static class WakeUpReceiver extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
