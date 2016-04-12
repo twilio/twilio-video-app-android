@@ -228,8 +228,8 @@ public class TwilioConversationsImpl {
          * It is possible that the user has tried to set the log level before the native library
          * has loaded. Here we apply the log level because we know the native library is available
          */
-        if(level != 0) {
-            trySetCoreLogLevel(level);
+        if(level != LogLevel.OFF) {
+            trySetCoreLogLevel(level.ordinal());
         }
 
         /*
@@ -341,7 +341,7 @@ public class TwilioConversationsImpl {
 
     public static void setLogLevel(LogLevel level) {
         setSDKLogLevel(level);
-        setCoreLogLevel(level.ordinal());
+        trySetCoreLogLevel(level.ordinal());
         // Save the log level
         TwilioConversationsImpl.level = level;
     }
@@ -392,8 +392,6 @@ public class TwilioConversationsImpl {
                 Logger.setLogLevel(Log.ASSERT);
                 break;
         }
-        trySetCoreLogLevel(level);
-        TwilioConversationsImpl.level = level;
     }
 
     public static int getLogLevel() {
