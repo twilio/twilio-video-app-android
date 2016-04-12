@@ -62,7 +62,7 @@ public class AccessTokenHelper {
 
             @Override
             public void failure(RetrofitError error) {
-                fail();
+                fail(error.getMessage());
             }
         });
 

@@ -1130,7 +1130,7 @@ public class TCClientActivity extends AppCompatActivity {
         incomingInvite.accept(localMedia, new ConversationCallback() {
             @Override
             public void onConversation(Conversation conversation, TwilioConversationsException e) {
-                Timber.e("onConversationInvite onConversation");
+                Timber.i("onConversation");
                 if (e == null) {
                     TCClientActivity.this.conversation = conversation;
                     conversation.setConversationListener(conversationListener());

@@ -271,7 +271,7 @@ JNIEXPORT jboolean JNICALL Java_com_twilio_conversations_impl_ConversationImpl_e
 {
     TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK, kTSCoreLogLevelDebug, "enableVideo");
     TSCSessionPtr *session = reinterpret_cast<TSCSessionPtr *>(nativeSession);
-    if(IsNull(env, j_video_constraints) || !((bool)enabled)) {
+    if(IsNull(env, j_video_constraints)) {
         return (session->get()->enableVideo((bool) enabled, (bool) paused) ? JNI_TRUE : JNI_FALSE);
     } else {
         TSCConstraintsRef videoConstraints = createVideoConstraints(env, j_video_constraints);
