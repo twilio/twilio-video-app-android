@@ -158,7 +158,7 @@ JNIEXPORT void JNICALL Java_com_twilio_conversations_impl_TwilioConversationsImp
  * Signature: ()J
  */
 JNIEXPORT void JNICALL Java_com_twilio_conversations_impl_TwilioConversationsImpl_destroyCore(JNIEnv *env, jobject obj) {
-    TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK, kTSCoreLogLevelDebug, "destroyCore");
+    TS_CORE_LOG_MODULE(kTSCoreLogModulePlatform, kTSCoreLogLevelDebug, "destroyCore");
     TSCSDK* tscSdk = TSCSDK::instance();
     TSCMediaCodecRegistry& codecManager = tscSdk->getMediaCodecRegistry();
 

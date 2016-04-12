@@ -61,7 +61,7 @@ JNIEXPORT jlong JNICALL Java_com_twilio_conversations_impl_ConversationImpl_wrap
 TSCConstraintsRef createVideoConstraints(JNIEnv *env, jobject j_video_constraints) {
     TSCConstraintsRef constraints = new TSCConstraintsObject();
 
-    TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK, kTSCoreLogLevelDebug, "Parsing video constraints");
+    TS_CORE_LOG_MODULE(kTSCoreLogModulePlatform, kTSCoreLogLevelDebug, "Parsing video constraints");
 
     jclass video_constraints_class = env->GetObjectClass(j_video_constraints);
     jfieldID min_fps_field =
@@ -73,7 +73,7 @@ TSCConstraintsRef createVideoConstraints(JNIEnv *env, jobject j_video_constraint
     int max_fps =
             env->GetIntField(j_video_constraints, max_fps_field);
 
-    TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK, kTSCoreLogLevelDebug,
+    TS_CORE_LOG_MODULE(kTSCoreLogModulePlatform, kTSCoreLogLevelDebug,
                        "Video constraints minFps %d maxFps %d",
                        min_fps,
                        max_fps);
@@ -98,7 +98,7 @@ TSCConstraintsRef createVideoConstraints(JNIEnv *env, jobject j_video_constraint
     int min_height =
             env->GetIntField(j_min_video_dimensions, min_height_field);
 
-    TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK, kTSCoreLogLevelDebug,
+    TS_CORE_LOG_MODULE(kTSCoreLogModulePlatform, kTSCoreLogLevelDebug,
                        "Video constraints min width %d min height %d",
                        min_width,
                        min_height);
@@ -114,7 +114,7 @@ TSCConstraintsRef createVideoConstraints(JNIEnv *env, jobject j_video_constraint
     int max_height =
             env->GetIntField(j_max_video_dimensions, max_height_field);
 
-    TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK, kTSCoreLogLevelDebug,
+    TS_CORE_LOG_MODULE(kTSCoreLogModulePlatform, kTSCoreLogLevelDebug,
                        "Video constraints max width %d max height %d",
                        max_width,
                        max_height);
@@ -145,7 +145,7 @@ twiliosdk::IceOptions createIceOptions(JNIEnv *env, jobjectArray j_iceServers,
     if (!webrtc_jni::IsNull(env, j_iceServers)) {
         int size = env->GetArrayLength(j_iceServers);
         if (size == 0) {
-            TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK, kTSCoreLogLevelDebug, "no ice servers were provided");
+            TS_CORE_LOG_MODULE(kTSCoreLogModulePlatform, kTSCoreLogLevelDebug, "no ice servers were provided");
         } else {
             // Adding IceServers
             for (int i=0; i<size; i++) {

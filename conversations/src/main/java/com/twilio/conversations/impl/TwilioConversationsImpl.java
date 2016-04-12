@@ -353,10 +353,6 @@ public class TwilioConversationsImpl {
         setModuleLevel(module.ordinal(), level.ordinal());
     }
 
-    public static LogLevel getLogLevel() {
-        return TwilioConversationsImpl.level;
-    }
-
     private static void setSDKLogLevel(LogLevel level) {
          /*
          * The Log Levels are defined differently in the Twilio Logger
@@ -394,7 +390,7 @@ public class TwilioConversationsImpl {
         }
     }
 
-    public static int getLogLevel() {
+    public static LogLevel getLogLevel() {
         return tryGetCoreLogLevel();
     }
 
@@ -425,9 +421,9 @@ public class TwilioConversationsImpl {
      * @return Core log level or current value that the user has set if the native library has not
      * been loaded
      */
-    private static int tryGetCoreLogLevel() {
+    private static LogLevel tryGetCoreLogLevel() {
         try {
-            return getCoreLogLevel();
+            return LogLevel.values()[getCoreLogLevel()];
         } catch (UnsatisfiedLinkError e) {
             logger.w("Native log level not available before initialization. Returning currently" +
                             "set log level");
