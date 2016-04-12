@@ -404,13 +404,7 @@ public class TwilioConversationsImpl {
      * been loaded
      */
     private static int tryGetCoreLogLevel() {
-        try {
-            return getCoreLogLevel();
-        } catch (UnsatisfiedLinkError e) {
-            logger.w("Native log level not available before initialization. Returning currently" +
-                            "set log level");
-            return level;
-        }
+        return (libraryIsLoaded) ? (getCoreLogLevel()) : (level);
     }
 
     /**
@@ -419,10 +413,8 @@ public class TwilioConversationsImpl {
      * @param level
      */
     private static void trySetCoreLogLevel(int level) {
-        try {
+        if (libraryIsLoaded) {
             setCoreLogLevel(level);
-        } catch (UnsatisfiedLinkError e) {
-            logger.w("Native logger unavailable. Will set during initialization");
         }
     }
 
