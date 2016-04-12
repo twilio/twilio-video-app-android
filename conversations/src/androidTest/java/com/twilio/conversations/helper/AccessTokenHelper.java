@@ -16,14 +16,14 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 public class AccessTokenHelper {
-
     /**
      * A synchronous method that returns an initialized TwilioAccessManager
      */
     public static TwilioAccessManager obtainTwilioAccessManager(String username) throws InterruptedException {
         String accessToken = obtainCapabilityToken(username);
         final CountDownLatch tokenUpdatedLatch = new CountDownLatch(1);
-        TwilioAccessManager twilioAccessManager = TwilioAccessManagerFactory.createAccessManager(accessToken, new TwilioAccessManagerListener() {
+        TwilioAccessManager twilioAccessManager = TwilioAccessManagerFactory
+                .createAccessManager(accessToken, new TwilioAccessManagerListener() {
             @Override
             public void onTokenExpired(TwilioAccessManager twilioAccessManager) {
                 fail();
@@ -70,5 +70,4 @@ public class AccessTokenHelper {
 
         return capabilityToken[0];
     }
-
 }
