@@ -1,17 +1,24 @@
 package com.twilio.conversations;
 
+/**
+ * Use video constraints to apply to a {@link LocalVideoTrack}.
+ * Note that {@link VideoConstraints} is used to resolve the capture format, but the actual
+ * video sent to Participants may be downscaled temporally or spatially in response to network
+ * and device conditions.
+ *
+ */
 public class VideoConstraints {
 
     // Battery saving 10 fps video
-    public static final int FRAME_RATE_10 = 10;
+    public static final int FPS_10 = 10;
     // Battery saving 15 fps video
-    public static final int FRAME_RATE_15 = 15;
+    public static final int FPS_15 = 15;
     // Battery efficient 20 fps video
-    public static final int FRAME_RATE_20 = 20;
+    public static final int FPS_20 = 20;
     // Cinematic 24 fps video
-    public static final int FRAME_RATE_24 = 24;
+    public static final int FPS_24 = 24;
     // Smooth 30 fps video
-    public static final int FRAME_RATE_30 = 30;
+    public static final int FPS_30 = 30;
 
     private final VideoDimensions minVideoDimensions;
     private final VideoDimensions maxVideoDimensions;
@@ -25,18 +32,30 @@ public class VideoConstraints {
         this.maxFps = builder.maxFps;
     }
 
+    /**
+     * The minimum video size allowed
+     */
     public VideoDimensions getMinVideoDimensions() {
         return minVideoDimensions;
     }
 
+    /**
+     * The maximum video size allowed
+     */
     public VideoDimensions getMaxVideoDimensions() {
         return maxVideoDimensions;
     }
 
+    /**
+     * The minimum frames per second allowed
+     */
     public int getMinFps() {
         return minFps;
     }
 
+    /**
+     * The maximum frames per second allowed
+     */
     public int getMaxFps() {
         return maxFps;
     }

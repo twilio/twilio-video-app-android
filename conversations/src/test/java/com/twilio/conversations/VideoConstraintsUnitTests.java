@@ -6,6 +6,21 @@ import static junit.framework.Assert.*;
 
 public class VideoConstraintsUnitTests {
 
+    @Test(expected = IllegalStateException.class)
+    public void negativeWidthVideoDimensions() {
+        new VideoDimensions(-1, 5);
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void negativeHeightVideoDimensions() {
+        new VideoDimensions(1, -1);
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void negativeWidthAndHeightVideoDimensions() {
+        new VideoDimensions(-1, -1);
+    }
+
     @Test
     public void createCustomMinAndMaxDimensions() {
         int dummyMinWidth = 100;
@@ -29,14 +44,14 @@ public class VideoConstraintsUnitTests {
         VideoConstraints videoConstraints = new VideoConstraints.Builder()
                 .minVideoDimensions(VideoDimensions.CIF_VIDEO_DIMENSIONS)
                 .maxVideoDimensions(VideoDimensions.HD_720P_VIDEO_DIMENSIONS)
-                .minFps(VideoConstraints.FRAME_RATE_10)
-                .maxFps(VideoConstraints.FRAME_RATE_24)
+                .minFps(VideoConstraints.FPS_10)
+                .maxFps(VideoConstraints.FPS_24)
                 .build();
 
         assertEquals(VideoDimensions.CIF_VIDEO_DIMENSIONS, videoConstraints.getMinVideoDimensions());
         assertEquals(VideoDimensions.HD_720P_VIDEO_DIMENSIONS, videoConstraints.getMaxVideoDimensions());
-        assertEquals(VideoConstraints.FRAME_RATE_10, videoConstraints.getMinFps());
-        assertEquals(VideoConstraints.FRAME_RATE_24, videoConstraints.getMaxFps());
+        assertEquals(VideoConstraints.FPS_10, videoConstraints.getMinFps());
+        assertEquals(VideoConstraints.FPS_24, videoConstraints.getMaxFps());
     }
 
     @Test(expected = NullPointerException.class)
@@ -65,6 +80,14 @@ public class VideoConstraintsUnitTests {
     public void useNegativeMaxFps() {
         new VideoConstraints.Builder()
                 .maxFps(-100)
+                .build();
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void localVideoTrackWithNegativeMinAndMaxFps() {
+        new VideoConstraints.Builder()
+                .minFps(-1)
+                .maxFps(-1)
                 .build();
     }
 

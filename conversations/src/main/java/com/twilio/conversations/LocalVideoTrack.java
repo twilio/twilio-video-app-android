@@ -20,4 +20,15 @@ public interface LocalVideoTrack extends VideoTrack {
      */
     boolean enable(boolean enabled);
 
+    /**
+     * Specifies the video constraints associated with this track
+     *
+     * If you do not provide any video constraints, the default video constraints are set to a
+     * a minimum of 10 frames per second, a maximum of 30 frames per second, and a maximum video
+     * dimension size of 640x480.
+     *
+     * @return video constraints
+     */
+    VideoConstraints getVideoConstraints();
+
 }
