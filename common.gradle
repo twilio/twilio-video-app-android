@@ -17,9 +17,8 @@ ext.getVersionName = {
 
 ext.generateVersionName = {
     def version = getVersionName()
-    def build = version.toString().replace(".", "") as int
 
-    return version + "-" + build
+    return version
 }
 
 ext.generateVersionCode = {

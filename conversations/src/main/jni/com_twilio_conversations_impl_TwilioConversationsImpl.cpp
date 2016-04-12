@@ -2,6 +2,7 @@
 #include <jni.h>
 #include <string.h>
 
+#include "TSCMediaCodecRegistry.h"
 #include "TSCoreSDKTypes.h"
 #include "TSCoreConstants.h"
 #include "TSCoreSDK.h"
@@ -23,9 +24,15 @@
 #include "talk/app/webrtc/java/jni/jni_helpers.h"
 #include "talk/app/webrtc/java/jni/classreferenceholder.h"
 #include "talk/app/webrtc/java/jni/androidnetworkmonitor_jni.h"
+#include "talk/media/webrtc/webrtcvideodecoderfactory.h"
+#include "talk/media/webrtc/webrtcvideoencoderfactory.h"
+#include "android_video_codec_manager.h"
+
 
 #define TAG  "TwilioSDK(native)"
 
+using cricket::WebRtcVideoDecoderFactory;
+using cricket::WebRtcVideoEncoderFactory;
 using namespace webrtc_jni;
 using namespace twiliosdk;
 
@@ -51,14 +58,6 @@ extern "C" void JNIEXPORT JNICALL JNI_OnUnLoad(JavaVM *jvm, void *reserved) {
     FreeGlobalClassReferenceHolder();
 }
 
-static TwilioCommon::AccessManager* getNativeAccessMgrFromJava(JNIEnv* jni, jobject j_accessMgr) {
-    jclass j_accessManagerClass = GetObjectClass(jni, j_accessMgr);
-    jmethodID getNativeHandleId = GetMethodID(jni, j_accessManagerClass, "getNativeHandle", "()J");
-
-    jlong j_am = jni->CallLongMethod(j_accessMgr, getNativeHandleId);
-    return reinterpret_cast<TwilioCommon::AccessManager*>(j_am);
-}
-
 /*
  * Class:     com_twilio_conversations_impl_TwilioConversationsImpl
  * Method:    initCore
@@ -68,9 +67,6 @@ JNIEXPORT jboolean JNICALL Java_com_twilio_conversations_impl_TwilioConversation
     TS_CORE_LOG_MODULE(kTSCoreLogModulePlatform, kTSCoreLogLevelDebug, "initCore");
     bool failure = false;
     TSCSDK* tscSdk = TSCSDK::instance();
-
-    TSCPlatformDataProviderRef provider = new rtc::RefCountedObject<AndroidPlatformInfoProvider>(env, context);
-    tscSdk->setPlatformDataProvider(provider);
 
     // TODO investigate relocating some of these calls to more timely locations
     if (!media_jvm_set) {
@@ -84,6 +80,15 @@ JNIEXPORT jboolean JNICALL Java_com_twilio_conversations_impl_TwilioConversation
     if (tscSdk != NULL &&
         tscSdk->isInitialized() &&
         !failure) {
+        TSCPlatformDataProviderRef provider =
+                new rtc::RefCountedObject<AndroidPlatformInfoProvider>(env, context);
+        TSCMediaCodecRegistry& codecManager = tscSdk->getMediaCodecRegistry();
+        TSCVideoCodecRef androidVideoCodecManager =
+                new rtc::RefCountedObject<AndroidVideoCodecManager>();
+
+        tscSdk->setPlatformDataProvider(provider);
+        codecManager.registerVideoCodec(androidVideoCodecManager);
+
         return JNI_TRUE;
     }
 
@@ -198,7 +203,8 @@ JNIEXPORT jlong JNICALL Java_com_twilio_conversations_impl_TwilioConversationsIm
     TSCEndpointPtr *endpoint = new TSCEndpointPtr();
     *endpoint = TSCSDK::instance()->createEndpoint(options, accessManager, *endpointObserver);
 
-    return jlongFromPointer(endpoint);
+    codecManager.unregisterVideoCodecsForName(AndroidVideoCodecManager::videoCodecManagerName);
+    TSCSDK::destroy();
 }
 
 

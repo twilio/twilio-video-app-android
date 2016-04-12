@@ -56,13 +56,6 @@ public interface Conversation {
     String getSid();
 
     /**
-     * Releases resources associated with this conversation.
-     *
-     * Attempts to use this conversation object after disposal will result in an IllegalStateException.
-     */
-    void dispose();
-
-    /**
      * Gets the {@link StatsListener} of this conversation
      *
      * @return listener of this conversation media tracks stats

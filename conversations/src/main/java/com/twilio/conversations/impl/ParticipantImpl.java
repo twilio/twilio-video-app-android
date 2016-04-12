@@ -49,6 +49,10 @@ public class ParticipantImpl implements Participant {
         return sid;
     }
 
+    void setSid(String sid) {
+        this.sid = sid;
+    }
+
     MediaImpl getMediaImpl() {
         return media;
     }

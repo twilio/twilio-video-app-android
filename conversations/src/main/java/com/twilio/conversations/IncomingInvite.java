@@ -12,6 +12,11 @@ public interface IncomingInvite {
     void accept(LocalMedia localMedia, ConversationCallback conversationCallback);
 
     /**
+     * Accepts this invitation with custom ICE options
+     */
+    void accept(LocalMedia localMedia, IceOptions iceOptions, ConversationCallback conversationCallback);
+
+    /**
      * Rejects this invitation
      */
     void reject();

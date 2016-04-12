@@ -12,6 +12,9 @@ import android.os.Handler;
 
 import com.twilio.conversations.AudioTrack;
 import com.twilio.conversations.Conversation;
+import com.twilio.conversations.IceOptions;
+import com.twilio.conversations.IceServer;
+import com.twilio.conversations.IceTransportPolicy;
 import com.twilio.conversations.StatsListener;
 import com.twilio.conversations.MediaTrackStatsRecord;
 import com.twilio.conversations.TwilioConversationsException;
@@ -23,6 +26,7 @@ import com.twilio.conversations.MediaTrackState;
 import com.twilio.conversations.Participant;
 import com.twilio.conversations.TrackOrigin;
 import com.twilio.conversations.TwilioConversations;
+import com.twilio.conversations.VideoConstraints;
 import com.twilio.conversations.VideoRenderer;
 import com.twilio.conversations.VideoTrack;
 import com.twilio.conversations.impl.core.ConversationStateObserver;
@@ -41,30 +45,27 @@ import com.twilio.conversations.impl.util.CallbackHandler;
 
 public class ConversationImpl implements Conversation,
         NativeHandleInterface, SessionObserver, CoreSession {
-    private static final String DISPOSE_MESSAGE = "The conversation has been disposed. " +
+    private static final String DISPOSED_MESSAGE = "The conversation has been destroyed. " +
             "This operation is no longer valid";
-    private static final String FINALIZE_MESSAGE = "Conversations must be released by " +
-            "calling dispose(). Failure to do so may result in leaked resources.";
-    private Set<String> invitedParticipants = new HashSet<String>();
+    private Set<String> invitedParticipants = new HashSet<>();
     private String inviter;
     private ConversationsClientImpl conversationsClient;
     private ConversationListener conversationListener;
     private ConversationStateObserver conversationStateObserver;
-    private Map<String,ParticipantImpl> participantMap = new HashMap<String,ParticipantImpl>();
+    private Map<String,ParticipantImpl> participantMap = new HashMap<>();
     private LocalMediaImpl localMediaImpl;
     private Handler handler;
     private IncomingInviteImpl incomingInviteImpl;
     private OutgoingInviteImpl outgoingInviteImpl;
     private StatsListener statsListener;
     private Handler statsHandler;
-    private DisposalState disposalState = DisposalState.NOT_DISPOSED;
-
 
     private static String TAG = "ConversationImpl";
 
     static final Logger logger = Logger.getLogger(ConversationImpl.class);
     private SessionState state;
     private ConversationStatus conversationStatus;
+    private String conversationSid;
 
     class SessionObserverInternal implements NativeHandleInterface {
 
@@ -133,7 +134,9 @@ public class ConversationImpl implements Conversation,
         nativeSession = wrapOutgoingSession(conversationsClient.getNativeHandle(),
                 sessionObserverInternal.getNativeHandle(),
                 participantIdentityArray);
-
+        if(nativeSession != 0) {
+            conversationSid = getConversationSid(nativeSession);
+        }
     }
 
     private ConversationImpl(ConversationsClientImpl conversationsClient,
@@ -143,6 +146,8 @@ public class ConversationImpl implements Conversation,
         this.conversationsClient = conversationsClient;
         this.conversationStateObserver = conversationStateObserver;
         this.nativeSession = nativeSession;
+
+        conversationSid = getConversationSid(nativeSession);
 
         inviter = participantsIdentities[0];
 
@@ -154,6 +159,8 @@ public class ConversationImpl implements Conversation,
         for (String participantIdentity : participantsIdentities) {
             findOrCreateParticipant(participantIdentity, null);
             invitedParticipants.add(participantIdentity);
+
+
         }
         sessionObserverInternal = new SessionObserverInternal(this, this);
         setSessionObserver(nativeSession, sessionObserverInternal.getNativeHandle());
@@ -191,7 +198,6 @@ public class ConversationImpl implements Conversation,
 
     @Override
     public Set<Participant> getParticipants() {
-        checkDisposed();
         Set<Participant> participants =
                 new HashSet<Participant>(participantMap.values());
         return participants;
@@ -218,33 +224,32 @@ public class ConversationImpl implements Conversation,
 
     @Override
     public void setConversationListener(ConversationListener listener) {
+        handler = CallbackHandler.create();
+        if(handler == null) {
+            throw new IllegalThreadStateException("This thread must be able to obtain a Looper");
+        }
         this.conversationListener = listener;
     }
 
     @Override
-    public void invite(Set<String> participantIdentityes) throws IllegalArgumentException {
+    public void invite(Set<String> participantIdentities) throws IllegalArgumentException {
         checkDisposed();
-        if ((participantIdentityes == null) || (participantIdentityes.size() == 0)) {
-            throw new IllegalArgumentException("participantIdentityes cannot be null or empty");
+        if ((participantIdentities == null) || (participantIdentities.size() == 0)) {
+            throw new IllegalArgumentException("participantIdentities cannot be null or empty");
         }
-        inviteParticipants(participantIdentityes);
+        inviteParticipants(participantIdentities);
     }
 
     @Override
     public void disconnect() {
-        checkDisposed();
-        stop();
+        if(nativeSession != 0) {
+            stop();
+        }
     }
 
     @Override
     public String getSid() {
-        checkDisposed();
-        String conversationSid = getConversationSid(nativeSession);
-        if(conversationSid == null || conversationSid.length() == 0) {
-            return null;
-        } else {
-            return conversationSid;
-        }
+        return conversationSid;
     }
 
     @Override
@@ -268,20 +273,22 @@ public class ConversationImpl implements Conversation,
         }
     }
 
-    @Override
-    protected void finalize() throws Throwable {
-        if (disposalState == DisposalState.NOT_DISPOSED || nativeSession != 0) {
-            logger.e(FINALIZE_MESSAGE);
-            dispose();
-        }
-    }
-
     private ParticipantImpl findOrCreateParticipant(String participantIdentity, String participantSid) {
         ParticipantImpl participant = participantMap.get(participantIdentity);
         if(participant == null) {
             logger.d("Creating new participant" + participantIdentity);
+            if(participantSid == null) {
+                logger.w("Participant sid was null");
+            }
             participant = new ParticipantImpl(participantIdentity, participantSid);
             participantMap.put(participantIdentity, participant);
+        } else if(participant != null && participant.getSid() == null) {
+            /*
+             * Incoming invites do not provide the participant sid. The sid becomes
+             * available when the onParticipantConnect event is fired.
+             */
+            logger.d("Participant sid added for " + participantIdentity);
+            participant.setSid(participantSid);
         }
         return participant;
     }
@@ -303,12 +310,6 @@ public class ConversationImpl implements Conversation,
             // TODO GSDK-492 multi-invite behavior
         }
 
-        if (conversationStatus == ConversationStatus.DISCONNECTED &&
-                disposalState == DisposalState.DISPOSING) {
-            // If the conversation was active, dispose will disconnect the conversation
-            // now we must complete the disposal
-            disposeConversation();
-        }
     }
 
     SessionState getSessionState() {
@@ -345,6 +346,7 @@ public class ConversationImpl implements Conversation,
                     interruptedException.printStackTrace();
                 }
             }
+            disposeConversation();
         }
     }
 
@@ -359,32 +361,32 @@ public class ConversationImpl implements Conversation,
         // Remove this conversation from the client
         conversationsClient.removeConversation(this);
         // Conversations that are rejected do not have a listener
-        if(conversationListener == null) {
-            return;
-        }
-        participantMap.clear();
-        if (error == null) {
-            if(handler != null && conversationListener != null) {
-                handler.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        conversationListener.onConversationEnded(ConversationImpl.this, null);
-                    }
-                });
+        if(conversationListener != null) {
+            participantMap.clear();
+            if (error == null) {
+                if (handler != null && conversationListener != null) {
+                    handler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            conversationListener.onConversationEnded(ConversationImpl.this, null);
+                        }
+                    });
+                }
+            } else {
+                final TwilioConversationsException e =
+                        new TwilioConversationsException(error.getCode(),
+                                error.getMessage());
+                if (handler != null && conversationListener != null) {
+                    handler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            conversationListener.onConversationEnded(ConversationImpl.this, e);
+                        }
+                    });
+                }
             }
-        } else {
-            final TwilioConversationsException e =
-                    new TwilioConversationsException(error.getCode(),
-                            error.getMessage());
-            if(handler != null && conversationListener != null) {
-                handler.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        conversationListener.onConversationEnded(ConversationImpl.this, e);
-                    }
-                });
-            }
         }
+        disposeConversation();
     }
 
     @Override
@@ -400,24 +402,6 @@ public class ConversationImpl implements Conversation,
                     public void run() {
                         conversationListener.onParticipantConnected(ConversationImpl.this, participantImpl);
                         waitLatch.countDown();
-                        /**
-                         * Workaround for CSDK-225. MediaTracks are added before onParticipantConnected is called.
-                         */
-                        Media media = participantImpl.getMediaImpl();
-                        for(final VideoTrack videoTrack : media.getVideoTracks()) {
-                            final Handler participantHandler = participantImpl.getHandler();
-                            if(participantHandler != null) {
-                                participantHandler.post(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        if (participantImpl.getParticipantListener() != null) {
-                                            participantImpl.getParticipantListener().onVideoTrackAdded(
-                                                    ConversationImpl.this, participantImpl, videoTrack);
-                                        }
-                                    }
-                                });
-                            }
-                        }
                     }
                 });
             } else {
@@ -495,7 +479,7 @@ public class ConversationImpl implements Conversation,
 
     @Override
     public void onVideoTrackAdded(final TrackInfo trackInfo, final org.webrtc.VideoTrack webRtcVideoTrack) {
-        log("onVideoTrackAdded", trackInfo.getParticipantIdentity() + " " + trackInfo.getTrackId() + trackInfo.isEnabled());
+        log("onVideoTrackAdded", trackInfo.getParticipantIdentity() + " " + trackInfo.getTrackId() + " " + trackInfo.isEnabled());
 
         if(trackInfo.getTrackOrigin() == TrackOrigin.LOCAL) {
             List<LocalVideoTrack> tracksList = localMediaImpl.getLocalVideoTracks();
@@ -717,7 +701,26 @@ public class ConversationImpl implements Conversation,
     public void onReceiveTrackStatistics(CoreTrackStatsReport report) {
         if (statsHandler != null && statsListener != null) {
             final MediaTrackStatsRecord stats = MediaTrackStatsRecordFactory.create(report);
+
             if (stats != null) {
+                /*
+                 * Do not report stats until the participant sid of this participant is available
+                 * on both the conversation and the media stats record.
+                 * It will become available when the onParticipantConnected event is triggered.
+                 */
+                boolean foundSid = false;
+                for(Participant participant: getParticipants()) {
+                    if(participant.getSid() != null && stats.getParticipantSid() != null && participant.getSid().equals(stats.getParticipantSid())) {
+                        foundSid = true;
+                        break;
+                    }
+                }
+
+                if(!foundSid) {
+                    logger.d("stats report skipped since the participant sid has not been set yet");
+                    return;
+                }
+
                 statsHandler.post(new Runnable() {
                     @Override
                     public void run() {
@@ -725,6 +728,7 @@ public class ConversationImpl implements Conversation,
                     }
                 });
             }
+
         }
 
     }
@@ -777,22 +781,6 @@ public class ConversationImpl implements Conversation,
         return nativeSession;
     }
 
-    @Override
-    public synchronized void dispose() {
-        checkDisposed();
-        disposalState = DisposalState.DISPOSING;
-        if (isActive()) {
-            // We should disconnect the conversation before disposing
-            stop();
-        } else {
-            disposeConversation();
-        }
-    }
-
-    public DisposalState getDisposalState() {
-        return disposalState;
-    }
-
     public void setLocalMedia(LocalMedia media) {
         checkDisposed();
         localMediaImpl = (LocalMediaImpl)media;
@@ -838,26 +826,42 @@ public class ConversationImpl implements Conversation,
         return isMuted(nativeSession);
     }
 
+
+    CoreSessionMediaConstraints createMediaConstrains(IceOptions iceOptions) {
+        LocalMedia localMedia = getLocalMedia();
+        boolean enableVideo = !localMedia.getLocalVideoTracks().isEmpty();
+        boolean pauseVideo = false;
+        if (enableVideo) {
+            pauseVideo = !localMedia.getLocalVideoTracks().get(0).isEnabled();
+        }
+        return new CoreSessionMediaConstraints(localMedia.isMicrophoneAdded(),
+                        localMedia.isMuted(), enableVideo, pauseVideo, iceOptions);
+
+    }
+
     /**
      * CoreSession
      */
     @Override
-    public void start() {
+    public void start(final CoreSessionMediaConstraints mediaConstraints) {
         logger.d("starting call");
 
 		/*
 		 * Determine the media constraints
 		 */
+        final VideoConstraints videoConstraints;
         LocalMedia localMedia = getLocalMedia();
-        boolean enableVideo = !localMedia.getLocalVideoTracks().isEmpty();
-        boolean pauseVideo = false;
-        if (enableVideo) {
+        if(mediaConstraints.isVideoEnabled()) {
             setupExternalCapturer();
-            pauseVideo = !localMedia.getLocalVideoTracks().get(0).isEnabled();
+            LocalVideoTrackImpl localVideoTrackImpl = (LocalVideoTrackImpl)localMedia.getLocalVideoTracks().get(0);
+            videoConstraints = localVideoTrackImpl.getVideoConstraints();
+        } else {
+            videoConstraints = null;
         }
-        final CoreSessionMediaConstraints mediaConstraints =
-                new CoreSessionMediaConstraints(localMedia.isMicrophoneAdded(),
-                        localMedia.isMuted(), enableVideo, pauseVideo);
+
+        IceOptions iceOptions = mediaConstraints.getIceOptions();
+        final IceTransportPolicy policy = (iceOptions != null) ?
+                iceOptions.iceTransportPolicy : IceTransportPolicy.ICE_TRANSPORT_POLICY_ALL;
 
 		/*
 		 * Retain the session pointer since it can be reset before the
@@ -872,7 +876,9 @@ public class ConversationImpl implements Conversation,
                         mediaConstraints.isAudioEnabled(),
                         mediaConstraints.isAudioMuted(),
                         mediaConstraints.isVideoEnabled(),
-                        mediaConstraints.isVideoPaused());
+                        mediaConstraints.isVideoPaused(),
+                        videoConstraints,
+                        mediaConstraints.getIceServersArray(), policy);
 
             }
         }).start();
@@ -921,13 +927,14 @@ public class ConversationImpl implements Conversation,
             freeNativeHandle(nativeSession);
             nativeSession = 0;
         }
-        EglBaseProvider.releaseEglBase();
-        disposalState = DisposalState.DISPOSED;
+        if(conversationsClient.getActiveConversationsCount() == 0) {
+            EglBaseProvider.releaseEglBase();
+        }
     }
 
     private synchronized void checkDisposed() {
-        if (disposalState != DisposalState.NOT_DISPOSED || nativeSession == 0) {
-            throw new IllegalStateException(DISPOSE_MESSAGE);
+        if (nativeSession == 0) {
+            throw new IllegalStateException(DISPOSED_MESSAGE);
         }
     }
 
@@ -938,7 +945,11 @@ public class ConversationImpl implements Conversation,
                               boolean enableAudio,
                               boolean muteAudio,
                               boolean enableVideo,
-                              boolean pauseVideo);
+                              boolean pauseVideo,
+                              VideoConstraints videoConstraints,
+                              IceServer[] iceServers,
+                              IceTransportPolicy iceTransportPolicy);
+
     private native void setExternalCapturer(long nativeSession, long nativeCapturer);
     private native void stop(long nativeSession);
     private native void setSessionObserver(long nativeSession, long nativeSessionObserver);

@@ -29,28 +29,24 @@ import android.os.Handler;
 import android.util.Log;
 
 import com.twilio.common.TwilioAccessManager;
+import com.twilio.conversations.ClientOptions;
 import com.twilio.conversations.ConversationsClientListener;
 import com.twilio.conversations.TwilioConversations;
 import com.twilio.conversations.TwilioConversations.LogLevel;
 import com.twilio.conversations.TwilioConversations.LogModule;
 import com.twilio.conversations.impl.logging.Logger;
 import com.twilio.conversations.impl.util.CallbackHandler;
-
+import com.twilio.conversations.internal.ReLinker;
 
 public class TwilioConversationsImpl {
     private static final int REQUEST_CODE_WAKEUP = 100;
     private static final long BACKGROUND_WAKEUP_INTERVAL = 10 * 60 * 1000;
 
-    static {
-        // We rename this artifact so we do not clash with
-        // webrtc java classes expecting this native so
-        System.loadLibrary("jingle_peerconnection_so");
-    }
-
     static final Logger logger = Logger.getLogger(TwilioConversationsImpl.class);
 
     private static volatile TwilioConversationsImpl instance;
     private static LogLevel level = LogLevel.OFF;
+    private static volatile boolean libraryIsLoaded = false;
     protected Context applicationContext;
     private boolean initialized;
     private boolean initializing;
@@ -221,6 +217,22 @@ public class TwilioConversationsImpl {
             throw new IllegalThreadStateException("This thread must be able to obtain a Looper");
         }
 
+        /**
+         * With all the invariants satisfied we can now load the library if we have not done so
+         */
+        if (!libraryIsLoaded) {
+            ReLinker.loadLibrary(applicationContext, "jingle_peerconnection_so");
+            libraryIsLoaded = true;
+        }
+
+        /**
+         * It is possible that the user has tried to set the log level before the native library
+         * has loaded. Here we apply the log level because we know the native library is available
+         */
+        if(level != 0) {
+            trySetCoreLogLevel(level);
+        }
+
         /*
          * Initialize the core in a new thread since it may otherwise block the calling thread.
          * The calling thread may often be the UI thread which should never be blocked.
@@ -235,7 +247,8 @@ public class TwilioConversationsImpl {
                     handler.post(new Runnable() {
                         @Override
                         public void run() {
-                            initListener.onError(new RuntimeException("Twilio conversations failed to initialize."));
+                            initListener.onError(new RuntimeException("Twilio conversations " +
+                                    "failed to initialize."));
                         }
                     });
                 } else {
@@ -277,79 +290,47 @@ public class TwilioConversationsImpl {
             unregisterConnectivityBroadcastReceiver();
         }
 
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                Queue<ConversationsClientImpl> clientsDisposing = new ArrayDeque<>();
-                Application application = (Application)
-                        TwilioConversationsImpl.this.applicationContext.getApplicationContext();
-                AlarmManager alarmManager = (AlarmManager) applicationContext
-                        .getSystemService(Context.ALARM_SERVICE);
+        // TODO: make this async again after debugging
 
-                alarmManager.cancel(wakeUpPendingIntent);
-                application.unregisterActivityLifecycleCallbacks(applicationForegroundTracker);
+        Queue<ConversationsClientImpl> clientsDisposing = new ArrayDeque<>();
+        Application application = (Application)
+                TwilioConversationsImpl.this.applicationContext.getApplicationContext();
+        AlarmManager alarmManager = (AlarmManager) applicationContext
+                .getSystemService(Context.ALARM_SERVICE);
 
-                // Process clients and determine which ones need to be closed
-                for (Map.Entry<UUID, WeakReference<ConversationsClientImpl>> entry :
-                        conversationsClientMap.entrySet()) {
-                    WeakReference<ConversationsClientImpl> weakClientRef =
-                            conversationsClientMap.remove(entry.getKey());
+        alarmManager.cancel(wakeUpPendingIntent);
+        application.unregisterActivityLifecycleCallbacks(applicationForegroundTracker);
 
-                    if (weakClientRef != null) {
-                        ConversationsClientImpl client = weakClientRef.get();
-                        if (client != null) {
-                            if (client.getDisposalState() == DisposalState.NOT_DISPOSED) {
-                                client.dispose();
-                                // Add clients that are not disposed to ensure they are disposed later
-                                clientsDisposing.add(client);
-                            }
-                        }
-                    }
+        // Process clients and determine which ones need to be closed
+        for (Map.Entry<UUID, WeakReference<ConversationsClientImpl>> entry :
+                conversationsClientMap.entrySet()) {
+            WeakReference<ConversationsClientImpl> weakClientRef =
+                    conversationsClientMap.remove(entry.getKey());
+
+            if (weakClientRef != null) {
+                ConversationsClientImpl client = weakClientRef.get();
+                if (client != null) {
+                    // Dispose of the client regardless of whether it is still listening.
+                    client.disposeClient();
                 }
-
-                // Wait until all clients are disposed.
-                while (!clientsDisposing.isEmpty()) {
-                    ConversationsClientImpl clientPendingDispose = clientsDisposing.poll();
-
-                    if (clientPendingDispose.getDisposalState() != DisposalState.DISPOSED) {
-                        clientsDisposing.add(clientPendingDispose);
-                    }
-                }
-
-                // Now we can teardown the sdk
-                // TODO destroy investigate making this asynchronous with callbacks
-                destroyCore();
-                initialized = false;
             }
-        }).start();
+        }
+
+        // Now we can teardown the sdk
+        // TODO destroy investigate making this asynchronous with callbacks
+        logger.d("Destroying Core");
+        destroyCore();
+        logger.d("Core destroyed");
+        initialized = false;
     }
 
     public ConversationsClientImpl createConversationsClient(TwilioAccessManager accessManager,
-                                                             Map<String, String> options,
+                                                             ClientOptions options,
                                                              ConversationsClientListener inListener) {
-        if(options != null && accessManager != null) {
-            // Let's simplify options map by using array instead,
-            // for easier passing data to jni layer
-            String[] optionsArray = new String[options.size() * 2];
-            int i = 0;
-            for (Map.Entry<String, String> entrySet : options.entrySet()) {
-                optionsArray[i++] = entrySet.getKey();
-                optionsArray[i++] = entrySet.getValue();
-            }
-
+        if(accessManager != null) {
             final ConversationsClientImpl conversationsClient = new ConversationsClientImpl(applicationContext,
-                    accessManager, inListener);
-            long nativeEndpointObserverHandle = conversationsClient.getEndpointObserverHandle();
-            if (nativeEndpointObserverHandle == 0) {
-                return null;
-            }
-            final long nativeEndpointHandle = createEndpoint(accessManager, optionsArray,
-                    nativeEndpointObserverHandle);
-            if (nativeEndpointHandle == 0) {
-                return null;
-            }
-            conversationsClient.setNativeEndpointHandle(nativeEndpointHandle);
-            if (conversationsClientMap.size() == 0) {
+                    accessManager, inListener, options);
+           if (conversationsClientMap.size() == 0) {
                 registerConnectivityBroadcastReceiver();
             }
             conversationsClientMap.put(conversationsClient.getUuid(),
@@ -412,7 +393,14 @@ public class TwilioConversationsImpl {
                 Logger.setLogLevel(Log.ASSERT);
                 break;
         }
+        trySetCoreLogLevel(level);
+        TwilioConversationsImpl.level = level;
     }
+
+    public static int getLogLevel() {
+        return tryGetCoreLogLevel();
+    }
+
     public boolean isInitialized() {
         return initialized;
     }
@@ -433,6 +421,34 @@ public class TwilioConversationsImpl {
         }
 
         return null;
+    }
+
+    /**
+     * Convenience safety method for retrieving core log level.
+     * @return Core log level or current value that the user has set if the native library has not
+     * been loaded
+     */
+    private static int tryGetCoreLogLevel() {
+        try {
+            return getCoreLogLevel();
+        } catch (UnsatisfiedLinkError e) {
+            logger.w("Native log level not available before initialization. Returning currently" +
+                            "set log level");
+            return level;
+        }
+    }
+
+    /**
+     * This is a convenience safety method in the event that the core log level is attempted before
+     * initialization.
+     * @param level
+     */
+    private static void trySetCoreLogLevel(int level) {
+        try {
+            setCoreLogLevel(level);
+        } catch (UnsatisfiedLinkError e) {
+            logger.w("Native logger unavailable. Will set during initialization");
+        }
     }
 
     private void onNetworkChange() {
@@ -461,9 +477,6 @@ public class TwilioConversationsImpl {
     private native void onApplicationWakeUp();
     private native void onApplicationBackground();
     private native void destroyCore();
-    private native long createEndpoint(TwilioAccessManager accessManager,
-                                       String[] optionsArray,
-                                       long nativeEndpointObserver);
     private native static void setCoreLogLevel(int level);
     private native static void setModuleLevel(int module, int level);
     private native static int getCoreLogLevel();

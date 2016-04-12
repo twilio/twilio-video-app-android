@@ -7,6 +7,12 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+
+JNIEXPORT jlong JNICALL
+Java_com_twilio_conversations_impl_ConversationsClientImpl_createEndpoint
+  (JNIEnv *, jobject, jobject, jobjectArray, jlong);
+
 /*
  * Class:     com_twilio_conversations_impl_ConversationsClientImpl
  * Method:    listen

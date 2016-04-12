@@ -56,7 +56,7 @@ public class LocalMediaImpl implements LocalMedia {
 
     @Override
     public boolean mute(boolean on) {
-        if (convWeak != null && convWeak.get() != null) {
+        if (convWeak != null && convWeak.get() != null && convWeak.get().getNativeHandle() != 0) {
             audioMuted = on;
             return convWeak.get().mute(on);
         } else if (audioMuted != on){
@@ -176,7 +176,7 @@ public class LocalMediaImpl implements LocalMedia {
     }
 
     void setConversation(ConversationImpl conversation) {
-        this.convWeak = new WeakReference<ConversationImpl>(conversation);
+        this.convWeak = new WeakReference<>(conversation);
     }
 
     @Override

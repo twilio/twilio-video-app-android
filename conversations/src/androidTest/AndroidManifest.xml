@@ -12,7 +12,7 @@
 
     <application>
         <activity
-            android:name="com.twilio.conversations.TwilioConversationsActivity">
+            android:name="com.twilio.conversations.activity.TwilioConversationsActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

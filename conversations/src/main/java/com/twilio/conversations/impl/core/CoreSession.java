@@ -1,9 +1,11 @@
 package com.twilio.conversations.impl.core;
 
+import com.twilio.conversations.IceOptions;
+
 import java.util.Set;
 
 public interface CoreSession {
-    void start();
+    void start(CoreSessionMediaConstraints mediaConstraints);
 
     void stop();
 
