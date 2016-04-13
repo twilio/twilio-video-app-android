@@ -41,7 +41,7 @@ public class CameraCapturerImpl implements CameraCapturer {
     private CapturerState lastCapturerState;
 
     // Preview capturer members
-    private final ViewGroup previewContainer;
+    private ViewGroup previewContainer;
     private Camera camera;
     private int cameraId;
     private CapturerPreview capturerPreview;
