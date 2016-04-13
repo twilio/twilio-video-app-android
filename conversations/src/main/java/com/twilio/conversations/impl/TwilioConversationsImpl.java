@@ -405,7 +405,7 @@ public class TwilioConversationsImpl {
     }
 
     public static LogLevel getLogLevel() {
-        return tryGetCoreLogLevel();
+        return LogLevel.values()[tryGetCoreLogLevel()];
     }
 
     public boolean isInitialized() {
@@ -435,8 +435,8 @@ public class TwilioConversationsImpl {
      * @return Core log level or current value that the user has set if the native library has not
      * been loaded
      */
-    private static LogLevel tryGetCoreLogLevel() {
-        return (libraryIsLoaded) ? (LogLevel.values()[getCoreLogLevel()]) : (level);
+    private static int tryGetCoreLogLevel() {
+        return (libraryIsLoaded) ? (getCoreLogLevel()) : (level.ordinal());
     }
 
     /**
