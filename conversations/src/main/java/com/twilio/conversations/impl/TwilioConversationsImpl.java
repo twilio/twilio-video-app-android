@@ -2,6 +2,7 @@ package com.twilio.conversations.impl;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayDeque;
+import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -33,6 +34,7 @@ import com.twilio.conversations.ClientOptions;
 import com.twilio.conversations.ConversationsClientListener;
 import com.twilio.conversations.TwilioConversations;
 import com.twilio.conversations.TwilioConversations.LogLevel;
+import com.twilio.conversations.TwilioConversations.LogModule;
 import com.twilio.conversations.impl.logging.Logger;
 import com.twilio.conversations.impl.util.CallbackHandler;
 import com.twilio.conversations.internal.ReLinker;
@@ -44,8 +46,11 @@ public class TwilioConversationsImpl {
     static final Logger logger = Logger.getLogger(TwilioConversationsImpl.class);
 
     private static volatile TwilioConversationsImpl instance;
+
     private static volatile boolean libraryIsLoaded = false;
-    private static int level = 0;
+    private static LogLevel level = LogLevel.OFF;
+    private static Map<LogModule, LogLevel> moduleLogLevel = new EnumMap<LogModule, LogLevel>
+            (LogModule.class);
     protected Context applicationContext;
     private boolean initialized;
     private boolean initializing;
@@ -156,7 +161,7 @@ public class TwilioConversationsImpl {
             }
         }
 
-        if(level != 0) {
+        if(level != LogLevel.OFF) {
             // Re-apply the log level. Initialization sets a default log level.
             setLogLevel(level);
         }
@@ -227,10 +232,18 @@ public class TwilioConversationsImpl {
          * It is possible that the user has tried to set the log level before the native library
          * has loaded. Here we apply the log level because we know the native library is available
          */
-        if(level != 0) {
-            trySetCoreLogLevel(level);
+        if(level != LogLevel.OFF) {
+            trySetCoreLogLevel(level.ordinal());
         }
 
+        /**
+         * It is possible that the user has tried to set the log level for a specific module
+         * before the library has loaded. Here we apply the log level for the module because we
+         * know the native library is available
+         */
+        for (LogModule module: moduleLogLevel.keySet()) {
+            trySetCoreModuleLogLevel(module.ordinal(), moduleLogLevel.get(module).ordinal());
+        }
         /*
          * Initialize the core in a new thread since it may otherwise block the calling thread.
          * The calling thread may often be the UI thread which should never be blocked.
@@ -338,42 +351,61 @@ public class TwilioConversationsImpl {
         return null;
     }
 
-    public static void setLogLevel(int level) {
-        /**
+    public static void setLogLevel(LogLevel level) {
+        setSDKLogLevel(level);
+        trySetCoreLogLevel(level.ordinal());
+        // Save the log level
+        TwilioConversationsImpl.level = level;
+    }
+
+    public static void setModuleLogLevel(LogModule module, LogLevel level) {
+        if (module == LogModule.PLATFORM) {
+            setSDKLogLevel(level);
+        }
+        trySetCoreModuleLogLevel(module.ordinal(), level.ordinal());
+        //Save the module log level
+        TwilioConversationsImpl.moduleLogLevel.put(module, level);
+    }
+
+    private static void setSDKLogLevel(LogLevel level) {
+         /*
          * The Log Levels are defined differently in the Twilio Logger
          * which is based off android.util.Log.
          */
         switch(level) {
-            case LogLevel.DISABLED:
+            case OFF:
                 Logger.setLogLevel(Log.ASSERT);
                 break;
-            case LogLevel.ERROR:
+            case FATAL:
                 Logger.setLogLevel(Log.ERROR);
                 break;
-            case LogLevel.WARNING:
+            case ERROR:
+                Logger.setLogLevel(Log.ERROR);
+                break;
+            case WARNING:
                 Logger.setLogLevel(Log.WARN);
                 break;
-            case LogLevel.INFO:
+            case INFO:
                 Logger.setLogLevel(Log.INFO);
                 break;
-            case LogLevel.DEBUG:
+            case DEBUG:
                 Logger.setLogLevel(Log.DEBUG);
                 break;
-            case LogLevel.VERBOSE:
+            case TRACE:
+                Logger.setLogLevel(Log.VERBOSE);
+                break;
+            case ALL:
                 Logger.setLogLevel(Log.VERBOSE);
                 break;
             default:
                 // Set the log level to assert/disabled if the value passed in is unknown
                 Logger.setLogLevel(Log.ASSERT);
-                level = TwilioConversations.LogLevel.DISABLED;
                 break;
         }
-        trySetCoreLogLevel(level);
-        TwilioConversationsImpl.level = level;
     }
 
-    public static int getLogLevel() {
-        return tryGetCoreLogLevel();
+    public static LogLevel getLogLevel() {
+        return LogLevel.values()[tryGetCoreLogLevel()];
     }
 
     public boolean isInitialized() {
@@ -404,7 +436,7 @@ public class TwilioConversationsImpl {
      * been loaded
      */
     private static int tryGetCoreLogLevel() {
-        return (libraryIsLoaded) ? (getCoreLogLevel()) : (level);
+        return (libraryIsLoaded) ? (getCoreLogLevel()) : (level.ordinal());
     }
 
     /**
@@ -415,6 +447,11 @@ public class TwilioConversationsImpl {
     private static void trySetCoreLogLevel(int level) {
         if (libraryIsLoaded) {
             setCoreLogLevel(level);
+        }
+    }
+    private static void trySetCoreModuleLogLevel(int module, int level){
+        if (libraryIsLoaded) {
+            setModuleLevel(module, level);
         }
     }
 
@@ -445,6 +482,7 @@ public class TwilioConversationsImpl {
     private native void onApplicationBackground();
     private native void destroyCore();
     private native static void setCoreLogLevel(int level);
+    private native static void setModuleLevel(int module, int level);
     private native static int getCoreLogLevel();
     private native void refreshRegistrations();
 }

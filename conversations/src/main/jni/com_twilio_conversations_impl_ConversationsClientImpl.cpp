@@ -18,7 +18,7 @@ using namespace webrtc_jni;
 
 JNIEXPORT jlong JNICALL Java_com_twilio_conversations_impl_ConversationsClientImpl_createEndpoint
         (JNIEnv *env, jobject obj, jobject j_accessMgr, jobjectArray optionsArray, jlong nativeEndpointObserver) {
-    TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK, kTSCoreLogLevelDebug, "createEndpoint");
+    TS_CORE_LOG_MODULE(kTSCoreLogModulePlatform, kTSCoreLogLevelDebug, "createEndpoint");
 
     TSCOptions options;
 
@@ -35,7 +35,7 @@ JNIEXPORT jlong JNICALL Java_com_twilio_conversations_impl_ConversationsClientIm
     }
 
     if (!nativeEndpointObserver) {
-        TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK, kTSCoreLogLevelError, "nativeEndpointObserver is null");
+        TS_CORE_LOG_MODULE(kTSCoreLogModulePlatform, kTSCoreLogLevelError, "nativeEndpointObserver is null");
         return 0;
     }
 
@@ -43,12 +43,12 @@ JNIEXPORT jlong JNICALL Java_com_twilio_conversations_impl_ConversationsClientIm
     TwilioCommon::AccessManager* accessManager = getNativeAccessMgrFromJava(env, j_accessMgr);
 
     if (accessManager == NULL) {
-        TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK, kTSCoreLogLevelError, "AccessManager is null");
+        TS_CORE_LOG_MODULE(kTSCoreLogModulePlatform, kTSCoreLogLevelError, "AccessManager is null");
         return 0;
     }
 
     if (accessManager->getToken().empty()) {
-        TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK, kTSCoreLogLevelError, "token is null");
+        TS_CORE_LOG_MODULE(kTSCoreLogModulePlatform, kTSCoreLogLevelError, "token is null");
         return 0;
     }
 
@@ -75,7 +75,7 @@ static TwilioCommon::AccessManager* getNativeAccessMgrFromJava(JNIEnv* jni, jobj
  */
 JNIEXPORT void JNICALL Java_com_twilio_conversations_impl_ConversationsClientImpl_listen
         (JNIEnv *env, jobject obj, jlong nativeEndpoint) {
-    TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK, kTSCoreLogLevelDebug, "listen");
+    TS_CORE_LOG_MODULE(kTSCoreLogModulePlatform, kTSCoreLogLevelDebug, "listen");
     reinterpret_cast<TSCEndpointPtr *>(nativeEndpoint)->get()->registerEndpoint(true, true);
 }
 
@@ -86,7 +86,7 @@ JNIEXPORT void JNICALL Java_com_twilio_conversations_impl_ConversationsClientImp
  */
 JNIEXPORT void JNICALL Java_com_twilio_conversations_impl_ConversationsClientImpl_unlisten
         (JNIEnv *env, jobject obj, jlong nativeEndpoint) {
-    TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK, kTSCoreLogLevelDebug, "unlisten");
+    TS_CORE_LOG_MODULE(kTSCoreLogModulePlatform, kTSCoreLogLevelDebug, "unlisten");
     reinterpret_cast<TSCEndpointPtr *>(nativeEndpoint)->get()->unregisterEndpoint();
 }
 
@@ -98,7 +98,7 @@ JNIEXPORT void JNICALL Java_com_twilio_conversations_impl_ConversationsClientImp
  */
 JNIEXPORT void JNICALL Java_com_twilio_conversations_impl_ConversationsClientImpl_reject
         (JNIEnv *env, jobject obj, jlong nativeEndpoint, jlong nativeSession) {
-    TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK, kTSCoreLogLevelDebug, "reject");
+    TS_CORE_LOG_MODULE(kTSCoreLogModulePlatform, kTSCoreLogLevelDebug, "reject");
     TSCSessionPtr *session = reinterpret_cast<TSCSessionPtr *>(nativeSession);
     reinterpret_cast<TSCEndpointPtr *>(nativeEndpoint)->get()->reject(*session);
 }
@@ -110,7 +110,7 @@ JNIEXPORT void JNICALL Java_com_twilio_conversations_impl_ConversationsClientImp
  */
 JNIEXPORT void JNICALL Java_com_twilio_conversations_impl_ConversationsClientImpl_freeNativeHandle
         (JNIEnv *env, jobject obj, jlong nativeEndpoint) {
-    TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK, kTSCoreLogLevelDebug, "freeNativeHandle");
+    TS_CORE_LOG_MODULE(kTSCoreLogModulePlatform, kTSCoreLogLevelDebug, "freeNativeHandle");
     TSCEndpointPtr *endpoint = reinterpret_cast<TSCEndpointPtr *>(nativeEndpoint);
     if (endpoint != nullptr) {
         TSCSDK::instance()->destroyEndpoint(*endpoint);

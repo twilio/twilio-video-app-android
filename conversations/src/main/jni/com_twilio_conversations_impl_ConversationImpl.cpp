@@ -21,7 +21,7 @@ using namespace webrtc_jni;
 
 JNIEXPORT jlong JNICALL Java_com_twilio_conversations_impl_ConversationImpl_wrapOutgoingSession
         (JNIEnv *env, jobject obj, jlong nativeEndpoint, jlong nativeSessionObserver, jobjectArray participantList) {
-    TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK, kTSCoreLogLevelDebug, "wrapOutgoingSession");
+    TS_CORE_LOG_MODULE(kTSCoreLogModulePlatform, kTSCoreLogLevelDebug, "wrapOutgoingSession");
     TSCEndpointPtr *endpoint = reinterpret_cast<TSCEndpointPtr *>(nativeEndpoint);
     TSCOptions options;
     options.insert(std::pair<std::string,std::string>("audio","yes"));
@@ -29,7 +29,7 @@ JNIEXPORT jlong JNICALL Java_com_twilio_conversations_impl_ConversationImpl_wrap
 
     TSCSessionObserverPtr *sessionObserver = reinterpret_cast<TSCSessionObserverPtr *>(nativeSessionObserver);
     if (sessionObserver == nullptr || !(*sessionObserver)) {
-        TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK, kTSCoreLogLevelDebug, "sessionObserver was null");
+        TS_CORE_LOG_MODULE(kTSCoreLogModulePlatform, kTSCoreLogLevelDebug, "sessionObserver was null");
         return 0;
     }
 
@@ -37,7 +37,7 @@ JNIEXPORT jlong JNICALL Java_com_twilio_conversations_impl_ConversationImpl_wrap
     *outgoingSession = endpoint->get()->createSession(options, *sessionObserver);
 
     if (outgoingSession == nullptr || !(*outgoingSession)) {
-        TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK, kTSCoreLogLevelDebug, "outgoingSession was null");
+        TS_CORE_LOG_MODULE(kTSCoreLogModulePlatform, kTSCoreLogLevelDebug, "outgoingSession was null");
         return 0;
     }
 
@@ -61,7 +61,7 @@ JNIEXPORT jlong JNICALL Java_com_twilio_conversations_impl_ConversationImpl_wrap
 TSCConstraintsRef createVideoConstraints(JNIEnv *env, jobject j_video_constraints) {
     TSCConstraintsRef constraints = new TSCConstraintsObject();
 
-    TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK, kTSCoreLogLevelDebug, "Parsing video constraints");
+    TS_CORE_LOG_MODULE(kTSCoreLogModulePlatform, kTSCoreLogLevelDebug, "Parsing video constraints");
 
     jclass video_constraints_class = env->GetObjectClass(j_video_constraints);
     jfieldID min_fps_field =
@@ -73,7 +73,7 @@ TSCConstraintsRef createVideoConstraints(JNIEnv *env, jobject j_video_constraint
     int max_fps =
             env->GetIntField(j_video_constraints, max_fps_field);
 
-    TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK, kTSCoreLogLevelDebug,
+    TS_CORE_LOG_MODULE(kTSCoreLogModulePlatform, kTSCoreLogLevelDebug,
                        "Video constraints minFps %d maxFps %d",
                        min_fps,
                        max_fps);
@@ -98,7 +98,7 @@ TSCConstraintsRef createVideoConstraints(JNIEnv *env, jobject j_video_constraint
     int min_height =
             env->GetIntField(j_min_video_dimensions, min_height_field);
 
-    TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK, kTSCoreLogLevelDebug,
+    TS_CORE_LOG_MODULE(kTSCoreLogModulePlatform, kTSCoreLogLevelDebug,
                        "Video constraints min width %d min height %d",
                        min_width,
                        min_height);
@@ -114,7 +114,7 @@ TSCConstraintsRef createVideoConstraints(JNIEnv *env, jobject j_video_constraint
     int max_height =
             env->GetIntField(j_max_video_dimensions, max_height_field);
 
-    TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK, kTSCoreLogLevelDebug,
+    TS_CORE_LOG_MODULE(kTSCoreLogModulePlatform, kTSCoreLogLevelDebug,
                        "Video constraints max width %d max height %d",
                        max_width,
                        max_height);
@@ -145,7 +145,7 @@ twiliosdk::IceOptions createIceOptions(JNIEnv *env, jobjectArray j_iceServers,
     if (!webrtc_jni::IsNull(env, j_iceServers)) {
         int size = env->GetArrayLength(j_iceServers);
         if (size == 0) {
-            TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK, kTSCoreLogLevelDebug, "no ice servers were provided");
+            TS_CORE_LOG_MODULE(kTSCoreLogModulePlatform, kTSCoreLogLevelDebug, "no ice servers were provided");
         } else {
             // Adding IceServers
             for (int i=0; i<size; i++) {
@@ -206,7 +206,7 @@ JNIEXPORT void JNICALL Java_com_twilio_conversations_impl_ConversationImpl_start
          jboolean j_muteAudio, jboolean j_enableVideo, jboolean j_pauseVideo,
              jobject j_video_constraints, jobjectArray j_iceServers, jobject j_iceTransportPolicy)
 {
-    TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK, kTSCoreLogLevelDebug, "start");
+    TS_CORE_LOG_MODULE(kTSCoreLogModulePlatform, kTSCoreLogLevelDebug, "start");
     TSCSessionPtr *session = reinterpret_cast<TSCSessionPtr *>(nativeSession);
 
     bool enableAudio = j_enableAudio == JNI_TRUE ? true : false;
@@ -214,9 +214,7 @@ JNIEXPORT void JNICALL Java_com_twilio_conversations_impl_ConversationImpl_start
     bool enableVideo = j_enableVideo == JNI_TRUE ? true : false;
     bool pauseVideo = j_pauseVideo == JNI_TRUE ? true : false;
 
-
-
-    TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK, kTSCoreLogLevelDebug, "local media config: %s, %s, %s, %s",
+    TS_CORE_LOG_MODULE(kTSCoreLogModulePlatform, kTSCoreLogLevelDebug, "local media config: %s, %s, %s, %s",
                        (enableAudio ? "enabledAudio = true":"enabledAudio = false"),
                        (muteAudio ? "muteAudio = true":"muteAudio = false"),
                        (enableVideo ? "enableVideo = true":"enableVideo=false"),
@@ -239,7 +237,7 @@ JNIEXPORT void JNICALL Java_com_twilio_conversations_impl_ConversationImpl_start
 JNIEXPORT void JNICALL Java_com_twilio_conversations_impl_ConversationImpl_stop
         (JNIEnv *env, jobject obj, jlong nativeSession)
 {
-    TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK, kTSCoreLogLevelDebug, "stop");
+    TS_CORE_LOG_MODULE(kTSCoreLogModulePlatform, kTSCoreLogLevelDebug, "stop");
     TSCSessionPtr *session = reinterpret_cast<TSCSessionPtr *>(nativeSession);
     session->get()->stop();
 }
@@ -247,20 +245,20 @@ JNIEXPORT void JNICALL Java_com_twilio_conversations_impl_ConversationImpl_stop
 JNIEXPORT void JNICALL Java_com_twilio_conversations_impl_ConversationImpl_setExternalCapturer
         (JNIEnv *env, jobject obj, jlong nativeSession, jlong nativeCapturer)
 {
-    TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK, kTSCoreLogLevelDebug, "setExternalCapturer");
+    TS_CORE_LOG_MODULE(kTSCoreLogModulePlatform, kTSCoreLogLevelDebug, "setExternalCapturer");
     TSCSessionPtr *session = reinterpret_cast<TSCSessionPtr *>(nativeSession);
     TSCVideoCaptureControllerPtr videoCaptureController = session->get()->getVideoCaptureController();
     if(videoCaptureController != nullptr) {
         videoCaptureController->setExternalVideoCapturer(reinterpret_cast<cricket::VideoCapturer *>(nativeCapturer));
     } else {
-        TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK, kTSCoreLogLevelDebug, "videoCapturerController was null");
+        TS_CORE_LOG_MODULE(kTSCoreLogModulePlatform, kTSCoreLogLevelDebug, "videoCapturerController was null");
     }
 }
 
 JNIEXPORT void JNICALL Java_com_twilio_conversations_impl_ConversationImpl_setSessionObserver
         (JNIEnv *, jobject, jlong nativeSession, jlong nativeSessionObserver)
 {
-    TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK, kTSCoreLogLevelDebug, "setSessionObserver");
+    TS_CORE_LOG_MODULE(kTSCoreLogModulePlatform, kTSCoreLogLevelDebug, "setSessionObserver");
     TSCSessionPtr *session = reinterpret_cast<TSCSessionPtr *>(nativeSession);
     TSCSessionObserverPtr *sessionObserver = reinterpret_cast<TSCSessionObserverPtr *>(nativeSessionObserver);
     session->get()->setSessionObserver(*sessionObserver);
@@ -269,7 +267,7 @@ JNIEXPORT void JNICALL Java_com_twilio_conversations_impl_ConversationImpl_setSe
 JNIEXPORT jboolean JNICALL Java_com_twilio_conversations_impl_ConversationImpl_enableVideo
         (JNIEnv *env, jobject, jlong nativeSession, jboolean enabled, jboolean paused, jobject j_video_constraints)
 {
-    TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK, kTSCoreLogLevelDebug, "enableVideo");
+    TS_CORE_LOG_MODULE(kTSCoreLogModulePlatform, kTSCoreLogLevelDebug, "enableVideo");
     TSCSessionPtr *session = reinterpret_cast<TSCSessionPtr *>(nativeSession);
     if(IsNull(env, j_video_constraints)) {
         return (session->get()->enableVideo((bool) enabled, (bool) paused) ? JNI_TRUE : JNI_FALSE);
@@ -281,7 +279,7 @@ JNIEXPORT jboolean JNICALL Java_com_twilio_conversations_impl_ConversationImpl_e
 
 JNIEXPORT void JNICALL Java_com_twilio_conversations_impl_ConversationImpl_freeNativeHandle
         (JNIEnv *env, jobject obj, jlong nativeSession) {
-    TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK, kTSCoreLogLevelDebug, "freeNativeHandle: Session");
+    TS_CORE_LOG_MODULE(kTSCoreLogModulePlatform, kTSCoreLogLevelDebug, "freeNativeHandle: Session");
     TSCSessionPtr *session = reinterpret_cast<TSCSessionPtr *>(nativeSession);
     if (session != nullptr) {
         session->reset();
@@ -292,7 +290,7 @@ JNIEXPORT void JNICALL Java_com_twilio_conversations_impl_ConversationImpl_freeN
 JNIEXPORT jboolean JNICALL Java_com_twilio_conversations_impl_ConversationImpl_mute
         (JNIEnv *, jobject, jlong nativeSession, jboolean on)
 {
-    TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK, kTSCoreLogLevelDebug, "mute");
+    TS_CORE_LOG_MODULE(kTSCoreLogModulePlatform, kTSCoreLogLevelDebug, "mute");
     TSCSessionPtr *session = reinterpret_cast<TSCSessionPtr *>(nativeSession);
     TSCAudioInputControllerPtr audioInputCtrl = session->get()->getAudioInputController();
     if (audioInputCtrl) {
@@ -304,7 +302,7 @@ JNIEXPORT jboolean JNICALL Java_com_twilio_conversations_impl_ConversationImpl_m
 JNIEXPORT jboolean JNICALL Java_com_twilio_conversations_impl_ConversationImpl_isMuted
         (JNIEnv *, jobject, jlong nativeSession)
 {
-    TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK, kTSCoreLogLevelDebug, "isMuted");
+    TS_CORE_LOG_MODULE(kTSCoreLogModulePlatform, kTSCoreLogLevelDebug, "isMuted");
     TSCSessionPtr *session = reinterpret_cast<TSCSessionPtr *>(nativeSession);
     TSCAudioInputControllerPtr audioInputCtrl = session->get()->getAudioInputController();
     if (audioInputCtrl) {
@@ -316,11 +314,11 @@ JNIEXPORT jboolean JNICALL Java_com_twilio_conversations_impl_ConversationImpl_i
 JNIEXPORT void JNICALL Java_com_twilio_conversations_impl_ConversationImpl_inviteParticipants
         (JNIEnv *env, jobject obj, jlong nativeSession, jobjectArray participantList)
 {
-    TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK, kTSCoreLogLevelDebug, "inviteParticipants");
+    TS_CORE_LOG_MODULE(kTSCoreLogModulePlatform, kTSCoreLogLevelDebug, "inviteParticipants");
     TSCSessionPtr *session = reinterpret_cast<TSCSessionPtr *>(nativeSession);
     int size = env->GetArrayLength(participantList);
     if (size == 0) {
-        TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK, kTSCoreLogLevelDebug, "no participants were provided");
+        TS_CORE_LOG_MODULE(kTSCoreLogModulePlatform, kTSCoreLogLevelDebug, "no participants were provided");
         return;
     }
 
@@ -336,7 +334,7 @@ JNIEXPORT void JNICALL Java_com_twilio_conversations_impl_ConversationImpl_invit
 JNIEXPORT jstring JNICALL Java_com_twilio_conversations_impl_ConversationImpl_getConversationSid
         (JNIEnv *env, jobject obj, jlong nativeSession)
 {
-    TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK, kTSCoreLogLevelDebug, "getConversationSid");
+    TS_CORE_LOG_MODULE(kTSCoreLogModulePlatform, kTSCoreLogLevelDebug, "getConversationSid");
     TSCSessionPtr *session = reinterpret_cast<TSCSessionPtr *>(nativeSession);
 
     return JavaStringFromStdString(env, session->get()->getConversationSid());
@@ -345,7 +343,7 @@ JNIEXPORT jstring JNICALL Java_com_twilio_conversations_impl_ConversationImpl_ge
 JNIEXPORT jboolean JNICALL Java_com_twilio_conversations_impl_ConversationImpl_enableAudio
         (JNIEnv *, jobject, jlong nativeSession, jboolean j_enabled, jboolean j_muted)
 {
-    TS_CORE_LOG_MODULE(kTSCoreLogModuleSignalSDK, kTSCoreLogLevelDebug, "enableAudio");
+    TS_CORE_LOG_MODULE(kTSCoreLogModulePlatform, kTSCoreLogLevelDebug, "enableAudio");
     TSCSessionPtr *session = reinterpret_cast<TSCSessionPtr *>(nativeSession);
     bool enabled = (j_enabled == JNI_TRUE) ? true : false;
     bool muted = (j_muted) ? true : false;
