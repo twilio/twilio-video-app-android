@@ -188,15 +188,16 @@ public class TwilioConversationsTests extends TwilioConversationsTestsBase {
     @Test
     public void setLogLevel_shouldSetLogLevelToDisabledForInvalidLevel() {
         int invalidLevel = 100;
-        TwilioConversations.setLogLevel(invalidLevel);
+        TwilioConversations.setLogLevel(TwilioConversations.LogLevel.values()
+                [invalidLevel]);
 
-        assertEquals(TwilioConversations.LogLevel.DISABLED,
+        assertEquals(TwilioConversations.LogLevel.OFF,
                 TwilioConversations.getLogLevel());
     }
 
     @Test
     public void setLogLevel_canBeDoneBeforeAndAfterInit() throws InterruptedException {
-        int level = TwilioConversations.LogLevel.VERBOSE;
+        TwilioConversations.LogLevel level = TwilioConversations.LogLevel.DEBUG;
 
         TwilioConversations.setLogLevel(level);
         assertEquals(level, TwilioConversations.getLogLevel());
