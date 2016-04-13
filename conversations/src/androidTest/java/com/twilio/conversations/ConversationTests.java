@@ -2,6 +2,7 @@ package com.twilio.conversations;
 
 import android.os.Build;
 import android.os.Handler;
+import android.support.test.filters.LargeTest;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
 
@@ -27,6 +28,7 @@ import java.util.concurrent.TimeUnit;
 import static org.junit.Assert.*;
 
 @RunWith(AndroidJUnit4.class)
+@LargeTest
 public class ConversationTests extends TwilioConversationsTestsBase {
     private static String USER = "john";
     private static String NON_EXISTANT_PARTICIPANT ="non-existant-paritcipant";

@@ -2,9 +2,9 @@ package com.twilio.conversations;
 
 import android.content.Context;
 import android.os.Build;
+import android.support.test.filters.LargeTest;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
-import android.test.suitebuilder.annotation.LargeTest;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 

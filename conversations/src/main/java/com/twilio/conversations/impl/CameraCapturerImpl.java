@@ -20,6 +20,7 @@ import com.twilio.conversations.CameraCapturer;
 import com.twilio.conversations.CapturerErrorListener;
 import com.twilio.conversations.CapturerException;
 import com.twilio.conversations.CapturerException.ExceptionDomain;
+import com.twilio.conversations.R;
 import com.twilio.conversations.impl.logging.Logger;
 
 
@@ -43,7 +44,7 @@ public class CameraCapturerImpl implements CameraCapturer {
     private ViewGroup previewContainer;
     private Camera camera;
     private int cameraId;
-    private CameraPreview cameraPreview;
+    private CapturerPreview capturerPreview;
     private CapturerState capturerState = CapturerState.IDLE;
 
     /* Conversation capturer members */
@@ -158,9 +159,9 @@ public class CameraCapturerImpl implements CameraCapturer {
         }
         camera.setParameters(params);
 
-        cameraPreview = new CameraPreview(context, camera, listener);
+        capturerPreview = new CapturerPreview(context, camera, listener);
         previewContainer.removeAllViews();
-        previewContainer.addView(cameraPreview);
+        previewContainer.addView(capturerPreview);
 
         capturerState = CapturerState.PREVIEWING;
     }
@@ -171,7 +172,7 @@ public class CameraCapturerImpl implements CameraCapturer {
             if (previewContainer != null) {
                 previewContainer.removeAllViews();
             }
-            cameraPreview = null;
+            capturerPreview = null;
             if(camera != null) {
                 camera.release();
                 camera = null;
@@ -296,14 +297,14 @@ public class CameraCapturerImpl implements CameraCapturer {
         }
     };
 
-    private class CameraPreview extends SurfaceView implements SurfaceHolder.Callback {
+    private class CapturerPreview extends SurfaceView implements SurfaceHolder.Callback {
         private Context context;
         private SurfaceHolder holder;
         private Camera camera;
         private CapturerErrorListener listener;
         private OrientationEventListener orientationEventListener;
 
-        public CameraPreview(Context context, Camera camera, CapturerErrorListener listener) {
+        public CapturerPreview(Context context, Camera camera, CapturerErrorListener listener) {
             super(context);
             this.context = context;
             this.camera = camera;
@@ -317,6 +318,7 @@ public class CameraCapturerImpl implements CameraCapturer {
                     updatePreviewOrientation();
                 }
             };
+            setContentDescription(context.getString(R.string.capturer_preview_content_description));
         }
 
         @Override
