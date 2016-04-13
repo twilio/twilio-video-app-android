@@ -108,6 +108,15 @@ public class CameraCapturerImpl implements CameraCapturer {
     }
 
     @Override
+    public void startPreview(ViewGroup previewContainer) {
+        if (this.previewContainer != null) {
+            this.previewContainer.removeAllViews();
+        }
+        this.previewContainer = previewContainer;
+        startPreview();
+    }
+
+    @Override
     public synchronized void startPreview() {
         if(capturerState.equals(CapturerState.PREVIEWING) ||
                 capturerState.equals(CapturerState.BROADCASTING)) {
