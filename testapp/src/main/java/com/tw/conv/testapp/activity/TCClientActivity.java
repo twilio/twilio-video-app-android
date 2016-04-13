@@ -413,7 +413,6 @@ public class TCClientActivity extends AppCompatActivity {
         cameraCapturer = CameraCapturerFactory.createCameraCapturer(
                 TCClientActivity.this,
                 currentCameraSource,
-                previewFrameLayout,
                 capturerErrorListener());
 
         switchCameraActionFab.setOnClickListener(switchCameraClickListener());
@@ -560,7 +559,7 @@ public class TCClientActivity extends AppCompatActivity {
 
     private void startPreview() {
         if (cameraCapturer != null) {
-            cameraCapturer.startPreview();
+            cameraCapturer.startPreview(previewFrameLayout);
         }
     }
 
