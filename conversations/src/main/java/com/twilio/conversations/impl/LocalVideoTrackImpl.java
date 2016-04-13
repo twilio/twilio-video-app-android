@@ -31,8 +31,9 @@ public class LocalVideoTrackImpl extends VideoTrackImpl implements LocalVideoTra
         this.videoConstraints = videoConstraints;
     }
 
-    /*
-     * TODO: Obtain the default video constraints using JNI
+    /**
+     * TODO
+     * Obtain the default video constraints using JNI
      * to ensure we stay in sync if the defaults change in the core.
      * This requires a significant amount of boilerplate with the current
      * implementation but it can be greatly simplified with a small core refactor.
