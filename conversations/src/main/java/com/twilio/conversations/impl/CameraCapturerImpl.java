@@ -40,17 +40,18 @@ public class CameraCapturerImpl implements CameraCapturer {
     private CameraSource source;
     private CapturerState lastCapturerState;
 
-    /* Preview capturer members */
-    private ViewGroup previewContainer;
+    // Preview capturer members
+    private final ViewGroup previewContainer;
     private Camera camera;
     private int cameraId;
     private CapturerPreview capturerPreview;
     private CapturerState capturerState = CapturerState.IDLE;
 
-    /* Conversation capturer members */
+    // Conversation capturer members
     private VideoCapturerAndroid videoCapturerAndroid;
     private CapturerErrorListener listener;
     private long nativeVideoCapturerAndroid;
+    private boolean broadcastCapturerPaused = false;
 
     private CameraCapturerImpl(Context context,
                                CameraSource source,
@@ -89,6 +90,7 @@ public class CameraCapturerImpl implements CameraCapturer {
      */
     private int getCameraId() {
         String deviceName;
+
         if(source == CameraSource.CAMERA_SOURCE_BACK_CAMERA) {
             deviceName = CameraEnumerationAndroid.getNameOfBackFacingDevice();
         } else {
@@ -105,6 +107,7 @@ public class CameraCapturerImpl implements CameraCapturer {
                 }
             }
         }
+
         return cameraId;
     }
 
@@ -137,8 +140,8 @@ public class CameraCapturerImpl implements CameraCapturer {
                 if(listener != null) {
                     listener.onError(new CapturerException(ExceptionDomain.CAMERA,
                             "Unable to open camera " +
-                                    CameraEnumerationAndroid.getDeviceName(cameraId) +
-                                    ":" + e.getMessage()));
+                                    CameraEnumerationAndroid.getDeviceName(cameraId) + ":" +
+                                    e.getMessage()));
                 }
                 return;
             }
@@ -207,7 +210,7 @@ public class CameraCapturerImpl implements CameraCapturer {
             cameraId = (cameraId + 1) % Camera.getNumberOfCameras();
             startPreview();
             return true;
-        } else if (capturerState.equals(CapturerState.BROADCASTING)) {
+        } else if (capturerState.equals(CapturerState.BROADCASTING) && !broadcastCapturerPaused) {
             // TODO: propagate error
             videoCapturerAndroid.switchCamera(null);
             return true;
@@ -220,6 +223,7 @@ public class CameraCapturerImpl implements CameraCapturer {
         lastCapturerState = capturerState;
         if(capturerState.equals(CapturerState.BROADCASTING)) {
             stopVideoSource(session);
+            broadcastCapturerPaused = true;
         }
     }
 
@@ -229,6 +233,7 @@ public class CameraCapturerImpl implements CameraCapturer {
                 restartVideoSource(session);
             }
             lastCapturerState = null;
+            broadcastCapturerPaused = false;
         }
     }
 
@@ -244,9 +249,10 @@ public class CameraCapturerImpl implements CameraCapturer {
     private long retrieveNativeVideoCapturerAndroid(VideoCapturerAndroid videoCapturerAndroid) {
         // Use reflection to retrieve the native video capturer handle
         long nativeHandle = 0;
+
         try {
-            Field field = videoCapturerAndroid
-                    .getClass().getSuperclass().getDeclaredField("nativeVideoCapturer");
+            Field field = videoCapturerAndroid.getClass()
+                    .getSuperclass().getDeclaredField("nativeVideoCapturer");
             field.setAccessible(true);
             nativeHandle = field.getLong(videoCapturerAndroid);
         } catch (NoSuchFieldException e) {
@@ -256,6 +262,7 @@ public class CameraCapturerImpl implements CameraCapturer {
             throw new RuntimeException("Unable to access nativeVideoCapturer field: " +
                     e.getMessage());
         }
+
         return nativeHandle;
     }
 
@@ -272,7 +279,6 @@ public class CameraCapturerImpl implements CameraCapturer {
 
 
     private final CameraEventsHandler cameraEventsHandler = new CameraEventsHandler() {
-
         @Override
         public void onCameraError(String errorMsg) {
             if(CameraCapturerImpl.this.listener != null) {

@@ -130,7 +130,8 @@ public class TCClientActivity extends AppCompatActivity {
     private LinearLayout statsLayout;
     private TextView localVideoTrackStatsTextView;
     private RemoteVideoTrackStatsAdapter remoteVideoTrackStatsAdapter;
-    private LinkedHashMap<String, RemoteVideoTrackStatsRecord> remoteVideoTrackStatsRecordMap = new LinkedHashMap<>();
+    private LinkedHashMap<String, RemoteVideoTrackStatsRecord>
+            remoteVideoTrackStatsRecordMap = new LinkedHashMap<>();
     private RecyclerView remoteStatsRecyclerView;
 
     private enum AudioState {
@@ -344,8 +345,10 @@ public class TCClientActivity extends AppCompatActivity {
                 }
 
                 Timber.i("Video Constraints Fps " + minFps + " " + maxFps);
-                Timber.i("Video Constraints MinVD " + minVideoDimensions.width + " " + minVideoDimensions.height);
-                Timber.i("Video Constraints MaxVD " + maxVideoDimensions.width + " " + maxVideoDimensions.height);
+                Timber.i("Video Constraints MinVD " +
+                        minVideoDimensions.width + " " + minVideoDimensions.height);
+                Timber.i("Video Constraints MaxVD " +
+                        maxVideoDimensions.width + " " + maxVideoDimensions.height);
             }
 
             @Override
@@ -356,26 +359,32 @@ public class TCClientActivity extends AppCompatActivity {
 
         fpsRangeBar.setOnRangeBarChangeListener(new RangeBar.OnRangeBarChangeListener() {
             @Override
-            public void onRangeChangeListener(RangeBar rangeBar, int leftPinIndex, int rightPinIndex, String leftPinValue, String rightPinValue) {
+            public void onRangeChangeListener(RangeBar rangeBar, int leftPinIndex,
+                                              int rightPinIndex, String leftPinValue,
+                                              String rightPinValue) {
                 minFps = Integer.valueOf(leftPinValue);
                 maxFps = Integer.valueOf(rightPinValue);
             }
         });
 
-        videoDimensionsRangeBar.setOnRangeBarChangeListener(new RangeBar.OnRangeBarChangeListener() {
-            @Override
-            public void onRangeChangeListener(RangeBar rangeBar, int leftPinIndex, int rightPinIndex, String leftPinValue, String rightPinValue) {
-                minVideoDimensions = videoDimensionsMap.get(leftPinIndex);
-                maxVideoDimensions = videoDimensionsMap.get(rightPinIndex);
-            }
-        });
+        videoDimensionsRangeBar.setOnRangeBarChangeListener(
+                new RangeBar.OnRangeBarChangeListener() {
+                    @Override
+                    public void onRangeChangeListener(RangeBar rangeBar, int leftPinIndex,
+                                                      int rightPinIndex, String leftPinValue,
+                                                      String rightPinValue) {
+                        minVideoDimensions = videoDimensionsMap.get(leftPinIndex);
+                        maxVideoDimensions = videoDimensionsMap.get(rightPinIndex);
+                    }
+                });
 
         videoDimensionsRangeBar.setFormatter(new IRangeBarFormatter() {
             @Override
             public String format(String value) {
                 int position = Integer.decode(value) - 1;
                 VideoDimensions videoDimensions = videoDimensionsMap.get(position);
-                return String.valueOf(videoDimensions.width) + ":"  + String.valueOf(videoDimensions.height);
+                return String.valueOf(videoDimensions.width) + ":"  +
+                        String.valueOf(videoDimensions.height);
             }
         });
 
@@ -387,9 +396,11 @@ public class TCClientActivity extends AppCompatActivity {
         ClientOptionsInternal options = new ClientOptionsInternal(privateOptions);
 
         // Get the capability token
-        capabilityToken = getIntent().getExtras().getString(TCCapabilityTokenProvider.CAPABILITY_TOKEN);
+        capabilityToken = getIntent().getExtras()
+                .getString(TCCapabilityTokenProvider.CAPABILITY_TOKEN);
         if(savedInstanceState != null) {
-            capabilityToken = savedInstanceState.getString(TCCapabilityTokenProvider.CAPABILITY_TOKEN);
+            capabilityToken = savedInstanceState
+                    .getString(TCCapabilityTokenProvider.CAPABILITY_TOKEN);
         }
 
         accessManager = TwilioAccessManagerFactory.createAccessManager(capabilityToken,
@@ -784,20 +795,24 @@ public class TCClientActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 if(cameraCapturer != null) {
-                    // Switch our camera
-                    cameraCapturer.switchCamera();
+                    boolean cameraSwitchSucceeded = cameraCapturer.switchCamera();
 
-                    // Update the camera source
-                    currentCameraSource = (currentCameraSource == CameraCapturer.CameraSource.CAMERA_SOURCE_FRONT_CAMERA) ?
-                            (CameraCapturer.CameraSource.CAMERA_SOURCE_BACK_CAMERA) :
-                            (CameraCapturer.CameraSource.CAMERA_SOURCE_FRONT_CAMERA);
+                    if (cameraSwitchSucceeded) {
+                        // Update the camera source
+                        currentCameraSource =
+                                (currentCameraSource ==
+                                        CameraCapturer.CameraSource.CAMERA_SOURCE_FRONT_CAMERA) ?
+                                        (CameraCapturer.CameraSource.CAMERA_SOURCE_BACK_CAMERA) :
+                                        (CameraCapturer.CameraSource.CAMERA_SOURCE_FRONT_CAMERA);
 
-                    // Update our local renderer to mirror or not
-                    mirrorLocalRenderer = (currentCameraSource == CameraCapturer.CameraSource.CAMERA_SOURCE_FRONT_CAMERA);
+                        // Update our local renderer to mirror or not
+                        mirrorLocalRenderer = (currentCameraSource ==
+                                CameraCapturer.CameraSource.CAMERA_SOURCE_FRONT_CAMERA);
 
-                    // Determine if our renderer is mirroring now
-                    if (localRenderer != null) {
-                        localRenderer.setMirror(mirrorLocalRenderer);
+                        // Determine if our renderer is mirroring now
+                        if (localRenderer != null) {
+                            localRenderer.setMirror(mirrorLocalRenderer);
+                        }
                     }
                 }
             }
@@ -842,15 +857,20 @@ public class TCClientActivity extends AppCompatActivity {
             boolean enable = !videoTrack.isEnabled();
             boolean set = videoTrack.enable(enable);
             if(set) {
+                switchCameraActionFab.setEnabled(videoTrack.isEnabled());
                 if (videoTrack.isEnabled()) {
                     pauseActionFab.setImageDrawable(
-                            ContextCompat.getDrawable(TCClientActivity.this, R.drawable.ic_pause_green_24px));
+                            ContextCompat.getDrawable(TCClientActivity.this,
+                                    R.drawable.ic_pause_green_24px));
                 } else {
                     pauseActionFab.setImageDrawable(
-                            ContextCompat.getDrawable(TCClientActivity.this, R.drawable.ic_pause_red_24px));
+                            ContextCompat.getDrawable(TCClientActivity.this,
+                                    R.drawable.ic_pause_red_24px));
                 }
             } else {
-                Snackbar.make(conversationStatusTextView, "Pause action failed", Snackbar.LENGTH_LONG)
+                Snackbar.make(conversationStatusTextView,
+                        "Pause action failed",
+                        Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
             }
         } else {
