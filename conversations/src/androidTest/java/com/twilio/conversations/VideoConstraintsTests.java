@@ -48,12 +48,10 @@ public class VideoConstraintsTests extends TwilioConversationsTestsBase {
 
     @Test(expected = NullPointerException.class)
     public void localVideoTrackWithNullVideoConstraints() {
-        ViewGroup viewGroup = new LinearLayout(activityRule.getActivity());
         CameraCapturer cameraCapturer = CameraCapturerFactory.
                 createCameraCapturer(
                         activityRule.getActivity(),
                         CameraCapturer.CameraSource.CAMERA_SOURCE_FRONT_CAMERA,
-                        viewGroup,
                         new CapturerErrorListener() {
                             @Override
                             public void onError(CapturerException e) {

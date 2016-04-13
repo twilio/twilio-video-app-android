@@ -24,12 +24,6 @@ public interface CameraCapturer {
     void startPreview(ViewGroup previewContainer);
 
     /**
-     * Starts previewing the camera.
-     */
-    @Deprecated
-    void startPreview();
-
-    /**
      * Stops previewing the camera.
      */
     void stopPreview();

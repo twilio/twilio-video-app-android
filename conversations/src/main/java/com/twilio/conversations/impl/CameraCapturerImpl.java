@@ -76,13 +76,8 @@ public class CameraCapturerImpl implements CameraCapturer {
     public static CameraCapturerImpl create(
             Context context,
             CameraSource source,
-            ViewGroup previewContainer,
             CapturerErrorListener listener) {
-        CameraCapturerImpl cameraCapturer =
-                new CameraCapturerImpl(context, source, listener);
-        cameraCapturer.previewContainer = previewContainer;
-
-        return cameraCapturer;
+        return new CameraCapturerImpl(context, source, listener);
     }
 
     /**
@@ -117,11 +112,89 @@ public class CameraCapturerImpl implements CameraCapturer {
             this.previewContainer.removeAllViews();
         }
         this.previewContainer = previewContainer;
-        startPreview();
+        startPreviewInternal();
+    }
+
+
+
+    @Override
+    public synchronized void stopPreview() {
+        if(capturerState.equals(CapturerState.PREVIEWING)) {
+            if (previewContainer != null) {
+                previewContainer.removeAllViews();
+            }
+            capturerPreview = null;
+            if(camera != null) {
+                camera.release();
+                camera = null;
+            }
+            capturerState = CapturerState.IDLE;
+        }
     }
 
     @Override
-    public synchronized void startPreview() {
+    public synchronized boolean isPreviewing() {
+        return capturerState.equals(CapturerState.PREVIEWING);
+    }
+
+    /**
+     * Called internally prior to a session being started to setup
+     * the capturer used during a Conversation.
+     */
+    synchronized void startConversationCapturer(long session) {
+        this.session = session;
+
+        if(isPreviewing()) {
+            stopPreview();
+        }
+        createVideoCapturerAndroid();
+        capturerState = CapturerState.BROADCASTING;
+    }
+
+    @Override
+    public synchronized boolean switchCamera() {
+        if(capturerState.equals(CapturerState.PREVIEWING)) {
+            stopPreview();
+            cameraId = (cameraId + 1) % Camera.getNumberOfCameras();
+            startPreviewInternal();
+            return true;
+        } else if (capturerState.equals(CapturerState.BROADCASTING) && !broadcastCapturerPaused) {
+            // TODO: propagate error
+            videoCapturerAndroid.switchCamera(null);
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    void pause() {
+        lastCapturerState = capturerState;
+        if(capturerState.equals(CapturerState.BROADCASTING)) {
+            stopVideoSource(session);
+            broadcastCapturerPaused = true;
+        }
+    }
+
+    void resume() {
+        if(lastCapturerState != null) {
+            if(lastCapturerState.equals(CapturerState.BROADCASTING)) {
+                restartVideoSource(session);
+            }
+            lastCapturerState = null;
+            broadcastCapturerPaused = false;
+        }
+    }
+
+    long getNativeVideoCapturer()  {
+        return nativeVideoCapturerAndroid;
+    }
+
+    void resetNativeVideoCapturer() {
+        nativeVideoCapturerAndroid = 0;
+        capturerState = CapturerState.IDLE;
+    }
+
+    private synchronized void startPreviewInternal() {
         if(capturerState.equals(CapturerState.PREVIEWING) ||
                 capturerState.equals(CapturerState.BROADCASTING)) {
             return;
@@ -167,83 +240,6 @@ public class CameraCapturerImpl implements CameraCapturer {
         previewContainer.addView(capturerPreview);
 
         capturerState = CapturerState.PREVIEWING;
-    }
-
-    @Override
-    public synchronized void stopPreview() {
-        if(capturerState.equals(CapturerState.PREVIEWING)) {
-            if (previewContainer != null) {
-                previewContainer.removeAllViews();
-            }
-            capturerPreview = null;
-            if(camera != null) {
-                camera.release();
-                camera = null;
-            }
-            capturerState = CapturerState.IDLE;
-        }
-    }
-
-    @Override
-    public synchronized boolean isPreviewing() {
-        return capturerState.equals(CapturerState.PREVIEWING);
-    }
-
-    /**
-     * Called internally prior to a session being started to setup
-     * the capturer used during a Conversation.
-     */
-    synchronized void startConversationCapturer(long session) {
-        this.session = session;
-
-        if(isPreviewing()) {
-            stopPreview();
-        }
-        createVideoCapturerAndroid();
-        capturerState = CapturerState.BROADCASTING;
-    }
-
-    @Override
-    public synchronized boolean switchCamera() {
-        if(capturerState.equals(CapturerState.PREVIEWING)) {
-            stopPreview();
-            cameraId = (cameraId + 1) % Camera.getNumberOfCameras();
-            startPreview();
-            return true;
-        } else if (capturerState.equals(CapturerState.BROADCASTING) && !broadcastCapturerPaused) {
-            // TODO: propagate error
-            videoCapturerAndroid.switchCamera(null);
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    void pause() {
-        lastCapturerState = capturerState;
-        if(capturerState.equals(CapturerState.BROADCASTING)) {
-            stopVideoSource(session);
-            broadcastCapturerPaused = true;
-        }
-    }
-
-    void resume() {
-        if(lastCapturerState != null) {
-            if(lastCapturerState.equals(CapturerState.BROADCASTING)) {
-                restartVideoSource(session);
-            }
-            lastCapturerState = null;
-            broadcastCapturerPaused = false;
-        }
-    }
-
-    long getNativeVideoCapturer()  {
-        return nativeVideoCapturerAndroid;
-    }
-
-    void resetNativeVideoCapturer() {
-        nativeVideoCapturerAndroid = 0;
-        capturerState = CapturerState.IDLE;
     }
 
     private long retrieveNativeVideoCapturerAndroid(VideoCapturerAndroid videoCapturerAndroid) {

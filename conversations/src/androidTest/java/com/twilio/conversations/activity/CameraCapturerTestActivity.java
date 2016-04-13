@@ -16,20 +16,14 @@ import static junit.framework.Assert.fail;
 
 public class CameraCapturerTestActivity extends Activity {
     public static final String CONTENT_DESCRIPTION_CREATE_CAPTURER = "Creates camera capturer";
-    public static final String CONTENT_DESCRIPTION_CREATE_CAPTURER_NO_PREVIEW_CONTAINER =
-            "Creates camera capturer with now preview container";
     public static final String CONTENT_DESCRIPTION_START_PREVIEW = "Starts preview of capturer";
     public static final String CONTENT_DESCRIPTION_STOP_PREVIEW = "Stops preview of capturer";
-    public static final String CONTENT_DESCRIPTION_START_PREVIEW_PREVIEW_CONTAINER =
-            "Starts preview of capturer within given preview container";
 
     private LinearLayout baseLayout;
     private LinearLayout buttonToolBar;
     private FrameLayout previewFrameLayout;
     private Button createCapturerButton;
-    private Button createCapturerButtonNoPreviewContainer;
     private Button startPreviewButton;
-    private Button startPreviewButtonWithContainer;
     private Button stopPreviewButton;
 
     public CameraCapturer cameraCapturer;
@@ -50,16 +44,12 @@ public class CameraCapturerTestActivity extends Activity {
 
         // Setup each button
         setupCapturerButton();
-        setupCapturerWithNoPreviewContainerButton();
         setupPreviewButton();
-        setupPreviewButtonWithContainer();
         setupStopPreviewButton();
 
         // Add everything to the base layout
         buttonToolBar.addView(createCapturerButton);
-        buttonToolBar.addView(createCapturerButtonNoPreviewContainer);
         buttonToolBar.addView(startPreviewButton);
-        buttonToolBar.addView(startPreviewButtonWithContainer);
         buttonToolBar.addView(stopPreviewButton);
         baseLayout.addView(buttonToolBar);
         baseLayout.addView(previewFrameLayout);
@@ -78,11 +68,11 @@ public class CameraCapturerTestActivity extends Activity {
         });
     }
 
-    private void setupPreviewButtonWithContainer() {
-        startPreviewButtonWithContainer = new Button(this);
-        startPreviewButtonWithContainer
-                .setContentDescription(CONTENT_DESCRIPTION_START_PREVIEW_PREVIEW_CONTAINER);
-        startPreviewButtonWithContainer.setOnClickListener(new View.OnClickListener() {
+    private void setupPreviewButton() {
+        startPreviewButton = new Button(this);
+        startPreviewButton
+                .setContentDescription(CONTENT_DESCRIPTION_START_PREVIEW);
+        startPreviewButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 cameraCapturer.startPreview(previewFrameLayout);
@@ -90,48 +80,16 @@ public class CameraCapturerTestActivity extends Activity {
         });
     }
 
-    private void setupPreviewButton() {
-        startPreviewButton = new Button(this);
-        startPreviewButton.setContentDescription(CONTENT_DESCRIPTION_START_PREVIEW);
-        startPreviewButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                cameraCapturer.startPreview();
-            }
-        });
-    }
-
-    private void setupCapturerWithNoPreviewContainerButton() {
-        createCapturerButtonNoPreviewContainer = new Button(this);
-        createCapturerButtonNoPreviewContainer
-                .setContentDescription(CONTENT_DESCRIPTION_CREATE_CAPTURER_NO_PREVIEW_CONTAINER);
-        createCapturerButtonNoPreviewContainer.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                cameraCapturer = CameraCapturerFactory
-                        .createCameraCapturer(CameraCapturerTestActivity.this,
-                                CameraCapturer.CameraSource.CAMERA_SOURCE_FRONT_CAMERA,
-                                new CapturerErrorListener() {
-                                    @Override
-                                    public void onError(CapturerException e) {
-                                        fail(e.getMessage());
-                                    }
-                                });
-
-            }
-        });
-    }
-
     private void setupCapturerButton() {
         createCapturerButton = new Button(this);
-        createCapturerButton.setContentDescription(CONTENT_DESCRIPTION_CREATE_CAPTURER);
+        createCapturerButton
+                .setContentDescription(CONTENT_DESCRIPTION_CREATE_CAPTURER);
         createCapturerButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 cameraCapturer = CameraCapturerFactory
                         .createCameraCapturer(CameraCapturerTestActivity.this,
                                 CameraCapturer.CameraSource.CAMERA_SOURCE_FRONT_CAMERA,
-                                previewFrameLayout,
                                 new CapturerErrorListener() {
                                     @Override
                                     public void onError(CapturerException e) {

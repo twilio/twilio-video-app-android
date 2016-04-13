@@ -54,7 +54,7 @@ public class CameraCapturerTests {
                                 capturerErrorOccured.countDown();
                             }
                         });
-        cameraCapturer.startPreview();
+        cameraCapturer.startPreview(null);
 
         assertTrue(capturerErrorOccured.await(10, TimeUnit.SECONDS));
     }
@@ -65,20 +65,6 @@ public class CameraCapturerTests {
                 .CONTENT_DESCRIPTION_CREATE_CAPTURER))
                 .perform(click());
         onView(withContentDescription(CameraCapturerTestActivity.CONTENT_DESCRIPTION_START_PREVIEW))
-                .perform(click());
-
-        onView(withContentDescription(R.string.capturer_preview_content_description))
-                .check(matches(isDisplayed()));
-        assertTrue(cameraCapturerTestActivity.cameraCapturer.isPreviewing());
-    }
-
-    @Test
-    public void startPreview_shouldAllowStartPreviewWithPreviewContainer() {
-        onView(withContentDescription(CameraCapturerTestActivity
-                .CONTENT_DESCRIPTION_CREATE_CAPTURER_NO_PREVIEW_CONTAINER))
-                .perform(click());
-        onView(withContentDescription(CameraCapturerTestActivity
-                .CONTENT_DESCRIPTION_START_PREVIEW_PREVIEW_CONTAINER))
                 .perform(click());
 
         onView(withContentDescription(R.string.capturer_preview_content_description))
