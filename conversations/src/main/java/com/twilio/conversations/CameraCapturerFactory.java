@@ -15,6 +15,19 @@ public class CameraCapturerFactory {
      * Creates an instance of CameraCapturer
      *
      * @param source the camera source
+     * @return CameraCapturer
+     */
+    public static CameraCapturer createCameraCapturer (
+            Context context,
+            CameraSource source,
+            CapturerErrorListener listener) {
+        return createCameraCapturer(context, source, null, listener);
+    }
+
+    /**
+     * Creates an instance of CameraCapturer
+     *
+     * @param source the camera source
      * @param previewContainer the view where the preview will be shown
      * @return CameraCapturer
      */

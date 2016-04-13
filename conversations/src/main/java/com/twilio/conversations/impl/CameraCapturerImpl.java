@@ -40,7 +40,7 @@ public class CameraCapturerImpl implements CameraCapturer {
     private CapturerState lastCapturerState;
 
     /* Preview capturer members */
-    private final ViewGroup previewContainer;
+    private ViewGroup previewContainer;
     private Camera camera;
     private int cameraId;
     private CameraPreview cameraPreview;
@@ -51,8 +51,9 @@ public class CameraCapturerImpl implements CameraCapturer {
     private CapturerErrorListener listener;
     private long nativeVideoCapturerAndroid;
 
-    private CameraCapturerImpl(Context context, CameraSource source,
-                               ViewGroup previewContainer, CapturerErrorListener listener) {
+    private CameraCapturerImpl(Context context,
+                               CameraSource source,
+                               CapturerErrorListener listener) {
         if(context == null) {
             throw new NullPointerException("context must not be null");
         }
@@ -62,11 +63,11 @@ public class CameraCapturerImpl implements CameraCapturer {
 
         this.context = context;
         this.source = source;
-        this.previewContainer = previewContainer;
         this.listener = listener;
         cameraId = getCameraId();
         if(cameraId < 0 && listener != null) {
-            listener.onError(new CapturerException(ExceptionDomain.CAMERA, "Invalid camera source."));
+            listener.onError(new CapturerException(ExceptionDomain.CAMERA,
+                    "Invalid camera source."));
         }
     }
 
@@ -76,12 +77,13 @@ public class CameraCapturerImpl implements CameraCapturer {
             ViewGroup previewContainer,
             CapturerErrorListener listener) {
         CameraCapturerImpl cameraCapturer =
-                new CameraCapturerImpl(context, source, previewContainer, listener);
+                new CameraCapturerImpl(context, source, listener);
+        cameraCapturer.previewContainer = previewContainer;
 
         return cameraCapturer;
     }
 
-    /*
+    /**
      * Use VideoCapturerAndroid to determine the camera id of the specified source.
      */
     private int getCameraId() {
@@ -107,7 +109,14 @@ public class CameraCapturerImpl implements CameraCapturer {
 
     @Override
     public synchronized void startPreview() {
-        if(capturerState.equals(CapturerState.PREVIEWING) || capturerState.equals(CapturerState.BROADCASTING)) {
+        if(capturerState.equals(CapturerState.PREVIEWING) ||
+                capturerState.equals(CapturerState.BROADCASTING)) {
+            return;
+        }
+
+        if (previewContainer == null && listener != null) {
+            listener.onError(new CapturerException(ExceptionDomain.CAMERA,
+                    "Cannot start preview without a preview container"));
             return;
         }
 
@@ -116,20 +125,26 @@ public class CameraCapturerImpl implements CameraCapturer {
                 camera = Camera.open(cameraId);
             } catch (Exception e) {
                 if(listener != null) {
-                    listener.onError(new CapturerException(ExceptionDomain.CAMERA, "Unable to open camera " + CameraEnumerationAndroid.getDeviceName(cameraId) + ":" + e.getMessage()));
+                    listener.onError(new CapturerException(ExceptionDomain.CAMERA,
+                            "Unable to open camera " +
+                                    CameraEnumerationAndroid.getDeviceName(cameraId) +
+                                    ":" + e.getMessage()));
                 }
                 return;
             }
 
             if (camera == null && listener != null) {
-                listener.onError(new CapturerException(ExceptionDomain.CAMERA, "Unable to open camera " + CameraEnumerationAndroid.getDeviceName(cameraId)));
+                listener.onError(new CapturerException(ExceptionDomain.CAMERA,
+                        "Unable to open camera " +
+                                CameraEnumerationAndroid.getDeviceName(cameraId)));
                 return;
             }
         }
 
         // Set camera to continually auto-focus
         Camera.Parameters params = camera.getParameters();
-        if (params.getSupportedFocusModes().contains(Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE)) {
+        if (params.getSupportedFocusModes()
+                .contains(Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE)) {
             params.setFocusMode(Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE);
         }
         camera.setParameters(params);
@@ -144,7 +159,9 @@ public class CameraCapturerImpl implements CameraCapturer {
     @Override
     public synchronized void stopPreview() {
         if(capturerState.equals(CapturerState.PREVIEWING)) {
-            previewContainer.removeAllViews();
+            if (previewContainer != null) {
+                previewContainer.removeAllViews();
+            }
             cameraPreview = null;
             if(camera != null) {
                 camera.release();
@@ -159,7 +176,7 @@ public class CameraCapturerImpl implements CameraCapturer {
         return capturerState.equals(CapturerState.PREVIEWING);
     }
 
-    /*
+    /**
      * Called internally prior to a session being started to setup
      * the capturer used during a Conversation.
      */
@@ -218,13 +235,16 @@ public class CameraCapturerImpl implements CameraCapturer {
         // Use reflection to retrieve the native video capturer handle
         long nativeHandle = 0;
         try {
-            Field field = videoCapturerAndroid.getClass().getSuperclass().getDeclaredField("nativeVideoCapturer");
+            Field field = videoCapturerAndroid
+                    .getClass().getSuperclass().getDeclaredField("nativeVideoCapturer");
             field.setAccessible(true);
             nativeHandle = field.getLong(videoCapturerAndroid);
         } catch (NoSuchFieldException e) {
-            throw new RuntimeException("Unable to get nativeVideoCapturer field: " + e.getMessage());
+            throw new RuntimeException("Unable to get nativeVideoCapturer field: " +
+                    e.getMessage());
         } catch (IllegalAccessException e) {
-            throw new RuntimeException("Unable to access nativeVideoCapturer field: " + e.getMessage());
+            throw new RuntimeException("Unable to access nativeVideoCapturer field: " +
+                    e.getMessage());
         }
         return nativeHandle;
     }
@@ -232,7 +252,8 @@ public class CameraCapturerImpl implements CameraCapturer {
     private void createVideoCapturerAndroid() {
         String deviceName = CameraEnumerationAndroid.getDeviceName(cameraId);
         if(deviceName == null && listener != null) {
-            listener.onError(new CapturerException(ExceptionDomain.CAMERA, "Camera device not found"));
+            listener.onError(new CapturerException(ExceptionDomain.CAMERA,
+                    "Camera device not found"));
             return;
         }
         videoCapturerAndroid = VideoCapturerAndroid.create(deviceName, cameraEventsHandler);
@@ -245,7 +266,8 @@ public class CameraCapturerImpl implements CameraCapturer {
         @Override
         public void onCameraError(String errorMsg) {
             if(CameraCapturerImpl.this.listener != null) {
-                CameraCapturerImpl.this.listener.onError(new CapturerException(ExceptionDomain.CAMERA, errorMsg));
+                CameraCapturerImpl.this.listener
+                        .onError(new CapturerException(ExceptionDomain.CAMERA, errorMsg));
             }
         }
 
@@ -335,7 +357,8 @@ public class CameraCapturerImpl implements CameraCapturer {
                     updatePreviewOrientation();
                 } catch (Exception e) {
                     if(listener != null) {
-                        listener.onError(new CapturerException(ExceptionDomain.CAMERA, "Unable to restart preview: " + e.getMessage()));
+                        listener.onError(new CapturerException(ExceptionDomain.CAMERA,
+                                "Unable to restart preview: " + e.getMessage()));
                     }
                 }
             }

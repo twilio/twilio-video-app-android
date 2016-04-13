@@ -18,25 +18,21 @@ public interface CameraCapturer {
 
     /**
      * Starts previewing the camera.
-     *
      */
     void startPreview();
 
     /**
      * Stops previewing the camera.
-     *
      */
     void stopPreview();
 
     /**
      * Returns whether the camera capturer is previewing the camera
-     *
      */
     boolean isPreviewing();
 
     /**
      * Switches the camera to the next available camera source.
-     *
      */
     boolean switchCamera();
 }
