@@ -26,6 +26,7 @@ public interface CameraCapturer {
     /**
      * Starts previewing the camera.
      */
+    @Deprecated
     void startPreview();
 
     /**

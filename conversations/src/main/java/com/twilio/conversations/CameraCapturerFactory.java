@@ -31,6 +31,7 @@ public class CameraCapturerFactory {
      * @param previewContainer the view where the preview will be shown
      * @return CameraCapturer
      */
+    @Deprecated
     public static CameraCapturer createCameraCapturer (
             Context context,
             CameraSource source,
