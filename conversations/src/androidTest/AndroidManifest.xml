@@ -20,5 +20,9 @@
             </intent-filter>
         </activity>
 
+        <activity
+            android:name="com.twilio.conversations.activity.CameraCapturerTestActivity">
+        </activity>
+
     </application>
 </manifest>

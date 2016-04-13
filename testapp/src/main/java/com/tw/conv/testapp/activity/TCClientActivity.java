@@ -413,7 +413,6 @@ public class TCClientActivity extends AppCompatActivity {
         cameraCapturer = CameraCapturerFactory.createCameraCapturer(
                 TCClientActivity.this,
                 currentCameraSource,
-                previewFrameLayout,
                 capturerErrorListener());
 
         switchCameraActionFab.setOnClickListener(switchCameraClickListener());
@@ -560,7 +559,7 @@ public class TCClientActivity extends AppCompatActivity {
 
     private void startPreview() {
         if (cameraCapturer != null) {
-            cameraCapturer.startPreview();
+            cameraCapturer.startPreview(previewFrameLayout);
         }
     }
 
@@ -824,7 +823,7 @@ public class TCClientActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 if (videoState == VideoState.DISABLED) {
-                    cameraCapturer.startPreview();
+                    cameraCapturer.startPreview(previewFrameLayout);
                     if (localMedia != null) {
                         localContainer = (ViewGroup)findViewById(R.id.localContainer);
                         LocalVideoTrack videoTrack = createLocalVideoTrack(cameraCapturer);

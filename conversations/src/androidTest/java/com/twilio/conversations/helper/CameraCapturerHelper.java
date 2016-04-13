@@ -14,7 +14,6 @@ public class CameraCapturerHelper {
         return CameraCapturerFactory.createCameraCapturer(
                 context,
                 cameraSource,
-                new RelativeLayout(context),
                 new CapturerErrorListener() {
                     @Override
                     public void onError(CapturerException e) {
@@ -23,5 +22,4 @@ public class CameraCapturerHelper {
                 });
 
     }
-
 }

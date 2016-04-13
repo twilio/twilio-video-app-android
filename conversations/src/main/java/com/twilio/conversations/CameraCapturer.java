@@ -1,5 +1,7 @@
 package com.twilio.conversations;
 
+import android.view.ViewGroup;
+
 /**
  * A camera capturer retrieves frames from a
  * camera source on the device which can be previewed onto
@@ -9,7 +11,6 @@ package com.twilio.conversations;
 public interface CameraCapturer {
     /**
      * Camera source types
-     *
      */
     enum CameraSource {
         CAMERA_SOURCE_FRONT_CAMERA,
@@ -17,26 +18,23 @@ public interface CameraCapturer {
     };
 
     /**
-     * Starts previewing the camera.
-     *
+     * Starts previewing the camera within the provided ViewGroup
+     * @param previewContainer View where camera will be previewed
      */
-    void startPreview();
+    void startPreview(ViewGroup previewContainer);
 
     /**
      * Stops previewing the camera.
-     *
      */
     void stopPreview();
 
     /**
      * Returns whether the camera capturer is previewing the camera
-     *
      */
     boolean isPreviewing();
 
     /**
      * Switches the camera to the next available camera source.
-     *
      */
     boolean switchCamera();
 }

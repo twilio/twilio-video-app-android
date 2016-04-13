@@ -20,6 +20,7 @@ import com.twilio.conversations.CameraCapturer;
 import com.twilio.conversations.CapturerErrorListener;
 import com.twilio.conversations.CapturerException;
 import com.twilio.conversations.CapturerException.ExceptionDomain;
+import com.twilio.conversations.R;
 import com.twilio.conversations.impl.logging.Logger;
 
 
@@ -40,10 +41,10 @@ public class CameraCapturerImpl implements CameraCapturer {
     private CapturerState lastCapturerState;
 
     // Preview capturer members
-    private final ViewGroup previewContainer;
+    private ViewGroup previewContainer;
     private Camera camera;
     private int cameraId;
-    private CameraPreview cameraPreview;
+    private CapturerPreview capturerPreview;
     private CapturerState capturerState = CapturerState.IDLE;
 
     // Conversation capturer members
@@ -52,8 +53,9 @@ public class CameraCapturerImpl implements CameraCapturer {
     private long nativeVideoCapturerAndroid;
     private boolean broadcastCapturerPaused = false;
 
-    private CameraCapturerImpl(Context context, CameraSource source,
-                               ViewGroup previewContainer, CapturerErrorListener listener) {
+    private CameraCapturerImpl(Context context,
+                               CameraSource source,
+                               CapturerErrorListener listener) {
         if(context == null) {
             throw new NullPointerException("context must not be null");
         }
@@ -63,23 +65,19 @@ public class CameraCapturerImpl implements CameraCapturer {
 
         this.context = context;
         this.source = source;
-        this.previewContainer = previewContainer;
         this.listener = listener;
         cameraId = getCameraId();
         if(cameraId < 0 && listener != null) {
-            listener.onError(new CapturerException(ExceptionDomain.CAMERA, "Invalid camera source."));
+            listener.onError(new CapturerException(ExceptionDomain.CAMERA,
+                    "Invalid camera source."));
         }
     }
 
     public static CameraCapturerImpl create(
             Context context,
             CameraSource source,
-            ViewGroup previewContainer,
             CapturerErrorListener listener) {
-        CameraCapturerImpl cameraCapturer =
-                new CameraCapturerImpl(context, source, previewContainer, listener);
-
-        return cameraCapturer;
+        return new CameraCapturerImpl(context, source, listener);
     }
 
     /**
@@ -109,53 +107,23 @@ public class CameraCapturerImpl implements CameraCapturer {
     }
 
     @Override
-    public synchronized void startPreview() {
-        if(capturerState.equals(CapturerState.PREVIEWING) ||
-                capturerState.equals(CapturerState.BROADCASTING)) {
-            return;
+    public void startPreview(ViewGroup previewContainer) {
+        if (this.previewContainer != null) {
+            this.previewContainer.removeAllViews();
         }
-
-        if (camera == null) {
-            try {
-                camera = Camera.open(cameraId);
-            } catch (Exception e) {
-                if(listener != null) {
-                    listener.onError(new CapturerException(ExceptionDomain.CAMERA,
-                            "Unable to open camera " +
-                                    CameraEnumerationAndroid.getDeviceName(cameraId) + ":" +
-                                    e.getMessage()));
-                }
-                return;
-            }
-
-            if (camera == null && listener != null) {
-                listener.onError(new CapturerException(ExceptionDomain.CAMERA,
-                        "Unable to open camera " +
-                                CameraEnumerationAndroid.getDeviceName(cameraId)));
-                return;
-            }
-        }
-
-        // Set camera to continually auto-focus
-        Camera.Parameters params = camera.getParameters();
-        if (params.getSupportedFocusModes()
-                .contains(Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE)) {
-            params.setFocusMode(Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE);
-        }
-        camera.setParameters(params);
-
-        cameraPreview = new CameraPreview(context, camera, listener);
-        previewContainer.removeAllViews();
-        previewContainer.addView(cameraPreview);
-
-        capturerState = CapturerState.PREVIEWING;
+        this.previewContainer = previewContainer;
+        startPreviewInternal();
     }
+
+
 
     @Override
     public synchronized void stopPreview() {
         if(capturerState.equals(CapturerState.PREVIEWING)) {
-            previewContainer.removeAllViews();
-            cameraPreview = null;
+            if (previewContainer != null) {
+                previewContainer.removeAllViews();
+            }
+            capturerPreview = null;
             if(camera != null) {
                 camera.release();
                 camera = null;
@@ -188,7 +156,7 @@ public class CameraCapturerImpl implements CameraCapturer {
         if(capturerState.equals(CapturerState.PREVIEWING)) {
             stopPreview();
             cameraId = (cameraId + 1) % Camera.getNumberOfCameras();
-            startPreview();
+            startPreviewInternal();
             return true;
         } else if (capturerState.equals(CapturerState.BROADCASTING) && !broadcastCapturerPaused) {
             // TODO: propagate error
@@ -226,6 +194,54 @@ public class CameraCapturerImpl implements CameraCapturer {
         capturerState = CapturerState.IDLE;
     }
 
+    private synchronized void startPreviewInternal() {
+        if(capturerState.equals(CapturerState.PREVIEWING) ||
+                capturerState.equals(CapturerState.BROADCASTING)) {
+            return;
+        }
+
+        if (previewContainer == null && listener != null) {
+            listener.onError(new CapturerException(ExceptionDomain.CAMERA,
+                    "Cannot start preview without a preview container"));
+            return;
+        }
+
+        if (camera == null) {
+            try {
+                camera = Camera.open(cameraId);
+            } catch (Exception e) {
+                if(listener != null) {
+                    listener.onError(new CapturerException(ExceptionDomain.CAMERA,
+                            "Unable to open camera " +
+                                    CameraEnumerationAndroid.getDeviceName(cameraId) + ":" +
+                                    e.getMessage()));
+                }
+                return;
+            }
+
+            if (camera == null && listener != null) {
+                listener.onError(new CapturerException(ExceptionDomain.CAMERA,
+                        "Unable to open camera " +
+                                CameraEnumerationAndroid.getDeviceName(cameraId)));
+                return;
+            }
+        }
+
+        // Set camera to continually auto-focus
+        Camera.Parameters params = camera.getParameters();
+        if (params.getSupportedFocusModes()
+                .contains(Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE)) {
+            params.setFocusMode(Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE);
+        }
+        camera.setParameters(params);
+
+        capturerPreview = new CapturerPreview(context, camera, listener);
+        previewContainer.removeAllViews();
+        previewContainer.addView(capturerPreview);
+
+        capturerState = CapturerState.PREVIEWING;
+    }
+
     private long retrieveNativeVideoCapturerAndroid(VideoCapturerAndroid videoCapturerAndroid) {
         // Use reflection to retrieve the native video capturer handle
         long nativeHandle = 0;
@@ -251,7 +267,6 @@ public class CameraCapturerImpl implements CameraCapturer {
         if(deviceName == null && listener != null) {
             listener.onError(new CapturerException(ExceptionDomain.CAMERA,
                     "Camera device not found"));
-
             return;
         }
         videoCapturerAndroid = VideoCapturerAndroid.create(deviceName, cameraEventsHandler);
@@ -284,14 +299,14 @@ public class CameraCapturerImpl implements CameraCapturer {
         }
     };
 
-    private class CameraPreview extends SurfaceView implements SurfaceHolder.Callback {
+    private class CapturerPreview extends SurfaceView implements SurfaceHolder.Callback {
         private Context context;
         private SurfaceHolder holder;
         private Camera camera;
         private CapturerErrorListener listener;
         private OrientationEventListener orientationEventListener;
 
-        public CameraPreview(Context context, Camera camera, CapturerErrorListener listener) {
+        public CapturerPreview(Context context, Camera camera, CapturerErrorListener listener) {
             super(context);
             this.context = context;
             this.camera = camera;
@@ -305,6 +320,7 @@ public class CameraCapturerImpl implements CameraCapturer {
                     updatePreviewOrientation();
                 }
             };
+            setContentDescription(context.getString(R.string.capturer_preview_content_description));
         }
 
         @Override

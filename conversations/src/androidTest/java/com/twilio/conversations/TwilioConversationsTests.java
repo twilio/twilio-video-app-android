@@ -2,8 +2,8 @@ package com.twilio.conversations;
 
 import android.content.Context;
 import android.support.test.InstrumentationRegistry;
+import android.support.test.filters.LargeTest;
 import android.support.test.runner.AndroidJUnit4;
-import android.test.suitebuilder.annotation.LargeTest;
 
 import com.twilio.common.TwilioAccessManager;
 import com.twilio.common.TwilioAccessManagerFactory;
@@ -14,9 +14,7 @@ import com.twilio.conversations.impl.ConversationsClientImpl;
 import com.twilio.conversations.internal.ClientOptionsInternal;
 
 import org.junit.After;
-import org.junit.AfterClass;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
