@@ -403,7 +403,7 @@ public class TCClientActivity extends AppCompatActivity {
                     .getString(TCCapabilityTokenProvider.CAPABILITY_TOKEN);
         }
 
-        accessManager = TwilioAccessManagerFactory.createAccessManager(capabilityToken,
+        accessManager = TwilioAccessManagerFactory.createAccessManager(this, capabilityToken,
                 accessManagerListener());
 
         conversationsClient = TwilioConversations.createConversationsClient(accessManager, options,

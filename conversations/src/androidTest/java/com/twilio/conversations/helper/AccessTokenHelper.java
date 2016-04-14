@@ -1,5 +1,7 @@
 package com.twilio.conversations.helper;
 
+import android.content.Context;
+
 import com.twilio.common.TwilioAccessManager;
 import com.twilio.common.TwilioAccessManagerFactory;
 import com.twilio.common.TwilioAccessManagerListener;
@@ -19,11 +21,11 @@ public class AccessTokenHelper {
     /**
      * A synchronous method that returns an initialized TwilioAccessManager
      */
-    public static TwilioAccessManager obtainTwilioAccessManager(String username) throws InterruptedException {
+    public static TwilioAccessManager obtainTwilioAccessManager(Context context, String username) throws InterruptedException {
         String accessToken = obtainCapabilityToken(username);
         final CountDownLatch tokenUpdatedLatch = new CountDownLatch(1);
         TwilioAccessManager twilioAccessManager = TwilioAccessManagerFactory
-                .createAccessManager(accessToken, new TwilioAccessManagerListener() {
+                .createAccessManager(context, accessToken, new TwilioAccessManagerListener() {
             @Override
             public void onTokenExpired(TwilioAccessManager twilioAccessManager) {
                 fail();

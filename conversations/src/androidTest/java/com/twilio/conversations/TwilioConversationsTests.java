@@ -112,7 +112,7 @@ public class TwilioConversationsTests extends TwilioConversationsTestsBase {
     @Ignore
     public void destroy_shouldDestroyActiveConversationClients() throws InterruptedException {
         TwilioConversationsHelper.initialize(context);
-        accessManager = AccessTokenHelper.obtainTwilioAccessManager("username");
+        accessManager = AccessTokenHelper.obtainTwilioAccessManager(context, "username");
         ConversationsClientImpl conversationClient = (ConversationsClientImpl) TwilioConversations
                 .createConversationsClient(accessManager,
                         conversationsClientListener());
@@ -121,7 +121,7 @@ public class TwilioConversationsTests extends TwilioConversationsTestsBase {
     @Test(expected =  IllegalStateException.class)
     public void createConversationsClient_shouldBeAllowedBeforeInitialize()
             throws InterruptedException {
-        accessManager = AccessTokenHelper.obtainTwilioAccessManager("username");
+        accessManager = AccessTokenHelper.obtainTwilioAccessManager(context, "username");
         TwilioConversations.createConversationsClient(accessManager,
                 conversationsClientListener());
     }
@@ -149,7 +149,7 @@ public class TwilioConversationsTests extends TwilioConversationsTestsBase {
             throws InterruptedException {
         TwilioConversationsHelper.initialize(context);
 
-        accessManager = TwilioAccessManagerFactory.createAccessManager("DEADBEEF", null);
+        accessManager = TwilioAccessManagerFactory.createAccessManager(context, "DEADBEEF", null);
         ConversationsClient conversationsClient = TwilioConversations
                 .createConversationsClient(accessManager, conversationsClientListener());
 
@@ -161,7 +161,7 @@ public class TwilioConversationsTests extends TwilioConversationsTestsBase {
             throws InterruptedException {
         TwilioConversationsHelper.initialize(context);
 
-        accessManager = TwilioAccessManagerFactory.createAccessManager("DEADBEEF", null);
+        accessManager = TwilioAccessManagerFactory.createAccessManager(context, "DEADBEEF", null);
         ConversationsClient conversationsClient = TwilioConversations
                 .createConversationsClient(accessManager, null, conversationsClientListener());
 
@@ -176,21 +176,11 @@ public class TwilioConversationsTests extends TwilioConversationsTestsBase {
         HashMap optionsMap = new HashMap<>();
         optionsMap.put("foo", "bar");
         ClientOptionsInternal options = new ClientOptionsInternal(optionsMap);
-        accessManager = TwilioAccessManagerFactory.createAccessManager("DEADBEEF", null);
+        accessManager = TwilioAccessManagerFactory.createAccessManager(context, "DEADBEEF", null);
         ConversationsClient conversationsClient = TwilioConversations
                 .createConversationsClient(accessManager, options, conversationsClientListener());
 
         assertNotNull(conversationsClient);
-    }
-
-    @Test
-    public void setLogLevel_shouldSetLogLevelToDisabledForInvalidLevel() {
-        int invalidLevel = 101;
-        TwilioConversations.setLogLevel(TwilioConversations.LogLevel.values()
-                [invalidLevel]);
-
-        assertEquals(TwilioConversations.LogLevel.OFF,
-                TwilioConversations.getLogLevel());
     }
 
     @Test

@@ -2,6 +2,7 @@ package com.twilio.conversations;
 
 import android.content.Context;
 import android.os.Build;
+import android.support.test.InstrumentationRegistry;
 import android.support.test.filters.LargeTest;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
@@ -13,10 +14,12 @@ import com.twilio.conversations.activity.TwilioConversationsActivity;
 import com.twilio.conversations.helper.AccessTokenHelper;
 import com.twilio.conversations.helper.CameraCapturerHelper;
 import com.twilio.conversations.helper.ConversationsClientHelper;
+import com.twilio.conversations.helper.OSLevelHelper;
 import com.twilio.conversations.helper.TwilioConversationsHelper;
 import com.twilio.conversations.helper.TwilioConversationsTestsBase;
 
 import org.junit.After;
+import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
@@ -36,10 +39,16 @@ import static junit.framework.Assert.fail;
 @Ignore
 public class VideoConstraintsTests extends TwilioConversationsTestsBase {
     private static final String SELF_TEST_USER = "SELF_TEST_USER";
+    private Context context;
 
     @Rule
     public ActivityTestRule<TwilioConversationsActivity> activityRule = new ActivityTestRule<>(
             TwilioConversationsActivity.class);
+
+    @Before
+    public void setup() {
+        context = InstrumentationRegistry.getContext();
+    }
 
     @After
     public void teardown() {
@@ -67,13 +76,13 @@ public class VideoConstraintsTests extends TwilioConversationsTestsBase {
     @Test
     @Ignore
     public void startConversationWithInvalidVideoConstraints() throws InterruptedException {
-        if(requiresRuntimePermissions()) {
+        if(OSLevelHelper.requiresRuntimePermissions()) {
             return;
         }
 
         TwilioConversations.setLogLevel(TwilioConversations.LogLevel.DEBUG);
 
-        TwilioAccessManager twilioAccessManager = AccessTokenHelper.obtainTwilioAccessManager(SELF_TEST_USER);
+        TwilioAccessManager twilioAccessManager = AccessTokenHelper.obtainTwilioAccessManager(context, SELF_TEST_USER);
         ConversationsClient conversationsClient = ConversationsClientHelper.registerClient(activityRule.getActivity(), twilioAccessManager);
 
         final CountDownLatch localVideoTrackFailedLatch = new CountDownLatch(1);
@@ -162,13 +171,13 @@ public class VideoConstraintsTests extends TwilioConversationsTestsBase {
     @Test
     @Ignore
     public void startConversationWithValidVideoConstraints() throws InterruptedException {
-        if(requiresRuntimePermissions()) {
+        if(OSLevelHelper.requiresRuntimePermissions()) {
             return;
         }
 
         TwilioConversations.setLogLevel(TwilioConversations.LogLevel.DEBUG);
 
-        TwilioAccessManager twilioAccessManager = AccessTokenHelper.obtainTwilioAccessManager(SELF_TEST_USER);
+        TwilioAccessManager twilioAccessManager = AccessTokenHelper.obtainTwilioAccessManager(context, SELF_TEST_USER);
         ConversationsClient conversationsClient = ConversationsClientHelper.registerClient(activityRule.getActivity(), twilioAccessManager);
 
         final CountDownLatch localVideoTrackAddedLatch = new CountDownLatch(1);
@@ -262,10 +271,4 @@ public class VideoConstraintsTests extends TwilioConversationsTestsBase {
         return LocalVideoTrackFactory.createLocalVideoTrack(cameraCapturer, videoConstraints);
     }
 
-    /**
-     * Runtime permissions to enable the camera are not enabled in this test
-     */
-    private boolean requiresRuntimePermissions() {
-        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.M;
-    }
 }
