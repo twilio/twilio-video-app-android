@@ -3,6 +3,7 @@ package com.twilio.conversations;
 import android.content.Context;
 import android.os.Build;
 import android.os.Handler;
+import android.support.test.InstrumentationRegistry;
 import android.support.test.filters.LargeTest;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
@@ -42,7 +43,7 @@ public class ConversationTests extends TwilioConversationsTestsBase {
 
     @Before
     public void setup() {
-        context = activityRule.getActivity();
+        context = InstrumentationRegistry.getContext();
     }
 
     @After

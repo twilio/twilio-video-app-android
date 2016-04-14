@@ -5,6 +5,7 @@ import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
 
 import com.twilio.conversations.activity.CameraCapturerTestActivity;
+import com.twilio.conversations.helper.OSLevelHelper;
 
 import org.junit.After;
 import org.junit.Before;
@@ -61,6 +62,10 @@ public class CameraCapturerTests {
 
     @Test
     public void startPreview_shouldAddNewViewWithCameraPreview() {
+        if(OSLevelHelper.requiresRuntimePermissions()) {
+            return;
+        }
+
         onView(withContentDescription(CameraCapturerTestActivity
                 .CONTENT_DESCRIPTION_CREATE_CAPTURER))
                 .perform(click());
