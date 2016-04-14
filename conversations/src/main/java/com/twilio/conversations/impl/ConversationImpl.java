@@ -104,6 +104,9 @@ public class ConversationImpl implements Conversation,
     private SessionObserverInternal sessionObserverInternal;
     private long nativeSession;
 
+    /*
+     * Outgoing invite
+     */
     private ConversationImpl(ConversationsClientImpl conversationsClient,
                              Set<String> participants,
                              LocalMedia localMedia,
@@ -134,11 +137,20 @@ public class ConversationImpl implements Conversation,
         nativeSession = wrapOutgoingSession(conversationsClient.getNativeHandle(),
                 sessionObserverInternal.getNativeHandle(),
                 participantIdentityArray);
-        if(nativeSession != 0) {
-            conversationSid = getConversationSid(nativeSession);
-        }
     }
 
+    /*
+     * The outgoing invite does not have a sid until it is accepted. As a result,
+     * the ConversationClientImpl will call this to retain the conversation sid
+     * when the conversation becomes valid.
+     */
+    void retainSid() {
+        conversationSid = getConversationSid(nativeSession);
+    }
+
+    /*
+     * Incoming invite
+     */
     private ConversationImpl(ConversationsClientImpl conversationsClient,
                              long nativeSession,
                              String[] participantsIdentities,
@@ -147,6 +159,7 @@ public class ConversationImpl implements Conversation,
         this.conversationStateObserver = conversationStateObserver;
         this.nativeSession = nativeSession;
 
+        // The sid is available from the session when an incoming invite is provided
         conversationSid = getConversationSid(nativeSession);
 
         inviter = participantsIdentities[0];
