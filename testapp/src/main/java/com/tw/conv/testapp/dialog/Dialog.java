@@ -6,6 +6,10 @@ import android.support.v7.app.AlertDialog;
 import android.widget.EditText;
 
 import com.tw.conv.testapp.R;
+import com.tw.conv.testapp.provider.TwilioIceServer;
+import com.tw.conv.testapp.provider.TwilioIceServers;
+
+import java.util.List;
 
 public class Dialog {
     public static AlertDialog createInviteDialog(String caller, String sid, DialogInterface.OnClickListener acceptClickListener, DialogInterface.OnClickListener rejectClickListener, Context context) {
@@ -56,4 +60,12 @@ public class Dialog {
         int verticalPadding = context.getResources().getDimensionPixelOffset(R.dimen.activity_vertical_margin);
         alertDialogBuilder.setView(participantEditText, horizontalPadding, verticalPadding, horizontalPadding, 0);
     }
+
+    public static IceServersDialogFragment createIceServersDialog(List<TwilioIceServer> iceServers, IceServersDialogFragment.IceServersDialogListener listener) {
+        IceServersDialogFragment dialog = new IceServersDialogFragment();
+        dialog.setIceServers(iceServers);
+        dialog.setListener(listener);
+        return dialog;
+    }
+
 }

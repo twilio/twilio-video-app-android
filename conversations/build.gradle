@@ -265,6 +265,7 @@ dependencies {
     androidTestCompile 'com.android.support.test.espresso:espresso-core:2.2.2'
     androidTestCompile 'com.android.support.test:runner:0.4'
     androidTestCompile 'com.android.support.test:rules:0.4'
+    androidTestCompile 'com.google.code.gson:gson:2.6.2'
 
     compile 'com.twilio.sdk:twilio-common-android:0.4.0-rc1'
     // TODO this really should be on nexus as a jar and not local

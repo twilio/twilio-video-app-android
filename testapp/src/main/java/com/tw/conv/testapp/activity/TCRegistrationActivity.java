@@ -20,14 +20,23 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.tw.conv.testapp.BuildConfig;
 import com.tw.conv.testapp.R;
 import com.tw.conv.testapp.TestAppApplication;
+import com.tw.conv.testapp.dialog.Dialog;
+import com.tw.conv.testapp.dialog.IceServersDialogFragment;
+import com.tw.conv.testapp.provider.TwilioIceServer;
+import com.tw.conv.testapp.provider.TwilioIceServers;
 import com.tw.conv.testapp.provider.TCCapabilityTokenProvider;
+import com.tw.conv.testapp.provider.TCIceServersProvider;
 import com.twilio.conversations.TwilioConversations;
 
 import net.hockeyapp.android.CrashManager;
 import net.hockeyapp.android.UpdateManager;
+
+import java.util.List;
 
 import retrofit.Callback;
 import retrofit.RetrofitError;
@@ -36,11 +45,20 @@ import retrofit.client.Response;
 public class TCRegistrationActivity extends AppCompatActivity {
     public static final int PERMISSIONS_REQUEST_CODE = 0;
 
+    private static final String ICE_OPTIONS_DIALOG = "IceOptionsDialog";
+
     private EditText usernameEditText;
     private Button registrationButton;
     private ProgressDialog progressDialog;
     private TextView versionText;
     private Spinner realmSpinner;
+    private ProgressDialog iceServerProgressDialog;
+    private TwilioIceServers twilioIceServers;
+    private List<TwilioIceServer> selectedTwilioIceServers;
+    private String iceTransportPolicy = "";
+    private Button iceOptionsButton;
+    private IceServersDialogFragment iceOptionsDialog;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,7 +76,8 @@ public class TCRegistrationActivity extends AppCompatActivity {
                         R.array.realm_array, android.R.layout.simple_spinner_dropdown_item);
         spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         realmSpinner.setAdapter(spinnerAdapter);
-
+        iceOptionsButton = (Button)findViewById(R.id.ice_options_button);
+        iceOptionsButton.setOnClickListener(iceOptionsButtonClickListener());
 
         registrationButton.setOnClickListener(registrationClickListener());
 
@@ -202,11 +221,81 @@ public class TCRegistrationActivity extends AppCompatActivity {
 
     }
 
+    private View.OnClickListener iceOptionsButtonClickListener() {
+        return new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (twilioIceServers != null) {
+                    showIceDialog();
+                } else {
+                    iceServerProgressDialog = ProgressDialog.show(
+                            TCRegistrationActivity.this, null, "Obtaining Twilio ICE Servers", true);
+                    obtainTwilioIceServers(TCRegistrationActivity.this
+                            .realmSpinner.getSelectedItem().toString().toLowerCase());
+                }
+            }
+        };
+    }
+
+    private void showIceDialog(){
+        if (iceOptionsDialog == null) {
+            iceOptionsDialog = Dialog.createIceServersDialog(
+                    twilioIceServers.getIceServers(), iceOptionsDialogListener());
+        }
+        iceOptionsDialog.show(getSupportFragmentManager(), ICE_OPTIONS_DIALOG);
+    }
+
+    private IceServersDialogFragment.IceServersDialogListener iceOptionsDialogListener() {
+        return new IceServersDialogFragment.IceServersDialogListener() {
+            @Override
+            public void onIceOptionsSelected(String iceTransportPolicy, List<TwilioIceServer> selectedServers) {
+                TCRegistrationActivity.this.iceTransportPolicy = iceTransportPolicy;
+                TCRegistrationActivity.this.selectedTwilioIceServers =
+                        iceOptionsDialog.getSelectedServers();
+            }
+
+            @Override
+            public void onIceOptionsCancel() {
+
+            }
+        };
+    }
+
+    private void obtainTwilioIceServers(final String realm) {
+        TCIceServersProvider.obtainTwilioIceServers(new Callback<TwilioIceServers>() {
+            @Override
+            public void success(TwilioIceServers twilioIceServers, Response response) {
+                iceServerProgressDialog.dismiss();
+                if (response.getStatus() == 200) {
+                    TCRegistrationActivity.this.twilioIceServers = twilioIceServers;
+                    showIceDialog();
+                } else {
+                    Snackbar.make(registrationButton,
+                            "ICEretrieval failed. Status: " + response.getStatus(),
+                            Snackbar.LENGTH_LONG)
+                            .setAction("Action", null).show();
+                }
+            }
+
+            @Override
+            public void failure(RetrofitError error) {
+                iceServerProgressDialog.dismiss();
+                Snackbar.make(registrationButton,
+                        "ICE retrieval failed. Error: " + error.getMessage(),
+                        Snackbar.LENGTH_LONG)
+                        .setAction("Action", null).show();
+            }
+        });
+    }
+
     private void startClient(String username, String capabilityToken, String realm) {
         Intent intent = new Intent(this, TCClientActivity.class);
         intent.putExtra(TCCapabilityTokenProvider.USERNAME, username);
         intent.putExtra(TCCapabilityTokenProvider.CAPABILITY_TOKEN, capabilityToken);
         intent.putExtra(TCCapabilityTokenProvider.REALM, realm);
+        intent.putExtra(TwilioIceServers.ICE_TRANSPORT_POLICY, iceTransportPolicy);
+        Gson gson = new GsonBuilder().create();
+        intent.putExtra(TwilioIceServers.ICE_SERVERS, gson.toJson(selectedTwilioIceServers));
         startActivity(intent);
         finish();
     }

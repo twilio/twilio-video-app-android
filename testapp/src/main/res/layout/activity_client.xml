@@ -6,7 +6,8 @@
     android:id="@+id/navigation_drawer"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.tw.conv.testapp.activity.TCClientActivity">
+    tools:context="com.tw.conv.testapp.activity.TCClientActivity"
+    tools:showIn="@layout/content_client">
 
     <android.support.design.widget.CoordinatorLayout
         xmlns:android="http://schemas.android.com/apk/res/android"
@@ -170,7 +171,10 @@
                 android:layout_marginLeft="@dimen/activity_horizontal_margin"
                 android:layout_marginRight="@dimen/activity_horizontal_margin" />
 
+            <include layout="@layout/ice_options_layout"/>
         </LinearLayout>
+
+
     </ScrollView>
 
     <ScrollView

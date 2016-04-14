@@ -7,19 +7,48 @@ import java.util.List;
 
 public class TwilioIceServers {
 
-    public String username;
+    public static final String ICE_TRANSPORT_POLICY = "ice_transport_type";
+    public static final String ICE_SERVERS = "ice_servers";
 
-    public String password;
+    private String username;
+
+    private String password;
 
     @SerializedName("account_sid")
-    public String accountSid;
+    private String accountSid;
 
     @SerializedName("ice_servers")
-    public List<TwilioIceServer> iceServers;
+    private List<TwilioIceServer> iceServers;
 
     @SerializedName("date_created")
-    public String dateCreated;
+    private String dateCreated;
 
     @SerializedName("date_updated")
-    public String dateUpdated;
+    private String dateUpdated;
+
+    public TwilioIceServers() {}
+
+    public String getUsername() {
+        return username;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public String getAccountSid() {
+        return accountSid;
+    }
+
+    public List<TwilioIceServer> getIceServers() {
+        return iceServers;
+    }
+
+    public String getDateCreated() {
+        return dateCreated;
+    }
+
+    public String getDateUpdated() {
+        return dateUpdated;
+    }
 }
