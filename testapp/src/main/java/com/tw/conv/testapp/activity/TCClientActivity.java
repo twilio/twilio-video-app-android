@@ -1020,6 +1020,7 @@ public class TCClientActivity extends AppCompatActivity {
                                 public void onConversation(Conversation conversation, TwilioConversationsException e) {
                                     Timber.e("sendConversationInvite onConversation");
                                     if (e == null) {
+                                        Timber.i("Conversation SID " + conversation.getSid());
                                         TCClientActivity.this.conversation = conversation;
                                         conversation.setConversationListener(conversationListener());
                                         if(statsCheckBox.isChecked()) {
@@ -1151,6 +1152,7 @@ public class TCClientActivity extends AppCompatActivity {
             public void onConversation(Conversation conversation, TwilioConversationsException e) {
                 Timber.i("onConversation");
                 if (e == null) {
+                    Timber.i("Conversation SID " + conversation.getSid());
                     TCClientActivity.this.conversation = conversation;
                     conversation.setConversationListener(conversationListener());
                     if(statsCheckBox.isChecked()) {

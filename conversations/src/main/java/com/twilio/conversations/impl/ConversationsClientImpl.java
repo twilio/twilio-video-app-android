@@ -315,6 +315,7 @@ public class ConversationsClientImpl implements
             pendingOutgoingInvites.remove(conversationImpl);
             // Stop listening to ConversationListener. The developer should provide their own listener
             conversationImpl.setConversationListener(null);
+            conversationImpl.retainSid();
             if (outgoingInviteImpl.getHandler() != null && outgoingInviteImpl.getConversationCallback() != null) {
                 /**
                  * Block the thread to ensure no other callbacks are called until the developer handles
