@@ -1,5 +1,6 @@
 package com.twilio.conversations;
 
+import android.content.Context;
 import android.os.Build;
 import android.os.Handler;
 import android.support.test.filters.LargeTest;
@@ -15,6 +16,7 @@ import com.twilio.conversations.helper.TwilioConversationsHelper;
 import com.twilio.conversations.helper.TwilioConversationsTestsBase;
 
 import org.junit.After;
+import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
@@ -32,10 +34,16 @@ import static org.junit.Assert.*;
 public class ConversationTests extends TwilioConversationsTestsBase {
     private static String USER = "john";
     private static String NON_EXISTANT_PARTICIPANT ="non-existant-paritcipant";
+    private Context context;
 
     @Rule
-    public ActivityTestRule<TwilioConversationsActivity> mActivityRule = new ActivityTestRule<>(
+    public ActivityTestRule<TwilioConversationsActivity> activityRule = new ActivityTestRule<>(
             TwilioConversationsActivity.class);
+
+    @Before
+    public void setup() {
+        context = activityRule.getActivity();
+    }
 
     @After
     public void teardown() {
@@ -49,14 +57,14 @@ public class ConversationTests extends TwilioConversationsTestsBase {
            return;
         }
 
-        TwilioAccessManager accessManager = AccessTokenHelper.obtainTwilioAccessManager(USER);
-        ConversationsClient conversationsClient = ConversationsClientHelper.registerClient(mActivityRule.getActivity(), accessManager);
+        TwilioAccessManager accessManager = AccessTokenHelper.obtainTwilioAccessManager(context, USER);
+        ConversationsClient conversationsClient = ConversationsClientHelper.registerClient(activityRule.getActivity(), accessManager);
 
         LocalMedia localMedia = LocalMediaFactory.createLocalMedia(new LocalMediaListener() {
             @Override
             public void onLocalVideoTrackAdded(final LocalMedia localMedia, LocalVideoTrack localVideoTrack) {
                 try {
-                    mActivityRule.runOnUiThread(new Runnable() {
+                    activityRule.runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
 
@@ -87,7 +95,7 @@ public class ConversationTests extends TwilioConversationsTestsBase {
             }
         });
 
-        CameraCapturer cameraCapturer = CameraCapturerHelper.createCameraCapturer(mActivityRule.getActivity(), CameraCapturer.CameraSource.CAMERA_SOURCE_FRONT_CAMERA);
+        CameraCapturer cameraCapturer = CameraCapturerHelper.createCameraCapturer(activityRule.getActivity(), CameraCapturer.CameraSource.CAMERA_SOURCE_FRONT_CAMERA);
 
         localMedia.addLocalVideoTrack(LocalVideoTrackFactory.createLocalVideoTrack(cameraCapturer));
 
