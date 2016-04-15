@@ -8,12 +8,12 @@ import android.widget.EditText;
 import com.tw.conv.testapp.R;
 
 public class Dialog {
-    public static AlertDialog createInviteDialog(String caller, DialogInterface.OnClickListener acceptClickListener, DialogInterface.OnClickListener rejectClickListener, Context context) {
+    public static AlertDialog createInviteDialog(String caller, String sid, DialogInterface.OnClickListener acceptClickListener, DialogInterface.OnClickListener rejectClickListener, Context context) {
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(context);
 
         alertDialogBuilder.setIcon(R.drawable.ic_call_black_24dp);
         alertDialogBuilder.setTitle("Incoming Call");
-        alertDialogBuilder.setMessage(caller + " is calling");
+        alertDialogBuilder.setMessage(caller + " is calling" + "\n" + "sid " + sid);
         alertDialogBuilder.setPositiveButton("Accept", acceptClickListener);
         alertDialogBuilder.setNegativeButton("Reject", rejectClickListener);
         alertDialogBuilder.setCancelable(false);
