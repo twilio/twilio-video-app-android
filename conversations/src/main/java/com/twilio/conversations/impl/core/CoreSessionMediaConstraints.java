@@ -12,11 +12,12 @@ public class CoreSessionMediaConstraints {
 
 	public CoreSessionMediaConstraints(
 			boolean enableAudio, boolean muteAudio,
-			boolean enableVideo, boolean pauseVideo, IceOptions options) {
+			boolean enableVideo, boolean pauseVideo, IceOptions iceOptions) {
 		this.enableAudio = enableAudio;
 		this.muteAudio = muteAudio;
 		this.enableVideo = enableVideo;
 		this.pauseVideo = pauseVideo;
+		this.iceOptions = iceOptions;
 	}
 
 	public boolean isAudioEnabled() {
