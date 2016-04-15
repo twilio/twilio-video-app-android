@@ -1127,7 +1127,9 @@ public class TCClientActivity extends AppCompatActivity {
     }
 
     private void showInviteDialog(final IncomingInvite incomingInvite) {
-        alertDialog = Dialog.createInviteDialog(incomingInvite.getInviter(),
+        alertDialog = Dialog.createInviteDialog(
+                incomingInvite.getInviter(),
+                incomingInvite.getConversationSid(),
                 acceptCallClickListener(incomingInvite),
                 rejectCallClickListener(incomingInvite),
                 this);
