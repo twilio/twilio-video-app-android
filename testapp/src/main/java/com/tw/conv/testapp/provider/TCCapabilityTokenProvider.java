@@ -23,21 +23,6 @@ public class TCCapabilityTokenProvider {
         void obtainTwilioCapabilityToken(@QueryMap Map<String, String> options, Callback<String> tokenCallback);
     }
 
-    private static class TwilioAuthorizationInterceptor implements RequestInterceptor {
-        private static final String AUTH_USERNAME = "twilio";
-        private static final String AUTH_PASSWORD = "video";
-
-        @Override
-        public void intercept(RequestFacade requestFacade) {
-            requestFacade.addHeader("Authorization", getAuthValue());
-        }
-
-        private String getAuthValue() {
-            final String authString = AUTH_USERNAME + ":" + AUTH_PASSWORD;
-            return "Basic " + Base64.encodeToString(authString.getBytes(), Base64.NO_WRAP);
-        }
-    }
-
     private static TokenService tokenService = new RestAdapter.Builder()
             .setEndpoint("https://simple-signaling.appspot.com")
             .setRequestInterceptor(new TwilioAuthorizationInterceptor())

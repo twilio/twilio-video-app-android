@@ -4,11 +4,15 @@ import android.util.Base64;
 
 import com.google.gson.GsonBuilder;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import retrofit.Callback;
 import retrofit.RequestInterceptor;
 import retrofit.RestAdapter;
 import retrofit.converter.GsonConverter;
 import retrofit.http.GET;
+import retrofit.http.QueryMap;
 
 public class TCIceServersProvider {
     public static final String REALM = "realm";
@@ -16,25 +20,10 @@ public class TCIceServersProvider {
     /* Define the Retrofit Token Service */
     interface IceService {
         @GET("/ice")
-        void obtainTwilioIceServers(Callback<TwilioIceServers> tokenCallback);
+        void obtainTwilioIceServers(@QueryMap Map<String, String> options, Callback<TwilioIceServers> tokenCallback);
     }
 
-    private static class TwilioAuthorizationInterceptor implements RequestInterceptor {
-        private static final String AUTH_USERNAME = "twilio";
-        private static final String AUTH_PASSWORD = "video";
-
-        @Override
-        public void intercept(RequestFacade requestFacade) {
-            requestFacade.addHeader("Authorization", getAuthValue());
-        }
-
-        private String getAuthValue() {
-            final String authString = AUTH_USERNAME + ":" + AUTH_PASSWORD;
-            return "Basic " + Base64.encodeToString(authString.getBytes(), Base64.NO_WRAP);
-        }
-    }
-
-    private static IceService tokenService = new RestAdapter.Builder()
+    private static IceService iceService = new RestAdapter.Builder()
             .setEndpoint("http://pacificgrid.ngrok.io")
             .setRequestInterceptor(new TwilioAuthorizationInterceptor())
             .setConverter(new GsonConverter(new GsonBuilder().create()))
@@ -42,8 +31,10 @@ public class TCIceServersProvider {
             .create(IceService.class);
 
 
-    public static void obtainTwilioIceServers(Callback<TwilioIceServers> callback) {
-        tokenService.obtainTwilioIceServers(callback);
+    public static void obtainTwilioIceServers(String realm, Callback<TwilioIceServers> callback) {
+        HashMap<String,String> options = new HashMap<>();
+        options.put(REALM, realm);
+        iceService.obtainTwilioIceServers(options, callback);
     }
 
 

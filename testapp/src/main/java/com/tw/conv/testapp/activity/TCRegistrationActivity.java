@@ -262,7 +262,7 @@ public class TCRegistrationActivity extends AppCompatActivity {
     }
 
     private void obtainTwilioIceServers(final String realm) {
-        TCIceServersProvider.obtainTwilioIceServers(new Callback<TwilioIceServers>() {
+        TCIceServersProvider.obtainTwilioIceServers(realm, new Callback<TwilioIceServers>() {
             @Override
             public void success(TwilioIceServers twilioIceServers, Response response) {
                 iceServerProgressDialog.dismiss();
