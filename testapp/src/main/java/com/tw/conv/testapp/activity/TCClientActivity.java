@@ -43,33 +43,21 @@ import android.widget.TextView;
 
 import com.appyvet.rangebar.IRangeBarFormatter;
 import com.appyvet.rangebar.RangeBar;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.reflect.TypeToken;
+import com.tw.conv.testapp.R;
 import com.tw.conv.testapp.adapter.IceServerAdapter;
 import com.tw.conv.testapp.adapter.RemoteVideoTrackStatsAdapter;
+import com.tw.conv.testapp.dialog.Dialog;
+import com.tw.conv.testapp.provider.TCCapabilityTokenProvider;
+import com.tw.conv.testapp.provider.TCIceServersProvider;
+import com.tw.conv.testapp.provider.TwilioIceResponse;
 import com.tw.conv.testapp.provider.TwilioIceServer;
-import com.tw.conv.testapp.provider.TwilioIceServers;
 import com.tw.conv.testapp.util.IceOptionsHelper;
+import com.tw.conv.testapp.util.ParticipantParser;
 import com.twilio.common.TwilioAccessManager;
 import com.twilio.common.TwilioAccessManagerFactory;
 import com.twilio.common.TwilioAccessManagerListener;
-import com.twilio.conversations.IceOptions;
-import com.twilio.conversations.IceServer;
-import com.twilio.conversations.IceTransportPolicy;
-import com.twilio.conversations.LocalAudioTrackStatsRecord;
-import com.twilio.conversations.LocalVideoTrackStatsRecord;
-import com.twilio.conversations.RemoteVideoTrackStatsRecord;
-import com.twilio.conversations.StatsListener;
-import com.twilio.conversations.MediaTrackStatsRecord;
-import com.twilio.conversations.RemoteAudioTrackStatsRecord;
-import com.twilio.conversations.TwilioConversationsException;
-import com.tw.conv.testapp.R;
-import com.tw.conv.testapp.dialog.Dialog;
-import com.tw.conv.testapp.provider.TCCapabilityTokenProvider;
-import com.tw.conv.testapp.util.ParticipantParser;
-import com.twilio.conversations.AudioTrack;
 import com.twilio.conversations.AudioOutput;
+import com.twilio.conversations.AudioTrack;
 import com.twilio.conversations.CameraCapturer;
 import com.twilio.conversations.CameraCapturerFactory;
 import com.twilio.conversations.CapturerErrorListener;
@@ -79,17 +67,27 @@ import com.twilio.conversations.ConversationCallback;
 import com.twilio.conversations.ConversationListener;
 import com.twilio.conversations.ConversationsClient;
 import com.twilio.conversations.ConversationsClientListener;
+import com.twilio.conversations.IceOptions;
+import com.twilio.conversations.IceServer;
+import com.twilio.conversations.IceTransportPolicy;
 import com.twilio.conversations.IncomingInvite;
+import com.twilio.conversations.LocalAudioTrackStatsRecord;
 import com.twilio.conversations.LocalMedia;
+import com.twilio.conversations.LocalMediaFactory;
 import com.twilio.conversations.LocalMediaListener;
 import com.twilio.conversations.LocalVideoTrack;
 import com.twilio.conversations.LocalVideoTrackFactory;
-import com.twilio.conversations.LocalMediaFactory;
+import com.twilio.conversations.LocalVideoTrackStatsRecord;
 import com.twilio.conversations.MediaTrack;
+import com.twilio.conversations.MediaTrackStatsRecord;
 import com.twilio.conversations.OutgoingInvite;
 import com.twilio.conversations.Participant;
 import com.twilio.conversations.ParticipantListener;
+import com.twilio.conversations.RemoteAudioTrackStatsRecord;
+import com.twilio.conversations.RemoteVideoTrackStatsRecord;
+import com.twilio.conversations.StatsListener;
 import com.twilio.conversations.TwilioConversations;
+import com.twilio.conversations.TwilioConversationsException;
 import com.twilio.conversations.VideoConstraints;
 import com.twilio.conversations.VideoDimensions;
 import com.twilio.conversations.VideoRendererObserver;
@@ -97,7 +95,6 @@ import com.twilio.conversations.VideoTrack;
 import com.twilio.conversations.VideoViewRenderer;
 import com.twilio.conversations.internal.ClientOptionsInternal;
 
-import java.lang.reflect.Type;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -196,9 +193,10 @@ public class TCClientActivity extends AppCompatActivity {
     private VideoDimensions minVideoDimensions = null;
     private VideoDimensions maxVideoDimensions = null;
 
-    private IceOptions iceOptions;
     private Spinner iceTransPolicySpinner;
     private ListView twilioIceServersListView;
+    private LinearLayout iceOptionsLayout;
+    private CheckBox enableIceCheckbox;
 
 
     private static final Map<Integer, VideoDimensions> videoDimensionsMap;
@@ -422,6 +420,14 @@ public class TCClientActivity extends AppCompatActivity {
                     .getString(TCCapabilityTokenProvider.CAPABILITY_TOKEN);
         }
 
+        setIceOptionsViews();
+        iceOptionsLayout = (LinearLayout)findViewById(R.id.ice_options_layout);
+        iceOptionsLayout.setVisibility(View.GONE);
+        enableIceCheckbox = (CheckBox)findViewById(R.id.enable_ice_checkbox);
+        enableIceCheckbox.setChecked(false);
+        enableIceCheckbox.setOnCheckedChangeListener(enableIceCheckedChangeListener());
+
+
         accessManager = TwilioAccessManagerFactory.createAccessManager(this, capabilityToken,
                 accessManagerListener());
 
@@ -440,7 +446,6 @@ public class TCClientActivity extends AppCompatActivity {
         setAudioStateIcon();
         videoState = VideoState.ENABLED;
         setVideoStateIcon();
-        setIceOptionsViews();
         setVolumeControlStream(AudioManager.STREAM_VOICE_CALL);
         setSpeakerphoneOn(true);
         setCallAction();
@@ -448,48 +453,6 @@ public class TCClientActivity extends AppCompatActivity {
         registerRejectReceiver();
     }
 
-
-
-    private IceOptions getIceOptionsFromIntent() {
-        String selectedTwilioIceServersJson =
-                getIntent().getExtras().getString(TwilioIceServers.ICE_SELECTED_SERVERS);
-
-        //Transform twilio ice servers from json to Set<IceServer>
-        List<TwilioIceServer> selectedIceServers =
-                IceOptionsHelper.convertToTwilioIceServerList(selectedTwilioIceServersJson);
-        Set<IceServer> iceServers = IceOptionsHelper.convertToIceServersSet(selectedIceServers);
-
-        String transPolicyStr =
-                getIntent().getExtras().getString(TwilioIceServers.ICE_TRANSPORT_POLICY);
-        IceTransportPolicy transPolicy  = IceTransportPolicy.ICE_TRANSPORT_POLICY_ALL;;
-        if (transPolicyStr.equalsIgnoreCase("relay") ) {
-            transPolicy = IceTransportPolicy.ICE_TRANSPORT_POLICY_RELAY;
-        }
-        if (iceServers.size() > 0) {
-            return new IceOptions(transPolicy, iceServers);
-        }
-        return new IceOptions(transPolicy);
-    }
-
-    private void setIceOptionsViews(){
-        iceTransPolicySpinner = (Spinner)findViewById(R.id.ice_trans_policy_spinner);
-        ArrayAdapter<CharSequence> iceTransPolicyArrayAdapter = ArrayAdapter.createFromResource(
-                this, R.array.ice_trans_policy_array, android.R.layout.simple_spinner_item);
-        iceTransPolicyArrayAdapter.setDropDownViewResource(
-                android.R.layout.simple_spinner_dropdown_item);
-        iceTransPolicySpinner.setAdapter(iceTransPolicyArrayAdapter);
-        String twilioIceServersJson =
-                getIntent().getExtras().getString(TwilioIceServers.ICE_SERVERS);
-        List<TwilioIceServer> twilioIceServers =
-                IceOptionsHelper.convertToTwilioIceServerList(twilioIceServersJson);
-        twilioIceServersListView = (ListView)findViewById(R.id.ice_servers_list_view);
-
-        if (twilioIceServers.size() > 0) {
-            IceServerAdapter iceServerAdapter =
-                    new IceServerAdapter(this, twilioIceServers);
-            twilioIceServersListView.setAdapter(iceServerAdapter);
-        }
-    }
 
     @Override
     public void onBackPressed() {
@@ -720,6 +683,91 @@ public class TCClientActivity extends AppCompatActivity {
     private void hideAction() {
         callActionFab.hide();
         speakerActionFab.hide();
+    }
+
+    private IceOptions getIceOptionsFromIntent() {
+        String selectedTwilioIceServersJson =
+                getIntent().getExtras().getString(TwilioIceResponse.ICE_SELECTED_SERVERS);
+
+        //Transform twilio ice servers from json to Set<IceServer>
+        List<TwilioIceServer> selectedIceServers =
+                IceOptionsHelper.convertToTwilioIceServerList(selectedTwilioIceServersJson);
+        Set<IceServer> iceServers = IceOptionsHelper.convertToIceServersSet(selectedIceServers);
+
+        String transPolicyStr =
+                getIntent().getExtras().getString(TwilioIceResponse.ICE_TRANSPORT_POLICY);
+        IceTransportPolicy transPolicy  = IceTransportPolicy.ICE_TRANSPORT_POLICY_ALL;;
+        if (transPolicyStr.equalsIgnoreCase("relay") ) {
+            transPolicy = IceTransportPolicy.ICE_TRANSPORT_POLICY_RELAY;
+        }
+        if (iceServers.size() > 0) {
+            return new IceOptions(transPolicy, iceServers);
+        }
+        return new IceOptions(transPolicy);
+    }
+
+    private void setIceOptionsViews(){
+        iceTransPolicySpinner = (Spinner)findViewById(R.id.ice_trans_policy_spinner);
+        ArrayAdapter<CharSequence> iceTransPolicyArrayAdapter = ArrayAdapter.createFromResource(
+                this, R.array.ice_trans_policy_array, android.R.layout.simple_spinner_item);
+        iceTransPolicyArrayAdapter.setDropDownViewResource(
+                android.R.layout.simple_spinner_dropdown_item);
+        iceTransPolicySpinner.setAdapter(iceTransPolicyArrayAdapter);
+        String twilioIceServersJson =
+                getIntent().getExtras().getString(TwilioIceResponse.ICE_SERVERS);
+        List<TwilioIceServer> twilioIceServers =
+                IceOptionsHelper.convertToTwilioIceServerList(twilioIceServersJson);
+        twilioIceServersListView = (ListView)findViewById(R.id.ice_servers_list_view);
+
+        if (twilioIceServers.size() > 0) {
+            IceServerAdapter iceServerAdapter =
+                    new IceServerAdapter(this, twilioIceServers);
+            twilioIceServersListView.setAdapter(iceServerAdapter);
+        } else {
+            // We are going to obtain list of servers anyway
+            TCIceServersProvider.obtainTwilioIceServers(realm, new Callback<TwilioIceResponse>() {
+                @Override
+                public void success(TwilioIceResponse twilioIceResponse, Response response) {
+                    IceServerAdapter iceServerAdapter =
+                            new IceServerAdapter(TCClientActivity.this, twilioIceResponse.getIceServers());
+                    twilioIceServersListView.setAdapter(iceServerAdapter);
+                }
+
+                @Override
+                public void failure(RetrofitError error) {
+                    Timber.w(error.getMessage());
+                }
+            });
+        }
+    }
+
+    private IceOptions createIceOptions() {
+        if (!enableIceCheckbox.isChecked()) {
+            return null;
+        }
+        List<TwilioIceServer> selectedTwIceServers =
+                IceOptionsHelper.getSelectedServersFromListView(twilioIceServersListView);
+        IceTransportPolicy policy = IceOptionsHelper.convertToIceTransportPolicy(
+                iceTransPolicySpinner.getSelectedItem().toString());
+        if (selectedTwIceServers.size() > 0) {
+            Set<IceServer> iceServers =
+                    IceOptionsHelper.convertToIceServersSet(selectedTwIceServers);
+            return new IceOptions(policy, iceServers);
+        }
+        return new IceOptions(policy);
+    }
+
+    private CompoundButton.OnCheckedChangeListener enableIceCheckedChangeListener() {
+        return new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked) {
+                    iceOptionsLayout.setVisibility(View.VISIBLE);
+                } else {
+                    iceOptionsLayout.setVisibility(View.GONE);
+                }
+            }
+        };
     }
 
     private ConversationsClientListener conversationsClientListener() {
@@ -1077,8 +1125,10 @@ public class TCClientActivity extends AppCompatActivity {
                 if(participants.size() > 0) {
 
                     localMedia = createLocalMedia();
+
+                    IceOptions iceOptions = createIceOptions();
                     outgoingInvite = conversationsClient.sendConversationInvite(participants,
-                            localMedia, new ConversationCallback() {
+                            localMedia, iceOptions, new ConversationCallback() {
                                 @Override
                                 public void onConversation(Conversation conversation, TwilioConversationsException e) {
                                     Timber.e("sendConversationInvite onConversation");
@@ -1212,7 +1262,8 @@ public class TCClientActivity extends AppCompatActivity {
     }
 
     private void acceptInvite(IncomingInvite incomingInvite) {
-        incomingInvite.accept(localMedia, new ConversationCallback() {
+        IceOptions iceOptions = createIceOptions();
+        incomingInvite.accept(localMedia, iceOptions, new ConversationCallback() {
             @Override
             public void onConversation(Conversation conversation, TwilioConversationsException e) {
                 Timber.i("onConversation");

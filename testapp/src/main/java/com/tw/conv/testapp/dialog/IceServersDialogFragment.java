@@ -1,6 +1,6 @@
 package com.tw.conv.testapp.dialog;
 
-import android.app.*;
+import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatDialogFragment;
@@ -14,8 +14,7 @@ import android.widget.Spinner;
 import com.tw.conv.testapp.R;
 import com.tw.conv.testapp.adapter.IceServerAdapter;
 import com.tw.conv.testapp.provider.TwilioIceServer;
-import com.tw.conv.testapp.provider.TwilioIceServers;
-import com.twilio.conversations.IceTransportPolicy;
+import com.tw.conv.testapp.util.IceOptionsHelper;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -88,17 +87,9 @@ public class IceServersDialogFragment extends AppCompatDialogFragment{
         return new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                selectedServers = new ArrayList<>();
-                if (iceServersListView != null) {
-                    int len = iceServersListView.getCount();
-                    checkedItems = iceServersListView.getCheckedItemPositions();
-                    for (int i=0; i<len; i++) {
-                        if (checkedItems.get(i)) {
-                            selectedServers.add(
-                                    (TwilioIceServer)iceServersListView.getItemAtPosition(i));
-                        }
-                    }
-                }
+                selectedServers =
+                        IceOptionsHelper.getSelectedServersFromListView(iceServersListView);
+                checkedItems = iceServersListView.getCheckedItemPositions();
                 if (listener != null) {
                     String transportPolicy = "";
                     if (iceTransPolicySpinner != null) {

@@ -7,7 +7,6 @@ import android.widget.EditText;
 
 import com.tw.conv.testapp.R;
 import com.tw.conv.testapp.provider.TwilioIceServer;
-import com.tw.conv.testapp.provider.TwilioIceServers;
 
 import java.util.List;
 

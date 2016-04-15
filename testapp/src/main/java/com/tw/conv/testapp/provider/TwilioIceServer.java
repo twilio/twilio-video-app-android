@@ -1,7 +1,5 @@
 package com.tw.conv.testapp.provider;
 
-import android.support.annotation.Nullable;
-
 public class TwilioIceServer {
     private String url;
     private String username;

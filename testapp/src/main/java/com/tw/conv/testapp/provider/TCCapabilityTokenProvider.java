@@ -1,12 +1,9 @@
 package com.tw.conv.testapp.provider;
 
-import android.util.Base64;
-
 import java.util.HashMap;
 import java.util.Map;
 
 import retrofit.Callback;
-import retrofit.RequestInterceptor;
 import retrofit.RestAdapter;
 import retrofit.http.GET;
 import retrofit.http.QueryMap;

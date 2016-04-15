@@ -5,11 +5,11 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.view.HapticFeedbackConstants;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
@@ -25,10 +25,10 @@ import com.tw.conv.testapp.R;
 import com.tw.conv.testapp.TestAppApplication;
 import com.tw.conv.testapp.dialog.Dialog;
 import com.tw.conv.testapp.dialog.IceServersDialogFragment;
-import com.tw.conv.testapp.provider.TwilioIceServer;
-import com.tw.conv.testapp.provider.TwilioIceServers;
 import com.tw.conv.testapp.provider.TCCapabilityTokenProvider;
 import com.tw.conv.testapp.provider.TCIceServersProvider;
+import com.tw.conv.testapp.provider.TwilioIceResponse;
+import com.tw.conv.testapp.provider.TwilioIceServer;
 import com.tw.conv.testapp.util.IceOptionsHelper;
 import com.twilio.conversations.TwilioConversations;
 
@@ -52,7 +52,7 @@ public class TCRegistrationActivity extends AppCompatActivity {
     private TextView versionText;
     private Spinner realmSpinner;
     private ProgressDialog iceServerProgressDialog;
-    private TwilioIceServers twilioIceServers;
+    private TwilioIceResponse twilioIceResponse;
     private List<TwilioIceServer> selectedTwilioIceServers;
     private String iceTransportPolicy = "";
     private Button iceOptionsButton;
@@ -224,7 +224,7 @@ public class TCRegistrationActivity extends AppCompatActivity {
         return new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (twilioIceServers != null) {
+                if (twilioIceResponse != null) {
                     showIceDialog();
                 } else {
                     iceServerProgressDialog = ProgressDialog.show(
@@ -239,7 +239,7 @@ public class TCRegistrationActivity extends AppCompatActivity {
     private void showIceDialog(){
         if (iceOptionsDialog == null) {
             iceOptionsDialog = Dialog.createIceServersDialog(
-                    twilioIceServers.getIceServers(), iceOptionsDialogListener());
+                    twilioIceResponse.getIceServers(), iceOptionsDialogListener());
         }
         iceOptionsDialog.show(getSupportFragmentManager(), ICE_OPTIONS_DIALOG);
     }
@@ -261,12 +261,12 @@ public class TCRegistrationActivity extends AppCompatActivity {
     }
 
     private void obtainTwilioIceServers(final String realm) {
-        TCIceServersProvider.obtainTwilioIceServers(realm, new Callback<TwilioIceServers>() {
+        TCIceServersProvider.obtainTwilioIceServers(realm, new Callback<TwilioIceResponse>() {
             @Override
-            public void success(TwilioIceServers twilioIceServers, Response response) {
+            public void success(TwilioIceResponse twilioIceResponse, Response response) {
                 iceServerProgressDialog.dismiss();
                 if (response.getStatus() == 200) {
-                    TCRegistrationActivity.this.twilioIceServers = twilioIceServers;
+                    TCRegistrationActivity.this.twilioIceResponse = twilioIceResponse;
                     showIceDialog();
                 } else {
                     Snackbar.make(registrationButton,
@@ -292,11 +292,15 @@ public class TCRegistrationActivity extends AppCompatActivity {
         intent.putExtra(TCCapabilityTokenProvider.USERNAME, username);
         intent.putExtra(TCCapabilityTokenProvider.CAPABILITY_TOKEN, capabilityToken);
         intent.putExtra(TCCapabilityTokenProvider.REALM, realm);
-        intent.putExtra(TwilioIceServers.ICE_TRANSPORT_POLICY, iceTransportPolicy);
-        intent.putExtra(TwilioIceServers.ICE_SELECTED_SERVERS,
-                IceOptionsHelper.convertToJson(selectedTwilioIceServers));
-        intent.putExtra(TwilioIceServers.ICE_SERVERS,
-                IceOptionsHelper.convertToJson(twilioIceServers.getIceServers()));
+        intent.putExtra(TwilioIceResponse.ICE_TRANSPORT_POLICY, iceTransportPolicy);
+        if (selectedTwilioIceServers != null) {
+            intent.putExtra(TwilioIceResponse.ICE_SELECTED_SERVERS,
+                    IceOptionsHelper.convertToJson(selectedTwilioIceServers));
+        }
+        if (twilioIceResponse != null && twilioIceResponse.getIceServers() != null) {
+            intent.putExtra(TwilioIceResponse.ICE_SERVERS,
+                    IceOptionsHelper.convertToJson(twilioIceResponse.getIceServers()));
+        }
         startActivity(intent);
         finish();
     }

@@ -8,8 +8,6 @@ import android.widget.BaseAdapter;
 import android.widget.TextView;
 
 import com.tw.conv.testapp.provider.TwilioIceServer;
-import com.tw.conv.testapp.provider.TwilioIceServers;
-import com.twilio.conversations.IceServer;
 
 import java.util.List;
 

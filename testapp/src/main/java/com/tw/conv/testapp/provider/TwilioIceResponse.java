@@ -5,7 +5,7 @@ import com.google.gson.annotations.SerializedName;
 
 import java.util.List;
 
-public class TwilioIceServers {
+public class TwilioIceResponse {
 
     public static final String ICE_TRANSPORT_POLICY = "ice_transport_type";
     public static final String ICE_SELECTED_SERVERS = "ice_selected_servers";
@@ -27,7 +27,7 @@ public class TwilioIceServers {
     @SerializedName("date_updated")
     private String dateUpdated;
 
-    public TwilioIceServers() {}
+    public TwilioIceResponse() {}
 
     public String getUsername() {
         return username;

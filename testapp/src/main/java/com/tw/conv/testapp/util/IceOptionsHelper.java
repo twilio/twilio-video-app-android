@@ -1,14 +1,15 @@
 package com.tw.conv.testapp.util;
 
 
-import android.support.annotation.Nullable;
+import android.util.SparseBooleanArray;
+import android.widget.ListView;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import com.tw.conv.testapp.provider.TwilioIceServer;
-import com.tw.conv.testapp.provider.TwilioIceServers;
 import com.twilio.conversations.IceServer;
+import com.twilio.conversations.IceTransportPolicy;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -48,5 +49,27 @@ public class IceOptionsHelper {
             }
         }
         return result;
+    }
+
+    public static List<TwilioIceServer> getSelectedServersFromListView(ListView iceServersListView) {
+        List<TwilioIceServer> selectedServers = new ArrayList<>();
+        if (iceServersListView != null) {
+            int len = iceServersListView.getCount();
+            SparseBooleanArray checkedItems = iceServersListView.getCheckedItemPositions();
+            for (int i=0; i<len; i++) {
+                if (checkedItems.get(i)) {
+                    selectedServers.add(
+                            (TwilioIceServer)iceServersListView.getItemAtPosition(i));
+                }
+            }
+        }
+        return selectedServers;
+    }
+
+    public static IceTransportPolicy convertToIceTransportPolicy(String iceTransportStr) {
+        if (iceTransportStr.equalsIgnoreCase("relay")) {
+            return IceTransportPolicy.ICE_TRANSPORT_POLICY_RELAY;
+        }
+        return IceTransportPolicy.ICE_TRANSPORT_POLICY_ALL;
     }
 }
