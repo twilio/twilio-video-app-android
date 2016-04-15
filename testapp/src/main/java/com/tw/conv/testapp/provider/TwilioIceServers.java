@@ -8,6 +8,7 @@ import java.util.List;
 public class TwilioIceServers {
 
     public static final String ICE_TRANSPORT_POLICY = "ice_transport_type";
+    public static final String ICE_SELECTED_SERVERS = "ice_selected_servers";
     public static final String ICE_SERVERS = "ice_servers";
 
     private String username;

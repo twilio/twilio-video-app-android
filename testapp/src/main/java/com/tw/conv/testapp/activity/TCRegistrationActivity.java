@@ -20,8 +20,6 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.tw.conv.testapp.BuildConfig;
 import com.tw.conv.testapp.R;
 import com.tw.conv.testapp.TestAppApplication;
@@ -31,6 +29,7 @@ import com.tw.conv.testapp.provider.TwilioIceServer;
 import com.tw.conv.testapp.provider.TwilioIceServers;
 import com.tw.conv.testapp.provider.TCCapabilityTokenProvider;
 import com.tw.conv.testapp.provider.TCIceServersProvider;
+import com.tw.conv.testapp.util.IceOptionsHelper;
 import com.twilio.conversations.TwilioConversations;
 
 import net.hockeyapp.android.CrashManager;
@@ -294,8 +293,10 @@ public class TCRegistrationActivity extends AppCompatActivity {
         intent.putExtra(TCCapabilityTokenProvider.CAPABILITY_TOKEN, capabilityToken);
         intent.putExtra(TCCapabilityTokenProvider.REALM, realm);
         intent.putExtra(TwilioIceServers.ICE_TRANSPORT_POLICY, iceTransportPolicy);
-        Gson gson = new GsonBuilder().create();
-        intent.putExtra(TwilioIceServers.ICE_SERVERS, gson.toJson(selectedTwilioIceServers));
+        intent.putExtra(TwilioIceServers.ICE_SELECTED_SERVERS,
+                IceOptionsHelper.convertToJson(selectedTwilioIceServers));
+        intent.putExtra(TwilioIceServers.ICE_SERVERS,
+                IceOptionsHelper.convertToJson(twilioIceServers.getIceServers()));
         startActivity(intent);
         finish();
     }

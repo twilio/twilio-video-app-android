@@ -34,6 +34,7 @@
     <string name="ice_servers_dialog_title">ICE Options</string>
     <string name="ice_servers_list_desc">Choose server(s)</string>
     <string name="ice_options_button">Ice Options</string>
+    <string name="enable_ice">Enable ICE Options</string>
 
     <string-array name="realm_array">
         <item>Prod</item>
