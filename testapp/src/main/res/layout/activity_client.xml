@@ -169,8 +169,29 @@
                 custom:temporaryPins="false"
                 android:layout_marginLeft="@dimen/activity_horizontal_margin"
                 android:layout_marginRight="@dimen/activity_horizontal_margin" />
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/activity_horizontal_margin" >
+
+                <CheckBox
+                    android:id="@+id/enable_ice_checkbox"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/enable_ice"/>
+
+            </LinearLayout>
+            <include layout="@layout/ice_options_layout"/>
 
         </LinearLayout>
+
+
+
+
     </ScrollView>
 
     <ScrollView

@@ -2,12 +2,16 @@ package com.tw.conv.testapp.provider;
 
 import android.util.Base64;
 
+import com.google.gson.GsonBuilder;
+import com.tw.conv.testapp.model.TwilioIceResponse;
+
 import java.util.HashMap;
 import java.util.Map;
 
 import retrofit.Callback;
 import retrofit.RequestInterceptor;
 import retrofit.RestAdapter;
+import retrofit.converter.GsonConverter;
 import retrofit.http.GET;
 import retrofit.http.QueryMap;
 
@@ -21,6 +25,9 @@ public class TCCapabilityTokenProvider {
     interface TokenService {
         @GET("/access-token")
         void obtainTwilioCapabilityToken(@QueryMap Map<String, String> options, Callback<String> tokenCallback);
+
+        @GET("/ice")
+        void obtainTwilioIceServers(@QueryMap Map<String, String> options, Callback<TwilioIceResponse> tokenCallback);
     }
 
     private static class TwilioAuthorizationInterceptor implements RequestInterceptor {
@@ -41,6 +48,7 @@ public class TCCapabilityTokenProvider {
     private static TokenService tokenService = new RestAdapter.Builder()
             .setEndpoint("https://simple-signaling.appspot.com")
             .setRequestInterceptor(new TwilioAuthorizationInterceptor())
+            .setConverter(new GsonConverter(new GsonBuilder().create()))
             .build()
             .create(TokenService.class);
 
@@ -51,5 +59,12 @@ public class TCCapabilityTokenProvider {
         options.put("identity", username);
         options.put("ttl", TTL);
         tokenService.obtainTwilioCapabilityToken(options, callback);
+    }
+
+
+    public static void obtainTwilioIceServers(String realm, Callback<TwilioIceResponse> callback) {
+        HashMap<String,String> options = new HashMap<>();
+        options.put(REALM, realm);
+        tokenService.obtainTwilioIceServers(options, callback);
     }
 }

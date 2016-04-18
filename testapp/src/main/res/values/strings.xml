@@ -26,11 +26,25 @@
     <string name="enable_stats">Enable Stats</string>
     <string name="local">Local Media</string>
     <string name="remote">Remote Media</string>
+    <string name="ice_options">Enable ICE options</string>
+    <string name="ice_transp_policy">Transportation policy</string>
+    <string name="realm_string">Realm</string>
+    <string name="stun_turn">STUN or TURN server</string>
+    <string name="add_server">Add</string>
+    <string name="ice_servers_dialog_title">ICE Options</string>
+    <string name="ice_servers_list_desc">Choose server(s)</string>
+    <string name="ice_options_button">Ice Options</string>
+    <string name="enable_ice">Enable ICE Options</string>
 
     <string-array name="realm_array">
         <item>Prod</item>
         <item>Stage</item>
         <item>Dev</item>
+    </string-array>
+
+    <string-array name="ice_trans_policy_array">
+        <item>All</item>
+        <item>Relay</item>
     </string-array>
 
 </resources>
