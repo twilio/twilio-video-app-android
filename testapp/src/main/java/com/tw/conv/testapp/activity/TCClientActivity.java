@@ -724,7 +724,7 @@ public class TCClientActivity extends AppCompatActivity {
             twilioIceServersListView.setAdapter(iceServerAdapter);
         } else {
             // We are going to obtain list of servers anyway
-            SimpleSignalingUtils.obtainTwilioIceServers(realm, new Callback<TwilioIceResponse>() {
+            SimpleSignalingUtils.getIceServers(realm, new Callback<TwilioIceResponse>() {
                 @Override
                 public void success(TwilioIceResponse twilioIceResponse, Response response) {
                     IceServerAdapter iceServerAdapter =
@@ -1708,7 +1708,7 @@ public class TCClientActivity extends AppCompatActivity {
             Timber.e("AccessManager is null");
             return;
         }
-        SimpleSignalingUtils.obtainTwilioCapabilityToken(
+        SimpleSignalingUtils.getAccessToken(
                 accessManager.getIdentity(), realm, new Callback<String>() {
 
                     @Override

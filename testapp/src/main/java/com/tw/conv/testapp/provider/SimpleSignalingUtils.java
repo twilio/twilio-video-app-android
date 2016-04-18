@@ -28,12 +28,12 @@ public class SimpleSignalingUtils {
     /* Define the Retrofit Token Service */
     interface SimpleSignalingApi {
         @GET("/access-token")
-        void obtainTwilioCapabilityToken(@QueryMap Map<String, String> options,
-                                         Callback<String> tokenCallback);
+        void getAccessToken(@QueryMap Map<String, String> options,
+                            Callback<String> tokenCallback);
 
         @GET("/ice")
-        void obtainTwilioIceServers(@QueryMap Map<String, String> options,
-                                    Callback<TwilioIceResponse> tokenCallback);
+        void getIceServers(@QueryMap Map<String, String> options,
+                           Callback<TwilioIceResponse> tokenCallback);
     }
 
     private static class TwilioAuthorizationInterceptor implements RequestInterceptor {
@@ -59,19 +59,19 @@ public class SimpleSignalingUtils {
             .create(SimpleSignalingApi.class);
 
 
-    public static void obtainTwilioCapabilityToken(String username, String realm,
-                                                   Callback<String> callback) {
+    public static void getAccessToken(String username, String realm,
+                                      Callback<String> callback) {
         HashMap<String,String> options = new HashMap<>();
         options.put(REALM, realm);
         options.put("identity", username);
         options.put("ttl", TTL);
-        simpleSignalingService.obtainTwilioCapabilityToken(options, callback);
+        simpleSignalingService.getAccessToken(options, callback);
     }
 
 
-    public static void obtainTwilioIceServers(String realm, Callback<TwilioIceResponse> callback) {
+    public static void getIceServers(String realm, Callback<TwilioIceResponse> callback) {
         HashMap<String,String> options = new HashMap<>();
         options.put(REALM, realm);
-        simpleSignalingService.obtainTwilioIceServers(options, callback);
+        simpleSignalingService.getIceServers(options, callback);
     }
 }

@@ -205,7 +205,7 @@ public class TCRegistrationActivity extends AppCompatActivity {
     }
 
     private void obtainCapabilityToken(final String username, final String realm) {
-        SimpleSignalingUtils.obtainTwilioCapabilityToken(username,
+        SimpleSignalingUtils.getAccessToken(username,
                 realm, new Callback<String>() {
 
             @Override
@@ -276,7 +276,7 @@ public class TCRegistrationActivity extends AppCompatActivity {
     }
 
     private void obtainTwilioIceServers(final String realm) {
-        SimpleSignalingUtils.obtainTwilioIceServers(realm, new Callback<TwilioIceResponse>() {
+        SimpleSignalingUtils.getIceServers(realm, new Callback<TwilioIceResponse>() {
             @Override
             public void success(TwilioIceResponse twilioIceResponse, Response response) {
                 iceServerProgressDialog.dismiss();
