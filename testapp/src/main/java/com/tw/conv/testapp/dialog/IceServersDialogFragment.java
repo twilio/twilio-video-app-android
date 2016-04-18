@@ -13,7 +13,7 @@ import android.widget.Spinner;
 
 import com.tw.conv.testapp.R;
 import com.tw.conv.testapp.adapter.IceServerAdapter;
-import com.tw.conv.testapp.provider.TwilioIceServer;
+import com.tw.conv.testapp.model.TwilioIceServer;
 import com.tw.conv.testapp.util.IceOptionsHelper;
 
 import java.util.ArrayList;

@@ -7,7 +7,7 @@ import android.widget.ListView;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
-import com.tw.conv.testapp.provider.TwilioIceServer;
+import com.tw.conv.testapp.model.TwilioIceServer;
 import com.twilio.conversations.IceServer;
 import com.twilio.conversations.IceTransportPolicy;
 

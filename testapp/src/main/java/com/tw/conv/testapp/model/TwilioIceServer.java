@@ -1,4 +1,4 @@
-package com.tw.conv.testapp.provider;
+package com.tw.conv.testapp.model;
 
 public class TwilioIceServer {
     private String url;

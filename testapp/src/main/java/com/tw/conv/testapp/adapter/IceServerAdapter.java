@@ -7,7 +7,7 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 
-import com.tw.conv.testapp.provider.TwilioIceServer;
+import com.tw.conv.testapp.model.TwilioIceServer;
 
 import java.util.List;
 

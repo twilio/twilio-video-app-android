@@ -46,3 +46,5 @@
 # platform version.  We know about them, and they are safe.
 -keep class android.support.** { *; }
 -dontwarn android.app.Notification
+
+-keep class com.tw.conv.testapp.model.** { *; }
