@@ -194,7 +194,7 @@ public class TCClientActivity extends AppCompatActivity {
 
     private Spinner iceTransPolicySpinner;
     private ListView twilioIceServersListView;
-    private LinearLayout iceOptionsLayout;
+    private RelativeLayout iceOptionsLayout;
     private CheckBox enableIceCheckbox;
 
 
@@ -420,7 +420,7 @@ public class TCClientActivity extends AppCompatActivity {
         }
 
         setIceOptionsViews();
-        iceOptionsLayout = (LinearLayout)findViewById(R.id.ice_options_layout);
+        iceOptionsLayout = (RelativeLayout) findViewById(R.id.ice_options_layout);
         iceOptionsLayout.setVisibility(View.GONE);
         enableIceCheckbox = (CheckBox)findViewById(R.id.enable_ice_checkbox);
         enableIceCheckbox.setChecked(false);
