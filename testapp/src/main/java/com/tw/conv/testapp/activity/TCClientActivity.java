@@ -47,7 +47,7 @@ import com.tw.conv.testapp.R;
 import com.tw.conv.testapp.adapter.IceServerAdapter;
 import com.tw.conv.testapp.adapter.RemoteVideoTrackStatsAdapter;
 import com.tw.conv.testapp.dialog.Dialog;
-import com.tw.conv.testapp.provider.SimpleSignalingUtils;
+import com.tw.conv.testapp.util.SimpleSignalingUtils;
 import com.tw.conv.testapp.model.TwilioIceResponse;
 import com.tw.conv.testapp.model.TwilioIceServer;
 import com.tw.conv.testapp.util.IceOptionsHelper;
