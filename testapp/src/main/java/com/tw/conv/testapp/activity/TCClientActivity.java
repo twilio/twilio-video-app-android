@@ -47,7 +47,7 @@ import com.tw.conv.testapp.R;
 import com.tw.conv.testapp.adapter.IceServerAdapter;
 import com.tw.conv.testapp.adapter.RemoteVideoTrackStatsAdapter;
 import com.tw.conv.testapp.dialog.Dialog;
-import com.tw.conv.testapp.provider.TCCapabilityTokenProvider;
+import com.tw.conv.testapp.util.SimpleSignalingUtils;
 import com.tw.conv.testapp.model.TwilioIceResponse;
 import com.tw.conv.testapp.model.TwilioIceServer;
 import com.tw.conv.testapp.util.IceOptionsHelper;
@@ -403,20 +403,20 @@ public class TCClientActivity extends AppCompatActivity {
             }
         });
 
-        String username = getIntent().getExtras().getString(TCCapabilityTokenProvider.USERNAME);
+        String username = getIntent().getExtras().getString(SimpleSignalingUtils.USERNAME);
         getSupportActionBar().setTitle(username);
 
-        realm = getIntent().getExtras().getString(TCCapabilityTokenProvider.REALM);
+        realm = getIntent().getExtras().getString(SimpleSignalingUtils.REALM);
         Map<String, String> privateOptions = createPrivateOptions(realm);
         IceOptions iceOptions = getIceOptionsFromIntent();
         ClientOptionsInternal options = new ClientOptionsInternal(iceOptions, privateOptions);
 
         // Get the capability token
         capabilityToken = getIntent().getExtras()
-                .getString(TCCapabilityTokenProvider.CAPABILITY_TOKEN);
+                .getString(SimpleSignalingUtils.CAPABILITY_TOKEN);
         if(savedInstanceState != null) {
             capabilityToken = savedInstanceState
-                    .getString(TCCapabilityTokenProvider.CAPABILITY_TOKEN);
+                    .getString(SimpleSignalingUtils.CAPABILITY_TOKEN);
         }
 
         setIceOptionsViews();
@@ -514,7 +514,7 @@ public class TCClientActivity extends AppCompatActivity {
     @Override
     public void onSaveInstanceState(Bundle bundle) {
         super.onSaveInstanceState(bundle);
-        bundle.putString(TCCapabilityTokenProvider.CAPABILITY_TOKEN, capabilityToken);
+        bundle.putString(SimpleSignalingUtils.CAPABILITY_TOKEN, capabilityToken);
     }
 
     @Override
@@ -724,7 +724,7 @@ public class TCClientActivity extends AppCompatActivity {
             twilioIceServersListView.setAdapter(iceServerAdapter);
         } else {
             // We are going to obtain list of servers anyway
-            TCCapabilityTokenProvider.obtainTwilioIceServers(realm, new Callback<TwilioIceResponse>() {
+            SimpleSignalingUtils.getIceServers(realm, new Callback<TwilioIceResponse>() {
                 @Override
                 public void success(TwilioIceResponse twilioIceResponse, Response response) {
                     IceServerAdapter iceServerAdapter =
@@ -1708,7 +1708,7 @@ public class TCClientActivity extends AppCompatActivity {
             Timber.e("AccessManager is null");
             return;
         }
-        TCCapabilityTokenProvider.obtainTwilioCapabilityToken(
+        SimpleSignalingUtils.getAccessToken(
                 accessManager.getIdentity(), realm, new Callback<String>() {
 
                     @Override
