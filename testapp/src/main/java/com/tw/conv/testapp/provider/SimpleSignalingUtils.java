@@ -15,19 +15,25 @@ import retrofit.converter.GsonConverter;
 import retrofit.http.GET;
 import retrofit.http.QueryMap;
 
-public class TCCapabilityTokenProvider {
+public class SimpleSignalingUtils {
     public static final String CAPABILITY_TOKEN = "capability_token";
     public static final String USERNAME = "username";
     public static final String REALM = "realm";
-    public static final String TTL = "300"; //The default is usually 30 minutes. We are intentionally setting it to 5 minutes to validate expiration.
+    /*
+     * The default is usually 30 minutes. We are intentionally setting it to 5 minutes to validate
+     * expiration.
+     */
+    public static final String TTL = "300";
     
     /* Define the Retrofit Token Service */
-    interface TokenService {
+    interface SimpleSignalingApi {
         @GET("/access-token")
-        void obtainTwilioCapabilityToken(@QueryMap Map<String, String> options, Callback<String> tokenCallback);
+        void obtainTwilioCapabilityToken(@QueryMap Map<String, String> options,
+                                         Callback<String> tokenCallback);
 
         @GET("/ice")
-        void obtainTwilioIceServers(@QueryMap Map<String, String> options, Callback<TwilioIceResponse> tokenCallback);
+        void obtainTwilioIceServers(@QueryMap Map<String, String> options,
+                                    Callback<TwilioIceResponse> tokenCallback);
     }
 
     private static class TwilioAuthorizationInterceptor implements RequestInterceptor {
@@ -45,26 +51,27 @@ public class TCCapabilityTokenProvider {
         }
     }
 
-    private static TokenService tokenService = new RestAdapter.Builder()
+    private static SimpleSignalingApi simpleSignalingService = new RestAdapter.Builder()
             .setEndpoint("https://simple-signaling.appspot.com")
             .setRequestInterceptor(new TwilioAuthorizationInterceptor())
             .setConverter(new GsonConverter(new GsonBuilder().create()))
             .build()
-            .create(TokenService.class);
+            .create(SimpleSignalingApi.class);
 
 
-    public static void obtainTwilioCapabilityToken(String username, String realm, Callback<String> callback) {
+    public static void obtainTwilioCapabilityToken(String username, String realm,
+                                                   Callback<String> callback) {
         HashMap<String,String> options = new HashMap<>();
         options.put(REALM, realm);
         options.put("identity", username);
         options.put("ttl", TTL);
-        tokenService.obtainTwilioCapabilityToken(options, callback);
+        simpleSignalingService.obtainTwilioCapabilityToken(options, callback);
     }
 
 
     public static void obtainTwilioIceServers(String realm, Callback<TwilioIceResponse> callback) {
         HashMap<String,String> options = new HashMap<>();
         options.put(REALM, realm);
-        tokenService.obtainTwilioIceServers(options, callback);
+        simpleSignalingService.obtainTwilioIceServers(options, callback);
     }
 }

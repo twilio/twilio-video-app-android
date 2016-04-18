@@ -25,7 +25,7 @@ import com.tw.conv.testapp.R;
 import com.tw.conv.testapp.TestAppApplication;
 import com.tw.conv.testapp.dialog.Dialog;
 import com.tw.conv.testapp.dialog.IceServersDialogFragment;
-import com.tw.conv.testapp.provider.TCCapabilityTokenProvider;
+import com.tw.conv.testapp.provider.SimpleSignalingUtils;
 import com.tw.conv.testapp.model.TwilioIceResponse;
 import com.tw.conv.testapp.model.TwilioIceServer;
 import com.tw.conv.testapp.util.IceOptionsHelper;
@@ -205,7 +205,7 @@ public class TCRegistrationActivity extends AppCompatActivity {
     }
 
     private void obtainCapabilityToken(final String username, final String realm) {
-        TCCapabilityTokenProvider.obtainTwilioCapabilityToken(username,
+        SimpleSignalingUtils.obtainTwilioCapabilityToken(username,
                 realm, new Callback<String>() {
 
             @Override
@@ -276,7 +276,7 @@ public class TCRegistrationActivity extends AppCompatActivity {
     }
 
     private void obtainTwilioIceServers(final String realm) {
-        TCCapabilityTokenProvider.obtainTwilioIceServers(realm, new Callback<TwilioIceResponse>() {
+        SimpleSignalingUtils.obtainTwilioIceServers(realm, new Callback<TwilioIceResponse>() {
             @Override
             public void success(TwilioIceResponse twilioIceResponse, Response response) {
                 iceServerProgressDialog.dismiss();
@@ -304,9 +304,9 @@ public class TCRegistrationActivity extends AppCompatActivity {
 
     private void startClient(String username, String capabilityToken, String realm) {
         Intent intent = new Intent(this, TCClientActivity.class);
-        intent.putExtra(TCCapabilityTokenProvider.USERNAME, username);
-        intent.putExtra(TCCapabilityTokenProvider.CAPABILITY_TOKEN, capabilityToken);
-        intent.putExtra(TCCapabilityTokenProvider.REALM, realm);
+        intent.putExtra(SimpleSignalingUtils.USERNAME, username);
+        intent.putExtra(SimpleSignalingUtils.CAPABILITY_TOKEN, capabilityToken);
+        intent.putExtra(SimpleSignalingUtils.REALM, realm);
         intent.putExtra(TwilioIceResponse.ICE_TRANSPORT_POLICY, iceTransportPolicy);
         if (selectedTwilioIceServers != null) {
             intent.putExtra(TwilioIceResponse.ICE_SELECTED_SERVERS,
