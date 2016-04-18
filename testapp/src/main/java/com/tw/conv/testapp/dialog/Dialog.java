@@ -11,7 +11,11 @@ import com.tw.conv.testapp.model.TwilioIceServer;
 import java.util.List;
 
 public class Dialog {
-    public static AlertDialog createInviteDialog(String caller, String sid, DialogInterface.OnClickListener acceptClickListener, DialogInterface.OnClickListener rejectClickListener, Context context) {
+    public static AlertDialog createInviteDialog(String caller,
+                                                 String sid,
+                                                 DialogInterface.OnClickListener acceptClickListener,
+                                                 DialogInterface.OnClickListener rejectClickListener,
+                                                 Context context) {
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(context);
 
         alertDialogBuilder.setIcon(R.drawable.ic_call_black_24dp);
@@ -24,7 +28,10 @@ public class Dialog {
         return alertDialogBuilder.create();
     }
 
-    public static AlertDialog createCallParticipantsDialog(EditText participantEditText, DialogInterface.OnClickListener callParticipantsClickListener, DialogInterface.OnClickListener cancelClickListener, Context context) {
+    public static AlertDialog createCallParticipantsDialog(EditText participantEditText,
+                                                           DialogInterface.OnClickListener callParticipantsClickListener,
+                                                           DialogInterface.OnClickListener cancelClickListener,
+                                                           Context context) {
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(context);
 
         alertDialogBuilder.setIcon(R.drawable.ic_call_black_24dp);
@@ -38,7 +45,10 @@ public class Dialog {
         return alertDialogBuilder.create();
     }
 
-    public static AlertDialog createAddParticipantsDialog(EditText participantEditText, DialogInterface.OnClickListener addParticipantsClickListener, DialogInterface.OnClickListener cancelClickListener, Context context) {
+    public static AlertDialog createAddParticipantsDialog(EditText participantEditText,
+                                                          DialogInterface.OnClickListener addParticipantsClickListener,
+                                                          DialogInterface.OnClickListener cancelClickListener,
+                                                          Context context) {
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(context);
 
         alertDialogBuilder.setIcon(R.drawable.ic_call_black_24dp);
@@ -52,19 +62,22 @@ public class Dialog {
         return alertDialogBuilder.create();
     }
 
-    private static void setParticipantFieldInDialog(EditText participantEditText, AlertDialog.Builder alertDialogBuilder, Context context) {
+    private static void setParticipantFieldInDialog(EditText participantEditText,
+                                                    AlertDialog.Builder alertDialogBuilder,
+                                                    Context context) {
         // Add a participant field to the dialog
         participantEditText.setHint("Participant1" + "," + " Participant2...");
         int horizontalPadding = context.getResources().getDimensionPixelOffset(R.dimen.activity_horizontal_margin);
         int verticalPadding = context.getResources().getDimensionPixelOffset(R.dimen.activity_vertical_margin);
-        alertDialogBuilder.setView(participantEditText, horizontalPadding, verticalPadding, horizontalPadding, 0);
+        alertDialogBuilder.setView(participantEditText, horizontalPadding, verticalPadding,
+                horizontalPadding, 0);
     }
 
-    public static IceServersDialogFragment createIceServersDialog(List<TwilioIceServer> iceServers, IceServersDialogFragment.IceServersDialogListener listener) {
+    public static IceServersDialogFragment createIceServersDialog(List<TwilioIceServer> iceServers,
+                                                                  IceServersDialogFragment.IceServersDialogListener listener) {
         IceServersDialogFragment dialog = new IceServersDialogFragment();
         dialog.setIceServers(iceServers);
         dialog.setListener(listener);
         return dialog;
     }
-
 }

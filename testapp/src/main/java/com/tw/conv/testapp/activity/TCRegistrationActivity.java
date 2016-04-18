@@ -89,7 +89,8 @@ public class TCRegistrationActivity extends AppCompatActivity {
     public boolean checkPermissions(){
         int resultCamera = ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA);
         int resultMic = ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO);
-        int resultStorage = ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE);
+        int resultStorage = ContextCompat.checkSelfPermission(this,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE);
 
         return ((resultCamera == PackageManager.PERMISSION_GRANTED) &&
                 (resultMic == PackageManager.PERMISSION_GRANTED) &&
@@ -98,21 +99,28 @@ public class TCRegistrationActivity extends AppCompatActivity {
 
     public void requestPermissions(){
         if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.CAMERA) ||
-                ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.RECORD_AUDIO) ||
-                ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+                ActivityCompat.shouldShowRequestPermissionRationale(this,
+                        Manifest.permission.RECORD_AUDIO) ||
+                ActivityCompat.shouldShowRequestPermissionRationale(this,
+                        Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
             Toast.makeText(this,
-                    "Camera, Microphone, and Writing to External Storage permissions are requested. Please enabled them in App Settings.",
+                    "Camera, Microphone, and Writing to External Storage permissions are " +
+                            "requested. Please enabled them in App Settings.",
                     Toast.LENGTH_LONG).show();
         } else {
             ActivityCompat.requestPermissions(
                     this,
-                    new String[]{Manifest.permission.CAMERA, Manifest.permission.RECORD_AUDIO, Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                    new String[]{Manifest.permission.CAMERA,
+                            Manifest.permission.RECORD_AUDIO,
+                            Manifest.permission.WRITE_EXTERNAL_STORAGE},
                     PERMISSIONS_REQUEST_CODE);
         }
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode,
+                                           String[] permissions,
+                                           int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if(grantResults[0] == PackageManager.PERMISSION_DENIED ||
                 grantResults[1] == PackageManager.PERMISSION_DENIED) {
@@ -144,7 +152,8 @@ public class TCRegistrationActivity extends AppCompatActivity {
 
             @Override
             public void onClick(View view) {
-                progressDialog = ProgressDialog.show(TCRegistrationActivity.this, null, "Registering with Twilio", true);
+                progressDialog = ProgressDialog.show(TCRegistrationActivity.this, null,
+                        "Registering with Twilio", true);
                 String username = usernameEditText.getText().toString();
                 if(username != null && username.length() != 0) {
                     hideKeyboard();
@@ -160,33 +169,38 @@ public class TCRegistrationActivity extends AppCompatActivity {
     private void hideKeyboard() {
         View view = this.getCurrentFocus();
         if (view != null) {
-            InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+            InputMethodManager imm = (InputMethodManager)
+                    getSystemService(Context.INPUT_METHOD_SERVICE);
             imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
         }
     }
 
     private void registerUser(final String username) {
-
         TwilioConversations.setLogLevel(TwilioConversations.LogLevel.DEBUG);
 
         if(!TwilioConversations.isInitialized()) {
-            TwilioConversations.initialize(getApplicationContext(), new TwilioConversations.InitListener() {
-                @Override
-                public void onInitialized() {
-                    obtainCapabilityToken(username,
-                            TCRegistrationActivity.this.realmSpinner.getSelectedItem().toString().toLowerCase());
-                }
+            TwilioConversations.initialize(getApplicationContext(),
+                    new TwilioConversations.InitListener() {
+                        @Override
+                        public void onInitialized() {
+                            obtainCapabilityToken(username,
+                                    TCRegistrationActivity.this.realmSpinner.getSelectedItem()
+                                            .toString().toLowerCase());
+                        }
 
-                @Override
-                public void onError(Exception e) {
-                    Snackbar.make(registrationButton, "Twilio initialization failed: " + e.getMessage(), Snackbar.LENGTH_LONG)
-                            .setAction("Action", null).show();
+                        @Override
+                        public void onError(Exception e) {
+                            Snackbar.make(registrationButton,
+                                    "Twilio initialization failed: " + e.getMessage(),
+                                    Snackbar.LENGTH_LONG)
+                                    .setAction("Action", null).show();
 
-                }
-            });
+                        }
+                    });
         } else {
             obtainCapabilityToken(username,
-                    TCRegistrationActivity.this.realmSpinner.getSelectedItem().toString().toLowerCase());
+                    TCRegistrationActivity.this.realmSpinner.getSelectedItem()
+                            .toString().toLowerCase());
         }
     }
 
@@ -227,7 +241,8 @@ public class TCRegistrationActivity extends AppCompatActivity {
                     showIceDialog();
                 } else {
                     iceServerProgressDialog = ProgressDialog.show(
-                            TCRegistrationActivity.this, null, "Obtaining Twilio ICE Servers", true);
+                            TCRegistrationActivity.this, null,
+                            "Obtaining Twilio ICE Servers", true);
                     obtainTwilioIceServers(TCRegistrationActivity.this
                             .realmSpinner.getSelectedItem().toString().toLowerCase());
                 }
@@ -246,7 +261,8 @@ public class TCRegistrationActivity extends AppCompatActivity {
     private IceServersDialogFragment.IceServersDialogListener iceOptionsDialogListener() {
         return new IceServersDialogFragment.IceServersDialogListener() {
             @Override
-            public void onIceOptionsSelected(String iceTransportPolicy, List<TwilioIceServer> selectedServers) {
+            public void onIceOptionsSelected(String iceTransportPolicy,
+                                             List<TwilioIceServer> selectedServers) {
                 TCRegistrationActivity.this.iceTransportPolicy = iceTransportPolicy;
                 TCRegistrationActivity.this.selectedTwilioIceServers =
                         iceOptionsDialog.getSelectedServers();
@@ -269,7 +285,7 @@ public class TCRegistrationActivity extends AppCompatActivity {
                     showIceDialog();
                 } else {
                     Snackbar.make(registrationButton,
-                            "ICEretrieval failed. Status: " + response.getStatus(),
+                            "ICE retrieval failed. Status: " + response.getStatus(),
                             Snackbar.LENGTH_LONG)
                             .setAction("Action", null).show();
                 }
