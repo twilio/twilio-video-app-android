@@ -48,7 +48,6 @@ import com.tw.conv.testapp.adapter.IceServerAdapter;
 import com.tw.conv.testapp.adapter.RemoteVideoTrackStatsAdapter;
 import com.tw.conv.testapp.dialog.Dialog;
 import com.tw.conv.testapp.provider.TCCapabilityTokenProvider;
-import com.tw.conv.testapp.provider.TCIceServersProvider;
 import com.tw.conv.testapp.provider.TwilioIceResponse;
 import com.tw.conv.testapp.provider.TwilioIceServer;
 import com.tw.conv.testapp.util.IceOptionsHelper;
@@ -725,7 +724,7 @@ public class TCClientActivity extends AppCompatActivity {
             twilioIceServersListView.setAdapter(iceServerAdapter);
         } else {
             // We are going to obtain list of servers anyway
-            TCIceServersProvider.obtainTwilioIceServers(realm, new Callback<TwilioIceResponse>() {
+            TCCapabilityTokenProvider.obtainTwilioIceServers(realm, new Callback<TwilioIceResponse>() {
                 @Override
                 public void success(TwilioIceResponse twilioIceResponse, Response response) {
                     IceServerAdapter iceServerAdapter =

@@ -1,10 +1,16 @@
 package com.tw.conv.testapp.provider;
 
+import android.util.Base64;
+
+import com.google.gson.GsonBuilder;
+
 import java.util.HashMap;
 import java.util.Map;
 
 import retrofit.Callback;
+import retrofit.RequestInterceptor;
 import retrofit.RestAdapter;
+import retrofit.converter.GsonConverter;
 import retrofit.http.GET;
 import retrofit.http.QueryMap;
 
@@ -18,11 +24,30 @@ public class TCCapabilityTokenProvider {
     interface TokenService {
         @GET("/access-token")
         void obtainTwilioCapabilityToken(@QueryMap Map<String, String> options, Callback<String> tokenCallback);
+
+        @GET("/ice")
+        void obtainTwilioIceServers(@QueryMap Map<String, String> options, Callback<TwilioIceResponse> tokenCallback);
+    }
+
+    private static class TwilioAuthorizationInterceptor implements RequestInterceptor {
+        private static final String AUTH_USERNAME = "twilio";
+        private static final String AUTH_PASSWORD = "video";
+
+        @Override
+        public void intercept(RequestFacade requestFacade) {
+            requestFacade.addHeader("Authorization", getAuthValue());
+        }
+
+        private String getAuthValue() {
+            final String authString = AUTH_USERNAME + ":" + AUTH_PASSWORD;
+            return "Basic " + Base64.encodeToString(authString.getBytes(), Base64.NO_WRAP);
+        }
     }
 
     private static TokenService tokenService = new RestAdapter.Builder()
             .setEndpoint("https://simple-signaling.appspot.com")
             .setRequestInterceptor(new TwilioAuthorizationInterceptor())
+            .setConverter(new GsonConverter(new GsonBuilder().create()))
             .build()
             .create(TokenService.class);
 
@@ -33,5 +58,12 @@ public class TCCapabilityTokenProvider {
         options.put("identity", username);
         options.put("ttl", TTL);
         tokenService.obtainTwilioCapabilityToken(options, callback);
+    }
+
+
+    public static void obtainTwilioIceServers(String realm, Callback<TwilioIceResponse> callback) {
+        HashMap<String,String> options = new HashMap<>();
+        options.put(REALM, realm);
+        tokenService.obtainTwilioIceServers(options, callback);
     }
 }

@@ -26,7 +26,6 @@ import com.tw.conv.testapp.TestAppApplication;
 import com.tw.conv.testapp.dialog.Dialog;
 import com.tw.conv.testapp.dialog.IceServersDialogFragment;
 import com.tw.conv.testapp.provider.TCCapabilityTokenProvider;
-import com.tw.conv.testapp.provider.TCIceServersProvider;
 import com.tw.conv.testapp.provider.TwilioIceResponse;
 import com.tw.conv.testapp.provider.TwilioIceServer;
 import com.tw.conv.testapp.util.IceOptionsHelper;
@@ -261,7 +260,7 @@ public class TCRegistrationActivity extends AppCompatActivity {
     }
 
     private void obtainTwilioIceServers(final String realm) {
-        TCIceServersProvider.obtainTwilioIceServers(realm, new Callback<TwilioIceResponse>() {
+        TCCapabilityTokenProvider.obtainTwilioIceServers(realm, new Callback<TwilioIceResponse>() {
             @Override
             public void success(TwilioIceResponse twilioIceResponse, Response response) {
                 iceServerProgressDialog.dismiss();
