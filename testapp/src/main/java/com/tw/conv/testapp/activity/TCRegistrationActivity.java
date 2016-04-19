@@ -5,6 +5,7 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
@@ -83,7 +84,9 @@ public class TCRegistrationActivity extends AppCompatActivity {
             requestPermissions();
         }
 
-        UpdateManager.register(this, TestAppApplication.HOCKEY_APP_ID);
+        if (!BuildConfig.DEBUG) {
+            UpdateManager.register(this, TestAppApplication.HOCKEY_APP_ID);
+        }
     }
 
     public boolean checkPermissions(){
@@ -129,9 +132,11 @@ public class TCRegistrationActivity extends AppCompatActivity {
                     Toast.LENGTH_LONG).show();
         }
         if(grantResults[2] == PackageManager.PERMISSION_GRANTED) {
-            // Perform registration once more when the external storage permission is granted
-            UpdateManager.unregister();
-            UpdateManager.register(this, TestAppApplication.HOCKEY_APP_ID);
+            if (!BuildConfig.DEBUG) {
+                // Perform registration once more when the external storage permission is granted
+                UpdateManager.unregister();
+                UpdateManager.register(this, TestAppApplication.HOCKEY_APP_ID);
+            }
         }
     }
 
@@ -144,7 +149,10 @@ public class TCRegistrationActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
-        UpdateManager.unregister();
+
+        if (!BuildConfig.DEBUG) {
+            UpdateManager.unregister();
+        }
     }
 
     private View.OnClickListener registrationClickListener() {
