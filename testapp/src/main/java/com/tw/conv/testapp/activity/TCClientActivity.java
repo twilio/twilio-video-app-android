@@ -198,7 +198,7 @@ public class TCClientActivity extends AppCompatActivity {
     private ListView twilioIceServersListView;
     private RelativeLayout iceOptionsLayout;
     private CheckBox enableIceCheckbox;
-
+    private CheckBox preferH264Checkbox;
 
     private static final Map<Integer, VideoDimensions> videoDimensionsMap;
     static {
@@ -428,7 +428,8 @@ public class TCClientActivity extends AppCompatActivity {
         enableIceCheckbox = (CheckBox)findViewById(R.id.enable_ice_checkbox);
         enableIceCheckbox.setChecked(false);
         enableIceCheckbox.setOnCheckedChangeListener(enableIceCheckedChangeListener());
-
+        preferH264Checkbox = (CheckBox) findViewById(R.id.prefer_h264_checkbox);
+        preferH264Checkbox.setChecked(preferH264);
 
         accessManager = TwilioAccessManagerFactory.createAccessManager(this, capabilityToken,
                 accessManagerListener());
