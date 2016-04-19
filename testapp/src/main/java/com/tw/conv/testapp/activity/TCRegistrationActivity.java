@@ -16,6 +16,7 @@ import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -51,13 +52,13 @@ public class TCRegistrationActivity extends AppCompatActivity {
     private ProgressDialog progressDialog;
     private TextView versionText;
     private Spinner realmSpinner;
+    private CheckBox preferH264Checkbox;
     private ProgressDialog iceServerProgressDialog;
     private TwilioIceResponse twilioIceResponse;
     private List<TwilioIceServer> selectedTwilioIceServers;
     private String iceTransportPolicy = "";
     private Button iceOptionsButton;
     private IceServersDialogFragment iceOptionsDialog;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,6 +72,7 @@ public class TCRegistrationActivity extends AppCompatActivity {
         versionText.setText(BuildConfig.VERSION_NAME);
 
         realmSpinner = (Spinner)findViewById(R.id.realm_spinner);
+        preferH264Checkbox = (CheckBox) findViewById(R.id.prefer_h264_checkbox);
         ArrayAdapter<CharSequence> spinnerAdapter = ArrayAdapter.createFromResource(this,
                         R.array.realm_array, android.R.layout.simple_spinner_dropdown_item);
         spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -316,6 +318,7 @@ public class TCRegistrationActivity extends AppCompatActivity {
         intent.putExtra(SimpleSignalingUtils.CAPABILITY_TOKEN, capabilityToken);
         intent.putExtra(SimpleSignalingUtils.REALM, realm);
         intent.putExtra(TwilioIceResponse.ICE_TRANSPORT_POLICY, iceTransportPolicy);
+        intent.putExtra(TCClientActivity.OPTION_PREFER_H264_KEY, preferH264Checkbox.isChecked());
         if (selectedTwilioIceServers != null) {
             intent.putExtra(TwilioIceResponse.ICE_SELECTED_SERVERS,
                     IceOptionsHelper.convertToJson(selectedTwilioIceServers));

@@ -120,6 +120,7 @@ public class TCClientActivity extends AppCompatActivity {
     private static final String ACTION_ACCEPT_INCOMING_CALL =
             "com.tw.conv.testapp.action.ACCEPT_INCOMING_CALL";
 
+    public static final String OPTION_PREFER_H264_KEY = "enable-h264";
     private static final String OPTION_DEV_REGISTRAR = "endpoint.dev.twilio.com";
     private static final String OPTION_DEV_STATS_URL = "https://eventgw.dev.twilio.com";
     private static final String OPTION_STAGE_REGISTRAR = "endpoint.stage.twilio.com";
@@ -142,6 +143,7 @@ public class TCClientActivity extends AppCompatActivity {
     private LinkedHashMap<String, RemoteVideoTrackStatsRecord>
             remoteVideoTrackStatsRecordMap = new LinkedHashMap<>();
     private RecyclerView remoteStatsRecyclerView;
+    private boolean preferH264;
 
     private enum AudioState {
         ENABLED,
@@ -407,6 +409,7 @@ public class TCClientActivity extends AppCompatActivity {
         getSupportActionBar().setTitle(username);
 
         realm = getIntent().getExtras().getString(SimpleSignalingUtils.REALM);
+        preferH264 = getIntent().getExtras().getBoolean(OPTION_PREFER_H264_KEY);
         Map<String, String> privateOptions = createPrivateOptions(realm);
         IceOptions iceOptions = getIceOptionsFromIntent();
         ClientOptionsInternal options = new ClientOptionsInternal(iceOptions, privateOptions);
@@ -579,6 +582,7 @@ public class TCClientActivity extends AppCompatActivity {
             options.put(OPTION_REGISTRAR_KEY, OPTION_STAGE_REGISTRAR);
             options.put(OPTION_STATS_KEY, OPTION_STAGE_STATS_URL);
         }
+        options.put(OPTION_PREFER_H264_KEY, preferH264 ? "true" : "false");
         return options;
     }
 
