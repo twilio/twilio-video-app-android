@@ -51,24 +51,28 @@ public class VideoTrackImpl implements VideoTrack {
 
     @Override
     public void addRenderer(VideoRenderer videoRenderer) {
-        org.webrtc.VideoRenderer webrtcVideoRenderer =
-                createWebRtcVideoRenderer(videoRenderer);
-        videoRenderersMap.put(videoRenderer, webrtcVideoRenderer);
-        videoTrack.addRenderer(webrtcVideoRenderer);
+        if (videoRenderer != null) {
+            org.webrtc.VideoRenderer webrtcVideoRenderer =
+                    createWebRtcVideoRenderer(videoRenderer);
+            videoRenderersMap.put(videoRenderer, webrtcVideoRenderer);
+            videoTrack.addRenderer(webrtcVideoRenderer);
+        }
     }
 
     @Override
     public void removeRenderer(VideoRenderer videoRenderer) {
-        org.webrtc.VideoRenderer webrtcVideoRenderer =
-                videoRenderersMap.remove(videoRenderer);
-        if (webrtcVideoRenderer != null) {
-            videoTrack.removeRenderer(webrtcVideoRenderer);
+        if (videoRenderer != null) {
+            org.webrtc.VideoRenderer webrtcVideoRenderer =
+                    videoRenderersMap.remove(videoRenderer);
+            if (webrtcVideoRenderer != null) {
+                videoTrack.removeRenderer(webrtcVideoRenderer);
+            }
         }
     }
 
     @Override
     public List<VideoRenderer> getRenderers() {
-        return new ArrayList<VideoRenderer>(videoRenderersMap.keySet());
+        return new ArrayList<>(videoRenderersMap.keySet());
     }
 
     private org.webrtc.VideoRenderer createWebRtcVideoRenderer(VideoRenderer videoRenderer) {
