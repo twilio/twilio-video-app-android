@@ -10,7 +10,7 @@ buildscript {
         }
     }
     dependencies {
-        classpath "com.android.tools.build:gradle-experimental:0.7.0-beta1"
+        classpath "com.android.tools.build:gradle-experimental:0.7.0-beta3"
     }
 }
 allprojects {

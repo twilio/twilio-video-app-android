@@ -656,7 +656,8 @@ public class TCClientActivity extends AppCompatActivity {
     }
 
     private void setCallAction() {
-        callActionFab.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_call_white_24px));
+        callActionFab.setImageDrawable(ContextCompat.getDrawable(this,
+                R.drawable.ic_call_white_24px));
         callActionFab.show();
         callActionFab.setOnClickListener(callClickListener());
         switchCameraActionFab.show();
@@ -670,7 +671,8 @@ public class TCClientActivity extends AppCompatActivity {
     }
 
     private void setHangupAction() {
-        callActionFab.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_call_end_white_24px));
+        callActionFab.setImageDrawable(ContextCompat.getDrawable(this,
+                R.drawable.ic_call_end_white_24px));
         callActionFab.show();
         callActionFab.setOnClickListener(hangupClickListener());
         addParticipantActionFab.show();
@@ -728,7 +730,8 @@ public class TCClientActivity extends AppCompatActivity {
                 @Override
                 public void success(TwilioIceResponse twilioIceResponse, Response response) {
                     IceServerAdapter iceServerAdapter =
-                            new IceServerAdapter(TCClientActivity.this, twilioIceResponse.getIceServers());
+                            new IceServerAdapter(TCClientActivity.this,
+                                    twilioIceResponse.getIceServers());
                     twilioIceServersListView.setAdapter(iceServerAdapter);
                 }
 
@@ -805,7 +808,7 @@ public class TCClientActivity extends AppCompatActivity {
                     NotificationManager notificationManager =
                             (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
-                    /**
+                    /*
                      * Pending intents are often reused and this results in some not being
                      * triggered correctly so we explicitly cancel any existing intents first.
                      * This is a known bug and workaround seen at
@@ -855,7 +858,7 @@ public class TCClientActivity extends AppCompatActivity {
 
     private TwilioAccessManagerListener accessManagerListener() {
         return new TwilioAccessManagerListener() {
-            /**
+            /*
              *  The token expiration event notifies the developer 3 minutes before
              *  token actually expires to allow the developer to request a new token
              */
@@ -946,7 +949,8 @@ public class TCClientActivity extends AppCompatActivity {
                     cameraCapturer.stopPreview();
                     if (localMedia != null) {
                         if (localMedia.getLocalVideoTracks().size() > 0) {
-                            localMedia.removeLocalVideoTrack(localMedia.getLocalVideoTracks().get(0));
+                            localMedia.removeLocalVideoTrack(localMedia
+                                    .getLocalVideoTracks().get(0));
                             pauseActionFab.hide();
                         }
                     } else {
@@ -1002,10 +1006,12 @@ public class TCClientActivity extends AppCompatActivity {
         if(localMedia != null && localMedia.getLocalVideoTracks().size() > 0 ) {
             if(localMedia.getLocalVideoTracks().get(0).isEnabled()) {
                 pauseActionFab.setImageDrawable(
-                        ContextCompat.getDrawable(TCClientActivity.this, R.drawable.ic_pause_green_24px));
+                        ContextCompat.getDrawable(TCClientActivity.this,
+                                R.drawable.ic_pause_green_24px));
             } else {
                 pauseActionFab.setImageDrawable(
-                        ContextCompat.getDrawable(TCClientActivity.this, R.drawable.ic_pause_red_24px));
+                        ContextCompat.getDrawable(TCClientActivity.this,
+                                R.drawable.ic_pause_red_24px));
             }
             pauseActionFab.show();
         } else {
@@ -1023,8 +1029,8 @@ public class TCClientActivity extends AppCompatActivity {
                         if(microphoneAdded) {
                             audioState = AudioState.ENABLED;
                         } else {
-                            Snackbar.make(conversationStatusTextView, "Adding microphone failed", Snackbar.LENGTH_LONG)
-                                    .setAction("Action", null).show();
+                            Snackbar.make(conversationStatusTextView, "Adding microphone failed",
+                                    Snackbar.LENGTH_LONG).setAction("Action", null).show();
                         }
                     } else {
                         audioState = AudioState.ENABLED;
@@ -1035,8 +1041,8 @@ public class TCClientActivity extends AppCompatActivity {
                         if(microphoneRemoved) {
                             audioState = AudioState.DISABLED;
                         } else {
-                            Snackbar.make(conversationStatusTextView, "Removing microphone failed", Snackbar.LENGTH_LONG)
-                                    .setAction("Action", null).show();
+                            Snackbar.make(conversationStatusTextView, "Removing microphone failed",
+                                    Snackbar.LENGTH_LONG).setAction("Action", null).show();
                         }
                     } else {
                         audioState = AudioState.DISABLED;
@@ -1050,12 +1056,15 @@ public class TCClientActivity extends AppCompatActivity {
     private void setAudioStateIcon() {
         if (audioState == AudioState.ENABLED) {
             audioActionFab.setImageDrawable(
-                    ContextCompat.getDrawable(TCClientActivity.this, R.drawable.ic_mic_white_24px));
+                    ContextCompat.getDrawable(TCClientActivity.this,
+                            R.drawable.ic_mic_white_24px));
         } else if (audioState == AudioState.DISABLED) {
             audioActionFab.setImageDrawable(
-                    ContextCompat.getDrawable(TCClientActivity.this, R.drawable.ic_mic_off_gray_24px));
+                    ContextCompat.getDrawable(TCClientActivity.this,
+                            R.drawable.ic_mic_off_gray_24px));
         }
-        if(audioState == AudioState.ENABLED && localMedia != null && localMedia.isMicrophoneAdded()) {
+        if(audioState == AudioState.ENABLED && localMedia != null &&
+                localMedia.isMicrophoneAdded()) {
             muteActionFab.show();
         } else {
             muteActionFab.hide();
@@ -1068,10 +1077,12 @@ public class TCClientActivity extends AppCompatActivity {
         if(set) {
             if (enable) {
                 muteActionFab.setImageDrawable(
-                        ContextCompat.getDrawable(TCClientActivity.this, R.drawable.ic_mic_red_24px));
+                        ContextCompat.getDrawable(TCClientActivity.this,
+                                R.drawable.ic_mic_red_24px));
             } else {
                 muteActionFab.setImageDrawable(
-                        ContextCompat.getDrawable(TCClientActivity.this, R.drawable.ic_mic_green_24px));
+                        ContextCompat.getDrawable(TCClientActivity.this,
+                                R.drawable.ic_mic_green_24px));
             }
         } else {
             Snackbar.make(conversationStatusTextView, "Mute action failed", Snackbar.LENGTH_LONG)
@@ -1116,7 +1127,6 @@ public class TCClientActivity extends AppCompatActivity {
 
     private DialogInterface.OnClickListener callParticipantClickListener(final EditText participantEditText) {
         return new DialogInterface.OnClickListener() {
-
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
                 stopPreview();
@@ -1140,13 +1150,16 @@ public class TCClientActivity extends AppCompatActivity {
                                         }
                                     } else {
                                         if (e.getErrorCode() == TwilioConversations.CONVERSATION_REJECTED) {
-                                            Snackbar.make(conversationStatusTextView, "Invite rejected", Snackbar.LENGTH_LONG)
+                                            Snackbar.make(conversationStatusTextView,
+                                                    "Invite rejected", Snackbar.LENGTH_LONG)
                                                     .setAction("Action", null).show();
                                         } else if (e.getErrorCode() == TwilioConversations.CONVERSATION_IGNORED) {
-                                            Snackbar.make(conversationStatusTextView, "Invite ignored", Snackbar.LENGTH_LONG)
+                                            Snackbar.make(conversationStatusTextView,
+                                                    "Invite ignored", Snackbar.LENGTH_LONG)
                                                     .setAction("Action", null).show();
                                         } else  {
-                                            Snackbar.make(conversationStatusTextView, e.getMessage(), Snackbar.LENGTH_LONG)
+                                            Snackbar.make(conversationStatusTextView,
+                                                    e.getMessage(), Snackbar.LENGTH_LONG)
                                                     .setAction("Action", null).show();
                                         }
 
@@ -1321,11 +1334,13 @@ public class TCClientActivity extends AppCompatActivity {
                 AudioOutput.HEADSET);
 
         if (on == true) {
-            Drawable drawable = ContextCompat.getDrawable(TCClientActivity.this, R.drawable.ic_volume_down_white_24px);
+            Drawable drawable = ContextCompat.getDrawable(TCClientActivity.this,
+                    R.drawable.ic_volume_down_white_24px);
             speakerActionFab.setImageDrawable(drawable);
         } else {
             // route back to headset
-            Drawable drawable = ContextCompat.getDrawable(TCClientActivity.this, R.drawable.ic_volume_down_gray_24px);
+            Drawable drawable = ContextCompat.getDrawable(TCClientActivity.this,
+                    R.drawable.ic_volume_down_gray_24px);
             speakerActionFab.setImageDrawable(drawable);
         }
     }
@@ -1366,8 +1381,10 @@ public class TCClientActivity extends AppCompatActivity {
     private ConversationListener conversationListener() {
         return new ConversationListener() {
             @Override
-            public void onParticipantConnected(Conversation conversation, Participant participant) {
-                conversationStatusTextView.setText("onParticipantConnected " + participant.getIdentity());
+            public void onParticipantConnected(Conversation conversation,
+                                               Participant participant) {
+                conversationStatusTextView.setText("onParticipantConnected " +
+                        participant.getIdentity());
                 videoLinearLayout.invalidate();
 
                 participant.setParticipantListener(participantListener());
@@ -1375,26 +1392,34 @@ public class TCClientActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onFailedToConnectParticipant(Conversation conversation, Participant participant, TwilioConversationsException e) {
+            public void onFailedToConnectParticipant(Conversation conversation,
+                                                     Participant participant,
+                                                     TwilioConversationsException e) {
                 Timber.e(e.getMessage());
-                conversationStatusTextView.setText("onFailedToConnectParticipant " + participant.getIdentity());
+                conversationStatusTextView.setText("onFailedToConnectParticipant " +
+                        participant.getIdentity());
             }
 
             @Override
-            public void onParticipantDisconnected(Conversation conversation, Participant participant) {
-                conversationStatusTextView.setText("onParticipantDisconnected " + participant.getIdentity());
+            public void onParticipantDisconnected(Conversation conversation,
+                                                  Participant participant) {
+                conversationStatusTextView.setText("onParticipantDisconnected " +
+                        participant.getIdentity());
             }
 
             @Override
-            public void onConversationEnded(Conversation conversation, TwilioConversationsException e) {
+            public void onConversationEnded(Conversation conversation,
+                                            TwilioConversationsException e) {
                 String status = "onConversationEnded";
                 if (e != null) {
                     status += " " + e.getMessage();
                     if(e.getErrorCode() == TwilioConversations.CONVERSATION_FAILED) {
-                        Snackbar.make(conversationStatusTextView, "Invite failed " + conversation.getSid(), Snackbar.LENGTH_LONG)
+                        Snackbar.make(conversationStatusTextView, "Invite failed " +
+                                conversation.getSid(), Snackbar.LENGTH_LONG)
                                 .setAction("Action", null).show();
                     } else if(e.getErrorCode() == TwilioConversations.CONVERSATION_REJECTED) {
-                        Snackbar.make(conversationStatusTextView, "Invite was rejected " + conversation.getSid(), Snackbar.LENGTH_LONG)
+                        Snackbar.make(conversationStatusTextView, "Invite was rejected " +
+                                conversation.getSid(), Snackbar.LENGTH_LONG)
                                 .setAction("Action", null).show();
                     }
                 }
@@ -1419,7 +1444,8 @@ public class TCClientActivity extends AppCompatActivity {
                 StringBuilder strBld = new StringBuilder();
                 strBld.append(
                         String.format("Receiving stats for sid: %s, trackId: %s, direction: %s ",
-                                stats.getParticipantSid(), stats.getTrackId(), stats.getDirection()));
+                                stats.getParticipantSid(), stats.getTrackId(),
+                                stats.getDirection()));
                 if (stats instanceof LocalAudioTrackStatsRecord) {
                     strBld.append(
                             String.format("media type: audio, bytes sent %d",
@@ -1448,7 +1474,10 @@ public class TCClientActivity extends AppCompatActivity {
                     if(conversation.getLocalMedia().getLocalVideoTracks().size() > 0) {
                         showLocalVideoTrackStats((LocalVideoTrackStatsRecord) stats);
                     } else {
-                        // Latent stats callbacks can be triggered even after a local track is removed.
+                        /*
+                         * Latent stats callbacks can be triggered even after a local track is
+                         * removed.
+                         */
                         statsLayout.setVisibility(View.GONE);
                     }
                 } else if(stats instanceof RemoteVideoTrackStatsRecord) {
@@ -1458,7 +1487,10 @@ public class TCClientActivity extends AppCompatActivity {
                     if(participant.getMedia().getVideoTracks().size() > 0) {
                         showRemoteVideoTrackStats(conversation, (RemoteVideoTrackStatsRecord)stats);
                     } else {
-                        // Latent stats callbacks can be triggered even after a remote track is removed.
+                        /*
+                         * Latent stats callbacks can be triggered even after a remote track is
+                         * removed.
+                         */
                         remoteVideoTrackStatsRecordMap.clear();
                         remoteVideoTrackStatsAdapter.notifyDataSetChanged();
                     }
@@ -1469,23 +1501,25 @@ public class TCClientActivity extends AppCompatActivity {
 
     private void showLocalVideoTrackStats(LocalVideoTrackStatsRecord localVideoTrackStatsRecord) {
         String localVideoStats =
-                String.format("<b>SID</b> %s<br/>", localVideoTrackStatsRecord.getParticipantSid()) +
-                        '\n' +
-                        String.format("<b>Codec</b> %s<br/>", localVideoTrackStatsRecord.getCodecName()) +
-                        '\n' +
-                        String.format("<b>Capture Dimensions</b> %s<br/>", localVideoTrackStatsRecord.getCaptureDimensions().toString()) +
-                        '\n' +
-                        String.format("<b>Sent Dimensions</b> %s<br/>", localVideoTrackStatsRecord.getSentDimensions().toString()) +
-                        '\n' +
+                String.format("<b>SID</b> %s<br/>",
+                        localVideoTrackStatsRecord.getParticipantSid()) + '\n' +
+                        String.format("<b>Codec</b> %s<br/>",
+                                localVideoTrackStatsRecord.getCodecName()) + '\n' +
+                        String.format("<b>Capture Dimensions</b> %s<br/>",
+                                localVideoTrackStatsRecord.getCaptureDimensions().toString()) +
+                        '\n' + String.format("<b>Sent Dimensions</b> %s<br/>",
+                                localVideoTrackStatsRecord.getSentDimensions().toString()) + '\n' +
                         String.format("<b>Fps</b> %d", localVideoTrackStatsRecord.getFrameRate());
 
         localVideoTrackStatsTextView.setText(Html.fromHtml(localVideoStats));
     }
 
-    private void showRemoteVideoTrackStats(Conversation conversation, RemoteVideoTrackStatsRecord remoteVideoTrackStatsRecord) {
+    private void showRemoteVideoTrackStats(Conversation conversation,
+                                           RemoteVideoTrackStatsRecord remoteVideoTrackStatsRecord) {
         for(Participant participant: conversation.getParticipants()) {
             if(participant.getSid().equals(remoteVideoTrackStatsRecord.getParticipantSid())) {
-                remoteVideoTrackStatsRecordMap.put(participant.getIdentity(), remoteVideoTrackStatsRecord);
+                remoteVideoTrackStatsRecordMap.put(participant.getIdentity(),
+                        remoteVideoTrackStatsRecord);
                 remoteVideoTrackStatsAdapter.notifyDataSetChanged();
                 break;
             }
@@ -1495,7 +1529,9 @@ public class TCClientActivity extends AppCompatActivity {
     private ParticipantListener participantListener() {
         return new ParticipantListener() {
             @Override
-            public void onVideoTrackAdded(Conversation conversation, Participant participant, VideoTrack videoTrack) {
+            public void onVideoTrackAdded(Conversation conversation,
+                                          Participant participant,
+                                          VideoTrack videoTrack) {
                 Timber.i("onVideoTrackAdded " + participant.getIdentity());
                 conversationStatusTextView.setText("onVideoTrackAdded " + participant.getIdentity());
                 if (availableContainers.isEmpty()) {
@@ -1507,7 +1543,8 @@ public class TCClientActivity extends AppCompatActivity {
                 participantContainers.put(participant, participantContainer);
 
                 // Remote participant
-                participantVideoRenderer = new VideoViewRenderer(TCClientActivity.this, participantContainer);
+                participantVideoRenderer = new VideoViewRenderer(TCClientActivity.this,
+                        participantContainer);
                 participantVideoRenderer.setObserver(new VideoRendererObserver() {
                     @Override
                     public void onFirstFrame() {
@@ -1526,9 +1563,12 @@ public class TCClientActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onVideoTrackRemoved(Conversation conversation, Participant participant, VideoTrack videoTrack) {
+            public void onVideoTrackRemoved(Conversation conversation,
+                                            Participant participant,
+                                            VideoTrack videoTrack) {
                 Timber.i("onVideoTrackRemoved " + participant.getIdentity());
-                conversationStatusTextView.setText("onVideoTrackRemoved " + participant.getIdentity());
+                conversationStatusTextView.setText("onVideoTrackRemoved " +
+                        participant.getIdentity());
                 ViewGroup participantContainer = participantContainers.remove(participant);
                 if (participantContainer != null) {
                     participantContainer.removeAllViews();
@@ -1539,23 +1579,30 @@ public class TCClientActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onAudioTrackAdded(Conversation conversation, Participant participant, AudioTrack audioTrack) {
+            public void onAudioTrackAdded(Conversation conversation,
+                                          Participant participant,
+                                          AudioTrack audioTrack) {
                 Timber.i("onAudioTrackAdded " + participant.getIdentity());
             }
 
             @Override
-            public void onAudioTrackRemoved(Conversation conversation, Participant participant, AudioTrack audioTrack) {
+            public void onAudioTrackRemoved(Conversation conversation,
+                                            Participant participant,
+                                            AudioTrack audioTrack) {
                 Timber.i("onAudioTrackRemoved " + participant.getIdentity());
             }
 
             @Override
-            public void onTrackEnabled(Conversation conversation, Participant participant, MediaTrack mediaTrack) {
+            public void onTrackEnabled(Conversation conversation,
+                                       Participant participant,
+                                       MediaTrack mediaTrack) {
                 Timber.i("onTrackEnabled " + participant.getIdentity());
 
                 for(VideoTrack videoTrack : participant.getMedia().getVideoTracks()) {
                     if(videoTrack.getTrackId().equals(mediaTrack.getTrackId())) {
                         ViewGroup participantContainer = participantContainers.get(participant);
-                        List<View> trackStatusViews = getViewsByTag(participantContainer, mediaTrack.getTrackId());
+                        List<View> trackStatusViews = getViewsByTag(participantContainer,
+                                mediaTrack.getTrackId());
                         for(View trackStatusView: trackStatusViews) {
                             participantContainer.removeView(trackStatusView);
                         }
@@ -1566,9 +1613,13 @@ public class TCClientActivity extends AppCompatActivity {
                 for(AudioTrack audioTrack: participant.getMedia().getAudioTracks()) {
                     if(audioTrack.getTrackId().equals(mediaTrack.getTrackId())) {
                         ViewGroup participantContainer = participantContainers.get(participant);
-                        // If the conversation does not have a video track, there is no participant container available
+                        /*
+                         * If the conversation does not have a video track,
+                         * there is no participant container available
+                         */
                         if(participantContainer != null) {
-                            List<View> trackStatusViews = getViewsByTag(participantContainer, mediaTrack.getTrackId());
+                            List<View> trackStatusViews = getViewsByTag(participantContainer,
+                                    mediaTrack.getTrackId());
                             for (View trackStatusView : trackStatusViews) {
                                 participantContainer.removeView(trackStatusView);
                             }
@@ -1579,9 +1630,9 @@ public class TCClientActivity extends AppCompatActivity {
             }
 
             private ArrayList<View> getViewsByTag(ViewGroup root, String tag){
-                ArrayList<View> views = new ArrayList<View>();
+                ArrayList<View> views = new ArrayList<>();
                 final int childCount = root.getChildCount();
-                for (int i = 0; i < childCount; i++) {
+                for (int i = 0 ; i < childCount ; i++) {
                     final View child = root.getChildAt(i);
                     if (child instanceof ViewGroup) {
                         views.addAll(getViewsByTag((ViewGroup) child, tag));
@@ -1597,7 +1648,9 @@ public class TCClientActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onTrackDisabled(Conversation conversation, Participant participant, MediaTrack mediaTrack) {
+            public void onTrackDisabled(Conversation conversation,
+                                        Participant participant,
+                                        MediaTrack mediaTrack) {
                 Timber.i("onTrackDisabled " + participant.getIdentity());
 
                 for(VideoTrack videoTrack : participant.getMedia().getVideoTracks()) {
@@ -1606,7 +1659,9 @@ public class TCClientActivity extends AppCompatActivity {
                         ImageView disabledView = new ImageView(TCClientActivity.this);
                         disabledView.setTag(mediaTrack.getTrackId());
                         disabledView.setBackgroundResource(R.drawable.ic_videocam_off_red_24px);
-                        RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                        RelativeLayout.LayoutParams layoutParams = new RelativeLayout
+                                .LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
+                                ViewGroup.LayoutParams.WRAP_CONTENT);
                         layoutParams.addRule(RelativeLayout.CENTER_IN_PARENT);
                         disabledView.setLayoutParams(layoutParams);
                         participantContainer.addView(disabledView);
@@ -1617,12 +1672,17 @@ public class TCClientActivity extends AppCompatActivity {
                 for(AudioTrack audioTrack : participant.getMedia().getAudioTracks()) {
                     if(audioTrack.getTrackId().equals(mediaTrack.getTrackId())) {
                         ViewGroup participantContainer = participantContainers.get(participant);
-                        // If the conversation does not have a video track, there is no participant container available
+                        /*
+                         * If the conversation does not have a video track,
+                         * there is no participant container available
+                         */
                         if(participantContainer != null) {
                             ImageView disabledView = new ImageView(TCClientActivity.this);
                             disabledView.setTag(mediaTrack.getTrackId());
                             disabledView.setBackgroundResource(R.drawable.ic_mic_off_red_24px);
-                            RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                            RelativeLayout.LayoutParams layoutParams = new RelativeLayout
+                                    .LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
+                                    ViewGroup.LayoutParams.WRAP_CONTENT);
                             layoutParams.addRule(RelativeLayout.CENTER_HORIZONTAL);
                             disabledView.setLayoutParams(layoutParams);
                             participantContainer.addView(disabledView);
@@ -1638,7 +1698,8 @@ public class TCClientActivity extends AppCompatActivity {
     private LocalMediaListener localMediaListener() {
         return new LocalMediaListener() {
             @Override
-            public void onLocalVideoTrackAdded(LocalMedia localMedia, LocalVideoTrack localVideoTrack) {
+            public void onLocalVideoTrackAdded(LocalMedia localMedia,
+                                               LocalVideoTrack localVideoTrack) {
                 videoState = VideoState.ENABLED;
                 conversationStatusTextView.setText("onLocalVideoTrackAdded");
                 localRenderer = new VideoViewRenderer(TCClientActivity.this,
@@ -1652,7 +1713,8 @@ public class TCClientActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onLocalVideoTrackRemoved(LocalMedia localMedia, LocalVideoTrack localVideoTrack) {
+            public void onLocalVideoTrackRemoved(LocalMedia localMedia,
+                                                 LocalVideoTrack localVideoTrack) {
                 videoState = VideoState.DISABLED;
                 conversationStatusTextView.setText("onLocalVideoTrackRemoved");
                 localContainer.removeAllViews();
@@ -1662,7 +1724,9 @@ public class TCClientActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onLocalVideoTrackError(LocalMedia localMedia, LocalVideoTrack localVideoTrack, TwilioConversationsException e) {
+            public void onLocalVideoTrackError(LocalMedia localMedia,
+                                               LocalVideoTrack localVideoTrack,
+                                               TwilioConversationsException e) {
                 setVideoStateIcon();
                 Snackbar.make(conversationStatusTextView, e.getMessage(), Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
@@ -1727,8 +1791,10 @@ public class TCClientActivity extends AppCompatActivity {
 
                     @Override
                     public void failure(RetrofitError error) {
-                        Timber.e("Error fetching new capability token: " + error.getLocalizedMessage());
-                        conversationsClientStatusTextView.setText("failure to obtain capability token");
+                        Timber.e("Error fetching new capability token: " +
+                                error.getLocalizedMessage());
+                        conversationsClientStatusTextView
+                                .setText("failure to obtain capability token");
                     }
                 });
 
