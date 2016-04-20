@@ -185,7 +185,23 @@
                     android:text="@string/enable_ice"/>
 
             </LinearLayout>
+
             <include layout="@layout/ice_options_layout"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/prefer_h264"
+                android:textSize="15sp"
+                android:layout_marginTop="@dimen/activity_horizontal_margin"
+                android:layout_marginLeft="@dimen/activity_horizontal_margin" />
+            <CheckBox
+                android:id="@+id/prefer_h264_checkbox"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:layout_marginLeft="@dimen/activity_horizontal_margin"
+                android:enabled="false"/>
 
         </LinearLayout>
 
