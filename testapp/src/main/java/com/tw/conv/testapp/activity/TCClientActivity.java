@@ -98,6 +98,7 @@ import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -163,7 +164,7 @@ public class TCClientActivity extends AppCompatActivity {
     private AlertDialog alertDialog;
     private TextView conversationsClientStatusTextView;
     private TextView conversationStatusTextView;
-    private VideoViewRenderer participantVideoRenderer;
+    private Map<Participant, VideoViewRenderer> participantVideoRenderers = new HashMap<>();
     private FloatingActionButton callActionFab;
     private FloatingActionButton switchCameraActionFab;
     private FloatingActionButton localVideoActionFab;
@@ -1548,7 +1549,7 @@ public class TCClientActivity extends AppCompatActivity {
                 participantContainers.put(participant, participantContainer);
 
                 // Remote participant
-                participantVideoRenderer = new VideoViewRenderer(TCClientActivity.this,
+                VideoViewRenderer participantVideoRenderer = new VideoViewRenderer(TCClientActivity.this,
                         participantContainer);
                 participantVideoRenderer.setObserver(new VideoRendererObserver() {
                     @Override
@@ -1564,6 +1565,7 @@ public class TCClientActivity extends AppCompatActivity {
                                 " ]");
                     }
                 });
+                participantVideoRenderers.put(participant, participantVideoRenderer);
                 videoTrack.addRenderer(participantVideoRenderer);
             }
 
@@ -1574,6 +1576,11 @@ public class TCClientActivity extends AppCompatActivity {
                 Timber.i("onVideoTrackRemoved " + participant.getIdentity());
                 conversationStatusTextView.setText("onVideoTrackRemoved " +
                         participant.getIdentity());
+                VideoViewRenderer participantVideoRenderer = participantVideoRenderers
+                        .remove(participant);
+                if (participantVideoRenderer != null) {
+                    participantVideoRenderer.release();
+                }
                 ViewGroup participantContainer = participantContainers.remove(participant);
                 if (participantContainer != null) {
                     participantContainer.removeAllViews();
@@ -1723,6 +1730,7 @@ public class TCClientActivity extends AppCompatActivity {
                 videoState = VideoState.DISABLED;
                 conversationStatusTextView.setText("onLocalVideoTrackRemoved");
                 localContainer.removeAllViews();
+                localRenderer.release();
                 setVideoStateIcon();
                 setAudioStateIcon();
                 statsLayout.setVisibility(View.GONE);
@@ -1741,9 +1749,10 @@ public class TCClientActivity extends AppCompatActivity {
     }
 
     private void reset() {
-        if(participantVideoRenderer != null) {
-            participantVideoRenderer = null;
+        for (VideoViewRenderer participantVideoRenderer : participantVideoRenderers.values()) {
+            participantVideoRenderer.release();
         }
+        participantVideoRenderers.clear();
         localContainer.removeAllViews();
         for (ViewGroup participantContainer : participantContainers.values()) {
             availableContainers.add(participantContainer);
