@@ -2,6 +2,8 @@ package com.twilio.conversations.impl;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 
 import org.webrtc.VideoCapturerAndroid;
 import org.webrtc.VideoCapturerAndroid.CameraEventsHandler;
@@ -189,9 +191,21 @@ public class CameraCapturerImpl implements CameraCapturer {
         return nativeVideoCapturerAndroid;
     }
 
+    /*
+     * We can go idle and switch to preview at this point. Disposal will happen
+     * when the conversation is disposed
+     */
     void resetNativeVideoCapturer() {
-        nativeVideoCapturerAndroid = 0;
         capturerState = CapturerState.IDLE;
+    }
+
+    /*
+     * We own the last remnants of the capturer so when the conversation is disposed we dispose
+     * of the capturer.
+     */
+    void dispose() {
+        disposeCapturer(nativeVideoCapturerAndroid);
+        nativeVideoCapturerAndroid = 0;
     }
 
     private synchronized void startPreviewInternal() {
@@ -247,16 +261,17 @@ public class CameraCapturerImpl implements CameraCapturer {
         long nativeHandle = 0;
 
         try {
-            Field field = videoCapturerAndroid.getClass()
-                    .getSuperclass().getDeclaredField("nativeVideoCapturer");
-            field.setAccessible(true);
-            nativeHandle = field.getLong(videoCapturerAndroid);
-        } catch (NoSuchFieldException e) {
-            throw new RuntimeException("Unable to get nativeVideoCapturer field: " +
-                    e.getMessage());
+            Method takeNativeVideoCapturerMethod = videoCapturerAndroid.getClass()
+                    .getSuperclass().getDeclaredMethod("takeNativeVideoCapturer");
+            takeNativeVideoCapturerMethod.setAccessible(true);
+            nativeHandle = (long) takeNativeVideoCapturerMethod.invoke(videoCapturerAndroid);
         } catch (IllegalAccessException e) {
             throw new RuntimeException("Unable to access nativeVideoCapturer field: " +
                     e.getMessage());
+        } catch (NoSuchMethodException e) {
+            e.printStackTrace();
+        } catch (InvocationTargetException e) {
+            e.printStackTrace();
         }
 
         return nativeHandle;
@@ -417,4 +432,5 @@ public class CameraCapturerImpl implements CameraCapturer {
 
     private native void stopVideoSource(long nativeSession);
     private native void restartVideoSource(long nativeSession);
+    private native void disposeCapturer(long nativeVideoCapturerAndroid);
 }

@@ -1,3 +1,4 @@
+#include <talk/app/webrtc/androidvideocapturer.h>
 #include "com_twilio_conversations_impl_CameraCapturerImpl.h"
 #include "talk/app/webrtc/java/jni/jni_helpers.h"
 #include "TSCoreSDKTypes.h"
@@ -27,5 +28,11 @@ JNIEXPORT void JNICALL Java_com_twilio_conversations_impl_CameraCapturerImpl_res
     TS_CORE_LOG_MODULE(kTSCoreLogModulePlatform, kTSCoreLogLevelDebug, "stopVideoSource");
     TSCSessionPtr *session = reinterpret_cast<TSCSessionPtr *>(nativeSession);
     session->get()->restartVideoSource();
+}
+
+JNIEXPORT void JNICALL
+Java_com_twilio_conversations_impl_CameraCapturerImpl_disposeCapturer(JNIEnv *env, jobject instance,
+                                                                      jlong nativeVideoCapturerAndroid) {
+    delete reinterpret_cast<webrtc::AndroidVideoCapturerDelegate *>(nativeVideoCapturerAndroid);
 }
 
