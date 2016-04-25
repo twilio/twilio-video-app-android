@@ -110,8 +110,8 @@ public class LocalMediaImpl implements LocalMedia {
             // This leaves responsibility to a user to unpause the capturer, which user doesn't have to do
             // during initial creation. This is inconsistent behavior and it should be more investigated.
             CameraCapturerImpl cameraCapturerImpl = (CameraCapturerImpl)localVideoTrackImpl.getCameraCapturer();
-            long nativeVideoCapturer = cameraCapturerImpl.getNativeVideoCapturer();
-            if(nativeVideoCapturer == 0) {
+            if(cameraCapturerImpl.getCapturerState() !=
+                    CameraCapturerImpl.CapturerState.BROADCASTING) {
                 logger.d("Create a new external capturer since the nativeVideoCapturer is no longer valid");
                 convWeak.get().setupExternalCapturer();
             }

@@ -32,7 +32,7 @@ public class CameraCapturerImpl implements CameraCapturer {
     static final Logger logger = Logger.getLogger(CameraCapturerImpl.class);
     private long session;
 
-    private enum CapturerState {
+    enum CapturerState {
         IDLE,
         PREVIEWING,
         BROADCASTING
@@ -139,7 +139,7 @@ public class CameraCapturerImpl implements CameraCapturer {
         return capturerState.equals(CapturerState.PREVIEWING);
     }
 
-    /**
+    /*
      * Called internally prior to a session being started to setup
      * the capturer used during a Conversation.
      */
@@ -149,7 +149,9 @@ public class CameraCapturerImpl implements CameraCapturer {
         if(isPreviewing()) {
             stopPreview();
         }
-        createVideoCapturerAndroid();
+        if (nativeVideoCapturerAndroid == 0) {
+            createVideoCapturerAndroid();
+        }
         capturerState = CapturerState.BROADCASTING;
     }
 
@@ -189,6 +191,10 @@ public class CameraCapturerImpl implements CameraCapturer {
 
     long getNativeVideoCapturer()  {
         return nativeVideoCapturerAndroid;
+    }
+
+    CapturerState getCapturerState() {
+        return capturerState;
     }
 
     /*
@@ -279,7 +285,7 @@ public class CameraCapturerImpl implements CameraCapturer {
 
     private void createVideoCapturerAndroid() {
         String deviceName = CameraEnumerationAndroid.getDeviceName(cameraId);
-        if(deviceName == null && listener != null) {
+        if (deviceName == null && listener != null) {
             listener.onError(new CapturerException(ExceptionDomain.CAMERA,
                     "Camera device not found"));
             return;
@@ -287,7 +293,6 @@ public class CameraCapturerImpl implements CameraCapturer {
         videoCapturerAndroid = VideoCapturerAndroid.create(deviceName, cameraEventsHandler);
         nativeVideoCapturerAndroid = retrieveNativeVideoCapturerAndroid(videoCapturerAndroid);
     }
-
 
     private final CameraEventsHandler cameraEventsHandler = new CameraEventsHandler() {
         @Override
