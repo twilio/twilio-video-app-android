@@ -84,16 +84,23 @@ public class VideoViewRenderer implements VideoRenderer {
         this.rendererObserver = rendererObserver;
     }
 
-    private void setupRenderer(final Context context, final ViewGroup container) {
-        container.addView(surfaceViewRenderer);
-        surfaceViewRenderer.init(EglBaseProvider.provideEglBase().getContext(),
-                internalEventListener);
-        surfaceViewRenderer.setScalingType(convertToWebRtcScaleType(videoScaleType));
+    /**
+     * Releases resources associated with the video renderer
+     */
+    public void release() {
+        surfaceViewRenderer.release();
     }
 
     @Override
     public void renderFrame(I420Frame frame) {
         surfaceViewRenderer.renderFrame(convertToWebRtcFrame(frame));
+    }
+
+    private void setupRenderer(final Context context, final ViewGroup container) {
+        container.addView(surfaceViewRenderer);
+        surfaceViewRenderer.init(EglBaseProvider.provideEglBase().getContext(),
+                internalEventListener);
+        surfaceViewRenderer.setScalingType(convertToWebRtcScaleType(videoScaleType));
     }
 
     private void refreshRenderer() {

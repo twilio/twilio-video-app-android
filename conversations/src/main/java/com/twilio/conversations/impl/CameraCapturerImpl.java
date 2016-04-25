@@ -2,6 +2,8 @@ package com.twilio.conversations.impl;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 
 import org.webrtc.VideoCapturerAndroid;
 import org.webrtc.VideoCapturerAndroid.CameraEventsHandler;
@@ -30,7 +32,7 @@ public class CameraCapturerImpl implements CameraCapturer {
     static final Logger logger = Logger.getLogger(CameraCapturerImpl.class);
     private long session;
 
-    private enum CapturerState {
+    enum CapturerState {
         IDLE,
         PREVIEWING,
         BROADCASTING
@@ -137,7 +139,7 @@ public class CameraCapturerImpl implements CameraCapturer {
         return capturerState.equals(CapturerState.PREVIEWING);
     }
 
-    /**
+    /*
      * Called internally prior to a session being started to setup
      * the capturer used during a Conversation.
      */
@@ -147,7 +149,9 @@ public class CameraCapturerImpl implements CameraCapturer {
         if(isPreviewing()) {
             stopPreview();
         }
-        createVideoCapturerAndroid();
+        if (nativeVideoCapturerAndroid == 0) {
+            createVideoCapturerAndroid();
+        }
         capturerState = CapturerState.BROADCASTING;
     }
 
@@ -189,9 +193,25 @@ public class CameraCapturerImpl implements CameraCapturer {
         return nativeVideoCapturerAndroid;
     }
 
+    CapturerState getCapturerState() {
+        return capturerState;
+    }
+
+    /*
+     * We can go idle and switch to preview at this point. Disposal will happen
+     * when the conversation is disposed
+     */
     void resetNativeVideoCapturer() {
-        nativeVideoCapturerAndroid = 0;
         capturerState = CapturerState.IDLE;
+    }
+
+    /*
+     * We own the last remnants of the capturer so when the conversation is disposed we dispose
+     * of the capturer.
+     */
+    void dispose() {
+        disposeCapturer(nativeVideoCapturerAndroid);
+        nativeVideoCapturerAndroid = 0;
     }
 
     private synchronized void startPreviewInternal() {
@@ -247,15 +267,18 @@ public class CameraCapturerImpl implements CameraCapturer {
         long nativeHandle = 0;
 
         try {
-            Field field = videoCapturerAndroid.getClass()
-                    .getSuperclass().getDeclaredField("nativeVideoCapturer");
-            field.setAccessible(true);
-            nativeHandle = field.getLong(videoCapturerAndroid);
-        } catch (NoSuchFieldException e) {
-            throw new RuntimeException("Unable to get nativeVideoCapturer field: " +
-                    e.getMessage());
+            Method takeNativeVideoCapturerMethod = videoCapturerAndroid.getClass()
+                    .getSuperclass().getDeclaredMethod("takeNativeVideoCapturer");
+            takeNativeVideoCapturerMethod.setAccessible(true);
+            nativeHandle = (long) takeNativeVideoCapturerMethod.invoke(videoCapturerAndroid);
         } catch (IllegalAccessException e) {
             throw new RuntimeException("Unable to access nativeVideoCapturer field: " +
+                    e.getMessage());
+        } catch (NoSuchMethodException e) {
+            throw new RuntimeException("Unable to retrieve nativeVideoCapturer field: " +
+                    e.getMessage());
+        } catch (InvocationTargetException e) {
+            throw new RuntimeException("Unable to request nativeVideoCapturer field: " +
                     e.getMessage());
         }
 
@@ -264,7 +287,7 @@ public class CameraCapturerImpl implements CameraCapturer {
 
     private void createVideoCapturerAndroid() {
         String deviceName = CameraEnumerationAndroid.getDeviceName(cameraId);
-        if(deviceName == null && listener != null) {
+        if (deviceName == null && listener != null) {
             listener.onError(new CapturerException(ExceptionDomain.CAMERA,
                     "Camera device not found"));
             return;
@@ -272,7 +295,6 @@ public class CameraCapturerImpl implements CameraCapturer {
         videoCapturerAndroid = VideoCapturerAndroid.create(deviceName, cameraEventsHandler);
         nativeVideoCapturerAndroid = retrieveNativeVideoCapturerAndroid(videoCapturerAndroid);
     }
-
 
     private final CameraEventsHandler cameraEventsHandler = new CameraEventsHandler() {
         @Override
@@ -417,4 +439,5 @@ public class CameraCapturerImpl implements CameraCapturer {
 
     private native void stopVideoSource(long nativeSession);
     private native void restartVideoSource(long nativeSession);
+    private native void disposeCapturer(long nativeVideoCapturerAndroid);
 }

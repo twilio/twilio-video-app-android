@@ -54,6 +54,7 @@ public class ConversationImpl implements Conversation,
     private ConversationStateObserver conversationStateObserver;
     private Map<String,ParticipantImpl> participantMap = new HashMap<>();
     private LocalMediaImpl localMediaImpl;
+    private CameraCapturerImpl cameraCapturer;
     private Handler handler;
     private IncomingInviteImpl incomingInviteImpl;
     private OutgoingInviteImpl outgoingInviteImpl;
@@ -817,7 +818,7 @@ public class ConversationImpl implements Conversation,
         LocalVideoTrack localVideoTrack = localMediaImpl.getLocalVideoTracks().get(0);
         // TODO: Camera capture is the only supported local video stream for now.
         // Once we start supporting screen share or etc, we should modify this method.
-        CameraCapturerImpl cameraCapturer = (CameraCapturerImpl)localVideoTrack.getCameraCapturer();
+        cameraCapturer = (CameraCapturerImpl)localVideoTrack.getCameraCapturer();
         cameraCapturer.startConversationCapturer(nativeSession);
         setExternalCapturer(nativeSession, cameraCapturer.getNativeVideoCapturer());
     }
@@ -933,6 +934,10 @@ public class ConversationImpl implements Conversation,
         }
         if(conversationsClient.getActiveConversationsCount() == 0) {
             EglBaseProvider.releaseEglBase();
+        }
+        if (cameraCapturer != null) {
+            cameraCapturer.dispose();
+            cameraCapturer = null;
         }
     }
 

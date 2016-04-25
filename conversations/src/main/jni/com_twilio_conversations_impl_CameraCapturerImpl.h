@@ -14,6 +14,10 @@ JNIEXPORT void JNICALL Java_com_twilio_conversations_impl_CameraCapturerImpl_sto
 JNIEXPORT void JNICALL Java_com_twilio_conversations_impl_CameraCapturerImpl_restartVideoSource
         (JNIEnv *, jobject, jlong);
 
+JNIEXPORT void JNICALL
+Java_com_twilio_conversations_impl_CameraCapturerImpl_disposeCapturer(JNIEnv *env, jobject instance,
+                                                                      jlong nativeVideoCapturerAndroid);
+
 #ifdef __cplusplus
 }
 #endif
