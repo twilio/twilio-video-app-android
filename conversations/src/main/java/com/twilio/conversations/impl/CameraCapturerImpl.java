@@ -4,8 +4,6 @@ import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.LinkedList;
-import java.util.List;
 
 import org.webrtc.VideoCapturerAndroid;
 import org.webrtc.VideoCapturerAndroid.CameraEventsHandler;
@@ -55,7 +53,6 @@ public class CameraCapturerImpl implements CameraCapturer {
     private VideoCapturerAndroid videoCapturerAndroid;
     private CapturerErrorListener listener;
     private long nativeVideoCapturerAndroid;
-    private List<Long> oldNativeCapturers = new LinkedList<>();
     private boolean broadcastCapturerPaused = false;
 
     private CameraCapturerImpl(Context context,
@@ -200,9 +197,6 @@ public class CameraCapturerImpl implements CameraCapturer {
      */
     void resetNativeVideoCapturer() {
         capturerState = CapturerState.IDLE;
-        long oldNativeCapturer = nativeVideoCapturerAndroid;
-        oldNativeCapturers.add(oldNativeCapturer);
-        nativeVideoCapturerAndroid = 0;
     }
 
     /*
@@ -210,10 +204,6 @@ public class CameraCapturerImpl implements CameraCapturer {
      * of the capturer.
      */
     void dispose() {
-        for (Long oldNativeCapturer : oldNativeCapturers) {
-            disposeCapturer(oldNativeCapturer);
-        }
-        oldNativeCapturers.clear();
         disposeCapturer(nativeVideoCapturerAndroid);
         nativeVideoCapturerAndroid = 0;
     }
