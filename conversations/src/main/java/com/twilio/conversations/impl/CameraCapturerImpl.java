@@ -275,9 +275,11 @@ public class CameraCapturerImpl implements CameraCapturer {
             throw new RuntimeException("Unable to access nativeVideoCapturer field: " +
                     e.getMessage());
         } catch (NoSuchMethodException e) {
-            e.printStackTrace();
+            throw new RuntimeException("Unable to retrieve nativeVideoCapturer field: " +
+                    e.getMessage());
         } catch (InvocationTargetException e) {
-            e.printStackTrace();
+            throw new RuntimeException("Unable to request nativeVideoCapturer field: " +
+                    e.getMessage());
         }
 
         return nativeHandle;
