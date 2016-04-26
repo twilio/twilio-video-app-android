@@ -13,7 +13,6 @@ import java.util.Set;
 
 public class OutgoingInviteImpl implements OutgoingInvite {
     static final Logger logger = Logger.getLogger(OutgoingInviteImpl.class);
-    private final Handler handler;
 
     private ConversationsClientImpl conversationsClientImpl;
     private ConversationImpl conversationImpl;
@@ -27,10 +26,6 @@ public class OutgoingInviteImpl implements OutgoingInvite {
         this.conversationsClientImpl = conversationsClientImpl;
         this.conversationCallback = conversationCallback;
         this.inviteStatus = InviteStatus.PENDING;
-        this.handler = CallbackHandler.create();
-        if(handler == null) {
-            throw new IllegalThreadStateException("This thread must be able to obtain a Looper");
-        }
     }
 
     static OutgoingInviteImpl create(ConversationsClientImpl conversationsClientImpl,
@@ -46,10 +41,6 @@ public class OutgoingInviteImpl implements OutgoingInvite {
             return null;
         }
         return new OutgoingInviteImpl(conversationsClientImpl, conversationImpl, conversationCallback);
-    }
-
-    Handler getHandler() {
-        return handler;
     }
 
     void setStatus(InviteStatus inviteStatus) {

@@ -112,7 +112,8 @@ public class ConversationImpl implements Conversation,
                              Set<String> participants,
                              LocalMedia localMedia,
                              ConversationListener conversationListener,
-                             ConversationStateObserver conversationStateObserver) {
+                             ConversationStateObserver conversationStateObserver,
+                             Handler handler) {
         this.conversationsClient = conversationsClient;
         this.invitedParticipants = participants;
 
@@ -122,7 +123,7 @@ public class ConversationImpl implements Conversation,
             participantIdentityArray[i++] = participant;
         }
 
-        handler = CallbackHandler.create();
+        this.handler = handler;
         if(handler == null) {
             throw new IllegalThreadStateException("This thread must be able to obtain a Looper");
         }
@@ -155,7 +156,8 @@ public class ConversationImpl implements Conversation,
     private ConversationImpl(ConversationsClientImpl conversationsClient,
                              long nativeSession,
                              String[] participantsIdentities,
-                             ConversationStateObserver conversationStateObserver) {
+                             ConversationStateObserver conversationStateObserver,
+                             Handler handler) {
         this.conversationsClient = conversationsClient;
         this.conversationStateObserver = conversationStateObserver;
         this.nativeSession = nativeSession;
@@ -165,7 +167,7 @@ public class ConversationImpl implements Conversation,
 
         inviter = participantsIdentities[0];
 
-        handler = CallbackHandler.create();
+        this.handler = handler;
         if(handler == null) {
             throw new IllegalThreadStateException("This thread must be able to obtain a Looper");
         }
@@ -180,26 +182,33 @@ public class ConversationImpl implements Conversation,
         setSessionObserver(nativeSession, sessionObserverInternal.getNativeHandle());
     }
 
-    public static ConversationImpl createOutgoingConversation(ConversationsClientImpl conversationsClient,
-                                                              Set<String> participants,
-                                                              LocalMedia localMedia,
-                                                              ConversationListener listener,
-                                                              ConversationStateObserver conversationStateObserver) {
-        ConversationImpl conversationImpl = new ConversationImpl(conversationsClient, participants, localMedia, listener, conversationStateObserver);
+    public static ConversationImpl createOutgoingConversation(
+            ConversationsClientImpl conversationsClient,
+            Set<String> participants,
+            LocalMedia localMedia,
+            ConversationListener listener,
+            ConversationStateObserver conversationStateObserver,
+            Handler handler) {
+        ConversationImpl conversationImpl = new ConversationImpl(conversationsClient,
+                participants, localMedia, listener, conversationStateObserver, handler);
         return conversationImpl;
     }
 
-    public static ConversationImpl createIncomingConversation(ConversationsClientImpl conversationsClientImpl,
-                                                              long nativeSession,
-                                                              String[] participantIdentities,
-                                                              ConversationStateObserver conversationStateObserver) {
+    public static ConversationImpl createIncomingConversation(
+            ConversationsClientImpl conversationsClientImpl,
+            long nativeSession,
+            String[] participantIdentities,
+            ConversationStateObserver conversationStateObserver,
+            Handler handler) {
+
         if (nativeSession == 0) {
             return null;
         }
         if (participantIdentities == null || participantIdentities.length == 0) {
             return null;
         }
-        ConversationImpl conversationImpl = new ConversationImpl(conversationsClientImpl, nativeSession, participantIdentities, conversationStateObserver);
+        ConversationImpl conversationImpl = new ConversationImpl(conversationsClientImpl,
+                nativeSession, participantIdentities, conversationStateObserver, handler);
         return conversationImpl;
     }
 
@@ -238,7 +247,6 @@ public class ConversationImpl implements Conversation,
 
     @Override
     public void setConversationListener(ConversationListener listener) {
-        handler = CallbackHandler.create();
         if(handler == null) {
             throw new IllegalThreadStateException("This thread must be able to obtain a Looper");
         }
@@ -515,9 +523,8 @@ public class ConversationImpl implements Conversation,
             final ParticipantImpl participantImpl = findOrCreateParticipant(trackInfo.getParticipantIdentity(), null);
             final VideoTrackImpl videoTrackImpl = new VideoTrackImpl(webRtcVideoTrack, trackInfo);
             participantImpl.getMediaImpl().addVideoTrack(videoTrackImpl);
-            final Handler participantHandler = participantImpl.getHandler();
-            if(participantHandler != null) {
-                participantHandler.post(new Runnable() {
+            if(handler != null) {
+                handler.post(new Runnable() {
                     @Override
                     public void run() {
                         if (participantImpl.getParticipantListener() != null) {
@@ -583,9 +590,8 @@ public class ConversationImpl implements Conversation,
             final ParticipantImpl participantImpl = findOrCreateParticipant(trackInfo.getParticipantIdentity(), null);
             final VideoTrackImpl videoTrackImpl = participantImpl.getMediaImpl().removeVideoTrack(trackInfo);
             videoTrackImpl.setTrackState(MediaTrackState.ENDED);
-            final Handler participantHandler = participantImpl.getHandler();
-            if(participantHandler != null) {
-                participantHandler.post(new Runnable() {
+            if(handler != null) {
+                handler.post(new Runnable() {
                     @Override
                     public void run() {
                         if (participantImpl.getParticipantListener() != null) {
@@ -608,9 +614,8 @@ public class ConversationImpl implements Conversation,
             for(final VideoTrack videoTrack: videoTracks) {
                 if(trackInfo.getTrackId().equals(videoTrack.getTrackId())) {
                     ((VideoTrackImpl)videoTrack).updateTrackInfo(trackInfo);
-                    final Handler participantHandler = participantImpl.getHandler();
-                    if(participantHandler != null) {
-                        participantHandler.post(new Runnable() {
+                    if(handler != null) {
+                        handler.post(new Runnable() {
                             @Override
                             public void run() {
                                 if (participantImpl.getParticipantListener() != null) {
@@ -639,9 +644,8 @@ public class ConversationImpl implements Conversation,
             final ParticipantImpl participantImpl = findOrCreateParticipant(trackInfo.getParticipantIdentity(), null);
             final AudioTrackImpl audioTrackImpl = new AudioTrackImpl(webRtcAudioTrack, trackInfo);
             participantImpl.getMediaImpl().addAudioTrack(audioTrackImpl);
-            final Handler participantHandler = participantImpl.getHandler();
-            if(participantHandler != null) {
-                participantHandler.post(new Runnable() {
+            if(handler != null) {
+                handler.post(new Runnable() {
                     @Override
                     public void run() {
                         if (participantImpl.getParticipantListener() != null) {
@@ -664,9 +668,8 @@ public class ConversationImpl implements Conversation,
             final ParticipantImpl participantImpl = findOrCreateParticipant(trackInfo.getParticipantIdentity(), null);
             final AudioTrackImpl audioTrackImpl = participantImpl.getMediaImpl().removeAudioTrack(trackInfo);
             audioTrackImpl.setTrackState(MediaTrackState.ENDED);
-            final Handler participantHandler = participantImpl.getHandler();
-            if(participantHandler != null) {
-                participantHandler.post(new Runnable() {
+            if(handler != null) {
+                handler.post(new Runnable() {
                     @Override
                     public void run() {
                         if (participantImpl.getParticipantListener() != null) {
@@ -689,9 +692,8 @@ public class ConversationImpl implements Conversation,
             for(final AudioTrack audioTrack: audioTracks) {
                 if(trackInfo.getTrackId().equals(audioTrack.getTrackId())) {
                     ((AudioTrackImpl)audioTrack).updateTrackInfo(trackInfo);
-                    final Handler participantHandler = participantImpl.getHandler();
-                    if(participantHandler != null) {
-                        participantHandler.post(new Runnable() {
+                    if(handler != null) {
+                        handler.post(new Runnable() {
                             @Override
                             public void run() {
                                 if (participantImpl.getParticipantListener() != null) {
@@ -879,7 +881,8 @@ public class ConversationImpl implements Conversation,
                 mediaConstraints.isVideoEnabled(),
                 mediaConstraints.isVideoPaused(),
                 videoConstraints,
-                mediaConstraints.getIceServersArray(), policy);
+                mediaConstraints.getIceServersArray(),
+                policy);
 
     }
 

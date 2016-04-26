@@ -55,6 +55,7 @@ public class TwilioConversationsImpl {
     private boolean initialized;
     private boolean initializing;
     private ExecutorService refreshRegExecutor = Executors.newSingleThreadExecutor();
+    private Handler handler;
 
     public static class WakeUpReceiver extends BroadcastReceiver {
         @Override
@@ -215,7 +216,7 @@ public class TwilioConversationsImpl {
             throw new RuntimeException(builder.toString());
         }
 
-        final Handler handler = CallbackHandler.create();
+        handler = CallbackHandler.create();
         if(handler == null) {
             throw new IllegalThreadStateException("This thread must be able to obtain a Looper");
         }
@@ -328,12 +329,14 @@ public class TwilioConversationsImpl {
         initialized = false;
     }
 
-    public ConversationsClientImpl createConversationsClient(TwilioAccessManager accessManager,
-                                                             ClientOptions options,
-                                                             ConversationsClientListener inListener) {
+    public ConversationsClientImpl createConversationsClient(
+            TwilioAccessManager accessManager,
+            ClientOptions options,
+            ConversationsClientListener inListener) {
+
         if(accessManager != null) {
-            final ConversationsClientImpl conversationsClient = new ConversationsClientImpl(applicationContext,
-                    accessManager, inListener, options);
+            final ConversationsClientImpl conversationsClient = new ConversationsClientImpl(
+                    applicationContext, accessManager, inListener, options, handler);
            if (conversationsClientMap.size() == 0) {
                 registerConnectivityBroadcastReceiver();
             }
