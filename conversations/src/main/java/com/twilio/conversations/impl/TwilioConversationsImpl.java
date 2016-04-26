@@ -244,54 +244,47 @@ public class TwilioConversationsImpl {
         for (LogModule module: moduleLogLevel.keySet()) {
             trySetCoreModuleLogLevel(module.ordinal(), moduleLogLevel.get(module).ordinal());
         }
-        /*
-         * Initialize the core in a new thread since it may otherwise block the calling thread.
-         * The calling thread may often be the UI thread which should never be blocked.
-         */
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                boolean success = initCore(applicationContext);
-                if (!success) {
-                    initializing = false;
-                    initialized = false;
-                    handler.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            initListener.onError(new RuntimeException("Twilio conversations " +
-                                    "failed to initialize."));
-                        }
-                    });
-                } else {
-                    Application application = (Application)
-                            TwilioConversationsImpl.this.applicationContext;
-                    AlarmManager alarmManager = (AlarmManager) context
-                            .getSystemService(Context.ALARM_SERVICE);
 
-                    // Wake up periodically to refresh connections
-                    wakeUpPendingIntent = PendingIntent.getBroadcast(context,
-                            REQUEST_CODE_WAKEUP,
-                            new Intent(context, WakeUpReceiver.class),
-                            PendingIntent.FLAG_UPDATE_CURRENT);
-                    alarmManager.setInexactRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP,
-                            BACKGROUND_WAKEUP_INTERVAL,
-                            BACKGROUND_WAKEUP_INTERVAL,
-                            wakeUpPendingIntent);
-
-                    // Give hints to the core on application visibility events
-                    application.registerActivityLifecycleCallbacks(applicationForegroundTracker);
-
-                    initialized = true;
-                    initializing = false;
-                    handler.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            initListener.onInitialized();
-                        }
-                    });
+        boolean success = initCore(applicationContext);
+        if (!success) {
+            initializing = false;
+            initialized = false;
+            handler.post(new Runnable() {
+                @Override
+                public void run() {
+                    initListener.onError(new RuntimeException("Twilio conversations " +
+                            "failed to initialize."));
                 }
-            }
-        }).start();
+            });
+        } else {
+            Application application = (Application)
+                    TwilioConversationsImpl.this.applicationContext;
+            AlarmManager alarmManager = (AlarmManager) context
+                    .getSystemService(Context.ALARM_SERVICE);
+
+            // Wake up periodically to refresh connections
+            wakeUpPendingIntent = PendingIntent.getBroadcast(context,
+                    REQUEST_CODE_WAKEUP,
+                    new Intent(context, WakeUpReceiver.class),
+                    PendingIntent.FLAG_UPDATE_CURRENT);
+            alarmManager.setInexactRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP,
+                    BACKGROUND_WAKEUP_INTERVAL,
+                    BACKGROUND_WAKEUP_INTERVAL,
+                    wakeUpPendingIntent);
+
+            // Give hints to the core on application visibility events
+            application.registerActivityLifecycleCallbacks(applicationForegroundTracker);
+
+            initialized = true;
+            initializing = false;
+            handler.post(new Runnable() {
+                @Override
+                public void run() {
+                    initListener.onInitialized();
+                }
+            });
+        }
+
 
     }
 

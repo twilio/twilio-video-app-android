@@ -873,20 +873,13 @@ public class ConversationImpl implements Conversation,
 		 * new thread references it.
 		 */
         final long retainedNativeSession = nativeSession;
-        // Call start on a new thread to avoid blocking the calling thread
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                start(retainedNativeSession,
-                        mediaConstraints.isAudioEnabled(),
-                        mediaConstraints.isAudioMuted(),
-                        mediaConstraints.isVideoEnabled(),
-                        mediaConstraints.isVideoPaused(),
-                        videoConstraints,
-                        mediaConstraints.getIceServersArray(), policy);
-
-            }
-        }).start();
+        start(retainedNativeSession,
+                mediaConstraints.isAudioEnabled(),
+                mediaConstraints.isAudioMuted(),
+                mediaConstraints.isVideoEnabled(),
+                mediaConstraints.isVideoPaused(),
+                videoConstraints,
+                mediaConstraints.getIceServersArray(), policy);
 
     }
 
@@ -897,13 +890,7 @@ public class ConversationImpl implements Conversation,
 		 * new thread references it.
 		 */
         final long retainNativeSession = nativeSession;
-        // Call stop on a new thread to avoid blocking the calling thread
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                stop(retainNativeSession);
-            }
-        }).start();
+        stop(retainNativeSession);
     }
 
     @Override
