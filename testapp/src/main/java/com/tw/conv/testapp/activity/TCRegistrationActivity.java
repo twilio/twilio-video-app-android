@@ -4,9 +4,11 @@ import android.Manifest;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -45,13 +47,18 @@ import retrofit.client.Response;
 public class TCRegistrationActivity extends AppCompatActivity {
     public static final int PERMISSIONS_REQUEST_CODE = 0;
 
+    private static final String USERNAME_KEY = "username";
+    private static final String REALM_KEY = "realm";
+    private static final String PREFER_H264_KEY = "preferH264";
     private static final String ICE_OPTIONS_DIALOG = "IceOptionsDialog";
 
+    private SharedPreferences sharedPreferences;
     private EditText usernameEditText;
     private Button registrationButton;
     private ProgressDialog progressDialog;
     private TextView versionText;
     private Spinner realmSpinner;
+    private ArrayAdapter<CharSequence> spinnerAdapter;
     private CheckBox preferH264Checkbox;
     private ProgressDialog iceServerProgressDialog;
     private TwilioIceResponse twilioIceResponse;
@@ -65,6 +72,8 @@ public class TCRegistrationActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_registration);
 
+        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+
         usernameEditText = (EditText)findViewById(R.id.username_edittext);
         registrationButton = (Button)findViewById(R.id.registration_button);
         versionText = (TextView)findViewById(R.id.version_textview);
@@ -73,7 +82,7 @@ public class TCRegistrationActivity extends AppCompatActivity {
 
         realmSpinner = (Spinner)findViewById(R.id.realm_spinner);
         preferH264Checkbox = (CheckBox) findViewById(R.id.prefer_h264_checkbox);
-        ArrayAdapter<CharSequence> spinnerAdapter = ArrayAdapter.createFromResource(this,
+        spinnerAdapter = ArrayAdapter.createFromResource(this,
                         R.array.realm_array, android.R.layout.simple_spinner_dropdown_item);
         spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         realmSpinner.setAdapter(spinnerAdapter);
@@ -88,6 +97,11 @@ public class TCRegistrationActivity extends AppCompatActivity {
 
         if (!BuildConfig.DEBUG) {
             UpdateManager.register(this, TestAppApplication.HOCKEY_APP_ID);
+        }
+
+        // Only restoring last registration if this is first launch
+        if (savedInstanceState == null) {
+            restoreLastSuccessfulRegistration();
         }
     }
 
@@ -221,6 +235,7 @@ public class TCRegistrationActivity extends AppCompatActivity {
             @Override
             public void success(String capabilityToken, Response response) {
                 if (response.getStatus() == 200) {
+                    storeSuccessfulRegistration(username, realm);
                     startClient(username, capabilityToken, realm);
                 } else {
                     progressDialog.dismiss();
@@ -310,6 +325,33 @@ public class TCRegistrationActivity extends AppCompatActivity {
                         .setAction("Action", null).show();
             }
         });
+    }
+
+    private void restoreLastSuccessfulRegistration() {
+        usernameEditText.setText(sharedPreferences.getString(USERNAME_KEY, null));
+        Integer lastRealmPosition = getRealmPosition(sharedPreferences.getString(REALM_KEY, null));
+        if (lastRealmPosition != null) {
+            realmSpinner.setSelection(lastRealmPosition);
+        }
+        preferH264Checkbox.setChecked(sharedPreferences.getBoolean(PREFER_H264_KEY, false));
+    }
+
+    private Integer getRealmPosition(String realm) {
+        for (int i = 0 ; i < spinnerAdapter.getCount() ; i++) {
+            String currentRealm = (String) spinnerAdapter.getItem(i);
+            if (currentRealm.equalsIgnoreCase(realm)) {
+                return i;
+            }
+        }
+
+        return null;
+    }
+
+    private void storeSuccessfulRegistration(String username, String realm) {
+        sharedPreferences.edit().putString(USERNAME_KEY, username).apply();
+        sharedPreferences.edit().putString(REALM_KEY, realm.toLowerCase()).apply();
+        sharedPreferences.edit().putBoolean(PREFER_H264_KEY, preferH264Checkbox.isChecked())
+                .apply();
     }
 
     private void startClient(String username, String capabilityToken, String realm) {
