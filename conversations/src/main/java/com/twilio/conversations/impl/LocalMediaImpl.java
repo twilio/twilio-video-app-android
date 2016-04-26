@@ -33,12 +33,7 @@ public class LocalMediaImpl implements LocalMedia {
         this.localMediaListener = localMediaListener;
         audioEnabled = true;
         audioMuted = false;
-
-        // We are only using this handler until LocalMedia is added to conversation.
-        // From that point on, library handler created during TwilioConversation.initialize()
-        // will be used.
-        // LocalMedia can be created before sdk is initialized and we need some handler to
-        // return exceptions that can happen before this object is added to conversation.
+        
         handler = CallbackHandler.create();
         if(handler == null) {
           throw new IllegalThreadStateException("This thread must be able to obtain a Looper");
@@ -47,10 +42,6 @@ public class LocalMediaImpl implements LocalMedia {
 
     Handler getHandler() {
         return handler;
-    }
-
-    void setHandler(Handler handler) {
-        this.handler = handler;
     }
 
     @Override
