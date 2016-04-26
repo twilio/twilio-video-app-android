@@ -130,6 +130,7 @@ public class ConversationImpl implements Conversation,
 
         localMediaImpl = (LocalMediaImpl)localMedia;
         localMediaImpl.setConversation(this);
+        localMediaImpl.setHandler(handler);
 
         this.conversationListener = conversationListener;
         this.conversationStateObserver = conversationStateObserver;
@@ -792,6 +793,7 @@ public class ConversationImpl implements Conversation,
         checkDisposed();
         localMediaImpl = (LocalMediaImpl)media;
         localMediaImpl.setConversation(this);
+        localMediaImpl.setHandler(handler);
     }
 
     private ConversationStatus sessionStateToStatus(SessionState state,
