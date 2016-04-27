@@ -354,19 +354,12 @@ public class ConversationImpl implements Conversation,
                     conversationsClient.onConversationTerminated(this, e);
                 }
             } else if(handler != null) {
-                final CountDownLatch waitLatch = new CountDownLatch(1);
                 handler.post(new Runnable() {
                     @Override
                     public void run() {
                         conversationListener.onConversationEnded(ConversationImpl.this, e);
-                        waitLatch.countDown();
                     }
                 });
-                try {
-                    waitLatch.await();
-                } catch (InterruptedException interruptedException) {
-                    interruptedException.printStackTrace();
-                }
             }
             disposeConversation();
         }
@@ -414,8 +407,6 @@ public class ConversationImpl implements Conversation,
     @Override
     public void onParticipantConnected(String participantIdentity, String participantSid, CoreError error) {
         log("onParticipantConnected",  participantIdentity, error);
-        // Block this thread until the handler has completed its work.
-        final CountDownLatch waitLatch = new CountDownLatch(1);
         final ParticipantImpl participantImpl = findOrCreateParticipant(participantIdentity, participantSid);
         if (error == null) {
             if(handler != null && conversationListener != null) {
@@ -423,11 +414,8 @@ public class ConversationImpl implements Conversation,
                     @Override
                     public void run() {
                         conversationListener.onParticipantConnected(ConversationImpl.this, participantImpl);
-                        waitLatch.countDown();
                     }
                 });
-            } else {
-                waitLatch.countDown();
             }
         } else {
             final TwilioConversationsException e = new TwilioConversationsException(error.getCode(),
@@ -439,53 +427,33 @@ public class ConversationImpl implements Conversation,
                     logger.e("onParticipantConnected -> received unexpected error code -> " +
                             e.getErrorCode());
                 }
-                waitLatch.countDown();
             } else if(handler != null) {
                 handler.post(new Runnable() {
                     @Override
                     public void run() {
                         conversationListener.onFailedToConnectParticipant(ConversationImpl.this,
                                 participantImpl, e);
-                        waitLatch.countDown();
                     }
                 });
-            } else {
-                waitLatch.countDown();
             }
-        }
-        try {
-            waitLatch.await();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
         }
     }
 
     @Override
     public void onParticipantDisconnected(final String participantIdentity, String participantSid, final DisconnectReason reason) {
         log("onParticipantDisconnected", participantIdentity, reason);
-        // Block this thread until the handler has completed its work.
-        final CountDownLatch waitLatch = new CountDownLatch(1);
         final ParticipantImpl participant = participantMap.remove(participantIdentity);
         if(participant == null) {
             logger.i("participant removed but was never in list");
-            waitLatch.countDown();
         } else {
             if(handler != null && conversationListener != null) {
                 handler.post(new Runnable() {
                     @Override
                     public void run() {
                         conversationListener.onParticipantDisconnected(ConversationImpl.this, participant);
-                        waitLatch.countDown();
                     }
                 });
-            } else {
-                waitLatch.countDown();
             }
-        }
-        try {
-            waitLatch.await();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
         }
     }
 
