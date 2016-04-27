@@ -123,15 +123,17 @@ public class ConversationsClientImpl implements
 
     ConversationsClientImpl(Context context,
                             TwilioAccessManager accessManager,
-                            ConversationsClientListener conversationsClientListener, ClientOptions options) {
+                            ConversationsClientListener conversationsClientListener,
+                            ClientOptions options,
+                            Handler handler) {
         this.context = context;
         this.conversationsClientListener = conversationsClientListener;
         this.accessManager = accessManager;
 
-        handler = CallbackHandler.create();
         if(handler == null) {
             throw new IllegalThreadStateException("This thread must be able to obtain a Looper");
         }
+        this.handler = handler;
         if (options != null) {
             iceOptions = options.getIceOptions();
         }
@@ -194,7 +196,6 @@ public class ConversationsClientImpl implements
 
     @Override
     public void setConversationsClientListener(ConversationsClientListener listener) {
-        handler = CallbackHandler.create();
         if(handler == null) {
             throw new IllegalThreadStateException("This thread must be able to obtain a Looper");
         }
@@ -219,7 +220,10 @@ public class ConversationsClientImpl implements
     }
 
     @Override
-    public OutgoingInvite sendConversationInvite(Set<String> participants, LocalMedia localMedia, IceOptions iceOptions, ConversationCallback conversationCallback) {
+    public OutgoingInvite sendConversationInvite(Set<String> participants,
+                                                 LocalMedia localMedia,
+                                                 IceOptions iceOptions,
+                                                 ConversationCallback conversationCallback) {
         if(participants == null || participants.size() == 0) {
             throw new IllegalStateException("Invite at least one participant");
         }
@@ -242,7 +246,7 @@ public class ConversationsClientImpl implements
         }
 
         ConversationImpl outgoingConversationImpl = ConversationImpl.createOutgoingConversation(
-                this, participants, localMedia, this, this);
+                this, participants, localMedia, this, this, handler);
 
         if (outgoingConversationImpl == null ||
                 outgoingConversationImpl.getNativeHandle() == 0) {
@@ -287,13 +291,13 @@ public class ConversationsClientImpl implements
             // Stop listening to ConversationListener. The developer should provide their own listener
             conversationImpl.setConversationListener(null);
             // Notify the developer that the conversation is active
-            if (incomingInviteImpl.getHandler() != null && incomingInviteImpl.getConversationCallback() != null) {
+            if (incomingInviteImpl.getConversationCallback() != null) {
                 /**
                  * Block the thread to ensure no other callbacks are called until the developer
                  * handles this callback.
                  */
                 final CountDownLatch waitLatch = new CountDownLatch(1);
-                incomingInviteImpl.getHandler().post(new Runnable() {
+                handler.post(new Runnable() {
                     @Override
                     public void run() {
                         incomingInviteImpl.getConversationCallback().onConversation(conversationImpl, null);
@@ -316,13 +320,13 @@ public class ConversationsClientImpl implements
             // Stop listening to ConversationListener. The developer should provide their own listener
             conversationImpl.setConversationListener(null);
             conversationImpl.retainSid();
-            if (outgoingInviteImpl.getHandler() != null && outgoingInviteImpl.getConversationCallback() != null) {
+            if (outgoingInviteImpl.getConversationCallback() != null) {
                 /**
                  * Block the thread to ensure no other callbacks are called until the developer handles
                  * this callback.
                  */
                 final CountDownLatch waitLatch = new CountDownLatch(1);
-                outgoingInviteImpl.getHandler().post(new Runnable() {
+                handler.post(new Runnable() {
                     @Override
                     public void run() {
                         outgoingInviteImpl.getConversationCallback().onConversation(conversationImpl, null);
@@ -348,9 +352,8 @@ public class ConversationsClientImpl implements
                     InviteStatus.FAILED;
             outgoingInviteImpl.setStatus(status);
             pendingOutgoingInvites.remove(conversationImpl);
-            if (outgoingInviteImpl.getHandler() != null &&
-                    outgoingInviteImpl.getConversationCallback() != null) {
-                outgoingInviteImpl.getHandler().post(new Runnable() {
+            if (outgoingInviteImpl.getConversationCallback() != null) {
+                handler.post(new Runnable() {
                     @Override
                     public void run() {
                         // The call ended by the user
@@ -514,7 +517,8 @@ public class ConversationsClientImpl implements
                 ConversationImpl.createIncomingConversation(this,
                         nativeSession,
                         participants,
-                        this);
+                        this,
+                        handler);
         if (incomingConversationImpl == null) {
             logger.e("Failed to create conversation");
             return;
@@ -523,7 +527,8 @@ public class ConversationsClientImpl implements
         conversations.add(incomingConversationImpl);
 
         final IncomingInviteImpl incomingInviteImpl = IncomingInviteImpl.create(this,
-                incomingConversationImpl);
+                incomingConversationImpl,
+                handler);
         if (incomingInviteImpl == null) {
             logger.e("Failed to create IncomingInvite");
             return;

@@ -33,10 +33,10 @@ public class LocalMediaImpl implements LocalMedia {
         this.localMediaListener = localMediaListener;
         audioEnabled = true;
         audioMuted = false;
-
+        
         handler = CallbackHandler.create();
         if(handler == null) {
-            throw new IllegalThreadStateException("This thread must be able to obtain a Looper");
+          throw new IllegalThreadStateException("This thread must be able to obtain a Looper");
         }
     }
 
@@ -84,10 +84,16 @@ public class LocalMediaImpl implements LocalMedia {
         }
         LocalVideoTrackImpl localVideoTrackImpl = (LocalVideoTrackImpl)track;
         if(!localVideoTrackImpl.getState().equals(MediaTrackState.IDLE)) {
-            postVideoTrackException(localVideoTrackImpl, new TwilioConversationsException(TwilioConversations.TRACK_OPERATION_IN_PROGRESS, " A track operation is already in progress."));
+            postVideoTrackException(localVideoTrackImpl,
+                    new TwilioConversationsException(
+                            TwilioConversations.TRACK_OPERATION_IN_PROGRESS,
+                            " A track operation is already in progress."));
         }
         if (videoTracksImpl.size() >= MAX_LOCAL_VIDEO_TRACKS) {
-            postVideoTrackException(localVideoTrackImpl, new TwilioConversationsException(TwilioConversations.TOO_MANY_TRACKS, "Unable to add the local video track. Only " + MAX_LOCAL_VIDEO_TRACKS + " local video track is supported."));
+            postVideoTrackException(localVideoTrackImpl,
+                    new TwilioConversationsException(TwilioConversations.TOO_MANY_TRACKS,
+                            "Unable to add the local video track. Only " + MAX_LOCAL_VIDEO_TRACKS +
+                                    " local video track is supported."));
         }
         if (localVideoTrackImpl.getCameraCapturer() == null) {
             if (handler != null) {
@@ -96,7 +102,12 @@ public class LocalMediaImpl implements LocalMedia {
                     public void run() {
                         if (localMediaListener != null) {
                             localMediaListener.onLocalVideoTrackError(
-                                    LocalMediaImpl.this, track, new TwilioConversationsException(TwilioConversations.INVALID_VIDEO_CAPTURER, "The LocalVideoTrack must be associated with a camera capturer"));
+                                    LocalMediaImpl.this,
+                                    track,
+                                    new TwilioConversationsException(
+                                            TwilioConversations.INVALID_VIDEO_CAPTURER,
+                                            "The LocalVideoTrack must be associated with a "+
+                                                    "camera capturer"));
                         }
                     }
                 });
@@ -212,4 +223,5 @@ public class LocalMediaImpl implements LocalMedia {
     public boolean isMicrophoneAdded() {
         return audioEnabled;
     }
+
 }

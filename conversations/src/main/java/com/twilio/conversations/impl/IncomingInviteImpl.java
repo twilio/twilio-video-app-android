@@ -13,7 +13,6 @@ import com.twilio.conversations.LocalMedia;
 import com.twilio.conversations.TwilioConversations;
 import com.twilio.conversations.TwilioConversationsException;
 import com.twilio.conversations.impl.logging.Logger;
-import com.twilio.conversations.impl.util.CallbackHandler;
 
 public class IncomingInviteImpl implements IncomingInvite {
     static final Logger logger = Logger.getLogger(IncomingInviteImpl.class);
@@ -25,29 +24,27 @@ public class IncomingInviteImpl implements IncomingInvite {
     private InviteStatus inviteStatus;
 
     private IncomingInviteImpl(ConversationsClientImpl conversationsClientImpl,
-                               ConversationImpl conversationImpl) {
+                               ConversationImpl conversationImpl,
+                               Handler handler) {
         this.conversationImpl = conversationImpl;
         this.conversationsClientImpl = conversationsClientImpl;
         inviteStatus = InviteStatus.PENDING;
-        this.handler = CallbackHandler.create();
-        if(handler == null) {
-            throw new IllegalThreadStateException("This thread must be able to obtain a Looper");
-        }
+        this.handler = handler;
     }
 
     static IncomingInviteImpl create(ConversationsClientImpl conversationsClientImpl,
-                                     ConversationImpl conversationImpl) {
+                                     ConversationImpl conversationImpl,
+                                     Handler handler) {
         if(conversationsClientImpl == null) {
             return null;
         }
         if(conversationImpl == null) {
             return null;
         }
-        return new IncomingInviteImpl(conversationsClientImpl, conversationImpl);
-    }
-
-    Handler getHandler() {
-        return handler;
+        if (handler == null) {
+            return null;
+        }
+        return new IncomingInviteImpl(conversationsClientImpl, conversationImpl, handler);
     }
 
     void setStatus(InviteStatus inviteStatus) {
