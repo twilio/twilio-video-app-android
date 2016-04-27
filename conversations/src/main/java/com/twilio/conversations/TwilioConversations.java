@@ -12,6 +12,22 @@ import com.twilio.conversations.impl.TwilioConversationsImpl;
 /**
  * Twilio Conversations SDK
  *
+ * <h3>Threading model</h3>
+ *
+ * <p>All registered listeners are invoked from thread that was used to initialize
+ * {@link TwilioConversations}, with few exceptions that are listed bellow. If the calling thread
+ * doesn't have Looper associated with it, SDK will attempt to use main thread Handler instead.
+ * </p>
+ * <p>These are the exception to the model described above.</p>
+ * <ul>
+ * <li>{@link LocalMediaListener} events will be invoked from the thread that was used to
+ * create {@link LocalMedia} object, or main thread in case where there is no Looper associated
+ * with calling thread. </li>
+ * <li>{@link StatsListener} events will be invoked from the thread that was used to call
+ * {@link Conversation#setStatsListener(StatsListener)}, or main thread in case where there is
+ * no Looper associated with calling thread.</li>
+ * </ul>
+ *
  */
 public class TwilioConversations {
     /**

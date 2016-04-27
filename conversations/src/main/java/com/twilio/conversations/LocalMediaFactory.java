@@ -11,6 +11,10 @@ public class LocalMediaFactory {
     /**
      * Creates a new instance of the {@link LocalMedia}
      *
+     * <p>Calling thread will be used to invoke all events on {@link LocalMediaListener}. If the
+     * calling thread doesn't have Looper associated with it, SDK will attempt to use main thread
+     * Handler instead.</p>
+     *
      * @return instance of local media
      */
     public static LocalMedia createLocalMedia(LocalMediaListener localMediaListener) {
