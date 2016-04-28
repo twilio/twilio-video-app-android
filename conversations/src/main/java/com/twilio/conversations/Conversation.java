@@ -57,8 +57,16 @@ public interface Conversation {
 
     /**
      * Disconnects from this conversation.
-     * {@link ConversationListener#onConversationEnded(Conversation, TwilioConversationsException)}
-     * will be invoked upon the completion of this process.
+     *
+     * <p>Results of this call will propagate up in the following order:
+     * <ol>
+     * <li>{@link ConversationListener#onFailedToConnectParticipant(Conversation, Participant,
+     * TwilioConversationsException)} will be invoked with error code
+     * {@link TwilioConversations#CONVERSATION_TERMINATED} for each participant of the
+     * {@link Conversation}
+     * <li>{@link ConversationListener#onConversationEnded(Conversation,
+     * TwilioConversationsException)} will be invoked upon the completion of this process.
+     * </ol>
      */
     void disconnect();
 
