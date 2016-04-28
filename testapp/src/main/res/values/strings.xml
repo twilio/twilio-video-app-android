@@ -36,6 +36,7 @@
     <string name="ice_options_button">Ice Options</string>
     <string name="enable_ice">Enable ICE Options</string>
     <string name="prefer_h264">Prefer H264</string>
+    <string name="aspect_ratio">Aspect Ratio</string>
 
     <string-array name="realm_array">
         <item>Prod</item>
@@ -46,6 +47,12 @@
     <string-array name="ice_trans_policy_array">
         <item>All</item>
         <item>Relay</item>
+    </string-array>
+
+    <string-array name="aspect_ratio_array">
+        <item>Default</item>
+        <item>4:3</item>
+        <item>16:9</item>
     </string-array>
 
 </resources>

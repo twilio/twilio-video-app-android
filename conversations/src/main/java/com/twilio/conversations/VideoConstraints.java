@@ -20,16 +20,30 @@ public class VideoConstraints {
     // Smooth 30 fps video
     public static final int FPS_30 = 30;
 
+    // Min aspect ratio (4:3)
+    public static final double ASPECT_RATIO_4_3_MIN = 1.333;
+    // Max aspect ratio (4:3)
+    public static final double ASPECT_RATIO_4_3_MAX = 1.334;
+    // Min aspect ratio (16:9)
+    public static final double ASPECT_RATIO_16_9_MIN = 1.777;
+    // Max aspect ratio (16:9)
+    public static final double ASPECT_RATIO_16_9_MAX = 1.778;
+
     private final VideoDimensions minVideoDimensions;
     private final VideoDimensions maxVideoDimensions;
     private final int minFps;
     private final int maxFps;
+
+    private final double minAspectRatio;
+    private final double maxAspectRatio;
 
     private VideoConstraints(Builder builder) {
         this.minVideoDimensions = builder.minVideoDimensions;
         this.maxVideoDimensions = builder.maxVideoDimensions;
         this.minFps = builder.minFps;
         this.maxFps = builder.maxFps;
+        this.minAspectRatio = builder.minAspectRatio;
+        this.maxAspectRatio = builder.maxAspectRatio;
     }
 
     /**
@@ -60,11 +74,27 @@ public class VideoConstraints {
         return maxFps;
     }
 
+    /**
+     * The minimum aspect ratio allowed
+     */
+    public double getMinAspectRatio() {
+        return minAspectRatio;
+    }
+
+    /**
+     * The maximum aspect ratio allowed
+     */
+    public double getMaxAspectRatio() {
+        return maxAspectRatio;
+    }
+
     public static class Builder {
         private VideoDimensions minVideoDimensions = new VideoDimensions(0,0);
         private VideoDimensions maxVideoDimensions = new VideoDimensions(0,0);
         private int minFps = 0;
         private int maxFps = 0;
+        private double minAspectRatio = 0.0;
+        private double maxAspectRatio = 0.0;
 
         public Builder() { }
 
@@ -85,6 +115,16 @@ public class VideoConstraints {
 
         public Builder maxFps(int maxFps) {
             this.maxFps = maxFps;
+            return this;
+        }
+
+        public Builder minAspectRatio(double aspectRatio) {
+            this.minAspectRatio = aspectRatio;
+            return this;
+        }
+
+        public Builder maxAspectRatio(double aspectRatio) {
+            this.maxAspectRatio = aspectRatio;
             return this;
         }
 
@@ -112,6 +152,15 @@ public class VideoConstraints {
             }
             if(minVideoDimensions.height > maxVideoDimensions.height) {
                 throw new IllegalStateException("Min video dimensions height " + minVideoDimensions.height+ " is greater than max video dimensions height " + maxVideoDimensions.height);
+            }
+            if (minAspectRatio < 0) {
+                throw new IllegalStateException("minAspectRatio is less than 0");
+            }
+            if (maxAspectRatio < 0) {
+                throw new IllegalStateException("maxAspectRatio is less than 0");
+            }
+            if (minAspectRatio > maxAspectRatio) {
+                throw new IllegalStateException("minAspectRatio is greater than maxAspectRatio");
             }
             return new VideoConstraints(this);
         }
