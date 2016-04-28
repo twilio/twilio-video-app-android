@@ -65,7 +65,7 @@ public interface Conversation {
     /**
      * Sets the {@link StatsListener} of this conversation
      *
-     * @param listener A listener of this conversation media tracks stats
+     * @param listener Listens to media tracks stats from this conversation
      */
     void setStatsListener(StatsListener listener);
 }

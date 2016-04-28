@@ -11,6 +11,9 @@ public class LocalMediaFactory {
     /**
      * Creates a new instance of the {@link LocalMedia}
      *
+     * <p>The {@link LocalMediaListener} is invoked on the thread that provides the
+     * LocalMediaListener instance.</p>
+     *
      * @return instance of local media
      */
     public static LocalMedia createLocalMedia(LocalMediaListener localMediaListener) {

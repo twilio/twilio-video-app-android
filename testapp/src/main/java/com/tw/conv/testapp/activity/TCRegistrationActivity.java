@@ -29,10 +29,10 @@ import com.tw.conv.testapp.R;
 import com.tw.conv.testapp.TestAppApplication;
 import com.tw.conv.testapp.dialog.Dialog;
 import com.tw.conv.testapp.dialog.IceServersDialogFragment;
-import com.tw.conv.testapp.util.SimpleSignalingUtils;
 import com.tw.conv.testapp.model.TwilioIceResponse;
 import com.tw.conv.testapp.model.TwilioIceServer;
 import com.tw.conv.testapp.util.IceOptionsHelper;
+import com.tw.conv.testapp.util.SimpleSignalingUtils;
 import com.twilio.conversations.TwilioConversations;
 
 import net.hockeyapp.android.CrashManager;
