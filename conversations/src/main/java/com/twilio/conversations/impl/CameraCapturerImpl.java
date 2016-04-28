@@ -1,7 +1,6 @@
 package com.twilio.conversations.impl;
 
 import java.io.IOException;
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.List;
@@ -12,8 +11,6 @@ import org.webrtc.CameraEnumerationAndroid;
 
 import android.content.Context;
 import android.hardware.Camera;
-import android.hardware.SensorManager;
-import android.view.OrientationEventListener;
 import android.view.Surface;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
