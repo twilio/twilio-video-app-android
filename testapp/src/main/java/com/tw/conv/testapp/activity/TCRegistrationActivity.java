@@ -104,9 +104,6 @@ public class TCRegistrationActivity extends AppCompatActivity {
             restoreLastSuccessfulRegistration();
         }
 
-        // Prevent soft keyboard focus when the Activity opens
-        this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
-
     }
 
     public boolean checkPermissions(){

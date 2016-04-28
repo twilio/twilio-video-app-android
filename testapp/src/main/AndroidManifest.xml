@@ -24,7 +24,7 @@
         android:theme="@style/AppTheme" >
         <activity
             android:name="com.tw.conv.testapp.activity.TCRegistrationActivity"
-            android:windowSoftInputMode="adjustResize">
+            android:windowSoftInputMode="adjustResize|stateAlwaysHidden">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
