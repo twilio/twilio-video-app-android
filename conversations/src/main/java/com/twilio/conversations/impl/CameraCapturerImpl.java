@@ -12,6 +12,7 @@ import org.webrtc.CameraEnumerationAndroid;
 
 import android.content.Context;
 import android.hardware.Camera;
+import android.hardware.SensorManager;
 import android.view.OrientationEventListener;
 import android.view.Surface;
 import android.view.SurfaceHolder;
@@ -331,7 +332,6 @@ public class CameraCapturerImpl implements CameraCapturer {
         private List<Camera.Size> supportedPreviewSizes;
         private Camera.Size previewSize;
         private CapturerErrorListener listener;
-        private OrientationEventListener orientationEventListener;
 
         public CapturerPreview(Context context, Camera camera, CapturerErrorListener listener) {
             super(context);
@@ -344,12 +344,6 @@ public class CameraCapturerImpl implements CameraCapturer {
             addView(surfaceView);
             holder = surfaceView.getHolder();
             holder.addCallback(this);
-            orientationEventListener = new OrientationEventListener(context) {
-                @Override
-                public void onOrientationChanged(int orientation) {
-                    updatePreview();
-                }
-            };
             setContentDescription(context.getString(R.string.capturer_preview_content_description));
         }
 
@@ -358,9 +352,8 @@ public class CameraCapturerImpl implements CameraCapturer {
             final int width = resolveSize(getSuggestedMinimumWidth(), widthMeasureSpec);
             final int height = resolveSize(getSuggestedMinimumHeight(), heightMeasureSpec);
 
-            setMeasuredDimension(width, height);
-
             // Now that we know the size of the view we calculate the optimal preview size
+            setMeasuredDimension(width, height);
             previewSize = getOptimalPreviewSize(supportedPreviewSizes, width, height);
         }
 
@@ -403,7 +396,6 @@ public class CameraCapturerImpl implements CameraCapturer {
                 if (camera != null) {
                     camera.setPreviewDisplay(holder);
                     camera.startPreview();
-                    orientationEventListener.enable();
                 }
 
             } catch (IOException e) {
@@ -415,37 +407,34 @@ public class CameraCapturerImpl implements CameraCapturer {
         }
 
         @Override
-        public void surfaceDestroyed(SurfaceHolder holder) {
-            if(camera != null) {
-                orientationEventListener.disable();
-                camera.stopPreview();
+        public void surfaceChanged(SurfaceHolder holder, int format, int w, int h) {
+            if(holder.getSurface() != null && camera != null) {
                 try {
-                    camera.setPreviewDisplay(null);
-                } catch(IOException e) {
+                    camera.stopPreview();
+                    camera.setPreviewDisplay(this.holder);
+                    updatePreviewOrientation();
+                    updatePreviewSize();
+                    requestLayout();
+                    camera.startPreview();
+                } catch (Exception e) {
                     if(listener != null) {
                         listener.onError(new CapturerException(ExceptionDomain.CAMERA,
-                                "Unable to reset preview: " + e.getMessage()));
+                                "Unable to update preview: " + e.getMessage()));
                     }
                 }
             }
         }
 
         @Override
-        public void surfaceChanged(SurfaceHolder holder, int format, int w, int h) {
-            if (this.holder.getSurface() == null) {
-                return;
-            }
-
+        public void surfaceDestroyed(SurfaceHolder holder) {
             if(camera != null) {
                 try {
                     camera.stopPreview();
-                    camera.setPreviewDisplay(this.holder);
-                    updatePreview();
-                    camera.startPreview();
-                } catch (Exception e) {
+                    camera.setPreviewDisplay(null);
+                } catch(IOException e) {
                     if(listener != null) {
                         listener.onError(new CapturerException(ExceptionDomain.CAMERA,
-                                "Unable to restart preview: " + e.getMessage()));
+                                "Unable to reset preview: " + e.getMessage()));
                     }
                 }
             }
@@ -485,12 +474,6 @@ public class CameraCapturerImpl implements CameraCapturer {
             }
 
             return optimalSize;
-        }
-
-        private void updatePreview() {
-            updatePreviewOrientation();
-            updatePreviewSize();
-            requestLayout();
         }
 
         private void updatePreviewOrientation() {
