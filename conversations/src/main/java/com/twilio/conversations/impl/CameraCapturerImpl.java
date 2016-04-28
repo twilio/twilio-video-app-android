@@ -1,9 +1,9 @@
 package com.twilio.conversations.impl;
 
 import java.io.IOException;
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.List;
 
 import org.webrtc.VideoCapturerAndroid;
 import org.webrtc.VideoCapturerAndroid.CameraEventsHandler;
@@ -11,10 +11,10 @@ import org.webrtc.CameraEnumerationAndroid;
 
 import android.content.Context;
 import android.hardware.Camera;
-import android.view.OrientationEventListener;
 import android.view.Surface;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
+import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 
@@ -321,28 +321,70 @@ public class CameraCapturerImpl implements CameraCapturer {
         }
     };
 
-    private class CapturerPreview extends SurfaceView implements SurfaceHolder.Callback {
+    private class CapturerPreview extends ViewGroup implements SurfaceHolder.Callback {
         private Context context;
+        private SurfaceView surfaceView;
         private SurfaceHolder holder;
         private Camera camera;
+        private List<Camera.Size> supportedPreviewSizes;
+        private Camera.Size previewSize;
         private CapturerErrorListener listener;
-        private OrientationEventListener orientationEventListener;
 
         public CapturerPreview(Context context, Camera camera, CapturerErrorListener listener) {
             super(context);
             this.context = context;
             this.camera = camera;
             this.listener = listener;
+            this.surfaceView = new SurfaceView(context);
+            this.supportedPreviewSizes = camera.getParameters().getSupportedPreviewSizes();
 
-            holder = getHolder();
+            addView(surfaceView);
+            holder = surfaceView.getHolder();
             holder.addCallback(this);
-            orientationEventListener = new OrientationEventListener(context) {
-                @Override
-                public void onOrientationChanged(int orientation) {
-                    updatePreviewOrientation();
-                }
-            };
             setContentDescription(context.getString(R.string.capturer_preview_content_description));
+        }
+
+        @Override
+        protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+            final int width = resolveSize(getSuggestedMinimumWidth(), widthMeasureSpec);
+            final int height = resolveSize(getSuggestedMinimumHeight(), heightMeasureSpec);
+
+            // Now that we know the size of the view we calculate the optimal preview size
+            setMeasuredDimension(width, height);
+            previewSize = getOptimalPreviewSize(supportedPreviewSizes, width, height);
+        }
+
+        @Override
+        protected void onLayout(boolean changed, int l, int t, int r, int b) {
+            if (changed && getChildCount() > 0) {
+                final View child = getChildAt(0);
+                final int width = r - l;
+                final int height = b - t;
+                int previewWidth = width;
+                int previewHeight = height;
+                int displayOrientation = calculateDisplayOrientation();
+                boolean verticalOrientation = displayOrientation == 90 ||
+                        displayOrientation == 270;
+
+                if (previewSize != null) {
+                    if (verticalOrientation) {
+                        previewWidth = previewSize.height;
+                        previewHeight = previewSize.width;
+                    } else {
+                        previewWidth = previewSize.width;
+                        previewHeight = previewSize.height;
+                    }
+                }
+                if (verticalOrientation) {
+                    final int scaledChildHeight = previewHeight * width / previewWidth;
+                    child.layout(0, (height - scaledChildHeight) / 2,
+                            width, (height + scaledChildHeight) / 2);
+                } else {
+                    final int scaledChildWidth = previewWidth * height / previewHeight;
+                    child.layout((width - scaledChildWidth) / 2, 0,
+                            (width + scaledChildWidth) / 2, height);
+                }
+            }
         }
 
         @Override
@@ -351,7 +393,6 @@ public class CameraCapturerImpl implements CameraCapturer {
                 if (camera != null) {
                     camera.setPreviewDisplay(holder);
                     camera.startPreview();
-                    orientationEventListener.enable();
                 }
 
             } catch (IOException e) {
@@ -363,11 +404,29 @@ public class CameraCapturerImpl implements CameraCapturer {
         }
 
         @Override
+        public void surfaceChanged(SurfaceHolder holder, int format, int w, int h) {
+            if(holder.getSurface() != null && camera != null) {
+                try {
+                    camera.stopPreview();
+                    camera.setPreviewDisplay(this.holder);
+                    updatePreviewOrientation();
+                    updatePreviewSize();
+                    requestLayout();
+                    camera.startPreview();
+                } catch (Exception e) {
+                    if(listener != null) {
+                        listener.onError(new CapturerException(ExceptionDomain.CAMERA,
+                                "Unable to update preview: " + e.getMessage()));
+                    }
+                }
+            }
+        }
+
+        @Override
         public void surfaceDestroyed(SurfaceHolder holder) {
             if(camera != null) {
-                orientationEventListener.disable();
-                camera.stopPreview();
                 try {
+                    camera.stopPreview();
                     camera.setPreviewDisplay(null);
                 } catch(IOException e) {
                     if(listener != null) {
@@ -378,40 +437,65 @@ public class CameraCapturerImpl implements CameraCapturer {
             }
         }
 
-        @Override
-        public void surfaceChanged(SurfaceHolder holder, int format, int w, int h) {
-            if (this.holder.getSurface() == null) {
-                return;
+        /*
+         * Calculates the optimal preview size based on supported preview sizes
+         * and provided dimensions
+         */
+        private Camera.Size getOptimalPreviewSize(List<Camera.Size> sizes, int width, int height) {
+            final double ASPECT_TOLERANCE = 0.1;
+            double targetRatio = (double) width / height;
+            if (sizes == null) return null;
+            Camera.Size optimalSize = null;
+            double minDiff = Double.MAX_VALUE;
+            int targetHeight = height;
+
+            // Try to find an size match aspect ratio and size
+            for (Camera.Size size : sizes) {
+                double ratio = (double) size.width / size.height;
+                if (Math.abs(ratio - targetRatio) > ASPECT_TOLERANCE) continue;
+                if (Math.abs(size.height - targetHeight) < minDiff) {
+                    optimalSize = size;
+                    minDiff = Math.abs(size.height - targetHeight);
+                }
             }
 
-            if(camera != null) {
-                try {
-                    camera.stopPreview();
-                    camera.setPreviewDisplay(this.holder);
-                    camera.startPreview();
-                    updatePreviewOrientation();
-                } catch (Exception e) {
-                    if(listener != null) {
-                        listener.onError(new CapturerException(ExceptionDomain.CAMERA,
-                                "Unable to restart preview: " + e.getMessage()));
+            // Cannot find the one match the aspect ratio, ignore the requirement
+            if (optimalSize == null) {
+                minDiff = Double.MAX_VALUE;
+                for (Camera.Size size : sizes) {
+                    if (Math.abs(size.height - targetHeight) < minDiff) {
+                        optimalSize = size;
+                        minDiff = Math.abs(size.height - targetHeight);
                     }
                 }
             }
+
+            return optimalSize;
         }
 
         private void updatePreviewOrientation() {
+            camera.setDisplayOrientation(calculateDisplayOrientation());
+        }
+
+        private int calculateDisplayOrientation() {
             Camera.CameraInfo info = new Camera.CameraInfo();
             Camera.getCameraInfo(cameraId, info);
             int degrees = getDeviceOrientation();
-            int resultOrientation;
+            int displayOrientation;
 
             if (info.facing == Camera.CameraInfo.CAMERA_FACING_FRONT) {
-                resultOrientation = (info.orientation + degrees) % 360;
-                resultOrientation = (360 - resultOrientation) % 360;
+                displayOrientation = (info.orientation + degrees) % 360;
+                displayOrientation = (360 - displayOrientation) % 360;
             } else {
-                resultOrientation = (info.orientation - degrees + 360) % 360;
+                displayOrientation = (info.orientation - degrees + 360) % 360;
             }
-            camera.setDisplayOrientation(resultOrientation);
+
+            return displayOrientation;
+        }
+
+        private void updatePreviewSize() {
+            Camera.Parameters parameters = camera.getParameters();
+            parameters.setPreviewSize(previewSize.width, previewSize.height);
         }
 
         private int getDeviceOrientation() {

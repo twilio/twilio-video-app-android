@@ -47,3 +47,6 @@ sdk/libs/
 *.swp
 *.swo
 **/**/**/libs
+
+# Screenshots
+*.png
