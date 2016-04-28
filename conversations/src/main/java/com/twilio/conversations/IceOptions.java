@@ -5,13 +5,12 @@ import java.util.Set;
 /**
  *  IceOptions specifies custom media connectivity configurations.
  *
- *  Media connections are established using the ICE (Interactive Connectivity Establishment) protocol.
- *  These options allow you to customize how data flows to and from participants, and which protocols to use.
- *  You may also provide your own ICE servers, overriding the defaults.
+ *  Media connections are established using the ICE (Interactive Connectivity Establishment)
+ *  protocol. These options allow you to customize how data flows to and from participants, and
+ *  which protocols to use. You may also provide your own ICE servers, overriding the defaults.
  *  https://www.twilio.com/stun-turn
  */
 public class IceOptions {
-
     /**
      * Set of {@link IceServer} objects to be used during connection establishment.
      */

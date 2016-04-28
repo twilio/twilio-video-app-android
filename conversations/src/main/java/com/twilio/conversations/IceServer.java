@@ -17,5 +17,4 @@ public class IceServer {
     public IceServer(String serverUrl) {
         this(serverUrl, "", "");
     }
-
 }

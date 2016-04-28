@@ -3,18 +3,24 @@ package com.twilio.conversations;
 import java.util.Set;
 
 /**
- * An IncomingInvite represents an invitation from a client to a Conversation An IncomingInvite represents an invitation from a client to a {@link Conversation}
+ * An IncomingInvite represents an invitation from a client to a Conversation An IncomingInvite
+ * represents an invitation from a client to a {@link Conversation}
  */
 public interface IncomingInvite {
     /**
-     * Accepts this invitation
+     * Accepts this invitation. {@link ConversationCallback#onConversation(Conversation,
+     * TwilioConversationsException)} will be invoked when the {@link Conversation} is available.
      */
     void accept(LocalMedia localMedia, ConversationCallback conversationCallback);
 
     /**
-     * Accepts this invitation with custom ICE options
+     * Accepts this invitation with custom ICE options.
+     * {@link ConversationCallback#onConversation(Conversation, TwilioConversationsException)}
+     * will be invoked when the {@link Conversation} is available.
      */
-    void accept(LocalMedia localMedia, IceOptions iceOptions, ConversationCallback conversationCallback);
+    void accept(LocalMedia localMedia,
+                IceOptions iceOptions,
+                ConversationCallback conversationCallback);
 
     /**
      * Rejects this invitation

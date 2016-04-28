@@ -4,7 +4,6 @@ import java.nio.ByteBuffer;
 
 /**
  * A YUV frame in the I420 format
- *
  */
 public class I420Frame {
     public final int width;
