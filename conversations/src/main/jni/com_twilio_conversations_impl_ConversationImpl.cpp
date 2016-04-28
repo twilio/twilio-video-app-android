@@ -103,6 +103,20 @@ TSCConstraintsRef createVideoConstraints(JNIEnv *env, jobject j_video_constraint
                        min_width,
                        min_height);
 
+    jfieldID min_aspect_ratio_field =
+            env->GetFieldID(video_constraints_class, "minAspectRatio", "D");
+    jfieldID max_aspect_ratio_field =
+            env->GetFieldID(video_constraints_class, "maxAspectRatio", "D");
+    double min_aspect_ratio =
+            env->GetDoubleField(j_video_constraints, min_aspect_ratio_field);
+    double max_aspect_ratio =
+            env->GetDoubleField(j_video_constraints, max_aspect_ratio_field);
+
+    TS_CORE_LOG_MODULE(kTSCoreLogModulePlatform, kTSCoreLogLevelDebug,
+                       "Video aspect ratio minAspectRatio %f maxAspectRatio %f",
+                       min_aspect_ratio,
+                       max_aspect_ratio);
+
     jobject j_max_video_dimensions = env->GetObjectField(j_video_constraints, max_video_dimensions_field);
     jclass max_video_dimensions_class = env->GetObjectClass(j_max_video_dimensions);
     jfieldID max_width_field =
@@ -134,6 +148,12 @@ TSCConstraintsRef createVideoConstraints(JNIEnv *env, jobject j_video_constraint
     if (min_width > 0 && min_height > 0) {
         constraints->SetMandatory(twiliosdk::TSCConstraints::kMinWidth, min_width);
         constraints->SetMandatory(twiliosdk::TSCConstraints::kMinHeight, min_height);
+    }
+    if (min_aspect_ratio > 0) {
+        constraints->SetMandatory(twiliosdk::TSCConstraints::kMinAspectRatio, min_aspect_ratio);
+    }
+    if (max_aspect_ratio > 0) {
+        constraints->SetMandatory(twiliosdk::TSCConstraints::kMaxAspectRatio, max_aspect_ratio);
     }
     return constraints;
 }
