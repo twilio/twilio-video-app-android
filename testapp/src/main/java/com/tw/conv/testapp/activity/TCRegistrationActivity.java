@@ -14,6 +14,7 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.view.HapticFeedbackConstants;
 import android.view.View;
+import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -102,6 +103,7 @@ public class TCRegistrationActivity extends AppCompatActivity {
         if (savedInstanceState == null) {
             restoreLastSuccessfulRegistration();
         }
+
     }
 
     public boolean checkPermissions(){
@@ -328,6 +330,9 @@ public class TCRegistrationActivity extends AppCompatActivity {
 
     private void restoreLastSuccessfulRegistration() {
         usernameEditText.setText(sharedPreferences.getString(USERNAME_KEY, null));
+        if(usernameEditText.getText() != null) {
+            usernameEditText.setSelection(usernameEditText.getText().length());
+        }
         Integer lastRealmPosition = getRealmPosition(sharedPreferences.getString(REALM_KEY, null));
         if (lastRealmPosition != null) {
             realmSpinner.setSelection(lastRealmPosition);
