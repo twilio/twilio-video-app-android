@@ -50,7 +50,7 @@
     </string-array>
 
     <string-array name="aspect_ratio_array">
-        <item>0:0</item>
+        <item>Default</item>
         <item>4:3</item>
         <item>16:9</item>
     </string-array>
