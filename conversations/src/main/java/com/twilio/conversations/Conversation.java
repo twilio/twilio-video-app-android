@@ -36,15 +36,29 @@ public interface Conversation {
     void setConversationListener(ConversationListener listener);
 
     /**
-     * Invites one or more participants to this conversation
+     * Invites one or more participants to this conversation.
      *
-     * @param participantIdentities A set of strings representing the identities of these participants.
+     * <p>Results of this call will propagate up according to the following scenarios:
+     * <ol>
+     * <li>{@link ConversationListener#onParticipantConnected(Conversation, Participant)} will be
+     * invoked if recipient accepts invite and is connected.
+     * <li>{@link ConversationListener#onFailedToConnectParticipant(Conversation, Participant,
+     * TwilioConversationsException)} will be invoked with error code
+     * {@link TwilioConversations#CONVERSATION_FAILED} if the recipient rejected the invite.
+     * <li>{@link ConversationListener#onFailedToConnectParticipant(Conversation, Participant,
+     * TwilioConversationsException)} will be invoked with error code
+     * {@link TwilioConversations#CONVERSATION_IGNORED} if the recipient ignored the invite.
+     * </ol>
+     *
+     * @param participantIdentities A set of strings representing the identities of these
+     *                              participants.
      */
     void invite(Set<String> participantIdentities) throws IllegalArgumentException;
 
     /**
-     * Disconnects from this conversation
-     *
+     * Disconnects from this conversation.
+     * {@link ConversationListener#onConversationEnded(Conversation, TwilioConversationsException)}
+     * will be invoked upon the completion of this process.
      */
     void disconnect();
 
