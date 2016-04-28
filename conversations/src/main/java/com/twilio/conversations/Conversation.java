@@ -65,11 +65,7 @@ public interface Conversation {
     /**
      * Sets the {@link StatsListener} of this conversation
      *
-     * <p>Calling thread will be used to invoke all events on {@link StatsListener}. If the
-     * calling thread doesn't have Looper associated with it, SDK will attempt to use main thread
-     * Handler instead.</p>
-     *
-     * @param listener A listener of this conversation media tracks stats
+     * @param listener Listens to media tracks stats from this conversation
      */
     void setStatsListener(StatsListener listener);
 }

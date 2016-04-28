@@ -81,6 +81,9 @@ public interface LocalMedia {
     /**
      * Sets the {@link LocalMediaListener}
      *
+     * <p>The {@link LocalMediaListener} is invoked on the thread that provides the
+     * LocalMediaListener instance.</p>
+     *
      * @param listener A media events listener
      */
     void setLocalMediaListener(LocalMediaListener listener);

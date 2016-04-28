@@ -185,7 +185,6 @@ public class TCClientActivity extends AppCompatActivity {
     private AudioState audioState;
     private String capabilityToken;
     private TwilioAccessManager accessManager;
-    private ExecutorService statsExecutorService;
 
     private VideoConstraints videoConstraints;
 
@@ -1189,27 +1188,14 @@ public class TCClientActivity extends AppCompatActivity {
     }
 
     private void enableStats() {
-        if (statsExecutorService != null) {
-            statsExecutorService.shutdown();
+        if(conversation != null) {
+            conversation.setStatsListener(statsListener());
         }
-        statsExecutorService = Executors.newFixedThreadPool(1);
-        statsExecutorService.submit(new Runnable() {
-            @Override
-            public void run() {
-                if(conversation != null) {
-                    conversation.setStatsListener(statsListener());
-                }
-            }
-        });
     }
 
     private void disableStats() {
         if(conversation != null) {
             conversation.setStatsListener(null);
-            if (statsExecutorService != null) {
-                statsExecutorService.shutdownNow();
-                statsExecutorService = null;
-            }
         }
         if(remoteVideoTrackStatsRecordMap != null) {
             remoteVideoTrackStatsRecordMap.clear();
