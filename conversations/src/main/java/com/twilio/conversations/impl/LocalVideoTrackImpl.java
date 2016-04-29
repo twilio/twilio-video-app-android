@@ -42,6 +42,8 @@ public class LocalVideoTrackImpl extends VideoTrackImpl implements LocalVideoTra
         return new VideoConstraints.Builder()
                 .minFps(10)
                 .maxFps(30)
+                .minAspectRatio(VideoConstraints.ASPECT_RATIO_4_3_MIN)
+                .maxAspectRatio(VideoConstraints.ASPECT_RATIO_4_3_MAX)
                 .maxVideoDimensions(new VideoDimensions(640,480))
                 .build();
     }

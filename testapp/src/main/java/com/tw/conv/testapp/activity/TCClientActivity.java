@@ -29,6 +29,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
@@ -47,11 +48,11 @@ import com.tw.conv.testapp.R;
 import com.tw.conv.testapp.adapter.IceServerAdapter;
 import com.tw.conv.testapp.adapter.RemoteVideoTrackStatsAdapter;
 import com.tw.conv.testapp.dialog.Dialog;
-import com.tw.conv.testapp.util.SimpleSignalingUtils;
 import com.tw.conv.testapp.model.TwilioIceResponse;
 import com.tw.conv.testapp.model.TwilioIceServer;
 import com.tw.conv.testapp.util.IceOptionsHelper;
 import com.tw.conv.testapp.util.ParticipantParser;
+import com.tw.conv.testapp.util.SimpleSignalingUtils;
 import com.twilio.common.TwilioAccessManager;
 import com.twilio.common.TwilioAccessManagerFactory;
 import com.twilio.common.TwilioAccessManagerListener;
@@ -103,8 +104,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 import retrofit.Callback;
 import retrofit.RetrofitError;
@@ -185,7 +184,6 @@ public class TCClientActivity extends AppCompatActivity {
     private AudioState audioState;
     private String capabilityToken;
     private TwilioAccessManager accessManager;
-    private ExecutorService statsExecutorService;
 
     private VideoConstraints videoConstraints;
 
@@ -193,12 +191,22 @@ public class TCClientActivity extends AppCompatActivity {
     private int maxFps = 0;
     private VideoDimensions minVideoDimensions = null;
     private VideoDimensions maxVideoDimensions = null;
+    class AspectRatio {
+        public double minAspectRatio;
+        public double maxAspectRatio;
+        public AspectRatio(double min, double max) {
+            minAspectRatio = min;
+            maxAspectRatio = max;
+        }
+    }
+    private AspectRatio aspectRatio = new AspectRatio(0.0, 0.0);
 
     private Spinner iceTransPolicySpinner;
     private ListView twilioIceServersListView;
     private RelativeLayout iceOptionsLayout;
     private CheckBox enableIceCheckbox;
     private CheckBox preferH264Checkbox;
+    private Spinner aspectRatioSpinner;
 
     private static final Map<Integer, VideoDimensions> videoDimensionsMap;
     static {
@@ -339,17 +347,21 @@ public class TCClientActivity extends AppCompatActivity {
                 maxFps = Integer.valueOf(fpsRangeBar.getRightPinValue());
                 minVideoDimensions = videoDimensionsMap.get(videoDimensionsRangeBar.getLeftIndex());
                 maxVideoDimensions = videoDimensionsMap.get(videoDimensionsRangeBar.getRightIndex());
+                aspectRatio = getAspectRatio();
             }
 
             @Override
             public void onDrawerClosed(View drawerView) {
                 // Update video constraints
                 try {
+                    aspectRatio = getAspectRatio();
                     videoConstraints = new VideoConstraints.Builder()
                             .minFps(minFps)
                             .maxFps(maxFps)
                             .minVideoDimensions(minVideoDimensions)
                             .maxVideoDimensions(maxVideoDimensions)
+                            .minAspectRatio(aspectRatio.minAspectRatio)
+                            .maxAspectRatio(aspectRatio.maxAspectRatio)
                             .build();
                 } catch(Exception e) {
                     Snackbar.make(
@@ -430,6 +442,12 @@ public class TCClientActivity extends AppCompatActivity {
         enableIceCheckbox.setOnCheckedChangeListener(enableIceCheckedChangeListener());
         preferH264Checkbox = (CheckBox) findViewById(R.id.prefer_h264_checkbox);
         preferH264Checkbox.setChecked(preferH264);
+
+        aspectRatioSpinner = (Spinner)findViewById(R.id.aspect_ratio_spinner);
+        ArrayAdapter<CharSequence> spinnerAdapter = ArrayAdapter.createFromResource(this,
+                R.array.aspect_ratio_array, android.R.layout.simple_spinner_item);
+        spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        aspectRatioSpinner.setAdapter(spinnerAdapter);
 
         accessManager = TwilioAccessManagerFactory.createAccessManager(this, capabilityToken,
                 accessManagerListener());
@@ -1189,27 +1207,14 @@ public class TCClientActivity extends AppCompatActivity {
     }
 
     private void enableStats() {
-        if (statsExecutorService != null) {
-            statsExecutorService.shutdown();
+        if(conversation != null) {
+            conversation.setStatsListener(statsListener());
         }
-        statsExecutorService = Executors.newFixedThreadPool(1);
-        statsExecutorService.submit(new Runnable() {
-            @Override
-            public void run() {
-                if(conversation != null) {
-                    conversation.setStatsListener(statsListener());
-                }
-            }
-        });
     }
 
     private void disableStats() {
         if(conversation != null) {
             conversation.setStatsListener(null);
-            if (statsExecutorService != null) {
-                statsExecutorService.shutdownNow();
-                statsExecutorService = null;
-            }
         }
         if(remoteVideoTrackStatsRecordMap != null) {
             remoteVideoTrackStatsRecordMap.clear();
@@ -1871,5 +1876,19 @@ public class TCClientActivity extends AppCompatActivity {
         if (manager != null) {
             manager.unregisterReceiver(rejectIncomingInviteReceiver);
         }
+    }
+
+    private AspectRatio getAspectRatio() {
+        switch ((int)aspectRatioSpinner.getSelectedItemId()) {
+            case 0:
+                return new AspectRatio(0.0, 0.0);
+            case 1:
+                return new AspectRatio(VideoConstraints.ASPECT_RATIO_4_3_MIN,
+                        VideoConstraints.ASPECT_RATIO_4_3_MAX);
+            case 2:
+                return new AspectRatio(VideoConstraints.ASPECT_RATIO_16_9_MIN,
+                        VideoConstraints.ASPECT_RATIO_16_9_MAX);
+        }
+        return new AspectRatio(0.0, 0.0);
     }
 }

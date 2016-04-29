@@ -46,12 +46,16 @@ public class VideoConstraintsUnitTests {
                 .maxVideoDimensions(VideoDimensions.HD_720P_VIDEO_DIMENSIONS)
                 .minFps(VideoConstraints.FPS_10)
                 .maxFps(VideoConstraints.FPS_24)
+                .minAspectRatio(VideoConstraints.ASPECT_RATIO_4_3_MIN)
+                .maxAspectRatio(VideoConstraints.ASPECT_RATIO_4_3_MAX)
                 .build();
 
         assertEquals(VideoDimensions.CIF_VIDEO_DIMENSIONS, videoConstraints.getMinVideoDimensions());
         assertEquals(VideoDimensions.HD_720P_VIDEO_DIMENSIONS, videoConstraints.getMaxVideoDimensions());
         assertEquals(VideoConstraints.FPS_10, videoConstraints.getMinFps());
         assertEquals(VideoConstraints.FPS_24, videoConstraints.getMaxFps());
+        assertEquals(VideoConstraints.ASPECT_RATIO_4_3_MIN, videoConstraints.getMinAspectRatio());
+        assertEquals(VideoConstraints.ASPECT_RATIO_4_3_MAX, videoConstraints.getMaxAspectRatio());
     }
 
     @Test(expected = NullPointerException.class)
@@ -96,6 +100,36 @@ public class VideoConstraintsUnitTests {
         new VideoConstraints.Builder()
                 .minFps(20)
                 .maxFps(10)
+                .build();
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void useNegativeMinAspectRatio() {
+        new VideoConstraints.Builder()
+                .minAspectRatio(-1.33)
+                .build();
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void useNegativeMaxAspectRatio() {
+        new VideoConstraints.Builder()
+                .maxAspectRatio(-1.333)
+                .build();
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void localVideoTrackWithNegativeMinAndMaxAspectRatio() {
+        new VideoConstraints.Builder()
+                .minAspectRatio(-1.33)
+                .maxAspectRatio(-1.33)
+                .build();
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void useInvalidAspectRatioRange() {
+        new VideoConstraints.Builder()
+                .minAspectRatio(1.334)
+                .maxAspectRatio(1.333)
                 .build();
     }
 

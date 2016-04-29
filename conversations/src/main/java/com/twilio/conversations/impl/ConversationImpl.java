@@ -59,7 +59,6 @@ public class ConversationImpl implements Conversation,
     private IncomingInviteImpl incomingInviteImpl;
     private OutgoingInviteImpl outgoingInviteImpl;
     private StatsListener statsListener;
-    private Handler statsHandler;
 
     private static String TAG = "ConversationImpl";
 
@@ -283,12 +282,10 @@ public class ConversationImpl implements Conversation,
     public void setStatsListener(StatsListener listener) {
         statsListener = listener;
         if (listener != null) {
-            statsHandler = CallbackHandler.create();
             if (sessionObserverInternal != null) {
                 sessionObserverInternal.enableStats(nativeSession, true);
             }
         } else {
-            statsHandler = null;
             if (sessionObserverInternal != null) {
                 sessionObserverInternal.enableStats(nativeSession, false);
             }
@@ -687,7 +684,7 @@ public class ConversationImpl implements Conversation,
 
     @Override
     public void onReceiveTrackStatistics(CoreTrackStatsReport report) {
-        if (statsHandler != null && statsListener != null) {
+        if (handler != null && statsListener != null) {
             final MediaTrackStatsRecord stats = MediaTrackStatsRecordFactory.create(report);
 
             if (stats != null) {
@@ -697,11 +694,13 @@ public class ConversationImpl implements Conversation,
                  * It will become available when the onParticipantConnected event is triggered.
                  */
                 for(final Participant participant: getParticipants()) {
-                    if(participant.getSid() != null && stats.getParticipantSid() != null && participant.getSid().equals(stats.getParticipantSid())) {
-                        statsHandler.post(new Runnable() {
+                    if(participant.getSid() != null && stats.getParticipantSid() != null &&
+                            participant.getSid().equals(stats.getParticipantSid())) {
+                        handler.post(new Runnable() {
                             @Override
                             public void run() {
-                                statsListener.onMediaTrackStatsRecord(ConversationImpl.this, participant, stats);
+                                statsListener.onMediaTrackStatsRecord(
+                                        ConversationImpl.this, participant, stats);
                             }
                         });
                         return;
