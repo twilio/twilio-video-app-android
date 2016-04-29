@@ -1,5 +1,5 @@
 #include "com_twilio_conversations_impl_ConversationsClientImpl_EndpointObserverInternal.h"
-#include "talk/app/webrtc/java/jni/jni_helpers.h"
+#include "webrtc/api/java/jni/jni_helpers.h"
 #include "TSCoreSDKTypes.h"
 #include "TSCoreError.h"
 #include "TSCEndpoint.h"
@@ -7,7 +7,7 @@
 #include "TSCSession.h"
 #include "TSCLogger.h"
 #include <android/log.h>
-#include <webrtc/base/criticalsection.h>
+#include "webrtc/base/criticalsection.h"
 
 using namespace webrtc_jni;
 using namespace twiliosdk;

@@ -7,7 +7,7 @@ public final class EglBaseProvider {
 
     public static EglBase provideEglBase() {
         if (rootEglBase == null) {
-            rootEglBase = new EglBase();
+            rootEglBase = EglBase.create();
         }
 
         return rootEglBase;

@@ -15,17 +15,17 @@
 #include "webrtc/voice_engine/include/voe_base.h"
 #include "webrtc/modules/video_capture/video_capture_internal.h"
 #include "webrtc/modules/video_render/video_render_internal.h"
-#include "talk/app/webrtc/java/jni/androidvideocapturer_jni.h"
+#include "webrtc/api/java/jni/androidvideocapturer_jni.h"
 #include "webrtc/modules/audio_device/android/audio_manager.h"
 #include "webrtc/modules/audio_device/android/opensles_player.h"
 
 #include "com_twilio_conversations_impl_TwilioConversationsImpl.h"
 
-#include "talk/app/webrtc/java/jni/jni_helpers.h"
-#include "talk/app/webrtc/java/jni/classreferenceholder.h"
-#include "talk/app/webrtc/java/jni/androidnetworkmonitor_jni.h"
-#include "talk/media/webrtc/webrtcvideodecoderfactory.h"
-#include "talk/media/webrtc/webrtcvideoencoderfactory.h"
+#include "webrtc/api/java/jni/jni_helpers.h"
+#include "webrtc/api/java/jni/classreferenceholder.h"
+#include "webrtc/api/java/jni/androidnetworkmonitor_jni.h"
+#include "webrtc/media/engine/webrtcvideodecoderfactory.h"
+#include "webrtc/media/engine/webrtcvideoencoderfactory.h"
 #include "android_video_codec_manager.h"
 
 

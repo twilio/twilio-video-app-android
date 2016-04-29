@@ -1,5 +1,5 @@
-#include "talk/app/webrtc/java/jni/jni_helpers.h"
-#include "talk/app/webrtc/mediastreaminterface.h"
+#include "webrtc/api/java/jni/jni_helpers.h"
+#include "webrtc/api/mediastreaminterface.h"
 
 #include "com_twilio_conversations_impl_ConversationImpl_SessionObserverInternal.h"
 

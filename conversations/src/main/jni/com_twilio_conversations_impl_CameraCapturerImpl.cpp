@@ -1,6 +1,8 @@
-#include <talk/app/webrtc/androidvideocapturer.h>
+#include <webrtc/api/java/jni/androidvideocapturer_jni.h>
+#include <webrtc/api/java/jni/classreferenceholder.h>
+#include "webrtc/api/androidvideocapturer.h"
 #include "com_twilio_conversations_impl_CameraCapturerImpl.h"
-#include "talk/app/webrtc/java/jni/jni_helpers.h"
+#include "webrtc/api/java/jni/jni_helpers.h"
 #include "TSCoreSDKTypes.h"
 #include "TSCoreError.h"
 #include "TSCLogger.h"
@@ -30,9 +32,29 @@ JNIEXPORT void JNICALL Java_com_twilio_conversations_impl_CameraCapturerImpl_res
     session->get()->restartVideoSource();
 }
 
+JNIEXPORT jlong JNICALL
+Java_com_twilio_conversations_impl_CameraCapturerImpl_createNativeCapturer(JNIEnv *env,
+                                                                           jobject instance,
+                                                                           jobject j_video_capturer) {
+    jobject j_surface_texture_helper =
+            env->CallObjectMethod(j_video_capturer,
+                                  GetMethodID(env,
+                                              FindClass(env, "org/webrtc/VideoCapturer"),
+                                              "getSurfaceTextureHelper",
+                                              "()Lorg/webrtc/SurfaceTextureHelper;"));
+    webrtc::AndroidVideoCapturerDelegate *delegate =
+            new rtc::RefCountedObject<AndroidVideoCapturerJni>(env, j_video_capturer, j_surface_texture_helper);
+    delegate->AddRef();
+    return jlongFromPointer(delegate);
+}
+
 JNIEXPORT void JNICALL
-Java_com_twilio_conversations_impl_CameraCapturerImpl_disposeCapturer(JNIEnv *env, jobject instance,
+Java_com_twilio_conversations_impl_CameraCapturerImpl_disposeCapturer(JNIEnv *env,
+                                                                      jobject instance,
                                                                       jlong nativeVideoCapturerAndroid) {
-    delete reinterpret_cast<webrtc::AndroidVideoCapturerDelegate *>(nativeVideoCapturerAndroid);
+    webrtc::AndroidVideoCapturerDelegate *delegate =
+            reinterpret_cast<webrtc::AndroidVideoCapturerDelegate *>(nativeVideoCapturerAndroid);
+    delegate->Release();
+    delete delegate;
 }
 
