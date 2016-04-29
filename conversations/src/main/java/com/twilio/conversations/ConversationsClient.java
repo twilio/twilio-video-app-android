@@ -31,7 +31,7 @@ public interface ConversationsClient {
     boolean isListening();
 
     /**
-     * Starts listening for incoming conversations.
+     * Starts listening for incoming invites and allows outgoing invites to be sent.
      *
      * <p>The result of this method will propagate via the {@link ConversationsClientListener}:</p>
      * <ol>
@@ -54,7 +54,8 @@ public interface ConversationsClient {
 
     /**
      * Sends an invitation to start a conversation with the following participants and local media
-     * configuration.
+     * configuration. The {@link ConversationsClient} must be listening before sending an
+     * outgoing invite.
      *
      * <p>The result of this method will propagate via the {@link ConversationCallback} provided
      * according to the following scenarios:</p>
@@ -83,7 +84,8 @@ public interface ConversationsClient {
 
     /**
      * Sends an invitation to start a conversation with the following participants and local media
-     * configuration
+     * configuration. The {@link ConversationsClient} must be listening before sending an
+     * outgoing invite.
      *
      * <p>The result of this method will propagate via the {@link ConversationCallback} provided
      * according to the following scenarios:</p>
