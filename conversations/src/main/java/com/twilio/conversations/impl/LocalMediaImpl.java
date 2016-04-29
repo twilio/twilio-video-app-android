@@ -77,12 +77,12 @@ public class LocalMediaImpl implements LocalMedia {
     }
 
     @Override
-    public void addLocalVideoTrack(final LocalVideoTrack track)
+    public void addLocalVideoTrack(final LocalVideoTrack localVideoTrack)
             throws IllegalArgumentException, UnsupportedOperationException {
-        if (track == null) {
+        if (localVideoTrack == null) {
             throw new NullPointerException("LocalVideoTrack can't be null");
         }
-        LocalVideoTrackImpl localVideoTrackImpl = (LocalVideoTrackImpl)track;
+        LocalVideoTrackImpl localVideoTrackImpl = (LocalVideoTrackImpl) localVideoTrack;
         if(!localVideoTrackImpl.getState().equals(MediaTrackState.IDLE)) {
             postVideoTrackException(localVideoTrackImpl,
                     new TwilioConversationsException(
@@ -103,7 +103,7 @@ public class LocalMediaImpl implements LocalMedia {
                         if (localMediaListener != null) {
                             localMediaListener.onLocalVideoTrackError(
                                     LocalMediaImpl.this,
-                                    track,
+                                    localVideoTrack,
                                     new TwilioConversationsException(
                                             TwilioConversations.INVALID_VIDEO_CAPTURER,
                                             "The LocalVideoTrack must be associated with a "+
@@ -138,27 +138,27 @@ public class LocalMediaImpl implements LocalMedia {
     }
 
     @Override
-    public void removeLocalVideoTrack(LocalVideoTrack track) throws IllegalArgumentException {
+    public void removeLocalVideoTrack(LocalVideoTrack localVideoTrack) throws IllegalArgumentException {
         if (videoTracksImpl.size() == 0) {
             logger.w("There are no local video tracks in the list");
             return;
-        } else if (!videoTracksImpl.contains(track)) {
+        } else if (!videoTracksImpl.contains(localVideoTrack)) {
             logger.w("The specified local video track was not found");
             return;
         }
-        if(track.getState().equals(MediaTrackState.ENDED)) {
-            postVideoTrackException(track, new TwilioConversationsException(TwilioConversations.INVALID_VIDEO_TRACK_STATE, "The provided video track is not in a valid state"));
-        } else if(!track.getState().equals(MediaTrackState.STARTED)) {
-            postVideoTrackException(track, new TwilioConversationsException(TwilioConversations.TRACK_OPERATION_IN_PROGRESS, " A track operation is already in progress."));
+        if(localVideoTrack.getState().equals(MediaTrackState.ENDED)) {
+            postVideoTrackException(localVideoTrack, new TwilioConversationsException(TwilioConversations.INVALID_VIDEO_TRACK_STATE, "The provided video track is not in a valid state"));
+        } else if(!localVideoTrack.getState().equals(MediaTrackState.STARTED)) {
+            postVideoTrackException(localVideoTrack, new TwilioConversationsException(TwilioConversations.TRACK_OPERATION_IN_PROGRESS, " A track operation is already in progress."));
         }
         if (convWeak == null || convWeak.get() == null) {
             logger.d("Conversation is null");
             return;
         }
         ConversationImpl conv = convWeak.get();
-        boolean enabled = conv.enableVideo(false, !track.isEnabled(), null);
+        boolean enabled = conv.enableVideo(false, !localVideoTrack.isEnabled(), null);
         if(enabled) {
-            ((LocalVideoTrackImpl) track).setTrackState(MediaTrackState.ENDING);
+            ((LocalVideoTrackImpl) localVideoTrack).setTrackState(MediaTrackState.ENDING);
         }
     }
 

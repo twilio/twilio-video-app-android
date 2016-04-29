@@ -3,7 +3,6 @@ package com.twilio.conversations;
 /**
  * LocalMediaListener interface defines a set of callbacks for events related to a
  * {@link LocalMedia}.
- *
  */
 public interface LocalMediaListener {
     /**
