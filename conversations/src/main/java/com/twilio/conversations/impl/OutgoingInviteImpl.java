@@ -1,13 +1,9 @@
 package com.twilio.conversations.impl;
 
-import android.os.Handler;
-
-import com.twilio.conversations.Conversation;
 import com.twilio.conversations.ConversationCallback;
 import com.twilio.conversations.InviteStatus;
 import com.twilio.conversations.OutgoingInvite;
 import com.twilio.conversations.impl.logging.Logger;
-import com.twilio.conversations.impl.util.CallbackHandler;
 
 import java.util.Set;
 

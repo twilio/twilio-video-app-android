@@ -450,7 +450,8 @@ public class ConversationsClientImpl implements
                 handler.post(new Runnable() {
                     @Override
                     public void run() {
-                        conversationsClientListener.onFailedToStartListening(ConversationsClientImpl.this, e);
+                        conversationsClientListener
+                                .onFailedToStartListening(ConversationsClientImpl.this, e);
                     }
                 });
             }
@@ -460,7 +461,8 @@ public class ConversationsClientImpl implements
                 handler.post(new Runnable() {
                     @Override
                     public void run() {
-                        conversationsClientListener.onStartListeningForInvites(ConversationsClientImpl.this);
+                        conversationsClientListener
+                                .onStartListeningForInvites(ConversationsClientImpl.this);
                     }
                 });
             }
@@ -475,11 +477,11 @@ public class ConversationsClientImpl implements
             handler.post(new Runnable() {
                 @Override
                 public void run() {
-                    conversationsClientListener.onStopListeningForInvites(ConversationsClientImpl.this);
+                    conversationsClientListener
+                            .onStopListeningForInvites(ConversationsClientImpl.this);
                 }
             });
         }
-
     }
 
     @Override
@@ -487,12 +489,14 @@ public class ConversationsClientImpl implements
         logger.d("onStateDidChange " + state.toString());
         EndpointState oldEndpointState = endpointState;
         endpointState = state;
-        if ((oldEndpointState == EndpointState.RECONNECTING) && (endpointState == EndpointState.REGISTERED)) {
+        if ((oldEndpointState == EndpointState.RECONNECTING) &&
+                (endpointState == EndpointState.REGISTERED)) {
             if (handler != null) {
                 handler.post(new Runnable() {
                     @Override
                     public void run() {
-                        conversationsClientListener.onStartListeningForInvites(ConversationsClientImpl.this);
+                        conversationsClientListener
+                                .onStartListeningForInvites(ConversationsClientImpl.this);
                     }
                 });
             }
@@ -502,7 +506,8 @@ public class ConversationsClientImpl implements
                 handler.post(new Runnable() {
                     @Override
                     public void run() {
-                        conversationsClientListener.onStopListeningForInvites(ConversationsClientImpl.this);
+                        conversationsClientListener
+                                .onStopListeningForInvites(ConversationsClientImpl.this);
                     }
                 });
             }
@@ -580,7 +585,7 @@ public class ConversationsClientImpl implements
     @Override
     public void setAudioOutput(AudioOutput audioOutput) {
         logger.d("setAudioOutput");
-        AudioManager audioManager = (AudioManager)context.getSystemService(Context.AUDIO_SERVICE);
+        AudioManager audioManager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
         if (audioOutput == AudioOutput.SPEAKERPHONE) {
             audioManager.setSpeakerphoneOn(true);
         } else {
@@ -592,7 +597,7 @@ public class ConversationsClientImpl implements
     @Override
     public AudioOutput getAudioOutput() {
         logger.d("getAudioOutput");
-        AudioManager audioManager = (AudioManager)context.getSystemService(Context.AUDIO_SERVICE);
+        AudioManager audioManager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
         return audioManager.isSpeakerphoneOn() ? AudioOutput.SPEAKERPHONE : AudioOutput.HEADSET;
     }
 

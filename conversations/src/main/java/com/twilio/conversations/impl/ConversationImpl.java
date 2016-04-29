@@ -402,15 +402,19 @@ public class ConversationImpl implements Conversation,
     }
 
     @Override
-    public void onParticipantConnected(String participantIdentity, String participantSid, CoreError error) {
+    public void onParticipantConnected(String participantIdentity,
+                                       String participantSid,
+                                       CoreError error) {
         log("onParticipantConnected",  participantIdentity, error);
-        final ParticipantImpl participantImpl = findOrCreateParticipant(participantIdentity, participantSid);
+        final ParticipantImpl participantImpl = findOrCreateParticipant(participantIdentity,
+                participantSid);
         if (error == null) {
             if(handler != null && conversationListener != null) {
                 handler.post(new Runnable() {
                     @Override
                     public void run() {
-                        conversationListener.onParticipantConnected(ConversationImpl.this, participantImpl);
+                        conversationListener.onParticipantConnected(ConversationImpl.this,
+                                participantImpl);
                     }
                 });
             }
