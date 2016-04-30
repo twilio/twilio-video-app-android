@@ -42,19 +42,18 @@ Java_com_twilio_conversations_impl_CameraCapturerImpl_createNativeCapturer(JNIEn
                                               FindClass(env, "org/webrtc/VideoCapturer"),
                                               "getSurfaceTextureHelper",
                                               "()Lorg/webrtc/SurfaceTextureHelper;"));
-    webrtc::AndroidVideoCapturerDelegate *delegate =
+    rtc::scoped_refptr<webrtc::AndroidVideoCapturerDelegate> delegate =
             new rtc::RefCountedObject<AndroidVideoCapturerJni>(env, j_video_capturer, j_surface_texture_helper);
-    delegate->AddRef();
-    return jlongFromPointer(delegate);
+    rtc::scoped_ptr<cricket::VideoCapturer> capturer(new webrtc::AndroidVideoCapturer(delegate));
+    return jlongFromPointer(capturer.release());
 }
 
 JNIEXPORT void JNICALL
 Java_com_twilio_conversations_impl_CameraCapturerImpl_disposeCapturer(JNIEnv *env,
                                                                       jobject instance,
                                                                       jlong nativeVideoCapturerAndroid) {
-    webrtc::AndroidVideoCapturerDelegate *delegate =
-            reinterpret_cast<webrtc::AndroidVideoCapturerDelegate *>(nativeVideoCapturerAndroid);
-    delegate->Release();
-    delete delegate;
+    webrtc::AndroidVideoCapturer *capturer =
+            reinterpret_cast<webrtc::AndroidVideoCapturer *>(nativeVideoCapturerAndroid);
+    // XXX: VideoCapturer is owned by video source; I don't think we should delete it ourselves
+    //      delete capturer;
 }
-
