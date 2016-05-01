@@ -54,6 +54,5 @@ Java_com_twilio_conversations_impl_CameraCapturerImpl_disposeCapturer(JNIEnv *en
                                                                       jlong nativeVideoCapturerAndroid) {
     webrtc::AndroidVideoCapturer *capturer =
             reinterpret_cast<webrtc::AndroidVideoCapturer *>(nativeVideoCapturerAndroid);
-    // XXX: VideoCapturer is owned by video source; I don't think we should delete it ourselves
-    //      delete capturer;
+    delete capturer;
 }
