@@ -348,10 +348,17 @@ public class CameraCapturerImpl implements CameraCapturer {
         protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
             final int width = resolveSize(getSuggestedMinimumWidth(), widthMeasureSpec);
             final int height = resolveSize(getSuggestedMinimumHeight(), heightMeasureSpec);
+            final int displayOrientation = calculateDisplayOrientation();
+            final boolean verticalOrientation = displayOrientation == 90 ||
+                    displayOrientation == 270;
 
             // Now that we know the size of the view we calculate the optimal preview size
             setMeasuredDimension(width, height);
-            previewSize = getOptimalPreviewSize(supportedPreviewSizes, width, height);
+            if (verticalOrientation) {
+                previewSize = getOptimalPreviewSize(supportedPreviewSizes, height, width);
+            } else {
+                previewSize = getOptimalPreviewSize(supportedPreviewSizes, width, height);
+            }
         }
 
         @Override
