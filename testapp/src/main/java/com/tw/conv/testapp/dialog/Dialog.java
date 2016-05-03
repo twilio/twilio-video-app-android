@@ -6,6 +6,7 @@ import android.support.v7.app.AlertDialog;
 import android.widget.EditText;
 
 import com.tw.conv.testapp.R;
+import com.tw.conv.testapp.activity.TCClientActivity;
 import com.tw.conv.testapp.model.TwilioIceServer;
 
 import java.util.List;
@@ -23,6 +24,17 @@ public class Dialog {
         alertDialogBuilder.setMessage(caller + " is calling" + "\n" + "sid " + sid);
         alertDialogBuilder.setPositiveButton("Accept", acceptClickListener);
         alertDialogBuilder.setNegativeButton("Reject", rejectClickListener);
+        alertDialogBuilder.setCancelable(false);
+
+        return alertDialogBuilder.create();
+    }
+
+    public static AlertDialog createAutoAcceptInviteDialog(String caller, String sid, Context context) {
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(context);
+
+        alertDialogBuilder.setIcon(R.drawable.ic_call_black_24dp);
+        alertDialogBuilder.setTitle("Auto Accepting Incoming Call");
+        alertDialogBuilder.setMessage(caller + " is calling" + "\n" + "sid " + sid);
         alertDialogBuilder.setCancelable(false);
 
         return alertDialogBuilder.create();
@@ -80,4 +92,5 @@ public class Dialog {
         dialog.setListener(listener);
         return dialog;
     }
+
 }

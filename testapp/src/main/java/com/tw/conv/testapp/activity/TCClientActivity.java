@@ -10,6 +10,7 @@ import android.content.IntentFilter;
 import android.graphics.drawable.Drawable;
 import android.media.AudioManager;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.NotificationCompat;
@@ -120,6 +121,7 @@ public class TCClientActivity extends AppCompatActivity {
             "com.tw.conv.testapp.action.ACCEPT_INCOMING_CALL";
 
     public static final String OPTION_PREFER_H264_KEY = "enable-h264";
+    public static final String OPTION_AUTO_ACCEPT_KEY = "auto-accept";
     private static final String OPTION_DEV_REGISTRAR = "endpoint.dev.twilio.com";
     private static final String OPTION_DEV_STATS_URL = "https://eventgw.dev.twilio.com";
     private static final String OPTION_STAGE_REGISTRAR = "endpoint.stage.twilio.com";
@@ -143,6 +145,7 @@ public class TCClientActivity extends AppCompatActivity {
             remoteVideoTrackStatsRecordMap = new LinkedHashMap<>();
     private RecyclerView remoteStatsRecyclerView;
     private boolean preferH264;
+    private boolean autoAccept;
 
     private enum AudioState {
         ENABLED,
@@ -422,6 +425,7 @@ public class TCClientActivity extends AppCompatActivity {
 
         realm = getIntent().getExtras().getString(SimpleSignalingUtils.REALM);
         preferH264 = getIntent().getExtras().getBoolean(OPTION_PREFER_H264_KEY);
+        autoAccept = getIntent().getExtras().getBoolean(OPTION_AUTO_ACCEPT_KEY);
         Map<String, String> privateOptions = createPrivateOptions(realm);
         IceOptions iceOptions = getIceOptionsFromIntent();
         ClientOptionsInternal options = new ClientOptionsInternal(iceOptions, privateOptions);
@@ -826,7 +830,11 @@ public class TCClientActivity extends AppCompatActivity {
                 if (!inBackground) {
                     conversationsClientStatusTextView
                             .setText("onIncomingInvite" + incomingInvite.getInviter());
-                    showInviteDialog(incomingInvite);
+                    if(autoAccept) {
+                        showAutoAcceptInviteDialog(incomingInvite);
+                    } else {
+                        showInviteDialog(incomingInvite);
+                    }
                 } else {
                     NotificationManager notificationManager =
                             (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
@@ -1271,16 +1279,37 @@ public class TCClientActivity extends AppCompatActivity {
         alertDialog.show();
     }
 
+    private void showAutoAcceptInviteDialog(final IncomingInvite incomingInvite) {
+        alertDialog = Dialog.createAutoAcceptInviteDialog(
+        incomingInvite.getInviter(),
+                incomingInvite.getConversationSid(),
+                this);
+        alertDialog.show();
+
+        // Show the dialog and then automatically accept the call
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                alertDialog.dismiss();
+                acceptCall();
+            }
+        }, 3000);
+    }
+
     private DialogInterface.OnClickListener acceptCallClickListener(
             final IncomingInvite invite) {
         return new DialogInterface.OnClickListener() {
             @Override
             public void onClick(final DialogInterface dialogInterface, int i) {
-                localMedia = createLocalMedia();
-                acceptInvite(incomingInvite);
-                setHangupAction();
+                acceptCall();
             }
         };
+    }
+
+    private void acceptCall() {
+        localMedia = createLocalMedia();
+        acceptInvite(incomingInvite);
+        setHangupAction();
     }
 
     private void acceptInvite(IncomingInvite incomingInvite) {
