@@ -30,7 +30,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
@@ -111,7 +110,7 @@ import retrofit.RetrofitError;
 import retrofit.client.Response;
 import timber.log.Timber;
 
-public class TCClientActivity extends AppCompatActivity {
+public class ClientActivity extends AppCompatActivity {
     private static final int REQUEST_CODE_REJECT_INCOMING_CALL = 1000;
     private static final int REQUEST_CODE_ACCEPT_INCOMING_CALL = 1001;
     private static final int INCOMING_CALL_NOTIFICATION_ID = 1002;
@@ -461,7 +460,7 @@ public class TCClientActivity extends AppCompatActivity {
 
 
         cameraCapturer = CameraCapturerFactory.createCameraCapturer(
-                TCClientActivity.this,
+                ClientActivity.this,
                 currentCameraSource,
                 capturerErrorListener());
 
@@ -677,8 +676,8 @@ public class TCClientActivity extends AppCompatActivity {
     }
 
     private void returnToRegistration() {
-        startActivity(new Intent(TCClientActivity.this,
-                TCRegistrationActivity.class));
+        startActivity(new Intent(ClientActivity.this,
+                RegistrationActivity.class));
         finish();
     }
 
@@ -757,7 +756,7 @@ public class TCClientActivity extends AppCompatActivity {
                 @Override
                 public void success(TwilioIceResponse twilioIceResponse, Response response) {
                     IceServerAdapter iceServerAdapter =
-                            new IceServerAdapter(TCClientActivity.this,
+                            new IceServerAdapter(ClientActivity.this,
                                     twilioIceResponse.getIceServers());
                     twilioIceServersListView.setAdapter(iceServerAdapter);
                 }
@@ -826,7 +825,7 @@ public class TCClientActivity extends AppCompatActivity {
             @Override
             public void onIncomingInvite(ConversationsClient conversationsClient,
                                          IncomingInvite incomingInvite) {
-                TCClientActivity.this.incomingInvite = incomingInvite;
+                ClientActivity.this.incomingInvite = incomingInvite;
                 if (!inBackground) {
                     conversationsClientStatusTextView
                             .setText("onIncomingInvite" + incomingInvite.getInviter());
@@ -851,7 +850,7 @@ public class TCClientActivity extends AppCompatActivity {
                     PendingIntent rejectPendingIntent = getRejectPendingIntent();
 
                     NotificationCompat.Builder mBuilder =
-                            new NotificationCompat.Builder(TCClientActivity.this)
+                            new NotificationCompat.Builder(ClientActivity.this)
                                     .setSmallIcon(R.drawable.ic_videocam_green_24px)
                                     .setDeleteIntent(rejectPendingIntent)
                                     .setContentTitle(incomingInvite.getInviter())
@@ -872,7 +871,7 @@ public class TCClientActivity extends AppCompatActivity {
             @Override
             public void onIncomingInviteCancelled(ConversationsClient conversationsClient,
                                                   IncomingInvite incomingInvite) {
-                TCClientActivity.this.incomingInvite = null;
+                ClientActivity.this.incomingInvite = null;
                 if (!inBackground) {
                     alertDialog.dismiss();
                     Snackbar.make(conversationStatusTextView, "Invite from " +
@@ -1004,11 +1003,11 @@ public class TCClientActivity extends AppCompatActivity {
                 switchCameraActionFab.setEnabled(videoTrack.isEnabled());
                 if (videoTrack.isEnabled()) {
                     pauseActionFab.setImageDrawable(
-                            ContextCompat.getDrawable(TCClientActivity.this,
+                            ContextCompat.getDrawable(ClientActivity.this,
                                     R.drawable.ic_pause_green_24px));
                 } else {
                     pauseActionFab.setImageDrawable(
-                            ContextCompat.getDrawable(TCClientActivity.this,
+                            ContextCompat.getDrawable(ClientActivity.this,
                                     R.drawable.ic_pause_red_24px));
                 }
             } else {
@@ -1026,22 +1025,22 @@ public class TCClientActivity extends AppCompatActivity {
         if (videoState == VideoState.ENABLED) {
             switchCameraActionFab.show();
             localVideoActionFab.setImageDrawable(
-                    ContextCompat.getDrawable(TCClientActivity.this,
+                    ContextCompat.getDrawable(ClientActivity.this,
                             R.drawable.ic_videocam_white_24px));
         } else {
             switchCameraActionFab.hide();
             localVideoActionFab.setImageDrawable(
-                    ContextCompat.getDrawable(TCClientActivity.this,
+                    ContextCompat.getDrawable(ClientActivity.this,
                             R.drawable.ic_videocam_off_gray_24px));
         }
         if(localMedia != null && localMedia.getLocalVideoTracks().size() > 0 ) {
             if(localMedia.getLocalVideoTracks().get(0).isEnabled()) {
                 pauseActionFab.setImageDrawable(
-                        ContextCompat.getDrawable(TCClientActivity.this,
+                        ContextCompat.getDrawable(ClientActivity.this,
                                 R.drawable.ic_pause_green_24px));
             } else {
                 pauseActionFab.setImageDrawable(
-                        ContextCompat.getDrawable(TCClientActivity.this,
+                        ContextCompat.getDrawable(ClientActivity.this,
                                 R.drawable.ic_pause_red_24px));
             }
             pauseActionFab.show();
@@ -1087,11 +1086,11 @@ public class TCClientActivity extends AppCompatActivity {
     private void setAudioStateIcon() {
         if (audioState == AudioState.ENABLED) {
             audioActionFab.setImageDrawable(
-                    ContextCompat.getDrawable(TCClientActivity.this,
+                    ContextCompat.getDrawable(ClientActivity.this,
                             R.drawable.ic_mic_white_24px));
         } else if (audioState == AudioState.DISABLED) {
             audioActionFab.setImageDrawable(
-                    ContextCompat.getDrawable(TCClientActivity.this,
+                    ContextCompat.getDrawable(ClientActivity.this,
                             R.drawable.ic_mic_off_gray_24px));
         }
         if(audioState == AudioState.ENABLED && localMedia != null &&
@@ -1108,11 +1107,11 @@ public class TCClientActivity extends AppCompatActivity {
         if(set) {
             if (enable) {
                 muteActionFab.setImageDrawable(
-                        ContextCompat.getDrawable(TCClientActivity.this,
+                        ContextCompat.getDrawable(ClientActivity.this,
                                 R.drawable.ic_mic_red_24px));
             } else {
                 muteActionFab.setImageDrawable(
-                        ContextCompat.getDrawable(TCClientActivity.this,
+                        ContextCompat.getDrawable(ClientActivity.this,
                                 R.drawable.ic_mic_green_24px));
             }
         } else {
@@ -1174,7 +1173,7 @@ public class TCClientActivity extends AppCompatActivity {
                                     Timber.e("sendConversationInvite onConversation");
                                     if (e == null) {
                                         Timber.i("Conversation SID " + conversation.getSid());
-                                        TCClientActivity.this.conversation = conversation;
+                                        ClientActivity.this.conversation = conversation;
                                         conversation.setConversationListener(conversationListener());
                                         if(statsCheckBox.isChecked()) {
                                             enableStats();
@@ -1320,7 +1319,7 @@ public class TCClientActivity extends AppCompatActivity {
                 Timber.i("onConversation");
                 if (e == null) {
                     Timber.i("Conversation SID " + conversation.getSid());
-                    TCClientActivity.this.conversation = conversation;
+                    ClientActivity.this.conversation = conversation;
                     conversation.setConversationListener(conversationListener());
                     if(statsCheckBox.isChecked()) {
                         enableStats();
@@ -1373,12 +1372,12 @@ public class TCClientActivity extends AppCompatActivity {
                 AudioOutput.HEADSET);
 
         if (on == true) {
-            Drawable drawable = ContextCompat.getDrawable(TCClientActivity.this,
+            Drawable drawable = ContextCompat.getDrawable(ClientActivity.this,
                     R.drawable.ic_volume_down_white_24px);
             speakerActionFab.setImageDrawable(drawable);
         } else {
             // route back to headset
-            Drawable drawable = ContextCompat.getDrawable(TCClientActivity.this,
+            Drawable drawable = ContextCompat.getDrawable(ClientActivity.this,
                     R.drawable.ic_volume_down_gray_24px);
             speakerActionFab.setImageDrawable(drawable);
         }
@@ -1582,7 +1581,7 @@ public class TCClientActivity extends AppCompatActivity {
                 participantContainers.put(participant, participantContainer);
 
                 // Remote participant
-                VideoViewRenderer participantVideoRenderer = new VideoViewRenderer(TCClientActivity.this,
+                VideoViewRenderer participantVideoRenderer = new VideoViewRenderer(ClientActivity.this,
                         participantContainer);
                 participantVideoRenderer.setObserver(new VideoRendererObserver() {
                     @Override
@@ -1701,7 +1700,7 @@ public class TCClientActivity extends AppCompatActivity {
                 for(VideoTrack videoTrack : participant.getMedia().getVideoTracks()) {
                     if(videoTrack.getTrackId().equals(mediaTrack.getTrackId())) {
                         ViewGroup participantContainer = participantContainers.get(participant);
-                        ImageView disabledView = new ImageView(TCClientActivity.this);
+                        ImageView disabledView = new ImageView(ClientActivity.this);
                         disabledView.setTag(mediaTrack.getTrackId());
                         disabledView.setBackgroundResource(R.drawable.ic_videocam_off_red_24px);
                         RelativeLayout.LayoutParams layoutParams = new RelativeLayout
@@ -1722,7 +1721,7 @@ public class TCClientActivity extends AppCompatActivity {
                          * there is no participant container available
                          */
                         if(participantContainer != null) {
-                            ImageView disabledView = new ImageView(TCClientActivity.this);
+                            ImageView disabledView = new ImageView(ClientActivity.this);
                             disabledView.setTag(mediaTrack.getTrackId());
                             disabledView.setBackgroundResource(R.drawable.ic_mic_off_red_24px);
                             RelativeLayout.LayoutParams layoutParams = new RelativeLayout
@@ -1747,7 +1746,7 @@ public class TCClientActivity extends AppCompatActivity {
                                                LocalVideoTrack localVideoTrack) {
                 videoState = VideoState.ENABLED;
                 conversationStatusTextView.setText("onLocalVideoTrackAdded");
-                localRenderer = new VideoViewRenderer(TCClientActivity.this,
+                localRenderer = new VideoViewRenderer(ClientActivity.this,
                         localContainer);
                 localRenderer.setMirror(mirrorLocalRenderer);
                 localVideoTrack.addRenderer(localRenderer);
@@ -1804,9 +1803,9 @@ public class TCClientActivity extends AppCompatActivity {
         videoState = VideoState.ENABLED;
         setVideoStateIcon();
         pauseActionFab.setImageDrawable(
-                ContextCompat.getDrawable(TCClientActivity.this, R.drawable.ic_pause_green_24px));
+                ContextCompat.getDrawable(ClientActivity.this, R.drawable.ic_pause_green_24px));
         muteActionFab.setImageDrawable(
-                ContextCompat.getDrawable(TCClientActivity.this, R.drawable.ic_mic_green_24px));
+                ContextCompat.getDrawable(ClientActivity.this, R.drawable.ic_mic_green_24px));
 
         setSpeakerphoneOn(true);
 
@@ -1879,7 +1878,7 @@ public class TCClientActivity extends AppCompatActivity {
     }
 
     private PendingIntent getAcceptPendingIntent() {
-        Intent incomingCallAcceptIntent = new Intent(this, TCClientActivity.class);
+        Intent incomingCallAcceptIntent = new Intent(this, ClientActivity.class);
         incomingCallAcceptIntent.setAction(ACTION_ACCEPT_INCOMING_CALL);
         incomingCallAcceptIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP |
                 Intent.FLAG_ACTIVITY_SINGLE_TOP);

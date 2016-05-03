@@ -14,7 +14,6 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.view.HapticFeedbackConstants;
 import android.view.View;
-import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -44,7 +43,7 @@ import retrofit.Callback;
 import retrofit.RetrofitError;
 import retrofit.client.Response;
 
-public class TCRegistrationActivity extends AppCompatActivity {
+public class RegistrationActivity extends AppCompatActivity {
     public static final int PERMISSIONS_REQUEST_CODE = 0;
 
     private static final String USERNAME_KEY = "username";
@@ -180,7 +179,7 @@ public class TCRegistrationActivity extends AppCompatActivity {
 
             @Override
             public void onClick(View view) {
-                progressDialog = ProgressDialog.show(TCRegistrationActivity.this, null,
+                progressDialog = ProgressDialog.show(RegistrationActivity.this, null,
                         "Registering with Twilio", true);
                 String username = usernameEditText.getText().toString();
                 if(username != null && username.length() != 0) {
@@ -212,7 +211,7 @@ public class TCRegistrationActivity extends AppCompatActivity {
                         @Override
                         public void onInitialized() {
                             obtainCapabilityToken(username,
-                                    TCRegistrationActivity.this.realmSpinner.getSelectedItem()
+                                    RegistrationActivity.this.realmSpinner.getSelectedItem()
                                             .toString().toLowerCase());
                         }
 
@@ -227,7 +226,7 @@ public class TCRegistrationActivity extends AppCompatActivity {
                     });
         } else {
             obtainCapabilityToken(username,
-                    TCRegistrationActivity.this.realmSpinner.getSelectedItem()
+                    RegistrationActivity.this.realmSpinner.getSelectedItem()
                             .toString().toLowerCase());
         }
     }
@@ -270,9 +269,9 @@ public class TCRegistrationActivity extends AppCompatActivity {
                     showIceDialog();
                 } else {
                     iceServerProgressDialog = ProgressDialog.show(
-                            TCRegistrationActivity.this, null,
+                            RegistrationActivity.this, null,
                             "Obtaining Twilio ICE Servers", true);
-                    obtainTwilioIceServers(TCRegistrationActivity.this
+                    obtainTwilioIceServers(RegistrationActivity.this
                             .realmSpinner.getSelectedItem().toString().toLowerCase());
                 }
             }
@@ -292,8 +291,8 @@ public class TCRegistrationActivity extends AppCompatActivity {
             @Override
             public void onIceOptionsSelected(String iceTransportPolicy,
                                              List<TwilioIceServer> selectedServers) {
-                TCRegistrationActivity.this.iceTransportPolicy = iceTransportPolicy;
-                TCRegistrationActivity.this.selectedTwilioIceServers =
+                RegistrationActivity.this.iceTransportPolicy = iceTransportPolicy;
+                RegistrationActivity.this.selectedTwilioIceServers =
                         iceOptionsDialog.getSelectedServers();
             }
 
@@ -310,7 +309,7 @@ public class TCRegistrationActivity extends AppCompatActivity {
             public void success(TwilioIceResponse twilioIceResponse, Response response) {
                 iceServerProgressDialog.dismiss();
                 if (response.getStatus() == 200) {
-                    TCRegistrationActivity.this.twilioIceResponse = twilioIceResponse;
+                    RegistrationActivity.this.twilioIceResponse = twilioIceResponse;
                     showIceDialog();
                 } else {
                     Snackbar.make(registrationButton,
@@ -365,13 +364,13 @@ public class TCRegistrationActivity extends AppCompatActivity {
     }
 
     private void startClient(String username, String capabilityToken, String realm) {
-        Intent intent = new Intent(this, TCClientActivity.class);
+        Intent intent = new Intent(this, ClientActivity.class);
         intent.putExtra(SimpleSignalingUtils.USERNAME, username);
         intent.putExtra(SimpleSignalingUtils.CAPABILITY_TOKEN, capabilityToken);
         intent.putExtra(SimpleSignalingUtils.REALM, realm);
         intent.putExtra(TwilioIceResponse.ICE_TRANSPORT_POLICY, iceTransportPolicy);
-        intent.putExtra(TCClientActivity.OPTION_PREFER_H264_KEY, preferH264Checkbox.isChecked());
-        intent.putExtra(TCClientActivity.OPTION_AUTO_ACCEPT_KEY, autoAcceptCheckbox.isChecked());
+        intent.putExtra(ClientActivity.OPTION_PREFER_H264_KEY, preferH264Checkbox.isChecked());
+        intent.putExtra(ClientActivity.OPTION_AUTO_ACCEPT_KEY, autoAcceptCheckbox.isChecked());
         if (selectedTwilioIceServers != null) {
             intent.putExtra(TwilioIceResponse.ICE_SELECTED_SERVERS,
                     IceOptionsHelper.convertToJson(selectedTwilioIceServers));
