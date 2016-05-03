@@ -11,8 +11,12 @@ import com.twilio.conversations.MediaTrackState;
 import com.twilio.conversations.VideoRenderer;
 import com.twilio.conversations.VideoTrack;
 import com.twilio.conversations.impl.core.TrackInfo;
+import com.twilio.conversations.impl.logging.Logger;
 
 public class VideoTrackImpl implements VideoTrack {
+    private static final String WARNING_NULL_RENDERER = "Attempted to add a null renderer.";
+    private static final Logger logger = Logger.getLogger(VideoTrackImpl.class);
+
     private org.webrtc.VideoTrack videoTrack;
     private TrackInfo trackInfo;
     private MediaTrackState trackState;
@@ -56,6 +60,8 @@ public class VideoTrackImpl implements VideoTrack {
                     createWebRtcVideoRenderer(videoRenderer);
             videoRenderersMap.put(videoRenderer, webrtcVideoRenderer);
             videoTrack.addRenderer(webrtcVideoRenderer);
+        } else {
+            logger.w(WARNING_NULL_RENDERER);
         }
     }
 
