@@ -37,6 +37,7 @@
     <string name="enable_ice">Enable ICE Options</string>
     <string name="prefer_h264">Prefer H264</string>
     <string name="aspect_ratio">Aspect Ratio</string>
+    <string name="auto_accept">Auto Accept Invites</string>
 
     <string-array name="realm_array">
         <item>Prod</item>

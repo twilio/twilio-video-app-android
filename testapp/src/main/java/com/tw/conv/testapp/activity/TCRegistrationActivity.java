@@ -50,6 +50,7 @@ public class TCRegistrationActivity extends AppCompatActivity {
     private static final String USERNAME_KEY = "username";
     private static final String REALM_KEY = "realm";
     private static final String PREFER_H264_KEY = "preferH264";
+    public static final String AUTO_ACCEPT_KEY = "autoAccept";
     private static final String ICE_OPTIONS_DIALOG = "IceOptionsDialog";
 
     private SharedPreferences sharedPreferences;
@@ -60,6 +61,7 @@ public class TCRegistrationActivity extends AppCompatActivity {
     private Spinner realmSpinner;
     private ArrayAdapter<CharSequence> spinnerAdapter;
     private CheckBox preferH264Checkbox;
+    private CheckBox autoAcceptCheckbox;
     private ProgressDialog iceServerProgressDialog;
     private TwilioIceResponse twilioIceResponse;
     private List<TwilioIceServer> selectedTwilioIceServers;
@@ -82,6 +84,7 @@ public class TCRegistrationActivity extends AppCompatActivity {
 
         realmSpinner = (Spinner)findViewById(R.id.realm_spinner);
         preferH264Checkbox = (CheckBox) findViewById(R.id.prefer_h264_checkbox);
+        autoAcceptCheckbox = (CheckBox) findViewById(R.id.auto_accept_checkbox);
         spinnerAdapter = ArrayAdapter.createFromResource(this,
                         R.array.realm_array, android.R.layout.simple_spinner_dropdown_item);
         spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -338,6 +341,7 @@ public class TCRegistrationActivity extends AppCompatActivity {
             realmSpinner.setSelection(lastRealmPosition);
         }
         preferH264Checkbox.setChecked(sharedPreferences.getBoolean(PREFER_H264_KEY, false));
+        autoAcceptCheckbox.setChecked(sharedPreferences.getBoolean(AUTO_ACCEPT_KEY, false));
     }
 
     private Integer getRealmPosition(String realm) {
@@ -356,6 +360,8 @@ public class TCRegistrationActivity extends AppCompatActivity {
         sharedPreferences.edit().putString(REALM_KEY, realm.toLowerCase()).apply();
         sharedPreferences.edit().putBoolean(PREFER_H264_KEY, preferH264Checkbox.isChecked())
                 .apply();
+        sharedPreferences.edit().putBoolean(AUTO_ACCEPT_KEY, autoAcceptCheckbox.isChecked())
+                .apply();
     }
 
     private void startClient(String username, String capabilityToken, String realm) {
@@ -365,6 +371,7 @@ public class TCRegistrationActivity extends AppCompatActivity {
         intent.putExtra(SimpleSignalingUtils.REALM, realm);
         intent.putExtra(TwilioIceResponse.ICE_TRANSPORT_POLICY, iceTransportPolicy);
         intent.putExtra(TCClientActivity.OPTION_PREFER_H264_KEY, preferH264Checkbox.isChecked());
+        intent.putExtra(TCClientActivity.OPTION_AUTO_ACCEPT_KEY, autoAcceptCheckbox.isChecked());
         if (selectedTwilioIceServers != null) {
             intent.putExtra(TwilioIceResponse.ICE_SELECTED_SERVERS,
                     IceOptionsHelper.convertToJson(selectedTwilioIceServers));
