@@ -10,7 +10,7 @@ import com.twilio.conversations.LocalMedia;
 import com.twilio.conversations.LocalMediaListener;
 import com.twilio.conversations.LocalVideoTrack;
 import com.twilio.conversations.MediaTrackState;
-import com.twilio.conversations.TwilioConversations;
+import com.twilio.conversations.TwilioConversationsClient;
 import com.twilio.conversations.TwilioConversationsException;
 import com.twilio.conversations.impl.core.TrackInfo;
 import com.twilio.conversations.impl.logging.Logger;
@@ -86,12 +86,12 @@ public class LocalMediaImpl implements LocalMedia {
         if(!localVideoTrackImpl.getState().equals(MediaTrackState.IDLE)) {
             postVideoTrackException(localVideoTrackImpl,
                     new TwilioConversationsException(
-                            TwilioConversations.TRACK_OPERATION_IN_PROGRESS,
+                            TwilioConversationsClient.TRACK_OPERATION_IN_PROGRESS,
                             " A track operation is already in progress."));
         }
         if (videoTracksImpl.size() >= MAX_LOCAL_VIDEO_TRACKS) {
             postVideoTrackException(localVideoTrackImpl,
-                    new TwilioConversationsException(TwilioConversations.TOO_MANY_TRACKS,
+                    new TwilioConversationsException(TwilioConversationsClient.TOO_MANY_TRACKS,
                             "Unable to add the local video track. Only " + MAX_LOCAL_VIDEO_TRACKS +
                                     " local video track is supported."));
         }
@@ -105,7 +105,7 @@ public class LocalMediaImpl implements LocalMedia {
                                     LocalMediaImpl.this,
                                     localVideoTrack,
                                     new TwilioConversationsException(
-                                            TwilioConversations.INVALID_VIDEO_CAPTURER,
+                                            TwilioConversationsClient.INVALID_VIDEO_CAPTURER,
                                             "The LocalVideoTrack must be associated with a "+
                                                     "camera capturer"));
                         }
@@ -130,7 +130,7 @@ public class LocalMediaImpl implements LocalMedia {
             if(!enabledVideo) {
                 // Remove the video track since it failed to be added
                 videoTracksImpl.remove(localVideoTrackImpl);
-                postVideoTrackException(localVideoTrackImpl, new TwilioConversationsException(TwilioConversations.TRACK_OPERATION_IN_PROGRESS, " A track operation is already in progress."));
+                postVideoTrackException(localVideoTrackImpl, new TwilioConversationsException(TwilioConversationsClient.TRACK_OPERATION_IN_PROGRESS, " A track operation is already in progress."));
             } else {
                 localVideoTrackImpl.setTrackState(MediaTrackState.STARTING);
             }
@@ -147,9 +147,9 @@ public class LocalMediaImpl implements LocalMedia {
             return;
         }
         if(localVideoTrack.getState().equals(MediaTrackState.ENDED)) {
-            postVideoTrackException(localVideoTrack, new TwilioConversationsException(TwilioConversations.INVALID_VIDEO_TRACK_STATE, "The provided video track is not in a valid state"));
+            postVideoTrackException(localVideoTrack, new TwilioConversationsException(TwilioConversationsClient.INVALID_VIDEO_TRACK_STATE, "The provided video track is not in a valid state"));
         } else if(!localVideoTrack.getState().equals(MediaTrackState.STARTED)) {
-            postVideoTrackException(localVideoTrack, new TwilioConversationsException(TwilioConversations.TRACK_OPERATION_IN_PROGRESS, " A track operation is already in progress."));
+            postVideoTrackException(localVideoTrack, new TwilioConversationsException(TwilioConversationsClient.TRACK_OPERATION_IN_PROGRESS, " A track operation is already in progress."));
         }
         if (convWeak == null || convWeak.get() == null) {
             logger.d("Conversation is null");

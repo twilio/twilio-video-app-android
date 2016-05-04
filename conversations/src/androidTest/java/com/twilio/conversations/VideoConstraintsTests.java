@@ -1,19 +1,16 @@
 package com.twilio.conversations;
 
 import android.content.Context;
-import android.os.Build;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.filters.LargeTest;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
-import android.view.ViewGroup;
-import android.widget.LinearLayout;
 
 import com.twilio.common.TwilioAccessManager;
 import com.twilio.conversations.activity.TwilioConversationsActivity;
 import com.twilio.conversations.helper.AccessTokenHelper;
 import com.twilio.conversations.helper.CameraCapturerHelper;
-import com.twilio.conversations.helper.ConversationsClientHelper;
+import com.twilio.conversations.helper.TwilioConversationsClientHelper;
 import com.twilio.conversations.helper.OSLevelHelper;
 import com.twilio.conversations.helper.TwilioConversationsHelper;
 import com.twilio.conversations.helper.TwilioConversationsTestsBase;
@@ -83,7 +80,7 @@ public class VideoConstraintsTests extends TwilioConversationsTestsBase {
         TwilioConversations.setLogLevel(TwilioConversations.LogLevel.DEBUG);
 
         TwilioAccessManager twilioAccessManager = AccessTokenHelper.obtainTwilioAccessManager(context, SELF_TEST_USER);
-        ConversationsClient conversationsClient = ConversationsClientHelper.registerClient(activityRule.getActivity(), twilioAccessManager);
+        TwilioConversationsClient twilioConversationsClient = TwilioConversationsClientHelper.registerClient(activityRule.getActivity(), twilioAccessManager);
 
         final CountDownLatch localVideoTrackFailedLatch = new CountDownLatch(1);
 
@@ -121,7 +118,7 @@ public class VideoConstraintsTests extends TwilioConversationsTestsBase {
         participants.add(SELF_TEST_USER);
 
         final CountDownLatch conversationEndsWhenInviteCancelled = new CountDownLatch(1);
-        final OutgoingInvite outgoingInvite = conversationsClient.sendConversationInvite(participants, localMedia, new ConversationCallback() {
+        final OutgoingInvite outgoingInvite = twilioConversationsClient.sendConversationInvite(participants, localMedia, new ConversationCallback() {
             @Override
             public void onConversation(final Conversation conversation, TwilioConversationsException exception) {
                 // The outgoing invite is cancelled and reported as an exception here
@@ -133,36 +130,36 @@ public class VideoConstraintsTests extends TwilioConversationsTestsBase {
         /**
          * Set a new conversations client listener to handle the stop listening for invites event here
          */
-        conversationsClient.setConversationsClientListener(new ConversationsClientListener() {
+        twilioConversationsClient.setConversationsClientListener(new ConversationsClientListener() {
             @Override
-            public void onStartListeningForInvites(ConversationsClient conversationsClient) {
+            public void onStartListeningForInvites(TwilioConversationsClient twilioConversationsClient) {
 
             }
 
             @Override
-            public void onStopListeningForInvites(ConversationsClient conversationsClient) {
+            public void onStopListeningForInvites(TwilioConversationsClient twilioConversationsClient) {
                 outgoingInvite.cancel();
             }
 
             @Override
-            public void onFailedToStartListening(ConversationsClient conversationsClient, TwilioConversationsException exception) {
+            public void onFailedToStartListening(TwilioConversationsClient twilioConversationsClient, TwilioConversationsException exception) {
 
             }
 
             @Override
-            public void onIncomingInvite(ConversationsClient conversationsClient, IncomingInvite incomingInvite) {
+            public void onIncomingInvite(TwilioConversationsClient twilioConversationsClient, IncomingInvite incomingInvite) {
 
             }
 
             @Override
-            public void onIncomingInviteCancelled(ConversationsClient conversationsClient, IncomingInvite incomingInvite) {
+            public void onIncomingInviteCancelled(TwilioConversationsClient twilioConversationsClient, IncomingInvite incomingInvite) {
 
             }
         });
 
         assertTrue(localVideoTrackFailedLatch.await(20, TimeUnit.SECONDS));
 
-        conversationsClient.unlisten();
+        twilioConversationsClient.unlisten();
 
         assertTrue(conversationEndsWhenInviteCancelled.await(20, TimeUnit.SECONDS));
 
@@ -178,7 +175,7 @@ public class VideoConstraintsTests extends TwilioConversationsTestsBase {
         TwilioConversations.setLogLevel(TwilioConversations.LogLevel.DEBUG);
 
         TwilioAccessManager twilioAccessManager = AccessTokenHelper.obtainTwilioAccessManager(context, SELF_TEST_USER);
-        ConversationsClient conversationsClient = ConversationsClientHelper.registerClient(activityRule.getActivity(), twilioAccessManager);
+        TwilioConversationsClient twilioConversationsClient = TwilioConversationsClientHelper.registerClient(activityRule.getActivity(), twilioAccessManager);
 
         final CountDownLatch localVideoTrackAddedLatch = new CountDownLatch(1);
         final CountDownLatch localVideoTrackRemovedLatch = new CountDownLatch(1);
@@ -217,7 +214,7 @@ public class VideoConstraintsTests extends TwilioConversationsTestsBase {
         participants.add(SELF_TEST_USER);
 
         final CountDownLatch conversationEndsWhenInviteCancelled = new CountDownLatch(1);
-        final OutgoingInvite outgoingInvite = conversationsClient.sendConversationInvite(participants, localMedia, new ConversationCallback() {
+        final OutgoingInvite outgoingInvite = twilioConversationsClient.sendConversationInvite(participants, localMedia, new ConversationCallback() {
             @Override
             public void onConversation(final Conversation conversation, TwilioConversationsException exception) {
                 // The outgoing invite is cancelled and reported as an exception here
@@ -229,36 +226,36 @@ public class VideoConstraintsTests extends TwilioConversationsTestsBase {
         /**
          * Set a new conversations client listener to handle the stop listening for invites event here
          */
-        conversationsClient.setConversationsClientListener(new ConversationsClientListener() {
+        twilioConversationsClient.setConversationsClientListener(new ConversationsClientListener() {
             @Override
-            public void onStartListeningForInvites(ConversationsClient conversationsClient) {
+            public void onStartListeningForInvites(TwilioConversationsClient twilioConversationsClient) {
 
             }
 
             @Override
-            public void onStopListeningForInvites(ConversationsClient conversationsClient) {
+            public void onStopListeningForInvites(TwilioConversationsClient twilioConversationsClient) {
                 outgoingInvite.cancel();
             }
 
             @Override
-            public void onFailedToStartListening(ConversationsClient conversationsClient, TwilioConversationsException exception) {
+            public void onFailedToStartListening(TwilioConversationsClient twilioConversationsClient, TwilioConversationsException exception) {
 
             }
 
             @Override
-            public void onIncomingInvite(ConversationsClient conversationsClient, IncomingInvite incomingInvite) {
+            public void onIncomingInvite(TwilioConversationsClient twilioConversationsClient, IncomingInvite incomingInvite) {
 
             }
 
             @Override
-            public void onIncomingInviteCancelled(ConversationsClient conversationsClient, IncomingInvite incomingInvite) {
+            public void onIncomingInviteCancelled(TwilioConversationsClient twilioConversationsClient, IncomingInvite incomingInvite) {
 
             }
         });
 
         assertTrue(localVideoTrackAddedLatch.await(20, TimeUnit.SECONDS));
 
-        conversationsClient.unlisten();
+        twilioConversationsClient.unlisten();
 
         assertTrue(localVideoTrackRemovedLatch.await(20, TimeUnit.SECONDS));
 

@@ -22,11 +22,11 @@ public interface ConversationListener {
      * @param exception Exception encountered in adding participant to conversation.
      *                  <p>The error codes returned correspond to the following scenarios:
      *                  <ol>
-     *                      <li>{@link TwilioConversations#CONVERSATION_REJECTED} returned when
+     *                      <li>{@link TwilioConversationsClient#CONVERSATION_REJECTED} returned when
      *                      participant rejects an invite.</li>
-     *                      <li>{@link TwilioConversations#CONVERSATION_IGNORED} returned when
+     *                      <li>{@link TwilioConversationsClient#CONVERSATION_IGNORED} returned when
      *                      participant ignores an invite</li>
-     *                      <li>{@link TwilioConversations#CONVERSATION_FAILED} returned when
+     *                      <li>{@link TwilioConversationsClient#CONVERSATION_FAILED} returned when
      *                      participant rejects an invite to an existing conversation</li>
      *                  </ol>
      */

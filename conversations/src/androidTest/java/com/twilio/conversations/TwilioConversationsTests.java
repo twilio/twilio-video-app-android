@@ -10,7 +10,7 @@ import com.twilio.common.TwilioAccessManagerFactory;
 import com.twilio.conversations.helper.AccessTokenHelper;
 import com.twilio.conversations.helper.TwilioConversationsHelper;
 import com.twilio.conversations.helper.TwilioConversationsTestsBase;
-import com.twilio.conversations.impl.ConversationsClientImpl;
+import com.twilio.conversations.impl.TwilioConversationsClientImpl;
 import com.twilio.conversations.internal.ClientOptionsInternal;
 
 import org.junit.After;
@@ -113,7 +113,7 @@ public class TwilioConversationsTests extends TwilioConversationsTestsBase {
     public void destroy_shouldDestroyActiveConversationClients() throws InterruptedException {
         TwilioConversationsHelper.initialize(context);
         accessManager = AccessTokenHelper.obtainTwilioAccessManager(context, "username");
-        ConversationsClientImpl conversationClient = (ConversationsClientImpl) TwilioConversations
+        TwilioConversationsClientImpl conversationClient = (TwilioConversationsClientImpl) TwilioConversations
                 .createConversationsClient(accessManager,
                         conversationsClientListener());
     }
@@ -150,10 +150,10 @@ public class TwilioConversationsTests extends TwilioConversationsTestsBase {
         TwilioConversationsHelper.initialize(context);
 
         accessManager = TwilioAccessManagerFactory.createAccessManager(context, "DEADBEEF", null);
-        ConversationsClient conversationsClient = TwilioConversations
+        TwilioConversationsClient twilioConversationsClient = TwilioConversations
                 .createConversationsClient(accessManager, conversationsClientListener());
 
-        assertNotNull(conversationsClient);
+        assertNotNull(twilioConversationsClient);
     }
 
     @Test
@@ -162,10 +162,10 @@ public class TwilioConversationsTests extends TwilioConversationsTestsBase {
         TwilioConversationsHelper.initialize(context);
 
         accessManager = TwilioAccessManagerFactory.createAccessManager(context, "DEADBEEF", null);
-        ConversationsClient conversationsClient = TwilioConversations
+        TwilioConversationsClient twilioConversationsClient = TwilioConversations
                 .createConversationsClient(accessManager, null, conversationsClientListener());
 
-        assertNotNull(conversationsClient);
+        assertNotNull(twilioConversationsClient);
     }
 
     @Test
@@ -177,10 +177,10 @@ public class TwilioConversationsTests extends TwilioConversationsTestsBase {
         optionsMap.put("foo", "bar");
         ClientOptionsInternal options = new ClientOptionsInternal(optionsMap);
         accessManager = TwilioAccessManagerFactory.createAccessManager(context, "DEADBEEF", null);
-        ConversationsClient conversationsClient = TwilioConversations
+        TwilioConversationsClient twilioConversationsClient = TwilioConversations
                 .createConversationsClient(accessManager, options, conversationsClientListener());
 
-        assertNotNull(conversationsClient);
+        assertNotNull(twilioConversationsClient);
     }
 
     @Test
@@ -211,29 +211,29 @@ public class TwilioConversationsTests extends TwilioConversationsTestsBase {
     private ConversationsClientListener conversationsClientListener() {
         return new ConversationsClientListener() {
             @Override
-            public void onStartListeningForInvites(ConversationsClient conversationsClient) {
+            public void onStartListeningForInvites(TwilioConversationsClient twilioConversationsClient) {
 
             }
 
             @Override
-            public void onStopListeningForInvites(ConversationsClient conversationsClient) {
+            public void onStopListeningForInvites(TwilioConversationsClient twilioConversationsClient) {
 
             }
 
             @Override
-            public void onFailedToStartListening(ConversationsClient conversationsClient,
+            public void onFailedToStartListening(TwilioConversationsClient twilioConversationsClient,
                                                  TwilioConversationsException e) {
 
             }
 
             @Override
-            public void onIncomingInvite(ConversationsClient conversationsClient,
+            public void onIncomingInvite(TwilioConversationsClient twilioConversationsClient,
                                          IncomingInvite incomingInvite) {
 
             }
 
             @Override
-            public void onIncomingInviteCancelled(ConversationsClient conversationsClient,
+            public void onIncomingInviteCancelled(TwilioConversationsClient twilioConversationsClient,
                                                   IncomingInvite incomingInvite) {
 
             }

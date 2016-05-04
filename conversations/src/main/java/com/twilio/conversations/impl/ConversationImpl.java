@@ -6,7 +6,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.CountDownLatch;
 
 import android.os.Handler;
 
@@ -17,15 +16,14 @@ import com.twilio.conversations.IceServer;
 import com.twilio.conversations.IceTransportPolicy;
 import com.twilio.conversations.StatsListener;
 import com.twilio.conversations.MediaTrackStatsRecord;
+import com.twilio.conversations.TwilioConversationsClient;
 import com.twilio.conversations.TwilioConversationsException;
 import com.twilio.conversations.ConversationListener;
 import com.twilio.conversations.LocalMedia;
 import com.twilio.conversations.LocalVideoTrack;
-import com.twilio.conversations.Media;
 import com.twilio.conversations.MediaTrackState;
 import com.twilio.conversations.Participant;
 import com.twilio.conversations.TrackOrigin;
-import com.twilio.conversations.TwilioConversations;
 import com.twilio.conversations.VideoConstraints;
 import com.twilio.conversations.VideoRenderer;
 import com.twilio.conversations.VideoTrack;
@@ -41,7 +39,6 @@ import com.twilio.conversations.impl.core.SessionState;
 import com.twilio.conversations.impl.core.TrackInfo;
 import com.twilio.conversations.impl.core.CoreTrackStatsReport;
 import com.twilio.conversations.impl.logging.Logger;
-import com.twilio.conversations.impl.util.CallbackHandler;
 
 public class ConversationImpl implements Conversation,
         NativeHandleInterface, SessionObserver, CoreSession {
@@ -49,7 +46,7 @@ public class ConversationImpl implements Conversation,
             "This operation is no longer valid";
     private Set<String> invitedParticipants = new HashSet<>();
     private String inviter;
-    private ConversationsClientImpl conversationsClient;
+    private TwilioConversationsClientImpl conversationsClient;
     private ConversationListener conversationListener;
     private ConversationStateObserver conversationStateObserver;
     private Map<String,ParticipantImpl> participantMap = new HashMap<>();
@@ -107,7 +104,7 @@ public class ConversationImpl implements Conversation,
     /*
      * Outgoing invite
      */
-    private ConversationImpl(ConversationsClientImpl conversationsClient,
+    private ConversationImpl(TwilioConversationsClientImpl conversationsClient,
                              Set<String> participants,
                              LocalMedia localMedia,
                              ConversationListener conversationListener,
@@ -152,7 +149,7 @@ public class ConversationImpl implements Conversation,
     /*
      * Incoming invite
      */
-    private ConversationImpl(ConversationsClientImpl conversationsClient,
+    private ConversationImpl(TwilioConversationsClientImpl conversationsClient,
                              long nativeSession,
                              String[] participantsIdentities,
                              ConversationStateObserver conversationStateObserver,
@@ -182,7 +179,7 @@ public class ConversationImpl implements Conversation,
     }
 
     public static ConversationImpl createOutgoingConversation(
-            ConversationsClientImpl conversationsClient,
+            TwilioConversationsClientImpl conversationsClient,
             Set<String> participants,
             LocalMedia localMedia,
             ConversationListener listener,
@@ -194,7 +191,7 @@ public class ConversationImpl implements Conversation,
     }
 
     public static ConversationImpl createIncomingConversation(
-            ConversationsClientImpl conversationsClientImpl,
+            TwilioConversationsClientImpl conversationsClientImpl,
             long nativeSession,
             String[] participantIdentities,
             ConversationStateObserver conversationStateObserver,
@@ -347,7 +344,7 @@ public class ConversationImpl implements Conversation,
             final TwilioConversationsException e =
                     new TwilioConversationsException(error.getCode(), error.getMessage());
             if(conversationListener == null) {
-                if(e.getErrorCode() == TwilioConversations.CONVERSATION_TERMINATED) {
+                if(e.getErrorCode() == TwilioConversationsClient.CONVERSATION_TERMINATED) {
                     conversationsClient.onConversationTerminated(this, e);
                 }
             } else if(handler != null) {
@@ -422,7 +419,7 @@ public class ConversationImpl implements Conversation,
             final TwilioConversationsException e = new TwilioConversationsException(error.getCode(),
                     error.getMessage());
             if (conversationListener == null) {
-                if(e.getErrorCode() == TwilioConversations.CONVERSATION_TERMINATED) {
+                if(e.getErrorCode() == TwilioConversationsClient.CONVERSATION_TERMINATED) {
                     conversationsClient.onConversationTerminated(this, e);
                 } else {
                     logger.e("onParticipantConnected -> received unexpected error code -> " +

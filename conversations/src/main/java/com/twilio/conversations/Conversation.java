@@ -44,11 +44,11 @@ public interface Conversation {
      *     be invoked if recipient accepts invite and is connected.</li>
      *     <li>{@link ConversationListener#onFailedToConnectParticipant(Conversation, Participant,
      *     TwilioConversationsException)} will be invoked with error code
-     *     {@link TwilioConversations#CONVERSATION_FAILED} if the recipient rejected the
+     *     {@link TwilioConversationsClient#CONVERSATION_FAILED} if the recipient rejected the
      *     invite.</li>
      *     <li>{@link ConversationListener#onFailedToConnectParticipant(Conversation, Participant,
      *     TwilioConversationsException)} will be invoked with error code
-     *     {@link TwilioConversations#CONVERSATION_IGNORED} if the recipient ignored the
+     *     {@link TwilioConversationsClient#CONVERSATION_IGNORED} if the recipient ignored the
      *     invite.</li>
      * </ol>
      *
@@ -64,7 +64,7 @@ public interface Conversation {
      * <ol>
      *     <li>{@link ConversationListener#onFailedToConnectParticipant(Conversation, Participant,
      *     TwilioConversationsException)} will be invoked with error code
-     *     {@link TwilioConversations#CONVERSATION_TERMINATED} for each participant of the
+     *     {@link TwilioConversationsClient#CONVERSATION_TERMINATED} for each participant of the
      *     {@link Conversation}</li>
      *     <li>{@link ConversationListener#onConversationEnded(Conversation,
      *     TwilioConversationsException)} will be invoked upon the completion of this process.</li>

@@ -130,11 +130,11 @@ public class TwilioConversationsImpl {
      * TODO
      * Currently this is needed to see if we have actually registered our receiver upon destruction
      * of the SDK. However this is only enabled when a client is created. Should this just
-     * be tracked in ConversationsClient?
+     * be tracked in TwilioConversationsClient?
      */
     private boolean observingConnectivity = false;
 
-    protected final Map<UUID, WeakReference<ConversationsClientImpl>> conversationsClientMap = new ConcurrentHashMap<>();
+    protected final Map<UUID, WeakReference<TwilioConversationsClientImpl>> conversationsClientMap = new ConcurrentHashMap<>();
 
     /**
      * TODO 
@@ -298,7 +298,7 @@ public class TwilioConversationsImpl {
 
         // TODO: make this async again after debugging
 
-        Queue<ConversationsClientImpl> clientsDisposing = new ArrayDeque<>();
+        Queue<TwilioConversationsClientImpl> clientsDisposing = new ArrayDeque<>();
         Application application = (Application)
                 TwilioConversationsImpl.this.applicationContext.getApplicationContext();
         AlarmManager alarmManager = (AlarmManager) applicationContext
@@ -308,13 +308,13 @@ public class TwilioConversationsImpl {
         application.unregisterActivityLifecycleCallbacks(applicationForegroundTracker);
 
         // Process clients and determine which ones need to be closed
-        for (Map.Entry<UUID, WeakReference<ConversationsClientImpl>> entry :
+        for (Map.Entry<UUID, WeakReference<TwilioConversationsClientImpl>> entry :
                 conversationsClientMap.entrySet()) {
-            WeakReference<ConversationsClientImpl> weakClientRef =
+            WeakReference<TwilioConversationsClientImpl> weakClientRef =
                     conversationsClientMap.remove(entry.getKey());
 
             if (weakClientRef != null) {
-                ConversationsClientImpl client = weakClientRef.get();
+                TwilioConversationsClientImpl client = weakClientRef.get();
                 if (client != null) {
                     // Dispose of the client regardless of whether it is still listening.
                     client.disposeClient();
@@ -330,13 +330,13 @@ public class TwilioConversationsImpl {
         initialized = false;
     }
 
-    public ConversationsClientImpl createConversationsClient(
+    public TwilioConversationsClientImpl createConversationsClient(
             TwilioAccessManager accessManager,
             ClientOptions options,
             ConversationsClientListener inListener) {
 
         if(accessManager != null) {
-            final ConversationsClientImpl conversationsClient = new ConversationsClientImpl(
+            final TwilioConversationsClientImpl conversationsClient = new TwilioConversationsClientImpl(
                     applicationContext, accessManager, inListener, options, handler);
            if (conversationsClientMap.size() == 0) {
                 registerConnectivityBroadcastReceiver();
@@ -413,10 +413,10 @@ public class TwilioConversationsImpl {
         return initializing;
     }
 
-    public ConversationsClientImpl findDeviceByUUID(UUID uuid) {
-        WeakReference<ConversationsClientImpl> deviceRef = conversationsClientMap.get(uuid);
+    public TwilioConversationsClientImpl findDeviceByUUID(UUID uuid) {
+        WeakReference<TwilioConversationsClientImpl> deviceRef = conversationsClientMap.get(uuid);
         if (deviceRef != null) {
-            ConversationsClientImpl device = deviceRef.get();
+            TwilioConversationsClientImpl device = deviceRef.get();
             if (device != null) {
                 return device;
             } else {
