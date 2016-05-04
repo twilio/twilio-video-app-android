@@ -23,7 +23,7 @@
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
         <activity
-            android:name="com.tw.conv.testapp.activity.TCRegistrationActivity"
+            android:name=".activity.RegistrationActivity"
             android:windowSoftInputMode="adjustResize|stateAlwaysHidden">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -33,13 +33,13 @@
         </activity>
 
         <activity
-            android:name="com.tw.conv.testapp.activity.TCClientActivity"
+            android:name=".activity.ClientActivity"
             android:label="@string/title_activity_client"
             android:configChanges="orientation|screenSize"
             android:launchMode="singleTop">
         </activity>
 
-        <receiver android:name=".activity.TCClientActivity$Rebroadcaster" />
+        <receiver android:name=".activity.ClientActivity$Rebroadcaster" />
 
         <activity android:name="net.hockeyapp.android.UpdateActivity" />
     </application>

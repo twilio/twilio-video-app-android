@@ -6,7 +6,6 @@ import android.support.v7.app.AlertDialog;
 import android.widget.EditText;
 
 import com.tw.conv.testapp.R;
-import com.tw.conv.testapp.activity.TCClientActivity;
 import com.tw.conv.testapp.model.TwilioIceServer;
 
 import java.util.List;
