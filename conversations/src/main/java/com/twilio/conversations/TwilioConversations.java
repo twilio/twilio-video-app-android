@@ -3,7 +3,6 @@ package com.twilio.conversations;
 import android.content.Context;
 
 import com.twilio.common.TwilioAccessManager;
-import com.twilio.common.TwilioAccessManagerFactory;
 import com.twilio.conversations.impl.TwilioConversationsImpl;
 
 
@@ -21,50 +20,6 @@ import com.twilio.conversations.impl.TwilioConversationsImpl;
  */
 public class TwilioConversations {
 
-    /**
-     * Interface for the listener object to pass to
-     * {@link TwilioConversations#initialize(Context, InitListener)}.
-     */
-    public interface InitListener {
-        /**
-         * Callback to report when Twilio Conversations SDK
-         * has been successfully initialized.
-         */
-        void onInitialized();
-
-        /**
-         * Called if there is an error initializing the Twilio
-         * Conversations SDK.
-         *
-         * @param exception An exception describing the error that occurred
-         */
-        void onError(Exception exception);
-    }
-
-    /**
-     * Log levels for the Twilio Conversations SDK
-     */
-    public enum LogLevel {
-        OFF,
-        FATAL,
-        ERROR,
-        WARNING,
-        INFO,
-        DEBUG,
-        TRACE,
-        ALL
-    }
-
-    /**
-     * Modules for the Twilio Conversations SDK
-     */
-    public enum LogModule {
-        CORE,
-        PLATFORM,
-        SIGNALING,
-        WEBRTC
-    }
-
     private TwilioConversations() {}
 
     /**
@@ -74,12 +29,12 @@ public class TwilioConversations {
      *            The application context of your Android application
      *
      * @param initListener
-     *            A {@link TwilioConversations.InitListener} that will notify you
+     *            A {@link TwilioConversationsClient.InitListener} that will notify you
      *            when the service is ready
      *
      */
     public static void initialize(Context context,
-                                  TwilioConversations.InitListener initListener) {
+                                  TwilioConversationsClient.InitListener initListener) {
         if (context == null) {
             throw new NullPointerException("applicationContext must not be null");
         }
@@ -113,7 +68,7 @@ public class TwilioConversations {
      *
      * @return the logging level
      */
-    public static LogLevel getLogLevel() {
+    public static TwilioConversationsClient.LogLevel getLogLevel() {
         return TwilioConversationsImpl.getLogLevel();
     }
 
@@ -122,7 +77,7 @@ public class TwilioConversations {
      *
      * @param level The logging level
      */
-    public static void setLogLevel(LogLevel level) {
+    public static void setLogLevel(TwilioConversationsClient.LogLevel level) {
         TwilioConversationsImpl.setLogLevel(level);
     }
 
@@ -132,7 +87,7 @@ public class TwilioConversations {
      * @param module The module for this log level
      * @param level The logging level
      */
-    public static void setModuleLogLevel(LogModule module, LogLevel level) {
+    public static void setModuleLogLevel(TwilioConversationsClient.LogModule module, TwilioConversationsClient.LogLevel level) {
         TwilioConversationsImpl.setModuleLogLevel(module, level);
     }
 

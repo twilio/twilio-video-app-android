@@ -73,7 +73,7 @@ public class TwilioConversationsTests extends TwilioConversationsTestsBase {
         final CountDownLatch errorCallback = new CountDownLatch(1);
         TwilioConversationsHelper.initialize(context);
 
-        TwilioConversations.initialize(context, new TwilioConversations.InitListener() {
+        TwilioConversations.initialize(context, new TwilioConversationsClient.InitListener() {
             @Override
             public void onInitialized() {
                 fail("Should receive error because sdk is initialized already!");
@@ -185,14 +185,14 @@ public class TwilioConversationsTests extends TwilioConversationsTestsBase {
 
     @Test
     public void setLogLevel_canBeDoneBeforeAndAfterInit() throws InterruptedException {
-        TwilioConversations.LogLevel level = TwilioConversations.LogLevel.DEBUG;
+        TwilioConversationsClient.LogLevel level = TwilioConversationsClient.LogLevel.DEBUG;
 
         TwilioConversations.setLogLevel(level);
         assertEquals(level, TwilioConversations.getLogLevel());
 
         TwilioConversationsHelper.initialize(context);
 
-        level = TwilioConversations.LogLevel.ERROR;
+        level = TwilioConversationsClient.LogLevel.ERROR;
         TwilioConversations.setLogLevel(level);
         assertEquals(level, TwilioConversations.getLogLevel());
     }

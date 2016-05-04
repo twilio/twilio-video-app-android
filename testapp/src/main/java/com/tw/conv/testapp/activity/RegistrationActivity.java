@@ -34,6 +34,7 @@ import com.tw.conv.testapp.model.TwilioIceServer;
 import com.tw.conv.testapp.util.IceOptionsHelper;
 import com.tw.conv.testapp.util.SimpleSignalingUtils;
 import com.twilio.conversations.TwilioConversations;
+import com.twilio.conversations.TwilioConversationsClient;
 
 import net.hockeyapp.android.CrashManager;
 import net.hockeyapp.android.UpdateManager;
@@ -218,12 +219,12 @@ public class RegistrationActivity extends AppCompatActivity {
     }
 
     private void registerUser(final String username) {
-        TwilioConversations.setLogLevel(TwilioConversations.LogLevel.DEBUG);
+        TwilioConversations.setLogLevel(TwilioConversationsClient.LogLevel.DEBUG);
 
         // We need to initialize here in case user logs out and completely tears down sdk
         if(!TwilioConversations.isInitialized()) {
             TwilioConversations.initialize(getApplicationContext(),
-                    new TwilioConversations.InitListener() {
+                    new TwilioConversationsClient.InitListener() {
                         @Override
                         public void onInitialized() {
                             obtainCapabilityToken(username,

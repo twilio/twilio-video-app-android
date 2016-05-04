@@ -4,6 +4,7 @@ import android.content.Context;
 import android.support.annotation.Nullable;
 
 import com.twilio.conversations.TwilioConversations;
+import com.twilio.conversations.TwilioConversationsClient;
 
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
@@ -30,13 +31,13 @@ public class TwilioConversationsHelper {
         while(TwilioConversations.isInitialized());
     }
 
-    public static TwilioConversations.InitListener createInitListener() {
+    public static TwilioConversationsClient.InitListener createInitListener() {
         return createInitListener(null);
     }
 
-    public static TwilioConversations.InitListener createInitListener(
+    public static TwilioConversationsClient.InitListener createInitListener(
             @Nullable final CountDownLatch initLatch) {
-        return new TwilioConversations.InitListener() {
+        return new TwilioConversationsClient.InitListener() {
             @Override
             public void onInitialized() {
                 if (initLatch != null) {

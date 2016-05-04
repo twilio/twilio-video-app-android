@@ -33,9 +33,9 @@ import com.twilio.common.TwilioAccessManager;
 import com.twilio.conversations.ClientOptions;
 import com.twilio.conversations.ConversationsClient;
 import com.twilio.conversations.ConversationsClientListener;
-import com.twilio.conversations.TwilioConversations;
-import com.twilio.conversations.TwilioConversations.LogLevel;
-import com.twilio.conversations.TwilioConversations.LogModule;
+import com.twilio.conversations.TwilioConversationsClient.LogLevel;
+import com.twilio.conversations.TwilioConversationsClient.LogModule;
+import com.twilio.conversations.TwilioConversationsClient;
 import com.twilio.conversations.impl.logging.Logger;
 import com.twilio.conversations.impl.util.CallbackHandler;
 import com.twilio.conversations.internal.ReLinker;
@@ -49,7 +49,7 @@ public class TwilioConversationsImpl {
     private static volatile TwilioConversationsImpl instance;
 
     private static volatile boolean libraryIsLoaded = false;
-    private static LogLevel level = LogLevel.OFF;
+    private static LogLevel level = TwilioConversationsClient.LogLevel.OFF;
     private static Map<LogModule, LogLevel> moduleLogLevel = new EnumMap<LogModule, LogLevel>
             (LogModule.class);
     protected Context applicationContext;
@@ -163,7 +163,7 @@ public class TwilioConversationsImpl {
             }
         }
 
-        if(level != LogLevel.OFF) {
+        if(level != TwilioConversationsClient.LogLevel.OFF) {
             // Re-apply the log level. Initialization sets a default log level.
             setLogLevel(level);
         }
@@ -174,7 +174,7 @@ public class TwilioConversationsImpl {
     TwilioConversationsImpl() {}
 
     public void initialize(final Context context,
-                           final TwilioConversations.InitListener initListener) {
+                           final TwilioConversationsClient.InitListener initListener) {
         if (isInitialized() || isInitializing()) {
             initListener.onError(new RuntimeException("Initialize already called"));
             return;
@@ -234,7 +234,7 @@ public class TwilioConversationsImpl {
          * It is possible that the user has tried to set the log level before the native library
          * has loaded. Here we apply the log level because we know the native library is available
          */
-        if(level != LogLevel.OFF) {
+        if(level != TwilioConversationsClient.LogLevel.OFF) {
             trySetCoreLogLevel(level.ordinal());
         }
 
@@ -356,7 +356,7 @@ public class TwilioConversationsImpl {
     }
 
     public static void setModuleLogLevel(LogModule module, LogLevel level) {
-        if (module == LogModule.PLATFORM) {
+        if (module == TwilioConversationsClient.LogModule.PLATFORM) {
             setSDKLogLevel(level);
         }
         trySetCoreModuleLogLevel(module.ordinal(), level.ordinal());
@@ -402,7 +402,7 @@ public class TwilioConversationsImpl {
     }
 
     public static LogLevel getLogLevel() {
-        return LogLevel.values()[tryGetCoreLogLevel()];
+        return TwilioConversationsClient.LogLevel.values()[tryGetCoreLogLevel()];
     }
 
     public boolean isInitialized() {

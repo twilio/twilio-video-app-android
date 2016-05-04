@@ -1,5 +1,7 @@
 package com.twilio.conversations;
 
+import android.content.Context;
+
 import java.util.Set;
 
 /**
@@ -209,4 +211,52 @@ public interface TwilioConversationsClient {
      * @return audio output speaker
      */
     AudioOutput getAudioOutput();
+
+    // TODO - remove this comment - TWILIO CONVERSARTIONS STUFF
+
+    /**
+     * Log levels for the Twilio Conversations SDK
+     */
+    enum LogLevel {
+        OFF,
+        FATAL,
+        ERROR,
+        WARNING,
+        INFO,
+        DEBUG,
+        TRACE,
+        ALL
+    }
+
+    /**
+     * Modules for the Twilio Conversations SDK
+     */
+    enum LogModule {
+        CORE,
+        PLATFORM,
+        SIGNALING,
+        WEBRTC
+    }
+
+    /**
+     * Interface for the listener object to pass to
+     * {@link TwilioConversations#initialize(Context, InitListener)}.
+     */
+    interface InitListener {
+        /**
+         * Callback to report when Twilio Conversations SDK
+         * has been successfully initialized.
+         */
+        void onInitialized();
+
+        /**
+         * Called if there is an error initializing the Twilio
+         * Conversations SDK.
+         *
+         * @param exception An exception describing the error that occurred
+         */
+        void onError(Exception exception);
+    }
+
+
 }
