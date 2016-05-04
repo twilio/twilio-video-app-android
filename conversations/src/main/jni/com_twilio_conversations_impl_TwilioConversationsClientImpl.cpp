@@ -3,7 +3,7 @@
 #include "webrtc/api/java/jni/jni_helpers.h"
 /* Header for class com_twilio_conversations_impl_ConversationsClientImpl */
 
-#include "com_twilio_conversations_impl_ConversationsClientImpl.h"
+#include "com_twilio_conversations_impl_TwilioConversationsClientImpl.h"
 
 #include "TSCoreSDK.h"
 #include "TSCoreSDKTypes.h"

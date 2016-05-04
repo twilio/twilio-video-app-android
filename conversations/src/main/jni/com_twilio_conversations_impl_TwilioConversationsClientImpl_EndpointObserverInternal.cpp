@@ -1,4 +1,4 @@
-#include "com_twilio_conversations_impl_ConversationsClientImpl_EndpointObserverInternal.h"
+#include "com_twilio_conversations_impl_TwilioConversationsClientImpl_EndpointObserverInternal.h"
 #include "webrtc/api/java/jni/jni_helpers.h"
 #include "TSCoreSDKTypes.h"
 #include "TSCoreError.h"
