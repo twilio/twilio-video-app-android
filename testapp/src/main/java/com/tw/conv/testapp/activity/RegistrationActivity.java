@@ -205,6 +205,7 @@ public class RegistrationActivity extends AppCompatActivity {
     private void registerUser(final String username) {
         TwilioConversations.setLogLevel(TwilioConversations.LogLevel.DEBUG);
 
+        // We need to initialize here in case user logs out and completely tears down sdk
         if(!TwilioConversations.isInitialized()) {
             TwilioConversations.initialize(getApplicationContext(),
                     new TwilioConversations.InitListener() {
