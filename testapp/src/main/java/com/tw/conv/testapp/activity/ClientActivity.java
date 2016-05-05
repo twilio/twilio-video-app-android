@@ -135,6 +135,7 @@ public class ClientActivity extends AppCompatActivity {
     private boolean wasLive = false;
     private boolean inBackground = false;
     private boolean loggingOut = false;
+    private String username;
     private String realm;
     private CheckBox statsCheckBox;
     private LinearLayout statsLayout;
@@ -145,6 +146,9 @@ public class ClientActivity extends AppCompatActivity {
     private RecyclerView remoteStatsRecyclerView;
     private boolean preferH264;
     private boolean autoAccept;
+    private String selectedTwilioIceServersJson;
+    private String iceTransportPolicy;
+    private String twilioIceServersJson;
 
     private enum AudioState {
         ENABLED,
@@ -419,25 +423,36 @@ public class ClientActivity extends AppCompatActivity {
             }
         });
 
-        String username = getIntent().getExtras().getString(SimpleSignalingUtils.USERNAME);
-        getSupportActionBar().setTitle(username);
+        if (savedInstanceState != null) {
+            Timber.d("Restoring client activity state");
+            username = savedInstanceState.getString(SimpleSignalingUtils.USERNAME);
+            realm = savedInstanceState.getString(SimpleSignalingUtils.REALM);
+            preferH264 = savedInstanceState.getBoolean(OPTION_PREFER_H264_KEY);
+            autoAccept = savedInstanceState.getBoolean(OPTION_AUTO_ACCEPT_KEY);
+            capabilityToken = savedInstanceState.getString(SimpleSignalingUtils.CAPABILITY_TOKEN);
+            selectedTwilioIceServersJson = savedInstanceState
+                    .getString(TwilioIceResponse.ICE_SELECTED_SERVERS);
+            iceTransportPolicy = savedInstanceState
+                    .getString(TwilioIceResponse.ICE_TRANSPORT_POLICY);
+            twilioIceServersJson = savedInstanceState.getString(TwilioIceResponse.ICE_SERVERS);
+        } else {
+            Bundle extras = getIntent().getExtras();
 
-        realm = getIntent().getExtras().getString(SimpleSignalingUtils.REALM);
-        preferH264 = getIntent().getExtras().getBoolean(OPTION_PREFER_H264_KEY);
-        autoAccept = getIntent().getExtras().getBoolean(OPTION_AUTO_ACCEPT_KEY);
-        Map<String, String> privateOptions = createPrivateOptions(realm);
-        IceOptions iceOptions = getIceOptionsFromIntent();
-        ClientOptionsInternal options = new ClientOptionsInternal(iceOptions, privateOptions);
-
-        // Get the capability token
-        capabilityToken = getIntent().getExtras()
-                .getString(SimpleSignalingUtils.CAPABILITY_TOKEN);
-        if(savedInstanceState != null) {
-            capabilityToken = savedInstanceState
-                    .getString(SimpleSignalingUtils.CAPABILITY_TOKEN);
+            username = extras.getString(SimpleSignalingUtils.USERNAME);
+            realm = extras.getString(SimpleSignalingUtils.REALM);
+            preferH264 = extras.getBoolean(OPTION_PREFER_H264_KEY);
+            autoAccept = extras.getBoolean(OPTION_AUTO_ACCEPT_KEY);
+            capabilityToken = extras.getString(SimpleSignalingUtils.CAPABILITY_TOKEN);
+            selectedTwilioIceServersJson = extras.getString(TwilioIceResponse.ICE_SELECTED_SERVERS);
+            iceTransportPolicy = extras.getString(TwilioIceResponse.ICE_TRANSPORT_POLICY);
+            twilioIceServersJson = extras.getString(TwilioIceResponse.ICE_SERVERS);
         }
 
+        Map<String, String> privateOptions = createPrivateOptions(realm);
+        IceOptions iceOptions = retrieveIceOptions();
+        ClientOptionsInternal options = new ClientOptionsInternal(iceOptions, privateOptions);
         setIceOptionsViews();
+        getSupportActionBar().setTitle(username);
         iceOptionsLayout = (RelativeLayout) findViewById(R.id.ice_options_layout);
         iceOptionsLayout.setVisibility(View.GONE);
         enableIceCheckbox = (CheckBox)findViewById(R.id.enable_ice_checkbox);
@@ -539,7 +554,15 @@ public class ClientActivity extends AppCompatActivity {
     @Override
     public void onSaveInstanceState(Bundle bundle) {
         super.onSaveInstanceState(bundle);
+        Timber.d("Saving client activity state");
+        bundle.putString(SimpleSignalingUtils.USERNAME, username);
         bundle.putString(SimpleSignalingUtils.CAPABILITY_TOKEN, capabilityToken);
+        bundle.putString(SimpleSignalingUtils.REALM, realm);
+        bundle.putBoolean(OPTION_PREFER_H264_KEY, preferH264);
+        bundle.putBoolean(OPTION_AUTO_ACCEPT_KEY, autoAccept);
+        bundle.putString(TwilioIceResponse.ICE_SELECTED_SERVERS, selectedTwilioIceServersJson);
+        bundle.putString(TwilioIceResponse.ICE_TRANSPORT_POLICY, iceTransportPolicy);
+        bundle.putString(TwilioIceResponse.ICE_SERVERS, twilioIceServersJson);
     }
 
     @Override
@@ -712,24 +735,20 @@ public class ClientActivity extends AppCompatActivity {
         speakerActionFab.hide();
     }
 
-    private IceOptions getIceOptionsFromIntent() {
-        String selectedTwilioIceServersJson =
-                getIntent().getExtras().getString(TwilioIceResponse.ICE_SELECTED_SERVERS);
-
+    private IceOptions retrieveIceOptions() {
         //Transform twilio ice servers from json to Set<IceServer>
         List<TwilioIceServer> selectedIceServers =
                 IceOptionsHelper.convertToTwilioIceServerList(selectedTwilioIceServersJson);
         Set<IceServer> iceServers = IceOptionsHelper.convertToIceServersSet(selectedIceServers);
+        IceTransportPolicy transPolicy  = IceTransportPolicy.ICE_TRANSPORT_POLICY_ALL;
 
-        String transPolicyStr =
-                getIntent().getExtras().getString(TwilioIceResponse.ICE_TRANSPORT_POLICY);
-        IceTransportPolicy transPolicy  = IceTransportPolicy.ICE_TRANSPORT_POLICY_ALL;;
-        if (transPolicyStr.equalsIgnoreCase("relay") ) {
+        if (iceTransportPolicy.equalsIgnoreCase("relay") ) {
             transPolicy = IceTransportPolicy.ICE_TRANSPORT_POLICY_RELAY;
         }
         if (iceServers.size() > 0) {
             return new IceOptions(transPolicy, iceServers);
         }
+
         return new IceOptions(transPolicy);
     }
 
@@ -740,8 +759,6 @@ public class ClientActivity extends AppCompatActivity {
         iceTransPolicyArrayAdapter.setDropDownViewResource(
                 android.R.layout.simple_spinner_dropdown_item);
         iceTransPolicySpinner.setAdapter(iceTransPolicyArrayAdapter);
-        String twilioIceServersJson =
-                getIntent().getExtras().getString(TwilioIceResponse.ICE_SERVERS);
         List<TwilioIceServer> twilioIceServers =
                 IceOptionsHelper.convertToTwilioIceServerList(twilioIceServersJson);
         twilioIceServersListView = (ListView)findViewById(R.id.ice_servers_list_view);
