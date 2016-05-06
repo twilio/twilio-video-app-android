@@ -33,6 +33,7 @@ import com.tw.conv.testapp.model.TwilioIceResponse;
 import com.tw.conv.testapp.model.TwilioIceServer;
 import com.tw.conv.testapp.util.IceOptionsHelper;
 import com.tw.conv.testapp.util.SimpleSignalingUtils;
+import com.twilio.conversations.LogLevel;
 import com.twilio.conversations.TwilioConversations;
 import com.twilio.conversations.TwilioConversationsClient;
 
@@ -219,11 +220,11 @@ public class RegistrationActivity extends AppCompatActivity {
     }
 
     private void registerUser(final String username) {
-        TwilioConversations.setLogLevel(TwilioConversationsClient.LogLevel.DEBUG);
+        TwilioConversationsClient.setLogLevel(LogLevel.DEBUG);
 
         // We need to initialize here in case user logs out and completely tears down sdk
-        if(!TwilioConversations.isInitialized()) {
-            TwilioConversations.initialize(getApplicationContext(),
+        if(!TwilioConversationsClient.isInitialized()) {
+            TwilioConversationsClient.initialize(getApplicationContext(),
                     new TwilioConversationsClient.InitListener() {
                         @Override
                         public void onInitialized() {

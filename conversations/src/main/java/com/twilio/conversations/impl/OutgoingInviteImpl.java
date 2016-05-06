@@ -10,12 +10,12 @@ import java.util.Set;
 public class OutgoingInviteImpl implements OutgoingInvite {
     static final Logger logger = Logger.getLogger(OutgoingInviteImpl.class);
 
-    private TwilioConversationsClientImpl conversationsClientImpl;
+    private TwilioConversationsClientInternal conversationsClientImpl;
     private ConversationImpl conversationImpl;
     private ConversationCallback conversationCallback;
     private InviteStatus inviteStatus;
 
-    private OutgoingInviteImpl(TwilioConversationsClientImpl conversationsClientImpl,
+    private OutgoingInviteImpl(TwilioConversationsClientInternal conversationsClientImpl,
                                ConversationImpl conversationImpl,
                                ConversationCallback conversationCallback) {
         this.conversationImpl = conversationImpl;
@@ -24,7 +24,7 @@ public class OutgoingInviteImpl implements OutgoingInvite {
         this.inviteStatus = InviteStatus.PENDING;
     }
 
-    static OutgoingInviteImpl create(TwilioConversationsClientImpl conversationsClientImpl,
+    static OutgoingInviteImpl create(TwilioConversationsClientInternal conversationsClientImpl,
                                      ConversationImpl conversationImpl,
                                      ConversationCallback conversationCallback) {
         if(conversationsClientImpl == null) {

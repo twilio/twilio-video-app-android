@@ -18,12 +18,12 @@ public class IncomingInviteImpl implements IncomingInvite {
     static final Logger logger = Logger.getLogger(IncomingInviteImpl.class);
     private final Handler handler;
 
-    private TwilioConversationsClientImpl conversationsClientImpl;
+    private TwilioConversationsClientInternal conversationsClientImpl;
     private ConversationImpl conversationImpl;
     private ConversationCallback conversationCallback;
     private InviteStatus inviteStatus;
 
-    private IncomingInviteImpl(TwilioConversationsClientImpl conversationsClientImpl,
+    private IncomingInviteImpl(TwilioConversationsClientInternal conversationsClientImpl,
                                ConversationImpl conversationImpl,
                                Handler handler) {
         this.conversationImpl = conversationImpl;
@@ -32,7 +32,7 @@ public class IncomingInviteImpl implements IncomingInvite {
         this.handler = handler;
     }
 
-    static IncomingInviteImpl create(TwilioConversationsClientImpl conversationsClientImpl,
+    static IncomingInviteImpl create(TwilioConversationsClientInternal conversationsClientImpl,
                                      ConversationImpl conversationImpl,
                                      Handler handler) {
         if(conversationsClientImpl == null) {

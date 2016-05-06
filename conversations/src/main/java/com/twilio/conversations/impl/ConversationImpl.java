@@ -46,7 +46,7 @@ public class ConversationImpl implements Conversation,
             "This operation is no longer valid";
     private Set<String> invitedParticipants = new HashSet<>();
     private String inviter;
-    private TwilioConversationsClientImpl conversationsClient;
+    private TwilioConversationsClientInternal conversationsClient;
     private ConversationListener conversationListener;
     private ConversationStateObserver conversationStateObserver;
     private Map<String,ParticipantImpl> participantMap = new HashMap<>();
@@ -104,7 +104,7 @@ public class ConversationImpl implements Conversation,
     /*
      * Outgoing invite
      */
-    private ConversationImpl(TwilioConversationsClientImpl conversationsClient,
+    private ConversationImpl(TwilioConversationsClientInternal conversationsClient,
                              Set<String> participants,
                              LocalMedia localMedia,
                              ConversationListener conversationListener,
@@ -149,7 +149,7 @@ public class ConversationImpl implements Conversation,
     /*
      * Incoming invite
      */
-    private ConversationImpl(TwilioConversationsClientImpl conversationsClient,
+    private ConversationImpl(TwilioConversationsClientInternal conversationsClient,
                              long nativeSession,
                              String[] participantsIdentities,
                              ConversationStateObserver conversationStateObserver,
@@ -179,7 +179,7 @@ public class ConversationImpl implements Conversation,
     }
 
     public static ConversationImpl createOutgoingConversation(
-            TwilioConversationsClientImpl conversationsClient,
+            TwilioConversationsClientInternal conversationsClient,
             Set<String> participants,
             LocalMedia localMedia,
             ConversationListener listener,
@@ -191,7 +191,7 @@ public class ConversationImpl implements Conversation,
     }
 
     public static ConversationImpl createIncomingConversation(
-            TwilioConversationsClientImpl conversationsClientImpl,
+            TwilioConversationsClientInternal conversationsClientImpl,
             long nativeSession,
             String[] participantIdentities,
             ConversationStateObserver conversationStateObserver,

@@ -18,17 +18,17 @@ public class TwilioConversationsHelper {
     public static void initialize(Context context) throws InterruptedException {
         final CountDownLatch initLatch = new CountDownLatch(1);
 
-        TwilioConversations.initialize(context, createInitListener(initLatch));
+        TwilioConversationsClient.initialize(context, createInitListener(initLatch));
 
         assertTrue(initLatch.await(INIT_TIMEOUT_SECONDS, TimeUnit.SECONDS));
 
     }
 
     public static void destroy() {
-        if(TwilioConversations.isInitialized()) {
-            TwilioConversations.destroy();
+        if(TwilioConversationsClient.isInitialized()) {
+            TwilioConversationsClient.destroy();
         }
-        while(TwilioConversations.isInitialized());
+        while(TwilioConversationsClient.isInitialized());
     }
 
     public static TwilioConversationsClient.InitListener createInitListener() {

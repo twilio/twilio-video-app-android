@@ -33,8 +33,8 @@ import com.twilio.common.TwilioAccessManager;
 import com.twilio.conversations.ClientOptions;
 import com.twilio.conversations.ConversationsClient;
 import com.twilio.conversations.ConversationsClientListener;
-import com.twilio.conversations.TwilioConversationsClient.LogLevel;
-import com.twilio.conversations.TwilioConversationsClient.LogModule;
+import com.twilio.conversations.LogLevel;
+import com.twilio.conversations.LogModule;
 import com.twilio.conversations.TwilioConversationsClient;
 import com.twilio.conversations.impl.logging.Logger;
 import com.twilio.conversations.impl.util.CallbackHandler;
@@ -49,7 +49,7 @@ public class TwilioConversationsImpl {
     private static volatile TwilioConversationsImpl instance;
 
     private static volatile boolean libraryIsLoaded = false;
-    private static LogLevel level = TwilioConversationsClient.LogLevel.OFF;
+    private static LogLevel level = LogLevel.OFF;
     private static Map<LogModule, LogLevel> moduleLogLevel = new EnumMap<LogModule, LogLevel>
             (LogModule.class);
     protected Context applicationContext;
@@ -134,7 +134,7 @@ public class TwilioConversationsImpl {
      */
     private boolean observingConnectivity = false;
 
-    protected final Map<UUID, WeakReference<TwilioConversationsClientImpl>> conversationsClientMap = new ConcurrentHashMap<>();
+    protected final Map<UUID, WeakReference<TwilioConversationsClientInternal>> conversationsClientMap = new ConcurrentHashMap<>();
 
     /**
      * TODO 
@@ -163,7 +163,7 @@ public class TwilioConversationsImpl {
             }
         }
 
-        if(level != TwilioConversationsClient.LogLevel.OFF) {
+        if(level != LogLevel.OFF) {
             // Re-apply the log level. Initialization sets a default log level.
             setLogLevel(level);
         }
@@ -234,7 +234,7 @@ public class TwilioConversationsImpl {
          * It is possible that the user has tried to set the log level before the native library
          * has loaded. Here we apply the log level because we know the native library is available
          */
-        if(level != TwilioConversationsClient.LogLevel.OFF) {
+        if(level != LogLevel.OFF) {
             trySetCoreLogLevel(level.ordinal());
         }
 
@@ -298,7 +298,7 @@ public class TwilioConversationsImpl {
 
         // TODO: make this async again after debugging
 
-        Queue<TwilioConversationsClientImpl> clientsDisposing = new ArrayDeque<>();
+        Queue<TwilioConversationsClientInternal> clientsDisposing = new ArrayDeque<>();
         Application application = (Application)
                 TwilioConversationsImpl.this.applicationContext.getApplicationContext();
         AlarmManager alarmManager = (AlarmManager) applicationContext
@@ -308,13 +308,13 @@ public class TwilioConversationsImpl {
         application.unregisterActivityLifecycleCallbacks(applicationForegroundTracker);
 
         // Process clients and determine which ones need to be closed
-        for (Map.Entry<UUID, WeakReference<TwilioConversationsClientImpl>> entry :
+        for (Map.Entry<UUID, WeakReference<TwilioConversationsClientInternal>> entry :
                 conversationsClientMap.entrySet()) {
-            WeakReference<TwilioConversationsClientImpl> weakClientRef =
+            WeakReference<TwilioConversationsClientInternal> weakClientRef =
                     conversationsClientMap.remove(entry.getKey());
 
             if (weakClientRef != null) {
-                TwilioConversationsClientImpl client = weakClientRef.get();
+                TwilioConversationsClientInternal client = weakClientRef.get();
                 if (client != null) {
                     // Dispose of the client regardless of whether it is still listening.
                     client.disposeClient();
@@ -330,13 +330,13 @@ public class TwilioConversationsImpl {
         initialized = false;
     }
 
-    public TwilioConversationsClientImpl createConversationsClient(
+    public TwilioConversationsClientInternal createConversationsClient(
             TwilioAccessManager accessManager,
             ClientOptions options,
             ConversationsClientListener inListener) {
 
         if(accessManager != null) {
-            final TwilioConversationsClientImpl conversationsClient = new TwilioConversationsClientImpl(
+            final TwilioConversationsClientInternal conversationsClient = new TwilioConversationsClientInternal(
                     applicationContext, accessManager, inListener, options, handler);
            if (conversationsClientMap.size() == 0) {
                 registerConnectivityBroadcastReceiver();
@@ -356,7 +356,7 @@ public class TwilioConversationsImpl {
     }
 
     public static void setModuleLogLevel(LogModule module, LogLevel level) {
-        if (module == TwilioConversationsClient.LogModule.PLATFORM) {
+        if (module == LogModule.PLATFORM) {
             setSDKLogLevel(level);
         }
         trySetCoreModuleLogLevel(module.ordinal(), level.ordinal());
@@ -402,7 +402,7 @@ public class TwilioConversationsImpl {
     }
 
     public static LogLevel getLogLevel() {
-        return TwilioConversationsClient.LogLevel.values()[tryGetCoreLogLevel()];
+        return LogLevel.values()[tryGetCoreLogLevel()];
     }
 
     public boolean isInitialized() {
@@ -413,10 +413,10 @@ public class TwilioConversationsImpl {
         return initializing;
     }
 
-    public TwilioConversationsClientImpl findDeviceByUUID(UUID uuid) {
-        WeakReference<TwilioConversationsClientImpl> deviceRef = conversationsClientMap.get(uuid);
+    public TwilioConversationsClientInternal findDeviceByUUID(UUID uuid) {
+        WeakReference<TwilioConversationsClientInternal> deviceRef = conversationsClientMap.get(uuid);
         if (deviceRef != null) {
-            TwilioConversationsClientImpl device = deviceRef.get();
+            TwilioConversationsClientInternal device = deviceRef.get();
             if (device != null) {
                 return device;
             } else {

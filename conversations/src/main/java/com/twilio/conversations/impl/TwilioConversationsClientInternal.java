@@ -38,13 +38,12 @@ import com.twilio.conversations.impl.core.SessionState;
 import com.twilio.conversations.impl.logging.Logger;
 import com.twilio.conversations.internal.ClientOptionsInternal;
 
-public class TwilioConversationsClientImpl implements
-        TwilioConversationsClient,
+public class TwilioConversationsClientInternal implements
         NativeHandleInterface,
         Parcelable,
         EndpointObserver,
         CoreEndpoint, ConversationListener, ConversationStateObserver {
-    static final Logger logger = Logger.getLogger(TwilioConversationsClientImpl.class);
+    static final Logger logger = Logger.getLogger(TwilioConversationsClientInternal.class);
 
     void removeConversation(ConversationImpl conversationImpl) {
         conversations.remove(conversationImpl);
@@ -60,7 +59,7 @@ public class TwilioConversationsClientImpl implements
             handler.post(new Runnable() {
                 @Override
                 public void run() {
-                    conversationsClientListener.onIncomingInviteCancelled(TwilioConversationsClientImpl.this,
+                    conversationsClientListener.onIncomingInviteCancelled(twilioConversationsClient,
                             conversationImpl.getIncomingInviteImpl());
                 }
             });
@@ -74,11 +73,11 @@ public class TwilioConversationsClientImpl implements
 
         public EndpointObserverInternal(EndpointObserver observer) {
             this.nativeEndpointObserver = wrapNativeObserver(observer,
-                    TwilioConversationsClientImpl.this);
+                    TwilioConversationsClientInternal.this);
         }
 
         private native long wrapNativeObserver(EndpointObserver observer,
-                                               TwilioConversationsClient twilioConversationsClient);
+                                               TwilioConversationsClientInternal twilioConversationsClientInternal);
         private native void freeNativeObserver(long nativeEndpointObserver);
 
         @Override
@@ -109,6 +108,7 @@ public class TwilioConversationsClientImpl implements
     private Map<ConversationImpl, IncomingInviteImpl> pendingIncomingInvites = new HashMap<>();
     private boolean listening = false;
     private IceOptions iceOptions;
+    private TwilioConversationsClient twilioConversationsClient;
 
     public UUID getUuid() {
         return uuid;
@@ -119,11 +119,11 @@ public class TwilioConversationsClientImpl implements
         return super.hashCode();
     }
 
-    TwilioConversationsClientImpl(Context context,
-                                  TwilioAccessManager accessManager,
-                                  ConversationsClientListener conversationsClientListener,
-                                  ClientOptions options,
-                                  Handler handler) {
+    TwilioConversationsClientInternal(Context context,
+                                      TwilioAccessManager accessManager,
+                                      ConversationsClientListener conversationsClientListener,
+                                      ClientOptions options,
+                                      Handler handler) {
         this.context = context;
         this.conversationsClientListener = conversationsClientListener;
         this.accessManager = accessManager;
@@ -177,7 +177,6 @@ public class TwilioConversationsClientImpl implements
         return activeConversations;
     }
 
-    @Override
     public synchronized void listen() {
         if(nativeEndpointHandle != 0) {
             listening = true;
@@ -185,14 +184,12 @@ public class TwilioConversationsClientImpl implements
         }
     }
 
-    @Override
     public synchronized void unlisten() {
         if(nativeEndpointHandle != 0) {
             unlisten(nativeEndpointHandle);
         }
     }
 
-    @Override
     public void setConversationsClientListener(ConversationsClientListener listener) {
         if(handler == null) {
             throw new IllegalThreadStateException("This thread must be able to obtain a Looper");
@@ -200,24 +197,20 @@ public class TwilioConversationsClientImpl implements
         this.conversationsClientListener = listener;
     }
 
-    @Override
     public String getIdentity() {
         return new String(accessManager.getIdentity());
     }
 
-    @Override
     public boolean isListening() {
         return endpointState == EndpointState.REGISTERED;
     }
 
-    @Override
     public OutgoingInvite sendConversationInvite(Set<String> participants,
                                                  LocalMedia localMedia,
                                                  ConversationCallback conversationCallback) {
         return sendConversationInvite(participants, localMedia, null, conversationCallback);
     }
 
-    @Override
     public OutgoingInvite sendConversationInvite(Set<String> participants,
                                                  LocalMedia localMedia,
                                                  IceOptions iceOptions,
@@ -411,16 +404,16 @@ public class TwilioConversationsClientImpl implements
     }
 
     /* Parcelable */
-    public static final Parcelable.Creator<TwilioConversationsClientImpl> CREATOR = new Parcelable.Creator<TwilioConversationsClientImpl>() {
+    public static final Parcelable.Creator<TwilioConversationsClientInternal> CREATOR = new Parcelable.Creator<TwilioConversationsClientInternal>() {
         @Override
-        public TwilioConversationsClientImpl createFromParcel(Parcel in) {
+        public TwilioConversationsClientInternal createFromParcel(Parcel in) {
             UUID uuid = (UUID)in.readSerializable();
             TwilioConversationsImpl twilioConversations = TwilioConversationsImpl.getInstance();
             return twilioConversations.findDeviceByUUID(uuid);
         }
 
         @Override
-        public TwilioConversationsClientImpl[] newArray(int size)
+        public TwilioConversationsClientInternal[] newArray(int size)
         {
             throw new UnsupportedOperationException();
         }
@@ -449,7 +442,7 @@ public class TwilioConversationsClientImpl implements
                     @Override
                     public void run() {
                         conversationsClientListener
-                                .onFailedToStartListening(TwilioConversationsClientImpl.this, e);
+                                .onFailedToStartListening(twilioConversationsClient, e);
                     }
                 });
             }
@@ -460,7 +453,7 @@ public class TwilioConversationsClientImpl implements
                     @Override
                     public void run() {
                         conversationsClientListener
-                                .onStartListeningForInvites(TwilioConversationsClientImpl.this);
+                                .onStartListeningForInvites(twilioConversationsClient);
                     }
                 });
             }
@@ -476,7 +469,7 @@ public class TwilioConversationsClientImpl implements
                 @Override
                 public void run() {
                     conversationsClientListener
-                            .onStopListeningForInvites(TwilioConversationsClientImpl.this);
+                            .onStopListeningForInvites(twilioConversationsClient);
                 }
             });
         }
@@ -494,7 +487,7 @@ public class TwilioConversationsClientImpl implements
                     @Override
                     public void run() {
                         conversationsClientListener
-                                .onStartListeningForInvites(TwilioConversationsClientImpl.this);
+                                .onStartListeningForInvites(twilioConversationsClient);
                     }
                 });
             }
@@ -505,7 +498,7 @@ public class TwilioConversationsClientImpl implements
                     @Override
                     public void run() {
                         conversationsClientListener
-                                .onStopListeningForInvites(TwilioConversationsClientImpl.this);
+                                .onStopListeningForInvites(twilioConversationsClient);
                     }
                 });
             }
@@ -544,7 +537,7 @@ public class TwilioConversationsClientImpl implements
             handler.post(new Runnable() {
                 @Override
                 public void run() {
-                    conversationsClientListener.onIncomingInvite(TwilioConversationsClientImpl.this,
+                    conversationsClientListener.onIncomingInvite(twilioConversationsClient,
                             incomingInviteImpl);
                 }
             });
@@ -580,7 +573,6 @@ public class TwilioConversationsClientImpl implements
         // We are intentionally not implementing ignore
     }
 
-    @Override
     public void setAudioOutput(AudioOutput audioOutput) {
         logger.d("setAudioOutput");
         AudioManager audioManager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
@@ -592,11 +584,14 @@ public class TwilioConversationsClientImpl implements
 
     }
 
-    @Override
     public AudioOutput getAudioOutput() {
         logger.d("getAudioOutput");
         AudioManager audioManager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
         return audioManager.isSpeakerphoneOn() ? AudioOutput.SPEAKERPHONE : AudioOutput.HEADSET;
+    }
+
+    public void setTwilioConversationsClient(TwilioConversationsClient twilioConversationsClient) {
+        this.twilioConversationsClient = twilioConversationsClient;
     }
 
     boolean hasTerminated() {

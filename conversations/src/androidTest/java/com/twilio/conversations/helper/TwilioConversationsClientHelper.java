@@ -22,7 +22,7 @@ public class TwilioConversationsClientHelper {
 
         final CountDownLatch listeningLatch = new CountDownLatch(1);
 
-        TwilioConversationsClient twilioConversationsClient = TwilioConversations.createConversationsClient(twilioAccessManager, new ConversationsClientListener() {
+        TwilioConversationsClient twilioConversationsClient = TwilioConversationsClient.createConversationsClient(twilioAccessManager, new ConversationsClientListener() {
 
             @Override
             public void onStartListeningForInvites(TwilioConversationsClient conversationsClient) {

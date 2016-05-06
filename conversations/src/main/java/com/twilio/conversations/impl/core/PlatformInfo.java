@@ -12,6 +12,7 @@ import android.net.NetworkInfo;
 import android.provider.Settings.Secure;
 
 import com.twilio.conversations.TwilioConversations;
+import com.twilio.conversations.TwilioConversationsClient;
 
 public final class PlatformInfo {
     private static final String PLATFORM_NAME = "Android";
@@ -87,7 +88,7 @@ public final class PlatformInfo {
     }
 
     static String getRtcPlatformSdkVersion() {
-        return TwilioConversations.getVersion();
+        return TwilioConversationsClient.getVersion();
     }
 
     static String getOsArch() {

@@ -77,7 +77,7 @@ public class VideoConstraintsTests extends TwilioConversationsTestsBase {
             return;
         }
 
-        TwilioConversations.setLogLevel(TwilioConversationsClient.LogLevel.DEBUG);
+        TwilioConversationsClient.setLogLevel(LogLevel.DEBUG);
 
         TwilioAccessManager twilioAccessManager = AccessTokenHelper.obtainTwilioAccessManager(context, SELF_TEST_USER);
         TwilioConversationsClient twilioConversationsClient = TwilioConversationsClientHelper.registerClient(activityRule.getActivity(), twilioAccessManager);
@@ -172,7 +172,7 @@ public class VideoConstraintsTests extends TwilioConversationsTestsBase {
             return;
         }
 
-        TwilioConversations.setLogLevel(TwilioConversationsClient.LogLevel.DEBUG);
+        TwilioConversationsClient.setLogLevel(LogLevel.DEBUG);
 
         TwilioAccessManager twilioAccessManager = AccessTokenHelper.obtainTwilioAccessManager(context, SELF_TEST_USER);
         TwilioConversationsClient twilioConversationsClient = TwilioConversationsClientHelper.registerClient(activityRule.getActivity(), twilioAccessManager);

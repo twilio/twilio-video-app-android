@@ -16,7 +16,7 @@ static TwilioCommon::AccessManager* getNativeAccessMgrFromJava(JNIEnv* jni, jobj
 using namespace twiliosdk;
 using namespace webrtc_jni;
 
-JNIEXPORT jlong JNICALL Java_com_twilio_conversations_impl_TwilioConversationsClientImpl_createEndpoint
+JNIEXPORT jlong JNICALL Java_com_twilio_conversations_impl_TwilioConversationsClientInternal_createEndpoint
         (JNIEnv *env, jobject obj, jobject j_accessMgr, jobjectArray optionsArray, jlong nativeEndpointObserver) {
     TS_CORE_LOG_MODULE(kTSCoreLogModulePlatform, kTSCoreLogLevelDebug, "createEndpoint");
 
@@ -73,7 +73,7 @@ static TwilioCommon::AccessManager* getNativeAccessMgrFromJava(JNIEnv* jni, jobj
  * Method:    listen
  * Signature: (J)V
  */
-JNIEXPORT void JNICALL Java_com_twilio_conversations_impl_TwilioConversationsClientImpl_listen__J
+JNIEXPORT void JNICALL Java_com_twilio_conversations_impl_TwilioConversationsClientInternal_listen__J
         (JNIEnv *env, jobject obj, jlong nativeEndpoint) {
     TS_CORE_LOG_MODULE(kTSCoreLogModulePlatform, kTSCoreLogLevelDebug, "listen");
     reinterpret_cast<TSCEndpointPtr *>(nativeEndpoint)->get()->registerEndpoint(true, true);
@@ -84,7 +84,7 @@ JNIEXPORT void JNICALL Java_com_twilio_conversations_impl_TwilioConversationsCli
  * Method:    unlisten
  * Signature: (J)V
  */
-JNIEXPORT void JNICALL Java_com_twilio_conversations_impl_TwilioConversationsClientImpl_unlisten__J
+JNIEXPORT void JNICALL Java_com_twilio_conversations_impl_TwilioConversationsClientInternal_unlisten__J
         (JNIEnv *env, jobject obj, jlong nativeEndpoint) {
     TS_CORE_LOG_MODULE(kTSCoreLogModulePlatform, kTSCoreLogLevelDebug, "unlisten");
     reinterpret_cast<TSCEndpointPtr *>(nativeEndpoint)->get()->unregisterEndpoint();
@@ -96,7 +96,7 @@ JNIEXPORT void JNICALL Java_com_twilio_conversations_impl_TwilioConversationsCli
  * Method:    reject
  * Signature: (JJ)V
  */
-JNIEXPORT void JNICALL Java_com_twilio_conversations_impl_TwilioConversationsClientImpl_reject__JJ
+JNIEXPORT void JNICALL Java_com_twilio_conversations_impl_TwilioConversationsClientInternal_reject__JJ
         (JNIEnv *env, jobject obj, jlong nativeEndpoint, jlong nativeSession) {
     TS_CORE_LOG_MODULE(kTSCoreLogModulePlatform, kTSCoreLogLevelDebug, "reject");
     TSCSessionPtr *session = reinterpret_cast<TSCSessionPtr *>(nativeSession);
@@ -108,7 +108,7 @@ JNIEXPORT void JNICALL Java_com_twilio_conversations_impl_TwilioConversationsCli
  * Method:    freeNativeHandle
  * Signature: (J)V
  */
-JNIEXPORT void JNICALL Java_com_twilio_conversations_impl_TwilioConversationsClientImpl_freeNativeHandle
+JNIEXPORT void JNICALL Java_com_twilio_conversations_impl_TwilioConversationsClientInternal_freeNativeHandle
         (JNIEnv *env, jobject obj, jlong nativeEndpoint) {
     TS_CORE_LOG_MODULE(kTSCoreLogModulePlatform, kTSCoreLogLevelDebug, "freeNativeHandle");
     TSCEndpointPtr *endpoint = reinterpret_cast<TSCEndpointPtr *>(nativeEndpoint);

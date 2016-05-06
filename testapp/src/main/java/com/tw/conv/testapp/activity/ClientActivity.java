@@ -474,7 +474,7 @@ public class ClientActivity extends AppCompatActivity {
         accessManager = TwilioAccessManagerFactory.createAccessManager(this, capabilityToken,
                 accessManagerListener());
 
-        twilioConversationsClient = TwilioConversations.createConversationsClient(accessManager, options,
+        twilioConversationsClient = TwilioConversationsClient.createConversationsClient(accessManager, options,
                 conversationsClientListener());
 
 
@@ -693,7 +693,7 @@ public class ClientActivity extends AppCompatActivity {
     }
 
     private void destroyConversationsSdk() {
-        TwilioConversations.destroy();
+        TwilioConversationsClient.destroy();
     }
 
     private void disposeAccessManager() {
