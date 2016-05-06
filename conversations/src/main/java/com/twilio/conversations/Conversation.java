@@ -36,15 +36,39 @@ public interface Conversation {
     void setConversationListener(ConversationListener listener);
 
     /**
-     * Invites one or more participants to this conversation
+     * Invites one or more participants to this conversation.
      *
-     * @param participantIdentities A set of strings representing the identities of these participants.
+     * <p>Results of this method will propagate up according to the following scenarios:
+     * <ol>
+     *     <li>{@link ConversationListener#onParticipantConnected(Conversation, Participant)} will
+     *     be invoked if recipient accepts invite and is connected.</li>
+     *     <li>{@link ConversationListener#onFailedToConnectParticipant(Conversation, Participant,
+     *     TwilioConversationsException)} will be invoked with error code
+     *     {@link TwilioConversations#CONVERSATION_FAILED} if the recipient rejected the
+     *     invite.</li>
+     *     <li>{@link ConversationListener#onFailedToConnectParticipant(Conversation, Participant,
+     *     TwilioConversationsException)} will be invoked with error code
+     *     {@link TwilioConversations#CONVERSATION_IGNORED} if the recipient ignored the
+     *     invite.</li>
+     * </ol>
+     *
+     * @param participantIdentities A set of strings representing the identities of these
+     *                              participants.
      */
     void invite(Set<String> participantIdentities) throws IllegalArgumentException;
 
     /**
-     * Disconnects from this conversation
+     * Disconnects from this conversation.
      *
+     * <p>Results of this method will propagate up in the following order:
+     * <ol>
+     *     <li>{@link ConversationListener#onFailedToConnectParticipant(Conversation, Participant,
+     *     TwilioConversationsException)} will be invoked with error code
+     *     {@link TwilioConversations#CONVERSATION_TERMINATED} for each participant of the
+     *     {@link Conversation}</li>
+     *     <li>{@link ConversationListener#onConversationEnded(Conversation,
+     *     TwilioConversationsException)} will be invoked upon the completion of this process.</li>
+     * </ol>
      */
     void disconnect();
 

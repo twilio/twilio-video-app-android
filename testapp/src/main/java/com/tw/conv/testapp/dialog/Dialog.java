@@ -28,6 +28,17 @@ public class Dialog {
         return alertDialogBuilder.create();
     }
 
+    public static AlertDialog createAutoAcceptInviteDialog(String caller, String sid, Context context) {
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(context);
+
+        alertDialogBuilder.setIcon(R.drawable.ic_call_black_24dp);
+        alertDialogBuilder.setTitle("Auto Accepting Incoming Call");
+        alertDialogBuilder.setMessage(caller + " is calling" + "\n" + "sid " + sid);
+        alertDialogBuilder.setCancelable(false);
+
+        return alertDialogBuilder.create();
+    }
+
     public static AlertDialog createCallParticipantsDialog(EditText participantEditText,
                                                            DialogInterface.OnClickListener callParticipantsClickListener,
                                                            DialogInterface.OnClickListener cancelClickListener,
@@ -80,4 +91,5 @@ public class Dialog {
         dialog.setListener(listener);
         return dialog;
     }
+
 }

@@ -10,6 +10,7 @@ import android.content.IntentFilter;
 import android.graphics.drawable.Drawable;
 import android.media.AudioManager;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.NotificationCompat;
@@ -29,7 +30,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
@@ -110,7 +110,7 @@ import retrofit.RetrofitError;
 import retrofit.client.Response;
 import timber.log.Timber;
 
-public class TCClientActivity extends AppCompatActivity {
+public class ClientActivity extends AppCompatActivity {
     private static final int REQUEST_CODE_REJECT_INCOMING_CALL = 1000;
     private static final int REQUEST_CODE_ACCEPT_INCOMING_CALL = 1001;
     private static final int INCOMING_CALL_NOTIFICATION_ID = 1002;
@@ -120,6 +120,7 @@ public class TCClientActivity extends AppCompatActivity {
             "com.tw.conv.testapp.action.ACCEPT_INCOMING_CALL";
 
     public static final String OPTION_PREFER_H264_KEY = "enable-h264";
+    public static final String OPTION_AUTO_ACCEPT_KEY = "auto-accept";
     private static final String OPTION_DEV_REGISTRAR = "endpoint.dev.twilio.com";
     private static final String OPTION_DEV_STATS_URL = "https://eventgw.dev.twilio.com";
     private static final String OPTION_STAGE_REGISTRAR = "endpoint.stage.twilio.com";
@@ -134,6 +135,7 @@ public class TCClientActivity extends AppCompatActivity {
     private boolean wasLive = false;
     private boolean inBackground = false;
     private boolean loggingOut = false;
+    private String username;
     private String realm;
     private CheckBox statsCheckBox;
     private LinearLayout statsLayout;
@@ -143,6 +145,10 @@ public class TCClientActivity extends AppCompatActivity {
             remoteVideoTrackStatsRecordMap = new LinkedHashMap<>();
     private RecyclerView remoteStatsRecyclerView;
     private boolean preferH264;
+    private boolean autoAccept;
+    private String selectedTwilioIceServersJson;
+    private String iceTransportPolicy;
+    private String twilioIceServersJson;
 
     private enum AudioState {
         ENABLED,
@@ -417,24 +423,36 @@ public class TCClientActivity extends AppCompatActivity {
             }
         });
 
-        String username = getIntent().getExtras().getString(SimpleSignalingUtils.USERNAME);
-        getSupportActionBar().setTitle(username);
+        if (savedInstanceState != null) {
+            Timber.d("Restoring client activity state");
+            username = savedInstanceState.getString(SimpleSignalingUtils.USERNAME);
+            realm = savedInstanceState.getString(SimpleSignalingUtils.REALM);
+            preferH264 = savedInstanceState.getBoolean(OPTION_PREFER_H264_KEY);
+            autoAccept = savedInstanceState.getBoolean(OPTION_AUTO_ACCEPT_KEY);
+            capabilityToken = savedInstanceState.getString(SimpleSignalingUtils.CAPABILITY_TOKEN);
+            selectedTwilioIceServersJson = savedInstanceState
+                    .getString(TwilioIceResponse.ICE_SELECTED_SERVERS);
+            iceTransportPolicy = savedInstanceState
+                    .getString(TwilioIceResponse.ICE_TRANSPORT_POLICY);
+            twilioIceServersJson = savedInstanceState.getString(TwilioIceResponse.ICE_SERVERS);
+        } else {
+            Bundle extras = getIntent().getExtras();
 
-        realm = getIntent().getExtras().getString(SimpleSignalingUtils.REALM);
-        preferH264 = getIntent().getExtras().getBoolean(OPTION_PREFER_H264_KEY);
-        Map<String, String> privateOptions = createPrivateOptions(realm);
-        IceOptions iceOptions = getIceOptionsFromIntent();
-        ClientOptionsInternal options = new ClientOptionsInternal(iceOptions, privateOptions);
-
-        // Get the capability token
-        capabilityToken = getIntent().getExtras()
-                .getString(SimpleSignalingUtils.CAPABILITY_TOKEN);
-        if(savedInstanceState != null) {
-            capabilityToken = savedInstanceState
-                    .getString(SimpleSignalingUtils.CAPABILITY_TOKEN);
+            username = extras.getString(SimpleSignalingUtils.USERNAME);
+            realm = extras.getString(SimpleSignalingUtils.REALM);
+            preferH264 = extras.getBoolean(OPTION_PREFER_H264_KEY);
+            autoAccept = extras.getBoolean(OPTION_AUTO_ACCEPT_KEY);
+            capabilityToken = extras.getString(SimpleSignalingUtils.CAPABILITY_TOKEN);
+            selectedTwilioIceServersJson = extras.getString(TwilioIceResponse.ICE_SELECTED_SERVERS);
+            iceTransportPolicy = extras.getString(TwilioIceResponse.ICE_TRANSPORT_POLICY);
+            twilioIceServersJson = extras.getString(TwilioIceResponse.ICE_SERVERS);
         }
 
+        Map<String, String> privateOptions = createPrivateOptions(realm);
+        IceOptions iceOptions = retrieveIceOptions();
+        ClientOptionsInternal options = new ClientOptionsInternal(iceOptions, privateOptions);
         setIceOptionsViews();
+        getSupportActionBar().setTitle(username);
         iceOptionsLayout = (RelativeLayout) findViewById(R.id.ice_options_layout);
         iceOptionsLayout.setVisibility(View.GONE);
         enableIceCheckbox = (CheckBox)findViewById(R.id.enable_ice_checkbox);
@@ -457,7 +475,7 @@ public class TCClientActivity extends AppCompatActivity {
 
 
         cameraCapturer = CameraCapturerFactory.createCameraCapturer(
-                TCClientActivity.this,
+                ClientActivity.this,
                 currentCameraSource,
                 capturerErrorListener());
 
@@ -536,7 +554,15 @@ public class TCClientActivity extends AppCompatActivity {
     @Override
     public void onSaveInstanceState(Bundle bundle) {
         super.onSaveInstanceState(bundle);
+        Timber.d("Saving client activity state");
+        bundle.putString(SimpleSignalingUtils.USERNAME, username);
         bundle.putString(SimpleSignalingUtils.CAPABILITY_TOKEN, capabilityToken);
+        bundle.putString(SimpleSignalingUtils.REALM, realm);
+        bundle.putBoolean(OPTION_PREFER_H264_KEY, preferH264);
+        bundle.putBoolean(OPTION_AUTO_ACCEPT_KEY, autoAccept);
+        bundle.putString(TwilioIceResponse.ICE_SELECTED_SERVERS, selectedTwilioIceServersJson);
+        bundle.putString(TwilioIceResponse.ICE_TRANSPORT_POLICY, iceTransportPolicy);
+        bundle.putString(TwilioIceResponse.ICE_SERVERS, twilioIceServersJson);
     }
 
     @Override
@@ -673,8 +699,8 @@ public class TCClientActivity extends AppCompatActivity {
     }
 
     private void returnToRegistration() {
-        startActivity(new Intent(TCClientActivity.this,
-                TCRegistrationActivity.class));
+        startActivity(new Intent(ClientActivity.this,
+                RegistrationActivity.class));
         finish();
     }
 
@@ -709,24 +735,20 @@ public class TCClientActivity extends AppCompatActivity {
         speakerActionFab.hide();
     }
 
-    private IceOptions getIceOptionsFromIntent() {
-        String selectedTwilioIceServersJson =
-                getIntent().getExtras().getString(TwilioIceResponse.ICE_SELECTED_SERVERS);
-
+    private IceOptions retrieveIceOptions() {
         //Transform twilio ice servers from json to Set<IceServer>
         List<TwilioIceServer> selectedIceServers =
                 IceOptionsHelper.convertToTwilioIceServerList(selectedTwilioIceServersJson);
         Set<IceServer> iceServers = IceOptionsHelper.convertToIceServersSet(selectedIceServers);
+        IceTransportPolicy transPolicy  = IceTransportPolicy.ICE_TRANSPORT_POLICY_ALL;
 
-        String transPolicyStr =
-                getIntent().getExtras().getString(TwilioIceResponse.ICE_TRANSPORT_POLICY);
-        IceTransportPolicy transPolicy  = IceTransportPolicy.ICE_TRANSPORT_POLICY_ALL;;
-        if (transPolicyStr.equalsIgnoreCase("relay") ) {
+        if (iceTransportPolicy.equalsIgnoreCase("relay") ) {
             transPolicy = IceTransportPolicy.ICE_TRANSPORT_POLICY_RELAY;
         }
         if (iceServers.size() > 0) {
             return new IceOptions(transPolicy, iceServers);
         }
+
         return new IceOptions(transPolicy);
     }
 
@@ -737,8 +759,6 @@ public class TCClientActivity extends AppCompatActivity {
         iceTransPolicyArrayAdapter.setDropDownViewResource(
                 android.R.layout.simple_spinner_dropdown_item);
         iceTransPolicySpinner.setAdapter(iceTransPolicyArrayAdapter);
-        String twilioIceServersJson =
-                getIntent().getExtras().getString(TwilioIceResponse.ICE_SERVERS);
         List<TwilioIceServer> twilioIceServers =
                 IceOptionsHelper.convertToTwilioIceServerList(twilioIceServersJson);
         twilioIceServersListView = (ListView)findViewById(R.id.ice_servers_list_view);
@@ -753,7 +773,7 @@ public class TCClientActivity extends AppCompatActivity {
                 @Override
                 public void success(TwilioIceResponse twilioIceResponse, Response response) {
                     IceServerAdapter iceServerAdapter =
-                            new IceServerAdapter(TCClientActivity.this,
+                            new IceServerAdapter(ClientActivity.this,
                                     twilioIceResponse.getIceServers());
                     twilioIceServersListView.setAdapter(iceServerAdapter);
                 }
@@ -822,11 +842,15 @@ public class TCClientActivity extends AppCompatActivity {
             @Override
             public void onIncomingInvite(ConversationsClient conversationsClient,
                                          IncomingInvite incomingInvite) {
-                TCClientActivity.this.incomingInvite = incomingInvite;
+                ClientActivity.this.incomingInvite = incomingInvite;
                 if (!inBackground) {
                     conversationsClientStatusTextView
                             .setText("onIncomingInvite" + incomingInvite.getInviter());
-                    showInviteDialog(incomingInvite);
+                    if(autoAccept) {
+                        showAutoAcceptInviteDialog(incomingInvite);
+                    } else {
+                        showInviteDialog(incomingInvite);
+                    }
                 } else {
                     NotificationManager notificationManager =
                             (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
@@ -843,7 +867,7 @@ public class TCClientActivity extends AppCompatActivity {
                     PendingIntent rejectPendingIntent = getRejectPendingIntent();
 
                     NotificationCompat.Builder mBuilder =
-                            new NotificationCompat.Builder(TCClientActivity.this)
+                            new NotificationCompat.Builder(ClientActivity.this)
                                     .setSmallIcon(R.drawable.ic_videocam_green_24px)
                                     .setDeleteIntent(rejectPendingIntent)
                                     .setContentTitle(incomingInvite.getInviter())
@@ -864,7 +888,7 @@ public class TCClientActivity extends AppCompatActivity {
             @Override
             public void onIncomingInviteCancelled(ConversationsClient conversationsClient,
                                                   IncomingInvite incomingInvite) {
-                TCClientActivity.this.incomingInvite = null;
+                ClientActivity.this.incomingInvite = null;
                 if (!inBackground) {
                     alertDialog.dismiss();
                     Snackbar.make(conversationStatusTextView, "Invite from " +
@@ -996,11 +1020,11 @@ public class TCClientActivity extends AppCompatActivity {
                 switchCameraActionFab.setEnabled(videoTrack.isEnabled());
                 if (videoTrack.isEnabled()) {
                     pauseActionFab.setImageDrawable(
-                            ContextCompat.getDrawable(TCClientActivity.this,
+                            ContextCompat.getDrawable(ClientActivity.this,
                                     R.drawable.ic_pause_green_24px));
                 } else {
                     pauseActionFab.setImageDrawable(
-                            ContextCompat.getDrawable(TCClientActivity.this,
+                            ContextCompat.getDrawable(ClientActivity.this,
                                     R.drawable.ic_pause_red_24px));
                 }
             } else {
@@ -1018,22 +1042,22 @@ public class TCClientActivity extends AppCompatActivity {
         if (videoState == VideoState.ENABLED) {
             switchCameraActionFab.show();
             localVideoActionFab.setImageDrawable(
-                    ContextCompat.getDrawable(TCClientActivity.this,
+                    ContextCompat.getDrawable(ClientActivity.this,
                             R.drawable.ic_videocam_white_24px));
         } else {
             switchCameraActionFab.hide();
             localVideoActionFab.setImageDrawable(
-                    ContextCompat.getDrawable(TCClientActivity.this,
+                    ContextCompat.getDrawable(ClientActivity.this,
                             R.drawable.ic_videocam_off_gray_24px));
         }
         if(localMedia != null && localMedia.getLocalVideoTracks().size() > 0 ) {
             if(localMedia.getLocalVideoTracks().get(0).isEnabled()) {
                 pauseActionFab.setImageDrawable(
-                        ContextCompat.getDrawable(TCClientActivity.this,
+                        ContextCompat.getDrawable(ClientActivity.this,
                                 R.drawable.ic_pause_green_24px));
             } else {
                 pauseActionFab.setImageDrawable(
-                        ContextCompat.getDrawable(TCClientActivity.this,
+                        ContextCompat.getDrawable(ClientActivity.this,
                                 R.drawable.ic_pause_red_24px));
             }
             pauseActionFab.show();
@@ -1079,11 +1103,11 @@ public class TCClientActivity extends AppCompatActivity {
     private void setAudioStateIcon() {
         if (audioState == AudioState.ENABLED) {
             audioActionFab.setImageDrawable(
-                    ContextCompat.getDrawable(TCClientActivity.this,
+                    ContextCompat.getDrawable(ClientActivity.this,
                             R.drawable.ic_mic_white_24px));
         } else if (audioState == AudioState.DISABLED) {
             audioActionFab.setImageDrawable(
-                    ContextCompat.getDrawable(TCClientActivity.this,
+                    ContextCompat.getDrawable(ClientActivity.this,
                             R.drawable.ic_mic_off_gray_24px));
         }
         if(audioState == AudioState.ENABLED && localMedia != null &&
@@ -1100,11 +1124,11 @@ public class TCClientActivity extends AppCompatActivity {
         if(set) {
             if (enable) {
                 muteActionFab.setImageDrawable(
-                        ContextCompat.getDrawable(TCClientActivity.this,
+                        ContextCompat.getDrawable(ClientActivity.this,
                                 R.drawable.ic_mic_red_24px));
             } else {
                 muteActionFab.setImageDrawable(
-                        ContextCompat.getDrawable(TCClientActivity.this,
+                        ContextCompat.getDrawable(ClientActivity.this,
                                 R.drawable.ic_mic_green_24px));
             }
         } else {
@@ -1166,7 +1190,7 @@ public class TCClientActivity extends AppCompatActivity {
                                     Timber.e("sendConversationInvite onConversation");
                                     if (e == null) {
                                         Timber.i("Conversation SID " + conversation.getSid());
-                                        TCClientActivity.this.conversation = conversation;
+                                        ClientActivity.this.conversation = conversation;
                                         conversation.setConversationListener(conversationListener());
                                         if(statsCheckBox.isChecked()) {
                                             enableStats();
@@ -1271,16 +1295,37 @@ public class TCClientActivity extends AppCompatActivity {
         alertDialog.show();
     }
 
+    private void showAutoAcceptInviteDialog(final IncomingInvite incomingInvite) {
+        alertDialog = Dialog.createAutoAcceptInviteDialog(
+        incomingInvite.getInviter(),
+                incomingInvite.getConversationSid(),
+                this);
+        alertDialog.show();
+
+        // Show the dialog and then automatically accept the call
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                alertDialog.dismiss();
+                acceptCall();
+            }
+        }, 3000);
+    }
+
     private DialogInterface.OnClickListener acceptCallClickListener(
             final IncomingInvite invite) {
         return new DialogInterface.OnClickListener() {
             @Override
             public void onClick(final DialogInterface dialogInterface, int i) {
-                localMedia = createLocalMedia();
-                acceptInvite(incomingInvite);
-                setHangupAction();
+                acceptCall();
             }
         };
+    }
+
+    private void acceptCall() {
+        localMedia = createLocalMedia();
+        acceptInvite(incomingInvite);
+        setHangupAction();
     }
 
     private void acceptInvite(IncomingInvite incomingInvite) {
@@ -1291,7 +1336,7 @@ public class TCClientActivity extends AppCompatActivity {
                 Timber.i("onConversation");
                 if (e == null) {
                     Timber.i("Conversation SID " + conversation.getSid());
-                    TCClientActivity.this.conversation = conversation;
+                    ClientActivity.this.conversation = conversation;
                     conversation.setConversationListener(conversationListener());
                     if(statsCheckBox.isChecked()) {
                         enableStats();
@@ -1344,12 +1389,12 @@ public class TCClientActivity extends AppCompatActivity {
                 AudioOutput.HEADSET);
 
         if (on == true) {
-            Drawable drawable = ContextCompat.getDrawable(TCClientActivity.this,
+            Drawable drawable = ContextCompat.getDrawable(ClientActivity.this,
                     R.drawable.ic_volume_down_white_24px);
             speakerActionFab.setImageDrawable(drawable);
         } else {
             // route back to headset
-            Drawable drawable = ContextCompat.getDrawable(TCClientActivity.this,
+            Drawable drawable = ContextCompat.getDrawable(ClientActivity.this,
                     R.drawable.ic_volume_down_gray_24px);
             speakerActionFab.setImageDrawable(drawable);
         }
@@ -1553,7 +1598,7 @@ public class TCClientActivity extends AppCompatActivity {
                 participantContainers.put(participant, participantContainer);
 
                 // Remote participant
-                VideoViewRenderer participantVideoRenderer = new VideoViewRenderer(TCClientActivity.this,
+                VideoViewRenderer participantVideoRenderer = new VideoViewRenderer(ClientActivity.this,
                         participantContainer);
                 participantVideoRenderer.setObserver(new VideoRendererObserver() {
                     @Override
@@ -1672,7 +1717,7 @@ public class TCClientActivity extends AppCompatActivity {
                 for(VideoTrack videoTrack : participant.getMedia().getVideoTracks()) {
                     if(videoTrack.getTrackId().equals(mediaTrack.getTrackId())) {
                         ViewGroup participantContainer = participantContainers.get(participant);
-                        ImageView disabledView = new ImageView(TCClientActivity.this);
+                        ImageView disabledView = new ImageView(ClientActivity.this);
                         disabledView.setTag(mediaTrack.getTrackId());
                         disabledView.setBackgroundResource(R.drawable.ic_videocam_off_red_24px);
                         RelativeLayout.LayoutParams layoutParams = new RelativeLayout
@@ -1693,7 +1738,7 @@ public class TCClientActivity extends AppCompatActivity {
                          * there is no participant container available
                          */
                         if(participantContainer != null) {
-                            ImageView disabledView = new ImageView(TCClientActivity.this);
+                            ImageView disabledView = new ImageView(ClientActivity.this);
                             disabledView.setTag(mediaTrack.getTrackId());
                             disabledView.setBackgroundResource(R.drawable.ic_mic_off_red_24px);
                             RelativeLayout.LayoutParams layoutParams = new RelativeLayout
@@ -1718,7 +1763,7 @@ public class TCClientActivity extends AppCompatActivity {
                                                LocalVideoTrack localVideoTrack) {
                 videoState = VideoState.ENABLED;
                 conversationStatusTextView.setText("onLocalVideoTrackAdded");
-                localRenderer = new VideoViewRenderer(TCClientActivity.this,
+                localRenderer = new VideoViewRenderer(ClientActivity.this,
                         localContainer);
                 localRenderer.setMirror(mirrorLocalRenderer);
                 localVideoTrack.addRenderer(localRenderer);
@@ -1775,9 +1820,9 @@ public class TCClientActivity extends AppCompatActivity {
         videoState = VideoState.ENABLED;
         setVideoStateIcon();
         pauseActionFab.setImageDrawable(
-                ContextCompat.getDrawable(TCClientActivity.this, R.drawable.ic_pause_green_24px));
+                ContextCompat.getDrawable(ClientActivity.this, R.drawable.ic_pause_green_24px));
         muteActionFab.setImageDrawable(
-                ContextCompat.getDrawable(TCClientActivity.this, R.drawable.ic_mic_green_24px));
+                ContextCompat.getDrawable(ClientActivity.this, R.drawable.ic_mic_green_24px));
 
         setSpeakerphoneOn(true);
 
@@ -1850,7 +1895,7 @@ public class TCClientActivity extends AppCompatActivity {
     }
 
     private PendingIntent getAcceptPendingIntent() {
-        Intent incomingCallAcceptIntent = new Intent(this, TCClientActivity.class);
+        Intent incomingCallAcceptIntent = new Intent(this, ClientActivity.class);
         incomingCallAcceptIntent.setAction(ACTION_ACCEPT_INCOMING_CALL);
         incomingCallAcceptIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP |
                 Intent.FLAG_ACTIVITY_SINGLE_TOP);

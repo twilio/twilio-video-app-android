@@ -1,6 +1,5 @@
 package com.twilio.conversations;
 
-import android.view.ViewGroup;
 import android.content.Context;
 
 import com.twilio.conversations.CameraCapturer.CameraSource;

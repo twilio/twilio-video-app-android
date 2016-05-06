@@ -17,22 +17,30 @@ public interface LocalMedia {
     /**
      * Adds a local video track to list of tracks.
      *
-     * @param track
+     * <p>The result of this operation will propagate via {@link LocalMediaListener}. A
+     * successful addition of the local video track will invoke
+     * {@link LocalMediaListener#onLocalVideoTrackAdded(LocalMedia, LocalVideoTrack)}. If any
+     * problems occur adding the video track then
+     * {@link LocalMediaListener#onLocalVideoTrackError(LocalMedia, LocalVideoTrack,
+     * TwilioConversationsException)} will be invoked.</p>
      *
-     * @note This operation may not always succeed. If a failure occurs the error
-     * is reported in {@link LocalMediaListener}.onLocalVideoTrackError(...)
+     * @param localVideoTrack The local video track to be added.
      */
-    void addLocalVideoTrack(LocalVideoTrack track);
+    void addLocalVideoTrack(LocalVideoTrack localVideoTrack);
 
     /**
      * Removes the local video track from list of tracks.
      *
-     * @param track
+     * <p>The result of this operation will propagate via {@link LocalMediaListener}. A
+     * successful removal of the local video track will invoke
+     * {@link LocalMediaListener#onLocalVideoTrackRemoved(LocalMedia, LocalVideoTrack)}. If any
+     * problems occur removing the video track then
+     * {@link LocalMediaListener#onLocalVideoTrackError(LocalMedia, LocalVideoTrack,
+     * TwilioConversationsException)} will be invoked.</p>
      *
-     * @note This operation may not always succeed. If a failure occurs the error
-     * is reported in {@link LocalMediaListener}.onLocalVideoTrackError(...)
+     * @param localVideoTrack The local video track to be removed
      */
-    void removeLocalVideoTrack(LocalVideoTrack track);
+    void removeLocalVideoTrack(LocalVideoTrack localVideoTrack);
 
     /**
      * Specifies whether or not your local audio should be muted

@@ -6,7 +6,7 @@
     android:id="@+id/navigation_drawer"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.tw.conv.testapp.activity.TCClientActivity"
+    tools:context=".activity.ClientActivity"
     tools:showIn="@layout/content_client">
 
     <android.support.design.widget.CoordinatorLayout
