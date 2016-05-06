@@ -1,6 +1,6 @@
 #include "android_video_codec_manager.h"
-#include "talk/app/webrtc/java/jni/androidmediadecoder_jni.h"
-#include "talk/app/webrtc/java/jni/androidmediaencoder_jni.h"
+#include "webrtc/api/java/jni/androidmediadecoder_jni.h"
+#include "webrtc/api/java/jni/androidmediaencoder_jni.h"
 
 const std::string AndroidVideoCodecManager::videoCodecManagerName = "AndroidVideoCodec";
 

@@ -98,7 +98,7 @@ public class VideoViewRenderer implements VideoRenderer {
 
     private void setupRenderer(final Context context, final ViewGroup container) {
         container.addView(surfaceViewRenderer);
-        surfaceViewRenderer.init(EglBaseProvider.provideEglBase().getContext(),
+        surfaceViewRenderer.init(EglBaseProvider.provideEglBase().getEglBaseContext(),
                 internalEventListener);
         surfaceViewRenderer.setScalingType(convertToWebRtcScaleType(videoScaleType));
     }

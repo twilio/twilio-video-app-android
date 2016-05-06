@@ -1,5 +1,5 @@
 #include "com_twilio_conversations_impl_ConversationImpl.h"
-#include "talk/app/webrtc/java/jni/jni_helpers.h"
+#include "webrtc/api/java/jni/jni_helpers.h"
 #include "TSCoreSDKTypes.h"
 #include "TSCoreError.h"
 #include "TSCLogger.h"
@@ -8,7 +8,7 @@
 #include "TSCVideoCaptureController.h"
 #include "TSCSession.h"
 #include "TSCAudioInputController.h"
-#include <TSCoreSDK.h>
+#include "TSCoreSDK.h"
 
 #include <string>
 #include <map>

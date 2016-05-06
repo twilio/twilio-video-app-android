@@ -10,7 +10,7 @@
 #include "TSCoreSDKTypes.h"
 #include "ITSCVideoCodec.h"
 
-#include "talk/app/webrtc/java/jni/jni_helpers.h"
+#include "webrtc/api/java/jni/jni_helpers.h"
 
 using namespace webrtc_jni;
 using namespace twiliosdk;

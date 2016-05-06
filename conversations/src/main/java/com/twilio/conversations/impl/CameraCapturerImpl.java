@@ -293,7 +293,7 @@ public class CameraCapturerImpl implements CameraCapturer {
             return;
         }
         videoCapturerAndroid = VideoCapturerAndroid.create(deviceName, cameraEventsHandler);
-        nativeVideoCapturerAndroid = retrieveNativeVideoCapturerAndroid(videoCapturerAndroid);
+        nativeVideoCapturerAndroid = createNativeCapturer(videoCapturerAndroid);
     }
 
     private final CameraEventsHandler cameraEventsHandler = new CameraEventsHandler() {
@@ -303,6 +303,11 @@ public class CameraCapturerImpl implements CameraCapturer {
                 CameraCapturerImpl.this.listener
                         .onError(new CapturerException(ExceptionDomain.CAMERA, errorMsg));
             }
+        }
+
+        @Override
+        public void onCameraFreezed(String s) {
+
         }
 
         @Override
@@ -530,5 +535,6 @@ public class CameraCapturerImpl implements CameraCapturer {
 
     private native void stopVideoSource(long nativeSession);
     private native void restartVideoSource(long nativeSession);
+    private native long createNativeCapturer(VideoCapturerAndroid capturerAndroid);
     private native void disposeCapturer(long nativeVideoCapturerAndroid);
 }
