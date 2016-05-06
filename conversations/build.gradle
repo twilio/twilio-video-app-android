@@ -254,7 +254,7 @@ dependencies {
     preCompile 'org.pocoproject.twilio:twilio-poco:1.6.15:android@tar.bz2'
     preCompile 'com.googlesource.boringssl.twilio:twilio-boringssl:1.0.13:android@tar.bz2'
     preCompile 'com.twilio.sdk:twilio-common:0.1.13:android@tar.bz2'
-    preCompile 'com.twilio.sdk:twilio-webrtc:48.7:android@tar.bz2'
+    preCompile 'com.twilio.sdk:twilio-webrtc:50.0:android@tar.bz2'
     preCompile 'com.twilio.sdk:twilio-conversations:0.10.22:android@tar.bz2'
 
     testCompile 'junit:junit:4.12'
