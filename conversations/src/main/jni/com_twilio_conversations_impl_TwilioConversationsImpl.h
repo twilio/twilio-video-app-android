@@ -22,30 +22,6 @@ JNIEXPORT jboolean JNICALL Java_com_twilio_conversations_impl_TwilioConversation
 
 /*
  * Class:     com_twilio_conversations_impl_TwilioConversationsImpl
- * Method:    onApplicationForeground
- * Signature: ()J
- */
-JNIEXPORT void JNICALL Java_com_twilio_conversations_impl_TwilioConversationsImpl_onApplicationForeground
-        (JNIEnv *, jobject);
-
-/*
- * Class:     com_twilio_conversations_impl_TwilioConversationsImpl
- * Method:    onApplicationWakeUp
- * Signature: ()J
- */
-JNIEXPORT void JNICALL Java_com_twilio_conversations_impl_TwilioConversationsImpl_onApplicationWakeUp
-        (JNIEnv *, jobject);
-
-/*
- * Class:     com_twilio_conversations_impl_TwilioConversationsImpl
- * Method:    onApplicationBackground
- * Signature: ()J
- */
-JNIEXPORT void JNICALL Java_com_twilio_conversations_impl_TwilioConversationsImpl_onApplicationBackground
-        (JNIEnv *, jobject);
-
-/*
- * Class:     com_twilio_conversations_impl_TwilioConversationsImpl
  * Method:    destroyCore
  * Signature: ()J
  */

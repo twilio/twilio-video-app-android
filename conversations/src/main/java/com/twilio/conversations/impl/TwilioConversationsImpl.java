@@ -58,56 +58,8 @@ public class TwilioConversationsImpl {
     private ExecutorService refreshRegExecutor = Executors.newSingleThreadExecutor();
     private Handler handler;
 
-    public static class WakeUpReceiver extends BroadcastReceiver {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            if (getInstance().isInitialized()) {
-                getInstance().onApplicationWakeUp();
-            }
-        }
-    }
     private PendingIntent wakeUpPendingIntent;
-    private class ApplicationForegroundTracker implements Application.ActivityLifecycleCallbacks {
-        private Activity currentActivity;
-        @Override
-        public void onActivityCreated(Activity activity, Bundle savedInstanceState) {
 
-        }
-
-        @Override
-        public void onActivityStarted(Activity activity) {
-            currentActivity = activity;
-            onApplicationForeground();
-        }
-
-        @Override
-        public void onActivityResumed(Activity activity) {
-
-        }
-
-        @Override
-        public void onActivityPaused(Activity activity) {
-
-        }
-
-        @Override
-        public void onActivityStopped(Activity activity) {
-            if (currentActivity == null ||
-                    currentActivity == activity) {
-                onApplicationBackground();
-            }
-        }
-
-        @Override
-        public void onActivitySaveInstanceState(Activity activity, Bundle outState) {
-
-        }
-
-        @Override
-        public void onActivityDestroyed(Activity activity) {
-
-        }
-    }
     private final ApplicationForegroundTracker applicationForegroundTracker =
             new ApplicationForegroundTracker();
     private class ConnectivityChangeReceiver extends BroadcastReceiver {
