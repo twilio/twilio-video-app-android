@@ -218,14 +218,16 @@ public class TwilioConversationsClient {
      *
      * @param listener A listener for client events.
      */
-    public void setConversationsClientListener(ConversationsClientListener listener){}
+    public void setConversationsClientListener(ConversationsClientListener listener){
+        conversationsClientInternal.setConversationsClientListener(listener);
+    }
 
     /**
      * Get identity of this conversations client on the network.
      *
      * @return identity of this conversations client
      */
-    public String getIdentity(){return null;}
+    public String getIdentity(){return conversationsClientInternal.getIdentity();}
 
     /**
      * Reflects current listening state of the conversations client.
@@ -233,7 +235,7 @@ public class TwilioConversationsClient {
      * @return <code>true</code> if conversations client is listening, </code>false</code>
      * otherwise.
      */
-    public boolean isListening(){return false;}
+    public boolean isListening(){return conversationsClientInternal.isListening();}
 
     /**
      * Starts listening for incoming invites and allows outgoing invites to be sent.
@@ -247,7 +249,7 @@ public class TwilioConversationsClient {
      *     occurred while attempting to listen</li>
      * </ol>
      */
-    public void listen(){}
+    public void listen(){conversationsClientInternal.listen();}
 
     /**
      * Stops listening for incoming conversations.
@@ -255,7 +257,7 @@ public class TwilioConversationsClient {
      * <p>{@link ConversationsClientListener#onStopListeningForInvites(TwilioConversationsClient)}
      * will be invoked upon the completion of this process</p>
      */
-    public void unlisten(){}
+    public void unlisten(){conversationsClientInternal.unlisten();}
 
     /**
      * Sends an invitation to start a conversation with the following participants and local media
@@ -285,7 +287,10 @@ public class TwilioConversationsClient {
      */
     public OutgoingInvite sendConversationInvite(Set<String> participants,
                                           LocalMedia localMedia,
-                                          ConversationCallback conversationCallback) {return null;}
+                                          ConversationCallback conversationCallback) {
+        return conversationsClientInternal.sendConversationInvite(
+                participants, localMedia, conversationCallback);
+    }
 
     /**
      * Sends an invitation to start a conversation with the following participants and local media
@@ -317,7 +322,10 @@ public class TwilioConversationsClient {
     public OutgoingInvite sendConversationInvite(Set<String> participants,
                                           LocalMedia localMedia,
                                           IceOptions iceOptions,
-                                          ConversationCallback conversationCallback) {return null;}
+                                          ConversationCallback conversationCallback) {
+        return conversationsClientInternal.sendConversationInvite(
+                participants, localMedia, iceOptions, conversationCallback);
+    }
 
     /**
      * Sets the audio output speaker for the device.
@@ -329,14 +337,16 @@ public class TwilioConversationsClient {
      *
      * @param audioOutput that should be used by the system
      */
-    public void setAudioOutput(AudioOutput audioOutput) {}
+    public void setAudioOutput(AudioOutput audioOutput) {
+        conversationsClientInternal.setAudioOutput(audioOutput);
+    }
 
     /**
      * Audio output speaker for the current client device
      *
      * @return audio output speaker
      */
-    public AudioOutput getAudioOutput() {return null;}
+    public AudioOutput getAudioOutput() {return conversationsClientInternal.getAudioOutput();}
     
 
     /**
