@@ -41,6 +41,7 @@
     <string name="auto_accept">Accept invites automatically</string>
     <string name="use_headset">Start audio using headset</string>
     <string name="error_initializing_conversations">Error initializing conversations sdk</string>
+    <string name="logout_when_conv_ends">Logout when conversation ends</string>
 
     <string-array name="realm_array">
         <item>Prod</item>

@@ -61,6 +61,22 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal">
             <CheckBox
+                android:id="@+id/logout_when_conv_ends_checkbox"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/activity_horizontal_margin" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/logout_when_conv_ends"
+                android:layout_marginLeft="@dimen/activity_horizontal_margin" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+            <CheckBox
                 android:id="@+id/auto_accept_checkbox"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
