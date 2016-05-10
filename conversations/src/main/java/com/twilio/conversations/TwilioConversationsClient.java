@@ -684,7 +684,7 @@ public class TwilioConversationsClient {
          */
         private boolean observingConnectivity = false;
 
-        protected final Map<UUID, WeakReference<TwilioConversationsClient>>
+        protected final Map<UUID, TwilioConversationsClient>
                 conversationsClientMap = new ConcurrentHashMap<>();
 
 
@@ -730,17 +730,13 @@ public class TwilioConversationsClient {
             application.unregisterActivityLifecycleCallbacks(applicationForegroundTracker);
 
             // Process clients and determine which ones need to be closed
-            for (Map.Entry<UUID, WeakReference<TwilioConversationsClient>> entry :
+            for (Map.Entry<UUID, TwilioConversationsClient> entry :
                     conversationsClientMap.entrySet()) {
-                WeakReference<TwilioConversationsClient> weakClientRef =
+                TwilioConversationsClient client =
                         conversationsClientMap.remove(entry.getKey());
-
-                if (weakClientRef != null) {
-                    TwilioConversationsClient client = weakClientRef.get();
-                    if (client != null) {
-                        // Dispose of the client regardless of whether it is still listening.
-                        client.conversationsClientInternal.disposeClient();
-                    }
+                if (client != null) {
+                    // Dispose of the client regardless of whether it is still listening.
+                    client.conversationsClientInternal.disposeClient();
                 }
             }
         }
@@ -750,8 +746,7 @@ public class TwilioConversationsClient {
             if (conversationsClientMap.size() == 0) {
                 registerConnectivityBroadcastReceiver();
             }
-            conversationsClientMap.put(client.uuid,
-                    new WeakReference<>(client));
+            conversationsClientMap.put(client.uuid, client);
         }
 
 
