@@ -571,7 +571,7 @@ public class TwilioConversationsClientInternal implements
         return !listening;
     }
 
-    void disposeClient() {
+    public void disposeClient() {
         if (nativeEndpointHandle != 0) {
             freeNativeHandle(nativeEndpointHandle);
             nativeEndpointHandle = 0;

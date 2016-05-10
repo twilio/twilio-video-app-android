@@ -222,6 +222,14 @@ public class TwilioConversationsClient {
      */
     public static void destroy() {
         twilioConversationsImpl.destroy();
+        twilioConversationsImpl = null;
+
+        // Now we can teardown the sdk
+        // TODO destroy investigate making this asynchronous with callbacks
+        logger.d("Destroying Core");
+        destroyCore();
+        logger.d("Core destroyed");
+        initialized = false;
     }
 
     /**
@@ -301,14 +309,21 @@ public class TwilioConversationsClient {
         if (listener == null) {
             throw new NullPointerException("listener must not be null");
         }
-        TwilioConversationsImpl conversationsSdk = twilioConversationsImpl;
 
-        if (!initialized) {
+        if (!initialized || (twilioConversationsImpl == null)) {
             throw new IllegalStateException("Cannot create client before initialize is called");
         }
+        TwilioConversationsClientInternal internalClient = new TwilioConversationsClientInternal(
+                        twilioConversationsImpl.applicationContext,
+                        accessManager,
+                        listener,
+                        options,
+                        twilioConversationsImpl.handler);
+        TwilioConversationsClient client =
+                new TwilioConversationsClient(internalClient);
 
-        TwilioConversationsClient client = new TwilioConversationsClient(
-                conversationsSdk.createConversationsClientInternal(accessManager, options, listener));
+        twilioConversationsImpl.registerTwilioConversationClient(client);
+
         return client;
     }
 
@@ -483,7 +498,6 @@ public class TwilioConversationsClient {
     private TwilioConversationsClientInternal conversationsClientInternal;
     private static volatile TwilioConversationsImpl twilioConversationsImpl;
 
-
     private static final int REQUEST_CODE_WAKEUP = 100;
     private static final long BACKGROUND_WAKEUP_INTERVAL = 10 * 60 * 1000;
 
@@ -497,6 +511,8 @@ public class TwilioConversationsClient {
 
     private static boolean initialized;
     private static boolean initializing;
+
+    private final UUID uuid = UUID.randomUUID();
 
     private TwilioConversationsClient(
             TwilioConversationsClientInternal conversationsClientInternal) {
@@ -660,7 +676,7 @@ public class TwilioConversationsClient {
         private final ConnectivityChangeReceiver connectivityChangeReceiver =
                 new ConnectivityChangeReceiver();
 
-        /**
+        /*
          * TODO
          * Currently this is needed to see if we have actually registered our receiver upon destruction
          * of the SDK. However this is only enabled when a client is created. Should this just
@@ -668,7 +684,8 @@ public class TwilioConversationsClient {
          */
         private boolean observingConnectivity = false;
 
-        protected final Map<UUID, WeakReference<TwilioConversationsClientInternal>> conversationsClientMap = new ConcurrentHashMap<>();
+        protected final Map<UUID, WeakReference<TwilioConversationsClient>>
+                conversationsClientMap = new ConcurrentHashMap<>();
 
 
 
@@ -703,9 +720,9 @@ public class TwilioConversationsClient {
 
             // TODO: make this async again after debugging
 
-            Queue<TwilioConversationsClientInternal> clientsDisposing = new ArrayDeque<>();
+            Queue<TwilioConversationsClient> clientsDisposing = new ArrayDeque<>();
             Application application = (Application)
-                    TwilioConversationsImpl.this.applicationContext.getApplicationContext();
+                    applicationContext.getApplicationContext();
             AlarmManager alarmManager = (AlarmManager) applicationContext
                     .getSystemService(Context.ALARM_SERVICE);
 
@@ -713,45 +730,28 @@ public class TwilioConversationsClient {
             application.unregisterActivityLifecycleCallbacks(applicationForegroundTracker);
 
             // Process clients and determine which ones need to be closed
-            for (Map.Entry<UUID, WeakReference<TwilioConversationsClientInternal>> entry :
+            for (Map.Entry<UUID, WeakReference<TwilioConversationsClient>> entry :
                     conversationsClientMap.entrySet()) {
-                WeakReference<TwilioConversationsClientInternal> weakClientRef =
+                WeakReference<TwilioConversationsClient> weakClientRef =
                         conversationsClientMap.remove(entry.getKey());
 
                 if (weakClientRef != null) {
-                    TwilioConversationsClientInternal client = weakClientRef.get();
+                    TwilioConversationsClient client = weakClientRef.get();
                     if (client != null) {
                         // Dispose of the client regardless of whether it is still listening.
-                        // TODO - !nn! - fix this
-                        //client.disposeClient();
+                        client.conversationsClientInternal.disposeClient();
                     }
                 }
             }
-
-            // Now we can teardown the sdk
-            // TODO destroy investigate making this asynchronous with callbacks
-            logger.d("Destroying Core");
-            destroyCore();
-            logger.d("Core destroyed");
-            initialized = false;
         }
 
-        public TwilioConversationsClientInternal createConversationsClientInternal(
-                TwilioAccessManager accessManager,
-                ClientOptions options,
-                ConversationsClientListener inListener) {
 
-            if (accessManager != null) {
-                final TwilioConversationsClientInternal conversationsClient = new TwilioConversationsClientInternal(
-                        applicationContext, accessManager, inListener, options, handler);
-                if (conversationsClientMap.size() == 0) {
-                    registerConnectivityBroadcastReceiver();
-                }
-                conversationsClientMap.put(conversationsClient.getUuid(),
-                        new WeakReference<>(conversationsClient));
-                return conversationsClient;
+        public void registerTwilioConversationClient(TwilioConversationsClient client) {
+            if (conversationsClientMap.size() == 0) {
+                registerConnectivityBroadcastReceiver();
             }
-            return null;
+            conversationsClientMap.put(client.uuid,
+                    new WeakReference<>(client));
         }
 
 
