@@ -704,7 +704,7 @@ public class ClientActivity extends AppCompatActivity {
 
     private void returnToRegistration() {
         Intent registrationIntent = new Intent(ClientActivity.this, RegistrationActivity.class);
-        registrationIntent.putExtra(RegistrationActivity.LOGGED_OUT_OPTION_KEY, true);
+        registrationIntent.putExtra(RegistrationActivity.OPTION_LOGGED_OUT_KEY, true);
         startActivity(registrationIntent);
         finish();
     }

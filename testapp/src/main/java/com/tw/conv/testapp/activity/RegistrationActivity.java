@@ -46,7 +46,7 @@ import retrofit.client.Response;
 public class RegistrationActivity extends AppCompatActivity {
     public static final int PERMISSIONS_REQUEST_CODE = 0;
 
-    public static final String LOGGED_OUT_OPTION_KEY = "loggedOut";
+    public static final String OPTION_LOGGED_OUT_KEY = "loggedOut";
 
     private static final String USERNAME_KEY = "username";
     private static final String REALM_KEY = "realm";
@@ -115,7 +115,7 @@ public class RegistrationActivity extends AppCompatActivity {
 
         }
 
-        boolean loggedOut = getIntent().getBooleanExtra(LOGGED_OUT_OPTION_KEY, false);
+        boolean loggedOut = getIntent().getBooleanExtra(OPTION_LOGGED_OUT_KEY, false);
         if(!loggedOut &&
                 usernameEditText.getText().length() > 0 &&
                 autoRegisterCheckbox.isChecked()) {
