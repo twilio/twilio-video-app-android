@@ -12,6 +12,7 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.text.TextUtils;
 import android.view.HapticFeedbackConstants;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
@@ -46,10 +47,14 @@ import retrofit.client.Response;
 public class RegistrationActivity extends AppCompatActivity {
     public static final int PERMISSIONS_REQUEST_CODE = 0;
 
+    public static final String OPTION_LOGGED_OUT_KEY = "loggedOut";
+
     private static final String USERNAME_KEY = "username";
     private static final String REALM_KEY = "realm";
     private static final String PREFER_H264_KEY = "preferH264";
     public static final String AUTO_ACCEPT_KEY = "autoAccept";
+    public static final String USE_HEADSET_KEY = "startAudioUsingHeadset";
+    public static final String AUTO_REGISTER_KEY = "autoRegister";
     private static final String ICE_OPTIONS_DIALOG = "IceOptionsDialog";
 
     private SharedPreferences sharedPreferences;
@@ -61,6 +66,8 @@ public class RegistrationActivity extends AppCompatActivity {
     private ArrayAdapter<CharSequence> spinnerAdapter;
     private CheckBox preferH264Checkbox;
     private CheckBox autoAcceptCheckbox;
+    private CheckBox autoRegisterCheckbox;
+    private CheckBox useHeadsetCheckbox;
     private ProgressDialog iceServerProgressDialog;
     private TwilioIceResponse twilioIceResponse;
     private List<TwilioIceServer> selectedTwilioIceServers;
@@ -84,6 +91,8 @@ public class RegistrationActivity extends AppCompatActivity {
         realmSpinner = (Spinner)findViewById(R.id.realm_spinner);
         preferH264Checkbox = (CheckBox) findViewById(R.id.prefer_h264_checkbox);
         autoAcceptCheckbox = (CheckBox) findViewById(R.id.auto_accept_checkbox);
+        autoRegisterCheckbox = (CheckBox) findViewById(R.id.auto_register_checkbox);
+        useHeadsetCheckbox = (CheckBox) findViewById(R.id.use_headset_checkbox);
         spinnerAdapter = ArrayAdapter.createFromResource(this,
                         R.array.realm_array, android.R.layout.simple_spinner_dropdown_item);
         spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -106,6 +115,12 @@ public class RegistrationActivity extends AppCompatActivity {
             restoreLastSuccessfulRegistration();
         }
 
+        boolean loggedOut = getIntent().getBooleanExtra(OPTION_LOGGED_OUT_KEY, false);
+        if(!loggedOut &&
+                !TextUtils.isEmpty(usernameEditText.getText()) &&
+                autoRegisterCheckbox.isChecked()) {
+            registrationButton.performClick();
+        }
     }
 
     public boolean checkPermissions(){
@@ -342,6 +357,8 @@ public class RegistrationActivity extends AppCompatActivity {
         }
         preferH264Checkbox.setChecked(sharedPreferences.getBoolean(PREFER_H264_KEY, false));
         autoAcceptCheckbox.setChecked(sharedPreferences.getBoolean(AUTO_ACCEPT_KEY, false));
+        autoRegisterCheckbox.setChecked(sharedPreferences.getBoolean(AUTO_REGISTER_KEY, false));
+        useHeadsetCheckbox.setChecked(sharedPreferences.getBoolean(USE_HEADSET_KEY, false));
     }
 
     private Integer getRealmPosition(String realm) {
@@ -362,6 +379,10 @@ public class RegistrationActivity extends AppCompatActivity {
                 .apply();
         sharedPreferences.edit().putBoolean(AUTO_ACCEPT_KEY, autoAcceptCheckbox.isChecked())
                 .apply();
+        sharedPreferences.edit().putBoolean(AUTO_REGISTER_KEY, autoRegisterCheckbox.isChecked())
+                .apply();
+        sharedPreferences.edit().putBoolean(USE_HEADSET_KEY, useHeadsetCheckbox.isChecked())
+                .apply();
     }
 
     private void startClient(String username, String capabilityToken, String realm) {
@@ -370,8 +391,9 @@ public class RegistrationActivity extends AppCompatActivity {
         intent.putExtra(SimpleSignalingUtils.CAPABILITY_TOKEN, capabilityToken);
         intent.putExtra(SimpleSignalingUtils.REALM, realm);
         intent.putExtra(TwilioIceResponse.ICE_TRANSPORT_POLICY, iceTransportPolicy);
-        intent.putExtra(ClientActivity.OPTION_PREFER_H264_KEY, preferH264Checkbox.isChecked());
         intent.putExtra(ClientActivity.OPTION_AUTO_ACCEPT_KEY, autoAcceptCheckbox.isChecked());
+        intent.putExtra(ClientActivity.OPTION_USE_HEADSET_KEY, useHeadsetCheckbox.isChecked());
+        intent.putExtra(ClientActivity.OPTION_PREFER_H264_KEY, preferH264Checkbox.isChecked());
         if (selectedTwilioIceServers != null) {
             intent.putExtra(TwilioIceResponse.ICE_SELECTED_SERVERS,
                     IceOptionsHelper.convertToJson(selectedTwilioIceServers));
