@@ -130,7 +130,7 @@ public class TwilioConversationsClient {
      *
      */
     public static void initialize(Context context,
-                                  TwilioConversationsClient.InitListener initListener) {
+                                  final TwilioConversationsClient.InitListener initListener) {
         if (context == null) {
             throw new NullPointerException("applicationContext must not be null");
         }
@@ -138,16 +138,81 @@ public class TwilioConversationsClient {
             throw new NullPointerException("initListener must not be null");
         }
 
-        if (twilioConversationsImpl == null) {
-            twilioConversationsImpl = new TwilioConversationsImpl();
-
-        }
         if (level != LogLevel.OFF) {
             // Re-apply the log level. Initialization sets a default log level.
             setLogLevel(level);
         }
 
-        twilioConversationsImpl.initialize(context, initListener);
+        if (initialized || initializing) {
+            initListener.onError(new RuntimeException("Initialize already called"));
+            return;
+        }
+
+        twilioConversationsImpl = new TwilioConversationsImpl();
+
+        initializing = true;
+
+        checkPermissions(context);
+
+        Context applicationContext = context.getApplicationContext();
+        twilioConversationsImpl.applicationContext = applicationContext;
+
+        Handler handler = CallbackHandler.create();
+        if (handler == null) {
+            throw new IllegalThreadStateException("This thread must be able to obtain a Looper");
+        }
+
+        twilioConversationsImpl.handler = handler;
+
+        /*
+         * With all the invariants satisfied we can now load the library if we have not done so
+         */
+        if (!libraryIsLoaded) {
+            ReLinker.loadLibrary(applicationContext, "jingle_peerconnection_so");
+            libraryIsLoaded = true;
+        }
+
+        /*
+         * It is possible that the user has tried to set the log level before the native library
+         * has loaded. Here we apply the log level because we know the native library is available
+         */
+        if (level != LogLevel.OFF) {
+            trySetCoreLogLevel(level.ordinal());
+        }
+
+        /*
+         * It is possible that the user has tried to set the log level for a specific module
+         * before the library has loaded. Here we apply the log level for the module because we
+         * know the native library is available
+         */
+        for (LogModule module : moduleLogLevel.keySet()) {
+            trySetCoreModuleLogLevel(module.ordinal(), moduleLogLevel.get(module).ordinal());
+        }
+
+        boolean success = initCore(applicationContext);
+        if (!success) {
+            initializing = false;
+            initialized = false;
+            handler.post(new Runnable() {
+                @Override
+                public void run() {
+                    initListener.onError(new RuntimeException("Twilio conversations " +
+                            "failed to initialize."));
+                }
+            });
+        } else {
+
+            twilioConversationsImpl.setupLifecycleListeners();
+            initialized = true;
+            initializing = false;
+            handler.post(new Runnable() {
+                @Override
+                public void run() {
+                    initListener.onInitialized();
+                }
+            });
+        }
+
     }
 
     /**
@@ -243,7 +308,7 @@ public class TwilioConversationsClient {
         }
 
         TwilioConversationsClient client = new TwilioConversationsClient(
-                conversationsSdk.createConversationsClient(accessManager, options, listener));
+                conversationsSdk.createConversationsClientInternal(accessManager, options, listener));
         return client;
     }
 
@@ -524,13 +589,49 @@ public class TwilioConversationsClient {
             "android.permission.ACCESS_WIFI_STATE"
     };
 
+    private static void checkPermissions(Context context) {
+        PackageManager pm = context.getPackageManager();
+        PackageInfo pinfo = null;
+        try {
+            pinfo = pm.getPackageInfo(context.getPackageName(),
+                    PackageManager.GET_PERMISSIONS
+                            | PackageManager.GET_SERVICES);
+        } catch (PackageManager.NameNotFoundException e) {
+            throw new RuntimeException("Unable to resolve permissions. " + e.getMessage());
+        }
+
+        // Check application permissions
+        Map<String, Boolean> appPermissions = new HashMap<String, Boolean>(
+                pinfo.requestedPermissions != null ? pinfo.requestedPermissions.length
+                        : 0);
+        if (pinfo.requestedPermissions != null) {
+            for (String permission : pinfo.requestedPermissions)
+                appPermissions.put(permission, true);
+        }
+
+        List<String> missingPermissions = new LinkedList<String>();
+        for (String permission : requiredPermissions) {
+            if (!appPermissions.containsKey(permission))
+                missingPermissions.add(permission);
+        }
+
+        if (!missingPermissions.isEmpty()) {
+            StringBuilder builder = new StringBuilder(
+                    "Your app is missing the following required permissions:");
+            for (String permission : missingPermissions)
+                builder.append(' ').append(permission);
+
+            throw new RuntimeException(builder.toString());
+        }
+    }
+
 
 
     // TwilioConversationsImpl
     private static class TwilioConversationsImpl {
-        protected Context applicationContext;
-
-        private Handler handler;
+        // TODO - !nn! - set proper visibility and lifetime
+        public Context applicationContext;
+        public Handler handler;
 
         private PendingIntent wakeUpPendingIntent;
 
@@ -574,122 +675,25 @@ public class TwilioConversationsClient {
         TwilioConversationsImpl() {
         }
 
-        public void initialize(final Context context,
-                               final TwilioConversationsClient.InitListener initListener) {
-            if (initialized || initializing) {
-                initListener.onError(new RuntimeException("Initialize already called"));
-                return;
-            }
+        public void setupLifecycleListeners() {
+            Application application = (Application) twilioConversationsImpl.applicationContext;
+            AlarmManager alarmManager = (AlarmManager) applicationContext
+                    .getSystemService(Context.ALARM_SERVICE);
 
-            initializing = true;
-            this.applicationContext = context.getApplicationContext();
+            // Wake up periodically to refresh connections
+            wakeUpPendingIntent = PendingIntent.getBroadcast(applicationContext,
+                    REQUEST_CODE_WAKEUP,
+                    new Intent(applicationContext, WakeUpReceiver.class),
+                    PendingIntent.FLAG_UPDATE_CURRENT);
+            alarmManager.setInexactRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP,
+                    BACKGROUND_WAKEUP_INTERVAL,
+                    BACKGROUND_WAKEUP_INTERVAL,
+                    wakeUpPendingIntent);
 
-            PackageManager pm = context.getPackageManager();
-            PackageInfo pinfo = null;
-            try {
-                pinfo = pm.getPackageInfo(context.getPackageName(),
-                        PackageManager.GET_PERMISSIONS
-                                | PackageManager.GET_SERVICES);
-            } catch (PackageManager.NameNotFoundException e) {
-                throw new RuntimeException("Unable to resolve permissions. " + e.getMessage());
-            }
-
-            // Check application permissions
-            Map<String, Boolean> appPermissions = new HashMap<String, Boolean>(
-                    pinfo.requestedPermissions != null ? pinfo.requestedPermissions.length
-                            : 0);
-            if (pinfo.requestedPermissions != null) {
-                for (String permission : pinfo.requestedPermissions)
-                    appPermissions.put(permission, true);
-            }
-
-            List<String> missingPermissions = new LinkedList<String>();
-            for (String permission : requiredPermissions) {
-                if (!appPermissions.containsKey(permission))
-                    missingPermissions.add(permission);
-            }
-
-            if (!missingPermissions.isEmpty()) {
-                StringBuilder builder = new StringBuilder(
-                        "Your app is missing the following required permissions:");
-                for (String permission : missingPermissions)
-                    builder.append(' ').append(permission);
-
-                throw new RuntimeException(builder.toString());
-            }
-
-            handler = CallbackHandler.create();
-            if (handler == null) {
-                throw new IllegalThreadStateException("This thread must be able to obtain a Looper");
-            }
-
-            /**
-             * With all the invariants satisfied we can now load the library if we have not done so
-             */
-            if (!libraryIsLoaded) {
-                ReLinker.loadLibrary(applicationContext, "jingle_peerconnection_so");
-                libraryIsLoaded = true;
-            }
-
-            /**
-             * It is possible that the user has tried to set the log level before the native library
-             * has loaded. Here we apply the log level because we know the native library is available
-             */
-            if (level != LogLevel.OFF) {
-                trySetCoreLogLevel(level.ordinal());
-            }
-
-            /**
-             * It is possible that the user has tried to set the log level for a specific module
-             * before the library has loaded. Here we apply the log level for the module because we
-             * know the native library is available
-             */
-            for (LogModule module : moduleLogLevel.keySet()) {
-                trySetCoreModuleLogLevel(module.ordinal(), moduleLogLevel.get(module).ordinal());
-            }
-
-            boolean success = initCore(applicationContext);
-            if (!success) {
-                initializing = false;
-                initialized = false;
-                handler.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        initListener.onError(new RuntimeException("Twilio conversations " +
-                                "failed to initialize."));
-                    }
-                });
-            } else {
-                Application application = (Application)
-                        TwilioConversationsImpl.this.applicationContext;
-                AlarmManager alarmManager = (AlarmManager) context
-                        .getSystemService(Context.ALARM_SERVICE);
-
-                // Wake up periodically to refresh connections
-                wakeUpPendingIntent = PendingIntent.getBroadcast(context,
-                        REQUEST_CODE_WAKEUP,
-                        new Intent(context, WakeUpReceiver.class),
-                        PendingIntent.FLAG_UPDATE_CURRENT);
-                alarmManager.setInexactRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP,
-                        BACKGROUND_WAKEUP_INTERVAL,
-                        BACKGROUND_WAKEUP_INTERVAL,
-                        wakeUpPendingIntent);
-
-                // Give hints to the core on application visibility events
-                application.registerActivityLifecycleCallbacks(applicationForegroundTracker);
-
-                initialized = true;
-                initializing = false;
-                handler.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        initListener.onInitialized();
-                    }
-                });
-            }
-
-
+            // Give hints to the core on application visibility events
+            application.registerActivityLifecycleCallbacks(applicationForegroundTracker);
         }
+
 
         public void destroy() {
             if (observingConnectivity) {
@@ -732,7 +736,7 @@ public class TwilioConversationsClient {
             initialized = false;
         }
 
-        public TwilioConversationsClientInternal createConversationsClient(
+        public TwilioConversationsClientInternal createConversationsClientInternal(
                 TwilioAccessManager accessManager,
                 ClientOptions options,
                 ConversationsClientListener inListener) {
@@ -749,21 +753,6 @@ public class TwilioConversationsClient {
             }
             return null;
         }
-
-        public TwilioConversationsClientInternal findDeviceByUUID(UUID uuid) {
-            WeakReference<TwilioConversationsClientInternal> deviceRef = conversationsClientMap.get(uuid);
-            if (deviceRef != null) {
-                TwilioConversationsClientInternal device = deviceRef.get();
-                if (device != null) {
-                    return device;
-                } else {
-                    conversationsClientMap.remove(uuid);
-                }
-            }
-
-            return null;
-        }
-
 
 
         private void onNetworkChange() {
@@ -806,3 +795,4 @@ public class TwilioConversationsClient {
     private native static void setModuleLevel(int module, int level);
     private native static int getCoreLogLevel();
 }
+

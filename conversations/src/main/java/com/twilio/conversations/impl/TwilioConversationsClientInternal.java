@@ -40,7 +40,6 @@ import com.twilio.conversations.internal.ClientOptionsInternal;
 
 public class TwilioConversationsClientInternal implements
         NativeHandleInterface,
-        Parcelable,
         EndpointObserver,
         CoreEndpoint, ConversationListener, ConversationStateObserver {
     static final Logger logger = Logger.getLogger(TwilioConversationsClientInternal.class);
@@ -392,34 +391,6 @@ public class TwilioConversationsClientInternal implements
         ConversationImpl conversationImpl = (ConversationImpl)conversation;
         handleConversationFailed(conversationImpl, e);
     }
-
-    @Override /* Parcelable */
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override /* Parcelable */
-    public void writeToParcel(Parcel out, int flags) {
-        out.writeSerializable(uuid);
-    }
-
-    /* Parcelable */
-    public static final Parcelable.Creator<TwilioConversationsClientInternal> CREATOR = new Parcelable.Creator<TwilioConversationsClientInternal>() {
-        @Override
-        public TwilioConversationsClientInternal createFromParcel(Parcel in) {
-            UUID uuid = (UUID)in.readSerializable();
-            // TODO - !nn! - fix this
-            //TwilioConversationsImpl twilioConversations = TwilioConversationsImpl.getInstance();
-            //return twilioConversations.findDeviceByUUID(uuid);
-            return null;
-        }
-
-        @Override
-        public TwilioConversationsClientInternal[] newArray(int size)
-        {
-            throw new UnsupportedOperationException();
-        }
-    };
 
     /**
      * NativeHandleInterface
