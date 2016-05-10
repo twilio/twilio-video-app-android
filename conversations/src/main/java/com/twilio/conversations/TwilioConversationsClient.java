@@ -148,21 +148,18 @@ public class TwilioConversationsClient {
             return;
         }
 
-        twilioConversationsImpl = new TwilioConversationsImpl();
-
         initializing = true;
 
-        checkPermissions(context);
-
         Context applicationContext = context.getApplicationContext();
-        twilioConversationsImpl.applicationContext = applicationContext;
-
         Handler handler = CallbackHandler.create();
         if (handler == null) {
             throw new IllegalThreadStateException("This thread must be able to obtain a Looper");
         }
 
-        twilioConversationsImpl.handler = handler;
+        twilioConversationsImpl = new TwilioConversationsImpl(applicationContext, handler);
+
+        checkPermissions(context);
+
 
         /*
          * With all the invariants satisfied we can now load the library if we have not done so
@@ -646,8 +643,8 @@ public class TwilioConversationsClient {
     // TwilioConversationsImpl
     private static class TwilioConversationsImpl {
         // TODO - !nn! - set proper visibility and lifetime
-        public Context applicationContext;
-        public Handler handler;
+        public final Context applicationContext;
+        public final Handler handler;
 
         private PendingIntent wakeUpPendingIntent;
 
@@ -689,7 +686,9 @@ public class TwilioConversationsClient {
 
 
 
-        TwilioConversationsImpl() {
+        public TwilioConversationsImpl(Context applicationContext, Handler handler) {
+            this.applicationContext = applicationContext;
+            this.handler = handler;
         }
 
         public void setupLifecycleListeners() {
