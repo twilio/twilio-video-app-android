@@ -12,53 +12,7 @@ extern "C" {
 JNIEXPORT jlong JNICALL Java_com_twilio_conversations_impl_ConversationsImpl_createEndpoint
   (JNIEnv *, jobject, jobject, jobjectArray, jlong);
 
-/*
- * Class:     com_twilio_conversations_impl_TwilioConversationsImpl
- * Method:    initCore
- * Signature: (Landroid/content/Context;)Z
- */
-JNIEXPORT jboolean JNICALL Java_com_twilio_conversations_impl_TwilioConversationsImpl_initCore
-  (JNIEnv *, jobject, jobject);
 
-/*
- * Class:     com_twilio_conversations_impl_TwilioConversationsImpl
- * Method:    destroyCore
- * Signature: ()J
- */
-JNIEXPORT void JNICALL Java_com_twilio_conversations_impl_TwilioConversationsImpl_destroyCore
-  (JNIEnv *, jobject);
-
-/*
- * Class:     com_twilio_conversations_impl_TwilioConversationsImpl
- * Method:    setCoreLogLevel 
- * Signature: (I)J
- */
-JNIEXPORT void JNICALL Java_com_twilio_conversations_impl_TwilioConversationsImpl_setCoreLogLevel
-  (JNIEnv *, jobject, jint);
-
-/*
- * Class:     com_twilio_conversations_impl_TwilioConversationsImpl
- * Method:    setModuleLevel
- * Signature: (II)J
- */
-JNIEXPORT void JNICALL Java_com_twilio_conversations_impl_TwilioConversationsImpl_setModuleLevel
-        (JNIEnv *, jobject, jint, jint);
-
-/*
- * Class:     com_twilio_conversations_impl_TwilioConversationsImpl
- * Method:    getCoreLogLevel 
- * Signature: ()J
- */
-JNIEXPORT jint JNICALL Java_com_twilio_conversations_impl_TwilioConversationsImpl_getCoreLogLevel
-  (JNIEnv *, jobject);
-
-/*
- * Class:     com_twilio_conversations_impl_TwilioConversationsImpl
- * Method:    refreshRegistrations
- * Signature: (J)V
- */
-JNIEXPORT void JNICALL Java_com_twilio_conversations_impl_TwilioConversationsImpl_refreshRegistrations
-  (JNIEnv *, jobject);
 
 
 #ifdef __cplusplus

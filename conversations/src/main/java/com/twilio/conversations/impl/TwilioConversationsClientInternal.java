@@ -119,7 +119,7 @@ public class TwilioConversationsClientInternal implements
         return super.hashCode();
     }
 
-    TwilioConversationsClientInternal(Context context,
+    public TwilioConversationsClientInternal(Context context,
                                       TwilioAccessManager accessManager,
                                       ConversationsClientListener conversationsClientListener,
                                       ClientOptions options,
@@ -408,8 +408,10 @@ public class TwilioConversationsClientInternal implements
         @Override
         public TwilioConversationsClientInternal createFromParcel(Parcel in) {
             UUID uuid = (UUID)in.readSerializable();
-            TwilioConversationsImpl twilioConversations = TwilioConversationsImpl.getInstance();
-            return twilioConversations.findDeviceByUUID(uuid);
+            // TODO - !nn! - fix this
+            //TwilioConversationsImpl twilioConversations = TwilioConversationsImpl.getInstance();
+            //return twilioConversations.findDeviceByUUID(uuid);
+            return null;
         }
 
         @Override
