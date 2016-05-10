@@ -6,7 +6,6 @@ import com.twilio.common.TwilioAccessManager;
 import com.twilio.conversations.TwilioConversationsClient;
 import com.twilio.conversations.ConversationsClientListener;
 import com.twilio.conversations.IncomingInvite;
-import com.twilio.conversations.TwilioConversations;
 import com.twilio.conversations.TwilioConversationsException;
 
 import java.util.concurrent.CountDownLatch;

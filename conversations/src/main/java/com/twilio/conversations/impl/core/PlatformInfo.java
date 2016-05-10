@@ -11,7 +11,6 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.provider.Settings.Secure;
 
-import com.twilio.conversations.TwilioConversations;
 import com.twilio.conversations.TwilioConversationsClient;
 
 public final class PlatformInfo {

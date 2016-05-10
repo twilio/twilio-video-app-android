@@ -160,12 +160,12 @@ public class TwilioConversationsClient {
     }
 
     /**
-     * Informs whether {@link TwilioConversations} is initialized or not.
+     * Informs whether {@link TwilioConversationsClient} is initialized or not.
      *
      * @return <code>true</code> if Twilio Conversations client is initialized, <code>false</code> otherwise.
      */
     public static boolean isInitialized() {
-        return twilioConversationsImpl.isInitialized();
+        return initialized;
     }
 
     /**
@@ -174,7 +174,7 @@ public class TwilioConversationsClient {
      * @return the logging level
      */
     public static LogLevel getLogLevel() {
-        return TwilioConversationsImpl.getLogLevel();
+        return LogLevel.values()[tryGetCoreLogLevel()];
     }
 
     /**
@@ -238,7 +238,7 @@ public class TwilioConversationsClient {
         }
         TwilioConversationsImpl conversationsSdk = twilioConversationsImpl;
 
-        if (!conversationsSdk.isInitialized()) {
+        if (!initialized) {
             throw new IllegalStateException("Cannot create client before initialize is called");
         }
 
@@ -430,7 +430,8 @@ public class TwilioConversationsClient {
 
     static final Logger logger = Logger.getLogger(TwilioConversationsClient.class);
 
-
+    private static boolean initialized;
+    private static boolean initializing;
 
     private TwilioConversationsClient(
             TwilioConversationsClientInternal conversationsClientInternal) {
@@ -504,21 +505,31 @@ public class TwilioConversationsClient {
         }
     }
 
+    /*
+     * TODO
+     * Technically the SDK should be able to work with all
+     * normal permissions. With Android 23 and up, the user could
+     * opt out of dangerous permissions at any time. The SDK should
+     * adjust accordingly.
+     **/
+    private static final String[] requiredPermissions = {
+            // Dangerous permissions (require permission)
+            "android.permission.CAMERA",
+            "android.permission.RECORD_AUDIO",
+
+            // Normal permissions (granted upon install)
+            "android.permission.INTERNET",
+            "android.permission.MODIFY_AUDIO_SETTINGS",
+            "android.permission.ACCESS_NETWORK_STATE",
+            "android.permission.ACCESS_WIFI_STATE"
+    };
 
 
 
     // TwilioConversationsImpl
     private static class TwilioConversationsImpl {
-
-
-
-
-
-
         protected Context applicationContext;
-        private static boolean initialized;
-        private static boolean initializing;
-        private ExecutorService refreshRegExecutor = Executors.newSingleThreadExecutor();
+
         private Handler handler;
 
         private PendingIntent wakeUpPendingIntent;
@@ -527,6 +538,11 @@ public class TwilioConversationsClient {
                 new ApplicationForegroundTracker();
 
         private class ConnectivityChangeReceiver extends BroadcastReceiver {
+
+            private ExecutorService refreshRegExecutor = Executors.newSingleThreadExecutor();
+
+            public ConnectivityChangeReceiver(){}
+
             @Override
             public void onReceive(Context context, Intent intent) {
                 if (intent.getAction().equalsIgnoreCase(ConnectivityManager.CONNECTIVITY_ACTION)) {
@@ -553,24 +569,6 @@ public class TwilioConversationsClient {
 
         protected final Map<UUID, WeakReference<TwilioConversationsClientInternal>> conversationsClientMap = new ConcurrentHashMap<>();
 
-        /**
-         * TODO
-         * Technically the SDK should be able to work with all
-         * normal permissions. With Android 23 and up, the user could
-         * opt out of dangerous permissions at any time. The SDK should
-         * adjust accordingly.
-         **/
-        private static final String[] requiredPermissions = {
-                // Dangerous permissions (require permission)
-                "android.permission.CAMERA",
-                "android.permission.RECORD_AUDIO",
-
-                // Normal permissions (granted upon install)
-                "android.permission.INTERNET",
-                "android.permission.MODIFY_AUDIO_SETTINGS",
-                "android.permission.ACCESS_NETWORK_STATE",
-                "android.permission.ACCESS_WIFI_STATE"
-        };
 
 
         TwilioConversationsImpl() {
@@ -578,7 +576,7 @@ public class TwilioConversationsClient {
 
         public void initialize(final Context context,
                                final TwilioConversationsClient.InitListener initListener) {
-            if (isInitialized() || isInitializing()) {
+            if (initialized || initializing) {
                 initListener.onError(new RuntimeException("Initialize already called"));
                 return;
             }
@@ -750,22 +748,6 @@ public class TwilioConversationsClient {
                 return conversationsClient;
             }
             return null;
-        }
-
-
-
-
-
-        public static LogLevel getLogLevel() {
-            return LogLevel.values()[tryGetCoreLogLevel()];
-        }
-
-        public boolean isInitialized() {
-            return initialized;
-        }
-
-        boolean isInitializing() {
-            return initializing;
         }
 
         public TwilioConversationsClientInternal findDeviceByUUID(UUID uuid) {

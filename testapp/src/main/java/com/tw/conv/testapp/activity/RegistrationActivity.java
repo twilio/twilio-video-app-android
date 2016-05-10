@@ -34,7 +34,6 @@ import com.tw.conv.testapp.model.TwilioIceServer;
 import com.tw.conv.testapp.util.IceOptionsHelper;
 import com.tw.conv.testapp.util.SimpleSignalingUtils;
 import com.twilio.conversations.LogLevel;
-import com.twilio.conversations.TwilioConversations;
 import com.twilio.conversations.TwilioConversationsClient;
 
 import net.hockeyapp.android.CrashManager;

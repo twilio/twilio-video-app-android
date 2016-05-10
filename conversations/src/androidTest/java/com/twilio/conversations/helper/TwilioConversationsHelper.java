@@ -3,7 +3,6 @@ package com.twilio.conversations.helper;
 import android.content.Context;
 import android.support.annotation.Nullable;
 
-import com.twilio.conversations.TwilioConversations;
 import com.twilio.conversations.TwilioConversationsClient;
 
 import java.util.concurrent.CountDownLatch;
