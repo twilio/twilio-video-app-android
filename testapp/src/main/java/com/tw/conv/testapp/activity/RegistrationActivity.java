@@ -12,6 +12,7 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.text.TextUtils;
 import android.view.HapticFeedbackConstants;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
@@ -112,12 +113,11 @@ public class RegistrationActivity extends AppCompatActivity {
         // Only restoring last registration if this is first launch
         if (savedInstanceState == null) {
             restoreLastSuccessfulRegistration();
-
         }
 
         boolean loggedOut = getIntent().getBooleanExtra(OPTION_LOGGED_OUT_KEY, false);
         if(!loggedOut &&
-                usernameEditText.getText().length() > 0 &&
+                !TextUtils.isEmpty(usernameEditText.getText()) &&
                 autoRegisterCheckbox.isChecked()) {
             registrationButton.performClick();
         }

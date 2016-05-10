@@ -564,6 +564,7 @@ public class ClientActivity extends AppCompatActivity {
         bundle.putString(SimpleSignalingUtils.REALM, realm);
         bundle.putBoolean(OPTION_PREFER_H264_KEY, preferH264);
         bundle.putBoolean(OPTION_AUTO_ACCEPT_KEY, autoAccept);
+        bundle.putBoolean(OPTION_USE_HEADSET_KEY, useHeadset);
         bundle.putString(TwilioIceResponse.ICE_SELECTED_SERVERS, selectedTwilioIceServersJson);
         bundle.putString(TwilioIceResponse.ICE_TRANSPORT_POLICY, iceTransportPolicy);
         bundle.putString(TwilioIceResponse.ICE_SERVERS, twilioIceServersJson);
