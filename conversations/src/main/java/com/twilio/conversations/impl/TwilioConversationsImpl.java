@@ -31,6 +31,7 @@ import android.util.Log;
 
 import com.twilio.common.TwilioAccessManager;
 import com.twilio.conversations.ClientOptions;
+import com.twilio.conversations.ConversationsClient;
 import com.twilio.conversations.ConversationsClientListener;
 import com.twilio.conversations.TwilioConversations;
 import com.twilio.conversations.TwilioConversations.LogLevel;
@@ -453,7 +454,16 @@ public class TwilioConversationsImpl {
 
     private void onNetworkChange() {
         if (initialized && (conversationsClientMap.size() > 0)) {
-            refreshRegistrations();
+
+            // Only refresh registrations if there are clients that are listening
+            for (Map.Entry<UUID, WeakReference<ConversationsClientImpl>> entry :
+                    conversationsClientMap.entrySet()) {
+                    if(entry.getValue().get().isListening()) {
+                        refreshRegistrations();
+                        break;
+                    }
+            }
+
         }
     }
 
