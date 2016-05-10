@@ -155,7 +155,7 @@ public class TwilioConversationsClient {
             throw new IllegalThreadStateException("This thread must be able to obtain a Looper");
         }
 
-        twilioConversationsImpl = new TwilioConversationsImpl(applicationContext, handler);
+        internalRegistry = new InternalRegistry(applicationContext, handler);
 
         checkPermissions(context);
 
@@ -198,7 +198,7 @@ public class TwilioConversationsClient {
             });
         } else {
 
-            twilioConversationsImpl.setupLifecycleListeners();
+            internalRegistry.setupLifecycleListeners();
             initialized = true;
             initializing = false;
             handler.post(new Runnable() {
@@ -217,8 +217,9 @@ public class TwilioConversationsClient {
      *
      */
     public static void destroy() {
-        twilioConversationsImpl.destroy();
-        twilioConversationsImpl = null;
+        // Destoy all registered clients and system events listeners
+        internalRegistry.destroy();
+        internalRegistry = null;
 
         // Now we can teardown the sdk
         // TODO destroy investigate making this asynchronous with callbacks
@@ -306,19 +307,19 @@ public class TwilioConversationsClient {
             throw new NullPointerException("listener must not be null");
         }
 
-        if (!initialized || (twilioConversationsImpl == null)) {
+        if (!initialized || (internalRegistry == null)) {
             throw new IllegalStateException("Cannot create client before initialize is called");
         }
         TwilioConversationsClientInternal internalClient = new TwilioConversationsClientInternal(
-                        twilioConversationsImpl.applicationContext,
+                        internalRegistry.applicationContext,
                         accessManager,
                         listener,
                         options,
-                        twilioConversationsImpl.handler);
+                        internalRegistry.handler);
         TwilioConversationsClient client =
                 new TwilioConversationsClient(internalClient);
 
-        twilioConversationsImpl.registerTwilioConversationClient(client);
+        internalRegistry.registerTwilioConversationClient(client);
 
         return client;
     }
@@ -492,7 +493,7 @@ public class TwilioConversationsClient {
     // Private
 
     private TwilioConversationsClientInternal conversationsClientInternal;
-    private static volatile TwilioConversationsImpl twilioConversationsImpl;
+    private static volatile InternalRegistry internalRegistry;
 
     private static final int REQUEST_CODE_WAKEUP = 100;
     private static final long BACKGROUND_WAKEUP_INTERVAL = 10 * 60 * 1000;
@@ -639,9 +640,8 @@ public class TwilioConversationsClient {
 
 
 
-    // TwilioConversationsImpl
-    private static class TwilioConversationsImpl {
-        // TODO - !nn! - set proper visibility and lifetime
+    // InternalRegistry
+    private static class InternalRegistry {
         public final Context applicationContext;
         public final Handler handler;
 
@@ -685,13 +685,13 @@ public class TwilioConversationsClient {
 
 
 
-        public TwilioConversationsImpl(Context applicationContext, Handler handler) {
+        public InternalRegistry(Context applicationContext, Handler handler) {
             this.applicationContext = applicationContext;
             this.handler = handler;
         }
 
         public void setupLifecycleListeners() {
-            Application application = (Application) twilioConversationsImpl.applicationContext;
+            Application application = (Application) internalRegistry.applicationContext;
             AlarmManager alarmManager = (AlarmManager) applicationContext
                     .getSystemService(Context.ALARM_SERVICE);
 
