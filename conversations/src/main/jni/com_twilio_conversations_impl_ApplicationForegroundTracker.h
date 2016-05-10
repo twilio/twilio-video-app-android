@@ -7,21 +7,21 @@ extern "C" {
 #endif
 
 /*
- * Class:     com_twilio_conversations_impl_TwilioConversationsImpl
+ * Class:     com_twilio_conversations_impl_ApplicationForegroundTracker
  * Method:    onApplicationForeground
  * Signature: ()J
  */
-JNIEXPORT void JNICALL Java_com_twilio_conversations_impl_ApplicationForegroundTracker_onApplicationForeground
+JNIEXPORT void JNICALL Java_com_twilio_conversations_impl_ApplicationForegroundTracker_nativeOnApplicationForeground
         (JNIEnv *, jobject);
 
 
 
 /*
- * Class:     com_twilio_conversations_impl_TwilioConversationsImpl
+ * Class:     com_twilio_conversations_impl_ApplicationForegroundTracker
  * Method:    onApplicationBackground
  * Signature: ()J
  */
-JNIEXPORT void JNICALL Java_com_twilio_conversations_impl_ApplicationForegroundTracker_onApplicationBackground
+JNIEXPORT void JNICALL Java_com_twilio_conversations_impl_ApplicationForegroundTracker_nativeOnApplicationBackground
         (JNIEnv *, jobject);
 
 #ifdef __cplusplus

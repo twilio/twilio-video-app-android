@@ -17,7 +17,7 @@ using namespace twiliosdk;
 using namespace webrtc_jni;
 
 /*
-* Class:     com_twilio_conversations_impl_TwilioConversationsImpl
+* Class:     com_twilio_conversations_impl_WakeUpReceiver
 * Method:    onApplicationWakeUp
 * Signature: ()J
 */

@@ -18,7 +18,7 @@ using namespace webrtc_jni;
 * Method:    onApplicationForeground
 * Signature: ()J
 */
-JNIEXPORT void JNICALL Java_com_twilio_conversations_impl_ApplicationForegroundTracker_onApplicationForeground
+JNIEXPORT void JNICALL Java_com_twilio_conversations_impl_ApplicationForegroundTracker_nativeOnApplicationForeground
         (JNIEnv *env, jobject) {
     TS_CORE_LOG_MODULE(kTSCoreLogModulePlatform, kTSCoreLogLevelDebug, "onApplicationForeground");
     TSCSDK* tscSdk = TSCSDK::instance();
@@ -39,7 +39,7 @@ JNIEXPORT void JNICALL Java_com_twilio_conversations_impl_ApplicationForegroundT
  * Method:    onApplicationBackground
  * Signature: ()J
  */
-JNIEXPORT void JNICALL Java_com_twilio_conversations_impl_ApplicationForegroundTracker_onApplicationBackground
+JNIEXPORT void JNICALL Java_com_twilio_conversations_impl_ApplicationForegroundTracker_nativeOnApplicationBackground
         (JNIEnv *env, jobject) {
     TS_CORE_LOG_MODULE(kTSCoreLogModulePlatform, kTSCoreLogLevelDebug, "onApplicationBackground");
     TSCSDK* tscSdk = TSCSDK::instance();
