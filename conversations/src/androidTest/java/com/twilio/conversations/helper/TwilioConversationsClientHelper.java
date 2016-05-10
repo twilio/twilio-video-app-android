@@ -4,7 +4,6 @@ import android.content.Context;
 
 import com.twilio.common.TwilioAccessManager;
 import com.twilio.conversations.TwilioConversationsClient;
-import com.twilio.conversations.ConversationsClientListener;
 import com.twilio.conversations.IncomingInvite;
 import com.twilio.conversations.TwilioConversationsException;
 
@@ -21,7 +20,7 @@ public class TwilioConversationsClientHelper {
 
         final CountDownLatch listeningLatch = new CountDownLatch(1);
 
-        TwilioConversationsClient twilioConversationsClient = TwilioConversationsClient.createConversationsClient(twilioAccessManager, new ConversationsClientListener() {
+        TwilioConversationsClient twilioConversationsClient = TwilioConversationsClient.create(twilioAccessManager, new TwilioConversationsClient.Listener() {
 
             @Override
             public void onStartListeningForInvites(TwilioConversationsClient conversationsClient) {

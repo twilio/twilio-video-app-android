@@ -37,7 +37,7 @@ import java.util.concurrent.Executors;
 /**
  * TwilioConversationsClient allows user to create or participate in conversations.
  *
- * @see ConversationsClientListener
+ * @see Listener
  */
 public class TwilioConversationsClient {
     /**
@@ -116,6 +116,59 @@ public class TwilioConversationsClient {
      *  @note: The video track is in the {@link MediaTrackState} ENDED state.
      */
     public static int INVALID_VIDEO_TRACK_STATE = 305;
+
+    /**
+     * Listener interface defines a set of callbacks for events related to a
+     * {@link TwilioConversationsClient}.
+     *
+     */
+    public static interface Listener {
+        /**
+         * This method notifies the listener that the client is successfully listening for incoming
+         * invitations. This method will be invoked after a successful call to
+         * {@link TwilioConversationsClient#listen()} or after a reconnect event.
+         *
+         * @param twilioConversationsClient The client that is listening for incoming invitations.
+         */
+        void onStartListeningForInvites(TwilioConversationsClient twilioConversationsClient);
+
+        /**
+         * This method notifies the listener that the client is no longer listening for invitations.
+         * This method will be invoked after a successful call to {@link TwilioConversationsClient#unlisten()}
+         * or when a network change occurs.
+         *
+         * @param twilioConversationsClient The client that is no longer listening for incoming invitations.
+         */
+        void onStopListeningForInvites(TwilioConversationsClient twilioConversationsClient);
+
+        /**
+         *
+         * This method notifies the listener that the client failed to start listening for invitations.
+         * This method is invoked after an unsuccessful call to {@link TwilioConversationsClient#listen()}.
+         *
+         * @param twilioConversationsClient The conversations client that failed to start listening for
+         *                            incoming invitations.
+         * @param exception Exception containing information that caused the failure.
+         */
+        void onFailedToStartListening(TwilioConversationsClient twilioConversationsClient,
+                                      TwilioConversationsException exception);
+
+        /**
+         * This method notifies the listener that the client has a pending invitation for a
+         * conversation.
+         *
+         * @param incomingInvite The invitation object.
+         */
+        void onIncomingInvite(TwilioConversationsClient twilioConversationsClient, IncomingInvite incomingInvite);
+
+        /**
+         * This method notifies the listener that the incoming invite was cancelled.
+         *
+         * @param incomingInvite The invitation object.
+         */
+        void onIncomingInviteCancelled(TwilioConversationsClient twilioConversationsClient,
+                                       IncomingInvite incomingInvite);
+    }
 
     /**
      * Initialize the Twilio Conversations SDK.
@@ -283,9 +336,9 @@ public class TwilioConversationsClient {
      * @return the initialized {@link TwilioConversationsClient}, or null if the Twilio Conversations Client
      *         was not initialized
      */
-    public static TwilioConversationsClient createConversationsClient(TwilioAccessManager accessManager,
-                                                                      ConversationsClientListener listener) {
-        return createConversationsClient(accessManager, null, listener);
+    public static TwilioConversationsClient create(TwilioAccessManager accessManager,
+                                                   Listener listener) {
+        return create(accessManager, null, listener);
     }
 
     /**
@@ -297,9 +350,9 @@ public class TwilioConversationsClient {
      * @return the initialized {@link TwilioConversationsClient}, or null if the Twilio Conversations Client
      *         was not initialized
      */
-    public static TwilioConversationsClient createConversationsClient(TwilioAccessManager accessManager,
-                                                                      ClientOptions options,
-                                                                      ConversationsClientListener listener) {
+    public static TwilioConversationsClient create(TwilioAccessManager accessManager,
+                                                   ClientOptions options,
+                                                   Listener listener) {
         if (accessManager == null) {
             throw new NullPointerException("access manager must not be null");
         }
@@ -334,11 +387,11 @@ public class TwilioConversationsClient {
     }
 
     /**
-     * Set a new {@link ConversationsClientListener} object to respond to client events.
+     * Set a new {@link Listener} object to respond to client events.
      *
      * @param listener A listener for client events.
      */
-    public void setConversationsClientListener(ConversationsClientListener listener){
+    public void setListener(Listener listener){
         conversationsClientInternal.setConversationsClientListener(listener);
     }
 
@@ -360,11 +413,11 @@ public class TwilioConversationsClient {
     /**
      * Starts listening for incoming invites and allows outgoing invites to be sent.
      *
-     * <p>The result of this method will propagate via the {@link ConversationsClientListener}:</p>
+     * <p>The result of this method will propagate via the {@link Listener}:</p>
      * <ol>
-     *     <li>{@link ConversationsClientListener#onStartListeningForInvites(TwilioConversationsClient)}
+     *     <li>{@link Listener#onStartListeningForInvites(TwilioConversationsClient)}
      *     will be invoked if the client is listening for invites</li>
-     *     <li>{@link ConversationsClientListener#onFailedToStartListening(TwilioConversationsClient,
+     *     <li>{@link Listener#onFailedToStartListening(TwilioConversationsClient,
      *     TwilioConversationsException)} (ConversationsClient)} will be invoked if an issue
      *     occurred while attempting to listen</li>
      * </ol>
@@ -374,7 +427,7 @@ public class TwilioConversationsClient {
     /**
      * Stops listening for incoming conversations.
      *
-     * <p>{@link ConversationsClientListener#onStopListeningForInvites(TwilioConversationsClient)}
+     * <p>{@link Listener#onStopListeningForInvites(TwilioConversationsClient)}
      * will be invoked upon the completion of this process</p>
      */
     public void unlisten(){conversationsClientInternal.unlisten();}
@@ -785,5 +838,6 @@ public class TwilioConversationsClient {
     private native static void nativeSetCoreLogLevel(int level);
     private native static void nativeSetModuleLevel(int module, int level);
     private native static int nativeGetCoreLogLevel();
+
 }
 

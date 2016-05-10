@@ -11,8 +11,6 @@ import java.util.concurrent.CountDownLatch;
 import android.content.Context;
 import android.media.AudioManager;
 import android.os.Handler;
-import android.os.Parcel;
-import android.os.Parcelable;
 
 import com.twilio.common.TwilioAccessManager;
 import com.twilio.conversations.AudioOutput;
@@ -21,7 +19,6 @@ import com.twilio.conversations.Conversation;
 import com.twilio.conversations.ConversationCallback;
 import com.twilio.conversations.ConversationListener;
 import com.twilio.conversations.TwilioConversationsClient;
-import com.twilio.conversations.ConversationsClientListener;
 import com.twilio.conversations.IceOptions;
 import com.twilio.conversations.InviteStatus;
 import com.twilio.conversations.LocalMedia;
@@ -95,7 +92,7 @@ public class TwilioConversationsClientInternal implements
 
     private final UUID uuid = UUID.randomUUID();
     private Context context;
-    private ConversationsClientListener conversationsClientListener;
+    private TwilioConversationsClient.Listener conversationsClientListener;
     private EndpointObserverInternal endpointObserver;
     private long nativeEndpointHandle;
     private TwilioAccessManager accessManager;
@@ -120,11 +117,11 @@ public class TwilioConversationsClientInternal implements
 
     public TwilioConversationsClientInternal(Context context,
                                       TwilioAccessManager accessManager,
-                                      ConversationsClientListener conversationsClientListener,
+                                      TwilioConversationsClient.Listener listener,
                                       ClientOptions options,
                                       Handler handler) {
         this.context = context;
-        this.conversationsClientListener = conversationsClientListener;
+        this.conversationsClientListener = listener;
         this.accessManager = accessManager;
 
         if(handler == null) {
@@ -189,7 +186,7 @@ public class TwilioConversationsClientInternal implements
         }
     }
 
-    public void setConversationsClientListener(ConversationsClientListener listener) {
+    public void setConversationsClientListener(TwilioConversationsClient.Listener listener) {
         if(handler == null) {
             throw new IllegalThreadStateException("This thread must be able to obtain a Looper");
         }

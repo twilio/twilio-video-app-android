@@ -66,7 +66,6 @@ import com.twilio.conversations.Conversation;
 import com.twilio.conversations.ConversationCallback;
 import com.twilio.conversations.ConversationListener;
 import com.twilio.conversations.TwilioConversationsClient;
-import com.twilio.conversations.ConversationsClientListener;
 import com.twilio.conversations.IceOptions;
 import com.twilio.conversations.IceServer;
 import com.twilio.conversations.IceTransportPolicy;
@@ -473,7 +472,7 @@ public class ClientActivity extends AppCompatActivity {
         accessManager = TwilioAccessManagerFactory.createAccessManager(this, capabilityToken,
                 accessManagerListener());
 
-        twilioConversationsClient = TwilioConversationsClient.createConversationsClient(accessManager, options,
+        twilioConversationsClient = TwilioConversationsClient.create(accessManager, options,
                 conversationsClientListener());
 
 
@@ -820,8 +819,8 @@ public class ClientActivity extends AppCompatActivity {
         };
     }
 
-    private ConversationsClientListener conversationsClientListener() {
-        return new ConversationsClientListener() {
+    private TwilioConversationsClient.Listener conversationsClientListener() {
+        return new TwilioConversationsClient.Listener() {
             @Override
             public void onStartListeningForInvites(TwilioConversationsClient twilioConversationsClient) {
                 conversationsClientStatusTextView.setText("onStartListeningForInvites");

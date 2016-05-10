@@ -130,7 +130,7 @@ public class VideoConstraintsTests extends TwilioConversationsTestsBase {
         /**
          * Set a new conversations client listener to handle the stop listening for invites event here
          */
-        twilioConversationsClient.setConversationsClientListener(new ConversationsClientListener() {
+        twilioConversationsClient.setListener(new TwilioConversationsClient.Listener() {
             @Override
             public void onStartListeningForInvites(TwilioConversationsClient twilioConversationsClient) {
 
@@ -226,7 +226,7 @@ public class VideoConstraintsTests extends TwilioConversationsTestsBase {
         /**
          * Set a new conversations client listener to handle the stop listening for invites event here
          */
-        twilioConversationsClient.setConversationsClientListener(new ConversationsClientListener() {
+        twilioConversationsClient.setListener(new TwilioConversationsClient.Listener() {
             @Override
             public void onStartListeningForInvites(TwilioConversationsClient twilioConversationsClient) {
 
