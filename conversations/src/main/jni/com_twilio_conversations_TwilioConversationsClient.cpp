@@ -63,7 +63,7 @@ extern "C" void JNIEXPORT JNICALL JNI_OnUnLoad(JavaVM *jvm, void *reserved) {
  * Method:    initCore
  * Signature: (Landroid/content/Context;)Z
  */
-JNIEXPORT jboolean JNICALL Java_com_twilio_conversations_TwilioConversationsClient_initCore(JNIEnv *env, jobject obj, jobject context) {
+JNIEXPORT jboolean JNICALL Java_com_twilio_conversations_TwilioConversationsClient_nativeInitCore(JNIEnv *env, jobject obj, jobject context) {
     TS_CORE_LOG_MODULE(kTSCoreLogModulePlatform, kTSCoreLogLevelDebug, "initCore");
     bool failure = false;
     TSCSDK* tscSdk = TSCSDK::instance();
@@ -101,7 +101,7 @@ JNIEXPORT jboolean JNICALL Java_com_twilio_conversations_TwilioConversationsClie
  * Method:    destroyCore
  * Signature: ()J
  */
-JNIEXPORT void JNICALL Java_com_twilio_conversations_TwilioConversationsClient_destroyCore(JNIEnv *env, jobject obj) {
+JNIEXPORT void JNICALL Java_com_twilio_conversations_TwilioConversationsClient_nativeDestroyCore(JNIEnv *env, jobject obj) {
     TS_CORE_LOG_MODULE(kTSCoreLogModulePlatform, kTSCoreLogLevelDebug, "destroyCore");
     TSCSDK* tscSdk = TSCSDK::instance();
     TSCMediaCodecRegistry& codecManager = tscSdk->getMediaCodecRegistry();
@@ -111,14 +111,14 @@ JNIEXPORT void JNICALL Java_com_twilio_conversations_TwilioConversationsClient_d
 }
 
 
-JNIEXPORT void JNICALL Java_com_twilio_conversations_TwilioConversationsClient_setCoreLogLevel
+JNIEXPORT void JNICALL Java_com_twilio_conversations_TwilioConversationsClient_nativeSetCoreLogLevel
         (JNIEnv *env, jobject obj, jint level) {
     TS_CORE_LOG_MODULE(kTSCoreLogModulePlatform, kTSCoreLogLevelDebug, "setCoreLogLevel");
     TSCoreLogLevel coreLogLevel = static_cast<TSCoreLogLevel>(level);
     TSCLogger::instance()->setLogLevel(coreLogLevel);
 }
 
-JNIEXPORT void JNICALL Java_com_twilio_conversations_TwilioConversationsClient_setModuleLevel
+JNIEXPORT void JNICALL Java_com_twilio_conversations_TwilioConversationsClient_nativeSetModuleLevel
         (JNIEnv *env, jobject obj, jint module, jint level) {
     TS_CORE_LOG_MODULE(kTSCoreLogModulePlatform, kTSCoreLogLevelDebug, "setModuleLevel");
     TSCoreLogModule coreLogModule = static_cast<TSCoreLogModule>(module);
@@ -126,13 +126,13 @@ JNIEXPORT void JNICALL Java_com_twilio_conversations_TwilioConversationsClient_s
     TSCLogger::instance()->setModuleLogLevel(coreLogModule, coreLogLevel);
 }
 
-JNIEXPORT jint JNICALL Java_com_twilio_conversations_TwilioConversationsClient_getCoreLogLevel
+JNIEXPORT jint JNICALL Java_com_twilio_conversations_TwilioConversationsClient_nativeGetCoreLogLevel
         (JNIEnv *env, jobject obj) {
     TS_CORE_LOG_MODULE(kTSCoreLogModulePlatform, kTSCoreLogLevelDebug, "getCoreLogLevel");
     return TSCLogger::instance()->getLogLevel();
 }
 
-JNIEXPORT void JNICALL Java_com_twilio_conversations_TwilioConversationsClient_refreshRegistrations
+JNIEXPORT void JNICALL Java_com_twilio_conversations_TwilioConversationsClient_nativeRefreshRegistrations
         (JNIEnv *, jobject) {
     TSCSDK::instance()->refreshRegistrations();
 }

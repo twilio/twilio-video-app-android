@@ -11,7 +11,7 @@ extern "C" {
  * Method:    initCore
  * Signature: (Landroid/content/Context;)Z
  */
-JNIEXPORT jboolean JNICALL Java_com_twilio_conversations_TwilioConversationsClient_initCore
+JNIEXPORT jboolean JNICALL Java_com_twilio_conversations_TwilioConversationsClient_nativeInitCore
         (JNIEnv *, jobject, jobject);
 
 /*
@@ -19,7 +19,7 @@ JNIEXPORT jboolean JNICALL Java_com_twilio_conversations_TwilioConversationsClie
  * Method:    destroyCore
  * Signature: ()J
  */
-JNIEXPORT void JNICALL Java_com_twilio_conversations_TwilioConversationsClient_destroyCore
+JNIEXPORT void JNICALL Java_com_twilio_conversations_TwilioConversationsClient_nativeDestroyCore
         (JNIEnv *, jobject);
 
 /*
@@ -27,7 +27,7 @@ JNIEXPORT void JNICALL Java_com_twilio_conversations_TwilioConversationsClient_d
  * Method:    setCoreLogLevel 
  * Signature: (I)J
  */
-JNIEXPORT void JNICALL Java_com_twilio_conversations_TwilioConversationsClient_setCoreLogLevel
+JNIEXPORT void JNICALL Java_com_twilio_conversations_TwilioConversationsClient_nativeSetCoreLogLevel
         (JNIEnv *, jobject, jint);
 
 /*
@@ -35,7 +35,7 @@ JNIEXPORT void JNICALL Java_com_twilio_conversations_TwilioConversationsClient_s
  * Method:    setModuleLevel
  * Signature: (II)J
  */
-JNIEXPORT void JNICALL Java_com_twilio_conversations_TwilioConversationsClient_setModuleLevel
+JNIEXPORT void JNICALL Java_com_twilio_conversations_TwilioConversationsClient_nativeSetModuleLevel
         (JNIEnv *, jobject, jint, jint);
 
 /*
@@ -43,7 +43,7 @@ JNIEXPORT void JNICALL Java_com_twilio_conversations_TwilioConversationsClient_s
  * Method:    getCoreLogLevel 
  * Signature: ()J
  */
-JNIEXPORT jint JNICALL Java_com_twilio_conversations_TwilioConversationsClient_getCoreLogLevel
+JNIEXPORT jint JNICALL Java_com_twilio_conversations_TwilioConversationsClient_nativeGetCoreLogLevel
         (JNIEnv *, jobject);
 
 /*
@@ -51,7 +51,7 @@ JNIEXPORT jint JNICALL Java_com_twilio_conversations_TwilioConversationsClient_g
  * Method:    refreshRegistrations
  * Signature: (J)V
  */
-JNIEXPORT void JNICALL Java_com_twilio_conversations_TwilioConversationsClient_refreshRegistrations
+JNIEXPORT void JNICALL Java_com_twilio_conversations_TwilioConversationsClient_nativeRefreshRegistrations
         (JNIEnv *, jobject);
 
 

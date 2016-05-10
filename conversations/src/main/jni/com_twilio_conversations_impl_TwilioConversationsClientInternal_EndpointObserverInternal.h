@@ -12,7 +12,7 @@ extern "C" {
  * Method:    wrapNativeObserver
  * Signature: (Lcom/twilio/conversations/impl/core/EndpointObserver;Lcom/twilio/conversations/Endpoint;)J
  */
-JNIEXPORT jlong JNICALL Java_com_twilio_conversations_impl_TwilioConversationsClientImpl_00024EndpointObserverInternal_wrapNativeObserver
+JNIEXPORT jlong JNICALL Java_com_twilio_conversations_impl_TwilioConversationsClientInternal_00024EndpointObserverInternal_wrapNativeObserver
   (JNIEnv *, jobject, jobject, jobject);
 
 /*
@@ -20,7 +20,7 @@ JNIEXPORT jlong JNICALL Java_com_twilio_conversations_impl_TwilioConversationsCl
  * Method:    freeNativeObserver
  * Signature: (J)V
  */
-JNIEXPORT void JNICALL Java_com_twilio_conversations_impl_TwilioConversationsClientImpl_00024EndpointObserverInternal_freeNativeObserver
+JNIEXPORT void JNICALL Java_com_twilio_conversations_impl_TwilioConversationsClientInternal_00024EndpointObserverInternal_freeNativeObserver
   (JNIEnv *, jobject, jlong);
 
 #ifdef __cplusplus

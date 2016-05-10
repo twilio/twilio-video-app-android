@@ -21,7 +21,6 @@ import com.twilio.conversations.impl.logging.Logger;
 import com.twilio.conversations.impl.util.CallbackHandler;
 import com.twilio.conversations.internal.ReLinker;
 
-import java.lang.ref.WeakReference;
 import java.util.ArrayDeque;
 import java.util.EnumMap;
 import java.util.HashMap;
@@ -186,7 +185,7 @@ public class TwilioConversationsClient {
             trySetCoreModuleLogLevel(module.ordinal(), moduleLogLevel.get(module).ordinal());
         }
 
-        boolean success = initCore(applicationContext);
+        boolean success = nativeInitCore(applicationContext);
         if (!success) {
             initializing = false;
             initialized = false;
@@ -224,7 +223,7 @@ public class TwilioConversationsClient {
         // Now we can teardown the sdk
         // TODO destroy investigate making this asynchronous with callbacks
         logger.d("Destroying Core");
-        destroyCore();
+        nativeDestroyCore();
         logger.d("Core destroyed");
         initialized = false;
     }
@@ -562,7 +561,7 @@ public class TwilioConversationsClient {
      */
     private static void trySetCoreLogLevel(int level) {
         if (libraryIsLoaded) {
-            setCoreLogLevel(level);
+            nativeSetCoreLogLevel(level);
         }
     }
 
@@ -573,13 +572,13 @@ public class TwilioConversationsClient {
      * been loaded
      */
     private static int tryGetCoreLogLevel() {
-        return (libraryIsLoaded) ? (getCoreLogLevel()) : (level.ordinal());
+        return (libraryIsLoaded) ? (nativeGetCoreLogLevel()) : (level.ordinal());
     }
 
 
     private static void trySetCoreModuleLogLevel(int module, int level) {
         if (libraryIsLoaded) {
-            setModuleLevel(module, level);
+            nativeSetModuleLevel(module, level);
         }
     }
 
@@ -752,10 +751,10 @@ public class TwilioConversationsClient {
         private void onNetworkChange() {
             if (initialized && (conversationsClientMap.size() > 0)) {
                 // Only refresh registrations if there are clients that are listening
-                for (Map.Entry<UUID, WeakReference<TwilioConversationsClientInternal>> entry :
+                for (Map.Entry<UUID, TwilioConversationsClient> entry :
                         conversationsClientMap.entrySet()) {
-                    if(entry.getValue().get().isListening()) {
-                        refreshRegistrations();
+                    if(entry.getValue().isListening()) {
+                        nativeRefreshRegistrations();
                         break;
                     }
                 }
@@ -780,13 +779,11 @@ public class TwilioConversationsClient {
 
     }
 
-    private native static boolean initCore(Context context);
-
-    private native static void destroyCore();
-
-    private native static void refreshRegistrations();
-    private native static void setCoreLogLevel(int level);
-    private native static void setModuleLevel(int module, int level);
-    private native static int getCoreLogLevel();
+    private native static boolean nativeInitCore(Context context);
+    private native static void nativeDestroyCore();
+    private native static void nativeRefreshRegistrations();
+    private native static void nativeSetCoreLogLevel(int level);
+    private native static void nativeSetModuleLevel(int module, int level);
+    private native static int nativeGetCoreLogLevel();
 }
 
