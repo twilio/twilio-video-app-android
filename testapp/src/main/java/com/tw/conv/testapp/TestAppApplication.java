@@ -22,23 +22,8 @@ public class TestAppApplication extends Application {
         // We initialize the sdk here in case the application was destroyed
         if(!TwilioConversationsClient.isInitialized()) {
             Timber.d("Initializing conversations from application context");
-            TwilioConversationsClient.initialize(this,
-                    new TwilioConversationsClient.InitListener() {
-                        @Override
-                        public void onInitialized() {
-                            Timber.d("Successfully initialized conversations");
-                        }
-
-                        @Override
-                        public void onError(Exception e) {
-                            Toast.makeText(TestAppApplication.this,
-                                    R.string.error_initializing_conversations,
-                                    Toast.LENGTH_LONG)
-                                    .show();
-                            throw new RuntimeException("Error initializing conversations: " +
-                                    e.getLocalizedMessage());
-                        }
-                    });
+            TwilioConversationsClient.initialize(this);
+            Timber.d("Successfully initialized conversations");
         }
     }
 }

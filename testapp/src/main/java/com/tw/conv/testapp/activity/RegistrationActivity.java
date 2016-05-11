@@ -223,24 +223,10 @@ public class RegistrationActivity extends AppCompatActivity {
 
         // We need to initialize here in case user logs out and completely tears down sdk
         if(!TwilioConversationsClient.isInitialized()) {
-            TwilioConversationsClient.initialize(getApplicationContext(),
-                    new TwilioConversationsClient.InitListener() {
-                        @Override
-                        public void onInitialized() {
-                            obtainCapabilityToken(username,
-                                    RegistrationActivity.this.realmSpinner.getSelectedItem()
-                                            .toString().toLowerCase());
-                        }
-
-                        @Override
-                        public void onError(Exception e) {
-                            Snackbar.make(registrationButton,
-                                    "Twilio initialization failed: " + e.getMessage(),
-                                    Snackbar.LENGTH_LONG)
-                                    .setAction("Action", null).show();
-
-                        }
-                    });
+            TwilioConversationsClient.initialize(getApplicationContext());
+            obtainCapabilityToken(username,
+                    RegistrationActivity.this.realmSpinner.getSelectedItem()
+                            .toString().toLowerCase());
         } else {
             obtainCapabilityToken(username,
                     RegistrationActivity.this.realmSpinner.getSelectedItem()
