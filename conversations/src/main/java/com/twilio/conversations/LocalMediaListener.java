@@ -31,11 +31,11 @@ public interface LocalMediaListener {
      *              the {@link LocalMedia}
      * @param exception Provides the error that occurred while attempting to add or remove
      *                  this {@link LocalVideoTrack}. Adding or removing a local video track
-     *                  can result in {@link TwilioConversations#TOO_MANY_TRACKS},
-     *                  {@link TwilioConversations#TRACK_OPERATION_IN_PROGRESS},
-     *                  {@link TwilioConversations#INVALID_VIDEO_CAPTURER},
-     *                  {@link TwilioConversations#INVALID_VIDEO_TRACK_STATE},
-     *                  or {@link TwilioConversations#TRACK_CREATION_FAILED}.
+     *                  can result in {@link TwilioConversationsClient#TOO_MANY_TRACKS},
+     *                  {@link TwilioConversationsClient#TRACK_OPERATION_IN_PROGRESS},
+     *                  {@link TwilioConversationsClient#INVALID_VIDEO_CAPTURER},
+     *                  {@link TwilioConversationsClient#INVALID_VIDEO_TRACK_STATE},
+     *                  or {@link TwilioConversationsClient#TRACK_CREATION_FAILED}.
      */
     void onLocalVideoTrackError(LocalMedia localMedia,
                                 LocalVideoTrack track,

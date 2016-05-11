@@ -1,4 +1,4 @@
-#include "com_twilio_conversations_impl_ConversationsClientImpl_EndpointObserverInternal.h"
+#include "com_twilio_conversations_impl_TwilioConversationsClientInternal_EndpointObserverInternal.h"
 #include "webrtc/api/java/jni/jni_helpers.h"
 #include "TSCoreSDKTypes.h"
 #include "TSCoreError.h"
@@ -235,7 +235,7 @@ private:
  * Method:    wrapNativeObserver
  * Signature: (Lcom/twilio/conversations/impl/core/EndpointObserver;Lcom/twilio/conversations/Endpoint;)J
  */
-JNIEXPORT jlong JNICALL Java_com_twilio_conversations_impl_ConversationsClientImpl_00024EndpointObserverInternal_wrapNativeObserver
+JNIEXPORT jlong JNICALL Java_com_twilio_conversations_impl_TwilioConversationsClientInternal_00024EndpointObserverInternal_wrapNativeObserver
         (JNIEnv *env, jobject obj, jobject j_endpoint_observer, jobject j_endpoint) {
     TS_CORE_LOG_MODULE(kTSCoreLogModulePlatform, kTSCoreLogLevelDebug, "wrapNativeObserver: Endpoint");
     TSCEndpointObserverPtr *endpointObserver = new TSCEndpointObserverPtr();
@@ -248,7 +248,7 @@ JNIEXPORT jlong JNICALL Java_com_twilio_conversations_impl_ConversationsClientIm
  * Method:    freeNativeObserver
  * Signature: (J)V
  */
-JNIEXPORT void JNICALL Java_com_twilio_conversations_impl_ConversationsClientImpl_00024EndpointObserverInternal_freeNativeObserver
+JNIEXPORT void JNICALL Java_com_twilio_conversations_impl_TwilioConversationsClientInternal_00024EndpointObserverInternal_freeNativeObserver
         (JNIEnv *env, jobject obj, jlong nativeEndpointObserver){
     TS_CORE_LOG_MODULE(kTSCoreLogModulePlatform, kTSCoreLogLevelDebug, "freeNativeObserver: Endpoint");
     TSCEndpointObserverPtr *endpointObserver = reinterpret_cast<TSCEndpointObserverPtr *>(nativeEndpointObserver);

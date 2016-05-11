@@ -12,7 +12,7 @@ import com.twilio.common.TwilioAccessManager;
 import com.twilio.conversations.activity.TwilioConversationsActivity;
 import com.twilio.conversations.helper.AccessTokenHelper;
 import com.twilio.conversations.helper.CameraCapturerHelper;
-import com.twilio.conversations.helper.ConversationsClientHelper;
+import com.twilio.conversations.helper.TwilioConversationsClientHelper;
 import com.twilio.conversations.helper.TwilioConversationsHelper;
 import com.twilio.conversations.helper.TwilioConversationsTestsBase;
 
@@ -59,7 +59,7 @@ public class ConversationTests extends TwilioConversationsTestsBase {
         }
 
         TwilioAccessManager accessManager = AccessTokenHelper.obtainTwilioAccessManager(context, USER);
-        ConversationsClient conversationsClient = ConversationsClientHelper.registerClient(activityRule.getActivity(), accessManager);
+        TwilioConversationsClient twilioConversationsClient = TwilioConversationsClientHelper.registerClient(activityRule.getActivity(), accessManager);
 
         LocalMedia localMedia = LocalMediaFactory.createLocalMedia(new LocalMediaListener() {
             @Override
@@ -105,7 +105,7 @@ public class ConversationTests extends TwilioConversationsTestsBase {
 
         final CountDownLatch conversationEndsWithException = new CountDownLatch(1);
 
-        conversationsClient.sendConversationInvite(participants, localMedia, new ConversationCallback() {
+        twilioConversationsClient.sendConversationInvite(participants, localMedia, new ConversationCallback() {
             @Override
             public void onConversation(Conversation conversation, TwilioConversationsException e) {
                 assertNotNull(e);

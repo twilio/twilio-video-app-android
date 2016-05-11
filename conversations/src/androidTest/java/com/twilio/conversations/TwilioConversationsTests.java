@@ -10,7 +10,6 @@ import com.twilio.common.TwilioAccessManagerFactory;
 import com.twilio.conversations.helper.AccessTokenHelper;
 import com.twilio.conversations.helper.TwilioConversationsHelper;
 import com.twilio.conversations.helper.TwilioConversationsTestsBase;
-import com.twilio.conversations.impl.ConversationsClientImpl;
 import com.twilio.conversations.internal.ClientOptionsInternal;
 
 import org.junit.After;
@@ -51,20 +50,20 @@ public class TwilioConversationsTests extends TwilioConversationsTestsBase {
 
     @Test(expected = NullPointerException.class)
     public void initialize_shouldNotAllowNullContext() {
-        TwilioConversations.initialize(null,
+        TwilioConversationsClient.initialize(null,
                 TwilioConversationsHelper.createInitListener());
     }
 
     @Test(expected = NullPointerException.class)
     public void initialize_shouldNotAllowNullInitListener() {
-        TwilioConversations.initialize(context, null);
+        TwilioConversationsClient.initialize(context, null);
     }
 
     @Test
     public void initialize_shouldSucceedWithValidContextAndListener() throws InterruptedException {
         TwilioConversationsHelper.initialize(context);
 
-        assertTrue(TwilioConversations.isInitialized());
+        assertTrue(TwilioConversationsClient.isInitialized());
     }
 
     @Test
@@ -73,7 +72,7 @@ public class TwilioConversationsTests extends TwilioConversationsTestsBase {
         final CountDownLatch errorCallback = new CountDownLatch(1);
         TwilioConversationsHelper.initialize(context);
 
-        TwilioConversations.initialize(context, new TwilioConversations.InitListener() {
+        TwilioConversationsClient.initialize(context, new TwilioConversationsClient.InitListener() {
             @Override
             public void onInitialized() {
                 fail("Should receive error because sdk is initialized already!");
@@ -97,9 +96,9 @@ public class TwilioConversationsTests extends TwilioConversationsTestsBase {
     public void initialize_shouldWorkRepeatedlyAfterDestroy() throws InterruptedException {
         for (int i = 0 ; i < 10 ; i++) {
             TwilioConversationsHelper.initialize(context);
-            assertTrue(TwilioConversations.isInitialized());
+            assertTrue(TwilioConversationsClient.isInitialized());
             TwilioConversationsHelper.destroy();
-            assertFalse(TwilioConversations.isInitialized());
+            assertFalse(TwilioConversationsClient.isInitialized());
         }
     }
 
@@ -113,8 +112,8 @@ public class TwilioConversationsTests extends TwilioConversationsTestsBase {
     public void destroy_shouldDestroyActiveConversationClients() throws InterruptedException {
         TwilioConversationsHelper.initialize(context);
         accessManager = AccessTokenHelper.obtainTwilioAccessManager(context, "username");
-        ConversationsClientImpl conversationClient = (ConversationsClientImpl) TwilioConversations
-                .createConversationsClient(accessManager,
+        TwilioConversationsClient conversationClient = (TwilioConversationsClient)TwilioConversationsClient
+                .create(accessManager,
                         conversationsClientListener());
     }
 
@@ -122,7 +121,7 @@ public class TwilioConversationsTests extends TwilioConversationsTestsBase {
     public void createConversationsClient_shouldBeAllowedBeforeInitialize()
             throws InterruptedException {
         accessManager = AccessTokenHelper.obtainTwilioAccessManager(context, "username");
-        TwilioConversations.createConversationsClient(accessManager,
+        TwilioConversationsClient.create(accessManager,
                 conversationsClientListener());
     }
 
@@ -131,7 +130,7 @@ public class TwilioConversationsTests extends TwilioConversationsTestsBase {
             throws InterruptedException {
         TwilioConversationsHelper.initialize(context);
 
-        TwilioConversations.createConversationsClient(accessManager, conversationsClientListener());
+        TwilioConversationsClient.create(accessManager, conversationsClientListener());
     }
 
     @Test(expected = NullPointerException.class)
@@ -139,7 +138,7 @@ public class TwilioConversationsTests extends TwilioConversationsTestsBase {
             throws InterruptedException {
         TwilioConversationsHelper.initialize(context);
 
-        TwilioConversations.createConversationsClient(null,
+        TwilioConversationsClient.create(null,
                 new ClientOptions(),
                 conversationsClientListener());
     }
@@ -150,10 +149,10 @@ public class TwilioConversationsTests extends TwilioConversationsTestsBase {
         TwilioConversationsHelper.initialize(context);
 
         accessManager = TwilioAccessManagerFactory.createAccessManager(context, "DEADBEEF", null);
-        ConversationsClient conversationsClient = TwilioConversations
-                .createConversationsClient(accessManager, conversationsClientListener());
+        TwilioConversationsClient twilioConversationsClient = TwilioConversationsClient
+                .create(accessManager, conversationsClientListener());
 
-        assertNotNull(conversationsClient);
+        assertNotNull(twilioConversationsClient);
     }
 
     @Test
@@ -162,10 +161,10 @@ public class TwilioConversationsTests extends TwilioConversationsTestsBase {
         TwilioConversationsHelper.initialize(context);
 
         accessManager = TwilioAccessManagerFactory.createAccessManager(context, "DEADBEEF", null);
-        ConversationsClient conversationsClient = TwilioConversations
-                .createConversationsClient(accessManager, null, conversationsClientListener());
+        TwilioConversationsClient twilioConversationsClient = TwilioConversationsClient
+                .create(accessManager, null, conversationsClientListener());
 
-        assertNotNull(conversationsClient);
+        assertNotNull(twilioConversationsClient);
     }
 
     @Test
@@ -177,63 +176,63 @@ public class TwilioConversationsTests extends TwilioConversationsTestsBase {
         optionsMap.put("foo", "bar");
         ClientOptionsInternal options = new ClientOptionsInternal(optionsMap);
         accessManager = TwilioAccessManagerFactory.createAccessManager(context, "DEADBEEF", null);
-        ConversationsClient conversationsClient = TwilioConversations
-                .createConversationsClient(accessManager, options, conversationsClientListener());
+        TwilioConversationsClient twilioConversationsClient = TwilioConversationsClient
+                .create(accessManager, options, conversationsClientListener());
 
-        assertNotNull(conversationsClient);
+        assertNotNull(twilioConversationsClient);
     }
 
     @Test
     public void setLogLevel_canBeDoneBeforeAndAfterInit() throws InterruptedException {
-        TwilioConversations.LogLevel level = TwilioConversations.LogLevel.DEBUG;
+        LogLevel level = LogLevel.DEBUG;
 
-        TwilioConversations.setLogLevel(level);
-        assertEquals(level, TwilioConversations.getLogLevel());
+        TwilioConversationsClient.setLogLevel(level);
+        assertEquals(level, TwilioConversationsClient.getLogLevel());
 
         TwilioConversationsHelper.initialize(context);
 
-        level = TwilioConversations.LogLevel.ERROR;
-        TwilioConversations.setLogLevel(level);
-        assertEquals(level, TwilioConversations.getLogLevel());
+        level = LogLevel.ERROR;
+        TwilioConversationsClient.setLogLevel(level);
+        assertEquals(level, TwilioConversationsClient.getLogLevel());
     }
 
     @Test
     public void getVersion_shouldReturnValidSemVerFormattedVersion() {
         String semVerRegex = "^([0-9]+)\\.([0-9]+)\\.([0-9]+)(?:-([0-9A-" +
                 "Za-z-]+(?:\\.[0-9A-Za-z-]+)*))?(?:\\+[0-9A-Za-z-]+)?$";
-        String version = TwilioConversations.getVersion();
+        String version = TwilioConversationsClient.getVersion();
 
         assertNotNull(version);
         assertNotEquals("", version);
         assertTrue(version.matches(semVerRegex));
     }
 
-    private ConversationsClientListener conversationsClientListener() {
-        return new ConversationsClientListener() {
+    private TwilioConversationsClient.Listener conversationsClientListener() {
+        return new TwilioConversationsClient.Listener() {
             @Override
-            public void onStartListeningForInvites(ConversationsClient conversationsClient) {
+            public void onStartListeningForInvites(TwilioConversationsClient twilioConversationsClient) {
 
             }
 
             @Override
-            public void onStopListeningForInvites(ConversationsClient conversationsClient) {
+            public void onStopListeningForInvites(TwilioConversationsClient twilioConversationsClient) {
 
             }
 
             @Override
-            public void onFailedToStartListening(ConversationsClient conversationsClient,
+            public void onFailedToStartListening(TwilioConversationsClient twilioConversationsClient,
                                                  TwilioConversationsException e) {
 
             }
 
             @Override
-            public void onIncomingInvite(ConversationsClient conversationsClient,
+            public void onIncomingInvite(TwilioConversationsClient twilioConversationsClient,
                                          IncomingInvite incomingInvite) {
 
             }
 
             @Override
-            public void onIncomingInviteCancelled(ConversationsClient conversationsClient,
+            public void onIncomingInviteCancelled(TwilioConversationsClient twilioConversationsClient,
                                                   IncomingInvite incomingInvite) {
 
             }

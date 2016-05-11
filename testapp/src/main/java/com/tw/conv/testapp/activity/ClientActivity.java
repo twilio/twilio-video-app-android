@@ -65,8 +65,7 @@ import com.twilio.conversations.CapturerException;
 import com.twilio.conversations.Conversation;
 import com.twilio.conversations.ConversationCallback;
 import com.twilio.conversations.ConversationListener;
-import com.twilio.conversations.ConversationsClient;
-import com.twilio.conversations.ConversationsClientListener;
+import com.twilio.conversations.TwilioConversationsClient;
 import com.twilio.conversations.IceOptions;
 import com.twilio.conversations.IceServer;
 import com.twilio.conversations.IceTransportPolicy;
@@ -86,7 +85,6 @@ import com.twilio.conversations.ParticipantListener;
 import com.twilio.conversations.RemoteAudioTrackStatsRecord;
 import com.twilio.conversations.RemoteVideoTrackStatsRecord;
 import com.twilio.conversations.StatsListener;
-import com.twilio.conversations.TwilioConversations;
 import com.twilio.conversations.TwilioConversationsException;
 import com.twilio.conversations.VideoConstraints;
 import com.twilio.conversations.VideoDimensions;
@@ -129,7 +127,7 @@ public class ClientActivity extends AppCompatActivity {
     private static final String OPTION_REGISTRAR_KEY = "registrar";
     private static final String OPTION_STATS_KEY = "stats-server-url";
 
-    private ConversationsClient conversationsClient;
+    private TwilioConversationsClient twilioConversationsClient;
     private OutgoingInvite outgoingInvite;
     private LocalMedia localMedia;
     private boolean wasPreviewing = false;
@@ -474,7 +472,7 @@ public class ClientActivity extends AppCompatActivity {
         accessManager = TwilioAccessManagerFactory.createAccessManager(this, capabilityToken,
                 accessManagerListener());
 
-        conversationsClient = TwilioConversations.createConversationsClient(accessManager, options,
+        twilioConversationsClient = TwilioConversationsClient.create(accessManager, options,
                 conversationsClientListener());
 
 
@@ -580,8 +578,8 @@ public class ClientActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        if (conversationsClient != null && !conversationsClient.isListening()) {
-            conversationsClient.listen();
+        if (twilioConversationsClient != null && !twilioConversationsClient.isListening()) {
+            twilioConversationsClient.listen();
         }
         if(cameraCapturer != null && wasPreviewing) {
             wasPreviewing = false;
@@ -664,8 +662,8 @@ public class ClientActivity extends AppCompatActivity {
         disposeConversation();
 
         // Lets unlisten first otherwise complete logout
-        if (conversationsClient != null && conversationsClient.isListening()) {
-            conversationsClient.unlisten();
+        if (twilioConversationsClient != null && twilioConversationsClient.isListening()) {
+            twilioConversationsClient.unlisten();
         } else {
             completeLogout();
         }
@@ -687,13 +685,13 @@ public class ClientActivity extends AppCompatActivity {
     }
 
     private void disposeConversationsClient() {
-        if (conversationsClient != null) {
-            conversationsClient = null;
+        if (twilioConversationsClient != null) {
+            twilioConversationsClient = null;
         }
     }
 
     private void destroyConversationsSdk() {
-        TwilioConversations.destroy();
+        TwilioConversationsClient.destroy();
     }
 
     private void disposeAccessManager() {
@@ -821,15 +819,15 @@ public class ClientActivity extends AppCompatActivity {
         };
     }
 
-    private ConversationsClientListener conversationsClientListener() {
-        return new ConversationsClientListener() {
+    private TwilioConversationsClient.Listener conversationsClientListener() {
+        return new TwilioConversationsClient.Listener() {
             @Override
-            public void onStartListeningForInvites(ConversationsClient conversationsClient) {
+            public void onStartListeningForInvites(TwilioConversationsClient twilioConversationsClient) {
                 conversationsClientStatusTextView.setText("onStartListeningForInvites");
             }
 
             @Override
-            public void onStopListeningForInvites(ConversationsClient conversationsClient) {
+            public void onStopListeningForInvites(TwilioConversationsClient twilioConversationsClient) {
                 conversationsClientStatusTextView.setText("onStopListeningForInvites");
                 // If we are logging out let us finish the teardown process
                 if (loggingOut) {
@@ -838,7 +836,7 @@ public class ClientActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onFailedToStartListening(ConversationsClient conversationsClient,
+            public void onFailedToStartListening(TwilioConversationsClient twilioConversationsClient,
                                                  TwilioConversationsException e) {
                 Timber.e(e.getMessage());
                 conversationsClientStatusTextView
@@ -846,7 +844,7 @@ public class ClientActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onIncomingInvite(ConversationsClient conversationsClient,
+            public void onIncomingInvite(TwilioConversationsClient twilioConversationsClient,
                                          IncomingInvite incomingInvite) {
                 ClientActivity.this.incomingInvite = incomingInvite;
                 if (!inBackground) {
@@ -892,7 +890,7 @@ public class ClientActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onIncomingInviteCancelled(ConversationsClient conversationsClient,
+            public void onIncomingInviteCancelled(TwilioConversationsClient twilioConversationsClient,
                                                   IncomingInvite incomingInvite) {
                 ClientActivity.this.incomingInvite = null;
                 if (!inBackground) {
@@ -1189,7 +1187,7 @@ public class ClientActivity extends AppCompatActivity {
                     localMedia = createLocalMedia();
 
                     IceOptions iceOptions = createIceOptions();
-                    outgoingInvite = conversationsClient.sendConversationInvite(participants,
+                    outgoingInvite = twilioConversationsClient.sendConversationInvite(participants,
                             localMedia, iceOptions, new ConversationCallback() {
                                 @Override
                                 public void onConversation(Conversation conversation, TwilioConversationsException e) {
@@ -1202,11 +1200,11 @@ public class ClientActivity extends AppCompatActivity {
                                             enableStats();
                                         }
                                     } else {
-                                        if (e.getErrorCode() == TwilioConversations.CONVERSATION_REJECTED) {
+                                        if (e.getErrorCode() == TwilioConversationsClient.CONVERSATION_REJECTED) {
                                             Snackbar.make(conversationStatusTextView,
                                                     "Invite rejected", Snackbar.LENGTH_LONG)
                                                     .setAction("Action", null).show();
-                                        } else if (e.getErrorCode() == TwilioConversations.CONVERSATION_IGNORED) {
+                                        } else if (e.getErrorCode() == TwilioConversationsClient.CONVERSATION_IGNORED) {
                                             Snackbar.make(conversationStatusTextView,
                                                     "Invite ignored", Snackbar.LENGTH_LONG)
                                                     .setAction("Action", null).show();
@@ -1347,7 +1345,7 @@ public class ClientActivity extends AppCompatActivity {
                     if(statsCheckBox.isChecked()) {
                         enableStats();
                     }
-                } else if (e.getErrorCode() == TwilioConversations.TOO_MANY_ACTIVE_CONVERSATIONS) {
+                } else if (e.getErrorCode() == TwilioConversationsClient.TOO_MANY_ACTIVE_CONVERSATIONS) {
                     Timber.w(e.getMessage());
                     conversationsClientStatusTextView
                             .setText("Unable to accept call. Too many active conversations.");
@@ -1387,11 +1385,11 @@ public class ClientActivity extends AppCompatActivity {
     }
 
     private void setSpeakerphoneOn(boolean on) {
-        if (conversationsClient == null) {
+        if (twilioConversationsClient == null) {
             Timber.e("Unable to set audio output, conversation client is null");
             return;
         }
-        conversationsClient.setAudioOutput(on ? AudioOutput.SPEAKERPHONE :
+        twilioConversationsClient.setAudioOutput(on ? AudioOutput.SPEAKERPHONE :
                 AudioOutput.HEADSET);
 
         if (on == true) {
@@ -1410,12 +1408,12 @@ public class ClientActivity extends AppCompatActivity {
         return new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (conversationsClient == null) {
+                if (twilioConversationsClient == null) {
                     Timber.e("Unable to set audio output, conversation client is null");
                     return;
                 }
                 boolean speakerOn =
-                        !(conversationsClient.getAudioOutput() ==  AudioOutput.SPEAKERPHONE) ?  true : false;
+                        !(twilioConversationsClient.getAudioOutput() ==  AudioOutput.SPEAKERPHONE) ?  true : false;
                 setSpeakerphoneOn(speakerOn);
             }
         };
@@ -1474,11 +1472,11 @@ public class ClientActivity extends AppCompatActivity {
                 String status = "onConversationEnded";
                 if (e != null) {
                     status += " " + e.getMessage();
-                    if(e.getErrorCode() == TwilioConversations.CONVERSATION_FAILED) {
+                    if(e.getErrorCode() == TwilioConversationsClient.CONVERSATION_FAILED) {
                         Snackbar.make(conversationStatusTextView, "Invite failed " +
                                 conversation.getSid(), Snackbar.LENGTH_LONG)
                                 .setAction("Action", null).show();
-                    } else if(e.getErrorCode() == TwilioConversations.CONVERSATION_REJECTED) {
+                    } else if(e.getErrorCode() == TwilioConversationsClient.CONVERSATION_REJECTED) {
                         Snackbar.make(conversationStatusTextView, "Invite was rejected " +
                                 conversation.getSid(), Snackbar.LENGTH_LONG)
                                 .setAction("Action", null).show();

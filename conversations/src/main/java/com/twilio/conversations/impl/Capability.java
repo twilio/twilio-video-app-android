@@ -1,16 +1,16 @@
 package com.twilio.conversations.impl;
 
-import com.twilio.conversations.ConversationsClient;
+import com.twilio.conversations.TwilioConversationsClient;
 
 /**
- * This enum is used as keys to the ConversationsClient's capabilities map.
+ * This enum is used as keys to the TwilioConversationsClient's capabilities map.
  *
  * The class of the value in the Map is annotated with each enum value. 
  *
- * @see ConversationsClient#getCapabilities()
+ * @see TwilioConversationsClient#getCapabilities()
  */
 public enum Capability {
-    /** <code>long</code> that represents the time the ConversationsClient's capability token expires (number of seconds relative to the UNIX epoch). */
+    /** <code>long</code> that represents the time the TwilioConversationsClient's capability token expires (number of seconds relative to the UNIX epoch). */
     EXPIRATION,
     /** <code>String</code> representing the account SID. */
     ACCOUNT_SID,

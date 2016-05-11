@@ -19,7 +19,7 @@
 #include "webrtc/modules/audio_device/android/audio_manager.h"
 #include "webrtc/modules/audio_device/android/opensles_player.h"
 
-#include "com_twilio_conversations_impl_TwilioConversationsImpl.h"
+#include "com_twilio_conversations_TwilioConversationsClient.h"
 
 #include "webrtc/api/java/jni/jni_helpers.h"
 #include "webrtc/api/java/jni/classreferenceholder.h"
@@ -59,11 +59,11 @@ extern "C" void JNIEXPORT JNICALL JNI_OnUnLoad(JavaVM *jvm, void *reserved) {
 }
 
 /*
- * Class:     com_twilio_conversations_impl_TwilioConversationsImpl
+ * Class:     com_twilio_conversations_TwilioConversationsClient
  * Method:    initCore
  * Signature: (Landroid/content/Context;)Z
  */
-JNIEXPORT jboolean JNICALL Java_com_twilio_conversations_impl_TwilioConversationsImpl_initCore(JNIEnv *env, jobject obj, jobject context) {
+JNIEXPORT jboolean JNICALL Java_com_twilio_conversations_TwilioConversationsClient_nativeInitCore(JNIEnv *env, jobject obj, jobject context) {
     TS_CORE_LOG_MODULE(kTSCoreLogModulePlatform, kTSCoreLogLevelDebug, "initCore");
     bool failure = false;
     TSCSDK* tscSdk = TSCSDK::instance();
@@ -95,69 +95,13 @@ JNIEXPORT jboolean JNICALL Java_com_twilio_conversations_impl_TwilioConversation
     return JNI_FALSE;
 }
 
-/*
-* Class:     com_twilio_conversations_impl_TwilioConversationsImpl
-* Method:    onApplicationForeground
-* Signature: ()J
-*/
-JNIEXPORT void JNICALL Java_com_twilio_conversations_impl_TwilioConversationsImpl_onApplicationForeground
-        (JNIEnv *env, jobject) {
-    TS_CORE_LOG_MODULE(kTSCoreLogModulePlatform, kTSCoreLogLevelDebug, "onApplicationForeground");
-    TSCSDK* tscSdk = TSCSDK::instance();
-
-    if (tscSdk != NULL) {
-        TS_CORE_LOG_MODULE(kTSCoreLogModulePlatform,
-                           kTSCoreLogLevelDebug,
-                           "onCompleteWakeUp");
-        tscSdk->onCompleteWakeUp();
-        CHECK_EXCEPTION(env) << "error during onCompleteWakeUp";
-    }
-}
 
 /*
-* Class:     com_twilio_conversations_impl_TwilioConversationsImpl
-* Method:    onApplicationWakeUp
-* Signature: ()J
-*/
-JNIEXPORT void JNICALL Java_com_twilio_conversations_impl_TwilioConversationsImpl_onApplicationWakeUp
-        (JNIEnv *env, jobject) {
-    TS_CORE_LOG_MODULE(kTSCoreLogModulePlatform, kTSCoreLogLevelDebug, "onApplicationWakeUp");
-    TSCSDK* tscSdk = TSCSDK::instance();
-
-    if (tscSdk != NULL) {
-        TS_CORE_LOG_MODULE(kTSCoreLogModulePlatform,
-                           kTSCoreLogLevelDebug,
-                           "onShortWakeUp");
-        tscSdk->onShortWakeUp();
-        CHECK_EXCEPTION(env) << "error during onShortWakeUp";
-    }
-}
-
-/*
- * Class:     com_twilio_conversations_impl_TwilioConversationsImpl
- * Method:    onApplicationBackground
- * Signature: ()J
- */
-JNIEXPORT void JNICALL Java_com_twilio_conversations_impl_TwilioConversationsImpl_onApplicationBackground
-        (JNIEnv *env, jobject) {
-    TS_CORE_LOG_MODULE(kTSCoreLogModulePlatform, kTSCoreLogLevelDebug, "onApplicationBackground");
-    TSCSDK* tscSdk = TSCSDK::instance();
-
-    if (tscSdk != NULL) {
-        TS_CORE_LOG_MODULE(kTSCoreLogModulePlatform,
-                           kTSCoreLogLevelDebug,
-                           "onGoingToSleep");
-        tscSdk->onGoingToSleep();
-        CHECK_EXCEPTION(env) << "error during onGoingToSleep";
-    }
-}
-
-/*
- * Class:     com_twilio_conversations_impl_TwilioConversationsImpl
+ * Class:     com_twilio_conversations_TwilioConversationsClient
  * Method:    destroyCore
  * Signature: ()J
  */
-JNIEXPORT void JNICALL Java_com_twilio_conversations_impl_TwilioConversationsImpl_destroyCore(JNIEnv *env, jobject obj) {
+JNIEXPORT void JNICALL Java_com_twilio_conversations_TwilioConversationsClient_nativeDestroyCore(JNIEnv *env, jobject obj) {
     TS_CORE_LOG_MODULE(kTSCoreLogModulePlatform, kTSCoreLogLevelDebug, "destroyCore");
     TSCSDK* tscSdk = TSCSDK::instance();
     TSCMediaCodecRegistry& codecManager = tscSdk->getMediaCodecRegistry();
@@ -167,14 +111,14 @@ JNIEXPORT void JNICALL Java_com_twilio_conversations_impl_TwilioConversationsImp
 }
 
 
-JNIEXPORT void JNICALL Java_com_twilio_conversations_impl_TwilioConversationsImpl_setCoreLogLevel
+JNIEXPORT void JNICALL Java_com_twilio_conversations_TwilioConversationsClient_nativeSetCoreLogLevel
         (JNIEnv *env, jobject obj, jint level) {
     TS_CORE_LOG_MODULE(kTSCoreLogModulePlatform, kTSCoreLogLevelDebug, "setCoreLogLevel");
     TSCoreLogLevel coreLogLevel = static_cast<TSCoreLogLevel>(level);
     TSCLogger::instance()->setLogLevel(coreLogLevel);
 }
 
-JNIEXPORT void JNICALL Java_com_twilio_conversations_impl_TwilioConversationsImpl_setModuleLevel
+JNIEXPORT void JNICALL Java_com_twilio_conversations_TwilioConversationsClient_nativeSetModuleLevel
         (JNIEnv *env, jobject obj, jint module, jint level) {
     TS_CORE_LOG_MODULE(kTSCoreLogModulePlatform, kTSCoreLogLevelDebug, "setModuleLevel");
     TSCoreLogModule coreLogModule = static_cast<TSCoreLogModule>(module);
@@ -182,13 +126,13 @@ JNIEXPORT void JNICALL Java_com_twilio_conversations_impl_TwilioConversationsImp
     TSCLogger::instance()->setModuleLogLevel(coreLogModule, coreLogLevel);
 }
 
-JNIEXPORT jint JNICALL Java_com_twilio_conversations_impl_TwilioConversationsImpl_getCoreLogLevel
+JNIEXPORT jint JNICALL Java_com_twilio_conversations_TwilioConversationsClient_nativeGetCoreLogLevel
         (JNIEnv *env, jobject obj) {
     TS_CORE_LOG_MODULE(kTSCoreLogModulePlatform, kTSCoreLogLevelDebug, "getCoreLogLevel");
     return TSCLogger::instance()->getLogLevel();
 }
 
-JNIEXPORT void JNICALL Java_com_twilio_conversations_impl_TwilioConversationsImpl_refreshRegistrations
+JNIEXPORT void JNICALL Java_com_twilio_conversations_TwilioConversationsClient_nativeRefreshRegistrations
         (JNIEnv *, jobject) {
     TSCSDK::instance()->refreshRegistrations();
 }

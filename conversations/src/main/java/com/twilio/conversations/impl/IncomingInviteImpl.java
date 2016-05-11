@@ -10,7 +10,7 @@ import com.twilio.conversations.IceOptions;
 import com.twilio.conversations.IncomingInvite;
 import com.twilio.conversations.InviteStatus;
 import com.twilio.conversations.LocalMedia;
-import com.twilio.conversations.TwilioConversations;
+import com.twilio.conversations.TwilioConversationsClient;
 import com.twilio.conversations.TwilioConversationsException;
 import com.twilio.conversations.impl.logging.Logger;
 
@@ -18,12 +18,12 @@ public class IncomingInviteImpl implements IncomingInvite {
     static final Logger logger = Logger.getLogger(IncomingInviteImpl.class);
     private final Handler handler;
 
-    private ConversationsClientImpl conversationsClientImpl;
+    private TwilioConversationsClientInternal conversationsClientImpl;
     private ConversationImpl conversationImpl;
     private ConversationCallback conversationCallback;
     private InviteStatus inviteStatus;
 
-    private IncomingInviteImpl(ConversationsClientImpl conversationsClientImpl,
+    private IncomingInviteImpl(TwilioConversationsClientInternal conversationsClientImpl,
                                ConversationImpl conversationImpl,
                                Handler handler) {
         this.conversationImpl = conversationImpl;
@@ -32,7 +32,7 @@ public class IncomingInviteImpl implements IncomingInvite {
         this.handler = handler;
     }
 
-    static IncomingInviteImpl create(ConversationsClientImpl conversationsClientImpl,
+    static IncomingInviteImpl create(TwilioConversationsClientInternal conversationsClientImpl,
                                      ConversationImpl conversationImpl,
                                      Handler handler) {
         if(conversationsClientImpl == null) {
@@ -128,7 +128,7 @@ public class IncomingInviteImpl implements IncomingInvite {
         if (conversationsClientImpl.getActiveConversationsCount() >=
                 TwilioConstants.MAX_CONVERSATIONS) {
             final TwilioConversationsException e = new TwilioConversationsException(
-                    TwilioConversations.TOO_MANY_ACTIVE_CONVERSATIONS,
+                    TwilioConversationsClient.TOO_MANY_ACTIVE_CONVERSATIONS,
                     "Maximum number of active conversations has reached. " +
                             "Max conversations limit is: " + TwilioConstants.MAX_CONVERSATIONS);
             if (handler != null) {

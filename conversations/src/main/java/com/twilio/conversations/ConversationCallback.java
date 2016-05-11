@@ -9,7 +9,7 @@ public interface ConversationCallback {
      *  Called when a conversation is successfully started.
      *
      *  @param conversation The conversation that was created. This can be null if
-     *  {@link TwilioConversations#TOO_MANY_ACTIVE_CONVERSATIONS} error occurs.
+     *  {@link TwilioConversationsClient#TOO_MANY_ACTIVE_CONVERSATIONS} error occurs.
      *  @param exception	An error describing why the conversation was not created.
      */
     void onConversation(Conversation conversation, TwilioConversationsException exception);
