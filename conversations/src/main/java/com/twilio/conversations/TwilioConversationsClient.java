@@ -176,18 +176,10 @@ public class TwilioConversationsClient {
      * @param context
      *            The application context of your Android application
      *
-     * @param initListener
-     *            A {@link TwilioConversationsClient.InitListener} that will notify you
-     *            when the service is ready
-     *
      */
-    public static void initialize(Context context,
-                                  final TwilioConversationsClient.InitListener initListener) {
+    public static void initialize(Context context) {
         if (context == null) {
             throw new NullPointerException("applicationContext must not be null");
-        }
-        if (initListener == null) {
-            throw new NullPointerException("initListener must not be null");
         }
 
         if (level != LogLevel.OFF) {
@@ -195,12 +187,9 @@ public class TwilioConversationsClient {
             setLogLevel(level);
         }
 
-        if (initialized || initializing) {
-            initListener.onError(new RuntimeException("Initialize already called"));
+        if (initialized) {
             return;
         }
-
-        initializing = true;
 
         Context applicationContext = context.getApplicationContext();
         Handler handler = CallbackHandler.create();
@@ -240,28 +229,11 @@ public class TwilioConversationsClient {
 
         boolean success = nativeInitCore(applicationContext);
         if (!success) {
-            initializing = false;
             initialized = false;
-            handler.post(new Runnable() {
-                @Override
-                public void run() {
-                    initListener.onError(new RuntimeException("Twilio conversations " +
-                            "failed to initialize."));
-                }
-            });
-        } else {
-
-            internalRegistry.setupLifecycleListeners();
-            initialized = true;
-            initializing = false;
-            handler.post(new Runnable() {
-                @Override
-                public void run() {
-                    initListener.onInitialized();
-                }
-            });
+            throw new RuntimeException("Twilio conversations failed to initialize.");
         }
-
+        internalRegistry.setupLifecycleListeners();
+        initialized = true;
     }
 
     /**
@@ -525,27 +497,6 @@ public class TwilioConversationsClient {
     public AudioOutput getAudioOutput() {
         return conversationsClientInternal.getAudioOutput();
     }
-    
-
-    /**
-     * Interface for the listener object to pass to
-     * {@link TwilioConversationsClient#initialize(Context, InitListener)}.
-     */
-    public interface InitListener {
-        /**
-         * Callback to report when Twilio Conversations SDK
-         * has been successfully initialized.
-         */
-        void onInitialized();
-
-        /**
-         * Called if there is an error initializing the Twilio
-         * Conversations SDK.
-         *
-         * @param exception An exception describing the error that occurred
-         */
-        void onError(Exception exception);
-    }
 
 
     // Private
@@ -565,7 +516,6 @@ public class TwilioConversationsClient {
     static final Logger logger = Logger.getLogger(TwilioConversationsClient.class);
 
     private static boolean initialized;
-    private static boolean initializing;
 
     private final UUID uuid = UUID.randomUUID();
 

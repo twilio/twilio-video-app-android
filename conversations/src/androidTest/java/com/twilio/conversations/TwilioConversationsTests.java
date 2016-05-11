@@ -50,13 +50,7 @@ public class TwilioConversationsTests extends TwilioConversationsTestsBase {
 
     @Test(expected = NullPointerException.class)
     public void initialize_shouldNotAllowNullContext() {
-        TwilioConversationsClient.initialize(null,
-                TwilioConversationsHelper.createInitListener());
-    }
-
-    @Test(expected = NullPointerException.class)
-    public void initialize_shouldNotAllowNullInitListener() {
-        TwilioConversationsClient.initialize(context, null);
+        TwilioConversationsClient.initialize(null);
     }
 
     @Test
@@ -67,23 +61,10 @@ public class TwilioConversationsTests extends TwilioConversationsTestsBase {
     }
 
     @Test
-    public void initialize_shouldNotifyWithErrorWhenAlreadyInitialized()
+    public void initialize_shouldSucceedWhenAlreadyInitialized()
             throws InterruptedException {
-        final CountDownLatch errorCallback = new CountDownLatch(1);
         TwilioConversationsHelper.initialize(context);
-
-        TwilioConversationsClient.initialize(context, new TwilioConversationsClient.InitListener() {
-            @Override
-            public void onInitialized() {
-                fail("Should receive error because sdk is initialized already!");
-            }
-
-            @Override
-            public void onError(Exception exception) {
-                errorCallback.countDown();
-            }
-        });
-        assertTrue(errorCallback.await(10, TimeUnit.SECONDS));
+        TwilioConversationsClient.initialize(context);
     }
 
     @Test
