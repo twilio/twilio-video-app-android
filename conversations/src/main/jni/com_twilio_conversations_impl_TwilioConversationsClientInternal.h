@@ -18,24 +18,24 @@ Java_com_twilio_conversations_impl_TwilioConversationsClientInternal_createEndpo
  * Method:    listen
  * Signature: (J)V
  */
-JNIEXPORT void JNICALL Java_com_twilio_conversations_impl_TwilioConversationsClientInternal_listen__J
-  (JNIEnv *, jobject, jlong);
+JNIEXPORT void JNICALL Java_com_twilio_conversations_impl_TwilioConversationsClientInternal_listen
+        (JNIEnv *, jobject, jlong);
 
 /*
  * Class:     com_twilio_conversations_impl_ConversationsClientImpl
  * Method:    unlisten
  * Signature: (J)V
  */
-JNIEXPORT void JNICALL Java_com_twilio_conversations_impl_TwilioConversationsClientInternal_unlisten__J
-  (JNIEnv *, jobject, jlong);
+JNIEXPORT void JNICALL Java_com_twilio_conversations_impl_TwilioConversationsClientInternal_unlisten
+        (JNIEnv *, jobject, jlong);
 
 /*
  * Class:     com_twilio_conversations_impl_ConversationsClientImpl
  * Method:    reject
  * Signature: (JJ)V
  */
-JNIEXPORT void JNICALL Java_com_twilio_conversations_impl_TwilioConversationsClientInternal_reject__JJ
-  (JNIEnv *, jobject, jlong, jlong);
+JNIEXPORT void JNICALL Java_com_twilio_conversations_impl_TwilioConversationsClientInternal_reject
+        (JNIEnv *, jobject, jlong, jlong);
 
 /*
  * Class:     com_twilio_conversations_impl_ConversationsClientImpl
