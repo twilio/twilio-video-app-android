@@ -216,6 +216,7 @@ public class ClientActivity extends AppCompatActivity {
     private RelativeLayout iceOptionsLayout;
     private CheckBox enableIceCheckbox;
     private CheckBox preferH264Checkbox;
+    private CheckBox logoutWhenConvEndsCheckbox;
     private Spinner aspectRatioSpinner;
 
     private static final Map<Integer, VideoDimensions> videoDimensionsMap;
@@ -468,6 +469,8 @@ public class ClientActivity extends AppCompatActivity {
         enableIceCheckbox.setOnCheckedChangeListener(enableIceCheckedChangeListener());
         preferH264Checkbox = (CheckBox) findViewById(R.id.prefer_h264_checkbox);
         preferH264Checkbox.setChecked(preferH264);
+        logoutWhenConvEndsCheckbox = (CheckBox) findViewById(R.id.logout_when_conv_ends_checkbox);
+        logoutWhenConvEndsCheckbox.setChecked(logoutWhenConvEnds);
 
         aspectRatioSpinner = (Spinner)findViewById(R.id.aspect_ratio_spinner);
         ArrayAdapter<CharSequence> spinnerAdapter = ArrayAdapter.createFromResource(this,
@@ -837,7 +840,7 @@ public class ClientActivity extends AppCompatActivity {
             public void onStopListeningForInvites(ConversationsClient conversationsClient) {
                 conversationsClientStatusTextView.setText("onStopListeningForInvites");
                 // If we are logging out let us finish the teardown process
-                if (loggingOut) {
+                if (loggingOut || logoutWhenConvEnds) {
                     completeLogout();
                 }
             }
