@@ -46,7 +46,7 @@ public class ConversationImpl implements Conversation,
             "This operation is no longer valid";
     private Set<String> invitedParticipants = new HashSet<>();
     private String inviter;
-    private TwilioConversationsClientInternal conversationsClient;
+    private TwilioConversationsClientInternal conversationsClientInternal;
     private ConversationListener conversationListener;
     private ConversationStateObserver conversationStateObserver;
     private Map<String,ParticipantImpl> participantMap = new HashMap<>();
@@ -104,13 +104,13 @@ public class ConversationImpl implements Conversation,
     /*
      * Outgoing invite
      */
-    private ConversationImpl(TwilioConversationsClientInternal conversationsClient,
+    private ConversationImpl(TwilioConversationsClientInternal conversationsClientInternal,
                              Set<String> participants,
                              LocalMedia localMedia,
                              ConversationListener conversationListener,
                              ConversationStateObserver conversationStateObserver,
                              Handler handler) {
-        this.conversationsClient = conversationsClient;
+        this.conversationsClientInternal = conversationsClientInternal;
         this.invitedParticipants = participants;
 
         String[] participantIdentityArray = new String[participants.size()];
@@ -132,7 +132,7 @@ public class ConversationImpl implements Conversation,
 
         sessionObserverInternal = new SessionObserverInternal(this, this);
 
-        nativeSession = wrapOutgoingSession(conversationsClient.getNativeHandle(),
+        nativeSession = wrapOutgoingSession(conversationsClientInternal.getNativeHandle(),
                 sessionObserverInternal.getNativeHandle(),
                 participantIdentityArray);
     }
@@ -149,12 +149,12 @@ public class ConversationImpl implements Conversation,
     /*
      * Incoming invite
      */
-    private ConversationImpl(TwilioConversationsClientInternal conversationsClient,
+    private ConversationImpl(TwilioConversationsClientInternal conversationsClientInternal,
                              long nativeSession,
                              String[] participantsIdentities,
                              ConversationStateObserver conversationStateObserver,
                              Handler handler) {
-        this.conversationsClient = conversationsClient;
+        this.conversationsClientInternal = conversationsClientInternal;
         this.conversationStateObserver = conversationStateObserver;
         this.nativeSession = nativeSession;
 
@@ -191,7 +191,7 @@ public class ConversationImpl implements Conversation,
     }
 
     public static ConversationImpl createIncomingConversation(
-            TwilioConversationsClientInternal conversationsClientImpl,
+            TwilioConversationsClientInternal conversationsClientInternal,
             long nativeSession,
             String[] participantIdentities,
             ConversationStateObserver conversationStateObserver,
@@ -203,7 +203,7 @@ public class ConversationImpl implements Conversation,
         if (participantIdentities == null || participantIdentities.length == 0) {
             return null;
         }
-        ConversationImpl conversationImpl = new ConversationImpl(conversationsClientImpl,
+        ConversationImpl conversationImpl = new ConversationImpl(conversationsClientInternal,
                 nativeSession, participantIdentities, conversationStateObserver, handler);
         return conversationImpl;
     }
@@ -338,14 +338,14 @@ public class ConversationImpl implements Conversation,
 
         if(error != null) {
             // Remove this conversation from the client
-            conversationsClient.removeConversation(this);
+            conversationsClientInternal.removeConversation(this);
             participantMap.clear();
 
             final TwilioConversationsException e =
                     new TwilioConversationsException(error.getCode(), error.getMessage());
             if(conversationListener == null) {
                 if(e.getErrorCode() == TwilioConversationsClient.CONVERSATION_TERMINATED) {
-                    conversationsClient.onConversationTerminated(this, e);
+                    conversationsClientInternal.onConversationTerminated(this, e);
                 }
             } else if(handler != null) {
                 handler.post(new Runnable() {
@@ -368,7 +368,7 @@ public class ConversationImpl implements Conversation,
         log("onStopCompleted", error);
 
         // Remove this conversation from the client
-        conversationsClient.removeConversation(this);
+        conversationsClientInternal.removeConversation(this);
         // Conversations that are rejected do not have a listener
         if(conversationListener != null) {
             participantMap.clear();
@@ -420,7 +420,7 @@ public class ConversationImpl implements Conversation,
                     error.getMessage());
             if (conversationListener == null) {
                 if(e.getErrorCode() == TwilioConversationsClient.CONVERSATION_TERMINATED) {
-                    conversationsClient.onConversationTerminated(this, e);
+                    conversationsClientInternal.onConversationTerminated(this, e);
                 } else {
                     logger.e("onParticipantConnected -> received unexpected error code -> " +
                             e.getErrorCode());
@@ -890,7 +890,7 @@ public class ConversationImpl implements Conversation,
             freeNativeHandle(nativeSession);
             nativeSession = 0;
         }
-        if(conversationsClient.getActiveConversationsCount() == 0) {
+        if(conversationsClientInternal.getActiveConversationsCount() == 0) {
             EglBaseProvider.releaseEglBase();
         }
         if (cameraCapturer != null) {
