@@ -363,14 +363,9 @@ public class TwilioConversationsClient {
         if (!initialized || (internalRegistry == null)) {
             throw new IllegalStateException("Cannot create client before initialize is called");
         }
-        TwilioConversationsClientInternal internalClient = new TwilioConversationsClientInternal(
-                        internalRegistry.applicationContext,
-                        accessManager,
-                        listener,
-                        options,
-                        internalRegistry.handler);
+
         TwilioConversationsClient client =
-                new TwilioConversationsClient(internalClient);
+                new TwilioConversationsClient(accessManager, options, listener);
 
         internalRegistry.registerTwilioConversationClient(client);
 
@@ -400,7 +395,9 @@ public class TwilioConversationsClient {
      *
      * @return identity of this conversations client
      */
-    public String getIdentity(){return conversationsClientInternal.getIdentity();}
+    public String getIdentity(){
+        return conversationsClientInternal.getIdentity();
+    }
 
     /**
      * Reflects current listening state of the conversations client.
@@ -408,7 +405,9 @@ public class TwilioConversationsClient {
      * @return <code>true</code> if conversations client is listening, </code>false</code>
      * otherwise.
      */
-    public boolean isListening(){return conversationsClientInternal.isListening();}
+    public boolean isListening(){
+        return conversationsClientInternal.isListening();
+    }
 
     /**
      * Starts listening for incoming invites and allows outgoing invites to be sent.
@@ -422,7 +421,9 @@ public class TwilioConversationsClient {
      *     occurred while attempting to listen</li>
      * </ol>
      */
-    public void listen(){conversationsClientInternal.listen();}
+    public void listen(){
+        conversationsClientInternal.listen();
+    }
 
     /**
      * Stops listening for incoming conversations.
@@ -430,7 +431,9 @@ public class TwilioConversationsClient {
      * <p>{@link Listener#onStopListeningForInvites(TwilioConversationsClient)}
      * will be invoked upon the completion of this process</p>
      */
-    public void unlisten(){conversationsClientInternal.unlisten();}
+    public void unlisten(){
+        conversationsClientInternal.unlisten();
+    }
 
     /**
      * Sends an invitation to start a conversation with the following participants and local media
@@ -519,7 +522,9 @@ public class TwilioConversationsClient {
      *
      * @return audio output speaker
      */
-    public AudioOutput getAudioOutput() {return conversationsClientInternal.getAudioOutput();}
+    public AudioOutput getAudioOutput() {
+        return conversationsClientInternal.getAudioOutput();
+    }
     
 
     /**
@@ -564,10 +569,17 @@ public class TwilioConversationsClient {
 
     private final UUID uuid = UUID.randomUUID();
 
-    private TwilioConversationsClient(
-            TwilioConversationsClientInternal conversationsClientInternal) {
-        this.conversationsClientInternal = conversationsClientInternal;
-        this.conversationsClientInternal.setTwilioConversationsClient(this);
+
+    private TwilioConversationsClient(TwilioAccessManager accessManager,
+                                      ClientOptions options,
+                                      Listener listener) {
+        this.conversationsClientInternal = new TwilioConversationsClientInternal(
+                this,
+                internalRegistry.applicationContext,
+                accessManager,
+                listener,
+                options,
+                internalRegistry.handler);
     }
 
     private static void setSDKLogLevel(LogLevel level) {

@@ -115,11 +115,13 @@ public class TwilioConversationsClientInternal implements
         return super.hashCode();
     }
 
-    public TwilioConversationsClientInternal(Context context,
-                                      TwilioAccessManager accessManager,
-                                      TwilioConversationsClient.Listener listener,
-                                      ClientOptions options,
-                                      Handler handler) {
+    public TwilioConversationsClientInternal(
+                TwilioConversationsClient conversationsClient,
+                Context context,
+                TwilioAccessManager accessManager,
+                TwilioConversationsClient.Listener listener,
+                ClientOptions options,
+                Handler handler) {
         this.context = context;
         this.conversationsClientListener = listener;
         this.accessManager = accessManager;
@@ -558,10 +560,6 @@ public class TwilioConversationsClientInternal implements
         logger.d("getAudioOutput");
         AudioManager audioManager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
         return audioManager.isSpeakerphoneOn() ? AudioOutput.SPEAKERPHONE : AudioOutput.HEADSET;
-    }
-
-    public void setTwilioConversationsClient(TwilioConversationsClient twilioConversationsClient) {
-        this.twilioConversationsClient = twilioConversationsClient;
     }
 
     boolean hasTerminated() {
