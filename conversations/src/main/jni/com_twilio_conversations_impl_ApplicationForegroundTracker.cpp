@@ -5,8 +5,8 @@
 #include "TSCConfiguration.h"
 #include "TSCLogger.h"
 
-#include "talk/app/webrtc/java/jni/jni_helpers.h"
-#include "talk/app/webrtc/java/jni/classreferenceholder.h"
+#include "webrtc/api/java/jni/jni_helpers.h"
+#include "webrtc/api/java/jni/classreferenceholder.h"
 
 #define TAG  "TwilioSDK(native)"
 

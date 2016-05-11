@@ -4,7 +4,7 @@ import android.app.Application;
 import android.support.design.widget.Snackbar;
 import android.widget.Toast;
 
-import com.twilio.conversations.TwilioConversations;
+import com.twilio.conversations.TwilioConversationsClient;
 
 import timber.log.Timber;
 
@@ -20,10 +20,10 @@ public class TestAppApplication extends Application {
         }
 
         // We initialize the sdk here in case the application was destroyed
-        if(!TwilioConversations.isInitialized()) {
+        if(!TwilioConversationsClient.isInitialized()) {
             Timber.d("Initializing conversations from application context");
-            TwilioConversations.initialize(this,
-                    new TwilioConversations.InitListener() {
+            TwilioConversationsClient.initialize(this,
+                    new TwilioConversationsClient.InitListener() {
                         @Override
                         public void onInitialized() {
                             Timber.d("Successfully initialized conversations");

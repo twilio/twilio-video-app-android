@@ -8,8 +8,8 @@
 #include "TSCLogger.h"
 #include "com_twilio_conversations_impl_WakeUpReceiver.h"
 
-#include "talk/app/webrtc/java/jni/jni_helpers.h"
-#include "talk/app/webrtc/java/jni/classreferenceholder.h"
+#include "webrtc/api/java/jni/jni_helpers.h"
+#include "webrtc/api/java/jni/classreferenceholder.h"
 
 #define TAG  "TwilioSDK(native)"
 
