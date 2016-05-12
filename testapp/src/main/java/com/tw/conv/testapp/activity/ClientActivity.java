@@ -11,6 +11,7 @@ import android.graphics.drawable.Drawable;
 import android.media.AudioManager;
 import android.os.Bundle;
 import android.os.Handler;
+import android.provider.MediaStore;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.NotificationCompat;
@@ -56,6 +57,7 @@ import com.tw.conv.testapp.util.SimpleSignalingUtils;
 import com.twilio.common.TwilioAccessManager;
 import com.twilio.common.TwilioAccessManagerFactory;
 import com.twilio.common.TwilioAccessManagerListener;
+import com.twilio.conversations.AspectRatio;
 import com.twilio.conversations.AudioOutput;
 import com.twilio.conversations.AudioTrack;
 import com.twilio.conversations.CameraCapturer;
@@ -197,15 +199,8 @@ public class ClientActivity extends AppCompatActivity {
     private int maxFps = 0;
     private VideoDimensions minVideoDimensions = null;
     private VideoDimensions maxVideoDimensions = null;
-    class AspectRatio {
-        public double minAspectRatio;
-        public double maxAspectRatio;
-        public AspectRatio(double min, double max) {
-            minAspectRatio = min;
-            maxAspectRatio = max;
-        }
-    }
-    private AspectRatio aspectRatio = new AspectRatio(0.0, 0.0);
+
+    private AspectRatio aspectRatio = new AspectRatio(0, 0);
 
     private Spinner iceTransPolicySpinner;
     private ListView twilioIceServersListView;
@@ -366,8 +361,7 @@ public class ClientActivity extends AppCompatActivity {
                             .maxFps(maxFps)
                             .minVideoDimensions(minVideoDimensions)
                             .maxVideoDimensions(maxVideoDimensions)
-                            .minAspectRatio(aspectRatio.minAspectRatio)
-                            .maxAspectRatio(aspectRatio.maxAspectRatio)
+                            .aspectRatio(aspectRatio)
                             .build();
                 } catch(Exception e) {
                     Snackbar.make(
@@ -1931,14 +1925,12 @@ public class ClientActivity extends AppCompatActivity {
     private AspectRatio getAspectRatio() {
         switch ((int)aspectRatioSpinner.getSelectedItemId()) {
             case 0:
-                return new AspectRatio(0.0, 0.0);
+                return new AspectRatio(0, 0);
             case 1:
-                return new AspectRatio(VideoConstraints.ASPECT_RATIO_4_3_MIN,
-                        VideoConstraints.ASPECT_RATIO_4_3_MAX);
+                return VideoConstraints.ASPECT_RATIO_4_3;
             case 2:
-                return new AspectRatio(VideoConstraints.ASPECT_RATIO_16_9_MIN,
-                        VideoConstraints.ASPECT_RATIO_16_9_MAX);
+                return VideoConstraints.ASPECT_RATIO_16_9;
         }
-        return new AspectRatio(0.0, 0.0);
+        return new AspectRatio(0, 0);
     }
 }

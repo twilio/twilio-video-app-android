@@ -20,30 +20,35 @@ public class VideoConstraints {
     // Smooth 30 fps video
     public static final int FPS_30 = 30;
 
-    // Min aspect ratio (4:3)
-    public static final double ASPECT_RATIO_4_3_MIN = 1.333;
-    // Max aspect ratio (4:3)
-    public static final double ASPECT_RATIO_4_3_MAX = 1.334;
-    // Min aspect ratio (16:9)
-    public static final double ASPECT_RATIO_16_9_MIN = 1.777;
-    // Max aspect ratio (16:9)
-    public static final double ASPECT_RATIO_16_9_MAX = 1.778;
+    /**
+     * Pre-defined aspect ratio 4:3
+     */
+    public static final AspectRatio ASPECT_RATIO_4_3 = new AspectRatio(4, 3);
+
+    /**
+     * Pre-defined aspect ratio 16:9
+     */
+    public static final AspectRatio ASPECT_RATIO_16_9 = new AspectRatio(16, 9);
+
+    /**
+     * Pre-defined aspect ratio 11:9
+     */
+    public static final AspectRatio ASPECT_RATIO_11_9 = new AspectRatio(11, 9);
+
 
     private final VideoDimensions minVideoDimensions;
     private final VideoDimensions maxVideoDimensions;
     private final int minFps;
     private final int maxFps;
 
-    private final double minAspectRatio;
-    private final double maxAspectRatio;
+    private final AspectRatio aspectRatio;
 
     private VideoConstraints(Builder builder) {
         this.minVideoDimensions = builder.minVideoDimensions;
         this.maxVideoDimensions = builder.maxVideoDimensions;
         this.minFps = builder.minFps;
         this.maxFps = builder.maxFps;
-        this.minAspectRatio = builder.minAspectRatio;
-        this.maxAspectRatio = builder.maxAspectRatio;
+        this.aspectRatio = builder.aspectRatio;
     }
 
     /**
@@ -75,26 +80,19 @@ public class VideoConstraints {
     }
 
     /**
-     * The minimum aspect ratio allowed
+     * The aspect ratio
      */
-    public double getMinAspectRatio() {
-        return minAspectRatio;
+    public AspectRatio getAspectRatio() {
+        return aspectRatio;
     }
 
-    /**
-     * The maximum aspect ratio allowed
-     */
-    public double getMaxAspectRatio() {
-        return maxAspectRatio;
-    }
 
     public static class Builder {
         private VideoDimensions minVideoDimensions = new VideoDimensions(0,0);
         private VideoDimensions maxVideoDimensions = new VideoDimensions(0,0);
         private int minFps = 0;
         private int maxFps = 0;
-        private double minAspectRatio = 0.0;
-        private double maxAspectRatio = 0.0;
+        private AspectRatio aspectRatio = new AspectRatio(0,0);
 
         public Builder() { }
 
@@ -118,13 +116,8 @@ public class VideoConstraints {
             return this;
         }
 
-        public Builder minAspectRatio(double aspectRatio) {
-            this.minAspectRatio = aspectRatio;
-            return this;
-        }
-
-        public Builder maxAspectRatio(double aspectRatio) {
-            this.maxAspectRatio = aspectRatio;
+        public Builder aspectRatio(AspectRatio aspectRatio) {
+            this.aspectRatio = aspectRatio;
             return this;
         }
 
@@ -153,14 +146,14 @@ public class VideoConstraints {
             if(minVideoDimensions.height > maxVideoDimensions.height) {
                 throw new IllegalStateException("Min video dimensions height " + minVideoDimensions.height+ " is greater than max video dimensions height " + maxVideoDimensions.height);
             }
-            if (minAspectRatio < 0) {
-                throw new IllegalStateException("minAspectRatio is less than 0");
+            if (aspectRatio.numerator < 0) {
+                throw new IllegalStateException("aspectRatio numerator is less than 0");
             }
-            if (maxAspectRatio < 0) {
-                throw new IllegalStateException("maxAspectRatio is less than 0");
+            if (aspectRatio.denominator < 0) {
+                throw new IllegalStateException("aspectRatio denominator is less than 0");
             }
-            if (minAspectRatio > maxAspectRatio) {
-                throw new IllegalStateException("minAspectRatio is greater than maxAspectRatio");
+            if (aspectRatio.denominator > aspectRatio.numerator) {
+                throw new IllegalStateException("aspectRatio denominator is greater than numerator");
             }
             return new VideoConstraints(this);
         }
