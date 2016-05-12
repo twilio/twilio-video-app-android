@@ -157,8 +157,7 @@ TSCConstraintsRef createVideoConstraints(JNIEnv *env, jobject j_video_constraint
         constraints->SetMandatory(twiliosdk::TSCConstraints::kMinHeight, min_height);
     }
     if ((numerator_aspect_ratio > 0) &&
-            (denominator_aspect_ratio > 0) &&
-            (numerator_aspect_ratio > denominator_aspect_ratio)){
+            (denominator_aspect_ratio > 0)){
         double aspect_ratio = (double) numerator_aspect_ratio / denominator_aspect_ratio;
         constraints->SetMandatory(twiliosdk::TSCConstraints::kMinAspectRatio, aspect_ratio);
         constraints->SetMandatory(twiliosdk::TSCConstraints::kMaxAspectRatio, aspect_ratio);

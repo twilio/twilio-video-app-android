@@ -152,9 +152,6 @@ public class VideoConstraints {
             if (aspectRatio.denominator < 0) {
                 throw new IllegalStateException("aspectRatio denominator is less than 0");
             }
-            if (aspectRatio.denominator > aspectRatio.numerator) {
-                throw new IllegalStateException("aspectRatio denominator is greater than numerator");
-            }
             return new VideoConstraints(this);
         }
     }
