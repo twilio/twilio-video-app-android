@@ -122,6 +122,7 @@ public class ClientActivity extends AppCompatActivity {
     public static final String OPTION_PREFER_H264_KEY = "enable-h264";
     public static final String OPTION_AUTO_ACCEPT_KEY = "auto-accept";
     public static final String OPTION_USE_HEADSET_KEY = "use-headset";
+    public static final String OPTION_LOGOUT_WHEN_CONV_ENDS_KEY = "logout-when-conv-ends";
     private static final String OPTION_DEV_REGISTRAR = "endpoint.dev.twilio.com";
     private static final String OPTION_DEV_STATS_URL = "https://eventgw.dev.twilio.com";
     private static final String OPTION_STAGE_REGISTRAR = "endpoint.stage.twilio.com";
@@ -151,6 +152,7 @@ public class ClientActivity extends AppCompatActivity {
     private String iceTransportPolicy;
     private String twilioIceServersJson;
     private boolean useHeadset;
+    private boolean logoutWhenConvEnds;
 
     private enum AudioState {
         ENABLED,
@@ -207,6 +209,7 @@ public class ClientActivity extends AppCompatActivity {
     private RelativeLayout iceOptionsLayout;
     private CheckBox enableIceCheckbox;
     private CheckBox preferH264Checkbox;
+    private CheckBox logoutWhenConvEndsCheckbox;
     private Spinner aspectRatioSpinner;
 
     private static final Map<Integer, VideoDimensions> videoDimensionsMap;
@@ -424,6 +427,7 @@ public class ClientActivity extends AppCompatActivity {
             preferH264 = savedInstanceState.getBoolean(OPTION_PREFER_H264_KEY);
             autoAccept = savedInstanceState.getBoolean(OPTION_AUTO_ACCEPT_KEY);
             useHeadset = savedInstanceState.getBoolean(OPTION_USE_HEADSET_KEY);
+            logoutWhenConvEnds = savedInstanceState.getBoolean(OPTION_LOGOUT_WHEN_CONV_ENDS_KEY);
             capabilityToken = savedInstanceState.getString(SimpleSignalingUtils.CAPABILITY_TOKEN);
             selectedTwilioIceServersJson = savedInstanceState
                     .getString(TwilioIceResponse.ICE_SELECTED_SERVERS);
@@ -438,6 +442,7 @@ public class ClientActivity extends AppCompatActivity {
             preferH264 = extras.getBoolean(OPTION_PREFER_H264_KEY);
             autoAccept = extras.getBoolean(OPTION_AUTO_ACCEPT_KEY);
             useHeadset = extras.getBoolean(OPTION_USE_HEADSET_KEY);
+            logoutWhenConvEnds = extras.getBoolean(OPTION_LOGOUT_WHEN_CONV_ENDS_KEY);
             capabilityToken = extras.getString(SimpleSignalingUtils.CAPABILITY_TOKEN);
             selectedTwilioIceServersJson = extras.getString(TwilioIceResponse.ICE_SELECTED_SERVERS);
             iceTransportPolicy = extras.getString(TwilioIceResponse.ICE_TRANSPORT_POLICY);
@@ -456,6 +461,8 @@ public class ClientActivity extends AppCompatActivity {
         enableIceCheckbox.setOnCheckedChangeListener(enableIceCheckedChangeListener());
         preferH264Checkbox = (CheckBox) findViewById(R.id.prefer_h264_checkbox);
         preferH264Checkbox.setChecked(preferH264);
+        logoutWhenConvEndsCheckbox = (CheckBox) findViewById(R.id.logout_when_conv_ends_checkbox);
+        logoutWhenConvEndsCheckbox.setChecked(logoutWhenConvEnds);
 
         aspectRatioSpinner = (Spinner)findViewById(R.id.aspect_ratio_spinner);
         ArrayAdapter<CharSequence> spinnerAdapter = ArrayAdapter.createFromResource(this,
@@ -557,6 +564,7 @@ public class ClientActivity extends AppCompatActivity {
         bundle.putBoolean(OPTION_PREFER_H264_KEY, preferH264);
         bundle.putBoolean(OPTION_AUTO_ACCEPT_KEY, autoAccept);
         bundle.putBoolean(OPTION_USE_HEADSET_KEY, useHeadset);
+        bundle.putBoolean(OPTION_LOGOUT_WHEN_CONV_ENDS_KEY, logoutWhenConvEnds);
         bundle.putString(TwilioIceResponse.ICE_SELECTED_SERVERS, selectedTwilioIceServersJson);
         bundle.putString(TwilioIceResponse.ICE_TRANSPORT_POLICY, iceTransportPolicy);
         bundle.putString(TwilioIceResponse.ICE_SERVERS, twilioIceServersJson);
@@ -824,7 +832,7 @@ public class ClientActivity extends AppCompatActivity {
             public void onStopListeningForInvites(TwilioConversationsClient twilioConversationsClient) {
                 conversationsClientStatusTextView.setText("onStopListeningForInvites");
                 // If we are logging out let us finish the teardown process
-                if (loggingOut) {
+                if (loggingOut || logoutWhenConvEnds) {
                     completeLogout();
                 }
             }
@@ -1480,7 +1488,7 @@ public class ClientActivity extends AppCompatActivity {
                 disableStats();
 
                 // If user is logging out we need to finish that process otherwise we just reset
-                if (loggingOut) {
+                if (loggingOut || logoutWhenConvEnds) {
                     logout();
                 } else {
                     reset();

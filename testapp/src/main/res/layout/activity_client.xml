@@ -21,6 +21,7 @@
             android:layout_width="wrap_content" android:layout_height="wrap_content"
             android:layout_gravity="bottom|end" android:layout_margin="@dimen/fab_margin"
             android:src="@drawable/ic_call_white_24px" />
+
         <android.support.design.widget.FloatingActionButton android:id="@+id/add_participant_action_fab"
             android:layout_width="wrap_content" android:layout_height="wrap_content"
             android:layout_gravity="bottom|end"
@@ -203,25 +204,41 @@
 
             <include layout="@layout/ice_options_layout"/>
 
-            <TextView
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/prefer_h264"
-                android:textSize="15sp"
-                android:layout_marginTop="@dimen/activity_horizontal_margin"
-                android:layout_marginLeft="@dimen/activity_horizontal_margin" />
-            <CheckBox
-                android:id="@+id/prefer_h264_checkbox"
-                android:layout_width="wrap_content"
+                android:layout_marginLeft="@dimen/activity_horizontal_margin" >
+
+                <CheckBox
+                    android:id="@+id/prefer_h264_checkbox"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:enabled="false"/>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/prefer_h264" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:layout_marginLeft="@dimen/activity_horizontal_margin"
-                android:enabled="false"/>
+                android:layout_marginLeft="@dimen/activity_horizontal_margin" >
+
+                <CheckBox
+                    android:id="@+id/logout_when_conv_ends_checkbox"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:enabled="false"/>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/logout_when_conv_ends" />
+
+            </LinearLayout>
 
         </LinearLayout>
-
-
-
 
     </ScrollView>
 
