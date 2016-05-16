@@ -82,7 +82,7 @@ import com.twilio.conversations.MediaTrack;
 import com.twilio.conversations.MediaTrackStatsRecord;
 import com.twilio.conversations.OutgoingInvite;
 import com.twilio.conversations.Participant;
-import com.twilio.conversations.ParticipantListener;
+import com.twilio.conversations.Participant.Listener;
 import com.twilio.conversations.RemoteAudioTrackStatsRecord;
 import com.twilio.conversations.RemoteVideoTrackStatsRecord;
 import com.twilio.conversations.StatsListener;
@@ -1586,8 +1586,8 @@ public class ClientActivity extends AppCompatActivity {
         }
     }
 
-    private ParticipantListener participantListener() {
-        return new ParticipantListener() {
+    private Participant.Listener participantListener() {
+        return new Participant.Listener() {
             @Override
             public void onVideoTrackAdded(Conversation conversation,
                                           Participant participant,
