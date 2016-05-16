@@ -70,18 +70,18 @@ public class ConversationImpl implements Conversation,
 
         public SessionObserverInternal(SessionObserver sessionObserver,
                                        Conversation conversation) {
-            this.nativeSessionObserver = wrapNativeObserver(sessionObserver, conversation);
+            this.nativeSessionObserver = nativeWrapObserver(sessionObserver, conversation);
         }
 
         public void enableStats(long nativeSession, boolean enable) {
-            enableStats(nativeSessionObserver, nativeSession, enable);
+            nativeEnableStats(nativeSessionObserver, nativeSession, enable);
         }
 
-        private native long wrapNativeObserver(SessionObserver sessionObserver,
+        private native long nativeWrapObserver(SessionObserver sessionObserver,
                                                Conversation conversation);
-        private native void freeNativeObserver(long nativeSessionObserver);
+        private native void nativeFreeObserver(long nativeSessionObserver);
 
-        private native void enableStats(long nativeSessionObserver, long nativeSession, boolean enable);
+        private native void nativeEnableStats(long nativeSessionObserver, long nativeSession, boolean enable);
 
         @Override
         public long getNativeHandle() {
@@ -90,7 +90,7 @@ public class ConversationImpl implements Conversation,
 
         public void dispose() {
             if (nativeSessionObserver != 0) {
-                freeNativeObserver(nativeSessionObserver);
+                nativeFreeObserver(nativeSessionObserver);
                 nativeSessionObserver = 0;
             }
 
@@ -132,7 +132,7 @@ public class ConversationImpl implements Conversation,
 
         sessionObserverInternal = new SessionObserverInternal(this, this);
 
-        nativeSession = wrapOutgoingSession(conversationsClientInternal.getNativeHandle(),
+        nativeSession = nativeWrapOutgoingSession(conversationsClientInternal.getNativeHandle(),
                 sessionObserverInternal.getNativeHandle(),
                 participantIdentityArray);
     }
@@ -787,7 +787,7 @@ public class ConversationImpl implements Conversation,
     void setupExternalCapturer() {
         LocalVideoTrack localVideoTrack = localMediaImpl.getLocalVideoTracks().get(0);
         // TODO: Camera capture is the only supported local video stream for now.
-        // Once we start supporting screen share or etc, we should modify this method.
+        // Once we nativeStart supporting screen share or etc, we should modify this method.
         cameraCapturer = (CameraCapturerImpl)localVideoTrack.getCameraCapturer();
         cameraCapturer.startConversationCapturer(nativeSession);
         nativeSetExternalCapturer(nativeSession, cameraCapturer.getNativeVideoCapturer());
@@ -843,7 +843,7 @@ public class ConversationImpl implements Conversation,
 		 * new thread references it.
 		 */
         final long retainedNativeSession = nativeSession;
-        start(retainedNativeSession,
+        nativeStart(retainedNativeSession,
                 mediaConstraints.isAudioEnabled(),
                 mediaConstraints.isAudioMuted(),
                 mediaConstraints.isVideoEnabled(),
@@ -905,17 +905,17 @@ public class ConversationImpl implements Conversation,
         }
     }
 
-    private native long wrapOutgoingSession(long nativeEndpoint,
-                                            long nativeSessionObserver,
-                                            String[] participants);
-    private native void start(long nativeSession,
-                              boolean enableAudio,
-                              boolean muteAudio,
-                              boolean enableVideo,
-                              boolean pauseVideo,
-                              VideoConstraints videoConstraints,
-                              IceServer[] iceServers,
-                              IceTransportPolicy iceTransportPolicy);
+    private native long nativeWrapOutgoingSession(long nativeEndpoint,
+                                                  long nativeSessionObserver,
+                                                  String[] participants);
+    private native void nativeStart(long nativeSession,
+                                    boolean enableAudio,
+                                    boolean muteAudio,
+                                    boolean enableVideo,
+                                    boolean pauseVideo,
+                                    VideoConstraints videoConstraints,
+                                    IceServer[] iceServers,
+                                    IceTransportPolicy iceTransportPolicy);
 
     private native void nativeSetExternalCapturer(long nativeSession, long nativeCapturer);
     private native void nativeStop(long nativeSession);

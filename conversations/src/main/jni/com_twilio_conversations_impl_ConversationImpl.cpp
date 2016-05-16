@@ -19,7 +19,7 @@ using namespace twiliosdk;
 using namespace webrtc_jni;
 
 
-JNIEXPORT jlong JNICALL Java_com_twilio_conversations_impl_ConversationImpl_wrapOutgoingSession
+JNIEXPORT jlong JNICALL Java_com_twilio_conversations_impl_ConversationImpl_nativeWrapOutgoingSession
         (JNIEnv *env, jobject obj, jlong nativeEndpoint, jlong nativeSessionObserver, jobjectArray participantList) {
     TS_CORE_LOG_MODULE(kTSCoreLogModulePlatform, kTSCoreLogLevelDebug, "wrapOutgoingSession");
     TSCEndpointPtr *endpoint = reinterpret_cast<TSCEndpointPtr *>(nativeEndpoint);
@@ -228,7 +228,7 @@ twiliosdk::IceOptions createIceOptions(JNIEnv *env, jobjectArray j_iceServers,
 }
 
 
-JNIEXPORT void JNICALL Java_com_twilio_conversations_impl_ConversationImpl_start
+JNIEXPORT void JNICALL Java_com_twilio_conversations_impl_ConversationImpl_nativeStart
         (JNIEnv *env, jobject obj, jlong nativeSession, jboolean j_enableAudio,
          jboolean j_muteAudio, jboolean j_enableVideo, jboolean j_pauseVideo,
              jobject j_video_constraints, jobjectArray j_iceServers, jobject j_iceTransportPolicy)
@@ -261,7 +261,7 @@ JNIEXPORT void JNICALL Java_com_twilio_conversations_impl_ConversationImpl_start
 }
 
 
-JNIEXPORT void JNICALL Java_com_twilio_conversations_impl_ConversationImpl_nativeStop__J
+JNIEXPORT void JNICALL Java_com_twilio_conversations_impl_ConversationImpl_nativeStop
         (JNIEnv *env, jobject obj, jlong nativeSession)
 {
     TS_CORE_LOG_MODULE(kTSCoreLogModulePlatform, kTSCoreLogLevelDebug, "stop");
@@ -291,7 +291,7 @@ JNIEXPORT void JNICALL Java_com_twilio_conversations_impl_ConversationImpl_nativ
     session->get()->setSessionObserver(*sessionObserver);
 }
 
-JNIEXPORT jboolean JNICALL Java_com_twilio_conversations_impl_ConversationImpl_nativeEnableVideo__JZZLcom_twilio_conversations_VideoConstraints_2
+JNIEXPORT jboolean JNICALL Java_com_twilio_conversations_impl_ConversationImpl_nativeEnableVideo
         (JNIEnv *env, jobject, jlong nativeSession, jboolean enabled, jboolean paused, jobject j_video_constraints)
 {
     TS_CORE_LOG_MODULE(kTSCoreLogModulePlatform, kTSCoreLogLevelDebug, "enableVideo");
@@ -314,7 +314,7 @@ JNIEXPORT void JNICALL Java_com_twilio_conversations_impl_ConversationImpl_nativ
     }
 }
 
-JNIEXPORT jboolean JNICALL Java_com_twilio_conversations_impl_ConversationImpl_nativeMute__JZ
+JNIEXPORT jboolean JNICALL Java_com_twilio_conversations_impl_ConversationImpl_nativeMute
         (JNIEnv *, jobject, jlong nativeSession, jboolean on)
 {
     TS_CORE_LOG_MODULE(kTSCoreLogModulePlatform, kTSCoreLogLevelDebug, "mute");
@@ -326,7 +326,7 @@ JNIEXPORT jboolean JNICALL Java_com_twilio_conversations_impl_ConversationImpl_n
     return JNI_FALSE;
 }
 
-JNIEXPORT jboolean JNICALL Java_com_twilio_conversations_impl_ConversationImpl_nativeIsMuted__J
+JNIEXPORT jboolean JNICALL Java_com_twilio_conversations_impl_ConversationImpl_nativeIsMuted
         (JNIEnv *, jobject, jlong nativeSession)
 {
     TS_CORE_LOG_MODULE(kTSCoreLogModulePlatform, kTSCoreLogLevelDebug, "isMuted");
@@ -338,7 +338,7 @@ JNIEXPORT jboolean JNICALL Java_com_twilio_conversations_impl_ConversationImpl_n
     return JNI_FALSE;
 }
 
-JNIEXPORT void JNICALL Java_com_twilio_conversations_impl_ConversationImpl_nativeInviteParticipants__JLjava_lang_String_3_093_2
+JNIEXPORT void JNICALL Java_com_twilio_conversations_impl_ConversationImpl_nativeInviteParticipants
         (JNIEnv *env, jobject obj, jlong nativeSession, jobjectArray participantList)
 {
     TS_CORE_LOG_MODULE(kTSCoreLogModulePlatform, kTSCoreLogLevelDebug, "inviteParticipants");
@@ -367,7 +367,7 @@ JNIEXPORT jstring JNICALL Java_com_twilio_conversations_impl_ConversationImpl_na
     return JavaStringFromStdString(env, session->get()->getConversationSid());
 }
 
-JNIEXPORT jboolean JNICALL Java_com_twilio_conversations_impl_ConversationImpl_nativeEnableAudio__JZZ
+JNIEXPORT jboolean JNICALL Java_com_twilio_conversations_impl_ConversationImpl_nativeEnableAudio
         (JNIEnv *, jobject, jlong nativeSession, jboolean j_enabled, jboolean j_muted)
 {
     TS_CORE_LOG_MODULE(kTSCoreLogModulePlatform, kTSCoreLogLevelDebug, "enableAudio");
