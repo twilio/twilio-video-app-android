@@ -98,8 +98,8 @@ public class VideoTrackImpl implements VideoTrack {
 
     @Override
     public boolean isEnabled() {
-        if (videoTrack != null) {
-            return videoTrack.enabled();
+        if ((videoTrack != null) && (trackInfo != null)) {
+            return trackInfo.isEnabled();
         }
         return false;
     }
