@@ -196,7 +196,7 @@ public class TwilioConversationsClientInternal implements
     }
 
     public String getIdentity() {
-        return new String(accessManager.getIdentity());
+        return accessManager.getIdentity();
     }
 
     public boolean isListening() {
