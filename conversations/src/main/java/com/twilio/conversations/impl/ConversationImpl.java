@@ -18,7 +18,6 @@ import com.twilio.conversations.StatsListener;
 import com.twilio.conversations.MediaTrackStatsRecord;
 import com.twilio.conversations.TwilioConversationsClient;
 import com.twilio.conversations.TwilioConversationsException;
-import com.twilio.conversations.ConversationListener;
 import com.twilio.conversations.LocalMedia;
 import com.twilio.conversations.LocalVideoTrack;
 import com.twilio.conversations.MediaTrackState;
@@ -47,7 +46,7 @@ public class ConversationImpl implements Conversation,
     private Set<String> invitedParticipants = new HashSet<>();
     private String inviter;
     private TwilioConversationsClientInternal conversationsClientInternal;
-    private ConversationListener conversationListener;
+    private Conversation.Listener conversationListener;
     private ConversationStateObserver conversationStateObserver;
     private Map<String,ParticipantImpl> participantMap = new HashMap<>();
     private LocalMediaImpl localMediaImpl;
@@ -107,7 +106,7 @@ public class ConversationImpl implements Conversation,
     private ConversationImpl(TwilioConversationsClientInternal conversationsClientInternal,
                              Set<String> participants,
                              LocalMedia localMedia,
-                             ConversationListener conversationListener,
+                             Conversation.Listener conversationListener,
                              ConversationStateObserver conversationStateObserver,
                              Handler handler) {
         this.conversationsClientInternal = conversationsClientInternal;
@@ -182,7 +181,7 @@ public class ConversationImpl implements Conversation,
             TwilioConversationsClientInternal conversationsClient,
             Set<String> participants,
             LocalMedia localMedia,
-            ConversationListener listener,
+            Conversation.Listener listener,
             ConversationStateObserver conversationStateObserver,
             Handler handler) {
         ConversationImpl conversationImpl = new ConversationImpl(conversationsClient,
@@ -237,12 +236,12 @@ public class ConversationImpl implements Conversation,
     }
 
     @Override
-    public ConversationListener getConversationListener() {
+    public Conversation.Listener getConversationListener() {
         return conversationListener;
     }
 
     @Override
-    public void setConversationListener(ConversationListener listener) {
+    public void setConversationListener(Conversation.Listener listener) {
         if(handler == null) {
             throw new IllegalThreadStateException("This thread must be able to obtain a Looper");
         }

@@ -65,7 +65,6 @@ import com.twilio.conversations.CapturerErrorListener;
 import com.twilio.conversations.CapturerException;
 import com.twilio.conversations.Conversation;
 import com.twilio.conversations.ConversationCallback;
-import com.twilio.conversations.ConversationListener;
 import com.twilio.conversations.TwilioConversationsClient;
 import com.twilio.conversations.IceOptions;
 import com.twilio.conversations.IceServer;
@@ -1436,8 +1435,8 @@ public class ClientActivity extends AppCompatActivity {
         };
     }
 
-    private ConversationListener conversationListener() {
-        return new ConversationListener() {
+    private Conversation.Listener conversationListener() {
+        return new Conversation.Listener() {
             @Override
             public void onParticipantConnected(Conversation conversation,
                                                Participant participant) {
