@@ -10,7 +10,7 @@ extern "C" {
 
 
 JNIEXPORT jlong JNICALL
-Java_com_twilio_conversations_impl_TwilioConversationsClientInternal_createEndpoint
+Java_com_twilio_conversations_impl_TwilioConversationsClientInternal_nativeCreateEndpoint
   (JNIEnv *, jobject, jobject, jobjectArray, jlong);
 
 /*
@@ -18,7 +18,7 @@ Java_com_twilio_conversations_impl_TwilioConversationsClientInternal_createEndpo
  * Method:    listen
  * Signature: (J)V
  */
-JNIEXPORT void JNICALL Java_com_twilio_conversations_impl_TwilioConversationsClientInternal_listen
+JNIEXPORT void JNICALL Java_com_twilio_conversations_impl_TwilioConversationsClientInternal_nativeListen__J
         (JNIEnv *, jobject, jlong);
 
 /*
@@ -26,7 +26,7 @@ JNIEXPORT void JNICALL Java_com_twilio_conversations_impl_TwilioConversationsCli
  * Method:    unlisten
  * Signature: (J)V
  */
-JNIEXPORT void JNICALL Java_com_twilio_conversations_impl_TwilioConversationsClientInternal_unlisten
+JNIEXPORT void JNICALL Java_com_twilio_conversations_impl_TwilioConversationsClientInternal_nativeUnlisten__J
         (JNIEnv *, jobject, jlong);
 
 /*
@@ -34,7 +34,7 @@ JNIEXPORT void JNICALL Java_com_twilio_conversations_impl_TwilioConversationsCli
  * Method:    reject
  * Signature: (JJ)V
  */
-JNIEXPORT void JNICALL Java_com_twilio_conversations_impl_TwilioConversationsClientInternal_reject
+JNIEXPORT void JNICALL Java_com_twilio_conversations_impl_TwilioConversationsClientInternal_nativeReject__JJ
         (JNIEnv *, jobject, jlong, jlong);
 
 /*
@@ -42,7 +42,7 @@ JNIEXPORT void JNICALL Java_com_twilio_conversations_impl_TwilioConversationsCli
  * Method:    freeNativeHandle
  * Signature: ()V
  */
-JNIEXPORT void JNICALL Java_com_twilio_conversations_impl_TwilioConversationsClientInternal_freeNativeHandle
+JNIEXPORT void JNICALL Java_com_twilio_conversations_impl_TwilioConversationsClientInternal_nativeFreeHandle
   (JNIEnv *, jobject, jlong);
 
 #ifdef __cplusplus
