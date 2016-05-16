@@ -16,9 +16,9 @@ import android.util.Log;
 import com.twilio.common.TwilioAccessManager;
 import com.twilio.conversations.impl.ApplicationForegroundTracker;
 import com.twilio.conversations.impl.TwilioConversationsClientInternal;
+import com.twilio.conversations.impl.Util;
 import com.twilio.conversations.impl.WakeUpReceiver;
 import com.twilio.conversations.impl.logging.Logger;
-import com.twilio.conversations.impl.util.CallbackHandler;
 import com.twilio.conversations.internal.ReLinker;
 
 import java.util.ArrayDeque;
@@ -192,7 +192,7 @@ public class TwilioConversationsClient {
         }
 
         Context applicationContext = context.getApplicationContext();
-        Handler handler = CallbackHandler.create();
+        Handler handler = Util.createCallbackHandler();
         if (handler == null) {
             throw new IllegalThreadStateException("This thread must be able to obtain a Looper");
         }

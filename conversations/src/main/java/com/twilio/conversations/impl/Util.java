@@ -1,15 +1,14 @@
-package com.twilio.conversations.impl.util;
+package com.twilio.conversations.impl;
 
 import android.os.Handler;
 import android.os.Looper;
 
-
-public class CallbackHandler {
+public class Util {
     /*
      * Return a handler on the thread looper, or the main thread looper if the calling thread
      * does not have a looper. If neither are available this handler will return null.
      */
-    public static Handler create() {
+    public static Handler createCallbackHandler() {
         Handler handler = null;
         Looper looper;
 
