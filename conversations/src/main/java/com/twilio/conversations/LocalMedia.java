@@ -7,6 +7,44 @@ import java.util.List;
  *
  */
 public interface LocalMedia {
+    interface Listener {
+        /**
+         * This method notifies the listener when a {@link LocalVideoTrack} has been added
+         * to the {@link LocalMedia}
+         *
+         * @param localMedia The local media associated with this track.
+         * @param videoTrack The local video track that was added to the conversation.
+         */
+        void onLocalVideoTrackAdded(LocalMedia localMedia, LocalVideoTrack videoTrack);
+
+        /**
+         * This method notifies the listener when a {@link LocalVideoTrack} has been removed
+         * from the {@link LocalMedia}
+         *
+         * @param localMedia The local media associated with this track.
+         * @param videoTrack The local video track that was removed from the conversation.
+         */
+        void onLocalVideoTrackRemoved(LocalMedia localMedia, LocalVideoTrack videoTrack);
+
+        /**
+         * This method notifies the listener when an error occurred when
+         * attempting to add or remove a {@link LocalVideoTrack}
+         * @param localMedia The {@link LocalMedia} associated with the {@link LocalVideoTrack}
+         * @param track The {@link LocalVideoTrack} that was requested to be added or removed to
+         *              the {@link LocalMedia}
+         * @param exception Provides the error that occurred while attempting to add or remove
+         *                  this {@link LocalVideoTrack}. Adding or removing a local video track
+         *                  can result in {@link TwilioConversationsClient#TOO_MANY_TRACKS},
+         *                  {@link TwilioConversationsClient#TRACK_OPERATION_IN_PROGRESS},
+         *                  {@link TwilioConversationsClient#INVALID_VIDEO_CAPTURER},
+         *                  {@link TwilioConversationsClient#INVALID_VIDEO_TRACK_STATE},
+         *                  or {@link TwilioConversationsClient#TRACK_CREATION_FAILED}.
+         */
+        void onLocalVideoTrackError(LocalMedia localMedia,
+                                    LocalVideoTrack track,
+                                    TwilioConversationsException exception);
+    }
+
     /**
      * Returns the local video tracks
      *
@@ -17,11 +55,11 @@ public interface LocalMedia {
     /**
      * Adds a local video track to list of tracks.
      *
-     * <p>The result of this operation will propagate via {@link LocalMediaListener}. A
+     * <p>The result of this operation will propagate via {@link Listener}. A
      * successful addition of the local video track will invoke
-     * {@link LocalMediaListener#onLocalVideoTrackAdded(LocalMedia, LocalVideoTrack)}. If any
+     * {@link Listener#onLocalVideoTrackAdded(LocalMedia, LocalVideoTrack)}. If any
      * problems occur adding the video track then
-     * {@link LocalMediaListener#onLocalVideoTrackError(LocalMedia, LocalVideoTrack,
+     * {@link Listener#onLocalVideoTrackError(LocalMedia, LocalVideoTrack,
      * TwilioConversationsException)} will be invoked.</p>
      *
      * @param localVideoTrack The local video track to be added.
@@ -31,11 +69,11 @@ public interface LocalMedia {
     /**
      * Removes the local video track from list of tracks.
      *
-     * <p>The result of this operation will propagate via {@link LocalMediaListener}. A
+     * <p>The result of this operation will propagate via {@link Listener}. A
      * successful removal of the local video track will invoke
-     * {@link LocalMediaListener#onLocalVideoTrackRemoved(LocalMedia, LocalVideoTrack)}. If any
+     * {@link Listener#onLocalVideoTrackRemoved(LocalMedia, LocalVideoTrack)}. If any
      * problems occur removing the video track then
-     * {@link LocalMediaListener#onLocalVideoTrackError(LocalMedia, LocalVideoTrack,
+     * {@link Listener#onLocalVideoTrackError(LocalMedia, LocalVideoTrack,
      * TwilioConversationsException)} will be invoked.</p>
      *
      * @param localVideoTrack The local video track to be removed
@@ -80,19 +118,19 @@ public interface LocalMedia {
     boolean isMicrophoneAdded();
 
     /**
-     * Gets the {@link LocalMediaListener}
+     * Gets the {@link Listener}
      *
      * @return media events listener
      */
-    LocalMediaListener getLocalMediaListener();
+    LocalMedia.Listener getLocalMediaListener();
 
     /**
-     * Sets the {@link LocalMediaListener}
+     * Sets the {@link Listener}
      *
-     * <p>The {@link LocalMediaListener} is invoked on the thread that provides the
+     * <p>The {@link Listener} is invoked on the thread that provides the
      * LocalMediaListener instance.</p>
      *
      * @param listener A media events listener
      */
-    void setLocalMediaListener(LocalMediaListener listener);
+    void setLocalMediaListener(LocalMedia.Listener listener);
 }

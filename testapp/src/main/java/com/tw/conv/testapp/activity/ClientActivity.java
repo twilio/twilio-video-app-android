@@ -74,7 +74,6 @@ import com.twilio.conversations.IncomingInvite;
 import com.twilio.conversations.LocalAudioTrackStatsRecord;
 import com.twilio.conversations.LocalMedia;
 import com.twilio.conversations.LocalMediaFactory;
-import com.twilio.conversations.LocalMediaListener;
 import com.twilio.conversations.LocalVideoTrack;
 import com.twilio.conversations.LocalVideoTrackFactory;
 import com.twilio.conversations.LocalVideoTrackStatsRecord;
@@ -82,7 +81,6 @@ import com.twilio.conversations.MediaTrack;
 import com.twilio.conversations.MediaTrackStatsRecord;
 import com.twilio.conversations.OutgoingInvite;
 import com.twilio.conversations.Participant;
-import com.twilio.conversations.Participant.Listener;
 import com.twilio.conversations.RemoteAudioTrackStatsRecord;
 import com.twilio.conversations.RemoteVideoTrackStatsRecord;
 import com.twilio.conversations.StatsListener;
@@ -1761,8 +1759,8 @@ public class ClientActivity extends AppCompatActivity {
         };
     }
 
-    private LocalMediaListener localMediaListener() {
-        return new LocalMediaListener() {
+    private LocalMedia.Listener localMediaListener() {
+        return new LocalMedia.Listener() {
             @Override
             public void onLocalVideoTrackAdded(LocalMedia localMedia,
                                                LocalVideoTrack localVideoTrack) {
