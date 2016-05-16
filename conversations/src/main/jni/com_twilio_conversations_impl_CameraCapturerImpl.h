@@ -8,21 +8,21 @@
 extern "C" {
 #endif
 
-JNIEXPORT void JNICALL Java_com_twilio_conversations_impl_CameraCapturerImpl_stopVideoSource
+JNIEXPORT void JNICALL Java_com_twilio_conversations_impl_CameraCapturerImpl_nativeStopVideoSource
         (JNIEnv *, jobject, jlong);
 
-JNIEXPORT void JNICALL Java_com_twilio_conversations_impl_CameraCapturerImpl_restartVideoSource
+JNIEXPORT void JNICALL Java_com_twilio_conversations_impl_CameraCapturerImpl_nativeRestartVideoSource
         (JNIEnv *, jobject, jlong);
 
 JNIEXPORT jlong JNICALL
-Java_com_twilio_conversations_impl_CameraCapturerImpl_createNativeCapturer(JNIEnv *env,
-                                                                           jobject instance,
-                                                                           jobject j_video_capturer);
+Java_com_twilio_conversations_impl_CameraCapturerImpl_nativeCreateNativeCapturer(JNIEnv *env,
+                                                                                 jobject instance,
+                                                                                 jobject j_video_capturer);
 
 JNIEXPORT void JNICALL
-Java_com_twilio_conversations_impl_CameraCapturerImpl_disposeCapturer(JNIEnv *env,
-                                                                      jobject instance,
-                                                                      jlong nativeVideoCapturerAndroid);
+Java_com_twilio_conversations_impl_CameraCapturerImpl_nativeDisposeCapturer(JNIEnv *env,
+                                                                            jobject instance,
+                                                                            jlong nativeVideoCapturerAndroid);
 
 #ifdef __cplusplus
 }
