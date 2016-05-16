@@ -261,7 +261,7 @@ JNIEXPORT void JNICALL Java_com_twilio_conversations_impl_ConversationImpl_start
 }
 
 
-JNIEXPORT void JNICALL Java_com_twilio_conversations_impl_ConversationImpl_stop
+JNIEXPORT void JNICALL Java_com_twilio_conversations_impl_ConversationImpl_nativeStop__J
         (JNIEnv *env, jobject obj, jlong nativeSession)
 {
     TS_CORE_LOG_MODULE(kTSCoreLogModulePlatform, kTSCoreLogLevelDebug, "stop");
@@ -269,7 +269,7 @@ JNIEXPORT void JNICALL Java_com_twilio_conversations_impl_ConversationImpl_stop
     session->get()->stop();
 }
 
-JNIEXPORT void JNICALL Java_com_twilio_conversations_impl_ConversationImpl_setExternalCapturer
+JNIEXPORT void JNICALL Java_com_twilio_conversations_impl_ConversationImpl_nativeSetExternalCapturer
         (JNIEnv *env, jobject obj, jlong nativeSession, jlong nativeCapturer)
 {
     TS_CORE_LOG_MODULE(kTSCoreLogModulePlatform, kTSCoreLogLevelDebug, "setExternalCapturer");
@@ -282,7 +282,7 @@ JNIEXPORT void JNICALL Java_com_twilio_conversations_impl_ConversationImpl_setEx
     }
 }
 
-JNIEXPORT void JNICALL Java_com_twilio_conversations_impl_ConversationImpl_setSessionObserver
+JNIEXPORT void JNICALL Java_com_twilio_conversations_impl_ConversationImpl_nativeSetSessionObserver
         (JNIEnv *, jobject, jlong nativeSession, jlong nativeSessionObserver)
 {
     TS_CORE_LOG_MODULE(kTSCoreLogModulePlatform, kTSCoreLogLevelDebug, "setSessionObserver");
@@ -291,7 +291,7 @@ JNIEXPORT void JNICALL Java_com_twilio_conversations_impl_ConversationImpl_setSe
     session->get()->setSessionObserver(*sessionObserver);
 }
 
-JNIEXPORT jboolean JNICALL Java_com_twilio_conversations_impl_ConversationImpl_enableVideo
+JNIEXPORT jboolean JNICALL Java_com_twilio_conversations_impl_ConversationImpl_nativeEnableVideo__JZZLcom_twilio_conversations_VideoConstraints_2
         (JNIEnv *env, jobject, jlong nativeSession, jboolean enabled, jboolean paused, jobject j_video_constraints)
 {
     TS_CORE_LOG_MODULE(kTSCoreLogModulePlatform, kTSCoreLogLevelDebug, "enableVideo");
@@ -304,7 +304,7 @@ JNIEXPORT jboolean JNICALL Java_com_twilio_conversations_impl_ConversationImpl_e
     }
 }
 
-JNIEXPORT void JNICALL Java_com_twilio_conversations_impl_ConversationImpl_freeNativeHandle
+JNIEXPORT void JNICALL Java_com_twilio_conversations_impl_ConversationImpl_nativeFreeHandle
         (JNIEnv *env, jobject obj, jlong nativeSession) {
     TS_CORE_LOG_MODULE(kTSCoreLogModulePlatform, kTSCoreLogLevelDebug, "freeNativeHandle: Session");
     TSCSessionPtr *session = reinterpret_cast<TSCSessionPtr *>(nativeSession);
@@ -314,7 +314,7 @@ JNIEXPORT void JNICALL Java_com_twilio_conversations_impl_ConversationImpl_freeN
     }
 }
 
-JNIEXPORT jboolean JNICALL Java_com_twilio_conversations_impl_ConversationImpl_mute
+JNIEXPORT jboolean JNICALL Java_com_twilio_conversations_impl_ConversationImpl_nativeMute__JZ
         (JNIEnv *, jobject, jlong nativeSession, jboolean on)
 {
     TS_CORE_LOG_MODULE(kTSCoreLogModulePlatform, kTSCoreLogLevelDebug, "mute");
@@ -326,7 +326,7 @@ JNIEXPORT jboolean JNICALL Java_com_twilio_conversations_impl_ConversationImpl_m
     return JNI_FALSE;
 }
 
-JNIEXPORT jboolean JNICALL Java_com_twilio_conversations_impl_ConversationImpl_isMuted
+JNIEXPORT jboolean JNICALL Java_com_twilio_conversations_impl_ConversationImpl_nativeIsMuted__J
         (JNIEnv *, jobject, jlong nativeSession)
 {
     TS_CORE_LOG_MODULE(kTSCoreLogModulePlatform, kTSCoreLogLevelDebug, "isMuted");
@@ -338,7 +338,7 @@ JNIEXPORT jboolean JNICALL Java_com_twilio_conversations_impl_ConversationImpl_i
     return JNI_FALSE;
 }
 
-JNIEXPORT void JNICALL Java_com_twilio_conversations_impl_ConversationImpl_inviteParticipants
+JNIEXPORT void JNICALL Java_com_twilio_conversations_impl_ConversationImpl_nativeInviteParticipants__JLjava_lang_String_3_093_2
         (JNIEnv *env, jobject obj, jlong nativeSession, jobjectArray participantList)
 {
     TS_CORE_LOG_MODULE(kTSCoreLogModulePlatform, kTSCoreLogLevelDebug, "inviteParticipants");
@@ -358,7 +358,7 @@ JNIEXPORT void JNICALL Java_com_twilio_conversations_impl_ConversationImpl_invit
     session->get()->inviteParticipants(participants);
 }
 
-JNIEXPORT jstring JNICALL Java_com_twilio_conversations_impl_ConversationImpl_getConversationSid
+JNIEXPORT jstring JNICALL Java_com_twilio_conversations_impl_ConversationImpl_nativeGetConversationSid
         (JNIEnv *env, jobject obj, jlong nativeSession)
 {
     TS_CORE_LOG_MODULE(kTSCoreLogModulePlatform, kTSCoreLogLevelDebug, "getConversationSid");
@@ -367,7 +367,7 @@ JNIEXPORT jstring JNICALL Java_com_twilio_conversations_impl_ConversationImpl_ge
     return JavaStringFromStdString(env, session->get()->getConversationSid());
 }
 
-JNIEXPORT jboolean JNICALL Java_com_twilio_conversations_impl_ConversationImpl_enableAudio
+JNIEXPORT jboolean JNICALL Java_com_twilio_conversations_impl_ConversationImpl_nativeEnableAudio__JZZ
         (JNIEnv *, jobject, jlong nativeSession, jboolean j_enabled, jboolean j_muted)
 {
     TS_CORE_LOG_MODULE(kTSCoreLogModulePlatform, kTSCoreLogLevelDebug, "enableAudio");
