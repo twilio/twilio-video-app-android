@@ -3,6 +3,9 @@ package com.twilio.conversations.impl;
 import android.os.Handler;
 import android.os.Looper;
 
+/*
+ * Junk drawer of utility methods needed throughout SDK.
+ */
 public class Util {
     /*
      * Return a handler on the thread looper, or the main thread looper if the calling thread
