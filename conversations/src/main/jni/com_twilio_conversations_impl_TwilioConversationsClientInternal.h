@@ -18,7 +18,7 @@ Java_com_twilio_conversations_impl_TwilioConversationsClientInternal_nativeCreat
  * Method:    listen
  * Signature: (J)V
  */
-JNIEXPORT void JNICALL Java_com_twilio_conversations_impl_TwilioConversationsClientInternal_nativeListen__J
+JNIEXPORT void JNICALL Java_com_twilio_conversations_impl_TwilioConversationsClientInternal_nativeListen
         (JNIEnv *, jobject, jlong);
 
 /*
@@ -26,7 +26,7 @@ JNIEXPORT void JNICALL Java_com_twilio_conversations_impl_TwilioConversationsCli
  * Method:    unlisten
  * Signature: (J)V
  */
-JNIEXPORT void JNICALL Java_com_twilio_conversations_impl_TwilioConversationsClientInternal_nativeUnlisten__J
+JNIEXPORT void JNICALL Java_com_twilio_conversations_impl_TwilioConversationsClientInternal_nativeUnlisten
         (JNIEnv *, jobject, jlong);
 
 /*
@@ -34,7 +34,7 @@ JNIEXPORT void JNICALL Java_com_twilio_conversations_impl_TwilioConversationsCli
  * Method:    reject
  * Signature: (JJ)V
  */
-JNIEXPORT void JNICALL Java_com_twilio_conversations_impl_TwilioConversationsClientInternal_nativeReject__JJ
+JNIEXPORT void JNICALL Java_com_twilio_conversations_impl_TwilioConversationsClientInternal_nativeReject
         (JNIEnv *, jobject, jlong, jlong);
 
 /*
