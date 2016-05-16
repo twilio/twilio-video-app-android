@@ -372,7 +372,7 @@ public class TwilioConversationsClient {
      * Get identity of this conversations client on the network.
      *
      * @return identity of this conversations client
-     *         or null in case when invalid TwilioAccessManager is provided
+     *         or null if an invalid TwilioAccessManager was provided
      */
     public String getIdentity(){
         return conversationsClientInternal.getIdentity();
