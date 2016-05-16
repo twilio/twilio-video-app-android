@@ -11,7 +11,6 @@ import android.graphics.drawable.Drawable;
 import android.media.AudioManager;
 import android.os.Bundle;
 import android.os.Handler;
-import android.provider.MediaStore;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.NotificationCompat;
@@ -90,7 +89,7 @@ import com.twilio.conversations.StatsListener;
 import com.twilio.conversations.TwilioConversationsException;
 import com.twilio.conversations.VideoConstraints;
 import com.twilio.conversations.VideoDimensions;
-import com.twilio.conversations.VideoRendererObserver;
+import com.twilio.conversations.VideoRenderer;
 import com.twilio.conversations.VideoTrack;
 import com.twilio.conversations.VideoViewRenderer;
 import com.twilio.conversations.internal.ClientOptionsInternal;
@@ -1606,7 +1605,7 @@ public class ClientActivity extends AppCompatActivity {
                 // Remote participant
                 VideoViewRenderer participantVideoRenderer = new VideoViewRenderer(ClientActivity.this,
                         participantContainer);
-                participantVideoRenderer.setObserver(new VideoRendererObserver() {
+                participantVideoRenderer.setObserver(new VideoRenderer.Observer() {
                     @Override
                     public void onFirstFrame() {
                         Timber.i("Participant onFirstFrame");

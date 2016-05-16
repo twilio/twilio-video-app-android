@@ -46,7 +46,7 @@ public class VideoViewRenderer implements VideoRenderer {
     private final SurfaceViewRenderer surfaceViewRenderer;
     private boolean mirror = false;
     private VideoScaleType videoScaleType = VideoScaleType.ASPECT_FIT;
-    private VideoRendererObserver rendererObserver;
+    private VideoRenderer.Observer rendererObserver;
 
     /**
      * Create a video view renderer that will display frames in
@@ -80,7 +80,7 @@ public class VideoViewRenderer implements VideoRenderer {
         refreshRenderer();
     }
 
-    public void setObserver(VideoRendererObserver rendererObserver) {
+    public void setObserver(VideoRenderer.Observer rendererObserver) {
         this.rendererObserver = rendererObserver;
     }
 
