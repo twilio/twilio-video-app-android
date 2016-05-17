@@ -9,40 +9,40 @@
 extern "C" {
 #endif
 
-JNIEXPORT jlong JNICALL Java_com_twilio_conversations_impl_ConversationImpl_wrapOutgoingSession
+JNIEXPORT jlong JNICALL Java_com_twilio_conversations_impl_ConversationImpl_nativeWrapOutgoingSession
   (JNIEnv *, jobject, jlong, jlong, jobjectArray);
 
-JNIEXPORT void JNICALL Java_com_twilio_conversations_impl_ConversationImpl_start
+JNIEXPORT void JNICALL Java_com_twilio_conversations_impl_ConversationImpl_nativeStart
   (JNIEnv *, jobject, jlong, jboolean, jboolean, jboolean, jboolean, jobject, jobjectArray, jobject);
 
-JNIEXPORT void JNICALL Java_com_twilio_conversations_impl_ConversationImpl_stop
+JNIEXPORT void JNICALL Java_com_twilio_conversations_impl_ConversationImpl_nativeStop
   (JNIEnv *, jobject, jlong);
 
-JNIEXPORT void JNICALL Java_com_twilio_conversations_impl_ConversationImpl_setExternalCapturer
+JNIEXPORT void JNICALL Java_com_twilio_conversations_impl_ConversationImpl_nativeSetExternalCapturer
   (JNIEnv *, jobject, jlong, jlong);
 
-JNIEXPORT void JNICALL Java_com_twilio_conversations_impl_ConversationImpl_setSessionObserver
+JNIEXPORT void JNICALL Java_com_twilio_conversations_impl_ConversationImpl_nativeSetSessionObserver
   (JNIEnv *, jobject, jlong, jlong);
 
-JNIEXPORT void JNICALL Java_com_twilio_conversations_impl_ConversationImpl_freeNativeHandle
+JNIEXPORT void JNICALL Java_com_twilio_conversations_impl_ConversationImpl_nativeFreeHandle
   (JNIEnv *, jobject, jlong);
 
-JNIEXPORT jboolean JNICALL Java_com_twilio_conversations_impl_ConversationImpl_enableVideo
+JNIEXPORT jboolean JNICALL Java_com_twilio_conversations_impl_ConversationImpl_nativeEnableVideo
   (JNIEnv *, jobject, jlong, jboolean, jboolean, jobject);
 
-JNIEXPORT jboolean JNICALL Java_com_twilio_conversations_impl_ConversationImpl_mute
+JNIEXPORT jboolean JNICALL Java_com_twilio_conversations_impl_ConversationImpl_nativeMute
   (JNIEnv *, jobject, jlong, jboolean);
 
-JNIEXPORT jboolean JNICALL Java_com_twilio_conversations_impl_ConversationImpl_isMuted
+JNIEXPORT jboolean JNICALL Java_com_twilio_conversations_impl_ConversationImpl_nativeIsMuted
   (JNIEnv *, jobject, jlong);
 
-JNIEXPORT void JNICALL Java_com_twilio_conversations_impl_ConversationImpl_inviteParticipants
+JNIEXPORT void JNICALL Java_com_twilio_conversations_impl_ConversationImpl_nativeInviteParticipants
   (JNIEnv *, jobject, jlong, jobjectArray);
 
-JNIEXPORT jstring JNICALL Java_com_twilio_conversations_impl_ConversationImpl_getConversationSid
+JNIEXPORT jstring JNICALL Java_com_twilio_conversations_impl_ConversationImpl_nativeGetConversationSid
   (JNIEnv *, jobject, jlong);
 
-JNIEXPORT jboolean JNICALL Java_com_twilio_conversations_impl_ConversationImpl_enableAudio
+JNIEXPORT jboolean JNICALL Java_com_twilio_conversations_impl_ConversationImpl_nativeEnableAudio
   (JNIEnv *, jobject, jlong, jboolean, jboolean);
 
 

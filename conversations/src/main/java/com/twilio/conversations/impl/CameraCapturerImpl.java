@@ -174,7 +174,7 @@ public class CameraCapturerImpl implements CameraCapturer {
     void pause() {
         lastCapturerState = capturerState;
         if(capturerState.equals(CapturerState.BROADCASTING)) {
-            stopVideoSource(session);
+            nativeStopVideoSource(session);
             broadcastCapturerPaused = true;
         }
     }
@@ -182,7 +182,7 @@ public class CameraCapturerImpl implements CameraCapturer {
     void resume() {
         if(lastCapturerState != null) {
             if(lastCapturerState.equals(CapturerState.BROADCASTING)) {
-                restartVideoSource(session);
+                nativeRestartVideoSource(session);
             }
             lastCapturerState = null;
             broadcastCapturerPaused = false;
@@ -210,7 +210,7 @@ public class CameraCapturerImpl implements CameraCapturer {
      * of the capturer.
      */
     void dispose() {
-        disposeCapturer(nativeVideoCapturerAndroid);
+        nativeDisposeCapturer(nativeVideoCapturerAndroid);
         nativeVideoCapturerAndroid = 0;
     }
 
@@ -293,7 +293,7 @@ public class CameraCapturerImpl implements CameraCapturer {
             return;
         }
         videoCapturerAndroid = VideoCapturerAndroid.create(deviceName, cameraEventsHandler);
-        nativeVideoCapturerAndroid = createNativeCapturer(videoCapturerAndroid);
+        nativeVideoCapturerAndroid = nativeCreateNativeCapturer(videoCapturerAndroid);
     }
 
     private final CameraEventsHandler cameraEventsHandler = new CameraEventsHandler() {
@@ -533,8 +533,8 @@ public class CameraCapturerImpl implements CameraCapturer {
         }
     }
 
-    private native void stopVideoSource(long nativeSession);
-    private native void restartVideoSource(long nativeSession);
-    private native long createNativeCapturer(VideoCapturerAndroid capturerAndroid);
-    private native void disposeCapturer(long nativeVideoCapturerAndroid);
+    private native void nativeStopVideoSource(long nativeSession);
+    private native void nativeRestartVideoSource(long nativeSession);
+    private native long nativeCreateNativeCapturer(VideoCapturerAndroid capturerAndroid);
+    private native void nativeDisposeCapturer(long nativeVideoCapturerAndroid);
 }

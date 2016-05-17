@@ -595,7 +595,7 @@ private:
  * Method:    wrapNativeObserver
  * Signature: (Lcom/twilio/conversations/SessionObserver;Lcom/twilio/conversations/Conversation;)J
  */
-JNIEXPORT jlong JNICALL Java_com_twilio_conversations_impl_ConversationImpl_00024SessionObserverInternal_wrapNativeObserver
+JNIEXPORT jlong JNICALL Java_com_twilio_conversations_impl_ConversationImpl_00024SessionObserverInternal_nativeWrapObserver
         (JNIEnv *env, jobject obj, jobject observer, jobject conversation) {
     TS_CORE_LOG_MODULE(kTSCoreLogModulePlatform, kTSCoreLogLevelDebug, "wrapNativeObserver: Session");
     TSCSessionObserverPtr *sessionObserver = new TSCSessionObserverPtr();
@@ -608,7 +608,7 @@ JNIEXPORT jlong JNICALL Java_com_twilio_conversations_impl_ConversationImpl_0002
  * Method:    freeNativeObserver
  * Signature: (J)V
  */
-JNIEXPORT void JNICALL Java_com_twilio_conversations_impl_ConversationImpl_00024SessionObserverInternal_freeNativeObserver
+JNIEXPORT void JNICALL Java_com_twilio_conversations_impl_ConversationImpl_00024SessionObserverInternal_nativeFreeObserver
         (JNIEnv *env, jobject obj, jlong nativeSessionObserver){
     TS_CORE_LOG_MODULE(kTSCoreLogModulePlatform, kTSCoreLogLevelDebug, "freeNativeObserver: Session");
     TSCSessionObserverPtr *sessionObserver = reinterpret_cast<TSCSessionObserverPtr *>(nativeSessionObserver);
@@ -620,7 +620,7 @@ JNIEXPORT void JNICALL Java_com_twilio_conversations_impl_ConversationImpl_00024
     }
 }
 
-JNIEXPORT void JNICALL Java_com_twilio_conversations_impl_ConversationImpl_00024SessionObserverInternal_enableStats
+JNIEXPORT void JNICALL Java_com_twilio_conversations_impl_ConversationImpl_00024SessionObserverInternal_nativeEnableStats
         (JNIEnv *, jobject, jlong nativeSessionObserver, jlong nativeSession, jboolean enable) {
     TS_CORE_LOG_MODULE(kTSCoreLogModulePlatform, kTSCoreLogLevelDebug, "enableStats");
     TSCSessionObserverPtr *sessionObserver = reinterpret_cast<TSCSessionObserverPtr *>(nativeSessionObserver);

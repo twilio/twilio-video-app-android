@@ -15,7 +15,7 @@ using namespace webrtc_jni;
 #define TAG  "TwilioSDK(native)"
 
 
-JNIEXPORT void JNICALL Java_com_twilio_conversations_impl_CameraCapturerImpl_stopVideoSource
+JNIEXPORT void JNICALL Java_com_twilio_conversations_impl_CameraCapturerImpl_nativeStopVideoSource
         (JNIEnv *env, jobject obj, jlong nativeSession)
 {
     TS_CORE_LOG_MODULE(kTSCoreLogModulePlatform, kTSCoreLogLevelDebug, "stopVideoSource");
@@ -24,7 +24,7 @@ JNIEXPORT void JNICALL Java_com_twilio_conversations_impl_CameraCapturerImpl_sto
 }
 
 
-JNIEXPORT void JNICALL Java_com_twilio_conversations_impl_CameraCapturerImpl_restartVideoSource
+JNIEXPORT void JNICALL Java_com_twilio_conversations_impl_CameraCapturerImpl_nativeRestartVideoSource
         (JNIEnv *env, jobject obj, jlong nativeSession)
 {
     TS_CORE_LOG_MODULE(kTSCoreLogModulePlatform, kTSCoreLogLevelDebug, "stopVideoSource");
@@ -33,9 +33,9 @@ JNIEXPORT void JNICALL Java_com_twilio_conversations_impl_CameraCapturerImpl_res
 }
 
 JNIEXPORT jlong JNICALL
-Java_com_twilio_conversations_impl_CameraCapturerImpl_createNativeCapturer(JNIEnv *env,
-                                                                           jobject instance,
-                                                                           jobject j_video_capturer) {
+Java_com_twilio_conversations_impl_CameraCapturerImpl_nativeCreateNativeCapturer(JNIEnv *env,
+                                                                                 jobject instance,
+                                                                                 jobject j_video_capturer) {
     jobject j_surface_texture_helper =
             env->CallObjectMethod(j_video_capturer,
                                   GetMethodID(env,
@@ -49,9 +49,9 @@ Java_com_twilio_conversations_impl_CameraCapturerImpl_createNativeCapturer(JNIEn
 }
 
 JNIEXPORT void JNICALL
-Java_com_twilio_conversations_impl_CameraCapturerImpl_disposeCapturer(JNIEnv *env,
-                                                                      jobject instance,
-                                                                      jlong nativeVideoCapturerAndroid) {
+Java_com_twilio_conversations_impl_CameraCapturerImpl_nativeDisposeCapturer(JNIEnv *env,
+                                                                            jobject instance,
+                                                                            jlong nativeVideoCapturerAndroid) {
     webrtc::AndroidVideoCapturer *capturer =
             reinterpret_cast<webrtc::AndroidVideoCapturer *>(nativeVideoCapturerAndroid);
     delete capturer;

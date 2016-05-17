@@ -68,13 +68,13 @@ public class TwilioConversationsClientInternal implements
         private long nativeEndpointObserver;
 
         public EndpointObserverInternal(EndpointObserver observer) {
-            this.nativeEndpointObserver = wrapNativeObserver(observer,
+            this.nativeEndpointObserver = nativeWrapObserver(observer,
                     TwilioConversationsClientInternal.this);
         }
 
-        private native long wrapNativeObserver(EndpointObserver observer,
+        private native long nativeWrapObserver(EndpointObserver observer,
                                                TwilioConversationsClientInternal twilioConversationsClientInternal);
-        private native void freeNativeObserver(long nativeEndpointObserver);
+        private native void nativeFreeObserver(long nativeEndpointObserver);
 
         @Override
         public long getNativeHandle() {
@@ -83,7 +83,7 @@ public class TwilioConversationsClientInternal implements
 
         public void dispose() {
             if (nativeEndpointObserver != 0) {
-                freeNativeObserver(nativeEndpointObserver);
+                nativeFreeObserver(nativeEndpointObserver);
                 nativeEndpointObserver = 0;
             }
         }
@@ -139,7 +139,7 @@ public class TwilioConversationsClientInternal implements
         String[] optionsArray = getOptionsArray(options);
 
         endpointObserver = new EndpointObserverInternal(this);
-        nativeEndpointHandle = createEndpoint(accessManager, optionsArray,
+        nativeEndpointHandle = nativeCreateEndpoint(accessManager, optionsArray,
                 endpointObserver.getNativeHandle());
 
         if(nativeEndpointHandle == 0) {
@@ -178,13 +178,13 @@ public class TwilioConversationsClientInternal implements
     public synchronized void listen() {
         if(nativeEndpointHandle != 0) {
             listening = true;
-            listen(nativeEndpointHandle);
+            nativeListen(nativeEndpointHandle);
         }
     }
 
     public synchronized void unlisten() {
         if(nativeEndpointHandle != 0) {
-            unlisten(nativeEndpointHandle);
+            nativeUnlisten(nativeEndpointHandle);
         }
     }
 
@@ -535,7 +535,7 @@ public class TwilioConversationsClientInternal implements
      */
     @Override
     public void reject(ConversationImpl conversationImpl) {
-        reject(getNativeHandle(), conversationImpl.getNativeHandle());
+        nativeReject(getNativeHandle(), conversationImpl.getNativeHandle());
         pendingIncomingInvites.remove(conversationImpl);
         conversations.remove(conversationImpl);
     }
@@ -568,7 +568,7 @@ public class TwilioConversationsClientInternal implements
 
     public void disposeClient() {
         if (nativeEndpointHandle != 0) {
-            freeNativeHandle(nativeEndpointHandle);
+            nativeFreeHandle(nativeEndpointHandle);
             nativeEndpointHandle = 0;
         }
         if (endpointObserver != null) {
@@ -577,11 +577,11 @@ public class TwilioConversationsClientInternal implements
         }
     }
 
-    private native long createEndpoint(TwilioAccessManager accessManager,
-                                       String[] optionsArray,
-                                       long nativeEndpointObserver);
-    private native void listen(long nativeEndpoint);
-    private native void unlisten(long nativeEndpoint);
-    private native void reject(long nativeEndpoint, long nativeSession);
-    private native void freeNativeHandle(long nativeEndpoint);
+    private native long nativeCreateEndpoint(TwilioAccessManager accessManager,
+                                             String[] optionsArray,
+                                             long nativeEndpointObserver);
+    private native void nativeListen(long nativeEndpoint);
+    private native void nativeUnlisten(long nativeEndpoint);
+    private native void nativeReject(long nativeEndpoint, long nativeSession);
+    private native void nativeFreeHandle(long nativeEndpoint);
 }
