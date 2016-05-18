@@ -3,6 +3,7 @@ package com.twilio.conversations;
 import android.content.Context;
 import android.os.Handler;
 import android.os.Looper;
+import android.view.SurfaceView;
 import android.view.ViewGroup;
 
 import com.twilio.conversations.impl.EglBaseProvider;
@@ -94,6 +95,10 @@ public class VideoViewRenderer implements VideoRenderer {
     @Override
     public void renderFrame(I420Frame frame) {
         surfaceViewRenderer.renderFrame(convertToWebRtcFrame(frame));
+    }
+
+    public SurfaceView getSurfaceView(){
+        return surfaceViewRenderer;
     }
 
     private void setupRenderer(final Context context, final ViewGroup container) {
