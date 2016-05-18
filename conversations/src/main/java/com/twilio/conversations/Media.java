@@ -1,7 +1,5 @@
 package com.twilio.conversations;
 
-import com.twilio.conversations.core.TrackInfo;
-
 import java.util.ArrayList;
 import java.util.List;
 

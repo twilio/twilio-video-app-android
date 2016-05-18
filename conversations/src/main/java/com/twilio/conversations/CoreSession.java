@@ -1,6 +1,4 @@
-package com.twilio.conversations.core;
-
-import com.twilio.conversations.VideoConstraints;
+package com.twilio.conversations;
 
 import java.util.Set;
 

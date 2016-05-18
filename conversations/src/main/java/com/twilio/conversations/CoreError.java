@@ -1,4 +1,4 @@
-package com.twilio.conversations.core;
+package com.twilio.conversations;
 
 public interface CoreError {
     int getCode();

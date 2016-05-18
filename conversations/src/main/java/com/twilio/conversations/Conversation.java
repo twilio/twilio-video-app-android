@@ -2,17 +2,6 @@ package com.twilio.conversations;
 
 import android.os.Handler;
 
-import com.twilio.conversations.core.ConversationStateObserver;
-import com.twilio.conversations.core.ConversationStatus;
-import com.twilio.conversations.core.CoreError;
-import com.twilio.conversations.core.CoreSession;
-import com.twilio.conversations.core.CoreSessionMediaConstraints;
-import com.twilio.conversations.core.CoreTrackStatsReport;
-import com.twilio.conversations.core.DisconnectReason;
-import com.twilio.conversations.core.MediaStreamInfo;
-import com.twilio.conversations.core.SessionObserver;
-import com.twilio.conversations.core.SessionState;
-import com.twilio.conversations.core.TrackInfo;
 import com.twilio.conversations.internal.Logger;
 
 import java.util.ArrayList;

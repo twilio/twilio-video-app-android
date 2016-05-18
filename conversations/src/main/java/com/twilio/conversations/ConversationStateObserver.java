@@ -1,6 +1,4 @@
-package com.twilio.conversations.core;
-
-import com.twilio.conversations.Conversation;
+package com.twilio.conversations;
 
 public interface ConversationStateObserver {
     void onConversationStatusChanged(Conversation conversation,

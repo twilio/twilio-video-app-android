@@ -1,4 +1,4 @@
-package com.twilio.conversations.core;
+package com.twilio.conversations;
 
 class MediaStreamInfoImpl implements MediaStreamInfo {
     private long sessionId;

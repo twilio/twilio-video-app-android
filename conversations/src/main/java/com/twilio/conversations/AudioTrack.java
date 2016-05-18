@@ -1,7 +1,5 @@
 package com.twilio.conversations;
 
-import com.twilio.conversations.core.TrackInfo;
-
 /**
  * An audio track represents a single local or remote audio source
  */

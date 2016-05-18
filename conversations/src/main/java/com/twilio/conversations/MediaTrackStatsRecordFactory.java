@@ -1,7 +1,5 @@
 package com.twilio.conversations;
 
-import com.twilio.conversations.core.CoreTrackStatsReport;
-
 class MediaTrackStatsRecordFactory {
     public static MediaTrackStatsRecord create(CoreTrackStatsReport report) {
         MediaTrackStatsRecord record = null;

@@ -1,6 +1,5 @@
 package com.twilio.conversations;
 
-import com.twilio.conversations.core.TrackInfo;
 import com.twilio.conversations.internal.Logger;
 
 import java.lang.reflect.Field;

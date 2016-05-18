@@ -1,4 +1,4 @@
-package com.twilio.conversations.core;
+package com.twilio.conversations;
 
 import java.net.InetAddress;
 import java.net.NetworkInterface;

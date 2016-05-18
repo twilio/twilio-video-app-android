@@ -1,4 +1,4 @@
-package com.twilio.conversations.core;
+package com.twilio.conversations;
 
 import org.webrtc.VideoTrack;
 import org.webrtc.AudioTrack;

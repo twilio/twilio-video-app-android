@@ -30,88 +30,88 @@ public:
             j_observer_class_(
                     jni, GetObjectClass(jni, j_observer)),
             j_track_stats_report_class_(
-                    jni, jni->FindClass("com/twilio/conversations/core/CoreTrackStatsReport")),
+                    jni, jni->FindClass("com/twilio/conversations/CoreTrackStatsReport")),
             j_session_state_changed_id(
                     GetMethodID(jni,
                                 *j_observer_class_,
                                 "onSessionStateChanged",
-                                "(Lcom/twilio/conversations/core/SessionState;)V")),
+                                "(Lcom/twilio/conversations/SessionState;)V")),
             j_start_completed_id(
                     GetMethodID(jni,
                                 *j_observer_class_,
                                 "onStartCompleted",
-                                "(Lcom/twilio/conversations/core/CoreError;)V")),
+                                "(Lcom/twilio/conversations/CoreError;)V")),
             j_stop_completed_id(
                     GetMethodID(jni,
                                 *j_observer_class_,
                                 "onStopCompleted",
-                                "(Lcom/twilio/conversations/core/CoreError;)V")),
+                                "(Lcom/twilio/conversations/CoreError;)V")),
             j_participant_connected_id(
                     GetMethodID(jni,
                                 *j_observer_class_,
                                 "onParticipantConnected",
-                                "(Ljava/lang/String;Ljava/lang/String;Lcom/twilio/conversations/core/CoreError;)V")),
+                                "(Ljava/lang/String;Ljava/lang/String;Lcom/twilio/conversations/CoreError;)V")),
             j_participant_disconnected_id(
                     GetMethodID(jni,
                                 *j_observer_class_,
                                 "onParticipantDisconnected",
-                                "(Ljava/lang/String;Ljava/lang/String;Lcom/twilio/conversations/core/DisconnectReason;)V")),
+                                "(Ljava/lang/String;Ljava/lang/String;Lcom/twilio/conversations/DisconnectReason;)V")),
             j_media_stream_added_id(
                     GetMethodID(jni,
                                 *j_observer_class_,
                                 "onMediaStreamAdded",
-                                "(Lcom/twilio/conversations/core/MediaStreamInfo;)V")),
+                                "(Lcom/twilio/conversations/MediaStreamInfo;)V")),
             j_media_stream_removed_id(
                     GetMethodID(jni,
                                 *j_observer_class_,
                                 "onMediaStreamRemoved",
-                                "(Lcom/twilio/conversations/core/MediaStreamInfo;)V")),
+                                "(Lcom/twilio/conversations/MediaStreamInfo;)V")),
             j_video_track_added_id_(
                     GetMethodID(jni,
                                 *j_observer_class_,
                                 "onVideoTrackAdded",
-                                "(Lcom/twilio/conversations/core/TrackInfo;Lorg/webrtc/VideoTrack;)V")),
+                                "(Lcom/twilio/conversations/TrackInfo;Lorg/webrtc/VideoTrack;)V")),
             j_video_track_failed_to_add_id_(
                     GetMethodID(jni,
                                 *j_observer_class_,
                                 "onVideoTrackFailedToAdd",
-                                "(Lcom/twilio/conversations/core/TrackInfo;Lcom/twilio/conversations/core/CoreError;)V")),
+                                "(Lcom/twilio/conversations/TrackInfo;Lcom/twilio/conversations/CoreError;)V")),
             j_video_track_removed_id_(
                     GetMethodID(jni,
                                 *j_observer_class_,
                                 "onVideoTrackRemoved",
-                                "(Lcom/twilio/conversations/core/TrackInfo;)V")),
+                                "(Lcom/twilio/conversations/TrackInfo;)V")),
             j_video_track_state_changed_id_(
                     GetMethodID(jni,
                                 *j_observer_class_,
                                 "onVideoTrackStateChanged",
-                                "(Lcom/twilio/conversations/core/TrackInfo;)V")),
+                                "(Lcom/twilio/conversations/TrackInfo;)V")),
             j_audio_track_added_id_(
                     GetMethodID(jni,
                                 *j_observer_class_,
                                 "onAudioTrackAdded",
-                                "(Lcom/twilio/conversations/core/TrackInfo;Lorg/webrtc/AudioTrack;)V")),
+                                "(Lcom/twilio/conversations/TrackInfo;Lorg/webrtc/AudioTrack;)V")),
             j_audio_track_removed_id_(
                     GetMethodID(jni,
                                 *j_observer_class_,
                                 "onAudioTrackRemoved",
-                                "(Lcom/twilio/conversations/core/TrackInfo;)V")),
+                                "(Lcom/twilio/conversations/TrackInfo;)V")),
             j_audio_track_state_changed_id_(
                     GetMethodID(jni,
                                 *j_observer_class_,
                                 "onAudioTrackStateChanged",
-                                "(Lcom/twilio/conversations/core/TrackInfo;)V")),
+                                "(Lcom/twilio/conversations/TrackInfo;)V")),
             j_receive_track_statistics_id_(
-                    GetMethodID(jni, *j_observer_class_, "onReceiveTrackStatistics", "(Lcom/twilio/conversations/core/CoreTrackStatsReport;)V")),
+                    GetMethodID(jni, *j_observer_class_, "onReceiveTrackStatistics", "(Lcom/twilio/conversations/CoreTrackStatsReport;)V")),
             j_track_stats_report_ctor_id_(
                     GetMethodID(jni, *j_track_stats_report_class_, "<init>",
                                 "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;D[Ljava/lang/String;[Ljava/lang/String;)V")),
             j_trackinfo_class_(
-                    jni, jni->FindClass("com/twilio/conversations/core/TrackInfoImpl")),
+                    jni, jni->FindClass("com/twilio/conversations/TrackInfoImpl")),
             j_trackorigin_class_(
                     jni, jni->FindClass("com/twilio/conversations/TrackOrigin")),
             j_sessionstate_enum_(
-                    jni, jni->FindClass("com/twilio/conversations/core/SessionState")),
+                    jni, jni->FindClass("com/twilio/conversations/SessionState")),
             j_trackinfo_ctor_id_(
                     GetMethodID(jni,
                                 *j_trackinfo_class_,
@@ -132,16 +132,16 @@ public:
                                 "<init>",
                                 "(J)V")),
             j_errorimpl_class_(
-                    jni, jni->FindClass("com/twilio/conversations/core/CoreErrorImpl")),
+                    jni, jni->FindClass("com/twilio/conversations/CoreErrorImpl")),
             j_errorimpl_ctor_id_(
                     GetMethodID(jni,
                                 *j_errorimpl_class_,
                                 "<init>",
                                 "(Ljava/lang/String;ILjava/lang/String;)V")),
             j_disreason_enum_(
-                    jni, jni->FindClass("com/twilio/conversations/core/DisconnectReason")),
+                    jni, jni->FindClass("com/twilio/conversations/DisconnectReason")),
             j_media_stream_info_class_(
-                    jni, jni->FindClass("com/twilio/conversations/core/MediaStreamInfoImpl")),
+                    jni, jni->FindClass("com/twilio/conversations/MediaStreamInfoImpl")),
             j_media_stream_info_ctor_(
                     GetMethodID(jni,
                                 *j_media_stream_info_class_,
@@ -173,7 +173,7 @@ protected:
 
         TS_CORE_LOG_MODULE(kTSCoreLogModulePlatform, kTSCoreLogLevelDebug, "onStateDidChange");
 
-        const std::string session_state_class = "com/twilio/conversations/core/SessionState";
+        const std::string session_state_class = "com/twilio/conversations/SessionState";
         jobject j_session_state = webrtc_jni::JavaEnumFromIndex(
                 jni(), *j_sessionstate_enum_, session_state_class, state);
         CHECK_EXCEPTION(jni()) << "error during NewObject";
@@ -251,13 +251,13 @@ protected:
 
         TS_CORE_LOG_MODULE(kTSCoreLogModulePlatform,
                            kTSCoreLogLevelDebug,
-                           "onParticipantDidDisconect");
+                           "onParticipantDidDisconnect");
 
         jstring j_participant_identity = stringToJString(jni(), participant);
         jstring j_participant_sid = stringToJString(jni(), participantSid);
 
         const std::string dis_reason_class =
-                "com/twilio/conversations/core/DisconnectReason";
+                "com/twilio/conversations/DisconnectReason";
         jobject j_reason = webrtc_jni::JavaEnumFromIndex(
                 jni(), *j_disreason_enum_, dis_reason_class, reason);
         CHECK_EXCEPTION(jni()) << "error during NewObject";

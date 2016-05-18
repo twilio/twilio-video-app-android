@@ -1,8 +1,6 @@
 package com.twilio.conversations;
 
 
-import com.twilio.conversations.core.CoreTrackStatsReport;
-
 public class LocalVideoTrackStatsRecord extends MediaTrackStatsRecord {
     private final long bytesSent;
     private final long packetsSent;

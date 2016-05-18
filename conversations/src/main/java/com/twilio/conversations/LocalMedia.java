@@ -2,7 +2,6 @@ package com.twilio.conversations;
 
 import android.os.Handler;
 
-import com.twilio.conversations.core.TrackInfo;
 import com.twilio.conversations.internal.Logger;
 
 import java.lang.ref.WeakReference;

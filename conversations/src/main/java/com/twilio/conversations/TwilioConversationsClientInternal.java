@@ -13,13 +13,6 @@ import android.media.AudioManager;
 import android.os.Handler;
 
 import com.twilio.common.TwilioAccessManager;
-import com.twilio.conversations.core.ConversationStateObserver;
-import com.twilio.conversations.core.ConversationStatus;
-import com.twilio.conversations.core.CoreEndpoint;
-import com.twilio.conversations.core.CoreError;
-import com.twilio.conversations.core.EndpointObserver;
-import com.twilio.conversations.core.EndpointState;
-import com.twilio.conversations.core.SessionState;
 import com.twilio.conversations.internal.Logger;
 import com.twilio.conversations.internal.ClientOptionsInternal;
 

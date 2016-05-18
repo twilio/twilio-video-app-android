@@ -1,7 +1,5 @@
 package com.twilio.conversations;
 
-import com.twilio.conversations.core.CoreTrackStatsReport;
-
 public class RemoteAudioTrackStatsRecord extends MediaTrackStatsRecord {
     private final long bytesReceived;
     private final long packetsReceived;

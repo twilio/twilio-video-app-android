@@ -1,7 +1,5 @@
 package com.twilio.conversations;
 
-import com.twilio.conversations.core.CoreTrackStatsReport;
-
 public class MediaTrackStatsRecord {
     private final String trackId;
     private final int packetsLost;

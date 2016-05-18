@@ -25,26 +25,26 @@ public:
                      GetMethodID(env,
                                  *j_observer_class_,
                                  "onRegistrationDidComplete",
-                                 "(Lcom/twilio/conversations/core/CoreError;)V")),
+                                 "(Lcom/twilio/conversations/CoreError;)V")),
              j_unreg_complete_(
                      GetMethodID(env,
                                  *j_observer_class_,
                                  "onUnregistrationDidComplete",
-                                 "(Lcom/twilio/conversations/core/CoreError;)V")),
+                                 "(Lcom/twilio/conversations/CoreError;)V")),
              j_state_change_(
                      GetMethodID(env,
                                  *j_observer_class_,
                                  "onStateDidChange",
-                                 "(Lcom/twilio/conversations/core/EndpointState;)V")),
+                                 "(Lcom/twilio/conversations/EndpointState;)V")),
              j_incoming_call_(
                      GetMethodID(env,
                                  *j_observer_class_,
                                  "onIncomingCallDidReceive",
                                  "(J[Ljava/lang/String;)V")),
              j_statetype_enum_(
-                     env, env->FindClass("com/twilio/conversations/core/EndpointState")),
+                     env, env->FindClass("com/twilio/conversations/EndpointState")),
              j_errorimpl_class_(
-                     env, env->FindClass("com/twilio/conversations/core/CoreErrorImpl")),
+                     env, env->FindClass("com/twilio/conversations/CoreErrorImpl")),
              j_errorimpl_ctor_id_(
                      GetMethodID( env,
                                   *j_errorimpl_class_,
@@ -114,7 +114,7 @@ protected:
                            "onStateDidChange, new state:%d",
                            state);
 
-        const std::string state_type_enum = "com/twilio/conversations/core/EndpointState";
+        const std::string state_type_enum = "com/twilio/conversations/EndpointState";
 
         jobject j_state_type =
                 webrtc_jni::JavaEnumFromIndex(jni(), *j_statetype_enum_, state_type_enum, state);
@@ -233,7 +233,7 @@ private:
 /*
  * Class:     com_twilio_conversations_ConversationsClient_EndpointObserverInternal
  * Method:    wrapNativeObserver
- * Signature: (Lcom/twilio/conversations/core/EndpointObserver;Lcom/twilio/conversations/Endpoint;)J
+ * Signature: (Lcom/twilio/conversations/EndpointObserver;Lcom/twilio/conversations/Endpoint;)J
  */
 JNIEXPORT jlong JNICALL Java_com_twilio_conversations_TwilioConversationsClientInternal_00024EndpointObserverInternal_nativeWrapObserver
         (JNIEnv *env, jobject obj, jobject j_endpoint_observer, jobject j_endpoint) {

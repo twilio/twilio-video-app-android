@@ -1,6 +1,4 @@
-package com.twilio.conversations.core;
-
-import com.twilio.conversations.TrackOrigin;
+package com.twilio.conversations;
 
 
 public class TrackInfoImpl implements TrackInfo {
