@@ -1602,7 +1602,7 @@ public class ClientActivity extends AppCompatActivity {
                 // Remote participant
                 VideoViewRenderer participantVideoRenderer = new VideoViewRenderer(ClientActivity.this,
                         participantContainer);
-                participantVideoRenderer.setObserver(new VideoRenderer.Observer() {
+                participantVideoRenderer.setObserver(new VideoRenderer.Listener() {
                     @Override
                     public void onFirstFrame() {
                         Timber.i("Participant onFirstFrame");
