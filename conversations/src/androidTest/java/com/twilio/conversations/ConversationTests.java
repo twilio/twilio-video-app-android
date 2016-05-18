@@ -61,7 +61,7 @@ public class ConversationTests extends TwilioConversationsTestsBase {
         TwilioAccessManager accessManager = AccessTokenHelper.obtainTwilioAccessManager(context, USER);
         TwilioConversationsClient twilioConversationsClient = TwilioConversationsClientHelper.registerClient(activityRule.getActivity(), accessManager);
 
-        LocalMedia localMedia = LocalMediaFactory.createLocalMedia(new LocalMediaListener() {
+        LocalMedia localMedia = LocalMediaFactory.createLocalMedia(new LocalMedia.Listener() {
             @Override
             public void onLocalVideoTrackAdded(final LocalMedia localMedia, LocalVideoTrack localVideoTrack) {
                 try {

@@ -91,7 +91,7 @@ public class VideoConstraintsTests extends TwilioConversationsTestsBase {
                         .maxVideoDimensions(new VideoDimensions(10,20))
                         .build());
 
-        LocalMedia localMedia = LocalMediaFactory.createLocalMedia(new LocalMediaListener() {
+        LocalMedia localMedia = LocalMediaFactory.createLocalMedia(new LocalMedia.Listener() {
             @Override
             public void onLocalVideoTrackAdded(LocalMedia localMedia, LocalVideoTrack videoTrack) {
                 fail();
@@ -187,7 +187,7 @@ public class VideoConstraintsTests extends TwilioConversationsTestsBase {
                         .maxVideoDimensions(VideoDimensions.VGA_VIDEO_DIMENSIONS)
                         .build());
 
-        LocalMedia localMedia = LocalMediaFactory.createLocalMedia(new LocalMediaListener() {
+        LocalMedia localMedia = LocalMediaFactory.createLocalMedia(new LocalMedia.Listener() {
             @Override
             public void onLocalVideoTrackAdded(LocalMedia localMedia, LocalVideoTrack videoTrack) {
                 localVideoTrackAddedLatch.countDown();
