@@ -1,18 +1,51 @@
 package com.twilio.conversations;
 
-public interface MediaTrackStatsRecord {
+import com.twilio.conversations.core.CoreTrackStatsReport;
 
-    String getTrackId();
+public class MediaTrackStatsRecord {
+    private final String trackId;
+    private final int packetsLost;
+    private final String direction;
+    private final String codecName;
+    private final String ssrc;
+    private final String participantSid;
+    private final long unixTimestamp;
 
-    int getPacketsLost();
+    public MediaTrackStatsRecord(CoreTrackStatsReport report) {
+        trackId = report.trackId;
+        packetsLost = report.getIntValue(CoreTrackStatsReport.KeyEnum.PACKETS_LOST);
+        direction = report.direction;
+        codecName = report.codecName;
+        ssrc = report.ssrc;
+        participantSid = report.participantSid;
+        unixTimestamp = report.timestamp;
+    }
 
-    String getDirection();
+    public String getTrackId() {
+        return trackId;
+    }
 
-    String getCodecName();
+    public int getPacketsLost() {
+        return packetsLost;
+    }
 
-    String getSsrc();
+    public String getDirection() {
+        return direction;
+    }
 
-    String getParticipantSid();
+    public String getCodecName() {
+        return codecName;
+    }
 
-    long getUnixTimestamp();
+    public String getSsrc() {
+        return ssrc;
+    }
+
+    public String getParticipantSid() {
+        return participantSid;
+    }
+
+    public long getUnixTimestamp() {
+        return unixTimestamp;
+    }
 }

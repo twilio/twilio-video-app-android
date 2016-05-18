@@ -3,7 +3,6 @@ package com.twilio.conversations;
 import android.content.Context;
 
 import com.twilio.conversations.CameraCapturer.CameraSource;
-import com.twilio.conversations.impl.CameraCapturerImpl;
 
 /**
  * A factory for creating an instance of {@link CameraCapturer}
@@ -20,6 +19,6 @@ public class CameraCapturerFactory {
             Context context,
             CameraSource source,
             CapturerErrorListener listener) {
-        return CameraCapturerImpl.create(context, source, listener);
+        return CameraCapturer.create(context, source, listener);
     }
 }

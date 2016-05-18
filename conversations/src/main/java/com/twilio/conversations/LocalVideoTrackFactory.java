@@ -1,7 +1,5 @@
 package com.twilio.conversations;
 
-import com.twilio.conversations.impl.LocalVideoTrackImpl;
-
 /**
  * A factory for creating an instance of {@link LocalVideoTrack}
  */
@@ -13,7 +11,7 @@ public class LocalVideoTrackFactory {
      * @return new instance of LocalVideoTrack
      */
     public static LocalVideoTrack createLocalVideoTrack(CameraCapturer cameraCapturer) {
-        return new LocalVideoTrackImpl(cameraCapturer);
+        return new LocalVideoTrack(cameraCapturer);
     }
 
     /**
@@ -29,7 +27,7 @@ public class LocalVideoTrackFactory {
      */
     public static LocalVideoTrack createLocalVideoTrack(CameraCapturer cameraCapturer,
                                                         VideoConstraints videoConstraints) {
-        return new LocalVideoTrackImpl(cameraCapturer, videoConstraints);
+        return new LocalVideoTrack(cameraCapturer, videoConstraints);
     }
 }
 

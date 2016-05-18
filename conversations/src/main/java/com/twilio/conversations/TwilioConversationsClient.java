@@ -14,11 +14,7 @@ import android.os.Handler;
 import android.util.Log;
 
 import com.twilio.common.TwilioAccessManager;
-import com.twilio.conversations.impl.ApplicationForegroundTracker;
-import com.twilio.conversations.impl.TwilioConversationsClientInternal;
-import com.twilio.conversations.impl.Util;
-import com.twilio.conversations.impl.WakeUpReceiver;
-import com.twilio.conversations.impl.logging.Logger;
+import com.twilio.conversations.internal.Logger;
 import com.twilio.conversations.internal.ReLinker;
 
 import java.util.ArrayDeque;

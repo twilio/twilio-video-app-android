@@ -1,18 +1,48 @@
 package com.twilio.conversations;
 
 
-public interface LocalAudioTrackStatsRecord extends MediaTrackStatsRecord {
+import com.twilio.conversations.core.CoreTrackStatsReport;
 
-    long getBytesSent();
+public class LocalAudioTrackStatsRecord extends MediaTrackStatsRecord {
+    private final long bytesSent;
+    private final long packetsSent;
+    private final int audioInputLevel;
+    private final int jitterReceived;
+    private final int jitter;
+    private final int roundTripTime;
 
-    long getPacketsSent();
+    public LocalAudioTrackStatsRecord(CoreTrackStatsReport report) {
+        super(report);
+        this.bytesSent = report.getLongValue(CoreTrackStatsReport.KeyEnum.BYTES_SENT);
+        this.packetsSent = report.getLongValue(CoreTrackStatsReport.KeyEnum.PACKETS_SENT);
+        audioInputLevel = report.getIntValue(CoreTrackStatsReport.KeyEnum.AUDIO_INPUT_LEVEL);
+        jitterReceived = report.getIntValue(CoreTrackStatsReport.KeyEnum.JITTER_RECEIVED);
+        jitter = report.getIntValue(CoreTrackStatsReport.KeyEnum.JITTER);
+        roundTripTime = report.getIntValue(CoreTrackStatsReport.KeyEnum.RTT);
 
-    int getAudioInputLevel();
+    }
 
-    int getJitterReceived();
+    public long getBytesSent() {
+        return bytesSent;
+    }
 
-    int getJitter();
+    public long getPacketsSent() {
+        return packetsSent;
+    }
 
-    int getRoundTripTime();
+    public int getAudioInputLevel() {
+        return audioInputLevel;
+    }
 
+    public int getJitterReceived() {
+        return jitterReceived;
+    }
+
+    public int getJitter() {
+        return jitter;
+    }
+
+    public int getRoundTripTime() {
+        return roundTripTime;
+    }
 }

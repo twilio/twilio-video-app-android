@@ -4,6 +4,6 @@
     package="com.twilio.conversations">
 
     <application>
-        <receiver android:name=".impl.WakeUpReceiver" />
+        <receiver android:name=".WakeUpReceiver" />
     </application>
 </manifest>

@@ -1,8 +1,5 @@
 package com.twilio.conversations;
 
-import com.twilio.conversations.impl.LocalMediaImpl;
-
-
 /**
  * A factory for creating an instance of {@link LocalMedia}
  *
@@ -17,6 +14,6 @@ public class LocalMediaFactory {
      * @return instance of local media
      */
     public static LocalMedia createLocalMedia(LocalMedia.Listener localMediaListener) {
-        return new LocalMediaImpl(localMediaListener);
+        return new LocalMedia(localMediaListener);
     }
 }
