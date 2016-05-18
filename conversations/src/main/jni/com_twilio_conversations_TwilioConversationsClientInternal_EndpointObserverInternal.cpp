@@ -44,7 +44,7 @@ public:
              j_statetype_enum_(
                      env, env->FindClass("com/twilio/conversations/EndpointState")),
              j_errorimpl_class_(
-                     env, env->FindClass("com/twilio/conversations/CoreErrorImpl")),
+                     env, env->FindClass("com/twilio/conversations/CoreError")),
              j_errorimpl_ctor_id_(
                      GetMethodID( env,
                                   *j_errorimpl_class_,

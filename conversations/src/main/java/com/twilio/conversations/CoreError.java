@@ -1,9 +1,25 @@
 package com.twilio.conversations;
 
-public interface CoreError {
-    int getCode();
+public class CoreError {
+    private String errorDomain;
+    private int errorCode;
+    private String errorMesage;
 
-    String getDomain();
+    public CoreError(String errorDomain, int errorCode, String errorMessage) {
+        this.errorDomain = errorDomain;
+        this.errorCode = errorCode;
+        this.errorMesage = errorMessage;
+    }
 
-    String getMessage();
+    public int getCode() {
+        return errorCode;
+    }
+
+    public String getDomain() {
+        return errorDomain;
+    }
+
+    public String getMessage() {
+        return errorMesage;
+    }
 }

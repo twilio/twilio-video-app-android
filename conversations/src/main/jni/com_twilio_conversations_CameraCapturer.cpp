@@ -49,7 +49,7 @@ Java_com_twilio_conversations_CameraCapturer_nativeCreateNativeCapturer(JNIEnv *
 }
 
 JNIEXPORT void JNICALL
-Java_com_twilio_conversations_impl_CameraCapturer_nativeDisposeCapturer(JNIEnv *env,
+Java_com_twilio_conversations_CameraCapturer_nativeDisposeCapturer(JNIEnv *env,
                                                                         jobject instance,
                                                                         jlong nativeVideoCapturerAndroid) {
     webrtc::AndroidVideoCapturer *capturer =

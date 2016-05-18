@@ -1,13 +1,34 @@
 package com.twilio.conversations;
 
-import com.twilio.conversations.TrackOrigin;
+public class TrackInfo {
+    private String participantIdentity;
+    private String trackId;
+    private TrackOrigin trackOrigin;
+    private boolean enabled;
 
-public interface TrackInfo {
-    String getParticipantIdentity();
+    public TrackInfo(String participantIdentity,
+                     String trackId,
+                     TrackOrigin trackOrigin,
+                     boolean enabled) {
+        this.participantIdentity = participantIdentity;
+        this.trackId = trackId;
+        this.trackOrigin = trackOrigin;
+        this.enabled = enabled;
+    }
 
-    String getTrackId();
+    public String getParticipantIdentity() {
+        return participantIdentity;
+    }
 
-    TrackOrigin getTrackOrigin();
+    public String getTrackId() {
+        return trackId;
+    }
 
-    boolean isEnabled();
+    public TrackOrigin getTrackOrigin() {
+        return trackOrigin;
+    }
+
+    public boolean isEnabled() {
+        return enabled;
+    }
 }

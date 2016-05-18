@@ -107,7 +107,7 @@ public:
                     GetMethodID(jni, *j_track_stats_report_class_, "<init>",
                                 "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;D[Ljava/lang/String;[Ljava/lang/String;)V")),
             j_trackinfo_class_(
-                    jni, jni->FindClass("com/twilio/conversations/TrackInfoImpl")),
+                    jni, jni->FindClass("com/twilio/conversations/TrackInfo")),
             j_trackorigin_class_(
                     jni, jni->FindClass("com/twilio/conversations/TrackOrigin")),
             j_sessionstate_enum_(
@@ -132,7 +132,7 @@ public:
                                 "<init>",
                                 "(J)V")),
             j_errorimpl_class_(
-                    jni, jni->FindClass("com/twilio/conversations/CoreErrorImpl")),
+                    jni, jni->FindClass("com/twilio/conversations/CoreError")),
             j_errorimpl_ctor_id_(
                     GetMethodID(jni,
                                 *j_errorimpl_class_,
@@ -141,7 +141,7 @@ public:
             j_disreason_enum_(
                     jni, jni->FindClass("com/twilio/conversations/DisconnectReason")),
             j_media_stream_info_class_(
-                    jni, jni->FindClass("com/twilio/conversations/MediaStreamInfoImpl")),
+                    jni, jni->FindClass("com/twilio/conversations/MediaStreamInfo")),
             j_media_stream_info_ctor_(
                     GetMethodID(jni,
                                 *j_media_stream_info_class_,
