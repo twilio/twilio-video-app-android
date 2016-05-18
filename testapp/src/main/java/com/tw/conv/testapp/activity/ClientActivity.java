@@ -1668,9 +1668,31 @@ public class ClientActivity extends AppCompatActivity {
                     participantContainer.removeAllViews();
                     if (participantContainer != mainContainer) {
                         videoLinearLayout.removeView(participantContainer);
-                    } else {
+                    } else if (!participantContainers.isEmpty()) {
                         mainContainer = (ViewGroup)findViewById(R.id.mainContainer);
-                        // TODO - !nn! - pick new container from videoLinearLayout and add it to main
+                        // TODO - !nn! - put this into separate method
+                        // Take first available container
+                        Map.Entry<Participant, ViewGroup> entry = participantContainers.entrySet().iterator().next();
+                        // grab participant associated with that container
+                        Participant part = entry.getKey();
+                        // take out renderer and container for that particiant
+                        participantVideoRenderer = participantVideoRenderers.remove(part);
+                        participantContainer = participantContainers.remove(part);
+                        // remove small view from linear layout
+                        videoLinearLayout.removeView(participantContainer);
+                        // remove renderer from participant video track
+                        VideoTrack vt = part.getMedia().getVideoTracks().get(0);
+                        vt.removeRenderer(participantVideoRenderer);
+                        participantVideoRenderer.release();
+
+                        // Create new renderer, connect it to main container and
+                        // add it to participant video track
+                        participantVideoRenderer = new VideoViewRenderer(ClientActivity.this, mainContainer);
+                        participantVideoRenderer.setVideoScaleType(VideoScaleType.ASPECT_FILL);
+                        participantVideoRenderer.getSurfaceView().setZOrderMediaOverlay(false);
+                        vt.addRenderer(participantVideoRenderer);
+                        participantContainers.put(part, mainContainer);
+                        participantVideoRenderers.put(part, participantVideoRenderer);
                     }
                     //availableContainers.add(participantContainer);
                 }
@@ -1804,6 +1826,7 @@ public class ClientActivity extends AppCompatActivity {
                 localContainer = createParticipantView();
                 localRenderer = new VideoViewRenderer(ClientActivity.this,
                         localContainer);
+                localRenderer.setVideoScaleType(VideoScaleType.ASPECT_FILL);
                 localRenderer.setMirror(mirrorLocalRenderer);
                 localVideoTrack.addRenderer(localRenderer);
                 videoLinearLayout.addView(localContainer);
