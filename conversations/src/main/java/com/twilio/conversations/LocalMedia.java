@@ -55,11 +55,11 @@ public interface LocalMedia {
     /**
      * Adds a local video track to list of tracks.
      *
-     * <p>The result of this operation will propagate via {@link Listener}. A
+     * <p>The result of this operation will propagate via {@link LocalMedia.Listener}. A
      * successful addition of the local video track will invoke
-     * {@link Listener#onLocalVideoTrackAdded(LocalMedia, LocalVideoTrack)}. If any
+     * {@link LocalMedia.Listener#onLocalVideoTrackAdded(LocalMedia, LocalVideoTrack)}. If any
      * problems occur adding the video track then
-     * {@link Listener#onLocalVideoTrackError(LocalMedia, LocalVideoTrack,
+     * {@link LocalMedia.Listener#onLocalVideoTrackError(LocalMedia, LocalVideoTrack,
      * TwilioConversationsException)} will be invoked.</p>
      *
      * @param localVideoTrack The local video track to be added.
@@ -69,11 +69,11 @@ public interface LocalMedia {
     /**
      * Removes the local video track from list of tracks.
      *
-     * <p>The result of this operation will propagate via {@link Listener}. A
+     * <p>The result of this operation will propagate via {@link LocalMedia.Listener}. A
      * successful removal of the local video track will invoke
-     * {@link Listener#onLocalVideoTrackRemoved(LocalMedia, LocalVideoTrack)}. If any
+     * {@link LocalMedia.Listener#onLocalVideoTrackRemoved(LocalMedia, LocalVideoTrack)}. If any
      * problems occur removing the video track then
-     * {@link Listener#onLocalVideoTrackError(LocalMedia, LocalVideoTrack,
+     * {@link LocalMedia.Listener#onLocalVideoTrackError(LocalMedia, LocalVideoTrack,
      * TwilioConversationsException)} will be invoked.</p>
      *
      * @param localVideoTrack The local video track to be removed
