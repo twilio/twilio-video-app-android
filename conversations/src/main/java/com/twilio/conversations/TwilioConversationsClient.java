@@ -16,9 +16,9 @@ import android.util.Log;
 import com.twilio.common.TwilioAccessManager;
 import com.twilio.conversations.impl.ApplicationForegroundTracker;
 import com.twilio.conversations.impl.TwilioConversationsClientInternal;
+import com.twilio.conversations.impl.Util;
 import com.twilio.conversations.impl.WakeUpReceiver;
 import com.twilio.conversations.impl.logging.Logger;
-import com.twilio.conversations.impl.util.CallbackHandler;
 import com.twilio.conversations.internal.ReLinker;
 
 import java.util.ArrayDeque;
@@ -134,20 +134,22 @@ public class TwilioConversationsClient {
 
         /**
          * This method notifies the listener that the client is no longer listening for invitations.
-         * This method will be invoked after a successful call to {@link TwilioConversationsClient#unlisten()}
-         * or when a network change occurs.
+         * This method will be invoked after a successful call to
+         * {@link TwilioConversationsClient#unlisten()} or when a network change occurs.
          *
-         * @param twilioConversationsClient The client that is no longer listening for incoming invitations.
+         * @param twilioConversationsClient The client that is no longer listening for incoming
+         *                                  invitations.
          */
         void onStopListeningForInvites(TwilioConversationsClient twilioConversationsClient);
 
         /**
          *
-         * This method notifies the listener that the client failed to start listening for invitations.
-         * This method is invoked after an unsuccessful call to {@link TwilioConversationsClient#listen()}.
+         * This method notifies the listener that the client failed to start listening for
+         * invitations. This method is invoked after an unsuccessful call to
+         * {@link TwilioConversationsClient#listen()}.
          *
-         * @param twilioConversationsClient The conversations client that failed to start listening for
-         *                            incoming invitations.
+         * @param twilioConversationsClient The conversations client that failed to start listening
+         *                                  for incoming invitations.
          * @param exception Exception containing information that caused the failure.
          */
         void onFailedToStartListening(TwilioConversationsClient twilioConversationsClient,
@@ -159,7 +161,8 @@ public class TwilioConversationsClient {
          *
          * @param incomingInvite The invitation object.
          */
-        void onIncomingInvite(TwilioConversationsClient twilioConversationsClient, IncomingInvite incomingInvite);
+        void onIncomingInvite(TwilioConversationsClient twilioConversationsClient,
+                              IncomingInvite incomingInvite);
 
         /**
          * This method notifies the listener that the incoming invite was cancelled.
@@ -192,7 +195,7 @@ public class TwilioConversationsClient {
         }
 
         Context applicationContext = context.getApplicationContext();
-        Handler handler = CallbackHandler.create();
+        Handler handler = Util.createCallbackHandler();
         if (handler == null) {
             throw new IllegalThreadStateException("This thread must be able to obtain a Looper");
         }
@@ -257,7 +260,8 @@ public class TwilioConversationsClient {
     /**
      * Informs whether {@link TwilioConversationsClient} is initialized or not.
      *
-     * @return <code>true</code> if Twilio Conversations client is initialized, <code>false</code> otherwise.
+     * @return <code>true</code> if Twilio Conversations client is initialized,
+     *         <code>false</code> otherwise.
      */
     public static boolean isInitialized() {
         return initialized;
@@ -302,11 +306,12 @@ public class TwilioConversationsClient {
     /**
      * Creates a new {@link TwilioConversationsClient}.
      *
-     * @param accessManager The instance of {@link TwilioAccessManager} that is handling token lifetime
+     * @param accessManager The instance of {@link TwilioAccessManager} that is handling token
+     *                      lifetime
      * @param listener A listener that receive events from the TwilioConversationsClient.
      *
-     * @return the initialized {@link TwilioConversationsClient}, or null if the Twilio Conversations Client
-     *         was not initialized
+     * @return the initialized {@link TwilioConversationsClient}, or null if the Twilio
+     *         Conversations Client was not initialized
      */
     public static TwilioConversationsClient create(TwilioAccessManager accessManager,
                                                    Listener listener) {
@@ -316,11 +321,12 @@ public class TwilioConversationsClient {
     /**
      * Creates a new {@link TwilioConversationsClient}.
      *
-     * @param accessManager The instance of {@link TwilioAccessManager} that is handling token lifetime
+     * @param accessManager The instance of {@link TwilioAccessManager} that is handling
+     *                      token lifetime
      * @param listener A listener that receive events from the TwilioConversationsClient.
      *
-     * @return the initialized {@link TwilioConversationsClient}, or null if the Twilio Conversations Client
-     *         was not initialized
+     * @return the initialized {@link TwilioConversationsClient}, or null if the Twilio
+     *         Conversations Client was not initialized
      */
     public static TwilioConversationsClient create(TwilioAccessManager accessManager,
                                                    ClientOptions options,
@@ -366,6 +372,7 @@ public class TwilioConversationsClient {
      * Get identity of this conversations client on the network.
      *
      * @return identity of this conversations client
+     *         or null if an invalid TwilioAccessManager was provided
      */
     public String getIdentity(){
         return conversationsClientInternal.getIdentity();

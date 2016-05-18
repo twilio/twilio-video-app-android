@@ -4,7 +4,6 @@ import android.os.Handler;
 
 import com.twilio.conversations.Media;
 import com.twilio.conversations.Participant;
-import com.twilio.conversations.impl.util.CallbackHandler;
 
 public class ParticipantImpl implements Participant {
     private String identity;
@@ -31,7 +30,7 @@ public class ParticipantImpl implements Participant {
 
     @Override
     public void setParticipantListener(Participant.Listener participantListener) {
-        this.handler = CallbackHandler.create();
+        this.handler = Util.createCallbackHandler();
         if(handler == null) {
             throw new IllegalThreadStateException("This thread must be able to obtain a Looper");
         }

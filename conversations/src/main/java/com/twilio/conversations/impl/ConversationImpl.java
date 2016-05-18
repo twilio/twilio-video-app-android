@@ -69,18 +69,18 @@ public class ConversationImpl implements Conversation,
 
         public SessionObserverInternal(SessionObserver sessionObserver,
                                        Conversation conversation) {
-            this.nativeSessionObserver = wrapNativeObserver(sessionObserver, conversation);
+            this.nativeSessionObserver = nativeWrapObserver(sessionObserver, conversation);
         }
 
         public void enableStats(long nativeSession, boolean enable) {
-            enableStats(nativeSessionObserver, nativeSession, enable);
+            nativeEnableStats(nativeSessionObserver, nativeSession, enable);
         }
 
-        private native long wrapNativeObserver(SessionObserver sessionObserver,
+        private native long nativeWrapObserver(SessionObserver sessionObserver,
                                                Conversation conversation);
-        private native void freeNativeObserver(long nativeSessionObserver);
+        private native void nativeFreeObserver(long nativeSessionObserver);
 
-        private native void enableStats(long nativeSessionObserver, long nativeSession, boolean enable);
+        private native void nativeEnableStats(long nativeSessionObserver, long nativeSession, boolean enable);
 
         @Override
         public long getNativeHandle() {
@@ -89,7 +89,7 @@ public class ConversationImpl implements Conversation,
 
         public void dispose() {
             if (nativeSessionObserver != 0) {
-                freeNativeObserver(nativeSessionObserver);
+                nativeFreeObserver(nativeSessionObserver);
                 nativeSessionObserver = 0;
             }
 
@@ -131,7 +131,7 @@ public class ConversationImpl implements Conversation,
 
         sessionObserverInternal = new SessionObserverInternal(this, this);
 
-        nativeSession = wrapOutgoingSession(conversationsClientInternal.getNativeHandle(),
+        nativeSession = nativeWrapOutgoingSession(conversationsClientInternal.getNativeHandle(),
                 sessionObserverInternal.getNativeHandle(),
                 participantIdentityArray);
     }
@@ -142,7 +142,7 @@ public class ConversationImpl implements Conversation,
      * when the conversation becomes valid.
      */
     void retainSid() {
-        conversationSid = getConversationSid(nativeSession);
+        conversationSid = nativeGetConversationSid(nativeSession);
     }
 
     /*
@@ -158,7 +158,7 @@ public class ConversationImpl implements Conversation,
         this.nativeSession = nativeSession;
 
         // The sid is available from the session when an incoming invite is provided
-        conversationSid = getConversationSid(nativeSession);
+        conversationSid = nativeGetConversationSid(nativeSession);
 
         inviter = participantsIdentities[0];
 
@@ -174,7 +174,7 @@ public class ConversationImpl implements Conversation,
 
         }
         sessionObserverInternal = new SessionObserverInternal(this, this);
-        setSessionObserver(nativeSession, sessionObserverInternal.getNativeHandle());
+        nativeSetSessionObserver(nativeSession, sessionObserverInternal.getNativeHandle());
     }
 
     public static ConversationImpl createOutgoingConversation(
@@ -786,18 +786,18 @@ public class ConversationImpl implements Conversation,
     void setupExternalCapturer() {
         LocalVideoTrack localVideoTrack = localMediaImpl.getLocalVideoTracks().get(0);
         // TODO: Camera capture is the only supported local video stream for now.
-        // Once we start supporting screen share or etc, we should modify this method.
+        // Once we nativeStart supporting screen share or etc, we should modify this method.
         cameraCapturer = (CameraCapturerImpl)localVideoTrack.getCameraCapturer();
         cameraCapturer.startConversationCapturer(nativeSession);
-        setExternalCapturer(nativeSession, cameraCapturer.getNativeVideoCapturer());
+        nativeSetExternalCapturer(nativeSession, cameraCapturer.getNativeVideoCapturer());
     }
 
     boolean mute(boolean on) {
-        return mute(nativeSession, on);
+        return nativeMute(nativeSession, on);
     }
 
     boolean isMuted() {
-        return isMuted(nativeSession);
+        return nativeIsMuted(nativeSession);
     }
 
 
@@ -842,7 +842,7 @@ public class ConversationImpl implements Conversation,
 		 * new thread references it.
 		 */
         final long retainedNativeSession = nativeSession;
-        start(retainedNativeSession,
+        nativeStart(retainedNativeSession,
                 mediaConstraints.isAudioEnabled(),
                 mediaConstraints.isAudioMuted(),
                 mediaConstraints.isVideoEnabled(),
@@ -860,24 +860,24 @@ public class ConversationImpl implements Conversation,
 		 * new thread references it.
 		 */
         final long retainNativeSession = nativeSession;
-        stop(retainNativeSession);
+        nativeStop(retainNativeSession);
     }
 
     @Override
     public boolean enableVideo(boolean enabled, boolean paused, VideoConstraints videoConstraints) {
-        return enableVideo(nativeSession, enabled, paused, videoConstraints);
+        return nativeEnableVideo(nativeSession, enabled, paused, videoConstraints);
     }
 
     @Override
     public void inviteParticipants(Set<String> participants) {
         String[] participantIdentityArray =
                 participants.toArray(new String[participants.size()]);
-        inviteParticipants(nativeSession, participantIdentityArray);
+        nativeInviteParticipants(nativeSession, participantIdentityArray);
     }
 
     @Override
     public boolean enableAudio(boolean enabled, boolean muted) {
-        return enableAudio(nativeSession, enabled, muted);
+        return nativeEnableAudio(nativeSession, enabled, muted);
     }
 
     private void disposeConversation() {
@@ -886,7 +886,7 @@ public class ConversationImpl implements Conversation,
             sessionObserverInternal = null;
         }
         if (nativeSession != 0) {
-            freeNativeHandle(nativeSession);
+            nativeFreeHandle(nativeSession);
             nativeSession = 0;
         }
         if(conversationsClientInternal.getActiveConversationsCount() == 0) {
@@ -904,26 +904,27 @@ public class ConversationImpl implements Conversation,
         }
     }
 
-    private native long wrapOutgoingSession(long nativeEndpoint,
-                                            long nativeSessionObserver,
-                                            String[] participants);
-    private native void start(long nativeSession,
-                              boolean enableAudio,
-                              boolean muteAudio,
-                              boolean enableVideo,
-                              boolean pauseVideo,
-                              VideoConstraints videoConstraints,
-                              IceServer[] iceServers,
-                              IceTransportPolicy iceTransportPolicy);
+    private native long nativeWrapOutgoingSession(long nativeEndpoint,
+                                                  long nativeSessionObserver,
+                                                  String[] participants);
+    private native void nativeStart(long nativeSession,
+                                    boolean enableAudio,
+                                    boolean muteAudio,
+                                    boolean enableVideo,
+                                    boolean pauseVideo,
+                                    VideoConstraints videoConstraints,
+                                    IceServer[] iceServers,
+                                    IceTransportPolicy iceTransportPolicy);
 
-    private native void setExternalCapturer(long nativeSession, long nativeCapturer);
-    private native void stop(long nativeSession);
-    private native void setSessionObserver(long nativeSession, long nativeSessionObserver);
-    private native void freeNativeHandle(long nativeHandle);
-    private native boolean enableVideo(long nativeHandle, boolean enabled, boolean paused, VideoConstraints videoConstraints);
-    private native boolean mute(long nativeSession, boolean on);
-    private native boolean isMuted(long nativeSession);
-    private native void inviteParticipants(long nativeHandle, String[] participants);
-    private native String getConversationSid(long nativeHandle);
-    private native boolean enableAudio(long nativeHandle, boolean enabled, boolean muted);
+    private native void nativeSetExternalCapturer(long nativeSession, long nativeCapturer);
+    private native void nativeStop(long nativeSession);
+    private native void nativeSetSessionObserver(long nativeSession, long nativeSessionObserver);
+    private native void nativeFreeHandle(long nativeHandle);
+    private native boolean nativeEnableVideo(long nativeHandle, boolean enabled, boolean paused,
+                                             VideoConstraints videoConstraints);
+    private native boolean nativeMute(long nativeSession, boolean on);
+    private native boolean nativeIsMuted(long nativeSession);
+    private native void nativeInviteParticipants(long nativeHandle, String[] participants);
+    private native String nativeGetConversationSid(long nativeHandle);
+    private native boolean nativeEnableAudio(long nativeHandle, boolean enabled, boolean muted);
 }

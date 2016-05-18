@@ -12,7 +12,7 @@ extern "C" {
  * Method:    wrapNativeObserver
  * Signature: (Lcom/twilio/conversations/ConversationListener;Lcom/twilio/conversations/Endpoint;)J
  */
-JNIEXPORT jlong JNICALL Java_com_twilio_conversations_impl_ConversationImpl_00024SessionObserverInternal_wrapNativeObserver
+JNIEXPORT jlong JNICALL Java_com_twilio_conversations_impl_ConversationImpl_00024SessionObserverInternal_nativeWrapObserver
   (JNIEnv *, jobject, jobject, jobject);
 
 /*
@@ -20,7 +20,7 @@ JNIEXPORT jlong JNICALL Java_com_twilio_conversations_impl_ConversationImpl_0002
  * Method:    freeNativeObserver
  * Signature: (J)V
  */
-JNIEXPORT void JNICALL Java_com_twilio_conversations_impl_ConversationImpl_00024SessionObserverInternal_freeNativeObserver
+JNIEXPORT void JNICALL Java_com_twilio_conversations_impl_ConversationImpl_00024SessionObserverInternal_nativeFreeObserver
   (JNIEnv *, jobject, jlong);
 
 /*
@@ -28,7 +28,7 @@ JNIEXPORT void JNICALL Java_com_twilio_conversations_impl_ConversationImpl_00024
  * Method:    enableStats
  * Signature: (JJZ)V
  */
-JNIEXPORT void JNICALL Java_com_twilio_conversations_impl_ConversationImpl_00024SessionObserverInternal_enableStats
+JNIEXPORT void JNICALL Java_com_twilio_conversations_impl_ConversationImpl_00024SessionObserverInternal_nativeEnableStats
         (JNIEnv *, jobject, jlong, jlong, jboolean);
 
 #ifdef __cplusplus

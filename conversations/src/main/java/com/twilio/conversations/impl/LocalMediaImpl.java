@@ -13,7 +13,6 @@ import com.twilio.conversations.TwilioConversationsClient;
 import com.twilio.conversations.TwilioConversationsException;
 import com.twilio.conversations.impl.core.TrackInfo;
 import com.twilio.conversations.impl.logging.Logger;
-import com.twilio.conversations.impl.util.CallbackHandler;
 
 public class LocalMediaImpl implements LocalMedia {
     private List<LocalVideoTrackImpl> videoTracksImpl = new ArrayList<LocalVideoTrackImpl>();
@@ -33,7 +32,7 @@ public class LocalMediaImpl implements LocalMedia {
         audioEnabled = true;
         audioMuted = false;
         
-        handler = CallbackHandler.create();
+        handler = Util.createCallbackHandler();
         if(handler == null) {
           throw new IllegalThreadStateException("This thread must be able to obtain a Looper");
         }

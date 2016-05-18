@@ -31,8 +31,8 @@ public class AudioTrackImpl implements AudioTrack {
 
     @Override
     public boolean isEnabled() {
-        if (audioTrack != null) {
-            return audioTrack.enabled();
+        if ((audioTrack != null) && (trackInfo != null)) {
+            return trackInfo.isEnabled();
         }
         return false;
     }
