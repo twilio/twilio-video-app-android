@@ -16,7 +16,7 @@ import com.twilio.common.TwilioAccessManager;
 import com.twilio.conversations.internal.Logger;
 import com.twilio.conversations.internal.ClientOptionsInternal;
 
-public class TwilioConversationsClientInternal implements
+final class TwilioConversationsClientInternal implements
         NativeHandleInterface,
         EndpointObserver,
         CoreEndpoint,
