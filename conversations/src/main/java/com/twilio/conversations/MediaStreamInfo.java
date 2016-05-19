@@ -1,11 +1,11 @@
 package com.twilio.conversations;
 
-public class MediaStreamInfo {
+class MediaStreamInfo {
     private long sessionId;
     private long streamId;
     private String participantAddress;
 
-    public MediaStreamInfo(int sessionId, int streamId, String participantAddress) {
+    MediaStreamInfo(int sessionId, int streamId, String participantAddress) {
         this.sessionId = sessionId;
         this.streamId = streamId;
         this.participantAddress = participantAddress;
