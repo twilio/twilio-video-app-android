@@ -11,7 +11,6 @@ import android.graphics.drawable.Drawable;
 import android.media.AudioManager;
 import android.os.Bundle;
 import android.os.Handler;
-import android.provider.MediaStore;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.NotificationCompat;
@@ -66,7 +65,6 @@ import com.twilio.conversations.CapturerErrorListener;
 import com.twilio.conversations.CapturerException;
 import com.twilio.conversations.Conversation;
 import com.twilio.conversations.ConversationCallback;
-import com.twilio.conversations.ConversationListener;
 import com.twilio.conversations.TwilioConversationsClient;
 import com.twilio.conversations.IceOptions;
 import com.twilio.conversations.IceServer;
@@ -75,7 +73,6 @@ import com.twilio.conversations.IncomingInvite;
 import com.twilio.conversations.LocalAudioTrackStatsRecord;
 import com.twilio.conversations.LocalMedia;
 import com.twilio.conversations.LocalMediaFactory;
-import com.twilio.conversations.LocalMediaListener;
 import com.twilio.conversations.LocalVideoTrack;
 import com.twilio.conversations.LocalVideoTrackFactory;
 import com.twilio.conversations.LocalVideoTrackStatsRecord;
@@ -83,14 +80,13 @@ import com.twilio.conversations.MediaTrack;
 import com.twilio.conversations.MediaTrackStatsRecord;
 import com.twilio.conversations.OutgoingInvite;
 import com.twilio.conversations.Participant;
-import com.twilio.conversations.ParticipantListener;
 import com.twilio.conversations.RemoteAudioTrackStatsRecord;
 import com.twilio.conversations.RemoteVideoTrackStatsRecord;
 import com.twilio.conversations.StatsListener;
 import com.twilio.conversations.TwilioConversationsException;
 import com.twilio.conversations.VideoConstraints;
 import com.twilio.conversations.VideoDimensions;
-import com.twilio.conversations.VideoRendererObserver;
+import com.twilio.conversations.VideoRenderer;
 import com.twilio.conversations.VideoTrack;
 import com.twilio.conversations.VideoViewRenderer;
 import com.twilio.conversations.internal.ClientOptionsInternal;
@@ -1439,8 +1435,8 @@ public class ClientActivity extends AppCompatActivity {
         };
     }
 
-    private ConversationListener conversationListener() {
-        return new ConversationListener() {
+    private Conversation.Listener conversationListener() {
+        return new Conversation.Listener() {
             @Override
             public void onParticipantConnected(Conversation conversation,
                                                Participant participant) {
@@ -1587,8 +1583,8 @@ public class ClientActivity extends AppCompatActivity {
         }
     }
 
-    private ParticipantListener participantListener() {
-        return new ParticipantListener() {
+    private Participant.Listener participantListener() {
+        return new Participant.Listener() {
             @Override
             public void onVideoTrackAdded(Conversation conversation,
                                           Participant participant,
@@ -1606,7 +1602,7 @@ public class ClientActivity extends AppCompatActivity {
                 // Remote participant
                 VideoViewRenderer participantVideoRenderer = new VideoViewRenderer(ClientActivity.this,
                         participantContainer);
-                participantVideoRenderer.setObserver(new VideoRendererObserver() {
+                participantVideoRenderer.setObserver(new VideoRenderer.Observer() {
                     @Override
                     public void onFirstFrame() {
                         Timber.i("Participant onFirstFrame");
@@ -1762,8 +1758,8 @@ public class ClientActivity extends AppCompatActivity {
         };
     }
 
-    private LocalMediaListener localMediaListener() {
-        return new LocalMediaListener() {
+    private LocalMedia.Listener localMediaListener() {
+        return new LocalMedia.Listener() {
             @Override
             public void onLocalVideoTrackAdded(LocalMedia localMedia,
                                                LocalVideoTrack localVideoTrack) {

@@ -7,7 +7,6 @@ import java.util.List;
 import android.os.Handler;
 
 import com.twilio.conversations.LocalMedia;
-import com.twilio.conversations.LocalMediaListener;
 import com.twilio.conversations.LocalVideoTrack;
 import com.twilio.conversations.MediaTrackState;
 import com.twilio.conversations.TwilioConversationsClient;
@@ -21,14 +20,14 @@ public class LocalMediaImpl implements LocalMedia {
     private boolean audioEnabled;
     private boolean audioMuted;
     private Handler handler;
-    private LocalMediaListener localMediaListener;
+    private LocalMedia.Listener localMediaListener;
 
     private static int MAX_LOCAL_VIDEO_TRACKS = 1;
 
     private static String TAG = "LocalMediaImpl";
     static final Logger logger = Logger.getLogger(LocalMediaImpl.class);
 
-    public LocalMediaImpl(LocalMediaListener localMediaListener) {
+    public LocalMediaImpl(LocalMedia.Listener localMediaListener) {
         this.localMediaListener = localMediaListener;
         audioEnabled = true;
         audioMuted = false;
@@ -44,12 +43,12 @@ public class LocalMediaImpl implements LocalMedia {
     }
 
     @Override
-    public LocalMediaListener getLocalMediaListener() {
+    public LocalMedia.Listener getLocalMediaListener() {
         return localMediaListener;
     }
 
     @Override
-    public void setLocalMediaListener(LocalMediaListener listener) {
+    public void setLocalMediaListener(LocalMedia.Listener listener) {
         localMediaListener = listener;
     }
 

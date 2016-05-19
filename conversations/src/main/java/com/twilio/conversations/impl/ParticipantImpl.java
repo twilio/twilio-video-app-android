@@ -4,13 +4,12 @@ import android.os.Handler;
 
 import com.twilio.conversations.Media;
 import com.twilio.conversations.Participant;
-import com.twilio.conversations.ParticipantListener;
 
 public class ParticipantImpl implements Participant {
     private String identity;
     private String sid;
     private MediaImpl media;
-    private ParticipantListener participantListener;
+    private Participant.Listener participantListener;
     private Handler handler;
 
     public ParticipantImpl(String identity, String sid) {
@@ -30,7 +29,7 @@ public class ParticipantImpl implements Participant {
     }
 
     @Override
-    public void setParticipantListener(ParticipantListener participantListener) {
+    public void setParticipantListener(Participant.Listener participantListener) {
         this.handler = Util.createCallbackHandler();
         if(handler == null) {
             throw new IllegalThreadStateException("This thread must be able to obtain a Looper");
@@ -39,7 +38,7 @@ public class ParticipantImpl implements Participant {
     }
 
     @Override
-    public ParticipantListener getParticipantListener() {
+    public Participant.Listener getParticipantListener() {
         return participantListener;
     }
 

@@ -155,8 +155,8 @@ public class TwilioConversationsClientTests extends TwilioConversationsTestsBase
         assertTrue(twilioConversationsClient.isListening());
     }
 
-    private LocalMediaListener localMediaListener(){
-        return new LocalMediaListener() {
+    private LocalMedia.Listener localMediaListener(){
+        return new LocalMedia.Listener() {
             @Override
             public void onLocalVideoTrackAdded(LocalMedia localMedia,
                                                LocalVideoTrack localVideoTrack) {

@@ -17,7 +17,6 @@ import com.twilio.conversations.AudioOutput;
 import com.twilio.conversations.ClientOptions;
 import com.twilio.conversations.Conversation;
 import com.twilio.conversations.ConversationCallback;
-import com.twilio.conversations.ConversationListener;
 import com.twilio.conversations.TwilioConversationsClient;
 import com.twilio.conversations.IceOptions;
 import com.twilio.conversations.InviteStatus;
@@ -38,7 +37,7 @@ import com.twilio.conversations.internal.ClientOptionsInternal;
 public class TwilioConversationsClientInternal implements
         NativeHandleInterface,
         EndpointObserver,
-        CoreEndpoint, ConversationListener, ConversationStateObserver {
+        CoreEndpoint, Conversation.Listener, ConversationStateObserver {
     static final Logger logger = Logger.getLogger(TwilioConversationsClientInternal.class);
 
     void removeConversation(ConversationImpl conversationImpl) {
