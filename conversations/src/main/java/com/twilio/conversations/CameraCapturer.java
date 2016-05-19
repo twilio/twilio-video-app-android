@@ -60,6 +60,17 @@ public class CameraCapturer {
     private long nativeVideoCapturerAndroid;
     private boolean broadcastCapturerPaused = false;
 
+    /**
+     * Creates an instance of CameraCapturer
+     *
+     * @param source the camera source
+     * @return CameraCapturer
+     */
+    public static CameraCapturer create(Context context, CameraSource source,
+                                        CapturerErrorListener listener) {
+        return new CameraCapturer(context, source, listener);
+    }
+
     private CameraCapturer(Context context,
                                CameraSource source,
                                CapturerErrorListener listener) {
@@ -78,13 +89,6 @@ public class CameraCapturer {
             listener.onError(new CapturerException(CapturerException.ExceptionDomain.CAMERA,
                     "Invalid camera source."));
         }
-    }
-
-    public static CameraCapturer create(
-            Context context,
-            CameraSource source,
-            CapturerErrorListener listener) {
-        return new CameraCapturer(context, source, listener);
     }
 
     /**

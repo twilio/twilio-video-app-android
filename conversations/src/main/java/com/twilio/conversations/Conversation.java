@@ -747,7 +747,7 @@ public class Conversation implements NativeHandleInterface, SessionObserver, Cor
     @Override
     public void onReceiveTrackStatistics(CoreTrackStatsReport report) {
         if (handler != null && statsListener != null) {
-            final MediaTrackStatsRecord stats = MediaTrackStatsRecordFactory.create(report);
+            final MediaTrackStatsRecord stats = MediaTrackStatsRecord.create(report);
 
             if (stats != null) {
                 /*

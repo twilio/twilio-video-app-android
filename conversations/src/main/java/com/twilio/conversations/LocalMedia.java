@@ -25,6 +25,18 @@ public class LocalMedia {
     private static String TAG = "LocalMedial";
     static final Logger logger = Logger.getLogger(LocalMedia.class);
 
+    /**
+     * Creates a new instance of the {@link LocalMedia}
+     *
+     * <p>The {@link LocalMedia.Listener} is invoked on the thread that provides the
+     * LocalMediaListener instance.</p>
+     *
+     * @return instance of local media
+     */
+    public static LocalMedia create(LocalMedia.Listener localMediaListener) {
+        return new LocalMedia(localMediaListener);
+    }
+
     public LocalMedia(LocalMedia.Listener localMediaListener) {
         this.localMediaListener = localMediaListener;
         audioEnabled = true;

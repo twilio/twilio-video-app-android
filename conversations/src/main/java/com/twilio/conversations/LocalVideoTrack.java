@@ -9,6 +9,32 @@ public class LocalVideoTrack extends VideoTrack {
     private CameraCapturer cameraCapturer;
     private boolean enabledVideo = true;
 
+    /**
+     * Create new instance of local video track
+     *
+     * @param cameraCapturer
+     * @return new instance of LocalVideoTrack
+     */
+    public static LocalVideoTrack create(CameraCapturer cameraCapturer) {
+        return new LocalVideoTrack(cameraCapturer);
+    }
+
+    /**
+     * Create new instance of local video track with {@link VideoConstraints}
+     *
+     * If you do not provide any video constraints, the default video constraints are set to a
+     * a minimum of 10 frames per second, a maximum of 30 frames per second, and a maximum video
+     * dimension size of 640x480.
+     *
+     * @param cameraCapturer
+     * @param videoConstraints
+     * @return new instance of LocalVideoTrack
+     */
+    public static LocalVideoTrack create(CameraCapturer cameraCapturer,
+                                         VideoConstraints videoConstraints) {
+        return new LocalVideoTrack(cameraCapturer, videoConstraints);
+    }
+
     public LocalVideoTrack(CameraCapturer cameraCapturer) {
         super();
         if(cameraCapturer == null) {

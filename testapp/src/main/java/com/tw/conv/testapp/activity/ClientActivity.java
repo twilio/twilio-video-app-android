@@ -60,7 +60,6 @@ import com.twilio.conversations.AspectRatio;
 import com.twilio.conversations.AudioOutput;
 import com.twilio.conversations.AudioTrack;
 import com.twilio.conversations.CameraCapturer;
-import com.twilio.conversations.CameraCapturerFactory;
 import com.twilio.conversations.CapturerErrorListener;
 import com.twilio.conversations.CapturerException;
 import com.twilio.conversations.Conversation;
@@ -72,9 +71,7 @@ import com.twilio.conversations.IceTransportPolicy;
 import com.twilio.conversations.IncomingInvite;
 import com.twilio.conversations.LocalAudioTrackStatsRecord;
 import com.twilio.conversations.LocalMedia;
-import com.twilio.conversations.LocalMediaFactory;
 import com.twilio.conversations.LocalVideoTrack;
-import com.twilio.conversations.LocalVideoTrackFactory;
 import com.twilio.conversations.LocalVideoTrackStatsRecord;
 import com.twilio.conversations.MediaTrack;
 import com.twilio.conversations.MediaTrackStatsRecord;
@@ -473,9 +470,7 @@ public class ClientActivity extends AppCompatActivity {
                 conversationsClientListener());
 
 
-        cameraCapturer = CameraCapturerFactory.createCameraCapturer(
-                ClientActivity.this,
-                currentCameraSource,
+        cameraCapturer = CameraCapturer.create(ClientActivity.this, currentCameraSource,
                 capturerErrorListener());
 
         switchCameraActionFab.setOnClickListener(switchCameraClickListener());
@@ -1866,7 +1861,7 @@ public class ClientActivity extends AppCompatActivity {
     }
 
     private LocalMedia createLocalMedia() {
-        LocalMedia localMedia = LocalMediaFactory.createLocalMedia(localMediaListener());
+        LocalMedia localMedia = LocalMedia.create(localMediaListener());
         if (videoState != VideoState.DISABLED) {
             LocalVideoTrack videoTrack = createLocalVideoTrack(cameraCapturer);
             localMedia.addLocalVideoTrack(videoTrack);
@@ -1882,9 +1877,9 @@ public class ClientActivity extends AppCompatActivity {
 
     private LocalVideoTrack createLocalVideoTrack(CameraCapturer cameraCapturer) {
         if(videoConstraints == null) {
-            return LocalVideoTrackFactory.createLocalVideoTrack(cameraCapturer);
+            return LocalVideoTrack.create(cameraCapturer);
         } else {
-            return LocalVideoTrackFactory.createLocalVideoTrack(cameraCapturer, videoConstraints);
+            return LocalVideoTrack.create(cameraCapturer, videoConstraints);
         }
     }
     private PendingIntent getRejectPendingIntent() {

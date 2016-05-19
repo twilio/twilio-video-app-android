@@ -9,7 +9,25 @@ public class MediaTrackStatsRecord {
     private final String participantSid;
     private final long unixTimestamp;
 
-    public MediaTrackStatsRecord(CoreTrackStatsReport report) {
+    static MediaTrackStatsRecord create(CoreTrackStatsReport report) {
+        MediaTrackStatsRecord record = null;
+        if (report.direction.equalsIgnoreCase(CoreTrackStatsReport.DIRECTION_SENDING)) {
+            if (report.mediaType.equalsIgnoreCase(CoreTrackStatsReport.MEDIA_OPTION_AUDIO_KEY)) {
+                record = new LocalAudioTrackStatsRecord(report);
+            } else if (report.mediaType.equalsIgnoreCase(CoreTrackStatsReport.MEDIA_OPTION_VIDEO_KEY)) {
+                record = new LocalVideoTrackStatsRecord(report);
+            }
+        } else if (report.direction.equalsIgnoreCase(CoreTrackStatsReport.DIRECTION_RECEIVING)){
+            if (report.mediaType.equalsIgnoreCase(CoreTrackStatsReport.MEDIA_OPTION_AUDIO_KEY)) {
+                record = new RemoteAudioTrackStatsRecord(report);
+            } else if (report.mediaType.equalsIgnoreCase(CoreTrackStatsReport.MEDIA_OPTION_VIDEO_KEY)) {
+                record = new RemoteVideoTrackStatsRecord(report);
+            }
+        }
+        return record;
+    }
+
+    MediaTrackStatsRecord(CoreTrackStatsReport report) {
         trackId = report.trackId;
         packetsLost = report.getIntValue(CoreTrackStatsReport.KeyEnum.PACKETS_LOST);
         direction = report.direction;
