@@ -1,6 +1,6 @@
 package com.twilio.conversations;
 
-public enum ConversationStatus {
+enum ConversationStatus {
     INITIALIZED,
     CONNECTING,
     CONNECTED,
