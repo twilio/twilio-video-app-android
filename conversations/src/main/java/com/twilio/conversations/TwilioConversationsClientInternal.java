@@ -363,7 +363,7 @@ final class TwilioConversationsClientInternal implements
 
     @Override
     public void onParticipantDisconnected(Conversation conversation, Participant participant) {
-        // TODO
+        // Do nothing.
     }
 
     @Override
