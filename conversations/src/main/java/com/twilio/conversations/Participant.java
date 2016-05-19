@@ -26,9 +26,6 @@ public class Participant {
 
     public void setParticipantListener(Participant.Listener participantListener) {
         this.handler = Util.createCallbackHandler();
-        if(handler == null) {
-            throw new IllegalThreadStateException("This thread must be able to obtain a Looper");
-        }
         this.participantListener = participantListener;
     }
 

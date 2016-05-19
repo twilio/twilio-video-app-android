@@ -192,12 +192,8 @@ public class TwilioConversationsClient {
 
         Context applicationContext = context.getApplicationContext();
         Handler handler = Util.createCallbackHandler();
-        if (handler == null) {
-            throw new IllegalThreadStateException("This thread must be able to obtain a Looper");
-        }
 
         internalRegistry = new InternalRegistry(applicationContext, handler);
-
         checkPermissions(context);
 
 

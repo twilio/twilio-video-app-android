@@ -11,7 +11,7 @@ final class Util {
      * Return a handler on the thread looper, or the main thread looper if the calling thread
      * does not have a looper. If neither are available this handler will return null.
      */
-    public static Handler createCallbackHandler() {
+    static Handler createCallbackHandler() {
         Handler handler = null;
         Looper looper;
 
@@ -20,6 +20,10 @@ final class Util {
         } else if((looper = Looper.getMainLooper()) != null) {
             handler = new Handler(looper);
         }
+        if(handler == null) {
+            throw new IllegalThreadStateException("This thread must be able to obtain a Looper");
+        }
+
         return handler;
     }
 }

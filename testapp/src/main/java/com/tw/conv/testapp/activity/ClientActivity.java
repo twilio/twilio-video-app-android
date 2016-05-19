@@ -1861,7 +1861,7 @@ public class ClientActivity extends AppCompatActivity {
     }
 
     private LocalMedia createLocalMedia() {
-        LocalMedia localMedia = LocalMedia.create(localMediaListener());
+        LocalMedia localMedia = new LocalMedia(localMediaListener());
         if (videoState != VideoState.DISABLED) {
             LocalVideoTrack videoTrack = createLocalVideoTrack(cameraCapturer);
             localMedia.addLocalVideoTrack(videoTrack);

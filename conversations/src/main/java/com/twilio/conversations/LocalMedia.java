@@ -12,6 +12,9 @@ import java.util.List;
  * Provides local video and audio tracks associated with a {@link Participant}
  */
 public class LocalMedia {
+    private static int MAX_LOCAL_VIDEO_TRACKS = 1;
+    private static final Logger logger = Logger.getLogger(LocalMedia.class);
+
     private List<LocalVideoTrack> videoTracks = new ArrayList<>();
     private WeakReference<Conversation> convWeak;
     private boolean audioEnabled;
@@ -19,36 +22,11 @@ public class LocalMedia {
     private Handler handler;
     private LocalMedia.Listener localMediaListener;
 
-    private static int MAX_LOCAL_VIDEO_TRACKS = 1;
-
-    private static String TAG = "LocalMedial";
-    static final Logger logger = Logger.getLogger(LocalMedia.class);
-
-    /**
-     * Creates a new instance of the {@link LocalMedia}
-     *
-     * <p>The {@link LocalMedia.Listener} is invoked on the thread that provides the
-     * LocalMediaListener instance.</p>
-     *
-     * @return instance of local media
-     */
-    public static LocalMedia create(LocalMedia.Listener localMediaListener) {
-        return new LocalMedia(localMediaListener);
-    }
-
     public LocalMedia(LocalMedia.Listener localMediaListener) {
         this.localMediaListener = localMediaListener;
-        audioEnabled = true;
-        audioMuted = false;
-
-        handler = Util.createCallbackHandler();
-        if(handler == null) {
-            throw new IllegalThreadStateException("This thread must be able to obtain a Looper");
-        }
-    }
-
-    Handler getHandler() {
-        return handler;
+        this.audioEnabled = true;
+        this.audioMuted = false;
+        this.handler = Util.createCallbackHandler();
     }
 
     /**
@@ -218,34 +196,6 @@ public class LocalMedia {
         }
     }
 
-    private void postVideoTrackException(final LocalVideoTrack localVideoTrack, final TwilioConversationsException trackException) {
-        if (handler != null) {
-            handler.post(new Runnable() {
-                @Override
-                public void run() {
-                    if (localMediaListener != null) {
-                        localMediaListener.onLocalVideoTrackError(
-                                LocalMedia.this, localVideoTrack, trackException);
-                    }
-                }
-            });
-        }
-    }
-
-    LocalVideoTrack removeLocalVideoTrack(TrackInfo trackInfo) {
-        for(LocalVideoTrack videoTrack : new ArrayList<>(videoTracks)) {
-            if(trackInfo.getTrackId().equals(videoTrack.getTrackInfo().getTrackId())) {
-                videoTracks.remove(videoTrack);
-                return videoTrack;
-            }
-        }
-        return null;
-    }
-
-    void setConversation(Conversation conversation) {
-        this.convWeak = new WeakReference<>(conversation);
-    }
-
     /**
      * Enables local audio to media session.
      *
@@ -274,15 +224,6 @@ public class LocalMedia {
         }
     }
 
-    private boolean enableAudio(boolean enable) {
-        if (convWeak != null && convWeak.get() != null) {
-            return convWeak.get().enableAudio(enable, audioMuted);
-        } else {
-            // The conversation is not ongoing. Always return true
-            return true;
-        }
-    }
-
     /**
      * Indicates whether or not your local
      * audio is enabled in the media session
@@ -291,6 +232,48 @@ public class LocalMedia {
      */
     public boolean isMicrophoneAdded() {
         return audioEnabled;
+    }
+
+    Handler getHandler() {
+        return handler;
+    }
+
+    LocalVideoTrack removeLocalVideoTrack(TrackInfo trackInfo) {
+        for(LocalVideoTrack videoTrack : new ArrayList<>(videoTracks)) {
+            if(trackInfo.getTrackId().equals(videoTrack.getTrackInfo().getTrackId())) {
+                videoTracks.remove(videoTrack);
+                return videoTrack;
+            }
+        }
+        return null;
+    }
+
+    void setConversation(Conversation conversation) {
+        this.convWeak = new WeakReference<>(conversation);
+    }
+
+    private void postVideoTrackException(final LocalVideoTrack localVideoTrack,
+                                         final TwilioConversationsException trackException) {
+        if (handler != null) {
+            handler.post(new Runnable() {
+                @Override
+                public void run() {
+                    if (localMediaListener != null) {
+                        localMediaListener.onLocalVideoTrackError(
+                                LocalMedia.this, localVideoTrack, trackException);
+                    }
+                }
+            });
+        }
+    }
+
+    private boolean enableAudio(boolean enable) {
+        if (convWeak != null && convWeak.get() != null) {
+            return convWeak.get().enableAudio(enable, audioMuted);
+        } else {
+            // The conversation is not ongoing. Always return true
+            return true;
+        }
     }
 
     public interface Listener {
