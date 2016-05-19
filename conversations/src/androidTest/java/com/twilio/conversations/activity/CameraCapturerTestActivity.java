@@ -8,7 +8,6 @@ import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 
 import com.twilio.conversations.CameraCapturer;
-import com.twilio.conversations.CameraCapturerFactory;
 import com.twilio.conversations.CapturerErrorListener;
 import com.twilio.conversations.CapturerException;
 
@@ -87,8 +86,7 @@ public class CameraCapturerTestActivity extends Activity {
         createCapturerButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                cameraCapturer = CameraCapturerFactory
-                        .createCameraCapturer(CameraCapturerTestActivity.this,
+                cameraCapturer = CameraCapturer.create(CameraCapturerTestActivity.this,
                                 CameraCapturer.CameraSource.CAMERA_SOURCE_FRONT_CAMERA,
                                 new CapturerErrorListener() {
                                     @Override

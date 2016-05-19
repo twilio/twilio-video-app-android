@@ -54,8 +54,7 @@ public class VideoConstraintsTests extends TwilioConversationsTestsBase {
 
     @Test(expected = NullPointerException.class)
     public void localVideoTrackWithNullVideoConstraints() {
-        CameraCapturer cameraCapturer = CameraCapturerFactory.
-                createCameraCapturer(
+        CameraCapturer cameraCapturer = CameraCapturer.create(
                         activityRule.getActivity(),
                         CameraCapturer.CameraSource.CAMERA_SOURCE_FRONT_CAMERA,
                         new CapturerErrorListener() {
@@ -67,7 +66,7 @@ public class VideoConstraintsTests extends TwilioConversationsTestsBase {
 
         assertNotNull(cameraCapturer);
 
-        LocalVideoTrackFactory.createLocalVideoTrack(cameraCapturer, null);
+        LocalVideoTrack.create(cameraCapturer, null);
     }
 
     @Test
@@ -91,7 +90,7 @@ public class VideoConstraintsTests extends TwilioConversationsTestsBase {
                         .maxVideoDimensions(new VideoDimensions(10,20))
                         .build());
 
-        LocalMedia localMedia = LocalMediaFactory.createLocalMedia(new LocalMedia.Listener() {
+        LocalMedia localMedia = LocalMedia.create(new LocalMedia.Listener() {
             @Override
             public void onLocalVideoTrackAdded(LocalMedia localMedia, LocalVideoTrack videoTrack) {
                 fail();
@@ -118,14 +117,16 @@ public class VideoConstraintsTests extends TwilioConversationsTestsBase {
         participants.add(SELF_TEST_USER);
 
         final CountDownLatch conversationEndsWhenInviteCancelled = new CountDownLatch(1);
-        final OutgoingInvite outgoingInvite = twilioConversationsClient.sendConversationInvite(participants, localMedia, new ConversationCallback() {
-            @Override
-            public void onConversation(final Conversation conversation, TwilioConversationsException exception) {
-                // The outgoing invite is cancelled and reported as an exception here
-                assertNotNull(exception);
-                conversationEndsWhenInviteCancelled.countDown();
-            }
-        });
+        final OutgoingInvite outgoingInvite = twilioConversationsClient
+                .sendConversationInvite(participants, localMedia, new ConversationCallback() {
+                    @Override
+                    public void onConversation(final Conversation conversation,
+                                               TwilioConversationsException exception) {
+                        // The outgoing invite is cancelled and reported as an exception here
+                        assertNotNull(exception);
+                        conversationEndsWhenInviteCancelled.countDown();
+                    }
+                });
 
         /**
          * Set a new conversations client listener to handle the stop listening for invites event here
@@ -142,17 +143,20 @@ public class VideoConstraintsTests extends TwilioConversationsTestsBase {
             }
 
             @Override
-            public void onFailedToStartListening(TwilioConversationsClient twilioConversationsClient, TwilioConversationsException exception) {
+            public void onFailedToStartListening(TwilioConversationsClient twilioConversationsClient,
+                                                 TwilioConversationsException exception) {
 
             }
 
             @Override
-            public void onIncomingInvite(TwilioConversationsClient twilioConversationsClient, IncomingInvite incomingInvite) {
+            public void onIncomingInvite(TwilioConversationsClient twilioConversationsClient,
+                                         IncomingInvite incomingInvite) {
 
             }
 
             @Override
-            public void onIncomingInviteCancelled(TwilioConversationsClient twilioConversationsClient, IncomingInvite incomingInvite) {
+            public void onIncomingInviteCancelled(TwilioConversationsClient twilioConversationsClient,
+                                                  IncomingInvite incomingInvite) {
 
             }
         });
@@ -187,7 +191,7 @@ public class VideoConstraintsTests extends TwilioConversationsTestsBase {
                         .maxVideoDimensions(VideoDimensions.VGA_VIDEO_DIMENSIONS)
                         .build());
 
-        LocalMedia localMedia = LocalMediaFactory.createLocalMedia(new LocalMedia.Listener() {
+        LocalMedia localMedia = LocalMedia.create(new LocalMedia.Listener() {
             @Override
             public void onLocalVideoTrackAdded(LocalMedia localMedia, LocalVideoTrack videoTrack) {
                 localVideoTrackAddedLatch.countDown();
@@ -199,7 +203,9 @@ public class VideoConstraintsTests extends TwilioConversationsTestsBase {
             }
 
             @Override
-            public void onLocalVideoTrackError(LocalMedia localMedia, LocalVideoTrack track, TwilioConversationsException exception) {
+            public void onLocalVideoTrackError(LocalMedia localMedia,
+                                               LocalVideoTrack track,
+                                               TwilioConversationsException exception) {
                 fail();
             }
         });
@@ -265,7 +271,6 @@ public class VideoConstraintsTests extends TwilioConversationsTestsBase {
 
     private LocalVideoTrack createLocalVideoTrackWithVideoConstraints(Context context, VideoConstraints videoConstraints) throws InterruptedException {
         CameraCapturer cameraCapturer = CameraCapturerHelper.createCameraCapturer(context, CameraCapturer.CameraSource.CAMERA_SOURCE_FRONT_CAMERA);
-        return LocalVideoTrackFactory.createLocalVideoTrack(cameraCapturer, videoConstraints);
+        return LocalVideoTrack.create(cameraCapturer, videoConstraints);
     }
-
 }
