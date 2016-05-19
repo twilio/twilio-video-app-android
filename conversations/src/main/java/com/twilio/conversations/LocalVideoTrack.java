@@ -16,7 +16,7 @@ public class LocalVideoTrack extends VideoTrack {
      * @return new instance of LocalVideoTrack
      */
     public static LocalVideoTrack create(CameraCapturer cameraCapturer) {
-        return new LocalVideoTrack(cameraCapturer);
+        return create(cameraCapturer, defaultVideoConstraints());
     }
 
     /**
@@ -32,26 +32,17 @@ public class LocalVideoTrack extends VideoTrack {
      */
     public static LocalVideoTrack create(CameraCapturer cameraCapturer,
                                          VideoConstraints videoConstraints) {
-        return new LocalVideoTrack(cameraCapturer, videoConstraints);
-    }
-
-    public LocalVideoTrack(CameraCapturer cameraCapturer) {
-        super();
-        if(cameraCapturer == null) {
-            throw new NullPointerException("CameraCapturer must not be null");
-        }
-        this.cameraCapturer = cameraCapturer;
-        this.videoConstraints = defaultVideoConstraints();
-    }
-
-    public LocalVideoTrack(CameraCapturer cameraCapturer, VideoConstraints videoConstraints) {
-        super();
         if(cameraCapturer == null) {
             throw new NullPointerException("CameraCapturer must not be null");
         }
         if(videoConstraints == null) {
             throw new NullPointerException("VideoConstraints must not be null");
         }
+        return new LocalVideoTrack(cameraCapturer, videoConstraints);
+    }
+
+    private LocalVideoTrack(CameraCapturer cameraCapturer, VideoConstraints videoConstraints) {
+        super();
         this.cameraCapturer = cameraCapturer;
         this.videoConstraints = videoConstraints;
     }
