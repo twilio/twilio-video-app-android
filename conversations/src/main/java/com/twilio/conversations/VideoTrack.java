@@ -53,7 +53,6 @@ public class VideoTrack implements MediaTrack {
 
     /**
      * The list of renderers receiving video from this video track
-     * @return
      */
     public List<VideoRenderer> getRenderers() {
         return new ArrayList<>(videoRenderersMap.keySet());
