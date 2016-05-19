@@ -54,61 +54,7 @@
             android:layout_marginBottom="16dp"
             android:layout_marginRight="16dp"
             android:orientation="horizontal">
-            <!--
-            <RelativeLayout
-                android:id="@+id/localContainer"
-                android:layout_width="@dimen/local_video_size"
-                android:layout_height="@dimen/local_video_size"
-                android:layout_weight="1"/>
-
-            <RelativeLayout
-                android:id="@+id/participantContainer1"
-                android:layout_width="@dimen/local_video_size"
-                android:layout_height="@dimen/local_video_size"
-                android:layout_weight="1"/>
-            <RelativeLayout
-                android:id="@+id/participantContainer2"
-                android:layout_width="@dimen/local_video_size"
-                android:layout_height="@dimen/local_video_size"
-                android:layout_weight="1"/> -->
         </LinearLayout>
     </RelativeLayout>
-
-    <!--
-	<RelativeLayout
-		android:id="@+id/videoLinearLayout"
-		android:layout_above="@id/status"
-		android:layout_width="match_parent"
-		android:layout_height="match_parent">
-
-		<RelativeLayout
-			android:id="@+id/participantContainer1"
-			android:layout_width="match_parent"
-			android:layout_height="match_parent" />
-
-		<RelativeLayout
-			android:id="@+id/localContainer"
-			android:layout_width="@dimen/local_video_size"
-			android:layout_height="@dimen/local_video_size"
-			android:layout_alignParentBottom="true"
-			android:layout_alignParentLeft="true"
-			android:layout_marginLeft="16dp"
-			android:layout_marginBottom="16dp" />
-
-        <RelativeLayout
-            android:id="@+id/participantContainer2"
-            android:layout_width="@dimen/local_video_size"
-            android:layout_height="@dimen/local_video_size"
-            android:layout_toRightOf="@id/localContainer"
-            android:layout_alignBottom="@id/localContainer" />
-        <RelativeLayout
-            android:id="@+id/participantContainer3"
-            android:layout_width="@dimen/local_video_size"
-            android:layout_height="@dimen/local_video_size"
-            android:layout_toRightOf="@id/participantContainer2"
-            android:layout_alignBottom="@id/localContainer" />
-
-	</RelativeLayout>
-	-->
 
 </RelativeLayout>
