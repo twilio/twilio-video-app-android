@@ -10,7 +10,6 @@ import java.util.List;
 
 /**
  * Provides local video and audio tracks associated with a {@link Participant}
- *
  */
 public class LocalMedia {
     private List<LocalVideoTrack> videoTracks = new ArrayList<>();

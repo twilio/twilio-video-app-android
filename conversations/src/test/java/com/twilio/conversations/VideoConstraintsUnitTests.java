@@ -120,7 +120,7 @@ public class VideoConstraintsUnitTests {
     public void localVideoTrackWithNullCameraCapturer() {
         CameraCapturer cameraCapturer = null;
 
-        LocalVideoTrackFactory.createLocalVideoTrack(cameraCapturer);
+        new LocalVideoTrack(cameraCapturer);
     }
 
     @Test(expected = NullPointerException.class)
@@ -130,7 +130,7 @@ public class VideoConstraintsUnitTests {
         VideoConstraints videoConstraints = new VideoConstraints.Builder()
                 .build();
 
-        LocalVideoTrackFactory.createLocalVideoTrack(cameraCapturer, videoConstraints);
+        new LocalVideoTrack(cameraCapturer, videoConstraints);
     }
 
 }

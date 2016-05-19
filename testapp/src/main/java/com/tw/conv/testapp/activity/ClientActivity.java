@@ -1877,9 +1877,9 @@ public class ClientActivity extends AppCompatActivity {
 
     private LocalVideoTrack createLocalVideoTrack(CameraCapturer cameraCapturer) {
         if(videoConstraints == null) {
-            return LocalVideoTrack.create(cameraCapturer);
+            return new LocalVideoTrack(cameraCapturer);
         } else {
-            return LocalVideoTrack.create(cameraCapturer, videoConstraints);
+            return new LocalVideoTrack(cameraCapturer, videoConstraints);
         }
     }
     private PendingIntent getRejectPendingIntent() {

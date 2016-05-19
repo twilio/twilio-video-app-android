@@ -66,7 +66,7 @@ public class VideoConstraintsTests extends TwilioConversationsTestsBase {
 
         assertNotNull(cameraCapturer);
 
-        LocalVideoTrack.create(cameraCapturer, null);
+        new LocalVideoTrack(cameraCapturer, null);
     }
 
     @Test
@@ -271,6 +271,6 @@ public class VideoConstraintsTests extends TwilioConversationsTestsBase {
 
     private LocalVideoTrack createLocalVideoTrackWithVideoConstraints(Context context, VideoConstraints videoConstraints) throws InterruptedException {
         CameraCapturer cameraCapturer = CameraCapturerHelper.createCameraCapturer(context, CameraCapturer.CameraSource.CAMERA_SOURCE_FRONT_CAMERA);
-        return LocalVideoTrack.create(cameraCapturer, videoConstraints);
+        return new LocalVideoTrack(cameraCapturer, videoConstraints);
     }
 }

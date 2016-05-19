@@ -97,7 +97,7 @@ public class ConversationTests extends TwilioConversationsTestsBase {
 
         CameraCapturer cameraCapturer = CameraCapturerHelper.createCameraCapturer(activityRule.getActivity(), CameraCapturer.CameraSource.CAMERA_SOURCE_FRONT_CAMERA);
 
-        localMedia.addLocalVideoTrack(LocalVideoTrack.create(cameraCapturer));
+        localMedia.addLocalVideoTrack(new LocalVideoTrack(cameraCapturer));
 
         Set<String> participants = new HashSet<>();
         participants.add(NON_EXISTANT_PARTICIPANT);
