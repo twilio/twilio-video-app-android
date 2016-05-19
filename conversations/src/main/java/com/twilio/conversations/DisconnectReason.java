@@ -1,6 +1,6 @@
 package com.twilio.conversations;
 
-public enum DisconnectReason {
+enum DisconnectReason {
 	PARTICIPANT_TERMINATED(1),
 	WILL_RECONNECT_PEER(2);
 

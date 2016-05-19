@@ -2,7 +2,6 @@ package com.twilio.conversations;
 
 
 public class ClientOptions {
-
     private IceOptions iceOptions;
 
     public ClientOptions() {}
@@ -18,5 +17,4 @@ public class ClientOptions {
     public void setIceOptions(IceOptions iceOptions) {
         this.iceOptions = iceOptions;
     }
-
 }

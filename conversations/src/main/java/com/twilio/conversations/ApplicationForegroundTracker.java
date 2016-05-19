@@ -4,7 +4,7 @@ import android.app.Activity;
 import android.app.Application;
 import android.os.Bundle;
 
-public class ApplicationForegroundTracker implements Application.ActivityLifecycleCallbacks {
+final class ApplicationForegroundTracker implements Application.ActivityLifecycleCallbacks {
     private Activity currentActivity;
 
     @Override

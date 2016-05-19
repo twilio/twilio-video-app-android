@@ -6,7 +6,6 @@ import com.twilio.conversations.CameraCapturer.CameraSource;
 
 /**
  * A factory for creating an instance of {@link CameraCapturer}
- *
  */
 public class CameraCapturerFactory {
     /**

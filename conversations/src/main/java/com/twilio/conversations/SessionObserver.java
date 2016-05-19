@@ -3,7 +3,7 @@ package com.twilio.conversations;
 import org.webrtc.VideoTrack;
 import org.webrtc.AudioTrack;
 
-public interface SessionObserver {
+interface SessionObserver {
     void onSessionStateChanged(SessionState status);
 
     void onStartCompleted(CoreError error);

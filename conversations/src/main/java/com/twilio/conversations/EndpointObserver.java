@@ -1,6 +1,6 @@
 package com.twilio.conversations;
 
-public interface EndpointObserver {
+interface EndpointObserver {
     void onRegistrationDidComplete(CoreError error);
 
     void onUnregistrationDidComplete(CoreError error);

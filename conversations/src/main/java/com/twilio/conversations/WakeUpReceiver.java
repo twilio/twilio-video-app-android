@@ -7,7 +7,7 @@ import android.content.Intent;
 import com.twilio.conversations.TwilioConversationsClient;
 
 
-public class WakeUpReceiver extends BroadcastReceiver {
+public final class WakeUpReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
         if (TwilioConversationsClient.isInitialized()) {

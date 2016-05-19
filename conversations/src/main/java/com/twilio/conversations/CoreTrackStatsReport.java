@@ -5,8 +5,7 @@ import com.twilio.conversations.internal.Logger;
 import java.util.HashMap;
 import java.util.Map;
 
-public class CoreTrackStatsReport {
-
+class CoreTrackStatsReport {
     public static final String DIRECTION_SENDING = "sending";
     public static final String DIRECTION_RECEIVING = "receiving";
     public static final String MEDIA_OPTION_AUDIO_KEY = "audio";
@@ -62,7 +61,7 @@ public class CoreTrackStatsReport {
         }
     }
 
-    public CoreTrackStatsReport(String participantAddress, String participantSid,
+    CoreTrackStatsReport(String participantAddress, String participantSid,
                                 String trackId, String mediaType, String direction, String codecName,
                                 String ssrc, String activeConnectionId, double timestamp,
                                 String[] keys, String[] values) {
@@ -120,5 +119,4 @@ public class CoreTrackStatsReport {
         }
         return result;
     }
-
 }

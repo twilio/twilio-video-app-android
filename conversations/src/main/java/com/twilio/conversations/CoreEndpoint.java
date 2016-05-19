@@ -1,12 +1,7 @@
 package com.twilio.conversations;
 
-import com.twilio.conversations.Conversation;
-import com.twilio.conversations.IceOptions;
-
-public interface CoreEndpoint {
-    void accept(Conversation conversationImpl, IceOptions iceOptions);
-
+interface CoreEndpoint {
+    void accept(Conversation conversation, IceOptions iceOptions);
     void reject(Conversation conversationImpl);
-
     void ignore(Conversation conversationImpl);
 }

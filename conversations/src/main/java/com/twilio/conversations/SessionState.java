@@ -1,6 +1,6 @@
 package com.twilio.conversations;
 
-public enum SessionState {
+enum SessionState {
 	INITIALIZED,
 	STARTING,
 	START_FAILING,

@@ -6,7 +6,7 @@ import android.os.Looper;
 /*
  * Junk drawer of utility methods needed throughout SDK.
  */
-public class Util {
+final class Util {
     /*
      * Return a handler on the thread looper, or the main thread looper if the calling thread
      * does not have a looper. If neither are available this handler will return null.

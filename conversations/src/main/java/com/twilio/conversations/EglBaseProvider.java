@@ -2,7 +2,7 @@ package com.twilio.conversations;
 
 import org.webrtc.EglBase;
 
-public final class EglBaseProvider {
+final class EglBaseProvider {
     private static EglBase rootEglBase;
 
     public static EglBase provideEglBase() {

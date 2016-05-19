@@ -1,16 +1,13 @@
 package com.twilio.conversations;
 
-import com.twilio.conversations.IceOptions;
-import com.twilio.conversations.IceServer;
-
-public class CoreSessionMediaConstraints {
+class CoreSessionMediaConstraints {
 	private boolean enableAudio;
 	private boolean muteAudio;
 	private boolean enableVideo;
 	private boolean pauseVideo;
 	private IceOptions iceOptions;
 
-	public CoreSessionMediaConstraints(
+	CoreSessionMediaConstraints(
 			boolean enableAudio, boolean muteAudio,
 			boolean enableVideo, boolean pauseVideo, IceOptions iceOptions) {
 		this.enableAudio = enableAudio;

@@ -1,6 +1,6 @@
 package com.twilio.conversations;
 
-public class CoreError {
+class CoreError {
     private String errorDomain;
     private int errorCode;
     private String errorMesage;

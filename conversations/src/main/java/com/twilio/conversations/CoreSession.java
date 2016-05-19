@@ -2,7 +2,7 @@ package com.twilio.conversations;
 
 import java.util.Set;
 
-public interface CoreSession {
+interface CoreSession {
     void start(CoreSessionMediaConstraints mediaConstraints);
 
     void stop();

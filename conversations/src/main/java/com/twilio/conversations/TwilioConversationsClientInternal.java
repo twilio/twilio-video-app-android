@@ -19,7 +19,9 @@ import com.twilio.conversations.internal.ClientOptionsInternal;
 public class TwilioConversationsClientInternal implements
         NativeHandleInterface,
         EndpointObserver,
-        CoreEndpoint, Conversation.Listener, ConversationStateObserver {
+        CoreEndpoint,
+        Conversation.Listener,
+        ConversationStateObserver {
     static final Logger logger = Logger.getLogger(TwilioConversationsClientInternal.class);
 
     void removeConversation(Conversation conversation) {

@@ -1,6 +1,6 @@
 package com.twilio.conversations;
 
-public enum EndpointState {
+enum EndpointState {
     INITIALIZED,
     REGISTERING,
     REGISTERED,
