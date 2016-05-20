@@ -41,7 +41,7 @@
         android:layout_height="match_parent">
 
         <RelativeLayout
-            android:id="@+id/mainContainer"
+            android:id="@+id/mainVideoContainer"
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
         <LinearLayout

@@ -180,7 +180,7 @@ public class ClientActivity extends AppCompatActivity {
     private Conversation conversation;
     private FrameLayout previewFrameLayout;
     private LocalData localData;
-    private ViewGroup mainContainer;
+    private ViewGroup mainVideoContainer;
     private boolean mirrorLocalRenderer = true;
 
     private class LocalData {
@@ -298,7 +298,7 @@ public class ClientActivity extends AppCompatActivity {
         previewFrameLayout = (FrameLayout) findViewById(R.id.previewFrameLayout);
         localData = new LocalData();
         localData.container = createParticipantContainer();
-        mainContainer = (ViewGroup)findViewById(R.id.mainContainer);
+        mainVideoContainer = (ViewGroup)findViewById(R.id.mainVideoContainer);
         videoLinearLayout = (LinearLayout)findViewById(R.id.videoLinearLayout);
         videoLinearLayout.removeAllViews();
 
@@ -1631,10 +1631,10 @@ public class ClientActivity extends AppCompatActivity {
                         " ]");
             }
         });
-        if (container == mainContainer) {
-            renderer.applyZOrder(false, false);
+        if (container == mainVideoContainer) {
+            renderer.applyZOrder(false);
         } else {
-            renderer.applyZOrder(true, true);
+            renderer.applyZOrder(true);
             videoLinearLayout.addView(container);
         }
         videoTrack.addRenderer(renderer);
@@ -1651,7 +1651,7 @@ public class ClientActivity extends AppCompatActivity {
         // take out renderer and container for that particiant
         ParticipantData data = participantDataMap.remove(participant);
         // remove small container from linear layout
-        if (data.container != mainContainer) {
+        if (data.container != mainVideoContainer) {
             videoLinearLayout.removeView(data.container);
         }
         data.container.removeAllViews();
@@ -1685,7 +1685,7 @@ public class ClientActivity extends AppCompatActivity {
     }
 
     private void switchLocalContainer(ViewGroup participantContainer) {
-        if (participantContainer != mainContainer) {
+        if (participantContainer != mainVideoContainer) {
             videoLinearLayout.removeView(participantContainer);
         }
 
@@ -1694,7 +1694,7 @@ public class ClientActivity extends AppCompatActivity {
         removeParticipantContainer(participant);
 
         // Remove local container from layout
-        if (localData.container != mainContainer) {
+        if (localData.container != mainVideoContainer) {
             videoLinearLayout.removeView(localData.container);
         }
         localData.localVideoTrack.removeRenderer(localData.renderer);
@@ -1716,13 +1716,13 @@ public class ClientActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 ViewGroup view = (ViewGroup)v;
-                if (view != mainContainer) {
-                    if (mainContainer == localData.container) {
+                if (view != mainVideoContainer) {
+                    if (mainVideoContainer == localData.container) {
                         switchLocalContainer(view);
                     } else if (view == localData.container) {
-                        switchLocalContainer(mainContainer);
+                        switchLocalContainer(mainVideoContainer);
                     } else {
-                        switchContainers(view, mainContainer);
+                        switchContainers(view, mainVideoContainer);
                     }
                 }
             }
@@ -1739,8 +1739,8 @@ public class ClientActivity extends AppCompatActivity {
                 conversationStatusTextView.setText("onVideoTrackAdded " + participant.getIdentity());
                 ViewGroup participantContainer = null;
                 if (participantDataMap.isEmpty()) {
-                    mainContainer = (ViewGroup)findViewById(R.id.mainContainer);
-                    participantContainer = mainContainer;
+                    mainVideoContainer = (ViewGroup)findViewById(R.id.mainVideoContainer);
+                    participantContainer = mainVideoContainer;
                 } else {
                     participantContainer = createParticipantContainer();
                 }
@@ -1756,7 +1756,7 @@ public class ClientActivity extends AppCompatActivity {
                         participant.getIdentity());
                 ParticipantData data = participantDataMap.get(participant);
                 if (data != null) {
-                    if (data.container != mainContainer) {
+                    if (data.container != mainVideoContainer) {
                         removeParticipantContainer(participant);
                     } else {
                         removeParticipantContainer(participant);
@@ -1767,8 +1767,8 @@ public class ClientActivity extends AppCompatActivity {
                             // grab participant associated with that container
                             Participant part = entry.getKey();
                             removeParticipantContainer(part);
-                            mainContainer = (ViewGroup) findViewById(R.id.mainContainer);
-                            addParticipantToContainer(part, mainContainer);
+                            mainVideoContainer = (ViewGroup) findViewById(R.id.mainVideoContainer);
+                            addParticipantToContainer(part, mainVideoContainer);
                         }
                     }
                 }
