@@ -35,36 +35,26 @@
 
 	</LinearLayout>
 
-	<LinearLayout
-		android:id="@+id/videoLinearLayout"
-		android:layout_above="@id/status"
-		android:orientation="vertical"
-		android:layout_width="match_parent"
-		android:layout_height="match_parent">
+    <RelativeLayout
+        android:layout_above="@id/status"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
 
-		<RelativeLayout
-			android:id="@+id/localContainer"
-			android:layout_width="match_parent"
-			android:layout_height="match_parent"
-			android:layout_weight="1" />
-
-		<RelativeLayout
-			android:id="@+id/participantContainer1"
-			android:layout_width="match_parent"
-			android:layout_height="match_parent"
-			android:layout_weight="1" />
-
-		<RelativeLayout
-			android:id="@+id/participantContainer2"
-			android:layout_width="match_parent"
-			android:layout_height="match_parent"
-			android:layout_weight="1" />
-		<RelativeLayout
-			android:id="@+id/participantContainer3"
-			android:layout_width="match_parent"
-			android:layout_height="match_parent"
-			android:layout_weight="1" />
-
-	</LinearLayout>
+        <RelativeLayout
+            android:id="@+id/mainVideoContainer"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+        <LinearLayout
+            android:id="@+id/videoLinearLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentBottom="true"
+            android:layout_marginLeft="16dp"
+            android:layout_marginBottom="16dp"
+            android:layout_marginRight="16dp"
+            android:orientation="horizontal">
+        </LinearLayout>
+    </RelativeLayout>
 
 </RelativeLayout>
