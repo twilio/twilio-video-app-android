@@ -1,6 +1,6 @@
 package com.twilio.conversations;
 
-public final class TwilioConstants {
+final class TwilioConstants {
     public static final String ConversationsClientOptionUserNameKey = "user-name";
     public static final String ConversationsClientOptionAliasNameKey = "alias-name";
     public static final String ConversationsClientOptionPasswordKey = "password";
