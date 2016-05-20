@@ -98,15 +98,13 @@ public class VideoViewRenderer implements VideoRenderer {
     }
 
     /**
-     * Controls placement of the video render relative to other objects
+     * Controls placement of the video render relative to other surface
      *
      * @param overlaySurface if true, video renderer is placed on top of another video renderer
      *                       in the window (but still behind window itself)
-     * @param overlayWindow if true, video renderer is placed on top of it's window
      */
-    public void applyZOrder(boolean overlaySurface, boolean overlayWindow) {
+    public void applyZOrder(boolean overlaySurface) {
         surfaceViewRenderer.setZOrderMediaOverlay(overlaySurface);
-        surfaceViewRenderer.setZOrderOnTop(overlayWindow);
     }
 
     private void setupRenderer(final Context context, final ViewGroup container) {
