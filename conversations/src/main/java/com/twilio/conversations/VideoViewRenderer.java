@@ -6,8 +6,6 @@ import android.os.Looper;
 import android.view.SurfaceView;
 import android.view.ViewGroup;
 
-import com.twilio.conversations.impl.EglBaseProvider;
-
 import org.webrtc.SurfaceViewRenderer;
 import org.webrtc.RendererCommon.ScalingType;
 import org.webrtc.RendererCommon.RendererEvents;

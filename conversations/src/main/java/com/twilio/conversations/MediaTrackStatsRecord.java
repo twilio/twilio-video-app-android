@@ -1,18 +1,67 @@
 package com.twilio.conversations;
 
-public interface MediaTrackStatsRecord {
+public class MediaTrackStatsRecord {
+    private final String trackId;
+    private final int packetsLost;
+    private final String direction;
+    private final String codecName;
+    private final String ssrc;
+    private final String participantSid;
+    private final long unixTimestamp;
 
-    String getTrackId();
+    static MediaTrackStatsRecord create(CoreTrackStatsReport report) {
+        MediaTrackStatsRecord record = null;
+        if (report.direction.equalsIgnoreCase(CoreTrackStatsReport.DIRECTION_SENDING)) {
+            if (report.mediaType.equalsIgnoreCase(CoreTrackStatsReport.MEDIA_OPTION_AUDIO_KEY)) {
+                record = new LocalAudioTrackStatsRecord(report);
+            } else if (report.mediaType.equalsIgnoreCase(CoreTrackStatsReport.MEDIA_OPTION_VIDEO_KEY)) {
+                record = new LocalVideoTrackStatsRecord(report);
+            }
+        } else if (report.direction.equalsIgnoreCase(CoreTrackStatsReport.DIRECTION_RECEIVING)){
+            if (report.mediaType.equalsIgnoreCase(CoreTrackStatsReport.MEDIA_OPTION_AUDIO_KEY)) {
+                record = new RemoteAudioTrackStatsRecord(report);
+            } else if (report.mediaType.equalsIgnoreCase(CoreTrackStatsReport.MEDIA_OPTION_VIDEO_KEY)) {
+                record = new RemoteVideoTrackStatsRecord(report);
+            }
+        }
+        return record;
+    }
 
-    int getPacketsLost();
+    MediaTrackStatsRecord(CoreTrackStatsReport report) {
+        trackId = report.trackId;
+        packetsLost = report.getIntValue(CoreTrackStatsReport.KeyEnum.PACKETS_LOST);
+        direction = report.direction;
+        codecName = report.codecName;
+        ssrc = report.ssrc;
+        participantSid = report.participantSid;
+        unixTimestamp = report.timestamp;
+    }
 
-    String getDirection();
+    public String getTrackId() {
+        return trackId;
+    }
 
-    String getCodecName();
+    public int getPacketsLost() {
+        return packetsLost;
+    }
 
-    String getSsrc();
+    public String getDirection() {
+        return direction;
+    }
 
-    String getParticipantSid();
+    public String getCodecName() {
+        return codecName;
+    }
 
-    long getUnixTimestamp();
+    public String getSsrc() {
+        return ssrc;
+    }
+
+    public String getParticipantSid() {
+        return participantSid;
+    }
+
+    public long getUnixTimestamp() {
+        return unixTimestamp;
+    }
 }

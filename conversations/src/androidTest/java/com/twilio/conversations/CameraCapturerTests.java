@@ -46,8 +46,7 @@ public class CameraCapturerTests {
     public void startPreview_shouldReturnErrorWhenNoPreviewContainerProvided()
             throws InterruptedException {
         final CountDownLatch capturerErrorOccured = new CountDownLatch(1);
-        CameraCapturer cameraCapturer = CameraCapturerFactory
-                .createCameraCapturer(cameraCapturerTestActivity,
+        CameraCapturer cameraCapturer = CameraCapturer.create(cameraCapturerTestActivity,
                         CameraCapturer.CameraSource.CAMERA_SOURCE_FRONT_CAMERA,
                         new CapturerErrorListener() {
                             @Override

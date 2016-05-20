@@ -61,14 +61,14 @@ public class ConversationTests extends TwilioConversationsTestsBase {
         TwilioAccessManager accessManager = AccessTokenHelper.obtainTwilioAccessManager(context, USER);
         TwilioConversationsClient twilioConversationsClient = TwilioConversationsClientHelper.registerClient(activityRule.getActivity(), accessManager);
 
-        LocalMedia localMedia = LocalMediaFactory.createLocalMedia(new LocalMedia.Listener() {
+        LocalMedia localMedia = new LocalMedia(new LocalMedia.Listener() {
             @Override
-            public void onLocalVideoTrackAdded(final LocalMedia localMedia, LocalVideoTrack localVideoTrack) {
+            public void onLocalVideoTrackAdded(final LocalMedia localMedia,
+                                               LocalVideoTrack localVideoTrack) {
                 try {
                     activityRule.runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-
                             final Handler handler = new Handler();
                             handler.post(new Runnable() {
                                 @Override
@@ -77,7 +77,6 @@ public class ConversationTests extends TwilioConversationsTestsBase {
                                     handler.postDelayed(this, 100);
                                 }
                             });
-
                         }
                     });
                 } catch (Throwable throwable) {
@@ -98,7 +97,7 @@ public class ConversationTests extends TwilioConversationsTestsBase {
 
         CameraCapturer cameraCapturer = CameraCapturerHelper.createCameraCapturer(activityRule.getActivity(), CameraCapturer.CameraSource.CAMERA_SOURCE_FRONT_CAMERA);
 
-        localMedia.addLocalVideoTrack(LocalVideoTrackFactory.createLocalVideoTrack(cameraCapturer));
+        localMedia.addLocalVideoTrack(new LocalVideoTrack(cameraCapturer));
 
         Set<String> participants = new HashSet<>();
         participants.add(NON_EXISTANT_PARTICIPANT);
@@ -115,5 +114,4 @@ public class ConversationTests extends TwilioConversationsTestsBase {
 
         conversationEndsWithException.await(10, TimeUnit.SECONDS);
     }
-
 }

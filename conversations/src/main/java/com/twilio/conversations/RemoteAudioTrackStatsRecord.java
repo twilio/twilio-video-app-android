@@ -1,16 +1,38 @@
 package com.twilio.conversations;
 
+public class RemoteAudioTrackStatsRecord extends MediaTrackStatsRecord {
+    private final long bytesReceived;
+    private final long packetsReceived;
+    private final int audioOutputLevel;
+    private final int jitterBuffer;
+    private final int jitterReceived;
 
-public interface RemoteAudioTrackStatsRecord extends MediaTrackStatsRecord {
+    public RemoteAudioTrackStatsRecord(CoreTrackStatsReport report) {
+        super(report);
+        bytesReceived = report.getLongValue(CoreTrackStatsReport.KeyEnum.BYTES_RECEIVED);
+        packetsReceived = report.getLongValue(CoreTrackStatsReport.KeyEnum.PACKETS_RECEIVED);
+        audioOutputLevel = report.getIntValue(CoreTrackStatsReport.KeyEnum.AUDIO_OUTPUT_LEVEL);
+        jitterBuffer = report.getIntValue(CoreTrackStatsReport.KeyEnum.JITTER_BUFFER_MS);
+        jitterReceived = report.getIntValue(CoreTrackStatsReport.KeyEnum.JITTER_RECEIVED);
+    }
 
-    long getBytesReceived();
+    public long getBytesReceived() {
+        return bytesReceived;
+    }
 
-    long getPacketsReceived();
+    public long getPacketsReceived() {
+        return packetsReceived;
+    }
 
-    int getAudioOutputLevel();
+    public int getAudioOutputLevel() {
+        return audioOutputLevel;
+    }
 
-    int getJitterBuffer();
+    public int getJitterBuffer() {
+        return jitterBuffer;
+    }
 
-    int getJitterReceived();
-
+    public int getJitterReceived() {
+        return jitterReceived;
+    }
 }

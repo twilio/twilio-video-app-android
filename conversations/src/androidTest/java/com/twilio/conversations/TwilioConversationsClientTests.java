@@ -58,7 +58,7 @@ public class TwilioConversationsClientTests extends TwilioConversationsTestsBase
                 .registerClient(activityRule.getActivity(), accessManager);
         Assert.assertNotNull(twilioConversationsClient);
 
-        LocalMedia localMedia = LocalMediaFactory.createLocalMedia(localMediaListener());
+        LocalMedia localMedia = new LocalMedia(localMediaListener());
         Assert.assertNotNull(localMedia);
 
         twilioConversationsClient.sendConversationInvite(null, localMedia, conversationCallback());
@@ -85,7 +85,7 @@ public class TwilioConversationsClientTests extends TwilioConversationsTestsBase
                 .registerClient(activityRule.getActivity(), accessManager);
         Assert.assertNotNull(twilioConversationsClient);
 
-        LocalMedia localMedia = LocalMediaFactory.createLocalMedia(localMediaListener());
+        LocalMedia localMedia = new LocalMedia(localMediaListener());
 
         Set<String> participants = new HashSet<>();
         participants.add(PARTICIPANT);
@@ -101,7 +101,7 @@ public class TwilioConversationsClientTests extends TwilioConversationsTestsBase
                 .registerClient(activityRule.getActivity(), accessManager);
         Assert.assertNotNull(twilioConversationsClient);
 
-        LocalMedia localMedia = LocalMediaFactory.createLocalMedia(localMediaListener());
+        LocalMedia localMedia = new LocalMedia(localMediaListener());
 
         Set<String> participants = new HashSet<>();
 
@@ -118,7 +118,7 @@ public class TwilioConversationsClientTests extends TwilioConversationsTestsBase
                 .registerClient(activityRule.getActivity(), accessManager);
         Assert.assertNotNull(twilioConversationsClient);
 
-        LocalMedia localMedia = LocalMediaFactory.createLocalMedia(localMediaListener());
+        LocalMedia localMedia = new LocalMedia(localMediaListener());
 
         Set<String> participants = new HashSet<>();
         participants.add(PARTICIPANT);
@@ -137,7 +137,7 @@ public class TwilioConversationsClientTests extends TwilioConversationsTestsBase
                 .registerClient(activityRule.getActivity(), accessManager);
         Assert.assertNotNull(twilioConversationsClient);
 
-        LocalMedia localMedia = LocalMediaFactory.createLocalMedia(localMediaListener());
+        LocalMedia localMedia = new LocalMedia(localMediaListener());
 
         Set<String> participants = new HashSet<>();
         participants.add(PARTICIPANT);
@@ -149,7 +149,8 @@ public class TwilioConversationsClientTests extends TwilioConversationsTestsBase
     @Test
     @Ignore
     public void canListenAfterClientCreation() throws InterruptedException {
-        TwilioAccessManager accessManager = AccessTokenHelper.obtainTwilioAccessManager(context, TEST_USER);
+        TwilioAccessManager accessManager = AccessTokenHelper.obtainTwilioAccessManager(context,
+                TEST_USER);
         TwilioConversationsClient twilioConversationsClient = TwilioConversationsClientHelper
                 .registerClient(activityRule.getActivity(), accessManager);
         assertTrue(twilioConversationsClient.isListening());

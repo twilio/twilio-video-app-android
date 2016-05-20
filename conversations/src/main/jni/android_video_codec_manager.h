@@ -1,7 +1,3 @@
-//
-// Created by Aaron Alaniz on 4/1/16.
-//
-
 #ifndef ANDROID_VIDEO_CODEC_MANAGER_H
 #define ANDROID_VIDEO_CODEC_MANAGER_H
 

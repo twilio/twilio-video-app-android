@@ -1,5 +1,5 @@
-#ifndef TC_PLATFORM_DATA_PROVIDER_IMPL_H
-#define TC_PLATFORM_DATA_PROVIDER_IMPL_H
+#ifndef TC_PLATFORM_DATA_PROVIDER_H
+#define TC_PLATFORM_DATA_PROVIDER_H
 
 #include <jni.h>
 #include <string.h>
