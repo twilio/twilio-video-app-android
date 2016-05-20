@@ -97,8 +97,16 @@ public class VideoViewRenderer implements VideoRenderer {
         surfaceViewRenderer.renderFrame(convertToWebRtcFrame(frame));
     }
 
-    public SurfaceView getSurfaceView(){
-        return surfaceViewRenderer;
+    /**
+     * Controls placement of the video render relative to other objects
+     *
+     * @param overlaySurface if true, video renderer is placed on top of another video renderer
+     *                       in the window (but still behind window itself)
+     * @param overlayWindow if true, video renderer is placed on top of it's window
+     */
+    public void applyZOrder(boolean overlaySurface, boolean overlayWindow) {
+        surfaceViewRenderer.setZOrderMediaOverlay(overlaySurface);
+        surfaceViewRenderer.setZOrderOnTop(overlayWindow);
     }
 
     private void setupRenderer(final Context context, final ViewGroup container) {

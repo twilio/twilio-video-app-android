@@ -11,7 +11,6 @@ import android.graphics.drawable.Drawable;
 import android.media.AudioManager;
 import android.os.Bundle;
 import android.os.Handler;
-import android.provider.Telephony;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.NotificationCompat;
@@ -1633,9 +1632,9 @@ public class ClientActivity extends AppCompatActivity {
             }
         });
         if (container == mainContainer) {
-            renderer.getSurfaceView().setZOrderMediaOverlay(false);
+            renderer.applyZOrder(false, false);
         } else {
-            renderer.getSurfaceView().setZOrderMediaOverlay(true);
+            renderer.applyZOrder(true, true);
             videoLinearLayout.addView(container);
         }
         videoTrack.addRenderer(renderer);
