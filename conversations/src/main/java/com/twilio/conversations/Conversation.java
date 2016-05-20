@@ -151,7 +151,7 @@ public class Conversation implements NativeHandleInterface, SessionObserver, Cor
         nativeSetSessionObserver(nativeSession, sessionObserverInternal.getNativeHandle());
     }
 
-    public static Conversation createOutgoingConversation(
+    static Conversation createOutgoingConversation(
             TwilioConversationsClientInternal conversationsClient,
             Set<String> participants,
             LocalMedia localMedia,
@@ -163,7 +163,7 @@ public class Conversation implements NativeHandleInterface, SessionObserver, Cor
         return conversation;
     }
 
-    public static Conversation createIncomingConversation(
+    static Conversation createIncomingConversation(
             TwilioConversationsClientInternal conversationsClientInternal,
             long nativeSession,
             String[] participantIdentities,
