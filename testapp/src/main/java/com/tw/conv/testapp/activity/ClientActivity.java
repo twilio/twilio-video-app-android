@@ -1617,7 +1617,7 @@ public class ClientActivity extends AppCompatActivity {
                                                          VideoTrack videoTrack) {
         VideoViewRenderer renderer = new VideoViewRenderer(this, container);
         renderer.setVideoScaleType(VideoScaleType.ASPECT_FILL);
-        renderer.setObserver(new VideoRendererObserver() {
+        renderer.setObserver(new VideoRenderer.Observer() {
             @Override
             public void onFirstFrame() {
                 Timber.i("Participant onFirstFrame");
