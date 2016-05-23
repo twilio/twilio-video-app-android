@@ -61,7 +61,7 @@ public class TwilioConversationsClientTests extends TwilioConversationsTestsBase
         LocalMedia localMedia = new LocalMedia(localMediaListener());
         Assert.assertNotNull(localMedia);
 
-        twilioConversationsClient.sendConversationInvite(null, localMedia, conversationCallback());
+        twilioConversationsClient.inviteToConversation(null, localMedia, conversationCallback());
     }
 
     @Test(expected = IllegalStateException.class)
@@ -74,7 +74,7 @@ public class TwilioConversationsClientTests extends TwilioConversationsTestsBase
         Set<String> participants = new HashSet<>();
         participants.add(PARTICIPANT);
 
-        twilioConversationsClient.sendConversationInvite(participants, null, conversationCallback());
+        twilioConversationsClient.inviteToConversation(participants, null, conversationCallback());
     }
 
     @Test(expected = IllegalStateException.class)
@@ -90,7 +90,7 @@ public class TwilioConversationsClientTests extends TwilioConversationsTestsBase
         Set<String> participants = new HashSet<>();
         participants.add(PARTICIPANT);
 
-        twilioConversationsClient.sendConversationInvite(participants, localMedia, null);
+        twilioConversationsClient.inviteToConversation(participants, localMedia, null);
     }
 
     @Test(expected = IllegalStateException.class)
@@ -105,7 +105,7 @@ public class TwilioConversationsClientTests extends TwilioConversationsTestsBase
 
         Set<String> participants = new HashSet<>();
 
-        twilioConversationsClient.sendConversationInvite(participants,
+        twilioConversationsClient.inviteToConversation(participants,
                 localMedia,
                 conversationCallback());
     }
@@ -124,7 +124,7 @@ public class TwilioConversationsClientTests extends TwilioConversationsTestsBase
         participants.add(PARTICIPANT);
         participants.add(null);
 
-        twilioConversationsClient.sendConversationInvite(participants,
+        twilioConversationsClient.inviteToConversation(participants,
                 localMedia,
                 conversationCallback());
     }
@@ -143,7 +143,7 @@ public class TwilioConversationsClientTests extends TwilioConversationsTestsBase
         participants.add(PARTICIPANT);
         participants.add("");
 
-        twilioConversationsClient.sendConversationInvite(participants, localMedia, conversationCallback());
+        twilioConversationsClient.inviteToConversation(participants, localMedia, conversationCallback());
     }
 
     @Test
