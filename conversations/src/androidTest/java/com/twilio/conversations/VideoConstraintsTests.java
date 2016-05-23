@@ -118,7 +118,7 @@ public class VideoConstraintsTests extends TwilioConversationsTestsBase {
 
         final CountDownLatch conversationEndsWhenInviteCancelled = new CountDownLatch(1);
         final OutgoingInvite outgoingInvite = twilioConversationsClient
-                .sendConversationInvite(participants, localMedia, new ConversationCallback() {
+                .inviteToConversation(participants, localMedia, new ConversationCallback() {
                     @Override
                     public void onConversation(final Conversation conversation,
                                                TwilioConversationsException exception) {
@@ -220,7 +220,7 @@ public class VideoConstraintsTests extends TwilioConversationsTestsBase {
         participants.add(SELF_TEST_USER);
 
         final CountDownLatch conversationEndsWhenInviteCancelled = new CountDownLatch(1);
-        final OutgoingInvite outgoingInvite = twilioConversationsClient.sendConversationInvite(participants, localMedia, new ConversationCallback() {
+        final OutgoingInvite outgoingInvite = twilioConversationsClient.inviteToConversation(participants, localMedia, new ConversationCallback() {
             @Override
             public void onConversation(final Conversation conversation, TwilioConversationsException exception) {
                 // The outgoing invite is cancelled and reported as an exception here

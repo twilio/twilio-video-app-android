@@ -434,9 +434,9 @@ public class TwilioConversationsClient {
      * @param conversationCallback The callback that will provide the conversation once it's been
      *                             created
      */
-    public OutgoingInvite sendConversationInvite(Set<String> participants,
-                                          LocalMedia localMedia,
-                                          ConversationCallback conversationCallback) {
+    public OutgoingInvite inviteToConversation(Set<String> participants,
+                                               LocalMedia localMedia,
+                                               ConversationCallback conversationCallback) {
         return conversationsClientInternal.sendConversationInvite(
                 participants, localMedia, conversationCallback);
     }
@@ -468,10 +468,10 @@ public class TwilioConversationsClient {
      * @param conversationCallback The callback that will provide the conversation once it's been
      *                             created
      */
-    public OutgoingInvite sendConversationInvite(Set<String> participants,
-                                          LocalMedia localMedia,
-                                          IceOptions iceOptions,
-                                          ConversationCallback conversationCallback) {
+    public OutgoingInvite inviteToConversation(Set<String> participants,
+                                               LocalMedia localMedia,
+                                               IceOptions iceOptions,
+                                               ConversationCallback conversationCallback) {
         return conversationsClientInternal.sendConversationInvite(
                 participants, localMedia, iceOptions, conversationCallback);
     }

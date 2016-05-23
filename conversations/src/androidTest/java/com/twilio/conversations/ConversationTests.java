@@ -104,7 +104,7 @@ public class ConversationTests extends TwilioConversationsTestsBase {
 
         final CountDownLatch conversationEndsWithException = new CountDownLatch(1);
 
-        twilioConversationsClient.sendConversationInvite(participants, localMedia, new ConversationCallback() {
+        twilioConversationsClient.inviteToConversation(participants, localMedia, new ConversationCallback() {
             @Override
             public void onConversation(Conversation conversation, TwilioConversationsException e) {
                 assertNotNull(e);

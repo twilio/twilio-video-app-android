@@ -1210,11 +1210,11 @@ public class ClientActivity extends AppCompatActivity {
                     localMedia = createLocalMedia();
 
                     IceOptions iceOptions = createIceOptions();
-                    outgoingInvite = twilioConversationsClient.sendConversationInvite(participants,
+                    outgoingInvite = twilioConversationsClient.inviteToConversation(participants,
                             localMedia, iceOptions, new ConversationCallback() {
                                 @Override
                                 public void onConversation(Conversation conversation, TwilioConversationsException e) {
-                                    Timber.e("sendConversationInvite onConversation");
+                                    Timber.e("inviteToConversation onConversation");
                                     if (e == null) {
                                         Timber.i("Conversation SID " + conversation.getSid());
                                         ClientActivity.this.conversation = conversation;
