@@ -236,17 +236,19 @@ public class TwilioConversationsClient {
      * all {@link TwilioConversationsClient} are destroyed and are no longer usable.
      *
      */
-    public static void destroy() {
-        // Destoy all registered clients and system events listeners
-        internalRegistry.destroy();
-        internalRegistry = null;
+    public synchronized static void destroy() {
+        if (initialized) {
+            // Destoy all registered clients and system events listeners
+            internalRegistry.destroy();
+            internalRegistry = null;
 
-        // Now we can teardown the sdk
-        // TODO destroy investigate making this asynchronous with callbacks
-        logger.d("Destroying Core");
-        nativeDestroyCore();
-        logger.d("Core destroyed");
-        initialized = false;
+            // Now we can teardown the sdk
+            // TODO destroy investigate making this asynchronous with callbacks
+            logger.d("Destroying Core");
+            nativeDestroyCore();
+            logger.d("Core destroyed");
+            initialized = false;
+        }
     }
 
     /**
