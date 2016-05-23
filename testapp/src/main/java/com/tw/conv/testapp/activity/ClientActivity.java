@@ -54,9 +54,7 @@ import com.tw.conv.testapp.model.TwilioIceServer;
 import com.tw.conv.testapp.util.IceOptionsHelper;
 import com.tw.conv.testapp.util.ParticipantParser;
 import com.tw.conv.testapp.util.SimpleSignalingUtils;
-import com.twilio.common.TwilioAccessManager;
-import com.twilio.common.TwilioAccessManagerFactory;
-import com.twilio.common.TwilioAccessManagerListener;
+import com.twilio.common.AccessManager;
 import com.twilio.conversations.AspectRatio;
 import com.twilio.conversations.AudioOutput;
 import com.twilio.conversations.AudioTrack;
@@ -204,7 +202,7 @@ public class ClientActivity extends AppCompatActivity {
     private VideoState videoState;
     private AudioState audioState;
     private String capabilityToken;
-    private TwilioAccessManager accessManager;
+    private AccessManager accessManager;
 
     private VideoConstraints videoConstraints;
 
@@ -479,7 +477,7 @@ public class ClientActivity extends AppCompatActivity {
         spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         aspectRatioSpinner.setAdapter(spinnerAdapter);
 
-        accessManager = TwilioAccessManagerFactory.createAccessManager(this, capabilityToken,
+        accessManager = AccessManager.create(this, capabilityToken,
                 accessManagerListener());
 
         twilioConversationsClient = TwilioConversationsClient.create(accessManager, options,
@@ -929,26 +927,26 @@ public class ClientActivity extends AppCompatActivity {
         };
     }
 
-    private TwilioAccessManagerListener accessManagerListener() {
-        return new TwilioAccessManagerListener() {
+    private AccessManager.Listener accessManagerListener() {
+        return new AccessManager.Listener() {
             /*
              *  The token expiration event notifies the developer 3 minutes before
              *  token actually expires to allow the developer to request a new token
              */
             @Override
-            public void onTokenExpired(TwilioAccessManager twilioAccessManager) {
+            public void onTokenExpired(AccessManager twilioAccessManager) {
                 Timber.d("onAccessManagerTokenExpire");
                 conversationsClientStatusTextView.setText("onAccessManagerTokenExpire");
                 obtainCapabilityToken();
             }
 
             @Override
-            public void onTokenUpdated(TwilioAccessManager twilioAccessManager) {
+            public void onTokenUpdated(AccessManager twilioAccessManager) {
                 conversationsClientStatusTextView.setText("onAccessManagerTokenUpdated");
             }
 
             @Override
-            public void onError(TwilioAccessManager twilioAccessManager, String s) {
+            public void onError(AccessManager twilioAccessManager, String s) {
                 Timber.e(s);
                 conversationsClientStatusTextView.setText("onAccessManagerTokenError: " + s);
             }

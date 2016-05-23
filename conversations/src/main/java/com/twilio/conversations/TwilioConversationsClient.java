@@ -13,7 +13,7 @@ import android.net.ConnectivityManager;
 import android.os.Handler;
 import android.util.Log;
 
-import com.twilio.common.TwilioAccessManager;
+import com.twilio.common.AccessManager;
 import com.twilio.conversations.internal.Logger;
 import com.twilio.conversations.internal.ReLinker;
 
@@ -300,14 +300,14 @@ public class TwilioConversationsClient {
     /**
      * Creates a new {@link TwilioConversationsClient}.
      *
-     * @param accessManager The instance of {@link TwilioAccessManager} that is handling token
+     * @param accessManager The instance of {@link AccessManager} that is handling token
      *                      lifetime
      * @param listener A listener that receive events from the TwilioConversationsClient.
      *
      * @return the initialized {@link TwilioConversationsClient}, or null if the Twilio
      *         Conversations Client was not initialized
      */
-    public static TwilioConversationsClient create(TwilioAccessManager accessManager,
+    public static TwilioConversationsClient create(AccessManager accessManager,
                                                    Listener listener) {
         return create(accessManager, null, listener);
     }
@@ -315,14 +315,14 @@ public class TwilioConversationsClient {
     /**
      * Creates a new {@link TwilioConversationsClient}.
      *
-     * @param accessManager The instance of {@link TwilioAccessManager} that is handling
+     * @param accessManager The instance of {@link AccessManager} that is handling
      *                      token lifetime
      * @param listener A listener that receive events from the TwilioConversationsClient.
      *
      * @return the initialized {@link TwilioConversationsClient}, or null if the Twilio
      *         Conversations Client was not initialized
      */
-    public static TwilioConversationsClient create(TwilioAccessManager accessManager,
+    public static TwilioConversationsClient create(AccessManager accessManager,
                                                    ClientOptions options,
                                                    Listener listener) {
         if (accessManager == null) {
@@ -521,7 +521,7 @@ public class TwilioConversationsClient {
     private final UUID uuid = UUID.randomUUID();
 
 
-    private TwilioConversationsClient(TwilioAccessManager accessManager,
+    private TwilioConversationsClient(AccessManager accessManager,
                                       ClientOptions options,
                                       Listener listener) {
         this.conversationsClientInternal = new TwilioConversationsClientInternal(

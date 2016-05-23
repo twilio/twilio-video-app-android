@@ -12,7 +12,8 @@ import android.content.Context;
 import android.media.AudioManager;
 import android.os.Handler;
 
-import com.twilio.common.TwilioAccessManager;
+import com.twilio.common.AccessManager;
+
 import com.twilio.conversations.internal.Logger;
 import com.twilio.conversations.internal.ClientOptionsInternal;
 
@@ -78,7 +79,7 @@ final class TwilioConversationsClientInternal implements
     private TwilioConversationsClient.Listener conversationsClientListener;
     private EndpointObserverInternal endpointObserver;
     private long nativeEndpointHandle;
-    private TwilioAccessManager accessManager;
+    private AccessManager accessManager;
     private Handler handler;
     private EndpointState endpointState;
     private Set<Conversation> conversations = Collections
@@ -101,7 +102,7 @@ final class TwilioConversationsClientInternal implements
     public TwilioConversationsClientInternal(
                 TwilioConversationsClient conversationsClient,
                 Context context,
-                TwilioAccessManager accessManager,
+                AccessManager accessManager,
                 TwilioConversationsClient.Listener listener,
                 ClientOptions options,
                 Handler handler) {
@@ -557,7 +558,7 @@ final class TwilioConversationsClientInternal implements
         }
     }
 
-    private native long nativeCreateEndpoint(TwilioAccessManager accessManager,
+    private native long nativeCreateEndpoint(AccessManager accessManager,
                                              String[] optionsArray,
                                              long nativeEndpointObserver);
     private native void nativeListen(long nativeEndpoint);
