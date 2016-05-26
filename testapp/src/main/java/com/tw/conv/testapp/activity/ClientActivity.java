@@ -1637,14 +1637,19 @@ public class ClientActivity extends AppCompatActivity {
     }
 
     private void addParticipantToContainer(Participant participant, ViewGroup container) {
-        VideoTrack videoTrack = participant.getMedia().getVideoTracks().get(0);
-        VideoViewRenderer renderer = createRendererForContainer(container, videoTrack);
-        participantDataMap.put(participant, new ParticipantData(container, renderer));
+        if (participant.getMedia().getVideoTracks().size() > 0) {
+            VideoTrack videoTrack = participant.getMedia().getVideoTracks().get(0);
+            VideoViewRenderer renderer = createRendererForContainer(container, videoTrack);
+            participantDataMap.put(participant, new ParticipantData(container, renderer));
+        }
     }
 
     private void removeParticipantContainer(Participant participant) {
         // take out renderer and container for that particiant
         ParticipantData data = participantDataMap.remove(participant);
+        if (data == null) {
+            return;
+        }
         // remove small container from linear layout
         if (data.container != mainVideoContainer) {
             videoLinearLayout.removeView(data.container);
@@ -1686,6 +1691,9 @@ public class ClientActivity extends AppCompatActivity {
 
         // Remove participant from main container
         Participant participant = getParticipantFromContainer(participantContainer);
+        if (participant == null) {
+            return;
+        }
         removeParticipantContainer(participant);
 
         // Remove local container from layout
@@ -1733,13 +1741,18 @@ public class ClientActivity extends AppCompatActivity {
                 Timber.i("onVideoTrackAdded " + participant.getIdentity());
                 conversationStatusTextView.setText("onVideoTrackAdded " + participant.getIdentity());
                 ViewGroup participantContainer = null;
-                if (participantDataMap.isEmpty()) {
+                if (participantDataMap.isEmpty() &&
+                        localData.container != mainVideoContainer) {
                     mainVideoContainer = (ViewGroup)findViewById(R.id.mainVideoContainer);
                     participantContainer = mainVideoContainer;
                 } else {
                     participantContainer = createParticipantContainer();
                 }
-                addParticipantToContainer(participant, participantContainer);
+                if (mainVideoContainer == localData.container) {
+                    switchLocalContainer(participantContainer);
+                } else {
+                    addParticipantToContainer(participant, participantContainer);
+                }
             }
 
             @Override
@@ -1755,7 +1768,9 @@ public class ClientActivity extends AppCompatActivity {
                         removeParticipantContainer(participant);
                     } else {
                         removeParticipantContainer(participant);
-                        if (!participantDataMap.isEmpty()) {
+                        if (participantDataMap.isEmpty()) {
+                            // TODO - !nn! - move local container to main
+                        } else {
                             // Take first available container
                             Map.Entry<Participant, ParticipantData> entry =
                                     participantDataMap.entrySet().iterator().next();
@@ -1895,7 +1910,14 @@ public class ClientActivity extends AppCompatActivity {
                                                LocalVideoTrack localVideoTrack) {
                 videoState = VideoState.ENABLED;
                 conversationStatusTextView.setText("onLocalVideoTrackAdded");
-                ViewGroup localContainer = createParticipantContainer();
+                ViewGroup localContainer = null;
+                if (participantDataMap.isEmpty()) {
+                    mainVideoContainer = (ViewGroup)findViewById(R.id.mainVideoContainer);
+                    localContainer = mainVideoContainer;
+                } else {
+                    localContainer = createParticipantContainer();
+                    videoLinearLayout.addView(localContainer);
+                }
                 VideoViewRenderer localRenderer = new VideoViewRenderer(ClientActivity.this,
                         localContainer);
                 localRenderer.setVideoScaleType(VideoScaleType.ASPECT_FILL);
@@ -1904,7 +1926,6 @@ public class ClientActivity extends AppCompatActivity {
                 localData.container = localContainer;
                 localData.renderer = localRenderer;
                 localData.localVideoTrack = localVideoTrack;
-                videoLinearLayout.addView(localContainer);
                 setVideoStateIcon();
                 pauseActionFab.setOnClickListener(pauseClickListener());
                 setAudioStateIcon();
