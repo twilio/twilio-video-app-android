@@ -171,8 +171,6 @@ model {
                 "-DWEBRTC_ANDROID",
                 "-DWEBRTC_ANDROID_OPENSLES",
                 "-DPOCO_ANDROID",
-                "-DPJ_IS_BIG_ENDIAN=0",
-                "-DPJ_IS_LITTLE_ENDIAN=1",
                 "-Wall",
                 "-std=gnu++11",
                 "-fexceptions"
