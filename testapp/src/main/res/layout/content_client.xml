@@ -36,16 +36,13 @@
 	</LinearLayout>
 
     <RelativeLayout
+		android:id="@+id/videoMainRelativeLayout"
         android:layout_above="@id/status"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <RelativeLayout
-            android:id="@+id/mainVideoContainer"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent" />
         <LinearLayout
-            android:id="@+id/videoLinearLayout"
+            android:id="@+id/videoThumbsLinearLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
