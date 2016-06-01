@@ -2,7 +2,7 @@ package com.twilio.conversations.helper;
 
 import android.content.Context;
 
-import com.twilio.common.TwilioAccessManager;
+import com.twilio.common.AccessManager;
 import com.twilio.conversations.TwilioConversationsClient;
 import com.twilio.conversations.IncomingInvite;
 import com.twilio.conversations.TwilioConversationsException;
@@ -15,7 +15,7 @@ import static org.junit.Assert.fail;
 
 public class TwilioConversationsClientHelper {
 
-    public static TwilioConversationsClient registerClient(Context context, TwilioAccessManager twilioAccessManager) throws InterruptedException {
+    public static TwilioConversationsClient registerClient(Context context, AccessManager twilioAccessManager) throws InterruptedException {
         TwilioConversationsHelper.initialize(context);
 
         final CountDownLatch listeningLatch = new CountDownLatch(1);

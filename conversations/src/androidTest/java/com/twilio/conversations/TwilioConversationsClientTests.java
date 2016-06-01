@@ -5,7 +5,7 @@ import android.support.test.filters.LargeTest;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
 
-import com.twilio.common.TwilioAccessManager;
+import com.twilio.common.AccessManager;
 import com.twilio.conversations.activity.TwilioConversationsActivity;
 import com.twilio.conversations.helper.AccessTokenHelper;
 import com.twilio.conversations.helper.TwilioConversationsClientHelper;
@@ -32,7 +32,7 @@ public class TwilioConversationsClientTests extends TwilioConversationsTestsBase
     private static String PARTICIPANT = "janne";
     private Context context;
 
-    private TwilioAccessManager accessManager;
+    private AccessManager accessManager;
 
     @Rule
     public ActivityTestRule<TwilioConversationsActivity> activityRule = new ActivityTestRule<>(
@@ -53,7 +53,7 @@ public class TwilioConversationsClientTests extends TwilioConversationsTestsBase
 
     @Test(expected = IllegalStateException.class)
     public void cannotSendInviteWithNullParticipantSet() throws InterruptedException {
-        accessManager = AccessTokenHelper.obtainTwilioAccessManager(context, PARTICIPANT);
+        accessManager = AccessTokenHelper.obtainAccessManager(context, PARTICIPANT);
         TwilioConversationsClient twilioConversationsClient = TwilioConversationsClientHelper
                 .registerClient(activityRule.getActivity(), accessManager);
         Assert.assertNotNull(twilioConversationsClient);
@@ -66,7 +66,7 @@ public class TwilioConversationsClientTests extends TwilioConversationsTestsBase
 
     @Test(expected = IllegalStateException.class)
     public void cannotSendInviteWithNullLocalMedia() throws InterruptedException {
-        accessManager = AccessTokenHelper.obtainTwilioAccessManager(context, PARTICIPANT);
+        accessManager = AccessTokenHelper.obtainAccessManager(context, PARTICIPANT);
         TwilioConversationsClient twilioConversationsClient = TwilioConversationsClientHelper
                 .registerClient(activityRule.getActivity(), accessManager);
         Assert.assertNotNull(twilioConversationsClient);
@@ -80,7 +80,7 @@ public class TwilioConversationsClientTests extends TwilioConversationsTestsBase
     @Test(expected = IllegalStateException.class)
     @Ignore
     public void cannotSendInviteWithNullConversationCallback() throws InterruptedException {
-        accessManager = AccessTokenHelper.obtainTwilioAccessManager(context, PARTICIPANT);
+        accessManager = AccessTokenHelper.obtainAccessManager(context, PARTICIPANT);
         TwilioConversationsClient twilioConversationsClient = TwilioConversationsClientHelper
                 .registerClient(activityRule.getActivity(), accessManager);
         Assert.assertNotNull(twilioConversationsClient);
@@ -96,7 +96,7 @@ public class TwilioConversationsClientTests extends TwilioConversationsTestsBase
     @Test(expected = IllegalStateException.class)
     @Ignore
     public void cannotSendInviteWithEmptyParticipantSet() throws InterruptedException {
-        accessManager = AccessTokenHelper.obtainTwilioAccessManager(context, PARTICIPANT);
+        accessManager = AccessTokenHelper.obtainAccessManager(context, PARTICIPANT);
         TwilioConversationsClient twilioConversationsClient = TwilioConversationsClientHelper
                 .registerClient(activityRule.getActivity(), accessManager);
         Assert.assertNotNull(twilioConversationsClient);
@@ -113,7 +113,7 @@ public class TwilioConversationsClientTests extends TwilioConversationsTestsBase
     @Test(expected = IllegalArgumentException.class)
     @Ignore
     public void cannotSendInviteIfOneOfParticipantsIsNull() throws InterruptedException {
-        accessManager = AccessTokenHelper.obtainTwilioAccessManager(context, PARTICIPANT);
+        accessManager = AccessTokenHelper.obtainAccessManager(context, PARTICIPANT);
         TwilioConversationsClient twilioConversationsClient = TwilioConversationsClientHelper
                 .registerClient(activityRule.getActivity(), accessManager);
         Assert.assertNotNull(twilioConversationsClient);
@@ -132,7 +132,7 @@ public class TwilioConversationsClientTests extends TwilioConversationsTestsBase
     @Test(expected = IllegalArgumentException.class)
     @Ignore
     public void cannotSendInviteIfOneOfParticipantsIsEmptyString() throws InterruptedException {
-        accessManager = AccessTokenHelper.obtainTwilioAccessManager(context, PARTICIPANT);
+        accessManager = AccessTokenHelper.obtainAccessManager(context, PARTICIPANT);
         TwilioConversationsClient twilioConversationsClient = TwilioConversationsClientHelper
                 .registerClient(activityRule.getActivity(), accessManager);
         Assert.assertNotNull(twilioConversationsClient);
@@ -149,7 +149,7 @@ public class TwilioConversationsClientTests extends TwilioConversationsTestsBase
     @Test
     @Ignore
     public void canListenAfterClientCreation() throws InterruptedException {
-        TwilioAccessManager accessManager = AccessTokenHelper.obtainTwilioAccessManager(context,
+        AccessManager accessManager = AccessTokenHelper.obtainAccessManager(context,
                 TEST_USER);
         TwilioConversationsClient twilioConversationsClient = TwilioConversationsClientHelper
                 .registerClient(activityRule.getActivity(), accessManager);

@@ -8,7 +8,7 @@ import android.support.test.filters.LargeTest;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
 
-import com.twilio.common.TwilioAccessManager;
+import com.twilio.common.AccessManager;
 import com.twilio.conversations.activity.TwilioConversationsActivity;
 import com.twilio.conversations.helper.AccessTokenHelper;
 import com.twilio.conversations.helper.CameraCapturerHelper;
@@ -58,7 +58,7 @@ public class ConversationTests extends TwilioConversationsTestsBase {
            return;
         }
 
-        TwilioAccessManager accessManager = AccessTokenHelper.obtainTwilioAccessManager(context, USER);
+        AccessManager accessManager = AccessTokenHelper.obtainAccessManager(context, USER);
         TwilioConversationsClient twilioConversationsClient = TwilioConversationsClientHelper.registerClient(activityRule.getActivity(), accessManager);
 
         LocalMedia localMedia = new LocalMedia(new LocalMedia.Listener() {
