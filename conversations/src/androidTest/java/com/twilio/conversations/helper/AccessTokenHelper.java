@@ -2,9 +2,7 @@ package com.twilio.conversations.helper;
 
 import android.content.Context;
 
-import com.twilio.common.TwilioAccessManager;
-import com.twilio.common.TwilioAccessManagerFactory;
-import com.twilio.common.TwilioAccessManagerListener;
+import com.twilio.common.AccessManager;
 import com.twilio.conversations.provider.AccessTokenProvider;
 
 import java.util.concurrent.CountDownLatch;
@@ -21,23 +19,22 @@ public class AccessTokenHelper {
     /**
      * A synchronous method that returns an initialized TwilioAccessManager
      */
-    public static TwilioAccessManager obtainTwilioAccessManager(Context context, String username) throws InterruptedException {
+    public static AccessManager obtainAccessManager(Context context, String username) throws InterruptedException {
         String accessToken = obtainCapabilityToken(username);
         final CountDownLatch tokenUpdatedLatch = new CountDownLatch(1);
-        TwilioAccessManager twilioAccessManager = TwilioAccessManagerFactory
-                .createAccessManager(context, accessToken, new TwilioAccessManagerListener() {
+        AccessManager twilioAccessManager = AccessManager.create(context, accessToken, new AccessManager.Listener() {
             @Override
-            public void onTokenExpired(TwilioAccessManager twilioAccessManager) {
+            public void onTokenExpired(AccessManager twilioAccessManager) {
                 fail();
             }
 
             @Override
-            public void onTokenUpdated(TwilioAccessManager twilioAccessManager) {
+            public void onTokenUpdated(AccessManager twilioAccessManager) {
                 tokenUpdatedLatch.countDown();
             }
 
             @Override
-            public void onError(TwilioAccessManager twilioAccessManager, String s) {
+            public void onError(AccessManager twilioAccessManager, String s) {
                 fail(s);
             }
         });

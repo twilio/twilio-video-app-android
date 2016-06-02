@@ -6,7 +6,7 @@ import android.support.test.filters.LargeTest;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
 
-import com.twilio.common.TwilioAccessManager;
+import com.twilio.common.AccessManager;
 import com.twilio.conversations.activity.TwilioConversationsActivity;
 import com.twilio.conversations.helper.AccessTokenHelper;
 import com.twilio.conversations.helper.CameraCapturerHelper;
@@ -78,7 +78,7 @@ public class VideoConstraintsTests extends TwilioConversationsTestsBase {
 
         TwilioConversationsClient.setLogLevel(LogLevel.DEBUG);
 
-        TwilioAccessManager twilioAccessManager = AccessTokenHelper.obtainTwilioAccessManager(context, SELF_TEST_USER);
+        AccessManager twilioAccessManager = AccessTokenHelper.obtainAccessManager(context, SELF_TEST_USER);
         TwilioConversationsClient twilioConversationsClient = TwilioConversationsClientHelper.registerClient(activityRule.getActivity(), twilioAccessManager);
 
         final CountDownLatch localVideoTrackFailedLatch = new CountDownLatch(1);
@@ -178,7 +178,7 @@ public class VideoConstraintsTests extends TwilioConversationsTestsBase {
 
         TwilioConversationsClient.setLogLevel(LogLevel.DEBUG);
 
-        TwilioAccessManager twilioAccessManager = AccessTokenHelper.obtainTwilioAccessManager(context, SELF_TEST_USER);
+        AccessManager twilioAccessManager = AccessTokenHelper.obtainAccessManager(context, SELF_TEST_USER);
         TwilioConversationsClient twilioConversationsClient = TwilioConversationsClientHelper.registerClient(activityRule.getActivity(), twilioAccessManager);
 
         final CountDownLatch localVideoTrackAddedLatch = new CountDownLatch(1);
