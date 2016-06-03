@@ -8,6 +8,7 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CountDownLatch;
 
+import android.Manifest;
 import android.content.Context;
 import android.media.AudioManager;
 import android.os.Handler;
@@ -234,6 +235,7 @@ final class TwilioConversationsClientInternal implements
             outgoingConversationImpl.start(
                     outgoingConversationImpl.createMediaConstrains(iceOptions));
         }
+        checkAudioPermission();
 
         conversations.add(outgoingConversationImpl);
         logger.i("Conversations size is now " + conversations.size());
@@ -472,6 +474,7 @@ final class TwilioConversationsClientInternal implements
             logger.e("Failed to create conversation");
             return;
         }
+        checkAudioPermission();
 
         conversations.add(incomingConversationImpl);
 
@@ -555,6 +558,13 @@ final class TwilioConversationsClientInternal implements
         if (endpointObserver != null) {
             endpointObserver.dispose();
             endpointObserver = null;
+        }
+    }
+
+    private void checkAudioPermission() {
+        if (!Util.permissionGranted(context, Manifest.permission.RECORD_AUDIO)) {
+            logger.w("RECORD_AUDIO permission not granted. " +
+                    "Your local audio will not be heard in conversation");
         }
     }
 
