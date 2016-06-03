@@ -1,5 +1,6 @@
 package com.twilio.conversations;
 
+import android.Manifest;
 import android.app.AlarmManager;
 import android.app.Application;
 import android.app.PendingIntent;
@@ -113,12 +114,20 @@ public class TwilioConversationsClient {
      */
     public static int INVALID_VIDEO_TRACK_STATE = 305;
 
+    private static final String[] REQUIRED_PERMISSIONS = {
+            // Required permissions granted upon install
+            Manifest.permission.INTERNET,
+            Manifest.permission.MODIFY_AUDIO_SETTINGS,
+            Manifest.permission.ACCESS_NETWORK_STATE,
+            Manifest.permission.ACCESS_WIFI_STATE
+    };
+
     /**
      * Listener interface defines a set of callbacks for events related to a
      * {@link TwilioConversationsClient}.
      *
      */
-    public static interface Listener {
+    public interface Listener {
         /**
          * This method notifies the listener that the client is successfully listening for incoming
          * invitations. This method will be invoked after a successful call to
@@ -172,30 +181,28 @@ public class TwilioConversationsClient {
     /**
      * Initialize the Twilio Conversations SDK.
      *
-     * @param context
-     *            The application context of your Android application
-     *
+     * @param context The application context of your Android application
      */
     public static void initialize(Context context) {
+        if (initialized) {
+            return;
+        }
+
         if (context == null) {
             throw new NullPointerException("applicationContext must not be null");
         }
+
+        checkPermissions(context);
 
         if (level != LogLevel.OFF) {
             // Re-apply the log level. Initialization sets a default log level.
             setLogLevel(level);
         }
 
-        if (initialized) {
-            return;
-        }
-
         Context applicationContext = context.getApplicationContext();
         Handler handler = Util.createCallbackHandler();
 
         internalRegistry = new InternalRegistry(applicationContext, handler);
-        checkPermissions(context);
-
 
         /*
          * With all the invariants satisfied we can now load the library if we have not done so
@@ -234,7 +241,6 @@ public class TwilioConversationsClient {
     /**
      * Dispose the Twilio Conversations SDK. Note that once this completes
      * all {@link TwilioConversationsClient} are destroyed and are no longer usable.
-     *
      */
     public synchronized static void destroy() {
         if (initialized) {
@@ -599,49 +605,12 @@ public class TwilioConversationsClient {
         }
     }
 
-    /*
-     * TODO
-     * Technically the SDK should be able to work with all
-     * normal permissions. With Android 23 and up, the user could
-     * opt out of dangerous permissions at any time. The SDK should
-     * adjust accordingly.
-     **/
-    private static final String[] requiredPermissions = {
-            // Dangerous permissions (require permission)
-            "android.permission.CAMERA",
-            "android.permission.RECORD_AUDIO",
-
-            // Normal permissions (granted upon install)
-            "android.permission.INTERNET",
-            "android.permission.MODIFY_AUDIO_SETTINGS",
-            "android.permission.ACCESS_NETWORK_STATE",
-            "android.permission.ACCESS_WIFI_STATE"
-    };
-
     private static void checkPermissions(Context context) {
-        PackageManager pm = context.getPackageManager();
-        PackageInfo pinfo = null;
-        try {
-            pinfo = pm.getPackageInfo(context.getPackageName(),
-                    PackageManager.GET_PERMISSIONS
-                            | PackageManager.GET_SERVICES);
-        } catch (PackageManager.NameNotFoundException e) {
-            throw new RuntimeException("Unable to resolve permissions. " + e.getMessage());
-        }
-
-        // Check application permissions
-        Map<String, Boolean> appPermissions = new HashMap<String, Boolean>(
-                pinfo.requestedPermissions != null ? pinfo.requestedPermissions.length
-                        : 0);
-        if (pinfo.requestedPermissions != null) {
-            for (String permission : pinfo.requestedPermissions)
-                appPermissions.put(permission, true);
-        }
-
-        List<String> missingPermissions = new LinkedList<String>();
-        for (String permission : requiredPermissions) {
-            if (!appPermissions.containsKey(permission))
+        List<String> missingPermissions = new LinkedList<>();
+        for (String permission : REQUIRED_PERMISSIONS) {
+            if (!Util.permissionGranted(context, permission)) {
                 missingPermissions.add(permission);
+            }
         }
 
         if (!missingPermissions.isEmpty()) {
@@ -653,8 +622,6 @@ public class TwilioConversationsClient {
             throw new RuntimeException(builder.toString());
         }
     }
-
-
 
     // InternalRegistry
     private static class InternalRegistry {
