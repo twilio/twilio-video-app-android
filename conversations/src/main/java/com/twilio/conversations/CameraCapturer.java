@@ -1,5 +1,6 @@
 package com.twilio.conversations;
 
+import android.Manifest;
 import android.content.Context;
 import android.hardware.Camera;
 import android.view.Surface;
@@ -91,7 +92,7 @@ public class CameraCapturer {
         }
     }
 
-    /**
+    /*
      * Use VideoCapturerAndroid to determine the camera id of the specified source.
      */
     private int getCameraId() {
@@ -183,7 +184,8 @@ public class CameraCapturer {
             cameraId = (cameraId + 1) % Camera.getNumberOfCameras();
             startPreviewInternal();
             return true;
-        } else if (capturerState.equals(CapturerState.BROADCASTING) && !broadcastCapturerPaused) {
+        } else if (capturerState.equals(CapturerState.BROADCASTING) &&
+                !broadcastCapturerPaused) {
             // TODO: propagate error
             videoCapturerAndroid.switchCamera(null);
             return true;
@@ -241,6 +243,12 @@ public class CameraCapturer {
             return;
         }
 
+        if (!Util.permissionGranted(context, Manifest.permission.CAMERA)) {
+            listener.onError(new CapturerException(CapturerException.ExceptionDomain.CAMERA,
+                    "Camera permission not granted"));
+            return;
+        }
+
         if (previewContainer == null && listener != null) {
             listener.onError(new CapturerException(CapturerException.ExceptionDomain.CAMERA,
                     "Cannot start preview without a preview container"));
@@ -283,35 +291,18 @@ public class CameraCapturer {
         capturerState = CapturerState.PREVIEWING;
     }
 
-    private long retrieveNativeVideoCapturerAndroid(VideoCapturerAndroid videoCapturerAndroid) {
-        // Use reflection to retrieve the native video capturer handle
-        long nativeHandle = 0;
-
-        try {
-            Method takeNativeVideoCapturerMethod = videoCapturerAndroid.getClass()
-                    .getSuperclass().getDeclaredMethod("takeNativeVideoCapturer");
-            takeNativeVideoCapturerMethod.setAccessible(true);
-            nativeHandle = (long) takeNativeVideoCapturerMethod.invoke(videoCapturerAndroid);
-        } catch (IllegalAccessException e) {
-            throw new RuntimeException("Unable to access nativeVideoCapturer field: " +
-                    e.getMessage());
-        } catch (NoSuchMethodException e) {
-            throw new RuntimeException("Unable to retrieve nativeVideoCapturer field: " +
-                    e.getMessage());
-        } catch (InvocationTargetException e) {
-            throw new RuntimeException("Unable to request nativeVideoCapturer field: " +
-                    e.getMessage());
-        }
-
-        return nativeHandle;
-    }
-
     private void createVideoCapturerAndroid() {
         String deviceName = CameraEnumerationAndroid.getDeviceName(cameraId);
         if (deviceName == null && listener != null) {
             listener.onError(new CapturerException(CapturerException.ExceptionDomain.CAMERA,
                     "Camera device not found"));
             return;
+        }
+        if (!Util.permissionGranted(context, Manifest.permission.CAMERA)) {
+            if (listener != null) {
+                listener.onError(new CapturerException(CapturerException.ExceptionDomain.CAPTURER,
+                        "Camera permission not granted"));
+            }
         }
         videoCapturerAndroid = VideoCapturerAndroid.create(deviceName, cameraEventsHandler);
         nativeVideoCapturerAndroid = nativeCreateNativeCapturer(videoCapturerAndroid);
