@@ -62,60 +62,42 @@ public class CameraCapturer {
     private boolean broadcastCapturerPaused = false;
 
     /**
-     * Creates an instance of CameraCapturer
+     * Creates an instance of CameraCapturer. {@link android.Manifest.permission#CAMERA} should be
+     * requested before creating and interacting with CameraCapturer. If permission is not granted
+     * the {@link CapturerErrorListener} will be invoked
      *
      * @param source the camera source
      * @return CameraCapturer
      */
-    public static CameraCapturer create(Context context, CameraSource source,
+    public static CameraCapturer create(Context context,
+                                        CameraSource source,
                                         CapturerErrorListener listener) {
+        if (context == null) {
+            throw new NullPointerException("context must not be null");
+        }
+        if (source == null) {
+            throw new NullPointerException("source must not be null");
+        }
+        if (!Util.permissionGranted(context, Manifest.permission.CAMERA) &&
+                listener != null) {
+            listener.onError(new CapturerException(CapturerException.ExceptionDomain.CAMERA,
+                    "CAMERA permission not granted"));
+        }
+
         return new CameraCapturer(context, source, listener);
     }
 
     private CameraCapturer(Context context,
-                               CameraSource source,
-                               CapturerErrorListener listener) {
-        if(context == null) {
-            throw new NullPointerException("context must not be null");
-        }
-        if(source == null) {
-            throw new NullPointerException("source must not be null");
-        }
-
+                           CameraSource source,
+                           CapturerErrorListener listener) {
         this.context = context;
         this.source = source;
         this.listener = listener;
-        cameraId = getCameraId();
+        this.cameraId = getCameraId();
         if(cameraId < 0 && listener != null) {
             listener.onError(new CapturerException(CapturerException.ExceptionDomain.CAMERA,
                     "Invalid camera source."));
         }
-    }
-
-    /*
-     * Use VideoCapturerAndroid to determine the camera id of the specified source.
-     */
-    private int getCameraId() {
-        String deviceName;
-
-        if(source == CameraSource.CAMERA_SOURCE_BACK_CAMERA) {
-            deviceName = CameraEnumerationAndroid.getNameOfBackFacingDevice();
-        } else {
-            deviceName = CameraEnumerationAndroid.getNameOfFrontFacingDevice();
-        }
-        if(deviceName == null) {
-            cameraId = -1;
-        } else {
-            String[] deviceNames = CameraEnumerationAndroid.getDeviceNames();
-            for(int i = 0; i < deviceNames.length; i++) {
-                if(deviceName.equals(deviceNames[i])) {
-                    cameraId = i;
-                    break;
-                }
-            }
-        }
-
-        return cameraId;
     }
 
     /**
@@ -235,6 +217,32 @@ public class CameraCapturer {
     void dispose() {
         nativeDisposeCapturer(nativeVideoCapturerAndroid);
         nativeVideoCapturerAndroid = 0;
+    }
+
+    /*
+    * Use VideoCapturerAndroid to determine the camera id of the specified source.
+    */
+    private int getCameraId() {
+        String deviceName;
+
+        if(source == CameraSource.CAMERA_SOURCE_BACK_CAMERA) {
+            deviceName = CameraEnumerationAndroid.getNameOfBackFacingDevice();
+        } else {
+            deviceName = CameraEnumerationAndroid.getNameOfFrontFacingDevice();
+        }
+        if(deviceName == null) {
+            cameraId = -1;
+        } else {
+            String[] deviceNames = CameraEnumerationAndroid.getDeviceNames();
+            for(int i = 0; i < deviceNames.length; i++) {
+                if(deviceName.equals(deviceNames[i])) {
+                    cameraId = i;
+                    break;
+                }
+            }
+        }
+
+        return cameraId;
     }
 
     private synchronized void startPreviewInternal() {
