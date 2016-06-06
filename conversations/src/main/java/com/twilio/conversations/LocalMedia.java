@@ -1,5 +1,6 @@
 package com.twilio.conversations;
 
+import android.Manifest;
 import android.os.Handler;
 
 import com.twilio.conversations.internal.Logger;
@@ -197,7 +198,8 @@ public class LocalMedia {
     }
 
     /**
-     * Enables local audio to media session.
+     * Enables local audio to media session. {@link android.Manifest.permission#RECORD_AUDIO}
+     * permission must be granted prior to invoking
      *
      * @return true if local audio is enabled
      */
