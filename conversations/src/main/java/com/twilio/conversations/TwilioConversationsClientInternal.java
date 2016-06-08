@@ -8,6 +8,7 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CountDownLatch;
 
+import android.Manifest;
 import android.content.Context;
 import android.media.AudioManager;
 import android.os.Handler;

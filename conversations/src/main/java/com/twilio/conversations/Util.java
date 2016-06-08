@@ -1,5 +1,7 @@
 package com.twilio.conversations;
 
+import android.content.Context;
+import android.content.pm.PackageManager;
 import android.os.Handler;
 import android.os.Looper;
 
@@ -25,5 +27,11 @@ final class Util {
         }
 
         return handler;
+    }
+
+    static boolean permissionGranted(Context context, String permission) {
+        int permissionCheck = context.checkCallingOrSelfPermission(permission);
+
+        return permissionCheck == PackageManager.PERMISSION_GRANTED;
     }
 }
