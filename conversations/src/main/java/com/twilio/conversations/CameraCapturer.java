@@ -13,6 +13,7 @@ import android.view.WindowManager;
 import com.twilio.conversations.internal.Logger;
 
 import org.webrtc.CameraEnumerationAndroid;
+import org.webrtc.EglBase;
 import org.webrtc.VideoCapturerAndroid;
 
 import java.io.IOException;
@@ -313,7 +314,8 @@ public class CameraCapturer {
             }
         }
         videoCapturerAndroid = VideoCapturerAndroid.create(deviceName, cameraEventsHandler);
-        nativeVideoCapturerAndroid = nativeCreateNativeCapturer(videoCapturerAndroid);
+        final EglBase.Context eglContext = EglBaseProvider.provideEglBase().getEglBaseContext();
+        nativeVideoCapturerAndroid = nativeCreateNativeCapturer(videoCapturerAndroid, eglContext);
     }
 
     private final VideoCapturerAndroid.CameraEventsHandler cameraEventsHandler =
@@ -557,6 +559,7 @@ public class CameraCapturer {
 
     private native void nativeStopVideoSource(long nativeSession);
     private native void nativeRestartVideoSource(long nativeSession);
-    private native long nativeCreateNativeCapturer(VideoCapturerAndroid capturerAndroid);
+    private native long nativeCreateNativeCapturer(VideoCapturerAndroid capturerAndroid,
+                                                   EglBase.Context eglContext);
     private native void nativeDisposeCapturer(long nativeVideoCapturerAndroid);
 }

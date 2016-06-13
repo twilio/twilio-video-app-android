@@ -14,7 +14,6 @@ using namespace webrtc_jni;
 
 #define TAG  "TwilioSDK(native)"
 
-
 JNIEXPORT void JNICALL Java_com_twilio_conversations_CameraCapturer_nativeStopVideoSource
         (JNIEnv *env, jobject obj, jlong nativeSession)
 {
@@ -35,16 +34,11 @@ JNIEXPORT void JNICALL Java_com_twilio_conversations_CameraCapturer_nativeRestar
 JNIEXPORT jlong JNICALL
 Java_com_twilio_conversations_CameraCapturer_nativeCreateNativeCapturer(JNIEnv *env,
                                                                         jobject instance,
-                                                                        jobject j_video_capturer) {
-    jobject j_surface_texture_helper =
-            env->CallObjectMethod(j_video_capturer,
-                                  GetMethodID(env,
-                                              FindClass(env, "org/webrtc/VideoCapturer"),
-                                              "getSurfaceTextureHelper",
-                                              "()Lorg/webrtc/SurfaceTextureHelper;"));
+                                                                        jobject j_video_capturer,
+                                                                        jobject j_egl_context) {
     rtc::scoped_refptr<webrtc::AndroidVideoCapturerDelegate> delegate =
-            new rtc::RefCountedObject<AndroidVideoCapturerJni>(env, j_video_capturer, j_surface_texture_helper);
-    rtc::scoped_ptr<cricket::VideoCapturer> capturer(new webrtc::AndroidVideoCapturer(delegate));
+            new rtc::RefCountedObject<AndroidVideoCapturerJni>(env, j_video_capturer, j_egl_context);
+    std::unique_ptr<cricket::VideoCapturer> capturer(new webrtc::AndroidVideoCapturer(delegate));
     return jlongFromPointer(capturer.release());
 }
 

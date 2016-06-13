@@ -15,7 +15,8 @@ JNIEXPORT void JNICALL Java_com_twilio_conversations_CameraCapturer_nativeRestar
 JNIEXPORT jlong JNICALL
         Java_com_twilio_conversations_CameraCapturer_nativeCreateNativeCapturer(JNIEnv *env,
                                                                                 jobject instance,
-                                                                                jobject j_video_capturer);
+                                                                                jobject j_video_capturer,
+                                                                                jobject j_egl_context);
 
 JNIEXPORT void JNICALL
         Java_com_twilio_conversations_CameraCapturer_nativeDisposeCapturer(JNIEnv *env,
