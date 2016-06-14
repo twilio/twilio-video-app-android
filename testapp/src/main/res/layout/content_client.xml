@@ -1,47 +1,47 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-	xmlns:tools="http://schemas.android.com/tools"
-	android:layout_width="match_parent"
-	android:layout_height="match_parent"
-	tools:showIn="@layout/activity_client">
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:showIn="@layout/activity_client">
 
-	<FrameLayout
-		android:id="@+id/previewFrameLayout"
-		android:layout_width="match_parent"
-		android:layout_height="match_parent"
-		android:keepScreenOn="true"/>
+    <FrameLayout
+        android:id="@+id/previewFrameLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:keepScreenOn="true"/>
 
-	<LinearLayout
-		android:id="@+id/status"
-		android:layout_width="fill_parent"
-		android:layout_height="wrap_content"
-		android:orientation="vertical"
-		android:layout_alignParentBottom="true"
-		android:layout_alignParentLeft="true"
-		android:layout_alignParentStart="true">
+    <LinearLayout
+        android:id="@+id/status"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true">
 
-		<TextView
-			android:id="@+id/conversations_client_status_textview"
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"
-			android:layout_gravity="center"
-			android:text="@string/endpointStatus"/>
+        <TextView
+            android:id="@+id/conversations_client_status_textview"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="@string/endpointStatus"/>
 
-		<TextView
-			android:id="@+id/conversation_status_textview"
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"
-			android:layout_gravity="center"
-			android:text="@string/conversationStatus"/>
+        <TextView
+            android:id="@+id/conversation_status_textview"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="@string/conversationStatus"/>
 
-	</LinearLayout>
+    </LinearLayout>
 
     <RelativeLayout
-		android:id="@+id/videoMainRelativeLayout"
+        android:id="@+id/videoMainRelativeLayout"
         android:layout_above="@id/status"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-		android:keepScreenOn="true">
+        android:keepScreenOn="true">
 
         <LinearLayout
             android:id="@+id/videoThumbsLinearLayout"
