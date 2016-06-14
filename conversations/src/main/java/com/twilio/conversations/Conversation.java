@@ -758,18 +758,48 @@ public class Conversation implements NativeHandleInterface, SessionObserver, Cor
                 for(final Participant participant: getParticipants()) {
                     if(participant.getSid() != null && stats.getParticipantSid() != null &&
                             participant.getSid().equals(stats.getParticipantSid())) {
-                        handler.post(new Runnable() {
-                            @Override
-                            public void run() {
-                                statsListener.onMediaTrackStatsRecord(Conversation.this,
-                                        participant, stats);
-                            }
-                        });
+                        postStatsToListener(participant, stats);
                         return;
                     }
                 }
                 logger.d("stats report skipped since the participant sid has not been set yet");
             }
+        }
+    }
+
+    private void postStatsToListener(final Participant participant, final MediaTrackStatsRecord stats) {
+        if (stats instanceof LocalAudioTrackStatsRecord) {
+            handler.post(new Runnable() {
+                @Override
+                public void run() {
+                    statsListener.onLocalAudioTrackStatsRecord(Conversation.this,
+                            participant, (LocalAudioTrackStatsRecord) stats);
+                }
+            });
+        } else if (stats instanceof LocalVideoTrackStatsRecord) {
+            handler.post(new Runnable() {
+                @Override
+                public void run() {
+                    statsListener.onLocalVideoTrackStatsRecord(Conversation.this,
+                            participant, (LocalVideoTrackStatsRecord) stats);
+                }
+            });
+        } else if (stats instanceof RemoteAudioTrackStatsRecord) {
+            handler.post(new Runnable() {
+                @Override
+                public void run() {
+                    statsListener.onRemoteAudioTrackStatsRecord(Conversation.this,
+                            participant, (RemoteAudioTrackStatsRecord) stats);
+                }
+            });
+        } else if (stats instanceof RemoteVideoTrackStatsRecord) {
+            handler.post(new Runnable() {
+                @Override
+                public void run() {
+                    statsListener.onRemoteVideoTrackStatsRecord(Conversation.this,
+                            participant, (RemoteVideoTrackStatsRecord) stats);
+                }
+            });
         }
     }
 

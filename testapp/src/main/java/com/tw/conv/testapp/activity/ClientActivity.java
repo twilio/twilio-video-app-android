@@ -1523,61 +1523,70 @@ public class ClientActivity extends AppCompatActivity {
 
     private StatsListener statsListener() {
         return new StatsListener() {
-            @Override
-            public void onMediaTrackStatsRecord(Conversation conversation, Participant participant, MediaTrackStatsRecord stats) {
+
+            private void logTrackStatsRecord(MediaTrackStatsRecord trackStatsRecord,
+                                            String mediaSpecificLog) {
                 StringBuilder strBld = new StringBuilder();
                 strBld.append(
                         String.format("Receiving stats for sid: %s, trackId: %s, direction: %s ",
-                                stats.getParticipantSid(), stats.getTrackId(),
-                                stats.getDirection()));
-                if (stats instanceof LocalAudioTrackStatsRecord) {
-                    strBld.append(
-                            String.format("media type: audio, bytes sent %d",
-                                    ((LocalAudioTrackStatsRecord) stats).getBytesSent()));
-                } else if (stats instanceof LocalVideoTrackStatsRecord) {
-                    strBld.append(
-                            String.format("media type: video, bytes sent %d",
-                                    ((LocalVideoTrackStatsRecord) stats).getBytesSent()));
-                } else if (stats instanceof RemoteAudioTrackStatsRecord) {
-                    strBld.append(
-                            String.format("media type: audio, bytes received %d",
-                                    ((RemoteAudioTrackStatsRecord) stats).getBytesReceived()));
-                } else if (stats instanceof RemoteVideoTrackStatsRecord) {
-                    strBld.append(
-                            String.format("media type: video, bytes received %d",
-                                    ((RemoteVideoTrackStatsRecord) stats).getBytesReceived()));
-                } else {
-                    strBld.append("Unknown media type");
-                }
+                                trackStatsRecord.getParticipantSid(), trackStatsRecord.getTrackId(),
+                                trackStatsRecord.getDirection()));
+                strBld.append(mediaSpecificLog);
                 Timber.i(strBld.toString());
+            }
 
-                if(stats instanceof LocalVideoTrackStatsRecord) {
-                    if(statsLayout.getVisibility() != View.VISIBLE) {
-                        statsLayout.setVisibility(View.VISIBLE);
-                    }
-                    if(conversation.getLocalMedia().getLocalVideoTracks().size() > 0) {
-                        showLocalVideoTrackStats((LocalVideoTrackStatsRecord) stats);
-                    } else {
+            @Override
+            public void onLocalAudioTrackStatsRecord(Conversation conversation, Participant participant, LocalAudioTrackStatsRecord trackStatsRecord) {
+                logTrackStatsRecord(trackStatsRecord,
+                        String.format("media type: audio, bytes sent %d",
+                                trackStatsRecord.getBytesSent()));
+            }
+
+            @Override
+            public void onLocalVideoTrackStatsRecord(Conversation conversation, Participant participant, LocalVideoTrackStatsRecord trackStatsRecord) {
+                logTrackStatsRecord(trackStatsRecord,
+                        String.format("media type: video, bytes sent %d",
+                                trackStatsRecord.getBytesSent()));
+
+                if(statsLayout.getVisibility() != View.VISIBLE) {
+                    statsLayout.setVisibility(View.VISIBLE);
+                }
+                if(conversation.getLocalMedia().getLocalVideoTracks().size() > 0) {
+                    showLocalVideoTrackStats(trackStatsRecord);
+                } else {
                         /*
                          * Latent stats callbacks can be triggered even after a local track is
                          * removed.
                          */
-                        statsLayout.setVisibility(View.GONE);
-                    }
-                } else if(stats instanceof RemoteVideoTrackStatsRecord) {
-                    if(remoteStatsRecyclerView.getVisibility() != View.VISIBLE) {
-                        remoteStatsRecyclerView.setVisibility(View.VISIBLE);
-                    }
-                    if(participant.getMedia().getVideoTracks().size() > 0) {
-                        showRemoteVideoTrackStats(conversation, (RemoteVideoTrackStatsRecord)stats);
-                    } else {
+                    statsLayout.setVisibility(View.GONE);
+                }
+            }
+
+            @Override
+            public void onRemoteAudioTrackStatsRecord(Conversation conversation, Participant participant, RemoteAudioTrackStatsRecord trackStatsRecord) {
+                logTrackStatsRecord(trackStatsRecord,
+                        String.format("media type: audio, bytes received %d",
+                                trackStatsRecord.getBytesReceived()));
+            }
+
+            @Override
+            public void onRemoteVideoTrackStatsRecord(Conversation conversation, Participant participant, RemoteVideoTrackStatsRecord trackStatsRecord) {
+                logTrackStatsRecord(trackStatsRecord,
+                        String.format("media type: video, bytes received %d",
+                                trackStatsRecord.getBytesReceived()));
+
+                if(remoteStatsRecyclerView.getVisibility() != View.VISIBLE) {
+                    remoteStatsRecyclerView.setVisibility(View.VISIBLE);
+                }
+                if(participant.getMedia().getVideoTracks().size() > 0) {
+                    showRemoteVideoTrackStats(conversation, trackStatsRecord);
+                } else {
                         /*
                          * Latent stats callbacks can be triggered even after a remote track is
                          * removed.
                          */
-                        remoteVideoTrackStatsRecordMap.clear();
-                        remoteVideoTrackStatsAdapter.notifyDataSetChanged();
-                    }
+                    remoteVideoTrackStatsRecordMap.clear();
+                    remoteVideoTrackStatsAdapter.notifyDataSetChanged();
                 }
             }
         };
