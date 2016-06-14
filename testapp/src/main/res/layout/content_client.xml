@@ -8,7 +8,8 @@
 	<FrameLayout
 		android:id="@+id/previewFrameLayout"
 		android:layout_width="match_parent"
-		android:layout_height="match_parent" />
+		android:layout_height="match_parent"
+		android:keepScreenOn="true"/>
 
 	<LinearLayout
 		android:id="@+id/status"
@@ -39,7 +40,8 @@
 		android:id="@+id/videoMainRelativeLayout"
         android:layout_above="@id/status"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+		android:keepScreenOn="true">
 
         <LinearLayout
             android:id="@+id/videoThumbsLinearLayout"
