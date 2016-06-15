@@ -4,7 +4,6 @@ export LANG=en_US.UTF-8;
 export PATH=/usr/local/bin:$PATH
 export WORKSPACE_ROOT_DIR=`pwd`
 export SCRIPTS_DIR="$WORKSPACE_ROOT_DIR/scripts"
-export SDK_RELEASE_TOOLS_PATH="/usr/local/sbin/sdk-release-tools-ng";
 export SDK_PACKAGE_PATH="$WORKSPACE_ROOT_DIR/package"
 
 if [ ! -z "$RELEASE_VERSION" ]; then
@@ -21,17 +20,12 @@ fi
 
 
 echo "Prepping sdk-release-tool..."
-if [ ! -d $SDK_RELEASE_TOOLS_PATH ]; then
-    echo "Error: $SDK_RELEASE_TOOLS_PATH does not exist"
+if [ ! -d $SDK_RELEASE_TOOL_HOME ]; then
+    echo "Error: $SDK_RELEASE_TOOL_HOME does not exist"
     exit 1
 fi
 
-if [ ! -f "$SDK_RELEASE_TOOLS_PATH/sdk-release-tool/cdn-sdki.stage.json" ] || [ ! -f "$SDK_RELEASE_TOOLS_PATH/sdk-release-tool/cdn-sdki.prod.json" ]; then
-    echo "Error: creds json not found"
-    exit 1
-fi
-
-if [ ! -d "$SDK_RELEASE_TOOLS_PATH/sdk-release-tool/venv" ]; then
+if [ ! -d "$SDK_RELEASE_TOOL_HOME/venv" ]; then
     echo "Error: venv not found. Please run \"make\""
     exit 1
 fi
@@ -39,7 +33,7 @@ fi
 rm -rf ${SDK_PACKAGE_PATH}
 mkdir -p ${SDK_PACKAGE_PATH}
 
-pushd "$SDK_RELEASE_TOOLS_PATH/sdk-release-tool/"
+pushd "$SDK_RELEASE_TOOL_HOME"
 
 echo "sdk-release-tool: downloading..."
 ./sdk-release-tool download --stage twilio-conversations-android ${SDK_RELEASE_VERSION}-rc${SDK_RC_BUILD_NUMBER} ${SDK_PACKAGE_PATH}
