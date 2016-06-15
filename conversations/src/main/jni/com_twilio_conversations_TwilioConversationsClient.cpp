@@ -13,7 +13,6 @@
 #include "AccessManager/AccessManager.h"
 #include "webrtc/voice_engine/include/voe_base.h"
 #include "webrtc/modules/video_capture/video_capture_internal.h"
-#include "webrtc/modules/video_render/video_render_internal.h"
 #include "webrtc/api/java/jni/androidvideocapturer_jni.h"
 #include "webrtc/modules/audio_device/android/audio_manager.h"
 #include "webrtc/modules/audio_device/android/opensles_player.h"
@@ -71,7 +70,6 @@ JNIEXPORT jboolean JNICALL Java_com_twilio_conversations_TwilioConversationsClie
     if (!media_jvm_set) {
         failure |= webrtc::OpenSLESPlayer::SetAndroidAudioDeviceObjects(GetJVM(), context);
         failure |= webrtc::VoiceEngine::SetAndroidObjects(GetJVM(), context);
-        failure |= webrtc::SetRenderAndroidVM(GetJVM());
         failure |= webrtc_jni::AndroidVideoCapturerJni::SetAndroidObjects(env, context);
         media_jvm_set = true;
     }
