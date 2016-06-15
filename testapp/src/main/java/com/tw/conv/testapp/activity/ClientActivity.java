@@ -1207,7 +1207,7 @@ public class ClientActivity extends AppCompatActivity {
             public void onClick(DialogInterface dialogInterface, int i) {
                 stopPreview();
                 Set<String> participants = ParticipantParser.getParticipants(participantEditText.getText().toString());
-                if(participants.size() > 0) {
+                if(participants.size() > 0 && !participants.contains("")) {
 
                     localMedia = createLocalMedia();
 
@@ -1253,7 +1253,13 @@ public class ClientActivity extends AppCompatActivity {
                     }
 
                 } else {
-                    participantEditText.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS);
+                    reset();
+                    Snackbar.make(
+                            conversationStatusTextView,
+                            "Unable to create conversation. Participants list is empty",
+                            Snackbar.LENGTH_LONG)
+                            .setAction("Action", null)
+                            .show();
                 }
             }
         };
@@ -1295,10 +1301,15 @@ public class ClientActivity extends AppCompatActivity {
                     return;
                 }
                 Set<String> participants = ParticipantParser.getParticipants(participantEditText.getText().toString());
-                if(participants.size() > 0) {
+                if(participants.size() > 0 && !participants.contains("")) {
                     conversation.invite(participants);
                 } else {
-                    participantEditText.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS);
+                    Snackbar.make(
+                            conversationStatusTextView,
+                            "Unable to invite. Participants list is empty.",
+                            Snackbar.LENGTH_LONG)
+                            .setAction("Action", null)
+                            .show();
                 }
             }
         };
