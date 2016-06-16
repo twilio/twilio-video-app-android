@@ -17,8 +17,8 @@ public class OutgoingInvite {
     private InviteStatus inviteStatus;
 
     private OutgoingInvite(TwilioConversationsClientInternal conversationsClient,
-                               Conversation conversation,
-                               ConversationCallback conversationCallback) {
+                           Conversation conversation,
+                           ConversationCallback conversationCallback) {
         this.conversation = conversation;
         this.conversationsClient = conversationsClient;
         this.conversationCallback = conversationCallback;
@@ -26,8 +26,8 @@ public class OutgoingInvite {
     }
 
     static OutgoingInvite create(TwilioConversationsClientInternal conversationsClient,
-                                     Conversation conversation,
-                                     ConversationCallback conversationCallback) {
+                                 Conversation conversation,
+                                 ConversationCallback conversationCallback) {
         if(conversationsClient == null) {
             return null;
         }
