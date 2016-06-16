@@ -14,7 +14,7 @@ import java.util.Set;
 /**
  * A Conversation represents communication between the client and one or more participants.
  */
-public class Conversation implements NativeHandleInterface, SessionObserver {
+public class Conversation implements NativeHandleInterface {
     private static final String DISPOSED_MESSAGE = "The conversation has been destroyed. " +
             "This operation is no longer valid";
     private Set<String> invitedParticipants = new HashSet<>();
@@ -38,12 +38,434 @@ public class Conversation implements NativeHandleInterface, SessionObserver {
     private String conversationSid;
 
     class SessionObserverInternal implements NativeHandleInterface {
-
         private long nativeSessionObserver;
+        private final Conversation conversation;
+        private final SessionObserver sessionObserver = new SessionObserver() {
+            @Override
+            public void onSessionStateChanged(SessionState state) {
+                logger.i("state changed to: " + state.name());
 
-        public SessionObserverInternal(SessionObserver sessionObserver,
-                                       Conversation conversation) {
+                ConversationStatus newConversationStatus = sessionStateToStatus(state,
+                        conversationStatus);
+                conversation.state = state;
+
+                if(conversationStatus != newConversationStatus) {
+                    conversationStatus = newConversationStatus;
+                    conversationStateObserver.onConversationStatusChanged(conversation,
+                            conversationStatus);
+
+                    // TODO GSDK-492 multi-invite behavior
+                }
+            }
+
+            @Override
+            public void onStartCompleted(CoreError error) {
+                log("onStartCompleted", error);
+
+                if(error != null) {
+                    // Remove this conversation from the client
+                    conversationsClientInternal.removeConversation(conversation);
+                    participantMap.clear();
+
+                    final TwilioConversationsException e =
+                            new TwilioConversationsException(error.getCode(), error.getMessage());
+                    if(conversationListener == null) {
+                        if(e.getErrorCode() == TwilioConversationsClient.CONVERSATION_TERMINATED) {
+                            conversationsClientInternal.onConversationTerminated(conversation, e);
+                        }
+                    } else if(handler != null) {
+                        handler.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                conversationListener.onConversationEnded(conversation, e);
+                            }
+                        });
+                    }
+                    disposeConversation();
+                }
+            }
+
+            @Override
+            public void onStopCompleted(CoreError error) {
+                /**
+                 * Note that we are not using a latch here because of deadlock situation revealed in
+                 * GSDK-598
+                 */
+                log("onStopCompleted", error);
+
+                // Remove this conversation from the client
+                conversationsClientInternal.removeConversation(conversation);
+                // Conversations that are rejected do not have a listener
+                if(conversationListener != null) {
+                    participantMap.clear();
+                    if (error == null) {
+                        if (handler != null && conversationListener != null) {
+                            handler.post(new Runnable() {
+                                @Override
+                                public void run() {
+                                    conversationListener.onConversationEnded(conversation, null);
+                                }
+                            });
+                        }
+                    } else {
+                        final TwilioConversationsException e =
+                                new TwilioConversationsException(error.getCode(),
+                                        error.getMessage());
+                        if (handler != null && conversationListener != null) {
+                            handler.post(new Runnable() {
+                                @Override
+                                public void run() {
+                                    conversationListener.onConversationEnded(conversation, e);
+                                }
+                            });
+                        }
+                    }
+                }
+                disposeConversation();
+            }
+
+            @Override
+            public void onParticipantConnected(String participantIdentity,
+                                               String participantSid,
+                                               CoreError error) {
+                log("onParticipantConnected",  participantIdentity, error);
+                final Participant participant = findOrCreateParticipant(participantIdentity,
+                        participantSid);
+                if (error == null) {
+                    if(handler != null && conversationListener != null) {
+                        handler.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                conversationListener.onParticipantConnected(conversation,
+                                        participant);
+                            }
+                        });
+                    }
+                } else {
+                    final TwilioConversationsException e =
+                            new TwilioConversationsException(error.getCode(), error.getMessage());
+                    if (conversationListener == null) {
+                        if(e.getErrorCode() == TwilioConversationsClient.CONVERSATION_TERMINATED) {
+                            conversationsClientInternal.onConversationTerminated(conversation, e);
+                        } else {
+                            logger.e("onParticipantConnected -> received unexpected error code -> " +
+                                    e.getErrorCode());
+                        }
+                    } else if(handler != null) {
+                        handler.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                conversationListener.onFailedToConnectParticipant(conversation,
+                                        participant, e);
+                            }
+                        });
+                    }
+                }
+            }
+
+            @Override
+            public void onParticipantDisconnected(String participantIdentity,
+                                                  String participantSid,
+                                                  DisconnectReason reason) {
+                log("onParticipantDisconnected", participantIdentity, reason);
+                final Participant participant = participantMap.remove(participantIdentity);
+                if(participant == null) {
+                    logger.i("participant removed but was never in list");
+                } else {
+                    if(handler != null && conversationListener != null) {
+                        handler.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                conversationListener.onParticipantDisconnected(conversation,
+                                        participant);
+                            }
+                        });
+                    }
+                }
+            }
+
+            @Override
+            public void onMediaStreamAdded(MediaStreamInfo stream) {
+                log("onMediaStreamAdded", stream.getParticipantAddress() + " " +
+                        stream.getStreamId());
+            }
+
+            @Override
+            public void onMediaStreamRemoved(MediaStreamInfo stream) {
+                log("onMediaStreamRemoved", stream.getParticipantAddress() + " " +
+                        stream.getStreamId());
+            }
+
+            @Override
+            public void onVideoTrackAdded(TrackInfo trackInfo,
+                                          org.webrtc.VideoTrack webRtcVideoTrack) {
+                log("onVideoTrackAdded", trackInfo.getParticipantIdentity() + " " +
+                        trackInfo.getTrackId() + " " + trackInfo.isEnabled());
+
+                if(trackInfo.getTrackOrigin() == TrackOrigin.LOCAL) {
+                    List<LocalVideoTrack> tracksList = localMedia.getLocalVideoTracks();
+                    final LocalVideoTrack videoTrack = tracksList.get(0);
+                    videoTrack.setWebrtcVideoTrack(webRtcVideoTrack);
+                    videoTrack.setTrackInfo(trackInfo);
+                    if (localMedia.getHandler() != null) {
+                        localMedia.getHandler().post(new Runnable() {
+                            @Override
+                            public void run() {
+                                if (localMedia.getLocalMediaListener() != null) {
+                                    localMedia.getLocalMediaListener().onLocalVideoTrackAdded(localMedia,
+                                            videoTrack);
+                                }
+                            }
+                        });
+                    }
+                } else {
+                    final Participant participant = findOrCreateParticipant(trackInfo
+                            .getParticipantIdentity(), null);
+                    final VideoTrack videoTrack = new VideoTrack(webRtcVideoTrack, trackInfo);
+                    participant.getMedia().addVideoTrack(videoTrack);
+                    if(handler != null) {
+                        handler.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                if (participant.getParticipantListener() != null) {
+                                    participant.getParticipantListener().onVideoTrackAdded(
+                                            conversation, participant, videoTrack);
+                                }
+                            }
+                        });
+                    }
+                }
+            }
+
+            @Override
+            public void onVideoTrackFailedToAdd(TrackInfo trackInfo, CoreError error) {
+                log("onVideoFailedToAdd", trackInfo.getParticipantIdentity() + " " +
+                        trackInfo.getTrackId() + trackInfo.isEnabled(), error);
+                if(trackInfo.getTrackOrigin().equals(TrackOrigin.LOCAL)) {
+                    // Remove local video track
+                    final LocalVideoTrack localVideoTrack = localMedia.getLocalVideoTracks().remove(0);
+                    List<VideoRenderer> renderers = new ArrayList<>(localVideoTrack.getRenderers());
+                    // Remove renderers
+                    for(VideoRenderer renderer: renderers) {
+                        localVideoTrack.removeRenderer(renderer);
+                    }
+                    localVideoTrack.removeCameraCapturer();
+
+                    final TwilioConversationsException e =
+                            new TwilioConversationsException(error.getCode(), error.getMessage());
+
+                    if(localMedia.getHandler() != null) {
+                        localMedia.getHandler().post(new Runnable() {
+                            @Override
+                            public void run() {
+                                if(localMedia.getLocalMediaListener() != null) {
+                                    localMedia.getLocalMediaListener().onLocalVideoTrackError(localMedia,
+                                            localVideoTrack, e);
+                                }
+                            }
+                        });
+                    }
+                } else {
+                    logger.w("Remote track failed to add unexpectedly");
+                }
+            }
+
+            @Override
+            public void onVideoTrackRemoved(TrackInfo trackInfo) {
+                log("onVideoTrackRemoved", trackInfo.getParticipantIdentity() + " " +
+                        trackInfo.getTrackId() + " " + trackInfo.isEnabled());
+                if (trackInfo.getTrackOrigin() == TrackOrigin.LOCAL) {
+                    final LocalVideoTrack localVideoTrack =
+                            localMedia.removeLocalVideoTrack(trackInfo);
+                    localVideoTrack.removeCameraCapturer();
+                    localVideoTrack.setTrackState(MediaTrackState.ENDED);
+                    if(localMedia.getHandler() != null) {
+                        localMedia.getHandler().post(new Runnable() {
+                            @Override
+                            public void run() {
+                                if (localMedia.getLocalMediaListener() != null) {
+                                    localMedia.getLocalMediaListener()
+                                            .onLocalVideoTrackRemoved(localMedia, localVideoTrack);
+                                }
+                            }
+                        });
+                    }
+                } else {
+                    final Participant participant = findOrCreateParticipant(trackInfo
+                            .getParticipantIdentity(), null);
+                    final VideoTrack videoTrack = participant.getMedia().removeVideoTrack(trackInfo);
+                    videoTrack.setTrackState(MediaTrackState.ENDED);
+                    if(handler != null) {
+                        handler.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                if (participant.getParticipantListener() != null) {
+                                    participant.getParticipantListener()
+                                            .onVideoTrackRemoved(conversation, participant,
+                                                    videoTrack);
+                                }
+                            }
+                        });
+                    }
+                }
+            }
+
+            @Override
+            public void onVideoTrackStateChanged(final TrackInfo trackInfo) {
+                log("onVideoTrackStateChanged", trackInfo.getParticipantIdentity() + " " +
+                        trackInfo.getTrackId() + " " + trackInfo.isEnabled());
+                if(trackInfo.getTrackOrigin() == TrackOrigin.LOCAL) {
+                    return;
+                } else {
+                    final Participant participant = findOrCreateParticipant(trackInfo
+                            .getParticipantIdentity(), null);
+                    List<VideoTrack> videoTracks = participant.getMedia().getVideoTracks();
+                    for(final VideoTrack videoTrack: videoTracks) {
+                        if(trackInfo.getTrackId().equals(videoTrack.getTrackId())) {
+                            videoTrack.updateTrackInfo(trackInfo);
+                            if(handler != null) {
+                                handler.post(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        if (participant.getParticipantListener() != null) {
+                                            if(trackInfo.isEnabled()) {
+                                                participant.getParticipantListener()
+                                                        .onTrackEnabled(conversation, participant,
+                                                                videoTrack);
+                                            } else {
+                                                participant.getParticipantListener()
+                                                        .onTrackDisabled(conversation, participant,
+                                                                videoTrack);
+                                            }
+                                        }
+                                    }
+                                });
+                            }
+                            break;
+                        }
+                    }
+                }
+            }
+
+            @Override
+            public void onAudioTrackAdded(TrackInfo trackInfo,
+                                          org.webrtc.AudioTrack webRtcAudioTrack) {
+                log("onAudioTrackAdded", trackInfo.getParticipantIdentity() + " " +
+                        trackInfo.getTrackId() + " " + trackInfo.isEnabled());
+
+                if(trackInfo.getTrackOrigin() == TrackOrigin.LOCAL) {
+                    // TODO: expose audio tracks in local media
+                } else {
+                    final Participant participant = findOrCreateParticipant(trackInfo
+                            .getParticipantIdentity(), null);
+                    final AudioTrack audioTrack = new AudioTrack(webRtcAudioTrack, trackInfo);
+                    participant.getMedia().addAudioTrack(audioTrack);
+                    if(handler != null) {
+                        handler.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                if (participant.getParticipantListener() != null) {
+                                    participant.getParticipantListener().onAudioTrackAdded(
+                                            conversation, participant, audioTrack);
+                                }
+                            }
+                        });
+                    }
+                }
+            }
+
+            @Override
+            public void onAudioTrackRemoved(TrackInfo trackInfo) {
+                log("onAudioTrackRemoved", trackInfo.getParticipantIdentity() + " " +
+                        trackInfo.getTrackId() + " " + trackInfo.isEnabled());
+
+                if(trackInfo.getTrackOrigin() == TrackOrigin.LOCAL) {
+                    // TODO: remove audio track from local media once audio tracks are exposed
+                } else {
+                    final Participant participant = findOrCreateParticipant(trackInfo
+                            .getParticipantIdentity(), null);
+                    final AudioTrack audioTrack = participant.getMedia()
+                            .removeAudioTrack(trackInfo);
+                    audioTrack.setTrackState(MediaTrackState.ENDED);
+                    if(handler != null) {
+                        handler.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                if (participant.getParticipantListener() != null) {
+                                    participant.getParticipantListener()
+                                            .onAudioTrackRemoved(conversation, participant,
+                                                    audioTrack);
+                                }
+                            }
+                        });
+                    }
+                }
+            }
+
+            @Override
+            public void onAudioTrackStateChanged(final TrackInfo trackInfo) {
+                log("onAudioTrackStateChanged", trackInfo.getParticipantIdentity() + " " +
+                        trackInfo.getTrackId() + " " + trackInfo.isEnabled());
+                if(trackInfo.getTrackOrigin() == TrackOrigin.LOCAL) {
+                    return;
+                } else {
+                    final Participant participant = findOrCreateParticipant(trackInfo
+                            .getParticipantIdentity(), null);
+                    List<AudioTrack> audioTracks = participant.getMedia().getAudioTracks();
+                    for(final AudioTrack audioTrack: audioTracks) {
+                        if(trackInfo.getTrackId().equals(audioTrack.getTrackId())) {
+                            audioTrack.updateTrackInfo(trackInfo);
+                            if(handler != null) {
+                                handler.post(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        if (participant.getParticipantListener() != null) {
+                                            if(trackInfo.isEnabled()) {
+                                                participant.getParticipantListener()
+                                                        .onTrackEnabled(conversation, participant,
+                                                                audioTrack);
+                                            } else {
+                                                participant.getParticipantListener()
+                                                        .onTrackDisabled(conversation, participant,
+                                                                audioTrack);
+                                            }
+                                        }
+                                    }
+                                });
+                            }
+                            break;
+                        }
+                    }
+                }
+            }
+
+            @Override
+            public void onReceiveTrackStatistics(CoreTrackStatsReport report) {
+                if (handler != null && statsListener != null) {
+                    final MediaTrackStatsRecord stats = MediaTrackStatsRecord.create(report);
+
+                    if (stats != null) {
+                        /*
+                         * Do not report stats until the participant sid of this participant
+                         * is available on both the conversation and the media stats record. It
+                         * will become available when the onParticipantConnected event is triggered.
+                         */
+                        for(final Participant participant: getParticipants()) {
+                            if(participant.getSid() != null && stats.getParticipantSid() != null &&
+                                    participant.getSid().equals(stats.getParticipantSid())) {
+                                postStatsToListener(participant, stats);
+                                return;
+                            }
+                        }
+                        logger.d("stats report skipped since the participant sid has not been set yet");
+                    }
+                }
+            }
+        };
+
+        public SessionObserverInternal(Conversation conversation) {
             this.nativeSessionObserver = nativeWrapObserver(sessionObserver, conversation);
+            this.conversation = conversation;
         }
 
         public void enableStats(long nativeSession, boolean enable) {
@@ -105,7 +527,7 @@ public class Conversation implements NativeHandleInterface, SessionObserver {
         this.conversationListener = conversationListener;
         this.conversationStateObserver = conversationStateObserver;
 
-        sessionObserverInternal = new SessionObserverInternal(this, this);
+        sessionObserverInternal = new SessionObserverInternal(this);
 
         nativeSession = nativeWrapOutgoingSession(conversationsClientInternal.getNativeHandle(),
                 sessionObserverInternal.getNativeHandle(),
@@ -149,7 +571,7 @@ public class Conversation implements NativeHandleInterface, SessionObserver {
 
 
         }
-        sessionObserverInternal = new SessionObserverInternal(this, this);
+        sessionObserverInternal = new SessionObserverInternal(this);
         nativeSetSessionObserver(nativeSession, sessionObserverInternal.getNativeHandle());
     }
 
@@ -344,432 +766,12 @@ public class Conversation implements NativeHandleInterface, SessionObserver {
         return participant;
     }
 
-    /**
-     * SessionObserver events
-     */
-    @Override
-    public void onSessionStateChanged(SessionState state) {
-        logger.i("state changed to: " + state.name());
-
-        ConversationStatus newConversationStatus = sessionStateToStatus(state, conversationStatus);
-        this.state = state;
-
-        if(conversationStatus != newConversationStatus) {
-            conversationStatus = newConversationStatus;
-            conversationStateObserver.onConversationStatusChanged(Conversation.this, conversationStatus);
-
-            // TODO GSDK-492 multi-invite behavior
-        }
-
-    }
-
     SessionState getSessionState() {
         return state;
     }
 
-    @Override
-    public void onStartCompleted(CoreError error) {
-        log("onStartCompleted", error);
-
-        if(error != null) {
-            // Remove this conversation from the client
-            conversationsClientInternal.removeConversation(this);
-            participantMap.clear();
-
-            final TwilioConversationsException e =
-                    new TwilioConversationsException(error.getCode(), error.getMessage());
-            if(conversationListener == null) {
-                if(e.getErrorCode() == TwilioConversationsClient.CONVERSATION_TERMINATED) {
-                    conversationsClientInternal.onConversationTerminated(this, e);
-                }
-            } else if(handler != null) {
-                handler.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        conversationListener.onConversationEnded(Conversation.this, e);
-                    }
-                });
-            }
-            disposeConversation();
-        }
-    }
-
-    @Override
-    public void onStopCompleted(CoreError error) {
-        /**
-         * Note that we are not using a latch here because of deadlock situation revealed in
-         * GSDK-598
-         */
-        log("onStopCompleted", error);
-
-        // Remove this conversation from the client
-        conversationsClientInternal.removeConversation(this);
-        // Conversations that are rejected do not have a listener
-        if(conversationListener != null) {
-            participantMap.clear();
-            if (error == null) {
-                if (handler != null && conversationListener != null) {
-                    handler.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            conversationListener.onConversationEnded(Conversation.this, null);
-                        }
-                    });
-                }
-            } else {
-                final TwilioConversationsException e =
-                        new TwilioConversationsException(error.getCode(),
-                                error.getMessage());
-                if (handler != null && conversationListener != null) {
-                    handler.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            conversationListener.onConversationEnded(Conversation.this, e);
-                        }
-                    });
-                }
-            }
-        }
-        disposeConversation();
-    }
-
-    @Override
-    public void onParticipantConnected(String participantIdentity,
-                                       String participantSid,
-                                       CoreError error) {
-        log("onParticipantConnected",  participantIdentity, error);
-        final Participant participant = findOrCreateParticipant(participantIdentity,
-                participantSid);
-        if (error == null) {
-            if(handler != null && conversationListener != null) {
-                handler.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        conversationListener.onParticipantConnected(Conversation.this,
-                                participant);
-                    }
-                });
-            }
-        } else {
-            final TwilioConversationsException e = new TwilioConversationsException(error.getCode(),
-                    error.getMessage());
-            if (conversationListener == null) {
-                if(e.getErrorCode() == TwilioConversationsClient.CONVERSATION_TERMINATED) {
-                    conversationsClientInternal.onConversationTerminated(this, e);
-                } else {
-                    logger.e("onParticipantConnected -> received unexpected error code -> " +
-                            e.getErrorCode());
-                }
-            } else if(handler != null) {
-                handler.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        conversationListener.onFailedToConnectParticipant(Conversation.this,
-                                participant, e);
-                    }
-                });
-            }
-        }
-    }
-
-    @Override
-    public void onParticipantDisconnected(final String participantIdentity,
-                                          String participantSid,
-                                          final DisconnectReason reason) {
-        log("onParticipantDisconnected", participantIdentity, reason);
-        final Participant participant = participantMap.remove(participantIdentity);
-        if(participant == null) {
-            logger.i("participant removed but was never in list");
-        } else {
-            if(handler != null && conversationListener != null) {
-                handler.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        conversationListener.onParticipantDisconnected(Conversation.this,
-                                participant);
-                    }
-                });
-            }
-        }
-    }
-
-    @Override
-    public void onMediaStreamAdded(MediaStreamInfo stream) {
-        log("onMediaStreamAdded", stream.getParticipantAddress() + " " + stream.getStreamId());
-    }
-
-    @Override
-    public void onMediaStreamRemoved(MediaStreamInfo stream) {
-        log("onMediaStreamRemoved", stream.getParticipantAddress() + " " + stream.getStreamId());
-    }
-
-    @Override
-    public void onVideoTrackAdded(final TrackInfo trackInfo,
-                                  final org.webrtc.VideoTrack webRtcVideoTrack) {
-        log("onVideoTrackAdded", trackInfo.getParticipantIdentity() + " " +
-                trackInfo.getTrackId() + " " + trackInfo.isEnabled());
-
-        if(trackInfo.getTrackOrigin() == TrackOrigin.LOCAL) {
-            List<LocalVideoTrack> tracksList = localMedia.getLocalVideoTracks();
-            final LocalVideoTrack videoTrack = tracksList.get(0);
-            videoTrack.setWebrtcVideoTrack(webRtcVideoTrack);
-            videoTrack.setTrackInfo(trackInfo);
-            if (localMedia.getHandler() != null) {
-                localMedia.getHandler().post(new Runnable() {
-                    @Override
-                    public void run() {
-                        if (localMedia.getLocalMediaListener() != null) {
-                            localMedia.getLocalMediaListener().onLocalVideoTrackAdded(localMedia,
-                                    videoTrack);
-                        }
-                    }
-                });
-            }
-        } else {
-            final Participant participant = findOrCreateParticipant(trackInfo
-                    .getParticipantIdentity(), null);
-            final VideoTrack videoTrack = new VideoTrack(webRtcVideoTrack, trackInfo);
-            participant.getMedia().addVideoTrack(videoTrack);
-            if(handler != null) {
-                handler.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        if (participant.getParticipantListener() != null) {
-                            participant.getParticipantListener().onVideoTrackAdded(
-                                    Conversation.this, participant, videoTrack);
-                        }
-                    }
-                });
-            }
-        }
-    }
-
-    @Override
-    public void onVideoTrackFailedToAdd(final TrackInfo trackInfo, CoreError error) {
-        log("onVideoFailedToAdd", trackInfo.getParticipantIdentity() + " " +
-                trackInfo.getTrackId() + trackInfo.isEnabled(), error);
-        if(trackInfo.getTrackOrigin().equals(TrackOrigin.LOCAL)) {
-            // Remove local video track
-            final LocalVideoTrack localVideoTrack = localMedia.getLocalVideoTracks().remove(0);
-            List<VideoRenderer> renderers = new ArrayList<>(localVideoTrack.getRenderers());
-            // Remove renderers
-            for(VideoRenderer renderer: renderers) {
-                localVideoTrack.removeRenderer(renderer);
-            }
-            localVideoTrack.removeCameraCapturer();
-
-            final TwilioConversationsException e =
-                    new TwilioConversationsException(error.getCode(), error.getMessage());
-
-            if(localMedia.getHandler() != null) {
-                localMedia.getHandler().post(new Runnable() {
-                    @Override
-                    public void run() {
-                        if(localMedia.getLocalMediaListener() != null) {
-                            localMedia.getLocalMediaListener().onLocalVideoTrackError(localMedia,
-                                    localVideoTrack, e);
-                        }
-                    }
-                });
-            }
-        } else {
-            logger.w("Remote track failed to add unexpectedly");
-        }
-    }
-
-    @Override
-    public void onVideoTrackRemoved(final TrackInfo trackInfo) {
-        log("onVideoTrackRemoved", trackInfo.getParticipantIdentity() + " " +
-                trackInfo.getTrackId() + " " + trackInfo.isEnabled());
-        if (trackInfo.getTrackOrigin() == TrackOrigin.LOCAL) {
-            final LocalVideoTrack localVideoTrack =
-                    localMedia.removeLocalVideoTrack(trackInfo);
-            localVideoTrack.removeCameraCapturer();
-            localVideoTrack.setTrackState(MediaTrackState.ENDED);
-            if(localMedia.getHandler() != null) {
-                localMedia.getHandler().post(new Runnable() {
-                    @Override
-                    public void run() {
-                        if (localMedia.getLocalMediaListener() != null) {
-                            localMedia.getLocalMediaListener()
-                                    .onLocalVideoTrackRemoved(localMedia, localVideoTrack);
-                        }
-                    }
-                });
-            }
-        } else {
-            final Participant participant = findOrCreateParticipant(trackInfo
-                    .getParticipantIdentity(), null);
-            final VideoTrack videoTrack = participant.getMedia().removeVideoTrack(trackInfo);
-            videoTrack.setTrackState(MediaTrackState.ENDED);
-            if(handler != null) {
-                handler.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        if (participant.getParticipantListener() != null) {
-                            participant.getParticipantListener()
-                                    .onVideoTrackRemoved(Conversation.this, participant,
-                                            videoTrack);
-                        }
-                    }
-                });
-            }
-        }
-    }
-
-    @Override
-    public void onVideoTrackStateChanged(final TrackInfo trackInfo) {
-        log("onVideoTrackStateChanged", trackInfo.getParticipantIdentity() + " " +
-                trackInfo.getTrackId() + " " + trackInfo.isEnabled());
-        if(trackInfo.getTrackOrigin() == TrackOrigin.LOCAL) {
-            return;
-        } else {
-            final Participant participant = findOrCreateParticipant(trackInfo
-                    .getParticipantIdentity(), null);
-            List<VideoTrack> videoTracks = participant.getMedia().getVideoTracks();
-            for(final VideoTrack videoTrack: videoTracks) {
-                if(trackInfo.getTrackId().equals(videoTrack.getTrackId())) {
-                    videoTrack.updateTrackInfo(trackInfo);
-                    if(handler != null) {
-                        handler.post(new Runnable() {
-                            @Override
-                            public void run() {
-                                if (participant.getParticipantListener() != null) {
-                                    if(trackInfo.isEnabled()) {
-                                        participant.getParticipantListener()
-                                                .onTrackEnabled(Conversation.this, participant,
-                                                        videoTrack);
-                                    } else {
-                                        participant.getParticipantListener()
-                                                .onTrackDisabled(Conversation.this, participant,
-                                                        videoTrack);
-                                    }
-                                }
-                            }
-                        });
-                    }
-                    break;
-                }
-            }
-        }
-    }
-
-    @Override
-    public void onAudioTrackAdded(TrackInfo trackInfo, final org.webrtc.AudioTrack webRtcAudioTrack) {
-        log("onAudioTrackAdded", trackInfo.getParticipantIdentity() + " " +
-                trackInfo.getTrackId() + " " + trackInfo.isEnabled());
-
-        if(trackInfo.getTrackOrigin() == TrackOrigin.LOCAL) {
-            // TODO: expose audio tracks in local media
-        } else {
-            final Participant participant = findOrCreateParticipant(trackInfo
-                    .getParticipantIdentity(), null);
-            final AudioTrack audioTrack = new AudioTrack(webRtcAudioTrack, trackInfo);
-            participant.getMedia().addAudioTrack(audioTrack);
-            if(handler != null) {
-                handler.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        if (participant.getParticipantListener() != null) {
-                            participant.getParticipantListener().onAudioTrackAdded(
-                                    Conversation.this, participant, audioTrack);
-                        }
-                    }
-                });
-            }
-        }
-    }
-
-    @Override
-    public void onAudioTrackRemoved(TrackInfo trackInfo) {
-        log("onAudioTrackRemoved", trackInfo.getParticipantIdentity() + " " +
-                trackInfo.getTrackId() + " " + trackInfo.isEnabled());
-
-        if(trackInfo.getTrackOrigin() == TrackOrigin.LOCAL) {
-            // TODO: remove audio track from local media once audio tracks are exposed
-        } else {
-            final Participant participant = findOrCreateParticipant(trackInfo
-                    .getParticipantIdentity(), null);
-            final AudioTrack audioTrack = participant.getMedia()
-                    .removeAudioTrack(trackInfo);
-            audioTrack.setTrackState(MediaTrackState.ENDED);
-            if(handler != null) {
-                handler.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        if (participant.getParticipantListener() != null) {
-                            participant.getParticipantListener()
-                                    .onAudioTrackRemoved(Conversation.this, participant,
-                                            audioTrack);
-                        }
-                    }
-                });
-            }
-        }
-    }
-
-    @Override
-    public void onAudioTrackStateChanged(final TrackInfo trackInfo) {
-        log("onAudioTrackStateChanged", trackInfo.getParticipantIdentity() + " " +
-                trackInfo.getTrackId() + " " + trackInfo.isEnabled());
-        if(trackInfo.getTrackOrigin() == TrackOrigin.LOCAL) {
-            return;
-        } else {
-            final Participant participant = findOrCreateParticipant(trackInfo
-                    .getParticipantIdentity(), null);
-            List<AudioTrack> audioTracks = participant.getMedia().getAudioTracks();
-            for(final AudioTrack audioTrack: audioTracks) {
-                if(trackInfo.getTrackId().equals(audioTrack.getTrackId())) {
-                    audioTrack.updateTrackInfo(trackInfo);
-                    if(handler != null) {
-                        handler.post(new Runnable() {
-                            @Override
-                            public void run() {
-                                if (participant.getParticipantListener() != null) {
-                                    if(trackInfo.isEnabled()) {
-                                        participant.getParticipantListener()
-                                                .onTrackEnabled(Conversation.this, participant,
-                                                        audioTrack);
-                                    } else {
-                                        participant.getParticipantListener()
-                                                .onTrackDisabled(Conversation.this, participant,
-                                                        audioTrack);
-                                    }
-                                }
-                            }
-                        });
-                    }
-                    break;
-                }
-            }
-
-        }
-    }
-
-    @Override
-    public void onReceiveTrackStatistics(CoreTrackStatsReport report) {
-        if (handler != null && statsListener != null) {
-            final MediaTrackStatsRecord stats = MediaTrackStatsRecord.create(report);
-
-            if (stats != null) {
-                /*
-                 * Do not report stats until the participant sid of this participant is available
-                 * on both the conversation and the media stats record.
-                 * It will become available when the onParticipantConnected event is triggered.
-                 */
-                for(final Participant participant: getParticipants()) {
-                    if(participant.getSid() != null && stats.getParticipantSid() != null &&
-                            participant.getSid().equals(stats.getParticipantSid())) {
-                        postStatsToListener(participant, stats);
-                        return;
-                    }
-                }
-                logger.d("stats report skipped since the participant sid has not been set yet");
-            }
-        }
-    }
-
-    private void postStatsToListener(final Participant participant, final MediaTrackStatsRecord stats) {
+    private void postStatsToListener(final Participant participant,
+                                     final MediaTrackStatsRecord stats) {
         if (stats instanceof LocalAudioTrackStatsRecord) {
             handler.post(new Runnable() {
                 @Override
