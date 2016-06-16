@@ -14,7 +14,7 @@ import java.util.Set;
 /**
  * A Conversation represents communication between the client and one or more participants.
  */
-public class Conversation implements NativeHandleInterface {
+public class Conversation {
     private static final String DISPOSED_MESSAGE = "The conversation has been destroyed. " +
             "This operation is no longer valid";
     private Set<String> invitedParticipants = new HashSet<>();
@@ -847,11 +847,7 @@ public class Conversation implements NativeHandleInterface {
         this.outgoingInvite = outgoingInvite;
     }
 
-    /**
-     * NativeHandleInterface
-     */
-    @Override
-    public long getNativeHandle() {
+    long getNativeHandle() {
         return nativeSession;
     }
 
