@@ -14,7 +14,7 @@ import java.util.Set;
 /**
  * A Conversation represents communication between the client and one or more participants.
  */
-public class Conversation implements NativeHandleInterface, SessionObserver, CoreSession {
+public class Conversation implements NativeHandleInterface, SessionObserver {
     private static final String DISPOSED_MESSAGE = "The conversation has been destroyed. " +
             "This operation is no longer valid";
     private Set<String> invitedParticipants = new HashSet<>();
@@ -54,7 +54,9 @@ public class Conversation implements NativeHandleInterface, SessionObserver, Cor
                                                Conversation conversation);
         private native void nativeFreeObserver(long nativeSessionObserver);
 
-        private native void nativeEnableStats(long nativeSessionObserver, long nativeSession, boolean enable);
+        private native void nativeEnableStats(long nativeSessionObserver,
+                                              long nativeSession,
+                                              boolean enable);
 
         @Override
         public long getNativeHandle() {
@@ -909,8 +911,7 @@ public class Conversation implements NativeHandleInterface, SessionObserver, Cor
 
     }
 
-    @Override
-    public void start(final CoreSessionMediaConstraints mediaConstraints) {
+    void start(final CoreSessionMediaConstraints mediaConstraints) {
         logger.d("starting call");
 
 		/*
@@ -946,8 +947,7 @@ public class Conversation implements NativeHandleInterface, SessionObserver, Cor
 
     }
 
-    @Override
-    public void stop() {
+    void stop() {
 		/*
 		 * Retain the session pointer since it can be reset before the
 		 * new thread references it.
@@ -956,20 +956,17 @@ public class Conversation implements NativeHandleInterface, SessionObserver, Cor
         nativeStop(retainNativeSession);
     }
 
-    @Override
-    public boolean enableVideo(boolean enabled, boolean paused, VideoConstraints videoConstraints) {
+    boolean enableVideo(boolean enabled, boolean paused, VideoConstraints videoConstraints) {
         return nativeEnableVideo(nativeSession, enabled, paused, videoConstraints);
     }
 
-    @Override
-    public void inviteParticipants(Set<String> participants) {
+    void inviteParticipants(Set<String> participants) {
         String[] participantIdentityArray =
                 participants.toArray(new String[participants.size()]);
         nativeInviteParticipants(nativeSession, participantIdentityArray);
     }
 
-    @Override
-    public boolean enableAudio(boolean enabled, boolean muted) {
+    boolean enableAudio(boolean enabled, boolean muted) {
         return nativeEnableAudio(nativeSession, enabled, muted);
     }
 
