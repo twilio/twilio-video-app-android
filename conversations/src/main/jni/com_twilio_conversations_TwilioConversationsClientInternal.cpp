@@ -9,7 +9,8 @@
 #include "TSCSession.h"
 #include "TSCLogger.h"
 
-static TwilioCommon::AccessManager* getNativeAccessMgrFromJava(JNIEnv* jni, jobject j_accessMgr) ;
+static std::shared_ptr<TwilioCommon::AccessManager> getNativeAccessMgrFromJava(JNIEnv* jni,
+                                                                               jobject j_accessMgr);
 
 using namespace twiliosdk;
 using namespace webrtc_jni;
@@ -38,7 +39,10 @@ JNIEXPORT jlong JNICALL Java_com_twilio_conversations_TwilioConversationsClientI
     }
 
     TSCEndpointObserverPtr *endpointObserver = reinterpret_cast<TSCEndpointObserverPtr *>(nativeEndpointObserver);
-    TwilioCommon::AccessManager* accessManager = getNativeAccessMgrFromJava(env, j_accessMgr);
+
+    // Grab the shared_ptr to access manager
+    std::shared_ptr<TwilioCommon::AccessManager> accessManager =
+            getNativeAccessMgrFromJava(env, j_accessMgr);
 
     if (accessManager == NULL) {
         TS_CORE_LOG_MODULE(kTSCoreLogModulePlatform, kTSCoreLogLevelError, "AccessManager is null");
@@ -53,17 +57,24 @@ JNIEXPORT jlong JNICALL Java_com_twilio_conversations_TwilioConversationsClientI
     TS_CORE_LOG_DEBUG("access token is:%s", accessManager->getToken().c_str());
 
     TSCEndpointPtr *endpoint = new TSCEndpointPtr();
-    *endpoint = TSCSDK::instance()->createEndpoint(options, accessManager, *endpointObserver);
+    *endpoint = TSCSDK::instance()->createEndpoint(options, accessManager.get(), *endpointObserver);
+
+    // Release control of our local copy of the access manager shared_ptr
+    accessManager.reset();
 
     return jlongFromPointer(endpoint);
 }
 
-static TwilioCommon::AccessManager* getNativeAccessMgrFromJava(JNIEnv* jni, jobject j_accessMgr) {
+static std::shared_ptr<TwilioCommon::AccessManager> getNativeAccessMgrFromJava(JNIEnv* jni,
+                                                                               jobject j_accessMgr) {
     jclass j_accessManagerClass = GetObjectClass(jni, j_accessMgr);
     jmethodID getNativeHandleId = GetMethodID(jni, j_accessManagerClass, "getNativeHandle", "()J");
 
     jlong j_am = jni->CallLongMethod(j_accessMgr, getNativeHandleId);
-    return reinterpret_cast<TwilioCommon::AccessManager*>(j_am);
+
+    // Recreate a reference to the share_ptr of AccessManager by dereferencing the ptr
+    // to the shared_ptr
+    return *(reinterpret_cast<std::shared_ptr<TwilioCommon::AccessManager> *>(j_am));
 }
 
 /*

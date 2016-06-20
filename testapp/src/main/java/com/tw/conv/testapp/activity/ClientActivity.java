@@ -480,8 +480,7 @@ public class ClientActivity extends AppCompatActivity {
         spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         aspectRatioSpinner.setAdapter(spinnerAdapter);
 
-        accessManager = AccessManager.create(this, capabilityToken,
-                accessManagerListener());
+        accessManager = new AccessManager(this, capabilityToken, accessManagerListener());
 
         twilioConversationsClient = TwilioConversationsClient.create(accessManager, options,
                 conversationsClientListener());
@@ -695,7 +694,6 @@ public class ClientActivity extends AppCompatActivity {
     private void completeLogout() {
         disposeConversationsClient();
         destroyConversationsSdk();
-        disposeAccessManager();
         returnToRegistration();
         loggingOut = false;
     }
@@ -715,13 +713,6 @@ public class ClientActivity extends AppCompatActivity {
 
     private void destroyConversationsSdk() {
         TwilioConversationsClient.destroy();
-    }
-
-    private void disposeAccessManager() {
-        if (accessManager != null) {
-            accessManager.dispose();
-            accessManager = null;
-        }
     }
 
     private void returnToRegistration() {
