@@ -57,7 +57,7 @@ JNIEXPORT jlong JNICALL Java_com_twilio_conversations_TwilioConversationsClientI
     TS_CORE_LOG_DEBUG("access token is:%s", accessManager->getToken().c_str());
 
     TSCEndpointPtr *endpoint = new TSCEndpointPtr();
-    *endpoint = TSCSDK::instance()->createEndpoint(options, accessManager.get(), *endpointObserver);
+    *endpoint = TSCSDK::instance()->createEndpoint(options, accessManager, *endpointObserver);
 
     // Release control of our local copy of the access manager shared_ptr
     accessManager.reset();
