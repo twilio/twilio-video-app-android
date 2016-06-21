@@ -62,10 +62,11 @@ extern "C" void JNIEXPORT JNICALL JNI_OnUnLoad(JavaVM *jvm, void *reserved) {
  * Method:    initCore
  * Signature: (Landroid/content/Context;)Z
  */
-JNIEXPORT jboolean JNICALL Java_com_twilio_conversations_TwilioConversationsClient_nativeInitCore(JNIEnv *env, jobject obj, jobject context) {
+JNIEXPORT jlong JNICALL Java_com_twilio_conversations_TwilioConversationsClient_nativeInitCore(
+        JNIEnv *env, jobject obj, jobject context) {
     TS_CORE_LOG_MODULE(kTSCoreLogModulePlatform, kTSCoreLogLevelDebug, "initCore");
     bool failure = false;
-    TSCSDK* tscSdk = TSCSDK::instance();
+    TSCSDK* tscSdk = new TSCSDK();
 
     // TODO investigate relocating some of these calls to more timely locations
     if (!media_jvm_set) {
@@ -76,9 +77,7 @@ JNIEXPORT jboolean JNICALL Java_com_twilio_conversations_TwilioConversationsClie
         media_jvm_set = true;
     }
 
-    if (tscSdk != NULL &&
-        tscSdk->isInitialized() &&
-        !failure) {
+    if (tscSdk != NULL && !failure) {
         TSCPlatformDataProviderRef provider =
                 new rtc::RefCountedObject<AndroidPlatformInfoProvider>(env, context);
         TSCMediaCodecRegistry& codecManager = tscSdk->getMediaCodecRegistry();
@@ -88,10 +87,10 @@ JNIEXPORT jboolean JNICALL Java_com_twilio_conversations_TwilioConversationsClie
         tscSdk->setPlatformDataProvider(provider);
         codecManager.registerVideoCodec(androidVideoCodecManager);
 
-        return JNI_TRUE;
+        return jlongFromPointer(tscSdk);
     }
 
-    return JNI_FALSE;
+    return 0;
 }
 
 
@@ -100,13 +99,13 @@ JNIEXPORT jboolean JNICALL Java_com_twilio_conversations_TwilioConversationsClie
  * Method:    destroyCore
  * Signature: ()J
  */
-JNIEXPORT void JNICALL Java_com_twilio_conversations_TwilioConversationsClient_nativeDestroyCore(JNIEnv *env, jobject obj) {
+JNIEXPORT void JNICALL Java_com_twilio_conversations_TwilioConversationsClient_nativeDestroyCore(JNIEnv *env, jobject obj, jlong nativeCore) {
     TS_CORE_LOG_MODULE(kTSCoreLogModulePlatform, kTSCoreLogLevelDebug, "destroyCore");
-    TSCSDK* tscSdk = TSCSDK::instance();
+    TSCSDK* tscSdk = reinterpret_cast<TSCSDK*>(nativeCore);
     TSCMediaCodecRegistry& codecManager = tscSdk->getMediaCodecRegistry();
 
     codecManager.unregisterVideoCodecsForName(AndroidVideoCodecManager::videoCodecManagerName);
-    TSCSDK::destroy();
+    delete tscSdk;
 }
 
 
@@ -132,8 +131,10 @@ JNIEXPORT jint JNICALL Java_com_twilio_conversations_TwilioConversationsClient_n
 }
 
 JNIEXPORT void JNICALL Java_com_twilio_conversations_TwilioConversationsClient_nativeRefreshRegistrations
-        (JNIEnv *, jobject) {
-    TSCSDK::instance()->refreshRegistrations();
+        (JNIEnv *, jobject, jlong nativeCore) {
+    TS_CORE_LOG_MODULE(kTSCoreLogModulePlatform, kTSCoreLogLevelDebug, "refreshRegistrations");
+    TSCSDK* tscSdk = reinterpret_cast<TSCSDK*>(nativeCore);
+    tscSdk->refreshRegistrations();
 }
 
 

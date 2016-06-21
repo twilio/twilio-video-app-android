@@ -125,7 +125,7 @@ final class TwilioConversationsClientInternal implements
 
         endpointObserver = new EndpointObserverInternal(this);
         nativeEndpointHandle = nativeCreateEndpoint(accessManager, optionsArray,
-                endpointObserver.getNativeHandle());
+                endpointObserver.getNativeHandle(), TwilioConversationsClient.getNativeCore());
 
         if(nativeEndpointHandle == 0) {
             throw new IllegalStateException("Native endpoint handle must not be null");
@@ -550,7 +550,7 @@ final class TwilioConversationsClientInternal implements
 
     public void disposeClient() {
         if (nativeEndpointHandle != 0) {
-            nativeFreeHandle(nativeEndpointHandle);
+            nativeFreeHandle(nativeEndpointHandle, TwilioConversationsClient.getNativeCore());
             nativeEndpointHandle = 0;
         }
         if (endpointObserver != null) {
@@ -561,9 +561,10 @@ final class TwilioConversationsClientInternal implements
 
     private native long nativeCreateEndpoint(AccessManager accessManager,
                                              String[] optionsArray,
-                                             long nativeEndpointObserver);
+                                             long nativeEndpointObserver,
+                                             long nativeCore);
     private native void nativeListen(long nativeEndpoint);
     private native void nativeUnlisten(long nativeEndpoint);
     private native void nativeReject(long nativeEndpoint, long nativeSession);
-    private native void nativeFreeHandle(long nativeEndpoint);
+    private native void nativeFreeHandle(long nativeEndpoint, long nativeCore);
 }

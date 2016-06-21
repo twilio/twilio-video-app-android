@@ -11,9 +11,9 @@ public final class WakeUpReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
         if (TwilioConversationsClient.isInitialized()) {
-            nativeOnApplicationWakeUp();
+            nativeOnApplicationWakeUp(TwilioConversationsClient.getNativeCore());
         }
     }
 
-    private native void nativeOnApplicationWakeUp();
+    private native void nativeOnApplicationWakeUp(long nativeCore);
 }
