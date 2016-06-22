@@ -253,7 +253,7 @@ dependencies {
     preCompile 'com.googlesource.boringssl.twilio:twilio-boringssl:1.0.13:android@tar.bz2'
     preCompile 'com.twilio.sdk:twilio-common:0.2.0:android@tar.bz2'
     preCompile 'com.twilio.sdk:twilio-webrtc:52.0:android@tar.bz2'
-    preCompile 'com.twilio.sdk:twilio-conversations:0.11.7:android@tar.bz2'
+    preCompile 'com.twilio.sdk:twilio-conversations:0.12.0:android@tar.bz2'
 
     testCompile 'junit:junit:4.12'
     testCompile 'org.mockito:mockito-core:1.10.19'
