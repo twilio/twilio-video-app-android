@@ -387,12 +387,11 @@ task packageRelease(type: GradleBuild){
 
 /**
  * Maven upload configuration that can be used for any maven repo
- *
  */
 uploadArchives {
     repositories {
         mavenDeployer {
-            repository(url: "${mavenRepo};publish=1") {
+            repository(url: "${mavenRepo}") {
                 authentication(
                         userName: mavenUsername,
                         password: mavenPassword
@@ -401,6 +400,9 @@ uploadArchives {
             pom.version = getVersionName() + ((project.hasProperty("releaseCandidate") &&
                     project.property("releaseCandidate").toBoolean() == true) ?
                     "-rc${project.property("versionRc")}" :
+                    '') + ((project.hasProperty("snapshot") &&
+                    project.property("snapshot").toBoolean() == true) ?
+                    "-SNAPSHOT" :
                     '')
             pom.groupId = 'com.twilio'
             pom.artifactId = 'conversations-android'
