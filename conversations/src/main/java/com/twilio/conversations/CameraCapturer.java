@@ -124,6 +124,7 @@ public class CameraCapturer {
         if(capturerState.equals(CapturerState.PREVIEWING)) {
             if (previewContainer != null) {
                 previewContainer.removeAllViews();
+                previewContainer = null;
             }
             capturerPreview = null;
             if(camera != null) {
