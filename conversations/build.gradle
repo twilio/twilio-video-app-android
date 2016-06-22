@@ -251,9 +251,9 @@ model {
 dependencies {
     preCompile 'org.pocoproject.twilio:twilio-poco:1.6.16:android@tar.bz2'
     preCompile 'com.googlesource.boringssl.twilio:twilio-boringssl:1.0.13:android@tar.bz2'
-    preCompile 'com.twilio.sdk:twilio-common:0.1.15:android@tar.bz2'
+    preCompile 'com.twilio.sdk:twilio-common:0.2.0:android@tar.bz2'
     preCompile 'com.twilio.sdk:twilio-webrtc:52.0:android@tar.bz2'
-    preCompile 'com.twilio.sdk:twilio-conversations:0.11.6:android@tar.bz2'
+    preCompile 'com.twilio.sdk:twilio-conversations:0.12.0:android@tar.bz2'
 
     testCompile 'junit:junit:4.12'
     testCompile 'org.mockito:mockito-core:1.10.19'
@@ -266,7 +266,8 @@ dependencies {
     androidTestCompile 'com.android.support.test:rules:0.4'
     androidTestCompile 'com.google.code.gson:gson:2.6.2'
 
-    compile 'com.twilio:common-android:0.5.0'
+    // compile 'com.twilio:common-android:0.5.0'
+    compile 'com.twilio.sdk:twilio-common-android:0.6.0-rc1'
     // TODO this really should be on nexus as a jar and not local
     compile files("${twilioSdkHome}/twilio-webrtc/lib/release/libjingle_peerconnection_java.jar")
 }
