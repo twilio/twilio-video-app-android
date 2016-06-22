@@ -121,6 +121,7 @@ public class TwilioConversationsClient {
             Manifest.permission.ACCESS_NETWORK_STATE,
             Manifest.permission.ACCESS_WIFI_STATE
     };
+    private static long nativeCore;
 
     /**
      * Listener interface defines a set of callbacks for events related to a
@@ -202,7 +203,6 @@ public class TwilioConversationsClient {
         Context applicationContext = context.getApplicationContext();
         Handler handler = Util.createCallbackHandler();
 
-        internalRegistry = new InternalRegistry(applicationContext, handler);
 
         /*
          * With all the invariants satisfied we can now load the library if we have not done so
@@ -229,11 +229,14 @@ public class TwilioConversationsClient {
             trySetCoreModuleLogLevel(module.ordinal(), moduleLogLevel.get(module).ordinal());
         }
 
-        boolean success = nativeInitCore(applicationContext);
-        if (!success) {
+        nativeCore = nativeInitCore(applicationContext);
+        if (nativeCore == 0) {
             initialized = false;
             throw new RuntimeException("Twilio conversations failed to initialize.");
         }
+
+        internalRegistry = new InternalRegistry(applicationContext, handler, nativeCore);
+
         internalRegistry.setupLifecycleListeners();
         initialized = true;
     }
@@ -251,10 +254,14 @@ public class TwilioConversationsClient {
             // Now we can teardown the sdk
             // TODO destroy investigate making this asynchronous with callbacks
             logger.d("Destroying Core");
-            nativeDestroyCore();
+            nativeDestroyCore(nativeCore);
             logger.d("Core destroyed");
             initialized = false;
         }
+    }
+
+    static long getNativeCore() {
+        return nativeCore;
     }
 
     /**
@@ -630,8 +637,7 @@ public class TwilioConversationsClient {
 
         private PendingIntent wakeUpPendingIntent;
 
-        private final ApplicationForegroundTracker applicationForegroundTracker =
-                new ApplicationForegroundTracker();
+        private final ApplicationForegroundTracker applicationForegroundTracker;
 
         private class ConnectivityChangeReceiver extends BroadcastReceiver {
 
@@ -668,7 +674,8 @@ public class TwilioConversationsClient {
 
 
 
-        public InternalRegistry(Context applicationContext, Handler handler) {
+        public InternalRegistry(Context applicationContext, Handler handler, long nativeCore) {
+            this.applicationForegroundTracker = new ApplicationForegroundTracker(nativeCore);
             this.applicationContext = applicationContext;
             this.handler = handler;
         }
@@ -737,7 +744,7 @@ public class TwilioConversationsClient {
                 for (Map.Entry<UUID, TwilioConversationsClient> entry :
                         conversationsClientMap.entrySet()) {
                     if(entry.getValue().isListening()) {
-                        nativeRefreshRegistrations();
+                        nativeRefreshRegistrations(TwilioConversationsClient.getNativeCore());
                         break;
                     }
                 }
@@ -762,9 +769,9 @@ public class TwilioConversationsClient {
 
     }
 
-    private native static boolean nativeInitCore(Context context);
-    private native static void nativeDestroyCore();
-    private native static void nativeRefreshRegistrations();
+    private native static long nativeInitCore(Context context);
+    private native static void nativeDestroyCore(long nativeCore);
+    private native static void nativeRefreshRegistrations(long nativeCore);
     private native static void nativeSetCoreLogLevel(int level);
     private native static void nativeSetModuleLevel(int module, int level);
     private native static int nativeGetCoreLogLevel();

@@ -9,7 +9,7 @@ extern "C" {
 
 JNIEXPORT jlong JNICALL
 Java_com_twilio_conversations_TwilioConversationsClientInternal_nativeCreateEndpoint
-  (JNIEnv *, jobject, jobject, jobjectArray, jlong);
+  (JNIEnv *, jobject, jobject, jobjectArray, jlong, jlong);
 
 /*
  * Class:     com_twilio_conversations_ConversationsClient
@@ -41,7 +41,7 @@ JNIEXPORT void JNICALL Java_com_twilio_conversations_TwilioConversationsClientIn
  * Signature: ()V
  */
 JNIEXPORT void JNICALL Java_com_twilio_conversations_TwilioConversationsClientInternal_nativeFreeHandle
-  (JNIEnv *, jobject, jlong);
+  (JNIEnv *, jobject, jlong, jlong);
 
 #ifdef __cplusplus
 }
