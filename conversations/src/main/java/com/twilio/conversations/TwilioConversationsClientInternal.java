@@ -561,10 +561,10 @@ final class TwilioConversationsClientInternal implements
 
     private native long nativeCreateEndpoint(AccessManager accessManager,
                                              String[] optionsArray,
-                                             long nativeEndpointObserver,
-                                             long nativeCore);
+                                             long nativeCore,
+                                             long nativeEndpointObserver);
     private native void nativeListen(long nativeEndpoint);
     private native void nativeUnlisten(long nativeEndpoint);
     private native void nativeReject(long nativeEndpoint, long nativeSession);
-    private native void nativeFreeHandle(long nativeEndpoint, long nativeCore);
+    private native void nativeFreeHandle(long nativeCore, long nativeEndpoint);
 }

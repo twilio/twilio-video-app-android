@@ -16,7 +16,7 @@ using namespace twiliosdk;
 using namespace webrtc_jni;
 
 JNIEXPORT jlong JNICALL Java_com_twilio_conversations_TwilioConversationsClientInternal_nativeCreateEndpoint
-        (JNIEnv *env, jobject obj, jobject j_accessMgr, jobjectArray optionsArray, jlong nativeEndpointObserver, jlong nativeCore) {
+        (JNIEnv *env, jobject obj, jobject j_accessMgr, jobjectArray optionsArray, jlong nativeCore, jlong nativeEndpointObserver) {
     TS_CORE_LOG_MODULE(kTSCoreLogModulePlatform, kTSCoreLogLevelDebug, "createEndpoint");
 
     TSCOptions options;
@@ -119,7 +119,7 @@ JNIEXPORT void JNICALL Java_com_twilio_conversations_TwilioConversationsClientIn
  * Signature: (J)V
  */
 JNIEXPORT void JNICALL Java_com_twilio_conversations_TwilioConversationsClientInternal_nativeFreeHandle
-        (JNIEnv *env, jobject obj, jlong nativeEndpoint, jlong nativeCore) {
+        (JNIEnv *env, jobject obj, jlong nativeCore, jlong nativeEndpoint) {
     TS_CORE_LOG_MODULE(kTSCoreLogModulePlatform, kTSCoreLogLevelDebug, "freeNativeHandle");
     TSCEndpointPtr *endpoint = reinterpret_cast<TSCEndpointPtr *>(nativeEndpoint);
     if (endpoint != nullptr) {
