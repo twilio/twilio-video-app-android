@@ -260,10 +260,6 @@ public class TwilioConversationsClient {
         }
     }
 
-    static long getNativeCore() {
-        return nativeCore;
-    }
-
     /**
      * Informs whether {@link TwilioConversationsClient} is initialized or not.
      *
@@ -350,7 +346,7 @@ public class TwilioConversationsClient {
         }
 
         TwilioConversationsClient client =
-                new TwilioConversationsClient(accessManager, options, listener);
+                new TwilioConversationsClient(accessManager, nativeCore, options, listener);
 
         internalRegistry.registerTwilioConversationClient(client);
 
@@ -535,12 +531,14 @@ public class TwilioConversationsClient {
 
 
     private TwilioConversationsClient(AccessManager accessManager,
+                                      long nativeCore,
                                       ClientOptions options,
                                       Listener listener) {
         this.conversationsClientInternal = new TwilioConversationsClientInternal(
                 this,
                 internalRegistry.applicationContext,
                 accessManager,
+                nativeCore,
                 listener,
                 options,
                 internalRegistry.handler);
@@ -685,10 +683,13 @@ public class TwilioConversationsClient {
             AlarmManager alarmManager = (AlarmManager) applicationContext
                     .getSystemService(Context.ALARM_SERVICE);
 
+            Intent wakeupReceiverIntent = new Intent(applicationContext, WakeUpReceiver.class);
+            wakeupReceiverIntent.putExtra(WakeUpReceiver.NATIVE_CORE_PTR, nativeCore);
+
             // Wake up periodically to refresh connections
             wakeUpPendingIntent = PendingIntent.getBroadcast(applicationContext,
                     REQUEST_CODE_WAKEUP,
-                    new Intent(applicationContext, WakeUpReceiver.class),
+                    wakeupReceiverIntent,
                     PendingIntent.FLAG_UPDATE_CURRENT);
             alarmManager.setInexactRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP,
                     BACKGROUND_WAKEUP_INTERVAL,
@@ -744,7 +745,7 @@ public class TwilioConversationsClient {
                 for (Map.Entry<UUID, TwilioConversationsClient> entry :
                         conversationsClientMap.entrySet()) {
                     if(entry.getValue().isListening()) {
-                        nativeRefreshRegistrations(TwilioConversationsClient.getNativeCore());
+                        nativeRefreshRegistrations(nativeCore);
                         break;
                     }
                 }

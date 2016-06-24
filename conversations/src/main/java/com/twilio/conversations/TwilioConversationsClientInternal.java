@@ -24,7 +24,26 @@ final class TwilioConversationsClientInternal implements
         CoreEndpoint,
         Conversation.Listener,
         ConversationStateObserver {
-    static final Logger logger = Logger.getLogger(TwilioConversationsClientInternal.class);
+
+    private static final Logger logger = Logger.getLogger(TwilioConversationsClientInternal.class);
+
+    private final UUID uuid = UUID.randomUUID();
+    private final TwilioConversationsClient twilioConversationsClient;
+    private Context context;
+    private TwilioConversationsClient.Listener conversationsClientListener;
+    private EndpointObserverInternal endpointObserver;
+    private long nativeEndpointHandle;
+    private AccessManager accessManager;
+    private long nativeCore;
+    private Handler handler;
+    private EndpointState endpointState;
+    private Set<Conversation> conversations = Collections
+            .newSetFromMap(new ConcurrentHashMap<Conversation, Boolean>());
+    private Map<Conversation, OutgoingInvite> pendingOutgoingInvites = new HashMap<>();
+    private Map<Conversation, IncomingInvite> pendingIncomingInvites = new HashMap<>();
+    private boolean listening = false;
+    private IceOptions iceOptions;
+
 
     void removeConversation(Conversation conversation) {
         conversations.remove(conversation);
@@ -75,22 +94,6 @@ final class TwilioConversationsClientInternal implements
 
     }
 
-    private final UUID uuid = UUID.randomUUID();
-    private Context context;
-    private TwilioConversationsClient.Listener conversationsClientListener;
-    private EndpointObserverInternal endpointObserver;
-    private long nativeEndpointHandle;
-    private AccessManager accessManager;
-    private Handler handler;
-    private EndpointState endpointState;
-    private Set<Conversation> conversations = Collections
-            .newSetFromMap(new ConcurrentHashMap<Conversation, Boolean>());
-    private Map<Conversation, OutgoingInvite> pendingOutgoingInvites = new HashMap<>();
-    private Map<Conversation, IncomingInvite> pendingIncomingInvites = new HashMap<>();
-    private boolean listening = false;
-    private IceOptions iceOptions;
-    private TwilioConversationsClient twilioConversationsClient;
-
     public UUID getUuid() {
         return uuid;
     }
@@ -101,15 +104,18 @@ final class TwilioConversationsClientInternal implements
     }
 
     public TwilioConversationsClientInternal(
-                TwilioConversationsClient conversationsClient,
+                TwilioConversationsClient twilioConversationsClient,
                 Context context,
                 AccessManager accessManager,
+                long nativeCore,
                 TwilioConversationsClient.Listener listener,
                 ClientOptions options,
                 Handler handler) {
+        this.twilioConversationsClient = twilioConversationsClient;
         this.context = context;
         this.conversationsClientListener = listener;
         this.accessManager = accessManager;
+        this.nativeCore = nativeCore;
 
         if(handler == null) {
             throw new IllegalThreadStateException("This thread must be able to obtain a Looper");
@@ -125,7 +131,7 @@ final class TwilioConversationsClientInternal implements
 
         endpointObserver = new EndpointObserverInternal(this);
         nativeEndpointHandle = nativeCreateEndpoint(accessManager, optionsArray,
-                endpointObserver.getNativeHandle(), TwilioConversationsClient.getNativeCore());
+                nativeCore, endpointObserver.getNativeHandle());
 
         if(nativeEndpointHandle == 0) {
             throw new IllegalStateException("Native endpoint handle must not be null");
@@ -550,7 +556,7 @@ final class TwilioConversationsClientInternal implements
 
     public void disposeClient() {
         if (nativeEndpointHandle != 0) {
-            nativeFreeHandle(nativeEndpointHandle, TwilioConversationsClient.getNativeCore());
+            nativeFreeHandle(nativeCore, nativeEndpointHandle);
             nativeEndpointHandle = 0;
         }
         if (endpointObserver != null) {
