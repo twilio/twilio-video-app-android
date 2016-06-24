@@ -22,22 +22,23 @@ public class AccessTokenHelper {
     public static AccessManager obtainAccessManager(Context context, String username) throws InterruptedException {
         String accessToken = obtainCapabilityToken(username);
         final CountDownLatch tokenUpdatedLatch = new CountDownLatch(1);
-        AccessManager twilioAccessManager = AccessManager.create(context, accessToken, new AccessManager.Listener() {
-            @Override
-            public void onTokenExpired(AccessManager twilioAccessManager) {
-                fail();
-            }
+        AccessManager twilioAccessManager = new AccessManager(context, accessToken,
+                new AccessManager.Listener() {
+                    @Override
+                    public void onTokenExpired(AccessManager twilioAccessManager) {
+                        fail();
+                    }
 
-            @Override
-            public void onTokenUpdated(AccessManager twilioAccessManager) {
-                tokenUpdatedLatch.countDown();
-            }
+                    @Override
+                    public void onTokenUpdated(AccessManager twilioAccessManager) {
+                        tokenUpdatedLatch.countDown();
+                    }
 
-            @Override
-            public void onError(AccessManager twilioAccessManager, String s) {
-                fail(s);
-            }
-        });
+                    @Override
+                    public void onError(AccessManager twilioAccessManager, String s) {
+                        fail(s);
+                    }
+                });
 
         assertTrue(tokenUpdatedLatch.await(10, TimeUnit.SECONDS));
 
