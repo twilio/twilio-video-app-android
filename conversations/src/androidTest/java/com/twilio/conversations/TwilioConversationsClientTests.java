@@ -47,7 +47,7 @@ public class TwilioConversationsClientTests extends TwilioConversationsTestsBase
     public void teardown() {
         TwilioConversationsHelper.destroy();
         if(accessManager != null) {
-            accessManager.dispose();
+            accessManager = null;
         }
     }
 

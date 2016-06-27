@@ -59,6 +59,11 @@ public class OutgoingInvite {
         if(inviteStatus == InviteStatus.PENDING) {
             logger.i("Cancelling pending invite");
             inviteStatus = InviteStatus.CANCELLED;
+
+            // Ensures that we do not get callbacks from session while cancelling an invite
+            if (conversation.sessionObserverInternal != null) {
+                conversation.sessionObserverInternal.dispose();
+            }
             conversation.disconnect();
         } else {
             logger.w("The invite was not cancelled. Invites can only be cancelled in the pending state");

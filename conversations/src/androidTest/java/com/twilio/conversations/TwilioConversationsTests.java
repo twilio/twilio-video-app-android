@@ -41,7 +41,7 @@ public class TwilioConversationsTests extends TwilioConversationsTestsBase {
     public void teardown() {
         TwilioConversationsHelper.destroy();
         if(accessManager != null) {
-            accessManager.dispose();
+            accessManager = null;
         }
     }
 
@@ -126,7 +126,7 @@ public class TwilioConversationsTests extends TwilioConversationsTestsBase {
             throws InterruptedException {
         TwilioConversationsHelper.initialize(context);
 
-        accessManager = AccessManager.create(context, "DEADBEEF", null);
+        accessManager = new AccessManager(context, "DEADBEEF", null);
         TwilioConversationsClient twilioConversationsClient = TwilioConversationsClient
                 .create(accessManager, conversationsClientListener());
 
@@ -138,7 +138,7 @@ public class TwilioConversationsTests extends TwilioConversationsTestsBase {
             throws InterruptedException {
         TwilioConversationsHelper.initialize(context);
 
-        accessManager = AccessManager.create(context, "DEADBEEF", null);
+        accessManager = new AccessManager(context, "DEADBEEF", null);
         TwilioConversationsClient twilioConversationsClient = TwilioConversationsClient
                 .create(accessManager, null, conversationsClientListener());
 
@@ -153,7 +153,7 @@ public class TwilioConversationsTests extends TwilioConversationsTestsBase {
         HashMap optionsMap = new HashMap<>();
         optionsMap.put("foo", "bar");
         ClientOptionsInternal options = new ClientOptionsInternal(optionsMap);
-        accessManager = AccessManager.create(context, "DEADBEEF", null);
+        accessManager = new AccessManager(context, "DEADBEEF", null);
         TwilioConversationsClient twilioConversationsClient = TwilioConversationsClient
                 .create(accessManager, options, conversationsClientListener());
 
