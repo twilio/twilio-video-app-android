@@ -177,9 +177,17 @@ protected:
         jobject j_session_state = webrtc_jni::JavaEnumFromIndex(
                 jni(), *j_sessionstate_enum_, session_state_class, state);
         CHECK_EXCEPTION(jni()) << "error during NewObject";
-        jni()->CallVoidMethod(
-                *j_observer_global_, j_session_state_changed_id, j_session_state);
-        CHECK_EXCEPTION(jni()) << "error during CallVoidMethod";
+        {
+            rtc::CritScope cs(&deletion_lock_);
+
+            if (!isObserverValid(std::string("onStateDidChange"))) {
+                return;
+            }
+
+            jni()->CallVoidMethod(
+                    *j_observer_global_, j_session_state_changed_id, j_session_state);
+            CHECK_EXCEPTION(jni()) << "error during CallVoidMethod";
+        }
     }
 
     virtual void onStartDidComplete(TSCoreErrorCode code, const std::string message) {
@@ -189,8 +197,16 @@ protected:
 
         jobject j_error_obj = errorToJavaCoreErrorImpl(code, message);
         CHECK_EXCEPTION(jni()) << "error during NewObject";
-        jni()->CallVoidMethod(*j_observer_global_, j_start_completed_id, j_error_obj);
-        CHECK_EXCEPTION(jni()) << "error during CallVoidMethod";
+        {
+            rtc::CritScope cs(&deletion_lock_);
+
+            if (!isObserverValid(std::string("onStartDidComplete"))) {
+                return;
+            }
+
+            jni()->CallVoidMethod(*j_observer_global_, j_start_completed_id, j_error_obj);
+            CHECK_EXCEPTION(jni()) << "error during CallVoidMethod";
+        }
     }
 
     virtual void onStopDidComplete(TSCoreErrorCode code, const std::string message) {
@@ -261,10 +277,18 @@ protected:
         jobject j_reason = webrtc_jni::JavaEnumFromIndex(
                 jni(), *j_disreason_enum_, dis_reason_class, reason);
         CHECK_EXCEPTION(jni()) << "error during NewObject";
+        {
+            rtc::CritScope cs(&deletion_lock_);
 
-        jni()->CallVoidMethod(*j_observer_global_, j_participant_disconnected_id,
-                              j_participant_identity, j_participant_sid, j_reason);
-        CHECK_EXCEPTION(jni()) << "error during CallVoidMethod";
+            if (!isObserverValid(std::string("onParticipantDidDisconnect"))) {
+                return;
+            }
+
+            jni()->CallVoidMethod(*j_observer_global_, j_participant_disconnected_id,
+                                  j_participant_identity, j_participant_sid, j_reason);
+            CHECK_EXCEPTION(jni()) << "error during CallVoidMethod";
+
+        }
     }
 
     virtual void onMediaStreamDidAdd(TSCMediaStreamInfoObject* stream) {
@@ -274,9 +298,18 @@ protected:
 
         jobject j_media_info = mediaStrInfoJavaMediaStrInfoImpl(stream);
         CHECK_EXCEPTION(jni()) << "error during NewObject";
-        jni()->CallVoidMethod(
-                *j_observer_global_, j_media_stream_added_id, j_media_info);
-        CHECK_EXCEPTION(jni()) << "error during CallVoidMethod";
+
+        {
+            rtc::CritScope cs(&deletion_lock_);
+
+            if (!isObserverValid(std::string("onMediaStreamDidAdd"))) {
+                return;
+            }
+
+            jni()->CallVoidMethod(
+                    *j_observer_global_, j_media_stream_added_id, j_media_info);
+            CHECK_EXCEPTION(jni()) << "error during CallVoidMethod";
+        }
     }
 
     virtual void onMediaStreamDidRemove(TSCMediaStreamInfoObject* stream) {
@@ -317,8 +350,19 @@ protected:
         CHECK_EXCEPTION(jni()) << "error during NewObject";
         jobject j_trackinfo = TrackInfoToJavaTrackInfoImpl(trackInfo);
         CHECK_EXCEPTION(jni()) << "error during NewObject";
-        jni()->CallVoidMethod(*j_observer_global_, j_video_track_added_id_, j_trackinfo, j_track);
-        CHECK_EXCEPTION(jni()) << "error during CallVoidMethod";
+
+        {
+            rtc::CritScope cs(&deletion_lock_);
+
+            if (!isObserverValid(std::string("onVideoTrackDidAdd"))) {
+                return;
+            }
+
+            jni()->CallVoidMethod(*j_observer_global_, j_video_track_added_id_, j_trackinfo,
+                                  j_track);
+            CHECK_EXCEPTION(jni()) << "error during CallVoidMethod";
+        }
+
         videoTrack->AddRef();
     }
 
@@ -335,8 +379,18 @@ protected:
         CHECK_EXCEPTION(jni()) << "error during NewObject";
         jobject j_error_obj = errorToJavaCoreErrorImpl(errorCode, errorMessage);
         CHECK_EXCEPTION(jni()) << "error during NewObject";
-        jni()->CallVoidMethod(*j_observer_global_, j_video_track_failed_to_add_id_, j_trackinfo, j_error_obj);
-        CHECK_EXCEPTION(jni()) << "error during CallVoidMethod";
+
+        {
+            rtc::CritScope cs(&deletion_lock_);
+
+            if (!isObserverValid(std::string("onVideoTrackDidFail"))) {
+                return;
+            }
+
+            jni()->CallVoidMethod(*j_observer_global_, j_video_track_failed_to_add_id_, j_trackinfo,
+                                  j_error_obj);
+            CHECK_EXCEPTION(jni()) << "error during CallVoidMethod";
+        }
     }
 
     virtual void onVideoTrackDidRemove(TSCVideoTrackInfoObject* trackInfo) {
@@ -348,8 +402,17 @@ protected:
 
         jobject j_trackinfo = TrackInfoToJavaTrackInfoImpl(trackInfo);
         CHECK_EXCEPTION(jni()) << "error during NewObject";
-        jni()->CallVoidMethod(*j_observer_global_, j_video_track_removed_id_, j_trackinfo);
-        CHECK_EXCEPTION(jni()) << "error during CallVoidMethod";
+
+        {
+            rtc::CritScope cs(&deletion_lock_);
+
+            if (!isObserverValid(std::string("onVideoTrackDidRemove"))) {
+                return;
+            }
+
+            jni()->CallVoidMethod(*j_observer_global_, j_video_track_removed_id_, j_trackinfo);
+            CHECK_EXCEPTION(jni()) << "error during CallVoidMethod";
+        }
     }
 
     virtual void onVideoTrackStateDidChange(TSCVideoTrackInfoObject* trackInfo) {
@@ -361,8 +424,18 @@ protected:
 
         jobject j_trackinfo = TrackInfoToJavaTrackInfoImpl(trackInfo);
         CHECK_EXCEPTION(jni()) << "error during NewObject";
-        jni()->CallVoidMethod(*j_observer_global_, j_video_track_state_changed_id_, j_trackinfo);
-        CHECK_EXCEPTION(jni()) << "error during CallVoidMethod";
+
+        {
+            rtc::CritScope cs(&deletion_lock_);
+
+            if (!isObserverValid(std::string("onVideoTrackStateDidChange"))) {
+                return;
+            }
+
+            jni()->CallVoidMethod(*j_observer_global_, j_video_track_state_changed_id_,
+                                  j_trackinfo);
+            CHECK_EXCEPTION(jni()) << "error during CallVoidMethod";
+        }
     }
 
     virtual void onAudioTrackDidAdd(TSCAudioTrackInfoObject *trackInfo,
@@ -377,8 +450,17 @@ protected:
         CHECK_EXCEPTION(jni()) << "error during NewObject";
         jobject j_trackinfo = TrackInfoToJavaTrackInfoImpl(trackInfo);
         CHECK_EXCEPTION(jni()) << "error during NewObject";
-        jni()->CallVoidMethod(*j_observer_global_, j_audio_track_added_id_, j_trackinfo, j_track);
-        CHECK_EXCEPTION(jni()) << "error during CallVoidMethod";
+
+        {
+            rtc::CritScope cs(&deletion_lock_);
+
+            if (!isObserverValid(std::string("onAudioTrackDidAdd"))) {
+                return;
+            }
+
+            jni()->CallVoidMethod(*j_observer_global_, j_audio_track_added_id_, j_trackinfo, j_track);
+            CHECK_EXCEPTION(jni()) << "error during CallVoidMethod";
+        }
         audioTrack->AddRef();
     }
 
@@ -391,8 +473,17 @@ protected:
 
         jobject j_trackinfo = TrackInfoToJavaTrackInfoImpl(trackInfo);
         CHECK_EXCEPTION(jni()) << "error during NewObject";
-        jni()->CallVoidMethod(*j_observer_global_, j_audio_track_removed_id_, j_trackinfo);
-        CHECK_EXCEPTION(jni()) << "error during CallVoidMethod";
+
+        {
+            rtc::CritScope cs(&deletion_lock_);
+
+            if (!isObserverValid(std::string("onAudioTrackDidRemove"))) {
+                return;
+            }
+
+            jni()->CallVoidMethod(*j_observer_global_, j_audio_track_removed_id_, j_trackinfo);
+            CHECK_EXCEPTION(jni()) << "error during CallVoidMethod";
+        }
     }
 
     virtual void onAudioTrackStateDidChange(TSCAudioTrackInfoObject* trackInfo) {
@@ -404,8 +495,17 @@ protected:
 
         jobject j_trackinfo = TrackInfoToJavaTrackInfoImpl(trackInfo);
         CHECK_EXCEPTION(jni()) << "error during NewObject";
-        jni()->CallVoidMethod(*j_observer_global_, j_audio_track_state_changed_id_, j_trackinfo);
-        CHECK_EXCEPTION(jni()) << "error during CallVoidMethod";
+
+        {
+            rtc::CritScope cs(&deletion_lock_);
+
+            if (!isObserverValid(std::string("onAudioTrackDidChange"))) {
+                return;
+            }
+
+            jni()->CallVoidMethod(*j_observer_global_, j_audio_track_state_changed_id_, j_trackinfo);
+            CHECK_EXCEPTION(jni()) << "error during CallVoidMethod";
+        }
     }
 
     virtual void onDidReceiveSessionStatistics(TSCSessionStatisticsPtr statistics) {
@@ -450,9 +550,16 @@ protected:
                                     participantAddress, participantSid, trackId, mediaType,
                                     direction, codecName, ssrc, activeConnectionId, timestamp,
                                     keys, values);
-            jni()->CallVoidMethod(*j_observer_global_,
-                                j_receive_track_statistics_id_, j_track_stats_report);
+            {
+                rtc::CritScope cs(&deletion_lock_);
 
+                if (!isObserverValid(std::string("onDidReceiveSessionStatistics"))) {
+                    return;
+                }
+
+                jni()->CallVoidMethod(*j_observer_global_,
+                                      j_receive_track_statistics_id_, j_track_stats_report);
+            }
         }
     }
 
