@@ -223,6 +223,7 @@ public class ClientActivity extends AppCompatActivity {
     private CheckBox preferH264Checkbox;
     private CheckBox logoutWhenConvEndsCheckbox;
     private Spinner aspectRatioSpinner;
+    private AudioManager audioManager;
 
     private static final Map<Integer, VideoDimensions> videoDimensionsMap;
     static {
@@ -490,6 +491,7 @@ public class ClientActivity extends AppCompatActivity {
                 capturerErrorListener());
 
         switchCameraActionFab.setOnClickListener(switchCameraClickListener());
+        audioManager = (AudioManager)getSystemService(Context.AUDIO_SERVICE);
 
         audioState = AudioState.ENABLED;
         setAudioStateIcon();
@@ -1195,6 +1197,7 @@ public class ClientActivity extends AppCompatActivity {
         } else if(outgoingInvite != null){
             outgoingInvite.cancel();
         }
+        setAudioFocus(false);
     }
 
     private DialogInterface.OnClickListener callParticipantClickListener(final EditText participantEditText) {
@@ -1206,6 +1209,7 @@ public class ClientActivity extends AppCompatActivity {
                 if(participants.size() > 0 && !participants.contains("")) {
 
                     localMedia = createLocalMedia();
+                    setAudioFocus(true);
 
                     IceOptions iceOptions = createIceOptions();
                     outgoingInvite = twilioConversationsClient.inviteToConversation(participants,
@@ -1366,6 +1370,7 @@ public class ClientActivity extends AppCompatActivity {
 
     private void acceptInvite(IncomingInvite incomingInvite) {
         IceOptions iceOptions = createIceOptions();
+        setAudioFocus(true);
         incomingInvite.accept(localMedia, iceOptions, new ConversationCallback() {
             @Override
             public void onConversation(Conversation conversation, TwilioConversationsException e) {
@@ -2163,5 +2168,26 @@ public class ClientActivity extends AppCompatActivity {
                 return VideoConstraints.ASPECT_RATIO_16_9;
         }
         return new AspectRatio(0, 0);
+    }
+
+    private int savedAudioMode = AudioManager.MODE_INVALID;
+    private void setAudioFocus(boolean setFocus) {
+        if (audioManager != null) {
+            if (setFocus) {
+                savedAudioMode = audioManager.getMode();
+                // Request audio focus before making any device switch.
+                audioManager.requestAudioFocus(null, AudioManager.STREAM_VOICE_CALL,
+                        AudioManager.AUDIOFOCUS_GAIN_TRANSIENT);
+
+                // Start by setting MODE_IN_COMMUNICATION as default audio mode. It is
+                // required to be in this mode when playout and/or recording starts for
+                // best possible VoIP performance.
+                // Some devices have difficulties with speaker mode if this is not set.
+                audioManager.setMode(AudioManager.MODE_IN_COMMUNICATION);
+            } else {
+                audioManager.setMode(savedAudioMode);
+                audioManager.abandonAudioFocus(null);
+            }
+        }
     }
 }
