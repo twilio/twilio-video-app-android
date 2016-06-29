@@ -11,7 +11,7 @@ extern "C" {
  * Signature: ()J
  */
 JNIEXPORT void JNICALL Java_com_twilio_conversations_WakeUpReceiver_nativeOnApplicationWakeUp
-(JNIEnv *, jobject);
+(JNIEnv *, jobject, jlong);
 
 #ifdef __cplusplus
 }

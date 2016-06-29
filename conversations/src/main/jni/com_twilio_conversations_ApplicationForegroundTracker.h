@@ -12,7 +12,7 @@ extern "C" {
  * Signature: ()J
  */
 JNIEXPORT void JNICALL Java_com_twilio_conversations_ApplicationForegroundTracker_nativeOnApplicationForeground
-        (JNIEnv *, jobject);
+        (JNIEnv *, jobject, jlong nativeCore);
 
 /*
  * Class:     com_twilio_conversations_ApplicationForegroundTracker
@@ -20,7 +20,7 @@ JNIEXPORT void JNICALL Java_com_twilio_conversations_ApplicationForegroundTracke
  * Signature: ()J
  */
 JNIEXPORT void JNICALL Java_com_twilio_conversations_ApplicationForegroundTracker_nativeOnApplicationBackground
-        (JNIEnv *, jobject);
+        (JNIEnv *, jobject, jlong nativeCore);
 
 #ifdef __cplusplus
 }

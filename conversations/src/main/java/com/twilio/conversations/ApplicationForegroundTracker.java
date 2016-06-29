@@ -6,6 +6,11 @@ import android.os.Bundle;
 
 final class ApplicationForegroundTracker implements Application.ActivityLifecycleCallbacks {
     private Activity currentActivity;
+    private long nativeCore;
+
+    public ApplicationForegroundTracker(long nativeCore) {
+        this.nativeCore = nativeCore;
+    }
 
     @Override
     public void onActivityCreated(Activity activity, Bundle savedInstanceState) {
@@ -15,7 +20,7 @@ final class ApplicationForegroundTracker implements Application.ActivityLifecycl
     @Override
     public void onActivityStarted(Activity activity) {
         currentActivity = activity;
-        nativeOnApplicationForeground();
+        nativeOnApplicationForeground(nativeCore);
     }
 
     @Override
@@ -32,7 +37,7 @@ final class ApplicationForegroundTracker implements Application.ActivityLifecycl
     public void onActivityStopped(Activity activity) {
         if (currentActivity == null ||
                 currentActivity == activity) {
-            nativeOnApplicationBackground();
+            nativeOnApplicationBackground(nativeCore);
         }
     }
 
@@ -47,6 +52,6 @@ final class ApplicationForegroundTracker implements Application.ActivityLifecycl
     }
 
 
-    private native void nativeOnApplicationForeground();
-    private native void nativeOnApplicationBackground();
+    private native void nativeOnApplicationForeground(long nativeCore);
+    private native void nativeOnApplicationBackground(long nativeCore);
 }

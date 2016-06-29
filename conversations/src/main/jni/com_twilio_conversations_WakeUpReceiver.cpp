@@ -22,9 +22,9 @@ using namespace webrtc_jni;
 * Signature: ()J
 */
 JNIEXPORT void JNICALL Java_com_twilio_conversations_WakeUpReceiver_nativeOnApplicationWakeUp
-(JNIEnv *env, jobject) {
+(JNIEnv *env, jobject, jlong nativeCore) {
     TS_CORE_LOG_MODULE(kTSCoreLogModulePlatform, kTSCoreLogLevelDebug, "onApplicationWakeUp");
-    TSCSDK* tscSdk = TSCSDK::instance();
+    TSCSDK* tscSdk = reinterpret_cast<TSCSDK*>(nativeCore);
 
     if (tscSdk != NULL) {
         TS_CORE_LOG_MODULE(kTSCoreLogModulePlatform, kTSCoreLogLevelDebug, "onShortWakeUp");

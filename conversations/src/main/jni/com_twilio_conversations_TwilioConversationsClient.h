@@ -11,7 +11,7 @@ extern "C" {
  * Method:    initCore
  * Signature: (Landroid/content/Context;)Z
  */
-JNIEXPORT jboolean JNICALL Java_com_twilio_conversations_TwilioConversationsClient_nativeInitCore
+JNIEXPORT jlong JNICALL Java_com_twilio_conversations_TwilioConversationsClient_nativeInitCore
         (JNIEnv *, jobject, jobject);
 
 /*
@@ -20,7 +20,7 @@ JNIEXPORT jboolean JNICALL Java_com_twilio_conversations_TwilioConversationsClie
  * Signature: ()J
  */
 JNIEXPORT void JNICALL Java_com_twilio_conversations_TwilioConversationsClient_nativeDestroyCore
-        (JNIEnv *, jobject);
+        (JNIEnv *, jobject, jlong);
 
 /*
  * Class:     com_twilio_conversations_TwilioConversationsClient
