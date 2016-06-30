@@ -495,8 +495,7 @@ public class Conversation {
 
     }
 
-    // Made as package scope for OutgoingInvite so when we cancel we dispose our observer
-    SessionObserverInternal sessionObserverInternal;
+    private SessionObserverInternal sessionObserverInternal;
     private long nativeSession;
 
     /*
