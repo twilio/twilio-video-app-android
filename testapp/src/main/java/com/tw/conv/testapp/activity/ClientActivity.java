@@ -1197,6 +1197,7 @@ public class ClientActivity extends AppCompatActivity {
         } else if(outgoingInvite != null){
             outgoingInvite.cancel();
         }
+        mainVideoContainer = null;
         setAudioFocus(false);
     }
 
@@ -1730,7 +1731,9 @@ public class ClientActivity extends AppCompatActivity {
                                 videoMainRelativeLayout.removeView(mainVideoContainer);
                                 ParticipantData mainParticipantData =
                                         getParticipantDataFromContainer(mainVideoContainer);
-                                resizeParticipantContainer(mainParticipantData, false);
+                                if (mainParticipantData != null) {
+                                    resizeParticipantContainer(mainParticipantData, false);
+                                }
                                 resizeParticipantContainer(participantData, true);
                             }
                             mainVideoContainer = participantData.container;
