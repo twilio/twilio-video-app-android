@@ -85,7 +85,7 @@ public class Dialog {
     }
 
     public static IceServersDialogFragment createIceServersDialog(List<TwilioIceServer> iceServers,
-                                                                  IceServersDialogFragment.IceServersDialogListener listener) {
+                                                                  IceServersDialogFragment.Listener listener) {
         IceServersDialogFragment dialog = new IceServersDialogFragment();
         dialog.setIceServers(iceServers);
         dialog.setListener(listener);
