@@ -884,8 +884,10 @@ public class Conversation {
         // TODO: Camera capture is the only supported local video stream for now.
         // Once we nativeStart supporting screen share or etc, we should modify this method.
         cameraCapturer = localVideoTrack.getCameraCapturer();
-        cameraCapturer.startConversationCapturer(nativeSession);
-        nativeSetExternalCapturer(nativeSession, cameraCapturer.getNativeVideoCapturer());
+        if (cameraCapturer != null) {
+            cameraCapturer.startConversationCapturer(nativeSession);
+            nativeSetExternalCapturer(nativeSession, cameraCapturer.getNativeVideoCapturer());
+        }
     }
 
     boolean mute(boolean on) {
@@ -909,8 +911,13 @@ public class Conversation {
 
     }
 
-    void start(final CoreSessionMediaConstraints mediaConstraints) {
+    synchronized void start(final CoreSessionMediaConstraints mediaConstraints) {
         logger.d("starting call");
+
+        if (nativeSession == 0) {
+            logger.w("Can't start conversation that has already been disposed");
+            return;
+        }
 
 		/*
 		 * Determine the media constraints
@@ -945,7 +952,8 @@ public class Conversation {
 
     }
 
-    void stop() {
+    synchronized void stop() {
+        logger.d("stopping call");
 		/*
 		 * Retain the session pointer since it can be reset before the
 		 * new thread references it.
@@ -968,7 +976,7 @@ public class Conversation {
         return nativeEnableAudio(nativeSession, enabled, muted);
     }
 
-    private void disposeConversation() {
+    synchronized private void disposeConversation() {
         if (sessionObserverInternal != null) {
             sessionObserverInternal.dispose();
             sessionObserverInternal = null;

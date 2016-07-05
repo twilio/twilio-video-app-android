@@ -919,6 +919,7 @@ public class ClientActivity extends AppCompatActivity {
                     Snackbar.make(conversationStatusTextView, "Invite from " +
                             incomingInvite.getInviter() + " terminated", Snackbar.LENGTH_LONG)
                             .setAction("Action", null).show();
+                    reset();
                 } else {
                     NotificationManager notificationManager =
                             (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
