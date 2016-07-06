@@ -64,6 +64,15 @@ public class RegistrationActivity extends AppCompatActivity {
 
     private SharedPreferences sharedPreferences;
 
+    private ProgressDialog progressDialog;
+    private ProgressDialog iceServerProgressDialog;
+    private ArrayAdapter<CharSequence> spinnerAdapter;
+    private TwilioIceResponse twilioIceResponse;
+    private List<TwilioIceServer> selectedTwilioIceServers;
+    private String iceTransportPolicy = "";
+    private IceServersDialogFragment iceOptionsDialog;
+
+
     @BindView(R.id.username_edittext) EditText usernameEditText;
     @BindView(R.id.registration_button) Button registrationButton;
     @BindView(R.id.version_textview) TextView versionText;
@@ -75,13 +84,6 @@ public class RegistrationActivity extends AppCompatActivity {
     @BindView(R.id.logout_when_conv_ends_checkbox) CheckBox logoutWhenConvEndsCheckbox;
     @BindView(R.id.ice_options_button) Button iceOptionsButton;
 
-    private ProgressDialog progressDialog;
-    private ProgressDialog iceServerProgressDialog;
-    private ArrayAdapter<CharSequence> spinnerAdapter;
-    private TwilioIceResponse twilioIceResponse;
-    private List<TwilioIceServer> selectedTwilioIceServers;
-    private String iceTransportPolicy = "";
-    private IceServersDialogFragment iceOptionsDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -186,7 +188,7 @@ public class RegistrationActivity extends AppCompatActivity {
     }
 
     @OnClick(R.id.registration_button)
-    void registrationClickListener(View view) {
+    void register(View view) {
         progressDialog = ProgressDialog.show(RegistrationActivity.this, null,
                 "Registering with Twilio", true);
         String username = usernameEditText.getText().toString();
@@ -255,7 +257,7 @@ public class RegistrationActivity extends AppCompatActivity {
     }
 
     @OnClick(R.id.ice_options_button)
-    void iceOptionsButtonClickListener(View view) {
+    void changeIceOptions(View view) {
         if (twilioIceResponse != null) {
             showIceDialog();
         } else {
