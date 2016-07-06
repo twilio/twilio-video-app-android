@@ -11,6 +11,8 @@ import com.tw.conv.testapp.model.TwilioIceServer;
 
 import java.util.List;
 
+import butterknife.ButterKnife;
+
 public class IceServerAdapter extends BaseAdapter {
 
     private List<TwilioIceServer> iceServers;
@@ -45,8 +47,7 @@ public class IceServerAdapter extends BaseAdapter {
                     .from(context)
                     .inflate(android.R.layout.simple_list_item_multiple_choice, parent, false);
         }
-
-        urlTextView = (TextView) convertView.findViewById(android.R.id.text1);
+        urlTextView = ButterKnife.findById(convertView, android.R.id.text1);
         urlTextView.setText(iceServers.get(position).getUrl());
 
         return convertView;

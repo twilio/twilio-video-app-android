@@ -24,7 +24,6 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Html;
 import android.util.TypedValue;
-import android.view.HapticFeedbackConstants;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -96,12 +95,21 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.OnCheckedChanged;
+import butterknife.OnClick;
 import retrofit.Callback;
 import retrofit.RetrofitError;
 import retrofit.client.Response;
 import timber.log.Timber;
 
 public class ClientActivity extends AppCompatActivity {
+    public static final String OPTION_PREFER_H264_KEY = "enable-h264";
+    public static final String OPTION_AUTO_ACCEPT_KEY = "auto-accept";
+    public static final String OPTION_USE_HEADSET_KEY = "use-headset";
+    public static final String OPTION_LOGOUT_WHEN_CONV_ENDS_KEY = "logout-when-conv-ends";
+
     private static final int REQUEST_CODE_REJECT_INCOMING_CALL = 1000;
     private static final int REQUEST_CODE_ACCEPT_INCOMING_CALL = 1001;
     private static final int INCOMING_CALL_NOTIFICATION_ID = 1002;
@@ -109,11 +117,6 @@ public class ClientActivity extends AppCompatActivity {
             "com.tw.conv.testapp.action.REJECT_INCOMING_CALL";
     private static final String ACTION_ACCEPT_INCOMING_CALL =
             "com.tw.conv.testapp.action.ACCEPT_INCOMING_CALL";
-
-    public static final String OPTION_PREFER_H264_KEY = "enable-h264";
-    public static final String OPTION_AUTO_ACCEPT_KEY = "auto-accept";
-    public static final String OPTION_USE_HEADSET_KEY = "use-headset";
-    public static final String OPTION_LOGOUT_WHEN_CONV_ENDS_KEY = "logout-when-conv-ends";
     private static final String OPTION_DEV_REGISTRAR = "endpoint.dev.twilio.com";
     private static final String OPTION_DEV_STATS_URL = "https://eventgw.dev.twilio.com";
     private static final String OPTION_STAGE_REGISTRAR = "endpoint.stage.twilio.com";
@@ -130,13 +133,10 @@ public class ClientActivity extends AppCompatActivity {
     private boolean loggingOut = false;
     private String username;
     private String realm;
-    private CheckBox statsCheckBox;
-    private LinearLayout statsLayout;
-    private TextView localVideoTrackStatsTextView;
+
     private RemoteVideoTrackStatsAdapter remoteVideoTrackStatsAdapter;
     private LinkedHashMap<String, RemoteVideoTrackStatsRecord>
             remoteVideoTrackStatsRecordMap = new LinkedHashMap<>();
-    private RecyclerView remoteStatsRecyclerView;
     private boolean preferH264;
     private boolean autoAccept;
     private String selectedTwilioIceServersJson;
@@ -161,25 +161,13 @@ public class ClientActivity extends AppCompatActivity {
     private CameraCapturer cameraCapturer;
     private EditText participantEditText;
     private AlertDialog  alertDialog;
-    private TextView conversationsClientStatusTextView;
-    private TextView conversationStatusTextView;
-    private FloatingActionButton callActionFab;
-    private FloatingActionButton switchCameraActionFab;
-    private FloatingActionButton localVideoActionFab;
-    private FloatingActionButton pauseActionFab;
-    private FloatingActionButton audioActionFab;
-    private FloatingActionButton muteActionFab;
-    private FloatingActionButton addParticipantActionFab;
-    private FloatingActionButton speakerActionFab;
+
     private IncomingInvite incomingInvite;
     private Conversation conversation;
-    private FrameLayout previewFrameLayout;
     private LocalData localData;
     private RelativeLayout mainVideoContainer;
-    private RelativeLayout videoMainRelativeLayout;
 
     private boolean mirrorLocalRenderer = true;
-
     private class ParticipantData {
         public RelativeLayout container;
         public VideoViewRenderer renderer;
@@ -191,38 +179,22 @@ public class ClientActivity extends AppCompatActivity {
             this.renderer = renderer;
         }
     }
-
     private class LocalData extends ParticipantData {
         public LocalVideoTrack localVideoTrack;
 
         public LocalData() {}
     }
-
-
     private Map<Participant, ParticipantData> participantDataMap;
-
-    private LinearLayout videoThumbsLinearLayout;
     private VideoState videoState;
     private AudioState audioState;
     private String capabilityToken;
     private AccessManager accessManager;
-
     private VideoConstraints videoConstraints;
-
     private int minFps = 0;
     private int maxFps = 0;
     private VideoDimensions minVideoDimensions = null;
     private VideoDimensions maxVideoDimensions = null;
-
     private AspectRatio aspectRatio = new AspectRatio(0, 0);
-
-    private Spinner iceTransPolicySpinner;
-    private ListView twilioIceServersListView;
-    private RelativeLayout iceOptionsLayout;
-    private CheckBox enableIceCheckbox;
-    private CheckBox preferH264Checkbox;
-    private CheckBox logoutWhenConvEndsCheckbox;
-    private Spinner aspectRatioSpinner;
     private AudioManager audioManager;
 
     private static final Map<Integer, VideoDimensions> videoDimensionsMap;
@@ -239,6 +211,32 @@ public class ClientActivity extends AppCompatActivity {
         vdMap.put(8, VideoDimensions.HD_1080P_VIDEO_DIMENSIONS);
         videoDimensionsMap = Collections.unmodifiableMap(vdMap);
     }
+
+    @BindView(R.id.enable_stats_checkbox) CheckBox statsCheckBox;
+    @BindView(R.id.stats_layout) LinearLayout statsLayout;
+    @BindView(R.id.local_video_track_stats_textview) TextView localVideoTrackStatsTextView;
+    @BindView(R.id.stats_recycler_view) RecyclerView remoteStatsRecyclerView;
+    @BindView(R.id.conversations_client_status_textview) TextView conversationsClientStatusTextView;
+    @BindView(R.id.conversation_status_textview) TextView conversationStatusTextView;
+    @BindView(R.id.call_action_fab) FloatingActionButton callActionFab;
+    @BindView(R.id.switch_camera_action_fab) FloatingActionButton switchCameraActionFab;
+    @BindView(R.id.local_video_action_fab) FloatingActionButton localVideoActionFab;
+    @BindView(R.id.local_video_pause_fab) FloatingActionButton pauseActionFab;
+    @BindView(R.id.audio_action_fab) FloatingActionButton audioActionFab;
+    @BindView(R.id.local_audio_mute_fab) FloatingActionButton muteActionFab;
+    @BindView(R.id.add_participant_action_fab) FloatingActionButton addParticipantActionFab;
+    @BindView(R.id.speaker_action_fab) FloatingActionButton speakerActionFab;
+    @BindView(R.id.previewFrameLayout) FrameLayout previewFrameLayout;
+    @BindView(R.id.videoMainRelativeLayout) RelativeLayout videoMainRelativeLayout;
+    @BindView(R.id.videoThumbsLinearLayout) LinearLayout videoThumbsLinearLayout;
+    @BindView(R.id.ice_trans_policy_spinner) Spinner iceTransPolicySpinner;
+    @BindView(R.id.ice_servers_list_view) ListView twilioIceServersListView;
+    @BindView(R.id.ice_options_layout) RelativeLayout iceOptionsLayout;
+    @BindView(R.id.enable_ice_checkbox) CheckBox enableIceCheckbox;
+    @BindView(R.id.prefer_h264_checkbox) CheckBox preferH264Checkbox;
+    @BindView(R.id.logout_when_conv_ends_checkbox) CheckBox logoutWhenConvEndsCheckbox;
+    @BindView(R.id.aspect_ratio_spinner) Spinner aspectRatioSpinner;
+
 
     /**
      * FIXME
@@ -293,41 +291,22 @@ public class ClientActivity extends AppCompatActivity {
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON);
 
         setContentView(R.layout.activity_client);
+        ButterKnife.bind(this);
 
-        previewFrameLayout = (FrameLayout) findViewById(R.id.previewFrameLayout);
         localData = new LocalData();
         localData.container = createParticipantContainer();
-        videoMainRelativeLayout = (RelativeLayout)findViewById(R.id.videoMainRelativeLayout);
-        videoThumbsLinearLayout = (LinearLayout)findViewById(R.id.videoThumbsLinearLayout);
         videoThumbsLinearLayout.removeAllViews();
-
 
         participantDataMap = new HashMap<>();
 
-        callActionFab = (FloatingActionButton)findViewById(R.id.call_action_fab);
         callActionFab.hide();
-        conversationsClientStatusTextView = (TextView) findViewById(R.id.conversations_client_status_textview);
-        conversationStatusTextView = (TextView) findViewById(R.id.conversation_status_textview);
-        switchCameraActionFab = (FloatingActionButton)findViewById(R.id.switch_camera_action_fab);
-        localVideoActionFab = (FloatingActionButton)findViewById(R.id.local_video_action_fab);
-        pauseActionFab = (FloatingActionButton)findViewById(R.id.local_video_pause_fab);
-        audioActionFab = (FloatingActionButton)findViewById(R.id.audio_action_fab);
-        muteActionFab = (FloatingActionButton)findViewById(R.id.local_audio_mute_fab);
 
-        addParticipantActionFab = (FloatingActionButton)findViewById(R.id.add_participant_action_fab);
-        speakerActionFab = (FloatingActionButton)findViewById(R.id.speaker_action_fab);
-
-        statsCheckBox = (CheckBox)findViewById(R.id.enable_stats_checkbox);
-        statsLayout = (LinearLayout)findViewById(R.id.stats_layout);
         statsLayout.setVisibility(View.INVISIBLE);
 
-        remoteStatsRecyclerView = (RecyclerView) findViewById(R.id.stats_recycler_view);
         remoteVideoTrackStatsAdapter = new RemoteVideoTrackStatsAdapter(remoteVideoTrackStatsRecordMap);
         remoteStatsRecyclerView.setAdapter(remoteVideoTrackStatsAdapter);
         remoteStatsRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         remoteStatsRecyclerView.setItemAnimator(new DefaultItemAnimator());
-
-        localVideoTrackStatsTextView = (TextView)findViewById(R.id.local_video_track_stats_textview);
 
         statsCheckBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
@@ -342,10 +321,11 @@ public class ClientActivity extends AppCompatActivity {
             }
         });
 
-        DrawerLayout drawerLayout = (DrawerLayout)findViewById(R.id.navigation_drawer);
+        DrawerLayout drawerLayout = ButterKnife.findById(this, R.id.navigation_drawer);
 
-        final RangeBar fpsRangeBar = (RangeBar)findViewById(R.id.fps_rangebar);
-        final RangeBar videoDimensionsRangeBar = (RangeBar)findViewById(R.id.video_dimensions_rangebar);
+        final RangeBar fpsRangeBar = ButterKnife.findById(this, R.id.fps_rangebar);
+        final RangeBar videoDimensionsRangeBar =
+                ButterKnife.findById(this, R.id.video_dimensions_rangebar);
 
         videoDimensionsRangeBar.setTickStart(1);
         videoDimensionsRangeBar.setTickEnd(videoDimensionsMap.size());
@@ -465,17 +445,11 @@ public class ClientActivity extends AppCompatActivity {
         ClientOptionsInternal options = new ClientOptionsInternal(iceOptions, privateOptions);
         setIceOptionsViews();
         getSupportActionBar().setTitle(username);
-        iceOptionsLayout = (RelativeLayout) findViewById(R.id.ice_options_layout);
         iceOptionsLayout.setVisibility(View.GONE);
-        enableIceCheckbox = (CheckBox)findViewById(R.id.enable_ice_checkbox);
         enableIceCheckbox.setChecked(false);
-        enableIceCheckbox.setOnCheckedChangeListener(enableIceCheckedChangeListener());
-        preferH264Checkbox = (CheckBox) findViewById(R.id.prefer_h264_checkbox);
         preferH264Checkbox.setChecked(preferH264);
-        logoutWhenConvEndsCheckbox = (CheckBox) findViewById(R.id.logout_when_conv_ends_checkbox);
         logoutWhenConvEndsCheckbox.setChecked(logoutWhenConvEnds);
 
-        aspectRatioSpinner = (Spinner)findViewById(R.id.aspect_ratio_spinner);
         ArrayAdapter<CharSequence> spinnerAdapter = ArrayAdapter.createFromResource(this,
                 R.array.aspect_ratio_array, android.R.layout.simple_spinner_item);
         spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -490,7 +464,6 @@ public class ClientActivity extends AppCompatActivity {
         cameraCapturer = CameraCapturer.create(ClientActivity.this, currentCameraSource,
                 capturerErrorListener());
 
-        switchCameraActionFab.setOnClickListener(switchCameraClickListener());
         audioManager = (AudioManager)getSystemService(Context.AUDIO_SERVICE);
 
         audioState = AudioState.ENABLED;
@@ -732,14 +705,11 @@ public class ClientActivity extends AppCompatActivity {
     private void setCallAction() {
         callActionFab.setImageDrawable(ContextCompat.getDrawable(this,
                 R.drawable.ic_call_white_24px));
-        callActionFab.show();
         callActionFab.setOnClickListener(callClickListener());
+        callActionFab.show();
         switchCameraActionFab.show();
-        switchCameraActionFab.setOnClickListener(switchCameraClickListener());
         localVideoActionFab.show();
-        localVideoActionFab.setOnClickListener(localVideoClickListener());
         audioActionFab.show();
-        audioActionFab.setOnClickListener(audioClickListener());
         addParticipantActionFab.hide();
         speakerActionFab.hide();
     }
@@ -750,9 +720,7 @@ public class ClientActivity extends AppCompatActivity {
         callActionFab.show();
         callActionFab.setOnClickListener(hangupClickListener());
         addParticipantActionFab.show();
-        addParticipantActionFab.setOnClickListener(addClickListener());
         speakerActionFab.show();
-        speakerActionFab.setOnClickListener(speakerClickListener());
     }
 
     private void hideAction() {
@@ -778,7 +746,6 @@ public class ClientActivity extends AppCompatActivity {
     }
 
     private void setIceOptionsViews(){
-        iceTransPolicySpinner = (Spinner)findViewById(R.id.ice_trans_policy_spinner);
         ArrayAdapter<CharSequence> iceTransPolicyArrayAdapter = ArrayAdapter.createFromResource(
                 this, R.array.ice_trans_policy_array, android.R.layout.simple_spinner_item);
         iceTransPolicyArrayAdapter.setDropDownViewResource(
@@ -786,7 +753,6 @@ public class ClientActivity extends AppCompatActivity {
         iceTransPolicySpinner.setAdapter(iceTransPolicyArrayAdapter);
         List<TwilioIceServer> twilioIceServers =
                 IceOptionsHelper.convertToTwilioIceServerList(twilioIceServersJson);
-        twilioIceServersListView = (ListView)findViewById(R.id.ice_servers_list_view);
 
         if (twilioIceServers.size() > 0) {
             IceServerAdapter iceServerAdapter =
@@ -827,17 +793,13 @@ public class ClientActivity extends AppCompatActivity {
         return new IceOptions(policy);
     }
 
-    private CompoundButton.OnCheckedChangeListener enableIceCheckedChangeListener() {
-        return new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if (isChecked) {
-                    iceOptionsLayout.setVisibility(View.VISIBLE);
-                } else {
-                    iceOptionsLayout.setVisibility(View.GONE);
-                }
-            }
-        };
+    @OnCheckedChanged(R.id.enable_ice_checkbox)
+    public void toggleIceOptions(CompoundButton buttonView, boolean isChecked) {
+        if (isChecked) {
+            iceOptionsLayout.setVisibility(View.VISIBLE);
+        } else {
+            iceOptionsLayout.setVisibility(View.GONE);
+        }
     }
 
     private TwilioConversationsClient.Listener conversationsClientListener() {
@@ -975,95 +937,58 @@ public class ClientActivity extends AppCompatActivity {
         };
     }
 
-    private View.OnClickListener switchCameraClickListener() {
-        return new View.OnClickListener(){
-            @Override
-            public void onClick(View view) {
-                if(cameraCapturer != null) {
-                    boolean cameraSwitchSucceeded = cameraCapturer.switchCamera();
+    @OnClick(R.id.switch_camera_action_fab)
+    public void switchCamera(View view) {
+        if(cameraCapturer != null) {
+            boolean cameraSwitchSucceeded = cameraCapturer.switchCamera();
 
-                    if (cameraSwitchSucceeded) {
-                        // Update the camera source
-                        currentCameraSource =
-                                (currentCameraSource ==
-                                        CameraCapturer.CameraSource.CAMERA_SOURCE_FRONT_CAMERA) ?
-                                        (CameraCapturer.CameraSource.CAMERA_SOURCE_BACK_CAMERA) :
-                                        (CameraCapturer.CameraSource.CAMERA_SOURCE_FRONT_CAMERA);
+            if (cameraSwitchSucceeded) {
+                // Update the camera source
+                currentCameraSource =
+                        (currentCameraSource ==
+                                CameraCapturer.CameraSource.CAMERA_SOURCE_FRONT_CAMERA) ?
+                                (CameraCapturer.CameraSource.CAMERA_SOURCE_BACK_CAMERA) :
+                                (CameraCapturer.CameraSource.CAMERA_SOURCE_FRONT_CAMERA);
 
-                        // Update our local renderer to mirror or not
-                        mirrorLocalRenderer = (currentCameraSource ==
-                                CameraCapturer.CameraSource.CAMERA_SOURCE_FRONT_CAMERA);
+                // Update our local renderer to mirror or not
+                mirrorLocalRenderer = (currentCameraSource ==
+                        CameraCapturer.CameraSource.CAMERA_SOURCE_FRONT_CAMERA);
 
-                        // Determine if our renderer is mirroring now
-                        if (localData.renderer != null) {
-                            localData.renderer.setMirror(mirrorLocalRenderer);
-                        }
-                    }
+                // Determine if our renderer is mirroring now
+                if (localData.renderer != null) {
+                    localData.renderer.setMirror(mirrorLocalRenderer);
                 }
             }
-        };
+        }
     }
 
-    private View.OnClickListener localVideoClickListener() {
-        return new View.OnClickListener(){
-            @Override
-            public void onClick(View view) {
-                if (videoState == VideoState.DISABLED) {
-                    cameraCapturer.startPreview(previewFrameLayout);
-                    if (localMedia != null) {
-                        localData = new LocalData();
-                        localData.container = createParticipantContainer();
-                        LocalVideoTrack videoTrack = createLocalVideoTrack(cameraCapturer);
-                        localMedia.addLocalVideoTrack(videoTrack);
-                        localData.localVideoTrack = videoTrack;
-                        switchCameraActionFab.hide();
-                    } else {
-                        videoState = VideoState.ENABLED;
-                    }
-                } else if (videoState == VideoState.ENABLED) {
-                    cameraCapturer.stopPreview();
-                    if (localMedia != null) {
-                        if (localMedia.getLocalVideoTracks().size() > 0) {
-                            localMedia.removeLocalVideoTrack(localMedia
-                                    .getLocalVideoTracks().get(0));
-                            pauseActionFab.hide();
-                        }
-                    } else {
-                        videoState = VideoState.DISABLED;
-                    }
-                }
-                setVideoStateIcon();
+    @OnClick(R.id.local_video_action_fab)
+    public void toggleLocalVideo(View view) {
+        if (videoState == VideoState.DISABLED) {
+            cameraCapturer.startPreview(previewFrameLayout);
+            if (localMedia != null) {
+                localData = new LocalData();
+                localData.container = createParticipantContainer();
+                LocalVideoTrack videoTrack = createLocalVideoTrack(cameraCapturer);
+                localMedia.addLocalVideoTrack(videoTrack);
+                localData.localVideoTrack = videoTrack;
+                switchCameraActionFab.hide();
+            } else {
+                videoState = VideoState.ENABLED;
             }
-        };
-    }
-
-    public void pauseVideo() {
-        List<LocalVideoTrack> videoTracks =
-                localMedia.getLocalVideoTracks();
-        if (videoTracks.size() > 0) {
-            LocalVideoTrack videoTrack = videoTracks.get(0);
-            boolean enable = !videoTrack.isEnabled();
-            boolean set = videoTrack.enable(enable);
-            if(set) {
-                switchCameraActionFab.setEnabled(videoTrack.isEnabled());
-                if (videoTrack.isEnabled()) {
-                    pauseActionFab.setImageDrawable(
-                            ContextCompat.getDrawable(ClientActivity.this,
-                                    R.drawable.ic_pause_green_24px));
-                } else {
-                    pauseActionFab.setImageDrawable(
-                            ContextCompat.getDrawable(ClientActivity.this,
-                                    R.drawable.ic_pause_red_24px));
+        } else if (videoState == VideoState.ENABLED) {
+            cameraCapturer.stopPreview();
+            if (localMedia != null) {
+                if (localMedia.getLocalVideoTracks().size() > 0) {
+                    localMedia.removeLocalVideoTrack(localMedia
+                            .getLocalVideoTracks().get(0));
+                    pauseActionFab.hide();
                 }
             } else {
-                Snackbar.make(conversationStatusTextView,
-                        "Pause action failed",
-                        Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+                videoState = VideoState.DISABLED;
             }
-        } else {
-            Timber.w("Camera is not present. Unable to pause");
         }
+        setVideoStateIcon();
     }
 
     private void setVideoStateIcon() {
@@ -1094,38 +1019,34 @@ public class ClientActivity extends AppCompatActivity {
         }
     }
 
-    private View.OnClickListener audioClickListener() {
-        return new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (audioState == AudioState.DISABLED)  {
-                    if (localMedia != null) {
-                        boolean microphoneAdded = localMedia.addMicrophone();
-                        if(microphoneAdded) {
-                            audioState = AudioState.ENABLED;
-                        } else {
-                            Snackbar.make(conversationStatusTextView, "Adding microphone failed",
-                                    Snackbar.LENGTH_LONG).setAction("Action", null).show();
-                        }
-                    } else {
-                        audioState = AudioState.ENABLED;
-                    }
+    @OnClick(R.id.audio_action_fab)
+    public void toggleLocalAudio(View view) {
+        if (audioState == AudioState.DISABLED)  {
+            if (localMedia != null) {
+                boolean microphoneAdded = localMedia.addMicrophone();
+                if(microphoneAdded) {
+                    audioState = AudioState.ENABLED;
                 } else {
-                    if (localMedia != null) {
-                        boolean microphoneRemoved = localMedia.removeMicrophone();
-                        if(microphoneRemoved) {
-                            audioState = AudioState.DISABLED;
-                        } else {
-                            Snackbar.make(conversationStatusTextView, "Removing microphone failed",
-                                    Snackbar.LENGTH_LONG).setAction("Action", null).show();
-                        }
-                    } else {
-                        audioState = AudioState.DISABLED;
-                    }
+                    Snackbar.make(conversationStatusTextView, "Adding microphone failed",
+                            Snackbar.LENGTH_LONG).setAction("Action", null).show();
                 }
-                setAudioStateIcon();
+            } else {
+                audioState = AudioState.ENABLED;
             }
-        };
+        } else {
+            if (localMedia != null) {
+                boolean microphoneRemoved = localMedia.removeMicrophone();
+                if(microphoneRemoved) {
+                    audioState = AudioState.DISABLED;
+                } else {
+                    Snackbar.make(conversationStatusTextView, "Removing microphone failed",
+                            Snackbar.LENGTH_LONG).setAction("Action", null).show();
+                }
+            } else {
+                audioState = AudioState.DISABLED;
+            }
+        }
+        setAudioStateIcon();
     }
 
     private void setAudioStateIcon() {
@@ -1146,32 +1067,9 @@ public class ClientActivity extends AppCompatActivity {
         }
     }
 
-    private void muteAudio() {
-        boolean enable = !localMedia.isMuted();
-        boolean set = localMedia.mute(enable);
-        if(set) {
-            if (enable) {
-                muteActionFab.setImageDrawable(
-                        ContextCompat.getDrawable(ClientActivity.this,
-                                R.drawable.ic_mic_red_24px));
-            } else {
-                muteActionFab.setImageDrawable(
-                        ContextCompat.getDrawable(ClientActivity.this,
-                                R.drawable.ic_mic_green_24px));
-            }
-        } else {
-            Snackbar.make(conversationStatusTextView, "Mute action failed", Snackbar.LENGTH_LONG)
-                    .setAction("Action", null).show();
-        }
-    }
-
-    private View.OnClickListener addClickListener() {
-        return new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                showAddParticipantsDialog();
-            }
-        };
+    @OnClick(R.id.add_participant_action_fab)
+    public void addParticipants(View view) {
+        showAddParticipantsDialog();
     }
 
     private void showAddParticipantsDialog() {
@@ -1443,37 +1341,66 @@ public class ClientActivity extends AppCompatActivity {
         }
     }
 
-    private View.OnClickListener speakerClickListener() {
-        return new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (twilioConversationsClient == null) {
-                    Timber.e("Unable to set audio output, conversation client is null");
-                    return;
+    @OnClick(R.id.speaker_action_fab)
+    public void toggleSpeaker(View view) {
+        if (twilioConversationsClient == null) {
+            Timber.e("Unable to set audio output, conversation client is null");
+            return;
+        }
+        boolean speakerOn =
+                !(twilioConversationsClient.getAudioOutput() ==  AudioOutput.SPEAKERPHONE) ?
+                        true : false;
+        setSpeakerphoneOn(speakerOn);
+    }
+
+    @OnClick(R.id.local_video_pause_fab)
+    public void pauseVideo(View view) {
+        List<LocalVideoTrack> videoTracks =
+                localMedia.getLocalVideoTracks();
+        if (videoTracks.size() > 0) {
+            LocalVideoTrack videoTrack = videoTracks.get(0);
+            boolean enable = !videoTrack.isEnabled();
+            boolean set = videoTrack.enable(enable);
+            if(set) {
+                switchCameraActionFab.setEnabled(videoTrack.isEnabled());
+                if (videoTrack.isEnabled()) {
+                    pauseActionFab.setImageDrawable(
+                            ContextCompat.getDrawable(ClientActivity.this,
+                                    R.drawable.ic_pause_green_24px));
+                } else {
+                    pauseActionFab.setImageDrawable(
+                            ContextCompat.getDrawable(ClientActivity.this,
+                                    R.drawable.ic_pause_red_24px));
                 }
-                boolean speakerOn =
-                        !(twilioConversationsClient.getAudioOutput() ==  AudioOutput.SPEAKERPHONE) ?  true : false;
-                setSpeakerphoneOn(speakerOn);
+            } else {
+                Snackbar.make(conversationStatusTextView,
+                        "Pause action failed",
+                        Snackbar.LENGTH_LONG)
+                        .setAction("Action", null).show();
             }
-        };
+        } else {
+            Timber.w("Camera is not present. Unable to pause");
+        }
     }
 
-    private View.OnClickListener pauseClickListener() {
-        return new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                pauseVideo();
+    @OnClick(R.id.local_audio_mute_fab)
+    public void muteAudio(View view) {
+        boolean enable = !localMedia.isMuted();
+        boolean set = localMedia.mute(enable);
+        if(set) {
+            if (enable) {
+                muteActionFab.setImageDrawable(
+                        ContextCompat.getDrawable(ClientActivity.this,
+                                R.drawable.ic_mic_red_24px));
+            } else {
+                muteActionFab.setImageDrawable(
+                        ContextCompat.getDrawable(ClientActivity.this,
+                                R.drawable.ic_mic_green_24px));
             }
-        };
-    }
-
-    private View.OnClickListener muteClickListener() {
-        return new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                muteAudio();
-            }
-        };
+        } else {
+            Snackbar.make(conversationStatusTextView, "Mute action failed", Snackbar.LENGTH_LONG)
+                    .setAction("Action", null).show();
+        }
     }
 
     private Conversation.Listener conversationListener() {
@@ -1980,9 +1907,7 @@ public class ClientActivity extends AppCompatActivity {
 
 
                 setVideoStateIcon();
-                pauseActionFab.setOnClickListener(pauseClickListener());
                 setAudioStateIcon();
-                muteActionFab.setOnClickListener(muteClickListener());
             }
 
             @Override
