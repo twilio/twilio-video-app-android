@@ -11,6 +11,7 @@ import android.graphics.drawable.Drawable;
 import android.media.AudioManager;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.NotificationCompat;
@@ -96,6 +97,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
 import retrofit.Callback;
 import retrofit.RetrofitError;
 import retrofit.client.Response;
@@ -130,13 +133,13 @@ public class ClientActivity extends AppCompatActivity {
     private boolean loggingOut = false;
     private String username;
     private String realm;
-    private CheckBox statsCheckBox;
-    private LinearLayout statsLayout;
-    private TextView localVideoTrackStatsTextView;
+    @BindView(R.id.enable_stats_checkbox) CheckBox statsCheckBox;
+    @BindView(R.id.stats_layout) LinearLayout statsLayout;
+    @BindView(R.id.local_video_track_stats_textview) TextView localVideoTrackStatsTextView;
     private RemoteVideoTrackStatsAdapter remoteVideoTrackStatsAdapter;
     private LinkedHashMap<String, RemoteVideoTrackStatsRecord>
             remoteVideoTrackStatsRecordMap = new LinkedHashMap<>();
-    private RecyclerView remoteStatsRecyclerView;
+    @BindView(R.id.stats_recycler_view) RecyclerView remoteStatsRecyclerView;
     private boolean preferH264;
     private boolean autoAccept;
     private String selectedTwilioIceServersJson;
@@ -161,22 +164,23 @@ public class ClientActivity extends AppCompatActivity {
     private CameraCapturer cameraCapturer;
     private EditText participantEditText;
     private AlertDialog  alertDialog;
-    private TextView conversationsClientStatusTextView;
-    private TextView conversationStatusTextView;
-    private FloatingActionButton callActionFab;
-    private FloatingActionButton switchCameraActionFab;
-    private FloatingActionButton localVideoActionFab;
-    private FloatingActionButton pauseActionFab;
-    private FloatingActionButton audioActionFab;
-    private FloatingActionButton muteActionFab;
-    private FloatingActionButton addParticipantActionFab;
-    private FloatingActionButton speakerActionFab;
+    @BindView(R.id.conversations_client_status_textview) TextView conversationsClientStatusTextView;
+    @BindView(R.id.conversation_status_textview) TextView conversationStatusTextView;
+    @BindView(R.id.call_action_fab) FloatingActionButton callActionFab;
+
+    @BindView(R.id.switch_camera_action_fab) FloatingActionButton switchCameraActionFab;
+    @BindView(R.id.local_video_action_fab) FloatingActionButton localVideoActionFab;
+    @BindView(R.id.local_video_pause_fab) FloatingActionButton pauseActionFab;
+    @BindView(R.id.audio_action_fab) FloatingActionButton audioActionFab;
+    @BindView(R.id.local_audio_mute_fab) FloatingActionButton muteActionFab;
+    @BindView(R.id.add_participant_action_fab) FloatingActionButton addParticipantActionFab;
+    @BindView(R.id.speaker_action_fab) FloatingActionButton speakerActionFab;
     private IncomingInvite incomingInvite;
     private Conversation conversation;
-    private FrameLayout previewFrameLayout;
+    @BindView(R.id.previewFrameLayout) FrameLayout previewFrameLayout;
     private LocalData localData;
     private RelativeLayout mainVideoContainer;
-    private RelativeLayout videoMainRelativeLayout;
+    @BindView(R.id.videoMainRelativeLayout) RelativeLayout videoMainRelativeLayout;
 
     private boolean mirrorLocalRenderer = true;
 
@@ -201,7 +205,7 @@ public class ClientActivity extends AppCompatActivity {
 
     private Map<Participant, ParticipantData> participantDataMap;
 
-    private LinearLayout videoThumbsLinearLayout;
+    @BindView(R.id.videoThumbsLinearLayout) LinearLayout videoThumbsLinearLayout;
     private VideoState videoState;
     private AudioState audioState;
     private String capabilityToken;
@@ -216,13 +220,13 @@ public class ClientActivity extends AppCompatActivity {
 
     private AspectRatio aspectRatio = new AspectRatio(0, 0);
 
-    private Spinner iceTransPolicySpinner;
-    private ListView twilioIceServersListView;
-    private RelativeLayout iceOptionsLayout;
-    private CheckBox enableIceCheckbox;
-    private CheckBox preferH264Checkbox;
-    private CheckBox logoutWhenConvEndsCheckbox;
-    private Spinner aspectRatioSpinner;
+    @BindView(R.id.ice_trans_policy_spinner) Spinner iceTransPolicySpinner;
+    @BindView(R.id.ice_servers_list_view) ListView twilioIceServersListView;
+    @BindView(R.id.ice_options_layout) RelativeLayout iceOptionsLayout;
+    @BindView(R.id.enable_ice_checkbox) CheckBox enableIceCheckbox;
+    @BindView(R.id.prefer_h264_checkbox) CheckBox preferH264Checkbox;
+    @BindView(R.id.logout_when_conv_ends_checkbox) CheckBox logoutWhenConvEndsCheckbox;
+    @BindView(R.id.aspect_ratio_spinner) Spinner aspectRatioSpinner;
     private AudioManager audioManager;
 
     private static final Map<Integer, VideoDimensions> videoDimensionsMap;
@@ -289,45 +293,27 @@ public class ClientActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         // So calls can be answered when screen is locked
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD);
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON);
 
         setContentView(R.layout.activity_client);
+        ButterKnife.bind(this);
 
-        previewFrameLayout = (FrameLayout) findViewById(R.id.previewFrameLayout);
         localData = new LocalData();
         localData.container = createParticipantContainer();
-        videoMainRelativeLayout = (RelativeLayout)findViewById(R.id.videoMainRelativeLayout);
-        videoThumbsLinearLayout = (LinearLayout)findViewById(R.id.videoThumbsLinearLayout);
         videoThumbsLinearLayout.removeAllViews();
-
 
         participantDataMap = new HashMap<>();
 
-        callActionFab = (FloatingActionButton)findViewById(R.id.call_action_fab);
         callActionFab.hide();
-        conversationsClientStatusTextView = (TextView) findViewById(R.id.conversations_client_status_textview);
-        conversationStatusTextView = (TextView) findViewById(R.id.conversation_status_textview);
-        switchCameraActionFab = (FloatingActionButton)findViewById(R.id.switch_camera_action_fab);
-        localVideoActionFab = (FloatingActionButton)findViewById(R.id.local_video_action_fab);
-        pauseActionFab = (FloatingActionButton)findViewById(R.id.local_video_pause_fab);
-        audioActionFab = (FloatingActionButton)findViewById(R.id.audio_action_fab);
-        muteActionFab = (FloatingActionButton)findViewById(R.id.local_audio_mute_fab);
 
-        addParticipantActionFab = (FloatingActionButton)findViewById(R.id.add_participant_action_fab);
-        speakerActionFab = (FloatingActionButton)findViewById(R.id.speaker_action_fab);
-
-        statsCheckBox = (CheckBox)findViewById(R.id.enable_stats_checkbox);
-        statsLayout = (LinearLayout)findViewById(R.id.stats_layout);
         statsLayout.setVisibility(View.INVISIBLE);
 
-        remoteStatsRecyclerView = (RecyclerView) findViewById(R.id.stats_recycler_view);
         remoteVideoTrackStatsAdapter = new RemoteVideoTrackStatsAdapter(remoteVideoTrackStatsRecordMap);
         remoteStatsRecyclerView.setAdapter(remoteVideoTrackStatsAdapter);
         remoteStatsRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         remoteStatsRecyclerView.setItemAnimator(new DefaultItemAnimator());
-
-        localVideoTrackStatsTextView = (TextView)findViewById(R.id.local_video_track_stats_textview);
 
         statsCheckBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
@@ -342,10 +328,11 @@ public class ClientActivity extends AppCompatActivity {
             }
         });
 
-        DrawerLayout drawerLayout = (DrawerLayout)findViewById(R.id.navigation_drawer);
+        DrawerLayout drawerLayout = ButterKnife.findById(this, R.id.navigation_drawer);
 
-        final RangeBar fpsRangeBar = (RangeBar)findViewById(R.id.fps_rangebar);
-        final RangeBar videoDimensionsRangeBar = (RangeBar)findViewById(R.id.video_dimensions_rangebar);
+        final RangeBar fpsRangeBar = ButterKnife.findById(this, R.id.fps_rangebar);
+        final RangeBar videoDimensionsRangeBar =
+                ButterKnife.findById(this, R.id.video_dimensions_rangebar);
 
         videoDimensionsRangeBar.setTickStart(1);
         videoDimensionsRangeBar.setTickEnd(videoDimensionsMap.size());
@@ -465,17 +452,12 @@ public class ClientActivity extends AppCompatActivity {
         ClientOptionsInternal options = new ClientOptionsInternal(iceOptions, privateOptions);
         setIceOptionsViews();
         getSupportActionBar().setTitle(username);
-        iceOptionsLayout = (RelativeLayout) findViewById(R.id.ice_options_layout);
         iceOptionsLayout.setVisibility(View.GONE);
-        enableIceCheckbox = (CheckBox)findViewById(R.id.enable_ice_checkbox);
         enableIceCheckbox.setChecked(false);
         enableIceCheckbox.setOnCheckedChangeListener(enableIceCheckedChangeListener());
-        preferH264Checkbox = (CheckBox) findViewById(R.id.prefer_h264_checkbox);
         preferH264Checkbox.setChecked(preferH264);
-        logoutWhenConvEndsCheckbox = (CheckBox) findViewById(R.id.logout_when_conv_ends_checkbox);
         logoutWhenConvEndsCheckbox.setChecked(logoutWhenConvEnds);
 
-        aspectRatioSpinner = (Spinner)findViewById(R.id.aspect_ratio_spinner);
         ArrayAdapter<CharSequence> spinnerAdapter = ArrayAdapter.createFromResource(this,
                 R.array.aspect_ratio_array, android.R.layout.simple_spinner_item);
         spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -778,7 +760,6 @@ public class ClientActivity extends AppCompatActivity {
     }
 
     private void setIceOptionsViews(){
-        iceTransPolicySpinner = (Spinner)findViewById(R.id.ice_trans_policy_spinner);
         ArrayAdapter<CharSequence> iceTransPolicyArrayAdapter = ArrayAdapter.createFromResource(
                 this, R.array.ice_trans_policy_array, android.R.layout.simple_spinner_item);
         iceTransPolicyArrayAdapter.setDropDownViewResource(
@@ -786,7 +767,6 @@ public class ClientActivity extends AppCompatActivity {
         iceTransPolicySpinner.setAdapter(iceTransPolicyArrayAdapter);
         List<TwilioIceServer> twilioIceServers =
                 IceOptionsHelper.convertToTwilioIceServerList(twilioIceServersJson);
-        twilioIceServersListView = (ListView)findViewById(R.id.ice_servers_list_view);
 
         if (twilioIceServers.size() > 0) {
             IceServerAdapter iceServerAdapter =
