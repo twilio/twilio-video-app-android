@@ -719,7 +719,7 @@ public class ClientActivity extends AppCompatActivity {
     }
 
     private void disposeAccessManager() {
-        accessManager = null;
+        accessManager.dispose();
     }
 
     private void returnToRegistration() {
