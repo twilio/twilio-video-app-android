@@ -255,7 +255,7 @@ public class RegistrationActivity extends AppCompatActivity {
     }
 
     @OnClick(R.id.ice_options_button)
-    void iceOptionsButtonClickListener() {
+    void iceOptionsButtonClickListener(View view) {
         if (twilioIceResponse != null) {
             showIceDialog();
         } else {

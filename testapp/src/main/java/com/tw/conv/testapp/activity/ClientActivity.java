@@ -11,7 +11,6 @@ import android.graphics.drawable.Drawable;
 import android.media.AudioManager;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.NotificationCompat;
@@ -25,7 +24,6 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Html;
 import android.util.TypedValue;
-import android.view.HapticFeedbackConstants;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -99,6 +97,8 @@ import java.util.Set;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnCheckedChanged;
+import butterknife.OnClick;
 import retrofit.Callback;
 import retrofit.RetrofitError;
 import retrofit.client.Response;
@@ -293,7 +293,6 @@ public class ClientActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         // So calls can be answered when screen is locked
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD);
-        getWindow().addFlags(WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON);
 
@@ -454,7 +453,6 @@ public class ClientActivity extends AppCompatActivity {
         getSupportActionBar().setTitle(username);
         iceOptionsLayout.setVisibility(View.GONE);
         enableIceCheckbox.setChecked(false);
-        enableIceCheckbox.setOnCheckedChangeListener(enableIceCheckedChangeListener());
         preferH264Checkbox.setChecked(preferH264);
         logoutWhenConvEndsCheckbox.setChecked(logoutWhenConvEnds);
 
@@ -472,7 +470,6 @@ public class ClientActivity extends AppCompatActivity {
         cameraCapturer = CameraCapturer.create(ClientActivity.this, currentCameraSource,
                 capturerErrorListener());
 
-        switchCameraActionFab.setOnClickListener(switchCameraClickListener());
         audioManager = (AudioManager)getSystemService(Context.AUDIO_SERVICE);
 
         audioState = AudioState.ENABLED;
@@ -714,14 +711,11 @@ public class ClientActivity extends AppCompatActivity {
     private void setCallAction() {
         callActionFab.setImageDrawable(ContextCompat.getDrawable(this,
                 R.drawable.ic_call_white_24px));
-        callActionFab.show();
         callActionFab.setOnClickListener(callClickListener());
+        callActionFab.show();
         switchCameraActionFab.show();
-        switchCameraActionFab.setOnClickListener(switchCameraClickListener());
         localVideoActionFab.show();
-        localVideoActionFab.setOnClickListener(localVideoClickListener());
         audioActionFab.show();
-        audioActionFab.setOnClickListener(audioClickListener());
         addParticipantActionFab.hide();
         speakerActionFab.hide();
     }
@@ -732,9 +726,7 @@ public class ClientActivity extends AppCompatActivity {
         callActionFab.show();
         callActionFab.setOnClickListener(hangupClickListener());
         addParticipantActionFab.show();
-        addParticipantActionFab.setOnClickListener(addClickListener());
         speakerActionFab.show();
-        speakerActionFab.setOnClickListener(speakerClickListener());
     }
 
     private void hideAction() {
@@ -807,17 +799,13 @@ public class ClientActivity extends AppCompatActivity {
         return new IceOptions(policy);
     }
 
-    private CompoundButton.OnCheckedChangeListener enableIceCheckedChangeListener() {
-        return new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if (isChecked) {
-                    iceOptionsLayout.setVisibility(View.VISIBLE);
-                } else {
-                    iceOptionsLayout.setVisibility(View.GONE);
-                }
-            }
-        };
+    @OnCheckedChanged(R.id.enable_ice_checkbox)
+    public void enableIceCheckedChangeListener(CompoundButton buttonView, boolean isChecked) {
+        if (isChecked) {
+            iceOptionsLayout.setVisibility(View.VISIBLE);
+        } else {
+            iceOptionsLayout.setVisibility(View.GONE);
+        }
     }
 
     private TwilioConversationsClient.Listener conversationsClientListener() {
@@ -955,66 +943,58 @@ public class ClientActivity extends AppCompatActivity {
         };
     }
 
-    private View.OnClickListener switchCameraClickListener() {
-        return new View.OnClickListener(){
-            @Override
-            public void onClick(View view) {
-                if(cameraCapturer != null) {
-                    boolean cameraSwitchSucceeded = cameraCapturer.switchCamera();
+    @OnClick(R.id.switch_camera_action_fab)
+    public void switchCameraClickListener(View view) {
+        if(cameraCapturer != null) {
+            boolean cameraSwitchSucceeded = cameraCapturer.switchCamera();
 
-                    if (cameraSwitchSucceeded) {
-                        // Update the camera source
-                        currentCameraSource =
-                                (currentCameraSource ==
-                                        CameraCapturer.CameraSource.CAMERA_SOURCE_FRONT_CAMERA) ?
-                                        (CameraCapturer.CameraSource.CAMERA_SOURCE_BACK_CAMERA) :
-                                        (CameraCapturer.CameraSource.CAMERA_SOURCE_FRONT_CAMERA);
+            if (cameraSwitchSucceeded) {
+                // Update the camera source
+                currentCameraSource =
+                        (currentCameraSource ==
+                                CameraCapturer.CameraSource.CAMERA_SOURCE_FRONT_CAMERA) ?
+                                (CameraCapturer.CameraSource.CAMERA_SOURCE_BACK_CAMERA) :
+                                (CameraCapturer.CameraSource.CAMERA_SOURCE_FRONT_CAMERA);
 
-                        // Update our local renderer to mirror or not
-                        mirrorLocalRenderer = (currentCameraSource ==
-                                CameraCapturer.CameraSource.CAMERA_SOURCE_FRONT_CAMERA);
+                // Update our local renderer to mirror or not
+                mirrorLocalRenderer = (currentCameraSource ==
+                        CameraCapturer.CameraSource.CAMERA_SOURCE_FRONT_CAMERA);
 
-                        // Determine if our renderer is mirroring now
-                        if (localData.renderer != null) {
-                            localData.renderer.setMirror(mirrorLocalRenderer);
-                        }
-                    }
+                // Determine if our renderer is mirroring now
+                if (localData.renderer != null) {
+                    localData.renderer.setMirror(mirrorLocalRenderer);
                 }
             }
-        };
+        }
     }
 
-    private View.OnClickListener localVideoClickListener() {
-        return new View.OnClickListener(){
-            @Override
-            public void onClick(View view) {
-                if (videoState == VideoState.DISABLED) {
-                    cameraCapturer.startPreview(previewFrameLayout);
-                    if (localMedia != null) {
-                        localData = new LocalData();
-                        localData.container = createParticipantContainer();
-                        LocalVideoTrack videoTrack = createLocalVideoTrack(cameraCapturer);
-                        localMedia.addLocalVideoTrack(videoTrack);
-                        localData.localVideoTrack = videoTrack;
-                        switchCameraActionFab.hide();
-                    } else {
-                        videoState = VideoState.ENABLED;
-                    }
-                } else if (videoState == VideoState.ENABLED) {
-                    cameraCapturer.stopPreview();
-                    if (localMedia != null) {
-                        if (localMedia.getLocalVideoTracks().size() > 0) {
-                            localMedia.removeLocalVideoTrack(localMedia
-                                    .getLocalVideoTracks().get(0));
-                            pauseActionFab.hide();
-                        }
-                    } else {
-                        videoState = VideoState.DISABLED;
-                    }
-                }
-                setVideoStateIcon();
+    @OnClick(R.id.local_video_action_fab)
+    public void localVideoClickListener(View view) {
+        if (videoState == VideoState.DISABLED) {
+            cameraCapturer.startPreview(previewFrameLayout);
+            if (localMedia != null) {
+                localData = new LocalData();
+                localData.container = createParticipantContainer();
+                LocalVideoTrack videoTrack = createLocalVideoTrack(cameraCapturer);
+                localMedia.addLocalVideoTrack(videoTrack);
+                localData.localVideoTrack = videoTrack;
+                switchCameraActionFab.hide();
+            } else {
+                videoState = VideoState.ENABLED;
             }
-        };
+        } else if (videoState == VideoState.ENABLED) {
+            cameraCapturer.stopPreview();
+            if (localMedia != null) {
+                if (localMedia.getLocalVideoTracks().size() > 0) {
+                    localMedia.removeLocalVideoTrack(localMedia
+                            .getLocalVideoTracks().get(0));
+                    pauseActionFab.hide();
+                }
+            } else {
+                videoState = VideoState.DISABLED;
+            }
+        }
+        setVideoStateIcon();
     }
 
     public void pauseVideo() {
@@ -1074,38 +1054,34 @@ public class ClientActivity extends AppCompatActivity {
         }
     }
 
-    private View.OnClickListener audioClickListener() {
-        return new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (audioState == AudioState.DISABLED)  {
-                    if (localMedia != null) {
-                        boolean microphoneAdded = localMedia.addMicrophone();
-                        if(microphoneAdded) {
-                            audioState = AudioState.ENABLED;
-                        } else {
-                            Snackbar.make(conversationStatusTextView, "Adding microphone failed",
-                                    Snackbar.LENGTH_LONG).setAction("Action", null).show();
-                        }
-                    } else {
-                        audioState = AudioState.ENABLED;
-                    }
+    @OnClick(R.id.audio_action_fab)
+    public void audioClickListener(View view) {
+        if (audioState == AudioState.DISABLED)  {
+            if (localMedia != null) {
+                boolean microphoneAdded = localMedia.addMicrophone();
+                if(microphoneAdded) {
+                    audioState = AudioState.ENABLED;
                 } else {
-                    if (localMedia != null) {
-                        boolean microphoneRemoved = localMedia.removeMicrophone();
-                        if(microphoneRemoved) {
-                            audioState = AudioState.DISABLED;
-                        } else {
-                            Snackbar.make(conversationStatusTextView, "Removing microphone failed",
-                                    Snackbar.LENGTH_LONG).setAction("Action", null).show();
-                        }
-                    } else {
-                        audioState = AudioState.DISABLED;
-                    }
+                    Snackbar.make(conversationStatusTextView, "Adding microphone failed",
+                            Snackbar.LENGTH_LONG).setAction("Action", null).show();
                 }
-                setAudioStateIcon();
+            } else {
+                audioState = AudioState.ENABLED;
             }
-        };
+        } else {
+            if (localMedia != null) {
+                boolean microphoneRemoved = localMedia.removeMicrophone();
+                if(microphoneRemoved) {
+                    audioState = AudioState.DISABLED;
+                } else {
+                    Snackbar.make(conversationStatusTextView, "Removing microphone failed",
+                            Snackbar.LENGTH_LONG).setAction("Action", null).show();
+                }
+            } else {
+                audioState = AudioState.DISABLED;
+            }
+        }
+        setAudioStateIcon();
     }
 
     private void setAudioStateIcon() {
@@ -1145,13 +1121,9 @@ public class ClientActivity extends AppCompatActivity {
         }
     }
 
-    private View.OnClickListener addClickListener() {
-        return new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                showAddParticipantsDialog();
-            }
-        };
+    @OnClick(R.id.add_participant_action_fab)
+    public void addClickListener(View view) {
+        showAddParticipantsDialog();
     }
 
     private void showAddParticipantsDialog() {
@@ -1423,37 +1395,25 @@ public class ClientActivity extends AppCompatActivity {
         }
     }
 
-    private View.OnClickListener speakerClickListener() {
-        return new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (twilioConversationsClient == null) {
-                    Timber.e("Unable to set audio output, conversation client is null");
-                    return;
-                }
-                boolean speakerOn =
-                        !(twilioConversationsClient.getAudioOutput() ==  AudioOutput.SPEAKERPHONE) ?  true : false;
-                setSpeakerphoneOn(speakerOn);
-            }
-        };
+    @OnClick(R.id.speaker_action_fab)
+    public void speakerClickListener(View view) {
+        if (twilioConversationsClient == null) {
+            Timber.e("Unable to set audio output, conversation client is null");
+            return;
+        }
+        boolean speakerOn =
+                !(twilioConversationsClient.getAudioOutput() ==  AudioOutput.SPEAKERPHONE) ?  true : false;
+        setSpeakerphoneOn(speakerOn);
     }
 
-    private View.OnClickListener pauseClickListener() {
-        return new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                pauseVideo();
-            }
-        };
+    @OnClick(R.id.local_video_pause_fab)
+    public void pauseClickListener(View view) {
+        pauseVideo();
     }
 
-    private View.OnClickListener muteClickListener() {
-        return new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                muteAudio();
-            }
-        };
+    @OnClick(R.id.local_audio_mute_fab)
+    public void muteClickListener(View view) {
+        muteAudio();
     }
 
     private Conversation.Listener conversationListener() {
@@ -1960,9 +1920,7 @@ public class ClientActivity extends AppCompatActivity {
 
 
                 setVideoStateIcon();
-                pauseActionFab.setOnClickListener(pauseClickListener());
                 setAudioStateIcon();
-                muteActionFab.setOnClickListener(muteClickListener());
             }
 
             @Override
