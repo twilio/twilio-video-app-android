@@ -44,7 +44,7 @@ import android.widget.TextView;
 import com.appyvet.rangebar.IRangeBarFormatter;
 import com.appyvet.rangebar.RangeBar;
 import com.tw.conv.testapp.R;
-import com.tw.conv.testapp.View.IceOptionsView;
+import com.tw.conv.testapp.controller.IceOptionsController;
 import com.tw.conv.testapp.adapter.RemoteVideoTrackStatsAdapter;
 import com.tw.conv.testapp.dialog.Dialog;
 import com.tw.conv.testapp.util.ParticipantParser;
@@ -203,7 +203,7 @@ public class ClientActivity extends AppCompatActivity {
         videoDimensionsMap = Collections.unmodifiableMap(vdMap);
     }
 
-    private IceOptionsView iceOptionsView;
+    private IceOptionsController iceOptionsController;
 
     @BindView(R.id.enable_stats_checkbox) CheckBox statsCheckBox;
     @BindView(R.id.stats_layout) LinearLayout statsLayout;
@@ -282,7 +282,7 @@ public class ClientActivity extends AppCompatActivity {
         setContentView(R.layout.activity_client);
         ButterKnife.bind(this);
 
-        iceOptionsView = new IceOptionsView(this);
+        iceOptionsController = new IceOptionsController(this);
 
         localData = new LocalData();
         localData.container = createParticipantContainer();
@@ -411,7 +411,7 @@ public class ClientActivity extends AppCompatActivity {
             useHeadset = savedInstanceState.getBoolean(OPTION_USE_HEADSET_KEY);
             logoutWhenConvEnds = savedInstanceState.getBoolean(OPTION_LOGOUT_WHEN_CONV_ENDS_KEY);
             capabilityToken = savedInstanceState.getString(SimpleSignalingUtils.CAPABILITY_TOKEN);
-            iceOptionsView.restoreState(savedInstanceState);
+            iceOptionsController.restoreState(savedInstanceState);
         } else {
             Bundle extras = getIntent().getExtras();
 
@@ -422,14 +422,14 @@ public class ClientActivity extends AppCompatActivity {
             useHeadset = extras.getBoolean(OPTION_USE_HEADSET_KEY);
             logoutWhenConvEnds = extras.getBoolean(OPTION_LOGOUT_WHEN_CONV_ENDS_KEY);
             capabilityToken = extras.getString(SimpleSignalingUtils.CAPABILITY_TOKEN);
-            iceOptionsView.restoreState(extras);
+            iceOptionsController.restoreState(extras);
         }
 
         Map<String, String> privateOptions = createPrivateOptions(realm);
 
-        IceOptions iceOptions = iceOptionsView.retrieveIceOptions();
+        IceOptions iceOptions = iceOptionsController.retrieveIceOptions();
         ClientOptionsInternal options = new ClientOptionsInternal(iceOptions, privateOptions);
-        iceOptionsView.setIceOptionsViews(realm);
+        iceOptionsController.setIceOptionsViews(realm);
 
         getSupportActionBar().setTitle(username);
 
@@ -533,7 +533,7 @@ public class ClientActivity extends AppCompatActivity {
         bundle.putBoolean(OPTION_AUTO_ACCEPT_KEY, autoAccept);
         bundle.putBoolean(OPTION_USE_HEADSET_KEY, useHeadset);
         bundle.putBoolean(OPTION_LOGOUT_WHEN_CONV_ENDS_KEY, logoutWhenConvEnds);
-        iceOptionsView.saveState(bundle);
+        iceOptionsController.saveState(bundle);
     }
 
     @Override
@@ -1017,7 +1017,7 @@ public class ClientActivity extends AppCompatActivity {
                     localMedia = createLocalMedia();
                     setAudioFocus(true);
 
-                    IceOptions iceOptions = iceOptionsView.createIceOptions();
+                    IceOptions iceOptions = iceOptionsController.createIceOptions();
                     outgoingInvite = twilioConversationsClient.inviteToConversation(participants,
                             localMedia, iceOptions, new ConversationCallback() {
                                 @Override
@@ -1175,7 +1175,7 @@ public class ClientActivity extends AppCompatActivity {
     }
 
     private void acceptInvite(IncomingInvite incomingInvite) {
-        IceOptions iceOptions = iceOptionsView.createIceOptions();
+        IceOptions iceOptions = iceOptionsController.createIceOptions();
         setAudioFocus(true);
         incomingInvite.accept(localMedia, iceOptions, new ConversationCallback() {
             @Override

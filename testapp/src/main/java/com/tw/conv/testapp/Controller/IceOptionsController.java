@@ -1,4 +1,4 @@
-package com.tw.conv.testapp.View;
+package com.tw.conv.testapp.controller;
 
 import android.app.Activity;
 import android.os.Bundle;
@@ -31,7 +31,7 @@ import retrofit.RetrofitError;
 import retrofit.client.Response;
 import timber.log.Timber;
 
-public class IceOptionsView {
+public class IceOptionsController {
 
     private Activity activity;
 
@@ -44,7 +44,7 @@ public class IceOptionsView {
     @BindView(R.id.ice_options_layout) RelativeLayout iceOptionsLayout;
     @BindView(R.id.enable_ice_checkbox) CheckBox enableIceCheckbox;
 
-    public IceOptionsView(Activity activity) {
+    public IceOptionsController(Activity activity) {
         this.activity = activity;
         ButterKnife.bind(this, activity);
         iceOptionsLayout.setVisibility(View.GONE);
