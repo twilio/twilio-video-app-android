@@ -44,9 +44,10 @@ import android.widget.TextView;
 import com.appyvet.rangebar.IRangeBarFormatter;
 import com.appyvet.rangebar.RangeBar;
 import com.tw.conv.testapp.R;
-import com.tw.conv.testapp.controller.IceOptionsController;
 import com.tw.conv.testapp.adapter.RemoteVideoTrackStatsAdapter;
 import com.tw.conv.testapp.dialog.Dialog;
+import com.tw.conv.testapp.model.OptionModel;
+import com.tw.conv.testapp.ui.IceOptionsUI;
 import com.tw.conv.testapp.util.ParticipantParser;
 import com.tw.conv.testapp.util.SimpleSignalingUtils;
 import com.twilio.common.AccessManager;
@@ -98,7 +99,6 @@ import retrofit.client.Response;
 import timber.log.Timber;
 
 public class ClientActivity extends AppCompatActivity {
-    public static final String OPTION_PREFER_H264_KEY = "enable-h264";
     public static final String OPTION_AUTO_ACCEPT_KEY = "auto-accept";
     public static final String OPTION_USE_HEADSET_KEY = "use-headset";
     public static final String OPTION_LOGOUT_WHEN_CONV_ENDS_KEY = "logout-when-conv-ends";
@@ -110,12 +110,6 @@ public class ClientActivity extends AppCompatActivity {
             "com.tw.conv.testapp.action.REJECT_INCOMING_CALL";
     private static final String ACTION_ACCEPT_INCOMING_CALL =
             "com.tw.conv.testapp.action.ACCEPT_INCOMING_CALL";
-    private static final String OPTION_DEV_REGISTRAR = "endpoint.dev.twilio.com";
-    private static final String OPTION_DEV_STATS_URL = "https://eventgw.dev.twilio.com";
-    private static final String OPTION_STAGE_REGISTRAR = "endpoint.stage.twilio.com";
-    private static final String OPTION_STAGE_STATS_URL = "https://eventgw.stage.twilio.com";
-    private static final String OPTION_REGISTRAR_KEY = "registrar";
-    private static final String OPTION_STATS_KEY = "stats-server-url";
 
     private TwilioConversationsClient twilioConversationsClient;
     private OutgoingInvite outgoingInvite;
@@ -130,7 +124,7 @@ public class ClientActivity extends AppCompatActivity {
     private RemoteVideoTrackStatsAdapter remoteVideoTrackStatsAdapter;
     private LinkedHashMap<String, RemoteVideoTrackStatsRecord>
             remoteVideoTrackStatsRecordMap = new LinkedHashMap<>();
-    private boolean preferH264;
+
     private boolean autoAccept;
 
     private boolean useHeadset;
@@ -203,7 +197,8 @@ public class ClientActivity extends AppCompatActivity {
         videoDimensionsMap = Collections.unmodifiableMap(vdMap);
     }
 
-    private IceOptionsController iceOptionsController;
+    private IceOptionsUI iceOptionsUI;
+    private OptionModel optionModel;
 
     @BindView(R.id.enable_stats_checkbox) CheckBox statsCheckBox;
     @BindView(R.id.stats_layout) LinearLayout statsLayout;
@@ -282,7 +277,29 @@ public class ClientActivity extends AppCompatActivity {
         setContentView(R.layout.activity_client);
         ButterKnife.bind(this);
 
-        iceOptionsController = new IceOptionsController(this);
+        if (savedInstanceState != null) {
+            Timber.d("Restoring client activity state");
+            username = savedInstanceState.getString(SimpleSignalingUtils.USERNAME);
+            realm = savedInstanceState.getString(SimpleSignalingUtils.REALM);
+            autoAccept = savedInstanceState.getBoolean(OPTION_AUTO_ACCEPT_KEY);
+            useHeadset = savedInstanceState.getBoolean(OPTION_USE_HEADSET_KEY);
+            logoutWhenConvEnds = savedInstanceState.getBoolean(OPTION_LOGOUT_WHEN_CONV_ENDS_KEY);
+            capabilityToken = savedInstanceState.getString(SimpleSignalingUtils.CAPABILITY_TOKEN);
+            optionModel = new OptionModel(savedInstanceState);
+
+        } else {
+            Bundle extras = getIntent().getExtras();
+
+            username = extras.getString(SimpleSignalingUtils.USERNAME);
+            realm = extras.getString(SimpleSignalingUtils.REALM);
+            autoAccept = extras.getBoolean(OPTION_AUTO_ACCEPT_KEY);
+            useHeadset = extras.getBoolean(OPTION_USE_HEADSET_KEY);
+            logoutWhenConvEnds = extras.getBoolean(OPTION_LOGOUT_WHEN_CONV_ENDS_KEY);
+            capabilityToken = extras.getString(SimpleSignalingUtils.CAPABILITY_TOKEN);
+            optionModel = new OptionModel(extras);
+        }
+
+        iceOptionsUI = new IceOptionsUI(this, optionModel);
 
         localData = new LocalData();
         localData.container = createParticipantContainer();
@@ -402,38 +419,9 @@ public class ClientActivity extends AppCompatActivity {
             }
         });
 
-        if (savedInstanceState != null) {
-            Timber.d("Restoring client activity state");
-            username = savedInstanceState.getString(SimpleSignalingUtils.USERNAME);
-            realm = savedInstanceState.getString(SimpleSignalingUtils.REALM);
-            preferH264 = savedInstanceState.getBoolean(OPTION_PREFER_H264_KEY);
-            autoAccept = savedInstanceState.getBoolean(OPTION_AUTO_ACCEPT_KEY);
-            useHeadset = savedInstanceState.getBoolean(OPTION_USE_HEADSET_KEY);
-            logoutWhenConvEnds = savedInstanceState.getBoolean(OPTION_LOGOUT_WHEN_CONV_ENDS_KEY);
-            capabilityToken = savedInstanceState.getString(SimpleSignalingUtils.CAPABILITY_TOKEN);
-            iceOptionsController.restoreState(savedInstanceState);
-        } else {
-            Bundle extras = getIntent().getExtras();
-
-            username = extras.getString(SimpleSignalingUtils.USERNAME);
-            realm = extras.getString(SimpleSignalingUtils.REALM);
-            preferH264 = extras.getBoolean(OPTION_PREFER_H264_KEY);
-            autoAccept = extras.getBoolean(OPTION_AUTO_ACCEPT_KEY);
-            useHeadset = extras.getBoolean(OPTION_USE_HEADSET_KEY);
-            logoutWhenConvEnds = extras.getBoolean(OPTION_LOGOUT_WHEN_CONV_ENDS_KEY);
-            capabilityToken = extras.getString(SimpleSignalingUtils.CAPABILITY_TOKEN);
-            iceOptionsController.restoreState(extras);
-        }
-
-        Map<String, String> privateOptions = createPrivateOptions(realm);
-
-        IceOptions iceOptions = iceOptionsController.retrieveIceOptions();
-        ClientOptionsInternal options = new ClientOptionsInternal(iceOptions, privateOptions);
-        iceOptionsController.setIceOptionsViews(realm);
-
         getSupportActionBar().setTitle(username);
 
-        preferH264Checkbox.setChecked(preferH264);
+        preferH264Checkbox.setChecked(optionModel.isPreferH264());
         logoutWhenConvEndsCheckbox.setChecked(logoutWhenConvEnds);
 
         ArrayAdapter<CharSequence> spinnerAdapter = ArrayAdapter.createFromResource(this,
@@ -441,6 +429,7 @@ public class ClientActivity extends AppCompatActivity {
         spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         aspectRatioSpinner.setAdapter(spinnerAdapter);
 
+        ClientOptionsInternal options = optionModel.createClientOptionsInternal();
         accessManager = new AccessManager(this, capabilityToken, accessManagerListener());
 
         twilioConversationsClient = TwilioConversationsClient.create(accessManager, options,
@@ -529,11 +518,10 @@ public class ClientActivity extends AppCompatActivity {
         bundle.putString(SimpleSignalingUtils.USERNAME, username);
         bundle.putString(SimpleSignalingUtils.CAPABILITY_TOKEN, capabilityToken);
         bundle.putString(SimpleSignalingUtils.REALM, realm);
-        bundle.putBoolean(OPTION_PREFER_H264_KEY, preferH264);
         bundle.putBoolean(OPTION_AUTO_ACCEPT_KEY, autoAccept);
         bundle.putBoolean(OPTION_USE_HEADSET_KEY, useHeadset);
         bundle.putBoolean(OPTION_LOGOUT_WHEN_CONV_ENDS_KEY, logoutWhenConvEnds);
-        iceOptionsController.saveState(bundle);
+        optionModel.saveState(bundle);
     }
 
     @Override
@@ -600,19 +588,6 @@ public class ClientActivity extends AppCompatActivity {
         layout.setClickable(true);
         layout.setOnClickListener(participantContainerClickListener());
         return layout;
-    }
-
-    private Map<String, String> createPrivateOptions(String realm) {
-        Map<String, String> options = new HashMap<>();
-        if (realm.equalsIgnoreCase("dev")) {
-            options.put(OPTION_REGISTRAR_KEY, OPTION_DEV_REGISTRAR);
-            options.put(OPTION_STATS_KEY, OPTION_DEV_STATS_URL);
-        } else if (realm.equalsIgnoreCase("stage")) {
-            options.put(OPTION_REGISTRAR_KEY, OPTION_STAGE_REGISTRAR);
-            options.put(OPTION_STATS_KEY, OPTION_STAGE_STATS_URL);
-        }
-        options.put(OPTION_PREFER_H264_KEY, preferH264 ? "true" : "false");
-        return options;
     }
 
     private void startPreview() {
@@ -1017,7 +992,7 @@ public class ClientActivity extends AppCompatActivity {
                     localMedia = createLocalMedia();
                     setAudioFocus(true);
 
-                    IceOptions iceOptions = iceOptionsController.createIceOptions();
+                    IceOptions iceOptions = createIceOptions();
                     outgoingInvite = twilioConversationsClient.inviteToConversation(participants,
                             localMedia, iceOptions, new ConversationCallback() {
                                 @Override
@@ -1175,7 +1150,7 @@ public class ClientActivity extends AppCompatActivity {
     }
 
     private void acceptInvite(IncomingInvite incomingInvite) {
-        IceOptions iceOptions = iceOptionsController.createIceOptions();
+        IceOptions iceOptions = createIceOptions();
         setAudioFocus(true);
         incomingInvite.accept(localMedia, iceOptions, new ConversationCallback() {
             @Override
@@ -2024,5 +1999,14 @@ public class ClientActivity extends AppCompatActivity {
                 audioManager.abandonAudioFocus(null);
             }
         }
+    }
+
+    private IceOptions createIceOptions() {
+        if (iceOptionsUI.isEnabled()) {
+            return optionModel.createIceOptions(
+                    iceOptionsUI.getSelectedIceServers(),
+                    iceOptionsUI.getSelectedTransportPolicy());
+        }
+        return null;
     }
 }

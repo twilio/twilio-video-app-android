@@ -29,6 +29,7 @@ import com.tw.conv.testapp.R;
 import com.tw.conv.testapp.TestAppApplication;
 import com.tw.conv.testapp.dialog.Dialog;
 import com.tw.conv.testapp.dialog.IceServersDialogFragment;
+import com.tw.conv.testapp.model.OptionModel;
 import com.tw.conv.testapp.model.TwilioIceResponse;
 import com.tw.conv.testapp.model.TwilioIceServer;
 import com.tw.conv.testapp.util.IceOptionsHelper;
@@ -374,7 +375,7 @@ public class RegistrationActivity extends AppCompatActivity {
         intent.putExtra(TwilioIceResponse.ICE_TRANSPORT_POLICY, iceTransportPolicy);
         intent.putExtra(ClientActivity.OPTION_AUTO_ACCEPT_KEY, autoAcceptCheckbox.isChecked());
         intent.putExtra(ClientActivity.OPTION_USE_HEADSET_KEY, useHeadsetCheckbox.isChecked());
-        intent.putExtra(ClientActivity.OPTION_PREFER_H264_KEY, preferH264Checkbox.isChecked());
+        intent.putExtra(OptionModel.OPTION_PREFER_H264_KEY, preferH264Checkbox.isChecked());
         intent.putExtra(
                 ClientActivity.OPTION_LOGOUT_WHEN_CONV_ENDS_KEY,
                 logoutWhenConvEndsCheckbox.isChecked());
