@@ -9,6 +9,7 @@
 #include "TSCSession.h"
 #include "TSCAudioInputController.h"
 #include "TSCoreSDK.h"
+#include "TSCConstraints.h"
 
 #include <string>
 #include <map>
