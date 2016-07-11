@@ -15,7 +15,7 @@
 #include "TSCTrackStatsReport.h"
 #include "com_twilio_conversations_Conversation.h"
 #include <android/log.h>
-#include <webrtc/base/criticalsection.h>
+#include "webrtc/base/criticalsection.h"
 
 using namespace webrtc;
 using namespace webrtc_jni;
