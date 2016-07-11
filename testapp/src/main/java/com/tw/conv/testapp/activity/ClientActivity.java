@@ -37,7 +37,6 @@ import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -45,12 +44,10 @@ import android.widget.TextView;
 import com.appyvet.rangebar.IRangeBarFormatter;
 import com.appyvet.rangebar.RangeBar;
 import com.tw.conv.testapp.R;
-import com.tw.conv.testapp.adapter.IceServerAdapter;
 import com.tw.conv.testapp.adapter.RemoteVideoTrackStatsAdapter;
 import com.tw.conv.testapp.dialog.Dialog;
-import com.tw.conv.testapp.model.TwilioIceResponse;
-import com.tw.conv.testapp.model.TwilioIceServer;
-import com.tw.conv.testapp.util.IceOptionsHelper;
+import com.tw.conv.testapp.model.OptionModel;
+import com.tw.conv.testapp.ui.IceOptionsUI;
 import com.tw.conv.testapp.util.ParticipantParser;
 import com.tw.conv.testapp.util.SimpleSignalingUtils;
 import com.twilio.common.AccessManager;
@@ -62,10 +59,7 @@ import com.twilio.conversations.CapturerErrorListener;
 import com.twilio.conversations.CapturerException;
 import com.twilio.conversations.Conversation;
 import com.twilio.conversations.ConversationCallback;
-import com.twilio.conversations.TwilioConversationsClient;
 import com.twilio.conversations.IceOptions;
-import com.twilio.conversations.IceServer;
-import com.twilio.conversations.IceTransportPolicy;
 import com.twilio.conversations.IncomingInvite;
 import com.twilio.conversations.LocalAudioTrackStatsRecord;
 import com.twilio.conversations.LocalMedia;
@@ -78,6 +72,7 @@ import com.twilio.conversations.Participant;
 import com.twilio.conversations.RemoteAudioTrackStatsRecord;
 import com.twilio.conversations.RemoteVideoTrackStatsRecord;
 import com.twilio.conversations.StatsListener;
+import com.twilio.conversations.TwilioConversationsClient;
 import com.twilio.conversations.TwilioConversationsException;
 import com.twilio.conversations.VideoConstraints;
 import com.twilio.conversations.VideoDimensions;
@@ -97,7 +92,6 @@ import java.util.Set;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import butterknife.OnCheckedChanged;
 import butterknife.OnClick;
 import retrofit.Callback;
 import retrofit.RetrofitError;
@@ -105,7 +99,6 @@ import retrofit.client.Response;
 import timber.log.Timber;
 
 public class ClientActivity extends AppCompatActivity {
-    public static final String OPTION_PREFER_H264_KEY = "enable-h264";
     public static final String OPTION_AUTO_ACCEPT_KEY = "auto-accept";
     public static final String OPTION_USE_HEADSET_KEY = "use-headset";
     public static final String OPTION_LOGOUT_WHEN_CONV_ENDS_KEY = "logout-when-conv-ends";
@@ -117,12 +110,6 @@ public class ClientActivity extends AppCompatActivity {
             "com.tw.conv.testapp.action.REJECT_INCOMING_CALL";
     private static final String ACTION_ACCEPT_INCOMING_CALL =
             "com.tw.conv.testapp.action.ACCEPT_INCOMING_CALL";
-    private static final String OPTION_DEV_REGISTRAR = "endpoint.dev.twilio.com";
-    private static final String OPTION_DEV_STATS_URL = "https://eventgw.dev.twilio.com";
-    private static final String OPTION_STAGE_REGISTRAR = "endpoint.stage.twilio.com";
-    private static final String OPTION_STAGE_STATS_URL = "https://eventgw.stage.twilio.com";
-    private static final String OPTION_REGISTRAR_KEY = "registrar";
-    private static final String OPTION_STATS_KEY = "stats-server-url";
 
     private TwilioConversationsClient twilioConversationsClient;
     private OutgoingInvite outgoingInvite;
@@ -137,11 +124,9 @@ public class ClientActivity extends AppCompatActivity {
     private RemoteVideoTrackStatsAdapter remoteVideoTrackStatsAdapter;
     private LinkedHashMap<String, RemoteVideoTrackStatsRecord>
             remoteVideoTrackStatsRecordMap = new LinkedHashMap<>();
-    private boolean preferH264;
+
     private boolean autoAccept;
-    private String selectedTwilioIceServersJson;
-    private String iceTransportPolicy;
-    private String twilioIceServersJson;
+
     private boolean useHeadset;
     private boolean logoutWhenConvEnds;
 
@@ -212,6 +197,9 @@ public class ClientActivity extends AppCompatActivity {
         videoDimensionsMap = Collections.unmodifiableMap(vdMap);
     }
 
+    private IceOptionsUI iceOptionsUI;
+    private OptionModel optionModel;
+
     @BindView(R.id.enable_stats_checkbox) CheckBox statsCheckBox;
     @BindView(R.id.stats_layout) LinearLayout statsLayout;
     @BindView(R.id.local_video_track_stats_textview) TextView localVideoTrackStatsTextView;
@@ -229,10 +217,6 @@ public class ClientActivity extends AppCompatActivity {
     @BindView(R.id.previewFrameLayout) FrameLayout previewFrameLayout;
     @BindView(R.id.videoMainRelativeLayout) RelativeLayout videoMainRelativeLayout;
     @BindView(R.id.videoThumbsLinearLayout) LinearLayout videoThumbsLinearLayout;
-    @BindView(R.id.ice_trans_policy_spinner) Spinner iceTransPolicySpinner;
-    @BindView(R.id.ice_servers_list_view) ListView twilioIceServersListView;
-    @BindView(R.id.ice_options_layout) RelativeLayout iceOptionsLayout;
-    @BindView(R.id.enable_ice_checkbox) CheckBox enableIceCheckbox;
     @BindView(R.id.prefer_h264_checkbox) CheckBox preferH264Checkbox;
     @BindView(R.id.logout_when_conv_ends_checkbox) CheckBox logoutWhenConvEndsCheckbox;
     @BindView(R.id.aspect_ratio_spinner) Spinner aspectRatioSpinner;
@@ -292,6 +276,30 @@ public class ClientActivity extends AppCompatActivity {
 
         setContentView(R.layout.activity_client);
         ButterKnife.bind(this);
+
+        if (savedInstanceState != null) {
+            Timber.d("Restoring client activity state");
+            username = savedInstanceState.getString(SimpleSignalingUtils.USERNAME);
+            realm = savedInstanceState.getString(SimpleSignalingUtils.REALM);
+            autoAccept = savedInstanceState.getBoolean(OPTION_AUTO_ACCEPT_KEY);
+            useHeadset = savedInstanceState.getBoolean(OPTION_USE_HEADSET_KEY);
+            logoutWhenConvEnds = savedInstanceState.getBoolean(OPTION_LOGOUT_WHEN_CONV_ENDS_KEY);
+            capabilityToken = savedInstanceState.getString(SimpleSignalingUtils.CAPABILITY_TOKEN);
+            optionModel = new OptionModel(savedInstanceState);
+
+        } else {
+            Bundle extras = getIntent().getExtras();
+
+            username = extras.getString(SimpleSignalingUtils.USERNAME);
+            realm = extras.getString(SimpleSignalingUtils.REALM);
+            autoAccept = extras.getBoolean(OPTION_AUTO_ACCEPT_KEY);
+            useHeadset = extras.getBoolean(OPTION_USE_HEADSET_KEY);
+            logoutWhenConvEnds = extras.getBoolean(OPTION_LOGOUT_WHEN_CONV_ENDS_KEY);
+            capabilityToken = extras.getString(SimpleSignalingUtils.CAPABILITY_TOKEN);
+            optionModel = new OptionModel(extras);
+        }
+
+        iceOptionsUI = new IceOptionsUI(this, optionModel);
 
         localData = new LocalData();
         localData.container = createParticipantContainer();
@@ -411,43 +419,9 @@ public class ClientActivity extends AppCompatActivity {
             }
         });
 
-        if (savedInstanceState != null) {
-            Timber.d("Restoring client activity state");
-            username = savedInstanceState.getString(SimpleSignalingUtils.USERNAME);
-            realm = savedInstanceState.getString(SimpleSignalingUtils.REALM);
-            preferH264 = savedInstanceState.getBoolean(OPTION_PREFER_H264_KEY);
-            autoAccept = savedInstanceState.getBoolean(OPTION_AUTO_ACCEPT_KEY);
-            useHeadset = savedInstanceState.getBoolean(OPTION_USE_HEADSET_KEY);
-            logoutWhenConvEnds = savedInstanceState.getBoolean(OPTION_LOGOUT_WHEN_CONV_ENDS_KEY);
-            capabilityToken = savedInstanceState.getString(SimpleSignalingUtils.CAPABILITY_TOKEN);
-            selectedTwilioIceServersJson = savedInstanceState
-                    .getString(TwilioIceResponse.ICE_SELECTED_SERVERS);
-            iceTransportPolicy = savedInstanceState
-                    .getString(TwilioIceResponse.ICE_TRANSPORT_POLICY);
-            twilioIceServersJson = savedInstanceState.getString(TwilioIceResponse.ICE_SERVERS);
-        } else {
-            Bundle extras = getIntent().getExtras();
-
-            username = extras.getString(SimpleSignalingUtils.USERNAME);
-            realm = extras.getString(SimpleSignalingUtils.REALM);
-            preferH264 = extras.getBoolean(OPTION_PREFER_H264_KEY);
-            autoAccept = extras.getBoolean(OPTION_AUTO_ACCEPT_KEY);
-            useHeadset = extras.getBoolean(OPTION_USE_HEADSET_KEY);
-            logoutWhenConvEnds = extras.getBoolean(OPTION_LOGOUT_WHEN_CONV_ENDS_KEY);
-            capabilityToken = extras.getString(SimpleSignalingUtils.CAPABILITY_TOKEN);
-            selectedTwilioIceServersJson = extras.getString(TwilioIceResponse.ICE_SELECTED_SERVERS);
-            iceTransportPolicy = extras.getString(TwilioIceResponse.ICE_TRANSPORT_POLICY);
-            twilioIceServersJson = extras.getString(TwilioIceResponse.ICE_SERVERS);
-        }
-
-        Map<String, String> privateOptions = createPrivateOptions(realm);
-        IceOptions iceOptions = retrieveIceOptions();
-        ClientOptionsInternal options = new ClientOptionsInternal(iceOptions, privateOptions);
-        setIceOptionsViews();
         getSupportActionBar().setTitle(username);
-        iceOptionsLayout.setVisibility(View.GONE);
-        enableIceCheckbox.setChecked(false);
-        preferH264Checkbox.setChecked(preferH264);
+
+        preferH264Checkbox.setChecked(optionModel.isPreferH264());
         logoutWhenConvEndsCheckbox.setChecked(logoutWhenConvEnds);
 
         ArrayAdapter<CharSequence> spinnerAdapter = ArrayAdapter.createFromResource(this,
@@ -455,6 +429,7 @@ public class ClientActivity extends AppCompatActivity {
         spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         aspectRatioSpinner.setAdapter(spinnerAdapter);
 
+        ClientOptionsInternal options = optionModel.createClientOptionsInternal();
         accessManager = new AccessManager(this, capabilityToken, accessManagerListener());
 
         twilioConversationsClient = TwilioConversationsClient.create(accessManager, options,
@@ -543,13 +518,10 @@ public class ClientActivity extends AppCompatActivity {
         bundle.putString(SimpleSignalingUtils.USERNAME, username);
         bundle.putString(SimpleSignalingUtils.CAPABILITY_TOKEN, capabilityToken);
         bundle.putString(SimpleSignalingUtils.REALM, realm);
-        bundle.putBoolean(OPTION_PREFER_H264_KEY, preferH264);
         bundle.putBoolean(OPTION_AUTO_ACCEPT_KEY, autoAccept);
         bundle.putBoolean(OPTION_USE_HEADSET_KEY, useHeadset);
         bundle.putBoolean(OPTION_LOGOUT_WHEN_CONV_ENDS_KEY, logoutWhenConvEnds);
-        bundle.putString(TwilioIceResponse.ICE_SELECTED_SERVERS, selectedTwilioIceServersJson);
-        bundle.putString(TwilioIceResponse.ICE_TRANSPORT_POLICY, iceTransportPolicy);
-        bundle.putString(TwilioIceResponse.ICE_SERVERS, twilioIceServersJson);
+        optionModel.saveState(bundle);
     }
 
     @Override
@@ -616,19 +588,6 @@ public class ClientActivity extends AppCompatActivity {
         layout.setClickable(true);
         layout.setOnClickListener(participantContainerClickListener());
         return layout;
-    }
-
-    private Map<String, String> createPrivateOptions(String realm) {
-        Map<String, String> options = new HashMap<>();
-        if (realm.equalsIgnoreCase("dev")) {
-            options.put(OPTION_REGISTRAR_KEY, OPTION_DEV_REGISTRAR);
-            options.put(OPTION_STATS_KEY, OPTION_DEV_STATS_URL);
-        } else if (realm.equalsIgnoreCase("stage")) {
-            options.put(OPTION_REGISTRAR_KEY, OPTION_STAGE_REGISTRAR);
-            options.put(OPTION_STATS_KEY, OPTION_STAGE_STATS_URL);
-        }
-        options.put(OPTION_PREFER_H264_KEY, preferH264 ? "true" : "false");
-        return options;
     }
 
     private void startPreview() {
@@ -726,80 +685,6 @@ public class ClientActivity extends AppCompatActivity {
     private void hideAction() {
         callActionFab.hide();
         speakerActionFab.hide();
-    }
-
-    private IceOptions retrieveIceOptions() {
-        //Transform twilio ice servers from json to Set<IceServer>
-        List<TwilioIceServer> selectedIceServers =
-                IceOptionsHelper.convertToTwilioIceServerList(selectedTwilioIceServersJson);
-        Set<IceServer> iceServers = IceOptionsHelper.convertToIceServersSet(selectedIceServers);
-        IceTransportPolicy transPolicy  = IceTransportPolicy.ICE_TRANSPORT_POLICY_ALL;
-
-        if (iceTransportPolicy.equalsIgnoreCase("relay") ) {
-            transPolicy = IceTransportPolicy.ICE_TRANSPORT_POLICY_RELAY;
-        }
-        if (iceServers.size() > 0) {
-            return new IceOptions(transPolicy, iceServers);
-        }
-
-        return new IceOptions(transPolicy);
-    }
-
-    private void setIceOptionsViews(){
-        ArrayAdapter<CharSequence> iceTransPolicyArrayAdapter = ArrayAdapter.createFromResource(
-                this, R.array.ice_trans_policy_array, android.R.layout.simple_spinner_item);
-        iceTransPolicyArrayAdapter.setDropDownViewResource(
-                android.R.layout.simple_spinner_dropdown_item);
-        iceTransPolicySpinner.setAdapter(iceTransPolicyArrayAdapter);
-        List<TwilioIceServer> twilioIceServers =
-                IceOptionsHelper.convertToTwilioIceServerList(twilioIceServersJson);
-
-        if (twilioIceServers.size() > 0) {
-            IceServerAdapter iceServerAdapter =
-                    new IceServerAdapter(this, twilioIceServers);
-            twilioIceServersListView.setAdapter(iceServerAdapter);
-        } else {
-            // We are going to obtain list of servers anyway
-            SimpleSignalingUtils.getIceServers(realm, new Callback<TwilioIceResponse>() {
-                @Override
-                public void success(TwilioIceResponse twilioIceResponse, Response response) {
-                    IceServerAdapter iceServerAdapter =
-                            new IceServerAdapter(ClientActivity.this,
-                                    twilioIceResponse.getIceServers());
-                    twilioIceServersListView.setAdapter(iceServerAdapter);
-                }
-
-                @Override
-                public void failure(RetrofitError error) {
-                    Timber.w(error.getMessage());
-                }
-            });
-        }
-    }
-
-    private IceOptions createIceOptions() {
-        if (!enableIceCheckbox.isChecked()) {
-            return null;
-        }
-        List<TwilioIceServer> selectedTwIceServers =
-                IceOptionsHelper.getSelectedServersFromListView(twilioIceServersListView);
-        IceTransportPolicy policy = IceOptionsHelper.convertToIceTransportPolicy(
-                iceTransPolicySpinner.getSelectedItem().toString());
-        if (selectedTwIceServers.size() > 0) {
-            Set<IceServer> iceServers =
-                    IceOptionsHelper.convertToIceServersSet(selectedTwIceServers);
-            return new IceOptions(policy, iceServers);
-        }
-        return new IceOptions(policy);
-    }
-
-    @OnCheckedChanged(R.id.enable_ice_checkbox)
-    public void toggleIceOptions(CompoundButton buttonView, boolean isChecked) {
-        if (isChecked) {
-            iceOptionsLayout.setVisibility(View.VISIBLE);
-        } else {
-            iceOptionsLayout.setVisibility(View.GONE);
-        }
     }
 
     private TwilioConversationsClient.Listener conversationsClientListener() {
@@ -1069,10 +954,6 @@ public class ClientActivity extends AppCompatActivity {
 
     @OnClick(R.id.add_participant_action_fab)
     public void addParticipants(View view) {
-        showAddParticipantsDialog();
-    }
-
-    private void showAddParticipantsDialog() {
         participantEditText = new EditText(this);
         alertDialog = Dialog.createAddParticipantsDialog(participantEditText,
                 addParticipantsClickListener(participantEditText),
@@ -2118,5 +1999,14 @@ public class ClientActivity extends AppCompatActivity {
                 audioManager.abandonAudioFocus(null);
             }
         }
+    }
+
+    private IceOptions createIceOptions() {
+        if (iceOptionsUI.isEnabled()) {
+            return optionModel.createIceOptions(
+                    iceOptionsUI.getSelectedIceServers(),
+                    iceOptionsUI.getSelectedTransportPolicy());
+        }
+        return null;
     }
 }
