@@ -52,7 +52,7 @@ JNIEXPORT jint JNICALL Java_com_twilio_conversations_TwilioConversationsClient_n
  * Signature: (J)V
  */
 JNIEXPORT void JNICALL Java_com_twilio_conversations_TwilioConversationsClient_nativeRefreshRegistrations
-        (JNIEnv *, jobject);
+        (JNIEnv *, jobject, jlong nativeCore);
 
 
 #ifdef __cplusplus
