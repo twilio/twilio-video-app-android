@@ -38,12 +38,6 @@ public class RoomsActivity extends AppCompatActivity {
     @BindView(R.id.registration_button) Button registrationButton;
     @BindView(R.id.version_textview) TextView versionText;
     @BindView(R.id.realm_spinner) Spinner realmSpinner;
-    @BindView(R.id.prefer_h264_checkbox) CheckBox preferH264Checkbox;
-    @BindView(R.id.auto_accept_checkbox) CheckBox autoAcceptCheckbox;
-    @BindView(R.id.auto_register_checkbox) CheckBox autoRegisterCheckbox;
-    @BindView(R.id.use_headset_checkbox) CheckBox useHeadsetCheckbox;
-    @BindView(R.id.logout_when_conv_ends_checkbox) CheckBox logoutWhenConvEndsCheckbox;
-    @BindView(R.id.ice_options_button) Button iceOptionsButton;
 
     private ProgressDialog progressDialog;
     private ArrayAdapter<CharSequence> spinnerAdapter;
@@ -142,17 +136,7 @@ public class RoomsActivity extends AppCompatActivity {
             }
         });
 
-        client.connect(new Room.Listener() {
-            @Override
-            public void onParticipantConnected(Room room, Participant participant) {
-
-            }
-
-            @Override
-            public void onParticipantDisconnected(Room room, Participant participant) {
-
-            }
-        });
+        // TODO: call connect
     }
 
 }
