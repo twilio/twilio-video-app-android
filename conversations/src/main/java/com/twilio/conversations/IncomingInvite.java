@@ -83,7 +83,8 @@ public class IncomingInvite {
 
         if (inviteStatus != InviteStatus.PENDING) {
             inviteStatus = InviteStatus.FAILED;
-            throw new IllegalStateException("Invite status must be PENDING");
+            logger.w("Invite status must be PENDING to accept");
+            return;
         }
 
         this.conversationCallback = conversationCallback;

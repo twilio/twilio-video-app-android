@@ -368,6 +368,9 @@ public class TwilioConversationsClient {
      * @param listener A listener for client events.
      */
     public void setListener(Listener listener){
+        if (!initialized) {
+            throw new IllegalStateException("Cannot set listener before initialize is called");
+        }
         conversationsClientInternal.setConversationsClientListener(listener);
     }
 
@@ -378,6 +381,9 @@ public class TwilioConversationsClient {
      *         or null if an invalid TwilioAccessManager was provided
      */
     public String getIdentity(){
+        if (!initialized) {
+            throw new IllegalStateException("Cannot get identity before initialize is called");
+        }
         return conversationsClientInternal.getIdentity();
     }
 
@@ -388,6 +394,9 @@ public class TwilioConversationsClient {
      * otherwise.
      */
     public boolean isListening(){
+        if (!initialized) {
+            throw new IllegalStateException("Cannot get listening state before initialize is called");
+        }
         return conversationsClientInternal.isListening();
     }
 
@@ -404,6 +413,9 @@ public class TwilioConversationsClient {
      * </ol>
      */
     public void listen(){
+        if (!initialized) {
+            throw new IllegalStateException("Cannot listen before initialize is called");
+        }
         conversationsClientInternal.listen();
     }
 
@@ -414,6 +426,9 @@ public class TwilioConversationsClient {
      * will be invoked upon the completion of this process</p>
      */
     public void unlisten(){
+        if (!initialized) {
+            throw new IllegalStateException("Cannot unlisten before initialize is called");
+        }
         conversationsClientInternal.unlisten();
     }
 
@@ -446,6 +461,9 @@ public class TwilioConversationsClient {
     public OutgoingInvite inviteToConversation(Set<String> participants,
                                                LocalMedia localMedia,
                                                ConversationCallback conversationCallback) {
+        if (!initialized) {
+            throw new IllegalStateException("Cannot create conversation before initialize is called");
+        }
         return conversationsClientInternal.sendConversationInvite(
                 participants, localMedia, conversationCallback);
     }
@@ -481,6 +499,9 @@ public class TwilioConversationsClient {
                                                LocalMedia localMedia,
                                                IceOptions iceOptions,
                                                ConversationCallback conversationCallback) {
+        if (!initialized) {
+            throw new IllegalStateException("Cannot create conversation before initialize is called");
+        }
         return conversationsClientInternal.sendConversationInvite(
                 participants, localMedia, iceOptions, conversationCallback);
     }
@@ -496,6 +517,9 @@ public class TwilioConversationsClient {
      * @param audioOutput that should be used by the system
      */
     public void setAudioOutput(AudioOutput audioOutput) {
+        if (!initialized) {
+            throw new IllegalStateException("Cannot set audio output before initialize is called");
+        }
         conversationsClientInternal.setAudioOutput(audioOutput);
     }
 
@@ -505,6 +529,9 @@ public class TwilioConversationsClient {
      * @return audio output speaker
      */
     public AudioOutput getAudioOutput() {
+        if (!initialized) {
+            throw new IllegalStateException("Cannot get audio output before initialize is called");
+        }
         return conversationsClientInternal.getAudioOutput();
     }
 
