@@ -10,7 +10,6 @@ import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -19,8 +18,7 @@ import com.tw.conv.testapp.BuildConfig;
 import com.tw.conv.testapp.R;
 import com.tw.conv.testapp.util.SimpleSignalingUtils;
 import com.twilio.common.AccessManager;
-import com.twilio.conversations.Client;
-import com.twilio.conversations.Participant;
+import com.twilio.conversations.RoomsClient;
 import com.twilio.conversations.Room;
 import com.twilio.conversations.RoomsException;
 
@@ -119,7 +117,7 @@ public class RoomsActivity extends AppCompatActivity {
     private void startClient(String capabilityToken) {
         Timber.i("Start Client");
         AccessManager accessManager = new AccessManager(this, capabilityToken, null);
-        Client client = new Client(this, accessManager, new Client.Listener() {
+        RoomsClient roomsClient = new RoomsClient(this, accessManager, new RoomsClient.Listener() {
             @Override
             public void onConnected(Room room) {
                 Timber.i("Connected to room");

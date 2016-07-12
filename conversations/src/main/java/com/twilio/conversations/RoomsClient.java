@@ -19,7 +19,7 @@ import java.util.Map;
  * The Client allows user to create or participate in Rooms.
  *
  */
-public class Client {
+public class RoomsClient {
 
     private static final String[] REQUIRED_PERMISSIONS = {
             // Required permissions granted upon install
@@ -32,7 +32,7 @@ public class Client {
     private static LogLevel level = LogLevel.OFF;
     private static Map<LogModule, LogLevel> moduleLogLevel = new EnumMap(LogModule.class);
     private static volatile boolean libraryIsLoaded = false;
-    private static final Logger logger = Logger.getLogger(Client.class);
+    private static final Logger logger = Logger.getLogger(RoomsClient.class);
 
     private Handler handler;
     private final Context applicationContext;
@@ -40,7 +40,7 @@ public class Client {
     private AccessManager accessManager;
     private Map<String, Room> rooms;
 
-    public Client(Context context, AccessManager accessManager, Client.Listener listener) {
+    public RoomsClient(Context context, AccessManager accessManager, RoomsClient.Listener listener) {
         if (context == null) {
             throw new NullPointerException("applicationContext must not be null");
         }
@@ -145,7 +145,7 @@ public class Client {
 
     /**
      * Listener interface defines a set of callbacks for events related to a
-     * {@link Client}.
+     * {@link RoomsClient}.
      *
      */
     public interface Listener {
@@ -185,7 +185,7 @@ public class Client {
         setSDKLogLevel(level);
         trySetCoreLogLevel(level.ordinal());
         // Save the log level
-        Client.level = level;
+        RoomsClient.level = level;
     }
 
     /**
@@ -200,7 +200,7 @@ public class Client {
         }
         trySetCoreModuleLogLevel(module.ordinal(), level.ordinal());
         //Save the module log level
-        Client.moduleLogLevel.put(module, level);
+        RoomsClient.moduleLogLevel.put(module, level);
     }
 
     private static void setSDKLogLevel(LogLevel level) {

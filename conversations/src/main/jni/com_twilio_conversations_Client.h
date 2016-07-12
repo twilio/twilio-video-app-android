@@ -7,13 +7,13 @@
 extern "C" {
 #endif
 
-JNIEXPORT void JNICALL Java_com_twilio_conversations_Client_nativeSetCoreLogLevel
+JNIEXPORT void JNICALL Java_com_twilio_conversations_RoomsClient_nativeSetCoreLogLevel
         (JNIEnv *, jobject, jint);
 
-JNIEXPORT void JNICALL Java_com_twilio_conversations_Client_nativeSetModuleLevel
+JNIEXPORT void JNICALL Java_com_twilio_conversations_RoomsClient_nativeSetModuleLevel
         (JNIEnv *, jobject, jint, jint);
 
-JNIEXPORT jint JNICALL Java_com_twilio_conversations_Client_nativeGetCoreLogLevel
+JNIEXPORT jint JNICALL Java_com_twilio_conversations_RoomsClient_nativeGetCoreLogLevel
         (JNIEnv *, jobject);
 
 #ifdef __cplusplus
