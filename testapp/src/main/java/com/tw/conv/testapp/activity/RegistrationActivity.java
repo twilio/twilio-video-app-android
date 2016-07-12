@@ -29,6 +29,7 @@ import com.tw.conv.testapp.R;
 import com.tw.conv.testapp.TestAppApplication;
 import com.tw.conv.testapp.dialog.Dialog;
 import com.tw.conv.testapp.dialog.IceServersDialogFragment;
+import com.tw.conv.testapp.model.OptionModel;
 import com.tw.conv.testapp.model.TwilioIceResponse;
 import com.tw.conv.testapp.model.TwilioIceServer;
 import com.tw.conv.testapp.util.IceOptionsHelper;
@@ -41,6 +42,9 @@ import net.hockeyapp.android.UpdateManager;
 
 import java.util.List;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
 import retrofit.Callback;
 import retrofit.RetrofitError;
 import retrofit.client.Response;
@@ -60,51 +64,42 @@ public class RegistrationActivity extends AppCompatActivity {
     private static final String ICE_OPTIONS_DIALOG = "IceOptionsDialog";
 
     private SharedPreferences sharedPreferences;
-    private EditText usernameEditText;
-    private Button registrationButton;
+
     private ProgressDialog progressDialog;
-    private TextView versionText;
-    private Spinner realmSpinner;
-    private ArrayAdapter<CharSequence> spinnerAdapter;
-    private CheckBox preferH264Checkbox;
-    private CheckBox autoAcceptCheckbox;
-    private CheckBox autoRegisterCheckbox;
-    private CheckBox useHeadsetCheckbox;
-    private CheckBox logoutWhenConvEndsCheckbox;
     private ProgressDialog iceServerProgressDialog;
+    private ArrayAdapter<CharSequence> spinnerAdapter;
     private TwilioIceResponse twilioIceResponse;
     private List<TwilioIceServer> selectedTwilioIceServers;
     private String iceTransportPolicy = "";
-    private Button iceOptionsButton;
     private IceServersDialogFragment iceOptionsDialog;
+
+
+    @BindView(R.id.username_edittext) EditText usernameEditText;
+    @BindView(R.id.registration_button) Button registrationButton;
+    @BindView(R.id.version_textview) TextView versionText;
+    @BindView(R.id.realm_spinner) Spinner realmSpinner;
+    @BindView(R.id.prefer_h264_checkbox) CheckBox preferH264Checkbox;
+    @BindView(R.id.auto_accept_checkbox) CheckBox autoAcceptCheckbox;
+    @BindView(R.id.auto_register_checkbox) CheckBox autoRegisterCheckbox;
+    @BindView(R.id.use_headset_checkbox) CheckBox useHeadsetCheckbox;
+    @BindView(R.id.logout_when_conv_ends_checkbox) CheckBox logoutWhenConvEndsCheckbox;
+    @BindView(R.id.ice_options_button) Button iceOptionsButton;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_registration);
+        ButterKnife.bind(this);
 
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
 
-        usernameEditText = (EditText)findViewById(R.id.username_edittext);
-        registrationButton = (Button)findViewById(R.id.registration_button);
-        versionText = (TextView)findViewById(R.id.version_textview);
-
         versionText.setText(BuildConfig.VERSION_NAME);
 
-        realmSpinner = (Spinner)findViewById(R.id.realm_spinner);
-        preferH264Checkbox = (CheckBox) findViewById(R.id.prefer_h264_checkbox);
-        autoAcceptCheckbox = (CheckBox) findViewById(R.id.auto_accept_checkbox);
-        autoRegisterCheckbox = (CheckBox) findViewById(R.id.auto_register_checkbox);
-        useHeadsetCheckbox = (CheckBox) findViewById(R.id.use_headset_checkbox);
-        logoutWhenConvEndsCheckbox = (CheckBox) findViewById(R.id.logout_when_conv_ends_checkbox);
         spinnerAdapter = ArrayAdapter.createFromResource(this,
                         R.array.realm_array, android.R.layout.simple_spinner_dropdown_item);
         spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         realmSpinner.setAdapter(spinnerAdapter);
-        iceOptionsButton = (Button)findViewById(R.id.ice_options_button);
-        iceOptionsButton.setOnClickListener(iceOptionsButtonClickListener());
-
-        registrationButton.setOnClickListener(registrationClickListener());
 
         if (!checkPermissions()) {
             requestPermissions();
@@ -193,23 +188,18 @@ public class RegistrationActivity extends AppCompatActivity {
         }
     }
 
-    private View.OnClickListener registrationClickListener() {
-        return new View.OnClickListener() {
-
-            @Override
-            public void onClick(View view) {
-                progressDialog = ProgressDialog.show(RegistrationActivity.this, null,
-                        "Registering with Twilio", true);
-                String username = usernameEditText.getText().toString();
-                if(username != null && username.length() != 0) {
-                    hideKeyboard();
-                    registerUser(username);
-                } else {
-                    view.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS);
-                    progressDialog.dismiss();
-                }
-            }
-        };
+    @OnClick(R.id.registration_button)
+    void register(View view) {
+        progressDialog = ProgressDialog.show(RegistrationActivity.this, null,
+                "Registering with Twilio", true);
+        String username = usernameEditText.getText().toString();
+        if(username != null && username.length() != 0) {
+            hideKeyboard();
+            registerUser(username);
+        } else {
+            view.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS);
+            progressDialog.dismiss();
+        }
     }
 
     private void hideKeyboard() {
@@ -267,21 +257,17 @@ public class RegistrationActivity extends AppCompatActivity {
 
     }
 
-    private View.OnClickListener iceOptionsButtonClickListener() {
-        return new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (twilioIceResponse != null) {
-                    showIceDialog();
-                } else {
-                    iceServerProgressDialog = ProgressDialog.show(
-                            RegistrationActivity.this, null,
-                            "Obtaining Twilio ICE Servers", true);
-                    obtainTwilioIceServers(RegistrationActivity.this
-                            .realmSpinner.getSelectedItem().toString().toLowerCase());
-                }
-            }
-        };
+    @OnClick(R.id.ice_options_button)
+    void changeIceOptions(View view) {
+        if (twilioIceResponse != null) {
+            showIceDialog();
+        } else {
+            iceServerProgressDialog = ProgressDialog.show(
+                    RegistrationActivity.this, null,
+                    "Obtaining Twilio ICE Servers", true);
+            obtainTwilioIceServers(RegistrationActivity.this
+                    .realmSpinner.getSelectedItem().toString().toLowerCase());
+        }
     }
 
     private void showIceDialog(){
@@ -292,8 +278,8 @@ public class RegistrationActivity extends AppCompatActivity {
         iceOptionsDialog.show(getSupportFragmentManager(), ICE_OPTIONS_DIALOG);
     }
 
-    private IceServersDialogFragment.IceServersDialogListener iceOptionsDialogListener() {
-        return new IceServersDialogFragment.IceServersDialogListener() {
+    private IceServersDialogFragment.Listener iceOptionsDialogListener() {
+        return new IceServersDialogFragment.Listener() {
             @Override
             public void onIceOptionsSelected(String iceTransportPolicy,
                                              List<TwilioIceServer> selectedServers) {
@@ -389,7 +375,7 @@ public class RegistrationActivity extends AppCompatActivity {
         intent.putExtra(TwilioIceResponse.ICE_TRANSPORT_POLICY, iceTransportPolicy);
         intent.putExtra(ClientActivity.OPTION_AUTO_ACCEPT_KEY, autoAcceptCheckbox.isChecked());
         intent.putExtra(ClientActivity.OPTION_USE_HEADSET_KEY, useHeadsetCheckbox.isChecked());
-        intent.putExtra(ClientActivity.OPTION_PREFER_H264_KEY, preferH264Checkbox.isChecked());
+        intent.putExtra(OptionModel.OPTION_PREFER_H264_KEY, preferH264Checkbox.isChecked());
         intent.putExtra(
                 ClientActivity.OPTION_LOGOUT_WHEN_CONV_ENDS_KEY,
                 logoutWhenConvEndsCheckbox.isChecked());

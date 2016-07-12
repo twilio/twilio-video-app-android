@@ -1,8 +1,6 @@
 package com.tw.conv.testapp;
 
 import android.app.Application;
-import android.support.design.widget.Snackbar;
-import android.widget.Toast;
 
 import com.twilio.conversations.TwilioConversationsClient;
 

@@ -164,9 +164,13 @@ public class CameraCapturer {
      */
     public synchronized boolean switchCamera() {
         if(capturerState.equals(CapturerState.PREVIEWING)) {
+            // Stop preview actually nulls out the preview container so we cache a ref here
+            ViewGroup previewContainer = this.previewContainer;
             stopPreview();
             cameraId = (cameraId + 1) % Camera.getNumberOfCameras();
-            startPreviewInternal();
+
+            // Restart the preview with the old container
+            startPreview(previewContainer);
             return true;
         } else if (capturerState.equals(CapturerState.BROADCASTING) &&
                 !broadcastCapturerPaused) {

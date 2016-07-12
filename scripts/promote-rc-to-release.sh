@@ -1,4 +1,4 @@
-# This script is used to promote an RC to Release. It pulls down the RC from stage CDN and uploads it to prod CDN using the sdk release tool.
+#!/bin/bash
 
 export LANG=en_US.UTF-8;
 export PATH=/usr/local/bin:$PATH
@@ -61,6 +61,6 @@ mkdir ${SCRIPTS_DIR}/downloads
 DIRECT_URL="https://media.twiliocdn.com/sdk/android/conversations/releases/${SDK_RELEASE_VERSION}/twilio-conversations-android-${SDK_RELEASE_VERSION}.aar"
 
 curl $DIRECT_URL --output ${SCRIPTS_DIR}/downloads/twilio-conversations-direct.aar
-md5 ${SDK_PACKAGE_PATH}/dist/${SDK_RELEASE_VERSION}/twilio-conversations-android.aar ${SCRIPTS_DIR}/downloads/twilio-conversations-direct.aar
+md5sum ${SDK_PACKAGE_PATH}/dist/${SDK_RELEASE_VERSION}/twilio-conversations-android.aar ${SCRIPTS_DIR}/downloads/twilio-conversations-direct.aar
 
 popd

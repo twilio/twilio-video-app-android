@@ -1,4 +1,4 @@
-#This script is used to pin prod release to latest.
+#!/bin/bash
 
 export LANG=en_US.UTF-8;
 export PATH=/usr/local/bin:$PATH
@@ -56,7 +56,7 @@ echo "Testing whether versions are same..."
 curl -L $MAJORMINOR_URL --output ${SCRIPTS_DIR}/downloads/twilio-conversations-majorminor.aar
 curl -L $LATEST_URL --output ${SCRIPTS_DIR}/downloads/twilio-conversations-latest.aar
 
-md5 ${SCRIPTS_DIR}/downloads/twilio-conversations-direct.aar ${SCRIPTS_DIR}/downloads/twilio-conversations-majorminor.aar ${SCRIPTS_DIR}/downloads/twilio-conversations-latest.aar
+md5sum ${SCRIPTS_DIR}/downloads/twilio-conversations-direct.aar ${SCRIPTS_DIR}/downloads/twilio-conversations-majorminor.aar ${SCRIPTS_DIR}/downloads/twilio-conversations-latest.aar
 popd
 
 echo "Major minor version: $MAJORMINOR"

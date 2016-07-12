@@ -12,6 +12,9 @@ import com.twilio.conversations.RemoteVideoTrackStatsRecord;
 
 import java.util.LinkedHashMap;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+
 public class RemoteVideoTrackStatsAdapter extends RecyclerView.Adapter<RemoteVideoTrackStatsAdapter.ViewHolder> {
 
     private LinkedHashMap<String, RemoteVideoTrackStatsRecord> statsRecordMap;
@@ -60,13 +63,12 @@ public class RemoteVideoTrackStatsAdapter extends RecyclerView.Adapter<RemoteVid
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
-        public TextView title;
-        public TextView stats;
+        public @BindView(R.id.video_track_title_textview) TextView title;
+        public @BindView(R.id.video_track_stats_textview) TextView stats;
 
         public ViewHolder(View itemView) {
             super(itemView);
-            title = (TextView) itemView.findViewById(R.id.video_track_title_textview);
-            stats = (TextView) itemView.findViewById(R.id.video_track_stats_textview);
+            ButterKnife.bind(this, itemView);
         }
     }
 
