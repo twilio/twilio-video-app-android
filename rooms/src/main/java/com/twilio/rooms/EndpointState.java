@@ -1,0 +1,12 @@
+package com.twilio.rooms;
+
+enum EndpointState {
+    INITIALIZED,
+    REGISTERING,
+    REGISTERED,
+    REGISTRATION_FAILED,
+    UNREGISTERING,
+    UNREGISTERED,
+    UNREGISTRATION_FAILED,
+    RECONNECTING
+}
