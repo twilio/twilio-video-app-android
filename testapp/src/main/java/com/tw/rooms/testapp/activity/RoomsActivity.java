@@ -116,6 +116,12 @@ public class RoomsActivity extends AppCompatActivity {
 
     private void startClient(String capabilityToken) {
         Timber.i("Start Client");
+
+        Snackbar.make(registrationButton,
+                "Starting the client...",
+                Snackbar.LENGTH_LONG)
+                .setAction("Action", null).show();
+
         AccessManager accessManager = new AccessManager(this, capabilityToken, null);
         RoomsClient roomsClient = new RoomsClient(this, accessManager, new RoomsClient.Listener() {
             @Override

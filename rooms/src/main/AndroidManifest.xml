@@ -3,7 +3,5 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.twilio.rooms">
 
-    <application>
-        <receiver android:name="com.twilio.rooms.WakeUpReceiver" />
-    </application>
+    <application></application>
 </manifest>

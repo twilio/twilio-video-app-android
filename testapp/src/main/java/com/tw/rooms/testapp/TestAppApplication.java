@@ -2,12 +2,10 @@ package com.tw.rooms.testapp;
 
 import android.app.Application;
 
-import com.twilio.rooms.TwilioConversationsClient;
-
 import timber.log.Timber;
 
 public class TestAppApplication extends Application {
-    public static final String HOCKEY_APP_ID = "f6f18860be18f5addf08df70c3760c2c";
+    public static final String HOCKEY_APP_ID = "11347c1df4dc4a929a1f6637fcbe64dc";
 
     @Override
     public void onCreate() {
@@ -17,11 +15,5 @@ public class TestAppApplication extends Application {
             Timber.plant(new Timber.DebugTree());
         }
 
-        // We initialize the sdk here in case the application was destroyed
-        if(!TwilioConversationsClient.isInitialized()) {
-            Timber.d("Initializing conversations from application context");
-            TwilioConversationsClient.initialize(this);
-            Timber.d("Successfully initialized conversations");
-        }
     }
 }
