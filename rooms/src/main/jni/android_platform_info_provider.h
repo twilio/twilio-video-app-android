@@ -4,22 +4,21 @@
 #include <jni.h>
 #include <string.h>
 #include "TSCoreSDKTypes.h"
-#include "TSCPlatformDataProvider.h"
-#include "TSCPlatformInfoReport.h"
+#include "PlatformInfoProvider.h"
 
 #include "webrtc/api/java/jni/jni_helpers.h"
 
 using namespace webrtc_jni;
 using namespace twiliosdk;
 
-class AndroidPlatformInfoProvider : public TSCPlatformDataProvider {
+class AndroidPlatformInfoProvider : public PlatformInfoProvider {
 
 public:
     AndroidPlatformInfoProvider(JNIEnv* jni, jobject context);
 
     virtual ~AndroidPlatformInfoProvider() {}
 
-    virtual const TSCPlatformInfoReport getReport() const;
+    virtual const PlatformInfo getReport() const;
 
 private:
     std::string callStringMethod(jmethodID methodId, bool useContext = false) const;
