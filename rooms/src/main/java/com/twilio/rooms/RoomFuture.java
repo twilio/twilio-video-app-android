@@ -1,9 +1,10 @@
 package com.twilio.rooms;
 
 public class RoomFuture {
+    private long nativeRoomFutureHandle;
 
-    RoomFuture(Room room) {
-        // TODO: implement me
+    RoomFuture(long nativeRoomFutureHandle) {
+        this.nativeRoomFutureHandle = nativeRoomFutureHandle;
     }
 
     public void cancel() {

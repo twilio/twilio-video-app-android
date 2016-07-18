@@ -18,6 +18,7 @@ import com.tw.rooms.testapp.BuildConfig;
 import com.tw.rooms.testapp.R;
 import com.tw.rooms.testapp.util.SimpleSignalingUtils;
 import com.twilio.common.AccessManager;
+import com.twilio.rooms.Participant;
 import com.twilio.rooms.RoomsClient;
 import com.twilio.rooms.Room;
 import com.twilio.rooms.RoomsException;
@@ -140,7 +141,17 @@ public class RoomsActivity extends AppCompatActivity {
             }
         });
 
-        // TODO: call connect
+        roomsClient.connect(new Room.Listener() {
+            @Override
+            public void onParticipantConnected(Room room, Participant participant) {
+
+            }
+
+            @Override
+            public void onParticipantDisconnected(Room room, Participant participant) {
+
+            }
+        });
     }
 
 }
