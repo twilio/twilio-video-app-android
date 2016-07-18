@@ -90,9 +90,10 @@ public class RoomsClient {
     private static volatile boolean libraryIsLoaded = false;
     private static final Logger logger = Logger.getLogger(RoomsClient.class);
 
-    private Handler handler;
+    private final Handler handler;
     private final Context applicationContext;
     private Listener listener;
+    private ClientListenerHandle clientListenerHandle;
     private AccessManager accessManager;
     private Map<String, Room> rooms;
 
@@ -103,12 +104,14 @@ public class RoomsClient {
         if(accessManager == null) {
             throw new NullPointerException("accessManager must not be null");
         }
+        if(listener == null) {
+            throw new NullPointerException("listener must not be null");
+        }
 
         this.applicationContext = context.getApplicationContext();
         this.accessManager = accessManager;
         this.listener = listener;
-
-        handler = Util.createCallbackHandler();
+        this.handler = Util.createCallbackHandler();
 
         checkPermissions(context);
 
@@ -132,6 +135,7 @@ public class RoomsClient {
             trySetCoreModuleLogLevel(module.ordinal(), moduleLogLevel.get(module).ordinal());
         }
 
+        clientListenerHandle = new ClientListenerHandle(listener);
     }
 
     /**
@@ -182,8 +186,8 @@ public class RoomsClient {
     }
 
     public RoomFuture connect(Room.Listener listener) {
-        // TODO: implement me
-        return null;
+        long nativeRoomFutureHandle = nativeConnect(accessManager.getToken(), clientListenerHandle.get());
+        return new RoomFuture(nativeRoomFutureHandle) ;
     }
 
     public RoomFuture connect(ConnectOptions connectOptions, Room.Listener listener) {
@@ -342,8 +346,21 @@ public class RoomsClient {
         }
     }
 
+    class ClientListenerHandle extends NativeHandle {
+
+        public ClientListenerHandle(RoomsClient.Listener listener) {
+            super(listener);
+        }
+
+        @Override
+        native protected long nativeCreate(Object object);
+
+        @Override
+        native protected void nativeFree(long nativeHandle);
+    }
+
     private native static void nativeSetCoreLogLevel(int level);
     private native static void nativeSetModuleLevel(int module, int level);
     private native static int nativeGetCoreLogLevel();
-
+    private native long nativeConnect(String token, long nativeClientListenerHandle);
 }

@@ -6,7 +6,6 @@
 #include "TSCoreSDKTypes.h"
 #include "TSCoreError.h"
 #include "TSCLogger.h"
-#include "TSCEndpoint.h"
 #include "TSCSession.h"
 
 using namespace twiliosdk;
