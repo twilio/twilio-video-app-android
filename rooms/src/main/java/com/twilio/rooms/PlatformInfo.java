@@ -85,7 +85,7 @@ public final class PlatformInfo {
     }
 
     static String getRtcPlatformSdkVersion() {
-        return TwilioConversationsClient.getVersion();
+        return RoomsClient.getVersion();
     }
 
     static String getOsArch() {

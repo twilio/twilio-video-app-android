@@ -60,8 +60,8 @@ AndroidPlatformInfoProvider::AndroidPlatformInfoProvider(JNIEnv* jni, jobject co
                                   "()Ljava/lang/String;"))
 {}
 
-const TSCPlatformInfoReport AndroidPlatformInfoProvider::getReport() const {
-    TSCPlatformInfoReport report;
+const PlatformInfo AndroidPlatformInfoProvider::getReport() const {
+    PlatformInfo report;
     report.platformName = this->callStringMethod(j_getPlatfomName_id);
     report.platformVersion = this->callStringMethod(j_getPlatformVersion_id);
     report.hwDeviceManufacturer = this->callStringMethod(j_getHwDeviceManufacturer_id);
@@ -98,7 +98,6 @@ std::string AndroidPlatformInfoProvider::callStringMethod(jmethodID methodId,
     return result;
 }
 
-// Let's hope we have less then 2^31 processors :-)
 unsigned int AndroidPlatformInfoProvider::callUnsignedIntMethod(jmethodID methodId) const {
     JNIEnv* jni = AttachCurrentThreadIfNeeded();
     jint result = (jint)jni->CallStaticIntMethod(*j_platform_info_class_, methodId);

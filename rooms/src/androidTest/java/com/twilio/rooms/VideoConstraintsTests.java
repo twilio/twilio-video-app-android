@@ -1,29 +1,19 @@
 package com.twilio.rooms;
 
 import android.content.Context;
-import android.support.test.InstrumentationRegistry;
 import android.support.test.filters.LargeTest;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
 
-import com.twilio.common.AccessManager;
-import com.twilio.rooms.activity.TwilioConversationsActivity;
-import com.twilio.rooms.helper.AccessTokenHelper;
+import com.twilio.rooms.activity.RoomsTestActivity;
 import com.twilio.rooms.helper.CameraCapturerHelper;
-import com.twilio.rooms.helper.TwilioConversationsClientHelper;
 import com.twilio.rooms.helper.OSLevelHelper;
-import com.twilio.rooms.helper.TwilioConversationsHelper;
-import com.twilio.rooms.helper.TwilioConversationsTestsBase;
 
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import java.util.HashSet;
-import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
@@ -34,23 +24,11 @@ import static junit.framework.Assert.fail;
 @RunWith(AndroidJUnit4.class)
 @LargeTest
 @Ignore
-public class VideoConstraintsTests extends TwilioConversationsTestsBase {
-    private static final String SELF_TEST_USER = "SELF_TEST_USER";
-    private Context context;
+public class VideoConstraintsTests {
 
     @Rule
-    public ActivityTestRule<TwilioConversationsActivity> activityRule = new ActivityTestRule<>(
-            TwilioConversationsActivity.class);
-
-    @Before
-    public void setup() {
-        context = InstrumentationRegistry.getContext();
-    }
-
-    @After
-    public void teardown() {
-        TwilioConversationsHelper.destroy();
-    }
+    public ActivityTestRule<RoomsTestActivity> activityRule = new ActivityTestRule<>(
+            RoomsTestActivity.class);
 
     @Test(expected = NullPointerException.class)
     public void localVideoTrackWithNullVideoConstraints() {
@@ -76,11 +54,6 @@ public class VideoConstraintsTests extends TwilioConversationsTestsBase {
             return;
         }
 
-        TwilioConversationsClient.setLogLevel(LogLevel.DEBUG);
-
-        AccessManager twilioAccessManager = AccessTokenHelper.obtainAccessManager(context, SELF_TEST_USER);
-        TwilioConversationsClient twilioConversationsClient = TwilioConversationsClientHelper.registerClient(activityRule.getActivity(), twilioAccessManager);
-
         final CountDownLatch localVideoTrackFailedLatch = new CountDownLatch(1);
 
         LocalVideoTrack localVideoTrack = createLocalVideoTrackWithVideoConstraints(
@@ -102,71 +75,14 @@ public class VideoConstraintsTests extends TwilioConversationsTestsBase {
             }
 
             @Override
-            public void onLocalVideoTrackError(LocalMedia localMedia, LocalVideoTrack track, TwilioConversationsException exception) {
+            public void onLocalVideoTrackError(LocalMedia localMedia, LocalVideoTrack track, RoomsException exception) {
                 localVideoTrackFailedLatch.countDown();
             }
         });
 
         localMedia.addLocalVideoTrack(localVideoTrack);
 
-        /**
-         * Intentionally call the user registered to this client to allow the conversation
-         * to setup its local media without requiring a remote participant.
-         */
-        Set<String> participants = new HashSet<>();
-        participants.add(SELF_TEST_USER);
-
-        final CountDownLatch conversationEndsWhenInviteCancelled = new CountDownLatch(1);
-        final OutgoingInvite outgoingInvite = twilioConversationsClient
-                .inviteToConversation(participants, localMedia, new ConversationCallback() {
-                    @Override
-                    public void onConversation(final Conversation conversation,
-                                               TwilioConversationsException exception) {
-                        // The outgoing invite is cancelled and reported as an exception here
-                        assertNotNull(exception);
-                        conversationEndsWhenInviteCancelled.countDown();
-                    }
-                });
-
-        /**
-         * Set a new conversations client listener to handle the stop listening for invites event here
-         */
-        twilioConversationsClient.setListener(new TwilioConversationsClient.Listener() {
-            @Override
-            public void onStartListeningForInvites(TwilioConversationsClient twilioConversationsClient) {
-
-            }
-
-            @Override
-            public void onStopListeningForInvites(TwilioConversationsClient twilioConversationsClient) {
-                outgoingInvite.cancel();
-            }
-
-            @Override
-            public void onFailedToStartListening(TwilioConversationsClient twilioConversationsClient,
-                                                 TwilioConversationsException exception) {
-
-            }
-
-            @Override
-            public void onIncomingInvite(TwilioConversationsClient twilioConversationsClient,
-                                         IncomingInvite incomingInvite) {
-
-            }
-
-            @Override
-            public void onIncomingInviteCancelled(TwilioConversationsClient twilioConversationsClient,
-                                                  IncomingInvite incomingInvite) {
-
-            }
-        });
-
         assertTrue(localVideoTrackFailedLatch.await(20, TimeUnit.SECONDS));
-
-        twilioConversationsClient.unlisten();
-
-        assertTrue(conversationEndsWhenInviteCancelled.await(20, TimeUnit.SECONDS));
-
     }
 
     @Test
@@ -175,11 +91,6 @@ public class VideoConstraintsTests extends TwilioConversationsTestsBase {
         if(OSLevelHelper.requiresRuntimePermissions()) {
             return;
         }
-
-        TwilioConversationsClient.setLogLevel(LogLevel.DEBUG);
-
-        AccessManager twilioAccessManager = AccessTokenHelper.obtainAccessManager(context, SELF_TEST_USER);
-        TwilioConversationsClient twilioConversationsClient = TwilioConversationsClientHelper.registerClient(activityRule.getActivity(), twilioAccessManager);
 
         final CountDownLatch localVideoTrackAddedLatch = new CountDownLatch(1);
         final CountDownLatch localVideoTrackRemovedLatch = new CountDownLatch(1);
@@ -205,68 +116,16 @@ public class VideoConstraintsTests extends TwilioConversationsTestsBase {
             @Override
             public void onLocalVideoTrackError(LocalMedia localMedia,
                                                LocalVideoTrack track,
-                                               TwilioConversationsException exception) {
+                                               RoomsException exception) {
                 fail();
             }
         });
 
         localMedia.addLocalVideoTrack(localVideoTrack);
 
-        /*
-         * Intentionally call the user registered to this client to allow the conversation
-         * to setup its local media without requiring a remote participant.
-         */
-        Set<String> participants = new HashSet<>();
-        participants.add(SELF_TEST_USER);
-
-        final CountDownLatch conversationEndsWhenInviteCancelled = new CountDownLatch(1);
-        final OutgoingInvite outgoingInvite = twilioConversationsClient.inviteToConversation(participants, localMedia, new ConversationCallback() {
-            @Override
-            public void onConversation(final Conversation conversation, TwilioConversationsException exception) {
-                // The outgoing invite is cancelled and reported as an exception here
-                assertNotNull(exception);
-                conversationEndsWhenInviteCancelled.countDown();
-            }
-        });
-
-        /**
-         * Set a new conversations client listener to handle the stop listening for invites event here
-         */
-        twilioConversationsClient.setListener(new TwilioConversationsClient.Listener() {
-            @Override
-            public void onStartListeningForInvites(TwilioConversationsClient twilioConversationsClient) {
-
-            }
-
-            @Override
-            public void onStopListeningForInvites(TwilioConversationsClient twilioConversationsClient) {
-                outgoingInvite.cancel();
-            }
-
-            @Override
-            public void onFailedToStartListening(TwilioConversationsClient twilioConversationsClient, TwilioConversationsException exception) {
-
-            }
-
-            @Override
-            public void onIncomingInvite(TwilioConversationsClient twilioConversationsClient, IncomingInvite incomingInvite) {
-
-            }
-
-            @Override
-            public void onIncomingInviteCancelled(TwilioConversationsClient twilioConversationsClient, IncomingInvite incomingInvite) {
-
-            }
-        });
-
         assertTrue(localVideoTrackAddedLatch.await(20, TimeUnit.SECONDS));
 
-        twilioConversationsClient.unlisten();
-
         assertTrue(localVideoTrackRemovedLatch.await(20, TimeUnit.SECONDS));
-
-        assertTrue(conversationEndsWhenInviteCancelled.await(20, TimeUnit.SECONDS));
-
     }
 
     private LocalVideoTrack createLocalVideoTrackWithVideoConstraints(Context context, VideoConstraints videoConstraints) throws InterruptedException {

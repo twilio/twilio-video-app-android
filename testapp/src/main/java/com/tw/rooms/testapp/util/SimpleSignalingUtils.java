@@ -16,8 +16,6 @@ import retrofit.http.GET;
 import retrofit.http.QueryMap;
 
 public class SimpleSignalingUtils {
-    public static final String CAPABILITY_TOKEN = "capability_token";
-    public static final String USERNAME = "username";
     public static final String REALM = "realm";
     /*
      * The default is usually 30 minutes. We are intentionally setting it to 5 minutes to validate

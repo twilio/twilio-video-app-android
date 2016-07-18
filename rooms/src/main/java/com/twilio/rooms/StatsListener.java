@@ -12,41 +12,41 @@ public interface StatsListener {
     /**
      * This method notifies the listener when statistics are received for a local audio track.
      *
-     * @param conversation The conversation
+     * @param room The room
      * @param participant The participant
      * @param trackStatsRecord Local audio track statistics.
      */
-    void onLocalAudioTrackStatsRecord(Conversation conversation, Participant participant,
+    void onLocalAudioTrackStatsRecord(Room room, Participant participant,
                                       LocalAudioTrackStatsRecord trackStatsRecord);
 
     /**
      * This method notifies the listener when statistics are received for a local video track.
      *
-     * @param conversation The conversation
+     * @param room The room
      * @param participant The participant
      * @param trackStatsRecord Local video track statistics.
      */
-    void onLocalVideoTrackStatsRecord(Conversation conversation, Participant participant,
+    void onLocalVideoTrackStatsRecord(Room room, Participant participant,
                                       LocalVideoTrackStatsRecord trackStatsRecord);
 
     /**
      * This method notifies the listener when statistics are received for a remote audio track.
      *
-     * @param conversation The conversation
+     * @param room The room
      * @param participant The participant
      * @param trackStatsRecord Remote audio track statistics.
      */
-    void onRemoteAudioTrackStatsRecord(Conversation conversation, Participant participant,
+    void onRemoteAudioTrackStatsRecord(Room room, Participant participant,
                                        RemoteAudioTrackStatsRecord trackStatsRecord);
 
     /**
      * This method notifies the listener when statistics are received for a remote video track.
      *
-     * @param conversation The conversation
+     * @param room The room
      * @param participant The participant
      * @param trackStatsRecord Remote video track statistics.
      */
-    void onRemoteVideoTrackStatsRecord(Conversation conversation, Participant participant,
+    void onRemoteVideoTrackStatsRecord(Room room, Participant participant,
                                        RemoteVideoTrackStatsRecord trackStatsRecord);
 
 }
