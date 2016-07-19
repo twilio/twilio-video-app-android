@@ -188,7 +188,7 @@ public class RoomsClient {
     }
 
     public RoomFuture connect(Room.Listener listener) {
-        long nativeRoomFutureHandle = nativeConnect(accessManager.getToken(), clientListenerHandle.get());
+        long nativeRoomFutureHandle = nativeConnect(applicationContext, accessManager.getToken(), clientListenerHandle.get());
         return new RoomFuture(nativeRoomFutureHandle) ;
     }
 
@@ -365,5 +365,5 @@ public class RoomsClient {
     private native static void nativeSetModuleLevel(int module, int level);
     private native static int nativeGetCoreLogLevel();
     private native long nativeInitCore(Context context);
-    private native long nativeConnect(String token, long nativeClientListenerHandle);
+    private native long nativeConnect(Context context, String token, long nativeClientListenerHandle);
 }

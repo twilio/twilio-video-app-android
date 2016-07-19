@@ -7,6 +7,9 @@
 #include "TSCoreConstants.h"
 #include "rooms.h"
 #include "client_observer.h"
+#include "TSCMediaCodecRegistry.h"
+#include "android_platform_info_provider.h"
+#include "android_video_codec_manager.h"
 
 #include "webrtc/voice_engine/include/voe_base.h"
 #include "webrtc/modules/video_capture/video_capture_internal.h"
@@ -26,10 +29,10 @@ using cricket::WebRtcVideoEncoderFactory;
 
 static bool media_jvm_set = false;
 
-class AndroidClientObserver : public rooms::ClientObserver {
+class AndroidClientObserver: public rooms::ClientObserver {
 public:
     AndroidClientObserver(JNIEnv *env, jobject j_client_observer) :
-            j_client_observer_(env, j_client_observer) {
+        j_client_observer_(env, j_client_observer) {
         TS_CORE_LOG_MODULE(kTSCoreLogModulePlatform,
                            kTSCoreLogLevelDebug,
                            "AndroidClientObserver");
@@ -123,17 +126,17 @@ extern "C" void JNIEXPORT JNICALL JNI_OnUnLoad(JavaVM *jvm, void *reserved) {
 }
 
 JNIEXPORT void JNICALL Java_com_twilio_rooms_RoomsClient_nativeSetCoreLogLevel
-        (JNIEnv *, jobject, jint) {
+    (JNIEnv *, jobject, jint) {
     // TODO: implement me
 }
 
 JNIEXPORT void JNICALL Java_com_twilio_rooms_RoomsClient_nativeSetModuleLevel
-        (JNIEnv *, jobject, jint, jint) {
+    (JNIEnv *, jobject, jint, jint) {
     // TODO: implement me
 }
 
 JNIEXPORT jint JNICALL Java_com_twilio_rooms_RoomsClient_nativeGetCoreLogLevel
-        (JNIEnv *, jobject) {
+    (JNIEnv *, jobject) {
     return 0;
 }
 
@@ -142,6 +145,7 @@ JNIEXPORT jboolean JNICALL
 Java_com_twilio_rooms_RoomsClient_nativeInitCore(JNIEnv *env, jobject instance, jobject context) {
     bool failure = false;
 
+    // Setup media related Android device objects
     if (!media_jvm_set) {
         failure |= webrtc::OpenSLESPlayer::SetAndroidAudioDeviceObjects(GetJVM(), context);
         failure |= webrtc::VoiceEngine::SetAndroidObjects(GetJVM(), context);
@@ -149,21 +153,34 @@ Java_com_twilio_rooms_RoomsClient_nativeInitCore(JNIEnv *env, jobject instance, 
         media_jvm_set = true;
     }
 
-    // TODO: Decide whether we need failure or success
     return failure ? JNI_FALSE : JNI_TRUE;
 }
 
 JNIEXPORT jlong JNICALL
-Java_com_twilio_rooms_RoomsClient_nativeConnect(JNIEnv *env, jobject instance, jstring tokenString,
+Java_com_twilio_rooms_RoomsClient_nativeConnect(JNIEnv *env,
+                                                jobject instance,
+                                                jobject context,
+                                                jstring tokenString,
                                                 jlong android_client_observer_handle) {
-
+    // Lazily initialize the core relying on a disconnect as the condition used to destroy the core
     twiliosdk::TSCSDK *sdk = new twiliosdk::TSCSDK();
 
-    std::string token = webrtc_jni::JavaToStdString(env, tokenString);
-    std::shared_ptr<TwilioCommon::AccessManager> access_manager = TwilioCommon::AccessManager::create(
-            token, nullptr);
+    AndroidPlatformInfoProvider provider(env, context);
+    sdk->setPlatformInfo(provider.getReport());
 
-    AndroidClientObserver *android_client_observer = reinterpret_cast<AndroidClientObserver *>(android_client_observer_handle);
+    TSCVideoCodecRef androidVideoCodecManager =
+        new rtc::RefCountedObject<AndroidVideoCodecManager>();
+    TSCMediaCodecRegistry &codecManager = sdk->getMediaCodecRegistry();
+    codecManager.registerVideoCodec(androidVideoCodecManager);
+
+    // Connect to a room
+    std::string token = webrtc_jni::JavaToStdString(env, tokenString);
+    std::shared_ptr<TwilioCommon::AccessManager>
+        access_manager = TwilioCommon::AccessManager::create(
+        token, nullptr);
+
+    AndroidClientObserver *android_client_observer =
+        reinterpret_cast<AndroidClientObserver *>(android_client_observer_handle);
     std::shared_ptr<rooms::ClientObserver> client_observer(android_client_observer);
 
     std::shared_ptr<media::MediaStack> media_stack(new media::MediaStack());
@@ -198,7 +215,8 @@ Java_com_twilio_rooms_RoomsClient_00024ClientListenerHandle_nativeFree(JNIEnv *e
                                                                        jlong nativeHandle) {
     TS_CORE_LOG_MODULE(kTSCoreLogModulePlatform, kTSCoreLogLevelDebug,
                        "Free native ClientObserver");
-    AndroidClientObserver *androidClientObserver = reinterpret_cast<AndroidClientObserver *>(nativeHandle);
+    AndroidClientObserver
+        *androidClientObserver = reinterpret_cast<AndroidClientObserver *>(nativeHandle);
     if (androidClientObserver != nullptr) {
         androidClientObserver->setObserverDeleted();
         delete androidClientObserver;
