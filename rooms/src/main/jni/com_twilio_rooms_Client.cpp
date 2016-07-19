@@ -28,26 +28,6 @@ using namespace webrtc_jni;
 
 static bool media_jvm_set = false;
 
-class ClientDataHolder {
-public:
-    ClientDataHolder(std::unique_ptr<rooms::Client> client,
-                     std::shared_ptr<rooms::ClientObserver> client_observer,
-                     std::shared_ptr<TwilioCommon::AccessManager> access_manager,
-                     std::shared_ptr<media::MediaStack> media_stack) {
-        client_ = std::move(client);
-        client_observer_ = client_observer;
-        access_manager_ = access_manager;
-        media_stack_ = media_stack;
-    }
-
-private:
-    std::unique_ptr<rooms::Client> client_;
-    std::shared_ptr<rooms::ClientObserver> client_observer_;
-    std::shared_ptr<TwilioCommon::AccessManager> access_manager_;
-    std::shared_ptr<media::MediaStack> media_stack_;
-
-};
-
 extern "C" jint JNIEXPORT JNICALL JNI_OnLoad(JavaVM *jvm, void *reserved) {
     TS_CORE_LOG_MODULE(kTSCoreLogModulePlatform, kTSCoreLogLevelDebug, "JNI_OnLoad");
     jint ret = InitGlobalJniVariables(jvm);
@@ -82,9 +62,8 @@ JNIEXPORT jint JNICALL Java_com_twilio_rooms_RoomsClient_nativeGetCoreLogLevel
     return 0;
 }
 
-
 JNIEXPORT jboolean JNICALL
-Java_com_twilio_rooms_RoomsClient_nativeInitCore(JNIEnv *env, jobject instance, jobject context) {
+Java_com_twilio_rooms_RoomsClient_nativeInitialize(JNIEnv *env, jobject instance, jobject context) {
     bool failure = false;
 
     // Setup media related Android device objects
@@ -97,6 +76,26 @@ Java_com_twilio_rooms_RoomsClient_nativeInitCore(JNIEnv *env, jobject instance, 
 
     return failure ? JNI_FALSE : JNI_TRUE;
 }
+
+class ClientDataHolder {
+public:
+    ClientDataHolder(std::unique_ptr<rooms::Client> client,
+                     std::shared_ptr<rooms::ClientObserver> client_observer,
+                     std::shared_ptr<TwilioCommon::AccessManager> access_manager,
+                     std::shared_ptr<media::MediaStack> media_stack) {
+        client_ = std::move(client);
+        client_observer_ = client_observer;
+        access_manager_ = access_manager;
+        media_stack_ = media_stack;
+    }
+
+private:
+    std::unique_ptr<rooms::Client> client_;
+    std::shared_ptr<rooms::ClientObserver> client_observer_;
+    std::shared_ptr<TwilioCommon::AccessManager> access_manager_;
+    std::shared_ptr<media::MediaStack> media_stack_;
+
+};
 
 JNIEXPORT jlong JNICALL
 Java_com_twilio_rooms_RoomsClient_nativeConnect(JNIEnv *env,

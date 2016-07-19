@@ -135,7 +135,7 @@ public class RoomsClient {
             trySetCoreModuleLogLevel(module.ordinal(), moduleLogLevel.get(module).ordinal());
         }
 
-        nativeInitCore(applicationContext);
+        nativeInitialize(applicationContext);
 
         clientListenerHandle = new ClientListenerHandle(listener);
     }
@@ -364,6 +364,6 @@ public class RoomsClient {
     private native static void nativeSetCoreLogLevel(int level);
     private native static void nativeSetModuleLevel(int module, int level);
     private native static int nativeGetCoreLogLevel();
-    private native long nativeInitCore(Context context);
+    private native long nativeInitialize(Context context);
     private native long nativeConnect(Context context, String token, long nativeClientListenerHandle);
 }

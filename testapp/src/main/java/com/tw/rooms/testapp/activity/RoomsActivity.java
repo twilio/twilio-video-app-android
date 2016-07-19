@@ -127,17 +127,17 @@ public class RoomsActivity extends AppCompatActivity {
         RoomsClient roomsClient = new RoomsClient(this, accessManager, new RoomsClient.Listener() {
             @Override
             public void onConnected(Room room) {
-                Timber.i("Connected to room");
+                Timber.i("onConnected");
             }
 
             @Override
             public void onConnectFailure(RoomsException error) {
-                Timber.i("Connect Failure");
+                Timber.i("onConnectFailure");
             }
 
             @Override
             public void onDisconnected(Room room, RoomsException error) {
-                Timber.i("Disconnected from room");
+                Timber.i("onDisconnected");
             }
         });
 
