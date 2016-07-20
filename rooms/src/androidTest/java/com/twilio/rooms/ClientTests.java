@@ -1,0 +1,96 @@
+package com.twilio.rooms;
+
+import android.content.Context;
+import android.support.test.InstrumentationRegistry;
+import android.support.test.filters.LargeTest;
+import android.support.test.rule.ActivityTestRule;
+import android.support.test.runner.AndroidJUnit4;
+
+import com.twilio.common.AccessManager;
+import com.twilio.rooms.activity.RoomsTestActivity;
+
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
+@RunWith(AndroidJUnit4.class)
+@LargeTest
+public class ClientTests {
+
+    private Context context;
+
+    @Rule
+    public ActivityTestRule<RoomsTestActivity> activityRule = new ActivityTestRule<>(
+            RoomsTestActivity.class);
+
+    @Before
+    public void setup() {
+        context = InstrumentationRegistry.getInstrumentation().getTargetContext();
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void client_shouldReturnNPEWhenContextIsNull() {
+        new RoomsClient(null, accessManager(), clientListener());
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void client_shouldReturnNPEWhenAccessManagerIsNull() {
+        new RoomsClient(context, null, clientListener());
+    }
+
+    @Test
+    public void client_shouldBeCreatedWhenListenerIsNull() {
+        new RoomsClient(context, accessManager(), null);
+    }
+
+    @Test
+    public void logLevel_shouldBeOff() {
+        LogLevel logLevel = RoomsClient.getLogLevel();
+        assertEquals(LogLevel.OFF, logLevel);
+    }
+
+    @Test
+    public void logLevel_shouldBeRetained() {
+        RoomsClient.setLogLevel(LogLevel.DEBUG);
+        assertEquals(LogLevel.DEBUG, RoomsClient.getLogLevel());
+    }
+
+    @Test
+    public void getVersion_shouldReturnValidSemVerFormattedVersion() {
+        String semVerRegex = "^([0-9]+)\\.([0-9]+)\\.([0-9]+)(?:-([0-9A-" +
+                "Za-z-]+(?:\\.[0-9A-Za-z-]+)*))?(?:\\+[0-9A-Za-z-]+)?$";
+        String version = RoomsClient.getVersion();
+
+        assertNotNull(version);
+        assertTrue(version.matches(semVerRegex));
+    }
+
+    private AccessManager accessManager() {
+        return new AccessManager(context, null, null);
+    }
+
+    private RoomsClient.Listener clientListener() {
+        return new RoomsClient.Listener() {
+            @Override
+            public void onConnected(Room room) {
+
+            }
+
+            @Override
+            public void onConnectFailure(RoomsException error) {
+
+            }
+
+            @Override
+            public void onDisconnected(Room room, RoomsException error) {
+
+            }
+        };
+    }
+}
+

@@ -104,9 +104,6 @@ public class RoomsClient {
         if(accessManager == null) {
             throw new NullPointerException("accessManager must not be null");
         }
-        if(listener == null) {
-            throw new NullPointerException("listener must not be null");
-        }
 
         this.applicationContext = context.getApplicationContext();
         this.accessManager = accessManager;
@@ -137,7 +134,6 @@ public class RoomsClient {
 
         nativeInitialize(applicationContext);
 
-        clientListenerHandle = new ClientListenerHandle(listener);
     }
 
     /**
@@ -187,7 +183,8 @@ public class RoomsClient {
         return audioManager.isSpeakerphoneOn() ? AudioOutput.SPEAKERPHONE : AudioOutput.HEADSET;
     }
 
-    public RoomFuture connect(Room.Listener listener) {
+    public RoomFuture connect(Room.Listener roomListener) {
+        clientListenerHandle = new ClientListenerHandle(listener);
         long nativeRoomFutureHandle = nativeConnect(applicationContext, accessManager.getToken(), clientListenerHandle.get());
         return new RoomFuture(nativeRoomFutureHandle) ;
     }
