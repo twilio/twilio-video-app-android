@@ -29,7 +29,8 @@ using namespace webrtc_jni;
 static bool media_jvm_set = false;
 
 extern "C" jint JNIEXPORT JNICALL JNI_OnLoad(JavaVM *jvm, void *reserved) {
-    TS_CORE_LOG_MODULE(kTSCoreLogModulePlatform, kTSCoreLogLevelDebug, "JNI_OnLoad");
+    std::string func_name = std::string(__FUNCTION__);
+    TS_CORE_LOG_MODULE(kTSCoreLogModulePlatform, kTSCoreLogLevelDebug, "%s", func_name.c_str());
     jint ret = InitGlobalJniVariables(jvm);
     if (ret < 0) {
         TS_CORE_LOG_MODULE(kTSCoreLogModulePlatform,
@@ -43,23 +44,30 @@ extern "C" jint JNIEXPORT JNICALL JNI_OnLoad(JavaVM *jvm, void *reserved) {
 }
 
 extern "C" void JNIEXPORT JNICALL JNI_OnUnLoad(JavaVM *jvm, void *reserved) {
-    TS_CORE_LOG_MODULE(kTSCoreLogModulePlatform, kTSCoreLogLevelDebug, "JNI_OnUnload");
+    std::string func_name = std::string(__FUNCTION__);
+    TS_CORE_LOG_MODULE(kTSCoreLogModulePlatform, kTSCoreLogLevelDebug, "%s", func_name.c_str());
     webrtc_jni::FreeGlobalClassReferenceHolder();
 }
 
 JNIEXPORT void JNICALL Java_com_twilio_rooms_RoomsClient_nativeSetCoreLogLevel
-    (JNIEnv *, jobject, jint) {
-    // TODO: implement me
+    (JNIEnv *env, jobject instance, jint level) {
+    TS_CORE_LOG_MODULE(kTSCoreLogModulePlatform, kTSCoreLogLevelDebug, "setCoreLogLevel");
+    TSCoreLogLevel coreLogLevel = static_cast<TSCoreLogLevel>(level);
+    TSCLogger::instance()->setLogLevel(coreLogLevel);
 }
 
 JNIEXPORT void JNICALL Java_com_twilio_rooms_RoomsClient_nativeSetModuleLevel
-    (JNIEnv *, jobject, jint, jint) {
-    // TODO: implement me
+    (JNIEnv *env, jobject instance, jint module, jint level) {
+    TS_CORE_LOG_MODULE(kTSCoreLogModulePlatform, kTSCoreLogLevelDebug, "setModuleLevel");
+    TSCoreLogModule coreLogModule = static_cast<TSCoreLogModule>(module);
+    TSCoreLogLevel coreLogLevel = static_cast<TSCoreLogLevel>(level);
+    TSCLogger::instance()->setModuleLogLevel(coreLogModule, coreLogLevel);
 }
 
 JNIEXPORT jint JNICALL Java_com_twilio_rooms_RoomsClient_nativeGetCoreLogLevel
-    (JNIEnv *, jobject) {
-    return 0;
+    (JNIEnv *env, jobject instance) {
+    TS_CORE_LOG_MODULE(kTSCoreLogModulePlatform, kTSCoreLogLevelDebug, "getCoreLogLevel");
+    return TSCLogger::instance()->getLogLevel();
 }
 
 JNIEXPORT jboolean JNICALL
@@ -145,7 +153,7 @@ Java_com_twilio_rooms_RoomsClient_00024ClientListenerHandle_nativeCreate(JNIEnv 
                                                                          jobject instance,
                                                                          jobject object) {
     TS_CORE_LOG_MODULE(kTSCoreLogModulePlatform, kTSCoreLogLevelDebug,
-                       "Create native ClientObserver");
+                       "Create AndroidClientObserver");
     AndroidClientObserver *androidClientObserver = new AndroidClientObserver(env, object);
     return jlongFromPointer(androidClientObserver);
 }
@@ -155,7 +163,7 @@ Java_com_twilio_rooms_RoomsClient_00024ClientListenerHandle_nativeFree(JNIEnv *e
                                                                        jobject instance,
                                                                        jlong nativeHandle) {
     TS_CORE_LOG_MODULE(kTSCoreLogModulePlatform, kTSCoreLogLevelDebug,
-                       "Free native ClientObserver");
+                       "Free AndroidClientObserver");
     AndroidClientObserver
         *androidClientObserver = reinterpret_cast<AndroidClientObserver *>(nativeHandle);
     if (androidClientObserver != nullptr) {
