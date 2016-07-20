@@ -11,6 +11,7 @@
 #include "android_platform_info_provider.h"
 #include "android_video_codec_manager.h"
 #include "android_client_observer.h"
+#include "android_room_observer.h"
 
 #include "webrtc/voice_engine/include/voe_base.h"
 #include "webrtc/modules/video_capture/video_capture_internal.h"
@@ -110,7 +111,8 @@ Java_com_twilio_rooms_RoomsClient_nativeConnect(JNIEnv *env,
                                                 jobject instance,
                                                 jobject context,
                                                 jstring tokenString,
-                                                jlong android_client_observer_handle) {
+                                                jlong android_client_observer_handle,
+                                                jlong android_room_observer_handle) {
     // Lazily initialize the core relying on a disconnect as the condition used to destroy the core
     twiliosdk::TSCSDK *sdk = new twiliosdk::TSCSDK();
 
@@ -169,5 +171,29 @@ Java_com_twilio_rooms_RoomsClient_00024ClientListenerHandle_nativeFree(JNIEnv *e
     if (androidClientObserver != nullptr) {
         androidClientObserver->setObserverDeleted();
         delete androidClientObserver;
+    }
+}
+
+JNIEXPORT jlong JNICALL
+Java_com_twilio_rooms_RoomsClient_00024RoomListenerHandle_nativeCreate(JNIEnv *env,
+                                                                       jobject instance,
+                                                                       jobject object) {
+    TS_CORE_LOG_MODULE(kTSCoreLogModulePlatform, kTSCoreLogLevelDebug,
+                       "Create AndroidRoomObserver");
+    AndroidRoomObserver *androidRoomObserver = new AndroidRoomObserver(env, object);
+    return jlongFromPointer(androidRoomObserver);
+}
+
+JNIEXPORT void JNICALL
+Java_com_twilio_rooms_RoomsClient_00024RoomListenerHandle_nativeFree(JNIEnv *env,
+                                                                     jobject instance,
+                                                                     jlong nativeHandle) {
+    TS_CORE_LOG_MODULE(kTSCoreLogModulePlatform, kTSCoreLogLevelDebug,
+                       "Free AndroidRoomObserver");
+    AndroidRoomObserver
+        *androidRoomObserver = reinterpret_cast<AndroidRoomObserver *>(nativeHandle);
+    if (androidRoomObserver != nullptr) {
+        androidRoomObserver->setObserverDeleted();
+        delete androidRoomObserver;
     }
 }

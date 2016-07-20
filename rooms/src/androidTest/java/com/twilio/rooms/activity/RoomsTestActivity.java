@@ -9,7 +9,7 @@ public class RoomsTestActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         TextView tv = new TextView(this);
-        tv.setText("Hello Conversations!");
+        tv.setText("Hello Rooms!");
         setContentView(tv);
     }
 }

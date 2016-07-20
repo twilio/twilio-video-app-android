@@ -43,8 +43,8 @@ public class RoomsClientTests {
         new RoomsClient(context, null, clientListener());
     }
 
-    @Test
-    public void client_shouldBeCreatedWhenListenerIsNull() {
+    @Test(expected = NullPointerException.class)
+    public void client_shouldThrowExceptionWhenListenerIsNull() {
         new RoomsClient(context, accessManager(), null);
     }
 
@@ -66,7 +66,7 @@ public class RoomsClientTests {
 
     @Test
     public void audioOutput_shouldBeRetained() {
-        RoomsClient roomsClient = new RoomsClient(context, accessManager(), null);
+        RoomsClient roomsClient = new RoomsClient(context, accessManager(), clientListener());
         roomsClient.setAudioOutput(AudioOutput.SPEAKERPHONE);
         assertEquals(AudioOutput.SPEAKERPHONE, roomsClient.getAudioOutput());
     }

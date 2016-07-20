@@ -20,13 +20,18 @@ JNIEXPORT jboolean JNICALL Java_com_twilio_rooms_RoomsClient_nativeInitialize
     (JNIEnv *, jobject, jobject);
 
 JNIEXPORT jlong JNICALL Java_com_twilio_rooms_RoomsClient_nativeConnect
-        (JNIEnv *, jobject, jobject, jstring, jlong);
-
+        (JNIEnv *, jobject, jobject, jstring, jlong, jlong);
 
 JNIEXPORT jlong JNICALL Java_com_twilio_rooms_RoomsClient_00024ClientListenerHandle_nativeCreate
         (JNIEnv *, jobject, jobject);
 
 JNIEXPORT void JNICALL Java_com_twilio_rooms_RoomsClient_00024ClientListenerHandle_nativeFree
+        (JNIEnv *, jobject, jlong);
+
+JNIEXPORT jlong JNICALL Java_com_twilio_rooms_RoomsClient_00024RoomListenerHandle_nativeCreate
+        (JNIEnv *, jobject, jobject);
+
+JNIEXPORT void JNICALL Java_com_twilio_rooms_RoomsClient_00024RoomListenerHandle_nativeFree
         (JNIEnv *, jobject, jlong);
 
 #ifdef __cplusplus

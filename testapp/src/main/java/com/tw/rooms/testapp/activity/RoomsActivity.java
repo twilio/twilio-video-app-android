@@ -18,6 +18,7 @@ import com.tw.rooms.testapp.BuildConfig;
 import com.tw.rooms.testapp.R;
 import com.tw.rooms.testapp.util.SimpleSignalingUtils;
 import com.twilio.common.AccessManager;
+import com.twilio.rooms.LogLevel;
 import com.twilio.rooms.Participant;
 import com.twilio.rooms.RoomsClient;
 import com.twilio.rooms.Room;
@@ -124,6 +125,7 @@ public class RoomsActivity extends AppCompatActivity {
                 .setAction("Action", null).show();
 
         AccessManager accessManager = new AccessManager(this, capabilityToken, null);
+        RoomsClient.setLogLevel(LogLevel.DEBUG);
         RoomsClient roomsClient = new RoomsClient(this, accessManager, new RoomsClient.Listener() {
             @Override
             public void onConnected(Room room) {
