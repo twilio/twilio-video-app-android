@@ -23,7 +23,6 @@ import static junit.framework.Assert.fail;
 
 @RunWith(AndroidJUnit4.class)
 @LargeTest
-@Ignore
 public class VideoConstraintsTests {
 
     @Rule

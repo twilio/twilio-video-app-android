@@ -16,11 +16,11 @@ JNIEXPORT void JNICALL Java_com_twilio_rooms_RoomsClient_nativeSetModuleLevel
 JNIEXPORT jint JNICALL Java_com_twilio_rooms_RoomsClient_nativeGetCoreLogLevel
         (JNIEnv *, jobject);
 
-JNIEXPORT jboolean JNICALL Java_com_twilio_rooms_RoomsClient_nativeInitCore
-        (JNIEnv *, jobject, jobject);
+JNIEXPORT jboolean JNICALL Java_com_twilio_rooms_RoomsClient_nativeInitialize
+    (JNIEnv *, jobject, jobject);
 
 JNIEXPORT jlong JNICALL Java_com_twilio_rooms_RoomsClient_nativeConnect
-        (JNIEnv *, jobject, jstring, jlong);
+        (JNIEnv *, jobject, jobject, jstring, jlong);
 
 
 JNIEXPORT jlong JNICALL Java_com_twilio_rooms_RoomsClient_00024ClientListenerHandle_nativeCreate

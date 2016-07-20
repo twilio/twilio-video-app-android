@@ -17,63 +17,66 @@ import java.util.Map;
 
 /**
  * The Client allows user to create or participate in Rooms.
- *
  */
 public class RoomsClient {
     /**
-     *  Authenticating your Client failed due to invalid auth credentials.
+     * Authenticating your Client failed due to invalid auth credentials.
      */
     public static int INVALID_AUTH_DATA = 100;
     /**
-     *  The SIP account was invalid.
+     * The SIP account was invalid.
      */
     public static int INVALID_SIP_ACCOUNT = 102;
     /**
-     *  There was an error during Client registration.
+     * There was an error during Client registration.
      */
-    public static int CLIENT_REGISTATION_ERROR= 103;
+    public static int CLIENT_REGISTATION_ERROR = 103;
     /**
-     *  The Conversation was invalid.
+     * The Conversation was invalid.
      */
     public static int INVALID_CONVERSATION = 105;
     /**
-     *  The Conversation was terminated due to an unforeseen error.
+     * The Conversation was terminated due to an unforeseen error.
      */
     public static int CONVERSATION_TERMINATED = 110;
     /**
-     *  Establishing a media connection with the remote peer failed.
+     * Establishing a media connection with the remote peer failed.
      */
     public static int PEER_CONNECTION_FAILED = 111;
     /**
-     *  The client disconnected unexpectedly.
+     * The client disconnected unexpectedly.
      */
     public static int CLIENT_DISCONNECTED = 200;
     /**
-     *  Too many active Conversations.
+     * Too many active Conversations.
      */
     public static int TOO_MANY_ACTIVE_CONVERSATIONS = 201;
     /**
-     *  A track was created with constraints that could not be satisfied.
+     * A track was created with constraints that could not be satisfied.
      */
     public static int TRACK_CREATION_FAILED = 207;
     /**
-     *  Too many tracks were added to the local media.
-     *  @note: The current maximum is one video track at a time.
+     * Too many tracks were added to the local media.
+     *
+     * @note: The current maximum is one video track at a time.
      */
     public static int TOO_MANY_TRACKS = 300;
     /**
-     *  An invalid video capturer was added to the local media
-     *  @note: At the moment, only {@link CameraCapturer} is supported.
+     * An invalid video capturer was added to the local media
+     *
+     * @note: At the moment, only {@link CameraCapturer} is supported.
      */
     public static int INVALID_VIDEO_CAPTURER = 301;
     /**
-     *  An attempt was made to add or remove a track that is already being operated on.
-     *  @note: Retry your request at a later time.
+     * An attempt was made to add or remove a track that is already being operated on.
+     *
+     * @note: Retry your request at a later time.
      */
     public static int TRACK_OPERATION_IN_PROGRESS = 303;
     /**
-     *  An attempt was made to remove a track that has already ended.
-     *  @note: The video track is in the {@link MediaTrackState} ENDED state.
+     * An attempt was made to remove a track that has already ended.
+     *
+     * @note: The video track is in the {@link MediaTrackState} ENDED state.
      */
     public static int INVALID_VIDEO_TRACK_STATE = 305;
 
@@ -101,11 +104,8 @@ public class RoomsClient {
         if (context == null) {
             throw new NullPointerException("applicationContext must not be null");
         }
-        if(accessManager == null) {
+        if (accessManager == null) {
             throw new NullPointerException("accessManager must not be null");
-        }
-        if(listener == null) {
-            throw new NullPointerException("listener must not be null");
         }
 
         this.applicationContext = context.getApplicationContext();
@@ -135,9 +135,8 @@ public class RoomsClient {
             trySetCoreModuleLogLevel(module.ordinal(), moduleLogLevel.get(module).ordinal());
         }
 
-        nativeInitCore(applicationContext);
+        nativeInitialize(applicationContext);
 
-        clientListenerHandle = new ClientListenerHandle(listener);
     }
 
     /**
@@ -158,9 +157,9 @@ public class RoomsClient {
 
     /**
      * Sets the audio output speaker for the device.
-     *
+     * <p/>
      * Bluetooth headset is not supported.
-     *
+     * <p/>
      * To use volume up/down keys call
      * 'setVolumeControlStream(AudioManager.STREAM_VOICE_CALL);' in your Android Activity.
      *
@@ -187,9 +186,11 @@ public class RoomsClient {
         return audioManager.isSpeakerphoneOn() ? AudioOutput.SPEAKERPHONE : AudioOutput.HEADSET;
     }
 
-    public RoomFuture connect(Room.Listener listener) {
-        long nativeRoomFutureHandle = nativeConnect(accessManager.getToken(), clientListenerHandle.get());
-        return new RoomFuture(nativeRoomFutureHandle) ;
+    public RoomFuture connect(Room.Listener roomListener) {
+        clientListenerHandle = new ClientListenerHandle(listener);
+        long nativeRoomFutureHandle =
+                nativeConnect(applicationContext, accessManager.getToken(), clientListenerHandle.get());
+        return new RoomFuture(nativeRoomFutureHandle);
     }
 
     public RoomFuture connect(ConnectOptions connectOptions, Room.Listener listener) {
@@ -208,7 +209,6 @@ public class RoomsClient {
     /**
      * Listener interface defines a set of callbacks for events related to a
      * {@link RoomsClient}.
-     *
      */
     public interface Listener {
 
@@ -254,14 +254,14 @@ public class RoomsClient {
      * Sets the logging level for messages logged by a specific module.
      *
      * @param module The module for this log level
-     * @param level The logging level
+     * @param level  The logging level
      */
     public static void setModuleLogLevel(LogModule module, LogLevel level) {
         if (module == LogModule.PLATFORM) {
             setSDKLogLevel(level);
         }
         trySetCoreModuleLogLevel(module.ordinal(), level.ordinal());
-        //Save the module log level
+        // Save the module log level
         RoomsClient.moduleLogLevel.put(module, level);
     }
 
@@ -362,8 +362,12 @@ public class RoomsClient {
     }
 
     private native static void nativeSetCoreLogLevel(int level);
+
     private native static void nativeSetModuleLevel(int module, int level);
+
     private native static int nativeGetCoreLogLevel();
-    private native long nativeInitCore(Context context);
-    private native long nativeConnect(String token, long nativeClientListenerHandle);
+
+    private native long nativeInitialize(Context context);
+
+    private native long nativeConnect(Context context, String token, long nativeClientListenerHandle);
 }
