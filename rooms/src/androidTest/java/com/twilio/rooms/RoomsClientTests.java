@@ -49,12 +49,6 @@ public class RoomsClientTests {
     }
 
     @Test
-    public void logLevel_shouldDefaultToOff() {
-        LogLevel logLevel = RoomsClient.getLogLevel();
-        assertEquals(LogLevel.OFF, logLevel);
-    }
-
-    @Test
     public void logLevel_shouldBeRetained() {
         RoomsClient.setLogLevel(LogLevel.DEBUG);
         assertEquals(LogLevel.DEBUG, RoomsClient.getLogLevel());
