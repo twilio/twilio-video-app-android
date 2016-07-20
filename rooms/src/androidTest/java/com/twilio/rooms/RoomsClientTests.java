@@ -20,7 +20,7 @@ import static org.junit.Assert.assertTrue;
 
 @RunWith(AndroidJUnit4.class)
 @LargeTest
-public class ClientTests {
+public class RoomsClientTests {
 
     private Context context;
 
@@ -34,12 +34,12 @@ public class ClientTests {
     }
 
     @Test(expected = NullPointerException.class)
-    public void client_shouldReturnNPEWhenContextIsNull() {
+    public void client_shouldThrowExceptionWhenContextIsNull() {
         new RoomsClient(null, accessManager(), clientListener());
     }
 
     @Test(expected = NullPointerException.class)
-    public void client_shouldReturnNPEWhenAccessManagerIsNull() {
+    public void client_shouldThrowExceptionWhenAccessManagerIsNull() {
         new RoomsClient(context, null, clientListener());
     }
 
@@ -49,7 +49,7 @@ public class ClientTests {
     }
 
     @Test
-    public void logLevel_shouldBeOff() {
+    public void logLevel_shouldDefaultToOff() {
         LogLevel logLevel = RoomsClient.getLogLevel();
         assertEquals(LogLevel.OFF, logLevel);
     }
@@ -68,6 +68,13 @@ public class ClientTests {
 
         assertNotNull(version);
         assertTrue(version.matches(semVerRegex));
+    }
+
+    @Test
+    public void audioOutput_shouldBeRetained() {
+        RoomsClient roomsClient = new RoomsClient(context, accessManager(), null);
+        roomsClient.setAudioOutput(AudioOutput.SPEAKERPHONE);
+        assertEquals(AudioOutput.SPEAKERPHONE, roomsClient.getAudioOutput());
     }
 
     private AccessManager accessManager() {
