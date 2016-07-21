@@ -56,6 +56,8 @@ public class ConnectTests {
         RoomsClient roomsClient = new RoomsClient(context, accessManager, new RoomsClient.Listener() {
             @Override
             public void onConnected(Room room) {
+                assertNotNull(room.getSid());
+
                 connectedCountdownLatch.countDown();
             }
 
