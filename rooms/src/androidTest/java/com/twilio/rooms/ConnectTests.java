@@ -48,7 +48,7 @@ public class ConnectTests {
     }
 
     @Test
-    public void connect_shouldConnectToAnEmptyRoom() throws InterruptedException {
+    public void connect_shouldConnectToANewRoom() throws InterruptedException {
         final CountDownLatch connectedCountdownLatch = new CountDownLatch(1);
 
         AccessManager accessManager = AccessTokenHelper.obtainAccessManager(context, TEST_USER);
@@ -74,6 +74,40 @@ public class ConnectTests {
         roomsClient.connect(roomListener());
 
         assertTrue(connectedCountdownLatch.await(20, TimeUnit.SECONDS));
+    }
+
+    @Test
+    public void connect_shouldDisconnectFromANewRoom() throws InterruptedException {
+        final CountDownLatch connectedCountdownLatch = new CountDownLatch(1);
+        final CountDownLatch disconnectedCountdownLatch = new CountDownLatch(1);
+
+        AccessManager accessManager = AccessTokenHelper.obtainAccessManager(context, TEST_USER);
+
+        final RoomsClient roomsClient = new RoomsClient(context, accessManager, new RoomsClient.Listener() {
+            @Override
+            public void onConnected(Room room) {
+                connectedCountdownLatch.countDown();
+
+                room.disconnect();
+            }
+
+            @Override
+            public void onConnectFailure(RoomsException error) {
+                fail("Unexpected onConnectFailure callback");
+            }
+
+            @Override
+            public void onDisconnected(Room room, RoomsException error) {
+                disconnectedCountdownLatch.countDown();
+            }
+        });
+
+        roomsClient.connect(roomListener());
+
+        assertTrue(connectedCountdownLatch.await(20, TimeUnit.SECONDS));
+
+        assertTrue(disconnectedCountdownLatch.await(5, TimeUnit.SECONDS));
+
     }
 
     private AccessManager accessManager() {

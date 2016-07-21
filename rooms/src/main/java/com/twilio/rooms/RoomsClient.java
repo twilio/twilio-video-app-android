@@ -198,14 +198,6 @@ public class RoomsClient {
         return null;
     }
 
-    public void disconnect(Room room) {
-        // TODO: implement me
-    }
-
-    public Map<String, Room> getRooms() {
-        return rooms;
-    }
-
     /**
      * Listener interface defines a set of callbacks for events related to a
      * {@link RoomsClient}.

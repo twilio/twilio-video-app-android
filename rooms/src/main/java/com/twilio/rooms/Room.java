@@ -33,6 +33,10 @@ public class Room {
         // TODO: implement me
     }
 
+    public void disconnect() {
+        // TODO: implement me
+    }
+
     public interface Listener {
 
         void onParticipantConnected(Room room, Participant participant);
