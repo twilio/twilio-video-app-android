@@ -8,7 +8,7 @@
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
     android:paddingBottom="@dimen/activity_vertical_margin"
-    tools:context=".activity.RegistrationActivity">
+    tools:context=".activity.RoomsActivity">
 
     <LinearLayout
         android:id="@+id/register_layout"
@@ -26,6 +26,12 @@
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:hint="@string/username"/>
+        <EditText
+            android:id="@+id/room_name_edittext"
+            android:layout_margin="@dimen/activity_horizontal_margin"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/room_name"/>
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

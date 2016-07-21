@@ -2,20 +2,20 @@ package com.twilio.rooms;
 
 public class ConnectOptions {
 
-    private String roomName;
+    private String name;
     private boolean createRoom;
     private LocalMedia localMedia;
     private IceOptions iceOptions;
 
     private ConnectOptions(Builder builder) {
-        this.roomName = builder.name;
+        this.name = builder.name;
         this.createRoom = builder.createRoom;
         this.localMedia = builder.localMedia;
         this.iceOptions = builder.iceOptions;
     }
 
-    public String getRoomName() {
-        return roomName;
+    public String getName() {
+        return name;
     }
 
     public boolean willCreateRoom() {

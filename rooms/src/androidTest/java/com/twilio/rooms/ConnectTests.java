@@ -27,7 +27,7 @@ import static org.junit.Assert.fail;
 @LargeTest
 public class ConnectTests {
     private final static String TEST_USER = "TEST_USER";
-
+    private final static String TEST_ROOM = "TEST_ROOM";
 
     private Context context;
 
@@ -56,8 +56,35 @@ public class ConnectTests {
         RoomsClient roomsClient = new RoomsClient(context, accessManager, new RoomsClient.Listener() {
             @Override
             public void onConnected(Room room) {
-                assertNotNull(room.getSid());
+                connectedCountdownLatch.countDown();
+            }
 
+            @Override
+            public void onConnectFailure(RoomsException error) {
+                fail("Unexpected onConnectFailure callback");
+            }
+
+            @Override
+            public void onDisconnected(Room room, RoomsException error) {
+                fail("Unexpected onDisconnected callback");
+
+            }
+        });
+
+        roomsClient.connect(roomListener());
+
+        assertTrue(connectedCountdownLatch.await(20, TimeUnit.SECONDS));
+    }
+
+    @Test
+    public void connect_shouldConnectToANamedRoom() throws InterruptedException {
+        final CountDownLatch connectedCountdownLatch = new CountDownLatch(1);
+
+        AccessManager accessManager = AccessTokenHelper.obtainAccessManager(context, TEST_USER);
+
+        RoomsClient roomsClient = new RoomsClient(context, accessManager, new RoomsClient.Listener() {
+            @Override
+            public void onConnected(Room room) {
                 connectedCountdownLatch.countDown();
             }
 
@@ -104,7 +131,7 @@ public class ConnectTests {
             }
         });
 
-        roomsClient.connect(roomListener());
+        roomsClient.connect(TEST_ROOM, roomListener());
 
         assertTrue(connectedCountdownLatch.await(20, TimeUnit.SECONDS));
 

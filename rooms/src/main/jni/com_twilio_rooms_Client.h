@@ -20,7 +20,7 @@ JNIEXPORT jboolean JNICALL Java_com_twilio_rooms_RoomsClient_nativeInitialize
     (JNIEnv *, jobject, jobject);
 
 JNIEXPORT jlong JNICALL Java_com_twilio_rooms_RoomsClient_nativeConnect
-        (JNIEnv *, jobject, jobject, jstring, jlong, jlong);
+        (JNIEnv *, jobject, jobject, jstring, jlong, jlong, jstring);
 
 JNIEXPORT jlong JNICALL Java_com_twilio_rooms_RoomsClient_00024ClientListenerHandle_nativeCreate
         (JNIEnv *, jobject, jobject);

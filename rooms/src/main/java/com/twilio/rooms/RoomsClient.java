@@ -189,13 +189,23 @@ public class RoomsClient {
         clientListenerHandle = new ClientListenerHandle(listener);
         roomListenerHandle = new RoomListenerHandle(roomListener);
         long nativeRoomFutureHandle =
-                nativeConnect(applicationContext, accessManager.getToken(), clientListenerHandle.get(), roomListenerHandle.get());
+                nativeConnect(applicationContext, accessManager.getToken(), clientListenerHandle.get(), roomListenerHandle.get(), null);
         return new RoomFuture(nativeRoomFutureHandle);
     }
 
-    public RoomFuture connect(ConnectOptions connectOptions, Room.Listener listener) {
-        // TODO: implement me
-        return null;
+    public RoomFuture connect(String name, Room.Listener roomListener) {
+        if (name == null) {
+            throw new NullPointerException("name must not be null");
+        }
+        if (roomListener == null) {
+            throw new NullPointerException("roomListener must not be null");
+        }
+
+        clientListenerHandle = new ClientListenerHandle(listener);
+        roomListenerHandle = new RoomListenerHandle(roomListener);
+        long nativeRoomFutureHandle =
+                nativeConnect(applicationContext, accessManager.getToken(), clientListenerHandle.get(), roomListenerHandle.get(), name);
+        return new RoomFuture(nativeRoomFutureHandle);
     }
 
     /**
@@ -377,5 +387,6 @@ public class RoomsClient {
     private native long nativeConnect(Context context,
                                       String token,
                                       long nativeClientListenerHandle,
-                                      long nativeRoomListenerHandle);
+                                      long nativeRoomListenerHandle,
+                                      String name);
 }

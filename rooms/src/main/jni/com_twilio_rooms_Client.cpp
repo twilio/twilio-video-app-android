@@ -112,7 +112,8 @@ Java_com_twilio_rooms_RoomsClient_nativeConnect(JNIEnv *env,
                                                 jobject context,
                                                 jstring tokenString,
                                                 jlong android_client_observer_handle,
-                                                jlong android_room_observer_handle) {
+                                                jlong android_room_observer_handle,
+                                                jstring name) {
     // Lazily initialize the core relying on a disconnect as the condition used to destroy the core
     twiliosdk::TSCSDK *sdk = new twiliosdk::TSCSDK();
 
@@ -142,7 +143,12 @@ Java_com_twilio_rooms_RoomsClient_nativeConnect(JNIEnv *env,
                                                                   media_stack,
                                                                   sdk->getInvoker());
 
-    std::shared_ptr<rooms::RoomFuture> future = client->connect(nullptr);
+    if(IsNull(env, name)) {
+        std::shared_ptr<rooms::RoomFuture> future = client->connect(nullptr);
+    } else {
+        std::string roomName = webrtc_jni::JavaToStdString(env, name);
+        std::shared_ptr<rooms::RoomFuture> future = client->connect(roomName, nullptr);
+    }
 
     // TODO: properly delete holder
     new ClientDataHolder(std::move(client), client_observer, access_manager, media_stack);
