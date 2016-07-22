@@ -100,7 +100,7 @@ public class ConnectTests {
             }
         });
 
-        roomsClient.connect(roomListener());
+        roomsClient.connect(TEST_ROOM, roomListener());
 
         assertTrue(connectedCountdownLatch.await(20, TimeUnit.SECONDS));
     }
