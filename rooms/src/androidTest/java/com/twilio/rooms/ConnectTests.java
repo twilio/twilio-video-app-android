@@ -106,7 +106,7 @@ public class ConnectTests {
     }
 
     @Test
-    public void connect_shouldDisconnectFromANewRoom() throws InterruptedException {
+    public void connect_shouldDisconnectFromRoom() throws InterruptedException {
         final CountDownLatch connectedCountdownLatch = new CountDownLatch(1);
         final CountDownLatch disconnectedCountdownLatch = new CountDownLatch(1);
 
@@ -131,7 +131,7 @@ public class ConnectTests {
             }
         });
 
-        roomsClient.connect(TEST_ROOM, roomListener());
+        roomsClient.connect(roomListener());
 
         assertTrue(connectedCountdownLatch.await(20, TimeUnit.SECONDS));
 
