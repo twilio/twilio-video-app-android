@@ -18,6 +18,7 @@ import com.tw.rooms.testapp.BuildConfig;
 import com.tw.rooms.testapp.R;
 import com.tw.rooms.testapp.util.SimpleSignalingUtils;
 import com.twilio.common.AccessManager;
+import com.twilio.rooms.LogLevel;
 import com.twilio.rooms.Participant;
 import com.twilio.rooms.RoomsClient;
 import com.twilio.rooms.Room;
@@ -34,6 +35,7 @@ import timber.log.Timber;
 public class RoomsActivity extends AppCompatActivity {
 
     @BindView(R.id.username_edittext) EditText usernameEditText;
+    @BindView(R.id.room_name_edittext) EditText roomEditText;
     @BindView(R.id.registration_button) Button registrationButton;
     @BindView(R.id.version_textview) TextView versionText;
     @BindView(R.id.realm_spinner) Spinner realmSpinner;
@@ -124,6 +126,7 @@ public class RoomsActivity extends AppCompatActivity {
                 .setAction("Action", null).show();
 
         AccessManager accessManager = new AccessManager(this, capabilityToken, null);
+        RoomsClient.setLogLevel(LogLevel.DEBUG);
         RoomsClient roomsClient = new RoomsClient(this, accessManager, new RoomsClient.Listener() {
             @Override
             public void onConnected(Room room) {
@@ -141,17 +144,25 @@ public class RoomsActivity extends AppCompatActivity {
             }
         });
 
-        roomsClient.connect(new Room.Listener() {
-            @Override
-            public void onParticipantConnected(Room room, Participant participant) {
+        if(roomEditText.getText().length() == 0) {
+            roomsClient.connect(RoomListener());
+        } else {
+            roomsClient.connect(roomEditText.getText().toString(), RoomListener());
+        }
 
-            }
-
-            @Override
-            public void onParticipantDisconnected(Room room, Participant participant) {
-
-            }
-        });
     }
 
+    private Room.Listener RoomListener() {
+       return new Room.Listener() {
+           @Override
+           public void onParticipantConnected(Room room, Participant participant) {
+
+           }
+
+           @Override
+           public void onParticipantDisconnected(Room room, Participant participant) {
+
+           }
+       };
+    }
 }

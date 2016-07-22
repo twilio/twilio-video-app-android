@@ -2,26 +2,20 @@ package com.twilio.rooms;
 
 public class ConnectOptions {
 
-    private String roomName;
-    private String roomSid;
+    private String name;
     private boolean createRoom;
     private LocalMedia localMedia;
     private IceOptions iceOptions;
 
     private ConnectOptions(Builder builder) {
-        this.roomName = builder.roomName;
-        this.roomSid = builder.roomSid;
+        this.name = builder.name;
         this.createRoom = builder.createRoom;
         this.localMedia = builder.localMedia;
         this.iceOptions = builder.iceOptions;
     }
 
-    public String getRoomName() {
-        return roomName;
-    }
-
-    public String getRoomSid() {
-        return roomSid;
+    public String getName() {
+        return name;
     }
 
     public boolean willCreateRoom() {
@@ -37,21 +31,15 @@ public class ConnectOptions {
     }
 
     public static class Builder {
-        private String roomName;
-        private String roomSid;
+        private String name;
         private boolean createRoom;
         private LocalMedia localMedia;
         private IceOptions iceOptions;
 
         public Builder() { }
 
-        public Builder roomName(String roomName) {
-            this.roomName = roomName;
-            return this;
-        }
-
-        public Builder roomSid(String roomSid) {
-            this.roomSid = roomSid;
+        public Builder name(String name) {
+            this.name = name;
             return this;
         }
 

@@ -96,9 +96,10 @@ public class RoomsClient {
     private final Handler handler;
     private final Context applicationContext;
     private Listener listener;
-    private ClientListenerHandle clientListenerHandle;
     private AccessManager accessManager;
     private Map<String, Room> rooms;
+    private ClientListenerHandle clientListenerHandle;
+    private RoomListenerHandle roomListenerHandle;
 
     public RoomsClient(Context context, AccessManager accessManager, RoomsClient.Listener listener) {
         if (context == null) {
@@ -106,6 +107,9 @@ public class RoomsClient {
         }
         if (accessManager == null) {
             throw new NullPointerException("accessManager must not be null");
+        }
+        if (listener == null) {
+            throw new NullPointerException("listener must not be null");
         }
 
         this.applicationContext = context.getApplicationContext();
@@ -137,15 +141,6 @@ public class RoomsClient {
 
         nativeInitialize(applicationContext);
 
-    }
-
-    /**
-     * Set a new {@link Listener} to respond to client events.
-     *
-     * @param listener A listener for client events.
-     */
-    public void setListener(Listener listener) {
-        this.listener = listener;
     }
 
     /**
@@ -187,23 +182,30 @@ public class RoomsClient {
     }
 
     public RoomFuture connect(Room.Listener roomListener) {
+        if (roomListener == null) {
+            throw new NullPointerException("roomListener must not be null");
+        }
+
         clientListenerHandle = new ClientListenerHandle(listener);
+        roomListenerHandle = new RoomListenerHandle(roomListener);
         long nativeRoomFutureHandle =
-                nativeConnect(applicationContext, accessManager.getToken(), clientListenerHandle.get());
+                nativeConnect(applicationContext, accessManager.getToken(), clientListenerHandle.get(), roomListenerHandle.get(), null);
         return new RoomFuture(nativeRoomFutureHandle);
     }
 
-    public RoomFuture connect(ConnectOptions connectOptions, Room.Listener listener) {
-        // TODO: implement me
-        return null;
-    }
+    public RoomFuture connect(String name, Room.Listener roomListener) {
+        if (name == null) {
+            throw new NullPointerException("name must not be null");
+        }
+        if (roomListener == null) {
+            throw new NullPointerException("roomListener must not be null");
+        }
 
-    public void disconnect(Room room) {
-        // TODO: implement me
-    }
-
-    public Map<String, Room> getRooms() {
-        return rooms;
+        clientListenerHandle = new ClientListenerHandle(listener);
+        roomListenerHandle = new RoomListenerHandle(roomListener);
+        long nativeRoomFutureHandle =
+                nativeConnect(applicationContext, accessManager.getToken(), clientListenerHandle.get(), roomListenerHandle.get(), name);
+        return new RoomFuture(nativeRoomFutureHandle);
     }
 
     /**
@@ -355,10 +357,23 @@ public class RoomsClient {
         }
 
         @Override
-        native protected long nativeCreate(Object object);
+        protected native long nativeCreate(Object object);
 
         @Override
-        native protected void nativeFree(long nativeHandle);
+        protected native void nativeFree(long nativeHandle);
+    }
+
+    class RoomListenerHandle extends NativeHandle {
+
+        public RoomListenerHandle(Room.Listener listener) {
+            super(listener);
+        }
+
+        @Override
+        protected native long nativeCreate(Object object);
+
+        @Override
+        protected native void nativeFree(long nativeHandle);
     }
 
     private native static void nativeSetCoreLogLevel(int level);
@@ -369,5 +384,9 @@ public class RoomsClient {
 
     private native long nativeInitialize(Context context);
 
-    private native long nativeConnect(Context context, String token, long nativeClientListenerHandle);
+    private native long nativeConnect(Context context,
+                                      String token,
+                                      long nativeClientListenerHandle,
+                                      long nativeRoomListenerHandle,
+                                      String name);
 }

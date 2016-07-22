@@ -3,6 +3,11 @@ package com.twilio.rooms;
 import java.util.Map;
 
 public class Room {
+    long nativeRoomHandle;
+
+    Room(long nativeRoomHandle) {
+        this.nativeRoomHandle = nativeRoomHandle;
+    }
 
     public String getName() {
         // TODO: implement me
@@ -33,6 +38,10 @@ public class Room {
         // TODO: implement me
     }
 
+    public void disconnect() {
+        // TODO: implement me
+    }
+
     public interface Listener {
 
         void onParticipantConnected(Room room, Participant participant);
@@ -40,4 +49,9 @@ public class Room {
         void onParticipantDisconnected(Room room, Participant participant);
 
     }
+
+    private native String nativeGetName(long nativeRoomHandle);
+    private native String nativeGetSid(long nativeRoomHandle);
+    private native void nativeDisconnect(long nativeRoomHandle);
+
 }
