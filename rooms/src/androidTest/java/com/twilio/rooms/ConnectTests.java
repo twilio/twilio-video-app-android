@@ -117,7 +117,7 @@ public class ConnectTests {
             public void onConnected(Room room) {
                 connectedCountdownLatch.countDown();
 
-                room.disconnect();
+                // TODO: disconnect from room
             }
 
             @Override
