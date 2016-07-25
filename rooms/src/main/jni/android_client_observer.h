@@ -50,7 +50,6 @@ protected:
                 return;
             }
 
-            // TODO: create jobject Room
             jni()->CallVoidMethod(*j_client_observer_, j_on_connected_, nullptr);
             CHECK_EXCEPTION(jni()) << "error during CallVoidMethod";
         }
