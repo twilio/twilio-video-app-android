@@ -4,13 +4,13 @@ apply plugin: 'org.bitbucket.pvoid.android-apt'
 
 model {
     android {
-        compileSdkVersion 23
-        buildToolsVersion "23.0.2"
+        compileSdkVersion 24
+        buildToolsVersion "24.0.1"
 
         defaultConfig.with {
             applicationId "com.tw.conv.testapp"
             minSdkVersion.apiLevel 16
-            targetSdkVersion.apiLevel 23
+            targetSdkVersion.apiLevel 24
             versionName generateVersionName()
             versionCode generateVersionCode()
         }
