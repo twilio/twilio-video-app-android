@@ -3,12 +3,11 @@
 
 #include "webrtc/api/java/jni/jni_helpers.h"
 
+#include "room.h"
+#include "room_observer.h"
 #include "TSCLogger.h"
-#include "TSCoreConstants.h"
-#include "client_observer.h"
 
-
-class AndroidClientObserver: public twilio::rooms::ClientObserver {
+class AndroidClientObserver: public twilio::video::RoomObserver {
 public:
     AndroidClientObserver(JNIEnv *env, jobject j_client_observer) :
         j_client_observer_(env, j_client_observer),
@@ -38,7 +37,7 @@ public:
     }
 
 protected:
-    virtual void onConnected(std::shared_ptr<twilio::rooms::Room> room) {
+    virtual void onConnected(twilio::video::Room* room) {
         ScopedLocalRefFrame local_ref_frame(jni());
         std::string func_name = std::string(__FUNCTION__);
         TS_CORE_LOG_MODULE(kTSCoreLogModulePlatform, kTSCoreLogLevelDebug, "%s", func_name.c_str());
@@ -55,19 +54,28 @@ protected:
         }
     }
 
-    virtual void onDisconnected(std::shared_ptr<const twilio::rooms::Room> room,
-                                twilio::rooms::ClientError error_code = twilio::rooms::ClientError::kErrorUnknown) {
+    virtual void onDisconnected(const twilio::video::Room* room,
+                                twilio::video::ClientError error_code = twilio::video::ClientError::kErrorUnknown) {
         ScopedLocalRefFrame local_ref_frame(jni());
         std::string func_name = std::string(__FUNCTION__);
         TS_CORE_LOG_MODULE(kTSCoreLogModulePlatform, kTSCoreLogLevelDebug, "%s", func_name.c_str());
         // TODO: implement me
     }
 
-    virtual void onConnectFailure(std::string name_or_sid, twilio::rooms::ClientError error_code) {
+    virtual void onConnectFailure(std::string name_or_sid, twilio::video::ClientError error_code) {
         ScopedLocalRefFrame local_ref_frame(jni());
         std::string func_name = std::string(__FUNCTION__);
         TS_CORE_LOG_MODULE(kTSCoreLogModulePlatform, kTSCoreLogLevelDebug, "%s", func_name.c_str());
         // TODO: implement me
+    }
+
+    virtual void onParticipantConnected(std::shared_ptr<twilio::video::Participant> participant) {
+
+    }
+
+    virtual void onParticipantDisconnected(
+        std::shared_ptr<const twilio::video::Participant> participant) {
+
     }
 
 private:

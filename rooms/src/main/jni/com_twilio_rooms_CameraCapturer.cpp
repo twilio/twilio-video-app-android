@@ -3,10 +3,7 @@
 #include "webrtc/api/androidvideocapturer.h"
 #include "com_twilio_rooms_CameraCapturer.h"
 #include "webrtc/api/java/jni/jni_helpers.h"
-#include "TSCoreSDKTypes.h"
-#include "TSCoreError.h"
 #include "TSCLogger.h"
-#include "TSCSession.h"
 
 using namespace twiliosdk;
 using namespace webrtc_jni;
@@ -17,8 +14,9 @@ JNIEXPORT void JNICALL Java_com_twilio_rooms_CameraCapturer_nativeStopVideoSourc
         (JNIEnv *env, jobject obj, jlong nativeSession)
 {
     TS_CORE_LOG_MODULE(kTSCoreLogModulePlatform, kTSCoreLogLevelDebug, "stopVideoSource");
-    TSCSessionPtr *session = reinterpret_cast<TSCSessionPtr *>(nativeSession);
-    session->get()->stopVideoSource();
+    // TODO: Implement stopping video source
+    //TSCSessionPtr *session = reinterpret_cast<TSCSessionPtr *>(nativeSession);
+    //session->get()->stopVideoSource();
 }
 
 
@@ -26,8 +24,9 @@ JNIEXPORT void JNICALL Java_com_twilio_rooms_CameraCapturer_nativeRestartVideoSo
         (JNIEnv *env, jobject obj, jlong nativeSession)
 {
     TS_CORE_LOG_MODULE(kTSCoreLogModulePlatform, kTSCoreLogLevelDebug, "stopVideoSource");
-    TSCSessionPtr *session = reinterpret_cast<TSCSessionPtr *>(nativeSession);
-    session->get()->restartVideoSource();
+    // TODO: Implement restarting video source
+    //TSCSessionPtr *session = reinterpret_cast<TSCSessionPtr *>(nativeSession);
+    //session->get()->restartVideoSource();
 }
 
 JNIEXPORT jlong JNICALL

@@ -1,18 +1,9 @@
 #include "com_twilio_rooms_Client.h"
 #include "webrtc/api/java/jni/jni_helpers.h"
 
-#include "AccessManager/AccessManager.h"
-#include "TSCoreSDK.h"
-#include "TSCLogger.h"
-#include "TSCoreConstants.h"
-#include "rooms.h"
-#include "client_observer.h"
-#include "TSCMediaCodecRegistry.h"
-#include "android_platform_info_provider.h"
-#include "android_video_codec_manager.h"
-#include "android_client_observer.h"
-#include "android_room_observer.h"
 
+
+#include "webrtc/base/refcount.h"
 #include "webrtc/voice_engine/include/voe_base.h"
 #include "webrtc/modules/video_capture/video_capture_internal.h"
 #include "webrtc/api/java/jni/androidvideocapturer_jni.h"
@@ -21,10 +12,20 @@
 #include "webrtc/api/java/jni/classreferenceholder.h"
 #include "webrtc/media/engine/webrtcvideodecoderfactory.h"
 
+#include "AccessManager/AccessManager.h"
+#include "TSCLogger.h"
+#include "video.h"
+#include "media/media_factory.h"
+//#include "ITSCVideoCodec.h"
+//#include "TSCMediaCodecRegistry.h"
+#include "android_platform_info_provider.h"
+#include "android_video_codec_manager.h"
+#include "android_client_observer.h"
+#include "android_room_observer.h"
+
 #include <memory>
 
 using namespace twiliosdk;
-using namespace twilio;
 using namespace webrtc_jni;
 
 static bool media_jvm_set = false;
@@ -88,21 +89,21 @@ Java_com_twilio_rooms_RoomsClient_nativeInitialize(JNIEnv *env, jobject instance
 
 class ClientDataHolder {
 public:
-    ClientDataHolder(std::unique_ptr<rooms::Client> client,
-                     std::shared_ptr<rooms::ClientObserver> client_observer,
-                     std::shared_ptr<TwilioCommon::AccessManager> access_manager,
-                     std::shared_ptr<media::MediaStack> media_stack) {
+    ClientDataHolder(std::unique_ptr<twilio::video::Client> client,
+                     //std::shared_ptr<twilio::video::RoomO> client_observer,
+                     std::shared_ptr<TwilioCommon::AccessManager> access_manager//,
+                     /*std::shared_ptr<media::MediaStack> media_stack*/) {
         client_ = std::move(client);
-        client_observer_ = client_observer;
+        //client_observer_ = client_observer;
         access_manager_ = access_manager;
-        media_stack_ = media_stack;
+        //media_stack_ = media_stack;
     }
 
 private:
-    std::unique_ptr<rooms::Client> client_;
-    std::shared_ptr<rooms::ClientObserver> client_observer_;
+    std::unique_ptr<twilio::video::Client> client_;
+    //std::shared_ptr<twilio::video::ClientObserver> client_observer_;
     std::shared_ptr<TwilioCommon::AccessManager> access_manager_;
-    std::shared_ptr<media::MediaStack> media_stack_;
+    //std::shared_ptr<media::MediaStack> media_stack_;
 
 };
 
@@ -115,15 +116,15 @@ Java_com_twilio_rooms_RoomsClient_nativeConnect(JNIEnv *env,
                                                 jlong android_room_observer_handle,
                                                 jstring name) {
     // Lazily initialize the core relying on a disconnect as the condition used to destroy the core
-    twiliosdk::TSCSDK *sdk = new twiliosdk::TSCSDK();
+    //twiliosdk::TSCSDK *sdk = new twiliosdk::TSCSDK();
 
     AndroidPlatformInfoProvider provider(env, context);
-    sdk->setPlatformInfo(provider.getReport());
+    //sdk->setPlatformInfo(provider.getReport());
 
-    TSCVideoCodecRef androidVideoCodecManager =
-        new rtc::RefCountedObject<AndroidVideoCodecManager>();
-    TSCMediaCodecRegistry &codecManager = sdk->getMediaCodecRegistry();
-    codecManager.registerVideoCodec(androidVideoCodecManager);
+//    TSCVideoCodecRef androidVideoCodecManager =
+//        new rtc::RefCountedObject<AndroidVideoCodecManager>();
+    //TSCMediaCodecRegistry &codecManager = sdk->getMediaCodecRegistry();
+    //codecManager.registerVideoCodec(androidVideoCodecManager);
 
     // Connect to a room
     std::string token = webrtc_jni::JavaToStdString(env, tokenString);
@@ -133,25 +134,33 @@ Java_com_twilio_rooms_RoomsClient_nativeConnect(JNIEnv *env,
 
     AndroidClientObserver *android_client_observer =
         reinterpret_cast<AndroidClientObserver *>(android_client_observer_handle);
-    std::shared_ptr<rooms::ClientObserver> client_observer(android_client_observer);
+    std::shared_ptr<twilio::video::RoomObserver> client_observer(android_client_observer);
 
-    std::shared_ptr<media::MediaStack> media_stack(new media::MediaStack());
-    media_stack->start(media::MediaStackOptions());
+    //std::shared_ptr<media::MediaStack> media_stack(new media::MediaStack());
+    //media_stack->start(media::MediaStackOptions());
+    std::shared_ptr<twilio::media::MediaFactory> media_factory =
+        twilio::media::MediaFactory::create(twilio::media::MediaOptions());
 
-    std::unique_ptr<rooms::Client> client = rooms::Client::create(access_manager,
-                                                                  client_observer,
-                                                                  media_stack,
-                                                                  sdk->getInvoker());
+    twilio::video::Invoker *invoker = new twilio::video::Invoker();
 
-    if(IsNull(env, name)) {
-        std::shared_ptr<rooms::RoomFuture> future = client->connect(nullptr);
-    } else {
-        std::string roomName = webrtc_jni::JavaToStdString(env, name);
-        std::shared_ptr<rooms::RoomFuture> future = client->connect(roomName, nullptr);
-    }
+    std::unique_ptr<twilio::video::Client> client =
+        twilio::video::Client::create(access_manager,
+                                      //client_observer,
+                                      media_factory,
+                                      invoker);
+
+    std::shared_ptr<twilio::video::RoomFuture> future = client->connect(nullptr);
+    // TODO: Pass observer and create room with name
+//    if(IsNull(env, name)) {
+//        std::shared_ptr<twilio::video::RoomFuture> future = client->connect(nullptr);
+//    } else {
+//        std::string roomName = webrtc_jni::JavaToStdString(env, name);
+//        std::shared_ptr<twilio::video::RoomFuture> future = client->connect(roomName, nullptr);
+//    }
 
     // TODO: properly delete holder
-    new ClientDataHolder(std::move(client), client_observer, access_manager, media_stack);
+    //new ClientDataHolder(std::move(client), client_observer, access_manager, media_stack);
+    new ClientDataHolder(std::move(client), access_manager);//, media_stack);
 
     return 0;
 }

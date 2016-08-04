@@ -3,7 +3,6 @@
 
 #include <jni.h>
 #include <string.h>
-#include "TSCoreSDKTypes.h"
 #include "ITSCVideoCodec.h"
 
 #include "webrtc/api/java/jni/jni_helpers.h"

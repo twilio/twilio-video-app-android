@@ -12,9 +12,9 @@ def supportedAbis = [
         "x86_64"
 ]
 
-def coreHome = "${twilioSdkHome}/twilio-rooms"
+def coreHome = "${twilioSdkHome}/twilio-video"
 def coreHeaders = "${coreHome}/include"
-def coreStaticLib = "libtwilio-rooms.a"
+def coreStaticLib = "libtwilio-video.a"
 
 def twilioCommonHome = "${twilioSdkHome}/twilio-common"
 def twilioCommonHeaders = "${twilioCommonHome}/include"
@@ -253,7 +253,7 @@ dependencies {
     preCompile 'com.googlesource.boringssl.twilio:twilio-boringssl:1.0.13:android@tar.bz2'
     preCompile 'com.twilio.sdk:twilio-common:0.2.0:android@tar.bz2'
     preCompile 'com.twilio.sdk:twilio-webrtc:52.4:android@tar.bz2'
-    preCompile 'com.twilio.sdk:twilio-rooms:0.1.2:android@tar.bz2'
+    preCompile 'com.twilio.sdk:twilio-video:0.1.7-SNAPSHOT:android@tar.bz2'
 
     testCompile 'junit:junit:4.12'
     testCompile 'org.mockito:mockito-core:1.10.19'

@@ -3,12 +3,11 @@
 
 #include <jni.h>
 #include <string.h>
-#include "TSCoreSDKTypes.h"
 #include "PlatformInfoProvider.h"
 
 #include "webrtc/api/java/jni/jni_helpers.h"
 
-using namespace webrtc_jni;
+//using namespace webrtc_jni;
 using namespace twiliosdk;
 
 class AndroidPlatformInfoProvider : public PlatformInfoProvider {
@@ -27,8 +26,8 @@ private:
 
 
 private:
-    const ScopedGlobalRef<jobject> j_context_global_;
-    const ScopedGlobalRef<jclass> j_platform_info_class_;
+    const webrtc_jni::ScopedGlobalRef<jobject> j_context_global_;
+    const webrtc_jni::ScopedGlobalRef<jclass> j_platform_info_class_;
     const jmethodID j_getPlatfomName_id;
     const jmethodID j_getPlatformVersion_id;
     const jmethodID j_getHwDeviceManufacturer_id;

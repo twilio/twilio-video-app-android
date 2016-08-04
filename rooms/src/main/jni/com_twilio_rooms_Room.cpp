@@ -1,9 +1,7 @@
 #include "com_twilio_rooms_Room.h"
 #include "webrtc/api/java/jni/jni_helpers.h"
 
-#include "TSCoreSDK.h"
 #include "TSCLogger.h"
-#include "TSCoreConstants.h"
 #include "room.h"
 
 
