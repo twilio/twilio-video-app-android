@@ -43,6 +43,11 @@ public class Room {
     }
 
     public interface Listener {
+        void onConnected(Room room);
+
+        void onConnectFailure(RoomsException error);
+
+        void onDisconnected(Room room, RoomsException error);
 
         void onParticipantConnected(Room room, Participant participant);
 

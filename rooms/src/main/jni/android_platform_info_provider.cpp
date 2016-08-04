@@ -60,8 +60,8 @@ AndroidPlatformInfoProvider::AndroidPlatformInfoProvider(JNIEnv* jni, jobject co
                                   "()Ljava/lang/String;"))
 {}
 
-const PlatformInfo AndroidPlatformInfoProvider::getReport() const {
-    PlatformInfo report;
+const twiliosdk::PlatformInfo AndroidPlatformInfoProvider::getReport() const {
+    twiliosdk::PlatformInfo report;
     report.platformName = this->callStringMethod(j_getPlatfomName_id);
     report.platformVersion = this->callStringMethod(j_getPlatformVersion_id);
     report.hwDeviceManufacturer = this->callStringMethod(j_getHwDeviceManufacturer_id);

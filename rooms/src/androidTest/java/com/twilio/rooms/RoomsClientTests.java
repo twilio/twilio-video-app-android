@@ -35,17 +35,17 @@ public class RoomsClientTests {
 
     @Test(expected = NullPointerException.class)
     public void client_shouldThrowExceptionWhenContextIsNull() {
-        new RoomsClient(null, accessManager(), clientListener());
+        new RoomsClient(null, accessManager());
     }
 
     @Test(expected = NullPointerException.class)
     public void client_shouldThrowExceptionWhenAccessManagerIsNull() {
-        new RoomsClient(context, null, clientListener());
+        new RoomsClient(context, null);
     }
 
     @Test(expected = NullPointerException.class)
     public void client_shouldThrowExceptionWhenListenerIsNull() {
-        new RoomsClient(context, accessManager(), null);
+        new RoomsClient(context, accessManager());
     }
 
     @Test
@@ -66,32 +66,13 @@ public class RoomsClientTests {
 
     @Test
     public void audioOutput_shouldBeRetained() {
-        RoomsClient roomsClient = new RoomsClient(context, accessManager(), clientListener());
+        RoomsClient roomsClient = new RoomsClient(context, accessManager());
         roomsClient.setAudioOutput(AudioOutput.SPEAKERPHONE);
         assertEquals(AudioOutput.SPEAKERPHONE, roomsClient.getAudioOutput());
     }
 
     private AccessManager accessManager() {
         return new AccessManager(context, null, null);
-    }
-
-    private RoomsClient.Listener clientListener() {
-        return new RoomsClient.Listener() {
-            @Override
-            public void onConnected(Room room) {
-
-            }
-
-            @Override
-            public void onConnectFailure(RoomsException error) {
-
-            }
-
-            @Override
-            public void onDisconnected(Room room, RoomsException error) {
-
-            }
-        };
     }
 }
 

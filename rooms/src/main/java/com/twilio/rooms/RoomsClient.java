@@ -95,26 +95,20 @@ public class RoomsClient {
 
     private final Handler handler;
     private final Context applicationContext;
-    private Listener listener;
     private AccessManager accessManager;
     private Map<String, Room> rooms;
-    private ClientListenerHandle clientListenerHandle;
     private RoomListenerHandle roomListenerHandle;
 
-    public RoomsClient(Context context, AccessManager accessManager, RoomsClient.Listener listener) {
+    public RoomsClient(Context context, AccessManager accessManager) {
         if (context == null) {
             throw new NullPointerException("applicationContext must not be null");
         }
         if (accessManager == null) {
             throw new NullPointerException("accessManager must not be null");
         }
-        if (listener == null) {
-            throw new NullPointerException("listener must not be null");
-        }
 
         this.applicationContext = context.getApplicationContext();
         this.accessManager = accessManager;
-        this.listener = listener;
         this.handler = Util.createCallbackHandler();
 
         checkPermissions(context);
@@ -141,13 +135,6 @@ public class RoomsClient {
 
         nativeInitialize(applicationContext);
 
-    }
-
-    /**
-     * Get the {@link Listener}
-     */
-    public Listener getListener() {
-        return listener;
     }
 
     /**
@@ -186,10 +173,9 @@ public class RoomsClient {
             throw new NullPointerException("roomListener must not be null");
         }
 
-        clientListenerHandle = new ClientListenerHandle(listener);
         roomListenerHandle = new RoomListenerHandle(roomListener);
         long nativeRoomFutureHandle =
-                nativeConnect(applicationContext, accessManager.getToken(), clientListenerHandle.get(), roomListenerHandle.get(), null);
+                nativeConnect(applicationContext, accessManager.getToken(), roomListenerHandle.get(), null);
         return new RoomFuture(nativeRoomFutureHandle);
     }
 
@@ -201,25 +187,10 @@ public class RoomsClient {
             throw new NullPointerException("roomListener must not be null");
         }
 
-        clientListenerHandle = new ClientListenerHandle(listener);
         roomListenerHandle = new RoomListenerHandle(roomListener);
         long nativeRoomFutureHandle =
-                nativeConnect(applicationContext, accessManager.getToken(), clientListenerHandle.get(), roomListenerHandle.get(), name);
+                nativeConnect(applicationContext, accessManager.getToken(), roomListenerHandle.get(), name);
         return new RoomFuture(nativeRoomFutureHandle);
-    }
-
-    /**
-     * Listener interface defines a set of callbacks for events related to a
-     * {@link RoomsClient}.
-     */
-    public interface Listener {
-
-        void onConnected(Room room);
-
-        void onConnectFailure(RoomsException error);
-
-        void onDisconnected(Room room, RoomsException error);
-
     }
 
     /**
@@ -350,19 +321,6 @@ public class RoomsClient {
         }
     }
 
-    class ClientListenerHandle extends NativeHandle {
-
-        public ClientListenerHandle(RoomsClient.Listener listener) {
-            super(listener);
-        }
-
-        @Override
-        protected native long nativeCreate(Object object);
-
-        @Override
-        protected native void nativeFree(long nativeHandle);
-    }
-
     class RoomListenerHandle extends NativeHandle {
 
         public RoomListenerHandle(Room.Listener listener) {
@@ -386,7 +344,6 @@ public class RoomsClient {
 
     private native long nativeConnect(Context context,
                                       String token,
-                                      long nativeClientListenerHandle,
                                       long nativeRoomListenerHandle,
                                       String name);
 }

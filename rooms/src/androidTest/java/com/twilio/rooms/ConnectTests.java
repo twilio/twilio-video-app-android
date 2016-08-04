@@ -43,7 +43,7 @@ public class ConnectTests {
 
     @Test(expected = NullPointerException.class)
     public void connect_shouldThrowExceptionWhenRoomListenerIsNull() {
-        RoomsClient roomsClient = new RoomsClient(context, accessManager(), clientListener());
+        RoomsClient roomsClient = new RoomsClient(context, accessManager());
         roomsClient.connect(null);
     }
 
@@ -53,23 +53,7 @@ public class ConnectTests {
 
         AccessManager accessManager = AccessTokenHelper.obtainAccessManager(context, TEST_USER);
 
-        RoomsClient roomsClient = new RoomsClient(context, accessManager, new RoomsClient.Listener() {
-            @Override
-            public void onConnected(Room room) {
-                connectedCountdownLatch.countDown();
-            }
-
-            @Override
-            public void onConnectFailure(RoomsException error) {
-                fail("Unexpected onConnectFailure callback");
-            }
-
-            @Override
-            public void onDisconnected(Room room, RoomsException error) {
-                fail("Unexpected onDisconnected callback");
-
-            }
-        });
+        RoomsClient roomsClient = new RoomsClient(context, accessManager);
 
         roomsClient.connect(roomListener());
 
@@ -82,23 +66,7 @@ public class ConnectTests {
 
         AccessManager accessManager = AccessTokenHelper.obtainAccessManager(context, TEST_USER);
 
-        RoomsClient roomsClient = new RoomsClient(context, accessManager, new RoomsClient.Listener() {
-            @Override
-            public void onConnected(Room room) {
-                connectedCountdownLatch.countDown();
-            }
-
-            @Override
-            public void onConnectFailure(RoomsException error) {
-                fail("Unexpected onConnectFailure callback");
-            }
-
-            @Override
-            public void onDisconnected(Room room, RoomsException error) {
-                fail("Unexpected onDisconnected callback");
-
-            }
-        });
+        RoomsClient roomsClient = new RoomsClient(context, accessManager);
 
         roomsClient.connect(TEST_ROOM, roomListener());
 
@@ -112,24 +80,7 @@ public class ConnectTests {
 
         AccessManager accessManager = AccessTokenHelper.obtainAccessManager(context, TEST_USER);
 
-        final RoomsClient roomsClient = new RoomsClient(context, accessManager, new RoomsClient.Listener() {
-            @Override
-            public void onConnected(Room room) {
-                connectedCountdownLatch.countDown();
-
-                // TODO: disconnect from room
-            }
-
-            @Override
-            public void onConnectFailure(RoomsException error) {
-                fail("Unexpected onConnectFailure callback");
-            }
-
-            @Override
-            public void onDisconnected(Room room, RoomsException error) {
-                disconnectedCountdownLatch.countDown();
-            }
-        });
+        final RoomsClient roomsClient = new RoomsClient(context, accessManager);
 
         roomsClient.connect(roomListener());
 
@@ -146,20 +97,6 @@ public class ConnectTests {
     private Room.Listener roomListener() {
         return new Room.Listener() {
             @Override
-            public void onParticipantConnected(Room room, Participant participant) {
-
-            }
-
-            @Override
-            public void onParticipantDisconnected(Room room, Participant participant) {
-
-            }
-        };
-    }
-
-    private RoomsClient.Listener clientListener() {
-        return new RoomsClient.Listener() {
-            @Override
             public void onConnected(Room room) {
 
             }
@@ -173,6 +110,17 @@ public class ConnectTests {
             public void onDisconnected(Room room, RoomsException error) {
 
             }
+
+            @Override
+            public void onParticipantConnected(Room room, Participant participant) {
+
+            }
+
+            @Override
+            public void onParticipantDisconnected(Room room, Participant participant) {
+
+            }
+
         };
     }
 }

@@ -127,22 +127,7 @@ public class RoomsActivity extends AppCompatActivity {
 
         AccessManager accessManager = new AccessManager(this, capabilityToken, null);
         RoomsClient.setLogLevel(LogLevel.DEBUG);
-        RoomsClient roomsClient = new RoomsClient(this, accessManager, new RoomsClient.Listener() {
-            @Override
-            public void onConnected(Room room) {
-                Timber.i("onConnected");
-            }
-
-            @Override
-            public void onConnectFailure(RoomsException error) {
-                Timber.i("onConnectFailure");
-            }
-
-            @Override
-            public void onDisconnected(Room room, RoomsException error) {
-                Timber.i("onDisconnected");
-            }
-        });
+        RoomsClient roomsClient = new RoomsClient(this, accessManager);
 
         if(roomEditText.getText().length() == 0) {
             roomsClient.connect(RoomListener());
@@ -154,6 +139,21 @@ public class RoomsActivity extends AppCompatActivity {
 
     private Room.Listener RoomListener() {
        return new Room.Listener() {
+           @Override
+           public void onConnected(Room room) {
+
+           }
+
+           @Override
+           public void onConnectFailure(RoomsException error) {
+
+           }
+
+           @Override
+           public void onDisconnected(Room room, RoomsException error) {
+
+           }
+
            @Override
            public void onParticipantConnected(Room room, Participant participant) {
 

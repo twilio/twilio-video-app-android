@@ -7,17 +7,14 @@
 
 #include "webrtc/api/java/jni/jni_helpers.h"
 
-//using namespace webrtc_jni;
-using namespace twiliosdk;
-
-class AndroidPlatformInfoProvider : public PlatformInfoProvider {
+class AndroidPlatformInfoProvider : public twiliosdk::PlatformInfoProvider {
 
 public:
     AndroidPlatformInfoProvider(JNIEnv* jni, jobject context);
 
     virtual ~AndroidPlatformInfoProvider() {}
 
-    virtual const PlatformInfo getReport() const;
+    virtual const twiliosdk::PlatformInfo getReport() const;
 
 private:
     std::string callStringMethod(jmethodID methodId, bool useContext = false) const;
