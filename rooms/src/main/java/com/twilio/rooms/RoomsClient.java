@@ -98,6 +98,7 @@ public class RoomsClient {
     private AccessManager accessManager;
     private Map<String, Room> rooms;
     private RoomListenerHandle roomListenerHandle;
+    private long nativeClientDataHandler;
 
     public RoomsClient(Context context, AccessManager accessManager) {
         if (context == null) {
@@ -134,6 +135,7 @@ public class RoomsClient {
         }
 
         nativeInitialize(applicationContext);
+        nativeClientDataHandler = nativeCreateClient(accessManager.getToken());
 
     }
 
@@ -175,10 +177,11 @@ public class RoomsClient {
 
         roomListenerHandle = new RoomListenerHandle(roomListener);
         long nativeRoomFutureHandle =
-                nativeConnect(applicationContext, accessManager.getToken(), roomListenerHandle.get(), null);
+                nativeConnect(nativeClientDataHandler, roomListenerHandle.get(), null);
         return new RoomFuture(nativeRoomFutureHandle);
     }
 
+    // TODO: change room name to ConnectOptions
     public RoomFuture connect(String name, Room.Listener roomListener) {
         if (name == null) {
             throw new NullPointerException("name must not be null");
@@ -189,7 +192,7 @@ public class RoomsClient {
 
         roomListenerHandle = new RoomListenerHandle(roomListener);
         long nativeRoomFutureHandle =
-                nativeConnect(applicationContext, accessManager.getToken(), roomListenerHandle.get(), name);
+                nativeConnect(nativeClientDataHandler, roomListenerHandle.get(), name);
         return new RoomFuture(nativeRoomFutureHandle);
     }
 
@@ -342,8 +345,10 @@ public class RoomsClient {
 
     private native long nativeInitialize(Context context);
 
-    private native long nativeConnect(Context context,
-                                      String token,
+    // TODO: In future we should pass AccessManager and Media Factory (and maybe Invoker)
+    private native long nativeCreateClient(String token);
+
+    private native long nativeConnect(long nativeClientDataHandler,
                                       long nativeRoomListenerHandle,
                                       String name);
 }

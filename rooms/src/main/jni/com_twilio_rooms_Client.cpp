@@ -90,53 +90,28 @@ Java_com_twilio_rooms_RoomsClient_nativeInitialize(JNIEnv *env, jobject instance
 class ClientDataHolder {
 public:
     ClientDataHolder(std::unique_ptr<twilio::video::Client> client,
-                     AndroidRoomObserver* android_room_observer,
-                     std::shared_ptr<TwilioCommon::AccessManager> access_manager//,
-                     /*std::shared_ptr<media::MediaStack> media_stack*/) {
+                     std::shared_ptr<TwilioCommon::AccessManager> access_manager,
+                     std::shared_ptr<twilio::media::MediaFactory> media_factory) {
         client_ = std::move(client);
-        android_room_observer_ = android_room_observer;
         access_manager_ = access_manager;
-        //media_stack_ = media_stack;
+        media_factory_ = media_factory;
     }
 
-private:
     std::unique_ptr<twilio::video::Client> client_;
-    AndroidRoomObserver* android_room_observer_;
     std::shared_ptr<TwilioCommon::AccessManager> access_manager_;
-    //std::shared_ptr<media::MediaStack> media_stack_;
+    std::shared_ptr<twilio::media::MediaFactory> media_factory_;
 
 };
 
 JNIEXPORT jlong JNICALL
-Java_com_twilio_rooms_RoomsClient_nativeConnect(JNIEnv *env,
-                                                jobject instance,
-                                                jobject context,
-                                                jstring tokenString,
-                                                jlong android_room_observer_handle,
-                                                jstring name) {
-    // Lazily initialize the core relying on a disconnect as the condition used to destroy the core
-    //twiliosdk::TSCSDK *sdk = new twiliosdk::TSCSDK();
-
-    AndroidPlatformInfoProvider provider(env, context);
-    //sdk->setPlatformInfo(provider.getReport());
-
-//    TSCVideoCodecRef androidVideoCodecManager =
-//        new rtc::RefCountedObject<AndroidVideoCodecManager>();
-    //TSCMediaCodecRegistry &codecManager = sdk->getMediaCodecRegistry();
-    //codecManager.registerVideoCodec(androidVideoCodecManager);
-
-    // Connect to a room
-    std::string token = webrtc_jni::JavaToStdString(env, tokenString);
+Java_com_twilio_rooms_RoomsClient_nativeCreateClient(JNIEnv *env,
+                                                     jobject instance,
+                                                     jstring token_string) {
+    // Create client
+    std::string token = webrtc_jni::JavaToStdString(env, token_string);
     std::shared_ptr<TwilioCommon::AccessManager>
-        access_manager = TwilioCommon::AccessManager::create(
-        token, nullptr);
+        access_manager = TwilioCommon::AccessManager::create(token, nullptr);
 
-    AndroidRoomObserver *android_room_observer =
-        reinterpret_cast<AndroidRoomObserver *>(android_room_observer_handle);
-    //std::shared_ptr<twilio::video::RoomObserver> room_observer(android_room_observer);
-
-    //std::shared_ptr<media::MediaStack> media_stack(new media::MediaStack());
-    //media_stack->start(media::MediaStackOptions());
     std::shared_ptr<twilio::media::MediaFactory> media_factory =
         twilio::media::MediaFactory::create(twilio::media::MediaOptions());
 
@@ -144,12 +119,42 @@ Java_com_twilio_rooms_RoomsClient_nativeConnect(JNIEnv *env,
 
     std::unique_ptr<twilio::video::Client> client =
         twilio::video::Client::create(access_manager,
-                                      //client_observer,
                                       media_factory,
                                       invoker);
+    // TODO: Once we have access manager and media factory properly implemented in java layer,
+    // we won't be needing ClientDataHolder
+    return jlongFromPointer(
+        new ClientDataHolder(std::move(client), access_manager, media_factory));
+
+}
+
+JNIEXPORT jlong JNICALL
+Java_com_twilio_rooms_RoomsClient_nativeConnect(JNIEnv *env,
+                                                jobject instance,
+                                                jlong nativeDataHolder,
+                                                jlong android_room_observer_handle,
+                                                jstring name) {
+
+//    TSCVideoCodecRef androidVideoCodecManager =
+//        new rtc::RefCountedObject<AndroidVideoCodecManager>();
+    //TSCMediaCodecRegistry &codecManager = sdk->getMediaCodecRegistry();
+    //codecManager.registerVideoCodec(androidVideoCodecManager);
+
+
+    AndroidRoomObserver *android_room_observer =
+        reinterpret_cast<AndroidRoomObserver *>(android_room_observer_handle);
+    ClientDataHolder* client_data_holder =
+        reinterpret_cast<ClientDataHolder *>(nativeDataHolder);
+
+    //std::shared_ptr<media::MediaStack> media_stack(new media::MediaStack());
+    //media_stack->start(media::MediaStackOptions());
+
+
+
 
     if(IsNull(env, name)) {
-        std::shared_ptr<twilio::video::RoomFuture> future = client->connect(android_room_observer);
+        std::shared_ptr<twilio::video::RoomFuture> future =
+            client_data_holder->client_->connect(android_room_observer);
     } else {
         std::string roomName = webrtc_jni::JavaToStdString(env, name);
         twilio::video::ConnectOptions connect_options = twilio::video::ConnectOptions::Builder()
@@ -157,12 +162,8 @@ Java_com_twilio_rooms_RoomsClient_nativeConnect(JNIEnv *env,
                 .setCreateRoom(true)
                 .build();
         std::shared_ptr<twilio::video::RoomFuture> future =
-            client->connect(connect_options, android_room_observer);
+            client_data_holder->client_->connect(connect_options, android_room_observer);
     }
-
-    // TODO: properly delete holder
-    //new ClientDataHolder(std::move(client), client_observer, access_manager, media_stack);
-    new ClientDataHolder(std::move(client), android_room_observer, access_manager);//, media_stack);
 
     return 0;
 }

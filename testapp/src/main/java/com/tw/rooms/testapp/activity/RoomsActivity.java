@@ -141,27 +141,27 @@ public class RoomsActivity extends AppCompatActivity {
        return new Room.Listener() {
            @Override
            public void onConnected(Room room) {
-
+               Timber.i("onConnected");
            }
 
            @Override
            public void onConnectFailure(RoomsException error) {
-
+               Timber.i("onConnectFailure");
            }
 
            @Override
            public void onDisconnected(Room room, RoomsException error) {
-
+               Timber.i("onDisconnected");
            }
 
            @Override
            public void onParticipantConnected(Room room, Participant participant) {
-
+               Timber.i("onParticipantConnected");
            }
 
            @Override
            public void onParticipantDisconnected(Room room, Participant participant) {
-
+               Timber.i("onParticipantDisconnected");
            }
        };
     }
