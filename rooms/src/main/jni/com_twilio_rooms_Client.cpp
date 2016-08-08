@@ -16,8 +16,6 @@
 #include "TSCLogger.h"
 #include "video.h"
 #include "media/media_factory.h"
-//#include "ITSCVideoCodec.h"
-//#include "TSCMediaCodecRegistry.h"
 #include "android_platform_info_provider.h"
 #include "android_video_codec_manager.h"
 #include "android_room_observer.h"
@@ -137,10 +135,7 @@ Java_com_twilio_rooms_RoomsClient_nativeConnect(JNIEnv *env,
                                                 jlong android_room_observer_handle,
                                                 jstring name) {
 
-//    TSCVideoCodecRef androidVideoCodecManager =
-//        new rtc::RefCountedObject<AndroidVideoCodecManager>();
-    //TSCMediaCodecRegistry &codecManager = sdk->getMediaCodecRegistry();
-    //codecManager.registerVideoCodec(androidVideoCodecManager);
+
     ClientDataHolder* client_data_holder =
         reinterpret_cast<ClientDataHolder *>(nativeDataHolder);
 

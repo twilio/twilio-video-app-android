@@ -15,8 +15,7 @@ JNIEXPORT void JNICALL Java_com_twilio_rooms_CameraCapturer_nativeStopVideoSourc
 {
     TS_CORE_LOG_MODULE(kTSCoreLogModulePlatform, kTSCoreLogLevelDebug, "stopVideoSource");
     // TODO: Implement stopping video source
-    //TSCSessionPtr *session = reinterpret_cast<TSCSessionPtr *>(nativeSession);
-    //session->get()->stopVideoSource();
+
 }
 
 
@@ -25,8 +24,6 @@ JNIEXPORT void JNICALL Java_com_twilio_rooms_CameraCapturer_nativeRestartVideoSo
 {
     TS_CORE_LOG_MODULE(kTSCoreLogModulePlatform, kTSCoreLogLevelDebug, "stopVideoSource");
     // TODO: Implement restarting video source
-    //TSCSessionPtr *session = reinterpret_cast<TSCSessionPtr *>(nativeSession);
-    //session->get()->restartVideoSource();
 }
 
 JNIEXPORT jlong JNICALL
