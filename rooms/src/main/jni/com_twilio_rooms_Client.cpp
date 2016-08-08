@@ -164,7 +164,7 @@ Java_com_twilio_rooms_RoomsClient_nativeConnect(JNIEnv *env,
         client_data_holder->client_->connect(connect_options_builder.build(),
                                              android_room_observer);
 
-    return 0;
+    return jlongFromPointer(room.release());
 }
 
 JNIEXPORT jlong JNICALL
