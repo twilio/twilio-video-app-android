@@ -160,7 +160,7 @@ Java_com_twilio_rooms_RoomsClient_nativeConnect(JNIEnv *env,
         connect_options_builder.setRoomName(roomName);
     }
 
-    std::shared_ptr<twilio::video::RoomFuture> future =
+    std::unique_ptr<twilio::video::Room> room =
         client_data_holder->client_->connect(connect_options_builder.build(),
                                              android_room_observer);
 

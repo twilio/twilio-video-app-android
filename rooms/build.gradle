@@ -12,8 +12,15 @@ def supportedAbis = [
         "x86_64"
 ]
 
+def supportedArchFolderName = [
+        "armeabi-v7a" : "armeabiv7a",
+        "arm64-v8a" : "arm64v8a",
+        "x86" : "x86",
+        "x86_64" : "x86_64"
+]
+
 def coreHome = "${twilioSdkHome}/twilio-video"
-def coreHeaders = "${coreHome}/include"
+def coreHeaders = "${coreHome}/arm64v8a/gnu-4.9/debug/include"
 def coreStaticLib = "libtwilio-video.a"
 
 def twilioCommonHome = "${twilioSdkHome}/twilio-common"
@@ -39,6 +46,8 @@ def webRtcHome = "${twilioSdkHome}/twilio-webrtc"
 def webRtcHeaders = "${webRtcHome}/include"
 def webRtcStaticLib = "libwebrtc.a"
 
+def resiprocateStaticLib = "libresiprocate.a"
+
 configurations {
     preCompile
 }
@@ -49,8 +58,9 @@ model {
             twilioSdkCore {
                 headers.srcDir "${coreHeaders}"
                 binaries.withType(StaticLibraryBinary) {
-                    def coreStaticLibPath = "${coreHome}/lib/${buildType.getName()}/" +
-                            "${targetPlatform.getName()}/${coreStaticLib}"
+                    def coreStaticLibPath = "${coreHome}/"+
+                            "${supportedArchFolderName.get(targetPlatform.getName())}/gnu-4.9/"+
+                            "${buildType.getName()}/lib/${coreStaticLib}"
                     staticLibraryFile = file("${coreStaticLibPath}")
                 }
             }
@@ -135,6 +145,15 @@ model {
                     staticLibraryFile = file("${webRtcStaticLibPath}")
                 }
             }
+            resiprocate {
+                headers.srcDir "${coreHeaders}"
+                binaries.withType(StaticLibraryBinary) {
+                    def resiprocateStaticLibPath = "${coreHome}/"+
+                            "${supportedArchFolderName.get(targetPlatform.getName())}/gnu-4.9/"+
+                            "${buildType.getName()}/lib/${resiprocateStaticLib}"
+                    staticLibraryFile = file("${resiprocateStaticLibPath}")
+                }
+            }
         }
     }
 
@@ -199,6 +218,7 @@ model {
                 dependencies {
                     library "twilioSdkCore" linkage "static"
                     library "twilioCommon" linkage "static"
+                    library "resiprocate" linkage "static"
                     library "pocoFoundation" linkage "static"
                     library "pocoNet" linkage "static"
                     library "pocoCrypto" linkage "static"
@@ -206,8 +226,8 @@ model {
                     library "pocoUtil" linkage "static"
                     library "pocoXml" linkage "static"
                     library "pocoJson" linkage "static"
-                    library "boringssl" linkage "static"
                     library "webrtc" linkage "static"
+                    library "boringssl" linkage "static"
                 }
             }
         }
@@ -253,7 +273,7 @@ dependencies {
     preCompile 'com.googlesource.boringssl.twilio:twilio-boringssl:1.0.13:android@tar.bz2'
     preCompile 'com.twilio.sdk:twilio-common:0.2.0:android@tar.bz2'
     preCompile 'com.twilio.sdk:twilio-webrtc:52.4:android@tar.bz2'
-    preCompile 'com.twilio.sdk:twilio-video:0.1.7-SNAPSHOT:android@tar.bz2'
+    preCompile 'com.twilio.sdk:twilio-video:0.1.9:android@tar.bz2'
 
     testCompile 'junit:junit:4.12'
     testCompile 'org.mockito:mockito-core:1.10.19'
