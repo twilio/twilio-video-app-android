@@ -97,7 +97,6 @@ public class RoomsClient {
     private final Context applicationContext;
     private AccessManager accessManager;
     private Map<String, Room> rooms;
-    private RoomListenerHandle roomListenerHandle;
     private long nativeClientDataHandler;
 
     public RoomsClient(Context context, AccessManager accessManager) {
@@ -175,7 +174,7 @@ public class RoomsClient {
             throw new NullPointerException("roomListener must not be null");
         }
 
-        roomListenerHandle = new RoomListenerHandle(roomListener);
+        RoomListenerHandle roomListenerHandle = new RoomListenerHandle(roomListener);
         long nativeRoomFutureHandle =
                 nativeConnect(nativeClientDataHandler, roomListenerHandle.get(), null);
         return new RoomFuture(nativeRoomFutureHandle);
@@ -190,7 +189,7 @@ public class RoomsClient {
             throw new NullPointerException("roomListener must not be null");
         }
 
-        roomListenerHandle = new RoomListenerHandle(roomListener);
+        RoomListenerHandle roomListenerHandle = new RoomListenerHandle(roomListener);
         long nativeRoomFutureHandle =
                 nativeConnect(nativeClientDataHandler, roomListenerHandle.get(), name);
         return new RoomFuture(nativeRoomFutureHandle);

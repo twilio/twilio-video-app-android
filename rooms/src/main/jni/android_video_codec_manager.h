@@ -1,6 +1,6 @@
 #ifndef ANDROID_VIDEO_CODEC_MANAGER_H
 #define ANDROID_VIDEO_CODEC_MANAGER_H
-
+/*
 #include <jni.h>
 #include <string.h>
 #include "ITSCVideoCodec.h"
@@ -23,5 +23,5 @@ public:
     virtual const std::string getName();
 
 };
-
+*/
 #endif //ANDROID_VIDEO_CODEC_MANAGER_H

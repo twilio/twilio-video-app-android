@@ -112,8 +112,10 @@ Java_com_twilio_rooms_RoomsClient_nativeCreateClient(JNIEnv *env,
     std::shared_ptr<TwilioCommon::AccessManager>
         access_manager = TwilioCommon::AccessManager::create(token, nullptr);
 
+    // Create a MediaFactory
+    twilio::media::MediaOptions media_options;
     std::shared_ptr<twilio::media::MediaFactory> media_factory =
-        twilio::media::MediaFactory::create(twilio::media::MediaOptions());
+        twilio::media::MediaFactory::create(media_options);
 
     twilio::video::Invoker *invoker = new twilio::video::Invoker();
 
@@ -139,31 +141,28 @@ Java_com_twilio_rooms_RoomsClient_nativeConnect(JNIEnv *env,
 //        new rtc::RefCountedObject<AndroidVideoCodecManager>();
     //TSCMediaCodecRegistry &codecManager = sdk->getMediaCodecRegistry();
     //codecManager.registerVideoCodec(androidVideoCodecManager);
+    ClientDataHolder* client_data_holder =
+        reinterpret_cast<ClientDataHolder *>(nativeDataHolder);
+
+    std::shared_ptr<twilio::media::LocalMedia> local_media =
+        client_data_holder->media_factory_->createLocalMedia();
+    local_media->addAudioTrack(); // enabled, default constraints
+
 
 
     AndroidRoomObserver *android_room_observer =
         reinterpret_cast<AndroidRoomObserver *>(android_room_observer_handle);
-    ClientDataHolder* client_data_holder =
-        reinterpret_cast<ClientDataHolder *>(nativeDataHolder);
 
-    //std::shared_ptr<media::MediaStack> media_stack(new media::MediaStack());
-    //media_stack->start(media::MediaStackOptions());
-
-
-
-
-    if(IsNull(env, name)) {
-        std::shared_ptr<twilio::video::RoomFuture> future =
-            client_data_holder->client_->connect(android_room_observer);
-    } else {
+    twilio::video::ConnectOptions::Builder connect_options_builder =
+        twilio::video::ConnectOptions::Builder().setCreateRoom(true).setLocalMedia(local_media);
+    if(!IsNull(env, name)) {
         std::string roomName = webrtc_jni::JavaToStdString(env, name);
-        twilio::video::ConnectOptions connect_options = twilio::video::ConnectOptions::Builder()
-                .setRoomName(roomName)
-                .setCreateRoom(true)
-                .build();
-        std::shared_ptr<twilio::video::RoomFuture> future =
-            client_data_holder->client_->connect(connect_options, android_room_observer);
+        connect_options_builder.setRoomName(roomName);
     }
+
+    std::shared_ptr<twilio::video::RoomFuture> future =
+        client_data_holder->client_->connect(connect_options_builder.build(),
+                                             android_room_observer);
 
     return 0;
 }

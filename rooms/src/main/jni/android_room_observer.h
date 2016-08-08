@@ -7,6 +7,8 @@
 #include "participant.h"
 #include "room_observer.h"
 
+using namespace webrtc_jni;
+
 class AndroidRoomObserver: public twilio::video::RoomObserver {
 public:
     AndroidRoomObserver(JNIEnv *env, jobject j_room_observer) :
