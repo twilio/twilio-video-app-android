@@ -18,11 +18,11 @@ import com.tw.rooms.testapp.BuildConfig;
 import com.tw.rooms.testapp.R;
 import com.tw.rooms.testapp.util.SimpleSignalingUtils;
 import com.twilio.common.AccessManager;
-import com.twilio.rooms.LogLevel;
-import com.twilio.rooms.Participant;
-import com.twilio.rooms.RoomsClient;
-import com.twilio.rooms.Room;
-import com.twilio.rooms.RoomsException;
+import com.twilio.video.LogLevel;
+import com.twilio.video.Participant;
+import com.twilio.video.RoomsClient;
+import com.twilio.video.Room;
+import com.twilio.video.RoomsException;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;

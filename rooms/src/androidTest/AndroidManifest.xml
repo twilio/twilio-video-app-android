@@ -12,11 +12,11 @@
 
     <application>
         <activity
-            android:name="com.twilio.rooms.activity.RoomsTestActivity">
+            android:name="com.twilio.video.activity.RoomsTestActivity">
         </activity>
 
         <activity
-            android:name="com.twilio.rooms.activity.CameraCapturerTestActivity">
+            android:name="com.twilio.video.activity.CameraCapturerTestActivity">
         </activity>
 
     </application>
