@@ -17,7 +17,6 @@
 #include "video.h"
 #include "media/media_factory.h"
 #include "android_platform_info_provider.h"
-#include "android_video_codec_manager.h"
 #include "android_room_observer.h"
 #include "connect_options.h"
 
