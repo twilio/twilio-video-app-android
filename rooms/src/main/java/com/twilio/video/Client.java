@@ -169,6 +169,7 @@ public class Client {
         return audioManager.isSpeakerphoneOn() ? AudioOutput.SPEAKERPHONE : AudioOutput.HEADSET;
     }
 
+    // TODO: Remove RoomFuture
     public RoomFuture connect(Room.Listener roomListener) {
         if (roomListener == null) {
             throw new NullPointerException("roomListener must not be null");
@@ -181,6 +182,7 @@ public class Client {
     }
 
     // TODO: change room name to ConnectOptions
+    // TODO: Remove RoomFuture
     public RoomFuture connect(String name, Room.Listener roomListener) {
         if (name == null) {
             throw new NullPointerException("name must not be null");
