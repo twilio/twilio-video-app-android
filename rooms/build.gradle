@@ -23,8 +23,8 @@ def coreHome = "${twilioSdkHome}/twilio-video"
 def coreHeaders = "${coreHome}/arm64v8a/gnu-4.9/debug/include"
 def coreStaticLib = "libtwilio-video.a"
 
-def twilioCommonHome = "${twilioSdkHome}/twilio-common"
-def twilioCommonHeaders = "${twilioCommonHome}/include"
+def twilioCommonHome = "${coreHome}"
+def twilioCommonHeaders = "${coreHeaders}/common"
 def twilioCommonStaticLib = "libtwilio-common.a"
 
 def pocoHome = "${twilioSdkHome}/twilio-poco"
@@ -48,6 +48,8 @@ def webRtcStaticLib = "libwebrtc.a"
 
 def resiprocateStaticLib = "libresiprocate.a"
 
+def compilerVersion = "gnu-4.9"
+
 configurations {
     preCompile
 }
@@ -59,7 +61,8 @@ model {
                 headers.srcDir "${coreHeaders}"
                 binaries.withType(StaticLibraryBinary) {
                     def coreStaticLibPath = "${coreHome}/"+
-                            "${supportedArchFolderName.get(targetPlatform.getName())}/gnu-4.9/"+
+                            "${supportedArchFolderName.get(targetPlatform.getName())}/"+
+                            "${compilerVersion}/"+
                             "${buildType.getName()}/lib/${coreStaticLib}"
                     staticLibraryFile = file("${coreStaticLibPath}")
                 }
@@ -67,9 +70,10 @@ model {
             twilioCommon {
                 headers.srcDir "${twilioCommonHeaders}"
                 binaries.withType(StaticLibraryBinary) {
-                    def twilioCommonStaticLibPath = "${twilioCommonHome}/lib/" +
-                            "${buildType.getName()}/" +
-                            "${targetPlatform.getName()}/${twilioCommonStaticLib}"
+                    def twilioCommonStaticLibPath = "${twilioCommonHome}/" +
+                            "${supportedArchFolderName.get(targetPlatform.getName())}/"+
+                            "${compilerVersion}/"+
+                            "${buildType.getName()}/lib/${twilioCommonStaticLib}"
                     staticLibraryFile = file("${twilioCommonStaticLibPath}")
                 }
             }
