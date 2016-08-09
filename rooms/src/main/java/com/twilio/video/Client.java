@@ -19,6 +19,8 @@ import java.util.Map;
  * The Client allows user to create or participate in Rooms.
  */
 public class Client {
+
+    // TODO: Check which of these error codes are still valid
     /**
      * Authenticating your Client failed due to invalid auth credentials.
      */
@@ -133,8 +135,10 @@ public class Client {
             trySetCoreModuleLogLevel(module.ordinal(), moduleLogLevel.get(module).ordinal());
         }
 
-        nativeInitialize(applicationContext);
-        nativeClientDataHandler = nativeCreateClient(accessManager.getToken());
+        if (!nativeInitialize(applicationContext)) {
+            throw new RuntimeException("Unable to initialize WebRTC media related objects");
+        }
+        nativeClientDataHandler = nativeCreateClient(accessManager, null);
 
     }
 
@@ -344,10 +348,10 @@ public class Client {
 
     private native static int nativeGetCoreLogLevel();
 
-    private native long nativeInitialize(Context context);
+    private native boolean nativeInitialize(Context context);
 
     // TODO: In future we should pass AccessManager and Media Factory (and maybe Invoker)
-    private native long nativeCreateClient(String token);
+    private native long nativeCreateClient(AccessManager accessManager, MediaFactory mediaFactory);
 
     private native long nativeConnect(long nativeClientDataHandler,
                                       long nativeRoomListenerHandle,
