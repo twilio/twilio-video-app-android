@@ -1,4 +1,4 @@
-#include "com_twilio_rooms_Client.h"
+#include "com_twilio_video_Client.h"
 #include "webrtc/api/java/jni/jni_helpers.h"
 
 
@@ -49,14 +49,14 @@ extern "C" void JNIEXPORT JNICALL JNI_OnUnLoad(JavaVM *jvm, void *reserved) {
     webrtc_jni::FreeGlobalClassReferenceHolder();
 }
 
-JNIEXPORT void JNICALL Java_com_twilio_rooms_RoomsClient_nativeSetCoreLogLevel
+JNIEXPORT void JNICALL Java_com_twilio_video_RoomsClient_nativeSetCoreLogLevel
     (JNIEnv *env, jobject instance, jint level) {
     TS_CORE_LOG_MODULE(kTSCoreLogModulePlatform, kTSCoreLogLevelDebug, "setCoreLogLevel");
     TSCoreLogLevel coreLogLevel = static_cast<TSCoreLogLevel>(level);
     TSCLogger::instance()->setLogLevel(coreLogLevel);
 }
 
-JNIEXPORT void JNICALL Java_com_twilio_rooms_RoomsClient_nativeSetModuleLevel
+JNIEXPORT void JNICALL Java_com_twilio_video_RoomsClient_nativeSetModuleLevel
     (JNIEnv *env, jobject instance, jint module, jint level) {
     TS_CORE_LOG_MODULE(kTSCoreLogModulePlatform, kTSCoreLogLevelDebug, "setModuleLevel");
     TSCoreLogModule coreLogModule = static_cast<TSCoreLogModule>(module);
@@ -64,14 +64,14 @@ JNIEXPORT void JNICALL Java_com_twilio_rooms_RoomsClient_nativeSetModuleLevel
     TSCLogger::instance()->setModuleLogLevel(coreLogModule, coreLogLevel);
 }
 
-JNIEXPORT jint JNICALL Java_com_twilio_rooms_RoomsClient_nativeGetCoreLogLevel
+JNIEXPORT jint JNICALL Java_com_twilio_video_RoomsClient_nativeGetCoreLogLevel
     (JNIEnv *env, jobject instance) {
     TS_CORE_LOG_MODULE(kTSCoreLogModulePlatform, kTSCoreLogLevelDebug, "getCoreLogLevel");
     return TSCLogger::instance()->getLogLevel();
 }
 
 JNIEXPORT jboolean JNICALL
-Java_com_twilio_rooms_RoomsClient_nativeInitialize(JNIEnv *env, jobject instance, jobject context) {
+Java_com_twilio_video_RoomsClient_nativeInitialize(JNIEnv *env, jobject instance, jobject context) {
     bool failure = false;
 
     // Setup media related Android device objects
@@ -102,7 +102,7 @@ public:
 };
 
 JNIEXPORT jlong JNICALL
-Java_com_twilio_rooms_RoomsClient_nativeCreateClient(JNIEnv *env,
+Java_com_twilio_video_RoomsClient_nativeCreateClient(JNIEnv *env,
                                                      jobject instance,
                                                      jstring token_string) {
     // Create client
@@ -129,7 +129,7 @@ Java_com_twilio_rooms_RoomsClient_nativeCreateClient(JNIEnv *env,
 }
 
 JNIEXPORT jlong JNICALL
-Java_com_twilio_rooms_RoomsClient_nativeConnect(JNIEnv *env,
+Java_com_twilio_video_RoomsClient_nativeConnect(JNIEnv *env,
                                                 jobject instance,
                                                 jlong nativeDataHolder,
                                                 jlong android_room_observer_handle,
@@ -163,7 +163,7 @@ Java_com_twilio_rooms_RoomsClient_nativeConnect(JNIEnv *env,
 }
 
 JNIEXPORT jlong JNICALL
-Java_com_twilio_rooms_RoomsClient_00024RoomListenerHandle_nativeCreate(JNIEnv *env,
+Java_com_twilio_video_RoomsClient_00024RoomListenerHandle_nativeCreate(JNIEnv *env,
                                                                        jobject instance,
                                                                        jobject object) {
     TS_CORE_LOG_MODULE(kTSCoreLogModulePlatform, kTSCoreLogLevelDebug,
@@ -173,7 +173,7 @@ Java_com_twilio_rooms_RoomsClient_00024RoomListenerHandle_nativeCreate(JNIEnv *e
 }
 
 JNIEXPORT void JNICALL
-Java_com_twilio_rooms_RoomsClient_00024RoomListenerHandle_nativeFree(JNIEnv *env,
+Java_com_twilio_video_RoomsClient_00024RoomListenerHandle_nativeFree(JNIEnv *env,
                                                                      jobject instance,
                                                                      jlong nativeHandle) {
     TS_CORE_LOG_MODULE(kTSCoreLogModulePlatform, kTSCoreLogLevelDebug,

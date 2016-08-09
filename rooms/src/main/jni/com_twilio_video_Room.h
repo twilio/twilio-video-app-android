@@ -7,13 +7,13 @@
 extern "C" {
 #endif
 
-JNIEXPORT jstring JNICALL Java_com_twilio_rooms_Room_nativeGetName
+JNIEXPORT jstring JNICALL Java_com_twilio_video_Room_nativeGetName
         (JNIEnv *, jobject, jlong);
 
-JNIEXPORT jstring JNICALL Java_com_twilio_rooms_Room_nativeGetSid
+JNIEXPORT jstring JNICALL Java_com_twilio_video_Room_nativeGetSid
         (JNIEnv *, jobject, jlong);
 
-JNIEXPORT void JNICALL Java_com_twilio_rooms_Room_nativeDisconnect
+JNIEXPORT void JNICALL Java_com_twilio_video_Room_nativeDisconnect
         (JNIEnv *, jobject, jlong);
 
 #ifdef __cplusplus

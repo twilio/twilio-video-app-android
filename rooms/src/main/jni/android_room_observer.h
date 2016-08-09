@@ -18,7 +18,7 @@ public:
             GetMethodID(env,
                         *j_room_observer_class_,
                         "onConnected",
-                        "(Lcom/twilio/rooms/Room;)V")) {
+                        "(Lcom/twilio/video/Room;)V")) {
         TS_CORE_LOG_MODULE(kTSCoreLogModulePlatform,
                            kTSCoreLogLevelDebug,
                            "AndroidRoomObserver");

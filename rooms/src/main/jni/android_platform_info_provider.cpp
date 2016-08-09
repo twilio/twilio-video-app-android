@@ -3,7 +3,7 @@
 AndroidPlatformInfoProvider::AndroidPlatformInfoProvider(JNIEnv* jni, jobject context):
         j_context_global_(jni, context),
         j_platform_info_class_(jni,
-                               jni->FindClass("com/twilio/rooms/PlatformInfo")),
+                               jni->FindClass("com/twilio/video/PlatformInfo")),
         j_getPlatfomName_id(
             webrtc_jni::GetStaticMethodID(jni,
                                   *j_platform_info_class_,
