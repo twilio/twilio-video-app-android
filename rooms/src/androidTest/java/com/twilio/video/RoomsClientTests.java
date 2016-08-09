@@ -35,30 +35,30 @@ public class RoomsClientTests {
 
     @Test(expected = NullPointerException.class)
     public void client_shouldThrowExceptionWhenContextIsNull() {
-        new RoomsClient(null, accessManager());
+        new Client(null, accessManager());
     }
 
     @Test(expected = NullPointerException.class)
     public void client_shouldThrowExceptionWhenAccessManagerIsNull() {
-        new RoomsClient(context, null);
+        new Client(context, null);
     }
 
     @Test(expected = NullPointerException.class)
     public void client_shouldThrowExceptionWhenListenerIsNull() {
-        new RoomsClient(context, accessManager());
+        new Client(context, accessManager());
     }
 
     @Test
     public void logLevel_shouldBeRetained() {
-        RoomsClient.setLogLevel(LogLevel.DEBUG);
-        assertEquals(LogLevel.DEBUG, RoomsClient.getLogLevel());
+        Client.setLogLevel(LogLevel.DEBUG);
+        assertEquals(LogLevel.DEBUG, Client.getLogLevel());
     }
 
     @Test
     public void getVersion_shouldReturnValidSemVerFormattedVersion() {
         String semVerRegex = "^([0-9]+)\\.([0-9]+)\\.([0-9]+)(?:-([0-9A-" +
                 "Za-z-]+(?:\\.[0-9A-Za-z-]+)*))?(?:\\+[0-9A-Za-z-]+)?$";
-        String version = RoomsClient.getVersion();
+        String version = Client.getVersion();
 
         assertNotNull(version);
         assertTrue(version.matches(semVerRegex));
@@ -66,9 +66,9 @@ public class RoomsClientTests {
 
     @Test
     public void audioOutput_shouldBeRetained() {
-        RoomsClient roomsClient = new RoomsClient(context, accessManager());
-        roomsClient.setAudioOutput(AudioOutput.SPEAKERPHONE);
-        assertEquals(AudioOutput.SPEAKERPHONE, roomsClient.getAudioOutput());
+        Client client = new Client(context, accessManager());
+        client.setAudioOutput(AudioOutput.SPEAKERPHONE);
+        assertEquals(AudioOutput.SPEAKERPHONE, client.getAudioOutput());
     }
 
     private AccessManager accessManager() {

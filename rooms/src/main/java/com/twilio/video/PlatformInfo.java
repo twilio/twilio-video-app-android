@@ -85,7 +85,7 @@ public final class PlatformInfo {
     }
 
     static String getRtcPlatformSdkVersion() {
-        return RoomsClient.getVersion();
+        return Client.getVersion();
     }
 
     static String getOsArch() {

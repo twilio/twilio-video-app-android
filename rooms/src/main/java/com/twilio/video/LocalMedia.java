@@ -187,11 +187,11 @@ public class LocalMedia {
          *              the {@link LocalMedia}
          * @param exception Provides the error that occurred while attempting to add or remove
          *                  this {@link LocalVideoTrack}. Adding or removing a local video track
-         *                  can result in {@link RoomsClient#TOO_MANY_TRACKS},
-         *                  {@link RoomsClient#TRACK_OPERATION_IN_PROGRESS},
-         *                  {@link RoomsClient#INVALID_VIDEO_CAPTURER},
-         *                  {@link RoomsClient#INVALID_VIDEO_TRACK_STATE},
-         *                  or {@link RoomsClient#TRACK_CREATION_FAILED}.
+         *                  can result in {@link Client#TOO_MANY_TRACKS},
+         *                  {@link Client#TRACK_OPERATION_IN_PROGRESS},
+         *                  {@link Client#INVALID_VIDEO_CAPTURER},
+         *                  {@link Client#INVALID_VIDEO_TRACK_STATE},
+         *                  or {@link Client#TRACK_CREATION_FAILED}.
          */
         void onLocalVideoTrackError(LocalMedia localMedia,
                                     LocalVideoTrack track,

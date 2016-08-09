@@ -20,7 +20,7 @@ import com.tw.rooms.testapp.util.SimpleSignalingUtils;
 import com.twilio.common.AccessManager;
 import com.twilio.video.LogLevel;
 import com.twilio.video.Participant;
-import com.twilio.video.RoomsClient;
+import com.twilio.video.Client;
 import com.twilio.video.Room;
 import com.twilio.video.RoomsException;
 
@@ -126,13 +126,13 @@ public class RoomsActivity extends AppCompatActivity {
                 .setAction("Action", null).show();
 
         AccessManager accessManager = new AccessManager(this, capabilityToken, null);
-        RoomsClient.setLogLevel(LogLevel.DEBUG);
-        RoomsClient roomsClient = new RoomsClient(this, accessManager);
+        Client.setLogLevel(LogLevel.DEBUG);
+        Client client = new Client(this, accessManager);
 
         if(roomEditText.getText().length() == 0) {
-            roomsClient.connect(RoomListener());
+            client.connect(RoomListener());
         } else {
-            roomsClient.connect(roomEditText.getText().toString(), RoomListener());
+            client.connect(roomEditText.getText().toString(), RoomListener());
         }
 
     }

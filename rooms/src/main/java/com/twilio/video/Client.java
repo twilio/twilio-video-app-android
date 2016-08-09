@@ -18,7 +18,7 @@ import java.util.Map;
 /**
  * The Client allows user to create or participate in Rooms.
  */
-public class RoomsClient {
+public class Client {
     /**
      * Authenticating your Client failed due to invalid auth credentials.
      */
@@ -91,7 +91,7 @@ public class RoomsClient {
     private static LogLevel level = LogLevel.OFF;
     private static Map<LogModule, LogLevel> moduleLogLevel = new EnumMap(LogModule.class);
     private static volatile boolean libraryIsLoaded = false;
-    private static final Logger logger = Logger.getLogger(RoomsClient.class);
+    private static final Logger logger = Logger.getLogger(Client.class);
 
     private final Handler handler;
     private final Context applicationContext;
@@ -99,7 +99,7 @@ public class RoomsClient {
     private Map<String, Room> rooms;
     private long nativeClientDataHandler;
 
-    public RoomsClient(Context context, AccessManager accessManager) {
+    public Client(Context context, AccessManager accessManager) {
         if (context == null) {
             throw new NullPointerException("applicationContext must not be null");
         }
@@ -222,7 +222,7 @@ public class RoomsClient {
         setSDKLogLevel(level);
         trySetCoreLogLevel(level.ordinal());
         // Save the log level
-        RoomsClient.level = level;
+        Client.level = level;
     }
 
     /**
@@ -237,7 +237,7 @@ public class RoomsClient {
         }
         trySetCoreModuleLogLevel(module.ordinal(), level.ordinal());
         // Save the module log level
-        RoomsClient.moduleLogLevel.put(module, level);
+        Client.moduleLogLevel.put(module, level);
     }
 
     private static void setSDKLogLevel(LogLevel level) {

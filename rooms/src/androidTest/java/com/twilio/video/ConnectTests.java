@@ -38,13 +38,13 @@ public class ConnectTests {
     @Before
     public void setup() {
         context = InstrumentationRegistry.getInstrumentation().getTargetContext();
-        RoomsClient.setLogLevel(LogLevel.DEBUG);
+        Client.setLogLevel(LogLevel.DEBUG);
     }
 
     @Test(expected = NullPointerException.class)
     public void connect_shouldThrowExceptionWhenRoomListenerIsNull() {
-        RoomsClient roomsClient = new RoomsClient(context, accessManager());
-        roomsClient.connect(null);
+        Client client = new Client(context, accessManager());
+        client.connect(null);
     }
 
     @Test
@@ -53,9 +53,9 @@ public class ConnectTests {
 
         AccessManager accessManager = AccessTokenHelper.obtainAccessManager(context, TEST_USER);
 
-        RoomsClient roomsClient = new RoomsClient(context, accessManager);
+        Client client = new Client(context, accessManager);
 
-        roomsClient.connect(roomListener());
+        client.connect(roomListener());
 
         assertTrue(connectedCountdownLatch.await(20, TimeUnit.SECONDS));
     }
@@ -66,9 +66,9 @@ public class ConnectTests {
 
         AccessManager accessManager = AccessTokenHelper.obtainAccessManager(context, TEST_USER);
 
-        RoomsClient roomsClient = new RoomsClient(context, accessManager);
+        Client client = new Client(context, accessManager);
 
-        roomsClient.connect(TEST_ROOM, roomListener());
+        client.connect(TEST_ROOM, roomListener());
 
         assertTrue(connectedCountdownLatch.await(20, TimeUnit.SECONDS));
     }
@@ -80,9 +80,9 @@ public class ConnectTests {
 
         AccessManager accessManager = AccessTokenHelper.obtainAccessManager(context, TEST_USER);
 
-        final RoomsClient roomsClient = new RoomsClient(context, accessManager);
+        final Client client = new Client(context, accessManager);
 
-        roomsClient.connect(roomListener());
+        client.connect(roomListener());
 
         assertTrue(connectedCountdownLatch.await(20, TimeUnit.SECONDS));
 
