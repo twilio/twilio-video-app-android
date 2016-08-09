@@ -8,8 +8,8 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import com.tw.rooms.testapp.model.TwilioIceServer;
-import com.twilio.rooms.IceServer;
-import com.twilio.rooms.IceTransportPolicy;
+import com.twilio.video.IceServer;
+import com.twilio.video.IceTransportPolicy;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;

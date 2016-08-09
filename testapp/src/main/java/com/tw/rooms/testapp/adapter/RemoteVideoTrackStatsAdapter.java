@@ -8,7 +8,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.tw.rooms.testapp.R;
-import com.twilio.rooms.RemoteVideoTrackStatsRecord;
+import com.twilio.video.RemoteVideoTrackStatsRecord;
 
 import java.util.LinkedHashMap;
 

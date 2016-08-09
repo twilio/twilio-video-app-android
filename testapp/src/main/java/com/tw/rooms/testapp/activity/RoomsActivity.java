@@ -18,11 +18,11 @@ import com.tw.rooms.testapp.BuildConfig;
 import com.tw.rooms.testapp.R;
 import com.tw.rooms.testapp.util.SimpleSignalingUtils;
 import com.twilio.common.AccessManager;
-import com.twilio.rooms.LogLevel;
-import com.twilio.rooms.Participant;
-import com.twilio.rooms.RoomsClient;
-import com.twilio.rooms.Room;
-import com.twilio.rooms.RoomsException;
+import com.twilio.video.LogLevel;
+import com.twilio.video.Participant;
+import com.twilio.video.Client;
+import com.twilio.video.Room;
+import com.twilio.video.RoomsException;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -126,28 +126,13 @@ public class RoomsActivity extends AppCompatActivity {
                 .setAction("Action", null).show();
 
         AccessManager accessManager = new AccessManager(this, capabilityToken, null);
-        RoomsClient.setLogLevel(LogLevel.DEBUG);
-        RoomsClient roomsClient = new RoomsClient(this, accessManager, new RoomsClient.Listener() {
-            @Override
-            public void onConnected(Room room) {
-                Timber.i("onConnected");
-            }
-
-            @Override
-            public void onConnectFailure(RoomsException error) {
-                Timber.i("onConnectFailure");
-            }
-
-            @Override
-            public void onDisconnected(Room room, RoomsException error) {
-                Timber.i("onDisconnected");
-            }
-        });
+        Client.setLogLevel(LogLevel.DEBUG);
+        Client client = new Client(this, accessManager);
 
         if(roomEditText.getText().length() == 0) {
-            roomsClient.connect(RoomListener());
+            client.connect(RoomListener());
         } else {
-            roomsClient.connect(roomEditText.getText().toString(), RoomListener());
+            client.connect(roomEditText.getText().toString(), RoomListener());
         }
 
     }
@@ -155,13 +140,28 @@ public class RoomsActivity extends AppCompatActivity {
     private Room.Listener RoomListener() {
        return new Room.Listener() {
            @Override
-           public void onParticipantConnected(Room room, Participant participant) {
+           public void onConnected(Room room) {
+               Timber.i("onConnected");
+           }
 
+           @Override
+           public void onConnectFailure(RoomsException error) {
+               Timber.i("onConnectFailure");
+           }
+
+           @Override
+           public void onDisconnected(Room room, RoomsException error) {
+               Timber.i("onDisconnected");
+           }
+
+           @Override
+           public void onParticipantConnected(Room room, Participant participant) {
+               Timber.i("onParticipantConnected");
            }
 
            @Override
            public void onParticipantDisconnected(Room room, Participant participant) {
-
+               Timber.i("onParticipantDisconnected");
            }
        };
     }
