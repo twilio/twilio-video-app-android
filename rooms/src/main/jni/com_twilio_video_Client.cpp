@@ -1,8 +1,6 @@
 #include "com_twilio_video_Client.h"
 #include "webrtc/api/java/jni/jni_helpers.h"
 
-
-
 #include "webrtc/base/refcount.h"
 #include "webrtc/voice_engine/include/voe_base.h"
 #include "webrtc/modules/video_capture/video_capture_internal.h"
@@ -19,11 +17,11 @@
 #include "android_platform_info_provider.h"
 #include "android_room_observer.h"
 #include "connect_options.h"
+#include "com_twilio_video_ConnectOptions.h"
 
 #include <memory>
 
 using namespace twiliosdk;
-using namespace webrtc_jni;
 
 static bool media_jvm_set = false;
 
@@ -150,33 +148,51 @@ Java_com_twilio_video_Client_nativeConnect(JNIEnv *env,
                                            jobject j_instance,
                                            jlong j_client_data_context,
                                            jlong j_android_room_observer_handle,
-                                           jstring j_name) {
+                                           jobject j_connect_options) {
 
 
     ClientDataContext* client_data_context =
         reinterpret_cast<ClientDataContext *>(j_client_data_context);
 
-    std::shared_ptr<twilio::media::LocalMedia> local_media =
-        client_data_context->getMediaFactory()->createLocalMedia();
-    local_media->addAudioTrack(); // enabled, default constraints
-
-
-
     AndroidRoomObserver *android_room_observer =
         reinterpret_cast<AndroidRoomObserver *>(j_android_room_observer_handle);
 
-    twilio::video::ConnectOptions::Builder connect_options_builder =
-        twilio::video::ConnectOptions::Builder()
-            .setCreateRoom(true)
-            .setLocalMedia(local_media);
-    if(!IsNull(env, j_name)) {
-        std::string roomName = webrtc_jni::JavaToStdString(env, j_name);
-        connect_options_builder.setRoomName(roomName);
+    std::unique_ptr<twilio::video::Room> room;
+
+    bool have_connect_options = !webrtc_jni::IsNull(env, j_connect_options);
+    if (have_connect_options) {
+        // Get connect options
+        jclass j_connect_options_class = webrtc_jni::GetObjectClass(env, j_connect_options);
+        jmethodID j_createNativeObject_id =
+            webrtc_jni::GetMethodID(env, j_connect_options_class,
+                                    "createNativeObject", "()J");
+        jlong j_connect_options_handle =
+            env->CallLongMethod(j_connect_options, j_createNativeObject_id);
+        ConnectOptionsDataContext *connect_options_dc =
+            reinterpret_cast<ConnectOptionsDataContext *>(j_connect_options_handle);
+
+        // TODO: get local media from j_connect_options once it gets implemented
+        // Until then we are creating it here
+        std::shared_ptr<twilio::media::LocalMedia> local_media =
+            client_data_context->getMediaFactory()->createLocalMedia();
+        local_media->addAudioTrack(); // enabled, default constraints
+
+        // TODO: We are recreating connect options because we need to inject local media
+        // In future (once we have local media implemented) this can be removed
+        twilio::video::ConnectOptions connect_options = twilio::video::ConnectOptions::Builder()
+            .setCreateRoom(connect_options_dc->connect_options.getCreateRoom())
+            .setRoomName(connect_options_dc->connect_options.getRoomName())
+            .setLocalMedia(local_media)
+            .build();
+
+        room = client_data_context->getClient().connect(connect_options,
+                                                     android_room_observer);
+        delete connect_options_dc;
+
+    } else {
+        room = client_data_context->getClient().connect(android_room_observer);
     }
 
-    std::unique_ptr<twilio::video::Room> room =
-        client_data_context->getClient().connect(connect_options_builder.build(),
-                                             android_room_observer);
 
     // TODO: instead of releasing ownership, create Room data context and wrap it up
     return jlongFromPointer(room.release());

@@ -23,7 +23,7 @@ JNIEXPORT jlong JNICALL Java_com_twilio_video_Client_nativeCreateClient
     (JNIEnv *, jobject, jobject, jobject);
 
 JNIEXPORT jlong JNICALL Java_com_twilio_video_Client_nativeConnect
-        (JNIEnv *, jobject, jlong, jlong, jstring);
+        (JNIEnv *, jobject, jlong, jlong, jobject);
 
 JNIEXPORT jlong JNICALL Java_com_twilio_video_Client_00024RoomListenerHandle_nativeCreate
         (JNIEnv *, jobject, jobject);

@@ -99,7 +99,7 @@ public class Client {
     private final Context applicationContext;
     private AccessManager accessManager;
     private Map<String, Room> rooms;
-    private long nativeClientDataHandler;
+    private long nativeClientDataContext;
 
     public Client(Context context, AccessManager accessManager) {
         if (context == null) {
@@ -138,7 +138,7 @@ public class Client {
         if (!nativeInitialize(applicationContext)) {
             throw new RuntimeException("Unable to initialize WebRTC media related objects");
         }
-        nativeClientDataHandler = nativeCreateClient(accessManager, null);
+        nativeClientDataContext = nativeCreateClient(accessManager, null);
 
     }
 
@@ -173,32 +173,29 @@ public class Client {
         return audioManager.isSpeakerphoneOn() ? AudioOutput.SPEAKERPHONE : AudioOutput.HEADSET;
     }
 
-    // TODO: Remove RoomFuture
-    public RoomFuture connect(Room.Listener roomListener) {
+    public Room connect(Room.Listener roomListener) {
         if (roomListener == null) {
             throw new NullPointerException("roomListener must not be null");
         }
 
         RoomListenerHandle roomListenerHandle = new RoomListenerHandle(roomListener);
-        long nativeRoomFutureHandle =
-                nativeConnect(nativeClientDataHandler, roomListenerHandle.get(), null);
-        return new RoomFuture(nativeRoomFutureHandle);
+        long nativeRoomHandle =
+                nativeConnect(nativeClientDataContext, roomListenerHandle.get(), null);
+        return new Room(nativeRoomHandle);
     }
 
-    // TODO: change room name to ConnectOptions
-    // TODO: Remove RoomFuture
-    public RoomFuture connect(String name, Room.Listener roomListener) {
-        if (name == null) {
-            throw new NullPointerException("name must not be null");
+    public Room connect(ConnectOptions connectOptions, Room.Listener roomListener) {
+        if (connectOptions == null) {
+            throw new NullPointerException("connectOptions must not be null");
         }
         if (roomListener == null) {
             throw new NullPointerException("roomListener must not be null");
         }
 
         RoomListenerHandle roomListenerHandle = new RoomListenerHandle(roomListener);
-        long nativeRoomFutureHandle =
-                nativeConnect(nativeClientDataHandler, roomListenerHandle.get(), name);
-        return new RoomFuture(nativeRoomFutureHandle);
+        long nativeRoomHandle =
+                nativeConnect(nativeClientDataContext, roomListenerHandle.get(), connectOptions);
+        return new Room(nativeRoomHandle);
     }
 
     /**
@@ -350,10 +347,9 @@ public class Client {
 
     private native boolean nativeInitialize(Context context);
 
-    // TODO: In future we should pass AccessManager and Media Factory (and maybe Invoker)
     private native long nativeCreateClient(AccessManager accessManager, MediaFactory mediaFactory);
 
     private native long nativeConnect(long nativeClientDataHandler,
                                       long nativeRoomListenerHandle,
-                                      String name);
+                                      ConnectOptions ConnectOptions);
 }

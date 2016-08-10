@@ -7,6 +7,10 @@
 extern "C" {
 #endif
 
+struct RoomDataContext {
+
+};
+
 JNIEXPORT jstring JNICALL Java_com_twilio_video_Room_nativeGetName
         (JNIEnv *, jobject, jlong);
 
