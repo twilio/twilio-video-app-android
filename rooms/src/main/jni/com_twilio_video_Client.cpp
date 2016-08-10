@@ -18,6 +18,7 @@
 #include "android_room_observer.h"
 #include "connect_options.h"
 #include "com_twilio_video_ConnectOptions.h"
+#include "com_twilio_video_Room.h"
 
 #include <memory>
 
@@ -194,8 +195,9 @@ Java_com_twilio_video_Client_nativeConnect(JNIEnv *env,
     }
 
 
-    // TODO: instead of releasing ownership, create Room data context and wrap it up
-    return jlongFromPointer(room.release());
+    RoomDataContext *room_dc = new RoomDataContext();
+    room_dc->room = std::move(room);
+    return jlongFromPointer(room_dc);
 }
 
 JNIEXPORT jlong JNICALL

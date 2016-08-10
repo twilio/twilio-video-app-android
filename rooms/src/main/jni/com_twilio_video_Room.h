@@ -1,4 +1,6 @@
 #include <jni.h>
+#include <memory>
+#include <room.h>
 
 #ifndef _Included_com_twilio_conversations_Room
 #define _Included_com_twilio_conversations_Room
@@ -8,7 +10,7 @@ extern "C" {
 #endif
 
 struct RoomDataContext {
-
+    std::unique_ptr<twilio::video::Room> room;
 };
 
 JNIEXPORT jstring JNICALL Java_com_twilio_video_Room_nativeGetName
