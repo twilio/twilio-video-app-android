@@ -206,7 +206,7 @@ Java_com_twilio_video_Client_00024RoomListenerHandle_nativeCreate(JNIEnv *env,
                                                                        jobject object) {
     TS_CORE_LOG_MODULE(kTSCoreLogModulePlatform, kTSCoreLogLevelDebug,
                        "Create AndroidRoomObserver");
-    AndroidRoomObserver *androidRoomObserver = new AndroidRoomObserver(env, object);
+    AndroidRoomObserver *androidRoomObserver = new AndroidRoomObserver(env, instance);
     return jlongFromPointer(androidRoomObserver);
 }
 

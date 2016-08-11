@@ -142,7 +142,7 @@ public class RoomsActivity extends AppCompatActivity {
             room = client.connect(connectOptions, RoomListener());
         }
 
-        Timber.i("Connecting to room:"+room.getName());
+        Timber.i("Connecting to room:"+room.getSid());
     }
 
     private Room.Listener RoomListener() {
@@ -150,7 +150,7 @@ public class RoomsActivity extends AppCompatActivity {
            @Override
            public void onConnected(Room room) {
                Timber.i("onConnected");
-               
+
            }
 
            @Override

@@ -9,11 +9,15 @@ import android.util.Log;
 import com.twilio.common.AccessManager;
 import com.twilio.video.internal.Logger;
 import com.twilio.video.internal.ReLinker;
+import com.twilio.video.internal.RoomListener;
 
+import java.lang.ref.WeakReference;
 import java.util.EnumMap;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * The Client allows user to create or participate in Rooms.
@@ -100,6 +104,7 @@ public class Client {
     private AccessManager accessManager;
     private Map<String, Room> rooms;
     private long nativeClientDataContext;
+    private Map<String, WeakReference<Room>> roomMap = new ConcurrentHashMap<>();
 
     public Client(Context context, AccessManager accessManager) {
         if (context == null) {
@@ -178,10 +183,7 @@ public class Client {
             throw new NullPointerException("roomListener must not be null");
         }
 
-        RoomListenerHandle roomListenerHandle = new RoomListenerHandle(roomListener);
-        long nativeRoomHandle =
-                nativeConnect(nativeClientDataContext, roomListenerHandle.get(), null);
-        return new Room(nativeRoomHandle);
+        return doConnect(null, roomListener);
     }
 
     public Room connect(ConnectOptions connectOptions, Room.Listener roomListener) {
@@ -191,11 +193,20 @@ public class Client {
         if (roomListener == null) {
             throw new NullPointerException("roomListener must not be null");
         }
+        return doConnect(connectOptions, roomListener);
+    }
 
+    private Room doConnect(ConnectOptions connectOptions, Room.Listener roomListener) {
         RoomListenerHandle roomListenerHandle = new RoomListenerHandle(roomListener);
-        long nativeRoomHandle =
-                nativeConnect(nativeClientDataContext, roomListenerHandle.get(), connectOptions);
-        return new Room(nativeRoomHandle);
+        Room room;
+        synchronized (roomListenerHandle) {
+            long nativeRoomHandle = nativeConnect(
+                    nativeClientDataContext, roomListenerHandle.get(), connectOptions);
+            room = new Room(nativeRoomHandle);
+            roomMap.put(room.getSid(), new WeakReference<Room>(room));
+        }
+
+        return room;
     }
 
     /**
@@ -326,17 +337,104 @@ public class Client {
         }
     }
 
-    class RoomListenerHandle extends NativeHandle {
+    class RoomListenerHandle extends NativeHandle implements RoomListener {
+
+        private Room.Listener listener;
 
         public RoomListenerHandle(Room.Listener listener) {
             super(listener);
+            this.listener = listener;
         }
 
+        /*
+         * Native Handle
+         */
         @Override
         protected native long nativeCreate(Object object);
 
         @Override
         protected native void nativeFree(long nativeHandle);
+
+        /*
+         * RoomListener
+         */
+        @Override
+        public void onConnected(String roomSid) {
+            final Room room = getRoom(roomSid);
+            handler.post(new Runnable() {
+                @Override
+                public void run() {
+                    RoomListenerHandle.this.listener.onConnected(room);
+                }
+            });
+        }
+
+        @Override
+        public void onDisconnected(String roomSid, ClientError errorCode) {
+            final Room room = getRoom(roomSid);
+
+            // TODO: Transform ClientError to RoomException
+
+            handler.post(new Runnable() {
+                @Override
+                public void run() {
+                    RoomListenerHandle.this.listener.onDisconnected(room, null);
+                }
+            });
+        }
+
+        @Override
+        public void onConnectFailure(String roomSid, ClientError errorCode) {
+            final Room room = getRoom(roomSid);
+
+            // TODO: Transform ClientError to RoomException
+
+            handler.post(new Runnable() {
+                @Override
+                public void run() {
+                    RoomListenerHandle.this.listener.onDisconnected(room, null);
+                }
+            });
+        }
+
+        @Override
+        public void onParticipantConnected(String roomSid,
+                                           long participantNativeDC) {
+            final Room room = getRoom(roomSid);
+
+            // TODO: Create new participant with participantNaticeDC
+
+            handler.post(new Runnable() {
+                @Override
+                public void run() {
+                    RoomListenerHandle.this.listener.onParticipantConnected(room, null);
+                }
+            });
+        }
+
+        @Override
+        public void onParticipantDisconnected(String roomSid,
+                                              long participantNativeDC) {
+            final Room room = getRoom(roomSid);
+
+            // TODO: Create new participant with participantNaticeDC
+
+            handler.post(new Runnable() {
+                @Override
+                public void run() {
+                    RoomListenerHandle.this.listener
+                            .onParticipantDisconnected(room, null);
+                }
+            });
+        }
+
+        private synchronized Room getRoom(String roomSid) {
+            WeakReference<Room> roomRef = roomMap.get(roomSid);
+            if (roomRef != null) {
+                // TODO: log error
+            }
+            return roomRef.get();
+        }
     }
 
     private native static void nativeSetCoreLogLevel(int level);

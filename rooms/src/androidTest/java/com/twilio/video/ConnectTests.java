@@ -68,7 +68,7 @@ public class ConnectTests {
 
         Client client = new Client(context, accessManager);
 
-        client.connect(TEST_ROOM, roomListener());
+        //client.connect(TEST_ROOM, roomListener());
 
         assertTrue(connectedCountdownLatch.await(20, TimeUnit.SECONDS));
     }
