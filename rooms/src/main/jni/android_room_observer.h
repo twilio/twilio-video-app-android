@@ -4,8 +4,10 @@
 #include "webrtc/api/java/jni/jni_helpers.h"
 
 #include "TSCLogger.h"
-#include "participant.h"
 #include "room_observer.h"
+#include "participant.h"
+
+#include "com_twilio_video_Participant.h"
 
 using namespace webrtc_jni;
 
@@ -77,7 +79,8 @@ protected:
     }
 
     virtual void onDisconnected(const twilio::video::Room *room,
-                                twilio::video::ClientError error_code = twilio::video::ClientError::kErrorUnknown) {
+                                twilio::video::ClientError error_code =
+                                    twilio::video::ClientError::kErrorUnknown) {
         ScopedLocalRefFrame local_ref_frame(jni());
         std::string func_name = std::string(__FUNCTION__);
         TS_CORE_LOG_MODULE(kTSCoreLogModulePlatform, kTSCoreLogLevelDebug, "%s", func_name.c_str());
@@ -93,11 +96,21 @@ protected:
         }
     }
 
-    virtual void onConnectFailure(const twilio::video::Room *room, twilio::video::ClientError error_code) {
+    virtual void onConnectFailure(const twilio::video::Room *room,
+                                  twilio::video::ClientError error_code) {
         ScopedLocalRefFrame local_ref_frame(jni());
         std::string func_name = std::string(__FUNCTION__);
         TS_CORE_LOG_MODULE(kTSCoreLogModulePlatform, kTSCoreLogLevelDebug, "%s", func_name.c_str());
-        // TODO: implement me
+        {
+            rtc::CritScope cs(&deletion_lock_);
+
+            if (!isObserverValid(func_name)) {
+                return;
+            }
+            jint j_error_code = (jint)error_code;
+            jni()->CallVoidMethod(*j_room_observer_, j_on_connect_failure_, j_error_code);
+            CHECK_EXCEPTION(jni()) << "error during CallVoidMethod";
+        }
     }
     virtual void onParticipantConnected(twilio::video::Room *room,
                                         std::shared_ptr<twilio::video::Participant> participant) {
@@ -112,8 +125,11 @@ protected:
                 return;
             }
 
-            // TODO: implement me
-
+            ParticipantDataContext *participant_dc = new ParticipantDataContext();
+            participant_dc->participant = participant;
+            jni()->CallVoidMethod(*j_room_observer_,
+                                  j_on_participant_connected_,
+                                  jlongFromPointer(participant_dc));
             CHECK_EXCEPTION(jni()) << "error during CallVoidMethod";
         }
     }
@@ -131,7 +147,7 @@ protected:
                 return;
             }
 
-            // TODO: implement me
+            // TODO: Implement me
 
             CHECK_EXCEPTION(jni()) << "error during CallVoidMethod";
         }
