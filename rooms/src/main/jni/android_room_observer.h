@@ -18,27 +18,27 @@ public:
             GetMethodID(env,
                         *j_room_observer_class_,
                         "onConnected",
-                        "(Ljava/lang/String;)V")),
+                        "()V")),
         j_on_disconnected_(
             GetMethodID(env,
                         *j_room_observer_class_,
                         "onDisconnected",
-                        "(Ljava/lang/String;Lcom/twilio/video/ClientError;)V")),
+                        "(Lcom/twilio/video/ClientError;)V")),
         j_on_connect_failure_(
             GetMethodID(env,
                         *j_room_observer_class_,
                         "onConnectFailure",
-                        "(Ljava/lang/String;Lcom/twilio/video/ClientError;)V")),
+                        "(Lcom/twilio/video/ClientError;)V")),
         j_on_participant_connected_(
             GetMethodID(env,
                         *j_room_observer_class_,
                         "onParticipantConnected",
-                        "(Ljava/lang/String;J)V")),
+                        "(J)V")),
         j_on_participant_disconnected_(
             GetMethodID(env,
                         *j_room_observer_class_,
                         "onParticipantDisconnected",
-                        "(Ljava/lang/String;J)V")){
+                        "(J)V")){
         TS_CORE_LOG_MODULE(kTSCoreLogModulePlatform,
                            kTSCoreLogLevelDebug,
                            "AndroidRoomObserver");
@@ -71,10 +71,7 @@ protected:
                 return;
             }
 
-            std::string str = room->getSid();
-            TS_CORE_LOG_MODULE(kTSCoreLogModulePlatform, kTSCoreLogLevelWarning, "Room sid: %s", str.c_str());
-            jstring j_room_sid = JavaStringFromStdString(jni(), room->getSid());
-            jni()->CallVoidMethod(*j_room_observer_, j_on_connected_, j_room_sid);
+            jni()->CallVoidMethod(*j_room_observer_, j_on_connected_);
             CHECK_EXCEPTION(jni()) << "error during CallVoidMethod";
         }
     }

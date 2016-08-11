@@ -149,7 +149,8 @@ public class RoomsActivity extends AppCompatActivity {
        return new Room.Listener() {
            @Override
            public void onConnected(Room room) {
-               Timber.i("onConnected");
+               Timber.i("onConnected: "+room.getName() + " sid:"+
+                       room.getSid()+" state:"+room.getState());
 
            }
 

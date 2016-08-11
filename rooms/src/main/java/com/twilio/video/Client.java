@@ -361,9 +361,9 @@ public class Client {
          * RoomListener
          */
         @Override
-        public void onConnected(String roomSid) {
-            logger.d("onConnected: "+roomSid);
-            final Room room = getRoom(roomSid);
+        public void onConnected() {
+            logger.d("onConnected()");
+            final Room room = getRoom();
             handler.post(new Runnable() {
                 @Override
                 public void run() {
@@ -373,8 +373,8 @@ public class Client {
         }
 
         @Override
-        public void onDisconnected(String roomSid, ClientError errorCode) {
-            final Room room = getRoom(roomSid);
+        public void onDisconnected(ClientError errorCode) {
+            final Room room = getRoom();
 
             // TODO: Transform ClientError to RoomException
 
@@ -387,8 +387,8 @@ public class Client {
         }
 
         @Override
-        public void onConnectFailure(String roomSid, ClientError errorCode) {
-            final Room room = getRoom(roomSid);
+        public void onConnectFailure(ClientError errorCode) {
+            final Room room = getRoom();
 
             // TODO: Transform ClientError to RoomException
 
@@ -401,9 +401,8 @@ public class Client {
         }
 
         @Override
-        public void onParticipantConnected(String roomSid,
-                                           long participantNativeDC) {
-            final Room room = getRoom(roomSid);
+        public void onParticipantConnected(long participantNativeDC) {
+            final Room room = getRoom();
 
             // TODO: Create new participant with participantNaticeDC
 
@@ -416,9 +415,8 @@ public class Client {
         }
 
         @Override
-        public void onParticipantDisconnected(String roomSid,
-                                              long participantNativeDC) {
-            final Room room = getRoom(roomSid);
+        public void onParticipantDisconnected(long participantNativeDC) {
+            final Room room = getRoom();
 
             // TODO: Create new participant with participantNaticeDC
 
@@ -431,7 +429,7 @@ public class Client {
             });
         }
 
-        private synchronized Room getRoom(String roomSid) {
+        private synchronized Room getRoom() {
             long nativeRoomHandle = get();
             WeakReference<Room> roomRef = roomMap.get(nativeRoomHandle);
             if (roomRef == null) {
