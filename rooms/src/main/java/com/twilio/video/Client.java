@@ -104,7 +104,8 @@ public class Client {
     private AccessManager accessManager;
     private Map<String, Room> rooms;
     private long nativeClientDataContext;
-    private Map<String, WeakReference<Room>> roomMap = new ConcurrentHashMap<>();
+    // Using listener native handle as key
+    private Map<Long, WeakReference<Room>> roomMap = new ConcurrentHashMap<>();
 
     public Client(Context context, AccessManager accessManager) {
         if (context == null) {
@@ -197,13 +198,14 @@ public class Client {
     }
 
     private Room doConnect(ConnectOptions connectOptions, Room.Listener roomListener) {
+        logger.d("doConnect");
         RoomListenerHandle roomListenerHandle = new RoomListenerHandle(roomListener);
         Room room;
         synchronized (roomListenerHandle) {
             long nativeRoomHandle = nativeConnect(
                     nativeClientDataContext, roomListenerHandle.get(), connectOptions);
             room = new Room(nativeRoomHandle);
-            roomMap.put(room.getSid(), new WeakReference<Room>(room));
+            roomMap.put(roomListenerHandle.get(), new WeakReference<Room>(room));
         }
 
         return room;
@@ -360,6 +362,7 @@ public class Client {
          */
         @Override
         public void onConnected(String roomSid) {
+            logger.d("onConnected: "+roomSid);
             final Room room = getRoom(roomSid);
             handler.post(new Runnable() {
                 @Override
@@ -429,9 +432,12 @@ public class Client {
         }
 
         private synchronized Room getRoom(String roomSid) {
-            WeakReference<Room> roomRef = roomMap.get(roomSid);
-            if (roomRef != null) {
-                // TODO: log error
+            long nativeRoomHandle = get();
+            WeakReference<Room> roomRef = roomMap.get(nativeRoomHandle);
+            if (roomRef == null) {
+                // TODO: handle error
+                logger.w("Room reference is null");
+                return null;
             }
             return roomRef.get();
         }
