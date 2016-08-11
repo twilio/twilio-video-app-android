@@ -23,6 +23,7 @@ import com.twilio.video.LogLevel;
 import com.twilio.video.Participant;
 import com.twilio.video.Client;
 import com.twilio.video.Room;
+import com.twilio.video.RoomState;
 import com.twilio.video.RoomsException;
 
 import butterknife.BindView;
@@ -43,6 +44,7 @@ public class RoomsActivity extends AppCompatActivity {
 
     private ProgressDialog progressDialog;
     private ArrayAdapter<CharSequence> spinnerAdapter;
+    private Room room;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -135,11 +137,12 @@ public class RoomsActivity extends AppCompatActivity {
                 .build();
 
         if(roomEditText.getText().length() == 0) {
-            client.connect(RoomListener());
+            room = client.connect(RoomListener());
         } else {
-            client.connect(connectOptions, RoomListener());
+            room = client.connect(connectOptions, RoomListener());
         }
 
+        Timber.i("Connecting to room:"+room.getName());
     }
 
     private Room.Listener RoomListener() {
@@ -147,6 +150,7 @@ public class RoomsActivity extends AppCompatActivity {
            @Override
            public void onConnected(Room room) {
                Timber.i("onConnected");
+               
            }
 
            @Override

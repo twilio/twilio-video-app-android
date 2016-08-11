@@ -1,6 +1,6 @@
 #include <jni.h>
 #include <memory>
-#include <room.h>
+#include "room.h"
 
 #ifndef _Included_com_twilio_conversations_Room
 #define _Included_com_twilio_conversations_Room
@@ -20,6 +20,9 @@ JNIEXPORT jstring JNICALL Java_com_twilio_video_Room_nativeGetSid
         (JNIEnv *, jobject, jlong);
 
 JNIEXPORT void JNICALL Java_com_twilio_video_Room_nativeDisconnect
+        (JNIEnv *, jobject, jlong);
+
+JNIEXPORT jobject JNICALL Java_com_twilio_video_Room_nativeGetState
         (JNIEnv *, jobject, jlong);
 
 #ifdef __cplusplus

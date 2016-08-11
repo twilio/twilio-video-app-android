@@ -3,25 +3,23 @@ package com.twilio.video;
 import java.util.Map;
 
 public class Room {
-    long nativeRoomHandle;
 
-    Room(long nativeRoomHandle) {
-        this.nativeRoomHandle = nativeRoomHandle;
+    long nativeRoomDCHandle = 0;
+
+    Room(long nativeRoomDCHandle) {
+        this.nativeRoomDCHandle = nativeRoomDCHandle;
     }
 
     public String getName() {
-        // TODO: implement me
-        return null;
+        return nativeGetName(nativeRoomDCHandle);
     }
 
     public String getSid() {
-        // TODO: implement me
-        return null;
+        return nativeGetSid(nativeRoomDCHandle);
     }
 
-    public boolean isConnected() {
-        // TODO: implement me
-        return false;
+    public RoomState getState() {
+        return nativeGetState(nativeRoomDCHandle);
     }
 
     public Map<String, Participant> getParticipants() {
@@ -34,12 +32,10 @@ public class Room {
         return null;
     }
 
-    public void setStatsListener(StatsListener statsListener) {
-        // TODO: implement me
-    }
-
     public void disconnect() {
-        // TODO: implement me
+        nativeDisconnect(nativeRoomDCHandle);
+        // TODO: Should we delete room_dc at this point ?
+        //nativeRoomDCHandle = 0;
     }
 
     public interface Listener {
@@ -55,8 +51,9 @@ public class Room {
 
     }
 
-    private native String nativeGetName(long nativeRoomHandle);
-    private native String nativeGetSid(long nativeRoomHandle);
-    private native void nativeDisconnect(long nativeRoomHandle);
+    private native String nativeGetName(long nativeRoomDCHandle);
+    private native String nativeGetSid(long nativeRoomDCHandle);
+    private native RoomState nativeGetState(long nativeRoomDCHandle);
+    private native void nativeDisconnect(long nativeRoomDCHandle);
 
 }
