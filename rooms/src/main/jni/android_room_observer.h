@@ -23,12 +23,12 @@ public:
             GetMethodID(env,
                         *j_room_observer_class_,
                         "onDisconnected",
-                        "(Lcom/twilio/video/ClientError;)V")),
+                        "(I)V")),
         j_on_connect_failure_(
             GetMethodID(env,
                         *j_room_observer_class_,
                         "onConnectFailure",
-                        "(Lcom/twilio/video/ClientError;)V")),
+                        "(I)V")),
         j_on_participant_connected_(
             GetMethodID(env,
                         *j_room_observer_class_,
@@ -38,7 +38,7 @@ public:
             GetMethodID(env,
                         *j_room_observer_class_,
                         "onParticipantDisconnected",
-                        "(J)V")){
+                        "(J)V")) {
         TS_CORE_LOG_MODULE(kTSCoreLogModulePlatform,
                            kTSCoreLogLevelDebug,
                            "AndroidRoomObserver");
@@ -81,7 +81,16 @@ protected:
         ScopedLocalRefFrame local_ref_frame(jni());
         std::string func_name = std::string(__FUNCTION__);
         TS_CORE_LOG_MODULE(kTSCoreLogModulePlatform, kTSCoreLogLevelDebug, "%s", func_name.c_str());
-        // TODO: implement me
+        {
+            rtc::CritScope cs(&deletion_lock_);
+
+            if (!isObserverValid(func_name)) {
+                return;
+            }
+            jint j_error_code = (jint)error_code;
+            jni()->CallVoidMethod(*j_room_observer_, j_on_disconnected_, j_error_code);
+            CHECK_EXCEPTION(jni()) << "error during CallVoidMethod";
+        }
     }
 
     virtual void onConnectFailure(const twilio::video::Room *room, twilio::video::ClientError error_code) {

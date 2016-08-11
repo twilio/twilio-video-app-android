@@ -373,7 +373,7 @@ public class Client {
         }
 
         @Override
-        public void onDisconnected(ClientError errorCode) {
+        public void onDisconnected(int errorCode) {
             final Room room = getRoom();
 
             // TODO: Transform ClientError to RoomException
@@ -387,7 +387,7 @@ public class Client {
         }
 
         @Override
-        public void onConnectFailure(ClientError errorCode) {
+        public void onConnectFailure(int errorCode) {
             final Room room = getRoom();
 
             // TODO: Transform ClientError to RoomException
