@@ -10,8 +10,8 @@ extern "C" {
 #endif
 
 
-struct ConnectOptionsDataContext {
-  ConnectOptionsDataContext() :
+struct ConnectOptionsContext {
+  ConnectOptionsContext() :
       connect_options(twilio::video::ConnectOptions::Builder().build()){ }
   twilio::video::ConnectOptions connect_options;
 };

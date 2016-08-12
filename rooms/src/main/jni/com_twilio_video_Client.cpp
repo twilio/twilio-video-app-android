@@ -83,9 +83,9 @@ Java_com_twilio_video_Client_nativeInitialize(JNIEnv *env, jobject instance, job
     return !failure;
 }
 
-class ClientDataContext {
+class ClientContext {
 public:
-    ClientDataContext( std::unique_ptr<twilio::video::Client> client,
+    ClientContext( std::unique_ptr<twilio::video::Client> client,
                    std::shared_ptr<twilio::media::MediaFactory> media_factory,
                    twilio::video::Invoker *invoker) {
         client_ = std::move(client);
@@ -93,7 +93,7 @@ public:
         invoker_ = invoker;
     }
 
-    virtual ~ClientDataContext(){
+    virtual ~ClientContext(){
         delete invoker_;
     }
 
@@ -140,20 +140,20 @@ Java_com_twilio_video_Client_nativeCreateClient(JNIEnv *env,
                                       media_factory,
                                       invoker);
     return jlongFromPointer(
-        new ClientDataContext(std::move(client), media_factory, invoker));
+        new ClientContext(std::move(client), media_factory, invoker));
 
 }
 
 JNIEXPORT jlong JNICALL
 Java_com_twilio_video_Client_nativeConnect(JNIEnv *env,
                                            jobject j_instance,
-                                           jlong j_client_data_context,
+                                           jlong j_client_context,
                                            jlong j_android_room_observer_handle,
                                            jobject j_connect_options) {
 
 
-    ClientDataContext* client_data_context =
-        reinterpret_cast<ClientDataContext *>(j_client_data_context);
+    ClientContext* client_context =
+        reinterpret_cast<ClientContext *>(j_client_context);
 
     AndroidRoomObserver *android_room_observer =
         reinterpret_cast<AndroidRoomObserver *>(j_android_room_observer_handle);
@@ -169,35 +169,35 @@ Java_com_twilio_video_Client_nativeConnect(JNIEnv *env,
                                     "createNativeObject", "()J");
         jlong j_connect_options_handle =
             env->CallLongMethod(j_connect_options, j_createNativeObject_id);
-        ConnectOptionsDataContext *connect_options_dc =
-            reinterpret_cast<ConnectOptionsDataContext *>(j_connect_options_handle);
+        ConnectOptionsContext *connect_options_context =
+            reinterpret_cast<ConnectOptionsContext *>(j_connect_options_handle);
 
         // TODO: get local media from j_connect_options once it gets implemented
         // Until then we are creating it here
         std::shared_ptr<twilio::media::LocalMedia> local_media =
-            client_data_context->getMediaFactory()->createLocalMedia();
+            client_context->getMediaFactory()->createLocalMedia();
         local_media->addAudioTrack(); // enabled, default constraints
 
         // TODO: We are recreating connect options because we need to inject local media
         // In future (once we have local media implemented) this can be removed
         twilio::video::ConnectOptions connect_options = twilio::video::ConnectOptions::Builder()
-            .setCreateRoom(connect_options_dc->connect_options.getCreateRoom())
-            .setRoomName(connect_options_dc->connect_options.getRoomName())
+            .setCreateRoom(connect_options_context->connect_options.getCreateRoom())
+            .setRoomName(connect_options_context->connect_options.getRoomName())
             .setLocalMedia(local_media)
             .build();
 
-        room = client_data_context->getClient().connect(connect_options,
+        room = client_context->getClient().connect(connect_options,
                                                      android_room_observer);
-        delete connect_options_dc;
+        delete connect_options_context;
 
     } else {
-        room = client_data_context->getClient().connect(android_room_observer);
+        room = client_context->getClient().connect(android_room_observer);
     }
 
 
-    RoomDataContext *room_dc = new RoomDataContext();
-    room_dc->room = std::move(room);
-    return jlongFromPointer(room_dc);
+    RoomContext *room_context = new RoomContext();
+    room_context->room = std::move(room);
+    return jlongFromPointer(room_context);
 }
 
 JNIEXPORT jlong JNICALL

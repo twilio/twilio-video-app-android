@@ -25,7 +25,7 @@ Java_com_twilio_video_ConnectOptions_nativeCreate(JNIEnv *env,
     // TODO: Get ice options from j_ice_options
     // builder.setIceOptions();
 
-    ConnectOptionsDataContext *data_context = new ConnectOptionsDataContext();
+    ConnectOptionsContext *data_context = new ConnectOptionsContext();
     data_context->connect_options = builder.build();
     return webrtc_jni::jlongFromPointer(data_context);
 }

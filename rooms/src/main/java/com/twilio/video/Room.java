@@ -4,22 +4,22 @@ import java.util.Map;
 
 public class Room {
 
-    long nativeRoomDCHandle = 0;
+    long nativeRoomContextHandle = 0;
 
-    Room(long nativeRoomDCHandle) {
-        this.nativeRoomDCHandle = nativeRoomDCHandle;
+    Room(long nativeRoomContextHandle) {
+        this.nativeRoomContextHandle = nativeRoomContextHandle;
     }
 
     public String getName() {
-        return nativeGetName(nativeRoomDCHandle);
+        return nativeGetName(nativeRoomContextHandle);
     }
 
     public String getSid() {
-        return nativeGetSid(nativeRoomDCHandle);
+        return nativeGetSid(nativeRoomContextHandle);
     }
 
     public RoomState getState() {
-        return nativeGetState(nativeRoomDCHandle);
+        return nativeGetState(nativeRoomContextHandle);
     }
 
     public Map<String, Participant> getParticipants() {
@@ -33,9 +33,9 @@ public class Room {
     }
 
     public void disconnect() {
-        nativeDisconnect(nativeRoomDCHandle);
+        nativeDisconnect(nativeRoomContextHandle);
         // TODO: Should we delete room_dc at this point ?
-        //nativeRoomDCHandle = 0;
+        //nativeRoomContextHandle = 0;
     }
 
     public interface Listener {

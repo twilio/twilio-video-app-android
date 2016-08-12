@@ -102,8 +102,7 @@ public class Client {
     private final Handler handler;
     private final Context applicationContext;
     private AccessManager accessManager;
-    private Map<String, Room> rooms;
-    private long nativeClientDataContext;
+    private long nativeClientContext;
     // Using listener native handle as key
     private Map<Long, WeakReference<Room>> roomMap = new ConcurrentHashMap<>();
 
@@ -144,7 +143,7 @@ public class Client {
         if (!nativeInitialize(applicationContext)) {
             throw new RuntimeException("Failed to initialize the Video Client");
         }
-        nativeClientDataContext = nativeCreateClient(accessManager, null);
+        nativeClientContext = nativeCreateClient(accessManager, null);
 
     }
 
@@ -198,7 +197,7 @@ public class Client {
         Room room;
         synchronized (roomListenerHandle) {
             long nativeRoomHandle = nativeConnect(
-                    nativeClientDataContext, roomListenerHandle.get(), connectOptions);
+                    nativeClientContext, roomListenerHandle.get(), connectOptions);
             room = new Room(nativeRoomHandle);
             roomMap.put(roomListenerHandle.get(), new WeakReference<Room>(room));
         }

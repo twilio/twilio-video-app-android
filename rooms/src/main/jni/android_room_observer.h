@@ -125,13 +125,13 @@ protected:
                 return;
             }
 
-            ParticipantDataContext *participant_dc = new ParticipantDataContext();
-            participant_dc->participant = participant;
+            ParticipantContext *participant_context = new ParticipantContext();
+            participant_context->participant = participant;
             jstring j_sid = webrtc_jni::JavaStringFromStdString(jni(), participant->getSid());
             jni()->CallVoidMethod(*j_room_observer_,
                                   j_on_participant_connected_,
                                   j_sid,
-                                  jlongFromPointer(participant_dc));
+                                  jlongFromPointer(participant_context));
             CHECK_EXCEPTION(jni()) << "error during CallVoidMethod";
         }
     }

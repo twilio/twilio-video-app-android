@@ -9,7 +9,7 @@
 extern "C" {
 #endif
 
-struct RoomDataContext {
+struct RoomContext {
     std::unique_ptr<twilio::video::Room> room;
 };
 

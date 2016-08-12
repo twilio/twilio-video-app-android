@@ -11,7 +11,7 @@
 extern "C" {
 #endif
 
-struct ParticipantDataContext {
+struct ParticipantContext {
     std::shared_ptr<twilio::video::Participant> participant;
 };
 
