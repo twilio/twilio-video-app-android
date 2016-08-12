@@ -26,3 +26,10 @@ Java_com_twilio_video_Participant_nativeIsConnected(JNIEnv *env, jobject instanc
     // TODO
     return true;
 }
+
+JNIEXPORT void JNICALL
+Java_com_twilio_video_Participant_nativeRelease(JNIEnv *env, jobject instance, jlong nativeHandle) {
+
+    // TODO
+
+}

@@ -151,6 +151,7 @@ public class RoomsActivity extends AppCompatActivity {
            public void onConnected(Room room) {
                Timber.i("onConnected: "+room.getName() + " sid:"+
                        room.getSid()+" state:"+room.getState());
+               //room.disconnect();
 
            }
 

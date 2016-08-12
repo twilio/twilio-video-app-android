@@ -142,7 +142,7 @@ public class Client {
         }
 
         if (!nativeInitialize(applicationContext)) {
-            throw new RuntimeException("Unable to initialize WebRTC media related objects");
+            throw new RuntimeException("Failed to initialize the Video Client");
         }
         nativeClientDataContext = nativeCreateClient(accessManager, null);
 
@@ -183,8 +183,8 @@ public class Client {
         if (roomListener == null) {
             throw new NullPointerException("roomListener must not be null");
         }
-
-        return doConnect(null, roomListener);
+        ConnectOptions connectOptions = new ConnectOptions.Builder().build();
+        return connect(connectOptions, roomListener);
     }
 
     public Room connect(ConnectOptions connectOptions, Room.Listener roomListener) {
@@ -194,11 +194,6 @@ public class Client {
         if (roomListener == null) {
             throw new NullPointerException("roomListener must not be null");
         }
-        return doConnect(connectOptions, roomListener);
-    }
-
-    private Room doConnect(ConnectOptions connectOptions, Room.Listener roomListener) {
-        logger.d("doConnect");
         RoomListenerHandle roomListenerHandle = new RoomListenerHandle(roomListener);
         Room room;
         synchronized (roomListenerHandle) {
@@ -342,6 +337,7 @@ public class Client {
     class RoomListenerHandle extends NativeHandle implements RoomListener {
 
         private Room.Listener listener;
+        private Map<String, Participant> participantMap = new HashMap<>();
 
         public RoomListenerHandle(Room.Listener listener) {
             super(listener);
@@ -401,37 +397,42 @@ public class Client {
         }
 
         @Override
-        public void onParticipantConnected(long participantNativeDC) {
+        public void onParticipantConnected(String participantSid, long participantNativeDC) {
             final Room room = getRoom();
 
-            // TODO: Create new participant with participantNaticeDC
+            final Participant participant = new Participant(participantSid, participantNativeDC);
+            participantMap.put(participantSid, participant);
 
             handler.post(new Runnable() {
                 @Override
                 public void run() {
-                    RoomListenerHandle.this.listener.onParticipantConnected(room, null);
+                    RoomListenerHandle.this.listener.onParticipantConnected(room, participant);
                 }
             });
         }
 
         @Override
-        public void onParticipantDisconnected(long participantNativeDC) {
+        public void onParticipantDisconnected(String participantSid) {
             final Room room = getRoom();
 
-            // TODO: Create new participant with participantNaticeDC
+            final Participant participant = participantMap.remove(participantSid);
+            if (participant == null) {
+                // TODO: should we notify user somehow? Find strategy...
+            }
+            participant.release();
 
             handler.post(new Runnable() {
                 @Override
                 public void run() {
                     RoomListenerHandle.this.listener
-                            .onParticipantDisconnected(room, null);
+                            .onParticipantDisconnected(room, participant);
                 }
             });
         }
 
         private synchronized Room getRoom() {
-            long nativeRoomHandle = get();
-            WeakReference<Room> roomRef = roomMap.get(nativeRoomHandle);
+            long nativeRoomListenerHandle = get();
+            WeakReference<Room> roomRef = roomMap.get(nativeRoomListenerHandle);
             if (roomRef == null) {
                 // TODO: handle error
                 logger.w("Room reference is null");

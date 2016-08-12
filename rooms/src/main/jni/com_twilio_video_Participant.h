@@ -24,6 +24,9 @@ JNIEXPORT jstring JNICALL Java_com_twilio_video_Participant_nativeGetSid
 JNIEXPORT jboolean JNICALL Java_com_twilio_video_Participant_nativeIsConnected
     (JNIEnv *, jobject, jlong);
 
+JNIEXPORT void JNICALL Java_com_twilio_video_Participant_nativeRelease
+    (JNIEnv *, jobject, jlong);
+
 
 #ifdef __cplusplus
 }

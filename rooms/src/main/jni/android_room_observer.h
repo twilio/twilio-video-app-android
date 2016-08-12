@@ -35,12 +35,12 @@ public:
             GetMethodID(env,
                         *j_room_observer_class_,
                         "onParticipantConnected",
-                        "(J)V")),
+                        "(Ljava/lang/String;J)V")),
         j_on_participant_disconnected_(
             GetMethodID(env,
                         *j_room_observer_class_,
                         "onParticipantDisconnected",
-                        "(J)V")) {
+                        "(Ljava/lang/String;)V")) {
         TS_CORE_LOG_MODULE(kTSCoreLogModulePlatform,
                            kTSCoreLogLevelDebug,
                            "AndroidRoomObserver");
@@ -127,8 +127,10 @@ protected:
 
             ParticipantDataContext *participant_dc = new ParticipantDataContext();
             participant_dc->participant = participant;
+            jstring j_sid = webrtc_jni::JavaStringFromStdString(jni(), participant->getSid());
             jni()->CallVoidMethod(*j_room_observer_,
                                   j_on_participant_connected_,
+                                  j_sid,
                                   jlongFromPointer(participant_dc));
             CHECK_EXCEPTION(jni()) << "error during CallVoidMethod";
         }
@@ -147,7 +149,10 @@ protected:
                 return;
             }
 
-            // TODO: Implement me
+            jstring j_sid = webrtc_jni::JavaStringFromStdString(jni(), participant->getSid());
+            jni()->CallVoidMethod(*j_room_observer_,
+                                  j_on_participant_disconnected_,
+                                  j_sid);
 
             CHECK_EXCEPTION(jni()) << "error during CallVoidMethod";
         }

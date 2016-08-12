@@ -8,6 +8,6 @@ public interface RoomListener {
 
     // TODO: maybe better idea would be to pass participant native handle and create
     // participant from Java layer
-    void onParticipantConnected(long participantNativeDC);
-    void onParticipantDisconnected(long participantNativeDC);
+    void onParticipantConnected(String participantSid, long participantNativeDC);
+    void onParticipantDisconnected(String participantSid);
 }
