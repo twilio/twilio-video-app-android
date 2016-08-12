@@ -3,9 +3,9 @@
 
 #include "webrtc/api/java/jni/jni_helpers.h"
 
-#include "TSCLogger.h"
-#include "room_observer.h"
-#include "participant.h"
+#include "video/TSCLogger.h"
+#include "video/room_observer.h"
+#include "video/participant.h"
 
 #include "com_twilio_video_Participant.h"
 
@@ -137,7 +137,7 @@ protected:
     }
 
     virtual void onParticipantDisconnected(twilio::video::Room *room,
-                                           std::shared_ptr<const twilio::video::Participant> participant) {
+                                           std::shared_ptr<twilio::video::Participant> participant) {
         ScopedLocalRefFrame local_ref_frame(jni());
         std::string func_name = std::string(__FUNCTION__);
         TS_CORE_LOG_MODULE(kTSCoreLogModulePlatform, kTSCoreLogLevelDebug, "%s", func_name.c_str());

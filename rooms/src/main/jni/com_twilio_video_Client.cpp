@@ -10,13 +10,13 @@
 #include "webrtc/api/java/jni/classreferenceholder.h"
 #include "webrtc/media/engine/webrtcvideodecoderfactory.h"
 
-#include "AccessManager/AccessManager.h"
-#include "TSCLogger.h"
-#include "video.h"
+#include "common/AccessManager/AccessManager.h"
+#include "video/TSCLogger.h"
+#include "video/video.h"
 #include "media/media_factory.h"
 #include "android_platform_info_provider.h"
 #include "android_room_observer.h"
-#include "connect_options.h"
+#include "video/connect_options.h"
 #include "com_twilio_video_ConnectOptions.h"
 #include "com_twilio_video_Room.h"
 

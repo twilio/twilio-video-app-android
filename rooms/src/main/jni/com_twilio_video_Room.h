@@ -1,6 +1,6 @@
 #include <jni.h>
 #include <memory>
-#include "room.h"
+#include "video/room.h"
 
 #ifndef _Included_com_twilio_conversations_Room
 #define _Included_com_twilio_conversations_Room

@@ -1,7 +1,7 @@
 #include "com_twilio_video_Room.h"
 #include "webrtc/api/java/jni/jni_helpers.h"
 
-#include "TSCLogger.h"
+#include "video/TSCLogger.h"
 
 
 JNIEXPORT jstring JNICALL Java_com_twilio_video_Room_nativeGetName
