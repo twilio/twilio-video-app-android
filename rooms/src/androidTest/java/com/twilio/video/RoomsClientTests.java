@@ -43,11 +43,6 @@ public class RoomsClientTests {
         new Client(context, null);
     }
 
-    @Test(expected = NullPointerException.class)
-    public void client_shouldThrowExceptionWhenListenerIsNull() {
-        new Client(context, accessManager());
-    }
-
     @Test
     public void logLevel_shouldBeRetained() {
         Client.setLogLevel(LogLevel.DEBUG);

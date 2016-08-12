@@ -11,8 +11,11 @@ Java_com_twilio_video_ConnectOptions_nativeCreate(JNIEnv *env,
 
     twilio::video::ConnectOptions::Builder builder = twilio::video::ConnectOptions::Builder();
 
-    std::string name = webrtc_jni::JavaToStdString(env, j_name);
-    builder.setRoomName(name);
+    if (!webrtc_jni::IsNull(env, j_name)) {
+        std::string name = webrtc_jni::JavaToStdString(env, j_name);
+        builder.setRoomName(name);
+    }
+
     bool create_room = (bool)j_create_room;
     builder.setCreateRoom(create_room);
 
