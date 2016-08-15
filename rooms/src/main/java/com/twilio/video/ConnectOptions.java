@@ -30,6 +30,14 @@ public class ConnectOptions {
         return iceOptions;
     }
 
+    private long createNativeObject() {
+        return nativeCreate(name, createRoom, localMedia, iceOptions);
+    }
+
+    private native long nativeCreate(String name, boolean createRoom,
+                                     LocalMedia localMedia, IceOptions iceOptions);
+
+
     public static class Builder {
         private String name;
         private boolean createRoom;

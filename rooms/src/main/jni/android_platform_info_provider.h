@@ -3,7 +3,7 @@
 
 #include <jni.h>
 #include <string.h>
-#include "PlatformInfoProvider.h"
+#include "video/PlatformInfoProvider.h"
 
 #include "webrtc/api/java/jni/jni_helpers.h"
 

@@ -49,44 +49,55 @@ public class ConnectTests {
 
     @Test
     public void connect_shouldConnectToANewRoom() throws InterruptedException {
-        final CountDownLatch connectedCountdownLatch = new CountDownLatch(1);
+        FakeRoomListener roomListener = new FakeRoomListener();
+        roomListener.onConnectedLatch = new CountDownLatch(1);
 
         AccessManager accessManager = AccessTokenHelper.obtainAccessManager(context, TEST_USER);
 
         Client client = new Client(context, accessManager);
 
-        client.connect(roomListener());
+        client.connect(roomListener);
 
-        assertTrue(connectedCountdownLatch.await(20, TimeUnit.SECONDS));
+        assertTrue(roomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
     }
 
     @Test
     public void connect_shouldConnectToANamedRoom() throws InterruptedException {
-        final CountDownLatch connectedCountdownLatch = new CountDownLatch(1);
+        FakeRoomListener roomListener = new FakeRoomListener();
+        roomListener.onConnectedLatch = new CountDownLatch(1);
+
+        AccessManager accessManager = AccessTokenHelper.obtainAccessManager(context, TEST_USER);
+
+        Client client = new Client(context, accessManager);
+        ConnectOptions connectOptions = new ConnectOptions.Builder()
+                .createRoom(true)
+                .name(TEST_ROOM)
+                .build();
+
+        client.connect(connectOptions, roomListener);
+
+        assertTrue(roomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
+    }
+
+    @Test
+    public void connect_shouldDisconnectFromRoom() throws InterruptedException {
+        FakeRoomListener roomListener = new FakeRoomListener();
+        roomListener.onConnectedLatch = new CountDownLatch(1);
+        roomListener.onDisconnectedLatch = new CountDownLatch(1);
 
         AccessManager accessManager = AccessTokenHelper.obtainAccessManager(context, TEST_USER);
 
         Client client = new Client(context, accessManager);
 
-        client.connect(TEST_ROOM, roomListener());
+        Room room = client.connect(roomListener);
 
-        assertTrue(connectedCountdownLatch.await(20, TimeUnit.SECONDS));
-    }
+        assertTrue(roomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
+        assertEquals(room.getState(),RoomState.CONNECTED);
 
-    @Test
-    public void connect_shouldDisconnectFromRoom() throws InterruptedException {
-        final CountDownLatch connectedCountdownLatch = new CountDownLatch(1);
-        final CountDownLatch disconnectedCountdownLatch = new CountDownLatch(1);
+        room.disconnect();
 
-        AccessManager accessManager = AccessTokenHelper.obtainAccessManager(context, TEST_USER);
-
-        final Client client = new Client(context, accessManager);
-
-        client.connect(roomListener());
-
-        assertTrue(connectedCountdownLatch.await(20, TimeUnit.SECONDS));
-
-        assertTrue(disconnectedCountdownLatch.await(5, TimeUnit.SECONDS));
+        assertTrue(roomListener.onDisconnectedLatch.await(20, TimeUnit.SECONDS));
+        assertEquals(room.getState(),RoomState.DISCONNECTED);
 
     }
 
@@ -94,34 +105,44 @@ public class ConnectTests {
         return new AccessManager(context, null, null);
     }
 
-    private Room.Listener roomListener() {
-        return new Room.Listener() {
-            @Override
-            public void onConnected(Room room) {
+    class FakeRoomListener implements Room.Listener {
 
+        public CountDownLatch onConnectedLatch;
+        public CountDownLatch onConnectFailureLatch;
+        public CountDownLatch onDisconnectedLatch;
+        public CountDownLatch onParticipantConnectedLatch;
+        public CountDownLatch onParticipantDisconnectedLatch;
+
+        private void triggerLatch(CountDownLatch latch) {
+            if (latch != null) {
+                latch.countDown();
             }
+        }
 
-            @Override
-            public void onConnectFailure(RoomsException error) {
+        @Override
+        public void onConnected(Room room) {
+            triggerLatch(onConnectedLatch);
+        }
 
-            }
+        @Override
+        public void onConnectFailure(RoomsException error) {
+            triggerLatch(onConnectFailureLatch);
+        }
 
-            @Override
-            public void onDisconnected(Room room, RoomsException error) {
+        @Override
+        public void onDisconnected(Room room, RoomsException error) {
+            triggerLatch(onDisconnectedLatch);
+        }
 
-            }
+        @Override
+        public void onParticipantConnected(Room room, Participant participant) {
+            triggerLatch(onParticipantConnectedLatch);
+        }
 
-            @Override
-            public void onParticipantConnected(Room room, Participant participant) {
-
-            }
-
-            @Override
-            public void onParticipantDisconnected(Room room, Participant participant) {
-
-            }
-
-        };
+        @Override
+        public void onParticipantDisconnected(Room room, Participant participant) {
+            triggerLatch(onParticipantDisconnectedLatch);
+        }
     }
 }
 

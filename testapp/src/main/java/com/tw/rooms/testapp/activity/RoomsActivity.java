@@ -18,10 +18,12 @@ import com.tw.rooms.testapp.BuildConfig;
 import com.tw.rooms.testapp.R;
 import com.tw.rooms.testapp.util.SimpleSignalingUtils;
 import com.twilio.common.AccessManager;
+import com.twilio.video.ConnectOptions;
 import com.twilio.video.LogLevel;
 import com.twilio.video.Participant;
 import com.twilio.video.Client;
 import com.twilio.video.Room;
+import com.twilio.video.RoomState;
 import com.twilio.video.RoomsException;
 
 import butterknife.BindView;
@@ -42,6 +44,7 @@ public class RoomsActivity extends AppCompatActivity {
 
     private ProgressDialog progressDialog;
     private ArrayAdapter<CharSequence> spinnerAdapter;
+    private Room room;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -128,20 +131,28 @@ public class RoomsActivity extends AppCompatActivity {
         AccessManager accessManager = new AccessManager(this, capabilityToken, null);
         Client.setLogLevel(LogLevel.DEBUG);
         Client client = new Client(this, accessManager);
+        ConnectOptions connectOptions = new ConnectOptions.Builder()
+                .createRoom(true)
+                .name(roomEditText.getText().toString())
+                .build();
 
         if(roomEditText.getText().length() == 0) {
-            client.connect(RoomListener());
+            room = client.connect(RoomListener());
         } else {
-            client.connect(roomEditText.getText().toString(), RoomListener());
+            room = client.connect(connectOptions, RoomListener());
         }
 
+        Timber.i("Connecting to room:"+room.getSid());
     }
 
     private Room.Listener RoomListener() {
        return new Room.Listener() {
            @Override
            public void onConnected(Room room) {
-               Timber.i("onConnected");
+               Timber.i("onConnected: "+room.getName() + " sid:"+
+                       room.getSid()+" state:"+room.getState());
+               //room.disconnect();
+
            }
 
            @Override

@@ -9,6 +9,13 @@ public class Participant {
     private Media media;
     private Participant.Listener participantListener;
     private Handler handler;
+    private long nativeHandle;
+
+    Participant(String sid, long nativeHandle) {
+        this.nativeHandle = nativeHandle;
+        this.sid = sid;
+        this.identity = getIdentity();
+    }
 
     public Participant(String identity, String sid) {
         this.identity = identity;
@@ -44,6 +51,18 @@ public class Participant {
     Handler getHandler() {
         return handler;
     }
+
+    void release(){
+        if (nativeHandle != 0) {
+            nativeRelease(nativeHandle);
+            nativeHandle = 0;
+        }
+    }
+
+    private native String nativeGetIdentity(long nativeHandle);
+    private native String nativeGetSid(long nativeHandle);
+    private native boolean nativeIsConnected(long nativeHandle);
+    private native void nativeRelease(long nativeHandle);
 
     public interface Listener {
         /**

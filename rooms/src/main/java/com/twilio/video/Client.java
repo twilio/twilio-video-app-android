@@ -9,16 +9,22 @@ import android.util.Log;
 import com.twilio.common.AccessManager;
 import com.twilio.video.internal.Logger;
 import com.twilio.video.internal.ReLinker;
+import com.twilio.video.internal.RoomListener;
 
+import java.lang.ref.WeakReference;
 import java.util.EnumMap;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * The Client allows user to create or participate in Rooms.
  */
 public class Client {
+
+    // TODO: Check which of these error codes are still valid
     /**
      * Authenticating your Client failed due to invalid auth credentials.
      */
@@ -96,8 +102,9 @@ public class Client {
     private final Handler handler;
     private final Context applicationContext;
     private AccessManager accessManager;
-    private Map<String, Room> rooms;
-    private long nativeClientDataHandler;
+    private long nativeClientContext;
+    // Using listener native handle as key
+    private Map<Long, WeakReference<Room>> roomMap = new ConcurrentHashMap<>();
 
     public Client(Context context, AccessManager accessManager) {
         if (context == null) {
@@ -133,8 +140,10 @@ public class Client {
             trySetCoreModuleLogLevel(module.ordinal(), moduleLogLevel.get(module).ordinal());
         }
 
-        nativeInitialize(applicationContext);
-        nativeClientDataHandler = nativeCreateClient(accessManager.getToken());
+        if (!nativeInitialize(applicationContext)) {
+            throw new RuntimeException("Failed to initialize the Video Client");
+        }
+        nativeClientContext = nativeCreateClient(accessManager, null);
 
     }
 
@@ -169,32 +178,31 @@ public class Client {
         return audioManager.isSpeakerphoneOn() ? AudioOutput.SPEAKERPHONE : AudioOutput.HEADSET;
     }
 
-    // TODO: Remove RoomFuture
-    public RoomFuture connect(Room.Listener roomListener) {
+    public Room connect(Room.Listener roomListener) {
         if (roomListener == null) {
             throw new NullPointerException("roomListener must not be null");
         }
-
-        RoomListenerHandle roomListenerHandle = new RoomListenerHandle(roomListener);
-        long nativeRoomFutureHandle =
-                nativeConnect(nativeClientDataHandler, roomListenerHandle.get(), null);
-        return new RoomFuture(nativeRoomFutureHandle);
+        ConnectOptions connectOptions = new ConnectOptions.Builder().build();
+        return connect(connectOptions, roomListener);
     }
 
-    // TODO: change room name to ConnectOptions
-    // TODO: Remove RoomFuture
-    public RoomFuture connect(String name, Room.Listener roomListener) {
-        if (name == null) {
-            throw new NullPointerException("name must not be null");
+    public Room connect(ConnectOptions connectOptions, Room.Listener roomListener) {
+        if (connectOptions == null) {
+            throw new NullPointerException("connectOptions must not be null");
         }
         if (roomListener == null) {
             throw new NullPointerException("roomListener must not be null");
         }
-
         RoomListenerHandle roomListenerHandle = new RoomListenerHandle(roomListener);
-        long nativeRoomFutureHandle =
-                nativeConnect(nativeClientDataHandler, roomListenerHandle.get(), name);
-        return new RoomFuture(nativeRoomFutureHandle);
+        Room room;
+        synchronized (roomListenerHandle) {
+            long nativeRoomHandle = nativeConnect(
+                    nativeClientContext, roomListenerHandle.get(), connectOptions);
+            room = new Room(nativeRoomHandle);
+            roomMap.put(roomListenerHandle.get(), new WeakReference<Room>(room));
+        }
+
+        return room;
     }
 
     /**
@@ -325,17 +333,113 @@ public class Client {
         }
     }
 
-    class RoomListenerHandle extends NativeHandle {
+    class RoomListenerHandle extends NativeHandle implements RoomListener {
+
+        private Room.Listener listener;
+        private Map<String, Participant> participantMap = new HashMap<>();
 
         public RoomListenerHandle(Room.Listener listener) {
             super(listener);
+            this.listener = listener;
         }
 
+        /*
+         * Native Handle
+         */
         @Override
         protected native long nativeCreate(Object object);
 
         @Override
         protected native void nativeFree(long nativeHandle);
+
+        /*
+         * RoomListener
+         */
+        @Override
+        public void onConnected() {
+            logger.d("onConnected()");
+            final Room room = getRoom();
+            handler.post(new Runnable() {
+                @Override
+                public void run() {
+                    RoomListenerHandle.this.listener.onConnected(room);
+                }
+            });
+        }
+
+        @Override
+        public void onDisconnected(int errorCode) {
+            final Room room = getRoom();
+
+            // TODO: Transform ClientError to RoomException
+
+            handler.post(new Runnable() {
+                @Override
+                public void run() {
+                    RoomListenerHandle.this.listener.onDisconnected(room, null);
+                }
+            });
+        }
+
+        @Override
+        public void onConnectFailure(int errorCode) {
+            final Room room = getRoom();
+
+            // TODO: Transform ClientError to RoomException
+
+            handler.post(new Runnable() {
+                @Override
+                public void run() {
+                    RoomListenerHandle.this.listener.onDisconnected(room, null);
+                }
+            });
+        }
+
+        @Override
+        public void onParticipantConnected(String participantSid, long nativeParticipantContext) {
+            final Room room = getRoom();
+
+            final Participant participant = new Participant(participantSid, nativeParticipantContext);
+            participantMap.put(participantSid, participant);
+
+            handler.post(new Runnable() {
+                @Override
+                public void run() {
+                    RoomListenerHandle.this.listener.onParticipantConnected(room, participant);
+                }
+            });
+        }
+
+        @Override
+        public void onParticipantDisconnected(String participantSid) {
+            final Room room = getRoom();
+
+            final Participant participant = participantMap.remove(participantSid);
+            if (participant == null) {
+                logger.w("Received participant disconnected callback for non-existent participant");
+                return;
+            }
+            participant.release();
+
+            handler.post(new Runnable() {
+                @Override
+                public void run() {
+                    RoomListenerHandle.this.listener
+                            .onParticipantDisconnected(room, participant);
+                }
+            });
+        }
+
+        private synchronized Room getRoom() {
+            long nativeRoomListenerHandle = get();
+            WeakReference<Room> roomRef = roomMap.get(nativeRoomListenerHandle);
+            if (roomRef == null) {
+                // TODO: handle error
+                logger.w("Room reference is null");
+                return null;
+            }
+            return roomRef.get();
+        }
     }
 
     private native static void nativeSetCoreLogLevel(int level);
@@ -344,12 +448,11 @@ public class Client {
 
     private native static int nativeGetCoreLogLevel();
 
-    private native long nativeInitialize(Context context);
+    private native boolean nativeInitialize(Context context);
 
-    // TODO: In future we should pass AccessManager and Media Factory (and maybe Invoker)
-    private native long nativeCreateClient(String token);
+    private native long nativeCreateClient(AccessManager accessManager, MediaFactory mediaFactory);
 
     private native long nativeConnect(long nativeClientDataHandler,
                                       long nativeRoomListenerHandle,
-                                      String name);
+                                      ConnectOptions ConnectOptions);
 }

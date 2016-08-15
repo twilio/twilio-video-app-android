@@ -23,30 +23,29 @@ def coreHome = "${twilioSdkHome}/twilio-video"
 def coreHeaders = "${coreHome}/arm64v8a/gnu-4.9/debug/include"
 def coreStaticLib = "libtwilio-video.a"
 
-def twilioCommonHome = "${twilioSdkHome}/twilio-common"
-def twilioCommonHeaders = "${twilioCommonHome}/include"
+def twilioCommonHome = "${coreHome}"
+def twilioCommonHeaders = "${coreHeaders}/common"
 def twilioCommonStaticLib = "libtwilio-common.a"
 
-def pocoHome = "${twilioSdkHome}/twilio-poco"
-def pocoHeaders = "${pocoHome}/include"
-def pocoCryptoHeaders = "${pocoHeaders}/Crypto"
+def pocoHome = "${coreHome}"
 def pocoFoundationStaticLib = "libPocoFoundation.a"
 def pocoNetStaticLib = "libPocoNet.a"
 def pocoCryptoStaticLib = "libPocoCrypto.a"
 def pocoNetSslStaticLib = "libPocoNetSSL.a"
 def pocoUtilStaticLib = "libPocoUtil.a"
-def pocoXmlStaticLib = "libPocoXML.a"
 def pocoJsonStaticLib = "libPocoJSON.a"
 
-def boringSslHome = "${twilioSdkHome}/twilio-boringssl"
-def boringSslHeaders = "${boringSslHome}/include"
+def boringSslHome = "${coreHome}"
 def boringSslStaticLib = "libboringssl.a"
 
 def webRtcHome = "${twilioSdkHome}/twilio-webrtc"
 def webRtcHeaders = "${webRtcHome}/include"
 def webRtcStaticLib = "libwebrtc.a"
 
+def resiprocateHome = "${coreHome}"
 def resiprocateStaticLib = "libresiprocate.a"
+
+def compilerVersion = "gnu-4.9"
 
 configurations {
     preCompile
@@ -59,81 +58,91 @@ model {
                 headers.srcDir "${coreHeaders}"
                 binaries.withType(StaticLibraryBinary) {
                     def coreStaticLibPath = "${coreHome}/"+
-                            "${supportedArchFolderName.get(targetPlatform.getName())}/gnu-4.9/"+
-                            "${buildType.getName()}/lib/${coreStaticLib}"
+                            "${supportedArchFolderName.get(targetPlatform.getName())}/"+
+                            "${compilerVersion}/"+
+                            "${buildType.getName()}/lib/"+
+                            "${coreStaticLib}"
                     staticLibraryFile = file("${coreStaticLibPath}")
                 }
             }
             twilioCommon {
                 headers.srcDir "${twilioCommonHeaders}"
                 binaries.withType(StaticLibraryBinary) {
-                    def twilioCommonStaticLibPath = "${twilioCommonHome}/lib/" +
-                            "${buildType.getName()}/" +
-                            "${targetPlatform.getName()}/${twilioCommonStaticLib}"
+                    def twilioCommonStaticLibPath = "${twilioCommonHome}/" +
+                            "${supportedArchFolderName.get(targetPlatform.getName())}/"+
+                            "${compilerVersion}/"+
+                            "${buildType.getName()}/lib/"+
+                            "${twilioCommonStaticLib}"
                     staticLibraryFile = file("${twilioCommonStaticLibPath}")
                 }
             }
             pocoFoundation {
-                headers.srcDir "${pocoHeaders}"
                 binaries.withType(StaticLibraryBinary) {
-                    def pocoFoundationStaticLibPath = "${pocoHome}/lib/${buildType.getName()}/" +
-                            "${targetPlatform.getName()}/${pocoFoundationStaticLib}"
+                    def pocoFoundationStaticLibPath = "${pocoHome}/"+
+                            "${supportedArchFolderName.get(targetPlatform.getName())}/"+
+                            "${compilerVersion}/"+
+                            "${buildType.getName()}/lib/"+
+                            "${pocoFoundationStaticLib}"
                     staticLibraryFile = file("${pocoFoundationStaticLibPath}")
                 }
             }
             pocoNet {
-                headers.srcDir "${pocoHeaders}"
                 binaries.withType(StaticLibraryBinary) {
-                    def pocoNetStaticLibPath = "${pocoHome}/lib/${buildType.getName()}/" +
-                            "${targetPlatform.getName()}/${pocoNetStaticLib}"
+                    def pocoNetStaticLibPath = "${pocoHome}/" +
+                            "${supportedArchFolderName.get(targetPlatform.getName())}/"+
+                            "${compilerVersion}/"+
+                            "${buildType.getName()}/lib/"+
+                            "${pocoNetStaticLib}"
                     staticLibraryFile = file("${pocoNetStaticLibPath}")
                 }
             }
             pocoCrypto {
-                headers.srcDir "${pocoCryptoHeaders}"
                 binaries.withType(StaticLibraryBinary) {
-                    def pocoCryptoStaticLibPath = "${pocoHome}/lib/${buildType.getName()}/" +
-                            "${targetPlatform.getName()}/${pocoCryptoStaticLib}"
+                    def pocoCryptoStaticLibPath = "${pocoHome}/"+
+                            "${supportedArchFolderName.get(targetPlatform.getName())}/"+
+                            "${compilerVersion}/"+
+                            "${buildType.getName()}/lib/"+
+                            "${pocoCryptoStaticLib}"
                     staticLibraryFile = file("${pocoCryptoStaticLibPath}")
                 }
             }
             pocoNetSsl {
-                headers.srcDir "${pocoHeaders}"
                 binaries.withType(StaticLibraryBinary) {
-                    def pocoNetSslStaticLibPath = "${pocoHome}/lib/${buildType.getName()}/" +
-                            "${targetPlatform.getName()}/${pocoNetSslStaticLib}"
+                    def pocoNetSslStaticLibPath = "${pocoHome}/"+
+                            "${supportedArchFolderName.get(targetPlatform.getName())}/"+
+                            "${compilerVersion}/"+
+                            "${buildType.getName()}/lib/"+
+                            "${pocoNetSslStaticLib}"
                     staticLibraryFile = file("${pocoNetSslStaticLibPath}")
                 }
             }
             pocoUtil {
-                headers.srcDir "${pocoHeaders}"
                 binaries.withType(StaticLibraryBinary) {
-                    def pocoUtilStaticLibPath = "${pocoHome}/lib/${buildType.getName()}/" +
-                            "${targetPlatform.getName()}/${pocoUtilStaticLib}"
+                    def pocoUtilStaticLibPath = "${pocoHome}/"+
+                            "${supportedArchFolderName.get(targetPlatform.getName())}/"+
+                            "${compilerVersion}/"+
+                            "${buildType.getName()}/lib/"+
+                            "${pocoUtilStaticLib}"
                     staticLibraryFile = file("${pocoUtilStaticLibPath}")
                 }
             }
-            pocoXml {
-                headers.srcDir "${pocoHeaders}"
-                binaries.withType(StaticLibraryBinary) {
-                    def pocoXmlStaticLibPath = "${pocoHome}/lib/${buildType.getName()}/" +
-                            "${targetPlatform.getName()}/${pocoXmlStaticLib}"
-                    staticLibraryFile = file("${pocoXmlStaticLibPath}")
-                }
-            }
             pocoJson {
-                headers.srcDir "${pocoHeaders}"
                 binaries.withType(StaticLibraryBinary) {
-                    def pocoJsonStaticLibPath = "${pocoHome}/lib/${buildType.getName()}/" +
-                            "${targetPlatform.getName()}/${pocoJsonStaticLib}"
+                    def pocoJsonStaticLibPath = "${pocoHome}/" +
+                            "${supportedArchFolderName.get(targetPlatform.getName())}/"+
+                            "${compilerVersion}/"+
+                            "${buildType.getName()}/lib/"+
+                            "${pocoJsonStaticLib}"
                     staticLibraryFile = file("${pocoJsonStaticLibPath}")
                 }
             }
             boringssl {
-                headers.srcDir "${boringSslHeaders}"
                 binaries.withType(StaticLibraryBinary) {
-                    def boringSslStaticLibPath = "${boringSslHome}/lib/release/" +
-                            "${targetPlatform.getName()}/${boringSslStaticLib}"
+                    def boringSslStaticLibPath = "${boringSslHome}/" +
+                            "${supportedArchFolderName.get(targetPlatform.getName())}/"+
+                            "${compilerVersion}/"+
+                            "${buildType.getName()}/lib/"+
+                            "${boringSslStaticLib}"
                     staticLibraryFile = file("${boringSslStaticLibPath}")
                 }
             }
@@ -146,11 +155,12 @@ model {
                 }
             }
             resiprocate {
-                headers.srcDir "${coreHeaders}"
                 binaries.withType(StaticLibraryBinary) {
-                    def resiprocateStaticLibPath = "${coreHome}/"+
-                            "${supportedArchFolderName.get(targetPlatform.getName())}/gnu-4.9/"+
-                            "${buildType.getName()}/lib/${resiprocateStaticLib}"
+                    def resiprocateStaticLibPath = "${resiprocateHome}/"+
+                            "${supportedArchFolderName.get(targetPlatform.getName())}/"+
+                            "${compilerVersion}/"+
+                            "${buildType.getName()}/lib/"+
+                            "${resiprocateStaticLib}"
                     staticLibraryFile = file("${resiprocateStaticLibPath}")
                 }
             }
@@ -224,7 +234,6 @@ model {
                     library "pocoCrypto" linkage "static"
                     library "pocoNetSsl" linkage "static"
                     library "pocoUtil" linkage "static"
-                    library "pocoXml" linkage "static"
                     library "pocoJson" linkage "static"
                     library "webrtc" linkage "static"
                     library "boringssl" linkage "static"
@@ -273,7 +282,7 @@ dependencies {
     preCompile 'com.googlesource.boringssl.twilio:twilio-boringssl:1.0.13:android@tar.bz2'
     preCompile 'com.twilio.sdk:twilio-common:0.2.0:android@tar.bz2'
     preCompile 'com.twilio.sdk:twilio-webrtc:52.4:android@tar.bz2'
-    preCompile 'com.twilio.sdk:twilio-video:0.1.9:android@tar.bz2'
+    preCompile 'com.twilio.sdk:twilio-video:0.1.10:android@tar.bz2'
 
     testCompile 'junit:junit:4.12'
     testCompile 'org.mockito:mockito-core:1.10.19'

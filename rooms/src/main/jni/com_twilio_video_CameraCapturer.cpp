@@ -3,7 +3,7 @@
 #include "webrtc/api/androidvideocapturer.h"
 #include "com_twilio_video_CameraCapturer.h"
 #include "webrtc/api/java/jni/jni_helpers.h"
-#include "TSCLogger.h"
+#include "video/TSCLogger.h"
 
 using namespace twiliosdk;
 using namespace webrtc_jni;
