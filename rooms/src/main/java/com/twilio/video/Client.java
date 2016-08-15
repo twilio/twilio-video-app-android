@@ -396,11 +396,10 @@ public class Client {
         }
 
         @Override
-        public void onParticipantConnected(String participantSid, long nativeParticipantContext) {
+        public void onParticipantConnected(final Participant participant) {
             final Room room = getRoom();
 
-            final Participant participant = new Participant(participantSid, nativeParticipantContext);
-            participantMap.put(participantSid, participant);
+            participantMap.put(participant.getSid(), participant);
 
             handler.post(new Runnable() {
                 @Override

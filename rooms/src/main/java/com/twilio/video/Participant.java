@@ -7,20 +7,14 @@ public class Participant {
     private String identity;
     private String sid;
     private Media media;
-    private Participant.Listener participantListener;
-    private Handler handler;
-    private long nativeHandle;
+    private long nativeContext;
 
-    Participant(String sid, long nativeHandle) {
-        this.nativeHandle = nativeHandle;
-        this.sid = sid;
-        this.identity = getIdentity();
-    }
-
-    public Participant(String identity, String sid) {
+    Participant(String identity, String sid,
+                long nativeMediaContext, long nativeParticipantContext) {
         this.identity = identity;
         this.sid = sid;
         this.media = new Media();
+        this.nativeContext = nativeParticipantContext;
     }
 
     public String getIdentity() {
@@ -31,38 +25,29 @@ public class Participant {
         return media;
     }
 
-    public void setParticipantListener(Participant.Listener participantListener) {
-        this.handler = Util.createCallbackHandler();
-        this.participantListener = participantListener;
-    }
-
-    public Participant.Listener getParticipantListener() {
-        return participantListener;
-    }
-
     public String getSid() {
         return sid;
+    }
+
+    public boolean isConnected() {
+        return nativeIsConnected(nativeContext);
     }
 
     void setSid(String sid) {
         this.sid = sid;
     }
 
-    Handler getHandler() {
-        return handler;
-    }
-
     void release(){
-        if (nativeHandle != 0) {
-            nativeRelease(nativeHandle);
-            nativeHandle = 0;
+        if (nativeContext != 0) {
+            nativeRelease(nativeContext);
+            nativeContext = 0;
         }
     }
 
-    private native String nativeGetIdentity(long nativeHandle);
-    private native String nativeGetSid(long nativeHandle);
     private native boolean nativeIsConnected(long nativeHandle);
     private native void nativeRelease(long nativeHandle);
+
+    // TODO: Move this listener to Media.Listener
 
     public interface Listener {
         /**
