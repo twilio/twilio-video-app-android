@@ -396,10 +396,10 @@ public class Client {
         }
 
         @Override
-        public void onParticipantConnected(String participantSid, long participantNativeDC) {
+        public void onParticipantConnected(String participantSid, long nativeParticipantContext) {
             final Room room = getRoom();
 
-            final Participant participant = new Participant(participantSid, participantNativeDC);
+            final Participant participant = new Participant(participantSid, nativeParticipantContext);
             participantMap.put(participantSid, participant);
 
             handler.post(new Runnable() {
@@ -416,7 +416,8 @@ public class Client {
 
             final Participant participant = participantMap.remove(participantSid);
             if (participant == null) {
-                // TODO: should we notify user somehow? Find strategy...
+                logger.w("Received participant disconnected callback for non-existent participant");
+                return;
             }
             participant.release();
 

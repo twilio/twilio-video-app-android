@@ -92,11 +92,12 @@ public class ConnectTests {
         Room room = client.connect(roomListener);
 
         assertTrue(roomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
+        assertEquals(room.getState(),RoomState.CONNECTED);
 
         room.disconnect();
 
         assertTrue(roomListener.onDisconnectedLatch.await(20, TimeUnit.SECONDS));
-
+        assertEquals(room.getState(),RoomState.DISCONNECTED);
 
     }
 
