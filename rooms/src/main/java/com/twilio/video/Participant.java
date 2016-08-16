@@ -1,20 +1,18 @@
 package com.twilio.video;
 
 
-import android.os.Handler;
-
 public class Participant {
     private String identity;
     private String sid;
     private Media media;
-    private long nativeContext;
+    private long nativeParticipantContext;
 
     Participant(String identity, String sid,
                 long nativeMediaContext, long nativeParticipantContext) {
         this.identity = identity;
         this.sid = sid;
         this.media = new Media();
-        this.nativeContext = nativeParticipantContext;
+        this.nativeParticipantContext = nativeParticipantContext;
     }
 
     public String getIdentity() {
@@ -30,17 +28,13 @@ public class Participant {
     }
 
     public boolean isConnected() {
-        return nativeIsConnected(nativeContext);
-    }
-
-    void setSid(String sid) {
-        this.sid = sid;
+        return nativeIsConnected(nativeParticipantContext);
     }
 
     void release(){
-        if (nativeContext != 0) {
-            nativeRelease(nativeContext);
-            nativeContext = 0;
+        if (nativeParticipantContext != 0) {
+            nativeRelease(nativeParticipantContext);
+            nativeParticipantContext = 0;
         }
     }
 

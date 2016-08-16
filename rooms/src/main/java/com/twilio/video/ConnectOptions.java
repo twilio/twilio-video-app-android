@@ -39,8 +39,8 @@ public class ConnectOptions {
 
 
     public static class Builder {
-        private String name;
-        private boolean createRoom;
+        private String name = "";
+        private boolean createRoom = true;
         private LocalMedia localMedia;
         private IceOptions iceOptions;
 

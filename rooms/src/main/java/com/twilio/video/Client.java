@@ -198,7 +198,8 @@ public class Client {
         synchronized (roomListenerHandle) {
             long nativeRoomHandle = nativeConnect(
                     nativeClientContext, roomListenerHandle.get(), connectOptions);
-            room = new Room(nativeRoomHandle);
+            room = new Room(nativeRoomHandle, connectOptions.getName());
+            room.setState(RoomState.CONNECTING);
             roomMap.put(roomListenerHandle.get(), new WeakReference<Room>(room));
         }
 
@@ -336,7 +337,6 @@ public class Client {
     class RoomListenerHandle extends NativeHandle implements RoomListener {
 
         private Room.Listener listener;
-        private Map<String, Participant> participantMap = new HashMap<>();
 
         public RoomListenerHandle(Room.Listener listener) {
             super(listener);
@@ -359,6 +359,7 @@ public class Client {
         public void onConnected() {
             logger.d("onConnected()");
             final Room room = getRoom();
+            room.setState(RoomState.CONNECTED);
             handler.post(new Runnable() {
                 @Override
                 public void run() {
@@ -368,38 +369,41 @@ public class Client {
         }
 
         @Override
-        public void onDisconnected(int errorCode) {
+        public void onDisconnected(final int errorCode) {
+            logger.d("onDisconnected()");
             final Room room = getRoom();
-
-            // TODO: Transform ClientError to RoomException
+            room.setState(RoomState.DISCONNECTED);
+            room.release();
 
             handler.post(new Runnable() {
                 @Override
                 public void run() {
-                    RoomListenerHandle.this.listener.onDisconnected(room, null);
+                    RoomListenerHandle.this.listener
+                            .onDisconnected(room, new RoomsException(errorCode, ""));
                 }
             });
         }
 
         @Override
-        public void onConnectFailure(int errorCode) {
+        public void onConnectFailure(final int errorCode) {
+            logger.d("onConnectFailure()");
             final Room room = getRoom();
-
-            // TODO: Transform ClientError to RoomException
-
+            room.setState(RoomState.DISCONNECTED);
             handler.post(new Runnable() {
                 @Override
                 public void run() {
-                    RoomListenerHandle.this.listener.onDisconnected(room, null);
+                    RoomListenerHandle.this.listener
+                            .onConnectFailure(new RoomsException(errorCode, ""));
                 }
             });
         }
 
         @Override
         public void onParticipantConnected(final Participant participant) {
+            logger.d("onParticipantConnected()");
             final Room room = getRoom();
 
-            participantMap.put(participant.getSid(), participant);
+            room.addParticipant(participant);
 
             handler.post(new Runnable() {
                 @Override
@@ -411,9 +415,10 @@ public class Client {
 
         @Override
         public void onParticipantDisconnected(String participantSid) {
+            logger.d("onParticipantDisconnected()");
             final Room room = getRoom();
 
-            final Participant participant = participantMap.remove(participantSid);
+            final Participant participant = room.removeParticipant(participantSid);
             if (participant == null) {
                 logger.w("Received participant disconnected callback for non-existent participant");
                 return;
