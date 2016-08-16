@@ -191,14 +191,13 @@ public class Client {
         if (roomListener == null) {
             throw new NullPointerException("roomListener must not be null");
         }
-        InternalRoomListenerHandle roomListenerHandle = new InternalRoomListenerHandle(roomListener);
-        Room room;
-        synchronized (roomListenerHandle) {
-            long nativeRoomHandle = nativeConnect(
-                    nativeClientContext, roomListenerHandle.get(), connectOptions);
-            room = new Room(nativeRoomHandle, connectOptions.getName());
+
+        Room room = new Room(connectOptions.getName(), roomListener, handler);
+        synchronized (room.getConnectLock()) {
+            long nativeRoomContext = nativeConnect(
+                    nativeClientContext, room.getListenerhNativeHandle(), connectOptions);
+            room.setNativeContext(nativeRoomContext);
             room.setState(RoomState.CONNECTING);
-            roomMap.put(roomListenerHandle.get(), new WeakReference<Room>(room));
         }
 
         return room;
@@ -332,118 +331,7 @@ public class Client {
         }
     }
 
-    class InternalRoomListenerHandle extends NativeHandle implements Room.InternalRoomListener {
 
-        private Room.Listener listener;
-
-        public InternalRoomListenerHandle(Room.Listener listener) {
-            super(listener);
-            this.listener = listener;
-        }
-
-        /*
-         * Native Handle
-         */
-        @Override
-        protected native long nativeCreate(Object object);
-
-        @Override
-        protected native void nativeFree(long nativeHandle);
-
-        /*
-         * InternalRoomListener
-         */
-        @Override
-        public void onConnected(String roomSid) {
-            logger.d("onConnected()");
-            final Room room = getRoom();
-            room.setState(RoomState.CONNECTED);
-            room.setSid(roomSid);
-            handler.post(new Runnable() {
-                @Override
-                public void run() {
-                    InternalRoomListenerHandle.this.listener.onConnected(room);
-                }
-            });
-        }
-
-        @Override
-        public void onDisconnected(final int errorCode) {
-            logger.d("onDisconnected()");
-            final Room room = getRoom();
-            room.setState(RoomState.DISCONNECTED);
-            room.release();
-
-            handler.post(new Runnable() {
-                @Override
-                public void run() {
-                    InternalRoomListenerHandle.this.listener
-                            .onDisconnected(room, new RoomsException(errorCode, ""));
-                }
-            });
-        }
-
-        @Override
-        public void onConnectFailure(final int errorCode) {
-            logger.d("onConnectFailure()");
-            final Room room = getRoom();
-            room.setState(RoomState.DISCONNECTED);
-            handler.post(new Runnable() {
-                @Override
-                public void run() {
-                    InternalRoomListenerHandle.this.listener
-                            .onConnectFailure(new RoomsException(errorCode, ""));
-                }
-            });
-        }
-
-        @Override
-        public void onParticipantConnected(final Participant participant) {
-            logger.d("onParticipantConnected()");
-            final Room room = getRoom();
-
-            room.addParticipant(participant);
-
-            handler.post(new Runnable() {
-                @Override
-                public void run() {
-                    InternalRoomListenerHandle.this.listener.onParticipantConnected(room, participant);
-                }
-            });
-        }
-
-        @Override
-        public void onParticipantDisconnected(String participantSid) {
-            logger.d("onParticipantDisconnected()");
-            final Room room = getRoom();
-
-            final Participant participant = room.removeParticipant(participantSid);
-            if (participant == null) {
-                logger.w("Received participant disconnected callback for non-existent participant");
-                return;
-            }
-            participant.release();
-
-            handler.post(new Runnable() {
-                @Override
-                public void run() {
-                    InternalRoomListenerHandle.this.listener
-                            .onParticipantDisconnected(room, participant);
-                }
-            });
-        }
-
-        private synchronized Room getRoom() {
-            long nativeRoomListenerHandle = get();
-            WeakReference<Room> roomRef = roomMap.get(nativeRoomListenerHandle);
-            if (roomRef == null) {
-                // TODO: handle error
-                logger.w("Room reference is null");
-                return null;
-            }
-            return roomRef.get();
-        }
-    }
 
     private native static void nativeSetCoreLogLevel(int level);
 

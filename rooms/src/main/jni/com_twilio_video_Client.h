@@ -25,11 +25,6 @@ JNIEXPORT jlong JNICALL Java_com_twilio_video_Client_nativeCreateClient
 JNIEXPORT jlong JNICALL Java_com_twilio_video_Client_nativeConnect
         (JNIEnv *, jobject, jlong, jlong, jobject);
 
-JNIEXPORT jlong JNICALL Java_com_twilio_video_Client_00024InternalRoomListenerHandle_nativeCreate
-        (JNIEnv *, jobject, jobject);
-
-JNIEXPORT void JNICALL Java_com_twilio_video_Client_00024InternalRoomListenerHandle_nativeFree
-        (JNIEnv *, jobject, jlong);
 
 #ifdef __cplusplus
 }
