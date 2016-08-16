@@ -197,7 +197,7 @@ public class Client {
             long nativeRoomHandle = nativeConnect(
                     nativeClientContext, roomListenerHandle.get(), connectOptions);
             room = new Room(nativeRoomHandle, connectOptions.getName());
-            room.setState(Room.State.CONNECTING);
+            room.setState(RoomState.CONNECTING);
             roomMap.put(roomListenerHandle.get(), new WeakReference<Room>(room));
         }
 
@@ -354,10 +354,11 @@ public class Client {
          * InternalRoomListener
          */
         @Override
-        public void onConnected() {
+        public void onConnected(String roomSid) {
             logger.d("onConnected()");
             final Room room = getRoom();
-            room.setState(Room.State.CONNECTED);
+            room.setState(RoomState.CONNECTED);
+            room.setSid(roomSid);
             handler.post(new Runnable() {
                 @Override
                 public void run() {
@@ -370,7 +371,7 @@ public class Client {
         public void onDisconnected(final int errorCode) {
             logger.d("onDisconnected()");
             final Room room = getRoom();
-            room.setState(Room.State.DISCONNECTED);
+            room.setState(RoomState.DISCONNECTED);
             room.release();
 
             handler.post(new Runnable() {
@@ -386,7 +387,7 @@ public class Client {
         public void onConnectFailure(final int errorCode) {
             logger.d("onConnectFailure()");
             final Room room = getRoom();
-            room.setState(Room.State.DISCONNECTED);
+            room.setState(RoomState.DISCONNECTED);
             handler.post(new Runnable() {
                 @Override
                 public void run() {

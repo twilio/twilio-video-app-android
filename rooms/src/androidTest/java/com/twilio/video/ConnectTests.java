@@ -91,12 +91,12 @@ public class ConnectTests {
         Room room = client.connect(roomListener);
 
         assertTrue(roomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
-        assertEquals(room.getState(), Room.State.CONNECTED);
+        assertEquals(RoomState.CONNECTED, room.getState());
 
         room.disconnect();
 
         assertTrue(roomListener.onDisconnectedLatch.await(20, TimeUnit.SECONDS));
-        assertEquals(room.getState(), Room.State.DISCONNECTED);
+        assertEquals(RoomState.DISCONNECTED, room.getState());
 
     }
 
@@ -118,7 +118,7 @@ public class ConnectTests {
         Room room = client.connect(connectOptions, roomListener);
 
         assertTrue(roomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
-        assertEquals(Room.State.CONNECTED, room.getState());
+        assertEquals(RoomState.CONNECTED, room.getState());
 
         client2.connect(connectOptions, new EmptyRoomListener());
 
@@ -128,7 +128,7 @@ public class ConnectTests {
         room.disconnect();
 
         assertTrue(roomListener.onDisconnectedLatch.await(20, TimeUnit.SECONDS));
-        assertEquals(room.getState(), Room.State.DISCONNECTED);
+        assertEquals(RoomState.DISCONNECTED, room.getState());
 
     }
 

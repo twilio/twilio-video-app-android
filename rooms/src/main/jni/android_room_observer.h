@@ -22,7 +22,7 @@ public:
             GetMethodID(env,
                         *j_room_observer_class_,
                         "onConnected",
-                        "()V")),
+                        "(Ljava/lang/String;)V")),
         j_on_disconnected_(
             GetMethodID(env,
                         *j_room_observer_class_,
@@ -81,7 +81,9 @@ protected:
                 return;
             }
 
-            jni()->CallVoidMethod(*j_room_observer_, j_on_connected_);
+            jstring j_room_sid = webrtc_jni::JavaStringFromStdString(jni(), room->getSid());
+
+            jni()->CallVoidMethod(*j_room_observer_, j_on_connected_, j_room_sid);
             CHECK_EXCEPTION(jni()) << "error during CallVoidMethod";
         }
     }

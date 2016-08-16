@@ -8,14 +8,14 @@ public class Room {
     private long nativeRoomContext;
     private String name;
     private String sid;
-    private State state;
+    private RoomState roomState;
     private Map<String, Participant> participantMap = new HashMap<>();
 
     Room(long nativeRoomContext, String name) {
         this.nativeRoomContext = nativeRoomContext;
         this.name = name;
         this.sid = "";
-        state = State.DISCONNECTED;
+        roomState = RoomState.DISCONNECTED;
     }
 
     public String getName() {
@@ -23,14 +23,11 @@ public class Room {
     }
 
     public String getSid() {
-        if (sid.isEmpty() && state == State.CONNECTED) {
-            sid = nativeGetSid(nativeRoomContext);
-        }
         return sid;
     }
 
-    public State getState() {
-        return state;
+    public RoomState getState() {
+        return roomState;
     }
 
     public Map<String, Participant> getParticipants() {
@@ -43,7 +40,7 @@ public class Room {
     }
 
     public void disconnect() {
-        if (state != State.DISCONNECTED && nativeRoomContext != 0) {
+        if (roomState != RoomState.DISCONNECTED && nativeRoomContext != 0) {
             nativeDisconnect(nativeRoomContext);
         }
     }
@@ -63,17 +60,11 @@ public class Room {
 
     // JNI Callbacks Interface
     static interface InternalRoomListener {
-        void onConnected();
+        void onConnected(String roomSid);
         void onDisconnected(int errorCode);
         void onConnectFailure(int errorCode);
         void onParticipantConnected(Participant participant);
         void onParticipantDisconnected(String participantSid);
-    }
-
-    static enum State {
-        CONNECTING,
-        CONNECTED,
-        DISCONNECTED
     }
 
     // TODO: Once we move native listener inside room these methods might not be needed
@@ -91,12 +82,16 @@ public class Room {
         }
     }
 
-    void setState(State newState) {
-        state = newState;
+    void setState(RoomState newRoomState) {
+        roomState = newRoomState;
     }
 
     void addParticipant(Participant participant) {
         participantMap.put(participant.getSid(), participant);
+    }
+
+    void setSid(String roomSid) {
+        this.sid = roomSid;
     }
 
     Participant removeParticipant(String participantSid) {
@@ -105,7 +100,6 @@ public class Room {
         return participant;
     }
 
-    private native String nativeGetSid(long nativeRoomContext);
     private native void nativeDisconnect(long nativeRoomContext);
     private native void nativeRelease(long nativeRoomContext);
 }
