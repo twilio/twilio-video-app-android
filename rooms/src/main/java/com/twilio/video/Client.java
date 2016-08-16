@@ -9,11 +9,9 @@ import android.util.Log;
 import com.twilio.common.AccessManager;
 import com.twilio.video.internal.Logger;
 import com.twilio.video.internal.ReLinker;
-import com.twilio.video.internal.RoomListener;
 
 import java.lang.ref.WeakReference;
 import java.util.EnumMap;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -193,12 +191,13 @@ public class Client {
         if (roomListener == null) {
             throw new NullPointerException("roomListener must not be null");
         }
-        RoomListenerHandle roomListenerHandle = new RoomListenerHandle(roomListener);
+        InternalRoomListenerHandle roomListenerHandle = new InternalRoomListenerHandle(roomListener);
         Room room;
         synchronized (roomListenerHandle) {
             long nativeRoomHandle = nativeConnect(
                     nativeClientContext, roomListenerHandle.get(), connectOptions);
-            room = new Room(nativeRoomHandle);
+            room = new Room(nativeRoomHandle, connectOptions.getName());
+            room.setState(RoomState.CONNECTING);
             roomMap.put(roomListenerHandle.get(), new WeakReference<Room>(room));
         }
 
@@ -333,12 +332,11 @@ public class Client {
         }
     }
 
-    class RoomListenerHandle extends NativeHandle implements RoomListener {
+    class InternalRoomListenerHandle extends NativeHandle implements Room.InternalRoomListener {
 
         private Room.Listener listener;
-        private Map<String, Participant> participantMap = new HashMap<>();
 
-        public RoomListenerHandle(Room.Listener listener) {
+        public InternalRoomListenerHandle(Room.Listener listener) {
             super(listener);
             this.listener = listener;
         }
@@ -353,68 +351,73 @@ public class Client {
         protected native void nativeFree(long nativeHandle);
 
         /*
-         * RoomListener
+         * InternalRoomListener
          */
         @Override
-        public void onConnected() {
+        public void onConnected(String roomSid) {
             logger.d("onConnected()");
             final Room room = getRoom();
+            room.setState(RoomState.CONNECTED);
+            room.setSid(roomSid);
             handler.post(new Runnable() {
                 @Override
                 public void run() {
-                    RoomListenerHandle.this.listener.onConnected(room);
+                    InternalRoomListenerHandle.this.listener.onConnected(room);
                 }
             });
         }
 
         @Override
-        public void onDisconnected(int errorCode) {
+        public void onDisconnected(final int errorCode) {
+            logger.d("onDisconnected()");
             final Room room = getRoom();
-
-            // TODO: Transform ClientError to RoomException
+            room.setState(RoomState.DISCONNECTED);
+            room.release();
 
             handler.post(new Runnable() {
                 @Override
                 public void run() {
-                    RoomListenerHandle.this.listener.onDisconnected(room, null);
+                    InternalRoomListenerHandle.this.listener
+                            .onDisconnected(room, new RoomsException(errorCode, ""));
                 }
             });
         }
 
         @Override
-        public void onConnectFailure(int errorCode) {
+        public void onConnectFailure(final int errorCode) {
+            logger.d("onConnectFailure()");
             final Room room = getRoom();
-
-            // TODO: Transform ClientError to RoomException
-
+            room.setState(RoomState.DISCONNECTED);
             handler.post(new Runnable() {
                 @Override
                 public void run() {
-                    RoomListenerHandle.this.listener.onDisconnected(room, null);
+                    InternalRoomListenerHandle.this.listener
+                            .onConnectFailure(new RoomsException(errorCode, ""));
                 }
             });
         }
 
         @Override
-        public void onParticipantConnected(String participantSid, long nativeParticipantContext) {
+        public void onParticipantConnected(final Participant participant) {
+            logger.d("onParticipantConnected()");
             final Room room = getRoom();
 
-            final Participant participant = new Participant(participantSid, nativeParticipantContext);
-            participantMap.put(participantSid, participant);
+            room.addParticipant(participant);
 
             handler.post(new Runnable() {
                 @Override
                 public void run() {
-                    RoomListenerHandle.this.listener.onParticipantConnected(room, participant);
+                    InternalRoomListenerHandle.this.listener.onParticipantConnected(room, participant);
                 }
             });
         }
 
         @Override
         public void onParticipantDisconnected(String participantSid) {
+            logger.d("onParticipantDisconnected()");
             final Room room = getRoom();
 
-            final Participant participant = participantMap.remove(participantSid);
+            final Participant participant = room.removeParticipant(participantSid);
             if (participant == null) {
                 logger.w("Received participant disconnected callback for non-existent participant");
                 return;
@@ -424,7 +427,7 @@ public class Client {
             handler.post(new Runnable() {
                 @Override
                 public void run() {
-                    RoomListenerHandle.this.listener
+                    InternalRoomListenerHandle.this.listener
                             .onParticipantDisconnected(room, participant);
                 }
             });

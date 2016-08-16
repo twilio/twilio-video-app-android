@@ -201,7 +201,7 @@ Java_com_twilio_video_Client_nativeConnect(JNIEnv *env,
 }
 
 JNIEXPORT jlong JNICALL
-Java_com_twilio_video_Client_00024RoomListenerHandle_nativeCreate(JNIEnv *env,
+Java_com_twilio_video_Client_00024InternalRoomListenerHandle_nativeCreate(JNIEnv *env,
                                                                        jobject instance,
                                                                        jobject object) {
     TS_CORE_LOG_MODULE(kTSCoreLogModulePlatform, kTSCoreLogLevelDebug,
@@ -211,7 +211,7 @@ Java_com_twilio_video_Client_00024RoomListenerHandle_nativeCreate(JNIEnv *env,
 }
 
 JNIEXPORT void JNICALL
-Java_com_twilio_video_Client_00024RoomListenerHandle_nativeFree(JNIEnv *env,
+Java_com_twilio_video_Client_00024InternalRoomListenerHandle_nativeFree(JNIEnv *env,
                                                                      jobject instance,
                                                                      jlong nativeHandle) {
     TS_CORE_LOG_MODULE(kTSCoreLogModulePlatform, kTSCoreLogLevelDebug,

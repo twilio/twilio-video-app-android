@@ -15,12 +15,6 @@ struct ParticipantContext {
     std::shared_ptr<twilio::video::Participant> participant;
 };
 
-JNIEXPORT jstring JNICALL Java_com_twilio_video_Participant_nativeGetIdentity
-    (JNIEnv *, jobject, jlong);
-
-JNIEXPORT jstring JNICALL Java_com_twilio_video_Participant_nativeGetSid
-    (JNIEnv *, jobject, jlong);
-
 JNIEXPORT jboolean JNICALL Java_com_twilio_video_Participant_nativeIsConnected
     (JNIEnv *, jobject, jlong);
 
