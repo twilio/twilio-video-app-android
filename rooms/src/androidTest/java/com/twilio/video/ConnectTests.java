@@ -123,7 +123,7 @@ public class ConnectTests {
         client2.connect(connectOptions, new EmptyRoomListener());
 
         assertTrue(roomListener.onParticipantConnectedLatch.await(20, TimeUnit.SECONDS));
-        assertEquals(room.getParticipants().size(), 1);
+        assertEquals(1, room.getParticipants().size());
 
         room.disconnect();
 
@@ -131,6 +131,39 @@ public class ConnectTests {
         assertEquals(RoomState.DISCONNECTED, room.getState());
 
     }
+
+    @Test
+    public void connect_shouldDisconnectAnotherParticipant() throws InterruptedException {
+        FakeRoomListener roomListener = new FakeRoomListener();
+        roomListener.onConnectedLatch = new CountDownLatch(1);
+        roomListener.onParticipantDisconnectedLatch = new CountDownLatch(1);
+        roomListener.onParticipantConnectedLatch = new CountDownLatch(1);
+        String randomRoomName = TEST_ROOM + System.currentTimeMillis();
+
+        AccessManager accessManager = AccessTokenHelper.obtainAccessManager(context, TEST_USER);
+        AccessManager accessManager2 = AccessTokenHelper.obtainAccessManager(context, TEST_USER2);
+        ConnectOptions connectOptions = new ConnectOptions.Builder().name(randomRoomName).build();
+
+        Client client = new Client(context, accessManager);
+        Client client2 = new Client(context, accessManager2);
+
+        Room room = client.connect(connectOptions, roomListener);
+
+        assertTrue(roomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
+        assertEquals(RoomState.CONNECTED, room.getState());
+
+        Room client2room = client2.connect(connectOptions, new EmptyRoomListener());
+
+        assertTrue(roomListener.onParticipantConnectedLatch.await(20, TimeUnit.SECONDS));
+        assertEquals(room.getParticipants().size(), 1);
+
+        client2room.disconnect();
+
+        assertTrue(roomListener.onParticipantDisconnectedLatch.await(20, TimeUnit.SECONDS));
+        assertTrue(room.getParticipants().isEmpty());
+
+    }
+
 
     private AccessManager accessManager() {
         return new AccessManager(context, null, null);
