@@ -78,6 +78,9 @@ public class Room {
         this.nativeRoomContext = nativeRoomHandle;
     }
 
+    /*
+     * Needed for synchronizing during room creation.
+     */
     Object getConnectLock() {
         return internalRoomListenerImpl;
     }
@@ -210,6 +213,6 @@ public class Room {
 
     }
 
-    private native void nativeDisconnect(long nativeRoomContext);
-    private native void nativeRelease(long nativeRoomContext);
+    private native synchronized void nativeDisconnect(long nativeRoomContext);
+    private native synchronized void nativeRelease(long nativeRoomContext);
 }

@@ -193,6 +193,11 @@ public class Client {
         }
 
         Room room = new Room(connectOptions.getName(), roomListener, handler);
+        /*
+         * We need to synchronize access to room listener during initialization and make
+         * sure that onConnect() callback won't get call before connect() exits and Room
+         * creation is fully completed.
+         */
         synchronized (room.getConnectLock()) {
             long nativeRoomContext = nativeConnect(
                     nativeClientContext, room.getListenerhNativeHandle(), connectOptions);
@@ -339,11 +344,11 @@ public class Client {
 
     private native static int nativeGetCoreLogLevel();
 
-    private native boolean nativeInitialize(Context context);
+    private native synchronized boolean nativeInitialize(Context context);
 
-    private native long nativeCreateClient(AccessManager accessManager, MediaFactory mediaFactory);
+    private native synchronized long nativeCreateClient(AccessManager accessManager, MediaFactory mediaFactory);
 
-    private native long nativeConnect(long nativeClientDataHandler,
+    private native synchronized long nativeConnect(long nativeClientDataHandler,
                                       long nativeRoomListenerHandle,
                                       ConnectOptions ConnectOptions);
 }

@@ -101,7 +101,7 @@ public class ConnectTests {
     }
 
     @Test
-    public void connect_shouldConnectAnotherParticipant() throws InterruptedException {
+    public void connect_shouldConnectParticipant() throws InterruptedException {
         FakeRoomListener roomListener = new FakeRoomListener();
         roomListener.onConnectedLatch = new CountDownLatch(1);
         roomListener.onDisconnectedLatch = new CountDownLatch(1);
@@ -133,7 +133,7 @@ public class ConnectTests {
     }
 
     @Test
-    public void connect_shouldDisconnectAnotherParticipant() throws InterruptedException {
+    public void connect_shouldDisconnectParticipant() throws InterruptedException {
         FakeRoomListener roomListener = new FakeRoomListener();
         roomListener.onConnectedLatch = new CountDownLatch(1);
         roomListener.onParticipantDisconnectedLatch = new CountDownLatch(1);
