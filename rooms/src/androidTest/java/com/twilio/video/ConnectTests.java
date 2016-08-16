@@ -19,15 +19,14 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 @RunWith(AndroidJUnit4.class)
 @LargeTest
 public class ConnectTests {
-    private final static String TEST_USER = "TEST_USER";
-    private final static String TEST_ROOM = "TEST_ROOM";
+    private final static String TEST_USER  = "TEST_USER";
+    private final static String TEST_USER2 = "TEST_USER2";
+    private final static String TEST_ROOM  = "TEST_ROOM";
 
     private Context context;
 
@@ -101,6 +100,38 @@ public class ConnectTests {
 
     }
 
+    @Test
+    public void connect_shouldConnectAnotherParticipant() throws InterruptedException {
+        FakeRoomListener roomListener = new FakeRoomListener();
+        roomListener.onConnectedLatch = new CountDownLatch(1);
+        roomListener.onDisconnectedLatch = new CountDownLatch(1);
+        roomListener.onParticipantConnectedLatch = new CountDownLatch(1);
+        String roomName = TEST_ROOM + System.currentTimeMillis();
+
+        AccessManager accessManager = AccessTokenHelper.obtainAccessManager(context, TEST_USER);
+        AccessManager accessManager2 = AccessTokenHelper.obtainAccessManager(context, TEST_USER2);
+        ConnectOptions connectOptions = new ConnectOptions.Builder().name(roomName).build();
+
+        Client client = new Client(context, accessManager);
+        Client client2 = new Client(context, accessManager2);
+
+        Room room = client.connect(connectOptions, roomListener);
+
+        assertTrue(roomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
+        assertEquals(room.getState(),RoomState.CONNECTED);
+
+        client2.connect(connectOptions, new EmptyRoomListener());
+
+        assertTrue(roomListener.onParticipantConnectedLatch.await(20, TimeUnit.SECONDS));
+        assertTrue(room.getParticipants().size() >= 1);
+
+        room.disconnect();
+
+        assertTrue(roomListener.onDisconnectedLatch.await(20, TimeUnit.SECONDS));
+        assertEquals(room.getState(),RoomState.DISCONNECTED);
+
+    }
+
     private AccessManager accessManager() {
         return new AccessManager(context, null, null);
     }
@@ -142,6 +173,34 @@ public class ConnectTests {
         @Override
         public void onParticipantDisconnected(Room room, Participant participant) {
             triggerLatch(onParticipantDisconnectedLatch);
+        }
+    }
+
+    class EmptyRoomListener implements Room.Listener {
+
+        @Override
+        public void onConnected(Room room) {
+
+        }
+
+        @Override
+        public void onConnectFailure(RoomsException error) {
+
+        }
+
+        @Override
+        public void onDisconnected(Room room, RoomsException error) {
+
+        }
+
+        @Override
+        public void onParticipantConnected(Room room, Participant participant) {
+
+        }
+
+        @Override
+        public void onParticipantDisconnected(Room room, Participant participant) {
+
         }
     }
 }
