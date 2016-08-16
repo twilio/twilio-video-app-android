@@ -4,7 +4,6 @@ import android.os.Handler;
 
 import com.twilio.video.internal.Logger;
 
-import java.lang.ref.WeakReference;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -29,8 +28,8 @@ public class Room {
     private String sid;
     private RoomState roomState;
     private Map<String, Participant> participantMap = new HashMap<>();
-    private InternalListenerHandle internalListenerHandle;
-    private InternalRoomListener internalRoomListener;
+    private InternalRoomListenerHandle internalRoomListenerHandle;
+    private InternalRoomListenerImpl internalRoomListenerImpl;
     private Room.Listener listener;
     private final Handler handler;
 
@@ -39,8 +38,8 @@ public class Room {
         this.sid = "";
         this.roomState = RoomState.DISCONNECTED;
         this.listener = listener;
-        this.internalRoomListener = new JniRoomObserver();
-        this.internalListenerHandle = new InternalListenerHandle(internalRoomListener);
+        this.internalRoomListenerImpl = new InternalRoomListenerImpl();
+        this.internalRoomListenerHandle = new InternalRoomListenerHandle(internalRoomListenerImpl);
         this.handler = handler;
     }
 
@@ -72,7 +71,7 @@ public class Room {
     }
 
     long getListenerhNativeHandle() {
-        return internalListenerHandle.get();
+        return internalRoomListenerHandle.get();
     }
 
     void setNativeContext(long nativeRoomHandle) {
@@ -80,16 +79,7 @@ public class Room {
     }
 
     Object getConnectLock() {
-        return internalRoomListener;
-    }
-
-    // JNI Callbacks Interface
-    static interface InternalRoomListener {
-        void onConnected(String roomSid);
-        void onDisconnected(int errorCode);
-        void onConnectFailure(int errorCode);
-        void onParticipantConnected(Participant participant);
-        void onParticipantDisconnected(String participantSid);
+        return internalRoomListenerImpl;
     }
 
     // TODO: Once we move native listener inside room these methods might not be needed
@@ -104,6 +94,7 @@ public class Room {
             for (Participant participant : participantMap.values()) {
                 participant.release();
             }
+            internalRoomListenerHandle.release();
         }
     }
 
@@ -111,21 +102,20 @@ public class Room {
         roomState = newRoomState;
     }
 
-    void addParticipant(Participant participant) {
-        participantMap.put(participant.getSid(), participant);
-    }
-
     void setSid(String roomSid) {
         this.sid = roomSid;
     }
 
-    Participant removeParticipant(String participantSid) {
-        Participant participant = participantMap.remove(participantSid);
-        participant.release();
-        return participant;
+    // JNI Callbacks Interface
+    interface InternalRoomListener {
+        void onConnected(String roomSid);
+        void onDisconnected(int errorCode);
+        void onConnectFailure(int errorCode);
+        void onParticipantConnected(Participant participant);
+        void onParticipantDisconnected(String participantSid);
     }
 
-    class JniRoomObserver implements InternalRoomListener {
+    class InternalRoomListenerImpl implements InternalRoomListener {
 
         @Override
         public synchronized void onConnected(String roomSid) {
@@ -170,7 +160,7 @@ public class Room {
         public synchronized void onParticipantConnected(final Participant participant) {
             logger.d("onParticipantConnected()");
 
-            addParticipant(participant);
+            participantMap.put(participant.getSid(), participant);
 
             handler.post(new Runnable() {
                 @Override
@@ -184,7 +174,7 @@ public class Room {
         public synchronized void onParticipantDisconnected(String participantSid) {
             logger.d("onParticipantDisconnected()");
 
-            final Participant participant = removeParticipant(participantSid);
+            final Participant participant = participantMap.remove(participantSid);
             if (participant == null) {
                 logger.w("Received participant disconnected callback for non-existent participant");
                 return;
@@ -201,10 +191,10 @@ public class Room {
 
     }
 
-    class InternalListenerHandle extends NativeHandle {
+    class InternalRoomListenerHandle extends NativeHandle {
 
 
-        public InternalListenerHandle(InternalRoomListener listener) {
+        public InternalRoomListenerHandle(InternalRoomListener listener) {
             super(listener);
         }
 
