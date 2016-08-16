@@ -8,14 +8,14 @@ public class Room {
     private long nativeRoomContext;
     private String name;
     private String sid;
-    private RoomState state;
+    private State state;
     private Map<String, Participant> participantMap = new HashMap<>();
 
     Room(long nativeRoomContext, String name) {
         this.nativeRoomContext = nativeRoomContext;
         this.name = name;
         this.sid = "";
-        state = RoomState.DISCONNECTED;
+        state = State.DISCONNECTED;
     }
 
     public String getName() {
@@ -23,13 +23,13 @@ public class Room {
     }
 
     public String getSid() {
-        if (sid.isEmpty()) {
+        if (sid.isEmpty() && state == State.CONNECTED) {
             sid = nativeGetSid(nativeRoomContext);
         }
         return sid;
     }
 
-    public RoomState getState() {
+    public State getState() {
         return state;
     }
 
@@ -43,7 +43,9 @@ public class Room {
     }
 
     public void disconnect() {
-        nativeDisconnect(nativeRoomContext);
+        if (state != State.DISCONNECTED && nativeRoomContext != 0) {
+            nativeDisconnect(nativeRoomContext);
+        }
     }
 
     public interface Listener {
@@ -57,6 +59,21 @@ public class Room {
 
         void onParticipantDisconnected(Room room, Participant participant);
 
+    }
+
+    // JNI Callbacks Interface
+    static interface InternalRoomListener {
+        void onConnected();
+        void onDisconnected(int errorCode);
+        void onConnectFailure(int errorCode);
+        void onParticipantConnected(Participant participant);
+        void onParticipantDisconnected(String participantSid);
+    }
+
+    static enum State {
+        CONNECTING,
+        CONNECTED,
+        DISCONNECTED
     }
 
     // TODO: Once we move native listener inside room these methods might not be needed
@@ -74,7 +91,7 @@ public class Room {
         }
     }
 
-    void setState(RoomState newState) {
+    void setState(State newState) {
         state = newState;
     }
 
@@ -89,8 +106,6 @@ public class Room {
     }
 
     private native String nativeGetSid(long nativeRoomContext);
-    private native RoomState nativeGetState(long nativeRoomContext);
     private native void nativeDisconnect(long nativeRoomContext);
     private native void nativeRelease(long nativeRoomContext);
-
 }

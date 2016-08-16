@@ -91,12 +91,12 @@ public class ConnectTests {
         Room room = client.connect(roomListener);
 
         assertTrue(roomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
-        assertEquals(room.getState(),RoomState.CONNECTED);
+        assertEquals(room.getState(), Room.State.CONNECTED);
 
         room.disconnect();
 
         assertTrue(roomListener.onDisconnectedLatch.await(20, TimeUnit.SECONDS));
-        assertEquals(room.getState(),RoomState.DISCONNECTED);
+        assertEquals(room.getState(), Room.State.DISCONNECTED);
 
     }
 
@@ -106,11 +106,11 @@ public class ConnectTests {
         roomListener.onConnectedLatch = new CountDownLatch(1);
         roomListener.onDisconnectedLatch = new CountDownLatch(1);
         roomListener.onParticipantConnectedLatch = new CountDownLatch(1);
-        String roomName = TEST_ROOM + System.currentTimeMillis();
+        String randomRoomName = TEST_ROOM + System.currentTimeMillis();
 
         AccessManager accessManager = AccessTokenHelper.obtainAccessManager(context, TEST_USER);
         AccessManager accessManager2 = AccessTokenHelper.obtainAccessManager(context, TEST_USER2);
-        ConnectOptions connectOptions = new ConnectOptions.Builder().name(roomName).build();
+        ConnectOptions connectOptions = new ConnectOptions.Builder().name(randomRoomName).build();
 
         Client client = new Client(context, accessManager);
         Client client2 = new Client(context, accessManager2);
@@ -118,17 +118,17 @@ public class ConnectTests {
         Room room = client.connect(connectOptions, roomListener);
 
         assertTrue(roomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
-        assertEquals(room.getState(),RoomState.CONNECTED);
+        assertEquals(Room.State.CONNECTED, room.getState());
 
         client2.connect(connectOptions, new EmptyRoomListener());
 
         assertTrue(roomListener.onParticipantConnectedLatch.await(20, TimeUnit.SECONDS));
-        assertTrue(room.getParticipants().size() >= 1);
+        assertEquals(room.getParticipants().size(), 1);
 
         room.disconnect();
 
         assertTrue(roomListener.onDisconnectedLatch.await(20, TimeUnit.SECONDS));
-        assertEquals(room.getState(),RoomState.DISCONNECTED);
+        assertEquals(room.getState(), Room.State.DISCONNECTED);
 
     }
 

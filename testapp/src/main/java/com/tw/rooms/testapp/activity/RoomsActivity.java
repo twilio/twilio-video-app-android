@@ -23,7 +23,6 @@ import com.twilio.video.LogLevel;
 import com.twilio.video.Participant;
 import com.twilio.video.Client;
 import com.twilio.video.Room;
-import com.twilio.video.RoomState;
 import com.twilio.video.RoomsException;
 
 import butterknife.BindView;
