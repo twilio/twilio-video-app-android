@@ -74,7 +74,7 @@ public class VideoConstraintsTests {
             }
 
             @Override
-            public void onLocalVideoTrackError(LocalMedia localMedia, LocalVideoTrack track, RoomsException exception) {
+            public void onLocalVideoTrackError(LocalMedia localMedia, LocalVideoTrack track, VideoException exception) {
                 localVideoTrackFailedLatch.countDown();
             }
         });
@@ -115,7 +115,7 @@ public class VideoConstraintsTests {
             @Override
             public void onLocalVideoTrackError(LocalMedia localMedia,
                                                LocalVideoTrack track,
-                                               RoomsException exception) {
+                                               VideoException exception) {
                 fail();
             }
         });

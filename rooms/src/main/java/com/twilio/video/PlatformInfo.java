@@ -85,7 +85,7 @@ public final class PlatformInfo {
     }
 
     static String getRtcPlatformSdkVersion() {
-        return Client.getVersion();
+        return VideoClient.getVersion();
     }
 
     static String getOsArch() {

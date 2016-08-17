@@ -12,9 +12,9 @@ public class Room {
     public interface Listener {
         void onConnected(Room room);
 
-        void onConnectFailure(RoomsException error);
+        void onConnectFailure(VideoException error);
 
-        void onDisconnected(Room room, RoomsException error);
+        void onDisconnected(Room room, VideoException error);
 
         void onParticipantConnected(Room room, Participant participant);
 
@@ -64,13 +64,13 @@ public class Room {
         return null;
     }
 
-    public void disconnect() {
+    public synchronized void disconnect() {
         if (roomState != RoomState.DISCONNECTED && nativeRoomContext != 0) {
             nativeDisconnect(nativeRoomContext);
         }
     }
 
-    long getListenerhNativeHandle() {
+    long getListenerNativeHandle() {
         return internalRoomListenerHandle.get();
     }
 
@@ -85,9 +85,7 @@ public class Room {
         return internalRoomListenerImpl;
     }
 
-    // TODO: Once we move native listener inside room these methods might not be needed
-
-    void release() {
+    synchronized void release() {
         if (nativeRoomContext != 0) {
             nativeRelease(nativeRoomContext);
             nativeRoomContext = 0;
@@ -142,7 +140,7 @@ public class Room {
             handler.post(new Runnable() {
                 @Override
                 public void run() {
-                    Room.this.listener.onDisconnected(Room.this, new RoomsException(errorCode, ""));
+                    Room.this.listener.onDisconnected(Room.this, new VideoException(errorCode, ""));
                 }
             });
         }
@@ -154,7 +152,7 @@ public class Room {
             handler.post(new Runnable() {
                 @Override
                 public void run() {
-                    Room.this.listener.onConnectFailure(new RoomsException(errorCode, ""));
+                    Room.this.listener.onConnectFailure(new VideoException(errorCode, ""));
                 }
             });
         }
@@ -213,6 +211,6 @@ public class Room {
 
     }
 
-    private native synchronized void nativeDisconnect(long nativeRoomContext);
-    private native synchronized void nativeRelease(long nativeRoomContext);
+    private native void nativeDisconnect(long nativeRoomContext);
+    private native void nativeRelease(long nativeRoomContext);
 }

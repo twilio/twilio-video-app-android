@@ -1,4 +1,4 @@
-#include "com_twilio_video_Client.h"
+#include "com_twilio_video_VideoClient.h"
 #include "webrtc/api/java/jni/jni_helpers.h"
 
 #include "webrtc/base/refcount.h"
@@ -47,14 +47,14 @@ extern "C" void JNIEXPORT JNICALL JNI_OnUnLoad(JavaVM *jvm, void *reserved) {
     webrtc_jni::FreeGlobalClassReferenceHolder();
 }
 
-JNIEXPORT void JNICALL Java_com_twilio_video_Client_nativeSetCoreLogLevel
+JNIEXPORT void JNICALL Java_com_twilio_video_VideoClient_nativeSetCoreLogLevel
     (JNIEnv *env, jobject instance, jint level) {
     TS_CORE_LOG_MODULE(kTSCoreLogModulePlatform, kTSCoreLogLevelDebug, "setCoreLogLevel");
     TSCoreLogLevel coreLogLevel = static_cast<TSCoreLogLevel>(level);
     TSCLogger::instance()->setLogLevel(coreLogLevel);
 }
 
-JNIEXPORT void JNICALL Java_com_twilio_video_Client_nativeSetModuleLevel
+JNIEXPORT void JNICALL Java_com_twilio_video_VideoClient_nativeSetModuleLevel
     (JNIEnv *env, jobject instance, jint module, jint level) {
     TS_CORE_LOG_MODULE(kTSCoreLogModulePlatform, kTSCoreLogLevelDebug, "setModuleLevel");
     TSCoreLogModule coreLogModule = static_cast<TSCoreLogModule>(module);
@@ -62,14 +62,14 @@ JNIEXPORT void JNICALL Java_com_twilio_video_Client_nativeSetModuleLevel
     TSCLogger::instance()->setModuleLogLevel(coreLogModule, coreLogLevel);
 }
 
-JNIEXPORT jint JNICALL Java_com_twilio_video_Client_nativeGetCoreLogLevel
+JNIEXPORT jint JNICALL Java_com_twilio_video_VideoClient_nativeGetCoreLogLevel
     (JNIEnv *env, jobject instance) {
     TS_CORE_LOG_MODULE(kTSCoreLogModulePlatform, kTSCoreLogLevelDebug, "getCoreLogLevel");
     return TSCLogger::instance()->getLogLevel();
 }
 
 JNIEXPORT jboolean JNICALL
-Java_com_twilio_video_Client_nativeInitialize(JNIEnv *env, jobject instance, jobject context) {
+Java_com_twilio_video_VideoClient_nativeInitialize(JNIEnv *env, jobject instance, jobject context) {
     bool failure = false;
 
     // Setup media related Android device objects
@@ -111,10 +111,10 @@ public:
 };
 
 JNIEXPORT jlong JNICALL
-Java_com_twilio_video_Client_nativeCreateClient(JNIEnv *env,
-                                                jobject j_instance,
-                                                jobject j_access_manager,
-                                                jobject j_media_factory) {
+Java_com_twilio_video_VideoClient_nativeCreateClient(JNIEnv *env,
+                                                     jobject j_instance,
+                                                     jobject j_access_manager,
+                                                     jobject j_media_factory) {
 
     // Get native AccessManager shared_ptr from java object
     // Call the private method to get the native handle
@@ -145,11 +145,11 @@ Java_com_twilio_video_Client_nativeCreateClient(JNIEnv *env,
 }
 
 JNIEXPORT jlong JNICALL
-Java_com_twilio_video_Client_nativeConnect(JNIEnv *env,
-                                           jobject j_instance,
-                                           jlong j_client_context,
-                                           jlong j_android_room_observer_handle,
-                                           jobject j_connect_options) {
+Java_com_twilio_video_VideoClient_nativeConnect(JNIEnv *env,
+                                                jobject j_instance,
+                                                jlong j_client_context,
+                                                jlong j_android_room_observer_handle,
+                                                jobject j_connect_options) {
 
 
     ClientContext* client_context =

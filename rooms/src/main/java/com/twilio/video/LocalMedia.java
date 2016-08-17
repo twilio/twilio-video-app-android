@@ -84,7 +84,7 @@ public class LocalMedia {
      * {@link LocalMedia.Listener#onLocalVideoTrackAdded(LocalMedia, LocalVideoTrack)}. If any
      * problems occur adding the video track then
      * {@link LocalMedia.Listener#onLocalVideoTrackError(LocalMedia, LocalVideoTrack,
-     * RoomsException)} will be invoked.</p>
+     * VideoException)} will be invoked.</p>
      *
      * @param localVideoTrack The local video track to be added.
      */
@@ -101,7 +101,7 @@ public class LocalMedia {
      * {@link LocalMedia.Listener#onLocalVideoTrackRemoved(LocalMedia, LocalVideoTrack)}. If any
      * problems occur removing the video track then
      * {@link LocalMedia.Listener#onLocalVideoTrackError(LocalMedia, LocalVideoTrack,
-     * RoomsException)} will be invoked.</p>
+     * VideoException)} will be invoked.</p>
      *
      * @param localVideoTrack The local video track to be removed
      */
@@ -187,14 +187,14 @@ public class LocalMedia {
          *              the {@link LocalMedia}
          * @param exception Provides the error that occurred while attempting to add or remove
          *                  this {@link LocalVideoTrack}. Adding or removing a local video track
-         *                  can result in {@link Client#TOO_MANY_TRACKS},
-         *                  {@link Client#TRACK_OPERATION_IN_PROGRESS},
-         *                  {@link Client#INVALID_VIDEO_CAPTURER},
-         *                  {@link Client#INVALID_VIDEO_TRACK_STATE},
-         *                  or {@link Client#TRACK_CREATION_FAILED}.
+         *                  can result in {@link VideoClient#TOO_MANY_TRACKS},
+         *                  {@link VideoClient#TRACK_OPERATION_IN_PROGRESS},
+         *                  {@link VideoClient#INVALID_VIDEO_CAPTURER},
+         *                  {@link VideoClient#INVALID_VIDEO_TRACK_STATE},
+         *                  or {@link VideoClient#TRACK_CREATION_FAILED}.
          */
         void onLocalVideoTrackError(LocalMedia localMedia,
                                     LocalVideoTrack track,
-                                    RoomsException exception);
+                                    VideoException exception);
     }
 }

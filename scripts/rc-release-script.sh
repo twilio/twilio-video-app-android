@@ -26,7 +26,7 @@ if [ "$?" -ne "0" ]; then
 fi
 
 echo "sdk-release-tool: uploading..."
-# check out https://code.hq.twilio.com/client/sdk-release-tool for how to use sdk-release-tool
+# check out https://code.hq.twilio.com/videoClient/sdk-release-tool for how to use sdk-release-tool
 PWD=`pwd`
 export SDK_PACKAGE_PATH="${PWD}"
 pushd "$SDK_RELEASE_TOOL_HOME"

@@ -18,13 +18,13 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * The Client allows user to create or participate in Rooms.
+ * The VideoClient allows user to create or participate in Rooms.
  */
-public class Client {
+public class VideoClient {
 
     // TODO: Check which of these error codes are still valid
     /**
-     * Authenticating your Client failed due to invalid auth credentials.
+     * Authenticating your VideoClient failed due to invalid auth credentials.
      */
     public static int INVALID_AUTH_DATA = 100;
     /**
@@ -32,7 +32,7 @@ public class Client {
      */
     public static int INVALID_SIP_ACCOUNT = 102;
     /**
-     * There was an error during Client registration.
+     * There was an error during VideoClient registration.
      */
     public static int CLIENT_REGISTATION_ERROR = 103;
     /**
@@ -95,7 +95,7 @@ public class Client {
     private static LogLevel level = LogLevel.OFF;
     private static Map<LogModule, LogLevel> moduleLogLevel = new EnumMap(LogModule.class);
     private static volatile boolean libraryIsLoaded = false;
-    private static final Logger logger = Logger.getLogger(Client.class);
+    private static final Logger logger = Logger.getLogger(VideoClient.class);
 
     private final Handler handler;
     private final Context applicationContext;
@@ -104,7 +104,7 @@ public class Client {
     // Using listener native handle as key
     private Map<Long, WeakReference<Room>> roomMap = new ConcurrentHashMap<>();
 
-    public Client(Context context, AccessManager accessManager) {
+    public VideoClient(Context context, AccessManager accessManager) {
         if (context == null) {
             throw new NullPointerException("applicationContext must not be null");
         }
@@ -139,7 +139,7 @@ public class Client {
         }
 
         if (!nativeInitialize(applicationContext)) {
-            throw new RuntimeException("Failed to initialize the Video Client");
+            throw new RuntimeException("Failed to initialize the Video VideoClient");
         }
         nativeClientContext = nativeCreateClient(accessManager, null);
 
@@ -184,7 +184,7 @@ public class Client {
         return connect(connectOptions, roomListener);
     }
 
-    public Room connect(ConnectOptions connectOptions, Room.Listener roomListener) {
+    public synchronized Room connect(ConnectOptions connectOptions, Room.Listener roomListener) {
         if (connectOptions == null) {
             throw new NullPointerException("connectOptions must not be null");
         }
@@ -200,7 +200,7 @@ public class Client {
          */
         synchronized (room.getConnectLock()) {
             long nativeRoomContext = nativeConnect(
-                    nativeClientContext, room.getListenerhNativeHandle(), connectOptions);
+                    nativeClientContext, room.getListenerNativeHandle(), connectOptions);
             room.setNativeContext(nativeRoomContext);
             room.setState(RoomState.CONNECTING);
         }
@@ -235,7 +235,7 @@ public class Client {
         setSDKLogLevel(level);
         trySetCoreLogLevel(level.ordinal());
         // Save the log level
-        Client.level = level;
+        VideoClient.level = level;
     }
 
     /**
@@ -250,7 +250,7 @@ public class Client {
         }
         trySetCoreModuleLogLevel(module.ordinal(), level.ordinal());
         // Save the module log level
-        Client.moduleLogLevel.put(module, level);
+        VideoClient.moduleLogLevel.put(module, level);
     }
 
     private static void setSDKLogLevel(LogLevel level) {
@@ -344,11 +344,11 @@ public class Client {
 
     private native static int nativeGetCoreLogLevel();
 
-    private native synchronized boolean nativeInitialize(Context context);
+    private native boolean nativeInitialize(Context context);
 
-    private native synchronized long nativeCreateClient(AccessManager accessManager, MediaFactory mediaFactory);
+    private native long nativeCreateClient(AccessManager accessManager, MediaFactory mediaFactory);
 
-    private native synchronized long nativeConnect(long nativeClientDataHandler,
+    private native long nativeConnect(long nativeClientDataHandler,
                                       long nativeRoomListenerHandle,
                                       ConnectOptions ConnectOptions);
 }
