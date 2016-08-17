@@ -37,13 +37,13 @@ public class ConnectTests {
     @Before
     public void setup() {
         context = InstrumentationRegistry.getInstrumentation().getTargetContext();
-        Client.setLogLevel(LogLevel.DEBUG);
+        VideoClient.setLogLevel(LogLevel.DEBUG);
     }
 
     @Test(expected = NullPointerException.class)
     public void connect_shouldThrowExceptionWhenRoomListenerIsNull() {
-        Client client = new Client(context, accessManager());
-        client.connect(null);
+        VideoClient videoClient = new VideoClient(context, accessManager());
+        videoClient.connect(null);
     }
 
     @Test
@@ -53,9 +53,9 @@ public class ConnectTests {
 
         AccessManager accessManager = AccessTokenHelper.obtainAccessManager(context, TEST_USER);
 
-        Client client = new Client(context, accessManager);
+        VideoClient videoClient = new VideoClient(context, accessManager);
 
-        client.connect(roomListener);
+        videoClient.connect(roomListener);
 
         assertTrue(roomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
     }
@@ -67,13 +67,13 @@ public class ConnectTests {
 
         AccessManager accessManager = AccessTokenHelper.obtainAccessManager(context, TEST_USER);
 
-        Client client = new Client(context, accessManager);
+        VideoClient videoClient = new VideoClient(context, accessManager);
         ConnectOptions connectOptions = new ConnectOptions.Builder()
                 .createRoom(true)
                 .name(TEST_ROOM)
                 .build();
 
-        client.connect(connectOptions, roomListener);
+        videoClient.connect(connectOptions, roomListener);
 
         assertTrue(roomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
     }
@@ -86,9 +86,9 @@ public class ConnectTests {
 
         AccessManager accessManager = AccessTokenHelper.obtainAccessManager(context, TEST_USER);
 
-        Client client = new Client(context, accessManager);
+        VideoClient videoClient = new VideoClient(context, accessManager);
 
-        Room room = client.connect(roomListener);
+        Room room = videoClient.connect(roomListener);
 
         assertTrue(roomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
         assertEquals(RoomState.CONNECTED, room.getState());
@@ -101,7 +101,7 @@ public class ConnectTests {
     }
 
     @Test
-    public void connect_shouldConnectAnotherParticipant() throws InterruptedException {
+    public void connect_shouldConnectParticipant() throws InterruptedException {
         FakeRoomListener roomListener = new FakeRoomListener();
         roomListener.onConnectedLatch = new CountDownLatch(1);
         roomListener.onDisconnectedLatch = new CountDownLatch(1);
@@ -112,18 +112,18 @@ public class ConnectTests {
         AccessManager accessManager2 = AccessTokenHelper.obtainAccessManager(context, TEST_USER2);
         ConnectOptions connectOptions = new ConnectOptions.Builder().name(randomRoomName).build();
 
-        Client client = new Client(context, accessManager);
-        Client client2 = new Client(context, accessManager2);
+        VideoClient videoClient = new VideoClient(context, accessManager);
+        VideoClient videoClient2 = new VideoClient(context, accessManager2);
 
-        Room room = client.connect(connectOptions, roomListener);
+        Room room = videoClient.connect(connectOptions, roomListener);
 
         assertTrue(roomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
         assertEquals(RoomState.CONNECTED, room.getState());
 
-        client2.connect(connectOptions, new EmptyRoomListener());
+        videoClient2.connect(connectOptions, new EmptyRoomListener());
 
         assertTrue(roomListener.onParticipantConnectedLatch.await(20, TimeUnit.SECONDS));
-        assertEquals(room.getParticipants().size(), 1);
+        assertEquals(1, room.getParticipants().size());
 
         room.disconnect();
 
@@ -131,6 +131,39 @@ public class ConnectTests {
         assertEquals(RoomState.DISCONNECTED, room.getState());
 
     }
+
+    @Test
+    public void connect_shouldDisconnectParticipant() throws InterruptedException {
+        FakeRoomListener roomListener = new FakeRoomListener();
+        roomListener.onConnectedLatch = new CountDownLatch(1);
+        roomListener.onParticipantDisconnectedLatch = new CountDownLatch(1);
+        roomListener.onParticipantConnectedLatch = new CountDownLatch(1);
+        String randomRoomName = TEST_ROOM + System.currentTimeMillis();
+
+        AccessManager accessManager = AccessTokenHelper.obtainAccessManager(context, TEST_USER);
+        AccessManager accessManager2 = AccessTokenHelper.obtainAccessManager(context, TEST_USER2);
+        ConnectOptions connectOptions = new ConnectOptions.Builder().name(randomRoomName).build();
+
+        VideoClient videoClient = new VideoClient(context, accessManager);
+        VideoClient videoClient2 = new VideoClient(context, accessManager2);
+
+        Room room = videoClient.connect(connectOptions, roomListener);
+
+        assertTrue(roomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
+        assertEquals(RoomState.CONNECTED, room.getState());
+
+        Room client2room = videoClient2.connect(connectOptions, new EmptyRoomListener());
+
+        assertTrue(roomListener.onParticipantConnectedLatch.await(20, TimeUnit.SECONDS));
+        assertEquals(room.getParticipants().size(), 1);
+
+        client2room.disconnect();
+
+        assertTrue(roomListener.onParticipantDisconnectedLatch.await(20, TimeUnit.SECONDS));
+        assertTrue(room.getParticipants().isEmpty());
+
+    }
+
 
     private AccessManager accessManager() {
         return new AccessManager(context, null, null);
@@ -156,12 +189,12 @@ public class ConnectTests {
         }
 
         @Override
-        public void onConnectFailure(RoomsException error) {
+        public void onConnectFailure(VideoException error) {
             triggerLatch(onConnectFailureLatch);
         }
 
         @Override
-        public void onDisconnected(Room room, RoomsException error) {
+        public void onDisconnected(Room room, VideoException error) {
             triggerLatch(onDisconnectedLatch);
         }
 
@@ -184,12 +217,12 @@ public class ConnectTests {
         }
 
         @Override
-        public void onConnectFailure(RoomsException error) {
+        public void onConnectFailure(VideoException error) {
 
         }
 
         @Override
-        public void onDisconnected(Room room, RoomsException error) {
+        public void onDisconnected(Room room, VideoException error) {
 
         }
 

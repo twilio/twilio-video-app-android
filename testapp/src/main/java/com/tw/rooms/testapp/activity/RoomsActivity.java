@@ -21,9 +21,9 @@ import com.twilio.common.AccessManager;
 import com.twilio.video.ConnectOptions;
 import com.twilio.video.LogLevel;
 import com.twilio.video.Participant;
-import com.twilio.video.Client;
+import com.twilio.video.VideoClient;
 import com.twilio.video.Room;
-import com.twilio.video.RoomsException;
+import com.twilio.video.VideoException;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -120,25 +120,25 @@ public class RoomsActivity extends AppCompatActivity {
     }
 
     private void startClient(String capabilityToken) {
-        Timber.i("Start Client");
+        Timber.i("Start VideoClient");
 
         Snackbar.make(registrationButton,
-                "Starting the client...",
+                "Starting the videoClient...",
                 Snackbar.LENGTH_LONG)
                 .setAction("Action", null).show();
 
         AccessManager accessManager = new AccessManager(this, capabilityToken, null);
-        Client.setLogLevel(LogLevel.DEBUG);
-        Client client = new Client(this, accessManager);
+        VideoClient.setLogLevel(LogLevel.DEBUG);
+        VideoClient videoClient = new VideoClient(this, accessManager);
         ConnectOptions connectOptions = new ConnectOptions.Builder()
                 .createRoom(true)
                 .name(roomEditText.getText().toString())
                 .build();
 
         if(roomEditText.getText().length() == 0) {
-            room = client.connect(RoomListener());
+            room = videoClient.connect(RoomListener());
         } else {
-            room = client.connect(connectOptions, RoomListener());
+            room = videoClient.connect(connectOptions, RoomListener());
         }
 
         Timber.i("Connecting to room:"+room.getSid());
@@ -155,12 +155,12 @@ public class RoomsActivity extends AppCompatActivity {
            }
 
            @Override
-           public void onConnectFailure(RoomsException error) {
+           public void onConnectFailure(VideoException error) {
                Timber.i("onConnectFailure");
            }
 
            @Override
-           public void onDisconnected(Room room, RoomsException error) {
+           public void onDisconnected(Room room, VideoException error) {
                Timber.i("onDisconnected");
            }
 

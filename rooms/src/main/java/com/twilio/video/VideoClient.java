@@ -18,13 +18,13 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * The Client allows user to create or participate in Rooms.
+ * The VideoClient allows user to create or participate in Rooms.
  */
-public class Client {
+public class VideoClient {
 
     // TODO: Check which of these error codes are still valid
     /**
-     * Authenticating your Client failed due to invalid auth credentials.
+     * Authenticating your VideoClient failed due to invalid auth credentials.
      */
     public static int INVALID_AUTH_DATA = 100;
     /**
@@ -32,7 +32,7 @@ public class Client {
      */
     public static int INVALID_SIP_ACCOUNT = 102;
     /**
-     * There was an error during Client registration.
+     * There was an error during VideoClient registration.
      */
     public static int CLIENT_REGISTATION_ERROR = 103;
     /**
@@ -95,7 +95,7 @@ public class Client {
     private static LogLevel level = LogLevel.OFF;
     private static Map<LogModule, LogLevel> moduleLogLevel = new EnumMap(LogModule.class);
     private static volatile boolean libraryIsLoaded = false;
-    private static final Logger logger = Logger.getLogger(Client.class);
+    private static final Logger logger = Logger.getLogger(VideoClient.class);
 
     private final Handler handler;
     private final Context applicationContext;
@@ -104,7 +104,7 @@ public class Client {
     // Using listener native handle as key
     private Map<Long, WeakReference<Room>> roomMap = new ConcurrentHashMap<>();
 
-    public Client(Context context, AccessManager accessManager) {
+    public VideoClient(Context context, AccessManager accessManager) {
         if (context == null) {
             throw new NullPointerException("applicationContext must not be null");
         }
@@ -139,7 +139,7 @@ public class Client {
         }
 
         if (!nativeInitialize(applicationContext)) {
-            throw new RuntimeException("Failed to initialize the Video Client");
+            throw new RuntimeException("Failed to initialize the Video VideoClient");
         }
         nativeClientContext = nativeCreateClient(accessManager, null);
 
@@ -184,21 +184,25 @@ public class Client {
         return connect(connectOptions, roomListener);
     }
 
-    public Room connect(ConnectOptions connectOptions, Room.Listener roomListener) {
+    public synchronized Room connect(ConnectOptions connectOptions, Room.Listener roomListener) {
         if (connectOptions == null) {
             throw new NullPointerException("connectOptions must not be null");
         }
         if (roomListener == null) {
             throw new NullPointerException("roomListener must not be null");
         }
-        InternalRoomListenerHandle roomListenerHandle = new InternalRoomListenerHandle(roomListener);
-        Room room;
-        synchronized (roomListenerHandle) {
-            long nativeRoomHandle = nativeConnect(
-                    nativeClientContext, roomListenerHandle.get(), connectOptions);
-            room = new Room(nativeRoomHandle, connectOptions.getName());
+
+        Room room = new Room(connectOptions.getName(), roomListener, handler);
+        /*
+         * We need to synchronize access to room listener during initialization and make
+         * sure that onConnect() callback won't get call before connect() exits and Room
+         * creation is fully completed.
+         */
+        synchronized (room.getConnectLock()) {
+            long nativeRoomContext = nativeConnect(
+                    nativeClientContext, room.getListenerNativeHandle(), connectOptions);
+            room.setNativeContext(nativeRoomContext);
             room.setState(RoomState.CONNECTING);
-            roomMap.put(roomListenerHandle.get(), new WeakReference<Room>(room));
         }
 
         return room;
@@ -231,7 +235,7 @@ public class Client {
         setSDKLogLevel(level);
         trySetCoreLogLevel(level.ordinal());
         // Save the log level
-        Client.level = level;
+        VideoClient.level = level;
     }
 
     /**
@@ -246,7 +250,7 @@ public class Client {
         }
         trySetCoreModuleLogLevel(module.ordinal(), level.ordinal());
         // Save the module log level
-        Client.moduleLogLevel.put(module, level);
+        VideoClient.moduleLogLevel.put(module, level);
     }
 
     private static void setSDKLogLevel(LogLevel level) {
@@ -332,118 +336,7 @@ public class Client {
         }
     }
 
-    class InternalRoomListenerHandle extends NativeHandle implements Room.InternalRoomListener {
 
-        private Room.Listener listener;
-
-        public InternalRoomListenerHandle(Room.Listener listener) {
-            super(listener);
-            this.listener = listener;
-        }
-
-        /*
-         * Native Handle
-         */
-        @Override
-        protected native long nativeCreate(Object object);
-
-        @Override
-        protected native void nativeFree(long nativeHandle);
-
-        /*
-         * InternalRoomListener
-         */
-        @Override
-        public void onConnected(String roomSid) {
-            logger.d("onConnected()");
-            final Room room = getRoom();
-            room.setState(RoomState.CONNECTED);
-            room.setSid(roomSid);
-            handler.post(new Runnable() {
-                @Override
-                public void run() {
-                    InternalRoomListenerHandle.this.listener.onConnected(room);
-                }
-            });
-        }
-
-        @Override
-        public void onDisconnected(final int errorCode) {
-            logger.d("onDisconnected()");
-            final Room room = getRoom();
-            room.setState(RoomState.DISCONNECTED);
-            room.release();
-
-            handler.post(new Runnable() {
-                @Override
-                public void run() {
-                    InternalRoomListenerHandle.this.listener
-                            .onDisconnected(room, new RoomsException(errorCode, ""));
-                }
-            });
-        }
-
-        @Override
-        public void onConnectFailure(final int errorCode) {
-            logger.d("onConnectFailure()");
-            final Room room = getRoom();
-            room.setState(RoomState.DISCONNECTED);
-            handler.post(new Runnable() {
-                @Override
-                public void run() {
-                    InternalRoomListenerHandle.this.listener
-                            .onConnectFailure(new RoomsException(errorCode, ""));
-                }
-            });
-        }
-
-        @Override
-        public void onParticipantConnected(final Participant participant) {
-            logger.d("onParticipantConnected()");
-            final Room room = getRoom();
-
-            room.addParticipant(participant);
-
-            handler.post(new Runnable() {
-                @Override
-                public void run() {
-                    InternalRoomListenerHandle.this.listener.onParticipantConnected(room, participant);
-                }
-            });
-        }
-
-        @Override
-        public void onParticipantDisconnected(String participantSid) {
-            logger.d("onParticipantDisconnected()");
-            final Room room = getRoom();
-
-            final Participant participant = room.removeParticipant(participantSid);
-            if (participant == null) {
-                logger.w("Received participant disconnected callback for non-existent participant");
-                return;
-            }
-            participant.release();
-
-            handler.post(new Runnable() {
-                @Override
-                public void run() {
-                    InternalRoomListenerHandle.this.listener
-                            .onParticipantDisconnected(room, participant);
-                }
-            });
-        }
-
-        private synchronized Room getRoom() {
-            long nativeRoomListenerHandle = get();
-            WeakReference<Room> roomRef = roomMap.get(nativeRoomListenerHandle);
-            if (roomRef == null) {
-                // TODO: handle error
-                logger.w("Room reference is null");
-                return null;
-            }
-            return roomRef.get();
-        }
-    }
 
     private native static void nativeSetCoreLogLevel(int level);
 
