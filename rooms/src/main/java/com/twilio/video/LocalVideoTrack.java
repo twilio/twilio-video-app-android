@@ -6,24 +6,8 @@ package com.twilio.video;
  */
 public class LocalVideoTrack extends VideoTrack {
     private VideoConstraints videoConstraints;
-    private CameraCapturer cameraCapturer;
+    private VideoCapturer videoCapturer;
     private boolean enabledVideo = true;
-
-    public LocalVideoTrack(CameraCapturer cameraCapturer) {
-        this(cameraCapturer, defaultVideoConstraints());
-    }
-
-    public LocalVideoTrack(CameraCapturer cameraCapturer, VideoConstraints videoConstraints) {
-        super();
-        if(cameraCapturer == null) {
-            throw new NullPointerException("CameraCapturer must not be null");
-        }
-        if(videoConstraints == null) {
-            throw new NullPointerException("VideoConstraints must not be null");
-        }
-        this.cameraCapturer = cameraCapturer;
-        this.videoConstraints = videoConstraints;
-    }
 
     /**
      * TODO
@@ -40,14 +24,29 @@ public class LocalVideoTrack extends VideoTrack {
                 .maxVideoDimensions(new VideoDimensions(640,480))
                 .build();
     }
+    public LocalVideoTrack(VideoCapturer videoCapturer) {
+        this(videoCapturer, defaultVideoConstraints());
+    }
+
+    public LocalVideoTrack(VideoCapturer videoCapturer, VideoConstraints videoConstraints) {
+        super();
+        if(videoCapturer == null) {
+            throw new NullPointerException("CameraCapturer must not be null");
+        }
+        if(videoConstraints == null) {
+            throw new NullPointerException("VideoConstraints must not be null");
+        }
+        this.videoCapturer = videoCapturer;
+        this.videoConstraints = videoConstraints;
+    }
 
     /**
-     * Retrieves the {@link CameraCapturer} associated with this video track
+     * Retrieves the {@link VideoCapturer} associated with this video track
      *
      * @return camera
      */
-    public CameraCapturer getCameraCapturer() {
-        return cameraCapturer;
+    public VideoCapturer getVideoCapturer() {
+        return videoCapturer;
     }
 
     /**
@@ -61,9 +60,9 @@ public class LocalVideoTrack extends VideoTrack {
         if (videoTrack != null) {
             enabledVideo = videoTrack.setEnabled(enabled);
             if(enabledVideo && enabled) {
-                cameraCapturer.resume();
+//                videoCapturer.resume();
             } else if(enabledVideo && !enabled){
-                cameraCapturer.pause();
+//                videoCapturer.pause();
             }
         } else {
             enabledVideo = enabled;
@@ -79,11 +78,6 @@ public class LocalVideoTrack extends VideoTrack {
         } else {
             return enabledVideo;
         }
-    }
-
-    void removeCameraCapturer() {
-        cameraCapturer.resetNativeVideoCapturer();
-        cameraCapturer = null;
     }
 
     /**

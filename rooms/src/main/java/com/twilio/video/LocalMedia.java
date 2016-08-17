@@ -1,7 +1,5 @@
 package com.twilio.video;
 
-import android.os.Handler;
-
 import com.twilio.video.internal.Logger;
 
 import java.util.ArrayList;
@@ -16,14 +14,12 @@ public class LocalMedia {
     private List<LocalVideoTrack> videoTracks = new ArrayList<>();
     private boolean audioEnabled;
     private boolean audioMuted;
-    private Handler handler;
     private LocalMedia.Listener localMediaListener;
 
     public LocalMedia(LocalMedia.Listener localMediaListener) {
         this.localMediaListener = localMediaListener;
         this.audioEnabled = true;
         this.audioMuted = false;
-        this.handler = Util.createCallbackHandler();
     }
 
     /**
@@ -153,6 +149,10 @@ public class LocalMedia {
      */
     public boolean isMicrophoneAdded() {
         return audioEnabled;
+    }
+
+    public void release() {
+        // TODO
     }
 
     private boolean enableAudio(boolean enable) {
