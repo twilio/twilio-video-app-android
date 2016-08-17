@@ -283,10 +283,6 @@ model {
 }
 
 dependencies {
-    preCompile 'org.pocoproject.twilio:twilio-poco:1.6.16:android@tar.bz2'
-    preCompile 'com.googlesource.boringssl.twilio:twilio-boringssl:1.0.13:android@tar.bz2'
-    preCompile 'com.twilio.sdk:twilio-common:0.2.0:android@tar.bz2'
-    preCompile 'com.twilio.sdk:twilio-webrtc:52.4:android@tar.bz2'
     preCompile 'com.twilio.sdk:twilio-video:0.1.10:android@tar.bz2'
 
     testCompile 'junit:junit:4.12'
@@ -302,7 +298,10 @@ dependencies {
 
     compile 'com.twilio:common-android:0.6.1'
     // TODO this really should be on nexus as a jar and not local
-    compile files("${twilioSdkHome}/twilio-webrtc/lib/release/libjingle_peerconnection_java.jar")
+    // TODO we are hardcoding architecture for now,
+    // because I don't know how to access that information from here
+    compile files("${twilioSdkHome}/twilio-video/arm64v8a/gnu-4.9/release/lib/" +
+            "libjingle_peerconnection_java.jar")
 }
 
 /**
@@ -587,11 +586,11 @@ class ConversationsRuleSource extends RuleSource {
     }
 
     private void injectLinkerFlags(linkTask, sdkHome, arch, buildType) {
-        def pocoHome = "${sdkHome}/twilio-poco/lib/${buildType}"
-        def webRtcHome = "${sdkHome}/twilio-video/"
+        def twilioVideoHome = "${sdkHome}/twilio-video/"
         def archFolderName = supportedArchFolderName.get(arch)
-        def webRtcLibPath = "${webRtcHome}/${archFolderName}/gnu-4.9/release/lib/"+
-                "${webRtcJniStaticLib}"
+        def libsFolder = "${archFolderName}/gnu-4.9/${buildType}/lib/"
+        def pocoHome = "${twilioVideoHome}/${libsFolder}"
+        def webRtcLibPath = "${twilioVideoHome}/${libsFolder}/${webRtcJniStaticLib}"
 
         linkTask.doFirst {
             if (arch.equals('arm64-v8a')) {
@@ -599,8 +598,8 @@ class ConversationsRuleSource extends RuleSource {
             }
 
             properties["linkerArgs"].addAll([
-                    "-l${pocoHome}/${arch}/${pocoFoundationStaticLib}".toString(),
-                    "-l${pocoHome}/${arch}/${pocoCryptoStaticLib}".toString(),
+                    "-l${pocoHome}/${pocoFoundationStaticLib}".toString(),
+                    "-l${pocoHome}/${pocoCryptoStaticLib}".toString(),
 
                     /**
                      * Several webrtc classes use native webrtc-jni objects that are only
