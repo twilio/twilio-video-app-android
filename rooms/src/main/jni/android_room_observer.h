@@ -3,7 +3,7 @@
 
 #include "webrtc/api/java/jni/jni_helpers.h"
 
-#include "video/TSCLogger.h"
+#include "video/logger.h"
 #include "video/room_observer.h"
 #include "video/participant.h"
 

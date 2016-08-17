@@ -3,23 +3,17 @@ package com.twilio.video;
 public class ConnectOptions {
 
     private String name;
-    private boolean createRoom;
     private LocalMedia localMedia;
     private IceOptions iceOptions;
 
     private ConnectOptions(Builder builder) {
         this.name = builder.name;
-        this.createRoom = builder.createRoom;
         this.localMedia = builder.localMedia;
         this.iceOptions = builder.iceOptions;
     }
 
     public String getName() {
         return name;
-    }
-
-    public boolean willCreateRoom() {
-        return createRoom;
     }
 
     public LocalMedia getLocalMedia() {
@@ -31,16 +25,15 @@ public class ConnectOptions {
     }
 
     private long createNativeObject() {
-        return nativeCreate(name, createRoom, localMedia, iceOptions);
+        return nativeCreate(name, localMedia, iceOptions);
     }
 
-    private native long nativeCreate(String name, boolean createRoom,
+    private native long nativeCreate(String name,
                                      LocalMedia localMedia, IceOptions iceOptions);
 
 
     public static class Builder {
         private String name = "";
-        private boolean createRoom = true;
         private LocalMedia localMedia;
         private IceOptions iceOptions;
 
@@ -48,11 +41,6 @@ public class ConnectOptions {
 
         public Builder name(String name) {
             this.name = name;
-            return this;
-        }
-
-        public Builder createRoom(boolean createRoom) {
-            this.createRoom = createRoom;
             return this;
         }
 

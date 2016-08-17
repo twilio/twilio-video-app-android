@@ -2,7 +2,7 @@
 
 #include "webrtc/api/java/jni/jni_helpers.h"
 
-#include "video/TSCLogger.h"
+#include "video/logger.h"
 
 JNIEXPORT jboolean JNICALL
 Java_com_twilio_video_Participant_nativeIsConnected(JNIEnv *env, jobject instance,

@@ -5,7 +5,6 @@ JNIEXPORT jlong JNICALL
 Java_com_twilio_video_ConnectOptions_nativeCreate(JNIEnv *env,
                                                   jobject j_instance,
                                                   jstring j_name,
-                                                  jboolean j_create_room,
                                                   jobject j_local_media,
                                                   jobject j_ice_options) {
 
@@ -15,9 +14,6 @@ Java_com_twilio_video_ConnectOptions_nativeCreate(JNIEnv *env,
         std::string name = webrtc_jni::JavaToStdString(env, j_name);
         builder.setRoomName(name);
     }
-
-    bool create_room = (bool)j_create_room;
-    builder.setCreateRoom(create_room);
 
     // TODO: Get local media from j_local_media, once LocalMedia is fully implemented in Java
     // builder.setLocalMedia();

@@ -10,7 +10,7 @@
 #include "webrtc/api/java/jni/classreferenceholder.h"
 
 #include "common/AccessManager/AccessManager.h"
-#include "video/TSCLogger.h"
+#include "video/logger.h"
 #include "video/video.h"
 #include "media/media_factory.h"
 #include "android_platform_info_provider.h"
@@ -50,7 +50,7 @@ JNIEXPORT void JNICALL Java_com_twilio_video_VideoClient_nativeSetCoreLogLevel
     (JNIEnv *env, jobject instance, jint level) {
     TS_CORE_LOG_MODULE(kTSCoreLogModulePlatform, kTSCoreLogLevelDebug, "setCoreLogLevel");
     TSCoreLogLevel coreLogLevel = static_cast<TSCoreLogLevel>(level);
-    TSCLogger::instance()->setLogLevel(coreLogLevel);
+    Logger::instance()->setLogLevel(coreLogLevel);
 }
 
 JNIEXPORT void JNICALL Java_com_twilio_video_VideoClient_nativeSetModuleLevel
@@ -58,13 +58,13 @@ JNIEXPORT void JNICALL Java_com_twilio_video_VideoClient_nativeSetModuleLevel
     TS_CORE_LOG_MODULE(kTSCoreLogModulePlatform, kTSCoreLogLevelDebug, "setModuleLevel");
     TSCoreLogModule coreLogModule = static_cast<TSCoreLogModule>(module);
     TSCoreLogLevel coreLogLevel = static_cast<TSCoreLogLevel>(level);
-    TSCLogger::instance()->setModuleLogLevel(coreLogModule, coreLogLevel);
+    Logger::instance()->setModuleLogLevel(coreLogModule, coreLogLevel);
 }
 
 JNIEXPORT jint JNICALL Java_com_twilio_video_VideoClient_nativeGetCoreLogLevel
     (JNIEnv *env, jobject instance) {
     TS_CORE_LOG_MODULE(kTSCoreLogModulePlatform, kTSCoreLogLevelDebug, "getCoreLogLevel");
-    return TSCLogger::instance()->getLogLevel();
+    return Logger::instance()->getLogLevel();
 }
 
 JNIEXPORT jboolean JNICALL
@@ -180,7 +180,6 @@ Java_com_twilio_video_VideoClient_nativeConnect(JNIEnv *env,
         // TODO: We are recreating connect options because we need to inject local media
         // In future (once we have local media implemented) this can be removed
         twilio::video::ConnectOptions connect_options = twilio::video::ConnectOptions::Builder()
-            .setCreateRoom(connect_options_context->connect_options.getCreateRoom())
             .setRoomName(connect_options_context->connect_options.getRoomName())
             .setLocalMedia(local_media)
             .build();
