@@ -8,7 +8,6 @@
 #include "webrtc/modules/audio_device/android/audio_manager.h"
 #include "webrtc/modules/audio_device/android/opensles_player.h"
 #include "webrtc/api/java/jni/classreferenceholder.h"
-#include "webrtc/media/engine/webrtcvideodecoderfactory.h"
 
 #include "common/AccessManager/AccessManager.h"
 #include "video/TSCLogger.h"
