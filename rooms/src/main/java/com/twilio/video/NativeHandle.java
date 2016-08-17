@@ -1,7 +1,6 @@
 package com.twilio.video;
 
 abstract class NativeHandle {
-
     private long nativeHandle;
 
     public NativeHandle(Object object) {
@@ -21,5 +20,4 @@ abstract class NativeHandle {
 
     abstract protected long nativeCreate(Object object);
     abstract protected void nativeFree(long nativeHandle);
-
 }

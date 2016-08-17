@@ -62,7 +62,7 @@ public class VideoConstraintsTests {
                         .maxVideoDimensions(new VideoDimensions(10,20))
                         .build());
 
-        LocalMedia localMedia = new LocalMedia(new LocalMedia.Listener() {
+        LocalMedia localMedia = LocalMedia.create(new LocalMedia.Listener() {
             @Override
             public void onLocalVideoTrackAdded(LocalMedia localMedia, LocalVideoTrack videoTrack) {
                 fail();
@@ -101,7 +101,7 @@ public class VideoConstraintsTests {
                         .maxVideoDimensions(VideoDimensions.VGA_VIDEO_DIMENSIONS)
                         .build());
 
-        LocalMedia localMedia = new LocalMedia(new LocalMedia.Listener() {
+        LocalMedia localMedia = LocalMedia.create(new LocalMedia.Listener() {
             @Override
             public void onLocalVideoTrackAdded(LocalMedia localMedia, LocalVideoTrack videoTrack) {
                 localVideoTrackAddedLatch.countDown();
