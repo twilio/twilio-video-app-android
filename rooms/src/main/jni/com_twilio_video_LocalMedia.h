@@ -28,6 +28,9 @@ private:
     std::shared_ptr<LocalMedia> local_media_;
 };
 
+JNIEXPORT jlong JNICALL Java_com_twilio_video_LocalMedia_nativeAddAudioTrack(JNIEnv *,
+                                                                            jobject,
+                                                                            jlong);
 JNIEXPORT void JNICALL Java_com_twilio_video_LocalMedia_nativeRelease(JNIEnv *, jobject, jlong);
 
 }

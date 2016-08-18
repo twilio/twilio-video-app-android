@@ -9,10 +9,12 @@ import java.util.List;
  * Provides local video and audio tracks associated with a {@link Participant}
  */
 public class LocalMedia {
+    private static final String RELEASE_MESSAGE_TEMPLATE = "LocalMedia released %s unavailable";
     private static final Logger logger = Logger.getLogger(LocalMedia.class);
 
-    private final long nativeLocalMediaHandle;
-    private List<LocalVideoTrack> videoTracks = new ArrayList<>();
+    private long nativeLocalMediaHandle;
+    private final List<AudioTrack> audioTracks = new ArrayList<>();
+    private final List<LocalVideoTrack> videoTracks = new ArrayList<>();
     private boolean audioEnabled;
     private boolean audioMuted;
     private LocalMedia.Listener localMediaListener;
@@ -153,9 +155,32 @@ public class LocalMedia {
         return audioEnabled;
     }
 
+    public void addAudioTrack() {
+        checkReleased("addAudioTrack");
+        long nativeAudioTrack = nativeAddAudioTrack(nativeLocalMediaHandle);
+
+        if (nativeAudioTrack != 0 && localMediaListener != null) {
+            org.webrtc.AudioTrack webRtcAudioTrack = new org.webrtc.AudioTrack(nativeAudioTrack);
+            AudioTrack audioTrack = new AudioTrack(webRtcAudioTrack, null);
+
+            audioTracks.add(audioTrack);
+            localMediaListener.onLocalAudioTrackAdded(audioTrack);
+        } else if (nativeAudioTrack == 0 && localMediaListener != null) {
+            // TODO add local audio track error
+            localMediaListener.onLocalAudioTrackError();
+        }
+    }
+
+    public void addVideoTrack() {
+
+    }
+
     public void release() {
         if (nativeLocalMediaHandle != 0) {
             nativeRelease(nativeLocalMediaHandle);
+            nativeLocalMediaHandle = 0;
+            audioTracks.clear();
+            videoTracks.clear();
         }
     }
 
@@ -164,9 +189,22 @@ public class LocalMedia {
         return false;
     }
 
+    private void checkReleased(String methodName) {
+        if (nativeLocalMediaHandle == 0) {
+            String releaseErrorMessage = String.format(RELEASE_MESSAGE_TEMPLATE, methodName);
+
+            throw new IllegalStateException(releaseErrorMessage);
+        }
+    }
+
+    private native long nativeAddAudioTrack(long nativeLocalMediaHandle);
     private native void nativeRelease(long nativeLocalMediaHandle);
 
     public interface Listener {
+        // Flesh these out
+        void onLocalAudioTrackAdded(AudioTrack localAudioTrack);
+        void onLocalAudioTrackError();
+
         /**
          * This method notifies the listener when a {@link LocalVideoTrack} has been added
          * to the {@link LocalMedia}
