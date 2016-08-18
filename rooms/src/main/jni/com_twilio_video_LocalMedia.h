@@ -1,4 +1,5 @@
 #include <jni.h>
+#include "media/media.h"
 
 #ifndef ROOMS_ANDROID_COM_TWILIO_VIDEO_LOCALMEDIA_H_
 #define ROOMS_ANDROID_COM_TWILIO_VIDEO_LOCALMEDIA_H_
@@ -7,8 +8,30 @@
 extern "C" {
 #endif
 
-JNIEXPORT jlong JNICALL Java_com_twilio_video_LocalMedia_nativeCreate(JNIEnv *, jobject);
+namespace twilio {
+namespace media {
+
+class LocalMediaContext {
+public:
+    LocalMediaContext(std::shared_ptr<LocalMedia> local_media) : local_media_(local_media) {
+
+    }
+
+    virtual ~LocalMediaContext() {
+        local_media_.reset();
+    }
+
+    std::shared_ptr<LocalMedia> getLocalMedia() {
+        return local_media_;
+    }
+private:
+    std::shared_ptr<LocalMedia> local_media_;
+};
+
 JNIEXPORT void JNICALL Java_com_twilio_video_LocalMedia_nativeRelease(JNIEnv *, jobject, jlong);
+
+}
+}
 
 #ifdef __cplusplus
 }

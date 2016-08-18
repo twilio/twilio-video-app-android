@@ -104,7 +104,7 @@ public:
     std::shared_ptr<twilio::media::MediaFactory> getMediaFactory() const {
         return media_factory_;
     }
- private:
+private:
     std::unique_ptr<twilio::video::Client> client_;
     std::shared_ptr<twilio::media::MediaFactory> media_factory_;
     twilio::video::Invoker *invoker_;

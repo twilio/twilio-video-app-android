@@ -1,5 +1,7 @@
 package com.twilio.video;
 
+import android.content.Context;
+import android.support.test.InstrumentationRegistry;
 import android.support.test.filters.LargeTest;
 import android.support.test.runner.AndroidJUnit4;
 
@@ -11,16 +13,21 @@ import org.junit.runner.RunWith;
 @RunWith(AndroidJUnit4.class)
 @LargeTest
 public class LocalMediaTest {
-    LocalMedia localMedia;
+    private Context context;
+    private MediaFactory mediaFactory;
+    private LocalMedia localMedia;
 
     @Before
     public void setup() {
-        localMedia = LocalMedia.create(null);
+        context = InstrumentationRegistry.getInstrumentation().getTargetContext();
+        mediaFactory = MediaFactory.instance(context);
+        localMedia = mediaFactory.createLocalMedia(null);
     }
 
     @After
     public void teardown() {
         localMedia.release();
+        mediaFactory.release();
     }
 
     @Test

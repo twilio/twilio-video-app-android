@@ -31,7 +31,7 @@ public class VideoConstraintsTests {
 
     @Test(expected = NullPointerException.class)
     public void localVideoTrackWithNullVideoConstraints() {
-//        CameraCapturer cameraCapturer = CameraCapturer.create(
+//        CameraCapturer cameraCapturer = CameraCapturer.instance(
 //                        activityRule.getActivity(),
 //                        CameraCapturer.CameraSource.CAMERA_SOURCE_FRONT_CAMERA,
 //                        new CapturerErrorListener() {
@@ -62,22 +62,23 @@ public class VideoConstraintsTests {
                         .maxVideoDimensions(new VideoDimensions(10,20))
                         .build());
 
-        LocalMedia localMedia = LocalMedia.create(new LocalMedia.Listener() {
-            @Override
-            public void onLocalVideoTrackAdded(LocalMedia localMedia, LocalVideoTrack videoTrack) {
-                fail();
-            }
-
-            @Override
-            public void onLocalVideoTrackRemoved(LocalMedia localMedia, LocalVideoTrack videoTrack) {
-                fail();
-            }
-
-            @Override
-            public void onLocalVideoTrackError(LocalMedia localMedia, LocalVideoTrack track, VideoException exception) {
-                localVideoTrackFailedLatch.countDown();
-            }
-        });
+        LocalMedia localMedia = null;
+//        LocalMedia localMedia = LocalMedia.instance(null, new LocalMedia.Listener() {
+//            @Override
+//            public void onLocalVideoTrackAdded(LocalMedia localMedia, LocalVideoTrack videoTrack) {
+//                fail();
+//            }
+//
+//            @Override
+//            public void onLocalVideoTrackRemoved(LocalMedia localMedia, LocalVideoTrack videoTrack) {
+//                fail();
+//            }
+//
+//            @Override
+//            public void onLocalVideoTrackError(LocalMedia localMedia, LocalVideoTrack track, VideoException exception) {
+//                localVideoTrackFailedLatch.countDown();
+//            }
+//        });
 
         localMedia.addLocalVideoTrack(localVideoTrack);
 
@@ -101,24 +102,25 @@ public class VideoConstraintsTests {
                         .maxVideoDimensions(VideoDimensions.VGA_VIDEO_DIMENSIONS)
                         .build());
 
-        LocalMedia localMedia = LocalMedia.create(new LocalMedia.Listener() {
-            @Override
-            public void onLocalVideoTrackAdded(LocalMedia localMedia, LocalVideoTrack videoTrack) {
-                localVideoTrackAddedLatch.countDown();
-            }
-
-            @Override
-            public void onLocalVideoTrackRemoved(LocalMedia localMedia, LocalVideoTrack videoTrack) {
-                localVideoTrackRemovedLatch.countDown();
-            }
-
-            @Override
-            public void onLocalVideoTrackError(LocalMedia localMedia,
-                                               LocalVideoTrack track,
-                                               VideoException exception) {
-                fail();
-            }
-        });
+        LocalMedia localMedia = null;
+//        LocalMedia localMedia = LocalMedia.instance(null, new LocalMedia.Listener() {
+//            @Override
+//            public void onLocalVideoTrackAdded(LocalMedia localMedia, LocalVideoTrack videoTrack) {
+//                localVideoTrackAddedLatch.countDown();
+//            }
+//
+//            @Override
+//            public void onLocalVideoTrackRemoved(LocalMedia localMedia, LocalVideoTrack videoTrack) {
+//                localVideoTrackRemovedLatch.countDown();
+//            }
+//
+//            @Override
+//            public void onLocalVideoTrackError(LocalMedia localMedia,
+//                                               LocalVideoTrack track,
+//                                               VideoException exception) {
+//                fail();
+//            }
+//        });
 
         localMedia.addLocalVideoTrack(localVideoTrack);
 

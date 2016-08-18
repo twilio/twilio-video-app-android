@@ -9,9 +9,6 @@ import java.util.List;
  * Provides local video and audio tracks associated with a {@link Participant}
  */
 public class LocalMedia {
-    static {
-        System.loadLibrary("jingle_peerconnection_so");
-    }
     private static final Logger logger = Logger.getLogger(LocalMedia.class);
 
     private final long nativeLocalMediaHandle;
@@ -20,18 +17,7 @@ public class LocalMedia {
     private boolean audioMuted;
     private LocalMedia.Listener localMediaListener;
 
-    public static LocalMedia create(LocalMedia.Listener localMediaListener) {
-        long nativeLocalMediaHandle = nativeCreate();
-
-        if (nativeLocalMediaHandle == 0) {
-            logger.e("Failed to create local media");
-            return null;
-        }
-
-        return new LocalMedia(nativeLocalMediaHandle, localMediaListener);
-    }
-
-    private LocalMedia(long nativeLocalMediaHandle, LocalMedia.Listener localMediaListener) {
+    LocalMedia(long nativeLocalMediaHandle, LocalMedia.Listener localMediaListener) {
         this.nativeLocalMediaHandle = nativeLocalMediaHandle;
         this.localMediaListener = localMediaListener;
         this.audioEnabled = true;
@@ -178,7 +164,6 @@ public class LocalMedia {
         return false;
     }
 
-    private static native long nativeCreate();
     private native void nativeRelease(long nativeLocalMediaHandle);
 
     public interface Listener {

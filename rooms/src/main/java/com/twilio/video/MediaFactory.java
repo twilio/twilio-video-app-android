@@ -1,7 +1,81 @@
 package com.twilio.video;
 
 
-public class MediaFactory {
+import android.content.Context;
 
-    // TODO: Implement me
+import com.twilio.video.internal.Logger;
+import com.twilio.video.internal.ReLinker;
+
+public class MediaFactory {
+    private static final String RELEASE_MESSAGE_TEMPLATE = "MediaFactory released %s unavailable";
+    private static volatile boolean libraryIsLoaded = false;
+    private static final Logger logger = Logger.getLogger(MediaFactory.class);
+    private volatile static MediaFactory instance;
+
+    private long nativeMediaFactoryHandle;
+
+    public static MediaFactory instance(Context context) {
+        if (context == null) {
+            throw new NullPointerException("context must not be null");
+        }
+        if (instance == null) {
+            synchronized (MediaFactory.class) {
+                if (instance == null) {
+                    if (!libraryIsLoaded) {
+                        ReLinker.loadLibrary(context, "jingle_peerconnection_so");
+                        libraryIsLoaded = true;
+                    }
+                    long nativeMediaFactoryHandle = nativeCreate(context);
+
+                    if (nativeMediaFactoryHandle == 0) {
+                        logger.e("Failed to instance MediaFactory");
+                    } else {
+                        instance = new MediaFactory(nativeMediaFactoryHandle);
+                    }
+                }
+            }
+        }
+
+        return instance;
+    }
+
+    public LocalMedia createLocalMedia(LocalMedia.Listener listener) {
+        checkReleased("createLocalMedia");
+        long nativeLocalMediaHandle = nativeCreateLocalMedia(nativeMediaFactoryHandle);
+
+        if (nativeLocalMediaHandle == 0) {
+            logger.e("Failed to instance LocalMedia");
+            return null;
+        }
+
+        return new LocalMedia(nativeLocalMediaHandle, listener);
+    }
+
+    public void release() {
+        if (instance != null) {
+            synchronized (MediaFactory.class) {
+                if (instance != null) {
+                    nativeRelease(nativeMediaFactoryHandle);
+                    nativeMediaFactoryHandle = 0;
+                    instance = null;
+                }
+            }
+        }
+    }
+
+    private MediaFactory(long nativeMediaFactoryHandle) {
+        this.nativeMediaFactoryHandle = nativeMediaFactoryHandle;
+    }
+
+    private void checkReleased(String methodName) {
+        if (nativeMediaFactoryHandle == 0) {
+            String releaseErrorMessage = String.format(RELEASE_MESSAGE_TEMPLATE, methodName);
+
+            throw new IllegalStateException(releaseErrorMessage);
+        }
+    }
+
+    private static native long nativeCreate(Context context);
+    private static native long nativeCreateLocalMedia(long nativeMediaFactoryHandle);
+    private native void nativeRelease(long mediaFactoryHandle);
 }
