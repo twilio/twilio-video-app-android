@@ -41,7 +41,7 @@ def boringSslHome = "${coreHome}"
 def boringSslStaticLib = "libboringssl.a"
 
 def webRtcHome = "${coreHome}"
-def webRtcHeaders = "${coreHeaders}/third_party"
+def webRtcHeaders = "${coreHeaders}/third_party/webrtc"
 def webRtcStaticLib = "libwebrtc.a"
 
 def resiprocateHome = "${coreHome}"
