@@ -6,6 +6,8 @@ export WORKSPACE_ROOT_DIR=`pwd`
 export SCRIPTS_DIR="$WORKSPACE_ROOT_DIR/scripts"
 export SDK_PACKAGE_PATH="$WORKSPACE_ROOT_DIR/package"
 
+PRODUCT_NAME="video"
+
 if [ ! -z "$RELEASE_VERSION" ]; then
     export SDK_RELEASE_VERSION=${RELEASE_VERSION}
 else
@@ -36,7 +38,7 @@ mkdir -p ${SDK_PACKAGE_PATH}
 pushd "$SDK_RELEASE_TOOL_HOME"
 
 echo "sdk-release-tool: downloading..."
-./sdk-release-tool download --stage twilio-conversations-android ${SDK_RELEASE_VERSION}-rc${SDK_RC_BUILD_NUMBER} ${SDK_PACKAGE_PATH}
+./sdk-release-tool download --stage twilio-${PRODUCT_NAME}-android ${SDK_RELEASE_VERSION}-rc${SDK_RC_BUILD_NUMBER} ${SDK_PACKAGE_PATH}
 if [ "$?" -ne "0" ]; then
     echo "Error: failed to execute sdk-release-tool upload"
     exit 1
@@ -49,7 +51,7 @@ fi
 rsync -av "${SDK_PACKAGE_PATH}/dist/${SDK_RELEASE_VERSION}-rc${SDK_RC_BUILD_NUMBER}/" "${SDK_PACKAGE_PATH}/dist/${SDK_RELEASE_VERSION}/"
 
 echo "sdk-release-tool: uploading..."
-./sdk-release-tool upload --prod twilio-conversations-android ${SDK_RELEASE_VERSION} ${SDK_PACKAGE_PATH}
+./sdk-release-tool upload --prod twilio-${PRODUCT_NAME}-android ${SDK_RELEASE_VERSION} ${SDK_PACKAGE_PATH}
 if [ "$?" -ne "0" ]; then
     echo "Error: failed to execute sdk-release-tool upload"
     exit 1
@@ -58,9 +60,9 @@ fi
 rm -rf ${SCRIPTS_DIR}/downloads
 mkdir ${SCRIPTS_DIR}/downloads
 
-DIRECT_URL="https://media.twiliocdn.com/sdk/android/conversations/releases/${SDK_RELEASE_VERSION}/twilio-conversations-android-${SDK_RELEASE_VERSION}.aar"
+DIRECT_URL="https://media.twiliocdn.com/sdk/android/${PRODUCT_NAME}/releases/${SDK_RELEASE_VERSION}/twilio-${PRODUCT_NAME}-android-${SDK_RELEASE_VERSION}.aar"
 
-curl $DIRECT_URL --output ${SCRIPTS_DIR}/downloads/twilio-conversations-direct.aar
-md5sum ${SDK_PACKAGE_PATH}/dist/${SDK_RELEASE_VERSION}/twilio-conversations-android.aar ${SCRIPTS_DIR}/downloads/twilio-conversations-direct.aar
+curl $DIRECT_URL --output ${SCRIPTS_DIR}/downloads/twilio-${PRODUCT_NAME}-direct.aar
+md5sum ${SDK_PACKAGE_PATH}/dist/${SDK_RELEASE_VERSION}/twilio-${PRODUCT_NAME}-android.aar ${SCRIPTS_DIR}/downloads/twilio-${PRODUCT_NAME}-direct.aar
 
 popd
