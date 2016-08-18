@@ -12,12 +12,12 @@ fi
 RELEASE_VERSION="$1"
 
 PLATFORM_NAME="android"
-PRODUCT_NAME="conversations"
+PRODUCT_NAME="video"
 
 # paths
 WORKSPACE_ROOT_DIR=`pwd`
 ARTIFACT_DIR="$WORKSPACE_ROOT_DIR/target"
-ARTIFACT_NAME=twilio-conversations-android.aar
+ARTIFACT_NAME=twilio-${PRODUCT_NAME}-android.aar
 DOCS_DIR="$WORKSPACE_ROOT_DIR/target/javadoc"
 RELEASE_VERSION_PATH="$WORKSPACE_ROOT_DIR/dist"
 
