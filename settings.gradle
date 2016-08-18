@@ -1,1 +1,1 @@
-include ':rooms', ':testapp'
+include ':video', ':testapp'
