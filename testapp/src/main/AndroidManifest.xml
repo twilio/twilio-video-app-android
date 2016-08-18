@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.tw.rooms.testapp" >
+    package="com.tw.video.testapp" >
 
     <uses-feature android:name="android.hardware.camera" />
     <uses-feature android:name="android.hardware.camera.autofocus" />
@@ -18,12 +18,12 @@
 
     <application
         android:allowBackup="true"
-        android:name="com.tw.rooms.testapp.TestAppApplication"
+        android:name="com.tw.video.testapp.TestAppApplication"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
         <activity
-            android:name="com.tw.rooms.testapp.activity.RoomsActivity"
+            android:name="com.tw.video.testapp.activity.RoomsActivity"
             android:windowSoftInputMode="adjustResize|stateAlwaysHidden">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -32,7 +32,7 @@
             </intent-filter>
         </activity>
 
-        <receiver android:name="com.tw.rooms.testapp.activity.ClientActivity$Rebroadcaster" />
+        <receiver android:name="com.tw.video.testapp.activity.ClientActivity$Rebroadcaster" />
 
         <activity android:name="net.hockeyapp.android.UpdateActivity" />
     </application>

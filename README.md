@@ -1,4 +1,4 @@
-Android Conversations SDK
+Android Video SDK
 =============================
 
 ##Getting Started
@@ -17,13 +17,11 @@ Android Conversations SDK
 If you have all the dependencies installed, you can proceed with development. The SDK is built with gradle and can be imported into Android Studio. For first time users, just import the top level build.gradle file into Android Studio.
 
 ## Releasing
-The Conversations SDK is built and consumed with Android Studio as an aar. However, we currently ship a tar file with a 'fat' jar that contains all the native dependencies. To package a release execute the following.
+The SDK is built and consumed with Android Studio as an aar. However, we currently ship a tar file with a 'fat' jar that contains all the native dependencies. To package a release execute the following.
 
 ```
-./gradlew conversations:clean conversations:packageRelease
+./gradlew video:clean video:packageRelease
 ```
-
-Upon completion twilio-conversations-android.tar.bz2 will be located in `conversations/build/outputs/tar`
 
 ## Build Pipeline
 
@@ -36,11 +34,11 @@ These are executed from Jenkins, but these are a reference for building and uplo
 
 ### Uploading a Release Candidate
 ```
-./gradlew -PreleaseCandidate=true -Pmaven.repo=https://api.bintray.com/maven/twilio/internal-releases/conversations-android/ conversations:uploadArchives
+./gradlew -PreleaseCandidate=true -Pmaven.repo=https://api.bintray.com/maven/twilio/internal-releases/video-android/ video:uploadArchives
 ```
 
 ### Uploading Regular Archive
 ```
-./gradlew conversations:uploadArchives
+./gradlew video:uploadArchives
 ```
 

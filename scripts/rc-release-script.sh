@@ -2,6 +2,8 @@
 
 export LANG=en_US.UTF-8;
 
+PRODUCT_NAME="video"
+
 CDN_JSON_REALM="stage"
 SDK_VERSION=`head -3 gradle.properties | sed 's/[^0-9]*//g' | tr '\n' '.' | sed s'/.$//'`
 SDK_RC=`tail -1 gradle.properties | sed 's/[^0-9]*//g'`
@@ -26,11 +28,10 @@ if [ "$?" -ne "0" ]; then
 fi
 
 echo "sdk-release-tool: uploading..."
-# check out https://code.hq.twilio.com/videoClient/sdk-release-tool for how to use sdk-release-tool
 PWD=`pwd`
 export SDK_PACKAGE_PATH="${PWD}"
 pushd "$SDK_RELEASE_TOOL_HOME"
-./sdk-release-tool upload --${CDN_JSON_REALM} twilio-conversations-android ${SDK_VERSION}-rc${SDK_RC} ${SDK_PACKAGE_PATH}
+./sdk-release-tool upload --${CDN_JSON_REALM} twilio-${PRODUCT_NAME}-android ${SDK_VERSION}-rc${SDK_RC} ${SDK_PACKAGE_PATH}
 popd
 if [ "$?" -ne "0" ]; then
     echo "Error: failed to execute sdk-release-tool upload"
@@ -39,7 +40,7 @@ fi
 
 echo "sdk-release-tool: pinning..."
 pushd "$SDK_RELEASE_TOOL_HOME"
-./sdk-release-tool pin -f --${CDN_JSON_REALM} twilio-conversations-android ${SDK_VERSION}-rc${SDK_RC}
+./sdk-release-tool pin -f --${CDN_JSON_REALM} twilio-${PRODUCT_NAME}-android ${SDK_VERSION}-rc${SDK_RC}
 popd
 if [ "$?" -ne "0" ]; then
     echo "Error: failed to execute sdk-release-tool update"
@@ -48,7 +49,7 @@ fi
 
 echo "sdk-release-tool: pinning latest..."
 pushd "$SDK_RELEASE_TOOL_HOME"
-./sdk-release-tool pin-latest -f --${CDN_JSON_REALM} twilio-conversations-android ${SDK_VERSION}-rc${SDK_RC}
+./sdk-release-tool pin-latest -f --${CDN_JSON_REALM} twilio-${PRODUCT_NAME}-android ${SDK_VERSION}-rc${SDK_RC}
 popd
 if [ "$?" -ne "0" ]; then
     echo "Error: failed to execute sdk-release-tool update"
