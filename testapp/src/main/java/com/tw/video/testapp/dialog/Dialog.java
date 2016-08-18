@@ -1,6 +1,6 @@
-package com.tw.rooms.testapp.dialog;
+package com.tw.video.testapp.dialog;
 
-import com.tw.rooms.testapp.model.TwilioIceServer;
+import com.tw.video.testapp.model.TwilioIceServer;
 
 import java.util.List;
 

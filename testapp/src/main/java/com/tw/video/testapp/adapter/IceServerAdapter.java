@@ -1,4 +1,4 @@
-package com.tw.rooms.testapp.adapter;
+package com.tw.video.testapp.adapter;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -7,7 +7,7 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 
-import com.tw.rooms.testapp.model.TwilioIceServer;
+import com.tw.video.testapp.model.TwilioIceServer;
 
 import java.util.List;
 

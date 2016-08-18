@@ -1,4 +1,4 @@
-package com.tw.rooms.testapp.activity;
+package com.tw.video.testapp.activity;
 
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -14,9 +14,9 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
 
-import com.tw.rooms.testapp.BuildConfig;
-import com.tw.rooms.testapp.R;
-import com.tw.rooms.testapp.util.SimpleSignalingUtils;
+import com.tw.video.testapp.BuildConfig;
+import com.tw.video.testapp.R;
+import com.tw.video.testapp.util.SimpleSignalingUtils;
 import com.twilio.common.AccessManager;
 import com.twilio.video.ConnectOptions;
 import com.twilio.video.LogLevel;

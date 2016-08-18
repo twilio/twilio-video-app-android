@@ -1,4 +1,4 @@
-package com.tw.rooms.testapp;
+package com.tw.video.testapp;
 
 import android.app.Application;
 import android.test.ApplicationTestCase;

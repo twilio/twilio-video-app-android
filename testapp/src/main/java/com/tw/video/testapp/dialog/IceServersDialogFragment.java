@@ -1,4 +1,4 @@
-package com.tw.rooms.testapp.dialog;
+package com.tw.video.testapp.dialog;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
@@ -11,10 +11,10 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Spinner;
 
-import com.tw.rooms.testapp.R;
-import com.tw.rooms.testapp.adapter.IceServerAdapter;
-import com.tw.rooms.testapp.model.TwilioIceServer;
-import com.tw.rooms.testapp.util.IceOptionsHelper;
+import com.tw.video.testapp.R;
+import com.tw.video.testapp.adapter.IceServerAdapter;
+import com.tw.video.testapp.model.TwilioIceServer;
+import com.tw.video.testapp.util.IceOptionsHelper;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -1,4 +1,4 @@
-package com.tw.rooms.testapp.model;
+package com.tw.video.testapp.model;
 
 public class TwilioIceServer {
     private String url;

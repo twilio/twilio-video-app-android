@@ -1,9 +1,9 @@
-package com.tw.rooms.testapp.util;
+package com.tw.video.testapp.util;
 
 import android.util.Base64;
 
 import com.google.gson.GsonBuilder;
-import com.tw.rooms.testapp.model.TwilioIceResponse;
+import com.tw.video.testapp.model.TwilioIceResponse;
 
 import java.util.HashMap;
 import java.util.Map;

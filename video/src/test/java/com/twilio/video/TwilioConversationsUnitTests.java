@@ -35,7 +35,7 @@ public class TwilioConversationsUnitTests {
 
         try {
             // We expect a runtime exception but want to validate the message somewhat
-            // TODO: disabling for now since we are not using these tests in rooms.
+            // TODO: disabling for now since we are not using these tests in video.
             //TwilioConversationsClient.initialize(mockContext);
         } catch (RuntimeException e) {
             // Kinda wonky but ensures that we made it through permission check

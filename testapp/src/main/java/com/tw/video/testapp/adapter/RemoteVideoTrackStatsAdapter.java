@@ -1,4 +1,4 @@
-package com.tw.rooms.testapp.adapter;
+package com.tw.video.testapp.adapter;
 
 import android.support.v7.widget.RecyclerView;
 import android.text.Html;
@@ -7,7 +7,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.tw.rooms.testapp.R;
+import com.tw.video.testapp.R;
 import com.twilio.video.RemoteVideoTrackStatsRecord;
 
 import java.util.LinkedHashMap;
