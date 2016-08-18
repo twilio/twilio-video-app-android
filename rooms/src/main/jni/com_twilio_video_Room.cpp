@@ -1,7 +1,7 @@
 #include "com_twilio_video_Room.h"
 #include "webrtc/api/java/jni/jni_helpers.h"
 
-#include "video/TSCLogger.h"
+#include "video/logger.h"
 #include "android_room_observer.h"
 
 

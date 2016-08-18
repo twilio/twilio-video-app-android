@@ -1,3 +1,5 @@
+
+
 apply plugin: 'com.android.model.library'
 apply plugin: 'maven'
 
@@ -38,8 +40,8 @@ def pocoJsonStaticLib = "libPocoJSON.a"
 def boringSslHome = "${coreHome}"
 def boringSslStaticLib = "libboringssl.a"
 
-def webRtcHome = "${twilioSdkHome}/twilio-webrtc"
-def webRtcHeaders = "${webRtcHome}/include"
+def webRtcHome = "${coreHome}"
+def webRtcHeaders = "${coreHeaders}/third_party"
 def webRtcStaticLib = "libwebrtc.a"
 
 def resiprocateHome = "${coreHome}"
@@ -149,8 +151,11 @@ model {
             webrtc {
                 headers.srcDir "${webRtcHeaders}"
                 binaries.withType(StaticLibraryBinary) {
-                    def webRtcStaticLibPath = "${webRtcHome}/lib/release/" +
-                            "${targetPlatform.getName()}/${webRtcStaticLib}"
+                    def webRtcStaticLibPath = "${webRtcHome}/" +
+                            "${supportedArchFolderName.get(targetPlatform.getName())}/"+
+                            "${compilerVersion}/"+
+                            "${buildType.getName()}/lib/"+
+                            "${webRtcStaticLib}"
                     staticLibraryFile = file("${webRtcStaticLibPath}")
                 }
             }
@@ -278,11 +283,7 @@ model {
 }
 
 dependencies {
-    preCompile 'org.pocoproject.twilio:twilio-poco:1.6.16:android@tar.bz2'
-    preCompile 'com.googlesource.boringssl.twilio:twilio-boringssl:1.0.13:android@tar.bz2'
-    preCompile 'com.twilio.sdk:twilio-common:0.2.0:android@tar.bz2'
-    preCompile 'com.twilio.sdk:twilio-webrtc:52.4:android@tar.bz2'
-    preCompile 'com.twilio.sdk:twilio-video:0.1.10:android@tar.bz2'
+    preCompile 'com.twilio.sdk:twilio-video:0.1.11-SNAPSHOT:android@tar.bz2'
 
     testCompile 'junit:junit:4.12'
     testCompile 'org.mockito:mockito-core:1.10.19'
@@ -297,7 +298,10 @@ dependencies {
 
     compile 'com.twilio:common-android:0.6.1'
     // TODO this really should be on nexus as a jar and not local
-    compile files("${twilioSdkHome}/twilio-webrtc/lib/release/libjingle_peerconnection_java.jar")
+    // TODO we are hardcoding architecture for now,
+    // because I don't know how to access that information from here
+    compile files("${twilioSdkHome}/twilio-video/arm64v8a/gnu-4.9/release/lib/" +
+            "libjingle_peerconnection_java.jar")
 }
 
 /**
@@ -382,7 +386,8 @@ task localizeWebRtcJniLoadUnLoad(type: Exec, dependsOn: 'unpackPrebuilts') {
                 supportedHosts.each { host ->
                     def objCopy = "${ndkToolchains}/${toolchainPrefix}-${currentToolchainVersion}" +
                             "/prebuilt/${host}-x86_64/bin/${toolChainPrebuiltPrefix}-objcopy"
-                    def libWebRtcStaticLib = "${webRtcHome}/lib/release/${arch}/libwebrtc-jni.a"
+                    def libWebRtcStaticLib = "${webRtcHome}/${arch}/${compilerVersion}" +
+                            "/release/lib/libwebrtc-jni.a"
                     if (file("${objCopy}").exists() &&
                             file("${libWebRtcStaticLib}").exists() &&
                             archToolChain == toolChainPrebuiltPrefix) {
@@ -456,6 +461,13 @@ class ConversationsRuleSource extends RuleSource {
     static final def pocoFoundationStaticLib = "libPocoFoundation.a"
     static final def pocoCryptoStaticLib = "libPocoCrypto.a"
     static final def webRtcJniStaticLib = "libwebrtc-jni.a"
+    static final def supportedArchFolderName = [
+            "armeabi-v7a" : "armeabiv7a",
+            "arm64-v8a" : "arm64v8a",
+            "x86" : "x86",
+            "x86_64" : "x86_64"
+    ]
+
 
     @Mutate
     void validatePreCompileDebugEnvironmentArmeabiV7a(
@@ -574,16 +586,20 @@ class ConversationsRuleSource extends RuleSource {
     }
 
     private void injectLinkerFlags(linkTask, sdkHome, arch, buildType) {
-        def pocoHome = "${sdkHome}/twilio-poco/lib/${buildType}"
-        def webRtcHome = "${sdkHome}/twilio-webrtc/lib/release"
+        def twilioVideoHome = "${sdkHome}/twilio-video/"
+        def archFolderName = supportedArchFolderName.get(arch)
+        def libsFolder = "${archFolderName}/gnu-4.9/${buildType}/lib/"
+        def pocoHome = "${twilioVideoHome}/${libsFolder}"
+        def webRtcLibPath = "${twilioVideoHome}/${libsFolder}/${webRtcJniStaticLib}"
 
         linkTask.doFirst {
             if (arch.equals('arm64-v8a')) {
                 properties["linkerArgs"].add("-fuse-ld=gold")
             }
+
             properties["linkerArgs"].addAll([
-                    "-l${pocoHome}/${arch}/${pocoFoundationStaticLib}".toString(),
-                    "-l${pocoHome}/${arch}/${pocoCryptoStaticLib}".toString(),
+                    "-l${pocoHome}/${pocoFoundationStaticLib}".toString(),
+                    "-l${pocoHome}/${pocoCryptoStaticLib}".toString(),
 
                     /**
                      * Several webrtc classes use native webrtc-jni objects that are only
@@ -594,8 +610,7 @@ class ConversationsRuleSource extends RuleSource {
                      * dependency after we are not using whole archive anymore because the linker
                      * applies this option to every library after the option is specified.
                      */
-                    "-Wl,--whole-archive,-l${webRtcHome}/${arch}/${webRtcJniStaticLib},"
-                            .toString() + "--no-whole-archive"
+                    "-Wl,--whole-archive,-l${webRtcLibPath},".toString() + "--no-whole-archive"
             ])
         }
     }

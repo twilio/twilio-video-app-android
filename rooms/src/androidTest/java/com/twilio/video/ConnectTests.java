@@ -69,7 +69,6 @@ public class ConnectTests {
 
         VideoClient videoClient = new VideoClient(context, accessManager);
         ConnectOptions connectOptions = new ConnectOptions.Builder()
-                .createRoom(true)
                 .name(TEST_ROOM)
                 .build();
 

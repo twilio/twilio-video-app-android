@@ -131,7 +131,6 @@ public class RoomsActivity extends AppCompatActivity {
         VideoClient.setLogLevel(LogLevel.DEBUG);
         VideoClient videoClient = new VideoClient(this, accessManager);
         ConnectOptions connectOptions = new ConnectOptions.Builder()
-                .createRoom(true)
                 .name(roomEditText.getText().toString())
                 .build();
 
