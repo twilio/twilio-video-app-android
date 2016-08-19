@@ -8,6 +8,7 @@
 #include "video/participant.h"
 
 #include "com_twilio_video_Participant.h"
+#include "com_twilio_video_Media.h"
 
 using namespace webrtc_jni;
 
@@ -141,7 +142,11 @@ protected:
             jstring j_sid = webrtc_jni::JavaStringFromStdString(jni(), participant->getSid());
             jstring j_identity =
                 webrtc_jni::JavaStringFromStdString(jni(), participant->getIdentity());
-            jlong j_media_context = 0;
+            // Get media
+            MediaContext *media_context = new MediaContext();
+            media_context->media = participant->getMedia();
+            jlong j_media_context = webrtc_jni::jlongFromPointer(media_context);
+            // Create participant
             jlong j_participant_context = webrtc_jni::jlongFromPointer(participant_context);
             jobject j_participant =
                 jni()->NewObject(*j_participant_class_, j_participant_ctor_id_,

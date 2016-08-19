@@ -11,7 +11,7 @@ public class Participant {
                 long nativeMediaContext, long nativeParticipantContext) {
         this.identity = identity;
         this.sid = sid;
-        this.media = new Media();
+        this.media = new Media(nativeMediaContext);
         this.nativeParticipantContext = nativeParticipantContext;
     }
 
@@ -33,6 +33,7 @@ public class Participant {
 
     void release(){
         if (nativeParticipantContext != 0) {
+            media.release();
             nativeRelease(nativeParticipantContext);
             nativeParticipantContext = 0;
         }
