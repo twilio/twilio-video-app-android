@@ -39,7 +39,7 @@ public class MediaFactory {
         return instance;
     }
 
-    public LocalMedia createLocalMedia(LocalMedia.Listener listener) {
+    public LocalMedia createLocalMedia() {
         checkReleased("createLocalMedia");
         long nativeLocalMediaHandle = nativeCreateLocalMedia(nativeMediaFactoryHandle);
 
@@ -48,7 +48,7 @@ public class MediaFactory {
             return null;
         }
 
-        return new LocalMedia(nativeLocalMediaHandle, listener);
+        return new LocalMedia(nativeLocalMediaHandle);
     }
 
     public void release() {

@@ -80,7 +80,7 @@ public class VideoConstraintsTests {
 //            }
 //        });
 
-        localMedia.addLocalVideoTrack(localVideoTrack);
+//        localMedia.addLocalVideoTrack(localVideoTrack);
 
         assertTrue(localVideoTrackFailedLatch.await(20, TimeUnit.SECONDS));
     }
@@ -122,7 +122,7 @@ public class VideoConstraintsTests {
 //            }
 //        });
 
-        localMedia.addLocalVideoTrack(localVideoTrack);
+//        localMedia.addLocalVideoTrack(localVideoTrack);
 
         assertTrue(localVideoTrackAddedLatch.await(20, TimeUnit.SECONDS));
 

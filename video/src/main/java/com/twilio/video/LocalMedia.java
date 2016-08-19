@@ -13,180 +13,71 @@ public class LocalMedia {
     private static final Logger logger = Logger.getLogger(LocalMedia.class);
 
     private long nativeLocalMediaHandle;
-    private final List<AudioTrack> audioTracks = new ArrayList<>();
-    private final List<LocalVideoTrack> videoTracks = new ArrayList<>();
-    private boolean audioEnabled;
-    private boolean audioMuted;
-    private LocalMedia.Listener localMediaListener;
+    private final List<LocalAudioTrack> localAudioTracks = new ArrayList<>();
+    private final List<LocalVideoTrack> localVideoTracks = new ArrayList<>();
 
-    LocalMedia(long nativeLocalMediaHandle, LocalMedia.Listener localMediaListener) {
+    LocalMedia(long nativeLocalMediaHandle) {
         this.nativeLocalMediaHandle = nativeLocalMediaHandle;
-        this.localMediaListener = localMediaListener;
-        this.audioEnabled = true;
-        this.audioMuted = false;
     }
 
-    /**
-     * Gets the {@link Listener}
-     *
-     * @return media events listener
-     */
-    public LocalMedia.Listener getLocalMediaListener() {
-        return localMediaListener;
+    public List<LocalAudioTrack> getLocalAudioTracks() {
+        return localAudioTracks;
     }
 
-    /**
-     * Sets the {@link Listener}
-     *
-     * <p>The {@link Listener} is invoked on the thread that provides the
-     * LocalMediaListener instance.</p>
-     *
-     * @param listener A media events listener
-     */
-    public void setLocalMediaListener(LocalMedia.Listener listener) {
-        localMediaListener = listener;
-    }
-
-    /**
-     * Specifies whether or not your local audio should be muted
-     *
-     * @param on <code>true</code> if local audio should be muted, false otherwise
-     * @return <code>true</code> if mute operation is successful
-     */
-    public boolean mute(boolean on) {
-        // TODO: impelement me
-        return false;
-    }
-
-    /**
-     * Indicates whether your local audio is muted.
-     *
-     * @return <code>true</code> if local audio is muted, false otherwise
-     */
-    public boolean isMuted() {
-        return audioMuted;
-    }
-
-    /**
-     * Returns the local video tracks
-     *
-     * @return list of local video tracks
-     */
     public List<LocalVideoTrack> getLocalVideoTracks() {
-        return new ArrayList<>(videoTracks);
+        return localVideoTracks;
     }
 
-    /**
-     * Adds a local video track to list of tracks.
-     *
-     * <p>The result of this operation will propagate via {@link LocalMedia.Listener}. A
-     * successful addition of the local video track will invoke
-     * {@link LocalMedia.Listener#onLocalVideoTrackAdded(LocalMedia, LocalVideoTrack)}. If any
-     * problems occur adding the video track then
-     * {@link LocalMedia.Listener#onLocalVideoTrackError(LocalMedia, LocalVideoTrack,
-     * VideoException)} will be invoked.</p>
-     *
-     * @param localVideoTrack The local video track to be added.
-     */
-    public void addLocalVideoTrack(final LocalVideoTrack localVideoTrack)
-            throws IllegalArgumentException, UnsupportedOperationException {
-        // TODO: implement me
+    public LocalAudioTrack addAudioTrack(boolean enabled) {
+        return addAudioTrack(enabled, nativeGetDefaultAudioOptions());
     }
 
-    /**
-     * Removes the local video track from list of tracks.
-     *
-     * <p>The result of this operation will propagate via {@link LocalMedia.Listener}. A
-     * successful removal of the local video track will invoke
-     * {@link LocalMedia.Listener#onLocalVideoTrackRemoved(LocalMedia, LocalVideoTrack)}. If any
-     * problems occur removing the video track then
-     * {@link LocalMedia.Listener#onLocalVideoTrackError(LocalMedia, LocalVideoTrack,
-     * VideoException)} will be invoked.</p>
-     *
-     * @param localVideoTrack The local video track to be removed
-     */
-    public void removeLocalVideoTrack(LocalVideoTrack localVideoTrack) throws IllegalArgumentException {
-        if (videoTracks.size() == 0) {
-            logger.w("There are no local video tracks in the list");
-            return;
-        } else if (!videoTracks.contains(localVideoTrack)) {
-            logger.w("The specified local video track was not found");
-            return;
-        }
-        // TODO: implement me
-    }
-
-    /**
-     * Enables local audio to media session. {@link android.Manifest.permission#RECORD_AUDIO}
-     * permission must be granted prior to invoking
-     *
-     * @return true if local audio is enabled
-     */
-    public boolean addMicrophone() {
-        if (!audioEnabled) {
-            audioEnabled = enableAudio(true);
-            return audioEnabled;
-        } else {
-            return false;
-        }
-    }
-
-    /**
-     * Disables local audio from the media session.
-     *
-     * @return true if local audio is disabled
-     */
-    public boolean removeMicrophone() {
-        if (audioEnabled) {
-            audioEnabled = !enableAudio(false);
-            return !audioEnabled;
-        } else {
-            return false;
-        }
-    }
-
-    /**
-     * Indicates whether or not your local
-     * audio is enabled in the media session
-     *
-     * @return true if local audio is enabled
-     */
-    public boolean isMicrophoneAdded() {
-        return audioEnabled;
-    }
-
-    public void addAudioTrack() {
+    public LocalAudioTrack addAudioTrack(boolean enabled, AudioOptions audioOptions) {
         checkReleased("addAudioTrack");
-        long nativeAudioTrack = nativeAddAudioTrack(nativeLocalMediaHandle);
+        long nativeAudioTrack = nativeAddAudioTrack(nativeLocalMediaHandle, enabled, audioOptions);
+        LocalAudioTrack localAudioTrack = null;
 
-        if (nativeAudioTrack != 0 && localMediaListener != null) {
+        if (nativeAudioTrack != 0) {
             org.webrtc.AudioTrack webRtcAudioTrack = new org.webrtc.AudioTrack(nativeAudioTrack);
-            AudioTrack audioTrack = new AudioTrack(webRtcAudioTrack, null);
+            localAudioTrack = new LocalAudioTrack(webRtcAudioTrack, null);
 
-            audioTracks.add(audioTrack);
-            localMediaListener.onLocalAudioTrackAdded(audioTrack);
-        } else if (nativeAudioTrack == 0 && localMediaListener != null) {
-            // TODO add local audio track error
-            localMediaListener.onLocalAudioTrackError();
+            localAudioTrack.enable(enabled);
+            localAudioTracks.add(localAudioTrack);
+            return localAudioTrack;
+        } else if (nativeAudioTrack == 0) {
+            logger.e("Failed to create local audio track");
         }
+
+        return localAudioTrack;
     }
 
-    public void addVideoTrack() {
+    public boolean removeAudioTrack(LocalAudioTrack localAudioTrack) {
+        // TODO
+        return true;
+    }
 
+    public LocalVideoTrack addVideoTrack(boolean enabled) {
+        // TODO: get default video constraints
+        return addVideoTrack(enabled, null);
+    }
+
+    public LocalVideoTrack addVideoTrack(boolean enabled, VideoConstraints videoConstraints) {
+        // TODO: implement me
+        return null;
+    }
+
+    public boolean removeLocalVideoTrack(LocalVideoTrack localVideoTrack) {
+        // TODO: implement me
+        return true;
     }
 
     public void release() {
         if (nativeLocalMediaHandle != 0) {
             nativeRelease(nativeLocalMediaHandle);
             nativeLocalMediaHandle = 0;
-            audioTracks.clear();
-            videoTracks.clear();
+            localAudioTracks.clear();
+            localVideoTracks.clear();
         }
-    }
-
-    private boolean enableAudio(boolean enable) {
-        // TODO: implement me
-        return false;
     }
 
     private void checkReleased(String methodName) {
@@ -197,48 +88,9 @@ public class LocalMedia {
         }
     }
 
-    private native long nativeAddAudioTrack(long nativeLocalMediaHandle);
+    private static native AudioOptions nativeGetDefaultAudioOptions();
+    private native long nativeAddAudioTrack(long nativeLocalMediaHandle,
+                                            boolean enabled,
+                                            AudioOptions audioOptions);
     private native void nativeRelease(long nativeLocalMediaHandle);
-
-    public interface Listener {
-        // Flesh these out
-        void onLocalAudioTrackAdded(AudioTrack localAudioTrack);
-        void onLocalAudioTrackError();
-
-        /**
-         * This method notifies the listener when a {@link LocalVideoTrack} has been added
-         * to the {@link LocalMedia}
-         *
-         * @param localMedia The local media associated with this track.
-         * @param videoTrack The local video track that was added to the conversation.
-         */
-        void onLocalVideoTrackAdded(LocalMedia localMedia, LocalVideoTrack videoTrack);
-
-        /**
-         * This method notifies the listener when a {@link LocalVideoTrack} has been removed
-         * from the {@link LocalMedia}
-         *
-         * @param localMedia The local media associated with this track.
-         * @param videoTrack The local video track that was removed from the conversation.
-         */
-        void onLocalVideoTrackRemoved(LocalMedia localMedia, LocalVideoTrack videoTrack);
-
-        /**
-         * This method notifies the listener when an error occurred when
-         * attempting to add or remove a {@link LocalVideoTrack}
-         * @param localMedia The {@link LocalMedia} associated with the {@link LocalVideoTrack}
-         * @param track The {@link LocalVideoTrack} that was requested to be added or removed to
-         *              the {@link LocalMedia}
-         * @param exception Provides the error that occurred while attempting to add or remove
-         *                  this {@link LocalVideoTrack}. Adding or removing a local video track
-         *                  can result in {@link VideoClient#TOO_MANY_TRACKS},
-         *                  {@link VideoClient#TRACK_OPERATION_IN_PROGRESS},
-         *                  {@link VideoClient#INVALID_VIDEO_CAPTURER},
-         *                  {@link VideoClient#INVALID_VIDEO_TRACK_STATE},
-         *                  or {@link VideoClient#TRACK_CREATION_FAILED}.
-         */
-        void onLocalVideoTrackError(LocalMedia localMedia,
-                                    LocalVideoTrack track,
-                                    VideoException exception);
-    }
 }

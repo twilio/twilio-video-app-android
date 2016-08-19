@@ -14,6 +14,8 @@ import org.junit.runner.RunWith;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
+import static junit.framework.TestCase.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -28,7 +30,7 @@ public class LocalMediaTest {
     public void setup() {
         context = InstrumentationRegistry.getInstrumentation().getTargetContext();
         mediaFactory = MediaFactory.instance(context);
-        localMedia = mediaFactory.createLocalMedia(null);
+        localMedia = mediaFactory.createLocalMedia();
     }
 
     @After
@@ -44,93 +46,56 @@ public class LocalMediaTest {
     }
 
     @Test
-    public void canAddAudioTrack() throws InterruptedException {
-        final CountDownLatch audioTrackAdded = new CountDownLatch(1);
-        localMedia.setLocalMediaListener(new LocalMedia.Listener() {
-            @Override
-            public void onLocalAudioTrackAdded(AudioTrack localAudioTrack) {
-                audioTrackAdded.countDown();
+    public void canAddEnabledAudioTrack() {
+        boolean expectedEnabled = true;
+        LocalAudioTrack localAudioTrack = localMedia.addAudioTrack(expectedEnabled);
 
-            }
-
-            @Override
-            public void onLocalAudioTrackError() {
-
-            }
-
-            @Override
-            public void onLocalVideoTrackAdded(LocalMedia localMedia,
-                                               LocalVideoTrack videoTrack) {
-                fail("Expected audio track added event but received video track added");
-            }
-
-            @Override
-            public void onLocalVideoTrackRemoved(LocalMedia localMedia,
-                                                 LocalVideoTrack videoTrack) {
-                fail("Expected audio track added event but received video track removed");
-
-            }
-
-            @Override
-            public void onLocalVideoTrackError(LocalMedia localMedia,
-                                               LocalVideoTrack track,
-                                               VideoException exception) {
-                fail("Expected audio track added event but received video track error");
-            }
-        });
-        localMedia.addAudioTrack();
-        assertTrue(audioTrackAdded.await(5, TimeUnit.SECONDS));
+        assertNotNull(localAudioTrack);
+        assertEquals(expectedEnabled, localAudioTrack.isEnabled());
+        assertEquals(1, localMedia.getLocalAudioTracks().size());
     }
 
-    // FIXME we should support multiple audio tracks
     @Test
-    @Ignore
+    public void canAddDisabledAudioTrack() {
+        boolean expectedEnabled = false;
+        LocalAudioTrack localAudioTrack = localMedia.addAudioTrack(expectedEnabled);
+
+        assertNotNull(localAudioTrack);
+        assertEquals(expectedEnabled, localAudioTrack.isEnabled());
+        assertEquals(1, localMedia.getLocalAudioTracks().size());
+    }
+
+    @Test
+    public void canAddAudioTrackWithOptions() {
+        AudioOptions audioOptions = new AudioOptions.Builder()
+                .echoCancellation(true)
+                .autoGainControl(true)
+                .typingDetection(true)
+                .build();
+        LocalAudioTrack localAudioTrack = localMedia.addAudioTrack(true, audioOptions);
+
+        assertNotNull(localAudioTrack);
+    }
+
+    @Test
     public void canAddMultipleAudioTracks() throws InterruptedException {
         int numAudioTracks = 5;
-        final CountDownLatch audioTracksAdded = new CountDownLatch(numAudioTracks);
-        localMedia.setLocalMediaListener(new LocalMedia.Listener() {
-            @Override
-            public void onLocalAudioTrackAdded(AudioTrack localAudioTrack) {
-                audioTracksAdded.countDown();
-
-            }
-
-            @Override
-            public void onLocalAudioTrackError() {
-                fail("Expected audio track added event but received audio track error");
-            }
-
-            @Override
-            public void onLocalVideoTrackAdded(LocalMedia localMedia,
-                                               LocalVideoTrack videoTrack) {
-                fail("Expected audio track added event but received video track added");
-            }
-
-            @Override
-            public void onLocalVideoTrackRemoved(LocalMedia localMedia,
-                                                 LocalVideoTrack videoTrack) {
-                fail("Expected audio track added event but received video track removed");
-            }
-
-            @Override
-            public void onLocalVideoTrackError(LocalMedia localMedia,
-                                               LocalVideoTrack track,
-                                               VideoException exception) {
-                fail("Expected audio track added event but received video track error");
-            }
-        });
+        boolean[] expectedEnabled = new boolean[]{ false, true, true, false, false };
 
         for (int i = 0 ; i < numAudioTracks ; i++) {
-            localMedia.addAudioTrack();
-        }
+            LocalAudioTrack localAudioTrack = localMedia.addAudioTrack(expectedEnabled[i]);
+            int expectedSize = i + 1;
 
-        assertTrue(audioTracksAdded.await(5, TimeUnit.SECONDS));
+            assertNotNull(localAudioTrack);
+            assertEquals(expectedEnabled[i], localAudioTrack.isEnabled());
+            assertEquals(expectedSize, localMedia.getLocalAudioTracks().size());
+        }
     }
 
     @Test(expected = IllegalStateException.class)
     public void addAudioTrack_shouldFailAfterRelease() {
         localMedia.release();
-        localMedia.addAudioTrack();
+        localMedia.addAudioTrack(false);
     }
 
     @Test
@@ -142,8 +107,6 @@ public class LocalMediaTest {
     public void canAddAudioAndVideoTrack() {
         // TODO
     }
-
-
 
     @Test
     public void canAddMultipleVideoTracks() {

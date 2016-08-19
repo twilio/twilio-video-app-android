@@ -31,7 +31,7 @@ public class MediaFactoryTest {
 
     @Test
     public void canCreateLocalMedia() {
-        LocalMedia localMedia = mediaFactory.createLocalMedia(null);
+        LocalMedia localMedia = mediaFactory.createLocalMedia();
 
         localMedia.release();
         assertNotNull(localMedia);
@@ -46,6 +46,6 @@ public class MediaFactoryTest {
     @Test(expected = IllegalStateException.class)
     public void failsWhenCreatingLocalMediaAfterRelease() {
         mediaFactory.release();
-        mediaFactory.createLocalMedia(null);
+        mediaFactory.createLocalMedia();
     }
 }

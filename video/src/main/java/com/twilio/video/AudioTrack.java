@@ -4,7 +4,7 @@ package com.twilio.video;
  * An audio track represents a single local or remote audio source
  */
 public class AudioTrack implements MediaTrack {
-    private org.webrtc.AudioTrack audioTrack;
+    org.webrtc.AudioTrack audioTrack;
     private TrackInfo trackInfo;
     private MediaTrackState trackState;
 
