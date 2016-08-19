@@ -35,6 +35,15 @@ JNIEXPORT jlong JNICALL Java_com_twilio_video_LocalMedia_nativeAddAudioTrack(JNI
     return webrtc_jni::jlongFromPointer(audio_track.get()->getWebrtcTrack());
 }
 
+JNIEXPORT jboolean JNICALL Java_com_twilio_video_LocalMedia_nativeRemoveAudioTrack(JNIEnv *jni,
+                                                                                   jobject j_local_media,
+                                                                                   jlong local_media_handle,
+                                                                                   jstring track_id) {
+    LocalMedia* local_media = getLocalMedia(local_media_handle);
+
+    return local_media->removeAudioTrack(webrtc_jni::JavaToStdString(jni, track_id));
+}
+
 JNIEXPORT void JNICALL Java_com_twilio_video_LocalMedia_nativeRelease(JNIEnv *jni,
                                                                       jobject j_local_media,
                                                                       jlong local_media_handle) {

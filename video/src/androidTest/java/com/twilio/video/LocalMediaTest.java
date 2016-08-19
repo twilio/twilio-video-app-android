@@ -78,7 +78,20 @@ public class LocalMediaTest {
     }
 
     @Test
-    public void canAddMultipleAudioTracks() throws InterruptedException {
+    public void canRemoveAudioTrack() {
+        LocalAudioTrack localAudioTrack = localMedia.addAudioTrack(true);
+
+        // Validate the track was added
+        assertNotNull(localAudioTrack);
+        assertEquals(1, localMedia.getLocalAudioTracks().size());
+
+        // Now remove and validate it is gone
+        assertTrue(localMedia.removeAudioTrack(localAudioTrack));
+        assertEquals(0, localMedia.getLocalAudioTracks().size());
+    }
+
+    @Test
+    public void canAddMultipleAudioTracks() {
         int numAudioTracks = 5;
         boolean[] expectedEnabled = new boolean[]{ false, true, true, false, false };
 
@@ -92,10 +105,38 @@ public class LocalMediaTest {
         }
     }
 
+    @Test
+    public void canAddAndRemoveMultipleAudioTracks() {
+        int numAudioTracks = 5;
+        LocalAudioTrack[] localAudioTracks = new LocalAudioTrack[numAudioTracks];
+
+        for (int i = 0 ; i < numAudioTracks ; i++) {
+            int expectedSize = i + 1;
+
+            localAudioTracks[i] = localMedia.addAudioTrack(false);
+            assertNotNull(localAudioTracks[i]);
+            assertEquals(expectedSize, localMedia.getLocalAudioTracks().size());
+        }
+
+        for (int i = numAudioTracks - 1 ; i >= 0 ; i--) {
+            int expectedSize = i;
+            assertTrue(localMedia.removeAudioTrack(localAudioTracks[i]));
+            assertEquals(expectedSize, localMedia.getLocalAudioTracks().size());
+        }
+    }
+
     @Test(expected = IllegalStateException.class)
     public void addAudioTrack_shouldFailAfterRelease() {
         localMedia.release();
         localMedia.addAudioTrack(false);
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void removeAudioTrack_shouldFailAfterRelease() {
+        LocalAudioTrack localAudioTrack = localMedia.addAudioTrack(false);
+        assertNotNull(localAudioTrack);
+        localMedia.release();
+        localMedia.removeAudioTrack(localAudioTrack);
     }
 
     @Test

@@ -5,9 +5,6 @@ import com.twilio.video.internal.Logger;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Provides local video and audio tracks associated with a {@link Participant}
- */
 public class LocalMedia {
     private static final String RELEASE_MESSAGE_TEMPLATE = "LocalMedia released %s unavailable";
     private static final Logger logger = Logger.getLogger(LocalMedia.class);
@@ -52,8 +49,17 @@ public class LocalMedia {
     }
 
     public boolean removeAudioTrack(LocalAudioTrack localAudioTrack) {
-        // TODO
-        return true;
+        checkReleased("removeAudioTrack");
+        boolean result = nativeRemoveAudioTrack(nativeLocalMediaHandle,
+                localAudioTrack.getTrackId());
+
+        if (!result) {
+            logger.e("Failed to remove audio track");
+        } else {
+            localAudioTracks.remove(localAudioTrack);
+        }
+
+        return result;
     }
 
     public LocalVideoTrack addVideoTrack(boolean enabled) {
@@ -92,5 +98,6 @@ public class LocalMedia {
     private native long nativeAddAudioTrack(long nativeLocalMediaHandle,
                                             boolean enabled,
                                             AudioOptions audioOptions);
+    private native boolean nativeRemoveAudioTrack(long nativeLocalMediaHandle, String trackId);
     private native void nativeRelease(long nativeLocalMediaHandle);
 }
