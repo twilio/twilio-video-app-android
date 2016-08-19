@@ -32,6 +32,10 @@ public class AudioTrack implements MediaTrack {
         trackState = MediaTrackState.STARTED;
     }
 
+    org.webrtc.AudioTrack getWebrtcTrack() {
+        return audioTrack;
+    }
+
     TrackInfo getTrackInfo() {
         return trackInfo;
     }

@@ -18,6 +18,7 @@
 #include "video/connect_options.h"
 #include "com_twilio_video_ConnectOptions.h"
 #include "com_twilio_video_Room.h"
+#include "com_twilio_video_MediaFactory.h"
 
 #include <memory>
 
@@ -67,21 +68,6 @@ JNIEXPORT jint JNICALL Java_com_twilio_video_VideoClient_nativeGetCoreLogLevel
     return Logger::instance()->getLogLevel();
 }
 
-JNIEXPORT jboolean JNICALL
-Java_com_twilio_video_VideoClient_nativeInitialize(JNIEnv *env, jobject instance, jobject context) {
-    bool failure = false;
-
-    // Setup media related Android device objects
-    if (!media_jvm_set) {
-        failure |= webrtc::OpenSLESPlayer::SetAndroidAudioDeviceObjects(GetJVM(), context);
-        failure |= webrtc::VoiceEngine::SetAndroidObjects(GetJVM(), context);
-        failure |= webrtc_jni::AndroidVideoCapturerJni::SetAndroidObjects(env, context);
-        media_jvm_set = true;
-    }
-
-    return !failure;
-}
-
 class ClientContext {
 public:
     ClientContext( std::unique_ptr<twilio::video::Client> client,
@@ -103,7 +89,7 @@ public:
     std::shared_ptr<twilio::media::MediaFactory> getMediaFactory() const {
         return media_factory_;
     }
- private:
+private:
     std::unique_ptr<twilio::video::Client> client_;
     std::shared_ptr<twilio::media::MediaFactory> media_factory_;
     twilio::video::Invoker *invoker_;
@@ -113,7 +99,7 @@ JNIEXPORT jlong JNICALL
 Java_com_twilio_video_VideoClient_nativeCreateClient(JNIEnv *env,
                                                      jobject j_instance,
                                                      jobject j_access_manager,
-                                                     jobject j_media_factory) {
+                                                     jlong media_factory_handle) {
 
     // Get native AccessManager shared_ptr from java object
     // Call the private method to get the native handle
@@ -126,11 +112,8 @@ Java_com_twilio_video_VideoClient_nativeCreateClient(JNIEnv *env,
     std::shared_ptr<TwilioCommon::AccessManager> access_manager =
         *(reinterpret_cast<std::shared_ptr<TwilioCommon::AccessManager> *>(j_access_mgr_handle));
 
-    // TODO: Obtain media from j_media_factory once it gets implemented
-    // Creating media here until then
-    twilio::media::MediaOptions media_options;
     std::shared_ptr<twilio::media::MediaFactory> media_factory =
-        twilio::media::MediaFactory::create(media_options);
+            twilio_video_jni::getMediaFactory(media_factory_handle);
 
     twilio::video::Invoker *invoker = new twilio::video::Invoker();
 
