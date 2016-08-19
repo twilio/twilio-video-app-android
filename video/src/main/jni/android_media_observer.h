@@ -64,7 +64,7 @@ public:
             webrtc_jni::GetMethodID(env,
                                     *j_video_track_class_,
                                     "<init>",
-                                    "(Ljava/lang/String;)V")) {
+                                    "(JLjava/lang/String;ZJ)V")) {
         TS_CORE_LOG_MODULE(kTSCoreLogModulePlatform,
                            kTSCoreLogLevelDebug,
                            "AndroidMediaObserver");
@@ -106,8 +106,7 @@ protected:
             jboolean j_is_enabled = track->isEnabled();
 
             jobject j_audio_track =
-                jni()->NewObject(*j_audio_track_class_, j_audio_track_ctor_id_,
-                                 j_audio_track_context, j_track_id, j_is_enabled, j_webrtc_track);
+                createJavaAudioTrack(jni(), track, *j_audio_track_class_, j_audio_track_ctor_id_);
 
             jni()->CallVoidMethod(*j_media_observer_, j_on_audio_track_added_, j_audio_track);
             CHECK_EXCEPTION(jni()) << "error during CallVoidMethod";
@@ -147,16 +146,8 @@ protected:
                 return;
             }
 
-            VideoTrackContext *video_track_context = new VideoTrackContext();
-            video_track_context->video_track = track;
-            jlong j_video_track_context = webrtc_jni::jlongFromPointer(video_track_context);
-            jstring j_track_id = webrtc_jni::JavaStringFromStdString(jni(), track->getTrackId());
-            jlong j_webrtc_track = webrtc_jni::jlongFromPointer(track->getWebrtcTrack());
-            jboolean j_is_enabled = track->isEnabled();
-
             jobject j_video_track =
-                jni()->NewObject(*j_video_track_class_, j_video_track_ctor_id_,
-                                 j_video_track_context, j_track_id, j_is_enabled, j_webrtc_track);
+                createJavaVideoTrack(jni(), track, *j_video_track_class_, j_video_track_ctor_id_);
 
             jni()->CallVoidMethod(*j_media_observer_, j_on_video_track_added_, j_video_track);
             CHECK_EXCEPTION(jni()) << "error during CallVoidMethod";

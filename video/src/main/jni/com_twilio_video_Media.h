@@ -21,6 +21,22 @@ struct VideoTrackContext {
     std::shared_ptr<twilio::media::VideoTrack> video_track;
 };
 
+jobject createJavaAudioTrack(JNIEnv *env,
+                             std::shared_ptr<twilio::media::AudioTrack> audio_track,
+                             jclass j_audio_track_class, jmethodID j_audio_track_ctor_id);
+
+jobject createJavaVideoTrack(JNIEnv *env,
+                             std::shared_ptr<twilio::media::VideoTrack> video_track,
+                             jclass j_video_track_class, jmethodID j_video_track_ctor_id);
+
+/*
+ * Class:     com_twilio_video_Media
+ * Method:    nativeSetInternalListener
+ * Signature: (JJ)V
+ */
+JNIEXPORT void JNICALL Java_com_twilio_video_Media_nativeSetInternalListener
+    (JNIEnv *, jobject, jlong, jlong);
+
 /*
  * Class:     com_twilio_video_Media_InternalMediaListenerHandle
  * Method:    nativeCreate

@@ -22,6 +22,14 @@ public class VideoTrack {
     private boolean isEnabled;
     private long nativeVideoTrackContext;
 
+    VideoTrack(long nativeVideoTrackContext, String trackId,
+               boolean isEnabled, long nativeWebrtcTrack) {
+        this.nativeVideoTrackContext = nativeVideoTrackContext;
+        this.trackId = trackId;
+        this.isEnabled = isEnabled;
+        this.webrtcVideoTrack = new org.webrtc.VideoTrack(nativeWebrtcTrack);
+    }
+
     /**
      * Add a video renderer to get video from the video track
      *
@@ -97,13 +105,6 @@ public class VideoTrack {
 //        trackState = MediaTrackState.STARTED;
 //    }
 
-    VideoTrack(long nativeVideoTrackContext, String trackId,
-               boolean isEnabled, long nativeWebrtcTrack) {
-        this.nativeVideoTrackContext = nativeVideoTrackContext;
-        this.trackId = trackId;
-        this.isEnabled = isEnabled;
-        this.webrtcVideoTrack = new org.webrtc.VideoTrack(nativeWebrtcTrack);
-    }
 
 //    void setWebrtcVideoTrack(org.webrtc.VideoTrack videoTrack) {
 //        this.videoTrack = videoTrack;

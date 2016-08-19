@@ -8,10 +8,10 @@ public class Participant {
     private long nativeParticipantContext;
 
     Participant(String identity, String sid,
-                long nativeMediaContext, long nativeParticipantContext) {
+                Media media, long nativeParticipantContext) {
         this.identity = identity;
         this.sid = sid;
-        this.media = new Media(nativeMediaContext);
+        this.media = media;
         this.nativeParticipantContext = nativeParticipantContext;
     }
 

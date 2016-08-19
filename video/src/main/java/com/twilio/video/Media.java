@@ -92,8 +92,14 @@ public class Media {
     private InternalMediaListenerHandle internalMediaListenerHandle;
     private Listener listener;
 
-    Media(long nativeMediaContext) {
+    Media(long nativeMediaContext, List<AudioTrack> audioTracks, List<VideoTrack> videoTracks) {
         this.nativeMediaContext = nativeMediaContext;
+        this.audioTracks = audioTracks;
+        this.videoTracks = videoTracks;
+        internalMediaListenerImpl = new InternalMediaListenerImpl();
+        internalMediaListenerHandle =
+                new InternalMediaListenerHandle(internalMediaListenerImpl);
+        nativeSetInternalListener(nativeMediaContext, internalMediaListenerHandle.get());
     }
 
     public AudioTrack getAudioTrack(String trackId) {
@@ -252,4 +258,7 @@ public class Media {
 
 
     }
+
+    private native void nativeSetInternalListener(
+            long nativeMediaContext, long nativeInternalListener);
 }
