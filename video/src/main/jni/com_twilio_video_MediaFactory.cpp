@@ -36,7 +36,7 @@ JNIEXPORT jlong JNICALL Java_com_twilio_video_MediaFactory_nativeCreate(JNIEnv *
         }
     }
 
-    // TODO set encoder and decoder options
+    // TODO: Set encoder and decoder options
     twilio::media::MediaOptions media_options;
     std::shared_ptr<twilio::media::MediaFactory> media_factory =
             twilio::media::MediaFactory::create(media_options);
@@ -52,7 +52,7 @@ JNIEXPORT jlong JNICALL Java_com_twilio_video_MediaFactory_nativeCreateLocalMedi
     if (media_factory_handle != 0) {
         std::shared_ptr<twilio::media::MediaFactory> media_factory = getMediaFactory(media_factory_handle);
 
-        // TODO support passing a name in
+        // TODO: Support passing a name in
         std::shared_ptr<twilio::media::LocalMedia> local_media = media_factory->createLocalMedia("local media");
         LocalMediaContext* local_media_context = new LocalMediaContext(local_media);
         local_media_handle = webrtc_jni::jlongFromPointer(local_media_context);
