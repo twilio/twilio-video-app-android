@@ -44,8 +44,21 @@ public class MediaFactoryTest {
     }
 
     @Test(expected = IllegalStateException.class)
-    public void failsWhenCreatingLocalMediaAfterRelease() {
-        mediaFactory.release();
+    public void createLocalMedia_shouldFailAfterAllLocalMediasHaveBeenReleased() {
+        int numLocalMedias = 10;
+        LocalMedia[] localMedias = new LocalMedia[numLocalMedias];
+
+        // Create local medias
+        for (int i = 0 ; i < numLocalMedias ; i++) {
+            localMedias[i] = mediaFactory.createLocalMedia();
+        }
+
+        // Destroy local medias
+        for (int i = 0 ; i < numLocalMedias ; i++) {
+            localMedias[i].release();
+        }
+
+        // With all local medias released this should raise exception
         mediaFactory.createLocalMedia();
     }
 }

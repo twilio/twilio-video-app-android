@@ -23,20 +23,17 @@ import static org.junit.Assert.fail;
 @LargeTest
 public class LocalMediaTest {
     private Context context;
-    private MediaFactory mediaFactory;
     private LocalMedia localMedia;
 
     @Before
     public void setup() {
         context = InstrumentationRegistry.getInstrumentation().getTargetContext();
-        mediaFactory = MediaFactory.instance(context);
-        localMedia = mediaFactory.createLocalMedia();
+        localMedia = LocalMedia.create(context);
     }
 
     @After
     public void teardown() {
         localMedia.release();
-        mediaFactory.release();
     }
 
     @Test(expected = IllegalStateException.class)

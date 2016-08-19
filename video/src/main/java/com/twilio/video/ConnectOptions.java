@@ -29,7 +29,8 @@ public class ConnectOptions {
     }
 
     private native long nativeCreate(String name,
-                                     LocalMedia localMedia, IceOptions iceOptions);
+                                     LocalMedia localMedia,
+                                     IceOptions iceOptions);
 
 
     public static class Builder {

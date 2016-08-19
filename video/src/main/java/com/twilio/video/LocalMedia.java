@@ -1,5 +1,7 @@
 package com.twilio.video;
 
+import android.content.Context;
+
 import com.twilio.video.internal.Logger;
 
 import java.util.ArrayList;
@@ -12,9 +14,15 @@ public class LocalMedia {
     private long nativeLocalMediaHandle;
     private final List<LocalAudioTrack> localAudioTracks = new ArrayList<>();
     private final List<LocalVideoTrack> localVideoTracks = new ArrayList<>();
+    private final MediaFactory mediaFactory;
 
-    LocalMedia(long nativeLocalMediaHandle) {
+    public static LocalMedia create(Context context) {
+        return MediaFactory.instance(context).createLocalMedia();
+    }
+
+    LocalMedia(long nativeLocalMediaHandle, MediaFactory mediaFactory) {
         this.nativeLocalMediaHandle = nativeLocalMediaHandle;
+        this.mediaFactory = mediaFactory;
     }
 
     public List<LocalAudioTrack> getLocalAudioTracks() {
@@ -87,6 +95,7 @@ public class LocalMedia {
             nativeLocalMediaHandle = 0;
             localAudioTracks.clear();
             localVideoTracks.clear();
+            mediaFactory.release();
         }
     }
 

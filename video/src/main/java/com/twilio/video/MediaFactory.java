@@ -6,15 +6,16 @@ import android.content.Context;
 import com.twilio.video.internal.Logger;
 import com.twilio.video.internal.ReLinker;
 
-public class MediaFactory {
+class MediaFactory {
     private static final String RELEASE_MESSAGE_TEMPLATE = "MediaFactory released %s unavailable";
     private static volatile boolean libraryIsLoaded = false;
     private static final Logger logger = Logger.getLogger(MediaFactory.class);
     private volatile static MediaFactory instance;
+    private volatile static int mediaFactoryRefCount = 0;
 
     private long nativeMediaFactoryHandle;
 
-    public static MediaFactory instance(Context context) {
+    static MediaFactory instance(Context context) {
         if (context == null) {
             throw new NullPointerException("context must not be null");
         }
@@ -39,7 +40,7 @@ public class MediaFactory {
         return instance;
     }
 
-    public LocalMedia createLocalMedia() {
+    LocalMedia createLocalMedia() {
         checkReleased("createLocalMedia");
         long nativeLocalMediaHandle = nativeCreateLocalMedia(nativeMediaFactoryHandle);
 
@@ -47,14 +48,18 @@ public class MediaFactory {
             logger.e("Failed to instance LocalMedia");
             return null;
         }
+        synchronized (MediaFactory.class) {
+            mediaFactoryRefCount++;
+        }
 
-        return new LocalMedia(nativeLocalMediaHandle);
+        return new LocalMedia(nativeLocalMediaHandle, this);
     }
 
-    public void release() {
+    void release() {
         if (instance != null) {
             synchronized (MediaFactory.class) {
-                if (instance != null) {
+                mediaFactoryRefCount = Math.max(0, --mediaFactoryRefCount);
+                if (instance != null && mediaFactoryRefCount == 0) {
                     nativeRelease(nativeMediaFactoryHandle);
                     nativeMediaFactoryHandle = 0;
                     instance = null;
