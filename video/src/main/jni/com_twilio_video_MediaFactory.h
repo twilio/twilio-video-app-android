@@ -15,15 +15,16 @@ namespace media {
 class MediaFactoryContext {
 public:
     MediaFactoryContext(MediaOptions media_options, std::shared_ptr<MediaFactory> media_factory) :
-            media_factory_(media_factory),
-            media_options_(media_options) {
+            media_options_(media_options),
+            media_factory_(media_factory) {
 
     }
 
     virtual ~MediaFactoryContext() {
         media_factory_.reset();
         if (media_options_.audio_device_module != nullptr) {
-            delete media_options_.audio_device_module;
+            // TODO for some reason this causes compilation issues
+            //  delete media_options_.audio_device_module;
         }
         if (media_options_.video_encoder_factory != nullptr) {
             delete media_options_.video_encoder_factory;
@@ -41,6 +42,7 @@ private:
     std::shared_ptr<MediaFactory> media_factory_;
 };
 
+std::shared_ptr<MediaFactory> getMediaFactory(jlong);
 JNIEXPORT jlong JNICALL Java_com_twilio_video_MediaFactory_nativeCreate(JNIEnv *, jobject, jobject);
 JNIEXPORT jlong JNICALL Java_com_twilio_video_MediaFactory_nativeCreateLocalMedia(JNIEnv *,
                                                                                   jobject,

@@ -63,6 +63,10 @@ public class MediaFactory {
         }
     }
 
+    long getNativeMediaFactoryHandle() {
+        return nativeMediaFactoryHandle;
+    }
+
     private MediaFactory(long nativeMediaFactoryHandle) {
         this.nativeMediaFactoryHandle = nativeMediaFactoryHandle;
     }

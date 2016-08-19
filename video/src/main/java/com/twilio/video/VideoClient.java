@@ -138,11 +138,8 @@ public class VideoClient {
             trySetCoreModuleLogLevel(module.ordinal(), moduleLogLevel.get(module).ordinal());
         }
 
-        if (!nativeInitialize(applicationContext)) {
-            throw new RuntimeException("Failed to initialize the Video VideoClient");
-        }
-        nativeClientContext = nativeCreateClient(accessManager, null);
-
+        nativeClientContext = nativeCreateClient(accessManager,
+                MediaFactory.instance(context).getNativeMediaFactoryHandle());
     }
 
     /**
@@ -344,9 +341,8 @@ public class VideoClient {
 
     private native static int nativeGetCoreLogLevel();
 
-    private native boolean nativeInitialize(Context context);
-
-    private native long nativeCreateClient(AccessManager accessManager, MediaFactory mediaFactory);
+    private native long nativeCreateClient(AccessManager accessManager,
+                                           long nativeMediaFactoryHandle);
 
     private native long nativeConnect(long nativeClientDataHandler,
                                       long nativeRoomListenerHandle,

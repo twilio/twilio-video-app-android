@@ -12,6 +12,13 @@ namespace media {
 
 static bool media_jvm_set = false;
 
+std::shared_ptr<MediaFactory> getMediaFactory(jlong media_factory_handle) {
+    MediaFactoryContext *media_factory_context =
+            reinterpret_cast<MediaFactoryContext *>(media_factory_handle);
+
+    return media_factory_context->getMediaFactory();
+}
+
 JNIEXPORT jlong JNICALL Java_com_twilio_video_MediaFactory_nativeCreate(JNIEnv *jni,
                                                                         jobject j_media_factory,
                                                                         jobject context) {
@@ -44,9 +51,7 @@ JNIEXPORT jlong JNICALL Java_com_twilio_video_MediaFactory_nativeCreateLocalMedi
     jlong local_media_handle = 0;
 
     if (media_factory_handle != 0) {
-        MediaFactoryContext *media_factory_context =
-                reinterpret_cast<MediaFactoryContext *>(media_factory_handle);
-        std::shared_ptr<MediaFactory> media_factory = media_factory_context->getMediaFactory();
+        std::shared_ptr<MediaFactory> media_factory = getMediaFactory(media_factory_handle);
 
         // TODO support passing a name in
         std::shared_ptr<LocalMedia> local_media = media_factory->createLocalMedia("local media");
