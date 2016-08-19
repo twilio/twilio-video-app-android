@@ -18,7 +18,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * The VideoClient allows user to instance or participate in Rooms.
+ * The VideoClient allows user to create or participate in Rooms.
  */
 public class VideoClient {
 
