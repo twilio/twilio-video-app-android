@@ -1,5 +1,6 @@
 package com.twilio.video;
 
+// TODO: Discuss naming of AudioOptions vs AudioConstraints with rest of team
 public class AudioOptions {
     private final boolean echoCancellation;
     private final boolean autoGainControl;
