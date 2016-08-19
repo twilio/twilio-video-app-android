@@ -113,7 +113,7 @@ Java_com_twilio_video_VideoClient_nativeCreateClient(JNIEnv *env,
         *(reinterpret_cast<std::shared_ptr<TwilioCommon::AccessManager> *>(j_access_mgr_handle));
 
     std::shared_ptr<twilio::media::MediaFactory> media_factory =
-            twilio::media::getMediaFactory(media_factory_handle);
+            twilio_video_jni::getMediaFactory(media_factory_handle);
 
     twilio::video::Invoker *invoker = new twilio::video::Invoker();
 

@@ -7,12 +7,11 @@
 #include "webrtc/modules/audio_device/android/opensles_player.h"
 #include "webrtc/api/java/jni/classreferenceholder.h"
 
-namespace twilio {
-namespace media {
+namespace twilio_video_jni {
 
 static bool media_jvm_set = false;
 
-std::shared_ptr<MediaFactory> getMediaFactory(jlong media_factory_handle) {
+std::shared_ptr<twilio::media::MediaFactory> getMediaFactory(jlong media_factory_handle) {
     MediaFactoryContext *media_factory_context =
             reinterpret_cast<MediaFactoryContext *>(media_factory_handle);
 
@@ -38,9 +37,9 @@ JNIEXPORT jlong JNICALL Java_com_twilio_video_MediaFactory_nativeCreate(JNIEnv *
     }
 
     // TODO set encoder and decoder options
-    MediaOptions media_options;
-    std::shared_ptr<MediaFactory> media_factory = MediaFactory::create(media_options);
-
+    twilio::media::MediaOptions media_options;
+    std::shared_ptr<twilio::media::MediaFactory> media_factory =
+            twilio::media::MediaFactory::create(media_options);
 
     return webrtc_jni::jlongFromPointer(new MediaFactoryContext(media_options, media_factory));
 }
@@ -51,10 +50,10 @@ JNIEXPORT jlong JNICALL Java_com_twilio_video_MediaFactory_nativeCreateLocalMedi
     jlong local_media_handle = 0;
 
     if (media_factory_handle != 0) {
-        std::shared_ptr<MediaFactory> media_factory = getMediaFactory(media_factory_handle);
+        std::shared_ptr<twilio::media::MediaFactory> media_factory = getMediaFactory(media_factory_handle);
 
         // TODO support passing a name in
-        std::shared_ptr<LocalMedia> local_media = media_factory->createLocalMedia("local media");
+        std::shared_ptr<twilio::media::LocalMedia> local_media = media_factory->createLocalMedia("local media");
         LocalMediaContext* local_media_context = new LocalMediaContext(local_media);
         local_media_handle = webrtc_jni::jlongFromPointer(local_media_context);
     }
@@ -73,5 +72,4 @@ JNIEXPORT void JNICALL Java_com_twilio_video_MediaFactory_nativeRelease(JNIEnv *
     }
 }
 
-}
 }

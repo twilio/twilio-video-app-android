@@ -9,12 +9,12 @@
 extern "C" {
 #endif
 
-namespace twilio {
-namespace media {
+namespace twilio_video_jni {
 
 class MediaFactoryContext {
 public:
-    MediaFactoryContext(MediaOptions media_options, std::shared_ptr<MediaFactory> media_factory) :
+    MediaFactoryContext(twilio::media::MediaOptions media_options,
+                        std::shared_ptr<twilio::media::MediaFactory> media_factory) :
             media_options_(media_options),
             media_factory_(media_factory) {
 
@@ -34,22 +34,21 @@ public:
         }
     }
 
-    std::shared_ptr<MediaFactory> getMediaFactory() {
+    std::shared_ptr<twilio::media::MediaFactory> getMediaFactory() {
         return media_factory_;
     }
 private:
-    MediaOptions media_options_;
-    std::shared_ptr<MediaFactory> media_factory_;
+    twilio::media::MediaOptions media_options_;
+    std::shared_ptr<twilio::media::MediaFactory> media_factory_;
 };
 
-std::shared_ptr<MediaFactory> getMediaFactory(jlong);
+std::shared_ptr<twilio::media::MediaFactory> getMediaFactory(jlong);
 JNIEXPORT jlong JNICALL Java_com_twilio_video_MediaFactory_nativeCreate(JNIEnv *, jobject, jobject);
 JNIEXPORT jlong JNICALL Java_com_twilio_video_MediaFactory_nativeCreateLocalMedia(JNIEnv *,
                                                                                   jobject,
                                                                                   jlong);
 JNIEXPORT void JNICALL Java_com_twilio_video_MediaFactory_nativeRelease(JNIEnv *, jobject, jlong);
 
-}
 }
 
 #ifdef __cplusplus

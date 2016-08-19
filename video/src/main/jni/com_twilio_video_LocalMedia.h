@@ -8,12 +8,12 @@
 extern "C" {
 #endif
 
-namespace twilio {
-namespace media {
+namespace twilio_video_jni {
 
 class LocalMediaContext {
 public:
-    LocalMediaContext(std::shared_ptr<LocalMedia> local_media) : local_media_(local_media) {
+    LocalMediaContext(std::shared_ptr<twilio::media::LocalMedia> local_media)
+            : local_media_(local_media) {
 
     }
 
@@ -21,11 +21,11 @@ public:
         local_media_.reset();
     }
 
-    std::shared_ptr<LocalMedia> getLocalMedia() {
+    std::shared_ptr<twilio::media::LocalMedia> getLocalMedia() {
         return local_media_;
     }
 private:
-    std::shared_ptr<LocalMedia> local_media_;
+    std::shared_ptr<twilio::media::LocalMedia> local_media_;
 };
 
 JNIEXPORT jobject JNICALL Java_com_twilio_video_LocalMedia_nativeGetDefaultAudioOptions(JNIEnv *,
@@ -41,7 +41,6 @@ JNIEXPORT jboolean JNICALL Java_com_twilio_video_LocalMedia_nativeRemoveAudioTra
                                                                                    jstring);
 JNIEXPORT void JNICALL Java_com_twilio_video_LocalMedia_nativeRelease(JNIEnv *, jobject, jlong);
 
-}
 }
 
 #ifdef __cplusplus
