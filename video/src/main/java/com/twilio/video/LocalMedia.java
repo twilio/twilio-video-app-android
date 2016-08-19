@@ -18,10 +18,12 @@ public class LocalMedia {
     }
 
     public List<LocalAudioTrack> getLocalAudioTracks() {
+        checkReleased("getLocalAudioTracks");
         return localAudioTracks;
     }
 
     public List<LocalVideoTrack> getLocalVideoTracks() {
+        checkReleased("getLocalVideoTracks");
         return localVideoTracks;
     }
 
@@ -69,11 +71,13 @@ public class LocalMedia {
 
     public LocalVideoTrack addVideoTrack(boolean enabled, VideoConstraints videoConstraints) {
         // TODO: implement me
+        checkReleased("addVideoTrack");
         return null;
     }
 
     public boolean removeLocalVideoTrack(LocalVideoTrack localVideoTrack) {
         // TODO: implement me
+        checkReleased("removeVideoTrack");
         return true;
     }
 

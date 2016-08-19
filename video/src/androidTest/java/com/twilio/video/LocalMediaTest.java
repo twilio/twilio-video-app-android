@@ -39,10 +39,16 @@ public class LocalMediaTest {
         mediaFactory.release();
     }
 
-    @Test
-    public void release_shouldBeIdempotent() {
+    @Test(expected = IllegalStateException.class)
+    public void getLocalAudioTracks_shouldFailAfterRelease() {
         localMedia.release();
+        localMedia.getLocalAudioTracks();
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void getLocalVideoTracks_shouldFailAfterRelease() {
         localMedia.release();
+        localMedia.getLocalVideoTracks();
     }
 
     @Test
@@ -157,5 +163,11 @@ public class LocalMediaTest {
     @Test
     public void canAddMultipleAudioAndVideoTracks() {
         // TODO
+    }
+
+    @Test
+    public void release_shouldBeIdempotent() {
+        localMedia.release();
+        localMedia.release();
     }
 }
