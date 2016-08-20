@@ -189,6 +189,9 @@ public class Media {
         @Override
         public void onAudioTrackAdded(final AudioTrack audioTrack) {
             logger.d("onAudioTrackAdded");
+            if (listener == null) {
+                return;
+            }
             if (audioTrack == null) {
                 logger.w("Received audio track added callback for non-existing audio track");
             }
@@ -205,6 +208,9 @@ public class Media {
         @Override
         public void onAudioTrackRemoved(String trackId) {
             logger.d("onAudioTrackRemoved");
+            if (listener == null) {
+                return;
+            }
             final AudioTrack audioTrack = audioTrackMap.remove(trackId);
             if (audioTrack == null) {
                 logger.w("Received audio track removed callback for non-existent audio track");
@@ -223,6 +229,9 @@ public class Media {
         @Override
         public void onVideoTrackAdded(final VideoTrack videoTrack) {
             logger.d("onVideoTrackAdded");
+            if (listener == null) {
+                return;
+            }
             if (videoTrack == null) {
                 logger.w("Received video track added callback for non-existing video track");
             }
@@ -238,6 +247,9 @@ public class Media {
         @Override
         public void onVideoTrackRemoved(String trackId) {
             logger.d("onVideoTrackRemoved");
+            if (listener == null) {
+                return;
+            }
             final VideoTrack videoTrack = videoTrackMap.remove(trackId);
             if (videoTrack == null) {
                 logger.w("Received video track removed callback for non-existent video track");
@@ -255,6 +267,9 @@ public class Media {
         @Override
         public void onAudioTrackEnabled(String trackId) {
             logger.d("onAudioTrackEnabled");
+            if (listener == null) {
+                return;
+            }
             final AudioTrack audioTrack = audioTrackMap.remove(trackId);
             if (audioTrack == null) {
                 logger.w("Received audio track enabled callback for non-existent audio track");
@@ -271,6 +286,9 @@ public class Media {
         @Override
         public void onAudioTrackDisabled(String trackId) {
             logger.d("onAudioTrackDisabled");
+            if (listener == null) {
+                return;
+            }
             final AudioTrack audioTrack = audioTrackMap.remove(trackId);
             if (audioTrack == null) {
                 logger.w("Received audio track disabled callback for non-existent audio track");
@@ -287,6 +305,9 @@ public class Media {
         @Override
         public void onVideoTrackEnabled(String trackId) {
             logger.d("onVideoTrackEnabled");
+            if (listener == null) {
+                return;
+            }
             final VideoTrack videoTrack = videoTrackMap.remove(trackId);
             if (videoTrack == null) {
                 logger.w("Received video track enabled callback for non-existent video track");
@@ -303,6 +324,9 @@ public class Media {
         @Override
         public void onVideoTrackDisabled(String trackId) {
             logger.d("onVideoTrackDisabled");
+            if (listener == null) {
+                return;
+            }
             final VideoTrack videoTrack = videoTrackMap.remove(trackId);
             if (videoTrack == null) {
                 logger.w("Received video track disabled callback for non-existent video track");

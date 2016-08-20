@@ -1,27 +1,24 @@
 package com.twilio.video;
 
-public class LocalAudioTrack extends AudioTrack {
+public class LocalAudioTrack  {
+    private org.webrtc.AudioTrack webrtcAudioTrack;
+
     LocalAudioTrack(org.webrtc.AudioTrack audioTrack, TrackInfo trackInfo) {
-        super(audioTrack, trackInfo);
+        webrtcAudioTrack = audioTrack;
     }
 
-    @Override
     public String getTrackId() {
-        org.webrtc.AudioTrack audioTrack = getWebrtcTrack();
 
-        return audioTrack.id();
+        return webrtcAudioTrack.id();
     }
 
-    @Override
     public boolean isEnabled() {
-        org.webrtc.AudioTrack audioTrack = getWebrtcTrack();
 
-        return audioTrack.enabled();
+        return webrtcAudioTrack.enabled();
     }
 
     public boolean enable(boolean enable) {
-        org.webrtc.AudioTrack audioTrack = getWebrtcTrack();
 
-        return audioTrack.setEnabled(enable);
+        return webrtcAudioTrack.setEnabled(enable);
     }
 }

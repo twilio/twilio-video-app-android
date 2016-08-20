@@ -124,6 +124,10 @@ public class VideoTrack {
         }
     }
 
+    org.webrtc.VideoTrack getWebrtcVideoTrack() {
+        return webrtcVideoTrack;
+    }
+
     private native void nativeRelease(long nativeVideoTrackContext);
 }
 

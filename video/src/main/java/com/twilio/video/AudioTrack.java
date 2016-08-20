@@ -39,5 +39,5 @@ public class AudioTrack {
     }
 
     private native void nativeRelease(long nativeAudioTrackContext);
-    
+
 }
