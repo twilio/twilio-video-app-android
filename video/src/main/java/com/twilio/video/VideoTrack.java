@@ -76,53 +76,21 @@ public class VideoTrack {
         return trackId;
     }
 
-//    @Override
-//    public MediaTrackState getState() {
-//        return trackState;
-//    }
-
 
     public boolean isEnabled() {
         return isEnabled;
     }
 
-//    void updateTrackInfo(TrackInfo trackInfo) {
-//        this.trackInfo = trackInfo;
-//    }
-
-//    void setTrackState(MediaTrackState trackState) {
-//        this.trackState = trackState;
-//    }
-
-//    VideoTrack() {
-//        trackState = MediaTrackState.IDLE;
-//    }
-//
-//    VideoTrack(org.webrtc.VideoTrack videoTrack, TrackInfo trackInfo) {
-//        this.videoTrack = videoTrack;
-//        this.trackInfo = trackInfo;
-//
-//        trackState = MediaTrackState.STARTED;
-//    }
-
-
-//    void setWebrtcVideoTrack(org.webrtc.VideoTrack videoTrack) {
-//        this.videoTrack = videoTrack;
-//
-//        trackState = MediaTrackState.STARTED;
-//    }
-
-//    void setTrackInfo(TrackInfo trackInfo) {
-//        this.trackInfo = trackInfo;
-//    }
-
-//    org.webrtc.VideoTrack getWebrtcVideoTrack() {
-//        return videoTrack;
-//    }
-
-//    TrackInfo getTrackInfo() {
-//        return trackInfo;
-//    }
+    void release() {
+        if (nativeVideoTrackContext != 0) {
+            if (webrtcVideoTrack != null) {
+                webrtcVideoTrack.dispose();
+                webrtcVideoTrack = null;
+            }
+            nativeRelease(nativeVideoTrackContext);
+            nativeVideoTrackContext = 0;
+        }
+    }
 
     private class VideoRendererCallbackAdapter implements org.webrtc.VideoRenderer.Callbacks {
         private final VideoRenderer videoRenderer;
@@ -155,5 +123,7 @@ public class VideoTrack {
                     frameNativePointer);
         }
     }
+
+    private native void nativeRelease(long nativeVideoTrackContext);
 }
 

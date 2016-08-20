@@ -37,6 +37,18 @@ jobject createJavaVideoTrack(JNIEnv *env,
 JNIEXPORT void JNICALL Java_com_twilio_video_Media_nativeSetInternalListener
     (JNIEnv *, jobject, jlong, jlong);
 
+JNIEXPORT void JNICALL Java_com_twilio_video_AudioTrack_nativeRelease
+    (JNIEnv *, jobject, jlong);
+
+JNIEXPORT void JNICALL
+Java_com_twilio_video_VideoTrack_nativeRelease
+    (JNIEnv *, jobject, jlong);
+
+JNIEXPORT void JNICALL
+    Java_com_twilio_video_Media_nativeRelease
+    (JNIEnv *, jobject, jlong);
+
+
 /*
  * Class:     com_twilio_video_Media_InternalMediaListenerHandle
  * Method:    nativeCreate

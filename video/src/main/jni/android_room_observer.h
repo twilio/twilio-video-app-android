@@ -50,6 +50,11 @@ public:
                         *j_room_observer_class_,
                         "onParticipantDisconnected",
                         "(Ljava/lang/String;)V")),
+        j_get_handler_(
+            GetMethodID(env,
+                        *j_room_observer_class_,
+                        "getHandler",
+                        "()Landroid/os/Handler;")),
         j_participant_ctor_id_(
             GetMethodID(env,
                         *j_participant_class_,
@@ -79,7 +84,7 @@ public:
             webrtc_jni::GetMethodID(env,
                                     *j_media_class_,
                                     "<init>",
-                                    "(JLjava/util/List;Ljava/util/List;)V"))
+                                    "(JLjava/util/List;Ljava/util/List;Landroid/os/Handler;)V"))
         {
         TS_CORE_LOG_MODULE(kTSCoreLogModulePlatform,
                            kTSCoreLogLevelDebug,
@@ -268,9 +273,12 @@ private:
             jni()->CallVoidMethod(j_video_tracks, j_array_list_add_, j_video_track);
         }
 
+        jobject j_handler = jni()->CallObjectMethod(*j_room_observer_, j_get_handler_);
+
         // Create java media object
         return jni()->NewObject(
-            *j_media_class_, j_media_ctor_id_, j_media_context, j_audio_tracks, j_video_tracks);
+            *j_media_class_, j_media_ctor_id_, j_media_context,
+            j_audio_tracks, j_video_tracks, j_handler);
 
     }
 
@@ -289,6 +297,7 @@ private:
     jmethodID j_on_connect_failure_;
     jmethodID j_on_participant_connected_;
     jmethodID j_on_participant_disconnected_;
+    jmethodID j_get_handler_;
     jmethodID j_participant_ctor_id_;
     jmethodID j_array_list_ctor_id_;
     jmethodID j_array_list_add_;

@@ -48,6 +48,32 @@ Java_com_twilio_video_Media_nativeSetInternalListener(JNIEnv *env,
     media_context->media->attachObserver(media_observer);
 }
 
+JNIEXPORT void JNICALL
+Java_com_twilio_video_AudioTrack_nativeRelease(JNIEnv *env, jobject j_instance,
+                                               jlong j_audio_track_context) {
+
+    AudioTrackContext *audio_track_context =
+        reinterpret_cast<AudioTrackContext *>(j_audio_track_context);
+    delete audio_track_context;
+}
+
+JNIEXPORT void JNICALL
+Java_com_twilio_video_VideoTrack_nativeRelease(JNIEnv *env, jobject instance,
+                                               jlong j_video_track_context) {
+
+    VideoTrackContext *video_track_context =
+        reinterpret_cast<VideoTrackContext *>(j_video_track_context);
+    delete video_track_context;
+
+}
+
+JNIEXPORT void JNICALL
+Java_com_twilio_video_Media_nativeRelease(JNIEnv *env, jobject j_instance,
+                                          jlong j_native_media_context) {
+    MediaContext *media_context = reinterpret_cast<MediaContext *>(j_native_media_context);
+    delete media_context;
+}
+
 JNIEXPORT jlong JNICALL
 Java_com_twilio_video_Media_00024InternalMediaListenerHandle_nativeCreate(JNIEnv *env,
                                                                           jobject instance,

@@ -33,7 +33,9 @@ public class Participant {
 
     void release(){
         if (nativeParticipantContext != 0) {
-            media.release();
+            if (media != null) {
+                media.release();
+            }
             nativeRelease(nativeParticipantContext);
             nativeParticipantContext = 0;
         }

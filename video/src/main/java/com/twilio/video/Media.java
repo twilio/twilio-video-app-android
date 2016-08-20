@@ -1,11 +1,14 @@
 package com.twilio.video;
 
+import android.os.Handler;
 import android.provider.MediaStore;
 
 import com.twilio.video.internal.Logger;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Provides video and audio tracks associated with a {@link Participant}
@@ -17,8 +20,7 @@ public class Media {
          * This method notifies the listener that a {@link Participant} has added
          * an {@link AudioTrack} to this {@link Room}
          *
-         * @param room The room associated with this video track
-         * @param participant The participant associated with this video track
+         * @param media The media object associated with this audio track
          * @param audioTrack The audio track added to this room
          */
         void onAudioTrackAdded(Media media,
@@ -28,8 +30,7 @@ public class Media {
          * This method notifies the listener that a {@link Participant} has added
          * an {@link AudioTrack} to this {@link Room}
          *
-         * @param room The room associated with this video track
-         * @param participant The participant associated with this video track
+         * @param media The media object associated with this audio track
          * @param audioTrack The audio track removed from this room
          */
         void onAudioTrackRemoved(Media media,
@@ -84,18 +85,21 @@ public class Media {
 
     private static final Logger logger = Logger.getLogger(Media.class);
 
-    private List<VideoTrack> videoTracks = new ArrayList<>();
-    private List<AudioTrack> audioTracks = new ArrayList<>();
+    private Map<String, VideoTrack> videoTrackMap = new HashMap<>();
+    private Map<String, AudioTrack> audioTrackMap = new HashMap<>();
 
     private long nativeMediaContext;
     private InternalMediaListenerImpl internalMediaListenerImpl;
     private InternalMediaListenerHandle internalMediaListenerHandle;
     private Listener listener;
+    private Handler handler;
 
-    Media(long nativeMediaContext, List<AudioTrack> audioTracks, List<VideoTrack> videoTracks) {
+    Media(long nativeMediaContext,
+          List<AudioTrack> audioTracks, List<VideoTrack> videoTracks, Handler handler) {
         this.nativeMediaContext = nativeMediaContext;
-        this.audioTracks = audioTracks;
-        this.videoTracks = videoTracks;
+        this.handler = handler;
+        addAudioTracks(audioTracks);
+        addVideoTracks(videoTracks);
         internalMediaListenerImpl = new InternalMediaListenerImpl();
         internalMediaListenerHandle =
                 new InternalMediaListenerHandle(internalMediaListenerImpl);
@@ -103,11 +107,11 @@ public class Media {
     }
 
     public AudioTrack getAudioTrack(String trackId) {
-        return null;
+        return audioTrackMap.get(trackId);
     }
 
     public VideoTrack getVideoTrack(String trackId) {
-        return null;
+        return videoTrackMap.get(trackId);
     }
 
     /**
@@ -116,7 +120,7 @@ public class Media {
      * @return list of video tracks
      */
     public List<VideoTrack> getVideoTracks() {
-        return new ArrayList<>(videoTracks);
+        return new ArrayList<>(videoTrackMap.values());
     }
 
     /**
@@ -125,63 +129,46 @@ public class Media {
      * @return list of audio tracks
      */
     public List<AudioTrack> getAudioTracks() {
-        return new ArrayList<>(audioTracks);
+        return new ArrayList<>(audioTrackMap.values());
     }
 
     public void setListener(Listener listener) {
         this.listener = listener;
-        if (listener == null) {
-            internalMediaListenerHandle.release();
-            internalMediaListenerHandle = null;
-            internalMediaListenerImpl = null;
-        } else if (internalMediaListenerImpl == null) {
-            // Lazy initialize internal listener
-            internalMediaListenerImpl = new InternalMediaListenerImpl();
-            internalMediaListenerHandle =
-                    new InternalMediaListenerHandle(internalMediaListenerImpl);
-
-        }
     }
 
-    void addVideoTrack(VideoTrack videoTrack) {
-        if (videoTrack == null) {
-            throw new NullPointerException("VideoTrack can't be null");
-        }
-        videoTracks.add(videoTrack);
-    }
-
-    VideoTrack removeVideoTrack(TrackInfo trackInfo) {
-        for(VideoTrack videoTrack : new ArrayList<>(videoTracks)) {
-            if(trackInfo.getTrackId().equals(videoTrack.getTrackId())) {
-                videoTracks.remove(videoTrack);
-                return videoTrack;
+    void addVideoTracks(List<VideoTrack> videoTrackList) {
+        for (VideoTrack videoTrack : videoTrackList) {
+            if (videoTrack != null && videoTrack.getTrackId() != null) {
+                videoTrackMap.put(videoTrack.getTrackId(), videoTrack);
             }
         }
-        return null;
     }
 
-    void addAudioTrack(AudioTrack audioTrack) {
-        if (audioTrack == null) {
-            throw new NullPointerException("AudioTrack can't be null");
-        }
-        audioTracks.add(audioTrack);
-    }
-
-    AudioTrack removeAudioTrack(TrackInfo trackInfo) {
-        for(AudioTrack audioTrack : new ArrayList<>(audioTracks)) {
-            if(trackInfo.getTrackId().equals(audioTrack.getTrackId())) {
-                audioTracks.remove(audioTrack);
-                return audioTrack;
+    void addAudioTracks(List<AudioTrack> audioTrackList) {
+        for (AudioTrack audioTrack : audioTrackList) {
+            if (audioTrack != null && audioTrack.getTrackId() != null) {
+                audioTrackMap.put(audioTrack.getTrackId(), audioTrack);
             }
         }
-        return null;
+
     }
 
-    void release() {
+    synchronized void release() {
+        // Release all tracks
+        for (AudioTrack audioTrack : audioTrackMap.values()) {
+            audioTrack.release();
+        }
+        audioTrackMap.clear();
+        for (VideoTrack videoTrack : videoTrackMap.values()) {
+            videoTrack.release();
+        }
+        videoTrackMap.clear();
         if (nativeMediaContext != 0) {
-            //nativeRelease(nativeMediaContext);
+            nativeRelease(nativeMediaContext);
             nativeMediaContext = 0;
-            internalMediaListenerHandle.release();
+            if (internalMediaListenerHandle != null) {
+                internalMediaListenerHandle.release();
+            }
         }
     }
 
@@ -200,43 +187,133 @@ public class Media {
     class InternalMediaListenerImpl implements InternalMediaListener {
 
         @Override
-        public void onAudioTrackAdded(AudioTrack audioTrack) {
+        public void onAudioTrackAdded(final AudioTrack audioTrack) {
             logger.d("onAudioTrackAdded");
+            if (audioTrack == null) {
+                logger.w("Received audio track added callback for non-existing audio track");
+            }
+            audioTrackMap.put(audioTrack.getTrackId(), audioTrack);
+            handler.post(new Runnable() {
+                @Override
+                public void run() {
+                    Media.this.listener.onAudioTrackAdded(Media.this, audioTrack);
+                }
+            });
+
         }
 
         @Override
         public void onAudioTrackRemoved(String trackId) {
             logger.d("onAudioTrackRemoved");
+            final AudioTrack audioTrack = audioTrackMap.remove(trackId);
+            if (audioTrack == null) {
+                logger.w("Received audio track removed callback for non-existent audio track");
+                return;
+            }
+            audioTrack.release();
+            handler.post(new Runnable() {
+                @Override
+                public void run() {
+                    Media.this.listener.onAudioTrackRemoved(Media.this, audioTrack);
+                }
+            });
+
         }
 
         @Override
-        public void onVideoTrackAdded(VideoTrack videoTrack) {
+        public void onVideoTrackAdded(final VideoTrack videoTrack) {
             logger.d("onVideoTrackAdded");
+            if (videoTrack == null) {
+                logger.w("Received video track added callback for non-existing video track");
+            }
+            videoTrackMap.put(videoTrack.getTrackId(), videoTrack);
+            handler.post(new Runnable() {
+                @Override
+                public void run() {
+                    Media.this.listener.onVideoTrackAdded(Media.this, videoTrack);
+                }
+            });
         }
 
         @Override
         public void onVideoTrackRemoved(String trackId) {
             logger.d("onVideoTrackRemoved");
+            final VideoTrack videoTrack = videoTrackMap.remove(trackId);
+            if (videoTrack == null) {
+                logger.w("Received video track removed callback for non-existent video track");
+                return;
+            }
+            videoTrack.release();
+            handler.post(new Runnable() {
+                @Override
+                public void run() {
+                    Media.this.listener.onVideoTrackRemoved(Media.this, videoTrack);
+                }
+            });
         }
 
         @Override
         public void onAudioTrackEnabled(String trackId) {
             logger.d("onAudioTrackEnabled");
+            final AudioTrack audioTrack = audioTrackMap.remove(trackId);
+            if (audioTrack == null) {
+                logger.w("Received audio track enabled callback for non-existent audio track");
+                return;
+            }
+            handler.post(new Runnable() {
+                @Override
+                public void run() {
+                    Media.this.listener.onAudioTrackEnabled(Media.this, audioTrack);
+                }
+            });
         }
 
         @Override
         public void onAudioTrackDisabled(String trackId) {
             logger.d("onAudioTrackDisabled");
+            final AudioTrack audioTrack = audioTrackMap.remove(trackId);
+            if (audioTrack == null) {
+                logger.w("Received audio track disabled callback for non-existent audio track");
+                return;
+            }
+            handler.post(new Runnable() {
+                @Override
+                public void run() {
+                    Media.this.listener.onAudioTrackDisabled(Media.this, audioTrack);
+                }
+            });
         }
 
         @Override
         public void onVideoTrackEnabled(String trackId) {
             logger.d("onVideoTrackEnabled");
+            final VideoTrack videoTrack = videoTrackMap.remove(trackId);
+            if (videoTrack == null) {
+                logger.w("Received video track enabled callback for non-existent video track");
+                return;
+            }
+            handler.post(new Runnable() {
+                @Override
+                public void run() {
+                    Media.this.listener.onVideoTrackEnabled(Media.this, videoTrack);
+                }
+            });
         }
 
         @Override
         public void onVideoTrackDisabled(String trackId) {
             logger.d("onVideoTrackDisabled");
+            final VideoTrack videoTrack = videoTrackMap.remove(trackId);
+            if (videoTrack == null) {
+                logger.w("Received video track disabled callback for non-existent video track");
+                return;
+            }
+            handler.post(new Runnable() {
+                @Override
+                public void run() {
+                    Media.this.listener.onVideoTrackDisabled(Media.this, videoTrack);
+                }
+            });
         }
     }
 
@@ -261,4 +338,5 @@ public class Media {
 
     private native void nativeSetInternalListener(
             long nativeMediaContext, long nativeInternalListener);
+    private native void nativeRelease(long nativeMediaContext);
 }
