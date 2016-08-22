@@ -1,11 +1,13 @@
 #include <jni.h>
 
-#ifndef _Included_com_twilio_conversations_Client
-#define _Included_com_twilio_conversations_Client
+#ifndef VIDEO_ANDROID_COM_TWILIO_VIDEO_VIDEO_CLIENT_H_
+#define VIDEO_ANDROID_COM_TWILIO_VIDEO_VIDEO_CLIENT_H_
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+namespace twilio_video_jni {
 
 JNIEXPORT void JNICALL Java_com_twilio_video_VideoClient_nativeSetCoreLogLevel
         (JNIEnv *, jobject, jint);
@@ -17,13 +19,15 @@ JNIEXPORT jint JNICALL Java_com_twilio_video_VideoClient_nativeGetCoreLogLevel
         (JNIEnv *, jobject);
 
 JNIEXPORT jlong JNICALL Java_com_twilio_video_VideoClient_nativeCreateClient
-    (JNIEnv *, jobject, jobject, jlong);
+        (JNIEnv *, jobject, jobject, jlong);
 
 JNIEXPORT jlong JNICALL Java_com_twilio_video_VideoClient_nativeConnect
         (JNIEnv *, jobject, jlong, jlong, jobject);
 
+}
 
 #ifdef __cplusplus
 }
 #endif
-#endif
+
+#endif // VIDEO_ANDROID_COM_TWILIO_VIDEO_VIDEO_CLIENT_H_

@@ -189,7 +189,10 @@ public class VideoClient {
             throw new NullPointerException("roomListener must not be null");
         }
 
-        Room room = new Room(connectOptions.getName(), roomListener, handler);
+        Room room = new Room(connectOptions.getName(),
+                connectOptions.getLocalMedia(),
+                roomListener,
+                handler);
         /*
          * We need to synchronize access to room listener during initialization and make
          * sure that onConnect() callback won't get call before connect() exits and Room

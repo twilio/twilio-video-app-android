@@ -22,7 +22,7 @@
 
 #include <memory>
 
-using namespace twiliosdk;
+namespace twilio_video_jni {
 
 static bool media_jvm_set = false;
 
@@ -48,14 +48,14 @@ extern "C" void JNIEXPORT JNICALL JNI_OnUnLoad(JavaVM *jvm, void *reserved) {
 }
 
 JNIEXPORT void JNICALL Java_com_twilio_video_VideoClient_nativeSetCoreLogLevel
-    (JNIEnv *env, jobject instance, jint level) {
+        (JNIEnv *env, jobject instance, jint level) {
     TS_CORE_LOG_MODULE(kTSCoreLogModulePlatform, kTSCoreLogLevelDebug, "setCoreLogLevel");
     TSCoreLogLevel coreLogLevel = static_cast<TSCoreLogLevel>(level);
     Logger::instance()->setLogLevel(coreLogLevel);
 }
 
 JNIEXPORT void JNICALL Java_com_twilio_video_VideoClient_nativeSetModuleLevel
-    (JNIEnv *env, jobject instance, jint module, jint level) {
+        (JNIEnv *env, jobject instance, jint module, jint level) {
     TS_CORE_LOG_MODULE(kTSCoreLogModulePlatform, kTSCoreLogLevelDebug, "setModuleLevel");
     TSCoreLogModule coreLogModule = static_cast<TSCoreLogModule>(module);
     TSCoreLogLevel coreLogLevel = static_cast<TSCoreLogLevel>(level);
@@ -63,22 +63,22 @@ JNIEXPORT void JNICALL Java_com_twilio_video_VideoClient_nativeSetModuleLevel
 }
 
 JNIEXPORT jint JNICALL Java_com_twilio_video_VideoClient_nativeGetCoreLogLevel
-    (JNIEnv *env, jobject instance) {
+        (JNIEnv *env, jobject instance) {
     TS_CORE_LOG_MODULE(kTSCoreLogModulePlatform, kTSCoreLogLevelDebug, "getCoreLogLevel");
     return Logger::instance()->getLogLevel();
 }
 
 class ClientContext {
 public:
-    ClientContext( std::unique_ptr<twilio::video::Client> client,
-                   std::shared_ptr<twilio::media::MediaFactory> media_factory,
-                   twilio::video::Invoker *invoker) {
+    ClientContext(std::unique_ptr<twilio::video::Client> client,
+                  std::shared_ptr<twilio::media::MediaFactory> media_factory,
+                  twilio::video::Invoker *invoker) {
         client_ = std::move(client);
         media_factory_ = media_factory;
         invoker_ = invoker;
     }
 
-    virtual ~ClientContext(){
+    virtual ~ClientContext() {
         delete invoker_;
     }
 
@@ -89,6 +89,7 @@ public:
     std::shared_ptr<twilio::media::MediaFactory> getMediaFactory() const {
         return media_factory_;
     }
+
 private:
     std::unique_ptr<twilio::video::Client> client_;
     std::shared_ptr<twilio::media::MediaFactory> media_factory_;
@@ -105,24 +106,21 @@ Java_com_twilio_video_VideoClient_nativeCreateClient(JNIEnv *env,
     // Call the private method to get the native handle
     jclass j_access_mgr_class = webrtc_jni::GetObjectClass(env, j_access_manager);
     jmethodID j_getNativeHandle_id =
-        webrtc_jni::GetMethodID(env, j_access_mgr_class, "getNativeHandle", "()J");
+            webrtc_jni::GetMethodID(env, j_access_mgr_class, "getNativeHandle", "()J");
     jlong j_access_mgr_handle = env->CallLongMethod(j_access_manager, j_getNativeHandle_id);
     // Recreate a reference to the share_ptr of AccessManager by dereferencing the ptr
     // to the shared_ptr
     std::shared_ptr<TwilioCommon::AccessManager> access_manager =
-        *(reinterpret_cast<std::shared_ptr<TwilioCommon::AccessManager> *>(j_access_mgr_handle));
-
+            *(reinterpret_cast<std::shared_ptr<TwilioCommon::AccessManager> *>(j_access_mgr_handle));
     std::shared_ptr<twilio::media::MediaFactory> media_factory =
             twilio_video_jni::getMediaFactory(media_factory_handle);
-
     twilio::video::Invoker *invoker = new twilio::video::Invoker();
-
     std::unique_ptr<twilio::video::Client> client =
-        twilio::video::Client::create(access_manager,
-                                      media_factory,
-                                      invoker);
+            twilio::video::Client::create(access_manager,
+                                          media_factory,
+                                          invoker);
     return jlongFromPointer(
-        new ClientContext(std::move(client), media_factory, invoker));
+            new ClientContext(std::move(client), media_factory, invoker));
 
 }
 
@@ -134,11 +132,11 @@ Java_com_twilio_video_VideoClient_nativeConnect(JNIEnv *env,
                                                 jobject j_connect_options) {
 
 
-    ClientContext* client_context =
-        reinterpret_cast<ClientContext *>(j_client_context);
+    ClientContext *client_context =
+            reinterpret_cast<ClientContext *>(j_client_context);
 
     AndroidRoomObserver *android_room_observer =
-        reinterpret_cast<AndroidRoomObserver *>(j_android_room_observer_handle);
+            reinterpret_cast<AndroidRoomObserver *>(j_android_room_observer_handle);
 
     std::unique_ptr<twilio::video::Room> room;
 
@@ -147,28 +145,14 @@ Java_com_twilio_video_VideoClient_nativeConnect(JNIEnv *env,
         // Get connect options
         jclass j_connect_options_class = webrtc_jni::GetObjectClass(env, j_connect_options);
         jmethodID j_createNativeObject_id =
-            webrtc_jni::GetMethodID(env, j_connect_options_class,
-                                    "createNativeObject", "()J");
+                webrtc_jni::GetMethodID(env, j_connect_options_class,
+                                        "createNativeObject", "()J");
         jlong j_connect_options_handle =
-            env->CallLongMethod(j_connect_options, j_createNativeObject_id);
+                env->CallLongMethod(j_connect_options, j_createNativeObject_id);
         ConnectOptionsContext *connect_options_context =
-            reinterpret_cast<ConnectOptionsContext *>(j_connect_options_handle);
-
-        // TODO: get local media from j_connect_options once it gets implemented
-        // Until then we are creating it here
-        std::shared_ptr<twilio::media::LocalMedia> local_media =
-            client_context->getMediaFactory()->createLocalMedia();
-        local_media->addAudioTrack(); // enabled, default constraints
-
-        // TODO: We are recreating connect options because we need to inject local media
-        // In future (once we have local media implemented) this can be removed
-        twilio::video::ConnectOptions connect_options = twilio::video::ConnectOptions::Builder()
-            .setRoomName(connect_options_context->connect_options.getRoomName())
-            .setLocalMedia(local_media)
-            .build();
-
-        room = client_context->getClient().connect(connect_options,
-                                                     android_room_observer);
+                reinterpret_cast<ConnectOptionsContext *>(j_connect_options_handle);
+        room = client_context->getClient().connect(connect_options_context->connect_options,
+                                                   android_room_observer);
         delete connect_options_context;
 
     } else {
@@ -181,3 +165,4 @@ Java_com_twilio_video_VideoClient_nativeConnect(JNIEnv *env,
     return jlongFromPointer(room_context);
 }
 
+}
