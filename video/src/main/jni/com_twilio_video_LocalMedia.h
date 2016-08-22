@@ -30,8 +30,6 @@ private:
 
 JNIEXPORT jobject JNICALL Java_com_twilio_video_LocalMedia_nativeGetDefaultAudioOptions(JNIEnv *,
                                                                                         jobject);
-JNIEXPORT jobject JNICALL Java_com_twilio_video_LocalMedia_nativeGetDefaultVideoConstraints(JNIEnv *,
-                                                                                            jobject);
 JNIEXPORT jlong JNICALL Java_com_twilio_video_LocalMedia_nativeAddAudioTrack(JNIEnv *,
                                                                              jobject,
                                                                              jlong,

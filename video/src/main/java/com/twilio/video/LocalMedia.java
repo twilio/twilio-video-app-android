@@ -51,7 +51,7 @@ public class LocalMedia {
             localAudioTrack.enable(enabled);
             localAudioTracks.add(localAudioTrack);
             return localAudioTrack;
-        } else if (nativeAudioTrack == 0) {
+        } else {
             logger.e("Failed to create local audio track");
         }
 
@@ -73,7 +73,7 @@ public class LocalMedia {
     }
 
     public LocalVideoTrack addVideoTrack(boolean enabled, VideoCapturer videoCapturer) {
-        return addVideoTrack(enabled, videoCapturer, nativeGetDefaultVideoConstraints());
+        return addVideoTrack(enabled, videoCapturer, null);
     }
 
     public LocalVideoTrack addVideoTrack(boolean enabled,
@@ -93,7 +93,7 @@ public class LocalMedia {
             localVideoTrack.enable(enabled);
             localVideoTracks.add(localVideoTrack);
             return localVideoTrack;
-        } else if (nativeVideoTrack == 0) {
+        } else {
             logger.e("Failed to create local audio track");
         }
 
@@ -134,7 +134,6 @@ public class LocalMedia {
     }
 
     private static native AudioOptions nativeGetDefaultAudioOptions();
-    private static native VideoConstraints nativeGetDefaultVideoConstraints();
     private native long nativeAddAudioTrack(long nativeLocalMediaHandle,
                                             boolean enabled,
                                             AudioOptions audioOptions);

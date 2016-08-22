@@ -19,21 +19,20 @@ twilio::media::MediaConstraints* getAudioOptions(jobject j_audio_options) {
 }
 
 twilio::media::MediaConstraints* getVideoConstraints(jobject j_video_contraints) {
-    // TODO: convert from java object to actual constraints
-    return nullptr;
+    twilio::media::MediaConstraints* video_constraints = nullptr;
+
+    if (webrtc_jni::IsNull(webrtc_jni::GetEnv(), j_video_contraints)) {
+        video_constraints = twilio::media::MediaConstraints::defaultVideoConstraints();
+    } else {
+        // TODO: convert from java object to actual constraints
+    }
+
+    return video_constraints;
 }
 
 JNIEXPORT jobject JNICALL Java_com_twilio_video_LocalMedia_nativeGetDefaultAudioOptions(JNIEnv *jni,
                                                                                         jobject j_local_media) {
     // TODO: create default audio options
-    return nullptr;
-}
-
-JNIEXPORT jobject JNICALL Java_com_twilio_video_LocalMedia_nativeGetDefaultVideoConstraints(JNIEnv *jni,
-                                                                                            jobject j_local_media) {
-    twilio::media::MediaConstraints* default_video_constraints =
-            twilio::media::MediaConstraints::defaultVideoConstraints();
-
     return nullptr;
 }
 
