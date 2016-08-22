@@ -81,6 +81,10 @@ public class VideoTrack {
         return isEnabled;
     }
 
+    void setEnabled(boolean isEnabled) {
+        this.isEnabled = isEnabled;
+    }
+
     void release() {
         if (nativeVideoTrackContext != 0) {
             if (webrtcVideoTrack != null) {

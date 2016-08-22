@@ -270,11 +270,12 @@ public class Media {
             if (listener == null) {
                 return;
             }
-            final AudioTrack audioTrack = audioTrackMap.remove(trackId);
+            final AudioTrack audioTrack = audioTrackMap.get(trackId);
             if (audioTrack == null) {
                 logger.w("Received audio track enabled callback for non-existent audio track");
                 return;
             }
+            audioTrack.setEnabled(true);
             handler.post(new Runnable() {
                 @Override
                 public void run() {
@@ -289,11 +290,12 @@ public class Media {
             if (listener == null) {
                 return;
             }
-            final AudioTrack audioTrack = audioTrackMap.remove(trackId);
+            final AudioTrack audioTrack = audioTrackMap.get(trackId);
             if (audioTrack == null) {
                 logger.w("Received audio track disabled callback for non-existent audio track");
                 return;
             }
+            audioTrack.setEnabled(false);
             handler.post(new Runnable() {
                 @Override
                 public void run() {
@@ -308,11 +310,12 @@ public class Media {
             if (listener == null) {
                 return;
             }
-            final VideoTrack videoTrack = videoTrackMap.remove(trackId);
+            final VideoTrack videoTrack = videoTrackMap.get(trackId);
             if (videoTrack == null) {
                 logger.w("Received video track enabled callback for non-existent video track");
                 return;
             }
+            videoTrack.setEnabled(true);
             handler.post(new Runnable() {
                 @Override
                 public void run() {
@@ -327,11 +330,12 @@ public class Media {
             if (listener == null) {
                 return;
             }
-            final VideoTrack videoTrack = videoTrackMap.remove(trackId);
+            final VideoTrack videoTrack = videoTrackMap.get(trackId);
             if (videoTrack == null) {
                 logger.w("Received video track disabled callback for non-existent video track");
                 return;
             }
+            videoTrack.setEnabled(false);
             handler.post(new Runnable() {
                 @Override
                 public void run() {

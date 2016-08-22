@@ -27,6 +27,10 @@ public class AudioTrack {
         return isEnabled;
     }
 
+    void setEnabled(boolean isEnabled) {
+        this.isEnabled = isEnabled;
+    }
+
     void release() {
         if (nativeAudioTrackContext != 0) {
             if (webrtcAudioTrack != null) {
