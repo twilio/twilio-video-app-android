@@ -182,6 +182,10 @@ JNIEXPORT jlong JNICALL Java_com_twilio_video_LocalMedia_nativeAddVideoTrack(JNI
     rtc::scoped_refptr<webrtc::AndroidVideoCapturerDelegate> delegate =
             new rtc::RefCountedObject<webrtc_jni::AndroidVideoCapturerJni>(jni,
                                                                            j_video_capturer,
+                                                                           /* TODO
+                                                                            * Add EGL context for
+                                                                            * camera capturer
+                                                                            */
                                                                            nullptr);
     cricket::VideoCapturer* capturer = new webrtc::AndroidVideoCapturer(delegate);
     std::shared_ptr<twilio::media::VideoTrack> video_track = local_media->addVideoTrack(enabled,

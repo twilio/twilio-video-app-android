@@ -7,6 +7,9 @@ import org.webrtc.*;
 import java.util.ArrayList;
 import java.util.List;
 
+/*
+ * WIP: Delegates callbacks from WebRTC to our {@link VideoCapturer}
+ */
 class VideoCapturerDelegate implements org.webrtc.VideoCapturer {
     private final VideoCapturer videoCapturer;
 
@@ -37,7 +40,12 @@ class VideoCapturerDelegate implements org.webrtc.VideoCapturer {
         if (videoCapturer.getClass() == CameraCapturer2.class) {
             CameraCapturer2 cameraCapturer = (CameraCapturer2) videoCapturer;
 
-            cameraCapturer.webrtcCapturer.startCapture(width, height, framerate, surfaceTextureHelper, context, capturerObserver);
+            cameraCapturer.webrtcCapturer.startCapture(width,
+                    height,
+                    framerate,
+                    surfaceTextureHelper,
+                    context,
+                    capturerObserver);
         } else {
             videoCapturer.startCapture(width, height, framerate, null);
         }
@@ -61,7 +69,7 @@ class VideoCapturerDelegate implements org.webrtc.VideoCapturer {
 
             cameraCapturer.webrtcCapturer.dispose();
         } else {
-            // TODO
+            // TODO: Are we going to publish a release concept on the public capturer api?
         }
     }
 }

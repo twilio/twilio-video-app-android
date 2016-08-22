@@ -15,13 +15,13 @@ public class VideoTrack implements MediaTrack {
     private static final String WARNING_NULL_RENDERER = "Attempted to add a null renderer.";
     private static final Logger logger = Logger.getLogger(VideoTrack.class);
 
-    private final org.webrtc.VideoTrack rtcTrack;
+    private final org.webrtc.VideoTrack webRtcVideoTrack;
     private TrackInfo trackInfo;
     private MediaTrackState trackState;
     private Map<VideoRenderer, org.webrtc.VideoRenderer> videoRenderersMap = new HashMap<>();
 
-    VideoTrack(org.webrtc.VideoTrack rtcTrack) {
-        this.rtcTrack = rtcTrack;
+    VideoTrack(org.webrtc.VideoTrack webRtcVideoTrack) {
+        this.webRtcVideoTrack = webRtcVideoTrack;
     }
 
     /**
@@ -34,7 +34,7 @@ public class VideoTrack implements MediaTrack {
             org.webrtc.VideoRenderer webrtcVideoRenderer =
                     createWebRtcVideoRenderer(videoRenderer);
             videoRenderersMap.put(videoRenderer, webrtcVideoRenderer);
-            rtcTrack.addRenderer(webrtcVideoRenderer);
+            webRtcVideoTrack.addRenderer(webrtcVideoRenderer);
         } else {
             logger.w(WARNING_NULL_RENDERER);
         }
@@ -50,7 +50,7 @@ public class VideoTrack implements MediaTrack {
             org.webrtc.VideoRenderer webrtcVideoRenderer =
                     videoRenderersMap.remove(videoRenderer);
             if (webrtcVideoRenderer != null) {
-                rtcTrack.removeRenderer(webrtcVideoRenderer);
+                webRtcVideoTrack.removeRenderer(webrtcVideoRenderer);
             }
         }
     }
@@ -79,7 +79,7 @@ public class VideoTrack implements MediaTrack {
 
     @Override
     public boolean isEnabled() {
-        if ((rtcTrack != null) && (trackInfo != null)) {
+        if ((webRtcVideoTrack != null) && (trackInfo != null)) {
             return trackInfo.isEnabled();
         }
         return false;
@@ -98,7 +98,7 @@ public class VideoTrack implements MediaTrack {
     }
 
     org.webrtc.VideoTrack getWebrtcVideoTrack() {
-        return rtcTrack;
+        return webRtcVideoTrack;
     }
 
     TrackInfo getTrackInfo() {
