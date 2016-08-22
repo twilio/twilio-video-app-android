@@ -2,7 +2,7 @@
 #define CONVERSATIONS_ANDROID_COM_TWILIO_VIDEO_MEDIA_H_H
 #include <jni.h>
 
-#include "media/Media.h"
+#include "media/media.h"
 #include "media/track.h"
 
 #ifdef __cplusplus
