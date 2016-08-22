@@ -1,4 +1,6 @@
 #include "com_twilio_video_LocalMedia.h"
+#include "third_party/webrtc/webrtc/api/androidvideocapturer.h"
+#include "third_party/webrtc/webrtc/api/java/jni/androidvideocapturer_jni.h"
 #include "webrtc/api/java/jni/jni_helpers.h"
 
 namespace twilio_video_jni {
@@ -16,9 +18,22 @@ twilio::media::MediaConstraints* getAudioOptions(jobject j_audio_options) {
     return nullptr;
 }
 
+twilio::media::MediaConstraints* getVideoConstraints(jobject j_video_contraints) {
+    // TODO: convert from java object to actual constraints
+    return nullptr;
+}
+
 JNIEXPORT jobject JNICALL Java_com_twilio_video_LocalMedia_nativeGetDefaultAudioOptions(JNIEnv *jni,
                                                                                         jobject j_local_media) {
     // TODO: create default audio options
+    return nullptr;
+}
+
+JNIEXPORT jobject JNICALL Java_com_twilio_video_LocalMedia_nativeGetDefaultVideoConstraints(JNIEnv *jni,
+                                                                                            jobject j_local_media) {
+    twilio::media::MediaConstraints* default_video_constraints =
+            twilio::media::MediaConstraints::defaultVideoConstraints();
+
     return nullptr;
 }
 
@@ -41,6 +56,34 @@ JNIEXPORT jboolean JNICALL Java_com_twilio_video_LocalMedia_nativeRemoveAudioTra
     twilio::media::LocalMedia* local_media = getLocalMedia(local_media_handle);
 
     return local_media->removeAudioTrack(webrtc_jni::JavaToStdString(jni, track_id));
+}
+
+JNIEXPORT jlong JNICALL Java_com_twilio_video_LocalMedia_nativeAddVideoTrack(JNIEnv *jni,
+                                                                             jobject j_local_media,
+                                                                             jlong local_media_handle,
+                                                                             jboolean enabled,
+                                                                             jobject j_video_capturer,
+                                                                             jobject j_video_contraints) {
+    twilio::media::LocalMedia* local_media = getLocalMedia(local_media_handle);
+    rtc::scoped_refptr<webrtc::AndroidVideoCapturerDelegate> delegate =
+            new rtc::RefCountedObject<webrtc_jni::AndroidVideoCapturerJni>(jni,
+                                                                           j_video_capturer,
+                                                                           nullptr);
+    cricket::VideoCapturer* capturer = new webrtc::AndroidVideoCapturer(delegate);
+
+    std::shared_ptr<twilio::media::VideoTrack> video_track = local_media->addVideoTrack(enabled,
+                                                                                        getVideoConstraints(j_video_contraints),
+                                                                                        capturer);
+
+    return webrtc_jni::jlongFromPointer(video_track.get()->getWebrtcTrack());
+}
+JNIEXPORT jboolean JNICALL Java_com_twilio_video_LocalMedia_nativeRemoveVideoTrack(JNIEnv *jni,
+                                                                                   jobject j_local_media,
+                                                                                   jlong local_media_handle,
+                                                                                   jstring track_id) {
+    twilio::media::LocalMedia* local_media = getLocalMedia(local_media_handle);
+
+    return local_media->removeVideoTrack(webrtc_jni::JavaToStdString(jni, track_id));
 }
 
 JNIEXPORT void JNICALL Java_com_twilio_video_LocalMedia_nativeRelease(JNIEnv *jni,

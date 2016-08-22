@@ -5,6 +5,8 @@ import android.support.test.InstrumentationRegistry;
 import android.support.test.filters.LargeTest;
 import android.support.test.runner.AndroidJUnit4;
 
+import com.twilio.video.util.FakeVideoCapturer;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -24,11 +26,13 @@ import static org.junit.Assert.fail;
 public class LocalMediaTest {
     private Context context;
     private LocalMedia localMedia;
+    private VideoCapturer fakeVideoCapturer;
 
     @Before
     public void setup() {
         context = InstrumentationRegistry.getInstrumentation().getTargetContext();
         localMedia = LocalMedia.create(context);
+        fakeVideoCapturer = new FakeVideoCapturer();
     }
 
     @After
@@ -143,23 +147,96 @@ public class LocalMediaTest {
     }
 
     @Test
-    public void canAddVideoTrack() {
+    public void canAddEnabledVideoTrack() {
+        boolean expectedEnabled = true;
+        LocalVideoTrack localVideoTrack = localMedia.addVideoTrack(expectedEnabled,
+                fakeVideoCapturer);
+
+        assertNotNull(localVideoTrack);
+        assertEquals(expectedEnabled, localVideoTrack.isEnabled());
+        assertEquals(1, localMedia.getLocalVideoTracks().size());
+    }
+
+    @Test
+    public void canAddDisabledVideoTrack() {
+        boolean expectedEnabled = false;
+        LocalVideoTrack localVideoTrack = localMedia.addVideoTrack(expectedEnabled,
+                fakeVideoCapturer);
+
+        assertNotNull(localVideoTrack);
+        assertEquals(expectedEnabled, localVideoTrack.isEnabled());
+        assertEquals(1, localMedia.getLocalVideoTracks().size());
+    }
+
+    /**
+     * TODO add more constraint based tests
+     */
+    @Test
+    public void canAddVideoTrackWithConstraints() {
         // TODO
     }
 
     @Test
-    public void canAddAudioAndVideoTrack() {
-        // TODO
+    public void canRemoveVideoTrack() {
+        LocalVideoTrack localVideoTrack = localMedia.addVideoTrack(true, fakeVideoCapturer);
+
+        // Validate the track was added
+        assertNotNull(localVideoTrack);
+        assertEquals(1, localMedia.getLocalVideoTracks().size());
+
+        // Now remove and validate it is gone
+        assertTrue(localMedia.removeLocalVideoTrack(localVideoTrack));
+        assertEquals(0, localMedia.getLocalVideoTracks().size());
     }
 
     @Test
     public void canAddMultipleVideoTracks() {
-        // TODO
+        int numVideoTracks = 5;
+        boolean[] expectedEnabled = new boolean[]{ false, true, true, false, false };
+
+        for (int i = 0 ; i < numVideoTracks ; i++) {
+            LocalVideoTrack localVideoTrack = localMedia.addVideoTrack(expectedEnabled[i],
+                    fakeVideoCapturer);
+            int expectedSize = i + 1;
+
+            assertNotNull(localVideoTrack);
+            assertEquals(expectedEnabled[i], localVideoTrack.isEnabled());
+            assertEquals(expectedSize, localMedia.getLocalVideoTracks().size());
+        }
     }
 
     @Test
-    public void canAddMultipleAudioAndVideoTracks() {
-        // TODO
+    public void canAddAndRemoveMultipleVideoTracks() {
+        int numVideoTracks = 5;
+        LocalVideoTrack[] localVideoTracks = new LocalVideoTrack[numVideoTracks];
+
+        for (int i = 0 ; i < numVideoTracks ; i++) {
+            int expectedSize = i + 1;
+
+            localVideoTracks[i] = localMedia.addVideoTrack(false, fakeVideoCapturer);
+            assertNotNull(localVideoTracks[i]);
+            assertEquals(expectedSize, localMedia.getLocalVideoTracks().size());
+        }
+
+        for (int i = numVideoTracks - 1 ; i >= 0 ; i--) {
+            int expectedSize = i;
+            assertTrue(localMedia.removeLocalVideoTrack(localVideoTracks[i]));
+            assertEquals(expectedSize, localMedia.getLocalVideoTracks().size());
+        }
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void addVideoTrack_shouldFailAfterRelease() {
+        localMedia.release();
+        localMedia.addVideoTrack(false, new FakeVideoCapturer());
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void removeVideoTrack_shouldFailAfterRelease() {
+        LocalVideoTrack localVideoTrack = localMedia.addVideoTrack(false, fakeVideoCapturer);
+        assertNotNull(localVideoTrack);
+        localMedia.release();
+        localMedia.removeLocalVideoTrack(localVideoTrack);
     }
 
     @Test

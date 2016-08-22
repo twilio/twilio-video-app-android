@@ -15,10 +15,14 @@ public class VideoTrack implements MediaTrack {
     private static final String WARNING_NULL_RENDERER = "Attempted to add a null renderer.";
     private static final Logger logger = Logger.getLogger(VideoTrack.class);
 
-    private org.webrtc.VideoTrack videoTrack;
+    private final org.webrtc.VideoTrack rtcTrack;
     private TrackInfo trackInfo;
     private MediaTrackState trackState;
     private Map<VideoRenderer, org.webrtc.VideoRenderer> videoRenderersMap = new HashMap<>();
+
+    VideoTrack(org.webrtc.VideoTrack rtcTrack) {
+        this.rtcTrack = rtcTrack;
+    }
 
     /**
      * Add a video renderer to get video from the video track
@@ -30,7 +34,7 @@ public class VideoTrack implements MediaTrack {
             org.webrtc.VideoRenderer webrtcVideoRenderer =
                     createWebRtcVideoRenderer(videoRenderer);
             videoRenderersMap.put(videoRenderer, webrtcVideoRenderer);
-            videoTrack.addRenderer(webrtcVideoRenderer);
+            rtcTrack.addRenderer(webrtcVideoRenderer);
         } else {
             logger.w(WARNING_NULL_RENDERER);
         }
@@ -46,7 +50,7 @@ public class VideoTrack implements MediaTrack {
             org.webrtc.VideoRenderer webrtcVideoRenderer =
                     videoRenderersMap.remove(videoRenderer);
             if (webrtcVideoRenderer != null) {
-                videoTrack.removeRenderer(webrtcVideoRenderer);
+                rtcTrack.removeRenderer(webrtcVideoRenderer);
             }
         }
     }
@@ -75,7 +79,7 @@ public class VideoTrack implements MediaTrack {
 
     @Override
     public boolean isEnabled() {
-        if ((videoTrack != null) && (trackInfo != null)) {
+        if ((rtcTrack != null) && (trackInfo != null)) {
             return trackInfo.isEnabled();
         }
         return false;
@@ -89,29 +93,12 @@ public class VideoTrack implements MediaTrack {
         this.trackState = trackState;
     }
 
-    VideoTrack() {
-        trackState = MediaTrackState.IDLE;
-    }
-
-    VideoTrack(org.webrtc.VideoTrack videoTrack, TrackInfo trackInfo) {
-        this.videoTrack = videoTrack;
-        this.trackInfo = trackInfo;
-
-        trackState = MediaTrackState.STARTED;
-    }
-
-    void setWebrtcVideoTrack(org.webrtc.VideoTrack videoTrack) {
-        this.videoTrack = videoTrack;
-
-        trackState = MediaTrackState.STARTED;
-    }
-
     void setTrackInfo(TrackInfo trackInfo) {
         this.trackInfo = trackInfo;
     }
 
     org.webrtc.VideoTrack getWebrtcVideoTrack() {
-        return videoTrack;
+        return rtcTrack;
     }
 
     TrackInfo getTrackInfo() {

@@ -24,18 +24,11 @@ public class LocalVideoTrack extends VideoTrack {
                 .maxVideoDimensions(new VideoDimensions(640,480))
                 .build();
     }
-    public LocalVideoTrack(VideoCapturer videoCapturer) {
-        this(videoCapturer, defaultVideoConstraints());
-    }
 
-    public LocalVideoTrack(VideoCapturer videoCapturer, VideoConstraints videoConstraints) {
-        super();
-        if(videoCapturer == null) {
-            throw new NullPointerException("CameraCapturer must not be null");
-        }
-        if(videoConstraints == null) {
-            throw new NullPointerException("VideoConstraints must not be null");
-        }
+    LocalVideoTrack(org.webrtc.VideoTrack rtcTrack,
+                    VideoCapturer videoCapturer,
+                    VideoConstraints videoConstraints) {
+        super(rtcTrack);
         this.videoCapturer = videoCapturer;
         this.videoConstraints = videoConstraints;
     }
@@ -49,12 +42,6 @@ public class LocalVideoTrack extends VideoTrack {
         return videoCapturer;
     }
 
-    /**
-     * Specifies whether or not your camera video should be shared
-     *
-     * @param enabled <code>true</code> if camera should be shared, false otherwise
-     * @return true if the operation succeeded. false if there is an operation in progress.
-     */
     public boolean enable(boolean enabled) {
         org.webrtc.VideoTrack videoTrack = getWebrtcVideoTrack();
         if (videoTrack != null) {
@@ -71,13 +58,17 @@ public class LocalVideoTrack extends VideoTrack {
     }
 
     @Override
+    public String getTrackId() {
+        org.webrtc.VideoTrack videoTrack = getWebrtcVideoTrack();
+
+        return videoTrack.id();
+    }
+
+    @Override
     public boolean isEnabled() {
         org.webrtc.VideoTrack videoTrack = getWebrtcVideoTrack();
-        if (videoTrack != null) {
-            return videoTrack.enabled();
-        } else {
-            return enabledVideo;
-        }
+
+        return videoTrack.enabled();
     }
 
     /**
