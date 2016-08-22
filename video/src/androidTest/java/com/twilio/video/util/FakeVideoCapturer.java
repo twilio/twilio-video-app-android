@@ -13,6 +13,7 @@ public class FakeVideoCapturer implements VideoCapturer {
     private int captureWidth = 0;
     private int captureHeight = 0;
     private int captureFramerate = 0;
+    private boolean started = false;
 
     public int getCaptureWidth() {
         return captureWidth;
@@ -24,6 +25,10 @@ public class FakeVideoCapturer implements VideoCapturer {
 
     public int getCaptureFramerate() {
         return captureFramerate;
+    }
+
+    public boolean isStarted() {
+        return started;
     }
 
     @Override
@@ -42,10 +47,15 @@ public class FakeVideoCapturer implements VideoCapturer {
         this.captureWidth = width;
         this.captureHeight = height;
         this.captureFramerate = framerate;
+        this.started = true;
     }
 
     @Override
     public void stopCapture() {
         logger.i("stopCapture");
+        this.captureWidth = 0;
+        this.captureHeight = 0;
+        this.captureFramerate = 0;
+        this.started = false;
     }
 }

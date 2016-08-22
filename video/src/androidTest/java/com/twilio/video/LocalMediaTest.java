@@ -13,6 +13,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import static junit.framework.TestCase.assertEquals;
+import static junit.framework.TestCase.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
@@ -151,6 +152,7 @@ public class LocalMediaTest {
         assertNotNull(localVideoTrack);
         assertEquals(expectedEnabled, localVideoTrack.isEnabled());
         assertEquals(1, localMedia.getLocalVideoTracks().size());
+        assertTrue(fakeVideoCapturer.isStarted());
     }
 
     @Test
@@ -215,6 +217,7 @@ public class LocalMediaTest {
         // Now remove and validate it is gone
         assertTrue(localMedia.removeLocalVideoTrack(localVideoTrack));
         assertEquals(0, localMedia.getLocalVideoTracks().size());
+        assertFalse(fakeVideoCapturer.isStarted());
     }
 
     @Test
