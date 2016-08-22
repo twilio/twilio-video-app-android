@@ -240,6 +240,53 @@ public class LocalMediaTest {
     }
 
     @Test
+    public void canAddAudioAndVideoTrack() {
+        LocalAudioTrack localAudioTrack = localMedia.addAudioTrack(true);
+        LocalVideoTrack localVideoTrack = localMedia.addVideoTrack(true, fakeVideoCapturer);
+
+        assertNotNull(localAudioTrack);
+        assertNotNull(localVideoTrack);
+        assertEquals(1, localMedia.getLocalAudioTracks().size());
+        assertEquals(1, localMedia.getLocalVideoTracks().size());
+    }
+
+    @Test
+    public void canAddMultipleAudioAndVideoTracks() {
+        int numAudioTracks = 5;
+        int numVideoTracks = 5;
+        LocalAudioTrack[] localAudioTracks = new LocalAudioTrack[numAudioTracks];
+        LocalVideoTrack[] localVideoTracks = new LocalVideoTrack[numVideoTracks];
+
+        for (int i = 0 ; i < numAudioTracks ; i++) {
+            int expectedSize = i + 1;
+
+            localAudioTracks[i] = localMedia.addAudioTrack(false);
+            assertNotNull(localAudioTracks[i]);
+            assertEquals(expectedSize, localMedia.getLocalAudioTracks().size());
+        }
+
+        for (int i = 0 ; i < numVideoTracks ; i++) {
+            int expectedSize = i + 1;
+
+            localVideoTracks[i] = localMedia.addVideoTrack(false, fakeVideoCapturer);
+            assertNotNull(localVideoTracks[i]);
+            assertEquals(expectedSize, localMedia.getLocalVideoTracks().size());
+        }
+
+        for (int i = numAudioTracks - 1 ; i >= 0 ; i--) {
+            int expectedSize = i;
+            assertTrue(localMedia.removeAudioTrack(localAudioTracks[i]));
+            assertEquals(expectedSize, localMedia.getLocalAudioTracks().size());
+        }
+
+        for (int i = numVideoTracks - 1 ; i >= 0 ; i--) {
+            int expectedSize = i;
+            assertTrue(localMedia.removeLocalVideoTrack(localVideoTracks[i]));
+            assertEquals(expectedSize, localMedia.getLocalVideoTracks().size());
+        }
+    }
+
+    @Test
     public void release_shouldBeIdempotent() {
         localMedia.release();
         localMedia.release();
