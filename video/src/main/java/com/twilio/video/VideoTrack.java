@@ -11,14 +11,23 @@ import java.util.Map;
 /**
  * A video track represents a single local or remote video source
  */
-public class VideoTrack implements MediaTrack {
+public class VideoTrack {
     private static final String WARNING_NULL_RENDERER = "Attempted to add a null renderer.";
     private static final Logger logger = Logger.getLogger(VideoTrack.class);
 
-    private org.webrtc.VideoTrack videoTrack;
-    private TrackInfo trackInfo;
-    private MediaTrackState trackState;
+    private org.webrtc.VideoTrack webrtcVideoTrack;
+    private String trackId;
     private Map<VideoRenderer, org.webrtc.VideoRenderer> videoRenderersMap = new HashMap<>();
+    private boolean isEnabled;
+    private long nativeVideoTrackContext;
+
+    VideoTrack(long nativeVideoTrackContext, String trackId,
+               boolean isEnabled, long nativeWebrtcTrack) {
+        this.nativeVideoTrackContext = nativeVideoTrackContext;
+        this.trackId = trackId;
+        this.isEnabled = isEnabled;
+        this.webrtcVideoTrack = new org.webrtc.VideoTrack(nativeWebrtcTrack);
+    }
 
     /**
      * Add a video renderer to get video from the video track
@@ -30,7 +39,7 @@ public class VideoTrack implements MediaTrack {
             org.webrtc.VideoRenderer webrtcVideoRenderer =
                     createWebRtcVideoRenderer(videoRenderer);
             videoRenderersMap.put(videoRenderer, webrtcVideoRenderer);
-            videoTrack.addRenderer(webrtcVideoRenderer);
+            webrtcVideoTrack.addRenderer(webrtcVideoRenderer);
         } else {
             logger.w(WARNING_NULL_RENDERER);
         }
@@ -46,7 +55,7 @@ public class VideoTrack implements MediaTrack {
             org.webrtc.VideoRenderer webrtcVideoRenderer =
                     videoRenderersMap.remove(videoRenderer);
             if (webrtcVideoRenderer != null) {
-                videoTrack.removeRenderer(webrtcVideoRenderer);
+                webrtcVideoTrack.removeRenderer(webrtcVideoRenderer);
             }
         }
     }
@@ -62,60 +71,28 @@ public class VideoTrack implements MediaTrack {
         return new org.webrtc.VideoRenderer(new VideoRendererCallbackAdapter(videoRenderer));
     }
 
-    @Override
     public String getTrackId() {
-        return trackInfo != null ? trackInfo.getTrackId() : null;
-    }
-
-    @Override
-    public MediaTrackState getState() {
-        return trackState;
+        return trackId;
     }
 
 
-    @Override
     public boolean isEnabled() {
-        if ((videoTrack != null) && (trackInfo != null)) {
-            return trackInfo.isEnabled();
+        return isEnabled;
+    }
+
+    void setEnabled(boolean isEnabled) {
+        this.isEnabled = isEnabled;
+    }
+
+    void release() {
+        if (nativeVideoTrackContext != 0) {
+            if (webrtcVideoTrack != null) {
+                webrtcVideoTrack.dispose();
+                webrtcVideoTrack = null;
+            }
+            nativeRelease(nativeVideoTrackContext);
+            nativeVideoTrackContext = 0;
         }
-        return false;
-    }
-
-    void updateTrackInfo(TrackInfo trackInfo) {
-        this.trackInfo = trackInfo;
-    }
-
-    void setTrackState(MediaTrackState trackState) {
-        this.trackState = trackState;
-    }
-
-    VideoTrack() {
-        trackState = MediaTrackState.IDLE;
-    }
-
-    VideoTrack(org.webrtc.VideoTrack videoTrack, TrackInfo trackInfo) {
-        this.videoTrack = videoTrack;
-        this.trackInfo = trackInfo;
-
-        trackState = MediaTrackState.STARTED;
-    }
-
-    void setWebrtcVideoTrack(org.webrtc.VideoTrack videoTrack) {
-        this.videoTrack = videoTrack;
-
-        trackState = MediaTrackState.STARTED;
-    }
-
-    void setTrackInfo(TrackInfo trackInfo) {
-        this.trackInfo = trackInfo;
-    }
-
-    org.webrtc.VideoTrack getWebrtcVideoTrack() {
-        return videoTrack;
-    }
-
-    TrackInfo getTrackInfo() {
-        return trackInfo;
     }
 
     private class VideoRendererCallbackAdapter implements org.webrtc.VideoRenderer.Callbacks {
@@ -149,5 +126,11 @@ public class VideoTrack implements MediaTrack {
                     frameNativePointer);
         }
     }
+
+    org.webrtc.VideoTrack getWebrtcVideoTrack() {
+        return webrtcVideoTrack;
+    }
+
+    private native void nativeRelease(long nativeVideoTrackContext);
 }
 

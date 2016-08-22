@@ -4,10 +4,11 @@ package com.twilio.video;
  * A local video track that gets camera video from a {@link CameraCapturer}
  *
  */
-public class LocalVideoTrack extends VideoTrack {
+public class LocalVideoTrack  {
     private VideoConstraints videoConstraints;
     private VideoCapturer videoCapturer;
     private boolean enabledVideo = true;
+    private org.webrtc.VideoTrack webrtcVideoTrack;
 
     /**
      * TODO
@@ -29,7 +30,6 @@ public class LocalVideoTrack extends VideoTrack {
     }
 
     public LocalVideoTrack(VideoCapturer videoCapturer, VideoConstraints videoConstraints) {
-        super();
         if(videoCapturer == null) {
             throw new NullPointerException("CameraCapturer must not be null");
         }
@@ -56,9 +56,8 @@ public class LocalVideoTrack extends VideoTrack {
      * @return true if the operation succeeded. false if there is an operation in progress.
      */
     public boolean enable(boolean enabled) {
-        org.webrtc.VideoTrack videoTrack = getWebrtcVideoTrack();
-        if (videoTrack != null) {
-            enabledVideo = videoTrack.setEnabled(enabled);
+        if (webrtcVideoTrack != null) {
+            enabledVideo = webrtcVideoTrack.setEnabled(enabled);
             if(enabledVideo && enabled) {
 //                videoCapturer.resume();
             } else if(enabledVideo && !enabled){
@@ -70,11 +69,9 @@ public class LocalVideoTrack extends VideoTrack {
         return enabledVideo;
     }
 
-    @Override
     public boolean isEnabled() {
-        org.webrtc.VideoTrack videoTrack = getWebrtcVideoTrack();
-        if (videoTrack != null) {
-            return videoTrack.enabled();
+        if (webrtcVideoTrack != null) {
+            return webrtcVideoTrack.enabled();
         } else {
             return enabledVideo;
         }

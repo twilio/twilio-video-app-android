@@ -8,6 +8,9 @@
 #include "video/participant.h"
 
 #include "com_twilio_video_Participant.h"
+#include "com_twilio_video_Media.h"
+
+#include <vector>
 
 using namespace webrtc_jni;
 
@@ -18,6 +21,10 @@ public:
         j_room_observer_class_(env, GetObjectClass(env, *j_room_observer_)),
         j_participant_class_(
             env, env->FindClass("com/twilio/video/Participant")),
+        j_array_list_class_(env, env->FindClass("java/util/ArrayList")),
+        j_audio_track_class_(env, env->FindClass("com/twilio/video/AudioTrack")),
+        j_video_track_class_(env, env->FindClass("com/twilio/video/VideoTrack")),
+        j_media_class_(env, env->FindClass("com/twilio/video/Media")),
         j_on_connected_(
             GetMethodID(env,
                         *j_room_observer_class_,
@@ -43,11 +50,41 @@ public:
                         *j_room_observer_class_,
                         "onParticipantDisconnected",
                         "(Ljava/lang/String;)V")),
+        j_get_handler_(
+            GetMethodID(env,
+                        *j_room_observer_class_,
+                        "getHandler",
+                        "()Landroid/os/Handler;")),
         j_participant_ctor_id_(
             GetMethodID(env,
                         *j_participant_class_,
                         "<init>",
-                        "(Ljava/lang/String;Ljava/lang/String;JJ)V"))
+                        "(Ljava/lang/String;Ljava/lang/String;Lcom/twilio/video/Media;J)V")),
+        j_array_list_ctor_id_(
+            webrtc_jni::GetMethodID(env,
+                                    *j_array_list_class_,
+                                    "<init>",
+                                    "()V")),
+        j_array_list_add_(
+            webrtc_jni::GetMethodID(env,
+                                    *j_array_list_class_,
+                                    "add",
+                                    "(Ljava/lang/Object;)Z")),
+        j_audio_track_ctor_id_(
+            webrtc_jni::GetMethodID(env,
+                                    *j_audio_track_class_,
+                                    "<init>",
+                                    "(JLjava/lang/String;ZJ)V")),
+        j_video_track_ctor_id_(
+            webrtc_jni::GetMethodID(env,
+                                    *j_video_track_class_,
+                                    "<init>",
+                                    "(JLjava/lang/String;ZJ)V")),
+        j_media_ctor_id_(
+            webrtc_jni::GetMethodID(env,
+                                    *j_media_class_,
+                                    "<init>",
+                                    "(JLjava/util/List;Ljava/util/List;Landroid/os/Handler;)V"))
         {
         TS_CORE_LOG_MODULE(kTSCoreLogModulePlatform,
                            kTSCoreLogLevelDebug,
@@ -141,11 +178,14 @@ protected:
             jstring j_sid = webrtc_jni::JavaStringFromStdString(jni(), participant->getSid());
             jstring j_identity =
                 webrtc_jni::JavaStringFromStdString(jni(), participant->getIdentity());
-            jlong j_media_context = 0;
+
+            jobject j_media = createJavaMediaObject(participant->getMedia());
+
+            // Create participant
             jlong j_participant_context = webrtc_jni::jlongFromPointer(participant_context);
             jobject j_participant =
                 jni()->NewObject(*j_participant_class_, j_participant_ctor_id_,
-                                 j_identity, j_sid, j_media_context, j_participant_context);
+                                 j_identity, j_sid, j_media, j_participant_context);
 
             jni()->CallVoidMethod(*j_room_observer_,
                                   j_on_participant_connected_,
@@ -199,18 +239,71 @@ private:
         return true;
     }
 
+    jobject createJavaMediaObject(std::shared_ptr<twilio::media::Media> media) {
+        // Create media context
+        MediaContext *media_context = new MediaContext();
+        media_context->media = media;
+        jlong j_media_context = webrtc_jni::jlongFromPointer(media_context);
+
+        // Create ArrayList<AudioTrack>
+        jobject j_audio_tracks = jni()->NewObject(*j_array_list_class_, j_array_list_ctor_id_);
+
+        const std::vector<std::shared_ptr<twilio::media::AudioTrack>> audio_tracks =
+            media->getAudioTracks();
+
+        // Add audio tracks to array list
+        for (int i = 0; i < audio_tracks.size(); i++) {
+            jobject j_audio_track =
+                createJavaAudioTrack(jni(), audio_tracks[i],
+                                     *j_audio_track_class_, j_audio_track_ctor_id_);
+            jni()->CallVoidMethod(j_audio_tracks, j_array_list_add_, j_audio_track);
+        }
+
+        // Create ArrayList<VideoTracks>
+        jobject j_video_tracks = jni()->NewObject(*j_array_list_class_, j_array_list_ctor_id_);
+
+        const std::vector<std::shared_ptr<twilio::media::VideoTrack>> video_tracks =
+            media->getVideoTracks();
+
+        // Add audio tracks to array list
+        for (int i = 0; i < video_tracks.size(); i++) {
+            jobject j_video_track =
+                createJavaVideoTrack(jni(), video_tracks[i],
+                                     *j_video_track_class_, j_video_track_ctor_id_);
+            jni()->CallVoidMethod(j_video_tracks, j_array_list_add_, j_video_track);
+        }
+
+        jobject j_handler = jni()->CallObjectMethod(*j_room_observer_, j_get_handler_);
+
+        // Create java media object
+        return jni()->NewObject(
+            *j_media_class_, j_media_ctor_id_, j_media_context,
+            j_audio_tracks, j_video_tracks, j_handler);
+
+    }
+
     bool observer_deleted_ = false;
     mutable rtc::CriticalSection deletion_lock_;
 
     const webrtc_jni::ScopedGlobalRef<jobject> j_room_observer_;
     const webrtc_jni::ScopedGlobalRef<jclass> j_room_observer_class_;
     const webrtc_jni::ScopedGlobalRef<jclass> j_participant_class_;
+    const webrtc_jni::ScopedGlobalRef<jclass> j_array_list_class_;
+    const webrtc_jni::ScopedGlobalRef<jclass> j_audio_track_class_;
+    const webrtc_jni::ScopedGlobalRef<jclass> j_video_track_class_;
+    const webrtc_jni::ScopedGlobalRef<jclass> j_media_class_;
     jmethodID j_on_connected_;
     jmethodID j_on_disconnected_;
     jmethodID j_on_connect_failure_;
     jmethodID j_on_participant_connected_;
     jmethodID j_on_participant_disconnected_;
+    jmethodID j_get_handler_;
     jmethodID j_participant_ctor_id_;
+    jmethodID j_array_list_ctor_id_;
+    jmethodID j_array_list_add_;
+    jmethodID j_audio_track_ctor_id_;
+    jmethodID j_video_track_ctor_id_;
+    jmethodID j_media_ctor_id_;
 
 };
 

@@ -46,7 +46,7 @@ public class LocalMedia {
 
         if (nativeAudioTrack != 0) {
             org.webrtc.AudioTrack webRtcAudioTrack = new org.webrtc.AudioTrack(nativeAudioTrack);
-            localAudioTrack = new LocalAudioTrack(webRtcAudioTrack, null);
+            localAudioTrack = new LocalAudioTrack(webRtcAudioTrack);
 
             localAudioTrack.enable(enabled);
             localAudioTracks.add(localAudioTrack);
