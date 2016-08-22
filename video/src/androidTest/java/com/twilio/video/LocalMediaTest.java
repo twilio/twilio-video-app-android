@@ -18,6 +18,7 @@ import java.util.concurrent.TimeUnit;
 
 import static junit.framework.TestCase.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -168,13 +169,22 @@ public class LocalMediaTest {
         assertEquals(1, localMedia.getLocalVideoTracks().size());
     }
 
-    /**
-     * TODO add more constraint based tests
-     */
     @Test
-    public void canAddVideoTrackWithConstraints() {
-        // TODO
+    public void addLocalVideoTrack_shouldFailForInvalidConstraints() {
+        VideoConstraints invalidVideoConstraints = new VideoConstraints.Builder()
+                .minVideoDimensions(new VideoDimensions(1,2))
+                .maxVideoDimensions(new VideoDimensions(10,20))
+                .build();
+        LocalVideoTrack localVideoTrack = localMedia.addVideoTrack(true,
+                fakeVideoCapturer,
+                invalidVideoConstraints);
+
+        assertNull(localVideoTrack);
     }
+
+    /**
+     * TODO add valid video contraints tests
+     */
 
     @Test
     public void canRemoveVideoTrack() {
