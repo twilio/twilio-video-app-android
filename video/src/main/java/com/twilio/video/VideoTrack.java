@@ -17,7 +17,6 @@ public class VideoTrack {
 
     private org.webrtc.VideoTrack webrtcVideoTrack;
     private String trackId;
-    //private MediaTrackState trackState;
     private Map<VideoRenderer, org.webrtc.VideoRenderer> videoRenderersMap = new HashMap<>();
     private boolean isEnabled;
     private long nativeVideoTrackContext;

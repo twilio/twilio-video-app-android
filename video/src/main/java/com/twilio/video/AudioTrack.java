@@ -5,9 +5,7 @@ package com.twilio.video;
  */
 public class AudioTrack {
     private org.webrtc.AudioTrack webrtcAudioTrack;
-    //private TrackInfo trackInfo;
     private String trackId;
-    private MediaTrackState trackState;
     private long nativeAudioTrackContext;
     private boolean isEnabled;
 

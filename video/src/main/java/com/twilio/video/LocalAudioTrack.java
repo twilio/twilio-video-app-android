@@ -3,7 +3,7 @@ package com.twilio.video;
 public class LocalAudioTrack  {
     private org.webrtc.AudioTrack webrtcAudioTrack;
 
-    LocalAudioTrack(org.webrtc.AudioTrack audioTrack, TrackInfo trackInfo) {
+    LocalAudioTrack(org.webrtc.AudioTrack audioTrack) {
         webrtcAudioTrack = audioTrack;
     }
 
