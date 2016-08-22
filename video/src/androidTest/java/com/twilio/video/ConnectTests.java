@@ -9,6 +9,7 @@ import android.support.test.runner.AndroidJUnit4;
 import com.twilio.common.AccessManager;
 import com.twilio.video.activity.RoomsTestActivity;
 import com.twilio.video.helper.AccessTokenHelper;
+import com.twilio.video.helper.CallbackHelper;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -48,7 +49,7 @@ public class ConnectTests {
 
     @Test
     public void connect_shouldConnectToANewRoom() throws InterruptedException {
-        FakeRoomListener roomListener = new FakeRoomListener();
+        CallbackHelper.FakeRoomListener roomListener = new CallbackHelper.FakeRoomListener();
         roomListener.onConnectedLatch = new CountDownLatch(1);
 
         AccessManager accessManager = AccessTokenHelper.obtainAccessManager(context, TEST_USER);
@@ -62,7 +63,7 @@ public class ConnectTests {
 
     @Test
     public void connect_shouldConnectToANamedRoom() throws InterruptedException {
-        FakeRoomListener roomListener = new FakeRoomListener();
+        CallbackHelper.FakeRoomListener roomListener = new CallbackHelper.FakeRoomListener();
         roomListener.onConnectedLatch = new CountDownLatch(1);
 
         AccessManager accessManager = AccessTokenHelper.obtainAccessManager(context, TEST_USER);
@@ -79,7 +80,7 @@ public class ConnectTests {
 
     @Test
     public void connect_shouldDisconnectFromRoom() throws InterruptedException {
-        FakeRoomListener roomListener = new FakeRoomListener();
+        CallbackHelper.FakeRoomListener roomListener = new CallbackHelper.FakeRoomListener();
         roomListener.onConnectedLatch = new CountDownLatch(1);
         roomListener.onDisconnectedLatch = new CountDownLatch(1);
 
@@ -101,7 +102,7 @@ public class ConnectTests {
 
     @Test
     public void connect_shouldConnectParticipant() throws InterruptedException {
-        FakeRoomListener roomListener = new FakeRoomListener();
+        CallbackHelper.FakeRoomListener roomListener = new CallbackHelper.FakeRoomListener();
         roomListener.onConnectedLatch = new CountDownLatch(1);
         roomListener.onDisconnectedLatch = new CountDownLatch(1);
         roomListener.onParticipantConnectedLatch = new CountDownLatch(1);
@@ -119,7 +120,7 @@ public class ConnectTests {
         assertTrue(roomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
         assertEquals(RoomState.CONNECTED, room.getState());
 
-        videoClient2.connect(connectOptions, new EmptyRoomListener());
+        videoClient2.connect(connectOptions, new CallbackHelper.EmptyRoomListener());
 
         assertTrue(roomListener.onParticipantConnectedLatch.await(20, TimeUnit.SECONDS));
         assertEquals(1, room.getParticipants().size());
@@ -133,7 +134,7 @@ public class ConnectTests {
 
     @Test
     public void connect_shouldDisconnectParticipant() throws InterruptedException {
-        FakeRoomListener roomListener = new FakeRoomListener();
+        CallbackHelper.FakeRoomListener roomListener = new CallbackHelper.FakeRoomListener();
         roomListener.onConnectedLatch = new CountDownLatch(1);
         roomListener.onParticipantDisconnectedLatch = new CountDownLatch(1);
         roomListener.onParticipantConnectedLatch = new CountDownLatch(1);
@@ -151,7 +152,7 @@ public class ConnectTests {
         assertTrue(roomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
         assertEquals(RoomState.CONNECTED, room.getState());
 
-        Room client2room = videoClient2.connect(connectOptions, new EmptyRoomListener());
+        Room client2room = videoClient2.connect(connectOptions, new CallbackHelper.EmptyRoomListener());
 
         assertTrue(roomListener.onParticipantConnectedLatch.await(20, TimeUnit.SECONDS));
         assertEquals(room.getParticipants().size(), 1);
@@ -168,72 +169,5 @@ public class ConnectTests {
         return new AccessManager(context, null, null);
     }
 
-    class FakeRoomListener implements Room.Listener {
-
-        public CountDownLatch onConnectedLatch;
-        public CountDownLatch onConnectFailureLatch;
-        public CountDownLatch onDisconnectedLatch;
-        public CountDownLatch onParticipantConnectedLatch;
-        public CountDownLatch onParticipantDisconnectedLatch;
-
-        private void triggerLatch(CountDownLatch latch) {
-            if (latch != null) {
-                latch.countDown();
-            }
-        }
-
-        @Override
-        public void onConnected(Room room) {
-            triggerLatch(onConnectedLatch);
-        }
-
-        @Override
-        public void onConnectFailure(VideoException error) {
-            triggerLatch(onConnectFailureLatch);
-        }
-
-        @Override
-        public void onDisconnected(Room room, VideoException error) {
-            triggerLatch(onDisconnectedLatch);
-        }
-
-        @Override
-        public void onParticipantConnected(Room room, Participant participant) {
-            triggerLatch(onParticipantConnectedLatch);
-        }
-
-        @Override
-        public void onParticipantDisconnected(Room room, Participant participant) {
-            triggerLatch(onParticipantDisconnectedLatch);
-        }
-    }
-
-    class EmptyRoomListener implements Room.Listener {
-
-        @Override
-        public void onConnected(Room room) {
-
-        }
-
-        @Override
-        public void onConnectFailure(VideoException error) {
-
-        }
-
-        @Override
-        public void onDisconnected(Room room, VideoException error) {
-
-        }
-
-        @Override
-        public void onParticipantConnected(Room room, Participant participant) {
-
-        }
-
-        @Override
-        public void onParticipantDisconnected(Room room, Participant participant) {
-
-        }
-    }
 }
 
