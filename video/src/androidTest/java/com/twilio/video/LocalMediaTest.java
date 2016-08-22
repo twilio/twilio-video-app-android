@@ -9,25 +9,20 @@ import com.twilio.video.util.FakeVideoCapturer;
 
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
 
 import static junit.framework.TestCase.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 @RunWith(AndroidJUnit4.class)
 @LargeTest
 public class LocalMediaTest {
     private Context context;
     private LocalMedia localMedia;
-    private VideoCapturer fakeVideoCapturer;
+    private FakeVideoCapturer fakeVideoCapturer;
 
     @Before
     public void setup() {
@@ -182,9 +177,32 @@ public class LocalMediaTest {
         assertNull(localVideoTrack);
     }
 
-    /**
-     * TODO add valid video contraints tests
-     */
+    @Test
+    public void addLocalVideoTrack_shouldRespectValidConstraints() {
+        Integer expectedMinWidth = 320;
+        Integer expectedMinHeight = 180;
+        Integer expectedMaxWidth = 640;
+        Integer expectedMaxHeight = 360;
+        Integer expectedMinFps = 5;
+        Integer expectedMaxFps = 15;
+        VideoConstraints validVideoConstraints = new VideoConstraints.Builder()
+                .minVideoDimensions(new VideoDimensions(expectedMinWidth, expectedMinHeight))
+                .maxVideoDimensions(new VideoDimensions(expectedMaxWidth, expectedMaxHeight))
+                .minFps(expectedMinFps)
+                .maxFps(expectedMaxFps)
+                .build();
+        LocalVideoTrack localVideoTrack = localMedia.addVideoTrack(true,
+                fakeVideoCapturer,
+                validVideoConstraints);
+
+        assertNotNull(localVideoTrack);
+        assertTrue(fakeVideoCapturer.getCaptureWidth() >= expectedMinWidth);
+        assertTrue(fakeVideoCapturer.getCaptureWidth() <= expectedMaxWidth);
+        assertTrue(fakeVideoCapturer.getCaptureHeight() >= expectedMinHeight);
+        assertTrue(fakeVideoCapturer.getCaptureHeight() <= expectedMaxHeight);
+        assertTrue(fakeVideoCapturer.getCaptureFramerate() >= expectedMinFps);
+        assertTrue(fakeVideoCapturer.getCaptureFramerate() <= expectedMaxFps);
+    }
 
     @Test
     public void canRemoveVideoTrack() {

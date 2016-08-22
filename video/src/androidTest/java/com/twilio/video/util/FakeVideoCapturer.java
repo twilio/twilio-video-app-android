@@ -10,6 +10,22 @@ import java.util.List;
 public class FakeVideoCapturer implements VideoCapturer {
     private static final Logger logger = Logger.getLogger(FakeVideoCapturer.class);
 
+    private int captureWidth = 0;
+    private int captureHeight = 0;
+    private int captureFramerate = 0;
+
+    public int getCaptureWidth() {
+        return captureWidth;
+    }
+
+    public int getCaptureHeight() {
+        return captureHeight;
+    }
+
+    public int getCaptureFramerate() {
+        return captureFramerate;
+    }
+
     @Override
     public List<CaptureFormat> getSupportedFormats() {
         logger.i("getSupportedFormats");
@@ -23,6 +39,9 @@ public class FakeVideoCapturer implements VideoCapturer {
                              int framerate,
                              VideoCapturerObserver capturerObserver) {
         logger.i("startCapture");
+        this.captureWidth = width;
+        this.captureHeight = height;
+        this.captureFramerate = framerate;
     }
 
     @Override
