@@ -118,6 +118,11 @@ public class Room {
 
     class InternalRoomListenerImpl implements InternalRoomListener {
 
+        // TODO: find better way to pass Handler to Media
+        Handler getHandler() {
+            return Room.this.handler;
+        }
+
         @Override
         public synchronized void onConnected(String roomSid) {
             logger.d("onConnected()");

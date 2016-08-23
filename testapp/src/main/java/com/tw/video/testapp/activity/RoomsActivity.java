@@ -18,12 +18,15 @@ import com.tw.video.testapp.BuildConfig;
 import com.tw.video.testapp.R;
 import com.tw.video.testapp.util.SimpleSignalingUtils;
 import com.twilio.common.AccessManager;
+import com.twilio.video.AudioTrack;
 import com.twilio.video.ConnectOptions;
 import com.twilio.video.LogLevel;
+import com.twilio.video.Media;
 import com.twilio.video.Participant;
 import com.twilio.video.VideoClient;
 import com.twilio.video.Room;
 import com.twilio.video.VideoException;
+import com.twilio.video.VideoTrack;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -166,12 +169,59 @@ public class RoomsActivity extends AppCompatActivity {
            @Override
            public void onParticipantConnected(Room room, Participant participant) {
                Timber.i("onParticipantConnected");
+               participant.getMedia().setListener(createListener());
            }
 
            @Override
            public void onParticipantDisconnected(Room room, Participant participant) {
                Timber.i("onParticipantDisconnected");
            }
-       };
+          };
+    }
+
+    private Media.Listener createListener() {
+        return new Media.Listener() {
+
+            @Override
+            public void onAudioTrackAdded(Media media, AudioTrack audioTrack) {
+                Timber.i("onAudioTrackAdded");
+            }
+
+            @Override
+            public void onAudioTrackRemoved(Media media, AudioTrack audioTrack) {
+                Timber.i("onAudioTrackRemoved");
+            }
+
+            @Override
+            public void onVideoTrackAdded(Media media, VideoTrack videoTrack) {
+                Timber.i("onVideoTrackAdded");
+            }
+
+            @Override
+            public void onVideoTrackRemoved(Media media, VideoTrack videoTrack) {
+                Timber.i("onVideoTrackRemoved");
+            }
+
+            @Override
+            public void onAudioTrackEnabled(Media media, AudioTrack audioTrack) {
+                Timber.i("onAudioTrackEnabled");
+            }
+
+            @Override
+            public void onAudioTrackDisabled(Media media, AudioTrack audioTrack) {
+                Timber.i("onAudioTrackDisabled");
+            }
+
+            @Override
+            public void onVideoTrackEnabled(Media media, VideoTrack videoTrack) {
+                Timber.i("onVideoTrackEnabled");
+            }
+
+            @Override
+            public void onVideoTrackDisabled(Media media, VideoTrack videoTrack) {
+                Timber.i("onVideoTrackDisabled");
+            }
+        };
+
     }
 }
