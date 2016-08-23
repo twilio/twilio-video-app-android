@@ -177,6 +177,37 @@ public class ConnectTests {
     }
 
     @Test
+    public void shouldAllowAddingAndRemovingTracksWhileConnected() throws InterruptedException {
+        CallbackHelper.FakeRoomListener roomListener = new CallbackHelper.FakeRoomListener();
+
+        roomListener.onConnectedLatch = new CountDownLatch(1);
+
+        AccessManager accessManager = AccessTokenHelper.obtainAccessManager(context, TEST_USER);
+
+        VideoClient videoClient = new VideoClient(context, accessManager);
+        ConnectOptions connectOptions = new ConnectOptions.Builder()
+                .name(testRoom)
+                .localMedia(localMedia)
+                .build();
+
+        Room room = videoClient.connect(connectOptions, roomListener);
+
+        assertTrue(roomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
+        assertNotNull(room.getLocalMedia());
+
+        // Now we add our tracks
+        LocalAudioTrack localAudioTrack = localMedia.addAudioTrack(false);
+        LocalVideoTrack localVideoTrack = localMedia.addVideoTrack(false, fakeVideoCapturer);
+
+        // Let them sit a bit
+        Thread.sleep(1);
+
+        // Now remove them
+        localMedia.removeAudioTrack(localAudioTrack);
+        localMedia.removeLocalVideoTrack(localVideoTrack);
+    }
+
+    @Test
     public void connect_shouldDisconnectFromRoom() throws InterruptedException {
         CallbackHelper.FakeRoomListener roomListener = new CallbackHelper.FakeRoomListener();
         roomListener.onConnectedLatch = new CountDownLatch(1);
