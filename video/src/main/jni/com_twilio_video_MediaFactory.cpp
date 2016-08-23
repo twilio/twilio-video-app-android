@@ -53,7 +53,7 @@ JNIEXPORT jlong JNICALL Java_com_twilio_video_MediaFactory_nativeCreateLocalMedi
         std::shared_ptr<twilio::media::MediaFactory> media_factory = getMediaFactory(media_factory_handle);
 
         // TODO: Support passing a name in
-        std::shared_ptr<twilio::media::LocalMedia> local_media = media_factory->createLocalMedia("local media");
+        std::shared_ptr<twilio::media::LocalMedia> local_media = media_factory->createLocalMedia("android-local-media");
         LocalMediaContext* local_media_context = new LocalMediaContext(local_media);
         local_media_handle = webrtc_jni::jlongFromPointer(local_media_context);
     }
