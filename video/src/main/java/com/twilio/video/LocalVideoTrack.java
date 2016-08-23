@@ -5,37 +5,15 @@ package com.twilio.video;
  *
  */
 public class LocalVideoTrack  {
-    private VideoConstraints videoConstraints;
-    private VideoCapturer videoCapturer;
+    private final org.webrtc.VideoTrack webRtcVideoTrack;
+    private final VideoCapturer videoCapturer;
+    private final VideoConstraints videoConstraints;
     private boolean enabledVideo = true;
-    private org.webrtc.VideoTrack webrtcVideoTrack;
 
-    /**
-     * TODO
-     * Obtain the default video constraints using JNI
-     * to ensure we stay in sync if the defaults change in the core.
-     * This requires a significant amount of boilerplate with the current
-     * implementation but it can be greatly simplified with a small core refactor.
-     */
-    private static VideoConstraints defaultVideoConstraints() {
-        return new VideoConstraints.Builder()
-                .minFps(10)
-                .maxFps(30)
-                .aspectRatio(VideoConstraints.ASPECT_RATIO_4_3)
-                .maxVideoDimensions(new VideoDimensions(640,480))
-                .build();
-    }
-    public LocalVideoTrack(VideoCapturer videoCapturer) {
-        this(videoCapturer, defaultVideoConstraints());
-    }
-
-    public LocalVideoTrack(VideoCapturer videoCapturer, VideoConstraints videoConstraints) {
-        if(videoCapturer == null) {
-            throw new NullPointerException("CameraCapturer must not be null");
-        }
-        if(videoConstraints == null) {
-            throw new NullPointerException("VideoConstraints must not be null");
-        }
+    LocalVideoTrack(org.webrtc.VideoTrack webrtcVideoTrack,
+                    VideoCapturer videoCapturer,
+                    VideoConstraints videoConstraints) {
+        this.webRtcVideoTrack = webrtcVideoTrack;
         this.videoCapturer = videoCapturer;
         this.videoConstraints = videoConstraints;
     }
@@ -49,15 +27,9 @@ public class LocalVideoTrack  {
         return videoCapturer;
     }
 
-    /**
-     * Specifies whether or not your camera video should be shared
-     *
-     * @param enabled <code>true</code> if camera should be shared, false otherwise
-     * @return true if the operation succeeded. false if there is an operation in progress.
-     */
     public boolean enable(boolean enabled) {
-        if (webrtcVideoTrack != null) {
-            enabledVideo = webrtcVideoTrack.setEnabled(enabled);
+        if (webRtcVideoTrack != null) {
+            enabledVideo = webRtcVideoTrack.setEnabled(enabled);
             if(enabledVideo && enabled) {
 //                videoCapturer.resume();
             } else if(enabledVideo && !enabled){
@@ -69,12 +41,12 @@ public class LocalVideoTrack  {
         return enabledVideo;
     }
 
+    public String getTrackId() {
+        return webRtcVideoTrack.id();
+    }
+
     public boolean isEnabled() {
-        if (webrtcVideoTrack != null) {
-            return webrtcVideoTrack.enabled();
-        } else {
-            return enabledVideo;
-        }
+        return webRtcVideoTrack.enabled();
     }
 
     /**

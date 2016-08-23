@@ -39,6 +39,16 @@ JNIEXPORT jboolean JNICALL Java_com_twilio_video_LocalMedia_nativeRemoveAudioTra
                                                                                    jobject,
                                                                                    jlong,
                                                                                    jstring);
+JNIEXPORT jlong JNICALL Java_com_twilio_video_LocalMedia_nativeAddVideoTrack(JNIEnv *,
+                                                                             jobject,
+                                                                             jlong,
+                                                                             jboolean,
+                                                                             jobject,
+                                                                             jobject);
+JNIEXPORT jboolean JNICALL Java_com_twilio_video_LocalMedia_nativeRemoveVideoTrack(JNIEnv *,
+                                                                                   jobject,
+                                                                                   jlong,
+                                                                                   jstring);
 JNIEXPORT void JNICALL Java_com_twilio_video_LocalMedia_nativeRelease(JNIEnv *, jobject, jlong);
 
 }

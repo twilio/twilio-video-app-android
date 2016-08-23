@@ -51,7 +51,7 @@ public class LocalMedia {
             localAudioTrack.enable(enabled);
             localAudioTracks.add(localAudioTrack);
             return localAudioTrack;
-        } else if (nativeAudioTrack == 0) {
+        } else {
             logger.e("Failed to create local audio track");
         }
 
@@ -72,21 +72,47 @@ public class LocalMedia {
         return result;
     }
 
-    public LocalVideoTrack addVideoTrack(boolean enabled) {
-        // TODO: get default video constraints
-        return addVideoTrack(enabled, null);
+    public LocalVideoTrack addVideoTrack(boolean enabled, VideoCapturer videoCapturer) {
+        return addVideoTrack(enabled, videoCapturer, null);
     }
 
-    public LocalVideoTrack addVideoTrack(boolean enabled, VideoConstraints videoConstraints) {
-        // TODO: implement me
+    public LocalVideoTrack addVideoTrack(boolean enabled,
+                                         VideoCapturer videoCapturer,
+                                         VideoConstraints videoConstraints) {
         checkReleased("addVideoTrack");
-        return null;
+        long nativeVideoTrack = nativeAddVideoTrack(nativeLocalMediaHandle,
+                enabled,
+                new VideoCapturerDelegate(videoCapturer),
+                videoConstraints);
+        LocalVideoTrack localVideoTrack = null;
+
+        if (nativeVideoTrack != 0) {
+            org.webrtc.VideoTrack webRtcVideoTrack = new org.webrtc.VideoTrack(nativeVideoTrack);
+            localVideoTrack = new LocalVideoTrack(webRtcVideoTrack, videoCapturer, null);
+
+            localVideoTrack.enable(enabled);
+            localVideoTracks.add(localVideoTrack);
+            return localVideoTrack;
+        } else {
+            logger.e("Failed to create local audio track");
+        }
+
+        return localVideoTrack;
     }
 
     public boolean removeLocalVideoTrack(LocalVideoTrack localVideoTrack) {
-        // TODO: implement me
         checkReleased("removeVideoTrack");
-        return true;
+
+        boolean result = nativeRemoveVideoTrack(nativeLocalMediaHandle,
+                localVideoTrack.getTrackId());
+
+        if (!result) {
+            logger.e("Failed to remove video track");
+        } else {
+            localVideoTracks.remove(localVideoTrack);
+        }
+
+        return result;
     }
 
     public void release() {
@@ -112,5 +138,10 @@ public class LocalMedia {
                                             boolean enabled,
                                             AudioOptions audioOptions);
     private native boolean nativeRemoveAudioTrack(long nativeLocalMediaHandle, String trackId);
+    private native long nativeAddVideoTrack(long nativeLocalMediaHandle,
+                                            boolean enabled,
+                                            VideoCapturerDelegate videoCapturerDelegate,
+                                            VideoConstraints videoConstraints);
+    private native boolean nativeRemoveVideoTrack(long nativeLocalMediaHandle, String trackId);
     private native void nativeRelease(long nativeLocalMediaHandle);
 }

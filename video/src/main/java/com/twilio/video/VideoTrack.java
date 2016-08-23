@@ -21,8 +21,10 @@ public class VideoTrack {
     private boolean isEnabled;
     private long nativeVideoTrackContext;
 
-    VideoTrack(long nativeVideoTrackContext, String trackId,
-               boolean isEnabled, long nativeWebrtcTrack) {
+    VideoTrack(long nativeVideoTrackContext,
+               String trackId,
+               boolean isEnabled,
+               long nativeWebrtcTrack) {
         this.nativeVideoTrackContext = nativeVideoTrackContext;
         this.trackId = trackId;
         this.isEnabled = isEnabled;
