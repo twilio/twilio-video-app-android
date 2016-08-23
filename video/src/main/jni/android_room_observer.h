@@ -29,7 +29,7 @@ public:
             GetMethodID(env,
                         *j_room_observer_class_,
                         "onConnected",
-                        "(Ljava/lang/String;)V")),
+                        "(Ljava/lang/String;Ljava/util/List;)V")),
         j_on_disconnected_(
             GetMethodID(env,
                         *j_room_observer_class_,
@@ -119,8 +119,9 @@ protected:
             }
 
             jstring j_room_sid = webrtc_jni::JavaStringFromStdString(jni(), room->getSid());
+            jobject j_participants = createJavaParticipantList(room->getParticipants());
 
-            jni()->CallVoidMethod(*j_room_observer_, j_on_connected_, j_room_sid);
+            jni()->CallVoidMethod(*j_room_observer_, j_on_connected_, j_room_sid, j_participants);
             CHECK_EXCEPTION(jni()) << "error during CallVoidMethod";
         }
     }
@@ -173,19 +174,15 @@ protected:
                 return;
             }
 
-            ParticipantContext *participant_context = new ParticipantContext();
-            participant_context->participant = participant;
-            jstring j_sid = webrtc_jni::JavaStringFromStdString(jni(), participant->getSid());
-            jstring j_identity =
-                webrtc_jni::JavaStringFromStdString(jni(), participant->getIdentity());
 
             jobject j_media = createJavaMediaObject(participant->getMedia());
 
             // Create participant
-            jlong j_participant_context = webrtc_jni::jlongFromPointer(participant_context);
-            jobject j_participant =
-                jni()->NewObject(*j_participant_class_, j_participant_ctor_id_,
-                                 j_identity, j_sid, j_media, j_participant_context);
+            jobject j_participant = createJavaParticipant(jni(),
+                                                          participant,
+                                                          j_media,
+                                                          *j_participant_class_,
+                                                          j_participant_ctor_id_);
 
             jni()->CallVoidMethod(*j_room_observer_,
                                   j_on_participant_connected_,
@@ -280,6 +277,29 @@ private:
             *j_media_class_, j_media_ctor_id_, j_media_context,
             j_audio_tracks, j_video_tracks, j_handler);
 
+    }
+
+    jobject createJavaParticipantList(
+        const std::map<std::string, std::shared_ptr<twilio::video::Participant>> participants) {
+
+        // Create ArrayList<Participant>
+        jobject j_participants = jni()->NewObject(*j_array_list_class_, j_array_list_ctor_id_);
+
+        std::map<std::string, std::shared_ptr<twilio::video::Participant>>::const_iterator it;
+        for (it = participants.begin(); it != participants.end(); ++it) {
+            std::shared_ptr<twilio::video::Participant> participant = it->second;
+
+            jobject j_media = createJavaMediaObject(participant->getMedia());
+
+
+            jobject j_participant = createJavaParticipant(jni(),
+                                                           participant,
+                                                           j_media,
+                                                           *j_participant_class_,
+                                                           j_participant_ctor_id_);
+            jni()->CallVoidMethod(j_participants, j_array_list_add_, j_participant);
+        }
+        return j_participants;
     }
 
     bool observer_deleted_ = false;

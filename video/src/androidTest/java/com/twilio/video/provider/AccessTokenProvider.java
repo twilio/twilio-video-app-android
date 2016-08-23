@@ -13,8 +13,7 @@ import retrofit.http.QueryMap;
 
 public class AccessTokenProvider {
     //The default is usually 30 minutes.
-    // We are intentionally setting it to 5 minutes to validate expiration.
-    public static final String TTL = "300";
+    public static final String TTL = "3000";
 
     // Define the Retrofit Token Service
     interface TokenService {
