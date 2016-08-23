@@ -4,31 +4,16 @@ package com.twilio.video;
  * A local video track that gets camera video from a {@link CameraCapturer}
  *
  */
-public class LocalVideoTrack extends VideoTrack {
-    private VideoConstraints videoConstraints;
-    private VideoCapturer videoCapturer;
+public class LocalVideoTrack  {
+    private final org.webrtc.VideoTrack webRtcVideoTrack;
+    private final VideoCapturer videoCapturer;
+    private final VideoConstraints videoConstraints;
     private boolean enabledVideo = true;
 
-    /**
-     * TODO
-     * Obtain the default video constraints using JNI
-     * to ensure we stay in sync if the defaults change in the core.
-     * This requires a significant amount of boilerplate with the current
-     * implementation but it can be greatly simplified with a small core refactor.
-     */
-    private static VideoConstraints defaultVideoConstraints() {
-        return new VideoConstraints.Builder()
-                .minFps(10)
-                .maxFps(30)
-                .aspectRatio(VideoConstraints.ASPECT_RATIO_4_3)
-                .maxVideoDimensions(new VideoDimensions(640,480))
-                .build();
-    }
-
-    LocalVideoTrack(org.webrtc.VideoTrack rtcTrack,
+    LocalVideoTrack(org.webrtc.VideoTrack webrtcVideoTrack,
                     VideoCapturer videoCapturer,
                     VideoConstraints videoConstraints) {
-        super(rtcTrack);
+        this.webRtcVideoTrack = webrtcVideoTrack;
         this.videoCapturer = videoCapturer;
         this.videoConstraints = videoConstraints;
     }
@@ -43,9 +28,8 @@ public class LocalVideoTrack extends VideoTrack {
     }
 
     public boolean enable(boolean enabled) {
-        org.webrtc.VideoTrack videoTrack = getWebrtcVideoTrack();
-        if (videoTrack != null) {
-            enabledVideo = videoTrack.setEnabled(enabled);
+        if (webRtcVideoTrack != null) {
+            enabledVideo = webRtcVideoTrack.setEnabled(enabled);
             if(enabledVideo && enabled) {
 //                videoCapturer.resume();
             } else if(enabledVideo && !enabled){
@@ -57,18 +41,12 @@ public class LocalVideoTrack extends VideoTrack {
         return enabledVideo;
     }
 
-    @Override
     public String getTrackId() {
-        org.webrtc.VideoTrack videoTrack = getWebrtcVideoTrack();
-
-        return videoTrack.id();
+        return webRtcVideoTrack.id();
     }
 
-    @Override
     public boolean isEnabled() {
-        org.webrtc.VideoTrack videoTrack = getWebrtcVideoTrack();
-
-        return videoTrack.enabled();
+        return webRtcVideoTrack.enabled();
     }
 
     /**

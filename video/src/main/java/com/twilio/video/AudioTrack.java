@@ -3,48 +3,43 @@ package com.twilio.video;
 /**
  * An audio track represents a single local or remote audio source
  */
-public class AudioTrack implements MediaTrack {
-    private org.webrtc.AudioTrack audioTrack;
-    private TrackInfo trackInfo;
-    private MediaTrackState trackState;
+public class AudioTrack {
+    private org.webrtc.AudioTrack webrtcAudioTrack;
+    private String trackId;
+    private long nativeAudioTrackContext;
+    private boolean isEnabled;
 
-    @Override
+    AudioTrack(long nativeAudioTrackContext, String trackId,
+               boolean isEnabled, long nativeWebrtcTrack) {
+        this.nativeAudioTrackContext = nativeAudioTrackContext;
+        this.trackId = trackId;
+        this.isEnabled = isEnabled;
+        webrtcAudioTrack = new org.webrtc.AudioTrack(nativeWebrtcTrack);
+    }
+
     public String getTrackId() {
-        return trackInfo != null ? trackInfo.getTrackId() : null;
+        return trackId;
     }
 
-    @Override
-    public MediaTrackState getState() {
-        return trackState;
-    }
-
-    @Override
     public boolean isEnabled() {
-        if ((audioTrack != null) && (trackInfo != null)) {
-            return trackInfo.isEnabled();
+        return isEnabled;
+    }
+
+    void setEnabled(boolean isEnabled) {
+        this.isEnabled = isEnabled;
+    }
+
+    void release() {
+        if (nativeAudioTrackContext != 0) {
+            if (webrtcAudioTrack != null) {
+                webrtcAudioTrack.dispose();
+                webrtcAudioTrack = null;
+            }
+            nativeRelease(nativeAudioTrackContext);
+            nativeAudioTrackContext = 0;
         }
-        return false;
     }
 
-    AudioTrack(org.webrtc.AudioTrack audioTrack, TrackInfo trackInfo) {
-        this.audioTrack = audioTrack;
-        this.trackInfo = trackInfo;
-        trackState = MediaTrackState.STARTED;
-    }
+    private native void nativeRelease(long nativeAudioTrackContext);
 
-    org.webrtc.AudioTrack getWebrtcTrack() {
-        return audioTrack;
-    }
-
-    TrackInfo getTrackInfo() {
-        return trackInfo;
-    }
-
-    void updateTrackInfo(TrackInfo trackInfo) {
-        this.trackInfo = trackInfo;
-    }
-
-    void setTrackState(MediaTrackState trackState) {
-        this.trackState = trackState;
-    }
 }

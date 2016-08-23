@@ -2,6 +2,7 @@
 
 #ifndef _Included_com_twilio_conversations_CameraCapturer
 #define _Included_com_twilio_conversations_CameraCapturer
+
 #ifdef __cplusplus
 extern "C" {
 #endif
