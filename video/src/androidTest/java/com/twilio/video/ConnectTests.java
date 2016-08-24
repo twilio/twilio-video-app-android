@@ -129,7 +129,7 @@ public class ConnectTests {
 
         assertTrue(roomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
         assertNotNull(room.getLocalMedia());
-        localMedia.removeAudioTrack(localAudioTrack);
+        assertTrue(localMedia.removeAudioTrack(localAudioTrack));
     }
 
     @Test
@@ -150,7 +150,7 @@ public class ConnectTests {
 
         assertTrue(roomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
         assertNotNull(room.getLocalMedia());
-        localMedia.removeLocalVideoTrack(localVideoTrack);
+        assertTrue(localMedia.removeLocalVideoTrack(localVideoTrack));
     }
 
     @Test
@@ -172,8 +172,8 @@ public class ConnectTests {
 
         assertTrue(roomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
         assertNotNull(room.getLocalMedia());
-        localMedia.removeAudioTrack(localAudioTrack);
-        localMedia.removeLocalVideoTrack(localVideoTrack);
+        assertTrue(localMedia.removeAudioTrack(localAudioTrack));
+        assertTrue(localMedia.removeLocalVideoTrack(localVideoTrack));
     }
 
     @Test
@@ -203,8 +203,8 @@ public class ConnectTests {
         Thread.sleep(1);
 
         // Now remove them
-        localMedia.removeAudioTrack(localAudioTrack);
-        localMedia.removeLocalVideoTrack(localVideoTrack);
+        assertTrue(localMedia.removeAudioTrack(localAudioTrack));
+        assertTrue(localMedia.removeLocalVideoTrack(localVideoTrack));
     }
 
     @Test
