@@ -15,6 +15,12 @@ struct ParticipantContext {
     std::shared_ptr<twilio::video::Participant> participant;
 };
 
+jobject createJavaParticipant(JNIEnv *env,
+                              std::shared_ptr<twilio::video::Participant> participant,
+                              jobject j_media,
+                              jclass j_participant_class,
+                              jmethodID j_particpant_ctor_id);
+
 JNIEXPORT jboolean JNICALL Java_com_twilio_video_Participant_nativeIsConnected
     (JNIEnv *, jobject, jlong);
 

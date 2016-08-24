@@ -5,6 +5,7 @@ import android.os.Handler;
 import com.twilio.video.internal.Logger;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class Room {
@@ -99,17 +100,13 @@ public class Room {
         }
     }
 
-    void setState(RoomState newRoomState) {
-        roomState = newRoomState;
-    }
-
-    void setSid(String roomSid) {
-        this.sid = roomSid;
+    void setState(RoomState roomState) {
+        this.roomState = roomState;
     }
 
     // JNI Callbacks Interface
     interface InternalRoomListener {
-        void onConnected(String roomSid);
+        void onConnected(String roomSid, List<Participant> participantList);
         void onDisconnected(int errorCode);
         void onConnectFailure(int errorCode);
         void onParticipantConnected(Participant participant);
@@ -124,10 +121,13 @@ public class Room {
         }
 
         @Override
-        public synchronized void onConnected(String roomSid) {
+        public synchronized void onConnected(String roomSid, List<Participant> participantList) {
             logger.d("onConnected()");
-            setState(RoomState.CONNECTED);
-            setSid(roomSid);
+            Room.this.roomState = RoomState.CONNECTED;
+            Room.this.sid = roomSid;
+            for (Participant participant : participantList) {
+                participantMap.put(participant.getSid(), participant);
+            }
             handler.post(new Runnable() {
                 @Override
                 public void run() {
@@ -139,7 +139,7 @@ public class Room {
         @Override
         public synchronized void onDisconnected(final int errorCode) {
             logger.d("onDisconnected()");
-            setState(RoomState.DISCONNECTED);
+            Room.this.roomState = RoomState.DISCONNECTED;
             release();
 
             handler.post(new Runnable() {
@@ -153,7 +153,7 @@ public class Room {
         @Override
         public synchronized void onConnectFailure(final int errorCode) {
             logger.d("onConnectFailure()");
-            setState(RoomState.DISCONNECTED);
+            Room.this.roomState = RoomState.DISCONNECTED;
             handler.post(new Runnable() {
                 @Override
                 public void run() {
