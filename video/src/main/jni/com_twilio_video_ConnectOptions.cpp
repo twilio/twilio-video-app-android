@@ -1,7 +1,7 @@
 #include "com_twilio_video_ConnectOptions.h"
 #include "com_twilio_video_LocalMedia.h"
 
-#include "third_party/webrtc/webrtc/api/java/jni/jni_helpers.h"
+#include "webrtc/api/java/jni/jni_helpers.h"
 
 namespace twilio_video_jni {
 
