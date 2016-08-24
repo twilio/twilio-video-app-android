@@ -1,7 +1,6 @@
 package com.twilio.video;
 
 public class ConnectOptions {
-
     private String name;
     private LocalMedia localMedia;
     private IceOptions iceOptions;
@@ -59,5 +58,4 @@ public class ConnectOptions {
             return new ConnectOptions(this);
         }
     }
-
 }

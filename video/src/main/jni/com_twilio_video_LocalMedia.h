@@ -1,8 +1,8 @@
 #include <jni.h>
 #include "media/media.h"
 
-#ifndef ROOMS_ANDROID_COM_TWILIO_VIDEO_LOCALMEDIA_H_
-#define ROOMS_ANDROID_COM_TWILIO_VIDEO_LOCALMEDIA_H_
+#ifndef VIDEO_ANDROID_COM_TWILIO_VIDEO_LOCALMEDIA_H_
+#define VIDEO_ANDROID_COM_TWILIO_VIDEO_LOCALMEDIA_H_
 
 #ifdef __cplusplus
 extern "C" {
@@ -28,6 +28,7 @@ private:
     std::shared_ptr<twilio::media::LocalMedia> local_media_;
 };
 
+std::shared_ptr<twilio::media::LocalMedia> getLocalMedia(jlong);
 JNIEXPORT jobject JNICALL Java_com_twilio_video_LocalMedia_nativeGetDefaultAudioOptions(JNIEnv *,
                                                                                         jobject);
 JNIEXPORT jlong JNICALL Java_com_twilio_video_LocalMedia_nativeAddAudioTrack(JNIEnv *,
@@ -57,4 +58,4 @@ JNIEXPORT void JNICALL Java_com_twilio_video_LocalMedia_nativeRelease(JNIEnv *, 
 }
 #endif
 
-#endif // ROOMS_ANDROID_COM_TWILIO_VIDEO_LOCALMEDIA_H_
+#endif // VIDEO_ANDROID_COM_TWILIO_VIDEO_LOCALMEDIA_H_

@@ -10,7 +10,10 @@ import com.twilio.common.AccessManager;
 import com.twilio.video.activity.RoomsTestActivity;
 import com.twilio.video.helper.AccessTokenHelper;
 import com.twilio.video.helper.CallbackHelper;
+import com.twilio.video.util.FakeVideoCapturer;
+import com.twilio.video.util.RandUtils;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -20,6 +23,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 @RunWith(AndroidJUnit4.class)
@@ -27,9 +31,11 @@ import static org.junit.Assert.assertTrue;
 public class ConnectTests {
     private final static String TEST_USER  = "TEST_USER";
     private final static String TEST_USER2 = "TEST_USER2";
-    private final static String TEST_ROOM  = "TEST_ROOM";
 
     private Context context;
+    private String testRoom;
+    private LocalMedia localMedia;
+    private FakeVideoCapturer fakeVideoCapturer;
 
     @Rule
     public ActivityTestRule<RoomsTestActivity> activityRule = new ActivityTestRule<>(
@@ -38,7 +44,15 @@ public class ConnectTests {
     @Before
     public void setup() {
         context = InstrumentationRegistry.getInstrumentation().getTargetContext();
+        localMedia = LocalMedia.create(context);
+        fakeVideoCapturer = new FakeVideoCapturer();
+        testRoom = RandUtils.generateRandomString(10);
         VideoClient.setLogLevel(LogLevel.DEBUG);
+    }
+
+    @After
+    public void teardown() {
+        localMedia.release();
     }
 
     @Test(expected = NullPointerException.class)
@@ -70,12 +84,127 @@ public class ConnectTests {
 
         VideoClient videoClient = new VideoClient(context, accessManager);
         ConnectOptions connectOptions = new ConnectOptions.Builder()
-                .name(TEST_ROOM)
+                .name(testRoom)
                 .build();
 
         videoClient.connect(connectOptions, roomListener);
 
         assertTrue(roomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
+    }
+
+    @Test
+    public void connect_shouldAllowLocalMedia() throws InterruptedException {
+        CallbackHelper.FakeRoomListener roomListener = new CallbackHelper.FakeRoomListener();
+        roomListener.onConnectedLatch = new CountDownLatch(1);
+
+        AccessManager accessManager = AccessTokenHelper.obtainAccessManager(context, TEST_USER);
+
+        VideoClient videoClient = new VideoClient(context, accessManager);
+        ConnectOptions connectOptions = new ConnectOptions.Builder()
+                .name(testRoom)
+                .localMedia(localMedia)
+                .build();
+
+        Room room = videoClient.connect(connectOptions, roomListener);
+
+        assertTrue(roomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
+        assertNotNull(room.getLocalMedia());
+    }
+
+    @Test
+    public void connect_shouldAllowLocalMediaWithAudio() throws InterruptedException {
+        CallbackHelper.FakeRoomListener roomListener = new CallbackHelper.FakeRoomListener();
+        LocalAudioTrack localAudioTrack = localMedia.addAudioTrack(true);
+        roomListener.onConnectedLatch = new CountDownLatch(1);
+
+        AccessManager accessManager = AccessTokenHelper.obtainAccessManager(context, TEST_USER);
+
+        VideoClient videoClient = new VideoClient(context, accessManager);
+        ConnectOptions connectOptions = new ConnectOptions.Builder()
+                .name(testRoom)
+                .localMedia(localMedia)
+                .build();
+
+        Room room = videoClient.connect(connectOptions, roomListener);
+
+        assertTrue(roomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
+        assertNotNull(room.getLocalMedia());
+        assertTrue(localMedia.removeAudioTrack(localAudioTrack));
+    }
+
+    @Test
+    public void connect_shouldAllowLocalMediaWithVideo() throws InterruptedException {
+        CallbackHelper.FakeRoomListener roomListener = new CallbackHelper.FakeRoomListener();
+        LocalVideoTrack localVideoTrack = localMedia.addVideoTrack(true, fakeVideoCapturer);
+        roomListener.onConnectedLatch = new CountDownLatch(1);
+
+        AccessManager accessManager = AccessTokenHelper.obtainAccessManager(context, TEST_USER);
+
+        VideoClient videoClient = new VideoClient(context, accessManager);
+        ConnectOptions connectOptions = new ConnectOptions.Builder()
+                .name(testRoom)
+                .localMedia(localMedia)
+                .build();
+
+        Room room = videoClient.connect(connectOptions, roomListener);
+
+        assertTrue(roomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
+        assertNotNull(room.getLocalMedia());
+        assertTrue(localMedia.removeLocalVideoTrack(localVideoTrack));
+    }
+
+    @Test
+    public void connect_shouldAllowLocalMediaWithAudioAndVideo() throws InterruptedException {
+        CallbackHelper.FakeRoomListener roomListener = new CallbackHelper.FakeRoomListener();
+        LocalAudioTrack localAudioTrack = localMedia.addAudioTrack(false);
+        LocalVideoTrack localVideoTrack = localMedia.addVideoTrack(false, fakeVideoCapturer);
+        roomListener.onConnectedLatch = new CountDownLatch(1);
+
+        AccessManager accessManager = AccessTokenHelper.obtainAccessManager(context, TEST_USER);
+
+        VideoClient videoClient = new VideoClient(context, accessManager);
+        ConnectOptions connectOptions = new ConnectOptions.Builder()
+                .name(testRoom)
+                .localMedia(localMedia)
+                .build();
+
+        Room room = videoClient.connect(connectOptions, roomListener);
+
+        assertTrue(roomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
+        assertNotNull(room.getLocalMedia());
+        assertTrue(localMedia.removeAudioTrack(localAudioTrack));
+        assertTrue(localMedia.removeLocalVideoTrack(localVideoTrack));
+    }
+
+    @Test
+    public void shouldAllowAddingAndRemovingTracksWhileConnected() throws InterruptedException {
+        CallbackHelper.FakeRoomListener roomListener = new CallbackHelper.FakeRoomListener();
+
+        roomListener.onConnectedLatch = new CountDownLatch(1);
+
+        AccessManager accessManager = AccessTokenHelper.obtainAccessManager(context, TEST_USER);
+
+        VideoClient videoClient = new VideoClient(context, accessManager);
+        ConnectOptions connectOptions = new ConnectOptions.Builder()
+                .name(testRoom)
+                .localMedia(localMedia)
+                .build();
+
+        Room room = videoClient.connect(connectOptions, roomListener);
+
+        assertTrue(roomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
+        assertNotNull(room.getLocalMedia());
+
+        // Now we add our tracks
+        LocalAudioTrack localAudioTrack = localMedia.addAudioTrack(false);
+        LocalVideoTrack localVideoTrack = localMedia.addVideoTrack(false, fakeVideoCapturer);
+
+        // Let them sit a bit
+        Thread.sleep(1);
+
+        // Now remove them
+        assertTrue(localMedia.removeAudioTrack(localAudioTrack));
+        assertTrue(localMedia.removeLocalVideoTrack(localVideoTrack));
     }
 
     @Test
@@ -106,7 +235,7 @@ public class ConnectTests {
         roomListener.onConnectedLatch = new CountDownLatch(1);
         roomListener.onDisconnectedLatch = new CountDownLatch(1);
         roomListener.onParticipantConnectedLatch = new CountDownLatch(1);
-        String randomRoomName = TEST_ROOM + System.currentTimeMillis();
+        String randomRoomName = testRoom + System.currentTimeMillis();
 
         AccessManager accessManager = AccessTokenHelper.obtainAccessManager(context, TEST_USER);
         AccessManager accessManager2 = AccessTokenHelper.obtainAccessManager(context, TEST_USER2);
@@ -138,7 +267,7 @@ public class ConnectTests {
         roomListener.onConnectedLatch = new CountDownLatch(1);
         roomListener.onParticipantDisconnectedLatch = new CountDownLatch(1);
         roomListener.onParticipantConnectedLatch = new CountDownLatch(1);
-        String randomRoomName = TEST_ROOM + System.currentTimeMillis();
+        String randomRoomName = testRoom + System.currentTimeMillis();
 
         AccessManager accessManager = AccessTokenHelper.obtainAccessManager(context, TEST_USER);
         AccessManager accessManager2 = AccessTokenHelper.obtainAccessManager(context, TEST_USER2);

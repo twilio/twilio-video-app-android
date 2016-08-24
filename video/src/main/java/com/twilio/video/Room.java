@@ -25,7 +25,8 @@ public class Room {
 
     private static final Logger logger = Logger.getLogger(Room.class);
     private long nativeRoomContext;
-    private String name;
+    private final String name;
+    private final LocalMedia localMedia;
     private String sid;
     private RoomState roomState;
     private Map<String, Participant> participantMap = new HashMap<>();
@@ -34,8 +35,9 @@ public class Room {
     private Room.Listener listener;
     private final Handler handler;
 
-    Room(String name, Room.Listener listener, Handler handler) {
+    Room(String name, LocalMedia localMedia, Room.Listener listener, Handler handler) {
         this.name = name;
+        this.localMedia = localMedia;
         this.sid = "";
         this.roomState = RoomState.DISCONNECTED;
         this.listener = listener;
@@ -61,8 +63,7 @@ public class Room {
     }
 
     public LocalMedia getLocalMedia() {
-        // TODO: implement me
-        return null;
+        return localMedia;
     }
 
     public synchronized void disconnect() {

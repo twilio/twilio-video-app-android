@@ -125,6 +125,10 @@ public class LocalMedia {
         }
     }
 
+    long getNativeLocalMediaHandle() {
+        return nativeLocalMediaHandle;
+    }
+
     private void checkReleased(String methodName) {
         if (nativeLocalMediaHandle == 0) {
             String releaseErrorMessage = String.format(RELEASE_MESSAGE_TEMPLATE, methodName);
