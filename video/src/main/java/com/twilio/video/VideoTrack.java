@@ -73,17 +73,24 @@ public class VideoTrack {
         return new ArrayList<>(videoRenderersMap.keySet());
     }
 
-    private org.webrtc.VideoRenderer createWebRtcVideoRenderer(VideoRenderer videoRenderer) {
-        return new org.webrtc.VideoRenderer(new VideoRendererCallbackAdapter(videoRenderer));
-    }
-
+    /**
+     * This video track id
+     * @return track id
+     */
     public String getTrackId() {
         return trackId;
     }
 
-
+    /**
+     * Check if this video track is enabled
+     * @return true if track is enabled
+     */
     public boolean isEnabled() {
         return isEnabled;
+    }
+
+    private org.webrtc.VideoRenderer createWebRtcVideoRenderer(VideoRenderer videoRenderer) {
+        return new org.webrtc.VideoRenderer(new VideoRendererCallbackAdapter(videoRenderer));
     }
 
     void setEnabled(boolean isEnabled) {
@@ -93,6 +100,8 @@ public class VideoTrack {
     void release() {
         if (nativeVideoTrackContext != 0) {
             if (webrtcVideoTrack != null) {
+                // TODO: Check if we are the one respnosible of disposing.
+                // By looking at webrtc source code, RtpReceiver seems to be calling this method
                 webrtcVideoTrack.dispose();
                 webrtcVideoTrack = null;
             }
