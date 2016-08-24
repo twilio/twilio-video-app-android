@@ -2,10 +2,8 @@ package com.twilio.video;
 
 /**
  * A local video track that gets camera video from a {@link CameraCapturer}
- *
  */
-public class LocalVideoTrack  {
-    private final org.webrtc.VideoTrack webRtcVideoTrack;
+public class LocalVideoTrack extends VideoTrack {
     private final VideoCapturer videoCapturer;
     private final VideoConstraints videoConstraints;
     private boolean enabledVideo = true;
@@ -13,7 +11,7 @@ public class LocalVideoTrack  {
     LocalVideoTrack(org.webrtc.VideoTrack webrtcVideoTrack,
                     VideoCapturer videoCapturer,
                     VideoConstraints videoConstraints) {
-        this.webRtcVideoTrack = webrtcVideoTrack;
+        super(webrtcVideoTrack);
         this.videoCapturer = videoCapturer;
         this.videoConstraints = videoConstraints;
     }
@@ -28,6 +26,8 @@ public class LocalVideoTrack  {
     }
 
     public boolean enable(boolean enabled) {
+        org.webrtc.VideoTrack webRtcVideoTrack = getWebrtcVideoTrack();
+
         if (webRtcVideoTrack != null) {
             enabledVideo = webRtcVideoTrack.setEnabled(enabled);
             if(enabledVideo && enabled) {
@@ -42,10 +42,14 @@ public class LocalVideoTrack  {
     }
 
     public String getTrackId() {
+        org.webrtc.VideoTrack webRtcVideoTrack = getWebrtcVideoTrack();
+
         return webRtcVideoTrack.id();
     }
 
     public boolean isEnabled() {
+        org.webrtc.VideoTrack webRtcVideoTrack = getWebrtcVideoTrack();
+
         return webRtcVideoTrack.enabled();
     }
 

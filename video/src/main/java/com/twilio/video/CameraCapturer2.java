@@ -1,5 +1,6 @@
 package com.twilio.video;
 
+import org.webrtc.CameraEnumerationAndroid;
 import org.webrtc.VideoCapturerAndroid;
 
 import java.util.List;
@@ -9,7 +10,7 @@ public class CameraCapturer2 implements VideoCapturer {
 
     public static CameraCapturer2 create() {
         VideoCapturerAndroid videoCapturerAndroid =
-                VideoCapturerAndroid.create("nasdfasdf", null, false);
+                VideoCapturerAndroid.create(CameraEnumerationAndroid.getNameOfFrontFacingDevice(), null, false);
 
         return new CameraCapturer2(videoCapturerAndroid);
     }
