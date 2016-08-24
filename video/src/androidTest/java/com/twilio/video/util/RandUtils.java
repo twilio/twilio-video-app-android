@@ -6,14 +6,14 @@ public class RandUtils {
     private static final char[] symbols;
     static {
         StringBuilder symbolsBuilder = new StringBuilder();
-        for (char ch = '0' ; ch <= '9' ; ++ch) {
-            symbolsBuilder.append(ch);
+        for (char symbol = '0' ; symbol <= '9' ; symbol++) {
+            symbolsBuilder.append(symbol);
         }
-        for (char ch = 'a'; ch <= 'z'; ++ch) {
-            symbolsBuilder.append(ch);
+        for (char symbol = 'a' ; symbol <= 'z' ; symbol++) {
+            symbolsBuilder.append(symbol);
         }
-        for (char ch = 'A'; ch <= 'Z'; ++ch) {
-            symbolsBuilder.append(ch);
+        for (char symbol = 'A' ; symbol <= 'Z' ; symbol++) {
+            symbolsBuilder.append(symbol);
         }
         symbols = symbolsBuilder.toString().toCharArray();
     }
