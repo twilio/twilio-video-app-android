@@ -45,13 +45,7 @@ class VideoCapturerDelegate implements org.webrtc.VideoCapturer {
 
     @Override
     public void stopCapture() throws InterruptedException {
-        if (videoCapturer.getClass() == CameraCapturer.class) {
-            CameraCapturer cameraCapturer = (CameraCapturer) videoCapturer;
-
-            cameraCapturer.webrtcCapturer.stopCapture();
-        } else {
-            videoCapturer.stopCapture();
-        }
+        videoCapturer.stopCapture();
     }
 
     @Override

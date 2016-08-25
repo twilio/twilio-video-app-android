@@ -81,7 +81,11 @@ public class CameraCapturer implements VideoCapturer {
 
     @Override
     public void stopCapture() {
-        // TODO: implement generic capturer interface
+        try {
+            webrtcCapturer.stopCapture();
+        } catch (InterruptedException e) {
+            logger.e("Failed to stop camera capturer");
+        }
     }
 
     public synchronized CameraSource getCameraSource() {
