@@ -102,7 +102,7 @@ public class CameraCapturerParameterizedTest extends BaseCameraCapturerTest {
         instrumentation.waitForIdleSync();
         VideoViewRenderer videoViewRenderer = videoViewRendererReference.get();
         final CountDownLatch renderedFirstFrame = new CountDownLatch(1);
-        VideoRenderer.Observer rendererObserver = new VideoRenderer.Observer() {
+        VideoRenderer.Listener rendererListener = new VideoRenderer.Listener() {
             @Override
             public void onFirstFrame() {
                 renderedFirstFrame.countDown();
@@ -113,7 +113,7 @@ public class CameraCapturerParameterizedTest extends BaseCameraCapturerTest {
 
             }
         };
-        videoViewRenderer.setObserver(rendererObserver);
+        videoViewRenderer.setListener(rendererListener);
         cameraCapturer = CameraCapturer.create(cameraCapturerActivity, cameraSource, null);
         localVideoTrack = localMedia.addVideoTrack(true, cameraCapturer);
         localVideoTrack.addRenderer(videoViewRenderer);

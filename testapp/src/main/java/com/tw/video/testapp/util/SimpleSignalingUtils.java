@@ -16,7 +16,11 @@ import retrofit.http.GET;
 import retrofit.http.QueryMap;
 
 public class SimpleSignalingUtils {
+    public static final String CAPABILITY_TOKEN = "capability_token";
+    public static final String USERNAME = "username";
     public static final String REALM = "realm";
+    public static final String ROOM_NAME = "room_name";
+
     /*
      * The default is usually 30 minutes. We are intentionally setting it to 5 minutes to validate
      * expiration.

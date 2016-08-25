@@ -60,7 +60,7 @@ public class VideoTrack {
         if (videoRenderer != null) {
             org.webrtc.VideoRenderer webrtcVideoRenderer =
                     videoRenderersMap.remove(videoRenderer);
-            if (webrtcVideoRenderer != null) {
+            if (webrtcVideoTrack != null && webrtcVideoRenderer != null) {
                 webrtcVideoTrack.removeRenderer(webrtcVideoRenderer);
             }
         }
@@ -73,17 +73,24 @@ public class VideoTrack {
         return new ArrayList<>(videoRenderersMap.keySet());
     }
 
-    private org.webrtc.VideoRenderer createWebRtcVideoRenderer(VideoRenderer videoRenderer) {
-        return new org.webrtc.VideoRenderer(new VideoRendererCallbackAdapter(videoRenderer));
-    }
-
+    /**
+     * This video track id
+     * @return track id
+     */
     public String getTrackId() {
         return trackId;
     }
 
-
+    /**
+     * Check if this video track is enabled
+     * @return true if track is enabled
+     */
     public boolean isEnabled() {
         return isEnabled;
+    }
+
+    private org.webrtc.VideoRenderer createWebRtcVideoRenderer(VideoRenderer videoRenderer) {
+        return new org.webrtc.VideoRenderer(new VideoRendererCallbackAdapter(videoRenderer));
     }
 
     void setEnabled(boolean isEnabled) {
@@ -93,7 +100,12 @@ public class VideoTrack {
     void release() {
         if (nativeVideoTrackContext != 0) {
             if (webrtcVideoTrack != null) {
-                webrtcVideoTrack.dispose();
+                // TODO: Right now disposing is causing a crash in Core related to
+                // PeerConnectionSignaling. Lot of changes has been done
+                // in webrtc track teardown in core, so I'll wait for RC before dealing with this.
+                // Things to consider, when we dispose webrtcVideoTrack, it will automatically dispose
+                // all webrtc renderers. Should we dispose before, or after notifing the user ?
+                //webrtcVideoTrack.dispose();
                 webrtcVideoTrack = null;
             }
             nativeRelease(nativeVideoTrackContext);

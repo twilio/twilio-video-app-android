@@ -16,8 +16,8 @@
     <string name="register">Register</string>
     <string name="registering">Registering</string>
     <string name="title_activity_client">TC Client</string>
-    <string name="endpointStatus">Endpoint Status</string>
-    <string name="conversationStatus">Conversation Status</string>
+    <string name="video_client_status">Video Client Status</string>
+    <string name="room_status">Room Status</string>
     <string name="log_out">Log Out</string>
     <string name="fps">Frames per second</string>
     <string name="video_dimensions">Video dimensions</string>
