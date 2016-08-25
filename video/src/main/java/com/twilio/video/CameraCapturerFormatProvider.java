@@ -9,10 +9,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-class CameraCapturerFormatProvider {
+final class CameraCapturerFormatProvider {
     private static final Logger logger = Logger.getLogger(CameraCapturerFormatProvider.class);
 
-    private final Map<CameraCapturer.CameraSource, List<CaptureFormat>> supportedFormatsMap =
+    private final Map<CameraCapturer.CameraSource, List<VideoFormat>> supportedFormatsMap =
             new HashMap<>();
 
     static int getCameraId(CameraCapturer.CameraSource cameraSource) {
@@ -39,8 +39,8 @@ class CameraCapturerFormatProvider {
         return cameraId;
     }
 
-    List<CaptureFormat> getSupportedFormats(CameraCapturer.CameraSource cameraSource) {
-        List<CaptureFormat> supportedFormats = supportedFormatsMap.get(cameraSource);
+    List<VideoFormat> getSupportedFormats(CameraCapturer.CameraSource cameraSource) {
+        List<VideoFormat> supportedFormats = supportedFormatsMap.get(cameraSource);
 
         if (supportedFormats == null) {
             supportedFormats = getSupportedFormats(getCameraId(cameraSource));
@@ -50,7 +50,7 @@ class CameraCapturerFormatProvider {
         return supportedFormats;
     }
 
-    private List<CaptureFormat> getSupportedFormats(int cameraId) {
+    private List<VideoFormat> getSupportedFormats(int cameraId) {
         final android.hardware.Camera.Parameters parameters;
         android.hardware.Camera camera = null;
         try {
@@ -64,7 +64,7 @@ class CameraCapturerFormatProvider {
             }
         }
 
-        final List<CaptureFormat> formatList = new ArrayList<>();
+        final List<VideoFormat> formatList = new ArrayList<>();
         try {
             int minFps = 0;
             int maxFps = 0;
@@ -77,11 +77,11 @@ class CameraCapturerFormatProvider {
                 maxFps = range[android.hardware.Camera.Parameters.PREVIEW_FPS_MAX_INDEX];
             }
             for (android.hardware.Camera.Size size : parameters.getSupportedPreviewSizes()) {
-                formatList.add(new CaptureFormat(size.width,
+                formatList.add(new VideoFormat(size.width,
                         size.height,
                         minFps,
                         maxFps,
-                        CapturePixelFormat.NV21));
+                        VideoPixelFormat.NV21));
             }
         } catch (Exception e) {
             logger.e("getSupportedFormats() failed on camera index " + cameraId, e);

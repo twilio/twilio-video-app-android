@@ -3,10 +3,15 @@ package com.twilio.video;
 import java.util.List;
 
 public interface VideoCapturer {
-    List<CaptureFormat> getSupportedFormats();
+    List<VideoFormat> getSupportedFormats();
     void startCapture(int width,
                       int height,
                       int framerate,
-                      VideoCapturerObserver capturerObserver);
+                      Listener capturerListener);
     void stopCapture();
+
+    interface Listener {
+        void onCapturerStarted(boolean success);
+        void onFrameCaptured(VideoFrame videoFrame);
+    }
 }

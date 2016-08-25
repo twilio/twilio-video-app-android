@@ -26,7 +26,7 @@ final class VideoCapturerDelegate implements org.webrtc.VideoCapturer {
                              SurfaceTextureHelper surfaceTextureHelper,
                              Context context,
                              CapturerObserver capturerObserver) {
-        // TODO: ugh this is still cheating..need to figure out a way to pass this better
+        // FIXME: ugh this is still cheating..need to figure out a way to pass this better
         if (videoCapturer instanceof CameraCapturer) {
             CameraCapturer cameraCapturer = (CameraCapturer) videoCapturer;
 
@@ -35,7 +35,7 @@ final class VideoCapturerDelegate implements org.webrtc.VideoCapturer {
         videoCapturer.startCapture(width,
                 height,
                 framerate,
-                new VideoCapturerObserverAdapter(capturerObserver));
+                new VideoCapturerListenerAdapter(capturerObserver));
     }
 
     @Override
@@ -48,18 +48,18 @@ final class VideoCapturerDelegate implements org.webrtc.VideoCapturer {
         // Currently this is not part of our capturer api so we can just ignore
     }
 
-    private List<CameraEnumerationAndroid.CaptureFormat> convertToWebRtcFormats(List<CaptureFormat> captureFormats) {
+    private List<CameraEnumerationAndroid.CaptureFormat> convertToWebRtcFormats(List<VideoFormat> videoFormats) {
         List<CameraEnumerationAndroid.CaptureFormat> webRtcCaptureFormats =
-                new ArrayList<>(captureFormats.size());
+                new ArrayList<>(videoFormats.size());
 
-        for (int i = 0 ; i < captureFormats.size() ; i++) {
-            CaptureFormat captureFormat = captureFormats.get(i);
+        for (int i = 0; i < videoFormats.size() ; i++) {
+            VideoFormat videoFormat = videoFormats.get(i);
             CameraEnumerationAndroid.CaptureFormat webRtcCaptureFormat =
-                    new CameraEnumerationAndroid.CaptureFormat(captureFormat.getWidth(),
-                            captureFormat.getHeight(),
-                            captureFormat.getMinFramerate(),
-                            captureFormat.getMaxFramerate(),
-                            captureFormat.getCapturePixelFormat().getValue());
+                    new CameraEnumerationAndroid.CaptureFormat(videoFormat.width,
+                            videoFormat.height,
+                            videoFormat.minFramerate,
+                            videoFormat.maxFramerate,
+                            videoFormat.videoPixelFormat.getValue());
 
             webRtcCaptureFormats.add(i, webRtcCaptureFormat);
         }

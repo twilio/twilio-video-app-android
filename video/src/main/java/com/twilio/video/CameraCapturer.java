@@ -27,9 +27,44 @@ public class CameraCapturer implements VideoCapturer {
     private final CapturerErrorListener listener;
     private CameraSource cameraSource;
     private final CameraCapturerFormatProvider formatProvider = new CameraCapturerFormatProvider();
-    private VideoCapturerObserver videoCapturerObserver;
+    private VideoCapturer.Listener videoCapturerListener;
     private SurfaceTextureHelper surfaceTextureHelper;
-    private final CapturerObserverAdapter observerAdapter = new CapturerObserverAdapter();
+    private final org.webrtc.VideoCapturer.CapturerObserver observerAdapter =
+            new org.webrtc.VideoCapturer.CapturerObserver() {
+                @Override
+                public void onCapturerStarted(boolean success) {
+                    videoCapturerListener.onCapturerStarted(success);
+                }
+
+                @Override
+                public void onByteBufferFrameCaptured(byte[] bytes,
+                                                      int width,
+                                                      int height,
+                                                      int rotation,
+                                                      long timestamp) {
+                    VideoDimensions frameDimensions = new VideoDimensions(width, height);
+                    VideoFrame frame = new VideoFrame(bytes, frameDimensions, rotation, timestamp);
+
+                    videoCapturerListener.onFrameCaptured(frame);
+                }
+
+                @Override
+                public void onTextureFrameCaptured(int width,
+                                                   int height,
+                                                   int oesTextureId,
+                                                   float[] transformMatrix,
+                                                   int rotation,
+                                                   long timestampNs) {
+                    // TODO: Do we need to support capturing to texture?
+                }
+
+                @Override
+                public void onOutputFormatRequest(int width,
+                                                  int height,
+                                                  int framerate) {
+                    // TODO: Do we need to support an output format request?
+                }
+            };
 
     public static CameraCapturer create(Context context,
                                         CameraSource cameraSource,
@@ -72,7 +107,7 @@ public class CameraCapturer implements VideoCapturer {
     }
 
     @Override
-    public List<CaptureFormat> getSupportedFormats() {
+    public List<VideoFormat> getSupportedFormats() {
         return formatProvider.getSupportedFormats(cameraSource);
     }
 
@@ -80,8 +115,8 @@ public class CameraCapturer implements VideoCapturer {
     public void startCapture(int width,
                              int height,
                              int framerate,
-                             VideoCapturerObserver capturerObserver) {
-        this.videoCapturerObserver = capturerObserver;
+                             VideoCapturer.Listener videoCapturerListener) {
+        this.videoCapturerListener = videoCapturerListener;
         webrtcCapturer.startCapture(width,
                 height,
                 framerate,
@@ -135,30 +170,5 @@ public class CameraCapturer implements VideoCapturer {
         this.webrtcCapturer = webrtcCapturer;
         this.cameraSource = cameraSource;
         this.listener = listener;
-    }
-
-    class CapturerObserverAdapter implements org.webrtc.VideoCapturer.CapturerObserver {
-        @Override
-        public void onCapturerStarted(boolean b) {
-            videoCapturerObserver.onCapturerStarted(b);
-        }
-
-        @Override
-        public void onByteBufferFrameCaptured(byte[] bytes, int width, int height, int i2, long l) {
-            VideoDimensions frameDimensions = new VideoDimensions(width, height);
-            CaptureFrame frame = new CaptureFrame(bytes, frameDimensions, i2, l);
-
-            videoCapturerObserver.onFrameCaptured(frame);
-        }
-
-        @Override
-        public void onTextureFrameCaptured(int i, int i1, int i2, float[] floats, int i3, long l) {
-            // TODO: Do we need to support capturing to texture?
-        }
-
-        @Override
-        public void onOutputFormatRequest(int i, int i1, int i2) {
-            // TODO: Do we need to support an output format request?
-        }
     }
 }
