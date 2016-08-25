@@ -5,7 +5,7 @@ package com.twilio.video;
  *
  */
 public interface VideoRenderer {
-    interface Observer {
+    public interface Listener {
         /**
          * This method notifies the observer when the first frame has arrived.
          */

@@ -27,16 +27,16 @@ public class VideoViewRenderer implements VideoRenderer {
         @Override
         public void onFirstFrameRendered() {
             refreshRenderer();
-            if (rendererObserver != null) {
-                rendererObserver.onFirstFrame();
+            if (listener != null) {
+                listener.onFirstFrame();
             }
         }
 
         @Override
         public void onFrameResolutionChanged(int videoWidth, int videoHeight, int rotation) {
             refreshRenderer();
-            if (rendererObserver != null) {
-                rendererObserver.onFrameDimensionsChanged(videoWidth, videoHeight, rotation);
+            if (listener != null) {
+                listener.onFrameDimensionsChanged(videoWidth, videoHeight, rotation);
             }
         }
     };
@@ -44,7 +44,7 @@ public class VideoViewRenderer implements VideoRenderer {
     private final SurfaceViewRenderer surfaceViewRenderer;
     private boolean mirror = false;
     private VideoScaleType videoScaleType = VideoScaleType.ASPECT_FIT;
-    private VideoRenderer.Observer rendererObserver;
+    private VideoRenderer.Listener listener;
 
     /**
      * Create a video view renderer that will display frames in
@@ -78,8 +78,8 @@ public class VideoViewRenderer implements VideoRenderer {
         refreshRenderer();
     }
 
-    public void setObserver(VideoRenderer.Observer rendererObserver) {
-        this.rendererObserver = rendererObserver;
+    public void setListener(VideoRenderer.Listener listener) {
+        this.listener = listener;
     }
 
     /**
