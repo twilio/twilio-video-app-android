@@ -19,8 +19,8 @@ class VideoCapturerDelegate implements org.webrtc.VideoCapturer {
 
     @Override
     public List<CameraEnumerationAndroid.CaptureFormat> getSupportedFormats() {
-        if (videoCapturer.getClass() == CameraCapturer2.class) {
-            CameraCapturer2 cameraCapturer = (CameraCapturer2) videoCapturer;
+        if (videoCapturer.getClass() == CameraCapturer.class) {
+            CameraCapturer cameraCapturer = (CameraCapturer) videoCapturer;
 
             return cameraCapturer.webrtcCapturer.getSupportedFormats();
         } else {
@@ -37,8 +37,8 @@ class VideoCapturerDelegate implements org.webrtc.VideoCapturer {
                              SurfaceTextureHelper surfaceTextureHelper,
                              Context context,
                              CapturerObserver capturerObserver) {
-        if (videoCapturer.getClass() == CameraCapturer2.class) {
-            CameraCapturer2 cameraCapturer = (CameraCapturer2) videoCapturer;
+        if (videoCapturer.getClass() == CameraCapturer.class) {
+            CameraCapturer cameraCapturer = (CameraCapturer) videoCapturer;
 
             cameraCapturer.webrtcCapturer.startCapture(width,
                     height,
@@ -53,8 +53,8 @@ class VideoCapturerDelegate implements org.webrtc.VideoCapturer {
 
     @Override
     public void stopCapture() throws InterruptedException {
-        if (videoCapturer.getClass() == CameraCapturer2.class) {
-            CameraCapturer2 cameraCapturer = (CameraCapturer2) videoCapturer;
+        if (videoCapturer.getClass() == CameraCapturer.class) {
+            CameraCapturer cameraCapturer = (CameraCapturer) videoCapturer;
 
             cameraCapturer.webrtcCapturer.stopCapture();
         } else {
@@ -64,8 +64,8 @@ class VideoCapturerDelegate implements org.webrtc.VideoCapturer {
 
     @Override
     public void dispose() {
-        if (videoCapturer.getClass() == CameraCapturer2.class) {
-            CameraCapturer2 cameraCapturer = (CameraCapturer2) videoCapturer;
+        if (videoCapturer.getClass() == CameraCapturer.class) {
+            CameraCapturer cameraCapturer = (CameraCapturer) videoCapturer;
 
             cameraCapturer.webrtcCapturer.dispose();
         } else {

@@ -31,6 +31,10 @@ public class VideoTrack {
         this.webrtcVideoTrack = new org.webrtc.VideoTrack(nativeWebrtcTrack);
     }
 
+    VideoTrack(org.webrtc.VideoTrack webRtcVideoTrack) {
+        this.webrtcVideoTrack = webRtcVideoTrack;
+    }
+
     /**
      * Add a video renderer to get video from the video track
      *

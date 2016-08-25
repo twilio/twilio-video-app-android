@@ -95,6 +95,11 @@ public class LocalMediaTest {
     }
 
     @Test
+    public void removeAudioTrack_shouldReturnFalseForNull() {
+        assertFalse(localMedia.removeAudioTrack(null));
+    }
+
+    @Test
     public void canAddMultipleAudioTracks() {
         int numAudioTracks = 5;
         boolean[] expectedEnabled = new boolean[]{ false, true, true, false, false };
@@ -218,6 +223,11 @@ public class LocalMediaTest {
         assertTrue(localMedia.removeLocalVideoTrack(localVideoTrack));
         assertEquals(0, localMedia.getLocalVideoTracks().size());
         assertFalse(fakeVideoCapturer.isStarted());
+    }
+
+    @Test
+    public void removeVideoTrack_shouldReturnFalseForNull() {
+        assertFalse(localMedia.removeLocalVideoTrack(null));
     }
 
     @Test

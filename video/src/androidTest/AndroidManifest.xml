@@ -1,7 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest
     xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.twilio.conversations.test" >
+    xmlns:tools="http://schemas.android.com/tools"
+    package="com.twilio.conversations.test">
+
+    <uses-sdk tools:overrideLibrary="android.support.test.uiautomator.v18"/>
 
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.INTERNET"/>
@@ -12,11 +15,15 @@
 
     <application>
         <activity
-            android:name="com.twilio.video.activity.RoomsTestActivity">
+            android:name="com.twilio.video.ui.RoomsTestActivity">
         </activity>
 
         <activity
             android:name="com.twilio.video.activity.CameraCapturerTestActivity">
+        </activity>
+
+        <activity
+            android:name="com.twilio.video.ui.CameraCapturerTestActivity">
         </activity>
 
     </application>
