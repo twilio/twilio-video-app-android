@@ -7,7 +7,7 @@ import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
 
 import com.twilio.common.AccessManager;
-import com.twilio.video.activity.RoomsTestActivity;
+import com.twilio.video.ui.RoomsTestActivity;
 import com.twilio.video.helper.AccessTokenHelper;
 import com.twilio.video.helper.CallbackHelper;
 import com.twilio.video.util.FakeVideoCapturer;

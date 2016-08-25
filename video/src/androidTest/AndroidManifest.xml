@@ -15,7 +15,7 @@
 
     <application>
         <activity
-            android:name="com.twilio.video.activity.RoomsTestActivity">
+            android:name="com.twilio.video.ui.RoomsTestActivity">
         </activity>
 
         <activity

@@ -1,4 +1,4 @@
-package com.twilio.video.activity;
+package com.twilio.video.ui;
 
 import android.app.Activity;
 import android.os.Bundle;
