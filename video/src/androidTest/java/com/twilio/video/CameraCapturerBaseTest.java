@@ -39,7 +39,7 @@ public class CameraCapturerBaseTest extends BaseCameraCapturerTest {
         localVideoTrack.addRenderer(frameCountRenderer);
         Thread.sleep(TimeUnit.SECONDS.toMillis(1));
 
-        // Validate our frame count is atleast 5
+        // Validate our frame count is at least 5
         frameCount = frameCountRenderer.getFrameCount();
         assertTrue(frameCount >= 5);
 
@@ -50,7 +50,7 @@ public class CameraCapturerBaseTest extends BaseCameraCapturerTest {
         // Perform camera switch
         cameraCapturer.switchCamera();
 
-        // Wait and validate our frame count is atleast 10
+        // Wait and validate our frame count is at least 10
         Thread.sleep(TimeUnit.SECONDS.toMillis(1));
         frameCount = frameCountRenderer.getFrameCount();
         assertTrue(frameCount >= 10);
