@@ -14,7 +14,7 @@ import java.util.List;
 
 import static org.junit.Assert.fail;
 
-public class CameraCapturer2TestActivity extends Activity implements PermissionRequester {
+public class CameraCapturerTestActivity extends Activity implements PermissionRequester {
     static final private int REQUEST_CODE_CAMERA = 100;
 
     @Override

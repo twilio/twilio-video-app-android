@@ -23,7 +23,7 @@
         </activity>
 
         <activity
-            android:name="com.twilio.video.ui.CameraCapturer2TestActivity">
+            android:name="com.twilio.video.ui.CameraCapturerTestActivity">
         </activity>
 
     </application>

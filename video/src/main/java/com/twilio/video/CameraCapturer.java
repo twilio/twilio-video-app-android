@@ -10,8 +10,8 @@ import org.webrtc.VideoCapturerAndroid;
 
 import java.util.List;
 
-public class CameraCapturer2 implements VideoCapturer {
-    private static final Logger logger = Logger.getLogger(CameraCapturer2.class);
+public class CameraCapturer implements VideoCapturer {
+    private static final Logger logger = Logger.getLogger(CameraCapturer.class);
 
     /**
      * Camera source types
@@ -24,9 +24,9 @@ public class CameraCapturer2 implements VideoCapturer {
     final VideoCapturerAndroid webrtcCapturer;
     private final CapturerErrorListener listener;
 
-    public static CameraCapturer2 create(Context context,
-                                         CameraSource source,
-                                         CapturerErrorListener listener) {
+    public static CameraCapturer create(Context context,
+                                        CameraSource source,
+                                        CapturerErrorListener listener) {
         if (context == null) {
             throw new NullPointerException("context must not be null");
         }
@@ -56,7 +56,7 @@ public class CameraCapturer2 implements VideoCapturer {
             return null;
         }
 
-        return new CameraCapturer2(webrtcVideoCapturer, listener);
+        return new CameraCapturer(webrtcVideoCapturer, listener);
     }
 
     @Override
@@ -118,7 +118,7 @@ public class CameraCapturer2 implements VideoCapturer {
         return VideoCapturerAndroid.create(deviceName, cameraEventsHandler);
     }
 
-    private CameraCapturer2(VideoCapturerAndroid webrtcCapturer, CapturerErrorListener listener) {
+    private CameraCapturer(VideoCapturerAndroid webrtcCapturer, CapturerErrorListener listener) {
         this.webrtcCapturer = webrtcCapturer;
         this.listener = listener;
     }

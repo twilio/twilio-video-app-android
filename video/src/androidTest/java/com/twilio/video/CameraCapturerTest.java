@@ -5,7 +5,7 @@ import android.support.test.filters.LargeTest;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
 
-import com.twilio.video.ui.CameraCapturer2TestActivity;
+import com.twilio.video.ui.CameraCapturerTestActivity;
 import com.twilio.video.util.FrameCountRenderer;
 import com.twilio.video.util.PermissionUtils;
 
@@ -22,12 +22,12 @@ import static org.junit.Assert.assertTrue;
 
 @RunWith(AndroidJUnit4.class)
 @LargeTest
-public class CameraCapturer2Test {
-    @Rule public ActivityTestRule<CameraCapturer2TestActivity> activityRule =
-            new ActivityTestRule<>(CameraCapturer2TestActivity.class);
-    private CameraCapturer2TestActivity cameraCapturerActivity;
+public class CameraCapturerTest {
+    @Rule public ActivityTestRule<CameraCapturerTestActivity> activityRule =
+            new ActivityTestRule<>(CameraCapturerTestActivity.class);
+    private CameraCapturerTestActivity cameraCapturerActivity;
     private LocalMedia localMedia;
-    private CameraCapturer2 cameraCapturer2;
+    private CameraCapturer cameraCapturer;
     private LocalVideoTrack localVideoTrack;
     private FrameCountRenderer frameCountRenderer;
 
@@ -37,9 +37,9 @@ public class CameraCapturer2Test {
         PermissionUtils.allowPermissions(InstrumentationRegistry.getInstrumentation(),
                 cameraCapturerActivity);
         localMedia = LocalMedia.create(cameraCapturerActivity);
-        cameraCapturer2 = CameraCapturer2.create(cameraCapturerActivity,
-                CameraCapturer2.CameraSource.CAMERA_SOURCE_FRONT_CAMERA, null);
-        localVideoTrack = localMedia.addVideoTrack(true, cameraCapturer2);
+        cameraCapturer = CameraCapturer.create(cameraCapturerActivity,
+                CameraCapturer.CameraSource.CAMERA_SOURCE_FRONT_CAMERA, null);
+        localVideoTrack = localMedia.addVideoTrack(true, cameraCapturer);
         frameCountRenderer = new FrameCountRenderer();
     }
 
