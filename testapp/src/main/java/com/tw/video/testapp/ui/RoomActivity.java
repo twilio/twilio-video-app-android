@@ -1,8 +1,10 @@
-package com.tw.video.testapp.activity;
+package com.tw.video.testapp.ui;
 
+import android.content.Intent;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.RelativeLayout;
@@ -28,9 +30,7 @@ import com.twilio.video.VideoViewRenderer;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import retrofit.Callback;
-import retrofit.RetrofitError;
-import retrofit.client.Response;
+import butterknife.OnClick;
 import timber.log.Timber;
 
 public class RoomActivity extends AppCompatActivity {
@@ -117,13 +117,28 @@ public class RoomActivity extends AppCompatActivity {
         room = videoClient.connect(connectOptions, createRoomListener());
     }
 
+    @OnClick(R.id.exit_room_fab)
+    public void exitRoom(View view) {
+        if (room != null) {
+            Timber.i("Exiting room");
+            room.disconnect();
+        } else {
+            returnToVideoClientLogin();
+        }
+    }
+
+    private void returnToVideoClientLogin(){
+        Intent registrationIntent = new Intent(RoomActivity.this, VideoClientLoginActivity.class);
+        startActivity(registrationIntent);
+        finish();
+    }
+
     private Room.Listener createRoomListener() {
         return new Room.Listener() {
             @Override
             public void onConnected(Room room) {
                 Timber.i("onConnected: "+room.getName() + " sid:"+
                         room.getSid()+" state:"+room.getState());
-                //room.disconnect();
                 roomStatusTextview.setText("Connected to "+room.getName());
 
             }
@@ -138,6 +153,8 @@ public class RoomActivity extends AppCompatActivity {
             public void onDisconnected(Room room, VideoException error) {
                 Timber.i("onDisconnected");
                 roomStatusTextview.setText("Disconnected from "+roomName);
+                RoomActivity.this.room = null;
+                returnToVideoClientLogin();
             }
 
             @Override

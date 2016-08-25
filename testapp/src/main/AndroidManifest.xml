@@ -23,7 +23,7 @@
         android:label="@string/app_name"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".activity.RoomsActivity"
+            android:name=".ui.VideoClientLoginActivity"
             android:windowSoftInputMode="adjustResize|stateAlwaysHidden">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
@@ -32,10 +32,10 @@
             </intent-filter>
         </activity>
 
-        <receiver android:name=".activity.ClientActivity$Rebroadcaster"/>
+        <receiver android:name=".ui.ClientActivity$Rebroadcaster"/>
 
         <activity android:name="net.hockeyapp.android.UpdateActivity"/>
-        <activity android:name=".activity.RoomActivity">
+        <activity android:name=".ui.RoomActivity">
         </activity>
     </application>
 

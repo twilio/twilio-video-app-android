@@ -1,4 +1,4 @@
-package com.tw.video.testapp.activity;
+package com.tw.video.testapp.ui;
 
 import android.Manifest;
 import android.app.ProgressDialog;
@@ -23,16 +23,8 @@ import android.widget.Toast;
 import com.tw.video.testapp.BuildConfig;
 import com.tw.video.testapp.R;
 import com.tw.video.testapp.util.SimpleSignalingUtils;
-import com.twilio.common.AccessManager;
-import com.twilio.video.AudioTrack;
-import com.twilio.video.ConnectOptions;
 import com.twilio.video.LogLevel;
-import com.twilio.video.Media;
-import com.twilio.video.Participant;
 import com.twilio.video.VideoClient;
-import com.twilio.video.Room;
-import com.twilio.video.VideoException;
-import com.twilio.video.VideoTrack;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -42,7 +34,7 @@ import retrofit.RetrofitError;
 import retrofit.client.Response;
 import timber.log.Timber;
 
-public class RoomsActivity extends AppCompatActivity {
+public class VideoClientLoginActivity extends AppCompatActivity {
 
     @BindView(R.id.username_edittext) EditText usernameEditText;
     @BindView(R.id.room_name_edittext) EditText roomEditText;
@@ -107,7 +99,7 @@ public class RoomsActivity extends AppCompatActivity {
 
     @OnClick(R.id.registration_button)
     void register(View view) {
-        progressDialog = ProgressDialog.show(RoomsActivity.this, null,
+        progressDialog = ProgressDialog.show(VideoClientLoginActivity.this, null,
                 "Registering with Twilio", true);
         String username = usernameEditText.getText().toString();
         if(username != null && username.length() != 0) {
@@ -130,7 +122,7 @@ public class RoomsActivity extends AppCompatActivity {
 
     private void registerUser(final String username) {
         obtainCapabilityToken(username,
-                RoomsActivity.this.realmSpinner.getSelectedItem()
+                VideoClientLoginActivity.this.realmSpinner.getSelectedItem()
                         .toString().toLowerCase());
     }
 

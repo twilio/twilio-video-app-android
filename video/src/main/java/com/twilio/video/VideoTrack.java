@@ -60,7 +60,7 @@ public class VideoTrack {
         if (videoRenderer != null) {
             org.webrtc.VideoRenderer webrtcVideoRenderer =
                     videoRenderersMap.remove(videoRenderer);
-            if (webrtcVideoRenderer != null) {
+            if (webrtcVideoTrack != null && webrtcVideoRenderer != null) {
                 webrtcVideoTrack.removeRenderer(webrtcVideoRenderer);
             }
         }
