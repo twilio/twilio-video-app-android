@@ -6,6 +6,7 @@ import android.content.Context;
 import com.twilio.video.internal.Logger;
 
 import org.webrtc.CameraEnumerationAndroid;
+import org.webrtc.SurfaceTextureHelper;
 import org.webrtc.VideoCapturerAndroid;
 
 import java.util.List;
@@ -21,10 +22,14 @@ public class CameraCapturer implements VideoCapturer {
         CAMERA_SOURCE_BACK_CAMERA
     }
 
-    final VideoCapturerAndroid webrtcCapturer;
+    private final Context context;
+    private final VideoCapturerAndroid webrtcCapturer;
     private final CapturerErrorListener listener;
     private CameraSource cameraSource;
     private final CameraCapturerFormatProvider formatProvider = new CameraCapturerFormatProvider();
+    private VideoCapturerObserver videoCapturerObserver;
+    private SurfaceTextureHelper surfaceTextureHelper;
+    private final CapturerObserverAdapter observerAdapter = new CapturerObserverAdapter();
 
     public static CameraCapturer create(Context context,
                                         CameraSource cameraSource,
@@ -63,7 +68,7 @@ public class CameraCapturer implements VideoCapturer {
             return null;
         }
 
-        return new CameraCapturer(webrtcVideoCapturer, cameraSource, listener);
+        return new CameraCapturer(context, webrtcVideoCapturer, cameraSource, listener);
     }
 
     @Override
@@ -76,7 +81,13 @@ public class CameraCapturer implements VideoCapturer {
                              int height,
                              int framerate,
                              VideoCapturerObserver capturerObserver) {
-        // TODO: implement generic capturer interface
+        this.videoCapturerObserver = capturerObserver;
+        webrtcCapturer.startCapture(width,
+                height,
+                framerate,
+                surfaceTextureHelper,
+                context,
+                observerAdapter);
     }
 
     @Override
@@ -100,6 +111,10 @@ public class CameraCapturer implements VideoCapturer {
                 (CameraSource.CAMERA_SOURCE_FRONT_CAMERA);
     }
 
+    void setSurfaceTextureHelper(SurfaceTextureHelper surfaceTextureHelper) {
+        this.surfaceTextureHelper = surfaceTextureHelper;
+    }
+
     private static VideoCapturerAndroid createVideoCapturerAndroid(int cameraId,
                                                                    VideoCapturerAndroid.CameraEventsHandler cameraEventsHandler) {
         String deviceName = CameraEnumerationAndroid.getDeviceName(cameraId);
@@ -112,11 +127,38 @@ public class CameraCapturer implements VideoCapturer {
         return VideoCapturerAndroid.create(deviceName, cameraEventsHandler);
     }
 
-    private CameraCapturer(VideoCapturerAndroid webrtcCapturer,
+    private CameraCapturer(Context context,
+                           VideoCapturerAndroid webrtcCapturer,
                            CameraSource cameraSource,
                            CapturerErrorListener listener) {
+        this.context = context;
         this.webrtcCapturer = webrtcCapturer;
         this.cameraSource = cameraSource;
         this.listener = listener;
+    }
+
+    class CapturerObserverAdapter implements org.webrtc.VideoCapturer.CapturerObserver {
+        @Override
+        public void onCapturerStarted(boolean b) {
+            videoCapturerObserver.onCapturerStarted(b);
+        }
+
+        @Override
+        public void onByteBufferFrameCaptured(byte[] bytes, int width, int height, int i2, long l) {
+            VideoDimensions frameDimensions = new VideoDimensions(width, height);
+            CaptureFrame frame = new CaptureFrame(bytes, frameDimensions, i2, l);
+
+            videoCapturerObserver.onFrameCaptured(frame);
+        }
+
+        @Override
+        public void onTextureFrameCaptured(int i, int i1, int i2, float[] floats, int i3, long l) {
+            // TODO: Do we need to support capturing to texture?
+        }
+
+        @Override
+        public void onOutputFormatRequest(int i, int i1, int i2) {
+            // TODO: Do we need to support an output format request?
+        }
     }
 }

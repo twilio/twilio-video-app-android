@@ -7,10 +7,7 @@ import org.webrtc.*;
 import java.util.ArrayList;
 import java.util.List;
 
-/*
- * WIP: Delegates callbacks from WebRTC to our {@link VideoCapturer}
- */
-class VideoCapturerDelegate implements org.webrtc.VideoCapturer {
+final class VideoCapturerDelegate implements org.webrtc.VideoCapturer {
     private final VideoCapturer videoCapturer;
 
     VideoCapturerDelegate(VideoCapturer videoCapturer) {
@@ -29,18 +26,16 @@ class VideoCapturerDelegate implements org.webrtc.VideoCapturer {
                              SurfaceTextureHelper surfaceTextureHelper,
                              Context context,
                              CapturerObserver capturerObserver) {
-        if (videoCapturer.getClass() == CameraCapturer.class) {
+        // TODO: ugh this is still cheating..need to figure out a way to pass this better
+        if (videoCapturer instanceof CameraCapturer) {
             CameraCapturer cameraCapturer = (CameraCapturer) videoCapturer;
 
-            cameraCapturer.webrtcCapturer.startCapture(width,
-                    height,
-                    framerate,
-                    surfaceTextureHelper,
-                    context,
-                    capturerObserver);
-        } else {
-            videoCapturer.startCapture(width, height, framerate, null);
+            cameraCapturer.setSurfaceTextureHelper(surfaceTextureHelper);
         }
+        videoCapturer.startCapture(width,
+                height,
+                framerate,
+                new VideoCapturerObserverAdapter(capturerObserver));
     }
 
     @Override
@@ -50,13 +45,7 @@ class VideoCapturerDelegate implements org.webrtc.VideoCapturer {
 
     @Override
     public void dispose() {
-        if (videoCapturer.getClass() == CameraCapturer.class) {
-            CameraCapturer cameraCapturer = (CameraCapturer) videoCapturer;
-
-            cameraCapturer.webrtcCapturer.dispose();
-        } else {
-            // TODO: Are we going to publish a release concept on the public capturer api?
-        }
+        // Currently this is not part of our capturer api so we can just ignore
     }
 
     private List<CameraEnumerationAndroid.CaptureFormat> convertToWebRtcFormats(List<CaptureFormat> captureFormats) {
