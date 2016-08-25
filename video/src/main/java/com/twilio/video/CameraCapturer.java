@@ -37,13 +37,18 @@ public class CameraCapturer implements VideoCapturer {
                 listener != null) {
             listener.onError(new CapturerException(CapturerException.ExceptionDomain.CAMERA,
                     "CAMERA permission not granted"));
+
+            return null;
         }
 
         // Create the webrtc capturer
         int cameraId = getCameraId(source);
-        if (cameraId < 0 && listener != null) {
-            listener.onError(new CapturerException(CapturerException.ExceptionDomain.CAMERA,
-                    "Invalid camera source provided"));
+        if (cameraId < 0) {
+            logger.e("Failed to find camera source");
+            if (listener != null) {
+                listener.onError(new CapturerException(CapturerException.ExceptionDomain.CAMERA,
+                        "Unsupported camera source provided"));
+            }
             return null;
         }
         CameraCapturerEventsHandler eventsHandler = new CameraCapturerEventsHandler(listener);

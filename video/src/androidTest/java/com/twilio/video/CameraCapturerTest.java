@@ -37,9 +37,6 @@ public class CameraCapturerTest {
         PermissionUtils.allowPermissions(InstrumentationRegistry.getInstrumentation(),
                 cameraCapturerActivity);
         localMedia = LocalMedia.create(cameraCapturerActivity);
-        cameraCapturer = CameraCapturer.create(cameraCapturerActivity,
-                CameraCapturer.CameraSource.CAMERA_SOURCE_FRONT_CAMERA, null);
-        localVideoTrack = localMedia.addVideoTrack(true, cameraCapturer);
         frameCountRenderer = new FrameCountRenderer();
     }
 
@@ -49,8 +46,22 @@ public class CameraCapturerTest {
         localMedia.release();
     }
 
+    @Test(expected = NullPointerException.class)
+    public void create_shouldFailWithNullContext() {
+        cameraCapturer = CameraCapturer.create(null,
+                CameraCapturer.CameraSource.CAMERA_SOURCE_FRONT_CAMERA, null);
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void create_shouldFailWithNullSource() {
+        cameraCapturer = CameraCapturer.create(cameraCapturerActivity, null, null);
+    }
+
     @Test
     public void shouldCaptureFramesWhenAddedToVideoTrack() throws InterruptedException {
+        cameraCapturer = CameraCapturer.create(cameraCapturerActivity,
+                CameraCapturer.CameraSource.CAMERA_SOURCE_FRONT_CAMERA, null);
+        localVideoTrack = localMedia.addVideoTrack(true, cameraCapturer);
         int frameCount = frameCountRenderer.getFrameCount();
 
         // Validate our frame count is nothing
@@ -67,6 +78,9 @@ public class CameraCapturerTest {
 
     @Test
     public void shouldStopCapturingFramesWhenRemovedFromVideoTrack() throws InterruptedException {
+        cameraCapturer = CameraCapturer.create(cameraCapturerActivity,
+                CameraCapturer.CameraSource.CAMERA_SOURCE_FRONT_CAMERA, null);
+        localVideoTrack = localMedia.addVideoTrack(true, cameraCapturer);
         int frameCount = frameCountRenderer.getFrameCount();
 
         // Validate our frame count is nothing
