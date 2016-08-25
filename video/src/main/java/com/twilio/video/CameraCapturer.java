@@ -23,15 +23,16 @@ public class CameraCapturer implements VideoCapturer {
 
     final VideoCapturerAndroid webrtcCapturer;
     private final CapturerErrorListener listener;
+    private CameraSource cameraSource;
 
     public static CameraCapturer create(Context context,
-                                        CameraSource source,
+                                        CameraSource cameraSource,
                                         CapturerErrorListener listener) {
         if (context == null) {
             throw new NullPointerException("context must not be null");
         }
-        if (source == null) {
-            throw new NullPointerException("source must not be null");
+        if (cameraSource == null) {
+            throw new NullPointerException("camera source must not be null");
         }
         if (!Util.permissionGranted(context, Manifest.permission.CAMERA) &&
                 listener != null) {
@@ -42,7 +43,7 @@ public class CameraCapturer implements VideoCapturer {
         }
 
         // Create the webrtc capturer
-        int cameraId = getCameraId(source);
+        int cameraId = getCameraId(cameraSource);
         if (cameraId < 0) {
             logger.e("Failed to find camera source");
             if (listener != null) {
@@ -61,7 +62,7 @@ public class CameraCapturer implements VideoCapturer {
             return null;
         }
 
-        return new CameraCapturer(webrtcVideoCapturer, listener);
+        return new CameraCapturer(webrtcVideoCapturer, cameraSource, listener);
     }
 
     @Override
@@ -74,17 +75,24 @@ public class CameraCapturer implements VideoCapturer {
                              int height,
                              int framerate,
                              VideoCapturerObserver capturerObserver) {
-
+        // TODO: implement generic capturer interface
     }
 
     @Override
     public void stopCapture() {
+        // TODO: implement generic capturer interface
+    }
 
+    public synchronized CameraSource getCameraSource() {
+        return cameraSource;
     }
 
     public synchronized void switchCamera() {
         // TODO: propagate error
         webrtcCapturer.switchCamera(null);
+        cameraSource = (cameraSource == CameraSource.CAMERA_SOURCE_FRONT_CAMERA) ?
+                (CameraSource.CAMERA_SOURCE_BACK_CAMERA) :
+                (CameraSource.CAMERA_SOURCE_FRONT_CAMERA);
     }
 
     private static int getCameraId(CameraSource cameraSource) {
@@ -123,8 +131,11 @@ public class CameraCapturer implements VideoCapturer {
         return VideoCapturerAndroid.create(deviceName, cameraEventsHandler);
     }
 
-    private CameraCapturer(VideoCapturerAndroid webrtcCapturer, CapturerErrorListener listener) {
+    private CameraCapturer(VideoCapturerAndroid webrtcCapturer,
+                           CameraSource cameraSource,
+                           CapturerErrorListener listener) {
         this.webrtcCapturer = webrtcCapturer;
+        this.cameraSource = cameraSource;
         this.listener = listener;
     }
 }
