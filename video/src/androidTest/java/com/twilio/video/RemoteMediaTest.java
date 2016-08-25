@@ -18,14 +18,19 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 @RunWith(AndroidJUnit4.class)
 @LargeTest
+@Ignore
 public class RemoteMediaTest {
     private final static String TEST_USER  = "TEST_USER";
     private final static String TEST_USER2  = "TEST_USER2";
@@ -44,23 +49,13 @@ public class RemoteMediaTest {
 
 
     private Room connectClient(VideoClient videoClient, LocalMedia localMedia,
-                               CallbackHelper.FakeRoomListener roomListener) {
+                               Room.Listener roomListener) {
         ConnectOptions connectOptions = new ConnectOptions.Builder()
                 .name(testRoom)
                 .localMedia(localMedia)
                 .build();
         Room room = videoClient.connect(connectOptions, roomListener);
-        roomListener.onConnectedLatch = new CountDownLatch(1);
-        roomListener.onParticipantConnectedLatch = new CountDownLatch(1);
         return room;
-    }
-
-    private Participant getParticipantFromRoom(Room room) {
-        for (Participant participant : room.getParticipants().values()) {
-            // Grab first participant
-            return participant;
-        }
-        return null;
     }
 
     @Before
@@ -71,19 +66,25 @@ public class RemoteMediaTest {
         actor1LocalMedia = LocalMedia.create(context);
         actor1AccessManager = AccessTokenHelper.obtainAccessManager(context, TEST_USER);
         actor1VideoClient = new VideoClient(context, actor1AccessManager);
+        // Connect actor 1
         CallbackHelper.FakeRoomListener roomListener = new CallbackHelper.FakeRoomListener();
+        roomListener.onConnectedLatch = new CountDownLatch(1);
+        roomListener.onParticipantConnectedLatch = new CountDownLatch(1);
         room = connectClient(actor1VideoClient, actor1LocalMedia, roomListener);
         assertTrue(roomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
 
+        // Connect actor 2
         actor2LocalMedia = LocalMedia.create(context);
         actor2AccessManager = AccessTokenHelper.obtainAccessManager(context, TEST_USER2);
         actor2VideoClient = new VideoClient(context, actor2AccessManager);
-        CallbackHelper.FakeRoomListener roomListener2 = new CallbackHelper.FakeRoomListener();
+        CallbackHelper.EmptyRoomListener roomListener2 = new CallbackHelper.EmptyRoomListener();
         connectClient(actor2VideoClient, actor2LocalMedia, roomListener2);
-        assertTrue(roomListener2.onConnectedLatch.await(20, TimeUnit.SECONDS));
-        assertTrue(roomListener2.onParticipantConnectedLatch.await(20, TimeUnit.SECONDS));
 
-        participant = getParticipantFromRoom(room);
+        // Wait for actor2 to connect
+        assertTrue(roomListener.onParticipantConnectedLatch.await(20, TimeUnit.SECONDS));
+        List<Participant> participantList = new ArrayList<>(room.getParticipants().values());
+        assertEquals(1, participantList.size());
+        participant = participantList.get(0);
         assertNotNull(participant);
     }
 
@@ -91,6 +92,8 @@ public class RemoteMediaTest {
     public void teardown(){
         actor1LocalMedia.release();
         actor2LocalMedia.release();
+        actor1AccessManager.dispose();
+        actor2AccessManager.dispose();
     }
 
     // Audio
