@@ -9,6 +9,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.tw.video.testapp.R;
+import com.tw.video.testapp.util.AccessManagerHelper;
 import com.tw.video.testapp.util.SimpleSignalingUtils;
 import com.twilio.common.AccessManager;
 import com.twilio.video.AudioTrack;
@@ -27,6 +28,9 @@ import com.twilio.video.VideoViewRenderer;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import retrofit.Callback;
+import retrofit.RetrofitError;
+import retrofit.client.Response;
 import timber.log.Timber;
 
 public class RoomActivity extends AppCompatActivity {
@@ -74,6 +78,11 @@ public class RoomActivity extends AppCompatActivity {
         super.onDestroy();
         if (localMedia != null) {
             localMedia.release();
+            localMedia = null;
+        }
+        if (accessManager != null) {
+            accessManager.dispose();
+            accessManager = null;
         }
     }
 
@@ -94,7 +103,7 @@ public class RoomActivity extends AppCompatActivity {
     }
 
     private void createVideoClient() {
-        accessManager = new AccessManager(this, capabilityToken, null);
+        accessManager = AccessManagerHelper.createAccessManager(this, capabilityToken);
         videoClient = new VideoClient(this, accessManager);
     }
 
@@ -169,6 +178,7 @@ public class RoomActivity extends AppCompatActivity {
     private class ParticipantMediaListener implements Media.Listener {
 
         private Participant participant;
+        private VideoViewRenderer viewRenderer;
 
         ParticipantMediaListener(Participant participant) {
             this.participant = participant;
@@ -194,15 +204,17 @@ public class RoomActivity extends AppCompatActivity {
             RelativeLayout layout = new RelativeLayout(RoomActivity.this);
             layout.setClickable(false);
             layout.setLayoutParams(layoutParams);
-            VideoViewRenderer renderer = createRendererForContainer(layout);
+            viewRenderer = createRendererForContainer(layout);
             videoMainRelativeLayout.removeAllViews();
             videoMainRelativeLayout.addView(layout);
-            videoTrack.addRenderer(renderer);
+            videoTrack.addRenderer(viewRenderer);
         }
 
         @Override
         public void onVideoTrackRemoved(Media media, VideoTrack videoTrack) {
             Timber.i(participant.getIdentity() + ": onVideoTrackRemoved");
+            videoTrack.removeRenderer(viewRenderer);
+            viewRenderer = null;
             videoMainRelativeLayout.removeAllViews();
         }
 
@@ -227,5 +239,9 @@ public class RoomActivity extends AppCompatActivity {
         }
 
     }
+
+
+
+
 
 }

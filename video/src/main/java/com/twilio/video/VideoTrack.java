@@ -100,9 +100,12 @@ public class VideoTrack {
     void release() {
         if (nativeVideoTrackContext != 0) {
             if (webrtcVideoTrack != null) {
-                // TODO: Check if we are the one respnosible of disposing.
-                // By looking at webrtc source code, RtpReceiver seems to be calling this method
-                webrtcVideoTrack.dispose();
+                // TODO: Right now disposing is causing a crash in Core related to
+                // PeerConnectionSignaling. Lot of changes has been done
+                // in webrtc track teardown in core, so I'll wait for RC before dealing with this.
+                // Things to consider, when we dispose webrtcVideoTrack, it will automatically dispose
+                // all webrtc renderers. Should we dispose before, or after notifing the user ?
+                //webrtcVideoTrack.dispose();
                 webrtcVideoTrack = null;
             }
             nativeRelease(nativeVideoTrackContext);
