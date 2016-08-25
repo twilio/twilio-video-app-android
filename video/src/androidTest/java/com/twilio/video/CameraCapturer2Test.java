@@ -37,7 +37,8 @@ public class CameraCapturer2Test {
         PermissionUtils.allowPermissions(InstrumentationRegistry.getInstrumentation(),
                 cameraCapturerActivity);
         localMedia = LocalMedia.create(cameraCapturerActivity);
-        cameraCapturer2 = CameraCapturer2.create();
+        cameraCapturer2 = CameraCapturer2.create(cameraCapturerActivity,
+                CameraCapturer2.CameraSource.CAMERA_SOURCE_FRONT_CAMERA, null);
         localVideoTrack = localMedia.addVideoTrack(true, cameraCapturer2);
         frameCountRenderer = new FrameCountRenderer();
     }
