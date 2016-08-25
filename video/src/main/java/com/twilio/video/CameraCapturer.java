@@ -24,6 +24,7 @@ public class CameraCapturer implements VideoCapturer {
     final VideoCapturerAndroid webrtcCapturer;
     private final CapturerErrorListener listener;
     private CameraSource cameraSource;
+    private final CameraCapturerFormatProvider formatProvider = new CameraCapturerFormatProvider();
 
     public static CameraCapturer create(Context context,
                                         CameraSource cameraSource,
@@ -43,7 +44,7 @@ public class CameraCapturer implements VideoCapturer {
         }
 
         // Create the webrtc capturer
-        int cameraId = getCameraId(cameraSource);
+        int cameraId = CameraCapturerFormatProvider.getCameraId(cameraSource);
         if (cameraId < 0) {
             logger.e("Failed to find camera source");
             if (listener != null) {
@@ -67,7 +68,7 @@ public class CameraCapturer implements VideoCapturer {
 
     @Override
     public List<CaptureFormat> getSupportedFormats() {
-        return null;
+        return formatProvider.getSupportedFormats(cameraSource);
     }
 
     @Override
@@ -93,30 +94,6 @@ public class CameraCapturer implements VideoCapturer {
         cameraSource = (cameraSource == CameraSource.CAMERA_SOURCE_FRONT_CAMERA) ?
                 (CameraSource.CAMERA_SOURCE_BACK_CAMERA) :
                 (CameraSource.CAMERA_SOURCE_FRONT_CAMERA);
-    }
-
-    private static int getCameraId(CameraSource cameraSource) {
-        String deviceName;
-        int cameraId = -1;
-
-        if(cameraSource == CameraSource.CAMERA_SOURCE_BACK_CAMERA) {
-            deviceName = CameraEnumerationAndroid.getNameOfBackFacingDevice();
-        } else {
-            deviceName = CameraEnumerationAndroid.getNameOfFrontFacingDevice();
-        }
-        if(deviceName == null) {
-            cameraId = -1;
-        } else {
-            String[] deviceNames = CameraEnumerationAndroid.getDeviceNames();
-            for(int i = 0; i < deviceNames.length; i++) {
-                if(deviceName.equals(deviceNames[i])) {
-                    cameraId = i;
-                    break;
-                }
-            }
-        }
-
-        return cameraId;
     }
 
     private static VideoCapturerAndroid createVideoCapturerAndroid(int cameraId,

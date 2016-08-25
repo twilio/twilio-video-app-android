@@ -5,18 +5,38 @@ public class CaptureFormat {
     public final int height;
     public final int maxFramerate;
     public final int minFramerate;
-    public final int imageFormat;
+    public final CapturePixelFormat capturePixelFormat;
 
     public CaptureFormat(int width,
                          int height,
                          int minFramerate,
                          int maxFramerate,
-                         int imageFormat) {
+                         CapturePixelFormat capturePixelFormat) {
         this.width = width;
         this.height = height;
         this.minFramerate = minFramerate;
         this.maxFramerate = maxFramerate;
-        this.imageFormat = imageFormat;
+        this.capturePixelFormat = capturePixelFormat;
+    }
+
+    public int getWidth() {
+        return width;
+    }
+
+    public int getHeight() {
+        return height;
+    }
+
+    public int getMaxFramerate() {
+        return maxFramerate;
+    }
+
+    public int getMinFramerate() {
+        return minFramerate;
+    }
+
+    public CapturePixelFormat getCapturePixelFormat() {
+        return capturePixelFormat;
     }
 
     @Override
@@ -30,7 +50,7 @@ public class CaptureFormat {
         if (height != that.height) return false;
         if (maxFramerate != that.maxFramerate) return false;
         if (minFramerate != that.minFramerate) return false;
-        return imageFormat == that.imageFormat;
+        return capturePixelFormat == that.capturePixelFormat;
 
     }
 
@@ -40,7 +60,7 @@ public class CaptureFormat {
         result = 31 * result + height;
         result = 31 * result + maxFramerate;
         result = 31 * result + minFramerate;
-        result = 31 * result + imageFormat;
+        result = 31 * result + capturePixelFormat.getValue();
         return result;
     }
 
@@ -51,7 +71,7 @@ public class CaptureFormat {
                 ", height=" + height +
                 ", maxFramerate=" + maxFramerate +
                 ", minFramerate=" + minFramerate +
-                ", imageFormat=" + imageFormat +
+                ", capturePixelFormat=" + capturePixelFormat +
                 '}';
     }
 }

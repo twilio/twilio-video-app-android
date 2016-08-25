@@ -19,15 +19,7 @@ class VideoCapturerDelegate implements org.webrtc.VideoCapturer {
 
     @Override
     public List<CameraEnumerationAndroid.CaptureFormat> getSupportedFormats() {
-        if (videoCapturer.getClass() == CameraCapturer.class) {
-            CameraCapturer cameraCapturer = (CameraCapturer) videoCapturer;
-
-            return cameraCapturer.webrtcCapturer.getSupportedFormats();
-        } else {
-            videoCapturer.getSupportedFormats();
-        }
-
-        return new ArrayList<CameraEnumerationAndroid.CaptureFormat>();
+        return convertToWebRtcFormats(videoCapturer.getSupportedFormats());
     }
 
     @Override
@@ -71,5 +63,24 @@ class VideoCapturerDelegate implements org.webrtc.VideoCapturer {
         } else {
             // TODO: Are we going to publish a release concept on the public capturer api?
         }
+    }
+
+    private List<CameraEnumerationAndroid.CaptureFormat> convertToWebRtcFormats(List<CaptureFormat> captureFormats) {
+        List<CameraEnumerationAndroid.CaptureFormat> webRtcCaptureFormats =
+                new ArrayList<>(captureFormats.size());
+
+        for (int i = 0 ; i < captureFormats.size() ; i++) {
+            CaptureFormat captureFormat = captureFormats.get(i);
+            CameraEnumerationAndroid.CaptureFormat webRtcCaptureFormat =
+                    new CameraEnumerationAndroid.CaptureFormat(captureFormat.getWidth(),
+                            captureFormat.getHeight(),
+                            captureFormat.getMinFramerate(),
+                            captureFormat.getMaxFramerate(),
+                            captureFormat.getCapturePixelFormat().getValue());
+
+            webRtcCaptureFormats.add(i, webRtcCaptureFormat);
+        }
+
+        return webRtcCaptureFormats;
     }
 }
