@@ -2,19 +2,16 @@ package com.twilio.video;
 
 import android.Manifest;
 import android.content.Context;
-import android.hardware.Camera;
-import android.view.ViewGroup;
 
 import com.twilio.video.internal.Logger;
 
 import org.webrtc.CameraEnumerationAndroid;
-import org.webrtc.EglBase;
 import org.webrtc.VideoCapturerAndroid;
 
 import java.util.List;
 
 public class CameraCapturer2 implements VideoCapturer {
-    private static final Logger logger = Logger.getLogger(CameraCapturer.class);
+    private static final Logger logger = Logger.getLogger(CameraCapturer2.class);
 
     /**
      * Camera source types
