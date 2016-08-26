@@ -49,21 +49,25 @@ final class VideoCapturerDelegate implements org.webrtc.VideoCapturer {
     }
 
     private List<CameraEnumerationAndroid.CaptureFormat> convertToWebRtcFormats(List<VideoFormat> videoFormats) {
-        List<CameraEnumerationAndroid.CaptureFormat> webRtcCaptureFormats =
-                new ArrayList<>(videoFormats.size());
+        if (videoFormats != null) {
+            List<CameraEnumerationAndroid.CaptureFormat> webRtcCaptureFormats =
+                    new ArrayList<>(videoFormats.size());
 
-        for (int i = 0; i < videoFormats.size() ; i++) {
-            VideoFormat videoFormat = videoFormats.get(i);
-            CameraEnumerationAndroid.CaptureFormat webRtcCaptureFormat =
-                    new CameraEnumerationAndroid.CaptureFormat(videoFormat.width,
-                            videoFormat.height,
-                            videoFormat.minFramerate,
-                            videoFormat.maxFramerate,
-                            videoFormat.videoPixelFormat.getValue());
+                for (int i = 0; i < videoFormats.size(); i++) {
+                    VideoFormat videoFormat = videoFormats.get(i);
+                    CameraEnumerationAndroid.CaptureFormat webRtcCaptureFormat =
+                            new CameraEnumerationAndroid.CaptureFormat(videoFormat.width,
+                                    videoFormat.height,
+                                    videoFormat.minFramerate,
+                                    videoFormat.maxFramerate,
+                                    videoFormat.videoPixelFormat.getValue());
 
-            webRtcCaptureFormats.add(i, webRtcCaptureFormat);
+                    webRtcCaptureFormats.add(i, webRtcCaptureFormat);
+                }
+
+            return webRtcCaptureFormats;
         }
 
-        return webRtcCaptureFormats;
+        return new ArrayList<>();
     }
 }
