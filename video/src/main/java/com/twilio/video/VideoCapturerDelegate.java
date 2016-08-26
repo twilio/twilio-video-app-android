@@ -7,10 +7,7 @@ import org.webrtc.*;
 import java.util.ArrayList;
 import java.util.List;
 
-/*
- * WIP: Delegates callbacks from WebRTC to our {@link VideoCapturer}
- */
-class VideoCapturerDelegate implements org.webrtc.VideoCapturer {
+final class VideoCapturerDelegate implements org.webrtc.VideoCapturer {
     private final VideoCapturer videoCapturer;
 
     VideoCapturerDelegate(VideoCapturer videoCapturer) {
@@ -19,15 +16,7 @@ class VideoCapturerDelegate implements org.webrtc.VideoCapturer {
 
     @Override
     public List<CameraEnumerationAndroid.CaptureFormat> getSupportedFormats() {
-        if (videoCapturer.getClass() == CameraCapturer.class) {
-            CameraCapturer cameraCapturer = (CameraCapturer) videoCapturer;
-
-            return cameraCapturer.webrtcCapturer.getSupportedFormats();
-        } else {
-            videoCapturer.getSupportedFormats();
-        }
-
-        return new ArrayList<CameraEnumerationAndroid.CaptureFormat>();
+        return convertToWebRtcFormats(videoCapturer.getSupportedFormats());
     }
 
     @Override
@@ -37,39 +26,44 @@ class VideoCapturerDelegate implements org.webrtc.VideoCapturer {
                              SurfaceTextureHelper surfaceTextureHelper,
                              Context context,
                              CapturerObserver capturerObserver) {
-        if (videoCapturer.getClass() == CameraCapturer.class) {
+        // FIXME: ugh this is still cheating..need to figure out a way to pass this better
+        if (videoCapturer instanceof CameraCapturer) {
             CameraCapturer cameraCapturer = (CameraCapturer) videoCapturer;
 
-            cameraCapturer.webrtcCapturer.startCapture(width,
-                    height,
-                    framerate,
-                    surfaceTextureHelper,
-                    context,
-                    capturerObserver);
-        } else {
-            videoCapturer.startCapture(width, height, framerate, null);
+            cameraCapturer.setSurfaceTextureHelper(surfaceTextureHelper);
         }
+        videoCapturer.startCapture(width,
+                height,
+                framerate,
+                new VideoCapturerListenerAdapter(capturerObserver));
     }
 
     @Override
     public void stopCapture() throws InterruptedException {
-        if (videoCapturer.getClass() == CameraCapturer.class) {
-            CameraCapturer cameraCapturer = (CameraCapturer) videoCapturer;
-
-            cameraCapturer.webrtcCapturer.stopCapture();
-        } else {
-            videoCapturer.stopCapture();
-        }
+        videoCapturer.stopCapture();
     }
 
     @Override
     public void dispose() {
-        if (videoCapturer.getClass() == CameraCapturer.class) {
-            CameraCapturer cameraCapturer = (CameraCapturer) videoCapturer;
+        // Currently this is not part of our capturer api so we can just ignore
+    }
 
-            cameraCapturer.webrtcCapturer.dispose();
-        } else {
-            // TODO: Are we going to publish a release concept on the public capturer api?
+    private List<CameraEnumerationAndroid.CaptureFormat> convertToWebRtcFormats(List<VideoFormat> videoFormats) {
+        List<CameraEnumerationAndroid.CaptureFormat> webRtcCaptureFormats =
+                new ArrayList<>(videoFormats.size());
+
+        for (int i = 0; i < videoFormats.size() ; i++) {
+            VideoFormat videoFormat = videoFormats.get(i);
+            CameraEnumerationAndroid.CaptureFormat webRtcCaptureFormat =
+                    new CameraEnumerationAndroid.CaptureFormat(videoFormat.width,
+                            videoFormat.height,
+                            videoFormat.minFramerate,
+                            videoFormat.maxFramerate,
+                            videoFormat.videoPixelFormat.getValue());
+
+            webRtcCaptureFormats.add(i, webRtcCaptureFormat);
         }
+
+        return webRtcCaptureFormats;
     }
 }

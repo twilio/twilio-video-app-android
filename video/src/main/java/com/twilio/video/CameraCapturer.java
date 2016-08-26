@@ -6,6 +6,7 @@ import android.content.Context;
 import com.twilio.video.internal.Logger;
 
 import org.webrtc.CameraEnumerationAndroid;
+import org.webrtc.SurfaceTextureHelper;
 import org.webrtc.VideoCapturerAndroid;
 
 import java.util.List;
@@ -21,9 +22,49 @@ public class CameraCapturer implements VideoCapturer {
         CAMERA_SOURCE_BACK_CAMERA
     }
 
-    final VideoCapturerAndroid webrtcCapturer;
+    private final Context context;
+    private final VideoCapturerAndroid webrtcCapturer;
     private final CapturerErrorListener listener;
     private CameraSource cameraSource;
+    private final CameraCapturerFormatProvider formatProvider = new CameraCapturerFormatProvider();
+    private VideoCapturer.Listener videoCapturerListener;
+    private SurfaceTextureHelper surfaceTextureHelper;
+    private final org.webrtc.VideoCapturer.CapturerObserver observerAdapter =
+            new org.webrtc.VideoCapturer.CapturerObserver() {
+                @Override
+                public void onCapturerStarted(boolean success) {
+                    videoCapturerListener.onCapturerStarted(success);
+                }
+
+                @Override
+                public void onByteBufferFrameCaptured(byte[] bytes,
+                                                      int width,
+                                                      int height,
+                                                      int rotation,
+                                                      long timestamp) {
+                    VideoDimensions frameDimensions = new VideoDimensions(width, height);
+                    VideoFrame frame = new VideoFrame(bytes, frameDimensions, rotation, timestamp);
+
+                    videoCapturerListener.onFrameCaptured(frame);
+                }
+
+                @Override
+                public void onTextureFrameCaptured(int width,
+                                                   int height,
+                                                   int oesTextureId,
+                                                   float[] transformMatrix,
+                                                   int rotation,
+                                                   long timestampNs) {
+                    // TODO: Do we need to support capturing to texture?
+                }
+
+                @Override
+                public void onOutputFormatRequest(int width,
+                                                  int height,
+                                                  int framerate) {
+                    // TODO: Do we need to support an output format request?
+                }
+            };
 
     public static CameraCapturer create(Context context,
                                         CameraSource cameraSource,
@@ -43,7 +84,7 @@ public class CameraCapturer implements VideoCapturer {
         }
 
         // Create the webrtc capturer
-        int cameraId = getCameraId(cameraSource);
+        int cameraId = CameraCapturerFormatProvider.getCameraId(cameraSource);
         if (cameraId < 0) {
             logger.e("Failed to find camera source");
             if (listener != null) {
@@ -62,25 +103,35 @@ public class CameraCapturer implements VideoCapturer {
             return null;
         }
 
-        return new CameraCapturer(webrtcVideoCapturer, cameraSource, listener);
+        return new CameraCapturer(context, webrtcVideoCapturer, cameraSource, listener);
     }
 
     @Override
-    public List<CaptureFormat> getSupportedFormats() {
-        return null;
+    public List<VideoFormat> getSupportedFormats() {
+        return formatProvider.getSupportedFormats(cameraSource);
     }
 
     @Override
     public void startCapture(int width,
                              int height,
                              int framerate,
-                             VideoCapturerObserver capturerObserver) {
-        // TODO: implement generic capturer interface
+                             VideoCapturer.Listener videoCapturerListener) {
+        this.videoCapturerListener = videoCapturerListener;
+        webrtcCapturer.startCapture(width,
+                height,
+                framerate,
+                surfaceTextureHelper,
+                context,
+                observerAdapter);
     }
 
     @Override
     public void stopCapture() {
-        // TODO: implement generic capturer interface
+        try {
+            webrtcCapturer.stopCapture();
+        } catch (InterruptedException e) {
+            logger.e("Failed to stop camera capturer");
+        }
     }
 
     public synchronized CameraSource getCameraSource() {
@@ -95,28 +146,8 @@ public class CameraCapturer implements VideoCapturer {
                 (CameraSource.CAMERA_SOURCE_FRONT_CAMERA);
     }
 
-    private static int getCameraId(CameraSource cameraSource) {
-        String deviceName;
-        int cameraId = -1;
-
-        if(cameraSource == CameraSource.CAMERA_SOURCE_BACK_CAMERA) {
-            deviceName = CameraEnumerationAndroid.getNameOfBackFacingDevice();
-        } else {
-            deviceName = CameraEnumerationAndroid.getNameOfFrontFacingDevice();
-        }
-        if(deviceName == null) {
-            cameraId = -1;
-        } else {
-            String[] deviceNames = CameraEnumerationAndroid.getDeviceNames();
-            for(int i = 0; i < deviceNames.length; i++) {
-                if(deviceName.equals(deviceNames[i])) {
-                    cameraId = i;
-                    break;
-                }
-            }
-        }
-
-        return cameraId;
+    void setSurfaceTextureHelper(SurfaceTextureHelper surfaceTextureHelper) {
+        this.surfaceTextureHelper = surfaceTextureHelper;
     }
 
     private static VideoCapturerAndroid createVideoCapturerAndroid(int cameraId,
@@ -131,9 +162,11 @@ public class CameraCapturer implements VideoCapturer {
         return VideoCapturerAndroid.create(deviceName, cameraEventsHandler);
     }
 
-    private CameraCapturer(VideoCapturerAndroid webrtcCapturer,
+    private CameraCapturer(Context context,
+                           VideoCapturerAndroid webrtcCapturer,
                            CameraSource cameraSource,
                            CapturerErrorListener listener) {
+        this.context = context;
         this.webrtcCapturer = webrtcCapturer;
         this.cameraSource = cameraSource;
         this.listener = listener;

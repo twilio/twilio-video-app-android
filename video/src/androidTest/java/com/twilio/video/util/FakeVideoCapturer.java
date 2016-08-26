@@ -1,8 +1,7 @@
 package com.twilio.video.util;
 
-import com.twilio.video.CaptureFormat;
+import com.twilio.video.VideoFormat;
 import com.twilio.video.VideoCapturer;
-import com.twilio.video.VideoCapturerObserver;
 import com.twilio.video.internal.Logger;
 
 import java.util.List;
@@ -32,7 +31,7 @@ public class FakeVideoCapturer implements VideoCapturer {
     }
 
     @Override
-    public List<CaptureFormat> getSupportedFormats() {
+    public List<VideoFormat> getSupportedFormats() {
         logger.i("getSupportedFormats");
 
         return null;
@@ -42,7 +41,7 @@ public class FakeVideoCapturer implements VideoCapturer {
     public void startCapture(int width,
                              int height,
                              int framerate,
-                             VideoCapturerObserver capturerObserver) {
+                             VideoCapturer.Listener capturerListener) {
         logger.i("startCapture");
         this.captureWidth = width;
         this.captureHeight = height;
