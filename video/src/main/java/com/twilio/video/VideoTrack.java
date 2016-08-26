@@ -97,7 +97,7 @@ public class VideoTrack {
         this.isEnabled = isEnabled;
     }
 
-    void release() {
+    synchronized void release() {
         if (nativeVideoTrackContext != 0) {
             if (webrtcVideoTrack != null) {
                 // TODO: Right now disposing is causing a crash in Core related to
@@ -105,7 +105,7 @@ public class VideoTrack {
                 // in webrtc track teardown in core, so I'll wait for RC before dealing with this.
                 // Things to consider, when we dispose webrtcVideoTrack, it will automatically dispose
                 // all webrtc renderers. Should we dispose before, or after notifing the user ?
-                //webrtcVideoTrack.dispose();
+                // webrtcVideoTrack.dispose();
                 webrtcVideoTrack = null;
             }
             nativeRelease(nativeVideoTrackContext);
