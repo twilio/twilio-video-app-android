@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -15,9 +16,11 @@ import com.tw.video.testapp.util.AccessManagerHelper;
 import com.tw.video.testapp.util.SimpleSignalingUtils;
 import com.twilio.common.AccessManager;
 import com.twilio.video.AudioTrack;
+import com.twilio.video.CameraCapturer;
 import com.twilio.video.ConnectOptions;
 import com.twilio.video.LocalAudioTrack;
 import com.twilio.video.LocalMedia;
+import com.twilio.video.LocalVideoTrack;
 import com.twilio.video.Media;
 import com.twilio.video.Participant;
 import com.twilio.video.Room;
@@ -26,6 +29,7 @@ import com.twilio.video.VideoException;
 import com.twilio.video.VideoRenderer;
 import com.twilio.video.VideoScaleType;
 import com.twilio.video.VideoTrack;
+import com.twilio.video.VideoView;
 import com.twilio.video.VideoViewRenderer;
 
 import butterknife.BindView;
@@ -34,11 +38,11 @@ import butterknife.OnClick;
 import timber.log.Timber;
 
 public class RoomActivity extends AppCompatActivity {
-
     @BindView(R.id.exit_room_fab) FloatingActionButton exitRoomFab;
     @BindView(R.id.media_status_textview) TextView mediaStatusTextview;
     @BindView(R.id.room_status_textview) TextView roomStatusTextview;
-    @BindView(R.id.videoMainRelativeLayout) RelativeLayout videoMainRelativeLayout;
+    @BindView(R.id.primary_video_view) VideoView primaryVideoView;
+    @BindView(R.id.thumbnail_video_view) VideoView thumbnailVideoView;
 
     private String username;
     private String capabilityToken;
@@ -49,8 +53,8 @@ public class RoomActivity extends AppCompatActivity {
     private String roomName;
     private LocalMedia localMedia;
     private LocalAudioTrack localAudioTrack;
-
-
+    private LocalVideoTrack localVideoTrack;
+    private CameraCapturer cameraCapturer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,15 +72,29 @@ public class RoomActivity extends AppCompatActivity {
         processActivityIntent(savedInstanceState);
         localMedia = LocalMedia.create(this);
         localAudioTrack = localMedia.addAudioTrack(true);
+        cameraCapturer = CameraCapturer.create(this,
+                CameraCapturer.CameraSource.CAMERA_SOURCE_FRONT_CAMERA, null);
+        localVideoTrack = localMedia.addVideoTrack(true, cameraCapturer);
+        primaryVideoView.setMirror(true);
+        localVideoTrack.addRenderer(primaryVideoView);
         createVideoClient();
         connectToRoom();
-
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        if (primaryVideoView != null) {
+            primaryVideoView.release();
+            primaryVideoView = null;
+        }
+        if (thumbnailVideoView != null) {
+            thumbnailVideoView.release();
+            thumbnailVideoView = null;
+        }
         if (localMedia != null) {
+            localMedia.removeLocalVideoTrack(localVideoTrack);
+            localMedia.removeAudioTrack(localAudioTrack);
             localMedia.release();
             localMedia = null;
         }
@@ -161,6 +179,9 @@ public class RoomActivity extends AppCompatActivity {
             public void onParticipantConnected(Room room, Participant participant) {
                 Timber.i("onParticipantConnected: "+participant.getIdentity());
                 roomStatusTextview.setText("Participant "+participant.getIdentity()+ " joined");
+                localVideoTrack.removeRenderer(primaryVideoView);
+                thumbnailVideoView.setVisibility(View.VISIBLE);
+                localVideoTrack.addRenderer(thumbnailVideoView);
                 participant.getMedia().setListener(new ParticipantMediaListener(participant));
             }
 
@@ -168,6 +189,10 @@ public class RoomActivity extends AppCompatActivity {
             public void onParticipantDisconnected(Room room, Participant participant) {
                 Timber.i("onParticipantDisconnected "+participant.getIdentity());
                 roomStatusTextview.setText("Participant "+participant.getIdentity()+ " left.");
+                thumbnailVideoView.setVisibility(View.GONE);
+                localVideoTrack.removeRenderer(thumbnailVideoView);
+                primaryVideoView.setMirror(true);
+                localVideoTrack.addRenderer(primaryVideoView);
             }
         };
     }
@@ -193,7 +218,6 @@ public class RoomActivity extends AppCompatActivity {
     }
 
     private class ParticipantMediaListener implements Media.Listener {
-
         private Participant participant;
         private VideoViewRenderer viewRenderer;
 
@@ -221,18 +245,14 @@ public class RoomActivity extends AppCompatActivity {
             RelativeLayout layout = new RelativeLayout(RoomActivity.this);
             layout.setClickable(false);
             layout.setLayoutParams(layoutParams);
-            viewRenderer = createRendererForContainer(layout);
-            videoMainRelativeLayout.removeAllViews();
-            videoMainRelativeLayout.addView(layout);
-            videoTrack.addRenderer(viewRenderer);
+            primaryVideoView.setMirror(false);
+            videoTrack.addRenderer(primaryVideoView);
         }
 
         @Override
         public void onVideoTrackRemoved(Media media, VideoTrack videoTrack) {
             Timber.i(participant.getIdentity() + ": onVideoTrackRemoved");
-            videoTrack.removeRenderer(viewRenderer);
-            viewRenderer = null;
-            videoMainRelativeLayout.removeAllViews();
+            videoTrack.removeRenderer(primaryVideoView);
         }
 
         @Override
@@ -254,11 +274,5 @@ public class RoomActivity extends AppCompatActivity {
         public void onVideoTrackDisabled(Media media, VideoTrack videoTrack) {
             Timber.i(participant.getIdentity() + ": onVideoTrackDisabled");
         }
-
     }
-
-
-
-
-
 }
