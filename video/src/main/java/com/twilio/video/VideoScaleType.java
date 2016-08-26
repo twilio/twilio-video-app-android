@@ -16,8 +16,20 @@ public enum VideoScaleType {
     ASPECT_FILL,
 
     /**
-     * A combintation of fit and fill. Will scale, fit, and crop accordingly to
+     * A combination of fit and fill. Will scale, fit, and crop accordingly to
      * internal visibility fraction.
      */
-    ASPECT_BALANCED
+    ASPECT_BALANCED;
+
+    static VideoScaleType fromInt(int scaleTypeInt) {
+        if (scaleTypeInt == VideoScaleType.ASPECT_FIT.ordinal()) {
+            return VideoScaleType.ASPECT_FIT;
+        } else if (scaleTypeInt == VideoScaleType.ASPECT_FILL.ordinal()) {
+            return VideoScaleType.ASPECT_FILL;
+        } else if (scaleTypeInt == VideoScaleType.ASPECT_BALANCED.ordinal()) {
+            return VideoScaleType.ASPECT_BALANCED;
+        } else {
+            return VideoScaleType.ASPECT_FIT;
+        }
+    }
 }
