@@ -9,7 +9,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-final class CameraCapturerFormatProvider {
+class CameraCapturerFormatProvider {
     private static final Logger logger = Logger.getLogger(CameraCapturerFormatProvider.class);
 
     private final Map<CameraCapturer.CameraSource, List<VideoFormat>> supportedFormatsMap =

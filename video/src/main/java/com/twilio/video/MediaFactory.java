@@ -6,7 +6,7 @@ import android.content.Context;
 import com.twilio.video.internal.Logger;
 import com.twilio.video.internal.ReLinker;
 
-final class MediaFactory {
+class MediaFactory {
     private static final String RELEASE_MESSAGE_TEMPLATE = "MediaFactory released %s unavailable";
     private static volatile boolean libraryIsLoaded = false;
     private static final Logger logger = Logger.getLogger(MediaFactory.class);

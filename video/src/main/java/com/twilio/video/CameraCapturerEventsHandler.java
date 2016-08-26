@@ -2,7 +2,7 @@ package com.twilio.video;
 
 import org.webrtc.VideoCapturerAndroid;
 
-final class CameraCapturerEventsHandler implements VideoCapturerAndroid.CameraEventsHandler {
+class CameraCapturerEventsHandler implements VideoCapturerAndroid.CameraEventsHandler {
     private final CapturerErrorListener listener;
 
     public CameraCapturerEventsHandler(CapturerErrorListener listener) {
