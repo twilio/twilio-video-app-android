@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">Twilio Conversations</string>
+    <string name="app_name">Twilio Video</string>
     <string name="client_name">Client Name</string>
     <string name="login">Log In</string>
     <string name="logout">Log Out</string>
@@ -15,7 +15,7 @@
     <string name="username">Username</string>
     <string name="register">Register</string>
     <string name="registering">Registering</string>
-    <string name="title_activity_client">TC Client</string>
+    <string name="title_activity_client">TV Client</string>
     <string name="video_client_status">Video Client Status</string>
     <string name="room_status">Room Status</string>
     <string name="log_out">Log Out</string>
