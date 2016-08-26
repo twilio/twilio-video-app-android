@@ -6,6 +6,8 @@
 #include "webrtc/api/java/jni/androidvideocapturer_jni.h"
 #include "webrtc/modules/audio_device/android/opensles_player.h"
 #include "webrtc/api/java/jni/classreferenceholder.h"
+#include "webrtc/api/java/jni/androidmediadecoder_jni.h"
+#include "webrtc/api/java/jni/androidmediaencoder_jni.h"
 
 namespace twilio_video_jni {
 
@@ -36,8 +38,9 @@ JNIEXPORT jlong JNICALL Java_com_twilio_video_MediaFactory_nativeCreate(JNIEnv *
         }
     }
 
-    // TODO: Set encoder and decoder options
     twilio::media::MediaOptions media_options;
+    media_options.video_encoder_factory = new webrtc_jni::MediaCodecVideoEncoderFactory();
+    media_options.video_decoder_factory = new webrtc_jni::MediaCodecVideoDecoderFactory();
     std::shared_ptr<twilio::media::MediaFactory> media_factory =
             twilio::media::MediaFactory::create(media_options);
 

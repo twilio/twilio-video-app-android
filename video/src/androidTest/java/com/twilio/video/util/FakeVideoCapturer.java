@@ -4,6 +4,7 @@ import com.twilio.video.VideoFormat;
 import com.twilio.video.VideoCapturer;
 import com.twilio.video.internal.Logger;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class FakeVideoCapturer implements VideoCapturer {
@@ -34,7 +35,7 @@ public class FakeVideoCapturer implements VideoCapturer {
     public List<VideoFormat> getSupportedFormats() {
         logger.i("getSupportedFormats");
 
-        return null;
+        return new ArrayList<>();
     }
 
     @Override

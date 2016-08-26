@@ -26,12 +26,6 @@ public:
             // TODO for some reason this causes compilation issues
             //  delete media_options_.audio_device_module;
         }
-        if (media_options_.video_encoder_factory != nullptr) {
-            delete media_options_.video_encoder_factory;
-        }
-        if (media_options_.video_decoder_factory != nullptr) {
-            delete media_options_.video_decoder_factory;
-        }
     }
 
     std::shared_ptr<twilio::media::MediaFactory> getMediaFactory() {
