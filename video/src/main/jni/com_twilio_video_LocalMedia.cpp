@@ -160,7 +160,7 @@ JNIEXPORT jlong JNICALL Java_com_twilio_video_LocalMedia_nativeAddAudioTrack(JNI
 
     return (audio_track == nullptr) ?
            (0) :
-           (webrtc_jni::jlongFromPointer(audio_track.get()->getWebrtcTrack()));
+           (webrtc_jni::jlongFromPointer(audio_track.get()->getWebRtcTrack()));
 }
 
 JNIEXPORT jboolean JNICALL Java_com_twilio_video_LocalMedia_nativeRemoveAudioTrack(JNIEnv *jni,
@@ -194,7 +194,7 @@ JNIEXPORT jlong JNICALL Java_com_twilio_video_LocalMedia_nativeAddVideoTrack(JNI
 
     return (video_track == nullptr) ?
            (0) :
-           (webrtc_jni::jlongFromPointer(video_track.get()->getWebrtcTrack()));
+           (webrtc_jni::jlongFromPointer(video_track.get()->getWebRtcTrack()));
 }
 JNIEXPORT jboolean JNICALL Java_com_twilio_video_LocalMedia_nativeRemoveVideoTrack(JNIEnv *jni,
                                                                                    jobject j_local_media,
