@@ -12,7 +12,7 @@ jobject createJavaAudioTrack(JNIEnv *env,
     jlong j_audio_track_context = webrtc_jni::jlongFromPointer(audio_track_context);
     // Get track info
     jstring j_track_id = webrtc_jni::JavaStringFromStdString(env, audio_track->getTrackId());
-    jlong j_webrtc_track = webrtc_jni::jlongFromPointer(audio_track->getWebrtcTrack());
+    jlong j_webrtc_track = webrtc_jni::jlongFromPointer(audio_track->getWebRtcTrack());
     jboolean j_is_enabled = audio_track->isEnabled();
 
     return env->NewObject(j_audio_track_class, j_audio_track_ctor_id,
@@ -28,7 +28,7 @@ jobject createJavaVideoTrack(JNIEnv *env,
     jlong j_video_track_context = webrtc_jni::jlongFromPointer(video_track_context);
 
     jstring j_track_id = webrtc_jni::JavaStringFromStdString(env, video_track->getTrackId());
-    jlong j_webrtc_track = webrtc_jni::jlongFromPointer(video_track->getWebrtcTrack());
+    jlong j_webrtc_track = webrtc_jni::jlongFromPointer(video_track->getWebRtcTrack());
     jboolean j_is_enabled = video_track->isEnabled();
 
     return env->NewObject(j_video_track_class, j_video_track_ctor_id,
