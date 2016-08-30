@@ -2,7 +2,6 @@ package com.twilio.video;
 
 import android.app.Instrumentation;
 import android.content.Context;
-import android.provider.MediaStore;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.filters.LargeTest;
 import android.support.test.rule.ActivityTestRule;
@@ -11,7 +10,6 @@ import android.support.test.runner.AndroidJUnit4;
 import com.twilio.common.AccessManager;
 import com.twilio.video.helper.AccessTokenHelper;
 import com.twilio.video.helper.CallbackHelper;
-import com.twilio.video.ui.CameraCapturerTestActivity;
 import com.twilio.video.ui.RoomsTestActivity;
 import com.twilio.video.util.FakeVideoCapturer;
 import com.twilio.video.util.RandUtils;
@@ -25,7 +23,6 @@ import org.junit.runner.RunWith;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
