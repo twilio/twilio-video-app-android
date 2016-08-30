@@ -1,6 +1,8 @@
 package com.twilio.video;
 
+import android.app.Instrumentation;
 import android.content.Context;
+import android.provider.MediaStore;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.filters.LargeTest;
 import android.support.test.rule.ActivityTestRule;
@@ -15,11 +17,15 @@ import com.twilio.video.util.RandUtils;
 
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import java.util.concurrent.Callable;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.FutureTask;
+import java.util.concurrent.RunnableFuture;
 import java.util.concurrent.TimeUnit;
 
 import static org.junit.Assert.assertEquals;
@@ -36,23 +42,49 @@ public class ConnectTests {
     private String testRoom;
     private LocalMedia localMedia;
     private FakeVideoCapturer fakeVideoCapturer;
+    private VideoClient actor1VideoClient;
+    private VideoClient actor2VideoClient;
+    private AccessManager actor1AccessManager;
+    private AccessManager actor2AccessManager;
 
     @Rule
     public ActivityTestRule<RoomsTestActivity> activityRule = new ActivityTestRule<>(
             RoomsTestActivity.class);
 
     @Before
-    public void setup() {
+    public void setup() throws InterruptedException {
         context = InstrumentationRegistry.getInstrumentation().getTargetContext();
         localMedia = LocalMedia.create(context);
         fakeVideoCapturer = new FakeVideoCapturer();
         testRoom = RandUtils.generateRandomString(10);
         VideoClient.setLogLevel(LogLevel.DEBUG);
+
+        // Actor 1
+        actor1AccessManager = AccessTokenHelper.obtainAccessManager(context, TEST_USER);
+        Instrumentation instrumentation = InstrumentationRegistry.getInstrumentation();
+        instrumentation.runOnMainSync(new Runnable() {
+            @Override
+            public void run() {
+                actor1VideoClient = new VideoClient(context, actor1AccessManager);
+            }
+        });
+
+        // Actor 2
+        actor2AccessManager = AccessTokenHelper.obtainAccessManager(context, TEST_USER2);
+        instrumentation.runOnMainSync(new Runnable() {
+            @Override
+            public void run() {
+                actor2VideoClient = new VideoClient(context, actor2AccessManager);
+            }
+        });
+
     }
 
     @After
     public void teardown() {
         localMedia.release();
+        actor1AccessManager.dispose();
+        actor2AccessManager.dispose();
     }
 
     @Test(expected = NullPointerException.class)
@@ -66,11 +98,7 @@ public class ConnectTests {
         CallbackHelper.FakeRoomListener roomListener = new CallbackHelper.FakeRoomListener();
         roomListener.onConnectedLatch = new CountDownLatch(1);
 
-        AccessManager accessManager = AccessTokenHelper.obtainAccessManager(context, TEST_USER);
-
-        VideoClient videoClient = new VideoClient(context, accessManager);
-
-        videoClient.connect(roomListener);
+        actor1VideoClient.connect(roomListener);
 
         assertTrue(roomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
     }
@@ -80,14 +108,12 @@ public class ConnectTests {
         CallbackHelper.FakeRoomListener roomListener = new CallbackHelper.FakeRoomListener();
         roomListener.onConnectedLatch = new CountDownLatch(1);
 
-        AccessManager accessManager = AccessTokenHelper.obtainAccessManager(context, TEST_USER);
 
-        VideoClient videoClient = new VideoClient(context, accessManager);
         ConnectOptions connectOptions = new ConnectOptions.Builder()
                 .name(testRoom)
                 .build();
 
-        videoClient.connect(connectOptions, roomListener);
+        actor1VideoClient.connect(connectOptions, roomListener);
 
         assertTrue(roomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
     }
@@ -97,15 +123,12 @@ public class ConnectTests {
         CallbackHelper.FakeRoomListener roomListener = new CallbackHelper.FakeRoomListener();
         roomListener.onConnectedLatch = new CountDownLatch(1);
 
-        AccessManager accessManager = AccessTokenHelper.obtainAccessManager(context, TEST_USER);
-
-        VideoClient videoClient = new VideoClient(context, accessManager);
         ConnectOptions connectOptions = new ConnectOptions.Builder()
                 .name(testRoom)
                 .localMedia(localMedia)
                 .build();
 
-        Room room = videoClient.connect(connectOptions, roomListener);
+        Room room = actor1VideoClient.connect(connectOptions, roomListener);
 
         assertTrue(roomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
         assertNotNull(room.getLocalMedia());
@@ -117,15 +140,12 @@ public class ConnectTests {
         LocalAudioTrack localAudioTrack = localMedia.addAudioTrack(true);
         roomListener.onConnectedLatch = new CountDownLatch(1);
 
-        AccessManager accessManager = AccessTokenHelper.obtainAccessManager(context, TEST_USER);
-
-        VideoClient videoClient = new VideoClient(context, accessManager);
         ConnectOptions connectOptions = new ConnectOptions.Builder()
                 .name(testRoom)
                 .localMedia(localMedia)
                 .build();
 
-        Room room = videoClient.connect(connectOptions, roomListener);
+        Room room = actor1VideoClient.connect(connectOptions, roomListener);
 
         assertTrue(roomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
         assertNotNull(room.getLocalMedia());
@@ -138,15 +158,12 @@ public class ConnectTests {
         LocalVideoTrack localVideoTrack = localMedia.addVideoTrack(true, fakeVideoCapturer);
         roomListener.onConnectedLatch = new CountDownLatch(1);
 
-        AccessManager accessManager = AccessTokenHelper.obtainAccessManager(context, TEST_USER);
-
-        VideoClient videoClient = new VideoClient(context, accessManager);
         ConnectOptions connectOptions = new ConnectOptions.Builder()
                 .name(testRoom)
                 .localMedia(localMedia)
                 .build();
 
-        Room room = videoClient.connect(connectOptions, roomListener);
+        Room room = actor1VideoClient.connect(connectOptions, roomListener);
 
         assertTrue(roomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
         assertNotNull(room.getLocalMedia());
@@ -160,15 +177,12 @@ public class ConnectTests {
         LocalVideoTrack localVideoTrack = localMedia.addVideoTrack(false, fakeVideoCapturer);
         roomListener.onConnectedLatch = new CountDownLatch(1);
 
-        AccessManager accessManager = AccessTokenHelper.obtainAccessManager(context, TEST_USER);
-
-        VideoClient videoClient = new VideoClient(context, accessManager);
         ConnectOptions connectOptions = new ConnectOptions.Builder()
                 .name(testRoom)
                 .localMedia(localMedia)
                 .build();
 
-        Room room = videoClient.connect(connectOptions, roomListener);
+        Room room = actor1VideoClient.connect(connectOptions, roomListener);
 
         assertTrue(roomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
         assertNotNull(room.getLocalMedia());
@@ -182,15 +196,12 @@ public class ConnectTests {
 
         roomListener.onConnectedLatch = new CountDownLatch(1);
 
-        AccessManager accessManager = AccessTokenHelper.obtainAccessManager(context, TEST_USER);
-
-        VideoClient videoClient = new VideoClient(context, accessManager);
         ConnectOptions connectOptions = new ConnectOptions.Builder()
                 .name(testRoom)
                 .localMedia(localMedia)
                 .build();
 
-        Room room = videoClient.connect(connectOptions, roomListener);
+        Room room = actor1VideoClient.connect(connectOptions, roomListener);
 
         assertTrue(roomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
         assertNotNull(room.getLocalMedia());
@@ -213,11 +224,8 @@ public class ConnectTests {
         roomListener.onConnectedLatch = new CountDownLatch(1);
         roomListener.onDisconnectedLatch = new CountDownLatch(1);
 
-        AccessManager accessManager = AccessTokenHelper.obtainAccessManager(context, TEST_USER);
 
-        VideoClient videoClient = new VideoClient(context, accessManager);
-
-        Room room = videoClient.connect(roomListener);
+        Room room = actor1VideoClient.connect(roomListener);
 
         assertTrue(roomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
         assertEquals(RoomState.CONNECTED, room.getState());
@@ -237,19 +245,14 @@ public class ConnectTests {
         roomListener.onParticipantConnectedLatch = new CountDownLatch(1);
         String randomRoomName = testRoom + System.currentTimeMillis();
 
-        AccessManager accessManager = AccessTokenHelper.obtainAccessManager(context, TEST_USER);
-        AccessManager accessManager2 = AccessTokenHelper.obtainAccessManager(context, TEST_USER2);
         ConnectOptions connectOptions = new ConnectOptions.Builder().name(randomRoomName).build();
 
-        VideoClient videoClient = new VideoClient(context, accessManager);
-        VideoClient videoClient2 = new VideoClient(context, accessManager2);
-
-        Room room = videoClient.connect(connectOptions, roomListener);
+        Room room = actor1VideoClient.connect(connectOptions, roomListener);
 
         assertTrue(roomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
         assertEquals(RoomState.CONNECTED, room.getState());
 
-        videoClient2.connect(connectOptions, new CallbackHelper.EmptyRoomListener());
+        actor2VideoClient.connect(connectOptions, new CallbackHelper.EmptyRoomListener());
 
         assertTrue(roomListener.onParticipantConnectedLatch.await(20, TimeUnit.SECONDS));
         assertEquals(1, room.getParticipants().size());
@@ -269,19 +272,14 @@ public class ConnectTests {
         roomListener.onParticipantConnectedLatch = new CountDownLatch(1);
         String randomRoomName = testRoom + System.currentTimeMillis();
 
-        AccessManager accessManager = AccessTokenHelper.obtainAccessManager(context, TEST_USER);
-        AccessManager accessManager2 = AccessTokenHelper.obtainAccessManager(context, TEST_USER2);
         ConnectOptions connectOptions = new ConnectOptions.Builder().name(randomRoomName).build();
 
-        VideoClient videoClient = new VideoClient(context, accessManager);
-        VideoClient videoClient2 = new VideoClient(context, accessManager2);
-
-        Room room = videoClient.connect(connectOptions, roomListener);
+        Room room = actor1VideoClient.connect(connectOptions, roomListener);
 
         assertTrue(roomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
         assertEquals(RoomState.CONNECTED, room.getState());
 
-        Room client2room = videoClient2.connect(connectOptions, new CallbackHelper.EmptyRoomListener());
+        Room client2room = actor2VideoClient.connect(connectOptions, new CallbackHelper.EmptyRoomListener());
 
         assertTrue(roomListener.onParticipantConnectedLatch.await(20, TimeUnit.SECONDS));
         assertEquals(room.getParticipants().size(), 1);
