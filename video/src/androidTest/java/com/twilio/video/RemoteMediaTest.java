@@ -113,16 +113,26 @@ public class RemoteMediaTest {
     @After
     public void teardown(){
         room.disconnect();
+        room = null;
+        participant = null;
+        actor1VideoClient.release();
+        actor1VideoClient = null;
+        actor2VideoClient.release();
+        actor2VideoClient = null;
         actor1LocalMedia.release();
+        actor1LocalMedia = null;
         actor2LocalMedia.release();
+        actor2LocalMedia = null;
         actor1AccessManager.dispose();
+        actor1AccessManager = null;
         actor2AccessManager.dispose();
+        actor2AccessManager = null;
+        fakeVideoCapturer = null;
         Instrumentation instrumentation = InstrumentationRegistry.getInstrumentation();
         instrumentation.waitForIdleSync();
     }
 
     // Audio
-
     @Test
     public void media_onAudioTrackAdded() throws InterruptedException {
         CallbackHelper.FakeMediaListener mediaListener = new CallbackHelper.FakeMediaListener();

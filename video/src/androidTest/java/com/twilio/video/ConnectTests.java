@@ -82,9 +82,17 @@ public class ConnectTests {
 
     @After
     public void teardown() {
+        actor1VideoClient.release();
+        actor1VideoClient = null;
+        actor2VideoClient.release();
+        actor2VideoClient = null;
         localMedia.release();
+        localMedia = null;
         actor1AccessManager.dispose();
+        actor1AccessManager = null;
         actor2AccessManager.dispose();
+        actor2AccessManager = null;
+        fakeVideoCapturer = null;
     }
 
     @Test(expected = NullPointerException.class)

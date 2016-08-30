@@ -79,7 +79,8 @@ public:
     }
 
     virtual ~ClientContext() {
-        delete invoker_;
+        // TODO: deleting invoker causes a crash in core
+        // delete invoker_;
     }
 
     twilio::video::Client &getClient() const {
@@ -163,6 +164,17 @@ Java_com_twilio_video_VideoClient_nativeConnect(JNIEnv *env,
     RoomContext *room_context = new RoomContext();
     room_context->room = std::move(room);
     return jlongFromPointer(room_context);
+}
+
+JNIEXPORT void JNICALL
+Java_com_twilio_video_VideoClient_nativeFree(JNIEnv *env,
+                                             jobject j_instance,
+                                             jlong j_client_context) {
+    ClientContext *client_context = reinterpret_cast<ClientContext *>(j_client_context);
+    if (client_context != nullptr) {
+        delete client_context;
+    }
+
 }
 
 }
