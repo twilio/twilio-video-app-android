@@ -182,7 +182,11 @@ public class RoomActivity extends AppCompatActivity {
             icon = R.drawable.ic_mic_white_24px;
             localAudioEnableFab.show();
         } else {
-            localMedia.removeAudioTrack(localAudioTrack);
+            if (!localMedia.removeAudioTrack(localAudioTrack)) {
+                Snackbar.make(roomStatusTextview,
+                        "Audio track remove action failed",
+                        Snackbar.LENGTH_LONG).setAction("Action", null).show();
+            }
             localAudioTrack = null;
             icon = R.drawable.ic_mic_off_gray_24px;
             localAudioEnableFab.hide();
@@ -228,7 +232,11 @@ public class RoomActivity extends AppCompatActivity {
             localVideoPauseFab.show();
             icon = R.drawable.ic_videocam_white_24px;
         } else {
-            localMedia.removeLocalVideoTrack(localVideoTrack);
+            if (!localMedia.removeLocalVideoTrack(localVideoTrack)) {
+                Snackbar.make(roomStatusTextview,
+                        "Video track remove action failed",
+                        Snackbar.LENGTH_LONG).setAction("Action", null).show();
+            }
             localVideoTrack = null;
             thumbnailVideoView.setVisibility(View.INVISIBLE);
             if (room != null && room.getParticipants().size() == 0) {

@@ -38,7 +38,7 @@ public class VideoClientLoginActivity extends AppCompatActivity {
 
     @BindView(R.id.username_edittext) EditText usernameEditText;
     @BindView(R.id.room_name_edittext) EditText roomEditText;
-    @BindView(R.id.registration_button) Button registrationButton;
+    @BindView(R.id.join_room_button) Button joinRoomButton;
     @BindView(R.id.version_textview) TextView versionText;
     @BindView(R.id.realm_spinner) Spinner realmSpinner;
 
@@ -97,7 +97,7 @@ public class VideoClientLoginActivity extends AppCompatActivity {
         }
     }
 
-    @OnClick(R.id.registration_button)
+    @OnClick(R.id.join_room_button)
     void register(View view) {
         progressDialog = ProgressDialog.show(VideoClientLoginActivity.this, null,
                 "Registering with Twilio", true);
@@ -136,7 +136,7 @@ public class VideoClientLoginActivity extends AppCompatActivity {
                 if (response.getStatus() == 200) {
                     startClient(capabilityToken);
                 } else {
-                    Snackbar.make(registrationButton,
+                    Snackbar.make(joinRoomButton,
                             "Registration failed. Status: " + response.getStatus(),
                             Snackbar.LENGTH_LONG)
                             .setAction("Action", null).show();
@@ -146,7 +146,7 @@ public class VideoClientLoginActivity extends AppCompatActivity {
             @Override
             public void failure(RetrofitError error) {
                 progressDialog.dismiss();
-                Snackbar.make(registrationButton,
+                Snackbar.make(joinRoomButton,
                         "Registration failed. Error: " + error.getMessage(),
                         Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
