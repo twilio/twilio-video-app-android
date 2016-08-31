@@ -191,7 +191,7 @@ public class LocalMediaTest {
         Integer expectedMaxWidth = 640;
         Integer expectedMaxHeight = 360;
         Integer expectedMinFps = 5;
-        Integer expectedMaxFps = 15;
+        Integer expectedMaxFps = 30;
         VideoConstraints validVideoConstraints = new VideoConstraints.Builder()
                 .minVideoDimensions(new VideoDimensions(expectedMinWidth, expectedMinHeight))
                 .maxVideoDimensions(new VideoDimensions(expectedMaxWidth, expectedMaxHeight))
@@ -203,12 +203,14 @@ public class LocalMediaTest {
                 validVideoConstraints);
 
         assertNotNull(localVideoTrack);
-        assertTrue(fakeVideoCapturer.getCaptureWidth() >= expectedMinWidth);
-        assertTrue(fakeVideoCapturer.getCaptureWidth() <= expectedMaxWidth);
-        assertTrue(fakeVideoCapturer.getCaptureHeight() >= expectedMinHeight);
-        assertTrue(fakeVideoCapturer.getCaptureHeight() <= expectedMaxHeight);
-        assertTrue(fakeVideoCapturer.getCaptureFramerate() >= expectedMinFps);
-        assertTrue(fakeVideoCapturer.getCaptureFramerate() <= expectedMaxFps);
+
+        VideoFormat captureFormat = fakeVideoCapturer.getCaptureFormat();
+        assertTrue(captureFormat.dimensions.width >= expectedMinWidth);
+        assertTrue(captureFormat.dimensions.width <= expectedMaxWidth);
+        assertTrue(captureFormat.dimensions.height >= expectedMinHeight);
+        assertTrue(captureFormat.dimensions.height <= expectedMaxHeight);
+        assertTrue(captureFormat.framerate >= expectedMinFps);
+        assertTrue(captureFormat.framerate <= expectedMaxFps);
     }
 
     @Test

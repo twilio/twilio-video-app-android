@@ -2,8 +2,8 @@
 #include "media/media.h"
 #include "media/media_factory.h"
 
-#ifndef ROOMS_ANDROID_COM_TWILIO_VIDEO_MEDIAFACTORY_H_
-#define ROOMS_ANDROID_COM_TWILIO_VIDEO_MEDIAFACTORY_H_
+#ifndef VIDEO_ANDROID_COM_TWILIO_VIDEO_MEDIAFACTORY_H_
+#define VIDEO_ANDROID_COM_TWILIO_VIDEO_MEDIAFACTORY_H_
 
 #ifdef __cplusplus
 extern "C" {
@@ -49,4 +49,4 @@ JNIEXPORT void JNICALL Java_com_twilio_video_MediaFactory_nativeRelease(JNIEnv *
 }
 #endif
 
-#endif // ROOMS_ANDROID_COM_TWILIO_VIDEO_MEDIAFACTORY_H_
+#endif // VIDEO_ANDROID_COM_TWILIO_VIDEO_MEDIAFACTORY_H_

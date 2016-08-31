@@ -19,6 +19,7 @@
 #include "com_twilio_video_ConnectOptions.h"
 #include "com_twilio_video_Room.h"
 #include "com_twilio_video_MediaFactory.h"
+#include "class_reference_holder.h"
 
 #include <memory>
 
@@ -37,6 +38,7 @@ extern "C" jint JNIEXPORT JNICALL JNI_OnLoad(JavaVM *jvm, void *reserved) {
         return -1;
     }
     webrtc_jni::LoadGlobalClassReferenceHolder();
+    twilio_video_jni::LoadGlobalClassReferenceHolder();
 
     return ret;
 }
@@ -44,6 +46,7 @@ extern "C" jint JNIEXPORT JNICALL JNI_OnLoad(JavaVM *jvm, void *reserved) {
 extern "C" void JNIEXPORT JNICALL JNI_OnUnLoad(JavaVM *jvm, void *reserved) {
     std::string func_name = std::string(__FUNCTION__);
     TS_CORE_LOG_MODULE(kTSCoreLogModulePlatform, kTSCoreLogLevelDebug, "%s", func_name.c_str());
+    twilio_video_jni::FreeGlobalClassReferenceHolder();
     webrtc_jni::FreeGlobalClassReferenceHolder();
 }
 

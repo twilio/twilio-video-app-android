@@ -66,20 +66,18 @@ class CameraCapturerFormatProvider {
 
         final List<VideoFormat> formatList = new ArrayList<>();
         try {
-            int minFps = 0;
             int maxFps = 0;
             final List<int[]> listFpsRange = parameters.getSupportedPreviewFpsRange();
             if (listFpsRange != null) {
                 // getSupportedPreviewFpsRange() returns a sorted list. Take the fps range
                 // corresponding to the highest fps.
                 final int[] range = listFpsRange.get(listFpsRange.size() - 1);
-                minFps = range[android.hardware.Camera.Parameters.PREVIEW_FPS_MIN_INDEX];
-                maxFps = range[android.hardware.Camera.Parameters.PREVIEW_FPS_MAX_INDEX];
+                maxFps = (range[android.hardware.Camera.Parameters.PREVIEW_FPS_MAX_INDEX] + 999)
+                        / 1000;
             }
             for (android.hardware.Camera.Size size : parameters.getSupportedPreviewSizes()) {
-                formatList.add(new VideoFormat(size.width,
-                        size.height,
-                        minFps,
+                VideoDimensions dimensions = new VideoDimensions(size.width, size.height);
+                formatList.add(new VideoFormat(dimensions,
                         maxFps,
                         VideoPixelFormat.NV21));
             }

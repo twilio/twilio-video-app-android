@@ -1,19 +1,25 @@
 package com.twilio.video;
 
-import android.graphics.ImageFormat;
-import android.graphics.PixelFormat;
-
 public enum VideoPixelFormat {
-    NV21(ImageFormat.NV21),
-    RGBA_8888(PixelFormat.RGBA_8888);
+    NV21,
+    RGBA_8888;
 
-    private final int value;
+    private int value = Integer.MIN_VALUE;
 
-    VideoPixelFormat(int value) {
-        this.value = value;
-    }
-
+    /*
+     * We delay the JNI call until this is invoked because we know library has been loaded
+     */
     int getValue() {
+        if (isUnset()) {
+            // Cache the value for later use
+            value = nativeGetValue(name());
+        }
         return value;
     }
+
+    boolean isUnset() {
+        return value == Integer.MIN_VALUE;
+    }
+
+    private native int nativeGetValue(String name);
 }

@@ -40,6 +40,7 @@ def boringSslStaticLib = "libboringssl.a"
 
 def webRtcHome = "${coreHome}"
 def webRtcHeaders = "${coreHeaders}/third_party/webrtc"
+def libYuvHeaders = "${coreHeaders}/third_party/webrtc/third_party/libyuv/include"
 def webRtcStaticLib = "libwebrtc.a"
 
 def resiprocateHome = "${coreHome}"
@@ -205,7 +206,8 @@ model {
                 "-DPOCO_ANDROID",
                 "-Wall",
                 "-std=gnu++11",
-                "-fexceptions"
+                "-fexceptions",
+                "-I${libYuvHeaders}".toString()
         ])
         ldLibs.addAll([
                 "log",
@@ -281,7 +283,7 @@ model {
 }
 
 dependencies {
-    preCompile 'com.twilio.sdk:twilio-video:0.1.14-rc0:android@tar.bz2'
+    preCompile 'com.twilio.sdk:twilio-video:0.1.14-SNAPSHOT:android@tar.bz2'
 
     testCompile 'junit:junit:4.12'
     testCompile 'org.mockito:mockito-core:1.10.19'
