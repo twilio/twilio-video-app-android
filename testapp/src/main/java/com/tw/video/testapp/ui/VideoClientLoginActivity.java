@@ -51,7 +51,7 @@ public class VideoClientLoginActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        setContentView(R.layout.activity_rooms);
+        setContentView(R.layout.activity_video_client_login);
         ButterKnife.bind(this);
 
         versionText.setText(BuildConfig.VERSION_NAME);

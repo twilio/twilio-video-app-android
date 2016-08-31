@@ -43,6 +43,12 @@ public class RoomActivity extends AppCompatActivity {
     @BindView(R.id.room_status_textview) TextView roomStatusTextview;
     @BindView(R.id.primary_video_view) VideoView primaryVideoView;
     @BindView(R.id.thumbnail_video_view) VideoView thumbnailVideoView;
+    @BindView(R.id.switch_camera_action_fab) FloatingActionButton switchCameraActionFab;
+    @BindView(R.id.local_video_action_fab) FloatingActionButton localVideoActionFab;
+    @BindView(R.id.local_video_pause_fab) FloatingActionButton localVideoPauseFab;
+    @BindView(R.id.audio_action_fab) FloatingActionButton audioActionFab;
+    @BindView(R.id.local_audio_mute_fab) FloatingActionButton localAudioMuteFab;
+    @BindView(R.id.speaker_action_fab) FloatingActionButton speakerActionFab;
 
     private String username;
     private String capabilityToken;
@@ -142,6 +148,20 @@ public class RoomActivity extends AppCompatActivity {
             room.disconnect();
         } else {
             returnToVideoClientLogin();
+        }
+    }
+
+    @OnClick(R.id.switch_camera_action_fab)
+    public void switchCamera(View view) {
+        if (cameraCapturer != null) {
+            cameraCapturer.switchCamera();
+        }
+    }
+
+    @OnClick(R.id.local_audio_mute_fab)
+    public void muteLocalAudio(View view) {
+        if (localAudioTrack != null) {
+            
         }
     }
 
