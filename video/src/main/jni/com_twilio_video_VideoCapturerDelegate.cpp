@@ -7,31 +7,11 @@ namespace twilio_video_jni {
     void VideoCapturerDelegate::Start(const cricket::VideoFormat& capture_format,
                                       webrtc::AndroidVideoCapturer* capturer) {
         JNIEnv* jni = webrtc_jni::AttachCurrentThreadIfNeeded();
+        jclass j_video_capturer_delegate_class =
+                twilio_video_jni::FindClass(jni, "com/twilio/video/VideoCapturerDelegate");
         capture_pixel_format_ = capture_format.fourcc;
-        jclass j_video_capturer_delegate_class = twilio_video_jni::FindClass(jni,
-                                                                             "com/twilio/video/VideoCapturerDelegate");
-        const char* j_video_pixel_format_sig = "Lcom/twilio/video/VideoPixelFormat;";
-        jclass j_video_pixel_format_class = twilio_video_jni::FindClass(jni,
-                                                                        "com/twilio/video/VideoPixelFormat");
-        jfieldID j_video_pixel_format_field_id;
-
-        switch(capture_pixel_format_) {
-            case cricket::FOURCC_ABGR:
-                j_video_pixel_format_field_id = jni->GetStaticFieldID(j_video_pixel_format_class,
-                                                                      "RGBA_8888",
-                                                                      j_video_pixel_format_sig);
-                break;
-            case cricket::FOURCC_NV21:
-                j_video_pixel_format_field_id = jni->GetStaticFieldID(j_video_pixel_format_class,
-                                                                      "NV21",
-                                                                      j_video_pixel_format_sig);
-                break;
-            default:
-                break;
-        }
-
-        jobject j_video_pixel_format = jni->GetStaticObjectField(j_video_pixel_format_class,
-                                                                 j_video_pixel_format_field_id);
+        jobject j_video_pixel_format =
+                VideoPixelFormat::createJavaVideoPixelFormat(capture_pixel_format_) ;
         jni->CallVoidMethod(*j_video_capturer_,
                             webrtc_jni::GetMethodID(jni,
                                                     j_video_capturer_delegate_class,
