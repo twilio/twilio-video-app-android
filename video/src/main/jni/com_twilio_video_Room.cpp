@@ -35,7 +35,7 @@ Java_com_twilio_video_Room_00024InternalRoomListenerHandle_nativeCreate(JNIEnv *
 }
 
 JNIEXPORT void JNICALL
-Java_com_twilio_video_Room_00024InternalRoomListenerHandle_nativeFree(JNIEnv *env,
+Java_com_twilio_video_Room_00024InternalRoomListenerHandle_nativeRelease(JNIEnv *env,
                                                                         jobject instance,
                                                                         jlong nativeHandle) {
     TS_CORE_LOG_MODULE(kTSCoreLogModulePlatform, kTSCoreLogLevelDebug,

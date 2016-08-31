@@ -167,9 +167,9 @@ Java_com_twilio_video_VideoClient_nativeConnect(JNIEnv *env,
 }
 
 JNIEXPORT void JNICALL
-Java_com_twilio_video_VideoClient_nativeFree(JNIEnv *env,
-                                             jobject j_instance,
-                                             jlong j_client_context) {
+Java_com_twilio_video_VideoClient_nativeRelease(JNIEnv *env,
+                                                jobject j_instance,
+                                                jlong j_client_context) {
     ClientContext *client_context = reinterpret_cast<ClientContext *>(j_client_context);
     if (client_context != nullptr) {
         delete client_context;

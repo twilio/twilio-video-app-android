@@ -40,12 +40,10 @@ JNIEXPORT void JNICALL Java_com_twilio_video_Media_nativeSetInternalListener
 JNIEXPORT void JNICALL Java_com_twilio_video_AudioTrack_nativeRelease
     (JNIEnv *, jobject, jlong);
 
-JNIEXPORT void JNICALL
-Java_com_twilio_video_VideoTrack_nativeRelease
+JNIEXPORT void JNICALL Java_com_twilio_video_VideoTrack_nativeRelease
     (JNIEnv *, jobject, jlong);
 
-JNIEXPORT void JNICALL
-    Java_com_twilio_video_Media_nativeRelease
+JNIEXPORT void JNICALL Java_com_twilio_video_Media_nativeRelease
     (JNIEnv *, jobject, jlong);
 
 
@@ -59,10 +57,10 @@ JNIEXPORT jlong JNICALL Java_com_twilio_video_Media_00024InternalMediaListenerHa
 
 /*
  * Class:     com_twilio_video_Media_InternalMediaListenerHandle
- * Method:    nativeFree
+ * Method:    nativeRelease
  * Signature: (J)V
  */
-JNIEXPORT void JNICALL Java_com_twilio_video_Media_00024InternalMediaListenerHandle_nativeFree
+JNIEXPORT void JNICALL Java_com_twilio_video_Media_00024InternalMediaListenerHandle_nativeRelease
     (JNIEnv *, jobject, jlong);
 
 
