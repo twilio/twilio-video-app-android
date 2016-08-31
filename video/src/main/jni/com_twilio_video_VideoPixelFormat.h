@@ -17,7 +17,7 @@ public:
     static const jint kVideoPixelFormatNv21 = cricket::FOURCC_NV21;
     static const jint kVideoPixelFormatRgba8888 = cricket::FOURCC_ABGR;
 
-    static jobject createJavaVideoPixelFormat(uint32_t fourcc);
+    static jobject getJavaVideoPixelFormat(uint32_t fourcc);
 };
 
 JNIEXPORT jint JNICALL Java_com_twilio_video_VideoPixelFormat_nativeGetValue(JNIEnv *,

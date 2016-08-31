@@ -11,7 +11,7 @@ namespace twilio_video_jni {
                 twilio_video_jni::FindClass(jni, "com/twilio/video/VideoCapturerDelegate");
         capture_pixel_format_ = capture_format.fourcc;
         jobject j_video_pixel_format =
-                VideoPixelFormat::createJavaVideoPixelFormat(capture_pixel_format_) ;
+                VideoPixelFormat::getJavaVideoPixelFormat(capture_pixel_format_) ;
         jni->CallVoidMethod(*j_video_capturer_,
                             webrtc_jni::GetMethodID(jni,
                                                     j_video_capturer_delegate_class,
