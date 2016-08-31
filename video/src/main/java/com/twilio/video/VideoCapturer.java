@@ -4,9 +4,7 @@ import java.util.List;
 
 public interface VideoCapturer {
     List<VideoFormat> getSupportedFormats();
-    void startCapture(int width,
-                      int height,
-                      int framerate,
+    void startCapture(VideoFormat captureFormat,
                       Listener capturerListener);
     void stopCapture();
 

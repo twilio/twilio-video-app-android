@@ -112,14 +112,12 @@ public class CameraCapturer implements VideoCapturer {
     }
 
     @Override
-    public void startCapture(int width,
-                             int height,
-                             int framerate,
+    public void startCapture(VideoFormat captureFormat,
                              VideoCapturer.Listener videoCapturerListener) {
         this.videoCapturerListener = videoCapturerListener;
-        webrtcCapturer.startCapture(width,
-                height,
-                framerate,
+        webrtcCapturer.startCapture(captureFormat.dimensions.width,
+                captureFormat.dimensions.height,
+                captureFormat.framerate,
                 surfaceTextureHelper,
                 context,
                 observerAdapter);
