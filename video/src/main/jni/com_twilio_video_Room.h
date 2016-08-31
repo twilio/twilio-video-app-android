@@ -22,7 +22,7 @@ JNIEXPORT void JNICALL Java_com_twilio_video_Room_nativeRelease
 JNIEXPORT jlong JNICALL Java_com_twilio_video_Room_00024InternalRoomListenerHandle_nativeCreate
     (JNIEnv *, jobject, jobject);
 
-JNIEXPORT void JNICALL Java_com_twilio_video_Room_00024InternalRoomListenerHandle_nativeFree
+JNIEXPORT void JNICALL Java_com_twilio_video_Room_00024InternalRoomListenerHandle_nativeRelease
     (JNIEnv *, jobject, jlong);
 
 #ifdef __cplusplus

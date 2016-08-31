@@ -13,11 +13,11 @@ abstract class NativeHandle {
 
     public void release() {
         if (nativeHandle != 0) {
-            nativeFree(nativeHandle);
+            nativeRelease(nativeHandle);
             nativeHandle = 0;
         }
     }
 
     abstract protected long nativeCreate(Object object);
-    abstract protected void nativeFree(long nativeHandle);
+    abstract protected void nativeRelease(long nativeHandle);
 }

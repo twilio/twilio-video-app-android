@@ -10,12 +10,10 @@ import com.twilio.common.AccessManager;
 import com.twilio.video.internal.Logger;
 import com.twilio.video.internal.ReLinker;
 
-import java.lang.ref.WeakReference;
 import java.util.EnumMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * The VideoClient allows user to create or participate in Rooms.
@@ -101,8 +99,6 @@ public class VideoClient {
     private final Context applicationContext;
     private AccessManager accessManager;
     private long nativeClientContext;
-    // Using listener native handle as key
-    private Map<Long, WeakReference<Room>> roomMap = new ConcurrentHashMap<>();
 
     public VideoClient(Context context, AccessManager accessManager) {
         if (context == null) {
@@ -206,6 +202,13 @@ public class VideoClient {
         }
 
         return room;
+    }
+
+    public synchronized void release() {
+        if (nativeClientContext != 0) {
+            nativeRelease(nativeClientContext);
+            nativeClientContext = 0;
+        }
     }
 
     /**
@@ -350,4 +353,5 @@ public class VideoClient {
     private native long nativeConnect(long nativeClientDataHandler,
                                       long nativeRoomListenerHandle,
                                       ConnectOptions ConnectOptions);
+    private native void nativeRelease(long nativeClientDataHandler);
 }
