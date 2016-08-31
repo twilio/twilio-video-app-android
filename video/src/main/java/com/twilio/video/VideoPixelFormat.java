@@ -10,14 +10,14 @@ public enum VideoPixelFormat {
      * We delay the JNI call until this is invoked because we know library has been loaded
      */
     int getValue() {
-        if (unset()) {
+        if (isUnset()) {
             // Cache the value for later use
             value = nativeGetValue(name());
         }
         return value;
     }
 
-    boolean unset() {
+    boolean isUnset() {
         return value == Integer.MIN_VALUE;
     }
 

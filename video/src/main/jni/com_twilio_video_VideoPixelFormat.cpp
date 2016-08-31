@@ -9,7 +9,6 @@ namespace twilio_video_jni {
 
 jobject VideoPixelFormat::getJavaVideoPixelFormat(uint32_t fourcc) {
     JNIEnv* jni = webrtc_jni::AttachCurrentThreadIfNeeded();
-
     const char* j_video_pixel_format_sig = "Lcom/twilio/video/VideoPixelFormat;";
     jclass j_video_pixel_format_class = twilio_video_jni::FindClass(jni,
                                                                     "com/twilio/video/VideoPixelFormat");
