@@ -2,12 +2,13 @@ package com.tw.video.testapp.ui;
 
 import android.content.Intent;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
-import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -15,6 +16,7 @@ import com.tw.video.testapp.R;
 import com.tw.video.testapp.util.AccessManagerHelper;
 import com.tw.video.testapp.util.SimpleSignalingUtils;
 import com.twilio.common.AccessManager;
+import com.twilio.video.AudioOptions;
 import com.twilio.video.AudioTrack;
 import com.twilio.video.CameraCapturer;
 import com.twilio.video.ConnectOptions;
@@ -46,8 +48,8 @@ public class RoomActivity extends AppCompatActivity {
     @BindView(R.id.switch_camera_action_fab) FloatingActionButton switchCameraActionFab;
     @BindView(R.id.local_video_action_fab) FloatingActionButton localVideoActionFab;
     @BindView(R.id.local_video_pause_fab) FloatingActionButton localVideoPauseFab;
-    @BindView(R.id.audio_action_fab) FloatingActionButton audioActionFab;
-    @BindView(R.id.local_audio_mute_fab) FloatingActionButton localAudioMuteFab;
+    @BindView(R.id.local_audio_action_fab) FloatingActionButton localAudioActionFab;
+    @BindView(R.id.local_audio_enable_fab) FloatingActionButton localAudioMuteFab;
     @BindView(R.id.speaker_action_fab) FloatingActionButton speakerActionFab;
 
     private String username;
@@ -158,11 +160,74 @@ public class RoomActivity extends AppCompatActivity {
         }
     }
 
-    @OnClick(R.id.local_audio_mute_fab)
-    public void muteLocalAudio(View view) {
+    @OnClick(R.id.local_audio_enable_fab)
+    public void enableLocalAudio(View view) {
         if (localAudioTrack != null) {
-            
+            boolean enable = !localAudioTrack.isEnabled();
+            if (!localAudioTrack.enable(enable)) {
+                Snackbar.make(roomStatusTextview,
+                        "Audio track "+ (enable  ? "enable" : "diable") + " action failed",
+                        Snackbar.LENGTH_LONG).setAction("Action", null).show();
+                return;
+            }
+            int icon = enable ? R.drawable.ic_mic_green_24px : R.drawable.ic_mic_red_24px;
+            localAudioMuteFab.setImageDrawable(ContextCompat.getDrawable(RoomActivity.this, icon));
         }
+    }
+
+    @OnClick(R.id.local_audio_action_fab)
+    public void toggleLocalAudio(View view) {
+        int icon = 0;
+        if (localAudioTrack == null) {
+            localAudioTrack = localMedia.addAudioTrack(true);
+            icon = R.drawable.ic_mic_white_24px;
+        } else {
+            localMedia.removeAudioTrack(localAudioTrack);
+            localAudioTrack = null;
+            icon = R.drawable.ic_mic_off_gray_24px;
+        }
+        localAudioActionFab.setImageDrawable(ContextCompat.getDrawable(RoomActivity.this, icon));
+    }
+
+    @OnClick(R.id.local_video_pause_fab)
+    public void pauseVideo(View view) {
+        if (localVideoTrack != null) {
+            boolean enable = !localVideoTrack.isEnabled();
+            if (!localVideoTrack.enable(enable)) {
+                Snackbar.make(roomStatusTextview,
+                        "Video track "+ (enable  ? "enable" : "diable") + " action failed",
+                        Snackbar.LENGTH_LONG).setAction("Action", null).show();
+                return;
+            }
+            int icon = enable ? R.drawable.ic_pause_green_24px : R.drawable.ic_pause_red_24px;
+            localVideoPauseFab.setImageDrawable(
+                    ContextCompat.getDrawable(RoomActivity.this, icon));
+        }
+    }
+
+    @OnClick(R.id.local_video_action_fab)
+    public void toggleLocalVideo(View view) {
+        int icon = 0;
+        if (localVideoTrack == null) {
+            localVideoTrack = localMedia.addVideoTrack(true, cameraCapturer);
+            if (room != null && room.getParticipants().size() > 0) {
+                thumbnailVideoView.setVisibility(View.VISIBLE);
+                localVideoTrack.addRenderer(thumbnailVideoView);
+            } else {
+                localVideoTrack.addRenderer(primaryVideoView);
+            }
+            icon = R.drawable.ic_videocam_white_24px;
+        } else {
+            localMedia.removeLocalVideoTrack(localVideoTrack);
+            localVideoTrack = null;
+            thumbnailVideoView.setVisibility(View.INVISIBLE);
+            if (room != null && room.getParticipants().size() == 0) {
+                // TODO: do something with primaryVideoView to show empty pic
+            }
+            icon = R.drawable.ic_videocam_off_gray_24px;
+        }
+        localVideoActionFab.setImageDrawable(
+                ContextCompat.getDrawable(RoomActivity.this, icon));
     }
 
     private void returnToVideoClientLogin(){
