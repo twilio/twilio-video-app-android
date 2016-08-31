@@ -1,7 +1,9 @@
 package com.twilio.video.util;
 
+import com.twilio.video.VideoDimensions;
 import com.twilio.video.VideoFormat;
 import com.twilio.video.VideoCapturer;
+import com.twilio.video.VideoPixelFormat;
 import com.twilio.video.internal.Logger;
 
 import java.util.ArrayList;
@@ -24,8 +26,13 @@ public class FakeVideoCapturer implements VideoCapturer {
     @Override
     public List<VideoFormat> getSupportedFormats() {
         logger.i("getSupportedFormats");
+        VideoDimensions dimensions = new VideoDimensions(640, 360);
+        VideoFormat videoFormat = new VideoFormat(dimensions, 30, VideoPixelFormat.RGBA_8888);
+        List<VideoFormat> supportedFormats = new ArrayList<>();
 
-        return new ArrayList<>();
+        supportedFormats.add(videoFormat);
+
+        return supportedFormats;
     }
 
     @Override

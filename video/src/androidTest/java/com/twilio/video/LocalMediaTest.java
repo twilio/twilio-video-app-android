@@ -191,7 +191,7 @@ public class LocalMediaTest {
         Integer expectedMaxWidth = 640;
         Integer expectedMaxHeight = 360;
         Integer expectedMinFps = 5;
-        Integer expectedMaxFps = 15;
+        Integer expectedMaxFps = 30;
         VideoConstraints validVideoConstraints = new VideoConstraints.Builder()
                 .minVideoDimensions(new VideoDimensions(expectedMinWidth, expectedMinHeight))
                 .maxVideoDimensions(new VideoDimensions(expectedMaxWidth, expectedMaxHeight))
