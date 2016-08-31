@@ -1,26 +1,28 @@
 package com.twilio.video;
 
+import android.app.Instrumentation;
 import android.content.Context;
-import android.provider.MediaStore;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.filters.LargeTest;
+import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
 
 import com.twilio.common.AccessManager;
 import com.twilio.video.helper.AccessTokenHelper;
 import com.twilio.video.helper.CallbackHelper;
+import com.twilio.video.ui.RoomsTestActivity;
 import com.twilio.video.util.FakeVideoCapturer;
 import com.twilio.video.util.RandUtils;
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
@@ -30,10 +32,12 @@ import static org.junit.Assert.assertTrue;
 
 @RunWith(AndroidJUnit4.class)
 @LargeTest
-@Ignore
 public class RemoteMediaTest {
     private final static String TEST_USER  = "TEST_USER";
     private final static String TEST_USER2  = "TEST_USER2";
+    @Rule
+    public ActivityTestRule<RoomsTestActivity> activityRule =
+            new ActivityTestRule<>(RoomsTestActivity.class);
 
     private Context context;
     private LocalMedia actor1LocalMedia;
@@ -64,8 +68,16 @@ public class RemoteMediaTest {
         testRoom = RandUtils.generateRandomString(10);
         fakeVideoCapturer = new FakeVideoCapturer();
         actor1LocalMedia = LocalMedia.create(context);
-        actor1AccessManager = AccessTokenHelper.obtainAccessManager(context, TEST_USER);
-        actor1VideoClient = new VideoClient(context, actor1AccessManager);
+        //actor1AccessManager = AccessTokenHelper.obtainAccessManager(context, TEST_USER);
+        String token = AccessTokenHelper.obtainCapabilityToken(TEST_USER);
+        actor1AccessManager = new AccessManager(context, token, null);
+        Instrumentation instrumentation = InstrumentationRegistry.getInstrumentation();
+        instrumentation.runOnMainSync(new Runnable() {
+            @Override
+            public void run() {
+                actor1VideoClient = new VideoClient(context, actor1AccessManager);
+            }
+        });
         // Connect actor 1
         CallbackHelper.FakeRoomListener roomListener = new CallbackHelper.FakeRoomListener();
         roomListener.onConnectedLatch = new CountDownLatch(1);
@@ -75,8 +87,15 @@ public class RemoteMediaTest {
 
         // Connect actor 2
         actor2LocalMedia = LocalMedia.create(context);
-        actor2AccessManager = AccessTokenHelper.obtainAccessManager(context, TEST_USER2);
-        actor2VideoClient = new VideoClient(context, actor2AccessManager);
+        //actor2AccessManager = AccessTokenHelper.obtainAccessManager(context, TEST_USER2);
+        token = AccessTokenHelper.obtainCapabilityToken(TEST_USER2);
+        actor2AccessManager = new AccessManager(context, token, null);
+        instrumentation.runOnMainSync(new Runnable() {
+            @Override
+            public void run() {
+                actor2VideoClient = new VideoClient(context, actor2AccessManager);
+            }
+        });
         CallbackHelper.EmptyRoomListener roomListener2 = new CallbackHelper.EmptyRoomListener();
         connectClient(actor2VideoClient, actor2LocalMedia, roomListener2);
 
@@ -90,21 +109,34 @@ public class RemoteMediaTest {
 
     @After
     public void teardown(){
+        room.disconnect();
+        room = null;
+        participant = null;
+        actor1VideoClient.release();
+        actor1VideoClient = null;
+        actor2VideoClient.release();
+        actor2VideoClient = null;
         actor1LocalMedia.release();
+        actor1LocalMedia = null;
         actor2LocalMedia.release();
+        actor2LocalMedia = null;
         actor1AccessManager.dispose();
+        actor1AccessManager = null;
         actor2AccessManager.dispose();
+        actor2AccessManager = null;
+        fakeVideoCapturer = null;
+        Instrumentation instrumentation = InstrumentationRegistry.getInstrumentation();
+        instrumentation.waitForIdleSync();
     }
 
     // Audio
-
     @Test
     public void media_onAudioTrackAdded() throws InterruptedException {
         CallbackHelper.FakeMediaListener mediaListener = new CallbackHelper.FakeMediaListener();
         mediaListener.onAudioTrackAddedLatch = new CountDownLatch(1);
         participant.getMedia().setListener(mediaListener);
 
-        actor2LocalMedia.addAudioTrack(true);
+        LocalAudioTrack audioTrack = actor2LocalMedia.addAudioTrack(true);
         assertTrue(mediaListener.onAudioTrackAddedLatch.await(20, TimeUnit.SECONDS));
     }
 
@@ -171,6 +203,7 @@ public class RemoteMediaTest {
         assertTrue(mediaListener.onVideoTrackAddedLatch.await(20, TimeUnit.SECONDS));
         actor2LocalMedia.removeLocalVideoTrack(videoTrack);
         assertTrue(mediaListener.onVideoTrackRemovedLatch.await(20, TimeUnit.SECONDS));
+        assertTrue(true);
     }
 
     @Test

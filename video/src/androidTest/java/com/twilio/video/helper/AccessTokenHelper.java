@@ -48,7 +48,7 @@ public class AccessTokenHelper {
     /**
      * A synchronous method that returns an access token
      */
-    private static String obtainCapabilityToken(String username) throws InterruptedException {
+    public static String obtainCapabilityToken(String username) throws InterruptedException {
 
         final String[] capabilityToken = new String[1];
 

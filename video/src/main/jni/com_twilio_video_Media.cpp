@@ -85,9 +85,9 @@ Java_com_twilio_video_Media_00024InternalMediaListenerHandle_nativeCreate(JNIEnv
 }
 
 JNIEXPORT void JNICALL
-Java_com_twilio_video_Media_00024InternalMediaListenerHandle_nativeFree(JNIEnv *env,
-                                                                        jobject instance,
-                                                                        jlong nativeHandle) {
+Java_com_twilio_video_Media_00024InternalMediaListenerHandle_nativeRelease(JNIEnv *env,
+                                                                           jobject instance,
+                                                                           jlong nativeHandle) {
     TS_CORE_LOG_MODULE(kTSCoreLogModulePlatform, kTSCoreLogLevelDebug,
                        "Free AndroidMediaObserver");
     AndroidMediaObserver *android_media_observer =

@@ -387,7 +387,7 @@ public class Media {
         protected native long nativeCreate(Object object);
 
         @Override
-        protected native void nativeFree(long nativeHandle);
+        protected native void nativeRelease(long nativeHandle);
 
 
     }
