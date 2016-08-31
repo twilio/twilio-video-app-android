@@ -16,7 +16,6 @@ import com.tw.video.testapp.R;
 import com.tw.video.testapp.util.AccessManagerHelper;
 import com.tw.video.testapp.util.SimpleSignalingUtils;
 import com.twilio.common.AccessManager;
-import com.twilio.video.AudioOptions;
 import com.twilio.video.AudioTrack;
 import com.twilio.video.CameraCapturer;
 import com.twilio.video.ConnectOptions;
@@ -49,7 +48,7 @@ public class RoomActivity extends AppCompatActivity {
     @BindView(R.id.local_video_action_fab) FloatingActionButton localVideoActionFab;
     @BindView(R.id.local_video_pause_fab) FloatingActionButton localVideoPauseFab;
     @BindView(R.id.local_audio_action_fab) FloatingActionButton localAudioActionFab;
-    @BindView(R.id.local_audio_enable_fab) FloatingActionButton localAudioMuteFab;
+    @BindView(R.id.local_audio_enable_fab) FloatingActionButton localAudioEnableFab;
     @BindView(R.id.speaker_action_fab) FloatingActionButton speakerActionFab;
 
     private String username;
@@ -171,7 +170,7 @@ public class RoomActivity extends AppCompatActivity {
                 return;
             }
             int icon = enable ? R.drawable.ic_mic_green_24px : R.drawable.ic_mic_red_24px;
-            localAudioMuteFab.setImageDrawable(ContextCompat.getDrawable(RoomActivity.this, icon));
+            localAudioEnableFab.setImageDrawable(ContextCompat.getDrawable(RoomActivity.this, icon));
         }
     }
 
@@ -181,10 +180,12 @@ public class RoomActivity extends AppCompatActivity {
         if (localAudioTrack == null) {
             localAudioTrack = localMedia.addAudioTrack(true);
             icon = R.drawable.ic_mic_white_24px;
+            localAudioEnableFab.show();
         } else {
             localMedia.removeAudioTrack(localAudioTrack);
             localAudioTrack = null;
             icon = R.drawable.ic_mic_off_gray_24px;
+            localAudioEnableFab.hide();
         }
         localAudioActionFab.setImageDrawable(ContextCompat.getDrawable(RoomActivity.this, icon));
     }
@@ -199,7 +200,14 @@ public class RoomActivity extends AppCompatActivity {
                         Snackbar.LENGTH_LONG).setAction("Action", null).show();
                 return;
             }
-            int icon = enable ? R.drawable.ic_pause_green_24px : R.drawable.ic_pause_red_24px;
+            int icon = 0;
+            if (enable) {
+                icon = R.drawable.ic_pause_green_24px;
+                switchCameraActionFab.show();
+            } else {
+                icon = R.drawable.ic_pause_red_24px;
+                switchCameraActionFab.hide();
+            }
             localVideoPauseFab.setImageDrawable(
                     ContextCompat.getDrawable(RoomActivity.this, icon));
         }
@@ -216,6 +224,8 @@ public class RoomActivity extends AppCompatActivity {
             } else {
                 localVideoTrack.addRenderer(primaryVideoView);
             }
+            switchCameraActionFab.show();
+            localVideoPauseFab.show();
             icon = R.drawable.ic_videocam_white_24px;
         } else {
             localMedia.removeLocalVideoTrack(localVideoTrack);
@@ -224,6 +234,8 @@ public class RoomActivity extends AppCompatActivity {
             if (room != null && room.getParticipants().size() == 0) {
                 // TODO: do something with primaryVideoView to show empty pic
             }
+            switchCameraActionFab.hide();
+            localVideoPauseFab.hide();
             icon = R.drawable.ic_videocam_off_gray_24px;
         }
         localVideoActionFab.setImageDrawable(
