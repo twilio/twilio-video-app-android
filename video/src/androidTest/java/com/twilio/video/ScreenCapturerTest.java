@@ -97,34 +97,6 @@ public class ScreenCapturerTest {
         assertTrue(firstFrameReported.await(SCREEN_CAPTURER_DELAY, TimeUnit.SECONDS));
     }
 
-//    @Test
-//    public void shouldStopCapturingFramesWhenVideoTrackRemoved() throws InterruptedException {
-//        screenCapturer = new ScreenCapturer(screenCapturerActivity,
-//                screenCapturerActivity.getScreenCaptureResultCode(),
-//                screenCapturerActivity.getScreenCaptureIntent(),
-//                null);
-//        localVideoTrack = localMedia.addVideoTrack(true, screenCapturer);
-//        int frameCount = frameCountRenderer.getFrameCount();
-//
-//        // Validate our frame count is nothing
-//        assertEquals(0, frameCount);
-//
-//        // Add renderer and wait
-//        localVideoTrack.addRenderer(frameCountRenderer);
-//        Thread.sleep(TimeUnit.SECONDS.toMillis(SCREEN_CAPTURER_DELAY));
-//
-//        // Validate our frame count is incrementing
-//        assertTrue(frameCountRenderer.getFrameCount() > frameCount);
-//
-//        // Remove the renderer and wait
-//        frameCount = frameCountRenderer.getFrameCount();
-//        localVideoTrack.removeRenderer(frameCountRenderer);
-//        Thread.sleep(TimeUnit.SECONDS.toMillis(SCREEN_CAPTURER_DELAY));
-//
-//        boolean framesNotRenderering = frameCount >= (frameCountRenderer.getFrameCount() - 1);
-//        assertTrue(framesNotRenderering);
-//    }
-
     @Test
     public void shouldRaiseErrorOnListenerIfMediaProjectionCannotBeAccessed()
             throws InterruptedException {
