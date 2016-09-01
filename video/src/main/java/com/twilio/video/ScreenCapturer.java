@@ -178,10 +178,10 @@ public class ScreenCapturer implements VideoCapturer {
                 PixelFormat.RGBA_8888,
                 IMAGE_READER_BUFFER_MAX);
 
-        // Pipe images to our screen capturerer
+        // Pipe images to our screen capturer
         imageReader.setOnImageAvailableListener(screenCapturer, handler);
 
-        // Create our virtual display with callbacks on screenCapturerThreadHandler
+        // Create our virtual display with callbacks on the current thread
         virtualDisplay = mediaProjection.createVirtualDisplay(TAG,
                 captureFormat.dimensions.width,
                 captureFormat.dimensions.height,
