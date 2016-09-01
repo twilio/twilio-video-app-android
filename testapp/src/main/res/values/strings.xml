@@ -13,7 +13,7 @@
     <string name="conversation">Conversation</string>
     <string name="action_settings">Settings</string>
     <string name="username">Username</string>
-    <string name="register">Register</string>
+    <string name="join_room">Join Room</string>
     <string name="registering">Registering</string>
     <string name="title_activity_client">TV Client</string>
     <string name="video_client_status">Video Client Status</string>
