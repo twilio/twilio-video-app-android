@@ -38,7 +38,7 @@ public class CameraCapturerParameterizedTest extends BaseCameraCapturerTest {
     }
 
     @Test
-    public void shouldCaptureFramesWhenAddedToVideoTrack() throws InterruptedException {
+    public void shouldCaptureFramesWhenVideoTrackAdded() throws InterruptedException {
         cameraCapturer = CameraCapturer.create(cameraCapturerActivity, cameraSource, null);
         localVideoTrack = localMedia.addVideoTrack(true, cameraCapturer);
         int frameCount = frameCountRenderer.getFrameCount();
@@ -46,17 +46,16 @@ public class CameraCapturerParameterizedTest extends BaseCameraCapturerTest {
         // Validate our frame count is nothing
         assertEquals(0, frameCount);
 
-        // Add renderer and wait a second
+        // Add renderer and wait
         localVideoTrack.addRenderer(frameCountRenderer);
-        Thread.sleep(TimeUnit.SECONDS.toMillis(1));
+        Thread.sleep(TimeUnit.SECONDS.toMillis(CAMERA_CAPTURE_DELAY));
 
-        // Validate our frame count is atleast 5
-        frameCount = frameCountRenderer.getFrameCount();
-        assertTrue(frameCount >= 5);
+        // Validate our frame count is incrementing
+        assertTrue(frameCountRenderer.getFrameCount() > frameCount);
     }
 
     @Test
-    public void shouldStopCapturingFramesWhenRemovedFromVideoTrack() throws InterruptedException {
+    public void shouldStopCapturingFramesWhenVideoTrackRemoved() throws InterruptedException {
         cameraCapturer = CameraCapturer.create(cameraCapturerActivity, cameraSource, null);
         localVideoTrack = localMedia.addVideoTrack(true, cameraCapturer);
         int frameCount = frameCountRenderer.getFrameCount();
@@ -64,18 +63,17 @@ public class CameraCapturerParameterizedTest extends BaseCameraCapturerTest {
         // Validate our frame count is nothing
         assertEquals(0, frameCount);
 
-        // Add renderer and wait a second
+        // Add renderer and wait
         localVideoTrack.addRenderer(frameCountRenderer);
-        Thread.sleep(TimeUnit.SECONDS.toMillis(1));
+        Thread.sleep(TimeUnit.SECONDS.toMillis(CAMERA_CAPTURE_DELAY));
 
-        // Validate our frame count is atleast 5
-        frameCount = frameCountRenderer.getFrameCount();
-        assertTrue(frameCount >= 5);
+        // Validate our frame count is incrementing
+        assertTrue(frameCountRenderer.getFrameCount() > frameCount);
 
         // Remove the renderer and wait
         frameCount = frameCountRenderer.getFrameCount();
         localVideoTrack.removeRenderer(frameCountRenderer);
-        Thread.sleep(TimeUnit.SECONDS.toMillis(1));
+        Thread.sleep(TimeUnit.SECONDS.toMillis(CAMERA_CAPTURE_DELAY));
 
         /*
          * Ensure our camera capturer is no longer capturing frames with a one frame buffer in the
