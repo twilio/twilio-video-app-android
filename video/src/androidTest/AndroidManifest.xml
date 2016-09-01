@@ -19,11 +19,11 @@
         </activity>
 
         <activity
-            android:name="com.twilio.video.activity.CameraCapturerTestActivity">
+            android:name="com.twilio.video.ui.CameraCapturerTestActivity">
         </activity>
 
         <activity
-            android:name="com.twilio.video.ui.CameraCapturerTestActivity">
+            android:name="com.twilio.video.ui.ScreenCapturerTestActivity">
         </activity>
 
     </application>
