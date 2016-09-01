@@ -98,7 +98,7 @@ public class VideoClientLoginActivity extends AppCompatActivity {
     }
 
     @OnClick(R.id.join_room_button)
-    void register(View view) {
+    void joinRoom(View view) {
         progressDialog = ProgressDialog.show(VideoClientLoginActivity.this, null,
                 "Registering with Twilio", true);
         String username = usernameEditText.getText().toString();
