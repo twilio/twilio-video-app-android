@@ -103,8 +103,9 @@ public class LocalMedia {
     public boolean removeLocalVideoTrack(LocalVideoTrack localVideoTrack) {
         checkReleased("removeVideoTrack");
 
-        boolean result = localVideoTrack != null && nativeRemoveVideoTrack(nativeLocalMediaHandle,
-                localVideoTrack.getTrackId());
+        boolean result = localVideoTrack != null &&
+                localVideoTracks.contains(localVideoTrack) &&
+                nativeRemoveVideoTrack(nativeLocalMediaHandle, localVideoTrack.getTrackId());
 
         if (!result) {
             logger.e("Failed to remove video track");

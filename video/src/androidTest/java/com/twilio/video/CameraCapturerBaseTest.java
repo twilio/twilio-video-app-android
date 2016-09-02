@@ -35,13 +35,12 @@ public class CameraCapturerBaseTest extends BaseCameraCapturerTest {
         // Validate our frame count is nothing
         assertEquals(0, frameCount);
 
-        // Add renderer and wait a second
+        // Add renderer and wait
         localVideoTrack.addRenderer(frameCountRenderer);
-        Thread.sleep(TimeUnit.SECONDS.toMillis(1));
+        Thread.sleep(TimeUnit.SECONDS.toMillis(CAMERA_CAPTURE_DELAY));
 
-        // Validate our frame count is at least 5
-        frameCount = frameCountRenderer.getFrameCount();
-        assertTrue(frameCount >= 5);
+        // Validate our frame count is incrementing
+        assertTrue(frameCountRenderer.getFrameCount() > frameCount);
 
         // Validate front camera source
         assertEquals(CameraCapturer.CameraSource.CAMERA_SOURCE_FRONT_CAMERA,
@@ -50,10 +49,10 @@ public class CameraCapturerBaseTest extends BaseCameraCapturerTest {
         // Perform camera switch
         cameraCapturer.switchCamera();
 
-        // Wait and validate our frame count is at least 10
-        Thread.sleep(TimeUnit.SECONDS.toMillis(1));
+        // Wait and validate our frame count is still incrementing
         frameCount = frameCountRenderer.getFrameCount();
-        assertTrue(frameCount >= 10);
+        Thread.sleep(TimeUnit.SECONDS.toMillis(CAMERA_CAPTURE_DELAY));
+        assertTrue(frameCountRenderer.getFrameCount() > frameCount);
 
         // Validate back camera source
         assertEquals(CameraCapturer.CameraSource.CAMERA_SOURCE_BACK_CAMERA,
