@@ -214,4 +214,54 @@ public class ScreenCapturerTest {
         Thread.sleep(TimeUnit.SECONDS.toMillis(2));
         videoViewRenderer.release();
     }
+
+    @Test
+    public void canBeReused() throws InterruptedException {
+        int reuseCount = 5;
+        final CountDownLatch firstFramesReported = new CountDownLatch(reuseCount);
+        ScreenCapturer.Listener screenCapturerListener = new ScreenCapturer.Listener() {
+            @Override
+            public void onScreenCaptureError(String errorDescription) {
+                fail("Screen capture error not expected");
+            }
+
+            @Override
+            public void onFirstFrameAvailable() {
+                firstFramesReported.countDown();
+            }
+        };
+
+        // Reuse the same capturer while we iterate
+        screenCapturer = new ScreenCapturer(screenCapturerActivity,
+                screenCapturerActivity.getScreenCaptureResultCode(),
+                screenCapturerActivity.getScreenCaptureIntent(),
+                screenCapturerListener);
+
+        for (int i = 0 ; i < reuseCount ; i++) {
+            FrameCountRenderer renderer = new FrameCountRenderer();
+            localVideoTrack = localMedia.addVideoTrack(true, screenCapturer);
+            int frameCount = renderer.getFrameCount();
+
+            // Validate our frame count is nothing
+            assertEquals(0, frameCount);
+
+            // Add renderer and wait
+            localVideoTrack.addRenderer(renderer);
+            Thread.sleep(TimeUnit.SECONDS.toMillis(SCREEN_CAPTURER_DELAY));
+
+            // Validate our frame count is incrementing
+            assertTrue(renderer.getFrameCount() > frameCount);
+
+            // Remove video track and wait
+            frameCount = renderer.getFrameCount();
+            localMedia.removeLocalVideoTrack(localVideoTrack);
+            Thread.sleep(TimeUnit.SECONDS.toMillis(SCREEN_CAPTURER_DELAY));
+
+            boolean framesNotRenderering = frameCount >= (renderer.getFrameCount() - 1);
+            assertTrue(framesNotRenderering);
+        }
+
+        // Validate first frame was reported each time
+        assertTrue(firstFramesReported.await(SCREEN_CAPTURER_DELAY, TimeUnit.SECONDS));
+    }
 }
