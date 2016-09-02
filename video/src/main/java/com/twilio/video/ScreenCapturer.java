@@ -77,10 +77,10 @@ public class ScreenCapturer implements VideoCapturer {
                     try {
                         image = reader.acquireLatestImage();
                     } catch (IllegalStateException e) {
-                        logger.e("somehow ran out of frames to...out of sync?");
+                        String screenFrameFailure = "Failed to acquire screen frame";
+                        logger.e(screenFrameFailure);
                         if (screenCapturerListener != null) {
-                            screenCapturerListener.onScreenCaptureError("Failed to acquire " +
-                                    "screen frame");
+                            screenCapturerListener.onScreenCaptureError(screenFrameFailure);
                         }
                         return;
                     }
@@ -89,8 +89,10 @@ public class ScreenCapturer implements VideoCapturer {
                         final long captureTimeNs =
                                 TimeUnit.MILLISECONDS.toNanos(SystemClock.elapsedRealtime());
 
-                        if (screenCapturerListener != null && !firstFrameReported) {
-                            screenCapturerListener.onFirstFrameAvailable();
+                        if (!firstFrameReported) {
+                            if (screenCapturerListener != null) {
+                                screenCapturerListener.onFirstFrameAvailable();
+                            }
                             firstFrameReported = true;
                         }
 
