@@ -100,7 +100,7 @@ public class LocalMedia {
         return localVideoTrack;
     }
 
-    public boolean removeLocalVideoTrack(LocalVideoTrack localVideoTrack) {
+    public boolean removeVideoTrack(LocalVideoTrack localVideoTrack) {
         checkReleased("removeVideoTrack");
 
         boolean result = localVideoTrack != null &&

@@ -201,7 +201,7 @@ public class RemoteMediaTest {
 
         LocalVideoTrack videoTrack = actor2LocalMedia.addVideoTrack(true, fakeVideoCapturer);
         assertTrue(mediaListener.onVideoTrackAddedLatch.await(20, TimeUnit.SECONDS));
-        actor2LocalMedia.removeLocalVideoTrack(videoTrack);
+        actor2LocalMedia.removeVideoTrack(videoTrack);
         assertTrue(mediaListener.onVideoTrackRemovedLatch.await(20, TimeUnit.SECONDS));
         assertTrue(true);
     }

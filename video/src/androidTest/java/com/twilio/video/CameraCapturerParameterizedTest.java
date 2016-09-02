@@ -72,7 +72,7 @@ public class CameraCapturerParameterizedTest extends BaseCameraCapturerTest {
 
         // Remove the video track and wait
         frameCount = frameCountRenderer.getFrameCount();
-        localMedia.removeLocalVideoTrack(localVideoTrack);
+        localMedia.removeVideoTrack(localVideoTrack);
         Thread.sleep(TimeUnit.SECONDS.toMillis(CAMERA_CAPTURE_DELAY));
 
         /*

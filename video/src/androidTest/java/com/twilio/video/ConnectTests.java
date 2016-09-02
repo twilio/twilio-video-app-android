@@ -170,7 +170,7 @@ public class ConnectTests {
 
         assertTrue(roomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
         assertNotNull(room.getLocalMedia());
-        assertTrue(localMedia.removeLocalVideoTrack(localVideoTrack));
+        assertTrue(localMedia.removeVideoTrack(localVideoTrack));
     }
 
     @Test
@@ -190,7 +190,7 @@ public class ConnectTests {
         assertTrue(roomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
         assertNotNull(room.getLocalMedia());
         assertTrue(localMedia.removeAudioTrack(localAudioTrack));
-        assertTrue(localMedia.removeLocalVideoTrack(localVideoTrack));
+        assertTrue(localMedia.removeVideoTrack(localVideoTrack));
     }
 
     @Test
@@ -218,7 +218,7 @@ public class ConnectTests {
 
         // Now remove them
         assertTrue(localMedia.removeAudioTrack(localAudioTrack));
-        assertTrue(localMedia.removeLocalVideoTrack(localVideoTrack));
+        assertTrue(localMedia.removeVideoTrack(localVideoTrack));
     }
 
     @Test

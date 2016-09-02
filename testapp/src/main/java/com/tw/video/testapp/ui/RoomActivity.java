@@ -7,7 +7,6 @@ import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
-import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -93,7 +92,7 @@ public class RoomActivity extends AppCompatActivity {
             thumbnailVideoView = null;
         }
         if (localMedia != null) {
-            localMedia.removeLocalVideoTrack(localVideoTrack);
+            localMedia.removeVideoTrack(localVideoTrack);
             localMedia.removeAudioTrack(localAudioTrack);
             localMedia.release();
             localMedia = null;
