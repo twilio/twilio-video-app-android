@@ -132,7 +132,9 @@ public class CameraCapturer implements VideoCapturer {
 
     public synchronized void switchCamera() {
         // TODO: propagate error
-        webrtcCapturer.switchCamera(null);
+        if (webrtcCapturer != null) {
+            webrtcCapturer.switchCamera(null);
+        }
         cameraSource = (cameraSource == CameraSource.CAMERA_SOURCE_FRONT_CAMERA) ?
                 (CameraSource.CAMERA_SOURCE_BACK_CAMERA) :
                 (CameraSource.CAMERA_SOURCE_FRONT_CAMERA);

@@ -60,4 +60,32 @@ public class CameraCapturerBaseTest extends BaseCameraCapturerTest {
         assertEquals(CameraCapturer.CameraSource.CAMERA_SOURCE_BACK_CAMERA,
                 cameraCapturer.getCameraSource());
     }
+
+    @Test
+    public void shouldAllowCameraSwitchWhileNotOnLocalVideo() throws InterruptedException {
+        cameraCapturer = new CameraCapturer(cameraCapturerActivity,
+                CameraCapturer.CameraSource.CAMERA_SOURCE_FRONT_CAMERA,
+                null);
+
+        // Switch our camera
+        cameraCapturer.switchCamera();
+
+        // Now add our video track
+        localVideoTrack = localMedia.addVideoTrack(true, cameraCapturer);
+        int frameCount = frameCountRenderer.getFrameCount();
+
+        // Validate our frame count is nothing
+        assertEquals(0, frameCount);
+
+        // Add renderer and wait
+        localVideoTrack.addRenderer(frameCountRenderer);
+        Thread.sleep(TimeUnit.SECONDS.toMillis(CAMERA_CAPTURE_DELAY));
+
+        // Validate our frame count is incrementing
+        assertTrue(frameCountRenderer.getFrameCount() > frameCount);
+
+        // Validate we are on back camera source
+        assertEquals(CameraCapturer.CameraSource.CAMERA_SOURCE_BACK_CAMERA,
+                cameraCapturer.getCameraSource());
+    }
 }
