@@ -6,6 +6,7 @@ import android.os.Build;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
+import android.widget.FrameLayout;
 
 import com.twilio.video.ui.ScreenCapturerTestActivity;
 import com.twilio.video.util.FrameCountRenderer;
@@ -19,6 +20,9 @@ import org.junit.runner.RunWith;
 
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicReference;
+
+import com.twilio.video.test.R;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -167,5 +171,47 @@ public class ScreenCapturerTest {
 
         // We should be notified of an error because MediaProjection could not be accessed
         assertTrue(screenCaptureError.await(SCREEN_CAPTURER_DELAY, TimeUnit.SECONDS));
+    }
+
+    @Test
+    public void canBeRenderedToView() throws InterruptedException {
+        final FrameLayout localVideo =
+                (FrameLayout) screenCapturerActivity
+                        .findViewById(R.id.screen_capture_video_container);
+        final AtomicReference<VideoViewRenderer> videoViewRendererReference =
+                new AtomicReference<>();
+        Instrumentation instrumentation = InstrumentationRegistry.getInstrumentation();
+        screenCapturerActivity.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                videoViewRendererReference.set(new VideoViewRenderer(screenCapturerActivity,
+                        localVideo));
+            }
+        });
+        instrumentation.waitForIdleSync();
+        VideoViewRenderer videoViewRenderer = videoViewRendererReference.get();
+        final CountDownLatch renderedFirstFrame = new CountDownLatch(1);
+        VideoRenderer.Listener rendererListener = new VideoRenderer.Listener() {
+            @Override
+            public void onFirstFrame() {
+                renderedFirstFrame.countDown();
+            }
+
+            @Override
+            public void onFrameDimensionsChanged(int width, int height, int rotation) {
+
+            }
+        };
+        videoViewRenderer.setListener(rendererListener);
+        screenCapturer = new ScreenCapturer(screenCapturerActivity,
+                screenCapturerActivity.getScreenCaptureResultCode(),
+                screenCapturerActivity.getScreenCaptureIntent(),
+                null);
+        localVideoTrack = localMedia.addVideoTrack(true, screenCapturer);
+        localVideoTrack.addRenderer(videoViewRenderer);
+
+        assertTrue(renderedFirstFrame.await(2, TimeUnit.SECONDS));
+        Thread.sleep(TimeUnit.SECONDS.toMillis(2));
+        videoViewRenderer.release();
     }
 }
