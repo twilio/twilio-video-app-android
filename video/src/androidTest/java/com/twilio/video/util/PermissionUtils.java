@@ -14,6 +14,7 @@ import java.util.List;
 import static junit.framework.TestCase.fail;
 
 public class PermissionUtils {
+    private static final String SCREEN_CAPTURE_DO_NOT_SHOW_AGAIN = "Don't show again";
     private static final String ALLOW_SCREEN_CAPTURE = "Start now";
     private static final String ALLOW_PERMISSION = "Allow";
 
@@ -26,7 +27,11 @@ public class PermissionUtils {
     }
 
     @TargetApi(21)
-    public static void allowScreenCapture()  {
+    public static void allowScreenCapture(boolean showAgain)  {
+        if (!showAgain) {
+            clickAllowPermission(SCREEN_CAPTURE_DO_NOT_SHOW_AGAIN, "screen capture " +
+                    "do not ask again");
+        }
         clickAllowPermission(ALLOW_SCREEN_CAPTURE, Manifest.permission.CAPTURE_VIDEO_OUTPUT);
     }
 

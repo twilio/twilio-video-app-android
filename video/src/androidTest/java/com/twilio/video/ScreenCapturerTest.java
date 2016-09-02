@@ -1,7 +1,9 @@
 package com.twilio.video;
 
 import android.annotation.TargetApi;
+import android.app.Instrumentation;
 import android.os.Build;
+import android.support.test.InstrumentationRegistry;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
 
@@ -41,7 +43,7 @@ public class ScreenCapturerTest {
     public void setup() {
         assumeTrue(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP);
         screenCapturerActivity = activityRule.getActivity();
-        PermissionUtils.allowScreenCapture();
+        PermissionUtils.allowScreenCapture(false);
         localMedia = LocalMedia.create(screenCapturerActivity);
         frameCountRenderer = new FrameCountRenderer();
     }
@@ -52,11 +54,12 @@ public class ScreenCapturerTest {
             localMedia.removeLocalVideoTrack(localVideoTrack);
             localMedia.release();
         }
+
     }
 
     @Test(expected = NullPointerException.class)
     public void constructorShouldFailWithNullContext() {
-        screenCapturer= new ScreenCapturer(null,
+        screenCapturer = new ScreenCapturer(null,
                 screenCapturerActivity.getScreenCaptureResultCode(),
                 screenCapturerActivity.getScreenCaptureIntent(),
                 null);
@@ -95,6 +98,49 @@ public class ScreenCapturerTest {
 
         // Validate first frame was reported
         assertTrue(firstFrameReported.await(SCREEN_CAPTURER_DELAY, TimeUnit.SECONDS));
+    }
+
+    @Test
+    public void shouldStopCapturingFramesWhenVideoTrackRemoved() throws InterruptedException {
+        final CountDownLatch firstFrameReported = new CountDownLatch(1);
+        ScreenCapturer.Listener screenCapturerListener = new ScreenCapturer.Listener() {
+            @Override
+            public void onScreenCaptureError(String errorDescription) {
+                fail("Screen capture error not expected");
+            }
+
+            @Override
+            public void onFirstFrameAvailable() {
+                firstFrameReported.countDown();
+            }
+        };
+        screenCapturer = new ScreenCapturer(screenCapturerActivity,
+                screenCapturerActivity.getScreenCaptureResultCode(),
+                screenCapturerActivity.getScreenCaptureIntent(),
+                screenCapturerListener);
+        localVideoTrack = localMedia.addVideoTrack(true, screenCapturer);
+        int frameCount = frameCountRenderer.getFrameCount();
+
+        // Validate our frame count is nothing
+        assertEquals(0, frameCount);
+
+        // Add renderer and wait
+        localVideoTrack.addRenderer(frameCountRenderer);
+        Thread.sleep(TimeUnit.SECONDS.toMillis(SCREEN_CAPTURER_DELAY));
+
+        // Validate our frame count is incrementing
+        assertTrue(frameCountRenderer.getFrameCount() > frameCount);
+
+        // Validate first frame was reported
+        assertTrue(firstFrameReported.await(SCREEN_CAPTURER_DELAY, TimeUnit.SECONDS));
+
+        // Remove video track and wait
+        frameCount = frameCountRenderer.getFrameCount();
+        localMedia.removeLocalVideoTrack(localVideoTrack);
+        Thread.sleep(TimeUnit.SECONDS.toMillis(SCREEN_CAPTURER_DELAY));
+
+        boolean framesNotRenderering = frameCount >= (frameCountRenderer.getFrameCount() - 1);
+        assertTrue(framesNotRenderering);
     }
 
     @Test
