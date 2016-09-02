@@ -71,7 +71,7 @@ public class RoomActivity extends AppCompatActivity {
         processActivityIntent(savedInstanceState);
         localMedia = LocalMedia.create(this);
         localAudioTrack = localMedia.addAudioTrack(true);
-        cameraCapturer = CameraCapturer.create(this,
+        cameraCapturer = new CameraCapturer(this,
                 CameraCapturer.CameraSource.CAMERA_SOURCE_FRONT_CAMERA, null);
         localVideoTrack = localMedia.addVideoTrack(true, cameraCapturer);
         primaryVideoView.setMirror(true);

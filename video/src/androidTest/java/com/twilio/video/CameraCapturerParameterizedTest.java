@@ -17,6 +17,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
 import com.twilio.video.test.R;
+import com.twilio.video.util.FrameCountRenderer;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -39,7 +40,7 @@ public class CameraCapturerParameterizedTest extends BaseCameraCapturerTest {
 
     @Test
     public void shouldCaptureFramesWhenVideoTrackAdded() throws InterruptedException {
-        cameraCapturer = CameraCapturer.create(cameraCapturerActivity, cameraSource, null);
+        cameraCapturer = new CameraCapturer(cameraCapturerActivity, cameraSource, null);
         localVideoTrack = localMedia.addVideoTrack(true, cameraCapturer);
         int frameCount = frameCountRenderer.getFrameCount();
 
@@ -56,7 +57,7 @@ public class CameraCapturerParameterizedTest extends BaseCameraCapturerTest {
 
     @Test
     public void shouldStopCapturingFramesWhenVideoTrackRemoved() throws InterruptedException {
-        cameraCapturer = CameraCapturer.create(cameraCapturerActivity, cameraSource, null);
+        cameraCapturer = new CameraCapturer(cameraCapturerActivity, cameraSource, null);
         localVideoTrack = localMedia.addVideoTrack(true, cameraCapturer);
         int frameCount = frameCountRenderer.getFrameCount();
 
@@ -112,7 +113,7 @@ public class CameraCapturerParameterizedTest extends BaseCameraCapturerTest {
             }
         };
         videoViewRenderer.setListener(rendererListener);
-        cameraCapturer = CameraCapturer.create(cameraCapturerActivity, cameraSource, null);
+        cameraCapturer = new CameraCapturer(cameraCapturerActivity, cameraSource, null);
         localVideoTrack = localMedia.addVideoTrack(true, cameraCapturer);
         localVideoTrack.addRenderer(videoViewRenderer);
 
@@ -123,5 +124,37 @@ public class CameraCapturerParameterizedTest extends BaseCameraCapturerTest {
         assertTrue(renderedFirstFrame.await(2, TimeUnit.SECONDS));
         Thread.sleep(TimeUnit.SECONDS.toMillis(5));
         videoViewRenderer.release();
+    }
+
+    @Test
+    public void canBeReused() throws InterruptedException {
+        int reuseCount = 5;
+
+        // Reuse the same capturer while we iterate
+        cameraCapturer = new CameraCapturer(cameraCapturerActivity, cameraSource, null);
+
+        for (int i = 0 ; i < reuseCount ; i++) {
+            FrameCountRenderer renderer = new FrameCountRenderer();
+            localVideoTrack = localMedia.addVideoTrack(true, cameraCapturer);
+            int frameCount = renderer.getFrameCount();
+
+            // Validate our frame count is nothing
+            assertEquals(0, frameCount);
+
+            // Add renderer and wait
+            localVideoTrack.addRenderer(renderer);
+            Thread.sleep(TimeUnit.SECONDS.toMillis(CAMERA_CAPTURE_DELAY));
+
+            // Validate our frame count is incrementing
+            assertTrue(renderer.getFrameCount() > frameCount);
+
+            // Remove video track and wait
+            frameCount = renderer.getFrameCount();
+            localMedia.removeVideoTrack(localVideoTrack);
+            Thread.sleep(TimeUnit.SECONDS.toMillis(CAMERA_CAPTURE_DELAY));
+
+            boolean framesNotRenderering = frameCount >= (renderer.getFrameCount() - 1);
+            assertTrue(framesNotRenderering);
+        }
     }
 }

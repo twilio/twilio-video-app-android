@@ -23,10 +23,10 @@ public class CameraCapturer implements VideoCapturer {
     }
 
     private final Context context;
-    private final VideoCapturerAndroid webrtcCapturer;
     private final CapturerErrorListener listener;
-    private CameraSource cameraSource;
     private final CameraCapturerFormatProvider formatProvider = new CameraCapturerFormatProvider();
+    private VideoCapturerAndroid webrtcCapturer;
+    private CameraSource cameraSource;
     private VideoCapturer.Listener videoCapturerListener;
     private SurfaceTextureHelper surfaceTextureHelper;
     private final org.webrtc.VideoCapturer.CapturerObserver observerAdapter =
@@ -66,9 +66,10 @@ public class CameraCapturer implements VideoCapturer {
                 }
             };
 
-    public static CameraCapturer create(Context context,
-                                        CameraSource cameraSource,
-                                        CapturerErrorListener listener) {
+    public CameraCapturer(Context context,
+                          CameraSource cameraSource,
+                          CapturerErrorListener listener) {
+
         if (context == null) {
             throw new NullPointerException("context must not be null");
         }
@@ -79,31 +80,10 @@ public class CameraCapturer implements VideoCapturer {
                 listener != null) {
             listener.onError(new CapturerException(CapturerException.ExceptionDomain.CAMERA,
                     "CAMERA permission not granted"));
-
-            return null;
         }
-
-        // Create the webrtc capturer
-        int cameraId = CameraCapturerFormatProvider.getCameraId(cameraSource);
-        if (cameraId < 0) {
-            logger.e("Failed to find camera source");
-            if (listener != null) {
-                listener.onError(new CapturerException(CapturerException.ExceptionDomain.CAMERA,
-                        "Unsupported camera source provided"));
-            }
-            return null;
-        }
-        CameraCapturerEventsHandler eventsHandler = new CameraCapturerEventsHandler(listener);
-        VideoCapturerAndroid webrtcVideoCapturer = createVideoCapturerAndroid(cameraId,
-                eventsHandler);
-
-        if (webrtcVideoCapturer == null && listener != null) {
-            listener.onError(new CapturerException(CapturerException.ExceptionDomain.CAPTURER,
-                    "Failed to create capturer"));
-            return null;
-        }
-
-        return new CameraCapturer(context, webrtcVideoCapturer, cameraSource, listener);
+        this.context = context;
+        this.cameraSource = cameraSource;
+        this.listener = listener;
     }
 
     @Override
@@ -114,7 +94,19 @@ public class CameraCapturer implements VideoCapturer {
     @Override
     public void startCapture(VideoFormat captureFormat,
                              VideoCapturer.Listener videoCapturerListener) {
+        // Create the webrtc capturer
+        this.webrtcCapturer = createVideoCapturerAndroid();
+        if (webrtcCapturer == null) {
+            if (listener != null) {
+                listener.onError(new CapturerException(CapturerException.ExceptionDomain.CAPTURER,
+                        "Failed to create capturer"));
+            }
+            videoCapturerListener.onCapturerStarted(false);
+
+            return;
+        }
         this.videoCapturerListener = videoCapturerListener;
+
         webrtcCapturer.startCapture(captureFormat.dimensions.width,
                 captureFormat.dimensions.height,
                 captureFormat.framerate,
@@ -130,6 +122,8 @@ public class CameraCapturer implements VideoCapturer {
         } catch (InterruptedException e) {
             logger.e("Failed to stop camera capturer");
         }
+        webrtcCapturer.dispose();
+        webrtcCapturer = null;
     }
 
     public synchronized CameraSource getCameraSource() {
@@ -148,8 +142,18 @@ public class CameraCapturer implements VideoCapturer {
         this.surfaceTextureHelper = surfaceTextureHelper;
     }
 
-    private static VideoCapturerAndroid createVideoCapturerAndroid(int cameraId,
-                                                                   VideoCapturerAndroid.CameraEventsHandler cameraEventsHandler) {
+    private VideoCapturerAndroid createVideoCapturerAndroid() {
+        int cameraId = CameraCapturerFormatProvider.getCameraId(cameraSource);
+        if (cameraId < 0) {
+            logger.e("Failed to find camera source");
+            if (listener != null) {
+                listener.onError(new CapturerException(CapturerException.ExceptionDomain.CAMERA,
+                        "Unsupported camera source provided"));
+            }
+            return null;
+        }
+        CameraCapturerEventsHandler eventsHandler = new CameraCapturerEventsHandler(listener);
+
         String deviceName = CameraEnumerationAndroid.getDeviceName(cameraId);
         if (deviceName == null) {
             return null;
@@ -157,16 +161,6 @@ public class CameraCapturer implements VideoCapturer {
         // TODO: Need to figure out the best way to get this to to webrtc
         // final EglBase.Context eglContext = EglBaseProvider.provideEglBase().getEglBaseContext();
 
-        return VideoCapturerAndroid.create(deviceName, cameraEventsHandler);
-    }
-
-    private CameraCapturer(Context context,
-                           VideoCapturerAndroid webrtcCapturer,
-                           CameraSource cameraSource,
-                           CapturerErrorListener listener) {
-        this.context = context;
-        this.webrtcCapturer = webrtcCapturer;
-        this.cameraSource = cameraSource;
-        this.listener = listener;
+        return VideoCapturerAndroid.create(deviceName, eventsHandler);
     }
 }

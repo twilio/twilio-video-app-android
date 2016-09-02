@@ -16,19 +16,21 @@ import static org.junit.Assert.assertTrue;
 public class CameraCapturerBaseTest extends BaseCameraCapturerTest {
     @Test(expected = NullPointerException.class)
     public void create_shouldFailWithNullContext() {
-        cameraCapturer = CameraCapturer.create(null,
-                CameraCapturer.CameraSource.CAMERA_SOURCE_FRONT_CAMERA, null);
+        cameraCapturer = new CameraCapturer(null,
+                CameraCapturer.CameraSource.CAMERA_SOURCE_FRONT_CAMERA,
+                null);
     }
 
     @Test(expected = NullPointerException.class)
     public void create_shouldFailWithNullSource() {
-        cameraCapturer = CameraCapturer.create(cameraCapturerActivity, null, null);
+        cameraCapturer = new CameraCapturer(cameraCapturerActivity, null, null);
     }
 
     @Test
     public void shouldAllowCameraSwitch() throws InterruptedException {
-        cameraCapturer = CameraCapturer.create(cameraCapturerActivity,
-                CameraCapturer.CameraSource.CAMERA_SOURCE_FRONT_CAMERA, null);
+        cameraCapturer = new CameraCapturer(cameraCapturerActivity,
+                CameraCapturer.CameraSource.CAMERA_SOURCE_FRONT_CAMERA,
+                null);
         localVideoTrack = localMedia.addVideoTrack(true, cameraCapturer);
         int frameCount = frameCountRenderer.getFrameCount();
 
