@@ -70,9 +70,9 @@ public class CameraCapturerParameterizedTest extends BaseCameraCapturerTest {
         // Validate our frame count is incrementing
         assertTrue(frameCountRenderer.getFrameCount() > frameCount);
 
-        // Remove the renderer and wait
+        // Remove the video track and wait
         frameCount = frameCountRenderer.getFrameCount();
-        localVideoTrack.removeRenderer(frameCountRenderer);
+        localMedia.removeLocalVideoTrack(localVideoTrack);
         Thread.sleep(TimeUnit.SECONDS.toMillis(CAMERA_CAPTURE_DELAY));
 
         /*
