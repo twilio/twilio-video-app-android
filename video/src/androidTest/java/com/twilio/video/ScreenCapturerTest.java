@@ -211,7 +211,7 @@ public class ScreenCapturerTest {
         localVideoTrack.addRenderer(videoViewRenderer);
 
         assertTrue(renderedFirstFrame.await(2, TimeUnit.SECONDS));
-        Thread.sleep(TimeUnit.SECONDS.toMillis(2));
+        Thread.sleep(TimeUnit.SECONDS.toMillis(1));
         videoViewRenderer.release();
     }
 
