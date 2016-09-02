@@ -196,29 +196,8 @@ public class RoomActivity extends AppCompatActivity {
         };
     }
 
-    private VideoViewRenderer createRendererForContainer(ViewGroup container) {
-        VideoViewRenderer renderer = new VideoViewRenderer(this, container);
-        renderer.setVideoScaleType(VideoScaleType.ASPECT_FILL);
-        renderer.setListener(new VideoRenderer.Listener() {
-            @Override
-            public void onFirstFrame() {
-                Timber.i("Participant onFirstFrame");
-            }
-
-            @Override
-            public void onFrameDimensionsChanged(int width, int height, int rotation) {
-                Timber.i("Participant onFrameDimensionsChanged [ width: " + width +
-                        ", height: " + height +
-                        ", rotation: " + rotation +
-                        " ]");
-            }
-        });
-        return renderer;
-    }
-
     private class ParticipantMediaListener implements Media.Listener {
         private Participant participant;
-        private VideoViewRenderer viewRenderer;
 
         ParticipantMediaListener(Participant participant) {
             this.participant = participant;
