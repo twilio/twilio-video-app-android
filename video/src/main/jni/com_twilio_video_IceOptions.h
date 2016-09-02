@@ -9,13 +9,17 @@
 extern "C" {
 #endif
 
+namespace twilio_video_jni {
+
 struct IceOptionsContext {
     twilio::media::IceOptions ice_options;
 };
 
-JNIEXPORT jlong JNICALL Java_com_twilio_video_IceOptions_nativeCreate
-  (JNIEnv *, jobject, jobjectArray, jobject);
 
+JNIEXPORT jlong JNICALL Java_com_twilio_video_IceOptions_nativeCreate
+    (JNIEnv *, jobject, jobjectArray, jobject);
+
+}
 #ifdef __cplusplus
 }
 #endif

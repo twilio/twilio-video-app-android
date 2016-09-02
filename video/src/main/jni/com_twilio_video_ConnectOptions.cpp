@@ -38,8 +38,8 @@ Java_com_twilio_video_ConnectOptions_nativeCreate(JNIEnv *env,
             webrtc_jni::GetMethodID(env, j_ice_options_class,
                                     "createNativeContext", "()J");
         jlong j_ice_options_handle = env->CallLongMethod(j_ice_options, j_createNativeObject_id);
-        IceOptionsContext *ice_options_context =
-            reinterpret_cast<IceOptionsContext *>(j_ice_options_handle);
+        twilio_video_jni::IceOptionsContext *ice_options_context =
+            reinterpret_cast<twilio_video_jni::IceOptionsContext *>(j_ice_options_handle);
         builder.setIceOptions(ice_options_context->ice_options);
         delete ice_options_context;
     }

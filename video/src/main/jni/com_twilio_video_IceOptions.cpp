@@ -4,6 +4,7 @@
 
 #include "video/logger.h"
 
+namespace twilio_video_jni {
 
 JNIEXPORT jlong JNICALL
 Java_com_twilio_video_IceOptions_nativeCreate(JNIEnv *env,
@@ -74,5 +75,6 @@ Java_com_twilio_video_IceOptions_nativeCreate(JNIEnv *env,
     IceOptionsContext *ice_options_context = new IceOptionsContext();
     ice_options_context->ice_options = ice_options;
     return webrtc_jni::jlongFromPointer(ice_options_context);
+}
 }
 
