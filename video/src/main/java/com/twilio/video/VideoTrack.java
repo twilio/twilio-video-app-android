@@ -57,8 +57,7 @@ public class VideoTrack {
      * @param videoRenderer the video renderer that should no longer receives video
      */
     public synchronized void removeRenderer(VideoRenderer videoRenderer) {
-        checkReleased();
-        if (videoRenderer != null) {
+        if (!isReleased && videoRenderer != null) {
             org.webrtc.VideoRenderer webrtcVideoRenderer =
                     videoRenderersMap.remove(videoRenderer);
             if (webrtcVideoTrack != null && webrtcVideoRenderer != null) {
@@ -100,15 +99,6 @@ public class VideoTrack {
 
     synchronized void release() {
         if (nativeVideoTrackContext != 0) {
-            if (webrtcVideoTrack != null) {
-                // TODO: Right now disposing is causing a crash in Core related to
-                // PeerConnectionSignaling. Lot of changes has been done
-                // in webrtc track teardown in core, so I'll wait for RC before dealing with this.
-                // Things to consider, when we dispose webrtcVideoTrack, it will automatically dispose
-                // all webrtc renderers. Should we dispose before, or after notifing the user ?
-                // webrtcVideoTrack.dispose();
-                webrtcVideoTrack = null;
-            }
             isEnabled = false;
             videoRenderersMap.clear();
             webrtcVideoTrack = null;

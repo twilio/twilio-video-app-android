@@ -39,12 +39,6 @@ public class AudioTrack {
 
     synchronized void release() {
         if (nativeAudioTrackContext != 0) {
-            if (webrtcAudioTrack != null) {
-                // TODO: Check if we are the one respnosible of disposing.
-                // By looking at webrtc source code, RtpReceiver seems to be calling this method
-                //webrtcAudioTrack.dispose();
-                webrtcAudioTrack = null;
-            }
             isEnabled = false;
             webrtcAudioTrack = null;
             nativeRelease(nativeAudioTrackContext);
