@@ -18,6 +18,7 @@ public class VideoTrack {
     private Map<VideoRenderer, org.webrtc.VideoRenderer> videoRenderersMap = new HashMap<>();
     private boolean isEnabled;
     private long nativeVideoTrackContext;
+    private boolean isReleased = false;
 
     VideoTrack(long nativeVideoTrackContext,
                String trackId,
@@ -38,7 +39,8 @@ public class VideoTrack {
      *
      * @param videoRenderer video renderer that receives video
      */
-    public void addRenderer(VideoRenderer videoRenderer) {
+    public synchronized void addRenderer(VideoRenderer videoRenderer) {
+        checkReleased();
         if (videoRenderer != null) {
             org.webrtc.VideoRenderer webrtcVideoRenderer =
                     createWebRtcVideoRenderer(videoRenderer);
@@ -54,7 +56,8 @@ public class VideoTrack {
      *
      * @param videoRenderer the video renderer that should no longer receives video
      */
-    public void removeRenderer(VideoRenderer videoRenderer) {
+    public synchronized void removeRenderer(VideoRenderer videoRenderer) {
+        checkReleased();
         if (videoRenderer != null) {
             org.webrtc.VideoRenderer webrtcVideoRenderer =
                     videoRenderersMap.remove(videoRenderer);
@@ -106,8 +109,12 @@ public class VideoTrack {
                 // webrtcVideoTrack.dispose();
                 webrtcVideoTrack = null;
             }
+            isEnabled = false;
+            videoRenderersMap.clear();
+            webrtcVideoTrack = null;
             nativeRelease(nativeVideoTrackContext);
             nativeVideoTrackContext = 0;
+            isReleased = true;
         }
     }
 
@@ -145,6 +152,12 @@ public class VideoTrack {
 
     org.webrtc.VideoTrack getWebrtcVideoTrack() {
         return webrtcVideoTrack;
+    }
+
+    private synchronized void checkReleased() {
+        if (isReleased) {
+            throw new IllegalStateException("The video track has been destroyed.");
+        }
     }
 
     private native void nativeRelease(long nativeVideoTrackContext);

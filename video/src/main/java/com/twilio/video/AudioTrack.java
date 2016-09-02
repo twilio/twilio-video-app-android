@@ -45,6 +45,8 @@ public class AudioTrack {
                 //webrtcAudioTrack.dispose();
                 webrtcAudioTrack = null;
             }
+            isEnabled = false;
+            webrtcAudioTrack = null;
             nativeRelease(nativeAudioTrackContext);
             nativeAudioTrackContext = 0;
         }
