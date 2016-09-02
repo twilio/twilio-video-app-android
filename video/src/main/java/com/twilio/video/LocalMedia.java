@@ -61,6 +61,7 @@ public class LocalMedia {
     public boolean removeAudioTrack(LocalAudioTrack localAudioTrack) {
         checkReleased("removeAudioTrack");
         boolean result = localAudioTrack != null &&
+                localAudioTracks.contains(localAudioTrack) &&
                 nativeRemoveAudioTrack(nativeLocalMediaHandle, localAudioTrack.getTrackId());
 
         if (!result) {
