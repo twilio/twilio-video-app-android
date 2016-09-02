@@ -232,7 +232,7 @@ public class RoomActivity extends AppCompatActivity {
             localVideoPauseFab.show();
             icon = R.drawable.ic_videocam_white_24px;
         } else {
-            if (!localMedia.removeLocalVideoTrack(localVideoTrack)) {
+            if (!localMedia.removeVideoTrack(localVideoTrack)) {
                 Snackbar.make(roomStatusTextview,
                         "Video track remove action failed",
                         Snackbar.LENGTH_LONG).setAction("Action", null).show();
