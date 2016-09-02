@@ -35,7 +35,7 @@ public abstract class BaseCameraCapturerTest {
 
     @After
     public void teardown() {
-        localMedia.removeLocalVideoTrack(localVideoTrack);
+        localMedia.removeVideoTrack(localVideoTrack);
         localMedia.release();
     }
 }

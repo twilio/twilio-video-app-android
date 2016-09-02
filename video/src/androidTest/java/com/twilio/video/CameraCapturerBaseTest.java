@@ -16,19 +16,21 @@ import static org.junit.Assert.assertTrue;
 public class CameraCapturerBaseTest extends BaseCameraCapturerTest {
     @Test(expected = NullPointerException.class)
     public void create_shouldFailWithNullContext() {
-        cameraCapturer = CameraCapturer.create(null,
-                CameraCapturer.CameraSource.CAMERA_SOURCE_FRONT_CAMERA, null);
+        cameraCapturer = new CameraCapturer(null,
+                CameraCapturer.CameraSource.CAMERA_SOURCE_FRONT_CAMERA,
+                null);
     }
 
     @Test(expected = NullPointerException.class)
     public void create_shouldFailWithNullSource() {
-        cameraCapturer = CameraCapturer.create(cameraCapturerActivity, null, null);
+        cameraCapturer = new CameraCapturer(cameraCapturerActivity, null, null);
     }
 
     @Test
     public void shouldAllowCameraSwitch() throws InterruptedException {
-        cameraCapturer = CameraCapturer.create(cameraCapturerActivity,
-                CameraCapturer.CameraSource.CAMERA_SOURCE_FRONT_CAMERA, null);
+        cameraCapturer = new CameraCapturer(cameraCapturerActivity,
+                CameraCapturer.CameraSource.CAMERA_SOURCE_FRONT_CAMERA,
+                null);
         localVideoTrack = localMedia.addVideoTrack(true, cameraCapturer);
         int frameCount = frameCountRenderer.getFrameCount();
 
@@ -55,6 +57,34 @@ public class CameraCapturerBaseTest extends BaseCameraCapturerTest {
         assertTrue(frameCountRenderer.getFrameCount() > frameCount);
 
         // Validate back camera source
+        assertEquals(CameraCapturer.CameraSource.CAMERA_SOURCE_BACK_CAMERA,
+                cameraCapturer.getCameraSource());
+    }
+
+    @Test
+    public void shouldAllowCameraSwitchWhileNotOnLocalVideo() throws InterruptedException {
+        cameraCapturer = new CameraCapturer(cameraCapturerActivity,
+                CameraCapturer.CameraSource.CAMERA_SOURCE_FRONT_CAMERA,
+                null);
+
+        // Switch our camera
+        cameraCapturer.switchCamera();
+
+        // Now add our video track
+        localVideoTrack = localMedia.addVideoTrack(true, cameraCapturer);
+        int frameCount = frameCountRenderer.getFrameCount();
+
+        // Validate our frame count is nothing
+        assertEquals(0, frameCount);
+
+        // Add renderer and wait
+        localVideoTrack.addRenderer(frameCountRenderer);
+        Thread.sleep(TimeUnit.SECONDS.toMillis(CAMERA_CAPTURE_DELAY));
+
+        // Validate our frame count is incrementing
+        assertTrue(frameCountRenderer.getFrameCount() > frameCount);
+
+        // Validate we are on back camera source
         assertEquals(CameraCapturer.CameraSource.CAMERA_SOURCE_BACK_CAMERA,
                 cameraCapturer.getCameraSource());
     }

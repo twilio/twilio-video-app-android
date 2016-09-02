@@ -115,22 +115,4 @@ public class VideoConstraintsUnitTests {
                 .maxVideoDimensions(VideoDimensions.CIF_VIDEO_DIMENSIONS)
                 .build();
     }
-
-    @Test(expected = NullPointerException.class)
-    public void localVideoTrackWithNullCameraCapturer() {
-        CameraCapturer cameraCapturer = null;
-
-        new LocalVideoTrack(cameraCapturer);
-    }
-
-    @Test(expected = NullPointerException.class)
-    public void localVideoTrackWithNullCameraCapturer2() {
-        CameraCapturer cameraCapturer = null;
-
-        VideoConstraints videoConstraints = new VideoConstraints.Builder()
-                .build();
-
-        new LocalVideoTrack(cameraCapturer, videoConstraints);
-    }
-
 }

@@ -95,8 +95,24 @@ public class LocalMediaTest {
     }
 
     @Test
-    public void removeAudioTrack_shouldReturnFalseForNull() {
+    public void removeAudioTrack_shouldFailForNull() {
         assertFalse(localMedia.removeAudioTrack(null));
+    }
+
+    @Test
+    public void removeAudioTrack_shouldFailForRemovedTrack() {
+        LocalAudioTrack localAudioTrack = localMedia.addAudioTrack(true);
+
+        // Validate the track was added
+        assertNotNull(localAudioTrack);
+        assertEquals(1, localMedia.getLocalAudioTracks().size());
+
+        // Now remove and validate it is gone
+        assertTrue(localMedia.removeAudioTrack(localAudioTrack));
+        assertEquals(0, localMedia.getLocalAudioTracks().size());
+
+        // Try to remove again
+        assertFalse(localMedia.removeAudioTrack(localAudioTrack));
     }
 
     @Test
@@ -172,7 +188,7 @@ public class LocalMediaTest {
     }
 
     @Test
-    public void addLocalVideoTrack_shouldFailForInvalidConstraints() {
+    public void addVideoTrack_shouldFailForInvalidConstraints() {
         VideoConstraints invalidVideoConstraints = new VideoConstraints.Builder()
                 .minVideoDimensions(new VideoDimensions(1,2))
                 .maxVideoDimensions(new VideoDimensions(10,20))
@@ -185,7 +201,7 @@ public class LocalMediaTest {
     }
 
     @Test
-    public void addLocalVideoTrack_shouldRespectValidConstraints() {
+    public void addVideoTrack_shouldRespectValidConstraints() {
         Integer expectedMinWidth = 320;
         Integer expectedMinHeight = 180;
         Integer expectedMaxWidth = 640;
@@ -222,14 +238,30 @@ public class LocalMediaTest {
         assertEquals(1, localMedia.getLocalVideoTracks().size());
 
         // Now remove and validate it is gone
-        assertTrue(localMedia.removeLocalVideoTrack(localVideoTrack));
+        assertTrue(localMedia.removeVideoTrack(localVideoTrack));
         assertEquals(0, localMedia.getLocalVideoTracks().size());
         assertFalse(fakeVideoCapturer.isStarted());
     }
 
     @Test
-    public void removeVideoTrack_shouldReturnFalseForNull() {
-        assertFalse(localMedia.removeLocalVideoTrack(null));
+    public void removeVideoTrack_shouldFailForNull() {
+        assertFalse(localMedia.removeVideoTrack(null));
+    }
+
+    @Test
+    public void removeVideoTrack_shouldFailForRemovedTrack() {
+        LocalVideoTrack localVideoTrack = localMedia.addVideoTrack(true, fakeVideoCapturer);
+
+        // Validate the track was added
+        assertNotNull(localVideoTrack);
+        assertEquals(1, localMedia.getLocalVideoTracks().size());
+
+        // Now remove and validate it is gone
+        assertTrue(localMedia.removeVideoTrack(localVideoTrack));
+        assertEquals(0, localMedia.getLocalAudioTracks().size());
+
+        // Try to remove again
+        assertFalse(localMedia.removeVideoTrack(localVideoTrack));
     }
 
     @Test
@@ -263,7 +295,7 @@ public class LocalMediaTest {
 
         for (int i = numVideoTracks - 1 ; i >= 0 ; i--) {
             int expectedSize = i;
-            assertTrue(localMedia.removeLocalVideoTrack(localVideoTracks[i]));
+            assertTrue(localMedia.removeVideoTrack(localVideoTracks[i]));
             assertEquals(expectedSize, localMedia.getLocalVideoTracks().size());
         }
     }
@@ -279,7 +311,7 @@ public class LocalMediaTest {
         LocalVideoTrack localVideoTrack = localMedia.addVideoTrack(false, fakeVideoCapturer);
         assertNotNull(localVideoTrack);
         localMedia.release();
-        localMedia.removeLocalVideoTrack(localVideoTrack);
+        localMedia.removeVideoTrack(localVideoTrack);
     }
 
     @Test
@@ -324,7 +356,7 @@ public class LocalMediaTest {
 
         for (int i = numVideoTracks - 1 ; i >= 0 ; i--) {
             int expectedSize = i;
-            assertTrue(localMedia.removeLocalVideoTrack(localVideoTracks[i]));
+            assertTrue(localMedia.removeVideoTrack(localVideoTracks[i]));
             assertEquals(expectedSize, localMedia.getLocalVideoTracks().size());
         }
     }

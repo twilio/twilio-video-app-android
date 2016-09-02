@@ -79,7 +79,7 @@ public class RoomActivity extends AppCompatActivity {
         processActivityIntent(savedInstanceState);
         localMedia = LocalMedia.create(this);
         localAudioTrack = localMedia.addAudioTrack(true);
-        cameraCapturer = CameraCapturer.create(this,
+        cameraCapturer = new CameraCapturer(this,
                 CameraCapturer.CameraSource.CAMERA_SOURCE_FRONT_CAMERA, null);
         localVideoTrack = localMedia.addVideoTrack(true, cameraCapturer);
         primaryVideoView.setMirror(true);
@@ -100,7 +100,7 @@ public class RoomActivity extends AppCompatActivity {
             thumbnailVideoView = null;
         }
         if (localMedia != null) {
-            localMedia.removeLocalVideoTrack(localVideoTrack);
+            localMedia.removeVideoTrack(localVideoTrack);
             localMedia.removeAudioTrack(localAudioTrack);
             localMedia.release();
             localMedia = null;
@@ -302,29 +302,8 @@ public class RoomActivity extends AppCompatActivity {
         };
     }
 
-    private VideoViewRenderer createRendererForContainer(ViewGroup container) {
-        VideoViewRenderer renderer = new VideoViewRenderer(this, container);
-        renderer.setVideoScaleType(VideoScaleType.ASPECT_FILL);
-        renderer.setListener(new VideoRenderer.Listener() {
-            @Override
-            public void onFirstFrame() {
-                Timber.i("Participant onFirstFrame");
-            }
-
-            @Override
-            public void onFrameDimensionsChanged(int width, int height, int rotation) {
-                Timber.i("Participant onFrameDimensionsChanged [ width: " + width +
-                        ", height: " + height +
-                        ", rotation: " + rotation +
-                        " ]");
-            }
-        });
-        return renderer;
-    }
-
     private class ParticipantMediaListener implements Media.Listener {
         private Participant participant;
-        private VideoViewRenderer viewRenderer;
 
         ParticipantMediaListener(Participant participant) {
             this.participant = participant;

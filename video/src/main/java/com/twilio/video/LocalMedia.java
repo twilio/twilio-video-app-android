@@ -61,6 +61,7 @@ public class LocalMedia {
     public boolean removeAudioTrack(LocalAudioTrack localAudioTrack) {
         checkReleased("removeAudioTrack");
         boolean result = localAudioTrack != null &&
+                localAudioTracks.contains(localAudioTrack) &&
                 nativeRemoveAudioTrack(nativeLocalMediaHandle, localAudioTrack.getTrackId());
 
         if (!result) {
@@ -100,7 +101,7 @@ public class LocalMedia {
         return localVideoTrack;
     }
 
-    public boolean removeLocalVideoTrack(LocalVideoTrack localVideoTrack) {
+    public boolean removeVideoTrack(LocalVideoTrack localVideoTrack) {
         checkReleased("removeVideoTrack");
 
         boolean result = localVideoTrack != null &&

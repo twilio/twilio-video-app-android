@@ -55,7 +55,7 @@ public class ScreenCapturerTest {
     @After
     public void teardown() {
         if (localMedia != null) {
-            localMedia.removeLocalVideoTrack(localVideoTrack);
+            localMedia.removeVideoTrack(localVideoTrack);
             localMedia.release();
         }
 
@@ -140,7 +140,7 @@ public class ScreenCapturerTest {
 
         // Remove video track and wait
         frameCount = frameCountRenderer.getFrameCount();
-        localMedia.removeLocalVideoTrack(localVideoTrack);
+        localMedia.removeVideoTrack(localVideoTrack);
         Thread.sleep(TimeUnit.SECONDS.toMillis(SCREEN_CAPTURER_DELAY));
 
         boolean framesNotRenderering = frameCount >= (frameCountRenderer.getFrameCount() - 1);
@@ -254,7 +254,7 @@ public class ScreenCapturerTest {
 
             // Remove video track and wait
             frameCount = renderer.getFrameCount();
-            localMedia.removeLocalVideoTrack(localVideoTrack);
+            localMedia.removeVideoTrack(localVideoTrack);
             Thread.sleep(TimeUnit.SECONDS.toMillis(SCREEN_CAPTURER_DELAY));
 
             boolean framesNotRenderering = frameCount >= (renderer.getFrameCount() - 1);
