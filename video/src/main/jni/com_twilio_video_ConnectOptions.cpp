@@ -1,7 +1,9 @@
 #include "com_twilio_video_ConnectOptions.h"
 #include "com_twilio_video_LocalMedia.h"
+#include "com_twilio_video_IceOptions.h"
 
 #include "webrtc/api/java/jni/jni_helpers.h"
+#include "media/ice_options.h"
 
 namespace twilio_video_jni {
 
@@ -31,8 +33,10 @@ Java_com_twilio_video_ConnectOptions_nativeCreate(JNIEnv *env,
         builder.setLocalMedia(local_media);
     }
 
-    // TODO: Get ice options from j_ice_options
-    // builder.setIceOptions();
+    if (!webrtc_jni::IsNull(env, j_ice_options)) {
+        twilio::media::IceOptions ice_options = IceOptions::getIceOptions(env, j_ice_options);
+        builder.setIceOptions(ice_options);
+    }
 
     ConnectOptionsContext *data_context = new ConnectOptionsContext();
     data_context->connect_options = builder.build();

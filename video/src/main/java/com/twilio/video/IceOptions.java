@@ -11,27 +11,56 @@ import java.util.Set;
  *  https://www.twilio.com/stun-turn
  */
 public class IceOptions {
-    /**
-     * Set of {@link IceServer} objects to be used during connection establishment.
-     */
-    public final Set<IceServer> iceServers;
 
-    /**
-     * The transport policy to use. Defaults to {@link IceTransportPolicy#ALL}
-     */
-    public final IceTransportPolicy iceTransportPolicy;
+    private final Set<IceServer> iceServers;
+    private final IceTransportPolicy iceTransportPolicy;
 
-
-    public IceOptions(IceTransportPolicy iceTransportPolicy, Set<IceServer> iceServers) {
-        this.iceServers = iceServers;
-        this.iceTransportPolicy = iceTransportPolicy;
+    private IceOptions(Builder builder) {
+        this.iceServers = builder.iceServers;
+        this.iceTransportPolicy = builder.iceTransportPolicy;
     }
 
-    public IceOptions(IceTransportPolicy iceTransportPolicy) {
-        this(iceTransportPolicy, null);
+
+    public Set<IceServer> getIceServers() {
+        return iceServers;
     }
 
-    public IceOptions() {
-        this(IceTransportPolicy.ALL, null);
+    public IceTransportPolicy getIceTransportPolicy() {
+        return iceTransportPolicy;
+    }
+
+    IceServer[] getIceServersArray() {
+        IceServer[] iceServersArray = new IceServer[0];
+        if (iceServers != null && iceServers.size() > 0) {
+            iceServersArray = iceServers.toArray(new IceServer[iceServers.size()]);
+        }
+        return iceServersArray;
+    }
+
+    public static class Builder {
+        private Set<IceServer> iceServers;
+        private IceTransportPolicy iceTransportPolicy = IceTransportPolicy.ALL;
+
+        public Builder() {}
+
+        /**
+         * Set of {@link IceServer} objects to be used during connection establishment.
+         */
+        public Builder iceServers(Set<IceServer> iceServers) {
+            this.iceServers = iceServers;
+            return this;
+        }
+
+        /**
+         * The transport policy to use. Defaults to {@link IceTransportPolicy#ALL}
+         */
+        public Builder iceTransportPolicy(IceTransportPolicy iceTransportPolicy) {
+            this.iceTransportPolicy = iceTransportPolicy;
+            return this;
+        }
+
+        public IceOptions build() {
+            return new IceOptions(this);
+        }
     }
 }

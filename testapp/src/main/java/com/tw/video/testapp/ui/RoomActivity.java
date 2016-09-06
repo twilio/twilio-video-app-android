@@ -19,6 +19,9 @@ import com.twilio.common.AccessManager;
 import com.twilio.video.AudioTrack;
 import com.twilio.video.CameraCapturer;
 import com.twilio.video.ConnectOptions;
+import com.twilio.video.IceOptions;
+import com.twilio.video.IceServer;
+import com.twilio.video.IceTransportPolicy;
 import com.twilio.video.LocalAudioTrack;
 import com.twilio.video.LocalMedia;
 import com.twilio.video.LocalVideoTrack;
@@ -32,6 +35,9 @@ import com.twilio.video.VideoScaleType;
 import com.twilio.video.VideoTrack;
 import com.twilio.video.VideoView;
 import com.twilio.video.VideoViewRenderer;
+
+import java.util.HashSet;
+import java.util.Set;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -108,6 +114,10 @@ public class RoomActivity extends AppCompatActivity {
         if (accessManager != null) {
             accessManager.dispose();
             accessManager = null;
+        }
+        if (videoClient != null) {
+            videoClient.release();
+            videoClient = null;
         }
     }
 
