@@ -1,16 +1,16 @@
 package com.tw.video.testapp.ui;
 
 import android.content.Intent;
+import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.tw.video.testapp.R;
 import com.tw.video.testapp.util.AccessManagerHelper;
@@ -19,9 +19,6 @@ import com.twilio.common.AccessManager;
 import com.twilio.video.AudioTrack;
 import com.twilio.video.CameraCapturer;
 import com.twilio.video.ConnectOptions;
-import com.twilio.video.IceOptions;
-import com.twilio.video.IceServer;
-import com.twilio.video.IceTransportPolicy;
 import com.twilio.video.LocalAudioTrack;
 import com.twilio.video.LocalMedia;
 import com.twilio.video.LocalVideoTrack;
@@ -30,14 +27,10 @@ import com.twilio.video.Participant;
 import com.twilio.video.Room;
 import com.twilio.video.VideoClient;
 import com.twilio.video.VideoException;
-import com.twilio.video.VideoRenderer;
-import com.twilio.video.VideoScaleType;
 import com.twilio.video.VideoTrack;
 import com.twilio.video.VideoView;
-import com.twilio.video.VideoViewRenderer;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.Map;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -266,6 +259,28 @@ public class RoomActivity extends AppCompatActivity {
         finish();
     }
 
+    private synchronized void addParticipant(Participant participant) {
+        // TODO support multiple participants
+        if (thumbnailVideoView.getVisibility() == View.VISIBLE) {
+            Toast.makeText(this, "Do not support multiple participants yet", Toast.LENGTH_LONG)
+                    .show();
+            return;
+        }
+        roomStatusTextview.setText("Participant "+participant.getIdentity()+ " joined");
+        localVideoTrack.removeRenderer(primaryVideoView);
+        thumbnailVideoView.setVisibility(View.VISIBLE);
+        localVideoTrack.addRenderer(thumbnailVideoView);
+        participant.getMedia().setListener(new ParticipantMediaListener(participant));
+    }
+
+    private synchronized void removeParticipant(Participant participant) {
+        roomStatusTextview.setText("Participant "+participant.getIdentity()+ " left.");
+        thumbnailVideoView.setVisibility(View.GONE);
+        localVideoTrack.removeRenderer(thumbnailVideoView);
+        primaryVideoView.setMirror(true);
+        localVideoTrack.addRenderer(primaryVideoView);
+    }
+
     private Room.Listener createRoomListener() {
         return new Room.Listener() {
             @Override
@@ -274,6 +289,11 @@ public class RoomActivity extends AppCompatActivity {
                         room.getSid()+" state:"+room.getState());
                 roomStatusTextview.setText("Connected to "+room.getName());
 
+                for (Map.Entry<String, Participant> entry : room.getParticipants().entrySet()) {
+                    addParticipant(entry.getValue());
+                    // TODO just grabbing first participant...need to support multiple participants
+                    break;
+                }
             }
 
             @Override
@@ -293,21 +313,13 @@ public class RoomActivity extends AppCompatActivity {
             @Override
             public void onParticipantConnected(Room room, Participant participant) {
                 Timber.i("onParticipantConnected: "+participant.getIdentity());
-                roomStatusTextview.setText("Participant "+participant.getIdentity()+ " joined");
-                localVideoTrack.removeRenderer(primaryVideoView);
-                thumbnailVideoView.setVisibility(View.VISIBLE);
-                localVideoTrack.addRenderer(thumbnailVideoView);
-                participant.getMedia().setListener(new ParticipantMediaListener(participant));
+                addParticipant(participant);
             }
 
             @Override
             public void onParticipantDisconnected(Room room, Participant participant) {
                 Timber.i("onParticipantDisconnected "+participant.getIdentity());
-                roomStatusTextview.setText("Participant "+participant.getIdentity()+ " left.");
-                thumbnailVideoView.setVisibility(View.GONE);
-                localVideoTrack.removeRenderer(thumbnailVideoView);
-                primaryVideoView.setMirror(true);
-                localVideoTrack.addRenderer(primaryVideoView);
+                removeParticipant(participant);
             }
         };
     }
