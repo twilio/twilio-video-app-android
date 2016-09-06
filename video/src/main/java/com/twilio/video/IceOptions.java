@@ -17,7 +17,7 @@ public class IceOptions {
     public final Set<IceServer> iceServers;
 
     /**
-     * The transport policy to use. Defaults to {@link IceTransportPolicy#ICE_TRANSPORT_POLICY_ALL}
+     * The transport policy to use. Defaults to {@link IceTransportPolicy#ALL}
      */
     public final IceTransportPolicy iceTransportPolicy;
 
@@ -32,6 +32,6 @@ public class IceOptions {
     }
 
     public IceOptions() {
-        this(IceTransportPolicy.ICE_TRANSPORT_POLICY_ALL, null);
+        this(IceTransportPolicy.ALL, null);
     }
 }

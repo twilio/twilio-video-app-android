@@ -5,8 +5,7 @@ package com.twilio.video;
  */
 public enum IceTransportPolicy {
     // Only TURN relay transports will be used.
-    ICE_TRANSPORT_POLICY_RELAY,
-
+    RELAY,
     // All transports will be used.
-    ICE_TRANSPORT_POLICY_ALL
+    ALL
 }
