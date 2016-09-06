@@ -2,8 +2,6 @@ package com.twilio.video;
 
 import android.content.Context;
 
-import com.twilio.video.internal.Logger;
-
 import java.util.ArrayList;
 import java.util.List;
 

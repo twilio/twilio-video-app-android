@@ -3,8 +3,6 @@ package com.twilio.video;
 import android.Manifest;
 import android.content.Context;
 
-import com.twilio.video.internal.Logger;
-
 import org.webrtc.CameraEnumerationAndroid;
 import org.webrtc.SurfaceTextureHelper;
 import org.webrtc.VideoCapturerAndroid;

@@ -1,7 +1,5 @@
 package com.twilio.video;
 
-import com.twilio.video.internal.Logger;
-
 import java.util.HashMap;
 import java.util.Map;
 

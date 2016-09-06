@@ -7,8 +7,6 @@ import android.os.Handler;
 import android.util.Log;
 
 import com.twilio.common.AccessManager;
-import com.twilio.video.internal.Logger;
-import com.twilio.video.internal.ReLinker;
 
 import java.util.EnumMap;
 import java.util.LinkedList;

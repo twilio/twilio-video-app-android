@@ -1,4 +1,4 @@
-package com.twilio.video.internal;
+package com.twilio.video;
 
 import android.content.Context;
 import android.content.pm.ApplicationInfo;
@@ -21,7 +21,7 @@ import java.util.zip.ZipFile;
  * API 21
  */
 @SuppressWarnings({"deprecation", "PMD"})
-public class ReLinker {
+class ReLinker {
     private static final String LIB_DIR = "lib";
     private static final int MAX_TRIES = 5;
     private static final int COPY_BUFFER_SIZE = 4096;

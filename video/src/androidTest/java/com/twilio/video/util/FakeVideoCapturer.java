@@ -4,7 +4,7 @@ import com.twilio.video.VideoDimensions;
 import com.twilio.video.VideoFormat;
 import com.twilio.video.VideoCapturer;
 import com.twilio.video.VideoPixelFormat;
-import com.twilio.video.internal.Logger;
+import com.twilio.video.Logger;
 
 import java.util.ArrayList;
 import java.util.List;

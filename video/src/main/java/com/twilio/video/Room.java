@@ -2,8 +2,6 @@ package com.twilio.video;
 
 import android.os.Handler;
 
-import com.twilio.video.internal.Logger;
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
