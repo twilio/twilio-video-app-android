@@ -68,8 +68,8 @@ public class IceOptionsHelper {
 
     public static IceTransportPolicy convertToIceTransportPolicy(String iceTransportStr) {
         if (iceTransportStr.equalsIgnoreCase("relay")) {
-            return IceTransportPolicy.ICE_TRANSPORT_POLICY_RELAY;
+            return IceTransportPolicy.RELAY;
         }
-        return IceTransportPolicy.ICE_TRANSPORT_POLICY_ALL;
+        return IceTransportPolicy.ALL;
     }
 }
