@@ -39,16 +39,21 @@ public class VideoTrack {
      *
      * @param videoRenderer video renderer that receives video
      */
-    public synchronized void addRenderer(VideoRenderer videoRenderer) {
-        checkReleased();
+    public synchronized boolean addRenderer(VideoRenderer videoRenderer) throws
+            NullPointerException {
+        if (isReleased) {
+            logger.w("Cannot add renderer. Video track has been removed.");
+            return false;
+        }
         if (videoRenderer != null) {
             org.webrtc.VideoRenderer webrtcVideoRenderer =
                     createWebRtcVideoRenderer(videoRenderer);
             videoRenderersMap.put(videoRenderer, webrtcVideoRenderer);
             webrtcVideoTrack.addRenderer(webrtcVideoRenderer);
         } else {
-            logger.w(WARNING_NULL_RENDERER);
+            throw new NullPointerException(WARNING_NULL_RENDERER);
         }
+        return true;
     }
 
     /**
@@ -142,12 +147,6 @@ public class VideoTrack {
 
     org.webrtc.VideoTrack getWebrtcVideoTrack() {
         return webrtcVideoTrack;
-    }
-
-    private synchronized void checkReleased() {
-        if (isReleased) {
-            throw new IllegalStateException("The video track has been destroyed.");
-        }
     }
 
     private native void nativeRelease(long nativeVideoTrackContext);
