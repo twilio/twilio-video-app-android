@@ -1,11 +1,11 @@
-package com.twilio.video.internal;
+package com.twilio.video;
 
 import java.util.HashMap;
 import java.util.Map;
 
 import android.util.Log;
 
-public final class Logger {
+class Logger {
     public static final int INHERIT = Log.ASSERT + 1;
 
     private static final Map<Class<?>, Logger> loggers = new HashMap<Class<?>, Logger>();

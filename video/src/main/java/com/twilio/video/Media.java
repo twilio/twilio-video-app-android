@@ -1,9 +1,6 @@
 package com.twilio.video;
 
 import android.os.Handler;
-import android.provider.MediaStore;
-
-import com.twilio.video.internal.Logger;
 
 import java.util.ArrayList;
 import java.util.HashMap;

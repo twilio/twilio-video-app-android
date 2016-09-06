@@ -1,7 +1,5 @@
 package com.twilio.video;
 
-import com.twilio.video.internal.Logger;
-
 import org.webrtc.CameraEnumerationAndroid;
 
 import java.util.ArrayList;

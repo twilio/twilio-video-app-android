@@ -3,9 +3,6 @@ package com.twilio.video;
 
 import android.content.Context;
 
-import com.twilio.video.internal.Logger;
-import com.twilio.video.internal.ReLinker;
-
 class MediaFactory {
     private static final String RELEASE_MESSAGE_TEMPLATE = "MediaFactory released %s unavailable";
     private static volatile boolean libraryIsLoaded = false;
