@@ -29,15 +29,13 @@ public class IceOptions {
         return iceTransportPolicy;
     }
 
-    long createNativeContext() {
+    IceServer[] getIceServersArray() {
         IceServer[] iceServersArray = new IceServer[0];
         if (iceServers != null && iceServers.size() > 0) {
             iceServersArray = iceServers.toArray(new IceServer[iceServers.size()]);
         }
-        return nativeCreate(iceServersArray, iceTransportPolicy);
+        return iceServersArray;
     }
-
-    private native long nativeCreate(IceServer[] iceServers, IceTransportPolicy iceTransportPolicy);
 
     public static class Builder {
         private Set<IceServer> iceServers;

@@ -11,13 +11,10 @@ extern "C" {
 
 namespace twilio_video_jni {
 
-struct IceOptionsContext {
-    twilio::media::IceOptions ice_options;
+class IceOptions {
+public:
+    static twilio::media::IceOptions getIceOptions(JNIEnv *env, jobject j_ice_options);
 };
-
-
-JNIEXPORT jlong JNICALL Java_com_twilio_video_IceOptions_nativeCreate
-    (JNIEnv *, jobject, jobjectArray, jobject);
 
 }
 #ifdef __cplusplus

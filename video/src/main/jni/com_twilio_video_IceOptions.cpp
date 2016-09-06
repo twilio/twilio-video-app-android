@@ -6,11 +6,19 @@
 
 namespace twilio_video_jni {
 
-JNIEXPORT jlong JNICALL
-Java_com_twilio_video_IceOptions_nativeCreate(JNIEnv *env,
-                                              jobject j_instance,
-                                              jobjectArray j_ice_servers,
-                                              jobject j_ice_trans_policy) {
+twilio::media::IceOptions IceOptions::getIceOptions(JNIEnv *env, jobject j_ice_options) {
+    jclass j_ice_options_class = webrtc_jni::GetObjectClass(env, j_ice_options);
+    jmethodID j_get_ice_servers_array_id =
+        webrtc_jni::GetMethodID(env, j_ice_options_class,
+                                "getIceServersArray", "()[Lcom/twilio/video/IceServer;");
+    jmethodID j_get_ice_transport_policy_id =
+        webrtc_jni::GetMethodID(env, j_ice_options_class,
+                                "getIceTransportPolicy", "()Lcom/twilio/video/IceTransportPolicy;");
+    jobjectArray j_ice_servers =
+        (jobjectArray) env->CallObjectMethod(j_ice_options, j_get_ice_servers_array_id);
+    jobject j_ice_trans_policy =
+        env->CallObjectMethod(j_ice_options, j_get_ice_transport_policy_id);
+
     twilio::media::IceOptions ice_options;
     twilio::media::IceServers ice_servers;
     if (!webrtc_jni::IsNull(env, j_ice_servers)) {
@@ -72,9 +80,7 @@ Java_com_twilio_video_IceOptions_nativeCreate(JNIEnv *env,
                 twilio::media::IceTransportPolicy::kIceTransportPolicyAll;
         }
     }
-    IceOptionsContext *ice_options_context = new IceOptionsContext();
-    ice_options_context->ice_options = ice_options;
-    return webrtc_jni::jlongFromPointer(ice_options_context);
+    return ice_options;
 }
 }
 
