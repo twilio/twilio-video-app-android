@@ -6,6 +6,7 @@ import android.media.AudioManager;
 import android.os.Handler;
 import android.util.Log;
 
+import com.getkeepsafe.relinker.ReLinker;
 import com.twilio.common.AccessManager;
 
 import java.util.EnumMap;

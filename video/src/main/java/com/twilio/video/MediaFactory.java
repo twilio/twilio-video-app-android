@@ -1,7 +1,8 @@
 package com.twilio.video;
 
-
 import android.content.Context;
+
+import com.getkeepsafe.relinker.ReLinker;
 
 class MediaFactory {
     private static final String RELEASE_MESSAGE_TEMPLATE = "MediaFactory released %s unavailable";
