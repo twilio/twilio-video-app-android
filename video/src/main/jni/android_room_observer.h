@@ -297,7 +297,7 @@ private:
                                                            j_media,
                                                            *j_participant_class_,
                                                            j_participant_ctor_id_);
-            jni()->CallVoidMethod(j_participants, j_array_list_add_, j_participant);
+            jni()->CallBooleanMethod(j_participants, j_array_list_add_, j_participant);
         }
         return j_participants;
     }
