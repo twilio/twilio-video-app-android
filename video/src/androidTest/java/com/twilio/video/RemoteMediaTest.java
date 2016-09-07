@@ -12,6 +12,7 @@ import com.twilio.video.helper.AccessTokenHelper;
 import com.twilio.video.helper.CallbackHelper;
 import com.twilio.video.ui.RoomsTestActivity;
 import com.twilio.video.util.FakeVideoCapturer;
+import com.twilio.video.util.FakeVideoRenderer;
 import com.twilio.video.util.RandUtils;
 
 import org.junit.After;
@@ -27,6 +28,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
@@ -48,8 +50,10 @@ public class RemoteMediaTest {
     private AccessManager actor1AccessManager;
     private AccessManager actor2AccessManager;
     private Room room;
+    private Room actor2Room;
     private Participant participant;
     private String testRoom;
+    private CallbackHelper.FakeRoomListener roomListener;
 
 
     private Room connectClient(VideoClient videoClient, LocalMedia localMedia,
@@ -79,7 +83,7 @@ public class RemoteMediaTest {
             }
         });
         // Connect actor 1
-        CallbackHelper.FakeRoomListener roomListener = new CallbackHelper.FakeRoomListener();
+        roomListener = new CallbackHelper.FakeRoomListener();
         roomListener.onConnectedLatch = new CountDownLatch(1);
         roomListener.onParticipantConnectedLatch = new CountDownLatch(1);
         room = connectClient(actor1VideoClient, actor1LocalMedia, roomListener);
@@ -97,7 +101,7 @@ public class RemoteMediaTest {
             }
         });
         CallbackHelper.EmptyRoomListener roomListener2 = new CallbackHelper.EmptyRoomListener();
-        connectClient(actor2VideoClient, actor2LocalMedia, roomListener2);
+        actor2Room = connectClient(actor2VideoClient, actor2LocalMedia, roomListener2);
 
         // Wait for actor2 to connect
         assertTrue(roomListener.onParticipantConnectedLatch.await(20, TimeUnit.SECONDS));
@@ -111,6 +115,8 @@ public class RemoteMediaTest {
     public void teardown(){
         room.disconnect();
         room = null;
+        actor2Room.disconnect();
+        actor2Room = null;
         participant = null;
         actor1VideoClient.release();
         actor1VideoClient = null;
@@ -204,6 +210,56 @@ public class RemoteMediaTest {
         actor2LocalMedia.removeVideoTrack(videoTrack);
         assertTrue(mediaListener.onVideoTrackRemovedLatch.await(20, TimeUnit.SECONDS));
         assertTrue(true);
+    }
+
+    @Test
+    public void media_shouldSupportAddNullRenderer() throws InterruptedException {
+        CallbackHelper.FakeMediaListener mediaListener = new CallbackHelper.FakeMediaListener();
+        mediaListener.onVideoTrackAddedLatch = new CountDownLatch(1);
+        participant.getMedia().setListener(mediaListener);
+
+        LocalVideoTrack videoTrack = actor2LocalMedia.addVideoTrack(true, fakeVideoCapturer);
+        assertTrue(mediaListener.onVideoTrackAddedLatch.await(20, TimeUnit.SECONDS));
+        List<VideoTrack> videoTracks = participant.getMedia().getVideoTracks();
+        assertEquals(1, videoTracks.size());
+        videoTracks.get(0).addRenderer(null);
+    }
+
+    @Test
+    public void media_shouldAddRemoveRenderer() throws InterruptedException {
+        CallbackHelper.FakeMediaListener mediaListener = new CallbackHelper.FakeMediaListener();
+        mediaListener.onVideoTrackAddedLatch = new CountDownLatch(1);
+        participant.getMedia().setListener(mediaListener);
+
+        LocalVideoTrack videoTrack = actor2LocalMedia.addVideoTrack(true, fakeVideoCapturer);
+        assertTrue(mediaListener.onVideoTrackAddedLatch.await(20, TimeUnit.SECONDS));
+        List<VideoTrack> videoTracks = participant.getMedia().getVideoTracks();
+        assertEquals(1, videoTracks.size());
+        FakeVideoRenderer renderer = new FakeVideoRenderer();
+        videoTracks.get(0).addRenderer(renderer);
+        assertEquals(1, videoTracks.get(0).getRenderers().size());
+        videoTracks.get(0).removeRenderer(renderer);
+        assertEquals(0, videoTracks.get(0).getRenderers().size());
+    }
+
+    @Test
+    public void media_shouldFailToAddRendererOnRemovedTrack() throws InterruptedException {
+        CallbackHelper.FakeMediaListener mediaListener = new CallbackHelper.FakeMediaListener();
+        mediaListener.onVideoTrackAddedLatch = new CountDownLatch(1);
+        participant.getMedia().setListener(mediaListener);
+
+        LocalVideoTrack localVideoTrack = actor2LocalMedia.addVideoTrack(true, fakeVideoCapturer);
+        assertTrue(mediaListener.onVideoTrackAddedLatch.await(20, TimeUnit.SECONDS));
+        List<VideoTrack> videoTracks = participant.getMedia().getVideoTracks();
+        assertEquals(1, videoTracks.size());
+        FakeVideoRenderer renderer = new FakeVideoRenderer();
+        VideoTrack videoTrack = videoTracks.get(0);
+
+        roomListener.onParticipantDisconnectedLatch = new CountDownLatch(1);
+        actor2Room.disconnect();
+        assertTrue(roomListener.onParticipantDisconnectedLatch.await(20, TimeUnit.SECONDS));
+
+        videoTrack.addRenderer(renderer);
     }
 
     @Test

@@ -18,6 +18,7 @@ public class VideoTrack {
     private Map<VideoRenderer, org.webrtc.VideoRenderer> videoRenderersMap = new HashMap<>();
     private boolean isEnabled;
     private long nativeVideoTrackContext;
+    private boolean isReleased = false;
 
     VideoTrack(long nativeVideoTrackContext,
                String trackId,
@@ -38,7 +39,11 @@ public class VideoTrack {
      *
      * @param videoRenderer video renderer that receives video
      */
-    public void addRenderer(VideoRenderer videoRenderer) {
+    public synchronized void addRenderer(VideoRenderer videoRenderer) {
+        if (isReleased) {
+            logger.w("Cannot add renderer. Video track has been removed.");
+            return;
+        }
         if (videoRenderer != null) {
             org.webrtc.VideoRenderer webrtcVideoRenderer =
                     createWebRtcVideoRenderer(videoRenderer);
@@ -54,8 +59,8 @@ public class VideoTrack {
      *
      * @param videoRenderer the video renderer that should no longer receives video
      */
-    public void removeRenderer(VideoRenderer videoRenderer) {
-        if (videoRenderer != null) {
+    public synchronized void removeRenderer(VideoRenderer videoRenderer) {
+        if (!isReleased && videoRenderer != null) {
             org.webrtc.VideoRenderer webrtcVideoRenderer =
                     videoRenderersMap.remove(videoRenderer);
             if (webrtcVideoTrack != null && webrtcVideoRenderer != null) {
@@ -97,17 +102,12 @@ public class VideoTrack {
 
     synchronized void release() {
         if (nativeVideoTrackContext != 0) {
-            if (webrtcVideoTrack != null) {
-                // TODO: Right now disposing is causing a crash in Core related to
-                // PeerConnectionSignaling. Lot of changes has been done
-                // in webrtc track teardown in core, so I'll wait for RC before dealing with this.
-                // Things to consider, when we dispose webrtcVideoTrack, it will automatically dispose
-                // all webrtc renderers. Should we dispose before, or after notifing the user ?
-                // webrtcVideoTrack.dispose();
-                webrtcVideoTrack = null;
-            }
+            isEnabled = false;
+            videoRenderersMap.clear();
+            webrtcVideoTrack = null;
             nativeRelease(nativeVideoTrackContext);
             nativeVideoTrackContext = 0;
+            isReleased = true;
         }
     }
 
