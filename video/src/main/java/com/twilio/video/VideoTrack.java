@@ -39,11 +39,10 @@ public class VideoTrack {
      *
      * @param videoRenderer video renderer that receives video
      */
-    public synchronized boolean addRenderer(VideoRenderer videoRenderer) throws
-            NullPointerException {
+    public synchronized void addRenderer(VideoRenderer videoRenderer) {
         if (isReleased) {
             logger.w("Cannot add renderer. Video track has been removed.");
-            return false;
+            return;
         }
         if (videoRenderer != null) {
             org.webrtc.VideoRenderer webrtcVideoRenderer =
@@ -51,9 +50,8 @@ public class VideoTrack {
             videoRenderersMap.put(videoRenderer, webrtcVideoRenderer);
             webrtcVideoTrack.addRenderer(webrtcVideoRenderer);
         } else {
-            throw new NullPointerException(WARNING_NULL_RENDERER);
+            logger.w(WARNING_NULL_RENDERER);
         }
-        return true;
     }
 
     /**

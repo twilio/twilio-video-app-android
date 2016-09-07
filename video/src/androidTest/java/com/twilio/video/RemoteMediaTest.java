@@ -212,8 +212,8 @@ public class RemoteMediaTest {
         assertTrue(true);
     }
 
-    @Test(expected = NullPointerException.class)
-    public void media_shouldThrowExceptionOnAddNullRenderer() throws InterruptedException {
+    @Test
+    public void media_shouldSupportAddNullRenderer() throws InterruptedException {
         CallbackHelper.FakeMediaListener mediaListener = new CallbackHelper.FakeMediaListener();
         mediaListener.onVideoTrackAddedLatch = new CountDownLatch(1);
         participant.getMedia().setListener(mediaListener);
@@ -236,7 +236,7 @@ public class RemoteMediaTest {
         List<VideoTrack> videoTracks = participant.getMedia().getVideoTracks();
         assertEquals(1, videoTracks.size());
         FakeVideoRenderer renderer = new FakeVideoRenderer();
-        assertTrue(videoTracks.get(0).addRenderer(renderer));
+        videoTracks.get(0).addRenderer(renderer);
         assertEquals(1, videoTracks.get(0).getRenderers().size());
         videoTracks.get(0).removeRenderer(renderer);
         assertEquals(0, videoTracks.get(0).getRenderers().size());
@@ -259,7 +259,7 @@ public class RemoteMediaTest {
         actor2Room.disconnect();
         assertTrue(roomListener.onParticipantDisconnectedLatch.await(20, TimeUnit.SECONDS));
 
-        assertFalse(videoTrack.addRenderer(renderer));
+        videoTrack.addRenderer(renderer);
     }
 
     @Test
