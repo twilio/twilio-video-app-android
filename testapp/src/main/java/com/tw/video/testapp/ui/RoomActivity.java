@@ -1,6 +1,10 @@
 package com.tw.video.testapp.ui;
 
+import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
+import android.media.projection.MediaProjectionManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.FloatingActionButton;
@@ -28,6 +32,7 @@ import com.twilio.video.LocalVideoTrack;
 import com.twilio.video.Media;
 import com.twilio.video.Participant;
 import com.twilio.video.Room;
+import com.twilio.video.ScreenCapturer;
 import com.twilio.video.VideoClient;
 import com.twilio.video.VideoException;
 import com.twilio.video.VideoTrack;
@@ -231,6 +236,43 @@ public class RoomActivity extends AppCompatActivity {
     @OnClick(R.id.local_video_action_fab)
     public void toggleLocalVideo(View view) {
         int icon = 0;
+        if (localVideoTrack == null) {
+            localVideoTrack = localMedia.addVideoTrack(true, cameraCapturer);
+            if (room != null && !videoViewMap.isEmpty()) {
+                localVideoView = createVideoView();
+                localVideoTrack.addRenderer(localVideoView);
+                thumbnailLinearLayout.addView(localVideoView);
+                thumbnailLinearLayout.setVisibility(View.VISIBLE);
+            } else {
+                // Set as primary video view
+                localVideoView = primaryVideoView;
+                localVideoTrack.addRenderer(primaryVideoView);
+            }
+            switchCameraActionFab.show();
+            localVideoPauseFab.show();
+            icon = R.drawable.ic_videocam_white_24px;
+        } else {
+            if (localVideoView == primaryVideoView) {
+                // TODO: do something with primaryVideoView to show empty pic
+            } else {
+                thumbnailLinearLayout.removeView(localVideoView);
+                if (videoViewMap.isEmpty()) {
+                    thumbnailLinearLayout.setVisibility(View.GONE);
+                }
+            }
+            localVideoTrack.removeRenderer(localVideoView);
+            if (!localMedia.removeVideoTrack(localVideoTrack)) {
+                Snackbar.make(roomStatusTextview,
+                        "Video track remove action failed",
+                        Snackbar.LENGTH_LONG).setAction("Action", null).show();
+            }
+            localVideoTrack = null;
+            localVideoView = null;
+            switchCameraActionFab.hide();
+            localVideoPauseFab.hide();
+            icon = R.drawable.ic_videocam_off_gray_24px;
+
+        }
 //        if (localVideoTrack == null) {
 //            localVideoTrack = localMedia.addVideoTrack(true, cameraCapturer);
 //            if (room != null && room.getParticipants().size() > 0) {
@@ -275,9 +317,16 @@ public class RoomActivity extends AppCompatActivity {
     }
 
     private synchronized void addParticipant(Participant participant) {
+        if (videoViewMap.size() > 3) {
+            Toast.makeText(this, "Do not support multiple participants yet", Toast.LENGTH_LONG)
+                    .show();
+            return;
+        }
         roomStatusTextview.setText("Participant "+participant.getIdentity()+ " joined");
         VideoView videoView = null;
         if (videoViewMap.isEmpty()) {
+            // Move local renderer from main view to thumbnail and
+            // set participant renderer to main view
             localVideoTrack.removeRenderer(primaryVideoView);
             localVideoView = createVideoView();
             localVideoTrack.addRenderer(localVideoView);
@@ -292,6 +341,10 @@ public class RoomActivity extends AppCompatActivity {
             thumbnailLinearLayout.addView(videoView);
         }
         videoViewMap.put(participant, videoView);
+        List<VideoTrack> videoTracks = participant.getMedia().getVideoTracks();
+        if (!videoTracks.isEmpty()) {
+            videoTracks.get(0).addRenderer(videoView);
+        }
         participant.getMedia().setListener(new ParticipantMediaListener(participant));
     }
 
@@ -307,8 +360,8 @@ public class RoomActivity extends AppCompatActivity {
             participantVideoTracks.get(0).removeRenderer(videoView);
         }
         if (videoView == primaryVideoView) {
-            // Pick next view from thumbnail layout
             if (videoViewMap.size() != 0) {
+                // Pick next view from thumbnail layout
                 Map.Entry<Participant, VideoView> entry = videoViewMap.entrySet().iterator().next();
                 thumbnailLinearLayout.removeView(entry.getValue());
                 Participant nextParticipant = entry.getKey();
@@ -324,9 +377,12 @@ public class RoomActivity extends AppCompatActivity {
                 localVideoView = primaryVideoView;
                 thumbnailLinearLayout.setVisibility(View.GONE);
             }
-
         } else {
             thumbnailLinearLayout.removeView(videoView);
+        }
+        if (videoViewMap.isEmpty()) {
+            thumbnailLinearLayout.removeAllViews();
+            thumbnailLinearLayout.setVisibility(View.GONE);
         }
     }
 
