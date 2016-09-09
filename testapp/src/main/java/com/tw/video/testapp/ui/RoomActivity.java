@@ -368,8 +368,6 @@ public class RoomActivity extends AppCompatActivity {
 
                 for (Map.Entry<String, Participant> entry : room.getParticipants().entrySet()) {
                     addParticipant(entry.getValue());
-                    // TODO just grabbing first participant...need to support multiple participants
-                    //break;
                 }
             }
 
