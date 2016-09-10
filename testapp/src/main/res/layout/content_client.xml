@@ -8,14 +8,13 @@
              android:keepScreenOn="true"
              tools:showIn="@layout/activity_client">
 
-    <com.twilio.video.VideoView
-        android:id="@+id/thumbnail_video_view"
-        app:overlaySurface="true"
-        app:mirror="true"
-        android:visibility="gone"
-        android:layout_width="96dp"
+    <LinearLayout
+        android:id="@+id/thumbnail_linear_layout"
+        android:layout_width="match_parent"
         android:layout_height="96dp"
         android:layout_margin="16dp"
+        android:orientation="horizontal"
+        android:visibility="gone"
         android:layout_gravity="bottom|left"/>
 
     <com.twilio.video.VideoView

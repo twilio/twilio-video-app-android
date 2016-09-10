@@ -93,7 +93,7 @@ public class LocalMedia {
             localVideoTracks.add(localVideoTrack);
             return localVideoTrack;
         } else {
-            logger.e("Failed to create local audio track");
+            logger.e("Failed to create local video track");
         }
 
         return localVideoTrack;
