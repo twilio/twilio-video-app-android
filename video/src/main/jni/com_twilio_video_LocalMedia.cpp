@@ -156,12 +156,14 @@ JNIEXPORT jlong JNICALL Java_com_twilio_video_LocalMedia_nativeAddAudioTrack(JNI
                                                                              jboolean enabled,
                                                                              jobject j_audio_options) {
     std::shared_ptr<twilio::media::LocalMedia> local_media = getLocalMedia(local_media_handle);
-    std::shared_ptr<twilio::media::AudioTrack> audio_track = local_media->addAudioTrack(enabled,
-                                                                         getAudioOptions(j_audio_options));
 
-    return (audio_track == nullptr) ?
+    // TODO: convert audio options
+    std::shared_ptr<twilio::media::LocalAudioTrack> local_audio_track =
+            local_media->addAudioTrack(enabled);
+
+    return (local_audio_track == nullptr) ?
            (0) :
-           (webrtc_jni::jlongFromPointer(audio_track.get()->getWebRtcTrack()));
+           (webrtc_jni::jlongFromPointer(local_audio_track.get()->getWebRtcTrack()));
 }
 
 JNIEXPORT jboolean JNICALL Java_com_twilio_video_LocalMedia_nativeRemoveAudioTrack(JNIEnv *jni,

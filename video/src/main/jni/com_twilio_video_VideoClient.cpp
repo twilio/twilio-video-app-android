@@ -12,10 +12,12 @@
 #include "common/AccessManager/AccessManager.h"
 #include "video/logger.h"
 #include "video/video.h"
+#include "video/connect_options.h"
+#include "video/client_options.h"
 #include "media/media_factory.h"
+
 #include "android_platform_info_provider.h"
 #include "android_room_observer.h"
-#include "video/connect_options.h"
 #include "com_twilio_video_ConnectOptions.h"
 #include "com_twilio_video_Room.h"
 #include "com_twilio_video_MediaFactory.h"
@@ -74,11 +76,9 @@ JNIEXPORT jint JNICALL Java_com_twilio_video_VideoClient_nativeGetCoreLogLevel
 class ClientContext {
 public:
     ClientContext(std::unique_ptr<twilio::video::Client> client,
-                  std::shared_ptr<twilio::media::MediaFactory> media_factory,
-                  twilio::video::Invoker *invoker) {
+                  std::shared_ptr<twilio::media::MediaFactory> media_factory) {
         client_ = std::move(client);
         media_factory_ = media_factory;
-        invoker_ = invoker;
     }
 
     virtual ~ClientContext() {
@@ -97,12 +97,12 @@ public:
 private:
     std::unique_ptr<twilio::video::Client> client_;
     std::shared_ptr<twilio::media::MediaFactory> media_factory_;
-    twilio::video::Invoker *invoker_;
 };
 
 JNIEXPORT jlong JNICALL
 Java_com_twilio_video_VideoClient_nativeCreateClient(JNIEnv *env,
                                                      jobject j_instance,
+                                                     jobject j_context,
                                                      jobject j_access_manager,
                                                      jlong media_factory_handle) {
 
@@ -116,15 +116,23 @@ Java_com_twilio_video_VideoClient_nativeCreateClient(JNIEnv *env,
     // to the shared_ptr
     std::shared_ptr<TwilioCommon::AccessManager> access_manager =
             *(reinterpret_cast<std::shared_ptr<TwilioCommon::AccessManager> *>(j_access_mgr_handle));
+
     std::shared_ptr<twilio::media::MediaFactory> media_factory =
             twilio_video_jni::getMediaFactory(media_factory_handle);
-    twilio::video::Invoker *invoker = new twilio::video::Invoker();
+
+    AndroidPlatformInfoProvider *andr_plat_inf_provider =
+            new AndroidPlatformInfoProvider(env, j_context);
+
+    twilio::video::ClientOptions client_options = twilio::video::ClientOptions::Builder()
+        .setPlatformInfoProvider(andr_plat_inf_provider)
+        .build();
+
     std::unique_ptr<twilio::video::Client> client =
             twilio::video::Client::create(access_manager,
                                           media_factory,
-                                          invoker);
+                                          client_options);
     return jlongFromPointer(
-            new ClientContext(std::move(client), media_factory, invoker));
+            new ClientContext(std::move(client), media_factory));
 
 }
 

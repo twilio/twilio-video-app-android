@@ -9,7 +9,7 @@ import java.util.Map;
 /**
  * A video track represents a single local or remote video source
  */
-public class VideoTrack {
+public class VideoTrack implements Track {
     private static final String WARNING_NULL_RENDERER = "Attempted to add a null renderer.";
     private static final Logger logger = Logger.getLogger(VideoTrack.class);
 
@@ -80,6 +80,7 @@ public class VideoTrack {
      * This video track id
      * @return track id
      */
+    @Override
     public String getTrackId() {
         return trackId;
     }
@@ -88,6 +89,7 @@ public class VideoTrack {
      * Check if this video track is enabled
      * @return true if track is enabled
      */
+    @Override
     public boolean isEnabled() {
         return isEnabled;
     }
