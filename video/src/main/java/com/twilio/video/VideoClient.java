@@ -133,7 +133,8 @@ public class VideoClient {
             trySetCoreModuleLogLevel(module.ordinal(), moduleLogLevel.get(module).ordinal());
         }
 
-        nativeClientContext = nativeCreateClient(accessManager,
+        nativeClientContext = nativeCreateClient(context,
+                accessManager,
                 MediaFactory.instance(context).getNativeMediaFactoryHandle());
     }
 
@@ -346,7 +347,8 @@ public class VideoClient {
 
     private native static int nativeGetCoreLogLevel();
 
-    private native long nativeCreateClient(AccessManager accessManager,
+    private native long nativeCreateClient(Context context,
+                                           AccessManager accessManager,
                                            long nativeMediaFactoryHandle);
 
     private native long nativeConnect(long nativeClientDataHandler,

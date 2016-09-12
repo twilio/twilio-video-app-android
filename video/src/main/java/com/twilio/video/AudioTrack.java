@@ -3,7 +3,7 @@ package com.twilio.video;
 /**
  * An audio track represents a single local or remote audio source
  */
-public class AudioTrack {
+public class AudioTrack implements Track {
     private org.webrtc.AudioTrack webrtcAudioTrack;
     private String trackId;
     private long nativeAudioTrackContext;
@@ -17,10 +17,15 @@ public class AudioTrack {
         webrtcAudioTrack = new org.webrtc.AudioTrack(nativeWebrtcTrack);
     }
 
+    AudioTrack(org.webrtc.AudioTrack webrtcAudioTrack) {
+        this.webrtcAudioTrack = webrtcAudioTrack;
+    }
+
     /**
      * This audio track id
      * @return track id
      */
+    @Override
     public String getTrackId() {
         return trackId;
     }
@@ -29,8 +34,13 @@ public class AudioTrack {
      * Check if this audio track is enabled
      * @return true if track is enabled
      */
+    @Override
     public boolean isEnabled() {
         return isEnabled;
+    }
+
+    org.webrtc.AudioTrack getWebrtcAudioTrack() {
+        return webrtcAudioTrack;
     }
 
     void setEnabled(boolean isEnabled) {
