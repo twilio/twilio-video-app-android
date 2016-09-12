@@ -120,11 +120,11 @@ Java_com_twilio_video_VideoClient_nativeCreateClient(JNIEnv *env,
     std::shared_ptr<twilio::media::MediaFactory> media_factory =
             twilio_video_jni::getMediaFactory(media_factory_handle);
 
-    AndroidPlatformInfoProvider *andr_plat_inf_provider =
+    AndroidPlatformInfoProvider *android_platform_info_provider =
             new AndroidPlatformInfoProvider(env, j_context);
 
     twilio::video::ClientOptions client_options = twilio::video::ClientOptions::Builder()
-        .setPlatformInfoProvider(andr_plat_inf_provider)
+        .setPlatformInfoProvider(android_platform_info_provider)
         .build();
 
     std::unique_ptr<twilio::video::Client> client =
