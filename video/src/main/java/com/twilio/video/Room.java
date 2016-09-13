@@ -30,13 +30,16 @@ public class Room {
     private Map<String, Participant> participantMap = new HashMap<>();
     private InternalRoomListenerHandle internalRoomListenerHandle;
     private InternalRoomListenerImpl internalRoomListenerImpl;
+    private LocalParticipant localParticipant;
     private Room.Listener listener;
     private final Handler handler;
 
-    Room(String name, LocalMedia localMedia, Room.Listener listener, Handler handler) {
+    Room(String name, LocalMedia localMedia, String localParticipantIdentity,
+         Room.Listener listener, Handler handler) {
         this.name = name;
         this.localMedia = localMedia;
         this.sid = "";
+        this.localParticipant = new LocalParticipant(localParticipantIdentity, localMedia);
         this.roomState = RoomState.DISCONNECTED;
         this.listener = listener;
         this.internalRoomListenerImpl = new InternalRoomListenerImpl();
@@ -62,6 +65,13 @@ public class Room {
 
     public LocalMedia getLocalMedia() {
         return localMedia;
+    }
+
+    public LocalParticipant getLocalParticipant() {
+        if (roomState != RoomState.CONNECTED) {
+            return null;
+        }
+        return localParticipant;
     }
 
     public synchronized void disconnect() {
@@ -105,7 +115,9 @@ public class Room {
 
     // JNI Callbacks Interface
     interface InternalRoomListener {
-        void onConnected(String roomSid, List<Participant> participantList);
+        void onConnected(String roomSid,
+                         String localParticipantSid,
+                         List<Participant> participantList);
         void onDisconnected(int errorCode);
         void onConnectFailure(int errorCode);
         void onParticipantConnected(Participant participant);
@@ -120,13 +132,16 @@ public class Room {
         }
 
         @Override
-        public synchronized void onConnected(String roomSid, List<Participant> participantList) {
+        public synchronized void onConnected(String roomSid,
+                                             String localParticipantSid,
+                                             List<Participant> participantList) {
             logger.d("onConnected()");
-            Room.this.roomState = RoomState.CONNECTED;
             Room.this.sid = roomSid;
+            Room.this.localParticipant.setSid(localParticipantSid);
             for (Participant participant : participantList) {
                 participantMap.put(participant.getSid(), participant);
             }
+            Room.this.roomState = RoomState.CONNECTED;
             handler.post(new Runnable() {
                 @Override
                 public void run() {

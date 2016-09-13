@@ -75,28 +75,20 @@ JNIEXPORT jint JNICALL Java_com_twilio_video_VideoClient_nativeGetCoreLogLevel
 
 class ClientContext {
 public:
-    ClientContext(std::unique_ptr<twilio::video::Client> client,
-                  std::shared_ptr<twilio::media::MediaFactory> media_factory) {
+    ClientContext(std::unique_ptr<twilio::video::Client> client) {
         client_ = std::move(client);
-        media_factory_ = media_factory;
     }
 
     virtual ~ClientContext() {
-        // TODO: deleting invoker causes a crash in core
-        // delete invoker_;
     }
 
     twilio::video::Client &getClient() const {
         return *client_;
     }
 
-    std::shared_ptr<twilio::media::MediaFactory> getMediaFactory() const {
-        return media_factory_;
-    }
 
 private:
     std::unique_ptr<twilio::video::Client> client_;
-    std::shared_ptr<twilio::media::MediaFactory> media_factory_;
 };
 
 JNIEXPORT jlong JNICALL
@@ -132,7 +124,7 @@ Java_com_twilio_video_VideoClient_nativeCreateClient(JNIEnv *env,
                                           media_factory,
                                           client_options);
     return jlongFromPointer(
-            new ClientContext(std::move(client), media_factory));
+            new ClientContext(std::move(client)));
 
 }
 

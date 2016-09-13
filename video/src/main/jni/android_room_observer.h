@@ -29,7 +29,7 @@ public:
             GetMethodID(env,
                         *j_room_observer_class_,
                         "onConnected",
-                        "(Ljava/lang/String;Ljava/util/List;)V")),
+                        "(Ljava/lang/String;Ljava/lang/String;Ljava/util/List;)V")),
         j_on_disconnected_(
             GetMethodID(env,
                         *j_room_observer_class_,
@@ -119,9 +119,13 @@ protected:
             }
 
             jstring j_room_sid = webrtc_jni::JavaStringFromStdString(jni(), room->getSid());
+            std::string local_participant_sid = room->getLocalParticipant()->getSid();
+            jstring j_local_participant_sid =
+                webrtc_jni::JavaStringFromStdString(jni(), local_participant_sid);
             jobject j_participants = createJavaParticipantList(room->getParticipants());
 
-            jni()->CallVoidMethod(*j_room_observer_, j_on_connected_, j_room_sid, j_participants);
+            jni()->CallVoidMethod(*j_room_observer_, j_on_connected_,
+                                  j_room_sid, j_local_participant_sid, j_participants);
             CHECK_EXCEPTION(jni()) << "error during CallVoidMethod";
         }
     }
