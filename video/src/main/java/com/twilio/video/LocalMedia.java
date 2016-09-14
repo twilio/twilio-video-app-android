@@ -39,14 +39,10 @@ public class LocalMedia {
 
     public LocalAudioTrack addAudioTrack(boolean enabled, AudioOptions audioOptions) {
         checkReleased("addAudioTrack");
-        long nativeAudioTrack = nativeAddAudioTrack(nativeLocalMediaHandle, enabled, audioOptions);
-        LocalAudioTrack localAudioTrack = null;
+        LocalAudioTrack localAudioTrack = nativeAddAudioTrack(nativeLocalMediaHandle,
+                enabled, audioOptions);
 
-        if (nativeAudioTrack != 0) {
-            org.webrtc.AudioTrack webRtcAudioTrack = new org.webrtc.AudioTrack(nativeAudioTrack);
-            localAudioTrack = new LocalAudioTrack(webRtcAudioTrack);
-
-            localAudioTrack.enable(enabled);
+        if (localAudioTrack != null) {
             localAudioTracks.add(localAudioTrack);
             return localAudioTrack;
         } else {
@@ -58,14 +54,18 @@ public class LocalMedia {
 
     public boolean removeAudioTrack(LocalAudioTrack localAudioTrack) {
         checkReleased("removeAudioTrack");
-        boolean result = localAudioTrack != null &&
-                localAudioTracks.contains(localAudioTrack) &&
-                nativeRemoveAudioTrack(nativeLocalMediaHandle, localAudioTrack.getTrackId());
+        boolean result = false;
 
-        if (!result) {
-            logger.e("Failed to remove audio track");
-        } else {
-            localAudioTracks.remove(localAudioTrack);
+        if (localAudioTrack != null) {
+            result = localAudioTracks.contains(localAudioTrack) &&
+                    nativeRemoveAudioTrack(nativeLocalMediaHandle, localAudioTrack.getTrackId());
+
+            if (!result) {
+                logger.e("Failed to remove audio track");
+            } else {
+                localAudioTracks.remove(localAudioTrack);
+                localAudioTrack.release();
+            }
         }
 
         return result;
@@ -117,10 +117,19 @@ public class LocalMedia {
 
     public void release() {
         if (nativeLocalMediaHandle != 0) {
+            /*
+             * We clear all the tracks. Note that we must make a copy of the list to avoid a
+             * ConcurrentModificationException
+             */
+            for (LocalAudioTrack localAudioTrack : new ArrayList<>(localAudioTracks)) {
+                removeAudioTrack(localAudioTrack);
+            }
+            for (LocalVideoTrack localVideoTrack : new ArrayList<>(localVideoTracks)) {
+                removeVideoTrack(localVideoTrack);
+            }
             nativeRelease(nativeLocalMediaHandle);
             nativeLocalMediaHandle = 0;
-            localAudioTracks.clear();
-            localVideoTracks.clear();
+
             mediaFactory.release();
         }
     }
@@ -138,9 +147,9 @@ public class LocalMedia {
     }
 
     private static native AudioOptions nativeGetDefaultAudioOptions();
-    private native long nativeAddAudioTrack(long nativeLocalMediaHandle,
-                                            boolean enabled,
-                                            AudioOptions audioOptions);
+    private native LocalAudioTrack nativeAddAudioTrack(long nativeLocalMediaHandle,
+                                                       boolean enabled,
+                                                       AudioOptions audioOptions);
     private native boolean nativeRemoveAudioTrack(long nativeLocalMediaHandle, String trackId);
     private native long nativeAddVideoTrack(long nativeLocalMediaHandle,
                                             boolean enabled,

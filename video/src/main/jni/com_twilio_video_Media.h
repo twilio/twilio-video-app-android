@@ -1,5 +1,6 @@
-#ifndef CONVERSATIONS_ANDROID_COM_TWILIO_VIDEO_MEDIA_H_H
-#define CONVERSATIONS_ANDROID_COM_TWILIO_VIDEO_MEDIA_H_H
+#ifndef VIDEO_ANDROID_COM_TWILIO_VIDEO_MEDIA_H_
+#define VIDEO_ANDROID_COM_TWILIO_VIDEO_MEDIA_H_
+
 #include <jni.h>
 
 #include "media/media.h"
@@ -13,32 +14,21 @@ struct MediaContext {
     std::shared_ptr<twilio::media::Media> media;
 };
 
-struct AudioTrackContext {
-    std::shared_ptr<twilio::media::AudioTrack> audio_track;
-};
-
 struct VideoTrackContext {
     std::shared_ptr<twilio::media::VideoTrack> video_track;
 };
 
 jobject createJavaAudioTrack(JNIEnv *env,
                              std::shared_ptr<twilio::media::AudioTrack> audio_track,
-                             jclass j_audio_track_class, jmethodID j_audio_track_ctor_id);
+                             jclass j_audio_track_class,
+                             jmethodID j_audio_track_ctor_id);
 
 jobject createJavaVideoTrack(JNIEnv *env,
                              std::shared_ptr<twilio::media::VideoTrack> video_track,
                              jclass j_video_track_class, jmethodID j_video_track_ctor_id);
 
-/*
- * Class:     com_twilio_video_Media
- * Method:    nativeSetInternalListener
- * Signature: (JJ)V
- */
 JNIEXPORT void JNICALL Java_com_twilio_video_Media_nativeSetInternalListener
     (JNIEnv *, jobject, jlong, jlong);
-
-JNIEXPORT void JNICALL Java_com_twilio_video_AudioTrack_nativeRelease
-    (JNIEnv *, jobject, jlong);
 
 JNIEXPORT void JNICALL Java_com_twilio_video_VideoTrack_nativeRelease
     (JNIEnv *, jobject, jlong);
@@ -46,20 +36,9 @@ JNIEXPORT void JNICALL Java_com_twilio_video_VideoTrack_nativeRelease
 JNIEXPORT void JNICALL Java_com_twilio_video_Media_nativeRelease
     (JNIEnv *, jobject, jlong);
 
-
-/*
- * Class:     com_twilio_video_Media_InternalMediaListenerHandle
- * Method:    nativeCreate
- * Signature: (Ljava/lang/Object;)J
- */
 JNIEXPORT jlong JNICALL Java_com_twilio_video_Media_00024InternalMediaListenerHandle_nativeCreate
     (JNIEnv *, jobject, jobject);
 
-/*
- * Class:     com_twilio_video_Media_InternalMediaListenerHandle
- * Method:    nativeRelease
- * Signature: (J)V
- */
 JNIEXPORT void JNICALL Java_com_twilio_video_Media_00024InternalMediaListenerHandle_nativeRelease
     (JNIEnv *, jobject, jlong);
 
@@ -68,4 +47,4 @@ JNIEXPORT void JNICALL Java_com_twilio_video_Media_00024InternalMediaListenerHan
 }
 #endif
 
-#endif //CONVERSATIONS_ANDROID_COM_TWILIO_VIDEO_MEDIA_H_H
+#endif // VIDEO_ANDROID_COM_TWILIO_VIDEO_MEDIA_H_

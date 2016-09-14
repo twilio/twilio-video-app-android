@@ -4,21 +4,13 @@ package com.twilio.video;
  * An audio track represents a single local or remote audio source
  */
 public class AudioTrack implements Track {
-    private org.webrtc.AudioTrack webrtcAudioTrack;
     private String trackId;
-    private long nativeAudioTrackContext;
     private boolean isEnabled;
 
-    AudioTrack(long nativeAudioTrackContext, String trackId,
-               boolean isEnabled, long nativeWebrtcTrack) {
-        this.nativeAudioTrackContext = nativeAudioTrackContext;
+    AudioTrack(String trackId,
+               boolean isEnabled) {
         this.trackId = trackId;
         this.isEnabled = isEnabled;
-        webrtcAudioTrack = new org.webrtc.AudioTrack(nativeWebrtcTrack);
-    }
-
-    AudioTrack(org.webrtc.AudioTrack webrtcAudioTrack) {
-        this.webrtcAudioTrack = webrtcAudioTrack;
     }
 
     /**
@@ -39,23 +31,7 @@ public class AudioTrack implements Track {
         return isEnabled;
     }
 
-    org.webrtc.AudioTrack getWebrtcAudioTrack() {
-        return webrtcAudioTrack;
-    }
-
     void setEnabled(boolean isEnabled) {
         this.isEnabled = isEnabled;
     }
-
-    synchronized void release() {
-        if (nativeAudioTrackContext != 0) {
-            isEnabled = false;
-            webrtcAudioTrack = null;
-            nativeRelease(nativeAudioTrackContext);
-            nativeAudioTrackContext = 0;
-        }
-    }
-
-    private native void nativeRelease(long nativeAudioTrackContext);
-
 }

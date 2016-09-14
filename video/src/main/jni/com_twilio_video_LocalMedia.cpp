@@ -1,4 +1,5 @@
 #include "com_twilio_video_LocalMedia.h"
+#include "com_twilio_video_LocalAudioTrack.h"
 #include "com_twilio_video_VideoCapturerDelegate.h"
 #include "webrtc/api/androidvideocapturer.h"
 #include "webrtc/api/java/jni/androidvideocapturer_jni.h"
@@ -150,11 +151,11 @@ JNIEXPORT jobject JNICALL Java_com_twilio_video_LocalMedia_nativeGetDefaultAudio
     return nullptr;
 }
 
-JNIEXPORT jlong JNICALL Java_com_twilio_video_LocalMedia_nativeAddAudioTrack(JNIEnv *jni,
-                                                                             jobject j_local_media,
-                                                                             jlong local_media_handle,
-                                                                             jboolean enabled,
-                                                                             jobject j_audio_options) {
+JNIEXPORT jobject JNICALL Java_com_twilio_video_LocalMedia_nativeAddAudioTrack(JNIEnv *jni,
+                                                                               jobject j_local_media,
+                                                                               jlong local_media_handle,
+                                                                               jboolean enabled,
+                                                                               jobject j_audio_options) {
     std::shared_ptr<twilio::media::LocalMedia> local_media = getLocalMedia(local_media_handle);
 
     // TODO: convert audio options
@@ -162,8 +163,8 @@ JNIEXPORT jlong JNICALL Java_com_twilio_video_LocalMedia_nativeAddAudioTrack(JNI
             local_media->addAudioTrack(enabled);
 
     return (local_audio_track == nullptr) ?
-           (0) :
-           (webrtc_jni::jlongFromPointer(local_audio_track.get()->getWebRtcTrack()));
+           (nullptr) :
+           (createJavaLocalAudioTrack(local_audio_track));
 }
 
 JNIEXPORT jboolean JNICALL Java_com_twilio_video_LocalMedia_nativeRemoveAudioTrack(JNIEnv *jni,
