@@ -31,11 +31,13 @@ static bool media_jvm_set = false;
 
 extern "C" jint JNIEXPORT JNICALL JNI_OnLoad(JavaVM *jvm, void *reserved) {
     std::string func_name = std::string(__FUNCTION__);
-    TS_CORE_LOG_MODULE(kTSCoreLogModulePlatform, kTSCoreLogLevelDebug, "%s", func_name.c_str());
+    TS_CORE_LOG_MODULE(twilio::video::kTSCoreLogModulePlatform,
+                       twilio::video::kTSCoreLogLevelDebug,
+                       "%s", func_name.c_str());
     jint ret = InitGlobalJniVariables(jvm);
     if (ret < 0) {
-        TS_CORE_LOG_MODULE(kTSCoreLogModulePlatform,
-                           kTSCoreLogLevelError,
+        TS_CORE_LOG_MODULE(twilio::video::kTSCoreLogModulePlatform,
+                           twilio::video::kTSCoreLogLevelError,
                            "InitGlobalJniVariables() failed");
         return -1;
     }
@@ -47,30 +49,38 @@ extern "C" jint JNIEXPORT JNICALL JNI_OnLoad(JavaVM *jvm, void *reserved) {
 
 extern "C" void JNIEXPORT JNICALL JNI_OnUnLoad(JavaVM *jvm, void *reserved) {
     std::string func_name = std::string(__FUNCTION__);
-    TS_CORE_LOG_MODULE(kTSCoreLogModulePlatform, kTSCoreLogLevelDebug, "%s", func_name.c_str());
+    TS_CORE_LOG_MODULE(twilio::video::kTSCoreLogModulePlatform,
+                       twilio::video::kTSCoreLogLevelDebug,
+                       "%s", func_name.c_str());
     twilio_video_jni::FreeGlobalClassReferenceHolder();
     webrtc_jni::FreeGlobalClassReferenceHolder();
 }
 
 JNIEXPORT void JNICALL Java_com_twilio_video_VideoClient_nativeSetCoreLogLevel
         (JNIEnv *env, jobject instance, jint level) {
-    TS_CORE_LOG_MODULE(kTSCoreLogModulePlatform, kTSCoreLogLevelDebug, "setCoreLogLevel");
-    TSCoreLogLevel coreLogLevel = static_cast<TSCoreLogLevel>(level);
-    Logger::instance()->setLogLevel(coreLogLevel);
+    TS_CORE_LOG_MODULE(twilio::video::kTSCoreLogModulePlatform,
+                       twilio::video::kTSCoreLogLevelDebug,
+                       "setCoreLogLevel");
+    twilio::video::TSCoreLogLevel coreLogLevel = static_cast<twilio::video::TSCoreLogLevel>(level);
+    twilio::video::Logger::instance()->setLogLevel(coreLogLevel);
 }
 
 JNIEXPORT void JNICALL Java_com_twilio_video_VideoClient_nativeSetModuleLevel
         (JNIEnv *env, jobject instance, jint module, jint level) {
-    TS_CORE_LOG_MODULE(kTSCoreLogModulePlatform, kTSCoreLogLevelDebug, "setModuleLevel");
-    TSCoreLogModule coreLogModule = static_cast<TSCoreLogModule>(module);
-    TSCoreLogLevel coreLogLevel = static_cast<TSCoreLogLevel>(level);
-    Logger::instance()->setModuleLogLevel(coreLogModule, coreLogLevel);
+    TS_CORE_LOG_MODULE(twilio::video::kTSCoreLogModulePlatform,
+                       twilio::video::kTSCoreLogLevelDebug,
+                       "setModuleLevel");
+    twilio::video::TSCoreLogModule coreLogModule = static_cast<twilio::video::TSCoreLogModule>(module);
+    twilio::video::TSCoreLogLevel coreLogLevel = static_cast<twilio::video::TSCoreLogLevel>(level);
+    twilio::video::Logger::instance()->setModuleLogLevel(coreLogModule, coreLogLevel);
 }
 
 JNIEXPORT jint JNICALL Java_com_twilio_video_VideoClient_nativeGetCoreLogLevel
         (JNIEnv *env, jobject instance) {
-    TS_CORE_LOG_MODULE(kTSCoreLogModulePlatform, kTSCoreLogLevelDebug, "getCoreLogLevel");
-    return Logger::instance()->getLogLevel();
+    TS_CORE_LOG_MODULE(twilio::video::kTSCoreLogModulePlatform,
+                       twilio::video::kTSCoreLogLevelDebug,
+                       "getCoreLogLevel");
+    return twilio::video::Logger::instance()->getLogLevel();
 }
 
 class ClientContext {
@@ -115,14 +125,14 @@ Java_com_twilio_video_VideoClient_nativeCreateClient(JNIEnv *env,
     AndroidPlatformInfoProvider *android_platform_info_provider =
             new AndroidPlatformInfoProvider(env, j_context);
 
-    twilio::video::ClientOptions client_options = twilio::video::ClientOptions::Builder()
+    std::unique_ptr<twilio::video::ClientOptions> client_options = twilio::video::ClientOptions::Builder()
         .setPlatformInfoProvider(android_platform_info_provider)
         .build();
 
     std::unique_ptr<twilio::video::Client> client =
             twilio::video::Client::create(access_manager,
                                           media_factory,
-                                          client_options);
+                                          std::move(client_options));
     return jlongFromPointer(
             new ClientContext(std::move(client)));
 

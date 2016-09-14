@@ -65,22 +65,22 @@ public:
                                     *j_video_track_class_,
                                     "<init>",
                                     "(Lorg/webrtc/VideoTrack;)V")) {
-        TS_CORE_LOG_MODULE(kTSCoreLogModulePlatform,
-                           kTSCoreLogLevelDebug,
+        TS_CORE_LOG_MODULE(twilio::video::kTSCoreLogModulePlatform,
+                           twilio::video::kTSCoreLogLevelDebug,
                            "AndroidMediaObserver");
     }
 
     ~AndroidMediaObserver(){
-            TS_CORE_LOG_MODULE(kTSCoreLogModulePlatform,
-                               kTSCoreLogLevelDebug,
+            TS_CORE_LOG_MODULE(twilio::video::kTSCoreLogModulePlatform,
+                               twilio::video::kTSCoreLogLevelDebug,
                                "~AndroidMediaObserver");
     }
 
     void setObserverDeleted() {
         rtc::CritScope cs(&deletion_lock_);
         observer_deleted_ = true;
-        TS_CORE_LOG_MODULE(kTSCoreLogModulePlatform,
-                           kTSCoreLogLevelDebug,
+        TS_CORE_LOG_MODULE(twilio::video::kTSCoreLogModulePlatform,
+                           twilio::video::kTSCoreLogLevelDebug,
                            "room observer deleted");
     }
 
@@ -89,7 +89,9 @@ protected:
                                    std::shared_ptr<twilio::media::AudioTrack> track) {
         webrtc_jni::ScopedLocalRefFrame local_ref_frame(jni());
         std::string func_name = std::string(__FUNCTION__);
-        TS_CORE_LOG_MODULE(kTSCoreLogModulePlatform, kTSCoreLogLevelDebug, "%s", func_name.c_str());
+        TS_CORE_LOG_MODULE(twilio::video::kTSCoreLogModulePlatform,
+                           twilio::video::kTSCoreLogLevelDebug,
+                           "%s", func_name.c_str());
 
         {
             rtc::CritScope cs(&deletion_lock_);
@@ -114,7 +116,9 @@ protected:
                                      std::shared_ptr<twilio::media::AudioTrack> track) {
         webrtc_jni::ScopedLocalRefFrame local_ref_frame(jni());
         std::string func_name = std::string(__FUNCTION__);
-        TS_CORE_LOG_MODULE(kTSCoreLogModulePlatform, kTSCoreLogLevelDebug, "%s", func_name.c_str());
+        TS_CORE_LOG_MODULE(twilio::video::kTSCoreLogModulePlatform,
+                           twilio::video::kTSCoreLogLevelDebug,
+                           "%s", func_name.c_str());
 
         {
             rtc::CritScope cs(&deletion_lock_);
@@ -134,7 +138,9 @@ protected:
                                    std::shared_ptr<twilio::media::VideoTrack> track) {
         webrtc_jni::ScopedLocalRefFrame local_ref_frame(jni());
         std::string func_name = std::string(__FUNCTION__);
-        TS_CORE_LOG_MODULE(kTSCoreLogModulePlatform, kTSCoreLogLevelDebug, "%s", func_name.c_str());
+        TS_CORE_LOG_MODULE(twilio::video::kTSCoreLogModulePlatform,
+                           twilio::video::kTSCoreLogLevelDebug,
+                           "%s", func_name.c_str());
 
         {
             rtc::CritScope cs(&deletion_lock_);
@@ -155,7 +161,9 @@ protected:
                                      std::shared_ptr<twilio::media::VideoTrack> track) {
         webrtc_jni::ScopedLocalRefFrame local_ref_frame(jni());
         std::string func_name = std::string(__FUNCTION__);
-        TS_CORE_LOG_MODULE(kTSCoreLogModulePlatform, kTSCoreLogLevelDebug, "%s", func_name.c_str());
+        TS_CORE_LOG_MODULE(twilio::video::kTSCoreLogModulePlatform,
+                           twilio::video::kTSCoreLogLevelDebug,
+                           "%s", func_name.c_str());
 
         {
             rtc::CritScope cs(&deletion_lock_);
@@ -174,7 +182,9 @@ protected:
                                      std::shared_ptr<twilio::media::AudioTrack> track) {
         webrtc_jni::ScopedLocalRefFrame local_ref_frame(jni());
         std::string func_name = std::string(__FUNCTION__);
-        TS_CORE_LOG_MODULE(kTSCoreLogModulePlatform, kTSCoreLogLevelDebug, "%s", func_name.c_str());
+        TS_CORE_LOG_MODULE(twilio::video::kTSCoreLogModulePlatform,
+                           twilio::video::kTSCoreLogLevelDebug,
+                           "%s", func_name.c_str());
 
         {
             rtc::CritScope cs(&deletion_lock_);
@@ -194,7 +204,9 @@ protected:
                                       std::shared_ptr<twilio::media::AudioTrack> track) {
         webrtc_jni::ScopedLocalRefFrame local_ref_frame(jni());
         std::string func_name = std::string(__FUNCTION__);
-        TS_CORE_LOG_MODULE(kTSCoreLogModulePlatform, kTSCoreLogLevelDebug, "%s", func_name.c_str());
+        TS_CORE_LOG_MODULE(twilio::video::kTSCoreLogModulePlatform,
+                           twilio::video::kTSCoreLogLevelDebug,
+                           "%s", func_name.c_str());
 
         {
             rtc::CritScope cs(&deletion_lock_);
@@ -214,7 +226,9 @@ protected:
                                      std::shared_ptr<twilio::media::VideoTrack> track) {
         webrtc_jni::ScopedLocalRefFrame local_ref_frame(jni());
         std::string func_name = std::string(__FUNCTION__);
-        TS_CORE_LOG_MODULE(kTSCoreLogModulePlatform, kTSCoreLogLevelDebug, "%s", func_name.c_str());
+        TS_CORE_LOG_MODULE(twilio::video::kTSCoreLogModulePlatform,
+                           twilio::video::kTSCoreLogLevelDebug,
+                           "%s", func_name.c_str());
 
         {
             rtc::CritScope cs(&deletion_lock_);
@@ -234,7 +248,9 @@ protected:
                                       std::shared_ptr<twilio::media::VideoTrack> track) {
         webrtc_jni::ScopedLocalRefFrame local_ref_frame(jni());
         std::string func_name = std::string(__FUNCTION__);
-        TS_CORE_LOG_MODULE(kTSCoreLogModulePlatform, kTSCoreLogLevelDebug, "%s", func_name.c_str());
+        TS_CORE_LOG_MODULE(twilio::video::kTSCoreLogModulePlatform,
+                           twilio::video::kTSCoreLogLevelDebug,
+                           "%s", func_name.c_str());
 
         {
             rtc::CritScope cs(&deletion_lock_);
@@ -257,15 +273,15 @@ private:
 
     bool isObserverValid(const std::string &callbackName) {
         if (observer_deleted_) {
-            TS_CORE_LOG_MODULE(kTSCoreLogModulePlatform,
-                               kTSCoreLogLevelWarning,
+            TS_CORE_LOG_MODULE(twilio::video::kTSCoreLogModulePlatform,
+                               twilio::video::kTSCoreLogLevelWarning,
                                "media observer is marked for deletion, skipping %s callback",
                                callbackName.c_str());
             return false;
         };
         if (webrtc_jni::IsNull(jni(), *j_media_observer_)) {
-            TS_CORE_LOG_MODULE(kTSCoreLogModulePlatform,
-                               kTSCoreLogLevelWarning,
+            TS_CORE_LOG_MODULE(twilio::video::kTSCoreLogModulePlatform,
+                               twilio::video::kTSCoreLogLevelWarning,
                                "media observer reference has been destroyed, skipping %s callback",
                                callbackName.c_str());
             return false;

@@ -24,6 +24,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
@@ -133,6 +134,29 @@ public class ConnectTests {
 
         assertTrue(roomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
         assertNotNull(room.getLocalMedia());
+    }
+
+    @Test
+    public void connect_shouldGetLocalParticipant() throws InterruptedException {
+        CallbackHelper.FakeRoomListener roomListener = new CallbackHelper.FakeRoomListener();
+        roomListener.onConnectedLatch = new CountDownLatch(1);
+
+
+        ConnectOptions connectOptions = new ConnectOptions.Builder()
+                .name(testRoom)
+                .localMedia(localMedia)
+                .build();
+
+        Room room = actor1VideoClient.connect(connectOptions, roomListener);
+        assertEquals(null, room.getLocalParticipant());
+
+        assertTrue(roomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
+        LocalParticipant localParticipant = room.getLocalParticipant();
+        assertNotNull(localParticipant);
+        assertEquals(actor1AccessManager.getIdentity(), localParticipant.getIdentity());
+        assertEquals(localMedia, localParticipant.getLocalMedia());
+        assertNotNull(localParticipant.getSid());
+        assertTrue(!localParticipant.getSid().isEmpty());
     }
 
     @Test

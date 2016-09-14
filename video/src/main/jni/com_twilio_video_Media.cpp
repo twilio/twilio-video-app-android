@@ -35,7 +35,8 @@ Java_com_twilio_video_Media_nativeSetInternalListener(JNIEnv *env,
                                                       jobject j_instance,
                                                       jlong j_media_context,
                                                       jlong j_internal_listener) {
-    TS_CORE_LOG_MODULE(kTSCoreLogModulePlatform, kTSCoreLogLevelDebug,
+    TS_CORE_LOG_MODULE(twilio::video::kTSCoreLogModulePlatform,
+                       twilio::video::kTSCoreLogLevelDebug,
                        "Set internal media listener");
     MediaContext *media_context = reinterpret_cast<MediaContext *>(j_media_context);
     AndroidMediaObserver *media_observer =
@@ -54,7 +55,8 @@ JNIEXPORT jlong JNICALL
 Java_com_twilio_video_Media_00024InternalMediaListenerHandle_nativeCreate(JNIEnv *env,
                                                                           jobject instance,
                                                                           jobject j_object) {
-    TS_CORE_LOG_MODULE(kTSCoreLogModulePlatform, kTSCoreLogLevelDebug,
+    TS_CORE_LOG_MODULE(twilio::video::kTSCoreLogModulePlatform,
+                       twilio::video::kTSCoreLogLevelDebug,
                        "Create AndroidMediaObserver");
     AndroidMediaObserver *android_media_observer = new AndroidMediaObserver(env, j_object);
     return webrtc_jni::jlongFromPointer(android_media_observer);
@@ -64,7 +66,8 @@ JNIEXPORT void JNICALL
 Java_com_twilio_video_Media_00024InternalMediaListenerHandle_nativeRelease(JNIEnv *env,
                                                                            jobject instance,
                                                                            jlong nativeHandle) {
-    TS_CORE_LOG_MODULE(kTSCoreLogModulePlatform, kTSCoreLogLevelDebug,
+    TS_CORE_LOG_MODULE(twilio::video::kTSCoreLogModulePlatform,
+                       twilio::video::kTSCoreLogLevelDebug,
                        "Free AndroidMediaObserver");
     AndroidMediaObserver *android_media_observer =
         reinterpret_cast<AndroidMediaObserver *>(nativeHandle);
