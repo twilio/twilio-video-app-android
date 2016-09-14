@@ -64,7 +64,7 @@ public:
             webrtc_jni::GetMethodID(env,
                                     *j_video_track_class_,
                                     "<init>",
-                                    "(Ljava/lang/String;ZJ)V")) {
+                                    "(JLjava/lang/String;ZJ)V")) {
         TS_CORE_LOG_MODULE(kTSCoreLogModulePlatform,
                            kTSCoreLogLevelDebug,
                            "AndroidMediaObserver");

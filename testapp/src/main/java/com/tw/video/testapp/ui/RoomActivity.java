@@ -173,7 +173,8 @@ public class RoomActivity extends AppCompatActivity {
     public void enableLocalAudio(View view) {
         if (localAudioTrack != null) {
             boolean enable = !localAudioTrack.isEnabled();
-            if (!localAudioTrack.enable(enable)) {
+            localAudioTrack.enable(enable);
+            if (localAudioTrack.isEnabled() != enable) {
                 Snackbar.make(roomStatusTextview,
                         "Audio track "+ (enable  ? "enable" : "diable") + " action failed",
                         Snackbar.LENGTH_LONG).setAction("Action", null).show();

@@ -24,7 +24,7 @@ jobject createJavaLocalAudioTrack(std::shared_ptr<twilio::media::LocalAudioTrack
 
     return jni->NewObject(j_local_audio_track_class,
                           j_local_audio_track_ctor_id,
-                          local_audio_track_context,
+                          webrtc_jni::jlongFromPointer(local_audio_track_context),
                           webrtc_jni::JavaStringFromStdString(jni, local_audio_track->getTrackId()),
                           local_audio_track->isEnabled());
 }
