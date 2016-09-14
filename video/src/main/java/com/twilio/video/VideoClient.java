@@ -15,71 +15,9 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * The VideoClient allows user to create or participate in Rooms.
+ * The VideoClient allows user to connect to a Room
  */
 public class VideoClient {
-
-    // TODO: Check which of these error codes are still valid
-    /**
-     * Authenticating your VideoClient failed due to invalid auth credentials.
-     */
-    public static int INVALID_AUTH_DATA = 100;
-    /**
-     * The SIP account was invalid.
-     */
-    public static int INVALID_SIP_ACCOUNT = 102;
-    /**
-     * There was an error during VideoClient registration.
-     */
-    public static int CLIENT_REGISTATION_ERROR = 103;
-    /**
-     * The Conversation was invalid.
-     */
-    public static int INVALID_CONVERSATION = 105;
-    /**
-     * The Conversation was terminated due to an unforeseen error.
-     */
-    public static int CONVERSATION_TERMINATED = 110;
-    /**
-     * Establishing a media connection with the remote peer failed.
-     */
-    public static int PEER_CONNECTION_FAILED = 111;
-    /**
-     * The client disconnected unexpectedly.
-     */
-    public static int CLIENT_DISCONNECTED = 200;
-    /**
-     * Too many active Conversations.
-     */
-    public static int TOO_MANY_ACTIVE_CONVERSATIONS = 201;
-    /**
-     * A track was created with constraints that could not be satisfied.
-     */
-    public static int TRACK_CREATION_FAILED = 207;
-    /**
-     * Too many tracks were added to the local media.
-     *
-     * @note: The current maximum is one video track at a time.
-     */
-    public static int TOO_MANY_TRACKS = 300;
-    /**
-     * An invalid video capturer was added to the local media
-     *
-     * @note: At the moment, only {@link CameraCapturer} is supported.
-     */
-    public static int INVALID_VIDEO_CAPTURER = 301;
-    /**
-     * An attempt was made to add or remove a track that is already being operated on.
-     *
-     * @note: Retry your request at a later time.
-     */
-    public static int TRACK_OPERATION_IN_PROGRESS = 303;
-    /**
-     * An attempt was made to remove a track that has already ended.
-     *
-     * @note: The video track is in the {@link MediaTrackState} ENDED state.
-     */
-    public static int INVALID_VIDEO_TRACK_STATE = 305;
 
     private static final String[] REQUIRED_PERMISSIONS = {
             // Required permissions granted upon install
