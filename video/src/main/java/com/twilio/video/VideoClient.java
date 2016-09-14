@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * The VideoClient allows user to connect to a Room
+ * The VideoClient allows a user to connect to a Room
  */
 public class VideoClient {
 
