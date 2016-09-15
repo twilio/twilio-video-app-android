@@ -116,15 +116,11 @@ public class LocalMedia {
 
     public void release() {
         if (nativeLocalMediaHandle != 0) {
-            /*
-             * We clear all the tracks. Note that we must make a copy of the list to avoid a
-             * ConcurrentModificationException
-             */
-            for (LocalAudioTrack localAudioTrack : new ArrayList<>(localAudioTracks)) {
-                removeAudioTrack(localAudioTrack);
+            while (!localAudioTracks.isEmpty()) {
+                removeAudioTrack(localAudioTracks.get(0));
             }
-            for (LocalVideoTrack localVideoTrack : new ArrayList<>(localVideoTracks)) {
-                removeVideoTrack(localVideoTrack);
+            while (!localVideoTracks.isEmpty()) {
+                removeVideoTrack(localVideoTracks.get(0));
             }
             nativeRelease(nativeLocalMediaHandle);
             nativeLocalMediaHandle = 0;
