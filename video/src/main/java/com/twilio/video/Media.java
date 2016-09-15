@@ -179,10 +179,6 @@ public class Media {
     }
 
     synchronized void release() {
-        // Release all tracks
-        for (AudioTrack audioTrack : audioTrackMap.values()) {
-            audioTrack.release();
-        }
         audioTrackMap.clear();
         for (VideoTrack videoTrack : videoTrackMap.values()) {
             videoTrack.release();
@@ -241,7 +237,6 @@ public class Media {
                 logger.w("Received audio track removed callback for non-existent audio track");
                 return;
             }
-            audioTrack.release();
             handler.post(new Runnable() {
                 @Override
                 public void run() {

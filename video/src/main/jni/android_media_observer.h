@@ -59,12 +59,12 @@ public:
             webrtc_jni::GetMethodID(env,
                                     *j_audio_track_class_,
                                     "<init>",
-                                    "(JLjava/lang/String;ZJ)V")),
+                                    "(Ljava/lang/String;Z)V")),
         j_video_track_ctor_id_(
             webrtc_jni::GetMethodID(env,
                                     *j_video_track_class_,
                                     "<init>",
-                                    "(JLjava/lang/String;ZJ)V")) {
+                                    "(Lorg/webrtc/VideoTrack;)V")) {
         TS_CORE_LOG_MODULE(kTSCoreLogModulePlatform,
                            kTSCoreLogLevelDebug,
                            "AndroidMediaObserver");
@@ -98,9 +98,6 @@ protected:
                 return;
             }
 
-            AudioTrackContext *audio_track_context = new AudioTrackContext();
-            audio_track_context->audio_track = track;
-            jlong j_audio_track_context = webrtc_jni::jlongFromPointer(audio_track_context);
             jstring j_track_id = webrtc_jni::JavaStringFromStdString(jni(), track->getTrackId());
             jlong j_webrtc_track = webrtc_jni::jlongFromPointer(track->getWebRtcTrack());
             jboolean j_is_enabled = track->isEnabled();

@@ -19,11 +19,13 @@ jobject VideoPixelFormat::getJavaVideoPixelFormat(uint32_t fourcc) {
             j_video_pixel_format_field_id = jni->GetStaticFieldID(j_video_pixel_format_class,
                                                                   "RGBA_8888",
                                                                   j_video_pixel_format_sig);
+            CHECK_EXCEPTION(jni);
             break;
         case cricket::FOURCC_NV21:
             j_video_pixel_format_field_id = jni->GetStaticFieldID(j_video_pixel_format_class,
                                                                   "NV21",
                                                                   j_video_pixel_format_sig);
+            CHECK_EXCEPTION(jni);
             break;
         default:
             break;

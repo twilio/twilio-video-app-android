@@ -74,12 +74,12 @@ public:
             webrtc_jni::GetMethodID(env,
                                     *j_audio_track_class_,
                                     "<init>",
-                                    "(JLjava/lang/String;ZJ)V")),
+                                    "(Ljava/lang/String;Z)V")),
         j_video_track_ctor_id_(
             webrtc_jni::GetMethodID(env,
                                     *j_video_track_class_,
                                     "<init>",
-                                    "(JLjava/lang/String;ZJ)V")),
+                                    "(Lorg/webrtc/VideoTrack;)V")),
         j_media_ctor_id_(
             webrtc_jni::GetMethodID(env,
                                     *j_media_class_,

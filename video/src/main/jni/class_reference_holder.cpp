@@ -33,6 +33,8 @@ void FreeGlobalClassReferenceHolder() {
 ClassReferenceHolder::ClassReferenceHolder(JNIEnv* jni) {
     LoadClass(jni, "com/twilio/video/VideoCapturerDelegate");
     LoadClass(jni, "com/twilio/video/VideoPixelFormat");
+    LoadClass(jni, "com/twilio/video/LocalAudioTrack");
+    LoadClass(jni, "com/twilio/video/LocalVideoTrack");
 }
 
 ClassReferenceHolder::~ClassReferenceHolder() {
