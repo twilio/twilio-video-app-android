@@ -100,9 +100,10 @@ public class ConnectTests {
         CallbackHelper.FakeRoomListener roomListener = new CallbackHelper.FakeRoomListener();
         roomListener.onConnectedLatch = new CountDownLatch(1);
 
-        actor1VideoClient.connect(roomListener);
+        Room room = actor1VideoClient.connect(roomListener);
 
         assertTrue(roomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
+        room.disconnect();
     }
 
     @Test
@@ -115,9 +116,10 @@ public class ConnectTests {
                 .name(testRoom)
                 .build();
 
-        actor1VideoClient.connect(connectOptions, roomListener);
+        Room room = actor1VideoClient.connect(connectOptions, roomListener);
 
         assertTrue(roomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
+        room.disconnect();
     }
 
     @Test
@@ -134,6 +136,7 @@ public class ConnectTests {
 
         assertTrue(roomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
         assertNotNull(room.getLocalMedia());
+        room.disconnect();
     }
 
     @Test
@@ -157,6 +160,7 @@ public class ConnectTests {
         assertEquals(localMedia, localParticipant.getLocalMedia());
         assertNotNull(localParticipant.getSid());
         assertTrue(!localParticipant.getSid().isEmpty());
+        room.disconnect();
     }
 
     @Test
@@ -175,6 +179,7 @@ public class ConnectTests {
         assertTrue(roomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
         assertNotNull(room.getLocalMedia());
         assertTrue(localMedia.removeAudioTrack(localAudioTrack));
+        room.disconnect();
     }
 
     @Test
@@ -193,6 +198,7 @@ public class ConnectTests {
         assertTrue(roomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
         assertNotNull(room.getLocalMedia());
         assertTrue(localMedia.removeVideoTrack(localVideoTrack));
+        room.disconnect();
     }
 
     @Test
@@ -213,6 +219,7 @@ public class ConnectTests {
         assertNotNull(room.getLocalMedia());
         assertTrue(localMedia.removeAudioTrack(localAudioTrack));
         assertTrue(localMedia.removeVideoTrack(localVideoTrack));
+        room.disconnect();
     }
 
     @Test
@@ -241,6 +248,7 @@ public class ConnectTests {
         // Now remove them
         assertTrue(localMedia.removeAudioTrack(localAudioTrack));
         assertTrue(localMedia.removeVideoTrack(localVideoTrack));
+        room.disconnect();
     }
 
     @Test
@@ -313,6 +321,7 @@ public class ConnectTests {
 
         assertTrue(roomListener.onParticipantDisconnectedLatch.await(20, TimeUnit.SECONDS));
         assertTrue(room.getParticipants().isEmpty());
+        room.disconnect();
 
     }
 
