@@ -75,7 +75,7 @@ public class FakeVideoCapturer implements VideoCapturer {
         this.started.set(true);
 
         // Will asynchronously start the capturer
-        fakeCapturerThread.requestStart();
+        fakeCapturerThread.startAsync();
     }
 
     @Override
@@ -83,14 +83,14 @@ public class FakeVideoCapturer implements VideoCapturer {
         this.started.set(false);
 
         // Blocking call that ensures the capturer is stopped
-        fakeCapturerThread.requestStop();
+        fakeCapturerThread.stopSync();
     }
 
     class FakeCapturerThread extends Thread {
         private final Object looperStartedEvent = new Object();
         private boolean running = false;
 
-        public synchronized void requestStart() {
+        public synchronized void startAsync() {
             if (running) {
                 return;
             }
@@ -121,7 +121,7 @@ public class FakeVideoCapturer implements VideoCapturer {
             Looper.loop();
         }
 
-        public synchronized void requestStop() {
+        public synchronized void stopSync() {
             if (!running) {
                 return;
             }
