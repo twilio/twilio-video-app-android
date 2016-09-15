@@ -174,12 +174,6 @@ public class RoomActivity extends AppCompatActivity {
         if (localAudioTrack != null) {
             boolean enable = !localAudioTrack.isEnabled();
             localAudioTrack.enable(enable);
-            if (localAudioTrack.isEnabled() != enable) {
-                Snackbar.make(roomStatusTextview,
-                        "Audio track "+ (enable  ? "enable" : "diable") + " action failed",
-                        Snackbar.LENGTH_LONG).setAction("Action", null).show();
-                return;
-            }
             int icon = enable ? R.drawable.ic_mic_green_24px : R.drawable.ic_mic_red_24px;
             localAudioEnableFab.setImageDrawable(
                     ContextCompat.getDrawable(RoomActivity.this, icon));
@@ -212,12 +206,6 @@ public class RoomActivity extends AppCompatActivity {
             boolean enable = !localVideoTrack.isEnabled();
 
             localVideoTrack.enable(enable);
-            if (localVideoTrack.isEnabled() != enable) {
-                Snackbar.make(roomStatusTextview,
-                        "Video track "+ (enable  ? "enable" : "diable") + " action failed",
-                        Snackbar.LENGTH_LONG).setAction("Action", null).show();
-                return;
-            }
             int icon = 0;
             if (enable) {
                 icon = R.drawable.ic_pause_green_24px;
