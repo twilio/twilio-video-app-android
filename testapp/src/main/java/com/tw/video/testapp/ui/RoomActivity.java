@@ -115,10 +115,6 @@ public class RoomActivity extends AppCompatActivity {
             accessManager.dispose();
             accessManager = null;
         }
-        if (videoClient != null) {
-            videoClient.release();
-            videoClient = null;
-        }
     }
 
     private void processActivityIntent(Bundle savedInstanceState) {
