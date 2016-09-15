@@ -19,6 +19,11 @@ public class VideoTrack implements Track {
     private boolean isEnabled;
     private boolean isReleased = false;
 
+    /*
+     * NOTE
+     * This class is a wrapper for org.webrtc.VideoTrack. In order to remove the dependency
+     * on this class we would need to re-implement some JNI renderer boilerplate
+     */
     VideoTrack(org.webrtc.VideoTrack webRtcVideoTrack) {
         this.webrtcVideoTrack = webRtcVideoTrack;
         this.trackId = webRtcVideoTrack.id();
