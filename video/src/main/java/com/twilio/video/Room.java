@@ -30,6 +30,7 @@ public class Room {
     private Map<String, Participant> participantMap = new HashMap<>();
     private InternalRoomListenerHandle internalRoomListenerHandle;
     private InternalRoomListenerImpl internalRoomListenerImpl;
+    private LocalParticipant localParticipant;
     private Room.Listener listener;
     private final Handler handler;
 
@@ -62,6 +63,10 @@ public class Room {
 
     public LocalMedia getLocalMedia() {
         return localMedia;
+    }
+
+    public LocalParticipant getLocalParticipant() {
+        return localParticipant;
     }
 
     public synchronized void disconnect() {
@@ -105,7 +110,10 @@ public class Room {
 
     // JNI Callbacks Interface
     interface InternalRoomListener {
-        void onConnected(String roomSid, List<Participant> participantList);
+        void onConnected(String roomSid,
+                         String localParticipantSid,
+                         String localParticipantIdentity,
+                         List<Participant> participantList);
         void onDisconnected(int errorCode);
         void onConnectFailure(int errorCode);
         void onParticipantConnected(Participant participant);
@@ -120,13 +128,18 @@ public class Room {
         }
 
         @Override
-        public synchronized void onConnected(String roomSid, List<Participant> participantList) {
+        public synchronized void onConnected(String roomSid,
+                                             String localParticipantSid,
+                                             String localParticipantIdentity,
+                                             List<Participant> participantList) {
             logger.d("onConnected()");
-            Room.this.roomState = RoomState.CONNECTED;
             Room.this.sid = roomSid;
+            Room.this.localParticipant = new LocalParticipant(
+                    localParticipantSid, localParticipantIdentity, localMedia);
             for (Participant participant : participantList) {
                 participantMap.put(participant.getSid(), participant);
             }
+            Room.this.roomState = RoomState.CONNECTED;
             handler.post(new Runnable() {
                 @Override
                 public void run() {

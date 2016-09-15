@@ -29,7 +29,7 @@ public:
             GetMethodID(env,
                         *j_room_observer_class_,
                         "onConnected",
-                        "(Ljava/lang/String;Ljava/util/List;)V")),
+                        "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/util/List;)V")),
         j_on_disconnected_(
             GetMethodID(env,
                         *j_room_observer_class_,
@@ -86,22 +86,22 @@ public:
                                     "<init>",
                                     "(JLjava/util/List;Ljava/util/List;Landroid/os/Handler;)V"))
         {
-        TS_CORE_LOG_MODULE(kTSCoreLogModulePlatform,
-                           kTSCoreLogLevelDebug,
+        TS_CORE_LOG_MODULE(twilio::video::kTSCoreLogModulePlatform,
+                           twilio::video::kTSCoreLogLevelDebug,
                            "AndroidRoomObserver");
     }
 
     ~AndroidRoomObserver() {
-        TS_CORE_LOG_MODULE(kTSCoreLogModulePlatform,
-                           kTSCoreLogLevelDebug,
+        TS_CORE_LOG_MODULE(twilio::video::kTSCoreLogModulePlatform,
+                           twilio::video::kTSCoreLogLevelDebug,
                            "~AndroidRoomObserver");
     }
 
     void setObserverDeleted() {
         rtc::CritScope cs(&deletion_lock_);
         observer_deleted_ = true;
-        TS_CORE_LOG_MODULE(kTSCoreLogModulePlatform,
-                           kTSCoreLogLevelDebug,
+        TS_CORE_LOG_MODULE(twilio::video::kTSCoreLogModulePlatform,
+                           twilio::video::kTSCoreLogLevelDebug,
                            "room observer deleted");
     }
 
@@ -109,7 +109,9 @@ protected:
     virtual void onConnected(twilio::video::Room *room) {
         ScopedLocalRefFrame local_ref_frame(jni());
         std::string func_name = std::string(__FUNCTION__);
-        TS_CORE_LOG_MODULE(kTSCoreLogModulePlatform, kTSCoreLogLevelDebug, "%s", func_name.c_str());
+        TS_CORE_LOG_MODULE(twilio::video::kTSCoreLogModulePlatform,
+                           twilio::video::kTSCoreLogLevelDebug,
+                           "%s", func_name.c_str());
 
         {
             rtc::CritScope cs(&deletion_lock_);
@@ -119,9 +121,22 @@ protected:
             }
 
             jstring j_room_sid = webrtc_jni::JavaStringFromStdString(jni(), room->getSid());
+
+            std::shared_ptr<twilio::video::LocalParticipant> local_participant =
+                room->getLocalParticipant();
+            jstring j_local_participant_sid =
+                webrtc_jni::JavaStringFromStdString(jni(), local_participant->getSid());
+            jstring j_local_participant_identity =
+                webrtc_jni::JavaStringFromStdString(jni(), local_participant->getIdentity());
+
             jobject j_participants = createJavaParticipantList(room->getParticipants());
 
-            jni()->CallVoidMethod(*j_room_observer_, j_on_connected_, j_room_sid, j_participants);
+            jni()->CallVoidMethod(*j_room_observer_,
+                                  j_on_connected_,
+                                  j_room_sid,
+                                  j_local_participant_sid,
+                                  j_local_participant_identity,
+                                  j_participants);
             CHECK_EXCEPTION(jni()) << "error during CallVoidMethod";
         }
     }
@@ -131,7 +146,9 @@ protected:
                                     twilio::video::ClientError::kErrorUnknown) {
         ScopedLocalRefFrame local_ref_frame(jni());
         std::string func_name = std::string(__FUNCTION__);
-        TS_CORE_LOG_MODULE(kTSCoreLogModulePlatform, kTSCoreLogLevelDebug, "%s", func_name.c_str());
+        TS_CORE_LOG_MODULE(twilio::video::kTSCoreLogModulePlatform,
+                           twilio::video::kTSCoreLogLevelDebug,
+                           "%s", func_name.c_str());
         {
             rtc::CritScope cs(&deletion_lock_);
 
@@ -148,7 +165,9 @@ protected:
                                   twilio::video::ClientError error_code) {
         ScopedLocalRefFrame local_ref_frame(jni());
         std::string func_name = std::string(__FUNCTION__);
-        TS_CORE_LOG_MODULE(kTSCoreLogModulePlatform, kTSCoreLogLevelDebug, "%s", func_name.c_str());
+        TS_CORE_LOG_MODULE(twilio::video::kTSCoreLogModulePlatform,
+                           twilio::video::kTSCoreLogLevelDebug,
+                           "%s", func_name.c_str());
         {
             rtc::CritScope cs(&deletion_lock_);
 
@@ -165,7 +184,9 @@ protected:
                                         std::shared_ptr<twilio::video::Participant> participant) {
         ScopedLocalRefFrame local_ref_frame(jni());
         std::string func_name = std::string(__FUNCTION__);
-        TS_CORE_LOG_MODULE(kTSCoreLogModulePlatform, kTSCoreLogLevelDebug, "%s", func_name.c_str());
+        TS_CORE_LOG_MODULE(twilio::video::kTSCoreLogModulePlatform,
+                           twilio::video::kTSCoreLogLevelDebug,
+                           "%s", func_name.c_str());
 
         {
             rtc::CritScope cs(&deletion_lock_);
@@ -195,7 +216,9 @@ protected:
                                            std::shared_ptr<twilio::video::Participant> participant) {
         ScopedLocalRefFrame local_ref_frame(jni());
         std::string func_name = std::string(__FUNCTION__);
-        TS_CORE_LOG_MODULE(kTSCoreLogModulePlatform, kTSCoreLogLevelDebug, "%s", func_name.c_str());
+        TS_CORE_LOG_MODULE(twilio::video::kTSCoreLogModulePlatform,
+                           twilio::video::kTSCoreLogLevelDebug,
+                           "%s", func_name.c_str());
 
         {
             rtc::CritScope cs(&deletion_lock_);
@@ -220,15 +243,15 @@ private:
 
     bool isObserverValid(const std::string &callbackName) {
         if (observer_deleted_) {
-            TS_CORE_LOG_MODULE(kTSCoreLogModulePlatform,
-                               kTSCoreLogLevelWarning,
+            TS_CORE_LOG_MODULE(twilio::video::kTSCoreLogModulePlatform,
+                               twilio::video::kTSCoreLogLevelWarning,
                                "room observer is marked for deletion, skipping %s callback",
                                callbackName.c_str());
             return false;
         };
         if (IsNull(jni(), *j_room_observer_)) {
-            TS_CORE_LOG_MODULE(kTSCoreLogModulePlatform,
-                               kTSCoreLogLevelWarning,
+            TS_CORE_LOG_MODULE(twilio::video::kTSCoreLogModulePlatform,
+                               twilio::video::kTSCoreLogLevelWarning,
                                "room observer reference has been destroyed, skipping %s callback",
                                callbackName.c_str());
             return false;

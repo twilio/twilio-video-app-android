@@ -27,7 +27,9 @@ JNIEXPORT jboolean JNICALL
 Java_com_twilio_video_Participant_nativeIsConnected(JNIEnv *env, jobject instance,
                                                     jlong j_participant_context) {
     std::string func_name = std::string(__FUNCTION__);
-    TS_CORE_LOG_MODULE(kTSCoreLogModulePlatform, kTSCoreLogLevelDebug, "%s", func_name.c_str());
+    TS_CORE_LOG_MODULE(twilio::video::kTSCoreLogModulePlatform,
+                       twilio::video::kTSCoreLogLevelDebug,
+                       "%s", func_name.c_str());
     ParticipantContext *participant_context =
         reinterpret_cast<ParticipantContext *>(j_participant_context);
     if (participant_context == nullptr || !participant_context->participant) {

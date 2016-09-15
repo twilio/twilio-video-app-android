@@ -6,6 +6,7 @@
 #include "webrtc/api/java/jni/androidvideocapturer_jni.h"
 #include "webrtc/api/java/jni/jni_helpers.h"
 #include "class_reference_holder.h"
+#include "video/logger.h"
 
 namespace twilio_video_jni {
 
@@ -39,7 +40,9 @@ twilio::media::MediaConstraints* convertVideoConstraints(jobject j_video_constra
     twilio::media::MediaConstraints* video_constraints = new twilio::media::MediaConstraints();
     JNIEnv* env = webrtc_jni::GetEnv();
 
-    TS_CORE_LOG_MODULE(kTSCoreLogModulePlatform, kTSCoreLogLevelDebug, "Parsing video constraints");
+    TS_CORE_LOG_MODULE(twilio::video::kTSCoreLogModulePlatform,
+                       twilio::video::kTSCoreLogLevelDebug,
+                       "Parsing video constraints");
 
     jclass video_constraints_class = env->GetObjectClass(j_video_constraints);
     jfieldID min_fps_field =
@@ -51,7 +54,8 @@ twilio::media::MediaConstraints* convertVideoConstraints(jobject j_video_constra
     int max_fps =
             env->GetIntField(j_video_constraints, max_fps_field);
 
-    TS_CORE_LOG_MODULE(kTSCoreLogModulePlatform, kTSCoreLogLevelDebug,
+    TS_CORE_LOG_MODULE(twilio::video::kTSCoreLogModulePlatform,
+                       twilio::video::kTSCoreLogLevelDebug,
                        "Video constraints minFps %d maxFps %d",
                        min_fps,
                        max_fps);
@@ -76,7 +80,8 @@ twilio::media::MediaConstraints* convertVideoConstraints(jobject j_video_constra
     int min_height =
             env->GetIntField(j_min_video_dimensions, min_height_field);
 
-    TS_CORE_LOG_MODULE(kTSCoreLogModulePlatform, kTSCoreLogLevelDebug,
+    TS_CORE_LOG_MODULE(twilio::video::kTSCoreLogModulePlatform,
+                       twilio::video::kTSCoreLogLevelDebug,
                        "Video constraints min width %d min height %d",
                        min_width,
                        min_height);
@@ -97,7 +102,8 @@ twilio::media::MediaConstraints* convertVideoConstraints(jobject j_video_constra
     int denominator_aspect_ratio =
             env->GetIntField(j_aspect_ratio, denominator_field);
 
-    TS_CORE_LOG_MODULE(kTSCoreLogModulePlatform, kTSCoreLogLevelDebug,
+    TS_CORE_LOG_MODULE(twilio::video::kTSCoreLogModulePlatform,
+                       twilio::video::kTSCoreLogLevelDebug,
                        "Video aspect ratio %d:%d",
                        numerator_aspect_ratio,
                        denominator_aspect_ratio);
@@ -114,7 +120,8 @@ twilio::media::MediaConstraints* convertVideoConstraints(jobject j_video_constra
     int max_height =
             env->GetIntField(j_max_video_dimensions, max_height_field);
 
-    TS_CORE_LOG_MODULE(kTSCoreLogModulePlatform, kTSCoreLogLevelDebug,
+    TS_CORE_LOG_MODULE(twilio::video::kTSCoreLogModulePlatform,
+                       twilio::video::kTSCoreLogLevelDebug,
                        "Video constraints max width %d max height %d",
                        max_width,
                        max_height);

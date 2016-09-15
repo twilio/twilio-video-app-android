@@ -129,8 +129,6 @@ public class RemoteMediaTest {
         actor2AccessManager.dispose();
         actor2AccessManager = null;
         fakeVideoCapturer = null;
-        Instrumentation instrumentation = InstrumentationRegistry.getInstrumentation();
-        instrumentation.waitForIdleSync();
     }
 
     // Audio
@@ -158,7 +156,6 @@ public class RemoteMediaTest {
     }
 
     @Test
-    @Ignore
     public void media_onAudioTrackEnabled() throws InterruptedException {
         CallbackHelper.FakeMediaListener mediaListener = new CallbackHelper.FakeMediaListener();
         mediaListener.onAudioTrackAddedLatch = new CountDownLatch(1);
@@ -172,7 +169,6 @@ public class RemoteMediaTest {
     }
 
     @Test
-    @Ignore
     public void media_onAudioTrackDisabled() throws InterruptedException {
         CallbackHelper.FakeMediaListener mediaListener = new CallbackHelper.FakeMediaListener();
         mediaListener.onAudioTrackAddedLatch = new CountDownLatch(1);
@@ -261,7 +257,6 @@ public class RemoteMediaTest {
     }
 
     @Test
-    @Ignore
     public void media_onVideoTrackEnabled() throws InterruptedException {
         CallbackHelper.FakeMediaListener mediaListener = new CallbackHelper.FakeMediaListener();
         mediaListener.onVideoTrackAddedLatch = new CountDownLatch(1);
@@ -275,7 +270,6 @@ public class RemoteMediaTest {
     }
 
     @Test
-    @Ignore
     public void media_onVideoTrackDisabled() throws InterruptedException {
         CallbackHelper.FakeMediaListener mediaListener = new CallbackHelper.FakeMediaListener();
         mediaListener.onVideoTrackAddedLatch = new CountDownLatch(1);
