@@ -89,7 +89,6 @@ public class VideoClient {
      * @param audioOutput that should be used by the system
      */
     public void setAudioOutput(AudioOutput audioOutput) {
-        logger.d("setAudioOutput");
         AudioManager audioManager = (AudioManager) applicationContext.getSystemService(Context.AUDIO_SERVICE);
         if (audioOutput == AudioOutput.SPEAKERPHONE) {
             audioManager.setSpeakerphoneOn(true);
@@ -104,7 +103,6 @@ public class VideoClient {
      * @return audio output speaker
      */
     public AudioOutput getAudioOutput() {
-        logger.d("getAudioOutput");
         AudioManager audioManager = (AudioManager) applicationContext.getSystemService(Context.AUDIO_SERVICE);
         return audioManager.isSpeakerphoneOn() ? AudioOutput.SPEAKERPHONE : AudioOutput.HEADSET;
     }
