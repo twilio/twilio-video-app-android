@@ -215,7 +215,8 @@ public class VideoClient {
         return room;
     }
 
-    synchronized void release() {
+    synchronized void release(Room room) {
+        rooms.remove(room);
         if (rooms.isEmpty() && nativeClientContext != 0) {
             nativeRelease(nativeClientContext);
             nativeClientContext = 0;
@@ -233,15 +234,13 @@ public class VideoClient {
             @Override
             public void onConnectFailure(Room room, VideoException error) {
                 roomListener.onConnectFailure(room, error);
-                rooms.remove(room);
-                release();
+                release(room);
             }
 
             @Override
             public void onDisconnected(Room room, VideoException error) {
                 roomListener.onDisconnected(room, error);
-                rooms.remove(room);
-                release();
+                release(room);
             }
 
             @Override
