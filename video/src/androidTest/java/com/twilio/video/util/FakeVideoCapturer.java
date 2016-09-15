@@ -108,6 +108,7 @@ public class FakeVideoCapturer implements VideoCapturer {
                 }
             }
         }
+
         public void run() {
             Looper.prepare();
             synchronized (looperStartedEvent) {
