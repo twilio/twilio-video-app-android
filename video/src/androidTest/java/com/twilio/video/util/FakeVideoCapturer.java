@@ -27,15 +27,17 @@ public class FakeVideoCapturer implements VideoCapturer {
     private final Runnable frameGenerator = new Runnable() {
         @Override
         public void run() {
-            if (started.get()) {
-                // TODO: Actually generate some RGBA data for this frame
-                int bufferSize = captureFormat.dimensions.width * captureFormat.dimensions.height * 4;
-                byte[] emptyBuffer = new byte[bufferSize];
-                final long captureTimeNs =
-                        TimeUnit.MILLISECONDS.toNanos(SystemClock.elapsedRealtime());
-                VideoFrame emptyVideoFrame = new VideoFrame(emptyBuffer,
-                        captureFormat.dimensions, 0, captureTimeNs);
+            // TODO: Actually generate some RGBA data for this frame
+            int bufferSize = captureFormat.dimensions.width * captureFormat.dimensions.height * 4;
+            byte[] emptyBuffer = new byte[bufferSize];
+            final long captureTimeNs =
+                    TimeUnit.MILLISECONDS.toNanos(SystemClock.elapsedRealtime());
 
+            VideoFrame emptyVideoFrame = new VideoFrame(emptyBuffer,
+                    captureFormat.dimensions, 0, captureTimeNs);
+
+            // Only notify the frame listener of we are not stopped
+            if (started.get()) {
                 capturerListener.onFrameCaptured(emptyVideoFrame);
                 fakeVideoCapturerHandler.postDelayed(this, FRAMERATE_MS);
             }
@@ -74,7 +76,6 @@ public class FakeVideoCapturer implements VideoCapturer {
     @Override
     public void stopCapture() {
         this.started.set(false);
-        this.captureFormat = null;
         fakeVideoCapturerHandler.removeCallbacks(frameGenerator);
     }
 }

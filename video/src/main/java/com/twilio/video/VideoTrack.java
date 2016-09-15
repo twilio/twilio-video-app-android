@@ -101,11 +101,9 @@ public class VideoTrack implements Track {
     synchronized void release() {
         if (!isReleased) {
             isEnabled = false;
-            /*
-             * TODO
-             * I think we only need to keep this release if we decide to remove renderers
-             * when the video track is removed
-             */
+            for (Map.Entry<VideoRenderer, org.webrtc.VideoRenderer> entry : videoRenderersMap.entrySet()) {
+                webrtcVideoTrack.removeRenderer(entry.getValue());
+            }
             videoRenderersMap.clear();
             isReleased = true;
         }

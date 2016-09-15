@@ -56,15 +56,14 @@ public class LocalMedia {
         checkReleased("removeAudioTrack");
         boolean result = false;
 
-        if (localAudioTrack != null) {
-            result = localAudioTracks.contains(localAudioTrack) &&
-                    nativeRemoveAudioTrack(nativeLocalMediaHandle, localAudioTrack.getTrackId());
+        if (localAudioTrack != null && localAudioTracks.contains(localAudioTrack)) {
+            localAudioTrack.release();
+            result = nativeRemoveAudioTrack(nativeLocalMediaHandle, localAudioTrack.getTrackId());
 
             if (!result) {
                 logger.e("Failed to remove audio track");
             } else {
                 localAudioTracks.remove(localAudioTrack);
-                localAudioTrack.release();
             }
         }
 
@@ -98,15 +97,14 @@ public class LocalMedia {
         checkReleased("removeVideoTrack");
         boolean result = false;
 
-        if (localVideoTrack != null) {
-            result = localVideoTracks.contains(localVideoTrack) &&
-                    nativeRemoveVideoTrack(nativeLocalMediaHandle, localVideoTrack.getTrackId());
+        if (localVideoTrack != null && localVideoTracks.contains(localVideoTrack)) {
+            localVideoTrack.release();
+            result = nativeRemoveVideoTrack(nativeLocalMediaHandle, localVideoTrack.getTrackId());
 
             if (!result) {
                 logger.e("Failed to remove video track");
             } else {
                 localVideoTracks.remove(localVideoTrack);
-                localVideoTrack.release();
             }
         }
 

@@ -78,4 +78,19 @@ public class LocalVideoTrackBaseTest extends BaseLocalVideoTrackTest {
 
         localVideoTrack.removeRenderer(frameCountRenderer);
     }
+
+    @Test
+    public void rendereringShouldStopAfterRemoved() throws InterruptedException {
+        localVideoTrack.addRenderer(frameCountRenderer);
+        Thread.sleep(LOCAL_VIDEO_TRACK_TEST_DELAY_MS);
+
+        int frameCount = frameCountRenderer.getFrameCount();
+        assertTrue(frameCount > 0);
+
+        localMedia.removeVideoTrack(localVideoTrack);
+        Thread.sleep(LOCAL_VIDEO_TRACK_TEST_DELAY_MS);
+
+        boolean framesNotRenderering = frameCount >= (frameCountRenderer.getFrameCount() - 1);
+        assertTrue(framesNotRenderering);
+    }
 }
