@@ -81,7 +81,6 @@ public class LocalMedia {
         checkReleased("addVideoTrack");
         LocalVideoTrack localVideoTrack = nativeAddVideoTrack(nativeLocalMediaHandle,
                 enabled,
-                new VideoCapturerDelegate(videoCapturer),
                 videoCapturer,
                 videoConstraints);
 
@@ -148,7 +147,6 @@ public class LocalMedia {
     private native boolean nativeRemoveAudioTrack(long nativeLocalMediaHandle, String trackId);
     private native LocalVideoTrack nativeAddVideoTrack(long nativeLocalMediaHandle,
                                                        boolean enabled,
-                                                       VideoCapturerDelegate videoCapturerDelegate,
                                                        VideoCapturer videoCapturer,
                                                        VideoConstraints videoConstraints);
     private native boolean nativeRemoveVideoTrack(long nativeLocalMediaHandle, String trackId);

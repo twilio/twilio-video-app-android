@@ -5,6 +5,7 @@
 #include "webrtc/api/androidvideocapturer.h"
 #include "webrtc/api/java/jni/androidvideocapturer_jni.h"
 #include "webrtc/api/java/jni/jni_helpers.h"
+#include "class_reference_holder.h"
 
 namespace twilio_video_jni {
 
@@ -19,6 +20,19 @@ std::shared_ptr<twilio::media::LocalMedia> getLocalMedia(jlong local_media_handl
 twilio::media::MediaConstraints* getAudioOptions(jobject j_audio_options) {
     // TODO: actually convert audio options
     return nullptr;
+}
+
+jobject createJavaVideoCapturerDelegate(jobject j_video_capturer) {
+    JNIEnv *jni = webrtc_jni::GetEnv();
+    jclass j_video_capturer_delegate_class = twilio_video_jni::FindClass(jni,
+                                                                         "com/twilio/video/VideoCapturerDelegate");
+    jmethodID j_video_capturer_delegate_ctor_id = webrtc_jni::GetMethodID(jni,
+                                                                     j_video_capturer_delegate_class,
+                                                                     "<init>",
+                                                                     "(Lcom/twilio/video/VideoCapturer;)V");
+    return jni->NewObject(j_video_capturer_delegate_class,
+                          j_video_capturer_delegate_ctor_id,
+                          j_video_capturer);
 }
 
 twilio::media::MediaConstraints* convertVideoConstraints(jobject j_video_constraints) {
@@ -181,10 +195,10 @@ JNIEXPORT jobject JNICALL Java_com_twilio_video_LocalMedia_nativeAddVideoTrack(J
                                                                                jobject j_local_media,
                                                                                jlong local_media_handle,
                                                                                jboolean enabled,
-                                                                               jobject j_video_capturer_delegate,
                                                                                jobject j_video_capturer,
                                                                                jobject j_video_contraints) {
     std::shared_ptr<twilio::media::LocalMedia> local_media = getLocalMedia(local_media_handle);
+    jobject j_video_capturer_delegate = createJavaVideoCapturerDelegate(j_video_capturer);
     rtc::scoped_refptr<VideoCapturerDelegate> delegate =
             new rtc::RefCountedObject<VideoCapturerDelegate>(jni,
                                                              j_video_capturer_delegate,
