@@ -9,7 +9,6 @@ import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
-import android.support.v7.app.AppCompatActivity;
 import android.view.HapticFeedbackConstants;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
@@ -22,6 +21,7 @@ import android.widget.Toast;
 
 import com.tw.video.testapp.BuildConfig;
 import com.tw.video.testapp.R;
+import com.tw.video.testapp.base.BaseActivity;
 import com.tw.video.testapp.util.SimpleSignalingUtils;
 import com.twilio.video.LogLevel;
 import com.twilio.video.VideoClient;

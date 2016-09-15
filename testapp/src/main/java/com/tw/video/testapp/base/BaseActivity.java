@@ -1,4 +1,4 @@
-package com.tw.video.testapp.ui;
+package com.tw.video.testapp.base;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
