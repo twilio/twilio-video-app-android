@@ -36,7 +36,7 @@ public class FakeVideoCapturer implements VideoCapturer {
             VideoFrame emptyVideoFrame = new VideoFrame(emptyBuffer,
                     captureFormat.dimensions, 0, captureTimeNs);
 
-            // Only notify the frame listener of we are not stopped
+            // Only notify the frame listener if we are not stopped
             if (started.get()) {
                 capturerListener.onFrameCaptured(emptyVideoFrame);
                 fakeVideoCapturerHandler.postDelayed(this, FRAMERATE_MS);
