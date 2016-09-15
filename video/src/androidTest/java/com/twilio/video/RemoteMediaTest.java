@@ -118,9 +118,7 @@ public class RemoteMediaTest {
         actor2Room.disconnect();
         actor2Room = null;
         participant = null;
-        actor1VideoClient.release();
         actor1VideoClient = null;
-        actor2VideoClient.release();
         actor2VideoClient = null;
         actor1LocalMedia.release();
         actor1LocalMedia = null;

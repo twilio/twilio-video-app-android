@@ -10,9 +10,11 @@ import com.getkeepsafe.relinker.ReLinker;
 import com.twilio.common.AccessManager;
 
 import java.util.EnumMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * The VideoClient allows a user to connect to a Room
@@ -36,6 +38,7 @@ public class VideoClient {
     private final Context applicationContext;
     private AccessManager accessManager;
     private long nativeClientContext;
+    private Set<Room> rooms;
 
     public VideoClient(Context context, AccessManager accessManager) {
         if (context == null) {
@@ -48,6 +51,7 @@ public class VideoClient {
         this.applicationContext = context.getApplicationContext();
         this.accessManager = accessManager;
         this.handler = Util.createCallbackHandler();
+        this.rooms = new HashSet<>();
 
         checkPermissions(context);
 
@@ -71,9 +75,6 @@ public class VideoClient {
             trySetCoreModuleLogLevel(module.ordinal(), moduleLogLevel.get(module).ordinal());
         }
 
-        nativeClientContext = nativeCreateClient(context,
-                accessManager,
-                MediaFactory.instance(context).getNativeMediaFactoryHandle());
     }
 
     /**
@@ -87,7 +88,6 @@ public class VideoClient {
      * @param audioOutput that should be used by the system
      */
     public void setAudioOutput(AudioOutput audioOutput) {
-        logger.d("setAudioOutput");
         AudioManager audioManager = (AudioManager) applicationContext.getSystemService(Context.AUDIO_SERVICE);
         if (audioOutput == AudioOutput.SPEAKERPHONE) {
             audioManager.setSpeakerphoneOn(true);
@@ -102,7 +102,6 @@ public class VideoClient {
      * @return audio output speaker
      */
     public AudioOutput getAudioOutput() {
-        logger.d("getAudioOutput");
         AudioManager audioManager = (AudioManager) applicationContext.getSystemService(Context.AUDIO_SERVICE);
         return audioManager.isSpeakerphoneOn() ? AudioOutput.SPEAKERPHONE : AudioOutput.HEADSET;
     }
@@ -123,13 +122,22 @@ public class VideoClient {
             throw new NullPointerException("roomListener must not be null");
         }
 
+        if(rooms.isEmpty()) {
+            nativeClientContext = nativeCreateClient(applicationContext,
+                    accessManager,
+                    MediaFactory.instance(applicationContext).getNativeMediaFactoryHandle());
+        }
+
         Room room = new Room(connectOptions.getName(),
                 connectOptions.getLocalMedia(),
-                roomListener,
+                roomListenerProxy(roomListener),
                 handler);
+
+        rooms.add(room);
+
         /*
          * We need to synchronize access to room listener during initialization and make
-         * sure that onConnect() callback won't get call before connect() exits and Room
+         * sure that onConnect() callback won't get called before connect() exits and Room
          * creation is fully completed.
          */
         synchronized (room.getConnectLock()) {
@@ -142,11 +150,44 @@ public class VideoClient {
         return room;
     }
 
-    public synchronized void release() {
-        if (nativeClientContext != 0) {
+    synchronized void release(Room room) {
+        rooms.remove(room);
+        if (rooms.isEmpty() && nativeClientContext != 0) {
             nativeRelease(nativeClientContext);
             nativeClientContext = 0;
         }
+    }
+
+    private Room.Listener roomListenerProxy(final Room.Listener roomListener) {
+        return new Room.Listener() {
+
+            @Override
+            public void onConnected(Room room) {
+                roomListener.onConnected(room);
+            }
+
+            @Override
+            public void onConnectFailure(Room room, VideoException error) {
+                roomListener.onConnectFailure(room, error);
+                release(room);
+            }
+
+            @Override
+            public void onDisconnected(Room room, VideoException error) {
+                roomListener.onDisconnected(room, error);
+                release(room);
+            }
+
+            @Override
+            public void onParticipantConnected(Room room, Participant participant) {
+                roomListener.onParticipantConnected(room, participant);
+            }
+
+            @Override
+            public void onParticipantDisconnected(Room room, Participant participant) {
+                roomListener.onParticipantDisconnected(room, participant);
+            }
+        };
     }
 
     /**
