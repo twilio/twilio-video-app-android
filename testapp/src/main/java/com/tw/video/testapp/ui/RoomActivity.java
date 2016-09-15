@@ -372,7 +372,7 @@ public class RoomActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onConnectFailure(VideoException error) {
+            public void onConnectFailure(Room room, VideoException error) {
                 Timber.i("onConnectFailure");
                 roomStatusTextview.setText("Failed to connect to "+roomName);
             }

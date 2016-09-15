@@ -11,7 +11,7 @@ public class Room {
     public interface Listener {
         void onConnected(Room room);
 
-        void onConnectFailure(VideoException error);
+        void onConnectFailure(Room room, VideoException error);
 
         void onDisconnected(Room room, VideoException error);
 
@@ -156,7 +156,7 @@ public class Room {
             handler.post(new Runnable() {
                 @Override
                 public void run() {
-                    Room.this.listener.onConnectFailure(new VideoException(errorCode, ""));
+                    Room.this.listener.onConnectFailure(Room.this, new VideoException(errorCode, ""));
                 }
             });
         }
