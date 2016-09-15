@@ -115,10 +115,6 @@ public class RoomActivity extends AppCompatActivity {
             accessManager.dispose();
             accessManager = null;
         }
-        if (videoClient != null) {
-            videoClient.release();
-            videoClient = null;
-        }
     }
 
     private void processActivityIntent(Bundle savedInstanceState) {
@@ -363,7 +359,7 @@ public class RoomActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onConnectFailure(VideoException error) {
+            public void onConnectFailure(Room room, VideoException error) {
                 Timber.i("onConnectFailure");
                 roomStatusTextview.setText("Failed to connect to "+roomName);
             }

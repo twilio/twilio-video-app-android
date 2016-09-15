@@ -77,9 +77,7 @@ public class ConnectTests {
 
     @After
     public void teardown() {
-        actor1VideoClient.release();
         actor1VideoClient = null;
-        actor2VideoClient.release();
         actor2VideoClient = null;
         localMedia.release();
         localMedia = null;

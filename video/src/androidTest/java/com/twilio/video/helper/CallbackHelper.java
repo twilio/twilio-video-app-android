@@ -32,7 +32,7 @@ public class CallbackHelper {
         }
 
         @Override
-        public void onConnectFailure(VideoException error) {
+        public void onConnectFailure(Room room, VideoException error) {
             triggerLatch(onConnectFailureLatch);
         }
 
@@ -60,7 +60,7 @@ public class CallbackHelper {
         }
 
         @Override
-        public void onConnectFailure(VideoException error) {
+        public void onConnectFailure(Room room, VideoException error) {
 
         }
 

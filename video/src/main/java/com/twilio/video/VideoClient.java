@@ -10,76 +10,16 @@ import com.getkeepsafe.relinker.ReLinker;
 import com.twilio.common.AccessManager;
 
 import java.util.EnumMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
- * The VideoClient allows user to create or participate in Rooms.
+ * The VideoClient allows a user to connect to a Room
  */
 public class VideoClient {
-
-    // TODO: Check which of these error codes are still valid
-    /**
-     * Authenticating your VideoClient failed due to invalid auth credentials.
-     */
-    public static int INVALID_AUTH_DATA = 100;
-    /**
-     * The SIP account was invalid.
-     */
-    public static int INVALID_SIP_ACCOUNT = 102;
-    /**
-     * There was an error during VideoClient registration.
-     */
-    public static int CLIENT_REGISTATION_ERROR = 103;
-    /**
-     * The Conversation was invalid.
-     */
-    public static int INVALID_CONVERSATION = 105;
-    /**
-     * The Conversation was terminated due to an unforeseen error.
-     */
-    public static int CONVERSATION_TERMINATED = 110;
-    /**
-     * Establishing a media connection with the remote peer failed.
-     */
-    public static int PEER_CONNECTION_FAILED = 111;
-    /**
-     * The client disconnected unexpectedly.
-     */
-    public static int CLIENT_DISCONNECTED = 200;
-    /**
-     * Too many active Conversations.
-     */
-    public static int TOO_MANY_ACTIVE_CONVERSATIONS = 201;
-    /**
-     * A track was created with constraints that could not be satisfied.
-     */
-    public static int TRACK_CREATION_FAILED = 207;
-    /**
-     * Too many tracks were added to the local media.
-     *
-     * @note: The current maximum is one video track at a time.
-     */
-    public static int TOO_MANY_TRACKS = 300;
-    /**
-     * An invalid video capturer was added to the local media
-     *
-     * @note: At the moment, only {@link CameraCapturer} is supported.
-     */
-    public static int INVALID_VIDEO_CAPTURER = 301;
-    /**
-     * An attempt was made to add or remove a track that is already being operated on.
-     *
-     * @note: Retry your request at a later time.
-     */
-    public static int TRACK_OPERATION_IN_PROGRESS = 303;
-    /**
-     * An attempt was made to remove a track that has already ended.
-     *
-     * @note: The video track is in the {@link MediaTrackState} ENDED state.
-     */
-    public static int INVALID_VIDEO_TRACK_STATE = 305;
 
     private static final String[] REQUIRED_PERMISSIONS = {
             // Required permissions granted upon install
@@ -98,6 +38,7 @@ public class VideoClient {
     private final Context applicationContext;
     private AccessManager accessManager;
     private long nativeClientContext;
+    private Set<Room> rooms;
 
     public VideoClient(Context context, AccessManager accessManager) {
         if (context == null) {
@@ -110,6 +51,7 @@ public class VideoClient {
         this.applicationContext = context.getApplicationContext();
         this.accessManager = accessManager;
         this.handler = Util.createCallbackHandler();
+        this.rooms = new HashSet<>();
 
         checkPermissions(context);
 
@@ -133,9 +75,6 @@ public class VideoClient {
             trySetCoreModuleLogLevel(module.ordinal(), moduleLogLevel.get(module).ordinal());
         }
 
-        nativeClientContext = nativeCreateClient(context,
-                accessManager,
-                MediaFactory.instance(context).getNativeMediaFactoryHandle());
     }
 
     /**
@@ -149,7 +88,6 @@ public class VideoClient {
      * @param audioOutput that should be used by the system
      */
     public void setAudioOutput(AudioOutput audioOutput) {
-        logger.d("setAudioOutput");
         AudioManager audioManager = (AudioManager) applicationContext.getSystemService(Context.AUDIO_SERVICE);
         if (audioOutput == AudioOutput.SPEAKERPHONE) {
             audioManager.setSpeakerphoneOn(true);
@@ -164,7 +102,6 @@ public class VideoClient {
      * @return audio output speaker
      */
     public AudioOutput getAudioOutput() {
-        logger.d("getAudioOutput");
         AudioManager audioManager = (AudioManager) applicationContext.getSystemService(Context.AUDIO_SERVICE);
         return audioManager.isSpeakerphoneOn() ? AudioOutput.SPEAKERPHONE : AudioOutput.HEADSET;
     }
@@ -185,13 +122,22 @@ public class VideoClient {
             throw new NullPointerException("roomListener must not be null");
         }
 
+        if(rooms.isEmpty()) {
+            nativeClientContext = nativeCreateClient(applicationContext,
+                    accessManager,
+                    MediaFactory.instance(applicationContext).getNativeMediaFactoryHandle());
+        }
+
         Room room = new Room(connectOptions.getName(),
                 connectOptions.getLocalMedia(),
-                roomListener,
+                roomListenerProxy(roomListener),
                 handler);
+
+        rooms.add(room);
+
         /*
          * We need to synchronize access to room listener during initialization and make
-         * sure that onConnect() callback won't get call before connect() exits and Room
+         * sure that onConnect() callback won't get called before connect() exits and Room
          * creation is fully completed.
          */
         synchronized (room.getConnectLock()) {
@@ -204,11 +150,44 @@ public class VideoClient {
         return room;
     }
 
-    public synchronized void release() {
-        if (nativeClientContext != 0) {
+    synchronized void release(Room room) {
+        rooms.remove(room);
+        if (rooms.isEmpty() && nativeClientContext != 0) {
             nativeRelease(nativeClientContext);
             nativeClientContext = 0;
         }
+    }
+
+    private Room.Listener roomListenerProxy(final Room.Listener roomListener) {
+        return new Room.Listener() {
+
+            @Override
+            public void onConnected(Room room) {
+                roomListener.onConnected(room);
+            }
+
+            @Override
+            public void onConnectFailure(Room room, VideoException error) {
+                roomListener.onConnectFailure(room, error);
+                release(room);
+            }
+
+            @Override
+            public void onDisconnected(Room room, VideoException error) {
+                roomListener.onDisconnected(room, error);
+                release(room);
+            }
+
+            @Override
+            public void onParticipantConnected(Room room, Participant participant) {
+                roomListener.onParticipantConnected(room, participant);
+            }
+
+            @Override
+            public void onParticipantDisconnected(Room room, Participant participant) {
+                roomListener.onParticipantDisconnected(room, participant);
+            }
+        };
     }
 
     /**
