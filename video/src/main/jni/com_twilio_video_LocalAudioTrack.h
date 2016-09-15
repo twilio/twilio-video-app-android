@@ -18,7 +18,7 @@ public:
     }
 
     virtual ~LocalAudioTrackContext() {
-        local_audio_track_ = nullptr;
+        local_audio_track_.reset();
     }
 
     std::shared_ptr<twilio::media::LocalAudioTrack> getLocalAudioTrack() {

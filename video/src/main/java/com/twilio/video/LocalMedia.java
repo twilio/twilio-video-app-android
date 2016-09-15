@@ -79,17 +79,13 @@ public class LocalMedia {
                                          VideoCapturer videoCapturer,
                                          VideoConstraints videoConstraints) {
         checkReleased("addVideoTrack");
-        long nativeVideoTrack = nativeAddVideoTrack(nativeLocalMediaHandle,
+        LocalVideoTrack localVideoTrack = nativeAddVideoTrack(nativeLocalMediaHandle,
                 enabled,
                 new VideoCapturerDelegate(videoCapturer),
+                videoCapturer,
                 videoConstraints);
-        LocalVideoTrack localVideoTrack = null;
 
-        if (nativeVideoTrack != 0) {
-            org.webrtc.VideoTrack webRtcVideoTrack = new org.webrtc.VideoTrack(nativeVideoTrack);
-            localVideoTrack = new LocalVideoTrack(webRtcVideoTrack, videoCapturer, null);
-
-            localVideoTrack.enable(enabled);
+        if (localVideoTrack != null) {
             localVideoTracks.add(localVideoTrack);
             return localVideoTrack;
         } else {
@@ -101,15 +97,18 @@ public class LocalMedia {
 
     public boolean removeVideoTrack(LocalVideoTrack localVideoTrack) {
         checkReleased("removeVideoTrack");
+        boolean result = false;
 
-        boolean result = localVideoTrack != null &&
-                localVideoTracks.contains(localVideoTrack) &&
-                nativeRemoveVideoTrack(nativeLocalMediaHandle, localVideoTrack.getTrackId());
+        if (localVideoTrack != null) {
+            result = localVideoTracks.contains(localVideoTrack) &&
+                    nativeRemoveVideoTrack(nativeLocalMediaHandle, localVideoTrack.getTrackId());
 
-        if (!result) {
-            logger.e("Failed to remove video track");
-        } else {
-            localVideoTracks.remove(localVideoTrack);
+            if (!result) {
+                logger.e("Failed to remove video track");
+            } else {
+                localVideoTracks.remove(localVideoTrack);
+                localVideoTrack.release();
+            }
         }
 
         return result;
@@ -151,10 +150,11 @@ public class LocalMedia {
                                                        boolean enabled,
                                                        AudioOptions audioOptions);
     private native boolean nativeRemoveAudioTrack(long nativeLocalMediaHandle, String trackId);
-    private native long nativeAddVideoTrack(long nativeLocalMediaHandle,
-                                            boolean enabled,
-                                            VideoCapturerDelegate videoCapturerDelegate,
-                                            VideoConstraints videoConstraints);
+    private native LocalVideoTrack nativeAddVideoTrack(long nativeLocalMediaHandle,
+                                                       boolean enabled,
+                                                       VideoCapturerDelegate videoCapturerDelegate,
+                                                       VideoCapturer videoCapturer,
+                                                       VideoConstraints videoConstraints);
     private native boolean nativeRemoveVideoTrack(long nativeLocalMediaHandle, String trackId);
     private native void nativeRelease(long nativeLocalMediaHandle);
 }

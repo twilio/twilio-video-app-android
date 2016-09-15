@@ -13,25 +13,16 @@ public class VideoTrack implements Track {
     private static final String WARNING_NULL_RENDERER = "Attempted to add a null renderer.";
     private static final Logger logger = Logger.getLogger(VideoTrack.class);
 
-    private org.webrtc.VideoTrack webrtcVideoTrack;
-    private String trackId;
+    private final org.webrtc.VideoTrack webrtcVideoTrack;
+    private final String trackId;
     private Map<VideoRenderer, org.webrtc.VideoRenderer> videoRenderersMap = new HashMap<>();
     private boolean isEnabled;
-    private long nativeVideoTrackContext;
     private boolean isReleased = false;
-
-    VideoTrack(long nativeVideoTrackContext,
-               String trackId,
-               boolean isEnabled,
-               long nativeWebrtcTrack) {
-        this.nativeVideoTrackContext = nativeVideoTrackContext;
-        this.trackId = trackId;
-        this.isEnabled = isEnabled;
-        this.webrtcVideoTrack = new org.webrtc.VideoTrack(nativeWebrtcTrack);
-    }
 
     VideoTrack(org.webrtc.VideoTrack webRtcVideoTrack) {
         this.webrtcVideoTrack = webRtcVideoTrack;
+        this.trackId = webRtcVideoTrack.id();
+        this.isEnabled = webRtcVideoTrack.enabled();
     }
 
     /**
@@ -103,12 +94,14 @@ public class VideoTrack implements Track {
     }
 
     synchronized void release() {
-        if (nativeVideoTrackContext != 0) {
+        if (!isReleased) {
             isEnabled = false;
+            /*
+             * TODO
+             * I think we only need to keep this release if we decide to remove renderers
+             * when the video track is removed
+             */
             videoRenderersMap.clear();
-            webrtcVideoTrack = null;
-            nativeRelease(nativeVideoTrackContext);
-            nativeVideoTrackContext = 0;
             isReleased = true;
         }
     }
@@ -144,11 +137,5 @@ public class VideoTrack implements Track {
                     frameNativePointer);
         }
     }
-
-    org.webrtc.VideoTrack getWebrtcVideoTrack() {
-        return webrtcVideoTrack;
-    }
-
-    private native void nativeRelease(long nativeVideoTrackContext);
 }
 

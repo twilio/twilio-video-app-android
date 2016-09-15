@@ -1,6 +1,6 @@
 #include "com_twilio_video_Media.h"
 #include "webrtc/api/java/jni/jni_helpers.h"
-
+#include "webrtc/api/java/jni/classreferenceholder.h"
 #include "android_media_observer.h"
 
 jobject createJavaAudioTrack(JNIEnv *env,
@@ -16,17 +16,18 @@ jobject createJavaAudioTrack(JNIEnv *env,
 jobject createJavaVideoTrack(JNIEnv *env,
                              std::shared_ptr<twilio::media::VideoTrack> video_track,
                              jclass j_video_track_class, jmethodID j_video_track_ctor_id) {
-    // Create video track context
-    VideoTrackContext *video_track_context = new VideoTrackContext();
-    video_track_context->video_track = video_track;
-    jlong j_video_track_context = webrtc_jni::jlongFromPointer(video_track_context);
+    jclass j_webrtc_video_track_class = webrtc_jni::FindClass(env, "org/webrtc/VideoTrack");
+    jmethodID j_webrtc_video_track_ctor_id = webrtc_jni::GetMethodID(env,
+                                                                     j_webrtc_video_track_class,
+                                                                     "<init>",
+                                                                     "(J)V");
+    jobject j_webrtc_video_track = env->NewObject(j_webrtc_video_track_class,
+                                                  j_webrtc_video_track_ctor_id,
+                                                  webrtc_jni::jlongFromPointer(video_track->getWebRtcTrack()));
 
-    jstring j_track_id = webrtc_jni::JavaStringFromStdString(env, video_track->getTrackId());
-    jlong j_webrtc_track = webrtc_jni::jlongFromPointer(video_track->getWebRtcTrack());
-    jboolean j_is_enabled = video_track->isEnabled();
-
-    return env->NewObject(j_video_track_class, j_video_track_ctor_id,
-                         j_video_track_context, j_track_id, j_is_enabled, j_webrtc_track);
+    return env->NewObject(j_video_track_class,
+                          j_video_track_ctor_id,
+                          j_webrtc_video_track);
 }
 
 JNIEXPORT void JNICALL
@@ -40,16 +41,6 @@ Java_com_twilio_video_Media_nativeSetInternalListener(JNIEnv *env,
     AndroidMediaObserver *media_observer =
         reinterpret_cast<AndroidMediaObserver *>(j_internal_listener);
     media_context->media->attachObserver(media_observer);
-}
-
-JNIEXPORT void JNICALL
-Java_com_twilio_video_VideoTrack_nativeRelease(JNIEnv *env, jobject instance,
-                                               jlong j_video_track_context) {
-
-    VideoTrackContext *video_track_context =
-        reinterpret_cast<VideoTrackContext *>(j_video_track_context);
-    delete video_track_context;
-
 }
 
 JNIEXPORT void JNICALL

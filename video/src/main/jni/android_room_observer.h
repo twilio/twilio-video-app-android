@@ -79,7 +79,7 @@ public:
             webrtc_jni::GetMethodID(env,
                                     *j_video_track_class_,
                                     "<init>",
-                                    "(JLjava/lang/String;ZJ)V")),
+                                    "(Lorg/webrtc/VideoTrack;)V")),
         j_media_ctor_id_(
             webrtc_jni::GetMethodID(env,
                                     *j_media_class_,

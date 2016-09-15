@@ -40,7 +40,7 @@ public class LocalAudioTrack extends AudioTrack  {
         return nativeLocalAudioTrackHandle == 0;
     }
 
-    private native boolean nativeIsEnabled(long nativeLocalAudioTrackContext);
-    private native void nativeEnable(long nativeLocalAudioTrackContext, boolean enable);
-    private native void nativeRelease(long nativeLocalAudioTrackContext);
+    private native boolean nativeIsEnabled(long nativeLocalAudioTrackHandle);
+    private native void nativeEnable(long nativeLocalAudioTrackHandle, boolean enable);
+    private native void nativeRelease(long nativeLocalAudioTrackHandle);
 }

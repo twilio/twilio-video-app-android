@@ -4,14 +4,18 @@ package com.twilio.video;
  * A local video track that gets camera video from a {@link CameraCapturer}
  */
 public class LocalVideoTrack extends VideoTrack {
+    private static final Logger logger = Logger.getLogger(LocalAudioTrack.class);
+
+    private long nativeLocalVideoTrackHandle;
     private final VideoCapturer videoCapturer;
     private final VideoConstraints videoConstraints;
-    private boolean enabledVideo = true;
 
-    LocalVideoTrack(org.webrtc.VideoTrack webrtcVideoTrack,
+    LocalVideoTrack(long nativeLocalVideoTrackHandle,
                     VideoCapturer videoCapturer,
-                    VideoConstraints videoConstraints) {
+                    VideoConstraints videoConstraints,
+                    org.webrtc.VideoTrack webrtcVideoTrack) {
         super(webrtcVideoTrack);
+        this.nativeLocalVideoTrackHandle = nativeLocalVideoTrackHandle;
         this.videoCapturer = videoCapturer;
         this.videoConstraints = videoConstraints;
     }
@@ -23,34 +27,6 @@ public class LocalVideoTrack extends VideoTrack {
      */
     public VideoCapturer getVideoCapturer() {
         return videoCapturer;
-    }
-
-    public boolean enable(boolean enabled) {
-        org.webrtc.VideoTrack webRtcVideoTrack = getWebrtcVideoTrack();
-
-        if (webRtcVideoTrack != null) {
-            enabledVideo = webRtcVideoTrack.setEnabled(enabled);
-            if(enabledVideo && enabled) {
-//                videoCapturer.resume();
-            } else if(enabledVideo && !enabled){
-//                videoCapturer.pause();
-            }
-        } else {
-            enabledVideo = enabled;
-        }
-        return enabledVideo;
-    }
-
-    public String getTrackId() {
-        org.webrtc.VideoTrack webRtcVideoTrack = getWebrtcVideoTrack();
-
-        return webRtcVideoTrack.id();
-    }
-
-    public boolean isEnabled() {
-        org.webrtc.VideoTrack webRtcVideoTrack = getWebrtcVideoTrack();
-
-        return webRtcVideoTrack.enabled();
     }
 
     /**
@@ -65,4 +41,39 @@ public class LocalVideoTrack extends VideoTrack {
     public VideoConstraints getVideoConstraints() {
         return videoConstraints;
     }
+
+    @Override
+    public boolean isEnabled() {
+        if (!isReleased()) {
+            return nativeIsEnabled(nativeLocalVideoTrackHandle);
+        } else {
+            logger.e("Local audio track is not enabled because it has been removed");
+
+            return false;
+        }
+    }
+
+    public void enable(boolean enabled) {
+        if (!isReleased()) {
+            nativeEnable(nativeLocalVideoTrackHandle, enabled);
+        } else {
+            logger.e("Cannot enable a local audio track that has been removed");
+        }
+    }
+
+    synchronized void release() {
+        if (!isReleased()) {
+            super.release();
+            nativeRelease(nativeLocalVideoTrackHandle);
+            nativeLocalVideoTrackHandle = 0;
+        }
+    }
+
+    boolean isReleased() {
+        return nativeLocalVideoTrackHandle == 0;
+    }
+
+    private native boolean nativeIsEnabled(long nativeLocalVideoTrackHandle);
+    private native void nativeEnable(long nativeLocalVideoTrackHandle, boolean enable);
+    private native void nativeRelease(long nativeLocalVideoTrackHandle);
 }

@@ -210,7 +210,9 @@ public class RoomActivity extends AppCompatActivity {
     public void pauseVideo(View view) {
         if (localVideoTrack != null) {
             boolean enable = !localVideoTrack.isEnabled();
-            if (!localVideoTrack.enable(enable)) {
+
+            localVideoTrack.enable(enable);
+            if (localVideoTrack.isEnabled() != enable) {
                 Snackbar.make(roomStatusTextview,
                         "Video track "+ (enable  ? "enable" : "diable") + " action failed",
                         Snackbar.LENGTH_LONG).setAction("Action", null).show();
