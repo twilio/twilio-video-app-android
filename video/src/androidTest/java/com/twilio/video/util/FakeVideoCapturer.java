@@ -12,8 +12,11 @@ import com.twilio.video.VideoPixelFormat;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
+
+import static junit.framework.TestCase.fail;
 
 public class FakeVideoCapturer implements VideoCapturer {
     private static final long FRAMERATE_MS = 33;
@@ -23,7 +26,8 @@ public class FakeVideoCapturer implements VideoCapturer {
     private VideoCapturer.Listener capturerListener;
 
     // Just used for testing we will just capture on main thread
-    private final Handler fakeVideoCapturerHandler = new Handler(Looper.getMainLooper());
+    private FakeCapturerThread fakeCapturerThread = new FakeCapturerThread();
+    private Handler fakeVideoCapturerHandler;
     private final Runnable frameGenerator = new Runnable() {
         @Override
         public void run() {
@@ -68,14 +72,74 @@ public class FakeVideoCapturer implements VideoCapturer {
                              VideoCapturer.Listener capturerListener) {
         this.captureFormat = captureFormat;
         this.capturerListener = capturerListener;
-        this.started.set(fakeVideoCapturerHandler.postDelayed(frameGenerator, FRAMERATE_MS));
+        this.started.set(true);
 
-        capturerListener.onCapturerStarted(started.get());
+        // Will asynchronously start the capturer
+        fakeCapturerThread.requestStart();
     }
 
     @Override
     public void stopCapture() {
         this.started.set(false);
-        fakeVideoCapturerHandler.removeCallbacks(frameGenerator);
+
+        // Blocking call that ensures the capturer is stopped
+        fakeCapturerThread.requestStop();
+    }
+
+    class FakeCapturerThread extends Thread {
+        private final Object looperStartedEvent = new Object();
+        private boolean running = false;
+
+        public synchronized void requestStart() {
+            if (running) {
+                return;
+            }
+            running = true;
+            fakeVideoCapturerHandler = null;
+            start();
+            synchronized (looperStartedEvent) {
+                while (fakeVideoCapturerHandler == null) {
+                    try {
+                        looperStartedEvent.wait();
+                    } catch (InterruptedException e) {
+                        fail("Can not start fake capturer looper thread");
+                        running = false;
+                    }
+                }
+            }
+        }
+        public void run() {
+            Looper.prepare();
+            synchronized (looperStartedEvent) {
+                fakeVideoCapturerHandler = new Handler();
+                if (started.get()) {
+                    started.set(fakeVideoCapturerHandler.postDelayed(frameGenerator, FRAMERATE_MS));
+                    capturerListener.onCapturerStarted(started.get());
+                }
+                looperStartedEvent.notify();
+            }
+            Looper.loop();
+        }
+
+        public synchronized void requestStop() {
+            if (!running) {
+                return;
+            }
+            running = false;
+            final CountDownLatch capturerStopped = new CountDownLatch(1);
+            fakeVideoCapturerHandler.post(new Runnable() {
+                @Override
+                public void run() {
+                    Looper.myLooper().quit();
+                    capturerStopped.countDown();
+                }
+            });
+            try {
+                capturerStopped.await(10, TimeUnit.SECONDS);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+                fail("Failed to stop fake capturer");
+            }
+        }
     }
 }
