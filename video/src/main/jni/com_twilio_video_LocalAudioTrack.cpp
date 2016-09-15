@@ -22,11 +22,14 @@ jobject createJavaLocalAudioTrack(std::shared_ptr<twilio::media::LocalAudioTrack
     LocalAudioTrackContext* local_audio_track_context =
             new LocalAudioTrackContext(local_audio_track);
 
-    return jni->NewObject(j_local_audio_track_class,
-                          j_local_audio_track_ctor_id,
-                          webrtc_jni::jlongFromPointer(local_audio_track_context),
-                          webrtc_jni::JavaStringFromStdString(jni, local_audio_track->getTrackId()),
-                          local_audio_track->isEnabled());
+    jobject j_local_audio_track = jni->NewObject(j_local_audio_track_class,
+                                                 j_local_audio_track_ctor_id,
+                                                 webrtc_jni::jlongFromPointer(local_audio_track_context),
+                                                 webrtc_jni::JavaStringFromStdString(jni, local_audio_track->getTrackId()),
+                                                 local_audio_track->isEnabled());
+    CHECK_EXCEPTION(jni);
+
+    return j_local_audio_track;
 }
 
 JNIEXPORT jboolean JNICALL Java_com_twilio_video_LocalAudioTrack_nativeIsEnabled(JNIEnv *jni,

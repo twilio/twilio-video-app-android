@@ -32,13 +32,16 @@ jobject createJavaLocalVideoTrack(std::shared_ptr<twilio::media::LocalVideoTrack
     jobject j_webrtc_video_track = jni->NewObject(j_webrtc_video_track_class,
                                                   j_webrtc_video_track_ctor_id,
                                                   webrtc_jni::jlongFromPointer(local_video_track->getWebRtcTrack()));
+    CHECK_EXCEPTION(jni);
+    jobject j_local_video_track = jni->NewObject(j_video_track_class,
+                                                 j_video_track_ctor_id,
+                                                 webrtc_jni::jlongFromPointer(video_track_context),
+                                                 j_video_capturer,
+                                                 j_video_constraints,
+                                                 j_webrtc_video_track);
+    CHECK_EXCEPTION(jni);
 
-    return jni->NewObject(j_video_track_class,
-                          j_video_track_ctor_id,
-                          webrtc_jni::jlongFromPointer(video_track_context),
-                          j_video_capturer,
-                          j_video_constraints,
-                          j_webrtc_video_track);
+    return j_local_video_track;
 }
 
 JNIEXPORT jboolean JNICALL Java_com_twilio_video_LocalVideoTrack_nativeIsEnabled(JNIEnv *jni,
