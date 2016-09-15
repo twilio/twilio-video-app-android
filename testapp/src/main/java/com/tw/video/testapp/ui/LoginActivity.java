@@ -34,7 +34,7 @@ import retrofit.RetrofitError;
 import retrofit.client.Response;
 import timber.log.Timber;
 
-public class VideoClientLoginActivity extends AppCompatActivity {
+public class LoginActivity extends BaseActivity {
 
     @BindView(R.id.username_edittext) EditText usernameEditText;
     @BindView(R.id.room_name_edittext) EditText roomEditText;
@@ -99,7 +99,7 @@ public class VideoClientLoginActivity extends AppCompatActivity {
 
     @OnClick(R.id.join_room_button)
     void joinRoom(View view) {
-        progressDialog = ProgressDialog.show(VideoClientLoginActivity.this, null,
+        progressDialog = ProgressDialog.show(LoginActivity.this, null,
                 "Registering with Twilio", true);
         String username = usernameEditText.getText().toString();
         if(username != null && username.length() != 0) {
@@ -122,7 +122,7 @@ public class VideoClientLoginActivity extends AppCompatActivity {
 
     private void registerUser(final String username) {
         obtainCapabilityToken(username,
-                VideoClientLoginActivity.this.realmSpinner.getSelectedItem()
+                LoginActivity.this.realmSpinner.getSelectedItem()
                         .toString().toLowerCase());
     }
 

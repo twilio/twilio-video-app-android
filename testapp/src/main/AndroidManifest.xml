@@ -23,7 +23,7 @@
         android:label="@string/app_name"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".ui.VideoClientLoginActivity"
+            android:name=".ui.LoginActivity"
             android:windowSoftInputMode="adjustResize|stateAlwaysHidden">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
