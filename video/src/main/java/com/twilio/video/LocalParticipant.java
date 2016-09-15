@@ -2,11 +2,12 @@ package com.twilio.video;
 
 public class LocalParticipant {
 
-    private String sid;
-    private String identity;
-    private LocalMedia localMedia;
+    final private String sid;
+    final private String identity;
+    final private LocalMedia localMedia;
 
-    LocalParticipant(String identity, LocalMedia localMedia) {
+    LocalParticipant(String sid, String identity, LocalMedia localMedia) {
+        this.sid = sid;
         this.identity = identity;
         this.localMedia = localMedia;
     }
@@ -21,9 +22,5 @@ public class LocalParticipant {
 
     public LocalMedia getLocalMedia() {
         return localMedia;
-    }
-
-    void setSid(String sid) {
-        this.sid = sid;
     }
 }

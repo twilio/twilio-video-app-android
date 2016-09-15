@@ -34,12 +34,10 @@ public class Room {
     private Room.Listener listener;
     private final Handler handler;
 
-    Room(String name, LocalMedia localMedia, String localParticipantIdentity,
-         Room.Listener listener, Handler handler) {
+    Room(String name, LocalMedia localMedia, Room.Listener listener, Handler handler) {
         this.name = name;
         this.localMedia = localMedia;
         this.sid = "";
-        this.localParticipant = new LocalParticipant(localParticipantIdentity, localMedia);
         this.roomState = RoomState.DISCONNECTED;
         this.listener = listener;
         this.internalRoomListenerImpl = new InternalRoomListenerImpl();
@@ -68,9 +66,6 @@ public class Room {
     }
 
     public LocalParticipant getLocalParticipant() {
-        if (roomState != RoomState.CONNECTED) {
-            return null;
-        }
         return localParticipant;
     }
 
@@ -117,6 +112,7 @@ public class Room {
     interface InternalRoomListener {
         void onConnected(String roomSid,
                          String localParticipantSid,
+                         String localParticipantIdentity,
                          List<Participant> participantList);
         void onDisconnected(int errorCode);
         void onConnectFailure(int errorCode);
@@ -134,10 +130,12 @@ public class Room {
         @Override
         public synchronized void onConnected(String roomSid,
                                              String localParticipantSid,
+                                             String localParticipantIdentity,
                                              List<Participant> participantList) {
             logger.d("onConnected()");
             Room.this.sid = roomSid;
-            Room.this.localParticipant.setSid(localParticipantSid);
+            Room.this.localParticipant = new LocalParticipant(
+                    localParticipantSid, localParticipantIdentity, localMedia);
             for (Participant participant : participantList) {
                 participantMap.put(participant.getSid(), participant);
             }

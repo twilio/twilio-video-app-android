@@ -130,7 +130,6 @@ public class VideoClient {
 
         Room room = new Room(connectOptions.getName(),
                 connectOptions.getLocalMedia(),
-                accessManager.getIdentity(),
                 roomListenerProxy(roomListener),
                 handler);
 
