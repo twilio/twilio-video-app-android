@@ -47,7 +47,7 @@ public class LocalVideoTrack extends VideoTrack {
         if (!isReleased()) {
             return nativeIsEnabled(nativeLocalVideoTrackHandle);
         } else {
-            logger.e("Local audio track is not enabled because it has been removed");
+            logger.e("Local video track is not enabled because it has been removed");
 
             return false;
         }
@@ -57,7 +57,7 @@ public class LocalVideoTrack extends VideoTrack {
         if (!isReleased()) {
             nativeEnable(nativeLocalVideoTrackHandle, enabled);
         } else {
-            logger.e("Cannot enable a local audio track that has been removed");
+            logger.e("Cannot enable a local video track that has been removed");
         }
     }
 
