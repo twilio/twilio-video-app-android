@@ -10,7 +10,6 @@ import com.getkeepsafe.relinker.ReLinker;
 import com.twilio.common.AccessManager;
 
 import java.util.EnumMap;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -131,7 +130,7 @@ public class VideoClient {
 
         Room room = new Room(connectOptions.getName(),
                 connectOptions.getLocalMedia(),
-                RoomListenerProxy(roomListener),
+                roomListenerProxy(roomListener),
                 handler);
 
         rooms.add(room);
@@ -159,7 +158,7 @@ public class VideoClient {
         }
     }
 
-    private Room.Listener RoomListenerProxy(final Room.Listener roomListener) {
+    private Room.Listener roomListenerProxy(final Room.Listener roomListener) {
         return new Room.Listener() {
 
             @Override
