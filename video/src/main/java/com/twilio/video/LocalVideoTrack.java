@@ -48,7 +48,6 @@ public class LocalVideoTrack extends VideoTrack {
             return nativeIsEnabled(nativeLocalVideoTrackHandle);
         } else {
             logger.e("Local video track is not enabled because it has been removed");
-
             return false;
         }
     }
