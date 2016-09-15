@@ -260,7 +260,7 @@ public class RoomActivity extends AppCompatActivity {
     }
 
     private void returnToVideoClientLogin(){
-        Intent registrationIntent = new Intent(RoomActivity.this, VideoClientLoginActivity.class);
+        Intent registrationIntent = new Intent(RoomActivity.this, LoginActivity.class);
         startActivity(registrationIntent);
         finish();
     }
