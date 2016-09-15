@@ -101,8 +101,8 @@ public class VideoTrack implements Track {
     synchronized void release() {
         if (!isReleased) {
             isEnabled = false;
-            for (Map.Entry<VideoRenderer, org.webrtc.VideoRenderer> entry : videoRenderersMap.entrySet()) {
-                webrtcVideoTrack.removeRenderer(entry.getValue());
+            for (org.webrtc.VideoRenderer videoRenderer : videoRenderersMap.values()) {
+                webrtcVideoTrack.removeRenderer(videoRenderer);
             }
             videoRenderersMap.clear();
             isReleased = true;
