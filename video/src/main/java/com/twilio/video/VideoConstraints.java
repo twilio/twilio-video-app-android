@@ -2,39 +2,31 @@ package com.twilio.video;
 
 /**
  * Use video constraints to apply to a {@link LocalVideoTrack}.
- * Note that {@link VideoConstraints} is used to resolve the capture format, but the actual
- * video sent to Participants may be downscaled temporally or spatially in response to network
- * and device conditions.
  *
+ * <p><b>Note</b>: {@link VideoConstraints} is used to resolve the capture format, but the actual
+ * video sent to Participants may be downscaled temporally or spatially in response to network
+ * and device conditions.</p>
  */
 public class VideoConstraints {
-
-    // Battery saving 10 fps video
+    /** Battery saving 10 fps video. */
     public static final int FPS_10 = 10;
-    // Battery saving 15 fps video
+    /** Battery saving 15 fps video. */
     public static final int FPS_15 = 15;
-    // Battery efficient 20 fps video
+    /** Battery efficient 20 fps video. */
     public static final int FPS_20 = 20;
-    // Cinematic 24 fps video
+    /** Cinematic 24 fps video. */
     public static final int FPS_24 = 24;
-    // Smooth 30 fps video
+    /** Smooth 30 fps video. */
     public static final int FPS_30 = 30;
 
-    /**
-     * Pre-defined aspect ratio 4:3
-     */
+    /** Pre-defined aspect ratio 4:3. */
     public static final AspectRatio ASPECT_RATIO_4_3 = new AspectRatio(4, 3);
 
-    /**
-     * Pre-defined aspect ratio 16:9
-     */
+    /** Pre-defined aspect ratio 16:9. */
     public static final AspectRatio ASPECT_RATIO_16_9 = new AspectRatio(16, 9);
 
-    /**
-     * Pre-defined aspect ratio 11:9
-     */
+    /** Pre-defined aspect ratio 11:9. */
     public static final AspectRatio ASPECT_RATIO_11_9 = new AspectRatio(11, 9);
-
 
     private final VideoDimensions minVideoDimensions;
     private final VideoDimensions maxVideoDimensions;
@@ -52,40 +44,39 @@ public class VideoConstraints {
     }
 
     /**
-     * The minimum video size allowed
+     * The minimum video size allowed.
      */
     public VideoDimensions getMinVideoDimensions() {
         return minVideoDimensions;
     }
 
     /**
-     * The maximum video size allowed
+     * The maximum video size allowed.
      */
     public VideoDimensions getMaxVideoDimensions() {
         return maxVideoDimensions;
     }
 
     /**
-     * The minimum frames per second allowed
+     * The minimum frames per second allowed.
      */
     public int getMinFps() {
         return minFps;
     }
 
     /**
-     * The maximum frames per second allowed
+     * The maximum frames per second allowed.
      */
     public int getMaxFps() {
         return maxFps;
     }
 
     /**
-     * The aspect ratio
+     * The aspect ratio.
      */
     public AspectRatio getAspectRatio() {
         return aspectRatio;
     }
-
 
     public static class Builder {
         private VideoDimensions minVideoDimensions = new VideoDimensions(0,0);
@@ -155,5 +146,4 @@ public class VideoConstraints {
             return new VideoConstraints(this);
         }
     }
-
 }

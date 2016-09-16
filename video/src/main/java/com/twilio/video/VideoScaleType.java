@@ -2,7 +2,7 @@ package com.twilio.video;
 
 
 /**
- * Specifies what type of video scaling that will be performed by a {@link VideoRenderer}
+ * Specifies what type of video scaling that will be performed by a {@link VideoRenderer}.
  */
 public enum VideoScaleType {
     /**

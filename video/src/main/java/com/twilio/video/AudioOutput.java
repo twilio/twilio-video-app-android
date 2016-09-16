@@ -1,8 +1,7 @@
 package com.twilio.video;
 
 /**
- * Audio output types
- *
+ * Audio output types.
  */
 public enum AudioOutput {
     SPEAKERPHONE,

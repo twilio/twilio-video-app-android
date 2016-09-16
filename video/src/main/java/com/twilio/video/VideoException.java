@@ -4,7 +4,6 @@ import java.util.Locale;
 
 /**
  * A class that provides information about a {@link Room} error.
- *
  */
 public class VideoException extends Exception {
     private static final long serialVersionUID = 8881301848720707153L;

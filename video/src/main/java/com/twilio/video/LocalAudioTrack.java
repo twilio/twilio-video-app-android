@@ -1,5 +1,8 @@
 package com.twilio.video;
 
+/**
+ * Represents a local audio source.
+ */
 public class LocalAudioTrack extends AudioTrack  {
     private static final Logger logger = Logger.getLogger(LocalAudioTrack.class);
 
@@ -10,6 +13,11 @@ public class LocalAudioTrack extends AudioTrack  {
         this.nativeLocalAudioTrackHandle = nativeLocalAudioTrackHandle;
     }
 
+    /**
+     * Check if local audio track is enabled.
+     *
+     * @return true if the local audio is enabled.
+     */
     @Override
     public synchronized boolean isEnabled() {
         if (!isReleased()) {
@@ -21,6 +29,11 @@ public class LocalAudioTrack extends AudioTrack  {
         }
     }
 
+    /**
+     * Sets the state of the local audio track.
+     *
+     * @param enable the desired state of the local audio track.
+     */
     public synchronized void enable(boolean enable) {
         if (!isReleased()) {
             nativeEnable(nativeLocalAudioTrackHandle, enable);

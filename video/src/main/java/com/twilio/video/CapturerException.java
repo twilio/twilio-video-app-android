@@ -2,7 +2,6 @@ package com.twilio.video;
 
 /**
  * A class that provides information about a {@link CameraCapturer} error.
- *
  */
 public class CapturerException extends Exception {
     private static final long serialVersionUID = 853004373043422260L;

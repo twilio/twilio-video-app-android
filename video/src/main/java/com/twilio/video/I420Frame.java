@@ -3,7 +3,7 @@ package com.twilio.video;
 import java.nio.ByteBuffer;
 
 /**
- * A YUV frame in the I420 format
+ * A YUV frame in the I420 format.
  */
 public class I420Frame {
     public final int width;
@@ -51,7 +51,7 @@ public class I420Frame {
     }
 
     /**
-     * Construct a texture frame of the given dimensions with data in SurfaceTexture
+     * Construct a texture frame of the given dimensions with data in SurfaceTexture.
      */
     public I420Frame(int width, int height, int rotationDegree,
                      int textureId, float[] samplingMatrix, long nativeFramePointer) {

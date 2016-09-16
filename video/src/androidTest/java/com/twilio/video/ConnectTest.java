@@ -124,7 +124,7 @@ public class ConnectTest {
         roomListener.onConnectedLatch = new CountDownLatch(1);
 
         ConnectOptions connectOptions = new ConnectOptions.Builder()
-                .name(testRoom)
+                .roomName(testRoom)
                 .build();
         Room room = actor1VideoClient.connect(connectOptions, roomListener);
         assertTrue(roomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
@@ -138,13 +138,12 @@ public class ConnectTest {
         roomListener.onConnectedLatch = new CountDownLatch(1);
 
         ConnectOptions connectOptions = new ConnectOptions.Builder()
-                .name(testRoom)
+                .roomName(testRoom)
                 .localMedia(localMedia)
                 .build();
         Room room = actor1VideoClient.connect(connectOptions, roomListener);
         assertTrue(roomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
-        assertNotNull(room.getLocalMedia());
-
+        assertNotNull(room.getLocalParticipant().getLocalMedia());
         disconnectRoom(room, roomListener);
     }
 
@@ -154,7 +153,7 @@ public class ConnectTest {
         roomListener.onConnectedLatch = new CountDownLatch(1);
 
         ConnectOptions connectOptions = new ConnectOptions.Builder()
-                .name(testRoom)
+                .roomName(testRoom)
                 .localMedia(localMedia)
                 .build();
         Room room = actor1VideoClient.connect(connectOptions, roomListener);
@@ -178,12 +177,12 @@ public class ConnectTest {
         roomListener.onConnectedLatch = new CountDownLatch(1);
 
         ConnectOptions connectOptions = new ConnectOptions.Builder()
-                .name(testRoom)
+                .roomName(testRoom)
                 .localMedia(localMedia)
                 .build();
         Room room = actor1VideoClient.connect(connectOptions, roomListener);
         assertTrue(roomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
-        assertNotNull(room.getLocalMedia());
+        assertNotNull(room.getLocalParticipant().getLocalMedia());
         assertTrue(localMedia.removeAudioTrack(localAudioTrack));
 
         disconnectRoom(room, roomListener);
@@ -196,12 +195,12 @@ public class ConnectTest {
         roomListener.onConnectedLatch = new CountDownLatch(1);
 
         ConnectOptions connectOptions = new ConnectOptions.Builder()
-                .name(testRoom)
+                .roomName(testRoom)
                 .localMedia(localMedia)
                 .build();
         Room room = actor1VideoClient.connect(connectOptions, roomListener);
         assertTrue(roomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
-        assertNotNull(room.getLocalMedia());
+        assertNotNull(room.getLocalParticipant().getLocalMedia());
         assertTrue(localMedia.removeVideoTrack(localVideoTrack));
 
         disconnectRoom(room, roomListener);
@@ -215,12 +214,12 @@ public class ConnectTest {
         roomListener.onConnectedLatch = new CountDownLatch(1);
 
         ConnectOptions connectOptions = new ConnectOptions.Builder()
-                .name(testRoom)
+                .roomName(testRoom)
                 .localMedia(localMedia)
                 .build();
         Room room = actor1VideoClient.connect(connectOptions, roomListener);
         assertTrue(roomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
-        assertNotNull(room.getLocalMedia());
+        assertNotNull(room.getLocalParticipant().getLocalMedia());
         assertTrue(localMedia.removeAudioTrack(localAudioTrack));
         assertTrue(localMedia.removeVideoTrack(localVideoTrack));
 
@@ -233,12 +232,12 @@ public class ConnectTest {
         roomListener.onConnectedLatch = new CountDownLatch(1);
 
         ConnectOptions connectOptions = new ConnectOptions.Builder()
-                .name(testRoom)
+                .roomName(testRoom)
                 .localMedia(localMedia)
                 .build();
         Room room = actor1VideoClient.connect(connectOptions, roomListener);
         assertTrue(roomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
-        assertNotNull(room.getLocalMedia());
+        assertNotNull(room.getLocalParticipant().getLocalMedia());
 
         // Now we add our tracks
         LocalAudioTrack localAudioTrack = localMedia.addAudioTrack(false);
@@ -273,8 +272,9 @@ public class ConnectTest {
         roomListener.onConnectedLatch = new CountDownLatch(1);
         roomListener.onParticipantConnectedLatch = new CountDownLatch(1);
         String randomRoomName = testRoom + System.currentTimeMillis();
-
-        ConnectOptions connectOptions = new ConnectOptions.Builder().name(randomRoomName).build();
+        ConnectOptions connectOptions = new ConnectOptions.Builder()
+                .roomName(randomRoomName)
+                .build();
         Room room = actor1VideoClient.connect(connectOptions, roomListener);
         assertTrue(roomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
         assertEquals(RoomState.CONNECTED, room.getState());
@@ -296,8 +296,9 @@ public class ConnectTest {
         roomListener.onParticipantDisconnectedLatch = new CountDownLatch(1);
         roomListener.onParticipantConnectedLatch = new CountDownLatch(1);
         String randomRoomName = testRoom + System.currentTimeMillis();
-
-        ConnectOptions connectOptions = new ConnectOptions.Builder().name(randomRoomName).build();
+        ConnectOptions connectOptions = new ConnectOptions.Builder()
+                .roomName(randomRoomName)
+                .build();
         Room room = actor1VideoClient.connect(connectOptions, roomListener);
         assertTrue(roomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
         assertEquals(RoomState.CONNECTED, room.getState());

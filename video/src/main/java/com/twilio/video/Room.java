@@ -6,22 +6,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * A Room represents a media session with zero or more remote Participants. Media shared by any one
+ * {@link Participant} is distributed equally to all other Participants.
+ */
 public class Room {
-
-    public interface Listener {
-        void onConnected(Room room);
-
-        void onConnectFailure(Room room, VideoException error);
-
-        void onDisconnected(Room room, VideoException error);
-
-        void onParticipantConnected(Room room, Participant participant);
-
-        void onParticipantDisconnected(Room room, Participant participant);
-
-    }
-
     private static final Logger logger = Logger.getLogger(Room.class);
+
     private long nativeRoomContext;
     private String name;
     private final LocalMedia localMedia;
@@ -45,30 +36,48 @@ public class Room {
         this.handler = handler;
     }
 
+    /**
+     * Returns the name of the current room. This method will return the SID if the room was
+     * created without a name.
+     */
     public String getName() {
         return name;
     }
 
+    /**
+     * Returns the SID of the current room.
+     */
     public String getSid() {
         return sid;
     }
 
+    /**
+     * Returns the current room state.
+     */
     public RoomState getState() {
         return roomState;
     }
 
+    /**
+     * Returns all currently connected participants.
+     *
+     * @return a map of identities to participants.
+     */
     public Map<String, Participant> getParticipants() {
         return new HashMap<>(participantMap);
     }
 
-    public LocalMedia getLocalMedia() {
-        return localMedia;
-    }
-
+    /**
+     * Returns the current local participant. If the room has not reached
+     * {@link RoomState#CONNECTED} then this method will return null.
+     */
     public LocalParticipant getLocalParticipant() {
         return localParticipant;
     }
 
+    /**
+     * Disconnects from the room.
+     */
     public synchronized void disconnect() {
         if (roomState != RoomState.DISCONNECTED && nativeRoomContext != 0) {
             nativeDisconnect(nativeRoomContext);
@@ -212,9 +221,52 @@ public class Room {
 
     }
 
+    /**
+     * Listener definition of room related events.
+     */
+    public interface Listener {
+        /**
+         * Called when a room has succeeded.
+         *
+         * @param room the connected room.
+         */
+        void onConnected(Room room);
+
+        /**
+         * Called when a connection to a room failed.
+         *
+         * @param room the room that failed to be connected to.
+         * @param error an exception describing why connect failed.
+         */
+        void onConnectFailure(Room room, VideoException error);
+
+        /**
+         * Called when a room has been disconnected from.
+         *
+         * @param room the room that was disconnected from.
+         * @param error An exception if there was a problem that caused the room to be
+         *              disconnected from. This value will be null is there were no problems
+         *              disconnecting from the room.
+         */
+        void onDisconnected(Room room, VideoException error);
+
+        /**
+         * Called when a participant has connected to a room.
+         *
+         * @param room the room the participant connected to.
+         * @param participant the newly connected participant.
+         */
+        void onParticipantConnected(Room room, Participant participant);
+
+        /**
+         * Called when a participant has disconnected from a room.
+         * @param room the room the participant disconnected from.
+         * @param participant the disconnected participant.
+         */
+        void onParticipantDisconnected(Room room, Participant participant);
+    }
+
     class InternalRoomListenerHandle extends NativeHandle {
-
-
         public InternalRoomListenerHandle(InternalRoomListener listener) {
             super(listener);
         }
@@ -227,8 +279,6 @@ public class Room {
 
         @Override
         protected native void nativeRelease(long nativeHandle);
-
-
     }
 
     private native void nativeDisconnect(long nativeRoomContext);

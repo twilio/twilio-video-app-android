@@ -1,7 +1,7 @@
 package com.twilio.video;
 
 /**
- * A local video track that gets camera video from a {@link CameraCapturer}
+ * A local video track that gets video frames from a specified {@link VideoCapturer}.
  */
 public class LocalVideoTrack extends VideoTrack {
     private static final Logger logger = Logger.getLogger(LocalAudioTrack.class);
@@ -21,27 +21,27 @@ public class LocalVideoTrack extends VideoTrack {
     }
 
     /**
-     * Retrieves the {@link VideoCapturer} associated with this video track
-     *
-     * @return camera
+     * Retrieves the {@link VideoCapturer} associated with this video track.
      */
     public VideoCapturer getVideoCapturer() {
         return videoCapturer;
     }
 
     /**
-     * Specifies the video constraints associated with this track
+     * Retrieves the video constraints associated with this track.
      *
-     * If you do not provide any video constraints, the default video constraints are set to a
-     * a minimum of 10 frames per second, a maximum of 30 frames per second, and a maximum video
-     * dimension size of 640x480.
-     *
-     * @return video constraints
+     * <p>If you do not provide any video constraints, the default video constraints are set to a
+     * maximum video dimension size of 640x480 at a frame rate of 30 frames per second.</p>
      */
     public VideoConstraints getVideoConstraints() {
         return videoConstraints;
     }
 
+    /**
+     * Check if local video track is enabled.
+     *
+     * @return true if the local video is enabled.
+     */
     @Override
     public boolean isEnabled() {
         if (!isReleased()) {
@@ -52,6 +52,11 @@ public class LocalVideoTrack extends VideoTrack {
         }
     }
 
+    /**
+     * Sets the state of the local video track.
+     *
+     * @param enabled the desired state of the local video track.
+     */
     public void enable(boolean enabled) {
         if (!isReleased()) {
             nativeEnable(nativeLocalVideoTrackHandle, enabled);

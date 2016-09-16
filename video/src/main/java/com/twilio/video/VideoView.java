@@ -13,28 +13,33 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.nio.ByteBuffer;
 
+/**
+ * A VideoView renders frames from a {@link VideoTrack}. This class is an extension of
+ * {@link android.view.SurfaceView}, so it can be placed in your XML view hierarchy.
+ */
 public class VideoView extends SurfaceViewRenderer implements VideoRenderer {
-    // Used to ensure that our renderer has a means to post to main thread
-    // for renderer events
+    // Used to ensure that our renderer has a means to post to main thread for renderer events
     private final Handler uiThreadHandler = new Handler(Looper.getMainLooper());
+    private final RendererCommon.RendererEvents internalEventListener =
+            new RendererCommon.RendererEvents() {
+                @Override
+                public void onFirstFrameRendered() {
+                    refreshRenderer();
+                    if (listener != null) {
+                        listener.onFirstFrame();
+                    }
+                }
 
-    private final RendererCommon.RendererEvents internalEventListener = new RendererCommon.RendererEvents() {
-        @Override
-        public void onFirstFrameRendered() {
-            refreshRenderer();
-            if (listener != null) {
-                listener.onFirstFrame();
-            }
-        }
-
-        @Override
-        public void onFrameResolutionChanged(int videoWidth, int videoHeight, int rotation) {
-            refreshRenderer();
-            if (listener != null) {
-                listener.onFrameDimensionsChanged(videoWidth, videoHeight, rotation);
-            }
-        }
-    };
+                @Override
+                public void onFrameResolutionChanged(int videoWidth,
+                                                     int videoHeight,
+                                                     int rotation) {
+                    refreshRenderer();
+                    if (listener != null) {
+                        listener.onFrameDimensionsChanged(videoWidth, videoHeight, rotation);
+                    }
+                }
+            };
 
     private boolean mirror = false;
     private boolean overlaySurface = false;
@@ -62,32 +67,47 @@ public class VideoView extends SurfaceViewRenderer implements VideoRenderer {
         setupRenderer();
     }
 
+    /**
+     * Returns whether or not this view is mirroring video.
+     */
     public boolean getMirror() {
         return mirror;
     }
 
+    /**
+     * Sets whether or not the rendered video should be mirrored.
+     */
     public void setMirror(boolean mirror) {
         this.mirror = mirror;
         super.setMirror(mirror);
         refreshRenderer();
     }
 
+    /**
+     * Returns the current {@link VideoScaleType}.
+     */
     public VideoScaleType getVideoScaleType() {
         return videoScaleType;
     }
 
+    /**
+     * Sets the current scale type to specified value and updates the video.
+     */
     public void setVideoScaleType(VideoScaleType videoScaleType) {
         this.videoScaleType = videoScaleType;
         setScalingType(convertToWebRtcScaleType(videoScaleType));
         refreshRenderer();
     }
 
+    /**
+     * Sets listener of rendering events.
+     */
     public void setListener(VideoRenderer.Listener listener) {
         this.listener = listener;
     }
 
     /**
-     * Releases resources associated with the video renderer
+     * Releases resources associated with the video renderer.
      */
     public void release() {
         super.release();
@@ -96,16 +116,6 @@ public class VideoView extends SurfaceViewRenderer implements VideoRenderer {
     @Override
     public void renderFrame(I420Frame frame) {
         super.renderFrame(convertToWebRtcFrame(frame));
-    }
-
-    @Override
-    protected void onDetachedFromWindow() {
-        super.onDetachedFromWindow();
-    }
-
-    @Override
-    protected void onFinishInflate() {
-        super.onFinishInflate();
     }
 
     /**

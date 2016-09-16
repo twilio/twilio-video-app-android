@@ -20,6 +20,17 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * The ScreenCapturer class is used to provide video frames for a {@link LocalVideoTrack} from a
+ * device's screen. The frames are provided via the {@link MediaProjection} api. This capturer
+ * is only compatible with {@link android.os.Build.VERSION_CODES#LOLLIPOP} or higher.
+ *
+ * <p>This class represents an implementation of a {@link VideoCapturer} interface. Although
+ * public, these methods are not meant to be invoked directly.</p>
+ *
+ * <p><b>Note</b>: This capturer can be reused, but cannot be shared across multiple
+ * {@link LocalVideoTrack}s simultaneously.</p>
+ */
 @TargetApi(21)
 public class ScreenCapturer implements VideoCapturer {
     private static final String TAG = "ScreenCapturer";
@@ -130,8 +141,18 @@ public class ScreenCapturer implements VideoCapturer {
         this.screenCapturerListener = screenCapturerListener;
     }
 
+    /**
+     * Returns a list of all supported video formats. This is currently limited to VGA and 720p at
+     * 30 frames per second with a pixel format of RGBA.
+     *
+     * <p><b>Note</b>: This method can be invoked for informational purposes, but is primarily used
+     * internally.</p>
+     *
+     * @return all supported video formats.
+     */
     @Override
     public List<VideoFormat> getSupportedFormats() {
+        // TODO: Add support for more formats based on the size of device screen
         List<VideoFormat> screencastFormats = new ArrayList<>();
         VideoDimensions vgaDimensions = new VideoDimensions(640, 480);
         VideoDimensions hdDimensions = new VideoDimensions(1280, 720);
@@ -144,6 +165,15 @@ public class ScreenCapturer implements VideoCapturer {
         return screencastFormats;
     }
 
+    /**
+     * Starts capturing frames at the specified format. Frames will be provided to the given
+     * listener upon availability.
+     *
+     * <p><b>Note</b>: This method is not meant to be invoked directly.</p>
+     *
+     * @param captureFormat the format in which to capture frames.
+     * @param capturerListener consumer of available frames.
+     */
     @Override
     public void startCapture(VideoFormat captureFormat, VideoCapturer.Listener capturerListener) {
         this.capturerListener = capturerListener;
@@ -193,6 +223,12 @@ public class ScreenCapturer implements VideoCapturer {
         capturerListener.onCapturerStarted(true);
     }
 
+    /**
+     * Stops all frames being captured. {@link MediaProjection} should be available for use
+     * upon completion.
+     *
+     * <p><b>Note</b>: This method is not meant to be invoked directly.</p>
+     */
     @Override
     public void stopCapture() {
         logger.d("stopCapture");

@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * A video track represents a single local or remote video source
+ * A video track represents a single remote video source.
  */
 public class VideoTrack implements Track {
     private static final String WARNING_NULL_RENDERER = "Attempted to add a null renderer.";
@@ -31,9 +31,9 @@ public class VideoTrack implements Track {
     }
 
     /**
-     * Add a video renderer to get video from the video track
+     * Add a video renderer to get video from the video track.
      *
-     * @param videoRenderer video renderer that receives video
+     * @param videoRenderer video renderer that receives video.
      */
     public synchronized void addRenderer(VideoRenderer videoRenderer) {
         if (isReleased) {
@@ -51,9 +51,9 @@ public class VideoTrack implements Track {
     }
 
     /**
-     * Remove a video renderer to stop receiving video from the video track
+     * Remove a video renderer to stop receiving video from the video track.
      *
-     * @param videoRenderer the video renderer that should no longer receives video
+     * @param videoRenderer the video renderer that should no longer receives video.
      */
     public synchronized void removeRenderer(VideoRenderer videoRenderer) {
         if (!isReleased && videoRenderer != null) {
@@ -66,15 +66,16 @@ public class VideoTrack implements Track {
     }
 
     /**
-     * The list of renderers receiving video from this video track
+     * The list of renderers receiving video from this video track.
      */
     public List<VideoRenderer> getRenderers() {
         return new ArrayList<>(videoRenderersMap.keySet());
     }
 
     /**
-     * This video track id
-     * @return track id
+     * This video track id.
+     *
+     * @return track id.
      */
     @Override
     public String getTrackId() {
@@ -82,8 +83,9 @@ public class VideoTrack implements Track {
     }
 
     /**
-     * Check if this video track is enabled
-     * @return true if track is enabled
+     * Check if this video track is enabled.
+     *
+     * @return true if track is enabled.
      */
     @Override
     public boolean isEnabled() {
