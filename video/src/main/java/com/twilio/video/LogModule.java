@@ -1,7 +1,7 @@
 package com.twilio.video;
 
 /**
- * Modules for the Twilio Conversations SDK
+ * Modules that can be logged in the SDK
  */
 public enum LogModule {
     CORE,

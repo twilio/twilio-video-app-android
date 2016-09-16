@@ -11,7 +11,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.provider.Settings.Secure;
 
-public final class PlatformInfo {
+final class PlatformInfo {
     private static final String PLATFORM_NAME = "Android";
     private static final Pattern IPV4_PATTERN =
             Pattern.compile(

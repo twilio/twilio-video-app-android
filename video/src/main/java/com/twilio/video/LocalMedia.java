@@ -34,13 +34,9 @@ public class LocalMedia {
     }
 
     public LocalAudioTrack addAudioTrack(boolean enabled) {
-        return addAudioTrack(enabled, nativeGetDefaultAudioOptions());
-    }
-
-    public LocalAudioTrack addAudioTrack(boolean enabled, AudioOptions audioOptions) {
         checkReleased("addAudioTrack");
         LocalAudioTrack localAudioTrack = nativeAddAudioTrack(nativeLocalMediaHandle,
-                enabled, audioOptions);
+                enabled);
 
         if (localAudioTrack != null) {
             localAudioTracks.add(localAudioTrack);
@@ -138,10 +134,8 @@ public class LocalMedia {
         }
     }
 
-    private static native AudioOptions nativeGetDefaultAudioOptions();
     private native LocalAudioTrack nativeAddAudioTrack(long nativeLocalMediaHandle,
-                                                       boolean enabled,
-                                                       AudioOptions audioOptions);
+                                                       boolean enabled);
     private native boolean nativeRemoveAudioTrack(long nativeLocalMediaHandle, String trackId);
     private native LocalVideoTrack nativeAddVideoTrack(long nativeLocalMediaHandle,
                                                        boolean enabled,
