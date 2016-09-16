@@ -18,7 +18,7 @@ import java.util.List;
  * public, these methods are not meant to be invoked directly.</p>
  *
  * <p><b>Note</b>: This capturer can be reused, but cannot be shared across multiple
- * {@link LocalVideoTrack}s.</p>
+ * {@link LocalVideoTrack}s simultaneously.</p>
  */
 public class CameraCapturer implements VideoCapturer {
     private static final Logger logger = Logger.getLogger(CameraCapturer.class);

@@ -29,7 +29,7 @@ import java.util.concurrent.TimeUnit;
  * public, these methods are not meant to be invoked directly.</p>
  *
  * <p><b>Note</b>: This capturer can be reused, but cannot be shared across multiple
- * {@link LocalVideoTrack}s.</p>
+ * {@link LocalVideoTrack}s simultaneously.</p>
  */
 @TargetApi(21)
 public class ScreenCapturer implements VideoCapturer {
