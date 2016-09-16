@@ -14,7 +14,7 @@ public class Room {
     private static final Logger logger = Logger.getLogger(Room.class);
 
     private long nativeRoomContext;
-    private final String name;
+    private String name;
     private final LocalMedia localMedia;
     private String sid;
     private RoomState roomState;
@@ -143,6 +143,9 @@ public class Room {
                                              List<Participant> participantList) {
             logger.d("onConnected()");
             Room.this.sid = roomSid;
+            if (Room.this.name == null || Room.this.name.isEmpty()) {
+                Room.this.name = roomSid;
+            }
             Room.this.localParticipant = new LocalParticipant(
                     localParticipantSid, localParticipantIdentity, localMedia);
             for (Participant participant : participantList) {
