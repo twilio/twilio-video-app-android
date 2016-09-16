@@ -2,7 +2,6 @@ package com.twilio.video;
 
 /**
  * A listener that provides errors related to the {@link CameraCapturer}
- *
  */
 public interface CapturerErrorListener {
     /**
