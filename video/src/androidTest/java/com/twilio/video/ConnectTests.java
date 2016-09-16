@@ -163,10 +163,10 @@ public class ConnectTests {
         assertTrue(roomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
         LocalParticipant localParticipant = room.getLocalParticipant();
         assertNotNull(localParticipant);
-        assertEquals(actor1AccessManager.getIdentity(), localParticipant.identity);
-        assertEquals(localMedia, localParticipant.localMedia);
-        assertNotNull(localParticipant.sid);
-        assertTrue(!localParticipant.sid.isEmpty());
+        assertEquals(actor1AccessManager.getIdentity(), localParticipant.getIdentity());
+        assertEquals(localMedia, localParticipant.getLocalMedia());
+        assertNotNull(localParticipant.getSid());
+        assertTrue(!localParticipant.getSid().isEmpty());
         disconnectRoom(room, roomListener);
     }
 
