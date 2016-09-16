@@ -142,7 +142,7 @@ public class ConnectTests {
         Room room = actor1VideoClient.connect(connectOptions, roomListener);
 
         assertTrue(roomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
-        assertNotNull(room.getLocalMedia());
+        assertNotNull(room.getLocalParticipant().getLocalMedia());
         disconnectRoom(room, roomListener);
     }
 
@@ -184,7 +184,7 @@ public class ConnectTests {
         Room room = actor1VideoClient.connect(connectOptions, roomListener);
 
         assertTrue(roomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
-        assertNotNull(room.getLocalMedia());
+        assertNotNull(room.getLocalParticipant().getLocalMedia());
         assertTrue(localMedia.removeAudioTrack(localAudioTrack));
         disconnectRoom(room, roomListener);
     }
@@ -203,7 +203,7 @@ public class ConnectTests {
         Room room = actor1VideoClient.connect(connectOptions, roomListener);
 
         assertTrue(roomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
-        assertNotNull(room.getLocalMedia());
+        assertNotNull(room.getLocalParticipant().getLocalMedia());
         assertTrue(localMedia.removeVideoTrack(localVideoTrack));
         disconnectRoom(room, roomListener);
     }
@@ -223,7 +223,7 @@ public class ConnectTests {
         Room room = actor1VideoClient.connect(connectOptions, roomListener);
 
         assertTrue(roomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
-        assertNotNull(room.getLocalMedia());
+        assertNotNull(room.getLocalParticipant().getLocalMedia());
         assertTrue(localMedia.removeAudioTrack(localAudioTrack));
         assertTrue(localMedia.removeVideoTrack(localVideoTrack));
         disconnectRoom(room, roomListener);
@@ -243,7 +243,7 @@ public class ConnectTests {
         Room room = actor1VideoClient.connect(connectOptions, roomListener);
 
         assertTrue(roomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
-        assertNotNull(room.getLocalMedia());
+        assertNotNull(room.getLocalParticipant().getLocalMedia());
 
         // Now we add our tracks
         LocalAudioTrack localAudioTrack = localMedia.addAudioTrack(false);
