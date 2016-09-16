@@ -57,7 +57,7 @@ public class LocalVideoTrack extends VideoTrack {
      * Participants in the same Room. When a video track is disabled, blank frames is sent in place
      * of normal video.
      *
-     * @param enabled the desired state of the local audio track.
+     * @param enabled the desired state of the local video track.
      */
     public void enable(boolean enabled) {
         if (!isReleased()) {
