@@ -14,7 +14,7 @@ public class LocalAudioTrack extends AudioTrack  {
     }
 
     /**
-     * Check is local audio track is enabled
+     * Check if local audio track is enabled
      *
      * @return true if the local audio is enabled
      */
