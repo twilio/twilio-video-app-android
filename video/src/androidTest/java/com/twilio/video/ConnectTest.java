@@ -30,7 +30,7 @@ import static org.junit.Assert.assertTrue;
 
 @RunWith(AndroidJUnit4.class)
 @LargeTest
-public class ConnectTests {
+public class ConnectTest {
     private final static String TEST_USER  = "TEST_USER";
     private final static String TEST_USER2 = "TEST_USER2";
 
