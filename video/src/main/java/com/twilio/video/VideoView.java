@@ -91,7 +91,7 @@ public class VideoView extends SurfaceViewRenderer implements VideoRenderer {
     }
 
     /**
-     * Sets the current scale type to specified value and updates the video
+     * Sets the current scale type to specified value and updates the video.
      */
     public void setVideoScaleType(VideoScaleType videoScaleType) {
         this.videoScaleType = videoScaleType;
@@ -100,14 +100,14 @@ public class VideoView extends SurfaceViewRenderer implements VideoRenderer {
     }
 
     /**
-     * Sets listener of rendering events
+     * Sets listener of rendering events.
      */
     public void setListener(VideoRenderer.Listener listener) {
         this.listener = listener;
     }
 
     /**
-     * Releases resources associated with the video renderer
+     * Releases resources associated with the video renderer.
      */
     public void release() {
         super.release();

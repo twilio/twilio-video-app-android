@@ -17,10 +17,9 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * The VideoClient allows a user to connect to a Room
+ * The VideoClient allows a user to connect to a Room.
  */
 public class VideoClient {
-
     private static final String[] REQUIRED_PERMISSIONS = {
             // Required permissions granted upon install
             Manifest.permission.INTERNET,
@@ -97,9 +96,9 @@ public class VideoClient {
     }
 
     /**
-     * Audio output speaker for the current client device
+     * Audio output speaker for the current client device.
      *
-     * @return audio output speaker
+     * @return audio output speaker.
      */
     public AudioOutput getAudioOutput() {
         AudioManager audioManager = (AudioManager) applicationContext.getSystemService(Context.AUDIO_SERVICE);
@@ -109,7 +108,7 @@ public class VideoClient {
     /**
      * Connect to a {@link Room}.
      *
-     * @param roomListener listener of room related events
+     * @param roomListener listener of room related events.
      * @return room being connected to.
      */
     public Room connect(Room.Listener roomListener) {
@@ -123,8 +122,8 @@ public class VideoClient {
     /**
      * Connect to a {@link Room} with specified options.
      *
-     * @param connectOptions options for connecting to room
-     * @param roomListener listener of room related events
+     * @param connectOptions options for connecting to room.
+     * @param roomListener listener of room related events.
      * @return room being connected to.
      */
     public synchronized Room connect(ConnectOptions connectOptions, Room.Listener roomListener) {
@@ -331,18 +330,12 @@ public class VideoClient {
         }
     }
 
-
-
     private native static void nativeSetCoreLogLevel(int level);
-
     private native static void nativeSetModuleLevel(int module, int level);
-
     private native static int nativeGetCoreLogLevel();
-
     private native long nativeCreateClient(Context context,
                                            AccessManager accessManager,
                                            long nativeMediaFactoryHandle);
-
     private native long nativeConnect(long nativeClientDataHandler,
                                       long nativeRoomListenerHandle,
                                       ConnectOptions ConnectOptions);

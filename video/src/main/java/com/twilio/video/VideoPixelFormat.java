@@ -1,7 +1,7 @@
 package com.twilio.video;
 
 /**
- * Pixel format of a video frame
+ * Pixel format of a video frame.
  */
 public enum VideoPixelFormat {
     NV21,

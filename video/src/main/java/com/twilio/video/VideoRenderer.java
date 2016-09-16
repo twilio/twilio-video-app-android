@@ -1,7 +1,7 @@
 package com.twilio.video;
 
 /**
- * A VideoRenderer is used to receive frames from a {@link VideoTrack}
+ * A VideoRenderer is used to receive frames from a {@link VideoTrack}.
  */
 public interface VideoRenderer {
     interface Listener {
@@ -21,7 +21,7 @@ public interface VideoRenderer {
     }
 
     /**
-     * Provides the YUV frame in I420 format
+     * Provides the YUV frame in I420 format.
      *
      * @param frame I420 YUV frame
      */
