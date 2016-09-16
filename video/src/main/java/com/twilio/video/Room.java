@@ -22,7 +22,7 @@ public class Room {
     private InternalRoomListenerHandle internalRoomListenerHandle;
     private InternalRoomListenerImpl internalRoomListenerImpl;
     private LocalParticipant localParticipant;
-    private Room.Listener listener;
+    private final Room.Listener listener;
     private final Handler handler;
 
     Room(String name, LocalMedia localMedia, Room.Listener listener, Handler handler) {

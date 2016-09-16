@@ -17,13 +17,15 @@ public class Media {
     private Map<String, AudioTrack> audioTrackMap = new HashMap<>();
 
     private long nativeMediaContext;
-    private InternalMediaListenerImpl internalMediaListenerImpl;
-    private InternalMediaListenerHandle internalMediaListenerHandle;
+    private final InternalMediaListenerImpl internalMediaListenerImpl;
+    private final InternalMediaListenerHandle internalMediaListenerHandle;
     private Listener listener;
-    private Handler handler;
+    private final Handler handler;
 
     Media(long nativeMediaContext,
-          List<AudioTrack> audioTracks, List<VideoTrack> videoTracks, Handler handler) {
+          List<AudioTrack> audioTracks,
+          List<VideoTrack> videoTracks,
+          Handler handler) {
         this.nativeMediaContext = nativeMediaContext;
         this.handler = handler;
         addAudioTracks(audioTracks);

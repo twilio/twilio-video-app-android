@@ -4,14 +4,26 @@ package com.twilio.video;
  * Represents options when connecting to a {@link Room}.
  */
 public class ConnectOptions {
-    final String roomName;
-    final LocalMedia localMedia;
-    final IceOptions iceOptions;
+    private final String roomName;
+    private final LocalMedia localMedia;
+    private final IceOptions iceOptions;
 
     private ConnectOptions(Builder builder) {
         this.roomName = builder.roomName;
         this.localMedia = builder.localMedia;
         this.iceOptions = builder.iceOptions;
+    }
+
+    String getRoomName() {
+        return roomName;
+    }
+
+    LocalMedia getLocalMedia() {
+        return localMedia;
+    }
+
+    IceOptions getIceOptions() {
+        return iceOptions;
     }
 
     private long createNativeObject() {
