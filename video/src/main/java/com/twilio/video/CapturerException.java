@@ -9,7 +9,7 @@ public class CapturerException extends Exception {
 
     private final ExceptionDomain domain;
 
-    public static enum ExceptionDomain {
+    public enum ExceptionDomain {
         CAPTURER,
         CAMERA
     }

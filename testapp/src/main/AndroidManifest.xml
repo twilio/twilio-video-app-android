@@ -31,12 +31,8 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
-
-        <receiver android:name=".ui.ClientActivity$Rebroadcaster"/>
-
         <activity android:name="net.hockeyapp.android.UpdateActivity"/>
-        <activity android:name=".ui.RoomActivity">
-        </activity>
+        <activity android:name=".ui.RoomActivity" />
     </application>
 
 </manifest>

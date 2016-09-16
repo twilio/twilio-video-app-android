@@ -1,7 +1,7 @@
 package com.twilio.video;
 
 /**
- * Log levels for the Twilio Conversations SDK
+ * Log levels for the SDK
  */
 public enum LogLevel {
     OFF,
