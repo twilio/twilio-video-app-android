@@ -17,10 +17,10 @@
 
         <include layout="@layout/content_client" />
 
-        <android.support.design.widget.FloatingActionButton android:id="@+id/exit_room_fab"
+        <android.support.design.widget.FloatingActionButton android:id="@+id/join_room_fab"
             android:layout_width="wrap_content" android:layout_height="wrap_content"
             android:layout_gravity="bottom|end" android:layout_margin="@dimen/fab_margin"
-            android:src="@drawable/ic_exit_to_app_white_24px" />
+            android:src="@drawable/ic_add_circle_white_24px" />
 
 
         <LinearLayout

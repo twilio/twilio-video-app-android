@@ -12,10 +12,8 @@ import android.support.v4.content.ContextCompat;
 import android.view.HapticFeedbackConstants;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -37,15 +35,12 @@ import timber.log.Timber;
 public class LoginActivity extends BaseActivity {
 
     @BindView(R.id.username_edittext) EditText usernameEditText;
-    @BindView(R.id.room_name_edittext) EditText roomEditText;
-    @BindView(R.id.join_room_button) Button joinRoomButton;
+    @BindView(R.id.login_button) Button loginButton;
     @BindView(R.id.version_textview) TextView versionText;
-    @BindView(R.id.realm_spinner) Spinner realmSpinner;
 
     public static final int PERMISSIONS_REQUEST_CODE = 0;
 
     private ProgressDialog progressDialog;
-    private ArrayAdapter<CharSequence> spinnerAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,10 +51,6 @@ public class LoginActivity extends BaseActivity {
 
         versionText.setText(BuildConfig.VERSION_NAME);
 
-        spinnerAdapter = ArrayAdapter.createFromResource(this,
-                        R.array.realm_array, android.R.layout.simple_spinner_dropdown_item);
-        spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        realmSpinner.setAdapter(spinnerAdapter);
         if (!checkPermissions()) {
             requestPermissions();
         }
@@ -97,8 +88,8 @@ public class LoginActivity extends BaseActivity {
         }
     }
 
-    @OnClick(R.id.join_room_button)
-    void joinRoom(View view) {
+    @OnClick(R.id.login_button)
+    void login(View view) {
         progressDialog = ProgressDialog.show(LoginActivity.this, null,
                 "Registering with Twilio", true);
         String username = usernameEditText.getText().toString();
@@ -121,9 +112,7 @@ public class LoginActivity extends BaseActivity {
     }
 
     private void registerUser(final String username) {
-        obtainCapabilityToken(username,
-                LoginActivity.this.realmSpinner.getSelectedItem()
-                        .toString().toLowerCase());
+        obtainCapabilityToken(username, "prod");
     }
 
     private void obtainCapabilityToken(final String username, final String realm) {
@@ -136,7 +125,7 @@ public class LoginActivity extends BaseActivity {
                 if (response.getStatus() == 200) {
                     startClient(capabilityToken);
                 } else {
-                    Snackbar.make(joinRoomButton,
+                    Snackbar.make(loginButton,
                             "Registration failed. Status: " + response.getStatus(),
                             Snackbar.LENGTH_LONG)
                             .setAction("Action", null).show();
@@ -146,7 +135,7 @@ public class LoginActivity extends BaseActivity {
             @Override
             public void failure(RetrofitError error) {
                 progressDialog.dismiss();
-                Snackbar.make(joinRoomButton,
+                Snackbar.make(loginButton,
                         "Registration failed. Error: " + error.getMessage(),
                         Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
@@ -159,7 +148,6 @@ public class LoginActivity extends BaseActivity {
         Timber.i("Start VideoClient");
 
         Intent intent = new Intent(this, RoomActivity.class);
-        intent.putExtra(SimpleSignalingUtils.ROOM_NAME, roomEditText.getText().toString());
         intent.putExtra(SimpleSignalingUtils.CAPABILITY_TOKEN, capabilityToken);
         intent.putExtra(SimpleSignalingUtils.REALM, "prod");
         intent.putExtra(SimpleSignalingUtils.USERNAME, usernameEditText.getText().toString());

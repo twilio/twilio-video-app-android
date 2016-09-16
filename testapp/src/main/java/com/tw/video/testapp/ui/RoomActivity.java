@@ -1,18 +1,22 @@
 package com.tw.video.testapp.ui;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.tw.video.testapp.R;
+import com.tw.video.testapp.dialog.Dialog;
 import com.tw.video.testapp.util.AccessManagerHelper;
 import com.tw.video.testapp.util.SimpleSignalingUtils;
 import com.twilio.common.AccessManager;
@@ -40,7 +44,7 @@ import butterknife.OnClick;
 import timber.log.Timber;
 
 public class RoomActivity extends AppCompatActivity {
-    @BindView(R.id.exit_room_fab) FloatingActionButton exitRoomFab;
+    @BindView(R.id.join_room_fab) FloatingActionButton joinRoomFab;
     @BindView(R.id.media_status_textview) TextView mediaStatusTextview;
     @BindView(R.id.room_status_textview) TextView roomStatusTextview;
     @BindView(R.id.primary_video_view) VideoView primaryVideoView;
@@ -64,6 +68,7 @@ public class RoomActivity extends AppCompatActivity {
     private LocalVideoTrack localVideoTrack;
     private VideoView localVideoView;
     private CameraCapturer cameraCapturer;
+    private AlertDialog alertDialog;
     private Map<Participant, VideoView> videoViewMap = new HashMap<>();
 
     @Override
@@ -88,7 +93,7 @@ public class RoomActivity extends AppCompatActivity {
         primaryVideoView.setMirror(true);
         localVideoTrack.addRenderer(primaryVideoView);
         createVideoClient();
-        connectToRoom();
+        //connectToRoom();
     }
 
     @Override
@@ -138,8 +143,9 @@ public class RoomActivity extends AppCompatActivity {
         videoClient = new VideoClient(this, accessManager);
     }
 
-    private void connectToRoom() {
-        roomStatusTextview.setText("Connecting to room...");
+    private void connectToRoom(String roomName) {
+        roomStatusTextview.setText("Connecting to room "+roomName);
+        this.roomName = roomName;
         ConnectOptions connectOptions = new ConnectOptions.Builder()
                 .roomName(roomName)
                 .localMedia(localMedia)
@@ -148,13 +154,18 @@ public class RoomActivity extends AppCompatActivity {
         room = videoClient.connect(connectOptions, createRoomListener());
     }
 
-    @OnClick(R.id.exit_room_fab)
-    public void exitRoom(View view) {
+    @OnClick(R.id.join_room_fab)
+    public void joinRoom(View view) {
         if (room != null) {
             Timber.i("Exiting room");
             room.disconnect();
         } else {
-            returnToVideoClientLogin();
+            EditText joinRoomEditText = new EditText(this);
+            alertDialog = Dialog.createJoinRoomDialog(joinRoomEditText,
+                    joinRoomClickListener(joinRoomEditText),
+                    cancelCallClickListener(),
+                    this);
+            alertDialog.show();
         }
     }
 
@@ -257,6 +268,25 @@ public class RoomActivity extends AppCompatActivity {
         }
         localVideoActionFab.setImageDrawable(
                 ContextCompat.getDrawable(RoomActivity.this, icon));
+    }
+
+    private DialogInterface.OnClickListener joinRoomClickListener(final EditText joinRoomEditText) {
+        return new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                connectToRoom(joinRoomEditText.getText().toString());
+            }
+        };
+    }
+
+    private DialogInterface.OnClickListener cancelCallClickListener() {
+        return new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                // set proper action
+                alertDialog.dismiss();
+            }
+        };
     }
 
     private void returnToVideoClientLogin(){
