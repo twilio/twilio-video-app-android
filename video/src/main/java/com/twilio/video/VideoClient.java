@@ -106,6 +106,12 @@ public class VideoClient {
         return audioManager.isSpeakerphoneOn() ? AudioOutput.SPEAKERPHONE : AudioOutput.HEADSET;
     }
 
+    /**
+     * Connect to a {@link Room}.
+     *
+     * @param roomListener listener of room related events
+     * @return room being connected to.
+     */
     public Room connect(Room.Listener roomListener) {
         if (roomListener == null) {
             throw new NullPointerException("roomListener must not be null");
@@ -114,6 +120,13 @@ public class VideoClient {
         return connect(connectOptions, roomListener);
     }
 
+    /**
+     * Connect to a {@link Room} with specified options.
+     *
+     * @param connectOptions options for connecting to room
+     * @param roomListener listener of room related events
+     * @return room being connected to.
+     */
     public synchronized Room connect(ConnectOptions connectOptions, Room.Listener roomListener) {
         if (connectOptions == null) {
             throw new NullPointerException("connectOptions must not be null");
@@ -191,7 +204,7 @@ public class VideoClient {
     }
 
     /**
-     * Returns the version of the Rooms SDK.
+     * Returns the version of the Video SDK.
      *
      * @return the version of the SDK
      */
@@ -200,7 +213,7 @@ public class VideoClient {
     }
 
     /**
-     * Gets the logging level for messages logged by the Rooms SDK.
+     * Gets the logging level for messages logged by the Video SDK.
      *
      * @return the logging level
      */
@@ -209,7 +222,7 @@ public class VideoClient {
     }
 
     /**
-     * Sets the logging level for messages logged by the Rooms SDK.
+     * Sets the logging level for messages logged by the Video SDK.
      *
      * @param level The logging level
      */
