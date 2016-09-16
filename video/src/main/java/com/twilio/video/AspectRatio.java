@@ -2,7 +2,7 @@ package com.twilio.video;
 
 /**
  *  Rational aspect ratio represented as numerator:denominator
- *  For x:y aspect ratio you can set numerater to x and denominator to y
+ *  For x:y aspect ratio you can set numerator to x and denominator to y
  */
 public class AspectRatio {
     public final int numerator;
