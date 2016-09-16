@@ -283,7 +283,7 @@ model {
 }
 
 dependencies {
-    preCompile 'com.twilio.sdk:twilio-video:0.2.0-rc4:android@tar.bz2'
+    preCompile 'com.twilio.sdk:twilio-video:0.2.0-rc5:android@tar.bz2'
 
     testCompile 'junit:junit:4.12'
     testCompile 'org.mockito:mockito-core:1.10.19'
