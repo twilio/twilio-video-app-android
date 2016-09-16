@@ -29,7 +29,7 @@ public class LocalParticipant {
     }
 
     /**
-     * Returns the local media of a local participant.
+     * Returns the {@link LocalMedia} of a local participant.
      */
     public LocalMedia getLocalMedia() {
         return localMedia;
