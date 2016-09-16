@@ -43,6 +43,13 @@ public class ConnectTests {
     private AccessManager actor1AccessManager;
     private AccessManager actor2AccessManager;
 
+    private void disconnectRoom(Room room, CallbackHelper.FakeRoomListener roomListener)
+            throws InterruptedException {
+        roomListener.onDisconnectedLatch = new CountDownLatch(1);
+        room.disconnect();
+        assertTrue(roomListener.onDisconnectedLatch.await(20, TimeUnit.SECONDS));
+    }
+
     @Rule
     public ActivityTestRule<RoomsTestActivity> activityRule = new ActivityTestRule<>(
             RoomsTestActivity.class);
@@ -103,7 +110,7 @@ public class ConnectTests {
         Room room = actor1VideoClient.connect(roomListener);
 
         assertTrue(roomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
-        room.disconnect();
+        disconnectRoom(room, roomListener);
     }
 
     @Test
@@ -119,7 +126,7 @@ public class ConnectTests {
         Room room = actor1VideoClient.connect(connectOptions, roomListener);
 
         assertTrue(roomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
-        room.disconnect();
+        disconnectRoom(room, roomListener);
     }
 
     @Test
@@ -136,7 +143,7 @@ public class ConnectTests {
 
         assertTrue(roomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
         assertNotNull(room.getLocalMedia());
-        room.disconnect();
+        disconnectRoom(room, roomListener);
     }
 
     @Test
@@ -160,7 +167,7 @@ public class ConnectTests {
         assertEquals(localMedia, localParticipant.getLocalMedia());
         assertNotNull(localParticipant.getSid());
         assertTrue(!localParticipant.getSid().isEmpty());
-        room.disconnect();
+        disconnectRoom(room, roomListener);
     }
 
     @Test
@@ -179,7 +186,7 @@ public class ConnectTests {
         assertTrue(roomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
         assertNotNull(room.getLocalMedia());
         assertTrue(localMedia.removeAudioTrack(localAudioTrack));
-        room.disconnect();
+        disconnectRoom(room, roomListener);
     }
 
     @Test
@@ -198,7 +205,7 @@ public class ConnectTests {
         assertTrue(roomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
         assertNotNull(room.getLocalMedia());
         assertTrue(localMedia.removeVideoTrack(localVideoTrack));
-        room.disconnect();
+        disconnectRoom(room, roomListener);
     }
 
     @Test
@@ -219,7 +226,7 @@ public class ConnectTests {
         assertNotNull(room.getLocalMedia());
         assertTrue(localMedia.removeAudioTrack(localAudioTrack));
         assertTrue(localMedia.removeVideoTrack(localVideoTrack));
-        room.disconnect();
+        disconnectRoom(room, roomListener);
     }
 
     @Test
@@ -248,33 +255,28 @@ public class ConnectTests {
         // Now remove them
         assertTrue(localMedia.removeAudioTrack(localAudioTrack));
         assertTrue(localMedia.removeVideoTrack(localVideoTrack));
-        room.disconnect();
+        disconnectRoom(room, roomListener);
     }
 
     @Test
     public void connect_shouldDisconnectFromRoom() throws InterruptedException {
         CallbackHelper.FakeRoomListener roomListener = new CallbackHelper.FakeRoomListener();
         roomListener.onConnectedLatch = new CountDownLatch(1);
-        roomListener.onDisconnectedLatch = new CountDownLatch(1);
-
 
         Room room = actor1VideoClient.connect(roomListener);
 
         assertTrue(roomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
         assertEquals(RoomState.CONNECTED, room.getState());
 
-        room.disconnect();
+        disconnectRoom(room, roomListener);
 
-        assertTrue(roomListener.onDisconnectedLatch.await(20, TimeUnit.SECONDS));
         assertEquals(RoomState.DISCONNECTED, room.getState());
-
     }
 
     @Test
     public void connect_shouldConnectParticipant() throws InterruptedException {
         CallbackHelper.FakeRoomListener roomListener = new CallbackHelper.FakeRoomListener();
         roomListener.onConnectedLatch = new CountDownLatch(1);
-        roomListener.onDisconnectedLatch = new CountDownLatch(1);
         roomListener.onParticipantConnectedLatch = new CountDownLatch(1);
         String randomRoomName = testRoom + System.currentTimeMillis();
 
@@ -285,15 +287,15 @@ public class ConnectTests {
         assertTrue(roomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
         assertEquals(RoomState.CONNECTED, room.getState());
 
-        actor2VideoClient.connect(connectOptions, new CallbackHelper.EmptyRoomListener());
+        CallbackHelper.FakeRoomListener roomListener2 = new CallbackHelper.FakeRoomListener();
+        Room room2 = actor2VideoClient.connect(connectOptions, roomListener2);
 
         assertTrue(roomListener.onParticipantConnectedLatch.await(20, TimeUnit.SECONDS));
         assertEquals(1, room.getParticipants().size());
 
-        room.disconnect();
-
-        assertTrue(roomListener.onDisconnectedLatch.await(20, TimeUnit.SECONDS));
+        disconnectRoom(room, roomListener);
         assertEquals(RoomState.DISCONNECTED, room.getState());
+        disconnectRoom(room2, roomListener2);
 
     }
 
@@ -312,16 +314,17 @@ public class ConnectTests {
         assertTrue(roomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
         assertEquals(RoomState.CONNECTED, room.getState());
 
-        Room client2room = actor2VideoClient.connect(connectOptions, new CallbackHelper.EmptyRoomListener());
+        CallbackHelper.FakeRoomListener roomListener2 = new CallbackHelper.FakeRoomListener();
+        Room client2room = actor2VideoClient.connect(connectOptions, roomListener2);
 
         assertTrue(roomListener.onParticipantConnectedLatch.await(20, TimeUnit.SECONDS));
         assertEquals(room.getParticipants().size(), 1);
 
-        client2room.disconnect();
+        disconnectRoom(client2room, roomListener2);
 
         assertTrue(roomListener.onParticipantDisconnectedLatch.await(20, TimeUnit.SECONDS));
         assertTrue(room.getParticipants().isEmpty());
-        room.disconnect();
+        disconnectRoom(room, roomListener);
 
     }
 
