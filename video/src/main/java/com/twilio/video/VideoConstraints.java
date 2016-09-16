@@ -5,7 +5,6 @@ package com.twilio.video;
  * Note that {@link VideoConstraints} is used to resolve the capture format, but the actual
  * video sent to Participants may be downscaled temporally or spatially in response to network
  * and device conditions.
- *
  */
 public class VideoConstraints {
 

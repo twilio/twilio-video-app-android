@@ -2,10 +2,9 @@ package com.twilio.video;
 
 /**
  * A VideoRenderer is used to receive frames from a {@link VideoTrack}
- *
  */
 public interface VideoRenderer {
-    public interface Listener {
+    interface Listener {
         /**
          * This method notifies the observer when the first frame has arrived.
          */
