@@ -4,14 +4,26 @@ package com.twilio.video;
  * Represents options when connecting to a {@link Room}.
  */
 public class ConnectOptions {
-    final String roomName;
-    final LocalMedia localMedia;
-    final IceOptions iceOptions;
+    private final String roomName;
+    private final LocalMedia localMedia;
+    private final IceOptions iceOptions;
 
     private ConnectOptions(Builder builder) {
         this.roomName = builder.roomName;
         this.localMedia = builder.localMedia;
         this.iceOptions = builder.iceOptions;
+    }
+
+    String getRoomName() {
+        return roomName;
+    }
+
+    LocalMedia getLocalMedia() {
+        return localMedia;
+    }
+
+    IceOptions getIceOptions() {
+        return iceOptions;
     }
 
     private long createNativeObject() {
@@ -34,7 +46,7 @@ public class ConnectOptions {
         public Builder() { }
 
         /**
-         * The name of the room being connected to.
+         * The name of the room.
          */
         public Builder roomName(String roomName) {
             this.roomName = roomName;
@@ -50,7 +62,7 @@ public class ConnectOptions {
         }
 
         /**
-         * Ice options used when connecting.
+         * Custom ICE configuration used to connect to a Room.
          */
         public Builder iceOptions(IceOptions iceOptions) {
             this.iceOptions = iceOptions;

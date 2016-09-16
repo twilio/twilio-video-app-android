@@ -8,9 +8,10 @@ import java.util.List;
 /**
  * LocalMedia provides local audio and video track management.
  *
- * <p>LocalMedia can be published to the participants of a {@link Room} when provided via
+ * <p>LocalMedia can be shared to the participants of a {@link Room} when provided via
  * {@link ConnectOptions}. All track operations will be published to participants after
- * connected.</p>
+ * connected. The lifecycle of local media is independent of {@link Room}. The same media can
+ * be shared in zero, one, or many rooms.</p>
  */
 public class LocalMedia {
     private static final String RELEASE_MESSAGE_TEMPLATE = "LocalMedia released %s unavailable";

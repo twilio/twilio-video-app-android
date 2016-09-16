@@ -1,7 +1,7 @@
 package com.twilio.video;
 
 /**
- * Represents the local participant of a {@link Room} and is provided upon connected.
+ * Represents the local participant of a {@link Room} you are connected to.
  */
 public class LocalParticipant {
     private final String sid;
@@ -22,7 +22,7 @@ public class LocalParticipant {
     }
 
     /**
-     * Returns the identify of the local participant
+     * Returns the identity of the local participant.
      */
     public String getIdentity() {
         return identity;

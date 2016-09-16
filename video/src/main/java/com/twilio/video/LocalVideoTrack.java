@@ -53,7 +53,9 @@ public class LocalVideoTrack extends VideoTrack {
     }
 
     /**
-     * Sets the state of the local video track.
+     * Sets the state of the local video track. The results of this operation are signaled to other
+     * Participants in the same Room. When a video track is disabled, blank frames is sent in place
+     * of normal video.
      *
      * @param enabled the desired state of the local video track.
      */
