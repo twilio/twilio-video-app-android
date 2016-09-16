@@ -16,10 +16,7 @@ import java.nio.ByteBuffer;
 /**
  * A VideoViewRenderer receives frames from a {@link VideoTrack} and
  * renders them to a view.
- *
- * @deprecated Use {@link VideoView} instead
  */
-@Deprecated
 public class VideoViewRenderer implements VideoRenderer {
     // Used to ensure that our renderer has a means to post to main thread
     // for renderer events
