@@ -20,7 +20,7 @@ import java.nio.ByteBuffer;
  */
 public class VideoViewRenderer implements VideoRenderer {
     // Used to ensure that our renderer has a means to post to main thread
-    // for renderering events
+    // for renderer events
     private final Handler uiThreadHandler = new Handler(Looper.getMainLooper());
 
     private final RendererEvents internalEventListener = new RendererEvents() {

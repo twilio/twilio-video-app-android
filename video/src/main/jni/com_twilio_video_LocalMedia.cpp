@@ -167,20 +167,12 @@ twilio::media::MediaConstraints* getVideoConstraints(jobject j_video_contraints)
     return video_constraints;
 }
 
-JNIEXPORT jobject JNICALL Java_com_twilio_video_LocalMedia_nativeGetDefaultAudioOptions(JNIEnv *jni,
-                                                                                        jobject j_local_media) {
-    // TODO: create default audio options
-    return nullptr;
-}
-
 JNIEXPORT jobject JNICALL Java_com_twilio_video_LocalMedia_nativeAddAudioTrack(JNIEnv *jni,
                                                                                jobject j_local_media,
                                                                                jlong local_media_handle,
-                                                                               jboolean enabled,
-                                                                               jobject j_audio_options) {
+                                                                               jboolean enabled) {
     std::shared_ptr<twilio::media::LocalMedia> local_media = getLocalMedia(local_media_handle);
 
-    // TODO: convert audio options
     std::shared_ptr<twilio::media::LocalAudioTrack> local_audio_track =
             local_media->addAudioTrack(enabled);
 
