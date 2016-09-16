@@ -2,6 +2,7 @@ package com.twilio.video;
 
 import android.app.Instrumentation;
 import android.content.Context;
+import android.provider.Telephony;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.filters.LargeTest;
 import android.support.test.rule.ActivityTestRule;
@@ -20,9 +21,12 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
+import static junit.framework.TestCase.assertFalse;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
@@ -299,15 +303,34 @@ public class ConnectTest {
         assertEquals(RoomState.CONNECTED, room.getState());
 
         CallbackHelper.FakeRoomListener roomListener2 = new CallbackHelper.FakeRoomListener();
+        roomListener2.onConnectedLatch = new CountDownLatch(1);
+        roomListener2.onDisconnectedLatch = new CountDownLatch(1);
         Room client2room = actor2VideoClient.connect(connectOptions, roomListener2);
+
+        assertTrue(roomListener2.onConnectedLatch.await(20, TimeUnit.SECONDS));
+
+        List<Participant> client2Participants = new ArrayList<>(client2room.getParticipants().values());
+        Participant client1Participant = client2Participants.get(0);
+
+        assertEquals(1, client2Participants.size());
+        assertTrue(client1Participant.isConnected());
         assertTrue(roomListener.onParticipantConnectedLatch.await(20, TimeUnit.SECONDS));
-        assertEquals(room.getParticipants().size(), 1);
+
+        List<Participant> client1Participants = new ArrayList<>(room.getParticipants().values());
+        Participant client2Participant = client1Participants.get(0);
+
+        assertEquals(1, client1Participants.size());
+        assertTrue(client2Participant.isConnected());
 
         disconnectRoom(client2room, roomListener2);
+        assertTrue(roomListener2.onDisconnectedLatch.await(20, TimeUnit.SECONDS));
         assertTrue(roomListener.onParticipantDisconnectedLatch.await(20, TimeUnit.SECONDS));
+        assertFalse(client2Participant.isConnected());
         assertTrue(room.getParticipants().isEmpty());
 
         disconnectRoom(room, roomListener);
+        assertTrue(roomListener.onDisconnectedLatch.await(20, TimeUnit.SECONDS));
+        assertFalse(client1Participant.isConnected());
     }
 
 

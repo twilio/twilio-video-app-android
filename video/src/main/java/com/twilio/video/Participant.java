@@ -27,18 +27,26 @@ public class Participant {
         return sid;
     }
 
-    public boolean isConnected() {
-        return nativeIsConnected(nativeParticipantContext);
+    public synchronized boolean isConnected() {
+        if (!isReleased()) {
+            return nativeIsConnected(nativeParticipantContext);
+        } else {
+            return false;
+        }
     }
 
-    void release(){
-        if (nativeParticipantContext != 0) {
+    synchronized void release(){
+        if (!isReleased()) {
             if (media != null) {
                 media.release();
             }
             nativeRelease(nativeParticipantContext);
             nativeParticipantContext = 0;
         }
+    }
+
+    boolean isReleased() {
+        return nativeParticipantContext == 0;
     }
 
     private native boolean nativeIsConnected(long nativeHandle);
