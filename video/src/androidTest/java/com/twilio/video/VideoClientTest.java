@@ -20,7 +20,7 @@ import static org.junit.Assert.assertTrue;
 
 @RunWith(AndroidJUnit4.class)
 @LargeTest
-public class RoomsClientTests {
+public class VideoClientTest {
 
     private Context context;
 
