@@ -30,7 +30,9 @@ public class LocalAudioTrack extends AudioTrack  {
     }
 
     /**
-     * Sets the state of the local audio track.
+     * Sets the state of the local audio track. The results of this operation are signaled to other
+     * Participants in the same Room. When an audio track is disabled, silence is sent in place
+     * of normal audio.
      *
      * @param enable the desired state of the local audio track.
      */

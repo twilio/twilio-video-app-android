@@ -4,7 +4,7 @@ package com.twilio.video;
  * An audio track represents a remote audio source.
  */
 public class AudioTrack implements Track {
-    private String trackId;
+    private final String trackId;
     private boolean isEnabled;
 
     AudioTrack(String trackId, boolean isEnabled) {

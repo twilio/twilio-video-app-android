@@ -119,10 +119,10 @@ public class VideoView extends SurfaceViewRenderer implements VideoRenderer {
     }
 
     /**
-     * Controls placement of the video render relative to other surface
+     * Controls placement of the video render relative to other surface.
      *
      * @param overlaySurface if true, video renderer is placed on top of another video renderer
-     *                       in the window (but still behind window itself)
+     *                       in the window (but still behind window itself).
      */
     public void applyZOrder(boolean overlaySurface) {
         this.overlaySurface = overlaySurface;

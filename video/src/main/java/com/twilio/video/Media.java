@@ -8,89 +8,9 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Provides video and audio tracks associated with a {@link Participant}
+ * Provides video and audio tracks associated with a {@link Participant}.
  */
 public class Media {
-
-    public interface Listener {
-        /**
-         * This method notifies the listener that a {@link Participant} has added
-         * an {@link AudioTrack} to this {@link Room}
-         *
-         * @param media The media object associated with this audio track
-         * @param audioTrack The audio track added to this room
-         */
-        void onAudioTrackAdded(Media media,
-                               AudioTrack audioTrack);
-
-        /**
-         * This method notifies the listener that a {@link Participant} has removed
-         * an {@link AudioTrack} from this {@link Room}
-         *
-         * @param media The media object associated with this audio track
-         * @param audioTrack The audio track removed from this room
-         */
-        void onAudioTrackRemoved(Media media,
-                                 AudioTrack audioTrack);
-
-        /**
-         * This method notifies the listener that a {@link Participant} has added
-         * an {@link VideoTrack} to this {@link Room}
-         *
-         * @param media The media object associated with this video track
-         * @param videoTrack The video track added to this room
-         */
-        void onVideoTrackAdded(Media media,
-                               VideoTrack videoTrack);
-
-        /**
-         * This method notifies the listener that a {@link Participant} has removed
-         * an {@link VideoTrack} from this {@link Room}
-         *
-         * @param media The media object associated with this video track
-         * @param videoTrack The video track removed from this room
-         */
-        void onVideoTrackRemoved(Media media,
-                                 VideoTrack videoTrack);
-
-
-        /**
-         * This method notifies the listener that a {@link Participant} audio track
-         * has been enabled
-         *
-         * @param media The media object associated with this audio track
-         * @param audioTrack The audio track enabled in this room
-         */
-        void onAudioTrackEnabled(Media media, AudioTrack audioTrack);
-
-        /**
-         * This method notifies the listener that a {@link Participant} audio track
-         * has been disabled
-         *
-         * @param media The media object associated with this audio track
-         * @param audioTrack The audio track disabled in this room
-         */
-        void onAudioTrackDisabled(Media media, AudioTrack audioTrack);
-
-        /**
-         * This method notifies the listener that a {@link Participant} video track
-         * has been enabled
-         *
-         * @param media The media object associated with this audio track
-         * @param videoTrack The video track enabled in this room
-         */
-        void onVideoTrackEnabled(Media media, VideoTrack videoTrack);
-
-        /**
-         * This method notifies the listener that a {@link Participant} video track
-         * has been disabled
-         *
-         * @param media The media object associated with this audio track
-         * @param videoTrack The video track disabled in this room
-         */
-        void onVideoTrackDisabled(Media media, VideoTrack videoTrack);
-    }
-
     private static final Logger logger = Logger.getLogger(Media.class);
 
     private Map<String, VideoTrack> videoTrackMap = new HashMap<>();
@@ -115,47 +35,47 @@ public class Media {
     }
 
     /**
-     * Retrieves {@link AudioTrack} with this track id
+     * Retrieves {@link AudioTrack} with this track id.
      *
-     * @param trackId The id of this audio track
-     * @return audio track
+     * @param trackId The id of this audio track.
+     * @return audio track.
      */
     public AudioTrack getAudioTrack(String trackId) {
         return audioTrackMap.get(trackId);
     }
 
     /**
-     * Retrieves {@link VideoTrack} with this track id
+     * Retrieves {@link VideoTrack} with this track id.
      *
-     * @param trackId The id of this video track
-     * @return video track
+     * @param trackId The id of this video track.
+     * @return video track.
      */
     public VideoTrack getVideoTrack(String trackId) {
         return videoTrackMap.get(trackId);
     }
 
     /**
-     * Retrieves the list of video tracks
+     * Retrieves the list of video tracks.
      *
-     * @return list of video tracks
+     * @return list of video tracks.
      */
     public List<VideoTrack> getVideoTracks() {
         return new ArrayList<>(videoTrackMap.values());
     }
 
     /**
-     * Retrieves the list of audio tracks
+     * Retrieves the list of audio tracks.
      *
-     * @return list of audio tracks
+     * @return list of audio tracks.
      */
     public List<AudioTrack> getAudioTracks() {
         return new ArrayList<>(audioTrackMap.values());
     }
 
     /**
-     * Set listener for this media events
+     * Set listener for this media events.
      *
-     * @param listener of media events
+     * @param listener of media events.
      */
     public void setListener(Listener listener) {
         this.listener = listener;
@@ -191,6 +111,84 @@ public class Media {
                 internalMediaListenerHandle.release();
             }
         }
+    }
+
+    public interface Listener {
+        /**
+         * This method notifies the listener that a {@link Participant} has added
+         * an {@link AudioTrack} to this {@link Room}.
+         *
+         * @param media The media object associated with this audio track.
+         * @param audioTrack The audio track added to this room.
+         */
+        void onAudioTrackAdded(Media media,
+                               AudioTrack audioTrack);
+
+        /**
+         * This method notifies the listener that a {@link Participant} has removed
+         * an {@link AudioTrack} from this {@link Room}.
+         *
+         * @param media The media object associated with this audio track.
+         * @param audioTrack The audio track removed from this room.
+         */
+        void onAudioTrackRemoved(Media media,
+                                 AudioTrack audioTrack);
+
+        /**
+         * This method notifies the listener that a {@link Participant} has added
+         * an {@link VideoTrack} to this {@link Room}.
+         *
+         * @param media The media object associated with this video track.
+         * @param videoTrack The video track added to this room.
+         */
+        void onVideoTrackAdded(Media media,
+                               VideoTrack videoTrack);
+
+        /**
+         * This method notifies the listener that a {@link Participant} has removed
+         * an {@link VideoTrack} from this {@link Room}.
+         *
+         * @param media The media object associated with this video track.
+         * @param videoTrack The video track removed from this room.
+         */
+        void onVideoTrackRemoved(Media media,
+                                 VideoTrack videoTrack);
+
+        /**
+         * This method notifies the listener that a {@link Participant} audio track
+         * has been enabled.
+         *
+         * @param media The media object associated with this audio track.
+         * @param audioTrack The audio track enabled in this room.
+         */
+        void onAudioTrackEnabled(Media media, AudioTrack audioTrack);
+
+        /**
+         * This method notifies the listener that a {@link Participant} audio track
+         * has been disabled.
+         *
+         * @param media The media object associated with this audio track.
+         * @param audioTrack The audio track disabled in this room.
+         */
+        void onAudioTrackDisabled(Media media, AudioTrack audioTrack);
+
+        /**
+         * This method notifies the listener that a {@link Participant} video track
+         * has been enabled.
+         *
+         * @param media The media object associated with this audio track.
+         * @param videoTrack The video track enabled in this room.
+         */
+        void onVideoTrackEnabled(Media media, VideoTrack videoTrack);
+
+        /**
+         * This method notifies the listener that a {@link Participant} video track
+         * has been disabled.
+         *
+         * @param media The media object associated with this audio track.
+         * @param videoTrack The video track disabled in this room.
+         */
+        void onVideoTrackDisabled(Media media, VideoTrack videoTrack);
     }
 
     // JNI Callbacks Interface
@@ -366,8 +364,6 @@ public class Media {
     }
 
     class InternalMediaListenerHandle extends NativeHandle {
-
-
         public InternalMediaListenerHandle(InternalMediaListener listener) {
             super(listener);
         }
@@ -380,8 +376,6 @@ public class Media {
 
         @Override
         protected native void nativeRelease(long nativeHandle);
-
-
     }
 
     private native void nativeSetInternalListener(

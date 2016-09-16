@@ -34,7 +34,7 @@ public class ConnectOptions {
         public Builder() { }
 
         /**
-         * The name of the room being connected to.
+         * The name of the room.
          */
         public Builder roomName(String roomName) {
             this.roomName = roomName;
@@ -50,7 +50,7 @@ public class ConnectOptions {
         }
 
         /**
-         * Ice options used when connecting.
+         * Custom ICE configuration used to connect to a Room.
          */
         public Builder iceOptions(IceOptions iceOptions) {
             this.iceOptions = iceOptions;
