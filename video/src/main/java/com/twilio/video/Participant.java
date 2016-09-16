@@ -27,7 +27,7 @@ public class Participant {
         return sid;
     }
 
-    public boolean isConnected() {
+    public synchronized boolean isConnected() {
         if (!isReleased()) {
             return nativeIsConnected(nativeParticipantContext);
         } else {
@@ -35,7 +35,7 @@ public class Participant {
         }
     }
 
-    void release(){
+    synchronized void release(){
         if (!isReleased()) {
             if (media != null) {
                 media.release();
