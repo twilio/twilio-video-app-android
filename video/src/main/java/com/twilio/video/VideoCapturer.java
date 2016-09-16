@@ -14,8 +14,8 @@ public interface VideoCapturer {
     /**
      * Start capturing frames.
      *
-     * @param captureFormat format to start capturing in
-     * @param capturerListener consumes frames upon availability
+     * @param captureFormat format to start capturing in.
+     * @param capturerListener consumes frames upon availability.
      */
     void startCapture(VideoFormat captureFormat,
                       Listener capturerListener);
@@ -27,14 +27,14 @@ public interface VideoCapturer {
 
     interface Listener {
         /**
-         * Notify whether capturer started
+         * Notify whether capturer started.
          *
-         * @param success true if capturer successfully started or false if there was a failure
+         * @param success true if capturer successfully started or false if there was a failure.
          */
         void onCapturerStarted(boolean success);
 
         /**
-         * Provides available video frame
+         * Provides available video frame.
          */
         void onFrameCaptured(VideoFrame videoFrame);
     }
