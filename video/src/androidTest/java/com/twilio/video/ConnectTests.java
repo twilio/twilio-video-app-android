@@ -120,7 +120,7 @@ public class ConnectTests {
 
 
         ConnectOptions connectOptions = new ConnectOptions.Builder()
-                .name(testRoom)
+                .roomName(testRoom)
                 .build();
 
         Room room = actor1VideoClient.connect(connectOptions, roomListener);
@@ -135,7 +135,7 @@ public class ConnectTests {
         roomListener.onConnectedLatch = new CountDownLatch(1);
 
         ConnectOptions connectOptions = new ConnectOptions.Builder()
-                .name(testRoom)
+                .roomName(testRoom)
                 .localMedia(localMedia)
                 .build();
 
@@ -153,7 +153,7 @@ public class ConnectTests {
 
 
         ConnectOptions connectOptions = new ConnectOptions.Builder()
-                .name(testRoom)
+                .roomName(testRoom)
                 .localMedia(localMedia)
                 .build();
 
@@ -177,7 +177,7 @@ public class ConnectTests {
         roomListener.onConnectedLatch = new CountDownLatch(1);
 
         ConnectOptions connectOptions = new ConnectOptions.Builder()
-                .name(testRoom)
+                .roomName(testRoom)
                 .localMedia(localMedia)
                 .build();
 
@@ -196,7 +196,7 @@ public class ConnectTests {
         roomListener.onConnectedLatch = new CountDownLatch(1);
 
         ConnectOptions connectOptions = new ConnectOptions.Builder()
-                .name(testRoom)
+                .roomName(testRoom)
                 .localMedia(localMedia)
                 .build();
 
@@ -216,7 +216,7 @@ public class ConnectTests {
         roomListener.onConnectedLatch = new CountDownLatch(1);
 
         ConnectOptions connectOptions = new ConnectOptions.Builder()
-                .name(testRoom)
+                .roomName(testRoom)
                 .localMedia(localMedia)
                 .build();
 
@@ -236,7 +236,7 @@ public class ConnectTests {
         roomListener.onConnectedLatch = new CountDownLatch(1);
 
         ConnectOptions connectOptions = new ConnectOptions.Builder()
-                .name(testRoom)
+                .roomName(testRoom)
                 .localMedia(localMedia)
                 .build();
 
@@ -280,7 +280,9 @@ public class ConnectTests {
         roomListener.onParticipantConnectedLatch = new CountDownLatch(1);
         String randomRoomName = testRoom + System.currentTimeMillis();
 
-        ConnectOptions connectOptions = new ConnectOptions.Builder().name(randomRoomName).build();
+        ConnectOptions connectOptions = new ConnectOptions.Builder()
+                .roomName(randomRoomName)
+                .build();
 
         Room room = actor1VideoClient.connect(connectOptions, roomListener);
 
@@ -307,7 +309,9 @@ public class ConnectTests {
         roomListener.onParticipantConnectedLatch = new CountDownLatch(1);
         String randomRoomName = testRoom + System.currentTimeMillis();
 
-        ConnectOptions connectOptions = new ConnectOptions.Builder().name(randomRoomName).build();
+        ConnectOptions connectOptions = new ConnectOptions.Builder()
+                .roomName(randomRoomName)
+                .build();
 
         Room room = actor1VideoClient.connect(connectOptions, roomListener);
 

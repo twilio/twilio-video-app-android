@@ -128,8 +128,8 @@ public class VideoClient {
                     MediaFactory.instance(applicationContext).getNativeMediaFactoryHandle());
         }
 
-        Room room = new Room(connectOptions.getName(),
-                connectOptions.getLocalMedia(),
+        Room room = new Room(connectOptions.roomName,
+                connectOptions.localMedia,
                 roomListenerProxy(roomListener),
                 handler);
 

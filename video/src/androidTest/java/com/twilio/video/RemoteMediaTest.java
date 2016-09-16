@@ -60,7 +60,7 @@ public class RemoteMediaTest {
     private Room connectClient(VideoClient videoClient, LocalMedia localMedia,
                                Room.Listener roomListener) {
         ConnectOptions connectOptions = new ConnectOptions.Builder()
-                .name(testRoom)
+                .roomName(testRoom)
                 .localMedia(localMedia)
                 .build();
         Room room = videoClient.connect(connectOptions, roomListener);
