@@ -24,7 +24,7 @@ public class ConnectOptions {
     /**
      * Build new {@link ConnectOptions}.
      *
-     * <p>All methods are optional</p>
+     * <p>All methods are optional.</p>
      */
     public static class Builder {
         private String roomName = "";
@@ -34,7 +34,7 @@ public class ConnectOptions {
         public Builder() { }
 
         /**
-         * The name of the room being connected to
+         * The name of the room being connected to.
          */
         public Builder roomName(String roomName) {
             this.roomName = roomName;
@@ -42,7 +42,7 @@ public class ConnectOptions {
         }
 
         /**
-         * Media that will be published upon connection
+         * Media that will be published upon connection.
          */
         public Builder localMedia(LocalMedia localMedia) {
             this.localMedia = localMedia;
@@ -50,7 +50,7 @@ public class ConnectOptions {
         }
 
         /**
-         * Ice options used when connecting
+         * Ice options used when connecting.
          */
         public Builder iceOptions(IceOptions iceOptions) {
             this.iceOptions = iceOptions;

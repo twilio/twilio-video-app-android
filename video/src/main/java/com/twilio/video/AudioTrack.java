@@ -1,7 +1,7 @@
 package com.twilio.video;
 
 /**
- * An audio track represents a single remote audio source
+ * An audio track represents a remote audio source.
  */
 public class AudioTrack implements Track {
     private String trackId;
@@ -13,9 +13,9 @@ public class AudioTrack implements Track {
     }
 
     /**
-     * This audio track id
+     * This audio track id.
      *
-     * @return track id
+     * @return track id.
      */
     @Override
     public String getTrackId() {
@@ -23,9 +23,9 @@ public class AudioTrack implements Track {
     }
 
     /**
-     * Check if this audio track is enabled
+     * Check if this audio track is enabled.
      *
-     * @return true if track is enabled
+     * @return true if track is enabled.
      */
     @Override
     public boolean isEnabled() {

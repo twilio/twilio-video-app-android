@@ -148,12 +148,11 @@ public class ScreenCapturer implements VideoCapturer {
      * <p><b>Note</b>: This method can be invoked for informational purposes, but is primarily used
      * internally.</p>
      *
-     * @return all supported video formats
-     *
-     * // TODO: Add support for more formats based on the size of device screen
+     * @return all supported video formats.
      */
     @Override
     public List<VideoFormat> getSupportedFormats() {
+        // TODO: Add support for more formats based on the size of device screen
         List<VideoFormat> screencastFormats = new ArrayList<>();
         VideoDimensions vgaDimensions = new VideoDimensions(640, 480);
         VideoDimensions hdDimensions = new VideoDimensions(1280, 720);
@@ -170,10 +169,10 @@ public class ScreenCapturer implements VideoCapturer {
      * Starts capturing frames at the specified format. Frames will be provided to the given
      * listener upon availability.
      *
-     * <p><b>Note</b>: This method is not meant to be invoked directly</p>
+     * <p><b>Note</b>: This method is not meant to be invoked directly.</p>
      *
-     * @param captureFormat the format in which to capture frames
-     * @param capturerListener consumer of available frames
+     * @param captureFormat the format in which to capture frames.
+     * @param capturerListener consumer of available frames.
      */
     @Override
     public void startCapture(VideoFormat captureFormat, VideoCapturer.Listener capturerListener) {
@@ -228,7 +227,7 @@ public class ScreenCapturer implements VideoCapturer {
      * Stops all frames being captured. {@link MediaProjection} should be available for use
      * upon completion.
      *
-     * <p><b>Note</b>: This method is not meant to be invoked directly</p>
+     * <p><b>Note</b>: This method is not meant to be invoked directly.</p>
      */
     @Override
     public void stopCapture() {

@@ -24,7 +24,7 @@ public class CameraCapturer implements VideoCapturer {
     private static final Logger logger = Logger.getLogger(CameraCapturer.class);
 
     /**
-     * Camera source types
+     * Camera source types.
      */
     public enum CameraSource {
         CAMERA_SOURCE_FRONT_CAMERA,
@@ -103,7 +103,7 @@ public class CameraCapturer implements VideoCapturer {
      * <p><b>Note</b>: This method can be invoked for informational purposes, but is primarily used
      * internally.</p>
      *
-     * @return all supported video formats
+     * @return all supported video formats.
      */
     @Override
     public List<VideoFormat> getSupportedFormats() {
@@ -114,10 +114,10 @@ public class CameraCapturer implements VideoCapturer {
      * Starts capturing frames at the specified format. Frames will be provided to the given
      * listener upon availability.
      *
-     * <p><b>Note</b>: This method is not meant to be invoked directly</p>
+     * <p><b>Note</b>: This method is not meant to be invoked directly.</p>
      *
-     * @param captureFormat the format in which to capture frames
-     * @param videoCapturerListener consumer of available frames
+     * @param captureFormat the format in which to capture frames.
+     * @param videoCapturerListener consumer of available frames.
      */
     @Override
     public void startCapture(VideoFormat captureFormat,
@@ -147,7 +147,7 @@ public class CameraCapturer implements VideoCapturer {
      * Stops all frames being captured. The {@link android.hardware.Camera} interface should
      * be available for use upon completion.
      *
-     * <p><b>Note</b>: This method is not meant to be invoked directly</p>
+     * <p><b>Note</b>: This method is not meant to be invoked directly.</p>
      */
     @Override
     public void stopCapture() {
@@ -161,7 +161,7 @@ public class CameraCapturer implements VideoCapturer {
     }
 
     /**
-     * Returns the currently specified camera source
+     * Returns the currently specified camera source.
      */
     public synchronized CameraSource getCameraSource() {
         return cameraSource;

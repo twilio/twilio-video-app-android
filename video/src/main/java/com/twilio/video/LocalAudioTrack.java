@@ -14,9 +14,9 @@ public class LocalAudioTrack extends AudioTrack  {
     }
 
     /**
-     * Check if local audio track is enabled
+     * Check if local audio track is enabled.
      *
-     * @return true if the local audio is enabled
+     * @return true if the local audio is enabled.
      */
     @Override
     public synchronized boolean isEnabled() {
@@ -30,9 +30,9 @@ public class LocalAudioTrack extends AudioTrack  {
     }
 
     /**
-     * Sets the state of the local audio track
+     * Sets the state of the local audio track.
      *
-     * @param enable the desired state of the local audio track
+     * @param enable the desired state of the local audio track.
      */
     public synchronized void enable(boolean enable) {
         if (!isReleased()) {
