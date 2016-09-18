@@ -1,9 +1,6 @@
 package com.twilio.video;
 
-import android.app.Instrumentation;
-import android.support.test.InstrumentationRegistry;
 import android.support.test.filters.LargeTest;
-import android.widget.FrameLayout;
 
 import com.twilio.video.base.BaseCameraCapturerTest;
 
@@ -14,7 +11,6 @@ import org.junit.runners.Parameterized;
 import java.util.Arrays;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicReference;
 
 import com.twilio.video.test.R;
 import com.twilio.video.util.FrameCountRenderer;
@@ -86,20 +82,7 @@ public class CameraCapturerParameterizedTest extends BaseCameraCapturerTest {
 
     @Test
     public void canBeRenderedToView() throws InterruptedException {
-        final FrameLayout localVideo =
-                (FrameLayout) cameraCapturerActivity.findViewById(R.id.local_video);
-        final AtomicReference<VideoViewRenderer> videoViewRendererReference =
-                new AtomicReference<>();
-        Instrumentation instrumentation = InstrumentationRegistry.getInstrumentation();
-        cameraCapturerActivity.runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                videoViewRendererReference.set(new VideoViewRenderer(cameraCapturerActivity,
-                        localVideo));
-            }
-        });
-        instrumentation.waitForIdleSync();
-        VideoViewRenderer videoViewRenderer = videoViewRendererReference.get();
+        VideoView localVideo = (VideoView) cameraCapturerActivity.findViewById(R.id.local_video);
         final CountDownLatch renderedFirstFrame = new CountDownLatch(1);
         VideoRenderer.Listener rendererListener = new VideoRenderer.Listener() {
             @Override
@@ -112,10 +95,10 @@ public class CameraCapturerParameterizedTest extends BaseCameraCapturerTest {
 
             }
         };
-        videoViewRenderer.setListener(rendererListener);
+        localVideo.setListener(rendererListener);
         cameraCapturer = new CameraCapturer(cameraCapturerActivity, cameraSource, null);
         localVideoTrack = localMedia.addVideoTrack(true, cameraCapturer);
-        localVideoTrack.addRenderer(videoViewRenderer);
+        localVideoTrack.addRenderer(localVideo);
 
         /*
          * Validate we rendered the first frame and wait a few seconds so we can see the
@@ -123,7 +106,8 @@ public class CameraCapturerParameterizedTest extends BaseCameraCapturerTest {
          */
         assertTrue(renderedFirstFrame.await(2, TimeUnit.SECONDS));
         Thread.sleep(TimeUnit.SECONDS.toMillis(5));
-        videoViewRenderer.release();
+        localVideoTrack.removeRenderer(localVideo);
+        localVideo.release();
     }
 
     @Test
