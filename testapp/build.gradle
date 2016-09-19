@@ -1,16 +1,15 @@
 apply plugin: 'com.android.model.application'
 apply plugin: 'org.bitbucket.pvoid.android-apt'
 
-
 model {
     android {
-        compileSdkVersion 23
-        buildToolsVersion "23.0.2"
+        compileSdkVersion 24
+        buildToolsVersion "24.0.2"
 
         defaultConfig.with {
             applicationId "com.tw.video.testapp"
             minSdkVersion.apiLevel 16
-            targetSdkVersion.apiLevel 23
+            targetSdkVersion.apiLevel 24
             versionName generateVersionName()
             versionCode generateVersionCode()
         }
@@ -59,8 +58,8 @@ dependencies {
     compile project(':video')
 
     compile 'net.hockeyapp.android:HockeySDK:3.5.0'
-    compile 'com.android.support:appcompat-v7:23.2.1'
-    compile 'com.android.support:design:23.2.1'
+    compile 'com.android.support:appcompat-v7:24.2.1'
+    compile 'com.android.support:design:24.2.1'
     compile 'com.squareup.retrofit:retrofit:1.9.0'
     compile 'com.jakewharton.timber:timber:4.1.0'
     compile 'com.appyvet:materialrangebar:1.3'
