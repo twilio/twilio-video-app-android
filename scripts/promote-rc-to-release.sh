@@ -38,7 +38,7 @@ mkdir -p ${SDK_PACKAGE_PATH}
 pushd "$SDK_RELEASE_TOOL_HOME"
 
 echo "sdk-release-tool: downloading..."
-./sdk-release-tool download --stage twilio-${PRODUCT_NAME}-android ${SDK_RELEASE_VERSION}-rc${SDK_RC_BUILD_NUMBER} ${SDK_PACKAGE_PATH}
+./sdk-release-tool download --stage twilio-${PRODUCT_NAME}-android ${SDK_RC_VERSION} ${SDK_PACKAGE_PATH}
 if [ "$?" -ne "0" ]; then
     echo "Error: failed to execute sdk-release-tool upload"
     exit 1
