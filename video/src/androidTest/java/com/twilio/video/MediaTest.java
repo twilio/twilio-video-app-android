@@ -8,9 +8,9 @@ import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
 
 import com.twilio.common.AccessManager;
-import com.twilio.video.helper.AccessTokenHelper;
 import com.twilio.video.helper.CallbackHelper;
 import com.twilio.video.ui.RoomsTestActivity;
+import com.twilio.video.util.AccessManagerUtils;
 import com.twilio.video.util.FakeVideoCapturer;
 import com.twilio.video.util.FakeVideoRenderer;
 import com.twilio.video.util.RandUtils;
@@ -32,9 +32,7 @@ import static org.junit.Assert.assertTrue;
 
 @RunWith(AndroidJUnit4.class)
 @LargeTest
-public class RemoteMediaTest {
-    
-
+public class MediaTest {
     private final static String TEST_USER  = "TEST_USER";
     private final static String TEST_USER2  = "TEST_USER2";
     @Rule
@@ -83,8 +81,7 @@ public class RemoteMediaTest {
         testRoom = RandUtils.generateRandomString(10);
         fakeVideoCapturer = new FakeVideoCapturer();
         actor1LocalMedia = LocalMedia.create(context);
-        String token = AccessTokenHelper.obtainCapabilityToken(TEST_USER);
-        actor1AccessManager = new AccessManager(context, token, null);
+        actor1AccessManager = AccessManagerUtils.obtainAccessManager(context, TEST_USER);
         Instrumentation instrumentation = InstrumentationRegistry.getInstrumentation();
         instrumentation.runOnMainSync(new Runnable() {
             @Override
@@ -101,8 +98,7 @@ public class RemoteMediaTest {
 
         // Connect actor 2
         actor2LocalMedia = LocalMedia.create(context);
-        token = AccessTokenHelper.obtainCapabilityToken(TEST_USER2);
-        actor2AccessManager = new AccessManager(context, token, null);
+        actor2AccessManager = AccessManagerUtils.obtainAccessManager(context, TEST_USER2);
         instrumentation.runOnMainSync(new Runnable() {
             @Override
             public void run() {
@@ -291,5 +287,4 @@ public class RemoteMediaTest {
         videoTrack.enable(false);
         assertTrue(mediaListener.onVideoTrackDisabledLatch.await(20, TimeUnit.SECONDS));
     }
-
 }
