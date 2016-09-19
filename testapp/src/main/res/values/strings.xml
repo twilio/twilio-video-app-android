@@ -18,7 +18,6 @@
     <string name="title_activity_client">TV Client</string>
     <string name="video_client_status">Video Client Status</string>
     <string name="room_status">Room Status</string>
-    <string name="log_out">Log Out</string>
     <string name="fps">Frames per second</string>
     <string name="video_dimensions">Video dimensions</string>
     <string name="video_constraints">Video Constraints</string>

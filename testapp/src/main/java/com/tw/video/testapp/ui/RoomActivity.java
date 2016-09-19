@@ -8,6 +8,9 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.EditText;
@@ -70,6 +73,7 @@ public class RoomActivity extends AppCompatActivity {
     private VideoView localVideoView;
     private CameraCapturer cameraCapturer;
     private AlertDialog alertDialog;
+    boolean loggingOut;
     private Map<Participant, VideoView> videoViewMap = new HashMap<>();
 
     @Override
@@ -87,6 +91,7 @@ public class RoomActivity extends AppCompatActivity {
 
         processActivityIntent(savedInstanceState);
         updateUI(RoomState.DISCONNECTED);
+        loggingOut = false;
         localMedia = LocalMedia.create(this);
         localAudioTrack = localMedia.addAudioTrack(true);
         cameraCapturer = new CameraCapturer(this,
@@ -120,6 +125,35 @@ public class RoomActivity extends AppCompatActivity {
         if (accessManager != null) {
             accessManager.dispose();
             accessManager = null;
+        }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+
+        inflater.inflate(R.menu.room_menu, menu);
+
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_log_out:
+                // Will continue logout once the conversation has ended
+                loggingOut = true;
+
+                // End any current call
+                if (room != null && room.getState() != RoomState.DISCONNECTED) {
+                    room.disconnect();
+                } else {
+                    returnToVideoClientLogin();
+                }
+
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
         }
     }
 
@@ -430,7 +464,9 @@ public class RoomActivity extends AppCompatActivity {
                 removeAllParticipants();
                 updateUI(RoomState.DISCONNECTED);
                 RoomActivity.this.room = null;
-                //returnToVideoClientLogin();
+                if (loggingOut) {
+                    returnToVideoClientLogin();
+                }
             }
 
             @Override
