@@ -6,7 +6,7 @@ PRODUCT_NAME="video"
 
 CDN_JSON_REALM="stage"
 SDK_VERSION=`head -3 gradle.properties | sed 's/[^0-9]*//g' | tr '\n' '.' | sed s'/.$//'`
-SDK_RC=`tail -1 gradle.properties | sed 's/[^0-9]*//g'`
+SDK_RC=`sed -n '4p' gradle.properties | sed 's/[^0-9]*//g'`
 
 echo "Prepping for sdk-release-tool..."
 if [ ! -d $SDK_RELEASE_TOOL_HOME ]; then

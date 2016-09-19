@@ -16,6 +16,7 @@ buildscript {
         classpath 'org.bitbucket.pvoid:android-apt-experemental:1.0.1'
     }
 }
+
 allprojects {
     apply from: "$rootProject.projectDir/common.gradle"
     repositories {
