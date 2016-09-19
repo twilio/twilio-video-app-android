@@ -29,6 +29,7 @@ import com.twilio.video.LocalVideoTrack;
 import com.twilio.video.Media;
 import com.twilio.video.Participant;
 import com.twilio.video.Room;
+import com.twilio.video.RoomState;
 import com.twilio.video.VideoClient;
 import com.twilio.video.VideoException;
 import com.twilio.video.VideoTrack;
@@ -85,6 +86,7 @@ public class RoomActivity extends AppCompatActivity {
         ButterKnife.bind(this);
 
         processActivityIntent(savedInstanceState);
+        updateUI(RoomState.DISCONNECTED);
         localMedia = LocalMedia.create(this);
         localAudioTrack = localMedia.addAudioTrack(true);
         cameraCapturer = new CameraCapturer(this,
@@ -93,7 +95,6 @@ public class RoomActivity extends AppCompatActivity {
         primaryVideoView.setMirror(true);
         localVideoTrack.addRenderer(primaryVideoView);
         createVideoClient();
-        //connectToRoom();
     }
 
     @Override
@@ -151,7 +152,8 @@ public class RoomActivity extends AppCompatActivity {
                 .localMedia(localMedia)
                 .build();
 
-        room = videoClient.connect(connectOptions, createRoomListener());
+        room = videoClient.connect(connectOptions, roomListener());
+        updateUI(RoomState.CONNECTING);
     }
 
     @OnClick(R.id.join_room_fab)
@@ -163,7 +165,7 @@ public class RoomActivity extends AppCompatActivity {
             EditText joinRoomEditText = new EditText(this);
             alertDialog = Dialog.createJoinRoomDialog(joinRoomEditText,
                     joinRoomClickListener(joinRoomEditText),
-                    cancelCallClickListener(),
+                    cancelRoomClickListener(),
                     this);
             alertDialog.show();
         }
@@ -270,6 +272,21 @@ public class RoomActivity extends AppCompatActivity {
                 ContextCompat.getDrawable(RoomActivity.this, icon));
     }
 
+    private void updateUI(RoomState roomState) {
+        int joinIcon = 0;
+        if (roomState == RoomState.CONNECTING) {
+            joinIcon = R.drawable.ic_call_end_white_24px;
+        } else if (roomState == RoomState.CONNECTED) {
+            getSupportActionBar().setTitle(room.getName());
+            joinIcon = R.drawable.ic_call_end_white_24px;
+        } else { // disconnected
+            getSupportActionBar().setTitle(username);
+            joinIcon = R.drawable.ic_add_circle_white_24px;
+        }
+        joinRoomFab.setImageDrawable(
+                ContextCompat.getDrawable(RoomActivity.this, joinIcon));
+    }
+
     private DialogInterface.OnClickListener joinRoomClickListener(final EditText joinRoomEditText) {
         return new DialogInterface.OnClickListener() {
             @Override
@@ -279,7 +296,7 @@ public class RoomActivity extends AppCompatActivity {
         };
     }
 
-    private DialogInterface.OnClickListener cancelCallClickListener() {
+    private DialogInterface.OnClickListener cancelRoomClickListener() {
         return new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
@@ -335,6 +352,17 @@ public class RoomActivity extends AppCompatActivity {
         participant.getMedia().setListener(new ParticipantMediaListener(participant));
     }
 
+    private synchronized void removeAllParticipants() {
+        thumbnailLinearLayout.removeAllViews();
+        videoViewMap.clear();
+        // set local view as primary view
+        localVideoTrack.removeRenderer(localVideoView);
+        primaryVideoView.setMirror(true);
+        localVideoTrack.addRenderer(primaryVideoView);
+        localVideoView = primaryVideoView;
+        thumbnailLinearLayout.setVisibility(View.GONE);
+    }
+
     private synchronized void removeParticipant(Participant participant) {
         roomStatusTextview.setText("Participant "+participant.getIdentity()+ " left.");
         VideoView videoView = videoViewMap.remove(participant);
@@ -375,13 +403,14 @@ public class RoomActivity extends AppCompatActivity {
         }
     }
 
-    private Room.Listener createRoomListener() {
+    private Room.Listener roomListener() {
         return new Room.Listener() {
             @Override
             public void onConnected(Room room) {
                 Timber.i("onConnected: "+room.getName() + " sid:"+
                         room.getSid()+" state:"+room.getState());
                 roomStatusTextview.setText("Connected to "+room.getName());
+                updateUI(RoomState.CONNECTED);
 
                 for (Map.Entry<String, Participant> entry : room.getParticipants().entrySet()) {
                     addParticipant(entry.getValue());
@@ -398,8 +427,10 @@ public class RoomActivity extends AppCompatActivity {
             public void onDisconnected(Room room, VideoException error) {
                 Timber.i("onDisconnected");
                 roomStatusTextview.setText("Disconnected from "+roomName);
+                removeAllParticipants();
+                updateUI(RoomState.DISCONNECTED);
                 RoomActivity.this.room = null;
-                returnToVideoClientLogin();
+                //returnToVideoClientLogin();
             }
 
             @Override
