@@ -340,13 +340,7 @@ uploadArchives {
                         password: mavenPassword
                 )
             }
-            pom.version = getVersionName() + ((project.hasProperty("releaseCandidate") &&
-                    project.property("releaseCandidate").toBoolean() == true) ?
-                    "-rc${project.property("versionRc")}" :
-                    '') + ((project.hasProperty("snapshot") &&
-                    project.property("snapshot").toBoolean() == true) ?
-                    "-SNAPSHOT" :
-                    '')
+            pom.version = generateVersionName()
             pom.groupId = 'com.twilio'
             pom.artifactId = 'video-android'
             pom.packaging = 'aar'
