@@ -48,7 +48,7 @@ echo "copy release candidate to release folder"
 if [ ! -d "${SDK_PACKAGE_PATH}/dist/${SDK_RELEASE_VERSION}" ]; then
     mkdir "${SDK_PACKAGE_PATH}/dist/${SDK_RELEASE_VERSION}"
 fi
-rsync -av "${SDK_PACKAGE_PATH}/dist/${SDK_RELEASE_VERSION}-rc${SDK_RC_BUILD_NUMBER}/" "${SDK_PACKAGE_PATH}/dist/${SDK_RELEASE_VERSION}/"
+rsync -av "${SDK_PACKAGE_PATH}/dist/${SDK_RC_VERSION}/" "${SDK_PACKAGE_PATH}/dist/${SDK_RELEASE_VERSION}/"
 
 echo "sdk-release-tool: uploading..."
 ./sdk-release-tool upload --prod twilio-${PRODUCT_NAME}-android ${SDK_RELEASE_VERSION} ${SDK_PACKAGE_PATH}
