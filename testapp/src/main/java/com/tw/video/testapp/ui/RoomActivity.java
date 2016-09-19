@@ -141,7 +141,7 @@ public class RoomActivity extends AppCompatActivity {
     private void connectToRoom() {
         roomStatusTextview.setText("Connecting to room...");
         ConnectOptions connectOptions = new ConnectOptions.Builder()
-                .name(roomName)
+                .roomName(roomName)
                 .localMedia(localMedia)
                 .build();
 

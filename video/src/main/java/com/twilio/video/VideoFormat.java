@@ -1,5 +1,8 @@
 package com.twilio.video;
 
+/**
+ * Represents the format of a video frame.
+ */
 public class VideoFormat {
     public final VideoDimensions dimensions;
     public final int framerate;

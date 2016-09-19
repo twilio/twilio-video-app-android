@@ -17,10 +17,9 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * The VideoClient allows a user to connect to a Room
+ * The VideoClient allows a user to connect to a Room.
  */
 public class VideoClient {
-
     private static final String[] REQUIRED_PERMISSIONS = {
             // Required permissions granted upon install
             Manifest.permission.INTERNET,
@@ -97,15 +96,21 @@ public class VideoClient {
     }
 
     /**
-     * Audio output speaker for the current client device
+     * Audio output speaker for the current client device.
      *
-     * @return audio output speaker
+     * @return audio output speaker.
      */
     public AudioOutput getAudioOutput() {
         AudioManager audioManager = (AudioManager) applicationContext.getSystemService(Context.AUDIO_SERVICE);
         return audioManager.isSpeakerphoneOn() ? AudioOutput.SPEAKERPHONE : AudioOutput.HEADSET;
     }
 
+    /**
+     * Connect to a {@link Room}.
+     *
+     * @param roomListener listener of room related events.
+     * @return room being connected to.
+     */
     public Room connect(Room.Listener roomListener) {
         if (roomListener == null) {
             throw new NullPointerException("roomListener must not be null");
@@ -114,6 +119,13 @@ public class VideoClient {
         return connect(connectOptions, roomListener);
     }
 
+    /**
+     * Connect to a {@link Room} with specified options.
+     *
+     * @param connectOptions options for connecting to room.
+     * @param roomListener listener of room related events.
+     * @return room being connected to.
+     */
     public synchronized Room connect(ConnectOptions connectOptions, Room.Listener roomListener) {
         if (connectOptions == null) {
             throw new NullPointerException("connectOptions must not be null");
@@ -128,7 +140,7 @@ public class VideoClient {
                     MediaFactory.instance(applicationContext).getNativeMediaFactoryHandle());
         }
 
-        Room room = new Room(connectOptions.getName(),
+        Room room = new Room(connectOptions.getRoomName(),
                 connectOptions.getLocalMedia(),
                 roomListenerProxy(roomListener),
                 handler);
@@ -191,7 +203,7 @@ public class VideoClient {
     }
 
     /**
-     * Returns the version of the Rooms SDK.
+     * Returns the version of the Video SDK.
      *
      * @return the version of the SDK
      */
@@ -200,7 +212,7 @@ public class VideoClient {
     }
 
     /**
-     * Gets the logging level for messages logged by the Rooms SDK.
+     * Gets the logging level for messages logged by the Video SDK.
      *
      * @return the logging level
      */
@@ -209,7 +221,7 @@ public class VideoClient {
     }
 
     /**
-     * Sets the logging level for messages logged by the Rooms SDK.
+     * Sets the logging level for messages logged by the Video SDK.
      *
      * @param level The logging level
      */
@@ -318,18 +330,12 @@ public class VideoClient {
         }
     }
 
-
-
     private native static void nativeSetCoreLogLevel(int level);
-
     private native static void nativeSetModuleLevel(int module, int level);
-
     private native static int nativeGetCoreLogLevel();
-
     private native long nativeCreateClient(Context context,
                                            AccessManager accessManager,
                                            long nativeMediaFactoryHandle);
-
     private native long nativeConnect(long nativeClientDataHandler,
                                       long nativeRoomListenerHandle,
                                       ConnectOptions ConnectOptions);

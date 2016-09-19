@@ -5,6 +5,14 @@ import android.content.Context;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * LocalMedia provides local audio and video track management.
+ *
+ * <p>LocalMedia can be shared to the participants of a {@link Room} when provided via
+ * {@link ConnectOptions}. All track operations will be published to participants after
+ * connected. The lifecycle of local media is independent of {@link Room}. The same media can
+ * be shared in zero, one, or many rooms.</p>
+ */
 public class LocalMedia {
     private static final String RELEASE_MESSAGE_TEMPLATE = "LocalMedia released %s unavailable";
     private static final Logger logger = Logger.getLogger(LocalMedia.class);
@@ -14,6 +22,12 @@ public class LocalMedia {
     private final List<LocalVideoTrack> localVideoTracks = new ArrayList<>();
     private final MediaFactory mediaFactory;
 
+    /**
+     * Creates a new local media.
+     *
+     * @param context application context
+     * @return a new local media instance
+     */
     public static LocalMedia create(Context context) {
         return MediaFactory.instance(context).createLocalMedia();
     }
@@ -23,20 +37,31 @@ public class LocalMedia {
         this.mediaFactory = mediaFactory;
     }
 
-    public List<LocalAudioTrack> getLocalAudioTracks() {
-        checkReleased("getLocalAudioTracks");
+    /**
+     * Returns a list of all currently added audio tracks.
+     */
+    public List<LocalAudioTrack> getAudioTracks() {
+        checkReleased("getAudioTracks");
         return localAudioTracks;
     }
 
-    public List<LocalVideoTrack> getLocalVideoTracks() {
-        checkReleased("getLocalVideoTracks");
+    /**
+     * Returns a list of all currently added video tracks.
+     */
+    public List<LocalVideoTrack> getVideoTracks() {
+        checkReleased("getVideoTracks");
         return localVideoTracks;
     }
 
+    /**
+     * Adds audio track to local media.
+     *
+     * @param enabled initial state of audio track.
+     * @return local audio track if successfully added or null if audio track could not be added.
+     */
     public LocalAudioTrack addAudioTrack(boolean enabled) {
         checkReleased("addAudioTrack");
-        LocalAudioTrack localAudioTrack = nativeAddAudioTrack(nativeLocalMediaHandle,
-                enabled);
+        LocalAudioTrack localAudioTrack = nativeAddAudioTrack(nativeLocalMediaHandle, enabled);
 
         if (localAudioTrack != null) {
             localAudioTracks.add(localAudioTrack);
@@ -48,6 +73,12 @@ public class LocalMedia {
         return localAudioTrack;
     }
 
+    /**
+     * Removes audio track from local media.
+     *
+     * @param localAudioTrack local audio track to be removed.
+     * @return true if the removal succeeded or false if the audio track could not be removed.
+     */
     public boolean removeAudioTrack(LocalAudioTrack localAudioTrack) {
         checkReleased("removeAudioTrack");
         boolean result = false;
@@ -66,10 +97,25 @@ public class LocalMedia {
         return result;
     }
 
+    /**
+     * Adds local video track to local media.
+     *
+     * @param enabled initial state of video track.
+     * @param videoCapturer capturer that provides video frames.
+     * @return local video track if successfully added or null if video track could not be added.
+     */
     public LocalVideoTrack addVideoTrack(boolean enabled, VideoCapturer videoCapturer) {
         return addVideoTrack(enabled, videoCapturer, null);
     }
 
+    /**
+     * Adds local video track to local media.
+     *
+     * @param enabled initial state of video track.
+     * @param videoCapturer capturer that provides video frames.
+     * @param videoConstraints constraints to be applied on video track.
+     * @return local video track if successfully added or null if video track could not be added.
+     */
     public LocalVideoTrack addVideoTrack(boolean enabled,
                                          VideoCapturer videoCapturer,
                                          VideoConstraints videoConstraints) {
@@ -89,6 +135,12 @@ public class LocalMedia {
         return localVideoTrack;
     }
 
+    /**
+     * Removes video track from local media.
+     *
+     * @param localVideoTrack local video track to be removed.
+     * @return true if the removal succeeded or false if the video track could not be removed.
+     */
     public boolean removeVideoTrack(LocalVideoTrack localVideoTrack) {
         checkReleased("removeVideoTrack");
         boolean result = false;
@@ -107,6 +159,11 @@ public class LocalMedia {
         return result;
     }
 
+    /**
+     * Releases local media. This method must be called when local media is no longer needed. All
+     * audio and video tracks will be removed. Local media should not be used after calling this
+     * method.
+     */
     public void release() {
         if (nativeLocalMediaHandle != 0) {
             while (!localAudioTracks.isEmpty()) {
