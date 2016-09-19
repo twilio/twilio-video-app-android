@@ -37,8 +37,8 @@ These are executed from Jenkins, but these are a reference for building and uplo
 ./gradlew -PreleaseCandidate=true -Pmaven.repo=https://api.bintray.com/maven/twilio/internal-releases/video-android/ video:uploadArchives
 ```
 
-### Uploading Regular Archive
+### Uploading a Release
 ```
-./gradlew video:uploadArchives
+./gradlew -Prelease=true -Pmaven.repo=https://api.bintray.com/maven/twilio/internal-releases/video-android/ video:uploadArchives
 ```
 
