@@ -48,7 +48,7 @@ import butterknife.OnClick;
 import timber.log.Timber;
 
 public class RoomActivity extends AppCompatActivity {
-    @BindView(R.id.join_room_fab) FloatingActionButton joinRoomFab;
+    @BindView(R.id.connect_fab) FloatingActionButton connectFab;
     @BindView(R.id.media_status_textview) TextView mediaStatusTextview;
     @BindView(R.id.room_status_textview) TextView roomStatusTextview;
     @BindView(R.id.primary_video_view) VideoView primaryVideoView;
@@ -186,7 +186,7 @@ public class RoomActivity extends AppCompatActivity {
         updateUI(RoomState.CONNECTING);
     }
 
-    @OnClick(R.id.join_room_fab)
+    @OnClick(R.id.connect_fab)
     public void joinRoom(View view) {
         if (room != null) {
             Timber.i("Exiting room");
@@ -313,7 +313,7 @@ public class RoomActivity extends AppCompatActivity {
             getSupportActionBar().setTitle(username);
             joinIcon = R.drawable.ic_add_circle_white_24px;
         }
-        joinRoomFab.setImageDrawable(
+        connectFab.setImageDrawable(
                 ContextCompat.getDrawable(RoomActivity.this, joinIcon));
     }
 

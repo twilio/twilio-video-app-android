@@ -26,8 +26,8 @@ public class Dialog {
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(context);
 
         alertDialogBuilder.setIcon(R.drawable.ic_call_black_24dp);
-        alertDialogBuilder.setTitle("Join Room");
-        alertDialogBuilder.setPositiveButton("Join", connectClickListener);
+        alertDialogBuilder.setTitle("Connect to Room");
+        alertDialogBuilder.setPositiveButton("Connect", connectClickListener);
         alertDialogBuilder.setNegativeButton("Cancel", cancelClickListener);
         alertDialogBuilder.setCancelable(false);
 
@@ -39,7 +39,6 @@ public class Dialog {
     private static void setRoomtFieldInDialog(EditText roomEditText,
                                               AlertDialog.Builder alertDialogBuilder,
                                               Context context) {
-        // Add a room field to the dialog
         roomEditText.setHint("Room Name");
         int horizontalPadding = context.getResources().getDimensionPixelOffset(R.dimen.activity_horizontal_margin);
         int verticalPadding = context.getResources().getDimensionPixelOffset(R.dimen.activity_vertical_margin);
