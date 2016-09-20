@@ -130,7 +130,7 @@ public class VideoView extends SurfaceViewRenderer implements VideoRenderer {
     }
 
     private void setupRenderer() {
-        // Do not start EGL14 to avoid runtime exceptions when used in a developer tool
+        // Do not initialize EglBase when using developer tools to prevent EGL14 runtime exceptions
         if(!isInEditMode()) {
             init(EglBaseProvider.provideEglBase().getEglBaseContext(),
                     internalEventListener);
