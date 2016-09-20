@@ -6,8 +6,7 @@
     android:id="@+id/navigation_drawer"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.RoomActivity"
-    tools:showIn="@layout/content_client">
+    tools:context=".ui.RoomActivity" >
 
     <android.support.design.widget.CoordinatorLayout
         xmlns:android="http://schemas.android.com/apk/res/android"
@@ -15,7 +14,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent" >
 
-        <include layout="@layout/content_client" />
+        <include layout="@layout/content_room" />
 
         <android.support.design.widget.FloatingActionButton android:id="@+id/exit_room_fab"
             android:layout_width="wrap_content" android:layout_height="wrap_content"
