@@ -131,9 +131,7 @@ public class RoomActivity extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
-
         inflater.inflate(R.menu.room_menu, menu);
-
         return true;
     }
 
@@ -143,14 +141,12 @@ public class RoomActivity extends AppCompatActivity {
             case R.id.action_log_out:
                 // Will continue logout once the conversation has ended
                 loggingOut = true;
-
                 // End any current call
                 if (room != null && room.getState() != RoomState.DISCONNECTED) {
                     room.disconnect();
                 } else {
                     returnToVideoClientLogin();
                 }
-
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -197,7 +193,7 @@ public class RoomActivity extends AppCompatActivity {
             room.disconnect();
         } else {
             EditText joinRoomEditText = new EditText(this);
-            alertDialog = Dialog.createJoinRoomDialog(joinRoomEditText,
+            alertDialog = Dialog.createConnectDialog(joinRoomEditText,
                     joinRoomClickListener(joinRoomEditText),
                     cancelRoomClickListener(),
                     this);

@@ -19,15 +19,15 @@ public class Dialog {
         return dialog;
     }
 
-    public static AlertDialog createJoinRoomDialog(EditText roomEditText,
-                                                   DialogInterface.OnClickListener joinRoomClickListener,
-                                                   DialogInterface.OnClickListener cancelClickListener,
-                                                   Context context) {
+    public static AlertDialog createConnectDialog(EditText roomEditText,
+                                                  DialogInterface.OnClickListener connectClickListener,
+                                                  DialogInterface.OnClickListener cancelClickListener,
+                                                  Context context) {
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(context);
 
         alertDialogBuilder.setIcon(R.drawable.ic_call_black_24dp);
         alertDialogBuilder.setTitle("Join Room");
-        alertDialogBuilder.setPositiveButton("Join", joinRoomClickListener);
+        alertDialogBuilder.setPositiveButton("Join", connectClickListener);
         alertDialogBuilder.setNegativeButton("Cancel", cancelClickListener);
         alertDialogBuilder.setCancelable(false);
 

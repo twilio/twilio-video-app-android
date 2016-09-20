@@ -26,26 +26,6 @@
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:hint="@string/username"/>
-        <!--
-        <EditText
-            android:id="@+id/room_name_edittext"
-            android:layout_margin="@dimen/activity_horizontal_margin"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:hint="@string/room_name"/>
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/realm_string"
-            android:textSize="15sp"
-            android:layout_marginTop="@dimen/activity_horizontal_margin"
-            android:layout_marginLeft="@dimen/activity_horizontal_margin" />
-        <Spinner
-            android:id="@+id/realm_spinner"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:paddingLeft="@dimen/activity_horizontal_margin"
-            android:layout_gravity="center_horizontal" />-->
 
         <Button
             android:id="@+id/login_button"
