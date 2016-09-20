@@ -64,7 +64,10 @@ public class VideoView extends SurfaceViewRenderer implements VideoRenderer {
             a.recycle();
         }
 
-        setupRenderer();
+        // Do not setup the renderer when using developer tools to avoid EGL14 runtime exceptions
+        if(!isInEditMode()) {
+            setupRenderer();
+        }
     }
 
     /**
@@ -130,11 +133,8 @@ public class VideoView extends SurfaceViewRenderer implements VideoRenderer {
     }
 
     private void setupRenderer() {
-        // Do not initialize EglBase when using developer tools to prevent EGL14 runtime exceptions
-        if(!isInEditMode()) {
-            init(EglBaseProvider.provideEglBase().getEglBaseContext(),
-                    internalEventListener);
-        }
+        init(EglBaseProvider.provideEglBase().getEglBaseContext(),
+                internalEventListener);
         setMirror(mirror);
         setScalingType(convertToWebRtcScaleType(videoScaleType));
         setZOrderMediaOverlay(overlaySurface);
