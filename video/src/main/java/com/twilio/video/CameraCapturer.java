@@ -27,8 +27,8 @@ public class CameraCapturer implements VideoCapturer {
      * Camera source types.
      */
     public enum CameraSource {
-        CAMERA_SOURCE_FRONT_CAMERA,
-        CAMERA_SOURCE_BACK_CAMERA
+        FRONT_CAMERA,
+        BACK_CAMERA
     }
 
     private final Context context;
@@ -176,9 +176,9 @@ public class CameraCapturer implements VideoCapturer {
         if (webrtcCapturer != null) {
             webrtcCapturer.switchCamera(null);
         }
-        cameraSource = (cameraSource == CameraSource.CAMERA_SOURCE_FRONT_CAMERA) ?
-                (CameraSource.CAMERA_SOURCE_BACK_CAMERA) :
-                (CameraSource.CAMERA_SOURCE_FRONT_CAMERA);
+        cameraSource = (cameraSource == CameraSource.FRONT_CAMERA) ?
+                (CameraSource.BACK_CAMERA) :
+                (CameraSource.FRONT_CAMERA);
     }
 
     void setSurfaceTextureHelper(SurfaceTextureHelper surfaceTextureHelper) {

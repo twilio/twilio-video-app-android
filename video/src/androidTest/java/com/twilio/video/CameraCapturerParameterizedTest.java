@@ -24,8 +24,8 @@ public class CameraCapturerParameterizedTest extends BaseCameraCapturerTest {
     @Parameterized.Parameters(name = "{0}")
     public static Iterable<Object[]> data() {
         return Arrays.asList(new Object[][]{
-                {CameraCapturer.CameraSource.CAMERA_SOURCE_FRONT_CAMERA},
-                {CameraCapturer.CameraSource.CAMERA_SOURCE_BACK_CAMERA}});
+                {CameraCapturer.CameraSource.FRONT_CAMERA},
+                {CameraCapturer.CameraSource.BACK_CAMERA}});
     }
 
     private final CameraCapturer.CameraSource cameraSource;

@@ -17,7 +17,7 @@ public class CameraCapturerBaseTest extends BaseCameraCapturerTest {
     @Test(expected = NullPointerException.class)
     public void create_shouldFailWithNullContext() {
         cameraCapturer = new CameraCapturer(null,
-                CameraCapturer.CameraSource.CAMERA_SOURCE_FRONT_CAMERA,
+                CameraCapturer.CameraSource.FRONT_CAMERA,
                 null);
     }
 
@@ -29,7 +29,7 @@ public class CameraCapturerBaseTest extends BaseCameraCapturerTest {
     @Test
     public void shouldAllowCameraSwitch() throws InterruptedException {
         cameraCapturer = new CameraCapturer(cameraCapturerActivity,
-                CameraCapturer.CameraSource.CAMERA_SOURCE_FRONT_CAMERA,
+                CameraCapturer.CameraSource.FRONT_CAMERA,
                 null);
         localVideoTrack = localMedia.addVideoTrack(true, cameraCapturer);
         int frameCount = frameCountRenderer.getFrameCount();
@@ -45,7 +45,7 @@ public class CameraCapturerBaseTest extends BaseCameraCapturerTest {
         assertTrue(frameCountRenderer.getFrameCount() > frameCount);
 
         // Validate front camera source
-        assertEquals(CameraCapturer.CameraSource.CAMERA_SOURCE_FRONT_CAMERA,
+        assertEquals(CameraCapturer.CameraSource.FRONT_CAMERA,
                 cameraCapturer.getCameraSource());
 
         // Perform camera switch
@@ -57,14 +57,14 @@ public class CameraCapturerBaseTest extends BaseCameraCapturerTest {
         assertTrue(frameCountRenderer.getFrameCount() > frameCount);
 
         // Validate back camera source
-        assertEquals(CameraCapturer.CameraSource.CAMERA_SOURCE_BACK_CAMERA,
+        assertEquals(CameraCapturer.CameraSource.BACK_CAMERA,
                 cameraCapturer.getCameraSource());
     }
 
     @Test
     public void shouldAllowCameraSwitchWhileNotOnLocalVideo() throws InterruptedException {
         cameraCapturer = new CameraCapturer(cameraCapturerActivity,
-                CameraCapturer.CameraSource.CAMERA_SOURCE_FRONT_CAMERA,
+                CameraCapturer.CameraSource.FRONT_CAMERA,
                 null);
 
         // Switch our camera
@@ -85,7 +85,7 @@ public class CameraCapturerBaseTest extends BaseCameraCapturerTest {
         assertTrue(frameCountRenderer.getFrameCount() > frameCount);
 
         // Validate we are on back camera source
-        assertEquals(CameraCapturer.CameraSource.CAMERA_SOURCE_BACK_CAMERA,
+        assertEquals(CameraCapturer.CameraSource.BACK_CAMERA,
                 cameraCapturer.getCameraSource());
     }
 }
