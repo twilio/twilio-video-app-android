@@ -130,8 +130,11 @@ public class VideoView extends SurfaceViewRenderer implements VideoRenderer {
     }
 
     private void setupRenderer() {
-        init(EglBaseProvider.provideEglBase().getEglBaseContext(),
-                internalEventListener);
+        // Do not start EGL14 to avoid runtime exceptions when used in a developer tool
+        if(!isInEditMode()) {
+            init(EglBaseProvider.provideEglBase().getEglBaseContext(),
+                    internalEventListener);
+        }
         setMirror(mirror);
         setScalingType(convertToWebRtcScaleType(videoScaleType));
         setZOrderMediaOverlay(overlaySurface);
