@@ -3,7 +3,7 @@
 
     <string name="app_name">Twilio Video</string>
     <string name="client_name">Client Name</string>
-    <string name="login">Log In</string>
+    <string name="login">Login</string>
     <string name="logout">Log Out</string>
     <string name="invite_participant">Invite Participant</string>
     <string name="incoming_call_message">You have a new incoming call. Answer it?</string>
@@ -18,7 +18,6 @@
     <string name="title_activity_client">TV Client</string>
     <string name="video_client_status">Video Client Status</string>
     <string name="room_status">Room Status</string>
-    <string name="log_out">Log Out</string>
     <string name="fps">Frames per second</string>
     <string name="video_dimensions">Video dimensions</string>
     <string name="video_constraints">Video Constraints</string>

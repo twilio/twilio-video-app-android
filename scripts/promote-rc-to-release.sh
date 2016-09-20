@@ -38,7 +38,7 @@ mkdir -p ${SDK_PACKAGE_PATH}
 pushd "$SDK_RELEASE_TOOL_HOME"
 
 echo "sdk-release-tool: downloading..."
-./sdk-release-tool download --stage twilio-${PRODUCT_NAME}-android ${SDK_RELEASE_VERSION}-rc${SDK_RC_BUILD_NUMBER} ${SDK_PACKAGE_PATH}
+./sdk-release-tool download --stage twilio-${PRODUCT_NAME}-android ${SDK_RC_VERSION} ${SDK_PACKAGE_PATH}
 if [ "$?" -ne "0" ]; then
     echo "Error: failed to execute sdk-release-tool upload"
     exit 1
@@ -48,7 +48,7 @@ echo "copy release candidate to release folder"
 if [ ! -d "${SDK_PACKAGE_PATH}/dist/${SDK_RELEASE_VERSION}" ]; then
     mkdir "${SDK_PACKAGE_PATH}/dist/${SDK_RELEASE_VERSION}"
 fi
-rsync -av "${SDK_PACKAGE_PATH}/dist/${SDK_RELEASE_VERSION}-rc${SDK_RC_BUILD_NUMBER}/" "${SDK_PACKAGE_PATH}/dist/${SDK_RELEASE_VERSION}/"
+rsync -av "${SDK_PACKAGE_PATH}/dist/${SDK_RC_VERSION}/" "${SDK_PACKAGE_PATH}/dist/${SDK_RELEASE_VERSION}/"
 
 echo "sdk-release-tool: uploading..."
 ./sdk-release-tool upload --prod twilio-${PRODUCT_NAME}-android ${SDK_RELEASE_VERSION} ${SDK_PACKAGE_PATH}
