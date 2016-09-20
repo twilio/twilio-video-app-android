@@ -46,7 +46,7 @@ public class LoginActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        setContentView(R.layout.activity_video_client_login);
+        setContentView(R.layout.activity_login);
         ButterKnife.bind(this);
 
         versionText.setText(BuildConfig.VERSION_NAME);

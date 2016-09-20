@@ -3,7 +3,7 @@ package com.twilio.video;
 /**
  * A representation of a media track.
  */
-public interface Track {
+interface Track {
     /**
      * Returns the id associated with the track.
      */

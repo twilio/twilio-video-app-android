@@ -17,7 +17,7 @@ class CameraCapturerFormatProvider {
         String deviceName;
         int cameraId = -1;
 
-        if(cameraSource == CameraCapturer.CameraSource.CAMERA_SOURCE_BACK_CAMERA) {
+        if(cameraSource == CameraCapturer.CameraSource.BACK_CAMERA) {
             deviceName = CameraEnumerationAndroid.getNameOfBackFacingDevice();
         } else {
             deviceName = CameraEnumerationAndroid.getNameOfFrontFacingDevice();
