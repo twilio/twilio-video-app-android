@@ -64,7 +64,10 @@ public class VideoView extends SurfaceViewRenderer implements VideoRenderer {
             a.recycle();
         }
 
-        setupRenderer();
+        // Do not setup the renderer when using developer tools to avoid EGL14 runtime exceptions
+        if(!isInEditMode()) {
+            setupRenderer();
+        }
     }
 
     /**
