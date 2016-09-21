@@ -3,10 +3,14 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
+    <item android:id="@+id/action_switch_camera"
+          android:title="@string/switch_camera"
+          android:icon="@drawable/ic_switch_camera_512dp"
+          app:showAsAction="ifRoom"/>
     <item
         android:id="@+id/action_log_out"
         android:title="@string/logout"
         android:enabled="true"
-        app:showAsAction="ifRoom"/>
+        app:showAsAction="never"/>
 
 </menu>

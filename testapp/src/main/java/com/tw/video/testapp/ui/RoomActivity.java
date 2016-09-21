@@ -53,7 +53,6 @@ public class RoomActivity extends AppCompatActivity {
     @BindView(R.id.room_status_textview) TextView roomStatusTextview;
     @BindView(R.id.primary_video_view) VideoView primaryVideoView;
     @BindView(R.id.thumbnail_linear_layout) LinearLayout thumbnailLinearLayout;
-    @BindView(R.id.switch_camera_action_fab) FloatingActionButton switchCameraActionFab;
     @BindView(R.id.local_video_action_fab) FloatingActionButton localVideoActionFab;
     @BindView(R.id.local_video_pause_fab) FloatingActionButton localVideoPauseFab;
     @BindView(R.id.local_audio_action_fab) FloatingActionButton localAudioActionFab;
@@ -137,6 +136,17 @@ public class RoomActivity extends AppCompatActivity {
     }
 
     @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        MenuItem switchCameraItem = menu.findItem(R.id.action_switch_camera);
+        if (localVideoTrack != null && localVideoTrack.isEnabled()) {
+            switchCameraItem.setVisible(true);
+        } else {
+            switchCameraItem.setVisible(false);
+        }
+        return true;
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_log_out:
@@ -148,6 +158,9 @@ public class RoomActivity extends AppCompatActivity {
                 } else {
                     returnToVideoClientLogin();
                 }
+                return true;
+            case R.id.action_switch_camera:
+                switchCamera();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -202,8 +215,7 @@ public class RoomActivity extends AppCompatActivity {
         }
     }
 
-    @OnClick(R.id.switch_camera_action_fab)
-    public void switchCamera(View view) {
+    public void switchCamera() {
         if (cameraCapturer != null) {
             cameraCapturer.switchCamera();
             localVideoView.setMirror(
@@ -251,13 +263,16 @@ public class RoomActivity extends AppCompatActivity {
             int icon = 0;
             if (enable) {
                 icon = R.drawable.ic_pause_green_24px;
-                switchCameraActionFab.show();
+                // TODO: show switch camera menu item
+                //switchCameraActionFab.show();
             } else {
                 icon = R.drawable.ic_pause_red_24px;
-                switchCameraActionFab.hide();
+                // TODO: hide switch camera menu item
+                //switchCameraActionFab.hide();
             }
             localVideoPauseFab.setImageDrawable(
                     ContextCompat.getDrawable(RoomActivity.this, icon));
+            invalidateOptionsMenu();
         }
     }
 
@@ -276,7 +291,8 @@ public class RoomActivity extends AppCompatActivity {
                 localVideoView = primaryVideoView;
                 localVideoTrack.addRenderer(primaryVideoView);
             }
-            switchCameraActionFab.show();
+            // TODO: show switch camera menu item
+            //switchCameraActionFab.show();
             localVideoPauseFab.show();
             icon = R.drawable.ic_videocam_white_24px;
         } else {
@@ -296,13 +312,15 @@ public class RoomActivity extends AppCompatActivity {
             }
             localVideoTrack = null;
             localVideoView = null;
-            switchCameraActionFab.hide();
+            // TODO: hide switch camera menu item
+            //switchCameraActionFab.hide();
             localVideoPauseFab.hide();
             icon = R.drawable.ic_videocam_off_gray_24px;
 
         }
         localVideoActionFab.setImageDrawable(
                 ContextCompat.getDrawable(RoomActivity.this, icon));
+        invalidateOptionsMenu();
     }
 
     private void updateUI(RoomState roomState) {
@@ -458,6 +476,8 @@ public class RoomActivity extends AppCompatActivity {
             public void onConnectFailure(Room room, VideoException error) {
                 Timber.i("onConnectFailure");
                 roomStatusTextview.setText("Failed to connect to "+roomName);
+                RoomActivity.this.room = null;
+                updateUI(RoomState.DISCONNECTED);
             }
 
             @Override
