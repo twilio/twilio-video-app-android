@@ -55,7 +55,7 @@ configurations {
 model {
     repositories {
         libs(PrebuiltLibraries) {
-            twilioSdkCore {
+            videoCore {
                 headers.srcDir "${coreHeaders}"
                 binaries.withType(StaticLibraryBinary) {
                     def coreStaticLibPath = "${coreHome}/"+
@@ -231,7 +231,7 @@ model {
                     srcDir "src/main/jni"
                 }
                 dependencies {
-                    library "twilioSdkCore" linkage "static"
+                    library "videoCore" linkage "static"
                     library "twilioCommon" linkage "static"
                     library "resiprocate" linkage "static"
                     library "pocoFoundation" linkage "static"
@@ -283,7 +283,7 @@ model {
 }
 
 dependencies {
-    preCompile 'com.twilio.sdk:twilio-video:0.2.0:android@tar.bz2'
+    preCompile 'com.twilio.sdk:twilio-video:0.2.1-rc0:android@tar.bz2'
 
     testCompile 'junit:junit:4.12'
     testCompile 'org.mockito:mockito-core:1.10.19'
