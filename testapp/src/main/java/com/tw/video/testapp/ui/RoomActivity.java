@@ -99,6 +99,7 @@ public class RoomActivity extends AppCompatActivity {
         localVideoTrack = localMedia.addVideoTrack(true, cameraCapturer);
         primaryVideoView.setMirror(true);
         localVideoTrack.addRenderer(primaryVideoView);
+        localVideoView = primaryVideoView;
         createVideoClient();
     }
 
@@ -205,6 +206,8 @@ public class RoomActivity extends AppCompatActivity {
     public void switchCamera(View view) {
         if (cameraCapturer != null) {
             cameraCapturer.switchCamera();
+            localVideoView.setMirror(
+                    cameraCapturer.getCameraSource() == CameraCapturer.CameraSource.FRONT_CAMERA);
         }
     }
 
