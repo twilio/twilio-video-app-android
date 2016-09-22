@@ -22,7 +22,36 @@ cricket::AudioOptions getAudioOptions(jobject j_audio_options) {
     cricket::AudioOptions audio_options = cricket::AudioOptions();
 
     if (!webrtc_jni::IsNull(jni, j_audio_options)) {
-        // TODO
+        jclass audio_options_class = jni->GetObjectClass(j_audio_options);
+        jfieldID echo_cancellation_field =
+                jni->GetFieldID(audio_options_class, "echoCancellation", "Z");
+        jfieldID auto_gain_control_field =
+                jni->GetFieldID(audio_options_class, "autoGainControl", "Z");
+        jfieldID noise_suppression_field =
+                jni->GetFieldID(audio_options_class, "noiseSuppression", "Z");
+        jfieldID highpass_filter_field =
+                jni->GetFieldID(audio_options_class, "highpassFilter", "Z");
+        jfieldID stereo_swapping_field =
+                jni->GetFieldID(audio_options_class, "stereoSwapping", "Z");
+        jfieldID audio_jitter_buffer_fast_accelerate_field =
+                jni->GetFieldID(audio_options_class, "audioJitterBufferFastAccelerate", "Z");
+        jfieldID typing_detection_field =
+                jni->GetFieldID(audio_options_class, "typingDetection", "Z");
+
+        audio_options.echo_cancellation = rtc::Optional<bool>(jni->GetBooleanField(j_audio_options,
+                                                                                   echo_cancellation_field));
+        audio_options.auto_gain_control = rtc::Optional<bool>(jni->GetBooleanField(j_audio_options,
+                                                                                   auto_gain_control_field));
+        audio_options.noise_suppression = rtc::Optional<bool>(jni->GetBooleanField(j_audio_options,
+                                                                                   noise_suppression_field));
+        audio_options.highpass_filter = rtc::Optional<bool>(jni->GetBooleanField(j_audio_options,
+                                                                                 highpass_filter_field));
+        audio_options.stereo_swapping = rtc::Optional<bool>(jni->GetBooleanField(j_audio_options,
+                                                                                 stereo_swapping_field));
+        audio_options.audio_jitter_buffer_fast_accelerate = rtc::Optional<bool>(jni->GetBooleanField(j_audio_options,
+                                                                                                     audio_jitter_buffer_fast_accelerate_field));
+        audio_options.typing_detection = rtc::Optional<bool>(jni->GetBooleanField(j_audio_options,
+                                                                                  typing_detection_field));
     }
 
     return audio_options;
