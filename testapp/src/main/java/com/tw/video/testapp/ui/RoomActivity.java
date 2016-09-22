@@ -53,11 +53,8 @@ public class RoomActivity extends AppCompatActivity {
     @BindView(R.id.room_status_textview) TextView roomStatusTextview;
     @BindView(R.id.primary_video_view) VideoView primaryVideoView;
     @BindView(R.id.thumbnail_linear_layout) LinearLayout thumbnailLinearLayout;
-    @BindView(R.id.switch_camera_action_fab) FloatingActionButton switchCameraActionFab;
     @BindView(R.id.local_video_action_fab) FloatingActionButton localVideoActionFab;
-    @BindView(R.id.local_video_pause_fab) FloatingActionButton localVideoPauseFab;
     @BindView(R.id.local_audio_action_fab) FloatingActionButton localAudioActionFab;
-    @BindView(R.id.local_audio_enable_fab) FloatingActionButton localAudioEnableFab;
     @BindView(R.id.speaker_action_fab) FloatingActionButton speakerActionFab;
 
     private String username;
@@ -137,17 +134,44 @@ public class RoomActivity extends AppCompatActivity {
     }
 
     @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        MenuItem switchCameraMenuItem = menu.findItem(R.id.switch_camera_menu_item);
+        MenuItem pauseVideoMenuItem = menu.findItem(R.id.pause_video_menu_item);
+        if (localVideoTrack != null) {
+            switchCameraMenuItem.setVisible(localVideoTrack.isEnabled());
+            pauseVideoMenuItem.setTitle(localVideoTrack.isEnabled() ?
+                    R.string.pause_video : R.string.resume_video);
+        } else {
+            switchCameraMenuItem.setVisible(false);
+            pauseVideoMenuItem.setVisible(false);
+        }
+        MenuItem pauseAudioMenuItem = menu.findItem(R.id.pause_audio_menu_item);
+        if (localAudioTrack != null) {
+            pauseAudioMenuItem.setVisible(true);
+            pauseAudioMenuItem.setTitle(localAudioTrack.isEnabled() ?
+                    R.string.pause_audio : R.string.resume_audio);
+        } else {
+            pauseAudioMenuItem.setVisible(false);
+        }
+        return true;
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.action_log_out:
-                // Will continue logout once the conversation has ended
-                loggingOut = true;
-                // End any current call
-                if (room != null && room.getState() != RoomState.DISCONNECTED) {
-                    room.disconnect();
-                } else {
-                    returnToVideoClientLogin();
-                }
+            case R.id.log_out_menu_item:
+                logout();
+                return true;
+            case R.id.switch_camera_menu_item:
+                switchCamera();
+                return true;
+            case R.id.pause_audio_menu_item:
+                toggleLocalAudioTrackState();
+                return true;
+            case R.id.pause_video_menu_item:
+                toggleLocalVideoTrackState();
+                return true;
+            case R.id.settings_menu_item:
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -188,22 +212,32 @@ public class RoomActivity extends AppCompatActivity {
     }
 
     @OnClick(R.id.connect_fab)
-    public void joinRoom(View view) {
+    public void connect(View view) {
         if (room != null) {
             Timber.i("Exiting room");
             room.disconnect();
         } else {
-            EditText joinRoomEditText = new EditText(this);
-            alertDialog = Dialog.createConnectDialog(joinRoomEditText,
-                    joinRoomClickListener(joinRoomEditText),
+            EditText connectEditText = new EditText(this);
+            alertDialog = Dialog.createConnectDialog(connectEditText,
+                    connectClickListener(connectEditText),
                     cancelRoomClickListener(),
                     this);
             alertDialog.show();
         }
     }
 
-    @OnClick(R.id.switch_camera_action_fab)
-    public void switchCamera(View view) {
+    private void logout() {
+        // Will continue logout once the conversation has ended
+        loggingOut = true;
+        // End any current call
+        if (room != null && room.getState() != RoomState.DISCONNECTED) {
+            room.disconnect();
+        } else {
+            returnToVideoClientLogin();
+        }
+    }
+
+    private void switchCamera() {
         if (cameraCapturer != null) {
             cameraCapturer.switchCamera();
             localVideoView.setMirror(
@@ -211,14 +245,11 @@ public class RoomActivity extends AppCompatActivity {
         }
     }
 
-    @OnClick(R.id.local_audio_enable_fab)
-    public void enableLocalAudio(View view) {
+    private void toggleLocalAudioTrackState() {
         if (localAudioTrack != null) {
             boolean enable = !localAudioTrack.isEnabled();
             localAudioTrack.enable(enable);
-            int icon = enable ? R.drawable.ic_mic_green_24px : R.drawable.ic_mic_red_24px;
-            localAudioEnableFab.setImageDrawable(
-                    ContextCompat.getDrawable(RoomActivity.this, icon));
+            invalidateOptionsMenu();
         }
     }
 
@@ -228,7 +259,6 @@ public class RoomActivity extends AppCompatActivity {
         if (localAudioTrack == null) {
             localAudioTrack = localMedia.addAudioTrack(true);
             icon = R.drawable.ic_mic_white_24px;
-            localAudioEnableFab.show();
         } else {
             if (!localMedia.removeAudioTrack(localAudioTrack)) {
                 Snackbar.make(roomStatusTextview,
@@ -237,27 +267,16 @@ public class RoomActivity extends AppCompatActivity {
             }
             localAudioTrack = null;
             icon = R.drawable.ic_mic_off_gray_24px;
-            localAudioEnableFab.hide();
         }
         localAudioActionFab.setImageDrawable(ContextCompat.getDrawable(RoomActivity.this, icon));
+        invalidateOptionsMenu();
     }
 
-    @OnClick(R.id.local_video_pause_fab)
-    public void pauseVideo(View view) {
+    public void toggleLocalVideoTrackState() {
         if (localVideoTrack != null) {
             boolean enable = !localVideoTrack.isEnabled();
-
             localVideoTrack.enable(enable);
-            int icon = 0;
-            if (enable) {
-                icon = R.drawable.ic_pause_green_24px;
-                switchCameraActionFab.show();
-            } else {
-                icon = R.drawable.ic_pause_red_24px;
-                switchCameraActionFab.hide();
-            }
-            localVideoPauseFab.setImageDrawable(
-                    ContextCompat.getDrawable(RoomActivity.this, icon));
+            invalidateOptionsMenu();
         }
     }
 
@@ -276,8 +295,6 @@ public class RoomActivity extends AppCompatActivity {
                 localVideoView = primaryVideoView;
                 localVideoTrack.addRenderer(primaryVideoView);
             }
-            switchCameraActionFab.show();
-            localVideoPauseFab.show();
             icon = R.drawable.ic_videocam_white_24px;
         } else {
             if (localVideoView == primaryVideoView) {
@@ -296,13 +313,12 @@ public class RoomActivity extends AppCompatActivity {
             }
             localVideoTrack = null;
             localVideoView = null;
-            switchCameraActionFab.hide();
-            localVideoPauseFab.hide();
             icon = R.drawable.ic_videocam_off_gray_24px;
 
         }
         localVideoActionFab.setImageDrawable(
                 ContextCompat.getDrawable(RoomActivity.this, icon));
+        invalidateOptionsMenu();
     }
 
     private void updateUI(RoomState roomState) {
@@ -320,11 +336,11 @@ public class RoomActivity extends AppCompatActivity {
                 ContextCompat.getDrawable(RoomActivity.this, joinIcon));
     }
 
-    private DialogInterface.OnClickListener joinRoomClickListener(final EditText joinRoomEditText) {
+    private DialogInterface.OnClickListener connectClickListener(final EditText connectEditText) {
         return new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                connectToRoom(joinRoomEditText.getText().toString());
+                connectToRoom(connectEditText.getText().toString());
             }
         };
     }
@@ -458,6 +474,8 @@ public class RoomActivity extends AppCompatActivity {
             public void onConnectFailure(Room room, VideoException error) {
                 Timber.i("onConnectFailure");
                 roomStatusTextview.setText("Failed to connect to "+roomName);
+                RoomActivity.this.room = null;
+                updateUI(RoomState.DISCONNECTED);
             }
 
             @Override
