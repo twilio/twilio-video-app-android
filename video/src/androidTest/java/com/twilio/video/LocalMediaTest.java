@@ -70,6 +70,18 @@ public class LocalMediaTest {
     }
 
     @Test
+    public void canAddAudioTrackWithOptions() {
+        AudioOptions audioOptions = new AudioOptions.Builder()
+                .echoCancellation(true)
+                .autoGainControl(true)
+                .typingDetection(true)
+                .build();
+        LocalAudioTrack localAudioTrack = localMedia.addAudioTrack(true, audioOptions);
+
+        assertNotNull(localAudioTrack);
+    }
+
+    @Test
     public void canRemoveAudioTrack() {
         LocalAudioTrack localAudioTrack = localMedia.addAudioTrack(true);
 

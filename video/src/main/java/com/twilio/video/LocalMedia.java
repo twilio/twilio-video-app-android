@@ -60,8 +60,20 @@ public class LocalMedia {
      * @return local audio track if successfully added or null if audio track could not be added.
      */
     public LocalAudioTrack addAudioTrack(boolean enabled) {
+        return addAudioTrack(enabled, null);
+    }
+
+    /**
+     * Adds audio track to local media.
+     *
+     * @param enabled initial state of audio track.
+     * @param audioOptions audio options to be applied to the track.
+     * @return local audio track if successfully added or null if audio track could not be added.
+     */
+    public LocalAudioTrack addAudioTrack(boolean enabled, AudioOptions audioOptions) {
         checkReleased("addAudioTrack");
-        LocalAudioTrack localAudioTrack = nativeAddAudioTrack(nativeLocalMediaHandle, enabled);
+        LocalAudioTrack localAudioTrack = nativeAddAudioTrack(nativeLocalMediaHandle, enabled,
+                audioOptions);
 
         if (localAudioTrack != null) {
             localAudioTracks.add(localAudioTrack);
@@ -192,7 +204,8 @@ public class LocalMedia {
     }
 
     private native LocalAudioTrack nativeAddAudioTrack(long nativeLocalMediaHandle,
-                                                       boolean enabled);
+                                                       boolean enabled,
+                                                       AudioOptions audioOptions);
     private native boolean nativeRemoveAudioTrack(long nativeLocalMediaHandle, String trackId);
     private native LocalVideoTrack nativeAddVideoTrack(long nativeLocalMediaHandle,
                                                        boolean enabled,

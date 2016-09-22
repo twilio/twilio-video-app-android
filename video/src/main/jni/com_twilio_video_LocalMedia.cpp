@@ -17,10 +17,51 @@ std::shared_ptr<twilio::media::LocalMedia> getLocalMedia(jlong local_media_handl
     return local_media_context->getLocalMedia();
 }
 
-// TODO switch to cricket::AudioOptions extension
-twilio::media::MediaConstraints* getAudioOptions(jobject j_audio_options) {
-    // TODO: actually convert audio options
-    return nullptr;
+cricket::AudioOptions getAudioOptions(jobject j_audio_options) {
+    JNIEnv* jni = webrtc_jni::AttachCurrentThreadIfNeeded();
+    cricket::AudioOptions audio_options = cricket::AudioOptions();
+
+    if (!webrtc_jni::IsNull(jni, j_audio_options)) {
+        jclass audio_options_class = jni->GetObjectClass(j_audio_options);
+        jfieldID echo_cancellation_field =
+                jni->GetFieldID(audio_options_class, "echoCancellation", "Z");
+        jfieldID auto_gain_control_field =
+                jni->GetFieldID(audio_options_class, "autoGainControl", "Z");
+        jfieldID noise_suppression_field =
+                jni->GetFieldID(audio_options_class, "noiseSuppression", "Z");
+        jfieldID highpass_filter_field =
+                jni->GetFieldID(audio_options_class, "highpassFilter", "Z");
+        jfieldID stereo_swapping_field =
+                jni->GetFieldID(audio_options_class, "stereoSwapping", "Z");
+        jfieldID audio_jitter_buffer_fast_accelerate_field =
+                jni->GetFieldID(audio_options_class, "audioJitterBufferFastAccelerate", "Z");
+        jfieldID typing_detection_field =
+                jni->GetFieldID(audio_options_class, "typingDetection", "Z");
+
+        audio_options.echo_cancellation =
+                rtc::Optional<bool>(jni->GetBooleanField(j_audio_options,
+                                                         echo_cancellation_field));
+        audio_options.auto_gain_control =
+                rtc::Optional<bool>(jni->GetBooleanField(j_audio_options,
+                                                         auto_gain_control_field));
+        audio_options.noise_suppression =
+                rtc::Optional<bool>(jni->GetBooleanField(j_audio_options,
+                                                         noise_suppression_field));
+        audio_options.highpass_filter =
+                rtc::Optional<bool>(jni->GetBooleanField(j_audio_options,
+                                                         highpass_filter_field));
+        audio_options.stereo_swapping =
+                rtc::Optional<bool>(jni->GetBooleanField(j_audio_options,
+                                                         stereo_swapping_field));
+        audio_options.audio_jitter_buffer_fast_accelerate =
+                rtc::Optional<bool>(jni->GetBooleanField(j_audio_options,
+                                                         audio_jitter_buffer_fast_accelerate_field));
+        audio_options.typing_detection =
+                rtc::Optional<bool>(jni->GetBooleanField(j_audio_options,
+                                                         typing_detection_field));
+    }
+
+    return audio_options;
 }
 
 jobject createJavaVideoCapturerDelegate(jobject j_video_capturer) {
@@ -170,11 +211,13 @@ twilio::media::MediaConstraints* getVideoConstraints(jobject j_video_contraints)
 JNIEXPORT jobject JNICALL Java_com_twilio_video_LocalMedia_nativeAddAudioTrack(JNIEnv *jni,
                                                                                jobject j_local_media,
                                                                                jlong local_media_handle,
-                                                                               jboolean enabled) {
+                                                                               jboolean enabled,
+                                                                               jobject j_audio_options) {
     std::shared_ptr<twilio::media::LocalMedia> local_media = getLocalMedia(local_media_handle);
+    cricket::AudioOptions audio_options = getAudioOptions(j_audio_options);
 
     std::shared_ptr<twilio::media::LocalAudioTrack> local_audio_track =
-            local_media->addAudioTrack(enabled);
+            local_media->addAudioTrack(enabled, audio_options);
 
     return (local_audio_track == nullptr) ?
            (nullptr) :
