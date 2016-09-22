@@ -54,9 +54,7 @@ public class RoomActivity extends AppCompatActivity {
     @BindView(R.id.primary_video_view) VideoView primaryVideoView;
     @BindView(R.id.thumbnail_linear_layout) LinearLayout thumbnailLinearLayout;
     @BindView(R.id.local_video_action_fab) FloatingActionButton localVideoActionFab;
-    @BindView(R.id.local_video_pause_fab) FloatingActionButton localVideoPauseFab;
     @BindView(R.id.local_audio_action_fab) FloatingActionButton localAudioActionFab;
-    @BindView(R.id.local_audio_enable_fab) FloatingActionButton localAudioEnableFab;
     @BindView(R.id.speaker_action_fab) FloatingActionButton speakerActionFab;
 
     private String username;
@@ -162,14 +160,7 @@ public class RoomActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.log_out_menu_item:
-                // Will continue logout once the conversation has ended
-                loggingOut = true;
-                // End any current call
-                if (room != null && room.getState() != RoomState.DISCONNECTED) {
-                    room.disconnect();
-                } else {
-                    returnToVideoClientLogin();
-                }
+                logout();
                 return true;
             case R.id.switch_camera_menu_item:
                 switchCamera();
@@ -179,6 +170,8 @@ public class RoomActivity extends AppCompatActivity {
                 return true;
             case R.id.pause_video_menu_item:
                 toggleLocalVideoTrackState();
+                return true;
+            case R.id.settings_menu_item:
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -233,6 +226,17 @@ public class RoomActivity extends AppCompatActivity {
         }
     }
 
+    private void logout() {
+        // Will continue logout once the conversation has ended
+        loggingOut = true;
+        // End any current call
+        if (room != null && room.getState() != RoomState.DISCONNECTED) {
+            room.disconnect();
+        } else {
+            returnToVideoClientLogin();
+        }
+    }
+
     private void switchCamera() {
         if (cameraCapturer != null) {
             cameraCapturer.switchCamera();
@@ -255,7 +259,6 @@ public class RoomActivity extends AppCompatActivity {
         if (localAudioTrack == null) {
             localAudioTrack = localMedia.addAudioTrack(true);
             icon = R.drawable.ic_mic_white_24px;
-            localAudioEnableFab.show();
         } else {
             if (!localMedia.removeAudioTrack(localAudioTrack)) {
                 Snackbar.make(roomStatusTextview,
@@ -264,7 +267,6 @@ public class RoomActivity extends AppCompatActivity {
             }
             localAudioTrack = null;
             icon = R.drawable.ic_mic_off_gray_24px;
-            localAudioEnableFab.hide();
         }
         localAudioActionFab.setImageDrawable(ContextCompat.getDrawable(RoomActivity.this, icon));
         invalidateOptionsMenu();
@@ -293,7 +295,6 @@ public class RoomActivity extends AppCompatActivity {
                 localVideoView = primaryVideoView;
                 localVideoTrack.addRenderer(primaryVideoView);
             }
-            localVideoPauseFab.show();
             icon = R.drawable.ic_videocam_white_24px;
         } else {
             if (localVideoView == primaryVideoView) {
@@ -312,7 +313,6 @@ public class RoomActivity extends AppCompatActivity {
             }
             localVideoTrack = null;
             localVideoView = null;
-            localVideoPauseFab.hide();
             icon = R.drawable.ic_videocam_off_gray_24px;
 
         }
