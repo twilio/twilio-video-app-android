@@ -32,7 +32,7 @@
             </intent-filter>
         </activity>
         <activity android:name="net.hockeyapp.android.UpdateActivity"/>
-        <activity android:name=".ui.RoomActivity" />
+        <activity android:name=".ui.RoomActivity" android:configChanges="orientation|screenSize" />
     </application>
 
 </manifest>
