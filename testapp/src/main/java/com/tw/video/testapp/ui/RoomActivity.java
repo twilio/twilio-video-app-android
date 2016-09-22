@@ -363,11 +363,13 @@ public class RoomActivity extends AppCompatActivity {
         if (videoViewMap.isEmpty()) {
             // Move local renderer from main view to thumbnail and
             // set participant renderer to main view
-            localVideoTrack.removeRenderer(primaryVideoView);
-            localVideoView = createVideoView();
-            localVideoTrack.addRenderer(localVideoView);
-            thumbnailLinearLayout.addView(localVideoView);
-            thumbnailLinearLayout.setVisibility(View.VISIBLE);
+            if (localVideoTrack != null) {
+                localVideoTrack.removeRenderer(primaryVideoView);
+                localVideoView = createVideoView();
+                localVideoTrack.addRenderer(localVideoView);
+                thumbnailLinearLayout.addView(localVideoView);
+                thumbnailLinearLayout.setVisibility(View.VISIBLE);
+            }
             videoView = primaryVideoView;
             primaryVideoView.setMirror(false);
         } else {
@@ -420,11 +422,13 @@ public class RoomActivity extends AppCompatActivity {
                 }
                 videoViewMap.put(nextParticipant, primaryVideoView);
             } else {
-                // set local view as primary view
-                localVideoTrack.removeRenderer(localVideoView);
-                primaryVideoView.setMirror(true);
-                localVideoTrack.addRenderer(primaryVideoView);
-                localVideoView = primaryVideoView;
+                if (localVideoTrack != null) {
+                    // set local view as primary view
+                    localVideoTrack.removeRenderer(localVideoView);
+                    primaryVideoView.setMirror(true);
+                    localVideoTrack.addRenderer(primaryVideoView);
+                    localVideoView = primaryVideoView;
+                }
                 thumbnailLinearLayout.setVisibility(View.GONE);
             }
         } else {
