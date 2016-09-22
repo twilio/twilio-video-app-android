@@ -3,7 +3,6 @@ package com.tw.video.testapp.ui;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
@@ -14,6 +13,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -48,14 +48,14 @@ import butterknife.OnClick;
 import timber.log.Timber;
 
 public class RoomActivity extends AppCompatActivity {
-    @BindView(R.id.connect_fab) FloatingActionButton connectFab;
+    @BindView(R.id.connect_image_button) ImageButton connectImageButton;
     @BindView(R.id.media_status_textview) TextView mediaStatusTextview;
     @BindView(R.id.room_status_textview) TextView roomStatusTextview;
     @BindView(R.id.primary_video_view) VideoView primaryVideoView;
     @BindView(R.id.thumbnail_linear_layout) LinearLayout thumbnailLinearLayout;
-    @BindView(R.id.local_video_action_fab) FloatingActionButton localVideoActionFab;
-    @BindView(R.id.local_audio_action_fab) FloatingActionButton localAudioActionFab;
-    @BindView(R.id.speaker_action_fab) FloatingActionButton speakerActionFab;
+    @BindView(R.id.local_video_image_button) ImageButton localVideoImageButton;
+    @BindView(R.id.local_audio_image_button) ImageButton localAudioImageButton;
+    @BindView(R.id.speaker_image_button) ImageButton speakerImageButton;
 
     private String username;
     private String capabilityToken;
@@ -211,7 +211,7 @@ public class RoomActivity extends AppCompatActivity {
         updateUI(RoomState.CONNECTING);
     }
 
-    @OnClick(R.id.connect_fab)
+    @OnClick(R.id.connect_image_button)
     public void connect(View view) {
         if (room != null) {
             Timber.i("Exiting room");
@@ -253,7 +253,7 @@ public class RoomActivity extends AppCompatActivity {
         }
     }
 
-    @OnClick(R.id.local_audio_action_fab)
+    @OnClick(R.id.local_audio_image_button)
     public void toggleLocalAudio(View view) {
         int icon = 0;
         if (localAudioTrack == null) {
@@ -268,7 +268,7 @@ public class RoomActivity extends AppCompatActivity {
             localAudioTrack = null;
             icon = R.drawable.ic_mic_off_gray_24px;
         }
-        localAudioActionFab.setImageDrawable(ContextCompat.getDrawable(RoomActivity.this, icon));
+        localAudioImageButton.setImageDrawable(ContextCompat.getDrawable(RoomActivity.this, icon));
         invalidateOptionsMenu();
     }
 
@@ -280,7 +280,7 @@ public class RoomActivity extends AppCompatActivity {
         }
     }
 
-    @OnClick(R.id.local_video_action_fab)
+    @OnClick(R.id.local_video_image_button)
     public void toggleLocalVideo(View view) {
         int icon = 0;
         if (localVideoTrack == null) {
@@ -316,7 +316,7 @@ public class RoomActivity extends AppCompatActivity {
             icon = R.drawable.ic_videocam_off_gray_24px;
 
         }
-        localVideoActionFab.setImageDrawable(
+        localVideoImageButton.setImageDrawable(
                 ContextCompat.getDrawable(RoomActivity.this, icon));
         invalidateOptionsMenu();
     }
@@ -332,7 +332,7 @@ public class RoomActivity extends AppCompatActivity {
             getSupportActionBar().setTitle(username);
             joinIcon = R.drawable.ic_add_circle_white_24px;
         }
-        connectFab.setImageDrawable(
+        connectImageButton.setImageDrawable(
                 ContextCompat.getDrawable(RoomActivity.this, joinIcon));
     }
 
