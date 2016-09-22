@@ -17,10 +17,15 @@ std::shared_ptr<twilio::media::LocalMedia> getLocalMedia(jlong local_media_handl
     return local_media_context->getLocalMedia();
 }
 
-// TODO switch to cricket::AudioOptions extension
-twilio::media::MediaConstraints* getAudioOptions(jobject j_audio_options) {
-    // TODO: actually convert audio options
-    return nullptr;
+cricket::AudioOptions getAudioOptions(jobject j_audio_options) {
+    JNIEnv* jni = webrtc_jni::AttachCurrentThreadIfNeeded();
+    cricket::AudioOptions audio_options = cricket::AudioOptions();
+
+    if (!webrtc_jni::IsNull(jni, j_audio_options)) {
+        // TODO
+    }
+
+    return audio_options;
 }
 
 jobject createJavaVideoCapturerDelegate(jobject j_video_capturer) {
@@ -170,11 +175,13 @@ twilio::media::MediaConstraints* getVideoConstraints(jobject j_video_contraints)
 JNIEXPORT jobject JNICALL Java_com_twilio_video_LocalMedia_nativeAddAudioTrack(JNIEnv *jni,
                                                                                jobject j_local_media,
                                                                                jlong local_media_handle,
-                                                                               jboolean enabled) {
+                                                                               jboolean enabled,
+                                                                               jobject j_audio_options) {
     std::shared_ptr<twilio::media::LocalMedia> local_media = getLocalMedia(local_media_handle);
+    cricket::AudioOptions audio_options = getAudioOptions(j_audio_options);
 
     std::shared_ptr<twilio::media::LocalAudioTrack> local_audio_track =
-            local_media->addAudioTrack(enabled);
+            local_media->addAudioTrack(enabled, audio_options);
 
     return (local_audio_track == nullptr) ?
            (nullptr) :

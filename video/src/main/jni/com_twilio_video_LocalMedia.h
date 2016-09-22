@@ -32,7 +32,8 @@ std::shared_ptr<twilio::media::LocalMedia> getLocalMedia(jlong);
 JNIEXPORT jobject JNICALL Java_com_twilio_video_LocalMedia_nativeAddAudioTrack(JNIEnv *,
                                                                                jobject,
                                                                                jlong,
-                                                                               jboolean);
+                                                                               jboolean,
+                                                                               jobject);
 JNIEXPORT jboolean JNICALL Java_com_twilio_video_LocalMedia_nativeRemoveAudioTrack(JNIEnv *,
                                                                                    jobject,
                                                                                    jlong,
