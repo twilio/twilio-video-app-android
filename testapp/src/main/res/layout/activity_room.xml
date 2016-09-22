@@ -17,8 +17,8 @@
 
         <RelativeLayout
             android:layout_width="match_parent" android:layout_height="match_parent">
-            <android.support.design.widget.FloatingActionButton
-                android:id="@+id/connect_fab"
+            <ImageButton
+                android:id="@+id/connect_image_button"
                 android:layout_width="wrap_content" android:layout_height="wrap_content"
                 android:layout_alignParentBottom="true"
                 android:layout_alignParentEnd="true"
@@ -26,36 +26,36 @@
                 android:layout_marginEnd="@dimen/fab_margin"
                 android:layout_marginRight="@dimen/fab_margin"
                 android:layout_marginBottom="@dimen/fab_margin"
+                android:background="@drawable/roundbutton"
                 android:src="@drawable/ic_add_circle_white_24px"
                 app:backgroundTint="@android:color/holo_red_dark"/>
-            <android.support.design.widget.FloatingActionButton
-                android:id="@+id/local_video_action_fab"
+            <ImageButton
+                android:id="@+id/local_video_image_button"
                 android:layout_width="wrap_content" android:layout_height="wrap_content"
-                android:layout_above="@id/connect_fab"
-                android:layout_alignEnd="@id/connect_fab"
-                android:layout_alignRight="@id/connect_fab"
-                android:layout_marginRight="10dp"
+                android:layout_above="@id/connect_image_button"
+                android:layout_alignEnd="@id/connect_image_button"
+                android:layout_alignRight="@id/connect_image_button"
                 android:layout_marginBottom="@dimen/fab_margin"
-                android:src="@drawable/ic_videocam_white_24px"
-                app:fabSize="mini"/>
-            <android.support.design.widget.FloatingActionButton
-                android:id="@+id/local_audio_action_fab"
+                android:background="@drawable/roundbutton"
+                android:src="@drawable/ic_videocam_white_24px"/>
+            <ImageButton
+                android:id="@+id/local_audio_image_button"
                 android:layout_width="wrap_content" android:layout_height="wrap_content"
-                android:layout_above="@id/local_video_action_fab"
-                android:layout_alignEnd="@id/local_video_action_fab"
-                android:layout_alignRight="@id/local_video_action_fab"
+                android:layout_above="@id/local_video_image_button"
+                android:layout_alignEnd="@id/local_video_image_button"
+                android:layout_alignRight="@id/local_video_image_button"
                 android:layout_marginBottom="@dimen/fab_margin"
-                android:src="@drawable/ic_mic_white_24px"
-                app:fabSize="mini"/>
-            <android.support.design.widget.FloatingActionButton
-                android:id="@+id/speaker_action_fab"
+                android:background="@drawable/roundbutton"
+                android:src="@drawable/ic_mic_white_24px"/>
+            <ImageButton
+                android:id="@+id/speaker_image_button"
                 android:layout_width="wrap_content" android:layout_height="wrap_content"
-                android:layout_above="@id/local_audio_action_fab"
-                android:layout_alignEnd="@id/local_audio_action_fab"
-                android:layout_alignRight="@id/local_audio_action_fab"
+                android:layout_above="@id/local_audio_image_button"
+                android:layout_alignEnd="@id/local_audio_image_button"
+                android:layout_alignRight="@id/local_audio_image_button"
                 android:layout_marginBottom="@dimen/fab_margin"
-                android:src="@drawable/ic_volume_down_white_24px"
-                app:fabSize="mini"/>
+                android:background="@drawable/roundbutton"
+                android:src="@drawable/ic_volume_down_white_24px"/>
         </RelativeLayout>
     </android.support.design.widget.CoordinatorLayout>
 
