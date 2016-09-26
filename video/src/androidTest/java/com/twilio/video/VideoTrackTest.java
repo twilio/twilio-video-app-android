@@ -3,6 +3,7 @@ package com.twilio.video;
 import android.support.test.filters.LargeTest;
 import android.support.test.runner.AndroidJUnit4;
 
+import com.twilio.video.base.BaseMediaTest;
 import com.twilio.video.helper.CallbackHelper;
 import com.twilio.video.util.FakeVideoRenderer;
 
@@ -18,7 +19,7 @@ import static org.junit.Assert.assertTrue;
 
 @RunWith(AndroidJUnit4.class)
 @LargeTest
-public class VideoTrackTest extends MediaTest {
+public class VideoTrackTest extends BaseMediaTest {
     @Test
     public void addRenderer_shouldNotCrashForNullRenderer() throws InterruptedException {
         CallbackHelper.FakeMediaListener mediaListener = new CallbackHelper.FakeMediaListener();
