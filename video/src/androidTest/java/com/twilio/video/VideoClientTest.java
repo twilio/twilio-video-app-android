@@ -49,6 +49,7 @@ public class VideoClientTest {
     @After
     public void teardown() {
         localMedia.release();
+        accessManager.dispose();
     }
 
     @Test(expected = NullPointerException.class)
