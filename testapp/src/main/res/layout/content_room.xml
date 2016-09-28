@@ -14,11 +14,6 @@
         android:visibility="gone"
         android:layout_gravity="bottom|left"/>
 
-    <com.twilio.video.VideoView
-        android:id="@+id/primary_video_view"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
-
     <LinearLayout
         android:id="@+id/status"
         android:layout_width="fill_parent"
