@@ -450,7 +450,7 @@ def getNdkDir() {
  * Set of rules to ensure that tasks and flags are set correctly
  */
 class ConversationsRuleSource extends RuleSource {
-    static final def projectDir = new File("video").absolutePath
+    static final def projectDir = new File("library").absolutePath
     // TODO Add back ability to do local builds
 //    static final def twilioSdkHome = "/usr/local/twilio-sdk"
     static final def twilioSdkHome = "${projectDir}/build/prebuilt"
