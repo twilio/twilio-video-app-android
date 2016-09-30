@@ -20,7 +20,7 @@ model {
             jniLibs {
                 dependencies {
                     // TODO provide way to specify debug and release buildType
-                    project ":video" buildType "debug"
+                    project ":library" buildType "debug"
                 }
             }
         }
@@ -40,7 +40,7 @@ model {
         release {
             minifyEnabled true
             proguardFiles.add(file('android-proguard-rules.pro'))
-            proguardFiles.add(file("${project(':video').projectDir}/proguard-rules.pro"))
+            proguardFiles.add(file("${project(':library').projectDir}/proguard-rules.pro"))
             proguardFiles.add(file("proguard-rules.pro"))
             signingConfig = $("android.signingConfigs.debug")
         }
@@ -55,7 +55,7 @@ model {
 }
 
 dependencies {
-    compile project(':video')
+    compile project(':library')
 
     compile 'net.hockeyapp.android:HockeySDK:3.5.0'
     compile 'com.android.support:appcompat-v7:24.2.1'
