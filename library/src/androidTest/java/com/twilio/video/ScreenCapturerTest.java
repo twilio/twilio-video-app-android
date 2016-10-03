@@ -5,9 +5,9 @@ import android.os.Build;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
 
-import com.twilio.video.app.ui.ScreenCapturerTestActivity;
-import com.twilio.video.app.util.FrameCountRenderer;
-import com.twilio.video.app.util.PermissionUtils;
+import com.twilio.video.ui.ScreenCapturerTestActivity;
+import com.twilio.video.util.FrameCountRenderer;
+import com.twilio.video.util.PermissionUtils;
 
 import org.junit.After;
 import org.junit.Before;

@@ -2,7 +2,7 @@ package com.twilio.video;
 
 import android.support.test.filters.LargeTest;
 
-import com.twilio.video.app.base.BaseCameraCapturerTest;
+import com.twilio.video.base.BaseCameraCapturerTest;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -13,7 +13,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 import com.twilio.video.test.R;
-import com.twilio.video.app.util.FrameCountRenderer;
+import com.twilio.video.util.FrameCountRenderer;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;

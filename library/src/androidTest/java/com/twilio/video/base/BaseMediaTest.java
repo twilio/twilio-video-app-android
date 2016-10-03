@@ -1,4 +1,4 @@
-package com.twilio.video.app.base;
+package com.twilio.video.base;
 
 import android.app.Instrumentation;
 import android.content.Context;
@@ -13,10 +13,10 @@ import com.twilio.video.Room;
 import com.twilio.video.RoomState;
 import com.twilio.video.VideoClient;
 import com.twilio.video.helper.CallbackHelper;
-import com.twilio.video.app.ui.RoomsTestActivity;
-import com.twilio.video.app.util.AccessManagerUtils;
-import com.twilio.video.app.util.FakeVideoCapturer;
-import com.twilio.video.app.util.RandUtils;
+import com.twilio.video.ui.RoomsTestActivity;
+import com.twilio.video.util.AccessManagerUtils;
+import com.twilio.video.util.FakeVideoCapturer;
+import com.twilio.video.util.RandUtils;
 
 import org.junit.After;
 import org.junit.Before;

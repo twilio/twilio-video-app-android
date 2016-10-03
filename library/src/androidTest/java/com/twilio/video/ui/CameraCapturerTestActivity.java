@@ -1,4 +1,4 @@
-package com.twilio.video.app.ui;
+package com.twilio.video.ui;
 
 import android.Manifest;
 import android.app.Activity;
@@ -7,7 +7,7 @@ import android.os.Build;
 import android.os.Bundle;
 
 import com.twilio.video.test.R;
-import com.twilio.video.app.util.PermissionRequester;
+import com.twilio.video.util.PermissionRequester;
 
 import java.util.Arrays;
 import java.util.List;

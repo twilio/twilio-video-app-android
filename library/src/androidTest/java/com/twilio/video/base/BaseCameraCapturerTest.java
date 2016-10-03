@@ -1,13 +1,13 @@
-package com.twilio.video.app.base;
+package com.twilio.video.base;
 
 import android.support.test.rule.ActivityTestRule;
 
 import com.twilio.video.CameraCapturer;
 import com.twilio.video.LocalMedia;
 import com.twilio.video.LocalVideoTrack;
-import com.twilio.video.app.ui.CameraCapturerTestActivity;
-import com.twilio.video.app.util.FrameCountRenderer;
-import com.twilio.video.app.util.PermissionUtils;
+import com.twilio.video.ui.CameraCapturerTestActivity;
+import com.twilio.video.util.FrameCountRenderer;
+import com.twilio.video.util.PermissionUtils;
 
 import org.junit.After;
 import org.junit.Before;

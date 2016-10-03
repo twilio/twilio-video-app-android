@@ -1,10 +1,10 @@
-package com.twilio.video.app.base;
+package com.twilio.video.base;
 
 import android.content.Context;
 import android.support.test.InstrumentationRegistry;
 
 import com.twilio.video.LocalMedia;
-import com.twilio.video.app.util.FakeVideoCapturer;
+import com.twilio.video.util.FakeVideoCapturer;
 
 public abstract class BaseLocalVideoTrackTest {
     protected Context context;

@@ -1,4 +1,4 @@
-package com.twilio.video.app.util;
+package com.twilio.video.util;
 
 import java.util.Random;
 

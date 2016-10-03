@@ -7,9 +7,9 @@ import android.support.test.runner.AndroidJUnit4;
 
 import com.twilio.common.AccessManager;
 import com.twilio.video.helper.CallbackHelper;
-import com.twilio.video.app.util.AccessManagerUtils;
-import com.twilio.video.app.util.FakeVideoCapturer;
-import com.twilio.video.app.util.RandUtils;
+import com.twilio.video.util.AccessManagerUtils;
+import com.twilio.video.util.FakeVideoCapturer;
+import com.twilio.video.util.RandUtils;
 
 import org.junit.After;
 import org.junit.Before;

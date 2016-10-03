@@ -1,4 +1,4 @@
-package com.twilio.video.app.ui;
+package com.twilio.video.ui;
 
 import android.annotation.TargetApi;
 import android.app.Activity;
