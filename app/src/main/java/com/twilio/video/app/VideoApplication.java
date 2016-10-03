@@ -6,7 +6,7 @@ import com.twilio.video.BuildConfig;
 
 import timber.log.Timber;
 
-public class TestAppApplication extends Application {
+public class VideoApplication extends Application {
     public static final String HOCKEY_APP_ID = "11347c1df4dc4a929a1f6637fcbe64dc";
 
     @Override
