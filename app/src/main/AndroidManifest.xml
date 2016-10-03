@@ -24,6 +24,7 @@
         android:theme="@style/AppTheme">
         <activity
             android:name=".ui.LoginActivity"
+            android:theme="@style/AppTheme.SplashScreen"
             android:windowSoftInputMode="adjustResize|stateAlwaysHidden">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>

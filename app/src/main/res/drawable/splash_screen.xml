@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android"
+    android:opacity="opaque">
+    <item android:drawable="@color/colorPrimaryDark" />
+    <item
+        android:drawable="@drawable/ic_video_logo_login"
+        android:gravity="center" />
+    <item
+        android:bottom="72dp"
+        android:drawable="@drawable/twilio_name_white"
+        android:gravity="center_horizontal|bottom" />
+</layer-list>
