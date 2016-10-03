@@ -3,9 +3,9 @@ package com.twilio.video;
 import android.support.test.filters.LargeTest;
 import android.support.test.runner.AndroidJUnit4;
 
-import com.twilio.video.base.BaseLocalVideoTrackTest;
-import com.twilio.video.util.FakeVideoRenderer;
-import com.twilio.video.util.FrameCountRenderer;
+import com.twilio.video.app.base.BaseLocalVideoTrackTest;
+import com.twilio.video.app.util.FakeVideoRenderer;
+import com.twilio.video.app.util.FrameCountRenderer;
 
 import org.junit.After;
 import org.junit.Before;

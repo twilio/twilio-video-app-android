@@ -15,15 +15,15 @@
 
     <application>
         <activity
-            android:name="com.twilio.video.ui.RoomsTestActivity">
+            android:name="com.twilio.video.app.ui.RoomsTestActivity">
         </activity>
 
         <activity
-            android:name="com.twilio.video.ui.CameraCapturerTestActivity">
+            android:name="com.twilio.video.app.ui.CameraCapturerTestActivity">
         </activity>
 
         <activity
-            android:name="com.twilio.video.ui.ScreenCapturerTestActivity">
+            android:name="com.twilio.video.app.ui.ScreenCapturerTestActivity">
         </activity>
 
     </application>

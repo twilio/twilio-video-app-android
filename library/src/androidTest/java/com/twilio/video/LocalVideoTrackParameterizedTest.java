@@ -2,7 +2,7 @@ package com.twilio.video;
 
 import android.support.test.filters.LargeTest;
 
-import com.twilio.video.base.BaseLocalVideoTrackTest;
+import com.twilio.video.app.base.BaseLocalVideoTrackTest;
 
 import org.junit.After;
 import org.junit.Before;

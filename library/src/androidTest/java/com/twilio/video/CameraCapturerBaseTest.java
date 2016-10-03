@@ -2,7 +2,7 @@ package com.twilio.video;
 
 import android.support.test.runner.AndroidJUnit4;
 
-import com.twilio.video.base.BaseCameraCapturerTest;
+import com.twilio.video.app.base.BaseCameraCapturerTest;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;

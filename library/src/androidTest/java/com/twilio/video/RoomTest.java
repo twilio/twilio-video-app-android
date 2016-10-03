@@ -7,17 +7,15 @@ import android.support.test.runner.AndroidJUnit4;
 
 import com.twilio.common.AccessManager;
 import com.twilio.video.helper.CallbackHelper;
-import com.twilio.video.util.AccessManagerUtils;
-import com.twilio.video.util.FakeVideoCapturer;
-import com.twilio.video.util.RandUtils;
+import com.twilio.video.app.util.AccessManagerUtils;
+import com.twilio.video.app.util.FakeVideoCapturer;
+import com.twilio.video.app.util.RandUtils;
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
