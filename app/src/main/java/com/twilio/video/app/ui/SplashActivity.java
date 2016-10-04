@@ -1,4 +1,4 @@
-package com.tw.video.testapp.ui;
+package com.twilio.video.app.ui;
 
 import android.content.Intent;
 import android.os.Bundle;
