@@ -107,7 +107,6 @@ public class CameraCapturerParameterizedTest extends BaseCameraCapturerTest {
         assertTrue(renderedFirstFrame.await(2, TimeUnit.SECONDS));
         Thread.sleep(TimeUnit.SECONDS.toMillis(5));
         localVideoTrack.removeRenderer(localVideo);
-        localVideo.release();
     }
 
     @Test

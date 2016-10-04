@@ -107,15 +107,8 @@ public class RoomActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if (primaryVideoView != null) {
-            primaryVideoView.release();
-            primaryVideoView = null;
-        }
         if (thumbnailLinearLayout != null) {
             thumbnailLinearLayout.removeAllViews();
-            for (Map.Entry<Participant, VideoView> entry : videoViewMap.entrySet()) {
-                entry.getValue().release();
-            }
             videoViewMap.clear();
         }
         if (localMedia != null) {
@@ -369,14 +362,13 @@ public class RoomActivity extends AppCompatActivity {
     private VideoView createVideoView() {
         VideoView videoView = new VideoView(this);
         videoView.setMirror(true);
-        videoView.setZOrderMediaOverlay(true);
+        videoView.applyZOrder(true);
         return videoView;
     }
 
     private void clearPrimaryView() {
         // Replace the primary view to clear the contents of the last rendered frame in the view
         frameLayout.removeView(primaryVideoView);
-        primaryVideoView.release();
         primaryVideoView = new VideoView(this);
         primaryVideoView.setMirror(
                 cameraCapturer.getCameraSource() == CameraCapturer.CameraSource.FRONT_CAMERA);
