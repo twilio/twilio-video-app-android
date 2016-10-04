@@ -3,7 +3,7 @@
     android:opacity="opaque">
     <item android:drawable="@color/colorPrimaryDark" />
     <item
-        android:drawable="@drawable/ic_video_logo_login"
+        android:drawable="@drawable/ic_video_logo_splash"
         android:gravity="center" />
     <item
         android:bottom="72dp"
