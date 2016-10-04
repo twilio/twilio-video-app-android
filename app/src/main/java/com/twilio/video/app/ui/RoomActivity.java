@@ -373,6 +373,7 @@ public class RoomActivity extends AppCompatActivity {
         primaryVideoView.setMirror(
                 cameraCapturer.getCameraSource() == CameraCapturer.CameraSource.FRONT_CAMERA);
         frameLayout.addView(primaryVideoView);
+        primaryVideoView.requestLayout();
     }
 
     private synchronized void addParticipant(Participant participant) {
