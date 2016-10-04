@@ -1,4 +1,4 @@
-package com.tw.video.testapp.model;
+package com.twilio.video.app.model;
 
 
 import com.google.gson.annotations.SerializedName;

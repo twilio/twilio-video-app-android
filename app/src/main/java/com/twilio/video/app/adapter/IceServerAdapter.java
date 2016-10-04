@@ -1,4 +1,4 @@
-package com.tw.video.testapp.adapter;
+package com.twilio.video.app.adapter;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -7,7 +7,7 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 
-import com.tw.video.testapp.model.TwilioIceServer;
+import com.twilio.video.app.model.TwilioIceServer;
 
 import java.util.List;
 

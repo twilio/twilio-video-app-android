@@ -1,4 +1,4 @@
-package com.tw.video.testapp.ui;
+package com.twilio.video.app.ui;
 
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -19,10 +19,10 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.tw.video.testapp.R;
-import com.tw.video.testapp.dialog.Dialog;
-import com.tw.video.testapp.util.AccessManagerHelper;
-import com.tw.video.testapp.util.SimpleSignalingUtils;
+import com.twilio.video.app.R;
+import com.twilio.video.app.dialog.Dialog;
+import com.twilio.video.app.util.AccessManagerHelper;
+import com.twilio.video.app.util.SimpleSignalingUtils;
 import com.twilio.common.AccessManager;
 import com.twilio.video.AudioTrack;
 import com.twilio.video.CameraCapturer;

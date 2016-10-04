@@ -1,4 +1,4 @@
-package com.tw.video.testapp.util;
+package com.twilio.video.app.util;
 
 import android.content.Context;
 

@@ -2,7 +2,7 @@
 <manifest
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    package="com.twilio.conversations.test">
+    package="com.twilio.video">
 
     <uses-sdk tools:overrideLibrary="android.support.test.uiautomator.v18"/>
 
@@ -15,15 +15,15 @@
 
     <application>
         <activity
-            android:name="com.twilio.video.ui.RoomsTestActivity">
+            android:name=".ui.RoomsTestActivity">
         </activity>
 
         <activity
-            android:name="com.twilio.video.ui.CameraCapturerTestActivity">
+            android:name=".ui.CameraCapturerTestActivity">
         </activity>
 
         <activity
-            android:name="com.twilio.video.ui.ScreenCapturerTestActivity">
+            android:name=".ui.ScreenCapturerTestActivity">
         </activity>
 
     </application>

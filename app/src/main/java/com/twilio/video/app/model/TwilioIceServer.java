@@ -1,4 +1,4 @@
-package com.tw.video.testapp.model;
+package com.twilio.video.app.model;
 
 public class TwilioIceServer {
     private String url;

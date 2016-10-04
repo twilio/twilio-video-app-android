@@ -1,4 +1,4 @@
-package com.tw.video.testapp.ui;
+package com.twilio.video.app.ui;
 
 import android.Manifest;
 import android.app.ProgressDialog;
@@ -17,10 +17,10 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.tw.video.testapp.BuildConfig;
-import com.tw.video.testapp.R;
-import com.tw.video.testapp.base.BaseActivity;
-import com.tw.video.testapp.util.SimpleSignalingUtils;
+import com.twilio.video.BuildConfig;
+import com.twilio.video.app.R;
+import com.twilio.video.app.base.BaseActivity;
+import com.twilio.video.app.util.SimpleSignalingUtils;
 import com.twilio.video.LogLevel;
 import com.twilio.video.VideoClient;
 

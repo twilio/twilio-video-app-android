@@ -1,9 +1,9 @@
-package com.tw.video.testapp.util;
+package com.twilio.video.app.util;
 
 import android.util.Base64;
 
 import com.google.gson.GsonBuilder;
-import com.tw.video.testapp.model.TwilioIceResponse;
+import com.twilio.video.app.model.TwilioIceResponse;
 
 import java.util.HashMap;
 import java.util.Map;

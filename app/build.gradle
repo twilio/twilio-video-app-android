@@ -7,7 +7,7 @@ model {
         buildToolsVersion "24.0.2"
 
         defaultConfig.with {
-            applicationId "com.tw.video.testapp"
+            applicationId "com.twilio.video.app"
             minSdkVersion.apiLevel 16
             targetSdkVersion.apiLevel 24
             versionName generateVersionName()

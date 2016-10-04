@@ -1,12 +1,12 @@
-package com.tw.video.testapp.dialog;
+package com.twilio.video.app.dialog;
 
 import android.content.Context;
 import android.content.DialogInterface;
 import android.support.v7.app.AlertDialog;
 import android.widget.EditText;
 
-import com.tw.video.testapp.R;
-import com.tw.video.testapp.model.TwilioIceServer;
+import com.twilio.video.app.R;
+import com.twilio.video.app.model.TwilioIceServer;
 
 import java.util.List;
 

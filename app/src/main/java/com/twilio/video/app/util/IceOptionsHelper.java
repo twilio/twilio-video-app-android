@@ -1,4 +1,4 @@
-package com.tw.video.testapp.util;
+package com.twilio.video.app.util;
 
 
 import android.util.SparseBooleanArray;
@@ -7,7 +7,7 @@ import android.widget.ListView;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
-import com.tw.video.testapp.model.TwilioIceServer;
+import com.twilio.video.app.model.TwilioIceServer;
 import com.twilio.video.IceServer;
 import com.twilio.video.IceTransportPolicy;
 
