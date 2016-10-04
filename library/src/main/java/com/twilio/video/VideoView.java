@@ -63,11 +63,21 @@ public class VideoView extends SurfaceViewRenderer implements VideoRenderer {
         } finally {
             a.recycle();
         }
+    }
 
+    @Override
+    protected void onAttachedToWindow() {
+        super.onAttachedToWindow();
         // Do not setup the renderer when using developer tools to avoid EGL14 runtime exceptions
         if(!isInEditMode()) {
             setupRenderer();
         }
+    }
+
+    @Override
+    protected void onDetachedFromWindow() {
+        super.release();
+        super.onDetachedFromWindow();
     }
 
     /**
@@ -107,13 +117,6 @@ public class VideoView extends SurfaceViewRenderer implements VideoRenderer {
      */
     public void setListener(VideoRenderer.Listener listener) {
         this.listener = listener;
-    }
-
-    /**
-     * Releases resources associated with the video renderer.
-     */
-    public void release() {
-        super.release();
     }
 
     @Override
