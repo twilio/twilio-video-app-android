@@ -13,5 +13,6 @@ public class FrameCountRenderer implements VideoRenderer {
     @Override
     public void renderFrame(I420Frame frame) {
         frameCount++;
+        frame.release();
     }
 }
