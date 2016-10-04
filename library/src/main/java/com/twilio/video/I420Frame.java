@@ -80,6 +80,10 @@ public class I420Frame {
         return (rotationDegree % 180 == 0) ? height : width;
     }
 
+    /**
+     * Called when a {@link VideoRenderer} has completed rendering a frame. This must be invoked
+     * for each frame to ensure that resources are not leaked.
+     */
     public synchronized void release() {
         if (nativeFramePointer != 0) {
             nativeRelease(nativeFramePointer);
