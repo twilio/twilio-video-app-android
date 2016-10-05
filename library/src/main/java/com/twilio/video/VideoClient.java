@@ -1,13 +1,20 @@
 package com.twilio.video;
 
 import android.Manifest;
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.media.AudioManager;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Handler;
 import android.util.Log;
 
 import com.getkeepsafe.relinker.ReLinker;
 import com.twilio.common.AccessManager;
+
+import com.twilio.video.BuildConfig;
 
 import java.util.EnumMap;
 import java.util.HashSet;
@@ -35,9 +42,29 @@ public class VideoClient {
 
     private final Handler handler;
     private final Context applicationContext;
-    private AccessManager accessManager;
+    private final AccessManager accessManager;
+    private final Set<Room> rooms = new HashSet<>();
+    private final BroadcastReceiver connectivityChangeReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (intent.getAction().equalsIgnoreCase(ConnectivityManager.CONNECTIVITY_ACTION)) {
+                ConnectivityManager conn =  (ConnectivityManager)
+                        context.getSystemService(Context.CONNECTIVITY_SERVICE);
+                NetworkInfo networkInfo = conn.getActiveNetworkInfo();
+                NetworkChangeEvent networkChangeEvent = NetworkChangeEvent.CONNECTION_CHANGED;
+
+                if (networkInfo == null || !networkInfo.isConnectedOrConnecting()) {
+                    networkChangeEvent = NetworkChangeEvent.CONNECTION_LOST;
+                } else if (networkInfo.isConnected()) {
+                    networkChangeEvent = NetworkChangeEvent.CONNECTION_CHANGED;
+                }
+
+                logger.d("Network event detected: " + networkChangeEvent.name());
+                nativeOnNetworkChange(nativeClientContext, networkChangeEvent);
+            }
+        }
+    };
     private long nativeClientContext;
-    private Set<Room> rooms;
 
     public VideoClient(Context context, AccessManager accessManager) {
         if (context == null) {
@@ -50,7 +77,6 @@ public class VideoClient {
         this.applicationContext = context.getApplicationContext();
         this.accessManager = accessManager;
         this.handler = Util.createCallbackHandler();
-        this.rooms = new HashSet<>();
 
         checkPermissions(context);
 
@@ -73,7 +99,6 @@ public class VideoClient {
         for (LogModule module : moduleLogLevel.keySet()) {
             trySetCoreModuleLogLevel(module.ordinal(), moduleLogLevel.get(module).ordinal());
         }
-
     }
 
     /**
@@ -138,6 +163,9 @@ public class VideoClient {
             nativeClientContext = nativeCreateClient(applicationContext,
                     accessManager,
                     MediaFactory.instance(applicationContext).getNativeMediaFactoryHandle());
+
+            // Register for connectivity events
+            registerConnectivityBroadcastReceiver();
         }
 
         Room room = new Room(connectOptions.getRoomName(),
@@ -165,6 +193,9 @@ public class VideoClient {
     synchronized void release(Room room) {
         rooms.remove(room);
         if (rooms.isEmpty() && nativeClientContext != 0) {
+            // With no more room connections we can unregister for connectivity events
+            unregisterConnectivityBroadcastReceiver();
+
             nativeRelease(nativeClientContext);
             nativeClientContext = 0;
         }
@@ -330,6 +361,20 @@ public class VideoClient {
         }
     }
 
+    private void registerConnectivityBroadcastReceiver() {
+        applicationContext.registerReceiver(connectivityChangeReceiver,
+                new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
+    }
+
+    private void unregisterConnectivityBroadcastReceiver() {
+        applicationContext.unregisterReceiver(connectivityChangeReceiver);
+    }
+
+    enum NetworkChangeEvent {
+        CONNECTION_LOST,
+        CONNECTION_CHANGED
+    }
+
     private native static void nativeSetCoreLogLevel(int level);
     private native static void nativeSetModuleLevel(int module, int level);
     private native static int nativeGetCoreLogLevel();
@@ -339,5 +384,7 @@ public class VideoClient {
     private native long nativeConnect(long nativeClientDataHandler,
                                       long nativeRoomListenerHandle,
                                       ConnectOptions ConnectOptions);
+    private native void nativeOnNetworkChange(long nativeClientContext,
+                                              NetworkChangeEvent networkChangeEvent);
     private native void nativeRelease(long nativeClientDataHandler);
 }
