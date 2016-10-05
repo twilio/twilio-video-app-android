@@ -28,6 +28,7 @@ public class I420Frame {
     public final ByteBuffer[] yuvPlanes;
     /** The degree that the frame must be rotated clockwise to be rendered correctly. */
     public int rotationDegree;
+    final org.webrtc.VideoRenderer.I420Frame webRtcI420Frame;
     long nativeFramePointer;
     /*
      * Matrix that transforms standard coordinates to their proper sampling locations in
@@ -37,18 +38,14 @@ public class I420Frame {
      */
     private final float[] samplingMatrix;
 
-    I420Frame(int width,
-              int height,
-              int rotationDegree,
-              int[] yuvStrides,
-              ByteBuffer[] yuvPlanes,
-              long nativeFramePointer) {
-        this.width = width;
-        this.height = height;
-        this.yuvStrides = yuvStrides;
-        this.yuvPlanes = yuvPlanes;
-        this.rotationDegree = rotationDegree;
-        this.nativeFramePointer = nativeFramePointer;
+    I420Frame(org.webrtc.VideoRenderer.I420Frame webRtcI420Frame) {
+        this.width = webRtcI420Frame.width;
+        this.height = webRtcI420Frame.height;
+        this.yuvStrides = webRtcI420Frame.yuvStrides;
+        this.yuvPlanes = webRtcI420Frame.yuvPlanes;
+        this.rotationDegree = webRtcI420Frame.rotationDegree;
+        this.webRtcI420Frame = webRtcI420Frame;
+        this.nativeFramePointer = webRtcI420Frame.nativeFramePointer;
         if (rotationDegree % 90 != 0) {
             throw new IllegalArgumentException("Rotation degree not multiple of 90: " +
                     rotationDegree);
