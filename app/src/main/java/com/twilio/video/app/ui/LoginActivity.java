@@ -17,7 +17,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.twilio.video.BuildConfig;
+import com.twilio.video.app.BuildConfig;
 import com.twilio.video.app.R;
 import com.twilio.video.app.base.BaseActivity;
 import com.twilio.video.app.util.SimpleSignalingUtils;
