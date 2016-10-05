@@ -3,7 +3,7 @@ package com.twilio.video.app.base;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 
-import com.twilio.video.BuildConfig;
+import com.twilio.video.app.BuildConfig;
 import com.twilio.video.app.VideoApplication;
 
 import net.hockeyapp.android.CrashManager;
