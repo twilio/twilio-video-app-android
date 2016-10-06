@@ -40,6 +40,9 @@
     <string name="resume_audio">Resume audio</string>
     <string name="pause_video">Pause video</string>
     <string name="resume_video">Resume video</string>
+    <string name="share_screen">Share screen</string>
+    <string name="stop_screen_share">Stop screen share</string>
+    <string name="screen_capture_permission_not_granted">Screen capture permission not granted</string>
 
     <string-array name="realm_array">
         <item>Prod</item>
