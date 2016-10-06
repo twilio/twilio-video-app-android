@@ -121,7 +121,7 @@ public class VideoView extends SurfaceViewRenderer implements VideoRenderer {
 
     @Override
     public void renderFrame(I420Frame frame) {
-        super.renderFrame(convertToWebRtcFrame(frame));
+        super.renderFrame(frame.webRtcI420Frame);
     }
 
     /**
@@ -162,34 +162,6 @@ public class VideoView extends SurfaceViewRenderer implements VideoRenderer {
                 return RendererCommon.ScalingType.SCALE_ASPECT_BALANCED;
             default:
                 return RendererCommon.ScalingType.SCALE_ASPECT_FIT;
-        }
-    }
-
-    private org.webrtc.VideoRenderer.I420Frame convertToWebRtcFrame(I420Frame frame) {
-        try {
-            Constructor<org.webrtc.VideoRenderer.I420Frame> i420FrameConstructor =
-                    org.webrtc.VideoRenderer.I420Frame.class
-                            .getDeclaredConstructor(int.class,
-                                    int.class,
-                                    int.class,
-                                    int[].class,
-                                    ByteBuffer[].class,
-                                    long.class);
-            i420FrameConstructor.setAccessible(true);
-            return i420FrameConstructor.newInstance(frame.width,
-                    frame.height,
-                    frame.rotationDegree,
-                    frame.yuvStrides,
-                    frame.yuvPlanes,
-                    frame.nativeFramePointer);
-        } catch (InvocationTargetException e) {
-            throw new RuntimeException("Unable to transform I420 frame");
-        } catch (NoSuchMethodException e) {
-            throw new RuntimeException("Unable to transform I420 frame");
-        } catch (InstantiationException e) {
-            throw new RuntimeException("Unable to transform I420 frame");
-        } catch (IllegalAccessException e) {
-            throw new RuntimeException("Unable to transform I420 frame");
         }
     }
 }

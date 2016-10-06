@@ -120,26 +120,7 @@ public class VideoTrack implements Track {
 
         @Override
         public void renderFrame(org.webrtc.VideoRenderer.I420Frame frame) {
-            videoRenderer.renderFrame(transformWebRtcFrame(frame));
-        }
-
-        private I420Frame transformWebRtcFrame(org.webrtc.VideoRenderer.I420Frame frame) {
-            long frameNativePointer;
-            try {
-                Field nativeFramePointField = frame.getClass().getDeclaredField("nativeFramePointer");
-                nativeFramePointField.setAccessible(true);
-                frameNativePointer = nativeFramePointField.getLong(frame);
-            } catch (NoSuchFieldException e) {
-                throw new RuntimeException("Unable to retrieve I420 Frame native pointer");
-            } catch( IllegalAccessException e) {
-                throw new RuntimeException("Unable to retrieve I420 Frame native pointer");
-            }
-            return new I420Frame(frame.width,
-                    frame.height,
-                    frame.rotationDegree,
-                    frame.yuvStrides,
-                    frame.yuvPlanes,
-                    frameNativePointer);
+            videoRenderer.renderFrame(new I420Frame(frame));
         }
     }
 }
