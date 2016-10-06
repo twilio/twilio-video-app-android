@@ -2,7 +2,7 @@ package com.twilio.video.app;
 
 import android.app.Application;
 
-import com.twilio.video.BuildConfig;
+import com.twilio.video.app.BuildConfig;
 
 import timber.log.Timber;
 

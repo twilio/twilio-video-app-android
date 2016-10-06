@@ -45,7 +45,7 @@ JNIEXPORT jint JNICALL Java_com_twilio_video_VideoPixelFormat_nativeGetValue(JNI
     } else if (name == "RGBA_8888") {
         return VideoPixelFormat::kVideoPixelFormatRgba8888;
     } else {
-        return cricket::FOURCC_ANY;
+        FATAL() << "Failed to translate VideoPixelFormat to cricket fourcc";
     }
 }
 

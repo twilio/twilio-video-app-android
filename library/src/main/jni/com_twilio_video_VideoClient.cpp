@@ -56,6 +56,30 @@ extern "C" void JNIEXPORT JNICALL JNI_OnUnLoad(JavaVM *jvm, void *reserved) {
     webrtc_jni::FreeGlobalClassReferenceHolder();
 }
 
+twilio::video::NetworkChangeEvent getNetworkChangeEvent(jobject j_network_change_event) {
+    JNIEnv* jni = webrtc_jni::AttachCurrentThreadIfNeeded();
+    jclass j_network_change_event_class =
+            twilio_video_jni::FindClass(jni, "com/twilio/video/VideoClient$NetworkChangeEvent");
+    jmethodID name_method_id = webrtc_jni::GetMethodID(jni,
+                                                       j_network_change_event_class,
+                                                       "name",
+                                                       "()Ljava/lang/String;");
+    jstring connection_event_name = (jstring) jni->CallObjectMethod(j_network_change_event,
+                                                                    name_method_id);
+    std::string name = webrtc_jni::JavaToStdString(jni, connection_event_name);
+    twilio::video::NetworkChangeEvent network_changed_event = twilio::video::kConnectionChanged;
+
+    if (name == "CONNECTION_LOST") {
+        network_changed_event = twilio::video::NetworkChangeEvent::kConnectionLost;
+    } else if (name == "CONNECTION_CHANGED") {
+        network_changed_event = twilio::video::NetworkChangeEvent::kConnectionChanged;
+    } else {
+        FATAL() << "Network change event could not translated";
+    }
+
+    return network_changed_event;
+}
+
 JNIEXPORT void JNICALL Java_com_twilio_video_VideoClient_nativeSetCoreLogLevel
         (JNIEnv *env, jobject instance, jint level) {
     TS_CORE_LOG_MODULE(twilio::video::kTSCoreLogModulePlatform,
@@ -177,6 +201,16 @@ Java_com_twilio_video_VideoClient_nativeConnect(JNIEnv *env,
     RoomContext *room_context = new RoomContext();
     room_context->room = std::move(room);
     return jlongFromPointer(room_context);
+}
+
+JNIEXPORT void JNICALL Java_com_twilio_video_VideoClient_nativeOnNetworkChange(JNIEnv *env,
+                                                                               jobject j_instance,
+                                                                               jlong j_client_context,
+                                                                               jobject j_network_changed_event) {
+    ClientContext *client_context = reinterpret_cast<ClientContext *>(j_client_context);
+    twilio::video::NetworkChangeEvent networkChangeEvent =
+            getNetworkChangeEvent(j_network_changed_event);
+    client_context->getClient().onNetworkChange(networkChangeEvent);
 }
 
 JNIEXPORT void JNICALL
