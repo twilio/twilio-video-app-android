@@ -92,9 +92,24 @@ public class RoomActivity extends AppCompatActivity {
     private LocalVideoTrack screenVideoTrack;
     private VideoTrack primaryVideoTrack;
     private CameraCapturer cameraCapturer;
-    private ScreenCapturer screenCapturer;
     private AlertDialog alertDialog;
     boolean loggingOut;
+    private ScreenCapturer screenCapturer;
+    private final ScreenCapturer.Listener screenCapturerListener = new ScreenCapturer.Listener() {
+        @Override
+        public void onScreenCaptureError(String errorDescription) {
+            Timber.e("Screen capturer error: " + errorDescription);
+            stopScreenCapture();
+            Toast.makeText(RoomActivity.this, R.string.screen_capture_error,
+                    Toast.LENGTH_LONG).show();
+        }
+
+        @Override
+        public void onFirstFrameAvailable() {
+            Timber.d("First frame from screen re");
+
+        }
+    };
 
     private final Multimap<Participant, VideoView> participantVideoViewMultimap =
             HashMultimap.create();
@@ -211,8 +226,7 @@ public class RoomActivity extends AppCompatActivity {
 
                 return;
             }
-            // TODO: Add listener to detect any errors in screen capturer
-            screenCapturer = new ScreenCapturer(this, resultCode, data, null);
+            screenCapturer = new ScreenCapturer(this, resultCode, data, screenCapturerListener);
             startScreenCapture();
         }
     }
