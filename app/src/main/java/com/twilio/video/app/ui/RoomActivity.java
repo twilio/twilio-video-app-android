@@ -548,14 +548,19 @@ public class RoomActivity extends AppCompatActivity {
     }
 
     private void moveLocalVideoToThumbnail() {
+
         if (cameraVideoTrack != null) {
-            Timber.d("Moving camera video to thumbnail");
-            cameraVideoTrack.removeRenderer(primaryVideoView);
-            localThumbnailVideoView.setMirror(cameraCapturer.getCameraSource() ==
-                    CameraCapturer.CameraSource.FRONT_CAMERA);
-            videoThumbnailRelativeLayout.setVisibility(View.VISIBLE);
-            localThumbnailVideoView.setVisibility(View.VISIBLE);
-            cameraVideoTrack.addRenderer(localThumbnailVideoView);
+            boolean renderingToThumbnail = cameraVideoTrack.getRenderers().get(0) ==
+                    localThumbnailVideoView;
+            if (!renderingToThumbnail) {
+                Timber.d("Moving camera video to thumbnail");
+                cameraVideoTrack.removeRenderer(primaryVideoView);
+                localThumbnailVideoView.setMirror(cameraCapturer.getCameraSource() ==
+                        CameraCapturer.CameraSource.FRONT_CAMERA);
+                videoThumbnailRelativeLayout.setVisibility(View.VISIBLE);
+                localThumbnailVideoView.setVisibility(View.VISIBLE);
+                cameraVideoTrack.addRenderer(localThumbnailVideoView);
+            }
         } else {
             // TODO: Create thumbnail with name and icon in place of video
         }
@@ -563,12 +568,15 @@ public class RoomActivity extends AppCompatActivity {
 
     private void moveLocalVideoToPrimary() {
         if(cameraVideoTrack != null) {
-            Timber.d("Moving camera video to primary view");
-            cameraVideoTrack.removeRenderer(localThumbnailVideoView);
-            primaryVideoView.setVisibility(View.VISIBLE);
-            cameraVideoTrack.addRenderer(primaryVideoView);
-            primaryVideoView.setMirror(cameraCapturer.getCameraSource() ==
-                    CameraCapturer.CameraSource.FRONT_CAMERA);
+            boolean renderingToPrimary = cameraVideoTrack.getRenderers().get(0) == primaryVideoView;
+            if (!renderingToPrimary) {
+                Timber.d("Moving camera video to primary view");
+                cameraVideoTrack.removeRenderer(localThumbnailVideoView);
+                primaryVideoView.setVisibility(View.VISIBLE);
+                cameraVideoTrack.addRenderer(primaryVideoView);
+                primaryVideoView.setMirror(cameraCapturer.getCameraSource() ==
+                        CameraCapturer.CameraSource.FRONT_CAMERA);
+            }
         } else {
             // TODO: Show icon and name in place of video
             primaryVideoView.setVisibility(View.GONE);
