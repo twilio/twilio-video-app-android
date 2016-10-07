@@ -153,7 +153,7 @@ public class RoomActivity extends AppCompatActivity {
 
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
-        // Grab mene items for updating later
+        // Grab menu items for updating later
         switchCameraMenuItem = menu.findItem(R.id.switch_camera_menu_item);
         pauseVideoMenuItem = menu.findItem(R.id.pause_video_menu_item);
         pauseAudioMenuItem = menu.findItem(R.id.pause_audio_menu_item);
