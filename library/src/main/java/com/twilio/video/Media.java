@@ -210,158 +210,156 @@ public class Media {
         @Override
         public void onAudioTrackAdded(final AudioTrack audioTrack) {
             logger.d("onAudioTrackAdded");
-            if (listener == null) {
-                return;
-            }
             if (audioTrack == null) {
                 logger.w("Received audio track added callback for non-existing audio track");
             }
             audioTrackMap.put(audioTrack.getTrackId(), audioTrack);
-            handler.post(new Runnable() {
-                @Override
-                public void run() {
-                    Media.this.listener.onAudioTrackAdded(Media.this, audioTrack);
-                }
-            });
+            if (listener != null) {
+                handler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        Media.this.listener.onAudioTrackAdded(Media.this, audioTrack);
+                    }
+                });
+            }
 
         }
 
         @Override
         public void onAudioTrackRemoved(String trackId) {
             logger.d("onAudioTrackRemoved");
-            if (listener == null) {
-                return;
-            }
             final AudioTrack audioTrack = audioTrackMap.remove(trackId);
             if (audioTrack == null) {
                 logger.w("Received audio track removed callback for non-existent audio track");
                 return;
             }
-            handler.post(new Runnable() {
-                @Override
-                public void run() {
-                    Media.this.listener.onAudioTrackRemoved(Media.this, audioTrack);
-                }
-            });
+            if (listener != null) {
+                handler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        Media.this.listener.onAudioTrackRemoved(Media.this, audioTrack);
+                    }
+                });
+            }
 
         }
 
         @Override
         public void onVideoTrackAdded(final VideoTrack videoTrack) {
             logger.d("onVideoTrackAdded");
-            if (listener == null) {
-                return;
-            }
             if (videoTrack == null) {
                 logger.w("Received video track added callback for non-existing video track");
             }
             videoTrackMap.put(videoTrack.getTrackId(), videoTrack);
-            handler.post(new Runnable() {
-                @Override
-                public void run() {
-                    Media.this.listener.onVideoTrackAdded(Media.this, videoTrack);
-                }
-            });
+            if (listener != null) {
+                handler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        Media.this.listener.onVideoTrackAdded(Media.this, videoTrack);
+                    }
+                });
+            }
+
         }
 
         @Override
         public void onVideoTrackRemoved(String trackId) {
             logger.d("onVideoTrackRemoved");
-            if (listener == null) {
-                return;
-            }
             final VideoTrack videoTrack = videoTrackMap.remove(trackId);
             if (videoTrack == null) {
                 logger.w("Received video track removed callback for non-existent video track");
                 return;
             }
             videoTrack.release();
-            handler.post(new Runnable() {
-                @Override
-                public void run() {
-                    Media.this.listener.onVideoTrackRemoved(Media.this, videoTrack);
-                }
-            });
+            if (listener != null) {
+                handler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        Media.this.listener.onVideoTrackRemoved(Media.this, videoTrack);
+                    }
+                });
+            }
+
         }
 
         @Override
         public void onAudioTrackEnabled(String trackId) {
             logger.d("onAudioTrackEnabled");
-            if (listener == null) {
-                return;
-            }
             final AudioTrack audioTrack = audioTrackMap.get(trackId);
             if (audioTrack == null) {
                 logger.w("Received audio track enabled callback for non-existent audio track");
                 return;
             }
             audioTrack.setEnabled(true);
-            handler.post(new Runnable() {
-                @Override
-                public void run() {
-                    Media.this.listener.onAudioTrackEnabled(Media.this, audioTrack);
-                }
-            });
+            if (listener != null) {
+                handler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        Media.this.listener.onAudioTrackEnabled(Media.this, audioTrack);
+                    }
+                });
+            }
+
         }
 
         @Override
         public void onAudioTrackDisabled(String trackId) {
             logger.d("onAudioTrackDisabled");
-            if (listener == null) {
-                return;
-            }
             final AudioTrack audioTrack = audioTrackMap.get(trackId);
             if (audioTrack == null) {
                 logger.w("Received audio track disabled callback for non-existent audio track");
                 return;
             }
             audioTrack.setEnabled(false);
-            handler.post(new Runnable() {
-                @Override
-                public void run() {
-                    Media.this.listener.onAudioTrackDisabled(Media.this, audioTrack);
-                }
-            });
+            if (listener != null) {
+                handler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        Media.this.listener.onAudioTrackDisabled(Media.this, audioTrack);
+                    }
+                });
+            }
+
         }
 
         @Override
         public void onVideoTrackEnabled(String trackId) {
             logger.d("onVideoTrackEnabled");
-            if (listener == null) {
-                return;
-            }
             final VideoTrack videoTrack = videoTrackMap.get(trackId);
             if (videoTrack == null) {
                 logger.w("Received video track enabled callback for non-existent video track");
                 return;
             }
             videoTrack.setEnabled(true);
-            handler.post(new Runnable() {
-                @Override
-                public void run() {
-                    Media.this.listener.onVideoTrackEnabled(Media.this, videoTrack);
-                }
-            });
+            if (listener != null) {
+                handler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        Media.this.listener.onVideoTrackEnabled(Media.this, videoTrack);
+                    }
+                });
+            }
+
         }
 
         @Override
         public void onVideoTrackDisabled(String trackId) {
             logger.d("onVideoTrackDisabled");
-            if (listener == null) {
-                return;
-            }
             final VideoTrack videoTrack = videoTrackMap.get(trackId);
             if (videoTrack == null) {
                 logger.w("Received video track disabled callback for non-existent video track");
                 return;
             }
             videoTrack.setEnabled(false);
-            handler.post(new Runnable() {
-                @Override
-                public void run() {
-                    Media.this.listener.onVideoTrackDisabled(Media.this, videoTrack);
-                }
-            });
+            if (listener != null) {
+                handler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        Media.this.listener.onVideoTrackDisabled(Media.this, videoTrack);
+                    }
+                });
+            }
+
         }
     }
 
