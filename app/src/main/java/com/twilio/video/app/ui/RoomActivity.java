@@ -61,6 +61,7 @@ import timber.log.Timber;
 
 public class RoomActivity extends AppCompatActivity {
     private static final int REQUEST_MEDIA_PROJECTION = 100;
+    private static final int THUMBNAIL_DIMENSION = 96;
 
     @BindView(R.id.connect_image_button) ImageButton connectImageButton;
     @BindView(R.id.media_status_textview) TextView mediaStatusTextview;
@@ -106,8 +107,7 @@ public class RoomActivity extends AppCompatActivity {
 
         @Override
         public void onFirstFrameAvailable() {
-            Timber.d("First frame from screen re");
-
+            Timber.d("First frame from screen capturer available");
         }
     };
 
@@ -141,7 +141,10 @@ public class RoomActivity extends AppCompatActivity {
         cameraVideoTrack = localMedia.addVideoTrack(true, cameraCapturer);
         primaryVideoView.setMirror(true);
         cameraVideoTrack.addRenderer(primaryVideoView);
-        createVideoClient();
+
+        // Create our video client
+        accessManager = AccessManagerHelper.createAccessManager(this, capabilityToken);
+        videoClient = new VideoClient(this, accessManager);
     }
 
     @Override
@@ -272,37 +275,49 @@ public class RoomActivity extends AppCompatActivity {
     void toggleLocalVideo() {
         int icon = 0;
         if (cameraVideoTrack == null) {
+            // Add back local video from camera capturer
+            Timber.d("Adding local video");
             cameraVideoTrack = localMedia.addVideoTrack(true, cameraCapturer);
+
+            // If participants have video tracks we render in thumbnial
             if (room != null && !videoTrackVideoViewBiMap.isEmpty()) {
-                localThumbnailVideoView.setMirror(
-                        cameraCapturer.getCameraSource() == CameraCapturer.CameraSource.FRONT_CAMERA);
+                Timber.d("Participant video tracks are being rendered. Rendering local video in " +
+                        "thumbnail");
+                localThumbnailVideoView.setMirror(cameraCapturer.getCameraSource() ==
+                        CameraCapturer.CameraSource.FRONT_CAMERA);
                 cameraVideoTrack.addRenderer(localThumbnailVideoView);
             } else {
-                // Set as primary video view
+                // No remote tracks are being rendered so we render in primary view
+                Timber.d("No remote video is being rendered. Rendering local video in primary " +
+                        "view");
                 primaryVideoView.setVisibility(View.VISIBLE);
                 cameraVideoTrack.addRenderer(primaryVideoView);
             }
+            // Set and icon and menu items
             icon = R.drawable.ic_videocam_white_24px;
             switchCameraMenuItem.setVisible(cameraVideoTrack.isEnabled());
             pauseVideoMenuItem.setTitle(cameraVideoTrack.isEnabled() ?
                     R.string.pause_video : R.string.resume_video);
             pauseVideoMenuItem.setVisible(true);
         } else {
-
+            Timber.d("Removing local video");
             if (primaryVideoTrack == null) {
+                // TODO: Add UI for no video state in primary view
                 primaryVideoView.setVisibility(View.GONE);
             } else {
-                if (videoTrackVideoViewBiMap.isEmpty()) {
-                    videoThumbnailRelativeLayout.setVisibility(View.GONE);
-                }
+                // TODO: Add UI for no video in thumbnail view
+                localThumbnailVideoView.setVisibility(View.GONE);
             }
 
+            // Remove renderer and track
             cameraVideoTrack.removeRenderer(localThumbnailVideoView);
             if (!localMedia.removeVideoTrack(cameraVideoTrack)) {
                 Snackbar.make(roomStatusTextview,
                         "Video track remove action failed",
                         Snackbar.LENGTH_LONG).setAction("Action", null).show();
             }
+
+            // Cleanup and set menu items accordingly
             cameraVideoTrack = null;
             icon = R.drawable.ic_videocam_off_gray_24px;
             switchCameraMenuItem.setVisible(false);
@@ -324,7 +339,7 @@ public class RoomActivity extends AppCompatActivity {
         } else if (roomState == RoomState.CONNECTED) {
             getSupportActionBar().setTitle(room.getName());
             joinIcon = R.drawable.ic_call_end_white_24px;
-        } else { // disconnected
+        } else {
             getSupportActionBar().setTitle(username);
             joinIcon = R.drawable.ic_add_circle_white_24px;
         }
@@ -332,15 +347,10 @@ public class RoomActivity extends AppCompatActivity {
                 ContextCompat.getDrawable(RoomActivity.this, joinIcon));
     }
 
-    private void createVideoClient() {
-        accessManager = AccessManagerHelper.createAccessManager(this, capabilityToken);
-        videoClient = new VideoClient(this, accessManager);
-    }
-
     private void logout() {
-        // Will continue logout once the conversation has ended
+        // Will logout after disconnecting from the room
         loggingOut = true;
-        // End any current call
+        // Disconnect from the current room
         if (room != null && room.getState() != RoomState.DISCONNECTED) {
             room.disconnect();
         } else {
@@ -424,7 +434,7 @@ public class RoomActivity extends AppCompatActivity {
     }
 
     private void connectToRoom(String roomName) {
-        roomStatusTextview.setText("Connecting to room "+roomName);
+        roomStatusTextview.setText("Connecting to room " + roomName);
         this.roomName = roomName;
         ConnectOptions connectOptions = new ConnectOptions.Builder()
                 .roomName(roomName)
@@ -467,10 +477,10 @@ public class RoomActivity extends AppCompatActivity {
             thumbnailLinearLayout.addView(videoView);
             videoView.getLayoutParams().width = (int)
                     TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
-                            96, getResources().getDisplayMetrics());
+                            THUMBNAIL_DIMENSION, getResources().getDisplayMetrics());
             videoView.getLayoutParams().height = (int)
                     TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
-                            96, getResources().getDisplayMetrics());
+                            THUMBNAIL_DIMENSION, getResources().getDisplayMetrics());
             videoTrack.addRenderer(videoView);
             videoTrackVideoViewBiMap.put(videoTrack, videoView);
             videoView.setOnClickListener(new View.OnClickListener() {
@@ -510,7 +520,7 @@ public class RoomActivity extends AppCompatActivity {
     }
 
     private void removeParticipant(Participant participant) {
-        roomStatusTextview.setText("Participant "+participant.getIdentity()+ " left.");
+        roomStatusTextview.setText("Participant " + participant.getIdentity() + " left.");
         for (VideoView videoView : participantVideoViewMultimap.removeAll(participant)) {
             VideoTrack videoTrack = videoTrackVideoViewBiMap.inverse().get(videoView);
             if (videoTrack != null) {
@@ -588,9 +598,9 @@ public class RoomActivity extends AppCompatActivity {
         return new Room.Listener() {
             @Override
             public void onConnected(Room room) {
-                Timber.i("onConnected: "+room.getName() + " sid:"+
-                        room.getSid()+" state:"+room.getState());
-                roomStatusTextview.setText("Connected to "+room.getName());
+                Timber.i("onConnected: " + room.getName() + " sid:" +
+                        room.getSid() + " state:" + room.getState());
+                roomStatusTextview.setText("Connected to " + room.getName());
                 updateUi(RoomState.CONNECTED);
 
                 for (Map.Entry<String, Participant> entry : room.getParticipants().entrySet()) {
@@ -601,7 +611,7 @@ public class RoomActivity extends AppCompatActivity {
             @Override
             public void onConnectFailure(Room room, VideoException error) {
                 Timber.i("onConnectFailure");
-                roomStatusTextview.setText("Failed to connect to "+roomName);
+                roomStatusTextview.setText("Failed to connect to " + roomName);
                 RoomActivity.this.room = null;
                 updateUi(RoomState.DISCONNECTED);
             }
@@ -609,7 +619,7 @@ public class RoomActivity extends AppCompatActivity {
             @Override
             public void onDisconnected(Room room, VideoException error) {
                 Timber.i("onDisconnected");
-                roomStatusTextview.setText("Disconnected from "+roomName);
+                roomStatusTextview.setText("Disconnected from " + roomName);
                 removeAllParticipants();
                 updateUi(RoomState.DISCONNECTED);
                 RoomActivity.this.room = null;
@@ -620,13 +630,13 @@ public class RoomActivity extends AppCompatActivity {
 
             @Override
             public void onParticipantConnected(Room room, Participant participant) {
-                Timber.i("onParticipantConnected: "+participant.getIdentity());
+                Timber.i("onParticipantConnected: " + participant.getIdentity());
                 addParticipant(participant);
             }
 
             @Override
             public void onParticipantDisconnected(Room room, Participant participant) {
-                Timber.i("onParticipantDisconnected "+participant.getIdentity());
+                Timber.i("onParticipantDisconnected " + participant.getIdentity());
                 removeParticipant(participant);
             }
         };
