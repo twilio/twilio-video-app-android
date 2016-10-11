@@ -27,14 +27,6 @@ import java.util.Set;
  * The VideoClient allows a user to connect to a Room.
  */
 public class VideoClient {
-    private static final String[] REQUIRED_PERMISSIONS = {
-            // Required permissions granted upon install
-            Manifest.permission.INTERNET,
-            Manifest.permission.MODIFY_AUDIO_SETTINGS,
-            Manifest.permission.ACCESS_NETWORK_STATE,
-            Manifest.permission.ACCESS_WIFI_STATE
-    };
-
     private static LogLevel level = LogLevel.OFF;
     private static Map<LogModule, LogLevel> moduleLogLevel = new EnumMap(LogModule.class);
     private static volatile boolean libraryIsLoaded = false;
@@ -77,8 +69,6 @@ public class VideoClient {
         this.applicationContext = context.getApplicationContext();
         this.accessManager = accessManager;
         this.handler = Util.createCallbackHandler();
-
-        checkPermissions(context);
 
         if (!libraryIsLoaded) {
             ReLinker.loadLibrary(this.applicationContext, "jingle_peerconnection_so");
@@ -340,24 +330,6 @@ public class VideoClient {
     private static void trySetCoreModuleLogLevel(int module, int level) {
         if (libraryIsLoaded) {
             nativeSetModuleLevel(module, level);
-        }
-    }
-
-    private static void checkPermissions(Context context) {
-        List<String> missingPermissions = new LinkedList<>();
-        for (String permission : REQUIRED_PERMISSIONS) {
-            if (!Util.permissionGranted(context, permission)) {
-                missingPermissions.add(permission);
-            }
-        }
-
-        if (!missingPermissions.isEmpty()) {
-            StringBuilder builder = new StringBuilder(
-                    "Your app is missing the following required permissions:");
-            for (String permission : missingPermissions)
-                builder.append(' ').append(permission);
-
-            throw new RuntimeException(builder.toString());
         }
     }
 
