@@ -1,24 +1,37 @@
 package com.twilio.video.app.ui;
 
+import android.annotation.TargetApi;
+import android.app.Activity;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.media.projection.MediaProjectionManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.util.TypedValue;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.common.collect.BiMap;
+import com.google.common.collect.HashBiMap;
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.Multimap;
+import com.twilio.video.ScreenCapturer;
 import com.twilio.video.app.R;
 import com.twilio.video.app.dialog.Dialog;
 import com.twilio.video.app.util.AccessManagerHelper;
@@ -39,8 +52,6 @@ import com.twilio.video.VideoException;
 import com.twilio.video.VideoTrack;
 import com.twilio.video.VideoView;
 
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import butterknife.BindView;
@@ -49,14 +60,25 @@ import butterknife.OnClick;
 import timber.log.Timber;
 
 public class RoomActivity extends AppCompatActivity {
+    private static final int REQUEST_MEDIA_PROJECTION = 100;
+    private static final int THUMBNAIL_DIMENSION = 96;
+
     @BindView(R.id.connect_image_button) ImageButton connectImageButton;
     @BindView(R.id.media_status_textview) TextView mediaStatusTextview;
     @BindView(R.id.room_status_textview) TextView roomStatusTextview;
-    @BindView(R.id.thumbnail_linear_layout) LinearLayout thumbnailLinearLayout;
+    @BindView(R.id.primary_video) VideoView primaryVideoView;
+    @BindView(R.id.video_thumbnails_container) RelativeLayout videoThumbnailRelativeLayout;
+    @BindView(R.id.local_video_thumbnail) VideoView localThumbnailVideoView;
+    @BindView(R.id.remote_video_thumbnails) LinearLayout thumbnailLinearLayout;
     @BindView(R.id.local_video_image_button) ImageButton localVideoImageButton;
     @BindView(R.id.local_audio_image_button) ImageButton localAudioImageButton;
     @BindView(R.id.speaker_image_button) ImageButton speakerImageButton;
     @BindView(R.id.video_container) FrameLayout frameLayout;
+
+    private MenuItem switchCameraMenuItem;
+    private MenuItem pauseVideoMenuItem;
+    private MenuItem pauseAudioMenuItem;
+    private MenuItem screenCaptureMenuItem;
 
     private String username;
     private String capabilityToken;
@@ -67,13 +89,31 @@ public class RoomActivity extends AppCompatActivity {
     private String roomName;
     private LocalMedia localMedia;
     private LocalAudioTrack localAudioTrack;
-    private LocalVideoTrack localVideoTrack;
-    private VideoView primaryVideoView;
-    private VideoView localVideoView;
+    private LocalVideoTrack cameraVideoTrack;
+    private LocalVideoTrack screenVideoTrack;
+    private VideoTrack primaryVideoTrack;
     private CameraCapturer cameraCapturer;
     private AlertDialog alertDialog;
     boolean loggingOut;
-    private Map<Participant, VideoView> videoViewMap = new HashMap<>();
+    private ScreenCapturer screenCapturer;
+    private final ScreenCapturer.Listener screenCapturerListener = new ScreenCapturer.Listener() {
+        @Override
+        public void onScreenCaptureError(String errorDescription) {
+            Timber.e("Screen capturer error: " + errorDescription);
+            stopScreenCapture();
+            Toast.makeText(RoomActivity.this, R.string.screen_capture_error,
+                    Toast.LENGTH_LONG).show();
+        }
+
+        @Override
+        public void onFirstFrameAvailable() {
+            Timber.d("First frame from screen capturer available");
+        }
+    };
+
+    private final Multimap<Participant, VideoView> participantVideoViewMultimap =
+            HashMultimap.create();
+    private final BiMap<VideoTrack, VideoView> videoTrackVideoViewBiMap = HashBiMap.create();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -84,35 +124,33 @@ public class RoomActivity extends AppCompatActivity {
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON);
 
+        // Grab views
         setContentView(R.layout.activity_room);
-
         ButterKnife.bind(this);
 
-        processActivityIntent(savedInstanceState);
-        updateUI(RoomState.DISCONNECTED);
+        // Setup activity
+        processActivityIntent(getIntent().getExtras());
+        updateUi(RoomState.DISCONNECTED);
         loggingOut = false;
+
+        // Setup local media and video client
         localMedia = LocalMedia.create(this);
         localAudioTrack = localMedia.addAudioTrack(true);
         cameraCapturer = new CameraCapturer(this,
                 CameraCapturer.CameraSource.FRONT_CAMERA, null);
-        localVideoTrack = localMedia.addVideoTrack(true, cameraCapturer);
-        primaryVideoView = new VideoView(this);
+        cameraVideoTrack = localMedia.addVideoTrack(true, cameraCapturer);
         primaryVideoView.setMirror(true);
-        frameLayout.addView(primaryVideoView);
-        localVideoTrack.addRenderer(primaryVideoView);
-        localVideoView = primaryVideoView;
-        createVideoClient();
+        cameraVideoTrack.addRenderer(primaryVideoView);
+
+        // Create our video client
+        accessManager = AccessManagerHelper.createAccessManager(this, capabilityToken);
+        videoClient = new VideoClient(this, accessManager);
     }
 
     @Override
     protected void onDestroy() {
-        super.onDestroy();
-        if (thumbnailLinearLayout != null) {
-            thumbnailLinearLayout.removeAllViews();
-            videoViewMap.clear();
-        }
         if (localMedia != null) {
-            localMedia.removeVideoTrack(localVideoTrack);
+            localMedia.removeVideoTrack(cameraVideoTrack);
             localMedia.removeAudioTrack(localAudioTrack);
             localMedia.release();
             localMedia = null;
@@ -121,6 +159,7 @@ public class RoomActivity extends AppCompatActivity {
             accessManager.dispose();
             accessManager = null;
         }
+        super.onDestroy();
     }
 
     @Override
@@ -132,24 +171,15 @@ public class RoomActivity extends AppCompatActivity {
 
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
-        MenuItem switchCameraMenuItem = menu.findItem(R.id.switch_camera_menu_item);
-        MenuItem pauseVideoMenuItem = menu.findItem(R.id.pause_video_menu_item);
-        if (localVideoTrack != null) {
-            switchCameraMenuItem.setVisible(localVideoTrack.isEnabled());
-            pauseVideoMenuItem.setTitle(localVideoTrack.isEnabled() ?
-                    R.string.pause_video : R.string.resume_video);
-        } else {
-            switchCameraMenuItem.setVisible(false);
-            pauseVideoMenuItem.setVisible(false);
-        }
-        MenuItem pauseAudioMenuItem = menu.findItem(R.id.pause_audio_menu_item);
-        if (localAudioTrack != null) {
-            pauseAudioMenuItem.setVisible(true);
-            pauseAudioMenuItem.setTitle(localAudioTrack.isEnabled() ?
-                    R.string.pause_audio : R.string.resume_audio);
-        } else {
-            pauseAudioMenuItem.setVisible(false);
-        }
+        // Grab menu items for updating later
+        switchCameraMenuItem = menu.findItem(R.id.switch_camera_menu_item);
+        pauseVideoMenuItem = menu.findItem(R.id.pause_video_menu_item);
+        pauseAudioMenuItem = menu.findItem(R.id.pause_audio_menu_item);
+        screenCaptureMenuItem = menu.findItem(R.id.share_screen_menu_item);
+
+        // Screen sharing only available on lollipop and up
+        screenCaptureMenuItem.setVisible(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP);
+
         return true;
     }
 
@@ -162,6 +192,20 @@ public class RoomActivity extends AppCompatActivity {
             case R.id.switch_camera_menu_item:
                 switchCamera();
                 return true;
+            case R.id.share_screen_menu_item:
+                String shareScreen = getString(R.string.share_screen);
+
+                if (item.getTitle().equals(shareScreen)) {
+                    if (screenCapturer == null) {
+                        requestScreenCapturePermission();
+                    } else {
+                        startScreenCapture();
+                    }
+                } else {
+                    stopScreenCapture();
+                }
+
+                return true;
             case R.id.pause_audio_menu_item:
                 toggleLocalAudioTrackState();
                 return true;
@@ -169,47 +213,29 @@ public class RoomActivity extends AppCompatActivity {
                 toggleLocalVideoTrackState();
                 return true;
             case R.id.settings_menu_item:
+                // TODO: Implement settings
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
     }
 
-    private void processActivityIntent(Bundle savedInstanceState) {
-        if (savedInstanceState != null) {
-            Timber.d("Restoring client activity state");
-            username = savedInstanceState.getString(SimpleSignalingUtils.USERNAME);
-            capabilityToken = savedInstanceState.getString(SimpleSignalingUtils.CAPABILITY_TOKEN);
-            realm = savedInstanceState.getString(SimpleSignalingUtils.REALM);
-            roomName = savedInstanceState.getString(SimpleSignalingUtils.ROOM_NAME);
-        } else {
-            Bundle extras = getIntent().getExtras();
-            username = extras.getString(SimpleSignalingUtils.USERNAME);
-            capabilityToken = extras.getString(SimpleSignalingUtils.CAPABILITY_TOKEN);
-            realm = extras.getString(SimpleSignalingUtils.REALM);
-            roomName = extras.getString(SimpleSignalingUtils.ROOM_NAME);
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == REQUEST_MEDIA_PROJECTION) {
+            if (resultCode != Activity.RESULT_OK) {
+                Toast.makeText(this, R.string.screen_capture_permission_not_granted,
+                        Toast.LENGTH_LONG).show();
+
+                return;
+            }
+            screenCapturer = new ScreenCapturer(this, resultCode, data, screenCapturerListener);
+            startScreenCapture();
         }
     }
 
-    private void createVideoClient() {
-        accessManager = AccessManagerHelper.createAccessManager(this, capabilityToken);
-        videoClient = new VideoClient(this, accessManager);
-    }
-
-    private void connectToRoom(String roomName) {
-        roomStatusTextview.setText("Connecting to room "+roomName);
-        this.roomName = roomName;
-        ConnectOptions connectOptions = new ConnectOptions.Builder()
-                .roomName(roomName)
-                .localMedia(localMedia)
-                .build();
-
-        room = videoClient.connect(connectOptions, roomListener());
-        updateUI(RoomState.CONNECTING);
-    }
-
     @OnClick(R.id.connect_image_button)
-    public void connect(View view) {
+    void connect() {
         if (room != null) {
             Timber.i("Exiting room");
             room.disconnect();
@@ -223,39 +249,15 @@ public class RoomActivity extends AppCompatActivity {
         }
     }
 
-    private void logout() {
-        // Will continue logout once the conversation has ended
-        loggingOut = true;
-        // End any current call
-        if (room != null && room.getState() != RoomState.DISCONNECTED) {
-            room.disconnect();
-        } else {
-            returnToVideoClientLogin();
-        }
-    }
-
-    private void switchCamera() {
-        if (cameraCapturer != null) {
-            cameraCapturer.switchCamera();
-            localVideoView.setMirror(
-                    cameraCapturer.getCameraSource() == CameraCapturer.CameraSource.FRONT_CAMERA);
-        }
-    }
-
-    private void toggleLocalAudioTrackState() {
-        if (localAudioTrack != null) {
-            boolean enable = !localAudioTrack.isEnabled();
-            localAudioTrack.enable(enable);
-            invalidateOptionsMenu();
-        }
-    }
-
     @OnClick(R.id.local_audio_image_button)
-    public void toggleLocalAudio(View view) {
+    void toggleLocalAudio() {
         int icon = 0;
         if (localAudioTrack == null) {
             localAudioTrack = localMedia.addAudioTrack(true);
             icon = R.drawable.ic_mic_white_24px;
+            pauseAudioMenuItem.setVisible(true);
+            pauseAudioMenuItem.setTitle(localAudioTrack.isEnabled() ?
+                    R.string.pause_audio : R.string.resume_audio);
         } else {
             if (!localMedia.removeAudioTrack(localAudioTrack)) {
                 Snackbar.make(roomStatusTextview,
@@ -264,74 +266,152 @@ public class RoomActivity extends AppCompatActivity {
             }
             localAudioTrack = null;
             icon = R.drawable.ic_mic_off_gray_24px;
+            pauseAudioMenuItem.setVisible(false);
         }
         localAudioImageButton.setImageDrawable(ContextCompat.getDrawable(RoomActivity.this, icon));
-        invalidateOptionsMenu();
-    }
-
-    public void toggleLocalVideoTrackState() {
-        if (localVideoTrack != null) {
-            boolean enable = !localVideoTrack.isEnabled();
-            localVideoTrack.enable(enable);
-            invalidateOptionsMenu();
-        }
     }
 
     @OnClick(R.id.local_video_image_button)
-    public void toggleLocalVideo(View view) {
+    void toggleLocalVideo() {
         int icon = 0;
-        if (localVideoTrack == null) {
-            localVideoTrack = localMedia.addVideoTrack(true, cameraCapturer);
-            if (room != null && !videoViewMap.isEmpty()) {
-                localVideoView = createVideoView();
-                localVideoView.setMirror(
-                        cameraCapturer.getCameraSource() == CameraCapturer.CameraSource.FRONT_CAMERA);
-                localVideoTrack.addRenderer(localVideoView);
-                thumbnailLinearLayout.addView(localVideoView);
-                thumbnailLinearLayout.setVisibility(View.VISIBLE);
+        if (cameraVideoTrack == null) {
+            // Add back local video from camera capturer
+            Timber.d("Adding local video");
+            cameraVideoTrack = localMedia.addVideoTrack(true, cameraCapturer);
+
+            // If participants have video tracks we render in thumbnial
+            if (room != null && !videoTrackVideoViewBiMap.isEmpty()) {
+                Timber.d("Participant video tracks are being rendered. Rendering local video in " +
+                        "thumbnail");
+                localThumbnailVideoView.setMirror(cameraCapturer.getCameraSource() ==
+                        CameraCapturer.CameraSource.FRONT_CAMERA);
+                cameraVideoTrack.addRenderer(localThumbnailVideoView);
             } else {
-                // Set as primary video view
-                localVideoView = primaryVideoView;
-                localVideoTrack.addRenderer(primaryVideoView);
+                // No remote tracks are being rendered so we render in primary view
+                Timber.d("No remote video is being rendered. Rendering local video in primary " +
+                        "view");
+                primaryVideoView.setVisibility(View.VISIBLE);
+                cameraVideoTrack.addRenderer(primaryVideoView);
             }
+            // Set and icon and menu items
             icon = R.drawable.ic_videocam_white_24px;
+            switchCameraMenuItem.setVisible(cameraVideoTrack.isEnabled());
+            pauseVideoMenuItem.setTitle(cameraVideoTrack.isEnabled() ?
+                    R.string.pause_video : R.string.resume_video);
+            pauseVideoMenuItem.setVisible(true);
         } else {
-            if (localVideoView == primaryVideoView) {
-                clearPrimaryView();
+            Timber.d("Removing local video");
+            if (primaryVideoTrack == null) {
+                // TODO: Add UI for no video state in primary view
+                primaryVideoView.setVisibility(View.GONE);
             } else {
-                thumbnailLinearLayout.removeView(localVideoView);
-                if (videoViewMap.isEmpty()) {
-                    thumbnailLinearLayout.setVisibility(View.GONE);
-                }
+                // TODO: Add UI for no video in thumbnail view
+                localThumbnailVideoView.setVisibility(View.GONE);
             }
-            localVideoTrack.removeRenderer(localVideoView);
-            if (!localMedia.removeVideoTrack(localVideoTrack)) {
+
+            // Remove renderer and track
+            cameraVideoTrack.removeRenderer(localThumbnailVideoView);
+            if (!localMedia.removeVideoTrack(cameraVideoTrack)) {
                 Snackbar.make(roomStatusTextview,
                         "Video track remove action failed",
                         Snackbar.LENGTH_LONG).setAction("Action", null).show();
             }
-            localVideoTrack = null;
-            localVideoView = null;
+
+            // Cleanup and set menu items accordingly
+            cameraVideoTrack = null;
             icon = R.drawable.ic_videocam_off_gray_24px;
+            switchCameraMenuItem.setVisible(false);
+            pauseVideoMenuItem.setVisible(false);
         }
-        localVideoImageButton.setImageDrawable(
-                ContextCompat.getDrawable(RoomActivity.this, icon));
-        invalidateOptionsMenu();
+        localVideoImageButton.setImageDrawable(ContextCompat.getDrawable(RoomActivity.this, icon));
     }
 
-    private void updateUI(RoomState roomState) {
+    private void processActivityIntent(Bundle extras) {
+        username = extras.getString(SimpleSignalingUtils.USERNAME);
+        capabilityToken = extras.getString(SimpleSignalingUtils.CAPABILITY_TOKEN);
+        realm = extras.getString(SimpleSignalingUtils.REALM);
+    }
+
+    private void updateUi(RoomState roomState) {
         int joinIcon = 0;
         if (roomState == RoomState.CONNECTING) {
             joinIcon = R.drawable.ic_call_end_white_24px;
         } else if (roomState == RoomState.CONNECTED) {
             getSupportActionBar().setTitle(room.getName());
             joinIcon = R.drawable.ic_call_end_white_24px;
-        } else { // disconnected
+        } else {
             getSupportActionBar().setTitle(username);
             joinIcon = R.drawable.ic_add_circle_white_24px;
         }
         connectImageButton.setImageDrawable(
                 ContextCompat.getDrawable(RoomActivity.this, joinIcon));
+    }
+
+    private void logout() {
+        // Will logout after disconnecting from the room
+        loggingOut = true;
+        // Disconnect from the current room
+        if (room != null && room.getState() != RoomState.DISCONNECTED) {
+            room.disconnect();
+        } else {
+            returnToVideoClientLogin();
+        }
+    }
+
+    private void returnToVideoClientLogin(){
+        Intent registrationIntent = new Intent(RoomActivity.this, LoginActivity.class);
+        startActivity(registrationIntent);
+        finish();
+    }
+
+    private void switchCamera() {
+        if (cameraCapturer != null) {
+            Timber.d("Switching camera");
+            cameraCapturer.switchCamera();
+            localThumbnailVideoView.setMirror(cameraCapturer.getCameraSource() ==
+                    CameraCapturer.CameraSource.FRONT_CAMERA);
+        }
+    }
+
+    @TargetApi(21)
+    private void requestScreenCapturePermission() {
+        Timber.d("Requesting permission to capture screen");
+        MediaProjectionManager mediaProjectionManager = (MediaProjectionManager)
+                getSystemService(Context.MEDIA_PROJECTION_SERVICE);
+
+        // This initiates a prompt dialog for the user to confirm screen projection.
+        startActivityForResult(mediaProjectionManager.createScreenCaptureIntent(),
+                REQUEST_MEDIA_PROJECTION);
+    }
+
+    private void startScreenCapture() {
+        screenVideoTrack = localMedia.addVideoTrack(true, screenCapturer);
+        screenCaptureMenuItem.setIcon(R.drawable.ic_stop_screen_share_white_24dp);
+        screenCaptureMenuItem.setTitle(R.string.stop_screen_share);
+    }
+
+    private void stopScreenCapture() {
+        localMedia.removeVideoTrack(screenVideoTrack);
+        screenCaptureMenuItem.setIcon(R.drawable.ic_screen_share_white_24dp);
+        screenCaptureMenuItem.setTitle(R.string.share_screen);
+    }
+
+    private void toggleLocalAudioTrackState() {
+        if (localAudioTrack != null) {
+            boolean enable = !localAudioTrack.isEnabled();
+            localAudioTrack.enable(enable);
+            pauseAudioMenuItem.setTitle(localAudioTrack.isEnabled() ?
+                    R.string.pause_audio : R.string.resume_audio);
+        }
+    }
+
+    private void toggleLocalVideoTrackState() {
+        if (cameraVideoTrack != null) {
+            boolean enable = !cameraVideoTrack.isEnabled();
+            cameraVideoTrack.enable(enable);
+            pauseVideoMenuItem.setTitle(cameraVideoTrack.isEnabled() ?
+                    R.string.pause_video : R.string.resume_video);
+        }
     }
 
     private DialogInterface.OnClickListener connectClickListener(final EditText connectEditText) {
@@ -353,129 +433,175 @@ public class RoomActivity extends AppCompatActivity {
         };
     }
 
-    private void returnToVideoClientLogin(){
-        Intent registrationIntent = new Intent(RoomActivity.this, LoginActivity.class);
-        startActivity(registrationIntent);
-        finish();
+    private void connectToRoom(String roomName) {
+        roomStatusTextview.setText("Connecting to room " + roomName);
+        this.roomName = roomName;
+        ConnectOptions connectOptions = new ConnectOptions.Builder()
+                .roomName(roomName)
+                .localMedia(localMedia)
+                .build();
+
+        room = videoClient.connect(connectOptions, roomListener());
+        updateUi(RoomState.CONNECTING);
     }
 
-    private VideoView createVideoView() {
-        VideoView videoView = new VideoView(this);
-        videoView.setMirror(true);
-        videoView.applyZOrder(true);
-        return videoView;
-    }
-
-    private void clearPrimaryView() {
-        // Replace the primary view to clear the contents of the last rendered frame in the view
-        frameLayout.removeView(primaryVideoView);
-        primaryVideoView = new VideoView(this);
-        primaryVideoView.setMirror(
-                cameraCapturer.getCameraSource() == CameraCapturer.CameraSource.FRONT_CAMERA);
-        frameLayout.addView(primaryVideoView);
-        primaryVideoView.requestLayout();
-    }
-
-    private synchronized void addParticipant(Participant participant) {
-        if (videoViewMap.size() > 3) {
-            Toast.makeText(this, "Do not support more then 3 participants", Toast.LENGTH_LONG)
-                    .show();
-            return;
-        }
-        roomStatusTextview.setText("Participant "+participant.getIdentity()+ " joined");
-        VideoView videoView;
-        if (videoViewMap.isEmpty()) {
-            /*
-             * Move the local renderer from the main view to a thumbnail and
-             * set the participant renderer to the main view
-             */
-            if (localVideoTrack != null) {
-                localVideoTrack.removeRenderer(primaryVideoView);
-                localVideoView = createVideoView();
-                localVideoView.setMirror(
-                        cameraCapturer.getCameraSource() == CameraCapturer.CameraSource.FRONT_CAMERA);
-                localVideoTrack.addRenderer(localVideoView);
-                // Reset the contents of the primary view since they were occupied by the local renderer
-                clearPrimaryView();
-                thumbnailLinearLayout.addView(localVideoView);
-                thumbnailLinearLayout.setVisibility(View.VISIBLE);
-            }
-            primaryVideoView.setMirror(false);
-            videoView = primaryVideoView;
-        } else {
-            videoView = createVideoView();
-            thumbnailLinearLayout.addView(videoView);
-        }
-        videoViewMap.put(participant, videoView);
+    private void addParticipant(Participant participant) {
+        // Set listener
         participant.getMedia().setListener(new ParticipantMediaListener(participant));
+
+        // Render each participant video track
+        for (VideoTrack videoTrack : participant.getMedia().getVideoTracks()) {
+            VideoView videoView = addParticipantVideo(videoTrack);
+
+            // Maintain a relationship between a participant and its main rendered videos
+            participantVideoViewMultimap.put(participant, videoView);
+        }
     }
 
-    private synchronized void removeAllParticipants() {
-        thumbnailLinearLayout.removeAllViews();
-        thumbnailLinearLayout.setVisibility(View.GONE);
-        videoViewMap.clear();
-        if(localVideoTrack != null) {
-            // set local view as primary view
-            localVideoTrack.removeRenderer(localVideoView);
-            localVideoTrack.addRenderer(primaryVideoView);
-            localVideoView = primaryVideoView;
-            localVideoView.setMirror(
-                    cameraCapturer.getCameraSource() == CameraCapturer.CameraSource.FRONT_CAMERA);
+    private VideoView addParticipantVideo(VideoTrack videoTrack) {
+        if (primaryVideoTrack == null) {
+            Timber.d("Rendering participant video in primary view");
+            moveLocalVideoToThumbnail();
+            primaryVideoView.setMirror(false);
+            primaryVideoView.setVisibility(View.VISIBLE);
+            videoTrack.addRenderer(primaryVideoView);
+            videoTrackVideoViewBiMap.put(videoTrack, primaryVideoView);
+            primaryVideoTrack = videoTrack;
+
+            return primaryVideoView;
         } else {
-            clearPrimaryView();
+            Timber.d("Rendering participant video in thumbnail view");
+            VideoView videoView = new VideoView(this);
+            videoView.setMirror(false);
+            videoView.applyZOrder(true);
+            thumbnailLinearLayout.addView(videoView);
+            videoView.getLayoutParams().width = (int)
+                    TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
+                            THUMBNAIL_DIMENSION, getResources().getDisplayMetrics());
+            videoView.getLayoutParams().height = (int)
+                    TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
+                            THUMBNAIL_DIMENSION, getResources().getDisplayMetrics());
+            videoTrack.addRenderer(videoView);
+            videoTrackVideoViewBiMap.put(videoTrack, videoView);
+            videoView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Timber.d("Swapping clicked video with primary view");
+                    VideoView clickedVideoView = (VideoView) v;
+                    VideoTrack clickedVideoTrack = videoTrackVideoViewBiMap
+                            .inverse().get(clickedVideoView);
+
+                    // Swap track renderers
+                    clickedVideoTrack.removeRenderer(clickedVideoView);
+                    primaryVideoTrack.removeRenderer(primaryVideoView);
+                    clickedVideoTrack.addRenderer(primaryVideoView);
+                    primaryVideoTrack.addRenderer(clickedVideoView);
+
+                    // Update bimap
+                    videoTrackVideoViewBiMap.forcePut(clickedVideoTrack, primaryVideoView);
+                    videoTrackVideoViewBiMap.forcePut(primaryVideoTrack, clickedVideoView);
+
+                    // Swap references
+                    primaryVideoTrack = clickedVideoTrack;
+                }
+            });
+
+            return videoView;
         }
     }
 
-    private synchronized void removeParticipant(Participant participant) {
-        roomStatusTextview.setText("Participant "+participant.getIdentity()+ " left.");
-        VideoView videoView = videoViewMap.remove(participant);
-        if (videoView == null) {
-            // TODO: handle error
-            return;
+    private void removeAllParticipants() {
+        Timber.d("Cleaning out all participants");
+        thumbnailLinearLayout.removeAllViews();
+        videoTrackVideoViewBiMap.clear();
+        participantVideoViewMultimap.clear();
+        primaryVideoTrack = null;
+        moveLocalVideoToPrimary();
+    }
+
+    private void removeParticipant(Participant participant) {
+        roomStatusTextview.setText("Participant " + participant.getIdentity() + " left.");
+        for (VideoView videoView : participantVideoViewMultimap.removeAll(participant)) {
+            VideoTrack videoTrack = videoTrackVideoViewBiMap.inverse().get(videoView);
+            if (videoTrack != null) {
+                removeParticipantVideo(videoTrackVideoViewBiMap.inverse().get(videoView));
+            }
         }
-        List<VideoTrack> participantVideoTracks = participant.getMedia().getVideoTracks();
-        if (!participantVideoTracks.isEmpty()) {
-            participantVideoTracks.get(0).removeRenderer(videoView);
-        }
-        if (videoView == primaryVideoView) {
-            if (videoViewMap.size() != 0) {
-                // Pick next view from thumbnail layout
-                Map.Entry<Participant, VideoView> entry = videoViewMap.entrySet().iterator().next();
-                thumbnailLinearLayout.removeView(entry.getValue());
-                Participant nextParticipant = entry.getKey();
-                participantVideoTracks = nextParticipant.getMedia().getVideoTracks();
-                if (!participantVideoTracks.isEmpty()) {
-                    participantVideoTracks.get(0).removeRenderer(entry.getValue());
-                    participantVideoTracks.get(0).addRenderer(primaryVideoView);
-                }
-                videoViewMap.put(nextParticipant, primaryVideoView);
+    }
+
+    private void removeParticipantVideo(VideoTrack videoTrack) {
+        if (videoTrack == primaryVideoTrack) {
+            Timber.d("Removing participant video from primary view");
+            primaryVideoTrack.removeRenderer(primaryVideoView);
+            videoTrackVideoViewBiMap.remove(videoTrack);
+            ViewGroup remoteVideoThumbnails = thumbnailLinearLayout;
+            VideoView videoView = (VideoView) remoteVideoThumbnails.getChildAt(0);
+
+            if (videoView != null) {
+                Timber.d("Moving first remote thumbnail to primary view");
+                VideoTrack newPrimaryTrack = videoTrackVideoViewBiMap.inverse().get(videoView);
+                newPrimaryTrack.removeRenderer(videoView);
+                newPrimaryTrack.addRenderer(primaryVideoView);
+                videoTrackVideoViewBiMap.forcePut(newPrimaryTrack, primaryVideoView);
+                primaryVideoTrack = newPrimaryTrack;
+                remoteVideoThumbnails.removeView(videoView);
             } else {
-                if (localVideoTrack != null) {
-                    // set local view as primary view
-                    localVideoTrack.removeRenderer(localVideoView);
-                    primaryVideoView.setMirror(true);
-                    localVideoTrack.addRenderer(primaryVideoView);
-                    localVideoView = primaryVideoView;
-                }
-                thumbnailLinearLayout.setVisibility(View.GONE);
+                Timber.d("No remote thumbnail found.");
+                moveLocalVideoToPrimary();
+                primaryVideoTrack = null;
             }
         } else {
+            Timber.d("Removing participant video from thumbnail");
+            VideoView videoView = videoTrackVideoViewBiMap.remove(videoTrack);
             thumbnailLinearLayout.removeView(videoView);
         }
-        if (videoViewMap.isEmpty()) {
-            thumbnailLinearLayout.removeAllViews();
-            thumbnailLinearLayout.setVisibility(View.GONE);
+    }
+
+    private void moveLocalVideoToThumbnail() {
+
+        if (cameraVideoTrack != null) {
+            boolean renderingToThumbnail = cameraVideoTrack.getRenderers().get(0) ==
+                    localThumbnailVideoView;
+            if (!renderingToThumbnail) {
+                Timber.d("Moving camera video to thumbnail");
+                cameraVideoTrack.removeRenderer(primaryVideoView);
+                localThumbnailVideoView.setMirror(cameraCapturer.getCameraSource() ==
+                        CameraCapturer.CameraSource.FRONT_CAMERA);
+                videoThumbnailRelativeLayout.setVisibility(View.VISIBLE);
+                localThumbnailVideoView.setVisibility(View.VISIBLE);
+                cameraVideoTrack.addRenderer(localThumbnailVideoView);
+            }
+        } else {
+            // TODO: Create thumbnail with name and icon in place of video
         }
+    }
+
+    private void moveLocalVideoToPrimary() {
+        if(cameraVideoTrack != null) {
+            boolean renderingToPrimary = cameraVideoTrack.getRenderers().get(0) == primaryVideoView;
+            if (!renderingToPrimary) {
+                Timber.d("Moving camera video to primary view");
+                cameraVideoTrack.removeRenderer(localThumbnailVideoView);
+                primaryVideoView.setVisibility(View.VISIBLE);
+                cameraVideoTrack.addRenderer(primaryVideoView);
+                primaryVideoView.setMirror(cameraCapturer.getCameraSource() ==
+                        CameraCapturer.CameraSource.FRONT_CAMERA);
+            }
+        } else {
+            // TODO: Show icon and name in place of video
+            primaryVideoView.setVisibility(View.GONE);
+        }
+        localThumbnailVideoView.setVisibility(View.GONE);
     }
 
     private Room.Listener roomListener() {
         return new Room.Listener() {
             @Override
             public void onConnected(Room room) {
-                Timber.i("onConnected: "+room.getName() + " sid:"+
-                        room.getSid()+" state:"+room.getState());
-                roomStatusTextview.setText("Connected to "+room.getName());
-                updateUI(RoomState.CONNECTED);
+                Timber.i("onConnected: " + room.getName() + " sid:" +
+                        room.getSid() + " state:" + room.getState());
+                roomStatusTextview.setText("Connected to " + room.getName());
+                updateUi(RoomState.CONNECTED);
 
                 for (Map.Entry<String, Participant> entry : room.getParticipants().entrySet()) {
                     addParticipant(entry.getValue());
@@ -485,17 +611,17 @@ public class RoomActivity extends AppCompatActivity {
             @Override
             public void onConnectFailure(Room room, VideoException error) {
                 Timber.i("onConnectFailure");
-                roomStatusTextview.setText("Failed to connect to "+roomName);
+                roomStatusTextview.setText("Failed to connect to " + roomName);
                 RoomActivity.this.room = null;
-                updateUI(RoomState.DISCONNECTED);
+                updateUi(RoomState.DISCONNECTED);
             }
 
             @Override
             public void onDisconnected(Room room, VideoException error) {
                 Timber.i("onDisconnected");
-                roomStatusTextview.setText("Disconnected from "+roomName);
+                roomStatusTextview.setText("Disconnected from " + roomName);
                 removeAllParticipants();
-                updateUI(RoomState.DISCONNECTED);
+                updateUi(RoomState.DISCONNECTED);
                 RoomActivity.this.room = null;
                 if (loggingOut) {
                     returnToVideoClientLogin();
@@ -504,20 +630,20 @@ public class RoomActivity extends AppCompatActivity {
 
             @Override
             public void onParticipantConnected(Room room, Participant participant) {
-                Timber.i("onParticipantConnected: "+participant.getIdentity());
+                Timber.i("onParticipantConnected: " + participant.getIdentity());
                 addParticipant(participant);
             }
 
             @Override
             public void onParticipantDisconnected(Room room, Participant participant) {
-                Timber.i("onParticipantDisconnected "+participant.getIdentity());
+                Timber.i("onParticipantDisconnected " + participant.getIdentity());
                 removeParticipant(participant);
             }
         };
     }
 
     private class ParticipantMediaListener implements Media.Listener {
-        private Participant participant;
+        private final Participant participant;
 
         ParticipantMediaListener(Participant participant) {
             this.participant = participant;
@@ -537,14 +663,13 @@ public class RoomActivity extends AppCompatActivity {
         @Override
         public void onVideoTrackAdded(Media media, VideoTrack videoTrack) {
             Timber.i(participant.getIdentity() + ": onVideoTrackAdded");
-            VideoView videoView = videoViewMap.get(participant);
-            videoTrack.addRenderer(videoView);
+            participantVideoViewMultimap.put(participant, addParticipantVideo(videoTrack));
         }
 
         @Override
         public void onVideoTrackRemoved(Media media, VideoTrack videoTrack) {
             Timber.i(participant.getIdentity() + ": onVideoTrackRemoved");
-            videoTrack.removeRenderer(videoViewMap.get(participant));
+            removeParticipantVideo(videoTrack);
         }
 
         @Override
