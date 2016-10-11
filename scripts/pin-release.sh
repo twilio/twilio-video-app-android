@@ -41,14 +41,14 @@ LATEST_URL="https://media.twiliocdn.com/sdk/android/${PRODUCT_NAME}/latest/twili
 curl $DIRECT_URL --output ${SCRIPTS_DIR}/downloads/twilio-${PRODUCT_NAME}-direct.aar
 
 echo "sdk-release-tool: updating..."
-./sdk-release-tool pin --prod twilio-${PRODUCT_NAME}-android ${SDK_RELEASE_VERSION}
+./sdk-release-tool pin -f --prod twilio-${PRODUCT_NAME}-android ${SDK_RELEASE_VERSION}
 if [ "$?" -ne "0" ]; then
     echo "Error: failed to execute sdk-release-tool update"
     exit 1
 fi
 
 echo "sdk-release-tool: pin latest..."
-./sdk-release-tool pin-latest --prod twilio-${PRODUCT_NAME}-android ${SDK_RELEASE_VERSION}
+./sdk-release-tool pin-latest -f --prod twilio-${PRODUCT_NAME}-android ${SDK_RELEASE_VERSION}
 if [ "$?" -ne "0" ]; then
     echo "Error: failed to execute sdk-release-tool pin latest"
     exit 1
