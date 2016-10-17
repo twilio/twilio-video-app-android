@@ -5,9 +5,8 @@ import android.support.test.InstrumentationRegistry;
 import android.support.test.filters.LargeTest;
 import android.support.test.runner.AndroidJUnit4;
 
-import com.twilio.common.AccessManager;
 import com.twilio.video.helper.CallbackHelper;
-import com.twilio.video.util.AccessManagerUtils;
+import com.twilio.video.util.AccessTokenUtils;
 import com.twilio.video.util.FakeVideoCapturer;
 import com.twilio.video.util.RandUtils;
 
@@ -19,7 +18,6 @@ import org.junit.runner.RunWith;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
-import static junit.framework.Assert.assertFalse;
 import static junit.framework.Assert.assertNull;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -29,7 +27,8 @@ import static org.junit.Assert.assertTrue;
 @LargeTest
 public class RoomTest {
     private Context context;
-    private AccessManager accessManager;
+    private String identity;
+    private String token;
     private VideoClient videoClient;
     private String roomName;
     private LocalMedia localMedia;
@@ -37,9 +36,9 @@ public class RoomTest {
     @Before
     public void setup() throws InterruptedException {
         context = InstrumentationRegistry.getInstrumentation().getTargetContext();
-        accessManager = AccessManagerUtils.obtainAccessManager(context,
-                RandUtils.generateRandomString(10));
-        videoClient = new VideoClient(context, accessManager);
+        identity = RandUtils.generateRandomString(10);
+        token = AccessTokenUtils.getAccessToken(identity);
+        videoClient = new VideoClient(context, token);
         roomName = RandUtils.generateRandomString(20);
         localMedia = LocalMedia.create(context);
     }
@@ -64,7 +63,7 @@ public class RoomTest {
 
         LocalParticipant localParticipant = room.getLocalParticipant();
         assertNotNull(localParticipant);
-        assertEquals(accessManager.getIdentity(), localParticipant.getIdentity());
+        assertEquals(identity, localParticipant.getIdentity());
         assertEquals(localMedia, localParticipant.getLocalMedia());
         assertNotNull(localParticipant.getSid());
         assertTrue(!localParticipant.getSid().isEmpty());

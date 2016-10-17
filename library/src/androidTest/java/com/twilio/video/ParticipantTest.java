@@ -5,9 +5,8 @@ import android.support.test.InstrumentationRegistry;
 import android.support.test.filters.LargeTest;
 import android.support.test.runner.AndroidJUnit4;
 
-import com.twilio.common.AccessManager;
 import com.twilio.video.helper.CallbackHelper;
-import com.twilio.video.util.AccessManagerUtils;
+import com.twilio.video.util.AccessTokenUtils;
 import com.twilio.video.util.RandUtils;
 
 import org.junit.After;
@@ -28,8 +27,8 @@ import static org.junit.Assert.assertTrue;
 @LargeTest
 public class ParticipantTest {
     private Context context;
-    private AccessManager accessManager;
-    private AccessManager accessManager2;
+    private String tokenOne;
+    private String tokenTwo;
     private VideoClient videoClient;
     private VideoClient videoClient2;
     private String roomName;
@@ -38,12 +37,10 @@ public class ParticipantTest {
     @Before
     public void setup() throws InterruptedException {
         context = InstrumentationRegistry.getInstrumentation().getTargetContext();
-        accessManager = AccessManagerUtils.obtainAccessManager(context,
-                RandUtils.generateRandomString(10));
-        accessManager2 = AccessManagerUtils.obtainAccessManager(context,
-                RandUtils.generateRandomString(10));
-        videoClient = new VideoClient(context, accessManager);
-        videoClient2 = new VideoClient(context, accessManager2);
+        tokenOne = AccessTokenUtils.getAccessToken(RandUtils.generateRandomString(10));
+        tokenTwo = AccessTokenUtils.getAccessToken(RandUtils.generateRandomString(10));
+        videoClient = new VideoClient(context, tokenOne);
+        videoClient2 = new VideoClient(context, tokenTwo);
         roomName = RandUtils.generateRandomString(20);
         localMedia = LocalMedia.create(context);
     }

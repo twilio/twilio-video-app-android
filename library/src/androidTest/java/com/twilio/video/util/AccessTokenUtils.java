@@ -1,4 +1,4 @@
-package com.twilio.video.provider;
+package com.twilio.video.util;
 
 import android.util.Base64;
 
@@ -11,15 +11,16 @@ import retrofit.RestAdapter;
 import retrofit.http.GET;
 import retrofit.http.QueryMap;
 
-public class AccessTokenProvider {
-    //The default is usually 30 minutes.
-    public static final String TTL = "3000";
+public class AccessTokenUtils {
+    private static final String TTL = "3000";
 
     // Define the Retrofit Token Service
     interface TokenService {
         @GET("/access-token")
         void obtainTwilioCapabilityToken(@QueryMap Map<String, String> options,
                                          Callback<String> tokenCallback);
+        @GET("/access-token")
+        String obtainTwilioCapabilityToken(@QueryMap Map<String, String> options);
     }
 
     private static class TwilioAuthorizationInterceptor implements RequestInterceptor {
@@ -38,16 +39,24 @@ public class AccessTokenProvider {
     }
 
     private static TokenService tokenService = new RestAdapter.Builder()
-            .setEndpoint("https://simple-signaling.appspot.com")
+            .setEndpoint("https://simpler-signaling.appspot.com")
             .setRequestInterceptor(new TwilioAuthorizationInterceptor())
             .build()
             .create(TokenService.class);
 
-    public static void obtainTwilioCapabilityToken(String username, Callback<String> callback) {
+    public static void getAccessToken(String username, Callback<String> callback) {
         HashMap<String,String> options = new HashMap<>();
-        options.put("realm", "prod");
+        options.put("environment", "prod");
         options.put("identity", username);
         options.put("ttl", TTL);
         tokenService.obtainTwilioCapabilityToken(options, callback);
+    }
+
+    public static String getAccessToken(String username) {
+        HashMap<String,String> options = new HashMap<>();
+        options.put("environment", "prod");
+        options.put("identity", username);
+        options.put("ttl", TTL);
+        return tokenService.obtainTwilioCapabilityToken(options);
     }
 }

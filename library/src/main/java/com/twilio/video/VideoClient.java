@@ -12,7 +12,6 @@ import android.os.Handler;
 import android.util.Log;
 
 import com.getkeepsafe.relinker.ReLinker;
-import com.twilio.common.AccessManager;
 
 import com.twilio.video.BuildConfig;
 
@@ -34,7 +33,6 @@ public class VideoClient {
 
     private final Handler handler;
     private final Context applicationContext;
-    private final AccessManager accessManager;
     private final Set<Room> rooms = new HashSet<>();
     private final BroadcastReceiver connectivityChangeReceiver = new BroadcastReceiver() {
         @Override
@@ -56,18 +54,19 @@ public class VideoClient {
             }
         }
     };
+    private String token;
     private long nativeClientContext;
 
-    public VideoClient(Context context, AccessManager accessManager) {
+    public VideoClient(Context context, String token) {
         if (context == null) {
             throw new NullPointerException("applicationContext must not be null");
         }
-        if (accessManager == null) {
+        if (token == null) {
             throw new NullPointerException("accessManager must not be null");
         }
 
         this.applicationContext = context.getApplicationContext();
-        this.accessManager = accessManager;
+        this.token = token;
         this.handler = Util.createCallbackHandler();
 
         if (!libraryIsLoaded) {
@@ -151,7 +150,7 @@ public class VideoClient {
 
         if(rooms.isEmpty()) {
             nativeClientContext = nativeCreateClient(applicationContext,
-                    accessManager,
+                    token,
                     MediaFactory.instance(applicationContext).getNativeMediaFactoryHandle());
 
             // Register for connectivity events
@@ -351,7 +350,7 @@ public class VideoClient {
     private native static void nativeSetModuleLevel(int module, int level);
     private native static int nativeGetCoreLogLevel();
     private native long nativeCreateClient(Context context,
-                                           AccessManager accessManager,
+                                           String token,
                                            long nativeMediaFactoryHandle);
     private native long nativeConnect(long nativeClientDataHandler,
                                       long nativeRoomListenerHandle,

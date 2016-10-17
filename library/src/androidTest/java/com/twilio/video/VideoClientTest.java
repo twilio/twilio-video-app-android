@@ -5,9 +5,8 @@ import android.support.test.InstrumentationRegistry;
 import android.support.test.filters.LargeTest;
 import android.support.test.runner.AndroidJUnit4;
 
-import com.twilio.common.AccessManager;
 import com.twilio.video.helper.CallbackHelper;
-import com.twilio.video.util.AccessManagerUtils;
+import com.twilio.video.util.AccessTokenUtils;
 import com.twilio.video.util.FakeVideoCapturer;
 import com.twilio.video.util.RandUtils;
 
@@ -27,7 +26,7 @@ import static org.junit.Assert.assertTrue;
 @LargeTest
 public class VideoClientTest {
     private Context context;
-    private AccessManager accessManager;
+    private String token;
     private VideoClient videoClient;
     private String roomName;
     private LocalMedia localMedia;
@@ -35,9 +34,8 @@ public class VideoClientTest {
     @Before
     public void setup() throws InterruptedException {
         context = InstrumentationRegistry.getInstrumentation().getTargetContext();
-        accessManager = AccessManagerUtils.obtainAccessManager(context,
-                RandUtils.generateRandomString(10));
-        videoClient = new VideoClient(context, accessManager);
+        token = AccessTokenUtils.getAccessToken(RandUtils.generateRandomString(10));
+        videoClient = new VideoClient(context, token);
         roomName = RandUtils.generateRandomString(20);
         localMedia = LocalMedia.create(context);
     }
@@ -45,16 +43,15 @@ public class VideoClientTest {
     @After
     public void teardown() {
         localMedia.release();
-        accessManager.dispose();
     }
 
     @Test(expected = NullPointerException.class)
     public void client_shouldThrowExceptionWhenContextIsNull() {
-        new VideoClient(null, accessManager);
+        new VideoClient(null, token);
     }
 
     @Test(expected = NullPointerException.class)
-    public void client_shouldThrowExceptionWhenAccessManagerIsNull() {
+    public void client_shouldThrowExceptionWhenTokenIsNull() {
         new VideoClient(context, null);
     }
 
@@ -76,14 +73,14 @@ public class VideoClientTest {
 
     @Test
     public void audioOutput_shouldBeRetained() {
-        VideoClient videoClient = new VideoClient(context, accessManager);
+        VideoClient videoClient = new VideoClient(context, token);
         videoClient.setAudioOutput(AudioOutput.SPEAKERPHONE);
         assertEquals(AudioOutput.SPEAKERPHONE, videoClient.getAudioOutput());
     }
 
     @Test(expected = NullPointerException.class)
     public void connect_shouldThrowExceptionWhenRoomListenerIsNull() {
-        VideoClient videoClient = new VideoClient(context, accessManager);
+        VideoClient videoClient = new VideoClient(context, token);
         videoClient.connect(null);
     }
 

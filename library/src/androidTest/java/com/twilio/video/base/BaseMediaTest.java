@@ -5,7 +5,6 @@ import android.content.Context;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.rule.ActivityTestRule;
 
-import com.twilio.common.AccessManager;
 import com.twilio.video.ConnectOptions;
 import com.twilio.video.LocalMedia;
 import com.twilio.video.Participant;
@@ -14,7 +13,7 @@ import com.twilio.video.RoomState;
 import com.twilio.video.VideoClient;
 import com.twilio.video.helper.CallbackHelper;
 import com.twilio.video.ui.RoomsTestActivity;
-import com.twilio.video.util.AccessManagerUtils;
+import com.twilio.video.util.AccessTokenUtils;
 import com.twilio.video.util.FakeVideoCapturer;
 import com.twilio.video.util.RandUtils;
 
@@ -44,8 +43,8 @@ public abstract class BaseMediaTest {
     protected FakeVideoCapturer fakeVideoCapturer;
     protected VideoClient actor1VideoClient;
     protected VideoClient actor2VideoClient;
-    protected AccessManager actor1AccessManager;
-    protected AccessManager actor2AccessManager;
+    protected String tokenOne;
+    protected String  tokenTwo;
     protected Room actor1Room;
     protected Room actor2Room;
     protected Participant participant;
@@ -79,12 +78,12 @@ public abstract class BaseMediaTest {
         testRoom = RandUtils.generateRandomString(10);
         fakeVideoCapturer = new FakeVideoCapturer();
         actor1LocalMedia = LocalMedia.create(context);
-        actor1AccessManager = AccessManagerUtils.obtainAccessManager(context, TEST_USER);
+        tokenOne = AccessTokenUtils.getAccessToken(TEST_USER);
         Instrumentation instrumentation = InstrumentationRegistry.getInstrumentation();
         instrumentation.runOnMainSync(new Runnable() {
             @Override
             public void run() {
-                actor1VideoClient = new VideoClient(context, actor1AccessManager);
+                actor1VideoClient = new VideoClient(context, tokenOne);
             }
         });
         // Connect actor 1
@@ -96,11 +95,11 @@ public abstract class BaseMediaTest {
 
         // Connect actor 2
         actor2LocalMedia = LocalMedia.create(context);
-        actor2AccessManager = AccessManagerUtils.obtainAccessManager(context, TEST_USER2);
+        tokenTwo = AccessTokenUtils.getAccessToken(TEST_USER2);
         instrumentation.runOnMainSync(new Runnable() {
             @Override
             public void run() {
-                actor2VideoClient = new VideoClient(context, actor2AccessManager);
+                actor2VideoClient = new VideoClient(context, tokenTwo);
             }
         });
         actor2RoomListener = new CallbackHelper.FakeRoomListener();
@@ -128,10 +127,6 @@ public abstract class BaseMediaTest {
         actor1LocalMedia = null;
         actor2LocalMedia.release();
         actor2LocalMedia = null;
-        actor1AccessManager.dispose();
-        actor1AccessManager = null;
-        actor2AccessManager.dispose();
-        actor2AccessManager = null;
         fakeVideoCapturer = null;
     }
 }

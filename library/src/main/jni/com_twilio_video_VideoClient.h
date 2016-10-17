@@ -19,7 +19,7 @@ JNIEXPORT jint JNICALL Java_com_twilio_video_VideoClient_nativeGetCoreLogLevel
         (JNIEnv *, jobject);
 
 JNIEXPORT jlong JNICALL Java_com_twilio_video_VideoClient_nativeCreateClient
-        (JNIEnv *, jobject, jobject, jobject, jlong);
+        (JNIEnv *, jobject, jobject, jstring, jlong);
 
 JNIEXPORT jlong JNICALL Java_com_twilio_video_VideoClient_nativeConnect
         (JNIEnv *, jobject, jlong, jlong, jobject);

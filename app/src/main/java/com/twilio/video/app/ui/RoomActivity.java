@@ -34,9 +34,7 @@ import com.google.common.collect.Multimap;
 import com.twilio.video.ScreenCapturer;
 import com.twilio.video.app.R;
 import com.twilio.video.app.dialog.Dialog;
-import com.twilio.video.app.util.AccessManagerHelper;
 import com.twilio.video.app.util.SimpleSignalingUtils;
-import com.twilio.common.AccessManager;
 import com.twilio.video.AudioTrack;
 import com.twilio.video.CameraCapturer;
 import com.twilio.video.ConnectOptions;
@@ -83,7 +81,6 @@ public class RoomActivity extends AppCompatActivity {
     private String username;
     private String capabilityToken;
     private String realm;
-    private AccessManager accessManager;
     private VideoClient videoClient;
     private Room room;
     private String roomName;
@@ -143,8 +140,7 @@ public class RoomActivity extends AppCompatActivity {
         cameraVideoTrack.addRenderer(primaryVideoView);
 
         // Create our video client
-        accessManager = AccessManagerHelper.createAccessManager(this, capabilityToken);
-        videoClient = new VideoClient(this, accessManager);
+        videoClient = new VideoClient(this, capabilityToken);
     }
 
     @Override
@@ -154,10 +150,6 @@ public class RoomActivity extends AppCompatActivity {
             localMedia.removeAudioTrack(localAudioTrack);
             localMedia.release();
             localMedia = null;
-        }
-        if (accessManager != null) {
-            accessManager.dispose();
-            accessManager = null;
         }
         super.onDestroy();
     }
