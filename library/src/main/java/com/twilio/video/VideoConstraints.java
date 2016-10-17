@@ -3,6 +3,9 @@ package com.twilio.video;
 /**
  * Use video constraints to apply to a {@link LocalVideoTrack}.
  *
+ * <p>The default video constraints is a 4:3 aspect ratio with a maximum resolution of
+ * 640x480 and a maximum of 30 fps.</p>
+ *
  * <p><b>Note</b>: {@link VideoConstraints} is used to resolve the capture format, but the actual
  * video sent to Participants may be downscaled temporally or spatially in response to network
  * and device conditions.</p>
