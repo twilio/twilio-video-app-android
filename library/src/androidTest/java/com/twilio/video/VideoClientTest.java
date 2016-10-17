@@ -78,14 +78,8 @@ public class VideoClientTest {
         assertEquals(AudioOutput.SPEAKERPHONE, videoClient.getAudioOutput());
     }
 
-    @Test(expected = NullPointerException.class)
-    public void connect_shouldThrowExceptionWhenRoomListenerIsNull() {
-        VideoClient videoClient = new VideoClient(context, token);
-        videoClient.connect(null);
-    }
-
     @Test
-    public void connect_shouldConnectToANewRoom() throws InterruptedException {
+    public void connect_shouldConnectToRoom() throws InterruptedException {
         CallbackHelper.FakeRoomListener roomListener = new CallbackHelper.FakeRoomListener();
         roomListener.onConnectedLatch = new CountDownLatch(1);
 
@@ -93,6 +87,12 @@ public class VideoClientTest {
         assertTrue(roomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
         assertEquals(room.getSid(), room.getName());
         room.disconnect();
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void connect_shouldThrowExceptionWhenRoomListenerIsNull() {
+        VideoClient videoClient = new VideoClient(context, token);
+        videoClient.connect(null);
     }
 
     @Test
@@ -164,5 +164,29 @@ public class VideoClientTest {
         assertTrue(localMedia.removeVideoTrack(localVideoTrack));
         room.disconnect();
     }
-}
 
+    @Test
+    public void shouldAllowTokenUpdate() throws InterruptedException {
+        // First we connect with initial token
+        CallbackHelper.FakeRoomListener roomListener = new CallbackHelper.FakeRoomListener();
+        roomListener.onConnectedLatch = new CountDownLatch(1);
+
+        Room room = videoClient.connect(roomListener);
+        assertTrue(roomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
+        assertEquals(room.getSid(), room.getName());
+        room.disconnect();
+
+        // Now we update token and connect again
+        String newUserName = RandUtils.generateRandomString(10);
+        videoClient.updateToken(AccessTokenUtils.getAccessToken(newUserName));
+
+        // Connect again with new token
+        roomListener = new CallbackHelper.FakeRoomListener();
+        roomListener.onConnectedLatch = new CountDownLatch(1);
+
+        room = videoClient.connect(roomListener);
+        assertTrue(roomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
+        assertEquals(room.getSid(), room.getName());
+        room.disconnect();
+    }
+}
