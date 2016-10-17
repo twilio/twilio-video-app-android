@@ -2,11 +2,14 @@
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android"
     android:opacity="opaque">
     <item android:drawable="@color/colorPrimary" />
-    <item
-        android:drawable="@drawable/ic_video_logo_splash"
-        android:gravity="center" />
-    <item
-        android:bottom="64dp"
-        android:drawable="@drawable/twilio_name_white"
-        android:gravity="center_horizontal|bottom" />
+    <item>
+        <bitmap
+            android:gravity="center"
+            android:src="@drawable/video_logo_splash" />
+    </item>
+    <item android:bottom="64dp">
+        <bitmap
+            android:gravity="center|bottom"
+            android:src="@drawable/twilio_name_white" />
+    </item>
 </layer-list>
