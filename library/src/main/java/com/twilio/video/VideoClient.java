@@ -1,6 +1,5 @@
 package com.twilio.video;
 
-import android.Manifest;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -13,12 +12,8 @@ import android.util.Log;
 
 import com.getkeepsafe.relinker.ReLinker;
 
-import com.twilio.video.BuildConfig;
-
 import java.util.EnumMap;
 import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -157,6 +152,9 @@ public class VideoClient {
             registerConnectivityBroadcastReceiver();
         }
 
+        // Update the token in case user has updated
+        nativeUpdateToken(nativeClientContext, token);
+
         Room room = new Room(connectOptions.getRoomName(),
                 connectOptions.getLocalMedia(),
                 roomListenerProxy(roomListener),
@@ -177,6 +175,15 @@ public class VideoClient {
         }
 
         return room;
+    }
+
+    /**
+     * Updates the access token.
+     *
+     * @param token The new access token.
+     */
+    public synchronized void updateToken(String token) {
+        this.token = token;
     }
 
     synchronized void release(Room room) {
@@ -355,6 +362,7 @@ public class VideoClient {
     private native long nativeConnect(long nativeClientDataHandler,
                                       long nativeRoomListenerHandle,
                                       ConnectOptions ConnectOptions);
+    private native void nativeUpdateToken(long nativeClientContext, String token);
     private native void nativeOnNetworkChange(long nativeClientContext,
                                               NetworkChangeEvent networkChangeEvent);
     private native void nativeRelease(long nativeClientDataHandler);

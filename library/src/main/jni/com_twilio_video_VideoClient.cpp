@@ -192,6 +192,15 @@ Java_com_twilio_video_VideoClient_nativeConnect(JNIEnv *env,
     return jlongFromPointer(room_context);
 }
 
+JNIEXPORT jlong JNICALL Java_com_twilio_video_VideoClient_nativeUpdateToken
+        (JNIEnv *env, jobject j_instance, jlong j_client_context, jstring j_token) {
+    ClientContext *client_context =
+            reinterpret_cast<ClientContext *>(j_client_context);
+    std::string token = webrtc_jni::JavaToStdString(env, j_token);
+
+    client_context->getClient().updateToken(token);
+}
+
 JNIEXPORT void JNICALL Java_com_twilio_video_VideoClient_nativeOnNetworkChange(JNIEnv *env,
                                                                                jobject j_instance,
                                                                                jlong j_client_context,

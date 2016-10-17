@@ -24,6 +24,9 @@ JNIEXPORT jlong JNICALL Java_com_twilio_video_VideoClient_nativeCreateClient
 JNIEXPORT jlong JNICALL Java_com_twilio_video_VideoClient_nativeConnect
         (JNIEnv *, jobject, jlong, jlong, jobject);
 
+JNIEXPORT jlong JNICALL Java_com_twilio_video_VideoClient_nativeUpdateToken
+        (JNIEnv *, jobject, jlong, jstring);
+
 JNIEXPORT void JNICALL Java_com_twilio_video_VideoClient_nativeOnNetworkChange
         (JNIEnv *, jobject, jlong, jobject);
 
