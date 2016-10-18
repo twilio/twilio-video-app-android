@@ -9,7 +9,6 @@
 #include "webrtc/modules/audio_device/android/opensles_player.h"
 #include "webrtc/api/java/jni/classreferenceholder.h"
 
-#include "common/AccessManager/AccessManager.h"
 #include "video/logger.h"
 #include "video/video.h"
 #include "video/connect_options.h"
@@ -129,20 +128,10 @@ JNIEXPORT jlong JNICALL
 Java_com_twilio_video_VideoClient_nativeCreateClient(JNIEnv *env,
                                                      jobject j_instance,
                                                      jobject j_context,
-                                                     jobject j_access_manager,
+                                                     jstring j_token,
                                                      jlong media_factory_handle) {
 
-    // Get native AccessManager shared_ptr from java object
-    // Call the private method to get the native handle
-    jclass j_access_mgr_class = webrtc_jni::GetObjectClass(env, j_access_manager);
-    jmethodID j_getNativeHandle_id =
-            webrtc_jni::GetMethodID(env, j_access_mgr_class, "getNativeHandle", "()J");
-    jlong j_access_mgr_handle = env->CallLongMethod(j_access_manager, j_getNativeHandle_id);
-    // Recreate a reference to the share_ptr of AccessManager by dereferencing the ptr
-    // to the shared_ptr
-    std::shared_ptr<TwilioCommon::AccessManager> access_manager =
-            *(reinterpret_cast<std::shared_ptr<TwilioCommon::AccessManager> *>(j_access_mgr_handle));
-
+    std::string token = webrtc_jni::JavaToStdString(env, j_token);
     std::shared_ptr<twilio::media::MediaFactory> media_factory =
             twilio_video_jni::getMediaFactory(media_factory_handle);
 
@@ -154,7 +143,7 @@ Java_com_twilio_video_VideoClient_nativeCreateClient(JNIEnv *env,
         .build();
 
     std::unique_ptr<twilio::video::Client> client =
-            twilio::video::Client::create(access_manager,
+            twilio::video::Client::create(token,
                                           media_factory,
                                           std::move(client_options));
     return jlongFromPointer(
@@ -201,6 +190,15 @@ Java_com_twilio_video_VideoClient_nativeConnect(JNIEnv *env,
     RoomContext *room_context = new RoomContext();
     room_context->room = std::move(room);
     return jlongFromPointer(room_context);
+}
+
+JNIEXPORT jlong JNICALL Java_com_twilio_video_VideoClient_nativeUpdateToken
+        (JNIEnv *env, jobject j_instance, jlong j_client_context, jstring j_token) {
+    ClientContext *client_context =
+            reinterpret_cast<ClientContext *>(j_client_context);
+    std::string token = webrtc_jni::JavaToStdString(env, j_token);
+
+    client_context->getClient().updateToken(token);
 }
 
 JNIEXPORT void JNICALL Java_com_twilio_video_VideoClient_nativeOnNetworkChange(JNIEnv *env,

@@ -1,6 +1,5 @@
 package com.twilio.video;
 
-import android.Manifest;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -12,14 +11,9 @@ import android.os.Handler;
 import android.util.Log;
 
 import com.getkeepsafe.relinker.ReLinker;
-import com.twilio.common.AccessManager;
-
-import com.twilio.video.BuildConfig;
 
 import java.util.EnumMap;
 import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -34,7 +28,6 @@ public class VideoClient {
 
     private final Handler handler;
     private final Context applicationContext;
-    private final AccessManager accessManager;
     private final Set<Room> rooms = new HashSet<>();
     private final BroadcastReceiver connectivityChangeReceiver = new BroadcastReceiver() {
         @Override
@@ -56,18 +49,19 @@ public class VideoClient {
             }
         }
     };
+    private String token;
     private long nativeClientContext;
 
-    public VideoClient(Context context, AccessManager accessManager) {
+    public VideoClient(Context context, String token) {
         if (context == null) {
             throw new NullPointerException("applicationContext must not be null");
         }
-        if (accessManager == null) {
+        if (token == null) {
             throw new NullPointerException("accessManager must not be null");
         }
 
         this.applicationContext = context.getApplicationContext();
-        this.accessManager = accessManager;
+        this.token = token;
         this.handler = Util.createCallbackHandler();
 
         if (!libraryIsLoaded) {
@@ -151,12 +145,15 @@ public class VideoClient {
 
         if(rooms.isEmpty()) {
             nativeClientContext = nativeCreateClient(applicationContext,
-                    accessManager,
+                    token,
                     MediaFactory.instance(applicationContext).getNativeMediaFactoryHandle());
 
             // Register for connectivity events
             registerConnectivityBroadcastReceiver();
         }
+
+        // Update the token in case user has updated
+        nativeUpdateToken(nativeClientContext, token);
 
         Room room = new Room(connectOptions.getRoomName(),
                 connectOptions.getLocalMedia(),
@@ -178,6 +175,15 @@ public class VideoClient {
         }
 
         return room;
+    }
+
+    /**
+     * Updates the access token.
+     *
+     * @param token The new access token.
+     */
+    public synchronized void updateToken(String token) {
+        this.token = token;
     }
 
     synchronized void release(Room room) {
@@ -351,11 +357,12 @@ public class VideoClient {
     private native static void nativeSetModuleLevel(int module, int level);
     private native static int nativeGetCoreLogLevel();
     private native long nativeCreateClient(Context context,
-                                           AccessManager accessManager,
+                                           String token,
                                            long nativeMediaFactoryHandle);
     private native long nativeConnect(long nativeClientDataHandler,
                                       long nativeRoomListenerHandle,
                                       ConnectOptions ConnectOptions);
+    private native void nativeUpdateToken(long nativeClientContext, String token);
     private native void nativeOnNetworkChange(long nativeClientContext,
                                               NetworkChangeEvent networkChangeEvent);
     private native void nativeRelease(long nativeClientDataHandler);

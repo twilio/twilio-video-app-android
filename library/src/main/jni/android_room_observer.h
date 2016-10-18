@@ -143,7 +143,7 @@ protected:
 
     virtual void onDisconnected(const twilio::video::Room *room,
                                 twilio::video::ClientError error_code =
-                                    twilio::video::ClientError::kErrorUnknown) {
+                                twilio::video::ClientError::kInitNil) {
         ScopedLocalRefFrame local_ref_frame(jni());
         std::string func_name = std::string(__FUNCTION__);
         TS_CORE_LOG_MODULE(twilio::video::kTSCoreLogModulePlatform,
