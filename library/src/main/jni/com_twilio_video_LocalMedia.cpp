@@ -199,9 +199,7 @@ twilio::media::MediaConstraints* convertVideoConstraints(jobject j_video_constra
 twilio::media::MediaConstraints* getVideoConstraints(jobject j_video_contraints) {
     twilio::media::MediaConstraints* video_constraints = nullptr;
 
-    if (webrtc_jni::IsNull(webrtc_jni::GetEnv(), j_video_contraints)) {
-        video_constraints = twilio::media::MediaConstraints::defaultVideoConstraints();
-    } else {
+    if (!webrtc_jni::IsNull(webrtc_jni::GetEnv(), j_video_contraints)) {
         video_constraints = convertVideoConstraints(j_video_contraints);
     }
 
