@@ -31,6 +31,7 @@ import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
+import com.twilio.accessmanager.AccessManager;
 import com.twilio.video.ScreenCapturer;
 import com.twilio.video.app.R;
 import com.twilio.video.app.dialog.Dialog;
@@ -55,6 +56,9 @@ import java.util.Map;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import retrofit.Callback;
+import retrofit.RetrofitError;
+import retrofit.client.Response;
 import timber.log.Timber;
 
 public class RoomActivity extends AppCompatActivity {
@@ -81,6 +85,47 @@ public class RoomActivity extends AppCompatActivity {
     private String username;
     private String capabilityToken;
     private String realm;
+    private AccessManager accessManager;
+    private final AccessManager.Listener accessManagerListener = new AccessManager.Listener() {
+        @Override
+        public void onTokenWillExpire(final AccessManager accessManager) {
+            Timber.i("Access token will expire in three minutes");
+            SimpleSignalingUtils.getAccessToken(username, realm, new Callback<String>() {
+                @Override
+                public void success(String token, Response response) {
+                    Timber.i("Access token updated");
+                    accessManager.updateToken(token);
+                }
+
+                @Override
+                public void failure(RetrofitError error) {
+                    Toast.makeText(RoomActivity.this, "Failed fetch new access token",
+                            Toast.LENGTH_LONG).show();
+                }
+            });
+        }
+
+        @Override
+        public void onTokenExpired(AccessManager accessManager) {
+            Timber.i("Access token expired");
+        }
+
+        @Override
+        public void onError(AccessManager accessManager, String errorMessage) {
+            Timber.e("Access manager error " + errorMessage);
+        }
+    };
+    private final AccessManager.TokenUpdateListener tokenUpdateListener =
+            new AccessManager.TokenUpdateListener() {
+                @Override
+                public void onTokenUpdated(String token) {
+                    Timber.i("Access token updated");
+                    if (videoClient != null) {
+                        Timber.i("Updating video client access token");
+                        videoClient.updateToken(token);
+                    }
+                }
+            };
     private VideoClient videoClient;
     private Room room;
     private String roomName;
@@ -139,12 +184,20 @@ public class RoomActivity extends AppCompatActivity {
         primaryVideoView.setMirror(true);
         cameraVideoTrack.addRenderer(primaryVideoView);
 
+        // Create access manager to register for token updates
+        accessManager = new AccessManager(capabilityToken, accessManagerListener);
+        accessManager.addTokenUpdateListener(tokenUpdateListener);
+
         // Create our video client
         videoClient = new VideoClient(this, capabilityToken);
     }
 
     @Override
     protected void onDestroy() {
+        // Remove token update listener
+        accessManager.removeTokenUpdateListener(tokenUpdateListener);
+
+        // Teardown local media
         if (localMedia != null) {
             localMedia.removeVideoTrack(cameraVideoTrack);
             localMedia.removeAudioTrack(localAudioTrack);
