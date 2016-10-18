@@ -1,1 +1,1 @@
-include ':conversations', ':testapp'
+include ':library', ':app'

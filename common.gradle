@@ -11,18 +11,17 @@ ext.mavenUsername = (project.hasProperty('maven.username') ?
 ext.mavenPassword = (project.hasProperty('maven.password') ?
         project.property("maven.password") : '')
 
-ext.getVersionName = {
-    return "${versionMajor}.${versionMinor}.${versionPatch}"
-}
-
 ext.generateVersionName = {
-    def version = getVersionName()
-
-    return version
+    return "${versionMajor}.${versionMinor}.${versionPatch}" +
+           ((project.hasProperty("release") && project.property("release").toBoolean() == true) ?
+                   "-${project.property("phase")}${project.property("phaseNumber")}" : '') +
+           ((project.hasProperty("releaseCandidate") && project.property("releaseCandidate").toBoolean() == true) ?
+                   "-rc${project.property("versionRc")}" : '') +
+           ((project.hasProperty("snapshot") && project.property("snapshot").toBoolean() == true) ? "-SNAPSHOT" : '')
 }
 
 ext.generateVersionCode = {
-    def version = getVersionName()
+    def version = "${versionMajor}.${versionMinor}.${versionPatch}"
     def build = version.toString().replace(".", "") as int
 
     return build * 1000

@@ -49,5 +49,4 @@ sdk/libs/
 **/**/**/libs
 
 # Screenshots
-*.png
 .gradletasknamecache

@@ -1,0 +1,597 @@
+apply plugin: 'com.android.model.library'
+apply plugin: 'maven'
+
+def currentToolchainVersion = "4.9"
+// TODO add back ability for local builds
+//def twilioSdkHome = "/usr/local/twilio-sdk"
+def twilioSdkHome = "${buildDir}/prebuilt"
+def supportedAbis = [
+        "armeabi-v7a",
+        "arm64-v8a",
+        "x86",
+        "x86_64"
+]
+
+def supportedArchFolderName = [
+        "armeabi-v7a" : "armeabiv7a",
+        "arm64-v8a" : "arm64v8a",
+        "x86" : "x86",
+        "x86_64" : "x86_64"
+]
+
+def coreHome = "${twilioSdkHome}/twilio-video"
+def coreHeaders = "${coreHome}/arm64v8a/gnu-4.9/debug/include"
+def coreStaticLib = "libtwilio-video.a"
+
+def pocoHome = "${coreHome}"
+def pocoFoundationStaticLib = "libPocoFoundation.a"
+def pocoNetStaticLib = "libPocoNet.a"
+def pocoCryptoStaticLib = "libPocoCrypto.a"
+def pocoNetSslStaticLib = "libPocoNetSSL.a"
+def pocoUtilStaticLib = "libPocoUtil.a"
+def pocoJsonStaticLib = "libPocoJSON.a"
+
+def boringSslHome = "${coreHome}"
+def boringSslStaticLib = "libboringssl.a"
+
+def webRtcHome = "${coreHome}"
+def webRtcHeaders = "${coreHeaders}/third_party/webrtc"
+def libYuvHeaders = "${coreHeaders}/third_party/webrtc/third_party/libyuv/include"
+def webRtcStaticLib = "libwebrtc.a"
+
+def resiprocateHome = "${coreHome}"
+def resiprocateStaticLib = "libresiprocate.a"
+
+def compilerVersion = "gnu-4.9"
+
+configurations {
+    preCompile
+}
+
+model {
+    repositories {
+        libs(PrebuiltLibraries) {
+            videoCore {
+                headers.srcDir "${coreHeaders}"
+                binaries.withType(StaticLibraryBinary) {
+                    def coreStaticLibPath = "${coreHome}/"+
+                            "${supportedArchFolderName.get(targetPlatform.getName())}/"+
+                            "${compilerVersion}/"+
+                            "${buildType.getName()}/lib/"+
+                            "${coreStaticLib}"
+                    staticLibraryFile = file("${coreStaticLibPath}")
+                }
+            }
+            pocoFoundation {
+                binaries.withType(StaticLibraryBinary) {
+                    def pocoFoundationStaticLibPath = "${pocoHome}/"+
+                            "${supportedArchFolderName.get(targetPlatform.getName())}/"+
+                            "${compilerVersion}/"+
+                            "${buildType.getName()}/lib/"+
+                            "${pocoFoundationStaticLib}"
+                    staticLibraryFile = file("${pocoFoundationStaticLibPath}")
+                }
+            }
+            pocoNet {
+                binaries.withType(StaticLibraryBinary) {
+                    def pocoNetStaticLibPath = "${pocoHome}/" +
+                            "${supportedArchFolderName.get(targetPlatform.getName())}/"+
+                            "${compilerVersion}/"+
+                            "${buildType.getName()}/lib/"+
+                            "${pocoNetStaticLib}"
+                    staticLibraryFile = file("${pocoNetStaticLibPath}")
+                }
+            }
+            pocoCrypto {
+                binaries.withType(StaticLibraryBinary) {
+                    def pocoCryptoStaticLibPath = "${pocoHome}/"+
+                            "${supportedArchFolderName.get(targetPlatform.getName())}/"+
+                            "${compilerVersion}/"+
+                            "${buildType.getName()}/lib/"+
+                            "${pocoCryptoStaticLib}"
+                    staticLibraryFile = file("${pocoCryptoStaticLibPath}")
+                }
+            }
+            pocoNetSsl {
+                binaries.withType(StaticLibraryBinary) {
+                    def pocoNetSslStaticLibPath = "${pocoHome}/"+
+                            "${supportedArchFolderName.get(targetPlatform.getName())}/"+
+                            "${compilerVersion}/"+
+                            "${buildType.getName()}/lib/"+
+                            "${pocoNetSslStaticLib}"
+                    staticLibraryFile = file("${pocoNetSslStaticLibPath}")
+                }
+            }
+            pocoUtil {
+                binaries.withType(StaticLibraryBinary) {
+                    def pocoUtilStaticLibPath = "${pocoHome}/"+
+                            "${supportedArchFolderName.get(targetPlatform.getName())}/"+
+                            "${compilerVersion}/"+
+                            "${buildType.getName()}/lib/"+
+                            "${pocoUtilStaticLib}"
+                    staticLibraryFile = file("${pocoUtilStaticLibPath}")
+                }
+            }
+            pocoJson {
+                binaries.withType(StaticLibraryBinary) {
+                    def pocoJsonStaticLibPath = "${pocoHome}/" +
+                            "${supportedArchFolderName.get(targetPlatform.getName())}/"+
+                            "${compilerVersion}/"+
+                            "${buildType.getName()}/lib/"+
+                            "${pocoJsonStaticLib}"
+                    staticLibraryFile = file("${pocoJsonStaticLibPath}")
+                }
+            }
+            boringssl {
+                binaries.withType(StaticLibraryBinary) {
+                    def boringSslStaticLibPath = "${boringSslHome}/" +
+                            "${supportedArchFolderName.get(targetPlatform.getName())}/"+
+                            "${compilerVersion}/"+
+                            "${buildType.getName()}/lib/"+
+                            "${boringSslStaticLib}"
+                    staticLibraryFile = file("${boringSslStaticLibPath}")
+                }
+            }
+            webrtc {
+                headers.srcDir "${webRtcHeaders}"
+                binaries.withType(StaticLibraryBinary) {
+                    def webRtcStaticLibPath = "${webRtcHome}/" +
+                            "${supportedArchFolderName.get(targetPlatform.getName())}/"+
+                            "${compilerVersion}/"+
+                            "${buildType.getName()}/lib/"+
+                            "${webRtcStaticLib}"
+                    staticLibraryFile = file("${webRtcStaticLibPath}")
+                }
+            }
+            resiprocate {
+                binaries.withType(StaticLibraryBinary) {
+                    def resiprocateStaticLibPath = "${resiprocateHome}/"+
+                            "${supportedArchFolderName.get(targetPlatform.getName())}/"+
+                            "${compilerVersion}/"+
+                            "${buildType.getName()}/lib/"+
+                            "${resiprocateStaticLib}"
+                    staticLibraryFile = file("${resiprocateStaticLibPath}")
+                }
+            }
+        }
+    }
+
+    android {
+        compileSdkVersion 24
+        buildToolsVersion "24.0.2"
+
+        defaultConfig.with {
+            minSdkVersion.apiLevel 16
+            targetSdkVersion.apiLevel 24
+            versionName generateVersionName()
+            versionCode generateVersionCode()
+
+            testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        }
+
+        testOptions.unitTests.all {
+            ignoreFailures false
+
+            testLogging {
+                events 'passed', 'skipped', 'failed', 'standardOut', 'standardError'
+            }
+        }
+    }
+
+    android.ndk {
+        moduleName "jingle_peerconnection_so"
+        toolchainVersion "${currentToolchainVersion}"
+        platformVersion 21
+        stl "c++_static"
+        cppFlags.addAll([
+                "-DWEBRTC_POSIX",
+                "-DTWILIO_SDK_2_0",
+                "-DWEBRTC_ANDROID",
+                "-DWEBRTC_ANDROID_OPENSLES",
+                "-DPOCO_ANDROID",
+                "-Wall",
+                "-std=gnu++11",
+                "-fexceptions",
+                "-I${libYuvHeaders}".toString()
+        ])
+        ldLibs.addAll([
+                "log",
+                "z",
+                "m",
+                "dl",
+                "GLESv2",
+                "jnigraphics",
+                "OpenSLES",
+                "EGL",
+                "GLESv1_CM",
+                "android"
+        ])
+        abiFilters.addAll(supportedAbis)
+    }
+
+    android.sources {
+        main {
+            jni {
+                exportedHeaders {
+                    srcDir "src/main/jni"
+                }
+                dependencies {
+                    library "videoCore" linkage "static"
+                    library "resiprocate" linkage "static"
+                    library "pocoFoundation" linkage "static"
+                    library "pocoNet" linkage "static"
+                    library "pocoCrypto" linkage "static"
+                    library "pocoNetSsl" linkage "static"
+                    library "pocoUtil" linkage "static"
+                    library "pocoJson" linkage "static"
+                    library "webrtc" linkage "static"
+                    library "boringssl" linkage "static"
+                }
+            }
+        }
+    }
+
+    android.buildTypes {
+        debug {
+            ndk {
+                debuggable true
+            }
+        }
+        release {
+            minifyEnabled false
+        }
+    }
+
+    tasks {
+        /**
+         * Here we create a javadoc tasks that depends on the
+         * the current android model configuration
+         */
+        createJavadocs(Javadoc) {
+            def androidConfig = $.android
+            def androidJar = "${getSdkDir()}/platforms/${androidConfig.compileSdkVersion}/" +
+            "android.jar"
+
+            source = androidConfig.sources.main.java.source
+            classpath += project.files(androidJar);
+            options.links("http://docs.oracle.com/javase/7/docs/api/");
+            options.linksOffline("http://d.android.com/reference", "${getSdkDir()}/docs/reference");
+            options.footer("<script>(function(i,s,o,g,r,a,m){i[\"GoogleAnalyticsObject\"]=r;i[r]=i[r]||function(){(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)})(window,document,\"script\",\"https://www.google-analytics.com/analytics.js\",\"ga\");ga(\"create\", \"UA-2900316-33\", \"auto\");ga(\"send\", \"pageview\");</script>");
+            exclude '**/BuildConfig.java'
+            exclude '**/R.java'
+            exclude 'com/twilio/conversations/internal/*'
+            exclude 'com/twilio/conversations/impl/*'
+            failOnError false
+        }
+    }
+}
+
+dependencies {
+    preCompile 'com.twilio.sdk:twilio-video:0.2.3-rc0:android@tar.bz2'
+
+    testCompile 'junit:junit:4.12'
+    testCompile 'org.mockito:mockito-core:1.10.19'
+    testCompile 'com.google.guava:guava:19.0'
+
+    androidTestCompile 'com.squareup.retrofit:retrofit:1.9.0'
+    androidTestCompile 'com.android.support:support-annotations:24.2.1'
+    androidTestCompile 'com.android.support.test.espresso:espresso-core:2.2.2'
+    androidTestCompile 'com.android.support.test:runner:0.5'
+    androidTestCompile 'com.android.support.test:rules:0.5'
+    androidTestCompile 'com.android.support.test.uiautomator:uiautomator-v18:2.1.2'
+    androidTestCompile 'com.google.code.gson:gson:2.6.2'
+
+    compile 'com.getkeepsafe.relinker:relinker:1.2.2'
+    // TODO this really should be on nexus as a jar and not local
+    // TODO we are hardcoding architecture for now,
+    // because I don't know how to access that information from here
+    compile files("${twilioSdkHome}/twilio-video/arm64v8a/gnu-4.9/release/lib/" +
+            "libjingle_peerconnection_java.jar")
+}
+
+/**
+ * Iterates over conversations dependencies and ensures they are downloaded
+ */
+task unpackPrebuilts(type: Copy) {
+    def target = file("${buildDir}/prebuilt")
+
+    onlyIf { !target.exists() }
+
+    configurations.preCompile.each { dependency ->
+        from tarTree(dependency)
+        into target
+    }
+}
+
+/**
+ * Generates the current javadocs, assembles the project as release, and packages
+ * artifacts into tar
+ */
+task packageRelease(type: GradleBuild){
+    tasks = ['createJavadocs']
+}
+
+/**
+ * Maven upload configuration that can be used for any maven repo
+ */
+uploadArchives {
+    repositories {
+        mavenDeployer {
+            repository(url: "${mavenRepo}") {
+                authentication(
+                        userName: mavenUsername,
+                        password: mavenPassword
+                )
+            }
+            pom.version = generateVersionName()
+            pom.groupId = 'com.twilio'
+            pom.artifactId = 'video-android'
+            pom.packaging = 'aar'
+        }
+    }
+}
+
+/**
+ * Localize the JNI_OnLoad and JNI_OnUnLoad symbol in libwebrtc-jni.a to prevent conflicts with
+ * initialization
+ */
+task localizeWebRtcJniLoadUnLoad(type: Exec, dependsOn: 'unpackPrebuilts') {
+    def ndkDir = getNdkDir()
+    def ndkToolchains = "${ndkDir}/toolchains"
+    def toolchainMap = [
+            "arm-linux-androideabi" : "arm-linux-androideabi",
+            "aarch64-linux-android" : "aarch64-linux-android",
+            "x86" : "i686-linux-android",
+            "x86_64" : "x86_64-linux-android"
+    ]
+    def supportedArchs = [
+            "armeabi-v7a" : "arm-linux-androideabi",
+            "arm64-v8a" : "aarch64-linux-android",
+            "x86" : "i686-linux-android",
+            "x86_64" : "x86_64-linux-android"
+    ]
+    def supportedHosts = [
+            "darwin",
+            "linux"
+    ]
+
+    // For some reason I have to have something set for
+    // command line in order for this task to not complain just ignore this
+    // the real work follows in the loops below
+    commandLine 'true'
+    doLast {
+        toolchainMap.each { toolchainPrefix, toolChainPrebuiltPrefix ->
+            supportedArchs.each { arch, archToolChain ->
+                supportedHosts.each { host ->
+                    def objCopy = "${ndkToolchains}/${toolchainPrefix}-${currentToolchainVersion}" +
+                            "/prebuilt/${host}-x86_64/bin/${toolChainPrebuiltPrefix}-objcopy"
+                    def libWebRtcStaticLib = "${webRtcHome}/${arch}/${compilerVersion}" +
+                            "/release/lib/libwebrtc-jni.a"
+                    if (file("${objCopy}").exists() &&
+                            file("${libWebRtcStaticLib}").exists() &&
+                            archToolChain == toolChainPrebuiltPrefix) {
+                        exec {
+                            executable "${objCopy}"
+                            args '--localize-symbol',
+                                    'JNI_OnLoad',
+                                    "${libWebRtcStaticLib}"
+                        }
+                        exec {
+                            executable "${objCopy}"
+                            args '--localize-symbol',
+                                    'JNI_OnUnLoad',
+                                    "${libWebRtcStaticLib}"
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+def getSdkDir() {
+    // Checking environment variable for sdk home first
+    def sdkHome = System.env.ANDROID_SDK_HOME
+
+    // Android Studio does not see this environment but will generate a
+    // local.properties file with the ndk path set
+    if (sdkHome == null) {
+        println "Could not locate NDK home in environment variable. Trying local.properties"
+        Properties properties = new Properties()
+        properties.load(project.rootProject.file('local.properties').newDataInputStream())
+        sdkHome = properties.getProperty('sdk.dir')
+    }
+
+    // Fail the build for no sdk detected
+    assert sdkHome != null : "Could not find Android SDK!"
+
+    return sdkHome
+}
+
+def getNdkDir() {
+    // Checking environment variable for ndk home first
+    def ndkHome = System.env.ANDROID_NDK_HOME
+
+    // Android Studio does not see this environment but will generate a
+    // local.properties file with the ndk path set
+    if (ndkHome == null) {
+        println "Could not locate NDK home in environment variable. Trying local.properties"
+        Properties properties = new Properties()
+        properties.load(project.rootProject.file('local.properties').newDataInputStream())
+        ndkHome = properties.getProperty('ndk.dir')
+    }
+
+    // Fail the build for no ndk detected
+    assert ndkHome != null : "Could not find Android NDK!"
+
+    return ndkHome
+}
+
+/**
+ * TODO move to separate file
+ *
+ * Set of rules to ensure that tasks and flags are set correctly
+ */
+class ConversationsRuleSource extends RuleSource {
+    static final def projectDir = new File("library").absolutePath
+    // TODO Add back ability to do local builds
+//    static final def twilioSdkHome = "/usr/local/twilio-sdk"
+    static final def twilioSdkHome = "${projectDir}/build/prebuilt"
+    static final def pocoFoundationStaticLib = "libPocoFoundation.a"
+    static final def pocoCryptoStaticLib = "libPocoCrypto.a"
+    static final def webRtcJniStaticLib = "libwebrtc-jni.a"
+    static final def supportedArchFolderName = [
+            "armeabi-v7a" : "armeabiv7a",
+            "arm64-v8a" : "arm64v8a",
+            "x86" : "x86",
+            "x86_64" : "x86_64"
+    ]
+
+
+    @Mutate
+    void validatePreCompileDebugEnvironmentArmeabiV7a(
+            @Path('tasks.compileJingle_peerconnection_soArmeabi-v7aDebugSharedLibraryJingle_peerconnection_soMainCpp')
+                    Task compileTask) {
+        validatePreCompileEnvironment(compileTask)
+    }
+
+    @Mutate
+    void validatePreCompileReleaseEnvironmentArmeabiV7a(
+            @Path('tasks.compileJingle_peerconnection_soArmeabi-v7aReleaseSharedLibraryJingle_peerconnection_soMainCpp')
+                    Task compileTask) {
+        validatePreCompileEnvironment(compileTask)
+    }
+
+    @Mutate
+    void validatePreCompileDebugEnvironmentArm64V8a(
+            @Path('tasks.compileJingle_peerconnection_soArm64-v8aDebugSharedLibraryJingle_peerconnection_soMainCpp')
+                    Task compileTask) {
+        validatePreCompileEnvironment(compileTask)
+    }
+
+    @Mutate
+    void validatePreCompileReleaseEnvironmentArm64V8a(
+            @Path('tasks.compileJingle_peerconnection_soArm64-v8aReleaseSharedLibraryJingle_peerconnection_soMainCpp')
+                    Task compileTask) {
+        validatePreCompileEnvironment(compileTask)
+    }
+
+    @Mutate
+    void validatePreCompileDebugEnvironmentX86(
+            @Path('tasks.compileJingle_peerconnection_soX86DebugSharedLibraryJingle_peerconnection_soMainCpp')
+                    Task compileTask) {
+        validatePreCompileEnvironment(compileTask)
+    }
+
+    @Mutate
+    void validatePreCompileReleaseEnvironmentX86(
+            @Path('tasks.compileJingle_peerconnection_soX86ReleaseSharedLibraryJingle_peerconnection_soMainCpp')
+                    Task compileTask) {
+        validatePreCompileEnvironment(compileTask)
+    }
+
+    @Mutate
+    void validatePreCompileDebugEnvironmentX86_64(
+            @Path('tasks.compileJingle_peerconnection_soX86_64DebugSharedLibraryJingle_peerconnection_soMainCpp')
+                    Task compileTask) {
+        validatePreCompileEnvironment(compileTask)
+    }
+
+    @Mutate
+    void validatePreCompileReleaseEnvironmentX86_64(
+            @Path('tasks.compileJingle_peerconnection_soX86_64ReleaseSharedLibraryJingle_peerconnection_soMainCpp')
+                    Task compileTask) {
+        validatePreCompileEnvironment(compileTask)
+    }
+
+    @Mutate
+    void injectArmeabiV7aDebugLinkerFlags(
+            @Path('tasks.linkJingle_peerconnection_soArmeabi-v7aDebugSharedLibrary')
+                    Task linkTask) {
+        injectLinkerFlags(linkTask, twilioSdkHome, 'armeabi-v7a', 'debug')
+    }
+
+    @Mutate
+    void injectArmeabiV7aReleaseLinkerFlags(
+            @Path('tasks.linkJingle_peerconnection_soArmeabi-v7aReleaseSharedLibrary')
+                    Task linkTask) {
+        injectLinkerFlags(linkTask, twilioSdkHome, 'armeabi-v7a', 'release')
+    }
+
+    @Mutate
+    void injectArm64v8aDebugLinkerFlags(
+            @Path('tasks.linkJingle_peerconnection_soArm64-v8aDebugSharedLibrary')
+                    Task linkTask) {
+        injectLinkerFlags(linkTask, twilioSdkHome, 'arm64-v8a', 'debug')
+    }
+
+    @Mutate
+    void injectArm64v8aReleaseLinkerFlags(
+            @Path('tasks.linkJingle_peerconnection_soArm64-v8aReleaseSharedLibrary')
+                    Task linkTask) {
+        injectLinkerFlags(linkTask, twilioSdkHome, 'arm64-v8a', 'release')
+    }
+
+    @Mutate
+    void injectX86DebugLinkerFlags(
+            @Path('tasks.linkJingle_peerconnection_soX86DebugSharedLibrary')
+                    Task linkTask) {
+        injectLinkerFlags(linkTask, twilioSdkHome, 'x86', 'debug')
+    }
+
+    @Mutate
+    void injectX86ReleaseLinkerFlags(
+            @Path('tasks.linkJingle_peerconnection_soX86ReleaseSharedLibrary')
+                    Task linkTask) {
+        injectLinkerFlags(linkTask, twilioSdkHome, 'x86', 'release')
+    }
+
+    @Mutate
+    void injectX86_64DebugLinkerFlags(
+            @Path('tasks.linkJingle_peerconnection_soX86_64DebugSharedLibrary')
+                    Task linkTask) {
+        injectLinkerFlags(linkTask, twilioSdkHome, 'x86_64', 'debug')
+    }
+
+    @Mutate
+    void injectX86_64ReleaseLinkerFlags(
+            @Path('tasks.linkJingle_peerconnection_soX86_64ReleaseSharedLibrary')
+                    Task linkTask) {
+        injectLinkerFlags(linkTask, twilioSdkHome, 'x86_64', 'release')
+    }
+
+    private void validatePreCompileEnvironment(compileTask) {
+        compileTask.dependsOn("localizeWebRtcJniLoadUnLoad")
+    }
+
+    private void injectLinkerFlags(linkTask, sdkHome, arch, buildType) {
+        def twilioVideoHome = "${sdkHome}/twilio-video/"
+        def archFolderName = supportedArchFolderName.get(arch)
+        def libsFolder = "${archFolderName}/gnu-4.9/${buildType}/lib/"
+        def pocoHome = "${twilioVideoHome}/${libsFolder}"
+        def webRtcLibPath = "${twilioVideoHome}/${libsFolder}/${webRtcJniStaticLib}"
+
+        linkTask.doFirst {
+            if (arch.equals('arm64-v8a')) {
+                properties["linkerArgs"].add("-fuse-ld=gold")
+            }
+
+            properties["linkerArgs"].addAll([
+                    "-l${pocoHome}/${pocoFoundationStaticLib}".toString(),
+                    "-l${pocoHome}/${pocoCryptoStaticLib}".toString(),
+
+                    /**
+                     * Several webrtc classes use native webrtc-jni objects that are only
+                     * called from Java classes. The compiler will incorrectly strip some
+                     * of these native webrtc-jni objects during linking because it believes
+                     * they are unused by the native library. Here we tell the linker to keep
+                     * the whole archive to prevent this stripping and then we specify in the
+                     * dependency after we are not using whole archive anymore because the linker
+                     * applies this option to every library after the option is specified.
+                     */
+                    "-Wl,--whole-archive,-l${webRtcLibPath},".toString() + "--no-whole-archive"
+            ])
+        }
+    }
+}
+apply plugin: ConversationsRuleSource
