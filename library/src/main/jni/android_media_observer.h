@@ -116,8 +116,6 @@ protected:
             jobject j_audio_track =
                 createJavaAudioTrack(jni(), track, *j_audio_track_class_, j_audio_track_ctor_id_);
 
-
-
             jni()->CallVoidMethod(*j_media_observer_, j_on_audio_track_added_, j_audio_track);
             CHECK_EXCEPTION(jni()) << "error during CallVoidMethod";
         }
