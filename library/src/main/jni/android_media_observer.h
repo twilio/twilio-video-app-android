@@ -131,7 +131,6 @@ protected:
 
         {
             rtc::CritScope cs(&deletion_lock_);
-
             if (!isObserverValid(func_name)) {
                 return;
             }
@@ -140,6 +139,9 @@ protected:
 
             jni()->CallVoidMethod(*j_media_observer_, j_on_audio_track_removed_, j_track_id);
             CHECK_EXCEPTION(jni()) << "error during CallVoidMethod";
+
+            // Removing additional ref added to sure AudioTrack is destroyed
+            track->getWebRtcTrack()->Release();
         }
     }
 
