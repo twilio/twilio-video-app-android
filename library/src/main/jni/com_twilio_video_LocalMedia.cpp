@@ -216,15 +216,6 @@ JNIEXPORT jobject JNICALL Java_com_twilio_video_LocalMedia_nativeAddAudioTrack(J
     std::shared_ptr<twilio::media::LocalAudioTrack> local_audio_track =
             local_media->addAudioTrack(enabled, audio_options);
 
-    /*
-     * Needed to ensure that the reference to webrtc audio track is not destroyed twice. This issue
-     * only seems to occur while executing on x86_64 emulators, but it is a well documented issue
-     * of reference ownership between java and c++.
-     *
-     * https://monorail-staging.appspot.com/p/webrtc/issues/detail?id=5128
-     */
-    local_audio_track->getWebRtcTrack()->AddRef();
-
     return (local_audio_track == nullptr) ?
            (nullptr) :
            (createJavaLocalAudioTrack(local_audio_track));

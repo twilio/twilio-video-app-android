@@ -100,15 +100,6 @@ protected:
                 return;
             }
 
-            /*
-             * Needed to ensure that the reference to webrtc audio track is not destroyed twice. This issue
-             * only seems to occur while executing on x86_64 emulators, but it is a well documented issue
-             * of reference ownership between java and c++.
-             *
-             * https://monorail-staging.appspot.com/p/webrtc/issues/detail?id=5128
-             */
-            track->getWebRtcTrack()->AddRef();
-
             jstring j_track_id = webrtc_jni::JavaStringFromStdString(jni(), track->getTrackId());
             jlong j_webrtc_track = webrtc_jni::jlongFromPointer(track->getWebRtcTrack());
             jboolean j_is_enabled = track->isEnabled();
@@ -139,9 +130,6 @@ protected:
 
             jni()->CallVoidMethod(*j_media_observer_, j_on_audio_track_removed_, j_track_id);
             CHECK_EXCEPTION(jni()) << "error during CallVoidMethod";
-
-            // Removing additional ref added to sure AudioTrack is destroyed
-            track->getWebRtcTrack()->Release();
         }
     }
 
