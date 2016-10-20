@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">Video</string>
+    <string name="client_name">Client Name</string>
+    <string name="login">Login</string>
+    <string name="logout">Log Out</string>
+    <string name="settings">Settings</string>
+    <string name="username">Username</string>
+    <string name="join_room">Join Room</string>
+    <string name="registering">Registering</string>
+    <string name="video_client_status">Video Client Status</string>
+    <string name="room_status">Room Status</string>
+    <string name="fps">Frames per second</string>
+    <string name="video_dimensions">Video dimensions</string>
+    <string name="video_constraints">Video Constraints</string>
+    <string name="stats">Statistics</string>
+    <string name="enable_stats">Enable Stats</string>
+    <string name="local">Local Media</string>
+    <string name="remote">Remote Media</string>
+    <string name="ice_options">Enable ICE options</string>
+    <string name="ice_transp_policy">Transportation policy</string>
+    <string name="realm_string">Realm</string>
+    <string name="stun_turn">STUN or TURN server</string>
+    <string name="add_server">Add</string>
+    <string name="ice_servers_dialog_title">ICE Options</string>
+    <string name="ice_servers_list_desc">Choose server(s)</string>
+    <string name="ice_options_button">Ice Options</string>
+    <string name="enable_ice">Enable ICE Options</string>
+    <string name="prefer_h264">Prefer H264</string>
+    <string name="aspect_ratio">Aspect Ratio</string>
+    <string name="auto_register">Automatically register when app launches</string>
+    <string name="auto_accept">Accept invites automatically</string>
+    <string name="use_headset">Start audio using headset</string>
+    <string name="error_initializing_conversations">Error initializing conversations sdk</string>
+    <string name="logout_when_conv_ends">Logout when conversation ends</string>
+    <string name="room_name">Room Name</string>
+    <string name="switch_camera">Switch Camera</string>
+    <string name="pause_audio">Pause audio</string>
+    <string name="resume_audio">Resume audio</string>
+    <string name="pause_video">Pause video</string>
+    <string name="resume_video">Resume video</string>
+    <string name="share_screen">Share screen</string>
+    <string name="stop_screen_share">Stop screen share</string>
+    <string name="screen_capture_permission_not_granted">Screen capture permission not granted</string>
+    <string name="screen_capture_error">Screen capturer error occurred.</string>
+
+    <string-array name="realm_array">
+        <item>Prod</item>
+        <item>Stage</item>
+        <item>Dev</item>
+    </string-array>
+
+    <string-array name="ice_trans_policy_array">
+        <item>All</item>
+        <item>Relay</item>
+    </string-array>
+
+    <string-array name="aspect_ratio_array">
+        <item>Default</item>
+        <item>4:3</item>
+        <item>16:9</item>
+    </string-array>
+
+</resources>
