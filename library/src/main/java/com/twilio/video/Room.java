@@ -164,14 +164,13 @@ public class Room {
         public synchronized void onDisconnected(final int errorCode) {
             logger.d("onDisconnected()");
             Room.this.roomState = RoomState.DISCONNECTED;
-            release();
-
             handler.post(new Runnable() {
                 @Override
                 public void run() {
                     Room.this.listener.onDisconnected(Room.this, new VideoException(errorCode, ""));
                 }
             });
+            release();
         }
 
         @Override

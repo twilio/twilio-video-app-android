@@ -122,7 +122,6 @@ protected:
 
         {
             rtc::CritScope cs(&deletion_lock_);
-
             if (!isObserverValid(func_name)) {
                 return;
             }

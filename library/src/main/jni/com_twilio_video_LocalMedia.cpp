@@ -199,9 +199,7 @@ twilio::media::MediaConstraints* convertVideoConstraints(jobject j_video_constra
 twilio::media::MediaConstraints* getVideoConstraints(jobject j_video_contraints) {
     twilio::media::MediaConstraints* video_constraints = nullptr;
 
-    if (webrtc_jni::IsNull(webrtc_jni::GetEnv(), j_video_contraints)) {
-        video_constraints = twilio::media::MediaConstraints::defaultVideoConstraints();
-    } else {
+    if (!webrtc_jni::IsNull(webrtc_jni::GetEnv(), j_video_contraints)) {
         video_constraints = convertVideoConstraints(j_video_contraints);
     }
 
@@ -215,7 +213,6 @@ JNIEXPORT jobject JNICALL Java_com_twilio_video_LocalMedia_nativeAddAudioTrack(J
                                                                                jobject j_audio_options) {
     std::shared_ptr<twilio::media::LocalMedia> local_media = getLocalMedia(local_media_handle);
     cricket::AudioOptions audio_options = getAudioOptions(j_audio_options);
-
     std::shared_ptr<twilio::media::LocalAudioTrack> local_audio_track =
             local_media->addAudioTrack(enabled, audio_options);
 

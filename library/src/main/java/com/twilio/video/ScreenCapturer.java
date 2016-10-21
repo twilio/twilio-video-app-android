@@ -85,7 +85,7 @@ public class ScreenCapturer implements VideoCapturer {
                     Image image = null;
                     try {
                         image = reader.acquireLatestImage();
-                    } catch (IllegalStateException e) {
+                    } catch (Exception e) {
                         String screenFrameFailure = "Failed to acquire screen frame";
                         logger.e(screenFrameFailure);
                         if (screenCapturerListener != null) {
