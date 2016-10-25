@@ -167,7 +167,12 @@ public class Room {
             handler.post(new Runnable() {
                 @Override
                 public void run() {
-                    Room.this.listener.onDisconnected(Room.this, new VideoException(errorCode, ""));
+                    VideoException videoException = null;
+                    if(errorCode != 0) {
+                        // TODO: properly implement errors
+                        videoException = new VideoException(errorCode, "");
+                    }
+                    Room.this.listener.onDisconnected(Room.this, videoException);
                 }
             });
             release();
