@@ -1,17 +1,19 @@
 package com.twilio.video;
 
-import android.content.Context;
-import android.support.test.InstrumentationRegistry;
 import android.support.test.filters.LargeTest;
+import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
 
 import com.twilio.video.helper.CallbackHelper;
+import com.twilio.video.ui.MediaTestActivity;
 import com.twilio.video.util.AccessTokenUtils;
 import com.twilio.video.util.FakeVideoCapturer;
+import com.twilio.video.util.PermissionUtils;
 import com.twilio.video.util.RandUtils;
 
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -26,7 +28,10 @@ import static org.junit.Assert.assertTrue;
 @RunWith(AndroidJUnit4.class)
 @LargeTest
 public class RoomTest {
-    private Context context;
+    @Rule
+    public ActivityTestRule<MediaTestActivity> activityRule =
+            new ActivityTestRule<>(MediaTestActivity.class);
+    private MediaTestActivity mediaTestActivity;
     private String identity;
     private String token;
     private VideoClient videoClient;
@@ -35,12 +40,13 @@ public class RoomTest {
 
     @Before
     public void setup() throws InterruptedException {
-        context = InstrumentationRegistry.getInstrumentation().getTargetContext();
+        mediaTestActivity = activityRule.getActivity();
+        PermissionUtils.allowPermissions(mediaTestActivity);
         identity = RandUtils.generateRandomString(10);
         token = AccessTokenUtils.getAccessToken(identity);
-        videoClient = new VideoClient(context, token);
+        videoClient = new VideoClient(mediaTestActivity, token);
         roomName = RandUtils.generateRandomString(20);
-        localMedia = LocalMedia.create(context);
+        localMedia = LocalMedia.create(mediaTestActivity);
     }
 
     @After
@@ -85,8 +91,8 @@ public class RoomTest {
         assertNotNull(room.getLocalParticipant().getLocalMedia());
 
         // Now we add our tracks
-        LocalAudioTrack localAudioTrack = localMedia.addAudioTrack(false);
-        LocalVideoTrack localVideoTrack = localMedia.addVideoTrack(false, fakeVideoCapturer);
+        LocalAudioTrack localAudioTrack = localMedia.addAudioTrack(true);
+        LocalVideoTrack localVideoTrack = localMedia.addVideoTrack(true, fakeVideoCapturer);
 
         // Let them sit a bit
         Thread.sleep(1);

@@ -16,6 +16,7 @@ import android.os.SystemClock;
 import android.util.DisplayMetrics;
 import android.view.WindowManager;
 
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -105,17 +106,30 @@ public class ScreenCapturer implements VideoCapturer {
                             firstFrameReported = true;
                         }
 
-                        Image.Plane plane = image.getPlanes()[0];
-                        int bufferSize = plane.getBuffer().remaining();
-                        byte[] buffer = new byte[bufferSize];
-                        plane.getBuffer().get(buffer, 0, bufferSize);
+                        /*
+                         * Here we check for exceptions in the event that an image being
+                         * read has been closed. This is not a fatal condition, so the frame
+                         * will just be dropped.
+                         */
+                        try {
+                            Image.Plane plane = image.getPlanes()[0];
+                            ByteBuffer planeBuffer = plane.getBuffer();
+                            int bufferSize = planeBuffer.remaining();
+                            byte[] buffer = new byte[bufferSize];
+                            planeBuffer.get(buffer, 0, bufferSize);
 
-                        VideoDimensions dimensions = new VideoDimensions(image.getWidth(),
-                                image.getHeight());
-                        VideoFrame videoFrame = new VideoFrame(buffer,
-                                dimensions, 0, captureTimeNs);
-                        capturerListener.onFrameCaptured(videoFrame);
-                        image.close();
+                            VideoDimensions dimensions = new VideoDimensions(image.getWidth(),
+                                    image.getHeight());
+                            VideoFrame videoFrame = new VideoFrame(buffer,
+                                    dimensions, 0, captureTimeNs);
+                            capturerListener.onFrameCaptured(videoFrame);
+                            image.close();
+                        } catch (Exception e) {
+                            logger.e(e.getMessage());
+                            if (screenCapturerListener != null) {
+                                screenCapturerListener.onScreenCaptureError(e.getMessage());
+                            }
+                        }
                     }
                 }
             };

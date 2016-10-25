@@ -21,7 +21,7 @@
 
     <application>
         <activity
-            android:name=".ui.RoomsTestActivity">
+            android:name=".ui.MediaTestActivity">
         </activity>
 
         <activity

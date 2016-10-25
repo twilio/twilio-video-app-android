@@ -1,17 +1,19 @@
 package com.twilio.video;
 
-import android.content.Context;
-import android.support.test.InstrumentationRegistry;
 import android.support.test.filters.LargeTest;
+import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
 
 import com.twilio.video.helper.CallbackHelper;
+import com.twilio.video.ui.MediaTestActivity;
 import com.twilio.video.util.AccessTokenUtils;
 import com.twilio.video.util.FakeVideoCapturer;
+import com.twilio.video.util.PermissionUtils;
 import com.twilio.video.util.RandUtils;
 
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -25,7 +27,10 @@ import static org.junit.Assert.assertTrue;
 @RunWith(AndroidJUnit4.class)
 @LargeTest
 public class VideoClientTest {
-    private Context context;
+    @Rule
+    public ActivityTestRule<MediaTestActivity> activityRule =
+            new ActivityTestRule<>(MediaTestActivity.class);
+    private MediaTestActivity mediaTestActivity;
     private String token;
     private VideoClient videoClient;
     private String roomName;
@@ -33,11 +38,13 @@ public class VideoClientTest {
 
     @Before
     public void setup() throws InterruptedException {
-        context = InstrumentationRegistry.getInstrumentation().getTargetContext();
+        mediaTestActivity = activityRule.getActivity();
+        PermissionUtils.allowPermissions(mediaTestActivity);
         token = AccessTokenUtils.getAccessToken(RandUtils.generateRandomString(10));
-        videoClient = new VideoClient(context, token);
+        videoClient = new VideoClient(mediaTestActivity, token);
         roomName = RandUtils.generateRandomString(20);
-        localMedia = LocalMedia.create(context);
+        localMedia = LocalMedia.create(mediaTestActivity);
+        VideoClient.setLogLevel(LogLevel.ALL);
     }
 
     @After
@@ -52,7 +59,7 @@ public class VideoClientTest {
 
     @Test(expected = NullPointerException.class)
     public void client_shouldThrowExceptionWhenTokenIsNull() {
-        new VideoClient(context, null);
+        new VideoClient(mediaTestActivity, null);
     }
 
     @Test
@@ -73,7 +80,7 @@ public class VideoClientTest {
 
     @Test
     public void audioOutput_shouldBeRetained() {
-        VideoClient videoClient = new VideoClient(context, token);
+        VideoClient videoClient = new VideoClient(mediaTestActivity, token);
         videoClient.setAudioOutput(AudioOutput.SPEAKERPHONE);
         assertEquals(AudioOutput.SPEAKERPHONE, videoClient.getAudioOutput());
     }
@@ -91,7 +98,7 @@ public class VideoClientTest {
 
     @Test(expected = NullPointerException.class)
     public void connect_shouldThrowExceptionWhenRoomListenerIsNull() {
-        VideoClient videoClient = new VideoClient(context, token);
+        VideoClient videoClient = new VideoClient(mediaTestActivity, token);
         videoClient.connect(null);
     }
 
@@ -149,8 +156,8 @@ public class VideoClientTest {
     public void connect_shouldAllowLocalMediaWithAudioAndVideo() throws InterruptedException {
         CallbackHelper.FakeRoomListener roomListener = new CallbackHelper.FakeRoomListener();
         FakeVideoCapturer fakeVideoCapturer = new FakeVideoCapturer();
-        LocalAudioTrack localAudioTrack = localMedia.addAudioTrack(false);
-        LocalVideoTrack localVideoTrack = localMedia.addVideoTrack(false, fakeVideoCapturer);
+        LocalAudioTrack localAudioTrack = localMedia.addAudioTrack(true);
+        LocalVideoTrack localVideoTrack = localMedia.addVideoTrack(true, fakeVideoCapturer);
         roomListener.onConnectedLatch = new CountDownLatch(1);
 
         ConnectOptions connectOptions = new ConnectOptions.Builder()
