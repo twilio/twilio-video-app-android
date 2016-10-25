@@ -12,7 +12,7 @@ import com.twilio.video.Room;
 import com.twilio.video.RoomState;
 import com.twilio.video.VideoClient;
 import com.twilio.video.helper.CallbackHelper;
-import com.twilio.video.ui.RoomsTestActivity;
+import com.twilio.video.ui.MediaTestActivity;
 import com.twilio.video.util.AccessTokenUtils;
 import com.twilio.video.util.FakeVideoCapturer;
 import com.twilio.video.util.RandUtils;
@@ -34,8 +34,8 @@ public abstract class BaseMediaTest {
     protected final static String TEST_USER  = "TEST_USER";
     protected final static String TEST_USER2  = "TEST_USER2";
     @Rule
-    public ActivityTestRule<RoomsTestActivity> activityRule =
-            new ActivityTestRule<>(RoomsTestActivity.class);
+    public ActivityTestRule<MediaTestActivity> activityRule =
+            new ActivityTestRule<>(MediaTestActivity.class);
 
     protected Context context;
     protected LocalMedia actor1LocalMedia;
