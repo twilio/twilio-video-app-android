@@ -167,7 +167,12 @@ public class Room {
             handler.post(new Runnable() {
                 @Override
                 public void run() {
-                    Room.this.listener.onDisconnected(Room.this, new VideoException(errorCode, ""));
+                    VideoException videoException = null;
+                    if(errorCode != 0) {
+                        // TODO: properly implement errors
+                        videoException = new VideoException(errorCode, "");
+                    }
+                    Room.this.listener.onDisconnected(Room.this, videoException);
                 }
             });
             release();
@@ -177,6 +182,7 @@ public class Room {
         public synchronized void onConnectFailure(final int errorCode) {
             logger.d("onConnectFailure()");
             Room.this.roomState = RoomState.DISCONNECTED;
+
             handler.post(new Runnable() {
                 @Override
                 public void run() {
