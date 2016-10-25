@@ -106,6 +106,11 @@ public class ScreenCapturer implements VideoCapturer {
                             firstFrameReported = true;
                         }
 
+                        /*
+                         * Here we check for exceptions in the event that an image being
+                         * read has been closed. This is not a fatal condition, so the frame
+                         * will just be dropped.
+                         */
                         try {
                             Image.Plane plane = image.getPlanes()[0];
                             ByteBuffer planeBuffer = plane.getBuffer();
