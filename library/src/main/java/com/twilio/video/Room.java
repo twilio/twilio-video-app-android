@@ -182,7 +182,6 @@ public class Room {
         public synchronized void onConnectFailure(final int errorCode) {
             logger.d("onConnectFailure()");
             Room.this.roomState = RoomState.DISCONNECTED;
-
             handler.post(new Runnable() {
                 @Override
                 public void run() {
