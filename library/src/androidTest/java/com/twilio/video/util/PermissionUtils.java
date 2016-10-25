@@ -3,7 +3,6 @@ package com.twilio.video.util;
 import android.Manifest;
 import android.annotation.TargetApi;
 import android.app.Instrumentation;
-import android.support.test.InstrumentationRegistry;
 import android.support.test.uiautomator.UiDevice;
 import android.support.test.uiautomator.UiObject;
 import android.support.test.uiautomator.UiObjectNotFoundException;
@@ -11,43 +10,72 @@ import android.support.test.uiautomator.UiSelector;
 
 import java.util.List;
 
+import static android.support.test.InstrumentationRegistry.getInstrumentation;
 import static junit.framework.TestCase.fail;
 
 public class PermissionUtils {
+    private static final int PERMISSIONS_DIALOG_DELAY = 2000;
+    private static final int DENY_BUTTON_INDEX = 0;
+    private static final int GRANT_BUTTON_INDEX = 1;
     private static final String SCREEN_CAPTURE_DO_NOT_SHOW_AGAIN = "Don't show again";
-    private static final String ALLOW_SCREEN_CAPTURE = "Start now";
-    private static final String ALLOW_PERMISSION = "Allow";
 
     public static void allowPermissions(PermissionRequester permissionRequester)  {
         List<String> neededPermissions = permissionRequester.getNeededPermssions();
 
+        sleep(PERMISSIONS_DIALOG_DELAY);
+
         for (String permission : neededPermissions) {
-            clickAllowPermission(ALLOW_PERMISSION, permission);
+            clickPermissionAction(true, permission);
         }
     }
 
     @TargetApi(21)
     public static void allowScreenCapture(boolean showAgain)  {
+        sleep(PERMISSIONS_DIALOG_DELAY);
+
         if (!showAgain) {
-            clickAllowPermission(SCREEN_CAPTURE_DO_NOT_SHOW_AGAIN, "screen capture " +
-                    "do not ask again");
+            clickAction(SCREEN_CAPTURE_DO_NOT_SHOW_AGAIN);
         }
-        clickAllowPermission(ALLOW_SCREEN_CAPTURE, Manifest.permission.CAPTURE_VIDEO_OUTPUT);
+        clickPermissionAction(true, Manifest.permission.CAPTURE_VIDEO_OUTPUT);
     }
 
-    private static void clickAllowPermission(String allowButtonText, String permission) {
-        Instrumentation instrumentation = InstrumentationRegistry.getInstrumentation();
+    private static void clickPermissionAction(boolean enable, String permission) {
+        try {
+            UiDevice device = UiDevice.getInstance(getInstrumentation());
+            UiObject permissionAction = device.findObject(new UiSelector()
+                    .clickable(true)
+                    .checkable(false)
+                    .index(enable ? GRANT_BUTTON_INDEX : DENY_BUTTON_INDEX));
+            if (permissionAction.exists()) {
+                permissionAction.click();
+            }
+        } catch (UiObjectNotFoundException e) {
+            fail("Failed to" + (enable ? " allow " : " deny ") + permission);
+        }
+    }
+
+    private static void clickAction(String clickActionText) {
+        Instrumentation instrumentation = getInstrumentation();
 
         UiDevice device = UiDevice.getInstance(instrumentation);
-        UiObject allowScreenCapture =
-                device.findObject(new UiSelector().text(allowButtonText));
+        UiObject clickActionObject =
+                device.findObject(new UiSelector().text(clickActionText));
 
-        if (allowScreenCapture.exists()) {
+        if (clickActionObject.exists()) {
             try {
-                allowScreenCapture.click();
+                clickActionObject.click();
             } catch (UiObjectNotFoundException e) {
-                fail("Failed to allow permission: " + permission);
+                fail("Failed to click action: " + clickActionText);
             }
         }
     }
+
+    private static void sleep(long millis) {
+        try {
+            Thread.sleep(millis);
+        } catch (InterruptedException e) {
+            throw new RuntimeException("Cannot execute Thread.sleep()");
+        }
+    }
+
 }
