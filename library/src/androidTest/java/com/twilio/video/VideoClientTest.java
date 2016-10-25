@@ -1,7 +1,5 @@
 package com.twilio.video;
 
-import android.content.Context;
-import android.support.test.InstrumentationRegistry;
 import android.support.test.filters.LargeTest;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
@@ -10,6 +8,7 @@ import com.twilio.video.helper.CallbackHelper;
 import com.twilio.video.ui.MediaTestActivity;
 import com.twilio.video.util.AccessTokenUtils;
 import com.twilio.video.util.FakeVideoCapturer;
+import com.twilio.video.util.PermissionUtils;
 import com.twilio.video.util.RandUtils;
 
 import org.junit.After;
@@ -40,6 +39,7 @@ public class VideoClientTest {
     @Before
     public void setup() throws InterruptedException {
         mediaTestActivity = activityRule.getActivity();
+        PermissionUtils.allowPermissions(mediaTestActivity);
         token = AccessTokenUtils.getAccessToken(RandUtils.generateRandomString(10));
         videoClient = new VideoClient(mediaTestActivity, token);
         roomName = RandUtils.generateRandomString(20);
