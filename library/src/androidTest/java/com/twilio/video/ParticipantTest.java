@@ -32,7 +32,6 @@ public class ParticipantTest {
     private VideoClient videoClient;
     private VideoClient videoClient2;
     private String roomName;
-    private LocalMedia localMedia;
 
     @Before
     public void setup() throws InterruptedException {
@@ -42,12 +41,6 @@ public class ParticipantTest {
         videoClient = new VideoClient(context, tokenOne);
         videoClient2 = new VideoClient(context, tokenTwo);
         roomName = RandUtils.generateRandomString(20);
-        localMedia = LocalMedia.create(context);
-    }
-
-    @After
-    public void teardown() {
-        localMedia.release();
     }
 
     @Test

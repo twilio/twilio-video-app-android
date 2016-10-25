@@ -15,6 +15,7 @@ import com.twilio.video.helper.CallbackHelper;
 import com.twilio.video.ui.MediaTestActivity;
 import com.twilio.video.util.AccessTokenUtils;
 import com.twilio.video.util.FakeVideoCapturer;
+import com.twilio.video.util.PermissionUtils;
 import com.twilio.video.util.RandUtils;
 
 import org.junit.After;
@@ -36,8 +37,7 @@ public abstract class BaseMediaTest {
     @Rule
     public ActivityTestRule<MediaTestActivity> activityRule =
             new ActivityTestRule<>(MediaTestActivity.class);
-
-    protected Context context;
+    private MediaTestActivity mediaTestActivity;
     protected LocalMedia actor1LocalMedia;
     protected LocalMedia actor2LocalMedia;
     protected FakeVideoCapturer fakeVideoCapturer;
@@ -74,16 +74,17 @@ public abstract class BaseMediaTest {
 
     @Before
     public void setup() throws InterruptedException {
-        context = InstrumentationRegistry.getInstrumentation().getTargetContext();
+        mediaTestActivity = activityRule.getActivity();
+        PermissionUtils.allowPermissions(mediaTestActivity);
         testRoom = RandUtils.generateRandomString(10);
         fakeVideoCapturer = new FakeVideoCapturer();
-        actor1LocalMedia = LocalMedia.create(context);
+        actor1LocalMedia = LocalMedia.create(mediaTestActivity);
         tokenOne = AccessTokenUtils.getAccessToken(TEST_USER);
         Instrumentation instrumentation = InstrumentationRegistry.getInstrumentation();
         instrumentation.runOnMainSync(new Runnable() {
             @Override
             public void run() {
-                actor1VideoClient = new VideoClient(context, tokenOne);
+                actor1VideoClient = new VideoClient(mediaTestActivity, tokenOne);
             }
         });
         // Connect actor 1
@@ -94,12 +95,12 @@ public abstract class BaseMediaTest {
         assertTrue(actor1RoomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
 
         // Connect actor 2
-        actor2LocalMedia = LocalMedia.create(context);
+        actor2LocalMedia = LocalMedia.create(mediaTestActivity);
         tokenTwo = AccessTokenUtils.getAccessToken(TEST_USER2);
         instrumentation.runOnMainSync(new Runnable() {
             @Override
             public void run() {
-                actor2VideoClient = new VideoClient(context, tokenTwo);
+                actor2VideoClient = new VideoClient(mediaTestActivity, tokenTwo);
             }
         });
         actor2RoomListener = new CallbackHelper.FakeRoomListener();

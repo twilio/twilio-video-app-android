@@ -156,8 +156,8 @@ public class VideoClientTest {
     public void connect_shouldAllowLocalMediaWithAudioAndVideo() throws InterruptedException {
         CallbackHelper.FakeRoomListener roomListener = new CallbackHelper.FakeRoomListener();
         FakeVideoCapturer fakeVideoCapturer = new FakeVideoCapturer();
-        LocalAudioTrack localAudioTrack = localMedia.addAudioTrack(false);
-        LocalVideoTrack localVideoTrack = localMedia.addVideoTrack(false, fakeVideoCapturer);
+        LocalAudioTrack localAudioTrack = localMedia.addAudioTrack(true);
+        LocalVideoTrack localVideoTrack = localMedia.addVideoTrack(true, fakeVideoCapturer);
         roomListener.onConnectedLatch = new CountDownLatch(1);
 
         ConnectOptions connectOptions = new ConnectOptions.Builder()

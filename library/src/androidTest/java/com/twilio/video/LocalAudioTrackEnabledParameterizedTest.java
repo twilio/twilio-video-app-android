@@ -1,11 +1,14 @@
 package com.twilio.video;
 
-import android.content.Context;
-import android.support.test.InstrumentationRegistry;
 import android.support.test.filters.LargeTest;
+import android.support.test.rule.ActivityTestRule;
+
+import com.twilio.video.ui.MediaTestActivity;
+import com.twilio.video.util.PermissionUtils;
 
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -14,8 +17,6 @@ import java.util.Arrays;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 @RunWith(Parameterized.class)
@@ -29,7 +30,9 @@ public class LocalAudioTrackEnabledParameterizedTest {
     }
 
     private final boolean enabled;
-    private Context context;
+    @Rule public ActivityTestRule<MediaTestActivity> activityRule =
+            new ActivityTestRule<>(MediaTestActivity.class);
+    private MediaTestActivity mediaTestActivity;
     private LocalMedia localMedia;
     private LocalAudioTrack localAudioTrack;
 
@@ -40,8 +43,9 @@ public class LocalAudioTrackEnabledParameterizedTest {
 
     @Before
     public void setup() {
-        context = InstrumentationRegistry.getInstrumentation().getTargetContext();
-        localMedia = LocalMedia.create(context);
+        mediaTestActivity = activityRule.getActivity();
+        PermissionUtils.allowPermissions(mediaTestActivity);
+        localMedia = LocalMedia.create(mediaTestActivity);
         localAudioTrack = localMedia.addAudioTrack(enabled);
     }
 
