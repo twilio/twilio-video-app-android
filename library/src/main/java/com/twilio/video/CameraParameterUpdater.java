@@ -11,5 +11,5 @@ public interface CameraParameterUpdater {
      *
      * @param cameraParameters the current parameters for a {@link android.hardware.Camera}.
      */
-    void applyCameraParameterUpdates(Camera.Parameters cameraParameters);
+    void apply(Camera.Parameters cameraParameters);
 }

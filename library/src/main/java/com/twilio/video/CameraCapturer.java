@@ -103,7 +103,7 @@ public class CameraCapturer implements VideoCapturer {
                     synchronized (CameraCapturer.this) {
                         if (cameraParameterUpdater != null) {
                             logger.i("Updating camera parameters");
-                            cameraParameterUpdater.applyCameraParameterUpdates(parameters);
+                            cameraParameterUpdater.apply(parameters);
                         }
                     }
                 }
@@ -219,7 +219,7 @@ public class CameraCapturer implements VideoCapturer {
     /**
      * Schedules a camera parameter update. The current camera's
      * {@link android.hardware.Camera.Parameters} will be provided for modification via
-     * {@link CameraParameterUpdater#applyCameraParameterUpdates(Camera.Parameters)}. Any changes
+     * {@link CameraParameterUpdater#apply(Camera.Parameters)}. Any changes
      * to the parameters will be applied after the invocation of this callback. This method can be
      * invoked while capturing frames or not.
      *
@@ -239,7 +239,7 @@ public class CameraCapturer implements VideoCapturer {
      *     // Schedule camera parameter update
      *     cameraCapturer.updateCameraParameters(new CameraParameterUpdater() {
      *        {@literal @}Override
-     *         public void applyCameraParameterUpdates(Camera.Parameters cameraParameters) {
+     *         public void apply(Camera.Parameters cameraParameters) {
      *             // Ensure camera supports flash and turn on
      *             if (cameraParameters.getFlashMode() != null) {
      *                  cameraParameters.setFlashMode(Camera.Parameters.FLASH_MODE_TORCH);
