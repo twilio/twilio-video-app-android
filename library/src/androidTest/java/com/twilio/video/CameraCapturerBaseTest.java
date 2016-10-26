@@ -13,6 +13,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assume.assumeNotNull;
 
@@ -175,6 +176,38 @@ public class CameraCapturerBaseTest extends BaseCameraCapturerTest {
         assertTrue(cameraParametersUpdated.await(10, TimeUnit.SECONDS));
 
         // Validate our flash mode is actually different
+        assertEquals(expectedFlashMode, actualCameraParameters.get().getFlashMode());
+    }
+
+    @Test
+    public void updateCameraParameters_shouldReturnFalseIfUpdateIsPending()
+            throws InterruptedException {
+        CountDownLatch cameraParametersUpdated = new CountDownLatch(1);
+        String expectedFlashMode = Camera.Parameters.FLASH_MODE_TORCH;
+        AtomicReference<Camera.Parameters> actualCameraParameters = new AtomicReference<>();
+        cameraCapturer = new CameraCapturer(cameraCapturerActivity,
+                CameraCapturer.CameraSource.BACK_CAMERA,
+                null);
+        localVideoTrack = localMedia.addVideoTrack(true, cameraCapturer);
+
+        // Schedule our camera parameter update
+        scheduleCameraParameterFlashModeUpdate(cameraParametersUpdated, expectedFlashMode,
+                actualCameraParameters);
+
+        // Immediately schedule another
+        boolean parameterUpdateScheduled = cameraCapturer
+                .updateCameraParameters(new CameraParameterUpdater() {
+                    @Override
+                    public void apply(Camera.Parameters cameraParameters) {}
+                });
+
+        // With update pending this should have failed
+        assertFalse(parameterUpdateScheduled);
+
+        // Wait for original parameters to be set
+        assertTrue(cameraParametersUpdated.await(10, TimeUnit.SECONDS));
+
+        // Validate our flash mode
         assertEquals(expectedFlashMode, actualCameraParameters.get().getFlashMode());
     }
 

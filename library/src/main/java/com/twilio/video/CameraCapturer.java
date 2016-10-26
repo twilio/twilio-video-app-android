@@ -254,9 +254,7 @@ public class CameraCapturer implements VideoCapturer {
      * scheduled.
      */
     public synchronized boolean updateCameraParameters(CameraParameterUpdater cameraParameterUpdater) {
-        this.cameraParameterUpdater = cameraParameterUpdater;
-
-        // We assume the parameter update is scheduled unless specified otherwise from webrtc
+        // Assume that parameter update can be scheduled
         boolean parameterUpdateScheduled = true;
 
         /*
@@ -266,6 +264,11 @@ public class CameraCapturer implements VideoCapturer {
         if (webrtcCapturer != null) {
             parameterUpdateScheduled =
                     webrtcCapturer.injectCameraParameters(cameraParameterInjector);
+        }
+
+        // Only set parameter updater if we scheduled the injection
+        if (parameterUpdateScheduled) {
+            this.cameraParameterUpdater = cameraParameterUpdater;
         }
 
         return parameterUpdateScheduled;
