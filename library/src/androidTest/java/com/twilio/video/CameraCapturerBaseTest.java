@@ -181,19 +181,22 @@ public class CameraCapturerBaseTest extends BaseCameraCapturerTest {
     private void scheduleCameraParameterUpdate(final CountDownLatch cameraParametersUpdated,
                                                final String expectedFlashMode,
                                                final AtomicReference<Camera.Parameters> actualCameraParameters) {
-        cameraCapturer.updateCameraParameters(new CameraParameterUpdater() {
-            @Override
-            public void applyCameraParameterUpdates(Camera.Parameters cameraParameters) {
-                // This lets assume we can actually support flash mode
-                assumeNotNull(cameraParameters.getFlashMode());
+        boolean parameterUpdateScheduled = cameraCapturer
+                .updateCameraParameters(new CameraParameterUpdater() {
+                    @Override
+                    public void applyCameraParameterUpdates(Camera.Parameters cameraParameters) {
+                        // This lets assume we can actually support flash mode
+                        assumeNotNull(cameraParameters.getFlashMode());
 
-                // Turn the flash on set our parameters later for validation
-                cameraParameters.setFlashMode(expectedFlashMode);
-                actualCameraParameters.set(cameraParameters);
+                        // Turn the flash on set our parameters later for validation
+                        cameraParameters.setFlashMode(expectedFlashMode);
+                        actualCameraParameters.set(cameraParameters);
 
-                // Continue test
-                cameraParametersUpdated.countDown();
-            }
-        });
+                        // Continue test
+                        cameraParametersUpdated.countDown();
+                    }
+                });
+
+        assertTrue(parameterUpdateScheduled);
     }
 }

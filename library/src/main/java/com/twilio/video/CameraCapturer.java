@@ -52,7 +52,13 @@ public class CameraCapturer implements VideoCapturer {
                          * on the camera capturer instance.
                          */
                         if (cameraParameterUpdater != null) {
-                            webrtcCapturer.injectCameraParameters(cameraParameterInjector);
+                            boolean parameterUpdatedScheduled =
+                                    webrtcCapturer.injectCameraParameters(cameraParameterInjector);
+
+                            if (!parameterUpdatedScheduled) {
+                                logger.e("Failed to schedule camera parameter update after " +
+                                        "capturer started.");
+                            }
                         }
                     }
                 }
@@ -242,18 +248,27 @@ public class CameraCapturer implements VideoCapturer {
      *     });
      * </code></pre>
      *
-     * @param cameraParameterUpdater
+     * @param cameraParameterUpdater camera parameter updater that receives current camera
+     *                               parameters for modification.
+     * @return true if update was scheduled or false if an update is pending or could not be
+     * scheduled.
      */
-    public synchronized void updateCameraParameters(CameraParameterUpdater cameraParameterUpdater) {
+    public synchronized boolean updateCameraParameters(CameraParameterUpdater cameraParameterUpdater) {
         this.cameraParameterUpdater = cameraParameterUpdater;
+
+        // We assume the parameter update is scheduled unless specified otherwise from webrtc
+        boolean parameterUpdateScheduled = true;
 
         /*
          * If the camera capturer is running we can apply the parameters immediately. Otherwise
          * the parameters will be applied when the camera capturer is started again.
          */
         if (webrtcCapturer != null) {
-            webrtcCapturer.injectCameraParameters(cameraParameterInjector);
+            parameterUpdateScheduled =
+                    webrtcCapturer.injectCameraParameters(cameraParameterInjector);
         }
+
+        return parameterUpdateScheduled;
     }
 
     void setSurfaceTextureHelper(SurfaceTextureHelper surfaceTextureHelper) {
