@@ -2,6 +2,7 @@ package com.twilio.video;
 
 import android.Manifest;
 import android.content.Context;
+import android.hardware.Camera;
 
 import org.webrtc.CameraEnumerationAndroid;
 import org.webrtc.SurfaceTextureHelper;
@@ -43,6 +44,17 @@ public class CameraCapturer implements VideoCapturer {
                 @Override
                 public void onCapturerStarted(boolean success) {
                     videoCapturerListener.onCapturerStarted(success);
+
+                    synchronized (CameraCapturer.this) {
+                        /*
+                         * Here the user has specified a camera parameter updater. We need to apply
+                         * these parameters after the capturer is started to ensure consistency
+                         * on the camera capturer instance.
+                         */
+                        if (cameraParameterUpdater != null) {
+                            webrtcCapturer.injectCameraParameters(cameraParameterInjector);
+                        }
+                    }
                 }
 
                 @Override
@@ -74,6 +86,23 @@ public class CameraCapturer implements VideoCapturer {
                     // TODO: Do we need to support an output format request?
                 }
             };
+    private final VideoCapturerAndroid.CameraParameterInjector cameraParameterInjector =
+            new VideoCapturerAndroid.CameraParameterInjector() {
+                /*
+                 * We use the internal CameraParameterInjector we added in WebRTC to apply
+                 * a users custom camera parameters.
+                 */
+                @Override
+                public void onCameraParameters(Camera.Parameters parameters) {
+                    synchronized (CameraCapturer.this) {
+                        if (cameraParameterUpdater != null) {
+                            logger.i("Updating camera parameters");
+                            cameraParameterUpdater.applyCameraParameterUpdates(parameters);
+                        }
+                    }
+                }
+            };
+    private CameraParameterUpdater cameraParameterUpdater;
 
     public CameraCapturer(Context context,
                           CameraSource cameraSource,
@@ -179,6 +208,52 @@ public class CameraCapturer implements VideoCapturer {
         cameraSource = (cameraSource == CameraSource.FRONT_CAMERA) ?
                 (CameraSource.BACK_CAMERA) :
                 (CameraSource.FRONT_CAMERA);
+    }
+
+    /**
+     * Schedules a camera parameter update. The current camera's
+     * {@link android.hardware.Camera.Parameters} will be provided for modification via
+     * {@link CameraParameterUpdater#applyCameraParameterUpdates(Camera.Parameters)}. Any changes
+     * to the parameters will be applied after the invocation of this callback. This method can be
+     * invoked while capturing frames or not.
+     *
+     * <p>
+     *     The following snippet demonstrates how to turn on the flash of a camera while capturing.
+     * </p>
+     *
+     * <pre><code>
+     *     // Create local media and camera capturer
+     *     LocalMedia localMedia = LocalMedia.create(context);
+     *     CameraCapturer cameraCapturer = new CameraCapturer(context,
+     *          CameraCapturer.CameraSource.BACK_CAMERA, null);
+     *
+     *     // Start camera capturer
+     *     localMedia.addVideoTrack(true, cameraCapturer);
+     *
+     *     // Schedule camera parameter update
+     *     cameraCapturer.updateCameraParameters(new CameraParameterUpdater() {
+     *        {@literal @}Override
+     *         public void applyCameraParameterUpdates(Camera.Parameters cameraParameters) {
+     *             // Ensure camera supports flash and turn on
+     *             if (cameraParameters.getFlashMode() != null) {
+     *                  cameraParameters.setFlashMode(Camera.Parameters.FLASH_MODE_TORCH);
+     *             }
+     *         }
+     *     });
+     * </code></pre>
+     *
+     * @param cameraParameterUpdater
+     */
+    public synchronized void updateCameraParameters(CameraParameterUpdater cameraParameterUpdater) {
+        this.cameraParameterUpdater = cameraParameterUpdater;
+
+        /*
+         * If the camera capturer is running we can apply the parameters immediately. Otherwise
+         * the parameters will be applied when the camera capturer is started again.
+         */
+        if (webrtcCapturer != null) {
+            webrtcCapturer.injectCameraParameters(cameraParameterInjector);
+        }
     }
 
     void setSurfaceTextureHelper(SurfaceTextureHelper surfaceTextureHelper) {
