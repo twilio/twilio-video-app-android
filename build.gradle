@@ -10,7 +10,7 @@ buildscript {
         }
     }
     dependencies {
-        classpath "com.android.tools.build:gradle-experimental:0.7.0"
+        classpath "com.android.tools.build:gradle-experimental:0.7.3"
         // android-apt doesn't support gradle experimental plugin needed for ndk support
         // using this project instead
         classpath 'org.bitbucket.pvoid:android-apt-experemental:1.0.1'
