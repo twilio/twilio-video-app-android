@@ -92,6 +92,7 @@ public class CameraCapturer implements VideoCapturer {
                     // TODO: Do we need to support an output format request?
                 }
             };
+
     private final VideoCapturerAndroid.CameraParameterInjector cameraParameterInjector =
             new VideoCapturerAndroid.CameraParameterInjector() {
                 /*
