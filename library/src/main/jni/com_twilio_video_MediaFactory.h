@@ -21,10 +21,6 @@ public:
     }
 
     virtual ~MediaFactoryContext() {
-        if (media_options_.audio_device_module != nullptr) {
-            // TODO for some reason this causes compilation issues
-            //  delete media_options_.audio_device_module;
-        }
         media_factory_.reset();
     }
 
