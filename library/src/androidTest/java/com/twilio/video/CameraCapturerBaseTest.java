@@ -1,5 +1,6 @@
 package com.twilio.video;
 
+import android.hardware.Camera;
 import android.support.test.runner.AndroidJUnit4;
 
 import com.twilio.video.base.BaseCameraCapturerTest;
@@ -7,10 +8,14 @@ import com.twilio.video.base.BaseCameraCapturerTest;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicReference;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assume.assumeNotNull;
 
 @RunWith(AndroidJUnit4.class)
 public class CameraCapturerBaseTest extends BaseCameraCapturerTest {
@@ -87,5 +92,144 @@ public class CameraCapturerBaseTest extends BaseCameraCapturerTest {
         // Validate we are on back camera source
         assertEquals(CameraCapturer.CameraSource.BACK_CAMERA,
                 cameraCapturer.getCameraSource());
+    }
+
+    @Test
+    public void shouldAllowUpdatingCameraParametersBeforeCapturing() throws InterruptedException {
+        CountDownLatch cameraParametersUpdated = new CountDownLatch(1);
+        String expectedFlashMode = Camera.Parameters.FLASH_MODE_TORCH;
+        AtomicReference<Camera.Parameters> actualCameraParameters = new AtomicReference<>();
+        cameraCapturer = new CameraCapturer(cameraCapturerActivity,
+                CameraCapturer.CameraSource.BACK_CAMERA,
+                null);
+
+        // Set our camera parameters
+        scheduleCameraParameterFlashModeUpdate(cameraParametersUpdated, expectedFlashMode,
+                actualCameraParameters);
+
+        // Now add our video track
+        localVideoTrack = localMedia.addVideoTrack(true, cameraCapturer);
+
+        // Wait for parameters to be set
+        assertTrue(cameraParametersUpdated.await(10, TimeUnit.SECONDS));
+
+        // Validate our flash mode
+        assertEquals(expectedFlashMode, actualCameraParameters.get().getFlashMode());
+    }
+
+    @Test
+    public void shouldAllowUpdatingCameraParametersWhileCapturing() throws InterruptedException {
+        CountDownLatch cameraParametersUpdated = new CountDownLatch(1);
+        String expectedFlashMode = Camera.Parameters.FLASH_MODE_TORCH;
+        AtomicReference<Camera.Parameters> actualCameraParameters = new AtomicReference<>();
+        cameraCapturer = new CameraCapturer(cameraCapturerActivity,
+                CameraCapturer.CameraSource.BACK_CAMERA,
+                null);
+
+        // Begin capturing
+        localVideoTrack = localMedia.addVideoTrack(true, cameraCapturer);
+
+        // Schedule camera parameter update
+        scheduleCameraParameterFlashModeUpdate(cameraParametersUpdated, expectedFlashMode,
+                actualCameraParameters);
+
+        // Wait for parameters to be set
+        assertTrue(cameraParametersUpdated.await(10, TimeUnit.SECONDS));
+
+        // Validate our flash mode
+        assertEquals(expectedFlashMode, actualCameraParameters.get().getFlashMode());
+    }
+
+    @Test
+    public void updateCameraParameters_shouldManifestAfterCaptureCycle()
+            throws InterruptedException {
+        CountDownLatch cameraParametersUpdated = new CountDownLatch(1);
+        String expectedFlashMode = Camera.Parameters.FLASH_MODE_TORCH;
+        AtomicReference<Camera.Parameters> actualCameraParameters = new AtomicReference<>();
+        cameraCapturer = new CameraCapturer(cameraCapturerActivity,
+                CameraCapturer.CameraSource.BACK_CAMERA,
+                null);
+
+        // Begin capturing and validate our flash mode is set
+        localVideoTrack = localMedia.addVideoTrack(true, cameraCapturer);
+        scheduleCameraParameterFlashModeUpdate(cameraParametersUpdated, expectedFlashMode,
+                actualCameraParameters);
+
+        // Wait for parameters to be set
+        assertTrue(cameraParametersUpdated.await(10, TimeUnit.SECONDS));
+
+        // Validate our flash mode
+        assertEquals(expectedFlashMode, actualCameraParameters.get().getFlashMode());
+
+        // Remove the video track
+        localMedia.removeVideoTrack(localVideoTrack);
+
+        // Set our flash mode to something else
+        cameraParametersUpdated = new CountDownLatch(1);
+        expectedFlashMode = Camera.Parameters.FLASH_MODE_ON;
+        scheduleCameraParameterFlashModeUpdate(cameraParametersUpdated, expectedFlashMode, actualCameraParameters);
+
+        // Re add the track
+        localVideoTrack = localMedia.addVideoTrack(true, cameraCapturer);
+
+        // Wait for parameters to be set
+        assertTrue(cameraParametersUpdated.await(10, TimeUnit.SECONDS));
+
+        // Validate our flash mode is actually different
+        assertEquals(expectedFlashMode, actualCameraParameters.get().getFlashMode());
+    }
+
+    @Test
+    public void updateCameraParameters_shouldReturnFalseIfUpdateIsPending()
+            throws InterruptedException {
+        CountDownLatch cameraParametersUpdated = new CountDownLatch(1);
+        String expectedFlashMode = Camera.Parameters.FLASH_MODE_TORCH;
+        AtomicReference<Camera.Parameters> actualCameraParameters = new AtomicReference<>();
+        cameraCapturer = new CameraCapturer(cameraCapturerActivity,
+                CameraCapturer.CameraSource.BACK_CAMERA,
+                null);
+        localVideoTrack = localMedia.addVideoTrack(true, cameraCapturer);
+
+        // Schedule our camera parameter update
+        scheduleCameraParameterFlashModeUpdate(cameraParametersUpdated, expectedFlashMode,
+                actualCameraParameters);
+
+        // Immediately schedule another
+        boolean parameterUpdateScheduled = cameraCapturer
+                .updateCameraParameters(new CameraParameterUpdater() {
+                    @Override
+                    public void apply(Camera.Parameters cameraParameters) {}
+                });
+
+        // With update pending this should have failed
+        assertFalse(parameterUpdateScheduled);
+
+        // Wait for original parameters to be set
+        assertTrue(cameraParametersUpdated.await(10, TimeUnit.SECONDS));
+
+        // Validate our flash mode
+        assertEquals(expectedFlashMode, actualCameraParameters.get().getFlashMode());
+    }
+
+    private void scheduleCameraParameterFlashModeUpdate(final CountDownLatch cameraParametersUpdated,
+                                                        final String expectedFlashMode,
+                                                        final AtomicReference<Camera.Parameters> actualCameraParameters) {
+        boolean parameterUpdateScheduled = cameraCapturer
+                .updateCameraParameters(new CameraParameterUpdater() {
+                    @Override
+                    public void apply(Camera.Parameters cameraParameters) {
+                        // This lets assume we can actually support flash mode
+                        assumeNotNull(cameraParameters.getFlashMode());
+
+                        // Turn the flash on set our parameters later for validation
+                        cameraParameters.setFlashMode(expectedFlashMode);
+                        actualCameraParameters.set(cameraParameters);
+
+                        // Continue test
+                        cameraParametersUpdated.countDown();
+                    }
+                });
+
+        assertTrue(parameterUpdateScheduled);
     }
 }
