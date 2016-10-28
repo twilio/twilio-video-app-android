@@ -64,6 +64,15 @@ cricket::AudioOptions getAudioOptions(jobject j_audio_options) {
     return audio_options;
 }
 
+bool javaIsScreencast(jobject j_video_capturer) {
+    JNIEnv *jni = webrtc_jni::GetEnv();
+    jmethodID j_video_capturer_is_screencast_id = webrtc_jni::GetMethodID(jni,
+                                                                          jni->GetObjectClass(j_video_capturer),
+                                                                          "isScreencast",
+                                                                          "()Z");
+    return jni->CallBooleanMethod(j_video_capturer, j_video_capturer_is_screencast_id);
+}
+
 jobject createJavaVideoCapturerDelegate(jobject j_video_capturer) {
     JNIEnv *jni = webrtc_jni::GetEnv();
     jclass j_video_capturer_delegate_class = twilio_video_jni::FindClass(jni,
@@ -238,10 +247,12 @@ JNIEXPORT jobject JNICALL Java_com_twilio_video_LocalMedia_nativeAddVideoTrack(J
                                                                                jobject j_video_contraints) {
     std::shared_ptr<twilio::media::LocalMedia> local_media = getLocalMedia(local_media_handle);
     jobject j_video_capturer_delegate = createJavaVideoCapturerDelegate(j_video_capturer);
+    bool is_screencast = javaIsScreencast(j_video_capturer);
     rtc::scoped_refptr<VideoCapturerDelegate> delegate =
             new rtc::RefCountedObject<VideoCapturerDelegate>(jni,
                                                              j_video_capturer_delegate,
-                                                             nullptr);
+                                                             nullptr,
+                                                             is_screencast);
     cricket::VideoCapturer* capturer = new webrtc::AndroidVideoCapturer(delegate);
     std::shared_ptr<twilio::media::LocalVideoTrack> video_track = local_media->addVideoTrack(enabled,
                                                                                              getVideoConstraints(j_video_contraints),

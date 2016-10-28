@@ -38,7 +38,7 @@ class MediaFactory {
         return instance;
     }
 
-    LocalMedia createLocalMedia() {
+    LocalMedia createLocalMedia(Context context) {
         checkReleased("createLocalMedia");
         long nativeLocalMediaHandle = nativeCreateLocalMedia(nativeMediaFactoryHandle);
 
@@ -50,7 +50,7 @@ class MediaFactory {
             mediaFactoryRefCount++;
         }
 
-        return new LocalMedia(nativeLocalMediaHandle, this);
+        return new LocalMedia(context, this, nativeLocalMediaHandle);
     }
 
     void release() {

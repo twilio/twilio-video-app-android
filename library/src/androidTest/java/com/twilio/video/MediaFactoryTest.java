@@ -31,7 +31,7 @@ public class MediaFactoryTest {
 
     @Test
     public void canCreateLocalMedia() {
-        LocalMedia localMedia = mediaFactory.createLocalMedia();
+        LocalMedia localMedia = mediaFactory.createLocalMedia(context);
 
         localMedia.release();
         assertNotNull(localMedia);
@@ -50,7 +50,7 @@ public class MediaFactoryTest {
 
         // Create local medias
         for (int i = 0 ; i < numLocalMedias ; i++) {
-            localMedias[i] = mediaFactory.createLocalMedia();
+            localMedias[i] = mediaFactory.createLocalMedia(context);
         }
 
         // Destroy local medias
@@ -59,6 +59,6 @@ public class MediaFactoryTest {
         }
 
         // With all local medias released this should raise exception
-        mediaFactory.createLocalMedia();
+        mediaFactory.createLocalMedia(context);
     }
 }

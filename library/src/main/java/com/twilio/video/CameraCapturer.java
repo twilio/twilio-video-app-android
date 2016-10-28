@@ -3,12 +3,19 @@ package com.twilio.video;
 import android.Manifest;
 import android.content.Context;
 import android.hardware.Camera;
+import android.support.annotation.IntDef;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 import org.webrtc.CameraEnumerationAndroid;
 import org.webrtc.SurfaceTextureHelper;
 import org.webrtc.VideoCapturerAndroid;
 
+import java.lang.annotation.Retention;
+import java.util.ArrayList;
 import java.util.List;
+
+import static java.lang.annotation.RetentionPolicy.SOURCE;
 
 /**
  * The CameraCapturer class is used to provide video frames for a {@link LocalVideoTrack} from a
@@ -22,7 +29,26 @@ import java.util.List;
  * {@link LocalVideoTrack}s simultaneously.</p>
  */
 public class CameraCapturer implements VideoCapturer {
+    private static final String ERROR_MESSAGE_CAMERA_SERVER_DIED = "Camera server died!";
+    private static final String ERROR_MESSAGE_UNKNOWN = "Camera error:";
     private static final Logger logger = Logger.getLogger(CameraCapturer.class);
+
+    @Retention(SOURCE)
+    @IntDef({ERROR_CAMERA_FREEZE,
+            ERROR_CAMERA_SERVER_STOPPED,
+            ERROR_UNSUPPORTED_SOURCE,
+            ERROR_CAMERA_PERMISSION_NOT_GRANTED,
+            ERROR_CAPTURER_CREATION_FAILED,
+            ERROR_CAMERA_SWITCH_FAILED,
+            ERROR_UNKNOWN})
+    public @interface Error {}
+    public static final int ERROR_CAMERA_FREEZE = 0;
+    public static final int ERROR_CAMERA_SERVER_STOPPED = 1;
+    public static final int ERROR_UNSUPPORTED_SOURCE = 2;
+    public static final int ERROR_CAMERA_PERMISSION_NOT_GRANTED = 3;
+    public static final int ERROR_CAPTURER_CREATION_FAILED = 4;
+    public static final int ERROR_CAMERA_SWITCH_FAILED = 5;
+    public static final int ERROR_UNKNOWN = 6;
 
     /**
      * Camera source types.
@@ -33,8 +59,8 @@ public class CameraCapturer implements VideoCapturer {
     }
 
     private final Context context;
-    private final CapturerErrorListener listener;
     private final CameraCapturerFormatProvider formatProvider = new CameraCapturerFormatProvider();
+    private CameraCapturer.Listener listener;
     private VideoCapturerAndroid webrtcCapturer;
     private CameraSource cameraSource;
     private VideoCapturer.Listener videoCapturerListener;
@@ -111,23 +137,92 @@ public class CameraCapturer implements VideoCapturer {
             };
     private CameraParameterUpdater cameraParameterUpdater;
 
-    public CameraCapturer(Context context,
-                          CameraSource cameraSource,
-                          CapturerErrorListener listener) {
+    private final VideoCapturerAndroid.CameraEventsHandler cameraEventsHandler =
+            new VideoCapturerAndroid.CameraEventsHandler() {
+                @Override
+                public void onCameraError(String errorMsg) {
+                    if (listener != null) {
+                        if (errorMsg.equals(ERROR_MESSAGE_CAMERA_SERVER_DIED)) {
+                            logger.e("Camera server stopped.");
+                            listener.onError(CameraCapturer.ERROR_CAMERA_SERVER_STOPPED);
+                        } else if (errorMsg.contains(ERROR_MESSAGE_UNKNOWN)) {
+                            logger.e("Unknown camera error occurred.");
+                            listener.onError(CameraCapturer.ERROR_UNKNOWN);
+                        }
+                    }
+                }
 
+                @Override
+                public void onCameraFreezed(String s) {
+                    logger.e("Camera froze.");
+                    if(listener != null) {
+                        listener.onError(CameraCapturer.ERROR_CAMERA_FREEZE);
+                    }
+                }
+
+                @Override
+                public void onCameraOpening(int i) {
+                    // Ignore this event for now
+                }
+
+                @Override
+                public void onFirstFrameAvailable() {
+                    if (listener != null) {
+                        listener.onFirstFrameAvailable();
+                    }
+                }
+
+                @Override
+                public void onCameraClosed() {
+                    // Ignore this event for now
+                }
+            };
+
+    private final VideoCapturerAndroid.CameraSwitchHandler cameraSwitchHandler =
+            new VideoCapturerAndroid.CameraSwitchHandler() {
+                @Override
+                public void onCameraSwitchDone(boolean isFrontCamera) {
+                    synchronized (CameraCapturer.this) {
+                        cameraSource = (cameraSource == CameraSource.FRONT_CAMERA) ?
+                                (CameraSource.BACK_CAMERA) :
+                                (CameraSource.FRONT_CAMERA);
+                    }
+                    if (listener != null) {
+                        listener.onCameraSwitched();
+                    }
+                }
+
+                @Override
+                public void onCameraSwitchError(String errorMessage) {
+                    logger.e("Failed to switch to camera source " + cameraSource);
+                    if (listener != null) {
+                        listener.onError(ERROR_CAMERA_SWITCH_FAILED);
+                    }
+                }
+            };
+
+    public CameraCapturer(Context context, CameraSource cameraSource) {
+        this(context, cameraSource, null);
+    }
+
+    public CameraCapturer(Context context, CameraSource cameraSource, @Nullable Listener listener) {
         if (context == null) {
             throw new NullPointerException("context must not be null");
         }
         if (cameraSource == null) {
             throw new NullPointerException("camera source must not be null");
         }
-        if (!Util.permissionGranted(context, Manifest.permission.CAMERA) &&
-                listener != null) {
-            listener.onError(new CapturerException(CapturerException.ExceptionDomain.CAMERA,
-                    "CAMERA permission not granted"));
-        }
         this.context = context;
         this.cameraSource = cameraSource;
+        this.listener = listener;
+    }
+
+    /**
+     * Sets the camera capturer listener.
+     *
+     * @param listener the camera capturer listener.
+     */
+    public synchronized void setListener(Listener listener) {
         this.listener = listener;
     }
 
@@ -143,7 +238,24 @@ public class CameraCapturer implements VideoCapturer {
      */
     @Override
     public List<VideoFormat> getSupportedFormats() {
-        return formatProvider.getSupportedFormats(cameraSource);
+        // Camera permission is needed to query the supported formats of the device
+        if (Util.permissionGranted(context, Manifest.permission.CAMERA)) {
+            return formatProvider.getSupportedFormats(cameraSource);
+        } else {
+            /*
+             * Return default parameters and permission error will be surfaced when the capturing
+             * attempts to start.
+             */
+            return defaultFormats();
+        }
+    }
+
+    /**
+     * Indicates that the camera capturer is not a screen cast.
+     */
+    @Override
+    public boolean isScreencast() {
+        return false;
     }
 
     /**
@@ -158,25 +270,20 @@ public class CameraCapturer implements VideoCapturer {
     @Override
     public void startCapture(VideoFormat captureFormat,
                              VideoCapturer.Listener videoCapturerListener) {
-        // Create the webrtc capturer
-        this.webrtcCapturer = createVideoCapturerAndroid();
-        if (webrtcCapturer == null) {
-            if (listener != null) {
-                listener.onError(new CapturerException(CapturerException.ExceptionDomain.CAPTURER,
-                        "Failed to create capturer"));
-            }
+        boolean capturerCreated = createVideoCapturerAndroid();
+        if (capturerCreated) {
+            this.videoCapturerListener = videoCapturerListener;
+
+            webrtcCapturer.startCapture(captureFormat.dimensions.width,
+                    captureFormat.dimensions.height,
+                    captureFormat.framerate,
+                    surfaceTextureHelper,
+                    context,
+                    observerAdapter);
+        } else {
+            logger.e("Failed to startCapture");
             videoCapturerListener.onCapturerStarted(false);
-
-            return;
         }
-        this.videoCapturerListener = videoCapturerListener;
-
-        webrtcCapturer.startCapture(captureFormat.dimensions.width,
-                captureFormat.dimensions.height,
-                captureFormat.framerate,
-                surfaceTextureHelper,
-                context,
-                observerAdapter);
     }
 
     /**
@@ -208,13 +315,16 @@ public class CameraCapturer implements VideoCapturer {
      * or not.
      */
     public synchronized void switchCamera() {
-        // TODO: propagate error
         if (webrtcCapturer != null) {
-            webrtcCapturer.switchCamera(null);
+            webrtcCapturer.switchCamera(cameraSwitchHandler);
+        } else {
+            cameraSource = (cameraSource == CameraSource.FRONT_CAMERA) ?
+                    (CameraSource.BACK_CAMERA) :
+                    (CameraSource.FRONT_CAMERA);
+            if (listener != null) {
+                listener.onCameraSwitched();
+            }
         }
-        cameraSource = (cameraSource == CameraSource.FRONT_CAMERA) ?
-                (CameraSource.BACK_CAMERA) :
-                (CameraSource.FRONT_CAMERA);
     }
 
     /**
@@ -279,25 +389,68 @@ public class CameraCapturer implements VideoCapturer {
         this.surfaceTextureHelper = surfaceTextureHelper;
     }
 
-    private VideoCapturerAndroid createVideoCapturerAndroid() {
+    private List<VideoFormat> defaultFormats() {
+        List<VideoFormat> defaultFormats = new ArrayList<>();
+        VideoDimensions defaultDimensions = new VideoDimensions(640, 480);
+        VideoFormat defaultFormat = new VideoFormat(defaultDimensions, 30, VideoPixelFormat.NV21);
+
+        defaultFormats.add(defaultFormat);
+
+        return defaultFormats;
+    }
+
+    private boolean createVideoCapturerAndroid() {
+        if (!Util.permissionGranted(context, Manifest.permission.CAMERA)) {
+            logger.e("CAMERA permission must be granted to start capturer");
+            if (listener != null) {
+                listener.onError(ERROR_CAMERA_PERMISSION_NOT_GRANTED);
+            }
+            return false;
+        }
         int cameraId = CameraCapturerFormatProvider.getCameraId(cameraSource);
-        if (cameraId < 0) {
+        String deviceName = CameraEnumerationAndroid.getDeviceName(cameraId);
+
+        if (cameraId < 0 || deviceName == null) {
             logger.e("Failed to find camera source");
             if (listener != null) {
-                listener.onError(new CapturerException(CapturerException.ExceptionDomain.CAMERA,
-                        "Unsupported camera source provided"));
+                listener.onError(ERROR_UNSUPPORTED_SOURCE);
             }
-            return null;
-        }
-        CameraCapturerEventsHandler eventsHandler = new CameraCapturerEventsHandler(listener);
-
-        String deviceName = CameraEnumerationAndroid.getDeviceName(cameraId);
-        if (deviceName == null) {
-            return null;
+            return false;
         }
         // TODO: Need to figure out the best way to get this to to webrtc
         // final EglBase.Context eglContext = EglBaseProvider.provideEglBase().getEglBaseContext();
+        webrtcCapturer = VideoCapturerAndroid.create(deviceName, cameraEventsHandler);
 
-        return VideoCapturerAndroid.create(deviceName, eventsHandler);
+        if (webrtcCapturer == null) {
+            logger.e("Failed to create capturer");
+            if (listener != null) {
+                listener.onError(ERROR_CAPTURER_CREATION_FAILED);
+            }
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Interface that provides events and errors related to {@link CameraCapturer}.
+     */
+    public interface Listener {
+        /**
+         * Indicates when the first frame has been captured from the camera.
+         */
+        void onFirstFrameAvailable();
+
+        /**
+         * Notifies when a camera switch is complete.
+         */
+        void onCameraSwitched();
+
+        /**
+         * Reports an error that occurred in {@link CameraCapturer}.
+         *
+         * @param errorCode the code that describes the error that occurred.
+         */
+        void onError(@CameraCapturer.Error int errorCode);
     }
 }

@@ -180,6 +180,14 @@ public class ScreenCapturer implements VideoCapturer {
     }
 
     /**
+     * Inidicates that the screen capturer is a screencast.
+     */
+    @Override
+    public boolean isScreencast() {
+        return true;
+    }
+
+    /**
      * Starts capturing frames at the specified format. Frames will be provided to the given
      * listener upon availability.
      *
