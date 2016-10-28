@@ -59,7 +59,7 @@ public class LocalMedia {
 
     /**
      * Adds audio track to local media. Note that the RECORD_AUDIO permission must be granted
-     * in order for this operation to succeed.
+     * in order for this operation to succeed. If RECORD_AUDIO is not granted null is returned.
      *
      * @param enabled initial state of audio track.
      * @return local audio track if successfully added or null if audio track could not be added.
@@ -70,7 +70,7 @@ public class LocalMedia {
 
     /**
      * Adds audio track to local media. Note that the RECORD_AUDIO permission must be granted
-     * in order for this operation to succeed.
+     * in order for this operation to succeed. If RECORD_AUDIO is not granted null is returned.
      *
      * @param enabled initial state of audio track.
      * @param audioOptions audio options to be applied to the track.
