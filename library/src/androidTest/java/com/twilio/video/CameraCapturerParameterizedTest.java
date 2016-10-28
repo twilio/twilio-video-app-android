@@ -36,7 +36,7 @@ public class CameraCapturerParameterizedTest extends BaseCameraCapturerTest {
 
     @Test
     public void shouldCaptureFramesWhenVideoTrackAdded() throws InterruptedException {
-        cameraCapturer = new CameraCapturer(cameraCapturerActivity, cameraSource, null);
+        cameraCapturer = new CameraCapturer(cameraCapturerActivity, cameraSource);
         localVideoTrack = localMedia.addVideoTrack(true, cameraCapturer);
         int frameCount = frameCountRenderer.getFrameCount();
 
@@ -53,7 +53,7 @@ public class CameraCapturerParameterizedTest extends BaseCameraCapturerTest {
 
     @Test
     public void shouldStopCapturingFramesWhenVideoTrackRemoved() throws InterruptedException {
-        cameraCapturer = new CameraCapturer(cameraCapturerActivity, cameraSource, null);
+        cameraCapturer = new CameraCapturer(cameraCapturerActivity, cameraSource);
         localVideoTrack = localMedia.addVideoTrack(true, cameraCapturer);
         int frameCount = frameCountRenderer.getFrameCount();
 
@@ -96,7 +96,7 @@ public class CameraCapturerParameterizedTest extends BaseCameraCapturerTest {
             }
         };
         localVideo.setListener(rendererListener);
-        cameraCapturer = new CameraCapturer(cameraCapturerActivity, cameraSource, null);
+        cameraCapturer = new CameraCapturer(cameraCapturerActivity, cameraSource);
         localVideoTrack = localMedia.addVideoTrack(true, cameraCapturer);
         localVideoTrack.addRenderer(localVideo);
 
@@ -114,7 +114,7 @@ public class CameraCapturerParameterizedTest extends BaseCameraCapturerTest {
         int reuseCount = 5;
 
         // Reuse the same capturer while we iterate
-        cameraCapturer = new CameraCapturer(cameraCapturerActivity, cameraSource, null);
+        cameraCapturer = new CameraCapturer(cameraCapturerActivity, cameraSource);
 
         for (int i = 0 ; i < reuseCount ; i++) {
             FrameCountRenderer renderer = new FrameCountRenderer();
