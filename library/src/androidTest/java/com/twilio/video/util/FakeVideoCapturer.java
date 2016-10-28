@@ -68,6 +68,11 @@ public class FakeVideoCapturer implements VideoCapturer {
     }
 
     @Override
+    public boolean isScreencast() {
+        return false;
+    }
+
+    @Override
     public void startCapture(VideoFormat captureFormat,
                              VideoCapturer.Listener capturerListener) {
         this.captureFormat = captureFormat;

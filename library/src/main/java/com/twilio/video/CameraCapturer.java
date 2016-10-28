@@ -251,6 +251,14 @@ public class CameraCapturer implements VideoCapturer {
     }
 
     /**
+     * Indicates that the camera capturer is not a screen cast.
+     */
+    @Override
+    public boolean isScreencast() {
+        return false;
+    }
+
+    /**
      * Starts capturing frames at the specified format. Frames will be provided to the given
      * listener upon availability.
      *
