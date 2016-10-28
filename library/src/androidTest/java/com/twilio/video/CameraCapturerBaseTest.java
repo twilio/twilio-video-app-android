@@ -32,8 +32,25 @@ public class CameraCapturerBaseTest extends BaseCameraCapturerTest {
 
     @Test
     public void shouldAllowCameraSwitch() throws InterruptedException {
+        final CountDownLatch cameraSwitched = new CountDownLatch(1);
         cameraCapturer = new CameraCapturer(cameraCapturerActivity,
                 CameraCapturer.CameraSource.FRONT_CAMERA);
+        cameraCapturer.setListener(new CameraCapturer.Listener() {
+            @Override
+            public void onFirstFrameAvailable() {
+
+            }
+
+            @Override
+            public void onCameraSwitched() {
+                cameraSwitched.countDown();
+            }
+
+            @Override
+            public void onError(@CameraCapturer.Error int errorCode) {
+
+            }
+        });
         localVideoTrack = localMedia.addVideoTrack(true, cameraCapturer);
         int frameCount = frameCountRenderer.getFrameCount();
 
@@ -54,6 +71,9 @@ public class CameraCapturerBaseTest extends BaseCameraCapturerTest {
         // Perform camera switch
         cameraCapturer.switchCamera();
 
+        // Validate our switch happened
+        assertTrue(cameraSwitched.await(10, TimeUnit.SECONDS));
+
         // Wait and validate our frame count is still incrementing
         frameCount = frameCountRenderer.getFrameCount();
         Thread.sleep(TimeUnit.SECONDS.toMillis(CAMERA_CAPTURE_DELAY));
@@ -66,8 +86,25 @@ public class CameraCapturerBaseTest extends BaseCameraCapturerTest {
 
     @Test
     public void shouldAllowCameraSwitchWhileNotOnLocalVideo() throws InterruptedException {
+        final CountDownLatch cameraSwitched = new CountDownLatch(1);
         cameraCapturer = new CameraCapturer(cameraCapturerActivity,
                 CameraCapturer.CameraSource.FRONT_CAMERA);
+        cameraCapturer.setListener(new CameraCapturer.Listener() {
+            @Override
+            public void onFirstFrameAvailable() {
+
+            }
+
+            @Override
+            public void onCameraSwitched() {
+                cameraSwitched.countDown();
+            }
+
+            @Override
+            public void onError(@CameraCapturer.Error int errorCode) {
+
+            }
+        });
 
         // Switch our camera
         cameraCapturer.switchCamera();
@@ -75,6 +112,9 @@ public class CameraCapturerBaseTest extends BaseCameraCapturerTest {
         // Now add our video track
         localVideoTrack = localMedia.addVideoTrack(true, cameraCapturer);
         int frameCount = frameCountRenderer.getFrameCount();
+
+        // Validate our switch happened
+        assertTrue(cameraSwitched.await(10, TimeUnit.SECONDS));
 
         // Validate our frame count is nothing
         assertEquals(0, frameCount);

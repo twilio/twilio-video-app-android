@@ -179,14 +179,19 @@ public class CameraCapturer implements VideoCapturer {
     private final VideoCapturerAndroid.CameraSwitchHandler cameraSwitchHandler =
             new VideoCapturerAndroid.CameraSwitchHandler() {
                 @Override
-                public void onCameraSwitchDone(boolean b) {
+                public void onCameraSwitchDone(boolean isFrontCamera) {
+                    synchronized (CameraCapturer.this) {
+                        cameraSource = (cameraSource == CameraSource.FRONT_CAMERA) ?
+                                (CameraSource.BACK_CAMERA) :
+                                (CameraSource.FRONT_CAMERA);
+                    }
                     if (listener != null) {
                         listener.onCameraSwitched();
                     }
                 }
 
                 @Override
-                public void onCameraSwitchError(String s) {
+                public void onCameraSwitchError(String errorMessage) {
                     logger.e("Failed to switch to camera source " + cameraSource);
                     if (listener != null) {
                         listener.onError(ERROR_CAMERA_SWITCH_FAILED);
@@ -298,10 +303,14 @@ public class CameraCapturer implements VideoCapturer {
     public synchronized void switchCamera() {
         if (webrtcCapturer != null) {
             webrtcCapturer.switchCamera(cameraSwitchHandler);
+        } else {
+            cameraSource = (cameraSource == CameraSource.FRONT_CAMERA) ?
+                    (CameraSource.BACK_CAMERA) :
+                    (CameraSource.FRONT_CAMERA);
+            if (listener != null) {
+                listener.onCameraSwitched();
+            }
         }
-        cameraSource = (cameraSource == CameraSource.FRONT_CAMERA) ?
-                (CameraSource.BACK_CAMERA) :
-                (CameraSource.FRONT_CAMERA);
     }
 
     /**
