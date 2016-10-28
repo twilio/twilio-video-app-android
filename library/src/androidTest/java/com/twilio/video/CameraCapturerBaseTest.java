@@ -91,6 +91,28 @@ public class CameraCapturerBaseTest extends BaseCameraCapturerTest {
     }
 
     @Test
+    public void switchCamera_shouldFailWithSwitchPending() throws InterruptedException {
+        final CountDownLatch cameraSwitchError = new CountDownLatch(1);
+        cameraCapturer = new CameraCapturer(cameraCapturerActivity,
+                CameraCapturer.CameraSource.FRONT_CAMERA);
+        localVideoTrack = localMedia.addVideoTrack(true, cameraCapturer);
+        cameraCapturer.setListener(new CameraCapturer.Listener() {
+            @Override
+            public void onError(@CameraCapturer.CameraCapturerError int errorCode) {
+                assertEquals(CameraCapturer.ERROR_CAMERA_SWITCH_FAILED, errorCode);
+                cameraSwitchError.countDown();
+            }
+        });
+
+        // Switch our cameras quickly
+        cameraCapturer.switchCamera();
+        cameraCapturer.switchCamera();
+
+        // Wait for callback
+        assertTrue(cameraSwitchError.await(10, TimeUnit.SECONDS));
+    }
+
+    @Test
     public void shouldAllowUpdatingCameraParametersBeforeCapturing() throws InterruptedException {
         CountDownLatch cameraParametersUpdated = new CountDownLatch(1);
         String expectedFlashMode = Camera.Parameters.FLASH_MODE_TORCH;
