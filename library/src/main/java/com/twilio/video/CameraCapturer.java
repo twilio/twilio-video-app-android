@@ -404,7 +404,15 @@ public class CameraCapturer implements VideoCapturer {
         return true;
     }
 
+    /**
+     * Interface that provides events and errors related to {@link CameraCapturer}.
+     */
     public interface Listener {
+        /**
+         * Reports an error that occurred in {@link CameraCapturer}
+         *
+         * @param errorCode the code that describes the error that occurred.
+         */
         void onError(@CameraCapturer.Error int errorCode);
     }
 }
