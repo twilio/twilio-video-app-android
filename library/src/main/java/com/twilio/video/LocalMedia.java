@@ -5,6 +5,8 @@ import android.content.Context;
 import java.util.ArrayList;
 import java.util.List;
 
+import static android.Manifest.permission.RECORD_AUDIO;
+
 /**
  * LocalMedia provides local audio and video track management.
  *
@@ -17,10 +19,11 @@ public class LocalMedia {
     private static final String RELEASE_MESSAGE_TEMPLATE = "LocalMedia released %s unavailable";
     private static final Logger logger = Logger.getLogger(LocalMedia.class);
 
+    private final Context context;
+    private final MediaFactory mediaFactory;
     private long nativeLocalMediaHandle;
     private final List<LocalAudioTrack> localAudioTracks = new ArrayList<>();
     private final List<LocalVideoTrack> localVideoTracks = new ArrayList<>();
-    private final MediaFactory mediaFactory;
 
     /**
      * Creates a new local media.
@@ -29,12 +32,13 @@ public class LocalMedia {
      * @return a new local media instance
      */
     public static LocalMedia create(Context context) {
-        return MediaFactory.instance(context).createLocalMedia();
+        return MediaFactory.instance(context).createLocalMedia(context);
     }
 
-    LocalMedia(long nativeLocalMediaHandle, MediaFactory mediaFactory) {
-        this.nativeLocalMediaHandle = nativeLocalMediaHandle;
+    LocalMedia(Context context, MediaFactory mediaFactory, long nativeLocalMediaHandle) {
+        this.context = context;
         this.mediaFactory = mediaFactory;
+        this.nativeLocalMediaHandle = nativeLocalMediaHandle;
     }
 
     /**
@@ -54,7 +58,8 @@ public class LocalMedia {
     }
 
     /**
-     * Adds audio track to local media.
+     * Adds audio track to local media. Note that the RECORD_AUDIO permission must be granted
+     * in order for this operation to succeed.
      *
      * @param enabled initial state of audio track.
      * @return local audio track if successfully added or null if audio track could not be added.
@@ -64,7 +69,8 @@ public class LocalMedia {
     }
 
     /**
-     * Adds audio track to local media.
+     * Adds audio track to local media. Note that the RECORD_AUDIO permission must be granted
+     * in order for this operation to succeed.
      *
      * @param enabled initial state of audio track.
      * @param audioOptions audio options to be applied to the track.
@@ -72,14 +78,19 @@ public class LocalMedia {
      */
     public LocalAudioTrack addAudioTrack(boolean enabled, AudioOptions audioOptions) {
         checkReleased("addAudioTrack");
-        LocalAudioTrack localAudioTrack = nativeAddAudioTrack(nativeLocalMediaHandle, enabled,
-                audioOptions);
+        LocalAudioTrack localAudioTrack = null;
 
-        if (localAudioTrack != null) {
-            localAudioTracks.add(localAudioTrack);
-            return localAudioTrack;
+        if (Util.permissionGranted(context, RECORD_AUDIO)) {
+            localAudioTrack = nativeAddAudioTrack(nativeLocalMediaHandle, enabled, audioOptions);
+
+            if (localAudioTrack != null) {
+                localAudioTracks.add(localAudioTrack);
+                return localAudioTrack;
+            } else {
+                logger.e("Failed to create local audio track");
+            }
         } else {
-            logger.e("Failed to create local audio track");
+            logger.e("RECORD_AUDIO permission must be granted to add audio track");
         }
 
         return localAudioTrack;
