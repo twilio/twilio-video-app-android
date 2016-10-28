@@ -450,56 +450,56 @@ class ConversationsRuleSource extends RuleSource {
 
     @Mutate
     void validatePreCompileDebugEnvironmentArmeabiV7a(
-            @Path('tasks.compileJingle_peerconnection_soArmeabi-v7aDebugSharedLibraryJingle_peerconnection_soMainCpp')
+            @Path('tasks.compileJingle_peerconnection_soArmeabi-v7aDebugSharedLibraryJingle_peerconnection_soArmeabi-v7aDebugSharedLibraryMainCpp')
                     Task compileTask) {
         validatePreCompileEnvironment(compileTask)
     }
 
     @Mutate
     void validatePreCompileReleaseEnvironmentArmeabiV7a(
-            @Path('tasks.compileJingle_peerconnection_soArmeabi-v7aReleaseSharedLibraryJingle_peerconnection_soMainCpp')
+            @Path('tasks.compileJingle_peerconnection_soArmeabi-v7aReleaseSharedLibraryJingle_peerconnection_soArmeabi-v7aReleaseSharedLibraryMainCpp')
                     Task compileTask) {
         validatePreCompileEnvironment(compileTask)
     }
 
     @Mutate
     void validatePreCompileDebugEnvironmentArm64V8a(
-            @Path('tasks.compileJingle_peerconnection_soArm64-v8aDebugSharedLibraryJingle_peerconnection_soMainCpp')
+            @Path('tasks.compileJingle_peerconnection_soArm64-v8aDebugSharedLibraryJingle_peerconnection_soArm64-v8aDebugSharedLibraryMainCpp')
                     Task compileTask) {
         validatePreCompileEnvironment(compileTask)
     }
 
     @Mutate
     void validatePreCompileReleaseEnvironmentArm64V8a(
-            @Path('tasks.compileJingle_peerconnection_soArm64-v8aReleaseSharedLibraryJingle_peerconnection_soMainCpp')
+            @Path('tasks.compileJingle_peerconnection_soArm64-v8aReleaseSharedLibraryJingle_peerconnection_soArm64-v8aReleaseSharedLibraryMainCpp')
                     Task compileTask) {
         validatePreCompileEnvironment(compileTask)
     }
 
     @Mutate
     void validatePreCompileDebugEnvironmentX86(
-            @Path('tasks.compileJingle_peerconnection_soX86DebugSharedLibraryJingle_peerconnection_soMainCpp')
+            @Path('tasks.compileJingle_peerconnection_soX86DebugSharedLibraryJingle_peerconnection_soX86DebugSharedLibraryMainCpp')
                     Task compileTask) {
         validatePreCompileEnvironment(compileTask)
     }
 
     @Mutate
     void validatePreCompileReleaseEnvironmentX86(
-            @Path('tasks.compileJingle_peerconnection_soX86ReleaseSharedLibraryJingle_peerconnection_soMainCpp')
+            @Path('tasks.compileJingle_peerconnection_soX86ReleaseSharedLibraryJingle_peerconnection_soX86ReleaseSharedLibraryMainCpp')
                     Task compileTask) {
         validatePreCompileEnvironment(compileTask)
     }
 
     @Mutate
     void validatePreCompileDebugEnvironmentX86_64(
-            @Path('tasks.compileJingle_peerconnection_soX86_64DebugSharedLibraryJingle_peerconnection_soMainCpp')
+            @Path('tasks.compileJingle_peerconnection_soX86_64DebugSharedLibraryJingle_peerconnection_soX86_64DebugSharedLibraryMainCpp')
                     Task compileTask) {
         validatePreCompileEnvironment(compileTask)
     }
 
     @Mutate
     void validatePreCompileReleaseEnvironmentX86_64(
-            @Path('tasks.compileJingle_peerconnection_soX86_64ReleaseSharedLibraryJingle_peerconnection_soMainCpp')
+            @Path('tasks.compileJingle_peerconnection_soX86_64ReleaseSharedLibraryJingle_peerconnection_soX86_64ReleaseSharedLibraryMainCpp')
                     Task compileTask) {
         validatePreCompileEnvironment(compileTask)
     }
