@@ -12,6 +12,13 @@ public interface VideoCapturer {
     List<VideoFormat> getSupportedFormats();
 
     /**
+     * Indicates whether the capturer is a screen cast.
+     *
+     * @return true if the video capturer is a screecast and false if not.
+     */
+    boolean isScreencast();
+
+    /**
      * Start capturing frames.
      *
      * @param captureFormat format to start capturing in.

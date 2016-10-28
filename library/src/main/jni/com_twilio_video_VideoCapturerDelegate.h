@@ -14,11 +14,11 @@ namespace twilio_video_jni {
 
 class VideoCapturerDelegate : public webrtc_jni::AndroidVideoCapturerJni {
 public:
-    VideoCapturerDelegate(JNIEnv* jni, jobject j_video_capturer, jobject j_egl_context) :
+    VideoCapturerDelegate(JNIEnv* jni, jobject j_video_capturer, jobject j_egl_context, bool is_screencast) :
             webrtc_jni::AndroidVideoCapturerJni(jni,
                                                 j_video_capturer,
                                                 j_egl_context,
-                                                false) {}
+                                                is_screencast) {}
 
     void Start(const cricket::VideoFormat& capture_format,
                webrtc::AndroidVideoCapturer* capturer) override;
