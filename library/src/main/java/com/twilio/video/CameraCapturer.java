@@ -4,6 +4,8 @@ import android.Manifest;
 import android.content.Context;
 import android.hardware.Camera;
 import android.support.annotation.IntDef;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 import org.webrtc.CameraEnumerationAndroid;
 import org.webrtc.SurfaceTextureHelper;
@@ -200,7 +202,10 @@ public class CameraCapturer implements VideoCapturer {
             };
 
     public CameraCapturer(Context context, CameraSource cameraSource) {
+        this(context, cameraSource, null);
+    }
 
+    public CameraCapturer(Context context, CameraSource cameraSource, @Nullable Listener listener) {
         if (context == null) {
             throw new NullPointerException("context must not be null");
         }
@@ -209,6 +214,7 @@ public class CameraCapturer implements VideoCapturer {
         }
         this.context = context;
         this.cameraSource = cameraSource;
+        this.listener = listener;
     }
 
     /**
