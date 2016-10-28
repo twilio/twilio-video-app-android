@@ -39,7 +39,7 @@ public class CameraCapturer implements VideoCapturer {
             ERROR_CAPTURER_CREATION_FAILED,
             ERROR_CAMERA_SWITCH_FAILED,
             ERROR_UNKNOWN})
-    public @interface CameraCapturerError {}
+    public @interface Error {}
     public static final int ERROR_CAMERA_FREEZE = 0;
     public static final int ERROR_CAMERA_SERVER_STOPPED = 1;
     public static final int ERROR_UNSUPPORTED_SOURCE = 2;
@@ -405,6 +405,6 @@ public class CameraCapturer implements VideoCapturer {
     }
 
     public interface Listener {
-        void onError(@CameraCapturerError int errorCode);
+        void onError(@CameraCapturer.Error int errorCode);
     }
 }

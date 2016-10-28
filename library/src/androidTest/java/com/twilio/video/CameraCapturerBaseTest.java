@@ -98,7 +98,7 @@ public class CameraCapturerBaseTest extends BaseCameraCapturerTest {
         localVideoTrack = localMedia.addVideoTrack(true, cameraCapturer);
         cameraCapturer.setListener(new CameraCapturer.Listener() {
             @Override
-            public void onError(@CameraCapturer.CameraCapturerError int errorCode) {
+            public void onError(@CameraCapturer.Error int errorCode) {
                 assertEquals(CameraCapturer.ERROR_CAMERA_SWITCH_FAILED, errorCode);
                 cameraSwitchError.countDown();
             }
