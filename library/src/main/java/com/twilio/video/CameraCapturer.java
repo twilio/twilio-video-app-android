@@ -160,17 +160,19 @@ public class CameraCapturer implements VideoCapturer {
 
                 @Override
                 public void onCameraOpening(int i) {
-                    // TODO: Do we want to expose this event?
+                    // Ignore this event for now
                 }
 
                 @Override
                 public void onFirstFrameAvailable() {
-                    // TODO: Do we want to expose this event?
+                    if (listener != null) {
+                        listener.onFirstFrameAvailable();
+                    }
                 }
 
                 @Override
                 public void onCameraClosed() {
-                    // TODO: Do we want to expose this event?
+                    // Ignore this event for now
                 }
             };
 
@@ -178,7 +180,9 @@ public class CameraCapturer implements VideoCapturer {
             new VideoCapturerAndroid.CameraSwitchHandler() {
                 @Override
                 public void onCameraSwitchDone(boolean b) {
-                    // TODO: Do we want to expose this event?
+                    if (listener != null) {
+                        listener.onCameraSwitched();
+                    }
                 }
 
                 @Override
@@ -410,7 +414,17 @@ public class CameraCapturer implements VideoCapturer {
      */
     public interface Listener {
         /**
-         * Reports an error that occurred in {@link CameraCapturer}
+         * Indicates when the first frame has been captured from the camera.
+         */
+        void onFirstFrameAvailable();
+
+        /**
+         * Notifies when a camera switch is complete.
+         */
+        void onCameraSwitched();
+
+        /**
+         * Reports an error that occurred in {@link CameraCapturer}.
          *
          * @param errorCode the code that describes the error that occurred.
          */

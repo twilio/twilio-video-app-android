@@ -15,6 +15,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 import static org.junit.Assume.assumeNotNull;
 
 @RunWith(AndroidJUnit4.class)
@@ -97,6 +98,14 @@ public class CameraCapturerBaseTest extends BaseCameraCapturerTest {
                 CameraCapturer.CameraSource.FRONT_CAMERA);
         localVideoTrack = localMedia.addVideoTrack(true, cameraCapturer);
         cameraCapturer.setListener(new CameraCapturer.Listener() {
+            @Override
+            public void onFirstFrameAvailable() {
+            }
+
+            @Override
+            public void onCameraSwitched() {
+            }
+
             @Override
             public void onError(@CameraCapturer.Error int errorCode) {
                 assertEquals(CameraCapturer.ERROR_CAMERA_SWITCH_FAILED, errorCode);
