@@ -34,23 +34,23 @@ public class CameraCapturerBaseTest extends BaseCameraCapturerTest {
     public void shouldAllowCameraSwitch() throws InterruptedException {
         final CountDownLatch cameraSwitched = new CountDownLatch(1);
         cameraCapturer = new CameraCapturer(cameraCapturerActivity,
-                CameraCapturer.CameraSource.FRONT_CAMERA);
-        cameraCapturer.setListener(new CameraCapturer.Listener() {
-            @Override
-            public void onFirstFrameAvailable() {
+                CameraCapturer.CameraSource.FRONT_CAMERA,
+                new CameraCapturer.Listener() {
+                    @Override
+                    public void onFirstFrameAvailable() {
 
-            }
+                    }
 
-            @Override
-            public void onCameraSwitched() {
-                cameraSwitched.countDown();
-            }
+                    @Override
+                    public void onCameraSwitched() {
+                        cameraSwitched.countDown();
+                    }
 
-            @Override
-            public void onError(@CameraCapturer.Error int errorCode) {
+                    @Override
+                    public void onError(@CameraCapturer.Error int errorCode) {
 
-            }
-        });
+                    }
+                });
         localVideoTrack = localMedia.addVideoTrack(true, cameraCapturer);
         int frameCount = frameCountRenderer.getFrameCount();
 
@@ -88,23 +88,23 @@ public class CameraCapturerBaseTest extends BaseCameraCapturerTest {
     public void shouldAllowCameraSwitchWhileNotOnLocalVideo() throws InterruptedException {
         final CountDownLatch cameraSwitched = new CountDownLatch(1);
         cameraCapturer = new CameraCapturer(cameraCapturerActivity,
-                CameraCapturer.CameraSource.FRONT_CAMERA);
-        cameraCapturer.setListener(new CameraCapturer.Listener() {
-            @Override
-            public void onFirstFrameAvailable() {
+                CameraCapturer.CameraSource.FRONT_CAMERA,
+                new CameraCapturer.Listener() {
+                    @Override
+                    public void onFirstFrameAvailable() {
 
-            }
+                    }
 
-            @Override
-            public void onCameraSwitched() {
-                cameraSwitched.countDown();
-            }
+                    @Override
+                    public void onCameraSwitched() {
+                        cameraSwitched.countDown();
+                    }
 
-            @Override
-            public void onError(@CameraCapturer.Error int errorCode) {
+                    @Override
+                    public void onError(@CameraCapturer.Error int errorCode) {
 
-            }
-        });
+                    }
+                });
 
         // Switch our camera
         cameraCapturer.switchCamera();
@@ -135,23 +135,23 @@ public class CameraCapturerBaseTest extends BaseCameraCapturerTest {
     public void switchCamera_shouldFailWithSwitchPending() throws InterruptedException {
         final CountDownLatch cameraSwitchError = new CountDownLatch(1);
         cameraCapturer = new CameraCapturer(cameraCapturerActivity,
-                CameraCapturer.CameraSource.FRONT_CAMERA);
+                CameraCapturer.CameraSource.FRONT_CAMERA,
+                new CameraCapturer.Listener() {
+                    @Override
+                    public void onFirstFrameAvailable() {
+                    }
+
+                    @Override
+                    public void onCameraSwitched() {
+                    }
+
+                    @Override
+                    public void onError(@CameraCapturer.Error int errorCode) {
+                        assertEquals(CameraCapturer.ERROR_CAMERA_SWITCH_FAILED, errorCode);
+                        cameraSwitchError.countDown();
+                    }
+                });
         localVideoTrack = localMedia.addVideoTrack(true, cameraCapturer);
-        cameraCapturer.setListener(new CameraCapturer.Listener() {
-            @Override
-            public void onFirstFrameAvailable() {
-            }
-
-            @Override
-            public void onCameraSwitched() {
-            }
-
-            @Override
-            public void onError(@CameraCapturer.Error int errorCode) {
-                assertEquals(CameraCapturer.ERROR_CAMERA_SWITCH_FAILED, errorCode);
-                cameraSwitchError.countDown();
-            }
-        });
 
         // Switch our cameras quickly
         cameraCapturer.switchCamera();

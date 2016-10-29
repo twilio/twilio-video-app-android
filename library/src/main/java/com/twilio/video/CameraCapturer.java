@@ -4,7 +4,6 @@ import android.Manifest;
 import android.content.Context;
 import android.hardware.Camera;
 import android.support.annotation.IntDef;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import org.webrtc.CameraEnumerationAndroid;
@@ -214,15 +213,6 @@ public class CameraCapturer implements VideoCapturer {
         }
         this.context = context;
         this.cameraSource = cameraSource;
-        this.listener = listener;
-    }
-
-    /**
-     * Sets the camera capturer listener.
-     *
-     * @param listener the camera capturer listener.
-     */
-    public synchronized void setListener(Listener listener) {
         this.listener = listener;
     }
 
