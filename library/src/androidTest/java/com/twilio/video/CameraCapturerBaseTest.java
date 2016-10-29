@@ -21,13 +21,18 @@ import static org.junit.Assume.assumeNotNull;
 @RunWith(AndroidJUnit4.class)
 public class CameraCapturerBaseTest extends BaseCameraCapturerTest {
     @Test(expected = NullPointerException.class)
-    public void create_shouldFailWithNullContext() {
+    public void shouldFailWithNullContext() {
         cameraCapturer = new CameraCapturer(null, CameraCapturer.CameraSource.FRONT_CAMERA);
     }
 
     @Test(expected = NullPointerException.class)
-    public void create_shouldFailWithNullSource() {
+    public void shouldFailWithNullSource() {
         cameraCapturer = new CameraCapturer(cameraCapturerActivity, null);
+    }
+
+    @Test
+    public void shouldAllowNullListener() {
+        cameraCapturer = new CameraCapturer(cameraCapturerActivity, null, null);
     }
 
     @Test
