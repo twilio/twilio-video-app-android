@@ -32,7 +32,8 @@ public class CameraCapturerBaseTest extends BaseCameraCapturerTest {
 
     @Test
     public void shouldAllowNullListener() {
-        cameraCapturer = new CameraCapturer(cameraCapturerActivity, null, null);
+        cameraCapturer = new CameraCapturer(cameraCapturerActivity,
+                CameraCapturer.CameraSource.FRONT_CAMERA, null);
     }
 
     @Test
