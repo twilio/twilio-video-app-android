@@ -37,23 +37,23 @@ public class CameraCapturerParameterizedTest extends BaseCameraCapturerTest {
     @Test
     public void shouldCaptureFramesWhenVideoTrackAdded() throws InterruptedException {
         final CountDownLatch firstFrameReceived = new CountDownLatch(1);
-        cameraCapturer = new CameraCapturer(cameraCapturerActivity, cameraSource);
-        cameraCapturer.setListener(new CameraCapturer.Listener() {
-            @Override
-            public void onFirstFrameAvailable() {
-                firstFrameReceived.countDown();
-            }
+        cameraCapturer = new CameraCapturer(cameraCapturerActivity, cameraSource,
+                new CameraCapturer.Listener() {
+                    @Override
+                    public void onFirstFrameAvailable() {
+                        firstFrameReceived.countDown();
+                    }
 
-            @Override
-            public void onCameraSwitched() {
+                    @Override
+                    public void onCameraSwitched() {
 
-            }
+                    }
 
-            @Override
-            public void onError(@CameraCapturer.Error int errorCode) {
+                    @Override
+                    public void onError(@CameraCapturer.Error int errorCode) {
 
-            }
-        });
+                    }
+                });
         localVideoTrack = localMedia.addVideoTrack(true, cameraCapturer);
         int frameCount = frameCountRenderer.getFrameCount();
 
