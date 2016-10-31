@@ -284,13 +284,15 @@ public class CameraCapturer implements VideoCapturer {
      */
     @Override
     public void stopCapture() {
-        try {
-            webrtcCapturer.stopCapture();
-        } catch (InterruptedException e) {
-            logger.e("Failed to stop camera capturer");
+        if (webrtcCapturer != null) {
+            try {
+                webrtcCapturer.stopCapture();
+            } catch (InterruptedException e) {
+                logger.e("Failed to stop camera capturer");
+            }
+            webrtcCapturer.dispose();
+            webrtcCapturer = null;
         }
-        webrtcCapturer.dispose();
-        webrtcCapturer = null;
     }
 
     /**
