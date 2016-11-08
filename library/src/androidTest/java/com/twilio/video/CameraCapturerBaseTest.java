@@ -280,6 +280,45 @@ public class CameraCapturerBaseTest extends BaseCameraCapturerTest {
         assertEquals(expectedFlashMode, actualCameraParameters.get().getFlashMode());
     }
 
+    @Test
+    public void takePicture_shouldFailIfCapturerNotRunning() {
+        cameraCapturer = new CameraCapturer(cameraCapturerActivity,
+                CameraCapturer.CameraSource.BACK_CAMERA);
+
+        assertFalse(cameraCapturer.takePicture(new CameraCapturer.PictureListener() {
+            @Override
+            public void onShutter() {
+                fail();
+            }
+
+            @Override
+            public void onPictureTaken(byte[] pictureData) {
+                fail();
+            }
+        }));
+    }
+
+    @Test
+    public void takePicture_shouldFailWithPicturePending() {
+        cameraCapturer = new CameraCapturer(cameraCapturerActivity,
+                CameraCapturer.CameraSource.BACK_CAMERA);
+        localVideoTrack = localMedia.addVideoTrack(true, cameraCapturer);
+        CameraCapturer.PictureListener pictureListener = new CameraCapturer.PictureListener() {
+            @Override
+            public void onShutter() {
+
+            }
+
+            @Override
+            public void onPictureTaken(byte[] pictureData) {
+
+            }
+        };
+
+        assertTrue(cameraCapturer.takePicture(pictureListener));
+        assertFalse(cameraCapturer.takePicture(pictureListener));
+    }
+
     private void scheduleCameraParameterFlashModeUpdate(final CountDownLatch cameraParametersUpdated,
                                                         final String expectedFlashMode,
                                                         final AtomicReference<Camera.Parameters> actualCameraParameters) {

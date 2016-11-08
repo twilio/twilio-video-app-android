@@ -1,5 +1,6 @@
 package com.twilio.video;
 
+import android.graphics.BitmapFactory;
 import android.support.test.filters.LargeTest;
 
 import com.twilio.video.base.BaseCameraCapturerTest;
@@ -16,6 +17,7 @@ import com.twilio.video.test.R;
 import com.twilio.video.util.FrameCountRenderer;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 @RunWith(Parameterized.class)
@@ -68,6 +70,63 @@ public class CameraCapturerParameterizedTest extends BaseCameraCapturerTest {
         Thread.sleep(TimeUnit.SECONDS.toMillis(CAMERA_CAPTURE_DELAY));
 
         // Validate our frame count is incrementing
+        assertTrue(frameCountRenderer.getFrameCount() > frameCount);
+    }
+
+    @Test
+    public void shouldCaptureFramesAfterPictureTaken() throws InterruptedException {
+        final CountDownLatch firstFrameReceived = new CountDownLatch(1);
+        cameraCapturer = new CameraCapturer(cameraCapturerActivity, cameraSource,
+                new CameraCapturer.Listener() {
+                    @Override
+                    public void onFirstFrameAvailable() {
+                        firstFrameReceived.countDown();
+                    }
+
+                    @Override
+                    public void onCameraSwitched() {
+
+                    }
+
+                    @Override
+                    public void onError(@CameraCapturer.Error int errorCode) {
+
+                    }
+                });
+        localVideoTrack = localMedia.addVideoTrack(true, cameraCapturer);
+        int frameCount = frameCountRenderer.getFrameCount();
+
+        // Validate our frame count is nothing
+        assertEquals(0, frameCount);
+
+        // Validate we got our first frame
+        assertTrue(firstFrameReceived.await(3, TimeUnit.SECONDS));
+
+        // Add renderer and wait
+        localVideoTrack.addRenderer(frameCountRenderer);
+        Thread.sleep(TimeUnit.SECONDS.toMillis(CAMERA_CAPTURE_DELAY));
+
+        // Validate our frame count is incrementing
+        assertTrue(frameCountRenderer.getFrameCount() > frameCount);
+
+        // Capture frame count and take picture
+        frameCount = frameCountRenderer.getFrameCount();
+        assertTrue(cameraCapturer.takePicture(new CameraCapturer.PictureListener() {
+            @Override
+            public void onShutter() {
+
+            }
+
+            @Override
+            public void onPictureTaken(byte[] pictureData) {
+
+            }
+        }));
+
+        // Wait some time
+        Thread.sleep(TimeUnit.SECONDS.toMillis(CAMERA_CAPTURE_DELAY));
+
+        // Validate our frame count is incrementing after taking picture
         assertTrue(frameCountRenderer.getFrameCount() > frameCount);
     }
 
@@ -159,5 +218,32 @@ public class CameraCapturerParameterizedTest extends BaseCameraCapturerTest {
             boolean framesNotRenderering = frameCount >= (renderer.getFrameCount() - 1);
             assertTrue(framesNotRenderering);
         }
+    }
+
+    @Test
+    public void shouldAllowTakingPictureWhileCapturing() throws InterruptedException {
+        cameraCapturer = new CameraCapturer(cameraCapturerActivity, cameraSource);
+        localVideoTrack = localMedia.addVideoTrack(true, cameraCapturer);
+        final CountDownLatch shutterCallback = new CountDownLatch(1);
+        final CountDownLatch pictureTaken = new CountDownLatch(1);
+        CameraCapturer.PictureListener pictureListener = new CameraCapturer.PictureListener() {
+            @Override
+            public void onShutter() {
+                shutterCallback.countDown();
+            }
+
+            @Override
+            public void onPictureTaken(byte[] pictureData) {
+                // Validate our picture data
+                assertNotNull(pictureData);
+                assertNotNull(BitmapFactory.decodeByteArray(pictureData, 0, pictureData.length));
+
+                pictureTaken.countDown();
+            }
+        };
+
+        assertTrue(cameraCapturer.takePicture(pictureListener));
+        assertTrue(shutterCallback.await(10, TimeUnit.SECONDS));
+        assertTrue(pictureTaken.await(10, TimeUnit.SECONDS));
     }
 }
