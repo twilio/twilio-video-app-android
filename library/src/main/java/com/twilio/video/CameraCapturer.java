@@ -4,6 +4,7 @@ import android.Manifest;
 import android.content.Context;
 import android.hardware.Camera;
 import android.support.annotation.IntDef;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import org.webrtc.CameraEnumerationAndroid;
@@ -200,6 +201,24 @@ public class CameraCapturer implements VideoCapturer {
                 }
             };
 
+    private PictureListener pictureListener;
+    private final VideoCapturerAndroid.PictureEventHandler pictureEventHandler =
+            new VideoCapturerAndroid.PictureEventHandler() {
+                @Override
+                public void onShutter() {
+                    if (pictureListener != null) {
+                        pictureListener.onShutter();
+                    }
+                }
+
+                @Override
+                public void onPictureTaken(byte[] pictureData) {
+                    if (pictureListener != null) {
+                        pictureListener.onPictureTaken(pictureData);
+                    }
+                }
+            };
+
     public CameraCapturer(Context context, CameraSource cameraSource) {
         this(context, cameraSource, null);
     }
@@ -377,6 +396,53 @@ public class CameraCapturer implements VideoCapturer {
         return parameterUpdateScheduled;
     }
 
+    /**
+     * Schedules an image capture. This call will only succeed while capturing frames.
+     *
+     * <p>
+     *     The following snippet demonstrates how to capture and image and decode to a
+     *     {@link android.graphics.Bitmap}.
+     * </p>
+     *
+     * <pre><code>
+     *     // Create local media and camera capturer
+     *     LocalMedia localMedia = LocalMedia.create(context);
+     *     CameraCapturer cameraCapturer = new CameraCapturer(context,
+     *          CameraCapturer.CameraSource.BACK_CAMERA, null);
+     *
+     *     // Start camera capturer
+     *     localMedia.addVideoTrack(true, cameraCapturer);
+     *
+     *     // Schedule an image capture
+     *     cameraCapturer.takePicture(new CameraCapturer.PictureListener() {
+     *        {@literal @}Override
+     *         public void onShutter() {
+     *             // Show some UI or play a sound
+     *         }
+     *
+     *        {@literal @}Override
+     *         public void onPictureTaken(byte[] pictureData) {
+     *             Bitmap bitmap = BitmapFactory.decodeByteArray(pictureData, 0,
+     *                 pictureData.length);
+     *         }
+     *     });
+     * </code></pre>
+     *
+     * @param pictureListener listener that that receives the callback for the shutter and picture
+     *                        taken event.
+     * @return true if picture was scheduled to be taken or false if a picture is pending or could
+     * not be scheduled.
+     */
+    public synchronized boolean takePicture(@NonNull PictureListener pictureListener) {
+        if (webrtcCapturer != null) {
+            this.pictureListener = pictureListener;
+            return webrtcCapturer.takePicture(pictureEventHandler);
+        } else {
+            logger.e("Picture cannot be taken unless camera capturer is running");
+            return false;
+        }
+    }
+
     void setSurfaceTextureHelper(SurfaceTextureHelper surfaceTextureHelper) {
         this.surfaceTextureHelper = surfaceTextureHelper;
     }
@@ -444,5 +510,23 @@ public class CameraCapturer implements VideoCapturer {
          * @param errorCode the code that describes the error that occurred.
          */
         void onError(@CameraCapturer.Error int errorCode);
+    }
+
+    /**
+     * Interface that provides events related to taking a picture while capturing.
+     */
+    public interface PictureListener {
+        /**
+         * Invoked when photo is captured from sensor. This callback is a wrapper of
+         * {@link Camera.ShutterCallback#onShutter()}.
+         */
+        void onShutter();
+
+        /**
+         * Invoked when picture data is available.
+         *
+         * @param pictureData JPEG picture data.
+         */
+        void onPictureTaken(byte[] pictureData);
     }
 }
