@@ -57,7 +57,7 @@ public class VideoClient {
             throw new NullPointerException("applicationContext must not be null");
         }
         if (token == null) {
-            throw new NullPointerException("accessManager must not be null");
+            throw new NullPointerException("Token must not be null");
         }
 
         this.applicationContext = context.getApplicationContext();
