@@ -126,6 +126,7 @@ public class RoomActivity extends AppCompatActivity {
                     }
                 }
             };
+
     private VideoClient videoClient;
     private Room room;
     private String roomName;

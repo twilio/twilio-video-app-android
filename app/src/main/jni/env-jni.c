@@ -7,7 +7,7 @@ Java_com_twilio_video_app_util_Env_nativeSetEnv(JNIEnv *env, jclass type, jstrin
     const char *name= (*env)->GetStringUTFChars(env, j_name, 0);
     const char *value= (*env)->GetStringUTFChars(env, j_value, 0);
 
-    setenv(name, value, 1);
+    setenv(name, value, j_overwrite);
 
     (*env)->ReleaseStringUTFChars(env, j_name, name);
     (*env)->ReleaseStringUTFChars(env, j_value, value);
