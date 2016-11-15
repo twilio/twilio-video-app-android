@@ -46,9 +46,9 @@
     <string name="screen_capture_error">Screen capturer error occurred.</string>
 
     <string-array name="realm_array">
-        <item>Prod</item>
-        <item>Stage</item>
-        <item>Dev</item>
+        <item>Production</item>
+        <item>Staging</item>
+        <item>Development</item>
     </string-array>
 
     <string-array name="ice_trans_policy_array">
