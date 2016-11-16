@@ -3,15 +3,22 @@ apply plugin: 'org.bitbucket.pvoid.android-apt'
 
 model {
     android {
-        compileSdkVersion 24
-        buildToolsVersion "24.0.2"
+        compileSdkVersion 25
+        buildToolsVersion "25.0.0"
 
         defaultConfig.with {
             applicationId "com.twilio.video.app"
             minSdkVersion.apiLevel 16
-            targetSdkVersion.apiLevel 24
+            targetSdkVersion.apiLevel 25
             versionName generateVersionName()
             versionCode generateVersionCode()
+            vectorDrawables.useSupportLibrary = true
+        }
+
+        ndk {
+            moduleName = 'env-jni'
+            toolchain = 'clang'
+            CFlags.addAll(['-Wall'])
         }
     }
 
@@ -57,8 +64,7 @@ model {
 dependencies {
     compile project(':library')
     compile 'net.hockeyapp.android:HockeySDK:3.5.0'
-    compile 'com.android.support:appcompat-v7:24.2.1'
-    compile 'com.android.support:design:24.2.1'
+    compile 'com.android.support:design:25.0.0'
     compile 'com.squareup.retrofit:retrofit:1.9.0'
     compile 'com.jakewharton.timber:timber:4.1.0'
     compile 'com.appyvet:materialrangebar:1.3'

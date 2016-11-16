@@ -27,7 +27,7 @@
                 android:layout_marginRight="@dimen/fab_margin"
                 android:layout_marginBottom="@dimen/fab_margin"
                 android:background="@drawable/roundbutton"
-                android:src="@drawable/ic_add_circle_white_24px"
+                app:srcCompat="@drawable/ic_add_circle_white_24px"
                 app:backgroundTint="@android:color/holo_red_dark"/>
             <ImageButton
                 android:id="@+id/local_video_image_button"
@@ -37,7 +37,7 @@
                 android:layout_alignRight="@id/connect_image_button"
                 android:layout_marginBottom="@dimen/fab_margin"
                 android:background="@drawable/roundbutton"
-                android:src="@drawable/ic_videocam_white_24px"/>
+                app:srcCompat="@drawable/ic_videocam_white_24px"/>
             <ImageButton
                 android:id="@+id/local_audio_image_button"
                 android:layout_width="wrap_content" android:layout_height="wrap_content"
@@ -46,7 +46,7 @@
                 android:layout_alignRight="@id/local_video_image_button"
                 android:layout_marginBottom="@dimen/fab_margin"
                 android:background="@drawable/roundbutton"
-                android:src="@drawable/ic_mic_white_24px"/>
+                app:srcCompat="@drawable/ic_mic_white_24px"/>
             <ImageButton
                 android:id="@+id/speaker_image_button"
                 android:layout_width="wrap_content" android:layout_height="wrap_content"
@@ -55,7 +55,7 @@
                 android:layout_alignRight="@id/local_audio_image_button"
                 android:layout_marginBottom="@dimen/fab_margin"
                 android:background="@drawable/roundbutton"
-                android:src="@drawable/ic_volume_down_white_24px"/>
+                app:srcCompat="@drawable/ic_volume_down_white_24px"/>
         </RelativeLayout>
     </android.support.design.widget.CoordinatorLayout>
 

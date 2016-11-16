@@ -126,6 +126,7 @@ public class RoomActivity extends AppCompatActivity {
                     }
                 }
             };
+
     private VideoClient videoClient;
     private Room room;
     private String roomName;
@@ -312,7 +313,7 @@ public class RoomActivity extends AppCompatActivity {
             icon = R.drawable.ic_mic_off_gray_24px;
             pauseAudioMenuItem.setVisible(false);
         }
-        localAudioImageButton.setImageDrawable(ContextCompat.getDrawable(RoomActivity.this, icon));
+        localAudioImageButton.setImageResource(icon);
     }
 
     @OnClick(R.id.local_video_image_button)
@@ -367,7 +368,7 @@ public class RoomActivity extends AppCompatActivity {
             switchCameraMenuItem.setVisible(false);
             pauseVideoMenuItem.setVisible(false);
         }
-        localVideoImageButton.setImageDrawable(ContextCompat.getDrawable(RoomActivity.this, icon));
+        localVideoImageButton.setImageResource(icon);
     }
 
     private void processActivityIntent(Bundle extras) {
@@ -387,8 +388,7 @@ public class RoomActivity extends AppCompatActivity {
             getSupportActionBar().setTitle(username);
             joinIcon = R.drawable.ic_add_circle_white_24px;
         }
-        connectImageButton.setImageDrawable(
-                ContextCompat.getDrawable(RoomActivity.this, joinIcon));
+        connectImageButton.setImageResource(joinIcon);
     }
 
     private void logout() {

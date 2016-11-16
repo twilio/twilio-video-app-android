@@ -12,14 +12,17 @@ import android.support.v4.content.ContextCompat;
 import android.view.HapticFeedbackConstants;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.twilio.video.app.BuildConfig;
 import com.twilio.video.app.R;
 import com.twilio.video.app.base.BaseActivity;
+import com.twilio.video.app.util.Env;
 import com.twilio.video.app.util.SimpleSignalingUtils;
 import com.twilio.video.LogLevel;
 import com.twilio.video.VideoClient;
@@ -37,8 +40,10 @@ public class LoginActivity extends BaseActivity {
     @BindView(R.id.username_edittext) EditText usernameEditText;
     @BindView(R.id.login_button) Button loginButton;
     @BindView(R.id.version_textview) TextView versionText;
+    @BindView(R.id.realm_spinner) Spinner realmSpinner;
 
     public static final int PERMISSIONS_REQUEST_CODE = 0;
+    public static final String REALM = "TWILIO_ENVIRONMENT";
 
     private ProgressDialog progressDialog;
 
@@ -50,6 +55,18 @@ public class LoginActivity extends BaseActivity {
         ButterKnife.bind(this);
 
         versionText.setText(BuildConfig.VERSION_NAME);
+
+        realmSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                Env.setEnv(REALM, getResources().getStringArray(R.array.realm_array)[position], true);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
 
         if (!checkPermissions()) {
             requestPermissions();

@@ -27,6 +27,13 @@
             android:layout_height="wrap_content"
             android:hint="@string/username"/>
 
+        <Spinner
+            android:id="@+id/realm_spinner"
+            android:layout_margin="@dimen/activity_horizontal_margin"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:entries="@array/realm_array"/>
+
         <Button
             android:id="@+id/login_button"
             android:layout_margin="@dimen/activity_horizontal_margin"
