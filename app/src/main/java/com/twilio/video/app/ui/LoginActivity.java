@@ -22,10 +22,10 @@ import android.widget.Toast;
 import com.twilio.video.app.BuildConfig;
 import com.twilio.video.app.R;
 import com.twilio.video.app.base.BaseActivity;
-import com.twilio.video.app.util.Env;
 import com.twilio.video.app.util.SimpleSignalingUtils;
 import com.twilio.video.LogLevel;
 import com.twilio.video.VideoClient;
+import com.twilio.video.env.Env;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -43,9 +43,10 @@ public class LoginActivity extends BaseActivity {
     @BindView(R.id.realm_spinner) Spinner realmSpinner;
 
     public static final int PERMISSIONS_REQUEST_CODE = 0;
-    public static final String REALM = "TWILIO_ENVIRONMENT";
+    public static final String TWILIO_ENV_KEY = "TWILIO_ENVIRONMENT";
 
     private ProgressDialog progressDialog;
+    private String realm;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,7 +60,8 @@ public class LoginActivity extends BaseActivity {
         realmSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                Env.setEnv(REALM, getResources().getStringArray(R.array.realm_array)[position], true);
+                realm = SimpleSignalingUtils.REALMS.get(position);
+                Env.set(LoginActivity.this, TWILIO_ENV_KEY, getResources().getStringArray(R.array.realm_array)[position], true);
             }
 
             @Override
@@ -129,7 +131,7 @@ public class LoginActivity extends BaseActivity {
     }
 
     private void registerUser(final String username) {
-        obtainCapabilityToken(username, "prod");
+        obtainCapabilityToken(username, realm);
     }
 
     private void obtainCapabilityToken(final String username, final String realm) {
@@ -166,7 +168,7 @@ public class LoginActivity extends BaseActivity {
 
         Intent intent = new Intent(this, RoomActivity.class);
         intent.putExtra(SimpleSignalingUtils.CAPABILITY_TOKEN, capabilityToken);
-        intent.putExtra(SimpleSignalingUtils.REALM, "prod");
+        intent.putExtra(SimpleSignalingUtils.REALM, realm);
         intent.putExtra(SimpleSignalingUtils.USERNAME, usernameEditText.getText().toString());
 
         VideoClient.setLogLevel(LogLevel.DEBUG);

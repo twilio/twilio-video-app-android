@@ -5,11 +5,11 @@ import android.support.test.InstrumentationRegistry;
 import android.support.test.filters.LargeTest;
 import android.support.test.runner.AndroidJUnit4;
 
+import com.twilio.video.base.BaseClientTest;
 import com.twilio.video.helper.CallbackHelper;
 import com.twilio.video.util.AccessTokenUtils;
 import com.twilio.video.util.RandUtils;
 
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -25,7 +25,7 @@ import static org.junit.Assert.assertTrue;
 
 @RunWith(AndroidJUnit4.class)
 @LargeTest
-public class ParticipantTest {
+public class ParticipantTest extends BaseClientTest {
     private Context context;
     private String tokenOne;
     private String tokenTwo;
@@ -35,9 +35,10 @@ public class ParticipantTest {
 
     @Before
     public void setup() throws InterruptedException {
+        super.setup();
         context = InstrumentationRegistry.getInstrumentation().getTargetContext();
-        tokenOne = AccessTokenUtils.getAccessToken(RandUtils.generateRandomString(10));
-        tokenTwo = AccessTokenUtils.getAccessToken(RandUtils.generateRandomString(10));
+        tokenOne = AccessTokenUtils.getAccessToken(RandUtils.generateRandomString(10), BuildConfig.REALM);
+        tokenTwo = AccessTokenUtils.getAccessToken(RandUtils.generateRandomString(10), BuildConfig.REALM);
         videoClient = new VideoClient(context, tokenOne);
         videoClient2 = new VideoClient(context, tokenTwo);
         roomName = RandUtils.generateRandomString(20);

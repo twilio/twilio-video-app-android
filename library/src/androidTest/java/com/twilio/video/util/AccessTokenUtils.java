@@ -17,9 +17,6 @@ public class AccessTokenUtils {
     // Define the Retrofit Token Service
     interface TokenService {
         @GET("/access-token")
-        void obtainTwilioCapabilityToken(@QueryMap Map<String, String> options,
-                                         Callback<String> tokenCallback);
-        @GET("/access-token")
         String obtainTwilioCapabilityToken(@QueryMap Map<String, String> options);
     }
 
@@ -44,17 +41,9 @@ public class AccessTokenUtils {
             .build()
             .create(TokenService.class);
 
-    public static void getAccessToken(String username, Callback<String> callback) {
+    public static String getAccessToken(String username, String realm) {
         HashMap<String,String> options = new HashMap<>();
-        options.put("environment", "prod");
-        options.put("identity", username);
-        options.put("ttl", TTL);
-        tokenService.obtainTwilioCapabilityToken(options, callback);
-    }
-
-    public static String getAccessToken(String username) {
-        HashMap<String,String> options = new HashMap<>();
-        options.put("environment", "prod");
+        options.put("environment", realm);
         options.put("identity", username);
         options.put("ttl", TTL);
         return tokenService.obtainTwilioCapabilityToken(options);

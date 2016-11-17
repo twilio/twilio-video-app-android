@@ -1,7 +1,6 @@
 package com.twilio.video.base;
 
 import android.app.Instrumentation;
-import android.content.Context;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.rule.ActivityTestRule;
 
@@ -12,6 +11,7 @@ import com.twilio.video.Room;
 import com.twilio.video.RoomState;
 import com.twilio.video.VideoClient;
 import com.twilio.video.helper.CallbackHelper;
+import com.twilio.video.test.BuildConfig;
 import com.twilio.video.ui.MediaTestActivity;
 import com.twilio.video.util.AccessTokenUtils;
 import com.twilio.video.util.FakeVideoCapturer;
@@ -31,7 +31,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-public abstract class BaseMediaTest {
+public abstract class BaseMediaTest extends BaseClientTest {
     protected final static String TEST_USER  = "TEST_USER";
     protected final static String TEST_USER2  = "TEST_USER2";
     @Rule
@@ -74,12 +74,13 @@ public abstract class BaseMediaTest {
 
     @Before
     public void setup() throws InterruptedException {
+        super.setup();
         mediaTestActivity = activityRule.getActivity();
         PermissionUtils.allowPermissions(mediaTestActivity);
         testRoom = RandUtils.generateRandomString(10);
         fakeVideoCapturer = new FakeVideoCapturer();
         actor1LocalMedia = LocalMedia.create(mediaTestActivity);
-        tokenOne = AccessTokenUtils.getAccessToken(TEST_USER);
+        tokenOne = AccessTokenUtils.getAccessToken(TEST_USER, BuildConfig.REALM);
         Instrumentation instrumentation = InstrumentationRegistry.getInstrumentation();
         instrumentation.runOnMainSync(new Runnable() {
             @Override
@@ -96,7 +97,7 @@ public abstract class BaseMediaTest {
 
         // Connect actor 2
         actor2LocalMedia = LocalMedia.create(mediaTestActivity);
-        tokenTwo = AccessTokenUtils.getAccessToken(TEST_USER2);
+        tokenTwo = AccessTokenUtils.getAccessToken(TEST_USER2, BuildConfig.REALM);
         instrumentation.runOnMainSync(new Runnable() {
             @Override
             public void run() {

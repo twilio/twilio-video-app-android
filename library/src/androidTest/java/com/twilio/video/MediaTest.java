@@ -6,6 +6,7 @@ import android.support.test.runner.AndroidJUnit4;
 import com.twilio.video.base.BaseMediaTest;
 import com.twilio.video.helper.CallbackHelper;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -17,6 +18,7 @@ import static org.junit.Assert.assertTrue;
 @RunWith(AndroidJUnit4.class)
 @LargeTest
 public class MediaTest extends BaseMediaTest {
+
     @Test
     public void shouldReceiveOnAudioTrackAdded() throws InterruptedException {
         CallbackHelper.FakeMediaListener mediaListener = new CallbackHelper.FakeMediaListener();

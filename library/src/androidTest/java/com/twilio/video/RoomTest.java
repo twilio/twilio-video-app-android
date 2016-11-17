@@ -4,6 +4,7 @@ import android.support.test.filters.LargeTest;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
 
+import com.twilio.video.base.BaseClientTest;
 import com.twilio.video.helper.CallbackHelper;
 import com.twilio.video.ui.MediaTestActivity;
 import com.twilio.video.util.AccessTokenUtils;
@@ -27,7 +28,7 @@ import static org.junit.Assert.assertTrue;
 
 @RunWith(AndroidJUnit4.class)
 @LargeTest
-public class RoomTest {
+public class RoomTest extends BaseClientTest {
     @Rule
     public ActivityTestRule<MediaTestActivity> activityRule =
             new ActivityTestRule<>(MediaTestActivity.class);
@@ -40,10 +41,11 @@ public class RoomTest {
 
     @Before
     public void setup() throws InterruptedException {
+        super.setup();
         mediaTestActivity = activityRule.getActivity();
         PermissionUtils.allowPermissions(mediaTestActivity);
         identity = RandUtils.generateRandomString(10);
-        token = AccessTokenUtils.getAccessToken(identity);
+        token = AccessTokenUtils.getAccessToken(identity, BuildConfig.REALM);
         videoClient = new VideoClient(mediaTestActivity, token);
         roomName = RandUtils.generateRandomString(20);
         localMedia = LocalMedia.create(mediaTestActivity);

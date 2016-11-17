@@ -5,7 +5,9 @@ import android.util.Base64;
 import com.google.gson.GsonBuilder;
 import com.twilio.video.app.model.TwilioIceResponse;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import retrofit.Callback;
@@ -19,7 +21,11 @@ public class SimpleSignalingUtils {
     public static final String CAPABILITY_TOKEN = "capability_token";
     public static final String USERNAME = "username";
     public static final String REALM = "realm";
-    public static final String ROOM_NAME = "room_name";
+    public static final ArrayList<String> REALMS = new ArrayList<String>() {{
+        add("prod");
+        add("stage");
+        add("dev");
+    }};
 
     /*
      * The default is usually 30 minutes. We are intentionally setting it to 5 minutes to validate
