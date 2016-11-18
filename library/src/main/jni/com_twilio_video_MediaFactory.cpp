@@ -1,13 +1,13 @@
 #include "com_twilio_video_MediaFactory.h"
 #include "com_twilio_video_LocalMedia.h"
 
-#include "webrtc/api/java/jni/jni_helpers.h"
+#include "webrtc/api/android/jni/jni_helpers.h"
 #include "webrtc/voice_engine/include/voe_base.h"
-#include "webrtc/api/java/jni/androidvideocapturer_jni.h"
 #include "webrtc/modules/audio_device/android/opensles_player.h"
-#include "webrtc/api/java/jni/classreferenceholder.h"
-#include "webrtc/api/java/jni/androidmediadecoder_jni.h"
-#include "webrtc/api/java/jni/androidmediaencoder_jni.h"
+#include "webrtc/api/android/jni/classreferenceholder.h"
+#include "webrtc/api/android/jni/androidmediadecoder_jni.h"
+#include "webrtc/api/android/jni/androidmediaencoder_jni.h"
+#include "android_video_capturer_jni.h"
 
 namespace twilio_video_jni {
 
@@ -26,10 +26,9 @@ JNIEXPORT jlong JNICALL Java_com_twilio_video_MediaFactory_nativeCreate(JNIEnv *
     // Setup media related Android device objects
     if (!media_jvm_set) {
         bool failure = false;
-        failure |= webrtc::OpenSLESPlayer::SetAndroidAudioDeviceObjects(webrtc_jni::GetJVM(),
-                                                                        context);
+
         failure |= webrtc::VoiceEngine::SetAndroidObjects(webrtc_jni::GetJVM(), context);
-        failure |= webrtc_jni::AndroidVideoCapturerJni::SetAndroidObjects(jni, context);
+        failure |= AndroidVideoCapturerJni::SetAndroidObjects(jni, context);
 
         if (failure) {
             return 0;

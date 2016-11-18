@@ -77,16 +77,21 @@ public class CameraCapturer implements VideoCapturer {
                          * these parameters after the capturer is started to ensure consistency
                          * on the camera capturer instance.
                          */
-                        if (cameraParameterUpdater != null) {
-                            boolean parameterUpdatedScheduled =
-                                    webrtcCapturer.injectCameraParameters(cameraParameterInjector);
-
-                            if (!parameterUpdatedScheduled) {
-                                logger.e("Failed to schedule camera parameter update after " +
-                                        "capturer started.");
-                            }
-                        }
+//                        if (cameraParameterUpdater != null) {
+//                            boolean parameterUpdatedScheduled =
+//                                    webrtcCapturer.injectCameraParameters(cameraParameterInjector);
+//
+//                            if (!parameterUpdatedScheduled) {
+//                                logger.e("Failed to schedule camera parameter update after " +
+//                                        "capturer started.");
+//                            }
+//                        }
                     }
+                }
+
+                @Override
+                public void onCapturerStopped() {
+                    // TODO
                 }
 
                 @Override
@@ -110,33 +115,26 @@ public class CameraCapturer implements VideoCapturer {
                                                    long timestampNs) {
                     // TODO: Do we need to support capturing to texture?
                 }
-
-                @Override
-                public void onOutputFormatRequest(int width,
-                                                  int height,
-                                                  int framerate) {
-                    // TODO: Do we need to support an output format request?
-                }
             };
 
-    private final VideoCapturerAndroid.CameraParameterInjector cameraParameterInjector =
-            new VideoCapturerAndroid.CameraParameterInjector() {
-                /*
-                 * We use the internal CameraParameterInjector we added in WebRTC to apply
-                 * a users custom camera parameters.
-                 */
-                @Override
-                public void onCameraParameters(Camera.Parameters parameters) {
-                    synchronized (CameraCapturer.this) {
-                        if (cameraParameterUpdater != null) {
-                            logger.i("Updating camera parameters");
-                            cameraParameterUpdater.apply(parameters);
-                        }
-                    }
-                }
-            };
-    private CameraParameterUpdater cameraParameterUpdater;
-
+//    private final VideoCapturerAndroid.CameraParameterInjector cameraParameterInjector =
+//            new VideoCapturerAndroid.CameraParameterInjector() {
+//                /*
+//                 * We use the internal CameraParameterInjector we added in WebRTC to apply
+//                 * a users custom camera parameters.
+//                 */
+//                @Override
+//                public void onCameraParameters(Camera.Parameters parameters) {
+//                    synchronized (CameraCapturer.this) {
+//                        if (cameraParameterUpdater != null) {
+//                            logger.i("Updating camera parameters");
+//                            cameraParameterUpdater.apply(parameters);
+//                        }
+//                    }
+//                }
+//            };
+//    private CameraParameterUpdater cameraParameterUpdater;
+//
     private final VideoCapturerAndroid.CameraEventsHandler cameraEventsHandler =
             new VideoCapturerAndroid.CameraEventsHandler() {
                 @Override
@@ -161,7 +159,7 @@ public class CameraCapturer implements VideoCapturer {
                 }
 
                 @Override
-                public void onCameraOpening(int i) {
+                public void onCameraOpening(String message) {
                     // Ignore this event for now
                 }
 
@@ -202,22 +200,22 @@ public class CameraCapturer implements VideoCapturer {
             };
 
     private PictureListener pictureListener;
-    private final VideoCapturerAndroid.PictureEventHandler pictureEventHandler =
-            new VideoCapturerAndroid.PictureEventHandler() {
-                @Override
-                public void onShutter() {
-                    if (pictureListener != null) {
-                        pictureListener.onShutter();
-                    }
-                }
-
-                @Override
-                public void onPictureTaken(byte[] pictureData) {
-                    if (pictureListener != null) {
-                        pictureListener.onPictureTaken(pictureData);
-                    }
-                }
-            };
+//    private final VideoCapturerAndroid.PictureEventHandler pictureEventHandler =
+//            new VideoCapturerAndroid.PictureEventHandler() {
+//                @Override
+//                public void onShutter() {
+//                    if (pictureListener != null) {
+//                        pictureListener.onShutter();
+//                    }
+//                }
+//
+//                @Override
+//                public void onPictureTaken(byte[] pictureData) {
+//                    if (pictureListener != null) {
+//                        pictureListener.onPictureTaken(pictureData);
+//                    }
+//                }
+//            };
 
     public CameraCapturer(Context context, CameraSource cameraSource) {
         this(context, cameraSource, null);
@@ -283,12 +281,10 @@ public class CameraCapturer implements VideoCapturer {
         if (capturerCreated) {
             this.videoCapturerListener = videoCapturerListener;
 
+            webrtcCapturer.initialize(surfaceTextureHelper, context, observerAdapter);
             webrtcCapturer.startCapture(captureFormat.dimensions.width,
                     captureFormat.dimensions.height,
-                    captureFormat.framerate,
-                    surfaceTextureHelper,
-                    context,
-                    observerAdapter);
+                    captureFormat.framerate);
         } else {
             logger.e("Failed to startCapture");
             videoCapturerListener.onCapturerStarted(false);
@@ -384,13 +380,13 @@ public class CameraCapturer implements VideoCapturer {
          * the parameters will be applied when the camera capturer is started again.
          */
         if (webrtcCapturer != null) {
-            parameterUpdateScheduled =
-                    webrtcCapturer.injectCameraParameters(cameraParameterInjector);
+//            parameterUpdateScheduled =
+//                    webrtcCapturer.injectCameraParameters(cameraParameterInjector);
         }
 
         // Only set parameter updater if we scheduled the injection
         if (parameterUpdateScheduled) {
-            this.cameraParameterUpdater = cameraParameterUpdater;
+//            this.cameraParameterUpdater = cameraParameterUpdater;
         }
 
         return parameterUpdateScheduled;
@@ -436,7 +432,8 @@ public class CameraCapturer implements VideoCapturer {
     public synchronized boolean takePicture(@NonNull PictureListener pictureListener) {
         if (webrtcCapturer != null) {
             this.pictureListener = pictureListener;
-            return webrtcCapturer.takePicture(pictureEventHandler);
+            return true;
+//            return webrtcCapturer.takePicture(pictureEventHandler);
         } else {
             logger.e("Picture cannot be taken unless camera capturer is running");
             return false;

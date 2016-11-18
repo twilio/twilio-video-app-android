@@ -3,7 +3,7 @@
 #include "com_twilio_video_VideoPixelFormat.h"
 #include "class_reference_holder.h"
 
-#include "webrtc/api/java/jni/jni_helpers.h"
+#include "webrtc/api/android/jni/jni_helpers.h"
 
 namespace twilio_video_jni {
 

@@ -1,5 +1,5 @@
 #include "class_reference_holder.h"
-#include "webrtc/api/java/jni/jni_helpers.h"
+#include "webrtc/api/android/jni/jni_helpers.h"
 
 namespace twilio_video_jni {
 
@@ -36,6 +36,7 @@ ClassReferenceHolder::ClassReferenceHolder(JNIEnv* jni) {
     LoadClass(jni, "com/twilio/video/LocalAudioTrack");
     LoadClass(jni, "com/twilio/video/LocalVideoTrack");
     LoadClass(jni, "com/twilio/video/VideoClient$NetworkChangeEvent");
+    LoadClass(jni, "com/twilio/video/VideoCapturerDelegate$NativeObserver");
 }
 
 ClassReferenceHolder::~ClassReferenceHolder() {

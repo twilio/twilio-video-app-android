@@ -1,5 +1,5 @@
 #include "com_twilio_video_Room.h"
-#include "webrtc/api/java/jni/jni_helpers.h"
+#include "webrtc/api/android/jni/jni_helpers.h"
 
 #include "video/logger.h"
 #include "android_room_observer.h"
@@ -36,7 +36,7 @@ Java_com_twilio_video_Room_00024InternalRoomListenerHandle_nativeCreate(JNIEnv *
                        twilio::video::kTSCoreLogLevelDebug,
                        "Create AndroidRoomObserver");
     AndroidRoomObserver *android_room_observer = new AndroidRoomObserver(env, object);
-    return jlongFromPointer(android_room_observer);
+    return webrtc_jni::jlongFromPointer(android_room_observer);
 }
 
 JNIEXPORT void JNICALL

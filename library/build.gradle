@@ -7,9 +7,9 @@ def currentToolchainVersion = "4.9"
 def twilioSdkHome = "${buildDir}/prebuilt"
 def supportedAbis = [
         "armeabi-v7a",
-        "arm64-v8a",
-        "x86",
-        "x86_64"
+//        "arm64-v8a"
+//        "x86",
+//        "x86_64"
 ]
 
 def supportedArchFolderName = [
@@ -185,6 +185,7 @@ model {
         stl "c++_static"
         cppFlags.addAll([
                 "-DWEBRTC_POSIX",
+                "-DWEBRTC_BUILD_LIBEVENT",
                 "-DTWILIO_SDK_2_0",
                 "-DWEBRTC_ANDROID",
                 "-DWEBRTC_ANDROID_OPENSLES",
@@ -265,7 +266,7 @@ model {
 }
 
 dependencies {
-    preCompile 'com.twilio.sdk:twilio-video:0.4.1:android@tar.bz2'
+    //preCompile 'com.twilio.sdk:twilio-video:0.4.1:android@tar.bz2'
 
     testCompile 'junit:junit:4.12'
     testCompile 'org.mockito:mockito-core:1.10.19'
@@ -283,7 +284,7 @@ dependencies {
     // TODO this really should be on nexus as a jar and not local
     // TODO we are hardcoding architecture for now,
     // because I don't know how to access that information from here
-    compile files("${twilioSdkHome}/twilio-video/arm64v8a/gnu-4.9/release/lib/" +
+    compile files("${twilioSdkHome}/twilio-video/armeabiv7a/gnu-4.9/release/lib/" +
             "libjingle_peerconnection_java.jar")
 }
 
@@ -460,47 +461,47 @@ class ConversationsRuleSource extends RuleSource {
         validatePreCompileEnvironment(compileTask)
     }
 
-    @Mutate
-    void validatePreCompileDebugEnvironmentArm64V8a(
-            @Path('tasks.compileJingle_peerconnection_soArm64-v8aDebugSharedLibraryJingle_peerconnection_soArm64-v8aDebugSharedLibraryMainCpp')
-                    Task compileTask) {
-        validatePreCompileEnvironment(compileTask)
-    }
+//    @Mutate
+//    void validatePreCompileDebugEnvironmentArm64V8a(
+//            @Path('tasks.compileJingle_peerconnection_soArm64-v8aDebugSharedLibraryJingle_peerconnection_soArm64-v8aDebugSharedLibraryMainCpp')
+//                    Task compileTask) {
+//        validatePreCompileEnvironment(compileTask)
+//    }
+//
+//    @Mutate
+//    void validatePreCompileReleaseEnvironmentArm64V8a(
+//            @Path('tasks.compileJingle_peerconnection_soArm64-v8aReleaseSharedLibraryJingle_peerconnection_soArm64-v8aReleaseSharedLibraryMainCpp')
+//                    Task compileTask) {
+//        validatePreCompileEnvironment(compileTask)
+//    }
 
-    @Mutate
-    void validatePreCompileReleaseEnvironmentArm64V8a(
-            @Path('tasks.compileJingle_peerconnection_soArm64-v8aReleaseSharedLibraryJingle_peerconnection_soArm64-v8aReleaseSharedLibraryMainCpp')
-                    Task compileTask) {
-        validatePreCompileEnvironment(compileTask)
-    }
-
-    @Mutate
-    void validatePreCompileDebugEnvironmentX86(
-            @Path('tasks.compileJingle_peerconnection_soX86DebugSharedLibraryJingle_peerconnection_soX86DebugSharedLibraryMainCpp')
-                    Task compileTask) {
-        validatePreCompileEnvironment(compileTask)
-    }
-
-    @Mutate
-    void validatePreCompileReleaseEnvironmentX86(
-            @Path('tasks.compileJingle_peerconnection_soX86ReleaseSharedLibraryJingle_peerconnection_soX86ReleaseSharedLibraryMainCpp')
-                    Task compileTask) {
-        validatePreCompileEnvironment(compileTask)
-    }
-
-    @Mutate
-    void validatePreCompileDebugEnvironmentX86_64(
-            @Path('tasks.compileJingle_peerconnection_soX86_64DebugSharedLibraryJingle_peerconnection_soX86_64DebugSharedLibraryMainCpp')
-                    Task compileTask) {
-        validatePreCompileEnvironment(compileTask)
-    }
-
-    @Mutate
-    void validatePreCompileReleaseEnvironmentX86_64(
-            @Path('tasks.compileJingle_peerconnection_soX86_64ReleaseSharedLibraryJingle_peerconnection_soX86_64ReleaseSharedLibraryMainCpp')
-                    Task compileTask) {
-        validatePreCompileEnvironment(compileTask)
-    }
+//    @Mutate
+//    void validatePreCompileDebugEnvironmentX86(
+//            @Path('tasks.compileJingle_peerconnection_soX86DebugSharedLibraryJingle_peerconnection_soX86DebugSharedLibraryMainCpp')
+//                    Task compileTask) {
+//        validatePreCompileEnvironment(compileTask)
+//    }
+//
+//    @Mutate
+//    void validatePreCompileReleaseEnvironmentX86(
+//            @Path('tasks.compileJingle_peerconnection_soX86ReleaseSharedLibraryJingle_peerconnection_soX86ReleaseSharedLibraryMainCpp')
+//                    Task compileTask) {
+//        validatePreCompileEnvironment(compileTask)
+//    }
+//
+//    @Mutate
+//    void validatePreCompileDebugEnvironmentX86_64(
+//            @Path('tasks.compileJingle_peerconnection_soX86_64DebugSharedLibraryJingle_peerconnection_soX86_64DebugSharedLibraryMainCpp')
+//                    Task compileTask) {
+//        validatePreCompileEnvironment(compileTask)
+//    }
+//
+//    @Mutate
+//    void validatePreCompileReleaseEnvironmentX86_64(
+//            @Path('tasks.compileJingle_peerconnection_soX86_64ReleaseSharedLibraryJingle_peerconnection_soX86_64ReleaseSharedLibraryMainCpp')
+//                    Task compileTask) {
+//        validatePreCompileEnvironment(compileTask)
+//    }
 
     @Mutate
     void injectArmeabiV7aDebugLinkerFlags(
@@ -516,47 +517,47 @@ class ConversationsRuleSource extends RuleSource {
         injectLinkerFlags(linkTask, twilioSdkHome, 'armeabi-v7a', 'release')
     }
 
-    @Mutate
-    void injectArm64v8aDebugLinkerFlags(
-            @Path('tasks.linkJingle_peerconnection_soArm64-v8aDebugSharedLibrary')
-                    Task linkTask) {
-        injectLinkerFlags(linkTask, twilioSdkHome, 'arm64-v8a', 'debug')
-    }
+//    @Mutate
+//    void injectArm64v8aDebugLinkerFlags(
+//            @Path('tasks.linkJingle_peerconnection_soArm64-v8aDebugSharedLibrary')
+//                    Task linkTask) {
+//        injectLinkerFlags(linkTask, twilioSdkHome, 'arm64-v8a', 'debug')
+//    }
+//
+//    @Mutate
+//    void injectArm64v8aReleaseLinkerFlags(
+//            @Path('tasks.linkJingle_peerconnection_soArm64-v8aReleaseSharedLibrary')
+//                    Task linkTask) {
+//        injectLinkerFlags(linkTask, twilioSdkHome, 'arm64-v8a', 'release')
+//    }
 
-    @Mutate
-    void injectArm64v8aReleaseLinkerFlags(
-            @Path('tasks.linkJingle_peerconnection_soArm64-v8aReleaseSharedLibrary')
-                    Task linkTask) {
-        injectLinkerFlags(linkTask, twilioSdkHome, 'arm64-v8a', 'release')
-    }
-
-    @Mutate
-    void injectX86DebugLinkerFlags(
-            @Path('tasks.linkJingle_peerconnection_soX86DebugSharedLibrary')
-                    Task linkTask) {
-        injectLinkerFlags(linkTask, twilioSdkHome, 'x86', 'debug')
-    }
-
-    @Mutate
-    void injectX86ReleaseLinkerFlags(
-            @Path('tasks.linkJingle_peerconnection_soX86ReleaseSharedLibrary')
-                    Task linkTask) {
-        injectLinkerFlags(linkTask, twilioSdkHome, 'x86', 'release')
-    }
-
-    @Mutate
-    void injectX86_64DebugLinkerFlags(
-            @Path('tasks.linkJingle_peerconnection_soX86_64DebugSharedLibrary')
-                    Task linkTask) {
-        injectLinkerFlags(linkTask, twilioSdkHome, 'x86_64', 'debug')
-    }
-
-    @Mutate
-    void injectX86_64ReleaseLinkerFlags(
-            @Path('tasks.linkJingle_peerconnection_soX86_64ReleaseSharedLibrary')
-                    Task linkTask) {
-        injectLinkerFlags(linkTask, twilioSdkHome, 'x86_64', 'release')
-    }
+//    @Mutate
+//    void injectX86DebugLinkerFlags(
+//            @Path('tasks.linkJingle_peerconnection_soX86DebugSharedLibrary')
+//                    Task linkTask) {
+//        injectLinkerFlags(linkTask, twilioSdkHome, 'x86', 'debug')
+//    }
+//
+//    @Mutate
+//    void injectX86ReleaseLinkerFlags(
+//            @Path('tasks.linkJingle_peerconnection_soX86ReleaseSharedLibrary')
+//                    Task linkTask) {
+//        injectLinkerFlags(linkTask, twilioSdkHome, 'x86', 'release')
+//    }
+//
+//    @Mutate
+//    void injectX86_64DebugLinkerFlags(
+//            @Path('tasks.linkJingle_peerconnection_soX86_64DebugSharedLibrary')
+//                    Task linkTask) {
+//        injectLinkerFlags(linkTask, twilioSdkHome, 'x86_64', 'debug')
+//    }
+//
+//    @Mutate
+//    void injectX86_64ReleaseLinkerFlags(
+//            @Path('tasks.linkJingle_peerconnection_soX86_64ReleaseSharedLibrary')
+//                    Task linkTask) {
+//        injectLinkerFlags(linkTask, twilioSdkHome, 'x86_64', 'release')
+//    }
 
     private void validatePreCompileEnvironment(compileTask) {
         compileTask.dependsOn("localizeWebRtcJniLoadUnLoad")

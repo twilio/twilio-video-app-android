@@ -10,33 +10,33 @@ import java.util.List;
 final class VideoCapturerDelegate implements org.webrtc.VideoCapturer {
     private final VideoCapturer videoCapturer;
     private VideoPixelFormat videoPixelFormat;
+    private VideoCapturer.Listener listenerAdapter;
 
     VideoCapturerDelegate(VideoCapturer videoCapturer) {
         this.videoCapturer = videoCapturer;
     }
 
-    @Override
     public List<CameraEnumerationAndroid.CaptureFormat> getSupportedFormats() {
         return convertToWebRtcFormats(videoCapturer.getSupportedFormats());
     }
 
     @Override
-    public void startCapture(int width,
-                             int height,
-                             int framerate,
-                             SurfaceTextureHelper surfaceTextureHelper,
-                             Context context,
-                             CapturerObserver capturerObserver) {
+    public void initialize(SurfaceTextureHelper surfaceTextureHelper,
+                           Context context,
+                           CapturerObserver capturerObserver) {
+        this.listenerAdapter = new VideoCapturerListenerAdapter(capturerObserver);
         // FIXME: ugh this is still cheating..need to figure out a way to pass this better
         if (videoCapturer instanceof CameraCapturer) {
             CameraCapturer cameraCapturer = (CameraCapturer) videoCapturer;
 
             cameraCapturer.setSurfaceTextureHelper(surfaceTextureHelper);
         }
+    }
+
+    @Override
+    public void startCapture(int width, int height, int framerate) {
         VideoDimensions dimensions = new VideoDimensions(width, height);
         VideoFormat captureFormat = new VideoFormat(dimensions, framerate, videoPixelFormat);
-        VideoCapturerListenerAdapter listenerAdapter =
-                new VideoCapturerListenerAdapter(capturerObserver);
 
         videoCapturer.startCapture(captureFormat, listenerAdapter);
     }
@@ -47,8 +47,18 @@ final class VideoCapturerDelegate implements org.webrtc.VideoCapturer {
     }
 
     @Override
+    public void changeCaptureFormat(int width, int height, int framerate) {
+        // Currently this is not part of our capturer api so we can just ignore
+    }
+
+    @Override
     public void dispose() {
         // Currently this is not part of our capturer api so we can just ignore
+    }
+
+    @Override
+    public boolean isScreencast() {
+        return videoCapturer.isScreencast();
     }
 
     /*
@@ -64,7 +74,7 @@ final class VideoCapturerDelegate implements org.webrtc.VideoCapturer {
             List<CameraEnumerationAndroid.CaptureFormat> webRtcCaptureFormats =
                     new ArrayList<>(videoFormats.size());
 
-            for (int i = 0; i < videoFormats.size() ; i++) {
+            for (int i = 0; i < videoFormats.size(); i++) {
                 VideoFormat videoFormat = videoFormats.get(i);
                 CameraEnumerationAndroid.CaptureFormat webRtcCaptureFormat =
                         /*
@@ -85,5 +95,59 @@ final class VideoCapturerDelegate implements org.webrtc.VideoCapturer {
         }
 
         return new ArrayList<>();
+    }
+
+
+    // An implementation of CapturerObserver that forwards all calls from
+    // Java to the C layer.
+    static class NativeObserver implements org.webrtc.VideoCapturer.CapturerObserver {
+        private final long nativeCapturer;
+
+        public NativeObserver(long nativeCapturer) {
+            this.nativeCapturer = nativeCapturer;
+        }
+
+        @Override
+        public void onCapturerStarted(boolean success) {
+            nativeCapturerStarted(nativeCapturer, success);
+        }
+
+        @Override
+        public void onCapturerStopped() {
+        }
+
+        @Override
+        public void onByteBufferFrameCaptured(byte[] data, int width, int height,
+                                              int rotation, long timeStamp) {
+            nativeOnByteBufferFrameCaptured(nativeCapturer, data, data.length, width, height, rotation,
+                    timeStamp);
+        }
+
+        @Override
+        public void onTextureFrameCaptured(
+                int width, int height, int oesTextureId, float[] transformMatrix, int rotation,
+                long timestamp) {
+            nativeOnTextureFrameCaptured(nativeCapturer, width, height, oesTextureId, transformMatrix,
+                    rotation, timestamp);
+        }
+
+        private native void nativeCapturerStarted(long nativeCapturer,
+                                                  boolean success);
+
+        private native void nativeOnByteBufferFrameCaptured(long nativeCapturer,
+                                                            byte[] data,
+                                                            int length,
+                                                            int width,
+                                                            int height,
+                                                            int rotation,
+                                                            long timeStamp);
+
+        private native void nativeOnTextureFrameCaptured(long nativeCapturer,
+                                                         int width,
+                                                         int height,
+                                                         int oesTextureId,
+                                                         float[] transformMatrix,
+                                                         int rotation,
+                                                         long timestamp);
     }
 }
