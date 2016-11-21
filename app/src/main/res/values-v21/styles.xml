@@ -9,4 +9,7 @@
         <item name="android:statusBarColor">@color/colorPrimaryDark</item>
         <item name="android:windowBackground">@drawable/splash_screen</item>
     </style>
+    <style name="AppTheme.LoginScreen" parent="AppTheme.NoActionBar">
+        <item name="android:statusBarColor">@color/colorPrimaryDark</item>
+    </style>
 </resources>

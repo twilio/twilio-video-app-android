@@ -16,5 +16,7 @@
     <style name="AppTheme.SplashScreen" parent="AppTheme.NoActionBar">
         <item name="android:windowBackground">@drawable/splash_screen</item>
     </style>
+    <style name="AppTheme.LoginScreen" parent="AppTheme.NoActionBar">
+    </style>
 
 </resources>

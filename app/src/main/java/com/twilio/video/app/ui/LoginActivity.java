@@ -9,6 +9,8 @@ import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.HapticFeedbackConstants;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
@@ -30,6 +32,7 @@ import com.twilio.video.env.Env;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import butterknife.OnTextChanged;
 import retrofit.Callback;
 import retrofit.RetrofitError;
 import retrofit.client.Response;
@@ -74,6 +77,15 @@ public class LoginActivity extends BaseActivity {
             requestPermissions();
         }
 
+    }
+
+    @OnTextChanged(R.id.username_edittext)
+    public void onTextChanged(CharSequence charSequence, int start, int count, int after) {
+        if(after == 0) {
+            loginButton.setTextColor(ContextCompat.getColor(LoginActivity.this, R.color.colorButtonText));
+        } else {
+            loginButton.setTextColor(ContextCompat.getColor(LoginActivity.this, R.color.white));
+        }
     }
 
     public boolean checkPermissions(){

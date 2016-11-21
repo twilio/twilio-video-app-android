@@ -3,7 +3,7 @@
 
     <string name="app_name">Video</string>
     <string name="client_name">Client Name</string>
-    <string name="login">Login</string>
+    <string name="login">LOG IN</string>
     <string name="logout">Log Out</string>
     <string name="settings">Settings</string>
     <string name="username">Username</string>
