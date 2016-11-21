@@ -7,7 +7,7 @@
 #include "webrtc/api/android/jni/classreferenceholder.h"
 #include "webrtc/api/android/jni/androidmediadecoder_jni.h"
 #include "webrtc/api/android/jni/androidmediaencoder_jni.h"
-#include "android_video_capturer_jni.h"
+#include "com_twilio_video_VideoCapturerDelegate.h"
 
 namespace twilio_video_jni {
 
@@ -28,7 +28,7 @@ JNIEXPORT jlong JNICALL Java_com_twilio_video_MediaFactory_nativeCreate(JNIEnv *
         bool failure = false;
 
         failure |= webrtc::VoiceEngine::SetAndroidObjects(webrtc_jni::GetJVM(), context);
-        failure |= AndroidVideoCapturerJni::SetAndroidObjects(jni, context);
+        failure |= VideoCapturerDelegate::SetAndroidObjects(jni, context);
 
         if (failure) {
             return 0;
