@@ -20,7 +20,7 @@ def supportedArchFolderName = [
 ]
 
 def coreHome = "${twilioSdkHome}/twilio-video"
-def coreHeaders = "${coreHome}/arm64v8a/gnu-4.9/debug/include"
+def coreHeaders = "${coreHome}/armeabiv7a/gnu-4.9/release/include"
 def coreStaticLib = "libtwilio-video.a"
 
 def pocoHome = "${coreHome}"
