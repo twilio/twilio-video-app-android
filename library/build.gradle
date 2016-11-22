@@ -181,10 +181,11 @@ model {
     android.ndk {
         moduleName "jingle_peerconnection_so"
         toolchainVersion "${currentToolchainVersion}"
-        platformVersion 21
+        platformVersion 24
         stl "c++_static"
         cppFlags.addAll([
                 "-DWEBRTC_POSIX",
+                "-DNDEBUG",
                 "-DWEBRTC_BUILD_LIBEVENT",
                 "-DTWILIO_SDK_2_0",
                 "-DWEBRTC_ANDROID",
