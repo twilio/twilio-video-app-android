@@ -5,9 +5,11 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.media.projection.MediaProjectionManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -31,10 +33,7 @@ import com.google.common.collect.HashBiMap;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import com.twilio.accessmanager.AccessManager;
-import com.twilio.video.ScreenCapturer;
-import com.twilio.video.app.R;
-import com.twilio.video.app.dialog.Dialog;
-import com.twilio.video.app.util.SimpleSignalingUtils;
+import com.twilio.video.AspectRatio;
 import com.twilio.video.AudioTrack;
 import com.twilio.video.CameraCapturer;
 import com.twilio.video.ConnectOptions;
@@ -45,10 +44,16 @@ import com.twilio.video.Media;
 import com.twilio.video.Participant;
 import com.twilio.video.Room;
 import com.twilio.video.RoomState;
+import com.twilio.video.ScreenCapturer;
 import com.twilio.video.VideoClient;
+import com.twilio.video.VideoConstraints;
+import com.twilio.video.VideoDimensions;
 import com.twilio.video.VideoException;
 import com.twilio.video.VideoTrack;
 import com.twilio.video.VideoView;
+import com.twilio.video.app.R;
+import com.twilio.video.app.dialog.Dialog;
+import com.twilio.video.app.util.SimpleSignalingUtils;
 
 import java.util.Map;
 
@@ -63,6 +68,32 @@ import timber.log.Timber;
 public class RoomActivity extends AppCompatActivity {
     private static final int REQUEST_MEDIA_PROJECTION = 100;
     private static final int THUMBNAIL_DIMENSION = 96;
+
+    private AspectRatio[] aspectRatios = new AspectRatio[]{
+            VideoConstraints.ASPECT_RATIO_4_3,
+            VideoConstraints.ASPECT_RATIO_4_3,
+            VideoConstraints.ASPECT_RATIO_16_9,
+            VideoConstraints.ASPECT_RATIO_11_9
+    };
+
+    private VideoDimensions[] videoDimensions = new VideoDimensions[]{
+            VideoDimensions.CIF_VIDEO_DIMENSIONS,
+            VideoDimensions.VGA_VIDEO_DIMENSIONS,
+            VideoDimensions.WVGA_VIDEO_DIMENSIONS,
+            VideoDimensions.HD_540P_VIDEO_DIMENSIONS,
+            VideoDimensions.HD_720P_VIDEO_DIMENSIONS,
+            VideoDimensions.HD_960P_VIDEO_DIMENSIONS,
+            VideoDimensions.HD_S1080P_VIDEO_DIMENSIONS,
+            VideoDimensions.HD_1080P_VIDEO_DIMENSIONS
+    };
+
+    public class Preferences {
+        public static final String MIN_FPS = "pref_min_fps";
+        public static final String MAX_FPS = "pref_max_fps";
+        public static final String MIN_VIDEO_DIMENSIONS = "pref_min_video_dim";
+        public static final String MAX_VIDEO_DIMENSIONS = "pref_max_video_dim";
+        public static final String ASPECT_RATIO = "pref_aspect_ratio";
+    }
 
     @BindView(R.id.connect_image_button) ImageButton connectImageButton;
     @BindView(R.id.media_status_textview) TextView mediaStatusTextview;
@@ -80,6 +111,8 @@ public class RoomActivity extends AppCompatActivity {
     private MenuItem pauseVideoMenuItem;
     private MenuItem pauseAudioMenuItem;
     private MenuItem screenCaptureMenuItem;
+
+    private SharedPreferences sharedPreferences;
 
     private String username;
     private String capabilityToken;
@@ -130,8 +163,11 @@ public class RoomActivity extends AppCompatActivity {
     private Room room;
     private String roomName;
     private LocalMedia localMedia;
+    private VideoConstraints videoConstraints;
     private LocalAudioTrack localAudioTrack;
     private LocalVideoTrack cameraVideoTrack;
+    private boolean restoreLocalVideoCameraTrack = false;
+    private boolean restoreLocalVideoScreenTrack = false;
     private LocalVideoTrack screenVideoTrack;
     private VideoTrack primaryVideoTrack;
     private CameraCapturer cameraCapturer;
@@ -175,11 +211,15 @@ public class RoomActivity extends AppCompatActivity {
         updateUi(RoomState.DISCONNECTED);
         loggingOut = false;
 
+        // Setup video constraints
+        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        obtainVideoConstraints();
+
         // Setup local media and video client
         localMedia = LocalMedia.create(this);
         localAudioTrack = localMedia.addAudioTrack(true);
         cameraCapturer = new CameraCapturer(this, CameraCapturer.CameraSource.FRONT_CAMERA);
-        cameraVideoTrack = localMedia.addVideoTrack(true, cameraCapturer);
+        cameraVideoTrack = localMedia.addVideoTrack(true, cameraCapturer, videoConstraints);
         primaryVideoView.setMirror(true);
         cameraVideoTrack.addRenderer(primaryVideoView);
 
@@ -204,6 +244,42 @@ public class RoomActivity extends AppCompatActivity {
             localMedia = null;
         }
         super.onDestroy();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        // try to restore camera video track after setting screen
+        if (restoreLocalVideoCameraTrack) {
+            obtainVideoConstraints();
+
+            cameraVideoTrack = localMedia.addVideoTrack(true, cameraCapturer, videoConstraints);
+            if (cameraVideoTrack != null) {
+                localThumbnailVideoView.setMirror(cameraCapturer.getCameraSource() ==
+                        CameraCapturer.CameraSource.FRONT_CAMERA);
+                if (room != null && !videoTrackVideoViewBiMap.isEmpty()) {
+                    cameraVideoTrack.addRenderer(localThumbnailVideoView);
+                } else {
+                    cameraVideoTrack.addRenderer(primaryVideoView);
+                }
+            } else {
+                Snackbar.make(primaryVideoView, "Failed to add video track",
+                        Snackbar.LENGTH_SHORT).show();
+            }
+            restoreLocalVideoCameraTrack = false;
+        }
+
+        // try to restore screen share video track after setting screen
+        if (restoreLocalVideoScreenTrack) {
+            obtainVideoConstraints();
+            screenVideoTrack = localMedia.addVideoTrack(true, screenCapturer, videoConstraints);
+            if (screenVideoTrack == null) {
+                Snackbar.make(primaryVideoView, "Failed to add video track",
+                        Snackbar.LENGTH_SHORT).show();
+            }
+            restoreLocalVideoCameraTrack = false;
+        }
     }
 
     @Override
@@ -257,7 +333,27 @@ public class RoomActivity extends AppCompatActivity {
                 toggleLocalVideoTrackState();
                 return true;
             case R.id.settings_menu_item:
-                // TODO: Implement settings
+
+                // remove video tracks before going to setting screen
+                // and mark which track needs to be restored after settings applied
+                if (localMedia != null) {
+
+                    if (cameraVideoTrack != null) {
+                        localMedia.removeVideoTrack(cameraVideoTrack);
+                        restoreLocalVideoCameraTrack = true;
+                        cameraVideoTrack = null;
+                    }
+
+                    if (screenVideoTrack != null) {
+                        localMedia.removeVideoTrack(screenVideoTrack);
+                        restoreLocalVideoScreenTrack = true;
+                        screenVideoTrack = null;
+                    }
+
+                }
+
+                Intent intent = new Intent(RoomActivity.this, SettingsActivity.class);
+                startActivity(intent);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -321,7 +417,7 @@ public class RoomActivity extends AppCompatActivity {
         if (cameraVideoTrack == null) {
             // Add back local video from camera capturer
             Timber.d("Adding local video");
-            cameraVideoTrack = localMedia.addVideoTrack(true, cameraCapturer);
+            cameraVideoTrack = localMedia.addVideoTrack(true, cameraCapturer, videoConstraints);
 
             // If participants have video tracks we render in thumbnial
             if (room != null && !videoTrackVideoViewBiMap.isEmpty()) {
@@ -376,6 +472,48 @@ public class RoomActivity extends AppCompatActivity {
         realm = extras.getString(SimpleSignalingUtils.REALM);
     }
 
+    private void obtainVideoConstraints() {
+        Timber.d("Collecting video constraints...");
+
+        VideoConstraints.Builder builder = new VideoConstraints.Builder();
+
+        // setup aspect ratio
+        String aspectRatio = sharedPreferences.getString(Preferences.ASPECT_RATIO, "0");
+        int aspectRatioIndex = Integer.parseInt(aspectRatio);
+        builder.aspectRatio(aspectRatios[aspectRatioIndex]);
+
+        Timber.d("Aspect ratio : %s",
+                getResources().getStringArray(R.array.aspect_ratio_array)[aspectRatioIndex]);
+
+        // setup video dimensions
+        int minVideoDim = sharedPreferences.getInt(Preferences.MIN_VIDEO_DIMENSIONS, 0);
+        int maxVideoDim = sharedPreferences.getInt(Preferences.MAX_VIDEO_DIMENSIONS,
+                videoDimensions.length - 1);
+
+        if (maxVideoDim != -1 && minVideoDim != -1) {
+            builder.minVideoDimensions(videoDimensions[minVideoDim]);
+            builder.maxVideoDimensions(videoDimensions[maxVideoDim]);
+        }
+
+        Timber.d("Video dimensions: %s - %s",
+                getResources().getStringArray(R.array.video_dimensions_array)[minVideoDim],
+                getResources().getStringArray(R.array.video_dimensions_array)[maxVideoDim]);
+
+
+        // setup fps
+        int minFps = sharedPreferences.getInt(Preferences.MIN_FPS, 0);
+        int maxFps = sharedPreferences.getInt(Preferences.MAX_FPS, 30);
+
+        if (maxFps != -1 && minFps != -1) {
+            builder.minFps(minFps);
+            builder.maxFps(maxFps);
+        }
+
+        Timber.d("Frames per second: %d - %d", minFps, maxFps);
+
+        videoConstraints = builder.build();
+    }
+
     private void updateUi(RoomState roomState) {
         int joinIcon = 0;
         if (roomState == RoomState.CONNECTING) {
@@ -428,7 +566,7 @@ public class RoomActivity extends AppCompatActivity {
     }
 
     private void startScreenCapture() {
-        screenVideoTrack = localMedia.addVideoTrack(true, screenCapturer);
+        screenVideoTrack = localMedia.addVideoTrack(true, screenCapturer, videoConstraints);
         screenCaptureMenuItem.setIcon(R.drawable.ic_stop_screen_share_white_24dp);
         screenCaptureMenuItem.setTitle(R.string.stop_screen_share);
     }
