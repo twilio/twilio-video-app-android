@@ -1,4 +1,4 @@
-package com.twilio.video.app.preference;
+package com.twilio.video.app.data;
 
 import android.annotation.TargetApi;
 import android.content.Context;

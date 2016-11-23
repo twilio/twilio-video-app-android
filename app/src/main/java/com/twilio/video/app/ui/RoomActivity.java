@@ -52,6 +52,7 @@ import com.twilio.video.VideoException;
 import com.twilio.video.VideoTrack;
 import com.twilio.video.VideoView;
 import com.twilio.video.app.R;
+import com.twilio.video.app.data.Preferences;
 import com.twilio.video.app.dialog.Dialog;
 import com.twilio.video.app.util.SimpleSignalingUtils;
 
@@ -86,14 +87,6 @@ public class RoomActivity extends AppCompatActivity {
             VideoDimensions.HD_S1080P_VIDEO_DIMENSIONS,
             VideoDimensions.HD_1080P_VIDEO_DIMENSIONS
     };
-
-    public class Preferences {
-        public static final String MIN_FPS = "pref_min_fps";
-        public static final String MAX_FPS = "pref_max_fps";
-        public static final String MIN_VIDEO_DIMENSIONS = "pref_min_video_dim";
-        public static final String MAX_VIDEO_DIMENSIONS = "pref_max_video_dim";
-        public static final String ASPECT_RATIO = "pref_aspect_ratio";
-    }
 
     @BindView(R.id.connect_image_button) ImageButton connectImageButton;
     @BindView(R.id.media_status_textview) TextView mediaStatusTextview;
@@ -167,7 +160,6 @@ public class RoomActivity extends AppCompatActivity {
     private LocalAudioTrack localAudioTrack;
     private LocalVideoTrack cameraVideoTrack;
     private boolean restoreLocalVideoCameraTrack = false;
-    private boolean restoreLocalVideoScreenTrack = false;
     private LocalVideoTrack screenVideoTrack;
     private VideoTrack primaryVideoTrack;
     private CameraCapturer cameraCapturer;
@@ -269,17 +261,6 @@ public class RoomActivity extends AppCompatActivity {
             }
             restoreLocalVideoCameraTrack = false;
         }
-
-        // try to restore screen share video track after setting screen
-        if (restoreLocalVideoScreenTrack) {
-            obtainVideoConstraints();
-            screenVideoTrack = localMedia.addVideoTrack(true, screenCapturer, videoConstraints);
-            if (screenVideoTrack == null) {
-                Snackbar.make(primaryVideoView, "Failed to add video track",
-                        Snackbar.LENGTH_SHORT).show();
-            }
-            restoreLocalVideoCameraTrack = false;
-        }
     }
 
     @Override
@@ -334,22 +315,14 @@ public class RoomActivity extends AppCompatActivity {
                 return true;
             case R.id.settings_menu_item:
 
-                // remove video tracks before going to setting screen
-                // and mark which track needs to be restored after settings applied
-                if (localMedia != null) {
-
-                    if (cameraVideoTrack != null) {
-                        localMedia.removeVideoTrack(cameraVideoTrack);
-                        restoreLocalVideoCameraTrack = true;
-                        cameraVideoTrack = null;
-                    }
-
-                    if (screenVideoTrack != null) {
-                        localMedia.removeVideoTrack(screenVideoTrack);
-                        restoreLocalVideoScreenTrack = true;
-                        screenVideoTrack = null;
-                    }
-
+                /*
+                 * Remove video tracks before going to setting screen
+                 * and mark track to be restored after settings applied
+                 */
+                if (cameraVideoTrack != null) {
+                    localMedia.removeVideoTrack(cameraVideoTrack);
+                    restoreLocalVideoCameraTrack = true;
+                    cameraVideoTrack = null;
                 }
 
                 Intent intent = new Intent(RoomActivity.this, SettingsActivity.class);
@@ -566,7 +539,7 @@ public class RoomActivity extends AppCompatActivity {
     }
 
     private void startScreenCapture() {
-        screenVideoTrack = localMedia.addVideoTrack(true, screenCapturer, videoConstraints);
+        screenVideoTrack = localMedia.addVideoTrack(true, screenCapturer);
         screenCaptureMenuItem.setIcon(R.drawable.ic_stop_screen_share_white_24dp);
         screenCaptureMenuItem.setTitle(R.string.stop_screen_share);
     }

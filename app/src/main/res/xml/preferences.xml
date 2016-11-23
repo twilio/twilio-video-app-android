@@ -9,14 +9,14 @@
             android:key="pref_aspect_ratio"
             android:summary="%s"
             android:title="@string/aspect_ratio" />
-        <com.twilio.video.app.preference.RangeBarPreference
+        <com.twilio.video.app.data.RangeBarPreference
             android:title="@string/fps"
             app:endKey="pref_max_fps"
             app:endTick="30"
             app:height="@dimen/preference_aspect_ratio_height"
             app:startKey="pref_min_fps"
             app:startTick="0" />
-        <com.twilio.video.app.preference.RangeBarPreference
+        <com.twilio.video.app.data.RangeBarPreference
             android:title="@string/video_dimensions"
             app:endKey="pref_max_video_dim"
             app:entries="@array/video_dimensions_array"
