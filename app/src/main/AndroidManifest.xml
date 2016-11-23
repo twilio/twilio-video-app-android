@@ -34,6 +34,8 @@
             android:windowSoftInputMode="adjustResize|stateAlwaysHidden"/>
         <activity android:name="net.hockeyapp.android.UpdateActivity"/>
         <activity android:name=".ui.RoomActivity" android:configChanges="orientation|screenSize" />
-        <activity android:name=".ui.SettingsActivity"/>
+        <activity android:name=".ui.SettingsActivity"
+            android:parentActivityName=".ui.RoomActivity"
+            android:label="@string/settings"/>
     </application>
 </manifest>
