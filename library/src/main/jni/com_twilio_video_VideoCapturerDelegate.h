@@ -19,6 +19,11 @@
 
 namespace twilio_video_jni {
 
+/*
+ * The androidvideocapturer_jni was removed in WebRTC 55. The jni capturer from WebRTC 54 has been
+ * folded into VideoCapturerDelegate. Original source can be found at
+ * https://code.hq.twilio.com/client/twilio-webrtc/blob/twilio-webrtc-54/webrtc/api/android/jni/androidvideocapturer_jni.h
+ */
 class VideoCapturerDelegate : public AndroidVideoCapturerDelegate {
 public:
     static int SetAndroidObjects(JNIEnv *jni, jobject appliction_context);
@@ -63,8 +68,10 @@ public:
         typedef T type;
     };
 
-    // Helper function to make safe asynchronous calls to |capturer_|. The calls
-    // are not guaranteed to be delivered.
+    /*
+     * Helper function to make safe asynchronous calls to |capturer_|. The calls
+     * are not guaranteed to be delivered.
+     */
     template<typename... Args>
     void AsyncCapturerInvoke(
             const rtc::Location &posted_from,
@@ -82,13 +89,14 @@ public:
     rtc::scoped_refptr<webrtc_jni::SurfaceTextureHelper> surface_texture_helper_;
     rtc::ThreadChecker thread_checker_;
 
-    // |capturer| is a guaranteed to be a valid pointer between a call to
-    // AndroidVideoCapturerDelegate::Start
-    // until AndroidVideoCapturerDelegate::Stop.
+    /*
+     * |capturer| is a guaranteed to be a valid pointer between a call to
+     * AndroidVideoCapturerDelegate::Start
+     * until AndroidVideoCapturerDelegate::Stop.
+     */
     rtc::CriticalSection capturer_lock_;
     AndroidVideoCapturer *capturer_ GUARDED_BY(capturer_lock_);
-    // |invoker_| is used to communicate with |capturer_| on the thread Start() is
-    // called on.
+    // |invoker_| is used to communicate with |capturer_| on the thread Start() is called on.
     std::unique_ptr<rtc::GuardedAsyncInvoker> invoker_ GUARDED_BY(capturer_lock_);
 
     static jobject application_context_;

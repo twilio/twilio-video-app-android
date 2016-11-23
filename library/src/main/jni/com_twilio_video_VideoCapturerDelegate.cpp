@@ -32,7 +32,7 @@ VideoCapturerDelegate::VideoCapturerDelegate(JNIEnv* jni,
                   jni, "Camera SurfaceTextureHelper", j_egl_context)),
           capturer_(nullptr),
           is_screencast_(is_screencast) {
-    LOG(LS_INFO) << "AndroidVideoCapturerJni ctor";
+    LOG(LS_INFO) << "VideoCapturerDelegate ctor";
     jobject j_frame_observer =
             jni->NewObject(*j_observer_class_,
                            webrtc_jni::GetMethodID(jni, *j_observer_class_, "<init>", "(J)V"),
@@ -73,7 +73,7 @@ void VideoCapturerDelegate::Start(const cricket::VideoFormat& capture_format,
                                                 "(Lcom/twilio/video/VideoPixelFormat;)V"),
                         j_video_pixel_format);
 
-    LOG(LS_INFO) << "AndroidVideoCapturerJni start";
+    LOG(LS_INFO) << "VideoCapturerDelegate start";
     RTC_DCHECK(thread_checker_.CalledOnValidThread());
     {
         rtc::CritScope cs(&capturer_lock_);
@@ -96,10 +96,11 @@ void VideoCapturerDelegate::Stop() {
     LOG(LS_INFO) << "VideoCapturerDelegate stop";
     RTC_DCHECK(thread_checker_.CalledOnValidThread());
     {
-        // TODO(nisse): Consider moving this block until *after* the call to
-        // stopCapturer. stopCapturer should ensure that we get no
-        // more frames, and then we shouldn't need the if (!capturer_)
-        // checks in OnMemoryBufferFrame and OnTextureFrame.
+        /*
+         * TODO: Consider moving this block until *after* the call to stopCapturer.
+         * stopCapturer should ensure that we get no more frames, and then we shouldn't need
+         * the if (!capturer_) checks in OnMemoryBufferFrame and OnTextureFrame.
+         */
         rtc::CritScope cs(&capturer_lock_);
         // Destroying |invoker_| will cancel all pending calls to |capturer_|.
         invoker_ = nullptr;
@@ -177,7 +178,7 @@ std::vector<cricket::VideoFormat> VideoCapturerDelegate::GetSupportedFormats() {
 }
 
 void VideoCapturerDelegate::OnCapturerStarted(bool success) {
-    LOG(LS_INFO) << "AndroidVideoCapturerJni capture started: " << success;
+    LOG(LS_INFO) << "VideoCapturerDelegate capture started: " << success;
     AsyncCapturerInvoke(RTC_FROM_HERE, &AndroidVideoCapturer::OnCapturerStarted, success);
 }
 

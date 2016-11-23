@@ -9,26 +9,35 @@
 #include "webrtc/media/base/videocapturer.h"
 #include "webrtc/base/refcount.h"
 
+/*
+ * The androidvideocapturer was removed in WebRTC 55. The delegate and capturer defined below are
+ * ports of the implementations found in WebRTC 54. Original source can be found at
+ * https://code.hq.twilio.com/client/twilio-webrtc/blob/twilio-webrtc-54/webrtc/api/androidvideocapturer.h
+ */
 class AndroidVideoCapturer;
-
 class AndroidVideoCapturerDelegate : public rtc::RefCountInterface {
 public:
     virtual ~AndroidVideoCapturerDelegate() {}
-    // Start capturing. The implementation of the delegate must call
-    // AndroidVideoCapturer::OnCapturerStarted with the result of this request.
+    /*
+     * Start capturing. The implementation of the delegate must call
+     * AndroidVideoCapturer::OnCapturerStarted with the result of this request.
+     */
     virtual void Start(const cricket::VideoFormat& capture_format,
                        AndroidVideoCapturer* capturer) = 0;
 
-    // Stops capturing.
-    // The delegate may not call into AndroidVideoCapturer after this call.
+    /*
+     * Stops capturing.
+     * The delegate may not call into AndroidVideoCapturer after this call.
+     */
     virtual void Stop() = 0;
 
     virtual std::vector<cricket::VideoFormat> GetSupportedFormats() = 0;
     virtual bool IsScreencast() = 0;
 };
 
-// Android implementation of cricket::VideoCapturer for use with WebRtc
-// PeerConnection.
+/*
+ * Android implementation of cricket::VideoCapturer for use with WebRtc PeerConnection.
+ */
 class AndroidVideoCapturer : public cricket::VideoCapturer {
 public:
     explicit AndroidVideoCapturer(
@@ -47,15 +56,16 @@ public:
     bool GetBestCaptureFormat(const cricket::VideoFormat& desired,
                               cricket::VideoFormat* best_format) override;
 
-    // Expose these protected methods as public, to be used by the
-    // AndroidVideoCapturerJni.
+    // Expose these protected methods as public, to be used by the VideoCapturerDelegate.
     using cricket::VideoCapturer::AdaptFrame;
     using cricket::VideoCapturer::OnFrame;
 
 private:
-    // cricket::VideoCapturer implementation.
-    // Video frames will be delivered using
-    // cricket::VideoCapturer::SignalFrameCaptured on the thread that calls Start.
+    /*
+     * cricket::VideoCapturer implementation.
+     * Video frames will be delivered using
+     * cricket::VideoCapturer::SignalFrameCaptured on the thread that calls Start.
+     */
     cricket::CaptureState Start(const cricket::VideoFormat& capture_format) override;
     void Stop() override;
     bool IsRunning() override;
@@ -68,4 +78,4 @@ private:
     rtc::ThreadChecker thread_checker_;
 };
 
-#endif  // VIDEO_ANDROID_ANDROID_VIDEO_CAPTURER_H_
+#endif // VIDEO_ANDROID_ANDROID_VIDEO_CAPTURER_H_
