@@ -98,8 +98,9 @@ final class VideoCapturerDelegate implements org.webrtc.VideoCapturer {
     }
 
 
-    // An implementation of CapturerObserver that forwards all calls from
-    // Java to the C layer.
+    /*
+     * An implementation of CapturerObserver that forwards all calls from Java to the C layer.
+     */
     static class NativeObserver implements org.webrtc.VideoCapturer.CapturerObserver {
         private final long nativeCapturer;
 
@@ -114,6 +115,7 @@ final class VideoCapturerDelegate implements org.webrtc.VideoCapturer {
 
         @Override
         public void onCapturerStopped() {
+            // Not currently required in our capturer API
         }
 
         @Override

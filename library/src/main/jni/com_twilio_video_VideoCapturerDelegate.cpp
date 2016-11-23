@@ -266,15 +266,12 @@ void VideoCapturerDelegate::OnMemoryBufferFrame(void *video_frame, int length, i
         scaled_buffer->ScaleFrom(buffer);
         buffer = scaled_buffer;
     }
-    const cricket::WebRtcVideoFrame& frame = cricket::WebRtcVideoFrame(
-            buffer, capturer_->apply_rotation()
-                    ? webrtc::kVideoRotation_0
-                    : static_cast<webrtc::VideoRotation>(rotation),
-            translated_camera_time_us, 0);
-    frame.video_frame_buffer()->AddRef();
-    capturer_->OnFrame(
-            frame,
-            width, height);
+
+    capturer_->OnFrame(cricket::WebRtcVideoFrame(buffer,
+                                                 capturer_->apply_rotation() ?
+                                                 webrtc::kVideoRotation_0 :
+                                                 static_cast<webrtc::VideoRotation>(rotation),
+                                                 translated_camera_time_us, 0), width, height);
 }
 
 void VideoCapturerDelegate::OnTextureFrame(int width,

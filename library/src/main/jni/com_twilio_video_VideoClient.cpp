@@ -3,8 +3,6 @@
 
 #include "webrtc/base/refcount.h"
 #include "webrtc/voice_engine/include/voe_base.h"
-//#include "webrtc/modules/video_capture/video_capture_internal.h"
-//#include "webrtc/api/android/jni/androidvideocapturer_jni.h"
 #include "webrtc/modules/audio_device/android/audio_manager.h"
 #include "webrtc/modules/audio_device/android/opensles_player.h"
 #include "webrtc/api/android/jni/classreferenceholder.h"

@@ -91,7 +91,7 @@ public class CameraCapturer implements VideoCapturer {
 
                 @Override
                 public void onCapturerStopped() {
-                    // TODO
+                    // TODO: This is currently not required but investigate the requirement of this
                 }
 
                 @Override
