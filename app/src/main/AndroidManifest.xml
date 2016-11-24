@@ -36,6 +36,7 @@
         <activity android:name=".ui.RoomActivity" android:configChanges="orientation|screenSize" />
         <activity android:name=".ui.SettingsActivity"
             android:parentActivityName=".ui.RoomActivity"
-            android:label="@string/settings"/>
+            android:label="@string/settings"
+            android:theme="@style/AppTheme.Settings"/>
     </application>
 </manifest>

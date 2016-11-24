@@ -8,7 +8,8 @@
             android:entryValues="@array/aspect_ratio_array_values"
             android:key="pref_aspect_ratio"
             android:summary="%s"
-            android:title="@string/aspect_ratio" />
+            android:title="@string/aspect_ratio"
+            android:negativeButtonText="@null"/>
         <com.twilio.video.app.data.RangeBarPreference
             android:title="@string/fps"
             app:endKey="pref_max_fps"
