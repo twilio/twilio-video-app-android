@@ -471,7 +471,6 @@ public class RoomActivity extends AppCompatActivity {
                 getResources().getStringArray(R.array.video_dimensions_array)[minVideoDim],
                 getResources().getStringArray(R.array.video_dimensions_array)[maxVideoDim]);
 
-
         // setup fps
         int minFps = sharedPreferences.getInt(Preferences.MIN_FPS, 0);
         int maxFps = sharedPreferences.getInt(Preferences.MAX_FPS, 30);
