@@ -72,7 +72,6 @@ public class RoomActivity extends AppCompatActivity {
 
     private AspectRatio[] aspectRatios = new AspectRatio[]{
             VideoConstraints.ASPECT_RATIO_4_3,
-            VideoConstraints.ASPECT_RATIO_4_3,
             VideoConstraints.ASPECT_RATIO_16_9,
             VideoConstraints.ASPECT_RATIO_11_9
     };
