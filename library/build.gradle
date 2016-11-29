@@ -185,6 +185,7 @@ model {
         stl "c++_static"
         cppFlags.addAll([
                 "-DWEBRTC_POSIX",
+                // Needed to extend cricket::VideoCapturer without causing unwarranted destructor crashes
                 "-DNDEBUG",
                 "-DWEBRTC_BUILD_LIBEVENT",
                 "-DTWILIO_SDK_2_0",
