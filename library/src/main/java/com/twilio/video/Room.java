@@ -2,11 +2,14 @@ package com.twilio.video;
 
 import android.os.Handler;
 import android.support.annotation.IntDef;
+import android.util.Pair;
 
 import java.lang.annotation.Retention;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 import static java.lang.annotation.RetentionPolicy.SOURCE;
 
@@ -46,9 +49,13 @@ public class Room {
     private Map<String, Participant> participantMap = new HashMap<>();
     private InternalRoomListenerHandle internalRoomListenerHandle;
     private InternalRoomListenerImpl internalRoomListenerImpl;
+    private InternalStatsListenerHandle internalStatsListenerHandle;
+    private InternalStatsListenerImpl internalStatsListenerImpl;
     private LocalParticipant localParticipant;
     private final Room.Listener listener;
     private final Handler handler;
+    private Queue<Pair<Handler, StatsListener>> statsListenersQueue;
+
 
     Room(String name, LocalMedia localMedia, Room.Listener listener, Handler handler) {
         this.name = name;
@@ -59,6 +66,7 @@ public class Room {
         this.internalRoomListenerImpl = new InternalRoomListenerImpl();
         this.internalRoomListenerHandle = new InternalRoomListenerHandle(internalRoomListenerImpl);
         this.handler = handler;
+        this.statsListenersQueue = new ConcurrentLinkedQueue<>();
     }
 
     /**
@@ -99,6 +107,25 @@ public class Room {
     public LocalParticipant getLocalParticipant() {
         return localParticipant;
     }
+
+    /**
+     * TODO: Add documentation
+     * @param statsListener
+     */
+    public synchronized void getStats(StatsListener statsListener) {
+        if (statsListener == null) {
+            // TODO: handle exception
+        }
+        if (internalStatsListenerImpl == null) {
+            internalStatsListenerImpl = new InternalStatsListenerImpl();
+            internalStatsListenerHandle =
+                    new InternalStatsListenerHandle(internalStatsListenerImpl);
+        }
+        statsListenersQueue.offer(
+                new Pair<Handler, StatsListener>(Util.createCallbackHandler(), statsListener));
+        nativeGetStats(nativeRoomContext, internalStatsListenerHandle.get());
+
+    };
 
     /**
      * Disconnects from the room.
@@ -305,6 +332,45 @@ public class Room {
         protected native void nativeRelease(long nativeHandle);
     }
 
+    // JNI Callbacks Interface
+    interface InternalStatsListener {
+        void onStats(List<StatsReport> statsReports);
+    }
+
+    class InternalStatsListenerImpl implements InternalStatsListener{
+
+        public void onStats(final List<StatsReport> statsReports) {
+            final Pair<Handler, StatsListener> statsPair = Room.this.statsListenersQueue.poll();
+            if (statsPair == null) {
+                // TODO: handle this case...should never happen ?
+            }
+            statsPair.first.post(new Runnable() {
+                @Override
+                public void run() {
+                    statsPair.second.onStats(statsReports);
+                }
+            });
+        }
+    }
+
+    class InternalStatsListenerHandle extends NativeHandle {
+
+
+        public InternalStatsListenerHandle(InternalStatsListener listener) {
+            super(listener);
+        }
+
+        /*
+         * Native Handle
+         */
+        @Override
+        protected native long nativeCreate(Object object);
+
+        @Override
+        protected native void nativeRelease(long nativeHandle);
+    }
+
     private native void nativeDisconnect(long nativeRoomContext);
+    private native void nativeGetStats(long nativeRoomContext, long nativeStatsObserver);
     private native void nativeRelease(long nativeRoomContext);
 }

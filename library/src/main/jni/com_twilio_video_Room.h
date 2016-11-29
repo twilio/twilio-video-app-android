@@ -16,6 +16,9 @@ struct RoomContext {
 JNIEXPORT void JNICALL Java_com_twilio_video_Room_nativeDisconnect
         (JNIEnv *, jobject, jlong);
 
+JNIEXPORT void JNICALL Java_com_twilio_video_Room_nativeGetStats
+    (JNIEnv *, jobject, jlong, jlong);
+
 JNIEXPORT void JNICALL Java_com_twilio_video_Room_nativeRelease
     (JNIEnv *, jobject, jlong);
 
@@ -23,6 +26,12 @@ JNIEXPORT jlong JNICALL Java_com_twilio_video_Room_00024InternalRoomListenerHand
     (JNIEnv *, jobject, jobject);
 
 JNIEXPORT void JNICALL Java_com_twilio_video_Room_00024InternalRoomListenerHandle_nativeRelease
+    (JNIEnv *, jobject, jlong);
+
+JNIEXPORT jlong JNICALL Java_com_twilio_video_Room_00024InternalStatsListenerHandle_nativeCreate
+    (JNIEnv *, jobject, jobject);
+
+JNIEXPORT void JNICALL Java_com_twilio_video_Room_00024InternalStatsListenerHandle_nativeRelease
     (JNIEnv *, jobject, jlong);
 
 #ifdef __cplusplus

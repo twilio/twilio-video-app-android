@@ -2,11 +2,10 @@ package com.twilio.video;
 
 public abstract class BaseTrackStats {
 
-    public BaseTrackStats(String trackId, int packetsLost, String direction,
-                          String codecName, String ssrc, long unixTimestamp) {
+    public BaseTrackStats(String trackId, int packetsLost,
+                          String codecName, String ssrc, double unixTimestamp) {
         this.trackId = trackId;
         this.packetsLost = packetsLost;
-        this.direction = direction;
         this.codecName = codecName;
         this.ssrc = ssrc;
         this.unixTimestamp = unixTimestamp;
@@ -22,10 +21,6 @@ public abstract class BaseTrackStats {
      */
     public final int packetsLost;
     /**
-     * Track direction sending/receiving
-     */
-    public final String direction;
-    /**
      * Name of codec used for this track
      */
     public final String codecName;
@@ -33,5 +28,5 @@ public abstract class BaseTrackStats {
      * The SSRC identifier of the source
      */
     public final String ssrc;
-    public final long unixTimestamp;
+    public final double unixTimestamp;
 }
