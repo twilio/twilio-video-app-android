@@ -3,6 +3,7 @@ package com.twilio.video;
 import android.Manifest;
 import android.content.Context;
 import android.hardware.Camera;
+import android.os.Handler;
 import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -202,19 +203,30 @@ public class CameraCapturer implements VideoCapturer {
             };
 
     private PictureListener pictureListener;
+    private Handler pictureListenerHandler;
     private final VideoCapturerAndroid.PictureEventHandler pictureEventHandler =
             new VideoCapturerAndroid.PictureEventHandler() {
                 @Override
                 public void onShutter() {
                     if (pictureListener != null) {
-                        pictureListener.onShutter();
+                        pictureListenerHandler.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                pictureListener.onShutter();
+                            }
+                        });
                     }
                 }
 
                 @Override
-                public void onPictureTaken(byte[] pictureData) {
+                public void onPictureTaken(final byte[] pictureData) {
                     if (pictureListener != null) {
-                        pictureListener.onPictureTaken(pictureData);
+                        pictureListenerHandler.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                pictureListener.onPictureTaken(pictureData);
+                            }
+                        });
                     }
                 }
             };
@@ -434,6 +446,7 @@ public class CameraCapturer implements VideoCapturer {
      * not be scheduled.
      */
     public synchronized boolean takePicture(@NonNull PictureListener pictureListener) {
+        pictureListenerHandler = Util.createCallbackHandler();
         if (webrtcCapturer != null) {
             this.pictureListener = pictureListener;
             return webrtcCapturer.takePicture(pictureEventHandler);

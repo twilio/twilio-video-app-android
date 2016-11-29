@@ -1,6 +1,7 @@
 package com.twilio.video;
 
 import android.hardware.Camera;
+import android.support.test.InstrumentationRegistry;
 import android.support.test.runner.AndroidJUnit4;
 
 import com.twilio.video.base.BaseCameraCapturerTest;
@@ -317,6 +318,44 @@ public class CameraCapturerBaseTest extends BaseCameraCapturerTest {
 
         assertTrue(cameraCapturer.takePicture(pictureListener));
         assertFalse(cameraCapturer.takePicture(pictureListener));
+    }
+
+    @Test
+    public void shouldInvokePictureListenerOnCallingThread() throws InterruptedException {
+        cameraCapturer = new CameraCapturer(cameraCapturerActivity,
+                CameraCapturer.CameraSource.BACK_CAMERA);
+        localVideoTrack = localMedia.addVideoTrack(true, cameraCapturer);
+        final CountDownLatch shutterCallback = new CountDownLatch(1);
+        final CountDownLatch pictureTaken = new CountDownLatch(1);
+
+        /*
+         * Run on UI thread to avoid thread hopping between the test runner thread and the UI
+         * thread.
+         */
+        InstrumentationRegistry.getInstrumentation().runOnMainSync(new Runnable() {
+            @Override
+            public void run() {
+                final long callingThreadId = Thread.currentThread().getId();
+                CameraCapturer.PictureListener pictureListener =
+                        new CameraCapturer.PictureListener() {
+                            @Override
+                            public void onShutter() {
+                                assertEquals(callingThreadId, Thread.currentThread().getId());
+                                shutterCallback.countDown();
+                            }
+
+                            @Override
+                            public void onPictureTaken(byte[] pictureData) {
+                                assertEquals(callingThreadId, Thread.currentThread().getId());
+                                pictureTaken.countDown();
+                            }
+                        };
+                assertTrue(cameraCapturer.takePicture(pictureListener));
+            }
+        });
+
+        assertTrue(shutterCallback.await(10, TimeUnit.SECONDS));
+        assertTrue(pictureTaken.await(10, TimeUnit.SECONDS));
     }
 
     private void scheduleCameraParameterFlashModeUpdate(final CountDownLatch cameraParametersUpdated,
