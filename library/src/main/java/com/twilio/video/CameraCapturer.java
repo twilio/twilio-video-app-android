@@ -2,6 +2,9 @@ package com.twilio.video;
 
 import android.Manifest;
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
 import android.hardware.Camera;
 import android.os.Handler;
 import android.support.annotation.IntDef;
@@ -12,6 +15,7 @@ import org.webrtc.CameraEnumerationAndroid;
 import org.webrtc.SurfaceTextureHelper;
 import org.webrtc.VideoCapturerAndroid;
 
+import java.io.ByteArrayOutputStream;
 import java.lang.annotation.Retention;
 import java.util.ArrayList;
 import java.util.List;
@@ -221,15 +225,20 @@ public class CameraCapturer implements VideoCapturer {
                 @Override
                 public void onPictureTaken(final byte[] pictureData) {
                     if (pictureListener != null) {
+                        // Perform alignment on camera thread
+                        final byte[] alignedPictureData = alignPicture(pictureData);
+
                         pictureListenerHandler.post(new Runnable() {
                             @Override
                             public void run() {
-                                pictureListener.onPictureTaken(pictureData);
+                                pictureListener.onPictureTaken(alignedPictureData);
                             }
                         });
                     }
                 }
             };
+
+
 
     public CameraCapturer(Context context, CameraSource cameraSource) {
         this(context, cameraSource, null);
@@ -501,6 +510,43 @@ public class CameraCapturer implements VideoCapturer {
         }
 
         return true;
+    }
+
+    /*
+     * Aligns the picture data according to the current device orientation and camera source.
+     */
+    private byte[] alignPicture(byte[] pictureData) {
+        Bitmap bitmap = BitmapFactory.decodeByteArray(pictureData, 0, pictureData.length);
+        int degree = webrtcCapturer.getFrameOrientation();
+        Matrix matrix = new Matrix();
+
+        // Compensate for front camera mirroring
+        if(cameraSource == CameraSource.FRONT_CAMERA) {
+            switch (degree) {
+                case 0:
+                case 180:
+                    matrix.setScale(-1, 1);
+                    break;
+                case 90:
+                case 270:
+                    matrix.setScale(1, -1);
+                    break;
+                default:
+                    break;
+            }
+
+        }
+
+        // Apply rotation
+        matrix.postRotate(degree);
+        Bitmap rotatedBitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(),
+                bitmap.getHeight(), matrix, true);
+
+        // Write to byte array
+        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+        rotatedBitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream);
+
+        return stream.toByteArray();
     }
 
     /**
