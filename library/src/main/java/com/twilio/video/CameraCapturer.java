@@ -10,6 +10,8 @@ import android.os.Handler;
 import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.view.Surface;
+import android.view.WindowManager;
 
 import org.webrtc.CameraEnumerationAndroid;
 import org.webrtc.SurfaceTextureHelper;
@@ -17,6 +19,7 @@ import org.webrtc.VideoCapturerAndroid;
 
 import java.io.ByteArrayOutputStream;
 import java.lang.annotation.Retention;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -68,6 +71,7 @@ public class CameraCapturer implements VideoCapturer {
     private CameraCapturer.Listener listener;
     private VideoCapturerAndroid webrtcCapturer;
     private CameraSource cameraSource;
+    private Camera.CameraInfo info;
     private VideoCapturer.Listener videoCapturerListener;
     private SurfaceTextureHelper surfaceTextureHelper;
     private final org.webrtc.VideoCapturer.CapturerObserver observerAdapter =
@@ -517,7 +521,7 @@ public class CameraCapturer implements VideoCapturer {
      */
     private byte[] alignPicture(byte[] pictureData) {
         Bitmap bitmap = BitmapFactory.decodeByteArray(pictureData, 0, pictureData.length);
-        int degree = webrtcCapturer.getFrameOrientation();
+        int degree = getFrameOrientation();
         Matrix matrix = new Matrix();
 
         // Compensate for front camera mirroring
@@ -547,6 +551,61 @@ public class CameraCapturer implements VideoCapturer {
         rotatedBitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream);
 
         return stream.toByteArray();
+    }
+
+    private int getFrameOrientation() {
+        int rotation = getDeviceOrientation();
+
+        if (info == null) {
+            info = getCameraInfo();
+        }
+        if (info.facing == android.hardware.Camera.CameraInfo.CAMERA_FACING_BACK) {
+            rotation = 360 - rotation;
+        }
+
+        return (info.orientation + rotation) % 360;
+    }
+
+    private int getDeviceOrientation() {
+        int orientation = 0;
+
+        WindowManager wm = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
+        switch(wm.getDefaultDisplay().getRotation()) {
+            case Surface.ROTATION_90:
+                orientation = 90;
+                break;
+            case Surface.ROTATION_180:
+                orientation = 180;
+                break;
+            case Surface.ROTATION_270:
+                orientation = 270;
+                break;
+            case Surface.ROTATION_0:
+            default:
+                orientation = 0;
+                break;
+        }
+        return orientation;
+    }
+
+    /*
+     * FIXME
+     * Remove this once we have completed upgrade to WebRTC 55. This information can be provided
+     * without reflection with some small changes to WebRTC 55.
+     */
+    private Camera.CameraInfo getCameraInfo() {
+        Camera.CameraInfo cameraInfo;
+        try {
+            Field cameraInfoField = webrtcCapturer.getClass().getDeclaredField("info");
+            cameraInfoField.setAccessible(true);
+            cameraInfo = (Camera.CameraInfo) cameraInfoField.get(webrtcCapturer);
+        } catch (NoSuchFieldException e) {
+            throw new RuntimeException("Unable to retrieve camera info");
+        } catch( IllegalAccessException e) {
+            throw new RuntimeException("Could not access camera info");
+        }
+
+        return cameraInfo;
     }
 
     /**
