@@ -20,7 +20,7 @@ public class Room {
     @Retention(SOURCE)
     @IntDef({ERROR_INVALID_ACCESS_TOKEN,
             ERROR_ROOM_SIGNALING,
-            ERROR_CREATE_PEERCONNECITON_FAILURE,
+            ERROR_CREATE_PEERCONNECTION_FAILURE,
             ERROR_ICE_CONNECTION_FAILURE,
             ERROR_CREATE_LOCAL_SDP_FAILURE,
             ERROR_SET_LOCAL_SDP_FAILURE,
@@ -30,7 +30,7 @@ public class Room {
     public @interface Error {}
     public static final int ERROR_INVALID_ACCESS_TOKEN = 20101;
     public static final int ERROR_ROOM_SIGNALING = 53100;
-    public static final int ERROR_CREATE_PEERCONNECITON_FAILURE = 54001;
+    public static final int ERROR_CREATE_PEERCONNECTION_FAILURE = 54001;
     public static final int ERROR_ICE_CONNECTION_FAILURE = 54101;
     public static final int ERROR_CREATE_LOCAL_SDP_FAILURE = 54102;
     public static final int ERROR_SET_LOCAL_SDP_FAILURE = 54103;
