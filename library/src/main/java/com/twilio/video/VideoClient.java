@@ -206,14 +206,14 @@ public class VideoClient {
             }
 
             @Override
-            public void onConnectFailure(Room room, VideoException error) {
-                roomListener.onConnectFailure(room, error);
+            public void onConnectFailure(Room room, RoomException roomException) {
+                roomListener.onConnectFailure(room, roomException);
                 release(room);
             }
 
             @Override
-            public void onDisconnected(Room room, VideoException error) {
-                roomListener.onDisconnected(room, error);
+            public void onDisconnected(Room room, RoomException roomException) {
+                roomListener.onDisconnected(room, roomException);
                 release(room);
             }
 

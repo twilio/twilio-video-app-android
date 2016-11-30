@@ -1,27 +1,15 @@
 package com.twilio.video;
 
-import java.util.Locale;
-
-/**
- * A class that provides information about a {@link Room} error.
+/*
+ * Base class for all exception and errors throughout the SDK.
  */
-public class VideoException extends Exception {
-    private static final long serialVersionUID = 8881301848720707153L;
+abstract class VideoException extends Exception {
+    public final int code;
+    public final String message;
 
-    private int errorCode;
-    private String errorMessage;
-
-    public VideoException(int errorCode, String errorMessage) {
-        this.errorCode = errorCode;
-        this.errorMessage = errorMessage;
-    }
-
-    @Override
-    public String getMessage() {
-        return String.format(Locale.getDefault(),"code:%d, message:%s", errorCode, errorMessage);
-    }
-
-    public int getErrorCode() {
-        return errorCode;
+    protected VideoException(int code, String message) {
+        super(message);
+        this.code = code;
+        this.message = message;
     }
 }

@@ -22,6 +22,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 import static junit.framework.Assert.assertNull;
+import static junit.framework.Assert.fail;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
@@ -118,5 +119,39 @@ public class RoomTest extends BaseClientTest {
         room.disconnect();
         assertTrue(roomListener.onDisconnectedLatch.await(20, TimeUnit.SECONDS));
         assertEquals(RoomState.DISCONNECTED, room.getState());
+    }
+
+    @Test
+    public void shouldFailToConnectWithInvalidToken() throws InterruptedException {
+        videoClient.updateToken("invalid token");
+        final CountDownLatch connectFailure = new CountDownLatch(1);
+        videoClient.connect(new Room.Listener() {
+            @Override
+            public void onConnected(Room room) {
+                fail();
+            }
+
+            @Override
+            public void onConnectFailure(Room room, RoomException roomException) {
+                assertEquals(Room.ERROR_INVALID_ACCESS_TOKEN, roomException.code);
+                connectFailure.countDown();
+            }
+
+            @Override
+            public void onDisconnected(Room room, RoomException roomException) {
+                fail();
+            }
+
+            @Override
+            public void onParticipantConnected(Room room, Participant participant) {
+                fail();
+            }
+
+            @Override
+            public void onParticipantDisconnected(Room room, Participant participant) {
+                fail();
+            }
+        });
+        assertTrue(connectFailure.await(10, TimeUnit.SECONDS));
     }
 }
