@@ -6,16 +6,16 @@ import java.util.Locale;
  * A class that provides information about a {@link Room} error.
  */
 public class RoomError {
-    public final int errorCode;
-    public final String errorMessage;
+    public final int code;
+    public final String message;
 
-    RoomError(@Room.Error int errorCode, String errorMessage) {
-        this.errorCode = errorCode;
-        this.errorMessage = errorMessage;
+    RoomError(@Room.Error int code, String message) {
+        this.code = code;
+        this.message = message;
     }
 
     @Override
     public String toString() {
-        return String.format(Locale.getDefault(),"code:%d, message:%s", errorCode, errorMessage);
+        return String.format(Locale.getDefault(),"code:%d, message:%s", code, message);
     }
 }

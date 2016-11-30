@@ -12,8 +12,6 @@ import com.twilio.video.util.FakeVideoCapturer;
 import com.twilio.video.util.PermissionUtils;
 import com.twilio.video.util.RandUtils;
 
-import junit.framework.Assert;
-
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -135,7 +133,7 @@ public class RoomTest extends BaseClientTest {
 
             @Override
             public void onConnectFailure(Room room, RoomError error) {
-                assertEquals(Room.ERROR_INVALID_ACCESS_TOKEN, error.errorCode);
+                assertEquals(Room.ERROR_INVALID_ACCESS_TOKEN, error.code);
                 connectFailure.countDown();
             }
 
