@@ -178,7 +178,7 @@ protected:
             if (!isObserverValid(func_name)) {
                 return;
             }
-            jobject j_room_error = createJavaRoomError(room_error);
+            jobject j_room_error = createJavaRoomException(room_error);
             jni()->CallVoidMethod(*j_room_observer_, j_on_disconnected_, j_room_error);
             CHECK_EXCEPTION(jni()) << "error during CallVoidMethod";
         }
@@ -197,7 +197,7 @@ protected:
             if (!isObserverValid(func_name)) {
                 return;
             }
-            jobject j_room_error = createJavaRoomError(room_error);
+            jobject j_room_error = createJavaRoomException(room_error);
             jni()->CallVoidMethod(*j_room_observer_, j_on_connect_failure_, j_room_error);
             CHECK_EXCEPTION(jni()) << "error during CallVoidMethod";
         }
@@ -282,7 +282,7 @@ private:
         return true;
     }
 
-    jobject createJavaRoomError(const twilio::video::RoomError& room_error) {
+    jobject createJavaRoomException(const twilio::video::RoomError &room_error) {
         return jni()->NewObject(*j_room_error_class_,
                                 j_room_error_ctor_id_,
                                 room_error.getCode(),
