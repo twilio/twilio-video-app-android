@@ -46,7 +46,7 @@ public:
             GetMethodID(env,
                         *j_room_observer_class_,
                         "onConnectFailure",
-                        "(I)V")),
+                        "(Lcom/twilio/video/RoomError;)V")),
         j_on_participant_connected_(
             GetMethodID(env,
                         *j_room_observer_class_,
