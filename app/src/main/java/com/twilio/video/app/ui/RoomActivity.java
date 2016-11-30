@@ -45,6 +45,8 @@ import com.twilio.video.Participant;
 import com.twilio.video.Room;
 import com.twilio.video.RoomState;
 import com.twilio.video.ScreenCapturer;
+import com.twilio.video.StatsListener;
+import com.twilio.video.StatsReport;
 import com.twilio.video.VideoClient;
 import com.twilio.video.VideoConstraints;
 import com.twilio.video.VideoDimensions;
@@ -56,6 +58,7 @@ import com.twilio.video.app.data.Preferences;
 import com.twilio.video.app.dialog.Dialog;
 import com.twilio.video.app.util.SimpleSignalingUtils;
 
+import java.util.List;
 import java.util.Map;
 
 import butterknife.BindView;
@@ -381,6 +384,18 @@ public class RoomActivity extends AppCompatActivity {
             pauseAudioMenuItem.setVisible(false);
         }
         localAudioImageButton.setImageResource(icon);
+    }
+
+    @OnClick(R.id.enable_stats_checkbox)
+    void toggleStats() {
+        if (room != null) {
+            room.getStats(new StatsListener() {
+                @Override
+                public void onStats(List<StatsReport> statsReports) {
+                    Timber.d("Stats are ready for " + statsReports.size() + " peers");
+                }
+            });
+        }
     }
 
     @OnClick(R.id.local_video_image_button)

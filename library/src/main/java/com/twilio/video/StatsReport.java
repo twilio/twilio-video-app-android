@@ -1,9 +1,15 @@
 package com.twilio.video;
 
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class StatsReport {
+    private final String peerConnectionId;
+    private List<LocalAudioTrackStats> localAudioTracksStats = new ArrayList<>();
+    private List<LocalVideoTrackStats> localVideoTracksStats = new ArrayList<>();
+    private List<AudioTrackStats> audioTracksStats = new ArrayList<>();
+    private List<VideoTrackStats> videoTracksStats = new ArrayList<>();
 
     public StatsReport(String peerConnectionId) {
         this.peerConnectionId = peerConnectionId;
@@ -44,10 +50,4 @@ public class StatsReport {
     void addVideoTrackStats(VideoTrackStats videoTrackStats) {
         videoTracksStats.add(videoTrackStats);
     }
-
-    private final String peerConnectionId;
-    private List<LocalAudioTrackStats> localAudioTracksStats;
-    private List<LocalVideoTrackStats> localVideoTracksStats;
-    private List<AudioTrackStats> audioTracksStats;
-    private List<VideoTrackStats> videoTracksStats;
 }

@@ -112,14 +112,18 @@ public class Room {
      * TODO: Add documentation
      * @param statsListener
      */
-    public synchronized void getStats(StatsListener statsListener) {
+    public void getStats(StatsListener statsListener) {
         if (statsListener == null) {
-            // TODO: handle exception
+            throw new NullPointerException("StatsListener must not be null");
         }
         if (internalStatsListenerImpl == null) {
-            internalStatsListenerImpl = new InternalStatsListenerImpl();
-            internalStatsListenerHandle =
-                    new InternalStatsListenerHandle(internalStatsListenerImpl);
+            synchronized (this) {
+                if (internalStatsListenerImpl == null) {
+                    internalStatsListenerImpl = new InternalStatsListenerImpl();
+                    internalStatsListenerHandle =
+                            new InternalStatsListenerHandle(internalStatsListenerImpl);
+                }
+            }
         }
         statsListenersQueue.offer(
                 new Pair<Handler, StatsListener>(Util.createCallbackHandler(), statsListener));

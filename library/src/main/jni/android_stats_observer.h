@@ -129,7 +129,7 @@ protected:
             processAudioTrackStats(j_stats_report, stats_report->getAudioTrackStats());
             processVideoTrackStats(j_stats_report, stats_report->getVideoTrackStats());
 
-            jni()->CallVoidMethod(j_stats_reports, j_array_list_add_, j_stats_report);
+            jni()->CallBooleanMethod(j_stats_reports, j_array_list_add_, j_stats_report);
         }
 
         {
@@ -292,7 +292,7 @@ private:
                                  track_stats->getPacketsReceived(),
                                  track_stats->getJitterBuffer(),
                                  j_received_dimensions,
-                                 0);
+                                 track_stats->getReceivedFrameRate());
             jni()->CallVoidMethod(j_stats_report,
                                   j_stats_report_add_video_id_,
                                   j_video_track_stats);
