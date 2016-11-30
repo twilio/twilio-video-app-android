@@ -20,7 +20,7 @@ public:
     AndroidRoomObserver(JNIEnv *env, jobject j_room_observer) :
         j_room_observer_(env, j_room_observer),
         j_room_observer_class_(env, GetObjectClass(env, *j_room_observer_)),
-        j_room_error_class_(env, twilio_video_jni::FindClass(env, "com/twilio/video/RoomError")),
+        j_room_error_class_(env, twilio_video_jni::FindClass(env, "com/twilio/video/RoomException")),
         j_room_error_ctor_id_(
                 GetMethodID(env,
                             *j_room_error_class_,
@@ -41,12 +41,12 @@ public:
             GetMethodID(env,
                         *j_room_observer_class_,
                         "onDisconnected",
-                        "(Lcom/twilio/video/RoomError;)V")),
+                        "(Lcom/twilio/video/RoomException;)V")),
         j_on_connect_failure_(
             GetMethodID(env,
                         *j_room_observer_class_,
                         "onConnectFailure",
-                        "(Lcom/twilio/video/RoomError;)V")),
+                        "(Lcom/twilio/video/RoomException;)V")),
         j_on_participant_connected_(
             GetMethodID(env,
                         *j_room_observer_class_,

@@ -48,7 +48,7 @@ import com.twilio.video.ScreenCapturer;
 import com.twilio.video.VideoClient;
 import com.twilio.video.VideoConstraints;
 import com.twilio.video.VideoDimensions;
-import com.twilio.video.RoomError;
+import com.twilio.video.RoomException;
 import com.twilio.video.VideoTrack;
 import com.twilio.video.VideoView;
 import com.twilio.video.app.R;
@@ -761,7 +761,7 @@ public class RoomActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onConnectFailure(Room room, RoomError error) {
+            public void onConnectFailure(Room room, RoomException error) {
                 Timber.i("onConnectFailure");
                 roomStatusTextview.setText("Failed to connect to " + roomName);
                 RoomActivity.this.room = null;
@@ -769,7 +769,7 @@ public class RoomActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onDisconnected(Room room, RoomError error) {
+            public void onDisconnected(Room room, RoomException error) {
                 Timber.i("onDisconnected");
                 roomStatusTextview.setText("Disconnected from " + roomName);
                 removeAllParticipants();

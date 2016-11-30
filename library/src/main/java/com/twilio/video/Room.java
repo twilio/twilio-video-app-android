@@ -148,8 +148,8 @@ public class Room {
                          String localParticipantSid,
                          String localParticipantIdentity,
                          List<Participant> participantList);
-        void onDisconnected(RoomError roomError);
-        void onConnectFailure(RoomError roomError);
+        void onDisconnected(RoomException roomException);
+        void onConnectFailure(RoomException roomException);
         void onParticipantConnected(Participant participant);
         void onParticipantDisconnected(String participantSid);
     }
@@ -186,26 +186,26 @@ public class Room {
         }
 
         @Override
-        public synchronized void onDisconnected(final RoomError roomError) {
+        public synchronized void onDisconnected(final RoomException roomException) {
             logger.d("onDisconnected()");
             Room.this.roomState = RoomState.DISCONNECTED;
             handler.post(new Runnable() {
                 @Override
                 public void run() {
-                    Room.this.listener.onDisconnected(Room.this, roomError);
+                    Room.this.listener.onDisconnected(Room.this, roomException);
                 }
             });
             release();
         }
 
         @Override
-        public synchronized void onConnectFailure(final RoomError roomError) {
+        public synchronized void onConnectFailure(final RoomException roomException) {
             logger.d("onConnectFailure()");
             Room.this.roomState = RoomState.DISCONNECTED;
             handler.post(new Runnable() {
                 @Override
                 public void run() {
-                    Room.this.listener.onConnectFailure(Room.this, roomError);
+                    Room.this.listener.onConnectFailure(Room.this, roomException);
                 }
             });
         }
@@ -262,7 +262,7 @@ public class Room {
          * @param room the room that failed to be connected to.
          * @param error an exception describing why connect failed.
          */
-        void onConnectFailure(Room room, RoomError error);
+        void onConnectFailure(Room room, RoomException error);
 
         /**
          * Called when a room has been disconnected from.
@@ -272,7 +272,7 @@ public class Room {
          *              disconnected from. This value will be null is there were no problems
          *              disconnecting from the room.
          */
-        void onDisconnected(Room room, RoomError error);
+        void onDisconnected(Room room, RoomException error);
 
         /**
          * Called when a participant has connected to a room.
