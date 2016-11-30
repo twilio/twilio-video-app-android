@@ -1,10 +1,14 @@
 package com.twilio.video;
 
 import android.os.Handler;
+import android.support.annotation.IntDef;
 
+import java.lang.annotation.Retention;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import static java.lang.annotation.RetentionPolicy.SOURCE;
 
 /**
  * A Room represents a media session with zero or more remote Participants. Media shared by any one
@@ -12,6 +16,27 @@ import java.util.Map;
  */
 public class Room {
     private static final Logger logger = Logger.getLogger(Room.class);
+
+    @Retention(SOURCE)
+    @IntDef({ERROR_INVALID_ACCESS_TOKEN,
+            ERROR_ROOM_SIGNALING,
+            ERROR_CREATE_PEERCONNECITON_FAILURE,
+            ERROR_ICE_CONNECTION_FAILURE,
+            ERROR_CREATE_LOCAL_SDP_FAILURE,
+            ERROR_SET_LOCAL_SDP_FAILURE,
+            ERROR_EMPTY_LOCAL_SDP,
+            ERROR_PROCESS_REMOTE_SDP_FAILURE,
+            ERROR_SET_REMOTE_SDP_FAILURE})
+    public @interface Error {}
+    public static final int ERROR_INVALID_ACCESS_TOKEN = 20101;
+    public static final int ERROR_ROOM_SIGNALING = 53100;
+    public static final int ERROR_CREATE_PEERCONNECITON_FAILURE = 54001;
+    public static final int ERROR_ICE_CONNECTION_FAILURE = 54101;
+    public static final int ERROR_CREATE_LOCAL_SDP_FAILURE = 54102;
+    public static final int ERROR_SET_LOCAL_SDP_FAILURE = 54103;
+    public static final int ERROR_EMPTY_LOCAL_SDP = 54104;
+    public static final int ERROR_PROCESS_REMOTE_SDP_FAILURE = 54105;
+    public static final int ERROR_SET_REMOTE_SDP_FAILURE = 54106;
 
     private long nativeRoomContext;
     private String name;
@@ -123,8 +148,8 @@ public class Room {
                          String localParticipantSid,
                          String localParticipantIdentity,
                          List<Participant> participantList);
-        void onDisconnected(int errorCode);
-        void onConnectFailure(int errorCode);
+        void onDisconnected(RoomError roomError);
+        void onConnectFailure(RoomError roomError);
         void onParticipantConnected(Participant participant);
         void onParticipantDisconnected(String participantSid);
     }
@@ -161,31 +186,26 @@ public class Room {
         }
 
         @Override
-        public synchronized void onDisconnected(final int errorCode) {
+        public synchronized void onDisconnected(final RoomError roomError) {
             logger.d("onDisconnected()");
             Room.this.roomState = RoomState.DISCONNECTED;
             handler.post(new Runnable() {
                 @Override
                 public void run() {
-                    VideoException videoException = null;
-                    if(errorCode != 0) {
-                        // TODO: properly implement errors
-                        videoException = new VideoException(errorCode, "");
-                    }
-                    Room.this.listener.onDisconnected(Room.this, videoException);
+                    Room.this.listener.onDisconnected(Room.this, roomError);
                 }
             });
             release();
         }
 
         @Override
-        public synchronized void onConnectFailure(final int errorCode) {
+        public synchronized void onConnectFailure(final RoomError roomError) {
             logger.d("onConnectFailure()");
             Room.this.roomState = RoomState.DISCONNECTED;
             handler.post(new Runnable() {
                 @Override
                 public void run() {
-                    Room.this.listener.onConnectFailure(Room.this, new VideoException(errorCode, ""));
+                    Room.this.listener.onConnectFailure(Room.this, roomError);
                 }
             });
         }
@@ -242,7 +262,7 @@ public class Room {
          * @param room the room that failed to be connected to.
          * @param error an exception describing why connect failed.
          */
-        void onConnectFailure(Room room, VideoException error);
+        void onConnectFailure(Room room, RoomError error);
 
         /**
          * Called when a room has been disconnected from.
@@ -252,7 +272,7 @@ public class Room {
          *              disconnected from. This value will be null is there were no problems
          *              disconnecting from the room.
          */
-        void onDisconnected(Room room, VideoException error);
+        void onDisconnected(Room room, RoomError error);
 
         /**
          * Called when a participant has connected to a room.
