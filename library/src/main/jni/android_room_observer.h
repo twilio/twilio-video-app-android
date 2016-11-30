@@ -20,10 +20,10 @@ public:
     AndroidRoomObserver(JNIEnv *env, jobject j_room_observer) :
         j_room_observer_(env, j_room_observer),
         j_room_observer_class_(env, GetObjectClass(env, *j_room_observer_)),
-        j_room_error_class_(env, twilio_video_jni::FindClass(env, "com/twilio/video/RoomException")),
-        j_room_error_ctor_id_(
+        j_room_exception_class_(env, twilio_video_jni::FindClass(env, "com/twilio/video/RoomException")),
+        j_room_exception_ctor_id_(
                 GetMethodID(env,
-                            *j_room_error_class_,
+                            *j_room_exception_class_,
                             "<init>",
                             "(ILjava/lang/String;)V")),
         j_participant_class_(
@@ -283,8 +283,8 @@ private:
     }
 
     jobject createJavaRoomException(const twilio::video::RoomError &room_error) {
-        return jni()->NewObject(*j_room_error_class_,
-                                j_room_error_ctor_id_,
+        return jni()->NewObject(*j_room_exception_class_,
+                                j_room_exception_ctor_id_,
                                 room_error.getCode(),
                                 JavaStringFromStdString(jni(), room_error.getMessage()));
     }
@@ -360,7 +360,7 @@ private:
 
     const webrtc_jni::ScopedGlobalRef<jobject> j_room_observer_;
     const webrtc_jni::ScopedGlobalRef<jclass> j_room_observer_class_;
-    const webrtc_jni::ScopedGlobalRef<jclass> j_room_error_class_;
+    const webrtc_jni::ScopedGlobalRef<jclass> j_room_exception_class_;
     const webrtc_jni::ScopedGlobalRef<jclass> j_participant_class_;
     const webrtc_jni::ScopedGlobalRef<jclass> j_array_list_class_;
     const webrtc_jni::ScopedGlobalRef<jclass> j_audio_track_class_;
@@ -378,7 +378,7 @@ private:
     jmethodID j_audio_track_ctor_id_;
     jmethodID j_video_track_ctor_id_;
     jmethodID j_media_ctor_id_;
-    jmethodID j_room_error_ctor_id_;
+    jmethodID j_room_exception_ctor_id_;
 
 };
 
