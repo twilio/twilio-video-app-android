@@ -32,12 +32,12 @@ public class CallbackHelper {
         }
 
         @Override
-        public void onConnectFailure(Room room, RoomException error) {
+        public void onConnectFailure(Room room, RoomException roomException) {
             triggerLatch(onConnectFailureLatch);
         }
 
         @Override
-        public void onDisconnected(Room room, RoomException error) {
+        public void onDisconnected(Room room, RoomException roomException) {
             triggerLatch(onDisconnectedLatch);
         }
 
@@ -60,12 +60,12 @@ public class CallbackHelper {
         }
 
         @Override
-        public void onConnectFailure(Room room, RoomException error) {
+        public void onConnectFailure(Room room, RoomException roomException) {
 
         }
 
         @Override
-        public void onDisconnected(Room room, RoomException error) {
+        public void onDisconnected(Room room, RoomException roomException) {
 
         }
 

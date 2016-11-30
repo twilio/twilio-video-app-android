@@ -178,8 +178,8 @@ protected:
             if (!isObserverValid(func_name)) {
                 return;
             }
-            jobject j_room_error = createJavaRoomException(room_error);
-            jni()->CallVoidMethod(*j_room_observer_, j_on_disconnected_, j_room_error);
+            jobject j_room_exception = createJavaRoomException(room_error);
+            jni()->CallVoidMethod(*j_room_observer_, j_on_disconnected_, j_room_exception);
             CHECK_EXCEPTION(jni()) << "error during CallVoidMethod";
         }
     }
@@ -197,8 +197,8 @@ protected:
             if (!isObserverValid(func_name)) {
                 return;
             }
-            jobject j_room_error = createJavaRoomException(room_error);
-            jni()->CallVoidMethod(*j_room_observer_, j_on_connect_failure_, j_room_error);
+            jobject j_room_exception = createJavaRoomException(room_error);
+            jni()->CallVoidMethod(*j_room_observer_, j_on_connect_failure_, j_room_exception);
             CHECK_EXCEPTION(jni()) << "error during CallVoidMethod";
         }
     }

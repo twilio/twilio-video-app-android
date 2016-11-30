@@ -260,19 +260,19 @@ public class Room {
          * Called when a connection to a room failed.
          *
          * @param room the room that failed to be connected to.
-         * @param error an exception describing why connect failed.
+         * @param roomException an exception describing why connect failed.
          */
-        void onConnectFailure(Room room, RoomException error);
+        void onConnectFailure(Room room, RoomException roomException);
 
         /**
          * Called when a room has been disconnected from.
          *
          * @param room the room that was disconnected from.
-         * @param error An exception if there was a problem that caused the room to be
+         * @param roomException An exception if there was a problem that caused the room to be
          *              disconnected from. This value will be null is there were no problems
          *              disconnecting from the room.
          */
-        void onDisconnected(Room room, RoomException error);
+        void onDisconnected(Room room, RoomException roomException);
 
         /**
          * Called when a participant has connected to a room.

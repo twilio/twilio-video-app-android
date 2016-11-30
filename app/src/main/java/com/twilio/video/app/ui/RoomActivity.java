@@ -761,7 +761,7 @@ public class RoomActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onConnectFailure(Room room, RoomException error) {
+            public void onConnectFailure(Room room, RoomException roomException) {
                 Timber.i("onConnectFailure");
                 roomStatusTextview.setText("Failed to connect to " + roomName);
                 RoomActivity.this.room = null;
@@ -769,7 +769,7 @@ public class RoomActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onDisconnected(Room room, RoomException error) {
+            public void onDisconnected(Room room, RoomException roomException) {
                 Timber.i("onDisconnected");
                 roomStatusTextview.setText("Disconnected from " + roomName);
                 removeAllParticipants();
