@@ -23,7 +23,7 @@ import static org.junit.Assert.assertTrue;
 
 @RunWith(AndroidJUnit4.class)
 @LargeTest
-public class LocalAudioTrackAudioOptionsParameterizedTest {
+public class LocalAudioTrackTest {
     private static final int NUM_AUDIO_OPTIONS = 7;
     private static final int NUM_AUDIO_OPTIONS_PERMUTATIONS = (int) Math.pow(2, NUM_AUDIO_OPTIONS);
     private static final int ECHO_CANCELLATION_INDEX = 0;
