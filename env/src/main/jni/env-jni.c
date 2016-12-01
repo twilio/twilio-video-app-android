@@ -3,7 +3,7 @@
 #include <stdlib.h>
 
 JNIEXPORT void JNICALL
-Java_com_twilio_video_app_util_Env_nativeSetEnv(JNIEnv *env, jclass type, jstring j_name, jstring j_value, jboolean j_overwrite) {
+Java_com_twilio_video_env_Env_nativeSet(JNIEnv *env, jclass type, jstring j_name, jstring j_value, jboolean j_overwrite) {
     const char *name= (*env)->GetStringUTFChars(env, j_name, 0);
     const char *value= (*env)->GetStringUTFChars(env, j_value, 0);
 
@@ -14,7 +14,7 @@ Java_com_twilio_video_app_util_Env_nativeSetEnv(JNIEnv *env, jclass type, jstrin
 }
 
 JNIEXPORT jstring JNICALL
-Java_com_twilio_video_app_util_Env_nativeGetEnv(JNIEnv *env, jclass type, jstring j_name) {
+Java_com_twilio_video_env_Env_nativeGet(JNIEnv *env, jclass type, jstring j_name) {
     const char *name= (*env)->GetStringUTFChars(env, j_name, 0);
 
     const char *value = getenv(name);

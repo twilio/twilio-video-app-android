@@ -15,11 +15,6 @@ model {
             vectorDrawables.useSupportLibrary = true
         }
 
-        ndk {
-            moduleName = 'env-jni'
-            toolchain = 'clang'
-            CFlags.addAll(['-Wall'])
-        }
     }
 
     android.sources {
@@ -63,8 +58,10 @@ model {
 
 dependencies {
     compile project(':library')
+    compile project(':env')
     compile 'net.hockeyapp.android:HockeySDK:3.5.0'
-    compile 'com.android.support:design:25.0.0'
+    compile 'com.android.support:design:25.0.1'
+    compile 'com.android.support:preference-v14:25.0.1'
     compile 'com.squareup.retrofit:retrofit:1.9.0'
     compile 'com.jakewharton.timber:timber:4.1.0'
     compile 'com.appyvet:materialrangebar:1.3'

@@ -3,7 +3,7 @@
 
     <string name="app_name">Video</string>
     <string name="client_name">Client Name</string>
-    <string name="login">Login</string>
+    <string name="login">LOG IN</string>
     <string name="logout">Log Out</string>
     <string name="settings">Settings</string>
     <string name="username">Username</string>
@@ -57,9 +57,26 @@
     </string-array>
 
     <string-array name="aspect_ratio_array">
-        <item>Default</item>
         <item>4:3</item>
         <item>16:9</item>
+        <item>11:9</item>
+    </string-array>
+
+    <string-array name="aspect_ratio_array_values">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+    </string-array>
+
+    <string-array name="video_dimensions_array">
+        <item>352x288</item>
+        <item>640x480</item>
+        <item>800x480</item>
+        <item>960x540</item>
+        <item>1280x720</item>
+        <item>1280x960</item>
+        <item>1440x1080</item>
+        <item>1920x1080</item>
     </string-array>
 
 </resources>

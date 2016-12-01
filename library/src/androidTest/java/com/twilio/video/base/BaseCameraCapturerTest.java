@@ -28,7 +28,7 @@ public abstract class BaseCameraCapturerTest {
     protected FrameCountRenderer frameCountRenderer;
 
     @Before
-    public void setup() throws InterruptedException {
+    public void setup() {
         cameraCapturerActivity = activityRule.getActivity();
         PermissionUtils.allowPermissions(cameraCapturerActivity);
         localMedia = LocalMedia.create(cameraCapturerActivity);

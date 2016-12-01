@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="RangeBarPreference">
+        <attr name="entries" format="reference" />
+        <attr name="startKey" format="string" />
+        <attr name="endKey" format="string" />
+        <attr name="startTick" format="integer" />
+        <attr name="endTick" format="integer" />
+        <attr name="pinRadius" format="dimension" />
+        <attr name="height" format="dimension" />
+    </declare-styleable>
+</resources>

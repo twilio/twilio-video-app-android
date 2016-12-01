@@ -9,81 +9,88 @@
 
 #include "com_twilio_video_Participant.h"
 #include "com_twilio_video_Media.h"
+#include "class_reference_holder.h"
 
 #include <vector>
 
 class AndroidRoomObserver: public twilio::video::RoomObserver {
 public:
     AndroidRoomObserver(JNIEnv *env, jobject j_room_observer) :
-            j_room_observer_(env, j_room_observer),
-            j_room_observer_class_(env, webrtc_jni::GetObjectClass(env, *j_room_observer_)),
-            j_participant_class_(
-                    env, env->FindClass("com/twilio/video/Participant")),
-            j_array_list_class_(env, env->FindClass("java/util/ArrayList")),
-            j_audio_track_class_(env, env->FindClass("com/twilio/video/AudioTrack")),
-            j_video_track_class_(env, env->FindClass("com/twilio/video/VideoTrack")),
-            j_media_class_(env, env->FindClass("com/twilio/video/Media")),
-            j_on_connected_(
-                    webrtc_jni::GetMethodID(env,
-                                            *j_room_observer_class_,
-                                            "onConnected",
-                                            "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/util/List;)V")),
-            j_on_disconnected_(
-                    webrtc_jni::GetMethodID(env,
-                                            *j_room_observer_class_,
-                                            "onDisconnected",
-                                            "(I)V")),
-            j_on_connect_failure_(
-                    webrtc_jni::GetMethodID(env,
-                                            *j_room_observer_class_,
-                                            "onConnectFailure",
-                                            "(I)V")),
-            j_on_participant_connected_(
-                    webrtc_jni::GetMethodID(env,
-                                            *j_room_observer_class_,
-                                            "onParticipantConnected",
-                                            "(Lcom/twilio/video/Participant;)V")),
-            j_on_participant_disconnected_(
-                    webrtc_jni::GetMethodID(env,
-                                            *j_room_observer_class_,
-                                            "onParticipantDisconnected",
-                                            "(Ljava/lang/String;)V")),
-            j_get_handler_(
-                    webrtc_jni::GetMethodID(env,
-                                            *j_room_observer_class_,
-                                            "getHandler",
-                                            "()Landroid/os/Handler;")),
-            j_participant_ctor_id_(
-                    webrtc_jni::GetMethodID(env,
-                                            *j_participant_class_,
-                                            "<init>",
-                                            "(Ljava/lang/String;Ljava/lang/String;Lcom/twilio/video/Media;J)V")),
-            j_array_list_ctor_id_(
-                    webrtc_jni::GetMethodID(env,
-                                            *j_array_list_class_,
-                                            "<init>",
-                                            "()V")),
-            j_array_list_add_(
-                    webrtc_jni::GetMethodID(env,
-                                            *j_array_list_class_,
-                                            "add",
-                                            "(Ljava/lang/Object;)Z")),
-            j_audio_track_ctor_id_(
-                    webrtc_jni::GetMethodID(env,
-                                            *j_audio_track_class_,
-                                            "<init>",
-                                            "(Ljava/lang/String;Z)V")),
-            j_video_track_ctor_id_(
-                    webrtc_jni::GetMethodID(env,
-                                            *j_video_track_class_,
-                                            "<init>",
-                                            "(Lorg/webrtc/VideoTrack;)V")),
-            j_media_ctor_id_(
-                    webrtc_jni::GetMethodID(env,
-                                            *j_media_class_,
-                                            "<init>",
-                                            "(JLjava/util/List;Ljava/util/List;Landroid/os/Handler;)V"))
-    {
+        j_room_observer_(env, j_room_observer),
+        j_room_observer_class_(env, GetObjectClass(env, *j_room_observer_)),
+        j_room_exception_class_(env, twilio_video_jni::FindClass(env, "com/twilio/video/RoomException")),
+        j_room_exception_ctor_id_(
+                GetMethodID(env,
+                            *j_room_exception_class_,
+                            "<init>",
+                            "(ILjava/lang/String;)V")),
+        j_participant_class_(
+            env, env->FindClass("com/twilio/video/Participant")),
+        j_array_list_class_(env, env->FindClass("java/util/ArrayList")),
+        j_audio_track_class_(env, env->FindClass("com/twilio/video/AudioTrack")),
+        j_video_track_class_(env, env->FindClass("com/twilio/video/VideoTrack")),
+        j_media_class_(env, env->FindClass("com/twilio/video/Media")),
+        j_on_connected_(
+            GetMethodID(env,
+                        *j_room_observer_class_,
+                        "onConnected",
+                        "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/util/List;)V")),
+        j_on_disconnected_(
+            GetMethodID(env,
+                        *j_room_observer_class_,
+                        "onDisconnected",
+                        "(Lcom/twilio/video/RoomException;)V")),
+        j_on_connect_failure_(
+            GetMethodID(env,
+                        *j_room_observer_class_,
+                        "onConnectFailure",
+                        "(Lcom/twilio/video/RoomException;)V")),
+        j_on_participant_connected_(
+            GetMethodID(env,
+                        *j_room_observer_class_,
+                        "onParticipantConnected",
+                        "(Lcom/twilio/video/Participant;)V")),
+        j_on_participant_disconnected_(
+            GetMethodID(env,
+                        *j_room_observer_class_,
+                        "onParticipantDisconnected",
+                        "(Ljava/lang/String;)V")),
+        j_get_handler_(
+            GetMethodID(env,
+                        *j_room_observer_class_,
+                        "getHandler",
+                        "()Landroid/os/Handler;")),
+        j_participant_ctor_id_(
+            GetMethodID(env,
+                        *j_participant_class_,
+                        "<init>",
+                        "(Ljava/lang/String;Ljava/lang/String;Lcom/twilio/video/Media;J)V")),
+        j_array_list_ctor_id_(
+            webrtc_jni::GetMethodID(env,
+                                    *j_array_list_class_,
+                                    "<init>",
+                                    "()V")),
+        j_array_list_add_(
+            webrtc_jni::GetMethodID(env,
+                                    *j_array_list_class_,
+                                    "add",
+                                    "(Ljava/lang/Object;)Z")),
+        j_audio_track_ctor_id_(
+            webrtc_jni::GetMethodID(env,
+                                    *j_audio_track_class_,
+                                    "<init>",
+                                    "(Ljava/lang/String;Z)V")),
+        j_video_track_ctor_id_(
+            webrtc_jni::GetMethodID(env,
+                                    *j_video_track_class_,
+                                    "<init>",
+                                    "(Lorg/webrtc/VideoTrack;)V")),
+        j_media_ctor_id_(
+            webrtc_jni::GetMethodID(env,
+                                    *j_media_class_,
+                                    "<init>",
+                                    "(JLjava/util/List;Ljava/util/List;Landroid/os/Handler;)V"))
+        {
         TS_CORE_LOG_MODULE(twilio::video::kTSCoreLogModulePlatform,
                            twilio::video::kTSCoreLogLevelDebug,
                            "AndroidRoomObserver");
@@ -139,10 +146,8 @@ protected:
         }
     }
 
-    virtual void onDisconnected(const twilio::video::Room *room,
-                                twilio::video::ClientError error_code =
-                                twilio::video::ClientError::kSuccess) {
-        webrtc_jni::ScopedLocalRefFrame local_ref_frame(jni());
+    virtual void onDisconnected(const twilio::video::Room *room) {
+        ScopedLocalRefFrame local_ref_frame(jni());
         std::string func_name = std::string(__FUNCTION__);
         TS_CORE_LOG_MODULE(twilio::video::kTSCoreLogModulePlatform,
                            twilio::video::kTSCoreLogLevelDebug,
@@ -153,15 +158,33 @@ protected:
             if (!isObserverValid(func_name)) {
                 return;
             }
-            jint j_error_code = (jint)error_code;
-            jni()->CallVoidMethod(*j_room_observer_, j_on_disconnected_, j_error_code);
+            jni()->CallVoidMethod(*j_room_observer_, j_on_disconnected_, nullptr);
+            CHECK_EXCEPTION(jni()) << "error during CallVoidMethod";
+        }
+    }
+
+    virtual void onDisconnected(const twilio::video::Room *room,
+                                const twilio::video::RoomError room_error) {
+        ScopedLocalRefFrame local_ref_frame(jni());
+        std::string func_name = std::string(__FUNCTION__);
+        TS_CORE_LOG_MODULE(twilio::video::kTSCoreLogModulePlatform,
+                           twilio::video::kTSCoreLogLevelDebug,
+                           "%s", func_name.c_str());
+        {
+            rtc::CritScope cs(&deletion_lock_);
+
+            if (!isObserverValid(func_name)) {
+                return;
+            }
+            jobject j_room_exception = createJavaRoomException(room_error);
+            jni()->CallVoidMethod(*j_room_observer_, j_on_disconnected_, j_room_exception);
             CHECK_EXCEPTION(jni()) << "error during CallVoidMethod";
         }
     }
 
     virtual void onConnectFailure(const twilio::video::Room *room,
-                                  twilio::video::ClientError error_code) {
-        webrtc_jni::ScopedLocalRefFrame local_ref_frame(jni());
+                                  const twilio::video::RoomError room_error) {
+        ScopedLocalRefFrame local_ref_frame(jni());
         std::string func_name = std::string(__FUNCTION__);
         TS_CORE_LOG_MODULE(twilio::video::kTSCoreLogModulePlatform,
                            twilio::video::kTSCoreLogLevelDebug,
@@ -172,8 +195,8 @@ protected:
             if (!isObserverValid(func_name)) {
                 return;
             }
-            jint j_error_code = (jint)error_code;
-            jni()->CallVoidMethod(*j_room_observer_, j_on_connect_failure_, j_error_code);
+            jobject j_room_exception = createJavaRoomException(room_error);
+            jni()->CallVoidMethod(*j_room_observer_, j_on_connect_failure_, j_room_exception);
             CHECK_EXCEPTION(jni()) << "error during CallVoidMethod";
         }
     }
@@ -257,6 +280,13 @@ private:
         return true;
     }
 
+    jobject createJavaRoomException(const twilio::video::RoomError &room_error) {
+        return jni()->NewObject(*j_room_exception_class_,
+                                j_room_exception_ctor_id_,
+                                room_error.getCode(),
+                                JavaStringFromStdString(jni(), room_error.getMessage()));
+    }
+
     jobject createJavaMediaObject(std::shared_ptr<twilio::media::Media> media) {
         // Create media context
         MediaContext *media_context = new MediaContext();
@@ -328,6 +358,7 @@ private:
 
     const webrtc_jni::ScopedGlobalRef<jobject> j_room_observer_;
     const webrtc_jni::ScopedGlobalRef<jclass> j_room_observer_class_;
+    const webrtc_jni::ScopedGlobalRef<jclass> j_room_exception_class_;
     const webrtc_jni::ScopedGlobalRef<jclass> j_participant_class_;
     const webrtc_jni::ScopedGlobalRef<jclass> j_array_list_class_;
     const webrtc_jni::ScopedGlobalRef<jclass> j_audio_track_class_;
@@ -345,6 +376,7 @@ private:
     jmethodID j_audio_track_ctor_id_;
     jmethodID j_video_track_ctor_id_;
     jmethodID j_media_ctor_id_;
+    jmethodID j_room_exception_ctor_id_;
 
 };
 

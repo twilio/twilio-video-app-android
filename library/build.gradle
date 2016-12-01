@@ -166,6 +166,15 @@ model {
             versionName generateVersionName()
             versionCode generateVersionCode()
 
+            def realm = "\"${getRealm()}\""
+            buildConfigFields {
+                create() {
+                    type "String"
+                    name "REALM"
+                    value realm
+                }
+            }
+
             testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         }
 
@@ -267,12 +276,13 @@ model {
 }
 
 dependencies {
-    preCompile 'com.twilio.sdk:twilio-video:0.4.1:android@tar.bz2'
+    preCompile 'com.twilio.sdk:twilio-video:0.5.0-SNAPSHOT:android@tar.bz2'
 
     testCompile 'junit:junit:4.12'
     testCompile 'org.mockito:mockito-core:1.10.19'
     testCompile 'com.google.guava:guava:19.0'
 
+    androidTestCompile project(':env')
     androidTestCompile 'com.squareup.retrofit:retrofit:1.9.0'
     androidTestCompile 'com.android.support.test.espresso:espresso-core:2.2.2'
     androidTestCompile 'com.android.support.test:runner:0.5'
@@ -398,8 +408,10 @@ def getSdkDir() {
     if (sdkHome == null) {
         println "Could not locate NDK home in environment variable. Trying local.properties"
         Properties properties = new Properties()
-        properties.load(project.rootProject.file('local.properties').newDataInputStream())
-        sdkHome = properties.getProperty('sdk.dir')
+        if(project.rootProject.file('local.properties').exists()) {
+            properties.load(project.rootProject.file('local.properties').newDataInputStream())
+            sdkHome = properties.getProperty('sdk.dir')
+        }
     }
 
     // Fail the build for no sdk detected
@@ -417,14 +429,40 @@ def getNdkDir() {
     if (ndkHome == null) {
         println "Could not locate NDK home in environment variable. Trying local.properties"
         Properties properties = new Properties()
-        properties.load(project.rootProject.file('local.properties').newDataInputStream())
-        ndkHome = properties.getProperty('ndk.dir')
+        if (project.rootProject.file('local.properties').exists()) {
+            properties.load(project.rootProject.file('local.properties').newDataInputStream())
+            ndkHome = properties.getProperty('ndk.dir')
+        }
     }
 
     // Fail the build for no ndk detected
     assert ndkHome != null : "Could not find Android NDK!"
 
     return ndkHome
+}
+
+def getRealm() {
+    // Possible values for REALM are 'prod', 'stage', and 'dev'.
+
+    // Attempt to get it from the environment variable
+    def realm = System.getenv("REALM");
+
+    if (realm == null) {
+        println "Could not locate REALM environment variable. Trying local.properties"
+        Properties properties = new Properties()
+        if (project.rootProject.file('local.properties').exists()) {
+            properties.load(project.rootProject.file('local.properties').newDataInputStream())
+            realm = properties.getProperty('REALM')
+        }
+    }
+
+    if (realm == null) {
+        println "Could not locate REALM in local.properties."
+        realm = "prod"
+    }
+
+    println "Realm Environment: " + realm
+    return realm;
 }
 
 /**

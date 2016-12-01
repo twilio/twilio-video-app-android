@@ -4,6 +4,7 @@ import android.support.test.filters.LargeTest;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
 
+import com.twilio.video.base.BaseClientTest;
 import com.twilio.video.helper.CallbackHelper;
 import com.twilio.video.ui.MediaTestActivity;
 import com.twilio.video.util.AccessTokenUtils;
@@ -26,7 +27,7 @@ import static org.junit.Assert.assertTrue;
 
 @RunWith(AndroidJUnit4.class)
 @LargeTest
-public class VideoClientTest {
+public class VideoClientTest extends BaseClientTest {
     @Rule
     public ActivityTestRule<MediaTestActivity> activityRule =
             new ActivityTestRule<>(MediaTestActivity.class);
@@ -38,9 +39,10 @@ public class VideoClientTest {
 
     @Before
     public void setup() throws InterruptedException {
+        super.setup();
         mediaTestActivity = activityRule.getActivity();
         PermissionUtils.allowPermissions(mediaTestActivity);
-        token = AccessTokenUtils.getAccessToken(RandUtils.generateRandomString(10));
+        token = AccessTokenUtils.getAccessToken(RandUtils.generateRandomString(10), BuildConfig.REALM);
         videoClient = new VideoClient(mediaTestActivity, token);
         roomName = RandUtils.generateRandomString(20);
         localMedia = LocalMedia.create(mediaTestActivity);
@@ -185,7 +187,7 @@ public class VideoClientTest {
 
         // Now we update token and connect again
         String newUserName = RandUtils.generateRandomString(10);
-        videoClient.updateToken(AccessTokenUtils.getAccessToken(newUserName));
+        videoClient.updateToken(AccessTokenUtils.getAccessToken(newUserName, BuildConfig.REALM));
 
         // Connect again with new token
         roomListener = new CallbackHelper.FakeRoomListener();
