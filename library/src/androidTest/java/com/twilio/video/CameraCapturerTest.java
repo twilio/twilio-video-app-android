@@ -20,7 +20,7 @@ import static org.junit.Assert.fail;
 import static org.junit.Assume.assumeNotNull;
 
 @RunWith(AndroidJUnit4.class)
-public class CameraCapturerBaseTest extends BaseCameraCapturerTest {
+public class CameraCapturerTest extends BaseCameraCapturerTest {
     @Test(expected = NullPointerException.class)
     public void shouldFailWithNullContext() {
         cameraCapturer = new CameraCapturer(null, CameraCapturer.CameraSource.FRONT_CAMERA);
