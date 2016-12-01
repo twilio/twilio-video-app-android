@@ -12,7 +12,7 @@ public class AudioOptions {
     public final boolean audioJitterBufferFastAccelerate;
     public final boolean typingDetection;
 
-    public AudioOptions(Builder builder) {
+    private AudioOptions(Builder builder) {
         echoCancellation = builder.echoCancellation;
         autoGainControl = builder.autoGainControl;
         noiseSuppression = builder.noiseSuppression;
@@ -20,6 +20,19 @@ public class AudioOptions {
         stereoSwapping = builder.stereoSwapping;
         audioJitterBufferFastAccelerate = builder.audioJitterBufferFastAccelerate;
         typingDetection = builder.typingDetection;
+    }
+
+    @Override
+    public String toString() {
+        return "AudioOptions{" +
+                "echoCancellation=" + echoCancellation +
+                ", autoGainControl=" + autoGainControl +
+                ", noiseSuppression=" + noiseSuppression +
+                ", highpassFilter=" + highpassFilter +
+                ", stereoSwapping=" + stereoSwapping +
+                ", audioJitterBufferFastAccelerate=" + audioJitterBufferFastAccelerate +
+                ", typingDetection=" + typingDetection +
+                '}';
     }
 
     /**
