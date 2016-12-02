@@ -87,9 +87,9 @@ public class VideoClient {
 
     /**
      * Sets the audio output speaker for the device.
-     * <p/>
+     * <p>
      * Bluetooth headset is not supported.
-     * <p/>
+     * </p>
      * To use volume up/down keys call
      * 'setVolumeControlStream(AudioManager.STREAM_VOICE_CALL);' in your Android Activity.
      *
