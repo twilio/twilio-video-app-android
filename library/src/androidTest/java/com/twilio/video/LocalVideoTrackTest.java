@@ -16,7 +16,7 @@ import static org.junit.Assert.assertTrue;
 
 @RunWith(AndroidJUnit4.class)
 @LargeTest
-public class LocalVideoTrackBaseTest extends BaseLocalVideoTrackTest {
+public class LocalVideoTrackTest extends BaseLocalVideoTrackTest {
     private static final int LOCAL_VIDEO_TRACK_TEST_DELAY_MS = 3000;
 
     private LocalVideoTrack localVideoTrack;

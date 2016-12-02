@@ -18,7 +18,7 @@ import static org.junit.Assert.assertTrue;
 
 @RunWith(Parameterized.class)
 @LargeTest
-public class LocalVideoTrackParameterizedTest extends BaseLocalVideoTrackTest {
+public class LocalVideoTrackEnabledParameterizedTest extends BaseLocalVideoTrackTest {
     @Parameterized.Parameters(name = "enabled: {0}")
     public static Iterable<Object[]> data() {
         return Arrays.asList(new Object[][]{
@@ -29,7 +29,7 @@ public class LocalVideoTrackParameterizedTest extends BaseLocalVideoTrackTest {
     private final boolean enabled;
     private LocalVideoTrack localVideoTrack;
 
-    public LocalVideoTrackParameterizedTest(boolean enabled) {
+    public LocalVideoTrackEnabledParameterizedTest(boolean enabled) {
         this.enabled = enabled;
     }
 

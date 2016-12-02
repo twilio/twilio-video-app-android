@@ -22,7 +22,7 @@ import static org.junit.Assert.assertTrue;
 
 @RunWith(Parameterized.class)
 @LargeTest
-public class CameraCapturerParameterizedTest extends BaseCameraCapturerTest {
+public class CameraCapturerSourceParameterizedTest extends BaseCameraCapturerTest {
     @Parameterized.Parameters(name = "{0}")
     public static Iterable<Object[]> data() {
         return Arrays.asList(new Object[][]{
@@ -32,7 +32,7 @@ public class CameraCapturerParameterizedTest extends BaseCameraCapturerTest {
 
     private final CameraCapturer.CameraSource cameraSource;
 
-    public CameraCapturerParameterizedTest(CameraCapturer.CameraSource cameraSource) {
+    public CameraCapturerSourceParameterizedTest(CameraCapturer.CameraSource cameraSource) {
         this.cameraSource = cameraSource;
     }
 
