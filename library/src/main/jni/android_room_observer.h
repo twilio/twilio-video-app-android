@@ -377,7 +377,6 @@ private:
     jmethodID j_video_track_ctor_id_;
     jmethodID j_media_ctor_id_;
     jmethodID j_room_exception_ctor_id_;
-
 };
 
 #endif // VIDEO_ANDROID_ANDROID_ROOM_OBSERVER_H_
