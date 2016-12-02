@@ -110,11 +110,6 @@ task createJavadocs(type: Javadoc) {
     exclude '**/R.java'
 }
 
-task javadocJar(type: Jar, dependsOn: createJavadocs) {
-    classifier = 'javadoc'
-    from javadoc.destinationDir
-}
-
 /**
  * Iterates over conversations dependencies and ensures they are downloaded
  */
