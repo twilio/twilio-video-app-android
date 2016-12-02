@@ -14,7 +14,6 @@ android {
     compileSdkVersion 24
     buildToolsVersion "24.0.2"
 
-
     defaultConfig {
         minSdkVersion 16
         targetSdkVersion 24
@@ -97,7 +96,7 @@ dependencies {
             "libjingle_peerconnection_java.jar")
 }
 
-task javadoc(type: Javadoc) {
+task createJavadocs(type: Javadoc) {
     source android.sourceSets.main.java.srcDirs
     classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
     options {
@@ -111,7 +110,7 @@ task javadoc(type: Javadoc) {
     exclude '**/R.java'
 }
 
-task javadocJar(type: Jar, dependsOn: javadoc) {
+task javadocJar(type: Jar, dependsOn: createJavadocs) {
     classifier = 'javadoc'
     from javadoc.destinationDir
 }
