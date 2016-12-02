@@ -109,12 +109,13 @@ public class RoomActivity extends AppCompatActivity {
     private String username;
     private String capabilityToken;
     private String realm;
+    private String topology;
     private AccessManager accessManager;
     private final AccessManager.Listener accessManagerListener = new AccessManager.Listener() {
         @Override
         public void onTokenWillExpire(final AccessManager accessManager) {
             Timber.i("Access token will expire in three minutes");
-            SimpleSignalingUtils.getAccessToken(username, realm, new Callback<String>() {
+            SimpleSignalingUtils.getAccessToken(username, realm, topology, new Callback<String>() {
                 @Override
                 public void success(String token, Response response) {
                     Timber.i("Access token updated");
@@ -442,6 +443,7 @@ public class RoomActivity extends AppCompatActivity {
         username = extras.getString(SimpleSignalingUtils.USERNAME);
         capabilityToken = extras.getString(SimpleSignalingUtils.CAPABILITY_TOKEN);
         realm = extras.getString(SimpleSignalingUtils.REALM);
+        topology = extras.getString(SimpleSignalingUtils.TOPOLOGY);
     }
 
     private void obtainVideoConstraints() {

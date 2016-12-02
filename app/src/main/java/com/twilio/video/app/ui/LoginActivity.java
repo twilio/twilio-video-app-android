@@ -9,8 +9,6 @@ import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.view.HapticFeedbackConstants;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
@@ -38,18 +36,22 @@ import retrofit.RetrofitError;
 import retrofit.client.Response;
 import timber.log.Timber;
 
+import static com.twilio.video.app.util.SimpleSignalingUtils.P2P;
+
 public class LoginActivity extends BaseActivity {
 
     @BindView(R.id.username_edittext) EditText usernameEditText;
     @BindView(R.id.login_button) Button loginButton;
     @BindView(R.id.version_textview) TextView versionText;
     @BindView(R.id.realm_spinner) Spinner realmSpinner;
+    @BindView(R.id.topology_spinner) Spinner topologySpinner;
 
     public static final int PERMISSIONS_REQUEST_CODE = 0;
     public static final String TWILIO_ENV_KEY = "TWILIO_ENVIRONMENT";
 
     private ProgressDialog progressDialog;
     private String realm;
+    private String topology = P2P;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,6 +67,18 @@ public class LoginActivity extends BaseActivity {
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 realm = SimpleSignalingUtils.REALMS.get(position);
                 Env.set(LoginActivity.this, TWILIO_ENV_KEY, getResources().getStringArray(R.array.realm_array)[position], true);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+
+        topologySpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                topology = getResources().getStringArray(R.array.topology_array)[position];
             }
 
             @Override
@@ -148,7 +162,7 @@ public class LoginActivity extends BaseActivity {
 
     private void obtainCapabilityToken(final String username, final String realm) {
         SimpleSignalingUtils.getAccessToken(username,
-                realm, new Callback<String>() {
+                realm, topology, new Callback<String>() {
 
             @Override
             public void success(String capabilityToken, Response response) {
@@ -181,6 +195,7 @@ public class LoginActivity extends BaseActivity {
         Intent intent = new Intent(this, RoomActivity.class);
         intent.putExtra(SimpleSignalingUtils.CAPABILITY_TOKEN, capabilityToken);
         intent.putExtra(SimpleSignalingUtils.REALM, realm);
+        intent.putExtra(SimpleSignalingUtils.TOPOLOGY, topology);
         intent.putExtra(SimpleSignalingUtils.USERNAME, usernameEditText.getText().toString());
 
         VideoClient.setLogLevel(LogLevel.DEBUG);
