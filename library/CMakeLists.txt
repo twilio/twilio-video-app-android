@@ -89,9 +89,10 @@ target_link_libraries(${VIDEO_ANDROID_LIBRARY} "-lGLESv1_CM")
 target_link_libraries(${VIDEO_ANDROID_LIBRARY} "-landroid")
 
 # Link static library dependencies
+set(WEBRTC_JNI_LIB "-Wl,--whole-archive ${CORE_STATIC_LIB_DIR}/libwebrtc-jni.a -Wl,--no-whole-archive")
 set(VIDEO_ANDROID_STATIC_LIB_DEPS ${CORE_STATIC_LIB_DIR}/libtwilio-video.a
         ${CORE_STATIC_LIB_DIR}/libwebrtc.a
-        ${CORE_STATIC_LIB_DIR}/libwebrtc-jni.a
+        ${WEBRTC_JNI_LIB}
         ${CORE_STATIC_LIB_DIR}/libjni-helpers.a
         ${CORE_STATIC_LIB_DIR}/libresiprocate.a
         ${CORE_STATIC_LIB_DIR}/libPocoNet.a
@@ -102,7 +103,3 @@ set(VIDEO_ANDROID_STATIC_LIB_DEPS ${CORE_STATIC_LIB_DIR}/libtwilio-video.a
         ${CORE_STATIC_LIB_DIR}/libPocoFoundation.a
         ${CORE_STATIC_LIB_DIR}/libboringssl.a)
 target_link_libraries(${VIDEO_ANDROID_LIBRARY} ${VIDEO_ANDROID_STATIC_LIB_DEPS})
-
-# Link webrtc jni as whole archive
-#set(WEBRTC_JNI_LIB "-Wl,--whole-archive ${CORE_STATIC_LIB_DIR}/libwebrtc-jni.a -Wl,--no-whole-archive")
-#target_link_libraries(${VIDEO_ANDROID_LIBRARY} ${WEBRTC_JNI_LIB})
