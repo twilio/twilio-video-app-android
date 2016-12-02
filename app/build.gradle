@@ -7,10 +7,13 @@ android {
 
     defaultConfig {
         applicationId "com.twilio.video.app"
+
         minSdkVersion 16
         targetSdkVersion 25
+
         versionName generateVersionName()
         versionCode generateVersionCode()
+
         vectorDrawables.useSupportLibrary = true
     }
 
@@ -30,7 +33,7 @@ android {
             proguardFiles.add(file('android-proguard-rules.pro'))
             proguardFiles.add(file("${project(':library').projectDir}/proguard-rules.pro"))
             proguardFiles.add(file("proguard-rules.pro"))
-//            signingConfig = $("android.signingConfigs.debug")
+            signingConfig = signingConfigs.debug
         }
         debug {
             applicationIdSuffix ".debug"
@@ -41,17 +44,6 @@ android {
         }
     }
 }
-
-//    android.sources {
-//        main {
-//            jniLibs {
-//                dependencies {
-//                    // TODO provide way to specify debug and release buildType
-//                    project ":library" buildType "debug"
-//                }
-//            }
-//        }
-//    }
 
 dependencies {
     compile project(':library')

@@ -7,9 +7,12 @@ android {
     defaultConfig {
         minSdkVersion 16
         targetSdkVersion 25
+
         versionName "1.0"
         versionCode 1
+
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+
         externalNativeBuild {
             cmake {
                 arguments '-DANDROID_TOOLCHAIN=clang'

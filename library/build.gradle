@@ -17,13 +17,18 @@ android {
     defaultConfig {
         minSdkVersion 16
         targetSdkVersion 24
+
         versionName generateVersionName()
         versionCode generateVersionCode()
+
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+
         buildConfigField "String", "REALM", "\"${getRealm()}\""
+
         ndk {
             abiFilters 'x86', 'x86_64', 'armeabi-v7a', 'arm64-v8a'
         }
+
         externalNativeBuild {
             cmake {
                 arguments '-DANDROID_TOOLCHAIN=gcc',
@@ -47,6 +52,7 @@ android {
             }
         }
     }
+
     buildTypes {
         release {
             externalNativeBuild {
@@ -65,6 +71,7 @@ android {
             }
         }
     }
+
     externalNativeBuild {
         cmake {
             path "CMakeLists.txt"
@@ -110,7 +117,7 @@ task createJavadocs(type: Javadoc) {
     exclude '**/R.java'
 }
 
-/**
+/*
  * Iterates over conversations dependencies and ensures they are downloaded
  */
 task unpackPrebuilts(type: Copy) {
@@ -124,7 +131,7 @@ task unpackPrebuilts(type: Copy) {
     }
 }
 
-/**
+/*
  * Maven upload configuration that can be used for any maven repo
  */
 uploadArchives {
@@ -144,7 +151,7 @@ uploadArchives {
     }
 }
 
-/**
+/*
  * Localize the JNI_OnLoad and JNI_OnUnLoad symbol in libwebrtc-jni.a to prevent conflicts with
  * initialization
  */
@@ -168,9 +175,10 @@ task localizeWebRtcJniLoadUnLoad(type: Exec, dependsOn: 'unpackPrebuilts') {
             "linux"
     ]
 
-    // For some reason I have to have something set for
-    // command line in order for this task to not complain just ignore this
-    // the real work follows in the loops below
+    /*
+     * For some reason I have to have something set for command line in order for this task to not
+     * complain just ignore this the real work follows in the loops below
+     */
     commandLine 'true'
     doLast {
         toolchainMap.each { toolchainPrefix, toolChainPrebuiltPrefix ->
@@ -232,8 +240,10 @@ def getNdkDir() {
     // Checking environment variable for ndk home first
     def ndkHome = System.env.ANDROID_NDK_HOME
 
-    // Android Studio does not see this environment but will generate a
-    // local.properties file with the ndk path set
+    /*
+     * Android Studio does not see this environment but will generate a local.properties file with
+     * the ndk path set
+     */
     if (ndkHome == null) {
         println "Could not locate NDK home in environment variable. Trying local.properties"
         Properties properties = new Properties()
