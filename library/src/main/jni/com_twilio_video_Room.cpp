@@ -75,7 +75,7 @@ Java_com_twilio_video_Room_00024InternalStatsListenerHandle_nativeCreate(JNIEnv 
                        twilio::video::kTSCoreLogLevelDebug,
                        "Create AndroidStatsObserver");
     AndroidStatsObserver *android_stats_observer = new AndroidStatsObserver(env, object);
-    return jlongFromPointer(android_stats_observer);
+    return webrtc_jni::jlongFromPointer(android_stats_observer);
 }
 
 JNIEXPORT void JNICALL

@@ -1,7 +1,7 @@
 #ifndef VIDEO_ANDROID_ANDROID_STATS_OBSERVER_H_
 #define VIDEO_ANDROID_ANDROID_STATS_OBSERVER_H_
 
-#include "webrtc/api/java/jni/jni_helpers.h"
+#include "webrtc/api/android/jni/jni_helpers.h"
 
 #include "video/stats_observer.h"
 #include "video/stats_report.h"
@@ -107,7 +107,7 @@ public:
 protected:
     virtual void onStats(
             const std::vector<std::unique_ptr<twilio::video::StatsReport>> &stats_reports) {
-        ScopedLocalRefFrame local_ref_frame(jni());
+        webrtc_jni::ScopedLocalRefFrame local_ref_frame(jni());
         std::string func_name = std::string(__FUNCTION__);
         TS_CORE_LOG_MODULE(twilio::video::kTSCoreLogModulePlatform,
                            twilio::video::kTSCoreLogLevelDebug,
@@ -116,7 +116,7 @@ protected:
         // Create ArrayList<StatsReport>
         jobject j_stats_reports = jni()->NewObject(*j_array_list_class_, j_array_list_ctor_id_);
         for (auto const &stats_report : stats_reports) {
-            ScopedLocalRefFrame stats_iteration_ref_frame(jni());
+            webrtc_jni::ScopedLocalRefFrame stats_iteration_ref_frame(jni());
             jstring j_peerconnection_id =
                 webrtc_jni::JavaStringFromStdString(jni(), stats_report->getPeerConnectionId());
             jobject j_stats_report = jni()->NewObject(*j_stats_report_class_,
@@ -155,7 +155,7 @@ private:
                                callbackName.c_str());
             return false;
         };
-        if (IsNull(jni(), *j_stats_observer_)) {
+        if (webrtc_jni::IsNull(jni(), *j_stats_observer_)) {
             TS_CORE_LOG_MODULE(twilio::video::kTSCoreLogModulePlatform,
                                twilio::video::kTSCoreLogLevelWarning,
                                "stats observer reference has been destroyed, skipping %s callback",
@@ -168,7 +168,7 @@ private:
     void processLocalAudioTrackStats(jobject j_stats_report,
                                      const std::vector<std::unique_ptr<twilio::media::LocalAudioTrackStats>> &local_audio_tracks_stats) {
         for(auto const &track_stats : local_audio_tracks_stats) {
-            ScopedLocalRefFrame local_ref_frame(jni());
+            webrtc_jni::ScopedLocalRefFrame local_ref_frame(jni());
             jstring j_track_id =
                 webrtc_jni::JavaStringFromStdString(jni(), track_stats->getTrackId());
             jstring j_codec_name =
@@ -198,7 +198,7 @@ private:
     void processLocalVideoTrackStats(jobject j_stats_report,
                                      const std::vector<std::unique_ptr<twilio::media::LocalVideoTrackStats>> &local_video_tracks_stats) {
         for(auto const &track_stats : local_video_tracks_stats) {
-            ScopedLocalRefFrame local_ref_frame(jni());
+            webrtc_jni::ScopedLocalRefFrame local_ref_frame(jni());
             jstring j_track_id =
                 webrtc_jni::JavaStringFromStdString(jni(), track_stats->getTrackId());
             jstring j_codec_name =
@@ -239,7 +239,7 @@ private:
     void processAudioTrackStats(jobject j_stats_report,
                                 const std::vector<std::unique_ptr<twilio::media::AudioTrackStats>> &audio_tracks_stats) {
         for(auto const &track_stats : audio_tracks_stats) {
-            ScopedLocalRefFrame local_ref_frame(jni());
+            webrtc_jni::ScopedLocalRefFrame local_ref_frame(jni());
             jstring j_track_id =
                 webrtc_jni::JavaStringFromStdString(jni(), track_stats->getTrackId());
             jstring j_codec_name =
@@ -268,7 +268,7 @@ private:
     void processVideoTrackStats(jobject j_stats_report,
                                 const std::vector<std::unique_ptr<twilio::media::VideoTrackStats>> &video_tracks_stats) {
         for(auto const &track_stats : video_tracks_stats) {
-            ScopedLocalRefFrame local_ref_frame(jni());
+            webrtc_jni::ScopedLocalRefFrame local_ref_frame(jni());
             jstring j_track_id =
                 webrtc_jni::JavaStringFromStdString(jni(), track_stats->getTrackId());
             jstring j_codec_name =
