@@ -222,7 +222,7 @@ void VideoCapturerDelegate::OnMemoryBufferFrame(void *video_frame, int length, i
 
     switch (capture_pixel_format_) {
         /*
-         * TODO: Need add support for padding
+         * TODO: Add support for padding
          */
         case cricket::FOURCC_ABGR: {
             const uint8_t *src_rgba = static_cast<uint8_t *>(video_frame);
