@@ -2,6 +2,7 @@ package com.twilio.video;
 
 import android.os.Handler;
 import android.support.annotation.IntDef;
+import android.support.annotation.NonNull;
 import android.util.Pair;
 
 import java.lang.annotation.Retention;
@@ -109,10 +110,11 @@ public class Room {
     }
 
     /**
-     * TODO: Add documentation
-     * @param statsListener
+     * Retrieve stats for all media tracks and notify {@link StatsListener} via calling thread.
+     *
+     * @param statsListener listener that receives stats reports for all media tracks.
      */
-    public void getStats(StatsListener statsListener) {
+    public void getStats(@NonNull  StatsListener statsListener) {
         if (statsListener == null) {
             throw new NullPointerException("StatsListener must not be null");
         }

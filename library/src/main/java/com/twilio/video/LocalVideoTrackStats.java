@@ -2,22 +2,24 @@ package com.twilio.video;
 
 public class LocalVideoTrackStats extends LocalTrackStats {
     /**
-     * FrameWidthInput x FrameHeightInput
+     * Captured frame dimensions
      */
     public final VideoDimensions captureDimensions;
-    /**
-     * FrameWidthSent x FrameHeightSent
-     */
-    public final VideoDimensions sentDimensions;
-    /**
-     * Frame rate sent
-     */
-    public final int sentFrameRate;
 
     /**
      * Captured frame rate
      */
     public final int capturedFrameRate;
+
+    /**
+     * Sent frame dimensions
+     */
+    public final VideoDimensions sentDimensions;
+
+    /**
+     * Sent frame rate
+     */
+    public final int sentFrameRate;
 
     public LocalVideoTrackStats(String trackId,
                                 int packetsLost,

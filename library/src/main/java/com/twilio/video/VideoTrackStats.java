@@ -1,7 +1,14 @@
 package com.twilio.video;
 
 public class VideoTrackStats extends TrackStats {
+    /**
+     * Received frame dimensions
+     */
     public final VideoDimensions receivedDimensions;
+
+    /**
+     * Received frame rate
+     */
     public final int receivedFrameRate;
 
     public VideoTrackStats(String trackId,

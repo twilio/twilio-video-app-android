@@ -1,7 +1,14 @@
 package com.twilio.video;
 
 public class AudioTrackStats extends TrackStats {
+    /**
+     * Audio output level
+     */
     public final int audioOutputLevel;
+
+    /**
+     * Packet jitter measured in milliseconds
+     */
     public final int jitterReceived;
 
     public AudioTrackStats(String trackId,

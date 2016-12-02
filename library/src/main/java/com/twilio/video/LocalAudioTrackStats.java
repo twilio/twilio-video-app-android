@@ -1,11 +1,16 @@
 package com.twilio.video;
 
 public class LocalAudioTrackStats extends LocalTrackStats {
+    /**
+     *  Audio input level
+     */
     public final int audioInputLevel;
+
     /**
      * Packet jitter measured in milliseconds
      */
     public final int jitterReceived;
+
     /**
      * Jitter buffer measured in milliseconds
      */

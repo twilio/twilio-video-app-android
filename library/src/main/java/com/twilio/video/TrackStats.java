@@ -1,8 +1,19 @@
 package com.twilio.video;
 
 public abstract class TrackStats extends BaseTrackStats {
+    /**
+     * Total number of bytes received
+     */
     public final long bytesReceived;
+
+    /**
+     * Total number of packets received
+     */
     public final int packetsReceived;
+
+    /**
+     * Jitter buffer in milliseconds
+     */
     public final int jitterBuffer;
 
     public TrackStats(String trackId, int packetsLost,
