@@ -2,6 +2,7 @@ buildscript {
     apply from: "$rootProject.projectDir/common.gradle"
     repositories {
         jcenter()
+        mavenCentral()
         maven {
             url "http://nexus.corp.twilio.com/content/repositories/snapshots/"
         }
@@ -10,10 +11,8 @@ buildscript {
         }
     }
     dependencies {
-        classpath "com.android.tools.build:gradle-experimental:0.7.3"
-        // android-apt doesn't support gradle experimental plugin needed for ndk support
-        // using this project instead
-        classpath 'org.bitbucket.pvoid:android-apt-experemental:1.0.1'
+        classpath 'com.android.tools.build:gradle:2.2.2'
+        classpath 'com.jakewharton:butterknife-gradle-plugin:8.4.0'
     }
 }
 
@@ -21,6 +20,7 @@ allprojects {
     apply from: "$rootProject.projectDir/common.gradle"
     repositories {
         jcenter()
+        mavenCentral()
         maven {
             url "http://nexus.corp.twilio.com/content/repositories/snapshots/"
         }

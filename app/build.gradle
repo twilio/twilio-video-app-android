@@ -1,50 +1,36 @@
-apply plugin: 'com.android.model.application'
-apply plugin: 'org.bitbucket.pvoid.android-apt'
+apply plugin: 'com.android.application'
+apply plugin: 'com.jakewharton.butterknife'
 
-model {
-    android {
-        compileSdkVersion 25
-        buildToolsVersion "25.0.0"
+android {
+    compileSdkVersion 25
+    buildToolsVersion "25.0.0"
 
-        defaultConfig.with {
-            applicationId "com.twilio.video.app"
-            minSdkVersion.apiLevel 16
-            targetSdkVersion.apiLevel 25
-            versionName generateVersionName()
-            versionCode generateVersionCode()
-            vectorDrawables.useSupportLibrary = true
-        }
-
-    }
-
-    android.sources {
-        main {
-            jniLibs {
-                dependencies {
-                    // TODO provide way to specify debug and release buildType
-                    project ":library" buildType "debug"
-                }
-            }
-        }
+    defaultConfig {
+        applicationId "com.twilio.video.app"
+        minSdkVersion 16
+        targetSdkVersion 25
+        versionName generateVersionName()
+        versionCode generateVersionCode()
+        vectorDrawables.useSupportLibrary = true
     }
 
     /**
      * Use the debug keystore to sign all variants of the test app
      * since this is only used internally.
      */
-    android.signingConfigs {
+    signingConfigs {
         debug {
             storeFile file("${System.env.HOME}/.android/debug.keystore")
         }
     }
 
-    android.buildTypes {
+    buildTypes {
         release {
             minifyEnabled true
             proguardFiles.add(file('android-proguard-rules.pro'))
             proguardFiles.add(file("${project(':library').projectDir}/proguard-rules.pro"))
             proguardFiles.add(file("proguard-rules.pro"))
-            signingConfig = $("android.signingConfigs.debug")
+//            signingConfig = $("android.signingConfigs.debug")
         }
         debug {
             applicationIdSuffix ".debug"
@@ -56,6 +42,17 @@ model {
     }
 }
 
+//    android.sources {
+//        main {
+//            jniLibs {
+//                dependencies {
+//                    // TODO provide way to specify debug and release buildType
+//                    project ":library" buildType "debug"
+//                }
+//            }
+//        }
+//    }
+
 dependencies {
     compile project(':library')
     compile project(':env')
@@ -65,8 +62,8 @@ dependencies {
     compile 'com.squareup.retrofit:retrofit:1.9.0'
     compile 'com.jakewharton.timber:timber:4.1.0'
     compile 'com.appyvet:materialrangebar:1.3'
-    compile 'com.jakewharton:butterknife:8.1.0'
-    apt 'com.jakewharton:butterknife-compiler:8.1.0'
+    compile 'com.jakewharton:butterknife:8.4.0'
+    annotationProcessor 'com.jakewharton:butterknife-compiler:8.4.0'
     compile 'com.google.guava:guava:19.0'
     compile 'com.twilio:accessmanager-android:0.1.0'
 }
