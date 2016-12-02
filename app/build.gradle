@@ -46,7 +46,8 @@ android {
 }
 
 dependencies {
-    compile project(':library')
+    debugCompile project(path: ':library', configuration: 'debug')
+    releaseCompile project(path: ':library', configuration: 'release')
     compile project(':env')
     compile 'net.hockeyapp.android:HockeySDK:3.5.0'
     compile 'com.android.support:design:25.0.1'
