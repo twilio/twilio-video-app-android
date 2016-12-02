@@ -30,40 +30,28 @@ include_directories(${LIBYUV_INCLUDE_DIR})
 # Set static library properties
 add_library(webrtc STATIC IMPORTED GLOBAL)
 set_property(TARGET webrtc PROPERTY IMPORTED_LOCATION ${CORE_STATIC_LIB_DIR}/libwebrtc.a)
-
 add_library(webrtc-jni STATIC IMPORTED GLOBAL)
 set_property(TARGET webrtc-jni PROPERTY IMPORTED_LOCATION ${CORE_STATIC_LIB_DIR}/libwebrtc-jni.a)
-
 add_library(jni-helpers STATIC IMPORTED GLOBAL)
 set_property(TARGET jni-helpers PROPERTY IMPORTED_LOCATION ${CORE_STATIC_LIB_DIR}/libjni-helpers.a)
-
 include_directories(${RESIPROCATE_INCLUDE_DIR})
 add_library(resiprocate STATIC IMPORTED GLOBAL)
 set_property(TARGET resiprocate PROPERTY IMPORTED_LOCATION ${CORE_STATIC_LIB_DIR}/libresiprocate.a)
-
 include_directories(${POCO_INCLUDE_DIR})
 add_library(poco-net STATIC IMPORTED GLOBAL)
 set_property(TARGET poco-net PROPERTY IMPORTED_LOCATION ${CORE_STATIC_LIB_DIR}/libPocoNet.a)
-
 add_library(poco-netssl STATIC IMPORTED GLOBAL)
 set_property(TARGET poco-netssl PROPERTY IMPORTED_LOCATION ${CORE_STATIC_LIB_DIR}/libPocoNetSSL.a)
-
 add_library(poco-util STATIC IMPORTED GLOBAL)
 set_property(TARGET poco-util PROPERTY IMPORTED_LOCATION ${CORE_STATIC_LIB_DIR}/libPocoUtil.a)
-
 add_library(poco-crypto STATIC IMPORTED GLOBAL)
 set_property(TARGET poco-crypto PROPERTY IMPORTED_LOCATION ${CORE_STATIC_LIB_DIR}/libPocoCrypto.a)
-
 add_library(poco-json STATIC IMPORTED GLOBAL)
 set_property(TARGET poco-json PROPERTY IMPORTED_LOCATION ${CORE_STATIC_LIB_DIR}/libPocoJSON.a)
-
 add_library(poco-foundation STATIC IMPORTED GLOBAL)
 set_property(TARGET poco-foundation PROPERTY IMPORTED_LOCATION ${CORE_STATIC_LIB_DIR}/libPocoFoundation.a)
-
 add_library(boringssl STATIC IMPORTED GLOBAL)
 set_property(TARGET boringssl PROPERTY IMPORTED_LOCATION ${CORE_STATIC_LIB_DIR}/libboringssl.a)
-
-include_directories(${CORE_INCLUDE_DIR})
 add_library(video-core STATIC IMPORTED GLOBAL)
 set_property(TARGET video-core PROPERTY IMPORTED_LOCATION ${CORE_STATIC_LIB_DIR}/libtwilio-video.a)
 
@@ -89,10 +77,16 @@ target_link_libraries(${VIDEO_ANDROID_LIBRARY} "-lGLESv1_CM")
 target_link_libraries(${VIDEO_ANDROID_LIBRARY} "-landroid")
 
 # Link static library dependencies
-set(WEBRTC_JNI_LIB "-Wl,--whole-archive ${CORE_STATIC_LIB_DIR}/libwebrtc-jni.a -Wl,--no-whole-archive")
-set(VIDEO_ANDROID_STATIC_LIB_DEPS ${CORE_STATIC_LIB_DIR}/libtwilio-video.a
+target_link_libraries(${VIDEO_ANDROID_LIBRARY} ${CORE_STATIC_LIB_DIR}/libtwilio-video.a
         ${CORE_STATIC_LIB_DIR}/libwebrtc.a
-        ${WEBRTC_JNI_LIB}
+        # Several webrtc classes use native webrtc-jni objects that are only
+        # called from Java classes. The compiler will incorrectly strip some
+        # of these native webrtc-jni objects during linking because it believes
+        # they are unused by the native library. Here we tell the linker to keep
+        # the whole archive to prevent this stripping and then we specify in the
+        # dependency after we are not using whole archive anymore because the linker
+        # applies this option to every library after the option is specified.
+        "-Wl,--whole-archive ${CORE_STATIC_LIB_DIR}/libwebrtc-jni.a -Wl,--no-whole-archive"
         ${CORE_STATIC_LIB_DIR}/libjni-helpers.a
         ${CORE_STATIC_LIB_DIR}/libresiprocate.a
         ${CORE_STATIC_LIB_DIR}/libPocoNet.a
@@ -102,4 +96,3 @@ set(VIDEO_ANDROID_STATIC_LIB_DEPS ${CORE_STATIC_LIB_DIR}/libtwilio-video.a
         ${CORE_STATIC_LIB_DIR}/libPocoJSON.a
         ${CORE_STATIC_LIB_DIR}/libPocoFoundation.a
         ${CORE_STATIC_LIB_DIR}/libboringssl.a)
-target_link_libraries(${VIDEO_ANDROID_LIBRARY} ${VIDEO_ANDROID_STATIC_LIB_DEPS})
