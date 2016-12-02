@@ -5,7 +5,7 @@
 #include <string.h>
 #include "video/platform_info_provider.h"
 
-#include "webrtc/api/java/jni/jni_helpers.h"
+#include "webrtc/api/android/jni/jni_helpers.h"
 
 class AndroidPlatformInfoProvider : public twilio::video::PlatformInfoProvider {
 

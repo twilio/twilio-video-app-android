@@ -2,7 +2,7 @@
 #include "com_twilio_video_LocalMedia.h"
 #include "com_twilio_video_IceOptions.h"
 
-#include "webrtc/api/java/jni/jni_helpers.h"
+#include "webrtc/api/android/jni/jni_helpers.h"
 #include "media/ice_options.h"
 
 namespace twilio_video_jni {

@@ -1,13 +1,11 @@
 #include "com_twilio_video_VideoClient.h"
-#include "webrtc/api/java/jni/jni_helpers.h"
+#include "webrtc/api/android/jni/jni_helpers.h"
 
 #include "webrtc/base/refcount.h"
 #include "webrtc/voice_engine/include/voe_base.h"
-#include "webrtc/modules/video_capture/video_capture_internal.h"
-#include "webrtc/api/java/jni/androidvideocapturer_jni.h"
 #include "webrtc/modules/audio_device/android/audio_manager.h"
 #include "webrtc/modules/audio_device/android/opensles_player.h"
-#include "webrtc/api/java/jni/classreferenceholder.h"
+#include "webrtc/api/android/jni/classreferenceholder.h"
 
 #include "video/logger.h"
 #include "video/video.h"
@@ -33,7 +31,7 @@ extern "C" jint JNIEXPORT JNICALL JNI_OnLoad(JavaVM *jvm, void *reserved) {
     TS_CORE_LOG_MODULE(twilio::video::kTSCoreLogModulePlatform,
                        twilio::video::kTSCoreLogLevelDebug,
                        "%s", func_name.c_str());
-    jint ret = InitGlobalJniVariables(jvm);
+    jint ret = webrtc_jni::InitGlobalJniVariables(jvm);
     if (ret < 0) {
         TS_CORE_LOG_MODULE(twilio::video::kTSCoreLogModulePlatform,
                            twilio::video::kTSCoreLogLevelError,
@@ -146,9 +144,8 @@ Java_com_twilio_video_VideoClient_nativeCreateClient(JNIEnv *env,
             twilio::video::Client::create(token,
                                           media_factory,
                                           std::move(client_options));
-    return jlongFromPointer(
-            new ClientContext(std::move(client)));
 
+    return webrtc_jni::jlongFromPointer(new ClientContext(std::move(client)));
 }
 
 JNIEXPORT jlong JNICALL
@@ -189,7 +186,8 @@ Java_com_twilio_video_VideoClient_nativeConnect(JNIEnv *env,
 
     RoomContext *room_context = new RoomContext();
     room_context->room = std::move(room);
-    return jlongFromPointer(room_context);
+
+    return webrtc_jni::jlongFromPointer(room_context);
 }
 
 JNIEXPORT jlong JNICALL Java_com_twilio_video_VideoClient_nativeUpdateToken

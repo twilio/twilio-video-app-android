@@ -20,7 +20,7 @@ def supportedArchFolderName = [
 ]
 
 def coreHome = "${twilioSdkHome}/twilio-video"
-def coreHeaders = "${coreHome}/arm64v8a/gnu-4.9/debug/include"
+def coreHeaders = "${coreHome}/armeabiv7a/gnu-4.9/release/include"
 def coreStaticLib = "libtwilio-video.a"
 
 def pocoHome = "${coreHome}"
@@ -194,6 +194,9 @@ model {
         stl "c++_static"
         cppFlags.addAll([
                 "-DWEBRTC_POSIX",
+                // Needed to extend cricket::VideoCapturer without causing unwarranted destructor crashes
+                "-DNDEBUG",
+                "-DWEBRTC_BUILD_LIBEVENT",
                 "-DTWILIO_SDK_2_0",
                 "-DWEBRTC_ANDROID",
                 "-DWEBRTC_ANDROID_OPENSLES",
@@ -274,7 +277,7 @@ model {
 }
 
 dependencies {
-    preCompile 'com.twilio.sdk:twilio-video:0.5.0-rc1:android@tar.bz2'
+    preCompile 'com.twilio.sdk:twilio-video:0.5.0-SNAPSHOT:android@tar.bz2'
 
     testCompile 'junit:junit:4.12'
     testCompile 'org.mockito:mockito-core:1.10.19'
@@ -293,7 +296,7 @@ dependencies {
     // TODO this really should be on nexus as a jar and not local
     // TODO we are hardcoding architecture for now,
     // because I don't know how to access that information from here
-    compile files("${twilioSdkHome}/twilio-video/arm64v8a/gnu-4.9/release/lib/" +
+    compile files("${twilioSdkHome}/twilio-video/armeabiv7a/gnu-4.9/release/lib/" +
             "libjingle_peerconnection_java.jar")
 }
 

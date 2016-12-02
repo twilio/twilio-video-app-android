@@ -1,7 +1,7 @@
 #ifndef VIDEO_ANDROID_INCLUDE_ANDROID_MEDIA_OBSERVER_H_
 #define VIDEO_ANDROID_INCLUDE_ANDROID_MEDIA_OBSERVER_H_
 
-#include "webrtc/api/java/jni/jni_helpers.h"
+#include "webrtc/api/android/jni/jni_helpers.h"
 
 #include "video/logger.h"
 #include "media/media_observer.h"

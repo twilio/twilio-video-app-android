@@ -1,7 +1,7 @@
-#ifndef ROOMS_ANDROID_ANDROID_ROOM_OBSERVER_H
-#define ROOMS_ANDROID_ANDROID_ROOM_OBSERVER_H
+#ifndef VIDEO_ANDROID_ANDROID_ROOM_OBSERVER_H_
+#define VIDEO_ANDROID_ANDROID_ROOM_OBSERVER_H_
 
-#include "webrtc/api/java/jni/jni_helpers.h"
+#include "webrtc/api/android/jni/jni_helpers.h"
 
 #include "video/logger.h"
 #include "video/room_observer.h"
@@ -13,16 +13,14 @@
 
 #include <vector>
 
-using namespace webrtc_jni;
-
 class AndroidRoomObserver: public twilio::video::RoomObserver {
 public:
     AndroidRoomObserver(JNIEnv *env, jobject j_room_observer) :
         j_room_observer_(env, j_room_observer),
-        j_room_observer_class_(env, GetObjectClass(env, *j_room_observer_)),
+        j_room_observer_class_(env, webrtc_jni::GetObjectClass(env, *j_room_observer_)),
         j_room_exception_class_(env, twilio_video_jni::FindClass(env, "com/twilio/video/RoomException")),
         j_room_exception_ctor_id_(
-                GetMethodID(env,
+                webrtc_jni::GetMethodID(env,
                             *j_room_exception_class_,
                             "<init>",
                             "(ILjava/lang/String;)V")),
@@ -33,37 +31,37 @@ public:
         j_video_track_class_(env, env->FindClass("com/twilio/video/VideoTrack")),
         j_media_class_(env, env->FindClass("com/twilio/video/Media")),
         j_on_connected_(
-            GetMethodID(env,
+            webrtc_jni::GetMethodID(env,
                         *j_room_observer_class_,
                         "onConnected",
                         "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/util/List;)V")),
         j_on_disconnected_(
-            GetMethodID(env,
+            webrtc_jni::GetMethodID(env,
                         *j_room_observer_class_,
                         "onDisconnected",
                         "(Lcom/twilio/video/RoomException;)V")),
         j_on_connect_failure_(
-            GetMethodID(env,
+            webrtc_jni::GetMethodID(env,
                         *j_room_observer_class_,
                         "onConnectFailure",
                         "(Lcom/twilio/video/RoomException;)V")),
         j_on_participant_connected_(
-            GetMethodID(env,
+            webrtc_jni::GetMethodID(env,
                         *j_room_observer_class_,
                         "onParticipantConnected",
                         "(Lcom/twilio/video/Participant;)V")),
         j_on_participant_disconnected_(
-            GetMethodID(env,
+            webrtc_jni::GetMethodID(env,
                         *j_room_observer_class_,
                         "onParticipantDisconnected",
                         "(Ljava/lang/String;)V")),
         j_get_handler_(
-            GetMethodID(env,
+            webrtc_jni::GetMethodID(env,
                         *j_room_observer_class_,
                         "getHandler",
                         "()Landroid/os/Handler;")),
         j_participant_ctor_id_(
-            GetMethodID(env,
+            webrtc_jni::GetMethodID(env,
                         *j_participant_class_,
                         "<init>",
                         "(Ljava/lang/String;Ljava/lang/String;Lcom/twilio/video/Media;J)V")),
@@ -114,7 +112,7 @@ public:
 
 protected:
     virtual void onConnected(twilio::video::Room *room) {
-        ScopedLocalRefFrame local_ref_frame(jni());
+        webrtc_jni::ScopedLocalRefFrame local_ref_frame(jni());
         std::string func_name = std::string(__FUNCTION__);
         TS_CORE_LOG_MODULE(twilio::video::kTSCoreLogModulePlatform,
                            twilio::video::kTSCoreLogLevelDebug,
@@ -130,11 +128,11 @@ protected:
             jstring j_room_sid = webrtc_jni::JavaStringFromStdString(jni(), room->getSid());
 
             std::shared_ptr<twilio::video::LocalParticipant> local_participant =
-                room->getLocalParticipant();
+                    room->getLocalParticipant();
             jstring j_local_participant_sid =
-                webrtc_jni::JavaStringFromStdString(jni(), local_participant->getSid());
+                    webrtc_jni::JavaStringFromStdString(jni(), local_participant->getSid());
             jstring j_local_participant_identity =
-                webrtc_jni::JavaStringFromStdString(jni(), local_participant->getIdentity());
+                    webrtc_jni::JavaStringFromStdString(jni(), local_participant->getIdentity());
 
             jobject j_participants = createJavaParticipantList(room->getParticipants());
 
@@ -149,7 +147,7 @@ protected:
     }
 
     virtual void onDisconnected(const twilio::video::Room *room) {
-        ScopedLocalRefFrame local_ref_frame(jni());
+        webrtc_jni::ScopedLocalRefFrame local_ref_frame(jni());
         std::string func_name = std::string(__FUNCTION__);
         TS_CORE_LOG_MODULE(twilio::video::kTSCoreLogModulePlatform,
                            twilio::video::kTSCoreLogLevelDebug,
@@ -167,7 +165,7 @@ protected:
 
     virtual void onDisconnected(const twilio::video::Room *room,
                                 const twilio::video::RoomError room_error) {
-        ScopedLocalRefFrame local_ref_frame(jni());
+        webrtc_jni::ScopedLocalRefFrame local_ref_frame(jni());
         std::string func_name = std::string(__FUNCTION__);
         TS_CORE_LOG_MODULE(twilio::video::kTSCoreLogModulePlatform,
                            twilio::video::kTSCoreLogLevelDebug,
@@ -186,7 +184,7 @@ protected:
 
     virtual void onConnectFailure(const twilio::video::Room *room,
                                   const twilio::video::RoomError room_error) {
-        ScopedLocalRefFrame local_ref_frame(jni());
+        webrtc_jni::ScopedLocalRefFrame local_ref_frame(jni());
         std::string func_name = std::string(__FUNCTION__);
         TS_CORE_LOG_MODULE(twilio::video::kTSCoreLogModulePlatform,
                            twilio::video::kTSCoreLogLevelDebug,
@@ -205,7 +203,7 @@ protected:
 
     virtual void onParticipantConnected(twilio::video::Room *room,
                                         std::shared_ptr<twilio::video::Participant> participant) {
-        ScopedLocalRefFrame local_ref_frame(jni());
+        webrtc_jni::ScopedLocalRefFrame local_ref_frame(jni());
         std::string func_name = std::string(__FUNCTION__);
         TS_CORE_LOG_MODULE(twilio::video::kTSCoreLogModulePlatform,
                            twilio::video::kTSCoreLogLevelDebug,
@@ -237,7 +235,7 @@ protected:
 
     virtual void onParticipantDisconnected(twilio::video::Room *room,
                                            std::shared_ptr<twilio::video::Participant> participant) {
-        ScopedLocalRefFrame local_ref_frame(jni());
+        webrtc_jni::ScopedLocalRefFrame local_ref_frame(jni());
         std::string func_name = std::string(__FUNCTION__);
         TS_CORE_LOG_MODULE(twilio::video::kTSCoreLogModulePlatform,
                            twilio::video::kTSCoreLogLevelDebug,
@@ -272,7 +270,7 @@ private:
                                callbackName.c_str());
             return false;
         };
-        if (IsNull(jni(), *j_room_observer_)) {
+        if (webrtc_jni::IsNull(jni(), *j_room_observer_)) {
             TS_CORE_LOG_MODULE(twilio::video::kTSCoreLogModulePlatform,
                                twilio::video::kTSCoreLogLevelWarning,
                                "room observer reference has been destroyed, skipping %s callback",
@@ -286,7 +284,7 @@ private:
         return jni()->NewObject(*j_room_exception_class_,
                                 j_room_exception_ctor_id_,
                                 room_error.getCode(),
-                                JavaStringFromStdString(jni(), room_error.getMessage()));
+                                webrtc_jni::JavaStringFromStdString(jni(), room_error.getMessage()));
     }
 
     jobject createJavaMediaObject(std::shared_ptr<twilio::media::Media> media) {
@@ -299,13 +297,13 @@ private:
         jobject j_audio_tracks = jni()->NewObject(*j_array_list_class_, j_array_list_ctor_id_);
 
         const std::vector<std::shared_ptr<twilio::media::AudioTrack>> audio_tracks =
-            media->getAudioTracks();
+                media->getAudioTracks();
 
         // Add audio tracks to array list
         for (int i = 0; i < audio_tracks.size(); i++) {
             jobject j_audio_track =
-                createJavaAudioTrack(jni(), audio_tracks[i],
-                                     *j_audio_track_class_, j_audio_track_ctor_id_);
+                    createJavaAudioTrack(jni(), audio_tracks[i],
+                                         *j_audio_track_class_, j_audio_track_ctor_id_);
             jni()->CallVoidMethod(j_audio_tracks, j_array_list_add_, j_audio_track);
         }
 
@@ -313,13 +311,13 @@ private:
         jobject j_video_tracks = jni()->NewObject(*j_array_list_class_, j_array_list_ctor_id_);
 
         const std::vector<std::shared_ptr<twilio::media::VideoTrack>> video_tracks =
-            media->getVideoTracks();
+                media->getVideoTracks();
 
         // Add audio tracks to array list
         for (int i = 0; i < video_tracks.size(); i++) {
             jobject j_video_track =
-                createJavaVideoTrack(jni(), video_tracks[i],
-                                     *j_video_track_class_, j_video_track_ctor_id_);
+                    createJavaVideoTrack(jni(), video_tracks[i],
+                                         *j_video_track_class_, j_video_track_ctor_id_);
             jni()->CallVoidMethod(j_video_tracks, j_array_list_add_, j_video_track);
         }
 
@@ -327,13 +325,13 @@ private:
 
         // Create java media object
         return jni()->NewObject(
-            *j_media_class_, j_media_ctor_id_, j_media_context,
-            j_audio_tracks, j_video_tracks, j_handler);
+                *j_media_class_, j_media_ctor_id_, j_media_context,
+                j_audio_tracks, j_video_tracks, j_handler);
 
     }
 
     jobject createJavaParticipantList(
-        const std::map<std::string, std::shared_ptr<twilio::video::Participant>> participants) {
+            const std::map<std::string, std::shared_ptr<twilio::video::Participant>> participants) {
 
         // Create ArrayList<Participant>
         jobject j_participants = jni()->NewObject(*j_array_list_class_, j_array_list_ctor_id_);
@@ -346,10 +344,10 @@ private:
 
 
             jobject j_participant = createJavaParticipant(jni(),
-                                                           participant,
-                                                           j_media,
-                                                           *j_participant_class_,
-                                                           j_participant_ctor_id_);
+                                                          participant,
+                                                          j_media,
+                                                          *j_participant_class_,
+                                                          j_participant_ctor_id_);
             jni()->CallBooleanMethod(j_participants, j_array_list_add_, j_participant);
         }
         return j_participants;
@@ -379,7 +377,6 @@ private:
     jmethodID j_video_track_ctor_id_;
     jmethodID j_media_ctor_id_;
     jmethodID j_room_exception_ctor_id_;
-
 };
 
-#endif //ROOMS_ANDROID_ANDROID_ROOM_OBSERVER_H
+#endif // VIDEO_ANDROID_ANDROID_ROOM_OBSERVER_H_

@@ -2,11 +2,10 @@
 #include "com_twilio_video_LocalAudioTrack.h"
 #include "com_twilio_video_LocalVideoTrack.h"
 #include "com_twilio_video_VideoCapturerDelegate.h"
-#include "webrtc/api/androidvideocapturer.h"
-#include "webrtc/api/java/jni/androidvideocapturer_jni.h"
-#include "webrtc/api/java/jni/jni_helpers.h"
+#include "webrtc/api/android/jni/jni_helpers.h"
 #include "class_reference_holder.h"
 #include "video/logger.h"
+#include "android_video_capturer.h"
 
 namespace twilio_video_jni {
 
@@ -253,7 +252,7 @@ JNIEXPORT jobject JNICALL Java_com_twilio_video_LocalMedia_nativeAddVideoTrack(J
                                                              j_video_capturer_delegate,
                                                              nullptr,
                                                              is_screencast);
-    cricket::VideoCapturer* capturer = new webrtc::AndroidVideoCapturer(delegate);
+    cricket::VideoCapturer* capturer = new AndroidVideoCapturer(delegate);
     std::shared_ptr<twilio::media::LocalVideoTrack> video_track = local_media->addVideoTrack(enabled,
                                                                                              getVideoConstraints(j_video_contraints),
                                                                                              capturer);

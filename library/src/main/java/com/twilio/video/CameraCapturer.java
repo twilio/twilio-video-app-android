@@ -99,6 +99,11 @@ public class CameraCapturer implements VideoCapturer {
                 }
 
                 @Override
+                public void onCapturerStopped() {
+                    // TODO: This is currently not required but investigate the requirement of this
+                }
+
+                @Override
                 public void onByteBufferFrameCaptured(byte[] bytes,
                                                       int width,
                                                       int height,
@@ -118,13 +123,6 @@ public class CameraCapturer implements VideoCapturer {
                                                    int rotation,
                                                    long timestampNs) {
                     // TODO: Do we need to support capturing to texture?
-                }
-
-                @Override
-                public void onOutputFormatRequest(int width,
-                                                  int height,
-                                                  int framerate) {
-                    // TODO: Do we need to support an output format request?
                 }
             };
 
@@ -170,7 +168,7 @@ public class CameraCapturer implements VideoCapturer {
                 }
 
                 @Override
-                public void onCameraOpening(int i) {
+                public void onCameraOpening(String message) {
                     // Ignore this event for now
                 }
 
@@ -308,12 +306,10 @@ public class CameraCapturer implements VideoCapturer {
         if (capturerCreated) {
             this.videoCapturerListener = videoCapturerListener;
 
+            webrtcCapturer.initialize(surfaceTextureHelper, context, observerAdapter);
             webrtcCapturer.startCapture(captureFormat.dimensions.width,
                     captureFormat.dimensions.height,
-                    captureFormat.framerate,
-                    surfaceTextureHelper,
-                    context,
-                    observerAdapter);
+                    captureFormat.framerate);
         } else {
             logger.e("Failed to startCapture");
             videoCapturerListener.onCapturerStarted(false);
