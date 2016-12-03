@@ -21,10 +21,18 @@ public class SimpleSignalingUtils {
     public static final String CAPABILITY_TOKEN = "capability_token";
     public static final String USERNAME = "username";
     public static final String REALM = "realm";
+    public static final String TOPOLOGY = "topology";
+
+    public static final String PROD = "prod";
+    public static final String STAGE = "stage";
+    public static final String DEV= "dev";
+
+    public static final String P2P = "P2P";
+
     public static final ArrayList<String> REALMS = new ArrayList<String>() {{
-        add("prod");
-        add("stage");
-        add("dev");
+        add(PROD);
+        add(STAGE);
+        add(DEV);
     }};
 
     /*
@@ -68,18 +76,26 @@ public class SimpleSignalingUtils {
 
 
     public static void getAccessToken(String username, String realm,
-                                      Callback<String> callback) {
+                                      String topology, Callback<String> callback) {
         HashMap<String,String> options = new HashMap<>();
         options.put(REALM, realm);
         options.put("identity", username);
         options.put("ttl", TTL);
+        options.put("configurationProfileSid", getProfileConfigSid(realm, topology));
         simpleSignalingService.getAccessToken(options, callback);
     }
 
-
-    public static void getIceServers(String realm, Callback<TwilioIceResponse> callback) {
-        HashMap<String,String> options = new HashMap<>();
-        options.put(REALM, realm);
-        simpleSignalingService.getIceServers(options, callback);
+    private static String getProfileConfigSid(String realm, String topology) {
+        boolean isP2P = topology.equals(P2P);
+        switch(realm) {
+            case DEV:
+                return isP2P ? "VSbf4c8aee1e259d11b2c5adeebb7c0dbe" : "VS6469e95f0b2e2c8f931086988d69f815";
+            case STAGE:
+                return isP2P ? "VS0d1c1b07fafbe94b73670b37e7aedfbb" : "VS395e1a612a6e3c63100a3b4d99d52265";
+            case PROD:
+            default:
+                return isP2P ? "VS3f75e0f14e7c8b20938fc5092e82f23a" : "VS25275758820071c0d42246c538bc11ad";
+        }
     }
+
 }
