@@ -130,8 +130,7 @@ public class Room {
         statsListenersQueue.offer(
                 new Pair<Handler, StatsListener>(Util.createCallbackHandler(), statsListener));
         nativeGetStats(nativeRoomContext, internalStatsListenerHandle.get());
-
-    };
+    }
 
     /**
      * Disconnects from the room.

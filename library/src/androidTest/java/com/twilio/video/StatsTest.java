@@ -91,12 +91,13 @@ public class StatsTest extends BaseClientTest {
     private void checkLocalTrackStats(LocalTrackStats stats) {
         assertTrue(0 < stats.bytesSent);
         assertTrue(0 < stats.packetsSent);
-        //assertTrue(0 < stats.roundTripTime);
+        assertTrue(0 < stats.roundTripTime);
     }
 
     private void checkTrackStats(TrackStats stats) {
         assertTrue(0 < stats.bytesReceived);
         assertTrue(0 < stats.packetsReceived);
+        // Always 0. This field will be removed.
         //assertTrue(0 < stats.jitterBuffer);
     }
 
@@ -110,7 +111,6 @@ public class StatsTest extends BaseClientTest {
         roomName = RandUtils.generateRandomString(20);
         aliceListener = new CallbackHelper.FakeRoomListener();
         bobListener = new CallbackHelper.FakeRoomListener();
-
         aliceLocalMedia = LocalMedia.create(mediaTestActivity);
         bobLocalMedia = LocalMedia.create(mediaTestActivity);
     }
@@ -250,6 +250,7 @@ public class StatsTest extends BaseClientTest {
         statsReport = statsReportList.get(0);
         expectStatsReportTracksSize(statsReport, 1, 0, 1, 1);
 
+        // TODO: Commented out until CSDK-1039 is fixed
 //        // Remove Bob's video track and check the stats
 //        bobLocalMedia.removeVideoTrack(bobVideoTrack);
 //        assertTrue(mediaListener.onVideoTrackRemovedLatch.await(20, TimeUnit.SECONDS));
