@@ -346,9 +346,6 @@ public class Room {
 
         public void onStats(final List<StatsReport> statsReports) {
             final Pair<Handler, StatsListener> statsPair = Room.this.statsListenersQueue.poll();
-            if (statsPair == null) {
-                // TODO: handle this case...should never happen ?
-            }
             statsPair.first.post(new Runnable() {
                 @Override
                 public void run() {
@@ -359,7 +356,6 @@ public class Room {
     }
 
     class InternalStatsListenerHandle extends NativeHandle {
-
 
         public InternalStatsListenerHandle(InternalStatsListener listener) {
             super(listener);

@@ -365,7 +365,4 @@ public class StatsTest extends BaseClientTest {
         assertTrue(0 < videoTrackStats.receivedDimensions.width);
         assertTrue(0 < videoTrackStats.receivedDimensions.height);
     }
-
-
-
 }
