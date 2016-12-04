@@ -230,10 +230,9 @@ task localizeWebRtcJniLoadUnLoad(type: Exec, dependsOn: 'unpackPrebuilts') {
 }
 
 // Ensure that our pre build tasks are executed
-tasks.whenTaskAdded { task ->
-    if (task.name == 'assembleDebug' || task.name == 'assembleRelease') {
-        task.dependsOn(localizeWebRtcJniLoadUnLoad)
-        task.mustRunAfter(localizeWebRtcJniLoadUnLoad)
+afterEvaluate {
+    android.libraryVariants.all { variant ->
+        variant.javaCompiler.dependsOn(localizeWebRtcJniLoadUnLoad)
     }
 }
 
