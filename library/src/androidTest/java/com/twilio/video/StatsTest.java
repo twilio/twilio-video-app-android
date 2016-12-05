@@ -1,7 +1,6 @@
 package com.twilio.video;
 
 
-import android.icu.text.MessagePattern;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.filters.LargeTest;
 import android.support.test.rule.ActivityTestRule;
@@ -17,19 +16,17 @@ import com.twilio.video.util.RandUtils;
 
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 @RunWith(AndroidJUnit4.class)
@@ -47,59 +44,6 @@ public class StatsTest extends BaseClientTest {
     private Room aliceRoom, bobRoom;
     private LocalMedia aliceLocalMedia, bobLocalMedia;
     private CallbackHelper.FakeRoomListener aliceListener, bobListener;
-
-    private VideoClient createVideoClient() {
-        String identity = RandUtils.generateRandomString(10);
-        String token = AccessTokenUtils.getAccessToken(identity, BuildConfig.REALM);
-        VideoClient videoClient = new VideoClient(mediaTestActivity, token);
-        return videoClient;
-    }
-
-    private Room createRoom(VideoClient videoClient, CallbackHelper.FakeRoomListener listener,
-                            String roomName, LocalMedia localMedia) throws InterruptedException {
-        listener.onConnectedLatch = new CountDownLatch(1);
-
-        ConnectOptions connectOptions = new ConnectOptions.Builder()
-                .roomName(roomName)
-                .localMedia(localMedia)
-                .build();
-        Room room = videoClient.connect(connectOptions, listener);
-        assertTrue(listener.onConnectedLatch.await(20, TimeUnit.SECONDS));
-
-        return room;
-    }
-
-    private void expectStatsReportTracksSize(StatsReport statsReport, int localAudioTrackSize,
-                                             int localVideoTrackSize, int audioTrackSize,
-                                             int videoTrackSize) {
-
-        assertEquals(localAudioTrackSize, statsReport.getLocalAudioTrackStats().size());
-        assertEquals(localVideoTrackSize, statsReport.getLocalVideoTrackStats().size());
-        assertEquals(audioTrackSize, statsReport.getAudioTrackStats().size());
-        assertEquals(videoTrackSize, statsReport.getVideoTrackStats().size());
-    }
-
-    private void checkBaseTrackStats(BaseTrackStats stats) {
-        assertNotEquals("", stats.codecName);
-        assertNotEquals("", stats.ssrc);
-        assertNotEquals("", stats.trackId);
-        // TODO: Packets lost is always 0. Find a way to make test that will exercise this
-        assertTrue(0 <= stats.packetsLost);
-        assertTrue(0.0 < stats.unixTimestamp);
-    }
-
-    private void checkLocalTrackStats(LocalTrackStats stats) {
-        assertTrue(0 < stats.bytesSent);
-        assertTrue(0 < stats.packetsSent);
-        assertTrue(0 < stats.roundTripTime);
-    }
-
-    private void checkTrackStats(TrackStats stats) {
-        assertTrue(0 < stats.bytesReceived);
-        assertTrue(0 < stats.packetsReceived);
-        // Always 0. This field will be removed.
-        //assertTrue(0 < stats.jitterBuffer);
-    }
 
     @Before
     public void setup() throws InterruptedException {
@@ -364,5 +308,100 @@ public class StatsTest extends BaseClientTest {
         assertTrue(0 < videoTrackStats.receivedFrameRate);
         assertTrue(0 < videoTrackStats.receivedDimensions.width);
         assertTrue(0 < videoTrackStats.receivedDimensions.height);
+    }
+
+    @Test
+    public void shouldNotReceiveReportIfRoomIsDisconnected() throws InterruptedException {
+        // Connect Alice to room with both video and audio track
+        aliceLocalMedia.addAudioTrack(true);
+        aliceLocalMedia.addVideoTrack(true, new FakeVideoCapturer());
+        aliceRoom = createRoom(aliceVideoClient, aliceListener, roomName, aliceLocalMedia);
+        aliceListener.onParticipantConnectedLatch = new CountDownLatch(1);
+
+        // Connect Bob to room with both video and audio track
+        bobLocalMedia.addAudioTrack(true);
+        bobLocalMedia.addVideoTrack(true, new FakeVideoCapturer());
+        bobRoom = createRoom(bobVideoClient, bobListener, roomName, bobLocalMedia);
+        assertTrue(aliceListener.onParticipantConnectedLatch.await(20, TimeUnit.SECONDS));
+        CallbackHelper.FakeStatsListener aliceStatsListener =
+                new CallbackHelper.FakeStatsListener();
+        aliceStatsListener.onStatsLatch = new CountDownLatch(1);
+
+        // let's give peer connection some time to get media flowing
+        Thread.sleep(2000);
+
+        aliceListener.onDisconnectedLatch = new CountDownLatch(1);
+        aliceRoom.disconnect();
+
+        // call get stats immediately after disconnect
+        aliceRoom.getStats(aliceStatsListener);
+        assertFalse(aliceStatsListener.onStatsLatch.await(5, TimeUnit.SECONDS));
+
+        // wait for disconnect
+        assertTrue(aliceListener.onDisconnectedLatch.await(20, TimeUnit.SECONDS));
+        Thread.sleep(2000);
+        bobListener.onDisconnectedLatch = new CountDownLatch(1);
+        bobRoom.disconnect();
+        assertTrue(bobListener.onDisconnectedLatch.await(20, TimeUnit.SECONDS));
+
+        // call get stats after room has been disconnected
+        aliceStatsListener =
+                new CallbackHelper.FakeStatsListener();
+        aliceStatsListener.onStatsLatch = new CountDownLatch(1);
+        aliceRoom.getStats(aliceStatsListener);
+        assertFalse(aliceStatsListener.onStatsLatch.await(5, TimeUnit.SECONDS));
+    }
+
+    private VideoClient createVideoClient() {
+        String identity = RandUtils.generateRandomString(10);
+        String token = AccessTokenUtils.getAccessToken(identity, BuildConfig.REALM);
+        VideoClient videoClient = new VideoClient(mediaTestActivity, token);
+        return videoClient;
+    }
+
+    private Room createRoom(VideoClient videoClient, CallbackHelper.FakeRoomListener listener,
+                            String roomName, LocalMedia localMedia) throws InterruptedException {
+        listener.onConnectedLatch = new CountDownLatch(1);
+
+        ConnectOptions connectOptions = new ConnectOptions.Builder()
+                .roomName(roomName)
+                .localMedia(localMedia)
+                .build();
+        Room room = videoClient.connect(connectOptions, listener);
+        assertTrue(listener.onConnectedLatch.await(20, TimeUnit.SECONDS));
+
+        return room;
+    }
+
+    private void expectStatsReportTracksSize(StatsReport statsReport, int localAudioTrackSize,
+                                             int localVideoTrackSize, int audioTrackSize,
+                                             int videoTrackSize) {
+
+        assertEquals(localAudioTrackSize, statsReport.getLocalAudioTrackStats().size());
+        assertEquals(localVideoTrackSize, statsReport.getLocalVideoTrackStats().size());
+        assertEquals(audioTrackSize, statsReport.getAudioTrackStats().size());
+        assertEquals(videoTrackSize, statsReport.getVideoTrackStats().size());
+    }
+
+    private void checkBaseTrackStats(BaseTrackStats stats) {
+        assertNotEquals("", stats.codecName);
+        assertNotEquals("", stats.ssrc);
+        assertNotEquals("", stats.trackId);
+        // TODO: Packets lost is always 0. Find a way to make test that will exercise this
+        assertTrue(0 <= stats.packetsLost);
+        assertTrue(0.0 < stats.unixTimestamp);
+    }
+
+    private void checkLocalTrackStats(LocalTrackStats stats) {
+        assertTrue(0 < stats.bytesSent);
+        assertTrue(0 < stats.packetsSent);
+        assertTrue(0 < stats.roundTripTime);
+    }
+
+    private void checkTrackStats(TrackStats stats) {
+        assertTrue(0 < stats.bytesReceived);
+        assertTrue(0 < stats.packetsReceived);
+        // Always 0. This field will be removed.
+        //assertTrue(0 < stats.jitterBuffer);
     }
 }

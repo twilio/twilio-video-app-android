@@ -6,6 +6,7 @@ import android.support.annotation.NonNull;
 import android.util.Pair;
 
 import java.lang.annotation.Retention;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -114,18 +115,17 @@ public class Room {
      *
      * @param statsListener listener that receives stats reports for all media tracks.
      */
-    public void getStats(@NonNull  StatsListener statsListener) {
+    public synchronized void getStats(@NonNull StatsListener statsListener) {
         if (statsListener == null) {
             throw new NullPointerException("StatsListener must not be null");
         }
+        if (roomState == RoomState.DISCONNECTED) {
+            return;
+        }
         if (internalStatsListenerImpl == null) {
-            synchronized (this) {
-                if (internalStatsListenerImpl == null) {
-                    internalStatsListenerImpl = new InternalStatsListenerImpl();
-                    internalStatsListenerHandle =
-                            new InternalStatsListenerHandle(internalStatsListenerImpl);
-                }
-            }
+            internalStatsListenerImpl = new InternalStatsListenerImpl();
+            internalStatsListenerHandle =
+                    new InternalStatsListenerHandle(internalStatsListenerImpl);
         }
         statsListenersQueue.offer(
                 new Pair<Handler, StatsListener>(Util.createCallbackHandler(), statsListener));
@@ -158,9 +158,6 @@ public class Room {
 
     synchronized void release() {
         if (nativeRoomContext != 0) {
-            if (internalStatsListenerHandle != null) {
-                internalStatsListenerHandle.release();
-            }
             nativeRelease(nativeRoomContext);
             nativeRoomContext = 0;
             // TODO: Once native video team makes decision about participant strategy
@@ -170,6 +167,11 @@ public class Room {
                 participant.release();
             }
             internalRoomListenerHandle.release();
+            if (internalStatsListenerHandle != null) {
+                internalStatsListenerHandle.release();
+                internalStatsListenerHandle = null;
+            }
+            statsListenersQueue.clear();
         }
     }
 
@@ -349,12 +351,14 @@ public class Room {
 
         public void onStats(final List<StatsReport> statsReports) {
             final Pair<Handler, StatsListener> statsPair = Room.this.statsListenersQueue.poll();
-            statsPair.first.post(new Runnable() {
-                @Override
-                public void run() {
-                    statsPair.second.onStats(statsReports);
-                }
-            });
+            if (statsPair != null) {
+                statsPair.first.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        statsPair.second.onStats(statsReports);
+                    }
+                });
+            }
         }
     }
 

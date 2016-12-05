@@ -86,10 +86,9 @@ public:
             webrtc_jni::GetMethodID(env,
                                     *j_video_dimensions_class_,
                                     "<init>",
-                                    "(II)V"))
-        {
-
+                                    "(II)V")) {
     }
+
     virtual ~AndroidStatsObserver() {
         TS_CORE_LOG_MODULE(twilio::video::kTSCoreLogModulePlatform,
                            twilio::video::kTSCoreLogLevelDebug,
@@ -101,7 +100,7 @@ public:
         observer_deleted_ = true;
         TS_CORE_LOG_MODULE(twilio::video::kTSCoreLogModulePlatform,
                            twilio::video::kTSCoreLogLevelDebug,
-                           "room observer deleted");
+                           "stats observer deleted");
     }
 
 protected:
@@ -113,29 +112,28 @@ protected:
                            twilio::video::kTSCoreLogLevelDebug,
                            "%s", func_name.c_str());
 
-        // Create ArrayList<StatsReport>
-        jobject j_stats_reports = jni()->NewObject(*j_array_list_class_, j_array_list_ctor_id_);
-        for (auto const &stats_report : stats_reports) {
-            webrtc_jni::ScopedLocalRefFrame stats_iteration_ref_frame(jni());
-            jstring j_peerconnection_id =
-                webrtc_jni::JavaStringFromStdString(jni(), stats_report->getPeerConnectionId());
-            jobject j_stats_report = jni()->NewObject(*j_stats_report_class_,
-                                                      j_stats_report_ctor_id_,
-                                                      j_peerconnection_id);
-            processLocalAudioTrackStats(j_stats_report,
-                                        stats_report->getLocalAudioTrackStats());
-            processLocalVideoTrackStats(j_stats_report,
-                                        stats_report->getLocalVideoTrackStats());
-            processAudioTrackStats(j_stats_report, stats_report->getAudioTrackStats());
-            processVideoTrackStats(j_stats_report, stats_report->getVideoTrackStats());
-
-            jni()->CallBooleanMethod(j_stats_reports, j_array_list_add_, j_stats_report);
-        }
-
         {
             rtc::CritScope cs(&deletion_lock_);
             if (!isObserverValid(func_name)) {
                 return;
+            }
+            // Create ArrayList<StatsReport>
+            jobject j_stats_reports = jni()->NewObject(*j_array_list_class_, j_array_list_ctor_id_);
+            for (auto const &stats_report : stats_reports) {
+                webrtc_jni::ScopedLocalRefFrame stats_iteration_ref_frame(jni());
+                jstring j_peerconnection_id =
+                    webrtc_jni::JavaStringFromStdString(jni(), stats_report->getPeerConnectionId());
+                jobject j_stats_report = jni()->NewObject(*j_stats_report_class_,
+                                                          j_stats_report_ctor_id_,
+                                                          j_peerconnection_id);
+                processLocalAudioTrackStats(j_stats_report,
+                                            stats_report->getLocalAudioTrackStats());
+                processLocalVideoTrackStats(j_stats_report,
+                                            stats_report->getLocalVideoTrackStats());
+                processAudioTrackStats(j_stats_report, stats_report->getAudioTrackStats());
+                processVideoTrackStats(j_stats_report, stats_report->getVideoTrackStats());
+
+                jni()->CallBooleanMethod(j_stats_reports, j_array_list_add_, j_stats_report);
             }
 
             jni()->CallVoidMethod(*j_stats_observer_, j_on_stats_id_, j_stats_reports);
