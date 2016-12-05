@@ -100,7 +100,7 @@ public:
         observer_deleted_ = true;
         TS_CORE_LOG_MODULE(twilio::video::kTSCoreLogModulePlatform,
                            twilio::video::kTSCoreLogLevelDebug,
-                           "stats observer deleted");
+                           "android stats observer deleted");
     }
 
 protected:
@@ -149,14 +149,14 @@ private:
         if (observer_deleted_) {
             TS_CORE_LOG_MODULE(twilio::video::kTSCoreLogModulePlatform,
                                twilio::video::kTSCoreLogLevelWarning,
-                               "stats observer is marked for deletion, skipping %s callback",
+                               "android stats observer is marked for deletion, skipping %s callback",
                                callbackName.c_str());
             return false;
         };
         if (webrtc_jni::IsNull(jni(), *j_stats_observer_)) {
             TS_CORE_LOG_MODULE(twilio::video::kTSCoreLogModulePlatform,
                                twilio::video::kTSCoreLogLevelWarning,
-                               "stats observer reference has been destroyed, skipping %s callback",
+                               "android stats observer reference has been destroyed, skipping %s callback",
                                callbackName.c_str());
             return false;
         }
