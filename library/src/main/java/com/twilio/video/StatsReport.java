@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Stats report contains stats for all the media track that exist in peer connection.
+ * Stats report contains stats for all the media tracks that exist in peer connection.
  */
 public class StatsReport {
     private final String peerConnectionId;
