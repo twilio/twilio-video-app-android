@@ -2,11 +2,16 @@ package com.twilio.video;
 
 import android.os.Handler;
 import android.support.annotation.IntDef;
+import android.support.annotation.NonNull;
+import android.util.Pair;
 
 import java.lang.annotation.Retention;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 import static java.lang.annotation.RetentionPolicy.SOURCE;
 
@@ -46,9 +51,13 @@ public class Room {
     private Map<String, Participant> participantMap = new HashMap<>();
     private InternalRoomListenerHandle internalRoomListenerHandle;
     private InternalRoomListenerImpl internalRoomListenerImpl;
+    private InternalStatsListenerHandle internalStatsListenerHandle;
+    private InternalStatsListenerImpl internalStatsListenerImpl;
     private LocalParticipant localParticipant;
     private final Room.Listener listener;
     private final Handler handler;
+    private Queue<Pair<Handler, StatsListener>> statsListenersQueue;
+
 
     Room(String name, LocalMedia localMedia, Room.Listener listener, Handler handler) {
         this.name = name;
@@ -59,6 +68,7 @@ public class Room {
         this.internalRoomListenerImpl = new InternalRoomListenerImpl();
         this.internalRoomListenerHandle = new InternalRoomListenerHandle(internalRoomListenerImpl);
         this.handler = handler;
+        this.statsListenersQueue = new ConcurrentLinkedQueue<>();
     }
 
     /**
@@ -101,6 +111,29 @@ public class Room {
     }
 
     /**
+     * Retrieve stats for all media tracks and notify {@link StatsListener} via calling thread.
+     * In case where room is in {@link RoomState#DISCONNECTED} state, reports won't be delivered.
+     *
+     * @param statsListener listener that receives stats reports for all media tracks.
+     */
+    public synchronized void getStats(@NonNull StatsListener statsListener) {
+        if (statsListener == null) {
+            throw new NullPointerException("StatsListener must not be null");
+        }
+        if (roomState == RoomState.DISCONNECTED) {
+            return;
+        }
+        if (internalStatsListenerImpl == null) {
+            internalStatsListenerImpl = new InternalStatsListenerImpl();
+            internalStatsListenerHandle =
+                    new InternalStatsListenerHandle(internalStatsListenerImpl);
+        }
+        statsListenersQueue.offer(
+                new Pair<Handler, StatsListener>(Util.createCallbackHandler(), statsListener));
+        nativeGetStats(nativeRoomContext, internalStatsListenerHandle.get());
+    }
+
+    /**
      * Disconnects from the room.
      */
     public synchronized void disconnect() {
@@ -135,6 +168,11 @@ public class Room {
                 participant.release();
             }
             internalRoomListenerHandle.release();
+            if (internalStatsListenerHandle != null) {
+                internalStatsListenerHandle.release();
+                internalStatsListenerHandle = null;
+            }
+            statsListenersQueue.clear();
         }
     }
 
@@ -305,6 +343,43 @@ public class Room {
         protected native void nativeRelease(long nativeHandle);
     }
 
+    // JNI Callbacks Interface
+    interface InternalStatsListener {
+        void onStats(List<StatsReport> statsReports);
+    }
+
+    class InternalStatsListenerImpl implements InternalStatsListener{
+
+        public void onStats(final List<StatsReport> statsReports) {
+            final Pair<Handler, StatsListener> statsPair = Room.this.statsListenersQueue.poll();
+            if (statsPair != null) {
+                statsPair.first.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        statsPair.second.onStats(statsReports);
+                    }
+                });
+            }
+        }
+    }
+
+    class InternalStatsListenerHandle extends NativeHandle {
+
+        public InternalStatsListenerHandle(InternalStatsListener listener) {
+            super(listener);
+        }
+
+        /*
+         * Native Handle
+         */
+        @Override
+        protected native long nativeCreate(Object object);
+
+        @Override
+        protected native void nativeRelease(long nativeHandle);
+    }
+
     private native void nativeDisconnect(long nativeRoomContext);
+    private native void nativeGetStats(long nativeRoomContext, long nativeStatsObserver);
     private native void nativeRelease(long nativeRoomContext);
 }

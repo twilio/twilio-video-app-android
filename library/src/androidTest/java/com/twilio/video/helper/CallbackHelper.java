@@ -6,8 +6,11 @@ import com.twilio.video.Media;
 import com.twilio.video.Participant;
 import com.twilio.video.Room;
 import com.twilio.video.RoomException;
+import com.twilio.video.StatsListener;
+import com.twilio.video.StatsReport;
 import com.twilio.video.VideoTrack;
 
+import java.util.List;
 import java.util.concurrent.CountDownLatch;
 
 public class CallbackHelper {
@@ -137,6 +140,27 @@ public class CallbackHelper {
         @Override
         public void onVideoTrackDisabled(Media media, VideoTrack videoTrack) {
             triggerLatch(onVideoTrackDisabledLatch);
+        }
+    }
+
+    public static class FakeStatsListener implements StatsListener {
+        private List<StatsReport> statsReports;
+        public CountDownLatch onStatsLatch;
+
+        private void triggerLatch(CountDownLatch latch) {
+            if (latch != null) {
+                latch.countDown();
+            }
+        }
+
+        @Override
+        public void onStats(List<StatsReport> statsReports) {
+            this.statsReports = statsReports;
+            triggerLatch(onStatsLatch);
+        }
+
+        public List<StatsReport> getStatsReports() {
+            return statsReports;
         }
     }
 }
