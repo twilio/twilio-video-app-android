@@ -50,3 +50,6 @@ sdk/libs/
 
 # Screenshots
 .gradletasknamecache
+
+# Cmake
+**/.externalNativeBuild

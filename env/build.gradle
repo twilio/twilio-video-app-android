@@ -1,35 +1,39 @@
-apply plugin: 'com.android.model.library'
+apply plugin: 'com.android.library'
 
-model {
-    android {
-        compileSdkVersion 25
-        buildToolsVersion "25.0.0"
+android {
+    compileSdkVersion 25
+    buildToolsVersion "25.0.0"
 
-        defaultConfig.with {
-            minSdkVersion.apiLevel 16
-            targetSdkVersion.apiLevel 25
-            versionName "1.0"
-            versionCode 1
+    defaultConfig {
+        minSdkVersion 16
+        targetSdkVersion 25
 
-            testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        versionName "1.0"
+        versionCode 1
 
-        }
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
-        ndk {
-            moduleName = 'env-jni'
-            toolchain = 'clang'
-            CFlags.addAll(['-Wall'])
-        }
-
-        buildTypes {
-            debug {
-                ndk {
-                    debuggable true
-                }
+        externalNativeBuild {
+            cmake {
+                arguments '-DANDROID_TOOLCHAIN=clang'
             }
-            release {
-                minifyEnabled false
+        }
+    }
+
+    buildTypes {
+        debug {
+            ndk {
+                debuggable true
             }
+        }
+        release {
+            minifyEnabled false
+        }
+    }
+
+    externalNativeBuild {
+        cmake {
+            path "CMakeLists.txt"
         }
     }
 }
