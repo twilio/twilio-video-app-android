@@ -112,6 +112,7 @@ public class Room {
 
     /**
      * Retrieve stats for all media tracks and notify {@link StatsListener} via calling thread.
+     * In case where room is in {@link RoomState#DISCONNECTED} state, reports won't be delivered.
      *
      * @param statsListener listener that receives stats reports for all media tracks.
      */
