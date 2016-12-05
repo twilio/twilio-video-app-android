@@ -21,7 +21,7 @@ public class LocalVideoTrackStats extends LocalTrackStats {
      */
     public final int sentFrameRate;
 
-    public LocalVideoTrackStats(String trackId,
+    LocalVideoTrackStats(String trackId,
                                 int packetsLost,
                                 String codecName,
                                 String ssrc,
