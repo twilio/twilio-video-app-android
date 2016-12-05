@@ -16,7 +16,7 @@ public abstract class TrackStats extends BaseTrackStats {
      */
     public final int jitterBuffer;
 
-    public TrackStats(String trackId, int packetsLost,
+    protected TrackStats(String trackId, int packetsLost,
                       String codecName, String ssrc, double unixTimestamp,
                       long bytesReceived, int packetsReceived, int jitterBuffer) {
         super(trackId, packetsLost, codecName, ssrc, unixTimestamp);

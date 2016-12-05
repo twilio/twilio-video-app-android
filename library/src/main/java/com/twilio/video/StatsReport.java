@@ -14,7 +14,7 @@ public class StatsReport {
     private List<AudioTrackStats> audioTracksStats = new ArrayList<>();
     private List<VideoTrackStats> videoTracksStats = new ArrayList<>();
 
-    public StatsReport(String peerConnectionId) {
+    StatsReport(String peerConnectionId) {
         this.peerConnectionId = peerConnectionId;
     }
 

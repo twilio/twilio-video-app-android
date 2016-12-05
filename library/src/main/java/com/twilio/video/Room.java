@@ -158,6 +158,9 @@ public class Room {
 
     synchronized void release() {
         if (nativeRoomContext != 0) {
+            if (internalStatsListenerHandle != null) {
+                internalStatsListenerHandle.release();
+            }
             nativeRelease(nativeRoomContext);
             nativeRoomContext = 0;
             // TODO: Once native video team makes decision about participant strategy

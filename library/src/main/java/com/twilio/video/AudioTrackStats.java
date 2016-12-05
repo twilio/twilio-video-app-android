@@ -11,7 +11,7 @@ public class AudioTrackStats extends TrackStats {
      */
     public final int jitterReceived;
 
-    public AudioTrackStats(String trackId,
+    AudioTrackStats(String trackId,
                            int packetsLost,
                            String codecName,
                            String ssrc,

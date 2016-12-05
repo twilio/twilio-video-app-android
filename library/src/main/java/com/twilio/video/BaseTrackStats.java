@@ -27,7 +27,7 @@ public abstract class BaseTrackStats {
      */
     public final double unixTimestamp;
 
-    public BaseTrackStats(String trackId, int packetsLost,
+    protected BaseTrackStats(String trackId, int packetsLost,
                           String codecName, String ssrc, double unixTimestamp) {
         this.trackId = trackId;
         this.packetsLost = packetsLost;

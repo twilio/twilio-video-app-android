@@ -17,7 +17,7 @@ public abstract class LocalTrackStats extends BaseTrackStats {
      */
     public final long roundTripTime;
 
-    public LocalTrackStats(String trackId, int packetsLost,
+    protected LocalTrackStats(String trackId, int packetsLost,
                            String codecName, String ssrc, double unixTimestamp,
                            long bytesSent, int packetsSent, long roundTripTime) {
         super(trackId, packetsLost, codecName, ssrc, unixTimestamp);

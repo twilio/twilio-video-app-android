@@ -83,7 +83,7 @@ public class StatsTest extends BaseClientTest {
         assertNotEquals("", stats.codecName);
         assertNotEquals("", stats.ssrc);
         assertNotEquals("", stats.trackId);
-        // TODO: Packets lost is always 0. Find a way to make test that will excersize this
+        // TODO: Packets lost is always 0. Find a way to make test that will exercise this
         assertTrue(0 <= stats.packetsLost);
         assertTrue(0.0 < stats.unixTimestamp);
     }

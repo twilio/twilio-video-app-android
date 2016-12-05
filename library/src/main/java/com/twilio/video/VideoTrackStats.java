@@ -11,7 +11,7 @@ public class VideoTrackStats extends TrackStats {
      */
     public final int receivedFrameRate;
 
-    public VideoTrackStats(String trackId,
+    VideoTrackStats(String trackId,
                            int packetsLost,
                            String codecName,
                            String ssrc,

@@ -16,7 +16,7 @@ public class LocalAudioTrackStats extends LocalTrackStats {
      */
     public final int jitterBufferMs;
 
-    public LocalAudioTrackStats(String trackId,
+    LocalAudioTrackStats(String trackId,
                                 int packetsLost,
                                 String codecName,
                                 String ssrc,
