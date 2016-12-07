@@ -48,6 +48,8 @@
     <string name="general">General</string>
     <string name="media">Media</string>
     <string name="about">About</string>
+    <string name="identity">Identity</string>
+    <string name="version">Version</string>
 
     <string-array name="realm_array">
         <item>Production</item>

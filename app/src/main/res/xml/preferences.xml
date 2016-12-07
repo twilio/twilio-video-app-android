@@ -43,4 +43,14 @@
             app:pinRadius="36dp"
             app:startKey="pref_min_video_dim" />
     </PreferenceCategory>
+    <PreferenceCategory android:title="@string/about">
+        <Preference
+            android:title="@string/identity"
+            android:summary="Rob"/>
+        <Preference
+            android:title="@string/version"
+            android:summary="1.0.0"/>
+        <Preference
+            android:title="@string/logout"/>
+    </PreferenceCategory>
 </PreferenceScreen>
