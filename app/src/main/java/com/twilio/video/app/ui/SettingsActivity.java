@@ -1,5 +1,6 @@
 package com.twilio.video.app.ui;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -10,6 +11,7 @@ import android.support.v7.preference.PreferenceFragmentCompat;
 import android.support.v7.preference.PreferenceManager;
 import android.view.MenuItem;
 
+import com.twilio.video.app.BuildConfig;
 import com.twilio.video.app.R;
 import com.twilio.video.app.data.Preferences;
 import com.twilio.video.env.Env;
@@ -49,8 +51,8 @@ public class SettingsActivity extends AppCompatActivity {
         sharedPreferences.registerOnSharedPreferenceChangeListener(sharedPreferenceChangeListener);
 
         // Add the preference fragment
-        SettingsFragment settingsFragment = new SettingsFragment();
-        settingsFragment.setLogoutClickListener(logoutClickListener);
+        SettingsFragment settingsFragment = SettingsFragment.newInstance(sharedPreferences,
+                logoutClickListener);
         getSupportFragmentManager()
                 .beginTransaction()
                 .replace(android.R.id.content, settingsFragment)
@@ -82,15 +84,28 @@ public class SettingsActivity extends AppCompatActivity {
     }
 
     public static class SettingsFragment extends PreferenceFragmentCompat {
+        private SharedPreferences sharedPreferences;
         private Preference.OnPreferenceClickListener logoutClickListener;
 
-        void setLogoutClickListener(Preference.OnPreferenceClickListener logoutClickListener) {
-            this.logoutClickListener = logoutClickListener;
+        static SettingsFragment newInstance(SharedPreferences sharedPreferences,
+                                            Preference.OnPreferenceClickListener logoutClickListener) {
+            SettingsFragment settingsFragment = new SettingsFragment();
+
+            settingsFragment.logoutClickListener = logoutClickListener;
+            settingsFragment.sharedPreferences = sharedPreferences;
+
+            return settingsFragment;
         }
 
         @Override
         public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
+            // Add our preference from resources
             addPreferencesFromResource(R.xml.preferences);
+
+            // Fill out the rest of settings
+            String identity = sharedPreferences.getString(Preferences.IDENTITY, null);
+            findPreference(Preferences.IDENTITY).setSummary(identity);
+            findPreference(Preferences.VERSION).setSummary(BuildConfig.VERSION_NAME);
             findPreference(Preferences.LOGOUT).setOnPreferenceClickListener(logoutClickListener);
         }
     }
