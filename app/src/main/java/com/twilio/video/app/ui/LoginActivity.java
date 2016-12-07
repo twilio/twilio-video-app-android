@@ -9,23 +9,19 @@ import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.text.TextUtils;
 import android.view.HapticFeedbackConstants;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.Spinner;
-import android.widget.TextView;
 import android.widget.Toast;
 
-import com.twilio.video.app.BuildConfig;
 import com.twilio.video.app.R;
 import com.twilio.video.app.base.BaseActivity;
 import com.twilio.video.app.util.SimpleSignalingUtils;
 import com.twilio.video.LogLevel;
 import com.twilio.video.VideoClient;
-import com.twilio.video.env.Env;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -89,11 +85,11 @@ public class LoginActivity extends BaseActivity {
     }
 
     @OnTextChanged(R.id.username_edittext)
-    public void onTextChanged(CharSequence charSequence, int start, int count, int after) {
-        if(after == 0) {
-            loginButton.setTextColor(ContextCompat.getColor(LoginActivity.this, R.color.colorButtonText));
-        } else {
+    public void onTextChanged(CharSequence username, int start, int count, int after) {
+        if(!TextUtils.isEmpty(username)) {
             loginButton.setTextColor(ContextCompat.getColor(LoginActivity.this, android.R.color.white));
+        } else {
+            loginButton.setTextColor(ContextCompat.getColor(LoginActivity.this, R.color.colorButtonText));
         }
     }
 
