@@ -42,7 +42,6 @@ public class LoginActivity extends BaseActivity {
 
     @BindView(R.id.username_edittext) EditText usernameEditText;
     @BindView(R.id.login_button) Button loginButton;
-    @BindView(R.id.version_textview) TextView versionText;
     @BindView(R.id.realm_spinner) Spinner realmSpinner;
     @BindView(R.id.topology_spinner) Spinner topologySpinner;
 
@@ -59,8 +58,6 @@ public class LoginActivity extends BaseActivity {
 
         setContentView(R.layout.activity_login);
         ButterKnife.bind(this);
-
-        versionText.setText(BuildConfig.VERSION_NAME);
 
         realmSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override

@@ -52,17 +52,14 @@
                 android:layout_gravity="center_horizontal"
                 android:src="@drawable/video_logo_splash"/>
 
-            <TextView
-                android:id="@+id/version_textview"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textColor="@color/white"
-                android:textAppearance="?android:attr/textAppearanceSmall"
-                android:layout_gravity="center_horizontal"/>
-
             <EditText
                 android:id="@+id/username_edittext"
-                android:layout_margin="@dimen/activity_horizontal_margin"
+                android:layout_marginTop="@dimen/username_margin_top"
+                android:layout_marginLeft="@dimen/activity_horizontal_margin"
+                android:layout_marginStart="@dimen/activity_horizontal_margin"
+                android:layout_marginRight="@dimen/activity_horizontal_margin"
+                android:layout_marginEnd="@dimen/activity_horizontal_margin"
+                android:layout_marginBottom="@dimen/activity_horizontal_margin"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="@string/username"/>
