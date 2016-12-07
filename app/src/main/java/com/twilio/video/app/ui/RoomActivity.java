@@ -164,7 +164,6 @@ public class RoomActivity extends AppCompatActivity {
     private VideoTrack primaryVideoTrack;
     private CameraCapturer cameraCapturer;
     private AlertDialog alertDialog;
-    boolean loggingOut;
     private ScreenCapturer screenCapturer;
     private final ScreenCapturer.Listener screenCapturerListener = new ScreenCapturer.Listener() {
         @Override
@@ -201,7 +200,6 @@ public class RoomActivity extends AppCompatActivity {
         // Setup activity
         processActivityIntent(getIntent().getExtras());
         updateUi(RoomState.DISCONNECTED);
-        loggingOut = false;
 
         // Setup video constraints
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
@@ -287,9 +285,6 @@ public class RoomActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.log_out_menu_item:
-                logout();
-                return true;
             case R.id.switch_camera_menu_item:
                 switchCamera();
                 return true;
@@ -500,23 +495,6 @@ public class RoomActivity extends AppCompatActivity {
             joinIcon = R.drawable.ic_add_circle_white_24px;
         }
         connectImageButton.setImageResource(joinIcon);
-    }
-
-    private void logout() {
-        // Will logout after disconnecting from the room
-        loggingOut = true;
-        // Disconnect from the current room
-        if (room != null && room.getState() != RoomState.DISCONNECTED) {
-            room.disconnect();
-        } else {
-            returnToVideoClientLogin();
-        }
-    }
-
-    private void returnToVideoClientLogin(){
-        Intent registrationIntent = new Intent(RoomActivity.this, LoginActivity.class);
-        startActivity(registrationIntent);
-        finish();
     }
 
     private void switchCamera() {
@@ -778,9 +756,6 @@ public class RoomActivity extends AppCompatActivity {
                 removeAllParticipants();
                 updateUi(RoomState.DISCONNECTED);
                 RoomActivity.this.room = null;
-                if (loggingOut) {
-                    returnToVideoClientLogin();
-                }
             }
 
             @Override

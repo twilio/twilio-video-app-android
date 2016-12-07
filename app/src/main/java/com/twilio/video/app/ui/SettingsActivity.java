@@ -1,5 +1,6 @@
 package com.twilio.video.app.ui;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -58,5 +59,11 @@ public class SettingsActivity extends AppCompatActivity {
         public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
             addPreferencesFromResource(R.xml.preferences);
         }
+    }
+
+    private void logout() {
+        Intent registrationIntent = new Intent(this, LoginActivity.class);
+        startActivity(registrationIntent);
+        finish();
     }
 }
