@@ -54,7 +54,7 @@ import com.twilio.video.VideoView;
 import com.twilio.video.app.R;
 import com.twilio.video.app.data.Preferences;
 import com.twilio.video.app.dialog.Dialog;
-import com.twilio.video.app.util.SimpleSignalingUtils;
+import com.twilio.video.app.util.SimplerSignalingUtils;
 
 import java.util.Map;
 
@@ -115,7 +115,7 @@ public class RoomActivity extends AppCompatActivity {
         @Override
         public void onTokenWillExpire(final AccessManager accessManager) {
             Timber.i("Access token will expire in three minutes");
-            SimpleSignalingUtils.getAccessToken(username, realm, topology, new Callback<String>() {
+            SimplerSignalingUtils.getAccessToken(username, realm, topology, new Callback<String>() {
                 @Override
                 public void success(String token, Response response) {
                     Timber.i("Access token updated");
