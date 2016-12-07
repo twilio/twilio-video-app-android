@@ -22,7 +22,7 @@ import android.widget.Toast;
 import com.twilio.video.app.BuildConfig;
 import com.twilio.video.app.R;
 import com.twilio.video.app.base.BaseActivity;
-import com.twilio.video.app.util.SimpleSignalingUtils;
+import com.twilio.video.app.util.SimplerSignalingUtils;
 import com.twilio.video.LogLevel;
 import com.twilio.video.VideoClient;
 import com.twilio.video.env.Env;
@@ -36,7 +36,7 @@ import retrofit.RetrofitError;
 import retrofit.client.Response;
 import timber.log.Timber;
 
-import static com.twilio.video.app.util.SimpleSignalingUtils.P2P;
+import static com.twilio.video.app.util.SimplerSignalingUtils.P2P;
 
 public class LoginActivity extends BaseActivity {
 
@@ -65,7 +65,7 @@ public class LoginActivity extends BaseActivity {
         realmSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                realm = SimpleSignalingUtils.REALMS.get(position);
+                realm = SimplerSignalingUtils.REALMS.get(position);
                 Env.set(LoginActivity.this, TWILIO_ENV_KEY, getResources().getStringArray(R.array.realm_array)[position], true);
             }
 
@@ -161,7 +161,7 @@ public class LoginActivity extends BaseActivity {
     }
 
     private void obtainCapabilityToken(final String username, final String realm) {
-        SimpleSignalingUtils.getAccessToken(username,
+        SimplerSignalingUtils.getAccessToken(username,
                 realm, topology, new Callback<String>() {
 
             @Override
@@ -193,10 +193,10 @@ public class LoginActivity extends BaseActivity {
         Timber.i("Start VideoClient");
 
         Intent intent = new Intent(this, RoomActivity.class);
-        intent.putExtra(SimpleSignalingUtils.CAPABILITY_TOKEN, capabilityToken);
-        intent.putExtra(SimpleSignalingUtils.REALM, realm);
-        intent.putExtra(SimpleSignalingUtils.TOPOLOGY, topology);
-        intent.putExtra(SimpleSignalingUtils.USERNAME, usernameEditText.getText().toString());
+        intent.putExtra(SimplerSignalingUtils.CAPABILITY_TOKEN, capabilityToken);
+        intent.putExtra(SimplerSignalingUtils.REALM, realm);
+        intent.putExtra(SimplerSignalingUtils.TOPOLOGY, topology);
+        intent.putExtra(SimplerSignalingUtils.USERNAME, usernameEditText.getText().toString());
 
         VideoClient.setLogLevel(LogLevel.DEBUG);
 

@@ -7,7 +7,6 @@ import com.twilio.video.app.model.TwilioIceResponse;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import retrofit.Callback;
@@ -17,7 +16,7 @@ import retrofit.converter.GsonConverter;
 import retrofit.http.GET;
 import retrofit.http.QueryMap;
 
-public class SimpleSignalingUtils {
+public class SimplerSignalingUtils {
     public static final String CAPABILITY_TOKEN = "capability_token";
     public static final String USERNAME = "username";
     public static final String REALM = "realm";
@@ -42,7 +41,7 @@ public class SimpleSignalingUtils {
     public static final String TTL = "300";
     
     /* Define the Retrofit Token Service */
-    interface SimpleSignalingApi {
+    interface SimplerSignalingApi {
         @GET("/access-token")
         void getAccessToken(@QueryMap Map<String, String> options,
                             Callback<String> tokenCallback);
@@ -67,12 +66,12 @@ public class SimpleSignalingUtils {
         }
     }
 
-    private static SimpleSignalingApi simpleSignalingService = new RestAdapter.Builder()
-            .setEndpoint("https://simple-signaling.appspot.com")
+    private static SimplerSignalingApi simplerSignalingService = new RestAdapter.Builder()
+            .setEndpoint("https://simpler-signaling.appspot.com")
             .setRequestInterceptor(new TwilioAuthorizationInterceptor())
             .setConverter(new GsonConverter(new GsonBuilder().create()))
             .build()
-            .create(SimpleSignalingApi.class);
+            .create(SimplerSignalingApi.class);
 
 
     public static void getAccessToken(String username, String realm,
@@ -82,7 +81,7 @@ public class SimpleSignalingUtils {
         options.put("identity", username);
         options.put("ttl", TTL);
         options.put("configurationProfileSid", getProfileConfigSid(realm, topology));
-        simpleSignalingService.getAccessToken(options, callback);
+        simplerSignalingService.getAccessToken(options, callback);
     }
 
     private static String getProfileConfigSid(String realm, String topology) {
