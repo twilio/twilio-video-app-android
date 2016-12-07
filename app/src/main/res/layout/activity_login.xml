@@ -63,21 +63,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="@string/username"/>
-
-            <Spinner
-                android:id="@+id/realm_spinner"
-                android:layout_margin="@dimen/activity_horizontal_margin"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:entries="@array/realm_array"/>
-
-            <Spinner
-                android:id="@+id/topology_spinner"
-                android:layout_margin="@dimen/activity_horizontal_margin"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:entries="@array/topology_array"/>
-
         </LinearLayout>
     </ScrollView>
 

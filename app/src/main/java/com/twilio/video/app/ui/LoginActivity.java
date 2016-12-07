@@ -39,17 +39,14 @@ import timber.log.Timber;
 import static com.twilio.video.app.util.SimpleSignalingUtils.P2P;
 
 public class LoginActivity extends BaseActivity {
-
-    @BindView(R.id.username_edittext) EditText usernameEditText;
-    @BindView(R.id.login_button) Button loginButton;
-    @BindView(R.id.realm_spinner) Spinner realmSpinner;
-    @BindView(R.id.topology_spinner) Spinner topologySpinner;
-
     public static final int PERMISSIONS_REQUEST_CODE = 0;
     public static final String TWILIO_ENV_KEY = "TWILIO_ENVIRONMENT";
 
+    @BindView(R.id.username_edittext) EditText usernameEditText;
+    @BindView(R.id.login_button) Button loginButton;
+
     private ProgressDialog progressDialog;
-    private String realm;
+    private String realm = "prod";
     private String topology = P2P;
 
     @Override
@@ -59,30 +56,31 @@ public class LoginActivity extends BaseActivity {
         setContentView(R.layout.activity_login);
         ButterKnife.bind(this);
 
-        realmSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                realm = SimpleSignalingUtils.REALMS.get(position);
-                Env.set(LoginActivity.this, TWILIO_ENV_KEY, getResources().getStringArray(R.array.realm_array)[position], true);
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-
-            }
-        });
-
-        topologySpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                topology = getResources().getStringArray(R.array.topology_array)[position];
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-
-            }
-        });
+        // TODO Add to settings
+//        realmSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+//            @Override
+//            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+//                realm = SimpleSignalingUtils.REALMS.get(position);
+//                Env.set(LoginActivity.this, TWILIO_ENV_KEY, getResources().getStringArray(R.array.realm_array)[position], true);
+//            }
+//
+//            @Override
+//            public void onNothingSelected(AdapterView<?> parent) {
+//
+//            }
+//        });
+//
+//        topologySpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+//            @Override
+//            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+//                topology = getResources().getStringArray(R.array.topology_array)[position];
+//            }
+//
+//            @Override
+//            public void onNothingSelected(AdapterView<?> parent) {
+//
+//            }
+//        });
 
         if (!checkPermissions()) {
             requestPermissions();
