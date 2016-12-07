@@ -95,7 +95,7 @@ public class LoginActivity extends BaseActivity {
         if(after == 0) {
             loginButton.setTextColor(ContextCompat.getColor(LoginActivity.this, R.color.colorButtonText));
         } else {
-            loginButton.setTextColor(ContextCompat.getColor(LoginActivity.this, R.color.white));
+            loginButton.setTextColor(ContextCompat.getColor(LoginActivity.this, android.R.color.white));
         }
     }
 
