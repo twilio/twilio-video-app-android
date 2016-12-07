@@ -51,6 +51,7 @@
             android:title="@string/version"
             android:summary="1.0.0"/>
         <Preference
+            android:key="pref_logout"
             android:title="@string/logout"/>
     </PreferenceCategory>
 </PreferenceScreen>

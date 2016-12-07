@@ -5,6 +5,7 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.preference.Preference;
 import android.support.v7.preference.PreferenceFragmentCompat;
 import android.support.v7.preference.PreferenceManager;
 import android.view.MenuItem;
@@ -17,6 +18,8 @@ public class SettingsActivity extends AppCompatActivity {
     private static final String TWILIO_ENV_KEY = "TWILIO_ENVIRONMENT";
     private static final String DEFAULT_REALM = "Production";
 
+    private SharedPreferences sharedPreferences;
+
     private final SharedPreferences.OnSharedPreferenceChangeListener sharedPreferenceChangeListener
             = new SharedPreferences.OnSharedPreferenceChangeListener() {
         @Override
@@ -28,18 +31,29 @@ public class SettingsActivity extends AppCompatActivity {
         }
     };
 
+    private final Preference.OnPreferenceClickListener logoutClickListener =
+            new Preference.OnPreferenceClickListener() {
+                @Override
+                public boolean onPreferenceClick(Preference preference) {
+                    logout();
+                    return true;
+                }
+            };
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         // Register for preference changes
-        PreferenceManager.getDefaultSharedPreferences(this)
-                .registerOnSharedPreferenceChangeListener(sharedPreferenceChangeListener);
+        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        sharedPreferences.registerOnSharedPreferenceChangeListener(sharedPreferenceChangeListener);
 
         // Add the preference fragment
+        SettingsFragment settingsFragment = new SettingsFragment();
+        settingsFragment.setLogoutClickListener(logoutClickListener);
         getSupportFragmentManager()
                 .beginTransaction()
-                .replace(android.R.id.content, new SettingsFragment())
+                .replace(android.R.id.content, settingsFragment)
                 .commit();
     }
 
@@ -54,16 +68,30 @@ public class SettingsActivity extends AppCompatActivity {
         }
     }
 
+    private void logout() {
+        Intent registrationIntent = new Intent(this, LoginActivity.class);
+
+        // Clear all preferences and set defaults
+        sharedPreferences.edit().clear().apply();
+        PreferenceManager.setDefaultValues(this, R.xml.preferences, true);
+
+
+        // Return to login activity
+        startActivity(registrationIntent);
+        finish();
+    }
+
     public static class SettingsFragment extends PreferenceFragmentCompat {
+        private Preference.OnPreferenceClickListener logoutClickListener;
+
+        void setLogoutClickListener(Preference.OnPreferenceClickListener logoutClickListener) {
+            this.logoutClickListener = logoutClickListener;
+        }
+
         @Override
         public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
             addPreferencesFromResource(R.xml.preferences);
+            findPreference(Preferences.LOGOUT).setOnPreferenceClickListener(logoutClickListener);
         }
-    }
-
-    private void logout() {
-        Intent registrationIntent = new Intent(this, LoginActivity.class);
-        startActivity(registrationIntent);
-        finish();
     }
 }
