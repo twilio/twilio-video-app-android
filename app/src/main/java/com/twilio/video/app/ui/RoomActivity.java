@@ -440,10 +440,11 @@ public class RoomActivity extends AppCompatActivity {
     }
 
     private void processActivityIntent(Bundle extras) {
-        username = extras.getString(SimpleSignalingUtils.USERNAME);
-        capabilityToken = extras.getString(SimpleSignalingUtils.CAPABILITY_TOKEN);
-        realm = extras.getString(SimpleSignalingUtils.REALM);
-        topology = extras.getString(SimpleSignalingUtils.TOPOLOGY);
+        // TODO grab from preferences
+        username = "aaron";
+        capabilityToken = "1234";
+        realm = "prod";
+        topology = "P2P";
     }
 
     private void obtainVideoConstraints() {

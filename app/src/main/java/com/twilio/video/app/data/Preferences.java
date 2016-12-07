@@ -1,6 +1,7 @@
 package com.twilio.video.app.data;
 
 public class Preferences {
+    public static final String IDENTITY = "pref_identity";
     public static final String REALM = "pref_realm";
     public static final String TOPOLOGY = "pref_topology";
     public static final String MIN_FPS = "pref_min_fps";
