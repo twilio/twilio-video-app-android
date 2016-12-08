@@ -33,7 +33,10 @@
             android:theme="@style/AppTheme.LoginScreen"
             android:windowSoftInputMode="adjustResize|stateAlwaysHidden"/>
         <activity android:name="net.hockeyapp.android.UpdateActivity"/>
-        <activity android:name=".ui.RoomActivity" android:configChanges="orientation|screenSize" />
+        <activity
+            android:name=".ui.RoomActivity"
+            android:configChanges="orientation|screenSize"
+            android:theme="@style/AppTheme.Lobby"/>
         <activity android:name=".ui.SettingsActivity"
             android:parentActivityName=".ui.RoomActivity"
             android:label="@string/settings"

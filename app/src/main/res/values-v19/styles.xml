@@ -1,17 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
+
     <style name="AppTheme.NoActionBar">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
         <item name="windowActionModeOverlay">true</item>
-        <item name="android:windowDrawsSystemBarBackgrounds">true</item>
-        <item name="android:statusBarColor">@android:color/transparent</item>
-    </style>
-    <style name="AppTheme.SplashScreen" parent="AppTheme.NoActionBar">
-        <item name="android:statusBarColor">@color/colorPrimaryDark</item>
-        <item name="android:windowBackground">@drawable/splash_screen</item>
-    </style>
-    <style name="AppTheme.LoginScreen" parent="AppTheme.NoActionBar">
-        <item name="android:statusBarColor">@color/colorPrimaryDark</item>
     </style>
 
     <style name="AppTheme.Lobby" parent="AppTheme.NoActionBar">
@@ -24,6 +17,5 @@
         <item name="android:textColorHint">@color/lobbyHint</item>
 
         <item name="android:windowTranslucentStatus">true</item>
-        <item name="android:statusBarColor">@color/lobbyToolbar</item>
     </style>
 </resources>
