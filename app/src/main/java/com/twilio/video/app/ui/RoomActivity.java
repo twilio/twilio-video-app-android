@@ -55,6 +55,7 @@ import com.twilio.video.app.data.Preferences;
 import com.twilio.video.app.dialog.Dialog;
 import com.twilio.video.app.util.SimplerSignalingUtils;
 
+import java.net.HttpURLConnection;
 import java.util.Map;
 
 import butterknife.BindView;
@@ -511,7 +512,7 @@ public class RoomActivity extends AppCompatActivity {
         SimplerSignalingUtils.getAccessToken(username, realm, topology, new Callback<String>() {
             @Override
             public void success(String capabilityToken, Response response) {
-                if (response.getStatus() == 200) {
+                if (response.getStatus() == HttpURLConnection.HTTP_OK) {
                     if (videoClient == null) {
                         videoClient = new VideoClient(RoomActivity.this, capabilityToken);
                     } else {
