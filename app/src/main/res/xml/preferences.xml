@@ -46,12 +46,10 @@
     <PreferenceCategory android:title="@string/about">
         <Preference
             android:key="pref_identity"
-            android:title="@string/identity"
-            android:summary="Rob"/>
+            android:title="@string/identity"/>
         <Preference
             android:key="pref_version"
-            android:title="@string/version"
-            android:summary="1.0.0"/>
+            android:title="@string/version"/>
         <Preference
             android:key="pref_logout"
             android:title="@string/logout"/>
