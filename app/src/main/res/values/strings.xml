@@ -21,6 +21,7 @@
     <string name="ice_options">Enable ICE options</string>
     <string name="ice_transp_policy">Transportation policy</string>
     <string name="environment_string">Environment</string>
+    <string name="topology">Topology</string>
     <string name="stun_turn">STUN or TURN server</string>
     <string name="add_server">Add</string>
     <string name="ice_servers_dialog_title">ICE Options</string>
@@ -56,7 +57,7 @@
         <item>Development</item>
     </string-array>
 
-    <string-array name="realm_array_values">
+    <string-array name="environment_array_values">
         <item>prod</item>
         <item>stage</item>
         <item>dev</item>

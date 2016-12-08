@@ -4,11 +4,11 @@
     <PreferenceCategory android:title="@string/general">
         <ListPreference
             android:defaultValue="prod"
-            android:entries="@array/realm_array"
-            android:entryValues="@array/realm_array_values"
+            android:entries="@array/environment_array"
+            android:entryValues="@array/environment_array_values"
             android:key="pref_realm"
             android:summary="%s"
-            android:title="@string/realm_string"
+            android:title="@string/environment_string"
             android:negativeButtonText="@null"/>
         <ListPreference
             android:defaultValue="P2P"
