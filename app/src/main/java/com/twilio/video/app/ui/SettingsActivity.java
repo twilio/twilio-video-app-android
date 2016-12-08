@@ -84,15 +84,16 @@ public class SettingsActivity extends AppCompatActivity {
     }
 
     private void logout() {
-        Intent registrationIntent = new Intent(this, LoginActivity.class);
+        Intent loginIntent = new Intent(this, LoginActivity.class);
 
         // Clear all preferences and set defaults
         sharedPreferences.edit().clear().apply();
         PreferenceManager.setDefaultValues(this, R.xml.preferences, true);
 
         // Return to login activity
-        startActivity(registrationIntent);
-        finish();
+        loginIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        startActivity(loginIntent);
+        finishAffinity();
     }
 
     public static class SettingsFragment extends PreferenceFragmentCompat {
