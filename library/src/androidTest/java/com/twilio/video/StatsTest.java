@@ -60,7 +60,9 @@ public class StatsTest extends BaseClientTest {
     }
 
     @After
-    public void teardown() {
+    public void teardown() throws InterruptedException{
+        roomTearDown(aliceRoom);
+        roomTearDown(bobRoom);
         aliceLocalMedia.release();
         bobLocalMedia.release();;
     }
@@ -243,6 +245,39 @@ public class StatsTest extends BaseClientTest {
     }
 
     @Test
+    public void shouldGetStatsForMultipleRequests() throws InterruptedException {
+        final int numberOfRequests = 10;
+
+        // Connect Alice to room with local audio track only
+        aliceLocalMedia.addAudioTrack(true);
+        aliceRoom = createRoom(aliceVideoClient, aliceListener, roomName, aliceLocalMedia);
+        aliceListener.onParticipantConnectedLatch = new CountDownLatch(1);
+
+        // Connect Bob to room with audio and video track
+        bobLocalMedia.addAudioTrack(true);
+        bobRoom = createRoom(bobVideoClient, bobListener, roomName, bobLocalMedia);
+        assertTrue(aliceListener.onParticipantConnectedLatch.await(20, TimeUnit.SECONDS));
+        assertEquals(1, aliceRoom.getParticipants().size());
+
+        // let's give peer connection some time to get media flowing
+        Thread.sleep(2000);
+
+        // send getStats() requests
+        CallbackHelper.FakeStatsListener aliceStatsListener =
+                new CallbackHelper.FakeStatsListener();
+        aliceStatsListener.onStatsLatch = new CountDownLatch(numberOfRequests);
+        for (int i = 0; i < numberOfRequests; i++) {
+            aliceRoom.getStats(aliceStatsListener);
+        }
+
+        assertTrue(aliceStatsListener.onStatsLatch.await(20, TimeUnit.SECONDS));
+        // check last stats report
+        List<StatsReport> statsReportList = aliceStatsListener.getStatsReports();
+        assertEquals(1, statsReportList.size());
+        expectStatsReportTracksSize(statsReportList.get(0), 1, 0, 1, 0);
+    }
+
+    @Test
     public void reportShouldHaveNonEmptyValues() throws InterruptedException {
         // Connect Alice to room with both video and audio track
         aliceLocalMedia.addAudioTrack(true);
@@ -311,7 +346,44 @@ public class StatsTest extends BaseClientTest {
     }
 
     @Test
-    public void shouldNotReceiveReportIfRoomIsDisconnected() throws InterruptedException {
+    public void shouldReceiveEmptyReportsIfRoomGetsDisconnected() throws InterruptedException {
+        final int numberOfRequests = 10;
+
+        // Connect Alice to room with local audio track only
+        aliceLocalMedia.addAudioTrack(true);
+        aliceRoom = createRoom(aliceVideoClient, aliceListener, roomName, aliceLocalMedia);
+        aliceListener.onParticipantConnectedLatch = new CountDownLatch(1);
+
+        // Connect Bob to room with audio and video track
+        bobLocalMedia.addAudioTrack(true);
+        bobRoom = createRoom(bobVideoClient, bobListener, roomName, bobLocalMedia);
+        assertTrue(aliceListener.onParticipantConnectedLatch.await(20, TimeUnit.SECONDS));
+        assertEquals(1, aliceRoom.getParticipants().size());
+
+        // let's give peer connection some time to get media flowing
+        Thread.sleep(2000);
+
+        // send getStats() requests
+        CallbackHelper.FakeStatsListener aliceStatsListener =
+                new CallbackHelper.FakeStatsListener();
+        aliceStatsListener.onStatsLatch = new CountDownLatch(numberOfRequests);
+        for (int i = 0; i < numberOfRequests; i++) {
+            aliceRoom.getStats(aliceStatsListener);
+        }
+
+        // disconnect from room
+        aliceListener.onDisconnectedLatch = new CountDownLatch(1);
+        aliceRoom.disconnect();
+        assertTrue(aliceListener.onDisconnectedLatch.await(20, TimeUnit.SECONDS));
+
+        assertTrue(aliceStatsListener.onStatsLatch.await(20, TimeUnit.SECONDS));
+        List<StatsReport> statsReportList = aliceStatsListener.getStatsReports();
+        assertEquals(0, statsReportList.size());
+    }
+
+
+    @Test
+    public void shouldNotReceiveReportAfterRoomIsDisconnected() throws InterruptedException {
         // Connect Alice to room with both video and audio track
         aliceLocalMedia.addAudioTrack(true);
         aliceLocalMedia.addVideoTrack(true, new FakeVideoCapturer());
@@ -333,16 +405,9 @@ public class StatsTest extends BaseClientTest {
         aliceListener.onDisconnectedLatch = new CountDownLatch(1);
         aliceRoom.disconnect();
 
-        // call get stats immediately after disconnect
-        aliceRoom.getStats(aliceStatsListener);
-        assertFalse(aliceStatsListener.onStatsLatch.await(5, TimeUnit.SECONDS));
-
         // wait for disconnect
         assertTrue(aliceListener.onDisconnectedLatch.await(20, TimeUnit.SECONDS));
         Thread.sleep(2000);
-        bobListener.onDisconnectedLatch = new CountDownLatch(1);
-        bobRoom.disconnect();
-        assertTrue(bobListener.onDisconnectedLatch.await(20, TimeUnit.SECONDS));
 
         // call get stats after room has been disconnected
         aliceStatsListener =
@@ -371,6 +436,15 @@ public class StatsTest extends BaseClientTest {
         assertTrue(listener.onConnectedLatch.await(20, TimeUnit.SECONDS));
 
         return room;
+    }
+
+    private void roomTearDown(Room room) throws InterruptedException {
+        if (room != null && room.getState() != RoomState.DISCONNECTED) {
+            CallbackHelper.FakeRoomListener roomListener = new CallbackHelper.FakeRoomListener();
+            roomListener.onDisconnectedLatch = new CountDownLatch(1);
+            room.disconnect();
+            roomListener.onDisconnectedLatch.await(10, TimeUnit.SECONDS);
+        }
     }
 
     private void expectStatsReportTracksSize(StatsReport statsReport, int localAudioTrackSize,
