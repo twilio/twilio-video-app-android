@@ -43,14 +43,14 @@ public class LoginActivity extends BaseActivity {
     @BindView(R.id.username_edittext) EditText usernameEditText;
     @BindView(R.id.login_button) Button loginButton;
     @BindView(R.id.version_textview) TextView versionText;
-    @BindView(R.id.realm_spinner) Spinner realmSpinner;
+    @BindView(R.id.environment_spinner) Spinner environmentSpinner;
     @BindView(R.id.topology_spinner) Spinner topologySpinner;
 
     public static final int PERMISSIONS_REQUEST_CODE = 0;
     public static final String TWILIO_ENV_KEY = "TWILIO_ENVIRONMENT";
 
     private ProgressDialog progressDialog;
-    private String realm;
+    private String environment;
     private String topology = P2P;
 
     @Override
@@ -62,11 +62,11 @@ public class LoginActivity extends BaseActivity {
 
         versionText.setText(BuildConfig.VERSION_NAME);
 
-        realmSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+        environmentSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                realm = SimplerSignalingUtils.REALMS.get(position);
-                Env.set(LoginActivity.this, TWILIO_ENV_KEY, getResources().getStringArray(R.array.realm_array)[position], true);
+                environment = SimplerSignalingUtils.ENVIRONMENTS.get(position);
+                Env.set(LoginActivity.this, TWILIO_ENV_KEY, getResources().getStringArray(R.array.environment_array)[position], true);
             }
 
             @Override
@@ -157,12 +157,12 @@ public class LoginActivity extends BaseActivity {
     }
 
     private void registerUser(final String username) {
-        obtainCapabilityToken(username, realm);
+        obtainCapabilityToken(username, environment);
     }
 
-    private void obtainCapabilityToken(final String username, final String realm) {
+    private void obtainCapabilityToken(final String username, final String environment) {
         SimplerSignalingUtils.getAccessToken(username,
-                realm, topology, new Callback<String>() {
+                environment, topology, new Callback<String>() {
 
             @Override
             public void success(String capabilityToken, Response response) {
@@ -194,7 +194,7 @@ public class LoginActivity extends BaseActivity {
 
         Intent intent = new Intent(this, RoomActivity.class);
         intent.putExtra(SimplerSignalingUtils.CAPABILITY_TOKEN, capabilityToken);
-        intent.putExtra(SimplerSignalingUtils.REALM, realm);
+        intent.putExtra(SimplerSignalingUtils.ENVIRONMENT, environment);
         intent.putExtra(SimplerSignalingUtils.TOPOLOGY, topology);
         intent.putExtra(SimplerSignalingUtils.USERNAME, usernameEditText.getText().toString());
 

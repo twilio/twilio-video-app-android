@@ -19,7 +19,7 @@ import retrofit.http.QueryMap;
 public class SimplerSignalingUtils {
     public static final String CAPABILITY_TOKEN = "capability_token";
     public static final String USERNAME = "username";
-    public static final String REALM = "realm";
+    public static final String ENVIRONMENT = "environment";
     public static final String TOPOLOGY = "topology";
 
     public static final String PROD = "prod";
@@ -28,7 +28,7 @@ public class SimplerSignalingUtils {
 
     public static final String P2P = "P2P";
 
-    public static final ArrayList<String> REALMS = new ArrayList<String>() {{
+    public static final ArrayList<String> ENVIRONMENTS = new ArrayList<String>() {{
         add(PROD);
         add(STAGE);
         add(DEV);
@@ -73,20 +73,21 @@ public class SimplerSignalingUtils {
             .build()
             .create(SimplerSignalingApi.class);
 
-
-    public static void getAccessToken(String username, String realm,
-                                      String topology, Callback<String> callback) {
+    public static void getAccessToken(String username,
+                                      String environment,
+                                      String topology,
+                                      Callback<String> callback) {
         HashMap<String,String> options = new HashMap<>();
-        options.put(REALM, realm);
+        options.put("environment", environment);
         options.put("identity", username);
         options.put("ttl", TTL);
-        options.put("configurationProfileSid", getProfileConfigSid(realm, topology));
+        options.put("configurationProfileSid", getProfileConfigSid(environment, topology));
         simplerSignalingService.getAccessToken(options, callback);
     }
 
-    private static String getProfileConfigSid(String realm, String topology) {
+    private static String getProfileConfigSid(String environment, String topology) {
         boolean isP2P = topology.equals(P2P);
-        switch(realm) {
+        switch(environment) {
             case DEV:
                 return isP2P ? "VSbf4c8aee1e259d11b2c5adeebb7c0dbe" : "VS6469e95f0b2e2c8f931086988d69f815";
             case STAGE:

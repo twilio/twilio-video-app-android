@@ -419,7 +419,7 @@ public class StatsTest extends BaseClientTest {
 
     private VideoClient createVideoClient() {
         String identity = RandUtils.generateRandomString(10);
-        String token = AccessTokenUtils.getAccessToken(identity, BuildConfig.REALM);
+        String token = AccessTokenUtils.getAccessToken(identity);
         VideoClient videoClient = new VideoClient(mediaTestActivity, token);
         return videoClient;
     }

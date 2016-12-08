@@ -24,7 +24,7 @@ android {
 
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
-        buildConfigField "String", "REALM", "\"${getRealm()}\""
+        buildConfigField "String", "ENVIRONMENT", "\"${getEnvironment()}\""
 
         ndk {
             abiFilters 'x86', 'x86_64', 'armeabi-v7a', 'arm64-v8a'
@@ -259,26 +259,26 @@ def getNdkDir() {
     return ndkHome
 }
 
-def getRealm() {
-    // Possible values for REALM are 'prod', 'stage', and 'dev'.
+def getEnvironment() {
+    // Possible values for ENVIRONMENT are 'prod', 'stage', and 'dev'.
 
     // Attempt to get it from the environment variable
-    def realm = System.getenv("REALM");
+    def environment = System.getenv("ENVIRONMENT");
 
-    if (realm == null) {
-        println "Could not locate REALM environment variable. Trying local.properties"
+    if (environment == null) {
+        println "Could not locate ENVIRONMENT environment variable. Trying local.properties"
         Properties properties = new Properties()
         if (project.rootProject.file('local.properties').exists()) {
             properties.load(project.rootProject.file('local.properties').newDataInputStream())
-            realm = properties.getProperty('REALM')
+            environment = properties.getProperty('ENVIRONMENT')
         }
     }
 
-    if (realm == null) {
-        println "Could not locate REALM in local.properties."
-        realm = "prod"
+    if (environment == null) {
+        println "Could not locate ENVIRONMENT in local.properties."
+        environment = "prod"
     }
 
-    println "Realm Environment: " + realm
-    return realm;
+    println "Environment: " + environment
+    return environment;
 }

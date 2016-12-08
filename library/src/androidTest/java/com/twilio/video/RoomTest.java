@@ -46,7 +46,7 @@ public class RoomTest extends BaseClientTest {
         mediaTestActivity = activityRule.getActivity();
         PermissionUtils.allowPermissions(mediaTestActivity);
         identity = RandUtils.generateRandomString(10);
-        token = AccessTokenUtils.getAccessToken(identity, BuildConfig.REALM);
+        token = AccessTokenUtils.getAccessToken(identity);
         videoClient = new VideoClient(mediaTestActivity, token);
         roomName = RandUtils.generateRandomString(20);
         localMedia = LocalMedia.create(mediaTestActivity);

@@ -108,14 +108,14 @@ public class RoomActivity extends AppCompatActivity {
 
     private String username;
     private String capabilityToken;
-    private String realm;
+    private String environment;
     private String topology;
     private AccessManager accessManager;
     private final AccessManager.Listener accessManagerListener = new AccessManager.Listener() {
         @Override
         public void onTokenWillExpire(final AccessManager accessManager) {
             Timber.i("Access token will expire in three minutes");
-            SimplerSignalingUtils.getAccessToken(username, realm, topology, new Callback<String>() {
+            SimplerSignalingUtils.getAccessToken(username, environment, topology, new Callback<String>() {
                 @Override
                 public void success(String token, Response response) {
                     Timber.i("Access token updated");
@@ -442,7 +442,7 @@ public class RoomActivity extends AppCompatActivity {
     private void processActivityIntent(Bundle extras) {
         username = extras.getString(SimplerSignalingUtils.USERNAME);
         capabilityToken = extras.getString(SimplerSignalingUtils.CAPABILITY_TOKEN);
-        realm = extras.getString(SimplerSignalingUtils.REALM);
+        environment = extras.getString(SimplerSignalingUtils.ENVIRONMENT);
         topology = extras.getString(SimplerSignalingUtils.TOPOLOGY);
     }
 

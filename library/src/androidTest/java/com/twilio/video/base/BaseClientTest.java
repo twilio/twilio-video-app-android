@@ -16,7 +16,7 @@ public abstract class BaseClientTest {
     public void setup() throws InterruptedException {
         String twilioEnv;
         // The environment key uses different values than simple signaling
-        switch(BuildConfig.REALM) {
+        switch(BuildConfig.ENVIRONMENT) {
             case "prod":
                 twilioEnv = "Production";
                 break;

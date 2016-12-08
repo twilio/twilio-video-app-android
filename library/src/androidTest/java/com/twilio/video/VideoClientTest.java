@@ -42,7 +42,7 @@ public class VideoClientTest extends BaseClientTest {
         super.setup();
         mediaTestActivity = activityRule.getActivity();
         PermissionUtils.allowPermissions(mediaTestActivity);
-        token = AccessTokenUtils.getAccessToken(RandUtils.generateRandomString(10), BuildConfig.REALM);
+        token = AccessTokenUtils.getAccessToken(RandUtils.generateRandomString(10));
         videoClient = new VideoClient(mediaTestActivity, token);
         roomName = RandUtils.generateRandomString(20);
         localMedia = LocalMedia.create(mediaTestActivity);
@@ -187,7 +187,7 @@ public class VideoClientTest extends BaseClientTest {
 
         // Now we update token and connect again
         String newUserName = RandUtils.generateRandomString(10);
-        videoClient.updateToken(AccessTokenUtils.getAccessToken(newUserName, BuildConfig.REALM));
+        videoClient.updateToken(AccessTokenUtils.getAccessToken(newUserName));
 
         // Connect again with new token
         roomListener = new CallbackHelper.FakeRoomListener();

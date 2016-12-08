@@ -37,8 +37,8 @@ public class ParticipantTest extends BaseClientTest {
     public void setup() throws InterruptedException {
         super.setup();
         context = InstrumentationRegistry.getInstrumentation().getTargetContext();
-        tokenOne = AccessTokenUtils.getAccessToken(RandUtils.generateRandomString(10), BuildConfig.REALM);
-        tokenTwo = AccessTokenUtils.getAccessToken(RandUtils.generateRandomString(10), BuildConfig.REALM);
+        tokenOne = AccessTokenUtils.getAccessToken(RandUtils.generateRandomString(10));
+        tokenTwo = AccessTokenUtils.getAccessToken(RandUtils.generateRandomString(10));
         videoClient = new VideoClient(context, tokenOne);
         videoClient2 = new VideoClient(context, tokenTwo);
         roomName = RandUtils.generateRandomString(20);

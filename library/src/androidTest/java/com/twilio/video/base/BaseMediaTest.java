@@ -11,7 +11,6 @@ import com.twilio.video.Room;
 import com.twilio.video.RoomState;
 import com.twilio.video.VideoClient;
 import com.twilio.video.helper.CallbackHelper;
-import com.twilio.video.test.BuildConfig;
 import com.twilio.video.ui.MediaTestActivity;
 import com.twilio.video.util.AccessTokenUtils;
 import com.twilio.video.util.FakeVideoCapturer;
@@ -80,7 +79,7 @@ public abstract class BaseMediaTest extends BaseClientTest {
         testRoom = RandUtils.generateRandomString(10);
         fakeVideoCapturer = new FakeVideoCapturer();
         actor1LocalMedia = LocalMedia.create(mediaTestActivity);
-        tokenOne = AccessTokenUtils.getAccessToken(TEST_USER, BuildConfig.REALM);
+        tokenOne = AccessTokenUtils.getAccessToken(TEST_USER);
         Instrumentation instrumentation = InstrumentationRegistry.getInstrumentation();
         instrumentation.runOnMainSync(new Runnable() {
             @Override
@@ -97,7 +96,7 @@ public abstract class BaseMediaTest extends BaseClientTest {
 
         // Connect actor 2
         actor2LocalMedia = LocalMedia.create(mediaTestActivity);
-        tokenTwo = AccessTokenUtils.getAccessToken(TEST_USER2, BuildConfig.REALM);
+        tokenTwo = AccessTokenUtils.getAccessToken(TEST_USER2);
         instrumentation.runOnMainSync(new Runnable() {
             @Override
             public void run() {
