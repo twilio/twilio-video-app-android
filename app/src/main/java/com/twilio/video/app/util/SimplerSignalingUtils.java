@@ -17,22 +17,10 @@ import retrofit.http.GET;
 import retrofit.http.QueryMap;
 
 public class SimplerSignalingUtils {
-    public static final String CAPABILITY_TOKEN = "capability_token";
-    public static final String USERNAME = "username";
-    public static final String REALM = "realm";
-    public static final String TOPOLOGY = "topology";
-
+    private static final String P2P = "P2P";
     public static final String PROD = "prod";
     public static final String STAGE = "stage";
     public static final String DEV= "dev";
-
-    public static final String P2P = "P2P";
-
-    public static final ArrayList<String> REALMS = new ArrayList<String>() {{
-        add(PROD);
-        add(STAGE);
-        add(DEV);
-    }};
 
     /*
      * The default is usually 30 minutes. We are intentionally setting it to 5 minutes to validate
@@ -76,8 +64,8 @@ public class SimplerSignalingUtils {
 
     public static void getAccessToken(String username, String realm,
                                       String topology, Callback<String> callback) {
-        HashMap<String,String> options = new HashMap<>();
-        options.put(REALM, realm);
+        HashMap<String, String> options = new HashMap<>();
+        options.put("environment", realm);
         options.put("identity", username);
         options.put("ttl", TTL);
         options.put("configurationProfileSid", getProfileConfigSid(realm, topology));

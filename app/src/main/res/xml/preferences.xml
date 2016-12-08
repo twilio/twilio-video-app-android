@@ -3,9 +3,9 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <PreferenceCategory android:title="@string/general">
         <ListPreference
-            android:defaultValue="Production"
+            android:defaultValue="prod"
             android:entries="@array/realm_array"
-            android:entryValues="@array/realm_array"
+            android:entryValues="@array/realm_array_values"
             android:key="pref_realm"
             android:summary="%s"
             android:title="@string/realm_string"

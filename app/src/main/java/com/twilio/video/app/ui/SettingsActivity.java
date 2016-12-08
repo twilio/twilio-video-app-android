@@ -13,10 +13,14 @@ import android.view.MenuItem;
 import com.twilio.video.app.BuildConfig;
 import com.twilio.video.app.R;
 import com.twilio.video.app.data.Preferences;
+import com.twilio.video.app.util.SimplerSignalingUtils;
 import com.twilio.video.env.Env;
 
 public class SettingsActivity extends AppCompatActivity {
     private static final String TWILIO_ENV_KEY = "TWILIO_ENVIRONMENT";
+    private static final String TWILIO_DEV_ENV = "Development";
+    private static final String TWILIO_STAGE_ENV = "Staging";
+    private static final String TWILIO_PROD_ENV = "Production";
 
     private SharedPreferences sharedPreferences;
 
@@ -26,7 +30,7 @@ public class SettingsActivity extends AppCompatActivity {
         public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
             if (key.equals(Preferences.REALM)) {
                 String realm = sharedPreferences.getString(key, Preferences.REALM_DEFAULT);
-                Env.set(SettingsActivity.this, TWILIO_ENV_KEY, realm, true);
+                Env.set(SettingsActivity.this, TWILIO_ENV_KEY, getRealmEnv(realm), true);
             }
         }
     };
@@ -65,6 +69,16 @@ public class SettingsActivity extends AppCompatActivity {
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
+        }
+    }
+
+    private String getRealmEnv(String realm) {
+        if (realm.equals(SimplerSignalingUtils.DEV)) {
+            return TWILIO_DEV_ENV;
+        } else if (realm.equals(SimplerSignalingUtils.STAGE)) {
+            return TWILIO_STAGE_ENV;
+        } else {
+            return TWILIO_PROD_ENV;
         }
     }
 

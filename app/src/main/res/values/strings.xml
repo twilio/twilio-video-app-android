@@ -57,6 +57,12 @@
         <item>Development</item>
     </string-array>
 
+    <string-array name="realm_array_values">
+        <item>prod</item>
+        <item>stage</item>
+        <item>dev</item>
+    </string-array>
+
     <string-array name="topology_array">
         <item>P2P</item>
         <item>SFU</item>
