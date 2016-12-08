@@ -111,40 +111,6 @@ public class LoginActivity extends BaseActivity {
         }
     }
 
-    // TODO add to RoomActivity
-//    private void registerUser(final String username) {
-//        obtainCapabilityToken(username, realm);
-//    }
-//
-//    private void obtainCapabilityToken(final String username, final String realm) {
-//        SimpleSignalingUtils.getAccessToken(username,
-//                realm, topology, new Callback<String>() {
-//
-//            @Override
-//            public void success(String capabilityToken, Response response) {
-//                progressDialog.dismiss();
-//                if (response.getStatus() == 200) {
-//                    startClient(capabilityToken);
-//                } else {
-//                    Snackbar.make(loginButton,
-//                            "Registration failed. Status: " + response.getStatus(),
-//                            Snackbar.LENGTH_LONG)
-//                            .setAction("Action", null).show();
-//                }
-//            }
-//
-//            @Override
-//            public void failure(RetrofitError error) {
-//                progressDialog.dismiss();
-//                Snackbar.make(loginButton,
-//                        "Registration failed. Error: " + error.getMessage(),
-//                        Snackbar.LENGTH_LONG)
-//                        .setAction("Action", null).show();
-//            }
-//        });
-//
-//    }
-
     private void startLobbyActivity() {
         Intent intent = new Intent(this, RoomActivity.class);
         startActivity(intent);
