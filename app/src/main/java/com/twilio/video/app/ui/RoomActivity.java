@@ -56,6 +56,7 @@ import com.twilio.video.app.data.Preferences;
 import com.twilio.video.app.dialog.Dialog;
 import com.twilio.video.app.util.SimplerSignalingUtils;
 
+import java.net.HttpURLConnection;
 import java.util.Map;
 
 import butterknife.BindView;
@@ -103,55 +104,14 @@ public class RoomActivity extends AppCompatActivity {
     private MenuItem pauseVideoMenuItem;
     private MenuItem pauseAudioMenuItem;
     private MenuItem screenCaptureMenuItem;
+    private MenuItem settingsMenuItem;
 
     private SharedPreferences sharedPreferences;
 
     private String username;
-    private String capabilityToken;
-    private String environment;
+    private String realm;
     private String topology;
     private AccessManager accessManager;
-    private final AccessManager.Listener accessManagerListener = new AccessManager.Listener() {
-        @Override
-        public void onTokenWillExpire(final AccessManager accessManager) {
-            Timber.i("Access token will expire in three minutes");
-            SimplerSignalingUtils.getAccessToken(username, environment, topology, new Callback<String>() {
-                @Override
-                public void success(String token, Response response) {
-                    Timber.i("Access token updated");
-                    accessManager.updateToken(token);
-                }
-
-                @Override
-                public void failure(RetrofitError error) {
-                    Toast.makeText(RoomActivity.this, "Failed fetch new access token",
-                            Toast.LENGTH_LONG).show();
-                }
-            });
-        }
-
-        @Override
-        public void onTokenExpired(AccessManager accessManager) {
-            Timber.i("Access token expired");
-        }
-
-        @Override
-        public void onError(AccessManager accessManager, String errorMessage) {
-            Timber.e("Access manager error " + errorMessage);
-        }
-    };
-    private final AccessManager.TokenUpdateListener tokenUpdateListener =
-            new AccessManager.TokenUpdateListener() {
-                @Override
-                public void onTokenUpdated(String token) {
-                    Timber.i("Access token updated");
-                    if (videoClient != null) {
-                        Timber.i("Updating video client access token");
-                        videoClient.updateToken(token);
-                    }
-                }
-            };
-
     private VideoClient videoClient;
     private Room room;
     private String roomName;
@@ -164,7 +124,6 @@ public class RoomActivity extends AppCompatActivity {
     private VideoTrack primaryVideoTrack;
     private CameraCapturer cameraCapturer;
     private AlertDialog alertDialog;
-    boolean loggingOut;
     private ScreenCapturer screenCapturer;
     private final ScreenCapturer.Listener screenCapturerListener = new ScreenCapturer.Listener() {
         @Override
@@ -199,35 +158,24 @@ public class RoomActivity extends AppCompatActivity {
         ButterKnife.bind(this);
 
         // Setup activity
-        processActivityIntent(getIntent().getExtras());
-        updateUi(RoomState.DISCONNECTED);
-        loggingOut = false;
-
-        // Setup video constraints
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        username = sharedPreferences.getString(Preferences.IDENTITY, null);
+        realm = sharedPreferences.getString(Preferences.ENVIRONMENT, Preferences.ENVIRONMENT_DEFAULT);
+        topology = sharedPreferences.getString(Preferences.TOPOLOGY, Preferences.TOPOLOGY_DEFAULT);
         obtainVideoConstraints();
+        updateUi(RoomState.DISCONNECTED);
 
-        // Setup local media and video client
+        // Setup local media
         localMedia = LocalMedia.create(this);
         localAudioTrack = localMedia.addAudioTrack(true);
         cameraCapturer = new CameraCapturer(this, CameraCapturer.CameraSource.FRONT_CAMERA);
         cameraVideoTrack = localMedia.addVideoTrack(true, cameraCapturer, videoConstraints);
         primaryVideoView.setMirror(true);
         cameraVideoTrack.addRenderer(primaryVideoView);
-
-        // Create access manager to register for token updates
-        accessManager = new AccessManager(capabilityToken, accessManagerListener);
-        accessManager.addTokenUpdateListener(tokenUpdateListener);
-
-        // Create our video client
-        videoClient = new VideoClient(this, capabilityToken);
     }
 
     @Override
     protected void onDestroy() {
-        // Remove token update listener
-        accessManager.removeTokenUpdateListener(tokenUpdateListener);
-
         // Teardown local media
         if (localMedia != null) {
             localMedia.removeVideoTrack(cameraVideoTrack);
@@ -266,7 +214,10 @@ public class RoomActivity extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
+
         inflater.inflate(R.menu.room_menu, menu);
+        settingsMenuItem = menu.findItem(R.id.settings_menu_item);
+
         return true;
     }
 
@@ -287,9 +238,6 @@ public class RoomActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.log_out_menu_item:
-                logout();
-                return true;
             case R.id.switch_camera_menu_item:
                 switchCamera();
                 return true;
@@ -439,13 +387,6 @@ public class RoomActivity extends AppCompatActivity {
         localVideoImageButton.setImageResource(icon);
     }
 
-    private void processActivityIntent(Bundle extras) {
-        username = extras.getString(SimplerSignalingUtils.USERNAME);
-        capabilityToken = extras.getString(SimplerSignalingUtils.CAPABILITY_TOKEN);
-        environment = extras.getString(SimplerSignalingUtils.ENVIRONMENT);
-        topology = extras.getString(SimplerSignalingUtils.TOPOLOGY);
-    }
-
     private void obtainVideoConstraints() {
         Timber.d("Collecting video constraints...");
 
@@ -499,23 +440,12 @@ public class RoomActivity extends AppCompatActivity {
             joinIcon = R.drawable.ic_add_circle_white_24px;
         }
         connectImageButton.setImageResource(joinIcon);
-    }
 
-    private void logout() {
-        // Will logout after disconnecting from the room
-        loggingOut = true;
-        // Disconnect from the current room
-        if (room != null && room.getState() != RoomState.DISCONNECTED) {
-            room.disconnect();
-        } else {
-            returnToVideoClientLogin();
+        // TODO: Remove when we use a Service to connect to a room
+        if (settingsMenuItem != null) {
+            settingsMenuItem.setVisible(roomState != RoomState.CONNECTING &&
+                    roomState != RoomState.CONNECTED);
         }
-    }
-
-    private void returnToVideoClientLogin(){
-        Intent registrationIntent = new Intent(RoomActivity.this, LoginActivity.class);
-        startActivity(registrationIntent);
-        finish();
     }
 
     private void switchCamera() {
@@ -572,7 +502,7 @@ public class RoomActivity extends AppCompatActivity {
         return new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                connectToRoom(connectEditText.getText().toString());
+                connect(connectEditText.getText().toString());
             }
         };
     }
@@ -587,16 +517,79 @@ public class RoomActivity extends AppCompatActivity {
         };
     }
 
+    private void connect(final String roomName) {
+        String currentRealm = sharedPreferences.getString(Preferences.ENVIRONMENT,
+                Preferences.ENVIRONMENT_DEFAULT);
+        String currentTopology = sharedPreferences.getString(Preferences.TOPOLOGY,
+                Preferences.TOPOLOGY_DEFAULT);
+
+        if (newTokenNeeded(currentRealm, currentTopology)) {
+            Timber.d("Retrieving access token");
+            realm = currentRealm;
+            topology = currentTopology;
+            SimplerSignalingUtils.getAccessToken(username, realm, topology,
+                    new Callback<String>() {
+                        @Override
+                        public void success(String token, Response response) {
+                            if (response.getStatus() == HttpURLConnection.HTTP_OK) {
+                                Timber.d("Access token retrieved");
+                                updateToken(token);
+                                connectToRoom(roomName);
+                            } else {
+                                Snackbar.make(primaryVideoView,
+                                        "Retrieving access token failed. Status: " +
+                                                response.getStatus(),
+                                        Snackbar.LENGTH_LONG)
+                                        .setAction("Action", null).show();
+                                updateUi(RoomState.DISCONNECTED);
+                            }
+                        }
+
+                        @Override
+                        public void failure(RetrofitError error) {
+                            Snackbar.make(primaryVideoView,
+                                    "Retrieving access token failed. Error: " + error.getMessage(),
+                                    Snackbar.LENGTH_LONG)
+                                    .setAction("Action", null).show();
+                            updateUi(RoomState.DISCONNECTED);
+                        }
+                    });
+        } else {
+            connectToRoom(roomName);
+        }
+
+        updateUi(RoomState.CONNECTING);
+    }
+
+    private boolean newTokenNeeded(String currentRealm, String currentTopology) {
+        return !realm.equals(currentRealm) ||
+                !topology.equals(currentTopology) ||
+                accessManager == null ||
+                accessManager.isTokenExpired();
+    }
+
+    private void updateToken(String token) {
+        if (accessManager == null) {
+            accessManager = new AccessManager(token);
+        } else {
+            accessManager.updateToken(token);
+        }
+        if (videoClient == null) {
+            videoClient = new VideoClient(this, token);
+        } else {
+            videoClient.updateToken(token);
+        }
+    }
+
     private void connectToRoom(String roomName) {
-        roomStatusTextview.setText("Connecting to room " + roomName);
-        this.roomName = roomName;
         ConnectOptions connectOptions = new ConnectOptions.Builder()
                 .roomName(roomName)
                 .localMedia(localMedia)
                 .build();
 
+        this.roomName = roomName;
+        roomStatusTextview.setText("Connecting to room " + roomName);
         room = videoClient.connect(connectOptions, roomListener());
-        updateUi(RoomState.CONNECTING);
     }
 
     private void addParticipant(Participant participant) {
@@ -777,9 +770,6 @@ public class RoomActivity extends AppCompatActivity {
                 removeAllParticipants();
                 updateUi(RoomState.DISCONNECTED);
                 RoomActivity.this.room = null;
-                if (loggingOut) {
-                    returnToVideoClientLogin();
-                }
             }
 
             @Override

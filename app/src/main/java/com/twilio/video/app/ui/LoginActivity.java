@@ -1,57 +1,38 @@
 package com.twilio.video.app.ui;
 
 import android.Manifest;
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.preference.PreferenceManager;
+import android.text.TextUtils;
 import android.view.HapticFeedbackConstants;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.Spinner;
-import android.widget.TextView;
 import android.widget.Toast;
 
-import com.twilio.video.app.BuildConfig;
 import com.twilio.video.app.R;
 import com.twilio.video.app.base.BaseActivity;
-import com.twilio.video.app.util.SimplerSignalingUtils;
-import com.twilio.video.LogLevel;
-import com.twilio.video.VideoClient;
-import com.twilio.video.env.Env;
+import com.twilio.video.app.data.Preferences;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.OnTextChanged;
-import retrofit.Callback;
-import retrofit.RetrofitError;
-import retrofit.client.Response;
-import timber.log.Timber;
-
-import static com.twilio.video.app.util.SimplerSignalingUtils.P2P;
 
 public class LoginActivity extends BaseActivity {
+    public static final int PERMISSIONS_REQUEST_CODE = 0;
 
     @BindView(R.id.username_edittext) EditText usernameEditText;
     @BindView(R.id.login_button) Button loginButton;
-    @BindView(R.id.version_textview) TextView versionText;
-    @BindView(R.id.environment_spinner) Spinner environmentSpinner;
-    @BindView(R.id.topology_spinner) Spinner topologySpinner;
 
-    public static final int PERMISSIONS_REQUEST_CODE = 0;
-    public static final String TWILIO_ENV_KEY = "TWILIO_ENVIRONMENT";
-
-    private ProgressDialog progressDialog;
-    private String environment;
-    private String topology = P2P;
+    private SharedPreferences sharedPreferences;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,49 +41,25 @@ public class LoginActivity extends BaseActivity {
         setContentView(R.layout.activity_login);
         ButterKnife.bind(this);
 
-        versionText.setText(BuildConfig.VERSION_NAME);
-
-        environmentSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                environment = SimplerSignalingUtils.ENVIRONMENTS.get(position);
-                Env.set(LoginActivity.this, TWILIO_ENV_KEY, getResources().getStringArray(R.array.environment_array)[position], true);
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-
-            }
-        });
-
-        topologySpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                topology = getResources().getStringArray(R.array.topology_array)[position];
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-
-            }
-        });
+        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
 
         if (!checkPermissions()) {
             requestPermissions();
         }
-
     }
 
     @OnTextChanged(R.id.username_edittext)
-    public void onTextChanged(CharSequence charSequence, int start, int count, int after) {
-        if(after == 0) {
-            loginButton.setTextColor(ContextCompat.getColor(LoginActivity.this, R.color.colorButtonText));
+    public void onTextChanged(CharSequence username, int start, int count, int after) {
+        if(!TextUtils.isEmpty(username)) {
+            loginButton.setTextColor(ContextCompat.getColor(this, android.R.color.white));
+            loginButton.setEnabled(true);
         } else {
-            loginButton.setTextColor(ContextCompat.getColor(LoginActivity.this, R.color.white));
+            loginButton.setTextColor(ContextCompat.getColor(this, R.color.colorButtonText));
+            loginButton.setEnabled(false);
         }
     }
 
-    public boolean checkPermissions(){
+    private boolean checkPermissions(){
         int resultCamera = ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA);
         int resultMic = ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO);
         int resultStorage = ContextCompat.checkSelfPermission(this,
@@ -113,7 +70,7 @@ public class LoginActivity extends BaseActivity {
                 (resultStorage == PackageManager.PERMISSION_GRANTED));
     }
 
-    public void requestPermissions(){
+    private void requestPermissions(){
         if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.CAMERA) ||
                 ActivityCompat.shouldShowRequestPermissionRationale(this,
                         Manifest.permission.RECORD_AUDIO) ||
@@ -135,15 +92,13 @@ public class LoginActivity extends BaseActivity {
 
     @OnClick(R.id.login_button)
     void login(View view) {
-        progressDialog = ProgressDialog.show(LoginActivity.this, null,
-                "Registering with Twilio", true);
         String username = usernameEditText.getText().toString();
         if(username != null && username.length() != 0) {
+            sharedPreferences.edit().putString(Preferences.IDENTITY, username).apply();
             hideKeyboard();
-            registerUser(username);
+            startLobbyActivity();
         } else {
             view.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS);
-            progressDialog.dismiss();
         }
     }
 
@@ -156,50 +111,8 @@ public class LoginActivity extends BaseActivity {
         }
     }
 
-    private void registerUser(final String username) {
-        obtainCapabilityToken(username, environment);
-    }
-
-    private void obtainCapabilityToken(final String username, final String environment) {
-        SimplerSignalingUtils.getAccessToken(username,
-                environment, topology, new Callback<String>() {
-
-            @Override
-            public void success(String capabilityToken, Response response) {
-                progressDialog.dismiss();
-                if (response.getStatus() == 200) {
-                    startClient(capabilityToken);
-                } else {
-                    Snackbar.make(loginButton,
-                            "Registration failed. Status: " + response.getStatus(),
-                            Snackbar.LENGTH_LONG)
-                            .setAction("Action", null).show();
-                }
-            }
-
-            @Override
-            public void failure(RetrofitError error) {
-                progressDialog.dismiss();
-                Snackbar.make(loginButton,
-                        "Registration failed. Error: " + error.getMessage(),
-                        Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
-
-    }
-
-    private void startClient(String capabilityToken) {
-        Timber.i("Start VideoClient");
-
+    private void startLobbyActivity() {
         Intent intent = new Intent(this, RoomActivity.class);
-        intent.putExtra(SimplerSignalingUtils.CAPABILITY_TOKEN, capabilityToken);
-        intent.putExtra(SimplerSignalingUtils.ENVIRONMENT, environment);
-        intent.putExtra(SimplerSignalingUtils.TOPOLOGY, topology);
-        intent.putExtra(SimplerSignalingUtils.USERNAME, usernameEditText.getText().toString());
-
-        VideoClient.setLogLevel(LogLevel.DEBUG);
-
         startActivity(intent);
         finish();
     }

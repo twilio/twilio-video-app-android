@@ -37,6 +37,6 @@
         <activity android:name=".ui.SettingsActivity"
             android:parentActivityName=".ui.RoomActivity"
             android:label="@string/settings"
-            android:theme="@style/AppTheme.Settings"/>
+            android:theme="@style/AppTheme.Settings" />
     </application>
 </manifest>

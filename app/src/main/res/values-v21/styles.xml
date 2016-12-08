@@ -10,6 +10,9 @@
         <item name="android:windowBackground">@drawable/splash_screen</item>
     </style>
     <style name="AppTheme.LoginScreen" parent="AppTheme.NoActionBar">
+        <item name="colorAccent">@android:color/white</item>
         <item name="android:statusBarColor">@color/colorPrimaryDark</item>
+        <item name="android:editTextColor">@android:color/white</item>
+        <item name="android:textColorHint">@color/login_hint</item>
     </style>
 </resources>

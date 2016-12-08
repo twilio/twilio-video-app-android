@@ -25,10 +25,4 @@
           android:title="@string/settings"
           android:enabled="true"
           app:showAsAction="never"/>
-
-    <item android:id="@+id/log_out_menu_item"
-          android:title="@string/logout"
-          android:enabled="true"
-          app:showAsAction="never"/>
-
 </menu>

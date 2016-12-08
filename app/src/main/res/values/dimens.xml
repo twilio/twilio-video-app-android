@@ -6,4 +6,5 @@
     <dimen name="local_video_size">90dp</dimen>
     <dimen name="preference_video_dimensions_height">120dp</dimen>
     <dimen name="preference_aspect_ratio_height">72dp</dimen>
+    <dimen name="username_margin_top">94.5dp</dimen>
 </resources>

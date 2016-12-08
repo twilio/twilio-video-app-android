@@ -21,6 +21,7 @@
     <string name="ice_options">Enable ICE options</string>
     <string name="ice_transp_policy">Transportation policy</string>
     <string name="environment_string">Environment</string>
+    <string name="topology">Topology</string>
     <string name="stun_turn">STUN or TURN server</string>
     <string name="add_server">Add</string>
     <string name="ice_servers_dialog_title">ICE Options</string>
@@ -44,11 +45,22 @@
     <string name="stop_screen_share">Stop screen share</string>
     <string name="screen_capture_permission_not_granted">Screen capture permission not granted</string>
     <string name="screen_capture_error">Screen capturer error occurred.</string>
+    <string name="general">General</string>
+    <string name="media">Media</string>
+    <string name="about">About</string>
+    <string name="identity">Identity</string>
+    <string name="version">Version</string>
 
     <string-array name="environment_array">
         <item>Production</item>
         <item>Staging</item>
         <item>Development</item>
+    </string-array>
+
+    <string-array name="environment_array_values">
+        <item>prod</item>
+        <item>stage</item>
+        <item>dev</item>
     </string-array>
 
     <string-array name="topology_array">

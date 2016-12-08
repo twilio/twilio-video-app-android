@@ -2,6 +2,8 @@ package com.twilio.video.app;
 
 import android.app.Application;
 
+import com.twilio.video.LogLevel;
+import com.twilio.video.VideoClient;
 import com.twilio.video.app.BuildConfig;
 
 import timber.log.Timber;
@@ -15,6 +17,7 @@ public class VideoApplication extends Application {
 
         if (BuildConfig.DEBUG) {
             Timber.plant(new Timber.DebugTree());
+            VideoClient.setLogLevel(LogLevel.DEBUG);
         }
 
     }
