@@ -2,6 +2,8 @@ package com.twilio.video.util;
 
 import android.util.Base64;
 
+import com.twilio.video.test.BuildConfig;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -41,9 +43,9 @@ public class AccessTokenUtils {
             .build()
             .create(TokenService.class);
 
-    public static String getAccessToken(String username, String realm) {
+    public static String getAccessToken(String username) {
         HashMap<String,String> options = new HashMap<>();
-        options.put("environment", realm);
+        options.put("environment", BuildConfig.ENVIRONMENT);
         options.put("identity", username);
         options.put("ttl", TTL);
         return tokenService.obtainTwilioCapabilityToken(options);

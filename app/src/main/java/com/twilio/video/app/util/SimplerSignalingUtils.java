@@ -27,7 +27,7 @@ public class SimplerSignalingUtils {
      * expiration.
      */
     public static final String TTL = "300";
-    
+
     /* Define the Retrofit Token Service */
     interface SimplerSignalingApi {
         @GET("/access-token")
@@ -61,20 +61,21 @@ public class SimplerSignalingUtils {
             .build()
             .create(SimplerSignalingApi.class);
 
-
-    public static void getAccessToken(String username, String realm,
-                                      String topology, Callback<String> callback) {
-        HashMap<String, String> options = new HashMap<>();
-        options.put("environment", realm);
+    public static void getAccessToken(String username,
+                                      String environment,
+                                      String topology,
+                                      Callback<String> callback) {
+        HashMap<String,String> options = new HashMap<>();
+        options.put("environment", environment);
         options.put("identity", username);
         options.put("ttl", TTL);
-        options.put("configurationProfileSid", getProfileConfigSid(realm, topology));
+        options.put("configurationProfileSid", getProfileConfigSid(environment, topology));
         simplerSignalingService.getAccessToken(options, callback);
     }
 
-    private static String getProfileConfigSid(String realm, String topology) {
+    private static String getProfileConfigSid(String environment, String topology) {
         boolean isP2P = topology.equals(P2P);
-        switch(realm) {
+        switch(environment) {
             case DEV:
                 return isP2P ? "VSbf4c8aee1e259d11b2c5adeebb7c0dbe" : "VS6469e95f0b2e2c8f931086988d69f815";
             case STAGE:
