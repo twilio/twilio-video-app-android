@@ -172,8 +172,20 @@ public class Room {
                 internalStatsListenerHandle.release();
                 internalStatsListenerHandle = null;
             }
-            statsListenersQueue.clear();
+            cleanupStatsListenerQueue();
         }
+    }
+
+    private void cleanupStatsListenerQueue() {
+        for (final Pair<Handler, StatsListener> listenerPair : statsListenersQueue) {
+            listenerPair.first.post(new Runnable() {
+                @Override
+                public void run() {
+                    listenerPair.second.onStats(new ArrayList<StatsReport>());
+                }
+            });
+        }
+        statsListenersQueue.clear();
     }
 
     void setState(RoomState roomState) {
