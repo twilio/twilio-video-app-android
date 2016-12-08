@@ -17,7 +17,6 @@ import com.twilio.video.env.Env;
 
 public class SettingsActivity extends AppCompatActivity {
     private static final String TWILIO_ENV_KEY = "TWILIO_ENVIRONMENT";
-    private static final String DEFAULT_REALM = "Production";
 
     private SharedPreferences sharedPreferences;
 
@@ -26,7 +25,7 @@ public class SettingsActivity extends AppCompatActivity {
         @Override
         public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
             if (key.equals(Preferences.REALM)) {
-                String realm = sharedPreferences.getString(key, DEFAULT_REALM);
+                String realm = sharedPreferences.getString(key, Preferences.REALM_DEFAULT);
                 Env.set(SettingsActivity.this, TWILIO_ENV_KEY, realm, true);
             }
         }

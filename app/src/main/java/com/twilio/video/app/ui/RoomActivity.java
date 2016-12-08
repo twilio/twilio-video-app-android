@@ -505,13 +505,13 @@ public class RoomActivity extends AppCompatActivity {
         roomStatusTextview.setText("Connecting to room " + roomName);
         this.roomName = roomName;
 
-        String realm = sharedPreferences.getString(Preferences.REALM, "Production");
-        String topology = sharedPreferences.getString(Preferences.TOPOLOGY, "P2P");
+        String realm = sharedPreferences.getString(Preferences.REALM, Preferences.REALM_DEFAULT);
+        String topology = sharedPreferences.getString(Preferences.TOPOLOGY,
+                Preferences.TOPOLOGY_DEFAULT);
         SimplerSignalingUtils.getAccessToken(username, realm, topology, new Callback<String>() {
             @Override
             public void success(String capabilityToken, Response response) {
                 if (response.getStatus() == 200) {
-                    // Create our video client
                     if (videoClient == null) {
                         videoClient = new VideoClient(RoomActivity.this, capabilityToken);
                     } else {
