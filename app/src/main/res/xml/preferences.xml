@@ -6,7 +6,7 @@
             android:defaultValue="prod"
             android:entries="@array/environment_array"
             android:entryValues="@array/environment_array_values"
-            android:key="pref_realm"
+            android:key="pref_environment"
             android:summary="%s"
             android:title="@string/environment_string"
             android:negativeButtonText="@null"/>
