@@ -90,7 +90,6 @@ public class SettingsActivity extends AppCompatActivity {
         sharedPreferences.edit().clear().apply();
         PreferenceManager.setDefaultValues(this, R.xml.preferences, true);
 
-
         // Return to login activity
         startActivity(registrationIntent);
         finish();
