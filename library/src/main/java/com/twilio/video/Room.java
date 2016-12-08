@@ -176,7 +176,7 @@ public class Room {
         }
     }
 
-    void cleanupStatsListenerQueue() {
+    private void cleanupStatsListenerQueue() {
         for (final Pair<Handler, StatsListener> listenerPair : statsListenersQueue) {
             listenerPair.first.post(new Runnable() {
                 @Override
