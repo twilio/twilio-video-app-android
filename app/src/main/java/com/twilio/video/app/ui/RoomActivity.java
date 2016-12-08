@@ -104,6 +104,7 @@ public class RoomActivity extends AppCompatActivity {
     private MenuItem pauseVideoMenuItem;
     private MenuItem pauseAudioMenuItem;
     private MenuItem screenCaptureMenuItem;
+    private MenuItem settingsMenuItem;
 
     private SharedPreferences sharedPreferences;
 
@@ -213,7 +214,10 @@ public class RoomActivity extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
+
         inflater.inflate(R.menu.room_menu, menu);
+        settingsMenuItem = menu.findItem(R.id.settings_menu_item);
+
         return true;
     }
 
@@ -436,6 +440,12 @@ public class RoomActivity extends AppCompatActivity {
             joinIcon = R.drawable.ic_add_circle_white_24px;
         }
         connectImageButton.setImageResource(joinIcon);
+
+        // TODO: Remove when we use a Service to connect to a room
+        if (settingsMenuItem != null) {
+            settingsMenuItem.setVisible(roomState != RoomState.CONNECTING &&
+                    roomState != RoomState.CONNECTED);
+        }
     }
 
     private void switchCamera() {
