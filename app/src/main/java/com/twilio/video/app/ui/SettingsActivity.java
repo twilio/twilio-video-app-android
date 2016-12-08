@@ -28,9 +28,10 @@ public class SettingsActivity extends AppCompatActivity {
             = new SharedPreferences.OnSharedPreferenceChangeListener() {
         @Override
         public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-            if (key.equals(Preferences.REALM)) {
-                String realm = sharedPreferences.getString(key, Preferences.REALM_DEFAULT);
-                Env.set(SettingsActivity.this, TWILIO_ENV_KEY, getRealmEnv(realm), true);
+            if (key.equals(Preferences.ENVIRONMENT)) {
+                String environment = sharedPreferences.getString(key,
+                        Preferences.ENVIRONMENT_DEFAULT);
+                Env.set(SettingsActivity.this, TWILIO_ENV_KEY, getNativeEnvironment(environment), true);
             }
         }
     };
@@ -72,10 +73,10 @@ public class SettingsActivity extends AppCompatActivity {
         }
     }
 
-    private String getRealmEnv(String realm) {
-        if (realm.equals(SimplerSignalingUtils.DEV)) {
+    private String getNativeEnvironment(String environment) {
+        if (environment.equals(SimplerSignalingUtils.DEV)) {
             return TWILIO_DEV_ENV;
-        } else if (realm.equals(SimplerSignalingUtils.STAGE)) {
+        } else if (environment.equals(SimplerSignalingUtils.STAGE)) {
             return TWILIO_STAGE_ENV;
         } else {
             return TWILIO_PROD_ENV;

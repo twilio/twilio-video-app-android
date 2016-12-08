@@ -159,7 +159,7 @@ public class RoomActivity extends AppCompatActivity {
         // Setup activity
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         username = sharedPreferences.getString(Preferences.IDENTITY, null);
-        realm = sharedPreferences.getString(Preferences.REALM, Preferences.REALM_DEFAULT);
+        realm = sharedPreferences.getString(Preferences.ENVIRONMENT, Preferences.ENVIRONMENT_DEFAULT);
         topology = sharedPreferences.getString(Preferences.TOPOLOGY, Preferences.TOPOLOGY_DEFAULT);
         obtainVideoConstraints();
         updateUi(RoomState.DISCONNECTED);
@@ -508,8 +508,8 @@ public class RoomActivity extends AppCompatActivity {
     }
 
     private void connect(final String roomName) {
-        String currentRealm = sharedPreferences.getString(Preferences.REALM,
-                Preferences.REALM_DEFAULT);
+        String currentRealm = sharedPreferences.getString(Preferences.ENVIRONMENT,
+                Preferences.ENVIRONMENT_DEFAULT);
         String currentTopology = sharedPreferences.getString(Preferences.TOPOLOGY,
                 Preferences.TOPOLOGY_DEFAULT);
 
