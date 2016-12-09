@@ -55,6 +55,7 @@ import com.twilio.video.VideoTrack;
 import com.twilio.video.VideoView;
 import com.twilio.video.app.R;
 import com.twilio.video.app.data.Preferences;
+import com.twilio.video.app.util.InputUtils;
 import com.twilio.video.app.util.SimplerSignalingUtils;
 
 import java.util.Map;
@@ -385,7 +386,7 @@ public class RoomActivity extends AppCompatActivity {
 
         room = videoClient.connect(connectOptions, roomListener());
 
-        hideKeyboard();
+        InputUtils.hideKeyboard(this);
         updateUI(room);
     }
 
@@ -577,12 +578,6 @@ public class RoomActivity extends AppCompatActivity {
 
         joinStatusTextView.setText(joinStatus);
         joinRoomNameTextView.setText(roomName);
-    }
-
-    private void hideKeyboard() {
-        InputMethodManager inputManager =
-                (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
-        inputManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
     }
 
     private void logout() {
