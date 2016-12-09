@@ -43,7 +43,7 @@ import com.twilio.video.LocalVideoTrack;
 import com.twilio.video.Media;
 import com.twilio.video.Participant;
 import com.twilio.video.Room;
-import com.twilio.video.RoomException;
+import com.twilio.video.TwilioException;
 import com.twilio.video.RoomState;
 import com.twilio.video.ScreenCapturer;
 import com.twilio.video.VideoClient;
@@ -756,7 +756,7 @@ public class RoomActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onConnectFailure(Room room, RoomException roomException) {
+            public void onConnectFailure(Room room, TwilioException twilioException) {
                 Timber.i("onConnectFailure");
                 roomStatusTextview.setText("Failed to connect to " + roomName);
                 RoomActivity.this.room = null;
@@ -764,7 +764,7 @@ public class RoomActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onDisconnected(Room room, RoomException roomException) {
+            public void onDisconnected(Room room, TwilioException twilioException) {
                 Timber.i("onDisconnected");
                 roomStatusTextview.setText("Disconnected from " + roomName);
                 removeAllParticipants();

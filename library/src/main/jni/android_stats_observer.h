@@ -66,7 +66,7 @@ public:
             webrtc_jni::GetMethodID(env,
                                     *j_local_audio_track_stats_class_,
                                     "<init>",
-                                    "(Ljava/lang/String;ILjava/lang/String;Ljava/lang/String;DJIJIII)V")),
+                                    "(Ljava/lang/String;ILjava/lang/String;Ljava/lang/String;DJIJII)V")),
         j_local_video_track_stats_ctor_id_(
             webrtc_jni::GetMethodID(env,
                                     *j_local_video_track_stats_class_,
@@ -76,12 +76,12 @@ public:
             webrtc_jni::GetMethodID(env,
                                     *j_audio_track_stats_class_,
                                     "<init>",
-                                    "(Ljava/lang/String;ILjava/lang/String;Ljava/lang/String;DJIIII)V")),
+                                    "(Ljava/lang/String;ILjava/lang/String;Ljava/lang/String;DJIII)V")),
         j_video_track_stats_ctor_id_(
             webrtc_jni::GetMethodID(env,
                                     *j_video_track_stats_class_,
                                     "<init>",
-                                    "(Ljava/lang/String;ILjava/lang/String;Ljava/lang/String;DJIILcom/twilio/video/VideoDimensions;I)V")),
+                                    "(Ljava/lang/String;ILjava/lang/String;Ljava/lang/String;DJILcom/twilio/video/VideoDimensions;I)V")),
         j_video_dimensions_ctor_id_(
             webrtc_jni::GetMethodID(env,
                                     *j_video_dimensions_class_,
@@ -169,8 +169,8 @@ private:
             webrtc_jni::ScopedLocalRefFrame local_ref_frame(jni());
             jstring j_track_id =
                 webrtc_jni::JavaStringFromStdString(jni(), track_stats->getTrackId());
-            jstring j_codec_name =
-                webrtc_jni::JavaStringFromStdString(jni(), track_stats->getCodecName());
+            jstring j_codec =
+                webrtc_jni::JavaStringFromStdString(jni(), track_stats->getCodec());
             jstring j_ssrc =
                 webrtc_jni::JavaStringFromStdString(jni(), track_stats->getSsrc());
             jobject j_local_audio_track_stats =
@@ -178,15 +178,14 @@ private:
                                  j_local_audio_track_stats_ctor_id_,
                                  j_track_id,
                                  track_stats->getPacketsLost(),
-                                 j_codec_name,
+                                 j_codec,
                                  j_ssrc,
-                                 track_stats->getUnixTimestamp(),
+                                 track_stats->getTimestamp(),
                                  track_stats->getBytesSent(),
                                  track_stats->getPacketsSent(),
                                  track_stats->getRoundTripTime(),
-                                 track_stats->getAudioInputLevel(),
-                                 track_stats->getJitterReceived(),
-                                 track_stats->getJitterBufferMs());
+                                 track_stats->getAudioLevel(),
+                                 track_stats->getJitter());
             jni()->CallVoidMethod(j_stats_report,
                                   j_stats_report_add_local_audio_id_,
                                   j_local_audio_track_stats);
@@ -199,8 +198,8 @@ private:
             webrtc_jni::ScopedLocalRefFrame local_ref_frame(jni());
             jstring j_track_id =
                 webrtc_jni::JavaStringFromStdString(jni(), track_stats->getTrackId());
-            jstring j_codec_name =
-                webrtc_jni::JavaStringFromStdString(jni(), track_stats->getCodecName());
+            jstring j_codec =
+                webrtc_jni::JavaStringFromStdString(jni(), track_stats->getCodec());
             jstring j_ssrc =
                 webrtc_jni::JavaStringFromStdString(jni(), track_stats->getSsrc());
             jobject j_capture_dimensions =
@@ -211,23 +210,23 @@ private:
             jobject j_sent_dimensions =
                 jni()->NewObject(*j_video_dimensions_class_,
                                  j_video_dimensions_ctor_id_,
-                                 track_stats->getSentDimensions().getWidth(),
-                                 track_stats->getSentDimensions().getHeight());
+                                 track_stats->getDimensions().getWidth(),
+                                 track_stats->getDimensions().getHeight());
             jobject j_local_video_track_stats =
                 jni()->NewObject(*j_local_video_track_stats_class_,
                                  j_local_video_track_stats_ctor_id_,
                                  j_track_id,
                                  track_stats->getPacketsLost(),
-                                 j_codec_name,
+                                 j_codec,
                                  j_ssrc,
-                                 track_stats->getUnixTimestamp(),
+                                 track_stats->getTimestamp(),
                                  track_stats->getBytesSent(),
                                  track_stats->getPacketsSent(),
                                  track_stats->getRoundTripTime(),
                                  j_capture_dimensions,
                                  j_sent_dimensions,
                                  track_stats->getCapturedFrameRate(),
-                                 track_stats->getSentFrameRate());
+                                 track_stats->getFrameRate());
             jni()->CallVoidMethod(j_stats_report,
                                   j_stats_report_add_local_video_id_,
                                   j_local_video_track_stats);
@@ -241,7 +240,7 @@ private:
             jstring j_track_id =
                 webrtc_jni::JavaStringFromStdString(jni(), track_stats->getTrackId());
             jstring j_codec_name =
-                webrtc_jni::JavaStringFromStdString(jni(), track_stats->getCodecName());
+                webrtc_jni::JavaStringFromStdString(jni(), track_stats->getCodec());
             jstring j_ssrc =
                 webrtc_jni::JavaStringFromStdString(jni(), track_stats->getSsrc());
             jobject j_audio_track_stats =
@@ -251,12 +250,11 @@ private:
                                  track_stats->getPacketsLost(),
                                  j_codec_name,
                                  j_ssrc,
-                                 track_stats->getUnixTimestamp(),
+                                 track_stats->getTimestamp(),
                                  track_stats->getBytesReceived(),
                                  track_stats->getPacketsReceived(),
-                                 track_stats->getJitterBuffer(),
-                                 track_stats->getAudioOutputLevel(),
-                                 track_stats->getJitterReceived());
+                                 track_stats->getAudioLevel(),
+                                 track_stats->getJitter());
             jni()->CallVoidMethod(j_stats_report,
                                   j_stats_report_add_audio_id_,
                                   j_audio_track_stats);
@@ -270,14 +268,14 @@ private:
             jstring j_track_id =
                 webrtc_jni::JavaStringFromStdString(jni(), track_stats->getTrackId());
             jstring j_codec_name =
-                webrtc_jni::JavaStringFromStdString(jni(), track_stats->getCodecName());
+                webrtc_jni::JavaStringFromStdString(jni(), track_stats->getCodec());
             jstring j_ssrc =
                 webrtc_jni::JavaStringFromStdString(jni(), track_stats->getSsrc());
             jobject j_received_dimensions =
                 jni()->NewObject(*j_video_dimensions_class_,
                                  j_video_dimensions_ctor_id_,
-                                 track_stats->getReceivedDimensions().getWidth(),
-                                 track_stats->getReceivedDimensions().getHeight());
+                                 track_stats->getDimensions().getWidth(),
+                                 track_stats->getDimensions().getHeight());
             jobject j_video_track_stats =
                 jni()->NewObject(*j_video_track_stats_class_,
                                  j_video_track_stats_ctor_id_,
@@ -285,12 +283,11 @@ private:
                                  track_stats->getPacketsLost(),
                                  j_codec_name,
                                  j_ssrc,
-                                 track_stats->getUnixTimestamp(),
+                                 track_stats->getTimestamp(),
                                  track_stats->getBytesReceived(),
                                  track_stats->getPacketsReceived(),
-                                 track_stats->getJitterBuffer(),
                                  j_received_dimensions,
-                                 track_stats->getReceivedFrameRate());
+                                 track_stats->getFrameRate());
             jni()->CallVoidMethod(j_stats_report,
                                   j_stats_report_add_video_id_,
                                   j_video_track_stats);

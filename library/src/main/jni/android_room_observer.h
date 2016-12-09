@@ -18,10 +18,10 @@ public:
     AndroidRoomObserver(JNIEnv *env, jobject j_room_observer) :
         j_room_observer_(env, j_room_observer),
         j_room_observer_class_(env, webrtc_jni::GetObjectClass(env, *j_room_observer_)),
-        j_room_exception_class_(env, twilio_video_jni::FindClass(env, "com/twilio/video/RoomException")),
-        j_room_exception_ctor_id_(
+        j_twilio_exception_class_(env, twilio_video_jni::FindClass(env, "com/twilio/video/TwilioException")),
+        j_twilio_exception_ctor_id_(
                 webrtc_jni::GetMethodID(env,
-                            *j_room_exception_class_,
+                            *j_twilio_exception_class_,
                             "<init>",
                             "(ILjava/lang/String;)V")),
         j_participant_class_(
@@ -39,12 +39,12 @@ public:
             webrtc_jni::GetMethodID(env,
                         *j_room_observer_class_,
                         "onDisconnected",
-                        "(Lcom/twilio/video/RoomException;)V")),
+                        "(Lcom/twilio/video/TwilioException;)V")),
         j_on_connect_failure_(
             webrtc_jni::GetMethodID(env,
                         *j_room_observer_class_,
                         "onConnectFailure",
-                        "(Lcom/twilio/video/RoomException;)V")),
+                        "(Lcom/twilio/video/TwilioException;)V")),
         j_on_participant_connected_(
             webrtc_jni::GetMethodID(env,
                         *j_room_observer_class_,
@@ -146,25 +146,8 @@ protected:
         }
     }
 
-    virtual void onDisconnected(const twilio::video::Room *room) {
-        webrtc_jni::ScopedLocalRefFrame local_ref_frame(jni());
-        std::string func_name = std::string(__FUNCTION__);
-        TS_CORE_LOG_MODULE(twilio::video::kTSCoreLogModulePlatform,
-                           twilio::video::kTSCoreLogLevelDebug,
-                           "%s", func_name.c_str());
-        {
-            rtc::CritScope cs(&deletion_lock_);
-
-            if (!isObserverValid(func_name)) {
-                return;
-            }
-            jni()->CallVoidMethod(*j_room_observer_, j_on_disconnected_, nullptr);
-            CHECK_EXCEPTION(jni()) << "error during CallVoidMethod";
-        }
-    }
-
     virtual void onDisconnected(const twilio::video::Room *room,
-                                const twilio::video::RoomError room_error) {
+                                std::unique_ptr<twilio::video::TwilioError> twilio_error) {
         webrtc_jni::ScopedLocalRefFrame local_ref_frame(jni());
         std::string func_name = std::string(__FUNCTION__);
         TS_CORE_LOG_MODULE(twilio::video::kTSCoreLogModulePlatform,
@@ -176,14 +159,18 @@ protected:
             if (!isObserverValid(func_name)) {
                 return;
             }
-            jobject j_room_exception = createJavaRoomException(room_error);
-            jni()->CallVoidMethod(*j_room_observer_, j_on_disconnected_, j_room_exception);
+
+            jobject j_twilio_exception = nullptr;
+            if (twilio_error != nullptr) {
+                j_twilio_exception = createJavaRoomException(*twilio_error);
+            }
+            jni()->CallVoidMethod(*j_room_observer_, j_on_disconnected_, j_twilio_exception);
             CHECK_EXCEPTION(jni()) << "error during CallVoidMethod";
         }
     }
 
     virtual void onConnectFailure(const twilio::video::Room *room,
-                                  const twilio::video::RoomError room_error) {
+                                  const twilio::video::TwilioError twilio_error) {
         webrtc_jni::ScopedLocalRefFrame local_ref_frame(jni());
         std::string func_name = std::string(__FUNCTION__);
         TS_CORE_LOG_MODULE(twilio::video::kTSCoreLogModulePlatform,
@@ -195,7 +182,8 @@ protected:
             if (!isObserverValid(func_name)) {
                 return;
             }
-            jobject j_room_exception = createJavaRoomException(room_error);
+
+            jobject j_room_exception = createJavaRoomException(twilio_error);
             jni()->CallVoidMethod(*j_room_observer_, j_on_connect_failure_, j_room_exception);
             CHECK_EXCEPTION(jni()) << "error during CallVoidMethod";
         }
@@ -280,11 +268,11 @@ private:
         return true;
     }
 
-    jobject createJavaRoomException(const twilio::video::RoomError &room_error) {
-        return jni()->NewObject(*j_room_exception_class_,
-                                j_room_exception_ctor_id_,
-                                room_error.getCode(),
-                                webrtc_jni::JavaStringFromStdString(jni(), room_error.getMessage()));
+    jobject createJavaRoomException(const twilio::video::TwilioError &twilio_error) {
+        return jni()->NewObject(*j_twilio_exception_class_,
+                                j_twilio_exception_ctor_id_,
+                                twilio_error.getCode(),
+                                webrtc_jni::JavaStringFromStdString(jni(), twilio_error.getMessage()));
     }
 
     jobject createJavaMediaObject(std::shared_ptr<twilio::media::Media> media) {
@@ -358,7 +346,7 @@ private:
 
     const webrtc_jni::ScopedGlobalRef<jobject> j_room_observer_;
     const webrtc_jni::ScopedGlobalRef<jclass> j_room_observer_class_;
-    const webrtc_jni::ScopedGlobalRef<jclass> j_room_exception_class_;
+    const webrtc_jni::ScopedGlobalRef<jclass> j_twilio_exception_class_;
     const webrtc_jni::ScopedGlobalRef<jclass> j_participant_class_;
     const webrtc_jni::ScopedGlobalRef<jclass> j_array_list_class_;
     const webrtc_jni::ScopedGlobalRef<jclass> j_audio_track_class_;
@@ -376,7 +364,7 @@ private:
     jmethodID j_audio_track_ctor_id_;
     jmethodID j_video_track_ctor_id_;
     jmethodID j_media_ctor_id_;
-    jmethodID j_room_exception_ctor_id_;
+    jmethodID j_twilio_exception_ctor_id_;
 };
 
 #endif // VIDEO_ANDROID_ANDROID_ROOM_OBSERVER_H_

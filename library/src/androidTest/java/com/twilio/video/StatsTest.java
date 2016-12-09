@@ -311,10 +311,8 @@ public class StatsTest extends BaseClientTest {
         LocalAudioTrackStats localAudioTrackStats = statsReport.getLocalAudioTrackStats().get(0);
         checkBaseTrackStats(localAudioTrackStats);
         checkLocalTrackStats(localAudioTrackStats);
-        assertTrue(0 < localAudioTrackStats.audioInputLevel);
-        assertTrue(0 < localAudioTrackStats.jitterReceived);
-        // TODO: jitterBufferMs will be kicked out from report
-        //assertTrue(0 < localAudioTrackStats.jitterBufferMs);
+        assertTrue(0 < localAudioTrackStats.audioLevel);
+        assertTrue(0 < localAudioTrackStats.jitter);
         assertTrue(0 < localAudioTrackStats.roundTripTime);
 
         // Check LocalVideoTrackStats
@@ -324,25 +322,25 @@ public class StatsTest extends BaseClientTest {
         assertTrue(0 < localVideoTrackStats.capturedFrameRate);
         assertTrue(0 < localVideoTrackStats.captureDimensions.width);
         assertTrue(0 < localVideoTrackStats.captureDimensions.height);
-        assertTrue(0 < localVideoTrackStats.sentFrameRate);
-        assertTrue(0 < localVideoTrackStats.sentDimensions.width);
-        assertTrue(0 < localVideoTrackStats.sentDimensions.height);
+        assertTrue(0 < localVideoTrackStats.frameRate);
+        assertTrue(0 < localVideoTrackStats.dimensions.width);
+        assertTrue(0 < localVideoTrackStats.dimensions.height);
         assertTrue(0 < localVideoTrackStats.roundTripTime);
 
         // Check AudioTrackStats
         AudioTrackStats audioTrackStats = statsReport.getAudioTrackStats().get(0);
         checkBaseTrackStats(audioTrackStats);
         checkTrackStats(audioTrackStats);
-        assertTrue(0 < audioTrackStats.audioOutputLevel);
-        assertTrue(0 < audioTrackStats.jitterReceived);
+        assertTrue(0 < audioTrackStats.audioLevel);
+        assertTrue(0 < audioTrackStats.jitter);
 
         // Check VideoTrackStats
         VideoTrackStats videoTrackStats = statsReport.getVideoTrackStats().get(0);
         checkBaseTrackStats(videoTrackStats);
         checkTrackStats(videoTrackStats);
-        assertTrue(0 < videoTrackStats.receivedFrameRate);
-        assertTrue(0 < videoTrackStats.receivedDimensions.width);
-        assertTrue(0 < videoTrackStats.receivedDimensions.height);
+        assertTrue(0 < videoTrackStats.frameRate);
+        assertTrue(0 < videoTrackStats.dimensions.width);
+        assertTrue(0 < videoTrackStats.dimensions.height);
     }
 
     @Test
@@ -458,12 +456,12 @@ public class StatsTest extends BaseClientTest {
     }
 
     private void checkBaseTrackStats(BaseTrackStats stats) {
-        assertNotEquals("", stats.codecName);
+        assertNotEquals("", stats.codec);
         assertNotEquals("", stats.ssrc);
         assertNotEquals("", stats.trackId);
         // TODO: Packets lost is always 0. Find a way to make test that will exercise this
         assertTrue(0 <= stats.packetsLost);
-        assertTrue(0.0 < stats.unixTimestamp);
+        assertTrue(0.0 < stats.timestamp);
     }
 
     private void checkLocalTrackStats(LocalTrackStats stats) {
@@ -475,7 +473,5 @@ public class StatsTest extends BaseClientTest {
     private void checkTrackStats(TrackStats stats) {
         assertTrue(0 < stats.bytesReceived);
         assertTrue(0 < stats.packetsReceived);
-        // Always 0. This field will be removed.
-        //assertTrue(0 < stats.jitterBuffer);
     }
 }

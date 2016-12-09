@@ -206,14 +206,14 @@ public class VideoClient {
             }
 
             @Override
-            public void onConnectFailure(Room room, RoomException roomException) {
-                roomListener.onConnectFailure(room, roomException);
+            public void onConnectFailure(Room room, TwilioException twilioException) {
+                roomListener.onConnectFailure(room, twilioException);
                 release(room);
             }
 
             @Override
-            public void onDisconnected(Room room, RoomException roomException) {
-                roomListener.onDisconnected(room, roomException);
+            public void onDisconnected(Room room, TwilioException twilioException) {
+                roomListener.onDisconnected(room, twilioException);
                 release(room);
             }
 

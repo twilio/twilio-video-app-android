@@ -4,26 +4,25 @@ public class VideoTrackStats extends TrackStats {
     /**
      * Received frame dimensions
      */
-    public final VideoDimensions receivedDimensions;
+    public final VideoDimensions dimensions;
 
     /**
      * Received frame rate
      */
-    public final int receivedFrameRate;
+    public final int frameRate;
 
     VideoTrackStats(String trackId,
-                           int packetsLost,
-                           String codecName,
-                           String ssrc,
-                           double unixTimestamp,
-                           long bytesReceived,
-                           int packetsReceived,
-                           int jitterBuffer,
-                           VideoDimensions receivedDimensions,
-                           int receivedFrameRate) {
-        super(trackId, packetsLost, codecName, ssrc,
-                unixTimestamp, bytesReceived, packetsReceived, jitterBuffer);
-        this.receivedDimensions = receivedDimensions;
-        this.receivedFrameRate = receivedFrameRate;
+                    int packetsLost,
+                    String codec,
+                    String ssrc,
+                    double timestamp,
+                    long bytesReceived,
+                    int packetsReceived,
+                    VideoDimensions dimensions,
+                    int frameRate) {
+        super(trackId, packetsLost, codec, ssrc,
+                timestamp, bytesReceived, packetsReceived);
+        this.dimensions = dimensions;
+        this.frameRate = frameRate;
     }
 }

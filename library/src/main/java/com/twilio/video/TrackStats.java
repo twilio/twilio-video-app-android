@@ -11,17 +11,12 @@ public abstract class TrackStats extends BaseTrackStats {
      */
     public final int packetsReceived;
 
-    /**
-     * Jitter buffer in milliseconds
-     */
-    public final int jitterBuffer;
 
     protected TrackStats(String trackId, int packetsLost,
-                      String codecName, String ssrc, double unixTimestamp,
-                      long bytesReceived, int packetsReceived, int jitterBuffer) {
-        super(trackId, packetsLost, codecName, ssrc, unixTimestamp);
+                         String codec, String ssrc, double timestamp,
+                         long bytesReceived, int packetsReceived) {
+        super(trackId, packetsLost, codec, ssrc, timestamp);
         this.bytesReceived = bytesReceived;
         this.packetsReceived = packetsReceived;
-        this.jitterBuffer = jitterBuffer;
     }
 }

@@ -132,13 +132,13 @@ public class RoomTest extends BaseClientTest {
             }
 
             @Override
-            public void onConnectFailure(Room room, RoomException roomException) {
-                assertEquals(Room.ERROR_INVALID_ACCESS_TOKEN, roomException.code);
+            public void onConnectFailure(Room room, TwilioException twilioException) {
+                assertEquals(Room.ERROR_INVALID_ACCESS_TOKEN, twilioException.code);
                 connectFailure.countDown();
             }
 
             @Override
-            public void onDisconnected(Room room, RoomException roomException) {
+            public void onDisconnected(Room room, TwilioException twilioException) {
                 fail();
             }
 

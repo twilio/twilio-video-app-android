@@ -5,7 +5,7 @@ import com.twilio.video.AudioTrack;
 import com.twilio.video.Media;
 import com.twilio.video.Participant;
 import com.twilio.video.Room;
-import com.twilio.video.RoomException;
+import com.twilio.video.TwilioException;
 import com.twilio.video.StatsListener;
 import com.twilio.video.StatsReport;
 import com.twilio.video.VideoTrack;
@@ -35,12 +35,12 @@ public class CallbackHelper {
         }
 
         @Override
-        public void onConnectFailure(Room room, RoomException roomException) {
+        public void onConnectFailure(Room room, TwilioException twilioException) {
             triggerLatch(onConnectFailureLatch);
         }
 
         @Override
-        public void onDisconnected(Room room, RoomException roomException) {
+        public void onDisconnected(Room room, TwilioException twilioException) {
             triggerLatch(onDisconnectedLatch);
         }
 
@@ -63,12 +63,12 @@ public class CallbackHelper {
         }
 
         @Override
-        public void onConnectFailure(Room room, RoomException roomException) {
+        public void onConnectFailure(Room room, TwilioException twilioException) {
 
         }
 
         @Override
-        public void onDisconnected(Room room, RoomException roomException) {
+        public void onDisconnected(Room room, TwilioException twilioException) {
 
         }
 

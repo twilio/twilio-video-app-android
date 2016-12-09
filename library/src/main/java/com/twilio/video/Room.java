@@ -198,8 +198,8 @@ public class Room {
                          String localParticipantSid,
                          String localParticipantIdentity,
                          List<Participant> participantList);
-        void onDisconnected(RoomException roomException);
-        void onConnectFailure(RoomException roomException);
+        void onDisconnected(TwilioException twilioException);
+        void onConnectFailure(TwilioException twilioException);
         void onParticipantConnected(Participant participant);
         void onParticipantDisconnected(String participantSid);
     }
@@ -236,26 +236,26 @@ public class Room {
         }
 
         @Override
-        public synchronized void onDisconnected(final RoomException roomException) {
+        public synchronized void onDisconnected(final TwilioException twilioException) {
             logger.d("onDisconnected()");
             Room.this.roomState = RoomState.DISCONNECTED;
             handler.post(new Runnable() {
                 @Override
                 public void run() {
-                    Room.this.listener.onDisconnected(Room.this, roomException);
+                    Room.this.listener.onDisconnected(Room.this, twilioException);
                 }
             });
             release();
         }
 
         @Override
-        public synchronized void onConnectFailure(final RoomException roomException) {
+        public synchronized void onConnectFailure(final TwilioException twilioException) {
             logger.d("onConnectFailure()");
             Room.this.roomState = RoomState.DISCONNECTED;
             handler.post(new Runnable() {
                 @Override
                 public void run() {
-                    Room.this.listener.onConnectFailure(Room.this, roomException);
+                    Room.this.listener.onConnectFailure(Room.this, twilioException);
                 }
             });
         }
@@ -310,19 +310,19 @@ public class Room {
          * Called when a connection to a room failed.
          *
          * @param room the room that failed to be connected to.
-         * @param roomException an exception describing why connect failed.
+         * @param twilioException an exception describing why connect failed.
          */
-        void onConnectFailure(Room room, RoomException roomException);
+        void onConnectFailure(Room room, TwilioException twilioException);
 
         /**
          * Called when a room has been disconnected from.
          *
          * @param room the room that was disconnected from.
-         * @param roomException An exception if there was a problem that caused the room to be
+         * @param twilioException An exception if there was a problem that caused the room to be
          *              disconnected from. This value will be null is there were no problems
          *              disconnecting from the room.
          */
-        void onDisconnected(Room room, RoomException roomException);
+        void onDisconnected(Room room, TwilioException twilioException);
 
         /**
          * Called when a participant has connected to a room.

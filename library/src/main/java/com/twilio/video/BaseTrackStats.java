@@ -15,7 +15,7 @@ public abstract class BaseTrackStats {
     /**
      * Name of codec used for this track
      */
-    public final String codecName;
+    public final String codec;
 
     /**
      * The SSRC identifier of the source
@@ -25,14 +25,14 @@ public abstract class BaseTrackStats {
     /**
      * Unix timestamp in milliseconds
      */
-    public final double unixTimestamp;
+    public final double timestamp;
 
     protected BaseTrackStats(String trackId, int packetsLost,
-                          String codecName, String ssrc, double unixTimestamp) {
+                             String codec, String ssrc, double timestamp) {
         this.trackId = trackId;
         this.packetsLost = packetsLost;
-        this.codecName = codecName;
+        this.codec = codec;
         this.ssrc = ssrc;
-        this.unixTimestamp = unixTimestamp;
+        this.timestamp = timestamp;
     }
 }

@@ -4,26 +4,25 @@ public class AudioTrackStats extends TrackStats {
     /**
      * Audio output level
      */
-    public final int audioOutputLevel;
+    public final int audioLevel;
 
     /**
      * Packet jitter measured in milliseconds
      */
-    public final int jitterReceived;
+    public final int jitter;
 
     AudioTrackStats(String trackId,
-                           int packetsLost,
-                           String codecName,
-                           String ssrc,
-                           double unixTimestamp,
-                           long bytesReceived,
-                           int packetsReceived,
-                           int jitterBuffer,
-                           int audioOutputLevel,
-                           int jitterReceived) {
-        super(trackId, packetsLost, codecName, ssrc,
-                unixTimestamp, bytesReceived, packetsReceived, jitterBuffer);
-        this.audioOutputLevel = audioOutputLevel;
-        this.jitterReceived = jitterReceived;
+                    int packetsLost,
+                    String codec,
+                    String ssrc,
+                    double timestamp,
+                    long bytesReceived,
+                    int packetsReceived,
+                    int audioLevel,
+                    int jitter) {
+        super(trackId, packetsLost, codec, ssrc,
+                timestamp, bytesReceived, packetsReceived);
+        this.audioLevel = audioLevel;
+        this.jitter = jitter;
     }
 }
