@@ -25,6 +25,7 @@ android {
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
         buildConfigField "String", "ENVIRONMENT", "\"${getEnvironment()}\""
+        buildConfigField "String", "TOPOLOGY", "\"${getTopology()}\""
 
         ndk {
             abiFilters 'x86', 'x86_64', 'armeabi-v7a', 'arm64-v8a'
@@ -281,4 +282,28 @@ def getEnvironment() {
 
     println "Environment: " + environment
     return environment;
+}
+
+def getTopology() {
+    // Possible values for TOPOLOGY are 'P2P' and 'SFU'.
+
+    // Attempt to get it from the environment variable
+    def topology = System.getenv("TOPOLOGY");
+
+    if (topology == null) {
+        println "Could not locate TOPOLOGY environment variable. Trying local.properties"
+        Properties properties = new Properties()
+        if (project.rootProject.file('local.properties').exists()) {
+            properties.load(project.rootProject.file('local.properties').newDataInputStream())
+            topology = properties.getProperty('TOPOLOGY')
+        }
+    }
+
+    if (topology == null) {
+        println "Could not locate TOPOLOGY in local.properties."
+        topology = "P2P"
+    }
+
+    println "Topology: " + topology
+    return topology;
 }
