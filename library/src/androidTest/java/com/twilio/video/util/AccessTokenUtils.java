@@ -19,11 +19,7 @@ public class AccessTokenUtils {
     private static final String ENVIRONMENT = "environment";
     private static final String IDENTITY = "identity";
     private static final String TTL = "ttl";
-    /*
-     * The default is usually 30 minutes. We are intentionally setting it to 5 minutes to validate
-     * expiration.
-     */
-    private static final String TTL_DEFAULT = "300";
+    private static final String TTL_DEFAULT = "3000";
     private static final String CONFIGURATION_PROFILE_SID = "configurationProfileSid";
     public static final String STAGE = "stage";
     public static final String DEV= "dev";
