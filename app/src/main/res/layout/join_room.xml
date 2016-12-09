@@ -22,7 +22,7 @@
             android:layout_alignParentRight="true"
             android:layout_alignParentTop="true"
             android:layout_centerInParent="true"
-            android:text="Join"
+            android:text="@string/join"
             android:textAppearance="@style/TextAppearance.AppCompat.Widget.Button.Inverse" />
 
         <com.twilio.video.app.data.ClearableEditText
@@ -36,7 +36,7 @@
             android:layout_centerInParent="true"
             android:layout_toLeftOf="@id/connect"
             android:layout_toStartOf="@id/connect"
-            android:hint="Room"
+            android:hint="@string/room"
             android:inputType="textAutoComplete"
             android:maxLines="1"
             app:backgroundTint="@color/lobbyEditTextUnderline"

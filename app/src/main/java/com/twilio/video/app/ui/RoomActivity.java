@@ -13,6 +13,7 @@ import android.support.design.widget.Snackbar;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.TextUtils;
 import android.util.TypedValue;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -362,7 +363,7 @@ public class RoomActivity extends AppCompatActivity {
 
     @OnTextChanged(value = R.id.room_edit_text, callback = OnTextChanged.Callback.AFTER_TEXT_CHANGED)
     void onTextChanged(CharSequence text) {
-        connect.setEnabled(text.length() > 0);
+        connect.setEnabled(!TextUtils.isEmpty(text));
     }
 
     @OnClick(R.id.connect)

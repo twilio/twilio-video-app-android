@@ -4,8 +4,6 @@
     <color name="colorPrimaryDark">#a52229</color>
     <color name="colorAccent">#b0bec5</color>
     <color name="colorButtonText">#80fffffe</color>
-    <color name="white">#ffffff</color>
-    <color name="black">#000000</color>
 
     <color name="lobbyColorPrimary">#757575</color>
     <color name="lobbyColorPrimaryDark">#424242</color>

@@ -15,6 +15,7 @@
         <include layout="@layout/content_room" />
 
         <android.support.design.widget.AppBarLayout
+            android:id="@+id/lobby_toolbar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@color/lobbyToolbar"
@@ -36,9 +37,10 @@
             android:id="@+id/join_status_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="80dp"
+            android:layout_marginTop="16dp"
             android:orientation="vertical"
-            android:visibility="gone">
+            android:visibility="visible"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
             <TextView
                 android:id="@+id/join_status"
@@ -52,6 +54,7 @@
                 android:id="@+id/join_room_name"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
                 android:gravity="center"
                 android:textColor="@color/joinLayoutTextColor"
                 android:textSize="24sp"
