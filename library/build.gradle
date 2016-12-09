@@ -285,22 +285,22 @@ def getEnvironment() {
 }
 
 def getTopology() {
-    // Possible values for TOPOLOGY are 'P2P' and 'SFU'.
+    // Possible values for VIDEO_TOPOLOGY are 'P2P' and 'SFU'.
 
     // Attempt to get it from the environment variable
-    def topology = System.getenv("TOPOLOGY");
+    def topology = System.getenv("VIDEO_TOPOLOGY");
 
     if (topology == null) {
-        println "Could not locate TOPOLOGY environment variable. Trying local.properties"
+        println "Could not locate VIDEO_TOPOLOGY environment variable. Trying local.properties"
         Properties properties = new Properties()
         if (project.rootProject.file('local.properties').exists()) {
             properties.load(project.rootProject.file('local.properties').newDataInputStream())
-            topology = properties.getProperty('TOPOLOGY')
+            topology = properties.getProperty('VIDEO_TOPOLOGY')
         }
     }
 
     if (topology == null) {
-        println "Could not locate TOPOLOGY in local.properties."
+        println "Could not locate VIDEO_TOPOLOGY in local.properties."
         topology = "P2P"
     }
 
