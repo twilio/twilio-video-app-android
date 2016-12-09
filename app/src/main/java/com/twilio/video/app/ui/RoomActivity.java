@@ -21,7 +21,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
@@ -45,9 +44,8 @@ import com.twilio.video.LocalVideoTrack;
 import com.twilio.video.Media;
 import com.twilio.video.Participant;
 import com.twilio.video.Room;
-import com.twilio.video.TwilioException;
-import com.twilio.video.RoomState;
 import com.twilio.video.ScreenCapturer;
+import com.twilio.video.TwilioException;
 import com.twilio.video.VideoClient;
 import com.twilio.video.VideoConstraints;
 import com.twilio.video.VideoDimensions;
@@ -134,7 +132,6 @@ public class RoomActivity extends AppCompatActivity {
     private LocalVideoTrack screenVideoTrack;
     private VideoTrack primaryVideoTrack;
     private CameraCapturer cameraCapturer;
-    boolean loggingOut;
     private ScreenCapturer screenCapturer;
     private final ScreenCapturer.Listener screenCapturerListener = new ScreenCapturer.Listener() {
         @Override
@@ -316,31 +313,14 @@ public class RoomActivity extends AppCompatActivity {
     }
 
     @OnClick(R.id.connect)
-    void connect() {
-        if (room != null) {
-
-            Timber.w("Already in active call - sid: %s, state: %s",
-                    room.getSid(),
-                    room.getState().toString());
-
-            return;
-        }
-
+    void connectButtonClick() {
         String roomOrSid = roomEditText.getText().toString();
-
-        ConnectOptions connectOptions = new ConnectOptions.Builder()
-                .roomName(roomOrSid)
-                .localMedia(localMedia)
-                .build();
-
-        room = videoClient.connect(connectOptions, roomListener());
-
+        obtainTokenAndConnect(roomOrSid);
         InputUtils.hideKeyboard(this);
-        updateUI(room);
     }
 
     @OnClick(R.id.disconnect)
-    void disconnect() {
+    void disconnectButtonClick() {
         if (room != null) {
             Timber.i("Exiting room");
             room.disconnect();
@@ -465,11 +445,13 @@ public class RoomActivity extends AppCompatActivity {
         videoConstraints = builder.build();
     }
 
-    private void updateUI(Room room) {
+    private void updateUi(Room room) {
 
         int disconnectButtonState = View.GONE;
         int joinRoomLayoutState = View.VISIBLE;
         int joinStatusLayoutState = View.GONE;
+
+        boolean settingsMenuItemState = true;
 
         boolean connectButtonEnabled = false;
 
@@ -483,6 +465,7 @@ public class RoomActivity extends AppCompatActivity {
                     disconnectButtonState = View.VISIBLE;
                     joinRoomLayoutState = View.GONE;
                     joinStatusLayoutState = View.VISIBLE;
+                    settingsMenuItemState = false;
 
                     connectButtonEnabled = false;
 
@@ -494,6 +477,7 @@ public class RoomActivity extends AppCompatActivity {
                     disconnectButtonState = View.VISIBLE;
                     joinRoomLayoutState = View.GONE;
                     joinStatusLayoutState = View.GONE;
+                    settingsMenuItemState = false;
 
                     connectButtonEnabled = false;
 
@@ -521,10 +505,9 @@ public class RoomActivity extends AppCompatActivity {
         joinStatusTextView.setText(joinStatus);
         joinRoomNameTextView.setText(roomName);
 
-        // TODO: Remove when we use a Service to connect to a room
+        // TODO: Remove when we use a Service to obtainTokenAndConnect to a room
         if (settingsMenuItem != null) {
-            settingsMenuItem.setVisible(roomState != RoomState.CONNECTING &&
-                    roomState != RoomState.CONNECTED);
+            settingsMenuItem.setVisible(settingsMenuItemState);
         }
     }
 
@@ -578,26 +561,7 @@ public class RoomActivity extends AppCompatActivity {
         }
     }
 
-    private DialogInterface.OnClickListener connectClickListener(final EditText connectEditText) {
-        return new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                connect(connectEditText.getText().toString());
-            }
-        };
-    }
-
-    private DialogInterface.OnClickListener cancelRoomClickListener() {
-        return new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                // set proper action
-                alertDialog.dismiss();
-            }
-        };
-    }
-
-    private void connect(final String roomName) {
+    private void obtainTokenAndConnect(final String roomName) {
         String currentRealm = sharedPreferences.getString(Preferences.ENVIRONMENT,
                 Preferences.ENVIRONMENT_DEFAULT);
         String currentTopology = sharedPreferences.getString(Preferences.TOPOLOGY,
@@ -614,14 +578,14 @@ public class RoomActivity extends AppCompatActivity {
                             if (response.getStatus() == HttpURLConnection.HTTP_OK) {
                                 Timber.d("Access token retrieved");
                                 updateToken(token);
-                                connectToRoom(roomName);
+                                connect(roomName);
                             } else {
                                 Snackbar.make(primaryVideoView,
                                         "Retrieving access token failed. Status: " +
                                                 response.getStatus(),
                                         Snackbar.LENGTH_LONG)
                                         .setAction("Action", null).show();
-                                updateUi(RoomState.DISCONNECTED);
+                                updateUi(room);
                             }
                         }
 
@@ -631,14 +595,14 @@ public class RoomActivity extends AppCompatActivity {
                                     "Retrieving access token failed. Error: " + error.getMessage(),
                                     Snackbar.LENGTH_LONG)
                                     .setAction("Action", null).show();
-                            updateUi(RoomState.DISCONNECTED);
+                            updateUi(room);
                         }
                     });
         } else {
-            connectToRoom(roomName);
+            connect(roomName);
         }
 
-        updateUi(RoomState.CONNECTING);
+        updateUi(room);
     }
 
     private boolean newTokenNeeded(String currentRealm, String currentTopology) {
@@ -661,14 +625,12 @@ public class RoomActivity extends AppCompatActivity {
         }
     }
 
-    private void connectToRoom(String roomName) {
+    private void connect(String roomName) {
         ConnectOptions connectOptions = new ConnectOptions.Builder()
                 .roomName(roomName)
                 .localMedia(localMedia)
                 .build();
 
-        this.roomName = roomName;
-        roomStatusTextview.setText("Connecting to room " + roomName);
         room = videoClient.connect(connectOptions, roomListener());
     }
 
@@ -828,7 +790,7 @@ public class RoomActivity extends AppCompatActivity {
                 Timber.i("onConnected: " + room.getName() + " sid:" +
                         room.getSid() + " state:" + room.getState());
                 roomStatusTextview.setText("Connected to " + room.getName());
-                updateUI(room);
+                updateUi(room);
 
                 for (Map.Entry<String, Participant> entry : room.getParticipants().entrySet()) {
                     addParticipant(entry.getValue());
@@ -838,18 +800,16 @@ public class RoomActivity extends AppCompatActivity {
             @Override
             public void onConnectFailure(Room room, TwilioException twilioException) {
                 Timber.i("onConnectFailure");
-                roomStatusTextview.setText("Failed to connect to " + room.getName());
+                roomStatusTextview.setText("Failed to obtainTokenAndConnect to " + room.getName());
                 RoomActivity.this.room = null;
-                updateUI(room);
-            }
+                updateUi(room);            }
 
             @Override
             public void onDisconnected(Room room, TwilioException twilioException) {
                 Timber.i("onDisconnected");
                 roomStatusTextview.setText("Disconnected from " + room.getName());
                 removeAllParticipants();
-                updateUI(room);
-                RoomActivity.this.room = null;
+                updateUi(room);                RoomActivity.this.room = null;
             }
 
             @Override
