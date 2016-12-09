@@ -54,7 +54,6 @@ import com.twilio.video.RoomException;
 import com.twilio.video.VideoTrack;
 import com.twilio.video.VideoView;
 import com.twilio.video.app.R;
-import com.twilio.video.app.data.ClearableEditText;
 import com.twilio.video.app.data.Preferences;
 import com.twilio.video.app.util.SimplerSignalingUtils;
 

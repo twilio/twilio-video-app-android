@@ -1,4 +1,4 @@
-package com.twilio.video.app.data;
+package com.twilio.video.app.ui;
 
 import android.content.Context;
 import android.content.res.TypedArray;
