@@ -1,7 +1,7 @@
 Android Video SDK
 =============================
 
-##Getting Started
+## Getting Started
 
 1.  Install the Android SDK
     * Define `$ANROID_HOME`, `$ANDROID_SDK_HOME`, and `$ANDROID_SDK_ROOT`
@@ -15,6 +15,9 @@ Android Video SDK
 ## Developing
 
 If you have all the dependencies installed, you can proceed with development. The SDK is built with gradle and can be imported into Android Studio. For first time users, just import the top level build.gradle file into Android Studio.
+
+### Enabling Native Debugging for the Application
+By default, the Android Gradle plugin publishes the release variant of a library project. To override this behavior and enable native debugging of the application, add `PUBLISH_CONFIG=debug` to your `local.properties` file. This informs the plugin to publish the debug variant of the library.
 
 ## Releasing
 The SDK is built and consumed with Android Studio as an aar. However, we currently ship a tar file with a 'fat' jar that contains all the native dependencies. To package a release execute the following.
