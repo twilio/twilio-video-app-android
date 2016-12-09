@@ -50,6 +50,9 @@
     <string name="about">About</string>
     <string name="identity">Identity</string>
     <string name="version">Version</string>
+    <string name="join">Join</string>
+    <string name="room">Room</string>
+    <string name="turn_speaker_on">Speaker ON</string>
 
     <string-array name="environment_array">
         <item>Production</item>

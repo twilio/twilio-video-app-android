@@ -20,6 +20,11 @@ import android.widget.Toast;
 import com.twilio.video.app.R;
 import com.twilio.video.app.base.BaseActivity;
 import com.twilio.video.app.data.Preferences;
+import com.twilio.video.app.util.InputUtils;
+import com.twilio.video.app.util.SimplerSignalingUtils;
+import com.twilio.video.LogLevel;
+import com.twilio.video.VideoClient;
+import com.twilio.video.env.Env;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -54,6 +59,7 @@ public class LoginActivity extends BaseActivity {
             loginButton.setTextColor(ContextCompat.getColor(this, android.R.color.white));
             loginButton.setEnabled(true);
         } else {
+            loginButton.setTextColor(ContextCompat.getColor(LoginActivity.this, android.R.color.white));
             loginButton.setTextColor(ContextCompat.getColor(this, R.color.colorButtonText));
             loginButton.setEnabled(false);
         }
@@ -95,7 +101,7 @@ public class LoginActivity extends BaseActivity {
         String username = usernameEditText.getText().toString();
         if(username != null && username.length() != 0) {
             sharedPreferences.edit().putString(Preferences.IDENTITY, username).apply();
-            hideKeyboard();
+            InputUtils.hideKeyboard(this);
             startLobbyActivity();
         } else {
             view.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS);
