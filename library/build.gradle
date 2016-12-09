@@ -13,7 +13,9 @@ configurations {
 android {
     compileSdkVersion 24
     buildToolsVersion "24.0.2"
-    publishNonDefault true
+
+    // Parameterizing config allows video application to use a debug build of the library
+    defaultPublishConfig getPublishConfig()
 
     defaultConfig {
         minSdkVersion 16
@@ -306,4 +308,28 @@ def getTopology() {
 
     println "Topology: " + topology
     return topology;
+}
+
+def getPublishConfig() {
+    // Possible values for PUBLISH_CONFIG are 'debug' and 'release'.
+
+    // Attempt to get it from the environment variable
+    def publishConfig = System.getenv("PUBLISH_CONFIG");
+
+    if (publishConfig == null) {
+        println "Could not locate PUBLISH_CONFIG environment variable. Trying local.properties"
+        Properties properties = new Properties()
+        if (project.rootProject.file('local.properties').exists()) {
+            properties.load(project.rootProject.file('local.properties').newDataInputStream())
+            publishConfig = properties.getProperty('PUBLISH_CONFIG')
+        }
+    }
+
+    if (publishConfig == null) {
+        println "Could not locate PUBLISH_CONFIG in local.properties."
+        publishConfig = "release"
+    }
+
+    println "Publish Config: " + publishConfig
+    return publishConfig;
 }
