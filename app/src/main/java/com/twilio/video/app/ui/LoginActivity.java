@@ -1,7 +1,6 @@
 package com.twilio.video.app.ui;
 
 import android.Manifest;
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -12,7 +11,6 @@ import android.support.v7.preference.PreferenceManager;
 import android.text.TextUtils;
 import android.view.HapticFeedbackConstants;
 import android.view.View;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -20,6 +18,7 @@ import android.widget.Toast;
 import com.twilio.video.app.R;
 import com.twilio.video.app.base.BaseActivity;
 import com.twilio.video.app.data.Preferences;
+import com.twilio.video.app.util.InputUtils;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -54,6 +53,7 @@ public class LoginActivity extends BaseActivity {
             loginButton.setTextColor(ContextCompat.getColor(this, android.R.color.white));
             loginButton.setEnabled(true);
         } else {
+            loginButton.setTextColor(ContextCompat.getColor(LoginActivity.this, android.R.color.white));
             loginButton.setTextColor(ContextCompat.getColor(this, R.color.colorButtonText));
             loginButton.setEnabled(false);
         }
@@ -95,19 +95,10 @@ public class LoginActivity extends BaseActivity {
         String username = usernameEditText.getText().toString();
         if(username != null && username.length() != 0) {
             sharedPreferences.edit().putString(Preferences.IDENTITY, username).apply();
-            hideKeyboard();
+            InputUtils.hideKeyboard(this);
             startLobbyActivity();
         } else {
             view.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS);
-        }
-    }
-
-    private void hideKeyboard() {
-        View view = this.getCurrentFocus();
-        if (view != null) {
-            InputMethodManager imm = (InputMethodManager)
-                    getSystemService(Context.INPUT_METHOD_SERVICE);
-            imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
         }
     }
 
