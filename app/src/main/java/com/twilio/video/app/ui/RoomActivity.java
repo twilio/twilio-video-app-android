@@ -601,8 +601,6 @@ public class RoomActivity extends AppCompatActivity {
         } else {
             connect(roomName);
         }
-
-        updateUi(room);
     }
 
     private boolean newTokenNeeded(String currentRealm, String currentTopology) {
@@ -632,6 +630,7 @@ public class RoomActivity extends AppCompatActivity {
                 .build();
 
         room = videoClient.connect(connectOptions, roomListener());
+        updateUi(room);
     }
 
     private void addParticipant(Participant participant) {
