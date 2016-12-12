@@ -28,21 +28,21 @@ class EglBaseProvider {
     EglBase getRootEglBase() {
         synchronized (EglBaseProvider.class) {
             checkReleased("getRootEglBase");
-            return rootEglBase;
+            return instance.rootEglBase;
         }
     }
 
     EglBase getLocalEglBase() {
         synchronized (EglBaseProvider.class) {
             checkReleased("getLocalEglBase");
-            return localEglBase;
+            return instance.localEglBase;
         }
     }
 
     EglBase getRemoteEglBase() {
         synchronized (EglBaseProvider.class) {
             checkReleased("getRemoteEglBase");
-            return remoteEglBase;
+            return instance.remoteEglBase;
         }
     }
 
@@ -51,12 +51,12 @@ class EglBaseProvider {
             synchronized (EglBaseProvider.class) {
                 eglBaseProviderRefCount = Math.max(0, --eglBaseProviderRefCount);
                 if (instance != null && eglBaseProviderRefCount == 0) {
-                    remoteEglBase.release();
-                    remoteEglBase = null;
-                    localEglBase.release();
-                    localEglBase = null;
-                    rootEglBase.release();
-                    rootEglBase = null;
+                    instance.remoteEglBase.release();
+                    instance.remoteEglBase = null;
+                    instance.localEglBase.release();
+                    instance.localEglBase = null;
+                    instance.rootEglBase.release();
+                    instance.rootEglBase = null;
                     instance = null;
                 }
             }
