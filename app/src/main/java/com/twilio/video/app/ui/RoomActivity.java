@@ -1,15 +1,18 @@
 package com.twilio.video.app.ui;
 
+import android.Manifest;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.media.projection.MediaProjectionManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.design.widget.Snackbar;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -69,7 +72,8 @@ import retrofit.client.Response;
 import timber.log.Timber;
 
 public class RoomActivity extends AppCompatActivity {
-    private static final int REQUEST_MEDIA_PROJECTION = 100;
+    private static final int PERMISSIONS_REQUEST_CODE = 100;
+    private static final int MEDIA_PROJECTION_REQUEST_CODE = 101;
     private static final int THUMBNAIL_DIMENSION = 96;
 
     private AspectRatio[] aspectRatios = new AspectRatio[]{
@@ -171,18 +175,14 @@ public class RoomActivity extends AppCompatActivity {
         // Setup activity
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         username = sharedPreferences.getString(Preferences.IDENTITY, null);
-        realm = sharedPreferences.getString(Preferences.ENVIRONMENT, Preferences.ENVIRONMENT_DEFAULT);
-        topology = sharedPreferences.getString(Preferences.TOPOLOGY, Preferences.TOPOLOGY_DEFAULT);
+        realm = sharedPreferences.getString(Preferences.ENVIRONMENT,
+                Preferences.ENVIRONMENT_DEFAULT);
+        topology = sharedPreferences.getString(Preferences.TOPOLOGY,
+                Preferences.TOPOLOGY_DEFAULT);
+        localMedia = LocalMedia.create(this);
         obtainVideoConstraints();
         updateUi(room);
-
-        // Setup local media
-        localMedia = LocalMedia.create(this);
-        localAudioTrack = localMedia.addAudioTrack(true);
-        cameraCapturer = new CameraCapturer(this, CameraCapturer.CameraSource.FRONT_CAMERA);
-        cameraVideoTrack = localMedia.addVideoTrack(true, cameraCapturer, videoConstraints);
-        primaryVideoView.setMirror(true);
-        cameraVideoTrack.addRenderer(primaryVideoView);
+        requestPermissions();
     }
 
     @Override
@@ -195,6 +195,29 @@ public class RoomActivity extends AppCompatActivity {
             localMedia = null;
         }
         super.onDestroy();
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode,
+                                           String[] permissions,
+                                           int[] grantResults) {
+        if (requestCode == PERMISSIONS_REQUEST_CODE) {
+            boolean recordAudioPermissionGranted = grantResults[0] ==
+                    PackageManager.PERMISSION_GRANTED;
+            boolean cameraPermissionGranted = grantResults[1] ==
+                    PackageManager.PERMISSION_GRANTED;
+            boolean writeExternalStoragePermissionGranted = grantResults[2] ==
+                    PackageManager.PERMISSION_GRANTED;
+            boolean permissionsGranted = recordAudioPermissionGranted &&
+                    cameraPermissionGranted &&
+                    writeExternalStoragePermissionGranted;
+
+            if (permissionsGranted) {
+                setupLocalMedia();
+            } else {
+                Toast.makeText(this, R.string.permissions_required, Toast.LENGTH_LONG).show();
+            }
+        }
     }
 
     @Override
@@ -295,7 +318,7 @@ public class RoomActivity extends AppCompatActivity {
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == REQUEST_MEDIA_PROJECTION) {
+        if (requestCode == MEDIA_PROJECTION_REQUEST_CODE) {
             if (resultCode != Activity.RESULT_OK) {
                 Toast.makeText(this, R.string.screen_capture_permission_not_granted,
                         Toast.LENGTH_LONG).show();
@@ -445,8 +468,41 @@ public class RoomActivity extends AppCompatActivity {
         videoConstraints = builder.build();
     }
 
-    private void updateUi(Room room) {
+    private void requestPermissions() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (!permissionsGranted()) {
+                requestPermissions(new String[]{Manifest.permission.RECORD_AUDIO,
+                                Manifest.permission.CAMERA,
+                                Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                        PERMISSIONS_REQUEST_CODE);
+            } else {
+                setupLocalMedia();
+            }
+        } else {
+            setupLocalMedia();
+        }
+    }
 
+    private boolean permissionsGranted(){
+        int resultCamera = ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA);
+        int resultMic = ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO);
+        int resultStorage = ContextCompat.checkSelfPermission(this,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE);
+
+        return ((resultCamera == PackageManager.PERMISSION_GRANTED) &&
+                (resultMic == PackageManager.PERMISSION_GRANTED) &&
+                (resultStorage == PackageManager.PERMISSION_GRANTED));
+    }
+
+    private void setupLocalMedia() {
+        localAudioTrack = localMedia.addAudioTrack(true);
+        cameraCapturer = new CameraCapturer(this, CameraCapturer.CameraSource.FRONT_CAMERA);
+        cameraVideoTrack = localMedia.addVideoTrack(true, cameraCapturer, videoConstraints);
+        primaryVideoView.setMirror(true);
+        cameraVideoTrack.addRenderer(primaryVideoView);
+    }
+
+    private void updateUi(Room room) {
         int disconnectButtonState = View.GONE;
         int joinRoomLayoutState = View.VISIBLE;
         int joinStatusLayoutState = View.GONE;
@@ -528,7 +584,7 @@ public class RoomActivity extends AppCompatActivity {
 
         // This initiates a prompt dialog for the user to confirm screen projection.
         startActivityForResult(mediaProjectionManager.createScreenCaptureIntent(),
-                REQUEST_MEDIA_PROJECTION);
+                MEDIA_PROJECTION_REQUEST_CODE);
     }
 
     private void startScreenCapture() {
