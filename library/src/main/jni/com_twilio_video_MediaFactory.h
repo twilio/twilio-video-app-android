@@ -33,7 +33,11 @@ private:
 };
 
 std::shared_ptr<twilio::media::MediaFactory> getMediaFactory(jlong);
-JNIEXPORT jlong JNICALL Java_com_twilio_video_MediaFactory_nativeCreate(JNIEnv *, jobject, jobject);
+JNIEXPORT jlong JNICALL Java_com_twilio_video_MediaFactory_nativeCreate(JNIEnv *,
+                                                                        jobject,
+                                                                        jobject,
+                                                                        jobject,
+                                                                        jobject);
 JNIEXPORT jlong JNICALL Java_com_twilio_video_MediaFactory_nativeCreateLocalMedia(JNIEnv *,
                                                                                   jobject,
                                                                                   jlong);

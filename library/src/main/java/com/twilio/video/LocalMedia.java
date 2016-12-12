@@ -2,6 +2,8 @@ package com.twilio.video;
 
 import android.content.Context;
 
+import org.webrtc.EglBase;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,6 +24,7 @@ public class LocalMedia {
     private final Context context;
     private final MediaFactory mediaFactory;
     private long nativeLocalMediaHandle;
+    private EglBaseProvider eglBaseProvider;
     private final List<LocalAudioTrack> localAudioTracks = new ArrayList<>();
     private final List<LocalVideoTrack> localVideoTracks = new ArrayList<>();
 
@@ -39,6 +42,7 @@ public class LocalMedia {
         this.context = context;
         this.mediaFactory = mediaFactory;
         this.nativeLocalMediaHandle = nativeLocalMediaHandle;
+        this.eglBaseProvider = EglBaseProvider.instance();
     }
 
     /**
@@ -146,7 +150,8 @@ public class LocalMedia {
         LocalVideoTrack localVideoTrack = nativeAddVideoTrack(nativeLocalMediaHandle,
                 enabled,
                 videoCapturer,
-                videoConstraints);
+                videoConstraints,
+                eglBaseProvider.getLocalEglBase().getEglBaseContext());
 
         if (localVideoTrack != null) {
             localVideoTracks.add(localVideoTrack);
@@ -195,6 +200,8 @@ public class LocalMedia {
             while (!localVideoTracks.isEmpty()) {
                 removeVideoTrack(localVideoTracks.get(0));
             }
+            eglBaseProvider.release();
+            eglBaseProvider = null;
             nativeRelease(nativeLocalMediaHandle);
             nativeLocalMediaHandle = 0;
 
@@ -221,7 +228,8 @@ public class LocalMedia {
     private native LocalVideoTrack nativeAddVideoTrack(long nativeLocalMediaHandle,
                                                        boolean enabled,
                                                        VideoCapturer videoCapturer,
-                                                       VideoConstraints videoConstraints);
+                                                       VideoConstraints videoConstraints,
+                                                       EglBase.Context rootEglBase);
     private native boolean nativeRemoveVideoTrack(long nativeLocalMediaHandle, String trackId);
     private native void nativeRelease(long nativeLocalMediaHandle);
 }

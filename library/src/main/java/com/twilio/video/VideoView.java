@@ -45,6 +45,7 @@ public class VideoView extends SurfaceViewRenderer implements VideoRenderer {
     private boolean overlaySurface = false;
     private VideoScaleType videoScaleType = VideoScaleType.ASPECT_FIT;
     private VideoRenderer.Listener listener;
+    private EglBaseProvider eglBaseProvider;
 
     public VideoView(Context context) {
         this(context, null);
@@ -70,6 +71,7 @@ public class VideoView extends SurfaceViewRenderer implements VideoRenderer {
         super.onAttachedToWindow();
         // Do not setup the renderer when using developer tools to avoid EGL14 runtime exceptions
         if(!isInEditMode()) {
+            eglBaseProvider = EglBaseProvider.instance();
             setupRenderer();
         }
     }
@@ -77,6 +79,7 @@ public class VideoView extends SurfaceViewRenderer implements VideoRenderer {
     @Override
     protected void onDetachedFromWindow() {
         super.release();
+        this.eglBaseProvider.release();
         super.onDetachedFromWindow();
     }
 
@@ -136,8 +139,7 @@ public class VideoView extends SurfaceViewRenderer implements VideoRenderer {
     }
 
     private void setupRenderer() {
-        init(EglBaseProvider.provideEglBase().getEglBaseContext(),
-                internalEventListener);
+        init(eglBaseProvider.getRootEglBase().getEglBaseContext(), internalEventListener);
         setMirror(mirror);
         setScalingType(convertToWebRtcScaleType(videoScaleType));
         setZOrderMediaOverlay(overlaySurface);
