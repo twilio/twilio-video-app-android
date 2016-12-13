@@ -380,26 +380,33 @@ public class RoomActivity extends AppCompatActivity {
             Timber.d("Adding local video");
             cameraVideoTrack = localMedia.addVideoTrack(true, cameraCapturer, videoConstraints);
 
-            // If participants have video tracks we render in thumbnial
-            if (room != null && !videoTrackVideoViewBiMap.isEmpty()) {
-                Timber.d("Participant video tracks are being rendered. Rendering local video in " +
-                        "thumbnail");
-                localThumbnailVideoView.setMirror(cameraCapturer.getCameraSource() ==
-                        CameraCapturer.CameraSource.FRONT_CAMERA);
-                cameraVideoTrack.addRenderer(localThumbnailVideoView);
+            if (cameraVideoTrack != null) {
+                // If participants have video tracks we render in thumbnial
+                if (room != null && !videoTrackVideoViewBiMap.isEmpty()) {
+                    Timber.d("Participant video tracks are being rendered. Rendering local video in " +
+                            "thumbnail");
+                    localThumbnailVideoView.setMirror(cameraCapturer.getCameraSource() ==
+                            CameraCapturer.CameraSource.FRONT_CAMERA);
+                    cameraVideoTrack.addRenderer(localThumbnailVideoView);
+                } else {
+                    // No remote tracks are being rendered so we render in primary view
+                    Timber.d("No remote video is being rendered. Rendering local video in primary " +
+                            "view");
+                    primaryVideoView.setVisibility(View.VISIBLE);
+                    cameraVideoTrack.addRenderer(primaryVideoView);
+                }
+                // Set and icon and menu items
+                icon = R.drawable.ic_videocam_white_24px;
+                switchCameraMenuItem.setVisible(cameraVideoTrack.isEnabled());
+                pauseVideoMenuItem.setTitle(cameraVideoTrack.isEnabled() ?
+                        R.string.pause_video : R.string.resume_video);
+                pauseVideoMenuItem.setVisible(true);
             } else {
-                // No remote tracks are being rendered so we render in primary view
-                Timber.d("No remote video is being rendered. Rendering local video in primary " +
-                        "view");
-                primaryVideoView.setVisibility(View.VISIBLE);
-                cameraVideoTrack.addRenderer(primaryVideoView);
+                Snackbar.make(primaryVideoView,
+                        R.string.failed_to_add_camera_video_track,
+                        Snackbar.LENGTH_LONG)
+                        .setAction("Action", null).show();
             }
-            // Set and icon and menu items
-            icon = R.drawable.ic_videocam_white_24px;
-            switchCameraMenuItem.setVisible(cameraVideoTrack.isEnabled());
-            pauseVideoMenuItem.setTitle(cameraVideoTrack.isEnabled() ?
-                    R.string.pause_video : R.string.resume_video);
-            pauseVideoMenuItem.setVisible(true);
         } else {
             Timber.d("Removing local video");
             if (primaryVideoTrack == null) {
