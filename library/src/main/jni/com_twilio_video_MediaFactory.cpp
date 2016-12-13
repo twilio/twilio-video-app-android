@@ -22,7 +22,9 @@ std::shared_ptr<twilio::media::MediaFactory> getMediaFactory(jlong media_factory
 
 JNIEXPORT jlong JNICALL Java_com_twilio_video_MediaFactory_nativeCreate(JNIEnv *jni,
                                                                         jobject j_media_factory,
-                                                                        jobject context) {
+                                                                        jobject context,
+                                                                        jobject j_egl_local_context,
+                                                                        jobject j_egl_remote_context) {
     // Setup media related Android device objects
     if (!media_jvm_set) {
         bool failure = false;
@@ -38,8 +40,17 @@ JNIEXPORT jlong JNICALL Java_com_twilio_video_MediaFactory_nativeCreate(JNIEnv *
     }
 
     twilio::media::MediaOptions media_options;
-    media_options.video_encoder_factory = new webrtc_jni::MediaCodecVideoEncoderFactory();
-    media_options.video_decoder_factory = new webrtc_jni::MediaCodecVideoDecoderFactory();
+    webrtc_jni::MediaCodecVideoEncoderFactory* video_encoder_factory =
+            new webrtc_jni::MediaCodecVideoEncoderFactory();
+    webrtc_jni::MediaCodecVideoDecoderFactory* video_decoder_factory =
+            new webrtc_jni::MediaCodecVideoDecoderFactory();
+
+    // Enable the use of textures for encoding and decoding
+    video_encoder_factory->SetEGLContext(jni, j_egl_local_context);
+    video_decoder_factory->SetEGLContext(jni, j_egl_remote_context);
+
+    media_options.video_encoder_factory = video_encoder_factory;
+    media_options.video_decoder_factory = video_decoder_factory;
     std::shared_ptr<twilio::media::MediaFactory> media_factory =
             twilio::media::MediaFactory::create(media_options);
 

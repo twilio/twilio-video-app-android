@@ -2,25 +2,78 @@ package com.twilio.video;
 
 import org.webrtc.EglBase;
 
-final class EglBaseProvider {
-    private static EglBase rootEglBase;
+class EglBaseProvider {
+    private static final String RELEASE_MESSAGE_TEMPLATE = "EglBaseProvider released %s " +
+            "unavailable";
+    private volatile static EglBaseProvider instance;
+    private volatile static int eglBaseProviderRefCount = 0;
 
-    public static EglBase provideEglBase() {
-        if (rootEglBase == null) {
-            rootEglBase = EglBase.create();
+    private EglBase rootEglBase;
+    private EglBase localEglBase;
+    private EglBase remoteEglBase;
+
+    static EglBaseProvider instance() {
+        if (instance == null) {
+            synchronized (EglBaseProvider.class) {
+                if (instance == null) {
+                    instance = new EglBaseProvider();
+                }
+                eglBaseProviderRefCount++;
+            }
         }
 
-        return rootEglBase;
+        return instance;
     }
 
-    public static void releaseEglBase() {
-        if (rootEglBase != null) {
-            rootEglBase.release();
-            rootEglBase = null;
+    EglBase getRootEglBase() {
+        synchronized (EglBaseProvider.class) {
+            checkReleased("getRootEglBase");
+            return instance.rootEglBase;
+        }
+    }
+
+    EglBase getLocalEglBase() {
+        synchronized (EglBaseProvider.class) {
+            checkReleased("getLocalEglBase");
+            return instance.localEglBase;
+        }
+    }
+
+    EglBase getRemoteEglBase() {
+        synchronized (EglBaseProvider.class) {
+            checkReleased("getRemoteEglBase");
+            return instance.remoteEglBase;
+        }
+    }
+
+    void release() {
+        if (instance != null) {
+            synchronized (EglBaseProvider.class) {
+                eglBaseProviderRefCount = Math.max(0, --eglBaseProviderRefCount);
+                if (instance != null && eglBaseProviderRefCount == 0) {
+                    instance.remoteEglBase.release();
+                    instance.remoteEglBase = null;
+                    instance.localEglBase.release();
+                    instance.localEglBase = null;
+                    instance.rootEglBase.release();
+                    instance.rootEglBase = null;
+                    instance = null;
+                }
+            }
         }
     }
 
     private EglBaseProvider() {
-        // No instances
+        rootEglBase = EglBase.create();
+        localEglBase = EglBase.create(rootEglBase.getEglBaseContext());
+        remoteEglBase = EglBase.create(rootEglBase.getEglBaseContext());
+    }
+
+    private void checkReleased(String methodName) {
+        if (instance == null) {
+            String releaseErrorMessage = String.format(RELEASE_MESSAGE_TEMPLATE, methodName);
+
+            throw new IllegalStateException(releaseErrorMessage);
+        }
     }
 }

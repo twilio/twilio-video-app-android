@@ -388,6 +388,7 @@ public class RoomActivity extends AppCompatActivity {
                     localThumbnailVideoView.setMirror(cameraCapturer.getCameraSource() ==
                             CameraCapturer.CameraSource.FRONT_CAMERA);
                     cameraVideoTrack.addRenderer(localThumbnailVideoView);
+                    localThumbnailVideoView.setVisibility(View.VISIBLE);
                 } else {
                     // No remote tracks are being rendered so we render in primary view
                     Timber.d("No remote video is being rendered. Rendering local video in primary " +

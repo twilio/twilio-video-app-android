@@ -4,6 +4,8 @@ import android.content.Context;
 
 import com.getkeepsafe.relinker.ReLinker;
 
+import org.webrtc.EglBase;
+
 class MediaFactory {
     private static final String RELEASE_MESSAGE_TEMPLATE = "MediaFactory released %s unavailable";
     private static volatile boolean libraryIsLoaded = false;
@@ -12,6 +14,7 @@ class MediaFactory {
     private volatile static int mediaFactoryRefCount = 0;
 
     private long nativeMediaFactoryHandle;
+    private EglBaseProvider eglBaseProvider;
 
     static MediaFactory instance(Context context) {
         if (context == null) {
@@ -24,12 +27,18 @@ class MediaFactory {
                         ReLinker.loadLibrary(context, "jingle_peerconnection_so");
                         libraryIsLoaded = true;
                     }
-                    long nativeMediaFactoryHandle = nativeCreate(context);
+                    EglBaseProvider eglBaseProvider = EglBaseProvider.instance();
+                    EglBase localEglBase = eglBaseProvider.getLocalEglBase();
+                    EglBase remoteEglBase = eglBaseProvider.getRemoteEglBase();
+
+                    long nativeMediaFactoryHandle = nativeCreate(context,
+                            localEglBase.getEglBaseContext(),
+                            remoteEglBase.getEglBaseContext());
 
                     if (nativeMediaFactoryHandle == 0) {
                         logger.e("Failed to instance MediaFactory");
                     } else {
-                        instance = new MediaFactory(nativeMediaFactoryHandle);
+                        instance = new MediaFactory(nativeMediaFactoryHandle, eglBaseProvider);
                     }
                 }
             }
@@ -58,6 +67,11 @@ class MediaFactory {
             synchronized (MediaFactory.class) {
                 mediaFactoryRefCount = Math.max(0, --mediaFactoryRefCount);
                 if (instance != null && mediaFactoryRefCount == 0) {
+                    // Release EGL base provider
+                    eglBaseProvider.release();
+                    eglBaseProvider = null;
+
+                    // Release native media factory
                     nativeRelease(nativeMediaFactoryHandle);
                     nativeMediaFactoryHandle = 0;
                     instance = null;
@@ -70,8 +84,9 @@ class MediaFactory {
         return nativeMediaFactoryHandle;
     }
 
-    private MediaFactory(long nativeMediaFactoryHandle) {
+    private MediaFactory(long nativeMediaFactoryHandle, EglBaseProvider eglBaseProvider) {
         this.nativeMediaFactoryHandle = nativeMediaFactoryHandle;
+        this.eglBaseProvider = eglBaseProvider;
     }
 
     private void checkReleased(String methodName) {
@@ -82,7 +97,9 @@ class MediaFactory {
         }
     }
 
-    private static native long nativeCreate(Context context);
+    private static native long nativeCreate(Context context,
+                                            EglBase.Context localEglBase,
+                                            EglBase.Context remoteEglBase);
     private static native long nativeCreateLocalMedia(long nativeMediaFactoryHandle);
     private native void nativeRelease(long mediaFactoryHandle);
 }

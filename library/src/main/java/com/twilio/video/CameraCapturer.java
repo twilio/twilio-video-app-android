@@ -497,8 +497,6 @@ public class CameraCapturer implements VideoCapturer {
             }
             return false;
         }
-        // TODO: Need to figure out the best way to get this to to webrtc
-        // final EglBase.Context eglContext = EglBaseProvider.provideEglBase().getEglBaseContext();
         webrtcCapturer = VideoCapturerAndroid.create(deviceName, cameraEventsHandler);
 
         if (webrtcCapturer == null) {
