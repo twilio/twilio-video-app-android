@@ -508,7 +508,7 @@ public class RoomActivity extends AppCompatActivity {
         cameraVideoTrack = localMedia.addVideoTrack(true, cameraCapturer, videoConstraints);
         primaryVideoView.setMirror(true);
 
-        if (cameraCapturer != null) {
+        if (cameraVideoTrack != null) {
             cameraVideoTrack.addRenderer(primaryVideoView);
         } else {
             Snackbar.make(primaryVideoView,
