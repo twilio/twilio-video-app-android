@@ -243,14 +243,15 @@ JNIEXPORT jobject JNICALL Java_com_twilio_video_LocalMedia_nativeAddVideoTrack(J
                                                                                jlong local_media_handle,
                                                                                jboolean enabled,
                                                                                jobject j_video_capturer,
-                                                                               jobject j_video_contraints) {
+                                                                               jobject j_video_contraints,
+                                                                               jobject j_egl_context) {
     std::shared_ptr<twilio::media::LocalMedia> local_media = getLocalMedia(local_media_handle);
     jobject j_video_capturer_delegate = createJavaVideoCapturerDelegate(j_video_capturer);
     bool is_screencast = javaIsScreencast(j_video_capturer);
     rtc::scoped_refptr<VideoCapturerDelegate> delegate =
             new rtc::RefCountedObject<VideoCapturerDelegate>(jni,
                                                              j_video_capturer_delegate,
-                                                             nullptr,
+                                                             j_egl_context,
                                                              is_screencast);
     cricket::VideoCapturer* capturer = new AndroidVideoCapturer(delegate);
     std::shared_ptr<twilio::media::LocalVideoTrack> video_track = local_media->addVideoTrack(enabled,
