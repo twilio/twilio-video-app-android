@@ -238,7 +238,7 @@ public class RoomActivity extends AppCompatActivity {
                     cameraVideoTrack.addRenderer(primaryVideoView);
                 }
             } else {
-                Snackbar.make(primaryVideoView, "Failed to add video track",
+                Snackbar.make(primaryVideoView, R.string.failed_to_add_camera_video_track,
                         Snackbar.LENGTH_SHORT).show();
             }
             restoreLocalVideoCameraTrack = false;
@@ -499,7 +499,15 @@ public class RoomActivity extends AppCompatActivity {
         cameraCapturer = new CameraCapturer(this, CameraCapturer.CameraSource.FRONT_CAMERA);
         cameraVideoTrack = localMedia.addVideoTrack(true, cameraCapturer, videoConstraints);
         primaryVideoView.setMirror(true);
-        cameraVideoTrack.addRenderer(primaryVideoView);
+
+        if (cameraCapturer != null) {
+            cameraVideoTrack.addRenderer(primaryVideoView);
+        } else {
+            Snackbar.make(primaryVideoView,
+                    R.string.failed_to_add_camera_video_track,
+                    Snackbar.LENGTH_LONG)
+                    .setAction("Action", null).show();
+        }
     }
 
     private void updateUi(Room room) {
@@ -589,8 +597,16 @@ public class RoomActivity extends AppCompatActivity {
 
     private void startScreenCapture() {
         screenVideoTrack = localMedia.addVideoTrack(true, screenCapturer);
-        screenCaptureMenuItem.setIcon(R.drawable.ic_stop_screen_share_white_24dp);
-        screenCaptureMenuItem.setTitle(R.string.stop_screen_share);
+
+        if (screenVideoTrack != null) {
+            screenCaptureMenuItem.setIcon(R.drawable.ic_stop_screen_share_white_24dp);
+            screenCaptureMenuItem.setTitle(R.string.stop_screen_share);
+        } else {
+            Snackbar.make(primaryVideoView,
+                    R.string.failed_to_add_screen_video_track,
+                    Snackbar.LENGTH_LONG)
+                    .setAction("Action", null).show();
+        }
     }
 
     private void stopScreenCapture() {
