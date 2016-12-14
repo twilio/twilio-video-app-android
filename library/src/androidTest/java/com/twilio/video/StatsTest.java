@@ -74,14 +74,15 @@ public class StatsTest extends BaseClientTest {
     }
 
     @Test
-    public void shouldReceiveEmptyStatsInEmptyRoom() throws InterruptedException {
+    public void shouldReceiveStatsInEmptyRoom() throws InterruptedException {
         aliceRoom = createRoom(aliceVideoClient, aliceListener, roomName, aliceLocalMedia);
+
         CallbackHelper.FakeStatsListener aliceStatsListener =
                 new CallbackHelper.FakeStatsListener();
         aliceStatsListener.onStatsLatch = new CountDownLatch(1);
         aliceRoom.getStats(aliceStatsListener);
         assertTrue(aliceStatsListener.onStatsLatch.await(20, TimeUnit.SECONDS));
-        assertEquals(0, aliceStatsListener.getStatsReports().size());
+        assertTrue(1 >= aliceStatsListener.getStatsReports().size());
     }
 
     @Test
@@ -144,7 +145,7 @@ public class StatsTest extends BaseClientTest {
     }
 
     @Test
-    public void shouldReceiveStatsWhenParticipanAddTrack() throws InterruptedException {
+    public void shouldReceiveStatsWhenParticipanAddsOrRemovesTrack() throws InterruptedException {
         // Connect Alice to room with local audio track only
         aliceLocalMedia.addAudioTrack(true);
         aliceRoom = createRoom(aliceVideoClient, aliceListener, roomName, aliceLocalMedia);
@@ -196,22 +197,21 @@ public class StatsTest extends BaseClientTest {
         statsReport = statsReportList.get(0);
         expectStatsReportTracksSize(statsReport, 1, 0, 1, 1);
 
-        // TODO: Commented out until CSDK-1039 is fixed
-//        // Remove Bob's video track and check the stats
-//        bobLocalMedia.removeVideoTrack(bobVideoTrack);
-//        assertTrue(mediaListener.onVideoTrackRemovedLatch.await(20, TimeUnit.SECONDS));
-//
-//        // let's give peer connection some time to get media flowing
-//        Thread.sleep(2000);
-//        aliceStatsListener = new CallbackHelper.FakeStatsListener();
-//        aliceStatsListener.onStatsLatch = new CountDownLatch(1);
-//        aliceRoom.getStats(aliceStatsListener);
-//        assertTrue(aliceStatsListener.onStatsLatch.await(20, TimeUnit.SECONDS));
-//
-//        statsReportList = aliceStatsListener.getStatsReports();
-//        assertEquals(1, statsReportList.size());
-//        statsReport = statsReportList.get(0);
-//        expectStatsReportTracksSize(statsReport, 1, 0, 1, 0);
+        // Remove Bob's video track and check the stats
+        bobLocalMedia.removeVideoTrack(bobVideoTrack);
+        assertTrue(mediaListener.onVideoTrackRemovedLatch.await(20, TimeUnit.SECONDS));
+
+        // let's give peer connection some time to get media flowing
+        Thread.sleep(2000);
+        aliceStatsListener = new CallbackHelper.FakeStatsListener();
+        aliceStatsListener.onStatsLatch = new CountDownLatch(1);
+        aliceRoom.getStats(aliceStatsListener);
+        assertTrue(aliceStatsListener.onStatsLatch.await(20, TimeUnit.SECONDS));
+
+        statsReportList = aliceStatsListener.getStatsReports();
+        assertEquals(1, statsReportList.size());
+        statsReport = statsReportList.get(0);
+        expectStatsReportTracksSize(statsReport, 1, 0, 1, 0);
     }
 
     @Test
