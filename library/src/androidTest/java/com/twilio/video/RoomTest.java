@@ -5,9 +5,7 @@ import android.support.test.rule.*;
 import android.support.test.runner.AndroidJUnit4;
 
 import com.twilio.video.base.BaseClientTest;
-import com.twilio.video.env.Env;
 import com.twilio.video.helper.CallbackHelper;
-import com.twilio.video.test.*;
 import com.twilio.video.test.BuildConfig;
 import com.twilio.video.ui.MediaTestActivity;
 import com.twilio.video.util.AccessTokenUtils;
@@ -172,7 +170,7 @@ public class RoomTest extends BaseClientTest {
     }
 
     @Test
-    public void shouldReturnValidIsRecording() throws InterruptedException {
+    public void shouldReturnValidRecordingState() throws InterruptedException {
         CallbackHelper.FakeRoomListener roomListener = new CallbackHelper.FakeRoomListener();
         roomListener.onConnectedLatch = new CountDownLatch(1);
 
