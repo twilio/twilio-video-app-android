@@ -71,7 +71,7 @@ public class VideoView extends SurfaceViewRenderer implements VideoRenderer {
         super.onAttachedToWindow();
         // Do not setup the renderer when using developer tools to avoid EGL14 runtime exceptions
         if(!isInEditMode()) {
-            eglBaseProvider = EglBaseProvider.instance();
+            eglBaseProvider = EglBaseProvider.instance(this);
             setupRenderer();
         }
     }
@@ -79,7 +79,7 @@ public class VideoView extends SurfaceViewRenderer implements VideoRenderer {
     @Override
     protected void onDetachedFromWindow() {
         super.release();
-        this.eglBaseProvider.release();
+        this.eglBaseProvider.release(this);
         super.onDetachedFromWindow();
     }
 

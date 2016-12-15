@@ -2,27 +2,28 @@ package com.twilio.video;
 
 import org.webrtc.EglBase;
 
+import java.util.HashSet;
+import java.util.Set;
+
 class EglBaseProvider {
     private static final String RELEASE_MESSAGE_TEMPLATE = "EglBaseProvider released %s " +
             "unavailable";
     private volatile static EglBaseProvider instance;
-    private volatile static int eglBaseProviderRefCount = 0;
+    private volatile static Set<Object> eglBaseProviderOwners = new HashSet<>();
 
     private EglBase rootEglBase;
     private EglBase localEglBase;
     private EglBase remoteEglBase;
 
-    static EglBaseProvider instance() {
-        if (instance == null) {
-            synchronized (EglBaseProvider.class) {
-                if (instance == null) {
-                    instance = new EglBaseProvider();
-                }
-                eglBaseProviderRefCount++;
+    static EglBaseProvider instance(Object owner) {
+        synchronized (EglBaseProvider.class) {
+            if (instance == null) {
+                instance = new EglBaseProvider();
             }
-        }
+            eglBaseProviderOwners.add(owner);
 
-        return instance;
+            return instance;
+        }
     }
 
     EglBase getRootEglBase() {
@@ -46,19 +47,17 @@ class EglBaseProvider {
         }
     }
 
-    void release() {
-        if (instance != null) {
-            synchronized (EglBaseProvider.class) {
-                eglBaseProviderRefCount = Math.max(0, --eglBaseProviderRefCount);
-                if (instance != null && eglBaseProviderRefCount == 0) {
-                    instance.remoteEglBase.release();
-                    instance.remoteEglBase = null;
-                    instance.localEglBase.release();
-                    instance.localEglBase = null;
-                    instance.rootEglBase.release();
-                    instance.rootEglBase = null;
-                    instance = null;
-                }
+    void release(Object owner) {
+        synchronized (EglBaseProvider.class) {
+            eglBaseProviderOwners.remove(owner);
+            if (instance != null && eglBaseProviderOwners.isEmpty()) {
+                instance.remoteEglBase.release();
+                instance.remoteEglBase = null;
+                instance.localEglBase.release();
+                instance.localEglBase = null;
+                instance.rootEglBase.release();
+                instance.rootEglBase = null;
+                instance = null;
             }
         }
     }
