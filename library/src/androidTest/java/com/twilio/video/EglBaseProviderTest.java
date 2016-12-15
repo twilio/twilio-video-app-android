@@ -56,7 +56,7 @@ public class EglBaseProviderTest {
         // Release the test suite instance
         eglBaseProvider.release(this);
 
-        // Now an exception should be raised when trying to get local egl base
+        // Now an exception should be raised when trying to get root egl base
         eglBaseProvider.getRootEglBase();
     }
 
