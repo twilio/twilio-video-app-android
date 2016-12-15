@@ -4,7 +4,7 @@ import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
-import android.support.v4.content.ContextCompat;
+import android.support.graphics.drawable.VectorDrawableCompat;
 import android.support.v4.graphics.drawable.DrawableCompat;
 import android.support.v7.widget.AppCompatEditText;
 import android.text.Editable;
@@ -23,7 +23,6 @@ import com.twilio.video.app.R;
  * @attr name clearIcon - clear action icon to display to the right of EditText input.
  */
 public class ClearableEditText extends AppCompatEditText {
-
     /**
      * Clear icon resource id.
      */
@@ -58,7 +57,7 @@ public class ClearableEditText extends AppCompatEditText {
             // obtain clear icon resource id
             clearIconResId = stylables.getResourceId(R.styleable.ClearableEditText_clearIcon, -1);
             if (clearIconResId != -1) {
-                clearDrawable = ContextCompat.getDrawable(context, clearIconResId);
+                clearDrawable = VectorDrawableCompat.create(getResources(), clearIconResId, null);
             }
         }
 
