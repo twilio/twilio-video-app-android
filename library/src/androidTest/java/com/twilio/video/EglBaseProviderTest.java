@@ -139,7 +139,7 @@ public class EglBaseProviderTest {
     }
 
     @Test
-    public void getRootEglBase_shouldSucceedIfOneOnwerReleasesMultipleTimes() {
+    public void getRootEglBase_shouldSucceedIfOneOwnerReleasesMultipleTimes() {
         Object[] owners = getEglBaseProviderOwners(NUM_EGL_PROVIDERS);
         EglBaseProvider[] eglBaseProviders = getEglBaseProviders(owners);
 
@@ -158,7 +158,7 @@ public class EglBaseProviderTest {
     }
 
     @Test
-    public void getLocalEglBase_shouldSucceedIfOneOnwerReleasesMultipleTimes() {
+    public void getLocalEglBase_shouldSucceedIfOneOwnerReleasesMultipleTimes() {
         Object[] owners = getEglBaseProviderOwners(NUM_EGL_PROVIDERS);
         EglBaseProvider[] eglBaseProviders = getEglBaseProviders(owners);
 
@@ -177,7 +177,7 @@ public class EglBaseProviderTest {
     }
 
     @Test
-    public void getRemoteEglBase_shouldSucceedIfOneOnwerReleasesMultipleTimes() {
+    public void getRemoteEglBase_shouldSucceedIfOneOwnerReleasesMultipleTimes() {
         Object[] owners = getEglBaseProviderOwners(NUM_EGL_PROVIDERS);
         EglBaseProvider[] eglBaseProviders = getEglBaseProviders(owners);
 

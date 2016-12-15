@@ -30,7 +30,7 @@ class MediaFactory {
                     }
 
                     /*
-                     * We need to create a temporary owner of EglBaseProvider so create our native
+                     * We need to create a temporary owner of EglBaseProvider to create our native
                      * media factory.
                      */
                     Object temporaryEglOwner = new Object();
