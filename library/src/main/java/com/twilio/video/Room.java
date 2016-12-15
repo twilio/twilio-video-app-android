@@ -94,6 +94,14 @@ public class Room {
     }
 
     /**
+     * Returns whether any media in the Room is being recorded.
+     */
+    public boolean isRecording() {
+        return roomState == RoomState.CONNECTED ?
+                nativeIsRecording(nativeRoomContext) : false;
+    }
+
+    /**
      * Returns all currently connected participants.
      *
      * @return a map of identities to participants.
@@ -202,6 +210,8 @@ public class Room {
         void onConnectFailure(TwilioException twilioException);
         void onParticipantConnected(Participant participant);
         void onParticipantDisconnected(String participantSid);
+        void onRecordingStarted();
+        void onRecordingStopped();
     }
 
     class InternalRoomListenerImpl implements InternalRoomListener {
@@ -293,6 +303,30 @@ public class Room {
             });
         }
 
+        @Override
+        public void onRecordingStarted() {
+            logger.d("onRecordingStarted()");
+
+            handler.post(new Runnable() {
+                @Override
+                public void run() {
+                    Room.this.listener.onRecordingStarted(Room.this);
+                }
+            });
+        }
+
+        @Override
+        public void onRecordingStopped() {
+            logger.d("onRecordingStopped()");
+
+            handler.post(new Runnable() {
+                @Override
+                public void run() {
+                    Room.this.listener.onRecordingStopped(Room.this);
+                }
+            });
+        }
+
     }
 
     /**
@@ -338,6 +372,18 @@ public class Room {
          * @param participant the disconnected participant.
          */
         void onParticipantDisconnected(Room room, Participant participant);
+
+        /**
+         * Called when the media being shared to a {@link Room} is being recorded.
+         * @param room
+         */
+        void onRecordingStarted(Room room);
+
+        /**
+         * Called when the media being shared to a {@link Room} is no longer being recorded.
+         * @param room
+         */
+        void onRecordingStopped(Room room);
     }
 
     class InternalRoomListenerHandle extends NativeHandle {
@@ -391,6 +437,7 @@ public class Room {
         protected native void nativeRelease(long nativeHandle);
     }
 
+    private native boolean nativeIsRecording(long nativeRoomContext);
     private native void nativeDisconnect(long nativeRoomContext);
     private native void nativeGetStats(long nativeRoomContext, long nativeStatsObserver);
     private native void nativeRelease(long nativeRoomContext);
