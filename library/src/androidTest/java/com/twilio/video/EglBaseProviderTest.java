@@ -11,6 +11,7 @@ import static junit.framework.Assert.assertNotNull;
 
 @RunWith(AndroidJUnit4.class)
 public class EglBaseProviderTest {
+    private static final int NUM_EGL_PROVIDERS = 10;
     private EglBaseProvider eglBaseProvider;
 
     @Before
@@ -46,18 +47,17 @@ public class EglBaseProviderTest {
 
     @Test(expected = IllegalStateException.class)
     public void getRootEglBase_shouldFailAfterAllEglBaseProvidersHaveBeenReleased() {
-        int numEglBaseProviders = 10;
-        EglBaseProvider[] eglBaseProviders = new EglBaseProvider[numEglBaseProviders];
-        Object[] owners = new Object[numEglBaseProviders];
+        EglBaseProvider[] eglBaseProviders = new EglBaseProvider[NUM_EGL_PROVIDERS];
+        Object[] owners = new Object[NUM_EGL_PROVIDERS];
 
         // Get EGL base providers
-        for (int i = 0; i < numEglBaseProviders; i++) {
+        for (int i = 0; i < NUM_EGL_PROVIDERS; i++) {
             owners[i] = new Object();
             eglBaseProviders[i] = EglBaseProvider.instance(owners[i]);
         }
 
         // Release EGL base providers
-        for (int i = 0; i < numEglBaseProviders; i++) {
+        for (int i = 0; i < NUM_EGL_PROVIDERS; i++) {
             eglBaseProviders[i].release(owners[i]);
         }
 
@@ -70,18 +70,17 @@ public class EglBaseProviderTest {
 
     @Test(expected = IllegalStateException.class)
     public void getLocalEglBase_shouldFailAfterAllEglBaseProvidersHaveBeenReleased() {
-        int numEglBaseProviders = 10;
-        EglBaseProvider[] eglBaseProviders = new EglBaseProvider[numEglBaseProviders];
-        Object[] owners = new Object[numEglBaseProviders];
+        EglBaseProvider[] eglBaseProviders = new EglBaseProvider[NUM_EGL_PROVIDERS];
+        Object[] owners = new Object[NUM_EGL_PROVIDERS];
 
         // Get EGL base providers
-        for (int i = 0 ; i < numEglBaseProviders ; i++) {
+        for (int i = 0 ; i < NUM_EGL_PROVIDERS ; i++) {
             owners[i] = new Object();
             eglBaseProviders[i] = EglBaseProvider.instance(owners[i]);
         }
 
         // Release EGL base providers
-        for (int i = 0 ; i < numEglBaseProviders ; i++) {
+        for (int i = 0 ; i < NUM_EGL_PROVIDERS ; i++) {
             eglBaseProviders[i].release(owners[i]);
         }
 
@@ -94,18 +93,17 @@ public class EglBaseProviderTest {
 
     @Test(expected = IllegalStateException.class)
     public void getRemoteEglBase_shouldFailAfterAllEglBaseProvidersHaveBeenReleased() {
-        int numEglBaseProviders = 10;
-        EglBaseProvider[] eglBaseProviders = new EglBaseProvider[numEglBaseProviders];
-        Object[] owners = new Object[numEglBaseProviders];
+        EglBaseProvider[] eglBaseProviders = new EglBaseProvider[NUM_EGL_PROVIDERS];
+        Object[] owners = new Object[NUM_EGL_PROVIDERS];
 
         // Get EGL base providers
-        for (int i = 0 ; i < numEglBaseProviders ; i++) {
+        for (int i = 0 ; i < NUM_EGL_PROVIDERS ; i++) {
             owners[i] = new Object();
             eglBaseProviders[i] = EglBaseProvider.instance(owners[i]);
         }
 
         // Release EGL base providers
-        for (int i = 0 ; i < numEglBaseProviders ; i++) {
+        for (int i = 0 ; i < NUM_EGL_PROVIDERS ; i++) {
             eglBaseProviders[i].release(owners[i]);
         }
 
@@ -118,22 +116,21 @@ public class EglBaseProviderTest {
 
     @Test
     public void getRootEglBase_shouldSucceedIfStillOwnedAfterRelease() {
-        int numEglBaseProviders = 10;
-        EglBaseProvider[] eglBaseProviders = new EglBaseProvider[numEglBaseProviders];
-        Object[] owners = new Object[numEglBaseProviders];
+        EglBaseProvider[] eglBaseProviders = new EglBaseProvider[NUM_EGL_PROVIDERS];
+        Object[] owners = new Object[NUM_EGL_PROVIDERS];
 
         // Get EGL base providers
-        for (int i = 0 ; i < numEglBaseProviders ; i++) {
+        for (int i = 0 ; i < NUM_EGL_PROVIDERS ; i++) {
             owners[i] = new Object();
             eglBaseProviders[i] = EglBaseProvider.instance(owners[i]);
         }
 
         // Release EGL base providers
-        for (int i = 0 ; i < numEglBaseProviders ; i++) {
+        for (int i = 0 ; i < NUM_EGL_PROVIDERS ; i++) {
             eglBaseProviders[i].release(owners[i]);
 
             // Other egl provider owners should still be able to get root egl base
-            for (int j = i + 1 ; j < numEglBaseProviders ; j++) {
+            for (int j = i + 1 ; j < NUM_EGL_PROVIDERS ; j++) {
                 assertNotNull(eglBaseProviders[j].getRootEglBase());
             }
         }
@@ -141,22 +138,21 @@ public class EglBaseProviderTest {
 
     @Test
     public void getLocalEglBase_shouldSucceedIfStillOwnedAfterRelease() {
-        int numEglBaseProviders = 10;
-        EglBaseProvider[] eglBaseProviders = new EglBaseProvider[numEglBaseProviders];
-        Object[] owners = new Object[numEglBaseProviders];
+        EglBaseProvider[] eglBaseProviders = new EglBaseProvider[NUM_EGL_PROVIDERS];
+        Object[] owners = new Object[NUM_EGL_PROVIDERS];
 
         // Get EGL base providers
-        for (int i = 0 ; i < numEglBaseProviders ; i++) {
+        for (int i = 0 ; i < NUM_EGL_PROVIDERS ; i++) {
             owners[i] = new Object();
             eglBaseProviders[i] = EglBaseProvider.instance(owners[i]);
         }
 
         // Release EGL base providers
-        for (int i = 0 ; i < numEglBaseProviders ; i++) {
+        for (int i = 0 ; i < NUM_EGL_PROVIDERS ; i++) {
             eglBaseProviders[i].release(owners[i]);
 
             // Other egl provider owners should still be able to get local egl base
-            for (int j = i + 1 ; j < numEglBaseProviders ; j++) {
+            for (int j = i + 1 ; j < NUM_EGL_PROVIDERS ; j++) {
                 assertNotNull(eglBaseProviders[j].getLocalEglBase());
             }
         }
@@ -164,22 +160,21 @@ public class EglBaseProviderTest {
 
     @Test
     public void getRemoteEglBase_shouldSucceedIfStillOwnedAfterRelease() {
-        int numEglBaseProviders = 10;
-        EglBaseProvider[] eglBaseProviders = new EglBaseProvider[numEglBaseProviders];
-        Object[] owners = new Object[numEglBaseProviders];
+        EglBaseProvider[] eglBaseProviders = new EglBaseProvider[NUM_EGL_PROVIDERS];
+        Object[] owners = new Object[NUM_EGL_PROVIDERS];
 
         // Get EGL base providers
-        for (int i = 0 ; i < numEglBaseProviders ; i++) {
+        for (int i = 0 ; i < NUM_EGL_PROVIDERS ; i++) {
             owners[i] = new Object();
             eglBaseProviders[i] = EglBaseProvider.instance(owners[i]);
         }
 
         // Release EGL base providers
-        for (int i = 0 ; i < numEglBaseProviders ; i++) {
+        for (int i = 0 ; i < NUM_EGL_PROVIDERS ; i++) {
             eglBaseProviders[i].release(owners[i]);
 
             // Other egl provider owners should still be able to get remote egl base
-            for (int j = i + 1 ; j < numEglBaseProviders ; j++) {
+            for (int j = i + 1 ; j < NUM_EGL_PROVIDERS ; j++) {
                 assertNotNull(eglBaseProviders[j].getRemoteEglBase());
             }
         }
@@ -187,25 +182,24 @@ public class EglBaseProviderTest {
 
     @Test
     public void getRootEglBase_shouldSucceedIfOneOnwerReleasesMultipleTimes() {
-        int numEglBaseProviders = 10;
-        EglBaseProvider[] eglBaseProviders = new EglBaseProvider[numEglBaseProviders];
-        Object[] owners = new Object[numEglBaseProviders];
+        EglBaseProvider[] eglBaseProviders = new EglBaseProvider[NUM_EGL_PROVIDERS];
+        Object[] owners = new Object[NUM_EGL_PROVIDERS];
 
         // Get EGL base providers
-        for (int i = 0 ; i < numEglBaseProviders ; i++) {
+        for (int i = 0 ; i < NUM_EGL_PROVIDERS ; i++) {
             owners[i] = new Object();
             eglBaseProviders[i] = EglBaseProvider.instance(owners[i]);
         }
 
         // Release EGL base providers
-        for (int i = 0 ; i < numEglBaseProviders ; i++) {
+        for (int i = 0 ; i < NUM_EGL_PROVIDERS ; i++) {
             // Purposefully release egl base provider more than once
-            for (int j = 0 ; j < numEglBaseProviders + 1 ; j++) {
+            for (int j = 0 ; j < NUM_EGL_PROVIDERS + 1 ; j++) {
                 eglBaseProviders[i].release(owners[i]);
             }
 
             // Other egl provider owners should still be able to get root egl base
-            for (int j = i + 1 ; j < numEglBaseProviders ; j++) {
+            for (int j = i + 1 ; j < NUM_EGL_PROVIDERS ; j++) {
                 assertNotNull(eglBaseProviders[j].getRootEglBase());
             }
         }
@@ -213,25 +207,24 @@ public class EglBaseProviderTest {
 
     @Test
     public void getLocalEglBase_shouldSucceedIfOneOnwerReleasesMultipleTimes() {
-        int numEglBaseProviders = 10;
-        EglBaseProvider[] eglBaseProviders = new EglBaseProvider[numEglBaseProviders];
-        Object[] owners = new Object[numEglBaseProviders];
+        EglBaseProvider[] eglBaseProviders = new EglBaseProvider[NUM_EGL_PROVIDERS];
+        Object[] owners = new Object[NUM_EGL_PROVIDERS];
 
         // Get EGL base providers
-        for (int i = 0 ; i < numEglBaseProviders ; i++) {
+        for (int i = 0 ; i < NUM_EGL_PROVIDERS ; i++) {
             owners[i] = new Object();
             eglBaseProviders[i] = EglBaseProvider.instance(owners[i]);
         }
 
         // Release EGL base providers
-        for (int i = 0 ; i < numEglBaseProviders ; i++) {
+        for (int i = 0 ; i < NUM_EGL_PROVIDERS ; i++) {
             // Purposefully release egl base provider more than once
-            for (int j = 0 ; j < numEglBaseProviders + 1 ; j++) {
+            for (int j = 0 ; j < NUM_EGL_PROVIDERS + 1 ; j++) {
                 eglBaseProviders[i].release(owners[i]);
             }
 
             // Other egl provider owners should still be able to get local egl base
-            for (int j = i + 1 ; j < numEglBaseProviders ; j++) {
+            for (int j = i + 1 ; j < NUM_EGL_PROVIDERS ; j++) {
                 assertNotNull(eglBaseProviders[j].getLocalEglBase());
             }
         }
@@ -239,25 +232,24 @@ public class EglBaseProviderTest {
 
     @Test
     public void getRemoteEglBase_shouldSucceedIfOneOnwerReleasesMultipleTimes() {
-        int numEglBaseProviders = 10;
-        EglBaseProvider[] eglBaseProviders = new EglBaseProvider[numEglBaseProviders];
-        Object[] owners = new Object[numEglBaseProviders];
+        EglBaseProvider[] eglBaseProviders = new EglBaseProvider[NUM_EGL_PROVIDERS];
+        Object[] owners = new Object[NUM_EGL_PROVIDERS];
 
         // Get EGL base providers
-        for (int i = 0 ; i < numEglBaseProviders ; i++) {
+        for (int i = 0 ; i < NUM_EGL_PROVIDERS ; i++) {
             owners[i] = new Object();
             eglBaseProviders[i] = EglBaseProvider.instance(owners[i]);
         }
 
         // Release EGL base providers
-        for (int i = 0 ; i < numEglBaseProviders ; i++) {
+        for (int i = 0 ; i < NUM_EGL_PROVIDERS ; i++) {
             // Purposefully release egl base provider more than once
-            for (int j = 0 ; j < numEglBaseProviders + 1 ; j++) {
+            for (int j = 0 ; j < NUM_EGL_PROVIDERS + 1 ; j++) {
                 eglBaseProviders[i].release(owners[i]);
             }
 
             // Other egl provider owners should still be able to get remote egl base
-            for (int j = i + 1 ; j < numEglBaseProviders ; j++) {
+            for (int j = i + 1 ; j < NUM_EGL_PROVIDERS ; j++) {
                 assertNotNull(eglBaseProviders[j].getRemoteEglBase());
             }
         }
