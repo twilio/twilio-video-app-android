@@ -21,7 +21,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import java.security.AccessControlContext;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
@@ -157,12 +156,12 @@ public class RoomTest extends BaseClientTest {
             }
 
             @Override
-            public void onRecordingStarted() {
+            public void onRecordingStarted(Room room) {
                 fail();
             }
 
             @Override
-            public void onRecordingStopped() {
+            public void onRecordingStopped(Room room) {
                 fail();
             }
         });

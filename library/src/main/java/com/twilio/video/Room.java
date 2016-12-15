@@ -310,7 +310,7 @@ public class Room {
             handler.post(new Runnable() {
                 @Override
                 public void run() {
-                    Room.this.listener.onRecordingStarted();
+                    Room.this.listener.onRecordingStarted(Room.this);
                 }
             });
         }
@@ -322,7 +322,7 @@ public class Room {
             handler.post(new Runnable() {
                 @Override
                 public void run() {
-                    Room.this.listener.onRecordingStopped();
+                    Room.this.listener.onRecordingStopped(Room.this);
                 }
             });
         }
@@ -375,13 +375,15 @@ public class Room {
 
         /**
          * Called when the media being shared to a {@link Room} is being recorded.
+         * @param room
          */
-        void onRecordingStarted();
+        void onRecordingStarted(Room room);
 
         /**
          * Called when the media being shared to a {@link Room} is no longer being recorded.
+         * @param room
          */
-        void onRecordingStopped();
+        void onRecordingStopped(Room room);
     }
 
     class InternalRoomListenerHandle extends NativeHandle {

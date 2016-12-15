@@ -904,13 +904,13 @@ public class RoomActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onRecordingStarted() {
-                Timber.i("onRecordingStarted");
+            public void onRecordingStarted(Room room) {
+                Timber.i("onRecordingStarted: " + room.getName());
             }
 
             @Override
-            public void onRecordingStopped() {
-                Timber.i("onRecordingStopped");
+            public void onRecordingStopped(Room room) {
+                Timber.i("onRecordingStopped: " + room.getName());
             }
         };
     }

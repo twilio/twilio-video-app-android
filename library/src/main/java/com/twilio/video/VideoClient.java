@@ -228,12 +228,12 @@ public class VideoClient {
             }
 
             @Override
-            public void onRecordingStarted() {
+            public void onRecordingStarted(Room room) {
                 roomListener.onRecordingStarted();
             }
 
             @Override
-            public void onRecordingStopped() {
+            public void onRecordingStopped(Room room) {
                 roomListener.onRecordingStopped();
             }
         };

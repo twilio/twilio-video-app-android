@@ -57,12 +57,12 @@ public class CallbackHelper {
         }
 
         @Override
-        public void onRecordingStarted() {
+        public void onRecordingStarted(Room room) {
             triggerLatch(onRecordingStartedLatch);
         }
 
         @Override
-        public void onRecordingStopped() {
+        public void onRecordingStopped(Room room) {
             triggerLatch(onRecordingStoppedLatch);
         }
     }
@@ -95,12 +95,12 @@ public class CallbackHelper {
         }
 
         @Override
-        public void onRecordingStarted() {
+        public void onRecordingStarted(Room room) {
 
         }
 
         @Override
-        public void onRecordingStopped() {
+        public void onRecordingStopped(Room room) {
 
         }
     }
