@@ -1,5 +1,6 @@
 package com.twilio.video;
 
+import android.animation.ObjectAnimator;
 import android.content.Context;
 
 import com.getkeepsafe.relinker.ReLinker;
@@ -27,7 +28,13 @@ class MediaFactory {
                         ReLinker.loadLibrary(context, "jingle_peerconnection_so");
                         libraryIsLoaded = true;
                     }
-                    EglBaseProvider eglBaseProvider = EglBaseProvider.instance();
+
+                    /*
+                     * We need to create a temporary owner of EglBaseProvider so create our native
+                     * media factory.
+                     */
+                    Object temporaryEglOwner = new Object();
+                    EglBaseProvider eglBaseProvider = EglBaseProvider.instance(temporaryEglOwner);
                     EglBase localEglBase = eglBaseProvider.getLocalEglBase();
                     EglBase remoteEglBase = eglBaseProvider.getRemoteEglBase();
 
@@ -38,8 +45,13 @@ class MediaFactory {
                     if (nativeMediaFactoryHandle == 0) {
                         logger.e("Failed to instance MediaFactory");
                     } else {
-                        instance = new MediaFactory(nativeMediaFactoryHandle, eglBaseProvider);
+                        instance = new MediaFactory(nativeMediaFactoryHandle);
                     }
+                    /*
+                     * MediaFactory constructor will retain instance of EglBaseProvider so we can
+                     * release our temporary ownership in this method.
+                     */
+                    eglBaseProvider.release(temporaryEglOwner);
                 }
             }
         }
@@ -68,7 +80,7 @@ class MediaFactory {
                 mediaFactoryRefCount = Math.max(0, --mediaFactoryRefCount);
                 if (instance != null && mediaFactoryRefCount == 0) {
                     // Release EGL base provider
-                    eglBaseProvider.release();
+                    eglBaseProvider.release(this);
                     eglBaseProvider = null;
 
                     // Release native media factory
@@ -84,9 +96,9 @@ class MediaFactory {
         return nativeMediaFactoryHandle;
     }
 
-    private MediaFactory(long nativeMediaFactoryHandle, EglBaseProvider eglBaseProvider) {
+    private MediaFactory(long nativeMediaFactoryHandle) {
         this.nativeMediaFactoryHandle = nativeMediaFactoryHandle;
-        this.eglBaseProvider = eglBaseProvider;
+        this.eglBaseProvider = EglBaseProvider.instance(this);
     }
 
     private void checkReleased(String methodName) {

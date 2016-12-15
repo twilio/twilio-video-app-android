@@ -42,7 +42,7 @@ public class LocalMedia {
         this.context = context;
         this.mediaFactory = mediaFactory;
         this.nativeLocalMediaHandle = nativeLocalMediaHandle;
-        this.eglBaseProvider = EglBaseProvider.instance();
+        this.eglBaseProvider = EglBaseProvider.instance(this);
     }
 
     /**
@@ -200,7 +200,7 @@ public class LocalMedia {
             while (!localVideoTracks.isEmpty()) {
                 removeVideoTrack(localVideoTracks.get(0));
             }
-            eglBaseProvider.release();
+            eglBaseProvider.release(this);
             eglBaseProvider = null;
             nativeRelease(nativeLocalMediaHandle);
             nativeLocalMediaHandle = 0;
