@@ -226,6 +226,16 @@ public class VideoClient {
             public void onParticipantDisconnected(Room room, Participant participant) {
                 roomListener.onParticipantDisconnected(room, participant);
             }
+
+            @Override
+            public void onRecordingStarted() {
+                roomListener.onRecordingStarted();
+            }
+
+            @Override
+            public void onRecordingStopped() {
+                roomListener.onRecordingStopped();
+            }
         };
     }
 

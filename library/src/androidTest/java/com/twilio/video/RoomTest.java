@@ -1,16 +1,21 @@
 package com.twilio.video;
 
 import android.support.test.filters.LargeTest;
-import android.support.test.rule.ActivityTestRule;
+import android.support.test.rule.*;
 import android.support.test.runner.AndroidJUnit4;
 
 import com.twilio.video.base.BaseClientTest;
+import com.twilio.video.env.Env;
 import com.twilio.video.helper.CallbackHelper;
+import com.twilio.video.test.*;
+import com.twilio.video.test.BuildConfig;
 import com.twilio.video.ui.MediaTestActivity;
 import com.twilio.video.util.AccessTokenUtils;
 import com.twilio.video.util.FakeVideoCapturer;
 import com.twilio.video.util.PermissionUtils;
 import com.twilio.video.util.RandUtils;
+
+import junit.framework.Assert;
 
 import org.junit.After;
 import org.junit.Before;
@@ -18,6 +23,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import java.security.AccessControlContext;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
@@ -151,7 +157,47 @@ public class RoomTest extends BaseClientTest {
             public void onParticipantDisconnected(Room room, Participant participant) {
                 fail();
             }
+
+            @Override
+            public void onRecordingStarted() {
+                fail();
+            }
+
+            @Override
+            public void onRecordingStopped() {
+                fail();
+            }
         });
         assertTrue(connectFailure.await(10, TimeUnit.SECONDS));
     }
+
+    @Test
+    public void shouldReturnValidIsRecording() throws InterruptedException {
+        CallbackHelper.FakeRoomListener roomListener = new CallbackHelper.FakeRoomListener();
+        roomListener.onConnectedLatch = new CountDownLatch(1);
+
+        ConnectOptions connectOptions = new ConnectOptions.Builder()
+                .roomName(roomName)
+                .localMedia(localMedia)
+                .build();
+        Room room = videoClient.connect(connectOptions, roomListener);
+        assertNull(room.getLocalParticipant());
+        assertTrue(roomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
+
+        if(BuildConfig.TOPOLOGY.equals(AccessTokenUtils.P2P) || BuildConfig.TOPOLOGY.equals(AccessTokenUtils.SFU)) {
+           Assert.assertFalse(room.isRecording());
+        } else {
+            /*
+             * Making an assumption that other topologies, will have recording enabled by default.
+             * This assumption is subject to change and we will have to update this test
+             * accordingly.
+             */
+            Assert.assertTrue(room.isRecording());
+        }
+
+        room.disconnect();
+
+        Assert.assertFalse(room.isRecording());
+    }
+
 }

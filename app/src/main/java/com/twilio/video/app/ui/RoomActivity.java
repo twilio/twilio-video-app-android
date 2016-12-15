@@ -902,6 +902,16 @@ public class RoomActivity extends AppCompatActivity {
                 Timber.i("onParticipantDisconnected " + participant.getIdentity());
                 removeParticipant(participant);
             }
+
+            @Override
+            public void onRecordingStarted() {
+                Timber.i("onRecordingStarted");
+            }
+
+            @Override
+            public void onRecordingStopped() {
+                Timber.i("onRecordingStopped");
+            }
         };
     }
 

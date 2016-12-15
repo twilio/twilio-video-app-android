@@ -14,7 +14,8 @@ import retrofit.http.GET;
 import retrofit.http.QueryMap;
 
 public class AccessTokenUtils {
-    private static final String P2P = "P2P";
+    public static final String P2P = "P2P";
+    public static final String SFU = "SFU";
     private static final String PROD = "prod";
     private static final String ENVIRONMENT = "environment";
     private static final String IDENTITY = "identity";

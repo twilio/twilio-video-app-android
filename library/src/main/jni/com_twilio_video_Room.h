@@ -13,6 +13,9 @@ struct RoomContext {
     std::unique_ptr<twilio::video::Room> room;
 };
 
+JNIEXPORT jboolean JNICALL Java_com_twilio_video_Room_nativeIsRecording
+        (JNIEnv *, jobject, jlong);
+
 JNIEXPORT void JNICALL Java_com_twilio_video_Room_nativeDisconnect
         (JNIEnv *, jobject, jlong);
 
