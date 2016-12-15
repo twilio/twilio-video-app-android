@@ -51,9 +51,7 @@ public class EglBaseProviderTest {
         EglBaseProvider[] eglBaseProviders = getEglBaseProviders(owners);
 
         // Release EGL base providers
-        for (int i = 0; i < NUM_EGL_PROVIDERS; i++) {
-            eglBaseProviders[i].release(owners[i]);
-        }
+        releaseEglBaseProviders(owners, eglBaseProviders);
 
         // Release the test suite instance
         eglBaseProvider.release(this);
@@ -68,9 +66,7 @@ public class EglBaseProviderTest {
         EglBaseProvider[] eglBaseProviders = getEglBaseProviders(owners);
 
         // Release EGL base providers
-        for (int i = 0 ; i < NUM_EGL_PROVIDERS ; i++) {
-            eglBaseProviders[i].release(owners[i]);
-        }
+        releaseEglBaseProviders(owners, eglBaseProviders);
 
         // Release the test suite instance
         eglBaseProvider.release(this);
@@ -85,9 +81,7 @@ public class EglBaseProviderTest {
         EglBaseProvider[] eglBaseProviders = getEglBaseProviders(owners);
 
         // Release EGL base providers
-        for (int i = 0 ; i < NUM_EGL_PROVIDERS ; i++) {
-            eglBaseProviders[i].release(owners[i]);
-        }
+        releaseEglBaseProviders(owners, eglBaseProviders);
 
         // Release the test suite instance
         eglBaseProvider.release(this);
@@ -219,5 +213,12 @@ public class EglBaseProviderTest {
         }
 
         return eglBaseProviders;
+    }
+
+    private void releaseEglBaseProviders(Object[] eglBaseProviderOwners,
+                                         EglBaseProvider[] eglBaseProviders) {
+        for (int i = 0; i < eglBaseProviderOwners.length ; i++) {
+            eglBaseProviders[i].release(eglBaseProviderOwners[i]);
+        }
     }
 }
