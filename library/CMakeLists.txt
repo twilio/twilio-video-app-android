@@ -46,8 +46,6 @@ add_library(poco-util STATIC IMPORTED GLOBAL)
 set_property(TARGET poco-util PROPERTY IMPORTED_LOCATION ${CORE_STATIC_LIB_DIR}/libPocoUtil.a)
 add_library(poco-crypto STATIC IMPORTED GLOBAL)
 set_property(TARGET poco-crypto PROPERTY IMPORTED_LOCATION ${CORE_STATIC_LIB_DIR}/libPocoCrypto.a)
-add_library(poco-json STATIC IMPORTED GLOBAL)
-set_property(TARGET poco-json PROPERTY IMPORTED_LOCATION ${CORE_STATIC_LIB_DIR}/libPocoJSON.a)
 add_library(poco-foundation STATIC IMPORTED GLOBAL)
 set_property(TARGET poco-foundation PROPERTY IMPORTED_LOCATION ${CORE_STATIC_LIB_DIR}/libPocoFoundation.a)
 add_library(boringssl STATIC IMPORTED GLOBAL)
@@ -93,6 +91,5 @@ target_link_libraries(${VIDEO_ANDROID_LIBRARY} ${CORE_STATIC_LIB_DIR}/libtwilio-
         ${CORE_STATIC_LIB_DIR}/libPocoNetSSL.a
         ${CORE_STATIC_LIB_DIR}/libPocoUtil.a
         ${CORE_STATIC_LIB_DIR}/libPocoCrypto.a
-        ${CORE_STATIC_LIB_DIR}/libPocoJSON.a
         ${CORE_STATIC_LIB_DIR}/libPocoFoundation.a
         ${CORE_STATIC_LIB_DIR}/libboringssl.a)
