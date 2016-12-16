@@ -8,7 +8,7 @@ import com.twilio.video.base.BaseClientTest;
 import com.twilio.video.helper.CallbackHelper;
 import com.twilio.video.test.BuildConfig;
 import com.twilio.video.ui.MediaTestActivity;
-import com.twilio.video.util.AccessTokenUtils;
+import com.twilio.video.util.SimplerSignalingUtils;
 import com.twilio.video.util.FakeVideoCapturer;
 import com.twilio.video.util.PermissionUtils;
 import com.twilio.video.util.RandUtils;
@@ -49,7 +49,7 @@ public class RoomTest extends BaseClientTest {
         mediaTestActivity = activityRule.getActivity();
         PermissionUtils.allowPermissions(mediaTestActivity);
         identity = RandUtils.generateRandomString(10);
-        token = AccessTokenUtils.getAccessToken(identity);
+        token = SimplerSignalingUtils.getAccessToken(identity);
         videoClient = new VideoClient(mediaTestActivity, token);
         roomName = RandUtils.generateRandomString(20);
         localMedia = LocalMedia.create(mediaTestActivity);
@@ -181,7 +181,7 @@ public class RoomTest extends BaseClientTest {
         assertNull(room.getLocalParticipant());
         assertTrue(roomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
 
-        if(BuildConfig.TOPOLOGY.equals(AccessTokenUtils.P2P) || BuildConfig.TOPOLOGY.equals(AccessTokenUtils.SFU)) {
+        if(BuildConfig.TOPOLOGY.equals(SimplerSignalingUtils.P2P) || BuildConfig.TOPOLOGY.equals(SimplerSignalingUtils.SFU)) {
            Assert.assertFalse(room.isRecording());
         } else {
             /*

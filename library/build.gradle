@@ -287,7 +287,7 @@ def getEnvironment() {
 }
 
 def getTopology() {
-    // Possible values for VIDEO_TOPOLOGY are 'P2P' and 'SFU'.
+    // Possible values for VIDEO_TOPOLOGY are 'P2P', 'SFU', and 'SFU Recording'.
 
     // Attempt to get it from the environment variable
     def topology = System.getenv("VIDEO_TOPOLOGY");

@@ -3,6 +3,9 @@ package com.twilio.video.app.util;
 import android.util.Base64;
 
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.twilio.video.BuildConfig;
 import com.twilio.video.app.model.TwilioIceResponse;
 
 import java.util.HashMap;
@@ -11,13 +14,13 @@ import java.util.Map;
 import retrofit.Callback;
 import retrofit.RequestInterceptor;
 import retrofit.RestAdapter;
+import retrofit.RetrofitError;
+import retrofit.client.Response;
 import retrofit.converter.GsonConverter;
 import retrofit.http.GET;
 import retrofit.http.QueryMap;
 
 public class SimplerSignalingUtils {
-    private static final String P2P = "P2P";
-    private static final String PROD = "prod";
     private static final String ENVIRONMENT = "environment";
     private static final String IDENTITY = "identity";
     private static final String TTL = "ttl";
@@ -27,10 +30,13 @@ public class SimplerSignalingUtils {
      */
     private static final String TTL_DEFAULT = "300";
     private static final String CONFIGURATION_PROFILE_SID = "configurationProfileSid";
+    private static final String PROD = "prod";
     public static final String STAGE = "stage";
     public static final String DEV= "dev";
 
-
+    class Configuration {
+        public JsonObject configurationProfileSids;
+    }
 
     /* Define the Retrofit Token Service */
     interface SimplerSignalingApi {
@@ -41,6 +47,10 @@ public class SimplerSignalingUtils {
         @GET("/ice")
         void getIceServers(@QueryMap Map<String, String> options,
                            Callback<TwilioIceResponse> tokenCallback);
+
+        @GET("/configuration")
+        void getConfiguration(@QueryMap Map<String, String> options,
+                              Callback<Configuration> configurationCallback);
     }
 
     private static class TwilioAuthorizationInterceptor implements RequestInterceptor {
@@ -65,35 +75,42 @@ public class SimplerSignalingUtils {
             .build()
             .create(SimplerSignalingApi.class);
 
-    public static void getAccessToken(String username,
-                                      String environment,
-                                      String topology,
-                                      Callback<String> callback) {
-        HashMap<String,String> options = new HashMap<>();
+    public static void getAccessToken(final String username,
+                                      final String environment,
+                                      final String topology,
+                                      final Callback<String> callback) {
+
+        final HashMap<String,String> options = new HashMap<>();
         options.put(ENVIRONMENT, environment);
-        options.put(IDENTITY, username);
-        options.put(TTL, TTL_DEFAULT);
-        options.put(CONFIGURATION_PROFILE_SID, getProfileConfigSid(environment, topology));
-        simplerSignalingService.getAccessToken(options, callback);
+
+        simplerSignalingService.getConfiguration(options, new Callback<Configuration>() {
+            @Override
+            public void success(Configuration configuration, Response response) {
+                String configurationProfileSid = getConfigurationProfileSid(configuration, topology);
+
+                options.put(IDENTITY, username);
+                options.put(TTL, TTL_DEFAULT);
+                options.put(CONFIGURATION_PROFILE_SID, configurationProfileSid);
+
+                simplerSignalingService.getAccessToken(options, callback);
+            }
+
+            @Override
+            public void failure(RetrofitError error) {
+                // Return the error from attempting to obtain the configuration
+                callback.failure(error);
+            }
+        });
+
     }
 
-    private static String getProfileConfigSid(String environment, String topology) {
-        boolean isP2P = topology.equals(P2P);
-        switch(environment) {
-            case DEV:
-                return isP2P ?
-                        "VSbf4c8aee1e259d11b2c5adeebb7c0dbe" :
-                        "VS6469e95f0b2e2c8f931086988d69f815";
-            case STAGE:
-                return isP2P ?
-                        "VS0d1c1b07fafbe94b73670b37e7aedfbb" :
-                        "VS395e1a612a6e3c63100a3b4d99d52265";
-            case PROD:
-            default:
-                return isP2P ?
-                        "VS3f75e0f14e7c8b20938fc5092e82f23a" :
-                        "VS25275758820071c0d42246c538bc11ad";
+    private static String getConfigurationProfileSid(Configuration configuration, String topology) {
+        for(Map.Entry<String, JsonElement> entry : configuration.configurationProfileSids.entrySet()) {
+            if(topology.equals(entry.getValue().getAsString())) {
+                return entry.getKey();
+            }
         }
+        return null;
     }
 
 }

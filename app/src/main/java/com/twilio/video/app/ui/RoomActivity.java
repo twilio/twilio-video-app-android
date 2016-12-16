@@ -56,8 +56,10 @@ import com.twilio.video.VideoTrack;
 import com.twilio.video.VideoView;
 import com.twilio.video.app.R;
 import com.twilio.video.app.data.Preferences;
+import com.twilio.video.app.util.EnvUtil;
 import com.twilio.video.app.util.InputUtils;
 import com.twilio.video.app.util.SimplerSignalingUtils;
+import com.twilio.video.env.Env;
 
 import java.net.HttpURLConnection;
 import java.util.Map;
@@ -123,7 +125,7 @@ public class RoomActivity extends AppCompatActivity {
     private SharedPreferences sharedPreferences;
 
     private String username;
-    private String realm;
+    private String env;
     private String topology;
     private AccessManager accessManager;
     private VideoClient videoClient;
@@ -175,7 +177,7 @@ public class RoomActivity extends AppCompatActivity {
         // Setup activity
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         username = sharedPreferences.getString(Preferences.IDENTITY, null);
-        realm = sharedPreferences.getString(Preferences.ENVIRONMENT,
+        env = sharedPreferences.getString(Preferences.ENVIRONMENT,
                 Preferences.ENVIRONMENT_DEFAULT);
         topology = sharedPreferences.getString(Preferences.TOPOLOGY,
                 Preferences.TOPOLOGY_DEFAULT);
@@ -642,16 +644,19 @@ public class RoomActivity extends AppCompatActivity {
     }
 
     private void obtainTokenAndConnect(final String roomName) {
-        String currentRealm = sharedPreferences.getString(Preferences.ENVIRONMENT,
+        String currentEnv = sharedPreferences.getString(Preferences.ENVIRONMENT,
                 Preferences.ENVIRONMENT_DEFAULT);
         String currentTopology = sharedPreferences.getString(Preferences.TOPOLOGY,
                 Preferences.TOPOLOGY_DEFAULT);
-
-        if (newTokenNeeded(currentRealm, currentTopology)) {
+        if(env != currentEnv) {
+            // Reset the client to ensure that the client is created with the new environment
+            videoClient = null;
+        }
+        if (newTokenNeeded(currentEnv, currentTopology)) {
             Timber.d("Retrieving access token");
-            realm = currentRealm;
+            env = currentEnv;
             topology = currentTopology;
-            SimplerSignalingUtils.getAccessToken(username, realm, topology,
+            SimplerSignalingUtils.getAccessToken(username, env, topology,
                     new Callback<String>() {
                         @Override
                         public void success(String token, Response response) {
@@ -683,8 +688,8 @@ public class RoomActivity extends AppCompatActivity {
         }
     }
 
-    private boolean newTokenNeeded(String currentRealm, String currentTopology) {
-        return !realm.equals(currentRealm) ||
+    private boolean newTokenNeeded(String currentEnv, String currentTopology) {
+        return !env.equals(currentEnv) ||
                 !topology.equals(currentTopology) ||
                 accessManager == null ||
                 accessManager.isTokenExpired();
@@ -697,6 +702,8 @@ public class RoomActivity extends AppCompatActivity {
             accessManager.updateToken(token);
         }
         if (videoClient == null) {
+            String nativeEnvironmentVariableValue = EnvUtil.getNativeEnvironmentVariableValue(env);
+            Env.set(this, EnvUtil.TWILIO_ENV_KEY, nativeEnvironmentVariableValue, true);
             videoClient = new VideoClient(this, token);
         } else {
             videoClient.updateToken(token);
@@ -878,8 +885,8 @@ public class RoomActivity extends AppCompatActivity {
 
             @Override
             public void onConnectFailure(Room room, TwilioException twilioException) {
-                Timber.i("onConnectFailure");
-                roomStatusTextview.setText("Failed to obtainTokenAndConnect to " + room.getName());
+                Timber.i("onConnectFailure: " + twilioException.getMessage());
+                roomStatusTextview.setText("Failed to connect to " + room.getName());
                 RoomActivity.this.room = null;
                 updateUi(room);            }
 

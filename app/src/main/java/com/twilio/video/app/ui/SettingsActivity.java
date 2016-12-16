@@ -13,28 +13,10 @@ import android.view.MenuItem;
 import com.twilio.video.app.BuildConfig;
 import com.twilio.video.app.R;
 import com.twilio.video.app.data.Preferences;
-import com.twilio.video.app.util.SimplerSignalingUtils;
-import com.twilio.video.env.Env;
 
 public class SettingsActivity extends AppCompatActivity {
-    private static final String TWILIO_ENV_KEY = "TWILIO_ENVIRONMENT";
-    private static final String TWILIO_DEV_ENV = "Development";
-    private static final String TWILIO_STAGE_ENV = "Staging";
-    private static final String TWILIO_PROD_ENV = "Production";
 
     private SharedPreferences sharedPreferences;
-
-    private final SharedPreferences.OnSharedPreferenceChangeListener sharedPreferenceChangeListener
-            = new SharedPreferences.OnSharedPreferenceChangeListener() {
-        @Override
-        public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-            if (key.equals(Preferences.ENVIRONMENT)) {
-                String environment = sharedPreferences.getString(key,
-                        Preferences.ENVIRONMENT_DEFAULT);
-                Env.set(SettingsActivity.this, TWILIO_ENV_KEY, getNativeEnvironment(environment), true);
-            }
-        }
-    };
 
     private final Preference.OnPreferenceClickListener logoutClickListener =
             new Preference.OnPreferenceClickListener() {
@@ -49,9 +31,7 @@ public class SettingsActivity extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // Register for preference changes
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-        sharedPreferences.registerOnSharedPreferenceChangeListener(sharedPreferenceChangeListener);
 
         // Add the preference fragment
         SettingsFragment settingsFragment = SettingsFragment.newInstance(sharedPreferences,
@@ -70,16 +50,6 @@ public class SettingsActivity extends AppCompatActivity {
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
-        }
-    }
-
-    private String getNativeEnvironment(String environment) {
-        if (environment.equals(SimplerSignalingUtils.DEV)) {
-            return TWILIO_DEV_ENV;
-        } else if (environment.equals(SimplerSignalingUtils.STAGE)) {
-            return TWILIO_STAGE_ENV;
-        } else {
-            return TWILIO_PROD_ENV;
         }
     }
 
