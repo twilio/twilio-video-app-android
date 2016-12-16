@@ -1,5 +1,7 @@
 package com.twilio.video;
 
+import android.support.annotation.VisibleForTesting;
+
 import org.webrtc.EglBase;
 
 import java.util.HashSet;
@@ -50,6 +52,22 @@ class EglBaseProvider {
     void release(Object owner) {
         synchronized (EglBaseProvider.class) {
             eglBaseProviderOwners.remove(owner);
+            if (instance != null && eglBaseProviderOwners.isEmpty()) {
+                instance.remoteEglBase.release();
+                instance.remoteEglBase = null;
+                instance.localEglBase.release();
+                instance.localEglBase = null;
+                instance.rootEglBase.release();
+                instance.rootEglBase = null;
+                instance = null;
+            }
+        }
+    }
+
+    @VisibleForTesting(otherwise = VisibleForTesting.NONE)
+    static void clear() {
+        synchronized (EglBaseProvider.class) {
+            eglBaseProviderOwners.clear();
             if (instance != null && eglBaseProviderOwners.isEmpty()) {
                 instance.remoteEglBase.release();
                 instance.remoteEglBase = null;

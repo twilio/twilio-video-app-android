@@ -4,6 +4,7 @@ import android.support.test.runner.AndroidJUnit4;
 
 import org.junit.After;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -13,6 +14,12 @@ import static junit.framework.Assert.assertNotNull;
 public class EglBaseProviderTest {
     private static final int NUM_EGL_PROVIDERS = 10;
     private EglBaseProvider eglBaseProvider;
+
+    @BeforeClass
+    public static void suiteSetup() {
+        // Ensure that there are no lingering owners from a previous test suite
+        EglBaseProvider.clear();
+    }
 
     @Before
     public void setup() {
