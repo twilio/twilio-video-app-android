@@ -18,7 +18,7 @@ public class EglBaseProviderTest {
     @BeforeClass
     public static void suiteSetup() {
         // Ensure that there are no lingering owners from a previous test suite
-        EglBaseProvider.clear();
+        EglBaseProvider.waitForNoOwners();
     }
 
     @Before

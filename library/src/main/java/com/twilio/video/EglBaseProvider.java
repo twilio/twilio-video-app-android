@@ -65,17 +65,12 @@ class EglBaseProvider {
     }
 
     @VisibleForTesting(otherwise = VisibleForTesting.NONE)
-    static void clear() {
-        synchronized (EglBaseProvider.class) {
-            eglBaseProviderOwners.clear();
-            if (instance != null && eglBaseProviderOwners.isEmpty()) {
-                instance.remoteEglBase.release();
-                instance.remoteEglBase = null;
-                instance.localEglBase.release();
-                instance.localEglBase = null;
-                instance.rootEglBase.release();
-                instance.rootEglBase = null;
-                instance = null;
+    static void waitForNoOwners() {
+        while (true) {
+            synchronized (EglBaseProvider.class) {
+                if (eglBaseProviderOwners.isEmpty()) {
+                    break;
+                }
             }
         }
     }
