@@ -58,7 +58,7 @@ import com.twilio.video.app.R;
 import com.twilio.video.app.data.Preferences;
 import com.twilio.video.app.util.EnvUtil;
 import com.twilio.video.app.util.InputUtils;
-import com.twilio.video.app.util.SimplerSignalingUtils;
+import com.twilio.video.simplersignaling.SimplerSignalingUtils;
 import com.twilio.video.env.Env;
 
 import java.net.HttpURLConnection;

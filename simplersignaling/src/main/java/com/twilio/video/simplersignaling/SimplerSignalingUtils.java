@@ -1,15 +1,15 @@
-package com.twilio.video.app.util;
+package com.twilio.video.simplersignaling;
 
 import android.util.Base64;
+import android.util.Log;
 
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.twilio.video.BuildConfig;
-import com.twilio.video.app.model.TwilioIceResponse;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.CountDownLatch;
 
 import retrofit.Callback;
 import retrofit.RequestInterceptor;
@@ -32,7 +32,9 @@ public class SimplerSignalingUtils {
     private static final String CONFIGURATION_PROFILE_SID = "configurationProfileSid";
     private static final String PROD = "prod";
     public static final String STAGE = "stage";
-    public static final String DEV= "dev";
+    public static final String DEV = "dev";
+    public static final String P2P = "P2P";
+    public static final String SFU = "SFU";
 
     class Configuration {
         public JsonObject configurationProfileSids;
@@ -43,10 +45,6 @@ public class SimplerSignalingUtils {
         @GET("/access-token")
         void getAccessToken(@QueryMap Map<String, String> options,
                             Callback<String> tokenCallback);
-
-        @GET("/ice")
-        void getIceServers(@QueryMap Map<String, String> options,
-                           Callback<TwilioIceResponse> tokenCallback);
 
         @GET("/configuration")
         void getConfiguration(@QueryMap Map<String, String> options,
@@ -102,6 +100,37 @@ public class SimplerSignalingUtils {
             }
         });
 
+    }
+
+    // Provide a synchronous version of getAccessToken for tests
+    public static String getAccessToken(final String username,
+                                        final String environment,
+                                        final String topology) {
+
+        final CountDownLatch callbackLatch = new CountDownLatch(1);
+        final String[] token = new String[1];
+
+        getAccessToken(username, environment, topology, new Callback<String>() {
+            @Override
+            public void success(String s, Response response) {
+                token[0] = s;
+                callbackLatch.countDown();
+            }
+
+            @Override
+            public void failure(RetrofitError error) {
+                token[0] = null;
+                callbackLatch.countDown();
+            }
+        });
+
+        try {
+            callbackLatch.await();
+        } catch (InterruptedException e) {
+            return null;
+        }
+
+        return token[0];
     }
 
     private static String getConfigurationProfileSid(Configuration configuration, String topology) {

@@ -1,5 +1,7 @@
 package com.twilio.video.app.util;
 
+import com.twilio.video.simplersignaling.SimplerSignalingUtils;
+
 public class EnvUtil {
     private static final String TWILIO_DEV_ENV = "Development";
     private static final String TWILIO_STAGE_ENV = "Staging";

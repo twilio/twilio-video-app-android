@@ -9,7 +9,7 @@ import android.support.test.runner.AndroidJUnit4;
 import com.twilio.video.base.BaseClientTest;
 import com.twilio.video.helper.CallbackHelper;
 import com.twilio.video.ui.MediaTestActivity;
-import com.twilio.video.util.SimplerSignalingUtils;
+import com.twilio.video.util.AccessTokenUtils;
 import com.twilio.video.util.FakeVideoCapturer;
 import com.twilio.video.util.PermissionUtils;
 import com.twilio.video.util.RandUtils;
@@ -417,7 +417,7 @@ public class StatsTest extends BaseClientTest {
 
     private VideoClient createVideoClient() {
         String identity = RandUtils.generateRandomString(10);
-        String token = SimplerSignalingUtils.getAccessToken(identity);
+        String token = AccessTokenUtils.getAccessToken(identity);
         VideoClient videoClient = new VideoClient(mediaTestActivity, token);
         return videoClient;
     }

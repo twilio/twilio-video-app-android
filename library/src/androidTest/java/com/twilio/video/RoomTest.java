@@ -6,9 +6,10 @@ import android.support.test.runner.AndroidJUnit4;
 
 import com.twilio.video.base.BaseClientTest;
 import com.twilio.video.helper.CallbackHelper;
+import com.twilio.video.simplersignaling.SimplerSignalingUtils;
 import com.twilio.video.test.BuildConfig;
 import com.twilio.video.ui.MediaTestActivity;
-import com.twilio.video.util.SimplerSignalingUtils;
+import com.twilio.video.util.AccessTokenUtils;
 import com.twilio.video.util.FakeVideoCapturer;
 import com.twilio.video.util.PermissionUtils;
 import com.twilio.video.util.RandUtils;
@@ -49,7 +50,7 @@ public class RoomTest extends BaseClientTest {
         mediaTestActivity = activityRule.getActivity();
         PermissionUtils.allowPermissions(mediaTestActivity);
         identity = RandUtils.generateRandomString(10);
-        token = SimplerSignalingUtils.getAccessToken(identity);
+        token = AccessTokenUtils.getAccessToken(identity);
         videoClient = new VideoClient(mediaTestActivity, token);
         roomName = RandUtils.generateRandomString(20);
         localMedia = LocalMedia.create(mediaTestActivity);

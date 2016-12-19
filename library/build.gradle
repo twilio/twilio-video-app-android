@@ -91,6 +91,7 @@ dependencies {
     testCompile 'com.google.guava:guava:19.0'
 
     androidTestCompile project(':env')
+    androidTestCompile project(':simplersignaling')
     androidTestCompile 'com.squareup.retrofit:retrofit:1.9.0'
     androidTestCompile 'com.android.support.test.espresso:espresso-core:2.2.2'
     androidTestCompile 'com.android.support.test:runner:0.5'
