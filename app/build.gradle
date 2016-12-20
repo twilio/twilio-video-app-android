@@ -3,7 +3,7 @@ apply plugin: 'com.jakewharton.butterknife'
 
 android {
     compileSdkVersion 25
-    buildToolsVersion "25.0.0"
+    buildToolsVersion "25.0.1"
 
     defaultConfig {
         applicationId "com.twilio.video.app"
@@ -50,8 +50,8 @@ dependencies {
     compile project(':env')
     compile project(':simplersignaling')
     compile 'net.hockeyapp.android:HockeySDK:3.5.0'
-    compile 'com.android.support:design:25.0.1'
-    compile 'com.android.support:preference-v14:25.0.1'
+    compile 'com.android.support:design:25.1.0'
+    compile 'com.android.support:preference-v14:25.1.0'
     compile 'com.jakewharton.timber:timber:4.1.0'
     compile 'com.appyvet:materialrangebar:1.3'
     compile 'com.jakewharton:butterknife:8.4.0'
