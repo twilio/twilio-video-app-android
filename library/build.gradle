@@ -91,6 +91,7 @@ dependencies {
     testCompile 'com.google.guava:guava:19.0'
 
     androidTestCompile project(':env')
+    androidTestCompile project(':simplersignaling')
     androidTestCompile 'com.squareup.retrofit:retrofit:1.9.0'
     androidTestCompile 'com.android.support.test.espresso:espresso-core:2.2.2'
     androidTestCompile 'com.android.support.test:runner:0.5'
@@ -287,7 +288,7 @@ def getEnvironment() {
 }
 
 def getTopology() {
-    // Possible values for VIDEO_TOPOLOGY are 'P2P' and 'SFU'.
+    // Possible values for VIDEO_TOPOLOGY are 'P2P', 'SFU', and 'SFU Recording'.
 
     // Attempt to get it from the environment variable
     def topology = System.getenv("VIDEO_TOPOLOGY");

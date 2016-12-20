@@ -5,7 +5,7 @@
 
     <item android:id="@+id/speaker_menu_item"
           android:title="@string/turn_speaker_on"
-          android:icon="@drawable/ic_volume_down_white_24px"
+          android:icon="@drawable/ic_volume_up_white_24dp"
           app:showAsAction="ifRoom"/>
 
     <item android:id="@+id/switch_camera_menu_item"

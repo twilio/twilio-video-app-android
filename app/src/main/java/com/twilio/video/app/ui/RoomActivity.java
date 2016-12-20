@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.media.AudioManager;
 import android.media.projection.MediaProjectionManager;
 import android.os.Build;
 import android.os.Bundle;
@@ -56,8 +57,10 @@ import com.twilio.video.VideoTrack;
 import com.twilio.video.VideoView;
 import com.twilio.video.app.R;
 import com.twilio.video.app.data.Preferences;
+import com.twilio.video.app.util.EnvUtil;
 import com.twilio.video.app.util.InputUtils;
-import com.twilio.video.app.util.SimplerSignalingUtils;
+import com.twilio.video.simplersignaling.SimplerSignalingUtils;
+import com.twilio.video.env.Env;
 
 import java.net.HttpURLConnection;
 import java.util.Map;
@@ -70,6 +73,9 @@ import retrofit.Callback;
 import retrofit.RetrofitError;
 import retrofit.client.Response;
 import timber.log.Timber;
+
+import static com.twilio.video.app.R.drawable.ic_phonelink_ring_white_24dp;
+import static com.twilio.video.app.R.drawable.ic_volume_up_white_24dp;
 
 public class RoomActivity extends AppCompatActivity {
     private static final int PERMISSIONS_REQUEST_CODE = 100;
@@ -118,12 +124,14 @@ public class RoomActivity extends AppCompatActivity {
     private MenuItem pauseAudioMenuItem;
     private MenuItem screenCaptureMenuItem;
     private MenuItem settingsMenuItem;
-    private MenuItem speakerMenuItem;
 
     private SharedPreferences sharedPreferences;
+    private AudioManager audioManager;
+    private int savedAudioMode = AudioManager.MODE_INVALID;
+    private int savedVolumeControlStream;
 
     private String username;
-    private String realm;
+    private String env;
     private String topology;
     private AccessManager accessManager;
     private VideoClient videoClient;
@@ -172,10 +180,15 @@ public class RoomActivity extends AppCompatActivity {
         // Setup toolbar
         setSupportActionBar(toolbar);
 
-        // Setup activity
+        // Setup Audio
+        audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+        audioManager.setSpeakerphoneOn(true);
+        savedVolumeControlStream = getVolumeControlStream();
+
+        // Setup Activity
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         username = sharedPreferences.getString(Preferences.IDENTITY, null);
-        realm = sharedPreferences.getString(Preferences.ENVIRONMENT,
+        env = sharedPreferences.getString(Preferences.ENVIRONMENT,
                 Preferences.ENVIRONMENT_DEFAULT);
         topology = sharedPreferences.getString(Preferences.TOPOLOGY,
                 Preferences.TOPOLOGY_DEFAULT);
@@ -187,6 +200,8 @@ public class RoomActivity extends AppCompatActivity {
 
     @Override
     protected void onDestroy() {
+        // Reset the speakerphone
+        audioManager.setSpeakerphoneOn(false);
         // Teardown local media
         if (localMedia != null) {
             localMedia.removeVideoTrack(cameraVideoTrack);
@@ -262,7 +277,6 @@ public class RoomActivity extends AppCompatActivity {
         pauseVideoMenuItem = menu.findItem(R.id.pause_video_menu_item);
         pauseAudioMenuItem = menu.findItem(R.id.pause_audio_menu_item);
         screenCaptureMenuItem = menu.findItem(R.id.share_screen_menu_item);
-        speakerMenuItem = menu.findItem(R.id.share_screen_menu_item);
 
         // Screen sharing only available on lollipop and up
         screenCaptureMenuItem.setVisible(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP);
@@ -275,6 +289,15 @@ public class RoomActivity extends AppCompatActivity {
         switch (item.getItemId()) {
             case R.id.switch_camera_menu_item:
                 switchCamera();
+                return true;
+            case R.id.speaker_menu_item:
+                if (audioManager.isSpeakerphoneOn()) {
+                    audioManager.setSpeakerphoneOn(false);
+                    item.setIcon(ic_phonelink_ring_white_24dp);
+                } else {
+                    audioManager.setSpeakerphoneOn(true);
+                    item.setIcon(ic_volume_up_white_24dp);
+                }
                 return true;
             case R.id.share_screen_menu_item:
                 String shareScreen = getString(R.string.share_screen);
@@ -592,6 +615,36 @@ public class RoomActivity extends AppCompatActivity {
         }
     }
 
+    private void setAudioFocus(boolean setFocus) {
+        if (setFocus) {
+            savedAudioMode = audioManager.getMode();
+            // Request audio focus before making any device switch.
+            audioManager.requestAudioFocus(null, AudioManager.STREAM_VOICE_CALL,
+                    AudioManager.AUDIOFOCUS_GAIN_TRANSIENT);
+            /*
+             * Start by setting MODE_IN_COMMUNICATION as default audio mode. It is
+             * required to be in this mode when playout and/or recording starts for
+             * best possible VoIP performance.
+             * Some devices have difficulties with speaker mode if this is not set.
+             */
+            audioManager.setMode(AudioManager.MODE_IN_COMMUNICATION);
+        } else {
+            audioManager.setMode(savedAudioMode);
+            audioManager.abandonAudioFocus(null);
+        }
+    }
+
+    private void setVolumeControl(boolean setVolumeControl) {
+        if(setVolumeControl) {
+            /*
+             * Enable changing the volume using the up/down keys during a conversation
+             */
+            setVolumeControlStream(AudioManager.STREAM_VOICE_CALL);
+        } else {
+            setVolumeControlStream(savedVolumeControlStream);
+        }
+    }
+
     @TargetApi(21)
     private void requestScreenCapturePermission() {
         Timber.d("Requesting permission to capture screen");
@@ -642,16 +695,19 @@ public class RoomActivity extends AppCompatActivity {
     }
 
     private void obtainTokenAndConnect(final String roomName) {
-        String currentRealm = sharedPreferences.getString(Preferences.ENVIRONMENT,
+        String currentEnv = sharedPreferences.getString(Preferences.ENVIRONMENT,
                 Preferences.ENVIRONMENT_DEFAULT);
         String currentTopology = sharedPreferences.getString(Preferences.TOPOLOGY,
                 Preferences.TOPOLOGY_DEFAULT);
-
-        if (newTokenNeeded(currentRealm, currentTopology)) {
+        if(env != currentEnv) {
+            // Reset the client to ensure that the client is created with the new environment
+            videoClient = null;
+        }
+        if (newTokenNeeded(currentEnv, currentTopology)) {
             Timber.d("Retrieving access token");
-            realm = currentRealm;
+            env = currentEnv;
             topology = currentTopology;
-            SimplerSignalingUtils.getAccessToken(username, realm, topology,
+            SimplerSignalingUtils.getAccessToken(username, env, topology,
                     new Callback<String>() {
                         @Override
                         public void success(String token, Response response) {
@@ -683,8 +739,8 @@ public class RoomActivity extends AppCompatActivity {
         }
     }
 
-    private boolean newTokenNeeded(String currentRealm, String currentTopology) {
-        return !realm.equals(currentRealm) ||
+    private boolean newTokenNeeded(String currentEnv, String currentTopology) {
+        return !env.equals(currentEnv) ||
                 !topology.equals(currentTopology) ||
                 accessManager == null ||
                 accessManager.isTokenExpired();
@@ -697,6 +753,8 @@ public class RoomActivity extends AppCompatActivity {
             accessManager.updateToken(token);
         }
         if (videoClient == null) {
+            String nativeEnvironmentVariableValue = EnvUtil.getNativeEnvironmentVariableValue(env);
+            Env.set(this, EnvUtil.TWILIO_ENV_KEY, nativeEnvironmentVariableValue, true);
             videoClient = new VideoClient(this, token);
         } else {
             videoClient.updateToken(token);
@@ -869,6 +927,8 @@ public class RoomActivity extends AppCompatActivity {
                 Timber.i("onConnected: " + room.getName() + " sid:" +
                         room.getSid() + " state:" + room.getState());
                 roomStatusTextview.setText("Connected to " + room.getName());
+                setAudioFocus(true);
+                setVolumeControl(true);
                 updateUi(room);
 
                 for (Map.Entry<String, Participant> entry : room.getParticipants().entrySet()) {
@@ -878,8 +938,8 @@ public class RoomActivity extends AppCompatActivity {
 
             @Override
             public void onConnectFailure(Room room, TwilioException twilioException) {
-                Timber.i("onConnectFailure");
-                roomStatusTextview.setText("Failed to obtainTokenAndConnect to " + room.getName());
+                Timber.i("onConnectFailure: " + twilioException.getMessage());
+                roomStatusTextview.setText("Failed to connect to " + room.getName());
                 RoomActivity.this.room = null;
                 updateUi(room);            }
 
@@ -888,7 +948,10 @@ public class RoomActivity extends AppCompatActivity {
                 Timber.i("onDisconnected");
                 roomStatusTextview.setText("Disconnected from " + room.getName());
                 removeAllParticipants();
-                updateUi(room);                RoomActivity.this.room = null;
+                updateUi(room);
+                RoomActivity.this.room = null;
+                setAudioFocus(false);
+                setVolumeControl(false);
             }
 
             @Override

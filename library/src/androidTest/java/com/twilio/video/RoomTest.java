@@ -6,6 +6,7 @@ import android.support.test.runner.AndroidJUnit4;
 
 import com.twilio.video.base.BaseClientTest;
 import com.twilio.video.helper.CallbackHelper;
+import com.twilio.video.simplersignaling.SimplerSignalingUtils;
 import com.twilio.video.test.BuildConfig;
 import com.twilio.video.ui.MediaTestActivity;
 import com.twilio.video.util.AccessTokenUtils;
@@ -181,7 +182,7 @@ public class RoomTest extends BaseClientTest {
         assertNull(room.getLocalParticipant());
         assertTrue(roomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
 
-        if(BuildConfig.TOPOLOGY.equals(AccessTokenUtils.P2P) || BuildConfig.TOPOLOGY.equals(AccessTokenUtils.SFU)) {
+        if(BuildConfig.TOPOLOGY.equals(SimplerSignalingUtils.P2P) || BuildConfig.TOPOLOGY.equals(SimplerSignalingUtils.SFU)) {
            Assert.assertFalse(room.isRecording());
         } else {
             /*
