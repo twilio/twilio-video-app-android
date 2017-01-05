@@ -72,7 +72,7 @@ public class RoomMultiPartyTest extends BaseClientTest {
             roomListener.onConnectedLatch = new CountDownLatch(1);
             int numberOfParticipants = rooms.size();
 
-            // add listener to all other PARTICIPANTS
+            // add listener to all other participants
             for (Pair<Room, CallbackHelper.FakeRoomListener> roomPair : rooms) {
                 roomPair.second.onParticipantConnectedLatch = new CountDownLatch(1);
             }
@@ -81,13 +81,13 @@ public class RoomMultiPartyTest extends BaseClientTest {
             assertTrue(roomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
             assertEquals(numberOfParticipants, room.getParticipants().size());
 
-            // check if all PARTICIPANTS got notification
+            // check if all participants got notification
             for (Pair<Room, CallbackHelper.FakeRoomListener> roomPair : rooms) {
                 assertTrue(roomPair.second.onParticipantConnectedLatch.await(10, TimeUnit.SECONDS));
                 assertEquals(numberOfParticipants, roomPair.first.getParticipants().size());
             }
 
-            rooms.add(new Pair<Room, CallbackHelper.FakeRoomListener>(room, roomListener));
+            rooms.add(new Pair<>(room, roomListener));
         }
     }
 
@@ -106,7 +106,7 @@ public class RoomMultiPartyTest extends BaseClientTest {
             for (Participant participant : participantMap.values()) {
                 assertNotEquals(localSid, participant.getSid());
             }
-            rooms.add(new Pair<Room, CallbackHelper.FakeRoomListener>(room, roomListener));
+            rooms.add(new Pair<>(room, roomListener));
         }
     }
 

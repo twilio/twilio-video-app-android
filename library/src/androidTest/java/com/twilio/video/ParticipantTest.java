@@ -90,7 +90,8 @@ public class ParticipantTest extends BaseClientTest {
 
         assertTrue(roomListener2.onConnectedLatch.await(20, TimeUnit.SECONDS));
 
-        List<Participant> client2Participants = new ArrayList<>(client2room.getParticipants().values());
+        List<Participant> client2Participants = new ArrayList<>(client2room.getParticipants()
+                .values());
         Participant client1Participant = client2Participants.get(0);
 
         assertEquals(1, client2Participants.size());
