@@ -81,13 +81,6 @@ public class VideoClientTest extends BaseClientTest {
     }
 
     @Test
-    public void audioOutput_shouldBeRetained() {
-        VideoClient videoClient = new VideoClient(mediaTestActivity, token);
-        videoClient.setAudioOutput(AudioOutput.SPEAKERPHONE);
-        assertEquals(AudioOutput.SPEAKERPHONE, videoClient.getAudioOutput());
-    }
-
-    @Test
     public void connect_shouldConnectToRoom() throws InterruptedException {
         CallbackHelper.FakeRoomListener roomListener = new CallbackHelper.FakeRoomListener();
         roomListener.onConnectedLatch = new CountDownLatch(1);
