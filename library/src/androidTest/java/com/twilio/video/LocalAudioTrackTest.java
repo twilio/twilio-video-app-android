@@ -18,6 +18,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.assertFalse;
 import static junit.framework.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
@@ -68,6 +70,48 @@ public class LocalAudioTrackTest {
             // Remove the audio track and continue to next audio options configuration
             localMedia.removeAudioTrack(localAudioTrack);
         }
+    }
+
+    @Test
+    public void enable_shouldNotBeAllowedAfterRemoved() {
+        localAudioTrack = localMedia.addAudioTrack(false);
+        localMedia.removeAudioTrack(localAudioTrack);
+        localAudioTrack.enable(true);
+        assertFalse(localAudioTrack.isEnabled());
+    }
+
+    @Test
+    public void enable_shouldChangeState() {
+        localAudioTrack = localMedia.addAudioTrack(true);
+        localAudioTrack.enable(false);
+
+        assertFalse(localAudioTrack.isEnabled());
+    }
+
+    @Test
+    public void isEnabled_shouldReflectConstructedState() {
+        LocalAudioTrack enabledAudioTrack = localMedia.addAudioTrack(true);
+        LocalAudioTrack disabledAudioTrack = localMedia.addAudioTrack(false);
+
+        assertTrue(enabledAudioTrack.isEnabled());
+        assertFalse(disabledAudioTrack.isEnabled());
+    }
+
+    @Test
+    public void isEnabled_shouldReturnFalseAfterRemoved() {
+        localAudioTrack = localMedia.addAudioTrack(true);
+        assertTrue(localAudioTrack.isEnabled());
+        assertTrue(localMedia.removeAudioTrack(localAudioTrack));
+        assertFalse(localAudioTrack.isEnabled());
+    }
+
+    @Test
+    public void enable_shouldAllowSameState() {
+        localAudioTrack = localMedia.addAudioTrack(true);
+        localAudioTrack.enable(true);
+        localAudioTrack.enable(true);
+
+        assertTrue(localAudioTrack.isEnabled());
     }
 
     /*
