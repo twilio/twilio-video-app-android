@@ -10,12 +10,14 @@ import com.twilio.video.base.BaseClientTest;
 import com.twilio.video.helper.CallbackHelper;
 import com.twilio.video.ui.MediaTestActivity;
 import com.twilio.video.util.AccessTokenUtils;
+import com.twilio.video.util.Constants;
 import com.twilio.video.util.FakeVideoCapturer;
 import com.twilio.video.util.PermissionUtils;
 import com.twilio.video.util.RandUtils;
 
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -37,8 +39,6 @@ public class StatsTest extends BaseClientTest {
     public ActivityTestRule<MediaTestActivity> activityRule =
             new ActivityTestRule<>(MediaTestActivity.class);
     private MediaTestActivity mediaTestActivity;
-    private String aliceIdentity, bobIdentity;
-    private String aliceToken, bobToken;
     private VideoClient aliceVideoClient, bobVideoClient;
     private String roomName;
     private Room aliceRoom, bobRoom;
@@ -50,8 +50,8 @@ public class StatsTest extends BaseClientTest {
         super.setup();
         mediaTestActivity = activityRule.getActivity();
         PermissionUtils.allowPermissions(mediaTestActivity);
-        aliceVideoClient = createVideoClient();
-        bobVideoClient = createVideoClient();
+        aliceVideoClient = createVideoClient(Constants.PARTICIPANT_ALICE);
+        bobVideoClient = createVideoClient(Constants.PARTICIPANT_BOB);
         roomName = RandUtils.generateRandomString(20);
         aliceListener = new CallbackHelper.FakeRoomListener();
         bobListener = new CallbackHelper.FakeRoomListener();
@@ -415,8 +415,7 @@ public class StatsTest extends BaseClientTest {
         assertFalse(aliceStatsListener.onStatsLatch.await(5, TimeUnit.SECONDS));
     }
 
-    private VideoClient createVideoClient() {
-        String identity = RandUtils.generateRandomString(10);
+    private VideoClient createVideoClient(String identity) {
         String token = AccessTokenUtils.getAccessToken(identity);
         VideoClient videoClient = new VideoClient(mediaTestActivity, token);
         return videoClient;

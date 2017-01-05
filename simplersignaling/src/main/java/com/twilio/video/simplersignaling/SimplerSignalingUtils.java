@@ -24,11 +24,7 @@ public class SimplerSignalingUtils {
     private static final String ENVIRONMENT = "environment";
     private static final String IDENTITY = "identity";
     private static final String TTL = "ttl";
-    /*
-     * The default is usually 30 minutes. We are intentionally setting it to 5 minutes to validate
-     * expiration.
-     */
-    private static final String TTL_DEFAULT = "300";
+    private static final String TTL_DEFAULT = "1800";
     private static final String CONFIGURATION_PROFILE_SID = "configurationProfileSid";
     private static final String PROD = "prod";
     public static final String STAGE = "stage";

@@ -9,6 +9,7 @@ import android.util.Pair;
 import com.twilio.video.base.BaseClientTest;
 import com.twilio.video.helper.CallbackHelper;
 import com.twilio.video.util.AccessTokenUtils;
+import com.twilio.video.util.Constants;
 import com.twilio.video.util.RandUtils;
 
 import org.junit.After;
@@ -32,6 +33,9 @@ import static org.junit.Assert.assertTrue;
 @LargeTest
 public class RoomMultiPartyTest extends BaseClientTest {
     private static final int PARTICIPANT_NUM = 3;
+    private static final String[] PARTICIPANTS = {
+            Constants.PARTICIPANT_ALICE, Constants.PARTICIPANT_BOB, Constants.PARTICIPANT_CHARLIE
+    };
 
     private Context context;
     private List<VideoClient> videoClients;
@@ -45,7 +49,7 @@ public class RoomMultiPartyTest extends BaseClientTest {
         rooms = new ArrayList<>();
         videoClients = new ArrayList<>();
         for (int i = 0; i < PARTICIPANT_NUM; i++) {
-            String token = AccessTokenUtils.getAccessToken(RandUtils.generateRandomString(10));
+            String token = AccessTokenUtils.getAccessToken(PARTICIPANTS[i]);
             videoClients.add(new VideoClient(context, token));
         }
         roomName = RandUtils.generateRandomString(20);
@@ -68,7 +72,7 @@ public class RoomMultiPartyTest extends BaseClientTest {
             roomListener.onConnectedLatch = new CountDownLatch(1);
             int numberOfParticipants = rooms.size();
 
-            // add listener to all other participants
+            // add listener to all other PARTICIPANTS
             for (Pair<Room, CallbackHelper.FakeRoomListener> roomPair : rooms) {
                 roomPair.second.onParticipantConnectedLatch = new CountDownLatch(1);
             }
@@ -77,7 +81,7 @@ public class RoomMultiPartyTest extends BaseClientTest {
             assertTrue(roomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
             assertEquals(numberOfParticipants, room.getParticipants().size());
 
-            // check if all participants got notification
+            // check if all PARTICIPANTS got notification
             for (Pair<Room, CallbackHelper.FakeRoomListener> roomPair : rooms) {
                 assertTrue(roomPair.second.onParticipantConnectedLatch.await(10, TimeUnit.SECONDS));
                 assertEquals(numberOfParticipants, roomPair.first.getParticipants().size());

@@ -8,6 +8,7 @@ import com.twilio.video.base.BaseClientTest;
 import com.twilio.video.helper.CallbackHelper;
 import com.twilio.video.ui.MediaTestActivity;
 import com.twilio.video.util.AccessTokenUtils;
+import com.twilio.video.util.Constants;
 import com.twilio.video.util.FakeVideoCapturer;
 import com.twilio.video.util.PermissionUtils;
 import com.twilio.video.util.RandUtils;
@@ -42,7 +43,7 @@ public class VideoClientTest extends BaseClientTest {
         super.setup();
         mediaTestActivity = activityRule.getActivity();
         PermissionUtils.allowPermissions(mediaTestActivity);
-        token = AccessTokenUtils.getAccessToken(RandUtils.generateRandomString(10));
+        token = AccessTokenUtils.getAccessToken(Constants.PARTICIPANT_ALICE);
         videoClient = new VideoClient(mediaTestActivity, token);
         roomName = RandUtils.generateRandomString(20);
         localMedia = LocalMedia.create(mediaTestActivity);
@@ -179,8 +180,7 @@ public class VideoClientTest extends BaseClientTest {
         room.disconnect();
 
         // Now we update token and connect again
-        String newUserName = RandUtils.generateRandomString(10);
-        videoClient.updateToken(AccessTokenUtils.getAccessToken(newUserName));
+        videoClient.updateToken(AccessTokenUtils.getAccessToken(Constants.PARTICIPANT_BOB));
 
         // Connect again with new token
         roomListener = new CallbackHelper.FakeRoomListener();

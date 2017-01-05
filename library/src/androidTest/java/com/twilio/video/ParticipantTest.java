@@ -8,6 +8,7 @@ import android.support.test.runner.AndroidJUnit4;
 import com.twilio.video.base.BaseClientTest;
 import com.twilio.video.helper.CallbackHelper;
 import com.twilio.video.util.AccessTokenUtils;
+import com.twilio.video.util.Constants;
 import com.twilio.video.util.RandUtils;
 
 import org.junit.Before;
@@ -37,8 +38,8 @@ public class ParticipantTest extends BaseClientTest {
     public void setup() throws InterruptedException {
         super.setup();
         context = InstrumentationRegistry.getInstrumentation().getTargetContext();
-        tokenOne = AccessTokenUtils.getAccessToken(RandUtils.generateRandomString(10));
-        tokenTwo = AccessTokenUtils.getAccessToken(RandUtils.generateRandomString(10));
+        tokenOne = AccessTokenUtils.getAccessToken(Constants.PARTICIPANT_ALICE);
+        tokenTwo = AccessTokenUtils.getAccessToken(Constants.PARTICIPANT_BOB);
         videoClient = new VideoClient(context, tokenOne);
         videoClient2 = new VideoClient(context, tokenTwo);
         roomName = RandUtils.generateRandomString(20);

@@ -10,6 +10,7 @@ import com.twilio.video.simplersignaling.SimplerSignalingUtils;
 import com.twilio.video.test.BuildConfig;
 import com.twilio.video.ui.MediaTestActivity;
 import com.twilio.video.util.AccessTokenUtils;
+import com.twilio.video.util.Constants;
 import com.twilio.video.util.FakeVideoCapturer;
 import com.twilio.video.util.PermissionUtils;
 import com.twilio.video.util.RandUtils;
@@ -49,7 +50,7 @@ public class RoomTest extends BaseClientTest {
         super.setup();
         mediaTestActivity = activityRule.getActivity();
         PermissionUtils.allowPermissions(mediaTestActivity);
-        identity = RandUtils.generateRandomString(10);
+        identity = Constants.PARTICIPANT_ALICE;
         token = AccessTokenUtils.getAccessToken(identity);
         videoClient = new VideoClient(mediaTestActivity, token);
         roomName = RandUtils.generateRandomString(20);
