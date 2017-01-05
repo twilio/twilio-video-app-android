@@ -33,8 +33,8 @@ import static org.junit.Assert.assertTrue;
 
 @RunWith(AndroidJUnit4.class)
 @LargeTest
+@Ignore
 public class StatsTest extends BaseClientTest {
-
     @Rule
     public ActivityTestRule<MediaTestActivity> activityRule =
             new ActivityTestRule<>(MediaTestActivity.class);
@@ -64,7 +64,7 @@ public class StatsTest extends BaseClientTest {
         roomTearDown(aliceRoom);
         roomTearDown(bobRoom);
         aliceLocalMedia.release();
-        bobLocalMedia.release();;
+        bobLocalMedia.release();
     }
 
     @Test(expected = NullPointerException.class)
