@@ -11,7 +11,9 @@ import org.junit.runners.Parameterized;
 
 import java.util.Arrays;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.CyclicBarrier;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicReference;
 
 import com.twilio.video.test.R;
 import com.twilio.video.util.FrameCountRenderer;
@@ -19,6 +21,7 @@ import com.twilio.video.util.FrameCountRenderer;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 @RunWith(Parameterized.class)
 @LargeTest
@@ -57,25 +60,15 @@ public class CameraCapturerSourceParameterizedTest extends BaseCameraCapturerTes
                     }
                 });
         localVideoTrack = localMedia.addVideoTrack(true, cameraCapturer);
-        int frameCount = frameCountRenderer.getFrameCount();
-
-        // Validate our frame count is nothing
-        assertEquals(0, frameCount);
 
         // Validate we got our first frame
-        assertTrue(firstFrameReceived.await(3, TimeUnit.SECONDS));
-
-        // Add renderer and wait
-        localVideoTrack.addRenderer(frameCountRenderer);
-        Thread.sleep(TimeUnit.SECONDS.toMillis(CAMERA_CAPTURE_DELAY));
-
-        // Validate our frame count is incrementing
-        assertTrue(frameCountRenderer.getFrameCount() > frameCount);
+        assertTrue(firstFrameReceived.await(CAMERA_CAPTURE_DELAY_MS, TimeUnit.MILLISECONDS));
     }
 
     @Test
     public void shouldCaptureFramesAfterPictureTaken() throws InterruptedException {
         final CountDownLatch firstFrameReceived = new CountDownLatch(1);
+        final CountDownLatch pictureTaken = new CountDownLatch(1);
         cameraCapturer = new CameraCapturer(cameraCapturerActivity, cameraSource,
                 new CameraCapturer.Listener() {
                     @Override
@@ -100,17 +93,12 @@ public class CameraCapturerSourceParameterizedTest extends BaseCameraCapturerTes
         assertEquals(0, frameCount);
 
         // Validate we got our first frame
-        assertTrue(firstFrameReceived.await(3, TimeUnit.SECONDS));
+        assertTrue(firstFrameReceived.await(CAMERA_CAPTURE_DELAY_MS, TimeUnit.MILLISECONDS));
 
-        // Add renderer and wait
+        // Add renderer
         localVideoTrack.addRenderer(frameCountRenderer);
-        Thread.sleep(TimeUnit.SECONDS.toMillis(CAMERA_CAPTURE_DELAY));
-
-        // Validate our frame count is incrementing
-        assertTrue(frameCountRenderer.getFrameCount() > frameCount);
 
         // Capture frame count and take picture
-        frameCount = frameCountRenderer.getFrameCount();
         assertTrue(cameraCapturer.takePicture(new CameraCapturer.PictureListener() {
             @Override
             public void onShutter() {
@@ -119,44 +107,15 @@ public class CameraCapturerSourceParameterizedTest extends BaseCameraCapturerTes
 
             @Override
             public void onPictureTaken(byte[] pictureData) {
-
+                pictureTaken.countDown();
             }
         }));
 
-        // Wait some time
-        Thread.sleep(TimeUnit.SECONDS.toMillis(CAMERA_CAPTURE_DELAY));
+        // Wait for picture taken
+        assertTrue(pictureTaken.await(CAMERA_CAPTURE_DELAY_MS, TimeUnit.MILLISECONDS));
 
-        // Validate our frame count is incrementing after taking picture
-        assertTrue(frameCountRenderer.getFrameCount() > frameCount);
-    }
-
-    @Test
-    public void shouldStopCapturingFramesWhenVideoTrackRemoved() throws InterruptedException {
-        cameraCapturer = new CameraCapturer(cameraCapturerActivity, cameraSource);
-        localVideoTrack = localMedia.addVideoTrack(true, cameraCapturer);
-        int frameCount = frameCountRenderer.getFrameCount();
-
-        // Validate our frame count is nothing
-        assertEquals(0, frameCount);
-
-        // Add renderer and wait
-        localVideoTrack.addRenderer(frameCountRenderer);
-        Thread.sleep(TimeUnit.SECONDS.toMillis(CAMERA_CAPTURE_DELAY));
-
-        // Validate our frame count is incrementing
-        assertTrue(frameCountRenderer.getFrameCount() > frameCount);
-
-        // Remove the video track and wait
-        frameCount = frameCountRenderer.getFrameCount();
-        localMedia.removeVideoTrack(localVideoTrack);
-        Thread.sleep(TimeUnit.SECONDS.toMillis(CAMERA_CAPTURE_DELAY));
-
-        /*
-         * Ensure our camera capturer is no longer capturing frames with a one frame buffer in the
-         * event of a race in test case
-         */
-        boolean framesNotRenderering = frameCount >= (frameCountRenderer.getFrameCount() - 1);
-        assertTrue(framesNotRenderering);
+        // Validate we receive a new frame
+        assertTrue(frameCountRenderer.waitForFrame(CAMERA_CAPTURE_DELAY_MS));
     }
 
     @Test
@@ -178,45 +137,43 @@ public class CameraCapturerSourceParameterizedTest extends BaseCameraCapturerTes
         cameraCapturer = new CameraCapturer(cameraCapturerActivity, cameraSource);
         localVideoTrack = localMedia.addVideoTrack(true, cameraCapturer);
         localVideoTrack.addRenderer(localVideo);
-
-        /*
-         * Validate we rendered the first frame and wait a few seconds so we can see the
-         * frames if we are watching :-)
-         */
-        assertTrue(renderedFirstFrame.await(2, TimeUnit.SECONDS));
-        Thread.sleep(TimeUnit.SECONDS.toMillis(5));
+        assertTrue(renderedFirstFrame.await(CAMERA_CAPTURE_DELAY_MS, TimeUnit.MILLISECONDS));
         localVideoTrack.removeRenderer(localVideo);
     }
 
     @Test
     public void canBeReused() throws InterruptedException {
-        int reuseCount = 5;
+        int reuseCount = 2;
 
         // Reuse the same capturer while we iterate
-        cameraCapturer = new CameraCapturer(cameraCapturerActivity, cameraSource);
+        final AtomicReference<CountDownLatch> firstFrameReceived = new AtomicReference<>();
+        cameraCapturer = new CameraCapturer(cameraCapturerActivity, cameraSource,
+                new CameraCapturer.Listener() {
+                    @Override
+                    public void onFirstFrameAvailable() {
+                        firstFrameReceived.get().countDown();
+                    }
 
+                    @Override
+                    public void onCameraSwitched() {
+
+                    }
+
+                    @Override
+                    public void onError(@CameraCapturer.Error int errorCode) {
+
+                    }
+                });
         for (int i = 0 ; i < reuseCount ; i++) {
-            FrameCountRenderer renderer = new FrameCountRenderer();
+            firstFrameReceived.set(new CountDownLatch(1));
             localVideoTrack = localMedia.addVideoTrack(true, cameraCapturer);
-            int frameCount = renderer.getFrameCount();
 
-            // Validate our frame count is nothing
-            assertEquals(0, frameCount);
-
-            // Add renderer and wait
-            localVideoTrack.addRenderer(renderer);
-            Thread.sleep(TimeUnit.SECONDS.toMillis(CAMERA_CAPTURE_DELAY));
-
-            // Validate our frame count is incrementing
-            assertTrue(renderer.getFrameCount() > frameCount);
+            // Validate we got our first frame
+            assertTrue(firstFrameReceived.get().await(CAMERA_CAPTURE_DELAY_MS,
+                    TimeUnit.MILLISECONDS));
 
             // Remove video track and wait
-            frameCount = renderer.getFrameCount();
             localMedia.removeVideoTrack(localVideoTrack);
-            Thread.sleep(TimeUnit.SECONDS.toMillis(CAMERA_CAPTURE_DELAY));
-
-            boolean framesNotRenderering = frameCount >= (renderer.getFrameCount() - 1);
-            assertTrue(framesNotRenderering);
         }
     }
 
@@ -243,7 +200,7 @@ public class CameraCapturerSourceParameterizedTest extends BaseCameraCapturerTes
         };
 
         assertTrue(cameraCapturer.takePicture(pictureListener));
-        assertTrue(shutterCallback.await(10, TimeUnit.SECONDS));
-        assertTrue(pictureTaken.await(10, TimeUnit.SECONDS));
+        assertTrue(shutterCallback.await(CAMERA_CAPTURE_DELAY_MS, TimeUnit.MILLISECONDS));
+        assertTrue(pictureTaken.await(CAMERA_CAPTURE_DELAY_MS, TimeUnit.MILLISECONDS));
     }
 }

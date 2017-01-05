@@ -66,7 +66,7 @@ public class CameraCapturerTest extends BaseCameraCapturerTest {
 
         // Add renderer and wait
         localVideoTrack.addRenderer(frameCountRenderer);
-        Thread.sleep(TimeUnit.SECONDS.toMillis(CAMERA_CAPTURE_DELAY));
+        Thread.sleep(CAMERA_CAPTURE_DELAY_MS);
 
         // Validate our frame count is incrementing
         assertTrue(frameCountRenderer.getFrameCount() > frameCount);
@@ -83,7 +83,7 @@ public class CameraCapturerTest extends BaseCameraCapturerTest {
 
         // Wait and validate our frame count is still incrementing
         frameCount = frameCountRenderer.getFrameCount();
-        Thread.sleep(TimeUnit.SECONDS.toMillis(CAMERA_CAPTURE_DELAY));
+        Thread.sleep(CAMERA_CAPTURE_DELAY_MS);
         assertTrue(frameCountRenderer.getFrameCount() > frameCount);
 
         // Validate back camera source
@@ -128,7 +128,7 @@ public class CameraCapturerTest extends BaseCameraCapturerTest {
 
         // Add renderer and wait
         localVideoTrack.addRenderer(frameCountRenderer);
-        Thread.sleep(TimeUnit.SECONDS.toMillis(CAMERA_CAPTURE_DELAY));
+        Thread.sleep(CAMERA_CAPTURE_DELAY_MS);
 
         // Validate our frame count is incrementing
         assertTrue(frameCountRenderer.getFrameCount() > frameCount);
