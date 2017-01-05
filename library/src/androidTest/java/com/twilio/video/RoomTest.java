@@ -101,9 +101,6 @@ public class RoomTest extends BaseClientTest {
         LocalAudioTrack localAudioTrack = localMedia.addAudioTrack(true);
         LocalVideoTrack localVideoTrack = localMedia.addVideoTrack(true, fakeVideoCapturer);
 
-        // Let them sit a bit
-        Thread.sleep(1);
-
         // Now remove them
         assertTrue(localMedia.removeAudioTrack(localAudioTrack));
         assertTrue(localMedia.removeVideoTrack(localVideoTrack));
@@ -182,7 +179,8 @@ public class RoomTest extends BaseClientTest {
         assertNull(room.getLocalParticipant());
         assertTrue(roomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
 
-        if(BuildConfig.TOPOLOGY.equals(SimplerSignalingUtils.P2P) || BuildConfig.TOPOLOGY.equals(SimplerSignalingUtils.SFU)) {
+        if(BuildConfig.TOPOLOGY.equals(SimplerSignalingUtils.P2P) ||
+                BuildConfig.TOPOLOGY.equals(SimplerSignalingUtils.SFU)) {
            Assert.assertFalse(room.isRecording());
         } else {
             /*

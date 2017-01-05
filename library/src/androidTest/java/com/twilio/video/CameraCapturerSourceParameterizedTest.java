@@ -172,7 +172,7 @@ public class CameraCapturerSourceParameterizedTest extends BaseCameraCapturerTes
             assertTrue(firstFrameReceived.get().await(CAMERA_CAPTURE_DELAY_MS,
                     TimeUnit.MILLISECONDS));
 
-            // Remove video track and wait
+            // Remove video track
             localMedia.removeVideoTrack(localVideoTrack);
         }
     }
