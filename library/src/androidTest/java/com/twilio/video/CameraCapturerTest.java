@@ -59,17 +59,12 @@ public class CameraCapturerTest extends BaseCameraCapturerTest {
                     }
                 });
         localVideoTrack = localMedia.addVideoTrack(true, cameraCapturer);
-        int frameCount = frameCountRenderer.getFrameCount();
 
-        // Validate our frame count is nothing
-        assertEquals(0, frameCount);
-
-        // Add renderer and wait
+        // Add renderer
         localVideoTrack.addRenderer(frameCountRenderer);
-        Thread.sleep(CAMERA_CAPTURE_DELAY_MS);
 
-        // Validate our frame count is incrementing
-        assertTrue(frameCountRenderer.getFrameCount() > frameCount);
+        // Validate we get a frame
+        assertTrue(frameCountRenderer.waitForFrame(CAMERA_CAPTURE_DELAY_MS));
 
         // Validate front camera source
         assertEquals(CameraCapturer.CameraSource.FRONT_CAMERA,
@@ -79,12 +74,10 @@ public class CameraCapturerTest extends BaseCameraCapturerTest {
         cameraCapturer.switchCamera();
 
         // Validate our switch happened
-        assertTrue(cameraSwitched.await(10, TimeUnit.SECONDS));
+        assertTrue(cameraSwitched.await(CAMERA_CAPTURE_DELAY_MS, TimeUnit.MILLISECONDS));
 
-        // Wait and validate our frame count is still incrementing
-        frameCount = frameCountRenderer.getFrameCount();
-        Thread.sleep(CAMERA_CAPTURE_DELAY_MS);
-        assertTrue(frameCountRenderer.getFrameCount() > frameCount);
+        // Validate we get a frame after camera switch
+        assertTrue(frameCountRenderer.waitForFrame(CAMERA_CAPTURE_DELAY_MS));
 
         // Validate back camera source
         assertEquals(CameraCapturer.CameraSource.BACK_CAMERA,
@@ -118,20 +111,15 @@ public class CameraCapturerTest extends BaseCameraCapturerTest {
 
         // Now add our video track
         localVideoTrack = localMedia.addVideoTrack(true, cameraCapturer);
-        int frameCount = frameCountRenderer.getFrameCount();
 
         // Validate our switch happened
-        assertTrue(cameraSwitched.await(10, TimeUnit.SECONDS));
+        assertTrue(cameraSwitched.await(CAMERA_CAPTURE_DELAY_MS, TimeUnit.MILLISECONDS));
 
-        // Validate our frame count is nothing
-        assertEquals(0, frameCount);
-
-        // Add renderer and wait
+        // Add renderer
         localVideoTrack.addRenderer(frameCountRenderer);
-        Thread.sleep(CAMERA_CAPTURE_DELAY_MS);
 
-        // Validate our frame count is incrementing
-        assertTrue(frameCountRenderer.getFrameCount() > frameCount);
+        // Validate we get a frame
+        assertTrue(frameCountRenderer.waitForFrame(CAMERA_CAPTURE_DELAY_MS));
 
         // Validate we are on back camera source
         assertEquals(CameraCapturer.CameraSource.BACK_CAMERA,
@@ -165,7 +153,7 @@ public class CameraCapturerTest extends BaseCameraCapturerTest {
         cameraCapturer.switchCamera();
 
         // Wait for callback
-        assertTrue(cameraSwitchError.await(10, TimeUnit.SECONDS));
+        assertTrue(cameraSwitchError.await(CAMERA_CAPTURE_DELAY_MS, TimeUnit.MILLISECONDS));
     }
 
     @Test
@@ -206,7 +194,7 @@ public class CameraCapturerTest extends BaseCameraCapturerTest {
                 actualCameraParameters);
 
         // Wait for parameters to be set
-        assertTrue(cameraParametersUpdated.await(10, TimeUnit.SECONDS));
+        assertTrue(cameraParametersUpdated.await(CAMERA_CAPTURE_DELAY_MS, TimeUnit.MILLISECONDS));
 
         // Validate our flash mode
         assertEquals(expectedFlashMode, actualCameraParameters.get().getFlashMode());
@@ -238,13 +226,14 @@ public class CameraCapturerTest extends BaseCameraCapturerTest {
         // Set our flash mode to something else
         cameraParametersUpdated = new CountDownLatch(1);
         expectedFlashMode = Camera.Parameters.FLASH_MODE_ON;
-        scheduleCameraParameterFlashModeUpdate(cameraParametersUpdated, expectedFlashMode, actualCameraParameters);
+        scheduleCameraParameterFlashModeUpdate(cameraParametersUpdated, expectedFlashMode,
+                actualCameraParameters);
 
         // Re add the track
         localVideoTrack = localMedia.addVideoTrack(true, cameraCapturer);
 
         // Wait for parameters to be set
-        assertTrue(cameraParametersUpdated.await(10, TimeUnit.SECONDS));
+        assertTrue(cameraParametersUpdated.await(CAMERA_CAPTURE_DELAY_MS, TimeUnit.MILLISECONDS));
 
         // Validate our flash mode is actually different
         assertEquals(expectedFlashMode, actualCameraParameters.get().getFlashMode());
@@ -354,8 +343,8 @@ public class CameraCapturerTest extends BaseCameraCapturerTest {
             }
         });
 
-        assertTrue(shutterCallback.await(10, TimeUnit.SECONDS));
-        assertTrue(pictureTaken.await(10, TimeUnit.SECONDS));
+        assertTrue(shutterCallback.await(CAMERA_CAPTURE_DELAY_MS, TimeUnit.MILLISECONDS));
+        assertTrue(pictureTaken.await(CAMERA_CAPTURE_DELAY_MS, TimeUnit.MILLISECONDS));
     }
 
     private void scheduleCameraParameterFlashModeUpdate(final CountDownLatch cameraParametersUpdated,
