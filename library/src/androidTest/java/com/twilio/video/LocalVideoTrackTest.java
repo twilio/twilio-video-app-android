@@ -13,6 +13,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 @RunWith(AndroidJUnit4.class)
 @LargeTest
@@ -38,33 +39,20 @@ public class LocalVideoTrackTest extends BaseLocalVideoTrackTest {
     @Test
     public void canAddRenderer() throws InterruptedException {
         localVideoTrack.addRenderer(frameCountRenderer);
-        Thread.sleep(LOCAL_VIDEO_TRACK_TEST_DELAY_MS);
-
-        assertTrue(frameCountRenderer.getFrameCount() > 0);
+        assertTrue(frameCountRenderer.waitForFrame(LOCAL_VIDEO_TRACK_TEST_DELAY_MS));
     }
 
     @Test
     public void canRemoveRenderer() throws InterruptedException {
         localVideoTrack.addRenderer(frameCountRenderer);
-        Thread.sleep(LOCAL_VIDEO_TRACK_TEST_DELAY_MS);
-
-        int frameCount = frameCountRenderer.getFrameCount();
-        assertTrue(frameCount > 0);
-
+        assertTrue(frameCountRenderer.waitForFrame(LOCAL_VIDEO_TRACK_TEST_DELAY_MS));
         localVideoTrack.removeRenderer(frameCountRenderer);
-        Thread.sleep(LOCAL_VIDEO_TRACK_TEST_DELAY_MS);
-
-        boolean framesNotRenderering = frameCount >= (frameCountRenderer.getFrameCount() - 1);
-        assertTrue(framesNotRenderering);
     }
 
     @Test
     public void addRenderer_shouldSilentlyFailAfterRemoved() throws InterruptedException {
         localVideoTrack.addRenderer(frameCountRenderer);
-        Thread.sleep(LOCAL_VIDEO_TRACK_TEST_DELAY_MS);
-
-        assertTrue(frameCountRenderer.getFrameCount() > 0);
-
+        assertTrue(frameCountRenderer.waitForFrame(LOCAL_VIDEO_TRACK_TEST_DELAY_MS));
         localMedia.removeVideoTrack(localVideoTrack);
         localVideoTrack.addRenderer(new FakeVideoRenderer());
     }
@@ -72,25 +60,24 @@ public class LocalVideoTrackTest extends BaseLocalVideoTrackTest {
     @Test
     public void removeRenderer_shouldSilentlyFailAfterRemoved() throws InterruptedException {
         localVideoTrack.addRenderer(frameCountRenderer);
-        Thread.sleep(LOCAL_VIDEO_TRACK_TEST_DELAY_MS);
-
-        assertTrue(frameCountRenderer.getFrameCount() > 0);
-
+        assertTrue(frameCountRenderer.waitForFrame(LOCAL_VIDEO_TRACK_TEST_DELAY_MS));
         localVideoTrack.removeRenderer(frameCountRenderer);
     }
 
     @Test
     public void rendereringShouldStopAfterRemoved() throws InterruptedException {
         localVideoTrack.addRenderer(frameCountRenderer);
-        Thread.sleep(LOCAL_VIDEO_TRACK_TEST_DELAY_MS);
-
-        int frameCount = frameCountRenderer.getFrameCount();
-        assertTrue(frameCount > 0);
-
+        assertTrue(frameCountRenderer.waitForFrame(LOCAL_VIDEO_TRACK_TEST_DELAY_MS));
         localMedia.removeVideoTrack(localVideoTrack);
-        Thread.sleep(LOCAL_VIDEO_TRACK_TEST_DELAY_MS);
 
-        boolean framesNotRenderering = frameCount >= (frameCountRenderer.getFrameCount() - 1);
-        assertTrue(framesNotRenderering);
+        // Validate that eventually frame events stop
+        final int maxRetries = 3;
+        int retries = 0;
+        while (frameCountRenderer.waitForFrame(LOCAL_VIDEO_TRACK_TEST_DELAY_MS)) {
+            if (retries == maxRetries) {
+                fail("Still receiving frames after renderer removed");
+            }
+            retries++;
+        }
     }
 }
