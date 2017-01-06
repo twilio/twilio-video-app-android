@@ -38,12 +38,12 @@ library-sfu-instrumentation-tests:
         - 23
         - 24
     test-targets:
-        - "class com.twilio.video.MediaTest"
-        - "class com.twilio.video.ParticipantTest"
-        - "class com.twilio.video.RoomMultiPartyTest"
-        - "class com.twilio.video.RoomTest"
-        - "class com.twilio.video.StatsTest"
-        - "class com.twilio.video.VideoClientTest"
-        - "class com.twilio.video.VideoTrackTest"
+        - class com.twilio.video.MediaTest
+        - class com.twilio.video.ParticipantTest
+        - class com.twilio.video.RoomMultiPartyTest
+        - class com.twilio.video.RoomTest
+        - class com.twilio.video.StatsTest
+        - class com.twilio.video.VideoClientTest
+        - class com.twilio.video.VideoTrackTest
     locales: en
     orientations: portrait
