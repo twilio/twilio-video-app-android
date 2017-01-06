@@ -1,43 +1,76 @@
-library-instrumentation-tests:
+single-physical-device-library-instrumentation-tests:
     timeout: 30m
     type: instrumentation
     app: app/build/outputs/apk/app-debug.apk
     test: library/build/outputs/apk/library-debug-androidTest.apk
-    device-ids:
-        - Nexus5
-        - Nexus5X
-        - Nexus7
-        - herolte
-    os-version-ids:
-        - 21
-        - 22
-        - 23
-        - 24
+    device-ids: herolte
+    os-version-ids: 23
     locales: en
     orientations: portrait
 
-library-sfu-instrumentation-tests:
+subset-physical-devices-library-instrumentation-tests:
     timeout: 30m
     type: instrumentation
     app: app/build/outputs/apk/app-debug.apk
     test: library/build/outputs/apk/library-debug-androidTest.apk
     device-ids:
-        - Nexus5
-        - Nexus5X
-        - Nexus7
         - herolte
+        - j5lte
+        - m0
+        - serranolte
+        - t03g
+        - trelte
+        - zeroflte
+        - hammerhead
     os-version-ids:
+        - 18
+        - 19
         - 21
         - 22
         - 23
-        - 24
-    test-targets:
-        - class com.twilio.video.MediaTest
-        - class com.twilio.video.ParticipantTest
-        - class com.twilio.video.RoomMultiPartyTest
-        - class com.twilio.video.RoomTest
-        - class com.twilio.video.StatsTest
-        - class com.twilio.video.VideoClientTest
-        - class com.twilio.video.VideoTrackTest
+    locales: en
+    orientations: portrait
+
+all-physical-devices-library-instrumentation-tests:
+    timeout: 30m
+    type: instrumentation
+    app: app/build/outputs/apk/app-debug.apk
+    test: library/build/outputs/apk/library-debug-androidTest.apk
+    device-ids:
+        - D6503
+        - D6603
+        - E5803
+        - athene
+        - athene_f
+        - condor_umts
+        - falcon_umts
+        - flo
+        - flounder
+        - g3
+        - hammerhead
+        - herolte
+        - hlte
+        - htc_m8
+        - j5lte
+        - ja3g
+        - lt02wifi
+        - m0
+        - mako
+        - osprey_umts
+        - p1
+        - serranolte
+        - shamu
+        - t03g
+        - titan_umts
+        - trelte
+        - victara
+        - zeroflte
+        - zerolte
+    os-version-ids:
+        - 18
+        - 19
+        - 21
+        - 22
+        - 23
     locales: en
     orientations: portrait
