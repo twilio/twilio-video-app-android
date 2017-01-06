@@ -75,10 +75,6 @@ import java.net.HttpURLConnection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.TimeUnit;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -137,6 +133,8 @@ public class RoomActivity extends AppCompatActivity {
 
     @BindView(R.id.stats_recycler_view) RecyclerView statsRecyclerView;
     @BindView(R.id.stats_disabled) LinearLayout statsDisabledLayout;
+    @BindView(R.id.stats_disabled_title) TextView statsDisabledTitleTextView;
+    @BindView(R.id.stats_disabled_description) TextView statsDisabledDescTextView;
 
     private MenuItem switchCameraMenuItem;
     private MenuItem pauseVideoMenuItem;
@@ -959,10 +957,29 @@ public class RoomActivity extends AppCompatActivity {
 
     private void updateStatsUI(boolean enabled) {
         if (enabled) {
-            statsRecyclerView.setVisibility(View.VISIBLE);
-            statsDisabledLayout.setVisibility(View.INVISIBLE);
+            if (room != null && room.getParticipants().size() > 0) {
+                // show stats
+                statsRecyclerView.setVisibility(View.VISIBLE);
+                statsDisabledLayout.setVisibility(View.GONE);
+            } else if (room != null) {
+                // disable stats when there is no room
+                statsDisabledTitleTextView.setText(getString(R.string.stats_unavailable));
+                statsDisabledDescTextView.setText(
+                        getString(R.string.stats_description_media_not_shared));
+                statsRecyclerView.setVisibility(View.GONE);
+                statsDisabledLayout.setVisibility(View.VISIBLE);
+            } else {
+                // disable stats if there is room but no participants (no media)
+                statsDisabledTitleTextView.setText(getString(R.string.stats_unavailable));
+                statsDisabledDescTextView.setText(
+                        getString(R.string.stats_description_join_room));
+                statsRecyclerView.setVisibility(View.GONE);
+                statsDisabledLayout.setVisibility(View.VISIBLE);
+            }
         } else {
-            statsRecyclerView.setVisibility(View.INVISIBLE);
+            statsDisabledTitleTextView.setText(getString(R.string.stats_gathering_disabled));
+            statsDisabledDescTextView.setText(getString(R.string.stats_enable_in_settings));
+            statsRecyclerView.setVisibility(View.GONE);
             statsDisabledLayout.setVisibility(View.VISIBLE);
         }
     }
@@ -1032,12 +1049,14 @@ public class RoomActivity extends AppCompatActivity {
             public void onParticipantConnected(Room room, Participant participant) {
                 Timber.i("onParticipantConnected: " + participant.getIdentity());
                 addParticipant(participant);
+                updateStatsUI(sharedPreferences.getBoolean(Preferences.ENABLE_STATS, false));
             }
 
             @Override
             public void onParticipantDisconnected(Room room, Participant participant) {
                 Timber.i("onParticipantDisconnected " + participant.getIdentity());
                 removeParticipant(participant);
+                updateStatsUI(sharedPreferences.getBoolean(Preferences.ENABLE_STATS, false));
             }
 
             @Override

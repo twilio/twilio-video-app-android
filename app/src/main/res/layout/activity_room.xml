@@ -147,6 +147,7 @@
                     android:layout_height="wrap_content"
                     app:srcCompat="@drawable/ic_stats_disabled_image"/>
                 <TextView
+                    android:id="@+id/stats_disabled_title"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/stats_gathering_disabled"
@@ -154,6 +155,7 @@
                     android:layout_marginTop="@dimen/activity_vertical_margin"
                     android:textSize="18sp"/>
                 <TextView
+                    android:id="@+id/stats_disabled_description"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/stats_enable_in_settings"
