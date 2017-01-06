@@ -17,10 +17,6 @@ android {
     // Parameterizing config allows video application to use a debug build of the library
     defaultPublishConfig getPublishConfig()
 
-    dexOptions {
-        javaMaxHeapSize "4g"
-    }
-
     defaultConfig {
         minSdkVersion 16
         targetSdkVersion 25

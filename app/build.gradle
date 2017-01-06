@@ -5,10 +5,6 @@ android {
     compileSdkVersion 25
     buildToolsVersion "25.0.1"
 
-    dexOptions {
-        javaMaxHeapSize "4g"
-    }
-
     defaultConfig {
         applicationId "com.twilio.video.app"
 
