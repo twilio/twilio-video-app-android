@@ -10,6 +10,7 @@ import com.twilio.video.simplersignaling.SimplerSignalingUtils;
 import com.twilio.video.test.BuildConfig;
 import com.twilio.video.ui.MediaTestActivity;
 import com.twilio.video.util.AccessTokenUtils;
+import com.twilio.video.util.Constants;
 import com.twilio.video.util.FakeVideoCapturer;
 import com.twilio.video.util.PermissionUtils;
 import com.twilio.video.util.RandUtils;
@@ -49,7 +50,7 @@ public class RoomTest extends BaseClientTest {
         super.setup();
         mediaTestActivity = activityRule.getActivity();
         PermissionUtils.allowPermissions(mediaTestActivity);
-        identity = RandUtils.generateRandomString(10);
+        identity = Constants.PARTICIPANT_ALICE;
         token = AccessTokenUtils.getAccessToken(identity);
         videoClient = new VideoClient(mediaTestActivity, token);
         roomName = RandUtils.generateRandomString(20);
@@ -100,9 +101,6 @@ public class RoomTest extends BaseClientTest {
         // Now we add our tracks
         LocalAudioTrack localAudioTrack = localMedia.addAudioTrack(true);
         LocalVideoTrack localVideoTrack = localMedia.addVideoTrack(true, fakeVideoCapturer);
-
-        // Let them sit a bit
-        Thread.sleep(1);
 
         // Now remove them
         assertTrue(localMedia.removeAudioTrack(localAudioTrack));
@@ -182,7 +180,8 @@ public class RoomTest extends BaseClientTest {
         assertNull(room.getLocalParticipant());
         assertTrue(roomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
 
-        if(BuildConfig.TOPOLOGY.equals(SimplerSignalingUtils.P2P) || BuildConfig.TOPOLOGY.equals(SimplerSignalingUtils.SFU)) {
+        if(BuildConfig.TOPOLOGY.equals(SimplerSignalingUtils.P2P) ||
+                BuildConfig.TOPOLOGY.equals(SimplerSignalingUtils.SFU)) {
            Assert.assertFalse(room.isRecording());
         } else {
             /*

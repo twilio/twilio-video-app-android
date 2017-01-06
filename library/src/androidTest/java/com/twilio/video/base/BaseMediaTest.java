@@ -13,6 +13,7 @@ import com.twilio.video.VideoClient;
 import com.twilio.video.helper.CallbackHelper;
 import com.twilio.video.ui.MediaTestActivity;
 import com.twilio.video.util.AccessTokenUtils;
+import com.twilio.video.util.Constants;
 import com.twilio.video.util.FakeVideoCapturer;
 import com.twilio.video.util.PermissionUtils;
 import com.twilio.video.util.RandUtils;
@@ -31,8 +32,6 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 public abstract class BaseMediaTest extends BaseClientTest {
-    protected final static String TEST_USER  = "TEST_USER";
-    protected final static String TEST_USER2  = "TEST_USER2";
     @Rule
     public ActivityTestRule<MediaTestActivity> activityRule =
             new ActivityTestRule<>(MediaTestActivity.class);
@@ -79,7 +78,7 @@ public abstract class BaseMediaTest extends BaseClientTest {
         testRoom = RandUtils.generateRandomString(10);
         fakeVideoCapturer = new FakeVideoCapturer();
         actor1LocalMedia = LocalMedia.create(mediaTestActivity);
-        tokenOne = AccessTokenUtils.getAccessToken(TEST_USER);
+        tokenOne = AccessTokenUtils.getAccessToken(Constants.PARTICIPANT_ALICE);
         Instrumentation instrumentation = InstrumentationRegistry.getInstrumentation();
         instrumentation.runOnMainSync(new Runnable() {
             @Override
@@ -96,7 +95,7 @@ public abstract class BaseMediaTest extends BaseClientTest {
 
         // Connect actor 2
         actor2LocalMedia = LocalMedia.create(mediaTestActivity);
-        tokenTwo = AccessTokenUtils.getAccessToken(TEST_USER2);
+        tokenTwo = AccessTokenUtils.getAccessToken(Constants.PARTICIPANT_BOB);
         instrumentation.runOnMainSync(new Runnable() {
             @Override
             public void run() {

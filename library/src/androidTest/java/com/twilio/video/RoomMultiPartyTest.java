@@ -9,6 +9,7 @@ import android.util.Pair;
 import com.twilio.video.base.BaseClientTest;
 import com.twilio.video.helper.CallbackHelper;
 import com.twilio.video.util.AccessTokenUtils;
+import com.twilio.video.util.Constants;
 import com.twilio.video.util.RandUtils;
 
 import org.junit.After;
@@ -32,6 +33,9 @@ import static org.junit.Assert.assertTrue;
 @LargeTest
 public class RoomMultiPartyTest extends BaseClientTest {
     private static final int PARTICIPANT_NUM = 3;
+    private static final String[] PARTICIPANTS = {
+            Constants.PARTICIPANT_ALICE, Constants.PARTICIPANT_BOB, Constants.PARTICIPANT_CHARLIE
+    };
 
     private Context context;
     private List<VideoClient> videoClients;
@@ -45,7 +49,7 @@ public class RoomMultiPartyTest extends BaseClientTest {
         rooms = new ArrayList<>();
         videoClients = new ArrayList<>();
         for (int i = 0; i < PARTICIPANT_NUM; i++) {
-            String token = AccessTokenUtils.getAccessToken(RandUtils.generateRandomString(10));
+            String token = AccessTokenUtils.getAccessToken(PARTICIPANTS[i]);
             videoClients.add(new VideoClient(context, token));
         }
         roomName = RandUtils.generateRandomString(20);
@@ -83,7 +87,7 @@ public class RoomMultiPartyTest extends BaseClientTest {
                 assertEquals(numberOfParticipants, roomPair.first.getParticipants().size());
             }
 
-            rooms.add(new Pair<Room, CallbackHelper.FakeRoomListener>(room, roomListener));
+            rooms.add(new Pair<>(room, roomListener));
         }
     }
 
@@ -102,7 +106,7 @@ public class RoomMultiPartyTest extends BaseClientTest {
             for (Participant participant : participantMap.values()) {
                 assertNotEquals(localSid, participant.getSid());
             }
-            rooms.add(new Pair<Room, CallbackHelper.FakeRoomListener>(room, roomListener));
+            rooms.add(new Pair<>(room, roomListener));
         }
     }
 

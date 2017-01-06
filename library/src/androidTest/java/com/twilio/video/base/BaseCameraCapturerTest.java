@@ -16,7 +16,7 @@ import org.junit.Before;
 import org.junit.Rule;
 
 public abstract class BaseCameraCapturerTest {
-    protected static final int CAMERA_CAPTURE_DELAY = 3;
+    protected static final int CAMERA_CAPTURE_DELAY_MS = 3000;
 
     @Rule
     public ActivityTestRule<CameraCapturerTestActivity> activityRule =
