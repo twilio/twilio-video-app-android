@@ -10,6 +10,7 @@ import com.twilio.video.util.PermissionUtils;
 
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -25,6 +26,7 @@ import static org.junit.Assume.assumeTrue;
 
 @RunWith(AndroidJUnit4.class)
 @TargetApi(21)
+@Ignore
 public class ScreenCapturerTest {
     private static final int SCREEN_CAPTURER_DELAY_MS = 3000;
 
