@@ -21,4 +21,6 @@
     <color name="lobbyHangup">#CC2B33</color>
 
     <color name="joinLayoutTextColor">#ccffffff</color>
+    <color name="lobbyStatsDrawerBg">#CC000000</color>
+    <color name="colorFadedRed">#cc2b33</color>
 </resources>

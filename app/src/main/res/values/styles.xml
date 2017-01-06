@@ -49,4 +49,20 @@
         <item name="android:textColor">@android:color/black</item>
     </style>
 
+    <style name="AppTheme.Lobby.Drawer" parent="Widget.AppCompat.DrawerArrowToggle">
+        <item name="android:textColor">@android:color/white</item>
+    </style>
+    <style name="Stats.TextTitle" parent="AppTheme.Lobby.Drawer">
+        <item name="android:textSize">14sp</item>
+    </style>
+    <style name="Stats.TextValue" parent="Stats.TextTitle">
+        <item name="android:textSize">14sp</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+    <style name="Stats.TextTrack" parent="AppTheme.Lobby.Drawer">
+        <item name="android:textSize">16sp</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+
 </resources>

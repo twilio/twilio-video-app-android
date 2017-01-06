@@ -13,4 +13,5 @@ public class Preferences {
     public static final String ASPECT_RATIO = "pref_aspect_ratio";
     public static final String VERSION = "pref_version";
     public static final String LOGOUT = "pref_logout";
+    public static final String ENABLE_STATS = "pref_enable_stats";
 }

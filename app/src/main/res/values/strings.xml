@@ -14,7 +14,7 @@
     <string name="fps">Frames per second</string>
     <string name="video_dimensions">Video dimensions</string>
     <string name="video_constraints">Video Constraints</string>
-    <string name="stats">Statistics</string>
+    <string name="statistics">Statistics</string>
     <string name="enable_stats">Enable Stats</string>
     <string name="local">Local Media</string>
     <string name="remote">Remote Media</string>
@@ -56,6 +56,24 @@
     <string name="permissions_required">Camera, Microphone, and Writing to External Storage permissions are required. Please enable them in App Settings.</string>
     <string name="failed_to_add_camera_video_track">Failed to add camera video track</string>
     <string name="failed_to_add_screen_video_track">Failed to add screen video track</string>
+    <string name="stats_track_id">id</string>
+    <string name="stats_codec">codec</string>
+    <string name="stats_packets">packets lost</string>
+    <string name="stats_bytes_sent">bytes sent</string>
+    <string name="stats_bytes_received">bytes received</string>
+    <string name="stats_gathering_disabled">Stats Gathering Disabled</string>
+    <string name="stats_enable_in_settings">Enable in Settings</string>
+    <string name="stats_rtt">round trip time</string>
+    <string name="stats_jitter">jitter</string>
+    <string name="stats_audio_level">audio level</string>
+    <string name="stats_dimensions">dimensions</string>
+    <string name="stats_framerate">framerate</string>
+    <string name="audio_track">Audio Track</string>
+    <string name="local_audio_track">Local Audio Track</string>
+    <string name="video_track">Video Track</string>
+    <string name="local_video_track">Local Video Track</string>
+    <string name="camera_video_track">Camera Video Track</string>
+    <string name="screen_video_track">Screen Video Track</string>
 
     <string-array name="environment_array">
         <item>Production</item>

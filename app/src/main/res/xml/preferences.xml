@@ -2,6 +2,10 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <PreferenceCategory android:title="@string/general">
+        <CheckBoxPreference
+            android:defaultValue="false"
+            android:key="pref_enable_stats"
+            android:title="@string/enable_stats"/>
         <ListPreference
             android:defaultValue="prod"
             android:entries="@array/environment_array"

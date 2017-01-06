@@ -16,6 +16,8 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.util.TypedValue;
@@ -28,7 +30,9 @@ import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -48,7 +52,10 @@ import com.twilio.video.LocalVideoTrack;
 import com.twilio.video.Media;
 import com.twilio.video.Participant;
 import com.twilio.video.Room;
+import com.twilio.video.RoomState;
 import com.twilio.video.ScreenCapturer;
+import com.twilio.video.StatsListener;
+import com.twilio.video.StatsReport;
 import com.twilio.video.TwilioException;
 import com.twilio.video.VideoClient;
 import com.twilio.video.VideoConstraints;
@@ -56,14 +63,22 @@ import com.twilio.video.VideoDimensions;
 import com.twilio.video.VideoTrack;
 import com.twilio.video.VideoView;
 import com.twilio.video.app.R;
+import com.twilio.video.app.adapter.StatsListAdapter;
 import com.twilio.video.app.data.Preferences;
 import com.twilio.video.app.util.EnvUtil;
 import com.twilio.video.app.util.InputUtils;
+import com.twilio.video.app.util.StatsScheduler;
 import com.twilio.video.simplersignaling.SimplerSignalingUtils;
 import com.twilio.video.env.Env;
 
 import java.net.HttpURLConnection;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -81,6 +96,7 @@ public class RoomActivity extends AppCompatActivity {
     private static final int PERMISSIONS_REQUEST_CODE = 100;
     private static final int MEDIA_PROJECTION_REQUEST_CODE = 101;
     private static final int THUMBNAIL_DIMENSION = 96;
+    private static final int STATS_DELAY = 3000; // milliseconds
 
     private AspectRatio[] aspectRatios = new AspectRatio[]{
             VideoConstraints.ASPECT_RATIO_4_3,
@@ -118,6 +134,9 @@ public class RoomActivity extends AppCompatActivity {
     @BindView(R.id.join_status_layout) LinearLayout joinStatusLayout;
     @BindView(R.id.join_status) TextView joinStatusTextView;
     @BindView(R.id.join_room_name) TextView joinRoomNameTextView;
+
+    @BindView(R.id.stats_recycler_view) RecyclerView statsRecyclerView;
+    @BindView(R.id.stats_disabled) LinearLayout statsDisabledLayout;
 
     private MenuItem switchCameraMenuItem;
     private MenuItem pauseVideoMenuItem;
@@ -163,6 +182,9 @@ public class RoomActivity extends AppCompatActivity {
     private final Multimap<Participant, VideoView> participantVideoViewMultimap =
             HashMultimap.create();
     private final BiMap<VideoTrack, VideoView> videoTrackVideoViewBiMap = HashBiMap.create();
+    private StatsScheduler statsScheduler;
+    private StatsListAdapter statsListAdapter;
+    private Map<String, String> localVideoTrackNames = new HashMap<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -193,6 +215,7 @@ public class RoomActivity extends AppCompatActivity {
         topology = sharedPreferences.getString(Preferences.TOPOLOGY,
                 Preferences.TOPOLOGY_DEFAULT);
         localMedia = LocalMedia.create(this);
+        statsScheduler = new StatsScheduler();
         obtainVideoConstraints();
         updateUi(room);
         requestPermissions();
@@ -258,6 +281,7 @@ public class RoomActivity extends AppCompatActivity {
             }
             restoreLocalVideoCameraTrack = false;
         }
+        updateStats();
     }
 
     @Override
@@ -425,6 +449,8 @@ public class RoomActivity extends AppCompatActivity {
                 pauseVideoMenuItem.setTitle(cameraVideoTrack.isEnabled() ?
                         R.string.pause_video : R.string.resume_video);
                 pauseVideoMenuItem.setVisible(true);
+                localVideoTrackNames.put(
+                        cameraVideoTrack.getTrackId(), getString(R.string.camera_video_track));
             } else {
                 Snackbar.make(primaryVideoView,
                         R.string.failed_to_add_camera_video_track,
@@ -448,6 +474,7 @@ public class RoomActivity extends AppCompatActivity {
                         "Video track remove action failed",
                         Snackbar.LENGTH_LONG).setAction("Action", null).show();
             }
+            localVideoTrackNames.remove(cameraVideoTrack.getTrackId());
 
             // Cleanup and set menu items accordingly
             cameraVideoTrack = null;
@@ -533,6 +560,8 @@ public class RoomActivity extends AppCompatActivity {
 
         if (cameraVideoTrack != null) {
             cameraVideoTrack.addRenderer(primaryVideoView);
+            localVideoTrackNames.put(
+                    cameraVideoTrack.getTrackId(), getString(R.string.camera_video_track));
         } else {
             Snackbar.make(primaryVideoView,
                     R.string.failed_to_add_camera_video_track,
@@ -586,6 +615,10 @@ public class RoomActivity extends AppCompatActivity {
                     break;
             }
         }
+
+        statsListAdapter = new StatsListAdapter(this);
+        statsRecyclerView.setAdapter(statsListAdapter);
+        statsRecyclerView.setLayoutManager(new LinearLayoutManager(this));
 
         disconnectButton.setVisibility(disconnectButtonState);
         joinRoomLayout.setVisibility(joinRoomLayoutState);
@@ -662,6 +695,8 @@ public class RoomActivity extends AppCompatActivity {
         if (screenVideoTrack != null) {
             screenCaptureMenuItem.setIcon(R.drawable.ic_stop_screen_share_white_24dp);
             screenCaptureMenuItem.setTitle(R.string.stop_screen_share);
+            localVideoTrackNames.put(
+                    screenVideoTrack.getTrackId(), getString(R.string.screen_video_track));
         } else {
             Snackbar.make(primaryVideoView,
                     R.string.failed_to_add_screen_video_track,
@@ -672,6 +707,8 @@ public class RoomActivity extends AppCompatActivity {
 
     private void stopScreenCapture() {
         localMedia.removeVideoTrack(screenVideoTrack);
+        localVideoTrackNames.remove(screenVideoTrack.getTrackId());
+        screenVideoTrack = null;
         screenCaptureMenuItem.setIcon(R.drawable.ic_screen_share_white_24dp);
         screenCaptureMenuItem.setTitle(R.string.share_screen);
     }
@@ -920,6 +957,40 @@ public class RoomActivity extends AppCompatActivity {
         localThumbnailVideoView.setVisibility(View.GONE);
     }
 
+    private void updateStatsUI(boolean enabled) {
+        if (enabled) {
+            statsRecyclerView.setVisibility(View.VISIBLE);
+            statsDisabledLayout.setVisibility(View.INVISIBLE);
+        } else {
+            statsRecyclerView.setVisibility(View.INVISIBLE);
+            statsDisabledLayout.setVisibility(View.VISIBLE);
+        }
+    }
+
+    private void updateStats() {
+        if (statsScheduler.isRunning()) {
+            statsScheduler.cancelStatsGathering();
+        }
+        boolean enableStats = sharedPreferences.getBoolean(Preferences.ENABLE_STATS, false);
+        if (enableStats && (room != null) && (room.getState() == RoomState.CONNECTED)) {
+            statsScheduler.scheduleStatsGathering(room, statsListener(), STATS_DELAY);
+        }
+        updateStatsUI(enableStats);
+    }
+
+    private StatsListener statsListener() {
+        return new StatsListener() {
+            @Override
+            public void onStats(List<StatsReport> statsReports) {
+                // Running on StatsScheduler thread
+                if (room != null) {
+                    statsListAdapter.updateStatsData(
+                            statsReports, room.getParticipants(), localVideoTrackNames);
+                }
+            }
+        };
+    }
+
     private Room.Listener roomListener() {
         return new Room.Listener() {
             @Override
@@ -929,6 +1000,7 @@ public class RoomActivity extends AppCompatActivity {
                 roomStatusTextview.setText("Connected to " + room.getName());
                 setAudioFocus(true);
                 setVolumeControl(true);
+                updateStats();
                 updateUi(room);
 
                 for (Map.Entry<String, Participant> entry : room.getParticipants().entrySet()) {
@@ -941,7 +1013,8 @@ public class RoomActivity extends AppCompatActivity {
                 Timber.i("onConnectFailure: " + twilioException.getMessage());
                 roomStatusTextview.setText("Failed to connect to " + room.getName());
                 RoomActivity.this.room = null;
-                updateUi(room);            }
+                updateUi(room);
+            }
 
             @Override
             public void onDisconnected(Room room, TwilioException twilioException) {
@@ -950,6 +1023,7 @@ public class RoomActivity extends AppCompatActivity {
                 removeAllParticipants();
                 updateUi(room);
                 RoomActivity.this.room = null;
+                updateStats();
                 setAudioFocus(false);
                 setVolumeControl(false);
             }

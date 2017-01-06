@@ -109,64 +109,59 @@
         android:orientation="vertical"
         android:layout_gravity="end"
         android:background="?android:attr/windowBackground"
-        android:fitsSystemWindows="true" >
+        android:fitsSystemWindows="true"
+        android:fillViewport="true"
+        android:backgroundTint="@color/lobbyStatsDrawerBg">
 
-        <LinearLayout
+        <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical" >
+            android:layout_height="match_parent">
 
             <TextView
+                android:id="@+id/stats_text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/stats"
+                android:text="@string/statistics"
+                style="@style/AppTheme.Lobby.Drawer"
                 android:textSize="20sp"
                 android:layout_marginTop="@dimen/activity_horizontal_margin"
-                android:layout_marginLeft="@dimen/activity_horizontal_margin" />
+                android:layout_marginRight="@dimen/activity_horizontal_margin"
+                android:layout_alignParentRight="true"/>
 
-            <LinearLayout
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/stats_recycler_view"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_margin="@dimen/activity_horizontal_margin" >
-
-                <CheckBox
-                    android:id="@+id/enable_stats_checkbox"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/enable_stats"/>
-
-            </LinearLayout>
-
+                android:layout_below="@id/stats_text"
+                android:layout_marginTop="10dp"/>
             <LinearLayout
-                android:id="@+id/stats_layout"
+                android:id="@+id/stats_disabled"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical">
-                <TextView
-                    android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_centerInParent="true"
+                android:orientation="vertical"
+                android:gravity="center">
+                <ImageView
+                    android:id="@+id/stats_disabled_image"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/local"
-                    android:textSize="16sp"
-                    android:layout_marginLeft="@dimen/activity_horizontal_margin" />
-
+                    app:srcCompat="@drawable/ic_stats_disabled_image"/>
                 <TextView
-                    android:id="@+id/local_video_track_stats_textview"
-                    android:layout_width="match_parent"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="@dimen/activity_horizontal_margin" />
-
+                    android:text="@string/stats_gathering_disabled"
+                    style="@style/AppTheme.Lobby.Drawer"
+                    android:layout_marginTop="@dimen/activity_vertical_margin"
+                    android:textSize="18sp"/>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/stats_enable_in_settings"
+                    style="@style/AppTheme.Lobby.Drawer"
+                    android:layout_marginTop="@dimen/activity_vertical_margin"
+                    android:textSize="14sp"/>
             </LinearLayout>
-
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/stats_recycler_view"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
-
-        </LinearLayout>
+        </RelativeLayout>
 
     </ScrollView>
 </android.support.v4.widget.DrawerLayout>
