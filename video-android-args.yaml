@@ -4,12 +4,9 @@ library-instrumentation-tests:
     app: app/build/outputs/apk/app-debug.apk
     test: library/build/outputs/apk/library-debug-androidTest.apk
     device-ids:
-        - Nexus4
         - Nexus5
         - Nexus5X
-        - Nexus6
         - Nexus7
-        - Nexus9
         - herolte
     os-version-ids:
         - 21
@@ -25,12 +22,9 @@ library-sfu-instrumentation-tests:
     app: app/build/outputs/apk/app-debug.apk
     test: library/build/outputs/apk/library-debug-androidTest.apk
     device-ids:
-        - Nexus4
         - Nexus5
         - Nexus5X
-        - Nexus6
         - Nexus7
-        - Nexus9
         - herolte
     os-version-ids:
         - 21
