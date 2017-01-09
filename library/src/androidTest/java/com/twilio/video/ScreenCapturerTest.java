@@ -26,7 +26,6 @@ import static org.junit.Assume.assumeTrue;
 
 @RunWith(AndroidJUnit4.class)
 @TargetApi(21)
-@Ignore
 public class ScreenCapturerTest {
     private static final int SCREEN_CAPTURER_DELAY_MS = 3000;
 
@@ -63,6 +62,7 @@ public class ScreenCapturerTest {
     }
 
     @Test
+    @Ignore
     public void shouldCaptureFramesWhenVideoTrackAdded() throws InterruptedException {
         final CountDownLatch firstFrameReported = new CountDownLatch(1);
         ScreenCapturer.Listener screenCapturerListener = new ScreenCapturer.Listener() {
@@ -109,6 +109,7 @@ public class ScreenCapturerTest {
     }
 
     @Test
+    @Ignore
     public void canBeRenderedToView() throws InterruptedException {
         final VideoView localVideo =
                 (VideoView) screenCapturerActivity
@@ -135,6 +136,7 @@ public class ScreenCapturerTest {
     }
 
     @Test
+    @Ignore
     public void canBeReused() throws InterruptedException {
         int reuseCount = 2;
         final AtomicReference<CountDownLatch> firstFrameReceived = new AtomicReference<>();
