@@ -33,7 +33,6 @@ import static org.junit.Assert.assertTrue;
 
 @RunWith(AndroidJUnit4.class)
 @LargeTest
-@Ignore
 public class StatsTest extends BaseClientTest {
     @Rule
     public ActivityTestRule<MediaTestActivity> activityRule =
@@ -105,7 +104,7 @@ public class StatsTest extends BaseClientTest {
                     @Override
                     public void onStats(List<StatsReport> statsReports) {
                         assertEquals(callingThreadId, Thread.currentThread().getId());
-                        statsCallback.countDown();;
+                        statsCallback.countDown();
                     }
                 };
                 aliceRoom.getStats(statsListener);
@@ -145,6 +144,7 @@ public class StatsTest extends BaseClientTest {
     }
 
     @Test
+    @Ignore
     public void shouldReceiveStatsWhenParticipanAddsOrRemovesTrack() throws InterruptedException {
         // Connect Alice to room with local audio track only
         aliceLocalMedia.addAudioTrack(true);
@@ -278,6 +278,7 @@ public class StatsTest extends BaseClientTest {
     }
 
     @Test
+    @Ignore
     public void reportShouldHaveNonEmptyValues() throws InterruptedException {
         // Connect Alice to room with both video and audio track
         aliceLocalMedia.addAudioTrack(true);
@@ -344,6 +345,7 @@ public class StatsTest extends BaseClientTest {
     }
 
     @Test
+    @Ignore
     public void shouldReceiveEmptyReportsIfRoomGetsDisconnected() throws InterruptedException {
         final int numberOfRequests = 10;
 
@@ -381,6 +383,7 @@ public class StatsTest extends BaseClientTest {
 
 
     @Test
+    @Ignore
     public void shouldNotReceiveReportAfterRoomIsDisconnected() throws InterruptedException {
         // Connect Alice to room with both video and audio track
         aliceLocalMedia.addAudioTrack(true);
