@@ -1,5 +1,6 @@
 #include <jni.h>
 #include <memory>
+#include <video/stats_observer.h>
 #include "video/room.h"
 
 #ifndef _Included_com_twilio_conversations_Room
@@ -11,6 +12,10 @@ extern "C" {
 
 struct RoomContext {
     std::unique_ptr<twilio::video::Room> room;
+};
+
+struct StatsObserverContext {
+    std::shared_ptr<twilio::video::StatsObserver> stats_observer;
 };
 
 JNIEXPORT jboolean JNICALL Java_com_twilio_video_Room_nativeIsRecording

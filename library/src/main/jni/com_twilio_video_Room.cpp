@@ -33,9 +33,9 @@ JNIEXPORT void JNICALL Java_com_twilio_video_Room_nativeGetStats
                        twilio::video::kTSCoreLogLevelDebug,
                        "%s", func_name.c_str());
     RoomContext *room_context = reinterpret_cast<RoomContext *>(j_native_room_context);
-    AndroidStatsObserver *android_stats_observer =
-        reinterpret_cast<AndroidStatsObserver *>(j_native_stats_observer);
-    room_context->room->getStats(android_stats_observer);
+    StatsObserverContext *stats_observer_context =
+        reinterpret_cast<StatsObserverContext *>(j_native_stats_observer);
+    room_context->room->getStats(stats_observer_context->stats_observer);
 }
 
 JNIEXPORT void JNICALL Java_com_twilio_video_Room_nativeRelease
@@ -84,8 +84,9 @@ Java_com_twilio_video_Room_00024InternalStatsListenerHandle_nativeCreate(JNIEnv 
     TS_CORE_LOG_MODULE(twilio::video::kTSCoreLogModulePlatform,
                        twilio::video::kTSCoreLogLevelDebug,
                        "Create AndroidStatsObserver");
-    AndroidStatsObserver *android_stats_observer = new AndroidStatsObserver(env, object);
-    return webrtc_jni::jlongFromPointer(android_stats_observer);
+    StatsObserverContext *stats_observer_context = new StatsObserverContext();
+    stats_observer_context->stats_observer = std::make_shared<AndroidStatsObserver>(env, object);
+    return webrtc_jni::jlongFromPointer(stats_observer_context);
 }
 
 JNIEXPORT void JNICALL
@@ -95,10 +96,9 @@ Java_com_twilio_video_Room_00024InternalStatsListenerHandle_nativeRelease(JNIEnv
     TS_CORE_LOG_MODULE(twilio::video::kTSCoreLogModulePlatform,
                        twilio::video::kTSCoreLogLevelDebug,
                        "Free AndroidStatsObserver");
-    AndroidStatsObserver *android_stats_observer =
-        reinterpret_cast<AndroidStatsObserver *>(nativeHandle);
-    if (android_stats_observer != nullptr) {
-        android_stats_observer->setObserverDeleted();
-        delete android_stats_observer;
+    StatsObserverContext *stats_observer_context =
+        reinterpret_cast<StatsObserverContext *>(nativeHandle);
+    if (stats_observer_context != nullptr) {
+        delete stats_observer_context;
     }
 }

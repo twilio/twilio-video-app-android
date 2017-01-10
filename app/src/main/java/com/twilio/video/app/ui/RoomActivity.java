@@ -92,7 +92,7 @@ public class RoomActivity extends AppCompatActivity {
     private static final int PERMISSIONS_REQUEST_CODE = 100;
     private static final int MEDIA_PROJECTION_REQUEST_CODE = 101;
     private static final int THUMBNAIL_DIMENSION = 96;
-    private static final int STATS_DELAY = 3000; // milliseconds
+    private static final int STATS_DELAY = 1000; // milliseconds
 
     private AspectRatio[] aspectRatios = new AspectRatio[]{
             VideoConstraints.ASPECT_RATIO_4_3,
