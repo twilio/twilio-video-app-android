@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/participant_background"
+    android:layout_width="96dp"
+    android:layout_height="148dp"
+    android:layout_marginLeft="4dp"
+    android:layout_marginRight="4dp">
+
+    <!-- Participant layout with video track -->
+
+    <FrameLayout
+        android:id="@+id/participant_video_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <com.twilio.video.VideoView
+            android:id="@+id/participant_video"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
+
+        <TextView
+            android:id="@+id/participant_video_identity"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/participantBackground"
+            android:padding="4dp"
+            android:textColor="@android:color/white"
+            android:textSize="14sp" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@drawable/participant_stroke"/>
+
+    </FrameLayout>
+
+    <!-- Participant layout without video track -->
+
+    <RelativeLayout
+        android:id="@+id/participant_selected_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/participant_selected_background">
+
+        <ImageView
+            android:id="@+id/participant_stub_image"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            app:srcCompat="@drawable/ic_account_circle_white_24dp" />
+
+        <TextView
+            android:id="@+id/participant_selected_identity"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_above="@id/participant_stub_image"
+            android:layout_centerHorizontal="true"
+            android:layout_marginBottom="4dp"
+            android:textColor="@android:color/white"
+            android:textSize="14sp" />
+
+    </RelativeLayout>
+
+    <!-- Participant audio toggle -->
+
+    <ImageView
+        android:id="@+id/participant_no_audio"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_margin="6dp"
+        app:srcCompat="@drawable/ic_thumbnail_no_audio" />
+
+</FrameLayout>
