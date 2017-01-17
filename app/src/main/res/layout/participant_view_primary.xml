@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/participant_background"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <!-- Participant layout with video track -->
+
+    <FrameLayout
+        android:id="@+id/participant_video_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <com.twilio.video.VideoView
+            android:id="@+id/participant_video"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:overlaySurface="false"/>
+
+        <RelativeLayout
+            android:id="@+id/participant_badge"
+            android:layout_width="128dp"
+            android:layout_height="46dp"
+            android:background="@drawable/badge_background"
+            android:layout_marginTop="88dp"
+            android:layout_marginLeft="16dp"
+            android:layout_marginStart="16dp">
+
+            <TextView
+                android:id="@+id/participant_video_identity"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:textColor="@android:color/white"
+                android:textSize="14sp" />
+
+            <ImageView
+                android:id="@+id/participant_no_audio"
+                android:layout_width="10dp"
+                android:layout_height="11dp"
+                android:layout_centerVertical="true"
+                android:layout_marginLeft="16dp"
+                android:layout_marginStart="16dp"
+                android:layout_toEndOf="@id/participant_video_identity"
+                android:layout_toRightOf="@id/participant_video_identity"
+                app:srcCompat="@drawable/ic_thumbnail_no_audio_pillbox" />
+
+        </RelativeLayout>
+
+    </FrameLayout>
+
+    <!-- Participant layout without video track -->
+
+    <RelativeLayout
+        android:id="@+id/participant_selected_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/participantSelectedBackground">
+
+        <ImageView
+            android:id="@+id/participant_stub_image"
+            android:layout_width="107dp"
+            android:layout_height="107dp"
+            android:layout_centerInParent="true"
+            app:srcCompat="@drawable/ic_account_circle_white_48px" />
+
+        <TextView
+            android:id="@+id/participant_selected_identity"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_above="@id/participant_stub_image"
+            android:layout_centerHorizontal="true"
+            android:layout_marginBottom="24dp"
+            android:textColor="@android:color/white"
+            android:textSize="24sp"
+            android:textStyle="bold" />
+
+    </RelativeLayout>
+
+</FrameLayout>
