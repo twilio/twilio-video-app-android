@@ -40,6 +40,8 @@ set_property(TARGET resiprocate PROPERTY IMPORTED_LOCATION ${CORE_STATIC_LIB_DIR
 include_directories(${POCO_INCLUDE_DIR})
 add_library(poco-net STATIC IMPORTED GLOBAL)
 set_property(TARGET poco-net PROPERTY IMPORTED_LOCATION ${CORE_STATIC_LIB_DIR}/libPocoNet.a)
+add_library(poco-json STATIC IMPORTED GLOBAL)
+set_property(TARGET poco-json PROPERTY IMPORTED_LOCATION ${CORE_STATIC_LIB_DIR}/libPocoJSON.a)
 add_library(poco-netssl STATIC IMPORTED GLOBAL)
 set_property(TARGET poco-netssl PROPERTY IMPORTED_LOCATION ${CORE_STATIC_LIB_DIR}/libPocoNetSSL.a)
 add_library(poco-util STATIC IMPORTED GLOBAL)
@@ -87,6 +89,7 @@ target_link_libraries(${VIDEO_ANDROID_LIBRARY} ${CORE_STATIC_LIB_DIR}/libtwilio-
         "-Wl,--whole-archive ${CORE_STATIC_LIB_DIR}/libwebrtc-jni.a -Wl,--no-whole-archive"
         ${CORE_STATIC_LIB_DIR}/libjni-helpers.a
         ${CORE_STATIC_LIB_DIR}/libresiprocate.a
+        ${CORE_STATIC_LIB_DIR}/libPocoJSON.a
         ${CORE_STATIC_LIB_DIR}/libPocoNet.a
         ${CORE_STATIC_LIB_DIR}/libPocoNetSSL.a
         ${CORE_STATIC_LIB_DIR}/libPocoUtil.a

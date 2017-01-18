@@ -55,16 +55,6 @@ public:
                         *j_room_observer_class_,
                         "onParticipantDisconnected",
                         "(Ljava/lang/String;)V")),
-        j_on_recording_started_(
-            webrtc_jni::GetMethodID(env,
-                        *j_room_observer_class_,
-                        "onRecordingStarted",
-                        "()V")),
-        j_on_recording_stopped_(
-            webrtc_jni::GetMethodID(env,
-                        *j_room_observer_class_,
-                        "onRecordingStopped",
-                        "()V")),
         j_get_handler_(
             webrtc_jni::GetMethodID(env,
                         *j_room_observer_class_,
@@ -254,49 +244,6 @@ protected:
             CHECK_EXCEPTION(jni()) << "error during CallVoidMethod";
         }
     }
-
-    virtual void onRecordingStarted(twilio::video::Room *room) {
-        webrtc_jni::ScopedLocalRefFrame local_ref_frame(jni());
-        std::string func_name = std::string(__FUNCTION__);
-        TS_CORE_LOG_MODULE(twilio::video::kTSCoreLogModulePlatform,
-                           twilio::video::kTSCoreLogLevelDebug,
-                           "%s", func_name.c_str());
-
-        {
-            rtc::CritScope cs(&deletion_lock_);
-
-            if (!isObserverValid(func_name)) {
-                return;
-            }
-
-            jni()->CallVoidMethod(*j_room_observer_,
-                                  j_on_recording_started_);
-
-            CHECK_EXCEPTION(jni()) << "error during CallVoidMethod";
-        }
-    }
-
-    virtual void onRecordingStopped(twilio::video::Room *room) {
-        webrtc_jni::ScopedLocalRefFrame local_ref_frame(jni());
-        std::string func_name = std::string(__FUNCTION__);
-        TS_CORE_LOG_MODULE(twilio::video::kTSCoreLogModulePlatform,
-                           twilio::video::kTSCoreLogLevelDebug,
-                           "%s", func_name.c_str());
-
-        {
-            rtc::CritScope cs(&deletion_lock_);
-
-            if (!isObserverValid(func_name)) {
-                return;
-            }
-
-            jni()->CallVoidMethod(*j_room_observer_,
-                                  j_on_recording_stopped_);
-
-            CHECK_EXCEPTION(jni()) << "error during CallVoidMethod";
-        }
-    }
-
 private:
     JNIEnv *jni() {
         return webrtc_jni::AttachCurrentThreadIfNeeded();
@@ -409,8 +356,6 @@ private:
     jmethodID j_on_connect_failure_;
     jmethodID j_on_participant_connected_;
     jmethodID j_on_participant_disconnected_;
-    jmethodID j_on_recording_started_;
-    jmethodID j_on_recording_stopped_;
     jmethodID j_get_handler_;
     jmethodID j_participant_ctor_id_;
     jmethodID j_array_list_ctor_id_;
