@@ -84,13 +84,7 @@ android {
 }
 
 dependencies {
-    /*
-     * TODO: Remove WebRTC dependency once a stable release of 0.5.1 is available. We are pulling
-     * the dependency down directly to compile against a current version of the
-     * libjingle_peerconnection_java.jar which contains a fix for GSDK-1009.
-     */
-    preCompile 'com.twilio.sdk:twilio-webrtc:55.5:android@tar.bz2'
-    preCompile 'com.twilio.sdk:twilio-video:0.5.0:android@tar.bz2'
+    preCompile 'com.twilio.sdk:twilio-video:0.5.1-rc3:android@tar.bz2'
 
     testCompile 'junit:junit:4.12'
     testCompile 'org.mockito:mockito-core:1.10.19'
@@ -111,7 +105,7 @@ dependencies {
     // TODO this really should be on nexus as a jar and not local
     // TODO we are hardcoding architecture for now,
     // because I don't know how to access that information from here
-    compile files("${buildDir}/prebuilt/twilio-webrtc/lib/release/armeabi-v7a/" +
+    compile files("${coreHome}/armeabiv7a/gnu-4.9/release/lib/" +
             "libjingle_peerconnection_java.jar")
 }
 
