@@ -77,6 +77,7 @@
     <string name="local_video_track">Local Video Track</string>
     <string name="camera_video_track">Camera Video Track</string>
     <string name="screen_video_track">Screen Video Track</string>
+    <string name="you">You</string>
 
     <string-array name="environment_array">
         <item>Production</item>
