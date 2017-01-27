@@ -23,4 +23,8 @@
     <color name="joinLayoutTextColor">#ccffffff</color>
     <color name="lobbyStatsDrawerBg">#CC000000</color>
     <color name="colorFadedRed">#cc2b33</color>
+
+    <!-- Participant view colors -->
+    <color name="participantBackground">#66000000</color>
+    <color name="participantSelectedBackground">#cc000000</color>
 </resources>
