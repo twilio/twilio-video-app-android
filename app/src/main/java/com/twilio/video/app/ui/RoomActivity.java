@@ -29,7 +29,6 @@ import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -255,23 +254,8 @@ public class RoomActivity extends AppCompatActivity {
         // try to restore camera video track after setting screen
         if (restoreLocalVideoCameraTrack) {
             obtainVideoConstraints();
-
-//            // add local local camera track
-//            cameraVideoTrack = localMedia.addVideoTrack(true, cameraCapturer, videoConstraints);
-//
-//            // enable video settings
-//            switchCameraMenuItem.setVisible(cameraVideoTrack.isEnabled());
-//            pauseVideoMenuItem.setTitle(cameraVideoTrack.isEnabled() ?
-//                    R.string.pause_video : R.string.resume_video);
-//            pauseVideoMenuItem.setVisible(true);
-//
-//            // local video was rendered as primary view - refreshing
-//            participantController.renderAsPrimary("", getString(R.string.you), cameraVideoTrack,
-//                    localAudioTrack == null);
-//
-//            primaryVideoView.setMirror(cameraCapturer.getCameraSource() ==
-//                    CameraCapturer.CameraSource.BACK_CAMERA);
-
+            setupLocalVideoTrack();
+            renderLocalParticipantStub();
             restoreLocalVideoCameraTrack = false;
         }
         updateStats();
@@ -463,7 +447,7 @@ public class RoomActivity extends AppCompatActivity {
 
                 // update mirror
                 primaryVideoView.setMirror(cameraCapturer.getCameraSource() ==
-                        CameraCapturer.CameraSource.BACK_CAMERA);
+                        CameraCapturer.CameraSource.FRONT_CAMERA);
 
                 // update thumb state
                 participantController.updateThumb(localParticipant.getSid(), cameraVideoTrack,
@@ -472,14 +456,7 @@ public class RoomActivity extends AppCompatActivity {
 
         } else {
 
-            // local video was rendered as primary view - refreshing
-            participantController.renderAsPrimary("", getString(R.string.you), cameraVideoTrack,
-                    localAudioTrack == null);
-            participantController.getPrimaryView().showIdentityBadge(false);
-
-            // update mirror
-            primaryVideoView.setMirror(cameraCapturer.getCameraSource() ==
-                    CameraCapturer.CameraSource.BACK_CAMERA);
+            renderLocalParticipantStub();
         }
 
         // update toggle button icon
@@ -554,11 +531,26 @@ public class RoomActivity extends AppCompatActivity {
                 (resultStorage == PackageManager.PERMISSION_GRANTED));
     }
 
+    /**
+     * Initialize local media and provide stub participant for primary view.
+     */
     private void setupLocalMedia() {
         localAudioTrack = localMedia.addAudioTrack(true);
-        cameraCapturer = new CameraCapturer(this, CameraCapturer.CameraSource.FRONT_CAMERA);
+        setupLocalVideoTrack();
+        renderLocalParticipantStub();
+    }
+
+    /**
+     * Create local video track
+     */
+    private void setupLocalVideoTrack() {
+
+        // initialize capturer only once if needed
+        if (cameraCapturer == null) {
+            cameraCapturer = new CameraCapturer(this, CameraCapturer.CameraSource.FRONT_CAMERA);
+        }
+
         cameraVideoTrack = localMedia.addVideoTrack(true, cameraCapturer, videoConstraints);
-        primaryVideoView.setMirror(true);
 
         if (cameraVideoTrack != null) {
             localVideoTrackNames.put(cameraVideoTrack.getTrackId(),
@@ -567,11 +559,21 @@ public class RoomActivity extends AppCompatActivity {
             Snackbar.make(primaryVideoView, R.string.failed_to_add_camera_video_track,
                     Snackbar.LENGTH_LONG).show();
         }
+    }
 
-        // TODO: render local with empty sid
+    /**
+     * Render local video track.
+     *
+     * NOTE: Stub participant is created in controller. Make sure to remove it
+     * when connected to room.
+     */
+    private void renderLocalParticipantStub() {
         participantController.renderAsPrimary("", getString(R.string.you), cameraVideoTrack,
                 localAudioTrack == null);
-        participantController.getPrimaryView().showIdentityBadge(false);
+
+        primaryVideoView.showIdentityBadge(false);
+        primaryVideoView.setMirror(cameraCapturer.getCameraSource() ==
+                CameraCapturer.CameraSource.FRONT_CAMERA);
     }
 
     private void updateUi(Room room) {
@@ -653,7 +655,7 @@ public class RoomActivity extends AppCompatActivity {
 
                     // local video was rendered as primary view - refreshing
                     primaryVideoView.setMirror(cameraCapturer.getCameraSource() ==
-                            CameraCapturer.CameraSource.BACK_CAMERA);
+                            CameraCapturer.CameraSource.FRONT_CAMERA);
 
                 } else {
 
@@ -661,13 +663,13 @@ public class RoomActivity extends AppCompatActivity {
                     ParticipantView thumb = participantController.getThumb(
                             room.getLocalParticipant().getSid(), null);
                     thumb.setMirror(cameraCapturer.getCameraSource() ==
-                            CameraCapturer.CameraSource.BACK_CAMERA);
+                            CameraCapturer.CameraSource.FRONT_CAMERA);
                 }
             } else {
 
                 // local video was rendered as primary view - refreshing
                 primaryVideoView.setMirror(cameraCapturer.getCameraSource() ==
-                        CameraCapturer.CameraSource.BACK_CAMERA);
+                        CameraCapturer.CameraSource.FRONT_CAMERA);
             }
         }
     }
@@ -850,10 +852,7 @@ public class RoomActivity extends AppCompatActivity {
         participantController.removeAllThumbs();
         participantController.removePrimary();
 
-        // TODO: render local with empty sid
-        participantController.renderAsPrimary("", getString(R.string.you), cameraVideoTrack,
-                localAudioTrack == null);
-        participantController.getPrimaryView().showIdentityBadge(false);
+        renderLocalParticipantStub();
     }
 
     /**
