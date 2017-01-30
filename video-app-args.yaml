@@ -4,9 +4,7 @@ library-instrumentation-tests:
     app: app/build/outputs/apk/app-debug.apk
     test: library/build/outputs/apk/library-debug-androidTest.apk
     device-ids:
-        - Nexus7
         - herolte
-        - trelte
     os-version-ids:
         - 21
         - 22
@@ -20,9 +18,7 @@ library-sfu-instrumentation-tests:
     app: app/build/outputs/apk/app-debug.apk
     test: library/build/outputs/apk/library-debug-androidTest.apk
     device-ids:
-        - Nexus7
         - herolte
-        - trelte
     os-version-ids:
         - 21
         - 22
