@@ -52,6 +52,7 @@ import com.twilio.video.TwilioException;
 import com.twilio.video.VideoClient;
 import com.twilio.video.VideoConstraints;
 import com.twilio.video.VideoDimensions;
+import com.twilio.video.VideoRenderer;
 import com.twilio.video.VideoTrack;
 import com.twilio.video.app.R;
 import com.twilio.video.app.adapter.StatsListAdapter;
@@ -250,15 +251,14 @@ public class RoomActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-
-        // try to restore camera video track after setting screen
-        if (restoreLocalVideoCameraTrack) {
-            obtainVideoConstraints();
-            setupLocalVideoTrack();
-            renderLocalParticipantStub();
-            restoreLocalVideoCameraTrack = false;
-        }
+        restoreCameraTrack();
         updateStats();
+    }
+
+    @Override
+    protected void onPause() {
+        removeCameraTrack();
+        super.onPause();
     }
 
     @Override
@@ -321,16 +321,7 @@ public class RoomActivity extends AppCompatActivity {
                 toggleLocalVideoTrackState();
                 return true;
             case R.id.settings_menu_item:
-
-                /*
-                 * Remove video tracks before going to setting screen
-                 * and mark track to be restored after settings applied
-                 */
-                if (cameraVideoTrack != null) {
-                    localMedia.removeVideoTrack(cameraVideoTrack);
-                    restoreLocalVideoCameraTrack = true;
-                    cameraVideoTrack = null;
-                }
+                removeCameraTrack();
 
                 Intent intent = new Intent(RoomActivity.this, SettingsActivity.class);
                 startActivity(intent);
@@ -404,7 +395,7 @@ public class RoomActivity extends AppCompatActivity {
 
         if (cameraVideoTrack == null) {
 
-            // add local local camera track
+            // add local camera track
             cameraVideoTrack = localMedia.addVideoTrack(true, cameraCapturer, videoConstraints);
 
             // enable video settings
@@ -873,6 +864,31 @@ public class RoomActivity extends AppCompatActivity {
         }
 
         participantController.removeThumbs(participant.getSid());
+    }
+
+    /**
+     * Remove the video track and mark the track to be restored
+     * when going to the settings screen or going to the background
+     */
+    private void removeCameraTrack() {
+        if (cameraVideoTrack != null) {
+            localMedia.removeVideoTrack(cameraVideoTrack);
+            restoreLocalVideoCameraTrack = true;
+            cameraVideoTrack = null;
+        }
+
+    }
+
+    /**
+     * Try to restore camera video track after going to the settings screen or background
+     */
+    private void restoreCameraTrack() {
+        if (restoreLocalVideoCameraTrack) {
+            obtainVideoConstraints();
+            setupLocalVideoTrack();
+            renderLocalParticipantStub();
+            restoreLocalVideoCameraTrack = false;
+        }
     }
 
     private void updateStatsUI(boolean enabled) {
