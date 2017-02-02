@@ -22,8 +22,6 @@ public class CallbackHelper {
         public CountDownLatch onDisconnectedLatch;
         public CountDownLatch onParticipantConnectedLatch;
         public CountDownLatch onParticipantDisconnectedLatch;
-        public CountDownLatch onRecordingStartedLatch;
-        public CountDownLatch onRecordingStoppedLatch;
 
         private void triggerLatch(CountDownLatch latch) {
             if (latch != null) {
@@ -55,16 +53,6 @@ public class CallbackHelper {
         public void onParticipantDisconnected(Room room, Participant participant) {
             triggerLatch(onParticipantDisconnectedLatch);
         }
-
-        @Override
-        public void onRecordingStarted(Room room) {
-            triggerLatch(onRecordingStartedLatch);
-        }
-
-        @Override
-        public void onRecordingStopped(Room room) {
-            triggerLatch(onRecordingStoppedLatch);
-        }
     }
 
     public static class EmptyRoomListener implements Room.Listener {
@@ -91,16 +79,6 @@ public class CallbackHelper {
 
         @Override
         public void onParticipantDisconnected(Room room, Participant participant) {
-
-        }
-
-        @Override
-        public void onRecordingStarted(Room room) {
-
-        }
-
-        @Override
-        public void onRecordingStopped(Room room) {
 
         }
     }

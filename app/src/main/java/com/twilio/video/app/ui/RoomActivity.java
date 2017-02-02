@@ -1078,16 +1078,6 @@ public class RoomActivity extends AppCompatActivity {
 
                 updateStatsUI(sharedPreferences.getBoolean(Preferences.ENABLE_STATS, false));
             }
-
-            @Override
-            public void onRecordingStarted(Room room) {
-                Timber.i("onRecordingStarted: " + room.getName());
-            }
-
-            @Override
-            public void onRecordingStopped(Room room) {
-                Timber.i("onRecordingStopped: " + room.getName());
-            }
         };
     }
 
