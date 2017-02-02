@@ -38,7 +38,10 @@ public class LocalVideoTrack extends VideoTrack {
     }
 
     /**
-     * Check if local video track is enabled.
+     * Check if the local video track is enabled.
+     *
+     * When the value is false, blank video frames are sent. When the value is true, frames from the
+     * video capturer are provided.
      *
      * @return true if the local video is enabled.
      */
@@ -54,8 +57,8 @@ public class LocalVideoTrack extends VideoTrack {
 
     /**
      * Sets the state of the local video track. The results of this operation are signaled to other
-     * Participants in the same Room. When a video track is disabled, blank frames is sent in place
-     * of normal video.
+     * Participants in the same Room. When a video track is disabled, blank frames are sent in place
+     * of video frames from a video capturer.
      *
      * @param enabled the desired state of the local video track.
      */

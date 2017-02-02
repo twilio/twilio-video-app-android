@@ -14,7 +14,10 @@ public class LocalAudioTrack extends AudioTrack  {
     }
 
     /**
-     * Check if local audio track is enabled.
+     * Check if the local audio track is enabled.
+     *
+     * When the value is false, the local audio track is muted. When the value is true the
+     * local audio track is live.
      *
      * @return true if the local audio is enabled.
      */
@@ -31,8 +34,7 @@ public class LocalAudioTrack extends AudioTrack  {
 
     /**
      * Sets the state of the local audio track. The results of this operation are signaled to other
-     * Participants in the same Room. When an audio track is disabled, silence is sent in place
-     * of normal audio.
+     * Participants in the same Room. When an audio track is disabled, the audio is muted.
      *
      * @param enable the desired state of the local audio track.
      */
