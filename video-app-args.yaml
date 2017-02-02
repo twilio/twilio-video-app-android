@@ -12,6 +12,28 @@ library-instrumentation-tests:
     locales: en
     orientations: portrait
 
+library-load-instrumentation-tests:
+    timeout: 30m
+    type: instrumentation
+    app: app/build/outputs/apk/app-debug.apk
+    test: library/build/outputs/apk/library-debug-androidTest.apk
+    device-ids:
+        - m0
+        - Nexus5
+        - Nexus6
+    os-version-ids:
+        - 18
+        - 19
+        - 21
+        - 22
+        - 23
+        - 24
+        - 25
+    test-targets:
+        - class com.twilio.video.MediaFactoryTest#canCreateLocalMedia
+    locales: en
+    orientations: portrait
+
 library-sfu-instrumentation-tests:
     timeout: 30m
     type: instrumentation

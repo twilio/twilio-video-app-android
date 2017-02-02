@@ -35,8 +35,9 @@ android {
 
         externalNativeBuild {
             cmake {
+                // Using android-16 to prevent load libary bug GSDK-1020
                 arguments '-DANDROID_TOOLCHAIN=gcc',
-                        '-DANDROID_PLATFORM=android-21',
+                        '-DANDROID_PLATFORM=android-16',
                         '-DANDROID_STL=c++_static',
                         "-DVIDEO_DEPS_PREFIX=${buildDir}/prebuilt/twilio-video".toString()
                 cppFlags "-DWEBRTC_POSIX",
