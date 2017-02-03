@@ -5,6 +5,17 @@
 #include "android_room_observer.h"
 #include "android_stats_observer.h"
 
+
+JNIEXPORT jboolean JNICALL Java_com_twilio_video_Room_nativeIsRecording
+        (JNIEnv *env, jobject j_instance, jlong j_native_handle) {
+    std::string func_name = std::string(__FUNCTION__);
+    TS_CORE_LOG_MODULE(twilio::video::kTSCoreLogModulePlatform,
+                       twilio::video::kTSCoreLogLevelDebug,
+                       "%s", func_name.c_str());
+    RoomContext *room_context = reinterpret_cast<RoomContext *>(j_native_handle);
+    return room_context->room->isRecording();
+}
+
 JNIEXPORT void JNICALL Java_com_twilio_video_Room_nativeDisconnect
         (JNIEnv *env, jobject j_instance, jlong j_native_handle) {
     std::string func_name = std::string(__FUNCTION__);
@@ -24,7 +35,7 @@ JNIEXPORT void JNICALL Java_com_twilio_video_Room_nativeGetStats
     RoomContext *room_context = reinterpret_cast<RoomContext *>(j_native_room_context);
     StatsObserverContext *stats_observer_context =
         reinterpret_cast<StatsObserverContext *>(j_native_stats_observer);
-    room_context->room->getStats(stats_observer_context->stats_observer.get());
+    room_context->room->getStats(stats_observer_context->stats_observer);
 }
 
 JNIEXPORT void JNICALL Java_com_twilio_video_Room_nativeRelease

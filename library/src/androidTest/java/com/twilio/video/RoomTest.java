@@ -153,7 +153,48 @@ public class RoomTest extends BaseClientTest {
             public void onParticipantDisconnected(Room room, Participant participant) {
                 fail();
             }
+
+            @Override
+            public void onRecordingStarted(Room room) {
+                fail();
+            }
+
+            @Override
+            public void onRecordingStopped(Room room) {
+                fail();
+            }
         });
         assertTrue(connectFailure.await(10, TimeUnit.SECONDS));
     }
+
+    @Test
+    public void shouldReturnValidRecordingState() throws InterruptedException {
+        CallbackHelper.FakeRoomListener roomListener = new CallbackHelper.FakeRoomListener();
+        roomListener.onConnectedLatch = new CountDownLatch(1);
+
+        ConnectOptions connectOptions = new ConnectOptions.Builder()
+                .roomName(roomName)
+                .localMedia(localMedia)
+                .build();
+        Room room = videoClient.connect(connectOptions, roomListener);
+        assertNull(room.getLocalParticipant());
+        assertTrue(roomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
+
+        if(BuildConfig.TOPOLOGY.equals(SimplerSignalingUtils.P2P) ||
+                BuildConfig.TOPOLOGY.equals(SimplerSignalingUtils.SFU)) {
+           Assert.assertFalse(room.isRecording());
+        } else {
+            /*
+             * Making an assumption that other topologies, will have recording enabled by default.
+             * This assumption is subject to change and we will have to update this test
+             * accordingly.
+             */
+            Assert.assertTrue(room.isRecording());
+        }
+
+        room.disconnect();
+
+        Assert.assertFalse(room.isRecording());
+    }
+
 }

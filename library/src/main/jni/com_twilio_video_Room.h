@@ -18,6 +18,9 @@ struct StatsObserverContext {
     std::shared_ptr<twilio::video::StatsObserver> stats_observer;
 };
 
+JNIEXPORT jboolean JNICALL Java_com_twilio_video_Room_nativeIsRecording
+        (JNIEnv *, jobject, jlong);
+
 JNIEXPORT void JNICALL Java_com_twilio_video_Room_nativeDisconnect
         (JNIEnv *, jobject, jlong);
 
