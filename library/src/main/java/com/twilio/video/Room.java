@@ -165,17 +165,14 @@ public class Room {
         return internalRoomListenerImpl;
     }
 
+    // Doesn't release native room observer
     synchronized void release() {
         if (nativeRoomContext != 0) {
             nativeRelease(nativeRoomContext);
             nativeRoomContext = 0;
-            // TODO: Once native video team makes decision about participant strategy
-            // after disconnect, make sure it is properly implemented here. For now we are just
-            // removing native participant context in order to prevent memory leak.
             for (Participant participant : participantMap.values()) {
                 participant.release();
             }
-            internalRoomListenerHandle.release();
             if (internalStatsListenerHandle != null) {
                 internalStatsListenerHandle.release();
                 internalStatsListenerHandle = null;
@@ -252,6 +249,12 @@ public class Room {
             handler.post(new Runnable() {
                 @Override
                 public void run() {
+                    // Removing room observer on calling thread was causing a crash on some
+                    // devices (HTC 10). Check https://issues.corp.twilio.com/browse/CSDK-1114 for
+                    // details. This is a patch until underlying condition
+                    // (accessing deleted pointer) is fixed in core.
+                    internalRoomListenerHandle.release();
+
                     Room.this.listener.onDisconnected(Room.this, twilioException);
                 }
             });

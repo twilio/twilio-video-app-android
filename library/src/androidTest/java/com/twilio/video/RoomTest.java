@@ -1,7 +1,7 @@
 package com.twilio.video;
 
 import android.support.test.filters.LargeTest;
-import android.support.test.rule.*;
+import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
 
 import com.twilio.video.base.BaseClientTest;
@@ -109,18 +109,23 @@ public class RoomTest extends BaseClientTest {
     }
 
     @Test
-    public void canDisconnect() throws InterruptedException {
-        CallbackHelper.FakeRoomListener roomListener = new CallbackHelper.FakeRoomListener();
-        roomListener.onConnectedLatch = new CountDownLatch(1);
-        roomListener.onDisconnectedLatch = new CountDownLatch(1);
+    public void shouldReconnect() throws InterruptedException {
+        ConnectOptions connectOptions = new ConnectOptions.Builder()
+            .roomName(roomName)
+            .build();
+        for (int i=0; i < 5; i++) {
+            CallbackHelper.FakeRoomListener roomListener = new CallbackHelper.FakeRoomListener();
+            roomListener.onConnectedLatch = new CountDownLatch(1);
+            roomListener.onDisconnectedLatch = new CountDownLatch(1);
 
-        Room room = videoClient.connect(roomListener);
-        assertTrue(roomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
-        assertEquals(RoomState.CONNECTED, room.getState());
+            Room room = videoClient.connect(connectOptions, roomListener);
+            assertTrue(roomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
+            assertEquals(RoomState.CONNECTED, room.getState());
 
-        room.disconnect();
-        assertTrue(roomListener.onDisconnectedLatch.await(20, TimeUnit.SECONDS));
-        assertEquals(RoomState.DISCONNECTED, room.getState());
+            room.disconnect();
+            assertTrue(roomListener.onDisconnectedLatch.await(20, TimeUnit.SECONDS));
+            assertEquals(RoomState.DISCONNECTED, room.getState());
+        }
     }
 
     @Test
