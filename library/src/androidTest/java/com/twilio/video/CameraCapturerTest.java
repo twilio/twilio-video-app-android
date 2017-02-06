@@ -21,6 +21,12 @@ import static org.junit.Assume.assumeNotNull;
 
 @RunWith(AndroidJUnit4.class)
 public class CameraCapturerTest extends BaseCameraCapturerTest {
+    /*
+     * The camera freeze timeout in WebRTC is 4000 MS. Added 500 MS buffer to prevent
+     * false failures.
+     */
+    private static final int CAMERA_FREEZE_TIMEOUT_MS = 4500;
+
     @Test(expected = NullPointerException.class)
     public void shouldFailWithNullContext() {
         cameraCapturer = new CameraCapturer(null, CameraCapturer.CameraSource.FRONT_CAMERA);
@@ -198,6 +204,51 @@ public class CameraCapturerTest extends BaseCameraCapturerTest {
 
         // Validate our flash mode
         assertEquals(expectedFlashMode, actualCameraParameters.get().getFlashMode());
+    }
+
+    @Test
+    public void updateCameraParameters_shouldNotCauseCameraFreeze() throws InterruptedException {
+        CountDownLatch cameraParametersUpdated = new CountDownLatch(1);
+        final CountDownLatch cameraFroze = new CountDownLatch(1);
+        String expectedFlashMode = Camera.Parameters.FLASH_MODE_TORCH;
+        AtomicReference<Camera.Parameters> actualCameraParameters = new AtomicReference<>();
+        cameraCapturer = new CameraCapturer(cameraCapturerActivity,
+                CameraCapturer.CameraSource.BACK_CAMERA,
+                new CameraCapturer.Listener() {
+                    @Override
+                    public void onFirstFrameAvailable() {
+
+                    }
+
+                    @Override
+                    public void onCameraSwitched() {
+
+                    }
+
+                    @Override
+                    public void onError(@CameraCapturer.Error int errorCode) {
+                        if (errorCode == CameraCapturer.ERROR_CAMERA_FREEZE) {
+                            cameraFroze.countDown();
+
+                        }
+                    }
+                });
+
+        // Begin capturing
+        localVideoTrack = localMedia.addVideoTrack(true, cameraCapturer);
+
+        // Schedule camera parameter update
+        scheduleCameraParameterFlashModeUpdate(cameraParametersUpdated, expectedFlashMode,
+                actualCameraParameters);
+
+        // Wait for parameters to be set
+        assertTrue(cameraParametersUpdated.await(CAMERA_CAPTURE_DELAY_MS, TimeUnit.MILLISECONDS));
+
+        // Validate our flash mode
+        assertEquals(expectedFlashMode, actualCameraParameters.get().getFlashMode());
+
+        // Validate we do not get a camera freeze
+        assertFalse(cameraFroze.await(CAMERA_FREEZE_TIMEOUT_MS, TimeUnit.MILLISECONDS));
     }
 
     @Test
