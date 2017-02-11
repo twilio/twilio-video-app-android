@@ -29,26 +29,37 @@ public class VideoClient {
     private final Handler handler;
     private final Context applicationContext;
     private final Set<Room> rooms = new HashSet<>();
+    private NetworkInfo currentNetworkInfo = null;
+
     private final BroadcastReceiver connectivityChangeReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             if (intent.getAction().equalsIgnoreCase(ConnectivityManager.CONNECTIVITY_ACTION)) {
                 ConnectivityManager conn =  (ConnectivityManager)
                         context.getSystemService(Context.CONNECTIVITY_SERVICE);
-                NetworkInfo networkInfo = conn.getActiveNetworkInfo();
+                NetworkInfo newNetworkInfo = conn.getActiveNetworkInfo();
                 NetworkChangeEvent networkChangeEvent = NetworkChangeEvent.CONNECTION_CHANGED;
 
-                if (networkInfo == null || !networkInfo.isConnectedOrConnecting()) {
+                if ((newNetworkInfo != null) &&
+                    (currentNetworkInfo == null ||
+                     currentNetworkInfo.getDetailedState() != newNetworkInfo.getDetailedState() ||
+                     currentNetworkInfo.getType() != newNetworkInfo.getType() ||
+                     currentNetworkInfo.getSubtype() != newNetworkInfo.getSubtype())){
+                    if (!newNetworkInfo.isConnectedOrConnecting()) {
+                        networkChangeEvent = NetworkChangeEvent.CONNECTION_LOST;
+                    }
+                    logger.d("Network event detected: " + networkChangeEvent.name());
+                    nativeOnNetworkChange(nativeClientContext, networkChangeEvent);
+                } else if (newNetworkInfo == null) {
                     networkChangeEvent = NetworkChangeEvent.CONNECTION_LOST;
-                } else if (networkInfo.isConnected()) {
-                    networkChangeEvent = NetworkChangeEvent.CONNECTION_CHANGED;
+                    logger.d("Network connection lost");
+                    nativeOnNetworkChange(nativeClientContext, networkChangeEvent);
                 }
-
-                logger.d("Network event detected: " + networkChangeEvent.name());
-                nativeOnNetworkChange(nativeClientContext, networkChangeEvent);
+                currentNetworkInfo = newNetworkInfo;
             }
         }
     };
+
     private String token;
     private long nativeClientContext;
 
@@ -150,6 +161,10 @@ public class VideoClient {
 
             // Register for connectivity events
             registerConnectivityBroadcastReceiver();
+            ConnectivityManager conn =  (ConnectivityManager)
+                applicationContext.getSystemService(Context.CONNECTIVITY_SERVICE);
+            currentNetworkInfo = conn.getActiveNetworkInfo();
+
         }
 
         // Update the token in case user has updated
