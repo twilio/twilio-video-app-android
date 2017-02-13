@@ -53,6 +53,7 @@ library-sfu-instrumentation-tests:
         - class com.twilio.video.StatsTest
         - class com.twilio.video.VideoClientTest
         - class com.twilio.video.VideoTrackTest
+        - class com.twilio.video.IceTest
     locales: en
     orientations: portrait
 
