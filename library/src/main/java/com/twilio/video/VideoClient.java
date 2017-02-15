@@ -183,8 +183,8 @@ public class VideoClient {
          * creation is fully completed.
          */
         synchronized (room.getConnectLock()) {
-            long nativeRoomContext = nativeConnect(
-                    nativeClientContext, room.getListenerNativeHandle(), connectOptions);
+            long nativeRoomContext = nativeConnect(nativeClientContext,
+                    room.getListenerNativeHandle(), connectOptions);
             room.setNativeContext(nativeRoomContext);
             room.setState(RoomState.CONNECTING);
         }

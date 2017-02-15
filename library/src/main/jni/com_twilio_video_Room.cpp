@@ -53,13 +53,15 @@ JNIEXPORT void JNICALL Java_com_twilio_video_Room_nativeRelease
 
 JNIEXPORT jlong JNICALL
 Java_com_twilio_video_Room_00024InternalRoomListenerHandle_nativeCreate(JNIEnv *env,
-                                                                          jobject instance,
-                                                                          jobject object) {
+                                                                        jobject instance,
+                                                                        jobject object) {
     TS_CORE_LOG_MODULE(twilio::video::kTSCoreLogModulePlatform,
                        twilio::video::kTSCoreLogLevelDebug,
                        "Create AndroidRoomObserver");
-    AndroidRoomObserver *android_room_observer = new AndroidRoomObserver(env, object);
-    return webrtc_jni::jlongFromPointer(android_room_observer);
+    RoomObserverContext *room_observer_context = new RoomObserverContext();
+    room_observer_context->android_room_observer =
+            std::make_shared<AndroidRoomObserver>(env, object);
+    return webrtc_jni::jlongFromPointer(room_observer_context);
 }
 
 JNIEXPORT void JNICALL
@@ -69,11 +71,11 @@ Java_com_twilio_video_Room_00024InternalRoomListenerHandle_nativeRelease(JNIEnv 
     TS_CORE_LOG_MODULE(twilio::video::kTSCoreLogModulePlatform,
                        twilio::video::kTSCoreLogLevelDebug,
                        "Free AndroidRoomObserver");
-    AndroidRoomObserver
-        *android_room_observer = reinterpret_cast<AndroidRoomObserver *>(nativeHandle);
-    if (android_room_observer != nullptr) {
-        android_room_observer->setObserverDeleted();
-        delete android_room_observer;
+    RoomObserverContext
+        *room_observer_context = reinterpret_cast<RoomObserverContext *>(nativeHandle);
+    if (room_observer_context != nullptr) {
+        room_observer_context->android_room_observer->setObserverDeleted();
+        delete room_observer_context;
     }
 }
 

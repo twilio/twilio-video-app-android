@@ -3,9 +3,6 @@ cmake_minimum_required(VERSION 3.4.1)
 # Set the library name
 set(VIDEO_ANDROID_LIBRARY jingle_peerconnection_so)
 
-# Set the target arch
-string(REPLACE "-" "" TARGET_ARCH ${ANDROID_ABI})
-
 # Set compiler name and version
 string(REGEX MATCH "^([0-9]+\\.[0-9]+)" COMPILER_VERSION ${CMAKE_CXX_COMPILER_VERSION})
 string(TOLOWER ${CMAKE_CXX_COMPILER_ID}-${COMPILER_VERSION} COMPILER)
@@ -14,7 +11,7 @@ string(TOLOWER ${CMAKE_CXX_COMPILER_ID}-${COMPILER_VERSION} COMPILER)
 string(TOLOWER ${CMAKE_BUILD_TYPE} BUILD_TYPE)
 
 # Set core paths
-set(CORE_HOME_DIR ${VIDEO_DEPS_PREFIX}/${TARGET_ARCH}/${COMPILER}/${BUILD_TYPE})
+set(CORE_HOME_DIR ${VIDEO_DEPS_PREFIX}/${ANDROID_ABI}/${COMPILER}/${BUILD_TYPE})
 set(CORE_INCLUDE_DIR ${CORE_HOME_DIR}/include)
 set(CORE_STATIC_LIB_DIR ${CORE_HOME_DIR}/lib)
 

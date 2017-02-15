@@ -152,15 +152,15 @@ JNIEXPORT jlong JNICALL
 Java_com_twilio_video_VideoClient_nativeConnect(JNIEnv *env,
                                                 jobject j_instance,
                                                 jlong j_client_context,
-                                                jlong j_android_room_observer_handle,
+                                                jlong j_room_observer_context,
                                                 jobject j_connect_options) {
 
 
     ClientContext *client_context =
             reinterpret_cast<ClientContext *>(j_client_context);
 
-    AndroidRoomObserver *android_room_observer =
-            reinterpret_cast<AndroidRoomObserver *>(j_android_room_observer_handle);
+    RoomObserverContext *room_observer_context =
+            reinterpret_cast<RoomObserverContext *>(j_room_observer_context);
 
     std::unique_ptr<twilio::video::Room> room;
 
@@ -176,11 +176,11 @@ Java_com_twilio_video_VideoClient_nativeConnect(JNIEnv *env,
         ConnectOptionsContext *connect_options_context =
                 reinterpret_cast<ConnectOptionsContext *>(j_connect_options_handle);
         room = client_context->getClient().connect(connect_options_context->connect_options,
-                                                   android_room_observer);
+                                                   room_observer_context->android_room_observer);
         delete connect_options_context;
 
     } else {
-        room = client_context->getClient().connect(android_room_observer);
+        room = client_context->getClient().connect(room_observer_context->android_room_observer);
     }
 
 

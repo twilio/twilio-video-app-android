@@ -390,7 +390,7 @@ public class Room {
     }
 
     class InternalRoomListenerHandle extends NativeHandle {
-        public InternalRoomListenerHandle(InternalRoomListener listener) {
+        InternalRoomListenerHandle(InternalRoomListener listener) {
             super(listener);
         }
 
@@ -409,7 +409,7 @@ public class Room {
         void onStats(List<StatsReport> statsReports);
     }
 
-    class InternalStatsListenerImpl implements InternalStatsListener{
+    class InternalStatsListenerImpl implements InternalStatsListener {
 
         public void onStats(final List<StatsReport> statsReports) {
             final Pair<Handler, StatsListener> statsPair = Room.this.statsListenersQueue.poll();

@@ -1,7 +1,9 @@
 #include <jni.h>
 #include <memory>
-#include <video/stats_observer.h>
+
+#include "video/stats_observer.h"
 #include "video/room.h"
+#include "android_room_observer.h"
 
 #ifndef _Included_com_twilio_conversations_Room
 #define _Included_com_twilio_conversations_Room
@@ -12,6 +14,10 @@ extern "C" {
 
 struct RoomContext {
     std::unique_ptr<twilio::video::Room> room;
+};
+
+struct RoomObserverContext {
+    std::shared_ptr<AndroidRoomObserver> android_room_observer;
 };
 
 struct StatsObserverContext {
