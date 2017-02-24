@@ -34,17 +34,17 @@ public class VideoClientTest extends BaseClientTest {
             new ActivityTestRule<>(MediaTestActivity.class);
     private MediaTestActivity mediaTestActivity;
     private String token;
-    private VideoClient videoClient;
     private String roomName;
     private LocalMedia localMedia;
+    private CallbackHelper.FakeRoomListener roomListener;
 
     @Before
     public void setup() throws InterruptedException {
         super.setup();
         mediaTestActivity = activityRule.getActivity();
+        roomListener = new CallbackHelper.FakeRoomListener();
         PermissionUtils.allowPermissions(mediaTestActivity);
         token = AccessTokenUtils.getAccessToken(Constants.PARTICIPANT_ALICE);
-        videoClient = new VideoClient(mediaTestActivity, token);
         roomName = RandUtils.generateRandomString(20);
         localMedia = LocalMedia.create(mediaTestActivity);
         VideoClient.setLogLevel(LogLevel.ALL);
@@ -56,13 +56,16 @@ public class VideoClientTest extends BaseClientTest {
     }
 
     @Test(expected = NullPointerException.class)
-    public void client_shouldThrowExceptionWhenContextIsNull() {
-        new VideoClient(null, token);
+    public void connect_shouldThrowExceptionWhenContextIsNull() {
+        ConnectOptions connectOptions = new ConnectOptions.Builder(token)
+            .roomName(roomName)
+            .build();
+        Room room = VideoClient.connect(null, connectOptions, roomListener);
     }
 
     @Test(expected = NullPointerException.class)
-    public void client_shouldThrowExceptionWhenTokenIsNull() {
-        new VideoClient(mediaTestActivity, null);
+    public void connect_shouldThrowExceptionWhenConnectOptionsIsNull() {
+        Room room = VideoClient.connect(mediaTestActivity, null, roomListener);
     }
 
     @Test
@@ -83,10 +86,10 @@ public class VideoClientTest extends BaseClientTest {
 
     @Test
     public void connect_shouldConnectToRoom() throws InterruptedException {
-        CallbackHelper.FakeRoomListener roomListener = new CallbackHelper.FakeRoomListener();
         roomListener.onConnectedLatch = new CountDownLatch(1);
-
-        Room room = videoClient.connect(roomListener);
+        ConnectOptions connectOptions = new ConnectOptions.Builder(token)
+            .build();
+        Room room = VideoClient.connect(mediaTestActivity, connectOptions, roomListener);
         assertTrue(roomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
         assertEquals(room.getSid(), room.getName());
         room.disconnect();
@@ -94,8 +97,9 @@ public class VideoClientTest extends BaseClientTest {
 
     @Test(expected = NullPointerException.class)
     public void connect_shouldThrowExceptionWhenRoomListenerIsNull() {
-        VideoClient videoClient = new VideoClient(mediaTestActivity, token);
-        videoClient.connect(null);
+        ConnectOptions connectOptions = new ConnectOptions.Builder(token)
+            .build();
+        VideoClient.connect(mediaTestActivity, connectOptions, null);
     }
 
     @Test
@@ -103,11 +107,11 @@ public class VideoClientTest extends BaseClientTest {
         CallbackHelper.FakeRoomListener roomListener = new CallbackHelper.FakeRoomListener();
         roomListener.onConnectedLatch = new CountDownLatch(1);
 
-        ConnectOptions connectOptions = new ConnectOptions.Builder()
+        ConnectOptions connectOptions = new ConnectOptions.Builder(token)
                 .roomName(roomName)
                 .localMedia(localMedia)
                 .build();
-        Room room = videoClient.connect(connectOptions, roomListener);
+        Room room = VideoClient.connect(mediaTestActivity, connectOptions, roomListener);
         assertTrue(roomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
         assertNotNull(room.getLocalParticipant().getLocalMedia());
         room.disconnect();
@@ -115,15 +119,14 @@ public class VideoClientTest extends BaseClientTest {
 
     @Test
     public void connect_shouldAllowLocalMediaWithAudio() throws InterruptedException {
-        CallbackHelper.FakeRoomListener roomListener = new CallbackHelper.FakeRoomListener();
         LocalAudioTrack localAudioTrack = localMedia.addAudioTrack(true);
         roomListener.onConnectedLatch = new CountDownLatch(1);
 
-        ConnectOptions connectOptions = new ConnectOptions.Builder()
+        ConnectOptions connectOptions = new ConnectOptions.Builder(token)
                 .roomName(roomName)
                 .localMedia(localMedia)
                 .build();
-        Room room = videoClient.connect(connectOptions, roomListener);
+        Room room = VideoClient.connect(mediaTestActivity, connectOptions, roomListener);
         assertTrue(roomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
         assertNotNull(room.getLocalParticipant().getLocalMedia());
         assertTrue(localMedia.removeAudioTrack(localAudioTrack));
@@ -132,16 +135,15 @@ public class VideoClientTest extends BaseClientTest {
 
     @Test
     public void connect_shouldAllowLocalMediaWithVideo() throws InterruptedException {
-        CallbackHelper.FakeRoomListener roomListener = new CallbackHelper.FakeRoomListener();
         FakeVideoCapturer fakeVideoCapturer = new FakeVideoCapturer();
         LocalVideoTrack localVideoTrack = localMedia.addVideoTrack(true, fakeVideoCapturer);
         roomListener.onConnectedLatch = new CountDownLatch(1);
 
-        ConnectOptions connectOptions = new ConnectOptions.Builder()
+        ConnectOptions connectOptions = new ConnectOptions.Builder(token)
                 .roomName(roomName)
                 .localMedia(localMedia)
                 .build();
-        Room room = videoClient.connect(connectOptions, roomListener);
+        Room room = VideoClient.connect(mediaTestActivity, connectOptions, roomListener);
         assertTrue(roomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
         assertNotNull(room.getLocalParticipant().getLocalMedia());
         assertTrue(localMedia.removeVideoTrack(localVideoTrack));
@@ -150,45 +152,20 @@ public class VideoClientTest extends BaseClientTest {
 
     @Test
     public void connect_shouldAllowLocalMediaWithAudioAndVideo() throws InterruptedException {
-        CallbackHelper.FakeRoomListener roomListener = new CallbackHelper.FakeRoomListener();
         FakeVideoCapturer fakeVideoCapturer = new FakeVideoCapturer();
         LocalAudioTrack localAudioTrack = localMedia.addAudioTrack(true);
         LocalVideoTrack localVideoTrack = localMedia.addVideoTrack(true, fakeVideoCapturer);
         roomListener.onConnectedLatch = new CountDownLatch(1);
 
-        ConnectOptions connectOptions = new ConnectOptions.Builder()
+        ConnectOptions connectOptions = new ConnectOptions.Builder(token)
                 .roomName(roomName)
                 .localMedia(localMedia)
                 .build();
-        Room room = videoClient.connect(connectOptions, roomListener);
+        Room room = VideoClient.connect(mediaTestActivity, connectOptions, roomListener);
         assertTrue(roomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
         assertNotNull(room.getLocalParticipant().getLocalMedia());
         assertTrue(localMedia.removeAudioTrack(localAudioTrack));
         assertTrue(localMedia.removeVideoTrack(localVideoTrack));
-        room.disconnect();
-    }
-
-    @Test
-    public void shouldAllowTokenUpdate() throws InterruptedException {
-        // First we connect with initial token
-        CallbackHelper.FakeRoomListener roomListener = new CallbackHelper.FakeRoomListener();
-        roomListener.onConnectedLatch = new CountDownLatch(1);
-
-        Room room = videoClient.connect(roomListener);
-        assertTrue(roomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
-        assertEquals(room.getSid(), room.getName());
-        room.disconnect();
-
-        // Now we update token and connect again
-        videoClient.updateToken(AccessTokenUtils.getAccessToken(Constants.PARTICIPANT_BOB));
-
-        // Connect again with new token
-        roomListener = new CallbackHelper.FakeRoomListener();
-        roomListener.onConnectedLatch = new CountDownLatch(1);
-
-        room = videoClient.connect(roomListener);
-        assertTrue(roomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
-        assertEquals(room.getSid(), room.getName());
         room.disconnect();
     }
 }

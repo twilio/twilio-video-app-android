@@ -21,18 +21,6 @@ JNIEXPORT jint JNICALL Java_com_twilio_video_VideoClient_nativeGetCoreLogLevel
 JNIEXPORT jlong JNICALL Java_com_twilio_video_VideoClient_nativeCreateClient
         (JNIEnv *, jobject, jobject, jstring, jlong);
 
-JNIEXPORT jlong JNICALL Java_com_twilio_video_VideoClient_nativeConnect
-        (JNIEnv *, jobject, jlong, jlong, jobject);
-
-JNIEXPORT jlong JNICALL Java_com_twilio_video_VideoClient_nativeUpdateToken
-        (JNIEnv *, jobject, jlong, jstring);
-
-JNIEXPORT void JNICALL Java_com_twilio_video_VideoClient_nativeOnNetworkChange
-        (JNIEnv *, jobject, jlong, jobject);
-
-JNIEXPORT void JNICALL Java_com_twilio_video_VideoClient_nativeRelease
-        (JNIEnv *, jobject, jlong);
-
 }
 
 #ifdef __cplusplus

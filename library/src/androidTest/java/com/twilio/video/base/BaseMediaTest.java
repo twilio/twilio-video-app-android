@@ -39,8 +39,6 @@ public abstract class BaseMediaTest extends BaseClientTest {
     protected LocalMedia actor1LocalMedia;
     protected LocalMedia actor2LocalMedia;
     protected FakeVideoCapturer fakeVideoCapturer;
-    protected VideoClient actor1VideoClient;
-    protected VideoClient actor2VideoClient;
     protected String tokenOne;
     protected String  tokenTwo;
     protected Room actor1Room;
@@ -50,13 +48,13 @@ public abstract class BaseMediaTest extends BaseClientTest {
     protected CallbackHelper.FakeRoomListener actor1RoomListener;
     protected CallbackHelper.FakeRoomListener actor2RoomListener;
 
-    protected Room connectClient(VideoClient videoClient, LocalMedia localMedia,
+    protected Room connectClient(String token, LocalMedia localMedia,
                                Room.Listener roomListener) {
-        ConnectOptions connectOptions = new ConnectOptions.Builder()
+        ConnectOptions connectOptions = new ConnectOptions.Builder(token)
                 .roomName(testRoom)
                 .localMedia(localMedia)
                 .build();
-        Room room = videoClient.connect(connectOptions, roomListener);
+        Room room = VideoClient.connect(mediaTestActivity, connectOptions, roomListener);
         return room;
     }
 
@@ -79,31 +77,20 @@ public abstract class BaseMediaTest extends BaseClientTest {
         fakeVideoCapturer = new FakeVideoCapturer();
         actor1LocalMedia = LocalMedia.create(mediaTestActivity);
         tokenOne = AccessTokenUtils.getAccessToken(Constants.PARTICIPANT_ALICE);
-        Instrumentation instrumentation = InstrumentationRegistry.getInstrumentation();
-        instrumentation.runOnMainSync(new Runnable() {
-            @Override
-            public void run() {
-                actor1VideoClient = new VideoClient(mediaTestActivity, tokenOne);
-            }
-        });
+
         // Connect actor 1
         actor1RoomListener = new CallbackHelper.FakeRoomListener();
         actor1RoomListener.onConnectedLatch = new CountDownLatch(1);
         actor1RoomListener.onParticipantConnectedLatch = new CountDownLatch(1);
-        actor1Room = connectClient(actor1VideoClient, actor1LocalMedia, actor1RoomListener);
+        actor1Room = connectClient(tokenOne, actor1LocalMedia, actor1RoomListener);
         assertTrue(actor1RoomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
 
         // Connect actor 2
         actor2LocalMedia = LocalMedia.create(mediaTestActivity);
         tokenTwo = AccessTokenUtils.getAccessToken(Constants.PARTICIPANT_BOB);
-        instrumentation.runOnMainSync(new Runnable() {
-            @Override
-            public void run() {
-                actor2VideoClient = new VideoClient(mediaTestActivity, tokenTwo);
-            }
-        });
+
         actor2RoomListener = new CallbackHelper.FakeRoomListener();
-        actor2Room = connectClient(actor2VideoClient, actor2LocalMedia, actor2RoomListener);
+        actor2Room = connectClient(tokenTwo, actor2LocalMedia, actor2RoomListener);
 
         // Wait for actor2 to connect
         assertTrue(actor1RoomListener.onParticipantConnectedLatch.await(20, TimeUnit.SECONDS));
@@ -121,8 +108,6 @@ public abstract class BaseMediaTest extends BaseClientTest {
         actor1Room = null;
         actor1RoomListener = null;
         participant = null;
-        actor1VideoClient = null;
-        actor2VideoClient = null;
         actor1LocalMedia.release();
         actor1LocalMedia = null;
         actor2LocalMedia.release();

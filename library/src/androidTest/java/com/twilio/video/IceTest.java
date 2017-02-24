@@ -32,7 +32,7 @@ public class IceTest extends BaseClientTest {
     public ActivityTestRule<MediaTestActivity> activityRule =
         new ActivityTestRule<>(MediaTestActivity.class);
     private MediaTestActivity mediaTestActivity;
-    private VideoClient aliceVideoClient, bobVideoClient;
+    private String aliceToken, bobToken;
     private String roomName;
     private LocalMedia aliceLocalMedia, bobLocalMedia;
 
@@ -44,12 +44,10 @@ public class IceTest extends BaseClientTest {
         VideoClient.setModuleLogLevel(LogModule.SIGNALING, LogLevel.ALL);
         mediaTestActivity = activityRule.getActivity();
         PermissionUtils.allowPermissions(mediaTestActivity);
-        String aliceToken = AccessTokenUtils.getAccessToken(Constants.PARTICIPANT_ALICE);
-        aliceVideoClient = new VideoClient(mediaTestActivity, aliceToken);
+        aliceToken = AccessTokenUtils.getAccessToken(Constants.PARTICIPANT_ALICE);
         roomName = RandUtils.generateRandomString(20);
         aliceLocalMedia = LocalMedia.create(mediaTestActivity);
-        String bobToken = AccessTokenUtils.getAccessToken(Constants.PARTICIPANT_BOB);
-        bobVideoClient = new VideoClient(mediaTestActivity, bobToken);
+        bobToken = AccessTokenUtils.getAccessToken(Constants.PARTICIPANT_BOB);
         bobLocalMedia = LocalMedia.create(mediaTestActivity);
     }
 
@@ -72,13 +70,13 @@ public class IceTest extends BaseClientTest {
             .iceServers(iceServers)
             .iceTransportPolicy(IceTransportPolicy.RELAY)
             .build();
-        ConnectOptions connectOptions = new ConnectOptions.Builder()
+        ConnectOptions connectOptions = new ConnectOptions.Builder(aliceToken)
             .roomName(roomName)
             .iceOptions(iceOptions)
             .localMedia(aliceLocalMedia)
             .build();
 
-        Room room = aliceVideoClient.connect(connectOptions, roomListener);
+        Room room = VideoClient.connect(mediaTestActivity, connectOptions, roomListener);
         assertTrue(roomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
         room.disconnect();
         assertTrue(roomListener.onDisconnectedLatch.await(20, TimeUnit.SECONDS));
@@ -98,7 +96,7 @@ public class IceTest extends BaseClientTest {
             .build();
         aliceLocalMedia.addAudioTrack(true);
 
-        ConnectOptions connectOptions = new ConnectOptions.Builder()
+        ConnectOptions connectOptions = new ConnectOptions.Builder(aliceToken)
             .roomName(roomName)
             .iceOptions(iceOptions)
             .localMedia(aliceLocalMedia)
@@ -107,7 +105,7 @@ public class IceTest extends BaseClientTest {
         roomListener.onConnectedLatch = new CountDownLatch(1);
         roomListener.onDisconnectedLatch = new CountDownLatch(1);
 
-        Room aliceRoom = aliceVideoClient.connect(connectOptions, roomListener);
+        Room aliceRoom = VideoClient.connect(mediaTestActivity, connectOptions, roomListener);
         assertTrue(roomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
 
         aliceRoom.disconnect();
@@ -128,19 +126,19 @@ public class IceTest extends BaseClientTest {
             .iceTransportPolicy(IceTransportPolicy.RELAY)
             .build();
         aliceLocalMedia.addAudioTrack(true);
-        ConnectOptions connectOptions = new ConnectOptions.Builder()
+        ConnectOptions connectOptions = new ConnectOptions.Builder(aliceToken)
             .roomName(roomName)
             .iceOptions(iceOptions)
             .localMedia(aliceLocalMedia)
             .build();
 
-        Room aliceRoom = aliceVideoClient.connect(connectOptions, aliceListener);
+        Room aliceRoom = VideoClient.connect(mediaTestActivity, connectOptions, aliceListener);
         assertTrue(aliceListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
 
         bobLocalMedia.addAudioTrack(true);
         bobLocalMedia.addVideoTrack(true, new FakeVideoCapturer());
 
-        connectOptions = new ConnectOptions.Builder()
+        connectOptions = new ConnectOptions.Builder(bobToken)
             .roomName(roomName)
             .iceOptions(iceOptions)
             .localMedia(bobLocalMedia)
@@ -150,7 +148,7 @@ public class IceTest extends BaseClientTest {
         CallbackHelper.FakeMediaListener mediaListener = new CallbackHelper.FakeMediaListener();
         mediaListener.onAudioTrackAddedLatch = new CountDownLatch(1);
         mediaListener.onVideoTrackAddedLatch = new CountDownLatch(1);
-        Room bobRoom = bobVideoClient.connect(connectOptions, bobListener);
+        Room bobRoom = VideoClient.connect(mediaTestActivity, connectOptions, bobListener);
         assertTrue(bobListener.onConnectedLatch.await(10, TimeUnit.SECONDS));
         assertTrue(aliceListener.onParticipantConnectedLatch.await(10, TimeUnit.SECONDS));
         aliceRoom.getParticipants().entrySet().iterator().next()

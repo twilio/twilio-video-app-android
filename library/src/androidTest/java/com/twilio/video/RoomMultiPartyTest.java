@@ -38,7 +38,7 @@ public class RoomMultiPartyTest extends BaseClientTest {
     };
 
     private Context context;
-    private List<VideoClient> videoClients;
+    private List<String> tokens;
     private List<Pair<Room, CallbackHelper.FakeRoomListener>> rooms;
     private String roomName;
 
@@ -47,10 +47,9 @@ public class RoomMultiPartyTest extends BaseClientTest {
         super.setup();
         context = InstrumentationRegistry.getInstrumentation().getTargetContext();
         rooms = new ArrayList<>();
-        videoClients = new ArrayList<>();
+        tokens = new ArrayList<>();
         for (int i = 0; i < PARTICIPANT_NUM; i++) {
-            String token = AccessTokenUtils.getAccessToken(PARTICIPANTS[i]);
-            videoClients.add(new VideoClient(context, token));
+            tokens.add(AccessTokenUtils.getAccessToken(PARTICIPANTS[i]));
         }
         roomName = RandUtils.generateRandomString(20);
     }
@@ -67,7 +66,7 @@ public class RoomMultiPartyTest extends BaseClientTest {
 
     @Test
     public void shouldHaveCorrectParticipantCount() throws InterruptedException {
-        for (VideoClient client : videoClients) {
+        for (String token : tokens) {
             CallbackHelper.FakeRoomListener roomListener = new CallbackHelper.FakeRoomListener();
             roomListener.onConnectedLatch = new CountDownLatch(1);
             int numberOfParticipants = rooms.size();
@@ -77,7 +76,7 @@ public class RoomMultiPartyTest extends BaseClientTest {
                 roomPair.second.onParticipantConnectedLatch = new CountDownLatch(1);
             }
 
-            Room room = createRoom(client, roomListener, roomName);
+            Room room = createRoom(token, roomListener, roomName);
             assertTrue(roomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
             assertEquals(numberOfParticipants, room.getParticipants().size());
 
@@ -93,11 +92,11 @@ public class RoomMultiPartyTest extends BaseClientTest {
 
     @Test
     public void shouldNotHaveLocalParticipantInParticipantsList() throws InterruptedException {
-        for (VideoClient client : videoClients) {
+        for (String token : tokens) {
             CallbackHelper.FakeRoomListener roomListener = new CallbackHelper.FakeRoomListener();
             roomListener.onConnectedLatch = new CountDownLatch(1);
 
-            Room room = createRoom(client, roomListener, roomName);
+            Room room = createRoom(token, roomListener, roomName);
             String localIdentity = room.getLocalParticipant().getIdentity();
             String localSid = room.getLocalParticipant().getSid();
 
@@ -110,14 +109,14 @@ public class RoomMultiPartyTest extends BaseClientTest {
         }
     }
 
-    private Room createRoom(VideoClient videoClient, CallbackHelper.FakeRoomListener listener,
+    private Room createRoom(String token, CallbackHelper.FakeRoomListener listener,
                             String roomName) throws InterruptedException {
         listener.onConnectedLatch = new CountDownLatch(1);
 
-        ConnectOptions connectOptions = new ConnectOptions.Builder()
+        ConnectOptions connectOptions = new ConnectOptions.Builder(token)
                 .roomName(roomName)
                 .build();
-        Room room = videoClient.connect(connectOptions, listener);
+        Room room = VideoClient.connect(context, connectOptions, listener);
         assertTrue(listener.onConnectedLatch.await(20, TimeUnit.SECONDS));
         return room;
     }

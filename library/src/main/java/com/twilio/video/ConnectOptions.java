@@ -4,14 +4,20 @@ package com.twilio.video;
  * Represents options when connecting to a {@link Room}.
  */
 public class ConnectOptions {
+    private final String accessToken;
     private final String roomName;
     private final LocalMedia localMedia;
     private final IceOptions iceOptions;
 
     private ConnectOptions(Builder builder) {
+        this.accessToken = builder.accessToken;
         this.roomName = builder.roomName;
         this.localMedia = builder.localMedia;
         this.iceOptions = builder.iceOptions;
+    }
+
+    String getAccessToken() {
+        return accessToken;
     }
 
     String getRoomName() {
@@ -27,23 +33,29 @@ public class ConnectOptions {
     }
 
     private long createNativeObject() {
-        return nativeCreate(roomName, localMedia, iceOptions);
+        return nativeCreate(
+            accessToken, roomName, localMedia, iceOptions, PlatformInfo.getNativeHandle());
     }
 
-    private native long nativeCreate(String name,
+    private native long nativeCreate(String accessToken,
+                                     String roomName,
                                      LocalMedia localMedia,
-                                     IceOptions iceOptions);
+                                     IceOptions iceOptions,
+                                     long platformInfoNativeHandle);
     /**
      * Build new {@link ConnectOptions}.
      *
      * <p>All methods are optional.</p>
      */
     public static class Builder {
+        private String accessToken = "";
         private String roomName = "";
         private LocalMedia localMedia;
         private IceOptions iceOptions;
 
-        public Builder() { }
+        public Builder(String accessToken) {
+            this.accessToken = accessToken;
+        }
 
         /**
          * The name of the room.
@@ -69,7 +81,17 @@ public class ConnectOptions {
             return this;
         }
 
+        /**
+         * Builds {@link ConnectOptions} object.
+         * @throws Exception if accessToken is null or empty.
+         */
         public ConnectOptions build() {
+            if (accessToken == null) {
+                throw new NullPointerException("Token must not be null.");
+            }
+            if (accessToken.equals("")) {
+                throw new IllegalArgumentException("Token must not be empty.");
+            }
             return new ConnectOptions(this);
         }
     }

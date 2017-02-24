@@ -1,5 +1,6 @@
 package com.twilio.video;
 
+import android.content.Context;
 import android.os.Handler;
 import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
@@ -158,11 +159,32 @@ public class Room {
         this.nativeRoomContext = nativeRoomHandle;
     }
 
+    void onNetworkChanged(VideoClient.NetworkChangeEvent networkChangeEvent) {
+        if (nativeRoomContext != 0) {
+            nativeOnNetworkChange(nativeRoomContext, networkChangeEvent);
+        }
+    }
+
     /*
      * Needed for synchronizing during room creation.
      */
     Object getConnectLock() {
         return internalRoomListenerImpl;
+    }
+
+    /*
+     * We need to synchronize access to room listener during initialization and make
+     * sure that onConnect() callback won't get called before connect() exits and Room
+     * creation is fully completed.
+     */
+    void connect(Context context, ConnectOptions connectOptions) {
+        synchronized (internalRoomListenerImpl) {
+            this.nativeRoomContext = nativeConnect(
+                connectOptions,
+                MediaFactory.instance(context).getNativeMediaFactoryHandle(),
+                internalRoomListenerHandle.get());
+            this.roomState = RoomState.CONNECTING;
+        }
     }
 
     // Doesn't release native room observer
@@ -440,8 +462,13 @@ public class Room {
         protected native void nativeRelease(long nativeHandle);
     }
 
+    private native long nativeConnect(ConnectOptions ConnectOptions,
+                                      long nativeMediaFactoryHandle,
+                                      long nativeRoomListenerHandle);
     private native boolean nativeIsRecording(long nativeRoomContext);
     private native void nativeDisconnect(long nativeRoomContext);
     private native void nativeGetStats(long nativeRoomContext, long nativeStatsObserver);
     private native void nativeRelease(long nativeRoomContext);
+    private native void nativeOnNetworkChange(long nativeRoomContext,
+                                              VideoClient.NetworkChangeEvent networkChangeEvent);
 }

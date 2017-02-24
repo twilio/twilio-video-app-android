@@ -26,12 +26,11 @@ public class VideoClient {
     private static volatile boolean libraryIsLoaded = false;
     private static final Logger logger = Logger.getLogger(VideoClient.class);
 
-    private final Handler handler;
-    private final Context applicationContext;
-    private final Set<Room> rooms = new HashSet<>();
-    private NetworkInfo currentNetworkInfo = null;
+    private static final Set<Room> rooms = new HashSet<>();
+    private static NetworkInfo currentNetworkInfo = null;
+    private static Context applicationContext = null;
 
-    private final BroadcastReceiver connectivityChangeReceiver = new BroadcastReceiver() {
+    private static final BroadcastReceiver connectivityChangeReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             if (intent.getAction().equalsIgnoreCase(ConnectivityManager.CONNECTIVITY_ACTION)) {
@@ -49,95 +48,16 @@ public class VideoClient {
                         networkChangeEvent = NetworkChangeEvent.CONNECTION_LOST;
                     }
                     logger.d("Network event detected: " + networkChangeEvent.name());
-                    nativeOnNetworkChange(nativeClientContext, networkChangeEvent);
+                    onNetworkChange(networkChangeEvent);
                 } else if (newNetworkInfo == null) {
                     networkChangeEvent = NetworkChangeEvent.CONNECTION_LOST;
                     logger.d("Network connection lost");
-                    nativeOnNetworkChange(nativeClientContext, networkChangeEvent);
+                    onNetworkChange(networkChangeEvent);
                 }
                 currentNetworkInfo = newNetworkInfo;
             }
         }
     };
-
-    private String token;
-    private long nativeClientContext;
-
-    public VideoClient(Context context, String token) {
-        if (context == null) {
-            throw new NullPointerException("applicationContext must not be null");
-        }
-        if (token == null) {
-            throw new NullPointerException("Token must not be null");
-        }
-
-        this.applicationContext = context.getApplicationContext();
-        this.token = token;
-        this.handler = Util.createCallbackHandler();
-
-        if (!libraryIsLoaded) {
-            ReLinker.loadLibrary(this.applicationContext, "jingle_peerconnection_so");
-            libraryIsLoaded = true;
-        }
-
-        /*
-         * The user may have set the log level prior to the native library being loaded.
-         * Attempt to set the core log level now that the native library has loaded.
-         */
-        trySetCoreLogLevel(level.ordinal());
-
-        /*
-         * It is possible that the user has tried to set the log level for a specific module
-         * before the library has loaded. Here we apply the log level for the module because we
-         * know the native library is available
-         */
-        for (LogModule module : moduleLogLevel.keySet()) {
-            trySetCoreModuleLogLevel(module.ordinal(), moduleLogLevel.get(module).ordinal());
-        }
-    }
-
-    /**
-     * Sets the audio output speaker for the device.
-     * <p>
-     * Bluetooth headset is not supported.
-     * </p>
-     * To use volume up/down keys call
-     * 'setVolumeControlStream(AudioManager.STREAM_VOICE_CALL);' in your Android Activity.
-     *
-     * @param audioOutput that should be used by the system
-     */
-    public void setAudioOutput(AudioOutput audioOutput) {
-        AudioManager audioManager = (AudioManager) applicationContext.getSystemService(Context.AUDIO_SERVICE);
-        if (audioOutput == AudioOutput.SPEAKERPHONE) {
-            audioManager.setSpeakerphoneOn(true);
-        } else {
-            audioManager.setSpeakerphoneOn(false);
-        }
-    }
-
-    /**
-     * Audio output speaker for the current client device.
-     *
-     * @return audio output speaker.
-     */
-    public AudioOutput getAudioOutput() {
-        AudioManager audioManager = (AudioManager) applicationContext.getSystemService(Context.AUDIO_SERVICE);
-        return audioManager.isSpeakerphoneOn() ? AudioOutput.SPEAKERPHONE : AudioOutput.HEADSET;
-    }
-
-    /**
-     * Connect to a {@link Room}.
-     *
-     * @param roomListener listener of room related events.
-     * @return room being connected to.
-     */
-    public Room connect(Room.Listener roomListener) {
-        if (roomListener == null) {
-            throw new NullPointerException("roomListener must not be null");
-        }
-        ConnectOptions connectOptions = new ConnectOptions.Builder().build();
-        return connect(connectOptions, roomListener);
-    }
 
     /**
      * Connect to a {@link Room} with specified options.
@@ -146,7 +66,12 @@ public class VideoClient {
      * @param roomListener listener of room related events.
      * @return room being connected to.
      */
-    public synchronized Room connect(ConnectOptions connectOptions, Room.Listener roomListener) {
+    public static synchronized Room connect(Context context,
+                                            ConnectOptions connectOptions,
+                                            Room.Listener roomListener) {
+        if (context == null) {
+            throw new NullPointerException("context must not be null");
+        }
         if (connectOptions == null) {
             throw new NullPointerException("connectOptions must not be null");
         }
@@ -154,65 +79,62 @@ public class VideoClient {
             throw new NullPointerException("roomListener must not be null");
         }
 
-        if(rooms.isEmpty()) {
-            nativeClientContext = nativeCreateClient(applicationContext,
-                    token,
-                    MediaFactory.instance(applicationContext).getNativeMediaFactoryHandle());
+        // FIXME: we shouldn't be caching this, but otherwise we don't have
+        // a way of unregistering broadcast receiver
+        if (applicationContext == null) {
+            applicationContext = context.getApplicationContext();
+        }
 
+        if (!libraryIsLoaded) {
+            ReLinker.loadLibrary(applicationContext, "jingle_peerconnection_so");
+            libraryIsLoaded = true;
+            /*
+             * The user may have set the log level prior to the native library being loaded.
+             * Attempt to set the core log level now that the native library has loaded.
+             */
+            trySetCoreLogLevel(level.ordinal());
+            /*
+             * It is possible that the user has tried to set the log level for a specific module
+             * before the library has loaded. Here we apply the log level for the module because we
+             * know the native library is available
+             */
+            for (LogModule module : moduleLogLevel.keySet()) {
+                trySetCoreModuleLogLevel(module.ordinal(), moduleLogLevel.get(module).ordinal());
+            }
+        }
+
+        if(rooms.isEmpty()) {
             // Register for connectivity events
             registerConnectivityBroadcastReceiver();
             ConnectivityManager conn =  (ConnectivityManager)
                 applicationContext.getSystemService(Context.CONNECTIVITY_SERVICE);
             currentNetworkInfo = conn.getActiveNetworkInfo();
-
         }
-
-        // Update the token in case user has updated
-        nativeUpdateToken(nativeClientContext, token);
-
         Room room = new Room(connectOptions.getRoomName(),
                 connectOptions.getLocalMedia(),
                 roomListenerProxy(roomListener),
-                handler);
-
+                Util.createCallbackHandler());
         rooms.add(room);
-
-        /*
-         * We need to synchronize access to room listener during initialization and make
-         * sure that onConnect() callback won't get called before connect() exits and Room
-         * creation is fully completed.
-         */
-        synchronized (room.getConnectLock()) {
-            long nativeRoomContext = nativeConnect(nativeClientContext,
-                    room.getListenerNativeHandle(), connectOptions);
-            room.setNativeContext(nativeRoomContext);
-            room.setState(RoomState.CONNECTING);
-        }
-
+        room.connect(applicationContext, connectOptions);
         return room;
     }
 
-    /**
-     * Updates the access token.
-     *
-     * @param token The new access token.
-     */
-    public synchronized void updateToken(String token) {
-        this.token = token;
-    }
-
-    synchronized void release(Room room) {
+    synchronized static void release(Room room) {
         rooms.remove(room);
-        if (rooms.isEmpty() && nativeClientContext != 0) {
+        if (rooms.isEmpty()) {
             // With no more room connections we can unregister for connectivity events
             unregisterConnectivityBroadcastReceiver();
-
-            nativeRelease(nativeClientContext);
-            nativeClientContext = 0;
+            PlatformInfo.release();
         }
     }
 
-    private Room.Listener roomListenerProxy(final Room.Listener roomListener) {
+    private static synchronized void onNetworkChange(NetworkChangeEvent networkChangeEvent) {
+        for (Room room : rooms) {
+            room.onNetworkChanged(networkChangeEvent);
+        }
+    }
+
+    private static Room.Listener roomListenerProxy(final Room.Listener roomListener) {
         return new Room.Listener() {
 
             @Override
@@ -364,13 +286,17 @@ public class VideoClient {
         }
     }
 
-    private void registerConnectivityBroadcastReceiver() {
-        applicationContext.registerReceiver(connectivityChangeReceiver,
+    private static void registerConnectivityBroadcastReceiver() {
+        if (applicationContext != null) {
+            applicationContext.registerReceiver(connectivityChangeReceiver,
                 new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
+        }
     }
 
-    private void unregisterConnectivityBroadcastReceiver() {
-        applicationContext.unregisterReceiver(connectivityChangeReceiver);
+    private static void unregisterConnectivityBroadcastReceiver() {
+        if (applicationContext != null) {
+            applicationContext.unregisterReceiver(connectivityChangeReceiver);
+        }
     }
 
     enum NetworkChangeEvent {
@@ -381,14 +307,4 @@ public class VideoClient {
     private native static void nativeSetCoreLogLevel(int level);
     private native static void nativeSetModuleLevel(int module, int level);
     private native static int nativeGetCoreLogLevel();
-    private native long nativeCreateClient(Context context,
-                                           String token,
-                                           long nativeMediaFactoryHandle);
-    private native long nativeConnect(long nativeClientDataHandler,
-                                      long nativeRoomListenerHandle,
-                                      ConnectOptions ConnectOptions);
-    private native void nativeUpdateToken(long nativeClientContext, String token);
-    private native void nativeOnNetworkChange(long nativeClientContext,
-                                              NetworkChangeEvent networkChangeEvent);
-    private native void nativeRelease(long nativeClientDataHandler);
 }

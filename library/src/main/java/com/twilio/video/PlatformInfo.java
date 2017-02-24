@@ -13,86 +13,36 @@ import android.provider.Settings.Secure;
 
 final class PlatformInfo {
     private static final String PLATFORM_NAME = "Android";
-    private static final Pattern IPV4_PATTERN =
-            Pattern.compile(
-                    "^(25[0-5]|2[0-4]\\d|[0-1]?\\d?\\d)(\\.(25[0-5]|2[0-4]\\d|[0-1]?\\d?\\d)){3}$");
+    private static long nativeHandle = 0;
 
     private PlatformInfo(){}
 
-    static String getPlatfomName() {
-        return PLATFORM_NAME;
-    }
-
-    static String getPlatformVersion() {
-        return android.os.Build.VERSION.RELEASE;
-    }
-
-    static String getHwDeviceManufacturer() {
-        return android.os.Build.MANUFACTURER;
-    }
-
-    static String getHwDeviceModel() {
-        return android.os.Build.MODEL;
-    }
-
-    static String getHwDeviceUUID(Context context) {
-        return Secure.getString(context.getContentResolver(), Secure.ANDROID_ID);
-    }
-
-    static String getHwDeviceIPAddress() {
-        try {
-            for (Enumeration<NetworkInterface> en =
-                 NetworkInterface.getNetworkInterfaces(); en.hasMoreElements();) {
-                NetworkInterface intf = en.nextElement();
-                for (Enumeration<InetAddress> enumIpAddr =
-                     intf.getInetAddresses(); enumIpAddr.hasMoreElements();) {
-                    InetAddress inetAddress = enumIpAddr.nextElement();
-                    if (!inetAddress.isLoopbackAddress() &&
-                            isIPv4Address(inetAddress.getHostAddress())) {
-                        String ipaddress = inetAddress .getHostAddress().toString();
-                        return ipaddress;
-                    }
-                }
-            }
-        } catch (SocketException ex) {
-            // TODO: Ignoring exception for now
+    static synchronized long getNativeHandle() {
+        if (nativeHandle == 0) {
+            nativeHandle = nativeCreate(
+                PLATFORM_NAME,
+                android.os.Build.VERSION.RELEASE,
+                android.os.Build.MANUFACTURER,
+                android.os.Build.MODEL,
+                VideoClient.getVersion(),
+                System.getProperty("os.arch"));
         }
-        return "";
+        return nativeHandle;
     }
 
-    static String getHwDeviceConnectionType(Context context) {
-        ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo info = cm.getActiveNetworkInfo();
-        String connType = "";
-        if(info==null || !info.isConnected()) {
-            connType = "No connection"; //not connected
-        } else if(info.getType() == ConnectivityManager.TYPE_WIFI) {
-            connType = info.getTypeName();
-        } else if(info.getType() == ConnectivityManager.TYPE_MOBILE){
-            connType = info.getSubtypeName();
-        } else {
-            connType = "Unable to detect connection type";
+    static synchronized void release() {
+        if (nativeHandle != 0) {
+            nativeRelease(nativeHandle);
+            nativeHandle = 0;
         }
-        return connType;
     }
 
-    static int getHwDeviceNumCores() {
-        return Runtime.getRuntime().availableProcessors();
-    }
+    private static native long nativeCreate(String platformName,
+                                            String platformVersion,
+                                            String hwDeviceManufacturer,
+                                            String hwDeviceModel,
+                                            String sdkVersion,
+                                            String hwDeviceArch);
 
-    static double getTimeStamp() {
-        return System.currentTimeMillis() / 1000L;
-    }
-
-    static String getRtcPlatformSdkVersion() {
-        return VideoClient.getVersion();
-    }
-
-    static String getOsArch() {
-        return System.getProperty("os.arch");
-    }
-
-    private static boolean isIPv4Address(final String input) {
-        return IPV4_PATTERN.matcher(input).matches();
-    }
+    private static native void nativeRelease(long nativeHandle);
 }

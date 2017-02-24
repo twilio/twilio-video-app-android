@@ -138,7 +138,6 @@ public class RoomActivity extends AppCompatActivity {
     private String env;
     private String topology;
     private AccessManager accessManager;
-    private VideoClient videoClient;
     private Room room;
     private LocalMedia localMedia;
     private VideoConstraints videoConstraints;
@@ -753,10 +752,6 @@ public class RoomActivity extends AppCompatActivity {
                 Preferences.ENVIRONMENT_DEFAULT);
         String currentTopology = sharedPreferences.getString(Preferences.TOPOLOGY,
                 Preferences.TOPOLOGY_DEFAULT);
-        if(env != currentEnv) {
-            // Reset the client to ensure that the client is created with the new environment
-            videoClient = null;
-        }
         if (newTokenNeeded(currentEnv, currentTopology)) {
             Timber.d("Retrieving access token");
             env = currentEnv;
@@ -806,22 +801,15 @@ public class RoomActivity extends AppCompatActivity {
         } else {
             accessManager.updateToken(token);
         }
-        if (videoClient == null) {
-            String nativeEnvironmentVariableValue = EnvUtil.getNativeEnvironmentVariableValue(env);
-            Env.set(this, EnvUtil.TWILIO_ENV_KEY, nativeEnvironmentVariableValue, true);
-            videoClient = new VideoClient(this, token);
-        } else {
-            videoClient.updateToken(token);
-        }
     }
 
     private void connect(String roomName) {
-        ConnectOptions connectOptions = new ConnectOptions.Builder()
+        ConnectOptions connectOptions = new ConnectOptions.Builder(accessManager.getToken())
                 .roomName(roomName)
                 .localMedia(localMedia)
                 .build();
 
-        room = videoClient.connect(connectOptions, roomListener());
+        room = VideoClient.connect(this, connectOptions, roomListener());
         updateUi(room);
     }
 

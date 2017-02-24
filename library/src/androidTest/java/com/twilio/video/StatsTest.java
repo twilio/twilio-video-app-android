@@ -38,7 +38,7 @@ public class StatsTest extends BaseClientTest {
     public ActivityTestRule<MediaTestActivity> activityRule =
             new ActivityTestRule<>(MediaTestActivity.class);
     private MediaTestActivity mediaTestActivity;
-    private VideoClient aliceVideoClient, bobVideoClient;
+    private String aliceToken, bobToken;
     private String roomName;
     private Room aliceRoom, bobRoom;
     private LocalMedia aliceLocalMedia, bobLocalMedia;
@@ -49,8 +49,8 @@ public class StatsTest extends BaseClientTest {
         super.setup();
         mediaTestActivity = activityRule.getActivity();
         PermissionUtils.allowPermissions(mediaTestActivity);
-        aliceVideoClient = createVideoClient(Constants.PARTICIPANT_ALICE);
-        bobVideoClient = createVideoClient(Constants.PARTICIPANT_BOB);
+        aliceToken = AccessTokenUtils.getAccessToken(Constants.PARTICIPANT_ALICE);
+        bobToken = AccessTokenUtils.getAccessToken(Constants.PARTICIPANT_BOB);
         roomName = RandUtils.generateRandomString(20);
         aliceListener = new CallbackHelper.FakeRoomListener();
         bobListener = new CallbackHelper.FakeRoomListener();
@@ -68,13 +68,13 @@ public class StatsTest extends BaseClientTest {
 
     @Test(expected = NullPointerException.class)
     public void shouldFailWithNullListener() throws InterruptedException {
-        aliceRoom = createRoom(aliceVideoClient, aliceListener, roomName, aliceLocalMedia);
+        aliceRoom = createRoom(aliceToken, aliceListener, roomName, aliceLocalMedia);
         aliceRoom.getStats(null);
     }
 
     @Test
     public void shouldReceiveStatsInEmptyRoom() throws InterruptedException {
-        aliceRoom = createRoom(aliceVideoClient, aliceListener, roomName, aliceLocalMedia);
+        aliceRoom = createRoom(aliceToken, aliceListener, roomName, aliceLocalMedia);
 
         CallbackHelper.FakeStatsListener aliceStatsListener =
                 new CallbackHelper.FakeStatsListener();
@@ -88,7 +88,7 @@ public class StatsTest extends BaseClientTest {
     public void shouldInvokeListenerOnCallingThread() throws InterruptedException {
         // Connect Alice to room with local audio track only
         aliceLocalMedia.addAudioTrack(true);
-        aliceRoom = createRoom(aliceVideoClient, aliceListener, roomName, aliceLocalMedia);
+        aliceRoom = createRoom(aliceToken, aliceListener, roomName, aliceLocalMedia);
         aliceListener.onParticipantConnectedLatch = new CountDownLatch(1);
         final CountDownLatch statsCallback = new CountDownLatch(1);
 
@@ -118,13 +118,13 @@ public class StatsTest extends BaseClientTest {
     public void shouldReceiveStatsForParticipantTracks() throws InterruptedException {
         // Connect Alice to room with local audio track only
         aliceLocalMedia.addAudioTrack(true);
-        aliceRoom = createRoom(aliceVideoClient, aliceListener, roomName, aliceLocalMedia);
+        aliceRoom = createRoom(aliceToken, aliceListener, roomName, aliceLocalMedia);
         aliceListener.onParticipantConnectedLatch = new CountDownLatch(1);
 
         // Connect Bob to room with audio and video track
         bobLocalMedia.addAudioTrack(true);
         bobLocalMedia.addVideoTrack(true, new FakeVideoCapturer());
-        bobRoom = createRoom(bobVideoClient, bobListener, roomName, bobLocalMedia);
+        bobRoom = createRoom(bobToken, bobListener, roomName, bobLocalMedia);
         assertTrue(aliceListener.onParticipantConnectedLatch.await(20, TimeUnit.SECONDS));
         assertEquals(1, aliceRoom.getParticipants().size());
 
@@ -148,11 +148,11 @@ public class StatsTest extends BaseClientTest {
     public void shouldReceiveStatsWhenParticipanAddsOrRemovesTrack() throws InterruptedException {
         // Connect Alice to room with local audio track only
         aliceLocalMedia.addAudioTrack(true);
-        aliceRoom = createRoom(aliceVideoClient, aliceListener, roomName, aliceLocalMedia);
+        aliceRoom = createRoom(aliceToken, aliceListener, roomName, aliceLocalMedia);
         aliceListener.onParticipantConnectedLatch = new CountDownLatch(1);
 
         // Connect Bob without media
-        bobRoom = createRoom(bobVideoClient, bobListener, roomName, bobLocalMedia);
+        bobRoom = createRoom(bobToken, bobListener, roomName, bobLocalMedia);
         assertTrue(aliceListener.onParticipantConnectedLatch.await(20, TimeUnit.SECONDS));
         assertEquals(1, aliceRoom.getParticipants().size());
 
@@ -217,11 +217,11 @@ public class StatsTest extends BaseClientTest {
     @Test
     public void shouldReceiveStatsWhenLocalTrackIsAdded() throws InterruptedException {
         // Connect Alice to room without media
-        aliceRoom = createRoom(aliceVideoClient, aliceListener, roomName, aliceLocalMedia);
+        aliceRoom = createRoom(aliceToken, aliceListener, roomName, aliceLocalMedia);
         aliceListener.onParticipantConnectedLatch = new CountDownLatch(1);
 
         // Connect Bob without tracks
-        bobRoom = createRoom(bobVideoClient, bobListener, roomName, bobLocalMedia);
+        bobRoom = createRoom(bobToken, bobListener, roomName, bobLocalMedia);
         assertTrue(aliceListener.onParticipantConnectedLatch.await(20, TimeUnit.SECONDS));
         assertEquals(1, aliceRoom.getParticipants().size());
 
@@ -250,12 +250,12 @@ public class StatsTest extends BaseClientTest {
 
         // Connect Alice to room with local audio track only
         aliceLocalMedia.addAudioTrack(true);
-        aliceRoom = createRoom(aliceVideoClient, aliceListener, roomName, aliceLocalMedia);
+        aliceRoom = createRoom(aliceToken, aliceListener, roomName, aliceLocalMedia);
         aliceListener.onParticipantConnectedLatch = new CountDownLatch(1);
 
         // Connect Bob to room with audio and video track
         bobLocalMedia.addAudioTrack(true);
-        bobRoom = createRoom(bobVideoClient, bobListener, roomName, bobLocalMedia);
+        bobRoom = createRoom(bobToken, bobListener, roomName, bobLocalMedia);
         assertTrue(aliceListener.onParticipantConnectedLatch.await(20, TimeUnit.SECONDS));
         assertEquals(1, aliceRoom.getParticipants().size());
 
@@ -283,13 +283,13 @@ public class StatsTest extends BaseClientTest {
         // Connect Alice to room with both video and audio track
         aliceLocalMedia.addAudioTrack(true);
         aliceLocalMedia.addVideoTrack(true, new FakeVideoCapturer());
-        aliceRoom = createRoom(aliceVideoClient, aliceListener, roomName, aliceLocalMedia);
+        aliceRoom = createRoom(aliceToken, aliceListener, roomName, aliceLocalMedia);
         aliceListener.onParticipantConnectedLatch = new CountDownLatch(1);
 
         // Connect Bob to room with both video and audio track
         bobLocalMedia.addAudioTrack(true);
         bobLocalMedia.addVideoTrack(true, new FakeVideoCapturer());
-        bobRoom = createRoom(bobVideoClient, bobListener, roomName, bobLocalMedia);
+        bobRoom = createRoom(bobToken, bobListener, roomName, bobLocalMedia);
         assertTrue(aliceListener.onParticipantConnectedLatch.await(20, TimeUnit.SECONDS));
 
         // let's give peer connection some time to get media flowing
@@ -351,12 +351,12 @@ public class StatsTest extends BaseClientTest {
 
         // Connect Alice to room with local audio track only
         aliceLocalMedia.addAudioTrack(true);
-        aliceRoom = createRoom(aliceVideoClient, aliceListener, roomName, aliceLocalMedia);
+        aliceRoom = createRoom(aliceToken, aliceListener, roomName, aliceLocalMedia);
         aliceListener.onParticipantConnectedLatch = new CountDownLatch(1);
 
         // Connect Bob to room with audio and video track
         bobLocalMedia.addAudioTrack(true);
-        bobRoom = createRoom(bobVideoClient, bobListener, roomName, bobLocalMedia);
+        bobRoom = createRoom(bobToken, bobListener, roomName, bobLocalMedia);
         assertTrue(aliceListener.onParticipantConnectedLatch.await(20, TimeUnit.SECONDS));
         assertEquals(1, aliceRoom.getParticipants().size());
 
@@ -388,13 +388,13 @@ public class StatsTest extends BaseClientTest {
         // Connect Alice to room with both video and audio track
         aliceLocalMedia.addAudioTrack(true);
         aliceLocalMedia.addVideoTrack(true, new FakeVideoCapturer());
-        aliceRoom = createRoom(aliceVideoClient, aliceListener, roomName, aliceLocalMedia);
+        aliceRoom = createRoom(aliceToken, aliceListener, roomName, aliceLocalMedia);
         aliceListener.onParticipantConnectedLatch = new CountDownLatch(1);
 
         // Connect Bob to room with both video and audio track
         bobLocalMedia.addAudioTrack(true);
         bobLocalMedia.addVideoTrack(true, new FakeVideoCapturer());
-        bobRoom = createRoom(bobVideoClient, bobListener, roomName, bobLocalMedia);
+        bobRoom = createRoom(bobToken, bobListener, roomName, bobLocalMedia);
         assertTrue(aliceListener.onParticipantConnectedLatch.await(20, TimeUnit.SECONDS));
         CallbackHelper.FakeStatsListener aliceStatsListener =
                 new CallbackHelper.FakeStatsListener();
@@ -418,21 +418,15 @@ public class StatsTest extends BaseClientTest {
         assertFalse(aliceStatsListener.onStatsLatch.await(5, TimeUnit.SECONDS));
     }
 
-    private VideoClient createVideoClient(String identity) {
-        String token = AccessTokenUtils.getAccessToken(identity);
-        VideoClient videoClient = new VideoClient(mediaTestActivity, token);
-        return videoClient;
-    }
-
-    private Room createRoom(VideoClient videoClient, CallbackHelper.FakeRoomListener listener,
+    private Room createRoom(String token, CallbackHelper.FakeRoomListener listener,
                             String roomName, LocalMedia localMedia) throws InterruptedException {
         listener.onConnectedLatch = new CountDownLatch(1);
 
-        ConnectOptions connectOptions = new ConnectOptions.Builder()
+        ConnectOptions connectOptions = new ConnectOptions.Builder(token)
                 .roomName(roomName)
                 .localMedia(localMedia)
                 .build();
-        Room room = videoClient.connect(connectOptions, listener);
+        Room room = VideoClient.connect(mediaTestActivity, connectOptions, listener);
         assertTrue(listener.onConnectedLatch.await(20, TimeUnit.SECONDS));
 
         return room;

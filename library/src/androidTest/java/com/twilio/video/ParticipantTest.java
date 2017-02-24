@@ -30,8 +30,6 @@ public class ParticipantTest extends BaseClientTest {
     private Context context;
     private String tokenOne;
     private String tokenTwo;
-    private VideoClient videoClient;
-    private VideoClient videoClient2;
     private String roomName;
 
     @Before
@@ -40,8 +38,6 @@ public class ParticipantTest extends BaseClientTest {
         context = InstrumentationRegistry.getInstrumentation().getTargetContext();
         tokenOne = AccessTokenUtils.getAccessToken(Constants.PARTICIPANT_ALICE);
         tokenTwo = AccessTokenUtils.getAccessToken(Constants.PARTICIPANT_BOB);
-        videoClient = new VideoClient(context, tokenOne);
-        videoClient2 = new VideoClient(context, tokenTwo);
         roomName = RandUtils.generateRandomString(20);
     }
 
@@ -51,15 +47,18 @@ public class ParticipantTest extends BaseClientTest {
         roomListener.onConnectedLatch = new CountDownLatch(1);
         roomListener.onDisconnectedLatch = new CountDownLatch(1);
         roomListener.onParticipantConnectedLatch = new CountDownLatch(1);
-        ConnectOptions connectOptions = new ConnectOptions.Builder()
+        ConnectOptions connectOptions = new ConnectOptions.Builder(tokenOne)
                 .roomName(roomName)
                 .build();
-        Room room = videoClient.connect(connectOptions, roomListener);
+        Room room = VideoClient.connect(context, connectOptions, roomListener);
         assertTrue(roomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
         assertEquals(RoomState.CONNECTED, room.getState());
 
+        connectOptions = new ConnectOptions.Builder(tokenTwo)
+            .roomName(roomName)
+            .build();
         CallbackHelper.FakeRoomListener roomListener2 = new CallbackHelper.FakeRoomListener();
-        Room room2 = videoClient2.connect(connectOptions, roomListener2);
+        Room room2 = VideoClient.connect(context, connectOptions, roomListener2);
         assertTrue(roomListener.onParticipantConnectedLatch.await(20, TimeUnit.SECONDS));
         assertEquals(1, room.getParticipants().size());
 
@@ -76,17 +75,20 @@ public class ParticipantTest extends BaseClientTest {
         roomListener.onDisconnectedLatch = new CountDownLatch(1);
         roomListener.onParticipantDisconnectedLatch = new CountDownLatch(1);
         roomListener.onParticipantConnectedLatch = new CountDownLatch(1);
-        ConnectOptions connectOptions = new ConnectOptions.Builder()
+        ConnectOptions connectOptions = new ConnectOptions.Builder(tokenOne)
                 .roomName(roomName)
                 .build();
-        Room room = videoClient.connect(connectOptions, roomListener);
+        Room room = VideoClient.connect(context, connectOptions, roomListener);
         assertTrue(roomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
         assertEquals(RoomState.CONNECTED, room.getState());
 
+        ConnectOptions connectOptions2 = new ConnectOptions.Builder(tokenTwo)
+            .roomName(roomName)
+            .build();
         CallbackHelper.FakeRoomListener roomListener2 = new CallbackHelper.FakeRoomListener();
         roomListener2.onConnectedLatch = new CountDownLatch(1);
         roomListener2.onDisconnectedLatch = new CountDownLatch(1);
-        Room client2room = videoClient2.connect(connectOptions, roomListener2);
+        Room client2room = VideoClient.connect(context, connectOptions2, roomListener2);
 
         assertTrue(roomListener2.onConnectedLatch.await(20, TimeUnit.SECONDS));
 
