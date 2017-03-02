@@ -801,6 +801,8 @@ public class RoomActivity extends AppCompatActivity {
         } else {
             accessManager.updateToken(token);
         }
+        String nativeEnvironmentVariableValue = EnvUtil.getNativeEnvironmentVariableValue(env);
+        Env.set(this, EnvUtil.TWILIO_ENV_KEY, nativeEnvironmentVariableValue, true);
     }
 
     private void connect(String roomName) {
