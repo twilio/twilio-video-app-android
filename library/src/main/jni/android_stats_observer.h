@@ -205,8 +205,8 @@ private:
             jobject j_capture_dimensions =
                 jni()->NewObject(*j_video_dimensions_class_,
                                  j_video_dimensions_ctor_id_,
-                                 track_stats->getCapturedDimensions().getWidth(),
-                                 track_stats->getCapturedDimensions().getHeight());
+                                 track_stats->getCaptureDimensions().getWidth(),
+                                 track_stats->getCaptureDimensions().getHeight());
             jobject j_sent_dimensions =
                 jni()->NewObject(*j_video_dimensions_class_,
                                  j_video_dimensions_ctor_id_,
@@ -225,7 +225,7 @@ private:
                                  track_stats->getRoundTripTime(),
                                  j_capture_dimensions,
                                  j_sent_dimensions,
-                                 track_stats->getCapturedFrameRate(),
+                                 track_stats->getCaptureFrameRate(),
                                  track_stats->getFrameRate());
             jni()->CallVoidMethod(j_stats_report,
                                   j_stats_report_add_local_video_id_,

@@ -9,10 +9,10 @@ import java.util.List;
  */
 public class StatsReport {
     private final String peerConnectionId;
-    private List<LocalAudioTrackStats> localAudioTracksStats = new ArrayList<>();
-    private List<LocalVideoTrackStats> localVideoTracksStats = new ArrayList<>();
-    private List<AudioTrackStats> audioTracksStats = new ArrayList<>();
-    private List<VideoTrackStats> videoTracksStats = new ArrayList<>();
+    private List<LocalAudioTrackStats> localAudioTrackStats = new ArrayList<>();
+    private List<LocalVideoTrackStats> localVideoTrackStats = new ArrayList<>();
+    private List<AudioTrackStats> audioTrackStats = new ArrayList<>();
+    private List<VideoTrackStats> videoTrackStats = new ArrayList<>();
 
     StatsReport(String peerConnectionId) {
         this.peerConnectionId = peerConnectionId;
@@ -31,7 +31,7 @@ public class StatsReport {
      * @return a list of local audio tracks stats
      */
     public List<LocalAudioTrackStats> getLocalAudioTrackStats() {
-        return localAudioTracksStats;
+        return localAudioTrackStats;
     }
 
     /**
@@ -40,7 +40,7 @@ public class StatsReport {
      * @return a list of local video tracks stats
      */
     public List<LocalVideoTrackStats> getLocalVideoTrackStats() {
-        return localVideoTracksStats;
+        return localVideoTrackStats;
     }
 
     /**
@@ -49,7 +49,7 @@ public class StatsReport {
      * @return a list of remote audio tracks stats
      */
     public List<AudioTrackStats> getAudioTrackStats() {
-        return audioTracksStats;
+        return audioTrackStats;
     }
 
     /**
@@ -58,22 +58,22 @@ public class StatsReport {
      * @return a list of remote video tracks stats
      */
     public List<VideoTrackStats> getVideoTrackStats() {
-        return videoTracksStats;
+        return videoTrackStats;
     }
 
     void addLocalAudioTrackStats(LocalAudioTrackStats localAudioTrackStats) {
-        localAudioTracksStats.add(localAudioTrackStats);
+        this.localAudioTrackStats.add(localAudioTrackStats);
     }
 
     void addLocalVideoTrackStats(LocalVideoTrackStats localVideoTrackStats) {
-        localVideoTracksStats.add(localVideoTrackStats);
+        this.localVideoTrackStats.add(localVideoTrackStats);
     }
 
     void addAudioTrackStats(AudioTrackStats audioTrackStats) {
-        audioTracksStats.add(audioTrackStats);
+        this.audioTrackStats.add(audioTrackStats);
     }
 
     void addVideoTrackStats(VideoTrackStats videoTrackStats) {
-        videoTracksStats.add(videoTrackStats);
+        this.videoTrackStats.add(videoTrackStats);
     }
 }
