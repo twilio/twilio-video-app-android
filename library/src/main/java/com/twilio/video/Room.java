@@ -190,11 +190,13 @@ public class Room {
     // Doesn't release native room observer
     synchronized void release() {
         if (nativeRoomContext != 0) {
-            nativeRelease(nativeRoomContext);
-            nativeRoomContext = 0;
             for (Participant participant : participantMap.values()) {
                 participant.release();
             }
+            nativeRelease(nativeRoomContext);
+            nativeRoomContext = 0;
+            internalRoomListenerHandle.release();
+            internalRoomListenerHandle = null;
             if (internalStatsListenerHandle != null) {
                 internalStatsListenerHandle.release();
                 internalStatsListenerHandle = null;
@@ -271,16 +273,16 @@ public class Room {
             handler.post(new Runnable() {
                 @Override
                 public void run() {
-                    // Removing room observer on calling thread was causing a crash on some
-                    // devices (HTC 10). Check https://issues.corp.twilio.com/browse/CSDK-1114 for
-                    // details. This is a patch until underlying condition
-                    // (accessing deleted pointer) is fixed in core.
-                    internalRoomListenerHandle.release();
+                    // Room teardown on calling thread was causing a crash on some
+                    // devices (HTC 10). Check https://issues.corp.twilio.com/browse/CSDK-1114 and
+                    // https://issues.corp.twilio.com/browse/GSDK-1043 for details.
+                    // This is a patch until underlying condition (accessing deleted pointer)
+                    // is fixed in core.
+                    release();
 
                     Room.this.listener.onDisconnected(Room.this, twilioException);
                 }
             });
-            release();
         }
 
         @Override
