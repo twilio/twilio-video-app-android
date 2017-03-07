@@ -10,6 +10,7 @@ import android.support.v7.preference.PreferenceFragmentCompat;
 import android.support.v7.preference.PreferenceManager;
 import android.view.MenuItem;
 
+import com.twilio.video.VideoClient;
 import com.twilio.video.app.BuildConfig;
 import com.twilio.video.app.R;
 import com.twilio.video.app.data.Preferences;
@@ -62,6 +63,7 @@ public class SettingsActivity extends AppCompatActivity {
 
         // Return to login activity
         loginIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        loginIntent.putExtra(LoginActivity.EXTRA_SIGN_OUT, true);
         startActivity(loginIntent);
         finishAffinity();
     }
@@ -86,9 +88,10 @@ public class SettingsActivity extends AppCompatActivity {
             addPreferencesFromResource(R.xml.preferences);
 
             // Fill out the rest of settings
-            String identity = sharedPreferences.getString(Preferences.IDENTITY, null);
+            String identity = sharedPreferences.getString(Preferences.DISPLAY_NAME, null);
             findPreference(Preferences.IDENTITY).setSummary(identity);
             findPreference(Preferences.VERSION).setSummary(BuildConfig.VERSION_NAME);
+            findPreference(Preferences.VIDEO_LIBRARY_VERSION).setSummary(VideoClient.getVersion());
             findPreference(Preferences.LOGOUT).setOnPreferenceClickListener(logoutClickListener);
         }
     }

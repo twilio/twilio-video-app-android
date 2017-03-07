@@ -11,6 +11,20 @@ ext.mavenUsername = (project.hasProperty('maven.username') ?
 ext.mavenPassword = (project.hasProperty('maven.password') ?
         project.property("maven.password") : '')
 
+/**
+ * Properties used for signing release builds. Note that these properties must be set in order
+ * to build proper releases. We set placeholder values so developers are not required to set these
+ * properties for local development
+ */
+ext.keystore = (project.hasProperty('androidKeystore') ?
+        project.property('androidKeystore') : '/fake/path/to/keystore')
+ext.keystorePassword = (project.hasProperty('androidKeystorePassword') ?
+        project.property('androidKeystorePassword') : 'fakepassword')
+ext.releaseKeyAlias = (project.hasProperty('androidReleaseKeyAlias') ?
+        project.property('androidReleaseKeyAlias') : 'fakealias')
+ext.releaseKeyPassword = (project.hasProperty('androidReleaseKeyPassword') ?
+        project.property('androidReleaseKeyPassword') : 'fakepassword')
+
 ext.generateVersionName = {
     return "${versionMajor}.${versionMinor}.${versionPatch}" +
            ((project.hasProperty("release") && project.property("release").toBoolean() == true) ?

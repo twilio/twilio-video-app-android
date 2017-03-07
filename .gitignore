@@ -53,3 +53,6 @@ sdk/libs/
 
 # Cmake
 **/.externalNativeBuild
+
+# Google Play Services
+**/google-services.json

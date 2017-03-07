@@ -1,7 +1,7 @@
 library-instrumentation-tests:
     timeout: 30m
     type: instrumentation
-    app: app/build/outputs/apk/app-debug.apk
+    app: app/build/outputs/apk/app-internal-debug.apk
     test: library/build/outputs/apk/library-debug-androidTest.apk
     device-ids:
         - herolte
@@ -15,7 +15,7 @@ library-instrumentation-tests:
 library-load-instrumentation-tests:
     timeout: 30m
     type: instrumentation
-    app: app/build/outputs/apk/app-debug.apk
+    app: app/build/outputs/apk/app-internal-debug.apk
     test: library/build/outputs/apk/library-debug-androidTest.apk
     device-ids:
         - m0
@@ -37,7 +37,7 @@ library-load-instrumentation-tests:
 library-sfu-instrumentation-tests:
     timeout: 30m
     type: instrumentation
-    app: app/build/outputs/apk/app-debug.apk
+    app: app/build/outputs/apk/app-internal-debug.apk
     test: library/build/outputs/apk/library-debug-androidTest.apk
     device-ids:
         - herolte

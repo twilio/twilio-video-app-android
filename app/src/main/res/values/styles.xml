@@ -27,6 +27,8 @@
         <item name="displayOptions">showHome|showTitle|homeAsUp</item>
         <item name="preferenceTheme">@style/PreferenceThemeOverlay.v14.Material</item>
     </style>
+    <style name="AppTheme.Dialog" parent="Theme.AppCompat.Light.Dialog.Alert">
+    </style>
     <style name="AppTheme.Lobby" parent="AppTheme.NoActionBar">
         <item name="colorPrimary">@color/lobbyColorPrimary</item>
         <item name="colorPrimaryDark">@color/lobbyColorPrimaryDark</item>
@@ -62,6 +64,10 @@
     <style name="Stats.TextTrack" parent="AppTheme.Lobby.Drawer">
         <item name="android:textSize">16sp</item>
         <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="Authenticating" parent="Theme.AppCompat.Light.Dialog">
+        <item name="colorAccent">@color/colorPrimary</item>
     </style>
 
 

@@ -52,7 +52,6 @@ import com.twilio.video.TwilioException;
 import com.twilio.video.VideoClient;
 import com.twilio.video.VideoConstraints;
 import com.twilio.video.VideoDimensions;
-import com.twilio.video.VideoRenderer;
 import com.twilio.video.VideoTrack;
 import com.twilio.video.app.R;
 import com.twilio.video.app.adapter.StatsListAdapter;
@@ -60,10 +59,9 @@ import com.twilio.video.app.data.Preferences;
 import com.twilio.video.app.util.EnvUtil;
 import com.twilio.video.app.util.InputUtils;
 import com.twilio.video.app.util.StatsScheduler;
+import com.twilio.video.app.util.VideoAppService;
 import com.twilio.video.env.Env;
-import com.twilio.video.simplersignaling.SimplerSignalingUtils;
 
-import java.net.HttpURLConnection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -72,9 +70,10 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.OnTextChanged;
-import retrofit.Callback;
-import retrofit.RetrofitError;
-import retrofit.client.Response;
+import io.reactivex.Completable;
+import io.reactivex.Single;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.CompositeDisposable;
 import timber.log.Timber;
 
 import static com.twilio.video.app.R.drawable.ic_phonelink_ring_white_24dp;
@@ -134,7 +133,8 @@ public class RoomActivity extends AppCompatActivity {
     private int savedAudioMode = AudioManager.MODE_INVALID;
     private int savedVolumeControlStream;
 
-    private String username;
+    private String displayName;
+    private String email;
     private String env;
     private String topology;
     private AccessManager accessManager;
@@ -171,6 +171,11 @@ public class RoomActivity extends AppCompatActivity {
      */
     private ParticipantController participantController;
 
+    /**
+     * Disposes {@link VideoAppService} requests when activity is destroyed.
+     */
+    private final CompositeDisposable rxDisposables = new CompositeDisposable();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -198,7 +203,8 @@ public class RoomActivity extends AppCompatActivity {
 
         // Setup Activity
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-        username = sharedPreferences.getString(Preferences.IDENTITY, null);
+        email = sharedPreferences.getString(Preferences.EMAIL, null);
+        displayName = sharedPreferences.getString(Preferences.DISPLAY_NAME, null);
         env = sharedPreferences.getString(Preferences.ENVIRONMENT,
                 Preferences.ENVIRONMENT_DEFAULT);
         topology = sharedPreferences.getString(Preferences.TOPOLOGY,
@@ -221,6 +227,8 @@ public class RoomActivity extends AppCompatActivity {
             localMedia.release();
             localMedia = null;
         }
+        // dispose any token requests if needed
+        rxDisposables.clear();
         super.onDestroy();
     }
 
@@ -351,9 +359,49 @@ public class RoomActivity extends AppCompatActivity {
 
     @OnClick(R.id.connect)
     void connectButtonClick() {
-        String roomOrSid = roomEditText.getText().toString();
-        obtainTokenAndConnect(roomOrSid);
-        InputUtils.hideKeyboard(this);
+
+        // obtain room name
+        String roomName = roomEditText.getText().toString();
+
+        // obtain latest environment preferences
+        String env = sharedPreferences.getString(Preferences.ENVIRONMENT,
+                Preferences.ENVIRONMENT_DEFAULT);
+        String topology = sharedPreferences.getString(Preferences.TOPOLOGY,
+                Preferences.TOPOLOGY_DEFAULT);
+
+        // room observable
+        Single<Room> connection;
+
+        if (newTokenRequired(env, topology)) {
+
+            // update all env parameters before proceeding connection
+            connection = getToken(displayName, env, topology)
+                    .flatMapCompletable(this::updateToken)
+                    .andThen(updateEnv(env))
+                    .andThen(updateTopology(topology))
+                    .andThen(connect(roomName));
+        } else {
+
+            // ready to connect
+            connection = connect(roomName);
+        }
+
+        connection.observeOn(AndroidSchedulers.mainThread())
+                .doOnSubscribe(disposable -> {
+                    InputUtils.hideKeyboard(this);
+                    rxDisposables.add(disposable);
+                })
+                .doOnSuccess(room -> {
+                    this.room = room;
+                    updateUi(this.room);
+                })
+                .doOnError(e -> {
+                    final String message = "Failed to retrieve access token";
+                    Timber.e("%s -> reason: %s", message, e.getMessage());
+
+                    Snackbar.make(primaryVideoView, message, Snackbar.LENGTH_LONG).show();
+                })
+                .subscribe();
     }
 
     @OnClick(R.id.disconnect)
@@ -575,8 +623,8 @@ public class RoomActivity extends AppCompatActivity {
 
         boolean connectButtonEnabled = false;
 
-        String roomName = username;
-        String toolbarTitle = username;
+        String roomName = displayName;
+        String toolbarTitle = displayName;
         String joinStatus = "";
 
         if (room != null) {
@@ -747,72 +795,94 @@ public class RoomActivity extends AppCompatActivity {
         }
     }
 
-    private void obtainTokenAndConnect(final String roomName) {
-        String currentEnv = sharedPreferences.getString(Preferences.ENVIRONMENT,
-                Preferences.ENVIRONMENT_DEFAULT);
-        String currentTopology = sharedPreferences.getString(Preferences.TOPOLOGY,
-                Preferences.TOPOLOGY_DEFAULT);
-        if (newTokenNeeded(currentEnv, currentTopology)) {
-            Timber.d("Retrieving access token");
-            env = currentEnv;
-            topology = currentTopology;
-            SimplerSignalingUtils.getAccessToken(username, env, topology,
-                    new Callback<String>() {
-                        @Override
-                        public void success(String token, Response response) {
-                            if (response.getStatus() == HttpURLConnection.HTTP_OK) {
-                                Timber.d("Access token retrieved");
-                                updateToken(token);
-                                connect(roomName);
-                            } else {
-                                Snackbar.make(primaryVideoView,
-                                        "Retrieving access token failed. Status: " +
-                                                response.getStatus(),
-                                        Snackbar.LENGTH_LONG)
-                                        .setAction("Action", null).show();
-                                updateUi(room);
-                            }
-                        }
-
-                        @Override
-                        public void failure(RetrofitError error) {
-                            Snackbar.make(primaryVideoView,
-                                    "Retrieving access token failed. Error: " + error.getMessage(),
-                                    Snackbar.LENGTH_LONG)
-                                    .setAction("Action", null).show();
-                            updateUi(room);
-                        }
-                    });
-        } else {
-            connect(roomName);
-        }
-    }
-
-    private boolean newTokenNeeded(String currentEnv, String currentTopology) {
+    /**
+     * Validates whether it is necessary to request new token.
+     *
+     * @param currentEnv      environment required for new token
+     * @param currentTopology topology required for new token
+     * @return true if update is required, otherwise - false
+     */
+    private boolean newTokenRequired(String currentEnv, String currentTopology) {
         return !env.equals(currentEnv) ||
                 !topology.equals(currentTopology) ||
                 accessManager == null ||
                 accessManager.isTokenExpired();
     }
 
-    private void updateToken(String token) {
-        if (accessManager == null) {
-            accessManager = new AccessManager(token);
-        } else {
-            accessManager.updateToken(token);
-        }
-        String nativeEnvironmentVariableValue = EnvUtil.getNativeEnvironmentVariableValue(env);
-        Env.set(this, EnvUtil.TWILIO_ENV_KEY, nativeEnvironmentVariableValue, true);
+    /**
+     * Provides a token Single with specified parameters.
+     *
+     * @param idenity  identity to use in token
+     * @param env      environment to connect
+     * @param topology topology to use
+     * @return Single with fresh token
+     */
+    private Single<String> getToken(String idenity,
+                                    String env,
+                                    String topology) {
+
+        return VideoAppService.getConfigurationProfile(env, topology)
+                .flatMap(sid -> VideoAppService.getAccessToken(env, idenity, sid));
     }
 
-    private void connect(String roomName) {
-        ConnectOptions connectOptions = new ConnectOptions.Builder(accessManager.getToken())
-                .roomName(roomName)
-                .localMedia(localMedia)
-                .build();
+    /**
+     * Save token instance with help of {@link AccessManager}.
+     *
+     * @param token token from {@link VideoAppService}
+     * @return Completable
+     */
+    private Completable updateToken(String token) {
+        return Completable.fromAction(() -> {
+            if (accessManager == null) {
+                accessManager = new AccessManager(token);
+            } else {
+                accessManager.updateToken(token);
+            }
+        });
+    }
 
-        room = VideoClient.connect(this, connectOptions, roomListener());
-        updateUi(room);
+    /**
+     * Update local copy of topology.
+     *
+     * @param topology new topology to use
+     * @return Completable
+     */
+    private Completable updateTopology(String topology) {
+        return Completable.fromAction(() -> this.topology = topology);
+    }
+
+    /**
+     * Update {@link VideoClient} environment.
+     *
+     * @param env new environment to use
+     * @return Completable
+     */
+    private Completable updateEnv(String env) {
+        return Completable.fromAction(() -> {
+            String nativeEnvironmentVariableValue = EnvUtil.getNativeEnvironmentVariableValue(env);
+            Env.set(this, EnvUtil.TWILIO_ENV_KEY, nativeEnvironmentVariableValue, true);
+
+            this.env = env;
+        });
+    }
+
+    /**
+     * Connect to room with specified parameters.
+     *
+     * @param roomName room name or sid
+     * @return Single with room reference
+     */
+    private Single<Room> connect(String roomName) {
+        return Single.fromCallable(() -> {
+
+            ConnectOptions connectOptions = new ConnectOptions.Builder(accessManager.getToken())
+                    .roomName(roomName)
+                    .localMedia(localMedia)
+                    .build();
+
+            room = VideoClient.connect(this, connectOptions, roomListener());
+            return room;
+        });
     }
 
     /**
