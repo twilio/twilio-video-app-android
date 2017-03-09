@@ -692,21 +692,21 @@ public class RoomActivity extends AppCompatActivity {
                 if (participantController.getPrimaryItem().sid.equals(room.getLocalParticipant().getSid())) {
 
                     // local video was rendered as primary view - refreshing
-                    primaryVideoView.setMirror(cameraCapturer.getCameraSource() ==
+                    participantController.getPrimaryView().setMirror(cameraCapturer.getCameraSource() ==
                             CameraCapturer.CameraSource.FRONT_CAMERA);
 
                 } else {
 
                     // local video was rendered as thumb - refreshing thumb state
                     ParticipantView thumb = participantController.getThumb(
-                            room.getLocalParticipant().getSid(), null);
+                            room.getLocalParticipant().getSid(), cameraVideoTrack);
                     thumb.setMirror(cameraCapturer.getCameraSource() ==
                             CameraCapturer.CameraSource.FRONT_CAMERA);
                 }
             } else {
 
                 // local video was rendered as primary view - refreshing
-                primaryVideoView.setMirror(cameraCapturer.getCameraSource() ==
+                participantController.getPrimaryView().setMirror(cameraCapturer.getCameraSource() ==
                         CameraCapturer.CameraSource.FRONT_CAMERA);
             }
         }
