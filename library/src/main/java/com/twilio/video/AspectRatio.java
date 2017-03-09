@@ -12,4 +12,23 @@ public class AspectRatio {
         this.numerator = numerator;
         this.denominator = denominator;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        AspectRatio that = (AspectRatio) o;
+
+        if (numerator != that.numerator) return false;
+        return denominator == that.denominator;
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = numerator;
+        result = 31 * result + denominator;
+        return result;
+    }
 }

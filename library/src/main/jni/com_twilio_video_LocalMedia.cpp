@@ -191,8 +191,7 @@ twilio::media::MediaConstraints* convertVideoConstraints(jobject j_video_constra
         video_constraints->SetMandatory(twilio::media::MediaConstraints::kMinWidth, min_width);
         video_constraints->SetMandatory(twilio::media::MediaConstraints::kMinHeight, min_height);
     }
-    if ((numerator_aspect_ratio > 0) &&
-        (denominator_aspect_ratio > 0)){
+    if ((numerator_aspect_ratio > 0) && (denominator_aspect_ratio > 0)){
         double aspect_ratio = (double) numerator_aspect_ratio / denominator_aspect_ratio;
 
         video_constraints->SetMandatory(twilio::media::MediaConstraints::kMinAspectRatio,

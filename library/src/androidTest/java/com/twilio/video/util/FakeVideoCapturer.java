@@ -24,9 +24,7 @@ public class FakeVideoCapturer implements VideoCapturer {
     private VideoFormat captureFormat;
     private AtomicBoolean started = new AtomicBoolean(false);
     private VideoCapturer.Listener capturerListener;
-
-    // Just used for testing we will just capture on main thread
-    private FakeCapturerThread fakeCapturerThread = new FakeCapturerThread();
+    private FakeCapturerThread fakeCapturerThread;
     private Handler fakeVideoCapturerHandler;
     private final Runnable frameGenerator = new Runnable() {
         @Override
@@ -41,12 +39,22 @@ public class FakeVideoCapturer implements VideoCapturer {
                     captureFormat.dimensions, 0, captureTimeNs);
 
             // Only notify the frame listener if we are not stopped
-            if (started.get()) {
+            if (started.get() && fakeVideoCapturerHandler != null) {
                 capturerListener.onFrameCaptured(emptyVideoFrame);
                 fakeVideoCapturerHandler.postDelayed(this, FRAMERATE_MS);
             }
         }
     };
+
+    private final List<VideoFormat> supportedFormats;
+
+    public FakeVideoCapturer() {
+        this(defaultSupportedFormats());
+    }
+
+    public FakeVideoCapturer(List<VideoFormat> supportedFormats) {
+        this.supportedFormats = supportedFormats;
+    }
 
     public VideoFormat getCaptureFormat() {
         return captureFormat;
@@ -58,12 +66,6 @@ public class FakeVideoCapturer implements VideoCapturer {
 
     @Override
     public List<VideoFormat> getSupportedFormats() {
-        VideoDimensions dimensions = new VideoDimensions(640, 360);
-        VideoFormat videoFormat = new VideoFormat(dimensions, 30, VideoPixelFormat.RGBA_8888);
-        List<VideoFormat> supportedFormats = new ArrayList<>();
-
-        supportedFormats.add(videoFormat);
-
         return supportedFormats;
     }
 
@@ -80,6 +82,7 @@ public class FakeVideoCapturer implements VideoCapturer {
         this.started.set(true);
 
         // Will asynchronously start the capturer
+        fakeCapturerThread = new FakeCapturerThread();
         fakeCapturerThread.startAsync();
     }
 
@@ -89,6 +92,16 @@ public class FakeVideoCapturer implements VideoCapturer {
 
         // Blocking call that ensures the capturer is stopped
         fakeCapturerThread.stopSync();
+    }
+
+    private static List<VideoFormat> defaultSupportedFormats() {
+        VideoDimensions dimensions = new VideoDimensions(640, 360);
+        VideoFormat videoFormat = new VideoFormat(dimensions, 30, VideoPixelFormat.RGBA_8888);
+        List<VideoFormat> supportedFormats = new ArrayList<>();
+
+        supportedFormats.add(videoFormat);
+
+        return supportedFormats;
     }
 
     class FakeCapturerThread extends Thread {

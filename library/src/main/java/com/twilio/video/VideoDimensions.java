@@ -64,6 +64,25 @@ public class VideoDimensions {
     }
 
     @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        VideoDimensions that = (VideoDimensions) o;
+
+        if (width != that.width) return false;
+
+        return height == that.height;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = width;
+        result = 31 * result + height;
+        return result;
+    }
+
+    @Override
     public String toString() {
         return String.valueOf(width) + "x" + String.valueOf(height);
     }

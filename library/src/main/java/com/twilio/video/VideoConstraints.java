@@ -81,6 +81,31 @@ public class VideoConstraints {
         return aspectRatio;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        VideoConstraints that = (VideoConstraints) o;
+
+        if (minFps != that.minFps) return false;
+        if (maxFps != that.maxFps) return false;
+        if (!minVideoDimensions.equals(that.minVideoDimensions)) return false;
+        if (!maxVideoDimensions.equals(that.maxVideoDimensions)) return false;
+        return aspectRatio.equals(that.aspectRatio);
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = minVideoDimensions.hashCode();
+        result = 31 * result + maxVideoDimensions.hashCode();
+        result = 31 * result + minFps;
+        result = 31 * result + maxFps;
+        result = 31 * result + aspectRatio.hashCode();
+        return result;
+    }
+
     public static class Builder {
         private VideoDimensions minVideoDimensions = new VideoDimensions(0,0);
         private VideoDimensions maxVideoDimensions = new VideoDimensions(0,0);
@@ -123,7 +148,8 @@ public class VideoConstraints {
                 throw new NullPointerException("MaxVideoDimensions must not be null");
             }
             if(minFps > maxFps) {
-                throw new IllegalStateException("MinFps " + minFps + " is greater than maxFps " + maxFps);
+                throw new IllegalStateException("MinFps " + minFps + " is greater than maxFps " +
+                        maxFps);
             }
             if(minFps < 0) {
                 throw new IllegalStateException("MinFps is less than 0");
@@ -135,10 +161,14 @@ public class VideoConstraints {
                 throw new IllegalStateException("MinFps is greater than maxFps");
             }
             if(minVideoDimensions.width > maxVideoDimensions.width) {
-                throw new IllegalStateException("Min video dimensions width " + minVideoDimensions.width + " is greater than max video dimensions width " + maxVideoDimensions.width);
+                throw new IllegalStateException("Min video dimensions width " +
+                        minVideoDimensions.width + " is greater than max video dimensions width " +
+                        maxVideoDimensions.width);
             }
             if(minVideoDimensions.height > maxVideoDimensions.height) {
-                throw new IllegalStateException("Min video dimensions height " + minVideoDimensions.height+ " is greater than max video dimensions height " + maxVideoDimensions.height);
+                throw new IllegalStateException("Min video dimensions height " +
+                        minVideoDimensions.height+ " is greater than max video dimensions height " +
+                        maxVideoDimensions.height);
             }
             if (aspectRatio.numerator < 0) {
                 throw new IllegalStateException("aspectRatio numerator is less than 0");

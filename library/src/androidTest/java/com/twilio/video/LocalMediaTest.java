@@ -12,10 +12,11 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import java.util.ArrayList;
+
 import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertFalse;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 @RunWith(AndroidJUnit4.class)
@@ -187,17 +188,14 @@ public class LocalMediaTest {
         assertEquals(1, localMedia.getVideoTracks().size());
     }
 
-    @Test
-    public void addVideoTrack_shouldFailForInvalidConstraints() {
-        VideoConstraints invalidVideoConstraints = new VideoConstraints.Builder()
-                .minVideoDimensions(new VideoDimensions(1,2))
-                .maxVideoDimensions(new VideoDimensions(10,20))
-                .build();
-        LocalVideoTrack localVideoTrack = localMedia.addVideoTrack(true,
-                fakeVideoCapturer,
-                invalidVideoConstraints);
+    @Test(expected = IllegalStateException.class)
+    public void addVideoTrack_shouldFailIfVideoCapturerReturnsNullForSupportedFormats() {
+        localMedia.addVideoTrack(true, new FakeVideoCapturer(null));
+    }
 
-        assertNull(localVideoTrack);
+    @Test(expected = IllegalStateException.class)
+    public void addVideoTrack_shouldFailIfVideoCapturerProvidesNoSupportedFormats() {
+        localMedia.addVideoTrack(true, new FakeVideoCapturer(new ArrayList<VideoFormat>()));
     }
 
     @Test
