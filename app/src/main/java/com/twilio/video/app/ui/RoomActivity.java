@@ -72,8 +72,10 @@ import butterknife.OnClick;
 import butterknife.OnTextChanged;
 import io.reactivex.Completable;
 import io.reactivex.Single;
+import io.reactivex.SingleObserver;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.disposables.Disposable;
 import timber.log.Timber;
 
 import static com.twilio.video.app.R.drawable.ic_phonelink_ring_white_24dp;
@@ -387,21 +389,27 @@ public class RoomActivity extends AppCompatActivity {
         }
 
         connection.observeOn(AndroidSchedulers.mainThread())
-                .doOnSubscribe(disposable -> {
-                    InputUtils.hideKeyboard(this);
-                    rxDisposables.add(disposable);
-                })
-                .doOnSuccess(room -> {
-                    this.room = room;
-                    updateUi(this.room);
-                })
-                .doOnError(e -> {
-                    final String message = "Failed to retrieve access token";
-                    Timber.e("%s -> reason: %s", message, e.getMessage());
+                .subscribe(new SingleObserver<Room>() {
+                    @Override
+                    public void onSubscribe(Disposable disposable) {
+                        InputUtils.hideKeyboard(RoomActivity.this);
+                        rxDisposables.add(disposable);
+                    }
 
-                    Snackbar.make(primaryVideoView, message, Snackbar.LENGTH_LONG).show();
-                })
-                .subscribe();
+                    @Override
+                    public void onSuccess(Room room) {
+                        RoomActivity.this.room = room;
+                        updateUi(room);
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        final String message = "Failed to retrieve access token";
+                        Timber.e("%s -> reason: %s", message, e.getMessage());
+                        Snackbar.make(primaryVideoView, message, Snackbar.LENGTH_LONG).show();
+                    }
+                });
+
     }
 
     @OnClick(R.id.disconnect)
