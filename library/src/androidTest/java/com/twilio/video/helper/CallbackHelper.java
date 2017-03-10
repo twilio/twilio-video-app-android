@@ -25,6 +25,10 @@ public class CallbackHelper {
         public CountDownLatch onRecordingStartedLatch;
         public CountDownLatch onRecordingStoppedLatch;
 
+        private Room room;
+        private TwilioException twilioException;
+        private Participant participant;
+
         private void triggerLatch(CountDownLatch latch) {
             if (latch != null) {
                 latch.countDown();
@@ -33,37 +37,60 @@ public class CallbackHelper {
 
         @Override
         public void onConnected(Room room) {
+            this.room = room;
             triggerLatch(onConnectedLatch);
         }
 
         @Override
         public void onConnectFailure(Room room, TwilioException twilioException) {
+            this.room = room;
+            this.twilioException = twilioException;
             triggerLatch(onConnectFailureLatch);
         }
 
         @Override
         public void onDisconnected(Room room, TwilioException twilioException) {
+            this.room = room;
+            this.twilioException = twilioException;
             triggerLatch(onDisconnectedLatch);
         }
 
         @Override
         public void onParticipantConnected(Room room, Participant participant) {
+            this.room = room;
+            this.participant = participant;
             triggerLatch(onParticipantConnectedLatch);
         }
 
         @Override
         public void onParticipantDisconnected(Room room, Participant participant) {
+            this.room = room;
+            this.participant = participant;
             triggerLatch(onParticipantDisconnectedLatch);
         }
 
         @Override
         public void onRecordingStarted(Room room) {
+            this.room = room;
             triggerLatch(onRecordingStartedLatch);
         }
 
         @Override
         public void onRecordingStopped(Room room) {
+            this.room = room;
             triggerLatch(onRecordingStoppedLatch);
+        }
+
+        public Room getRoom() {
+            return room;
+        }
+
+        public TwilioException getTwilioException() {
+            return twilioException;
+        }
+
+        public Participant getParticipant() {
+            return participant;
         }
     }
 

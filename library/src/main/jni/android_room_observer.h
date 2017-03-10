@@ -23,7 +23,7 @@ public:
                 webrtc_jni::GetMethodID(env,
                             *j_twilio_exception_class_,
                             "<init>",
-                            "(ILjava/lang/String;)V")),
+                            "(I)V")),
         j_participant_class_(
             env, env->FindClass("com/twilio/video/Participant")),
         j_array_list_class_(env, env->FindClass("java/util/ArrayList")),
@@ -323,8 +323,7 @@ private:
     jobject createJavaRoomException(const twilio::video::TwilioError &twilio_error) {
         return jni()->NewObject(*j_twilio_exception_class_,
                                 j_twilio_exception_ctor_id_,
-                                twilio_error.getCode(),
-                                webrtc_jni::JavaStringFromStdString(jni(), twilio_error.getMessage()));
+                                twilio_error.getCode());
     }
 
     jobject createJavaMediaObject(std::shared_ptr<twilio::media::Media> media) {

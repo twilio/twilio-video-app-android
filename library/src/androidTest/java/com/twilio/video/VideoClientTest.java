@@ -168,4 +168,17 @@ public class VideoClientTest extends BaseClientTest {
         assertTrue(localMedia.removeVideoTrack(localVideoTrack));
         room.disconnect();
     }
+
+    @Test
+    public void connect_shouldFailToConnectWithBadToken() throws InterruptedException {
+        roomListener.onConnectFailureLatch = new CountDownLatch(1);
+        ConnectOptions connectOptions = new ConnectOptions.Builder("bad token")
+            .roomName(roomName)
+            .localMedia(localMedia)
+            .build();
+        Room room = VideoClient.connect(mediaTestActivity, connectOptions, roomListener);
+        assertTrue(roomListener.onConnectFailureLatch.await(20, TimeUnit.SECONDS));
+        assertEquals(roomListener.getTwilioException().code,
+            TwilioException.ACCESS_TOKEN_INVALID_EXCEPTION);
+    }
 }
