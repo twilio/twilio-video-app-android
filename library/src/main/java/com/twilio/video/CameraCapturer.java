@@ -81,6 +81,9 @@ public class CameraCapturer implements VideoCapturer {
                     videoCapturerListener.onCapturerStarted(success);
 
                     synchronized (CameraCapturer.this) {
+                        // Cache camera info immediately so we can use to align pictures
+                        CameraCapturer.this.info = getCameraInfo();
+
                         /*
                          * Here the user has specified a camera parameter updater. We need to apply
                          * these parameters after the capturer is started to ensure consistency
@@ -550,9 +553,6 @@ public class CameraCapturer implements VideoCapturer {
     private int getFrameOrientation() {
         int rotation = getDeviceOrientation();
 
-        if (info == null) {
-            info = getCameraInfo();
-        }
         if (info.facing == android.hardware.Camera.CameraInfo.CAMERA_FACING_BACK) {
             rotation = 360 - rotation;
         }
