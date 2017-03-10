@@ -20,7 +20,7 @@ import java.util.Set;
 /**
  * The VideoClient allows a user to connect to a Room.
  */
-public class VideoClient {
+public abstract class VideoClient {
     private static LogLevel level = LogLevel.OFF;
     private static Map<LogModule, LogLevel> moduleLogLevel = new EnumMap(LogModule.class);
     private static volatile boolean libraryIsLoaded = false;
