@@ -180,5 +180,6 @@ public class VideoClientTest extends BaseClientTest {
         assertTrue(roomListener.onConnectFailureLatch.await(20, TimeUnit.SECONDS));
         assertEquals(roomListener.getTwilioException().code,
             TwilioException.ACCESS_TOKEN_INVALID_EXCEPTION);
+        assertNotNull(roomListener.getTwilioException().message);
     }
 }

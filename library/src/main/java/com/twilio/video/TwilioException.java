@@ -1,10 +1,10 @@
 package com.twilio.video;
 
 import android.support.annotation.IntDef;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 import java.lang.annotation.Retention;
-import java.util.HashMap;
-import java.util.Map;
 
 import static java.lang.annotation.RetentionPolicy.SOURCE;
 
@@ -60,7 +60,7 @@ public class TwilioException extends Exception {
         CONFIGURATION_ACQUIRE_FAILED_EXCEPTION,
         CONFIGURATION_ACQUIRE_TURN_FAILED_EXCEPTION,
     })
-    public @interface Error {}
+    public @interface Code {}
     public static final int ACCESS_TOKEN_INVALID_EXCEPTION = 20101;
     public static final int ACCESS_TOKEN_HEADER_INVALID_EXCEPTION = 20102;
     public static final int ACCESS_TOKEN_ISSUER_INVALID_EXCEPTION = 20103;
@@ -105,55 +105,15 @@ public class TwilioException extends Exception {
 
     public final int code;
     public final String message;
+    public final String explanation;
 
-    private static Map<Integer, String> errorDescriptionMap = new HashMap<Integer, String>() {{
-        put(ACCESS_TOKEN_INVALID_EXCEPTION, "Invalid Access Token");
-        put(ACCESS_TOKEN_HEADER_INVALID_EXCEPTION, "Invalid Access Token header");
-        put(ACCESS_TOKEN_ISSUER_INVALID_EXCEPTION, "Invalid Access Token issuer/subject");
-        put(ACCESS_TOKEN_EXPIRED_EXCEPTION, "Access Token expired or expiration date invalid");
-        put(ACCESS_TOKEN_NOT_YET_VALID_EXCEPTION, "Access Token not yet valid");
-        put(ACCESS_TOKEN_GRANTS_INVALID_EXCEPTION, "Invalid Access Token grants");
-        put(ACCESS_TOKEN_SIGNATURE_INVALID_EXCEPTION, "Invalid Access Token signature");
-        put(SIGNALING_CONNECTION_ERROR_EXCEPTION, "Signaling connection error");
-        put(SIGNALING_CONNECTION_DISCONNECTED_EXCEPTION, "Signaling connection disconnected");
-        put(SIGNALING_CONNECTION_TIMEOUT_EXCEPTION, "Signaling connection timed out");
-        put(SIGNALING_INCOMING_MESSAGE_INVALID_EXCEPTION, "Client received an invalid signaling message");
-        put(SIGNALING_OUTGOING_MESSAGE_INVALID_EXCEPTION, "Client sent an invalid signaling message");
-        put(ROOM_NAME_INVALID_EXCEPTION, "Room name is invalid");
-        put(ROOM_NAME_TOO_LONG_EXCEPTION, "Room name is too long");
-        put(ROOM_NAME_CHARS_INVALID_EXCEPTION, "Room name contains invalid characters");
-        put(ROOM_CREATE_FAILED_EXCEPTION, "Unable to create Room");
-        put(ROOM_CONNECT_FAILED_EXCEPTION, "Unable to connect to Room");
-        put(ROOM_MAX_PARTICIPANTS_EXCEEDED_EXCEPTION, "Room contains too many Participants");
-        put(ROOM_NOT_FOUND_EXCEPTION, "Room not found");
-        put(ROOM_MAX_PARTICIPANTS_OUT_OF_RANGE_EXCEPTION, "MaxParticipants is out of range");
-        put(ROOM_TYPE_INVALID_EXCEPTION, "RoomType is not valid");
-        put(ROOM_TIMEOUT_OUT_OF_RANGE_EXCEPTION, "Timeout is out of range");
-        put(ROOM_STATUS_CALLBACK_METHOD_INVALID_EXCEPTION, "StatusCallbackMethod is invalid");
-        put(ROOM_STATUS_CALLBACK_INVALID_EXCEPTION, "StatusCallback is invalid");
-        put(PARTICIPANT_IDENTITY_INVALID_EXCEPTION, "Participant identity is invalid");
-        put(PARTICIPANT_IDENTITY_TOO_LONG_EXCEPTION, "Participant identity is too long");
-        put(PARTICIPANT_IDENTITY_CHARS_INVALID_EXCEPTION, "Participant identity contains invalid characters");
-        put(PARTICIPANT_MAX_TRACKS_EXCEEDED_EXCEPTION, "Participant has too many Tracks");
-        put(PARTICIPANT_NOT_FOUND_EXCEPTION, "Participant not found");
-        put(TRACK_INVALID_EXCEPTION, "Track is invalid");
-        put(TRACK_NAME_INVALID_EXCEPTION, "Track name is invalid");
-        put(TRACK_NAME_TOO_LONG_EXCEPTION, "Track name is too long");
-        put(TRACK_NAME_CHARS_INVALID_EXCEPTION, "Track name contains invalid characters");
-        put(MEDIA_CLIENT_LOCAL_DESC_FAILED_EXCEPTION, "Client is unable to create or apply a local media description");
-        put(MEDIA_SERVER_LOCAL_DESC_FAILED_EXCEPTION, "Server is unable to create or apply a local media description");
-        put(MEDIA_CLIENT_REMOTE_DESC_FAILED_EXCEPTION, "Client is unable to apply a remote media description");
-        put(MEDIA_SERVER_REMOTE_DESC_FAILED_EXCEPTION, "Server is unable to apply a remote media description");
-        put(MEDIA_NO_SUPPORTED_CODEC_EXCEPTION, "No supported codec");
-        put(MEDIA_CONNECTION_ERROR_EXCEPTION, "Media conection failed");
-        put(CONFIGURATION_ACQUIRE_FAILED_EXCEPTION, "Unable to acquire configuration");
-        put(CONFIGURATION_ACQUIRE_TURN_FAILED_EXCEPTION, "Unable to acquire TURN credentials");
-    }};
-
-    TwilioException(@TwilioException.Error int code) {
-        super(errorDescriptionMap.get(code));
+    TwilioException(@TwilioException.Code int code,
+                    @NonNull String message,
+                    @Nullable String explanation) {
+        super(message);
         this.code = code;
-        this.message = errorDescriptionMap.get(code);
+        this.message = message;
+        this.explanation = explanation;
     }
 }
 
