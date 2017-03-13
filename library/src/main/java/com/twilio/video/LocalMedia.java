@@ -133,7 +133,10 @@ public class LocalMedia {
     }
 
     /**
-     * Adds local video track to local media.
+     * Adds local video track to local media. Local media invokes
+     * {@link VideoCapturer#getSupportedFormats()} to find the closest supported
+     * {@link VideoFormat} to 640x480 at 30 frames per second. The closest format is used to apply
+     * default {@link VideoConstraints} to the returned {@link LocalVideoTrack}.
      *
      * @param enabled initial state of video track.
      * @param videoCapturer capturer that provides video frames.
@@ -144,7 +147,15 @@ public class LocalMedia {
     }
 
     /**
-     * Adds local video track to local media.
+     * Adds local video track to local media. Local media will only apply {@code videoConstraints}
+     * compatible with {@code videoCapturer}. Default constraints described in
+     * {@link #addVideoTrack(boolean, VideoCapturer)} will be applied to the returned
+     * {@link LocalVideoTrack} for the following conditions:
+     * <p>
+     * <ol>
+     *     <li>Passing {@code null} as {@code videoConstraints}.</li>
+     *     <li>{@code videoConstraints} are incompatible with {@code videoCapturer}</li>
+     * </ol>
      *
      * @param enabled initial state of video track.
      * @param videoCapturer capturer that provides video frames.
