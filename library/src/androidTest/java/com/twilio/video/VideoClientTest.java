@@ -178,8 +178,8 @@ public class VideoClientTest extends BaseClientTest {
             .build();
         Room room = VideoClient.connect(mediaTestActivity, connectOptions, roomListener);
         assertTrue(roomListener.onConnectFailureLatch.await(20, TimeUnit.SECONDS));
-        assertEquals(roomListener.getTwilioException().code,
+        assertEquals(roomListener.getTwilioException().getCode(),
             TwilioException.ACCESS_TOKEN_INVALID_EXCEPTION);
-        assertNotNull(roomListener.getTwilioException().message);
+        assertNotNull(roomListener.getTwilioException().getMessage());
     }
 }

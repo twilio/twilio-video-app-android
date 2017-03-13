@@ -103,17 +103,23 @@ public class TwilioException extends Exception {
     public static final int CONFIGURATION_ACQUIRE_FAILED_EXCEPTION = 53500;
     public static final int CONFIGURATION_ACQUIRE_TURN_FAILED_EXCEPTION = 53501;
 
-    public final int code;
-    public final String message;
-    public final String explanation;
+    private final int code;
+    private final String explanation;
 
     TwilioException(@TwilioException.Code int code,
                     @NonNull String message,
                     @Nullable String explanation) {
         super(message);
         this.code = code;
-        this.message = message;
         this.explanation = explanation;
+    }
+
+    public int getCode() {
+        return code;
+    }
+
+    public String getExplanation() {
+        return explanation;
     }
 }
 

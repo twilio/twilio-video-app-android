@@ -1097,8 +1097,8 @@ public class RoomActivity extends AppCompatActivity {
                 Timber.e("Failed to connect to room -> sid: %s, state: %s, code: %d, error: %s",
                         room.getSid(),
                         room.getState(),
-                        twilioException.code,
-                        twilioException.message);
+                        twilioException.getCode(),
+                        twilioException.getMessage());
 
                 removeAllParticipants();
 
