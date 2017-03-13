@@ -96,20 +96,22 @@ public class LocalMediaVideoConstraintsParameterizedTest {
             .minVideoDimensions(new VideoDimensions(640, 1920))
             .maxVideoDimensions(new VideoDimensions(640, 1920))
             .build();
-    private static final VideoConstraints maxWidth1920Constraints = new VideoConstraints.Builder()
-            .minVideoDimensions(VideoDimensions.CIF_VIDEO_DIMENSIONS)
-            .maxVideoDimensions(new VideoDimensions(1920, 480))
+    private static final VideoConstraints maxWidth288Constraints = new VideoConstraints.Builder()
+            .maxVideoDimensions(new VideoDimensions(288, 480))
             .build();
-    private static final VideoConstraints maxHeight1920Constraints = new VideoConstraints.Builder()
-            .minVideoDimensions(VideoDimensions.CIF_VIDEO_DIMENSIONS)
-            .maxVideoDimensions(new VideoDimensions(640, 1920))
+    private static final VideoConstraints maxHeight144Constraints = new VideoConstraints.Builder()
+            .maxVideoDimensions(new VideoDimensions(640, 144))
             .build();
-    private static final VideoConstraints aspectRatio16by9Constraints =
+    private static final VideoConstraints aspectRatio16by9Hd1080pConstraints =
             new VideoConstraints.Builder()
             .aspectRatio(new AspectRatio(16, 9))
             .maxFps(30)
             .maxVideoDimensions(VideoDimensions.HD_1080P_VIDEO_DIMENSIONS)
             .build();
+    private static final VideoConstraints aspectRatio16by9Constraints =
+            new VideoConstraints.Builder()
+                    .aspectRatio(new AspectRatio(16, 9))
+                    .build();
 
     private static class TestParameters {
         private final VideoConstraints videoConstraints;
@@ -137,13 +139,13 @@ public class LocalMediaVideoConstraintsParameterizedTest {
                         new TestParameters(minWidth1920Constraints, videoCapturer24Fps,
                                 vgaMax24FpsMaxConstraints)},
                 {"Capturer does not support max width constraint",
-                        new TestParameters(maxWidth1920Constraints, videoCapturer24Fps,
+                        new TestParameters(maxWidth288Constraints, videoCapturer24Fps,
                                 vgaMax24FpsMaxConstraints)},
                 {"Capturer does not support minimum height constraint",
                         new TestParameters(minHeight1920Constraints, videoCapturer24Fps,
                                 vgaMax24FpsMaxConstraints)},
                 {"Capturer does not support max height constraint",
-                        new TestParameters(maxHeight1920Constraints, videoCapturer24Fps,
+                        new TestParameters(maxHeight144Constraints, videoCapturer24Fps,
                                 vgaMax24FpsMaxConstraints)},
                 {"Capturer does not support minimum FPS constraint",
                         new TestParameters(vgaMin30FpsMaxConstraints, videoCapturer24Fps,
@@ -152,11 +154,17 @@ public class LocalMediaVideoConstraintsParameterizedTest {
                         new TestParameters(vgaMax24FpsMaxConstraints, videoCapturer30Fps,
                                 LocalMedia.defaultVideoConstraints)},
                 {"Capturer does not support aspect ratio constraint",
-                        new TestParameters(aspectRatio16by9Constraints, videoCapturer4by3Ratio30Fps,
+                        new TestParameters(aspectRatio16by9Hd1080pConstraints,
+                                videoCapturer4by3Ratio30Fps,
                                 LocalMedia.defaultVideoConstraints)},
                 {"Capturer supports aspect ratio constraint",
-                        new TestParameters(aspectRatio16by9Constraints, galaxyS5BackCameraCapturer,
+                        new TestParameters(aspectRatio16by9Constraints,
+                                galaxyS5BackCameraCapturer,
                                 aspectRatio16by9Constraints)},
+                {"Capturer supports aspect ratio and resolution constraint",
+                        new TestParameters(aspectRatio16by9Hd1080pConstraints,
+                                galaxyS5BackCameraCapturer,
+                                aspectRatio16by9Hd1080pConstraints)},
                 {"Capturer fully supports constraints",
                         new TestParameters(vgaMax24FpsMaxConstraints, videoCapturer30And24Fps,
                                 vgaMax24FpsMaxConstraints)}});

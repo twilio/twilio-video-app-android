@@ -244,11 +244,21 @@ public class LocalMedia {
             int minFps = videoConstraints.getMinFps();
             int maxFps = videoConstraints.getMaxFps();
             boolean formatCompatible = minVideoDimensions.width <= videoFormat.dimensions.width &&
-                    maxVideoDimensions.width >= videoFormat.dimensions.width &&
                     minVideoDimensions.height <= videoFormat.dimensions.height &&
-                    maxVideoDimensions.height >= videoFormat.dimensions.height &&
-                    minFps <= videoFormat.framerate &&
-                    maxFps >= videoFormat.framerate;
+                    minFps <= videoFormat.framerate;
+
+            // Validate that max dimensions are compatible
+            if (maxVideoDimensions.width > 0) {
+                formatCompatible &= maxVideoDimensions.width >= videoFormat.dimensions.width;
+            }
+            if (maxVideoDimensions.height > 0) {
+                formatCompatible &= maxVideoDimensions.height >= videoFormat.dimensions.height;
+            }
+
+            // Validate that max FPS is compatible
+            if (maxFps > 0) {
+                formatCompatible &= maxFps >= videoFormat.framerate;
+            }
 
             // Check if format resolution is within aspect ratio tolerance
             if (aspectRatio.numerator > 0 && aspectRatio.denominator > 0) {
