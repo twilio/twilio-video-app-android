@@ -85,6 +85,7 @@ public class RoomActivity extends AppCompatActivity {
     private static final int PERMISSIONS_REQUEST_CODE = 100;
     private static final int MEDIA_PROJECTION_REQUEST_CODE = 101;
     private static final int STATS_DELAY = 1000; // milliseconds
+    private static final String LOCAL_PARTICIPANT_STUB_SID = "";
 
     private AspectRatio[] aspectRatios = new AspectRatio[]{
             VideoConstraints.ASPECT_RATIO_4_3,
@@ -478,25 +479,25 @@ public class RoomActivity extends AppCompatActivity {
 
         if (room != null) {
 
-            LocalParticipant localParticipant = room.getLocalParticipant();
+            String localSid = room.getLocalParticipant().getSid();
 
             // update local participant thumb
-            participantController.updateThumb(room.getLocalParticipant().getSid(), oldVideo,
-                    cameraVideoTrack);
+            participantController.updateThumb(localSid, oldVideo, cameraVideoTrack);
 
-            if (participantController.getPrimaryItem().sid.equals(localParticipant.getSid())) {
+            if (participantController.getPrimaryItem().sid.equals(localSid)) {
 
                 // local video was rendered as primary view - refreshing
-                participantController.renderAsPrimary(localParticipant.getSid(), getString(R.string.you),
-                        cameraVideoTrack, localAudioTrack == null);
+                participantController.renderAsPrimary(localSid,
+                        getString(R.string.you),
+                        cameraVideoTrack,
+                        localAudioTrack == null,
+                        cameraCapturer.getCameraSource() == CameraCapturer.CameraSource.FRONT_CAMERA);
+
                 participantController.getPrimaryView().showIdentityBadge(false);
 
-                // update mirror
-                primaryVideoView.setMirror(cameraCapturer.getCameraSource() ==
-                        CameraCapturer.CameraSource.FRONT_CAMERA);
-
                 // update thumb state
-                participantController.updateThumb(localParticipant.getSid(), cameraVideoTrack,
+                participantController.updateThumb(localSid,
+                        cameraVideoTrack,
                         ParticipantView.State.SELECTED);
             }
 
@@ -614,12 +615,13 @@ public class RoomActivity extends AppCompatActivity {
      * when connected to room.
      */
     private void renderLocalParticipantStub() {
-        participantController.renderAsPrimary("", getString(R.string.you), cameraVideoTrack,
-                localAudioTrack == null);
+        participantController.renderAsPrimary(LOCAL_PARTICIPANT_STUB_SID,
+                getString(R.string.you),
+                cameraVideoTrack,
+                localAudioTrack == null,
+                cameraCapturer.getCameraSource() == CameraCapturer.CameraSource.FRONT_CAMERA);
 
         primaryVideoView.showIdentityBadge(false);
-        primaryVideoView.setMirror(cameraCapturer.getCameraSource() ==
-                CameraCapturer.CameraSource.FRONT_CAMERA);
     }
 
     private void updateUi(Room room) {
@@ -693,30 +695,20 @@ public class RoomActivity extends AppCompatActivity {
 
     private void switchCamera() {
         if (cameraCapturer != null) {
+            String localSid = (room == null) ?
+                    LOCAL_PARTICIPANT_STUB_SID : room.getLocalParticipant().getSid();
+
+            boolean mirror =
+                    cameraCapturer.getCameraSource() == CameraCapturer.CameraSource.BACK_CAMERA;
+
             cameraCapturer.switchCamera();
 
-            if (room != null) {
-
-                if (participantController.getPrimaryItem().sid.equals(room.getLocalParticipant().getSid())) {
-
-                    // local video was rendered as primary view - refreshing
-                    participantController.getPrimaryView().setMirror(cameraCapturer.getCameraSource() ==
-                            CameraCapturer.CameraSource.FRONT_CAMERA);
-
-                } else {
-
-                    // local video was rendered as thumb - refreshing thumb state
-                    ParticipantView thumb = participantController.getThumb(
-                            room.getLocalParticipant().getSid(), cameraVideoTrack);
-                    thumb.setMirror(cameraCapturer.getCameraSource() ==
-                            CameraCapturer.CameraSource.FRONT_CAMERA);
-                }
+            if (participantController.getPrimaryItem().sid.equals(localSid)) {
+                participantController.updatePrimaryThumb(mirror);
             } else {
-
-                // local video was rendered as primary view - refreshing
-                participantController.getPrimaryView().setMirror(cameraCapturer.getCameraSource() ==
-                        CameraCapturer.CameraSource.FRONT_CAMERA);
+                participantController.updateThumb(localSid, cameraVideoTrack, mirror);
             }
+
         }
     }
 
@@ -1040,6 +1032,7 @@ public class RoomActivity extends AppCompatActivity {
                         int state = old.videoTrack == null ?
                                 ParticipantView.State.NO_VIDEO : ParticipantView.State.VIDEO;
                         participantController.updateThumb(old.sid, old.videoTrack, state);
+                        participantController.updateThumb(old.sid, old.videoTrack, old.mirror);
 
                     } else {
 
@@ -1084,10 +1077,14 @@ public class RoomActivity extends AppCompatActivity {
 
                 // add local thumb and "click" on it to make primary
                 String localSid = room.getLocalParticipant().getSid();
-                participantController.addThumb(localSid, getString(R.string.you), cameraVideoTrack,
-                        localAudioTrack == null);
-                participantController.getThumb(room.getLocalParticipant().getSid(),
-                        cameraVideoTrack).callOnClick();
+
+                participantController.addThumb(localSid,
+                        getString(R.string.you),
+                        cameraVideoTrack,
+                        localAudioTrack == null,
+                        cameraCapturer.getCameraSource() == CameraCapturer.CameraSource.FRONT_CAMERA);
+
+                participantController.getThumb(localSid, cameraVideoTrack).callOnClick();
 
                 // add existing room participants thumbs
                 for (Participant participant : room.getParticipants().values()) {
