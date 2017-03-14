@@ -340,10 +340,11 @@ public class CameraCapturerTest extends BaseCameraCapturerTest {
     }
 
     @Test
-    public void takePicture_shouldFailWithPicturePending() {
+    public void takePicture_shouldFailWithPicturePending() throws  InterruptedException{
         cameraCapturer = new CameraCapturer(cameraCapturerActivity,
                 CameraCapturer.CameraSource.BACK_CAMERA);
         localVideoTrack = localMedia.addVideoTrack(true, cameraCapturer);
+        final CountDownLatch onPictureTakenLatch = new CountDownLatch(1);
         CameraCapturer.PictureListener pictureListener = new CameraCapturer.PictureListener() {
             @Override
             public void onShutter() {
@@ -352,12 +353,13 @@ public class CameraCapturerTest extends BaseCameraCapturerTest {
 
             @Override
             public void onPictureTaken(byte[] pictureData) {
-
+                onPictureTakenLatch.countDown();
             }
         };
 
         assertTrue(cameraCapturer.takePicture(pictureListener));
         assertFalse(cameraCapturer.takePicture(pictureListener));
+        assertTrue(onPictureTakenLatch.await(10, TimeUnit.SECONDS));
     }
 
     @Test
