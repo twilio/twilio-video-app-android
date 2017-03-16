@@ -97,7 +97,7 @@ dependencies {
      * the dependency down directly to compile against a current version of the
      * libjingle_peerconnection_java.jar which contains a fix for GSDK-1047.
      */
-    preCompile 'com.twilio.sdk:twilio-webrtc:55.11:android@tar.bz2'
+    preCompile 'com.twilio.sdk:twilio-webrtc:55.12:android@tar.bz2'
     preCompile 'com.twilio.sdk:twilio-video:0.7.0:android@tar.bz2'
 
     testCompile 'junit:junit:4.12'
