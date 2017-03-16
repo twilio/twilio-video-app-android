@@ -51,7 +51,9 @@ public class LocalAudioTrackTest {
 
     @After
     public void teardown() {
-        localMedia.release();
+        if (localMedia != null) {
+            localMedia.release();
+        }
     }
 
     @Test

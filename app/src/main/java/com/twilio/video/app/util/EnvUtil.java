@@ -1,6 +1,6 @@
 package com.twilio.video.app.util;
 
-import com.twilio.video.simplersignaling.SimplerSignalingUtils;
+import com.twilio.video.twilioapi.TwilioApiUtils;
 
 public class EnvUtil {
     private static final String TWILIO_DEV_ENV = "Development";
@@ -9,9 +9,9 @@ public class EnvUtil {
     public static final String TWILIO_ENV_KEY = "TWILIO_ENVIRONMENT";
 
     public static String getNativeEnvironmentVariableValue(String environment) {
-        if (environment.equals(SimplerSignalingUtils.DEV)) {
+        if (environment.equals(TwilioApiUtils.DEV)) {
             return TWILIO_DEV_ENV;
-        } else if (environment.equals(SimplerSignalingUtils.STAGE)) {
+        } else if (environment.equals(TwilioApiUtils.STAGE)) {
             return TWILIO_STAGE_ENV;
         } else {
             return TWILIO_PROD_ENV;

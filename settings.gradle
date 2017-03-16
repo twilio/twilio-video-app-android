@@ -1,1 +1,1 @@
-include ':library', ':app', ':env', ':simplersignaling', ':twilioapi'
+include ':library', ':app', ':env', ':twilioapi'

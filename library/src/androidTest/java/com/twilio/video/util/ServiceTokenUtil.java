@@ -11,14 +11,25 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 public class ServiceTokenUtil {
     private static TwilioServiceToken twilioServiceToken = null;
 
     public static Set<IceServer> getIceServers() {
+        Map<String, String> credentials = CredentialsUtils.resolveCredentials(
+                Environment.fromString(BuildConfig.ENVIRONMENT),
+                /*
+                 * We just pass P2P for now, but we don't actually care about topology since
+                 * we are only interested in ACCOUNT_SID and AUTH_TOKEN to use Twilio API.
+                 */
+                Topology.P2P);
         if (isExpired(twilioServiceToken)) {
-            twilioServiceToken = TwilioApiUtils.getServiceToken(BuildConfig.ENVIRONMENT);
+            twilioServiceToken = TwilioApiUtils
+                    .getServiceToken(credentials.get(CredentialsUtils.ACCOUNT_SID),
+                            credentials.get(CredentialsUtils.AUTH_TOKEN),
+                            BuildConfig.ENVIRONMENT);
         }
         return convertToIceServersSet(twilioServiceToken.getIceServers());
     }

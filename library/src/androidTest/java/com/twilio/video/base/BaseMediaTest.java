@@ -1,7 +1,5 @@
 package com.twilio.video.base;
 
-import android.app.Instrumentation;
-import android.support.test.InstrumentationRegistry;
 import android.support.test.rule.ActivityTestRule;
 
 import com.twilio.video.ConnectOptions;
@@ -12,7 +10,7 @@ import com.twilio.video.RoomState;
 import com.twilio.video.VideoClient;
 import com.twilio.video.helper.CallbackHelper;
 import com.twilio.video.ui.MediaTestActivity;
-import com.twilio.video.util.AccessTokenUtils;
+import com.twilio.video.util.CredentialsUtils;
 import com.twilio.video.util.Constants;
 import com.twilio.video.util.FakeVideoCapturer;
 import com.twilio.video.util.PermissionUtils;
@@ -76,7 +74,7 @@ public abstract class BaseMediaTest extends BaseClientTest {
         testRoom = RandUtils.generateRandomString(10);
         fakeVideoCapturer = new FakeVideoCapturer();
         actor1LocalMedia = LocalMedia.create(mediaTestActivity);
-        tokenOne = AccessTokenUtils.getAccessToken(Constants.PARTICIPANT_ALICE);
+        tokenOne = CredentialsUtils.getAccessToken(Constants.PARTICIPANT_ALICE);
 
         // Connect actor 1
         actor1RoomListener = new CallbackHelper.FakeRoomListener();
@@ -87,7 +85,7 @@ public abstract class BaseMediaTest extends BaseClientTest {
 
         // Connect actor 2
         actor2LocalMedia = LocalMedia.create(mediaTestActivity);
-        tokenTwo = AccessTokenUtils.getAccessToken(Constants.PARTICIPANT_BOB);
+        tokenTwo = CredentialsUtils.getAccessToken(Constants.PARTICIPANT_BOB);
 
         actor2RoomListener = new CallbackHelper.FakeRoomListener();
         actor2Room = connectClient(tokenTwo, actor2LocalMedia, actor2RoomListener);
@@ -108,10 +106,14 @@ public abstract class BaseMediaTest extends BaseClientTest {
         actor1Room = null;
         actor1RoomListener = null;
         participant = null;
-        actor1LocalMedia.release();
-        actor1LocalMedia = null;
-        actor2LocalMedia.release();
-        actor2LocalMedia = null;
+        if (actor1LocalMedia != null) {
+            actor1LocalMedia.release();
+            actor1LocalMedia = null;
+        }
+        if (actor2LocalMedia != null) {
+            actor2LocalMedia.release();
+            actor2LocalMedia = null;
+        }
         fakeVideoCapturer = null;
     }
 }

@@ -1,12 +1,11 @@
 package com.twilio.video;
 
 import android.support.test.rule.ActivityTestRule;
-import android.util.Log;
 
 import com.twilio.video.base.BaseClientTest;
 import com.twilio.video.helper.CallbackHelper;
 import com.twilio.video.ui.MediaTestActivity;
-import com.twilio.video.util.AccessTokenUtils;
+import com.twilio.video.util.CredentialsUtils;
 import com.twilio.video.util.Constants;
 import com.twilio.video.util.FakeVideoCapturer;
 import com.twilio.video.util.PermissionUtils;
@@ -15,12 +14,10 @@ import com.twilio.video.util.ServiceTokenUtil;
 
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
@@ -44,17 +41,21 @@ public class IceTest extends BaseClientTest {
         VideoClient.setModuleLogLevel(LogModule.SIGNALING, LogLevel.ALL);
         mediaTestActivity = activityRule.getActivity();
         PermissionUtils.allowPermissions(mediaTestActivity);
-        aliceToken = AccessTokenUtils.getAccessToken(Constants.PARTICIPANT_ALICE);
+        aliceToken = CredentialsUtils.getAccessToken(Constants.PARTICIPANT_ALICE);
         roomName = RandUtils.generateRandomString(20);
         aliceLocalMedia = LocalMedia.create(mediaTestActivity);
-        bobToken = AccessTokenUtils.getAccessToken(Constants.PARTICIPANT_BOB);
+        bobToken = CredentialsUtils.getAccessToken(Constants.PARTICIPANT_BOB);
         bobLocalMedia = LocalMedia.create(mediaTestActivity);
     }
 
     @After
     public void teardown() {
-        aliceLocalMedia.release();
-        bobLocalMedia.release();
+        if (aliceLocalMedia != null) {
+            aliceLocalMedia.release();
+        }
+        if (bobLocalMedia != null) {
+            bobLocalMedia.release();
+        }
     }
 
     @Test

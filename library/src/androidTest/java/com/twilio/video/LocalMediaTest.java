@@ -35,7 +35,9 @@ public class LocalMediaTest {
 
     @After
     public void teardown() {
-        localMedia.release();
+        if (localMedia != null) {
+            localMedia.release();
+        }
     }
 
     @Test(expected = IllegalStateException.class)

@@ -89,8 +89,8 @@ android {
 
 dependencies {
     compile project(':library')
+    compile project(':twilioapi')
     compile project(':env')
-    compile project(':simplersignaling')
     compile 'net.hockeyapp.android:HockeySDK:3.5.0'
     compile 'com.android.support:design:25.1.0'
     compile 'com.android.support:preference-v14:25.1.0'

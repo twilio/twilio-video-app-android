@@ -3,18 +3,75 @@ Android Video SDK
 
 ## Getting Started
 
-1.  Install the Android SDK
-    * Define `$ANROID_HOME`, `$ANDROID_SDK_HOME`, and `$ANDROID_SDK_ROOT`
-1.  Install the Android NDK
-    * Define `$NDK_ROOT`, `$ANDROID_NDK_HOME`, and `$ANDROID_NDK_ROOT`
-1.  Add the following to your `$PATH`
+The following steps must be done to setup your machine to build the Android Video SDK.
+
+1. Install [Android SDK](https://developer.android.com/studio/index.html)
+    1. Define `$ANROID_HOME`, `$ANDROID_SDK_HOME`, and `$ANDROID_SDK_ROOT`
+2. Install [Android NDK r12b](https://developer.android.com/ndk/downloads/older_releases.html)
+    1. Define `$NDK_ROOT`, `$ANDROID_NDK_HOME`, and `$ANDROID_NDK_ROOT`
+3. Add the following to your `$PATH`
     * `$ANDROID_HOME/tools`
     * `$ANDROID_HOME/platform-tools`
     * `$ANDROID_NDK_ROOT`
-1.  Download google-services.json for each needed build variant.
-    1. [Internal Debug (default)](https://console.firebase.google.com/project/video-app-79418/settings/general/android:com.twilio.video.app.internal.debug) - Download to `app/src/internal/debug`
-    1. [Internal Release](https://console.firebase.google.com/project/video-app-79418/settings/general/android:com.twilio.video.app.internal) - Download to `app/src/internal/release`
-    1. [Production Release](https://console.firebase.google.com/project/video-app-79418/settings/general/android:com.twilio.video.app) - Download to `app/src/production/release`
+    
+### Credentials
+
+Credentials are required in the form of a `twilio-video.json` located in the `library` directory. 
+There are two sets of key/value pairs: mandatory and optional. Mandatory values are 
+required to be set before building the project. Optional values are not required to be set, 
+but as a Twilio developer they are required to run tests across server environments and topologies.
+
+The following values must be set to execute tests. An example json file is provided 
+under [library/twilio-video-example.json](library/twilio-video-example.json). For Twilio 
+developers, these values represent prod credentials and a P2P configuration profile SID:
+
+```
+account_sid
+auth_token
+api_key
+api_key_secret
+configuration_profile_sid
+```
+
+
+The following values are additional prod configuration profile SIDs that allow developers to 
+test SFU and SFU Recording. Note these are optional values, but are required 
+to ensure the entire test suite can be executed. The values are not mandatory because not 
+every developer is guaranteed to have configuration profile SIDs for SFU or SFU Recording:
+
+```
+sfu_configuration_profile_sid
+sfu_recording_configuration_profile_sid
+```
+
+The following values are optional but are needed to run the test suite against dev 
+or staging environments:
+
+```
+dev_account_sid
+dev_auth_token
+dev_api_key
+dev_api_key_secret
+dev_p2p_configuration_profile_sid
+dev_sfu_configuration_profile_sid
+dev_sfu_recording_configuration_profile_sid
+
+stage_account_sid
+stage_auth_token
+stage_api_key
+stage_api_key_secret
+stage_p2p_configuration_profile_sid
+stage_sfu_configuration_profile_sid
+stage_sfu_recording_configuration_profile_sid
+```
+
+### Google Services
+
+To build the Video application download google-services.json for each needed build variant.
+
+- [Internal Debug (default)](https://console.firebase.google.com/project/video-app-79418/settings/general/android:com.twilio.video.app.internal.debug) - Download to `app/src/internal/debug`
+- [Internal Release](https://console.firebase.google.com/project/video-app-79418/settings/general/android:com.twilio.video.app.internal) - Download to `app/src/internal/release`
+- [Production Release](https://console.firebase.google.com/project/video-app-79418/settings/general/android:com.twilio.video.app) - Download to `app/src/production/release`
 
 ## Developing
 

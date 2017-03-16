@@ -18,6 +18,8 @@ public abstract class BaseLocalVideoTrackTest {
     }
 
     public void teardown() {
-        localMedia.release();
+        if (localMedia != null) {
+            localMedia.release();
+        }
     }
 }

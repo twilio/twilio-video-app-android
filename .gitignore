@@ -56,3 +56,6 @@ sdk/libs/
 
 # Google Play Services
 **/google-services.json
+
+# Twilio Video Config
+**/twilio-video.json

@@ -41,7 +41,9 @@ public class LocalVideoTrackEnabledParameterizedTest extends BaseLocalVideoTrack
 
     @After
     public void teardown() {
-        localMedia.removeVideoTrack(localVideoTrack);
+        if (localMedia != null) {
+            localMedia.removeVideoTrack(localVideoTrack);
+        }
         super.teardown();
     }
 

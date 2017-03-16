@@ -6,14 +6,14 @@ import android.support.test.runner.AndroidJUnit4;
 
 import com.twilio.video.base.BaseClientTest;
 import com.twilio.video.helper.CallbackHelper;
-import com.twilio.video.simplersignaling.SimplerSignalingUtils;
 import com.twilio.video.test.BuildConfig;
 import com.twilio.video.ui.MediaTestActivity;
-import com.twilio.video.util.AccessTokenUtils;
+import com.twilio.video.util.CredentialsUtils;
 import com.twilio.video.util.Constants;
 import com.twilio.video.util.FakeVideoCapturer;
 import com.twilio.video.util.PermissionUtils;
 import com.twilio.video.util.RandUtils;
+import com.twilio.video.util.Topology;
 
 import junit.framework.Assert;
 
@@ -50,14 +50,16 @@ public class RoomTest extends BaseClientTest {
         mediaTestActivity = activityRule.getActivity();
         PermissionUtils.allowPermissions(mediaTestActivity);
         identity = Constants.PARTICIPANT_ALICE;
-        token = AccessTokenUtils.getAccessToken(identity);
+        token = CredentialsUtils.getAccessToken(identity);
         roomName = RandUtils.generateRandomString(20);
         localMedia = LocalMedia.create(mediaTestActivity);
     }
 
     @After
     public void teardown() {
-        localMedia.release();
+        if (localMedia != null) {
+            localMedia.release();
+        }
     }
 
     @Test
@@ -184,8 +186,8 @@ public class RoomTest extends BaseClientTest {
         assertNull(room.getLocalParticipant());
         assertTrue(roomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
 
-        if(BuildConfig.TOPOLOGY.equals(SimplerSignalingUtils.P2P) ||
-                BuildConfig.TOPOLOGY.equals(SimplerSignalingUtils.SFU)) {
+        Topology topology = Topology.fromString(BuildConfig.TOPOLOGY);
+        if(topology == Topology.P2P || topology == Topology.SFU) {
            Assert.assertFalse(room.isRecording());
         } else {
             /*

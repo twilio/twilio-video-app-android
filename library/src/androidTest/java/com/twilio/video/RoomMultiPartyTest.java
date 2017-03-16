@@ -8,7 +8,7 @@ import android.util.Pair;
 
 import com.twilio.video.base.BaseClientTest;
 import com.twilio.video.helper.CallbackHelper;
-import com.twilio.video.util.AccessTokenUtils;
+import com.twilio.video.util.CredentialsUtils;
 import com.twilio.video.util.Constants;
 import com.twilio.video.util.RandUtils;
 
@@ -49,7 +49,7 @@ public class RoomMultiPartyTest extends BaseClientTest {
         rooms = new ArrayList<>();
         tokens = new ArrayList<>();
         for (int i = 0; i < PARTICIPANT_NUM; i++) {
-            tokens.add(AccessTokenUtils.getAccessToken(PARTICIPANTS[i]));
+            tokens.add(CredentialsUtils.getAccessToken(PARTICIPANTS[i]));
         }
         roomName = RandUtils.generateRandomString(20);
     }

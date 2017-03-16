@@ -191,7 +191,9 @@ public class LocalMediaVideoConstraintsParameterizedTest {
 
     @After
     public void teardown() {
-        localMedia.release();
+        if (localMedia != null) {
+            localMedia.release();
+        }
     }
 
     @Test

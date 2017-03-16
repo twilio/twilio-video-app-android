@@ -31,7 +31,9 @@ public abstract class BaseClientTest {
         }
 
         Env.set(InstrumentationRegistry.getContext(), TWILIO_ENVIRONMENT_KEY, twilioEnv, true);
-        assertEquals(twilioEnv, Env.get(InstrumentationRegistry.getContext(), TWILIO_ENVIRONMENT_KEY));
+        assertEquals(twilioEnv,
+                Env.get(InstrumentationRegistry.getContext(),
+                TWILIO_ENVIRONMENT_KEY));
     }
 
 }

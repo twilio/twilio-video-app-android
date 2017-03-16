@@ -17,6 +17,10 @@ android {
     // Parameterizing config allows video application to use a debug build of the library
     defaultPublishConfig getPublishConfig()
 
+    packagingOptions {
+        exclude 'META-INF/LICENSE'
+    }
+
     defaultConfig {
         minSdkVersion 16
         targetSdkVersion 25
@@ -28,6 +32,9 @@ android {
 
         buildConfigField "String", "ENVIRONMENT", "\"${getEnvironment()}\""
         buildConfigField "String", "TOPOLOGY", "\"${getTopology()}\""
+        buildConfigField "java.util.Map<String, String>",
+                "twilioCredentials",
+                "${getTwilioVideoConfig()}"
 
         ndk {
             abiFilters 'x86', 'x86_64', 'armeabi-v7a', 'arm64-v8a'
@@ -95,18 +102,18 @@ dependencies {
 
     testCompile 'junit:junit:4.12'
     testCompile 'org.mockito:mockito-core:1.10.19'
-    testCompile 'com.google.guava:guava:19.0'
+    testCompile 'com.google.guava:guava:20.0'
 
     androidTestCompile project(':env')
-    androidTestCompile project(':simplersignaling')
     androidTestCompile project(':twilioapi')
     androidTestCompile 'com.squareup.retrofit:retrofit:1.9.0'
     androidTestCompile 'com.android.support.test.espresso:espresso-core:2.2.2'
     androidTestCompile 'com.android.support.test:runner:0.5'
     androidTestCompile 'com.android.support.test:rules:0.5'
     androidTestCompile 'com.android.support.test.uiautomator:uiautomator-v18:2.1.2'
-    androidTestCompile 'com.google.code.gson:gson:2.6.2'
+    androidTestCompile 'com.google.code.gson:gson:2.7'
     androidTestCompile 'com.twilio:accessmanager-android:0.1.0'
+    androidTestCompile 'io.jsonwebtoken:jjwt:0.7.0'
 
     compile 'com.android.support:support-annotations:25.1.0'
     compile 'com.getkeepsafe.relinker:relinker:1.2.2'
@@ -344,3 +351,36 @@ def getPublishConfig() {
     return publishConfig;
 }
 
+def getTwilioVideoConfig() {
+    // Validate twilio-video.json exists
+    assert project.file('twilio-video.json').exists() :
+            "Could not find twilio-video.json in" + project.projectDir.toString();
+    def slurper = new groovy.json.JsonSlurper()
+    def twilioVideoConfig = slurper.parse(project.file('twilio-video.json'));
+
+    // Validate that mandatory credentials are set
+    assertCredentialDefined(twilioVideoConfig.credentials, "account_sid");
+    assertCredentialDefined(twilioVideoConfig.credentials, "auth_token");
+    assertCredentialDefined(twilioVideoConfig.credentials, "api_key");
+    assertCredentialDefined(twilioVideoConfig.credentials, "api_key_secret");
+    assertCredentialDefined(twilioVideoConfig.credentials, "configuration_profile_sid");
+
+    // Generate credential HashMap
+    def hashMapPrefix = "new java.util.HashMap<String , String>() {{\n";
+    def hashMapSuffix = "}}";
+    def hashMap = hashMapPrefix;
+
+    twilioVideoConfig.credentials.each { credentialsEntry ->
+        def hashMapEntry = "    put(\"${credentialsEntry.key}\", \"${credentialsEntry.value}\");\n";
+        hashMap += hashMapEntry
+    }
+
+    return hashMap + hashMapSuffix;
+}
+
+def assertCredentialDefined(credentials, credentialKey) {
+    assert credentials.containsKey(credentialKey) :
+            "twilio-video.json must contain key " + credentialKey;
+    assert credentials.get(credentialKey) != null : credentialKey + " must not be null";
+    assert !credentials.get(credentialKey).equals("") : credentialKey + " must not be empty";
+}

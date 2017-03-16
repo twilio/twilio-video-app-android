@@ -9,7 +9,7 @@ import android.support.test.runner.AndroidJUnit4;
 import com.twilio.video.base.BaseClientTest;
 import com.twilio.video.helper.CallbackHelper;
 import com.twilio.video.ui.MediaTestActivity;
-import com.twilio.video.util.AccessTokenUtils;
+import com.twilio.video.util.CredentialsUtils;
 import com.twilio.video.util.Constants;
 import com.twilio.video.util.FakeVideoCapturer;
 import com.twilio.video.util.PermissionUtils;
@@ -49,8 +49,8 @@ public class StatsTest extends BaseClientTest {
         super.setup();
         mediaTestActivity = activityRule.getActivity();
         PermissionUtils.allowPermissions(mediaTestActivity);
-        aliceToken = AccessTokenUtils.getAccessToken(Constants.PARTICIPANT_ALICE);
-        bobToken = AccessTokenUtils.getAccessToken(Constants.PARTICIPANT_BOB);
+        aliceToken = CredentialsUtils.getAccessToken(Constants.PARTICIPANT_ALICE);
+        bobToken = CredentialsUtils.getAccessToken(Constants.PARTICIPANT_BOB);
         roomName = RandUtils.generateRandomString(20);
         aliceListener = new CallbackHelper.FakeRoomListener();
         bobListener = new CallbackHelper.FakeRoomListener();
@@ -62,8 +62,12 @@ public class StatsTest extends BaseClientTest {
     public void teardown() throws InterruptedException{
         roomTearDown(aliceRoom);
         roomTearDown(bobRoom);
-        aliceLocalMedia.release();
-        bobLocalMedia.release();
+        if (aliceLocalMedia != null) {
+            aliceLocalMedia.release();
+        }
+        if (bobLocalMedia != null) {
+            bobLocalMedia.release();
+        }
     }
 
     @Test(expected = NullPointerException.class)
