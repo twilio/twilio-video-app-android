@@ -14,6 +14,7 @@ import com.twilio.video.util.Constants;
 import com.twilio.video.util.FakeVideoCapturer;
 import com.twilio.video.util.PermissionUtils;
 import com.twilio.video.util.RandUtils;
+import com.twilio.video.util.Topology;
 
 import org.junit.After;
 import org.junit.Before;
@@ -21,7 +22,9 @@ import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
@@ -31,9 +34,16 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
 
-@RunWith(AndroidJUnit4.class)
+@RunWith(Parameterized.class)
 @LargeTest
-public class StatsTest extends BaseClientTest {
+public class StatsTopologyParameterizedTest extends BaseClientTest {
+    @Parameterized.Parameters(name = "{0}")
+    public static Iterable<Object[]> data() {
+        return Arrays.asList(new Object[][]{
+                {Topology.P2P},
+                {Topology.SFU}});
+    }
+
     @Rule
     public ActivityTestRule<MediaTestActivity> activityRule =
             new ActivityTestRule<>(MediaTestActivity.class);
@@ -43,14 +53,19 @@ public class StatsTest extends BaseClientTest {
     private Room aliceRoom, bobRoom;
     private LocalMedia aliceLocalMedia, bobLocalMedia;
     private CallbackHelper.FakeRoomListener aliceListener, bobListener;
+    private final Topology topology;
+
+    public StatsTopologyParameterizedTest(Topology topology) {
+        this.topology = topology;
+    }
 
     @Before
     public void setup() throws InterruptedException {
         super.setup();
         mediaTestActivity = activityRule.getActivity();
         PermissionUtils.allowPermissions(mediaTestActivity);
-        aliceToken = CredentialsUtils.getAccessToken(Constants.PARTICIPANT_ALICE);
-        bobToken = CredentialsUtils.getAccessToken(Constants.PARTICIPANT_BOB);
+        aliceToken = CredentialsUtils.getAccessToken(Constants.PARTICIPANT_ALICE, topology);
+        bobToken = CredentialsUtils.getAccessToken(Constants.PARTICIPANT_BOB, topology);
         roomName = RandUtils.generateRandomString(20);
         aliceListener = new CallbackHelper.FakeRoomListener();
         bobListener = new CallbackHelper.FakeRoomListener();

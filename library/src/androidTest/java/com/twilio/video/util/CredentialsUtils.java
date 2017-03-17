@@ -43,10 +43,9 @@ public class CredentialsUtils {
     public static final String STAGE_SFU_RECORDING_CONFIGURATION_PROFILE_SID =
             "stage_sfu_recording_configuration_profile_sid";
 
-    public static String getAccessToken(String username) {
+    public static String getAccessToken(String username, Topology topology) {
         Map<String, String> credentials = resolveCredentials(
-                Environment.fromString(BuildConfig.ENVIRONMENT),
-                Topology.fromString(BuildConfig.TOPOLOGY));
+                Environment.fromString(BuildConfig.ENVIRONMENT), topology);
         VideoAccessToken videoAccessToken = new VideoAccessToken.Builder(
                 credentials.get(ACCOUNT_SID),
                 credentials.get(API_KEY),

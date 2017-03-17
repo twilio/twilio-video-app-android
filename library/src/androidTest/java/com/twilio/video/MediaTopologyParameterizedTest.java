@@ -5,19 +5,40 @@ import android.support.test.runner.AndroidJUnit4;
 
 import com.twilio.video.base.BaseMediaTest;
 import com.twilio.video.helper.CallbackHelper;
+import com.twilio.video.util.Topology;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 
+import java.util.Arrays;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 import static org.junit.Assert.assertTrue;
 
-@RunWith(AndroidJUnit4.class)
+@RunWith(Parameterized.class)
 @LargeTest
-public class MediaTest extends BaseMediaTest {
+public class MediaTopologyParameterizedTest extends BaseMediaTest {
+    @Parameterized.Parameters(name = "{0}")
+    public static Iterable<Object[]> data() {
+        return Arrays.asList(new Object[][]{
+                {Topology.P2P},
+                {Topology.SFU}});
+    }
+
+    private final Topology topology;
+
+    public MediaTopologyParameterizedTest(Topology topology) {
+        this.topology = topology;
+    }
+
+    @Before
+    public void setup() throws InterruptedException {
+        super.baseSetup(topology);
+    }
+
     @Test
     public void shouldReceiveTrackEvents() throws InterruptedException {
         // Audio track added

@@ -1,5 +1,6 @@
 package com.twilio.video;
 
+import android.support.test.filters.LargeTest;
 import android.support.test.rule.ActivityTestRule;
 
 import com.twilio.video.base.BaseClientTest;
@@ -11,12 +12,16 @@ import com.twilio.video.util.FakeVideoCapturer;
 import com.twilio.video.util.PermissionUtils;
 import com.twilio.video.util.RandUtils;
 import com.twilio.video.util.ServiceTokenUtil;
+import com.twilio.video.util.Topology;
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.CountDownLatch;
@@ -24,15 +29,30 @@ import java.util.concurrent.TimeUnit;
 
 import static org.junit.Assert.assertTrue;
 
-public class IceTest extends BaseClientTest {
+@RunWith(Parameterized.class)
+@LargeTest
+public class IceTopologyParameterizedTest extends BaseClientTest {
+    @Parameterized.Parameters(name = "{0}")
+    public static Iterable<Object[]> data() {
+        return Arrays.asList(new Object[][]{
+                {Topology.P2P},
+                {Topology.SFU}});
+    }
+
     @Rule
     public ActivityTestRule<MediaTestActivity> activityRule =
         new ActivityTestRule<>(MediaTestActivity.class);
     private MediaTestActivity mediaTestActivity;
-    private String aliceToken, bobToken;
+    private String aliceToken;
+    private String bobToken;
     private String roomName;
-    private LocalMedia aliceLocalMedia, bobLocalMedia;
+    private LocalMedia aliceLocalMedia;
+    private LocalMedia bobLocalMedia;
+    private final Topology topology;
 
+    public IceTopologyParameterizedTest(Topology topology) {
+        this.topology = topology;
+    }
 
     @Before
     public void setup() throws InterruptedException {
@@ -41,10 +61,10 @@ public class IceTest extends BaseClientTest {
         VideoClient.setModuleLogLevel(LogModule.SIGNALING, LogLevel.ALL);
         mediaTestActivity = activityRule.getActivity();
         PermissionUtils.allowPermissions(mediaTestActivity);
-        aliceToken = CredentialsUtils.getAccessToken(Constants.PARTICIPANT_ALICE);
+        aliceToken = CredentialsUtils.getAccessToken(Constants.PARTICIPANT_ALICE, topology);
         roomName = RandUtils.generateRandomString(20);
         aliceLocalMedia = LocalMedia.create(mediaTestActivity);
-        bobToken = CredentialsUtils.getAccessToken(Constants.PARTICIPANT_BOB);
+        bobToken = CredentialsUtils.getAccessToken(Constants.PARTICIPANT_BOB, topology);
         bobLocalMedia = LocalMedia.create(mediaTestActivity);
     }
 

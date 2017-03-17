@@ -15,6 +15,7 @@ import com.twilio.video.util.Constants;
 import com.twilio.video.util.FakeVideoCapturer;
 import com.twilio.video.util.PermissionUtils;
 import com.twilio.video.util.RandUtils;
+import com.twilio.video.util.Topology;
 
 import org.junit.After;
 import org.junit.Before;
@@ -66,15 +67,14 @@ public abstract class BaseMediaTest extends BaseClientTest {
         assertTrue(roomListener.onDisconnectedLatch.await(20, TimeUnit.SECONDS));
     }
 
-    @Before
-    public void setup() throws InterruptedException {
+    public void baseSetup(Topology topology) throws InterruptedException {
         super.setup();
         mediaTestActivity = activityRule.getActivity();
         PermissionUtils.allowPermissions(mediaTestActivity);
         testRoom = RandUtils.generateRandomString(10);
         fakeVideoCapturer = new FakeVideoCapturer();
         actor1LocalMedia = LocalMedia.create(mediaTestActivity);
-        tokenOne = CredentialsUtils.getAccessToken(Constants.PARTICIPANT_ALICE);
+        tokenOne = CredentialsUtils.getAccessToken(Constants.PARTICIPANT_ALICE, topology);
 
         // Connect actor 1
         actor1RoomListener = new CallbackHelper.FakeRoomListener();
@@ -85,7 +85,7 @@ public abstract class BaseMediaTest extends BaseClientTest {
 
         // Connect actor 2
         actor2LocalMedia = LocalMedia.create(mediaTestActivity);
-        tokenTwo = CredentialsUtils.getAccessToken(Constants.PARTICIPANT_BOB);
+        tokenTwo = CredentialsUtils.getAccessToken(Constants.PARTICIPANT_BOB, topology);
 
         actor2RoomListener = new CallbackHelper.FakeRoomListener();
         actor2Room = connectClient(tokenTwo, actor2LocalMedia, actor2RoomListener);

@@ -12,13 +12,16 @@ import com.twilio.video.util.Constants;
 import com.twilio.video.util.FakeVideoCapturer;
 import com.twilio.video.util.PermissionUtils;
 import com.twilio.video.util.RandUtils;
+import com.twilio.video.util.Topology;
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 
+import java.util.Arrays;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
@@ -26,9 +29,16 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-@RunWith(AndroidJUnit4.class)
+@RunWith(Parameterized.class)
 @LargeTest
-public class VideoClientTest extends BaseClientTest {
+public class VideoClientTopologyParameterizedTest extends BaseClientTest {
+    @Parameterized.Parameters(name = "{0}")
+    public static Iterable<Object[]> data() {
+        return Arrays.asList(new Object[][]{
+                {Topology.P2P},
+                {Topology.SFU}});
+    }
+
     @Rule
     public ActivityTestRule<MediaTestActivity> activityRule =
             new ActivityTestRule<>(MediaTestActivity.class);
@@ -37,6 +47,11 @@ public class VideoClientTest extends BaseClientTest {
     private String roomName;
     private LocalMedia localMedia;
     private CallbackHelper.FakeRoomListener roomListener;
+    private final Topology topology;
+
+    public VideoClientTopologyParameterizedTest(Topology topology) {
+        this.topology = topology;
+    }
 
     @Before
     public void setup() throws InterruptedException {
@@ -44,7 +59,7 @@ public class VideoClientTest extends BaseClientTest {
         mediaTestActivity = activityRule.getActivity();
         roomListener = new CallbackHelper.FakeRoomListener();
         PermissionUtils.allowPermissions(mediaTestActivity);
-        token = CredentialsUtils.getAccessToken(Constants.PARTICIPANT_ALICE);
+        token = CredentialsUtils.getAccessToken(Constants.PARTICIPANT_ALICE, topology);
         roomName = RandUtils.generateRandomString(20);
         localMedia = LocalMedia.create(mediaTestActivity);
         VideoClient.setLogLevel(LogLevel.ALL);

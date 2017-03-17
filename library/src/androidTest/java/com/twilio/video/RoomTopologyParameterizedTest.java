@@ -2,11 +2,9 @@ package com.twilio.video;
 
 import android.support.test.filters.LargeTest;
 import android.support.test.rule.ActivityTestRule;
-import android.support.test.runner.AndroidJUnit4;
 
 import com.twilio.video.base.BaseClientTest;
 import com.twilio.video.helper.CallbackHelper;
-import com.twilio.video.test.BuildConfig;
 import com.twilio.video.ui.MediaTestActivity;
 import com.twilio.video.util.CredentialsUtils;
 import com.twilio.video.util.Constants;
@@ -22,7 +20,9 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 
+import java.util.Arrays;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
@@ -32,9 +32,17 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-@RunWith(AndroidJUnit4.class)
+@RunWith(Parameterized.class)
 @LargeTest
-public class RoomTest extends BaseClientTest {
+public class RoomTopologyParameterizedTest extends BaseClientTest {
+    @Parameterized.Parameters(name = "{0}")
+    public static Iterable<Object[]> data() {
+        return Arrays.asList(new Object[][]{
+                {Topology.P2P},
+                {Topology.SFU},
+                {Topology.SFU_RECORDING}});
+    }
+
     @Rule
     public ActivityTestRule<MediaTestActivity> activityRule =
             new ActivityTestRule<>(MediaTestActivity.class);
@@ -43,6 +51,11 @@ public class RoomTest extends BaseClientTest {
     private String token;
     private String roomName;
     private LocalMedia localMedia;
+    private final Topology topology;
+
+    public RoomTopologyParameterizedTest(Topology topology) {
+        this.topology = topology;
+    }
 
     @Before
     public void setup() throws InterruptedException {
@@ -50,7 +63,7 @@ public class RoomTest extends BaseClientTest {
         mediaTestActivity = activityRule.getActivity();
         PermissionUtils.allowPermissions(mediaTestActivity);
         identity = Constants.PARTICIPANT_ALICE;
-        token = CredentialsUtils.getAccessToken(identity);
+        token = CredentialsUtils.getAccessToken(identity, topology);
         roomName = RandUtils.generateRandomString(20);
         localMedia = LocalMedia.create(mediaTestActivity);
     }
@@ -177,6 +190,7 @@ public class RoomTest extends BaseClientTest {
     public void shouldReturnValidRecordingState() throws InterruptedException {
         CallbackHelper.FakeRoomListener roomListener = new CallbackHelper.FakeRoomListener();
         roomListener.onConnectedLatch = new CountDownLatch(1);
+        roomListener.onDisconnectedLatch = new CountDownLatch(1);
 
         ConnectOptions connectOptions = new ConnectOptions.Builder(token)
                 .roomName(roomName)
@@ -186,7 +200,6 @@ public class RoomTest extends BaseClientTest {
         assertNull(room.getLocalParticipant());
         assertTrue(roomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
 
-        Topology topology = Topology.fromString(BuildConfig.TOPOLOGY);
         if(topology == Topology.P2P || topology == Topology.SFU) {
            Assert.assertFalse(room.isRecording());
         } else {
@@ -200,6 +213,8 @@ public class RoomTest extends BaseClientTest {
 
         room.disconnect();
 
+        // Wait for disconnect and validate recording state
+        assertTrue(roomListener.onDisconnectedLatch.await(20, TimeUnit.SECONDS));
         Assert.assertFalse(room.isRecording());
     }
 

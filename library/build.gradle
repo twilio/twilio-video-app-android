@@ -31,7 +31,6 @@ android {
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
         buildConfigField "String", "ENVIRONMENT", "\"${getEnvironment()}\""
-        buildConfigField "String", "TOPOLOGY", "\"${getTopology()}\""
         buildConfigField "java.util.Map<String, String>",
                 "twilioCredentials",
                 "${getTwilioVideoConfig()}"
@@ -301,30 +300,6 @@ def getEnvironment() {
 
     println "Environment: " + environment
     return environment;
-}
-
-def getTopology() {
-    // Possible values for VIDEO_TOPOLOGY are 'P2P', 'SFU', and 'SFU Recording'.
-
-    // Attempt to get it from the environment variable
-    def topology = System.getenv("VIDEO_TOPOLOGY");
-
-    if (topology == null) {
-        println "Could not locate VIDEO_TOPOLOGY environment variable. Trying local.properties"
-        Properties properties = new Properties()
-        if (project.rootProject.file('local.properties').exists()) {
-            properties.load(project.rootProject.file('local.properties').newDataInputStream())
-            topology = properties.getProperty('VIDEO_TOPOLOGY')
-        }
-    }
-
-    if (topology == null) {
-        println "Could not locate VIDEO_TOPOLOGY in local.properties."
-        topology = "P2P"
-    }
-
-    println "Topology: " + topology
-    return topology;
 }
 
 def getPublishConfig() {

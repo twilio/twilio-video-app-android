@@ -33,27 +33,3 @@ library-load-instrumentation-tests:
         - class com.twilio.video.MediaFactoryTest#canCreateLocalMedia
     locales: en
     orientations: portrait
-
-library-sfu-instrumentation-tests:
-    timeout: 30m
-    type: instrumentation
-    app: app/build/outputs/apk/app-internal-debug.apk
-    test: library/build/outputs/apk/library-debug-androidTest.apk
-    device-ids:
-        - herolte
-    os-version-ids:
-        - 21
-        - 22
-        - 23
-    test-targets:
-        - class com.twilio.video.MediaTest
-        - class com.twilio.video.ParticipantTest
-        - class com.twilio.video.RoomMultiPartyTest
-        - class com.twilio.video.RoomTest
-        - class com.twilio.video.StatsTest
-        - class com.twilio.video.VideoClientTest
-        - class com.twilio.video.VideoTrackTest
-        - class com.twilio.video.IceTest
-    locales: en
-    orientations: portrait
-

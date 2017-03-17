@@ -10,12 +10,15 @@ import com.twilio.video.helper.CallbackHelper;
 import com.twilio.video.util.CredentialsUtils;
 import com.twilio.video.util.Constants;
 import com.twilio.video.util.RandUtils;
+import com.twilio.video.util.Topology;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
@@ -24,20 +27,32 @@ import static junit.framework.Assert.assertFalse;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-@RunWith(AndroidJUnit4.class)
+@RunWith(Parameterized.class)
 @LargeTest
-public class ParticipantTest extends BaseClientTest {
+public class ParticipantTopologyParameterizedTest extends BaseClientTest {
+    @Parameterized.Parameters(name = "{0}")
+    public static Iterable<Object[]> data() {
+        return Arrays.asList(new Object[][]{
+                {Topology.P2P},
+                {Topology.SFU}});
+    }
+
     private Context context;
     private String tokenOne;
     private String tokenTwo;
     private String roomName;
+    private final Topology topology;
+
+    public ParticipantTopologyParameterizedTest(Topology topology) {
+        this.topology = topology;
+    }
 
     @Before
     public void setup() throws InterruptedException {
         super.setup();
         context = InstrumentationRegistry.getInstrumentation().getTargetContext();
-        tokenOne = CredentialsUtils.getAccessToken(Constants.PARTICIPANT_ALICE);
-        tokenTwo = CredentialsUtils.getAccessToken(Constants.PARTICIPANT_BOB);
+        tokenOne = CredentialsUtils.getAccessToken(Constants.PARTICIPANT_ALICE, topology);
+        tokenTwo = CredentialsUtils.getAccessToken(Constants.PARTICIPANT_BOB, topology);
         roomName = RandUtils.generateRandomString(20);
     }
 

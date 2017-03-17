@@ -3,7 +3,6 @@ package com.twilio.video;
 import android.content.Context;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.filters.LargeTest;
-import android.support.test.runner.AndroidJUnit4;
 import android.util.Pair;
 
 import com.twilio.video.base.BaseClientTest;
@@ -11,13 +10,16 @@ import com.twilio.video.helper.CallbackHelper;
 import com.twilio.video.util.CredentialsUtils;
 import com.twilio.video.util.Constants;
 import com.twilio.video.util.RandUtils;
+import com.twilio.video.util.Topology;
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
@@ -26,12 +28,18 @@ import java.util.concurrent.TimeUnit;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
-@RunWith(AndroidJUnit4.class)
+@RunWith(Parameterized.class)
 @LargeTest
-public class RoomMultiPartyTest extends BaseClientTest {
+public class RoomMultiPartyTopologyParameterizedTest extends BaseClientTest {
+    @Parameterized.Parameters(name = "{0}")
+    public static Iterable<Object[]> data() {
+        return Arrays.asList(new Object[][]{
+                {Topology.P2P},
+                {Topology.SFU}});
+    }
+
     private static final int PARTICIPANT_NUM = 3;
     private static final String[] PARTICIPANTS = {
             Constants.PARTICIPANT_ALICE, Constants.PARTICIPANT_BOB, Constants.PARTICIPANT_CHARLIE
@@ -41,6 +49,11 @@ public class RoomMultiPartyTest extends BaseClientTest {
     private List<String> tokens;
     private List<Pair<Room, CallbackHelper.FakeRoomListener>> rooms;
     private String roomName;
+    private final Topology topology;
+
+    public RoomMultiPartyTopologyParameterizedTest(Topology topology) {
+        this.topology = topology;
+    }
 
     @Before
     public void setup() throws InterruptedException {
@@ -49,7 +62,7 @@ public class RoomMultiPartyTest extends BaseClientTest {
         rooms = new ArrayList<>();
         tokens = new ArrayList<>();
         for (int i = 0; i < PARTICIPANT_NUM; i++) {
-            tokens.add(CredentialsUtils.getAccessToken(PARTICIPANTS[i]));
+            tokens.add(CredentialsUtils.getAccessToken(PARTICIPANTS[i], topology));
         }
         roomName = RandUtils.generateRandomString(20);
     }
