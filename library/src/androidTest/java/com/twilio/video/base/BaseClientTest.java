@@ -2,7 +2,7 @@ package com.twilio.video.base;
 
 import android.support.test.InstrumentationRegistry;
 
-import com.twilio.video.BuildConfig;
+import com.twilio.video.test.BuildConfig;
 import com.twilio.video.env.Env;
 
 import org.junit.Before;

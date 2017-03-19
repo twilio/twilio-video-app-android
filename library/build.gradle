@@ -30,11 +30,6 @@ android {
 
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
-        buildConfigField "String", "ENVIRONMENT", "\"${getEnvironment()}\""
-        buildConfigField "java.util.Map<String, String>",
-                "twilioCredentials",
-                "${getTwilioVideoConfig()}"
-
         ndk {
             abiFilters 'x86', 'x86_64', 'armeabi-v7a', 'arm64-v8a'
         }
@@ -87,6 +82,17 @@ android {
         cmake {
             path "CMakeLists.txt"
         }
+    }
+
+    /*
+     * Only set BuildConfig for tests so we do not expose the credentials used for tests in our
+     * published artifacts
+     */
+    testVariants.all { testVariant ->
+        testVariant.buildConfigField("String", "ENVIRONMENT", "\"${getEnvironment()}\"")
+        testVariant.buildConfigField("java.util.Map<String, String>",
+            "twilioCredentials",
+            "${getTwilioVideoConfig()}")
     }
 }
 
