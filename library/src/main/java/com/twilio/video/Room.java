@@ -269,17 +269,22 @@ public class Room {
         @Override
         public synchronized void onDisconnected(final TwilioException twilioException) {
             logger.d("onDisconnected()");
+            /*
+             * Release all Android level Room resources in notifier thread and before invoking
+             * onDisconnected callback for the following reasons:
+             *
+             * 1. Ensures that native WebRTC tracks are not null when removing remote renderers.
+             * 2. Protects developers from potentially referencing dead WebRTC tracks in
+             *    onDisconnected callback.
+             *
+             * See GSDK-1007, GSDK-1079, and GSDK-1043 for more details.
+             */
+            release();
+
             Room.this.roomState = RoomState.DISCONNECTED;
             handler.post(new Runnable() {
                 @Override
                 public void run() {
-                    // Room teardown on calling thread was causing a crash on some
-                    // devices (HTC 10). Check https://issues.corp.twilio.com/browse/CSDK-1114 and
-                    // https://issues.corp.twilio.com/browse/GSDK-1043 for details.
-                    // This is a patch until underlying condition (accessing deleted pointer)
-                    // is fixed in core.
-                    release();
-
                     Room.this.listener.onDisconnected(Room.this, twilioException);
                 }
             });
