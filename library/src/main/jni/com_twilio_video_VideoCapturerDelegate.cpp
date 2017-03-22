@@ -28,10 +28,10 @@ VideoCapturerDelegate::VideoCapturerDelegate(JNIEnv* jni,
                   jni,
                   twilio_video_jni::FindClass(jni,
                                               "com/twilio/video/VideoCapturerDelegate$NativeObserver")),
+          is_screencast_(is_screencast),
           surface_texture_helper_(webrtc_jni::SurfaceTextureHelper::create(
                   jni, "Camera SurfaceTextureHelper", j_egl_context)),
-          capturer_(nullptr),
-          is_screencast_(is_screencast) {
+          capturer_(nullptr) {
     LOG(LS_INFO) << "VideoCapturerDelegate ctor";
     jobject j_frame_observer =
             jni->NewObject(*j_observer_class_,

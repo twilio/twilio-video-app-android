@@ -137,7 +137,6 @@ public class RoomActivity extends AppCompatActivity {
     private int savedVolumeControlStream;
 
     private String displayName;
-    private String email;
     private String env;
     private String topology;
     private AccessManager accessManager;
@@ -206,7 +205,6 @@ public class RoomActivity extends AppCompatActivity {
 
         // Setup Activity
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-        email = sharedPreferences.getString(Preferences.EMAIL, null);
         displayName = sharedPreferences.getString(Preferences.DISPLAY_NAME, null);
         env = sharedPreferences.getString(Preferences.ENVIRONMENT,
                 Preferences.ENVIRONMENT_DEFAULT);

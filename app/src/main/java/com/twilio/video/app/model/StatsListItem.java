@@ -1,7 +1,6 @@
 package com.twilio.video.app.model;
 
 import com.twilio.video.BaseTrackStats;
-import com.twilio.video.app.adapter.StatsListAdapter;
 
 public class StatsListItem {
     public final String trackName;

@@ -19,11 +19,6 @@ public:
         j_room_observer_(env, j_room_observer),
         j_room_observer_class_(env, webrtc_jni::GetObjectClass(env, *j_room_observer_)),
         j_twilio_exception_class_(env, twilio_video_jni::FindClass(env, "com/twilio/video/TwilioException")),
-        j_twilio_exception_ctor_id_(
-                webrtc_jni::GetMethodID(env,
-                            *j_twilio_exception_class_,
-                            "<init>",
-                            "(ILjava/lang/String;Ljava/lang/String;)V")),
         j_participant_class_(
             env, env->FindClass("com/twilio/video/Participant")),
         j_array_list_class_(env, env->FindClass("java/util/ArrayList")),
@@ -99,7 +94,12 @@ public:
             webrtc_jni::GetMethodID(env,
                                     *j_media_class_,
                                     "<init>",
-                                    "(JLjava/util/List;Ljava/util/List;Landroid/os/Handler;)V"))
+                                    "(JLjava/util/List;Ljava/util/List;Landroid/os/Handler;)V")),
+        j_twilio_exception_ctor_id_(
+                webrtc_jni::GetMethodID(env,
+                            *j_twilio_exception_class_,
+                            "<init>",
+                            "(ILjava/lang/String;Ljava/lang/String;)V"))
         {
         TS_CORE_LOG_MODULE(twilio::video::kTSCoreLogModulePlatform,
                            twilio::video::kTSCoreLogLevelDebug,
@@ -341,7 +341,7 @@ private:
                 media->getAudioTracks();
 
         // Add audio tracks to array list
-        for (int i = 0; i < audio_tracks.size(); i++) {
+        for (unsigned int i = 0; i < audio_tracks.size(); i++) {
             jobject j_audio_track =
                     createJavaAudioTrack(jni(), audio_tracks[i],
                                          *j_audio_track_class_, j_audio_track_ctor_id_);
@@ -355,7 +355,7 @@ private:
                 media->getVideoTracks();
 
         // Add audio tracks to array list
-        for (int i = 0; i < video_tracks.size(); i++) {
+        for (unsigned int i = 0; i < video_tracks.size(); i++) {
             jobject j_video_track =
                     createJavaVideoTrack(jni(), video_tracks[i],
                                          *j_video_track_class_, j_video_track_ctor_id_);

@@ -100,10 +100,6 @@ protected:
                 return;
             }
 
-            jstring j_track_id = webrtc_jni::JavaStringFromStdString(jni(), track->getTrackId());
-            jlong j_webrtc_track = webrtc_jni::jlongFromPointer(track->getWebRtcTrack());
-            jboolean j_is_enabled = track->isEnabled();
-
             jobject j_audio_track =
                 createJavaAudioTrack(jni(), track, *j_audio_track_class_, j_audio_track_ctor_id_);
 

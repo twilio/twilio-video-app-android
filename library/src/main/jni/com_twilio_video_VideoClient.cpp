@@ -13,13 +13,8 @@
 #include "com_twilio_video_ConnectOptions.h"
 #include "com_twilio_video_Room.h"
 #include "com_twilio_video_MediaFactory.h"
-#include "class_reference_holder.h"
-
-#include <memory>
 
 namespace twilio_video_jni {
-
-static bool media_jvm_set = false;
 
 extern "C" jint JNIEXPORT JNICALL JNI_OnLoad(JavaVM *jvm, void *reserved) {
     std::string func_name = std::string(__FUNCTION__);

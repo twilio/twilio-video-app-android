@@ -79,10 +79,6 @@ public class VideoAppService {
             return chain.proceed(authorizedRequest);
         }
 
-        public String getAuthToken() {
-            return authToken;
-        }
-
         public void setAuthToken(String authToken) {
             this.authToken = authToken;
         }

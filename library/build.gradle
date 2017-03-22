@@ -52,6 +52,7 @@ android {
                         "-DWEBRTC_ANDROID",
                         "-DWEBRTC_ANDROID_OPENSLES",
                         "-DPOCO_ANDROID",
+                        "-Werror",
                         "-Wall",
                         "-std=c++11",
                         "-fexceptions"
