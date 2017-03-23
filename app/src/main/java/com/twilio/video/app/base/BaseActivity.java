@@ -6,31 +6,28 @@ import android.support.v7.app.AppCompatActivity;
 import com.twilio.video.app.BuildConfig;
 import com.twilio.video.app.VideoApplication;
 
-import net.hockeyapp.android.CrashManager;
 import net.hockeyapp.android.UpdateManager;
 
-public class BaseActivity extends AppCompatActivity {
+public abstract class BaseActivity extends AppCompatActivity {
+    private static final String INTERNAL_FLAVOR = "internal";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (!BuildConfig.DEBUG) {
+        if (internalRelease()) {
             UpdateManager.register(this, VideoApplication.HOCKEY_APP_ID);
         }
     }
 
     @Override
-    protected void onResume() {
-        super.onResume();
-        CrashManager.register(this, VideoApplication.HOCKEY_APP_ID);
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        if (!BuildConfig.DEBUG) {
+    protected void onDestroy() {
+        if (internalRelease()) {
             UpdateManager.unregister();
         }
+        super.onDestroy();
     }
 
+    private boolean internalRelease() {
+        return BuildConfig.FLAVOR.equals(INTERNAL_FLAVOR) && !BuildConfig.DEBUG;
+    }
 }

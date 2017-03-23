@@ -13,9 +13,10 @@ import android.view.MenuItem;
 import com.twilio.video.VideoClient;
 import com.twilio.video.app.BuildConfig;
 import com.twilio.video.app.R;
+import com.twilio.video.app.base.BaseActivity;
 import com.twilio.video.app.data.Preferences;
 
-public class SettingsActivity extends AppCompatActivity {
+public class SettingsActivity extends BaseActivity {
 
     private SharedPreferences sharedPreferences;
 

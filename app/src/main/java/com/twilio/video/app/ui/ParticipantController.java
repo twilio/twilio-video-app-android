@@ -1,5 +1,6 @@
 package com.twilio.video.app.ui;
 
+import android.view.View;
 import android.view.ViewGroup;
 
 import com.twilio.video.VideoTrack;
@@ -383,8 +384,13 @@ public class ParticipantController {
         view.setMuted(item.muted);
         view.setMirror(item.mirror);
 
-        view.setOnClickListener(v -> {
-            if (listener != null) listener.onThumbClick(item);
+        view.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (listener != null) {
+                    listener.onThumbClick(item);
+                }
+            }
         });
 
         if (item.videoTrack != null) {

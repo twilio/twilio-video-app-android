@@ -1,4 +1,5 @@
 apply plugin: 'com.android.application'
+apply plugin: 'com.google.firebase.firebase-crash'
 apply plugin: 'com.jakewharton.butterknife'
 
 android {
@@ -16,14 +17,12 @@ android {
 
         vectorDrawables.useSupportLibrary = true
 
-        jackOptions {
-            enabled true
-        }
+        multiDexEnabled true
     }
 
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility JavaVersion.VERSION_1_7
+        targetCompatibility JavaVersion.VERSION_1_7
     }
 
 
@@ -100,8 +99,8 @@ dependencies {
     compile 'com.google.guava:guava:19.0'
     compile 'com.twilio:accessmanager-android:0.1.0'
     compile 'com.android.support:support-v4:25.1.0'
-    //TODO: not sure if this is required
-    compile 'com.google.firebase:firebase-core:10.0.1'
+    compile 'com.android.support:multidex:1.0.1'
+    compile 'com.google.firebase:firebase-crash:10.0.1'
     compile 'com.google.firebase:firebase-auth:10.0.1'
     compile 'com.google.android.gms:play-services-auth:10.0.1'
 
