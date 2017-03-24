@@ -5,6 +5,7 @@ The Twilio Programmable Video SDKs use [Semantic Versioning](http://www.semver.o
 Improvements
 
 - Simplified internal data structures that populate `StatsReport`.
+- Upgraded to WebRTC 57.
 
 Bug Fixes
 

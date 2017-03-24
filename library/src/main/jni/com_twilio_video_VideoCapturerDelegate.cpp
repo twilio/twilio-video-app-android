@@ -1,6 +1,7 @@
 #include "com_twilio_video_VideoCapturerDelegate.h"
 #include "com_twilio_video_VideoPixelFormat.h"
 #include "class_reference_holder.h"
+#include "webrtc/base/logging.h"
 #include "libyuv/convert.h"
 
 namespace twilio_video_jni {
@@ -263,15 +264,15 @@ void VideoCapturerDelegate::OnMemoryBufferFrame(void *video_frame, int length, i
     if (adapted_width != buffer->width() || adapted_height != buffer->height()) {
         rtc::scoped_refptr<webrtc::I420Buffer> scaled_buffer(
                 post_scale_pool_.CreateBuffer(adapted_width, adapted_height));
-        scaled_buffer->ScaleFrom(buffer);
+        scaled_buffer->ScaleFrom(*buffer);
         buffer = scaled_buffer;
     }
 
-    capturer_->OnFrame(cricket::WebRtcVideoFrame(buffer,
-                                                 capturer_->apply_rotation() ?
-                                                 webrtc::kVideoRotation_0 :
+    capturer_->OnFrame(webrtc::VideoFrame(buffer,
+                                          capturer_->apply_rotation() ?
+                                          webrtc::kVideoRotation_0 :
                                                  static_cast<webrtc::VideoRotation>(rotation),
-                                                 translated_camera_time_us, 0), width, height);
+                                                 translated_camera_time_us), width, height);
 }
 
 void VideoCapturerDelegate::OnTextureFrame(int width,
@@ -320,14 +321,14 @@ void VideoCapturerDelegate::OnTextureFrame(int width,
         matrix.Rotate(static_cast<webrtc::VideoRotation>(rotation));
     }
 
-    capturer_->OnFrame(cricket::WebRtcVideoFrame(
+    capturer_->OnFrame(webrtc::VideoFrame(
             surface_texture_helper_->CreateTextureFrame(
                     adapted_width, adapted_height,
                     webrtc_jni::NativeHandleImpl(handle.oes_texture_id, matrix)),
             capturer_->apply_rotation()
             ? webrtc::kVideoRotation_0
             : static_cast<webrtc::VideoRotation>(rotation),
-            translated_camera_time_us, 0),
+            translated_camera_time_us),
                        width, height);
 }
 
