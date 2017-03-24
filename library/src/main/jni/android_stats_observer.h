@@ -105,7 +105,7 @@ public:
 
 protected:
     virtual void onStats(
-            const std::vector<std::unique_ptr<twilio::video::StatsReport>> &stats_reports) {
+            const std::vector<twilio::video::StatsReport> &stats_reports) {
         webrtc_jni::ScopedLocalRefFrame local_ref_frame(jni());
         std::string func_name = std::string(__FUNCTION__);
         TS_CORE_LOG_MODULE(twilio::video::kTSCoreLogModulePlatform,
@@ -122,16 +122,16 @@ protected:
             for (auto const &stats_report : stats_reports) {
                 webrtc_jni::ScopedLocalRefFrame stats_iteration_ref_frame(jni());
                 jstring j_peerconnection_id =
-                    webrtc_jni::JavaStringFromStdString(jni(), stats_report->getPeerConnectionId());
+                    webrtc_jni::JavaStringFromStdString(jni(), stats_report.peer_connection_id);
                 jobject j_stats_report = jni()->NewObject(*j_stats_report_class_,
                                                           j_stats_report_ctor_id_,
                                                           j_peerconnection_id);
                 processLocalAudioTrackStats(j_stats_report,
-                                            stats_report->getLocalAudioTrackStats());
+                                            stats_report.local_audio_track_stats);
                 processLocalVideoTrackStats(j_stats_report,
-                                            stats_report->getLocalVideoTrackStats());
-                processAudioTrackStats(j_stats_report, stats_report->getAudioTrackStats());
-                processVideoTrackStats(j_stats_report, stats_report->getVideoTrackStats());
+                                            stats_report.local_video_track_stats);
+                processAudioTrackStats(j_stats_report, stats_report.audio_track_stats);
+                processVideoTrackStats(j_stats_report, stats_report.video_track_stats);
 
                 jni()->CallBooleanMethod(j_stats_reports, j_array_list_add_, j_stats_report);
             }
@@ -164,28 +164,28 @@ private:
     }
 
     void processLocalAudioTrackStats(jobject j_stats_report,
-                                     const std::vector<std::unique_ptr<twilio::media::LocalAudioTrackStats>> &local_audio_tracks_stats) {
+                                     const std::vector<twilio::media::LocalAudioTrackStats> &local_audio_tracks_stats) {
         for(auto const &track_stats : local_audio_tracks_stats) {
             webrtc_jni::ScopedLocalRefFrame local_ref_frame(jni());
             jstring j_track_id =
-                webrtc_jni::JavaStringFromStdString(jni(), track_stats->getTrackId());
+                webrtc_jni::JavaStringFromStdString(jni(), track_stats.track_id);
             jstring j_codec =
-                webrtc_jni::JavaStringFromStdString(jni(), track_stats->getCodec());
+                webrtc_jni::JavaStringFromStdString(jni(), track_stats.codec);
             jstring j_ssrc =
-                webrtc_jni::JavaStringFromStdString(jni(), track_stats->getSsrc());
+                webrtc_jni::JavaStringFromStdString(jni(), track_stats.ssrc);
             jobject j_local_audio_track_stats =
                 jni()->NewObject(*j_local_audio_track_stats_class_,
                                  j_local_audio_track_stats_ctor_id_,
                                  j_track_id,
-                                 track_stats->getPacketsLost(),
+                                 track_stats.packets_lost,
                                  j_codec,
                                  j_ssrc,
-                                 track_stats->getTimestamp(),
-                                 track_stats->getBytesSent(),
-                                 track_stats->getPacketsSent(),
-                                 track_stats->getRoundTripTime(),
-                                 track_stats->getAudioLevel(),
-                                 track_stats->getJitter());
+                                 track_stats.timestamp,
+                                 track_stats.bytes_sent,
+                                 track_stats.packets_sent,
+                                 track_stats.round_trip_time,
+                                 track_stats.audio_level,
+                                 track_stats.jitter);
             jni()->CallVoidMethod(j_stats_report,
                                   j_stats_report_add_local_audio_id_,
                                   j_local_audio_track_stats);
@@ -193,40 +193,40 @@ private:
     }
 
     void processLocalVideoTrackStats(jobject j_stats_report,
-                                     const std::vector<std::unique_ptr<twilio::media::LocalVideoTrackStats>> &local_video_tracks_stats) {
+                                     const std::vector<twilio::media::LocalVideoTrackStats> &local_video_tracks_stats) {
         for(auto const &track_stats : local_video_tracks_stats) {
             webrtc_jni::ScopedLocalRefFrame local_ref_frame(jni());
             jstring j_track_id =
-                webrtc_jni::JavaStringFromStdString(jni(), track_stats->getTrackId());
+                webrtc_jni::JavaStringFromStdString(jni(), track_stats.track_id);
             jstring j_codec =
-                webrtc_jni::JavaStringFromStdString(jni(), track_stats->getCodec());
+                webrtc_jni::JavaStringFromStdString(jni(), track_stats.codec);
             jstring j_ssrc =
-                webrtc_jni::JavaStringFromStdString(jni(), track_stats->getSsrc());
+                webrtc_jni::JavaStringFromStdString(jni(), track_stats.ssrc);
             jobject j_capture_dimensions =
                 jni()->NewObject(*j_video_dimensions_class_,
                                  j_video_dimensions_ctor_id_,
-                                 track_stats->getCaptureDimensions().getWidth(),
-                                 track_stats->getCaptureDimensions().getHeight());
+                                 track_stats.capture_dimensions.width,
+                                 track_stats.capture_dimensions.height);
             jobject j_sent_dimensions =
                 jni()->NewObject(*j_video_dimensions_class_,
                                  j_video_dimensions_ctor_id_,
-                                 track_stats->getDimensions().getWidth(),
-                                 track_stats->getDimensions().getHeight());
+                                 track_stats.dimensions.width,
+                                 track_stats.dimensions.height);
             jobject j_local_video_track_stats =
                 jni()->NewObject(*j_local_video_track_stats_class_,
                                  j_local_video_track_stats_ctor_id_,
                                  j_track_id,
-                                 track_stats->getPacketsLost(),
+                                 track_stats.packets_lost,
                                  j_codec,
                                  j_ssrc,
-                                 track_stats->getTimestamp(),
-                                 track_stats->getBytesSent(),
-                                 track_stats->getPacketsSent(),
-                                 track_stats->getRoundTripTime(),
+                                 track_stats.timestamp,
+                                 track_stats.bytes_sent,
+                                 track_stats.packets_sent,
+                                 track_stats.round_trip_time,
                                  j_capture_dimensions,
                                  j_sent_dimensions,
-                                 track_stats->getCaptureFrameRate(),
-                                 track_stats->getFrameRate());
+                                 track_stats.capture_frame_rate,
+                                 track_stats.frame_rate);
             jni()->CallVoidMethod(j_stats_report,
                                   j_stats_report_add_local_video_id_,
                                   j_local_video_track_stats);
@@ -234,27 +234,27 @@ private:
     }
 
     void processAudioTrackStats(jobject j_stats_report,
-                                const std::vector<std::unique_ptr<twilio::media::AudioTrackStats>> &audio_tracks_stats) {
+                                const std::vector<twilio::media::AudioTrackStats> &audio_tracks_stats) {
         for(auto const &track_stats : audio_tracks_stats) {
             webrtc_jni::ScopedLocalRefFrame local_ref_frame(jni());
             jstring j_track_id =
-                webrtc_jni::JavaStringFromStdString(jni(), track_stats->getTrackId());
+                webrtc_jni::JavaStringFromStdString(jni(), track_stats.track_id);
             jstring j_codec_name =
-                webrtc_jni::JavaStringFromStdString(jni(), track_stats->getCodec());
+                webrtc_jni::JavaStringFromStdString(jni(), track_stats.codec);
             jstring j_ssrc =
-                webrtc_jni::JavaStringFromStdString(jni(), track_stats->getSsrc());
+                webrtc_jni::JavaStringFromStdString(jni(), track_stats.ssrc);
             jobject j_audio_track_stats =
                 jni()->NewObject(*j_audio_track_stats_class_,
                                  j_audio_track_stats_ctor_id_,
                                  j_track_id,
-                                 track_stats->getPacketsLost(),
+                                 track_stats.packets_lost,
                                  j_codec_name,
                                  j_ssrc,
-                                 track_stats->getTimestamp(),
-                                 track_stats->getBytesReceived(),
-                                 track_stats->getPacketsReceived(),
-                                 track_stats->getAudioLevel(),
-                                 track_stats->getJitter());
+                                 track_stats.timestamp,
+                                 track_stats.bytes_received,
+                                 track_stats.packets_received,
+                                 track_stats.audio_level,
+                                 track_stats.jitter);
             jni()->CallVoidMethod(j_stats_report,
                                   j_stats_report_add_audio_id_,
                                   j_audio_track_stats);
@@ -262,32 +262,32 @@ private:
     }
 
     void processVideoTrackStats(jobject j_stats_report,
-                                const std::vector<std::unique_ptr<twilio::media::VideoTrackStats>> &video_tracks_stats) {
+                                const std::vector<twilio::media::VideoTrackStats> &video_tracks_stats) {
         for(auto const &track_stats : video_tracks_stats) {
             webrtc_jni::ScopedLocalRefFrame local_ref_frame(jni());
             jstring j_track_id =
-                webrtc_jni::JavaStringFromStdString(jni(), track_stats->getTrackId());
+                webrtc_jni::JavaStringFromStdString(jni(), track_stats.track_id);
             jstring j_codec_name =
-                webrtc_jni::JavaStringFromStdString(jni(), track_stats->getCodec());
+                webrtc_jni::JavaStringFromStdString(jni(), track_stats.codec);
             jstring j_ssrc =
-                webrtc_jni::JavaStringFromStdString(jni(), track_stats->getSsrc());
+                webrtc_jni::JavaStringFromStdString(jni(), track_stats.ssrc);
             jobject j_received_dimensions =
                 jni()->NewObject(*j_video_dimensions_class_,
                                  j_video_dimensions_ctor_id_,
-                                 track_stats->getDimensions().getWidth(),
-                                 track_stats->getDimensions().getHeight());
+                                 track_stats.dimensions.width,
+                                 track_stats.dimensions.height);
             jobject j_video_track_stats =
                 jni()->NewObject(*j_video_track_stats_class_,
                                  j_video_track_stats_ctor_id_,
                                  j_track_id,
-                                 track_stats->getPacketsLost(),
+                                 track_stats.packets_lost,
                                  j_codec_name,
                                  j_ssrc,
-                                 track_stats->getTimestamp(),
-                                 track_stats->getBytesReceived(),
-                                 track_stats->getPacketsReceived(),
+                                 track_stats.timestamp,
+                                 track_stats.bytes_received,
+                                 track_stats.packets_received,
                                  j_received_dimensions,
-                                 track_stats->getFrameRate());
+                                 track_stats.frame_rate);
             jni()->CallVoidMethod(j_stats_report,
                                   j_stats_report_add_video_id_,
                                   j_video_track_stats);
