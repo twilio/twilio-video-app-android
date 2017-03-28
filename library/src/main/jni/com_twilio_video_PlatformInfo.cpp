@@ -1,6 +1,6 @@
 #include "com_twilio_video_PlatformInfo.h"
 #include "video/logger.h"
-#include "webrtc/api/android/jni/jni_helpers.h"
+#include "webrtc/sdk/android/src/jni/jni_helpers.h"
 
 namespace twilio_video_jni {
 

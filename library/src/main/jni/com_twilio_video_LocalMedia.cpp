@@ -2,7 +2,7 @@
 #include "com_twilio_video_LocalAudioTrack.h"
 #include "com_twilio_video_LocalVideoTrack.h"
 #include "com_twilio_video_VideoCapturerDelegate.h"
-#include "webrtc/api/android/jni/jni_helpers.h"
+#include "webrtc/sdk/android/src/jni/jni_helpers.h"
 #include "class_reference_holder.h"
 #include "video/logger.h"
 #include "android_video_capturer.h"

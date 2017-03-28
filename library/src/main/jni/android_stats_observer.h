@@ -1,7 +1,7 @@
 #ifndef VIDEO_ANDROID_ANDROID_STATS_OBSERVER_H_
 #define VIDEO_ANDROID_ANDROID_STATS_OBSERVER_H_
 
-#include "webrtc/api/android/jni/jni_helpers.h"
+#include "webrtc/sdk/android/src/jni/jni_helpers.h"
 
 #include "video/stats_observer.h"
 #include "video/stats_report.h"

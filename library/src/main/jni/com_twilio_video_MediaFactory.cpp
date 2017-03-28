@@ -1,12 +1,12 @@
 #include "com_twilio_video_MediaFactory.h"
 #include "com_twilio_video_LocalMedia.h"
 
-#include "webrtc/api/android/jni/jni_helpers.h"
+#include "webrtc/sdk/android/src/jni/jni_helpers.h"
 #include "webrtc/voice_engine/include/voe_base.h"
 #include "webrtc/modules/audio_device/android/opensles_player.h"
-#include "webrtc/api/android/jni/classreferenceholder.h"
-#include "webrtc/api/android/jni/androidmediadecoder_jni.h"
-#include "webrtc/api/android/jni/androidmediaencoder_jni.h"
+#include "webrtc/sdk/android/src/jni/classreferenceholder.h"
+#include "webrtc/sdk/android/src/jni/androidmediadecoder_jni.h"
+#include "webrtc/sdk/android/src/jni/androidmediaencoder_jni.h"
 #include "com_twilio_video_VideoCapturerDelegate.h"
 
 namespace twilio_video_jni {

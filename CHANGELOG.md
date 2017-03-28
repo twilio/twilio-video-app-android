@@ -1,5 +1,17 @@
 The Twilio Programmable Video SDKs use [Semantic Versioning](http://www.semver.org).
 
+####1.0.0-beta15
+
+Improvements
+
+- Upgraded to WebRTC 57.
+
+Known issues
+
+- Network handoff, and subsequent connection renegotiation is not supported for IPv6 networks [#72](https://github.com/twilio/video-quickstart-android/issues/72)
+- VP8 is the only supported codec [#71](https://github.com/twilio/video-quickstart-android/issues/71)
+- Participant disconnect event can take up to 120 seconds to occur [#80](https://github.com/twilio/video-quickstart-android/issues/80)
+
 ####1.0.0-beta14
 
 Improvements
