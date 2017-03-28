@@ -1,11 +1,11 @@
 #include "com_twilio_video_VideoClient.h"
-#include "webrtc/sdk/android/src/jni/jni_helpers.h"
+#include "webrtc/api/android/jni/jni_helpers.h"
 
 #include "webrtc/base/refcount.h"
 #include "webrtc/voice_engine/include/voe_base.h"
 #include "webrtc/modules/audio_device/android/audio_manager.h"
 #include "webrtc/modules/audio_device/android/opensles_player.h"
-#include "webrtc/sdk/android/src/jni/classreferenceholder.h"
+#include "webrtc/api/android/jni/classreferenceholder.h"
 
 #include "video/logger.h"
 #include "video/video_client.h"

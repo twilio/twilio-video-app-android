@@ -1,7 +1,7 @@
 #ifndef VIDEO_ANDROID_ANDROID_ROOM_OBSERVER_H_
 #define VIDEO_ANDROID_ANDROID_ROOM_OBSERVER_H_
 
-#include "webrtc/sdk/android/src/jni/jni_helpers.h"
+#include "webrtc/api/android/jni/jni_helpers.h"
 
 #include "video/logger.h"
 #include "video/room_observer.h"

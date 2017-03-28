@@ -1,5 +1,5 @@
 #include "com_twilio_video_Room.h"
-#include "webrtc/sdk/android/src/jni/jni_helpers.h"
+#include "webrtc/api/android/jni/jni_helpers.h"
 
 #include "video/logger.h"
 #include "video/video_client.h"

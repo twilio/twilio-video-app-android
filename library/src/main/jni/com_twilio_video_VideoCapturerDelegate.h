@@ -6,14 +6,14 @@
 
 #include "webrtc/base/refcount.h"
 #include "android_video_capturer.h"
-#include "webrtc/sdk/android/src/jni/native_handle_impl.h"
-#include "webrtc/sdk/android/src/jni/jni_helpers.h"
+#include "webrtc/api/android/jni/native_handle_impl.h"
+#include "webrtc/api/android/jni/jni_helpers.h"
 #include "webrtc/base/asyncinvoker.h"
 #include "webrtc/base/constructormagic.h"
 #include "webrtc/base/criticalsection.h"
 #include "webrtc/base/thread_checker.h"
 #include "webrtc/common_video/include/i420_buffer_pool.h"
-#include "webrtc/sdk/android/src/jni/surfacetexturehelper_jni.h"
+#include "webrtc/api/android/jni/surfacetexturehelper_jni.h"
 
 
 

@@ -1,5 +1,5 @@
 #include "class_reference_holder.h"
-#include "webrtc/sdk/android/src/jni/jni_helpers.h"
+#include "webrtc/api/android/jni/jni_helpers.h"
 
 namespace twilio_video_jni {
 

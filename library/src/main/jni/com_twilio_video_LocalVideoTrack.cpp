@@ -1,6 +1,6 @@
 #include "com_twilio_video_LocalVideoTrack.h"
-#include "webrtc/sdk/android/src/jni/jni_helpers.h"
-#include "webrtc/sdk/android/src/jni/classreferenceholder.h"
+#include "webrtc/api/android/jni/jni_helpers.h"
+#include "webrtc/api/android/jni/classreferenceholder.h"
 #include "class_reference_holder.h"
 
 namespace twilio_video_jni {

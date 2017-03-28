@@ -1,6 +1,6 @@
 #include "com_twilio_video_Media.h"
-#include "webrtc/sdk/android/src/jni/jni_helpers.h"
-#include "webrtc/sdk/android/src/jni/classreferenceholder.h"
+#include "webrtc/api/android/jni/jni_helpers.h"
+#include "webrtc/api/android/jni/classreferenceholder.h"
 #include "android_media_observer.h"
 
 jobject createJavaAudioTrack(JNIEnv *env,

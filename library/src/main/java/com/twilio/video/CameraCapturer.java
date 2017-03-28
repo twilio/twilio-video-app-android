@@ -16,7 +16,6 @@ import android.view.WindowManager;
 import org.webrtc.CameraEnumerationAndroid;
 import org.webrtc.SurfaceTextureHelper;
 import org.webrtc.VideoCapturerAndroid;
-import org.webrtc.Camera1Enumerator;
 
 import java.io.ByteArrayOutputStream;
 import java.lang.annotation.Retention;
@@ -186,11 +185,6 @@ public class CameraCapturer implements VideoCapturer {
                 @Override
                 public void onCameraClosed() {
                     // Ignore this event for now
-                }
-
-                @Override
-                public void onCameraDisconnected() {
-                    // TODO: do we need to handle this?
                 }
             };
 
