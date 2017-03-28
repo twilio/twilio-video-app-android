@@ -129,7 +129,7 @@ public class RoomMultiPartyTopologyParameterizedTest extends BaseClientTest {
         ConnectOptions connectOptions = new ConnectOptions.Builder(token)
                 .roomName(roomName)
                 .build();
-        Room room = VideoClient.connect(context, connectOptions, listener);
+        Room room = Video.connect(context, connectOptions, listener);
         assertTrue(listener.onConnectedLatch.await(20, TimeUnit.SECONDS));
         return room;
     }

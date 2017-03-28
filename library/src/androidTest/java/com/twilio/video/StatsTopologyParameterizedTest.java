@@ -4,7 +4,6 @@ package com.twilio.video;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.filters.LargeTest;
 import android.support.test.rule.ActivityTestRule;
-import android.support.test.runner.AndroidJUnit4;
 
 import com.twilio.video.base.BaseClientTest;
 import com.twilio.video.helper.CallbackHelper;
@@ -445,7 +444,7 @@ public class StatsTopologyParameterizedTest extends BaseClientTest {
                 .roomName(roomName)
                 .localMedia(localMedia)
                 .build();
-        Room room = VideoClient.connect(mediaTestActivity, connectOptions, listener);
+        Room room = Video.connect(mediaTestActivity, connectOptions, listener);
         assertTrue(listener.onConnectedLatch.await(20, TimeUnit.SECONDS));
 
         return room;

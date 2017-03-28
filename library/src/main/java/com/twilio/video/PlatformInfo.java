@@ -1,16 +1,5 @@
 package com.twilio.video;
 
-import java.net.InetAddress;
-import java.net.NetworkInterface;
-import java.net.SocketException;
-import java.util.Enumeration;
-import java.util.regex.Pattern;
-
-import android.content.Context;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
-import android.provider.Settings.Secure;
-
 final class PlatformInfo {
     private static final String PLATFORM_NAME = "Android";
     private static long nativeHandle = 0;
@@ -24,7 +13,7 @@ final class PlatformInfo {
                 android.os.Build.VERSION.RELEASE,
                 android.os.Build.MANUFACTURER,
                 android.os.Build.MODEL,
-                VideoClient.getVersion(),
+                Video.getVersion(),
                 System.getProperty("os.arch"));
         }
         return nativeHandle;

@@ -7,7 +7,7 @@ import com.twilio.video.LocalMedia;
 import com.twilio.video.Participant;
 import com.twilio.video.Room;
 import com.twilio.video.RoomState;
-import com.twilio.video.VideoClient;
+import com.twilio.video.Video;
 import com.twilio.video.helper.CallbackHelper;
 import com.twilio.video.ui.MediaTestActivity;
 import com.twilio.video.util.CredentialsUtils;
@@ -18,7 +18,6 @@ import com.twilio.video.util.RandUtils;
 import com.twilio.video.util.Topology;
 
 import org.junit.After;
-import org.junit.Before;
 import org.junit.Rule;
 
 import java.util.ArrayList;
@@ -53,7 +52,7 @@ public abstract class BaseMediaTest extends BaseClientTest {
                 .roomName(testRoom)
                 .localMedia(localMedia)
                 .build();
-        Room room = VideoClient.connect(mediaTestActivity, connectOptions, roomListener);
+        Room room = Video.connect(mediaTestActivity, connectOptions, roomListener);
         return room;
     }
 

@@ -5,7 +5,7 @@ import android.content.Context;
 import android.support.multidex.MultiDex;
 
 import com.twilio.video.LogLevel;
-import com.twilio.video.VideoClient;
+import com.twilio.video.Video;
 import com.twilio.video.app.util.DebugTree;
 import com.twilio.video.app.util.FirebaseTreeRanger;
 import com.twilio.video.app.util.ReleaseTree;
@@ -29,7 +29,7 @@ public class VideoApplication extends Application {
 
         if (BuildConfig.DEBUG) {
             Timber.plant(new DebugTree(firebaseTreeRanger));
-            VideoClient.setLogLevel(LogLevel.DEBUG);
+            Video.setLogLevel(LogLevel.DEBUG);
         } else {
             Timber.plant(new ReleaseTree(firebaseTreeRanger));
         }

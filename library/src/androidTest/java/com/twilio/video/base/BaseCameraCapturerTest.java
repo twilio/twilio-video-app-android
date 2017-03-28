@@ -6,7 +6,7 @@ import com.twilio.video.CameraCapturer;
 import com.twilio.video.LocalMedia;
 import com.twilio.video.LocalVideoTrack;
 import com.twilio.video.LogLevel;
-import com.twilio.video.VideoClient;
+import com.twilio.video.Video;
 import com.twilio.video.ui.CameraCapturerTestActivity;
 import com.twilio.video.util.FrameCountRenderer;
 import com.twilio.video.util.PermissionUtils;
@@ -32,7 +32,7 @@ public abstract class BaseCameraCapturerTest {
         cameraCapturerActivity = activityRule.getActivity();
         PermissionUtils.allowPermissions(cameraCapturerActivity);
         localMedia = LocalMedia.create(cameraCapturerActivity);
-        VideoClient.setLogLevel(LogLevel.ALL);
+        Video.setLogLevel(LogLevel.ALL);
         frameCountRenderer = new FrameCountRenderer();
     }
 

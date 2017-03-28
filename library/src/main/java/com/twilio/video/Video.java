@@ -4,10 +4,8 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.media.AudioManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.os.Handler;
 import android.util.Log;
 
 import com.getkeepsafe.relinker.ReLinker;
@@ -18,13 +16,13 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * The VideoClient allows a user to connect to a Room.
+ * This class allows a user to connect to a Room.
  */
-public abstract class VideoClient {
+public abstract class Video {
     private static LogLevel level = LogLevel.OFF;
     private static Map<LogModule, LogLevel> moduleLogLevel = new EnumMap(LogModule.class);
     private static volatile boolean libraryIsLoaded = false;
-    private static final Logger logger = Logger.getLogger(VideoClient.class);
+    private static final Logger logger = Logger.getLogger(Video.class);
 
     private static final Set<Room> rooms = new HashSet<>();
     private static NetworkInfo currentNetworkInfo = null;
@@ -203,7 +201,7 @@ public abstract class VideoClient {
         setSDKLogLevel(level);
         trySetCoreLogLevel(level.ordinal());
         // Save the log level
-        VideoClient.level = level;
+        Video.level = level;
     }
 
     /**
@@ -218,7 +216,7 @@ public abstract class VideoClient {
         }
         trySetCoreModuleLogLevel(module.ordinal(), level.ordinal());
         // Save the module log level
-        VideoClient.moduleLogLevel.put(module, level);
+        Video.moduleLogLevel.put(module, level);
     }
 
     private static void setSDKLogLevel(LogLevel level) {

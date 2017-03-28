@@ -159,7 +159,7 @@ public class Room {
         this.nativeRoomContext = nativeRoomHandle;
     }
 
-    void onNetworkChanged(VideoClient.NetworkChangeEvent networkChangeEvent) {
+    void onNetworkChanged(Video.NetworkChangeEvent networkChangeEvent) {
         if (nativeRoomContext != 0) {
             nativeOnNetworkChange(nativeRoomContext, networkChangeEvent);
         }
@@ -477,5 +477,5 @@ public class Room {
     private native void nativeGetStats(long nativeRoomContext, long nativeStatsObserver);
     private native void nativeRelease(long nativeRoomContext);
     private native void nativeOnNetworkChange(long nativeRoomContext,
-                                              VideoClient.NetworkChangeEvent networkChangeEvent);
+                                              Video.NetworkChangeEvent networkChangeEvent);
 }

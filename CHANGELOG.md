@@ -5,6 +5,7 @@ The Twilio Programmable Video SDKs use [Semantic Versioning](http://www.semver.o
 Improvements
 
 - Upgraded to WebRTC 57.
+- Renaming `VideoClient` class to `Video`.
 
 Known issues
 

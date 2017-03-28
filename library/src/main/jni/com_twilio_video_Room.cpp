@@ -81,7 +81,7 @@ JNIEXPORT void JNICALL Java_com_twilio_video_Room_nativeGetStats
 twilio::video::NetworkChangeEvent getNetworkChangeEvent(jobject j_network_change_event) {
     JNIEnv *jni = webrtc_jni::AttachCurrentThreadIfNeeded();
     jclass j_network_change_event_class =
-        twilio_video_jni::FindClass(jni, "com/twilio/video/VideoClient$NetworkChangeEvent");
+        twilio_video_jni::FindClass(jni, "com/twilio/video/Video$NetworkChangeEvent");
     jmethodID name_method_id = webrtc_jni::GetMethodID(jni,
                                                        j_network_change_event_class,
                                                        "name",

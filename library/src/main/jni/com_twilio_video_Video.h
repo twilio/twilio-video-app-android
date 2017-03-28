@@ -9,18 +9,14 @@ extern "C" {
 
 namespace twilio_video_jni {
 
-JNIEXPORT void JNICALL Java_com_twilio_video_VideoClient_nativeSetCoreLogLevel
+JNIEXPORT void JNICALL Java_com_twilio_video_Video_nativeSetCoreLogLevel
         (JNIEnv *, jobject, jint);
 
-JNIEXPORT void JNICALL Java_com_twilio_video_VideoClient_nativeSetModuleLevel
+JNIEXPORT void JNICALL Java_com_twilio_video_Video_nativeSetModuleLevel
         (JNIEnv *, jobject, jint, jint);
 
-JNIEXPORT jint JNICALL Java_com_twilio_video_VideoClient_nativeGetCoreLogLevel
+JNIEXPORT jint JNICALL Java_com_twilio_video_Video_nativeGetCoreLogLevel
         (JNIEnv *, jobject);
-
-JNIEXPORT jlong JNICALL Java_com_twilio_video_VideoClient_nativeCreateClient
-        (JNIEnv *, jobject, jobject, jstring, jlong);
-
 }
 
 #ifdef __cplusplus

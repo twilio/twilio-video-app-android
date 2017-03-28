@@ -15,7 +15,6 @@ import android.preference.PreferenceManager;
 import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -49,7 +48,7 @@ import com.twilio.video.ScreenCapturer;
 import com.twilio.video.StatsListener;
 import com.twilio.video.StatsReport;
 import com.twilio.video.TwilioException;
-import com.twilio.video.VideoClient;
+import com.twilio.video.Video;
 import com.twilio.video.VideoConstraints;
 import com.twilio.video.VideoDimensions;
 import com.twilio.video.VideoTrack;
@@ -876,7 +875,7 @@ public class RoomActivity extends BaseActivity {
     }
 
     /**
-     * Update {@link VideoClient} environment.
+     * Update {@link com.twilio.video.Video} environment.
      *
      * @param env new environment to use
      * @return Completable
@@ -912,7 +911,7 @@ public class RoomActivity extends BaseActivity {
                         .localMedia(localMedia)
                         .build();
 
-                room = VideoClient.connect(RoomActivity.this, connectOptions, roomListener());
+                room = Video.connect(RoomActivity.this, connectOptions, roomListener());
                 return room;
             }
         });

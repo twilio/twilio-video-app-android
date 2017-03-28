@@ -4,13 +4,12 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.preference.Preference;
 import android.support.v7.preference.PreferenceFragmentCompat;
 import android.support.v7.preference.PreferenceManager;
 import android.view.MenuItem;
 
-import com.twilio.video.VideoClient;
+import com.twilio.video.Video;
 import com.twilio.video.app.BuildConfig;
 import com.twilio.video.app.R;
 import com.twilio.video.app.base.BaseActivity;
@@ -92,7 +91,7 @@ public class SettingsActivity extends BaseActivity {
             String identity = sharedPreferences.getString(Preferences.DISPLAY_NAME, null);
             findPreference(Preferences.IDENTITY).setSummary(identity);
             findPreference(Preferences.VERSION).setSummary(BuildConfig.VERSION_NAME);
-            findPreference(Preferences.VIDEO_LIBRARY_VERSION).setSummary(VideoClient.getVersion());
+            findPreference(Preferences.VIDEO_LIBRARY_VERSION).setSummary(Video.getVersion());
             findPreference(Preferences.LOGOUT).setOnPreferenceClickListener(logoutClickListener);
         }
     }

@@ -3,7 +3,6 @@ package com.twilio.video;
 import android.content.Context;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.filters.LargeTest;
-import android.support.test.runner.AndroidJUnit4;
 
 import com.twilio.video.base.BaseClientTest;
 import com.twilio.video.helper.CallbackHelper;
@@ -65,7 +64,7 @@ public class ParticipantTopologyParameterizedTest extends BaseClientTest {
         ConnectOptions connectOptions = new ConnectOptions.Builder(tokenOne)
                 .roomName(roomName)
                 .build();
-        Room room = VideoClient.connect(context, connectOptions, roomListener);
+        Room room = Video.connect(context, connectOptions, roomListener);
         assertTrue(roomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
         assertEquals(RoomState.CONNECTED, room.getState());
 
@@ -73,7 +72,7 @@ public class ParticipantTopologyParameterizedTest extends BaseClientTest {
             .roomName(roomName)
             .build();
         CallbackHelper.FakeRoomListener roomListener2 = new CallbackHelper.FakeRoomListener();
-        Room room2 = VideoClient.connect(context, connectOptions, roomListener2);
+        Room room2 = Video.connect(context, connectOptions, roomListener2);
         assertTrue(roomListener.onParticipantConnectedLatch.await(20, TimeUnit.SECONDS));
         assertEquals(1, room.getParticipants().size());
 
@@ -93,7 +92,7 @@ public class ParticipantTopologyParameterizedTest extends BaseClientTest {
         ConnectOptions connectOptions = new ConnectOptions.Builder(tokenOne)
                 .roomName(roomName)
                 .build();
-        Room room = VideoClient.connect(context, connectOptions, roomListener);
+        Room room = Video.connect(context, connectOptions, roomListener);
         assertTrue(roomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
         assertEquals(RoomState.CONNECTED, room.getState());
 
@@ -103,7 +102,7 @@ public class ParticipantTopologyParameterizedTest extends BaseClientTest {
         CallbackHelper.FakeRoomListener roomListener2 = new CallbackHelper.FakeRoomListener();
         roomListener2.onConnectedLatch = new CountDownLatch(1);
         roomListener2.onDisconnectedLatch = new CountDownLatch(1);
-        Room client2room = VideoClient.connect(context, connectOptions2, roomListener2);
+        Room client2room = Video.connect(context, connectOptions2, roomListener2);
 
         assertTrue(roomListener2.onConnectedLatch.await(20, TimeUnit.SECONDS));
 

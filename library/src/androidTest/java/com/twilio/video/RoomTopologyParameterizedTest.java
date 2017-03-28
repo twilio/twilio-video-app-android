@@ -84,7 +84,7 @@ public class RoomTopologyParameterizedTest extends BaseClientTest {
                 .roomName(roomName)
                 .localMedia(localMedia)
                 .build();
-        Room room = VideoClient.connect(mediaTestActivity, connectOptions, roomListener);
+        Room room = Video.connect(mediaTestActivity, connectOptions, roomListener);
         assertNull(room.getLocalParticipant());
         assertTrue(roomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
 
@@ -107,7 +107,7 @@ public class RoomTopologyParameterizedTest extends BaseClientTest {
                 .roomName(roomName)
                 .localMedia(localMedia)
                 .build();
-        Room room = VideoClient.connect(mediaTestActivity, connectOptions, roomListener);
+        Room room = Video.connect(mediaTestActivity, connectOptions, roomListener);
         assertTrue(roomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
         assertNotNull(room.getLocalParticipant().getLocalMedia());
 
@@ -131,7 +131,7 @@ public class RoomTopologyParameterizedTest extends BaseClientTest {
             roomListener.onConnectedLatch = new CountDownLatch(1);
             roomListener.onDisconnectedLatch = new CountDownLatch(1);
 
-            Room room = VideoClient.connect(mediaTestActivity, connectOptions, roomListener);
+            Room room = Video.connect(mediaTestActivity, connectOptions, roomListener);
             assertTrue(roomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
             assertEquals(RoomState.CONNECTED, room.getState());
 
@@ -146,7 +146,7 @@ public class RoomTopologyParameterizedTest extends BaseClientTest {
         String invalidToken = "invalid token";
         ConnectOptions connectOptions = new ConnectOptions.Builder(invalidToken).build();
         final CountDownLatch connectFailure = new CountDownLatch(1);
-        VideoClient.connect(mediaTestActivity, connectOptions, new Room.Listener() {
+        Video.connect(mediaTestActivity, connectOptions, new Room.Listener() {
             @Override
             public void onConnected(Room room) {
                 fail();
@@ -196,7 +196,7 @@ public class RoomTopologyParameterizedTest extends BaseClientTest {
                 .roomName(roomName)
                 .localMedia(localMedia)
                 .build();
-        Room room = VideoClient.connect(mediaTestActivity, connectOptions, roomListener);
+        Room room = Video.connect(mediaTestActivity, connectOptions, roomListener);
         assertNull(room.getLocalParticipant());
         assertTrue(roomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
 

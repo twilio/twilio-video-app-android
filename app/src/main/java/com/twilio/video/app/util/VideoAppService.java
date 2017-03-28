@@ -9,6 +9,7 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GetTokenResult;
 import com.google.gson.JsonObject;
 import com.jakewharton.retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
+import com.twilio.video.Video;
 
 import java.io.IOException;
 import java.util.Map;
@@ -159,9 +160,9 @@ public class VideoAppService {
     }
 
     /**
-     * Obtain access token for {@link com.twilio.video.VideoClient}.
+     * Obtain access token for {@link com.twilio.video.Video}.
      *
-     * @param environment             environment to setup for {@link com.twilio.video.VideoClient}.
+     * @param environment             environment to setup for {@link com.twilio.video.Video}.
      * @param identity                client identity or display name.
      * @param configurationProfileSid configuration profile.
      * @return String access token.
@@ -174,9 +175,9 @@ public class VideoAppService {
     }
 
     /**
-     * Obtain access token for {@link com.twilio.video.VideoClient}.
+     * Obtain access token for {@link com.twilio.video.Video}.
      *
-     * @param environment             environment to setup for {@link com.twilio.video.VideoClient}.
+     * @param environment             environment to setup for {@link com.twilio.video.Video}.
      * @param identity                client identity or display name.
      * @param ttl                     token expiration time.
      * @param configurationProfileSid configuration profile.

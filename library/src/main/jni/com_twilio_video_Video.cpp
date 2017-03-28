@@ -1,4 +1,4 @@
-#include "com_twilio_video_VideoClient.h"
+#include "com_twilio_video_Video.h"
 #include "webrtc/sdk/android/src/jni/jni_helpers.h"
 
 #include "webrtc/base/refcount.h"
@@ -43,7 +43,7 @@ extern "C" void JNIEXPORT JNICALL JNI_OnUnLoad(JavaVM *jvm, void *reserved) {
     webrtc_jni::FreeGlobalClassReferenceHolder();
 }
 
-JNIEXPORT void JNICALL Java_com_twilio_video_VideoClient_nativeSetCoreLogLevel
+JNIEXPORT void JNICALL Java_com_twilio_video_Video_nativeSetCoreLogLevel
         (JNIEnv *env, jobject instance, jint level) {
     TS_CORE_LOG_MODULE(twilio::video::kTSCoreLogModulePlatform,
                        twilio::video::kTSCoreLogLevelDebug,
@@ -52,7 +52,7 @@ JNIEXPORT void JNICALL Java_com_twilio_video_VideoClient_nativeSetCoreLogLevel
     twilio::video::Logger::instance()->setLogLevel(coreLogLevel);
 }
 
-JNIEXPORT void JNICALL Java_com_twilio_video_VideoClient_nativeSetModuleLevel
+JNIEXPORT void JNICALL Java_com_twilio_video_Video_nativeSetModuleLevel
         (JNIEnv *env, jobject instance, jint module, jint level) {
     TS_CORE_LOG_MODULE(twilio::video::kTSCoreLogModulePlatform,
                        twilio::video::kTSCoreLogLevelDebug,
@@ -62,7 +62,7 @@ JNIEXPORT void JNICALL Java_com_twilio_video_VideoClient_nativeSetModuleLevel
     twilio::video::Logger::instance()->setModuleLogLevel(coreLogModule, coreLogLevel);
 }
 
-JNIEXPORT jint JNICALL Java_com_twilio_video_VideoClient_nativeGetCoreLogLevel
+JNIEXPORT jint JNICALL Java_com_twilio_video_Video_nativeGetCoreLogLevel
         (JNIEnv *env, jobject instance) {
     TS_CORE_LOG_MODULE(twilio::video::kTSCoreLogModulePlatform,
                        twilio::video::kTSCoreLogLevelDebug,
