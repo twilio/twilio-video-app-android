@@ -154,7 +154,7 @@ public class RoomTopologyParameterizedTest extends BaseClientTest {
 
             @Override
             public void onConnectFailure(Room room, TwilioException twilioException) {
-                assertEquals(Room.ERROR_INVALID_ACCESS_TOKEN, twilioException.getCode());
+                assertEquals(TwilioException.ACCESS_TOKEN_INVALID_EXCEPTION, twilioException.getCode());
                 connectFailure.countDown();
             }
 

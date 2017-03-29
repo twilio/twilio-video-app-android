@@ -23,27 +23,6 @@ import static java.lang.annotation.RetentionPolicy.SOURCE;
 public class Room {
     private static final Logger logger = Logger.getLogger(Room.class);
 
-    @Retention(SOURCE)
-    @IntDef({ERROR_INVALID_ACCESS_TOKEN,
-            ERROR_ROOM_SIGNALING,
-            ERROR_CREATE_PEERCONNECTION_FAILURE,
-            ERROR_ICE_CONNECTION_FAILURE,
-            ERROR_CREATE_LOCAL_SDP_FAILURE,
-            ERROR_SET_LOCAL_SDP_FAILURE,
-            ERROR_EMPTY_LOCAL_SDP,
-            ERROR_PROCESS_REMOTE_SDP_FAILURE,
-            ERROR_SET_REMOTE_SDP_FAILURE})
-    public @interface Error {}
-    public static final int ERROR_INVALID_ACCESS_TOKEN = 20101;
-    public static final int ERROR_ROOM_SIGNALING = 53100;
-    public static final int ERROR_CREATE_PEERCONNECTION_FAILURE = 54001;
-    public static final int ERROR_ICE_CONNECTION_FAILURE = 54101;
-    public static final int ERROR_CREATE_LOCAL_SDP_FAILURE = 54102;
-    public static final int ERROR_SET_LOCAL_SDP_FAILURE = 54103;
-    public static final int ERROR_EMPTY_LOCAL_SDP = 54104;
-    public static final int ERROR_PROCESS_REMOTE_SDP_FAILURE = 54105;
-    public static final int ERROR_SET_REMOTE_SDP_FAILURE = 54106;
-
     private long nativeRoomContext;
     private String name;
     private final LocalMedia localMedia;

@@ -36,7 +36,7 @@ public class FakeVideoCapturer implements VideoCapturer {
                     TimeUnit.MILLISECONDS.toNanos(SystemClock.elapsedRealtime());
 
             VideoFrame emptyVideoFrame = new VideoFrame(emptyBuffer,
-                    captureFormat.dimensions, 0, captureTimeNs);
+                    captureFormat.dimensions, VideoFrame.ROTATION_ANGLE_0_DEGREES, captureTimeNs);
 
             // Only notify the frame listener if we are not stopped
             if (started.get() && fakeVideoCapturerHandler != null) {
