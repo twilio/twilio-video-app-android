@@ -17,7 +17,7 @@ final class VideoCapturerListenerAdapter implements VideoCapturer.Listener {
         webRtcCapturerObserver.onByteBufferFrameCaptured(videoFrame.imageBuffer,
                 videoFrame.dimensions.width,
                 videoFrame.dimensions.height,
-                videoFrame.orientation,
+                videoFrame.orientation.getValue(),
                 videoFrame.timestamp);
     }
 }

@@ -121,7 +121,7 @@ public class ScreenCapturer implements VideoCapturer {
                             VideoDimensions dimensions = new VideoDimensions(image.getWidth(),
                                     image.getHeight());
                             VideoFrame videoFrame = new VideoFrame(buffer,
-                                    dimensions, 0, captureTimeNs);
+                                    dimensions, VideoFrame.RotationAngle.ROTATION_0, captureTimeNs);
                             capturerListener.onFrameCaptured(videoFrame);
                             image.close();
                         } catch (Exception e) {

@@ -114,7 +114,11 @@ public class CameraCapturer implements VideoCapturer {
                                                       int rotation,
                                                       long timestamp) {
                     VideoDimensions frameDimensions = new VideoDimensions(width, height);
-                    VideoFrame frame = new VideoFrame(bytes, frameDimensions, rotation, timestamp);
+                    VideoFrame frame = new VideoFrame(
+                        bytes,
+                        frameDimensions,
+                        VideoFrame.RotationAngle.fromInt(rotation),
+                        timestamp);
 
                     videoCapturerListener.onFrameCaptured(frame);
                 }
