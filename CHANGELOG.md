@@ -11,7 +11,8 @@ Known issues
 
 - Network handoff, and subsequent connection renegotiation is not supported for IPv6 networks [#72](https://github.com/twilio/video-quickstart-android/issues/72)
 - VP8 is the only supported codec [#71](https://github.com/twilio/video-quickstart-android/issues/71)
-- Participant disconnect event can take up to 120 seconds to occur [#80](https://github.com/twilio/video-quickstart-android/issues/80)
+- Participant disconnect event can take up to 120 seconds to occur [#80](https://github.com/twilio/video-quickstart-android/issues/80) [#73](https://github.com/twilio/video-quickstart-android/issues/73)
+- Missing media when adding audio/video tracks quickly while connected to room [#90](https://github.com/twilio/video-quickstart-android/issues/90)
 
 ####1.0.0-beta14
 
@@ -27,9 +28,10 @@ Known issues
 
 - Network handoff, and subsequent connection renegotiation is not supported for IPv6 networks [#72](https://github.com/twilio/video-quickstart-android/issues/72)
 - VP8 is the only supported codec [#71](https://github.com/twilio/video-quickstart-android/issues/71)
-- Participant disconnect event can take up to 120 seconds to occur [#80](https://github.com/twilio/video-quickstart-android/issues/80)
+- Participant disconnect event can take up to 120 seconds to occur [#80](https://github.com/twilio/video-quickstart-android/issues/80) [#73](https://github.com/twilio/video-quickstart-android/issues/73)
+- Missing media when adding audio/video tracks quickly while connected to room [#90](https://github.com/twilio/video-quickstart-android/issues/90)
 
-####1.0.0-beta13 (March 22, 2017)
+####1.0.0-beta13
 
 Improvements
 
@@ -47,9 +49,10 @@ Known issues
 
 - Network handoff, and subsequent connection renegotiation is not supported for IPv6 networks [#72](https://github.com/twilio/video-quickstart-android/issues/72)
 - VP8 is the only supported codec [#71](https://github.com/twilio/video-quickstart-android/issues/71)
-- Participant disconnect event can take up to 120 seconds to occur [#80](https://github.com/twilio/video-quickstart-android/issues/80)
+- Participant disconnect event can take up to 120 seconds to occur [#80](https://github.com/twilio/video-quickstart-android/issues/80) [#73](https://github.com/twilio/video-quickstart-android/issues/73)
+- Missing media when adding audio/video tracks quickly while connected to room [#90](https://github.com/twilio/video-quickstart-android/issues/90)
 
-####1.0.0-beta12 (March 14, 2017)
+####1.0.0-beta12
 
 Improvements
 
@@ -65,9 +68,10 @@ Known issues
 
 - Network handoff, and subsequent connection renegotiation is not supported for IPv6 networks [#72](https://github.com/twilio/video-quickstart-android/issues/72)
 - VP8 is the only supported codec [#71](https://github.com/twilio/video-quickstart-android/issues/71)
-- Participant disconnect event can take up to 120 seconds to occur [#80](https://github.com/twilio/video-quickstart-android/issues/80)
+- Participant disconnect event can take up to 120 seconds to occur [#80](https://github.com/twilio/video-quickstart-android/issues/80) [#73](https://github.com/twilio/video-quickstart-android/issues/73)
+- Missing media when adding audio/video tracks quickly while connected to room [#90](https://github.com/twilio/video-quickstart-android/issues/90)
 
-####1.0.0-beta11 (March 6, 2017)
+####1.0.0-beta11
 
 Improvements
 
@@ -103,8 +107,9 @@ Known issues
 
 - Network handoff, and subsequent connection renegotiation is not supported for IPv6 networks [#72](https://github.com/twilio/video-quickstart-android/issues/72)
 - VP8 is the only supported codec [#71](https://github.com/twilio/video-quickstart-android/issues/71)
+- Missing media when adding audio/video tracks quickly while connected to room [#90](https://github.com/twilio/video-quickstart-android/issues/90)
 
-####1.0.0-beta10 (February 24, 2017)
+####1.0.0-beta10
 
 Improvements
 
@@ -120,7 +125,7 @@ Known issues
 - Network handoff, and subsequent connection renegotiation is not supported for IPv6 networks [#72](https://github.com/twilio/video-quickstart-android/issues/72)
 - VP8 is the only supported codec [#71](https://github.com/twilio/video-quickstart-android/issues/71)
 
-####1.0.0-beta9 (February 15, 2017)
+####1.0.0-beta9
 
 Bug Fixes
 
@@ -133,7 +138,7 @@ Known issues
 - Tokens with purely numeric identities results in a crash
 - Participant identities with unicode characters are not supported
 
-####1.0.0-beta8 (February 8, 2017)
+####1.0.0-beta8
 
 Features
 
@@ -154,7 +159,7 @@ Known issues
 - Tokens with purely numeric identities results in a crash
 - Participant identities with unicode characters are not supported
 
-####1.0.0-beta7 (February 3, 2017)
+####1.0.0-beta7
 
 Improvements
 
@@ -171,7 +176,7 @@ Known issues
 - Disconnecting from a `Room` immediately after calling `getStats()` results in a crash.
 - Participant identities with unicode characters are not supported
 
-####1.0.0-beta6 (January 18, 2017)
+####1.0.0-beta6
 
 Bug Fixes
 
@@ -187,7 +192,7 @@ Known issues
 - Participant identities with unicode characters are not supported
 
 
-####1.0.0-beta5 (December 14, 2016)
+####1.0.0-beta5
 
 New features
 
@@ -213,7 +218,7 @@ Known issues
 - Participant identities with unicode characters are not supported
 
 
-####1.0.0-beta4 (November 23, 2016)
+####1.0.0-beta4
 
 New features
 
@@ -228,7 +233,7 @@ Known issues
 - On Nexus 9 device, intermittent high decoding times results in delayed video.
 - Participant identities with unicode characters are not supported
 
-####1.0.0-beta3 (November 2, 2016)
+####1.0.0-beta3
 
 New features
 
@@ -246,7 +251,7 @@ Known issues
 - VP8 is the only supported codec [#71](https://github.com/twilio/video-quickstart-android/issues/71)
 - Participant identities with unicode characters are not supported
 
-####1.0.0-beta2 (October 26, 2016)
+####1.0.0-beta2
 
 New features
 
@@ -264,7 +269,7 @@ Known issues
 - VP8 is the only supported codec [#71](https://github.com/twilio/video-quickstart-android/issues/71)
 - Participant identities with unicode characters are not supported
 
-####1.0.0-beta1 (October 11, 2016)
+####1.0.0-beta1
 
 New features
 
@@ -282,7 +287,7 @@ Known issues
 - Using x86 or x86_64 devices results in a crash
 - Participant identities with unicode characters are not supported
 
-####1.0.0-preview2 (September 23, 2016)
+####1.0.0-preview2
 
 New features
 
@@ -298,7 +303,7 @@ Known issues
 - Using x86 or x86_64 devices results in a crash
 - Participant identities with unicode characters are not supported
 
-####1.0.0-preview1 (September 19, 2016)
+####1.0.0-preview1
 
 New features
 
