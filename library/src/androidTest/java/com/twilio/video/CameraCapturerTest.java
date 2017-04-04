@@ -187,13 +187,33 @@ public class CameraCapturerTest extends BaseCameraCapturerTest {
     @Test
     public void shouldAllowUpdatingCameraParametersWhileCapturing() throws InterruptedException {
         CountDownLatch cameraParametersUpdated = new CountDownLatch(1);
+        final CountDownLatch firstFrameAvailable = new CountDownLatch(1);
         String expectedFlashMode = Camera.Parameters.FLASH_MODE_TORCH;
         AtomicReference<Camera.Parameters> actualCameraParameters = new AtomicReference<>();
         cameraCapturer = new CameraCapturer(cameraCapturerActivity,
-                CameraCapturer.CameraSource.BACK_CAMERA);
+                CameraCapturer.CameraSource.BACK_CAMERA,
+                new CameraCapturer.Listener() {
+                    @Override
+                    public void onFirstFrameAvailable() {
+                        firstFrameAvailable.countDown();
+                    }
+
+                    @Override
+                    public void onCameraSwitched() {
+
+                    }
+
+                    @Override
+                    public void onError(@CameraCapturer.Error int errorCode) {
+
+                    }
+                });
 
         // Begin capturing
         localVideoTrack = localMedia.addVideoTrack(true, cameraCapturer);
+
+        // Wait for first frame
+        assertTrue(firstFrameAvailable.await(CAMERA_CAPTURE_DELAY_MS, TimeUnit.MILLISECONDS));
 
         // Schedule camera parameter update
         scheduleCameraParameterFlashModeUpdate(cameraParametersUpdated, expectedFlashMode,
@@ -210,6 +230,7 @@ public class CameraCapturerTest extends BaseCameraCapturerTest {
     public void updateCameraParameters_shouldNotCauseCameraFreeze() throws InterruptedException {
         CountDownLatch cameraParametersUpdated = new CountDownLatch(1);
         final CountDownLatch cameraFroze = new CountDownLatch(1);
+        final CountDownLatch firstFrameAvailable = new CountDownLatch(1);
         String expectedFlashMode = Camera.Parameters.FLASH_MODE_TORCH;
         AtomicReference<Camera.Parameters> actualCameraParameters = new AtomicReference<>();
         cameraCapturer = new CameraCapturer(cameraCapturerActivity,
@@ -217,7 +238,7 @@ public class CameraCapturerTest extends BaseCameraCapturerTest {
                 new CameraCapturer.Listener() {
                     @Override
                     public void onFirstFrameAvailable() {
-
+                        firstFrameAvailable.countDown();
                     }
 
                     @Override
@@ -237,6 +258,9 @@ public class CameraCapturerTest extends BaseCameraCapturerTest {
         // Begin capturing
         localVideoTrack = localMedia.addVideoTrack(true, cameraCapturer);
 
+        // Wait for first frame
+        assertTrue(firstFrameAvailable.await(CAMERA_CAPTURE_DELAY_MS, TimeUnit.MILLISECONDS));
+
         // Schedule camera parameter update
         scheduleCameraParameterFlashModeUpdate(cameraParametersUpdated, expectedFlashMode,
                 actualCameraParameters);
@@ -255,13 +279,34 @@ public class CameraCapturerTest extends BaseCameraCapturerTest {
     public void updateCameraParameters_shouldManifestAfterCaptureCycle()
             throws InterruptedException {
         CountDownLatch cameraParametersUpdated = new CountDownLatch(1);
+        final CountDownLatch firstFrameAvailable = new CountDownLatch(1);
         String expectedFlashMode = Camera.Parameters.FLASH_MODE_TORCH;
         AtomicReference<Camera.Parameters> actualCameraParameters = new AtomicReference<>();
         cameraCapturer = new CameraCapturer(cameraCapturerActivity,
-                CameraCapturer.CameraSource.BACK_CAMERA);
+                CameraCapturer.CameraSource.BACK_CAMERA,
+                new CameraCapturer.Listener() {
+                    @Override
+                    public void onFirstFrameAvailable() {
+                        firstFrameAvailable.countDown();
+                    }
+
+                    @Override
+                    public void onCameraSwitched() {
+
+                    }
+
+                    @Override
+                    public void onError(@CameraCapturer.Error int errorCode) {
+
+                    }
+                });
 
         // Begin capturing and validate our flash mode is set
         localVideoTrack = localMedia.addVideoTrack(true, cameraCapturer);
+
+        // Wait for first frame
+        assertTrue(firstFrameAvailable.await(CAMERA_CAPTURE_DELAY_MS, TimeUnit.MILLISECONDS));
+
         scheduleCameraParameterFlashModeUpdate(cameraParametersUpdated, expectedFlashMode,
                 actualCameraParameters);
 
@@ -294,22 +339,49 @@ public class CameraCapturerTest extends BaseCameraCapturerTest {
     public void updateCameraParameters_shouldReturnFalseIfUpdateIsPending()
             throws InterruptedException {
         CountDownLatch cameraParametersUpdated = new CountDownLatch(1);
+        final CountDownLatch firstFrameAvailable = new CountDownLatch(1);
         String expectedFlashMode = Camera.Parameters.FLASH_MODE_TORCH;
         AtomicReference<Camera.Parameters> actualCameraParameters = new AtomicReference<>();
         cameraCapturer = new CameraCapturer(cameraCapturerActivity,
-                CameraCapturer.CameraSource.BACK_CAMERA);
+                CameraCapturer.CameraSource.BACK_CAMERA,
+                new CameraCapturer.Listener() {
+                    @Override
+                    public void onFirstFrameAvailable() {
+                        firstFrameAvailable.countDown();
+                    }
+
+                    @Override
+                    public void onCameraSwitched() {
+
+                    }
+
+                    @Override
+                    public void onError(@CameraCapturer.Error int errorCode) {
+
+                    }
+                });
         localVideoTrack = localMedia.addVideoTrack(true, cameraCapturer);
+
+        // Wait for first frame to be available
+        assertTrue(firstFrameAvailable.await(CAMERA_CAPTURE_DELAY_MS, TimeUnit.MILLISECONDS));
 
         // Schedule our camera parameter update
         scheduleCameraParameterFlashModeUpdate(cameraParametersUpdated, expectedFlashMode,
                 actualCameraParameters);
 
-        // Immediately schedule another
-        boolean parameterUpdateScheduled = cameraCapturer
-                .updateCameraParameters(new CameraParameterUpdater() {
-                    @Override
-                    public void apply(Camera.Parameters cameraParameters) {}
-                });
+        /*
+         * Not every parameter update fails so we string together a few calls and ensure that
+         * one of them fails to validate the scenario
+         */
+        boolean parameterUpdateScheduled = true;
+        final int updateIterations = 4;
+        for (int i = 0 ; i < updateIterations ; i++) {
+            parameterUpdateScheduled &=
+                    cameraCapturer.updateCameraParameters(new CameraParameterUpdater() {
+                        @Override
+                        public void apply(Camera.Parameters cameraParameters) {}
+                    });
+        }
 
         // With update pending this should have failed
         assertFalse(parameterUpdateScheduled);
@@ -322,29 +394,28 @@ public class CameraCapturerTest extends BaseCameraCapturerTest {
     }
 
     @Test
-    public void takePicture_shouldFailIfCapturerNotRunning() {
-        cameraCapturer = new CameraCapturer(cameraCapturerActivity,
-                CameraCapturer.CameraSource.BACK_CAMERA);
-
-        assertFalse(cameraCapturer.takePicture(new CameraCapturer.PictureListener() {
-            @Override
-            public void onShutter() {
-                fail();
-            }
-
-            @Override
-            public void onPictureTaken(byte[] pictureData) {
-                fail();
-            }
-        }));
-    }
-
-    @Test
     public void takePicture_shouldFailWithPicturePending() throws  InterruptedException{
-        cameraCapturer = new CameraCapturer(cameraCapturerActivity,
-                CameraCapturer.CameraSource.BACK_CAMERA);
-        localVideoTrack = localMedia.addVideoTrack(true, cameraCapturer);
         final CountDownLatch onPictureTakenLatch = new CountDownLatch(1);
+        final CountDownLatch firstFrameAvailable = new CountDownLatch(1);
+        cameraCapturer = new CameraCapturer(cameraCapturerActivity,
+                CameraCapturer.CameraSource.BACK_CAMERA,
+                new CameraCapturer.Listener() {
+                    @Override
+                    public void onFirstFrameAvailable() {
+                        firstFrameAvailable.countDown();
+                    }
+
+                    @Override
+                    public void onCameraSwitched() {
+
+                    }
+
+                    @Override
+                    public void onError(@CameraCapturer.Error int errorCode) {
+
+                    }
+                });
+        localVideoTrack = localMedia.addVideoTrack(true, cameraCapturer);
         CameraCapturer.PictureListener pictureListener = new CameraCapturer.PictureListener() {
             @Override
             public void onShutter() {
@@ -357,18 +428,39 @@ public class CameraCapturerTest extends BaseCameraCapturerTest {
             }
         };
 
+        assertTrue(firstFrameAvailable.await(CAMERA_CAPTURE_DELAY_MS, TimeUnit.SECONDS));
         assertTrue(cameraCapturer.takePicture(pictureListener));
         assertFalse(cameraCapturer.takePicture(pictureListener));
-        assertTrue(onPictureTakenLatch.await(10, TimeUnit.SECONDS));
+        assertTrue(onPictureTakenLatch.await(CAMERA_CAPTURE_DELAY_MS, TimeUnit.SECONDS));
     }
 
     @Test
     public void shouldInvokePictureListenerOnCallingThread() throws InterruptedException {
-        cameraCapturer = new CameraCapturer(cameraCapturerActivity,
-                CameraCapturer.CameraSource.BACK_CAMERA);
-        localVideoTrack = localMedia.addVideoTrack(true, cameraCapturer);
+        final CountDownLatch firstFrameAvailable = new CountDownLatch(1);
         final CountDownLatch shutterCallback = new CountDownLatch(1);
         final CountDownLatch pictureTaken = new CountDownLatch(1);
+
+        cameraCapturer = new CameraCapturer(cameraCapturerActivity,
+                CameraCapturer.CameraSource.BACK_CAMERA, new CameraCapturer.Listener() {
+            @Override
+            public void onFirstFrameAvailable() {
+                firstFrameAvailable.countDown();
+            }
+
+            @Override
+            public void onCameraSwitched() {
+
+            }
+
+            @Override
+            public void onError(@CameraCapturer.Error int errorCode) {
+
+            }
+        });
+        localVideoTrack = localMedia.addVideoTrack(true, cameraCapturer);
+
+        // Wait for capturer to actually start
+        assertTrue(firstFrameAvailable.await(CAMERA_CAPTURE_DELAY_MS, TimeUnit.MILLISECONDS));
 
         /*
          * Run on UI thread to avoid thread hopping between the test runner thread and the UI

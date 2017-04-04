@@ -176,10 +176,60 @@ public class CameraCapturerSourceParameterizedTest extends BaseCameraCapturerTes
 
     @Test
     public void shouldAllowTakingPictureWhileCapturing() throws InterruptedException {
-        cameraCapturer = new CameraCapturer(cameraCapturerActivity, cameraSource);
-        localVideoTrack = localMedia.addVideoTrack(true, cameraCapturer);
+        final CountDownLatch firstFrameAvailable = new CountDownLatch(1);
         final CountDownLatch shutterCallback = new CountDownLatch(1);
         final CountDownLatch pictureTaken = new CountDownLatch(1);
+
+        cameraCapturer = new CameraCapturer(cameraCapturerActivity,
+                cameraSource,
+                new CameraCapturer.Listener() {
+                    @Override
+                    public void onFirstFrameAvailable() {
+                        firstFrameAvailable.countDown();
+                    }
+
+                    @Override
+                    public void onCameraSwitched() {
+
+                    }
+
+                    @Override
+                    public void onError(@CameraCapturer.Error int errorCode) {
+
+                    }
+                });
+        localVideoTrack = localMedia.addVideoTrack(true, cameraCapturer);
+
+        CameraCapturer.PictureListener pictureListener = new CameraCapturer.PictureListener() {
+            @Override
+            public void onShutter() {
+                shutterCallback.countDown();
+            }
+
+            @Override
+            public void onPictureTaken(byte[] pictureData) {
+                // Validate our picture data
+                assertNotNull(pictureData);
+                assertNotNull(BitmapFactory.decodeByteArray(pictureData, 0, pictureData.length));
+
+                pictureTaken.countDown();
+            }
+        };
+
+        assertTrue(firstFrameAvailable.await(CAMERA_CAPTURE_DELAY_MS, TimeUnit.MILLISECONDS));
+        assertTrue(cameraCapturer.takePicture(pictureListener));
+        assertTrue(shutterCallback.await(CAMERA_CAPTURE_DELAY_MS, TimeUnit.MILLISECONDS));
+        assertTrue(pictureTaken.await(CAMERA_CAPTURE_DELAY_MS, TimeUnit.MILLISECONDS));
+    }
+
+    @Test
+    public void shouldAllowTakingPictureRightBeforeCapturerStarts() throws InterruptedException {
+        final CountDownLatch shutterCallback = new CountDownLatch(1);
+        final CountDownLatch pictureTaken = new CountDownLatch(1);
+
+        cameraCapturer = new CameraCapturer(cameraCapturerActivity, cameraSource);
+        localVideoTrack = localMedia.addVideoTrack(true, cameraCapturer);
+
         CameraCapturer.PictureListener pictureListener = new CameraCapturer.PictureListener() {
             @Override
             public void onShutter() {

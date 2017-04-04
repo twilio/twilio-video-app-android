@@ -1,6 +1,6 @@
 package com.twilio.video;
 
-import org.webrtc.CameraEnumerationAndroid;
+import org.webrtc.Camera1Enumerator;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -12,29 +12,33 @@ class CameraCapturerFormatProvider {
 
     private final Map<CameraCapturer.CameraSource, List<VideoFormat>> supportedFormatsMap =
             new HashMap<>();
+    private final Camera1Enumerator camera1Enumerator = new Camera1Enumerator(false);
 
-    static int getCameraId(CameraCapturer.CameraSource cameraSource) {
-        String deviceName;
+    int getCameraId(CameraCapturer.CameraSource cameraSource) {
         int cameraId = -1;
 
-        if(cameraSource == CameraCapturer.CameraSource.BACK_CAMERA) {
-            deviceName = CameraEnumerationAndroid.getNameOfBackFacingDevice();
-        } else {
-            deviceName = CameraEnumerationAndroid.getNameOfFrontFacingDevice();
-        }
-        if(deviceName == null) {
-            cameraId = -1;
-        } else {
-            String[] deviceNames = CameraEnumerationAndroid.getDeviceNames();
-            for(int i = 0; i < deviceNames.length; i++) {
-                if(deviceName.equals(deviceNames[i])) {
-                    cameraId = i;
-                    break;
-                }
+        String[] deviceNames = camera1Enumerator.getDeviceNames();
+        for(int i = 0; i < deviceNames.length; i++) {
+            if ((camera1Enumerator.isFrontFacing(deviceNames[i]) &&
+                    cameraSource == CameraCapturer.CameraSource.FRONT_CAMERA) ||
+                    (camera1Enumerator.isBackFacing(deviceNames[i]) && cameraSource ==
+                            CameraCapturer.CameraSource.BACK_CAMERA)) {
+                cameraId = i;
+                break;
             }
         }
 
         return cameraId;
+    }
+
+    String getDeviceName(int cameraId) {
+        String[] deviceNames = camera1Enumerator.getDeviceNames();
+
+        if (cameraId < 0 || cameraId >= deviceNames.length) {
+            throw new IllegalArgumentException("cameraId not available on this device");
+        }
+
+        return deviceNames[cameraId];
     }
 
     List<VideoFormat> getSupportedFormats(CameraCapturer.CameraSource cameraSource) {

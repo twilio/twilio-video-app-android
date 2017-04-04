@@ -13,16 +13,17 @@ import android.support.annotation.Nullable;
 import android.view.Surface;
 import android.view.WindowManager;
 
-import org.webrtc.CameraEnumerationAndroid;
+import org.webrtc.Camera1Capturer;
+import org.webrtc.Camera1Session;
+import org.webrtc.CameraVideoCapturer;
 import org.webrtc.SurfaceTextureHelper;
-import org.webrtc.VideoCapturerAndroid;
-import org.webrtc.Camera1Enumerator;
 
 import java.io.ByteArrayOutputStream;
 import java.lang.annotation.Retention;
-import java.lang.reflect.Field;
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import static java.lang.annotation.RetentionPolicy.SOURCE;
 
@@ -47,7 +48,6 @@ public class CameraCapturer implements VideoCapturer {
             ERROR_CAMERA_SERVER_STOPPED,
             ERROR_UNSUPPORTED_SOURCE,
             ERROR_CAMERA_PERMISSION_NOT_GRANTED,
-            ERROR_CAPTURER_CREATION_FAILED,
             ERROR_CAMERA_SWITCH_FAILED,
             ERROR_UNKNOWN})
     public @interface Error {}
@@ -55,7 +55,6 @@ public class CameraCapturer implements VideoCapturer {
     public static final int ERROR_CAMERA_SERVER_STOPPED = 1;
     public static final int ERROR_UNSUPPORTED_SOURCE = 2;
     public static final int ERROR_CAMERA_PERMISSION_NOT_GRANTED = 3;
-    public static final int ERROR_CAPTURER_CREATION_FAILED = 4;
     public static final int ERROR_CAMERA_SWITCH_FAILED = 5;
     public static final int ERROR_UNKNOWN = 6;
 
@@ -67,12 +66,28 @@ public class CameraCapturer implements VideoCapturer {
         BACK_CAMERA
     }
 
+    /*
+     * State definitions used to control interactions with the public API
+     */
+    private enum State {
+        IDLE,
+        STARTING,
+        RUNNING,
+        STOPPING
+    }
+
+    // These fields are used to safely transition between CameraCapturer states
+    private final Object stateLock = new Object();
+    private State state = State.IDLE;
+
     private final Context context;
     private final CameraCapturerFormatProvider formatProvider = new CameraCapturerFormatProvider();
+    private final AtomicBoolean picturePending = new AtomicBoolean(false);
+    private final AtomicBoolean parameterUpdatePending = new AtomicBoolean(false);
     private CameraCapturer.Listener listener;
-    private VideoCapturerAndroid webrtcCapturer;
+    private org.webrtc.Camera1Capturer webRtcCameraCapturer;
     private CameraSource cameraSource;
-    private Camera.CameraInfo info;
+    private Camera1Session camera1Session;
     private VideoCapturer.Listener videoCapturerListener;
     private SurfaceTextureHelper surfaceTextureHelper;
     private final org.webrtc.VideoCapturer.CapturerObserver observerAdapter =
@@ -81,30 +96,45 @@ public class CameraCapturer implements VideoCapturer {
                 public void onCapturerStarted(boolean success) {
                     videoCapturerListener.onCapturerStarted(success);
 
-                    synchronized (CameraCapturer.this) {
-                        // Cache camera info immediately so we can use to align pictures
-                        CameraCapturer.this.info = getCameraInfo();
+                    // Cache camera session immediately
+                    CameraCapturer.this.camera1Session =
+                            webRtcCameraCapturer.getCameraSession();
 
+                    // Transition the camera capturer to running state
+                    synchronized (stateLock) {
+                        state = State.RUNNING;
                         /*
-                         * Here the user has specified a camera parameter updater. We need to apply
-                         * these parameters after the capturer is started to ensure consistency
-                         * on the camera capturer instance.
+                         * The user requested a camera parameter update while the capturer was
+                         * not running. We need to apply these parameters after the capturer
+                         * is started to ensure consistency on the camera capturer instance.
                          */
                         if (cameraParameterUpdater != null) {
-                            boolean parameterUpdatedScheduled =
-                                    webrtcCapturer.injectCameraParameters(cameraParameterInjector);
+                            updateCameraParametersOnCameraThread(cameraParameterUpdater);
+                            cameraParameterUpdater = null;
+                        }
 
-                            if (!parameterUpdatedScheduled) {
-                                logger.e("Failed to schedule camera parameter update after " +
-                                        "capturer started.");
-                            }
+                        /*
+                         * The user requested a picture while capturer was not running. We service
+                         * the request once we know the capturer is running so user does not
+                         * have to wait for capturer to start to take a picture.
+                         */
+                        if (pictureListener != null) {
+                            takePicture(pictureListener);
+                            pictureListener = null;
                         }
                     }
+
                 }
 
                 @Override
                 public void onCapturerStopped() {
-                    // TODO: This is currently not required but investigate the requirement of this
+                    // Transition the camera capturer to idle
+                    synchronized (stateLock) {
+                        // Clear our current camera session
+                        CameraCapturer.this.camera1Session = null;
+
+                        state = State.IDLE;
+                    }
                 }
 
                 @Override
@@ -133,27 +163,11 @@ public class CameraCapturer implements VideoCapturer {
                     // TODO: Do we need to support capturing to texture?
                 }
             };
-
-    private final VideoCapturerAndroid.CameraParameterInjector cameraParameterInjector =
-            new VideoCapturerAndroid.CameraParameterInjector() {
-                /*
-                 * We use the internal CameraParameterInjector we added in WebRTC to apply
-                 * a users custom camera parameters.
-                 */
-                @Override
-                public void onCameraParameters(Camera.Parameters parameters) {
-                    synchronized (CameraCapturer.this) {
-                        if (cameraParameterUpdater != null) {
-                            logger.i("Updating camera parameters");
-                            cameraParameterUpdater.apply(parameters);
-                        }
-                    }
-                }
-            };
     private CameraParameterUpdater cameraParameterUpdater;
+    private PictureListener pictureListener;
 
-    private final VideoCapturerAndroid.CameraEventsHandler cameraEventsHandler =
-            new VideoCapturerAndroid.CameraEventsHandler() {
+    private final CameraVideoCapturer.CameraEventsHandler cameraEventsHandler =
+            new CameraVideoCapturer.CameraEventsHandler() {
                 @Override
                 public void onCameraError(String errorMsg) {
                     if (listener != null) {
@@ -198,8 +212,8 @@ public class CameraCapturer implements VideoCapturer {
                 }
             };
 
-    private final VideoCapturerAndroid.CameraSwitchHandler cameraSwitchHandler =
-            new VideoCapturerAndroid.CameraSwitchHandler() {
+    private final CameraVideoCapturer.CameraSwitchHandler cameraSwitchHandler =
+            new CameraVideoCapturer.CameraSwitchHandler() {
                 @Override
                 public void onCameraSwitchDone(boolean isFrontCamera) {
                     synchronized (CameraCapturer.this) {
@@ -220,40 +234,6 @@ public class CameraCapturer implements VideoCapturer {
                     }
                 }
             };
-
-    private PictureListener pictureListener;
-    private Handler pictureListenerHandler;
-    private final VideoCapturerAndroid.PictureEventHandler pictureEventHandler =
-            new VideoCapturerAndroid.PictureEventHandler() {
-                @Override
-                public void onShutter() {
-                    if (pictureListener != null) {
-                        pictureListenerHandler.post(new Runnable() {
-                            @Override
-                            public void run() {
-                                pictureListener.onShutter();
-                            }
-                        });
-                    }
-                }
-
-                @Override
-                public void onPictureTaken(final byte[] pictureData) {
-                    if (pictureListener != null) {
-                        // Perform alignment on camera thread
-                        final byte[] alignedPictureData = alignPicture(pictureData);
-
-                        pictureListenerHandler.post(new Runnable() {
-                            @Override
-                            public void run() {
-                                pictureListener.onPictureTaken(alignedPictureData);
-                            }
-                        });
-                    }
-                }
-            };
-
-
 
     public CameraCapturer(Context context, CameraSource cameraSource) {
         this(context, cameraSource, null);
@@ -315,12 +295,15 @@ public class CameraCapturer implements VideoCapturer {
     @Override
     public void startCapture(VideoFormat captureFormat,
                              VideoCapturer.Listener videoCapturerListener) {
-        boolean capturerCreated = createVideoCapturerAndroid();
+        boolean capturerCreated = createWebRtcCameraCapturer();
         if (capturerCreated) {
+            synchronized (stateLock) {
+                state = State.STARTING;
+            }
             this.videoCapturerListener = videoCapturerListener;
 
-            webrtcCapturer.initialize(surfaceTextureHelper, context, observerAdapter);
-            webrtcCapturer.startCapture(captureFormat.dimensions.width,
+            webRtcCameraCapturer.initialize(surfaceTextureHelper, context, observerAdapter);
+            webRtcCameraCapturer.startCapture(captureFormat.dimensions.width,
                     captureFormat.dimensions.height,
                     captureFormat.framerate);
         } else {
@@ -337,14 +320,13 @@ public class CameraCapturer implements VideoCapturer {
      */
     @Override
     public void stopCapture() {
-        if (webrtcCapturer != null) {
-            try {
-                webrtcCapturer.stopCapture();
-            } catch (InterruptedException e) {
-                logger.e("Failed to stop camera capturer");
+        if (webRtcCameraCapturer != null) {
+            synchronized (stateLock) {
+                state = State.STOPPING;
             }
-            webrtcCapturer.dispose();
-            webrtcCapturer = null;
+            webRtcCameraCapturer.stopCapture();
+            webRtcCameraCapturer.dispose();
+            webRtcCameraCapturer = null;
         }
     }
 
@@ -360,14 +342,16 @@ public class CameraCapturer implements VideoCapturer {
      * or not.
      */
     public synchronized void switchCamera() {
-        if (webrtcCapturer != null) {
-            webrtcCapturer.switchCamera(cameraSwitchHandler);
-        } else {
-            cameraSource = (cameraSource == CameraSource.FRONT_CAMERA) ?
-                    (CameraSource.BACK_CAMERA) :
-                    (CameraSource.FRONT_CAMERA);
-            if (listener != null) {
-                listener.onCameraSwitched();
+        synchronized (stateLock) {
+            if (state != State.IDLE) {
+                webRtcCameraCapturer.switchCamera(cameraSwitchHandler);
+            } else {
+                cameraSource = (cameraSource == CameraSource.FRONT_CAMERA) ?
+                        (CameraSource.BACK_CAMERA) :
+                        (CameraSource.FRONT_CAMERA);
+                if (listener != null) {
+                    listener.onCameraSwitched();
+                }
             }
         }
     }
@@ -409,29 +393,33 @@ public class CameraCapturer implements VideoCapturer {
      * @return true if update was scheduled or false if an update is pending or could not be
      * scheduled.
      */
-    public synchronized boolean updateCameraParameters(CameraParameterUpdater cameraParameterUpdater) {
-        // Assume that parameter update can be scheduled
-        boolean parameterUpdateScheduled = true;
+    public synchronized boolean updateCameraParameters(@NonNull final CameraParameterUpdater cameraParameterUpdater) {
+        synchronized (stateLock) {
+            if (state == State.RUNNING) {
+                if (!parameterUpdatePending.get()) {
+                    parameterUpdatePending.set(true);
+                    return camera1Session.cameraThreadHandler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            updateCameraParametersOnCameraThread(cameraParameterUpdater);
+                        }
+                    });
+                } else {
+                    logger.w("Parameters will not be applied with parameter update pending");
+                    return false;
+                }
+            } else {
+                logger.i("Camera capturer is not running. Parameters will be applied when " +
+                        "camera capturer is resumed");
+                this.cameraParameterUpdater = cameraParameterUpdater;
 
-        /*
-         * If the camera capturer is running we can apply the parameters immediately. Otherwise
-         * the parameters will be applied when the camera capturer is started again.
-         */
-        if (webrtcCapturer != null) {
-            parameterUpdateScheduled =
-                    webrtcCapturer.injectCameraParameters(cameraParameterInjector);
+                return true;
+            }
         }
-
-        // Only set parameter updater if we scheduled the injection
-        if (parameterUpdateScheduled) {
-            this.cameraParameterUpdater = cameraParameterUpdater;
-        }
-
-        return parameterUpdateScheduled;
     }
 
     /**
-     * Schedules an image capture. This call will only succeed while capturing frames.
+     * Schedules an image capture.
      *
      * <p>
      *     The following snippet demonstrates how to capture and image and decode to a
@@ -467,14 +455,31 @@ public class CameraCapturer implements VideoCapturer {
      * @return true if picture was scheduled to be taken or false if a picture is pending or could
      * not be scheduled.
      */
-    public synchronized boolean takePicture(@NonNull PictureListener pictureListener) {
-        pictureListenerHandler = Util.createCallbackHandler();
-        if (webrtcCapturer != null) {
-            this.pictureListener = pictureListener;
-            return webrtcCapturer.takePicture(pictureEventHandler);
-        } else {
-            logger.e("Picture cannot be taken unless camera capturer is running");
-            return false;
+    public synchronized boolean takePicture(@NonNull final PictureListener pictureListener) {
+        synchronized (stateLock) {
+            if (state == State.RUNNING) {
+                if (!picturePending.get()) {
+                    picturePending.set(true);
+                    final Handler pictureListenerHandler = Util.createCallbackHandler();
+
+                    return camera1Session.cameraThreadHandler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            takePictureOnCameraThread(pictureListenerHandler, pictureListener);
+                        }
+                    });
+                } else {
+                    logger.w("Picture cannot be taken while picture is pending");
+
+                    return false;
+                }
+            } else {
+                logger.i("Camera capturer is not running. Picture request will be serviced " +
+                        "when camera capturer is resumed");
+                this.pictureListener = pictureListener;
+
+                return true;
+            }
         }
     }
 
@@ -492,7 +497,7 @@ public class CameraCapturer implements VideoCapturer {
         return defaultFormats;
     }
 
-    private boolean createVideoCapturerAndroid() {
+    private boolean createWebRtcCameraCapturer() {
         if (!Util.permissionGranted(context, Manifest.permission.CAMERA)) {
             logger.e("CAMERA permission must be granted to start capturer");
             if (listener != null) {
@@ -500,8 +505,8 @@ public class CameraCapturer implements VideoCapturer {
             }
             return false;
         }
-        int cameraId = CameraCapturerFormatProvider.getCameraId(cameraSource);
-        String deviceName = CameraEnumerationAndroid.getDeviceName(cameraId);
+        int cameraId = formatProvider.getCameraId(cameraSource);
+        String deviceName = formatProvider.getDeviceName(cameraId);
 
         if (cameraId < 0 || deviceName == null) {
             logger.e("Failed to find camera source");
@@ -510,15 +515,8 @@ public class CameraCapturer implements VideoCapturer {
             }
             return false;
         }
-        webrtcCapturer = VideoCapturerAndroid.create(deviceName, cameraEventsHandler);
+        webRtcCameraCapturer = new Camera1Capturer(deviceName, cameraEventsHandler, false);
 
-        if (webrtcCapturer == null) {
-            logger.e("Failed to create capturer");
-            if (listener != null) {
-                listener.onError(ERROR_CAPTURER_CREATION_FAILED);
-            }
-            return false;
-        }
 
         return true;
     }
@@ -526,9 +524,9 @@ public class CameraCapturer implements VideoCapturer {
     /*
      * Aligns the picture data according to the current device orientation and camera source.
      */
-    private byte[] alignPicture(byte[] pictureData) {
+    private byte[] alignPicture(Camera.CameraInfo info, byte[] pictureData) {
         Bitmap bitmap = BitmapFactory.decodeByteArray(pictureData, 0, pictureData.length);
-        int degree = getFrameOrientation();
+        int degree = getFrameOrientation(info);
         Matrix matrix = new Matrix();
 
         // Compensate for front camera mirroring
@@ -560,7 +558,7 @@ public class CameraCapturer implements VideoCapturer {
         return stream.toByteArray();
     }
 
-    private int getFrameOrientation() {
+    private int getFrameOrientation(Camera.CameraInfo info) {
         int rotation = getDeviceOrientation();
 
         if (info.facing == android.hardware.Camera.CameraInfo.CAMERA_FACING_BACK) {
@@ -592,24 +590,82 @@ public class CameraCapturer implements VideoCapturer {
         return orientation;
     }
 
-    /*
-     * FIXME
-     * Remove this once we have completed upgrade to WebRTC 55. This information can be provided
-     * without reflection with some small changes to WebRTC 55.
-     */
-    private Camera.CameraInfo getCameraInfo() {
-        Camera.CameraInfo cameraInfo;
-        try {
-            Field cameraInfoField = webrtcCapturer.getClass().getDeclaredField("info");
-            cameraInfoField.setAccessible(true);
-            cameraInfo = (Camera.CameraInfo) cameraInfoField.get(webrtcCapturer);
-        } catch (NoSuchFieldException e) {
-            throw new RuntimeException("Unable to retrieve camera info");
-        } catch( IllegalAccessException e) {
-            throw new RuntimeException("Could not access camera info");
-        }
+    private void updateCameraParametersOnCameraThread(final CameraParameterUpdater cameraParameterUpdater) {
+        camera1Session.checkIsOnCameraThread();
 
-        return cameraInfo;
+        synchronized (stateLock) {
+            if (state == State.RUNNING) {
+                // Grab camera parameters and forward to updater
+                Camera.Parameters cameraParameters = camera1Session.camera.getParameters();
+                logger.i("Applying camera parameters");
+                cameraParameterUpdater.apply(cameraParameters);
+
+                // Stop preview and clear internal camera buffer to avoid camera freezes
+                camera1Session.camera.stopPreview();
+                camera1Session.camera.setPreviewCallbackWithBuffer(null);
+
+                // Apply the parameters
+                camera1Session.camera.setParameters(cameraParameters);
+
+                // Reinitialize the preview callback and buffer.
+                final int frameSize = camera1Session.captureFormat.frameSize();
+                for (int i = 0; i < Camera1Session.NUMBER_OF_CAPTURE_BUFFERS; i++) {
+                    final ByteBuffer buffer = ByteBuffer.allocateDirect(frameSize);
+                    camera1Session.camera.addCallbackBuffer(buffer.array());
+                }
+                camera1Session.listenForBytebufferFrames();
+                camera1Session.camera.startPreview();
+            } else {
+                logger.w("Attempted to update camera parameters while camera capturer is " +
+                        "not running");
+            }
+
+            // Clear the parameter updating flag
+            parameterUpdatePending.set(false);
+        }
+    }
+
+    private void takePictureOnCameraThread(final Handler pictureListenerHandler,
+                                           final PictureListener pictureListener) {
+        camera1Session.checkIsOnCameraThread();
+
+        synchronized (stateLock) {
+            if (state == State.RUNNING) {
+                final Camera.CameraInfo info = camera1Session.info;
+                camera1Session.camera
+                        .takePicture(new android.hardware.Camera.ShutterCallback() {
+                            @Override
+                            public void onShutter() {
+                                pictureListenerHandler.post(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        pictureListener.onShutter();
+                                    }
+                                });
+                            }
+                        }, null, new android.hardware.Camera.PictureCallback() {
+                            @Override
+                            public void onPictureTaken(byte[] pictureData,
+                                                       android.hardware.Camera camera) {
+                                final byte[] alignedPictureData = alignPicture(info, pictureData);
+                                pictureListenerHandler.post(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        pictureListener.onPictureTaken(alignedPictureData);
+                                        picturePending.set(false);
+                                    }
+                                });
+                                synchronized (stateLock) {
+                                    if (state == State.RUNNING) {
+                                        camera1Session.camera.startPreview();
+                                    }
+                                }
+                            }
+                        });
+            } else {
+                logger.w("Attempted to take picture while capturing is not running");
+            }
+        }
     }
 
     /**
