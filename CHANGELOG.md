@@ -10,6 +10,11 @@ valid orientation values.
 - Updated `CameraCapturer` to allow scheduling a picture to be taken while the capturer is not 
 running.
 
+Bug Fixes
+
+- Reverted decoding from surface textures. This revert 
+should fix problems for custom `VideoRenderer`s receiving `null` YUV data for `VideoTrack`s [#93](https://github.com/twilio/video-quickstart-android/issues/93)
+
 Known issues
 
 - Network handoff, and subsequent connection renegotiation is not supported for IPv6 networks [#72](https://github.com/twilio/video-quickstart-android/issues/72)
@@ -30,6 +35,7 @@ Known issues
 - VP8 is the only supported codec [#71](https://github.com/twilio/video-quickstart-android/issues/71)
 - Participant disconnect event can take up to 120 seconds to occur [#80](https://github.com/twilio/video-quickstart-android/issues/80) [#73](https://github.com/twilio/video-quickstart-android/issues/73)
 - Missing media when adding audio/video tracks quickly while connected to room [#90](https://github.com/twilio/video-quickstart-android/issues/90)
+- Missing YUV data when adding a custom `VideoRender` to `VideoTrack`s [#93](https://github.com/twilio/video-quickstart-android/issues/93)
 
 ####1.0.0-beta14
 
@@ -47,6 +53,7 @@ Known issues
 - VP8 is the only supported codec [#71](https://github.com/twilio/video-quickstart-android/issues/71)
 - Participant disconnect event can take up to 120 seconds to occur [#80](https://github.com/twilio/video-quickstart-android/issues/80) [#73](https://github.com/twilio/video-quickstart-android/issues/73)
 - Missing media when adding audio/video tracks quickly while connected to room [#90](https://github.com/twilio/video-quickstart-android/issues/90)
+- Missing YUV data when adding a custom `VideoRender` to `VideoTrack`s [#93](https://github.com/twilio/video-quickstart-android/issues/93)
 
 ####1.0.0-beta13
 
@@ -68,6 +75,7 @@ Known issues
 - VP8 is the only supported codec [#71](https://github.com/twilio/video-quickstart-android/issues/71)
 - Participant disconnect event can take up to 120 seconds to occur [#80](https://github.com/twilio/video-quickstart-android/issues/80) [#73](https://github.com/twilio/video-quickstart-android/issues/73)
 - Missing media when adding audio/video tracks quickly while connected to room [#90](https://github.com/twilio/video-quickstart-android/issues/90)
+- Missing YUV data when adding a custom `VideoRender` to `VideoTrack`s [#93](https://github.com/twilio/video-quickstart-android/issues/93)
 
 ####1.0.0-beta12
 
@@ -87,6 +95,7 @@ Known issues
 - VP8 is the only supported codec [#71](https://github.com/twilio/video-quickstart-android/issues/71)
 - Participant disconnect event can take up to 120 seconds to occur [#80](https://github.com/twilio/video-quickstart-android/issues/80) [#73](https://github.com/twilio/video-quickstart-android/issues/73)
 - Missing media when adding audio/video tracks quickly while connected to room [#90](https://github.com/twilio/video-quickstart-android/issues/90)
+- Missing YUV data when adding a custom `VideoRender` to `VideoTrack`s [#93](https://github.com/twilio/video-quickstart-android/issues/93)
 
 ####1.0.0-beta11
 
@@ -125,6 +134,7 @@ Known issues
 - Network handoff, and subsequent connection renegotiation is not supported for IPv6 networks [#72](https://github.com/twilio/video-quickstart-android/issues/72)
 - VP8 is the only supported codec [#71](https://github.com/twilio/video-quickstart-android/issues/71)
 - Missing media when adding audio/video tracks quickly while connected to room [#90](https://github.com/twilio/video-quickstart-android/issues/90)
+- Missing YUV data when adding a custom `VideoRender` to `VideoTrack`s [#93](https://github.com/twilio/video-quickstart-android/issues/93)
 
 ####1.0.0-beta10
 
@@ -141,6 +151,7 @@ Known issues
 
 - Network handoff, and subsequent connection renegotiation is not supported for IPv6 networks [#72](https://github.com/twilio/video-quickstart-android/issues/72)
 - VP8 is the only supported codec [#71](https://github.com/twilio/video-quickstart-android/issues/71)
+- Missing YUV data when adding a custom `VideoRender` to `VideoTrack`s [#93](https://github.com/twilio/video-quickstart-android/issues/93)
 
 ####1.0.0-beta9
 
@@ -154,6 +165,7 @@ Known issues
 - VP8 is the only supported codec [#71](https://github.com/twilio/video-quickstart-android/issues/71)
 - Tokens with purely numeric identities results in a crash
 - Participant identities with unicode characters are not supported
+- Missing YUV data when adding a custom `VideoRender` to `VideoTrack`s [#93](https://github.com/twilio/video-quickstart-android/issues/93)
 
 ####1.0.0-beta8
 
@@ -175,6 +187,7 @@ Known issues
 - VP8 is the only supported codec [#71](https://github.com/twilio/video-quickstart-android/issues/71)
 - Tokens with purely numeric identities results in a crash
 - Participant identities with unicode characters are not supported
+- Missing YUV data when adding a custom `VideoRender` to `VideoTrack`s [#93](https://github.com/twilio/video-quickstart-android/issues/93)
 
 ####1.0.0-beta7
 
@@ -192,6 +205,7 @@ Known issues
 - VP8 is the only supported codec [#71](https://github.com/twilio/video-quickstart-android/issues/71)
 - Disconnecting from a `Room` immediately after calling `getStats()` results in a crash.
 - Participant identities with unicode characters are not supported
+- Missing YUV data when adding a custom `VideoRender` to `VideoTrack`s [#93](https://github.com/twilio/video-quickstart-android/issues/93)
 
 ####1.0.0-beta6
 
@@ -207,6 +221,7 @@ Known issues
 - Disconnecting from a `Room` immediately after calling `getStats()` results in a crash.
 - Native library fails to load on some devices. [#53](https://github.com/twilio/video-quickstart-android/issues/53)
 - Participant identities with unicode characters are not supported
+- Missing YUV data when adding a custom `VideoRender` to `VideoTrack`s [#93](https://github.com/twilio/video-quickstart-android/issues/93)
 
 
 ####1.0.0-beta5
@@ -233,6 +248,7 @@ Known issues
 - VP8 is the only supported codec [#71](https://github.com/twilio/video-quickstart-android/issues/71)
 - Disconnecting from a `Room` immediately after calling `getStats()` results in a crash.
 - Participant identities with unicode characters are not supported
+- Missing YUV data when adding a custom `VideoRender` to `VideoTrack`s [#93](https://github.com/twilio/video-quickstart-android/issues/93)
 
 
 ####1.0.0-beta4

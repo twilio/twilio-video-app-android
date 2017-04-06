@@ -8,6 +8,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
+import static junit.framework.TestCase.assertNotNull;
+
 public class FrameCountRenderer implements VideoRenderer {
     private final AtomicReference<CountDownLatch> frameArrived =
             new AtomicReference<>(new CountDownLatch(1));
@@ -19,6 +21,9 @@ public class FrameCountRenderer implements VideoRenderer {
 
     @Override
     public void renderFrame(I420Frame frame) {
+        assertNotNull(frame);
+        assertNotNull(frame.yuvPlanes);
+        assertNotNull(frame.yuvStrides);
         frameCount++;
         frameArrived.get().countDown();
         frame.release();

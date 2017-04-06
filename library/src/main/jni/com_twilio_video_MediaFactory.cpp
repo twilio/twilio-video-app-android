@@ -45,9 +45,18 @@ JNIEXPORT jlong JNICALL Java_com_twilio_video_MediaFactory_nativeCreate(JNIEnv *
     webrtc_jni::MediaCodecVideoDecoderFactory* video_decoder_factory =
             new webrtc_jni::MediaCodecVideoDecoderFactory();
 
-    // Enable the use of textures for encoding and decoding
-    video_encoder_factory->SetEGLContext(jni, j_egl_local_context);
-    video_decoder_factory->SetEGLContext(jni, j_egl_remote_context);
+    /*
+     * TODO: Enable use of textures for encoding and decoding
+     *
+     * WebRTC represents an I420Frame decoded from a texture with a texture ID
+     * and does not fill out the stride and plane data when surfaced to Java. This is more
+     * efficient but causes problems for implementing a custom VideoRenderer because the pixel
+     * data is unavailable in yuvPlanes. This problem will need to be revisited because
+     * encoding/decoding from a texture provides performance gains. However, we do not want to
+     * prohibit developers implementing custom renderers. For more information see GSDK-1108.
+     */
+    // video_encoder_factory->SetEGLContext(jni, j_egl_local_context);
+    // video_decoder_factory->SetEGLContext(jni, j_egl_remote_context);
 
     media_options.video_encoder_factory = video_encoder_factory;
     media_options.video_decoder_factory = video_decoder_factory;
