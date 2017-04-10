@@ -1,15 +1,13 @@
 package com.twilio.video.app.util;
 
-import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.Task;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.common.collect.ImmutableMap;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GetTokenResult;
 import com.google.gson.JsonObject;
 import com.jakewharton.retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
-import com.twilio.video.Video;
 
 import java.io.IOException;
 import java.util.Map;
@@ -138,7 +136,7 @@ public class VideoAppService {
      * Obtain configuration profile for specified environment.
      *
      * @param environment configuration profile environment ("prod"|"stage"|"dev")
-     * @return JSON represetation with all configuration profiles available.
+     * @return JSON representation with all configuration profiles available.
      */
     public static Single<String> getConfigurationProfile(final String environment, final String topology) {
         return injectAuthToken()
@@ -221,14 +219,10 @@ public class VideoAppService {
                 }
 
                 firebaseUser.getToken(true)
-                        .addOnCompleteListener(new OnCompleteListener<GetTokenResult>() {
+                        .addOnSuccessListener(new OnSuccessListener<GetTokenResult>() {
                             @Override
-                            public void onComplete(@android.support.annotation.NonNull Task<GetTokenResult> task) {
-                                if (!task.isSuccessful()) {
-                                    emitter.onError(task.getException());
-                                } else {
-                                    emitter.onSuccess(task.getResult().getToken());
-                                }
+                            public void onSuccess(GetTokenResult getTokenResult) {
+                                emitter.onSuccess(getTokenResult.getToken());
                             }
                         })
                         .addOnFailureListener(new OnFailureListener() {
