@@ -144,11 +144,10 @@ public class CameraCapturer implements VideoCapturer {
                                                       int rotation,
                                                       long timestamp) {
                     VideoDimensions frameDimensions = new VideoDimensions(width, height);
-                    VideoFrame frame = new VideoFrame(
-                        bytes,
-                        frameDimensions,
-                        VideoFrame.RotationAngle.fromInt(rotation),
-                        timestamp);
+                    VideoFrame frame = new VideoFrame(bytes,
+                            frameDimensions,
+                            VideoFrame.RotationAngle.fromInt(rotation),
+                            timestamp);
 
                     videoCapturerListener.onFrameCaptured(frame);
                 }
@@ -159,8 +158,15 @@ public class CameraCapturer implements VideoCapturer {
                                                    int oesTextureId,
                                                    float[] transformMatrix,
                                                    int rotation,
-                                                   long timestampNs) {
-                    // TODO: Do we need to support capturing to texture?
+                                                   long timestamp) {
+                    VideoDimensions frameDimensions = new VideoDimensions(width, height);
+                    VideoFrame frame = new VideoFrame(oesTextureId,
+                            transformMatrix,
+                            frameDimensions,
+                            VideoFrame.RotationAngle.fromInt(rotation),
+                            timestamp);
+
+                    videoCapturerListener.onFrameCaptured(frame);
                 }
             };
     private CameraParameterUpdater cameraParameterUpdater;
@@ -515,8 +521,7 @@ public class CameraCapturer implements VideoCapturer {
             }
             return false;
         }
-        webRtcCameraCapturer = new Camera1Capturer(deviceName, cameraEventsHandler, false);
-
+        webRtcCameraCapturer = new Camera1Capturer(deviceName, cameraEventsHandler, true);
 
         return true;
     }
@@ -591,29 +596,23 @@ public class CameraCapturer implements VideoCapturer {
     }
 
     private void updateCameraParametersOnCameraThread(final CameraParameterUpdater cameraParameterUpdater) {
-        camera1Session.checkIsOnCameraThread();
-
         synchronized (stateLock) {
             if (state == State.RUNNING) {
+                // Validate execution on camera thread
+                camera1Session.checkIsOnCameraThread();
+
                 // Grab camera parameters and forward to updater
                 Camera.Parameters cameraParameters = camera1Session.camera.getParameters();
                 logger.i("Applying camera parameters");
                 cameraParameterUpdater.apply(cameraParameters);
 
-                // Stop preview and clear internal camera buffer to avoid camera freezes
+                // Stop preview
                 camera1Session.camera.stopPreview();
-                camera1Session.camera.setPreviewCallbackWithBuffer(null);
 
                 // Apply the parameters
                 camera1Session.camera.setParameters(cameraParameters);
 
-                // Reinitialize the preview callback and buffer.
-                final int frameSize = camera1Session.captureFormat.frameSize();
-                for (int i = 0; i < Camera1Session.NUMBER_OF_CAPTURE_BUFFERS; i++) {
-                    final ByteBuffer buffer = ByteBuffer.allocateDirect(frameSize);
-                    camera1Session.camera.addCallbackBuffer(buffer.array());
-                }
-                camera1Session.listenForBytebufferFrames();
+                // Resume preview
                 camera1Session.camera.startPreview();
             } else {
                 logger.w("Attempted to update camera parameters while camera capturer is " +

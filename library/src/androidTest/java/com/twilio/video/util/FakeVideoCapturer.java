@@ -1,5 +1,7 @@
 package com.twilio.video.util;
 
+import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.SystemClock;
@@ -10,6 +12,7 @@ import com.twilio.video.VideoCapturer;
 import com.twilio.video.VideoFrame;
 import com.twilio.video.VideoPixelFormat;
 
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
@@ -26,21 +29,33 @@ public class FakeVideoCapturer implements VideoCapturer {
     private VideoCapturer.Listener capturerListener;
     private FakeCapturerThread fakeCapturerThread;
     private Handler fakeVideoCapturerHandler;
+    private final int[] colors = new int[] {
+            Color.RED,
+            Color.GREEN,
+            Color.BLUE
+    };
+    private int frameCounter = 0;
+    private int colorIndex = 0;
     private final Runnable frameGenerator = new Runnable() {
         @Override
         public void run() {
-            // TODO: Actually generate some RGBA data for this frame
-            int bufferSize = captureFormat.dimensions.width * captureFormat.dimensions.height * 4;
-            byte[] emptyBuffer = new byte[bufferSize];
+            Bitmap bitmap = Bitmap.createBitmap(captureFormat.dimensions.width,
+                    captureFormat.dimensions.height,
+                    Bitmap.Config.ARGB_8888);
+            bitmap.eraseColor(getAndUpdateColor());
+            ByteBuffer buffer = ByteBuffer.allocateDirect(bitmap.getByteCount());
+            bitmap.copyPixelsToBuffer(buffer);
             final long captureTimeNs =
                     TimeUnit.MILLISECONDS.toNanos(SystemClock.elapsedRealtime());
 
-            VideoFrame emptyVideoFrame = new VideoFrame(emptyBuffer,
-                    captureFormat.dimensions, VideoFrame.RotationAngle.ROTATION_0, captureTimeNs);
+            VideoFrame rgbVideoFrame = new VideoFrame(buffer.array(),
+                    captureFormat.dimensions,
+                    VideoFrame.RotationAngle.ROTATION_90,
+                    captureTimeNs);
 
             // Only notify the frame listener if we are not stopped
             if (started.get() && fakeVideoCapturerHandler != null) {
-                capturerListener.onFrameCaptured(emptyVideoFrame);
+                capturerListener.onFrameCaptured(rgbVideoFrame);
                 fakeVideoCapturerHandler.postDelayed(this, FRAMERATE_MS);
             }
         }
@@ -92,6 +107,20 @@ public class FakeVideoCapturer implements VideoCapturer {
 
         // Blocking call that ensures the capturer is stopped
         fakeCapturerThread.stopSync();
+    }
+
+    private int getAndUpdateColor() {
+        // Get current color
+        int color = colors[colorIndex];
+
+        // Change the color every 30 frames
+        frameCounter++;
+        if (frameCounter % 30 == 0) {
+            frameCounter = 0;
+            colorIndex = (colorIndex + 1) % colors.length;
+        }
+
+        return color;
     }
 
     private static List<VideoFormat> defaultSupportedFormats() {

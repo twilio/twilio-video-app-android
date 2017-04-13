@@ -32,5 +32,9 @@
             android:name=".ui.ScreenCapturerTestActivity">
         </activity>
 
+        <activity
+            android:name=".ui.VideoRendererTestActivity">
+        </activity>
+
     </application>
 </manifest>

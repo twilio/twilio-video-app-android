@@ -37,7 +37,6 @@ final class VideoCapturerDelegate implements org.webrtc.VideoCapturer {
     public void startCapture(int width, int height, int framerate) {
         VideoDimensions dimensions = new VideoDimensions(width, height);
         VideoFormat captureFormat = new VideoFormat(dimensions, framerate, videoPixelFormat);
-
         videoCapturer.startCapture(captureFormat, listenerAdapter);
     }
 
@@ -119,18 +118,34 @@ final class VideoCapturerDelegate implements org.webrtc.VideoCapturer {
         }
 
         @Override
-        public void onByteBufferFrameCaptured(byte[] data, int width, int height,
-                                              int rotation, long timeStamp) {
-            nativeOnByteBufferFrameCaptured(nativeCapturer, data, data.length, width, height, rotation,
+        public void onByteBufferFrameCaptured(byte[] data,
+                                              int width,
+                                              int height,
+                                              int rotation,
+                                              long timeStamp) {
+            nativeOnByteBufferFrameCaptured(nativeCapturer,
+                    data,
+                    data.length,
+                    width,
+                    height,
+                    rotation,
                     timeStamp);
         }
 
         @Override
-        public void onTextureFrameCaptured(
-                int width, int height, int oesTextureId, float[] transformMatrix, int rotation,
-                long timestamp) {
-            nativeOnTextureFrameCaptured(nativeCapturer, width, height, oesTextureId, transformMatrix,
-                    rotation, timestamp);
+        public void onTextureFrameCaptured(int width,
+                                           int height,
+                                           int oesTextureId,
+                                           float[] transformMatrix,
+                                           int rotation,
+                                           long timestamp) {
+            nativeOnTextureFrameCaptured(nativeCapturer,
+                    width,
+                    height,
+                    oesTextureId,
+                    transformMatrix,
+                    rotation,
+                    timestamp);
         }
 
         private native void nativeCapturerStarted(long nativeCapturer,

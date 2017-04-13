@@ -246,13 +246,6 @@ public class StatsTopologyParameterizedTest extends BaseClientTest {
         assertTrue(aliceListener.onParticipantConnectedLatch.await(20, TimeUnit.SECONDS));
         assertEquals(1, aliceRoom.getParticipants().size());
 
-        // Grab participant sids
-        String aliceSid = aliceRoom.getLocalParticipant().getSid();
-        String bobSid = bobRoom.getLocalParticipant().getSid();
-
-        // Listen for media events
-        bobRoom.getParticipants().get(aliceSid).getMedia().setListener(bobMediaListener);
-
         /*
          * We only validate the presence of one local video track being added because adding two
          * tracks quickly causes issues in the stats gathered. This bug appears to be a symptom of
@@ -265,14 +258,8 @@ public class StatsTopologyParameterizedTest extends BaseClientTest {
         // TODO: Uncomment once CSDK-1206 is resolved
         // aliceLocalMedia.addAudioTrack(true);
 
-        // Wait for tracks to be received by Bob
-        // TODO: Uncomment once CSDK-1206 is resolved
-        // bobMediaListener.onAudioTrackAddedLatch = new CountDownLatch(1);
-        bobMediaListener.onVideoTrackAddedLatch = new CountDownLatch(1);
-
-        // TODO: Uncomment once CSDK-1206 is resolved
-        // assertTrue(bobMediaListener.onAudioTrackAddedLatch.await(20, TimeUnit.SECONDS));
-        assertTrue(bobMediaListener.onVideoTrackAddedLatch.await(20, TimeUnit.SECONDS));
+        // let's give peer connection some time to get media flowing
+        Thread.sleep(2000);
 
         CallbackHelper.FakeStatsListener aliceStatsListener =
                 new CallbackHelper.FakeStatsListener();

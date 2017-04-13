@@ -1,5 +1,25 @@
 The Twilio Programmable Video SDKs use [Semantic Versioning](http://www.semver.org).
 
+####1.0.0-beta17
+
+Improvements
+
+- Improved hardware accelerated encoding and decoding through the use of surface textures. 
+- Added `textureId` and `samplingMatrix` fields to `I420Frame` so implementations of `VideoRenderer`
+can extract YUV data from frame represented as texture.
+- Exposed `org.webrtc.YuvConverter` to facilitate converting a texture to an in memory YUV buffer.
+
+Bug Fixes
+
+- On Nexus 9 device, intermittent high decoding times results in delayed video. [#95](https://github.com/twilio/video-quickstart-android/issues/95)
+
+Known issues
+
+- Network handoff, and subsequent connection renegotiation is not supported for IPv6 networks [#72](https://github.com/twilio/video-quickstart-android/issues/72)
+- VP8 is the only supported codec [#71](https://github.com/twilio/video-quickstart-android/issues/71)
+- Participant disconnect event can take up to 120 seconds to occur [#80](https://github.com/twilio/video-quickstart-android/issues/80) [#73](https://github.com/twilio/video-quickstart-android/issues/73)
+- Missing media when adding audio/video tracks quickly while connected to room [#90](https://github.com/twilio/video-quickstart-android/issues/90)
+
 ####1.0.0-beta16
 
 Improvements

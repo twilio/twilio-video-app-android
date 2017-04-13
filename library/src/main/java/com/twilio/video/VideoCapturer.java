@@ -14,7 +14,7 @@ public interface VideoCapturer {
     /**
      * Indicates whether the capturer is a screen cast.
      *
-     * @return true if the video capturer is a screecast and false if not.
+     * @return true if the video capturer is a screencast and false if not.
      */
     boolean isScreencast();
 

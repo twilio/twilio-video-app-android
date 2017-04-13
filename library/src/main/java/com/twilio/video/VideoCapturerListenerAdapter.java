@@ -14,10 +14,24 @@ final class VideoCapturerListenerAdapter implements VideoCapturer.Listener {
 
     @Override
     public void onFrameCaptured(VideoFrame videoFrame) {
-        webRtcCapturerObserver.onByteBufferFrameCaptured(videoFrame.imageBuffer,
-                videoFrame.dimensions.width,
-                videoFrame.dimensions.height,
-                videoFrame.orientation.getValue(),
-                videoFrame.timestamp);
+        /*
+         * The imageBuffer field indicates if the frame is captured to a texture or not. Currently,
+         * only the CameraCapturer captures to texture because we have not exposed capturing to
+         * a texture to the VideoCapturer interface.
+         */
+        if (videoFrame.imageBuffer != null) {
+            webRtcCapturerObserver.onByteBufferFrameCaptured(videoFrame.imageBuffer,
+                    videoFrame.dimensions.width,
+                    videoFrame.dimensions.height,
+                    videoFrame.orientation.getValue(),
+                    videoFrame.timestamp);
+        } else {
+            webRtcCapturerObserver.onTextureFrameCaptured(videoFrame.dimensions.width,
+                    videoFrame.dimensions.height,
+                    videoFrame.textureId,
+                    videoFrame.transformMatrix,
+                    videoFrame.orientation.getValue(),
+                    videoFrame.timestamp);
+        }
     }
 }

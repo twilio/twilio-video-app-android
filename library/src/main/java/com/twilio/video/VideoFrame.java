@@ -1,10 +1,6 @@
 package com.twilio.video;
 
-import android.support.annotation.IntDef;
-
-import java.lang.annotation.Retention;
-
-import static java.lang.annotation.RetentionPolicy.SOURCE;
+import android.support.annotation.Nullable;
 
 /**
  * Represents a video frame provided by a {@link CameraCapturer}.
@@ -18,7 +14,8 @@ public class VideoFrame {
         ROTATION_270(270);
 
         private final int rotation;
-        private RotationAngle(int rotation) {
+
+        RotationAngle(int rotation) {
             this.rotation = rotation;
         }
 
@@ -37,10 +34,13 @@ public class VideoFrame {
                 return ROTATION_270;
             } else {
                 throw new IllegalArgumentException(
-                    "Orientation value must be 0, 90, 180 or 270: " + rotation);
+                        "Orientation value must be 0, 90, 180 or 270: " + rotation);
             }
         }
     }
+
+    final Integer textureId;
+    final float[] transformMatrix;
 
     /** The bytes of a frame. */
     public final byte[] imageBuffer;
@@ -55,7 +55,31 @@ public class VideoFrame {
                       VideoDimensions dimensions,
                       RotationAngle orientation,
                       long timestamp) {
+        this(imageBuffer, null, null, dimensions, orientation, timestamp);
+    }
+
+    /*
+     * This constructor is currently only used by CameraCapturer for frames captured to a texture.
+     * We will make this constructor public when we support capturing to a texture as part of the
+     * VideoCapturer API.
+     */
+    VideoFrame(int textureId,
+               float[] transformMatrix,
+               VideoDimensions dimensions,
+               RotationAngle orientation,
+               long timestamp) {
+        this(null, textureId, transformMatrix, dimensions, orientation, timestamp);
+    }
+
+    private VideoFrame(@Nullable byte[] imageBuffer,
+                       @Nullable Integer textureId,
+                       @Nullable float[] transformMatrix,
+                       VideoDimensions dimensions,
+                       RotationAngle orientation,
+                       long timestamp) {
         this.imageBuffer = imageBuffer;
+        this.textureId = textureId;
+        this.transformMatrix = transformMatrix;
         this.dimensions = dimensions;
         this.orientation = orientation;
         this.timestamp = timestamp;
