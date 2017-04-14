@@ -626,10 +626,11 @@ public class CameraCapturer implements VideoCapturer {
 
     private void takePictureOnCameraThread(final Handler pictureListenerHandler,
                                            final PictureListener pictureListener) {
-        camera1Session.checkIsOnCameraThread();
-
         synchronized (stateLock) {
             if (state == State.RUNNING) {
+                // Validate execution on camera thread
+                camera1Session.checkIsOnCameraThread();
+
                 final Camera.CameraInfo info = camera1Session.info;
                 camera1Session.camera
                         .takePicture(new android.hardware.Camera.ShutterCallback() {

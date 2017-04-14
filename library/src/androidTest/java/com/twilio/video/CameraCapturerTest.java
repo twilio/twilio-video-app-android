@@ -164,21 +164,24 @@ public class CameraCapturerTest extends BaseCameraCapturerTest {
 
     @Test
     public void shouldAllowUpdatingCameraParametersBeforeCapturing() throws InterruptedException {
-        CountDownLatch cameraParametersUpdated = new CountDownLatch(1);
+        CountDownLatch cameraParametersSet = new CountDownLatch(1);
         String expectedFlashMode = Camera.Parameters.FLASH_MODE_TORCH;
         AtomicReference<Camera.Parameters> actualCameraParameters = new AtomicReference<>();
         cameraCapturer = new CameraCapturer(cameraCapturerActivity,
                 CameraCapturer.CameraSource.BACK_CAMERA);
 
         // Set our camera parameters
-        scheduleCameraParameterFlashModeUpdate(cameraParametersUpdated, expectedFlashMode,
+        scheduleCameraParameterFlashModeUpdate(cameraParametersSet, expectedFlashMode,
                 actualCameraParameters);
 
         // Now add our video track
         localVideoTrack = localMedia.addVideoTrack(true, cameraCapturer);
 
         // Wait for parameters to be set
-        assertTrue(cameraParametersUpdated.await(10, TimeUnit.SECONDS));
+        assertTrue(cameraParametersSet.await(10, TimeUnit.SECONDS));
+
+        // Assume that flash is supported
+        assumeNotNull(actualCameraParameters.get().getFlashMode());
 
         // Validate our flash mode
         assertEquals(expectedFlashMode, actualCameraParameters.get().getFlashMode());
@@ -222,13 +225,16 @@ public class CameraCapturerTest extends BaseCameraCapturerTest {
         // Wait for parameters to be set
         assertTrue(cameraParametersUpdated.await(CAMERA_CAPTURE_DELAY_MS, TimeUnit.MILLISECONDS));
 
+        // Assume that flash is supported
+        assumeNotNull(actualCameraParameters.get().getFlashMode());
+
         // Validate our flash mode
         assertEquals(expectedFlashMode, actualCameraParameters.get().getFlashMode());
     }
 
     @Test
     public void updateCameraParameters_shouldNotCauseCameraFreeze() throws InterruptedException {
-        CountDownLatch cameraParametersUpdated = new CountDownLatch(1);
+        CountDownLatch cameraParametersSet = new CountDownLatch(1);
         final CountDownLatch cameraFroze = new CountDownLatch(1);
         final CountDownLatch firstFrameAvailable = new CountDownLatch(1);
         String expectedFlashMode = Camera.Parameters.FLASH_MODE_TORCH;
@@ -262,11 +268,14 @@ public class CameraCapturerTest extends BaseCameraCapturerTest {
         assertTrue(firstFrameAvailable.await(CAMERA_CAPTURE_DELAY_MS, TimeUnit.MILLISECONDS));
 
         // Schedule camera parameter update
-        scheduleCameraParameterFlashModeUpdate(cameraParametersUpdated, expectedFlashMode,
+        scheduleCameraParameterFlashModeUpdate(cameraParametersSet, expectedFlashMode,
                 actualCameraParameters);
 
         // Wait for parameters to be set
-        assertTrue(cameraParametersUpdated.await(CAMERA_CAPTURE_DELAY_MS, TimeUnit.MILLISECONDS));
+        assertTrue(cameraParametersSet.await(CAMERA_CAPTURE_DELAY_MS, TimeUnit.MILLISECONDS));
+
+        // Assume that flash is supported
+        assumeNotNull(actualCameraParameters.get().getFlashMode());
 
         // Validate our flash mode
         assertEquals(expectedFlashMode, actualCameraParameters.get().getFlashMode());
@@ -312,6 +321,9 @@ public class CameraCapturerTest extends BaseCameraCapturerTest {
 
         // Wait for parameters to be set
         assertTrue(cameraParametersUpdated.await(10, TimeUnit.SECONDS));
+
+        // Assume that flash is supported
+        assumeNotNull(actualCameraParameters.get().getFlashMode());
 
         // Validate our flash mode
         assertEquals(expectedFlashMode, actualCameraParameters.get().getFlashMode());
@@ -388,6 +400,9 @@ public class CameraCapturerTest extends BaseCameraCapturerTest {
 
         // Wait for original parameters to be set
         assertTrue(cameraParametersUpdated.await(10, TimeUnit.SECONDS));
+
+        // Assume that flash is supported
+        assumeNotNull(actualCameraParameters.get().getFlashMode());
 
         // Validate our flash mode
         assertEquals(expectedFlashMode, actualCameraParameters.get().getFlashMode());
@@ -492,22 +507,21 @@ public class CameraCapturerTest extends BaseCameraCapturerTest {
         assertTrue(pictureTaken.await(CAMERA_CAPTURE_DELAY_MS, TimeUnit.MILLISECONDS));
     }
 
-    private void scheduleCameraParameterFlashModeUpdate(final CountDownLatch cameraParametersUpdated,
+    private void scheduleCameraParameterFlashModeUpdate(final CountDownLatch cameraParametersSet,
                                                         final String expectedFlashMode,
                                                         final AtomicReference<Camera.Parameters> actualCameraParameters) {
         boolean parameterUpdateScheduled = cameraCapturer
                 .updateCameraParameters(new CameraParameterUpdater() {
                     @Override
                     public void apply(Camera.Parameters cameraParameters) {
-                        // This lets assume we can actually support flash mode
-                        assumeNotNull(cameraParameters.getFlashMode());
-
-                        // Turn the flash on set our parameters later for validation
-                        cameraParameters.setFlashMode(expectedFlashMode);
+                        // Turn the flash only if supported
+                        if (cameraParameters.getFlashMode() != null) {
+                            cameraParameters.setFlashMode(expectedFlashMode);
+                        }
                         actualCameraParameters.set(cameraParameters);
 
                         // Continue test
-                        cameraParametersUpdated.countDown();
+                        cameraParametersSet.countDown();
                     }
                 });
 

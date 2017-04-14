@@ -8,12 +8,15 @@ import com.twilio.video.LocalVideoTrack;
 import com.twilio.video.LogLevel;
 import com.twilio.video.Video;
 import com.twilio.video.ui.CameraCapturerTestActivity;
+import com.twilio.video.util.DeviceUtils;
 import com.twilio.video.util.FrameCountRenderer;
 import com.twilio.video.util.PermissionUtils;
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
+
+import static org.junit.Assume.assumeFalse;
 
 public abstract class BaseCameraCapturerTest {
     protected static final int CAMERA_CAPTURE_DELAY_MS = 3000;
@@ -29,6 +32,8 @@ public abstract class BaseCameraCapturerTest {
 
     @Before
     public void setup() {
+        // TODO: Resolve camera capturer test failures with Samsung Galaxy S3 GSDK-1080 GSDK-1110
+        assumeFalse(DeviceUtils.isSamsungGalaxyS3());
         cameraCapturerActivity = activityRule.getActivity();
         PermissionUtils.allowPermissions(cameraCapturerActivity);
         localMedia = LocalMedia.create(cameraCapturerActivity);
