@@ -22,6 +22,8 @@ import com.twilio.video.app.base.BaseActivity;
 import com.twilio.video.app.data.Preferences;
 import com.twilio.video.app.util.AuthHelper;
 
+import javax.inject.Inject;
+
 import butterknife.ButterKnife;
 import timber.log.Timber;
 
@@ -31,9 +33,9 @@ public class LoginActivity extends BaseActivity
     public static final String EXTRA_SIGN_OUT = "SignOut";
     private static final int GOOGLE_SIGN_IN = 4615;
 
-    private ProgressDialog progressDialog;
+    @Inject SharedPreferences sharedPreferences;
 
-    private SharedPreferences sharedPreferences;
+    private ProgressDialog progressDialog;
     private GoogleApiClient googleApiClient;
 
     @Override

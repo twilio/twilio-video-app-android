@@ -25,6 +25,8 @@
   *;
 }
 
+# Dagger 2
+-dontwarn com.google.errorprone.annotations.CanIgnoreReturnValue
 
 # Guava
 -keep class com.google.common.io.Resources {

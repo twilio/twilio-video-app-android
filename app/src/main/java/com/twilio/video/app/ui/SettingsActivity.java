@@ -15,9 +15,10 @@ import com.twilio.video.app.R;
 import com.twilio.video.app.base.BaseActivity;
 import com.twilio.video.app.data.Preferences;
 
-public class SettingsActivity extends BaseActivity {
+import javax.inject.Inject;
 
-    private SharedPreferences sharedPreferences;
+public class SettingsActivity extends BaseActivity {
+    @Inject SharedPreferences sharedPreferences;
 
     private final Preference.OnPreferenceClickListener logoutClickListener =
             new Preference.OnPreferenceClickListener() {
@@ -31,8 +32,6 @@ public class SettingsActivity extends BaseActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
 
         // Add the preference fragment
         SettingsFragment settingsFragment = SettingsFragment.newInstance(sharedPreferences,

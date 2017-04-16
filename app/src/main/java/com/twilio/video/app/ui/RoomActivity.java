@@ -31,14 +31,12 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.twilio.accessmanager.AccessManager;
 import com.twilio.video.AspectRatio;
 import com.twilio.video.AudioTrack;
 import com.twilio.video.CameraCapturer;
 import com.twilio.video.ConnectOptions;
 import com.twilio.video.LocalAudioTrack;
 import com.twilio.video.LocalMedia;
-import com.twilio.video.LocalParticipant;
 import com.twilio.video.LocalVideoTrack;
 import com.twilio.video.Media;
 import com.twilio.video.Participant;
@@ -56,16 +54,21 @@ import com.twilio.video.app.R;
 import com.twilio.video.app.adapter.StatsListAdapter;
 import com.twilio.video.app.base.BaseActivity;
 import com.twilio.video.app.data.Preferences;
+import com.twilio.video.app.data.api.TokenService;
+import com.twilio.video.app.data.api.VideoAppService;
+import com.twilio.video.app.data.api.model.Topology;
+import com.twilio.video.app.data.api.model.VideoConfiguration;
 import com.twilio.video.app.util.EnvUtil;
 import com.twilio.video.app.util.InputUtils;
 import com.twilio.video.app.util.StatsScheduler;
-import com.twilio.video.app.util.VideoAppService;
 import com.twilio.video.env.Env;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
+
+import javax.inject.Inject;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -140,16 +143,12 @@ public class RoomActivity extends BaseActivity {
     private MenuItem screenCaptureMenuItem;
     private MenuItem settingsMenuItem;
 
-    private SharedPreferences sharedPreferences;
     private AudioManager audioManager;
     private int savedAudioMode = AudioManager.MODE_INVALID;
     private int savedVolumeControlStream;
 
     private String displayName;
-    private String env;
-    private String topology;
     private String localParticipantSid = LOCAL_PARTICIPANT_STUB_SID;
-    private AccessManager accessManager;
     private Room room;
     private LocalMedia localMedia;
     private VideoConstraints videoConstraints;
@@ -177,6 +176,9 @@ public class RoomActivity extends BaseActivity {
     private StatsScheduler statsScheduler;
     private StatsListAdapter statsListAdapter;
     private Map<String, String> localVideoTrackNames = new HashMap<>();
+
+    @Inject TokenService tokenService;
+    @Inject SharedPreferences sharedPreferences;
 
     /**
      * Coordinates participant thumbs and primary participant rendering.
@@ -216,10 +218,6 @@ public class RoomActivity extends BaseActivity {
         // Setup Activity
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         displayName = sharedPreferences.getString(Preferences.DISPLAY_NAME, null);
-        env = sharedPreferences.getString(Preferences.ENVIRONMENT,
-                Preferences.ENVIRONMENT_DEFAULT);
-        topology = sharedPreferences.getString(Preferences.TOPOLOGY,
-                Preferences.TOPOLOGY_DEFAULT);
         localMedia = LocalMedia.create(this);
         statsScheduler = new StatsScheduler();
         obtainVideoConstraints();
@@ -370,37 +368,22 @@ public class RoomActivity extends BaseActivity {
 
     @OnClick(R.id.connect)
     void connectButtonClick() {
-
         // obtain room name
-        String roomName = roomEditText.getText().toString();
+        final String roomName = roomEditText.getText().toString();
 
         // obtain latest environment preferences
-        String env = sharedPreferences.getString(Preferences.ENVIRONMENT,
-                Preferences.ENVIRONMENT_DEFAULT);
-        String topology = sharedPreferences.getString(Preferences.TOPOLOGY,
-                Preferences.TOPOLOGY_DEFAULT);
+        Topology topology = Topology.fromString(sharedPreferences.getString(Preferences.TOPOLOGY,
+                Preferences.TOPOLOGY_DEFAULT));
 
-        // room observable
-        Single<Room> connection;
-
-        if (newTokenRequired(env, topology)) {
-
-            // update all env parameters before proceeding connection
-            connection = getToken(displayName, env, topology)
-                    .flatMapCompletable(new Function<String, CompletableSource>() {
-                        @Override
-                        public CompletableSource apply(@NonNull String token) throws Exception {
-                            return updateToken(token);
-                        }
-                    })
-                    .andThen(updateEnv(env))
-                    .andThen(updateTopology(topology))
-                    .andThen(connect(roomName));
-        } else {
-
-            // ready to connect
-            connection = connect(roomName);
-        }
+        Single<Room> connection = updateEnv()
+                .andThen(tokenService.getToken(displayName, topology))
+                .flatMap(new Function<String, SingleSource<? extends Room>>() {
+                    @Override
+                    public SingleSource<? extends Room> apply(@NonNull String token)
+                            throws Exception {
+                        return connect(token, roomName);
+                    }
+                });
 
         connection.observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new SingleObserver<Room>() {
@@ -806,93 +789,22 @@ public class RoomActivity extends BaseActivity {
     }
 
     /**
-     * Validates whether it is necessary to request new token.
-     *
-     * @param currentEnv      environment required for new token
-     * @param currentTopology topology required for new token
-     * @return true if update is required, otherwise - false
-     */
-    private boolean newTokenRequired(String currentEnv, String currentTopology) {
-        return !env.equals(currentEnv) ||
-                !topology.equals(currentTopology) ||
-                accessManager == null ||
-                accessManager.isTokenExpired();
-    }
-
-    /**
-     * Provides a token Single with specified parameters.
-     *
-     * @param identity  identity to use in token
-     * @param env      environment to connect
-     * @param topology topology to use
-     * @return Single with fresh token
-     */
-    private Single<String> getToken(final String identity,
-                                    final String env,
-                                    String topology) {
-
-        return VideoAppService.getConfigurationProfile(env, topology)
-                .flatMap(new Function<String, SingleSource<? extends String>>() {
-                    @Override
-                    public SingleSource<? extends String> apply(@NonNull String sid)
-                            throws Exception {
-                        return VideoAppService.getAccessToken(env, identity, sid);
-                    }
-                });
-    }
-
-    /**
-     * Save token instance with help of {@link AccessManager}.
-     *
-     * @param token token from {@link VideoAppService}
-     * @return Completable
-     */
-    private Completable updateToken(final String token) {
-        return Completable.fromAction(new Action() {
-            @Override
-            public void run() throws Exception {
-                if (accessManager == null) {
-                    accessManager = new AccessManager(token);
-                } else {
-                    accessManager.updateToken(token);
-                }
-            }
-        });
-    }
-
-    /**
-     * Update local copy of topology.
-     *
-     * @param topology new topology to use
-     * @return Completable
-     */
-    private Completable updateTopology(final String topology) {
-        return Completable.fromAction(new Action() {
-            @Override
-            public void run() throws Exception {
-                RoomActivity.this.topology = topology;
-            }
-        });
-    }
-
-    /**
      * Update {@link com.twilio.video.Video} environment.
      *
-     * @param env new environment to use
      * @return Completable
      */
-    private Completable updateEnv(final String env) {
+    private Completable updateEnv() {
         return Completable.fromAction(new Action() {
             @Override
             public void run() throws Exception {
+                String env = sharedPreferences.getString(Preferences.ENVIRONMENT,
+                        Preferences.ENVIRONMENT_DEFAULT);
                 String nativeEnvironmentVariableValue = EnvUtil
                         .getNativeEnvironmentVariableValue(env);
                 Env.set(RoomActivity.this,
                         EnvUtil.TWILIO_ENV_KEY,
                         nativeEnvironmentVariableValue,
                         true);
-
-                RoomActivity.this.env = env;
             }
         });
     }
@@ -903,11 +815,11 @@ public class RoomActivity extends BaseActivity {
      * @param roomName room name or sid
      * @return Single with room reference
      */
-    private Single<Room> connect(final String roomName) {
+    private Single<Room> connect(final String token, final String roomName) {
         return Single.fromCallable(new Callable<Room>() {
             @Override
             public Room call() throws Exception {
-                ConnectOptions connectOptions = new ConnectOptions.Builder(accessManager.getToken())
+                ConnectOptions connectOptions = new ConnectOptions.Builder(token)
                         .roomName(roomName)
                         .localMedia(localMedia)
                         .build();

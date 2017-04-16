@@ -11,7 +11,7 @@ buildscript {
         }
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:2.3.0'
+        classpath 'com.android.tools.build:gradle:2.3.1'
         classpath 'com.jakewharton:butterknife-gradle-plugin:8.4.0'
         classpath 'com.google.gms:google-services:3.0.0'
         classpath 'com.google.firebase:firebase-plugins:1.0.5'
