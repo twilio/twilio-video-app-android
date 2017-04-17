@@ -13,6 +13,8 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import static org.junit.Assert.assertTrue;
+
 @RunWith(AndroidJUnit4.class)
 @SmallTest
 public class ConnectOptionsTest {
@@ -35,5 +37,13 @@ public class ConnectOptionsTest {
     public void shouldThrowExceptionWhenTokenEmptyString() {
         ConnectOptions connectOptionsBuilder =
             new ConnectOptions.Builder("").build();
+    }
+
+    @Test
+    public void shouldEnableInsights() {
+        ConnectOptions connectOptions = new ConnectOptions.Builder("test")
+            .enableInsights(true)
+            .build();
+        assertTrue(connectOptions.isInsightsEnabled());
     }
 }

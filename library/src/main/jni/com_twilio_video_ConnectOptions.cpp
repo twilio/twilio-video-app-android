@@ -15,6 +15,7 @@ Java_com_twilio_video_ConnectOptions_nativeCreate(JNIEnv *env,
                                                   jstring j_room_name,
                                                   jobject j_local_media,
                                                   jobject j_ice_options,
+                                                  jboolean j_enable_insights,
                                                   jlong j_platform_info_handle) {
 
     std::string access_token = webrtc_jni::JavaToStdString(env, j_access_token);
@@ -48,6 +49,8 @@ Java_com_twilio_video_ConnectOptions_nativeCreate(JNIEnv *env,
     if (platform_info_context != nullptr) {
         builder.setPlatformInfo(platform_info_context->platform_info);
     }
+
+    builder.enableInsights(j_enable_insights);
 
     twilio_video_jni::ConnectOptionsContext *data_context = new twilio_video_jni::ConnectOptionsContext;
     data_context->connect_options = builder.build();

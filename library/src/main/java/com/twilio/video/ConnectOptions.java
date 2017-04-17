@@ -8,12 +8,14 @@ public class ConnectOptions {
     private final String roomName;
     private final LocalMedia localMedia;
     private final IceOptions iceOptions;
+    private final boolean enableInsights;
 
     private ConnectOptions(Builder builder) {
         this.accessToken = builder.accessToken;
         this.roomName = builder.roomName;
         this.localMedia = builder.localMedia;
         this.iceOptions = builder.iceOptions;
+        this.enableInsights = builder.enableInsights;
     }
 
     String getAccessToken() {
@@ -32,15 +34,20 @@ public class ConnectOptions {
         return iceOptions;
     }
 
+    boolean isInsightsEnabled() {
+        return enableInsights;
+    }
+
     private long createNativeObject() {
         return nativeCreate(
-            accessToken, roomName, localMedia, iceOptions, PlatformInfo.getNativeHandle());
+            accessToken, roomName, localMedia, iceOptions, enableInsights, PlatformInfo.getNativeHandle());
     }
 
     private native long nativeCreate(String accessToken,
                                      String roomName,
                                      LocalMedia localMedia,
                                      IceOptions iceOptions,
+                                     boolean enableInsights,
                                      long platformInfoNativeHandle);
     /**
      * Build new {@link ConnectOptions}.
@@ -52,6 +59,7 @@ public class ConnectOptions {
         private String roomName = "";
         private LocalMedia localMedia;
         private IceOptions iceOptions;
+        private boolean enableInsights;
 
         public Builder(String accessToken) {
             this.accessToken = accessToken;
@@ -78,6 +86,14 @@ public class ConnectOptions {
          */
         public Builder iceOptions(IceOptions iceOptions) {
             this.iceOptions = iceOptions;
+            return this;
+        }
+
+        /**
+         * Enable sending stats data to Insights
+         */
+        public Builder enableInsights(boolean enable) {
+            this.enableInsights = enable;
             return this;
         }
 
