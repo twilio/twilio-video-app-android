@@ -2,7 +2,6 @@ package com.twilio.video.helper;
 
 
 import com.twilio.video.AudioTrack;
-import com.twilio.video.Media;
 import com.twilio.video.Participant;
 import com.twilio.video.Room;
 import com.twilio.video.TwilioException;
@@ -132,7 +131,7 @@ public class CallbackHelper {
         }
     }
 
-    public static class FakeMediaListener implements Media.Listener {
+    public static class FakeParticipantListener implements Participant.Listener {
 
         public CountDownLatch onAudioTrackAddedLatch;
         public CountDownLatch onAudioTrackRemovedLatch;
@@ -152,42 +151,42 @@ public class CallbackHelper {
         }
 
         @Override
-        public void onAudioTrackAdded(Media media, AudioTrack audioTrack) {
+        public void onAudioTrackAdded(Participant participant, AudioTrack audioTrack) {
             triggerLatch(onAudioTrackAddedLatch);
         }
 
         @Override
-        public void onAudioTrackRemoved(Media media, AudioTrack audioTrack) {
+        public void onAudioTrackRemoved(Participant participant, AudioTrack audioTrack) {
             triggerLatch(onAudioTrackRemovedLatch);
         }
 
         @Override
-        public void onVideoTrackAdded(Media media, VideoTrack videoTrack) {
+        public void onVideoTrackAdded(Participant participant, VideoTrack videoTrack) {
             triggerLatch(onVideoTrackAddedLatch);
         }
 
         @Override
-        public void onVideoTrackRemoved(Media media, VideoTrack videoTrack) {
+        public void onVideoTrackRemoved(Participant participant, VideoTrack videoTrack) {
             triggerLatch(onVideoTrackRemovedLatch);
         }
 
         @Override
-        public void onAudioTrackEnabled(Media media, AudioTrack audioTrack) {
+        public void onAudioTrackEnabled(Participant participant, AudioTrack audioTrack) {
             triggerLatch(onAudioTrackEnabledLatch);
         }
 
         @Override
-        public void onAudioTrackDisabled(Media media, AudioTrack audioTrack) {
+        public void onAudioTrackDisabled(Participant participant, AudioTrack audioTrack) {
             triggerLatch(onAudioTrackDisabledLatch);
         }
 
         @Override
-        public void onVideoTrackEnabled(Media media, VideoTrack videoTrack) {
+        public void onVideoTrackEnabled(Participant participant, VideoTrack videoTrack) {
             triggerLatch(onVideoTrackEnabledLatch);
         }
 
         @Override
-        public void onVideoTrackDisabled(Media media, VideoTrack videoTrack) {
+        public void onVideoTrackDisabled(Participant participant, VideoTrack videoTrack) {
             triggerLatch(onVideoTrackDisabledLatch);
         }
     }

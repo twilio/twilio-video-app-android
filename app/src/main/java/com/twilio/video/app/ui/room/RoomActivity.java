@@ -38,7 +38,6 @@ import com.twilio.video.ConnectOptions;
 import com.twilio.video.LocalAudioTrack;
 import com.twilio.video.LocalMedia;
 import com.twilio.video.LocalVideoTrack;
-import com.twilio.video.Media;
 import com.twilio.video.Participant;
 import com.twilio.video.Room;
 import com.twilio.video.RoomState;
@@ -849,8 +848,8 @@ public class RoomActivity extends BaseActivity {
      * @param participant newly joined room participant
      */
     private void addParticipant(Participant participant) {
-        ParticipantMediaListener listener = new ParticipantMediaListener(participant);
-        participant.getMedia().setListener(listener);
+        ParticipantListener listener = new ParticipantListener();
+        participant.setListener(listener);
         participantController.addThumb(participant.getSid(), participant.getIdentity());
     }
 
@@ -1113,16 +1112,9 @@ public class RoomActivity extends BaseActivity {
         };
     }
 
-    private class ParticipantMediaListener implements Media.Listener {
-
-        private final Participant participant;
-
-        ParticipantMediaListener(Participant participant) {
-            this.participant = participant;
-        }
-
+    private class ParticipantListener implements Participant.Listener {
         @Override
-        public void onAudioTrackAdded(Media media, AudioTrack audioTrack) {
+        public void onAudioTrackAdded(Participant participant, AudioTrack audioTrack) {
             Timber.i("Participant added audio track -> participant: %s, audio: %s, enabled: %b",
                     participant.getSid(),
                     audioTrack.getTrackId(),
@@ -1144,7 +1136,7 @@ public class RoomActivity extends BaseActivity {
         }
 
         @Override
-        public void onAudioTrackRemoved(Media media, AudioTrack audioTrack) {
+        public void onAudioTrackRemoved(Participant participant, AudioTrack audioTrack) {
             Timber.i("Participant removed audio track -> participant: %s, audio: %s, enabled: %b",
                     participant.getSid(),
                     audioTrack.getTrackId(),
@@ -1166,7 +1158,7 @@ public class RoomActivity extends BaseActivity {
         }
 
         @Override
-        public void onVideoTrackAdded(Media media, VideoTrack videoTrack) {
+        public void onVideoTrackAdded(Participant participant, VideoTrack videoTrack) {
             Timber.i("Participant added video track -> participant: %s, id: %s, enabled: %b",
                     participant.getSid(),
                     videoTrack.getTrackId(),
@@ -1188,7 +1180,7 @@ public class RoomActivity extends BaseActivity {
         }
 
         @Override
-        public void onVideoTrackRemoved(Media media, VideoTrack videoTrack) {
+        public void onVideoTrackRemoved(Participant participant, VideoTrack videoTrack) {
             Timber.i("Participant removed video track -> participant: %s, id: %s, enabled: %b",
                     participant.getSid(),
                     videoTrack.getTrackId(),
@@ -1210,7 +1202,7 @@ public class RoomActivity extends BaseActivity {
         }
 
         @Override
-        public void onAudioTrackEnabled(Media media, AudioTrack audioTrack) {
+        public void onAudioTrackEnabled(Participant participant, AudioTrack audioTrack) {
             Timber.i("Participant enabled audio track -> participant: %s, audio: %s, enabled: %b",
                     participant.getSid(),
                     audioTrack.getTrackId(),
@@ -1220,7 +1212,7 @@ public class RoomActivity extends BaseActivity {
         }
 
         @Override
-        public void onAudioTrackDisabled(Media media, AudioTrack audioTrack) {
+        public void onAudioTrackDisabled(Participant participant, AudioTrack audioTrack) {
             Timber.i("Participant disabled audio track -> participant: %s, audio: %s, enabled: %b",
                     participant.getSid(),
                     audioTrack.getTrackId(),
@@ -1230,7 +1222,7 @@ public class RoomActivity extends BaseActivity {
         }
 
         @Override
-        public void onVideoTrackEnabled(Media media, VideoTrack videoTrack) {
+        public void onVideoTrackEnabled(Participant participant, VideoTrack videoTrack) {
             Timber.i("Participant enabled video track -> participant: %s, video: %s, enabled: %b",
                     participant.getSid(),
                     videoTrack.getTrackId(),
@@ -1240,7 +1232,7 @@ public class RoomActivity extends BaseActivity {
         }
 
         @Override
-        public void onVideoTrackDisabled(Media media, VideoTrack videoTrack) {
+        public void onVideoTrackDisabled(Participant participant, VideoTrack videoTrack) {
             Timber.i("Participant disabled video track -> participant: %s, video: %s, enabled: %b",
                     participant.getSid(),
                     videoTrack.getTrackId(),

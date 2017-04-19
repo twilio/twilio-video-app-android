@@ -113,24 +113,6 @@ public class StatsListAdapter extends RecyclerView.Adapter<StatsListAdapter.View
         return statsListItems.size();
     }
 
-    private String getParticipantName(String trackId, boolean isAudioTrack,
-                                      Map<String, Participant> participantMap) {
-        for (Participant participant : participantMap.values()) {
-            if (isAudioTrack) {
-                AudioTrack audioTrack = participant.getMedia().getAudioTrack(trackId);
-                if (audioTrack != null) {
-                    return participant.getIdentity();
-                }
-            } else {
-                VideoTrack videoTrack = participant.getMedia().getVideoTrack(trackId);
-                if (videoTrack != null) {
-                    return participant.getIdentity();
-                }
-            }
-        }
-        return "";
-    }
-
     public void updateStatsData(List<StatsReport> statsReports,
                                 Map<String, Participant> participantMap,
                                 Map<String, String> localVideoTrackNames){
@@ -214,5 +196,43 @@ public class StatsListAdapter extends RecyclerView.Adapter<StatsListAdapter.View
                 notifyDataSetChanged();
             }
         });
+    }
+
+    private String getParticipantName(String trackId, boolean isAudioTrack,
+                                      Map<String, Participant> participantMap) {
+        for (Participant participant : participantMap.values()) {
+            if (isAudioTrack) {
+                AudioTrack audioTrack = getAudioTrack(participant, trackId);
+                if (audioTrack != null) {
+                    return participant.getIdentity();
+                }
+            } else {
+                VideoTrack videoTrack = getVideoTrack(participant, trackId);
+                if (videoTrack != null) {
+                    return participant.getIdentity();
+                }
+            }
+        }
+        return "";
+    }
+
+    private AudioTrack getAudioTrack(Participant participant, String trackId) {
+        for (AudioTrack audioTrack : participant.getAudioTracks()) {
+            if (audioTrack.getTrackId().equals(trackId)) {
+                return audioTrack;
+            }
+        }
+
+        return null;
+    }
+
+    private VideoTrack getVideoTrack(Participant participant, String trackId) {
+        for (VideoTrack videoTrack : participant.getVideoTracks()) {
+            if (videoTrack.getTrackId().equals(trackId)) {
+                return videoTrack;
+            }
+        }
+
+        return null;
     }
 }

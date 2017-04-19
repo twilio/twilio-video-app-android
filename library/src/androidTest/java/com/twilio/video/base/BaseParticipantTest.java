@@ -29,7 +29,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-public abstract class BaseMediaTest extends BaseClientTest {
+public abstract class BaseParticipantTest extends BaseClientTest {
     @Rule
     public ActivityTestRule<MediaTestActivity> activityRule =
             new ActivityTestRule<>(MediaTestActivity.class);
@@ -38,7 +38,7 @@ public abstract class BaseMediaTest extends BaseClientTest {
     protected LocalMedia actor2LocalMedia;
     protected FakeVideoCapturer fakeVideoCapturer;
     protected String tokenOne;
-    protected String  tokenTwo;
+    protected String tokenTwo;
     protected Room actor1Room;
     protected Room actor2Room;
     protected Participant participant;

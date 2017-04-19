@@ -8,6 +8,9 @@ Improvements
 - Added `textureId` and `samplingMatrix` fields to `I420Frame` so implementations of `VideoRenderer`
 can extract YUV data from frame represented as texture.
 - Exposed `org.webrtc.YuvConverter` to facilitate converting a texture to an in memory YUV buffer.
+- Removed `Media` from `Participant` and migrated `Media.Listener` to `Participant.Listener`. 
+`AudioTrack` and `VideoTrack` events are raised with the corresponding `Participant` instance.
+- Added `getVideoTracks` and `getAudioTracks` to `Participant`.
 
 Bug Fixes
 

@@ -1,11 +1,9 @@
 package com.twilio.video;
 
 import android.support.test.filters.LargeTest;
-import android.support.test.runner.AndroidJUnit4;
 
-import com.twilio.video.base.BaseMediaTest;
+import com.twilio.video.base.BaseParticipantTest;
 import com.twilio.video.helper.CallbackHelper;
-import com.twilio.video.util.FakeVideoRenderer;
 import com.twilio.video.util.FrameCountRenderer;
 import com.twilio.video.util.Topology;
 
@@ -25,7 +23,7 @@ import static org.junit.Assert.assertTrue;
 
 @RunWith(Parameterized.class)
 @LargeTest
-public class VideoTrackTopologyParameterizedTest extends BaseMediaTest {
+public class VideoTrackTopologyParameterizedTest extends BaseParticipantTest {
     private static final int VIDEO_TRACK_TEST_DELAY_MS = 3000;
 
     @Parameterized.Parameters(name = "{0}")
@@ -48,26 +46,28 @@ public class VideoTrackTopologyParameterizedTest extends BaseMediaTest {
 
     @Test
     public void addRenderer_shouldNotCrashForNullRenderer() throws InterruptedException {
-        CallbackHelper.FakeMediaListener mediaListener = new CallbackHelper.FakeMediaListener();
-        mediaListener.onVideoTrackAddedLatch = new CountDownLatch(1);
-        participant.getMedia().setListener(mediaListener);
+        CallbackHelper.FakeParticipantListener participantListener =
+                new CallbackHelper.FakeParticipantListener();
+        participantListener.onVideoTrackAddedLatch = new CountDownLatch(1);
+        participant.setListener(participantListener);
 
         LocalVideoTrack videoTrack = actor2LocalMedia.addVideoTrack(true, fakeVideoCapturer);
-        assertTrue(mediaListener.onVideoTrackAddedLatch.await(20, TimeUnit.SECONDS));
-        List<VideoTrack> videoTracks = participant.getMedia().getVideoTracks();
+        assertTrue(participantListener.onVideoTrackAddedLatch.await(20, TimeUnit.SECONDS));
+        List<VideoTrack> videoTracks = participant.getVideoTracks();
         assertEquals(1, videoTracks.size());
         videoTracks.get(0).addRenderer(null);
     }
 
     @Test
     public void canAddAndRemoveRenderer() throws InterruptedException {
-        CallbackHelper.FakeMediaListener mediaListener = new CallbackHelper.FakeMediaListener();
-        mediaListener.onVideoTrackAddedLatch = new CountDownLatch(1);
-        participant.getMedia().setListener(mediaListener);
+        CallbackHelper.FakeParticipantListener participantListener =
+                new CallbackHelper.FakeParticipantListener();
+        participantListener.onVideoTrackAddedLatch = new CountDownLatch(1);
+        participant.setListener(participantListener);
 
         LocalVideoTrack videoTrack = actor2LocalMedia.addVideoTrack(true, fakeVideoCapturer);
-        assertTrue(mediaListener.onVideoTrackAddedLatch.await(20, TimeUnit.SECONDS));
-        List<VideoTrack> videoTracks = participant.getMedia().getVideoTracks();
+        assertTrue(participantListener.onVideoTrackAddedLatch.await(20, TimeUnit.SECONDS));
+        List<VideoTrack> videoTracks = participant.getVideoTracks();
         assertEquals(1, videoTracks.size());
         FrameCountRenderer frameCountRenderer = new FrameCountRenderer();
         videoTracks.get(0).addRenderer(frameCountRenderer);
@@ -79,13 +79,14 @@ public class VideoTrackTopologyParameterizedTest extends BaseMediaTest {
 
     @Test
     public void shouldFailToAddRendererOnRemovedTrack() throws InterruptedException {
-        CallbackHelper.FakeMediaListener mediaListener = new CallbackHelper.FakeMediaListener();
-        mediaListener.onVideoTrackAddedLatch = new CountDownLatch(1);
-        participant.getMedia().setListener(mediaListener);
+        CallbackHelper.FakeParticipantListener participantListener =
+                new CallbackHelper.FakeParticipantListener();
+        participantListener.onVideoTrackAddedLatch = new CountDownLatch(1);
+        participant.setListener(participantListener);
 
         LocalVideoTrack localVideoTrack = actor2LocalMedia.addVideoTrack(true, fakeVideoCapturer);
-        assertTrue(mediaListener.onVideoTrackAddedLatch.await(20, TimeUnit.SECONDS));
-        List<VideoTrack> videoTracks = participant.getMedia().getVideoTracks();
+        assertTrue(participantListener.onVideoTrackAddedLatch.await(20, TimeUnit.SECONDS));
+        List<VideoTrack> videoTracks = participant.getVideoTracks();
         assertEquals(1, videoTracks.size());
         FrameCountRenderer frameCountRenderer = new FrameCountRenderer();
         VideoTrack videoTrack = videoTracks.get(0);

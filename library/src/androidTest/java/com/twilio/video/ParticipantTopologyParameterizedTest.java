@@ -4,7 +4,7 @@ import android.content.Context;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.filters.LargeTest;
 
-import com.twilio.video.base.BaseClientTest;
+import com.twilio.video.base.BaseParticipantTest;
 import com.twilio.video.helper.CallbackHelper;
 import com.twilio.video.util.CredentialsUtils;
 import com.twilio.video.util.Constants;
@@ -28,7 +28,7 @@ import static org.junit.Assert.assertTrue;
 
 @RunWith(Parameterized.class)
 @LargeTest
-public class ParticipantTopologyParameterizedTest extends BaseClientTest {
+public class ParticipantTopologyParameterizedTest extends BaseParticipantTest {
     @Parameterized.Parameters(name = "{0}")
     public static Iterable<Object[]> data() {
         return Arrays.asList(new Object[][]{
@@ -48,7 +48,7 @@ public class ParticipantTopologyParameterizedTest extends BaseClientTest {
 
     @Before
     public void setup() throws InterruptedException {
-        super.setup();
+        super.baseSetup(topology);
         context = InstrumentationRegistry.getInstrumentation().getTargetContext();
         tokenOne = CredentialsUtils.getAccessToken(Constants.PARTICIPANT_ALICE, topology);
         tokenTwo = CredentialsUtils.getAccessToken(Constants.PARTICIPANT_BOB, topology);
@@ -129,5 +129,51 @@ public class ParticipantTopologyParameterizedTest extends BaseClientTest {
         room.disconnect();
         assertTrue(roomListener.onDisconnectedLatch.await(20, TimeUnit.SECONDS));
         assertFalse(client1Participant.isConnected());
+    }
+
+    @Test
+    public void shouldReceiveTrackEvents() throws InterruptedException {
+        // Audio track added
+        CallbackHelper.FakeParticipantListener participantListener =
+                new CallbackHelper.FakeParticipantListener();
+        participantListener.onAudioTrackAddedLatch = new CountDownLatch(1);
+        participant.setListener(participantListener);
+        LocalAudioTrack audioTrack = actor2LocalMedia.addAudioTrack(true);
+        assertTrue(participantListener.onAudioTrackAddedLatch.await(20, TimeUnit.SECONDS));
+
+        // Audio track disabled
+        participantListener.onAudioTrackDisabledLatch = new CountDownLatch(1);
+        audioTrack.enable(false);
+        assertTrue(participantListener.onAudioTrackDisabledLatch.await(20, TimeUnit.SECONDS));
+
+        // Audio track enabled
+        participantListener.onAudioTrackEnabledLatch = new CountDownLatch(1);
+        audioTrack.enable(true);
+        assertTrue(participantListener.onAudioTrackEnabledLatch.await(20, TimeUnit.SECONDS));
+
+        // Audio track removed
+        participantListener.onAudioTrackRemovedLatch = new CountDownLatch(1);
+        actor2LocalMedia.removeAudioTrack(audioTrack);
+        assertTrue(participantListener.onAudioTrackRemovedLatch.await(20, TimeUnit.SECONDS));
+
+        // Video track added
+        participantListener.onVideoTrackAddedLatch = new CountDownLatch(1);
+        LocalVideoTrack videoTrack = actor2LocalMedia.addVideoTrack(true, fakeVideoCapturer);
+        assertTrue(participantListener.onVideoTrackAddedLatch.await(20, TimeUnit.SECONDS));
+
+        // Video track disabled
+        participantListener.onVideoTrackDisabledLatch = new CountDownLatch(1);
+        videoTrack.enable(false);
+        assertTrue(participantListener.onVideoTrackDisabledLatch.await(20, TimeUnit.SECONDS));
+
+        // Video track enabled
+        participantListener.onVideoTrackEnabledLatch = new CountDownLatch(1);
+        videoTrack.enable(true);
+        assertTrue(participantListener.onVideoTrackEnabledLatch.await(20, TimeUnit.SECONDS));
+
+        // Video track removed
+        participantListener.onVideoTrackRemovedLatch = new CountDownLatch(1);
+        actor2LocalMedia.removeVideoTrack(videoTrack);
+        assertTrue(participantListener.onVideoTrackRemovedLatch.await(20, TimeUnit.SECONDS));
     }
 }

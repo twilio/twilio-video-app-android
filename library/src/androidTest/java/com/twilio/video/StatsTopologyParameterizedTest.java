@@ -52,7 +52,7 @@ public class StatsTopologyParameterizedTest extends BaseClientTest {
     private Room aliceRoom, bobRoom;
     private LocalMedia aliceLocalMedia, bobLocalMedia;
     private CallbackHelper.FakeRoomListener aliceListener, bobListener;
-    private CallbackHelper.FakeMediaListener aliceMediaListener, bobMediaListener;
+    private CallbackHelper.FakeParticipantListener aliceMediaListener, bobMediaListener;
     private final Topology topology;
 
     public StatsTopologyParameterizedTest(Topology topology) {
@@ -68,8 +68,8 @@ public class StatsTopologyParameterizedTest extends BaseClientTest {
         bobToken = CredentialsUtils.getAccessToken(Constants.PARTICIPANT_BOB, topology);
         roomName = RandUtils.generateRandomString(20);
         aliceListener = new CallbackHelper.FakeRoomListener();
-        aliceMediaListener = new CallbackHelper.FakeMediaListener();
-        bobMediaListener = new CallbackHelper.FakeMediaListener();
+        aliceMediaListener = new CallbackHelper.FakeParticipantListener();
+        bobMediaListener = new CallbackHelper.FakeParticipantListener();
         bobListener = new CallbackHelper.FakeRoomListener();
         aliceLocalMedia = LocalMedia.create(mediaTestActivity);
         bobLocalMedia = LocalMedia.create(mediaTestActivity);
@@ -178,15 +178,16 @@ public class StatsTopologyParameterizedTest extends BaseClientTest {
         assertEquals(1, aliceRoom.getParticipants().size());
 
         // Add audio track to Bob and check stats
-        CallbackHelper.FakeMediaListener mediaListener = new CallbackHelper.FakeMediaListener();
-        mediaListener.onAudioTrackAddedLatch = new CountDownLatch(1);
-        mediaListener.onVideoTrackAddedLatch = new CountDownLatch(1);
-        mediaListener.onVideoTrackRemovedLatch = new CountDownLatch(1);
+        CallbackHelper.FakeParticipantListener participantListener =
+                new CallbackHelper.FakeParticipantListener();
+        participantListener.onAudioTrackAddedLatch = new CountDownLatch(1);
+        participantListener.onVideoTrackAddedLatch = new CountDownLatch(1);
+        participantListener.onVideoTrackRemovedLatch = new CountDownLatch(1);
         Participant bob = aliceRoom.getParticipants().entrySet().iterator().next().getValue();
-        bob.getMedia().setListener(mediaListener);
+        bob.setListener(participantListener);
 
         bobLocalMedia.addAudioTrack(true);
-        assertTrue(mediaListener.onAudioTrackAddedLatch.await(20, TimeUnit.SECONDS));
+        assertTrue(participantListener.onAudioTrackAddedLatch.await(20, TimeUnit.SECONDS));
 
         // let's give peer connection some time to get media flowing
         Thread.sleep(2000);
@@ -204,7 +205,7 @@ public class StatsTopologyParameterizedTest extends BaseClientTest {
         // Add video track to bob and check stats
         LocalVideoTrack bobVideoTrack =
                 bobLocalMedia.addVideoTrack(true, new FakeVideoCapturer());
-        assertTrue(mediaListener.onVideoTrackAddedLatch.await(20, TimeUnit.SECONDS));
+        assertTrue(participantListener.onVideoTrackAddedLatch.await(20, TimeUnit.SECONDS));
 
         // let's give peer connection some time to get media flowing
         Thread.sleep(2000);
@@ -220,7 +221,7 @@ public class StatsTopologyParameterizedTest extends BaseClientTest {
 
         // Remove Bob's video track and check the stats
         bobLocalMedia.removeVideoTrack(bobVideoTrack);
-        assertTrue(mediaListener.onVideoTrackRemovedLatch.await(20, TimeUnit.SECONDS));
+        assertTrue(participantListener.onVideoTrackRemovedLatch.await(20, TimeUnit.SECONDS));
 
         // let's give peer connection some time to get media flowing
         Thread.sleep(2000);

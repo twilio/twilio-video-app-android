@@ -166,16 +166,17 @@ public class IceTopologyParameterizedTest extends BaseClientTest {
             .build();
         CallbackHelper.FakeRoomListener bobListener = new CallbackHelper.FakeRoomListener();
         bobListener.onConnectedLatch = new CountDownLatch(1);
-        CallbackHelper.FakeMediaListener mediaListener = new CallbackHelper.FakeMediaListener();
-        mediaListener.onAudioTrackAddedLatch = new CountDownLatch(1);
-        mediaListener.onVideoTrackAddedLatch = new CountDownLatch(1);
+        CallbackHelper.FakeParticipantListener participantListener =
+                new CallbackHelper.FakeParticipantListener();
+        participantListener.onAudioTrackAddedLatch = new CountDownLatch(1);
+        participantListener.onVideoTrackAddedLatch = new CountDownLatch(1);
         Room bobRoom = Video.connect(mediaTestActivity, connectOptions, bobListener);
         assertTrue(bobListener.onConnectedLatch.await(10, TimeUnit.SECONDS));
         assertTrue(aliceListener.onParticipantConnectedLatch.await(10, TimeUnit.SECONDS));
         aliceRoom.getParticipants().entrySet().iterator().next()
-            .getValue().getMedia().setListener(mediaListener);
-        assertTrue(mediaListener.onAudioTrackAddedLatch.await(10, TimeUnit.SECONDS));
-        assertTrue(mediaListener.onVideoTrackAddedLatch.await(10, TimeUnit.SECONDS));
+            .getValue().setListener(participantListener);
+        assertTrue(participantListener.onAudioTrackAddedLatch.await(10, TimeUnit.SECONDS));
+        assertTrue(participantListener.onVideoTrackAddedLatch.await(10, TimeUnit.SECONDS));
 
         aliceListener.onDisconnectedLatch = new CountDownLatch(1);
         bobListener.onDisconnectedLatch = new CountDownLatch(1);
