@@ -1,13 +1,12 @@
-package com.twilio.video.app.ui;
+package com.twilio.video.app.ui.splash;
 
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 import com.twilio.video.app.auth.Authenticator;
 import com.twilio.video.app.base.BaseActivity;
+import com.twilio.video.app.ui.room.RoomActivity;
 
 import javax.inject.Inject;
 

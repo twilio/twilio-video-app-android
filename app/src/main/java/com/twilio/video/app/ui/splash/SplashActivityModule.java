@@ -1,5 +1,4 @@
-package com.twilio.video.app.ui;
-
+package com.twilio.video.app.ui.splash;
 
 import android.app.Activity;
 
@@ -9,11 +8,11 @@ import dagger.android.ActivityKey;
 import dagger.android.AndroidInjector;
 import dagger.multibindings.IntoMap;
 
-@Module(subcomponents = LoginActivitySubcomponent.class)
-public abstract class LoginActivityModule {
+@Module(subcomponents = SplashActivitySubcomponent.class)
+public abstract class SplashActivityModule {
     @Binds
     @IntoMap
-    @ActivityKey(LoginActivity.class)
+    @ActivityKey(SplashActivity.class)
     abstract AndroidInjector.Factory<? extends Activity>
-    bindYourActivityInjectorFactory(LoginActivitySubcomponent.Builder builder);
+    bindYourActivityInjectorFactory(SplashActivitySubcomponent.Builder builder);
 }

@@ -1,4 +1,4 @@
-package com.twilio.video.app.ui;
+package com.twilio.video.app.ui.splash;
 
 import dagger.Subcomponent;
 import dagger.android.AndroidInjector;

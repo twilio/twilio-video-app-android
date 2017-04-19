@@ -1,4 +1,4 @@
-package com.twilio.video.app.ui;
+package com.twilio.video.app.ui.login;
 
 import android.content.Context;
 import android.os.Bundle;

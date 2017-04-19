@@ -1,4 +1,4 @@
-package com.twilio.video.app.ui;
+package com.twilio.video.app.ui.room;
 
 import android.Manifest;
 import android.annotation.TargetApi;
@@ -57,7 +57,7 @@ import com.twilio.video.app.data.Preferences;
 import com.twilio.video.app.data.api.TokenService;
 import com.twilio.video.app.data.api.VideoAppService;
 import com.twilio.video.app.data.api.model.Topology;
-import com.twilio.video.app.data.api.model.VideoConfiguration;
+import com.twilio.video.app.ui.settings.SettingsActivity;
 import com.twilio.video.app.util.EnvUtil;
 import com.twilio.video.app.util.InputUtils;
 import com.twilio.video.app.util.StatsScheduler;
@@ -75,7 +75,6 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.OnTextChanged;
 import io.reactivex.Completable;
-import io.reactivex.CompletableSource;
 import io.reactivex.Single;
 import io.reactivex.SingleObserver;
 import io.reactivex.SingleSource;

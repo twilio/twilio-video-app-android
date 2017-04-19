@@ -6,7 +6,7 @@
     android:id="@+id/navigation_drawer"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.RoomActivity" >
+    tools:context=".ui.room.RoomActivity" >
 
     <android.support.design.widget.CoordinatorLayout
         android:layout_width="match_parent"

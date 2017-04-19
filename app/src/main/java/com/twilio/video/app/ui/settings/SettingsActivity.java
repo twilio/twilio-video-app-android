@@ -1,4 +1,4 @@
-package com.twilio.video.app.ui;
+package com.twilio.video.app.ui.settings;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -14,6 +14,7 @@ import com.twilio.video.app.BuildConfig;
 import com.twilio.video.app.R;
 import com.twilio.video.app.base.BaseActivity;
 import com.twilio.video.app.data.Preferences;
+import com.twilio.video.app.ui.login.LoginActivity;
 
 import javax.inject.Inject;
 

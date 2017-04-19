@@ -1,4 +1,4 @@
-package com.twilio.video.app.ui;
+package com.twilio.video.app.ui.login;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
@@ -20,6 +20,7 @@ import com.google.firebase.auth.FirebaseUser;
 import com.twilio.video.app.R;
 import com.twilio.video.app.base.BaseActivity;
 import com.twilio.video.app.data.Preferences;
+import com.twilio.video.app.ui.room.RoomActivity;
 import com.twilio.video.app.util.AuthHelper;
 
 import javax.inject.Inject;
