@@ -1,5 +1,6 @@
 apply plugin: 'com.android.library'
 apply plugin: 'maven'
+apply plugin: 'jacoco'
 
 def currentToolchainVersion = "4.9"
 // TODO add back ability for local builds
@@ -12,7 +13,7 @@ configurations {
 
 android {
     compileSdkVersion 25
-    buildToolsVersion "25.0.1"
+    buildToolsVersion "25.0.2"
 
     // Parameterizing config allows video application to use a debug build of the library
     defaultPublishConfig getPublishConfig()
@@ -72,6 +73,7 @@ android {
             }
         }
         debug {
+            testCoverageEnabled true
             externalNativeBuild {
                 cmake {
                     cppFlags '-g'
@@ -95,6 +97,18 @@ android {
         testVariant.buildConfigField("java.util.Map<String, String>",
             "twilioCredentials",
             "${getTwilioVideoConfig()}")
+    }
+}
+
+android.testOptions.unitTests.all {
+    ignoreFailures false
+
+    jacoco {
+        includeNoLocationClasses = true
+    }
+
+    testLogging {
+        events "passed", "skipped", "failed", "standardOut", "standardError"
     }
 }
 
@@ -123,6 +137,30 @@ dependencies {
     // because I don't know how to access that information from here
     compile files("${coreHome}/armeabi-v7a/gnu-4.9/release/lib/" +
             "libjingle_peerconnection_java.jar")
+}
+
+task jacocoTestReport(type: JacocoReport,
+        dependsOn: ['testDebugUnitTest', 'createDebugCoverageReport']) {
+    reports {
+        xml.enabled = true
+        html.enabled = true
+    }
+
+    def fileFilter = ['**/R.class',
+                      '**/R$*.class',
+                      '**/BuildConfig.*',
+                      '**/Manifest*.*',
+                      '**/*Test*.*',
+                      'android/**/*.*']
+    def debugTree = fileTree(dir: "$project.buildDir/intermediates/classes/debug",
+            excludes: fileFilter)
+    def mainSrc = "$project.projectDir/src/main/java"
+
+    sourceDirectories = files([mainSrc])
+    classDirectories = files([debugTree])
+    executionData = fileTree(dir: project.buildDir, includes: [
+            'jacoco/testDebugUnitTest.exec', 'outputs/code-coverage/connected/*.ec'
+    ])
 }
 
 task createJavadocs(type: Javadoc) {

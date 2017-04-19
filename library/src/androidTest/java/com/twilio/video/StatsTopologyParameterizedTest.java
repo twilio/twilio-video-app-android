@@ -259,7 +259,7 @@ public class StatsTopologyParameterizedTest extends BaseClientTest {
         // aliceLocalMedia.addAudioTrack(true);
 
         // let's give peer connection some time to get media flowing
-        Thread.sleep(2000);
+        Thread.sleep(2500);
 
         CallbackHelper.FakeStatsListener aliceStatsListener =
                 new CallbackHelper.FakeStatsListener();
