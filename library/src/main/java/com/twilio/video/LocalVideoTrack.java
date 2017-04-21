@@ -1,23 +1,86 @@
 package com.twilio.video;
 
+import android.content.Context;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+
 /**
  * A local video track that gets video frames from a specified {@link VideoCapturer}.
  */
 public class LocalVideoTrack extends VideoTrack {
     private static final Logger logger = Logger.getLogger(LocalAudioTrack.class);
+    private static final double ASPECT_RATIO_TOLERANCE = 0.05;
+    private static final String CAPTURER_MUST_HAVE_ONE_SUPPORTED_FORMAT = "A VideoCapturer " +
+            "must provide at least one supported VideoFormat";
+    static final VideoConstraints defaultVideoConstraints = new VideoConstraints.Builder()
+            .maxFps(30)
+            .maxVideoDimensions(VideoDimensions.VGA_VIDEO_DIMENSIONS)
+            .build();
 
     private long nativeLocalVideoTrackHandle;
     private final VideoCapturer videoCapturer;
     private final VideoConstraints videoConstraints;
+    private final MediaFactory mediaFactory;
 
-    LocalVideoTrack(long nativeLocalVideoTrackHandle,
-                    VideoCapturer videoCapturer,
-                    VideoConstraints videoConstraints,
-                    org.webrtc.VideoTrack webrtcVideoTrack) {
-        super(webrtcVideoTrack);
-        this.nativeLocalVideoTrackHandle = nativeLocalVideoTrackHandle;
-        this.videoCapturer = videoCapturer;
-        this.videoConstraints = videoConstraints;
+    /**
+     * Creates a local video track. Local video track invokes
+     * {@link VideoCapturer#getSupportedFormats()} to find the closest supported
+     * {@link VideoFormat} to 640x480 at 30 frames per second. The closest format is used to apply
+     * default {@link VideoConstraints} to the returned {@link LocalVideoTrack}.
+     *
+     * @param context application context.
+     * @param enabled initial state of video track.
+     * @param videoCapturer capturer that provides video frames.
+     * @return local video track if successfully added or null if video track could not be created.
+     */
+    public static LocalVideoTrack create(@NonNull Context context,
+                                         boolean enabled,
+                                         @NonNull VideoCapturer videoCapturer) {
+        return create(context, enabled, videoCapturer, null);
+    }
+
+    /**
+     * Creates a local video track. Local video track will only apply {@code videoConstraints}
+     * compatible with {@code videoCapturer}. Default constraints described in
+     * {@link #create(Context, boolean, VideoCapturer)} will be applied to the returned
+     * {@link LocalVideoTrack} for the following conditions:
+     * <p>
+     * <ol>
+     *     <li>Passing {@code null} as {@code videoConstraints}.</li>
+     *     <li>{@code videoConstraints} are incompatible with {@code videoCapturer}</li>
+     * </ol>
+     *
+     * @param context application context.
+     * @param enabled initial state of video track.
+     * @param videoCapturer capturer that provides video frames.
+     * @param videoConstraints constraints to be applied on video track.
+     * @return local video track if successfully added or null if video track could not be created.
+     */
+    public static LocalVideoTrack create(@NonNull Context context,
+                                         boolean enabled,
+                                         @NonNull VideoCapturer videoCapturer,
+                                         @Nullable VideoConstraints videoConstraints) {
+        Preconditions.checkNotNull(context, "Context must not be null");
+        Preconditions.checkNotNull(videoCapturer, "VideoCapturer must not be null");
+        Preconditions.checkState(videoCapturer.getSupportedFormats() != null &&
+                        !videoCapturer.getSupportedFormats().isEmpty(),
+                CAPTURER_MUST_HAVE_ONE_SUPPORTED_FORMAT);
+
+        LocalVideoTrack localVideoTrack = MediaFactory.instance(context)
+                .createVideoTrack(enabled,
+                        videoCapturer,
+                        resolveConstraints(videoCapturer, videoConstraints));
+
+        if (localVideoTrack == null) {
+            logger.e("Failed to create local video track");
+        }
+
+        return localVideoTrack;
     }
 
     /**
@@ -46,7 +109,7 @@ public class LocalVideoTrack extends VideoTrack {
      * @return true if the local video is enabled.
      */
     @Override
-    public boolean isEnabled() {
+    public synchronized boolean isEnabled() {
         if (!isReleased()) {
             return nativeIsEnabled(nativeLocalVideoTrackHandle);
         } else {
@@ -62,7 +125,7 @@ public class LocalVideoTrack extends VideoTrack {
      *
      * @param enabled the desired state of the local video track.
      */
-    public void enable(boolean enabled) {
+    public synchronized void enable(boolean enabled) {
         if (!isReleased()) {
             nativeEnable(nativeLocalVideoTrackHandle, enabled);
         } else {
@@ -70,16 +133,149 @@ public class LocalVideoTrack extends VideoTrack {
         }
     }
 
-    synchronized void release() {
+    /**
+     * Releases native memory owned by video track.
+     */
+    public synchronized void release() {
         if (!isReleased()) {
             super.release();
             nativeRelease(nativeLocalVideoTrackHandle);
             nativeLocalVideoTrackHandle = 0;
+            mediaFactory.release();
         }
+    }
+
+    LocalVideoTrack(long nativeLocalVideoTrackHandle,
+                    VideoCapturer videoCapturer,
+                    VideoConstraints videoConstraints,
+                    org.webrtc.VideoTrack webrtcVideoTrack,
+                    MediaFactory mediaFactory) {
+        super(webrtcVideoTrack);
+        this.nativeLocalVideoTrackHandle = nativeLocalVideoTrackHandle;
+        this.videoCapturer = videoCapturer;
+        this.videoConstraints = videoConstraints;
+        this.mediaFactory = mediaFactory;
+    }
+
+    /*
+     * Safely resolves a set of VideoConstraints based on VideoCapturer supported formats
+     */
+    private static VideoConstraints resolveConstraints(VideoCapturer videoCapturer,
+                                                       VideoConstraints videoConstraints) {
+        if (videoConstraints == null || !constraintsCompatible(videoCapturer, videoConstraints)) {
+            logger.e("Applying VideoConstraints closest to 640x480@30 FPS.");
+            return getClosestCompatibleVideoConstraints(videoCapturer, defaultVideoConstraints);
+        } else {
+            return videoConstraints;
+        }
+    }
+
+    /*
+     * Returns true if at least one VideoFormat is compatible with the provided VideoConstraints.
+     * Based on a similar algorithm in webrtc/api/videocapturertracksource.cc
+     */
+    private static boolean constraintsCompatible(VideoCapturer videoCapturer,
+                                                 VideoConstraints videoConstraints) {
+        for (VideoFormat videoFormat : videoCapturer.getSupportedFormats()) {
+            VideoDimensions minVideoDimensions = videoConstraints.getMinVideoDimensions();
+            VideoDimensions maxVideoDimensions = videoConstraints.getMaxVideoDimensions();
+            AspectRatio aspectRatio = videoConstraints.getAspectRatio();
+            int minFps = videoConstraints.getMinFps();
+            int maxFps = videoConstraints.getMaxFps();
+            boolean formatCompatible = minVideoDimensions.width <= videoFormat.dimensions.width &&
+                    minVideoDimensions.height <= videoFormat.dimensions.height &&
+                    minFps <= videoFormat.framerate;
+
+            // Validate that max dimensions are compatible
+            if (maxVideoDimensions.width > 0) {
+                formatCompatible &= maxVideoDimensions.width >= videoFormat.dimensions.width;
+            }
+            if (maxVideoDimensions.height > 0) {
+                formatCompatible &= maxVideoDimensions.height >= videoFormat.dimensions.height;
+            }
+
+            // Validate that max FPS is compatible
+            if (maxFps > 0) {
+                formatCompatible &= maxFps >= videoFormat.framerate;
+            }
+
+            // Check if format resolution is within aspect ratio tolerance
+            if (aspectRatio.numerator > 0 && aspectRatio.denominator > 0) {
+                double targetRatio = (double) aspectRatio.numerator /
+                        (double) aspectRatio.denominator;
+                double ratio = (double) videoFormat.dimensions.width /
+                        (double) videoFormat.dimensions.height;
+
+                formatCompatible &= Math.abs(ratio - targetRatio) < ASPECT_RATIO_TOLERANCE;
+            }
+
+            if (formatCompatible) {
+                logger.i("VideoConstraints are compatible with VideoCapturer");
+                return true;
+            }
+        }
+
+        logger.e("VideoConstraints are not compatible with VideoCapturer");
+        return false;
+    }
+
+    /*
+     * Finds the closest compatible VideoConstraints for a given set of constraints to a
+     * VideoCapturer.
+     */
+    private static VideoConstraints getClosestCompatibleVideoConstraints(VideoCapturer videoCapturer,
+                                                                         final VideoConstraints videoConstraints) {
+        // Find closest supported dimensions
+        List<VideoFormat> supportedFormats = videoCapturer.getSupportedFormats();
+        VideoDimensions closestSupportedVideoDimensions =
+                Collections.min(supportedFormats,
+                        new LocalVideoTrack.ClosestComparator<VideoFormat>() {
+                            @Override int diff(VideoFormat videoFormat) {
+                                return Math.abs(videoConstraints.getMaxVideoDimensions().width -
+                                        videoFormat.dimensions.width) +
+                                        Math.abs(videoConstraints.getMaxVideoDimensions().height -
+                                                videoFormat.dimensions.height);
+                            }
+                        }).dimensions;
+
+        // Find closest supported framerate with matching dimensions
+        List<Integer> supportedFramerates = new ArrayList<>();
+        for (VideoFormat videoFormat : supportedFormats) {
+            if (videoFormat.dimensions.equals(closestSupportedVideoDimensions)) {
+                supportedFramerates.add(videoFormat.framerate);
+            }
+        }
+        int closestSupportedFramerate =
+                Collections.min(supportedFramerates,
+                        new LocalVideoTrack.ClosestComparator<Integer>() {
+                            @Override int diff(Integer framerate) {
+                                return Math.abs(videoConstraints.getMaxFps() - framerate);
+                            }
+                        });
+
+        return new VideoConstraints.Builder()
+                .maxFps(closestSupportedFramerate)
+                .maxVideoDimensions(closestSupportedVideoDimensions)
+                .build();
     }
 
     boolean isReleased() {
         return nativeLocalVideoTrackHandle == 0;
+    }
+
+    long getNativeHandle() {
+        return nativeLocalVideoTrackHandle;
+    }
+
+    // Helper class for finding the closest supported contraints
+    private static abstract class ClosestComparator<T> implements Comparator<T> {
+        // Difference between supported and requested parameter.
+        abstract int diff(T supportedParameter);
+
+        @Override
+        public int compare(T t1, T t2) {
+            return diff(t1) - diff(t2);
+        }
     }
 
     private native boolean nativeIsEnabled(long nativeLocalVideoTrackHandle);

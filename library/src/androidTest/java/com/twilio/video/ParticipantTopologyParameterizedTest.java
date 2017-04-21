@@ -12,6 +12,7 @@ import com.twilio.video.util.RandUtils;
 import com.twilio.video.util.Topology;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -138,42 +139,44 @@ public class ParticipantTopologyParameterizedTest extends BaseParticipantTest {
                 new CallbackHelper.FakeParticipantListener();
         participantListener.onAudioTrackAddedLatch = new CountDownLatch(1);
         participant.setListener(participantListener);
-        LocalAudioTrack audioTrack = actor2LocalMedia.addAudioTrack(true);
+        actor2LocalAudioTrack = LocalAudioTrack.create(mediaTestActivity, true);
+        actor2Room.getLocalParticipant().addAudioTrack(actor2LocalAudioTrack);
         assertTrue(participantListener.onAudioTrackAddedLatch.await(20, TimeUnit.SECONDS));
 
         // Audio track disabled
         participantListener.onAudioTrackDisabledLatch = new CountDownLatch(1);
-        audioTrack.enable(false);
+        actor2LocalAudioTrack.enable(false);
         assertTrue(participantListener.onAudioTrackDisabledLatch.await(20, TimeUnit.SECONDS));
 
         // Audio track enabled
         participantListener.onAudioTrackEnabledLatch = new CountDownLatch(1);
-        audioTrack.enable(true);
+        actor2LocalAudioTrack.enable(true);
         assertTrue(participantListener.onAudioTrackEnabledLatch.await(20, TimeUnit.SECONDS));
 
         // Audio track removed
         participantListener.onAudioTrackRemovedLatch = new CountDownLatch(1);
-        actor2LocalMedia.removeAudioTrack(audioTrack);
+        actor2Room.getLocalParticipant().removeAudioTrack(actor2LocalAudioTrack);
         assertTrue(participantListener.onAudioTrackRemovedLatch.await(20, TimeUnit.SECONDS));
 
         // Video track added
         participantListener.onVideoTrackAddedLatch = new CountDownLatch(1);
-        LocalVideoTrack videoTrack = actor2LocalMedia.addVideoTrack(true, fakeVideoCapturer);
+        actor2LocalVideoTrack = LocalVideoTrack.create(mediaTestActivity, true, fakeVideoCapturer);
+        actor2Room.getLocalParticipant().addVideoTrack(actor2LocalVideoTrack);
         assertTrue(participantListener.onVideoTrackAddedLatch.await(20, TimeUnit.SECONDS));
 
         // Video track disabled
         participantListener.onVideoTrackDisabledLatch = new CountDownLatch(1);
-        videoTrack.enable(false);
+        actor2LocalVideoTrack.enable(false);
         assertTrue(participantListener.onVideoTrackDisabledLatch.await(20, TimeUnit.SECONDS));
 
         // Video track enabled
         participantListener.onVideoTrackEnabledLatch = new CountDownLatch(1);
-        videoTrack.enable(true);
+        actor2LocalVideoTrack.enable(true);
         assertTrue(participantListener.onVideoTrackEnabledLatch.await(20, TimeUnit.SECONDS));
 
         // Video track removed
         participantListener.onVideoTrackRemovedLatch = new CountDownLatch(1);
-        actor2LocalMedia.removeVideoTrack(videoTrack);
+        actor2Room.getLocalParticipant().removeVideoTrack(actor2LocalVideoTrack);
         assertTrue(participantListener.onVideoTrackRemovedLatch.await(20, TimeUnit.SECONDS));
     }
 }

@@ -27,7 +27,7 @@ struct StatsObserverContext {
 };
 
 JNIEXPORT jlong JNICALL Java_com_twilio_video_Room_nativeConnect
-    (JNIEnv *, jobject, jobject, jlong, jlong);
+        (JNIEnv *, jobject, jobject, jlong, jlong);
 
 JNIEXPORT jboolean JNICALL Java_com_twilio_video_Room_nativeIsRecording
     (JNIEnv *, jobject, jlong);

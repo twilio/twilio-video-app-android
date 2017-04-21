@@ -3,7 +3,9 @@ package com.twilio.video.base;
 import android.support.test.rule.ActivityTestRule;
 
 import com.twilio.video.ConnectOptions;
-import com.twilio.video.LocalMedia;
+import com.twilio.video.LocalAudioTrack;
+import com.twilio.video.LocalParticipant;
+import com.twilio.video.LocalVideoTrack;
 import com.twilio.video.Participant;
 import com.twilio.video.Room;
 import com.twilio.video.RoomState;
@@ -33,24 +35,26 @@ public abstract class BaseParticipantTest extends BaseClientTest {
     @Rule
     public ActivityTestRule<MediaTestActivity> activityRule =
             new ActivityTestRule<>(MediaTestActivity.class);
-    private MediaTestActivity mediaTestActivity;
-    protected LocalMedia actor1LocalMedia;
-    protected LocalMedia actor2LocalMedia;
+    protected MediaTestActivity mediaTestActivity;
+    protected LocalVideoTrack actor1LocalVideoTrack;
+    protected LocalAudioTrack actor1LocalAudioTrack;
+    protected LocalVideoTrack actor2LocalVideoTrack;
+    protected LocalAudioTrack actor2LocalAudioTrack;
     protected FakeVideoCapturer fakeVideoCapturer;
     protected String tokenOne;
     protected String tokenTwo;
     protected Room actor1Room;
+    protected LocalParticipant actor1LocalParticipant;
     protected Room actor2Room;
+    protected LocalParticipant actor2LocalParticipant;
     protected Participant participant;
     protected String testRoom;
     protected CallbackHelper.FakeRoomListener actor1RoomListener;
     protected CallbackHelper.FakeRoomListener actor2RoomListener;
 
-    protected Room connectClient(String token, LocalMedia localMedia,
-                               Room.Listener roomListener) {
+    protected Room connectClient(String token, Room.Listener roomListener) {
         ConnectOptions connectOptions = new ConnectOptions.Builder(token)
                 .roomName(testRoom)
-                .localMedia(localMedia)
                 .build();
         Room room = Video.connect(mediaTestActivity, connectOptions, roomListener);
         return room;
@@ -72,25 +76,27 @@ public abstract class BaseParticipantTest extends BaseClientTest {
         PermissionUtils.allowPermissions(mediaTestActivity);
         testRoom = RandUtils.generateRandomString(10);
         fakeVideoCapturer = new FakeVideoCapturer();
-        actor1LocalMedia = LocalMedia.create(mediaTestActivity);
         tokenOne = CredentialsUtils.getAccessToken(Constants.PARTICIPANT_ALICE, topology);
 
         // Connect actor 1
         actor1RoomListener = new CallbackHelper.FakeRoomListener();
         actor1RoomListener.onConnectedLatch = new CountDownLatch(1);
         actor1RoomListener.onParticipantConnectedLatch = new CountDownLatch(1);
-        actor1Room = connectClient(tokenOne, actor1LocalMedia, actor1RoomListener);
+        actor1Room = connectClient(tokenOne, actor1RoomListener);
         assertTrue(actor1RoomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
+        actor1LocalParticipant = actor1Room.getLocalParticipant();
 
         // Connect actor 2
-        actor2LocalMedia = LocalMedia.create(mediaTestActivity);
         tokenTwo = CredentialsUtils.getAccessToken(Constants.PARTICIPANT_BOB, topology);
 
         actor2RoomListener = new CallbackHelper.FakeRoomListener();
-        actor2Room = connectClient(tokenTwo, actor2LocalMedia, actor2RoomListener);
+        actor2RoomListener.onConnectedLatch = new CountDownLatch(1);
+        actor2Room = connectClient(tokenTwo, actor2RoomListener);
+        assertTrue(actor2RoomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
 
         // Wait for actor2 to connect
         assertTrue(actor1RoomListener.onParticipantConnectedLatch.await(20, TimeUnit.SECONDS));
+        actor2LocalParticipant = actor2Room.getLocalParticipant();
         List<Participant> participantList = new ArrayList<>(actor1Room.getParticipants().values());
         assertEquals(1, participantList.size());
         participant = participantList.get(0);
@@ -105,13 +111,17 @@ public abstract class BaseParticipantTest extends BaseClientTest {
         actor1Room = null;
         actor1RoomListener = null;
         participant = null;
-        if (actor1LocalMedia != null) {
-            actor1LocalMedia.release();
-            actor1LocalMedia = null;
+        if (actor1LocalAudioTrack != null) {
+            actor1LocalAudioTrack.release();
         }
-        if (actor2LocalMedia != null) {
-            actor2LocalMedia.release();
-            actor2LocalMedia = null;
+        if (actor1LocalVideoTrack != null) {
+            actor1LocalVideoTrack.release();
+        }
+        if (actor2LocalAudioTrack != null) {
+            actor2LocalAudioTrack.release();
+        }
+        if (actor2LocalVideoTrack != null) {
+            actor2LocalVideoTrack.release();
         }
         fakeVideoCapturer = null;
     }

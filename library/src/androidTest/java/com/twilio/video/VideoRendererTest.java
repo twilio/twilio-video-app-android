@@ -32,7 +32,6 @@ public class VideoRendererTest {
     public ActivityTestRule<VideoRendererTestActivity> activityRule =
             new ActivityTestRule<>(VideoRendererTestActivity.class);
     private VideoRendererTestActivity videoRendererTestActivity;
-    private LocalMedia localMedia;
     private CameraCapturer cameraCapturer;
     private FakeVideoCapturer fakeVideoCapturer;
     private LocalVideoTrack cameraVideoTrack;
@@ -44,20 +43,22 @@ public class VideoRendererTest {
     public void setup() {
         videoRendererTestActivity = activityRule.getActivity();
         PermissionUtils.allowPermissions(videoRendererTestActivity);
-        localMedia = LocalMedia.create(videoRendererTestActivity);
         cameraCapturer = new CameraCapturer(videoRendererTestActivity,
                 CameraCapturer.CameraSource.FRONT_CAMERA);
         fakeVideoCapturer = new FakeVideoCapturer();
-        cameraVideoTrack = localMedia.addVideoTrack(true, cameraCapturer);
-        fakeVideoTrack = localMedia.addVideoTrack(true, fakeVideoCapturer);
+        cameraVideoTrack = LocalVideoTrack.create(videoRendererTestActivity, true, cameraCapturer);
+        fakeVideoTrack = LocalVideoTrack.create(videoRendererTestActivity, true, fakeVideoCapturer);
         videoView = (VideoView) videoRendererTestActivity.findViewById(R.id.video);
         imageView = (ImageView) videoRendererTestActivity.findViewById(R.id.image_view);
     }
 
     @After
     public void teardown() {
-        if (localMedia != null) {
-            localMedia.release();
+        if (cameraVideoTrack != null) {
+            cameraVideoTrack.release();
+        }
+        if (fakeVideoTrack != null) {
+            fakeVideoTrack.release();
         }
     }
 

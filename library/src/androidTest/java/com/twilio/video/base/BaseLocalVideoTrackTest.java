@@ -3,23 +3,22 @@ package com.twilio.video.base;
 import android.content.Context;
 import android.support.test.InstrumentationRegistry;
 
-import com.twilio.video.LocalMedia;
+import com.twilio.video.LocalVideoTrack;
 import com.twilio.video.util.FakeVideoCapturer;
 
 public abstract class BaseLocalVideoTrackTest {
     protected Context context;
-    protected LocalMedia localMedia;
+    protected LocalVideoTrack localVideoTrack;
     protected FakeVideoCapturer fakeVideoCapturer;
 
     public void setup() {
         context = InstrumentationRegistry.getInstrumentation().getTargetContext();
-        localMedia = LocalMedia.create(context);
         fakeVideoCapturer = new FakeVideoCapturer();
     }
 
     public void teardown() {
-        if (localMedia != null) {
-            localMedia.release();
+        if (localVideoTrack != null) {
+            localVideoTrack.release();
         }
     }
 }

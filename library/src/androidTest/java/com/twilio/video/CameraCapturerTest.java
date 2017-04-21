@@ -16,7 +16,6 @@ import java.util.concurrent.atomic.AtomicReference;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 import static org.junit.Assume.assumeNotNull;
 
 @RunWith(AndroidJUnit4.class)
@@ -26,16 +25,6 @@ public class CameraCapturerTest extends BaseCameraCapturerTest {
      * false failures.
      */
     private static final int CAMERA_FREEZE_TIMEOUT_MS = 4500;
-
-    @Test(expected = NullPointerException.class)
-    public void shouldFailWithNullContext() {
-        cameraCapturer = new CameraCapturer(null, CameraCapturer.CameraSource.FRONT_CAMERA);
-    }
-
-    @Test(expected = NullPointerException.class)
-    public void shouldFailWithNullSource() {
-        cameraCapturer = new CameraCapturer(cameraCapturerActivity, null);
-    }
 
     @Test
     public void shouldAllowNullListener() {
@@ -64,7 +53,7 @@ public class CameraCapturerTest extends BaseCameraCapturerTest {
 
                     }
                 });
-        localVideoTrack = localMedia.addVideoTrack(true, cameraCapturer);
+        localVideoTrack = LocalVideoTrack.create(cameraCapturerActivity, true, cameraCapturer);
 
         // Add renderer
         localVideoTrack.addRenderer(frameCountRenderer);
@@ -116,7 +105,7 @@ public class CameraCapturerTest extends BaseCameraCapturerTest {
         cameraCapturer.switchCamera();
 
         // Now add our video track
-        localVideoTrack = localMedia.addVideoTrack(true, cameraCapturer);
+        localVideoTrack = LocalVideoTrack.create(cameraCapturerActivity, true, cameraCapturer);
 
         // Validate our switch happened
         assertTrue(cameraSwitched.await(CAMERA_CAPTURE_DELAY_MS, TimeUnit.MILLISECONDS));
@@ -152,7 +141,7 @@ public class CameraCapturerTest extends BaseCameraCapturerTest {
                         cameraSwitchError.countDown();
                     }
                 });
-        localVideoTrack = localMedia.addVideoTrack(true, cameraCapturer);
+        localVideoTrack = LocalVideoTrack.create(cameraCapturerActivity, true, cameraCapturer);
 
         // Switch our cameras quickly
         cameraCapturer.switchCamera();
@@ -175,7 +164,7 @@ public class CameraCapturerTest extends BaseCameraCapturerTest {
                 actualCameraParameters);
 
         // Now add our video track
-        localVideoTrack = localMedia.addVideoTrack(true, cameraCapturer);
+        localVideoTrack = LocalVideoTrack.create(cameraCapturerActivity, true, cameraCapturer);
 
         // Wait for parameters to be set
         assertTrue(cameraParametersSet.await(10, TimeUnit.SECONDS));
@@ -213,7 +202,7 @@ public class CameraCapturerTest extends BaseCameraCapturerTest {
                 });
 
         // Begin capturing
-        localVideoTrack = localMedia.addVideoTrack(true, cameraCapturer);
+        localVideoTrack = LocalVideoTrack.create(cameraCapturerActivity, true, cameraCapturer);
 
         // Wait for first frame
         assertTrue(firstFrameAvailable.await(CAMERA_CAPTURE_DELAY_MS, TimeUnit.MILLISECONDS));
@@ -262,7 +251,7 @@ public class CameraCapturerTest extends BaseCameraCapturerTest {
                 });
 
         // Begin capturing
-        localVideoTrack = localMedia.addVideoTrack(true, cameraCapturer);
+        localVideoTrack = LocalVideoTrack.create(cameraCapturerActivity, true, cameraCapturer);
 
         // Wait for first frame
         assertTrue(firstFrameAvailable.await(CAMERA_CAPTURE_DELAY_MS, TimeUnit.MILLISECONDS));
@@ -311,7 +300,7 @@ public class CameraCapturerTest extends BaseCameraCapturerTest {
                 });
 
         // Begin capturing and validate our flash mode is set
-        localVideoTrack = localMedia.addVideoTrack(true, cameraCapturer);
+        localVideoTrack = LocalVideoTrack.create(cameraCapturerActivity, true, cameraCapturer);
 
         // Wait for first frame
         assertTrue(firstFrameAvailable.await(CAMERA_CAPTURE_DELAY_MS, TimeUnit.MILLISECONDS));
@@ -328,8 +317,8 @@ public class CameraCapturerTest extends BaseCameraCapturerTest {
         // Validate our flash mode
         assertEquals(expectedFlashMode, actualCameraParameters.get().getFlashMode());
 
-        // Remove the video track
-        localMedia.removeVideoTrack(localVideoTrack);
+        // Release the video track
+        localVideoTrack.release();
 
         // Set our flash mode to something else
         cameraParametersUpdated = new CountDownLatch(1);
@@ -337,8 +326,8 @@ public class CameraCapturerTest extends BaseCameraCapturerTest {
         scheduleCameraParameterFlashModeUpdate(cameraParametersUpdated, expectedFlashMode,
                 actualCameraParameters);
 
-        // Re add the track
-        localVideoTrack = localMedia.addVideoTrack(true, cameraCapturer);
+        // Recreate track
+        localVideoTrack = LocalVideoTrack.create(cameraCapturerActivity, true, cameraCapturer);
 
         // Wait for parameters to be set
         assertTrue(cameraParametersUpdated.await(CAMERA_CAPTURE_DELAY_MS, TimeUnit.MILLISECONDS));
@@ -372,7 +361,7 @@ public class CameraCapturerTest extends BaseCameraCapturerTest {
 
                     }
                 });
-        localVideoTrack = localMedia.addVideoTrack(true, cameraCapturer);
+        localVideoTrack = LocalVideoTrack.create(cameraCapturerActivity, true, cameraCapturer);
 
         // Wait for first frame to be available
         assertTrue(firstFrameAvailable.await(CAMERA_CAPTURE_DELAY_MS, TimeUnit.MILLISECONDS));
@@ -430,7 +419,7 @@ public class CameraCapturerTest extends BaseCameraCapturerTest {
 
                     }
                 });
-        localVideoTrack = localMedia.addVideoTrack(true, cameraCapturer);
+        localVideoTrack = LocalVideoTrack.create(cameraCapturerActivity, true, cameraCapturer);
         CameraCapturer.PictureListener pictureListener = new CameraCapturer.PictureListener() {
             @Override
             public void onShutter() {
@@ -472,7 +461,7 @@ public class CameraCapturerTest extends BaseCameraCapturerTest {
 
             }
         });
-        localVideoTrack = localMedia.addVideoTrack(true, cameraCapturer);
+        localVideoTrack = LocalVideoTrack.create(cameraCapturerActivity, true, cameraCapturer);
 
         // Wait for capturer to actually start
         assertTrue(firstFrameAvailable.await(CAMERA_CAPTURE_DELAY_MS, TimeUnit.MILLISECONDS));

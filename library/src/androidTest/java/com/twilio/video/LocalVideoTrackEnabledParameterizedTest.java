@@ -14,7 +14,6 @@ import java.util.Arrays;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 
 @RunWith(Parameterized.class)
 @LargeTest
@@ -27,7 +26,6 @@ public class LocalVideoTrackEnabledParameterizedTest extends BaseLocalVideoTrack
     }
 
     private final boolean enabled;
-    private LocalVideoTrack localVideoTrack;
 
     public LocalVideoTrackEnabledParameterizedTest(boolean enabled) {
         this.enabled = enabled;
@@ -36,14 +34,11 @@ public class LocalVideoTrackEnabledParameterizedTest extends BaseLocalVideoTrack
     @Before
     public void setup() {
         super.setup();
-        localVideoTrack = localMedia.addVideoTrack(enabled, fakeVideoCapturer);
+        localVideoTrack = LocalVideoTrack.create(context, enabled, fakeVideoCapturer);
     }
 
     @After
     public void teardown() {
-        if (localMedia != null) {
-            localMedia.removeVideoTrack(localVideoTrack);
-        }
         super.teardown();
     }
 
@@ -53,9 +48,9 @@ public class LocalVideoTrackEnabledParameterizedTest extends BaseLocalVideoTrack
     }
 
     @Test
-    public void isEnabled_shouldReturnFalseAfterRemoved() {
+    public void isEnabled_shouldReturnFalseAfterReleased() {
         assertEquals(enabled, localVideoTrack.isEnabled());
-        assertTrue(localMedia.removeVideoTrack(localVideoTrack));
+        localVideoTrack.release();
         assertFalse(localVideoTrack.isEnabled());
     }
 
@@ -95,10 +90,10 @@ public class LocalVideoTrackEnabledParameterizedTest extends BaseLocalVideoTrack
     }
 
     @Test
-    public void enable_shouldNotBeAllowedAfterRemoved() {
+    public void enable_shouldNotBeAllowedAfterReleased() {
         boolean updatedEnabled = !enabled;
 
-        localMedia.removeVideoTrack(localVideoTrack);
+        localVideoTrack.release();
         localVideoTrack.enable(updatedEnabled);
 
         assertEquals(false, localVideoTrack.isEnabled());

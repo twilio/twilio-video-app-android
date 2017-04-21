@@ -8,14 +8,13 @@ import com.twilio.video.ui.MediaTestActivity;
 import com.twilio.video.util.PermissionUtils;
 
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import static junit.framework.Assert.assertEquals;
@@ -39,52 +38,99 @@ public class LocalAudioTrackTest {
     @Rule public ActivityTestRule<MediaTestActivity> activityRule =
             new ActivityTestRule<>(MediaTestActivity.class);
     private MediaTestActivity mediaTestActivity;
-    private LocalMedia localMedia;
     private LocalAudioTrack localAudioTrack;
 
     @Before
     public void setup() {
         mediaTestActivity = activityRule.getActivity();
         PermissionUtils.allowPermissions(mediaTestActivity);
-        localMedia = LocalMedia.create(mediaTestActivity);
     }
 
     @After
     public void teardown() {
-        if (localMedia != null) {
-            localMedia.release();
+        if (localAudioTrack != null) {
+            localAudioTrack.release();
         }
     }
 
     @Test
-    public void canAddAudioTrackWithOptions() {
+    public void canCreateEnabledAudioTrack() {
+        localAudioTrack = LocalAudioTrack.create(mediaTestActivity, true);
+
+        assertNotNull(localAudioTrack);
+        assertTrue(localAudioTrack.isEnabled());
+    }
+
+    @Test
+    public void canCreateDisabledAudioTrack() {
+        localAudioTrack = LocalAudioTrack.create(mediaTestActivity, false);
+
+        assertNotNull(localAudioTrack);
+        assertFalse(localAudioTrack.isEnabled());
+    }
+
+    @Test
+    public void canCreateMultipleAudioTracks() {
+        int numAudioTracks = 5;
+        boolean[] expectedEnabled = new boolean[]{ false, true, true, false, false };
+
+        for (int i = 0 ; i < numAudioTracks ; i++) {
+            LocalAudioTrack localAudioTrack = LocalAudioTrack.create(mediaTestActivity,
+                    expectedEnabled[i]);
+
+            Assert.assertNotNull(localAudioTrack);
+            assertEquals(expectedEnabled[i], localAudioTrack.isEnabled());
+            localAudioTrack.release();
+        }
+    }
+
+    @Test
+    public void canReleaseAudioTrack() {
+        localAudioTrack = LocalAudioTrack.create(mediaTestActivity, true);
+
+        assertNotNull(localAudioTrack);
+        localAudioTrack.release();
+    }
+
+    @Test
+    public void release_shouldBeIdempotent() {
+        localAudioTrack = LocalAudioTrack.create(mediaTestActivity, true);
+
+        assertNotNull(localAudioTrack);
+        localAudioTrack.release();
+        localAudioTrack.release();
+    }
+
+    @Test
+    public void canCreateAudioTrackWithOptions() {
         List<AudioOptions> audioOptionsList = getAllAudioOptionsPermutations();
 
         for (AudioOptions audioOptions : audioOptionsList) {
-            localAudioTrack = localMedia.addAudioTrack(true, audioOptions);
+            localAudioTrack = LocalAudioTrack.create(mediaTestActivity, true, audioOptions);
 
-            // Validate the audio track was added
-            assertNotNull("Failed to add AudioTrack with options: " + audioOptions,
+            // Validate the audio track was created
+            assertNotNull("Failed to create AudioTrack with options: " + audioOptions,
                     localAudioTrack);
-            assertTrue("AudioTrack added is not enabled with options: " + audioOptions,
+            assertTrue("AudioTrack created is not enabled with options: " + audioOptions,
                     localAudioTrack.isEnabled());
 
             // Remove the audio track and continue to next audio options configuration
-            localMedia.removeAudioTrack(localAudioTrack);
+            localAudioTrack.release();
         }
     }
 
     @Test
-    public void enable_shouldNotBeAllowedAfterRemoved() {
-        localAudioTrack = localMedia.addAudioTrack(false);
-        localMedia.removeAudioTrack(localAudioTrack);
+    public void enable_shouldNotBeAllowedAfterReleased() {
+        localAudioTrack = LocalAudioTrack.create(mediaTestActivity, false);
+        assertTrue(true);
+        localAudioTrack.release();
         localAudioTrack.enable(true);
         assertFalse(localAudioTrack.isEnabled());
     }
 
     @Test
     public void enable_shouldChangeState() {
-        localAudioTrack = localMedia.addAudioTrack(true);
+        localAudioTrack = LocalAudioTrack.create(mediaTestActivity, true);
         localAudioTrack.enable(false);
 
         assertFalse(localAudioTrack.isEnabled());
@@ -92,24 +138,27 @@ public class LocalAudioTrackTest {
 
     @Test
     public void isEnabled_shouldReflectConstructedState() {
-        LocalAudioTrack enabledAudioTrack = localMedia.addAudioTrack(true);
-        LocalAudioTrack disabledAudioTrack = localMedia.addAudioTrack(false);
+        LocalAudioTrack enabledAudioTrack = LocalAudioTrack.create(mediaTestActivity, true);
+        LocalAudioTrack disabledAudioTrack = LocalAudioTrack.create(mediaTestActivity, false);
 
         assertTrue(enabledAudioTrack.isEnabled());
         assertFalse(disabledAudioTrack.isEnabled());
+
+        enabledAudioTrack.release();
+        disabledAudioTrack.release();
     }
 
     @Test
-    public void isEnabled_shouldReturnFalseAfterRemoved() {
-        localAudioTrack = localMedia.addAudioTrack(true);
+    public void isEnabled_shouldReturnFalseAfterReleased() {
+        localAudioTrack = LocalAudioTrack.create(mediaTestActivity, true);
         assertTrue(localAudioTrack.isEnabled());
-        assertTrue(localMedia.removeAudioTrack(localAudioTrack));
+        localAudioTrack.release();
         assertFalse(localAudioTrack.isEnabled());
     }
 
     @Test
     public void enable_shouldAllowSameState() {
-        localAudioTrack = localMedia.addAudioTrack(true);
+        localAudioTrack = LocalAudioTrack.create(mediaTestActivity, true);
         localAudioTrack.enable(true);
         localAudioTrack.enable(true);
 

@@ -1,9 +1,10 @@
-#include <jni.h>
-#include "media/media.h"
-#include "media/media_factory.h"
-
 #ifndef VIDEO_ANDROID_COM_TWILIO_VIDEO_MEDIAFACTORY_H_
 #define VIDEO_ANDROID_COM_TWILIO_VIDEO_MEDIAFACTORY_H_
+
+#include <jni.h>
+#include "media/media_factory.h"
+
+
 
 #ifdef __cplusplus
 extern "C" {
@@ -38,9 +39,18 @@ JNIEXPORT jlong JNICALL Java_com_twilio_video_MediaFactory_nativeCreate(JNIEnv *
                                                                         jobject,
                                                                         jobject,
                                                                         jobject);
-JNIEXPORT jlong JNICALL Java_com_twilio_video_MediaFactory_nativeCreateLocalMedia(JNIEnv *,
-                                                                                  jobject,
-                                                                                  jlong);
+JNIEXPORT jobject JNICALL Java_com_twilio_video_MediaFactory_nativeCreateAudioTrack(JNIEnv *,
+                                                                                    jobject,
+                                                                                    jlong,
+                                                                                    jboolean,
+                                                                                    jobject);
+JNIEXPORT jobject JNICALL Java_com_twilio_video_MediaFactory_nativeCreateVideoTrack(JNIEnv *,
+                                                                                    jobject,
+                                                                                    jlong,
+                                                                                    jboolean,
+                                                                                    jobject,
+                                                                                    jobject,
+                                                                                    jobject);
 JNIEXPORT void JNICALL Java_com_twilio_video_MediaFactory_nativeRelease(JNIEnv *, jobject, jlong);
 
 }

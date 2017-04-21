@@ -246,12 +246,8 @@ public class CameraCapturer implements VideoCapturer {
     }
 
     public CameraCapturer(Context context, CameraSource cameraSource, @Nullable Listener listener) {
-        if (context == null) {
-            throw new NullPointerException("context must not be null");
-        }
-        if (cameraSource == null) {
-            throw new NullPointerException("camera source must not be null");
-        }
+        Preconditions.checkNotNull(context, "Context must not be null");
+        Preconditions.checkNotNull(cameraSource, "Camera source must not be null");
         this.context = context;
         this.cameraSource = cameraSource;
         this.listener = listener;

@@ -30,7 +30,8 @@ private:
 
 std::shared_ptr<twilio::media::LocalAudioTrack> getLocalAudioTrack(jlong);
 
-jobject createJavaLocalAudioTrack(std::shared_ptr<twilio::media::LocalAudioTrack> local_audio_track);
+jobject createJavaLocalAudioTrack(jobject j_media_factory,
+                                  std::shared_ptr<twilio::media::LocalAudioTrack> local_audio_track);
 
 JNIEXPORT jboolean JNICALL Java_com_twilio_video_LocalAudioTrack_nativeIsEnabled(JNIEnv *,
                                                                                  jobject,

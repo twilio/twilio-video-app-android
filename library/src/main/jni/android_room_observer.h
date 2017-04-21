@@ -8,6 +8,7 @@
 #include "video/participant.h"
 
 #include "com_twilio_video_Participant.h"
+#include "com_twilio_video_LocalParticipant.h"
 #include "class_reference_holder.h"
 
 #include <vector>
@@ -30,7 +31,7 @@ public:
                     webrtc_jni::GetMethodID(env,
                                             *j_room_observer_class_,
                                             "onConnected",
-                                            "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/util/List;)V")),
+                                            "(Ljava/lang/String;JLjava/lang/String;Ljava/lang/String;Ljava/util/List;)V")),
             j_on_disconnected_(
                     webrtc_jni::GetMethodID(env,
                                             *j_room_observer_class_,
@@ -138,12 +139,15 @@ protected:
                     webrtc_jni::JavaStringFromStdString(jni(), local_participant->getSid());
             jstring j_local_participant_identity =
                     webrtc_jni::JavaStringFromStdString(jni(), local_participant->getIdentity());
+            LocalParticipantContext* local_participant_context =
+                new LocalParticipantContext(local_participant);
 
             jobject j_participants = createJavaParticipantList(room->getParticipants());
 
             jni()->CallVoidMethod(*j_room_observer_,
                                   j_on_connected_,
                                   j_room_sid,
+                                  webrtc_jni::jlongFromPointer(local_participant_context),
                                   j_local_participant_sid,
                                   j_local_participant_identity,
                                   j_participants);

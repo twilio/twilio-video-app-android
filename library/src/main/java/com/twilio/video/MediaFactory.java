@@ -1,7 +1,8 @@
 package com.twilio.video;
 
-import android.animation.ObjectAnimator;
 import android.content.Context;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 import com.getkeepsafe.relinker.ReLinker;
 
@@ -17,10 +18,8 @@ class MediaFactory {
     private long nativeMediaFactoryHandle;
     private EglBaseProvider eglBaseProvider;
 
-    static MediaFactory instance(Context context) {
-        if (context == null) {
-            throw new NullPointerException("context must not be null");
-        }
+    static MediaFactory instance(@NonNull Context context) {
+        Preconditions.checkNotNull(context, "Context must not be null");
         if (instance == null) {
             synchronized (MediaFactory.class) {
                 if (instance == null) {
@@ -59,19 +58,51 @@ class MediaFactory {
         return instance;
     }
 
-    LocalMedia createLocalMedia(Context context) {
-        checkReleased("createLocalMedia");
-        long nativeLocalMediaHandle = nativeCreateLocalMedia(nativeMediaFactoryHandle);
+    synchronized LocalAudioTrack createAudioTrack(boolean enabled,
+                                                  @Nullable AudioOptions audioOptions) {
+        Preconditions.checkState(nativeMediaFactoryHandle != 0,
+                RELEASE_MESSAGE_TEMPLATE,
+                "createAudioTrack");
+        LocalAudioTrack localAudioTrack = nativeCreateAudioTrack(nativeMediaFactoryHandle,
+                enabled,
+                audioOptions);
 
-        if (nativeLocalMediaHandle == 0) {
-            logger.e("Failed to instance LocalMedia");
+        if (localAudioTrack != null) {
+            synchronized (MediaFactory.class) {
+                mediaFactoryRefCount++;
+            }
+
+            return localAudioTrack;
+        } else {
+            logger.e("Failed to create local audio track");
+
             return null;
         }
-        synchronized (MediaFactory.class) {
-            mediaFactoryRefCount++;
-        }
+    }
 
-        return new LocalMedia(context, this, nativeLocalMediaHandle);
+    synchronized LocalVideoTrack createVideoTrack(boolean enabled,
+                                                  VideoCapturer videoCapturer,
+                                                  VideoConstraints videoConstraints) {
+        Preconditions.checkState(nativeMediaFactoryHandle != 0,
+                RELEASE_MESSAGE_TEMPLATE,
+                "createVideoTrack");
+        LocalVideoTrack localVideoTrack = nativeCreateVideoTrack(nativeMediaFactoryHandle,
+                enabled,
+                videoCapturer,
+                videoConstraints,
+                eglBaseProvider.getLocalEglBase().getEglBaseContext());
+
+        if (localVideoTrack != null) {
+            synchronized (MediaFactory.class) {
+                mediaFactoryRefCount++;
+            }
+
+            return localVideoTrack;
+        } else {
+            logger.e("Failed to create local video track");
+
+            return null;
+        }
     }
 
     void release() {
@@ -101,17 +132,16 @@ class MediaFactory {
         this.eglBaseProvider = EglBaseProvider.instance(this);
     }
 
-    private void checkReleased(String methodName) {
-        if (nativeMediaFactoryHandle == 0) {
-            String releaseErrorMessage = String.format(RELEASE_MESSAGE_TEMPLATE, methodName);
-
-            throw new IllegalStateException(releaseErrorMessage);
-        }
-    }
-
     private static native long nativeCreate(Context context,
                                             EglBase.Context localEglBase,
                                             EglBase.Context remoteEglBase);
-    private static native long nativeCreateLocalMedia(long nativeMediaFactoryHandle);
+    private native LocalAudioTrack nativeCreateAudioTrack(long nativeMediaFactoryHandle,
+                                                                 boolean enabled,
+                                                                 AudioOptions audioOptions);
+    private native LocalVideoTrack nativeCreateVideoTrack(long nativeMediaFactoryHandle,
+                                                                 boolean enabled,
+                                                                 VideoCapturer videoCapturer,
+                                                                 VideoConstraints videoConstraints,
+                                                                 EglBase.Context rootEglBase);
     private native void nativeRelease(long mediaFactoryHandle);
 }

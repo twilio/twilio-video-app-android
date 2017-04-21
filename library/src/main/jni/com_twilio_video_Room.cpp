@@ -2,7 +2,7 @@
 #include "webrtc/sdk/android/src/jni/jni_helpers.h"
 
 #include "video/logger.h"
-#include "video/video_client.h"
+#include "video/video.h"
 #include "media/media_factory.h"
 #include "android_room_observer.h"
 #include "android_stats_observer.h"
@@ -12,31 +12,28 @@
 namespace twilio_video_jni {
 
 JNIEXPORT jlong JNICALL Java_com_twilio_video_Room_nativeConnect(
-    JNIEnv *env,
-    jobject j_instance,
-    jobject j_connect_options,
-    jlong j_media_factory_context,
-    jlong j_room_observer_context) {
-
-    MediaFactoryContext *media_factory_context =
-        reinterpret_cast<MediaFactoryContext *>(j_media_factory_context);
+        JNIEnv *env,
+        jobject j_instance,
+        jobject j_connect_options,
+        jlong j_media_factory_handle,
+        jlong j_room_observer_handle) {
 
     RoomObserverContext *room_observer_context =
-        reinterpret_cast<RoomObserverContext *>(j_room_observer_context);
+        reinterpret_cast<RoomObserverContext *>(j_room_observer_handle);
 
     std::unique_ptr<twilio::video::Room> room;
+
     // Get connect options
     jclass j_connect_options_class = webrtc_jni::GetObjectClass(env, j_connect_options);
     jmethodID j_createNativeObject_id =
         webrtc_jni::GetMethodID(env, j_connect_options_class,
-                                "createNativeObject", "()J");
+                                "createNativeObject", "(J)J");
     jlong j_connect_options_handle =
-        env->CallLongMethod(j_connect_options, j_createNativeObject_id);
+        env->CallLongMethod(j_connect_options, j_createNativeObject_id, j_media_factory_handle);
     ConnectOptionsContext *connect_options_context =
         reinterpret_cast<ConnectOptionsContext *>(j_connect_options_handle);
-    room = twilio::video::VideoClient::connect(connect_options_context->connect_options,
-                                               media_factory_context->getMediaFactory(),
-                                               room_observer_context->android_room_observer);
+    room = twilio::video::connect(connect_options_context->connect_options,
+                                  room_observer_context->android_room_observer);
     delete connect_options_context;
     RoomContext *room_context = new RoomContext();
     room_context->room = std::move(room);

@@ -20,7 +20,7 @@ import static org.junit.Assert.assertEquals;
 
 @RunWith(Parameterized.class)
 @LargeTest
-public class LocalMediaVideoConstraintsParameterizedTest {
+public class LocalVideoTrackVideoConstraintsParameterizedTest {
     private static final VideoFormat cif30FpsVideoFormat =
             new VideoFormat(VideoDimensions.CIF_VIDEO_DIMENSIONS, 30, VideoPixelFormat.RGBA_8888);
     private static final VideoFormat vga30FpsVideoFormat =
@@ -132,7 +132,7 @@ public class LocalMediaVideoConstraintsParameterizedTest {
         return Arrays.asList(new Object[][]{
                 {"No constraints with capturer that supports default constraints",
                         new TestParameters(null, videoCapturer30Fps,
-                                LocalMedia.defaultVideoConstraints)},
+                                LocalVideoTrack.defaultVideoConstraints)},
                 {"No constraints with capturer format near default constraints",
                         new TestParameters(null, videoCapturer24Fps, vgaMax24FpsMaxConstraints)},
                 {"Capturer does not support minimum width constraint",
@@ -152,11 +152,11 @@ public class LocalMediaVideoConstraintsParameterizedTest {
                                 vgaMax24FpsMaxConstraints)},
                 {"Capturer does not support max FPS constraint",
                         new TestParameters(vgaMax24FpsMaxConstraints, videoCapturer30Fps,
-                                LocalMedia.defaultVideoConstraints)},
+                                LocalVideoTrack.defaultVideoConstraints)},
                 {"Capturer does not support aspect ratio constraint",
                         new TestParameters(aspectRatio16by9Hd1080pConstraints,
                                 videoCapturer4by3Ratio30Fps,
-                                LocalMedia.defaultVideoConstraints)},
+                                LocalVideoTrack.defaultVideoConstraints)},
                 {"Capturer supports aspect ratio constraint",
                         new TestParameters(aspectRatio16by9Constraints,
                                 galaxyS5BackCameraCapturer,
@@ -174,10 +174,10 @@ public class LocalMediaVideoConstraintsParameterizedTest {
     private final VideoCapturer videoCapturer;
     private final VideoConstraints expectedVideoConstraints;
     private Context context;
-    private LocalMedia localMedia;
+    private LocalVideoTrack localVideoTrack;
 
-    public LocalMediaVideoConstraintsParameterizedTest(String testScenario,
-                                                       TestParameters testParameters) {
+    public LocalVideoTrackVideoConstraintsParameterizedTest(String testScenario,
+                                                            TestParameters testParameters) {
         this.videoConstraints = testParameters.videoConstraints;
         this.videoCapturer = testParameters.videoCapturer;
         this.expectedVideoConstraints = testParameters.expectedVideoConstraints;
@@ -186,21 +186,19 @@ public class LocalMediaVideoConstraintsParameterizedTest {
     @Before
     public void setup() {
         context = InstrumentationRegistry.getInstrumentation().getTargetContext();
-        localMedia = LocalMedia.create(context);
+        localVideoTrack = LocalVideoTrack.create(context, true, videoCapturer,
+                videoConstraints);
     }
 
     @After
     public void teardown() {
-        if (localMedia != null) {
-            localMedia.release();
+        if (localVideoTrack != null) {
+            localVideoTrack.release();
         }
     }
 
     @Test
-    public void addVideoTrack_shouldResolveCapturerSupportedVideoConstraints() {
-        LocalVideoTrack localVideoTrack = localMedia.addVideoTrack(true, videoCapturer,
-                videoConstraints);
-
+    public void create_shouldResolveCapturerSupportedVideoConstraints() {
         assertEquals(expectedVideoConstraints, localVideoTrack.getVideoConstraints());
     }
 }

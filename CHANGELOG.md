@@ -4,13 +4,67 @@ The Twilio Programmable Video SDKs use [Semantic Versioning](http://www.semver.o
 
 Improvements
 
-- Improved hardware accelerated encoding and decoding through the use of surface textures. 
+- Replaced `LocalMedia` class with Track factories for `LocalVideoTrack` and `LocalAudioTrack`
+
+Working with `LocalVideoTrack` and `LocalAudioTrack` before 1.0.0-beta18
+
+    // Create LocalMedia
+    LocalMedia localMedia = LocalMedia.create(context);
+    LocalVideoTrack localVideoTrack = localMedia.addVideoTrack(true, videoCapturer);
+    LocalAudioTrack localAudioTrack = localMedia.addAudioTrack(true);
+
+    ...
+
+    // Destroy LocalMedia to free native memory resources
+    localMedia.release();
+
+Working with `LocalVideoTrack` and `LocalAudioTrack` now
+
+    // Create Tracks
+    LocalVideoTrack localVideoTrack = LocalVideoTrack.create(context, true, videoCapturer);
+    LocalAudioTrack localAudioTrack = LocalAudioTrack.create(context, true);
+
+    ...
+
+    // Destroy Tracks to free native memory resources
+    localVideoTrack.release();
+    localAudioTrack.release();
+
+- The `ConnectOptions.Builder` now takes a `List<LocalAudioTrack>` and `List<LocalVideoTrack>` instead of `LocalMedia`
+
+Providing `LocalVideoTrack` and `LocalAudioTrack` before 1.0.0-beta18
+
+    LocalMedia localMedia = LocalMedia.create(context);
+    LocalVideoTrack localVideoTrack = localMedia.addVideoTrack(true, videoCapturer);
+    LocalAudioTrack localAudioTrack = localMedia.addAudioTrack(true);
+
+    ConnectOptions connectOptions = new ConnectOptions.Builder(accessToken)
+        .roomName(roomName)
+        .localMedia(localMedia)
+        .build();
+    VideoClient.connect(context, connectOptions, roomListener);
+
+Providing `LocalVideoTrack` and `LocalAudioTrack` now
+
+    List<LocalVideoTrack> localAudioTracks =
+                new ArrayList<LocalVideoTrack>(){{ add(localVideoTrack); }};
+    List<LocalAudioTrack> localVideoTracks =
+                new ArrayList<LocalAudioTrack>(){{ add(localAudioTrack); }};
+
+    ConnectOptions connectOptions = new ConnectOptions.Builder(accessToken)
+        .roomName(roomName)
+        .audioTracks(localAudioTracks)
+        .videoTracks(localVideoTracks)
+        .build();
+    VideoClient.connect(context, connectOptions, roomListener);
+- Methods `getVideoTracks()` and `getAudioTracks()` moved from `LocalMedia` and `Media` to `LocalParticipant` and `Participant`
+- Removed `Media` from `Participant` and migrated `Media.Listener` to `Participant.Listener`.
+`AudioTrack` and `VideoTrack` events are raised with the corresponding `Participant` instance.
+This allows you to create tracks while connected to a `Room` without immediately adding them to the connected `Room`
+- Improved hardware accelerated encoding and decoding through the use of surface textures.
 - Added `textureId` and `samplingMatrix` fields to `I420Frame` so implementations of `VideoRenderer`
 can extract YUV data from frame represented as texture.
 - Exposed `org.webrtc.YuvConverter` to facilitate converting a texture to an in memory YUV buffer.
-- Removed `Media` from `Participant` and migrated `Media.Listener` to `Participant.Listener`. 
-`AudioTrack` and `VideoTrack` events are raised with the corresponding `Participant` instance.
-- Added `getVideoTracks` and `getAudioTracks` to `Participant`.
 
 Bug Fixes
 

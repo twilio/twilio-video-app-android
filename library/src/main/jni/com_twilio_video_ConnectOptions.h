@@ -16,7 +16,7 @@ struct ConnectOptionsContext {
 };
 
 JNIEXPORT jlong JNICALL Java_com_twilio_video_ConnectOptions_nativeCreate
-        (JNIEnv *, jobject, jstring, jstring, jobject, jobject, jboolean, jlong);
+        (JNIEnv *, jobject, jstring, jstring, jobjectArray, jobjectArray, jobject, jboolean, jlong, jlong);
 
 }
 

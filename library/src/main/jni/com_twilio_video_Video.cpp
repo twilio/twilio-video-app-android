@@ -8,7 +8,7 @@
 #include "webrtc/sdk/android/src/jni/classreferenceholder.h"
 
 #include "video/logger.h"
-#include "video/video_client.h"
+#include "video/video.h"
 #include "android_room_observer.h"
 #include "com_twilio_video_ConnectOptions.h"
 #include "com_twilio_video_Room.h"

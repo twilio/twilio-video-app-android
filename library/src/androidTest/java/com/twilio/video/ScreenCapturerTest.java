@@ -33,23 +33,20 @@ public class ScreenCapturerTest {
     public ActivityTestRule<ScreenCapturerTestActivity> activityRule =
             new ActivityTestRule<>(ScreenCapturerTestActivity.class);
     private ScreenCapturerTestActivity screenCapturerActivity;
-    private LocalMedia localMedia;
+    private LocalVideoTrack screenVideoTrack;
     private ScreenCapturer screenCapturer;
-    private LocalVideoTrack localVideoTrack;
 
     @Before
     public void setup() {
         assumeTrue(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP);
         screenCapturerActivity = activityRule.getActivity();
         PermissionUtils.allowScreenCapture(false);
-        localMedia = LocalMedia.create(screenCapturerActivity);
     }
 
     @After
     public void teardown() {
-        if (localMedia != null) {
-            localMedia.removeVideoTrack(localVideoTrack);
-            localMedia.release();
+        if (screenVideoTrack != null) {
+            screenVideoTrack.release();
         }
     }
 
@@ -78,7 +75,7 @@ public class ScreenCapturerTest {
                 screenCapturerActivity.getScreenCaptureResultCode(),
                 screenCapturerActivity.getScreenCaptureIntent(),
                 screenCapturerListener);
-        localVideoTrack = localMedia.addVideoTrack(true, screenCapturer);
+        screenVideoTrack = LocalVideoTrack.create(screenCapturerActivity, true, screenCapturer);
 
         // Validate first frame was reported
         assertTrue(firstFrameReported.await(SCREEN_CAPTURER_DELAY_MS, TimeUnit.MILLISECONDS));
@@ -102,7 +99,7 @@ public class ScreenCapturerTest {
                 Integer.MIN_VALUE,
                 null,
                 screenCapturerListener);
-        localVideoTrack = localMedia.addVideoTrack(true, screenCapturer);
+        screenVideoTrack = LocalVideoTrack.create(screenCapturerActivity, true, screenCapturer);
 
         // We should be notified of an error because MediaProjection could not be accessed
         assertTrue(screenCaptureError.await(SCREEN_CAPTURER_DELAY_MS, TimeUnit.MILLISECONDS));
@@ -129,8 +126,8 @@ public class ScreenCapturerTest {
                 screenCapturerActivity.getScreenCaptureResultCode(),
                 screenCapturerActivity.getScreenCaptureIntent(),
                 null);
-        localVideoTrack = localMedia.addVideoTrack(true, screenCapturer);
-        localVideoTrack.addRenderer(localVideo);
+        screenVideoTrack = LocalVideoTrack.create(screenCapturerActivity, true, screenCapturer);
+        screenVideoTrack.addRenderer(localVideo);
 
         assertTrue(renderedFirstFrame.await(SCREEN_CAPTURER_DELAY_MS, TimeUnit.MILLISECONDS));
     }
@@ -158,14 +155,14 @@ public class ScreenCapturerTest {
 
         for (int i = 0 ; i < reuseCount ; i++) {
             firstFrameReceived.set(new CountDownLatch(1));
-            localVideoTrack = localMedia.addVideoTrack(true, screenCapturer);
+            screenVideoTrack = LocalVideoTrack.create(screenCapturerActivity, true, screenCapturer);
 
             // Validate we got our first frame
             assertTrue(firstFrameReceived.get().await(SCREEN_CAPTURER_DELAY_MS,
                     TimeUnit.MILLISECONDS));
 
             // Remove video track and wait
-            localMedia.removeVideoTrack(localVideoTrack);
+            screenVideoTrack.release();
         }
     }
 }

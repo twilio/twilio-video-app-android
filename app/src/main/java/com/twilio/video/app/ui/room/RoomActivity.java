@@ -36,7 +36,7 @@ import com.twilio.video.AudioTrack;
 import com.twilio.video.CameraCapturer;
 import com.twilio.video.ConnectOptions;
 import com.twilio.video.LocalAudioTrack;
-import com.twilio.video.LocalMedia;
+import com.twilio.video.LocalParticipant;
 import com.twilio.video.LocalVideoTrack;
 import com.twilio.video.Participant;
 import com.twilio.video.Room;
@@ -62,6 +62,8 @@ import com.twilio.video.app.util.InputUtils;
 import com.twilio.video.app.util.StatsScheduler;
 import com.twilio.video.env.Env;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -146,9 +148,9 @@ public class RoomActivity extends BaseActivity {
     private int savedVolumeControlStream;
 
     private String displayName;
+    private LocalParticipant localParticipant;
     private String localParticipantSid = LOCAL_PARTICIPANT_STUB_SID;
     private Room room;
-    private LocalMedia localMedia;
     private VideoConstraints videoConstraints;
     private LocalAudioTrack localAudioTrack;
     private LocalVideoTrack cameraVideoTrack;
@@ -216,7 +218,6 @@ public class RoomActivity extends BaseActivity {
         // Setup Activity
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         displayName = sharedPreferences.getString(Preferences.DISPLAY_NAME, null);
-        localMedia = LocalMedia.create(this);
         statsScheduler = new StatsScheduler();
         obtainVideoConstraints();
         updateUi(room);
@@ -227,12 +228,18 @@ public class RoomActivity extends BaseActivity {
     protected void onDestroy() {
         // Reset the speakerphone
         audioManager.setSpeakerphoneOn(false);
-        // Teardown local media
-        if (localMedia != null) {
-            localMedia.removeVideoTrack(cameraVideoTrack);
-            localMedia.removeAudioTrack(localAudioTrack);
-            localMedia.release();
-            localMedia = null;
+        // Teardown tracks
+        if (localAudioTrack != null) {
+            localAudioTrack.release();
+            localAudioTrack = null;
+        }
+        if (cameraVideoTrack != null) {
+            cameraVideoTrack.release();
+            cameraVideoTrack = null;
+        }
+        if (screenVideoTrack != null) {
+            screenVideoTrack.release();
+            screenVideoTrack = null;
         }
         // dispose any token requests if needed
         rxDisposables.clear();
@@ -419,17 +426,16 @@ public class RoomActivity extends BaseActivity {
     void toggleLocalAudio() {
         int icon = 0;
         if (localAudioTrack == null) {
-            localAudioTrack = localMedia.addAudioTrack(true);
+            localAudioTrack = LocalAudioTrack.create(this, true);
             icon = R.drawable.ic_mic_white_24px;
             pauseAudioMenuItem.setVisible(true);
             pauseAudioMenuItem.setTitle(localAudioTrack.isEnabled() ?
                     R.string.pause_audio : R.string.resume_audio);
         } else {
-            if (!localMedia.removeAudioTrack(localAudioTrack)) {
-                Snackbar.make(primaryVideoView,
-                        "Audio track remove action failed",
-                        Snackbar.LENGTH_LONG).setAction("Action", null).show();
+            if (localParticipant != null) {
+                localParticipant.removeAudioTrack(localAudioTrack);
             }
+            localAudioTrack.release();
             localAudioTrack = null;
             icon = R.drawable.ic_mic_off_gray_24px;
             pauseAudioMenuItem.setVisible(false);
@@ -446,7 +452,10 @@ public class RoomActivity extends BaseActivity {
         if (cameraVideoTrack == null) {
 
             // add local camera track
-            cameraVideoTrack = localMedia.addVideoTrack(true, cameraCapturer, videoConstraints);
+            cameraVideoTrack = LocalVideoTrack.create(this, true, cameraCapturer, videoConstraints);
+            if (localParticipant != null) {
+                localParticipant.addVideoTrack(cameraVideoTrack);
+            }
 
             // enable video settings
             switchCameraMenuItem.setVisible(cameraVideoTrack.isEnabled());
@@ -455,15 +464,13 @@ public class RoomActivity extends BaseActivity {
             pauseVideoMenuItem.setVisible(true);
 
         } else {
-
             // remove local camera track
             cameraVideoTrack.removeRenderer(primaryVideoView);
 
-            // show snack if failed to remove track
-            if (!localMedia.removeVideoTrack(cameraVideoTrack)) {
-                Snackbar.make(primaryVideoView, "Failed to remove video track",
-                        Snackbar.LENGTH_LONG).show();
+            if (localParticipant != null) {
+                localParticipant.removeVideoTrack(cameraVideoTrack);
             }
+            cameraVideoTrack.release();
             cameraVideoTrack = null;
 
             // disable video settings
@@ -574,7 +581,7 @@ public class RoomActivity extends BaseActivity {
      * Initialize local media and provide stub participant for primary view.
      */
     private void setupLocalMedia() {
-        localAudioTrack = localMedia.addAudioTrack(true);
+        localAudioTrack = LocalAudioTrack.create(this, true);
         setupLocalVideoTrack();
         renderLocalParticipantStub();
     }
@@ -589,7 +596,7 @@ public class RoomActivity extends BaseActivity {
             cameraCapturer = new CameraCapturer(this, CameraCapturer.CameraSource.FRONT_CAMERA);
         }
 
-        cameraVideoTrack = localMedia.addVideoTrack(true, cameraCapturer, videoConstraints);
+        cameraVideoTrack = LocalVideoTrack.create(this, true, cameraCapturer, videoConstraints);
 
         if (cameraVideoTrack != null) {
             localVideoTrackNames.put(cameraVideoTrack.getTrackId(),
@@ -745,13 +752,17 @@ public class RoomActivity extends BaseActivity {
     }
 
     private void startScreenCapture() {
-        screenVideoTrack = localMedia.addVideoTrack(true, screenCapturer);
+        screenVideoTrack = LocalVideoTrack.create(this, true, screenCapturer);
 
         if (screenVideoTrack != null) {
             screenCaptureMenuItem.setIcon(R.drawable.ic_stop_screen_share_white_24dp);
             screenCaptureMenuItem.setTitle(R.string.stop_screen_share);
             localVideoTrackNames.put(
                     screenVideoTrack.getTrackId(), getString(R.string.screen_video_track));
+
+            if (localParticipant != null) {
+                localParticipant.addVideoTrack(screenVideoTrack);
+            }
         } else {
             Snackbar.make(primaryVideoView,
                     R.string.failed_to_add_screen_video_track,
@@ -761,7 +772,10 @@ public class RoomActivity extends BaseActivity {
     }
 
     private void stopScreenCapture() {
-        localMedia.removeVideoTrack(screenVideoTrack);
+        if (localParticipant != null) {
+            localParticipant.removeVideoTrack(screenVideoTrack);
+        }
+        screenVideoTrack.release();
         localVideoTrackNames.remove(screenVideoTrack.getTrackId());
         screenVideoTrack = null;
         screenCaptureMenuItem.setIcon(R.drawable.ic_screen_share_white_24dp);
@@ -830,13 +844,31 @@ public class RoomActivity extends BaseActivity {
                     enableInsights = false;
                 }
 
-                ConnectOptions connectOptions = new ConnectOptions.Builder(token)
+                ConnectOptions.Builder connectOptionsBuilder = new ConnectOptions.Builder(token)
                         .roomName(roomName)
-                        .localMedia(localMedia)
-                        .enableInsights(enableInsights)
-                        .build();
+                        .enableInsights(enableInsights);
 
-                room = Video.connect(RoomActivity.this, connectOptions, roomListener());
+                if (localAudioTrack != null) {
+                    connectOptionsBuilder
+                            .audioTracks(Collections.singletonList(localAudioTrack));
+                }
+
+                List<LocalVideoTrack> localVideoTracks = new ArrayList<>();
+                if (cameraVideoTrack != null) {
+                    localVideoTracks.add(cameraVideoTrack);
+                }
+
+                if (screenVideoTrack != null) {
+                    localVideoTracks.add(screenVideoTrack);
+                }
+
+                if (!localVideoTracks.isEmpty()) {
+                    connectOptionsBuilder.videoTracks(localVideoTracks);
+                }
+
+                room = Video.connect(RoomActivity.this,
+                        connectOptionsBuilder.build(),
+                        roomListener());
                 return room;
             }
         });
@@ -888,7 +920,10 @@ public class RoomActivity extends BaseActivity {
      */
     private void removeCameraTrack() {
         if (cameraVideoTrack != null) {
-            localMedia.removeVideoTrack(cameraVideoTrack);
+            if (localParticipant != null) {
+                localParticipant.removeVideoTrack(cameraVideoTrack);
+            }
+            cameraVideoTrack.release();
             restoreLocalVideoCameraTrack = true;
             cameraVideoTrack = null;
         }
@@ -1022,7 +1057,8 @@ public class RoomActivity extends BaseActivity {
                         room.getName(),
                         room.getSid(),
                         room.getState());
-                localParticipantSid = room.getLocalParticipant().getSid();
+                localParticipant = room.getLocalParticipant();
+                localParticipantSid = localParticipant.getSid();
 
                 setAudioFocus(true);
                 setVolumeControl(true);
@@ -1070,6 +1106,8 @@ public class RoomActivity extends BaseActivity {
 
                 removeAllParticipants();
                 RoomActivity.this.room = null;
+                RoomActivity.this.localParticipant = null;
+                RoomActivity.this.localParticipantSid = LOCAL_PARTICIPANT_STUB_SID;
 
                 updateUi(room);
                 updateStats();

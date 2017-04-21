@@ -109,7 +109,6 @@ public abstract class Video {
             currentNetworkInfo = conn.getActiveNetworkInfo();
         }
         Room room = new Room(connectOptions.getRoomName(),
-                connectOptions.getLocalMedia(),
                 roomListenerProxy(roomListener),
                 Util.createCallbackHandler());
         rooms.add(room);

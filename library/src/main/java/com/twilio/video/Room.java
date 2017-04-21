@@ -2,19 +2,15 @@ package com.twilio.video;
 
 import android.content.Context;
 import android.os.Handler;
-import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
 import android.util.Pair;
 
-import java.lang.annotation.Retention;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
-
-import static java.lang.annotation.RetentionPolicy.SOURCE;
 
 /**
  * A Room represents a media session with zero or more remote Participants. Media shared by any one
@@ -25,7 +21,6 @@ public class Room {
 
     private long nativeRoomContext;
     private String name;
-    private final LocalMedia localMedia;
     private String sid;
     private RoomState roomState;
     private Map<String, Participant> participantMap = new HashMap<>();
@@ -37,11 +32,10 @@ public class Room {
     private final Room.Listener listener;
     private final Handler handler;
     private Queue<Pair<Handler, StatsListener>> statsListenersQueue;
+    private ConnectOptions cachedConnectOptions;
 
-
-    Room(String name, LocalMedia localMedia, Room.Listener listener, Handler handler) {
+    Room(String name, Room.Listener listener, Handler handler) {
         this.name = name;
-        this.localMedia = localMedia;
         this.sid = "";
         this.roomState = RoomState.DISCONNECTED;
         this.listener = listener;
@@ -158,6 +152,8 @@ public class Room {
      */
     void connect(Context context, ConnectOptions connectOptions) {
         synchronized (internalRoomListenerImpl) {
+            // Retain the connect options to provide the audio and video tracks upon connect
+            this.cachedConnectOptions = connectOptions;
             this.nativeRoomContext = nativeConnect(
                 connectOptions,
                 MediaFactory.instance(context).getNativeMediaFactoryHandle(),
@@ -180,6 +176,7 @@ public class Room {
                 internalStatsListenerHandle.release();
                 internalStatsListenerHandle = null;
             }
+            localParticipant.release();
             cleanupStatsListenerQueue();
         }
     }
@@ -203,6 +200,7 @@ public class Room {
     // JNI Callbacks Interface
     interface InternalRoomListener {
         void onConnected(String roomSid,
+                         long localParticipantHandle,
                          String localParticipantSid,
                          String localParticipantIdentity,
                          List<Participant> participantList);
@@ -223,6 +221,7 @@ public class Room {
 
         @Override
         public synchronized void onConnected(String roomSid,
+                                             long nativeLocalParticipantHandle,
                                              String localParticipantSid,
                                              String localParticipantIdentity,
                                              List<Participant> participantList) {
@@ -232,7 +231,8 @@ public class Room {
                 Room.this.name = roomSid;
             }
             Room.this.localParticipant = new LocalParticipant(
-                    localParticipantSid, localParticipantIdentity, localMedia);
+                nativeLocalParticipantHandle, localParticipantSid, localParticipantIdentity, cachedConnectOptions.getAudioTracks(), cachedConnectOptions.getVideoTracks());
+            cachedConnectOptions = null;
             for (Participant participant : participantList) {
                 participantMap.put(participant.getSid(), participant);
             }

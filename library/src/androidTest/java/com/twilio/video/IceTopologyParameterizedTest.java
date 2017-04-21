@@ -16,12 +16,14 @@ import com.twilio.video.util.Topology;
 
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.CountDownLatch;
@@ -45,9 +47,11 @@ public class IceTopologyParameterizedTest extends BaseClientTest {
     private MediaTestActivity mediaTestActivity;
     private String aliceToken;
     private String bobToken;
+    private LocalVideoTrack aliceLocalVideoTrack;
+    private LocalAudioTrack aliceLocalAudioTrack;
+    private LocalVideoTrack bobLocalVideoTrack;
+    private LocalAudioTrack bobLocalAudioTrack;
     private String roomName;
-    private LocalMedia aliceLocalMedia;
-    private LocalMedia bobLocalMedia;
     private final Topology topology;
 
     public IceTopologyParameterizedTest(Topology topology) {
@@ -63,18 +67,22 @@ public class IceTopologyParameterizedTest extends BaseClientTest {
         PermissionUtils.allowPermissions(mediaTestActivity);
         aliceToken = CredentialsUtils.getAccessToken(Constants.PARTICIPANT_ALICE, topology);
         roomName = RandUtils.generateRandomString(20);
-        aliceLocalMedia = LocalMedia.create(mediaTestActivity);
         bobToken = CredentialsUtils.getAccessToken(Constants.PARTICIPANT_BOB, topology);
-        bobLocalMedia = LocalMedia.create(mediaTestActivity);
     }
 
     @After
     public void teardown() {
-        if (aliceLocalMedia != null) {
-            aliceLocalMedia.release();
+        if (aliceLocalAudioTrack != null) {
+            aliceLocalAudioTrack.release();
         }
-        if (bobLocalMedia != null) {
-            bobLocalMedia.release();
+        if (aliceLocalVideoTrack != null) {
+            aliceLocalVideoTrack.release();
+        }
+        if (bobLocalAudioTrack != null) {
+            bobLocalAudioTrack.release();
+        }
+        if (bobLocalVideoTrack != null) {
+            bobLocalVideoTrack.release();
         }
     }
 
@@ -94,7 +102,6 @@ public class IceTopologyParameterizedTest extends BaseClientTest {
         ConnectOptions connectOptions = new ConnectOptions.Builder(aliceToken)
             .roomName(roomName)
             .iceOptions(iceOptions)
-            .localMedia(aliceLocalMedia)
             .build();
 
         Room room = Video.connect(mediaTestActivity, connectOptions, roomListener);
@@ -115,13 +122,13 @@ public class IceTopologyParameterizedTest extends BaseClientTest {
             .iceServers(iceServers)
             .iceTransportPolicy(IceTransportPolicy.ALL)
             .build();
-        aliceLocalMedia.addAudioTrack(true);
+        aliceLocalAudioTrack = LocalAudioTrack.create(mediaTestActivity, true);
 
         ConnectOptions connectOptions = new ConnectOptions.Builder(aliceToken)
-            .roomName(roomName)
-            .iceOptions(iceOptions)
-            .localMedia(aliceLocalMedia)
-            .build();
+                .roomName(roomName)
+                .iceOptions(iceOptions)
+                .audioTracks(Collections.singletonList(aliceLocalAudioTrack))
+                .build();
         CallbackHelper.FakeRoomListener roomListener = new CallbackHelper.FakeRoomListener();
         roomListener.onConnectedLatch = new CountDownLatch(1);
         roomListener.onDisconnectedLatch = new CountDownLatch(1);
@@ -146,24 +153,26 @@ public class IceTopologyParameterizedTest extends BaseClientTest {
             .iceServers(iceServers)
             .iceTransportPolicy(IceTransportPolicy.RELAY)
             .build();
-        aliceLocalMedia.addAudioTrack(true);
+        aliceLocalAudioTrack = LocalAudioTrack.create(mediaTestActivity, true);
         ConnectOptions connectOptions = new ConnectOptions.Builder(aliceToken)
-            .roomName(roomName)
-            .iceOptions(iceOptions)
-            .localMedia(aliceLocalMedia)
-            .build();
+                .roomName(roomName)
+                .iceOptions(iceOptions)
+                .audioTracks(Collections.singletonList(aliceLocalAudioTrack))
+                .build();
 
         Room aliceRoom = Video.connect(mediaTestActivity, connectOptions, aliceListener);
         assertTrue(aliceListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
 
-        bobLocalMedia.addAudioTrack(true);
-        bobLocalMedia.addVideoTrack(true, new FakeVideoCapturer());
+        bobLocalAudioTrack = LocalAudioTrack.create(mediaTestActivity, true);
+        bobLocalVideoTrack = LocalVideoTrack.create(mediaTestActivity,
+                true, new FakeVideoCapturer());
 
         connectOptions = new ConnectOptions.Builder(bobToken)
-            .roomName(roomName)
-            .iceOptions(iceOptions)
-            .localMedia(bobLocalMedia)
-            .build();
+                .roomName(roomName)
+                .iceOptions(iceOptions)
+                .audioTracks(Collections.singletonList(bobLocalAudioTrack))
+                .videoTracks(Collections.singletonList(bobLocalVideoTrack))
+                .build();
         CallbackHelper.FakeRoomListener bobListener = new CallbackHelper.FakeRoomListener();
         bobListener.onConnectedLatch = new CountDownLatch(1);
         CallbackHelper.FakeParticipantListener participantListener =

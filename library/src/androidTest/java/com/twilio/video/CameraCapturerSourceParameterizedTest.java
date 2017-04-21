@@ -37,7 +37,7 @@ public class CameraCapturerSourceParameterizedTest extends BaseCameraCapturerTes
     }
 
     @Test
-    public void shouldCaptureFramesWhenVideoTrackAdded() throws InterruptedException {
+    public void shouldCaptureFramesWhenVideoTrackCreated() throws InterruptedException {
         final CountDownLatch firstFrameReceived = new CountDownLatch(1);
         cameraCapturer = new CameraCapturer(cameraCapturerActivity, cameraSource,
                 new CameraCapturer.Listener() {
@@ -56,7 +56,7 @@ public class CameraCapturerSourceParameterizedTest extends BaseCameraCapturerTes
 
                     }
                 });
-        localVideoTrack = localMedia.addVideoTrack(true, cameraCapturer);
+        localVideoTrack = LocalVideoTrack.create(cameraCapturerActivity, true, cameraCapturer);
 
         // Validate we got our first frame
         assertTrue(firstFrameReceived.await(CAMERA_CAPTURE_DELAY_MS, TimeUnit.MILLISECONDS));
@@ -83,7 +83,7 @@ public class CameraCapturerSourceParameterizedTest extends BaseCameraCapturerTes
 
                     }
                 });
-        localVideoTrack = localMedia.addVideoTrack(true, cameraCapturer);
+        localVideoTrack = LocalVideoTrack.create(cameraCapturerActivity, true, cameraCapturer);
         int frameCount = frameCountRenderer.getFrameCount();
 
         // Validate our frame count is nothing
@@ -132,7 +132,7 @@ public class CameraCapturerSourceParameterizedTest extends BaseCameraCapturerTes
         };
         localVideo.setListener(rendererListener);
         cameraCapturer = new CameraCapturer(cameraCapturerActivity, cameraSource);
-        localVideoTrack = localMedia.addVideoTrack(true, cameraCapturer);
+        localVideoTrack = LocalVideoTrack.create(cameraCapturerActivity, true, cameraCapturer);
         localVideoTrack.addRenderer(localVideo);
         assertTrue(renderedFirstFrame.await(CAMERA_CAPTURE_DELAY_MS, TimeUnit.MILLISECONDS));
         localVideoTrack.removeRenderer(localVideo);
@@ -163,14 +163,15 @@ public class CameraCapturerSourceParameterizedTest extends BaseCameraCapturerTes
                 });
         for (int i = 0 ; i < reuseCount ; i++) {
             firstFrameReceived.set(new CountDownLatch(1));
-            localVideoTrack = localMedia.addVideoTrack(true, cameraCapturer);
+            LocalVideoTrack localVideoTrack = LocalVideoTrack.create(cameraCapturerActivity,
+                    true, cameraCapturer);
 
             // Validate we got our first frame
             assertTrue(firstFrameReceived.get().await(CAMERA_CAPTURE_DELAY_MS,
                     TimeUnit.MILLISECONDS));
 
-            // Remove video track
-            localMedia.removeVideoTrack(localVideoTrack);
+            // Release video track
+            localVideoTrack.release();
         }
     }
 
@@ -198,7 +199,7 @@ public class CameraCapturerSourceParameterizedTest extends BaseCameraCapturerTes
 
                     }
                 });
-        localVideoTrack = localMedia.addVideoTrack(true, cameraCapturer);
+        localVideoTrack = LocalVideoTrack.create(cameraCapturerActivity, true, cameraCapturer);
 
         CameraCapturer.PictureListener pictureListener = new CameraCapturer.PictureListener() {
             @Override
@@ -228,7 +229,7 @@ public class CameraCapturerSourceParameterizedTest extends BaseCameraCapturerTes
         final CountDownLatch pictureTaken = new CountDownLatch(1);
 
         cameraCapturer = new CameraCapturer(cameraCapturerActivity, cameraSource);
-        localVideoTrack = localMedia.addVideoTrack(true, cameraCapturer);
+        localVideoTrack = LocalVideoTrack.create(cameraCapturerActivity, true, cameraCapturer);
 
         CameraCapturer.PictureListener pictureListener = new CameraCapturer.PictureListener() {
             @Override

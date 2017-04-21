@@ -8,6 +8,7 @@ import com.twilio.video.util.FrameCountRenderer;
 import com.twilio.video.util.Topology;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -50,8 +51,9 @@ public class VideoTrackTopologyParameterizedTest extends BaseParticipantTest {
                 new CallbackHelper.FakeParticipantListener();
         participantListener.onVideoTrackAddedLatch = new CountDownLatch(1);
         participant.setListener(participantListener);
+        actor2LocalVideoTrack = LocalVideoTrack.create(mediaTestActivity, true, fakeVideoCapturer);
 
-        LocalVideoTrack videoTrack = actor2LocalMedia.addVideoTrack(true, fakeVideoCapturer);
+        actor2LocalParticipant.addVideoTrack(actor2LocalVideoTrack);
         assertTrue(participantListener.onVideoTrackAddedLatch.await(20, TimeUnit.SECONDS));
         List<VideoTrack> videoTracks = participant.getVideoTracks();
         assertEquals(1, videoTracks.size());
@@ -64,8 +66,9 @@ public class VideoTrackTopologyParameterizedTest extends BaseParticipantTest {
                 new CallbackHelper.FakeParticipantListener();
         participantListener.onVideoTrackAddedLatch = new CountDownLatch(1);
         participant.setListener(participantListener);
+        actor2LocalVideoTrack = LocalVideoTrack.create(mediaTestActivity, true, fakeVideoCapturer);
 
-        LocalVideoTrack videoTrack = actor2LocalMedia.addVideoTrack(true, fakeVideoCapturer);
+        actor2LocalParticipant.addVideoTrack(actor2LocalVideoTrack);
         assertTrue(participantListener.onVideoTrackAddedLatch.await(20, TimeUnit.SECONDS));
         List<VideoTrack> videoTracks = participant.getVideoTracks();
         assertEquals(1, videoTracks.size());
@@ -83,8 +86,9 @@ public class VideoTrackTopologyParameterizedTest extends BaseParticipantTest {
                 new CallbackHelper.FakeParticipantListener();
         participantListener.onVideoTrackAddedLatch = new CountDownLatch(1);
         participant.setListener(participantListener);
+        actor2LocalVideoTrack = LocalVideoTrack.create(mediaTestActivity, true, fakeVideoCapturer);
 
-        LocalVideoTrack localVideoTrack = actor2LocalMedia.addVideoTrack(true, fakeVideoCapturer);
+        actor2LocalParticipant.addVideoTrack(actor2LocalVideoTrack);
         assertTrue(participantListener.onVideoTrackAddedLatch.await(20, TimeUnit.SECONDS));
         List<VideoTrack> videoTracks = participant.getVideoTracks();
         assertEquals(1, videoTracks.size());
