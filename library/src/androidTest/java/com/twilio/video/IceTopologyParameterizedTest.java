@@ -110,6 +110,7 @@ public class IceTopologyParameterizedTest extends BaseClientTest {
         assertTrue(roomListener.onDisconnectedLatch.await(20, TimeUnit.SECONDS));
     }
 
+    @Ignore
     @Test
     public void shouldConnectWithValidStunServers() throws InterruptedException {
         Set<IceServer> iceServers = new HashSet<>();
