@@ -86,6 +86,7 @@ public class IceTopologyParameterizedTest extends BaseClientTest {
         }
     }
 
+    @Ignore
     @Test
     public void shouldConnectWithWrongIceServers() throws InterruptedException {
         CallbackHelper.FakeRoomListener roomListener = new CallbackHelper.FakeRoomListener();
