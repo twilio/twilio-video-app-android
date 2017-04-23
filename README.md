@@ -97,3 +97,9 @@ by Android developers to perform multi-party voice and video calling
 
 The tests are located in the library module and use the AndroidJUnitRunner.
 The tests interact with the backend infrastructure and will result in billing activity on your account.
+
+### Test Coverage
+Enabling test coverage requires setting project property `testCoverageEnabled`. The snippet below
+demonstrates executing unit and instrumentation tests with code coverage enabled.
+
+`./gradlew -PtestCoverageEnabled=true library:clean library:jacocoTestReport`

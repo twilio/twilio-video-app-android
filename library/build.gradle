@@ -73,8 +73,7 @@ android {
             }
         }
         debug {
-            // Disabling test coverage for debug builds due to a strange crash
-            // testCoverageEnabled true
+            testCoverageEnabled getTestCoverageEnabled()
             externalNativeBuild {
                 cmake {
                     cppFlags '-g'
@@ -366,6 +365,18 @@ def getPublishConfig() {
 
     println "Publish Config: " + publishConfig
     return publishConfig;
+}
+
+def getTestCoverageEnabled() {
+    def testCoverageEnabled = false
+
+    if (project.hasProperty("testCoverageEnabled")) {
+        testCoverageEnabled = project.property("testCoverageEnabled").toBoolean()
+    }
+
+    println "Test Coverage Enabled: " + testCoverageEnabled
+
+    return testCoverageEnabled
 }
 
 def getTwilioVideoConfig() {
