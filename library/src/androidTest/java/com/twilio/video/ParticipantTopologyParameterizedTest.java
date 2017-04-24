@@ -140,7 +140,7 @@ public class ParticipantTopologyParameterizedTest extends BaseParticipantTest {
         participantListener.onAudioTrackAddedLatch = new CountDownLatch(1);
         participant.setListener(participantListener);
         actor2LocalAudioTrack = LocalAudioTrack.create(mediaTestActivity, true);
-        actor2Room.getLocalParticipant().addAudioTrack(actor2LocalAudioTrack);
+        assertTrue(actor2Room.getLocalParticipant().addAudioTrack(actor2LocalAudioTrack));
         assertTrue(participantListener.onAudioTrackAddedLatch.await(20, TimeUnit.SECONDS));
 
         // Audio track disabled
@@ -161,7 +161,7 @@ public class ParticipantTopologyParameterizedTest extends BaseParticipantTest {
         // Video track added
         participantListener.onVideoTrackAddedLatch = new CountDownLatch(1);
         actor2LocalVideoTrack = LocalVideoTrack.create(mediaTestActivity, true, fakeVideoCapturer);
-        actor2Room.getLocalParticipant().addVideoTrack(actor2LocalVideoTrack);
+        assertTrue(actor2Room.getLocalParticipant().addVideoTrack(actor2LocalVideoTrack));
         assertTrue(participantListener.onVideoTrackAddedLatch.await(20, TimeUnit.SECONDS));
 
         // Video track disabled

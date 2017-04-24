@@ -30,22 +30,22 @@ private:
 
 std::shared_ptr<twilio::video::LocalParticipant> getLocalParticipant(jlong);
 
-JNIEXPORT void JNICALL Java_com_twilio_video_LocalParticipant_nativeAddAudioTrack(JNIEnv *,
+JNIEXPORT bool JNICALL Java_com_twilio_video_LocalParticipant_nativeAddAudioTrack(JNIEnv *,
                                                                                   jobject,
                                                                                   jlong,
                                                                                   jlong);
 
-JNIEXPORT void JNICALL Java_com_twilio_video_LocalParticipant_nativeAddVideoTrack(JNIEnv *,
+JNIEXPORT bool JNICALL Java_com_twilio_video_LocalParticipant_nativeAddVideoTrack(JNIEnv *,
                                                                                   jobject,
                                                                                   jlong,
                                                                                   jlong);
 
-JNIEXPORT void JNICALL Java_com_twilio_video_LocalParticipant_nativeRemoveAudioTrack(JNIEnv *,
+JNIEXPORT bool JNICALL Java_com_twilio_video_LocalParticipant_nativeRemoveAudioTrack(JNIEnv *,
                                                                                      jobject,
                                                                                      jlong,
                                                                                      jlong);
 
-JNIEXPORT void JNICALL Java_com_twilio_video_LocalParticipant_nativeRemoveVideoTrack(JNIEnv *,
+JNIEXPORT bool JNICALL Java_com_twilio_video_LocalParticipant_nativeRemoveVideoTrack(JNIEnv *,
                                                                                      jobject,
                                                                                      jlong,
                                                                                      jlong);

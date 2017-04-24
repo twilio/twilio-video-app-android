@@ -53,7 +53,7 @@ public class VideoTrackTopologyParameterizedTest extends BaseParticipantTest {
         participant.setListener(participantListener);
         actor2LocalVideoTrack = LocalVideoTrack.create(mediaTestActivity, true, fakeVideoCapturer);
 
-        actor2LocalParticipant.addVideoTrack(actor2LocalVideoTrack);
+        assertTrue(actor2LocalParticipant.addVideoTrack(actor2LocalVideoTrack));
         assertTrue(participantListener.onVideoTrackAddedLatch.await(20, TimeUnit.SECONDS));
         List<VideoTrack> videoTracks = participant.getVideoTracks();
         assertEquals(1, videoTracks.size());
@@ -68,7 +68,7 @@ public class VideoTrackTopologyParameterizedTest extends BaseParticipantTest {
         participant.setListener(participantListener);
         actor2LocalVideoTrack = LocalVideoTrack.create(mediaTestActivity, true, fakeVideoCapturer);
 
-        actor2LocalParticipant.addVideoTrack(actor2LocalVideoTrack);
+        assertTrue(actor2LocalParticipant.addVideoTrack(actor2LocalVideoTrack));
         assertTrue(participantListener.onVideoTrackAddedLatch.await(20, TimeUnit.SECONDS));
         List<VideoTrack> videoTracks = participant.getVideoTracks();
         assertEquals(1, videoTracks.size());
@@ -88,7 +88,7 @@ public class VideoTrackTopologyParameterizedTest extends BaseParticipantTest {
         participant.setListener(participantListener);
         actor2LocalVideoTrack = LocalVideoTrack.create(mediaTestActivity, true, fakeVideoCapturer);
 
-        actor2LocalParticipant.addVideoTrack(actor2LocalVideoTrack);
+        assertTrue(actor2LocalParticipant.addVideoTrack(actor2LocalVideoTrack));
         assertTrue(participantListener.onVideoTrackAddedLatch.await(20, TimeUnit.SECONDS));
         List<VideoTrack> videoTracks = participant.getVideoTracks();
         assertEquals(1, videoTracks.size());

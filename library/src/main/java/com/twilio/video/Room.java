@@ -120,6 +120,7 @@ public class Room {
      */
     public synchronized void disconnect() {
         if (roomState != RoomState.DISCONNECTED && nativeRoomContext != 0) {
+            localParticipant.release();
             nativeDisconnect(nativeRoomContext);
         }
     }
@@ -176,7 +177,6 @@ public class Room {
                 internalStatsListenerHandle.release();
                 internalStatsListenerHandle = null;
             }
-            localParticipant.release();
             cleanupStatsListenerQueue();
         }
     }

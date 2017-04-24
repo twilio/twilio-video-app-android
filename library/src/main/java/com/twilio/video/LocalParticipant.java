@@ -32,35 +32,55 @@ public class LocalParticipant {
     /**
      * Returns the {@link LocalAudioTrack}s of a local participant.
      */
-    public List<LocalAudioTrack> getAudioTracks() {
+    public synchronized List<LocalAudioTrack> getAudioTracks() {
         return new ArrayList<>(audioTracks);
     }
 
     /**
      * Returns the {@link LocalVideoTrack}s of a local participant.
      */
-    public List<LocalVideoTrack> getVideoTracks() {
+    public synchronized List<LocalVideoTrack> getVideoTracks() {
         return new ArrayList<>(videoTracks);
     }
 
     /**
      * Adds an audio track to the local participant. If the local participant is connected to
      * {@link Room} then the audio track will be shared with all other participants.
+     *
+     * @return true if the audio track was added or false if the local participant is not connected
+     * or the track was already added.
      */
-    public void addAudioTrack(@NonNull LocalAudioTrack localAudioTrack) {
+    public synchronized boolean addAudioTrack(@NonNull LocalAudioTrack localAudioTrack) {
         Preconditions.checkNotNull(localAudioTrack, "LocalAudioTrack must not be null");
-        audioTracks.add(localAudioTrack);
-        nativeAddAudioTrack(nativeLocalParticipantHandle, localAudioTrack.getNativeHandle());
+        if (isReleased()) {
+            return false;
+        } else {
+            boolean added = nativeAddAudioTrack(nativeLocalParticipantHandle, localAudioTrack.getNativeHandle());
+            if (added) {
+                audioTracks.add(localAudioTrack);
+            }
+            return added;
+        }
     }
 
     /**
      * Adds a video track to the local participant. If the local participant is connected to
      * {@link Room} then the video track will be shared with all other participants.
+     *
+     * @return true if the video track was added or false if the local participant is not connected
+     * or the track was already added.
      */
-    public void addVideoTrack(@NonNull LocalVideoTrack localVideoTrack) {
+    public synchronized boolean addVideoTrack(@NonNull LocalVideoTrack localVideoTrack) {
         Preconditions.checkNotNull(localVideoTrack, "LocalVideoTrack must not be null");
-        videoTracks.add(localVideoTrack);
-        nativeAddVideoTrack(nativeLocalParticipantHandle, localVideoTrack.getNativeHandle());
+        if (isReleased()) {
+            return false;
+        } else {
+            boolean added = nativeAddVideoTrack(nativeLocalParticipantHandle, localVideoTrack.getNativeHandle());
+            if (added) {
+                videoTracks.add(localVideoTrack);
+            }
+            return added;
+        }
     }
 
     /**
@@ -71,10 +91,14 @@ public class LocalParticipant {
      * or could not remove audio track.
      */
 
-    public boolean removeAudioTrack(@NonNull LocalAudioTrack localAudioTrack) {
+    public synchronized boolean removeAudioTrack(@NonNull LocalAudioTrack localAudioTrack) {
         Preconditions.checkNotNull(localAudioTrack, "LocalAudioTrack must not be null");
-        nativeRemoveAudioTrack(nativeLocalParticipantHandle, localAudioTrack.getNativeHandle());
-        return audioTracks.remove(localAudioTrack);
+        if (isReleased()) {
+            return false;
+        } else {
+            audioTracks.remove(localAudioTrack);
+            return nativeRemoveAudioTrack(nativeLocalParticipantHandle, localAudioTrack.getNativeHandle());
+        }
     }
 
     /**
@@ -84,10 +108,14 @@ public class LocalParticipant {
      * @return true if video track was removed or false if the local participant is not connected
      * or could not remove video track.
      */
-    public boolean removeVideoTrack(@NonNull LocalVideoTrack localVideoTrack) {
+    public synchronized boolean removeVideoTrack(@NonNull LocalVideoTrack localVideoTrack) {
         Preconditions.checkNotNull(localVideoTrack, "LocalVideoTrack must not be null");
-        nativeRemoveVideoTrack(nativeLocalParticipantHandle, localVideoTrack.getNativeHandle());
-        return videoTracks.remove(localVideoTrack);
+        if (isReleased()) {
+            return false;
+        } else {
+            videoTracks.remove(localVideoTrack);
+            return nativeRemoveVideoTrack(nativeLocalParticipantHandle, localVideoTrack.getNativeHandle());
+        }
     }
 
     LocalParticipant(long nativeLocalParticipantHandle,
@@ -122,10 +150,9 @@ public class LocalParticipant {
         return nativeLocalParticipantHandle == 0;
     }
 
-    private native void nativeAddAudioTrack(long nativeHandle, long nativeAudioTrackHandle);
-    private native void nativeAddVideoTrack(long nativeHandle, long nativeVideoTrackHandle);
-    private native void nativeRemoveAudioTrack(long nativeHandle, long nativeAudioTrackHandle);
-    private native void nativeRemoveVideoTrack(long nativeHandle, long nativeVideoTrackHandle);
+    private native boolean nativeAddAudioTrack(long nativeHandle, long nativeAudioTrackHandle);
+    private native boolean nativeAddVideoTrack(long nativeHandle, long nativeVideoTrackHandle);
+    private native boolean nativeRemoveAudioTrack(long nativeHandle, long nativeAudioTrackHandle);
+    private native boolean nativeRemoveVideoTrack(long nativeHandle, long nativeVideoTrackHandle);
     private native void nativeRelease(long nativeHandle);
-
 }

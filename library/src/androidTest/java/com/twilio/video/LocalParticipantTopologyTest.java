@@ -27,6 +27,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
@@ -92,8 +93,8 @@ public class LocalParticipantTopologyTest extends BaseClientTest {
         // Now we add our tracks
         localAudioTrack = LocalAudioTrack.create(mediaTestActivity, true);
         localVideoTrack = LocalVideoTrack.create(mediaTestActivity, true, fakeVideoCapturer);
-        localParticipant.addAudioTrack(localAudioTrack);
-        localParticipant.addVideoTrack(localVideoTrack);
+        assertTrue(localParticipant.addAudioTrack(localAudioTrack));
+        assertTrue(localParticipant.addVideoTrack(localVideoTrack));
 
         // Now remove them
         assertTrue(localParticipant.removeAudioTrack(localAudioTrack));
@@ -182,6 +183,93 @@ public class LocalParticipantTopologyTest extends BaseClientTest {
         assertTrue(roomListener.onDisconnectedLatch.await(20, TimeUnit.SECONDS));
         assertEquals(identity, localParticipant.getIdentity());
         assertNotNull(localParticipant.getSid());
+    }
+
+    @Test
+    public void shouldNotAddAudioTrackAfterDisconnect() throws InterruptedException {
+        CallbackHelper.FakeRoomListener roomListener = new CallbackHelper.FakeRoomListener();
+        roomListener.onConnectedLatch = new CountDownLatch(1);
+        roomListener.onDisconnectedLatch = new CountDownLatch(1);
+
+        ConnectOptions connectOptions = new ConnectOptions.Builder(token)
+                .roomName(roomName)
+                .build();
+        Room room = Video.connect(mediaTestActivity, connectOptions, roomListener);
+        assertTrue(roomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
+        LocalParticipant localParticipant = room.getLocalParticipant();
+        assertNotNull(localParticipant);
+        int audio_track_size = localParticipant.getAudioTracks().size();
+        room.disconnect();
+        localAudioTrack = LocalAudioTrack.create(mediaTestActivity, true);
+        assertFalse(localParticipant.addAudioTrack(localAudioTrack));
+        assertEquals(audio_track_size, localParticipant.getAudioTracks().size());
+        assertTrue(roomListener.onDisconnectedLatch.await(20, TimeUnit.SECONDS));
+    }
+
+    @Test
+    public void shouldNotAddVideoTrackAfterDisconnect() throws InterruptedException {
+                CallbackHelper.FakeRoomListener roomListener = new CallbackHelper.FakeRoomListener();
+        roomListener.onConnectedLatch = new CountDownLatch(1);
+        roomListener.onDisconnectedLatch = new CountDownLatch(1);
+
+        ConnectOptions connectOptions = new ConnectOptions.Builder(token)
+                .roomName(roomName)
+                .build();
+        Room room = Video.connect(mediaTestActivity, connectOptions, roomListener);
+        assertTrue(roomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
+        LocalParticipant localParticipant = room.getLocalParticipant();
+        assertNotNull(localParticipant);
+        int video_track_size = localParticipant.getVideoTracks().size();
+        room.disconnect();
+        localVideoTrack = LocalVideoTrack.create(mediaTestActivity, true, new FakeVideoCapturer());
+        assertFalse(localParticipant.addVideoTrack(localVideoTrack));
+        assertEquals(video_track_size, localParticipant.getVideoTracks().size());
+        assertTrue(roomListener.onDisconnectedLatch.await(20, TimeUnit.SECONDS));
+    }
+
+    @Test
+    public void shouldNotRemoveAudioTrackAfterDisconnect() throws InterruptedException {
+        CallbackHelper.FakeRoomListener roomListener = new CallbackHelper.FakeRoomListener();
+        roomListener.onConnectedLatch = new CountDownLatch(1);
+        roomListener.onDisconnectedLatch = new CountDownLatch(1);
+
+        ConnectOptions connectOptions = new ConnectOptions.Builder(token)
+                .roomName(roomName)
+                .build();
+        Room room = Video.connect(mediaTestActivity, connectOptions, roomListener);
+        assertTrue(roomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
+        LocalParticipant localParticipant = room.getLocalParticipant();
+        assertNotNull(localParticipant);
+        localAudioTrack = LocalAudioTrack.create(mediaTestActivity, true);
+        localParticipant.addAudioTrack(localAudioTrack);
+        int audio_track_size = localParticipant.getAudioTracks().size();
+        room.disconnect();
+        assertFalse(localParticipant.removeAudioTrack(localAudioTrack));
+        assertEquals(audio_track_size, localParticipant.getAudioTracks().size());
+        assertTrue(roomListener.onDisconnectedLatch.await(20, TimeUnit.SECONDS));
+    }
+
+    @Test
+    public void shouldNotRemoveVideoTrackAfterDisconnect() throws InterruptedException {
+                CallbackHelper.FakeRoomListener roomListener = new CallbackHelper.FakeRoomListener();
+        roomListener.onConnectedLatch = new CountDownLatch(1);
+        roomListener.onDisconnectedLatch = new CountDownLatch(1);
+
+        ConnectOptions connectOptions = new ConnectOptions.Builder(token)
+                .roomName(roomName)
+                .build();
+        Room room = Video.connect(mediaTestActivity, connectOptions, roomListener);
+        assertTrue(roomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
+        LocalParticipant localParticipant = room.getLocalParticipant();
+        assertNotNull(localParticipant);
+        FakeVideoCapturer fakeVideoCapturer = new FakeVideoCapturer();
+        localVideoTrack = LocalVideoTrack.create(mediaTestActivity, true, fakeVideoCapturer);
+        localParticipant.addVideoTrack(localVideoTrack);
+        int video_track_size = localParticipant.getVideoTracks().size();
+        room.disconnect();
+        assertFalse(localParticipant.removeVideoTrack(localVideoTrack));
+        assertEquals(video_track_size, localParticipant.getVideoTracks().size());
+        assertTrue(roomListener.onDisconnectedLatch.await(20, TimeUnit.SECONDS));
     }
 
 }

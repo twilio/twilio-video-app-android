@@ -213,7 +213,7 @@ public class StatsTopologyParameterizedTest extends BaseClientTest {
 
         LocalParticipant bobLocalParticipant = bobRoom.getLocalParticipant();
         bobLocalAudioTrack = LocalAudioTrack.create(mediaTestActivity, true);
-        bobLocalParticipant.addAudioTrack(bobLocalAudioTrack);
+        assertTrue(bobLocalParticipant.addAudioTrack(bobLocalAudioTrack));
         assertTrue(participantListener.onAudioTrackAddedLatch.await(20, TimeUnit.SECONDS));
 
         // let's give peer connection some time to get media flowing
@@ -232,7 +232,7 @@ public class StatsTopologyParameterizedTest extends BaseClientTest {
         // Add video track to bob and check stats
         bobLocalVideoTrack = LocalVideoTrack
                 .create(mediaTestActivity, true, new FakeVideoCapturer());
-        bobLocalParticipant.addVideoTrack(bobLocalVideoTrack);
+        assertTrue(bobLocalParticipant.addVideoTrack(bobLocalVideoTrack));
         assertTrue(participantListener.onVideoTrackAddedLatch.await(20, TimeUnit.SECONDS));
 
         // let's give peer connection some time to get media flowing
@@ -288,7 +288,7 @@ public class StatsTopologyParameterizedTest extends BaseClientTest {
         // Add audio and video track to alice
         aliceLocalVideoTrack = LocalVideoTrack
                 .create(mediaTestActivity, true, new FakeVideoCapturer());
-        aliceLocalParticipant.addVideoTrack(aliceLocalVideoTrack);
+        assertTrue(aliceLocalParticipant.addVideoTrack(aliceLocalVideoTrack));
 
         // TODO: Uncomment once CSDK-1206 is resolved
         // aliceLocalMedia.addAudioTrack(true);
