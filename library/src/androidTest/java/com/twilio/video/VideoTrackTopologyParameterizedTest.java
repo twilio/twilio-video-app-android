@@ -7,6 +7,7 @@ import com.twilio.video.helper.CallbackHelper;
 import com.twilio.video.util.FrameCountRenderer;
 import com.twilio.video.util.Topology;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -43,6 +44,12 @@ public class VideoTrackTopologyParameterizedTest extends BaseParticipantTest {
     @Before
     public void setup() throws InterruptedException {
         super.baseSetup(topology);
+    }
+
+    @After
+    public void teardown() throws InterruptedException {
+        super.teardown();
+        assertTrue(MediaFactory.isReleased());
     }
 
     @Test

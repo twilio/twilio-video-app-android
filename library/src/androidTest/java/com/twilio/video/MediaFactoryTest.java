@@ -14,6 +14,7 @@ import org.junit.runner.RunWith;
 
 import java.util.Random;
 
+import static junit.framework.Assert.assertTrue;
 import static junit.framework.TestCase.assertNotNull;
 
 @RunWith(AndroidJUnit4.class)
@@ -34,6 +35,7 @@ public class MediaFactoryTest {
     @After
     public void teardown() {
         mediaFactory.release();
+        assertTrue(MediaFactory.isReleased());
     }
 
     @Test

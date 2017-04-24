@@ -58,24 +58,31 @@ class MediaFactory {
         return instance;
     }
 
+    static boolean isReleased() {
+        synchronized (MediaFactory.class) {
+            return instance == null;
+        }
+    }
+
     synchronized LocalAudioTrack createAudioTrack(boolean enabled,
                                                   @Nullable AudioOptions audioOptions) {
         Preconditions.checkState(nativeMediaFactoryHandle != 0,
                 RELEASE_MESSAGE_TEMPLATE,
                 "createAudioTrack");
+        /*
+         * Add a reference to ensure that if the creation of the track fails the MediaFactory
+         * instance is destroyed when release() is called below.
+         */
+        addRef();
         LocalAudioTrack localAudioTrack = nativeCreateAudioTrack(nativeMediaFactoryHandle,
                 enabled,
                 audioOptions);
 
         if (localAudioTrack != null) {
-            synchronized (MediaFactory.class) {
-                mediaFactoryRefCount++;
-            }
-
             return localAudioTrack;
         } else {
+            release();
             logger.e("Failed to create local audio track");
-
             return null;
         }
     }
@@ -86,6 +93,11 @@ class MediaFactory {
         Preconditions.checkState(nativeMediaFactoryHandle != 0,
                 RELEASE_MESSAGE_TEMPLATE,
                 "createVideoTrack");
+        /*
+         * Add a reference to ensure that if the creation of the track fails the MediaFactory
+         * instance is destroyed when release() is called below.
+         */
+        addRef();
         LocalVideoTrack localVideoTrack = nativeCreateVideoTrack(nativeMediaFactoryHandle,
                 enabled,
                 videoCapturer,
@@ -93,15 +105,18 @@ class MediaFactory {
                 eglBaseProvider.getLocalEglBase().getEglBaseContext());
 
         if (localVideoTrack != null) {
-            synchronized (MediaFactory.class) {
-                mediaFactoryRefCount++;
-            }
-
             return localVideoTrack;
         } else {
+            release();
             logger.e("Failed to create local video track");
-
             return null;
+        }
+    }
+
+    void addRef() {
+        synchronized (MediaFactory.class) {
+            Preconditions.checkNotNull(instance, "MediaFactory instance must not be null");
+            mediaFactoryRefCount++;
         }
     }
 

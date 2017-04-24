@@ -6,6 +6,7 @@ import android.support.test.runner.AndroidJUnit4;
 
 import com.twilio.video.base.BaseCameraCapturerTest;
 
+import org.junit.After;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -25,6 +26,12 @@ public class CameraCapturerTest extends BaseCameraCapturerTest {
      * false failures.
      */
     private static final int CAMERA_FREEZE_TIMEOUT_MS = 4500;
+
+    @After
+    public void teardown() {
+        super.teardown();
+        assertTrue(MediaFactory.isReleased());
+    }
 
     @Test
     public void shouldAllowNullListener() {

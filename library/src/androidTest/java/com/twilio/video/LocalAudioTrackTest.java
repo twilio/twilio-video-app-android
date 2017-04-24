@@ -51,6 +51,7 @@ public class LocalAudioTrackTest {
         if (localAudioTrack != null) {
             localAudioTrack.release();
         }
+        assertTrue(MediaFactory.isReleased());
     }
 
     @Test

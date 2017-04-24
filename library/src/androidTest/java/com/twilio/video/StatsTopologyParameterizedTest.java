@@ -95,6 +95,7 @@ public class StatsTopologyParameterizedTest extends BaseClientTest {
         if (bobLocalVideoTrack != null) {
             bobLocalVideoTrack.release();
         }
+        assertTrue(MediaFactory.isReleased());
     }
 
     @Test(expected = NullPointerException.class)

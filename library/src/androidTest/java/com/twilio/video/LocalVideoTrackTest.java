@@ -36,6 +36,7 @@ public class LocalVideoTrackTest extends BaseLocalVideoTrackTest {
     @After
     public void teardown() {
         super.teardown();
+        assertTrue(MediaFactory.isReleased());
     }
 
     @Test

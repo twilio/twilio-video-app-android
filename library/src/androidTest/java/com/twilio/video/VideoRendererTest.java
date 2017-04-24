@@ -60,6 +60,7 @@ public class VideoRendererTest {
         if (fakeVideoTrack != null) {
             fakeVideoTrack.release();
         }
+        assertTrue(MediaFactory.isReleased());
     }
 
     @Test

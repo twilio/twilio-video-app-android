@@ -16,6 +16,7 @@ import org.junit.runners.Parameterized;
 import java.util.Arrays;
 import java.util.List;
 
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertEquals;
 
 @RunWith(Parameterized.class)
@@ -195,6 +196,7 @@ public class LocalVideoTrackVideoConstraintsParameterizedTest {
         if (localVideoTrack != null) {
             localVideoTrack.release();
         }
+        assertTrue(MediaFactory.isReleased());
     }
 
     @Test

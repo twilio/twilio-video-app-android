@@ -5,6 +5,7 @@ import android.support.test.filters.LargeTest;
 
 import com.twilio.video.base.BaseCameraCapturerTest;
 
+import org.junit.After;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -34,6 +35,12 @@ public class CameraCapturerSourceParameterizedTest extends BaseCameraCapturerTes
 
     public CameraCapturerSourceParameterizedTest(CameraCapturer.CameraSource cameraSource) {
         this.cameraSource = cameraSource;
+    }
+
+    @After
+    public void teardown() {
+        super.teardown();
+        assertTrue(MediaFactory.isReleased());
     }
 
     @Test

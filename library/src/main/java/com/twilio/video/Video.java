@@ -108,11 +108,14 @@ public abstract class Video {
                 applicationContext.getSystemService(Context.CONNECTIVITY_SERVICE);
             currentNetworkInfo = conn.getActiveNetworkInfo();
         }
-        Room room = new Room(connectOptions.getRoomName(),
-                roomListenerProxy(roomListener),
-                Util.createCallbackHandler());
+        Room room = new Room(
+                applicationContext,
+                connectOptions.getRoomName(),
+                Util.createCallbackHandler(),
+                roomListenerProxy(roomListener)
+        );
         rooms.add(room);
-        room.connect(applicationContext, connectOptions);
+        room.connect(connectOptions);
         return room;
     }
 

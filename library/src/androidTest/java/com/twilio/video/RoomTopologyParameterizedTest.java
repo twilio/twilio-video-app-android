@@ -78,12 +78,14 @@ public class RoomTopologyParameterizedTest extends BaseClientTest {
         if (localVideoTrack != null) {
             localVideoTrack.release();
         }
+        assertTrue(MediaFactory.isReleased());
     }
 
     @Test
     public void shouldReturnLocalParticipantOnConnected() throws InterruptedException {
         CallbackHelper.FakeRoomListener roomListener = new CallbackHelper.FakeRoomListener();
         roomListener.onConnectedLatch = new CountDownLatch(1);
+        roomListener.onDisconnectedLatch = new CountDownLatch(1);
         localAudioTrack = LocalAudioTrack.create(mediaTestActivity, true);
         localVideoTrack = LocalVideoTrack.create(mediaTestActivity, true, new FakeVideoCapturer());
 
@@ -104,6 +106,7 @@ public class RoomTopologyParameterizedTest extends BaseClientTest {
         assertNotNull(localParticipant.getSid());
         assertTrue(!localParticipant.getSid().isEmpty());
         room.disconnect();
+        assertTrue(roomListener.onDisconnectedLatch.await(20, TimeUnit.SECONDS));
     }
 
     @Test
@@ -123,6 +126,8 @@ public class RoomTopologyParameterizedTest extends BaseClientTest {
             room.disconnect();
             assertTrue(roomListener.onDisconnectedLatch.await(20, TimeUnit.SECONDS));
             assertEquals(RoomState.DISCONNECTED, room.getState());
+
+            Thread.sleep(1000);
         }
     }
 

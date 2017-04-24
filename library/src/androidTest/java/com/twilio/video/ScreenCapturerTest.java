@@ -48,6 +48,7 @@ public class ScreenCapturerTest {
         if (screenVideoTrack != null) {
             screenVideoTrack.release();
         }
+        assertTrue(MediaFactory.isReleased());
     }
 
     @Test(expected = NullPointerException.class)

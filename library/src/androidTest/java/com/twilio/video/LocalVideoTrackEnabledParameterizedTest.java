@@ -14,6 +14,7 @@ import java.util.Arrays;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertFalse;
+import static junit.framework.Assert.assertTrue;
 
 @RunWith(Parameterized.class)
 @LargeTest
@@ -40,6 +41,7 @@ public class LocalVideoTrackEnabledParameterizedTest extends BaseLocalVideoTrack
     @After
     public void teardown() {
         super.teardown();
+        assertTrue(MediaFactory.isReleased());
     }
 
     @Test

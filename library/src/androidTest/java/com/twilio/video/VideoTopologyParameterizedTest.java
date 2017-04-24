@@ -76,6 +76,7 @@ public class VideoTopologyParameterizedTest extends BaseClientTest {
         if (localVideoTrack != null) {
             localVideoTrack.release();
         }
+        assertTrue(MediaFactory.isReleased());
     }
 
     @Test(expected = NullPointerException.class)
@@ -110,12 +111,14 @@ public class VideoTopologyParameterizedTest extends BaseClientTest {
     @Test
     public void connect_shouldConnectToRoom() throws InterruptedException {
         roomListener.onConnectedLatch = new CountDownLatch(1);
+        roomListener.onDisconnectedLatch = new CountDownLatch(1);
         ConnectOptions connectOptions = new ConnectOptions.Builder(token)
             .build();
         Room room = Video.connect(mediaTestActivity, connectOptions, roomListener);
         assertTrue(roomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
         assertEquals(room.getSid(), room.getName());
         room.disconnect();
+        assertTrue(roomListener.onDisconnectedLatch.await(20, TimeUnit.SECONDS));
     }
 
     @Test(expected = NullPointerException.class)
@@ -129,6 +132,7 @@ public class VideoTopologyParameterizedTest extends BaseClientTest {
     public void connect_shouldAllowAudioTracks() throws InterruptedException {
         localAudioTrack = LocalAudioTrack.create(mediaTestActivity, true);
         roomListener.onConnectedLatch = new CountDownLatch(1);
+        roomListener.onDisconnectedLatch = new CountDownLatch(1);
 
         List<LocalAudioTrack> localAudioTrackList =
                 new ArrayList<LocalAudioTrack>(){{ add(localAudioTrack); }};
@@ -146,6 +150,7 @@ public class VideoTopologyParameterizedTest extends BaseClientTest {
         assertEquals(localAudioTrack, localParticipant.getAudioTracks().get(0));
         assertTrue(localParticipant.removeAudioTrack(localAudioTrack));
         room.disconnect();
+        assertTrue(roomListener.onDisconnectedLatch.await(20, TimeUnit.SECONDS));
     }
 
     @Test
@@ -153,6 +158,7 @@ public class VideoTopologyParameterizedTest extends BaseClientTest {
         FakeVideoCapturer fakeVideoCapturer = new FakeVideoCapturer();
         localVideoTrack = LocalVideoTrack.create(mediaTestActivity, true, fakeVideoCapturer);
         roomListener.onConnectedLatch = new CountDownLatch(1);
+        roomListener.onDisconnectedLatch = new CountDownLatch(1);
 
         List<LocalVideoTrack> localVideoTrackList =
                 new ArrayList<LocalVideoTrack>(){{ add(localVideoTrack); }};
@@ -168,6 +174,7 @@ public class VideoTopologyParameterizedTest extends BaseClientTest {
         assertEquals(localVideoTrack, localParticipant.getVideoTracks().get(0));
         assertTrue(localParticipant.removeVideoTrack(localVideoTrack));
         room.disconnect();
+        assertTrue(roomListener.onDisconnectedLatch.await(20, TimeUnit.SECONDS));
     }
 
     @Test
@@ -176,6 +183,7 @@ public class VideoTopologyParameterizedTest extends BaseClientTest {
         localAudioTrack = LocalAudioTrack.create(mediaTestActivity, true);
         localVideoTrack = LocalVideoTrack.create(mediaTestActivity, true, fakeVideoCapturer);
         roomListener.onConnectedLatch = new CountDownLatch(1);
+        roomListener.onDisconnectedLatch = new CountDownLatch(1);
 
         List<LocalAudioTrack> localAudioTrackList =
                 new ArrayList<LocalAudioTrack>(){{ add(localAudioTrack); }};
@@ -197,6 +205,7 @@ public class VideoTopologyParameterizedTest extends BaseClientTest {
         assertTrue(localParticipant.removeAudioTrack(localAudioTrack));
         assertTrue(localParticipant.removeVideoTrack(localVideoTrack));
         room.disconnect();
+        assertTrue(roomListener.onDisconnectedLatch.await(20, TimeUnit.SECONDS));
     }
 
     @Test

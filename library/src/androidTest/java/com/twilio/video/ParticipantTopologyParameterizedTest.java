@@ -11,6 +11,7 @@ import com.twilio.video.util.Constants;
 import com.twilio.video.util.RandUtils;
 import com.twilio.video.util.Topology;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -56,6 +57,12 @@ public class ParticipantTopologyParameterizedTest extends BaseParticipantTest {
         roomName = RandUtils.generateRandomString(20);
     }
 
+    @After
+    public void teardown() throws InterruptedException {
+        super.teardown();
+        assertTrue(MediaFactory.isReleased());
+    }
+
     @Test
     public void participantCanConnect() throws InterruptedException {
         CallbackHelper.FakeRoomListener roomListener = new CallbackHelper.FakeRoomListener();
@@ -73,6 +80,7 @@ public class ParticipantTopologyParameterizedTest extends BaseParticipantTest {
             .roomName(roomName)
             .build();
         CallbackHelper.FakeRoomListener roomListener2 = new CallbackHelper.FakeRoomListener();
+        roomListener2.onDisconnectedLatch = new CountDownLatch(1);
         Room room2 = Video.connect(context, connectOptions, roomListener2);
         assertTrue(roomListener.onParticipantConnectedLatch.await(20, TimeUnit.SECONDS));
         assertEquals(1, room.getParticipants().size());
@@ -81,6 +89,7 @@ public class ParticipantTopologyParameterizedTest extends BaseParticipantTest {
         assertTrue(roomListener.onDisconnectedLatch.await(20, TimeUnit.SECONDS));
         assertEquals(RoomState.DISCONNECTED, room.getState());
         room2.disconnect();
+        assertTrue(roomListener2.onDisconnectedLatch.await(20, TimeUnit.SECONDS));
     }
 
     @Test

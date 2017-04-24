@@ -20,6 +20,7 @@ public class Room {
     private static final Logger logger = Logger.getLogger(Room.class);
 
     private long nativeRoomContext;
+    private Context context;
     private String name;
     private String sid;
     private RoomState roomState;
@@ -33,8 +34,10 @@ public class Room {
     private final Handler handler;
     private Queue<Pair<Handler, StatsListener>> statsListenersQueue;
     private ConnectOptions cachedConnectOptions;
+    private MediaFactory mediaFactory;
 
-    Room(String name, Room.Listener listener, Handler handler) {
+    Room(Context context, String name, Handler handler, Listener listener) {
+        this.context = context;
         this.name = name;
         this.sid = "";
         this.roomState = RoomState.DISCONNECTED;
@@ -43,6 +46,7 @@ public class Room {
         this.internalRoomListenerHandle = new InternalRoomListenerHandle(internalRoomListenerImpl);
         this.handler = handler;
         this.statsListenersQueue = new ConcurrentLinkedQueue<>();
+        this.mediaFactory = MediaFactory.instance(context);
     }
 
     /**
@@ -120,7 +124,9 @@ public class Room {
      */
     public synchronized void disconnect() {
         if (roomState != RoomState.DISCONNECTED && nativeRoomContext != 0) {
-            localParticipant.release();
+            if (localParticipant != null) {
+                localParticipant.release();
+            }
             nativeDisconnect(nativeRoomContext);
         }
     }
@@ -151,21 +157,23 @@ public class Room {
      * sure that onConnect() callback won't get called before connect() exits and Room
      * creation is fully completed.
      */
-    void connect(Context context, ConnectOptions connectOptions) {
+    void connect(ConnectOptions connectOptions) {
         synchronized (internalRoomListenerImpl) {
             // Retain the connect options to provide the audio and video tracks upon connect
-            this.cachedConnectOptions = connectOptions;
-            this.nativeRoomContext = nativeConnect(
+            cachedConnectOptions = connectOptions;
+            nativeRoomContext = nativeConnect(
                 connectOptions,
                 MediaFactory.instance(context).getNativeMediaFactoryHandle(),
                 internalRoomListenerHandle.get());
-            this.roomState = RoomState.CONNECTING;
+            mediaFactory.addRef();
+            roomState = RoomState.CONNECTING;
         }
     }
 
     // Doesn't release native room observer
     synchronized void release() {
         if (nativeRoomContext != 0) {
+            mediaFactory.release();
             for (Participant participant : participantMap.values()) {
                 participant.release();
             }
@@ -226,6 +234,7 @@ public class Room {
                                              String localParticipantIdentity,
                                              List<Participant> participantList) {
             logger.d("onConnected()");
+
             Room.this.sid = roomSid;
             if (Room.this.name == null || Room.this.name.isEmpty()) {
                 Room.this.name = roomSid;
@@ -260,6 +269,8 @@ public class Room {
              */
             release();
 
+            // Ensure the local participant is released if the disconnect was initiated by the core
+            localParticipant.release();
             Room.this.roomState = RoomState.DISCONNECTED;
             handler.post(new Runnable() {
                 @Override
@@ -272,6 +283,7 @@ public class Room {
         @Override
         public synchronized void onConnectFailure(final TwilioException twilioException) {
             logger.d("onConnectFailure()");
+            release();
             Room.this.roomState = RoomState.DISCONNECTED;
             handler.post(new Runnable() {
                 @Override

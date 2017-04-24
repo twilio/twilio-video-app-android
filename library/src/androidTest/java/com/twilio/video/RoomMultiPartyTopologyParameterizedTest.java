@@ -75,6 +75,7 @@ public class RoomMultiPartyTopologyParameterizedTest extends BaseClientTest {
             roomPair.second.onDisconnectedLatch.await(10, TimeUnit.SECONDS);
         }
         rooms.clear();
+        assertTrue(MediaFactory.isReleased());
     }
 
     @Test

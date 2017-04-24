@@ -84,6 +84,7 @@ public class IceTopologyParameterizedTest extends BaseClientTest {
         if (bobLocalVideoTrack != null) {
             bobLocalVideoTrack.release();
         }
+        assertTrue(MediaFactory.isReleased());
     }
 
     @Ignore
@@ -142,6 +143,7 @@ public class IceTopologyParameterizedTest extends BaseClientTest {
         assertTrue(roomListener.onDisconnectedLatch.await(20, TimeUnit.SECONDS));
     }
 
+    @Ignore
     @Test
     public void shouldConnectWithValidTurnServers() throws InterruptedException {
         CallbackHelper.FakeRoomListener aliceListener = new CallbackHelper.FakeRoomListener();
