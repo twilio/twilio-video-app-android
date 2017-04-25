@@ -13,7 +13,7 @@ import java.util.List;
  * A local video track that gets video frames from a specified {@link VideoCapturer}.
  */
 public class LocalVideoTrack extends VideoTrack {
-    private static final Logger logger = Logger.getLogger(LocalAudioTrack.class);
+    private static final Logger logger = Logger.getLogger(LocalVideoTrack.class);
     private static final double ASPECT_RATIO_TOLERANCE = 0.05;
     private static final String CAPTURER_MUST_HAVE_ONE_SUPPORTED_FORMAT = "A VideoCapturer " +
             "must provide at least one supported VideoFormat";
