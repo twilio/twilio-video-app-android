@@ -6,7 +6,7 @@ Improvements
 
 - Replaced `LocalMedia` class with Track factories for `LocalVideoTrack` and `LocalAudioTrack`
 
-Working with `LocalVideoTrack` and `LocalAudioTrack` before 1.0.0-beta18
+Working with `LocalVideoTrack` and `LocalAudioTrack` before 1.0.0-beta17
 
     // Create LocalMedia
     LocalMedia localMedia = LocalMedia.create(context);
@@ -32,7 +32,7 @@ Working with `LocalVideoTrack` and `LocalAudioTrack` now
 
 - The `ConnectOptions.Builder` now takes a `List<LocalAudioTrack>` and `List<LocalVideoTrack>` instead of `LocalMedia`
 
-Providing `LocalVideoTrack` and `LocalAudioTrack` before 1.0.0-beta18
+Providing `LocalVideoTrack` and `LocalAudioTrack` before 1.0.0-beta17
 
     LocalMedia localMedia = LocalMedia.create(context);
     LocalVideoTrack localVideoTrack = localMedia.addVideoTrack(true, videoCapturer);
@@ -69,6 +69,7 @@ can extract YUV data from frame represented as texture.
 Bug Fixes
 
 - On Nexus 9 device, intermittent high decoding times results in delayed video. [#95](https://github.com/twilio/video-quickstart-android/issues/95)
+- Unsatisfied link errors for `org.webrtc.voiceengine.WebRtcAudioManager` and `org.webrtc.voiceengine.WebRtcAudioTrack` construction. [#102](https://github.com/twilio/video-quickstart-android/issues/102)
 
 Known issues
 
@@ -99,6 +100,7 @@ Known issues
 - Participant disconnect event can take up to 120 seconds to occur [#80](https://github.com/twilio/video-quickstart-android/issues/80) [#73](https://github.com/twilio/video-quickstart-android/issues/73)
 - Missing media when adding audio/video tracks quickly while connected to room [#90](https://github.com/twilio/video-quickstart-android/issues/90)
 - On Nexus 9 device, intermittent high decoding times results in delayed video. [#95](https://github.com/twilio/video-quickstart-android/issues/95)
+- Unsatisfied link errors for `org.webrtc.voiceengine.WebRtcAudioManager` and `org.webrtc.voiceengine.WebRtcAudioTrack` construction. [#102](https://github.com/twilio/video-quickstart-android/issues/102)
 
 ####1.0.0-beta15
 

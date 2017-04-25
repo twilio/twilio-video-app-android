@@ -6,6 +6,7 @@
 #include "webrtc/modules/audio_device/android/audio_manager.h"
 #include "webrtc/modules/audio_device/android/opensles_player.h"
 #include "webrtc/sdk/android/src/jni/classreferenceholder.h"
+#include "webrtc/base/ssladapter.h"
 
 #include "video/logger.h"
 #include "video/video.h"
@@ -28,6 +29,7 @@ extern "C" jint JNIEXPORT JNICALL JNI_OnLoad(JavaVM *jvm, void *reserved) {
                            "InitGlobalJniVariables() failed");
         return -1;
     }
+    RTC_CHECK(rtc::InitializeSSL()) << "Failed to InitializeSSL()";
     webrtc_jni::LoadGlobalClassReferenceHolder();
     twilio_video_jni::LoadGlobalClassReferenceHolder();
 
@@ -41,6 +43,7 @@ extern "C" void JNIEXPORT JNICALL JNI_OnUnLoad(JavaVM *jvm, void *reserved) {
                        "%s", func_name.c_str());
     twilio_video_jni::FreeGlobalClassReferenceHolder();
     webrtc_jni::FreeGlobalClassReferenceHolder();
+    RTC_CHECK(rtc::CleanupSSL()) << "Failed to CleanupSSL()";
 }
 
 JNIEXPORT void JNICALL Java_com_twilio_video_Video_nativeSetCoreLogLevel
