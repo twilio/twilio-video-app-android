@@ -772,14 +772,16 @@ public class RoomActivity extends BaseActivity {
     }
 
     private void stopScreenCapture() {
-        if (localParticipant != null) {
-            localParticipant.removeVideoTrack(screenVideoTrack);
+        if (screenVideoTrack != null) {
+            if (localParticipant != null) {
+                localParticipant.removeVideoTrack(screenVideoTrack);
+            }
+            screenVideoTrack.release();
+            localVideoTrackNames.remove(screenVideoTrack.getTrackId());
+            screenVideoTrack = null;
+            screenCaptureMenuItem.setIcon(R.drawable.ic_screen_share_white_24dp);
+            screenCaptureMenuItem.setTitle(R.string.share_screen);
         }
-        screenVideoTrack.release();
-        localVideoTrackNames.remove(screenVideoTrack.getTrackId());
-        screenVideoTrack = null;
-        screenCaptureMenuItem.setIcon(R.drawable.ic_screen_share_white_24dp);
-        screenCaptureMenuItem.setTitle(R.string.share_screen);
     }
 
     private void toggleLocalAudioTrackState() {

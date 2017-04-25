@@ -65,6 +65,7 @@ This allows you to create tracks while connected to a `Room` without immediately
 - Added `textureId` and `samplingMatrix` fields to `I420Frame` so implementations of `VideoRenderer`
 can extract YUV data from frame represented as texture.
 - Exposed `org.webrtc.YuvConverter` to facilitate converting a texture to an in memory YUV buffer.
+- Invoke `ScreenCapturer.Listener` callbacks on the thread `ScreenCapturer` is created on.
 
 Bug Fixes
 

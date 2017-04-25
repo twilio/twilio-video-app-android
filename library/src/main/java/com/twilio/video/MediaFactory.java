@@ -3,6 +3,7 @@ package com.twilio.video;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.VisibleForTesting;
 
 import com.getkeepsafe.relinker.ReLinker;
 
@@ -58,6 +59,7 @@ class MediaFactory {
         return instance;
     }
 
+    @VisibleForTesting(otherwise = VisibleForTesting.NONE)
     static boolean isReleased() {
         synchronized (MediaFactory.class) {
             return instance == null;

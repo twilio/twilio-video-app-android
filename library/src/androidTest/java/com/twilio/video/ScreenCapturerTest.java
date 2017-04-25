@@ -1,7 +1,9 @@
 package com.twilio.video;
 
 import android.annotation.TargetApi;
+import android.content.Intent;
 import android.os.Build;
+import android.support.test.InstrumentationRegistry;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
 
@@ -21,6 +23,7 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import com.twilio.video.test.R;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assume.assumeTrue;
 
@@ -49,14 +52,6 @@ public class ScreenCapturerTest {
             screenVideoTrack.release();
         }
         assertTrue(MediaFactory.isReleased());
-    }
-
-    @Test(expected = NullPointerException.class)
-    public void constructorShouldFailWithNullContext() {
-        screenCapturer = new ScreenCapturer(null,
-                screenCapturerActivity.getScreenCaptureResultCode(),
-                screenCapturerActivity.getScreenCaptureIntent(),
-                null);
     }
 
     @Test
@@ -98,12 +93,62 @@ public class ScreenCapturerTest {
         // Create screen capturer with bogus result code
         screenCapturer = new ScreenCapturer(screenCapturerActivity,
                 Integer.MIN_VALUE,
-                null,
+                new Intent(),
                 screenCapturerListener);
         screenVideoTrack = LocalVideoTrack.create(screenCapturerActivity, true, screenCapturer);
 
         // We should be notified of an error because MediaProjection could not be accessed
         assertTrue(screenCaptureError.await(SCREEN_CAPTURER_DELAY_MS, TimeUnit.MILLISECONDS));
+    }
+
+    @Test
+    @Ignore
+    public void shouldInvokeScreenCapturerListenerCallbacksOnCreationThread()
+            throws InterruptedException {
+        final CountDownLatch screenCaptureError = new CountDownLatch(1);
+        final CountDownLatch firstFrameAvailable = new CountDownLatch(1);
+        /*
+         * Run on UI thread to avoid thread hopping between the test runner thread and the UI
+         * thread.
+         */
+        InstrumentationRegistry.getInstrumentation().runOnMainSync(new Runnable() {
+            @Override
+            public void run() {
+                final long callingThreadId = Thread.currentThread().getId();
+                ScreenCapturer.Listener screenCapturerListener = new ScreenCapturer.Listener() {
+                    @Override
+                    public void onScreenCaptureError(String errorDescription) {
+                        assertEquals(callingThreadId, Thread.currentThread().getId());
+                        screenCaptureError.countDown();
+                    }
+
+                    @Override
+                    public void onFirstFrameAvailable() {
+                        assertEquals(callingThreadId, Thread.currentThread().getId());
+                        firstFrameAvailable.countDown();
+                    }
+                };
+
+                // Validate error callback is invoked on correct thread
+                screenCapturer = new ScreenCapturer(screenCapturerActivity,
+                        Integer.MIN_VALUE,
+                        new Intent(),
+                        screenCapturerListener);
+                screenVideoTrack = LocalVideoTrack.create(screenCapturerActivity,
+                        true, screenCapturer);
+
+                // Validate first frame event is invoked on correct thread
+                screenCapturer = new ScreenCapturer(screenCapturerActivity,
+                        screenCapturerActivity.getScreenCaptureResultCode(),
+                        screenCapturerActivity.getScreenCaptureIntent(),
+                        screenCapturerListener);
+                screenVideoTrack = LocalVideoTrack.create(screenCapturerActivity,
+                        true, screenCapturer);
+            }
+        });
+
+        assertTrue(screenCaptureError.await(SCREEN_CAPTURER_DELAY_MS, TimeUnit.MILLISECONDS));
+        assertTrue(firstFrameAvailable.await(SCREEN_CAPTURER_DELAY_MS, TimeUnit.MILLISECONDS));
     }
 
     @Test

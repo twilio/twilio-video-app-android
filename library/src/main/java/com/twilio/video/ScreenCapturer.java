@@ -13,6 +13,8 @@ import android.media.projection.MediaProjectionManager;
 import android.os.Build;
 import android.os.Handler;
 import android.os.SystemClock;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.util.DisplayMetrics;
 import android.view.WindowManager;
 
@@ -47,6 +49,7 @@ public class ScreenCapturer implements VideoCapturer {
     private final int screenCaptureIntentResult;
     private final Intent screenCaptureIntentData;
     private final Listener screenCapturerListener;
+    private final Handler listenerHandler;
 
     private VideoCapturer.Listener capturerListener;
     private MediaProjection mediaProjection;
@@ -87,10 +90,15 @@ public class ScreenCapturer implements VideoCapturer {
                     try {
                         image = reader.acquireLatestImage();
                     } catch (Exception e) {
-                        String screenFrameFailure = "Failed to acquire screen frame";
+                        final String screenFrameFailure = "Failed to acquire screen frame";
                         logger.e(screenFrameFailure);
                         if (screenCapturerListener != null) {
-                            screenCapturerListener.onScreenCaptureError(screenFrameFailure);
+                            listenerHandler.post(new Runnable() {
+                                @Override
+                                public void run() {
+                                    screenCapturerListener.onScreenCaptureError(screenFrameFailure);
+                                }
+                            });
                         }
                         return;
                     }
@@ -101,7 +109,12 @@ public class ScreenCapturer implements VideoCapturer {
 
                         if (!firstFrameReported) {
                             if (screenCapturerListener != null) {
-                                screenCapturerListener.onFirstFrameAvailable();
+                                listenerHandler.post(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        screenCapturerListener.onFirstFrameAvailable();
+                                    }
+                                });
                             }
                             firstFrameReported = true;
                         }
@@ -124,10 +137,15 @@ public class ScreenCapturer implements VideoCapturer {
                                     dimensions, VideoFrame.RotationAngle.ROTATION_0, captureTimeNs);
                             capturerListener.onFrameCaptured(videoFrame);
                             image.close();
-                        } catch (Exception e) {
+                        } catch (final Exception e) {
                             logger.e(e.getMessage());
                             if (screenCapturerListener != null) {
-                                screenCapturerListener.onScreenCaptureError(e.getMessage());
+                                listenerHandler.post(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        screenCapturerListener.onScreenCaptureError(e.getMessage());
+                                    }
+                                });
                             }
                         }
                     }
@@ -139,20 +157,20 @@ public class ScreenCapturer implements VideoCapturer {
         void onFirstFrameAvailable();
     }
 
-    public ScreenCapturer(Context context,
+    public ScreenCapturer(@NonNull Context context,
                           int screenCaptureIntentResult,
-                          Intent screenCaptureIntentData,
-                          Listener screenCapturerListener) {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
-            throw new RuntimeException("Screen capturing unavailable for " + Build.VERSION.SDK_INT);
-        }
-        if (context == null) {
-            throw new NullPointerException("context must not be null");
-        }
+                          @NonNull Intent screenCaptureIntentData,
+                          @Nullable Listener screenCapturerListener) {
+        Preconditions.checkState(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP,
+                "Screen capturing unavailable for " + Build.VERSION.SDK_INT);
+        Preconditions.checkNotNull(context, "context must not be null");
+        Preconditions.checkNotNull(screenCaptureIntentData, "intent must not be null");
+
         this.context = context;
         this.screenCaptureIntentResult = screenCaptureIntentResult;
         this.screenCaptureIntentData = screenCaptureIntentData;
         this.screenCapturerListener = screenCapturerListener;
+        this.listenerHandler = Util.createCallbackHandler();
     }
 
     /**
@@ -211,7 +229,13 @@ public class ScreenCapturer implements VideoCapturer {
         // Notify user that media projection could not be accessed
         if (mediaProjection == null) {
             if (screenCapturerListener != null) {
-                screenCapturerListener.onScreenCaptureError("Unable to access media projection");
+                handler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        screenCapturerListener
+                                .onScreenCaptureError("Unable to access media projection");
+                    }
+                });
             }
             capturerListener.onCapturerStarted(false);
             return;
