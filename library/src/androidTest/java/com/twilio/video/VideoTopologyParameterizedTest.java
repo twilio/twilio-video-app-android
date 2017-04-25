@@ -121,6 +121,16 @@ public class VideoTopologyParameterizedTest extends BaseClientTest {
         assertTrue(roomListener.onDisconnectedLatch.await(20, TimeUnit.SECONDS));
     }
 
+    @Test
+    public void disconnect_canDisconnectBeforeConnectingFromRoom() throws InterruptedException {
+        roomListener.onDisconnectedLatch = new CountDownLatch(1);
+        ConnectOptions connectOptions = new ConnectOptions.Builder(token)
+                .build();
+        Room room = Video.connect(mediaTestActivity, connectOptions, roomListener);
+        room.disconnect();
+        assertTrue(roomListener.onDisconnectedLatch.await(20, TimeUnit.SECONDS));
+    }
+
     @Test(expected = NullPointerException.class)
     public void connect_shouldThrowExceptionWhenRoomListenerIsNull() {
         ConnectOptions connectOptions = new ConnectOptions.Builder(token)

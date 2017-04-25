@@ -269,8 +269,10 @@ public class Room {
              */
             release();
 
-            // Ensure the local participant is released if the disconnect was initiated by the core
-            localParticipant.release();
+            if (localParticipant != null) {
+                // Ensure the local participant is released if the disconnect was issued by the core
+                localParticipant.release();
+            }
             Room.this.roomState = RoomState.DISCONNECTED;
             handler.post(new Runnable() {
                 @Override
