@@ -12,7 +12,6 @@ public class ConnectOptions {
     private final List<LocalAudioTrack> audioTracks;
     private final List<LocalVideoTrack> videoTracks;
     private final IceOptions iceOptions;
-    private final boolean enableInsights;
 
     private ConnectOptions(Builder builder) {
         this.accessToken = builder.accessToken;
@@ -20,7 +19,6 @@ public class ConnectOptions {
         this.audioTracks = builder.audioTracks;
         this.videoTracks = builder.videoTracks;
         this.iceOptions = builder.iceOptions;
-        this.enableInsights = builder.enableInsights;
     }
 
     String getAccessToken() {
@@ -41,10 +39,6 @@ public class ConnectOptions {
 
     IceOptions getIceOptions() {
         return iceOptions;
-    }
-
-    boolean isInsightsEnabled() {
-        return enableInsights;
     }
 
     private LocalAudioTrack[] getLocalAudioTracksArray() {
@@ -71,7 +65,7 @@ public class ConnectOptions {
                 getLocalAudioTracksArray(),
                 getLocalVideoTracksArray(),
                 iceOptions,
-                enableInsights,
+                false,
                 PlatformInfo.getNativeHandle(),
                 mediaFactoryNativeHandle);
     }
@@ -95,7 +89,6 @@ public class ConnectOptions {
         private IceOptions iceOptions;
         private List<LocalAudioTrack> audioTracks;
         private List<LocalVideoTrack> videoTracks;
-        private boolean enableInsights;
 
         public Builder(String accessToken) {
             this.accessToken = accessToken;
@@ -132,14 +125,6 @@ public class ConnectOptions {
          */
         public Builder iceOptions(IceOptions iceOptions) {
             this.iceOptions = iceOptions;
-            return this;
-        }
-
-        /**
-         * Enable sending stats data to Insights
-         */
-        public Builder enableInsights(boolean enable) {
-            this.enableInsights = enable;
             return this;
         }
 

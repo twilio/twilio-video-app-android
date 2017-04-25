@@ -15,11 +15,14 @@ public class ConnectOptionsUnitTest {
         new ConnectOptions.Builder("").build();
     }
 
-    @Test
-    public void shouldEnableInsights() {
-        ConnectOptions connectOptions = new ConnectOptions.Builder("test")
-                .enableInsights(true)
-                .build();
-        assertTrue(connectOptions.isInsightsEnabled());
-    }
+    /*
+     * TODO: GSDK-1141 Disabled insights for GA. Uncomment once they are enabled again.
+     */
+//    @Test
+//    public void shouldEnableInsights() {
+//        ConnectOptions connectOptions = new ConnectOptions.Builder("test")
+//                .enableInsights(true)
+//                .build();
+//        assertTrue(connectOptions.isInsightsEnabled());
+//    }
 }

@@ -100,7 +100,7 @@ public abstract class Video {
                 trySetCoreModuleLogLevel(module.ordinal(), moduleLogLevel.get(module).ordinal());
             }
         }
-
+        
         if(rooms.isEmpty()) {
             // Register for connectivity events
             registerConnectivityBroadcastReceiver();

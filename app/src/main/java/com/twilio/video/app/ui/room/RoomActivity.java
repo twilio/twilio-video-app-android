@@ -833,22 +833,11 @@ public class RoomActivity extends BaseActivity {
         return Single.fromCallable(new Callable<Room>() {
             @Override
             public Room call() throws Exception {
-                boolean enableInsights = true;
                 String env = sharedPreferences.getString(Preferences.ENVIRONMENT,
                     Preferences.ENVIRONMENT_DEFAULT);
 
-                /*
-                 * TODO: GSDK-1116 Insights are enabled only for dev and stage for now.
-                 * Once core adds support for prod, insights will be enabled by default and
-                 * this code can then be removed.
-                 */
-                if (env.equals("prod")) {
-                    enableInsights = false;
-                }
-
                 ConnectOptions.Builder connectOptionsBuilder = new ConnectOptions.Builder(token)
-                        .roomName(roomName)
-                        .enableInsights(enableInsights);
+                        .roomName(roomName);
 
                 if (localAudioTrack != null) {
                     connectOptionsBuilder
