@@ -298,6 +298,7 @@ JNIEXPORT jobject JNICALL Java_com_twilio_video_MediaFactory_nativeCreateVideoTr
     return video_track == nullptr ?
            (nullptr) :
            (createJavaLocalVideoTrack(video_track,
+                                      enabled,
                                       j_video_capturer,
                                       j_video_contraints,
                                       j_media_factory));

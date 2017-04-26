@@ -65,7 +65,7 @@ AndroidParticipantObserver::AndroidParticipantObserver(JNIEnv *env,
                 webrtc_jni::GetMethodID(env,
                                         *j_video_track_class_,
                                         "<init>",
-                                        "(Lorg/webrtc/VideoTrack;)V")) {
+                                        "(Lorg/webrtc/VideoTrack;Z)V")) {
     TS_CORE_LOG_MODULE(twilio::video::kTSCoreLogModulePlatform,
                        twilio::video::kTSCoreLogLevelDebug,
                        "AndroidMediaObserver");

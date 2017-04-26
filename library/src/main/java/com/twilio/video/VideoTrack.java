@@ -23,10 +23,10 @@ public class VideoTrack implements Track {
      * This class is a wrapper for org.webrtc.VideoTrack. In order to remove the dependency
      * on this class we would need to re-implement some JNI renderer boilerplate
      */
-    VideoTrack(org.webrtc.VideoTrack webRtcVideoTrack) {
+    VideoTrack(org.webrtc.VideoTrack webRtcVideoTrack, boolean enabled) {
         this.webrtcVideoTrack = webRtcVideoTrack;
         this.trackId = webRtcVideoTrack.id();
-        this.isEnabled = webRtcVideoTrack.enabled();
+        this.isEnabled = enabled;
     }
 
     /**

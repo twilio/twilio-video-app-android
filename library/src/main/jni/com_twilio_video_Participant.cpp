@@ -136,6 +136,7 @@ jobject createJavaVideoTrack(JNIEnv *env,
                                                                      j_webrtc_video_track_class,
                                                                      "<init>",
                                                                      "(J)V");
+    jboolean j_is_enabled = video_track->isEnabled();
     jobject j_webrtc_video_track = env->NewObject(j_webrtc_video_track_class,
                                                   j_webrtc_video_track_ctor_id,
                                                   webrtc_jni::jlongFromPointer(
@@ -143,7 +144,8 @@ jobject createJavaVideoTrack(JNIEnv *env,
 
     return env->NewObject(j_video_track_class,
                           j_video_track_ctor_id,
-                          j_webrtc_video_track);
+                          j_webrtc_video_track,
+                          j_is_enabled);
 }
 
 JNIEXPORT void JNICALL

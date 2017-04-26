@@ -31,6 +31,7 @@ private:
 std::shared_ptr<twilio::media::LocalVideoTrack> getLocalVideoTrack(jlong);
 
 jobject createJavaLocalVideoTrack(std::shared_ptr<twilio::media::LocalVideoTrack> local_video_track,
+                                  jboolean j_enabled,
                                   jobject j_video_capturer,
                                   jobject j_video_constraints,
                                   jobject j_media_factory);

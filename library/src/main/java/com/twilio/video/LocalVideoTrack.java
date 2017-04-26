@@ -146,11 +146,12 @@ public class LocalVideoTrack extends VideoTrack {
     }
 
     LocalVideoTrack(long nativeLocalVideoTrackHandle,
+                    boolean enabled,
                     VideoCapturer videoCapturer,
                     VideoConstraints videoConstraints,
                     org.webrtc.VideoTrack webrtcVideoTrack,
                     MediaFactory mediaFactory) {
-        super(webrtcVideoTrack);
+        super(webrtcVideoTrack, enabled);
         this.nativeLocalVideoTrackHandle = nativeLocalVideoTrackHandle;
         this.videoCapturer = videoCapturer;
         this.videoConstraints = videoConstraints;

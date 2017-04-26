@@ -91,7 +91,7 @@ public:
                     webrtc_jni::GetMethodID(env,
                                             *j_video_track_class_,
                                             "<init>",
-                                            "(Lorg/webrtc/VideoTrack;)V")),
+                                            "(Lorg/webrtc/VideoTrack;Z)V")),
             j_twilio_exception_ctor_id_(
                     webrtc_jni::GetMethodID(env,
                                             *j_twilio_exception_class_,

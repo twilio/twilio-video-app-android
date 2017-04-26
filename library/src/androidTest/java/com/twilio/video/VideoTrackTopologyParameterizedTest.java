@@ -9,7 +9,6 @@ import com.twilio.video.util.Topology;
 
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -108,5 +107,23 @@ public class VideoTrackTopologyParameterizedTest extends BaseParticipantTest {
 
         videoTrack.addRenderer(frameCountRenderer);
         assertFalse(frameCountRenderer.waitForFrame(VIDEO_TRACK_TEST_DELAY_MS));
+    }
+
+    @Test
+    public void shouldEnableVideoTrackAfterConnectedToRoom() throws InterruptedException {
+        CallbackHelper.FakeParticipantListener participantListener =
+            new CallbackHelper.FakeParticipantListener();
+        participantListener.onVideoTrackAddedLatch = new CountDownLatch(1);
+        participantListener.onVideoTrackEnabledLatch = new CountDownLatch(1);
+        participant.setListener(participantListener);
+        actor2LocalVideoTrack = LocalVideoTrack.create(mediaTestActivity, false, fakeVideoCapturer);
+
+        assertTrue(actor2LocalParticipant.addVideoTrack(actor2LocalVideoTrack));
+        assertTrue(participantListener.onVideoTrackAddedLatch.await(20, TimeUnit.SECONDS));
+        assertFalse(actor1Room.getParticipants().get(0).getVideoTracks().get(0).isEnabled());
+
+        actor2LocalVideoTrack.enable(true);
+        assertTrue(participantListener.onVideoTrackEnabledLatch.await(20, TimeUnit.SECONDS));
+        assertTrue(actor1Room.getParticipants().get(0).getVideoTracks().get(0).isEnabled());
     }
 }
