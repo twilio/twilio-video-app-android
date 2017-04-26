@@ -14,6 +14,7 @@ import com.twilio.video.util.BitmapVideoRenderer;
 
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -64,6 +65,7 @@ public class VideoRendererTest {
     }
 
     @Test
+    @Ignore("Ignore until we understand issues GSDK-1132 GSDK-1139")
     public void canRenderCameraCapturerFrameToBitmap() throws InterruptedException {
         BitmapVideoRenderer bitmapVideoRenderer = new BitmapVideoRenderer();
         final CountDownLatch bitmapCaptured = new CountDownLatch(1);

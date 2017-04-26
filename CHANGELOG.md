@@ -61,7 +61,7 @@ Providing `LocalVideoTrack` and `LocalAudioTrack` now
 - Removed `Media` from `Participant` and migrated `Media.Listener` to `Participant.Listener`.
 `AudioTrack` and `VideoTrack` events are raised with the corresponding `Participant` instance.
 This allows you to create tracks while connected to a `Room` without immediately adding them to the connected `Room`
-- Improved hardware accelerated encoding and decoding through the use of surface textures.
+- Improved hardware accelerated decoding through the use of surface textures.
 - Added `textureId` and `samplingMatrix` fields to `I420Frame` so implementations of `VideoRenderer`
 can extract YUV data from frame represented as texture.
 - Exposed `org.webrtc.YuvConverter` to facilitate converting a texture to an in memory YUV buffer.

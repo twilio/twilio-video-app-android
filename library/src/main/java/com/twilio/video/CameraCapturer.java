@@ -517,7 +517,10 @@ public class CameraCapturer implements VideoCapturer {
             }
             return false;
         }
-        webRtcCameraCapturer = new Camera1Capturer(deviceName, cameraEventsHandler, true);
+        /*
+         * Disable capturing and encoding to texture until we understand issues GSDK-1132 GSDK-1139
+         */
+        webRtcCameraCapturer = new Camera1Capturer(deviceName, cameraEventsHandler, false);
 
         return true;
     }
@@ -602,11 +605,20 @@ public class CameraCapturer implements VideoCapturer {
                 logger.i("Applying camera parameters");
                 cameraParameterUpdater.apply(cameraParameters);
 
-                // Stop preview
+                // Stop preview and clear internal camera buffer to avoid camera freezes
                 camera1Session.camera.stopPreview();
+                camera1Session.camera.setPreviewCallbackWithBuffer(null);
 
                 // Apply the parameters
                 camera1Session.camera.setParameters(cameraParameters);
+
+                // Reinitialize the preview callback and buffer.
+                final int frameSize = camera1Session.captureFormat.frameSize();
+                for (int i = 0; i < Camera1Session.NUMBER_OF_CAPTURE_BUFFERS; i++) {
+                    final ByteBuffer buffer = ByteBuffer.allocateDirect(frameSize);
+                    camera1Session.camera.addCallbackBuffer(buffer.array());
+                }
+                camera1Session.listenForBytebufferFrames();
 
                 // Resume preview
                 camera1Session.camera.startPreview();
