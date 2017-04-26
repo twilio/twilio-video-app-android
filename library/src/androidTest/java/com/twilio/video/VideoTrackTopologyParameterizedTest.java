@@ -21,6 +21,7 @@ import java.util.concurrent.TimeUnit;
 import static junit.framework.TestCase.assertFalse;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assume.assumeFalse;
 
 @RunWith(Parameterized.class)
 @LargeTest
@@ -68,6 +69,11 @@ public class VideoTrackTopologyParameterizedTest extends BaseParticipantTest {
 
     @Test
     public void canAddAndRemoveRenderer() throws InterruptedException {
+        /*
+         * TODO: GSDK-1152 skipping test for SFU only because it is flaky.
+         * Should be investigated after GA.
+         */
+        assumeFalse(topology == Topology.SFU);
         CallbackHelper.FakeParticipantListener participantListener =
                 new CallbackHelper.FakeParticipantListener();
         participantListener.onVideoTrackAddedLatch = new CountDownLatch(1);

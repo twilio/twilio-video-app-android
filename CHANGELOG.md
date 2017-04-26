@@ -73,6 +73,7 @@ Bug Fixes
 
 - On Nexus 9 device, intermittent high decoding times results in delayed video. [#95](https://github.com/twilio/video-quickstart-android/issues/95)
 - Unsatisfied link errors for `org.webrtc.voiceengine.WebRtcAudioManager` and `org.webrtc.voiceengine.WebRtcAudioTrack` construction. [#102](https://github.com/twilio/video-quickstart-android/issues/102)
+- VideoTrack isEnabled() returning wrong state [#104](https://github.com/twilio/video-quickstart-android/issues/104)
 
 Known issues
 
@@ -104,6 +105,7 @@ Known issues
 - Missing media when adding audio/video tracks quickly while connected to room [#90](https://github.com/twilio/video-quickstart-android/issues/90)
 - On Nexus 9 device, intermittent high decoding times results in delayed video. [#95](https://github.com/twilio/video-quickstart-android/issues/95)
 - Unsatisfied link errors for `org.webrtc.voiceengine.WebRtcAudioManager` and `org.webrtc.voiceengine.WebRtcAudioTrack` construction. [#102](https://github.com/twilio/video-quickstart-android/issues/102)
+- VideoTrack isEnabled() returning wrong state [#104](https://github.com/twilio/video-quickstart-android/issues/104)
 
 ####1.0.0-beta15
 
