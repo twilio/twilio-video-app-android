@@ -429,6 +429,9 @@ public class RoomActivity extends BaseActivity {
         int icon = 0;
         if (localAudioTrack == null) {
             localAudioTrack = LocalAudioTrack.create(this, true);
+            if (localParticipant != null) {
+                localParticipant.addAudioTrack(localAudioTrack);
+            }
             icon = R.drawable.ic_mic_white_24px;
             pauseAudioMenuItem.setVisible(true);
             pauseAudioMenuItem.setTitle(localAudioTrack.isEnabled() ?
