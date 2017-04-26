@@ -66,6 +66,7 @@ This allows you to create tracks while connected to a `Room` without immediately
 can extract YUV data from frame represented as texture.
 - Exposed `org.webrtc.YuvConverter` to facilitate converting a texture to an in memory YUV buffer.
 - Invoke `ScreenCapturer.Listener` callbacks on the thread `ScreenCapturer` is created on.
+- Fixed an issue where the ConnectivityReceiver was causing a reconnect when connecting to a `Room` for the first time occasionally leading to a 53001 error `onConnectFailure` response.
 
 Bug Fixes
 
