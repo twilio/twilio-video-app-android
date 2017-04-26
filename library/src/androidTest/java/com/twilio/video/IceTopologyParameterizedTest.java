@@ -186,8 +186,7 @@ public class IceTopologyParameterizedTest extends BaseClientTest {
         Room bobRoom = Video.connect(mediaTestActivity, connectOptions, bobListener);
         assertTrue(bobListener.onConnectedLatch.await(10, TimeUnit.SECONDS));
         assertTrue(aliceListener.onParticipantConnectedLatch.await(10, TimeUnit.SECONDS));
-        aliceRoom.getParticipants().entrySet().iterator().next()
-            .getValue().setListener(participantListener);
+        aliceRoom.getParticipants().get(0).setListener(participantListener);
         assertTrue(participantListener.onAudioTrackAddedLatch.await(10, TimeUnit.SECONDS));
         assertTrue(participantListener.onVideoTrackAddedLatch.await(10, TimeUnit.SECONDS));
 

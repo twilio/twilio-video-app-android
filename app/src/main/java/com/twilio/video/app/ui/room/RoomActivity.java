@@ -1075,7 +1075,7 @@ public class RoomActivity extends BaseActivity {
                     localParticipantSid, cameraVideoTrack).callOnClick();
 
                 // add existing room participants thumbs
-                for (Participant participant : room.getParticipants().values()) {
+                for (Participant participant : room.getParticipants()) {
                     addParticipant(participant);
                 }
             }

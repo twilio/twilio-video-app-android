@@ -209,7 +209,7 @@ public class StatsTopologyParameterizedTest extends BaseClientTest {
         participantListener.onAudioTrackAddedLatch = new CountDownLatch(1);
         participantListener.onVideoTrackAddedLatch = new CountDownLatch(1);
         participantListener.onVideoTrackRemovedLatch = new CountDownLatch(1);
-        Participant bob = aliceRoom.getParticipants().entrySet().iterator().next().getValue();
+        Participant bob = aliceRoom.getParticipants().get(0);
         bob.setListener(participantListener);
 
         LocalParticipant bobLocalParticipant = bobRoom.getLocalParticipant();

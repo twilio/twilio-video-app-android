@@ -114,9 +114,8 @@ public class RoomMultiPartyTopologyParameterizedTest extends BaseClientTest {
             String localIdentity = room.getLocalParticipant().getIdentity();
             String localSid = room.getLocalParticipant().getSid();
 
-            Map<String, Participant> participantMap = room.getParticipants();
-            assertFalse(participantMap.containsKey(localIdentity));
-            for (Participant participant : participantMap.values()) {
+            List<Participant> participants = room.getParticipants();
+            for (Participant participant : participants) {
                 assertNotEquals(localSid, participant.getSid());
             }
             rooms.add(new Pair<>(room, roomListener));

@@ -114,7 +114,7 @@ public class StatsListAdapter extends RecyclerView.Adapter<StatsListAdapter.View
     }
 
     public void updateStatsData(List<StatsReport> statsReports,
-                                Map<String, Participant> participantMap,
+                                List<Participant> participants,
                                 Map<String, String> localVideoTrackNames){
         statsListItems.clear();
         // Generate stats items list from reports
@@ -158,7 +158,7 @@ public class StatsListAdapter extends RecyclerView.Adapter<StatsListAdapter.View
             int trackCount = 0;
             for (AudioTrackStats audioTrackStats : report.getAudioTrackStats()) {
                 String trackName =
-                        getParticipantName(audioTrackStats.trackId, true, participantMap) +
+                        getParticipantName(audioTrackStats.trackId, true, participants) +
                                 " " + context.getString(R.string.audio_track) + " " + trackCount;
                 StatsListItem item = new StatsListItem.Builder()
                         .baseTrackInfo(audioTrackStats)
@@ -175,7 +175,7 @@ public class StatsListAdapter extends RecyclerView.Adapter<StatsListAdapter.View
             trackCount = 0;
             for (VideoTrackStats videoTrackStats : report.getVideoTrackStats()) {
                 String trackName =
-                        getParticipantName(videoTrackStats.trackId, false, participantMap) +
+                        getParticipantName(videoTrackStats.trackId, false, participants) +
                                 " " + context.getString(R.string.video_track) + " " + trackCount;
                 StatsListItem item = new StatsListItem.Builder()
                         .baseTrackInfo(videoTrackStats)
@@ -199,8 +199,8 @@ public class StatsListAdapter extends RecyclerView.Adapter<StatsListAdapter.View
     }
 
     private String getParticipantName(String trackId, boolean isAudioTrack,
-                                      Map<String, Participant> participantMap) {
-        for (Participant participant : participantMap.values()) {
+                                      List<Participant> participants) {
+        for (Participant participant : participants) {
             if (isAudioTrack) {
                 AudioTrack audioTrack = getAudioTrack(participant, trackId);
                 if (audioTrack != null) {

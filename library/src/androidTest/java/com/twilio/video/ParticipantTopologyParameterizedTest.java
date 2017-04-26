@@ -116,15 +116,14 @@ public class ParticipantTopologyParameterizedTest extends BaseParticipantTest {
 
         assertTrue(roomListener2.onConnectedLatch.await(20, TimeUnit.SECONDS));
 
-        List<Participant> client2Participants = new ArrayList<>(client2room.getParticipants()
-                .values());
+        List<Participant> client2Participants = new ArrayList<>(client2room.getParticipants());
         Participant client1Participant = client2Participants.get(0);
 
         assertEquals(1, client2Participants.size());
         assertTrue(client1Participant.isConnected());
         assertTrue(roomListener.onParticipantConnectedLatch.await(20, TimeUnit.SECONDS));
 
-        List<Participant> client1Participants = new ArrayList<>(room.getParticipants().values());
+        List<Participant> client1Participants = new ArrayList<>(room.getParticipants());
         Participant client2Participant = client1Participants.get(0);
 
         assertEquals(1, client1Participants.size());

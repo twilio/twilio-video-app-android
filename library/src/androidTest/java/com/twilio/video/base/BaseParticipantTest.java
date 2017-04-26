@@ -97,7 +97,7 @@ public abstract class BaseParticipantTest extends BaseClientTest {
         // Wait for actor2 to connect
         assertTrue(actor1RoomListener.onParticipantConnectedLatch.await(20, TimeUnit.SECONDS));
         actor2LocalParticipant = actor2Room.getLocalParticipant();
-        List<Participant> participantList = new ArrayList<>(actor1Room.getParticipants().values());
+        List<Participant> participantList = new ArrayList<>(actor1Room.getParticipants());
         assertEquals(1, participantList.size());
         participant = participantList.get(0);
         assertNotNull(participant);

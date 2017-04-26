@@ -82,10 +82,10 @@ public class Room {
     /**
      * Returns all currently connected participants.
      *
-     * @return a map of identities to participants.
+     * @return list of participants.
      */
-    public Map<String, Participant> getParticipants() {
-        return new HashMap<>(participantMap);
+    public List<Participant> getParticipants() {
+        return new ArrayList<>(participantMap.values());
     }
 
     /**
