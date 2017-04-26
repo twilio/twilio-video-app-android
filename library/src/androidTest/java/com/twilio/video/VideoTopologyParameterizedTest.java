@@ -230,4 +230,63 @@ public class VideoTopologyParameterizedTest extends BaseClientTest {
             TwilioException.ACCESS_TOKEN_INVALID_EXCEPTION);
         assertNotNull(roomListener.getTwilioException().getMessage());
     }
+
+    @Test(expected = IllegalStateException.class)
+    public void connectOptions_shouldNotAllowReleasedLocalAudioTrack() throws InterruptedException {
+        localAudioTrack = LocalAudioTrack.create(mediaTestActivity, true);
+        localAudioTrack.release();
+        List<LocalAudioTrack> localAudioTracks = Collections.singletonList(localAudioTrack);
+        new ConnectOptions.Builder(token)
+            .roomName(roomName)
+            .audioTracks(localAudioTracks)
+            .build();
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void connectOptions_shouldNotAllowReleasedLocalVideoTrack() throws InterruptedException {
+        localVideoTrack = LocalVideoTrack.create(mediaTestActivity, true, new FakeVideoCapturer());
+        localVideoTrack.release();
+        List<LocalVideoTrack> localVideoTracks = Collections.singletonList(localVideoTrack);
+        new ConnectOptions.Builder(token)
+            .roomName(roomName)
+            .videoTracks(localVideoTracks)
+            .build();
+    }
+
+    @Test
+    public void connect_shouldAllowLocalVideoTrackToBeReleasedAfterConnect()
+            throws InterruptedException {
+        roomListener.onConnectedLatch = new CountDownLatch(1);
+        roomListener.onDisconnectedLatch = new CountDownLatch(1);
+        localVideoTrack = LocalVideoTrack.create(mediaTestActivity, true, new FakeVideoCapturer());
+        List<LocalVideoTrack> localVideoTracks = Collections.singletonList(localVideoTrack);
+        ConnectOptions connectOptions = new ConnectOptions.Builder(token)
+            .roomName(roomName)
+            .videoTracks(localVideoTracks)
+            .build();
+        Room room = Video.connect(mediaTestActivity, connectOptions, roomListener);
+        localVideoTrack.release();
+        assertTrue(roomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
+        room.disconnect();
+        assertTrue(roomListener.onDisconnectedLatch.await(20, TimeUnit.SECONDS));
+    }
+
+    @Test
+    public void connect_shouldAllowLocalAudioTrackToBeReleasedAfterConnect()
+            throws InterruptedException {
+        roomListener.onConnectedLatch = new CountDownLatch(1);
+        roomListener.onDisconnectedLatch = new CountDownLatch(1);
+        localAudioTrack = LocalAudioTrack.create(mediaTestActivity, true);
+        List<LocalAudioTrack> localAudioTracks = Collections.singletonList(localAudioTrack);
+        ConnectOptions connectOptions = new ConnectOptions.Builder(token)
+            .roomName(roomName)
+            .audioTracks(localAudioTracks)
+            .build();
+        Room room = Video.connect(mediaTestActivity, connectOptions, roomListener);
+        localAudioTrack.release();
+        assertTrue(roomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
+        room.disconnect();
+        assertTrue(roomListener.onDisconnectedLatch.await(20, TimeUnit.SECONDS));
+    }
+
 }

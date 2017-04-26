@@ -168,4 +168,5 @@ public class LocalVideoTrackTest extends BaseLocalVideoTrackTest {
             retries++;
         }
     }
+
 }

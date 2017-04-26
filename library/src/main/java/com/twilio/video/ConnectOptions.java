@@ -136,6 +136,21 @@ public class ConnectOptions {
             Preconditions.checkNotNull(accessToken, "Token must not be null.");
             Preconditions.checkArgument(!accessToken.equals(""), "Token must not be empty.");
 
+            if (videoTracks != null) {
+                for (LocalVideoTrack localVideoTrack : videoTracks) {
+                    Preconditions.checkState(
+                            !localVideoTrack.isReleased(),
+                            "LocalVideoTrack cannot be released");
+                }
+            }
+            if (audioTracks != null) {
+                for (LocalAudioTrack localAudioTrack : audioTracks) {
+                    Preconditions.checkState(
+                            !localAudioTrack.isReleased(),
+                            "LocalAudioTrack cannot be released");
+                }
+            }
+
             return new ConnectOptions(this);
         }
     }
