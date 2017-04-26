@@ -373,6 +373,7 @@ public class RoomActivity extends BaseActivity {
 
     @OnClick(R.id.connect)
     void connectButtonClick() {
+        connect.setEnabled(false);
         // obtain room name
         final String roomName = roomEditText.getText().toString();
 
@@ -409,6 +410,7 @@ public class RoomActivity extends BaseActivity {
                         final String message = "Failed to retrieve access token";
                         Timber.e("%s -> reason: %s", message, e.getMessage());
                         Snackbar.make(primaryVideoView, message, Snackbar.LENGTH_LONG).show();
+                        connect.setEnabled(true);
                     }
                 });
 

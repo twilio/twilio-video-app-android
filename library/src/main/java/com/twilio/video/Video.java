@@ -32,6 +32,10 @@ public abstract class Video {
         @Override
         public void onReceive(Context context, Intent intent) {
             if (intent.getAction().equalsIgnoreCase(ConnectivityManager.CONNECTIVITY_ACTION)) {
+                if (isInitialStickyBroadcast()) {
+                    logger.d("Ignoring network event, sticky broadcast");
+                    return;
+                }
                 ConnectivityManager conn =  (ConnectivityManager)
                         context.getSystemService(Context.CONNECTIVITY_SERVICE);
                 NetworkInfo newNetworkInfo = conn.getActiveNetworkInfo();
@@ -103,10 +107,10 @@ public abstract class Video {
         
         if(rooms.isEmpty()) {
             // Register for connectivity events
-            registerConnectivityBroadcastReceiver();
             ConnectivityManager conn =  (ConnectivityManager)
                 applicationContext.getSystemService(Context.CONNECTIVITY_SERVICE);
             currentNetworkInfo = conn.getActiveNetworkInfo();
+            registerConnectivityBroadcastReceiver();
         }
         Room room = new Room(
                 applicationContext,
