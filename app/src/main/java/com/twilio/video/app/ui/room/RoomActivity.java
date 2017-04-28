@@ -717,6 +717,7 @@ public class RoomActivity extends BaseActivity {
 
     private void setAudioFocus(boolean setFocus) {
         if (setFocus) {
+            setMicrophoneMute(false);
             savedAudioMode = audioManager.getMode();
             // Request audio focus before making any device switch.
             audioManager.requestAudioFocus(null, AudioManager.STREAM_VOICE_CALL,
@@ -732,6 +733,15 @@ public class RoomActivity extends BaseActivity {
             audioManager.setMode(savedAudioMode);
             audioManager.abandonAudioFocus(null);
         }
+    }
+
+    /** Sets the microphone mute state. */
+    private void setMicrophoneMute(boolean on) {
+        boolean wasMuted = audioManager.isMicrophoneMute();
+        if (wasMuted == on) {
+            return;
+        }
+        audioManager.setMicrophoneMute(on);
     }
 
     private void setVolumeControl(boolean setVolumeControl) {
