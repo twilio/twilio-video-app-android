@@ -14,6 +14,7 @@
 #include "com_twilio_video_ConnectOptions.h"
 #include "com_twilio_video_Room.h"
 #include "com_twilio_video_MediaFactory.h"
+#include "class_reference_holder.h"
 
 namespace twilio_video_jni {
 
