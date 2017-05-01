@@ -146,6 +146,8 @@ public class RoomActivity extends BaseActivity {
     private AudioManager audioManager;
     private int savedAudioMode = AudioManager.MODE_INVALID;
     private int savedVolumeControlStream;
+    private boolean savedIsMicrophoneMute = false;
+    private boolean savedIsSpeakerPhoneOn = false;
 
     private String displayName;
     private LocalParticipant localParticipant;
@@ -717,6 +719,8 @@ public class RoomActivity extends BaseActivity {
 
     private void setAudioFocus(boolean setFocus) {
         if (setFocus) {
+            savedIsSpeakerPhoneOn = audioManager.isSpeakerphoneOn();
+            savedIsMicrophoneMute = audioManager.isMicrophoneMute();
             setMicrophoneMute(false);
             savedAudioMode = audioManager.getMode();
             // Request audio focus before making any device switch.
@@ -729,9 +733,13 @@ public class RoomActivity extends BaseActivity {
              * Some devices have difficulties with speaker mode if this is not set.
              */
             audioManager.setMode(AudioManager.MODE_IN_COMMUNICATION);
+            setVolumeControl(true);
         } else {
             audioManager.setMode(savedAudioMode);
             audioManager.abandonAudioFocus(null);
+            audioManager.setMicrophoneMute(savedIsMicrophoneMute);
+            audioManager.setSpeakerphoneOn(savedIsSpeakerPhoneOn);
+            setVolumeControl(false);
         }
     }
 
@@ -1067,7 +1075,6 @@ public class RoomActivity extends BaseActivity {
                 localParticipantSid = localParticipant.getSid();
 
                 setAudioFocus(true);
-                setVolumeControl(true);
                 updateStats();
                 updateUi(room);
 
@@ -1102,6 +1109,8 @@ public class RoomActivity extends BaseActivity {
 
                 RoomActivity.this.room = null;
                 updateUi(room);
+
+                setAudioFocus(false);
             }
 
             @Override
@@ -1119,7 +1128,6 @@ public class RoomActivity extends BaseActivity {
                 updateStats();
 
                 setAudioFocus(false);
-                setVolumeControl(false);
             }
 
             @Override
