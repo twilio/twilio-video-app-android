@@ -57,6 +57,7 @@ import com.twilio.video.app.data.api.TokenService;
 import com.twilio.video.app.data.api.VideoAppService;
 import com.twilio.video.app.data.api.model.Topology;
 import com.twilio.video.app.ui.settings.SettingsActivity;
+import com.twilio.video.app.util.BuildConfigUtils;
 import com.twilio.video.app.util.EnvUtil;
 import com.twilio.video.app.util.InputUtils;
 import com.twilio.video.app.util.StatsScheduler;
@@ -218,8 +219,7 @@ public class RoomActivity extends BaseActivity {
         participantController.setListener(participantClickListener());
 
         // Setup Activity
-        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-        displayName = sharedPreferences.getString(Preferences.DISPLAY_NAME, null);
+        displayName = getDisplayName();
         statsScheduler = new StatsScheduler();
         obtainVideoConstraints();
         updateUi(room);
@@ -515,6 +515,15 @@ public class RoomActivity extends BaseActivity {
         // update toggle button icon
         localVideoImageButton.setImageResource(cameraVideoTrack != null ?
                 R.drawable.ic_videocam_white_24px : R.drawable.ic_videocam_off_gray_24px);
+    }
+
+    private String getDisplayName() {
+        String displayName = sharedPreferences.getString(Preferences.DISPLAY_NAME, null);
+
+        // Append serial number for internal flavor so the same account can be used across devices
+        return BuildConfigUtils.isInternalFlavor() ?
+                displayName + String.format(" (%s)", Build.SERIAL) :
+                displayName;
     }
 
     private void obtainVideoConstraints() {

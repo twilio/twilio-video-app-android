@@ -3,8 +3,8 @@ package com.twilio.video.app.base;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 
-import com.twilio.video.app.BuildConfig;
 import com.twilio.video.app.VideoApplication;
+import com.twilio.video.app.util.BuildConfigUtils;
 
 import net.hockeyapp.android.UpdateManager;
 
@@ -17,20 +17,16 @@ public abstract class BaseActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         AndroidInjection.inject(this);
         super.onCreate(savedInstanceState);
-        if (internalRelease()) {
+        if (BuildConfigUtils.isInternalRelease()) {
             UpdateManager.register(this, VideoApplication.HOCKEY_APP_ID);
         }
     }
 
     @Override
     protected void onDestroy() {
-        if (internalRelease()) {
+        if (BuildConfigUtils.isInternalRelease()) {
             UpdateManager.unregister();
         }
         super.onDestroy();
-    }
-
-    private boolean internalRelease() {
-        return BuildConfig.FLAVOR.equals(INTERNAL_FLAVOR) && !BuildConfig.DEBUG;
     }
 }

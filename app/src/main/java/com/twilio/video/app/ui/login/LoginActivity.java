@@ -3,6 +3,7 @@ package com.twilio.video.app.ui.login;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AlertDialog;
@@ -22,6 +23,7 @@ import com.twilio.video.app.base.BaseActivity;
 import com.twilio.video.app.data.Preferences;
 import com.twilio.video.app.ui.room.RoomActivity;
 import com.twilio.video.app.util.AuthHelper;
+import com.twilio.video.app.util.BuildConfigUtils;
 
 import javax.inject.Inject;
 
@@ -52,7 +54,6 @@ public class LoginActivity extends BaseActivity
                 .add(R.id.login_fragment_container, LoginLandingFragment.newInstance())
                 .commit();
         }
-        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
     }
 
     @Override
@@ -154,20 +155,24 @@ public class LoginActivity extends BaseActivity
     }
 
     private void saveIdentity(FirebaseUser user) {
-
         String email = (user.getEmail() != null) ? user.getEmail() : "";
 
+        sharedPreferences.edit()
+            .putString(Preferences.EMAIL, email)
+            .putString(Preferences.DISPLAY_NAME, getDisplayName(user))
+            .apply();
+    }
+
+    private String getDisplayName(FirebaseUser user) {
         String displayName = "";
+
         if (user.getDisplayName() != null) {
             displayName = user.getDisplayName();
         } else if (user.getEmail() != null) {
             displayName = user.getEmail().split("@")[0];
         }
 
-        sharedPreferences.edit()
-            .putString(Preferences.EMAIL, email)
-            .putString(Preferences.DISPLAY_NAME, displayName)
-            .apply();
+        return displayName;
     }
 
     private void processError(@AuthHelper.Error int errorCode) {
