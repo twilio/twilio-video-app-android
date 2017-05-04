@@ -55,7 +55,6 @@ public class ScreenCapturerTest {
     }
 
     @Test
-    @Ignore
     public void shouldCaptureFramesWhenVideoTrackAdded() throws InterruptedException {
         final CountDownLatch firstFrameReported = new CountDownLatch(1);
         ScreenCapturer.Listener screenCapturerListener = new ScreenCapturer.Listener() {
@@ -152,7 +151,6 @@ public class ScreenCapturerTest {
     }
 
     @Test
-    @Ignore
     public void canBeRenderedToView() throws InterruptedException {
         final VideoView localVideo =
                 (VideoView) screenCapturerActivity
@@ -179,7 +177,6 @@ public class ScreenCapturerTest {
     }
 
     @Test
-    @Ignore
     public void canBeReused() throws InterruptedException {
         int reuseCount = 2;
         final AtomicReference<CountDownLatch> firstFrameReceived = new AtomicReference<>();

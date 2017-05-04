@@ -30,6 +30,9 @@ final class VideoCapturerDelegate implements org.webrtc.VideoCapturer {
             CameraCapturer cameraCapturer = (CameraCapturer) videoCapturer;
 
             cameraCapturer.setSurfaceTextureHelper(surfaceTextureHelper);
+        } else if (videoCapturer instanceof ScreenCapturer) {
+            ScreenCapturer screenCapturer = (ScreenCapturer) videoCapturer;
+            screenCapturer.setSurfaceTextureHelper(surfaceTextureHelper);
         }
     }
 

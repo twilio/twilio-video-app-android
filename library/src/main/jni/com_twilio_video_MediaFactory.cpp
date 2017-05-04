@@ -243,9 +243,8 @@ JNIEXPORT jlong JNICALL Java_com_twilio_video_MediaFactory_nativeCreate(JNIEnv *
             new webrtc_jni::MediaCodecVideoEncoderFactory();
     webrtc_jni::MediaCodecVideoDecoderFactory* video_decoder_factory =
             new webrtc_jni::MediaCodecVideoDecoderFactory();
-
-    // Disabling capturing and encoding to texture until we understand GSDK-1132 GSDK-1139
-    // video_encoder_factory->SetEGLContext(jni, j_egl_local_context);
+    // Enable use of textures for encoding
+    video_encoder_factory->SetEGLContext(jni, j_egl_local_context);
     // Enable use of textures for decoding
     video_decoder_factory->SetEGLContext(jni, j_egl_remote_context);
 
