@@ -905,7 +905,12 @@ public class RoomActivity extends BaseActivity {
     private void addParticipant(Participant participant) {
         ParticipantListener listener = new ParticipantListener();
         participant.setListener(listener);
-        participantController.addThumb(participant.getSid(), participant.getIdentity());
+        VideoTrack participantVideoTrack =
+            participant.getVideoTracks().size() > 0 ? participant.getVideoTracks().get(0) : null;
+        boolean muted =
+            participant.getAudioTracks().size() > 0 ? !participant.getAudioTracks().get(0).isEnabled() : true;
+        participantController.addThumb(
+            participant.getSid(), participant.getIdentity(), participantVideoTrack, muted, false);
     }
 
     /**
