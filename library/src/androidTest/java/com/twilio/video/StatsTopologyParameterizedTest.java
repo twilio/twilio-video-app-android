@@ -188,7 +188,6 @@ public class StatsTopologyParameterizedTest extends BaseClientTest {
     }
 
     @Test
-    @Ignore
     public void shouldReceiveStatsWhenParticipanAddsOrRemovesTrack() throws InterruptedException {
         // Connect Alice to room with local audio track only
         aliceLocalAudioTrack = LocalAudioTrack.create(mediaTestActivity, true);
@@ -280,19 +279,13 @@ public class StatsTopologyParameterizedTest extends BaseClientTest {
         // Get alice local participant
         LocalParticipant aliceLocalParticipant = aliceRoom.getLocalParticipant();
 
-        /*
-         * We only validate the presence of one local video track being added because adding two
-         * tracks quickly causes issues in the stats gathered. This bug appears to be a symptom of
-         * CSDK-1206.
-         */
-
         // Add audio and video track to alice
         aliceLocalVideoTrack = LocalVideoTrack
                 .create(mediaTestActivity, true, new FakeVideoCapturer());
         assertTrue(aliceLocalParticipant.addVideoTrack(aliceLocalVideoTrack));
 
-        // TODO: Uncomment once CSDK-1206 is resolved
-        // aliceLocalMedia.addAudioTrack(true);
+        aliceLocalAudioTrack = LocalAudioTrack.create(mediaTestActivity, true);
+        assertTrue(aliceLocalParticipant.addAudioTrack(aliceLocalAudioTrack));
 
         // let's give peer connection some time to get media flowing
         Thread.sleep(2500);
@@ -307,8 +300,7 @@ public class StatsTopologyParameterizedTest extends BaseClientTest {
         assertEquals(1, statsReportList.size());
         StatsReport statsReport = statsReportList.get(0);
 
-        // TODO: Expect 1 local audio track when CSDK-1206 is resolved
-        expectStatsReportTracksSize(statsReport, 0, 1, 0, 0);
+        expectStatsReportTracksSize(statsReport, 1, 1, 0, 0);
     }
 
     @Test
@@ -472,7 +464,6 @@ public class StatsTopologyParameterizedTest extends BaseClientTest {
 
 
     @Test
-    @Ignore
     public void shouldNotReceiveReportAfterRoomIsDisconnected() throws InterruptedException {
         // Connect Alice to room with both video and audio track
         aliceLocalAudioTrack = LocalAudioTrack.create(mediaTestActivity, true);

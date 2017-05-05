@@ -613,10 +613,14 @@ public class RoomActivity extends BaseActivity {
         }
 
         cameraVideoTrack = LocalVideoTrack.create(this, true, cameraCapturer, videoConstraints);
-
         if (cameraVideoTrack != null) {
             localVideoTrackNames.put(cameraVideoTrack.getTrackId(),
                     getString(R.string.camera_video_track));
+
+            // Share camera video track if we are connected to room
+            if (localParticipant != null) {
+                localParticipant.addVideoTrack(cameraVideoTrack);
+            }
         } else {
             Snackbar.make(primaryVideoView, R.string.failed_to_add_camera_video_track,
                     Snackbar.LENGTH_LONG).show();
