@@ -906,15 +906,66 @@ public class RoomActivity extends BaseActivity {
      *
      * @param participant newly joined room participant
      */
-    private void addParticipant(Participant participant) {
+    private void addParticipant(Participant participant, boolean renderAsPrimary) {
         ParticipantListener listener = new ParticipantListener();
         participant.setListener(listener);
         VideoTrack participantVideoTrack =
             participant.getVideoTracks().size() > 0 ? participant.getVideoTracks().get(0) : null;
         boolean muted =
             participant.getAudioTracks().size() > 0 ? !participant.getAudioTracks().get(0).isEnabled() : true;
-        participantController.addThumb(
-            participant.getSid(), participant.getIdentity(), participantVideoTrack, muted, false);
+        if (renderAsPrimary) {
+            renderItemAsPrimary(new ParticipantController.Item(
+                participant.getSid(), participant.getIdentity(), participantVideoTrack, muted, false));
+        } else {
+            participantController.addThumb(
+                participant.getSid(), participant.getIdentity(), participantVideoTrack, muted, false);
+        }
+    }
+
+    /**
+     * Sets new item to render as primary view and moves existing primary view item
+     * to thumbs view.
+     * @param item New item to be rendered in primary view
+     */
+    private void renderItemAsPrimary(ParticipantController.Item item) {
+        // nothing to click while not in room
+        if (room == null) return;
+
+        // no need to renderer if same item clicked
+        ParticipantController.Item old = participantController.getPrimaryItem();
+        if (old != null && item.sid.equals(old.sid)) return;
+
+        // add back old participant to thumbs
+        if (old != null) {
+
+            if (old.sid.equals(localParticipantSid)) {
+
+                // toggle local participant state
+                int state = old.videoTrack == null ?
+                    ParticipantView.State.NO_VIDEO : ParticipantView.State.VIDEO;
+                participantController.updateThumb(old.sid, old.videoTrack, state);
+                participantController.updateThumb(old.sid, old.videoTrack, old.mirror);
+
+            } else {
+
+                // add thumb for remote participant
+                participantController.addThumb(old);
+            }
+        }
+
+        // handle new primary participant click
+        participantController.renderAsPrimary(item);
+
+        if (item.sid.equals(localParticipantSid)) {
+
+            // toggle local participant state and hide his badge
+            participantController.updateThumb(item.sid, item.videoTrack, ParticipantView.State.SELECTED);
+            participantController.getPrimaryView().showIdentityBadge(false);
+        } else {
+
+            // remove remote participant thumb
+            participantController.removeThumb(item);
+        }
     }
 
     /**
@@ -1038,45 +1089,7 @@ public class RoomActivity extends BaseActivity {
         return new ParticipantController.ItemClickListener() {
             @Override
             public void onThumbClick(ParticipantController.Item item) {
-
-                // nothing to click while not in room
-                if (room == null) return;
-
-                // no need to renderer if same item clicked
-                ParticipantController.Item old = participantController.getPrimaryItem();
-                if (old != null && item.sid.equals(old.sid)) return;
-
-                // add back old participant to thumbs
-                if (old != null) {
-
-                    if (old.sid.equals(localParticipantSid)) {
-
-                        // toggle local participant state
-                        int state = old.videoTrack == null ?
-                                ParticipantView.State.NO_VIDEO : ParticipantView.State.VIDEO;
-                        participantController.updateThumb(old.sid, old.videoTrack, state);
-                        participantController.updateThumb(old.sid, old.videoTrack, old.mirror);
-
-                    } else {
-
-                        // add thumb for remote participant
-                        participantController.addThumb(old);
-                    }
-                }
-
-                // handle new primary participant click
-                participantController.renderAsPrimary(item);
-
-                if (item.sid.equals(localParticipantSid)) {
-
-                    // toggle local participant state and hide his badge
-                    participantController.updateThumb(item.sid, item.videoTrack, ParticipantView.State.SELECTED);
-                    participantController.getPrimaryView().showIdentityBadge(false);
-                } else {
-
-                    // remove remote participant thumb
-                    participantController.removeThumb(item);
-                }
+                renderItemAsPrimary(item);
             }
         };
     }
@@ -1110,8 +1123,10 @@ public class RoomActivity extends BaseActivity {
                     localParticipantSid, cameraVideoTrack).callOnClick();
 
                 // add existing room participants thumbs
+                boolean isFirstParticipant = true;
                 for (Participant participant : room.getParticipants()) {
-                    addParticipant(participant);
+                    addParticipant(participant, isFirstParticipant);
+                    isFirstParticipant = false;
                 }
             }
 
@@ -1154,7 +1169,8 @@ public class RoomActivity extends BaseActivity {
                         room.getSid(),
                         participant.getSid());
 
-                addParticipant(participant);
+                boolean renderAsPrimary = room.getParticipants().size() == 1;
+                addParticipant(participant, renderAsPrimary);
 
                 updateStatsUI(sharedPreferences.getBoolean(Preferences.ENABLE_STATS, false));
             }
