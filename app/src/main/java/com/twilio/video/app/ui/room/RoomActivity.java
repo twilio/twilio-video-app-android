@@ -909,16 +909,34 @@ public class RoomActivity extends BaseActivity {
     private void addParticipant(Participant participant, boolean renderAsPrimary) {
         ParticipantListener listener = new ParticipantListener();
         participant.setListener(listener);
-        VideoTrack participantVideoTrack =
-            participant.getVideoTracks().size() > 0 ? participant.getVideoTracks().get(0) : null;
         boolean muted =
             participant.getAudioTracks().size() > 0 ? !participant.getAudioTracks().get(0).isEnabled() : true;
+
+        List<VideoTrack> videoTracks = participant.getVideoTracks();
+
+        if (videoTracks.size() == 0) {
+            addParticipantVideoTrack(
+                participant.getSid(), participant.getIdentity(), null, muted, renderAsPrimary);
+        } else {
+            for (VideoTrack videoTrack : videoTracks) {
+                addParticipantVideoTrack(
+                    participant.getSid(), participant.getIdentity(), videoTrack, muted, renderAsPrimary);
+                renderAsPrimary = false;
+            }
+        }
+    }
+
+    private void addParticipantVideoTrack(String participantSid,
+                                          String participantIdentity,
+                                          VideoTrack videoTrack,
+                                          boolean muted,
+                                          boolean renderAsPrimary) {
         if (renderAsPrimary) {
             renderItemAsPrimary(new ParticipantController.Item(
-                participant.getSid(), participant.getIdentity(), participantVideoTrack, muted, false));
+                participantSid, participantIdentity, videoTrack, muted, false));
         } else {
             participantController.addThumb(
-                participant.getSid(), participant.getIdentity(), participantVideoTrack, muted, false);
+                participantSid, participantIdentity, videoTrack, muted, false);
         }
     }
 
@@ -933,7 +951,7 @@ public class RoomActivity extends BaseActivity {
 
         // no need to renderer if same item clicked
         ParticipantController.Item old = participantController.getPrimaryItem();
-        if (old != null && item.sid.equals(old.sid)) return;
+        if (old != null && item.sid.equals(old.sid) && item.videoTrack == old.videoTrack) return;
 
         // add back old participant to thumbs
         if (old != null) {
@@ -1252,7 +1270,9 @@ public class RoomActivity extends BaseActivity {
 
             ParticipantController.Item primary = participantController.getPrimaryItem();
 
-            if (primary != null && primary.sid.equals(participant.getSid())) {
+            if (primary != null &&
+                primary.sid.equals(participant.getSid()) &&
+                primary.videoTrack == null) {
 
                 // no thumb needed - render as primary
                 primary.videoTrack = videoTrack;
@@ -1274,10 +1294,24 @@ public class RoomActivity extends BaseActivity {
 
             ParticipantController.Item primary = participantController.getPrimaryItem();
 
-            if (primary != null && primary.sid.equals(participant.getSid())) {
+            if (primary != null &&
+                primary.sid.equals(participant.getSid()) &&
+                primary.videoTrack == videoTrack) {
 
-                // no thumb needed - render as primary
-                primary.videoTrack = null;
+                List<VideoTrack> videoTracks = participant.getVideoTracks();
+                if (videoTracks.size() > 0) {
+                    //find next video track that belongs to participant and render as primary
+                    for (VideoTrack newVideoTrack : videoTracks) {
+                        if (newVideoTrack != videoTrack) {
+                            participantController.removeThumb(participant.getSid(), newVideoTrack);
+                            primary.videoTrack = newVideoTrack;
+                            break;
+                        }
+                    }
+                } else {
+                    // no thumb needed - render as primary
+                    primary.videoTrack = null;
+                }
                 participantController.renderAsPrimary(primary);
             } else {
 

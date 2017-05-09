@@ -8,6 +8,7 @@ import com.twilio.video.VideoTrack;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -250,9 +251,10 @@ public class ParticipantController {
      * @param videoTrack target video track.
      */
     public void removeOrEmptyThumb(String sid, String identity, VideoTrack videoTrack) {
-        if (getThumbs(sid).size() > 1) {
+        int thumbsCount = getThumbs(sid).size();
+        if (thumbsCount > 1 || (thumbsCount == 1 && primaryItem.sid == sid)) {
             removeThumb(sid, videoTrack);
-        } else if (getThumbsCount(sid) == 0) {
+        } else if (thumbsCount == 0) {
             addThumb(sid, identity);
         } else {
             updateThumb(sid, videoTrack, null);
@@ -363,10 +365,6 @@ public class ParticipantController {
 
     private boolean hasThumb(String sid, VideoTrack videoTrack) {
         return getThumb(sid, videoTrack) != null;
-    }
-
-    private int getThumbsCount(String sid) {
-        return getThumbs(sid).size();
     }
 
     private Item findItem(String sid, VideoTrack videoTrack) {
