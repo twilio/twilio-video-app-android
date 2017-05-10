@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.support.annotation.NonNull;
 import android.util.Log;
 
 import com.getkeepsafe.relinker.ReLinker;
@@ -68,18 +69,12 @@ public abstract class Video {
      * @param roomListener listener of room related events.
      * @return room being connected to.
      */
-    public static synchronized Room connect(Context context,
-                                            ConnectOptions connectOptions,
-                                            Room.Listener roomListener) {
-        if (context == null) {
-            throw new NullPointerException("context must not be null");
-        }
-        if (connectOptions == null) {
-            throw new NullPointerException("connectOptions must not be null");
-        }
-        if (roomListener == null) {
-            throw new NullPointerException("roomListener must not be null");
-        }
+    public static synchronized Room connect(@NonNull Context context,
+                                            @NonNull ConnectOptions connectOptions,
+                                            @NonNull Room.Listener roomListener) {
+        Preconditions.checkNotNull(context, "context must not be null");
+        Preconditions.checkNotNull(connectOptions, "connectOptions must not be null");
+        Preconditions.checkNotNull(roomListener, "roomListener must not be null");
 
         // FIXME: we shouldn't be caching this, but otherwise we don't have
         // a way of unregistering broadcast receiver

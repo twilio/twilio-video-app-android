@@ -79,35 +79,6 @@ public class VideoTopologyParameterizedTest extends BaseClientTest {
         assertTrue(MediaFactory.isReleased());
     }
 
-    @Test(expected = NullPointerException.class)
-    public void connect_shouldThrowExceptionWhenContextIsNull() {
-        ConnectOptions connectOptions = new ConnectOptions.Builder(token)
-            .roomName(roomName)
-            .build();
-        Room room = Video.connect(null, connectOptions, roomListener);
-    }
-
-    @Test(expected = NullPointerException.class)
-    public void connect_shouldThrowExceptionWhenConnectOptionsIsNull() {
-        Room room = Video.connect(mediaTestActivity, null, roomListener);
-    }
-
-    @Test
-    public void logLevel_shouldBeRetained() {
-        Video.setLogLevel(LogLevel.DEBUG);
-        assertEquals(LogLevel.DEBUG, Video.getLogLevel());
-    }
-
-    @Test
-    public void getVersion_shouldReturnValidSemVerFormattedVersion() {
-        String semVerRegex = "^([0-9]+)\\.([0-9]+)\\.([0-9]+)(?:-([0-9A-" +
-                "Za-z-]+(?:\\.[0-9A-Za-z-]+)*))?(?:\\+[0-9A-Za-z-]+)?$";
-        String version = Video.getVersion();
-
-        assertNotNull(version);
-        assertTrue(version.matches(semVerRegex));
-    }
-
     @Test
     public void connect_shouldConnectToRoom() throws InterruptedException {
         roomListener.onConnectedLatch = new CountDownLatch(1);
@@ -122,20 +93,14 @@ public class VideoTopologyParameterizedTest extends BaseClientTest {
     }
 
     @Test
-    public void disconnect_canDisconnectBeforeConnectingFromRoom() throws InterruptedException {
+    @Ignore("Disconnecting while connecting results in native crash. See GSDK-1153")
+    public void disconnect_canDisconnectBeforeConnectingToRoom() throws InterruptedException {
         roomListener.onDisconnectedLatch = new CountDownLatch(1);
         ConnectOptions connectOptions = new ConnectOptions.Builder(token)
                 .build();
         Room room = Video.connect(mediaTestActivity, connectOptions, roomListener);
         room.disconnect();
         assertTrue(roomListener.onDisconnectedLatch.await(20, TimeUnit.SECONDS));
-    }
-
-    @Test(expected = NullPointerException.class)
-    public void connect_shouldThrowExceptionWhenRoomListenerIsNull() {
-        ConnectOptions connectOptions = new ConnectOptions.Builder(token)
-            .build();
-        Video.connect(mediaTestActivity, connectOptions, null);
     }
 
     @Test
@@ -232,25 +197,77 @@ public class VideoTopologyParameterizedTest extends BaseClientTest {
     }
 
     @Test(expected = IllegalStateException.class)
-    public void connectOptions_shouldNotAllowReleasedLocalAudioTrack() throws InterruptedException {
-        localAudioTrack = LocalAudioTrack.create(mediaTestActivity, true);
-        localAudioTrack.release();
-        List<LocalAudioTrack> localAudioTracks = Collections.singletonList(localAudioTrack);
-        new ConnectOptions.Builder(token)
-            .roomName(roomName)
-            .audioTracks(localAudioTracks)
-            .build();
-    }
-
-    @Test(expected = IllegalStateException.class)
-    public void connectOptions_shouldNotAllowReleasedLocalVideoTrack() throws InterruptedException {
+    public void connect_shouldShouldFailIfLocalVideoTrackReleasedBeforeConnect()
+            throws InterruptedException {
+        roomListener.onConnectedLatch = new CountDownLatch(1);
+        roomListener.onDisconnectedLatch = new CountDownLatch(1);
         localVideoTrack = LocalVideoTrack.create(mediaTestActivity, true, new FakeVideoCapturer());
-        localVideoTrack.release();
         List<LocalVideoTrack> localVideoTracks = Collections.singletonList(localVideoTrack);
-        new ConnectOptions.Builder(token)
+        ConnectOptions connectOptions = new ConnectOptions.Builder(token)
             .roomName(roomName)
             .videoTracks(localVideoTracks)
             .build();
+        localVideoTrack.release();
+        Video.connect(mediaTestActivity, connectOptions, roomListener);
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void connect_shouldShouldFailIfLocalAudioTrackReleasedBeforeConnect()
+            throws InterruptedException {
+        roomListener.onConnectedLatch = new CountDownLatch(1);
+        roomListener.onDisconnectedLatch = new CountDownLatch(1);
+        localAudioTrack = LocalAudioTrack.create(mediaTestActivity, true);
+        List<LocalAudioTrack> localAudioTracks = Collections.singletonList(localAudioTrack);
+        ConnectOptions connectOptions = new ConnectOptions.Builder(token)
+            .roomName(roomName)
+            .audioTracks(localAudioTracks)
+            .build();
+        localAudioTrack.release();
+        Video.connect(mediaTestActivity, connectOptions, roomListener);
+    }
+
+    @Test
+    public void connect_shouldAllowLocalVideoTrackToBeReleasedWhileConnecting()
+            throws InterruptedException {
+        roomListener.onConnectedLatch = new CountDownLatch(1);
+        roomListener.onDisconnectedLatch = new CountDownLatch(1);
+        localVideoTrack = LocalVideoTrack.create(mediaTestActivity, true, new FakeVideoCapturer());
+        List<LocalVideoTrack> localVideoTracks = Collections.singletonList(localVideoTrack);
+        ConnectOptions connectOptions = new ConnectOptions.Builder(token)
+                .roomName(roomName)
+                .videoTracks(localVideoTracks)
+                .build();
+        Room room = Video.connect(mediaTestActivity, connectOptions, roomListener);
+
+        // Add sleep to ensure that connect has started
+        Thread.sleep(200);
+
+        localVideoTrack.release();
+        assertTrue(roomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
+        room.disconnect();
+        assertTrue(roomListener.onDisconnectedLatch.await(20, TimeUnit.SECONDS));
+    }
+
+    @Test
+    public void connect_shouldAllowLocalAudioTrackToBeReleasedWhileConnecting()
+            throws InterruptedException {
+        roomListener.onConnectedLatch = new CountDownLatch(1);
+        roomListener.onDisconnectedLatch = new CountDownLatch(1);
+        localAudioTrack = LocalAudioTrack.create(mediaTestActivity, true);
+        List<LocalAudioTrack> localAudioTracks = Collections.singletonList(localAudioTrack);
+        ConnectOptions connectOptions = new ConnectOptions.Builder(token)
+                .roomName(roomName)
+                .audioTracks(localAudioTracks)
+                .build();
+        Room room = Video.connect(mediaTestActivity, connectOptions, roomListener);
+
+        // Add sleep to ensure that connect has started
+        Thread.sleep(200);
+
+        localAudioTrack.release();
+        assertTrue(roomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
+        room.disconnect();
+        assertTrue(roomListener.onDisconnectedLatch.await(20, TimeUnit.SECONDS));
     }
 
     @Test
@@ -261,12 +278,12 @@ public class VideoTopologyParameterizedTest extends BaseClientTest {
         localVideoTrack = LocalVideoTrack.create(mediaTestActivity, true, new FakeVideoCapturer());
         List<LocalVideoTrack> localVideoTracks = Collections.singletonList(localVideoTrack);
         ConnectOptions connectOptions = new ConnectOptions.Builder(token)
-            .roomName(roomName)
-            .videoTracks(localVideoTracks)
-            .build();
+                .roomName(roomName)
+                .videoTracks(localVideoTracks)
+                .build();
         Room room = Video.connect(mediaTestActivity, connectOptions, roomListener);
-        localVideoTrack.release();
         assertTrue(roomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
+        localVideoTrack.release();
         room.disconnect();
         assertTrue(roomListener.onDisconnectedLatch.await(20, TimeUnit.SECONDS));
     }
@@ -279,12 +296,12 @@ public class VideoTopologyParameterizedTest extends BaseClientTest {
         localAudioTrack = LocalAudioTrack.create(mediaTestActivity, true);
         List<LocalAudioTrack> localAudioTracks = Collections.singletonList(localAudioTrack);
         ConnectOptions connectOptions = new ConnectOptions.Builder(token)
-            .roomName(roomName)
-            .audioTracks(localAudioTracks)
-            .build();
+                .roomName(roomName)
+                .audioTracks(localAudioTracks)
+                .build();
         Room room = Video.connect(mediaTestActivity, connectOptions, roomListener);
-        localAudioTrack.release();
         assertTrue(roomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
+        localAudioTrack.release();
         room.disconnect();
         assertTrue(roomListener.onDisconnectedLatch.await(20, TimeUnit.SECONDS));
     }

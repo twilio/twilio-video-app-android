@@ -10,13 +10,9 @@ extern "C" {
 
 namespace twilio_video_jni {
 
-struct ConnectOptionsContext {
-    ConnectOptionsContext() : connect_options(twilio::video::ConnectOptions::Builder("").build()) {}
-    twilio::video::ConnectOptions connect_options;
-};
-
 JNIEXPORT jlong JNICALL Java_com_twilio_video_ConnectOptions_nativeCreate
-        (JNIEnv *, jobject, jstring, jstring, jobjectArray, jobjectArray, jobject, jboolean, jlong, jlong);
+        (JNIEnv *, jobject, jstring, jstring, jobjectArray, jobjectArray, jobject, jboolean, jlong);
+
 
 }
 

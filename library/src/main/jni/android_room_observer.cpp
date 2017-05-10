@@ -1,63 +1,64 @@
 #include "android_room_observer.h"
 
-#include "video/logger.h"
 #include "video/room.h"
-#include "com_twilio_video_Participant.h"
-#include "com_twilio_video_LocalParticipant.h"
 #include "class_reference_holder.h"
-
-#include <vector>
 
 namespace twilio_video_jni {
 
-AndroidRoomObserver::AndroidRoomObserver(JNIEnv *env, jobject j_room_observer) :
+AndroidRoomObserver::AndroidRoomObserver(JNIEnv *env, jobject j_room, jobject j_room_observer) :
+    j_room_(env, j_room),
     j_room_observer_(env, j_room_observer),
+    j_room_class_(env, webrtc_jni::GetObjectClass(env, *j_room_)),
     j_room_observer_class_(env, webrtc_jni::GetObjectClass(env, *j_room_observer_)),
     j_twilio_exception_class_(env, twilio_video_jni::FindClass(env,
                                                                "com/twilio/video/TwilioException")),
-    j_participant_class_(
-        env, env->FindClass("com/twilio/video/Participant")),
-    j_array_list_class_(env, env->FindClass("java/util/ArrayList")),
-    j_audio_track_class_(env, env->FindClass("com/twilio/video/AudioTrack")),
-    j_video_track_class_(env, env->FindClass("com/twilio/video/VideoTrack")),
+    j_participant_class_(env, twilio_video_jni::FindClass(env, "com/twilio/video/Participant")),
+    j_array_list_class_(env, twilio_video_jni::FindClass(env, "java/util/ArrayList")),
+    j_audio_track_class_(env, twilio_video_jni::FindClass(env, "com/twilio/video/AudioTrack")),
+    j_video_track_class_(env, twilio_video_jni::FindClass(env, "com/twilio/video/VideoTrack")),
+    j_set_connected_(
+            webrtc_jni::GetMethodID(env,
+                                    *j_room_class_,
+                                    "setConnected",
+                                    "(Ljava/lang/String;JLjava/lang/String;Ljava/lang/String;Ljava/util/List;)V")),
     j_on_connected_(
         webrtc_jni::GetMethodID(env,
                                 *j_room_observer_class_,
                                 "onConnected",
-                                "(Ljava/lang/String;JLjava/lang/String;Ljava/lang/String;Ljava/util/List;)V")),
+                                "(Lcom/twilio/video/Room;)V")),
     j_on_disconnected_(
         webrtc_jni::GetMethodID(env,
                                 *j_room_observer_class_,
                                 "onDisconnected",
-                                "(Lcom/twilio/video/TwilioException;)V")),
+                                "(Lcom/twilio/video/Room;Lcom/twilio/video/TwilioException;)V")),
     j_on_connect_failure_(
         webrtc_jni::GetMethodID(env,
                                 *j_room_observer_class_,
                                 "onConnectFailure",
-                                "(Lcom/twilio/video/TwilioException;)V")),
+                                "(Lcom/twilio/video/Room;Lcom/twilio/video/TwilioException;)V")),
     j_on_participant_connected_(
         webrtc_jni::GetMethodID(env,
                                 *j_room_observer_class_,
                                 "onParticipantConnected",
-                                "(Lcom/twilio/video/Participant;)V")),
+                                "(Lcom/twilio/video/Room;Lcom/twilio/video/Participant;)V")),
     j_on_participant_disconnected_(
         webrtc_jni::GetMethodID(env,
                                 *j_room_observer_class_,
                                 "onParticipantDisconnected",
-                                "(Ljava/lang/String;)V")),
+                                "(Lcom/twilio/video/Room;Lcom/twilio/video/Participant;)V")),
     j_on_recording_started_(
         webrtc_jni::GetMethodID(env,
                                 *j_room_observer_class_,
                                 "onRecordingStarted",
-                                "()V")),
+                                "(Lcom/twilio/video/Room;)V")),
     j_on_recording_stopped_(
         webrtc_jni::GetMethodID(env,
                                 *j_room_observer_class_,
                                 "onRecordingStopped",
-                                "()V")),
+                                "(Lcom/twilio/video/Room;)V")),
     j_get_handler_(
         webrtc_jni::GetMethodID(env,
-                                *j_room_observer_class_,
+                                *j_room_class_,
                                 "getHandler",
                                 "()Landroid/os/Handler;")),
     j_participant_ctor_id_(
@@ -99,6 +100,13 @@ AndroidRoomObserver::~AndroidRoomObserver()  {
     TS_CORE_LOG_MODULE(twilio::video::kTSCoreLogModulePlatform,
                        twilio::video::kTSCoreLogLevelDebug,
                        "~AndroidRoomObserver");
+
+    // Delete all remaing global references to Participants
+    for (auto it = participants_.begin() ;
+            it != participants_.end() ; it++) {
+        webrtc_jni::DeleteGlobalRef(jni(), it->second);
+    }
+    participants_.clear();
 }
 
 void AndroidRoomObserver::setObserverDeleted()  {
@@ -124,7 +132,6 @@ void AndroidRoomObserver::onConnected(twilio::video::Room *room) {
         }
 
         jstring j_room_sid = webrtc_jni::JavaStringFromStdString(jni(), room->getSid());
-
         std::shared_ptr<twilio::video::LocalParticipant> local_participant =
             room->getLocalParticipant();
         jstring j_local_participant_sid =
@@ -133,17 +140,21 @@ void AndroidRoomObserver::onConnected(twilio::video::Room *room) {
             webrtc_jni::JavaStringFromStdString(jni(), local_participant->getIdentity());
         LocalParticipantContext* local_participant_context =
             new LocalParticipantContext(local_participant);
-
         jobject j_participants = createJavaParticipantList(room->getParticipants());
 
-        jni()->CallVoidMethod(*j_room_observer_,
-                              j_on_connected_,
+        jni()->CallVoidMethod(*j_room_,
+                              j_set_connected_,
                               j_room_sid,
                               webrtc_jni::jlongFromPointer(local_participant_context),
                               j_local_participant_sid,
                               j_local_participant_identity,
                               j_participants);
-        CHECK_EXCEPTION(jni()) << "error during CallVoidMethod";
+        CHECK_EXCEPTION(jni()) << "error calling setConnected";
+
+        jni()->CallVoidMethod(*j_room_observer_,
+                              j_on_connected_,
+                              *j_room_);
+        CHECK_EXCEPTION(jni()) << "error calling onConnected";
     }
 }
 
@@ -165,7 +176,7 @@ void AndroidRoomObserver::onDisconnected(const twilio::video::Room *room,
         if (twilio_error != nullptr) {
             j_twilio_exception = createJavaRoomException(*twilio_error);
         }
-        jni()->CallVoidMethod(*j_room_observer_, j_on_disconnected_, j_twilio_exception);
+        jni()->CallVoidMethod(*j_room_observer_, j_on_disconnected_, *j_room_, j_twilio_exception);
         CHECK_EXCEPTION(jni()) << "error during CallVoidMethod";
     }
 }
@@ -185,7 +196,7 @@ void AndroidRoomObserver::onConnectFailure(const twilio::video::Room *room,
         }
 
         jobject j_room_exception = createJavaRoomException(twilio_error);
-        jni()->CallVoidMethod(*j_room_observer_, j_on_connect_failure_, j_room_exception);
+        jni()->CallVoidMethod(*j_room_observer_, j_on_connect_failure_, *j_room_, j_room_exception);
         CHECK_EXCEPTION(jni()) << "error during CallVoidMethod";
     }
 }
@@ -207,7 +218,9 @@ void AndroidRoomObserver::onParticipantConnected(twilio::video::Room *room,
 
 
         // Create participant
-        jobject j_handler = jni()->CallObjectMethod(*j_room_observer_, j_get_handler_);
+        jobject j_handler = jni()->CallObjectMethod(*j_room_, j_get_handler_);
+        CHECK_EXCEPTION(jni()) << "Error calling getHandler";
+
         jobject j_participant = createJavaParticipant(jni(),
                                                       participant,
                                                       *j_participant_class_,
@@ -220,9 +233,13 @@ void AndroidRoomObserver::onParticipantConnected(twilio::video::Room *room,
                                                       *j_video_track_class_,
                                                       j_video_track_ctor_id_,
                                                       j_handler);
+        // Add global ref to java participant so we can reference in onParticipantDisconnected
+        participants_.insert(std::make_pair(participant,
+                                            webrtc_jni::NewGlobalRef(jni(), j_participant)));
 
         jni()->CallVoidMethod(*j_room_observer_,
                               j_on_participant_connected_,
+                              *j_room_,
                               j_participant);
         CHECK_EXCEPTION(jni()) << "error during CallVoidMethod";
     }
@@ -243,12 +260,17 @@ void AndroidRoomObserver::onParticipantDisconnected(twilio::video::Room *room,
             return;
         }
 
-        jstring j_sid = webrtc_jni::JavaStringFromStdString(jni(), participant->getSid());
+        auto it = participants_.find(participant);
+        jobject j_participant = it->second;
         jni()->CallVoidMethod(*j_room_observer_,
                               j_on_participant_disconnected_,
-                              j_sid);
-
+                              *j_room_,
+                              j_participant);
         CHECK_EXCEPTION(jni()) << "error during CallVoidMethod";
+
+        // Remove participant and delete global reference after developer is notified
+        participants_.erase(it);
+        webrtc_jni::DeleteGlobalRef(jni(), j_participant);
     }
 }
 
@@ -267,7 +289,8 @@ void AndroidRoomObserver::onRecordingStarted(twilio::video::Room *room) {
         }
 
         jni()->CallVoidMethod(*j_room_observer_,
-                              j_on_recording_started_);
+                              j_on_recording_started_,
+                              *j_room_);
 
         CHECK_EXCEPTION(jni()) << "error during CallVoidMethod";
     }
@@ -288,7 +311,8 @@ void AndroidRoomObserver::onRecordingStopped(twilio::video::Room *room)  {
         }
 
         jni()->CallVoidMethod(*j_room_observer_,
-                              j_on_recording_stopped_);
+                              j_on_recording_stopped_,
+                              *j_room_);
 
         CHECK_EXCEPTION(jni()) << "error during CallVoidMethod";
     }
@@ -335,7 +359,7 @@ jobject AndroidRoomObserver::createJavaParticipantList(
     jobject j_participants = jni()->NewObject(*j_array_list_class_, j_array_list_ctor_id_);
 
     std::map<std::string, std::shared_ptr<twilio::video::Participant>>::const_iterator it;
-    jobject j_handler = jni()->CallObjectMethod(*j_room_observer_, j_get_handler_);
+    jobject j_handler = jni()->CallObjectMethod(*j_room_, j_get_handler_);
     for (it = participants.begin(); it != participants.end(); ++it) {
         std::shared_ptr<twilio::video::Participant> participant = it->second;
         jobject j_participant = createJavaParticipant(jni(),
@@ -350,7 +374,9 @@ jobject AndroidRoomObserver::createJavaParticipantList(
                                                       *j_video_track_class_,
                                                       j_video_track_ctor_id_,
                                                       j_handler);
-
+        // Add global ref to java participant wo we can reference in onParticipantDisconnected
+        participants_.insert(std::make_pair(participant, webrtc_jni::NewGlobalRef(jni(),
+                                                                                  j_participant)));
         jni()->CallBooleanMethod(j_participants, j_array_list_add_, j_participant);
     }
     return j_participants;

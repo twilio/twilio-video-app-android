@@ -11,7 +11,7 @@ namespace twilio_video_jni {
 
 class AndroidRoomObserver : public twilio::video::RoomObserver {
 public:
-    AndroidRoomObserver(JNIEnv *env, jobject j_room_observer);
+    AndroidRoomObserver(JNIEnv *env, jobject j_room, jobject j_room_observer);
     ~AndroidRoomObserver();
     void setObserverDeleted();
 protected:
@@ -40,13 +40,16 @@ private:
     bool observer_deleted_ = false;
     mutable rtc::CriticalSection deletion_lock_;
 
+    const webrtc_jni::ScopedGlobalRef<jobject> j_room_;
     const webrtc_jni::ScopedGlobalRef<jobject> j_room_observer_;
+    const webrtc_jni::ScopedGlobalRef<jclass> j_room_class_;
     const webrtc_jni::ScopedGlobalRef<jclass> j_room_observer_class_;
     const webrtc_jni::ScopedGlobalRef<jclass> j_twilio_exception_class_;
     const webrtc_jni::ScopedGlobalRef<jclass> j_participant_class_;
     const webrtc_jni::ScopedGlobalRef<jclass> j_array_list_class_;
     const webrtc_jni::ScopedGlobalRef<jclass> j_audio_track_class_;
     const webrtc_jni::ScopedGlobalRef<jclass> j_video_track_class_;
+    jmethodID j_set_connected_;
     jmethodID j_on_connected_;
     jmethodID j_on_disconnected_;
     jmethodID j_on_connect_failure_;
@@ -61,6 +64,7 @@ private:
     jmethodID j_audio_track_ctor_id_;
     jmethodID j_video_track_ctor_id_;
     jmethodID j_twilio_exception_ctor_id_;
+    std::map<std::shared_ptr<twilio::video::Participant>, jobject> participants_;
 };
 
 }

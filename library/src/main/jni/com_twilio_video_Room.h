@@ -1,12 +1,15 @@
+#ifndef VIDEO_ANDROID_COM_TWILIO_VIDEO_ROOM_H_
+#define VIDEO_ANDROID_COM_TWILIO_VIDEO_ROOM_H_
+
 #include <jni.h>
 #include <memory>
 
+#include "video/video.h"
 #include "video/stats_observer.h"
 #include "video/room.h"
 #include "android_room_observer.h"
-
-#ifndef _Included_com_twilio_conversations_Room
-#define _Included_com_twilio_conversations_Room
+#include "android_stats_observer.h"
+#include "com_twilio_video_ConnectOptions.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -14,20 +17,8 @@ extern "C" {
 
 namespace twilio_video_jni {
 
-struct RoomContext {
-    std::unique_ptr<twilio::video::Room> room;
-};
-
-struct RoomObserverContext {
-    std::shared_ptr<AndroidRoomObserver> android_room_observer;
-};
-
-struct StatsObserverContext {
-    std::shared_ptr<twilio::video::StatsObserver> stats_observer;
-};
-
 JNIEXPORT jlong JNICALL Java_com_twilio_video_Room_nativeConnect
-        (JNIEnv *, jobject, jobject, jlong, jlong);
+        (JNIEnv *, jobject, jobject, jobject, jobject, jlong);
 
 JNIEXPORT jboolean JNICALL Java_com_twilio_video_Room_nativeIsRecording
     (JNIEnv *, jobject, jlong);
@@ -41,19 +32,10 @@ JNIEXPORT void JNICALL Java_com_twilio_video_Room_nativeGetStats
 JNIEXPORT void JNICALL Java_com_twilio_video_Room_nativeOnNetworkChange
     (JNIEnv *, jobject, jlong, jobject);
 
+JNIEXPORT void JNICALL Java_com_twilio_video_Room_nativeReleaseRoom
+        (JNIEnv *, jobject, jlong);
+
 JNIEXPORT void JNICALL Java_com_twilio_video_Room_nativeRelease
-    (JNIEnv *, jobject, jlong);
-
-JNIEXPORT jlong JNICALL Java_com_twilio_video_Room_00024InternalRoomListenerHandle_nativeCreate
-    (JNIEnv *, jobject, jobject);
-
-JNIEXPORT void JNICALL Java_com_twilio_video_Room_00024InternalRoomListenerHandle_nativeRelease
-    (JNIEnv *, jobject, jlong);
-
-JNIEXPORT jlong JNICALL Java_com_twilio_video_Room_00024InternalStatsListenerHandle_nativeCreate
-    (JNIEnv *, jobject, jobject);
-
-JNIEXPORT void JNICALL Java_com_twilio_video_Room_00024InternalStatsListenerHandle_nativeRelease
     (JNIEnv *, jobject, jlong);
 
 }
@@ -61,4 +43,4 @@ JNIEXPORT void JNICALL Java_com_twilio_video_Room_00024InternalStatsListenerHand
 #ifdef __cplusplus
 }
 #endif
-#endif
+#endif // VIDEO_ANDROID_COM_TWILIO_VIDEO_ROOM_H_

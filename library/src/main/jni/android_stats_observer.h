@@ -5,6 +5,7 @@
 
 #include "video/stats_observer.h"
 #include "video/stats_report.h"
+#include "class_reference_holder.h"
 
 #include <memory>
 #include <vector>
@@ -15,13 +16,13 @@ public:
     AndroidStatsObserver(JNIEnv *env, jobject j_stats_observer):
         j_stats_observer_(env, j_stats_observer),
         j_stats_observer_class_(env, webrtc_jni::GetObjectClass(env, *j_stats_observer_)),
-        j_array_list_class_(env, env->FindClass("java/util/ArrayList")),
-        j_stats_report_class_(env, env->FindClass("com/twilio/video/StatsReport")),
-        j_local_audio_track_stats_class_(env, env->FindClass("com/twilio/video/LocalAudioTrackStats")),
-        j_local_video_track_stats_class_(env, env->FindClass("com/twilio/video/LocalVideoTrackStats")),
-        j_audio_track_stats_class_(env, env->FindClass("com/twilio/video/AudioTrackStats")),
-        j_video_track_stats_class_(env, env->FindClass("com/twilio/video/VideoTrackStats")),
-        j_video_dimensions_class_(env, env->FindClass("com/twilio/video/VideoDimensions")),
+        j_array_list_class_(env, twilio_video_jni::FindClass(env, "java/util/ArrayList")),
+        j_stats_report_class_(env, twilio_video_jni::FindClass(env, "com/twilio/video/StatsReport")),
+        j_local_audio_track_stats_class_(env, twilio_video_jni::FindClass(env, "com/twilio/video/LocalAudioTrackStats")),
+        j_local_video_track_stats_class_(env, twilio_video_jni::FindClass(env, "com/twilio/video/LocalVideoTrackStats")),
+        j_audio_track_stats_class_(env, twilio_video_jni::FindClass(env, "com/twilio/video/AudioTrackStats")),
+        j_video_track_stats_class_(env, twilio_video_jni::FindClass(env, "com/twilio/video/VideoTrackStats")),
+        j_video_dimensions_class_(env, twilio_video_jni::FindClass(env, "com/twilio/video/VideoDimensions")),
         j_on_stats_id_(
             webrtc_jni::GetMethodID(env,
                                     *j_stats_observer_class_,

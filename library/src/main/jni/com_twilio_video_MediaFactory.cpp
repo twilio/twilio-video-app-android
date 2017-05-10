@@ -224,6 +224,10 @@ JNIEXPORT jlong JNICALL Java_com_twilio_video_MediaFactory_nativeCreate(JNIEnv *
                                                                         jobject context,
                                                                         jobject j_egl_local_context,
                                                                         jobject j_egl_remote_context) {
+    std::string func_name = std::string(__FUNCTION__);
+    TS_CORE_LOG_MODULE(twilio::video::kTSCoreLogModulePlatform,
+                       twilio::video::kTSCoreLogLevelDebug,
+                       "%s", func_name.c_str());
     // Setup media related Android device objects
     if (!media_jvm_set) {
         bool failure = false;
@@ -261,6 +265,10 @@ JNIEXPORT jobject JNICALL Java_com_twilio_video_MediaFactory_nativeCreateAudioTr
                                                                                     jlong media_factory_handle,
                                                                                     jboolean enabled,
                                                                                     jobject j_audio_options) {
+    std::string func_name = std::string(__FUNCTION__);
+    TS_CORE_LOG_MODULE(twilio::video::kTSCoreLogModulePlatform,
+                       twilio::video::kTSCoreLogLevelDebug,
+                       "%s", func_name.c_str());
     std::shared_ptr<twilio::media::MediaFactory> media_factory =
             getMediaFactory(media_factory_handle);
     cricket::AudioOptions audio_options = getAudioOptions(j_audio_options);
@@ -279,6 +287,10 @@ JNIEXPORT jobject JNICALL Java_com_twilio_video_MediaFactory_nativeCreateVideoTr
                                                                                     jobject j_video_capturer,
                                                                                     jobject j_video_contraints,
                                                                                     jobject j_egl_context) {
+    std::string func_name = std::string(__FUNCTION__);
+    TS_CORE_LOG_MODULE(twilio::video::kTSCoreLogModulePlatform,
+                       twilio::video::kTSCoreLogLevelDebug,
+                       "%s", func_name.c_str());
     std::shared_ptr<twilio::media::MediaFactory> media_factory =
             getMediaFactory(media_factory_handle);
     jobject j_video_capturer_delegate = createJavaVideoCapturerDelegate(j_video_capturer);
@@ -306,6 +318,10 @@ JNIEXPORT jobject JNICALL Java_com_twilio_video_MediaFactory_nativeCreateVideoTr
 JNIEXPORT void JNICALL Java_com_twilio_video_MediaFactory_nativeRelease(JNIEnv *jni,
                                                                         jobject j_media_factory,
                                                                         jlong media_factory_handle) {
+    std::string func_name = std::string(__FUNCTION__);
+    TS_CORE_LOG_MODULE(twilio::video::kTSCoreLogModulePlatform,
+                       twilio::video::kTSCoreLogLevelDebug,
+                       "%s", func_name.c_str());
     if (media_factory_handle != 0) {
         MediaFactoryContext *media_factory_context =
                 reinterpret_cast<MediaFactoryContext *>(media_factory_handle);

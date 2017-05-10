@@ -2,6 +2,7 @@ package com.twilio.video;
 
 import android.content.Context;
 import android.os.Handler;
+import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.util.Pair;
 
@@ -19,22 +20,135 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 public class Room {
     private static final Logger logger = Logger.getLogger(Room.class);
 
-    private long nativeRoomContext;
+    private long nativeRoomDelegate;
     private Context context;
     private String name;
     private String sid;
     private RoomState roomState;
     private Map<String, Participant> participantMap = new HashMap<>();
-    private InternalRoomListenerHandle internalRoomListenerHandle;
-    private InternalRoomListenerImpl internalRoomListenerImpl;
-    private InternalStatsListenerHandle internalStatsListenerHandle;
-    private InternalStatsListenerImpl internalStatsListenerImpl;
     private LocalParticipant localParticipant;
     private final Room.Listener listener;
     private final Handler handler;
+    private final long handlerThreadId;
     private Queue<Pair<Handler, StatsListener>> statsListenersQueue;
     private ConnectOptions cachedConnectOptions;
     private MediaFactory mediaFactory;
+    private final Room.Listener roomListenerProxy = new Room.Listener() {
+        @Override
+        public void onConnected(final Room room) {
+            logger.d("onConnected()");
+            handler.post(new Runnable() {
+                @Override
+                public void run() {
+                    Room.this.listener.onConnected(room);
+                }
+            });
+        }
+
+        @Override
+        public void onConnectFailure(final Room room, final TwilioException twilioException) {
+            logger.d("onConnectFailure()");
+            // Release native room
+            releaseRoom();
+
+            Room.this.roomState = RoomState.DISCONNECTED;
+            handler.post(new Runnable() {
+                @Override
+                public void run() {
+                    // Release native room delegate
+                    release();
+                    Room.this.listener.onConnectFailure(room, twilioException);
+                }
+            });
+        }
+
+        @Override
+        public void onDisconnected(final Room room, final TwilioException twilioException) {
+            logger.d("onDisconnected()");
+            // Release native room
+            releaseRoom();
+
+            if (localParticipant != null) {
+                // Ensure the local participant is released if the disconnect was issued by the core
+                localParticipant.release();
+            }
+            Room.this.roomState = RoomState.DISCONNECTED;
+            handler.post(new Runnable() {
+                @Override
+                public void run() {
+                    // Release native room delegate
+                    release();
+                    Room.this.listener.onDisconnected(room, twilioException);
+                }
+            });
+        }
+
+        @Override
+        public void onParticipantConnected(final Room room, final Participant participant) {
+            logger.d("onParticipantConnected()");
+
+            participantMap.put(participant.getSid(), participant);
+
+            handler.post(new Runnable() {
+                @Override
+                public void run() {
+                    Room.this.listener.onParticipantConnected(room, participant);
+                }
+            });
+        }
+
+        @Override
+        public void onParticipantDisconnected(final Room room, final Participant participant) {
+            logger.d("onParticipantDisconnected()");
+            participantMap.remove(participant.getSid());
+            participant.release();
+
+            handler.post(new Runnable() {
+                @Override
+                public void run() {
+                    Room.this.listener.onParticipantDisconnected(room, participant);
+                }
+            });
+        }
+
+        @Override
+        public void onRecordingStarted(final Room room) {
+            logger.d("onRecordingStarted()");
+
+            handler.post(new Runnable() {
+                @Override
+                public void run() {
+                    Room.this.listener.onRecordingStarted(room);
+                }
+            });
+        }
+
+        @Override
+        public void onRecordingStopped(final Room room) {
+            logger.d("onRecordingStopped()");
+
+            handler.post(new Runnable() {
+                @Override
+                public void run() {
+                    Room.this.listener.onRecordingStopped(room);
+                }
+            });
+        }
+    };
+    private final StatsListener statsListenerProxy = new StatsListener() {
+        @Override
+        public void onStats(final List<StatsReport> statsReports) {
+            final Pair<Handler, StatsListener> statsPair = Room.this.statsListenersQueue.poll();
+            if (statsPair != null) {
+                statsPair.first.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        statsPair.second.onStats(statsReports);
+                    }
+                });
+            }
+        }
+    };
 
     Room(Context context, String name, Handler handler, Listener listener) {
         this.context = context;
@@ -42,11 +156,9 @@ public class Room {
         this.sid = "";
         this.roomState = RoomState.DISCONNECTED;
         this.listener = listener;
-        this.internalRoomListenerImpl = new InternalRoomListenerImpl();
-        this.internalRoomListenerHandle = new InternalRoomListenerHandle(internalRoomListenerImpl);
         this.handler = handler;
+        this.handlerThreadId = handler.getLooper().getThread().getId();
         this.statsListenersQueue = new ConcurrentLinkedQueue<>();
-        this.mediaFactory = MediaFactory.instance(context);
     }
 
     /**
@@ -76,7 +188,7 @@ public class Room {
      */
     public boolean isRecording() {
         return roomState == RoomState.CONNECTED ?
-                nativeIsRecording(nativeRoomContext) : false;
+                nativeIsRecording(nativeRoomDelegate) : false;
     }
 
     /**
@@ -109,47 +221,26 @@ public class Room {
         if (roomState == RoomState.DISCONNECTED) {
             return;
         }
-        if (internalStatsListenerImpl == null) {
-            internalStatsListenerImpl = new InternalStatsListenerImpl();
-            internalStatsListenerHandle =
-                    new InternalStatsListenerHandle(internalStatsListenerImpl);
-        }
-        statsListenersQueue.offer(
-                new Pair<Handler, StatsListener>(Util.createCallbackHandler(), statsListener));
-        nativeGetStats(nativeRoomContext, internalStatsListenerHandle.get());
+        statsListenersQueue.offer(new Pair<>(Util.createCallbackHandler(), statsListener));
+        nativeGetStats(nativeRoomDelegate);
     }
 
     /**
      * Disconnects from the room.
      */
     public synchronized void disconnect() {
-        if (roomState != RoomState.DISCONNECTED && nativeRoomContext != 0) {
+        if (roomState != RoomState.DISCONNECTED && nativeRoomDelegate != 0) {
             if (localParticipant != null) {
                 localParticipant.release();
             }
-            nativeDisconnect(nativeRoomContext);
+            nativeDisconnect(nativeRoomDelegate);
         }
-    }
-
-    long getListenerNativeHandle() {
-        return internalRoomListenerHandle.get();
-    }
-
-    void setNativeContext(long nativeRoomHandle) {
-        this.nativeRoomContext = nativeRoomHandle;
     }
 
     void onNetworkChanged(Video.NetworkChangeEvent networkChangeEvent) {
-        if (nativeRoomContext != 0) {
-            nativeOnNetworkChange(nativeRoomContext, networkChangeEvent);
+        if (nativeRoomDelegate != 0) {
+            nativeOnNetworkChange(nativeRoomDelegate, networkChangeEvent);
         }
-    }
-
-    /*
-     * Needed for synchronizing during room creation.
-     */
-    Object getConnectLock() {
-        return internalRoomListenerImpl;
     }
 
     /*
@@ -157,35 +248,92 @@ public class Room {
      * sure that onConnect() callback won't get called before connect() exits and Room
      * creation is fully completed.
      */
-    void connect(ConnectOptions connectOptions) {
-        synchronized (internalRoomListenerImpl) {
+    void connect(final ConnectOptions connectOptions) {
+        // Check if audio or video tracks have been released
+        ConnectOptions.checkAudioTracksReleased(connectOptions.getAudioTracks());
+        ConnectOptions.checkVideoTracksReleased(connectOptions.getVideoTracks());
+
+        synchronized (roomListenerProxy) {
             // Retain the connect options to provide the audio and video tracks upon connect
+            mediaFactory = MediaFactory.instance(context);
             cachedConnectOptions = connectOptions;
-            nativeRoomContext = nativeConnect(
-                connectOptions,
-                MediaFactory.instance(context).getNativeMediaFactoryHandle(),
-                internalRoomListenerHandle.get());
+            nativeRoomDelegate = nativeConnect(connectOptions,
+                    roomListenerProxy,
+                    statsListenerProxy,
+                    mediaFactory.getNativeMediaFactoryHandle());
             mediaFactory.addRef();
             roomState = RoomState.CONNECTING;
         }
     }
 
-    // Doesn't release native room observer
-    synchronized void release() {
-        if (nativeRoomContext != 0) {
-            mediaFactory.release();
+    /*
+     * Called by JNI layer to get access to developers handler.
+     */
+    @SuppressWarnings("unused")
+    private synchronized Handler getHandler() {
+        return handler;
+    }
+
+    /*
+     * Called by JNI layer to finalize Room state after connected.
+     */
+    @SuppressWarnings("unused")
+    private synchronized void setConnected(String roomSid,
+                                           long nativeLocalParticipantHandle,
+                                           String localParticipantSid,
+                                           String localParticipantIdentity,
+                                           List<Participant> participants) {
+        logger.d("setConnected()");
+        this.sid = roomSid;
+        if (this.name == null || this.name.isEmpty()) {
+            this.name = roomSid;
+        }
+        this.localParticipant = new LocalParticipant(nativeLocalParticipantHandle,
+                localParticipantSid,
+                localParticipantIdentity,
+                cachedConnectOptions.getAudioTracks(),
+                cachedConnectOptions.getVideoTracks());
+        cachedConnectOptions = null;
+        for (Participant participant : participants) {
+            participantMap.put(participant.getSid(), participant);
+        }
+        this.roomState = RoomState.CONNECTED;
+    }
+
+    /*
+     * Release all native Room memory in notifier thread and before invoking
+     * onDisconnected callback for the following reasons:
+     *
+     * 1. Ensures that native WebRTC tracks are not null when removing remote renderers.
+     * 2. Protects developers from potentially referencing dead WebRTC tracks in
+     *    onDisconnected callback.
+     *
+     * See GSDK-1007, GSDK-1079, and GSDK-1043 for more details.
+     *
+     * Thread validation is performed in RoomDelegate.
+     */
+    synchronized void releaseRoom() {
+        if (nativeRoomDelegate != 0) {
             for (Participant participant : participantMap.values()) {
                 participant.release();
             }
-            nativeRelease(nativeRoomContext);
-            nativeRoomContext = 0;
-            internalRoomListenerHandle.release();
-            internalRoomListenerHandle = null;
-            if (internalStatsListenerHandle != null) {
-                internalStatsListenerHandle.release();
-                internalStatsListenerHandle = null;
-            }
+            nativeReleaseRoom(nativeRoomDelegate);
             cleanupStatsListenerQueue();
+        }
+    }
+
+    /*
+     * Release the native RoomDelegate from developer thread once the native Room memory
+     * has been released.
+     */
+    synchronized void release() {
+        // Validate that release is invoked from same thread that invoked constructor
+        Preconditions.checkState(handlerThreadId == Looper.myLooper().getThread().getId());
+
+        if (nativeRoomDelegate != 0) {
+            nativeRelease(nativeRoomDelegate);
+            nativeRoomDelegate = 0;
+            mediaFactory.release();
         }
     }
 
@@ -199,159 +347,6 @@ public class Room {
             });
         }
         statsListenersQueue.clear();
-    }
-
-    void setState(RoomState roomState) {
-        this.roomState = roomState;
-    }
-
-    // JNI Callbacks Interface
-    interface InternalRoomListener {
-        void onConnected(String roomSid,
-                         long localParticipantHandle,
-                         String localParticipantSid,
-                         String localParticipantIdentity,
-                         List<Participant> participantList);
-        void onDisconnected(TwilioException twilioException);
-        void onConnectFailure(TwilioException twilioException);
-        void onParticipantConnected(Participant participant);
-        void onParticipantDisconnected(String participantSid);
-        void onRecordingStarted();
-        void onRecordingStopped();
-    }
-
-    class InternalRoomListenerImpl implements InternalRoomListener {
-
-        // TODO: find better way to pass Handler to Media
-        Handler getHandler() {
-            return Room.this.handler;
-        }
-
-        @Override
-        public synchronized void onConnected(String roomSid,
-                                             long nativeLocalParticipantHandle,
-                                             String localParticipantSid,
-                                             String localParticipantIdentity,
-                                             List<Participant> participantList) {
-            logger.d("onConnected()");
-
-            Room.this.sid = roomSid;
-            if (Room.this.name == null || Room.this.name.isEmpty()) {
-                Room.this.name = roomSid;
-            }
-            Room.this.localParticipant = new LocalParticipant(
-                nativeLocalParticipantHandle, localParticipantSid, localParticipantIdentity, cachedConnectOptions.getAudioTracks(), cachedConnectOptions.getVideoTracks());
-            cachedConnectOptions = null;
-            for (Participant participant : participantList) {
-                participantMap.put(participant.getSid(), participant);
-            }
-            Room.this.roomState = RoomState.CONNECTED;
-            handler.post(new Runnable() {
-                @Override
-                public void run() {
-                    Room.this.listener.onConnected(Room.this);
-                }
-            });
-        }
-
-        @Override
-        public synchronized void onDisconnected(final TwilioException twilioException) {
-            logger.d("onDisconnected()");
-            /*
-             * Release all Android level Room resources in notifier thread and before invoking
-             * onDisconnected callback for the following reasons:
-             *
-             * 1. Ensures that native WebRTC tracks are not null when removing remote renderers.
-             * 2. Protects developers from potentially referencing dead WebRTC tracks in
-             *    onDisconnected callback.
-             *
-             * See GSDK-1007, GSDK-1079, and GSDK-1043 for more details.
-             */
-            release();
-
-            if (localParticipant != null) {
-                // Ensure the local participant is released if the disconnect was issued by the core
-                localParticipant.release();
-            }
-            Room.this.roomState = RoomState.DISCONNECTED;
-            handler.post(new Runnable() {
-                @Override
-                public void run() {
-                    Room.this.listener.onDisconnected(Room.this, twilioException);
-                }
-            });
-        }
-
-        @Override
-        public synchronized void onConnectFailure(final TwilioException twilioException) {
-            logger.d("onConnectFailure()");
-            release();
-            Room.this.roomState = RoomState.DISCONNECTED;
-            handler.post(new Runnable() {
-                @Override
-                public void run() {
-                    Room.this.listener.onConnectFailure(Room.this, twilioException);
-                }
-            });
-        }
-
-        @Override
-        public synchronized void onParticipantConnected(final Participant participant) {
-            logger.d("onParticipantConnected()");
-
-            participantMap.put(participant.getSid(), participant);
-
-            handler.post(new Runnable() {
-                @Override
-                public void run() {
-                    Room.this.listener.onParticipantConnected(Room.this, participant);
-                }
-            });
-        }
-
-        @Override
-        public synchronized void onParticipantDisconnected(String participantSid) {
-            logger.d("onParticipantDisconnected()");
-
-            final Participant participant = participantMap.remove(participantSid);
-            if (participant == null) {
-                logger.w("Received participant disconnected callback for non-existent participant");
-                return;
-            }
-            participant.release();
-
-            handler.post(new Runnable() {
-                @Override
-                public void run() {
-                    Room.this.listener.onParticipantDisconnected(Room.this, participant);
-                }
-            });
-        }
-
-        @Override
-        public void onRecordingStarted() {
-            logger.d("onRecordingStarted()");
-
-            handler.post(new Runnable() {
-                @Override
-                public void run() {
-                    Room.this.listener.onRecordingStarted(Room.this);
-                }
-            });
-        }
-
-        @Override
-        public void onRecordingStopped() {
-            logger.d("onRecordingStopped()");
-
-            handler.post(new Runnable() {
-                @Override
-                public void run() {
-                    Room.this.listener.onRecordingStopped(Room.this);
-                }
-            });
-        }
-
     }
 
     /**
@@ -411,64 +406,15 @@ public class Room {
         void onRecordingStopped(Room room);
     }
 
-    class InternalRoomListenerHandle extends NativeHandle {
-        InternalRoomListenerHandle(InternalRoomListener listener) {
-            super(listener);
-        }
-
-        /*
-         * Native Handle
-         */
-        @Override
-        protected native long nativeCreate(Object object);
-
-        @Override
-        protected native void nativeRelease(long nativeHandle);
-    }
-
-    // JNI Callbacks Interface
-    interface InternalStatsListener {
-        void onStats(List<StatsReport> statsReports);
-    }
-
-    class InternalStatsListenerImpl implements InternalStatsListener {
-
-        public void onStats(final List<StatsReport> statsReports) {
-            final Pair<Handler, StatsListener> statsPair = Room.this.statsListenersQueue.poll();
-            if (statsPair != null) {
-                statsPair.first.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        statsPair.second.onStats(statsReports);
-                    }
-                });
-            }
-        }
-    }
-
-    class InternalStatsListenerHandle extends NativeHandle {
-
-        public InternalStatsListenerHandle(InternalStatsListener listener) {
-            super(listener);
-        }
-
-        /*
-         * Native Handle
-         */
-        @Override
-        protected native long nativeCreate(Object object);
-
-        @Override
-        protected native void nativeRelease(long nativeHandle);
-    }
-
     private native long nativeConnect(ConnectOptions ConnectOptions,
-                                      long nativeMediaFactoryHandle,
-                                      long nativeRoomListenerHandle);
-    private native boolean nativeIsRecording(long nativeRoomContext);
-    private native void nativeDisconnect(long nativeRoomContext);
-    private native void nativeGetStats(long nativeRoomContext, long nativeStatsObserver);
-    private native void nativeRelease(long nativeRoomContext);
-    private native void nativeOnNetworkChange(long nativeRoomContext,
+                                      Listener listenerProxy,
+                                      StatsListener statsListenerProxy,
+                                      long nativeMediaFactoryHandle);
+    private native boolean nativeIsRecording(long nativeRoomDelegate);
+    private native void nativeGetStats(long nativeRoomDelegate);
+    private native void nativeOnNetworkChange(long nativeRoomDelegate,
                                               Video.NetworkChangeEvent networkChangeEvent);
+    private native void nativeDisconnect(long nativeRoomDelegate);
+    private native void nativeReleaseRoom(long nativeRoomDelegate);
+    private native void nativeRelease(long nativeRoomDelegate);
 }

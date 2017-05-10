@@ -130,4 +130,14 @@ public class MediaFactoryTest {
         mediaFactory.createVideoTrack(true, new FakeVideoCapturer(),
                 LocalVideoTrack.defaultVideoConstraints);
     }
+
+    @Test
+    public void canCreateAndReleaseRepeatedly() {
+        int numIterations = 100;
+        for (int i = 0 ; i < numIterations ; i++) {
+            MediaFactory mediaFactory = MediaFactory.instance(context);
+            mediaFactory.addRef();
+            mediaFactory.release();
+        }
+    }
 }

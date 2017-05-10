@@ -3,7 +3,6 @@
 #include "com_twilio_video_PlatformInfo.h"
 #include "com_twilio_video_LocalAudioTrack.h"
 #include "com_twilio_video_LocalVideoTrack.h"
-#include "com_twilio_video_MediaFactory.h"
 
 #include "webrtc/sdk/android/src/jni/jni_helpers.h"
 #include "class_reference_holder.h"
@@ -19,16 +18,15 @@ Java_com_twilio_video_ConnectOptions_nativeCreate(JNIEnv *env,
                                                   jobjectArray j_video_tracks,
                                                   jobject j_ice_options,
                                                   jboolean j_enable_insights,
-                                                  jlong j_platform_info_handle,
-                                                  jlong j_media_factory_handle) {
+                                                  jlong j_platform_info_handle) {
 
     std::string access_token = webrtc_jni::JavaToStdString(env, j_access_token);
-    twilio::video::ConnectOptions::Builder builder =
-        twilio::video::ConnectOptions::Builder(access_token);
+    twilio::video::ConnectOptions::Builder* builder =
+        new twilio::video::ConnectOptions::Builder(access_token);
 
     if (!webrtc_jni::IsNull(env, j_room_name)) {
         std::string name = webrtc_jni::JavaToStdString(env, j_room_name);
-        builder.setRoomName(name);
+        builder->setRoomName(name);
     }
 
     if (!webrtc_jni::IsNull(env, j_audio_tracks)) {
@@ -50,7 +48,7 @@ Java_com_twilio_video_ConnectOptions_nativeCreate(JNIEnv *env,
                 auto audio_track = getLocalAudioTrack(j_audio_track_handle);
                 audio_tracks.push_back(audio_track);
             }
-            builder.setAudioTracks(audio_tracks);
+            builder->setAudioTracks(audio_tracks);
         }
     }
 
@@ -73,30 +71,24 @@ Java_com_twilio_video_ConnectOptions_nativeCreate(JNIEnv *env,
                 auto video_track = getLocalVideoTrack(j_video_track_handle);
                 video_tracks.push_back(video_track);
             }
-            builder.setVideoTracks(video_tracks);
+            builder->setVideoTracks(video_tracks);
         }
     }
 
     if (!webrtc_jni::IsNull(env, j_ice_options)) {
         twilio::media::IceOptions ice_options = IceOptions::getIceOptions(env, j_ice_options);
-        builder.setIceOptions(ice_options);
+        builder->setIceOptions(ice_options);
     }
 
     PlatformInfoContext *platform_info_context =
         reinterpret_cast<PlatformInfoContext *>(j_platform_info_handle);
     if (platform_info_context != nullptr) {
-        builder.setPlatformInfo(platform_info_context->platform_info);
+        builder->setPlatformInfo(platform_info_context->platform_info);
     }
 
-    MediaFactoryContext *media_factory_context =
-            reinterpret_cast<MediaFactoryContext*>(j_media_factory_handle);
-    builder.setMediaFactory(media_factory_context->getMediaFactory());
+    builder->enableInsights(j_enable_insights);
 
-    builder.enableInsights(j_enable_insights);
-
-    twilio_video_jni::ConnectOptionsContext *data_context = new twilio_video_jni::ConnectOptionsContext;
-    data_context->connect_options = builder.build();
-    return webrtc_jni::jlongFromPointer(data_context);
+    return webrtc_jni::jlongFromPointer(builder);
 }
 
 }

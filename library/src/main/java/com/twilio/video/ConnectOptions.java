@@ -1,5 +1,7 @@
 package com.twilio.video;
 
+import android.support.annotation.Nullable;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,6 +14,26 @@ public class ConnectOptions {
     private final List<LocalAudioTrack> audioTracks;
     private final List<LocalVideoTrack> videoTracks;
     private final IceOptions iceOptions;
+
+    static void checkAudioTracksReleased(@Nullable List<LocalAudioTrack> audioTracks) {
+        if (audioTracks != null) {
+            for (LocalAudioTrack localAudioTrack : audioTracks) {
+                Preconditions.checkState(
+                        !localAudioTrack.isReleased(),
+                        "LocalAudioTrack cannot be released");
+            }
+        }
+    }
+
+    static void checkVideoTracksReleased(@Nullable List<LocalVideoTrack> videoTracks) {
+        if (videoTracks != null) {
+            for (LocalVideoTrack localVideoTrack : videoTracks) {
+                Preconditions.checkState(
+                        !localVideoTrack.isReleased(),
+                        "LocalVideoTrack cannot be released");
+            }
+        }
+    }
 
     private ConnectOptions(Builder builder) {
         this.accessToken = builder.accessToken;
@@ -59,15 +81,21 @@ public class ConnectOptions {
         return videoTracksArray;
     }
 
-    private long createNativeObject(long mediaFactoryNativeHandle) {
+    /*
+     * Invoked by JNI RoomDelegate to get pointer to twilio::video::ConnectOptions::Builder
+     */
+    @SuppressWarnings("unused")
+    private long createNativeConnectOptionsBuilder() {
+        checkAudioTracksReleased(audioTracks);
+        checkVideoTracksReleased(videoTracks);
+
         return nativeCreate(accessToken,
                 roomName,
                 getLocalAudioTracksArray(),
                 getLocalVideoTracksArray(),
                 iceOptions,
                 false,
-                PlatformInfo.getNativeHandle(),
-                mediaFactoryNativeHandle);
+                PlatformInfo.getNativeHandle());
     }
 
     private native long nativeCreate(String accessToken,
@@ -76,8 +104,7 @@ public class ConnectOptions {
                                      LocalVideoTrack[] videoTracks,
                                      IceOptions iceOptions,
                                      boolean enableInsights,
-                                     long platformInfoNativeHandle,
-                                     long mediaFactoryNativeHandle);
+                                     long platformInfoNativeHandle);
     /**
      * Build new {@link ConnectOptions}.
      *
@@ -136,20 +163,8 @@ public class ConnectOptions {
             Preconditions.checkNotNull(accessToken, "Token must not be null.");
             Preconditions.checkArgument(!accessToken.equals(""), "Token must not be empty.");
 
-            if (videoTracks != null) {
-                for (LocalVideoTrack localVideoTrack : videoTracks) {
-                    Preconditions.checkState(
-                            !localVideoTrack.isReleased(),
-                            "LocalVideoTrack cannot be released");
-                }
-            }
-            if (audioTracks != null) {
-                for (LocalAudioTrack localAudioTrack : audioTracks) {
-                    Preconditions.checkState(
-                            !localAudioTrack.isReleased(),
-                            "LocalAudioTrack cannot be released");
-                }
-            }
+            checkAudioTracksReleased(audioTracks);
+            checkVideoTracksReleased(videoTracks);
 
             return new ConnectOptions(this);
         }
