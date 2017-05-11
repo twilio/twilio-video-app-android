@@ -44,7 +44,6 @@ In order to use our project please make sure you have the following installed:
 
     ```
     account_sid
-    auth_token
     api_key
     api_key_secret
     configuration_profile_sid
@@ -67,7 +66,6 @@ In order to use our project please make sure you have the following installed:
 
     ```
     dev_account_sid
-    dev_auth_token
     dev_api_key
     dev_api_key_secret
     dev_p2p_configuration_profile_sid
@@ -76,7 +74,6 @@ In order to use our project please make sure you have the following installed:
     ```
     ```
     stage_account_sid
-    stage_auth_token
     stage_api_key
     stage_api_key_secret
     stage_p2p_configuration_profile_sid

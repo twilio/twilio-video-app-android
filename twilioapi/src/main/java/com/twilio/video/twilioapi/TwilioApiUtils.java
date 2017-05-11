@@ -56,7 +56,8 @@ public class TwilioApiUtils {
     }
 
     public static void getServiceToken(String accountSid,
-                                       String authToken,
+                                       String signingKeySid,
+                                       String signingKeySecret,
                                        String environment,
                                        Callback<TwilioServiceToken> callback)
             throws IllegalArgumentException {
@@ -69,12 +70,16 @@ public class TwilioApiUtils {
             currentEnvironment = environment;
             twilioApiService = createTwilioApiService();
         }
-        twilioApiService.getServiceToken(accountSid, authToken);
+        String authString = signingKeySid + ":" + signingKeySecret;
+        String authorization = "Basic " + Base64.encodeToString(authString.getBytes(),
+                Base64.NO_WRAP);
+        twilioApiService.getServiceToken(authorization, accountSid, callback);
     }
 
     // Provide a synchronous version of getServiceToken for tests
     public static TwilioServiceToken getServiceToken(String accountSid,
-                                                     String authToken,
+                                                     String signingKeySid,
+                                                     String signingKeySecret,
                                                      String environment) {
         if (!environment.equalsIgnoreCase(PROD) &&
             !environment.equalsIgnoreCase(STAGE) &&
@@ -86,7 +91,7 @@ public class TwilioApiUtils {
             twilioApiService = createTwilioApiService();
         }
 
-        String authString = accountSid + ":" + authToken;
+        String authString = signingKeySid + ":" + signingKeySecret;
         String authorization = "Basic " + Base64.encodeToString(authString.getBytes(),
                 Base64.NO_WRAP);
 

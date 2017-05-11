@@ -15,7 +15,6 @@ import static org.junit.Assume.assumeTrue;
 public class CredentialsUtils {
     private static final int TTL_DEFAULT = 1800;
     public static final String ACCOUNT_SID = "account_sid";
-    public static final String AUTH_TOKEN = "auth_token";
     public static final String API_KEY = "api_key";
     public static final String API_KEY_SECRET = "api_key_secret";
     public static final String CONFIGURATION_PROFILE_SID = "configuration_profile_sid";
@@ -23,7 +22,6 @@ public class CredentialsUtils {
     public static final String SFU_RECORDING_CONFIGURATION_PROFILE_SID =
             "sfu_recording_configuration_profile_sid";
     public static final String DEV_ACCOUNT_SID = "dev_account_sid";
-    public static final String DEV_AUTH_TOKEN = "dev_auth_token";
     public static final String DEV_API_KEY = "dev_api_key";
     public static final String DEV_API_KEY_SECRET = "dev_api_key_secret";
     public static final String DEV_P2P_CONFIGURATION_PROFILE_SID =
@@ -33,7 +31,6 @@ public class CredentialsUtils {
     public static final String DEV_SFU_RECORDING_CONFIGURATION_PROFILE_SID =
             "dev_sfu_recording_configuration_profile_sid";
     public static final String STAGE_ACCOUNT_SID = "stage_account_sid";
-    public static final String STAGE_AUTH_TOKEN = "stage_auth_token";
     public static final String STAGE_API_KEY = "stage_api_key";
     public static final String STAGE_API_KEY_SECRET = "stage_api_key_secret";
     public static final String STAGE_P2P_CONFIGURATION_PROFILE_SID =
@@ -65,12 +62,10 @@ public class CredentialsUtils {
         switch (environment) {
             case DEV:
                 checkCredentialDefined(DEV_ACCOUNT_SID);
-                checkCredentialDefined(DEV_AUTH_TOKEN);
                 checkCredentialDefined(DEV_API_KEY);
                 checkCredentialDefined(DEV_API_KEY_SECRET);
 
                 credentials.put(ACCOUNT_SID, BuildConfig.twilioCredentials.get(DEV_ACCOUNT_SID));
-                credentials.put(AUTH_TOKEN, BuildConfig.twilioCredentials.get(DEV_AUTH_TOKEN));
                 credentials.put(API_KEY, BuildConfig.twilioCredentials.get(DEV_API_KEY));
                 credentials.put(API_KEY_SECRET,
                         BuildConfig.twilioCredentials.get(DEV_API_KEY_SECRET));
@@ -104,12 +99,10 @@ public class CredentialsUtils {
                 break;
             case STAGE:
                 checkCredentialDefined(STAGE_ACCOUNT_SID);
-                checkCredentialDefined(STAGE_AUTH_TOKEN);
                 checkCredentialDefined(STAGE_API_KEY);
                 checkCredentialDefined(STAGE_API_KEY_SECRET);
 
                 credentials.put(ACCOUNT_SID, BuildConfig.twilioCredentials.get(STAGE_ACCOUNT_SID));
-                credentials.put(AUTH_TOKEN, BuildConfig.twilioCredentials.get(STAGE_AUTH_TOKEN));
                 credentials.put(API_KEY, BuildConfig.twilioCredentials.get(STAGE_API_KEY));
                 credentials.put(API_KEY_SECRET,
                         BuildConfig.twilioCredentials.get(STAGE_API_KEY_SECRET));
@@ -143,12 +136,10 @@ public class CredentialsUtils {
                 break;
             case PROD:
                 checkCredentialDefined(ACCOUNT_SID);
-                checkCredentialDefined(AUTH_TOKEN);
                 checkCredentialDefined(API_KEY);
                 checkCredentialDefined(API_KEY_SECRET);
 
                 credentials.put(ACCOUNT_SID, BuildConfig.twilioCredentials.get(ACCOUNT_SID));
-                credentials.put(AUTH_TOKEN, BuildConfig.twilioCredentials.get(AUTH_TOKEN));
                 credentials.put(API_KEY, BuildConfig.twilioCredentials.get(API_KEY));
                 credentials.put(API_KEY_SECRET, BuildConfig.twilioCredentials.get(API_KEY_SECRET));
 

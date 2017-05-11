@@ -28,7 +28,8 @@ public class ServiceTokenUtil {
         if (isExpired(twilioServiceToken)) {
             twilioServiceToken = TwilioApiUtils
                     .getServiceToken(credentials.get(CredentialsUtils.ACCOUNT_SID),
-                            credentials.get(CredentialsUtils.AUTH_TOKEN),
+                            credentials.get(CredentialsUtils.API_KEY),
+                            credentials.get(CredentialsUtils.API_KEY_SECRET),
                             BuildConfig.ENVIRONMENT);
         }
         return convertToIceServersSet(twilioServiceToken.getIceServers());
