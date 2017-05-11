@@ -388,7 +388,6 @@ def getTwilioVideoConfig() {
 
     // Validate that mandatory credentials are set
     assertCredentialDefined(twilioVideoConfig.credentials, "account_sid");
-    assertCredentialDefined(twilioVideoConfig.credentials, "auth_token");
     assertCredentialDefined(twilioVideoConfig.credentials, "api_key");
     assertCredentialDefined(twilioVideoConfig.credentials, "api_key_secret");
     assertCredentialDefined(twilioVideoConfig.credentials, "configuration_profile_sid");
