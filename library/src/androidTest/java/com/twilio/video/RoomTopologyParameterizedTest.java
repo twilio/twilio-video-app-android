@@ -207,4 +207,69 @@ public class RoomTopologyParameterizedTest extends BaseClientTest {
         Assert.assertFalse(room.isRecording());
     }
 
+    @Test
+    public void shouldDisconnectDuplicateParticipant() throws InterruptedException {
+        // Connect first participant
+        ConnectOptions connectOptions = new ConnectOptions.Builder(token)
+            .roomName(roomName)
+            .build();
+        final CountDownLatch connectedLatch = new CountDownLatch(1);
+        final CountDownLatch disconnectedLatch = new CountDownLatch(1);
+        Room room1 = Video.connect(mediaTestActivity, connectOptions, new Room.Listener() {
+            @Override
+            public void onConnected(Room room) {
+                connectedLatch.countDown();
+            }
+
+            @Override
+            public void onConnectFailure(Room room, TwilioException twilioException) {
+                fail();
+            }
+
+            @Override
+            public void onDisconnected(Room room, TwilioException twilioException) {
+                assertEquals(TwilioException.PARTICIPANT_DUPLICATE_IDENTITY_EXCEPTION, twilioException.getCode());
+                disconnectedLatch.countDown();
+            }
+
+            @Override
+            public void onParticipantConnected(Room room, Participant participant) {
+                fail();
+            }
+
+            @Override
+            public void onParticipantDisconnected(Room room, Participant participant) {
+                fail();
+            }
+
+            @Override
+            public void onRecordingStarted(Room room) {
+                fail();
+            }
+
+            @Override
+            public void onRecordingStopped(Room room) {
+                fail();
+            }
+        });
+        assertTrue(connectedLatch.await(10, TimeUnit.SECONDS));
+
+        // Connect second participant
+        connectOptions = new ConnectOptions.Builder(token)
+            .roomName(roomName)
+            .build();
+        CallbackHelper.FakeRoomListener room2Listener = new CallbackHelper.FakeRoomListener();
+        room2Listener.onConnectedLatch = new CountDownLatch(1);
+        room2Listener.onDisconnectedLatch = new CountDownLatch(1);
+        Room room2 = Video.connect(mediaTestActivity, connectOptions, room2Listener);
+        assertTrue(room2Listener.onConnectedLatch.await(10, TimeUnit.SECONDS));
+
+        // First participant should get disconnected
+        assertTrue(disconnectedLatch.await(10, TimeUnit.SECONDS));
+
+        // Disconnect second participant
+        room2.disconnect();
+        assertTrue(room2Listener.onDisconnectedLatch.await(10, TimeUnit.SECONDS));
+    }
+
 }

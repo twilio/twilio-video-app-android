@@ -6,6 +6,8 @@ Improvements
 
 - Improved internal native Room operations.
 - Improved `ScreenCapturer` performance by enabling capturing to a texture.
+- Added new error code for case when participant gets disconnected because of duplicate participant 
+joined the room. 
 
 Bug Fixes
 
