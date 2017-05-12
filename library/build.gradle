@@ -121,6 +121,7 @@ dependencies {
 
     androidTestCompile project(':env')
     androidTestCompile project(':twilioapi')
+    androidTestCompile project(':token')
     androidTestCompile 'com.squareup.retrofit:retrofit:1.9.0'
     androidTestCompile 'com.android.support.test.espresso:espresso-core:2.2.2'
     androidTestCompile 'com.android.support.test:runner:0.5'
@@ -128,7 +129,6 @@ dependencies {
     androidTestCompile 'com.android.support.test.uiautomator:uiautomator-v18:2.1.2'
     androidTestCompile 'com.google.code.gson:gson:2.7'
     androidTestCompile 'com.twilio:accessmanager-android:0.1.0'
-    androidTestCompile 'io.jsonwebtoken:jjwt:0.7.0'
 
     compile 'com.android.support:support-annotations:25.1.0'
     compile 'com.getkeepsafe.relinker:relinker:1.2.2'
@@ -380,29 +380,32 @@ def getTestCoverageEnabled() {
 }
 
 def getTwilioVideoConfig() {
-    // Validate twilio-video.json exists
-    assert project.file('twilio-video.json').exists() :
-            "Could not find twilio-video.json in" + project.projectDir.toString();
-    def slurper = new groovy.json.JsonSlurper()
-    def twilioVideoConfig = slurper.parse(project.file('twilio-video.json'));
+    if (project.file('twilio-video.json').exists()) {
+        def slurper = new groovy.json.JsonSlurper()
+        def twilioVideoConfig = slurper.parse(project.file('twilio-video.json'));
 
-    // Validate that mandatory credentials are set
-    assertCredentialDefined(twilioVideoConfig.credentials, "account_sid");
-    assertCredentialDefined(twilioVideoConfig.credentials, "api_key");
-    assertCredentialDefined(twilioVideoConfig.credentials, "api_key_secret");
-    assertCredentialDefined(twilioVideoConfig.credentials, "configuration_profile_sid");
+        // Validate that mandatory credentials are set
+        assertCredentialDefined(twilioVideoConfig.credentials, "account_sid");
+        assertCredentialDefined(twilioVideoConfig.credentials, "api_key");
+        assertCredentialDefined(twilioVideoConfig.credentials, "api_key_secret");
+        assertCredentialDefined(twilioVideoConfig.credentials, "configuration_profile_sid");
 
-    // Generate credential HashMap
-    def hashMapPrefix = "new java.util.HashMap<String , String>() {{\n";
-    def hashMapSuffix = "}}";
-    def hashMap = hashMapPrefix;
+        // Generate credential HashMap
+        def hashMapPrefix = "new java.util.HashMap<String , String>() {{\n";
+        def hashMapSuffix = "}}";
+        def hashMap = hashMapPrefix;
 
-    twilioVideoConfig.credentials.each { credentialsEntry ->
-        def hashMapEntry = "    put(\"${credentialsEntry.key}\", \"${credentialsEntry.value}\");\n";
-        hashMap += hashMapEntry
+        twilioVideoConfig.credentials.each { credentialsEntry ->
+            def hashMapEntry = "    put(\"${credentialsEntry.key}\", \"${credentialsEntry.value}\");\n";
+            hashMap += hashMapEntry
+        }
+
+        return hashMap + hashMapSuffix;
+    } else {
+        logger.log(LogLevel.WARN, "Could not find twilio-video.json in " +
+                project.projectDir.toString() + ". Library instrumentation tests cannot be run" +
+                " without credentials")
     }
-
-    return hashMap + hashMapSuffix;
 }
 
 def assertCredentialDefined(credentials, credentialKey) {

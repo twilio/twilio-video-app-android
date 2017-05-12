@@ -6,6 +6,10 @@ android {
     compileSdkVersion 25
     buildToolsVersion "25.0.1"
 
+    packagingOptions {
+        exclude 'META-INF/LICENSE'
+    }
+
     defaultConfig {
         applicationId "com.twilio.video.app"
 
@@ -74,13 +78,23 @@ android {
             buildConfigField 'String', 'TOPOLOGY_DEFAULT', '"SFU"'
             buildConfigField 'String', 'ENVIRONMENT_DEFAULT', '"prod"'
         }
+
+        development {
+            applicationId "com.twilio.video.app.development"
+            buildConfigField 'String', 'TOPOLOGY_DEFAULT', '"P2P"'
+            buildConfigField 'String', 'ENVIRONMENT_DEFAULT', '"prod"'
+            buildConfigField("java.util.Map<String, String>",
+                    "twilioCredentials",
+                    "${getTwilioVideoAppConfig()}")
+        }
     }
 
     variantFilter { variant ->
         def names = variant.flavors*.name
 
-        // Ignore production debug builds for now
-        if (names.contains("production") && variant.buildType.name == "debug") {
+        // Ignore production debug and development release builds
+        if ((names.contains("production") && variant.buildType.name == "debug") ||
+                (names.contains("development") && variant.buildType.name == "release")) {
             setIgnore(true)
         }
     }
@@ -118,6 +132,45 @@ dependencies {
     compile 'com.jakewharton.retrofit:retrofit2-rxjava2-adapter:1.0.0'
 
     annotationProcessor 'com.jakewharton:butterknife-compiler:8.4.0'
+
+    developmentCompile project(':token')
+}
+
+def getTwilioVideoAppConfig() {
+    if (project.file('twilio-video-app.json').exists()) {
+        def slurper = new groovy.json.JsonSlurper()
+        def twilioVideoConfig = slurper.parse(project.file('twilio-video-app.json'));
+
+        // Validate that mandatory credentials are set
+        assertCredentialDefined(twilioVideoConfig.credentials, "account_sid");
+        assertCredentialDefined(twilioVideoConfig.credentials, "api_key");
+        assertCredentialDefined(twilioVideoConfig.credentials, "api_key_secret");
+        assertCredentialDefined(twilioVideoConfig.credentials, "configuration_profile_sid");
+
+        // Generate credential HashMap
+        def hashMapPrefix = "new java.util.HashMap<String , String>() {{\n";
+        def hashMapSuffix = "}}";
+        def hashMap = hashMapPrefix;
+
+        twilioVideoConfig.credentials.each { credentialsEntry ->
+            def hashMapEntry = "    put(\"${credentialsEntry.key}\", " +
+                    "\"${credentialsEntry.value}\");\n";
+            hashMap += hashMapEntry
+        }
+
+        return hashMap + hashMapSuffix;
+    } else {
+        logger.log(LogLevel.WARN, "Could not find twilio-video-app.json in " +
+                project.projectDir.toString() + ". Development variant cannot connect to room" +
+                " without credentials")
+    }
+}
+
+def assertCredentialDefined(credentials, credentialKey) {
+    assert credentials.containsKey(credentialKey) :
+            "twilio-video-app.json must contain key " + credentialKey;
+    assert credentials.get(credentialKey) != null : credentialKey + " must not be null";
+    assert !credentials.get(credentialKey).equals("") : credentialKey + " must not be empty";
 }
 
 apply plugin: 'com.google.gms.google-services'

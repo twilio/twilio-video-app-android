@@ -84,6 +84,7 @@
     <string name="password">Password</string>
     <string name="unauthorized_title">Unauthorized</string>
     <string name="unauthorized_desc">Only users with a Twilio email address are authorized to use this application.</string>
+    <string name="name">Name</string>
 
     <string-array name="environment_array">
         <item>Production</item>

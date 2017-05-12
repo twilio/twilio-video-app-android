@@ -1,4 +1,4 @@
-package com.twilio.video.util;
+package com.twilio.video.token;
 
 import java.util.Date;
 import java.util.HashMap;

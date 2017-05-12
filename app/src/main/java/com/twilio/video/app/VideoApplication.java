@@ -23,7 +23,7 @@ public class VideoApplication extends Application implements HasDispatchingActiv
     @Inject DispatchingAndroidInjector<Activity> dispatchingActivityInjector;
     @Inject Timber.Tree tree;
 
-    private ApplicationComponent applicationComponent;
+    private VideoApplicationComponent applicationComponent;
 
     @Override
     protected void attachBaseContext(Context base) {
@@ -36,7 +36,7 @@ public class VideoApplication extends Application implements HasDispatchingActiv
         super.onCreate();
 
         // Create application component and inject application
-        applicationComponent = DaggerApplicationComponent.builder()
+        applicationComponent = DaggerVideoApplicationComponent.builder()
                 .applicationModule(new ApplicationModule(this))
                 .build();
         applicationComponent.inject(this);

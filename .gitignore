@@ -59,3 +59,6 @@ sdk/libs/
 
 # Twilio Video Config
 **/twilio-video.json
+
+# Twilio Video App Config
+**/twilio-video-app.json

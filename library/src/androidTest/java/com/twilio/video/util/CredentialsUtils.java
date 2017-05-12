@@ -1,8 +1,10 @@
 package com.twilio.video.util;
 
+import android.support.test.espresso.core.deps.guava.base.Preconditions;
 import android.support.test.espresso.core.deps.guava.base.Strings;
 
 import com.twilio.video.test.BuildConfig;
+import com.twilio.video.token.VideoAccessToken;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -39,8 +41,12 @@ public class CredentialsUtils {
             "stage_sfu_configuration_profile_sid";
     public static final String STAGE_SFU_RECORDING_CONFIGURATION_PROFILE_SID =
             "stage_sfu_recording_configuration_profile_sid";
+    private static final String TWILIO_VIDEO_JSON_NOT_PROVIDED = "library/twilio-video.json is " +
+            "required to create tokens for library tests that connect to a Room";
 
     public static String getAccessToken(String username, Topology topology) {
+        Preconditions.checkNotNull(BuildConfig.twilioCredentials,
+                TWILIO_VIDEO_JSON_NOT_PROVIDED);
         Map<String, String> credentials = resolveCredentials(
                 Environment.fromString(BuildConfig.ENVIRONMENT), topology);
         VideoAccessToken videoAccessToken = new VideoAccessToken.Builder(

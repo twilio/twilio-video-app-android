@@ -11,7 +11,6 @@ import android.media.AudioManager;
 import android.media.projection.MediaProjectionManager;
 import android.os.Build;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
@@ -520,8 +519,11 @@ public class RoomActivity extends BaseActivity {
     private String getDisplayName() {
         String displayName = sharedPreferences.getString(Preferences.DISPLAY_NAME, null);
 
-        // Append serial number for internal flavor so the same account can be used across devices
-        return BuildConfigUtils.isInternalFlavor() ?
+        /*
+         * Append serial number for internal or development flavor so the same account can be used
+         * across different devices.
+         */
+        return BuildConfigUtils.isInternalFlavor() || BuildConfigUtils.isDevelopmentFlavor() ?
                 displayName + String.format(" (%s)", Build.SERIAL) :
                 displayName;
     }
