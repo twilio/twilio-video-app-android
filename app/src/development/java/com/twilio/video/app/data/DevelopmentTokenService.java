@@ -15,7 +15,6 @@ import io.reactivex.Single;
 
 public class DevelopmentTokenService implements TokenService {
     private static final String ACCOUNT_SID = "account_sid";
-    private static final String AUTH_TOKEN = "auth_token";
     private static final String API_KEY = "api_key";
     private static final String API_KEY_SECRET = "api_key_secret";
     private static final String CONFIGURATION_PROFILE_SID = "configuration_profile_sid";
@@ -49,12 +48,10 @@ public class DevelopmentTokenService implements TokenService {
         Map<String, String> credentials = new HashMap<>();
 
         checkCredentialDefined(ACCOUNT_SID);
-        checkCredentialDefined(AUTH_TOKEN);
         checkCredentialDefined(API_KEY);
         checkCredentialDefined(API_KEY_SECRET);
 
         credentials.put(ACCOUNT_SID, BuildConfig.twilioCredentials.get(ACCOUNT_SID));
-        credentials.put(AUTH_TOKEN, BuildConfig.twilioCredentials.get(AUTH_TOKEN));
         credentials.put(API_KEY, BuildConfig.twilioCredentials.get(API_KEY));
         credentials.put(API_KEY_SECRET, BuildConfig.twilioCredentials.get(API_KEY_SECRET));
 
