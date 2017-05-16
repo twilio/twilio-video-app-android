@@ -24,32 +24,6 @@ include_directories(${CORE_INCLUDE_DIR})
 include_directories(${WEBRTC_INCLUDE_DIR})
 include_directories(${LIBYUV_INCLUDE_DIR})
 
-# Set static library properties
-add_library(webrtc STATIC IMPORTED GLOBAL)
-set_property(TARGET webrtc PROPERTY IMPORTED_LOCATION ${CORE_STATIC_LIB_DIR}/libwebrtc.a)
-add_library(webrtc-jni STATIC IMPORTED GLOBAL)
-set_property(TARGET webrtc-jni PROPERTY IMPORTED_LOCATION ${CORE_STATIC_LIB_DIR}/libwebrtc-jni.a)
-add_library(jni-helpers STATIC IMPORTED GLOBAL)
-set_property(TARGET jni-helpers PROPERTY IMPORTED_LOCATION ${CORE_STATIC_LIB_DIR}/libjni-helpers.a)
-include_directories(${RESIPROCATE_INCLUDE_DIR})
-add_library(resiprocate STATIC IMPORTED GLOBAL)
-set_property(TARGET resiprocate PROPERTY IMPORTED_LOCATION ${CORE_STATIC_LIB_DIR}/libresiprocate.a)
-include_directories(${POCO_INCLUDE_DIR})
-add_library(poco-net STATIC IMPORTED GLOBAL)
-set_property(TARGET poco-net PROPERTY IMPORTED_LOCATION ${CORE_STATIC_LIB_DIR}/libPocoNet.a)
-add_library(poco-netssl STATIC IMPORTED GLOBAL)
-set_property(TARGET poco-netssl PROPERTY IMPORTED_LOCATION ${CORE_STATIC_LIB_DIR}/libPocoNetSSL.a)
-add_library(poco-util STATIC IMPORTED GLOBAL)
-set_property(TARGET poco-util PROPERTY IMPORTED_LOCATION ${CORE_STATIC_LIB_DIR}/libPocoUtil.a)
-add_library(poco-crypto STATIC IMPORTED GLOBAL)
-set_property(TARGET poco-crypto PROPERTY IMPORTED_LOCATION ${CORE_STATIC_LIB_DIR}/libPocoCrypto.a)
-add_library(poco-foundation STATIC IMPORTED GLOBAL)
-set_property(TARGET poco-foundation PROPERTY IMPORTED_LOCATION ${CORE_STATIC_LIB_DIR}/libPocoFoundation.a)
-add_library(boringssl STATIC IMPORTED GLOBAL)
-set_property(TARGET boringssl PROPERTY IMPORTED_LOCATION ${CORE_STATIC_LIB_DIR}/libboringssl.a)
-add_library(video-core STATIC IMPORTED GLOBAL)
-set_property(TARGET video-core PROPERTY IMPORTED_LOCATION ${CORE_STATIC_LIB_DIR}/libtwilio-video.a)
-
 # Set source files
 file(GLOB_RECURSE SOURCE_FILES
     "src/main/jni/*.h"
