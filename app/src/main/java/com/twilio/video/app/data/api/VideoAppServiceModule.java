@@ -16,8 +16,6 @@ import retrofit2.converter.scalars.ScalarsConverterFactory;
 
 @Module
 public class VideoAppServiceModule {
-    private static final String BASE_URL = "https://app.video.bytwilio.com/";
-
     @Provides
     @ApplicationScope
     @Named("VideoAppService")
@@ -31,15 +29,15 @@ public class VideoAppServiceModule {
 
     @Provides
     @ApplicationScope
-    VideoAppService providesVideoAppService(@Named("VideoAppService") OkHttpClient okHttpClient) {
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(BASE_URL)
+    @Named("VideoAppService")
+    Retrofit.Builder providesRetrofitBuilder(@Named("VideoAppService") OkHttpClient okHttpClient) {
+        Retrofit.Builder retrofitBuilder = new Retrofit.Builder()
                 .client(okHttpClient)
-                .addCallAdapterFactory(RxJava2CallAdapterFactory.createWithScheduler(Schedulers.io()))
+                .addCallAdapterFactory(RxJava2CallAdapterFactory
+                        .createWithScheduler(Schedulers.io()))
                 .addConverterFactory(ScalarsConverterFactory.create())
-                .addConverterFactory(GsonConverterFactory.create())
-                .build();
+                .addConverterFactory(GsonConverterFactory.create());
 
-        return retrofit.create(VideoAppService.class);
+        return retrofitBuilder;
     }
 }
