@@ -12,11 +12,12 @@ import com.twilio.video.RoomState;
 import com.twilio.video.Video;
 import com.twilio.video.helper.CallbackHelper;
 import com.twilio.video.ui.MediaTestActivity;
-import com.twilio.video.util.CredentialsUtils;
 import com.twilio.video.util.Constants;
+import com.twilio.video.util.CredentialsUtils;
 import com.twilio.video.util.FakeVideoCapturer;
 import com.twilio.video.util.PermissionUtils;
 import com.twilio.video.util.RandUtils;
+import com.twilio.video.util.RoomUtils;
 import com.twilio.video.util.Topology;
 
 import org.junit.After;
@@ -75,6 +76,7 @@ public abstract class BaseParticipantTest extends BaseClientTest {
         mediaTestActivity = activityRule.getActivity();
         PermissionUtils.allowPermissions(mediaTestActivity);
         testRoom = RandUtils.generateRandomString(10);
+        assertNotNull(RoomUtils.createRoom(testRoom, topology));
         fakeVideoCapturer = new FakeVideoCapturer();
         tokenOne = CredentialsUtils.getAccessToken(Constants.PARTICIPANT_ALICE, topology);
 

@@ -19,12 +19,7 @@ public class ServiceTokenUtil {
 
     public static Set<IceServer> getIceServers() {
         Map<String, String> credentials = CredentialsUtils.resolveCredentials(
-                Environment.fromString(BuildConfig.ENVIRONMENT),
-                /*
-                 * We just pass P2P for now, but we don't actually care about topology since
-                 * we are only interested in ACCOUNT_SID and AUTH_TOKEN to use Twilio API.
-                 */
-                Topology.P2P);
+                Environment.fromString(BuildConfig.ENVIRONMENT));
         if (isExpired(twilioServiceToken)) {
             twilioServiceToken = TwilioApiUtils
                     .getServiceToken(credentials.get(CredentialsUtils.ACCOUNT_SID),

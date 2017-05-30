@@ -35,9 +35,9 @@ public class DevelopmentTokenService implements TokenService {
             public String call() throws Exception {
                 return new VideoAccessToken.Builder(credentials.get(ACCOUNT_SID),
                         credentials.get(API_KEY),
-                        credentials.get(API_KEY_SECRET),
-                        credentials.get(CONFIGURATION_PROFILE_SID))
+                        credentials.get(API_KEY_SECRET))
                         .identity(identity)
+                        .configurationProfileSid(credentials.get(CONFIGURATION_PROFILE_SID))
                         .build()
                         .getJwt();
             }

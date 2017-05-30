@@ -32,7 +32,7 @@ public class VideoTrackTopologyParameterizedTest extends BaseParticipantTest {
     public static Iterable<Object[]> data() {
         return Arrays.asList(new Object[][]{
                 {Topology.P2P},
-                {Topology.SFU}});
+                {Topology.GROUP}});
     }
 
     private final Topology topology;
@@ -70,10 +70,10 @@ public class VideoTrackTopologyParameterizedTest extends BaseParticipantTest {
     @Test
     public void canAddAndRemoveRenderer() throws InterruptedException {
         /*
-         * TODO: GSDK-1152 skipping test for SFU only because it is flaky.
+         * TODO: GSDK-1152 skipping test for GROUP only because it is flaky.
          * Should be investigated after GA.
          */
-        assumeFalse(topology == Topology.SFU);
+        assumeFalse(topology == Topology.GROUP);
         CallbackHelper.FakeParticipantListener participantListener =
                 new CallbackHelper.FakeParticipantListener();
         participantListener.onVideoTrackAddedLatch = new CountDownLatch(1);

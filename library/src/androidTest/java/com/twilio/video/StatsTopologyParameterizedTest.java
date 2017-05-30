@@ -14,6 +14,7 @@ import com.twilio.video.util.Constants;
 import com.twilio.video.util.FakeVideoCapturer;
 import com.twilio.video.util.PermissionUtils;
 import com.twilio.video.util.RandUtils;
+import com.twilio.video.util.RoomUtils;
 import com.twilio.video.util.Topology;
 
 import org.junit.After;
@@ -34,6 +35,7 @@ import java.util.concurrent.TimeUnit;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 @RunWith(Parameterized.class)
@@ -43,7 +45,7 @@ public class StatsTopologyParameterizedTest extends BaseClientTest {
     public static Iterable<Object[]> data() {
         return Arrays.asList(new Object[][]{
                 {Topology.P2P},
-                {Topology.SFU}});
+                {Topology.GROUP}});
     }
 
     @Rule
@@ -70,9 +72,10 @@ public class StatsTopologyParameterizedTest extends BaseClientTest {
         super.setup();
         mediaTestActivity = activityRule.getActivity();
         PermissionUtils.allowPermissions(mediaTestActivity);
+        roomName = RandUtils.generateRandomString(20);
+        assertNotNull(RoomUtils.createRoom(roomName, topology));
         aliceToken = CredentialsUtils.getAccessToken(Constants.PARTICIPANT_ALICE, topology);
         bobToken = CredentialsUtils.getAccessToken(Constants.PARTICIPANT_BOB, topology);
-        roomName = RandUtils.generateRandomString(20);
         aliceListener = new CallbackHelper.FakeRoomListener();
         aliceMediaListener = new CallbackHelper.FakeParticipantListener();
         bobMediaListener = new CallbackHelper.FakeParticipantListener();
@@ -535,7 +538,6 @@ public class StatsTopologyParameterizedTest extends BaseClientTest {
         if (videoTracks == null) {
            videoTracks = new ArrayList<>();
         }
-
         ConnectOptions connectOptions = new ConnectOptions.Builder(token)
                 .roomName(roomName)
                 .audioTracks(audioTracks)

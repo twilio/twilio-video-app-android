@@ -10,6 +10,7 @@ import com.twilio.video.helper.CallbackHelper;
 import com.twilio.video.util.CredentialsUtils;
 import com.twilio.video.util.Constants;
 import com.twilio.video.util.RandUtils;
+import com.twilio.video.util.RoomUtils;
 import com.twilio.video.util.Topology;
 
 import org.junit.After;
@@ -21,13 +22,13 @@ import org.junit.runners.Parameterized;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 @RunWith(Parameterized.class)
@@ -37,7 +38,7 @@ public class RoomMultiPartyTopologyParameterizedTest extends BaseClientTest {
     public static Iterable<Object[]> data() {
         return Arrays.asList(new Object[][]{
                 {Topology.P2P},
-                {Topology.SFU}});
+                {Topology.GROUP}});
     }
 
     private static final int PARTICIPANT_NUM = 3;
@@ -59,12 +60,13 @@ public class RoomMultiPartyTopologyParameterizedTest extends BaseClientTest {
     public void setup() throws InterruptedException {
         super.setup();
         context = InstrumentationRegistry.getInstrumentation().getTargetContext();
+        roomName = RandUtils.generateRandomString(20);
+        assertNotNull(RoomUtils.createRoom(roomName, topology));
         rooms = new ArrayList<>();
         tokens = new ArrayList<>();
         for (int i = 0; i < PARTICIPANT_NUM; i++) {
             tokens.add(CredentialsUtils.getAccessToken(PARTICIPANTS[i], topology));
         }
-        roomName = RandUtils.generateRandomString(20);
     }
 
     @After

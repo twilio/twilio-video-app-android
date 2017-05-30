@@ -5,12 +5,15 @@ import android.support.test.runner.AndroidJUnit4;
 
 import com.twilio.video.base.BaseClientTest;
 import com.twilio.video.helper.CallbackHelper;
+import com.twilio.video.twilioapi.VideoApiUtils;
+import com.twilio.video.twilioapi.model.VideoRoom;
 import com.twilio.video.ui.MediaTestActivity;
 import com.twilio.video.util.Constants;
 import com.twilio.video.util.CredentialsUtils;
 import com.twilio.video.util.FakeVideoCapturer;
 import com.twilio.video.util.PermissionUtils;
 import com.twilio.video.util.RandUtils;
+import com.twilio.video.util.RoomUtils;
 import com.twilio.video.util.Topology;
 
 import org.junit.After;
@@ -47,8 +50,9 @@ public class VideoTest extends BaseClientTest {
         mediaTestActivity = activityRule.getActivity();
         roomListener = new CallbackHelper.FakeRoomListener();
         PermissionUtils.allowPermissions(mediaTestActivity);
-        token = CredentialsUtils.getAccessToken(Constants.PARTICIPANT_ALICE, Topology.P2P);
         roomName = RandUtils.generateRandomString(20);
+        assertNotNull(RoomUtils.createRoom(roomName, Topology.P2P));
+        token = CredentialsUtils.getAccessToken(Constants.PARTICIPANT_ALICE, Topology.P2P);
         Video.setLogLevel(LogLevel.ALL);
     }
 

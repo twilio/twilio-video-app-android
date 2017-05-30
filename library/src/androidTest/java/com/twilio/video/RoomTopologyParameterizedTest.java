@@ -11,13 +11,13 @@ import com.twilio.video.util.Constants;
 import com.twilio.video.util.FakeVideoCapturer;
 import com.twilio.video.util.PermissionUtils;
 import com.twilio.video.util.RandUtils;
+import com.twilio.video.util.RoomUtils;
 import com.twilio.video.util.Topology;
 
 import junit.framework.Assert;
 
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -28,6 +28,7 @@ import java.util.Collections;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
+import static junit.framework.Assert.assertFalse;
 import static junit.framework.Assert.assertNull;
 import static junit.framework.Assert.fail;
 import static org.junit.Assert.assertEquals;
@@ -37,12 +38,12 @@ import static org.junit.Assert.assertTrue;
 @RunWith(Parameterized.class)
 @LargeTest
 public class RoomTopologyParameterizedTest extends BaseClientTest {
-    @Parameterized.Parameters(name = "{0}")
+    @Parameterized.Parameters(name = "Topology: {0}, enableRecording: {1}")
     public static Iterable<Object[]> data() {
         return Arrays.asList(new Object[][]{
-                {Topology.P2P},
-                {Topology.SFU},
-                {Topology.SFU_RECORDING}});
+                {Topology.P2P, false},
+                {Topology.GROUP, false},
+                {Topology.GROUP, true}});
     }
 
     @Rule
@@ -55,9 +56,11 @@ public class RoomTopologyParameterizedTest extends BaseClientTest {
     private LocalAudioTrack localAudioTrack;
     private LocalVideoTrack localVideoTrack;
     private final Topology topology;
+    private final boolean enableRecording;
 
-    public RoomTopologyParameterizedTest(Topology topology) {
+    public RoomTopologyParameterizedTest(Topology topology, boolean enableRecording) {
         this.topology = topology;
+        this.enableRecording = enableRecording;
     }
 
     @Before
@@ -66,8 +69,9 @@ public class RoomTopologyParameterizedTest extends BaseClientTest {
         mediaTestActivity = activityRule.getActivity();
         PermissionUtils.allowPermissions(mediaTestActivity);
         identity = Constants.PARTICIPANT_ALICE;
-        token = CredentialsUtils.getAccessToken(identity, topology);
         roomName = RandUtils.generateRandomString(20);
+        assertNotNull(RoomUtils.createRoom(roomName, topology, enableRecording));
+        token = CredentialsUtils.getAccessToken(identity, topology);
     }
 
     @After
@@ -189,15 +193,10 @@ public class RoomTopologyParameterizedTest extends BaseClientTest {
         assertNull(room.getLocalParticipant());
         assertTrue(roomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
 
-        if(topology == Topology.P2P || topology == Topology.SFU) {
-           Assert.assertFalse(room.isRecording());
-        } else {
-            /*
-             * Making an assumption that other topologies, will have recording enabled by default.
-             * This assumption is subject to change and we will have to update this test
-             * accordingly.
-             */
+        if (topology == Topology.GROUP && enableRecording) {
             Assert.assertTrue(room.isRecording());
+        } else {
+            assertFalse(room.isRecording());
         }
 
         room.disconnect();

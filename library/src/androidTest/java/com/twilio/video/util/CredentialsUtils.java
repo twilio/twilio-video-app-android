@@ -5,6 +5,8 @@ import android.support.test.espresso.core.deps.guava.base.Strings;
 
 import com.twilio.video.test.BuildConfig;
 import com.twilio.video.token.VideoAccessToken;
+import com.twilio.video.twilioapi.VideoApiUtils;
+import com.twilio.video.twilioapi.model.VideoRoom;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -19,41 +21,24 @@ public class CredentialsUtils {
     public static final String ACCOUNT_SID = "account_sid";
     public static final String API_KEY = "api_key";
     public static final String API_KEY_SECRET = "api_key_secret";
-    public static final String CONFIGURATION_PROFILE_SID = "configuration_profile_sid";
-    public static final String SFU_CONFIGURATION_PROFILE_SID = "sfu_configuration_profile_sid";
-    public static final String SFU_RECORDING_CONFIGURATION_PROFILE_SID =
-            "sfu_recording_configuration_profile_sid";
     public static final String DEV_ACCOUNT_SID = "dev_account_sid";
     public static final String DEV_API_KEY = "dev_api_key";
     public static final String DEV_API_KEY_SECRET = "dev_api_key_secret";
-    public static final String DEV_P2P_CONFIGURATION_PROFILE_SID =
-            "dev_p2p_configuration_profile_sid";
-    public static final String DEV_SFU_CONFIGURATION_PROFILE_SID =
-            "dev_sfu_configuration_profile_sid";
-    public static final String DEV_SFU_RECORDING_CONFIGURATION_PROFILE_SID =
-            "dev_sfu_recording_configuration_profile_sid";
     public static final String STAGE_ACCOUNT_SID = "stage_account_sid";
     public static final String STAGE_API_KEY = "stage_api_key";
     public static final String STAGE_API_KEY_SECRET = "stage_api_key_secret";
-    public static final String STAGE_P2P_CONFIGURATION_PROFILE_SID =
-            "stage_p2p_configuration_profile_sid";
-    public static final String STAGE_SFU_CONFIGURATION_PROFILE_SID =
-            "stage_sfu_configuration_profile_sid";
-    public static final String STAGE_SFU_RECORDING_CONFIGURATION_PROFILE_SID =
-            "stage_sfu_recording_configuration_profile_sid";
-    private static final String TWILIO_VIDEO_JSON_NOT_PROVIDED = "library/twilio-video.json is " +
+    public static final String TWILIO_VIDEO_JSON_NOT_PROVIDED = "library/twilio-video.json is " +
             "required to create tokens for library tests that connect to a Room";
 
     public static String getAccessToken(String username, Topology topology) {
         Preconditions.checkNotNull(BuildConfig.twilioCredentials,
                 TWILIO_VIDEO_JSON_NOT_PROVIDED);
         Map<String, String> credentials = resolveCredentials(
-                Environment.fromString(BuildConfig.ENVIRONMENT), topology);
+                Environment.fromString(BuildConfig.ENVIRONMENT));
         VideoAccessToken videoAccessToken = new VideoAccessToken.Builder(
                 credentials.get(ACCOUNT_SID),
                 credentials.get(API_KEY),
-                credentials.get(API_KEY_SECRET),
-                credentials.get(CONFIGURATION_PROFILE_SID))
+                credentials.get(API_KEY_SECRET))
                 .identity(username)
                 .ttl(TTL_DEFAULT)
                 .build();
@@ -61,8 +46,7 @@ public class CredentialsUtils {
         return videoAccessToken.getJwt();
     }
 
-    public static Map<String, String> resolveCredentials(Environment environment,
-                                                         Topology topology) {
+    public static Map<String, String> resolveCredentials(Environment environment) {
         Map<String, String> credentials = new HashMap<>();
 
         switch (environment) {
@@ -75,33 +59,6 @@ public class CredentialsUtils {
                 credentials.put(API_KEY, BuildConfig.twilioCredentials.get(DEV_API_KEY));
                 credentials.put(API_KEY_SECRET,
                         BuildConfig.twilioCredentials.get(DEV_API_KEY_SECRET));
-
-                switch (topology) {
-                    case P2P:
-                        checkCredentialDefined(DEV_P2P_CONFIGURATION_PROFILE_SID);
-
-                        credentials.put(CONFIGURATION_PROFILE_SID,
-                                BuildConfig.twilioCredentials
-                                        .get(DEV_P2P_CONFIGURATION_PROFILE_SID));
-                        break;
-                    case SFU:
-                        checkCredentialDefined(DEV_SFU_CONFIGURATION_PROFILE_SID);
-
-                        credentials.put(CONFIGURATION_PROFILE_SID,
-                                BuildConfig.twilioCredentials
-                                        .get(DEV_SFU_CONFIGURATION_PROFILE_SID));
-                        break;
-                    case SFU_RECORDING:
-                        checkCredentialDefined(DEV_SFU_RECORDING_CONFIGURATION_PROFILE_SID);
-
-                        credentials.put(CONFIGURATION_PROFILE_SID,
-                                BuildConfig.twilioCredentials
-                                        .get(DEV_SFU_RECORDING_CONFIGURATION_PROFILE_SID));
-                        break;
-                    default:
-                        throw new RuntimeException("Unknown topology");
-                }
-
                 break;
             case STAGE:
                 checkCredentialDefined(STAGE_ACCOUNT_SID);
@@ -113,32 +70,6 @@ public class CredentialsUtils {
                 credentials.put(API_KEY_SECRET,
                         BuildConfig.twilioCredentials.get(STAGE_API_KEY_SECRET));
 
-                switch (topology) {
-                    case P2P:
-                        checkCredentialDefined(STAGE_P2P_CONFIGURATION_PROFILE_SID);
-
-                        credentials.put(CONFIGURATION_PROFILE_SID,
-                                BuildConfig.twilioCredentials
-                                        .get(STAGE_P2P_CONFIGURATION_PROFILE_SID));
-                        break;
-                    case SFU:
-                        checkCredentialDefined(STAGE_SFU_CONFIGURATION_PROFILE_SID);
-
-                        credentials.put(CONFIGURATION_PROFILE_SID,
-                                BuildConfig.twilioCredentials
-                                        .get(STAGE_SFU_CONFIGURATION_PROFILE_SID));
-                        break;
-                    case SFU_RECORDING:
-                        checkCredentialDefined(STAGE_SFU_RECORDING_CONFIGURATION_PROFILE_SID);
-
-                        credentials.put(CONFIGURATION_PROFILE_SID,
-                                BuildConfig.twilioCredentials
-                                        .get(STAGE_SFU_RECORDING_CONFIGURATION_PROFILE_SID));
-                        break;
-                    default:
-                        throw new RuntimeException("Unknown topology");
-                }
-
                 break;
             case PROD:
                 checkCredentialDefined(ACCOUNT_SID);
@@ -149,30 +80,6 @@ public class CredentialsUtils {
                 credentials.put(API_KEY, BuildConfig.twilioCredentials.get(API_KEY));
                 credentials.put(API_KEY_SECRET, BuildConfig.twilioCredentials.get(API_KEY_SECRET));
 
-                switch (topology) {
-                    case P2P:
-                        checkCredentialDefined(CONFIGURATION_PROFILE_SID);
-
-                        credentials.put(CONFIGURATION_PROFILE_SID,
-                                BuildConfig.twilioCredentials.get(CONFIGURATION_PROFILE_SID));
-                        break;
-                    case SFU:
-                        checkCredentialDefined(SFU_CONFIGURATION_PROFILE_SID);
-
-                        credentials.put(CONFIGURATION_PROFILE_SID,
-                                BuildConfig.twilioCredentials.get(SFU_CONFIGURATION_PROFILE_SID));
-                        break;
-                    case SFU_RECORDING:
-                        checkCredentialDefined(SFU_RECORDING_CONFIGURATION_PROFILE_SID);
-
-                        credentials.put(CONFIGURATION_PROFILE_SID,
-                                BuildConfig.twilioCredentials
-                                        .get(SFU_RECORDING_CONFIGURATION_PROFILE_SID));
-                        break;
-                    default:
-                        throw new RuntimeException("Unknown topology");
-                }
-
                 break;
             default:
                 throw new RuntimeException("Unknown environment");
@@ -182,23 +89,9 @@ public class CredentialsUtils {
     }
 
     private static void checkCredentialDefined(String credentialKey) {
-        /*
-         * Not all developers will have SFU and SFU_RECORDING configuration profile sids
-         * so we should ignore tests that rely on these sids and fail if any
-         * other credentials are not set.
-         */
-        if (credentialKey.equals(SFU_CONFIGURATION_PROFILE_SID) ||
-                credentialKey.equals(SFU_RECORDING_CONFIGURATION_PROFILE_SID)) {
-            assumeTrue("Credential map does not contain key: " + credentialKey,
-                    BuildConfig.twilioCredentials.containsKey(credentialKey));
-            assumeFalse("Credential " + credentialKey + " must not be null or empty",
-                    Strings.isNullOrEmpty(BuildConfig.twilioCredentials.get(credentialKey)));
-
-        } else {
-            assertTrue("Credential map does not contain key: " + credentialKey,
-                    BuildConfig.twilioCredentials.containsKey(credentialKey));
-            assertFalse("Credential " + credentialKey + " must not be null or empty",
-                    Strings.isNullOrEmpty(BuildConfig.twilioCredentials.get(credentialKey)));
-        }
+        assertTrue("Credential map does not contain key: " + credentialKey,
+            BuildConfig.twilioCredentials.containsKey(credentialKey));
+        assertFalse("Credential " + credentialKey + " must not be null or empty",
+            Strings.isNullOrEmpty(BuildConfig.twilioCredentials.get(credentialKey)));
     }
 }

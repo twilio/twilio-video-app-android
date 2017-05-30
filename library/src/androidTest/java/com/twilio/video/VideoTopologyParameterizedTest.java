@@ -11,6 +11,7 @@ import com.twilio.video.util.Constants;
 import com.twilio.video.util.FakeVideoCapturer;
 import com.twilio.video.util.PermissionUtils;
 import com.twilio.video.util.RandUtils;
+import com.twilio.video.util.RoomUtils;
 import com.twilio.video.util.Topology;
 
 import org.junit.After;
@@ -39,7 +40,7 @@ public class VideoTopologyParameterizedTest extends BaseClientTest {
     public static Iterable<Object[]> data() {
         return Arrays.asList(new Object[][]{
                 {Topology.P2P},
-                {Topology.SFU}});
+                {Topology.GROUP}});
     }
 
     @Rule
@@ -63,8 +64,9 @@ public class VideoTopologyParameterizedTest extends BaseClientTest {
         mediaTestActivity = activityRule.getActivity();
         roomListener = new CallbackHelper.FakeRoomListener();
         PermissionUtils.allowPermissions(mediaTestActivity);
-        token = CredentialsUtils.getAccessToken(Constants.PARTICIPANT_ALICE, topology);
         roomName = RandUtils.generateRandomString(20);
+        assertNotNull(RoomUtils.createRoom(roomName, topology));
+        token = CredentialsUtils.getAccessToken(Constants.PARTICIPANT_ALICE, topology);
         Video.setLogLevel(LogLevel.ALL);
     }
 

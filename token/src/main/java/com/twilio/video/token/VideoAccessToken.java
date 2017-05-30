@@ -66,7 +66,11 @@ public class VideoAccessToken {
 
         // Setup grants payload
         grants.put("identity", identity);
-        grants.put("rtc", new Payload(configurationProfileSid));
+        if (configurationProfileSid != null) {
+            grants.put("rtc", new Payload(configurationProfileSid));
+        } else {
+            grants.put("video", new Video());
+        }
         payload.put("grants", grants);
 
         return payload;
@@ -85,7 +89,7 @@ public class VideoAccessToken {
 
     private String buildJwt() {
         // Initialize jwt builder
-        JwtBuilder builder = Jwts.builder()
+        JwtBuilder builder = new VideoJwtBuilder()
                 .signWith(ALGORITHM, keySpec)
                 .setHeaderParams(headers)
                 .setIssuer(apiKey)
@@ -118,12 +122,10 @@ public class VideoAccessToken {
 
         public Builder(String accountSid,
                        String apiKeySid,
-                       String apiKeySecret,
-                       String configurationProfileSid) {
+                       String apiKeySecret) {
             this.accountSid = accountSid;
             this.apiKey = apiKeySid;
             this.apiSecret = apiKeySecret;
-            this.configurationProfileSid = configurationProfileSid;
         }
 
         public Builder identity(String identity) {
@@ -141,6 +143,11 @@ public class VideoAccessToken {
             return this;
         }
 
+        public Builder configurationProfileSid(String configurationProfileSid) {
+            this.configurationProfileSid = configurationProfileSid;
+            return this;
+        }
+
         public VideoAccessToken build() {
             return new VideoAccessToken(this);
         }
@@ -152,5 +159,9 @@ public class VideoAccessToken {
         Payload(String configurationProfileSid) {
             this.configuration_profile_sid = configurationProfileSid;
         }
+    }
+
+    private static class Video {
+        Video() {}
     }
 }
