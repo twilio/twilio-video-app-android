@@ -1,5 +1,21 @@
 The Twilio Programmable Video SDKs use [Semantic Versioning](http://www.semver.org).
 
+####1.0.2
+
+Bug Fixes
+
+- Improved signaling connection retry logic. In the case of an error, the SDK will continue 
+to retry with a backoff timer when errors are encountered.
+- Fixed a bug in network handoff scenarios where the SDK was not handling the race condition 
+if network lost or network changed event is received when a network changed event is being processed.
+
+Known issues
+
+- Network handoff, and subsequent connection renegotiation is not supported for IPv6 networks [#72](https://github.com/twilio/video-quickstart-android/issues/72)
+- VP8 is the only supported codec [#71](https://github.com/twilio/video-quickstart-android/issues/71)
+- Participant disconnect event can take up to 120 seconds to occur [#80](https://github.com/twilio/video-quickstart-android/issues/80) [#73](https://github.com/twilio/video-quickstart-android/issues/73)
+- Disconnecting from a `Room` that has not connected sometimes results in a crash [#116](https://github.com/twilio/video-quickstart-android/issues/116)
+
 ####1.0.1
 
 Improvements
