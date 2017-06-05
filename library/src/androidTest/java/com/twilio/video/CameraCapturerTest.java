@@ -40,6 +40,42 @@ public class CameraCapturerTest extends BaseCameraCapturerTest {
     }
 
     @Test
+    public void shouldAllowSubsequentInstances() throws InterruptedException {
+        int numInstances = 4;
+        final CountDownLatch completed = new CountDownLatch(numInstances);
+        for (int i = 0 ; i < numInstances ; i++) {
+            final CountDownLatch firstFrameReceived = new CountDownLatch(1);
+            CameraCapturer cameraCapturer = new CameraCapturer(cameraCapturerActivity,
+                    CameraCapturer.CameraSource.FRONT_CAMERA,
+                    new CameraCapturer.Listener() {
+                        @Override
+                        public void onFirstFrameAvailable() {
+                            firstFrameReceived.countDown();
+                        }
+
+                        @Override
+                        public void onCameraSwitched() {
+
+                        }
+
+                        @Override
+                        public void onError(@CameraCapturer.Error int errorCode) {
+
+                        }
+                    });
+            LocalVideoTrack localVideoTrack = LocalVideoTrack.create(cameraCapturerActivity,
+                    true, cameraCapturer);
+
+            // Validate we got our first frame
+            assertTrue(firstFrameReceived.await(CAMERA_CAPTURE_DELAY_MS, TimeUnit.MILLISECONDS));
+
+            localVideoTrack.release();
+            completed.countDown();
+        }
+        assertTrue(completed.await(20, TimeUnit.SECONDS));
+    }
+
+    @Test
     public void shouldAllowCameraSwitch() throws InterruptedException {
         final CountDownLatch cameraSwitched = new CountDownLatch(1);
         cameraCapturer = new CameraCapturer(cameraCapturerActivity,
