@@ -2,6 +2,10 @@ The Twilio Programmable Video SDKs use [Semantic Versioning](http://www.semver.o
 
 ####1.0.2
 
+Improvements
+
+- Moved signaling network traffic to port 443. 
+
 Bug Fixes
 
 - Improved signaling connection retry logic. In the case of an error, the SDK will continue 
