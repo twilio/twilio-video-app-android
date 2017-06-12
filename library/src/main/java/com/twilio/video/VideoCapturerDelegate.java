@@ -12,10 +12,18 @@ final class VideoCapturerDelegate implements org.webrtc.VideoCapturer {
     private VideoPixelFormat videoPixelFormat;
     private VideoCapturer.Listener listenerAdapter;
 
+    /*
+     * Created from JNI.
+     */
+    @SuppressWarnings("unused")
     VideoCapturerDelegate(VideoCapturer videoCapturer) {
         this.videoCapturer = videoCapturer;
     }
 
+    /*
+     * Invoked from JNI
+     */
+    @SuppressWarnings("unused")
     public List<CameraEnumerationAndroid.CaptureFormat> getSupportedFormats() {
         return convertToWebRtcFormats(videoCapturer.getSupportedFormats());
     }
@@ -32,7 +40,12 @@ final class VideoCapturerDelegate implements org.webrtc.VideoCapturer {
             cameraCapturer.setSurfaceTextureHelper(surfaceTextureHelper);
         } else if (videoCapturer instanceof ScreenCapturer) {
             ScreenCapturer screenCapturer = (ScreenCapturer) videoCapturer;
+
             screenCapturer.setSurfaceTextureHelper(surfaceTextureHelper);
+        } else if (videoCapturer instanceof Camera2Capturer) {
+            Camera2Capturer camera2Capturer = (Camera2Capturer) videoCapturer;
+
+            camera2Capturer.setSurfaceTextureHelper(surfaceTextureHelper);
         }
     }
 
@@ -67,6 +80,7 @@ final class VideoCapturerDelegate implements org.webrtc.VideoCapturer {
      * Called from JNI layer prior to capturing so that we can provide the pixel format
      * when informing the current capturer to start
      */
+    @SuppressWarnings("unused")
     private void setVideoPixelFormat(VideoPixelFormat videoPixelFormat) {
         this.videoPixelFormat = videoPixelFormat;
     }

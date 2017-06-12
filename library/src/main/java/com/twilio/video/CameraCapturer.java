@@ -245,7 +245,9 @@ public class CameraCapturer implements VideoCapturer {
         this(context, cameraSource, null);
     }
 
-    public CameraCapturer(Context context, CameraSource cameraSource, @Nullable Listener listener) {
+    public CameraCapturer(@NonNull Context context,
+                          @NonNull CameraSource cameraSource,
+                          @Nullable Listener listener) {
         Preconditions.checkNotNull(context, "Context must not be null");
         Preconditions.checkNotNull(cameraSource, "Camera source must not be null");
         this.context = context;

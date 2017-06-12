@@ -1,5 +1,31 @@
 The Twilio Programmable Video SDKs use [Semantic Versioning](http://www.semver.org).
 
+####1.1.0
+
+Improvements
+
+- Added `Camera2Capturer`. `Camera2Capturer` uses `android.hardware.camera2` to implement 
+a `VideoCapturer`. `Camera2Capturer` does not yet implement `takePicture` and the ability to modify 
+camera parameters once `Camera2Capturer` is running.
+
+Create `LocalVideoTrack` with `Camera2Capturer`
+
+    
+    // Use CameraManager.getCameraIdList() for a list of all available camera IDs
+    String cameraId = "0";
+    Camera2Capturer.Listener camera2Listener = new Camera2Capturer.Listener() {
+            @Override
+            public void onFirstFrameAvailable() {}
+
+            @Override
+            public void onCameraSwitched(String newCameraId) {}
+
+            @Override
+            public void onError(Camera2Capturer.Exception exception) {}
+    }
+    Camera2Capturer camera2Capturer = new Camera2Capturer(context, cameraId, camera2Listener);
+    LocalVideoTrack = LocalVideoTrack.create(context, true, camera2Capturer);
+    
 ####1.0.2
 
 Improvements
