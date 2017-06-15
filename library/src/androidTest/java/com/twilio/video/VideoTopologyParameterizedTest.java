@@ -95,6 +95,20 @@ public class VideoTopologyParameterizedTest extends BaseClientTest {
     }
 
     @Test
+    public void canConnectWithInsightsDisabled() throws InterruptedException {
+        roomListener.onConnectedLatch = new CountDownLatch(1);
+        roomListener.onDisconnectedLatch = new CountDownLatch(1);
+        ConnectOptions connectOptions = new ConnectOptions.Builder(token)
+                .enableInsights(false)
+                .build();
+        Room room = Video.connect(mediaTestActivity, connectOptions, roomListener);
+        assertTrue(roomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
+        assertEquals(room.getSid(), room.getName());
+        room.disconnect();
+        assertTrue(roomListener.onDisconnectedLatch.await(20, TimeUnit.SECONDS));
+    }
+
+    @Test
     @Ignore("Disconnecting while connecting results in native crash. See GSDK-1153")
     public void disconnect_canDisconnectBeforeConnectingToRoom() throws InterruptedException {
         roomListener.onDisconnectedLatch = new CountDownLatch(1);

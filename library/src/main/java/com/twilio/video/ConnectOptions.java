@@ -14,6 +14,7 @@ public class ConnectOptions {
     private final List<LocalAudioTrack> audioTracks;
     private final List<LocalVideoTrack> videoTracks;
     private final IceOptions iceOptions;
+    private final boolean enableInsights;
 
     static void checkAudioTracksReleased(@Nullable List<LocalAudioTrack> audioTracks) {
         if (audioTracks != null) {
@@ -41,6 +42,7 @@ public class ConnectOptions {
         this.audioTracks = builder.audioTracks;
         this.videoTracks = builder.videoTracks;
         this.iceOptions = builder.iceOptions;
+        this.enableInsights = builder.enableInsights;
     }
 
     String getAccessToken() {
@@ -61,6 +63,10 @@ public class ConnectOptions {
 
     IceOptions getIceOptions() {
         return iceOptions;
+    }
+
+    boolean isInsightsEnabled() {
+        return enableInsights;
     }
 
     private LocalAudioTrack[] getLocalAudioTracksArray() {
@@ -94,7 +100,7 @@ public class ConnectOptions {
                 getLocalAudioTracksArray(),
                 getLocalVideoTracksArray(),
                 iceOptions,
-                false,
+                enableInsights,
                 PlatformInfo.getNativeHandle());
     }
 
@@ -116,6 +122,7 @@ public class ConnectOptions {
         private IceOptions iceOptions;
         private List<LocalAudioTrack> audioTracks;
         private List<LocalVideoTrack> videoTracks;
+        private boolean enableInsights = true;
 
         public Builder(String accessToken) {
             this.accessToken = accessToken;
@@ -152,6 +159,15 @@ public class ConnectOptions {
          */
         public Builder iceOptions(IceOptions iceOptions) {
             this.iceOptions = iceOptions;
+            return this;
+        }
+
+        /**
+         * Enable sending stats data to Insights. Sending stats data to Insights is enabled
+         * by default.
+         */
+        public Builder enableInsights(boolean enable) {
+            this.enableInsights = enable;
             return this;
         }
 

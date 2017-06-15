@@ -27,6 +27,15 @@ Create `LocalVideoTrack` with `Camera2Capturer`
     Camera2Capturer camera2Capturer = new Camera2Capturer(context, cameraId, camera2Listener);
     LocalVideoTrack = LocalVideoTrack.create(context, true, camera2Capturer);
     
+- This release adds Insights statistics collection, which reports RTP quality metrics back to 
+Twilio. In the future, these statistics will be included in customer-facing reports visible in the 
+Twilio Console. Insights collection is enabled by default, if you wish to disable it reference
+the following snippet.
+
+
+    ConnectOptions connectOptions = new ConnectOptions.Builder(token)
+            .enableInsights(false)
+            .build();
 
 Bug Fixes
 
