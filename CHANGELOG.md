@@ -12,20 +12,23 @@ camera parameters once `Camera2Capturer` is running.
 Create `LocalVideoTrack` with `Camera2Capturer`
 
     
-    // Use CameraManager.getCameraIdList() for a list of all available camera IDs
-    String cameraId = "0";
-    Camera2Capturer.Listener camera2Listener = new Camera2Capturer.Listener() {
-            @Override
-            public void onFirstFrameAvailable() {}
+    // Check if device supports Camera2Capturer 
+    if (Camera2Capturer.isSupported(context)) {
+        // Use CameraManager.getCameraIdList() for a list of all available camera IDs
+        String cameraId = "0";
+        Camera2Capturer.Listener camera2Listener = new Camera2Capturer.Listener() {
+                @Override
+                public void onFirstFrameAvailable() {}
 
-            @Override
-            public void onCameraSwitched(String newCameraId) {}
+                @Override
+                public void onCameraSwitched(String newCameraId) {}
 
-            @Override
-            public void onError(Camera2Capturer.Exception exception) {}
+                @Override
+                public void onError(Camera2Capturer.Exception exception) {}
+        }
+        Camera2Capturer camera2Capturer = new Camera2Capturer(context, cameraId, camera2Listener);
+        LocalVideoTrack = LocalVideoTrack.create(context, true, camera2Capturer);
     }
-    Camera2Capturer camera2Capturer = new Camera2Capturer(context, cameraId, camera2Listener);
-    LocalVideoTrack = LocalVideoTrack.create(context, true, camera2Capturer);
     
 - This release adds Insights statistics collection, which reports RTP quality metrics back to 
 Twilio. In the future, these statistics will be included in customer-facing reports visible in the 

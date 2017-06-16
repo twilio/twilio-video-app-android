@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.hardware.camera2.CameraAccessException;
+import android.hardware.camera2.CameraCharacteristics;
 import android.hardware.camera2.CameraManager;
 import android.os.Build;
 import android.os.Handler;
@@ -34,14 +35,38 @@ public class Camera2CapturerUnitTest {
     @Mock Camera2Capturer.Listener listener;
     @Mock CameraManager cameraManager;
     @Mock Handler handler;
+    @Mock CameraCharacteristics cameraCharacteristics;
 
     @Before
     public void setup() throws Exception {
         when(context.getApplicationContext()).thenReturn(context);
         when(cameraManager.getCameraIdList()).thenReturn(cameraIds);
+        when(cameraCharacteristics.get(CameraCharacteristics.INFO_SUPPORTED_HARDWARE_LEVEL))
+                .thenReturn(CameraCharacteristics.INFO_SUPPORTED_HARDWARE_LEVEL_FULL);
+        when(cameraManager.getCameraCharacteristics(cameraIds[0]))
+                .thenReturn(cameraCharacteristics);
+        when(cameraManager.getCameraCharacteristics(cameraIds[1]))
+                .thenReturn(cameraCharacteristics);
         when(context.getSystemService(Context.CAMERA_SERVICE)).thenReturn(cameraManager);
         ReflectionUtils.setFinalStaticField(Build.VERSION.class.getField("SDK_INT"),
                 Build.VERSION_CODES.LOLLIPOP);
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void isSupported_shouldFailWithNullContext() {
+        Camera2Capturer.isSupported(null);
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void shouldFailIfNotSupported() throws CameraAccessException {
+        when(cameraCharacteristics.get(CameraCharacteristics.INFO_SUPPORTED_HARDWARE_LEVEL))
+                .thenReturn(CameraCharacteristics.INFO_SUPPORTED_HARDWARE_LEVEL_LEGACY);
+        when(cameraManager.getCameraCharacteristics(cameraIds[0]))
+                .thenReturn(cameraCharacteristics);
+        when(cameraManager.getCameraCharacteristics(cameraIds[1]))
+                .thenReturn(cameraCharacteristics);
+
+        new Camera2Capturer(context, "0", listener, handler);
     }
 
     @Test(expected = IllegalStateException.class)

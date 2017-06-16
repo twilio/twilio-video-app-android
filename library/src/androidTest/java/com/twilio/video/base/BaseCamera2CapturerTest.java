@@ -29,6 +29,7 @@ public abstract class BaseCamera2CapturerTest {
     @Before
     public void setup() {
         assumeTrue(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP);
+        assumeTrue(Camera2Capturer.isSupported(activityRule.getActivity()));
         cameraCapturerActivity = activityRule.getActivity();
         PermissionUtils.allowPermissions(cameraCapturerActivity);
         frameCountRenderer = new FrameCountRenderer();

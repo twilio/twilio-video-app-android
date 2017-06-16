@@ -196,6 +196,28 @@ public class Camera2Capturer implements VideoCapturer {
     }
 
     /**
+     * Indicates if Camera2Capturer is compatible with device.
+     *
+     * <p>
+     * This method checks that all the following conditions are true:
+     * <br/>
+     * <ol>
+     *     <li>The device API level is at least {@link android.os.Build.VERSION_CODES#LOLLIPOP}.</li>
+     *     <li>All device cameras have hardware support level greater than {@link android.hardware.camera2.CameraCharacteristics#INFO_SUPPORTED_HARDWARE_LEVEL_LEGACY}.</li>
+     * </ol>
+     * <br/>
+     * For more details on supported hardware levels see the <a href="https://developer.android.com/reference/android/hardware/camera2/CameraCharacteristics.html#INFO_SUPPORTED_HARDWARE_LEVEL">Android documentation</a>.
+     * </p>
+     *
+     * @param context application context.
+     * @return true if device supports Camera2Capturer and false if not.
+     */
+    public static boolean isSupported(@NonNull Context context) {
+        Preconditions.checkNotNull(context, "Context must not be null");
+        return Camera2Enumerator.isSupported(context);
+    }
+
+    /**
      * Constructs a Camera2Capturer instance.
      *
      * <p><b>Note</b></p>: It is possible to construct multiple instances with different
@@ -224,6 +246,8 @@ public class Camera2Capturer implements VideoCapturer {
         Preconditions.checkState(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP,
                 "Camera2Capturer unavailable for " + Build.VERSION.SDK_INT);
         Preconditions.checkNotNull(context, "Context must not be null");
+        Preconditions.checkState(isSupported(context),
+                "Camera2Capturer is not supported on this device");
         Preconditions.checkNotNull(cameraId, "Camera ID must not be null");
         Preconditions.checkNotNull(listener, "Listener must not be null");
         Preconditions.checkArgument(!cameraId.isEmpty(), "Camera ID must not be empty");

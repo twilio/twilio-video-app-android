@@ -1,6 +1,7 @@
 package com.twilio.video;
 
 import android.annotation.TargetApi;
+import android.bluetooth.BluetoothClass;
 import android.content.Context;
 import android.content.Intent;
 import android.hardware.camera2.CameraAccessException;
@@ -9,6 +10,8 @@ import android.support.test.InstrumentationRegistry;
 import android.support.test.runner.AndroidJUnit4;
 
 import com.twilio.video.base.BaseCamera2CapturerTest;
+import com.twilio.video.util.DeviceUtils;
+import com.twilio.video.util.FrameCountRenderer;
 
 import org.junit.After;
 import org.junit.Before;
@@ -21,6 +24,7 @@ import java.util.concurrent.TimeUnit;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static org.junit.Assume.assumeFalse;
 import static org.junit.Assume.assumeTrue;
 
 @TargetApi(21)
@@ -44,6 +48,47 @@ public class Camera2CapturerTest extends BaseCamera2CapturerTest {
     public void teardown() {
         super.teardown();
         assertTrue(MediaFactory.isReleased());
+    }
+
+    @Test
+    public void shouldAllowSimultaneousUseOfInstancesWithDifferentIds()
+            throws InterruptedException {
+        assumeTrue(cameraIds.length > 1);
+        // TODO: Investigate test issues on Samsung Galaxy S7 GSDK-1207
+        assumeFalse(DeviceUtils.isSamsungGalaxyS7());
+        final String firstCameraId = cameraIds[0];
+        final String secondCameraId = cameraIds[1];
+        final FrameCountRenderer secondFrameCountRenderer = new FrameCountRenderer();
+        final CountDownLatch firstFrameReceived = new CountDownLatch(2);
+        final Camera2Capturer.Listener listener = new Camera2Capturer.Listener() {
+            @Override
+            public void onFirstFrameAvailable() {
+                firstFrameReceived.countDown();
+            }
+
+            @Override
+            public void onCameraSwitched(String newCameraId) {}
+
+            @Override
+            public void onError(Camera2Capturer.Exception camera2CapturerException) {}
+        };
+        camera2Capturer = new Camera2Capturer(cameraCapturerActivity, firstCameraId, listener);
+        Camera2Capturer secondCamera2Capturer = new Camera2Capturer(cameraCapturerActivity,
+                secondCameraId, listener);
+        localVideoTrack = LocalVideoTrack.create(cameraCapturerActivity, true, camera2Capturer);
+        LocalVideoTrack secondLocalVideoTrack = LocalVideoTrack.create(cameraCapturerActivity, true,
+                secondCamera2Capturer);
+
+        // Validate frames receive by both capturers
+        localVideoTrack.addRenderer(frameCountRenderer);
+        assertTrue(frameCountRenderer.waitForFrame(CAMERA2_CAPTURER_DELAY_MS));
+        secondLocalVideoTrack.addRenderer(secondFrameCountRenderer);
+        assertTrue(secondFrameCountRenderer.waitForFrame(CAMERA2_CAPTURER_DELAY_MS));
+        assertTrue(firstFrameReceived.await(CAMERA2_CAPTURER_DELAY_MS, TimeUnit.MILLISECONDS));
+
+        // Release tracks
+        localVideoTrack.release();
+        secondLocalVideoTrack.release();
     }
 
     @Test
