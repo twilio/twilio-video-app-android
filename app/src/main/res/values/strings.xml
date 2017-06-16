@@ -16,6 +16,7 @@
     <string name="video_constraints">Video Constraints</string>
     <string name="statistics">Statistics</string>
     <string name="enable_stats">Enable Stats</string>
+    <string name="enable_insights">Enable Insights</string>
     <string name="local">Local Media</string>
     <string name="remote">Remote Media</string>
     <string name="ice_options">Enable ICE options</string>

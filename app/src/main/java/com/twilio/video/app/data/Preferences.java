@@ -19,4 +19,6 @@ public class Preferences {
     public static final String VIDEO_LIBRARY_VERSION = "pref_video_library_version";
     public static final String LOGOUT = "pref_logout";
     public static final String ENABLE_STATS = "pref_enable_stats";
+    public static final String ENABLE_INSIGHTS = "pref_enable_insights";
+    public static final boolean ENABLE_INSIGHTS_DEFAULT = true;
 }

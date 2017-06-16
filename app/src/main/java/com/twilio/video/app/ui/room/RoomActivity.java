@@ -873,9 +873,12 @@ public class RoomActivity extends BaseActivity {
             public Room call() throws Exception {
                 String env = sharedPreferences.getString(Preferences.ENVIRONMENT,
                     Preferences.ENVIRONMENT_DEFAULT);
+                boolean enableInsights = sharedPreferences.getBoolean(Preferences.ENABLE_INSIGHTS,
+                        Preferences.ENABLE_INSIGHTS_DEFAULT);
 
                 ConnectOptions.Builder connectOptionsBuilder = new ConnectOptions.Builder(token)
-                        .roomName(roomName);
+                        .roomName(roomName)
+                        .enableInsights(enableInsights);
 
                 if (localAudioTrack != null) {
                     connectOptionsBuilder

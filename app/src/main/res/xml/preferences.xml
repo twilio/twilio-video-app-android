@@ -6,6 +6,10 @@
             android:defaultValue="false"
             android:key="pref_enable_stats"
             android:title="@string/enable_stats"/>
+        <CheckBoxPreference
+            android:key="pref_enable_insights"
+            android:title="@string/enable_insights"
+            android:defaultValue="true"/>
         <ListPreference
             android:defaultValue="prod"
             android:entries="@array/environment_array"
