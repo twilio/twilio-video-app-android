@@ -57,6 +57,7 @@ import com.twilio.video.app.data.api.VideoAppService;
 import com.twilio.video.app.data.api.model.Topology;
 import com.twilio.video.app.ui.settings.SettingsActivity;
 import com.twilio.video.app.util.BuildConfigUtils;
+import com.twilio.video.app.util.CameraCapturerCompat;
 import com.twilio.video.app.util.EnvUtil;
 import com.twilio.video.app.util.InputUtils;
 import com.twilio.video.app.util.StatsScheduler;
@@ -158,7 +159,7 @@ public class RoomActivity extends BaseActivity {
     private LocalVideoTrack cameraVideoTrack;
     private boolean restoreLocalVideoCameraTrack = false;
     private LocalVideoTrack screenVideoTrack;
-    private CameraCapturer cameraCapturer;
+    private CameraCapturerCompat cameraCapturer;
     private ScreenCapturer screenCapturer;
     private final ScreenCapturer.Listener screenCapturerListener = new ScreenCapturer.Listener() {
         @Override
@@ -458,7 +459,10 @@ public class RoomActivity extends BaseActivity {
         if (cameraVideoTrack == null) {
 
             // add local camera track
-            cameraVideoTrack = LocalVideoTrack.create(this, true, cameraCapturer, videoConstraints);
+            cameraVideoTrack = LocalVideoTrack.create(this,
+                    true,
+                    cameraCapturer.getVideoCapturer(),
+                    videoConstraints);
             if (localParticipant != null) {
                 localParticipant.addVideoTrack(cameraVideoTrack);
             }
@@ -611,10 +615,13 @@ public class RoomActivity extends BaseActivity {
 
         // initialize capturer only once if needed
         if (cameraCapturer == null) {
-            cameraCapturer = new CameraCapturer(this, CameraCapturer.CameraSource.FRONT_CAMERA);
+            cameraCapturer = new CameraCapturerCompat(this, CameraCapturer.CameraSource.FRONT_CAMERA);
         }
 
-        cameraVideoTrack = LocalVideoTrack.create(this, true, cameraCapturer, videoConstraints);
+        cameraVideoTrack = LocalVideoTrack.create(this,
+                true,
+                cameraCapturer.getVideoCapturer(),
+                videoConstraints);
         if (cameraVideoTrack != null) {
             localVideoTrackNames.put(cameraVideoTrack.getTrackId(),
                     getString(R.string.camera_video_track));
