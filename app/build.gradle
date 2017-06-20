@@ -142,7 +142,7 @@ def getHockeyAppId() {
     def hockeyAppId = "\"\""
 
     if (project.hasProperty("hockeyAppId")) {
-        hockeyAppId = project.property("hockeyAppId").toBoolean()
+        hockeyAppId = "\"${project.property("hockeyAppId")}\""
         logger.log(LogLevel.INFO, "HockeyApp ID: ${hockeyAppId}")
     } else {
         logger.log(LogLevel.INFO, "No HockeyApp ID provided")
