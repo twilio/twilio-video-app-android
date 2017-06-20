@@ -5,6 +5,7 @@
 - [Video App](#video-app)
 - [Tests](#tests)
 - [Native Debugging](#native-debugging)
+- [Code of Conduct](#code-of-conduct)
 
 The Android Video SDK provides multi-party voice and video calling on Android.
 
@@ -172,4 +173,8 @@ library module. By default, gradle publishes the release version of the Android 
 native debugging of the Android SDK in the app or library tests add 
 `PUBLISH_CONFIG=debug` to your `local.properties`.
 
+## Code of Conduct
 
+This project adheres to the Contributor Covenant [Code of Conduct](CODE_OF_CONDUCT.md). By
+participating, you are expected to uphold this code. Please report unacceptable behavior to
+[video-conduct@twilio.com](mailto:video-conduct@twilio.com).
