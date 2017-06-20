@@ -18,8 +18,6 @@ import dagger.android.HasDispatchingActivityInjector;
 import timber.log.Timber;
 
 public class VideoApplication extends Application implements HasDispatchingActivityInjector {
-    public static final String HOCKEY_APP_ID = "11347c1df4dc4a929a1f6637fcbe64dc";
-
     @Inject DispatchingAndroidInjector<Activity> dispatchingActivityInjector;
     @Inject Timber.Tree tree;
 

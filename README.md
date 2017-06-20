@@ -155,6 +155,13 @@ To get started with the development flavor follow these steps:
   
 4. Run the application.
 
+### HockeyApp
+The internal release flavor of the application requires setting the project property `hockeyAppId` 
+to register for application updates. The following snippet demonstrates how to build an internal 
+release with a Hockey App ID.
+
+`./gradlew -PhockeyAppId=1234 app:assembleInternalRelease`
+
 ## Tests
 
 The tests are located in the library module and use the AndroidJUnitRunner.

@@ -19,6 +19,8 @@ android {
         versionName generateVersionName()
         versionCode generateVersionCode()
 
+        buildConfigField 'String', 'HOCKEY_APP_ID', "${getHockeyAppId()}"
+
         vectorDrawables.useSupportLibrary = true
 
         multiDexEnabled true
@@ -134,6 +136,19 @@ dependencies {
     annotationProcessor 'com.jakewharton:butterknife-compiler:8.4.0'
 
     developmentCompile project(':token')
+}
+
+def getHockeyAppId() {
+    def hockeyAppId = "\"\""
+
+    if (project.hasProperty("hockeyAppId")) {
+        hockeyAppId = project.property("hockeyAppId").toBoolean()
+        logger.log(LogLevel.INFO, "HockeyApp ID: ${hockeyAppId}")
+    } else {
+        logger.log(LogLevel.INFO, "No HockeyApp ID provided")
+    }
+
+    return hockeyAppId
 }
 
 def getTwilioVideoAppConfig() {
