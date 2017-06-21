@@ -37,21 +37,3 @@ if [ "$?" -ne "0" ]; then
     echo "Error: failed to execute sdk-release-tool upload"
     exit 1
 fi
-
-echo "sdk-release-tool: pinning..."
-pushd "$SDK_RELEASE_TOOL_HOME"
-./sdk-release-tool pin -f --${CDN_JSON_REALM} twilio-${PRODUCT_NAME}-android ${SDK_VERSION}-rc${SDK_RC}
-popd
-if [ "$?" -ne "0" ]; then
-    echo "Error: failed to execute sdk-release-tool update"
-    exit 1
-fi
-
-echo "sdk-release-tool: pinning latest..."
-pushd "$SDK_RELEASE_TOOL_HOME"
-./sdk-release-tool pin-latest -f --${CDN_JSON_REALM} twilio-${PRODUCT_NAME}-android ${SDK_VERSION}-rc${SDK_RC}
-popd
-if [ "$?" -ne "0" ]; then
-    echo "Error: failed to execute sdk-release-tool update"
-    exit 1
-fi
