@@ -257,11 +257,12 @@ public class Participant {
 
     synchronized void release(){
         if (!isReleased()) {
-            audioTracks.clear();
+            for (AudioTrack audioTrack : audioTracks) {
+                audioTrack.setEnabled(false);
+            }
             for (VideoTrack videoTrack : videoTracks) {
                 videoTrack.release();
             }
-            videoTracks.clear();
             nativeRelease(nativeParticipantContext);
             nativeParticipantContext = 0;
         }

@@ -189,4 +189,36 @@ public class ParticipantTopologyParameterizedTest extends BaseParticipantTest {
         actor2Room.getLocalParticipant().removeVideoTrack(actor2LocalVideoTrack);
         assertTrue(participantListener.onVideoTrackRemovedLatch.await(20, TimeUnit.SECONDS));
     }
+
+    @Test
+    public void shouldHaveTracksAfterDisconnected() throws InterruptedException {
+        // Add audio and video tracks
+        CallbackHelper.FakeParticipantListener participantListener =
+                new CallbackHelper.FakeParticipantListener();
+        participantListener.onAudioTrackAddedLatch = new CountDownLatch(1);
+        participant.setListener(participantListener);
+        actor2LocalAudioTrack = LocalAudioTrack.create(mediaTestActivity, true);
+        assertTrue(actor2Room.getLocalParticipant().addAudioTrack(actor2LocalAudioTrack));
+        assertTrue(participantListener.onAudioTrackAddedLatch.await(20, TimeUnit.SECONDS));
+        participantListener.onVideoTrackAddedLatch = new CountDownLatch(1);
+        actor2LocalVideoTrack = LocalVideoTrack.create(mediaTestActivity, true, fakeVideoCapturer);
+        assertTrue(actor2Room.getLocalParticipant().addVideoTrack(actor2LocalVideoTrack));
+        assertTrue(participantListener.onVideoTrackAddedLatch.await(20, TimeUnit.SECONDS));
+
+        // Cache participant two tracks
+        List<AudioTrack> audioTracks = actor1RoomListener.getParticipant().getAudioTracks();
+        List<VideoTrack> videoTracks = actor1RoomListener.getParticipant().getVideoTracks();
+
+        // Participant two disconnects
+        actor1RoomListener.onParticipantDisconnectedLatch = new CountDownLatch(1);
+        actor2Room.disconnect();
+        assertTrue(actor1RoomListener.onParticipantDisconnectedLatch.await(20, TimeUnit.SECONDS));
+        Participant participant = actor1RoomListener.getParticipant();
+
+        // Validate that disconnected participant has all tracks
+        assertFalse(participant.getAudioTracks().get(0).isEnabled());
+        assertEquals(audioTracks.get(0), participant.getAudioTracks().get(0));
+        assertFalse(participant.getVideoTracks().get(0).isEnabled());
+        assertEquals(videoTracks.get(0), participant.getVideoTracks().get(0));
+    }
 }
