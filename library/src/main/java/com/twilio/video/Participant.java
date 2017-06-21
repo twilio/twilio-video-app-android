@@ -255,7 +255,7 @@ public class Participant {
         }
     }
 
-    synchronized void release(){
+    synchronized void release() {
         if (!isReleased()) {
             for (AudioTrack audioTrack : audioTracks) {
                 audioTrack.setEnabled(false);
