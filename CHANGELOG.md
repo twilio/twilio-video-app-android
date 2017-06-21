@@ -46,6 +46,8 @@ Bug Fixes
 to retry with a backoff timer when errors are encountered.
 - Fixed a bug in network handoff scenarios where the SDK was not handling the race condition 
 if network lost or network changed event is received when a network changed event is being processed.
+- Fixed bug where audio and video tracks were not available after `onParticipantDisconnected` was
+invoked [#125](https://github.com/twilio/video-quickstart-android/issues/125)
 
 Known issues
 

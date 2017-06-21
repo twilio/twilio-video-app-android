@@ -255,13 +255,11 @@ public class Participant {
         }
     }
 
-    synchronized void release(){
+    synchronized void release() {
         if (!isReleased()) {
-            audioTracks.clear();
             for (VideoTrack videoTrack : videoTracks) {
                 videoTrack.release();
             }
-            videoTracks.clear();
             nativeRelease(nativeParticipantContext);
             nativeParticipantContext = 0;
         }
