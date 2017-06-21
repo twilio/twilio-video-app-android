@@ -197,7 +197,7 @@ public class ParticipantTopologyParameterizedTest extends BaseParticipantTest {
                 new CallbackHelper.FakeParticipantListener();
         participantListener.onAudioTrackAddedLatch = new CountDownLatch(1);
         participant.setListener(participantListener);
-        actor2LocalAudioTrack = LocalAudioTrack.create(mediaTestActivity, true);
+        actor2LocalAudioTrack = LocalAudioTrack.create(mediaTestActivity, false);
         assertTrue(actor2Room.getLocalParticipant().addAudioTrack(actor2LocalAudioTrack));
         assertTrue(participantListener.onAudioTrackAddedLatch.await(20, TimeUnit.SECONDS));
         participantListener.onVideoTrackAddedLatch = new CountDownLatch(1);
@@ -216,9 +216,11 @@ public class ParticipantTopologyParameterizedTest extends BaseParticipantTest {
         Participant participant = actor1RoomListener.getParticipant();
 
         // Validate that disconnected participant has all tracks
-        assertFalse(participant.getAudioTracks().get(0).isEnabled());
+        assertEquals(audioTracks.get(0).isEnabled(),
+                participant.getAudioTracks().get(0).isEnabled());
         assertEquals(audioTracks.get(0), participant.getAudioTracks().get(0));
-        assertFalse(participant.getVideoTracks().get(0).isEnabled());
+        assertEquals(videoTracks.get(0).isEnabled(),
+                participant.getVideoTracks().get(0).isEnabled());
         assertEquals(videoTracks.get(0), participant.getVideoTracks().get(0));
     }
 }

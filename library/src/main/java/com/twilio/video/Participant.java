@@ -257,9 +257,6 @@ public class Participant {
 
     synchronized void release() {
         if (!isReleased()) {
-            for (AudioTrack audioTrack : audioTracks) {
-                audioTrack.setEnabled(false);
-            }
             for (VideoTrack videoTrack : videoTracks) {
                 videoTrack.release();
             }
