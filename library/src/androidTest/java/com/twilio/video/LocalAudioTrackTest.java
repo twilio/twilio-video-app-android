@@ -110,9 +110,9 @@ public class LocalAudioTrackTest {
             localAudioTrack = LocalAudioTrack.create(mediaTestActivity, true, audioOptions);
 
             // Validate the audio track was created
-            assertNotNull("Failed to create AudioTrack with options: " + audioOptions,
+            assertNotNull("Failed to create RemoteAudioTrack with options: " + audioOptions,
                     localAudioTrack);
-            assertTrue("AudioTrack created is not enabled with options: " + audioOptions,
+            assertTrue("RemoteAudioTrack created is not enabled with options: " + audioOptions,
                     localAudioTrack.isEnabled());
 
             // Remove the audio track and continue to next audio options configuration

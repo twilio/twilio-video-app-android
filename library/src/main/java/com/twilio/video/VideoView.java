@@ -9,10 +9,6 @@ import android.util.AttributeSet;
 import org.webrtc.RendererCommon;
 import org.webrtc.SurfaceViewRenderer;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
-import java.nio.ByteBuffer;
-
 /**
  * A VideoView renders frames from a {@link VideoTrack}. This class is an extension of
  * {@link android.view.SurfaceView}, so it can be placed in your XML view hierarchy.

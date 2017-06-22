@@ -13,8 +13,8 @@ public class Participant {
 
     private final String identity;
     private final String sid;
-    private final List<AudioTrack> audioTracks;
-    private final List<VideoTrack> videoTracks;
+    private final List<RemoteAudioTrack> remoteAudioTracks;
+    private final List<RemoteVideoTrack> remoteVideoTracks;
     private final Handler handler;
 
     /*
@@ -25,19 +25,19 @@ public class Participant {
     private final Listener participantListenerProxy = new Listener() {
         @Override
         public void onAudioTrackAdded(final Participant participant,
-                                      final AudioTrack audioTrack) {
+                                      final RemoteAudioTrack remoteAudioTrack) {
             logger.d("onAudioTrackAdded");
-            if (audioTrack == null) {
+            if (remoteAudioTrack == null) {
                 logger.w("Received audio track added callback for non-existing audio track");
                 return;
             }
-            audioTracks.add(audioTrack);
+            remoteAudioTracks.add(remoteAudioTrack);
             final Listener listener = listenerReference.get();
             if (listener != null) {
                 handler.post(new Runnable() {
                     @Override
                     public void run() {
-                        listener.onAudioTrackAdded(participant, audioTrack);
+                        listener.onAudioTrackAdded(participant, remoteAudioTrack);
                     }
                 });
             }
@@ -45,10 +45,10 @@ public class Participant {
 
         @Override
         public void onAudioTrackRemoved(final Participant participant,
-                                        final AudioTrack audioTrack) {
+                                        final RemoteAudioTrack remoteAudioTrack) {
             logger.d("onAudioTrackRemoved");
-            audioTracks.remove(audioTrack);
-            if (audioTrack == null) {
+            remoteAudioTracks.remove(remoteAudioTrack);
+            if (remoteAudioTrack == null) {
                 logger.w("Received audio track removed callback for non-existent audio track");
                 return;
             }
@@ -57,7 +57,7 @@ public class Participant {
                 handler.post(new Runnable() {
                     @Override
                     public void run() {
-                        listener.onAudioTrackRemoved(participant, audioTrack);
+                        listener.onAudioTrackRemoved(participant, remoteAudioTrack);
                     }
                 });
             }
@@ -65,19 +65,19 @@ public class Participant {
 
         @Override
         public void onVideoTrackAdded(final Participant participant,
-                                      final VideoTrack videoTrack) {
+                                      final RemoteVideoTrack remoteVideoTrack) {
             logger.d("onVideoTrackAdded");
-            if (videoTrack == null) {
+            if (remoteVideoTrack == null) {
                 logger.w("Received video track added callback for non-existing video track");
                 return;
             }
-            videoTracks.add(videoTrack);
+            remoteVideoTracks.add(remoteVideoTrack);
             final Listener listener = listenerReference.get();
             if (listener != null) {
                 handler.post(new Runnable() {
                     @Override
                     public void run() {
-                        listener.onVideoTrackAdded(participant, videoTrack);
+                        listener.onVideoTrackAdded(participant, remoteVideoTrack);
                     }
                 });
             }
@@ -85,20 +85,20 @@ public class Participant {
 
         @Override
         public void onVideoTrackRemoved(final Participant participant,
-                                        final VideoTrack videoTrack) {
+                                        final RemoteVideoTrack remoteVideoTrack) {
             logger.d("onVideoTrackRemoved");
-            videoTracks.remove(videoTrack);
-            if (videoTrack == null) {
+            remoteVideoTracks.remove(remoteVideoTrack);
+            if (remoteVideoTrack == null) {
                 logger.w("Received video track removed callback for non-existent video track");
                 return;
             }
-            videoTrack.release();
+            remoteVideoTrack.release();
             final Listener listener = listenerReference.get();
             if (listener != null) {
                 handler.post(new Runnable() {
                     @Override
                     public void run() {
-                        listener.onVideoTrackRemoved(participant, videoTrack);
+                        listener.onVideoTrackRemoved(participant, remoteVideoTrack);
                     }
                 });
             }
@@ -106,19 +106,19 @@ public class Participant {
 
         @Override
         public void onAudioTrackEnabled(final Participant participant,
-                                        final AudioTrack audioTrack) {
+                                        final RemoteAudioTrack remoteAudioTrack) {
             logger.d("onAudioTrackEnabled");
-            if (audioTrack == null) {
+            if (remoteAudioTrack == null) {
                 logger.w("Received audio track enabled callback for non-existent audio track");
                 return;
             }
-            audioTrack.setEnabled(true);
+            remoteAudioTrack.setEnabled(true);
             final Listener listener = listenerReference.get();
             if (listener != null) {
                 handler.post(new Runnable() {
                     @Override
                     public void run() {
-                        listener.onAudioTrackEnabled(participant, audioTrack);
+                        listener.onAudioTrackEnabled(participant, remoteAudioTrack);
                     }
                 });
             }
@@ -126,19 +126,19 @@ public class Participant {
 
         @Override
         public void onAudioTrackDisabled(final Participant participant,
-                                         final AudioTrack audioTrack) {
+                                         final RemoteAudioTrack remoteAudioTrack) {
             logger.d("onAudioTrackDisabled");
-            if (audioTrack == null) {
+            if (remoteAudioTrack == null) {
                 logger.w("Received audio track disabled callback for non-existent audio track");
                 return;
             }
-            audioTrack.setEnabled(false);
+            remoteAudioTrack.setEnabled(false);
             final Listener listener = listenerReference.get();
             if (listener != null) {
                 handler.post(new Runnable() {
                     @Override
                     public void run() {
-                        listener.onAudioTrackDisabled(participant, audioTrack);
+                        listener.onAudioTrackDisabled(participant, remoteAudioTrack);
                     }
                 });
             }
@@ -146,19 +146,19 @@ public class Participant {
 
         @Override
         public void onVideoTrackEnabled(final Participant participant,
-                                        final VideoTrack videoTrack) {
+                                        final RemoteVideoTrack remoteVideoTrack) {
             logger.d("onVideoTrackEnabled");
-            if (videoTrack == null) {
+            if (remoteVideoTrack == null) {
                 logger.w("Received video track enabled callback for non-existent video track");
                 return;
             }
-            videoTrack.setEnabled(true);
+            remoteVideoTrack.setEnabled(true);
             final Listener listener = listenerReference.get();
             if (listener != null) {
                 handler.post(new Runnable() {
                     @Override
                     public void run() {
-                        listener.onVideoTrackEnabled(participant, videoTrack);
+                        listener.onVideoTrackEnabled(participant, remoteVideoTrack);
                     }
                 });
             }
@@ -166,19 +166,19 @@ public class Participant {
 
         @Override
         public void onVideoTrackDisabled(final Participant participant,
-                                         final VideoTrack videoTrack) {
+                                         final RemoteVideoTrack remoteVideoTrack) {
             logger.d("onVideoTrackDisabled");
-            if (videoTrack == null) {
+            if (remoteVideoTrack == null) {
                 logger.w("Received video track disabled callback for non-existent video track");
                 return;
             }
-            videoTrack.setEnabled(false);
+            remoteVideoTrack.setEnabled(false);
             final Listener listener = listenerReference.get();
             if (listener != null) {
                 handler.post(new Runnable() {
                     @Override
                     public void run() {
-                        listener.onVideoTrackDisabled(participant, videoTrack);
+                        listener.onVideoTrackDisabled(participant, remoteVideoTrack);
                     }
                 });
             }
@@ -188,14 +188,14 @@ public class Participant {
 
     Participant(String identity,
                 String sid,
-                List<AudioTrack> audioTracks,
-                List<VideoTrack> videoTracks,
+                List<RemoteAudioTrack> remoteAudioTracks,
+                List<RemoteVideoTrack> remoteVideoTracks,
                 Handler handler,
                 long nativeParticipantContext) {
         this.identity = identity;
         this.sid = sid;
-        this.audioTracks = audioTracks;
-        this.videoTracks = videoTracks;
+        this.remoteAudioTracks = remoteAudioTracks;
+        this.remoteVideoTracks = remoteVideoTracks;
         this.handler = handler;
         this.nativeParticipantContext = nativeParticipantContext;
         nativeCreateParticipantListenerProxy(participantListenerProxy, nativeParticipantContext);
@@ -216,21 +216,21 @@ public class Participant {
     }
 
     /**
-     * Retrieves the list of audio tracks.
+     * Retrieves the list of remote audio tracks.
      *
      * @return list of audio tracks.
      */
-    public List<AudioTrack> getAudioTracks() {
-        return audioTracks;
+    public List<RemoteAudioTrack> getSubscribedAudioTracks() {
+        return remoteAudioTracks;
     }
 
     /**
-     * Retrieves the list of video tracks.
+     * Retrieves the list of remote video tracks.
      *
      * @return list of video tracks.
      */
-    public List<VideoTrack> getVideoTracks() {
-        return videoTracks;
+    public List<RemoteVideoTrack> getSubscribedVideoTracks() {
+        return remoteVideoTracks;
     }
 
     /**
@@ -257,8 +257,8 @@ public class Participant {
 
     synchronized void release() {
         if (!isReleased()) {
-            for (VideoTrack videoTrack : videoTracks) {
-                videoTrack.release();
+            for (RemoteVideoTrack remoteVideoTrack : remoteVideoTracks) {
+                remoteVideoTrack.release();
             }
             nativeRelease(nativeParticipantContext);
             nativeParticipantContext = 0;
@@ -272,79 +272,79 @@ public class Participant {
     public interface Listener {
         /**
          * This method notifies the listener that a {@link Participant} has added
-         * an {@link AudioTrack} to this {@link Room}.
+         * an {@link RemoteAudioTrack} to this {@link Room}.
          *
          * @param participant The participant object associated with this audio track.
-         * @param audioTrack The audio track added to this room.
+         * @param remoteAudioTrack The audio track added to this room.
          */
         void onAudioTrackAdded(Participant participant,
-                               AudioTrack audioTrack);
+                               RemoteAudioTrack remoteAudioTrack);
 
         /**
          * This method notifies the listener that a {@link Participant} has removed
-         * an {@link AudioTrack} from this {@link Room}.
+         * an {@link RemoteAudioTrack} from this {@link Room}.
          *
          * @param participant The participant object associated with this audio track.
-         * @param audioTrack The audio track removed from this room.
+         * @param remoteAudioTrack The audio track removed from this room.
          */
         void onAudioTrackRemoved(Participant participant,
-                                 AudioTrack audioTrack);
+                                 RemoteAudioTrack remoteAudioTrack);
 
         /**
          * This method notifies the listener that a {@link Participant} has added
-         * an {@link VideoTrack} to this {@link Room}.
+         * an {@link RemoteVideoTrack} to this {@link Room}.
          *
          * @param participant The participant object associated with this video track.
-         * @param videoTrack The video track added to this room.
+         * @param remoteVideoTrack The video track added to this room.
          */
         void onVideoTrackAdded(Participant participant,
-                               VideoTrack videoTrack);
+                               RemoteVideoTrack remoteVideoTrack);
 
         /**
          * This method notifies the listener that a {@link Participant} has removed
-         * an {@link VideoTrack} from this {@link Room}.
+         * an {@link RemoteVideoTrack} from this {@link Room}.
          *
          * @param participant The participant object associated with this video track.
-         * @param videoTrack The video track removed from this room.
+         * @param remoteVideoTrack The video track removed from this room.
          */
         void onVideoTrackRemoved(Participant participant,
-                                 VideoTrack videoTrack);
+                                 RemoteVideoTrack remoteVideoTrack);
 
         /**
          * This method notifies the listener that a {@link Participant} audio track
          * has been enabled.
          *
          * @param participant The participant object associated with this audio track.
-         * @param audioTrack The audio track enabled in this room.
+         * @param remoteAudioTrack The audio track enabled in this room.
          */
-        void onAudioTrackEnabled(Participant participant, AudioTrack audioTrack);
+        void onAudioTrackEnabled(Participant participant, RemoteAudioTrack remoteAudioTrack);
 
         /**
          * This method notifies the listener that a {@link Participant} audio track
          * has been disabled.
          *
          * @param participant The participant object associated with this audio track.
-         * @param audioTrack The audio track disabled in this room.
+         * @param remoteAudioTrack The audio track disabled in this room.
          */
-        void onAudioTrackDisabled(Participant participant, AudioTrack audioTrack);
+        void onAudioTrackDisabled(Participant participant, RemoteAudioTrack remoteAudioTrack);
 
         /**
          * This method notifies the listener that a {@link Participant} video track
          * has been enabled.
          *
          * @param participant The participant object associated with this audio track.
-         * @param videoTrack The video track enabled in this room.
+         * @param remoteVideoTrack The video track enabled in this room.
          */
-        void onVideoTrackEnabled(Participant participant, VideoTrack videoTrack);
+        void onVideoTrackEnabled(Participant participant, RemoteVideoTrack remoteVideoTrack);
 
         /**
          * This method notifies the listener that a {@link Participant} video track
          * has been disabled.
          *
          * @param participant The participant object associated with this audio track.
-         * @param videoTrack The video track disabled in this room.
+         * @param remoteVideoTrack The video track disabled in this room.
          */
-        void onVideoTrackDisabled(Participant participant, VideoTrack videoTrack);
+        void onVideoTrackDisabled(Participant participant, RemoteVideoTrack remoteVideoTrack);
     }
 
     private native void nativeCreateParticipantListenerProxy(Participant.Listener participantListenerProxy,

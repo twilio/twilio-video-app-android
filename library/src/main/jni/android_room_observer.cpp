@@ -14,8 +14,8 @@ AndroidRoomObserver::AndroidRoomObserver(JNIEnv *env, jobject j_room, jobject j_
                                                                "com/twilio/video/TwilioException")),
     j_participant_class_(env, twilio_video_jni::FindClass(env, "com/twilio/video/Participant")),
     j_array_list_class_(env, twilio_video_jni::FindClass(env, "java/util/ArrayList")),
-    j_audio_track_class_(env, twilio_video_jni::FindClass(env, "com/twilio/video/AudioTrack")),
-    j_video_track_class_(env, twilio_video_jni::FindClass(env, "com/twilio/video/VideoTrack")),
+    j_audio_track_class_(env, twilio_video_jni::FindClass(env, "com/twilio/video/RemoteAudioTrack")),
+    j_video_track_class_(env, twilio_video_jni::FindClass(env, "com/twilio/video/RemoteVideoTrack")),
     j_set_connected_(
             webrtc_jni::GetMethodID(env,
                                     *j_room_class_,
@@ -80,12 +80,12 @@ AndroidRoomObserver::AndroidRoomObserver(JNIEnv *env, jobject j_room, jobject j_
         webrtc_jni::GetMethodID(env,
                                 *j_audio_track_class_,
                                 "<init>",
-                                "(Ljava/lang/String;Z)V")),
+                                "(Ljava/lang/String;ZLjava/lang/String;)V")),
     j_video_track_ctor_id_(
         webrtc_jni::GetMethodID(env,
                                 *j_video_track_class_,
                                 "<init>",
-                                "(Lorg/webrtc/VideoTrack;Z)V")),
+                                "(Lorg/webrtc/VideoTrack;ZLjava/lang/String;)V")),
     j_twilio_exception_ctor_id_(
         webrtc_jni::GetMethodID(env,
                                 *j_twilio_exception_class_,

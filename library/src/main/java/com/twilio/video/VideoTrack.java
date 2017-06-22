@@ -5,10 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-/**
- * A video track represents a remote video source.
- */
-public class VideoTrack implements Track {
+public abstract class VideoTrack implements Track {
     private static final String WARNING_NULL_RENDERER = "Attempted to add a null renderer.";
     private static final Logger logger = Logger.getLogger(VideoTrack.class);
 
@@ -92,7 +89,7 @@ public class VideoTrack implements Track {
     }
 
     private org.webrtc.VideoRenderer createWebRtcVideoRenderer(VideoRenderer videoRenderer) {
-        return new org.webrtc.VideoRenderer(new VideoRendererCallbackAdapter(videoRenderer));
+        return new org.webrtc.VideoRenderer(new VideoTrack.VideoRendererCallbackAdapter(videoRenderer));
     }
 
     void setEnabled(boolean isEnabled) {
@@ -122,4 +119,3 @@ public class VideoTrack implements Track {
         }
     }
 }
-

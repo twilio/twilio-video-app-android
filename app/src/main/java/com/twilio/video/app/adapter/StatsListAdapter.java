@@ -10,13 +10,13 @@ import android.view.ViewGroup;
 import android.widget.TableRow;
 import android.widget.TextView;
 
-import com.twilio.video.AudioTrack;
+import com.twilio.video.RemoteAudioTrack;
 import com.twilio.video.AudioTrackStats;
 import com.twilio.video.LocalAudioTrackStats;
 import com.twilio.video.LocalVideoTrackStats;
 import com.twilio.video.Participant;
+import com.twilio.video.RemoteVideoTrack;
 import com.twilio.video.StatsReport;
-import com.twilio.video.VideoTrack;
 import com.twilio.video.VideoTrackStats;
 import com.twilio.video.app.R;
 import com.twilio.video.app.model.StatsListItem;
@@ -202,13 +202,13 @@ public class StatsListAdapter extends RecyclerView.Adapter<StatsListAdapter.View
                                       List<Participant> participants) {
         for (Participant participant : participants) {
             if (isAudioTrack) {
-                AudioTrack audioTrack = getAudioTrack(participant, trackId);
-                if (audioTrack != null) {
+                RemoteAudioTrack remoteAudioTrack = getAudioTrack(participant, trackId);
+                if (remoteAudioTrack != null) {
                     return participant.getIdentity();
                 }
             } else {
-                VideoTrack videoTrack = getVideoTrack(participant, trackId);
-                if (videoTrack != null) {
+                RemoteVideoTrack remoteVideoTrack = getRemoteVideoTrack(participant, trackId);
+                if (remoteVideoTrack != null) {
                     return participant.getIdentity();
                 }
             }
@@ -216,20 +216,20 @@ public class StatsListAdapter extends RecyclerView.Adapter<StatsListAdapter.View
         return "";
     }
 
-    private AudioTrack getAudioTrack(Participant participant, String trackId) {
-        for (AudioTrack audioTrack : participant.getAudioTracks()) {
-            if (audioTrack.getTrackId().equals(trackId)) {
-                return audioTrack;
+    private RemoteAudioTrack getAudioTrack(Participant participant, String trackId) {
+        for (RemoteAudioTrack remoteAudioTrack : participant.getSubscribedAudioTracks()) {
+            if (remoteAudioTrack.getTrackId().equals(trackId)) {
+                return remoteAudioTrack;
             }
         }
 
         return null;
     }
 
-    private VideoTrack getVideoTrack(Participant participant, String trackId) {
-        for (VideoTrack videoTrack : participant.getVideoTracks()) {
-            if (videoTrack.getTrackId().equals(trackId)) {
-                return videoTrack;
+    private RemoteVideoTrack getRemoteVideoTrack(Participant participant, String trackId) {
+        for (RemoteVideoTrack remoteVideoTrack : participant.getSubscribedVideoTracks()) {
+            if (remoteVideoTrack.getTrackId().equals(trackId)) {
+                return remoteVideoTrack;
             }
         }
 

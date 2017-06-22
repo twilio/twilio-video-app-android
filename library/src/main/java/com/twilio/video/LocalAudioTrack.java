@@ -9,7 +9,7 @@ import static android.Manifest.permission.RECORD_AUDIO;
 /**
  * Represents a local audio source.
  */
-public class LocalAudioTrack extends AudioTrack  {
+public class LocalAudioTrack extends AudioTrack {
     private static final Logger logger = Logger.getLogger(LocalAudioTrack.class);
 
     private final MediaFactory mediaFactory;

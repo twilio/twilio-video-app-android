@@ -14,58 +14,58 @@ AndroidParticipantObserver::AndroidParticipantObserver(JNIEnv *env,
                                       webrtc_jni::GetObjectClass(env, *j_participant_observer_)),
         audio_track_map_(audio_track_map),
         video_track_map_(video_track_map),
-        j_audio_track_class_(env, env->FindClass("com/twilio/video/AudioTrack")),
-        j_video_track_class_(env, env->FindClass("com/twilio/video/VideoTrack")),
+        j_audio_track_class_(env, env->FindClass("com/twilio/video/RemoteAudioTrack")),
+        j_video_track_class_(env, env->FindClass("com/twilio/video/RemoteVideoTrack")),
         j_on_audio_track_added_(
                 webrtc_jni::GetMethodID(env,
                                         *j_participant_observer_class_,
                                         "onAudioTrackAdded",
-                                        "(Lcom/twilio/video/Participant;Lcom/twilio/video/AudioTrack;)V")),
+                                        "(Lcom/twilio/video/Participant;Lcom/twilio/video/RemoteAudioTrack;)V")),
         j_on_audio_track_removed_(
                 webrtc_jni::GetMethodID(env,
                                         *j_participant_observer_class_,
                                         "onAudioTrackRemoved",
-                                        "(Lcom/twilio/video/Participant;Lcom/twilio/video/AudioTrack;)V")),
+                                        "(Lcom/twilio/video/Participant;Lcom/twilio/video/RemoteAudioTrack;)V")),
         j_on_video_track_added_(
                 webrtc_jni::GetMethodID(env,
                                         *j_participant_observer_class_,
                                         "onVideoTrackAdded",
-                                        "(Lcom/twilio/video/Participant;Lcom/twilio/video/VideoTrack;)V")),
+                                        "(Lcom/twilio/video/Participant;Lcom/twilio/video/RemoteVideoTrack;)V")),
         j_on_video_track_removed_(
                 webrtc_jni::GetMethodID(env,
                                         *j_participant_observer_class_,
                                         "onVideoTrackRemoved",
-                                        "(Lcom/twilio/video/Participant;Lcom/twilio/video/VideoTrack;)V")),
+                                        "(Lcom/twilio/video/Participant;Lcom/twilio/video/RemoteVideoTrack;)V")),
         j_on_audio_track_enabled_(
                 webrtc_jni::GetMethodID(env,
                                         *j_participant_observer_class_,
                                         "onAudioTrackEnabled",
-                                        "(Lcom/twilio/video/Participant;Lcom/twilio/video/AudioTrack;)V")),
+                                        "(Lcom/twilio/video/Participant;Lcom/twilio/video/RemoteAudioTrack;)V")),
         j_on_audio_track_disabled_(
                 webrtc_jni::GetMethodID(env,
                                         *j_participant_observer_class_,
                                         "onAudioTrackDisabled",
-                                        "(Lcom/twilio/video/Participant;Lcom/twilio/video/AudioTrack;)V")),
+                                        "(Lcom/twilio/video/Participant;Lcom/twilio/video/RemoteAudioTrack;)V")),
         j_on_video_track_enabled_(
                 webrtc_jni::GetMethodID(env,
                                         *j_participant_observer_class_,
                                         "onVideoTrackEnabled",
-                                        "(Lcom/twilio/video/Participant;Lcom/twilio/video/VideoTrack;)V")),
+                                        "(Lcom/twilio/video/Participant;Lcom/twilio/video/RemoteVideoTrack;)V")),
         j_on_video_track_disabled_(
                 webrtc_jni::GetMethodID(env,
                                         *j_participant_observer_class_,
                                         "onVideoTrackDisabled",
-                                        "(Lcom/twilio/video/Participant;Lcom/twilio/video/VideoTrack;)V")),
+                                        "(Lcom/twilio/video/Participant;Lcom/twilio/video/RemoteVideoTrack;)V")),
         j_audio_track_ctor_id_(
                 webrtc_jni::GetMethodID(env,
                                         *j_audio_track_class_,
                                         "<init>",
-                                        "(Ljava/lang/String;Z)V")),
+                                        "(Ljava/lang/String;ZLjava/lang/String;)V")),
         j_video_track_ctor_id_(
                 webrtc_jni::GetMethodID(env,
                                         *j_video_track_class_,
                                         "<init>",
-                                        "(Lorg/webrtc/VideoTrack;Z)V")) {
+                                        "(Lorg/webrtc/VideoTrack;ZLjava/lang/String;)V")) {
     TS_CORE_LOG_MODULE(twilio::video::kTSCoreLogModulePlatform,
                        twilio::video::kTSCoreLogLevelDebug,
                        "AndroidMediaObserver");
@@ -145,7 +145,7 @@ void AndroidParticipantObserver::onAudioTrackRemoved(twilio::video::Participant 
         // We can remove audio track and delete the global reference after notifying developer
         audio_track_map_.erase(it);
         webrtc_jni::DeleteGlobalRef(jni(), j_audio_track);
-        CHECK_EXCEPTION(jni()) << "error deleting global AudioTrack reference";
+        CHECK_EXCEPTION(jni()) << "error deleting global RemoteAudioTrack reference";
     }
 }
 
@@ -209,7 +209,7 @@ void AndroidParticipantObserver::onVideoTrackRemoved(twilio::video::Participant 
         // We can remove the video track and delete global reference after notifying developer
         video_track_map_.erase(it);
         webrtc_jni::DeleteGlobalRef(jni(), j_video_track);
-        CHECK_EXCEPTION(jni()) << "error deleting global VideoTrack reference";
+        CHECK_EXCEPTION(jni()) << "error deleting global RemoteVideoTrack reference";
     }
 }
 

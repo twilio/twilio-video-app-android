@@ -1,9 +1,6 @@
 package com.twilio.video;
 
-/**
- * An audio track represents a remote audio source.
- */
-public class AudioTrack implements Track {
+public abstract class AudioTrack implements Track {
     private final String trackId;
     private boolean isEnabled;
 

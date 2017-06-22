@@ -124,8 +124,14 @@ jobject createJavaAudioTrack(JNIEnv *env,
                              jmethodID j_audio_track_ctor_id) {
     jstring j_track_id = webrtc_jni::JavaStringFromStdString(env, audio_track->getTrackId());
     jboolean j_is_enabled = audio_track->isEnabled();
+    // TODO: Use real track SID when ready
+    jstring j_track_sid = j_track_id;
 
-    return env->NewObject(j_audio_track_class, j_audio_track_ctor_id, j_track_id, j_is_enabled);
+    return env->NewObject(j_audio_track_class,
+                          j_audio_track_ctor_id,
+                          j_track_id,
+                          j_is_enabled,
+                          j_track_sid);
 }
 
 jobject createJavaVideoTrack(JNIEnv *env,
@@ -141,11 +147,14 @@ jobject createJavaVideoTrack(JNIEnv *env,
                                                   j_webrtc_video_track_ctor_id,
                                                   webrtc_jni::jlongFromPointer(
                                                           video_track->getWebRtcTrack()));
+    // TODO: Get real track sid
+    jstring j_track_sid = webrtc_jni::JavaStringFromStdString(env, video_track->getTrackId());
 
     return env->NewObject(j_video_track_class,
                           j_video_track_ctor_id,
                           j_webrtc_video_track,
-                          j_is_enabled);
+                          j_is_enabled,
+                          j_track_sid);
 }
 
 JNIEXPORT void JNICALL

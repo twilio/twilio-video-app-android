@@ -206,8 +206,8 @@ public class ParticipantTopologyParameterizedTest extends BaseParticipantTest {
         assertTrue(participantListener.onVideoTrackAddedLatch.await(20, TimeUnit.SECONDS));
 
         // Cache participant two tracks
-        List<AudioTrack> audioTracks = actor1RoomListener.getParticipant().getAudioTracks();
-        List<VideoTrack> videoTracks = actor1RoomListener.getParticipant().getVideoTracks();
+        List<RemoteAudioTrack> remoteAudioTracks = actor1RoomListener.getParticipant().getSubscribedAudioTracks();
+        List<RemoteVideoTrack> remoteVideoTracks = actor1RoomListener.getParticipant().getSubscribedVideoTracks();
 
         // Participant two disconnects
         actor1RoomListener.onParticipantDisconnectedLatch = new CountDownLatch(1);
@@ -216,11 +216,11 @@ public class ParticipantTopologyParameterizedTest extends BaseParticipantTest {
         Participant participant = actor1RoomListener.getParticipant();
 
         // Validate that disconnected participant has all tracks
-        assertEquals(audioTracks.get(0).isEnabled(),
-                participant.getAudioTracks().get(0).isEnabled());
-        assertEquals(audioTracks.get(0), participant.getAudioTracks().get(0));
-        assertEquals(videoTracks.get(0).isEnabled(),
-                participant.getVideoTracks().get(0).isEnabled());
-        assertEquals(videoTracks.get(0), participant.getVideoTracks().get(0));
+        assertEquals(remoteAudioTracks.get(0).isEnabled(),
+                participant.getSubscribedAudioTracks().get(0).isEnabled());
+        assertEquals(remoteAudioTracks.get(0), participant.getSubscribedAudioTracks().get(0));
+        assertEquals(remoteVideoTracks.get(0).isEnabled(),
+                participant.getSubscribedVideoTracks().get(0).isEnabled());
+        assertEquals(remoteVideoTracks.get(0), participant.getSubscribedVideoTracks().get(0));
     }
 }
