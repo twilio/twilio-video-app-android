@@ -15,6 +15,7 @@ import com.twilio.video.util.FrameCountRenderer;
 
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -51,11 +52,10 @@ public class Camera2CapturerTest extends BaseCamera2CapturerTest {
     }
 
     @Test
+    @Ignore("Investigate test issues on certain devices GSDK-1207")
     public void shouldAllowSimultaneousUseOfInstancesWithDifferentIds()
             throws InterruptedException {
         assumeTrue(cameraIds.length > 1);
-        // TODO: Investigate test issues on Samsung Galaxy S7 GSDK-1207
-        assumeFalse(DeviceUtils.isSamsungGalaxyS7());
         final String firstCameraId = cameraIds[0];
         final String secondCameraId = cameraIds[1];
         final FrameCountRenderer secondFrameCountRenderer = new FrameCountRenderer();
