@@ -406,20 +406,20 @@ public class StatsTopologyParameterizedTest extends BaseClientTest {
         assertTrue(0 < localVideoTrackStats.dimensions.height);
         assertTrue(0 < localVideoTrackStats.roundTripTime);
 
-        // Check AudioTrackStats
-        AudioTrackStats audioTrackStats = statsReport.getAudioTrackStats().get(0);
-        checkBaseTrackStats(audioTrackStats);
-        checkTrackStats(audioTrackStats);
-        assertTrue(0 < audioTrackStats.audioLevel);
-        assertTrue(0 < audioTrackStats.jitter);
+        // Check RemoteAudioTrackStats
+        RemoteAudioTrackStats remoteAudioTrackStats = statsReport.getRemoteAudioTrackStats().get(0);
+        checkBaseTrackStats(remoteAudioTrackStats);
+        checkTrackStats(remoteAudioTrackStats);
+        assertTrue(0 < remoteAudioTrackStats.audioLevel);
+        assertTrue(0 < remoteAudioTrackStats.jitter);
 
-        // Check VideoTrackStats
-        VideoTrackStats videoTrackStats = statsReport.getVideoTrackStats().get(0);
-        checkBaseTrackStats(videoTrackStats);
-        checkTrackStats(videoTrackStats);
-        assertTrue(0 < videoTrackStats.frameRate);
-        assertTrue(0 < videoTrackStats.dimensions.width);
-        assertTrue(0 < videoTrackStats.dimensions.height);
+        // Check RemoteVideoTrackStats
+        RemoteVideoTrackStats remoteVideoTrackStats = statsReport.getRemoteVideoTrackStats().get(0);
+        checkBaseTrackStats(remoteVideoTrackStats);
+        checkTrackStats(remoteVideoTrackStats);
+        assertTrue(0 < remoteVideoTrackStats.frameRate);
+        assertTrue(0 < remoteVideoTrackStats.dimensions.width);
+        assertTrue(0 < remoteVideoTrackStats.dimensions.height);
     }
 
     @Test
@@ -564,8 +564,8 @@ public class StatsTopologyParameterizedTest extends BaseClientTest {
 
         assertEquals(localAudioTrackSize, statsReport.getLocalAudioTrackStats().size());
         assertEquals(localVideoTrackSize, statsReport.getLocalVideoTrackStats().size());
-        assertEquals(audioTrackSize, statsReport.getAudioTrackStats().size());
-        assertEquals(videoTrackSize, statsReport.getVideoTrackStats().size());
+        assertEquals(audioTrackSize, statsReport.getRemoteAudioTrackStats().size());
+        assertEquals(videoTrackSize, statsReport.getRemoteVideoTrackStats().size());
     }
 
     private void checkBaseTrackStats(BaseTrackStats stats) {

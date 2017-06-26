@@ -11,13 +11,13 @@ import android.widget.TableRow;
 import android.widget.TextView;
 
 import com.twilio.video.RemoteAudioTrack;
-import com.twilio.video.AudioTrackStats;
+import com.twilio.video.RemoteAudioTrackStats;
 import com.twilio.video.LocalAudioTrackStats;
 import com.twilio.video.LocalVideoTrackStats;
 import com.twilio.video.Participant;
 import com.twilio.video.RemoteVideoTrack;
 import com.twilio.video.StatsReport;
-import com.twilio.video.VideoTrackStats;
+import com.twilio.video.RemoteVideoTrackStats;
 import com.twilio.video.app.R;
 import com.twilio.video.app.model.StatsListItem;
 
@@ -156,15 +156,15 @@ public class StatsListAdapter extends RecyclerView.Adapter<StatsListAdapter.View
                 localTracksAdded = true;
             }
             int trackCount = 0;
-            for (AudioTrackStats audioTrackStats : report.getAudioTrackStats()) {
+            for (RemoteAudioTrackStats remoteAudioTrackStats : report.getRemoteAudioTrackStats()) {
                 String trackName =
-                        getParticipantName(audioTrackStats.trackId, true, participants) +
+                        getParticipantName(remoteAudioTrackStats.trackId, true, participants) +
                                 " " + context.getString(R.string.audio_track) + " " + trackCount;
                 StatsListItem item = new StatsListItem.Builder()
-                        .baseTrackInfo(audioTrackStats)
-                        .bytes(audioTrackStats.bytesReceived)
-                        .jitter(audioTrackStats.jitter)
-                        .audioLevel(audioTrackStats.audioLevel)
+                        .baseTrackInfo(remoteAudioTrackStats)
+                        .bytes(remoteAudioTrackStats.bytesReceived)
+                        .jitter(remoteAudioTrackStats.jitter)
+                        .audioLevel(remoteAudioTrackStats.audioLevel)
                         .trackName(trackName)
                         .isAudioTrack(true)
                         .isLocalTrack(false)
@@ -173,15 +173,15 @@ public class StatsListAdapter extends RecyclerView.Adapter<StatsListAdapter.View
                 trackCount++;
             }
             trackCount = 0;
-            for (VideoTrackStats videoTrackStats : report.getVideoTrackStats()) {
+            for (RemoteVideoTrackStats remoteVideoTrackStats : report.getRemoteVideoTrackStats()) {
                 String trackName =
-                        getParticipantName(videoTrackStats.trackId, false, participants) +
+                        getParticipantName(remoteVideoTrackStats.trackId, false, participants) +
                                 " " + context.getString(R.string.video_track) + " " + trackCount;
                 StatsListItem item = new StatsListItem.Builder()
-                        .baseTrackInfo(videoTrackStats)
-                        .bytes(videoTrackStats.bytesReceived)
-                        .dimensions(videoTrackStats.dimensions.toString())
-                        .framerate(videoTrackStats.frameRate)
+                        .baseTrackInfo(remoteVideoTrackStats)
+                        .bytes(remoteVideoTrackStats.bytesReceived)
+                        .dimensions(remoteVideoTrackStats.dimensions.toString())
+                        .framerate(remoteVideoTrackStats.frameRate)
                         .trackName(trackName)
                         .isAudioTrack(false)
                         .isLocalTrack(false)

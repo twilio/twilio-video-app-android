@@ -11,8 +11,8 @@ public class StatsReport {
     private final String peerConnectionId;
     private List<LocalAudioTrackStats> localAudioTrackStats = new ArrayList<>();
     private List<LocalVideoTrackStats> localVideoTrackStats = new ArrayList<>();
-    private List<AudioTrackStats> audioTrackStats = new ArrayList<>();
-    private List<VideoTrackStats> videoTrackStats = new ArrayList<>();
+    private List<RemoteAudioTrackStats> remoteAudioTrackStats = new ArrayList<>();
+    private List<RemoteVideoTrackStats> remoteVideoTrackStats = new ArrayList<>();
 
     StatsReport(String peerConnectionId) {
         this.peerConnectionId = peerConnectionId;
@@ -48,8 +48,8 @@ public class StatsReport {
      *
      * @return a list of remote audio tracks stats
      */
-    public List<AudioTrackStats> getAudioTrackStats() {
-        return audioTrackStats;
+    public List<RemoteAudioTrackStats> getRemoteAudioTrackStats() {
+        return remoteAudioTrackStats;
     }
 
     /**
@@ -57,8 +57,8 @@ public class StatsReport {
      *
      * @return a list of remote video tracks stats
      */
-    public List<VideoTrackStats> getVideoTrackStats() {
-        return videoTrackStats;
+    public List<RemoteVideoTrackStats> getRemoteVideoTrackStats() {
+        return remoteVideoTrackStats;
     }
 
     void addLocalAudioTrackStats(LocalAudioTrackStats localAudioTrackStats) {
@@ -69,11 +69,11 @@ public class StatsReport {
         this.localVideoTrackStats.add(localVideoTrackStats);
     }
 
-    void addAudioTrackStats(AudioTrackStats audioTrackStats) {
-        this.audioTrackStats.add(audioTrackStats);
+    void addAudioTrackStats(RemoteAudioTrackStats remoteAudioTrackStats) {
+        this.remoteAudioTrackStats.add(remoteAudioTrackStats);
     }
 
-    void addVideoTrackStats(VideoTrackStats videoTrackStats) {
-        this.videoTrackStats.add(videoTrackStats);
+    void addVideoTrackStats(RemoteVideoTrackStats remoteVideoTrackStats) {
+        this.remoteVideoTrackStats.add(remoteVideoTrackStats);
     }
 }

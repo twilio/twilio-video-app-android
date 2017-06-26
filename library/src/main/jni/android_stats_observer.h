@@ -20,8 +20,8 @@ public:
         j_stats_report_class_(env, twilio_video_jni::FindClass(env, "com/twilio/video/StatsReport")),
         j_local_audio_track_stats_class_(env, twilio_video_jni::FindClass(env, "com/twilio/video/LocalAudioTrackStats")),
         j_local_video_track_stats_class_(env, twilio_video_jni::FindClass(env, "com/twilio/video/LocalVideoTrackStats")),
-        j_audio_track_stats_class_(env, twilio_video_jni::FindClass(env, "com/twilio/video/AudioTrackStats")),
-        j_video_track_stats_class_(env, twilio_video_jni::FindClass(env, "com/twilio/video/VideoTrackStats")),
+        j_audio_track_stats_class_(env, twilio_video_jni::FindClass(env, "com/twilio/video/RemoteAudioTrackStats")),
+        j_video_track_stats_class_(env, twilio_video_jni::FindClass(env, "com/twilio/video/RemoteVideoTrackStats")),
         j_video_dimensions_class_(env, twilio_video_jni::FindClass(env, "com/twilio/video/VideoDimensions")),
         j_on_stats_id_(
             webrtc_jni::GetMethodID(env,
@@ -57,12 +57,12 @@ public:
             webrtc_jni::GetMethodID(env,
                                     *j_stats_report_class_,
                                     "addAudioTrackStats",
-                                    "(Lcom/twilio/video/AudioTrackStats;)V")),
+                                    "(Lcom/twilio/video/RemoteAudioTrackStats;)V")),
         j_stats_report_add_video_id_(
             webrtc_jni::GetMethodID(env,
                                     *j_stats_report_class_,
                                     "addVideoTrackStats",
-                                    "(Lcom/twilio/video/VideoTrackStats;)V")),
+                                    "(Lcom/twilio/video/RemoteVideoTrackStats;)V")),
         j_local_audio_track_stats_ctor_id_(
             webrtc_jni::GetMethodID(env,
                                     *j_local_audio_track_stats_class_,

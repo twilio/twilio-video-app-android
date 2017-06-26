@@ -45,8 +45,8 @@ ClassReferenceHolder::ClassReferenceHolder(JNIEnv* jni) {
     LoadClass(jni, "com/twilio/video/StatsReport");
     LoadClass(jni, "com/twilio/video/LocalAudioTrackStats");
     LoadClass(jni, "com/twilio/video/LocalVideoTrackStats");
-    LoadClass(jni, "com/twilio/video/AudioTrackStats");
-    LoadClass(jni, "com/twilio/video/VideoTrackStats");
+    LoadClass(jni, "com/twilio/video/RemoteAudioTrackStats");
+    LoadClass(jni, "com/twilio/video/RemoteVideoTrackStats");
     LoadClass(jni, "com/twilio/video/VideoDimensions");
 }
 
