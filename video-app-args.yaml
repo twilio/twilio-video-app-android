@@ -9,11 +9,14 @@ library-instrumentation-tests:
         - trelte
         - herolte
         - flounder
+        - sailfish
     os-version-ids:
         - 18
         - 19
         - 21
         - 22
         - 23
+        - 24
+        - 25
     locales: en
     orientations: portrait

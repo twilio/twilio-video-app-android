@@ -387,7 +387,10 @@ public class Room {
         void onParticipantConnected(Room room, Participant participant);
 
         /**
-         * Called when a participant has disconnected from a room.
+         * Called when a participant has disconnected from a room. The disconnected participant's
+         * audio and video tracks will still be available in their last known state. Video
+         * tracks renderers are removed when a participant is disconnected.
+         *
          * @param room the room the participant disconnected from.
          * @param participant the disconnected participant.
          */
