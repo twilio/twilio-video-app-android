@@ -1,6 +1,5 @@
 package com.twilio.video.base;
 
-import android.os.Build;
 import android.support.test.rule.ActivityTestRule;
 
 import com.twilio.video.Camera2Capturer;
@@ -28,7 +27,6 @@ public abstract class BaseCamera2CapturerTest {
 
     @Before
     public void setup() {
-        assumeTrue(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP);
         assumeTrue(Camera2Capturer.isSupported(activityRule.getActivity()));
         cameraCapturerActivity = activityRule.getActivity();
         PermissionUtils.allowPermissions(cameraCapturerActivity);

@@ -3,8 +3,6 @@ package com.twilio.video;
 import android.annotation.TargetApi;
 import android.Manifest;
 import android.content.Context;
-import android.hardware.camera2.CameraAccessException;
-import android.hardware.camera2.CameraManager;
 import android.os.Build;
 import android.os.Handler;
 import android.support.annotation.IntDef;
@@ -46,7 +44,6 @@ public class Camera2Capturer implements VideoCapturer {
     private final Map<String, List<VideoFormat>> supportedFormatsMap = new HashMap<>();
 
     private final Context applicationContext;
-    private final CameraManager cameraManager;
     private final Camera2Enumerator camera2Enumerator;
     private final Listener listener;
     private final Handler handler;
@@ -180,21 +177,6 @@ public class Camera2Capturer implements VideoCapturer {
                 }
             };
 
-    private static boolean cameraIdSupported(@NonNull CameraManager cameraManager,
-                                             @NonNull String targetCameraId) {
-        try {
-            for (String cameraId : cameraManager.getCameraIdList()) {
-                if (targetCameraId.equals(cameraId)) {
-                    return true;
-                }
-            }
-        } catch (CameraAccessException e) {
-            logger.e(e.getMessage());
-        }
-
-        return false;
-    }
-
     /**
      * Indicates if Camera2Capturer is compatible with device.
      *
@@ -226,7 +208,7 @@ public class Camera2Capturer implements VideoCapturer {
      *
      * @param context application context
      * @param cameraId unique identifier of the camera device to open that must be specified in
-     *                 {@link CameraManager#getCameraIdList()}.
+     *                 {@link android.hardware.camera2.CameraManager#getCameraIdList()}.
      * @param listener listener of camera 2 capturer events
      */
     public Camera2Capturer(@NonNull Context context,
@@ -252,8 +234,6 @@ public class Camera2Capturer implements VideoCapturer {
         Preconditions.checkNotNull(listener, "Listener must not be null");
         Preconditions.checkArgument(!cameraId.isEmpty(), "Camera ID must not be empty");
         this.applicationContext = context.getApplicationContext();
-        this.cameraManager = (CameraManager) applicationContext
-                .getSystemService(Context.CAMERA_SERVICE);
         this.camera2Enumerator = new Camera2Enumerator(applicationContext);
         this.cameraId = cameraId;
         this.listener = listener;
@@ -353,7 +333,7 @@ public class Camera2Capturer implements VideoCapturer {
         Preconditions.checkArgument(!newCameraId.isEmpty(), "Camera ID must not be empty");
         Preconditions.checkArgument(!newCameraId.equals(cameraId), "Camera ID must be different " +
                 "from current camera ID");
-        Preconditions.checkArgument(cameraIdSupported(cameraManager, newCameraId),
+        Preconditions.checkArgument(Camera2Utils.cameraIdSupported(applicationContext, newCameraId),
                 "Camera ID %s is not supported or could not be validated", newCameraId);
         synchronized (stateLock) {
             if (state != Camera2Capturer.State.IDLE) {
@@ -374,8 +354,8 @@ public class Camera2Capturer implements VideoCapturer {
         Preconditions.checkState(Util.permissionGranted(applicationContext,
                 Manifest.permission.CAMERA), "CAMERA permission must be granted to create video" +
                 "track with Camera2Capturer");
-        Preconditions.checkState(cameraIdSupported(cameraManager, cameraId), "Camera ID %s is " +
-                "not supported or could not be validated", cameraId);
+        Preconditions.checkState(Camera2Utils.cameraIdSupported(applicationContext, cameraId),
+                "Camera ID %s is not supported or could not be validated", cameraId);
     }
 
     private List<VideoFormat> convertToVideoFormats(
