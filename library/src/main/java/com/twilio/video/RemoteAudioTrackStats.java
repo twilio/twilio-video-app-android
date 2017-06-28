@@ -1,6 +1,6 @@
 package com.twilio.video;
 
-public class RemoteAudioTrackStats extends TrackStats {
+public class RemoteAudioTrackStats extends RemoteTrackStats {
     /**
      * Audio output level
      */

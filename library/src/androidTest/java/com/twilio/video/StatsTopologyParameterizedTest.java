@@ -583,7 +583,7 @@ public class StatsTopologyParameterizedTest extends BaseClientTest {
         assertTrue(0 < stats.roundTripTime);
     }
 
-    private void checkTrackStats(TrackStats stats) {
+    private void checkTrackStats(RemoteTrackStats stats) {
         assertTrue(0 < stats.bytesReceived);
         assertTrue(0 < stats.packetsReceived);
     }

@@ -1,6 +1,6 @@
 package com.twilio.video;
 
-public class RemoteVideoTrackStats extends TrackStats {
+public class RemoteVideoTrackStats extends RemoteTrackStats {
     /**
      * Received frame dimensions
      */
