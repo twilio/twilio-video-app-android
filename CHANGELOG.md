@@ -55,6 +55,7 @@ Known issues
 - VP8 is the only supported codec [#71](https://github.com/twilio/video-quickstart-android/issues/71)
 - Participant disconnect event can take up to 120 seconds to occur [#80](https://github.com/twilio/video-quickstart-android/issues/80) [#73](https://github.com/twilio/video-quickstart-android/issues/73)
 - Disconnecting from a `Room` that has not connected sometimes results in a crash [#116](https://github.com/twilio/video-quickstart-android/issues/116)
+- LocalParticipant release method is public [#132](https://github.com/twilio/video-quickstart-android/issues/132)
 
 ####1.0.2
 
@@ -68,6 +69,7 @@ Known issues
 - VP8 is the only supported codec [#71](https://github.com/twilio/video-quickstart-android/issues/71)
 - Participant disconnect event can take up to 120 seconds to occur [#80](https://github.com/twilio/video-quickstart-android/issues/80) [#73](https://github.com/twilio/video-quickstart-android/issues/73)
 - Disconnecting from a `Room` that has not connected sometimes results in a crash [#116](https://github.com/twilio/video-quickstart-android/issues/116)
+- LocalParticipant release method is public [#132](https://github.com/twilio/video-quickstart-android/issues/132)
 
 ####1.0.1
 
@@ -88,6 +90,7 @@ Known issues
 - VP8 is the only supported codec [#71](https://github.com/twilio/video-quickstart-android/issues/71)
 - Participant disconnect event can take up to 120 seconds to occur [#80](https://github.com/twilio/video-quickstart-android/issues/80) [#73](https://github.com/twilio/video-quickstart-android/issues/73)
 - Disconnecting from a `Room` that has not connected sometimes results in a crash [#116](https://github.com/twilio/video-quickstart-android/issues/116)
+- LocalParticipant release method is public [#132](https://github.com/twilio/video-quickstart-android/issues/132)
 
 ####1.0.0
 We've promoted 1.0.0-beta17 to 1.0.0 as our first General Availability release.
@@ -99,6 +102,7 @@ Known issues
 - Participant disconnect event can take up to 120 seconds to occur [#80](https://github.com/twilio/video-quickstart-android/issues/80) [#73](https://github.com/twilio/video-quickstart-android/issues/73)
 - Missing media when adding audio/video tracks quickly while connected to room [#90](https://github.com/twilio/video-quickstart-android/issues/90)
 - Disconnecting from a `Room` that has not connected sometimes results in a crash [#116](https://github.com/twilio/video-quickstart-android/issues/116) 
+- LocalParticipant release method is public [#132](https://github.com/twilio/video-quickstart-android/issues/132)
 
 ####1.0.0-beta17
 
@@ -181,6 +185,7 @@ Known issues
 - VP8 is the only supported codec [#71](https://github.com/twilio/video-quickstart-android/issues/71)
 - Participant disconnect event can take up to 120 seconds to occur [#80](https://github.com/twilio/video-quickstart-android/issues/80) [#73](https://github.com/twilio/video-quickstart-android/issues/73)
 - Missing media when adding audio/video tracks quickly while connected to room [#90](https://github.com/twilio/video-quickstart-android/issues/90)
+- LocalParticipant release method is public [#132](https://github.com/twilio/video-quickstart-android/issues/132)
 
 ####1.0.0-beta16
 
