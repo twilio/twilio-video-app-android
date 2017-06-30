@@ -136,10 +136,10 @@ public class LocalParticipant {
         this.videoTracks = videoTracks;
     }
 
-    /**
+    /*
      * Releases native memory owned by local participant.
      */
-    public synchronized void release() {
+    synchronized void release() {
         if (!isReleased()) {
             nativeRelease(nativeLocalParticipantHandle);
             nativeLocalParticipantHandle = 0;

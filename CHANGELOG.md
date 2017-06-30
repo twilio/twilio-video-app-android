@@ -6,6 +6,10 @@ Features
 
 - TODO: Add breakdown of Track SID API changes.
 
+Bug Fixes
+
+- Change visibility of `LocalParticipant#release()` from public to package. 
+[#132](https://github.com/twilio/video-quickstart-android/issues/132)
 
 Known issues
 
