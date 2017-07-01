@@ -2,7 +2,7 @@ package com.twilio.video.helper;
 
 
 import com.twilio.video.RemoteAudioTrack;
-import com.twilio.video.Participant;
+import com.twilio.video.RemoteParticipant;
 import com.twilio.video.RemoteVideoTrack;
 import com.twilio.video.Room;
 import com.twilio.video.TwilioException;
@@ -26,7 +26,7 @@ public class CallbackHelper {
 
         private Room room;
         private TwilioException twilioException;
-        private Participant participant;
+        private RemoteParticipant remoteParticipant;
 
         private void triggerLatch(CountDownLatch latch) {
             if (latch != null) {
@@ -55,16 +55,16 @@ public class CallbackHelper {
         }
 
         @Override
-        public void onParticipantConnected(Room room, Participant participant) {
+        public void onParticipantConnected(Room room, RemoteParticipant remoteParticipant) {
             this.room = room;
-            this.participant = participant;
+            this.remoteParticipant = remoteParticipant;
             triggerLatch(onParticipantConnectedLatch);
         }
 
         @Override
-        public void onParticipantDisconnected(Room room, Participant participant) {
+        public void onParticipantDisconnected(Room room, RemoteParticipant remoteParticipant) {
             this.room = room;
-            this.participant = participant;
+            this.remoteParticipant = remoteParticipant;
             triggerLatch(onParticipantDisconnectedLatch);
         }
 
@@ -88,8 +88,8 @@ public class CallbackHelper {
             return twilioException;
         }
 
-        public Participant getParticipant() {
-            return participant;
+        public RemoteParticipant getRemoteParticipant() {
+            return remoteParticipant;
         }
     }
 
@@ -111,12 +111,12 @@ public class CallbackHelper {
         }
 
         @Override
-        public void onParticipantConnected(Room room, Participant participant) {
+        public void onParticipantConnected(Room room, RemoteParticipant remoteParticipant) {
 
         }
 
         @Override
-        public void onParticipantDisconnected(Room room, Participant participant) {
+        public void onParticipantDisconnected(Room room, RemoteParticipant remoteParticipant) {
 
         }
 
@@ -131,7 +131,7 @@ public class CallbackHelper {
         }
     }
 
-    public static class FakeParticipantListener implements Participant.Listener {
+    public static class FakeParticipantListener implements RemoteParticipant.Listener {
 
         public CountDownLatch onAudioTrackAddedLatch;
         public CountDownLatch onAudioTrackRemovedLatch;
@@ -151,42 +151,42 @@ public class CallbackHelper {
         }
 
         @Override
-        public void onAudioTrackAdded(Participant participant, RemoteAudioTrack remoteAudioTrack) {
+        public void onAudioTrackAdded(RemoteParticipant remoteParticipant, RemoteAudioTrack remoteAudioTrack) {
             triggerLatch(onAudioTrackAddedLatch);
         }
 
         @Override
-        public void onAudioTrackRemoved(Participant participant, RemoteAudioTrack remoteAudioTrack) {
+        public void onAudioTrackRemoved(RemoteParticipant remoteParticipant, RemoteAudioTrack remoteAudioTrack) {
             triggerLatch(onAudioTrackRemovedLatch);
         }
 
         @Override
-        public void onVideoTrackAdded(Participant participant, RemoteVideoTrack remoteVideoTrack) {
+        public void onVideoTrackAdded(RemoteParticipant remoteParticipant, RemoteVideoTrack remoteVideoTrack) {
             triggerLatch(onVideoTrackAddedLatch);
         }
 
         @Override
-        public void onVideoTrackRemoved(Participant participant, RemoteVideoTrack remoteVideoTrack) {
+        public void onVideoTrackRemoved(RemoteParticipant remoteParticipant, RemoteVideoTrack remoteVideoTrack) {
             triggerLatch(onVideoTrackRemovedLatch);
         }
 
         @Override
-        public void onAudioTrackEnabled(Participant participant, RemoteAudioTrack remoteAudioTrack) {
+        public void onAudioTrackEnabled(RemoteParticipant remoteParticipant, RemoteAudioTrack remoteAudioTrack) {
             triggerLatch(onAudioTrackEnabledLatch);
         }
 
         @Override
-        public void onAudioTrackDisabled(Participant participant, RemoteAudioTrack remoteAudioTrack) {
+        public void onAudioTrackDisabled(RemoteParticipant remoteParticipant, RemoteAudioTrack remoteAudioTrack) {
             triggerLatch(onAudioTrackDisabledLatch);
         }
 
         @Override
-        public void onVideoTrackEnabled(Participant participant, RemoteVideoTrack remoteVideoTrack) {
+        public void onVideoTrackEnabled(RemoteParticipant remoteParticipant, RemoteVideoTrack remoteVideoTrack) {
             triggerLatch(onVideoTrackEnabledLatch);
         }
 
         @Override
-        public void onVideoTrackDisabled(Participant participant, RemoteVideoTrack remoteVideoTrack) {
+        public void onVideoTrackDisabled(RemoteParticipant remoteParticipant, RemoteVideoTrack remoteVideoTrack) {
             triggerLatch(onVideoTrackDisabledLatch);
         }
     }

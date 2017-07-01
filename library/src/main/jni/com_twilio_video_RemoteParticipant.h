@@ -1,5 +1,5 @@
-#ifndef VIDEO_ANDROID_INCLUDE_COM_TWILIO_VIDEO_PARTICIPANT_H_
-#define VIDEO_ANDROID_INCLUDE_COM_TWILIO_VIDEO_PARTICIPANT_H_
+#ifndef VIDEO_ANDROID_INCLUDE_COM_TWILIO_VIDEO_REMOTE_PARTICIPANT_H_
+#define VIDEO_ANDROID_INCLUDE_COM_TWILIO_VIDEO_REMOTE_PARTICIPANT_H_
 
 #include <jni.h>
 #include <memory>
@@ -13,7 +13,7 @@ namespace twilio_video_jni {
 extern "C" {
 #endif
 
-struct ParticipantContext {
+struct RemoteParticipantContext {
     std::shared_ptr<twilio::video::Participant> participant;
     std::map<std::shared_ptr<twilio::media::AudioTrack>, jobject> audio_track_map;
     std::map<std::shared_ptr<twilio::media::VideoTrack>, jobject> video_track_map;
@@ -34,7 +34,7 @@ jobject createJavaParticipant(JNIEnv *env,
                               jobject j_handler);
 
 jobject createParticipantAudioTracks(JNIEnv *env,
-                                     ParticipantContext *participant_context,
+                                     RemoteParticipantContext *participant_context,
                                      jclass j_array_list_class,
                                      jmethodID j_array_list_ctor_id,
                                      jmethodID j_array_list_add,
@@ -42,7 +42,7 @@ jobject createParticipantAudioTracks(JNIEnv *env,
                                      jmethodID j_audio_track_ctor_id);
 
 jobject createParticipantVideoTracks(JNIEnv *env,
-                                     ParticipantContext *participant_context,
+                                     RemoteParticipantContext *participant_context,
                                      jclass j_array_list_class,
                                      jmethodID j_array_list_ctor_id,
                                      jmethodID j_array_list_add,
@@ -58,13 +58,10 @@ jobject createJavaVideoTrack(JNIEnv *env,
                              std::shared_ptr<twilio::media::VideoTrack> video_track,
                              jclass j_video_track_class, jmethodID j_video_track_ctor_id);
 
-JNIEXPORT void JNICALL Java_com_twilio_video_Participant_nativeCreateParticipantListenerProxy
-        (JNIEnv *, jobject, jobject, jlong);
-
-JNIEXPORT jboolean JNICALL Java_com_twilio_video_Participant_nativeIsConnected
+JNIEXPORT jboolean JNICALL Java_com_twilio_video_RemoteParticipant_nativeIsConnected
         (JNIEnv *, jobject, jlong);
 
-JNIEXPORT void JNICALL Java_com_twilio_video_Participant_nativeRelease
+JNIEXPORT void JNICALL Java_com_twilio_video_RemoteParticipant_nativeRelease
         (JNIEnv *, jobject, jlong);
 
 #ifdef __cplusplus
@@ -73,4 +70,4 @@ JNIEXPORT void JNICALL Java_com_twilio_video_Participant_nativeRelease
 
 }
 
-#endif // VIDEO_ANDROID_INCLUDE_COM_TWILIO_VIDEO_PARTICIPANT_H_
+#endif // VIDEO_ANDROID_INCLUDE_COM_TWILIO_VIDEO_REMOTE_PARTICIPANT_H_

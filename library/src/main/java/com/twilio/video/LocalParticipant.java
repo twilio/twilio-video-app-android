@@ -3,21 +3,25 @@ package com.twilio.video;
 import android.support.annotation.NonNull;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
  * Represents the local participant of a {@link Room} you are connected to.
  */
-public class LocalParticipant {
+public class LocalParticipant implements Participant {
     private long nativeLocalParticipantHandle;
     private final String sid;
     private final String identity;
-    private final List<LocalAudioTrack> audioTracks;
-    private final List<LocalVideoTrack> videoTracks;
+    private final List<AudioTrack> audioTracks;
+    private final List<LocalAudioTrack> publishedAudioTracks;
+    private final List<VideoTrack> videoTracks;
+    private final List<LocalVideoTrack> publishedVideoTracks;
 
     /**
      * Returns the SID of the local participant.
      */
+    @Override
     public String getSid() {
         return sid;
     }
@@ -25,22 +29,39 @@ public class LocalParticipant {
     /**
      * Returns the identity of the local participant.
      */
+    @Override
     public String getIdentity() {
         return identity;
     }
 
     /**
-     * Returns the {@link LocalAudioTrack}s of a local participant.
+     * Returns read-only list of audio tracks.
      */
-    public synchronized List<LocalAudioTrack> getAudioTracks() {
-        return new ArrayList<>(audioTracks);
+    @Override
+    public synchronized List<AudioTrack> getAudioTracks() {
+        return Collections.unmodifiableList(audioTracks);
     }
 
     /**
-     * Returns the {@link LocalVideoTrack}s of a local participant.
+     * Returns read-only list of video tracks.
      */
-    public synchronized List<LocalVideoTrack> getVideoTracks() {
-        return new ArrayList<>(videoTracks);
+    @Override
+    public synchronized List<VideoTrack> getVideoTracks() {
+        return Collections.unmodifiableList(videoTracks);
+    }
+
+    /**
+     * Returns read-only list of published audio tracks.
+     */
+    public synchronized List<LocalAudioTrack> getPublishedAudioTracks() {
+        return Collections.unmodifiableList(publishedAudioTracks);
+    }
+
+    /**
+     * Returns read-only list of published video tracks.
+     */
+    public synchronized List<LocalVideoTrack> getPublishedVideoTracks() {
+        return Collections.unmodifiableList(publishedVideoTracks);
     }
 
     /**
@@ -55,8 +76,10 @@ public class LocalParticipant {
         if (isReleased()) {
             return false;
         } else {
-            boolean added = nativeAddAudioTrack(nativeLocalParticipantHandle, localAudioTrack.getNativeHandle());
+            boolean added = nativeAddAudioTrack(nativeLocalParticipantHandle,
+                    localAudioTrack.getNativeHandle());
             if (added) {
+                publishedAudioTracks.add(localAudioTrack);
                 audioTracks.add(localAudioTrack);
             }
             return added;
@@ -75,8 +98,10 @@ public class LocalParticipant {
         if (isReleased()) {
             return false;
         } else {
-            boolean added = nativeAddVideoTrack(nativeLocalParticipantHandle, localVideoTrack.getNativeHandle());
+            boolean added = nativeAddVideoTrack(nativeLocalParticipantHandle,
+                    localVideoTrack.getNativeHandle());
             if (added) {
+                publishedVideoTracks.add(localVideoTrack);
                 videoTracks.add(localVideoTrack);
             }
             return added;
@@ -96,8 +121,10 @@ public class LocalParticipant {
         if (isReleased()) {
             return false;
         } else {
+            publishedAudioTracks.remove(localAudioTrack);
             audioTracks.remove(localAudioTrack);
-            return nativeRemoveAudioTrack(nativeLocalParticipantHandle, localAudioTrack.getNativeHandle());
+            return nativeRemoveAudioTrack(nativeLocalParticipantHandle,
+                    localAudioTrack.getNativeHandle());
         }
     }
 
@@ -113,27 +140,33 @@ public class LocalParticipant {
         if (isReleased()) {
             return false;
         } else {
+            publishedVideoTracks.remove(localVideoTrack);
             videoTracks.remove(localVideoTrack);
-            return nativeRemoveVideoTrack(nativeLocalParticipantHandle, localVideoTrack.getNativeHandle());
+            return nativeRemoveVideoTrack(nativeLocalParticipantHandle,
+                    localVideoTrack.getNativeHandle());
         }
     }
 
     LocalParticipant(long nativeLocalParticipantHandle,
                      String sid,
                      String identity,
-                     List<LocalAudioTrack> audioTracks,
-                     List<LocalVideoTrack> videoTracks) {
+                     List<LocalAudioTrack> publishedAudioTracks,
+                     List<LocalVideoTrack> publishedVideoTracks) {
         this.nativeLocalParticipantHandle = nativeLocalParticipantHandle;
         this.sid = sid;
         this.identity = identity;
-        if (audioTracks == null) {
-            audioTracks = new ArrayList<>();
+        if (publishedAudioTracks == null) {
+            publishedAudioTracks = new ArrayList<>();
         }
-        this.audioTracks = audioTracks;
-        if (videoTracks == null) {
-            videoTracks = new ArrayList<>();
+        this.publishedAudioTracks = publishedAudioTracks;
+        this.audioTracks = new ArrayList<>(publishedAudioTracks.size());
+        addAudioTracks(publishedAudioTracks);
+        if (publishedVideoTracks == null) {
+            publishedVideoTracks = new ArrayList<>();
         }
-        this.videoTracks = videoTracks;
+        this.publishedVideoTracks = publishedVideoTracks;
+        this.videoTracks = new ArrayList<>(publishedVideoTracks.size());
+        addVideoTracks(publishedVideoTracks);
     }
 
     /*
@@ -148,6 +181,18 @@ public class LocalParticipant {
 
     boolean isReleased() {
         return nativeLocalParticipantHandle == 0;
+    }
+
+    private void addAudioTracks(List<LocalAudioTrack> localAudioTracks) {
+        for (LocalAudioTrack localAudioTrack : localAudioTracks) {
+            this.audioTracks.add(localAudioTrack);
+        }
+    }
+
+    private void addVideoTracks(List<LocalVideoTrack> localVideoTracks) {
+        for (LocalVideoTrack localVideoTrack : localVideoTracks) {
+            this.videoTracks.add(localVideoTrack);
+        }
     }
 
     private native boolean nativeAddAudioTrack(long nativeHandle, long nativeAudioTrackHandle);

@@ -4,7 +4,7 @@
 #include "webrtc/sdk/android/src/jni/jni_helpers.h"
 #include "video/room_observer.h"
 #include "video/participant.h"
-#include "com_twilio_video_Participant.h"
+#include "com_twilio_video_RemoteParticipant.h"
 #include "com_twilio_video_LocalParticipant.h"
 
 namespace twilio_video_jni {

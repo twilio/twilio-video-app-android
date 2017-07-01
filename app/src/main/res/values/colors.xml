@@ -24,7 +24,7 @@
     <color name="lobbyStatsDrawerBg">#CC000000</color>
     <color name="colorFadedRed">#cc2b33</color>
 
-    <!-- Participant view colors -->
+    <!-- RemoteParticipant view colors -->
     <color name="participantBackground">#66000000</color>
     <color name="participantSelectedBackground">#cc000000</color>
 </resources>

@@ -15,7 +15,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 
 /**
  * A Room represents a media session with zero or more remote Participants. Media shared by any one
- * {@link Participant} is distributed equally to all other Participants.
+ * {@link RemoteParticipant} is distributed equally to all other Participants.
  */
 public class Room {
     private static final Logger logger = Logger.getLogger(Room.class);
@@ -25,7 +25,7 @@ public class Room {
     private String name;
     private String sid;
     private RoomState roomState;
-    private Map<String, Participant> participantMap = new HashMap<>();
+    private Map<String, RemoteParticipant> participantMap = new HashMap<>();
     private LocalParticipant localParticipant;
     private final Room.Listener listener;
     private final Handler handler;
@@ -84,29 +84,31 @@ public class Room {
         }
 
         @Override
-        public void onParticipantConnected(final Room room, final Participant participant) {
+        public void onParticipantConnected(final Room room,
+                                           final RemoteParticipant remoteParticipant) {
             logger.d("onParticipantConnected()");
 
-            participantMap.put(participant.getSid(), participant);
+            participantMap.put(remoteParticipant.getSid(), remoteParticipant);
 
             handler.post(new Runnable() {
                 @Override
                 public void run() {
-                    Room.this.listener.onParticipantConnected(room, participant);
+                    Room.this.listener.onParticipantConnected(room, remoteParticipant);
                 }
             });
         }
 
         @Override
-        public void onParticipantDisconnected(final Room room, final Participant participant) {
+        public void onParticipantDisconnected(final Room room,
+                                              final RemoteParticipant remoteParticipant) {
             logger.d("onParticipantDisconnected()");
-            participantMap.remove(participant.getSid());
-            participant.release();
+            participantMap.remove(remoteParticipant.getSid());
+            remoteParticipant.release();
 
             handler.post(new Runnable() {
                 @Override
                 public void run() {
-                    Room.this.listener.onParticipantDisconnected(room, participant);
+                    Room.this.listener.onParticipantDisconnected(room, remoteParticipant);
                 }
             });
         }
@@ -196,7 +198,7 @@ public class Room {
      *
      * @return list of participants.
      */
-    public List<Participant> getParticipants() {
+    public List<RemoteParticipant> getRemoteParticipants() {
         return new ArrayList<>(participantMap.values());
     }
 
@@ -282,7 +284,7 @@ public class Room {
                                            long nativeLocalParticipantHandle,
                                            String localParticipantSid,
                                            String localParticipantIdentity,
-                                           List<Participant> participants) {
+                                           List<RemoteParticipant> remoteParticipants) {
         logger.d("setConnected()");
         this.sid = roomSid;
         if (this.name == null || this.name.isEmpty()) {
@@ -294,8 +296,8 @@ public class Room {
                 cachedConnectOptions.getAudioTracks(),
                 cachedConnectOptions.getVideoTracks());
         cachedConnectOptions = null;
-        for (Participant participant : participants) {
-            participantMap.put(participant.getSid(), participant);
+        for (RemoteParticipant remoteParticipant : remoteParticipants) {
+            participantMap.put(remoteParticipant.getSid(), remoteParticipant);
         }
         this.roomState = RoomState.CONNECTED;
     }
@@ -314,8 +316,8 @@ public class Room {
      */
     synchronized void releaseRoom() {
         if (nativeRoomDelegate != 0) {
-            for (Participant participant : participantMap.values()) {
-                participant.release();
+            for (RemoteParticipant remoteParticipant : participantMap.values()) {
+                remoteParticipant.release();
             }
             nativeReleaseRoom(nativeRoomDelegate);
             cleanupStatsListenerQueue();
@@ -382,9 +384,9 @@ public class Room {
          * Called when a participant has connected to a room.
          *
          * @param room the room the participant connected to.
-         * @param participant the newly connected participant.
+         * @param remoteParticipant the newly connected participant.
          */
-        void onParticipantConnected(Room room, Participant participant);
+        void onParticipantConnected(Room room, RemoteParticipant remoteParticipant);
 
         /**
          * Called when a participant has disconnected from a room. The disconnected participant's
@@ -392,9 +394,9 @@ public class Room {
          * tracks renderers are removed when a participant is disconnected.
          *
          * @param room the room the participant disconnected from.
-         * @param participant the disconnected participant.
+         * @param remoteParticipant the disconnected participant.
          */
-        void onParticipantDisconnected(Room room, Participant participant);
+        void onParticipantDisconnected(Room room, RemoteParticipant remoteParticipant);
 
         /**
          * Called when the media being shared to a {@link Room} is being recorded.

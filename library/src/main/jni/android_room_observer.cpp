@@ -12,7 +12,7 @@ AndroidRoomObserver::AndroidRoomObserver(JNIEnv *env, jobject j_room, jobject j_
     j_room_observer_class_(env, webrtc_jni::GetObjectClass(env, *j_room_observer_)),
     j_twilio_exception_class_(env, twilio_video_jni::FindClass(env,
                                                                "com/twilio/video/TwilioException")),
-    j_participant_class_(env, twilio_video_jni::FindClass(env, "com/twilio/video/Participant")),
+    j_participant_class_(env, twilio_video_jni::FindClass(env, "com/twilio/video/RemoteParticipant")),
     j_array_list_class_(env, twilio_video_jni::FindClass(env, "java/util/ArrayList")),
     j_audio_track_class_(env, twilio_video_jni::FindClass(env, "com/twilio/video/RemoteAudioTrack")),
     j_video_track_class_(env, twilio_video_jni::FindClass(env, "com/twilio/video/RemoteVideoTrack")),
@@ -40,12 +40,12 @@ AndroidRoomObserver::AndroidRoomObserver(JNIEnv *env, jobject j_room, jobject j_
         webrtc_jni::GetMethodID(env,
                                 *j_room_observer_class_,
                                 "onParticipantConnected",
-                                "(Lcom/twilio/video/Room;Lcom/twilio/video/Participant;)V")),
+                                "(Lcom/twilio/video/Room;Lcom/twilio/video/RemoteParticipant;)V")),
     j_on_participant_disconnected_(
         webrtc_jni::GetMethodID(env,
                                 *j_room_observer_class_,
                                 "onParticipantDisconnected",
-                                "(Lcom/twilio/video/Room;Lcom/twilio/video/Participant;)V")),
+                                "(Lcom/twilio/video/Room;Lcom/twilio/video/RemoteParticipant;)V")),
     j_on_recording_started_(
         webrtc_jni::GetMethodID(env,
                                 *j_room_observer_class_,
@@ -355,7 +355,7 @@ jobject AndroidRoomObserver::createJavaRoomException(
 jobject AndroidRoomObserver::createJavaParticipantList(
         const std::map<std::string, std::shared_ptr<twilio::video::Participant>> participants) {
 
-    // Create ArrayList<Participant>
+    // Create ArrayList<RemoteParticipant>
     jobject j_participants = jni()->NewObject(*j_array_list_class_, j_array_list_ctor_id_);
 
     std::map<std::string, std::shared_ptr<twilio::video::Participant>>::const_iterator it;

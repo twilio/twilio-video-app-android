@@ -173,7 +173,7 @@ public class StatsTopologyParameterizedTest extends BaseClientTest {
                 Collections.singletonList(bobLocalAudioTrack),
                 Collections.singletonList(bobLocalVideoTrack));
         assertTrue(aliceListener.onParticipantConnectedLatch.await(20, TimeUnit.SECONDS));
-        assertEquals(1, aliceRoom.getParticipants().size());
+        assertEquals(1, aliceRoom.getRemoteParticipants().size());
 
         // let's give peer connection some time to get media flowing
         Thread.sleep(2000);
@@ -203,7 +203,7 @@ public class StatsTopologyParameterizedTest extends BaseClientTest {
         // Connect Bob without media
         bobRoom = createRoom(bobToken, bobListener, roomName);
         assertTrue(aliceListener.onParticipantConnectedLatch.await(20, TimeUnit.SECONDS));
-        assertEquals(1, aliceRoom.getParticipants().size());
+        assertEquals(1, aliceRoom.getRemoteParticipants().size());
 
         // Add audio track to Bob and check stats
         CallbackHelper.FakeParticipantListener participantListener =
@@ -211,7 +211,7 @@ public class StatsTopologyParameterizedTest extends BaseClientTest {
         participantListener.onAudioTrackAddedLatch = new CountDownLatch(1);
         participantListener.onVideoTrackAddedLatch = new CountDownLatch(1);
         participantListener.onVideoTrackRemovedLatch = new CountDownLatch(1);
-        Participant bob = aliceRoom.getParticipants().get(0);
+        RemoteParticipant bob = aliceRoom.getRemoteParticipants().get(0);
         bob.setListener(participantListener);
 
         LocalParticipant bobLocalParticipant = bobRoom.getLocalParticipant();
@@ -276,10 +276,10 @@ public class StatsTopologyParameterizedTest extends BaseClientTest {
         // Connect Bob without tracks
         bobRoom = createRoom(bobToken, bobListener, roomName);
         assertTrue(aliceListener.onParticipantConnectedLatch.await(20, TimeUnit.SECONDS));
-        assertEquals(1, aliceRoom.getParticipants().size());
+        assertEquals(1, aliceRoom.getRemoteParticipants().size());
 
 
-        // Get alice local participant
+        // Get alice local remoteParticipant
         LocalParticipant aliceLocalParticipant = aliceRoom.getLocalParticipant();
 
         // Add audio and video track to alice
@@ -325,7 +325,7 @@ public class StatsTopologyParameterizedTest extends BaseClientTest {
                 roomName,
                 Collections.singletonList(bobLocalAudioTrack));
         assertTrue(aliceListener.onParticipantConnectedLatch.await(20, TimeUnit.SECONDS));
-        assertEquals(1, aliceRoom.getParticipants().size());
+        assertEquals(1, aliceRoom.getRemoteParticipants().size());
 
         // let's give peer connection some time to get media flowing
         Thread.sleep(2000);
@@ -442,7 +442,7 @@ public class StatsTopologyParameterizedTest extends BaseClientTest {
                 roomName,
                 Collections.singletonList(bobLocalAudioTrack));
         assertTrue(aliceListener.onParticipantConnectedLatch.await(20, TimeUnit.SECONDS));
-        assertEquals(1, aliceRoom.getParticipants().size());
+        assertEquals(1, aliceRoom.getRemoteParticipants().size());
 
         // let's give peer connection some time to get media flowing
         Thread.sleep(2000);

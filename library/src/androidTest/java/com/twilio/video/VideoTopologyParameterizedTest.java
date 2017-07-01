@@ -137,8 +137,8 @@ public class VideoTopologyParameterizedTest extends BaseClientTest {
 
         // Validate tracks in local participant
         LocalParticipant localParticipant = room.getLocalParticipant();
-        assertNotNull(localParticipant.getAudioTracks().get(0));
-        assertEquals(localAudioTrack, localParticipant.getAudioTracks().get(0));
+        assertNotNull(localParticipant.getPublishedAudioTracks().get(0));
+        assertEquals(localAudioTrack, localParticipant.getPublishedAudioTracks().get(0));
         assertTrue(localParticipant.removeAudioTrack(localAudioTrack));
         room.disconnect();
         assertTrue(roomListener.onDisconnectedLatch.await(20, TimeUnit.SECONDS));
@@ -161,8 +161,8 @@ public class VideoTopologyParameterizedTest extends BaseClientTest {
         Room room = Video.connect(mediaTestActivity, connectOptions, roomListener);
         assertTrue(roomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
         LocalParticipant localParticipant = room.getLocalParticipant();
-        assertNotNull(localParticipant.getVideoTracks().get(0));
-        assertEquals(localVideoTrack, localParticipant.getVideoTracks().get(0));
+        assertNotNull(localParticipant.getPublishedVideoTracks().get(0));
+        assertEquals(localVideoTrack, localParticipant.getPublishedVideoTracks().get(0));
         assertTrue(localParticipant.removeVideoTrack(localVideoTrack));
         room.disconnect();
         assertTrue(roomListener.onDisconnectedLatch.await(20, TimeUnit.SECONDS));
@@ -189,10 +189,10 @@ public class VideoTopologyParameterizedTest extends BaseClientTest {
         Room room = Video.connect(mediaTestActivity, connectOptions, roomListener);
         assertTrue(roomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
         LocalParticipant localParticipant = room.getLocalParticipant();
-        assertNotNull(localParticipant.getAudioTracks().get(0));
-        assertEquals(localAudioTrack, localParticipant.getAudioTracks().get(0));
-        assertNotNull(localParticipant.getVideoTracks().get(0));
-        assertEquals(localVideoTrack, localParticipant.getVideoTracks().get(0));
+        assertNotNull(localParticipant.getPublishedAudioTracks().get(0));
+        assertEquals(localAudioTrack, localParticipant.getPublishedAudioTracks().get(0));
+        assertNotNull(localParticipant.getPublishedVideoTracks().get(0));
+        assertEquals(localVideoTrack, localParticipant.getPublishedVideoTracks().get(0));
         assertTrue(localParticipant.removeAudioTrack(localAudioTrack));
         assertTrue(localParticipant.removeVideoTrack(localVideoTrack));
         room.disconnect();

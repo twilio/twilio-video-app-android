@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <!-- Participant layout with video track -->
+    <!-- RemoteParticipant layout with video track -->
 
     <FrameLayout
         android:id="@+id/participant_video_layout"
@@ -50,7 +50,7 @@
 
     </FrameLayout>
 
-    <!-- Participant layout without video track -->
+    <!-- RemoteParticipant layout without video track -->
 
     <RelativeLayout
         android:id="@+id/participant_selected_layout"

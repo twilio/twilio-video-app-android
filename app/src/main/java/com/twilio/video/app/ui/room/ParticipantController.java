@@ -26,7 +26,7 @@ public class ParticipantController {
     private ParticipantPrimaryView primaryView;
 
     /**
-     * Participant thumb view group, where participants are added or removed from.
+     * RemoteParticipant thumb view group, where participants are added or removed from.
      */
     private ViewGroup thumbsViewContainer;
 
@@ -408,27 +408,27 @@ public class ParticipantController {
     }
 
     /**
-     * Participant information data holder.
+     * RemoteParticipant information data holder.
      */
     public static class Item {
 
         /**
-         * Participant unique identifier.
+         * RemoteParticipant unique identifier.
          */
         String sid;
 
         /**
-         * Participant name.
+         * RemoteParticipant name.
          */
         String identity;
 
         /**
-         * Participant video track.
+         * RemoteParticipant video track.
          */
         VideoTrack videoTrack;
 
         /**
-         * Participant audio state.
+         * RemoteParticipant audio state.
          */
         boolean muted;
 

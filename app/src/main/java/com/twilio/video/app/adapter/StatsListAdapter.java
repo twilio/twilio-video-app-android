@@ -14,7 +14,7 @@ import com.twilio.video.RemoteAudioTrack;
 import com.twilio.video.RemoteAudioTrackStats;
 import com.twilio.video.LocalAudioTrackStats;
 import com.twilio.video.LocalVideoTrackStats;
-import com.twilio.video.Participant;
+import com.twilio.video.RemoteParticipant;
 import com.twilio.video.RemoteVideoTrack;
 import com.twilio.video.StatsReport;
 import com.twilio.video.RemoteVideoTrackStats;
@@ -114,7 +114,7 @@ public class StatsListAdapter extends RecyclerView.Adapter<StatsListAdapter.View
     }
 
     public void updateStatsData(List<StatsReport> statsReports,
-                                List<Participant> participants,
+                                List<RemoteParticipant> remoteParticipants,
                                 Map<String, String> localVideoTrackNames){
         statsListItems.clear();
         // Generate stats items list from reports
@@ -158,7 +158,7 @@ public class StatsListAdapter extends RecyclerView.Adapter<StatsListAdapter.View
             int trackCount = 0;
             for (RemoteAudioTrackStats remoteAudioTrackStats : report.getRemoteAudioTrackStats()) {
                 String trackName =
-                        getParticipantName(remoteAudioTrackStats.trackId, true, participants) +
+                        getParticipantName(remoteAudioTrackStats.trackId, true, remoteParticipants) +
                                 " " + context.getString(R.string.audio_track) + " " + trackCount;
                 StatsListItem item = new StatsListItem.Builder()
                         .baseTrackInfo(remoteAudioTrackStats)
@@ -175,7 +175,7 @@ public class StatsListAdapter extends RecyclerView.Adapter<StatsListAdapter.View
             trackCount = 0;
             for (RemoteVideoTrackStats remoteVideoTrackStats : report.getRemoteVideoTrackStats()) {
                 String trackName =
-                        getParticipantName(remoteVideoTrackStats.trackId, false, participants) +
+                        getParticipantName(remoteVideoTrackStats.trackId, false, remoteParticipants) +
                                 " " + context.getString(R.string.video_track) + " " + trackCount;
                 StatsListItem item = new StatsListItem.Builder()
                         .baseTrackInfo(remoteVideoTrackStats)
@@ -199,25 +199,25 @@ public class StatsListAdapter extends RecyclerView.Adapter<StatsListAdapter.View
     }
 
     private String getParticipantName(String trackId, boolean isAudioTrack,
-                                      List<Participant> participants) {
-        for (Participant participant : participants) {
+                                      List<RemoteParticipant> remoteParticipants) {
+        for (RemoteParticipant remoteParticipant : remoteParticipants) {
             if (isAudioTrack) {
-                RemoteAudioTrack remoteAudioTrack = getAudioTrack(participant, trackId);
+                RemoteAudioTrack remoteAudioTrack = getAudioTrack(remoteParticipant, trackId);
                 if (remoteAudioTrack != null) {
-                    return participant.getIdentity();
+                    return remoteParticipant.getIdentity();
                 }
             } else {
-                RemoteVideoTrack remoteVideoTrack = getRemoteVideoTrack(participant, trackId);
+                RemoteVideoTrack remoteVideoTrack = getRemoteVideoTrack(remoteParticipant, trackId);
                 if (remoteVideoTrack != null) {
-                    return participant.getIdentity();
+                    return remoteParticipant.getIdentity();
                 }
             }
         }
         return "";
     }
 
-    private RemoteAudioTrack getAudioTrack(Participant participant, String trackId) {
-        for (RemoteAudioTrack remoteAudioTrack : participant.getSubscribedAudioTracks()) {
+    private RemoteAudioTrack getAudioTrack(RemoteParticipant remoteParticipant, String trackId) {
+        for (RemoteAudioTrack remoteAudioTrack : remoteParticipant.getSubscribedAudioTracks()) {
             if (remoteAudioTrack.getTrackId().equals(trackId)) {
                 return remoteAudioTrack;
             }
@@ -226,8 +226,8 @@ public class StatsListAdapter extends RecyclerView.Adapter<StatsListAdapter.View
         return null;
     }
 
-    private RemoteVideoTrack getRemoteVideoTrack(Participant participant, String trackId) {
-        for (RemoteVideoTrack remoteVideoTrack : participant.getSubscribedVideoTracks()) {
+    private RemoteVideoTrack getRemoteVideoTrack(RemoteParticipant remoteParticipant, String trackId) {
+        for (RemoteVideoTrack remoteVideoTrack : remoteParticipant.getSubscribedVideoTracks()) {
             if (remoteVideoTrack.getTrackId().equals(trackId)) {
                 return remoteVideoTrack;
             }

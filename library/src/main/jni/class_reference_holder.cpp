@@ -38,7 +38,7 @@ ClassReferenceHolder::ClassReferenceHolder(JNIEnv* jni) {
     LoadClass(jni, "com/twilio/video/LocalVideoTrack");
     LoadClass(jni, "com/twilio/video/Video$NetworkChangeEvent");
     LoadClass(jni, "com/twilio/video/VideoCapturerDelegate$NativeObserver");
-    LoadClass(jni, "com/twilio/video/Participant");
+    LoadClass(jni, "com/twilio/video/RemoteParticipant");
     LoadClass(jni, "java/util/ArrayList");
     LoadClass(jni, "com/twilio/video/RemoteAudioTrack");
     LoadClass(jni, "com/twilio/video/RemoteVideoTrack");

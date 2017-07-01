@@ -1,4 +1,4 @@
-#include "com_twilio_video_Participant.h"
+#include "com_twilio_video_RemoteParticipant.h"
 
 #include "webrtc/sdk/android/src/jni/jni_helpers.h"
 #include "webrtc/sdk/android/src/jni/classreferenceholder.h"
@@ -6,6 +6,28 @@
 #include "video/logger.h"
 
 namespace twilio_video_jni {
+
+void bindRemoteParticipantListenerProxy(JNIEnv *env,
+                                        jobject j_participant,
+                                        jclass j_participant_class,
+                                        RemoteParticipantContext *participant_context) {
+    jfieldID j_participant_listener_proxy_field = webrtc_jni::GetFieldID(env,
+                                                                         j_participant_class,
+                                                                         "participantListenerProxy",
+                                                                         "Lcom/twilio/video/RemoteParticipant$Listener;");
+    jobject j_participant_listener_proxy = webrtc_jni::GetObjectField(env,
+                                                                      j_participant,
+                                                                      j_participant_listener_proxy_field);
+
+    participant_context->android_participant_observer =
+            std::make_shared<AndroidParticipantObserver>(env,
+                                                         j_participant,
+                                                         j_participant_listener_proxy,
+                                                         participant_context->audio_track_map,
+                                                         participant_context->video_track_map);
+    participant_context->participant->setObserver(
+            participant_context->android_participant_observer);
+}
 
 jobject createJavaParticipant(JNIEnv *env,
                               std::shared_ptr<twilio::video::Participant> participant,
@@ -19,7 +41,7 @@ jobject createJavaParticipant(JNIEnv *env,
                               jclass j_video_track_class,
                               jmethodID j_video_track_ctor_id,
                               jobject j_handler) {
-    ParticipantContext *participant_context = new ParticipantContext();
+    RemoteParticipantContext *participant_context = new RemoteParticipantContext();
     participant_context->participant = participant;
     jstring j_sid = webrtc_jni::JavaStringFromStdString(env, participant->getSid());
     jstring j_identity =
@@ -41,18 +63,26 @@ jobject createJavaParticipant(JNIEnv *env,
 
     // Create participant
     jlong j_participant_context = webrtc_jni::jlongFromPointer(participant_context);
-    return env->NewObject(j_participant_class,
-                          j_participant_ctor_id,
-                          j_identity,
-                          j_sid,
-                          j_audio_tracks,
-                          j_video_tracks,
-                          j_handler,
-                          j_participant_context);
+    jobject j_participant =  env->NewObject(j_participant_class,
+                                            j_participant_ctor_id,
+                                            j_identity,
+                                            j_sid,
+                                            j_audio_tracks,
+                                            j_video_tracks,
+                                            j_handler,
+                                            j_participant_context);
+
+    // Bind the participant listener proxy with the native participant observer
+    bindRemoteParticipantListenerProxy(env,
+                                       j_participant,
+                                       j_participant_class,
+                                       participant_context);
+
+    return j_participant;
 }
 
 jobject createParticipantAudioTracks(JNIEnv *env,
-                                     ParticipantContext* participant_context,
+                                     RemoteParticipantContext* participant_context,
                                      jclass j_array_list_class,
                                      jmethodID j_array_list_ctor_id,
                                      jmethodID j_array_list_add,
@@ -86,7 +116,7 @@ jobject createParticipantAudioTracks(JNIEnv *env,
 }
 
 jobject createParticipantVideoTracks(JNIEnv *env,
-                                     ParticipantContext* participant_context,
+                                     RemoteParticipantContext* participant_context,
                                      jclass j_array_list_class,
                                      jmethodID j_array_list_ctor_id,
                                      jmethodID j_array_list_add,
@@ -157,38 +187,19 @@ jobject createJavaVideoTrack(JNIEnv *env,
                           j_track_sid);
 }
 
-JNIEXPORT void JNICALL
-Java_com_twilio_video_Participant_nativeCreateParticipantListenerProxy(JNIEnv *env,
-                                                                       jobject j_participant,
-                                                                       jobject j_participant_listener_proxy,
-                                                                       jlong j_participant_context) {
-    std::string func_name = std::string(__FUNCTION__);
-    TS_CORE_LOG_MODULE(twilio::video::kTSCoreLogModulePlatform,
-                       twilio::video::kTSCoreLogLevelDebug,
-                       "%s", func_name.c_str());
-    ParticipantContext *participant_context =
-            reinterpret_cast<ParticipantContext *>(j_participant_context);
-    participant_context->android_participant_observer =
-            std::make_shared<AndroidParticipantObserver>(env,
-                                                         j_participant,
-                                                         j_participant_listener_proxy,
-                                                         participant_context->audio_track_map,
-                                                         participant_context->video_track_map);
-    participant_context->participant->setObserver(
-            participant_context->android_participant_observer);
-}
+
 
 JNIEXPORT jboolean JNICALL
-Java_com_twilio_video_Participant_nativeIsConnected(JNIEnv *env, jobject instance,
+Java_com_twilio_video_RemoteParticipant_nativeIsConnected(JNIEnv *env, jobject instance,
                                                     jlong j_participant_context) {
     std::string func_name = std::string(__FUNCTION__);
     TS_CORE_LOG_MODULE(twilio::video::kTSCoreLogModulePlatform,
                        twilio::video::kTSCoreLogLevelDebug,
                        "%s", func_name.c_str());
-    ParticipantContext *participant_context =
-            reinterpret_cast<ParticipantContext *>(j_participant_context);
+    RemoteParticipantContext *participant_context =
+            reinterpret_cast<RemoteParticipantContext *>(j_participant_context);
     if (participant_context == nullptr || !participant_context->participant) {
-        TS_CORE_LOG_WARNING("Participant object no longer exist");
+        TS_CORE_LOG_WARNING("RemoteParticipant object no longer exist");
         return false;
     }
 
@@ -196,11 +207,11 @@ Java_com_twilio_video_Participant_nativeIsConnected(JNIEnv *env, jobject instanc
 }
 
 JNIEXPORT void JNICALL
-Java_com_twilio_video_Participant_nativeRelease(JNIEnv *env,
+Java_com_twilio_video_RemoteParticipant_nativeRelease(JNIEnv *env,
                                                 jobject instance,
                                                 jlong j_participant_context) {
-    ParticipantContext *participant_context =
-            reinterpret_cast<ParticipantContext *>(j_participant_context);
+    RemoteParticipantContext *participant_context =
+            reinterpret_cast<RemoteParticipantContext *>(j_participant_context);
 
     // Delete the participant observer
     participant_context->android_participant_observer->setObserverDeleted();

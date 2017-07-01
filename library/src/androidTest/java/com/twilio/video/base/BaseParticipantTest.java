@@ -6,7 +6,7 @@ import com.twilio.video.ConnectOptions;
 import com.twilio.video.LocalAudioTrack;
 import com.twilio.video.LocalParticipant;
 import com.twilio.video.LocalVideoTrack;
-import com.twilio.video.Participant;
+import com.twilio.video.RemoteParticipant;
 import com.twilio.video.Room;
 import com.twilio.video.RoomState;
 import com.twilio.video.Video;
@@ -48,7 +48,7 @@ public abstract class BaseParticipantTest extends BaseClientTest {
     protected LocalParticipant actor1LocalParticipant;
     protected Room actor2Room;
     protected LocalParticipant actor2LocalParticipant;
-    protected Participant participant;
+    protected RemoteParticipant remoteParticipant;
     protected String testRoom;
     protected CallbackHelper.FakeRoomListener actor1RoomListener;
     protected CallbackHelper.FakeRoomListener actor2RoomListener;
@@ -99,10 +99,10 @@ public abstract class BaseParticipantTest extends BaseClientTest {
         // Wait for actor2 to connect
         assertTrue(actor1RoomListener.onParticipantConnectedLatch.await(20, TimeUnit.SECONDS));
         actor2LocalParticipant = actor2Room.getLocalParticipant();
-        List<Participant> participantList = new ArrayList<>(actor1Room.getParticipants());
-        assertEquals(1, participantList.size());
-        participant = participantList.get(0);
-        assertNotNull(participant);
+        List<RemoteParticipant> remoteParticipantList = new ArrayList<>(actor1Room.getRemoteParticipants());
+        assertEquals(1, remoteParticipantList.size());
+        remoteParticipant = remoteParticipantList.get(0);
+        assertNotNull(remoteParticipant);
     }
 
     @After
@@ -112,7 +112,7 @@ public abstract class BaseParticipantTest extends BaseClientTest {
         disconnectRoom(actor1Room, actor1RoomListener);
         actor1Room = null;
         actor1RoomListener = null;
-        participant = null;
+        remoteParticipant = null;
         if (actor1LocalAudioTrack != null) {
             actor1LocalAudioTrack.release();
         }

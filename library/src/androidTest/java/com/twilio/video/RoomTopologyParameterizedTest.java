@@ -105,8 +105,8 @@ public class RoomTopologyParameterizedTest extends BaseClientTest {
         LocalParticipant localParticipant = room.getLocalParticipant();
         assertNotNull(localParticipant);
         assertEquals(identity, localParticipant.getIdentity());
-        assertEquals(localAudioTrack, localParticipant.getAudioTracks().get(0));
-        assertEquals(localVideoTrack, localParticipant.getVideoTracks().get(0));
+        assertEquals(localAudioTrack, localParticipant.getPublishedAudioTracks().get(0));
+        assertEquals(localVideoTrack, localParticipant.getPublishedVideoTracks().get(0));
         assertNotNull(localParticipant.getSid());
         assertTrue(!localParticipant.getSid().isEmpty());
         room.disconnect();
@@ -158,12 +158,12 @@ public class RoomTopologyParameterizedTest extends BaseClientTest {
             }
 
             @Override
-            public void onParticipantConnected(Room room, Participant participant) {
+            public void onParticipantConnected(Room room, RemoteParticipant remoteParticipant) {
                 fail();
             }
 
             @Override
-            public void onParticipantDisconnected(Room room, Participant participant) {
+            public void onParticipantDisconnected(Room room, RemoteParticipant remoteParticipant) {
                 fail();
             }
 
@@ -208,7 +208,7 @@ public class RoomTopologyParameterizedTest extends BaseClientTest {
 
     @Test
     public void shouldDisconnectDuplicateParticipant() throws InterruptedException {
-        // Connect first participant
+        // Connect first remoteParticipant
         ConnectOptions connectOptions = new ConnectOptions.Builder(token)
             .roomName(roomName)
             .build();
@@ -232,12 +232,12 @@ public class RoomTopologyParameterizedTest extends BaseClientTest {
             }
 
             @Override
-            public void onParticipantConnected(Room room, Participant participant) {
+            public void onParticipantConnected(Room room, RemoteParticipant participant) {
                 fail();
             }
 
             @Override
-            public void onParticipantDisconnected(Room room, Participant participant) {
+            public void onParticipantDisconnected(Room room, RemoteParticipant participant) {
                 fail();
             }
 
@@ -253,7 +253,7 @@ public class RoomTopologyParameterizedTest extends BaseClientTest {
         });
         assertTrue(connectedLatch.await(10, TimeUnit.SECONDS));
 
-        // Connect second participant
+        // Connect second remoteParticipant
         connectOptions = new ConnectOptions.Builder(token)
             .roomName(roomName)
             .build();
@@ -263,10 +263,10 @@ public class RoomTopologyParameterizedTest extends BaseClientTest {
         Room room2 = Video.connect(mediaTestActivity, connectOptions, room2Listener);
         assertTrue(room2Listener.onConnectedLatch.await(10, TimeUnit.SECONDS));
 
-        // First participant should get disconnected
+        // First remoteParticipant should get disconnected
         assertTrue(disconnectedLatch.await(10, TimeUnit.SECONDS));
 
-        // Disconnect second participant
+        // Disconnect second remoteParticipant
         room2.disconnect();
         assertTrue(room2Listener.onDisconnectedLatch.await(10, TimeUnit.SECONDS));
     }
