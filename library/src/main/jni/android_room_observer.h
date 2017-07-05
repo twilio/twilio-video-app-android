@@ -3,7 +3,7 @@
 
 #include "webrtc/sdk/android/src/jni/jni_helpers.h"
 #include "video/room_observer.h"
-#include "video/participant.h"
+#include "video/remote_participant.h"
 #include "com_twilio_video_RemoteParticipant.h"
 #include "com_twilio_video_LocalParticipant.h"
 
@@ -21,9 +21,9 @@ protected:
     virtual void onConnectFailure(const twilio::video::Room *room,
                                   const twilio::video::TwilioError twilio_error);
     virtual void onParticipantConnected(twilio::video::Room *room,
-                                        std::shared_ptr<twilio::video::Participant> participant);
+                                        std::shared_ptr<twilio::video::RemoteParticipant> remote_participant);
     virtual void onParticipantDisconnected(twilio::video::Room *room,
-                                           std::shared_ptr<twilio::video::Participant> participant);
+                                           std::shared_ptr<twilio::video::RemoteParticipant> remote_participant);
     virtual void onRecordingStarted(twilio::video::Room *room);
     virtual void onRecordingStopped(twilio::video::Room *room);
 
@@ -35,7 +35,7 @@ private:
     jobject createJavaRoomException(const twilio::video::TwilioError &twilio_error);
 
     jobject createJavaParticipantList(
-            const std::map<std::string, std::shared_ptr<twilio::video::Participant>> participants);
+            const std::map<std::string, std::shared_ptr<twilio::video::RemoteParticipant>> participants);
 
     bool observer_deleted_ = false;
     mutable rtc::CriticalSection deletion_lock_;
@@ -45,10 +45,10 @@ private:
     const webrtc_jni::ScopedGlobalRef<jclass> j_room_class_;
     const webrtc_jni::ScopedGlobalRef<jclass> j_room_observer_class_;
     const webrtc_jni::ScopedGlobalRef<jclass> j_twilio_exception_class_;
-    const webrtc_jni::ScopedGlobalRef<jclass> j_participant_class_;
+    const webrtc_jni::ScopedGlobalRef<jclass> j_remote_participant_class_;
     const webrtc_jni::ScopedGlobalRef<jclass> j_array_list_class_;
-    const webrtc_jni::ScopedGlobalRef<jclass> j_audio_track_class_;
-    const webrtc_jni::ScopedGlobalRef<jclass> j_video_track_class_;
+    const webrtc_jni::ScopedGlobalRef<jclass> j_remote_audio_track_class_;
+    const webrtc_jni::ScopedGlobalRef<jclass> j_remote_video_track_class_;
     jmethodID j_set_connected_;
     jmethodID j_on_connected_;
     jmethodID j_on_disconnected_;
@@ -64,7 +64,7 @@ private:
     jmethodID j_audio_track_ctor_id_;
     jmethodID j_video_track_ctor_id_;
     jmethodID j_twilio_exception_ctor_id_;
-    std::map<std::shared_ptr<twilio::video::Participant>, jobject> participants_;
+    std::map<std::shared_ptr<twilio::video::RemoteParticipant>, jobject> remote_participants_;
 };
 
 }

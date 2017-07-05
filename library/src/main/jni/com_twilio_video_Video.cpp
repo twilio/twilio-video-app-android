@@ -8,24 +8,24 @@
 #include "webrtc/sdk/android/src/jni/classreferenceholder.h"
 #include "webrtc/base/ssladapter.h"
 
-#include "video/logger.h"
 #include "video/video.h"
 #include "android_room_observer.h"
 #include "com_twilio_video_ConnectOptions.h"
 #include "com_twilio_video_Room.h"
 #include "com_twilio_video_MediaFactory.h"
 #include "class_reference_holder.h"
+#include "logging.h"
 
 namespace twilio_video_jni {
 
 extern "C" jint JNIEXPORT JNICALL JNI_OnLoad(JavaVM *jvm, void *reserved) {
     std::string func_name = std::string(__FUNCTION__);
-    TS_CORE_LOG_MODULE(twilio::video::kTSCoreLogModulePlatform,
-                       twilio::video::kTSCoreLogLevelDebug,
-                       "%s", func_name.c_str());
+    VIDEO_ANDROID_LOG(twilio::video::kTSCoreLogModulePlatform,
+                      twilio::video::kTSCoreLogLevelDebug,
+                      "%s", func_name.c_str());
     jint ret = webrtc_jni::InitGlobalJniVariables(jvm);
     if (ret < 0) {
-        TS_CORE_LOG_MODULE(twilio::video::kTSCoreLogModulePlatform,
+        VIDEO_ANDROID_LOG(twilio::video::kTSCoreLogModulePlatform,
                            twilio::video::kTSCoreLogLevelError,
                            "InitGlobalJniVariables() failed");
         return -1;
@@ -39,9 +39,9 @@ extern "C" jint JNIEXPORT JNICALL JNI_OnLoad(JavaVM *jvm, void *reserved) {
 
 extern "C" void JNIEXPORT JNICALL JNI_OnUnLoad(JavaVM *jvm, void *reserved) {
     std::string func_name = std::string(__FUNCTION__);
-    TS_CORE_LOG_MODULE(twilio::video::kTSCoreLogModulePlatform,
-                       twilio::video::kTSCoreLogLevelDebug,
-                       "%s", func_name.c_str());
+    VIDEO_ANDROID_LOG(twilio::video::kTSCoreLogModulePlatform,
+                      twilio::video::kTSCoreLogLevelDebug,
+                      "%s", func_name.c_str());
     twilio_video_jni::FreeGlobalClassReferenceHolder();
     webrtc_jni::FreeGlobalClassReferenceHolder();
     RTC_CHECK(rtc::CleanupSSL()) << "Failed to CleanupSSL()";
@@ -49,29 +49,31 @@ extern "C" void JNIEXPORT JNICALL JNI_OnUnLoad(JavaVM *jvm, void *reserved) {
 
 JNIEXPORT void JNICALL Java_com_twilio_video_Video_nativeSetCoreLogLevel
         (JNIEnv *env, jobject instance, jint level) {
-    TS_CORE_LOG_MODULE(twilio::video::kTSCoreLogModulePlatform,
-                       twilio::video::kTSCoreLogLevelDebug,
-                       "setCoreLogLevel");
+    VIDEO_ANDROID_LOG(twilio::video::kTSCoreLogModulePlatform,
+                      twilio::video::kTSCoreLogLevelDebug,
+                      "setCoreLogLevel");
     twilio::video::TSCoreLogLevel coreLogLevel = static_cast<twilio::video::TSCoreLogLevel>(level);
-    twilio::video::Logger::instance()->setLogLevel(coreLogLevel);
+    twilio::video::setLogLevel(coreLogLevel);
 }
 
 JNIEXPORT void JNICALL Java_com_twilio_video_Video_nativeSetModuleLevel
         (JNIEnv *env, jobject instance, jint module, jint level) {
-    TS_CORE_LOG_MODULE(twilio::video::kTSCoreLogModulePlatform,
-                       twilio::video::kTSCoreLogLevelDebug,
-                       "setModuleLevel");
+    VIDEO_ANDROID_LOG(twilio::video::kTSCoreLogModulePlatform,
+                      twilio::video::kTSCoreLogLevelDebug,
+                      "setModuleLevel");
     twilio::video::TSCoreLogModule coreLogModule = static_cast<twilio::video::TSCoreLogModule>(module);
     twilio::video::TSCoreLogLevel coreLogLevel = static_cast<twilio::video::TSCoreLogLevel>(level);
-    twilio::video::Logger::instance()->setModuleLogLevel(coreLogModule, coreLogLevel);
+    twilio::video::setModuleLogLevel(coreLogModule, coreLogLevel);
 }
 
 JNIEXPORT jint JNICALL Java_com_twilio_video_Video_nativeGetCoreLogLevel
         (JNIEnv *env, jobject instance) {
-    TS_CORE_LOG_MODULE(twilio::video::kTSCoreLogModulePlatform,
-                       twilio::video::kTSCoreLogLevelDebug,
-                       "getCoreLogLevel");
-    return twilio::video::Logger::instance()->getLogLevel();
+    VIDEO_ANDROID_LOG(twilio::video::kTSCoreLogModulePlatform,
+                      twilio::video::kTSCoreLogLevelDebug,
+                      "getCoreLogLevel");
+    // FIXME: Uncomment once API has been added back CSDK-1525
+    // return twilio::video::getLogLevel();
+    return 0;
 }
 
 }

@@ -1,6 +1,7 @@
 #include "com_twilio_video_PlatformInfo.h"
-#include "video/logger.h"
+#include "video/video.h"
 #include "webrtc/sdk/android/src/jni/jni_helpers.h"
+#include "logging.h"
 
 namespace twilio_video_jni {
 
@@ -14,9 +15,9 @@ JNIEXPORT jlong JNICALL Java_com_twilio_video_PlatformInfo_nativeCreate(
     jstring j_sdk_version,
     jstring j_hw_device_arch) {
 
-    TS_CORE_LOG_MODULE(twilio::video::kTSCoreLogModulePlatform,
-                       twilio::video::kTSCoreLogLevelDebug,
-                       "Create PlatformInfo");
+    VIDEO_ANDROID_LOG(twilio::video::kTSCoreLogModulePlatform,
+                      twilio::video::kTSCoreLogLevelDebug,
+                      "Create PlatformInfo");
 
     PlatformInfoContext *context = new PlatformInfoContext();
     if (!webrtc_jni::IsNull(env, j_platform_name)) {
@@ -50,9 +51,9 @@ JNIEXPORT jlong JNICALL Java_com_twilio_video_PlatformInfo_nativeCreate(
 JNIEXPORT void JNICALL Java_com_twilio_video_PlatformInfo_nativeRelease
     (JNIEnv *env, jobject j_instance, jlong j_native_handle) {
 
-    TS_CORE_LOG_MODULE(twilio::video::kTSCoreLogModulePlatform,
-                       twilio::video::kTSCoreLogLevelDebug,
-                       "Free PlatformInfo");
+    VIDEO_ANDROID_LOG(twilio::video::kTSCoreLogModulePlatform,
+                      twilio::video::kTSCoreLogLevelDebug,
+                      "Free PlatformInfo");
     PlatformInfoContext *platform_info_context =
         reinterpret_cast<PlatformInfoContext *>(j_native_handle);
     if (platform_info_context != nullptr) {

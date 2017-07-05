@@ -14,6 +14,7 @@ import com.twilio.video.util.Topology;
 
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -191,6 +192,7 @@ public class RemoteParticipantTopologyParameterizedTest extends BaseParticipantT
     }
 
     @Test
+    @Ignore("Will not work until we probably implement the track subscription APIs GSDK-1214")
     public void shouldHaveTracksAfterDisconnected() throws InterruptedException {
         // Add audio and video tracks
         CallbackHelper.FakeParticipantListener participantListener =

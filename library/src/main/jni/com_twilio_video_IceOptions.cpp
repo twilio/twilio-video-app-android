@@ -2,7 +2,7 @@
 
 #include "webrtc/sdk/android/src/jni/jni_helpers.h"
 
-#include "video/logger.h"
+#include "video/video.h"
 
 namespace twilio_video_jni {
 
@@ -66,7 +66,6 @@ twilio::media::IceOptions IceOptions::getIceOptions(JNIEnv *env, jobject j_ice_o
     }
 
     if (!webrtc_jni::IsNull(env, j_ice_trans_policy)) {
-        //jclass enumClass = env->FindClass("com/twilio/conversations/IceTransportPolicy");
         jclass ice_policy_class = env->GetObjectClass(j_ice_trans_policy);
         jmethodID name_id = env->GetMethodID(ice_policy_class, "name", "()Ljava/lang/String;");
         jstring j_ice_policy = (jstring)env->CallObjectMethod(j_ice_trans_policy, name_id);

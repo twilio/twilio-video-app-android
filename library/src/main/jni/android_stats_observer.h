@@ -6,6 +6,7 @@
 #include "video/stats_observer.h"
 #include "video/stats_report.h"
 #include "class_reference_holder.h"
+#include "logging.h"
 
 #include <memory>
 #include <vector>
@@ -91,17 +92,17 @@ public:
     }
 
     virtual ~AndroidStatsObserver() {
-        TS_CORE_LOG_MODULE(twilio::video::kTSCoreLogModulePlatform,
-                           twilio::video::kTSCoreLogLevelDebug,
-                           "~AndroidStatsObserver");
+        VIDEO_ANDROID_LOG(twilio::video::kTSCoreLogModulePlatform,
+                          twilio::video::kTSCoreLogLevelDebug,
+                          "~AndroidStatsObserver");
     }
 
     void setObserverDeleted() {
         rtc::CritScope cs(&deletion_lock_);
         observer_deleted_ = true;
-        TS_CORE_LOG_MODULE(twilio::video::kTSCoreLogModulePlatform,
-                           twilio::video::kTSCoreLogLevelDebug,
-                           "android stats observer deleted");
+        VIDEO_ANDROID_LOG(twilio::video::kTSCoreLogModulePlatform,
+                          twilio::video::kTSCoreLogLevelDebug,
+                          "android stats observer deleted");
     }
 
 protected:
@@ -109,9 +110,9 @@ protected:
             const std::vector<twilio::video::StatsReport> &stats_reports) {
         webrtc_jni::ScopedLocalRefFrame local_ref_frame(jni());
         std::string func_name = std::string(__FUNCTION__);
-        TS_CORE_LOG_MODULE(twilio::video::kTSCoreLogModulePlatform,
-                           twilio::video::kTSCoreLogLevelDebug,
-                           "%s", func_name.c_str());
+        VIDEO_ANDROID_LOG(twilio::video::kTSCoreLogModulePlatform,
+                          twilio::video::kTSCoreLogLevelDebug,
+                          "%s", func_name.c_str());
 
         {
             rtc::CritScope cs(&deletion_lock_);
@@ -131,8 +132,8 @@ protected:
                                             stats_report.local_audio_track_stats);
                 processLocalVideoTrackStats(j_stats_report,
                                             stats_report.local_video_track_stats);
-                processAudioTrackStats(j_stats_report, stats_report.audio_track_stats);
-                processVideoTrackStats(j_stats_report, stats_report.video_track_stats);
+                processAudioTrackStats(j_stats_report, stats_report.remote_audio_track_stats);
+                processVideoTrackStats(j_stats_report, stats_report.remote_video_track_stats);
 
                 jni()->CallBooleanMethod(j_stats_reports, j_array_list_add_, j_stats_report);
             }
@@ -148,17 +149,17 @@ private:
 
     bool isObserverValid(const std::string &callbackName) {
         if (observer_deleted_) {
-            TS_CORE_LOG_MODULE(twilio::video::kTSCoreLogModulePlatform,
-                               twilio::video::kTSCoreLogLevelWarning,
-                               "android stats observer is marked for deletion, skipping %s callback",
-                               callbackName.c_str());
+            VIDEO_ANDROID_LOG(twilio::video::kTSCoreLogModulePlatform,
+                              twilio::video::kTSCoreLogLevelWarning,
+                              "android stats observer is marked for deletion, skipping %s callback",
+                              callbackName.c_str());
             return false;
         };
         if (webrtc_jni::IsNull(jni(), *j_stats_observer_)) {
-            TS_CORE_LOG_MODULE(twilio::video::kTSCoreLogModulePlatform,
-                               twilio::video::kTSCoreLogLevelWarning,
-                               "android stats observer reference has been destroyed, skipping %s callback",
-                               callbackName.c_str());
+            VIDEO_ANDROID_LOG(twilio::video::kTSCoreLogModulePlatform,
+                              twilio::video::kTSCoreLogLevelWarning,
+                              "android stats observer reference has been destroyed, skipping %s callback",
+                              callbackName.c_str());
             return false;
         }
         return true;
@@ -235,7 +236,7 @@ private:
     }
 
     void processAudioTrackStats(jobject j_stats_report,
-                                const std::vector<twilio::media::AudioTrackStats> &audio_tracks_stats) {
+                                const std::vector<twilio::media::RemoteAudioTrackStats> &audio_tracks_stats) {
         for(auto const &track_stats : audio_tracks_stats) {
             webrtc_jni::ScopedLocalRefFrame local_ref_frame(jni());
             jstring j_track_id =
@@ -263,7 +264,7 @@ private:
     }
 
     void processVideoTrackStats(jobject j_stats_report,
-                                const std::vector<twilio::media::VideoTrackStats> &video_tracks_stats) {
+                                const std::vector<twilio::media::RemoteVideoTrackStats> &video_tracks_stats) {
         for(auto const &track_stats : video_tracks_stats) {
             webrtc_jni::ScopedLocalRefFrame local_ref_frame(jni());
             jstring j_track_id =

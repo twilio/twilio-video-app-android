@@ -68,6 +68,7 @@ public class VideoTest extends BaseClientTest {
     }
 
     @Test
+    @Ignore("Broken until CSDK-1525 resolved")
     public void logLevel_shouldBeRetained() {
         Video.setLogLevel(LogLevel.DEBUG);
         assertEquals(LogLevel.DEBUG, Video.getLogLevel());
