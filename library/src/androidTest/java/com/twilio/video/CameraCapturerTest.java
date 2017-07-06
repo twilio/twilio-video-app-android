@@ -76,6 +76,43 @@ public class CameraCapturerTest extends BaseCameraCapturerTest {
     }
 
     @Test
+    public void shouldAllowSettingFpsVideoConstraints() throws InterruptedException {
+        final CountDownLatch firstFrameReceived = new CountDownLatch(1);
+        cameraCapturer = new CameraCapturer(cameraCapturerActivity,
+                CameraCapturer.CameraSource.FRONT_CAMERA,
+                new CameraCapturer.Listener() {
+                    @Override
+                    public void onFirstFrameAvailable() {
+                        firstFrameReceived.countDown();
+                    }
+
+                    @Override
+                    public void onCameraSwitched() {
+
+                    }
+
+                    @Override
+                    public void onError(@CameraCapturer.Error int errorCode) {
+
+                    }
+                });
+        VideoConstraints videoConstraints = new VideoConstraints.Builder()
+                .minFps(5)
+                .maxFps(15)
+                .build();
+        localVideoTrack = LocalVideoTrack.create(cameraCapturerActivity,
+                true,
+                cameraCapturer,
+                videoConstraints);
+
+        // Validate we got our first frame
+        assertTrue(firstFrameReceived.await(CAMERA_CAPTURE_DELAY_MS, TimeUnit.MILLISECONDS));
+
+        // Validate our constraints are applied
+        assertEquals(videoConstraints, localVideoTrack.getVideoConstraints());
+    }
+
+    @Test
     public void shouldAllowCameraSwitch() throws InterruptedException {
         final CountDownLatch cameraSwitched = new CountDownLatch(1);
         cameraCapturer = new CameraCapturer(cameraCapturerActivity,

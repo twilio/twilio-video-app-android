@@ -52,13 +52,6 @@ public class LocalVideoTrackVideoConstraintsParameterizedTest {
             vga24FpsVideoFormat,
             hd720p24fpsVideoFormat
     );
-    private static final List<VideoFormat> formats24And30Fps = Arrays.asList(cif24FpsVideoFormat,
-            vga24FpsVideoFormat,
-            hd720p24fpsVideoFormat,
-            cif30FpsVideoFormat,
-            vga30FpsVideoFormat,
-            hd720p30fpsVideoFormat
-    );
     private static final List<VideoFormat> galaxyS5BackCameraSupportedFormats = Arrays.asList(
             new VideoFormat(new VideoDimensions(1920, 1080), 30, VideoPixelFormat.NV21),
             new VideoFormat(new VideoDimensions(1440, 1080), 30, VideoPixelFormat.NV21),
@@ -75,13 +68,19 @@ public class LocalVideoTrackVideoConstraintsParameterizedTest {
     private static final VideoCapturer videoCapturer4by3Ratio30Fps =
             new FakeVideoCapturer(formats4by3Ratio30Fps);
     private static final VideoCapturer videoCapturer24Fps = new FakeVideoCapturer(formats24Fps);
-    private static final VideoCapturer videoCapturer30And24Fps =
-            new FakeVideoCapturer(formats24And30Fps);
     private static final VideoCapturer galaxyS5BackCameraCapturer =
             new FakeVideoCapturer(galaxyS5BackCameraSupportedFormats);
 
     private static final VideoConstraints vgaMax24FpsMaxConstraints = new VideoConstraints.Builder()
             .maxFps(24)
+            .maxVideoDimensions(VideoDimensions.VGA_VIDEO_DIMENSIONS)
+            .build();
+    private static final VideoConstraints vgaMax30FpsMaxConstraints = new VideoConstraints.Builder()
+            .maxFps(30)
+            .maxVideoDimensions(VideoDimensions.VGA_VIDEO_DIMENSIONS)
+            .build();
+    private static final VideoConstraints vgaMax60FpsMaxConstraints = new VideoConstraints.Builder()
+            .maxFps(60)
             .maxVideoDimensions(VideoDimensions.VGA_VIDEO_DIMENSIONS)
             .build();
     private static final VideoConstraints vgaMin30FpsMaxConstraints = new VideoConstraints.Builder()
@@ -152,7 +151,7 @@ public class LocalVideoTrackVideoConstraintsParameterizedTest {
                         new TestParameters(vgaMin30FpsMaxConstraints, videoCapturer24Fps,
                                 vgaMax24FpsMaxConstraints)},
                 {"Capturer does not support max FPS constraint",
-                        new TestParameters(vgaMax24FpsMaxConstraints, videoCapturer30Fps,
+                        new TestParameters(vgaMax60FpsMaxConstraints, videoCapturer30Fps,
                                 LocalVideoTrack.defaultVideoConstraints)},
                 {"Capturer does not support aspect ratio constraint",
                         new TestParameters(aspectRatio16by9Hd1080pConstraints,
@@ -167,7 +166,7 @@ public class LocalVideoTrackVideoConstraintsParameterizedTest {
                                 galaxyS5BackCameraCapturer,
                                 aspectRatio16by9Hd1080pConstraints)},
                 {"Capturer fully supports constraints",
-                        new TestParameters(vgaMax24FpsMaxConstraints, videoCapturer30And24Fps,
+                        new TestParameters(vgaMax24FpsMaxConstraints, videoCapturer30Fps,
                                 vgaMax24FpsMaxConstraints)}});
     }
 

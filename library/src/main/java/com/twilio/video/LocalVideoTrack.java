@@ -54,6 +54,17 @@ public class LocalVideoTrack extends VideoTrack {
      *     <li>Passing {@code null} as {@code videoConstraints}.</li>
      *     <li>{@code videoConstraints} are incompatible with {@code videoCapturer}</li>
      * </ol>
+     * <p>
+     * Video constraints are incompatible with a capturer if there is not at least one supported
+     * {@link VideoFormat} for which all the following conditions true:
+     * <ol>
+     *     <li>{@link VideoConstraints#minFps} and {@link VideoConstraints#maxFps} are both
+     *     less than or equal supported capture format frame rate.</li>
+     *     <li>{@link VideoConstraints#minVideoDimensions} width and height are less than or
+     *     equal to a supported capture format width and height.</li>
+     *     <li>{@link VideoConstraints#maxVideoDimensions} width and height are greater than or
+     *     equal to a supported capture format width and height.</li>
+     * </ol>
      *
      * @param context application context.
      * @param enabled initial state of video track.
@@ -197,7 +208,7 @@ public class LocalVideoTrack extends VideoTrack {
 
             // Validate that max FPS is compatible
             if (maxFps > 0) {
-                formatCompatible &= maxFps >= videoFormat.framerate;
+                formatCompatible &= maxFps <= videoFormat.framerate;
             }
 
             // Check if format resolution is within aspect ratio tolerance
