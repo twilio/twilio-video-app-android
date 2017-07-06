@@ -92,16 +92,16 @@ public:
     }
 
     virtual ~AndroidStatsObserver() {
-        VIDEO_ANDROID_LOG(twilio::video::kTSCoreLogModulePlatform,
-                          twilio::video::kTSCoreLogLevelDebug,
+        VIDEO_ANDROID_LOG(twilio::video::LogModule::kPlatform,
+                          twilio::video::LogLevel::kDebug,
                           "~AndroidStatsObserver");
     }
 
     void setObserverDeleted() {
         rtc::CritScope cs(&deletion_lock_);
         observer_deleted_ = true;
-        VIDEO_ANDROID_LOG(twilio::video::kTSCoreLogModulePlatform,
-                          twilio::video::kTSCoreLogLevelDebug,
+        VIDEO_ANDROID_LOG(twilio::video::LogModule::kPlatform,
+                          twilio::video::LogLevel::kDebug,
                           "android stats observer deleted");
     }
 
@@ -110,8 +110,8 @@ protected:
             const std::vector<twilio::video::StatsReport> &stats_reports) {
         webrtc_jni::ScopedLocalRefFrame local_ref_frame(jni());
         std::string func_name = std::string(__FUNCTION__);
-        VIDEO_ANDROID_LOG(twilio::video::kTSCoreLogModulePlatform,
-                          twilio::video::kTSCoreLogLevelDebug,
+        VIDEO_ANDROID_LOG(twilio::video::LogModule::kPlatform,
+                          twilio::video::LogLevel::kDebug,
                           "%s", func_name.c_str());
 
         {
@@ -149,15 +149,15 @@ private:
 
     bool isObserverValid(const std::string &callbackName) {
         if (observer_deleted_) {
-            VIDEO_ANDROID_LOG(twilio::video::kTSCoreLogModulePlatform,
-                              twilio::video::kTSCoreLogLevelWarning,
+            VIDEO_ANDROID_LOG(twilio::video::LogModule::kPlatform,
+                              twilio::video::LogLevel::kWarning,
                               "android stats observer is marked for deletion, skipping %s callback",
                               callbackName.c_str());
             return false;
         };
         if (webrtc_jni::IsNull(jni(), *j_stats_observer_)) {
-            VIDEO_ANDROID_LOG(twilio::video::kTSCoreLogModulePlatform,
-                              twilio::video::kTSCoreLogLevelWarning,
+            VIDEO_ANDROID_LOG(twilio::video::LogModule::kPlatform,
+                              twilio::video::LogLevel::kWarning,
                               "android stats observer reference has been destroyed, skipping %s callback",
                               callbackName.c_str());
             return false;

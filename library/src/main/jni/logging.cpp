@@ -7,8 +7,8 @@ const static int kLogBufferSize = 8096;
 /*
  * Log function that formats var args into std::string.
  */
-void log(twilio::video::TSCoreLogModule module,
-         twilio::video::TSCoreLogLevel level,
+void log(twilio::video::LogModule module,
+         twilio::video::LogLevel level,
          const char* file,
          const char* func,
          int line,

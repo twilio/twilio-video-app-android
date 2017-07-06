@@ -17,8 +17,8 @@
 
 namespace twilio_video_jni {
 
-void log(twilio::video::TSCoreLogModule module,
-         twilio::video::TSCoreLogLevel level,
+void log(twilio::video::LogModule module,
+         twilio::video::LogLevel level,
          const char* file,
          const char* func,
          int line,

@@ -15,8 +15,8 @@ JNIEXPORT jlong JNICALL Java_com_twilio_video_PlatformInfo_nativeCreate(
     jstring j_sdk_version,
     jstring j_hw_device_arch) {
 
-    VIDEO_ANDROID_LOG(twilio::video::kTSCoreLogModulePlatform,
-                      twilio::video::kTSCoreLogLevelDebug,
+    VIDEO_ANDROID_LOG(twilio::video::LogModule::kPlatform,
+                      twilio::video::LogLevel::kDebug,
                       "Create PlatformInfo");
 
     PlatformInfoContext *context = new PlatformInfoContext();
@@ -51,8 +51,8 @@ JNIEXPORT jlong JNICALL Java_com_twilio_video_PlatformInfo_nativeCreate(
 JNIEXPORT void JNICALL Java_com_twilio_video_PlatformInfo_nativeRelease
     (JNIEnv *env, jobject j_instance, jlong j_native_handle) {
 
-    VIDEO_ANDROID_LOG(twilio::video::kTSCoreLogModulePlatform,
-                      twilio::video::kTSCoreLogLevelDebug,
+    VIDEO_ANDROID_LOG(twilio::video::LogModule::kPlatform,
+                      twilio::video::LogLevel::kDebug,
                       "Free PlatformInfo");
     PlatformInfoContext *platform_info_context =
         reinterpret_cast<PlatformInfoContext *>(j_native_handle);
