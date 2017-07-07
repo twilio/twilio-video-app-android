@@ -16,8 +16,10 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assume.assumeNotNull;
+import static org.junit.Assume.assumeTrue;
 
 @RunWith(AndroidJUnit4.class)
 public class CameraCapturerTest extends BaseCameraCapturerTest {
@@ -110,6 +112,29 @@ public class CameraCapturerTest extends BaseCameraCapturerTest {
 
         // Validate our constraints are applied
         assertEquals(videoConstraints, localVideoTrack.getVideoConstraints());
+    }
+
+    @Test
+    public void shouldCreateLocalVideoTrackIfVideoConstraintsCompatible() {
+        cameraCapturer = new CameraCapturer(cameraCapturerActivity,
+                CameraCapturer.CameraSource.FRONT_CAMERA, null);
+
+        VideoConstraints videoConstraints = new VideoConstraints.Builder()
+                .minFps(0)
+                .maxFps(30)
+                .minVideoDimensions(VideoDimensions.WVGA_VIDEO_DIMENSIONS)
+                .maxVideoDimensions(VideoDimensions.HD_540P_VIDEO_DIMENSIONS)
+                .aspectRatio(VideoConstraints.ASPECT_RATIO_16_9)
+                .build();
+
+        assumeTrue(LocalVideoTrack.constraintsCompatible(cameraCapturer, videoConstraints));
+
+        localVideoTrack = LocalVideoTrack.create(cameraCapturerActivity,
+                true,
+                cameraCapturer,
+                videoConstraints);
+        assertNotNull(localVideoTrack);
+        localVideoTrack.release();
     }
 
     @Test

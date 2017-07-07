@@ -3,6 +3,7 @@ package com.twilio.video;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.VisibleForTesting;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -78,7 +79,7 @@ public class LocalVideoTrack extends VideoTrack {
                                          @Nullable VideoConstraints videoConstraints) {
         Preconditions.checkNotNull(context, "Context must not be null");
         Preconditions.checkNotNull(videoCapturer, "VideoCapturer must not be null");
-        Preconditions.checkState(videoCapturer.getSupportedFormats() != null &&
+        Preconditions.checkState(videoCapturer.getSupportedFormats()!= null &&
                         !videoCapturer.getSupportedFormats().isEmpty(),
                 CAPTURER_MUST_HAVE_ONE_SUPPORTED_FORMAT);
 
@@ -186,7 +187,8 @@ public class LocalVideoTrack extends VideoTrack {
      * Returns true if at least one VideoFormat is compatible with the provided VideoConstraints.
      * Based on a similar algorithm in webrtc/api/videocapturertracksource.cc
      */
-    private static boolean constraintsCompatible(VideoCapturer videoCapturer,
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+    static boolean constraintsCompatible(VideoCapturer videoCapturer,
                                                  VideoConstraints videoConstraints) {
         for (VideoFormat videoFormat : videoCapturer.getSupportedFormats()) {
             VideoDimensions minVideoDimensions = videoConstraints.getMinVideoDimensions();

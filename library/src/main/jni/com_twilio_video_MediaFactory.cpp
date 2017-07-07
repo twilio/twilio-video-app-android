@@ -200,10 +200,17 @@ twilio::media::MediaConstraints* convertVideoConstraints(jobject j_video_constra
     if ((numerator_aspect_ratio > 0) && (denominator_aspect_ratio > 0)){
         double aspect_ratio = (double) numerator_aspect_ratio / denominator_aspect_ratio;
 
+        /*
+         * Alter the aspect ratio by 5% to ensure that formats with an approximately close
+         * aspect ratio are not excluded by WebRTC
+         */
+        double min_aspect_ratio = aspect_ratio * 0.95;
+        double max_aspect_ratio = aspect_ratio * 1.05;
+
         video_constraints->SetMandatory(twilio::media::MediaConstraints::kMinAspectRatio,
-                                        aspect_ratio);
+                                        min_aspect_ratio);
         video_constraints->SetMandatory(twilio::media::MediaConstraints::kMaxAspectRatio,
-                                        aspect_ratio);
+                                        max_aspect_ratio);
     }
 
     return video_constraints;
