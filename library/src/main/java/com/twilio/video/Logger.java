@@ -59,7 +59,7 @@ class Logger {
     }
 
     public boolean isErrorEnabled() {
-        return level <= Log.ERROR || (level == INHERIT && globalLevel >= Log.ERROR);
+        return level <= Log.ERROR || (level == INHERIT && globalLevel <= Log.ERROR);
     }
 
     public void v(final String msg, final Throwable t) {

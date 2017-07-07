@@ -4,6 +4,7 @@ The Twilio Programmable Video SDKs use [Semantic Versioning](http://www.semver.o
 
 Bug Fixes
 
+- Fixed bug in Logger.java where setting certain LogLevel's did not print error logs 
 - Fixed bug in `LocalVideoTrack` where FPS check was incorrectly marking a constraint as incompatible. [#127](https://github.com/twilio/video-quickstart-android/issues/127)
 
 Known issues
