@@ -189,7 +189,7 @@ participating, you are expected to uphold this code. Please report unacceptable 
 
 ## License 
 
-    Copyright 2017 Twilio, inc.
+    Copyright 2017 Twilio, Inc.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
