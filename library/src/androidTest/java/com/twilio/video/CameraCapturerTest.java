@@ -1,3 +1,19 @@
+/*
+ * Copyright (C) 2017 Twilio, Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.twilio.video;
 
 import android.hardware.Camera;
@@ -16,8 +32,10 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assume.assumeNotNull;
+import static org.junit.Assume.assumeTrue;
 
 @RunWith(AndroidJUnit4.class)
 public class CameraCapturerTest extends BaseCameraCapturerTest {
@@ -73,6 +91,66 @@ public class CameraCapturerTest extends BaseCameraCapturerTest {
             completed.countDown();
         }
         assertTrue(completed.await(20, TimeUnit.SECONDS));
+    }
+
+    @Test
+    public void shouldAllowSettingFpsVideoConstraints() throws InterruptedException {
+        final CountDownLatch firstFrameReceived = new CountDownLatch(1);
+        cameraCapturer = new CameraCapturer(cameraCapturerActivity,
+                CameraCapturer.CameraSource.FRONT_CAMERA,
+                new CameraCapturer.Listener() {
+                    @Override
+                    public void onFirstFrameAvailable() {
+                        firstFrameReceived.countDown();
+                    }
+
+                    @Override
+                    public void onCameraSwitched() {
+
+                    }
+
+                    @Override
+                    public void onError(@CameraCapturer.Error int errorCode) {
+
+                    }
+                });
+        VideoConstraints videoConstraints = new VideoConstraints.Builder()
+                .minFps(5)
+                .maxFps(15)
+                .build();
+        localVideoTrack = LocalVideoTrack.create(cameraCapturerActivity,
+                true,
+                cameraCapturer,
+                videoConstraints);
+
+        // Validate we got our first frame
+        assertTrue(firstFrameReceived.await(CAMERA_CAPTURE_DELAY_MS, TimeUnit.MILLISECONDS));
+
+        // Validate our constraints are applied
+        assertEquals(videoConstraints, localVideoTrack.getVideoConstraints());
+    }
+
+    @Test
+    public void shouldCreateLocalVideoTrackIfVideoConstraintsCompatible() {
+        cameraCapturer = new CameraCapturer(cameraCapturerActivity,
+                CameraCapturer.CameraSource.FRONT_CAMERA, null);
+
+        VideoConstraints videoConstraints = new VideoConstraints.Builder()
+                .minFps(0)
+                .maxFps(30)
+                .minVideoDimensions(VideoDimensions.WVGA_VIDEO_DIMENSIONS)
+                .maxVideoDimensions(VideoDimensions.HD_540P_VIDEO_DIMENSIONS)
+                .aspectRatio(VideoConstraints.ASPECT_RATIO_16_9)
+                .build();
+
+        assumeTrue(LocalVideoTrack.constraintsCompatible(cameraCapturer, videoConstraints));
+
+        localVideoTrack = LocalVideoTrack.create(cameraCapturerActivity,
+                true,
+                cameraCapturer,
+                videoConstraints);
+        assertNotNull(localVideoTrack);
+        localVideoTrack.release();
     }
 
     @Test
