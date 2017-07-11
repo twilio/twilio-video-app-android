@@ -16,16 +16,24 @@
 
 package com.twilio.video;
 
+import android.Manifest;
 import android.content.Context;
+import android.content.pm.PackageManager;
+import android.graphics.Camera;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
+import java.util.ArrayList;
+
+import static org.mockito.Mockito.when;
+
 @RunWith(MockitoJUnitRunner.class)
 public class CameraCapturerUnitTest {
     @Mock Context context;
+    @Mock CameraCapturerFormatProvider formatProvider;
 
     @Test(expected = NullPointerException.class)
     public void shouldFailWithNullContext() {
@@ -35,5 +43,29 @@ public class CameraCapturerUnitTest {
     @Test(expected = NullPointerException.class)
     public void shouldFailWithNullSource() {
         new CameraCapturer(context, null);
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void getSupportedFormats_shouldFailWhenCameraPermissionNotGranted() {
+        when(context.checkCallingOrSelfPermission(Manifest.permission.CAMERA))
+                .thenReturn(PackageManager.PERMISSION_DENIED);
+        CameraCapturer cameraCapturer = new CameraCapturer(context,
+                CameraCapturer.CameraSource.BACK_CAMERA);
+
+        cameraCapturer.getSupportedFormats();
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void getSupportedFormats_shouldFailWhenFailToConnectToCameraService() {
+        when(context.checkCallingOrSelfPermission(Manifest.permission.CAMERA))
+                .thenReturn(PackageManager.PERMISSION_DENIED);
+        when(formatProvider.getSupportedFormats(CameraCapturer.CameraSource.BACK_CAMERA))
+                .thenReturn(new ArrayList<VideoFormat>());
+        CameraCapturer cameraCapturer = new CameraCapturer(context,
+                CameraCapturer.CameraSource.BACK_CAMERA,
+                null,
+                formatProvider);
+
+        cameraCapturer.getSupportedFormats();
     }
 }

@@ -69,38 +69,35 @@ class CameraCapturerFormatProvider {
     }
 
     private List<VideoFormat> getSupportedFormats(int cameraId) {
+        final List<VideoFormat> formatList = new ArrayList<>();
         final android.hardware.Camera.Parameters parameters;
         android.hardware.Camera camera = null;
         try {
             camera = android.hardware.Camera.open(cameraId);
             parameters = camera.getParameters();
         } catch (RuntimeException e) {
-            return new ArrayList<>();
+            logger.e(e.getMessage());
+            return formatList;
         } finally {
             if (camera != null) {
                 camera.release();
             }
         }
 
-        final List<VideoFormat> formatList = new ArrayList<>();
-        try {
-            int maxFps = 0;
-            final List<int[]> listFpsRange = parameters.getSupportedPreviewFpsRange();
-            if (listFpsRange != null) {
-                // getSupportedPreviewFpsRange() returns a sorted list. Take the fps range
-                // corresponding to the highest fps.
-                final int[] range = listFpsRange.get(listFpsRange.size() - 1);
-                maxFps = (range[android.hardware.Camera.Parameters.PREVIEW_FPS_MAX_INDEX] + 999)
-                        / 1000;
-            }
-            for (android.hardware.Camera.Size size : parameters.getSupportedPreviewSizes()) {
-                VideoDimensions dimensions = new VideoDimensions(size.width, size.height);
-                formatList.add(new VideoFormat(dimensions,
-                        maxFps,
-                        VideoPixelFormat.NV21));
-            }
-        } catch (Exception e) {
-            logger.e("getSupportedFormats() failed on camera index " + cameraId, e);
+        int maxFps = 0;
+        final List<int[]> listFpsRange = parameters.getSupportedPreviewFpsRange();
+        if (listFpsRange != null) {
+            // getSupportedPreviewFpsRange() returns a sorted list. Take the fps range
+            // corresponding to the highest fps.
+            final int[] range = listFpsRange.get(listFpsRange.size() - 1);
+            maxFps = (range[android.hardware.Camera.Parameters.PREVIEW_FPS_MAX_INDEX] + 999)
+                    / 1000;
+        }
+        for (android.hardware.Camera.Size size : parameters.getSupportedPreviewSizes()) {
+            VideoDimensions dimensions = new VideoDimensions(size.width, size.height);
+            formatList.add(new VideoFormat(dimensions,
+                    maxFps,
+                    VideoPixelFormat.NV21));
         }
 
         return formatList;

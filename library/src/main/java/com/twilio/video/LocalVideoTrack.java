@@ -95,7 +95,7 @@ public class LocalVideoTrack extends VideoTrack {
                                          @Nullable VideoConstraints videoConstraints) {
         Preconditions.checkNotNull(context, "Context must not be null");
         Preconditions.checkNotNull(videoCapturer, "VideoCapturer must not be null");
-        Preconditions.checkState(videoCapturer.getSupportedFormats()!= null &&
+        Preconditions.checkState(videoCapturer.getSupportedFormats() != null &&
                         !videoCapturer.getSupportedFormats().isEmpty(),
                 CAPTURER_MUST_HAVE_ONE_SUPPORTED_FORMAT);
 
@@ -205,7 +205,7 @@ public class LocalVideoTrack extends VideoTrack {
      */
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
     static boolean constraintsCompatible(VideoCapturer videoCapturer,
-                                                 VideoConstraints videoConstraints) {
+                                         VideoConstraints videoConstraints) {
         for (VideoFormat videoFormat : videoCapturer.getSupportedFormats()) {
             VideoDimensions minVideoDimensions = videoConstraints.getMinVideoDimensions();
             VideoDimensions maxVideoDimensions = videoConstraints.getMaxVideoDimensions();

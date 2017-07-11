@@ -157,8 +157,8 @@ public class ScreenCapturer implements VideoCapturer {
      * @return all supported video formats.
      */
     @Override
-    public List<VideoFormat> getSupportedFormats() {
-        // TODO: Add support for more formats based on the size of device screen
+    public synchronized List<VideoFormat> getSupportedFormats() {
+        // TODO: Add support for more formats based on the size of device screen GSDK-1243
         List<VideoFormat> screencastFormats = new ArrayList<>();
         VideoDimensions vgaDimensions = new VideoDimensions(640, 480);
         VideoDimensions hdDimensions = new VideoDimensions(1280, 720);

@@ -6,6 +6,12 @@ Features
 
 - The SDK now uses TLS 1.2 in favor of TLS 1.0 to connect to Twilio’s servers.
 
+Improvements
+
+- Added more checks and logging to `CameraCapturer` to help identify cases when the camera service cannot be reached. [#126](https://github.com/twilio/video-quickstart-android/issues/126)
+- Changed `getSupportedFormats` for `CameraCapturer`, `ScreenCapturer`, and `Camera2Capturer` to 
+be `synchronized`.
+
 Known issues
 
 - Network handoff, and subsequent connection renegotiation is not supported for IPv6 networks [#72](https://github.com/twilio/video-quickstart-android/issues/72)

@@ -26,6 +26,7 @@ import android.os.Handler;
 import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.VisibleForTesting;
 import android.view.Surface;
 import android.view.WindowManager;
 
@@ -97,7 +98,7 @@ public class CameraCapturer implements VideoCapturer {
     private State state = State.IDLE;
 
     private final Context context;
-    private final CameraCapturerFormatProvider formatProvider = new CameraCapturerFormatProvider();
+    private final CameraCapturerFormatProvider formatProvider;
     private final AtomicBoolean picturePending = new AtomicBoolean(false);
     private final AtomicBoolean parameterUpdatePending = new AtomicBoolean(false);
     private CameraCapturer.Listener listener;
@@ -264,11 +265,24 @@ public class CameraCapturer implements VideoCapturer {
     public CameraCapturer(@NonNull Context context,
                           @NonNull CameraSource cameraSource,
                           @Nullable Listener listener) {
+        this(context, cameraSource, listener, new CameraCapturerFormatProvider());
+    }
+
+    /*
+     * Visible for tests so we can provide a mocked format provider to emulate cases where
+     * an error occurs connecting to camera service.
+     */
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+    CameraCapturer(@NonNull Context context,
+                   @NonNull CameraSource cameraSource,
+                   @Nullable Listener listener,
+                   @NonNull CameraCapturerFormatProvider formatProvider) {
         Preconditions.checkNotNull(context, "Context must not be null");
         Preconditions.checkNotNull(cameraSource, "Camera source must not be null");
         this.context = context;
         this.cameraSource = cameraSource;
         this.listener = listener;
+        this.formatProvider = formatProvider;
     }
 
     /**
@@ -282,17 +296,15 @@ public class CameraCapturer implements VideoCapturer {
      * @return all supported video formats.
      */
     @Override
-    public List<VideoFormat> getSupportedFormats() {
-        // Camera permission is needed to query the supported formats of the device
-        if (Util.permissionGranted(context, Manifest.permission.CAMERA)) {
-            return formatProvider.getSupportedFormats(cameraSource);
-        } else {
-            /*
-             * Return default parameters and permission error will be surfaced when the capturing
-             * attempts to start.
-             */
-            return defaultFormats();
-        }
+    public synchronized List<VideoFormat> getSupportedFormats() {
+        Preconditions.checkState(Util.permissionGranted(context,
+                Manifest.permission.CAMERA), "CAMERA permission must be granted to create video" +
+                "track with CameraCapturer");
+        List<VideoFormat> supportedFormats = formatProvider.getSupportedFormats(cameraSource);
+        Preconditions.checkState(!supportedFormats.isEmpty(), "Supported formats could not be " +
+                "retrieved because an error occurred connecting to the camera service");
+
+        return supportedFormats;
     }
 
     /**

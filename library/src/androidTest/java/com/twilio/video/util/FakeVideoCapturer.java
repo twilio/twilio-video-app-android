@@ -96,7 +96,7 @@ public class FakeVideoCapturer implements VideoCapturer {
     }
 
     @Override
-    public List<VideoFormat> getSupportedFormats() {
+    public synchronized List<VideoFormat> getSupportedFormats() {
         return supportedFormats;
     }
 
