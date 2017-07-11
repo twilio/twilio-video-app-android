@@ -1,6 +1,6 @@
 The Twilio Programmable Video SDKs use [Semantic Versioning](http://www.semver.org).
 
-####1.1.2
+####1.2.0
 
 Features
 
@@ -8,6 +8,8 @@ Features
 
 Improvements
 
+- Deprecated `LocalParticipant#release`. This method is not meant to be called and is now a 
+no-op until it is removed in `2.0.0-preview1` release. [#132](https://github.com/twilio/video-quickstart-android/issues/132)
 - Added more checks and logging to `CameraCapturer` to help identify cases when the camera service cannot be reached. [#126](https://github.com/twilio/video-quickstart-android/issues/126)
 - Changed `getSupportedFormats` for `CameraCapturer`, `ScreenCapturer`, and `Camera2Capturer` to 
 be `synchronized`.

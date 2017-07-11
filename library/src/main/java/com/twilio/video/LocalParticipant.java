@@ -153,9 +153,18 @@ public class LocalParticipant {
     }
 
     /**
+     * This method is a no-op. Native memory will be released when {@link Room#disconnect()}
+     * is called.
+     */
+    @Deprecated
+    public synchronized void release() {
+        // No-op until we remove in 2.x
+    }
+
+    /*
      * Releases native memory owned by local participant.
      */
-    public synchronized void release() {
+    synchronized void internalRelease() {
         if (!isReleased()) {
             nativeRelease(nativeLocalParticipantHandle);
             nativeLocalParticipantHandle = 0;

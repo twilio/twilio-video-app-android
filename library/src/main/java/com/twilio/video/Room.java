@@ -86,7 +86,7 @@ public class Room {
 
             if (localParticipant != null) {
                 // Ensure the local participant is released if the disconnect was issued by the core
-                localParticipant.release();
+                localParticipant.internalRelease();
             }
             Room.this.roomState = RoomState.DISCONNECTED;
             handler.post(new Runnable() {
@@ -247,7 +247,7 @@ public class Room {
     public synchronized void disconnect() {
         if (roomState != RoomState.DISCONNECTED && nativeRoomDelegate != 0) {
             if (localParticipant != null) {
-                localParticipant.release();
+                localParticipant.internalRelease();
             }
             nativeDisconnect(nativeRoomDelegate);
         }
