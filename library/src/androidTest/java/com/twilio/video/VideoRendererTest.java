@@ -81,7 +81,6 @@ public class VideoRendererTest {
     }
 
     @Test
-    @Ignore("Ignore until we understand issues GSDK-1132 GSDK-1139")
     public void canRenderCameraCapturerFrameToBitmap() throws InterruptedException {
         BitmapVideoRenderer bitmapVideoRenderer = new BitmapVideoRenderer();
         final CountDownLatch bitmapCaptured = new CountDownLatch(1);

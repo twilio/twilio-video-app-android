@@ -12,6 +12,10 @@ Improvements
 - Changed `getSupportedFormats` for `CameraCapturer`, `ScreenCapturer`, and `Camera2Capturer` to 
 be `synchronized`.
 
+Bug Fixes
+
+- Fixed timing issue where camera was not always available after a video track was released. [#126](https://github.com/twilio/video-quickstart-android/issues/126)
+
 Known issues
 
 - Network handoff, and subsequent connection renegotiation is not supported for IPv6 networks [#72](https://github.com/twilio/video-quickstart-android/issues/72)
