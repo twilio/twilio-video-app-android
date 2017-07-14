@@ -34,6 +34,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 import static org.junit.Assume.assumeNotNull;
 import static org.junit.Assume.assumeTrue;
 
@@ -128,6 +129,54 @@ public class CameraCapturerTest extends BaseCameraCapturerTest {
 
         // Validate our constraints are applied
         assertEquals(videoConstraints, localVideoTrack.getVideoConstraints());
+    }
+
+    @Test
+    public void cameraShouldBeAvailableAfterVideoTrackReleased() throws InterruptedException {
+        final CameraCapturer.CameraSource cameraSource = CameraCapturer.CameraSource.FRONT_CAMERA;
+        final CountDownLatch firstFrameReceived = new CountDownLatch(1);
+        final CameraCapturerFormatProvider formatProvider = new CameraCapturerFormatProvider();
+        cameraCapturer = new CameraCapturer(cameraCapturerActivity,
+                cameraSource,
+                new CameraCapturer.Listener() {
+                    @Override
+                    public void onFirstFrameAvailable() {
+                        firstFrameReceived.countDown();
+                    }
+
+                    @Override
+                    public void onCameraSwitched() {
+
+                    }
+
+                    @Override
+                    public void onError(@CameraCapturer.Error int errorCode) {
+
+                    }
+                }, formatProvider);
+        localVideoTrack = LocalVideoTrack.create(cameraCapturerActivity,
+                true,
+                cameraCapturer);
+
+        // Validate we got our first frame
+        assertTrue(firstFrameReceived.await(CAMERA_CAPTURE_DELAY_MS, TimeUnit.MILLISECONDS));
+
+        // Release track
+        localVideoTrack.release();
+
+        // Now validate that the camera service is available for the same camera ID
+        int cameraId = formatProvider.getCameraId(cameraSource);
+        Camera camera = null;
+        try {
+            camera = Camera.open(cameraId);
+            assertNotNull(camera);
+        } catch (RuntimeException e) {
+            fail("Failed to connect to camera service after video track was released");
+        } finally {
+            if (camera != null) {
+                camera.release();
+            }
+        }
     }
 
     @Test

@@ -34,12 +34,14 @@ import org.webrtc.Camera1Capturer;
 import org.webrtc.Camera1Session;
 import org.webrtc.CameraVideoCapturer;
 import org.webrtc.SurfaceTextureHelper;
+import org.webrtc.ThreadUtils;
 
 import java.io.ByteArrayOutputStream;
 import java.lang.annotation.Retention;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import static java.lang.annotation.RetentionPolicy.SOURCE;
@@ -56,6 +58,8 @@ import static java.lang.annotation.RetentionPolicy.SOURCE;
  * {@link LocalVideoTrack}s simultaneously.</p>
  */
 public class CameraCapturer implements VideoCapturer {
+    private static final int CAMERA_CLOSED_TIMEOUT_MS = 1500;
+    private static final String CAMERA_CLOSED_FAILED = "Failed to close camera";
     private static final String ERROR_MESSAGE_CAMERA_SERVER_DIED = "Camera server died!";
     private static final String ERROR_MESSAGE_UNKNOWN = "Camera error:";
     private static final Logger logger = Logger.getLogger(CameraCapturer.class);
@@ -119,25 +123,32 @@ public class CameraCapturer implements VideoCapturer {
 
                     // Transition the camera capturer to running state
                     synchronized (stateLock) {
-                        state = State.RUNNING;
                         /*
-                         * The user requested a camera parameter update while the capturer was
-                         * not running. We need to apply these parameters after the capturer
-                         * is started to ensure consistency on the camera capturer instance.
+                         * We only transition from STARTING to RUNNING
                          */
-                        if (cameraParameterUpdater != null) {
-                            updateCameraParametersOnCameraThread(cameraParameterUpdater);
-                            cameraParameterUpdater = null;
-                        }
+                        if (state == State.STARTING) {
+                            state = State.RUNNING;
+                            /*
+                             * The user requested a camera parameter update while the capturer was
+                             * not running. We need to apply these parameters after the capturer
+                             * is started to ensure consistency on the camera capturer instance.
+                             */
+                            if (cameraParameterUpdater != null) {
+                                updateCameraParametersOnCameraThread(cameraParameterUpdater);
+                                cameraParameterUpdater = null;
+                            }
 
-                        /*
-                         * The user requested a picture while capturer was not running. We service
-                         * the request once we know the capturer is running so user does not
-                         * have to wait for capturer to start to take a picture.
-                         */
-                        if (pictureListener != null) {
-                            takePicture(pictureListener);
-                            pictureListener = null;
+                            /*
+                             * The user requested a picture while capturer was not running. We
+                             * service the request once we know the capturer is running so user
+                             * does not have to wait for capturer to start to take a picture.
+                             */
+                            if (pictureListener != null) {
+                                takePicture(pictureListener);
+                                pictureListener = null;
+                            }
+                        } else {
+                            logger.w("Attempted to transition from " + state + " to RUNNING");
                         }
                     }
 
@@ -145,13 +156,10 @@ public class CameraCapturer implements VideoCapturer {
 
                 @Override
                 public void onCapturerStopped() {
-                    // Transition the camera capturer to idle
-                    synchronized (stateLock) {
-                        // Clear our current camera session
-                        CameraCapturer.this.camera1Session = null;
-
-                        state = State.IDLE;
-                    }
+                    /*
+                     * Ignore this event because it does not accurately indicate that the we
+                     * have stopped capturing frames and the camera resource is freed.
+                     */
                 }
 
                 @Override
@@ -189,6 +197,7 @@ public class CameraCapturer implements VideoCapturer {
     private CameraParameterUpdater cameraParameterUpdater;
     private PictureListener pictureListener;
 
+    private CountDownLatch cameraClosed;
     private final CameraVideoCapturer.CameraEventsHandler cameraEventsHandler =
             new CameraVideoCapturer.CameraEventsHandler() {
                 @Override
@@ -226,7 +235,15 @@ public class CameraCapturer implements VideoCapturer {
 
                 @Override
                 public void onCameraClosed() {
-                    // Ignore this event for now
+                    synchronized (stateLock) {
+                        if (state == State.STOPPING) {
+                            // Null out the camera session because it is no longer usable
+                            CameraCapturer.this.camera1Session = null;
+
+                            // We are awaiting the camera being freed in stopCapture
+                            cameraClosed.countDown();
+                        }
+                    }
                 }
 
                 @Override
@@ -355,10 +372,23 @@ public class CameraCapturer implements VideoCapturer {
         if (webRtcCameraCapturer != null) {
             synchronized (stateLock) {
                 state = State.STOPPING;
+                cameraClosed = new CountDownLatch(1);
             }
             webRtcCameraCapturer.stopCapture();
             webRtcCameraCapturer.dispose();
             webRtcCameraCapturer = null;
+
+            /*
+             * We must wait until the camera closed event has been fired. This event indicates
+             * that we have stopped capturing and that the camera resource is freed for more details
+             * see GSDK-1132.
+             */
+            Preconditions.checkState(ThreadUtils.awaitUninterruptibly(cameraClosed,
+                    CAMERA_CLOSED_TIMEOUT_MS), CAMERA_CLOSED_FAILED);
+            synchronized (stateLock) {
+                cameraClosed = null;
+                state = State.IDLE;
+            }
         }
     }
 
