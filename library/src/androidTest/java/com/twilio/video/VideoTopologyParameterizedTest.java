@@ -228,36 +228,6 @@ public class VideoTopologyParameterizedTest extends BaseClientTest {
         assertNotNull(roomListener.getTwilioException().getMessage());
     }
 
-    @Test(expected = IllegalStateException.class)
-    public void connect_shouldShouldFailIfLocalVideoTrackReleasedBeforeConnect()
-            throws InterruptedException {
-        roomListener.onConnectedLatch = new CountDownLatch(1);
-        roomListener.onDisconnectedLatch = new CountDownLatch(1);
-        localVideoTrack = LocalVideoTrack.create(mediaTestActivity, true, new FakeVideoCapturer());
-        List<LocalVideoTrack> localVideoTracks = Collections.singletonList(localVideoTrack);
-        ConnectOptions connectOptions = new ConnectOptions.Builder(token)
-            .roomName(roomName)
-            .videoTracks(localVideoTracks)
-            .build();
-        localVideoTrack.release();
-        Video.connect(mediaTestActivity, connectOptions, roomListener);
-    }
-
-    @Test(expected = IllegalStateException.class)
-    public void connect_shouldShouldFailIfLocalAudioTrackReleasedBeforeConnect()
-            throws InterruptedException {
-        roomListener.onConnectedLatch = new CountDownLatch(1);
-        roomListener.onDisconnectedLatch = new CountDownLatch(1);
-        localAudioTrack = LocalAudioTrack.create(mediaTestActivity, true);
-        List<LocalAudioTrack> localAudioTracks = Collections.singletonList(localAudioTrack);
-        ConnectOptions connectOptions = new ConnectOptions.Builder(token)
-            .roomName(roomName)
-            .audioTracks(localAudioTracks)
-            .build();
-        localAudioTrack.release();
-        Video.connect(mediaTestActivity, connectOptions, roomListener);
-    }
-
     @Test
     public void connect_shouldAllowLocalVideoTrackToBeReleasedWhileConnecting()
             throws InterruptedException {

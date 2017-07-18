@@ -17,31 +17,20 @@
 package com.twilio.video;
 
 
-import android.support.annotation.Nullable;
-import android.support.test.InstrumentationRegistry;
 import android.support.test.filters.LargeTest;
-import android.support.test.rule.ActivityTestRule;
 
-import com.twilio.video.base.BaseClientTest;
+import com.twilio.video.base.BaseStatsTest;
 import com.twilio.video.helper.CallbackHelper;
-import com.twilio.video.ui.MediaTestActivity;
-import com.twilio.video.util.CredentialsUtils;
-import com.twilio.video.util.Constants;
 import com.twilio.video.util.FakeVideoCapturer;
-import com.twilio.video.util.PermissionUtils;
-import com.twilio.video.util.RandUtils;
-import com.twilio.video.util.RoomUtils;
 import com.twilio.video.util.Topology;
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
-import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -51,12 +40,11 @@ import java.util.concurrent.TimeUnit;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 @RunWith(Parameterized.class)
 @LargeTest
-public class StatsTopologyParameterizedTest extends BaseClientTest {
+public class StatsTopologyParameterizedTest extends BaseStatsTest {
     @Parameterized.Parameters(name = "{0}")
     public static Iterable<Object[]> data() {
         return Arrays.asList(new Object[][]{
@@ -64,108 +52,20 @@ public class StatsTopologyParameterizedTest extends BaseClientTest {
                 {Topology.GROUP}});
     }
 
-    @Rule
-    public ActivityTestRule<MediaTestActivity> activityRule =
-            new ActivityTestRule<>(MediaTestActivity.class);
-    private MediaTestActivity mediaTestActivity;
-    private String aliceToken, bobToken;
-    private String roomName;
-    private Room aliceRoom, bobRoom;
-    private LocalVideoTrack aliceLocalVideoTrack;
-    private LocalAudioTrack aliceLocalAudioTrack;
-    private LocalVideoTrack bobLocalVideoTrack;
-    private LocalAudioTrack bobLocalAudioTrack;
-    private CallbackHelper.FakeRoomListener aliceListener, bobListener;
-    private CallbackHelper.FakeParticipantListener aliceMediaListener, bobMediaListener;
-    private final Topology topology;
-
     public StatsTopologyParameterizedTest(Topology topology) {
         this.topology = topology;
     }
 
     @Before
     public void setup() throws InterruptedException {
-        super.setup();
-        mediaTestActivity = activityRule.getActivity();
-        PermissionUtils.allowPermissions(mediaTestActivity);
-        roomName = RandUtils.generateRandomString(20);
-        assertNotNull(RoomUtils.createRoom(roomName, topology));
-        aliceToken = CredentialsUtils.getAccessToken(Constants.PARTICIPANT_ALICE, topology);
-        bobToken = CredentialsUtils.getAccessToken(Constants.PARTICIPANT_BOB, topology);
-        aliceListener = new CallbackHelper.FakeRoomListener();
-        aliceMediaListener = new CallbackHelper.FakeParticipantListener();
-        bobMediaListener = new CallbackHelper.FakeParticipantListener();
-        bobListener = new CallbackHelper.FakeRoomListener();
+        super.baseSetup(topology);
     }
 
     @After
-    public void teardown() throws InterruptedException{
-        roomTearDown(aliceRoom);
-        roomTearDown(bobRoom);
-        if (aliceLocalAudioTrack != null) {
-            aliceLocalAudioTrack.release();
-        }
-        if (aliceLocalVideoTrack != null) {
-            aliceLocalVideoTrack.release();
-        }
-        if (bobLocalAudioTrack != null) {
-            bobLocalAudioTrack.release();
-        }
-        if (bobLocalVideoTrack != null) {
-            bobLocalVideoTrack.release();
-        }
+    @Override
+    public void teardown() throws InterruptedException {
+        super.teardown();
         assertTrue(MediaFactory.isReleased());
-    }
-
-    @Test(expected = NullPointerException.class)
-    public void shouldFailWithNullListener() throws InterruptedException {
-        aliceRoom = createRoom(aliceToken, aliceListener, roomName);
-        aliceRoom.getStats(null);
-    }
-
-    @Test
-    public void shouldReceiveStatsInEmptyRoom() throws InterruptedException {
-        aliceRoom = createRoom(aliceToken, aliceListener, roomName);
-
-        CallbackHelper.FakeStatsListener aliceStatsListener =
-                new CallbackHelper.FakeStatsListener();
-        aliceStatsListener.onStatsLatch = new CountDownLatch(1);
-        aliceRoom.getStats(aliceStatsListener);
-        assertTrue(aliceStatsListener.onStatsLatch.await(20, TimeUnit.SECONDS));
-        assertTrue(1 >= aliceStatsListener.getStatsReports().size());
-    }
-
-    @Test
-    public void shouldInvokeListenerOnCallingThread() throws InterruptedException {
-        // Connect Alice to room with local audio track only
-        aliceLocalAudioTrack = LocalAudioTrack.create(mediaTestActivity, true);
-        aliceRoom = createRoom(aliceToken,
-                aliceListener,
-                roomName,
-                Collections.singletonList(aliceLocalAudioTrack));
-        aliceListener.onParticipantConnectedLatch = new CountDownLatch(1);
-        final CountDownLatch statsCallback = new CountDownLatch(1);
-
-        /*
-         * Run on UI thread to avoid thread hopping between the test runner thread and the UI
-         * thread.
-         */
-        InstrumentationRegistry.getInstrumentation().runOnMainSync(new Runnable() {
-            @Override
-            public void run() {
-                final long callingThreadId = Thread.currentThread().getId();
-                StatsListener statsListener = new StatsListener() {
-                    @Override
-                    public void onStats(List<StatsReport> statsReports) {
-                        assertEquals(callingThreadId, Thread.currentThread().getId());
-                        statsCallback.countDown();
-                    }
-                };
-                aliceRoom.getStats(statsListener);
-            }
-        });
-
-        assertTrue(statsCallback.await(20, TimeUnit.SECONDS));
     }
 
     @Test
@@ -324,7 +224,7 @@ public class StatsTopologyParameterizedTest extends BaseClientTest {
 
     @Test
     public void shouldGetStatsForMultipleRequests() throws InterruptedException {
-        final int numberOfRequests = 10;
+        final int numberOfRequests = 4;
 
         // Connect Alice to room with local audio track only
         aliceLocalAudioTrack = LocalAudioTrack.create(mediaTestActivity, true);
@@ -517,7 +417,6 @@ public class StatsTopologyParameterizedTest extends BaseClientTest {
 
         // wait for disconnect
         assertTrue(aliceListener.onDisconnectedLatch.await(20, TimeUnit.SECONDS));
-        Thread.sleep(2000);
 
         // call get stats after room has been disconnected
         aliceStatsListener =
@@ -525,53 +424,6 @@ public class StatsTopologyParameterizedTest extends BaseClientTest {
         aliceStatsListener.onStatsLatch = new CountDownLatch(1);
         aliceRoom.getStats(aliceStatsListener);
         assertFalse(aliceStatsListener.onStatsLatch.await(5, TimeUnit.SECONDS));
-    }
-
-    private Room createRoom(String token,
-                            CallbackHelper.FakeRoomListener listener,
-                            String roomName) throws InterruptedException {
-        return createRoom(token, listener, roomName, null, null);
-    }
-
-    private Room createRoom(String token,
-                            CallbackHelper.FakeRoomListener listener,
-                            String roomName,
-                            List<LocalAudioTrack> audioTracks) throws InterruptedException {
-        return createRoom(token, listener, roomName, audioTracks, null);
-    }
-
-    private Room createRoom(String token,
-                            CallbackHelper.FakeRoomListener listener,
-                            String roomName,
-                            @Nullable List<LocalAudioTrack> audioTracks,
-                            @Nullable List<LocalVideoTrack> videoTracks)
-            throws InterruptedException {
-        listener.onConnectedLatch = new CountDownLatch(1);
-
-        if (audioTracks == null) {
-           audioTracks = new ArrayList<>();
-        }
-        if (videoTracks == null) {
-           videoTracks = new ArrayList<>();
-        }
-        ConnectOptions connectOptions = new ConnectOptions.Builder(token)
-                .roomName(roomName)
-                .audioTracks(audioTracks)
-                .videoTracks(videoTracks)
-                .build();
-        Room room = Video.connect(mediaTestActivity, connectOptions, listener);
-        assertTrue(listener.onConnectedLatch.await(20, TimeUnit.SECONDS));
-
-        return room;
-    }
-
-    private void roomTearDown(Room room) throws InterruptedException {
-        if (room != null && room.getState() != RoomState.DISCONNECTED) {
-            CallbackHelper.FakeRoomListener roomListener = new CallbackHelper.FakeRoomListener();
-            roomListener.onDisconnectedLatch = new CountDownLatch(1);
-            room.disconnect();
-            roomListener.onDisconnectedLatch.await(10, TimeUnit.SECONDS);
-        }
     }
 
     private void expectStatsReportTracksSize(StatsReport statsReport, int localAudioTrackSize,
