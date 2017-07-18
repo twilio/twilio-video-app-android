@@ -60,11 +60,11 @@ public class RemoteParticipantUnitTest {
 
     @Test(expected = UnsupportedOperationException.class)
     public void shouldNotAllowModifyingSubscribedAudioTracks() {
-        remoteParticipant.getSubscribedAudioTracks().add(mockRemoteAudioTrack);
+        remoteParticipant.getRemoteAudioTracks().add(mockRemoteAudioTrack);
     }
 
     @Test(expected = UnsupportedOperationException.class)
     public void shouldNotAllowModifyingSubscribedVideoTracks() {
-        remoteParticipant.getSubscribedVideoTracks().add(mockRemoteVideoTrackOne);
+        remoteParticipant.getRemoteVideoTracks().add(mockRemoteVideoTrackOne);
     }
 }

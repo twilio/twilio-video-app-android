@@ -78,7 +78,7 @@ public class RemoteVideoTrackTopologyParameterizedTest extends BaseParticipantTe
 
         assertTrue(actor2LocalParticipant.addVideoTrack(actor2LocalVideoTrack));
         assertTrue(participantListener.onVideoTrackAddedLatch.await(20, TimeUnit.SECONDS));
-        List<RemoteVideoTrack> remoteVideoTracks = remoteParticipant.getSubscribedVideoTracks();
+        List<RemoteVideoTrack> remoteVideoTracks = remoteParticipant.getRemoteVideoTracks();
         assertEquals(1, remoteVideoTracks.size());
         remoteVideoTracks.get(0).addRenderer(null);
     }
@@ -98,7 +98,7 @@ public class RemoteVideoTrackTopologyParameterizedTest extends BaseParticipantTe
 
         assertTrue(actor2LocalParticipant.addVideoTrack(actor2LocalVideoTrack));
         assertTrue(participantListener.onVideoTrackAddedLatch.await(20, TimeUnit.SECONDS));
-        List<RemoteVideoTrack> remoteVideoTracks = remoteParticipant.getSubscribedVideoTracks();
+        List<RemoteVideoTrack> remoteVideoTracks = remoteParticipant.getRemoteVideoTracks();
         assertEquals(1, remoteVideoTracks.size());
         FrameCountRenderer frameCountRenderer = new FrameCountRenderer();
         remoteVideoTracks.get(0).addRenderer(frameCountRenderer);
@@ -118,7 +118,7 @@ public class RemoteVideoTrackTopologyParameterizedTest extends BaseParticipantTe
 
         assertTrue(actor2LocalParticipant.addVideoTrack(actor2LocalVideoTrack));
         assertTrue(participantListener.onVideoTrackAddedLatch.await(20, TimeUnit.SECONDS));
-        List<RemoteVideoTrack> remoteVideoTracks = remoteParticipant.getSubscribedVideoTracks();
+        List<RemoteVideoTrack> remoteVideoTracks = remoteParticipant.getRemoteVideoTracks();
         assertEquals(1, remoteVideoTracks.size());
         FrameCountRenderer frameCountRenderer = new FrameCountRenderer();
         RemoteVideoTrack remoteVideoTrack = remoteVideoTracks.get(0);
@@ -142,10 +142,10 @@ public class RemoteVideoTrackTopologyParameterizedTest extends BaseParticipantTe
 
         assertTrue(actor2LocalParticipant.addVideoTrack(actor2LocalVideoTrack));
         assertTrue(participantListener.onVideoTrackAddedLatch.await(20, TimeUnit.SECONDS));
-        assertFalse(actor1Room.getRemoteParticipants().get(0).getSubscribedVideoTracks().get(0).isEnabled());
+        assertFalse(actor1Room.getRemoteParticipants().get(0).getRemoteVideoTracks().get(0).isEnabled());
 
         actor2LocalVideoTrack.enable(true);
         assertTrue(participantListener.onVideoTrackEnabledLatch.await(20, TimeUnit.SECONDS));
-        assertTrue(actor1Room.getRemoteParticipants().get(0).getSubscribedVideoTracks().get(0).isEnabled());
+        assertTrue(actor1Room.getRemoteParticipants().get(0).getRemoteVideoTracks().get(0).isEnabled());
     }
 }

@@ -226,13 +226,13 @@ public class RemoteParticipantTopologyParameterizedTest extends BaseParticipantT
         // Cache remoteParticipant two tracks
         List<RemoteAudioTrack> remoteAudioTracks = actor1RoomListener
                 .getRemoteParticipant()
-                .getSubscribedAudioTracks();
+                .getRemoteAudioTracks();
         List<AudioTrack> audioTracks = actor1RoomListener
                 .getRemoteParticipant()
                 .getAudioTracks();
         List<RemoteVideoTrack> remoteVideoTracks = actor1RoomListener
                 .getRemoteParticipant()
-                .getSubscribedVideoTracks();
+                .getRemoteVideoTracks();
         List<VideoTrack> videoTracks = actor1RoomListener
                 .getRemoteParticipant()
                 .getVideoTracks();
@@ -245,16 +245,16 @@ public class RemoteParticipantTopologyParameterizedTest extends BaseParticipantT
 
         // Validate that disconnected remoteParticipant has all tracks
         assertEquals(remoteAudioTracks.get(0).isEnabled(),
-                remoteParticipant.getSubscribedAudioTracks().get(0).isEnabled());
+                remoteParticipant.getRemoteAudioTracks().get(0).isEnabled());
         assertEquals(audioTracks.get(0).isEnabled(),
                 remoteParticipant.getAudioTracks().get(0).isEnabled());
-        assertEquals(remoteAudioTracks.get(0), remoteParticipant.getSubscribedAudioTracks().get(0));
+        assertEquals(remoteAudioTracks.get(0), remoteParticipant.getRemoteAudioTracks().get(0));
         assertEquals(audioTracks.get(0), remoteParticipant.getAudioTracks().get(0));
         assertEquals(remoteVideoTracks.get(0).isEnabled(),
-                remoteParticipant.getSubscribedVideoTracks().get(0).isEnabled());
+                remoteParticipant.getRemoteVideoTracks().get(0).isEnabled());
         assertEquals(videoTracks.get(0).isEnabled(),
                 remoteParticipant.getVideoTracks().get(0).isEnabled());
-        assertEquals(remoteVideoTracks.get(0), remoteParticipant.getSubscribedVideoTracks().get(0));
+        assertEquals(remoteVideoTracks.get(0), remoteParticipant.getRemoteVideoTracks().get(0));
         assertEquals(videoTracks.get(0), remoteParticipant.getVideoTracks().get(0));
     }
 }

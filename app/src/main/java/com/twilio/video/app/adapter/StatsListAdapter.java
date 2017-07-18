@@ -233,7 +233,7 @@ public class StatsListAdapter extends RecyclerView.Adapter<StatsListAdapter.View
     }
 
     private RemoteAudioTrack getAudioTrack(RemoteParticipant remoteParticipant, String trackId) {
-        for (RemoteAudioTrack remoteAudioTrack : remoteParticipant.getSubscribedAudioTracks()) {
+        for (RemoteAudioTrack remoteAudioTrack : remoteParticipant.getRemoteAudioTracks()) {
             if (remoteAudioTrack.getTrackId().equals(trackId)) {
                 return remoteAudioTrack;
             }
@@ -243,7 +243,7 @@ public class StatsListAdapter extends RecyclerView.Adapter<StatsListAdapter.View
     }
 
     private RemoteVideoTrack getRemoteVideoTrack(RemoteParticipant remoteParticipant, String trackId) {
-        for (RemoteVideoTrack remoteVideoTrack : remoteParticipant.getSubscribedVideoTracks()) {
+        for (RemoteVideoTrack remoteVideoTrack : remoteParticipant.getRemoteVideoTracks()) {
             if (remoteVideoTrack.getTrackId().equals(trackId)) {
                 return remoteVideoTrack;
             }

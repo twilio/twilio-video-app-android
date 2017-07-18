@@ -939,9 +939,9 @@ public class RoomActivity extends BaseActivity {
         ParticipantListener listener = new ParticipantListener();
         remoteParticipant.setListener(listener);
         boolean muted =
-            remoteParticipant.getSubscribedAudioTracks().size() > 0 ? !remoteParticipant.getSubscribedAudioTracks().get(0).isEnabled() : true;
+            remoteParticipant.getRemoteAudioTracks().size() > 0 ? !remoteParticipant.getRemoteAudioTracks().get(0).isEnabled() : true;
 
-        List<RemoteVideoTrack> remoteVideoTracks = remoteParticipant.getSubscribedVideoTracks();
+        List<RemoteVideoTrack> remoteVideoTracks = remoteParticipant.getRemoteVideoTracks();
 
         if (remoteVideoTracks.size() == 0) {
             addParticipantVideoTrack(
@@ -1327,7 +1327,7 @@ public class RoomActivity extends BaseActivity {
                 primary.sid.equals(remoteParticipant.getSid()) &&
                 primary.videoTrack == remoteVideoTrack) {
 
-                List<RemoteVideoTrack> remoteVideoTracks = remoteParticipant.getSubscribedVideoTracks();
+                List<RemoteVideoTrack> remoteVideoTracks = remoteParticipant.getRemoteVideoTracks();
                 if (remoteVideoTracks.size() > 0) {
                     //find next video track that belongs to remoteParticipant and render as primary
                     for (RemoteVideoTrack newRemoteVideoTrack : remoteVideoTracks) {

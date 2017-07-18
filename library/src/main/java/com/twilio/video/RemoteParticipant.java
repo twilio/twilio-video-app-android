@@ -270,7 +270,7 @@ public class RemoteParticipant implements Participant {
      *
      * @return list of audio tracks.
      */
-    public List<RemoteAudioTrack> getSubscribedAudioTracks() {
+    public List<RemoteAudioTrack> getRemoteAudioTracks() {
         return Collections.unmodifiableList(remoteAudioTracks);
     }
 
@@ -279,7 +279,7 @@ public class RemoteParticipant implements Participant {
      *
      * @return list of video tracks.
      */
-    public List<RemoteVideoTrack> getSubscribedVideoTracks() {
+    public List<RemoteVideoTrack> getRemoteVideoTracks() {
         return Collections.unmodifiableList(remoteVideoTracks);
     }
 
