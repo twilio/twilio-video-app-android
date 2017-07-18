@@ -149,8 +149,8 @@ public class LocalVideoTrackTest extends BaseLocalVideoTrackTest {
         localVideoTrack.removeRenderer(frameCountRenderer);
     }
 
-    @Test
-    public void addRenderer_shouldSilentlyFailAfterReleased() throws InterruptedException {
+    @Test(expected = IllegalStateException.class)
+    public void addRenderer_shouldFailAfterReleased() throws InterruptedException {
         localVideoTrack = LocalVideoTrack.create(context, true, fakeVideoCapturer);
         localVideoTrack.addRenderer(frameCountRenderer);
         assertTrue(frameCountRenderer.waitForFrame(LOCAL_VIDEO_TRACK_TEST_DELAY_MS));
@@ -158,8 +158,8 @@ public class LocalVideoTrackTest extends BaseLocalVideoTrackTest {
         localVideoTrack.addRenderer(new FakeVideoRenderer());
     }
 
-    @Test
-    public void removeRenderer_shouldSilentlyFailAfterReleased() throws InterruptedException {
+    @Test(expected = IllegalStateException.class)
+    public void removeRenderer_shouldFailAfterReleased() throws InterruptedException {
         localVideoTrack = LocalVideoTrack.create(context, true, fakeVideoCapturer);
         localVideoTrack.addRenderer(frameCountRenderer);
         assertTrue(frameCountRenderer.waitForFrame(LOCAL_VIDEO_TRACK_TEST_DELAY_MS));

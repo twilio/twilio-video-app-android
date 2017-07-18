@@ -108,25 +108,29 @@ jobject createRemoteParticipantAudioTracks(JNIEnv *env,
     jobject j_remote_audio_tracks = env->NewObject(j_array_list_class, j_array_list_ctor_id);
 
     const std::vector<std::shared_ptr<twilio::media::RemoteAudioTrack>> remote_audio_tracks =
-            remote_participant_context->remote_participant->getSubscribedAudioTracks();
+            remote_participant_context->remote_participant->getRemoteAudioTracks();
 
     // Add audio tracks to array list
     for (unsigned int i = 0; i < remote_audio_tracks.size(); i++) {
         std::shared_ptr<twilio::media::RemoteAudioTrack> remote_audio_track = remote_audio_tracks[i];
-        jobject j_remote_audio_track =
-                createJavaRemoteAudioTrack(env,
-                                           remote_audio_track,
-                                           j_remote_audio_track_class,
-                                           j_remote_audio_track_ctor_id);
 
-        /*
-         * We create a global reference to the java audio track so we can map audio track events
-         * to the original java instance.
-         */
-        remote_participant_context->remote_audio_track_map
-                .insert(std::make_pair(remote_audio_track,
-                                       webrtc_jni::NewGlobalRef(env, j_remote_audio_track)));
-        env->CallVoidMethod(j_remote_audio_tracks, j_array_list_add, j_remote_audio_track);
+        // TODO: GSDK-1214 We are only surfacing tracks that are subscribed right now
+        if (remote_audio_track->isSubscribed()) {
+            jobject j_remote_audio_track =
+                    createJavaRemoteAudioTrack(env,
+                                               remote_audio_track,
+                                               j_remote_audio_track_class,
+                                               j_remote_audio_track_ctor_id);
+
+            /*
+             * We create a global reference to the java audio track so we can map audio track events
+             * to the original java instance.
+             */
+            remote_participant_context->remote_audio_track_map
+                    .insert(std::make_pair(remote_audio_track,
+                                           webrtc_jni::NewGlobalRef(env, j_remote_audio_track)));
+            env->CallBooleanMethod(j_remote_audio_tracks, j_array_list_add, j_remote_audio_track);
+        }
     }
 
     return j_remote_audio_tracks;
@@ -142,24 +146,28 @@ jobject createRemoteParticipantVideoTracks(JNIEnv *env,
     jobject j_remote_video_tracks = env->NewObject(j_array_list_class, j_array_list_ctor_id);
 
     const std::vector<std::shared_ptr<twilio::media::RemoteVideoTrack>> remote_video_tracks =
-            remote_participant_context->remote_participant->getSubscribedVideoTracks();
+            remote_participant_context->remote_participant->getRemoteVideoTracks();
 
     // Add video tracks to array list
     for (unsigned int i = 0; i < remote_video_tracks.size(); i++) {
         std::shared_ptr<twilio::media::RemoteVideoTrack> remote_video_track = remote_video_tracks[i];
-        jobject j_remote_video_track =
-                createJavaRemoteVideoTrack(env,
-                                           remote_video_track,
-                                           j_remote_video_track_class,
-                                           j_remote_video_track_ctor_id);
-        /*
-         * We create a global reference to the java video track so we can map video track events
-         * to the original java instance.
-         */
-        remote_participant_context->remote_video_track_map
-                .insert(std::make_pair(remote_video_track,
-                                       webrtc_jni::NewGlobalRef(env, j_remote_video_track)));
-        env->CallVoidMethod(j_remote_video_tracks, j_array_list_add, j_remote_video_track);
+
+        // TODO: GSDK-1214 We are only surfacing tracks that are subscribed right now
+        if (remote_video_track->isSubscribed()) {
+            jobject j_remote_video_track =
+                    createJavaRemoteVideoTrack(env,
+                                               remote_video_track,
+                                               j_remote_video_track_class,
+                                               j_remote_video_track_ctor_id);
+            /*
+             * We create a global reference to the java video track so we can map video track events
+             * to the original java instance.
+             */
+            remote_participant_context->remote_video_track_map
+                    .insert(std::make_pair(remote_video_track,
+                                           webrtc_jni::NewGlobalRef(env, j_remote_video_track)));
+            env->CallBooleanMethod(j_remote_video_tracks, j_array_list_add, j_remote_video_track);
+        }
     }
 
     return j_remote_video_tracks;
@@ -171,8 +179,7 @@ jobject createJavaRemoteAudioTrack(JNIEnv *env,
                                    jmethodID j_remote_audio_track_ctor_id) {
     jstring j_track_id = webrtc_jni::JavaStringFromStdString(env, remote_audio_track->getTrackId());
     jboolean j_is_enabled = remote_audio_track->isEnabled();
-    // TODO: Use real track SID when ready
-    jstring j_track_sid = j_track_id;
+    jstring j_track_sid = webrtc_jni::JavaStringFromStdString(env, remote_audio_track->getSid());
 
     return env->NewObject(j_remote_audio_track_class,
                           j_remote_audio_track_ctor_id,
@@ -195,8 +202,7 @@ jobject createJavaRemoteVideoTrack(JNIEnv *env,
                                                   j_webrtc_video_track_ctor_id,
                                                   webrtc_jni::jlongFromPointer(
                                                           remote_video_track->getWebRtcTrack()));
-    // TODO: Get real track sid
-    jstring j_track_sid = webrtc_jni::JavaStringFromStdString(env, remote_video_track->getTrackId());
+    jstring j_track_sid = webrtc_jni::JavaStringFromStdString(env, remote_video_track->getSid());
 
     return env->NewObject(j_remote_video_track_class,
                           j_remote_video_track_ctor_id,

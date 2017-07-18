@@ -24,6 +24,7 @@ import com.twilio.video.base.BaseParticipantTest;
 import com.twilio.video.helper.CallbackHelper;
 import com.twilio.video.util.CredentialsUtils;
 import com.twilio.video.util.Constants;
+import com.twilio.video.util.FakeVideoCapturer;
 import com.twilio.video.util.RandUtils;
 import com.twilio.video.util.RoomUtils;
 import com.twilio.video.util.Topology;
@@ -166,44 +167,45 @@ public class RemoteParticipantTopologyParameterizedTest extends BaseParticipantT
                 new CallbackHelper.FakeParticipantListener();
         participantListener.onAudioTrackAddedLatch = new CountDownLatch(1);
         remoteParticipant.setListener(participantListener);
-        actor2LocalAudioTrack = LocalAudioTrack.create(mediaTestActivity, true);
-        assertTrue(actor2Room.getLocalParticipant().addAudioTrack(actor2LocalAudioTrack));
+        bobPublishableLocalAudioTrack = LocalAudioTrack.create(mediaTestActivity, true);
+        assertTrue(bobRoom.getLocalParticipant().addAudioTrack(bobPublishableLocalAudioTrack));
         assertTrue(participantListener.onAudioTrackAddedLatch.await(20, TimeUnit.SECONDS));
 
         // Audio track disabled
         participantListener.onAudioTrackDisabledLatch = new CountDownLatch(1);
-        actor2LocalAudioTrack.enable(false);
+        bobPublishableLocalAudioTrack.enable(false);
         assertTrue(participantListener.onAudioTrackDisabledLatch.await(20, TimeUnit.SECONDS));
 
         // Audio track enabled
         participantListener.onAudioTrackEnabledLatch = new CountDownLatch(1);
-        actor2LocalAudioTrack.enable(true);
+        bobPublishableLocalAudioTrack.enable(true);
         assertTrue(participantListener.onAudioTrackEnabledLatch.await(20, TimeUnit.SECONDS));
 
         // Audio track removed
         participantListener.onAudioTrackRemovedLatch = new CountDownLatch(1);
-        actor2Room.getLocalParticipant().removeAudioTrack(actor2LocalAudioTrack);
+        bobRoom.getLocalParticipant().removeAudioTrack(bobPublishableLocalAudioTrack);
         assertTrue(participantListener.onAudioTrackRemovedLatch.await(20, TimeUnit.SECONDS));
 
         // Video track added
         participantListener.onVideoTrackAddedLatch = new CountDownLatch(1);
-        actor2LocalVideoTrack = LocalVideoTrack.create(mediaTestActivity, true, fakeVideoCapturer);
-        assertTrue(actor2Room.getLocalParticipant().addVideoTrack(actor2LocalVideoTrack));
+        bobPublishableLocalVideoTrack = LocalVideoTrack.create(mediaTestActivity, true,
+                new FakeVideoCapturer());
+        assertTrue(bobRoom.getLocalParticipant().addVideoTrack(bobPublishableLocalVideoTrack));
         assertTrue(participantListener.onVideoTrackAddedLatch.await(20, TimeUnit.SECONDS));
 
         // Video track disabled
         participantListener.onVideoTrackDisabledLatch = new CountDownLatch(1);
-        actor2LocalVideoTrack.enable(false);
+        bobPublishableLocalVideoTrack.enable(false);
         assertTrue(participantListener.onVideoTrackDisabledLatch.await(20, TimeUnit.SECONDS));
 
         // Video track enabled
         participantListener.onVideoTrackEnabledLatch = new CountDownLatch(1);
-        actor2LocalVideoTrack.enable(true);
+        bobPublishableLocalVideoTrack.enable(true);
         assertTrue(participantListener.onVideoTrackEnabledLatch.await(20, TimeUnit.SECONDS));
 
         // Video track removed
         participantListener.onVideoTrackRemovedLatch = new CountDownLatch(1);
-        actor2Room.getLocalParticipant().removeVideoTrack(actor2LocalVideoTrack);
+        bobRoom.getLocalParticipant().removeVideoTrack(bobPublishableLocalVideoTrack);
         assertTrue(participantListener.onVideoTrackRemovedLatch.await(20, TimeUnit.SECONDS));
     }
 
@@ -215,33 +217,34 @@ public class RemoteParticipantTopologyParameterizedTest extends BaseParticipantT
                 new CallbackHelper.FakeParticipantListener();
         participantListener.onAudioTrackAddedLatch = new CountDownLatch(1);
         this.remoteParticipant.setListener(participantListener);
-        actor2LocalAudioTrack = LocalAudioTrack.create(mediaTestActivity, false);
-        assertTrue(actor2Room.getLocalParticipant().addAudioTrack(actor2LocalAudioTrack));
+        bobPublishableLocalAudioTrack = LocalAudioTrack.create(mediaTestActivity, false);
+        assertTrue(bobRoom.getLocalParticipant().addAudioTrack(bobPublishableLocalAudioTrack));
         assertTrue(participantListener.onAudioTrackAddedLatch.await(20, TimeUnit.SECONDS));
         participantListener.onVideoTrackAddedLatch = new CountDownLatch(1);
-        actor2LocalVideoTrack = LocalVideoTrack.create(mediaTestActivity, true, fakeVideoCapturer);
-        assertTrue(actor2Room.getLocalParticipant().addVideoTrack(actor2LocalVideoTrack));
+        bobPublishableLocalVideoTrack = LocalVideoTrack.create(mediaTestActivity, true,
+                new FakeVideoCapturer());
+        assertTrue(bobRoom.getLocalParticipant().addVideoTrack(bobPublishableLocalVideoTrack));
         assertTrue(participantListener.onVideoTrackAddedLatch.await(20, TimeUnit.SECONDS));
 
         // Cache remoteParticipant two tracks
-        List<RemoteAudioTrack> remoteAudioTracks = actor1RoomListener
+        List<RemoteAudioTrack> remoteAudioTracks = aliceRoomListener
                 .getRemoteParticipant()
                 .getRemoteAudioTracks();
-        List<AudioTrack> audioTracks = actor1RoomListener
+        List<AudioTrack> audioTracks = aliceRoomListener
                 .getRemoteParticipant()
                 .getAudioTracks();
-        List<RemoteVideoTrack> remoteVideoTracks = actor1RoomListener
+        List<RemoteVideoTrack> remoteVideoTracks = aliceRoomListener
                 .getRemoteParticipant()
                 .getRemoteVideoTracks();
-        List<VideoTrack> videoTracks = actor1RoomListener
+        List<VideoTrack> videoTracks = aliceRoomListener
                 .getRemoteParticipant()
                 .getVideoTracks();
 
         // RemoteParticipant two disconnects
-        actor1RoomListener.onParticipantDisconnectedLatch = new CountDownLatch(1);
-        actor2Room.disconnect();
-        assertTrue(actor1RoomListener.onParticipantDisconnectedLatch.await(20, TimeUnit.SECONDS));
-        RemoteParticipant remoteParticipant = actor1RoomListener.getRemoteParticipant();
+        aliceRoomListener.onParticipantDisconnectedLatch = new CountDownLatch(1);
+        bobRoom.disconnect();
+        assertTrue(aliceRoomListener.onParticipantDisconnectedLatch.await(20, TimeUnit.SECONDS));
+        RemoteParticipant remoteParticipant = aliceRoomListener.getRemoteParticipant();
 
         // Validate that disconnected remoteParticipant has all tracks
         assertEquals(remoteAudioTracks.get(0).isEnabled(),

@@ -6,6 +6,11 @@ Features
 
 - TODO: Add breakdown of Track SID API changes.
 
+Improvements
+
+- Null renderers cannot be added or removed from local or remote video tracks.
+- Renderers cannot be added or removed from a `LocalVideoTrack` that has been released. 
+
 Bug Fixes
 
 - Change visibility of `LocalParticipant#release()` from public to package. 

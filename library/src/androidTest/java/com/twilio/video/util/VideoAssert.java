@@ -14,27 +14,15 @@
  * limitations under the License.
  */
 
-package com.twilio.video;
+package com.twilio.video.util;
 
-/**
- * A remote video track represents a remote video source.
- */
-public class RemoteVideoTrack extends VideoTrack {
-    private final String sid;
+import org.junit.Assert;
 
-    RemoteVideoTrack(org.webrtc.VideoTrack webRtcVideoTrack, boolean enabled, String sid) {
-        super(webRtcVideoTrack, enabled);
-        this.sid = sid;
-    }
+public class VideoAssert extends Assert {
+    private static final String TRACK_SID_REGEX = "^MT[a-zA-Z0-9]{32}$";
 
-    /**
-     * Returns a string that uniquely identifies the remote video track within the scope
-     * of a {@link Room}.
-     *
-     * @return sid
-     */
-    public String getSid() {
-        return sid;
+    public static void assertIsTrackSid(String trackSid) {
+        assertTrue(String.format("%s is not track sid", trackSid),
+                trackSid.matches(TRACK_SID_REGEX));
     }
 }
-

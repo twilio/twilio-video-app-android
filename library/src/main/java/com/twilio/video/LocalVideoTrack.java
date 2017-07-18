@@ -128,6 +128,20 @@ public class LocalVideoTrack extends VideoTrack {
         return videoConstraints;
     }
 
+    @Override
+    public synchronized void addRenderer(@NonNull VideoRenderer videoRenderer) {
+        Preconditions.checkState(!isReleased(), "Cannot add renderer to video track that has " +
+                "been released");
+        super.addRenderer(videoRenderer);
+    }
+
+    @Override
+    public synchronized void removeRenderer(@NonNull VideoRenderer videoRenderer) {
+        Preconditions.checkState(!isReleased(), "Cannot remove renderer from video track that has " +
+                "been released");
+        super.removeRenderer(videoRenderer);
+    }
+
     /**
      * Check if the local video track is enabled.
      *

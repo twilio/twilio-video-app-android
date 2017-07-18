@@ -20,6 +20,7 @@ import android.support.test.filters.LargeTest;
 
 import com.twilio.video.base.BaseParticipantTest;
 import com.twilio.video.helper.CallbackHelper;
+import com.twilio.video.util.FakeVideoCapturer;
 import com.twilio.video.util.FrameCountRenderer;
 import com.twilio.video.util.Topology;
 
@@ -37,7 +38,8 @@ import java.util.concurrent.TimeUnit;
 import static junit.framework.TestCase.assertFalse;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assume.assumeFalse;
+import static com.twilio.video.util.VideoAssert.assertIsTrackSid;
+import static org.junit.Assume.assumeTrue;
 
 @RunWith(Parameterized.class)
 @LargeTest
@@ -69,35 +71,21 @@ public class RemoteVideoTrackTopologyParameterizedTest extends BaseParticipantTe
     }
 
     @Test
-    public void addRenderer_shouldNotCrashForNullRenderer() throws InterruptedException {
-        CallbackHelper.FakeParticipantListener participantListener =
-                new CallbackHelper.FakeParticipantListener();
-        participantListener.onVideoTrackAddedLatch = new CountDownLatch(1);
-        remoteParticipant.setListener(participantListener);
-        actor2LocalVideoTrack = LocalVideoTrack.create(mediaTestActivity, true, fakeVideoCapturer);
+    public void shouldHaveTrackSidAfterAdded() throws InterruptedException {
+        // TODO: GSDK-1249 Re-enable once track sid changes are deployed to prod SFU
+        assumeTrue(topology == Topology.P2P);
+        publishVideoTrack();
 
-        assertTrue(actor2LocalParticipant.addVideoTrack(actor2LocalVideoTrack));
-        assertTrue(participantListener.onVideoTrackAddedLatch.await(20, TimeUnit.SECONDS));
+        // Validate track was added
         List<RemoteVideoTrack> remoteVideoTracks = remoteParticipant.getRemoteVideoTracks();
-        assertEquals(1, remoteVideoTracks.size());
-        remoteVideoTracks.get(0).addRenderer(null);
+        assertEquals(2, remoteVideoTracks.size());
+
+        // Validate track sid
+        assertIsTrackSid(remoteVideoTracks.get(1).getSid());
     }
 
     @Test
-    public void canAddAndRemoveRenderer() throws InterruptedException {
-        /*
-         * TODO: GSDK-1152 skipping test for GROUP only because it is flaky.
-         * Should be investigated after GA.
-         */
-        assumeFalse(topology == Topology.GROUP);
-        CallbackHelper.FakeParticipantListener participantListener =
-                new CallbackHelper.FakeParticipantListener();
-        participantListener.onVideoTrackAddedLatch = new CountDownLatch(1);
-        remoteParticipant.setListener(participantListener);
-        actor2LocalVideoTrack = LocalVideoTrack.create(mediaTestActivity, true, fakeVideoCapturer);
-
-        assertTrue(actor2LocalParticipant.addVideoTrack(actor2LocalVideoTrack));
-        assertTrue(participantListener.onVideoTrackAddedLatch.await(20, TimeUnit.SECONDS));
+    public void canBeRendered() throws InterruptedException {
         List<RemoteVideoTrack> remoteVideoTracks = remoteParticipant.getRemoteVideoTracks();
         assertEquals(1, remoteVideoTracks.size());
         FrameCountRenderer frameCountRenderer = new FrameCountRenderer();
@@ -109,43 +97,33 @@ public class RemoteVideoTrackTopologyParameterizedTest extends BaseParticipantTe
     }
 
     @Test
-    public void shouldFailToAddRendererOnRemovedTrack() throws InterruptedException {
-        CallbackHelper.FakeParticipantListener participantListener =
-                new CallbackHelper.FakeParticipantListener();
-        participantListener.onVideoTrackAddedLatch = new CountDownLatch(1);
-        remoteParticipant.setListener(participantListener);
-        actor2LocalVideoTrack = LocalVideoTrack.create(mediaTestActivity, true, fakeVideoCapturer);
-
-        assertTrue(actor2LocalParticipant.addVideoTrack(actor2LocalVideoTrack));
-        assertTrue(participantListener.onVideoTrackAddedLatch.await(20, TimeUnit.SECONDS));
-        List<RemoteVideoTrack> remoteVideoTracks = remoteParticipant.getRemoteVideoTracks();
-        assertEquals(1, remoteVideoTracks.size());
-        FrameCountRenderer frameCountRenderer = new FrameCountRenderer();
-        RemoteVideoTrack remoteVideoTrack = remoteVideoTracks.get(0);
-
-        actor1RoomListener.onParticipantDisconnectedLatch = new CountDownLatch(1);
-        actor2Room.disconnect();
-        assertTrue(actor1RoomListener.onParticipantDisconnectedLatch.await(20, TimeUnit.SECONDS));
-
-        remoteVideoTrack.addRenderer(frameCountRenderer);
-        assertFalse(frameCountRenderer.waitForFrame(VIDEO_TRACK_TEST_DELAY_MS));
-    }
-
-    @Test
     public void shouldEnableVideoTrackAfterConnectedToRoom() throws InterruptedException {
         CallbackHelper.FakeParticipantListener participantListener =
             new CallbackHelper.FakeParticipantListener();
         participantListener.onVideoTrackAddedLatch = new CountDownLatch(1);
         participantListener.onVideoTrackEnabledLatch = new CountDownLatch(1);
         remoteParticipant.setListener(participantListener);
-        actor2LocalVideoTrack = LocalVideoTrack.create(mediaTestActivity, false, fakeVideoCapturer);
+        bobPublishableLocalVideoTrack = LocalVideoTrack.create(mediaTestActivity, false,
+                new FakeVideoCapturer());
 
-        assertTrue(actor2LocalParticipant.addVideoTrack(actor2LocalVideoTrack));
+        assertTrue(bobLocalParticipant.addVideoTrack(bobPublishableLocalVideoTrack));
         assertTrue(participantListener.onVideoTrackAddedLatch.await(20, TimeUnit.SECONDS));
-        assertFalse(actor1Room.getRemoteParticipants().get(0).getRemoteVideoTracks().get(0).isEnabled());
-
-        actor2LocalVideoTrack.enable(true);
+        assertFalse(aliceRoom.getRemoteParticipants().get(0).getRemoteVideoTracks().get(1)
+                .isEnabled());
+        bobPublishableLocalVideoTrack.enable(true);
         assertTrue(participantListener.onVideoTrackEnabledLatch.await(20, TimeUnit.SECONDS));
-        assertTrue(actor1Room.getRemoteParticipants().get(0).getRemoteVideoTracks().get(0).isEnabled());
+        assertTrue(aliceRoom.getRemoteParticipants().get(0).getRemoteVideoTracks().get(1)
+                .isEnabled());
+    }
+
+    private void publishVideoTrack() throws InterruptedException {
+        CallbackHelper.FakeParticipantListener participantListener =
+                new CallbackHelper.FakeParticipantListener();
+        participantListener.onVideoTrackAddedLatch = new CountDownLatch(1);
+        remoteParticipant.setListener(participantListener);
+        bobPublishableLocalVideoTrack = LocalVideoTrack.create(mediaTestActivity, true,
+                new FakeVideoCapturer());
+        assertTrue(bobLocalParticipant.addVideoTrack(bobPublishableLocalVideoTrack));
+        assertTrue(participantListener.onVideoTrackAddedLatch.await(20, TimeUnit.SECONDS));
     }
 }

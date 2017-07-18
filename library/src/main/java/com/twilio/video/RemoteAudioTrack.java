@@ -34,8 +34,7 @@ public class RemoteAudioTrack extends AudioTrack {
      * @return sid
      */
     public String getSid() {
-        // TODO: Implement once proper SID is used to build object
-        throw new UnsupportedOperationException();
+        return sid;
     }
 
     /**

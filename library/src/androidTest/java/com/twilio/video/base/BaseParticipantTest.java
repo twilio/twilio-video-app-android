@@ -40,6 +40,7 @@ import org.junit.After;
 import org.junit.Rule;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
@@ -49,98 +50,157 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 public abstract class BaseParticipantTest extends BaseClientTest {
-    @Rule
-    public ActivityTestRule<MediaTestActivity> activityRule =
+    @Rule public ActivityTestRule<MediaTestActivity> activityRule =
             new ActivityTestRule<>(MediaTestActivity.class);
     protected MediaTestActivity mediaTestActivity;
-    protected LocalVideoTrack actor1LocalVideoTrack;
-    protected LocalAudioTrack actor1LocalAudioTrack;
-    protected LocalVideoTrack actor2LocalVideoTrack;
-    protected LocalAudioTrack actor2LocalAudioTrack;
-    protected FakeVideoCapturer fakeVideoCapturer;
-    protected String tokenOne;
-    protected String tokenTwo;
-    protected Room actor1Room;
-    protected LocalParticipant actor1LocalParticipant;
-    protected Room actor2Room;
-    protected LocalParticipant actor2LocalParticipant;
-    protected RemoteParticipant remoteParticipant;
-    protected String testRoom;
-    protected CallbackHelper.FakeRoomListener actor1RoomListener;
-    protected CallbackHelper.FakeRoomListener actor2RoomListener;
 
-    protected Room connectClient(String token, Room.Listener roomListener) {
-        ConnectOptions connectOptions = new ConnectOptions.Builder(token)
-                .roomName(testRoom)
-                .build();
+    /*
+     * Alice and bob fixed tracks are provided upon connect.
+     */
+    protected LocalVideoTrack aliceFixedLocalVideoTrack;
+    protected LocalAudioTrack aliceFixedLocalAudioTrack;
+    protected LocalVideoTrack bobFixedLocalVideoTrack;
+    protected LocalAudioTrack bobFixedLocalAudioTrack;
+
+    /*
+     * Alice and bob publishable tracks represent media that can be published and unpublished from a
+     * room. This contrasts the fixed tracks which are added on connect.
+     */
+    protected LocalVideoTrack alicePublishableLocalVideoTrack;
+    protected LocalAudioTrack alicePublishableLocalAudioTrack;
+    protected LocalVideoTrack bobPublishableLocalVideoTrack;
+    protected LocalAudioTrack bobPublishableLocalAudioTrack;
+
+    protected String aliceToken;
+    protected String bobToken;
+    protected Room aliceRoom;
+    protected LocalParticipant aliceLocalParticipant;
+    protected Room bobRoom;
+    protected LocalParticipant bobLocalParticipant;
+    protected RemoteParticipant remoteParticipant;
+    protected String testRoomName;
+    protected CallbackHelper.FakeRoomListener aliceRoomListener;
+    protected CallbackHelper.FakeParticipantListener aliceParticipantListener;
+    protected CallbackHelper.FakeRoomListener bobRoomListener;
+    protected CallbackHelper.FakeParticipantListener bobParticipantListener;
+
+    protected Room connect(ConnectOptions connectOptions,
+                           CallbackHelper.FakeRoomListener roomListener)
+            throws InterruptedException {
+        roomListener.onConnectedLatch = new CountDownLatch(1);
         Room room = Video.connect(mediaTestActivity, connectOptions, roomListener);
+        assertTrue("Failed to connect to room",
+                roomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
         return room;
     }
 
-    protected void disconnectRoom(Room room, CallbackHelper.FakeRoomListener roomListener)
+    protected void disconnect(Room room, CallbackHelper.FakeRoomListener roomListener)
             throws InterruptedException {
         if (room == null || room.getState() == RoomState.DISCONNECTED) {
             return;
         }
         roomListener.onDisconnectedLatch = new CountDownLatch(1);
         room.disconnect();
-        assertTrue(roomListener.onDisconnectedLatch.await(20, TimeUnit.SECONDS));
+        assertTrue("Failed to disconnect from room",
+                roomListener.onDisconnectedLatch.await(20, TimeUnit.SECONDS));
     }
 
     public void baseSetup(Topology topology) throws InterruptedException {
         super.setup();
+        // Setup activity
         mediaTestActivity = activityRule.getActivity();
         PermissionUtils.allowPermissions(mediaTestActivity);
-        testRoom = RandUtils.generateRandomString(10);
-        assertNotNull(RoomUtils.createRoom(testRoom, topology));
-        fakeVideoCapturer = new FakeVideoCapturer();
-        tokenOne = CredentialsUtils.getAccessToken(Constants.PARTICIPANT_ALICE, topology);
 
-        // Connect actor 1
-        actor1RoomListener = new CallbackHelper.FakeRoomListener();
-        actor1RoomListener.onConnectedLatch = new CountDownLatch(1);
-        actor1RoomListener.onParticipantConnectedLatch = new CountDownLatch(1);
-        actor1Room = connectClient(tokenOne, actor1RoomListener);
-        assertTrue(actor1RoomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
-        actor1LocalParticipant = actor1Room.getLocalParticipant();
+        // Setup room
+        testRoomName = RandUtils.generateRandomString(10);
+        assertNotNull(RoomUtils.createRoom(testRoomName, topology));
 
-        // Connect actor 2
-        tokenTwo = CredentialsUtils.getAccessToken(Constants.PARTICIPANT_BOB, topology);
+        // Setup alice
+        aliceToken = CredentialsUtils.getAccessToken(Constants.PARTICIPANT_ALICE, topology);
+        aliceRoomListener = new CallbackHelper.FakeRoomListener();
+        aliceParticipantListener = new CallbackHelper.FakeParticipantListener();
+        aliceParticipantListener.onAudioTrackAddedLatch = new CountDownLatch(1);
+        aliceParticipantListener.onVideoTrackAddedLatch = new CountDownLatch(1);
+        aliceRoomListener.onParticipantConnectedLatch = new CountDownLatch(1);
+        aliceFixedLocalAudioTrack = LocalAudioTrack.create(mediaTestActivity, true);
+        aliceFixedLocalVideoTrack = LocalVideoTrack.create(mediaTestActivity, true,
+                new FakeVideoCapturer());
+        ConnectOptions aliceConnectOptions = new ConnectOptions.Builder(aliceToken)
+                .roomName(testRoomName)
+                .audioTracks(Collections.singletonList(aliceFixedLocalAudioTrack))
+                .videoTracks(Collections.singletonList(aliceFixedLocalVideoTrack))
+                .build();
 
-        actor2RoomListener = new CallbackHelper.FakeRoomListener();
-        actor2RoomListener.onConnectedLatch = new CountDownLatch(1);
-        actor2Room = connectClient(tokenTwo, actor2RoomListener);
-        assertTrue(actor2RoomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
+        // Setup bob
+        bobToken = CredentialsUtils.getAccessToken(Constants.PARTICIPANT_BOB, topology);
+        bobRoomListener = new CallbackHelper.FakeRoomListener();
+        bobParticipantListener = new CallbackHelper.FakeParticipantListener();
+        bobParticipantListener.onAudioTrackAddedLatch = new CountDownLatch(1);
+        bobParticipantListener.onVideoTrackAddedLatch = new CountDownLatch(1);
+        bobFixedLocalAudioTrack = LocalAudioTrack.create(mediaTestActivity, true);
+        bobFixedLocalVideoTrack = LocalVideoTrack.create(mediaTestActivity, true,
+                new FakeVideoCapturer());
+        ConnectOptions bobConnectOptions = new ConnectOptions.Builder(bobToken)
+                .roomName(testRoomName)
+                .audioTracks(Collections.singletonList(bobFixedLocalAudioTrack))
+                .videoTracks(Collections.singletonList(bobFixedLocalVideoTrack))
+                .build();
 
-        // Wait for actor2 to connect
-        assertTrue(actor1RoomListener.onParticipantConnectedLatch.await(20, TimeUnit.SECONDS));
-        actor2LocalParticipant = actor2Room.getLocalParticipant();
-        List<RemoteParticipant> remoteParticipantList = new ArrayList<>(actor1Room.getRemoteParticipants());
+        // Connect alice
+        aliceRoom = connect(aliceConnectOptions, aliceRoomListener);
+        aliceLocalParticipant = aliceRoom.getLocalParticipant();
+
+        // Connect bob
+        bobRoom = connect(bobConnectOptions, bobRoomListener);
+        bobRoom.getRemoteParticipants().get(0).setListener(bobParticipantListener);
+
+        // Alice wait for bob to connect
+        assertTrue(aliceRoomListener.onParticipantConnectedLatch.await(20, TimeUnit.SECONDS));
+        bobLocalParticipant = bobRoom.getLocalParticipant();
+        List<RemoteParticipant> remoteParticipantList = new ArrayList<>(aliceRoom.getRemoteParticipants());
         assertEquals(1, remoteParticipantList.size());
         remoteParticipant = remoteParticipantList.get(0);
+        remoteParticipant.setListener(aliceParticipantListener);
         assertNotNull(remoteParticipant);
+
+        // Alice wait until all of bob tracks are added
+        assertTrue(aliceParticipantListener.onAudioTrackAddedLatch.await(20, TimeUnit.SECONDS));
+        assertTrue(aliceParticipantListener.onVideoTrackAddedLatch.await(20, TimeUnit.SECONDS));
+        assertTrue(bobParticipantListener.onAudioTrackAddedLatch.await(20, TimeUnit.SECONDS));
+        assertTrue(bobParticipantListener.onVideoTrackAddedLatch.await(20, TimeUnit.SECONDS));
     }
 
     @After
     public void teardown() throws InterruptedException{
-        disconnectRoom(actor2Room, actor2RoomListener);
-        actor2Room = null;
-        disconnectRoom(actor1Room, actor1RoomListener);
-        actor1Room = null;
-        actor1RoomListener = null;
+        disconnect(bobRoom, bobRoomListener);
+        bobRoom = null;
+        disconnect(aliceRoom, aliceRoomListener);
+        aliceRoom = null;
+        aliceRoomListener = null;
         remoteParticipant = null;
-        if (actor1LocalAudioTrack != null) {
-            actor1LocalAudioTrack.release();
+        if (aliceFixedLocalAudioTrack != null) {
+            aliceFixedLocalAudioTrack.release();
         }
-        if (actor1LocalVideoTrack != null) {
-            actor1LocalVideoTrack.release();
+        if (aliceFixedLocalVideoTrack != null) {
+            aliceFixedLocalVideoTrack.release();
         }
-        if (actor2LocalAudioTrack != null) {
-            actor2LocalAudioTrack.release();
+        if (bobFixedLocalAudioTrack != null) {
+            bobFixedLocalAudioTrack.release();
         }
-        if (actor2LocalVideoTrack != null) {
-            actor2LocalVideoTrack.release();
+        if (bobFixedLocalVideoTrack != null) {
+            bobFixedLocalVideoTrack.release();
         }
-        fakeVideoCapturer = null;
+        if (alicePublishableLocalAudioTrack != null) {
+            alicePublishableLocalAudioTrack.release();
+        }
+        if (alicePublishableLocalVideoTrack != null) {
+            alicePublishableLocalVideoTrack.release();
+        }
+        if (bobPublishableLocalAudioTrack != null) {
+            bobPublishableLocalAudioTrack.release();
+        }
+        if (bobPublishableLocalVideoTrack != null) {
+            bobPublishableLocalVideoTrack.release();
+        }
     }
 }
