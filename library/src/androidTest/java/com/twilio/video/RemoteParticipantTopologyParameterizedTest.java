@@ -168,7 +168,7 @@ public class RemoteParticipantTopologyParameterizedTest extends BaseParticipantT
         participantListener.onAudioTrackAddedLatch = new CountDownLatch(1);
         remoteParticipant.setListener(participantListener);
         bobPublishableLocalAudioTrack = LocalAudioTrack.create(mediaTestActivity, true);
-        assertTrue(bobRoom.getLocalParticipant().addAudioTrack(bobPublishableLocalAudioTrack));
+        assertTrue(bobRoom.getLocalParticipant().publishAudioTrack(bobPublishableLocalAudioTrack));
         assertTrue(participantListener.onAudioTrackAddedLatch.await(20, TimeUnit.SECONDS));
 
         // Audio track disabled
@@ -183,14 +183,14 @@ public class RemoteParticipantTopologyParameterizedTest extends BaseParticipantT
 
         // Audio track removed
         participantListener.onAudioTrackRemovedLatch = new CountDownLatch(1);
-        bobRoom.getLocalParticipant().removeAudioTrack(bobPublishableLocalAudioTrack);
+        bobRoom.getLocalParticipant().unpublishAudioTrack(bobPublishableLocalAudioTrack);
         assertTrue(participantListener.onAudioTrackRemovedLatch.await(20, TimeUnit.SECONDS));
 
         // Video track added
         participantListener.onVideoTrackAddedLatch = new CountDownLatch(1);
         bobPublishableLocalVideoTrack = LocalVideoTrack.create(mediaTestActivity, true,
                 new FakeVideoCapturer());
-        assertTrue(bobRoom.getLocalParticipant().addVideoTrack(bobPublishableLocalVideoTrack));
+        assertTrue(bobRoom.getLocalParticipant().publishVideoTrack(bobPublishableLocalVideoTrack));
         assertTrue(participantListener.onVideoTrackAddedLatch.await(20, TimeUnit.SECONDS));
 
         // Video track disabled
@@ -205,7 +205,7 @@ public class RemoteParticipantTopologyParameterizedTest extends BaseParticipantT
 
         // Video track removed
         participantListener.onVideoTrackRemovedLatch = new CountDownLatch(1);
-        bobRoom.getLocalParticipant().removeVideoTrack(bobPublishableLocalVideoTrack);
+        bobRoom.getLocalParticipant().unpublishVideoTrack(bobPublishableLocalVideoTrack);
         assertTrue(participantListener.onVideoTrackRemovedLatch.await(20, TimeUnit.SECONDS));
     }
 
@@ -218,12 +218,12 @@ public class RemoteParticipantTopologyParameterizedTest extends BaseParticipantT
         participantListener.onAudioTrackAddedLatch = new CountDownLatch(1);
         this.remoteParticipant.setListener(participantListener);
         bobPublishableLocalAudioTrack = LocalAudioTrack.create(mediaTestActivity, false);
-        assertTrue(bobRoom.getLocalParticipant().addAudioTrack(bobPublishableLocalAudioTrack));
+        assertTrue(bobRoom.getLocalParticipant().publishAudioTrack(bobPublishableLocalAudioTrack));
         assertTrue(participantListener.onAudioTrackAddedLatch.await(20, TimeUnit.SECONDS));
         participantListener.onVideoTrackAddedLatch = new CountDownLatch(1);
         bobPublishableLocalVideoTrack = LocalVideoTrack.create(mediaTestActivity, true,
                 new FakeVideoCapturer());
-        assertTrue(bobRoom.getLocalParticipant().addVideoTrack(bobPublishableLocalVideoTrack));
+        assertTrue(bobRoom.getLocalParticipant().publishVideoTrack(bobPublishableLocalVideoTrack));
         assertTrue(participantListener.onVideoTrackAddedLatch.await(20, TimeUnit.SECONDS));
 
         // Cache remoteParticipant two tracks

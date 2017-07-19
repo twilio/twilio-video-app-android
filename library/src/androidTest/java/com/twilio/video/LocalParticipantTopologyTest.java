@@ -95,7 +95,7 @@ public class LocalParticipantTopologyTest extends BaseClientTest {
     }
 
     @Test
-    public void shouldAllowAddingAndRemovingTracksWhileConnected() throws InterruptedException {
+    public void shouldAllowPublishingAndUnpublishingTracksWhileConnected() throws InterruptedException {
         CallbackHelper.FakeRoomListener roomListener = new CallbackHelper.FakeRoomListener();
         FakeVideoCapturer fakeVideoCapturer = new FakeVideoCapturer();
         roomListener.onConnectedLatch = new CountDownLatch(1);
@@ -112,12 +112,12 @@ public class LocalParticipantTopologyTest extends BaseClientTest {
         // Now we add our tracks
         localAudioTrack = LocalAudioTrack.create(mediaTestActivity, true);
         localVideoTrack = LocalVideoTrack.create(mediaTestActivity, true, fakeVideoCapturer);
-        assertTrue(localParticipant.addAudioTrack(localAudioTrack));
-        assertTrue(localParticipant.addVideoTrack(localVideoTrack));
+        assertTrue(localParticipant.publishAudioTrack(localAudioTrack));
+        assertTrue(localParticipant.publishVideoTrack(localVideoTrack));
 
         // Now remove them
-        assertTrue(localParticipant.removeAudioTrack(localAudioTrack));
-        assertTrue(localParticipant.removeVideoTrack(localVideoTrack));
+        assertTrue(localParticipant.unpublishAudioTrack(localAudioTrack));
+        assertTrue(localParticipant.unpublishVideoTrack(localVideoTrack));
         room.disconnect();
         assertTrue(roomListener.onDisconnectedLatch.await(20, TimeUnit.SECONDS));
     }
@@ -218,7 +218,7 @@ public class LocalParticipantTopologyTest extends BaseClientTest {
     }
 
     @Test
-    public void shouldNotAddAudioTrackAfterDisconnect() throws InterruptedException {
+    public void shouldNotPublishAudioTrackAfterDisconnect() throws InterruptedException {
         CallbackHelper.FakeRoomListener roomListener = new CallbackHelper.FakeRoomListener();
         roomListener.onConnectedLatch = new CountDownLatch(1);
         roomListener.onDisconnectedLatch = new CountDownLatch(1);
@@ -233,14 +233,14 @@ public class LocalParticipantTopologyTest extends BaseClientTest {
         int audioTrackSize = localParticipant.getPublishedAudioTracks().size();
         room.disconnect();
         localAudioTrack = LocalAudioTrack.create(mediaTestActivity, true);
-        assertFalse(localParticipant.addAudioTrack(localAudioTrack));
+        assertFalse(localParticipant.publishAudioTrack(localAudioTrack));
         assertEquals(audioTrackSize, localParticipant.getAudioTracks().size());
         assertEquals(audioTrackSize, localParticipant.getPublishedAudioTracks().size());
         assertTrue(roomListener.onDisconnectedLatch.await(20, TimeUnit.SECONDS));
     }
 
     @Test
-    public void shouldNotAddVideoTrackAfterDisconnect() throws InterruptedException {
+    public void shouldNotPublishdVideoTrackAfterDisconnect() throws InterruptedException {
                 CallbackHelper.FakeRoomListener roomListener = new CallbackHelper.FakeRoomListener();
         roomListener.onConnectedLatch = new CountDownLatch(1);
         roomListener.onDisconnectedLatch = new CountDownLatch(1);
@@ -255,14 +255,14 @@ public class LocalParticipantTopologyTest extends BaseClientTest {
         int videoTrackSize = localParticipant.getPublishedVideoTracks().size();
         room.disconnect();
         localVideoTrack = LocalVideoTrack.create(mediaTestActivity, true, new FakeVideoCapturer());
-        assertFalse(localParticipant.addVideoTrack(localVideoTrack));
+        assertFalse(localParticipant.publishVideoTrack(localVideoTrack));
         assertEquals(videoTrackSize, localParticipant.getVideoTracks().size());
         assertEquals(videoTrackSize, localParticipant.getPublishedVideoTracks().size());
         assertTrue(roomListener.onDisconnectedLatch.await(20, TimeUnit.SECONDS));
     }
 
     @Test
-    public void shouldNotRemoveAudioTrackAfterDisconnect() throws InterruptedException {
+    public void shouldNotUnpublishAudioTrackAfterDisconnect() throws InterruptedException {
         CallbackHelper.FakeRoomListener roomListener = new CallbackHelper.FakeRoomListener();
         roomListener.onConnectedLatch = new CountDownLatch(1);
         roomListener.onDisconnectedLatch = new CountDownLatch(1);
@@ -275,17 +275,17 @@ public class LocalParticipantTopologyTest extends BaseClientTest {
         LocalParticipant localParticipant = room.getLocalParticipant();
         assertNotNull(localParticipant);
         localAudioTrack = LocalAudioTrack.create(mediaTestActivity, true);
-        localParticipant.addAudioTrack(localAudioTrack);
+        localParticipant.publishAudioTrack(localAudioTrack);
         int audioTrackSize = localParticipant.getPublishedAudioTracks().size();
         room.disconnect();
-        assertFalse(localParticipant.removeAudioTrack(localAudioTrack));
+        assertFalse(localParticipant.unpublishAudioTrack(localAudioTrack));
         assertEquals(audioTrackSize, localParticipant.getAudioTracks().size());
         assertEquals(audioTrackSize, localParticipant.getPublishedAudioTracks().size());
         assertTrue(roomListener.onDisconnectedLatch.await(20, TimeUnit.SECONDS));
     }
 
     @Test
-    public void shouldNotRemoveVideoTrackAfterDisconnect() throws InterruptedException {
+    public void shouldNotUnpublishVideoTrackAfterDisconnect() throws InterruptedException {
                 CallbackHelper.FakeRoomListener roomListener = new CallbackHelper.FakeRoomListener();
         roomListener.onConnectedLatch = new CountDownLatch(1);
         roomListener.onDisconnectedLatch = new CountDownLatch(1);
@@ -299,10 +299,10 @@ public class LocalParticipantTopologyTest extends BaseClientTest {
         assertNotNull(localParticipant);
         FakeVideoCapturer fakeVideoCapturer = new FakeVideoCapturer();
         localVideoTrack = LocalVideoTrack.create(mediaTestActivity, true, fakeVideoCapturer);
-        localParticipant.addVideoTrack(localVideoTrack);
+        localParticipant.publishVideoTrack(localVideoTrack);
         int videoTrackSize = localParticipant.getPublishedVideoTracks().size();
         room.disconnect();
-        assertFalse(localParticipant.removeVideoTrack(localVideoTrack));
+        assertFalse(localParticipant.unpublishVideoTrack(localVideoTrack));
         assertEquals(videoTrackSize, localParticipant.getVideoTracks().size());
         assertEquals(videoTrackSize, localParticipant.getPublishedVideoTracks().size());
         assertTrue(roomListener.onDisconnectedLatch.await(20, TimeUnit.SECONDS));

@@ -81,18 +81,17 @@ public class LocalParticipant implements Participant {
     }
 
     /**
-     * Adds an audio track to the local participant. If the local participant is connected to
-     * {@link Room} then the audio track will be shared with all other participants.
+     * Shares audio track to all participants in a {@link Room}.
      *
-     * @return true if the audio track was added or false if the local participant is not connected
-     * or the track was already added.
+     * @return true if the audio track published or false if the local participant is not connected
+     * or the track was already published.
      */
-    public synchronized boolean addAudioTrack(@NonNull LocalAudioTrack localAudioTrack) {
+    public synchronized boolean publishAudioTrack(@NonNull LocalAudioTrack localAudioTrack) {
         Preconditions.checkNotNull(localAudioTrack, "LocalAudioTrack must not be null");
         if (isReleased()) {
             return false;
         } else {
-            boolean added = nativeAddAudioTrack(nativeLocalParticipantHandle,
+            boolean added = nativePublishAudioTrack(nativeLocalParticipantHandle,
                     localAudioTrack.getNativeHandle());
             if (added) {
                 publishedAudioTracks.add(localAudioTrack);
@@ -103,18 +102,17 @@ public class LocalParticipant implements Participant {
     }
 
     /**
-     * Adds a video track to the local participant. If the local participant is connected to
-     * {@link Room} then the video track will be shared with all other participants.
+     * Shares video track to all participants in a {@link Room}.
      *
-     * @return true if the video track was added or false if the local participant is not connected
-     * or the track was already added.
+     * @return true if the video track was published or false if the local participant is
+     * not connected or the track was already published.
      */
-    public synchronized boolean addVideoTrack(@NonNull LocalVideoTrack localVideoTrack) {
+    public synchronized boolean publishVideoTrack(@NonNull LocalVideoTrack localVideoTrack) {
         Preconditions.checkNotNull(localVideoTrack, "LocalVideoTrack must not be null");
         if (isReleased()) {
             return false;
         } else {
-            boolean added = nativeAddVideoTrack(nativeLocalParticipantHandle,
+            boolean added = nativePublishVideoTrack(nativeLocalParticipantHandle,
                     localVideoTrack.getNativeHandle());
             if (added) {
                 publishedVideoTracks.add(localVideoTrack);
@@ -125,40 +123,38 @@ public class LocalParticipant implements Participant {
     }
 
     /**
-     * Removes the audio track from the local participant. If the local participant is connected to
-     * {@link Room} then the audio track will no longer be shared with other participants.
+     * Stops the sharing of an audio track to all the participants in a {@link Room}.
      *
-     * @return true if the audio track was removed or false if the local participant is not connected
-     * or could not remove audio track.
+     * @return true if the audio track was unpublished or false if the local participant is not
+     * connected or could not unpublish audio track.
      */
 
-    public synchronized boolean removeAudioTrack(@NonNull LocalAudioTrack localAudioTrack) {
+    public synchronized boolean unpublishAudioTrack(@NonNull LocalAudioTrack localAudioTrack) {
         Preconditions.checkNotNull(localAudioTrack, "LocalAudioTrack must not be null");
         if (isReleased()) {
             return false;
         } else {
             publishedAudioTracks.remove(localAudioTrack);
             audioTracks.remove(localAudioTrack);
-            return nativeRemoveAudioTrack(nativeLocalParticipantHandle,
+            return nativeUnpublishAudioTrack(nativeLocalParticipantHandle,
                     localAudioTrack.getNativeHandle());
         }
     }
 
     /**
-     * Removes the video track from the local participant. If the local participant is connected to
-     * {@link Room} then the video track will no longer be shared with other participants.
+     * Stops the sharing of a video track to all the participants in a {@link Room}.
      *
-     * @return true if video track was removed or false if the local participant is not connected
-     * or could not remove video track.
+     * @return true if video track was unpublished or false if the local participant is not
+     * connected or could not unpublish video track.
      */
-    public synchronized boolean removeVideoTrack(@NonNull LocalVideoTrack localVideoTrack) {
+    public synchronized boolean unpublishVideoTrack(@NonNull LocalVideoTrack localVideoTrack) {
         Preconditions.checkNotNull(localVideoTrack, "LocalVideoTrack must not be null");
         if (isReleased()) {
             return false;
         } else {
             publishedVideoTracks.remove(localVideoTrack);
             videoTracks.remove(localVideoTrack);
-            return nativeRemoveVideoTrack(nativeLocalParticipantHandle,
+            return nativeUnpublishVideoTrack(nativeLocalParticipantHandle,
                     localVideoTrack.getNativeHandle());
         }
     }
@@ -211,9 +207,11 @@ public class LocalParticipant implements Participant {
         }
     }
 
-    private native boolean nativeAddAudioTrack(long nativeHandle, long nativeAudioTrackHandle);
-    private native boolean nativeAddVideoTrack(long nativeHandle, long nativeVideoTrackHandle);
-    private native boolean nativeRemoveAudioTrack(long nativeHandle, long nativeAudioTrackHandle);
-    private native boolean nativeRemoveVideoTrack(long nativeHandle, long nativeVideoTrackHandle);
+    private native boolean nativePublishAudioTrack(long nativeHandle, long nativeAudioTrackHandle);
+    private native boolean nativePublishVideoTrack(long nativeHandle, long nativeVideoTrackHandle);
+    private native boolean nativeUnpublishAudioTrack(long nativeHandle,
+                                                     long nativeAudioTrackHandle);
+    private native boolean nativeUnpublishVideoTrack(long nativeHandle,
+                                                     long nativeVideoTrackHandle);
     private native void nativeRelease(long nativeHandle);
 }

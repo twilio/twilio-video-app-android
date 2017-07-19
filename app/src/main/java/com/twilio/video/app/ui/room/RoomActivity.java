@@ -449,7 +449,7 @@ public class RoomActivity extends BaseActivity {
         if (localAudioTrack == null) {
             localAudioTrack = LocalAudioTrack.create(this, true);
             if (localParticipant != null) {
-                localParticipant.addAudioTrack(localAudioTrack);
+                localParticipant.publishAudioTrack(localAudioTrack);
             }
             icon = R.drawable.ic_mic_white_24px;
             pauseAudioMenuItem.setVisible(true);
@@ -457,7 +457,7 @@ public class RoomActivity extends BaseActivity {
                     R.string.pause_audio : R.string.resume_audio);
         } else {
             if (localParticipant != null) {
-                localParticipant.removeAudioTrack(localAudioTrack);
+                localParticipant.unpublishAudioTrack(localAudioTrack);
             }
             localAudioTrack.release();
             localAudioTrack = null;
@@ -481,7 +481,7 @@ public class RoomActivity extends BaseActivity {
                     cameraCapturer.getVideoCapturer(),
                     videoConstraints);
             if (localParticipant != null) {
-                localParticipant.addVideoTrack(cameraVideoTrack);
+                localParticipant.publishVideoTrack(cameraVideoTrack);
             }
 
             // enable video settings
@@ -495,7 +495,7 @@ public class RoomActivity extends BaseActivity {
             cameraVideoTrack.removeRenderer(primaryVideoView);
 
             if (localParticipant != null) {
-                localParticipant.removeVideoTrack(cameraVideoTrack);
+                localParticipant.unpublishVideoTrack(cameraVideoTrack);
             }
             cameraVideoTrack.release();
             cameraVideoTrack = null;
@@ -645,7 +645,7 @@ public class RoomActivity extends BaseActivity {
 
             // Share camera video track if we are connected to room
             if (localParticipant != null) {
-                localParticipant.addVideoTrack(cameraVideoTrack);
+                localParticipant.publishVideoTrack(cameraVideoTrack);
             }
         } else {
             Snackbar.make(primaryVideoView, R.string.failed_to_add_camera_video_track,
@@ -823,7 +823,7 @@ public class RoomActivity extends BaseActivity {
                     screenVideoTrack.getTrackId(), getString(R.string.screen_video_track));
 
             if (localParticipant != null) {
-                localParticipant.addVideoTrack(screenVideoTrack);
+                localParticipant.publishVideoTrack(screenVideoTrack);
             }
         } else {
             Snackbar.make(primaryVideoView,
@@ -836,7 +836,7 @@ public class RoomActivity extends BaseActivity {
     private void stopScreenCapture() {
         if (screenVideoTrack != null) {
             if (localParticipant != null) {
-                localParticipant.removeVideoTrack(screenVideoTrack);
+                localParticipant.unpublishVideoTrack(screenVideoTrack);
             }
             screenVideoTrack.release();
             localVideoTrackNames.remove(screenVideoTrack.getTrackId());
@@ -1051,7 +1051,7 @@ public class RoomActivity extends BaseActivity {
     private void removeCameraTrack() {
         if (cameraVideoTrack != null) {
             if (localParticipant != null) {
-                localParticipant.removeVideoTrack(cameraVideoTrack);
+                localParticipant.unpublishVideoTrack(cameraVideoTrack);
             }
             cameraVideoTrack.release();
             restoreLocalVideoCameraTrack = true;

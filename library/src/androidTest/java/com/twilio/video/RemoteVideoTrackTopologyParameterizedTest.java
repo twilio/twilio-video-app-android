@@ -44,7 +44,7 @@ import static org.junit.Assume.assumeTrue;
 @RunWith(Parameterized.class)
 @LargeTest
 public class RemoteVideoTrackTopologyParameterizedTest extends BaseParticipantTest {
-    private static final int VIDEO_TRACK_TEST_DELAY_MS = 3000;
+    private static final int VIDEO_TRACK_TEST_DELAY_MS = 10000;
 
     @Parameterized.Parameters(name = "{0}")
     public static Iterable<Object[]> data() {
@@ -106,7 +106,7 @@ public class RemoteVideoTrackTopologyParameterizedTest extends BaseParticipantTe
         bobPublishableLocalVideoTrack = LocalVideoTrack.create(mediaTestActivity, false,
                 new FakeVideoCapturer());
 
-        assertTrue(bobLocalParticipant.addVideoTrack(bobPublishableLocalVideoTrack));
+        assertTrue(bobLocalParticipant.publishVideoTrack(bobPublishableLocalVideoTrack));
         assertTrue(participantListener.onVideoTrackAddedLatch.await(20, TimeUnit.SECONDS));
         assertFalse(aliceRoom.getRemoteParticipants().get(0).getRemoteVideoTracks().get(1)
                 .isEnabled());
@@ -123,7 +123,7 @@ public class RemoteVideoTrackTopologyParameterizedTest extends BaseParticipantTe
         remoteParticipant.setListener(participantListener);
         bobPublishableLocalVideoTrack = LocalVideoTrack.create(mediaTestActivity, true,
                 new FakeVideoCapturer());
-        assertTrue(bobLocalParticipant.addVideoTrack(bobPublishableLocalVideoTrack));
+        assertTrue(bobLocalParticipant.publishVideoTrack(bobPublishableLocalVideoTrack));
         assertTrue(participantListener.onVideoTrackAddedLatch.await(20, TimeUnit.SECONDS));
     }
 }

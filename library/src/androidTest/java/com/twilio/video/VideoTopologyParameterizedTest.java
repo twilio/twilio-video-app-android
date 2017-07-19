@@ -155,7 +155,7 @@ public class VideoTopologyParameterizedTest extends BaseClientTest {
         LocalParticipant localParticipant = room.getLocalParticipant();
         assertNotNull(localParticipant.getPublishedAudioTracks().get(0));
         assertEquals(localAudioTrack, localParticipant.getPublishedAudioTracks().get(0));
-        assertTrue(localParticipant.removeAudioTrack(localAudioTrack));
+        assertTrue(localParticipant.unpublishAudioTrack(localAudioTrack));
         room.disconnect();
         assertTrue(roomListener.onDisconnectedLatch.await(20, TimeUnit.SECONDS));
     }
@@ -179,7 +179,7 @@ public class VideoTopologyParameterizedTest extends BaseClientTest {
         LocalParticipant localParticipant = room.getLocalParticipant();
         assertNotNull(localParticipant.getPublishedVideoTracks().get(0));
         assertEquals(localVideoTrack, localParticipant.getPublishedVideoTracks().get(0));
-        assertTrue(localParticipant.removeVideoTrack(localVideoTrack));
+        assertTrue(localParticipant.unpublishVideoTrack(localVideoTrack));
         room.disconnect();
         assertTrue(roomListener.onDisconnectedLatch.await(20, TimeUnit.SECONDS));
     }
@@ -209,8 +209,8 @@ public class VideoTopologyParameterizedTest extends BaseClientTest {
         assertEquals(localAudioTrack, localParticipant.getPublishedAudioTracks().get(0));
         assertNotNull(localParticipant.getPublishedVideoTracks().get(0));
         assertEquals(localVideoTrack, localParticipant.getPublishedVideoTracks().get(0));
-        assertTrue(localParticipant.removeAudioTrack(localAudioTrack));
-        assertTrue(localParticipant.removeVideoTrack(localVideoTrack));
+        assertTrue(localParticipant.unpublishAudioTrack(localAudioTrack));
+        assertTrue(localParticipant.unpublishVideoTrack(localVideoTrack));
         room.disconnect();
         assertTrue(roomListener.onDisconnectedLatch.await(20, TimeUnit.SECONDS));
     }

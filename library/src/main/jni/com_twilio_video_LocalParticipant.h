@@ -46,25 +46,25 @@ private:
 
 std::shared_ptr<twilio::video::LocalParticipant> getLocalParticipant(jlong);
 
-JNIEXPORT bool JNICALL Java_com_twilio_video_LocalParticipant_nativeAddAudioTrack(JNIEnv *,
-                                                                                  jobject,
-                                                                                  jlong,
-                                                                                  jlong);
+JNIEXPORT bool JNICALL Java_com_twilio_video_LocalParticipant_nativePublishAudioTrack(JNIEnv *,
+                                                                                      jobject,
+                                                                                      jlong,
+                                                                                      jlong);
 
-JNIEXPORT bool JNICALL Java_com_twilio_video_LocalParticipant_nativeAddVideoTrack(JNIEnv *,
-                                                                                  jobject,
-                                                                                  jlong,
-                                                                                  jlong);
+JNIEXPORT bool JNICALL Java_com_twilio_video_LocalParticipant_nativePublishVideoTrack(JNIEnv *,
+                                                                                      jobject,
+                                                                                      jlong,
+                                                                                      jlong);
 
-JNIEXPORT bool JNICALL Java_com_twilio_video_LocalParticipant_nativeRemoveAudioTrack(JNIEnv *,
-                                                                                     jobject,
-                                                                                     jlong,
-                                                                                     jlong);
+JNIEXPORT bool JNICALL Java_com_twilio_video_LocalParticipant_nativeUnpublishAudioTrack(JNIEnv *,
+                                                                                        jobject,
+                                                                                        jlong,
+                                                                                        jlong);
 
-JNIEXPORT bool JNICALL Java_com_twilio_video_LocalParticipant_nativeRemoveVideoTrack(JNIEnv *,
-                                                                                     jobject,
-                                                                                     jlong,
-                                                                                     jlong);
+JNIEXPORT bool JNICALL Java_com_twilio_video_LocalParticipant_nativeUnpublishVideoTrack(JNIEnv *,
+                                                                                        jobject,
+                                                                                        jlong,
+                                                                                        jlong);
 JNIEXPORT void JNICALL Java_com_twilio_video_LocalParticipant_nativeRelease(JNIEnv *,
                                                                             jobject,
                                                                             jlong);
