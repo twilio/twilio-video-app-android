@@ -44,6 +44,7 @@ import java.util.concurrent.TimeUnit;
 
 import static junit.framework.Assert.assertFalse;
 import static junit.framework.Assert.assertNotNull;
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -162,14 +163,16 @@ public class RemoteParticipantTopologyParameterizedTest extends BaseParticipantT
 
     @Test
     public void shouldReceiveTrackEvents() throws InterruptedException {
-        // Audio track added
+        // Audio track added and subscribed
         CallbackHelper.FakeParticipantListener participantListener =
                 new CallbackHelper.FakeParticipantListener();
         participantListener.onAudioTrackAddedLatch = new CountDownLatch(1);
+        participantListener.onSubscribedToAudioTrackLatch = new CountDownLatch(1);
         remoteParticipant.setListener(participantListener);
         bobPublishableLocalAudioTrack = LocalAudioTrack.create(mediaTestActivity, true);
         assertTrue(bobRoom.getLocalParticipant().publishAudioTrack(bobPublishableLocalAudioTrack));
         assertTrue(participantListener.onAudioTrackAddedLatch.await(20, TimeUnit.SECONDS));
+        assertTrue(participantListener.onSubscribedToAudioTrackLatch.await(20, TimeUnit.SECONDS));
 
         // Audio track disabled
         participantListener.onAudioTrackDisabledLatch = new CountDownLatch(1);
@@ -181,17 +184,22 @@ public class RemoteParticipantTopologyParameterizedTest extends BaseParticipantT
         bobPublishableLocalAudioTrack.enable(true);
         assertTrue(participantListener.onAudioTrackEnabledLatch.await(20, TimeUnit.SECONDS));
 
-        // Audio track removed
+        // Audio track removed and unsubscribed
         participantListener.onAudioTrackRemovedLatch = new CountDownLatch(1);
+        participantListener.onUnsubscribedFromAudioTrackLatch = new CountDownLatch(1);
         bobRoom.getLocalParticipant().unpublishAudioTrack(bobPublishableLocalAudioTrack);
+        assertTrue(participantListener.onUnsubscribedFromAudioTrackLatch.await(20,
+                TimeUnit.SECONDS));
         assertTrue(participantListener.onAudioTrackRemovedLatch.await(20, TimeUnit.SECONDS));
 
-        // Video track added
+        // Video track added and subscribed
         participantListener.onVideoTrackAddedLatch = new CountDownLatch(1);
+        participantListener.onSubscribedToVideoTrackLatch = new CountDownLatch(1);
         bobPublishableLocalVideoTrack = LocalVideoTrack.create(mediaTestActivity, true,
                 new FakeVideoCapturer());
         assertTrue(bobRoom.getLocalParticipant().publishVideoTrack(bobPublishableLocalVideoTrack));
         assertTrue(participantListener.onVideoTrackAddedLatch.await(20, TimeUnit.SECONDS));
+        assertTrue(participantListener.onSubscribedToVideoTrackLatch.await(20, TimeUnit.SECONDS));
 
         // Video track disabled
         participantListener.onVideoTrackDisabledLatch = new CountDownLatch(1);
@@ -203,28 +211,48 @@ public class RemoteParticipantTopologyParameterizedTest extends BaseParticipantT
         bobPublishableLocalVideoTrack.enable(true);
         assertTrue(participantListener.onVideoTrackEnabledLatch.await(20, TimeUnit.SECONDS));
 
-        // Video track removed
+        // Video track removed and unsubscribed
         participantListener.onVideoTrackRemovedLatch = new CountDownLatch(1);
+        participantListener.onUnsubscribedFromVideoTrackLatch = new CountDownLatch(1);
         bobRoom.getLocalParticipant().unpublishVideoTrack(bobPublishableLocalVideoTrack);
+        assertTrue(participantListener.onUnsubscribedFromVideoTrackLatch.await(20,
+                TimeUnit.SECONDS));
         assertTrue(participantListener.onVideoTrackRemovedLatch.await(20, TimeUnit.SECONDS));
+
+        // Validate the order of events
+        String[] expectedParticipantEvents = new String[] {
+                "onAudioTrackAdded",
+                "onSubscribedToAudioTrack",
+                "onAudioTrackDisabled",
+                "onAudioTrackEnabled",
+                "onUnsubscribedFromAudioTrack",
+                "onAudioTrackRemoved",
+                "onVideoTrackAdded",
+                "onSubscribedToVideoTrack",
+                "onVideoTrackDisabled",
+                "onVideoTrackEnabled",
+                "onUnsubscribedFromVideoTrack",
+                "onVideoTrackRemoved"
+        };
+        assertArrayEquals(expectedParticipantEvents,
+                participantListener.participantEvents.toArray());
     }
 
     @Test
-    @Ignore("Will not work until we probably implement the track subscription APIs GSDK-1214")
     public void shouldHaveTracksAfterDisconnected() throws InterruptedException {
         // Add audio and video tracks
         CallbackHelper.FakeParticipantListener participantListener =
                 new CallbackHelper.FakeParticipantListener();
-        participantListener.onAudioTrackAddedLatch = new CountDownLatch(1);
+        participantListener.onSubscribedToAudioTrackLatch = new CountDownLatch(1);
         this.remoteParticipant.setListener(participantListener);
         bobPublishableLocalAudioTrack = LocalAudioTrack.create(mediaTestActivity, false);
         assertTrue(bobRoom.getLocalParticipant().publishAudioTrack(bobPublishableLocalAudioTrack));
-        assertTrue(participantListener.onAudioTrackAddedLatch.await(20, TimeUnit.SECONDS));
-        participantListener.onVideoTrackAddedLatch = new CountDownLatch(1);
+        assertTrue(participantListener.onSubscribedToAudioTrackLatch.await(20, TimeUnit.SECONDS));
+        participantListener.onSubscribedToVideoTrackLatch = new CountDownLatch(1);
         bobPublishableLocalVideoTrack = LocalVideoTrack.create(mediaTestActivity, true,
                 new FakeVideoCapturer());
         assertTrue(bobRoom.getLocalParticipant().publishVideoTrack(bobPublishableLocalVideoTrack));
-        assertTrue(participantListener.onVideoTrackAddedLatch.await(20, TimeUnit.SECONDS));
+        assertTrue(participantListener.onSubscribedToVideoTrackLatch.await(20, TimeUnit.SECONDS));
 
         // Cache remoteParticipant two tracks
         List<RemoteAudioTrack> remoteAudioTracks = aliceRoomListener

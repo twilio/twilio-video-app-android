@@ -20,6 +20,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -41,6 +42,11 @@ public class VideoTrackUnitTest {
     @Test(expected = NullPointerException.class)
     public void removeRenderer_shouldNotAllowNull() {
         videoTrack.removeRenderer(null);
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void setWebRtcTrack_shouldFailIfPreviousTrackNotInvalidated() {
+        videoTrack.setWebRtcTrack(Mockito.mock(org.webrtc.VideoTrack.class));
     }
 
     /*

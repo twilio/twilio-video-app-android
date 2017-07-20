@@ -99,8 +99,12 @@ private:
     const webrtc_jni::ScopedGlobalRef<jclass> j_remote_video_track_class_;
     jmethodID j_on_audio_track_added_;
     jmethodID j_on_audio_track_removed_;
+    jmethodID j_on_subscribed_to_audio_track_;
+    jmethodID j_on_unsubscribed_from_audio_track_;
     jmethodID j_on_video_track_added_;
     jmethodID j_on_video_track_removed_;
+    jmethodID j_on_subscribed_to_video_track_;
+    jmethodID j_on_unsubscribed_from_video_track_;
     jmethodID j_on_audio_track_enabled_;
     jmethodID j_on_audio_track_disabled_;
     jmethodID j_on_video_track_enabled_;

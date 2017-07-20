@@ -25,11 +25,13 @@ import com.twilio.video.TwilioException;
 import com.twilio.video.StatsListener;
 import com.twilio.video.StatsReport;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.PriorityQueue;
+import java.util.Queue;
 import java.util.concurrent.CountDownLatch;
 
 public class CallbackHelper {
-
     public static class FakeRoomListener implements Room.Listener {
 
         public CountDownLatch onConnectedLatch;
@@ -148,17 +150,19 @@ public class CallbackHelper {
     }
 
     public static class FakeParticipantListener implements RemoteParticipant.Listener {
-
         public CountDownLatch onAudioTrackAddedLatch;
         public CountDownLatch onAudioTrackRemovedLatch;
+        public CountDownLatch onSubscribedToAudioTrackLatch;
+        public CountDownLatch onUnsubscribedFromAudioTrackLatch;
         public CountDownLatch onVideoTrackAddedLatch;
         public CountDownLatch onVideoTrackRemovedLatch;
+        public CountDownLatch onSubscribedToVideoTrackLatch;
+        public CountDownLatch onUnsubscribedFromVideoTrackLatch;
         public CountDownLatch onAudioTrackEnabledLatch;
         public CountDownLatch onAudioTrackDisabledLatch;
         public CountDownLatch onVideoTrackEnabledLatch;
         public CountDownLatch onVideoTrackDisabledLatch;
-
-
+        public final List<String> participantEvents = new ArrayList<>();
 
         private void triggerLatch(CountDownLatch latch) {
             if (latch != null) {
@@ -167,42 +171,86 @@ public class CallbackHelper {
         }
 
         @Override
-        public void onAudioTrackAdded(RemoteParticipant remoteParticipant, RemoteAudioTrack remoteAudioTrack) {
+        public void onAudioTrackAdded(RemoteParticipant remoteParticipant,
+                                      RemoteAudioTrack remoteAudioTrack) {
+            participantEvents.add("onAudioTrackAdded");
             triggerLatch(onAudioTrackAddedLatch);
         }
 
         @Override
-        public void onAudioTrackRemoved(RemoteParticipant remoteParticipant, RemoteAudioTrack remoteAudioTrack) {
+        public void onAudioTrackRemoved(RemoteParticipant remoteParticipant,
+                                        RemoteAudioTrack remoteAudioTrack) {
+            participantEvents.add("onAudioTrackRemoved");
             triggerLatch(onAudioTrackRemovedLatch);
         }
 
         @Override
-        public void onVideoTrackAdded(RemoteParticipant remoteParticipant, RemoteVideoTrack remoteVideoTrack) {
+        public void onSubscribedToAudioTrack(RemoteParticipant remoteParticipant,
+                                             RemoteAudioTrack remoteAudioTrack) {
+            participantEvents.add("onSubscribedToAudioTrack");
+            triggerLatch(onSubscribedToAudioTrackLatch);
+        }
+
+        @Override
+        public void onUnsubscribedFromAudioTrack(RemoteParticipant remoteParticipant,
+                                                 RemoteAudioTrack remoteAudioTrack) {
+            participantEvents.add("onUnsubscribedFromAudioTrack");
+            triggerLatch(onUnsubscribedFromAudioTrackLatch);
+        }
+
+        @Override
+        public void onVideoTrackAdded(RemoteParticipant remoteParticipant,
+                                      RemoteVideoTrack remoteVideoTrack) {
+            participantEvents.add("onVideoTrackAdded");
             triggerLatch(onVideoTrackAddedLatch);
         }
 
         @Override
-        public void onVideoTrackRemoved(RemoteParticipant remoteParticipant, RemoteVideoTrack remoteVideoTrack) {
+        public void onVideoTrackRemoved(RemoteParticipant remoteParticipant,
+                                        RemoteVideoTrack remoteVideoTrack) {
+            participantEvents.add("onVideoTrackRemoved");
             triggerLatch(onVideoTrackRemovedLatch);
         }
 
         @Override
-        public void onAudioTrackEnabled(RemoteParticipant remoteParticipant, RemoteAudioTrack remoteAudioTrack) {
+        public void onSubscribedToVideoTrack(RemoteParticipant remoteParticipant,
+                                             RemoteVideoTrack remoteVideoTrack) {
+            participantEvents.add("onSubscribedToVideoTrack");
+            triggerLatch(onSubscribedToVideoTrackLatch);
+        }
+
+        @Override
+        public void onUnsubscribedFromVideoTrack(RemoteParticipant remoteParticipant,
+                                                 RemoteVideoTrack remoteVideoTrack) {
+            participantEvents.add("onUnsubscribedFromVideoTrack");
+            triggerLatch(onUnsubscribedFromVideoTrackLatch);
+        }
+
+        @Override
+        public void onAudioTrackEnabled(RemoteParticipant remoteParticipant,
+                                        RemoteAudioTrack remoteAudioTrack) {
+            participantEvents.add("onAudioTrackEnabled");
             triggerLatch(onAudioTrackEnabledLatch);
         }
 
         @Override
-        public void onAudioTrackDisabled(RemoteParticipant remoteParticipant, RemoteAudioTrack remoteAudioTrack) {
+        public void onAudioTrackDisabled(RemoteParticipant remoteParticipant,
+                                         RemoteAudioTrack remoteAudioTrack) {
+            participantEvents.add("onAudioTrackDisabled");
             triggerLatch(onAudioTrackDisabledLatch);
         }
 
         @Override
-        public void onVideoTrackEnabled(RemoteParticipant remoteParticipant, RemoteVideoTrack remoteVideoTrack) {
+        public void onVideoTrackEnabled(RemoteParticipant remoteParticipant,
+                                        RemoteVideoTrack remoteVideoTrack) {
+            participantEvents.add("onVideoTrackEnabled");
             triggerLatch(onVideoTrackEnabledLatch);
         }
 
         @Override
-        public void onVideoTrackDisabled(RemoteParticipant remoteParticipant, RemoteVideoTrack remoteVideoTrack) {
+        public void onVideoTrackDisabled(RemoteParticipant remoteParticipant,
+                                         RemoteVideoTrack remoteVideoTrack) {
+            participantEvents.add("onVideoTrackDisabled");
             triggerLatch(onVideoTrackDisabledLatch);
         }
     }

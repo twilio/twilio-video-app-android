@@ -942,14 +942,19 @@ public class RoomActivity extends BaseActivity {
             remoteParticipant.getRemoteAudioTracks().size() > 0 ? !remoteParticipant.getRemoteAudioTracks().get(0).isEnabled() : true;
 
         List<RemoteVideoTrack> remoteVideoTracks = remoteParticipant.getRemoteVideoTracks();
-
         if (remoteVideoTracks.size() == 0) {
-            addParticipantVideoTrack(
-                remoteParticipant.getSid(), remoteParticipant.getIdentity(), null, muted, renderAsPrimary);
+            addParticipantVideoTrack(remoteParticipant.getSid(),
+                    remoteParticipant.getIdentity(),
+                    null,
+                    muted,
+                    renderAsPrimary);
         } else {
             for (RemoteVideoTrack remoteVideoTrack : remoteVideoTracks) {
-                addParticipantVideoTrack(
-                    remoteParticipant.getSid(), remoteParticipant.getIdentity(), remoteVideoTrack, muted, renderAsPrimary);
+                addParticipantVideoTrack(remoteParticipant.getSid(),
+                        remoteParticipant.getIdentity(),
+                        remoteVideoTrack,
+                        muted,
+                        renderAsPrimary);
                 renderAsPrimary = false;
             }
         }
@@ -1247,10 +1252,52 @@ public class RoomActivity extends BaseActivity {
 
     private class ParticipantListener implements RemoteParticipant.Listener {
         @Override
-        public void onAudioTrackAdded(RemoteParticipant remoteParticipant, RemoteAudioTrack remoteAudioTrack) {
-            Timber.i("RemoteParticipant added audio track -> remoteParticipant: %s, audio: %s, enabled: %b",
-                    remoteParticipant.getSid(),
-                    remoteAudioTrack.getTrackId(),
+        public void onAudioTrackAdded(RemoteParticipant remoteParticipant,
+                                      RemoteAudioTrack remoteAudioTrack) {
+            Timber.i("onAudioTrackAdded: remoteParticipant: %s, audio: %s, enabled: %b",
+                    remoteParticipant.getIdentity(),
+                    remoteAudioTrack.getSid(),
+                    remoteAudioTrack.isEnabled());
+
+            // TODO: Need design
+        }
+
+        @Override
+        public void onAudioTrackRemoved(RemoteParticipant remoteParticipant,
+                                        RemoteAudioTrack remoteAudioTrack) {
+            Timber.i("onAudioTrackRemoved: remoteParticipant: %s, audio: %s, enabled: %b",
+                    remoteParticipant.getIdentity(),
+                    remoteAudioTrack.getSid(),
+                    remoteAudioTrack.isEnabled());
+            // TODO: Need design
+        }
+
+        @Override
+        public void onVideoTrackAdded(RemoteParticipant remoteParticipant,
+                                      RemoteVideoTrack remoteVideoTrack) {
+            Timber.i("onVideoTrackAdded: remoteParticipant: %s, video: %s, enabled: %b",
+                    remoteParticipant.getIdentity(),
+                    remoteVideoTrack.getSid(),
+                    remoteVideoTrack.isEnabled());
+            // TODO: Need design
+        }
+
+        @Override
+        public void onVideoTrackRemoved(RemoteParticipant remoteParticipant,
+                                        RemoteVideoTrack remoteVideoTrack) {
+            Timber.i("onVideoTrackRemoved: remoteParticipant: %s, video: %s, enabled: %b",
+                    remoteParticipant.getIdentity(),
+                    remoteVideoTrack.getSid(),
+                    remoteVideoTrack.isEnabled());
+            // TODO: Need design
+        }
+
+        @Override
+        public void onSubscribedToAudioTrack(RemoteParticipant remoteParticipant,
+                                             RemoteAudioTrack remoteAudioTrack) {
+            Timber.i("onSubscribedToAudioTrack: remoteParticipant: %s, audio: %s, enabled: %b",
+                    remoteParticipant.getIdentity(),
+                    remoteAudioTrack.getSid(),
                     remoteAudioTrack.isEnabled());
 
             boolean newAudioState = !remoteAudioTrack.isEnabled();
@@ -1269,10 +1316,11 @@ public class RoomActivity extends BaseActivity {
         }
 
         @Override
-        public void onAudioTrackRemoved(RemoteParticipant remoteParticipant, RemoteAudioTrack remoteAudioTrack) {
-            Timber.i("RemoteParticipant removed audio track -> remoteParticipant: %s, audio: %s, enabled: %b",
-                    remoteParticipant.getSid(),
-                    remoteAudioTrack.getTrackId(),
+        public void onUnsubscribedFromAudioTrack(RemoteParticipant remoteParticipant,
+                                                 RemoteAudioTrack remoteAudioTrack) {
+            Timber.i("onUnsubscribedFromAudioTrack: remoteParticipant: %s, audio: %s, enabled: %b",
+                    remoteParticipant.getIdentity(),
+                    remoteAudioTrack.getSid(),
                     remoteAudioTrack.isEnabled());
 
             boolean newAudioState = true;
@@ -1291,23 +1339,23 @@ public class RoomActivity extends BaseActivity {
         }
 
         @Override
-        public void onVideoTrackAdded(RemoteParticipant remoteParticipant, RemoteVideoTrack remoteVideoTrack) {
-            Timber.i("RemoteParticipant added video track -> remoteParticipant: %s, id: %s, enabled: %b",
-                    remoteParticipant.getSid(),
-                    remoteVideoTrack.getTrackId(),
+        public void onSubscribedToVideoTrack(RemoteParticipant remoteParticipant,
+                                             RemoteVideoTrack remoteVideoTrack) {
+            Timber.i("onSubscribedToVideoTrack: remoteParticipant: %s, video: %s, enabled: %b",
+                    remoteParticipant.getIdentity(),
+                    remoteVideoTrack.getSid(),
                     remoteVideoTrack.isEnabled());
 
             ParticipantController.Item primary = participantController.getPrimaryItem();
 
             if (primary != null &&
-                primary.sid.equals(remoteParticipant.getSid()) &&
-                primary.videoTrack == null) {
-
+                    primary.sid.equals(remoteParticipant.getSid()) &&
+                    primary.videoTrack == null &&
+                    remoteVideoTrack.getRenderers().isEmpty()) {
                 // no thumb needed - render as primary
                 primary.videoTrack = remoteVideoTrack;
                 participantController.renderAsPrimary(primary);
-            } else {
-
+            } else if (remoteVideoTrack.getRenderers().isEmpty()) {
                 // not a primary remoteParticipant requires thumb
                 participantController.addOrUpdateThumb(remoteParticipant.getSid(),
                         remoteParticipant.getIdentity(), null, remoteVideoTrack);
@@ -1315,10 +1363,11 @@ public class RoomActivity extends BaseActivity {
         }
 
         @Override
-        public void onVideoTrackRemoved(RemoteParticipant remoteParticipant, RemoteVideoTrack remoteVideoTrack) {
-            Timber.i("RemoteParticipant removed video track -> remoteParticipant: %s, id: %s, enabled: %b",
-                    remoteParticipant.getSid(),
-                    remoteVideoTrack.getTrackId(),
+        public void onUnsubscribedFromVideoTrack(RemoteParticipant remoteParticipant,
+                                                 RemoteVideoTrack remoteVideoTrack) {
+            Timber.i("onUnsubscribedFromVideoTrack: remoteParticipant: %s, video: %s, enabled: %b",
+                    remoteParticipant.getIdentity(),
+                    remoteVideoTrack.getSid(),
                     remoteVideoTrack.isEnabled());
 
             ParticipantController.Item primary = participantController.getPrimaryItem();
@@ -1351,40 +1400,44 @@ public class RoomActivity extends BaseActivity {
         }
 
         @Override
-        public void onAudioTrackEnabled(RemoteParticipant remoteParticipant, RemoteAudioTrack remoteAudioTrack) {
-            Timber.i("RemoteParticipant enabled audio track -> remoteParticipant: %s, audio: %s, enabled: %b",
-                    remoteParticipant.getSid(),
-                    remoteAudioTrack.getTrackId(),
+        public void onAudioTrackEnabled(RemoteParticipant remoteParticipant,
+                                        RemoteAudioTrack remoteAudioTrack) {
+            Timber.i("onAudioTrackEnabled: remoteParticipant: %s, audio: %s, enabled: %b",
+                    remoteParticipant.getIdentity(),
+                    remoteAudioTrack.getSid(),
                     remoteAudioTrack.isEnabled());
 
             // TODO: need design
         }
 
         @Override
-        public void onAudioTrackDisabled(RemoteParticipant remoteParticipant, RemoteAudioTrack remoteAudioTrack) {
-            Timber.i("RemoteParticipant disabled audio track -> remoteParticipant: %s, audio: %s, enabled: %b",
-                    remoteParticipant.getSid(),
-                    remoteAudioTrack.getTrackId(),
+        public void onAudioTrackDisabled(RemoteParticipant remoteParticipant,
+                                         RemoteAudioTrack remoteAudioTrack) {
+            Timber.i("onAudioTrackDisabled: remoteParticipant: %s, audio: %s, enabled: %b",
+                    remoteParticipant.getIdentity(),
+                    remoteAudioTrack.getSid(),
                     remoteAudioTrack.isEnabled());
 
             // TODO: need design
         }
 
         @Override
-        public void onVideoTrackEnabled(RemoteParticipant remoteParticipant, RemoteVideoTrack remoteVideoTrack) {
-            Timber.i("RemoteParticipant enabled video track -> remoteParticipant: %s, video: %s, enabled: %b",
-                    remoteParticipant.getSid(),
-                    remoteVideoTrack.getTrackId(),
+        public void onVideoTrackEnabled(RemoteParticipant remoteParticipant,
+                                        RemoteVideoTrack remoteVideoTrack) {
+            Timber.i("onVideoTrackEnabled: remoteParticipant: %s, video: %s, enabled: %b",
+                    remoteParticipant.getIdentity(),
+                    remoteVideoTrack.getSid(),
                     remoteVideoTrack.isEnabled());
 
             // TODO: need design
         }
 
         @Override
-        public void onVideoTrackDisabled(RemoteParticipant remoteParticipant, RemoteVideoTrack remoteVideoTrack) {
-            Timber.i("RemoteParticipant disabled video track -> remoteParticipant: %s, video: %s, enabled: %b",
-                    remoteParticipant.getSid(),
-                    remoteVideoTrack.getTrackId(),
+        public void onVideoTrackDisabled(RemoteParticipant remoteParticipant,
+                                         RemoteVideoTrack remoteVideoTrack) {
+            Timber.i("onVideoTrackDisabled: remoteParticipant: %s, video: %s, enabled: %b",
+                    remoteParticipant.getIdentity(),
+                    remoteVideoTrack.getSid(),
                     remoteVideoTrack.isEnabled());
 
             // TODO: need design

@@ -16,109 +16,139 @@
 
 package com.twilio.video;
 
+import android.content.Context;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.runner.AndroidJUnit4;
 
-import com.getkeepsafe.relinker.ReLinker;
+import com.twilio.video.util.FakeVideoCapturer;
+import com.twilio.video.util.FrameCountRenderer;
 import com.twilio.video.util.RandUtils;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import java.util.Random;
+import static com.twilio.video.util.VideoAssert.assertFramesRendered;
+import static com.twilio.video.util.VideoAssert.assertNoFramesRendered;
+import static org.junit.Assert.assertTrue;
 
 @RunWith(AndroidJUnit4.class)
 public class VideoTrackTest {
-    private final VideoRenderer videoRenderer = new VideoRenderer() {
-        @Override
-        public void renderFrame(I420Frame frame) {
+    private static final int RENDER_FRAME_DELAY_MS = 3000;
 
-        }
-    };
+    private Context context;
+    private final FrameCountRenderer frameCountRenderer = new FrameCountRenderer();
+    private LocalVideoTrack localVideoTrack;
     private VideoTrack videoTrack;
-    private org.webrtc.VideoTrack fakeWebRtcVideoTrack;
 
     @Before
     public void setup() {
-        ReLinker.loadLibrary(InstrumentationRegistry.getContext(), "jingle_peerconnection_so");
-        fakeWebRtcVideoTrack = new FakeWebRtcVideoTrack();
-        videoTrack = new InstrumentationTestVideoTrack(fakeWebRtcVideoTrack);
+        context = InstrumentationRegistry.getContext();
+        localVideoTrack = LocalVideoTrack.create(context, true, new FakeVideoCapturer());
+        videoTrack = new InstrumentationTestVideoTrack(localVideoTrack.getWebRtcTrack());
+    }
+
+    @After
+    public void teardown() {
+        videoTrack.release();
+        localVideoTrack.release();
+        assertTrue(MediaFactory.isReleased());
     }
 
     @Test
     public void shouldAllowAddRendererAfterReleased() {
         videoTrack.release();
-        videoTrack.addRenderer(videoRenderer);
+        videoTrack.addRenderer(frameCountRenderer);
     }
 
     @Test
     public void shouldAllowRemoveRendererAfterReleased() {
         videoTrack.release();
-        videoTrack.removeRenderer(videoRenderer);
+        videoTrack.removeRenderer(frameCountRenderer);
+    }
+
+    @Test
+    public void release_shouldBeIdempotent() {
+        videoTrack.release();
+        videoTrack.release();
+    }
+
+    @Test
+    public void invalidateWebRtcTrack_shouldBeIdempotent() {
+        videoTrack.invalidateWebRtcTrack();
+        videoTrack.invalidateWebRtcTrack();
+    }
+
+    /*
+     * This test validates the scenario where a developer can add a renderer to a RemoteVideoTrack
+     * after it is added but before it is subscribed to.
+     */
+    @Test
+    public void canAddRendererBeforeWebRtcTrackSet() throws InterruptedException {
+        VideoTrack videoTrack = new InstrumentationTestVideoTrack(true);
+
+        // Add renderer before webrtc track is set
+        videoTrack.addRenderer(frameCountRenderer);
+
+        // Assert that we see no frames
+        assertNoFramesRendered(frameCountRenderer, RENDER_FRAME_DELAY_MS);
+
+        // Set webrtc track
+        videoTrack.setWebRtcTrack(localVideoTrack.getWebRtcTrack());
+
+        // Validate that we now render frames
+        assertFramesRendered(frameCountRenderer, RENDER_FRAME_DELAY_MS);
+    }
+
+    /*
+     * This test validates the scenario where a developer can render frames when the following
+     * sequence occurs:
+     *
+     * 1. Remote track is subscribed to
+     * 2. Rendered added
+     * 2. Remove track is unsubscribed from
+     * 3. Remote track is subscribed to again
+     */
+    @Test
+    public void canRenderFramesAfterWebRtcTrackIsReset() throws InterruptedException {
+        // Add renderer
+        videoTrack.addRenderer(frameCountRenderer);
+
+        // Assert that we see frames
+        assertFramesRendered(frameCountRenderer, RENDER_FRAME_DELAY_MS);
+
+        // Invalidate WebRTC track
+        videoTrack.invalidateWebRtcTrack();
+
+        // Assert that no frames are received
+        assertNoFramesRendered(frameCountRenderer, RENDER_FRAME_DELAY_MS);
+
+        // Set webrtc track
+        LocalVideoTrack newVideoTrack = LocalVideoTrack.create(context, true,
+                new FakeVideoCapturer());
+        videoTrack.setWebRtcTrack(newVideoTrack.getWebRtcTrack());
+
+        // Validate that we render frames again
+        assertFramesRendered(frameCountRenderer, RENDER_FRAME_DELAY_MS);
+
+        // Release tracks
+        videoTrack.release();
+        newVideoTrack.release();
     }
 
     /*
      * Concrete video track to test functionality in abstract class.
      */
     private static class InstrumentationTestVideoTrack extends VideoTrack {
+        private static final int TRACK_ID_LENGTH = 10;
+
         InstrumentationTestVideoTrack(org.webrtc.VideoTrack webRtcVideoTrack) {
             super(webRtcVideoTrack, true);
         }
-    }
 
-    /*
-     * Fake WebRTC video track that allows testing of VideoTrack.
-     */
-    private static class FakeWebRtcVideoTrack extends org.webrtc.VideoTrack {
-        private static final int ID_LENGTH = 10;
-        private static final String TRACK_KIND = "fake";
-
-        private final String id;
-
-        FakeWebRtcVideoTrack() {
-            super(new Random().nextLong());
-            this.id = RandUtils.generateRandomString(ID_LENGTH);
-        }
-
-        @Override
-        public void addRenderer(org.webrtc.VideoRenderer renderer) {
-            // No-op
-        }
-
-        @Override
-        public void removeRenderer(org.webrtc.VideoRenderer renderer) {
-            // No-op
-        }
-
-        @Override
-        public void dispose() {
-            // No-op
-        }
-
-        @Override
-        public String id() {
-            return id;
-        }
-
-        @Override
-        public String kind() {
-            return TRACK_KIND;
-        }
-
-        @Override
-        public boolean enabled() {
-            return super.enabled();
-        }
-
-        @Override
-        public boolean setEnabled(boolean enable) {
-            return super.setEnabled(enable);
-        }
-
-        @Override
-        public State state() {
-            return super.state();
+        InstrumentationTestVideoTrack(boolean enabled) {
+            super(RandUtils.generateRandomString(TRACK_ID_LENGTH), enabled);
         }
     }
 }

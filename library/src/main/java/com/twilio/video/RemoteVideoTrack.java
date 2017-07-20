@@ -22,8 +22,8 @@ package com.twilio.video;
 public class RemoteVideoTrack extends VideoTrack {
     private final String sid;
 
-    RemoteVideoTrack(org.webrtc.VideoTrack webRtcVideoTrack, boolean enabled, String sid) {
-        super(webRtcVideoTrack, enabled);
+    RemoteVideoTrack(String trackId, boolean enabled, String sid) {
+        super(trackId, enabled);
         this.sid = sid;
     }
 

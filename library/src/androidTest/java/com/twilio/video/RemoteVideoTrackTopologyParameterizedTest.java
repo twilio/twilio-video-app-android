@@ -100,14 +100,14 @@ public class RemoteVideoTrackTopologyParameterizedTest extends BaseParticipantTe
     public void shouldEnableVideoTrackAfterConnectedToRoom() throws InterruptedException {
         CallbackHelper.FakeParticipantListener participantListener =
             new CallbackHelper.FakeParticipantListener();
-        participantListener.onVideoTrackAddedLatch = new CountDownLatch(1);
+        participantListener.onSubscribedToVideoTrackLatch = new CountDownLatch(1);
         participantListener.onVideoTrackEnabledLatch = new CountDownLatch(1);
         remoteParticipant.setListener(participantListener);
         bobPublishableLocalVideoTrack = LocalVideoTrack.create(mediaTestActivity, false,
                 new FakeVideoCapturer());
 
         assertTrue(bobLocalParticipant.publishVideoTrack(bobPublishableLocalVideoTrack));
-        assertTrue(participantListener.onVideoTrackAddedLatch.await(20, TimeUnit.SECONDS));
+        assertTrue(participantListener.onSubscribedToVideoTrackLatch.await(20, TimeUnit.SECONDS));
         assertFalse(aliceRoom.getRemoteParticipants().get(0).getRemoteVideoTracks().get(1)
                 .isEnabled());
         bobPublishableLocalVideoTrack.enable(true);
@@ -119,11 +119,13 @@ public class RemoteVideoTrackTopologyParameterizedTest extends BaseParticipantTe
     private void publishVideoTrack() throws InterruptedException {
         CallbackHelper.FakeParticipantListener participantListener =
                 new CallbackHelper.FakeParticipantListener();
+        participantListener.onSubscribedToVideoTrackLatch = new CountDownLatch(1);
         participantListener.onVideoTrackAddedLatch = new CountDownLatch(1);
         remoteParticipant.setListener(participantListener);
         bobPublishableLocalVideoTrack = LocalVideoTrack.create(mediaTestActivity, true,
                 new FakeVideoCapturer());
         assertTrue(bobLocalParticipant.publishVideoTrack(bobPublishableLocalVideoTrack));
         assertTrue(participantListener.onVideoTrackAddedLatch.await(20, TimeUnit.SECONDS));
+        assertTrue(participantListener.onSubscribedToVideoTrackLatch.await(20, TimeUnit.SECONDS));
     }
 }

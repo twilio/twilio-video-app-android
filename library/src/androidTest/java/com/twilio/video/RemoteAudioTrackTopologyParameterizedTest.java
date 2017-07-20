@@ -83,9 +83,11 @@ public class RemoteAudioTrackTopologyParameterizedTest extends BaseParticipantTe
         CallbackHelper.FakeParticipantListener participantListener =
                 new CallbackHelper.FakeParticipantListener();
         participantListener.onAudioTrackAddedLatch = new CountDownLatch(1);
+        participantListener.onSubscribedToAudioTrackLatch = new CountDownLatch(1);
         remoteParticipant.setListener(participantListener);
         bobPublishableLocalAudioTrack = LocalAudioTrack.create(mediaTestActivity, true);
         assertTrue(bobLocalParticipant.publishAudioTrack(bobPublishableLocalAudioTrack));
         assertTrue(participantListener.onAudioTrackAddedLatch.await(20, TimeUnit.SECONDS));
+        assertTrue(participantListener.onSubscribedToAudioTrackLatch.await(20, TimeUnit.SECONDS));
     }
 }

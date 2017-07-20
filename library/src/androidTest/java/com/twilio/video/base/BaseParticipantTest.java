@@ -119,8 +119,8 @@ public abstract class BaseParticipantTest extends BaseClientTest {
         aliceToken = CredentialsUtils.getAccessToken(Constants.PARTICIPANT_ALICE, topology);
         aliceRoomListener = new CallbackHelper.FakeRoomListener();
         aliceParticipantListener = new CallbackHelper.FakeParticipantListener();
-        aliceParticipantListener.onAudioTrackAddedLatch = new CountDownLatch(1);
-        aliceParticipantListener.onVideoTrackAddedLatch = new CountDownLatch(1);
+        aliceParticipantListener.onSubscribedToAudioTrackLatch = new CountDownLatch(1);
+        aliceParticipantListener.onSubscribedToVideoTrackLatch = new CountDownLatch(1);
         aliceRoomListener.onParticipantConnectedLatch = new CountDownLatch(1);
         aliceFixedLocalAudioTrack = LocalAudioTrack.create(mediaTestActivity, true);
         aliceFixedLocalVideoTrack = LocalVideoTrack.create(mediaTestActivity, true,
@@ -135,8 +135,8 @@ public abstract class BaseParticipantTest extends BaseClientTest {
         bobToken = CredentialsUtils.getAccessToken(Constants.PARTICIPANT_BOB, topology);
         bobRoomListener = new CallbackHelper.FakeRoomListener();
         bobParticipantListener = new CallbackHelper.FakeParticipantListener();
-        bobParticipantListener.onAudioTrackAddedLatch = new CountDownLatch(1);
-        bobParticipantListener.onVideoTrackAddedLatch = new CountDownLatch(1);
+        bobParticipantListener.onSubscribedToAudioTrackLatch = new CountDownLatch(1);
+        bobParticipantListener.onSubscribedToVideoTrackLatch = new CountDownLatch(1);
         bobFixedLocalAudioTrack = LocalAudioTrack.create(mediaTestActivity, true);
         bobFixedLocalVideoTrack = LocalVideoTrack.create(mediaTestActivity, true,
                 new FakeVideoCapturer());
@@ -164,10 +164,10 @@ public abstract class BaseParticipantTest extends BaseClientTest {
         assertNotNull(remoteParticipant);
 
         // Alice wait until all of bob tracks are added
-        assertTrue(aliceParticipantListener.onAudioTrackAddedLatch.await(20, TimeUnit.SECONDS));
-        assertTrue(aliceParticipantListener.onVideoTrackAddedLatch.await(20, TimeUnit.SECONDS));
-        assertTrue(bobParticipantListener.onAudioTrackAddedLatch.await(20, TimeUnit.SECONDS));
-        assertTrue(bobParticipantListener.onVideoTrackAddedLatch.await(20, TimeUnit.SECONDS));
+        assertTrue(aliceParticipantListener.onSubscribedToAudioTrackLatch.await(20, TimeUnit.SECONDS));
+        assertTrue(aliceParticipantListener.onSubscribedToVideoTrackLatch.await(20, TimeUnit.SECONDS));
+        assertTrue(bobParticipantListener.onSubscribedToAudioTrackLatch.await(20, TimeUnit.SECONDS));
+        assertTrue(bobParticipantListener.onSubscribedToVideoTrackLatch.await(20, TimeUnit.SECONDS));
     }
 
     @After

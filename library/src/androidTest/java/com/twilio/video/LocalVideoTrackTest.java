@@ -30,6 +30,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 
+import static com.twilio.video.util.VideoAssert.assertNoFramesRendered;
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.TestCase.assertFalse;
 import static junit.framework.TestCase.assertNotNull;
@@ -175,14 +176,7 @@ public class LocalVideoTrackTest extends BaseLocalVideoTrackTest {
         localVideoTrack.release();
 
         // Validate that eventually frame events stop
-        final int maxRetries = 3;
-        int retries = 0;
-        while (frameCountRenderer.waitForFrame(LOCAL_VIDEO_TRACK_TEST_DELAY_MS)) {
-            if (retries == maxRetries) {
-                fail("Still receiving frames after renderer removed");
-            }
-            retries++;
-        }
+        assertNoFramesRendered(frameCountRenderer, LOCAL_VIDEO_TRACK_TEST_DELAY_MS);
     }
 
 }

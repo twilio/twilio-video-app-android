@@ -224,16 +224,16 @@ public class StatsTopologyParameterizedTest extends BaseClientTest {
         // Add audio track to Bob and check stats
         CallbackHelper.FakeParticipantListener participantListener =
                 new CallbackHelper.FakeParticipantListener();
-        participantListener.onAudioTrackAddedLatch = new CountDownLatch(1);
-        participantListener.onVideoTrackAddedLatch = new CountDownLatch(1);
-        participantListener.onVideoTrackRemovedLatch = new CountDownLatch(1);
+        participantListener.onSubscribedToAudioTrackLatch = new CountDownLatch(1);
+        participantListener.onSubscribedToVideoTrackLatch = new CountDownLatch(1);
+        participantListener.onUnsubscribedFromVideoTrackLatch = new CountDownLatch(1);
         RemoteParticipant bob = aliceRoom.getRemoteParticipants().get(0);
         bob.setListener(participantListener);
 
         LocalParticipant bobLocalParticipant = bobRoom.getLocalParticipant();
         bobLocalAudioTrack = LocalAudioTrack.create(mediaTestActivity, true);
         assertTrue(bobLocalParticipant.publishAudioTrack(bobLocalAudioTrack));
-        assertTrue(participantListener.onAudioTrackAddedLatch.await(20, TimeUnit.SECONDS));
+        assertTrue(participantListener.onSubscribedToAudioTrackLatch.await(20, TimeUnit.SECONDS));
 
         // let's give peer connection some time to get media flowing
         Thread.sleep(2000);
@@ -252,7 +252,7 @@ public class StatsTopologyParameterizedTest extends BaseClientTest {
         bobLocalVideoTrack = LocalVideoTrack
                 .create(mediaTestActivity, true, new FakeVideoCapturer());
         assertTrue(bobLocalParticipant.publishVideoTrack(bobLocalVideoTrack));
-        assertTrue(participantListener.onVideoTrackAddedLatch.await(20, TimeUnit.SECONDS));
+        assertTrue(participantListener.onSubscribedToVideoTrackLatch.await(20, TimeUnit.SECONDS));
 
         // let's give peer connection some time to get media flowing
         Thread.sleep(2000);
@@ -268,7 +268,7 @@ public class StatsTopologyParameterizedTest extends BaseClientTest {
 
         // Remove Bob's video track and check the stats
         bobLocalParticipant.unpublishVideoTrack(bobLocalVideoTrack);
-        assertTrue(participantListener.onVideoTrackRemovedLatch.await(20, TimeUnit.SECONDS));
+        assertTrue(participantListener.onUnsubscribedFromVideoTrackLatch.await(20, TimeUnit.SECONDS));
 
         // let's give peer connection some time to get media flowing
         Thread.sleep(2000);
