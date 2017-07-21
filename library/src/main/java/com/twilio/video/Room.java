@@ -233,9 +233,7 @@ public class Room {
      * @param statsListener listener that receives stats reports for all media tracks.
      */
     public synchronized void getStats(@NonNull StatsListener statsListener) {
-        if (statsListener == null) {
-            throw new NullPointerException("StatsListener must not be null");
-        }
+        Preconditions.checkNotNull(statsListener, "StatsListener must not be null");
         if (roomState == RoomState.DISCONNECTED) {
             return;
         }

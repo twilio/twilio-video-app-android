@@ -40,7 +40,6 @@ import org.junit.After;
 import org.junit.Rule;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
@@ -54,23 +53,10 @@ public abstract class BaseParticipantTest extends BaseClientTest {
             new ActivityTestRule<>(MediaTestActivity.class);
     protected MediaTestActivity mediaTestActivity;
 
-    /*
-     * Alice and bob fixed tracks are provided upon connect.
-     */
-    protected LocalVideoTrack aliceFixedLocalVideoTrack;
-    protected LocalAudioTrack aliceFixedLocalAudioTrack;
-    protected LocalVideoTrack bobFixedLocalVideoTrack;
-    protected LocalAudioTrack bobFixedLocalAudioTrack;
-
-    /*
-     * Alice and bob publishable tracks represent media that can be published and unpublished from a
-     * room. This contrasts the fixed tracks which are added on connect.
-     */
-    protected LocalVideoTrack alicePublishableLocalVideoTrack;
-    protected LocalAudioTrack alicePublishableLocalAudioTrack;
-    protected LocalVideoTrack bobPublishableLocalVideoTrack;
-    protected LocalAudioTrack bobPublishableLocalAudioTrack;
-
+    protected LocalVideoTrack aliceLocalVideoTrack;
+    protected LocalAudioTrack aliceLocalAudioTrack;
+    protected LocalVideoTrack bobLocalVideoTrack;
+    protected LocalAudioTrack bobLocalAudioTrack;
     protected String aliceToken;
     protected String bobToken;
     protected Room aliceRoom;
@@ -119,31 +105,17 @@ public abstract class BaseParticipantTest extends BaseClientTest {
         aliceToken = CredentialsUtils.getAccessToken(Constants.PARTICIPANT_ALICE, topology);
         aliceRoomListener = new CallbackHelper.FakeRoomListener();
         aliceParticipantListener = new CallbackHelper.FakeParticipantListener();
-        aliceParticipantListener.onSubscribedToAudioTrackLatch = new CountDownLatch(1);
-        aliceParticipantListener.onSubscribedToVideoTrackLatch = new CountDownLatch(1);
         aliceRoomListener.onParticipantConnectedLatch = new CountDownLatch(1);
-        aliceFixedLocalAudioTrack = LocalAudioTrack.create(mediaTestActivity, true);
-        aliceFixedLocalVideoTrack = LocalVideoTrack.create(mediaTestActivity, true,
-                new FakeVideoCapturer());
         ConnectOptions aliceConnectOptions = new ConnectOptions.Builder(aliceToken)
                 .roomName(testRoomName)
-                .audioTracks(Collections.singletonList(aliceFixedLocalAudioTrack))
-                .videoTracks(Collections.singletonList(aliceFixedLocalVideoTrack))
                 .build();
 
         // Setup bob
         bobToken = CredentialsUtils.getAccessToken(Constants.PARTICIPANT_BOB, topology);
         bobRoomListener = new CallbackHelper.FakeRoomListener();
         bobParticipantListener = new CallbackHelper.FakeParticipantListener();
-        bobParticipantListener.onSubscribedToAudioTrackLatch = new CountDownLatch(1);
-        bobParticipantListener.onSubscribedToVideoTrackLatch = new CountDownLatch(1);
-        bobFixedLocalAudioTrack = LocalAudioTrack.create(mediaTestActivity, true);
-        bobFixedLocalVideoTrack = LocalVideoTrack.create(mediaTestActivity, true,
-                new FakeVideoCapturer());
         ConnectOptions bobConnectOptions = new ConnectOptions.Builder(bobToken)
                 .roomName(testRoomName)
-                .audioTracks(Collections.singletonList(bobFixedLocalAudioTrack))
-                .videoTracks(Collections.singletonList(bobFixedLocalVideoTrack))
                 .build();
 
         // Connect alice
@@ -157,17 +129,12 @@ public abstract class BaseParticipantTest extends BaseClientTest {
         // Alice wait for bob to connect
         assertTrue(aliceRoomListener.onParticipantConnectedLatch.await(20, TimeUnit.SECONDS));
         bobLocalParticipant = bobRoom.getLocalParticipant();
-        List<RemoteParticipant> remoteParticipantList = new ArrayList<>(aliceRoom.getRemoteParticipants());
+        List<RemoteParticipant> remoteParticipantList =
+                new ArrayList<>(aliceRoom.getRemoteParticipants());
         assertEquals(1, remoteParticipantList.size());
         remoteParticipant = remoteParticipantList.get(0);
         remoteParticipant.setListener(aliceParticipantListener);
         assertNotNull(remoteParticipant);
-
-        // Alice wait until all of bob tracks are added
-        assertTrue(aliceParticipantListener.onSubscribedToAudioTrackLatch.await(20, TimeUnit.SECONDS));
-        assertTrue(aliceParticipantListener.onSubscribedToVideoTrackLatch.await(20, TimeUnit.SECONDS));
-        assertTrue(bobParticipantListener.onSubscribedToAudioTrackLatch.await(20, TimeUnit.SECONDS));
-        assertTrue(bobParticipantListener.onSubscribedToVideoTrackLatch.await(20, TimeUnit.SECONDS));
     }
 
     @After
@@ -178,29 +145,17 @@ public abstract class BaseParticipantTest extends BaseClientTest {
         aliceRoom = null;
         aliceRoomListener = null;
         remoteParticipant = null;
-        if (aliceFixedLocalAudioTrack != null) {
-            aliceFixedLocalAudioTrack.release();
+        if (aliceLocalAudioTrack != null) {
+            aliceLocalAudioTrack.release();
         }
-        if (aliceFixedLocalVideoTrack != null) {
-            aliceFixedLocalVideoTrack.release();
+        if (aliceLocalVideoTrack != null) {
+            aliceLocalVideoTrack.release();
         }
-        if (bobFixedLocalAudioTrack != null) {
-            bobFixedLocalAudioTrack.release();
+        if (bobLocalAudioTrack != null) {
+            bobLocalAudioTrack.release();
         }
-        if (bobFixedLocalVideoTrack != null) {
-            bobFixedLocalVideoTrack.release();
-        }
-        if (alicePublishableLocalAudioTrack != null) {
-            alicePublishableLocalAudioTrack.release();
-        }
-        if (alicePublishableLocalVideoTrack != null) {
-            alicePublishableLocalVideoTrack.release();
-        }
-        if (bobPublishableLocalAudioTrack != null) {
-            bobPublishableLocalAudioTrack.release();
-        }
-        if (bobPublishableLocalVideoTrack != null) {
-            bobPublishableLocalVideoTrack.release();
+        if (bobLocalVideoTrack != null) {
+            bobLocalVideoTrack.release();
         }
     }
 }

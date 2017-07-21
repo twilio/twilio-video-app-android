@@ -17,11 +17,22 @@
 package com.twilio.video;
 
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
+
+import java.util.Collections;
+import java.util.List;
 
 import static junit.framework.TestCase.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.when;
 
+@RunWith(MockitoJUnitRunner.class)
 public class ConnectOptionsUnitTest {
+    @Mock LocalAudioTrack localAudioTrack;
+    @Mock LocalVideoTrack localVideoTrack;
+
     @Test(expected = NullPointerException.class)
     public void shouldThrowExceptionWhenTokenIsNull() {
         new ConnectOptions.Builder(null).build();
@@ -54,5 +65,25 @@ public class ConnectOptionsUnitTest {
                 .enableInsights(false)
                 .build();
         assertFalse(connectOptions.isInsightsEnabled());
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void shouldNotAllowReleasedLocalAudioTrack() throws InterruptedException {
+        when(localAudioTrack.isReleased())
+                .thenReturn(true);
+        new ConnectOptions.Builder("token")
+                .roomName("room name")
+                .audioTracks(Collections.singletonList(localAudioTrack))
+                .build();
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void shouldNotAllowReleasedLocalVideoTrack() throws InterruptedException {
+        when(localVideoTrack.isReleased())
+                .thenReturn(true);
+        new ConnectOptions.Builder("token")
+                .roomName("room name")
+                .videoTracks(Collections.singletonList(localVideoTrack))
+                .build();
     }
 }

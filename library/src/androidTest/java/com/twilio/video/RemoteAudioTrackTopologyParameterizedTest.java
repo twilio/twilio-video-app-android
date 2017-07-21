@@ -73,10 +73,10 @@ public class RemoteAudioTrackTopologyParameterizedTest extends BaseParticipantTe
 
         // Validate track was added
         List<RemoteAudioTrack> remoteAudioTracks = remoteParticipant.getRemoteAudioTracks();
-        assertEquals(2, remoteAudioTracks.size());
+        assertEquals(1, remoteAudioTracks.size());
 
         // Validate track sid
-        assertIsTrackSid(remoteAudioTracks.get(1).getSid());
+        assertIsTrackSid(remoteAudioTracks.get(0).getSid());
     }
 
     private void publishAudioTrack() throws InterruptedException {
@@ -85,8 +85,8 @@ public class RemoteAudioTrackTopologyParameterizedTest extends BaseParticipantTe
         participantListener.onAudioTrackAddedLatch = new CountDownLatch(1);
         participantListener.onSubscribedToAudioTrackLatch = new CountDownLatch(1);
         remoteParticipant.setListener(participantListener);
-        bobPublishableLocalAudioTrack = LocalAudioTrack.create(mediaTestActivity, true);
-        assertTrue(bobLocalParticipant.publishAudioTrack(bobPublishableLocalAudioTrack));
+        bobLocalAudioTrack = LocalAudioTrack.create(mediaTestActivity, true);
+        assertTrue(bobLocalParticipant.publishAudioTrack(bobLocalAudioTrack));
         assertTrue(participantListener.onAudioTrackAddedLatch.await(20, TimeUnit.SECONDS));
         assertTrue(participantListener.onSubscribedToAudioTrackLatch.await(20, TimeUnit.SECONDS));
     }

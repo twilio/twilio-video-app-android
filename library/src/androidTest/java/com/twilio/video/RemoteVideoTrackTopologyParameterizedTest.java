@@ -35,6 +35,7 @@ import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
+import static com.twilio.video.util.VideoAssert.assertFramesRendered;
 import static junit.framework.TestCase.assertFalse;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -71,27 +72,28 @@ public class RemoteVideoTrackTopologyParameterizedTest extends BaseParticipantTe
     }
 
     @Test
-    public void shouldHaveTrackSidAfterAdded() throws InterruptedException {
+    public void shouldHaveTrackSidAfterPublished() throws InterruptedException {
         // TODO: GSDK-1249 Re-enable once track sid changes are deployed to prod SFU
         assumeTrue(topology == Topology.P2P);
         publishVideoTrack();
 
         // Validate track was added
         List<RemoteVideoTrack> remoteVideoTracks = remoteParticipant.getRemoteVideoTracks();
-        assertEquals(2, remoteVideoTracks.size());
+        assertEquals(1, remoteVideoTracks.size());
 
         // Validate track sid
-        assertIsTrackSid(remoteVideoTracks.get(1).getSid());
+        assertIsTrackSid(remoteVideoTracks.get(0).getSid());
     }
 
     @Test
     public void canBeRendered() throws InterruptedException {
+        publishVideoTrack();
         List<RemoteVideoTrack> remoteVideoTracks = remoteParticipant.getRemoteVideoTracks();
         assertEquals(1, remoteVideoTracks.size());
         FrameCountRenderer frameCountRenderer = new FrameCountRenderer();
         remoteVideoTracks.get(0).addRenderer(frameCountRenderer);
         assertEquals(1, remoteVideoTracks.get(0).getRenderers().size());
-        assertTrue(frameCountRenderer.waitForFrame(VIDEO_TRACK_TEST_DELAY_MS));
+        assertFramesRendered(frameCountRenderer, VIDEO_TRACK_TEST_DELAY_MS);
         remoteVideoTracks.get(0).removeRenderer(frameCountRenderer);
         assertEquals(0, remoteVideoTracks.get(0).getRenderers().size());
     }
@@ -103,16 +105,16 @@ public class RemoteVideoTrackTopologyParameterizedTest extends BaseParticipantTe
         participantListener.onSubscribedToVideoTrackLatch = new CountDownLatch(1);
         participantListener.onVideoTrackEnabledLatch = new CountDownLatch(1);
         remoteParticipant.setListener(participantListener);
-        bobPublishableLocalVideoTrack = LocalVideoTrack.create(mediaTestActivity, false,
+        bobLocalVideoTrack = LocalVideoTrack.create(mediaTestActivity, false,
                 new FakeVideoCapturer());
 
-        assertTrue(bobLocalParticipant.publishVideoTrack(bobPublishableLocalVideoTrack));
+        assertTrue(bobLocalParticipant.publishVideoTrack(bobLocalVideoTrack));
         assertTrue(participantListener.onSubscribedToVideoTrackLatch.await(20, TimeUnit.SECONDS));
-        assertFalse(aliceRoom.getRemoteParticipants().get(0).getRemoteVideoTracks().get(1)
+        assertFalse(aliceRoom.getRemoteParticipants().get(0).getRemoteVideoTracks().get(0)
                 .isEnabled());
-        bobPublishableLocalVideoTrack.enable(true);
+        bobLocalVideoTrack.enable(true);
         assertTrue(participantListener.onVideoTrackEnabledLatch.await(20, TimeUnit.SECONDS));
-        assertTrue(aliceRoom.getRemoteParticipants().get(0).getRemoteVideoTracks().get(1)
+        assertTrue(aliceRoom.getRemoteParticipants().get(0).getRemoteVideoTracks().get(0)
                 .isEnabled());
     }
 
@@ -122,9 +124,9 @@ public class RemoteVideoTrackTopologyParameterizedTest extends BaseParticipantTe
         participantListener.onSubscribedToVideoTrackLatch = new CountDownLatch(1);
         participantListener.onVideoTrackAddedLatch = new CountDownLatch(1);
         remoteParticipant.setListener(participantListener);
-        bobPublishableLocalVideoTrack = LocalVideoTrack.create(mediaTestActivity, true,
+        bobLocalVideoTrack = LocalVideoTrack.create(mediaTestActivity, true,
                 new FakeVideoCapturer());
-        assertTrue(bobLocalParticipant.publishVideoTrack(bobPublishableLocalVideoTrack));
+        assertTrue(bobLocalParticipant.publishVideoTrack(bobLocalVideoTrack));
         assertTrue(participantListener.onVideoTrackAddedLatch.await(20, TimeUnit.SECONDS));
         assertTrue(participantListener.onSubscribedToVideoTrackLatch.await(20, TimeUnit.SECONDS));
     }
