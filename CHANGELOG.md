@@ -2,6 +2,20 @@ The Twilio Programmable Video SDKs use [Semantic Versioning](http://www.semver.o
 
 ####1.2.1
 
+Bug Fixes
+
+- Remove reference to `LocalMedia` in `CameraCapturer` javadoc.
+
+Known issues
+
+- Network handoff, and subsequent connection renegotiation is not supported for IPv6 networks [#72](https://github.com/twilio/video-quickstart-android/issues/72)
+- VP8 is the only supported codec [#71](https://github.com/twilio/video-quickstart-android/issues/71)
+- Participant disconnect event can take up to 120 seconds to occur [#80](https://github.com/twilio/video-quickstart-android/issues/80) [#73](https://github.com/twilio/video-quickstart-android/issues/73)
+- Disconnecting from a `Room` that has not connected sometimes results in a crash [#116](https://github.com/twilio/video-quickstart-android/issues/116)
+- LocalParticipant release method is public [#132](https://github.com/twilio/video-quickstart-android/issues/132)
+
+####1.2.1
+
 Improvements
 
 - Improved safety of asynchronous operations in native core.
