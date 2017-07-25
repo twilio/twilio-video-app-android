@@ -1,10 +1,15 @@
 The Twilio Programmable Video SDKs use [Semantic Versioning](http://www.semver.org).
 
-####1.2.1
+####1.2.2
+
+Improvements
+
+- Calling `Participant#setListener` with `null` is no longer allowed. 
 
 Bug Fixes
 
-- Remove reference to `LocalMedia` in `CameraCapturer` javadoc.
+- Removed reference to `LocalMedia` in `CameraCapturer` javadoc.
+- Fixed race condition that could result in track events not being raised.
 
 Known issues
 

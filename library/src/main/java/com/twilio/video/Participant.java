@@ -17,6 +17,7 @@
 package com.twilio.video;
 
 import android.os.Handler;
+import android.support.annotation.NonNull;
 
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
@@ -39,165 +40,165 @@ public class Participant {
      */
     private final AtomicReference<Listener> listenerReference = new AtomicReference<>(null);
     private final Listener participantListenerProxy = new Listener() {
+
+        /*
+         * All event processing is done on the same thread the developer used to connect to a
+         * room. All operations that modify the state of the participant MUST BE PERFORMED ON THE
+         * DEVELOPER'S THREAD. This is required because we have both an asynchronous and synchronous
+         * API and it is possible that the developer could use the synchronous API before receiving
+         * an asynchronous event. We currently only have one test
+         * `shouldReceiveTrackEventsIfListenerSetAfterEventReceived` that validates this scenario
+         * with the audio track added event.
+         */
+
         @Override
         public void onAudioTrackAdded(final Participant participant,
                                       final AudioTrack audioTrack) {
-            logger.d("onAudioTrackAdded");
-            if (audioTrack == null) {
-                logger.w("Received audio track added callback for non-existing audio track");
-                return;
-            }
-            audioTracks.add(audioTrack);
-            final Listener listener = listenerReference.get();
-            if (listener != null) {
-                handler.post(new Runnable() {
-                    @Override
-                    public void run() {
+            checkCallback(participant, audioTrack, "onAudioTrackAdded");
+            handler.post(new Runnable() {
+                @Override
+                public void run() {
+                    logger.d("onAudioTrackAdded");
+                    audioTracks.add(audioTrack);
+                    Listener listener = listenerReference.get();
+
+                    if (listener != null) {
                         listener.onAudioTrackAdded(participant, audioTrack);
                     }
-                });
-            }
+                }
+            });
         }
 
         @Override
         public void onAudioTrackRemoved(final Participant participant,
                                         final AudioTrack audioTrack) {
-            logger.d("onAudioTrackRemoved");
-            audioTracks.remove(audioTrack);
-            if (audioTrack == null) {
-                logger.w("Received audio track removed callback for non-existent audio track");
-                return;
-            }
-            final Listener listener = listenerReference.get();
-            if (listener != null) {
-                handler.post(new Runnable() {
-                    @Override
-                    public void run() {
+            checkCallback(participant, audioTrack, "onAudioTrackRemoved");
+            handler.post(new Runnable() {
+                @Override
+                public void run() {
+                    logger.d("onAudioTrackRemoved");
+                    audioTracks.remove(audioTrack);
+                    Listener listener = listenerReference.get();
+
+                    if (listener != null) {
                         listener.onAudioTrackRemoved(participant, audioTrack);
                     }
-                });
-            }
+                }
+            });
         }
 
         @Override
         public void onVideoTrackAdded(final Participant participant,
                                       final VideoTrack videoTrack) {
-            logger.d("onVideoTrackAdded");
-            if (videoTrack == null) {
-                logger.w("Received video track added callback for non-existing video track");
-                return;
-            }
-            videoTracks.add(videoTrack);
-            final Listener listener = listenerReference.get();
-            if (listener != null) {
-                handler.post(new Runnable() {
-                    @Override
-                    public void run() {
+            checkCallback(participant, videoTrack, "onVideoTrackAdded");
+            handler.post(new Runnable() {
+                @Override
+                public void run() {
+                    logger.d("onVideoTrackAdded");
+                    videoTracks.add(videoTrack);
+                    Listener listener = listenerReference.get();
+
+                    if (listener != null) {
                         listener.onVideoTrackAdded(participant, videoTrack);
                     }
-                });
-            }
+                }
+            });
         }
 
         @Override
         public void onVideoTrackRemoved(final Participant participant,
                                         final VideoTrack videoTrack) {
-            logger.d("onVideoTrackRemoved");
-            videoTracks.remove(videoTrack);
-            if (videoTrack == null) {
-                logger.w("Received video track removed callback for non-existent video track");
-                return;
-            }
-            videoTrack.release();
-            final Listener listener = listenerReference.get();
-            if (listener != null) {
-                handler.post(new Runnable() {
-                    @Override
-                    public void run() {
+            checkCallback(participant, videoTrack, "onVideoTrackRemoved");
+            handler.post(new Runnable() {
+                @Override
+                public void run() {
+                    logger.d("onVideoTrackRemoved");
+                    videoTracks.remove(videoTrack);
+                    videoTrack.release();
+                    Listener listener = listenerReference.get();
+
+                    if (listener != null) {
                         listener.onVideoTrackRemoved(participant, videoTrack);
                     }
-                });
-            }
+                }
+            });
         }
 
         @Override
         public void onAudioTrackEnabled(final Participant participant,
                                         final AudioTrack audioTrack) {
-            logger.d("onAudioTrackEnabled");
-            if (audioTrack == null) {
-                logger.w("Received audio track enabled callback for non-existent audio track");
-                return;
-            }
-            audioTrack.setEnabled(true);
-            final Listener listener = listenerReference.get();
-            if (listener != null) {
-                handler.post(new Runnable() {
-                    @Override
-                    public void run() {
+            checkCallback(participant, audioTrack, "onAudioTrackEnabled");
+            handler.post(new Runnable() {
+                @Override
+                public void run() {
+                    logger.d("onAudioTrackEnabled");
+                    Listener listener = listenerReference.get();
+
+                    if (listener != null) {
                         listener.onAudioTrackEnabled(participant, audioTrack);
                     }
-                });
-            }
+                }
+            });
         }
 
         @Override
         public void onAudioTrackDisabled(final Participant participant,
                                          final AudioTrack audioTrack) {
-            logger.d("onAudioTrackDisabled");
-            if (audioTrack == null) {
-                logger.w("Received audio track disabled callback for non-existent audio track");
-                return;
-            }
-            audioTrack.setEnabled(false);
-            final Listener listener = listenerReference.get();
-            if (listener != null) {
-                handler.post(new Runnable() {
-                    @Override
-                    public void run() {
+            checkCallback(participant, audioTrack, "onAudioTrackDisabled");
+            handler.post(new Runnable() {
+                @Override
+                public void run() {
+                    logger.d("onAudioTrackDisabled");
+                    audioTrack.setEnabled(false);
+                    Listener listener = listenerReference.get();
+
+                    if (listener != null) {
                         listener.onAudioTrackDisabled(participant, audioTrack);
                     }
-                });
-            }
+                }
+            });
         }
 
         @Override
         public void onVideoTrackEnabled(final Participant participant,
                                         final VideoTrack videoTrack) {
-            logger.d("onVideoTrackEnabled");
-            if (videoTrack == null) {
-                logger.w("Received video track enabled callback for non-existent video track");
-                return;
-            }
-            videoTrack.setEnabled(true);
-            final Listener listener = listenerReference.get();
-            if (listener != null) {
-                handler.post(new Runnable() {
-                    @Override
-                    public void run() {
+            checkCallback(participant, videoTrack, "onVideoTrackEnabled");
+            handler.post(new Runnable() {
+                @Override
+                public void run() {
+                    logger.d("onVideoTrackEnabled");
+                    videoTrack.setEnabled(true);
+                    Listener listener = listenerReference.get();
+
+                    if (listener != null) {
                         listener.onVideoTrackEnabled(participant, videoTrack);
                     }
-                });
-            }
+                }
+            });
         }
 
         @Override
         public void onVideoTrackDisabled(final Participant participant,
                                          final VideoTrack videoTrack) {
-            logger.d("onVideoTrackDisabled");
-            if (videoTrack == null) {
-                logger.w("Received video track disabled callback for non-existent video track");
-                return;
-            }
-            videoTrack.setEnabled(false);
-            final Listener listener = listenerReference.get();
-            if (listener != null) {
-                handler.post(new Runnable() {
-                    @Override
-                    public void run() {
+            checkCallback(participant, videoTrack, "onVideoTrackDisabled");
+            handler.post(new Runnable() {
+                @Override
+                public void run() {
+                    logger.d("onVideoTrackDisabled");
+                    videoTrack.setEnabled(false);
+                    Listener listener = listenerReference.get();
+
+                    if (listener != null) {
                         listener.onVideoTrackDisabled(participant, videoTrack);
                     }
-                });
-            }
+                }
+            });
+        }
+
+        private void checkCallback(Participant participant, Track track, String callback) {
+            Preconditions.checkState(participant != null, "Received null participant in %s",
+                    callback);
+            Preconditions.checkState(track != null, "Received null track in %s", callback);
         }
     };
     private long nativeParticipantContext;
@@ -254,8 +255,10 @@ public class Participant {
      *
      * @param listener of participant events.
      */
-    public void setListener(Participant.Listener listener) {
-        listenerReference.set(listener);
+    public void setListener(final @NonNull Participant.Listener listener) {
+        Preconditions.checkNotNull(listener, "Listener must not be null");
+
+        this.listenerReference.set(listener);
     }
 
     /**
