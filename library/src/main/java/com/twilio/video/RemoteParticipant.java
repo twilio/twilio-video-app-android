@@ -48,198 +48,241 @@ public class RemoteParticipant implements Participant {
      */
     @SuppressWarnings("unused")
     private final Listener participantListenerProxy = new Listener() {
+
+        /*
+         * All event processing is done on the same thread the developer used to connect to a
+         * room. All operations that modify the state of the participant MUST BE PERFORMED ON THE
+         * DEVELOPER'S THREAD. This is required because we have both an asynchronous and synchronous
+         * API and it is possible that the developer could use the synchronous API before receiving
+         * an asynchronous event. We currently only have one test
+         * `shouldReceiveTrackEventsIfListenerSetAfterEventReceived` that validates this scenario
+         * with the audio track added event.
+         */
+
         @Override
         public void onAudioTrackAdded(final RemoteParticipant remoteParticipant,
                                       final RemoteAudioTrack remoteAudioTrack) {
-            logger.d("onAudioTrackAdded");
-            audioTracks.add(remoteAudioTrack);
-            remoteAudioTracks.add(remoteAudioTrack);
-            final Listener listener = listenerReference.get();
-            if (listener != null) {
-                handler.post(new Runnable() {
-                    @Override
-                    public void run() {
+            checkCallback(remoteParticipant, remoteAudioTrack, "onAudioTrackAdded");
+            handler.post(new Runnable() {
+                @Override
+                public void run() {
+                    logger.d("onAudioTrackAdded");
+                    audioTracks.add(remoteAudioTrack);
+                    remoteAudioTracks.add(remoteAudioTrack);
+                    Listener listener = listenerReference.get();
+
+                    if (listener != null) {
                         listener.onAudioTrackAdded(remoteParticipant, remoteAudioTrack);
                     }
-                });
-            }
+                }
+            });
         }
 
         @Override
         public void onAudioTrackRemoved(final RemoteParticipant remoteParticipant,
                                         final RemoteAudioTrack remoteAudioTrack) {
-            logger.d("onAudioTrackRemoved");
-            audioTracks.remove(remoteAudioTrack);
-            remoteAudioTracks.remove(remoteAudioTrack);
-            final Listener listener = listenerReference.get();
-            if (listener != null) {
-                handler.post(new Runnable() {
-                    @Override
-                    public void run() {
+            checkCallback(remoteParticipant, remoteAudioTrack, "onAudioTrackRemoved");
+            handler.post(new Runnable() {
+                @Override
+                public void run() {
+                    logger.d("onAudioTrackRemoved");
+                    audioTracks.remove(remoteAudioTrack);
+                    remoteAudioTracks.remove(remoteAudioTrack);
+                    Listener listener = listenerReference.get();
+
+                    if (listener != null) {
                         listener.onAudioTrackRemoved(remoteParticipant, remoteAudioTrack);
                     }
-                });
-            }
+                }
+            });
         }
 
         @Override
         public void onSubscribedToAudioTrack(final RemoteParticipant remoteParticipant,
                                              final RemoteAudioTrack remoteAudioTrack) {
-            logger.d("onSubscribedToAudioTrack");
-            final Listener listener = listenerReference.get();
-            if (listener != null) {
-                handler.post(new Runnable() {
-                    @Override
-                    public void run() {
+            checkCallback(remoteParticipant, remoteAudioTrack, "onSubscribedToAudioTrack");
+            handler.post(new Runnable() {
+                @Override
+                public void run() {
+                    logger.d("onSubscribedToAudioTrack");
+                    Listener listener = listenerReference.get();
+
+                    if (listener != null) {
                         listener.onSubscribedToAudioTrack(remoteParticipant, remoteAudioTrack);
                     }
-                });
-            }
+                }
+            });
         }
 
         @Override
         public void onUnsubscribedFromAudioTrack(final RemoteParticipant remoteParticipant,
                                                  final RemoteAudioTrack remoteAudioTrack) {
-            logger.d("onUnsubscribedFromAudioTrack");
-            final Listener listener = listenerReference.get();
-            if (listener != null) {
-                handler.post(new Runnable() {
-                    @Override
-                    public void run() {
+            checkCallback(remoteParticipant, remoteAudioTrack, "onUnsubscribedFromAudioTrack");
+            handler.post(new Runnable() {
+                @Override
+                public void run() {
+                    logger.d("onUnsubscribedFromAudioTrack");
+                    Listener listener = listenerReference.get();
+
+                    if (listener != null) {
                         listener.onUnsubscribedFromAudioTrack(remoteParticipant, remoteAudioTrack);
                     }
-                });
-            }
+                }
+            });
         }
 
         @Override
         public void onVideoTrackAdded(final RemoteParticipant remoteParticipant,
                                       final RemoteVideoTrack remoteVideoTrack) {
-            logger.d("onVideoTrackAdded");
-            videoTracks.add(remoteVideoTrack);
-            remoteVideoTracks.add(remoteVideoTrack);
-            final Listener listener = listenerReference.get();
-            if (listener != null) {
-                handler.post(new Runnable() {
-                    @Override
-                    public void run() {
+            checkCallback(remoteParticipant, remoteVideoTrack, "onVideoTrackAdded");
+            handler.post(new Runnable() {
+                @Override
+                public void run() {
+                    logger.d("onVideoTrackAdded");
+                    videoTracks.add(remoteVideoTrack);
+                    remoteVideoTracks.add(remoteVideoTrack);
+                    Listener listener = listenerReference.get();
+
+                    if (listener != null) {
                         listener.onVideoTrackAdded(remoteParticipant, remoteVideoTrack);
                     }
-                });
-            }
+                }
+            });
         }
 
         @Override
         public void onVideoTrackRemoved(final RemoteParticipant remoteParticipant,
                                         final RemoteVideoTrack remoteVideoTrack) {
-            logger.d("onVideoTrackRemoved");
-            videoTracks.remove(remoteVideoTrack);
-            remoteVideoTracks.remove(remoteVideoTrack);
-            remoteVideoTrack.release();
-            final Listener listener = listenerReference.get();
-            if (listener != null) {
-                handler.post(new Runnable() {
-                    @Override
-                    public void run() {
+            checkCallback(remoteParticipant, remoteVideoTrack, "onVideoTrackRemoved");
+            handler.post(new Runnable() {
+                @Override
+                public void run() {
+                    logger.d("onVideoTrackRemoved");
+                    videoTracks.remove(remoteVideoTrack);
+                    remoteVideoTracks.remove(remoteVideoTrack);
+                    remoteVideoTrack.release();
+                    Listener listener = listenerReference.get();
+
+                    if (listener != null) {
                         listener.onVideoTrackRemoved(remoteParticipant, remoteVideoTrack);
                     }
-                });
-            }
+                }
+            });
         }
 
         @Override
         public void onSubscribedToVideoTrack(final RemoteParticipant remoteParticipant,
                                              final RemoteVideoTrack remoteVideoTrack) {
-            logger.d("onSubscribedToVideoTrack");
-            final Listener listener = listenerReference.get();
-            if (listener != null) {
-                handler.post(new Runnable() {
-                    @Override
-                    public void run() {
+            checkCallback(remoteParticipant, remoteVideoTrack, "onSubscribedToVideoTrack");
+            handler.post(new Runnable() {
+                @Override
+                public void run() {
+                    logger.d("onSubscribedToVideoTrack");
+                    Listener listener = listenerReference.get();
+
+                    if (listener != null) {
                         listener.onSubscribedToVideoTrack(remoteParticipant, remoteVideoTrack);
                     }
-                });
-            }
+                }
+            });
         }
 
         @Override
         public void onUnsubscribedFromVideoTrack(final RemoteParticipant remoteParticipant,
                                                  final RemoteVideoTrack remoteVideoTrack) {
-            logger.d("onUnsubscribedFromVideoTrack");
-            remoteVideoTrack.invalidateWebRtcTrack();
-            final Listener listener = listenerReference.get();
-            if (listener != null) {
-                handler.post(new Runnable() {
-                    @Override
-                    public void run() {
+            checkCallback(remoteParticipant, remoteVideoTrack, "onUnsubscribedFromVideoTrack");
+            handler.post(new Runnable() {
+                @Override
+                public void run() {
+                    logger.d("onUnsubscribedFromVideoTrack");
+                    remoteVideoTrack.invalidateWebRtcTrack();
+                    Listener listener = listenerReference.get();
+
+                    if (listener != null) {
                         listener.onUnsubscribedFromVideoTrack(remoteParticipant, remoteVideoTrack);
                     }
-                });
-            }
+                }
+            });
         }
 
         @Override
         public void onAudioTrackEnabled(final RemoteParticipant remoteParticipant,
                                         final RemoteAudioTrack remoteAudioTrack) {
-            logger.d("onAudioTrackEnabled");
-            remoteAudioTrack.setEnabled(true);
-            final Listener listener = listenerReference.get();
-            if (listener != null) {
-                handler.post(new Runnable() {
-                    @Override
-                    public void run() {
+            checkCallback(remoteParticipant, remoteAudioTrack, "onAudioTrackEnabled");
+            handler.post(new Runnable() {
+                @Override
+                public void run() {
+                    logger.d("onAudioTrackEnabled");
+                    remoteAudioTrack.setEnabled(true);
+                    Listener listener = listenerReference.get();
+
+                    if (listener != null) {
                         listener.onAudioTrackEnabled(remoteParticipant, remoteAudioTrack);
                     }
-                });
-            }
+                }
+            });
         }
 
         @Override
         public void onAudioTrackDisabled(final RemoteParticipant remoteParticipant,
                                          final RemoteAudioTrack remoteAudioTrack) {
-            logger.d("onAudioTrackDisabled");
-            remoteAudioTrack.setEnabled(false);
-            final Listener listener = listenerReference.get();
-            if (listener != null) {
-                handler.post(new Runnable() {
-                    @Override
-                    public void run() {
+            checkCallback(remoteParticipant, remoteAudioTrack, "onAudioTrackDisabled");
+            handler.post(new Runnable() {
+                @Override
+                public void run() {
+                    logger.d("onAudioTrackDisabled");
+                    remoteAudioTrack.setEnabled(false);
+                    Listener listener = listenerReference.get();
+
+                    if (listener != null) {
                         listener.onAudioTrackDisabled(remoteParticipant, remoteAudioTrack);
                     }
-                });
-            }
+                }
+            });
         }
 
         @Override
         public void onVideoTrackEnabled(final RemoteParticipant remoteParticipant,
                                         final RemoteVideoTrack remoteVideoTrack) {
-            logger.d("onVideoTrackEnabled");
-            remoteVideoTrack.setEnabled(true);
-            final Listener listener = listenerReference.get();
-            if (listener != null) {
-                handler.post(new Runnable() {
-                    @Override
-                    public void run() {
+            checkCallback(remoteParticipant, remoteVideoTrack, "onVideoTrackEnabled");
+            handler.post(new Runnable() {
+                @Override
+                public void run() {
+                    logger.d("onVideoTrackEnabled");
+                    remoteVideoTrack.setEnabled(true);
+                    Listener listener = listenerReference.get();
+
+                    if (listener != null) {
                         listener.onVideoTrackEnabled(remoteParticipant, remoteVideoTrack);
                     }
-                });
-            }
+                }
+            });
         }
 
         @Override
         public void onVideoTrackDisabled(final RemoteParticipant remoteParticipant,
                                          final RemoteVideoTrack remoteVideoTrack) {
-            logger.d("onVideoTrackDisabled");
-            remoteVideoTrack.setEnabled(false);
-            final Listener listener = listenerReference.get();
-            if (listener != null) {
-                handler.post(new Runnable() {
-                    @Override
-                    public void run() {
+            checkCallback(remoteParticipant, remoteVideoTrack, "onVideoTrackDisabled");
+            handler.post(new Runnable() {
+                @Override
+                public void run() {
+                    logger.d("onVideoTrackDisabled");
+                    remoteVideoTrack.setEnabled(false);
+                    Listener listener = listenerReference.get();
+
+                    if (listener != null) {
                         listener.onVideoTrackDisabled(remoteParticipant, remoteVideoTrack);
                     }
-                });
-            }
+                }
+            });
+        }
+
+        private void checkCallback(RemoteParticipant remoteParticipant,
+                                   Track track,
+                                   String callback) {
+            Preconditions.checkState(remoteParticipant != null, "Received null remote " +
+                            "participant in %s", callback);
+            Preconditions.checkState(track != null, "Received null track in %s", callback);
         }
     };
     private long nativeParticipantContext;
@@ -318,7 +361,9 @@ public class RemoteParticipant implements Participant {
      * @param listener of participant events.
      */
     public void setListener(RemoteParticipant.Listener listener) {
-        listenerReference.set(listener);
+        Preconditions.checkNotNull(listener, "Listener must not be null");
+
+        this.listenerReference.set(listener);
     }
 
     /**

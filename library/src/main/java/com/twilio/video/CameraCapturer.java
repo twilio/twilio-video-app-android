@@ -430,13 +430,12 @@ public class CameraCapturer implements VideoCapturer {
      * </p>
      *
      * <pre><code>
-     *     // Create local media and camera capturer
-     *     LocalMedia localMedia = LocalMedia.create(context);
+     *     // Create camera capturer
      *     CameraCapturer cameraCapturer = new CameraCapturer(context,
      *          CameraCapturer.CameraSource.BACK_CAMERA, null);
      *
      *     // Start camera capturer
-     *     localMedia.addVideoTrack(true, cameraCapturer);
+     *     LocalVideoTrack cameraVideoTrack = LocalVideoTrack.create(context, true, cameraCapturer);
      *
      *     // Schedule camera parameter update
      *     cameraCapturer.updateCameraParameters(new CameraParameterUpdater() {
@@ -489,13 +488,12 @@ public class CameraCapturer implements VideoCapturer {
      * </p>
      *
      * <pre><code>
-     *     // Create local media and camera capturer
-     *     LocalMedia localMedia = LocalMedia.create(context);
+     *     // Create camera capturer
      *     CameraCapturer cameraCapturer = new CameraCapturer(context,
      *          CameraCapturer.CameraSource.BACK_CAMERA, null);
      *
      *     // Start camera capturer
-     *     localMedia.addVideoTrack(true, cameraCapturer);
+     *     LocalVideoTrack cameraVideoTrack = LocalVideoTrack.create(context, true, cameraCapturer)
      *
      *     // Schedule an image capture
      *     cameraCapturer.takePicture(new CameraCapturer.PictureListener() {

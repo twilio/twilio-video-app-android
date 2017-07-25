@@ -48,6 +48,11 @@ public class RemoteParticipantUnitTest {
                 random.nextLong());
     }
 
+    @Test(expected = NullPointerException.class)
+    public void setListener_shouldNotAllowNull() throws Exception {
+        remoteParticipant.setListener(null);
+    }
+
     @Test(expected = UnsupportedOperationException.class)
     public void shouldNotAllowModifyingAudioTracks() {
         remoteParticipant.getAudioTracks().add(mockRemoteAudioTrack);
