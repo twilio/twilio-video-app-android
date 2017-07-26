@@ -28,6 +28,9 @@ import com.twilio.video.VideoTrack;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 public class CallbackHelper {
 
     public static class FakeRoomListener implements Room.Listener {
@@ -188,21 +191,25 @@ public class CallbackHelper {
 
         @Override
         public void onAudioTrackEnabled(Participant participant, AudioTrack audioTrack) {
+            assertTrue(audioTrack.isEnabled());
             triggerLatch(onAudioTrackEnabledLatch);
         }
 
         @Override
         public void onAudioTrackDisabled(Participant participant, AudioTrack audioTrack) {
+            assertFalse(audioTrack.isEnabled());
             triggerLatch(onAudioTrackDisabledLatch);
         }
 
         @Override
         public void onVideoTrackEnabled(Participant participant, VideoTrack videoTrack) {
+            assertTrue(videoTrack.isEnabled());
             triggerLatch(onVideoTrackEnabledLatch);
         }
 
         @Override
         public void onVideoTrackDisabled(Participant participant, VideoTrack videoTrack) {
+            assertFalse(videoTrack.isEnabled());
             triggerLatch(onVideoTrackDisabledLatch);
         }
     }

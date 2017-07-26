@@ -132,6 +132,7 @@ public class Participant {
                 @Override
                 public void run() {
                     logger.d("onAudioTrackEnabled");
+                    audioTrack.setEnabled(true);
                     Listener listener = listenerReference.get();
 
                     if (listener != null) {
