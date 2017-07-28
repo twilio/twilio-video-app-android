@@ -16,6 +16,10 @@
 
 package com.twilio.video;
 
+import android.os.Handler;
+
+import com.twilio.video.util.Constants;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -31,17 +35,76 @@ public class LocalParticipantUnitTest {
 
     private final Random random = new Random();
     private LocalParticipant localParticipant;
+    @Mock Handler handler;
+    @Mock PublishedAudioTrack mockPublishedAudioTrack;
     @Mock LocalAudioTrack mockAudioTrack;
+    @Mock PublishedVideoTrack mockPublishedVideoTrackOne;
     @Mock LocalVideoTrack mockVideoTrackOne;
     @Mock LocalVideoTrack mockVideoTrackTwo;
 
     @Before
     public void setup() {
         localParticipant = new LocalParticipant(random.nextLong(),
-                String.valueOf(random.nextInt(INT_MAX)),
+                Constants.MOCK_PARTICIPANT_SID,
                 String.valueOf(random.nextInt(INT_MAX)),
                 Arrays.asList(mockAudioTrack),
-                Arrays.asList(mockVideoTrackOne, mockVideoTrackTwo));
+                Arrays.asList(mockVideoTrackOne, mockVideoTrackTwo),
+                Arrays.asList(mockPublishedAudioTrack),
+                Arrays.asList(mockPublishedVideoTrackOne),
+                handler);
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void shouldFailWithNullSid() {
+        new LocalParticipant(random.nextLong(),
+                null,
+                String.valueOf(random.nextInt(INT_MAX)),
+                Arrays.asList(mockAudioTrack),
+                Arrays.asList(mockVideoTrackOne, mockVideoTrackTwo),
+                Arrays.asList(mockPublishedAudioTrack),
+                Arrays.asList(mockPublishedVideoTrackOne),
+                handler);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void shouldFailWithEmptySid() {
+        new LocalParticipant(random.nextLong(),
+                "",
+                String.valueOf(random.nextInt(INT_MAX)),
+                Arrays.asList(mockAudioTrack),
+                Arrays.asList(mockVideoTrackOne, mockVideoTrackTwo),
+                Arrays.asList(mockPublishedAudioTrack),
+                Arrays.asList(mockPublishedVideoTrackOne),
+                handler);
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void shouldFailWithNullIdentity() {
+        new LocalParticipant(random.nextLong(),
+                Constants.MOCK_PARTICIPANT_SID,
+                null,
+                Arrays.asList(mockAudioTrack),
+                Arrays.asList(mockVideoTrackOne, mockVideoTrackTwo),
+                Arrays.asList(mockPublishedAudioTrack),
+                Arrays.asList(mockPublishedVideoTrackOne),
+                handler);
+    }
+
+    @Test
+    public void shouldSucceedWithValidTrackSid() {
+        new LocalParticipant(random.nextLong(),
+                Constants.MOCK_PARTICIPANT_SID,
+                String.valueOf(random.nextInt(INT_MAX)),
+                Arrays.asList(mockAudioTrack),
+                Arrays.asList(mockVideoTrackOne, mockVideoTrackTwo),
+                Arrays.asList(mockPublishedAudioTrack),
+                Arrays.asList(mockPublishedVideoTrackOne),
+                handler);
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void setListener_shouldNotAllowNull() {
+        localParticipant.setListener(null);
     }
 
     @Test(expected = UnsupportedOperationException.class)
@@ -56,11 +119,11 @@ public class LocalParticipantUnitTest {
 
     @Test(expected = UnsupportedOperationException.class)
     public void shouldNotAllowModifyingPublishedAudioTracks() {
-        localParticipant.getPublishedAudioTracks().add(mockAudioTrack);
+        localParticipant.getPublishedAudioTracks().add(mockPublishedAudioTrack);
     }
 
     @Test(expected = UnsupportedOperationException.class)
     public void shouldNotAllowModifyingPublishedVideoTracks() {
-        localParticipant.getPublishedVideoTracks().add(mockVideoTrackOne);
+        localParticipant.getPublishedVideoTracks().add(mockPublishedVideoTrackOne);
     }
 }

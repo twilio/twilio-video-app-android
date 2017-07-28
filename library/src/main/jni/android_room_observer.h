@@ -27,7 +27,11 @@ namespace twilio_video_jni {
 
 class AndroidRoomObserver : public twilio::video::RoomObserver {
 public:
-    AndroidRoomObserver(JNIEnv *env, jobject j_room, jobject j_room_observer);
+    AndroidRoomObserver(JNIEnv *env,
+                        jobject j_room,
+                        jobject j_room_observer,
+                        jobject j_connect_options,
+                        jobject j_handler);
     ~AndroidRoomObserver();
     void setObserverDeleted();
 protected:
@@ -53,17 +57,25 @@ private:
     jobject createJavaParticipantList(
             const std::map<std::string, std::shared_ptr<twilio::video::RemoteParticipant>> participants);
 
+    jobject getLocalAudioTracks();
+    jobject getLocalVideoTracks();
+
     bool observer_deleted_ = false;
     mutable rtc::CriticalSection deletion_lock_;
 
     const webrtc_jni::ScopedGlobalRef<jobject> j_room_;
     const webrtc_jni::ScopedGlobalRef<jobject> j_room_observer_;
+    const webrtc_jni::ScopedGlobalRef<jobject> j_connect_options_;
+    const webrtc_jni::ScopedGlobalRef<jobject> j_handler_;
     const webrtc_jni::ScopedGlobalRef<jclass> j_room_class_;
     const webrtc_jni::ScopedGlobalRef<jclass> j_room_observer_class_;
+    const webrtc_jni::ScopedGlobalRef<jclass> j_local_participant_class_;
     const webrtc_jni::ScopedGlobalRef<jclass> j_twilio_exception_class_;
     const webrtc_jni::ScopedGlobalRef<jclass> j_remote_participant_class_;
     const webrtc_jni::ScopedGlobalRef<jclass> j_array_list_class_;
+    const webrtc_jni::ScopedGlobalRef<jclass> j_published_audio_track_class_;
     const webrtc_jni::ScopedGlobalRef<jclass> j_remote_audio_track_class_;
+    const webrtc_jni::ScopedGlobalRef<jclass> j_published_video_track_class_;
     const webrtc_jni::ScopedGlobalRef<jclass> j_remote_video_track_class_;
     jmethodID j_set_connected_;
     jmethodID j_on_connected_;
@@ -73,12 +85,16 @@ private:
     jmethodID j_on_participant_disconnected_;
     jmethodID j_on_recording_started_;
     jmethodID j_on_recording_stopped_;
-    jmethodID j_get_handler_;
+    jmethodID j_local_participant_ctor_id_;
     jmethodID j_participant_ctor_id_;
     jmethodID j_array_list_ctor_id_;
     jmethodID j_array_list_add_;
+    jmethodID j_published_audio_track_ctor_id_;
     jmethodID j_audio_track_ctor_id_;
+    jmethodID j_published_video_track_ctor_id_;
     jmethodID j_video_track_ctor_id_;
+    jmethodID j_connect_options_get_audio_tracks_;
+    jmethodID j_connect_options_get_video_tracks_;
     jmethodID j_twilio_exception_ctor_id_;
     std::map<std::shared_ptr<twilio::video::RemoteParticipant>, jobject> remote_participants_;
 };

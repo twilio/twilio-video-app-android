@@ -17,6 +17,9 @@
 package com.twilio.video.helper;
 
 
+import com.twilio.video.LocalParticipant;
+import com.twilio.video.PublishedAudioTrack;
+import com.twilio.video.PublishedVideoTrack;
 import com.twilio.video.RemoteAudioTrack;
 import com.twilio.video.RemoteParticipant;
 import com.twilio.video.RemoteVideoTrack;
@@ -31,7 +34,16 @@ import java.util.PriorityQueue;
 import java.util.Queue;
 import java.util.concurrent.CountDownLatch;
 
+import javax.annotation.Nullable;
+
 public class CallbackHelper {
+
+    private static void triggerLatch(@Nullable CountDownLatch latch) {
+        if (latch != null) {
+            latch.countDown();
+        }
+    }
+
     public static class FakeRoomListener implements Room.Listener {
 
         public CountDownLatch onConnectedLatch;
@@ -45,12 +57,6 @@ public class CallbackHelper {
         private Room room;
         private TwilioException twilioException;
         private RemoteParticipant remoteParticipant;
-
-        private void triggerLatch(CountDownLatch latch) {
-            if (latch != null) {
-                latch.countDown();
-            }
-        }
 
         @Override
         public void onConnected(Room room) {
@@ -164,12 +170,6 @@ public class CallbackHelper {
         public CountDownLatch onVideoTrackDisabledLatch;
         public final List<String> participantEvents = new ArrayList<>();
 
-        private void triggerLatch(CountDownLatch latch) {
-            if (latch != null) {
-                latch.countDown();
-            }
-        }
-
         @Override
         public void onAudioTrackAdded(RemoteParticipant remoteParticipant,
                                       RemoteAudioTrack remoteAudioTrack) {
@@ -259,12 +259,6 @@ public class CallbackHelper {
         private List<StatsReport> statsReports;
         public CountDownLatch onStatsLatch;
 
-        private void triggerLatch(CountDownLatch latch) {
-            if (latch != null) {
-                latch.countDown();
-            }
-        }
-
         @Override
         public void onStats(List<StatsReport> statsReports) {
             this.statsReports = statsReports;
@@ -273,6 +267,26 @@ public class CallbackHelper {
 
         public List<StatsReport> getStatsReports() {
             return statsReports;
+        }
+    }
+
+    public static class FakeLocalParticipantListener implements LocalParticipant.Listener {
+        public CountDownLatch onPublishedAudioTrackLatch;
+        public CountDownLatch onPublishedVideoTrackLatch;
+        public final List<String> localParticipantEvents = new ArrayList<>();
+
+        @Override
+        public void onPublishedAudioTrack(LocalParticipant localParticipant,
+                                          PublishedAudioTrack publishedAudioTrack) {
+            localParticipantEvents.add("onPublishedAudioTrack");
+            triggerLatch(onPublishedAudioTrackLatch);
+        }
+
+        @Override
+        public void onPublishedVideoTrack(LocalParticipant localParticipant,
+                                          PublishedVideoTrack publishedVideoTrack) {
+            localParticipantEvents.add("onPublishedVideoTrack");
+            triggerLatch(onPublishedVideoTrackLatch);
         }
     }
 }

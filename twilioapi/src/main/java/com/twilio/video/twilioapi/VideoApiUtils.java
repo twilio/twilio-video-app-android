@@ -74,10 +74,11 @@ public class VideoApiUtils {
             apiBaseUrl = DEV_BASE_URL;
         }
         return new RestAdapter.Builder()
-            .setEndpoint(apiBaseUrl)
-            .setConverter(new GsonConverter(new GsonBuilder().create()))
-            .build()
-            .create(VideoApiUtils.VideoApiService.class);
+                .setEndpoint(apiBaseUrl)
+                .setConverter(new GsonConverter(new GsonBuilder().create()))
+                .setLogLevel(RestAdapter.LogLevel.FULL)
+                .build()
+                .create(VideoApiUtils.VideoApiService.class);
     }
 
     public static void createRoom(String accountSid,

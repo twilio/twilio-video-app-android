@@ -21,6 +21,12 @@ import org.junit.Assert;
 public class VideoAssert extends Assert {
     private static final int DEFAULT_FRAMES_RENDERED_RETRY_MAX = 3;
     private static final String TRACK_SID_REGEX = "^MT[a-zA-Z0-9]{32}$";
+    private static final String PARTICIPANT_SID_REGEX = "^PA[a-zA-Z0-9]{32}$";
+
+    public static void assertIsParticipantSid(String participantSid) {
+        assertTrue(String.format("%s is not participant sid", participantSid),
+                participantSid.matches(PARTICIPANT_SID_REGEX));
+    }
 
     public static void assertIsTrackSid(String trackSid) {
         assertTrue(String.format("%s is not track sid", trackSid),

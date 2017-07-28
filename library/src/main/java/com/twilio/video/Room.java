@@ -47,7 +47,6 @@ public class Room {
     private final Handler handler;
     private final long handlerThreadId;
     private Queue<Pair<Handler, StatsListener>> statsListenersQueue;
-    private ConnectOptions cachedConnectOptions;
     private MediaFactory mediaFactory;
     private final Room.Listener roomListenerProxy = new Room.Listener() {
         @Override
@@ -272,22 +271,14 @@ public class Room {
         synchronized (roomListenerProxy) {
             // Retain the connect options to provide the audio and video tracks upon connect
             mediaFactory = MediaFactory.instance(context);
-            cachedConnectOptions = connectOptions;
             nativeRoomDelegate = nativeConnect(connectOptions,
                     roomListenerProxy,
                     statsListenerProxy,
-                    mediaFactory.getNativeMediaFactoryHandle());
+                    mediaFactory.getNativeMediaFactoryHandle(),
+                    handler);
             mediaFactory.addRef();
             roomState = RoomState.CONNECTING;
         }
-    }
-
-    /*
-     * Called by JNI layer to get access to developers handler.
-     */
-    @SuppressWarnings("unused")
-    private synchronized Handler getHandler() {
-        return handler;
     }
 
     /*
@@ -295,21 +286,14 @@ public class Room {
      */
     @SuppressWarnings("unused")
     private synchronized void setConnected(String roomSid,
-                                           long nativeLocalParticipantHandle,
-                                           String localParticipantSid,
-                                           String localParticipantIdentity,
+                                           LocalParticipant localParticipant,
                                            List<RemoteParticipant> remoteParticipants) {
         logger.d("setConnected()");
         this.sid = roomSid;
         if (this.name == null || this.name.isEmpty()) {
             this.name = roomSid;
         }
-        this.localParticipant = new LocalParticipant(nativeLocalParticipantHandle,
-                localParticipantSid,
-                localParticipantIdentity,
-                cachedConnectOptions.getAudioTracks(),
-                cachedConnectOptions.getVideoTracks());
-        cachedConnectOptions = null;
+        this.localParticipant = localParticipant;
         for (RemoteParticipant remoteParticipant : remoteParticipants) {
             participantMap.put(remoteParticipant.getSid(), remoteParticipant);
         }
@@ -428,7 +412,8 @@ public class Room {
     private native long nativeConnect(ConnectOptions ConnectOptions,
                                       Listener listenerProxy,
                                       StatsListener statsListenerProxy,
-                                      long nativeMediaFactoryHandle);
+                                      long nativeMediaFactoryHandle,
+                                      Handler handler);
     private native boolean nativeIsRecording(long nativeRoomDelegate);
     private native void nativeGetStats(long nativeRoomDelegate);
     private native void nativeOnNetworkChange(long nativeRoomDelegate,

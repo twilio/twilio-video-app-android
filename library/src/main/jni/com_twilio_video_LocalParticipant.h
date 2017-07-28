@@ -19,6 +19,7 @@
 
 #include <jni.h>
 #include "video/local_participant.h"
+#include "android_local_participant_observer.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -26,25 +27,41 @@ extern "C" {
 
 namespace twilio_video_jni {
 
-class LocalParticipantContext {
-public:
-    LocalParticipantContext(std::shared_ptr<twilio::video::LocalParticipant> local_participant)
-            : local_participant_(local_participant) {
-    }
+static const char *const kLocalParticipantConstructorSignature = "("
+        "J"
+        "Ljava/lang/String;"
+        "Ljava/lang/String;"
+        "Ljava/util/List;"
+        "Ljava/util/List;"
+        "Ljava/util/List;"
+        "Ljava/util/List;"
+        "Landroid/os/Handler;"
+        ")V";
 
-    virtual ~LocalParticipantContext(){
-        local_participant_.reset();
-    }
+jobject createJavaLocalParticipant(JNIEnv *env,
+                                   std::shared_ptr<twilio::video::LocalParticipant> local_participant,
+                                   jclass j_local_participant_class,
+                                   jmethodID j_local_participant_ctor_id,
+                                   jobject j_local_audio_tracks,
+                                   jobject j_local_video_tracks,
+                                   jclass j_array_list_class,
+                                   jmethodID j_array_list_ctor_id,
+                                   jmethodID j_array_list_add,
+                                   jclass j_published_audio_track_class,
+                                   jmethodID j_published_audio_track_ctor_id,
+                                   jclass j_published_video_track_class,
+                                   jmethodID j_published_video_track_ctor_id,
+                                   jobject j_handler);
 
-    std::shared_ptr<twilio::video::LocalParticipant> getLocalParticipant() {
-        return local_participant_;
-    }
+jobject createJavaPublishedAudioTrack(JNIEnv *env,
+                                      std::shared_ptr<twilio::media::PublishedAudioTrack> published_audio_track,
+                                      jclass j_published_audio_track_class,
+                                      jmethodID j_published_audio_track_ctor_id);
 
-private:
-    std::shared_ptr<twilio::video::LocalParticipant> local_participant_;
-};
-
-std::shared_ptr<twilio::video::LocalParticipant> getLocalParticipant(jlong);
+jobject createJavaPublishedVideoTrack(JNIEnv *env,
+                                      std::shared_ptr<twilio::media::PublishedVideoTrack> published_video_track,
+                                      jclass j_published_video_track_class,
+                                      jmethodID j_published_video_track_ctor_id);
 
 JNIEXPORT bool JNICALL Java_com_twilio_video_LocalParticipant_nativePublishAudioTrack(JNIEnv *,
                                                                                       jobject,

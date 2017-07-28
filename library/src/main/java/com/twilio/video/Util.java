@@ -20,6 +20,7 @@ import android.content.Context;
 import android.content.pm.PackageManager;
 import android.os.Handler;
 import android.os.Looper;
+import android.support.annotation.NonNull;
 
 /*
  * Junk drawer of utility methods needed throughout SDK.

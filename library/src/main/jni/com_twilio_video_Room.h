@@ -34,7 +34,7 @@ extern "C" {
 namespace twilio_video_jni {
 
 JNIEXPORT jlong JNICALL Java_com_twilio_video_Room_nativeConnect
-        (JNIEnv *, jobject, jobject, jobject, jobject, jlong);
+        (JNIEnv *, jobject, jobject, jobject, jobject, jlong, jobject);
 
 JNIEXPORT jboolean JNICALL Java_com_twilio_video_Room_nativeIsRecording
     (JNIEnv *, jobject, jlong);

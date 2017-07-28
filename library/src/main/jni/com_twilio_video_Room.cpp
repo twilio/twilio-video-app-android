@@ -28,13 +28,15 @@ JNIEXPORT jlong JNICALL Java_com_twilio_video_Room_nativeConnect(
         jobject j_connect_options,
         jobject j_room_listener,
         jobject j_stats_listener,
-        jlong j_media_factory_handle) {
+        jlong j_media_factory_handle,
+        jobject j_handler) {
     RoomDelegate *room_delegate = new RoomDelegate(env,
                                                   j_connect_options,
                                                   j_media_factory_handle,
                                                   j_room,
                                                   j_room_listener,
-                                                  j_stats_listener);
+                                                  j_stats_listener,
+                                                  j_handler);
     room_delegate->connect();
 
     return webrtc_jni::jlongFromPointer(room_delegate);

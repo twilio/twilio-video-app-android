@@ -29,11 +29,13 @@ RoomDelegate::RoomDelegate(JNIEnv *env,
                            jlong j_media_factory_handle,
                            jobject j_room,
                            jobject j_room_observer,
-                           jobject j_stats_observer) :
+                           jobject j_stats_observer,
+                           jobject j_handler) :
         j_connect_options_(env, j_connect_options),
         j_room_(env, j_room),
         j_room_observer_(env, j_room_observer),
         j_stats_observer_(env, j_stats_observer),
+        j_handler_(env, j_handler),
         notifier_thread_(rtc::Thread::Create()) {
     notifier_thread_->SetName(kRoomNotifierThreadName, nullptr);
     notifier_thread_->Start();
@@ -132,7 +134,11 @@ void RoomDelegate::connectOnNotifier() {
     JNIEnv *env = webrtc_jni::AttachCurrentThreadIfNeeded();
 
     // Create the room observer
-    android_room_observer_.reset(new AndroidRoomObserver(env, *j_room_, *j_room_observer_));
+    android_room_observer_.reset(new AndroidRoomObserver(env,
+                                                         *j_room_,
+                                                         *j_room_observer_,
+                                                         *j_connect_options_,
+                                                         *j_handler_));
 
     // Create the stats observer
     stats_observer_.reset(new AndroidStatsObserver(env, *j_stats_observer_));
