@@ -180,6 +180,73 @@ public class CameraCapturerTest extends BaseCameraCapturerTest {
     }
 
     @Test
+    public void shouldCaptureFramesAfterCameraSwitchAndRelease() throws InterruptedException {
+        final CameraCapturer.CameraSource cameraSource = CameraCapturer.CameraSource.FRONT_CAMERA;
+        final AtomicReference<CountDownLatch> firstFrameReceived =
+                new AtomicReference<>(new CountDownLatch(1));
+        cameraCapturer = new CameraCapturer(cameraCapturerActivity,
+                cameraSource,
+                new CameraCapturer.Listener() {
+                    @Override
+                    public void onFirstFrameAvailable() {
+                        firstFrameReceived.get().countDown();
+                    }
+
+                    @Override
+                    public void onCameraSwitched() {
+
+                    }
+
+                    @Override
+                    public void onError(@CameraCapturer.Error int errorCode) {
+
+                    }
+                });
+        localVideoTrack = LocalVideoTrack.create(cameraCapturerActivity,
+                true,
+                cameraCapturer);
+
+        // Validate we got our first frame
+        assertTrue(firstFrameReceived.get().await(CAMERA_CAPTURE_DELAY_MS, TimeUnit.MILLISECONDS));
+
+        // Switch camera
+        cameraCapturer.switchCamera();
+
+        // Release track
+        localVideoTrack.release();
+
+        // Create new camera capturer with front camera
+        firstFrameReceived.set(new CountDownLatch(1));
+        CameraCapturer newFrontCameraCapturer = new CameraCapturer(cameraCapturerActivity,
+                cameraSource,
+                new CameraCapturer.Listener() {
+                    @Override
+                    public void onFirstFrameAvailable() {
+                        firstFrameReceived.get().countDown();
+                    }
+
+                    @Override
+                    public void onCameraSwitched() {
+                        fail();
+                    }
+
+                    @Override
+                    public void onError(@CameraCapturer.Error int errorCode) {
+                        fail();
+                    }
+                });
+        localVideoTrack = LocalVideoTrack.create(cameraCapturerActivity,
+                true,
+                newFrontCameraCapturer);
+
+        // Validate we got our first frame
+        assertTrue(firstFrameReceived.get().await(CAMERA_CAPTURE_DELAY_MS, TimeUnit.MILLISECONDS));
+
+        // Release track
+        localVideoTrack.release();
+    }
+
+    @Test
     public void shouldCreateLocalVideoTrackIfVideoConstraintsCompatible() {
         cameraCapturer = new CameraCapturer(cameraCapturerActivity,
                 CameraCapturer.CameraSource.FRONT_CAMERA, null);
