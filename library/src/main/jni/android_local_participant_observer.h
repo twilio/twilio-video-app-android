@@ -35,9 +35,12 @@ public:
 
 
 protected:
-    virtual void onAudioTrackPublished(std::shared_ptr<twilio::media::PublishedAudioTrack> published_audio_track);
 
-    virtual void onVideoTrackPublished(std::shared_ptr<twilio::media::PublishedVideoTrack> published_video_track);
+    virtual void onAudioTrackPublished(twilio::video::LocalParticipant *local_participant,
+                                       std::shared_ptr<twilio::media::PublishedAudioTrack> track);
+
+    virtual void onVideoTrackPublished(twilio::video::LocalParticipant *local_participant,
+                                       std::shared_ptr<twilio::media::PublishedVideoTrack> track);
 
 private:
     JNIEnv *jni() {

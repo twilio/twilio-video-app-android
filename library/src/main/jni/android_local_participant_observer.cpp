@@ -70,7 +70,8 @@ void AndroidLocalParticipantObserver::setObserverDeleted() {
                       "local participant observer deleted");
 }
 
-void AndroidLocalParticipantObserver::onAudioTrackPublished(std::shared_ptr<twilio::media::PublishedAudioTrack> published_audio_track) {
+void AndroidLocalParticipantObserver::onAudioTrackPublished(twilio::video::LocalParticipant *local_participant,
+                                                            std::shared_ptr<twilio::media::PublishedAudioTrack> published_audio_track) {
     webrtc_jni::ScopedLocalRefFrame local_ref_frame(jni());
     std::string func_name = std::string(__FUNCTION__);
     VIDEO_ANDROID_LOG(twilio::video::LogModule::kPlatform,
@@ -96,7 +97,8 @@ void AndroidLocalParticipantObserver::onAudioTrackPublished(std::shared_ptr<twil
     }
 }
 
-void AndroidLocalParticipantObserver::onVideoTrackPublished(std::shared_ptr<twilio::media::PublishedVideoTrack> published_video_track) {
+void AndroidLocalParticipantObserver::onVideoTrackPublished(twilio::video::LocalParticipant *local_participant,
+                                                            std::shared_ptr<twilio::media::PublishedVideoTrack> published_video_track) {
     webrtc_jni::ScopedLocalRefFrame local_ref_frame(jni());
     std::string func_name = std::string(__FUNCTION__);
     VIDEO_ANDROID_LOG(twilio::video::LogModule::kPlatform,
