@@ -36,6 +36,9 @@ import java.util.concurrent.CountDownLatch;
 
 import javax.annotation.Nullable;
 
+import static junit.framework.TestCase.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 public class CallbackHelper {
 
     private static void triggerLatch(@Nullable CountDownLatch latch) {
@@ -187,6 +190,7 @@ public class CallbackHelper {
         @Override
         public void onSubscribedToAudioTrack(RemoteParticipant remoteParticipant,
                                              RemoteAudioTrack remoteAudioTrack) {
+            assertTrue(remoteAudioTrack.isSubscribed());
             participantEvents.add("onSubscribedToAudioTrack");
             triggerLatch(onSubscribedToAudioTrackLatch);
         }
@@ -194,6 +198,7 @@ public class CallbackHelper {
         @Override
         public void onUnsubscribedFromAudioTrack(RemoteParticipant remoteParticipant,
                                                  RemoteAudioTrack remoteAudioTrack) {
+            assertFalse(remoteAudioTrack.isSubscribed());
             participantEvents.add("onUnsubscribedFromAudioTrack");
             triggerLatch(onUnsubscribedFromAudioTrackLatch);
         }
@@ -215,6 +220,7 @@ public class CallbackHelper {
         @Override
         public void onSubscribedToVideoTrack(RemoteParticipant remoteParticipant,
                                              RemoteVideoTrack remoteVideoTrack) {
+            assertTrue(remoteVideoTrack.isSubscribed());
             participantEvents.add("onSubscribedToVideoTrack");
             triggerLatch(onSubscribedToVideoTrackLatch);
         }
@@ -222,6 +228,7 @@ public class CallbackHelper {
         @Override
         public void onUnsubscribedFromVideoTrack(RemoteParticipant remoteParticipant,
                                                  RemoteVideoTrack remoteVideoTrack) {
+            assertFalse(remoteVideoTrack.isSubscribed());
             participantEvents.add("onUnsubscribedFromVideoTrack");
             triggerLatch(onUnsubscribedFromVideoTrackLatch);
         }
@@ -229,6 +236,7 @@ public class CallbackHelper {
         @Override
         public void onAudioTrackEnabled(RemoteParticipant remoteParticipant,
                                         RemoteAudioTrack remoteAudioTrack) {
+            assertTrue(remoteAudioTrack.isEnabled());
             participantEvents.add("onAudioTrackEnabled");
             triggerLatch(onAudioTrackEnabledLatch);
         }
@@ -236,6 +244,7 @@ public class CallbackHelper {
         @Override
         public void onAudioTrackDisabled(RemoteParticipant remoteParticipant,
                                          RemoteAudioTrack remoteAudioTrack) {
+            assertFalse(remoteAudioTrack.isEnabled());
             participantEvents.add("onAudioTrackDisabled");
             triggerLatch(onAudioTrackDisabledLatch);
         }
@@ -243,6 +252,7 @@ public class CallbackHelper {
         @Override
         public void onVideoTrackEnabled(RemoteParticipant remoteParticipant,
                                         RemoteVideoTrack remoteVideoTrack) {
+            assertTrue(remoteVideoTrack.isEnabled());
             participantEvents.add("onVideoTrackEnabled");
             triggerLatch(onVideoTrackEnabledLatch);
         }
@@ -250,6 +260,7 @@ public class CallbackHelper {
         @Override
         public void onVideoTrackDisabled(RemoteParticipant remoteParticipant,
                                          RemoteVideoTrack remoteVideoTrack) {
+            assertFalse(remoteVideoTrack.isEnabled());
             participantEvents.add("onVideoTrackDisabled");
             triggerLatch(onVideoTrackDisabledLatch);
         }

@@ -31,6 +31,10 @@ android {
         targetCompatibility JavaVersion.VERSION_1_7
     }
 
+    lintOptions {
+        disable 'BinaryOperationInTimber'
+    }
+
 
     /**
      * Use the debug keystore to sign all variants of the test app

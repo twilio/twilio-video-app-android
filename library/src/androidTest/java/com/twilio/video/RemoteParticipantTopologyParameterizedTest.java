@@ -274,17 +274,27 @@ public class RemoteParticipantTopologyParameterizedTest extends BaseParticipantT
         assertTrue(aliceRoomListener.onParticipantDisconnectedLatch.await(20, TimeUnit.SECONDS));
         RemoteParticipant remoteParticipant = aliceRoomListener.getRemoteParticipant();
 
-        // Validate that disconnected remoteParticipant has all tracks
+        // Validate enabled matches last known state
         assertEquals(remoteAudioTracks.get(0).isEnabled(),
                 remoteParticipant.getRemoteAudioTracks().get(0).isEnabled());
         assertEquals(audioTracks.get(0).isEnabled(),
                 remoteParticipant.getAudioTracks().get(0).isEnabled());
-        assertEquals(remoteAudioTracks.get(0), remoteParticipant.getRemoteAudioTracks().get(0));
-        assertEquals(audioTracks.get(0), remoteParticipant.getAudioTracks().get(0));
         assertEquals(remoteVideoTracks.get(0).isEnabled(),
                 remoteParticipant.getRemoteVideoTracks().get(0).isEnabled());
         assertEquals(videoTracks.get(0).isEnabled(),
                 remoteParticipant.getVideoTracks().get(0).isEnabled());
+
+        // Validate alice is no longer subscribed to bob tracks
+        assertFalse(remoteParticipant.getRemoteAudioTracks().get(0).isSubscribed());
+        assertEquals(remoteAudioTracks.get(0).isSubscribed(),
+                remoteParticipant.getRemoteAudioTracks().get(0).isSubscribed());
+        assertFalse(remoteParticipant.getRemoteVideoTracks().get(0).isSubscribed());
+        assertEquals(remoteVideoTracks.get(0).isSubscribed(),
+                remoteParticipant.getRemoteVideoTracks().get(0).isSubscribed());
+
+        // Validate the track objects are equal
+        assertEquals(remoteAudioTracks.get(0), remoteParticipant.getRemoteAudioTracks().get(0));
+        assertEquals(audioTracks.get(0), remoteParticipant.getAudioTracks().get(0));
         assertEquals(remoteVideoTracks.get(0), remoteParticipant.getRemoteVideoTracks().get(0));
         assertEquals(videoTracks.get(0), remoteParticipant.getVideoTracks().get(0));
     }

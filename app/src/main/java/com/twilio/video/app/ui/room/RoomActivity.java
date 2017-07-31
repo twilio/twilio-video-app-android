@@ -1254,10 +1254,12 @@ public class RoomActivity extends BaseActivity {
         @Override
         public void onAudioTrackAdded(RemoteParticipant remoteParticipant,
                                       RemoteAudioTrack remoteAudioTrack) {
-            Timber.i("onAudioTrackAdded: remoteParticipant: %s, audio: %s, enabled: %b",
+            Timber.i("onAudioTrackAdded: remoteParticipant: %s, audio: %s, enabled: %b, " +
+                            "subscribed: %b",
                     remoteParticipant.getIdentity(),
                     remoteAudioTrack.getSid(),
-                    remoteAudioTrack.isEnabled());
+                    remoteAudioTrack.isEnabled(),
+                    remoteAudioTrack.isSubscribed());
 
             // TODO: Need design
         }
@@ -1265,41 +1267,48 @@ public class RoomActivity extends BaseActivity {
         @Override
         public void onAudioTrackRemoved(RemoteParticipant remoteParticipant,
                                         RemoteAudioTrack remoteAudioTrack) {
-            Timber.i("onAudioTrackRemoved: remoteParticipant: %s, audio: %s, enabled: %b",
+            Timber.i("onAudioTrackRemoved: remoteParticipant: %s, audio: %s, enabled: %b, " +
+                            "subscribed: %b",
                     remoteParticipant.getIdentity(),
                     remoteAudioTrack.getSid(),
-                    remoteAudioTrack.isEnabled());
+                    remoteAudioTrack.isEnabled(),
+                    remoteAudioTrack.isSubscribed());
             // TODO: Need design
         }
 
         @Override
         public void onVideoTrackAdded(RemoteParticipant remoteParticipant,
                                       RemoteVideoTrack remoteVideoTrack) {
-            Timber.i("onVideoTrackAdded: remoteParticipant: %s, video: %s, enabled: %b",
+            Timber.i("onVideoTrackAdded: remoteParticipant: %s, video: %s, enabled: %b, " +
+                            "subscribed: %b",
                     remoteParticipant.getIdentity(),
                     remoteVideoTrack.getSid(),
-                    remoteVideoTrack.isEnabled());
+                    remoteVideoTrack.isEnabled(),
+                    remoteVideoTrack.isSubscribed());
             // TODO: Need design
         }
 
         @Override
         public void onVideoTrackRemoved(RemoteParticipant remoteParticipant,
                                         RemoteVideoTrack remoteVideoTrack) {
-            Timber.i("onVideoTrackRemoved: remoteParticipant: %s, video: %s, enabled: %b",
+            Timber.i("onVideoTrackRemoved: remoteParticipant: %s, video: %s, enabled: %b, " +
+                            "subscribed: %b",
                     remoteParticipant.getIdentity(),
                     remoteVideoTrack.getSid(),
-                    remoteVideoTrack.isEnabled());
+                    remoteVideoTrack.isEnabled(),
+                    remoteVideoTrack.isSubscribed());
             // TODO: Need design
         }
 
         @Override
         public void onSubscribedToAudioTrack(RemoteParticipant remoteParticipant,
                                              RemoteAudioTrack remoteAudioTrack) {
-            Timber.i("onSubscribedToAudioTrack: remoteParticipant: %s, audio: %s, enabled: %b",
+            Timber.i("onSubscribedToAudioTrack: remoteParticipant: %s, audio: %s, enabled: %b, " +
+                            "subscribed: %b",
                     remoteParticipant.getIdentity(),
                     remoteAudioTrack.getSid(),
-                    remoteAudioTrack.isEnabled());
-
+                    remoteAudioTrack.isEnabled(),
+                    remoteAudioTrack.isSubscribed());
             boolean newAudioState = !remoteAudioTrack.isEnabled();
 
             if (participantController.getPrimaryItem().sid.equals(remoteParticipant.getSid())) {
@@ -1318,10 +1327,12 @@ public class RoomActivity extends BaseActivity {
         @Override
         public void onUnsubscribedFromAudioTrack(RemoteParticipant remoteParticipant,
                                                  RemoteAudioTrack remoteAudioTrack) {
-            Timber.i("onUnsubscribedFromAudioTrack: remoteParticipant: %s, audio: %s, enabled: %b",
+            Timber.i("onUnsubscribedFromAudioTrack: remoteParticipant: %s, audio: %s, enabled: %b, " +
+                            "subscribed: %b",
                     remoteParticipant.getIdentity(),
                     remoteAudioTrack.getSid(),
-                    remoteAudioTrack.isEnabled());
+                    remoteAudioTrack.isEnabled(),
+                    remoteAudioTrack.isSubscribed());
 
             boolean newAudioState = true;
 
@@ -1341,10 +1352,12 @@ public class RoomActivity extends BaseActivity {
         @Override
         public void onSubscribedToVideoTrack(RemoteParticipant remoteParticipant,
                                              RemoteVideoTrack remoteVideoTrack) {
-            Timber.i("onSubscribedToVideoTrack: remoteParticipant: %s, video: %s, enabled: %b",
+            Timber.i("onSubscribedToVideoTrack: remoteParticipant: %s, video: %s, enabled: %b, " +
+                            "subscribed: %b",
                     remoteParticipant.getIdentity(),
                     remoteVideoTrack.getSid(),
-                    remoteVideoTrack.isEnabled());
+                    remoteVideoTrack.isEnabled(),
+                    remoteVideoTrack.isSubscribed());
 
             ParticipantController.Item primary = participantController.getPrimaryItem();
 

@@ -21,10 +21,15 @@ package com.twilio.video;
  */
 public class RemoteVideoTrack extends VideoTrack {
     private final String sid;
+    private boolean subscribed;
 
-    RemoteVideoTrack(String trackId, boolean enabled, String sid) {
+    RemoteVideoTrack(String sid,
+                     String trackId,
+                     boolean enabled,
+                     boolean subscribed) {
         super(trackId, enabled);
         this.sid = sid;
+        this.subscribed = subscribed;
     }
 
     /**
@@ -35,6 +40,20 @@ public class RemoteVideoTrack extends VideoTrack {
      */
     public String getSid() {
         return sid;
+    }
+
+    /**
+     * Check if remote video track is subscribed to by {@link LocalParticipant}.
+     */
+    public boolean isSubscribed() {
+        return subscribed;
+    }
+
+    /*
+     * State updated by remote participant listener proxy.
+     */
+    void setSubscribed(boolean subscribed) {
+        this.subscribed = subscribed;
     }
 }
 

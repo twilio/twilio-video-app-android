@@ -83,6 +83,7 @@ public class RemoteVideoTrackTopologyParameterizedTest extends BaseParticipantTe
 
         // Validate track sid
         assertIsTrackSid(remoteVideoTracks.get(0).getSid());
+        assertTrue(remoteVideoTracks.get(0).isSubscribed());
     }
 
     @Test

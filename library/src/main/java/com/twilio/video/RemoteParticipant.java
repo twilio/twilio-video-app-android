@@ -105,6 +105,7 @@ public class RemoteParticipant implements Participant {
                 @Override
                 public void run() {
                     logger.d("onSubscribedToAudioTrack");
+                    remoteAudioTrack.setSubscribed(true);
                     Listener listener = listenerReference.get();
 
                     if (listener != null) {
@@ -122,6 +123,7 @@ public class RemoteParticipant implements Participant {
                 @Override
                 public void run() {
                     logger.d("onUnsubscribedFromAudioTrack");
+                    remoteAudioTrack.setSubscribed(false);
                     Listener listener = listenerReference.get();
 
                     if (listener != null) {
@@ -178,6 +180,7 @@ public class RemoteParticipant implements Participant {
                 @Override
                 public void run() {
                     logger.d("onSubscribedToVideoTrack");
+                    remoteVideoTrack.setSubscribed(true);
                     Listener listener = listenerReference.get();
 
                     if (listener != null) {
@@ -195,6 +198,7 @@ public class RemoteParticipant implements Participant {
                 @Override
                 public void run() {
                     logger.d("onUnsubscribedFromVideoTrack");
+                    remoteVideoTrack.setSubscribed(false);
                     remoteVideoTrack.invalidateWebRtcTrack();
                     Listener listener = listenerReference.get();
 

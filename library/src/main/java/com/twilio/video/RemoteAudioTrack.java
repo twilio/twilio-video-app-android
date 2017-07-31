@@ -21,10 +21,15 @@ package com.twilio.video;
  */
 public class RemoteAudioTrack extends AudioTrack {
     private final String sid;
+    private boolean subscribed;
 
-    RemoteAudioTrack(String trackId, boolean isEnabled, String sid) {
+    RemoteAudioTrack(String sid,
+                     String trackId,
+                     boolean isEnabled,
+                     boolean subscribed) {
         super(trackId, isEnabled);
         this.sid = sid;
+        this.subscribed = subscribed;
     }
 
     /**
@@ -35,6 +40,13 @@ public class RemoteAudioTrack extends AudioTrack {
      */
     public String getSid() {
         return sid;
+    }
+
+    /**
+     * Check if remote audio track is subscribed to by {@link LocalParticipant}.
+     */
+    public boolean isSubscribed() {
+        return subscribed;
     }
 
     /**
@@ -58,5 +70,12 @@ public class RemoteAudioTrack extends AudioTrack {
     public boolean isPlaybackEnabled() {
         // TODO: Impelement once playback can be enabled
         throw new UnsupportedOperationException();
+    }
+
+    /*
+     * State updated by remote participant listener proxy.
+     */
+    void setSubscribed(boolean subscribed) {
+        this.subscribed = subscribed;
     }
 }
