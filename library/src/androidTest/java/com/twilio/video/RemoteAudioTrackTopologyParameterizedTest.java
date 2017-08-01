@@ -34,6 +34,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 import static com.twilio.video.util.VideoAssert.assertIsTrackSid;
+import static junit.framework.TestCase.assertFalse;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assume.assumeTrue;
@@ -77,6 +78,56 @@ public class RemoteAudioTrackTopologyParameterizedTest extends BaseParticipantTe
 
         // Validate track sid
         assertIsTrackSid(remoteAudioTracks.get(0).getSid());
+    }
+
+    @Test
+    public void shouldAllowEnablePlayback() throws InterruptedException {
+        final CallbackHelper.FakeStatsListener statsListener =
+                new CallbackHelper.FakeStatsListener();
+        publishAudioTrack();
+
+        // Get bobs remote audio track
+        RemoteAudioTrack bobRemoteAudioTrack = remoteParticipant.getRemoteAudioTracks().get(0);
+
+        // Validate that playback is enabled by default
+        assertTrue(bobRemoteAudioTrack.isPlaybackEnabled());
+
+        // Validate that we can disable playback
+        bobRemoteAudioTrack.enablePlayback(false);
+        assertFalse(bobRemoteAudioTrack.isPlaybackEnabled());
+
+        // Wait to allow audio to flow and stats to contain valid values
+        Thread.sleep(2000);
+
+        // Request stats report
+        statsListener.onStatsLatch = new CountDownLatch(1);
+        aliceRoom.getStats(statsListener);
+        statsListener.onStatsLatch.await(20, TimeUnit.SECONDS);
+
+        // Validate that bobs audio level is zero after playback is disabled
+        RemoteAudioTrackStats remoteAudioTrackStats = statsListener.getStatsReports()
+                .get(0)
+                .getRemoteAudioTrackStats()
+                .get(0);
+        assertEquals(0, remoteAudioTrackStats.audioLevel);
+
+        // Now we enable playback
+        bobRemoteAudioTrack.enablePlayback(true);
+
+        // Wait to allow audio to flow and stats to contain valid values
+        Thread.sleep(2000);
+
+        // Request stats report
+        statsListener.onStatsLatch = new CountDownLatch(1);
+        aliceRoom.getStats(statsListener);
+        statsListener.onStatsLatch.await(20, TimeUnit.SECONDS);
+
+        // Validate that bobs audio level is greater than 0 after playback enabled
+        remoteAudioTrackStats = statsListener.getStatsReports()
+                .get(0)
+                .getRemoteAudioTrackStats()
+                .get(0);
+        assertTrue(remoteAudioTrackStats.audioLevel > 0);
     }
 
     private void publishAudioTrack() throws InterruptedException {

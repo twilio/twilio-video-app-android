@@ -16,12 +16,16 @@
 
 package com.twilio.video;
 
+import android.support.annotation.Nullable;
+
 /**
  * A remote audio track represents a remote audio source.
  */
 public class RemoteAudioTrack extends AudioTrack {
     private final String sid;
     private boolean subscribed;
+    private org.webrtc.AudioTrack webRtcAudioTrack;
+    private boolean playbackEnabled;
 
     RemoteAudioTrack(String sid,
                      String trackId,
@@ -30,6 +34,7 @@ public class RemoteAudioTrack extends AudioTrack {
         super(trackId, isEnabled);
         this.sid = sid;
         this.subscribed = subscribed;
+        this.playbackEnabled = true;
     }
 
     /**
@@ -45,7 +50,7 @@ public class RemoteAudioTrack extends AudioTrack {
     /**
      * Check if remote audio track is subscribed to by {@link LocalParticipant}.
      */
-    public boolean isSubscribed() {
+    public synchronized boolean isSubscribed() {
         return subscribed;
     }
 
@@ -54,9 +59,12 @@ public class RemoteAudioTrack extends AudioTrack {
      *
      * @param enable the desired playback state of the remote audio track.
      */
-    public void enablePlayback(boolean enable) {
-        // TODO: Implement once playback can be enabled
-        throw new UnsupportedOperationException();
+    public synchronized void enablePlayback(boolean enable) {
+        this.playbackEnabled = enable;
+
+        if (webRtcAudioTrack != null) {
+            webRtcAudioTrack.setEnabled(playbackEnabled);
+        }
     }
 
     /**
@@ -67,15 +75,29 @@ public class RemoteAudioTrack extends AudioTrack {
      *
      * @return true if remote audio is enabled.
      */
-    public boolean isPlaybackEnabled() {
-        // TODO: Impelement once playback can be enabled
-        throw new UnsupportedOperationException();
+    public synchronized boolean isPlaybackEnabled() {
+        return playbackEnabled;
+    }
+
+    /*
+     * Called from JNI layer after a remote audio track has been subscribed to
+     */
+    @SuppressWarnings("unused")
+    synchronized void setWebRtcTrack(org.webrtc.AudioTrack webRtcAudioTrack) {
+        Preconditions.checkState(this.webRtcAudioTrack == null, "Did not invalidate WebRTC track " +
+                "before initializing new track");
+        this.webRtcAudioTrack = webRtcAudioTrack;
+        this.webRtcAudioTrack.setEnabled(playbackEnabled);
+    }
+
+    synchronized void invalidateWebRtcTrack() {
+        this.webRtcAudioTrack = null;
     }
 
     /*
      * State updated by remote participant listener proxy.
      */
-    void setSubscribed(boolean subscribed) {
+    synchronized void setSubscribed(boolean subscribed) {
         this.subscribed = subscribed;
     }
 }

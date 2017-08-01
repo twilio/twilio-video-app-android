@@ -124,6 +124,7 @@ public class RemoteParticipant implements Participant {
                 public void run() {
                     logger.d("onUnsubscribedFromAudioTrack");
                     remoteAudioTrack.setSubscribed(false);
+                    remoteAudioTrack.invalidateWebRtcTrack();
                     Listener listener = listenerReference.get();
 
                     if (listener != null) {

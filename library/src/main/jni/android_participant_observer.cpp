@@ -38,6 +38,22 @@ jobject createJavaWebRtcVideoTrack(JNIEnv *env,
     return j_webrtc_video_track;
 }
 
+jobject createJavaWebRtcAudioTrack(JNIEnv *env,
+                                   std::shared_ptr<twilio::media::RemoteAudioTrack> remote_audio_track) {
+    jclass j_webrtc_audio_track_class = webrtc_jni::FindClass(env, "org/webrtc/AudioTrack");
+    jmethodID j_webrtc_audio_track_ctor_id = webrtc_jni::GetMethodID(env,
+                                                                     j_webrtc_audio_track_class,
+                                                                     "<init>",
+                                                                     "(J)V");
+    jobject j_webrtc_audio_track = env->NewObject(j_webrtc_audio_track_class,
+                                                  j_webrtc_audio_track_ctor_id,
+                                                  webrtc_jni::jlongFromPointer(
+                                                          remote_audio_track->getWebRtcTrack()));
+    CHECK_EXCEPTION(env) << "Failed to create org.webrtc.AudioTrack";
+
+    return j_webrtc_audio_track;
+}
+
 AndroidParticipantObserver::AndroidParticipantObserver(JNIEnv *env,
                                                        jobject j_remote_participant,
                                                        jobject j_remote_participant_observer,
@@ -391,6 +407,15 @@ void AndroidParticipantObserver::onAudioTrackSubscribed(twilio::video::RemotePar
         }
 
         jobject j_remote_audio_track = remote_audio_track_map_[remote_audio_track];
+        jobject j_webrtc_audio_track = createJavaWebRtcAudioTrack(jni(), remote_audio_track);
+        jmethodID j_set_webrtc_track_method_id = webrtc_jni::GetMethodID(jni(),
+                                                                         webrtc_jni::GetObjectClass(jni(), j_remote_audio_track),
+                                                                         "setWebRtcTrack",
+                                                                         "(Lorg/webrtc/AudioTrack;)V");
+        jni()->CallVoidMethod(j_remote_audio_track,
+                              j_set_webrtc_track_method_id,
+                              j_webrtc_audio_track);
+        CHECK_EXCEPTION(jni()) << "Error setting WebRTC Audio Track";
         jni()->CallVoidMethod(*j_remote_participant_observer_,
                               j_on_subscribed_to_audio_track_,
                               *j_remote_participant_,
