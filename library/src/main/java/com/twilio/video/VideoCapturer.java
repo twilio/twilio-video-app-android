@@ -48,6 +48,10 @@ public interface VideoCapturer {
      */
     void stopCapture();
 
+    /**
+     * Interface that allows an implementation of {@link VideoCapturer} to forward events to the
+     * video capturer pipeline.
+     */
     interface Listener {
         /**
          * Notify whether capturer started.

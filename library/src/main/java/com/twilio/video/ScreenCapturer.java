@@ -126,8 +126,20 @@ public class ScreenCapturer implements VideoCapturer {
             }
         };
 
+    /**
+     * Interface that provides events and errors related to {@link ScreenCapturer}.
+     */
     public interface Listener {
+        /**
+         * Reports an error that occurred in {@link ScreenCapturer}.
+         *
+         * @param errorDescription description of the error that occurred.
+         */
         void onScreenCaptureError(String errorDescription);
+
+        /**
+         * Indicates when the first frame has been captured from the screen.
+         */
         void onFirstFrameAvailable();
     }
 

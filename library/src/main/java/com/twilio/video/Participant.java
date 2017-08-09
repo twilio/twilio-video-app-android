@@ -289,6 +289,9 @@ public class Participant {
         return nativeParticipantContext == 0;
     }
 
+    /**
+     * Interface that provides {@link Participant} events.
+     */
     public interface Listener {
         /**
          * This method notifies the listener that a {@link Participant} has added
