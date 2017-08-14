@@ -4,7 +4,37 @@ The Twilio Programmable Video SDKs use [Semantic Versioning](http://www.semver.o
 
 Features
 
-- TODO: Add breakdown of Track SID API changes.
+- Added `RemoteAudioTrack` and `RemoteVideoTrack`. These new objects extend `AudioTrack` and 
+`VideoTrack` respectively and come with the following new methods: 
+  - `getSid` - Returns a unique identifier for the track within the scope of a `Room`
+  - `isSubscribed` - Indicates if the `LocalParticipant` is receiving audio or video.
+- Added `enablePlayback` to new `RemoteAudioTrack` which allows developers to mute the audio 
+ received from a `RemoteParticipant`.
+- Converted `Participant` to an interface and migrated previous functionality into 
+`RemoteParticipant`. `LocalParticipant` and the new `RemoteParticipant` implement `Participant`.
+- Added `RemoteParticipant#getRemoteAudioTracks` and `RemoteParticipant#getRemoteVideoTracks`.
+- Moved `Participant.Listener` to `RemoteParticipant.Listener` and changed the listener to return
+`RemoteParticipant`, `RemoteAudioTrack`, and `RemoteVideoTrack` in callbacks.
+- Added the following callbacks to `RemoteParticipant.Listener`:
+  - `onSubscribedToAudioTrack` - Indicates when audio is flowing from a remote particpant's audio 
+  track.
+  - `onUnsubscribedFromAudioTrack` - Indicates when audio is no longer flowing from a remote 
+  partipant's audio track.
+  - `onSubscribedToVideoTrack` - Indicates when video is flowing from a remote participant's video 
+  track.
+  - `onUnsubscribedFromVideoTrack` - Inidicates when video is no longer flowing from a remote
+  participant's video track.
+- Renamed `TrackStats` to `RemoteTrackStats`, `AudioTrackStats` to `RemoteAudioTrackStats`, and
+`VideoTrackStats` to `RemoteVideoTrackStats`
+- Added `PublishedAudioTrack` and `PublishedVideoTrack` that represent a published 
+`LocalAudioTrack` and `LocalVideoTrack`. These new classes contain the method `getSid` which returns
+the identifier of a local audio or video track within the scope of a `Room`.
+- Renamed `LocalParticipant#addAudioTrack` and `LocalParticipant#addVideoTrack` to 
+`LocalParticipant#publishedAudioTrack` and `LocalParticipant#publishVideoTrack`.
+- Added `LocalParticipant.Listener` which is provides the following callbacks:
+  - `onPublishedAudioTrack` - Indicates when a local audio track has been published to a `Room`.
+  - `onPublishedVideoTrack` - Indicates when a local video track has been published to a `Room`.
+- Added `LocalParticipant#getPublishedAudioTracks` and `LocalParticipant#getPublishedVideoTracks`.
 
 Improvements
 
