@@ -20,3 +20,64 @@ library-instrumentation-tests:
         - 25
     locales: en
     orientations: portrait
+
+library-camera-tests:
+    timeout: 5m
+    type: instrumentation
+    app: app/build/outputs/apk/app-internal-debug.apk
+    test: library/build/outputs/apk/library-debug-androidTest.apk
+    device-ids:
+        - A0001
+        - E5803
+        - F5121
+        - athene
+        - athene_f
+        - falcon_umts
+        - flounder
+        - g3
+        - hero2lte
+        - herolte
+        - hlte
+        - htc_m8
+        - j5lte
+        - j7xelte
+        - lt02wifi
+        - m0
+        - mako
+        - osprey_umts
+        - p1
+        - sailfish
+        - serranolte
+        - t03g
+        - trelte
+        - victara
+        - zeroflte
+        - zerolte
+        # The following devices have known issues executing camera tests. The bugs and tasks
+        # are tracked in epic GSDK-1278.
+        #
+        # - SH-04H
+        # - shamu
+        # - hammerhead
+        # - j1acevelte
+        # - flo
+        # - condor_umts
+        # - D6503
+        # - D6603
+        # - titan_umts
+    os-version-ids:
+        - 18
+        - 19
+        - 21
+        - 22
+        - 23
+        - 24
+        - 25
+    test-targets:
+        - class com.twilio.video.Camera2CapturerIdParameterizedTest
+        - class com.twilio.video.Camera2CapturerTest
+        - class com.twilio.video.Camera2CapturerUsageTest
+        - class com.twilio.video.CameraCapturerSourceParameterizedTest
+        - class com.twilio.video.CameraCapturerTest
+    locales: en
+    orientations: portrait
