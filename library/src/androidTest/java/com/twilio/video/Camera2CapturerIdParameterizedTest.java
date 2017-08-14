@@ -32,7 +32,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import static org.junit.Assert.assertTrue;
 
 @RunWith(Parameterized.class)
-public class Camera2IdParameterizedCapturerTest extends BaseCamera2CapturerTest {
+public class Camera2CapturerIdParameterizedTest extends BaseCamera2CapturerTest {
     @Parameterized.Parameters(name = "{0}")
     public static Iterable<Object[]> data() {
         return Arrays.asList(new Object[][]{
@@ -42,7 +42,7 @@ public class Camera2IdParameterizedCapturerTest extends BaseCamera2CapturerTest 
 
     private final String cameraId;
 
-    public Camera2IdParameterizedCapturerTest(String cameraId) {
+    public Camera2CapturerIdParameterizedTest(String cameraId) {
         this.cameraId = cameraId;
     }
 
