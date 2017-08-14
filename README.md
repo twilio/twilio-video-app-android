@@ -8,7 +8,15 @@
 - [Code of Conduct](#code-of-conduct)
 - [License](#license)
 
-The Android Video SDK provides multi-party voice and video calling on Android.
+
+[Programmable Video](https://www.twilio.com/video) provides developers with the infrastructure 
+and APIs to build WebRTC applications. The Android Video SDK allows developers to integrate 
+multi-party voice and video calling into an Android app. This project contains the source for the
+SDK along with a canonical app that demonstrates the platform's capabilities. For developers
+interested in an introduction to the Video Android SDK, we recommend visiting the [Twilio
+Video Quickstart for Android](https://github.com/twilio/video-quickstart-android) which contains 
+step-by-step instructions for building a simple Android video application along with a few examples 
+of how the SDK can be used.
 
 ## Getting Started
 

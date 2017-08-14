@@ -310,6 +310,9 @@ public class LocalParticipant implements Participant {
         }
     }
 
+    /**
+     * Interface that provides {@link LocalParticipant} events.
+     */
     public interface Listener {
         /**
          * This method notifies the listener that a {@link LocalAudioTrack} has been shared to a

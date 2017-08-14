@@ -14,8 +14,6 @@
  * limitations under the License.
  */
 
-#include <map>
-
 #include "com_twilio_video_LocalParticipant.h"
 #include "com_twilio_video_LocalAudioTrack.h"
 #include "com_twilio_video_LocalVideoTrack.h"

@@ -410,6 +410,9 @@ public class RemoteParticipant implements Participant {
         }
     }
 
+    /**
+     * Interface that provides {@link RemoteParticipant} events.
+     */
     public interface Listener {
         /**
          * This method notifies the listener that a {@link RemoteParticipant} has added
