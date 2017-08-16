@@ -22,6 +22,7 @@ import android.support.test.filters.LargeTest;
 import com.twilio.video.base.BaseCameraCapturerTest;
 
 import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -36,6 +37,7 @@ import com.twilio.video.test.R;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assume.assumeTrue;
 
 @RunWith(Parameterized.class)
 @LargeTest
@@ -51,6 +53,12 @@ public class CameraCapturerSourceParameterizedTest extends BaseCameraCapturerTes
 
     public CameraCapturerSourceParameterizedTest(CameraCapturer.CameraSource cameraSource) {
         this.cameraSource = cameraSource;
+    }
+
+    @Before
+    public void setup() {
+        super.setup();
+        assumeTrue(CameraCapturer.isSourceSupported(cameraSource));
     }
 
     @After
