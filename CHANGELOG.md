@@ -3,8 +3,8 @@ The Twilio Programmable Video SDKs use [Semantic Versioning](http://www.semver.o
 ####1.3.0
 
 Features
-- Added static method `CameraCapturer.isSourceSupported` that validates if a camera source is 
-supported by the device. This method is used when creating a `CameraCapturer` instance and when
+- Added static method `CameraCapturer.isSourceAvailable` that validates if a camera source is 
+available on the device. This method is used when creating a `CameraCapturer` instance and when
 calling `CameraCapturer#switchCamera` to validate that a source can be used for capturing frames.
 
 Improvements

@@ -69,10 +69,10 @@ public abstract class BaseCameraCapturerTest {
         }
     }
 
-    protected boolean bothCameraSourcesSupported() {
+    protected boolean bothCameraSourcesAvailable() {
         boolean bothCamerasSupported =
-                CameraCapturer.isSourceSupported(CameraCapturer.CameraSource.FRONT_CAMERA) &&
-                CameraCapturer.isSourceSupported(CameraCapturer.CameraSource.BACK_CAMERA);
+                CameraCapturer.isSourceAvailable(CameraCapturer.CameraSource.FRONT_CAMERA) &&
+                CameraCapturer.isSourceAvailable(CameraCapturer.CameraSource.BACK_CAMERA);
 
         /*
          * Validate that if both cameras are not supported that there are actually less than
@@ -86,9 +86,9 @@ public abstract class BaseCameraCapturerTest {
     }
 
     private @Nullable CameraCapturer.CameraSource getSupportedCameraSource() {
-        if (CameraCapturer.isSourceSupported(CameraCapturer.CameraSource.FRONT_CAMERA)) {
+        if (CameraCapturer.isSourceAvailable(CameraCapturer.CameraSource.FRONT_CAMERA)) {
             return CameraCapturer.CameraSource.FRONT_CAMERA;
-        } else if (CameraCapturer.isSourceSupported(CameraCapturer.CameraSource.BACK_CAMERA)) {
+        } else if (CameraCapturer.isSourceAvailable(CameraCapturer.CameraSource.BACK_CAMERA)) {
             return CameraCapturer.CameraSource.BACK_CAMERA;
         } else {
             Log.w("BaseCameraCapturerTest", "No supported camera source");

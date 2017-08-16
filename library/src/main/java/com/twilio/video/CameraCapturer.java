@@ -277,20 +277,20 @@ public class CameraCapturer implements VideoCapturer {
             };
 
     /**
-     * Indicates if a camera source is supported by the device.
+     * Indicates if a camera source is available on the device.
      *
      * @param cameraSource the camera source
-     * @return true if device supports the camera source and false if not.
+     * @return true if source is available on device and false otherwise.
      */
-    public static boolean isSourceSupported(@NonNull CameraSource cameraSource) {
+    public static boolean isSourceAvailable(@NonNull CameraSource cameraSource) {
         Preconditions.checkNotNull(cameraSource, "Camera source must not be null");
         CameraCapturerFormatProvider cameraCapturerFormatProvider =
                 new CameraCapturerFormatProvider();
 
-        return isSourceSupported(cameraCapturerFormatProvider, cameraSource);
+        return isSourceAvailable(cameraCapturerFormatProvider, cameraSource);
     }
 
-    static boolean isSourceSupported(@NonNull CameraCapturerFormatProvider cameraCapturerFormatProvider,
+    static boolean isSourceAvailable(@NonNull CameraCapturerFormatProvider cameraCapturerFormatProvider,
                                      @NonNull CameraSource cameraSource) {
         return cameraCapturerFormatProvider.getCameraId(cameraSource) != -1;
     }
@@ -316,7 +316,7 @@ public class CameraCapturer implements VideoCapturer {
                    @NonNull CameraCapturerFormatProvider formatProvider) {
         Preconditions.checkNotNull(context, "Context must not be null");
         Preconditions.checkNotNull(cameraSource, "Camera source must not be null");
-        Preconditions.checkArgument(isSourceSupported(formatProvider, cameraSource),
+        Preconditions.checkArgument(isSourceAvailable(formatProvider, cameraSource),
                 String.format("%s is not supported on this device", cameraSource));
         this.context = context;
         this.cameraSource = cameraSource;
@@ -429,7 +429,7 @@ public class CameraCapturer implements VideoCapturer {
         CameraSource nextCameraSource = cameraSource == CameraSource.FRONT_CAMERA ?
                 CameraSource.BACK_CAMERA :
                 CameraSource.FRONT_CAMERA;
-        boolean nextCameraSourceSupported = isSourceSupported(formatProvider, nextCameraSource);
+        boolean nextCameraSourceSupported = isSourceAvailable(formatProvider, nextCameraSource);
 
         if (!nextCameraSourceSupported) {
             logger.w(String.format("Cannot switch to unsupported camera source %s",

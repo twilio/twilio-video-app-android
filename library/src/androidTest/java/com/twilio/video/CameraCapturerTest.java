@@ -56,9 +56,9 @@ public class CameraCapturerTest extends BaseCameraCapturerTest {
     public void shouldAllowSourceSupportedCheck() {
         int sourcesSupported = 0;
         boolean frontCameraSupported = CameraCapturer
-                .isSourceSupported(CameraCapturer.CameraSource.FRONT_CAMERA);
+                .isSourceAvailable(CameraCapturer.CameraSource.FRONT_CAMERA);
         boolean backCameraSupported = CameraCapturer
-                .isSourceSupported(CameraCapturer.CameraSource.BACK_CAMERA);
+                .isSourceAvailable(CameraCapturer.CameraSource.BACK_CAMERA);
 
         // Update supported sources
         sourcesSupported = frontCameraSupported ? (sourcesSupported + 1) : (sourcesSupported);
@@ -194,7 +194,7 @@ public class CameraCapturerTest extends BaseCameraCapturerTest {
 
     @Test
     public void shouldCaptureFramesAfterCameraSwitchAndRelease() throws InterruptedException {
-        assumeTrue(bothCameraSourcesSupported());
+        assumeTrue(bothCameraSourcesAvailable());
         final CameraCapturer.CameraSource cameraSource = CameraCapturer.CameraSource.FRONT_CAMERA;
         final AtomicReference<CountDownLatch> firstFrameReceived =
                 new AtomicReference<>(new CountDownLatch(1));
@@ -285,7 +285,7 @@ public class CameraCapturerTest extends BaseCameraCapturerTest {
 
     @Test
     public void shouldAllowCameraSwitch() throws InterruptedException {
-        assumeTrue(bothCameraSourcesSupported());
+        assumeTrue(bothCameraSourcesAvailable());
         final CountDownLatch cameraSwitched = new CountDownLatch(1);
         cameraCapturer = new CameraCapturer(cameraCapturerActivity,
                 CameraCapturer.CameraSource.FRONT_CAMERA,
@@ -333,7 +333,7 @@ public class CameraCapturerTest extends BaseCameraCapturerTest {
 
     @Test
     public void shouldAllowCameraSwitchWhileNotOnLocalVideo() throws InterruptedException {
-        assumeTrue(bothCameraSourcesSupported());
+        assumeTrue(bothCameraSourcesAvailable());
         final CountDownLatch cameraSwitched = new CountDownLatch(1);
         cameraCapturer = new CameraCapturer(cameraCapturerActivity,
                 CameraCapturer.CameraSource.FRONT_CAMERA,
@@ -376,7 +376,7 @@ public class CameraCapturerTest extends BaseCameraCapturerTest {
 
     @Test
     public void switchCamera_shouldFailWithSwitchPending() throws InterruptedException {
-        assumeTrue(bothCameraSourcesSupported());
+        assumeTrue(bothCameraSourcesAvailable());
         final CountDownLatch cameraSwitchError = new CountDownLatch(1);
         cameraCapturer = new CameraCapturer(cameraCapturerActivity,
                 CameraCapturer.CameraSource.FRONT_CAMERA,
@@ -409,7 +409,7 @@ public class CameraCapturerTest extends BaseCameraCapturerTest {
     public void shouldAllowUpdatingCameraParametersBeforeCapturing() throws InterruptedException {
         // We use back camera for tests that require changes to camera paramters
         CameraCapturer.CameraSource cameraSource = CameraCapturer.CameraSource.BACK_CAMERA;
-        assumeTrue(CameraCapturer.isSourceSupported(cameraSource));
+        assumeTrue(CameraCapturer.isSourceAvailable(cameraSource));
 
         CountDownLatch cameraParametersSet = new CountDownLatch(1);
         String expectedFlashMode = Camera.Parameters.FLASH_MODE_TORCH;
@@ -437,7 +437,7 @@ public class CameraCapturerTest extends BaseCameraCapturerTest {
     public void shouldAllowUpdatingCameraParametersWhileCapturing() throws InterruptedException {
         // We use back camera for tests that require changes to camera paramters
         CameraCapturer.CameraSource cameraSource = CameraCapturer.CameraSource.BACK_CAMERA;
-        assumeTrue(CameraCapturer.isSourceSupported(cameraSource));
+        assumeTrue(CameraCapturer.isSourceAvailable(cameraSource));
 
         CountDownLatch cameraParametersUpdated = new CountDownLatch(1);
         final CountDownLatch firstFrameAvailable = new CountDownLatch(1);
@@ -486,7 +486,7 @@ public class CameraCapturerTest extends BaseCameraCapturerTest {
     public void updateCameraParameters_shouldNotCauseCameraFreeze() throws InterruptedException {
         // We use back camera for tests that require changes to camera paramters
         CameraCapturer.CameraSource cameraSource = CameraCapturer.CameraSource.BACK_CAMERA;
-        assumeTrue(CameraCapturer.isSourceSupported(cameraSource));
+        assumeTrue(CameraCapturer.isSourceAvailable(cameraSource));
 
         CountDownLatch cameraParametersSet = new CountDownLatch(1);
         final CountDownLatch cameraFroze = new CountDownLatch(1);
@@ -543,7 +543,7 @@ public class CameraCapturerTest extends BaseCameraCapturerTest {
             throws InterruptedException {
         // We use back camera for tests that require changes to camera paramters
         CameraCapturer.CameraSource cameraSource = CameraCapturer.CameraSource.BACK_CAMERA;
-        assumeTrue(CameraCapturer.isSourceSupported(cameraSource));
+        assumeTrue(CameraCapturer.isSourceAvailable(cameraSource));
 
         CountDownLatch cameraParametersUpdated = new CountDownLatch(1);
         final CountDownLatch firstFrameAvailable = new CountDownLatch(1);
@@ -610,7 +610,7 @@ public class CameraCapturerTest extends BaseCameraCapturerTest {
             throws InterruptedException {
         // We use back camera for tests that require changes to camera paramters
         CameraCapturer.CameraSource cameraSource = CameraCapturer.CameraSource.BACK_CAMERA;
-        assumeTrue(CameraCapturer.isSourceSupported(cameraSource));
+        assumeTrue(CameraCapturer.isSourceAvailable(cameraSource));
 
         CountDownLatch cameraParametersUpdated = new CountDownLatch(1);
         final CountDownLatch firstFrameAvailable = new CountDownLatch(1);

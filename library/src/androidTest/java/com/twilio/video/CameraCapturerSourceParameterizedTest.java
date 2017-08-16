@@ -58,7 +58,7 @@ public class CameraCapturerSourceParameterizedTest extends BaseCameraCapturerTes
     @Before
     public void setup() {
         super.setup();
-        assumeTrue(CameraCapturer.isSourceSupported(cameraSource));
+        assumeTrue(CameraCapturer.isSourceAvailable(cameraSource));
     }
 
     @After

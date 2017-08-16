@@ -37,7 +37,7 @@ public class CameraCapturerUnitTest {
 
     @Test(expected = NullPointerException.class)
     public void isSourceSupported_shouldFailWithNullSource() {
-        CameraCapturer.isSourceSupported(null);
+        CameraCapturer.isSourceAvailable(null);
     }
 
     @Test(expected = NullPointerException.class)
