@@ -9,6 +9,9 @@ buildscript {
         maven {
             url "http://nexus.corp.twilio.com/content/repositories/releases/"
         }
+        maven {
+            url "https://maven.google.com"
+        }
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:2.3.3'
@@ -28,6 +31,9 @@ allprojects {
         }
         maven {
             url "http://nexus.corp.twilio.com/content/repositories/releases/"
+        }
+        maven {
+            url "https://maven.google.com"
         }
     }
 }

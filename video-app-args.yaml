@@ -53,6 +53,8 @@ library-camera-tests:
         - victara
         - zeroflte
         - zerolte
+        - condor_umts
+        - titan_umts
         # The following devices have known issues executing camera tests. The bugs and tasks
         # are tracked in epic GSDK-1278.
         #
@@ -61,10 +63,8 @@ library-camera-tests:
         # - hammerhead
         # - j1acevelte
         # - flo
-        # - condor_umts
         # - D6503
         # - D6603
-        # - titan_umts
     os-version-ids:
         - 18
         - 19
