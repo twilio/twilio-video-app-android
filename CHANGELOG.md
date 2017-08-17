@@ -12,6 +12,11 @@ Improvements
 - Added javadoc to `Participant.Listener`, `ScreenCapturer.Listener`, `VideoCapturer.Listener`, 
 and `VideoRenderer.Listener`. 
 
+Bug Fixes
+
+- Fixed a bug where multiple participants adding/removing tracks at the same time was not handled 
+properly.
+
 Known issues
 
 - Network handoff, and subsequent connection renegotiation is not supported for IPv6 networks [#72](https://github.com/twilio/video-quickstart-android/issues/72)
