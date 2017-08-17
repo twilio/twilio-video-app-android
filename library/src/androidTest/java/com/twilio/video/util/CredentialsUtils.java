@@ -16,21 +16,15 @@
 
 package com.twilio.video.util;
 
-import android.support.test.espresso.core.deps.guava.base.Preconditions;
-import android.support.test.espresso.core.deps.guava.base.Strings;
 
 import com.twilio.video.test.BuildConfig;
 import com.twilio.video.token.VideoAccessToken;
-import com.twilio.video.twilioapi.VideoApiUtils;
-import com.twilio.video.twilioapi.model.VideoRoom;
 
 import java.util.HashMap;
 import java.util.Map;
 
 import static junit.framework.TestCase.assertFalse;
 import static junit.framework.TestCase.assertTrue;
-import static org.junit.Assume.assumeFalse;
-import static org.junit.Assume.assumeTrue;
 
 public class CredentialsUtils {
     private static final int TTL_DEFAULT = 1800;
@@ -108,6 +102,6 @@ public class CredentialsUtils {
         assertTrue("Credential map does not contain key: " + credentialKey,
             BuildConfig.twilioCredentials.containsKey(credentialKey));
         assertFalse("Credential " + credentialKey + " must not be null or empty",
-            Strings.isNullOrEmpty(BuildConfig.twilioCredentials.get(credentialKey)));
+            StringUtils.isNullOrEmpty(BuildConfig.twilioCredentials.get(credentialKey)));
     }
 }
