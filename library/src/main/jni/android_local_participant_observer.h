@@ -37,10 +37,10 @@ public:
 protected:
 
     virtual void onAudioTrackPublished(twilio::video::LocalParticipant *local_participant,
-                                       std::shared_ptr<twilio::media::PublishedAudioTrack> track);
+                                       std::shared_ptr<twilio::media::LocalAudioTrackPublication> local_audio_track_publication);
 
     virtual void onVideoTrackPublished(twilio::video::LocalParticipant *local_participant,
-                                       std::shared_ptr<twilio::media::PublishedVideoTrack> track);
+                                       std::shared_ptr<twilio::media::LocalVideoTrackPublication> local_video_track_publication);
 
 private:
     JNIEnv *jni() {

@@ -16,8 +16,6 @@
 
 package com.twilio.video;
 
-import android.support.annotation.Nullable;
-
 /**
  * A remote audio track represents a remote audio source.
  */

@@ -170,14 +170,14 @@ jobject createJavaRemoteAudioTrack(JNIEnv *env,
                                    jclass j_remote_audio_track_class,
                                    jmethodID j_remote_audio_track_ctor_id) {
     jstring j_track_sid = webrtc_jni::JavaStringFromStdString(env, remote_audio_track->getSid());
-    jstring j_track_id = webrtc_jni::JavaStringFromStdString(env, remote_audio_track->getTrackId());
     jboolean j_is_enabled = (jboolean) remote_audio_track->isEnabled();
     jboolean j_is_subscribed = (jboolean) remote_audio_track->isSubscribed();
 
     return env->NewObject(j_remote_audio_track_class,
                           j_remote_audio_track_ctor_id,
                           j_track_sid,
-                          j_track_id,
+                          // Using track SID as track ID until we complete GSDK-1286
+                          j_track_sid,
                           j_is_enabled,
                           j_is_subscribed);
 }
@@ -187,13 +187,16 @@ jobject createJavaRemoteVideoTrack(JNIEnv *env,
                                    jclass j_remote_video_track_class,
                                    jmethodID j_remote_video_track_ctor_id) {
     jstring j_track_sid = webrtc_jni::JavaStringFromStdString(env, remote_video_track->getSid());
-    jstring j_track_id = webrtc_jni::JavaStringFromStdString(env, remote_video_track->getTrackId());
     jboolean j_is_enabled = (jboolean) remote_video_track->isEnabled();
     jboolean j_is_subscribed = (jboolean) remote_video_track->isSubscribed();
     jobject j_remote_video_track = env->NewObject(j_remote_video_track_class,
                                                   j_remote_video_track_ctor_id,
                                                   j_track_sid,
-                                                  j_track_id,
+                                                  /*
+                                                   * Using track SID as track ID until we complete
+                                                   * GSDK-1286
+                                                   */
+                                                  j_track_sid,
                                                   j_is_enabled,
                                                   j_is_subscribed);
     CHECK_EXCEPTION(env) << "Failed to create RemoteVideoTrack";

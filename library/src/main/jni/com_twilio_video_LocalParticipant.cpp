@@ -29,26 +29,30 @@ struct LocalParticipantContext {
 };
 
 jobject createJavaPublishedAudioTrack(JNIEnv *env,
-                                      std::shared_ptr<twilio::media::PublishedAudioTrack> published_audio_track,
+                                      std::shared_ptr<twilio::media::LocalAudioTrackPublication> local_audio_track_publication,
                                       jclass j_published_audio_track_class,
                                       jmethodID j_published_audio_track_ctor_id) {
     jobject j_published_audio_track = env->NewObject(j_published_audio_track_class,
                                                      j_published_audio_track_ctor_id,
-                                                     webrtc_jni::JavaStringFromStdString(env, published_audio_track->getSid()),
-                                                     webrtc_jni::JavaStringFromStdString(env, published_audio_track->getTrackId()));
+                                                     webrtc_jni::JavaStringFromStdString(env,
+                                                                                         local_audio_track_publication->getTrackSid()),
+                                                     webrtc_jni::JavaStringFromStdString(env,
+                                                                                         local_audio_track_publication->getLocalTrack()->getTrackId()));
     CHECK_EXCEPTION(env) << "Failed to create PublishedAudioTrack";
 
     return j_published_audio_track;
 }
 
 jobject createJavaPublishedVideoTrack(JNIEnv *env,
-                                      std::shared_ptr<twilio::media::PublishedVideoTrack> published_video_track,
+                                      std::shared_ptr<twilio::media::LocalVideoTrackPublication> local_video_track_publication,
                                       jclass j_published_video_track_class,
                                       jmethodID j_published_video_track_ctor_id) {
     jobject j_published_video_track = env->NewObject(j_published_video_track_class,
                                                      j_published_video_track_ctor_id,
-                                                     webrtc_jni::JavaStringFromStdString(env, published_video_track->getSid()),
-                                                     webrtc_jni::JavaStringFromStdString(env, published_video_track->getTrackId()));
+                                                     webrtc_jni::JavaStringFromStdString(env,
+                                                                                         local_video_track_publication->getTrackSid()),
+                                                     webrtc_jni::JavaStringFromStdString(env,
+                                                                                         local_video_track_publication->getLocalTrack()->getTrackId()));
     CHECK_EXCEPTION(env) << "Failed to create PublishedVideoTrack";
 
     return j_published_video_track;
@@ -82,15 +86,16 @@ jobject createPublishedAudioTracks(JNIEnv *env,
                                    jclass j_published_audio_track_class,
                                    jmethodID j_published_audio_track_ctor_id) {
     jobject j_published_audio_tracks = env->NewObject(j_array_list_class, j_array_list_ctor_id);
-    const std::vector<std::shared_ptr<twilio::media::PublishedAudioTrack>> published_audio_tracks =
-            local_participant_context->local_participant->getPublishedAudioTracks();
+    const std::vector<std::shared_ptr<twilio::media::LocalAudioTrackPublication>> local_audio_track_publications =
+            local_participant_context->local_participant->getLocalAudioTracks();
 
     // Add audio tracks to array list
-    for (unsigned int i = 0; i < published_audio_tracks.size(); i++) {
-        std::shared_ptr<twilio::media::PublishedAudioTrack> remote_audio_track = published_audio_tracks[i];
+    for (unsigned int i = 0; i < local_audio_track_publications.size(); i++) {
+        std::shared_ptr<twilio::media::LocalAudioTrackPublication> local_audio_track_publication =
+                local_audio_track_publications[i];
         jobject j_remote_audio_track =
                 createJavaPublishedAudioTrack(env,
-                                              remote_audio_track,
+                                              local_audio_track_publication,
                                               j_published_audio_track_class,
                                               j_published_audio_track_ctor_id);
         env->CallBooleanMethod(j_published_audio_tracks, j_array_list_add, j_remote_audio_track);
@@ -107,12 +112,13 @@ jobject createPublishedVideoTracks(JNIEnv *env,
                                    jclass j_published_video_track_class,
                                    jmethodID j_published_video_track_ctor_id) {
     jobject j_published_video_tracks = env->NewObject(j_array_list_class, j_array_list_ctor_id);
-    const std::vector<std::shared_ptr<twilio::media::PublishedVideoTrack>> published_video_tracks =
-            local_participant_context->local_participant->getPublishedVideoTracks();
+    const std::vector<std::shared_ptr<twilio::media::LocalVideoTrackPublication>> local_video_track_publications =
+            local_participant_context->local_participant->getLocalVideoTracks();
 
     // Add video tracks to array list
-    for (unsigned int i = 0; i < published_video_tracks.size(); i++) {
-        std::shared_ptr<twilio::media::PublishedVideoTrack> remote_video_track = published_video_tracks[i];
+    for (unsigned int i = 0; i < local_video_track_publications.size(); i++) {
+        std::shared_ptr<twilio::media::LocalVideoTrackPublication> remote_video_track =
+                local_video_track_publications[i];
         jobject j_remote_video_track =
                 createJavaPublishedVideoTrack(env,
                                               remote_video_track,

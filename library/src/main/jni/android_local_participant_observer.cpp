@@ -71,7 +71,7 @@ void AndroidLocalParticipantObserver::setObserverDeleted() {
 }
 
 void AndroidLocalParticipantObserver::onAudioTrackPublished(twilio::video::LocalParticipant *local_participant,
-                                                            std::shared_ptr<twilio::media::PublishedAudioTrack> published_audio_track) {
+                                                            std::shared_ptr<twilio::media::LocalAudioTrackPublication> local_audio_track_publication) {
     webrtc_jni::ScopedLocalRefFrame local_ref_frame(jni());
     std::string func_name = std::string(__FUNCTION__);
     VIDEO_ANDROID_LOG(twilio::video::LogModule::kPlatform,
@@ -86,7 +86,7 @@ void AndroidLocalParticipantObserver::onAudioTrackPublished(twilio::video::Local
         }
 
         jobject j_published_audio_track = createJavaPublishedAudioTrack(jni(),
-                                                                        published_audio_track,
+                                                                        local_audio_track_publication,
                                                                         *j_published_audio_track_class_,
                                                                         j_published_audio_track_ctor_id_);
         jni()->CallVoidMethod(*j_local_participant_observer_,
@@ -98,7 +98,7 @@ void AndroidLocalParticipantObserver::onAudioTrackPublished(twilio::video::Local
 }
 
 void AndroidLocalParticipantObserver::onVideoTrackPublished(twilio::video::LocalParticipant *local_participant,
-                                                            std::shared_ptr<twilio::media::PublishedVideoTrack> published_video_track) {
+                                                            std::shared_ptr<twilio::media::LocalVideoTrackPublication> local_video_track_publication) {
     webrtc_jni::ScopedLocalRefFrame local_ref_frame(jni());
     std::string func_name = std::string(__FUNCTION__);
     VIDEO_ANDROID_LOG(twilio::video::LogModule::kPlatform,
@@ -112,7 +112,7 @@ void AndroidLocalParticipantObserver::onVideoTrackPublished(twilio::video::Local
         }
 
         jobject j_published_video_track = createJavaPublishedVideoTrack(jni(),
-                                                                        published_video_track,
+                                                                        local_video_track_publication,
                                                                         *j_published_video_track_class_,
                                                                         j_published_video_track_ctor_id_);
         jni()->CallVoidMethod(*j_local_participant_observer_,

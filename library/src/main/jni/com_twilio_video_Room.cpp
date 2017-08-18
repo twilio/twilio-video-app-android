@@ -86,7 +86,8 @@ twilio::video::NetworkChangeEvent getNetworkChangeEvent(jobject j_network_change
     jstring connection_event_name = (jstring) jni->CallObjectMethod(j_network_change_event,
                                                                     name_method_id);
     std::string name = webrtc_jni::JavaToStdString(jni, connection_event_name);
-    twilio::video::NetworkChangeEvent network_changed_event = twilio::video::kConnectionChanged;
+    twilio::video::NetworkChangeEvent network_changed_event =
+            twilio::video::NetworkChangeEvent::kConnectionChanged;
 
     if (name == "CONNECTION_LOST") {
         network_changed_event = twilio::video::NetworkChangeEvent::kConnectionLost;

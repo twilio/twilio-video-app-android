@@ -54,12 +54,12 @@ jobject createJavaLocalParticipant(JNIEnv *env,
                                    jobject j_handler);
 
 jobject createJavaPublishedAudioTrack(JNIEnv *env,
-                                      std::shared_ptr<twilio::media::PublishedAudioTrack> published_audio_track,
+                                      std::shared_ptr<twilio::media::LocalAudioTrackPublication> local_audio_track_publication,
                                       jclass j_published_audio_track_class,
                                       jmethodID j_published_audio_track_ctor_id);
 
 jobject createJavaPublishedVideoTrack(JNIEnv *env,
-                                      std::shared_ptr<twilio::media::PublishedVideoTrack> published_video_track,
+                                      std::shared_ptr<twilio::media::LocalVideoTrackPublication> local_video_track_publication,
                                       jclass j_published_video_track_class,
                                       jmethodID j_published_video_track_ctor_id);
 
