@@ -54,12 +54,22 @@ Known issues
 - Disconnecting from a `Room` that has not connected sometimes results in a crash [#116](https://github.com/twilio/video-quickstart-android/issues/116)
 - LocalParticipant release method is public [#132](https://github.com/twilio/video-quickstart-android/issues/132)
 
-####1.2.3
+####1.3.0
+
+Features
+- Added static method `CameraCapturer.isSourceAvailable` that validates if a camera source is 
+available on the device. This method is used when creating a `CameraCapturer` instance and when
+calling `CameraCapturer#switchCamera` to validate that a source can be used for capturing frames.
 
 Improvements
 
 - Added javadoc to `Participant.Listener`, `ScreenCapturer.Listener`, `VideoCapturer.Listener`, 
 and `VideoRenderer.Listener`. 
+
+Bug Fixes
+
+- Fixed a bug where multiple participants adding/removing tracks at the same time was not handled 
+properly.
 
 Known issues
 

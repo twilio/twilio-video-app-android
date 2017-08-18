@@ -31,6 +31,7 @@ import android.view.Surface;
 import android.view.WindowManager;
 
 import org.webrtc.Camera1Capturer;
+import org.webrtc.Camera1Enumerator;
 import org.webrtc.Camera1Session;
 import org.webrtc.CameraVideoCapturer;
 import org.webrtc.SurfaceTextureHelper;
@@ -275,6 +276,25 @@ public class CameraCapturer implements VideoCapturer {
                 }
             };
 
+    /**
+     * Indicates if a camera source is available on the device.
+     *
+     * @param cameraSource the camera source
+     * @return true if source is available on device and false otherwise.
+     */
+    public static boolean isSourceAvailable(@NonNull CameraSource cameraSource) {
+        Preconditions.checkNotNull(cameraSource, "Camera source must not be null");
+        CameraCapturerFormatProvider cameraCapturerFormatProvider =
+                new CameraCapturerFormatProvider();
+
+        return isSourceAvailable(cameraCapturerFormatProvider, cameraSource);
+    }
+
+    static boolean isSourceAvailable(@NonNull CameraCapturerFormatProvider cameraCapturerFormatProvider,
+                                     @NonNull CameraSource cameraSource) {
+        return cameraCapturerFormatProvider.getCameraId(cameraSource) != -1;
+    }
+
     public CameraCapturer(Context context, CameraSource cameraSource) {
         this(context, cameraSource, null);
     }
@@ -296,6 +316,8 @@ public class CameraCapturer implements VideoCapturer {
                    @NonNull CameraCapturerFormatProvider formatProvider) {
         Preconditions.checkNotNull(context, "Context must not be null");
         Preconditions.checkNotNull(cameraSource, "Camera source must not be null");
+        Preconditions.checkArgument(isSourceAvailable(formatProvider, cameraSource),
+                String.format("%s is not supported on this device", cameraSource));
         this.context = context;
         this.cameraSource = cameraSource;
         this.listener = listener;
@@ -404,13 +426,22 @@ public class CameraCapturer implements VideoCapturer {
      * or not.
      */
     public synchronized void switchCamera() {
+        CameraSource nextCameraSource = cameraSource == CameraSource.FRONT_CAMERA ?
+                CameraSource.BACK_CAMERA :
+                CameraSource.FRONT_CAMERA;
+        boolean nextCameraSourceSupported = isSourceAvailable(formatProvider, nextCameraSource);
+
+        if (!nextCameraSourceSupported) {
+            logger.w(String.format("Cannot switch to unsupported camera source %s",
+                    nextCameraSource));
+            return;
+        }
+
         synchronized (stateLock) {
             if (state != State.IDLE) {
                 webRtcCameraCapturer.switchCamera(cameraSwitchHandler);
             } else {
-                cameraSource = (cameraSource == CameraSource.FRONT_CAMERA) ?
-                        (CameraSource.BACK_CAMERA) :
-                        (CameraSource.FRONT_CAMERA);
+                cameraSource = nextCameraSource;
                 if (listener != null) {
                     listener.onCameraSwitched();
                 }

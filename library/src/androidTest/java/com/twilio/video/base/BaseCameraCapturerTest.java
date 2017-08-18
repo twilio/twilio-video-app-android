@@ -16,7 +16,10 @@
 
 package com.twilio.video.base;
 
+import android.hardware.Camera;
+import android.support.annotation.Nullable;
 import android.support.test.rule.ActivityTestRule;
+import android.util.Log;
 
 import com.twilio.video.CameraCapturer;
 import com.twilio.video.LocalVideoTrack;
@@ -33,6 +36,7 @@ import org.junit.Rule;
 
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assume.assumeFalse;
+import static org.junit.Assume.assumeTrue;
 
 public abstract class BaseCameraCapturerTest {
     protected static final int CAMERA_CAPTURE_DELAY_MS = 3000;
@@ -44,6 +48,7 @@ public abstract class BaseCameraCapturerTest {
     protected CameraCapturer cameraCapturer;
     protected LocalVideoTrack localVideoTrack;
     protected FrameCountRenderer frameCountRenderer;
+    protected CameraCapturer.CameraSource supportedCameraSource;
 
     @Before
     public void setup() {
@@ -53,12 +58,41 @@ public abstract class BaseCameraCapturerTest {
         PermissionUtils.allowPermissions(cameraCapturerActivity);
         Video.setLogLevel(LogLevel.ALL);
         frameCountRenderer = new FrameCountRenderer();
+        supportedCameraSource = getSupportedCameraSource();
+        assumeTrue(supportedCameraSource != null);
     }
 
     @After
     public void teardown() {
         if (localVideoTrack != null) {
             localVideoTrack.release();
+        }
+    }
+
+    protected boolean bothCameraSourcesAvailable() {
+        boolean bothCamerasSupported =
+                CameraCapturer.isSourceAvailable(CameraCapturer.CameraSource.FRONT_CAMERA) &&
+                CameraCapturer.isSourceAvailable(CameraCapturer.CameraSource.BACK_CAMERA);
+
+        /*
+         * Validate that if both cameras are not supported that there are actually less than
+         * two cameras reported by framework.
+         */
+        if (!bothCamerasSupported) {
+            assertTrue(Camera.getNumberOfCameras() < 2);
+        }
+
+        return bothCamerasSupported;
+    }
+
+    private @Nullable CameraCapturer.CameraSource getSupportedCameraSource() {
+        if (CameraCapturer.isSourceAvailable(CameraCapturer.CameraSource.FRONT_CAMERA)) {
+            return CameraCapturer.CameraSource.FRONT_CAMERA;
+        } else if (CameraCapturer.isSourceAvailable(CameraCapturer.CameraSource.BACK_CAMERA)) {
+            return CameraCapturer.CameraSource.BACK_CAMERA;
+        } else {
+            Log.w("BaseCameraCapturerTest", "No supported camera source");
+            return null;
         }
     }
 }

@@ -16,8 +16,6 @@
 
 package com.twilio.video.util;
 
-import android.support.test.espresso.core.deps.guava.base.Preconditions;
-
 import com.twilio.video.test.BuildConfig;
 import com.twilio.video.twilioapi.VideoApiUtils;
 import com.twilio.video.twilioapi.model.VideoRoom;
