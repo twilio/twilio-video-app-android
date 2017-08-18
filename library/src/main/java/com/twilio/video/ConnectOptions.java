@@ -31,6 +31,8 @@ public class ConnectOptions {
     private final List<LocalVideoTrack> videoTracks;
     private final IceOptions iceOptions;
     private final boolean enableInsights;
+    private final List<AudioCodec> preferredAudioCodecs;
+    private final List<VideoCodec> preferredVideoCodecs;
 
     static void checkAudioTracksReleased(@Nullable List<LocalAudioTrack> audioTracks) {
         if (audioTracks != null) {
@@ -59,6 +61,8 @@ public class ConnectOptions {
         this.videoTracks = builder.videoTracks;
         this.iceOptions = builder.iceOptions;
         this.enableInsights = builder.enableInsights;
+        this.preferredAudioCodecs = builder.preferredAudioCodecs;
+        this.preferredVideoCodecs = builder.preferredVideoCodecs;
     }
 
     String getAccessToken() {
@@ -103,6 +107,24 @@ public class ConnectOptions {
         return videoTracksArray;
     }
 
+    private AudioCodec[] getAudioCodecsArray() {
+        AudioCodec[] audioCodecsArray = new AudioCodec[0];
+        if (preferredAudioCodecs != null && !preferredAudioCodecs.isEmpty()) {
+            audioCodecsArray = new AudioCodec[preferredAudioCodecs.size()];
+            audioCodecsArray = preferredAudioCodecs.toArray(audioCodecsArray);
+        }
+        return audioCodecsArray;
+    }
+
+    private VideoCodec[] getVideoCodecsArray() {
+        VideoCodec[] videoCodecsArray = new VideoCodec[0];
+        if (preferredVideoCodecs != null && !preferredVideoCodecs.isEmpty()) {
+            videoCodecsArray = new VideoCodec[preferredVideoCodecs.size()];
+            videoCodecsArray = preferredVideoCodecs.toArray(videoCodecsArray);
+        }
+        return videoCodecsArray;
+    }
+
     /*
      * Invoked by JNI RoomDelegate to get pointer to twilio::video::ConnectOptions::Builder
      */
@@ -117,7 +139,9 @@ public class ConnectOptions {
                 getLocalVideoTracksArray(),
                 iceOptions,
                 enableInsights,
-                PlatformInfo.getNativeHandle());
+                PlatformInfo.getNativeHandle(),
+                getAudioCodecsArray(),
+                getVideoCodecsArray());
     }
 
     private native long nativeCreate(String accessToken,
@@ -126,7 +150,9 @@ public class ConnectOptions {
                                      LocalVideoTrack[] videoTracks,
                                      IceOptions iceOptions,
                                      boolean enableInsights,
-                                     long platformInfoNativeHandle);
+                                     long platformInfoNativeHandle,
+                                     AudioCodec[] preferredAudioCodecs,
+                                     VideoCodec[] preferredVideoCodecs);
     /**
      * Build new {@link ConnectOptions}.
      *
@@ -139,6 +165,8 @@ public class ConnectOptions {
         private List<LocalAudioTrack> audioTracks;
         private List<LocalVideoTrack> videoTracks;
         private boolean enableInsights = true;
+        private List<AudioCodec> preferredAudioCodecs;
+        private List<VideoCodec> preferredVideoCodecs;
 
         public Builder(String accessToken) {
             this.accessToken = accessToken;
@@ -184,6 +212,76 @@ public class ConnectOptions {
          */
         public Builder enableInsights(boolean enable) {
             this.enableInsights = enable;
+            return this;
+        }
+
+        /**
+         * Set preferred audio codecs. The list specifies which audio codecs would be
+         * preferred when negotiating audio between participants. The preferences are applied in
+         * the order found in the list starting with the most preferred audio codec to the
+         * least preferred audio codec. Audio codec preferences are not guaranteed to be satisfied
+         * because not all participants are guaranteed to support all audio codecs.
+         * {@link AudioCodec#OPUS} is the default audio codec if no preferences are set.
+         *
+         * <p>
+         *     The following snippet demonstrates how to prefer a single audio codec.
+         * </p>
+         *
+         * <pre><code>
+         *     ConnectOptions connectOptions = new ConnectOptions.Builder(token)
+         *          .preferAudioCodecs(Collections.singletonList(AudioCodec.ISAC))
+         *          .build();
+         * </code></pre>
+         *
+         * <p>
+         *     The following snippet demonstrates how to specify the exact order of codec
+         *     preferences.
+         * </p>
+         *
+         * <pre><code>
+         *     ConnectOptions connectOptions = new ConnectOptions.Builder(token)
+         *          .preferAudioCodecs(Arrays.asList(AudioCodec.ISAC,
+         *                  AudioCodec.G722, AudioCodec.OPUS))
+         *          .build();
+         * </code></pre>
+         */
+        public Builder preferAudioCodecs(List<AudioCodec> preferredAudioCodecs) {
+            this.preferredAudioCodecs = new ArrayList<>(preferredAudioCodecs);
+            return this;
+        }
+
+        /**
+         * Set preferred video codecs. The list specifies which video codecs would be
+         * preferred when negotiating video between participants. The preferences are applied in
+         * the order found in the list starting with the most preferred video codec to the
+         * least preferred video codec. Video codec preferences are not guaranteed to be satisfied
+         * because not all participants are guaranteed to support all video codecs.
+         * {@link VideoCodec#VP8} is the default video codec if no preferences are set.
+         *
+         * <p>
+         *     The following snippet demonstrates how to prefer a single video codec.
+         * </p>
+         *
+         * <pre><code>
+         *     ConnectOptions connectOptions = new ConnectOptions.Builder(token)
+         *          .preferVideoCodecs(Collections.singletonList(VideoCodec.H264))
+         *          .build();
+         * </code></pre>
+         *
+         * <p>
+         *     The following snippet demonstrates how to specify the exact order of codec
+         *     preferences.
+         * </p>
+         *
+         * <pre><code>
+         *     ConnectOptions connectOptions = new ConnectOptions.Builder(token)
+         *          .preferVideoCodecs(Arrays.asList(VideoCodec.H264,
+         *                  VideoCodec.VP8, VideoCodec.VP9))
+         *          .build();
+         * </code></pre>
+         */
+        public Builder preferVideoCodecs(List<VideoCodec> preferredVideoCodecs) {
+            this.preferredVideoCodecs = new ArrayList<>(preferredVideoCodecs);
             return this;
         }
 

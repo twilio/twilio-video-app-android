@@ -4,6 +4,16 @@ The Twilio Programmable Video SDKs use [Semantic Versioning](http://www.semver.o
 
 Features
 
+- Added `AudioCodec` and `VideoCodec` as part of the new codec preferences API. Audio and video
+codec preferences can be set in `ConnectOptions`. The following snippet
+demonstrates how to prefer the iSAC audio codec and VP9 video codec.
+
+      ConnectOptions aliceConnectOptions = new ConnectOptions.Builder(aliceToken)
+              .roomName(roomName)
+              .preferAudioCodecs(Collections.singletonList(VideoCodec.ISAC))
+              .preferVideoCodecs(Collections.singletonList(VideoCodec.VP9))
+              .build();
+
 - Added `RemoteAudioTrack` and `RemoteVideoTrack`. These new objects extend `AudioTrack` and 
 `VideoTrack` respectively and come with the following new methods: 
   - `getSid` - Returns a unique identifier for the track within the scope of a `Room`

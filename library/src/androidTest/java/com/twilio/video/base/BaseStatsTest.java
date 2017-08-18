@@ -116,8 +116,6 @@ public abstract class BaseStatsTest extends BaseClientTest {
                               @Nullable List<LocalAudioTrack> audioTracks,
                               @Nullable List<LocalVideoTrack> videoTracks)
             throws InterruptedException {
-        listener.onConnectedLatch = new CountDownLatch(1);
-
         if (audioTracks == null) {
             audioTracks = new ArrayList<>();
         }
@@ -129,6 +127,13 @@ public abstract class BaseStatsTest extends BaseClientTest {
                 .audioTracks(audioTracks)
                 .videoTracks(videoTracks)
                 .build();
+
+        return createRoom(listener, connectOptions);
+    }
+
+    protected Room createRoom(CallbackHelper.FakeRoomListener listener,
+                              ConnectOptions connectOptions) throws InterruptedException {
+        listener.onConnectedLatch = new CountDownLatch(1);
         Room room = Video.connect(mediaTestActivity, connectOptions, listener);
         assertTrue(listener.onConnectedLatch.await(20, TimeUnit.SECONDS));
 
