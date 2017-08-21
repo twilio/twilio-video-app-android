@@ -40,6 +40,7 @@ public class LocalVideoTrack extends VideoTrack {
             .build();
 
     private long nativeLocalVideoTrackHandle;
+    private final String trackId;
     private final VideoCapturer videoCapturer;
     private final VideoConstraints videoConstraints;
     private final MediaFactory mediaFactory;
@@ -161,6 +162,15 @@ public class LocalVideoTrack extends VideoTrack {
     }
 
     /**
+     * This video track id.
+     *
+     * @return track id.
+     */
+    public String getTrackId() {
+        return trackId;
+    }
+
+    /**
      * Sets the state of the local video track. The results of this operation are signaled to other
      * Participants in the same Room. When a video track is disabled, blank frames are sent in place
      * of video frames from a video capturer.
@@ -194,6 +204,7 @@ public class LocalVideoTrack extends VideoTrack {
                     org.webrtc.VideoTrack webrtcVideoTrack,
                     MediaFactory mediaFactory) {
         super(webrtcVideoTrack, enabled);
+        this.trackId = webrtcVideoTrack.id();
         this.nativeLocalVideoTrackHandle = nativeLocalVideoTrackHandle;
         this.videoCapturer = videoCapturer;
         this.videoConstraints = videoConstraints;

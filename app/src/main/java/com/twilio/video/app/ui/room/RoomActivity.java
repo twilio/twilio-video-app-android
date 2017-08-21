@@ -1389,19 +1389,18 @@ public class RoomActivity extends BaseActivity {
                 primary.sid.equals(remoteParticipant.getSid()) &&
                 primary.videoTrack == remoteVideoTrack) {
 
+                // Remove primary video track
+                primary.videoTrack = null;
+
+                // Try to find another video track to render as primary
                 List<RemoteVideoTrack> remoteVideoTracks = remoteParticipant.getRemoteVideoTracks();
-                if (remoteVideoTracks.size() > 0) {
-                    //find next video track that belongs to remoteParticipant and render as primary
-                    for (RemoteVideoTrack newRemoteVideoTrack : remoteVideoTracks) {
-                        if (newRemoteVideoTrack != remoteVideoTrack) {
-                            participantController.removeThumb(remoteParticipant.getSid(), newRemoteVideoTrack);
-                            primary.videoTrack = newRemoteVideoTrack;
-                            break;
-                        }
+                for (RemoteVideoTrack newRemoteVideoTrack : remoteVideoTracks) {
+                    if (newRemoteVideoTrack != remoteVideoTrack) {
+                        participantController.removeThumb(remoteParticipant.getSid(),
+                                newRemoteVideoTrack);
+                        primary.videoTrack = newRemoteVideoTrack;
+                        break;
                     }
-                } else {
-                    // no thumb needed - render as primary
-                    primary.videoTrack = null;
                 }
                 participantController.renderAsPrimary(primary);
             } else {

@@ -17,22 +17,10 @@
 package com.twilio.video;
 
 public abstract class AudioTrack implements Track {
-    private final String trackId;
     private boolean isEnabled;
 
-    AudioTrack(String trackId, boolean isEnabled) {
-        this.trackId = trackId;
+    AudioTrack(boolean isEnabled) {
         this.isEnabled = isEnabled;
-    }
-
-    /**
-     * This audio track id.
-     *
-     * @return track id.
-     */
-    @Override
-    public String getTrackId() {
-        return trackId;
     }
 
     /**

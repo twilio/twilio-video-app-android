@@ -27,7 +27,6 @@ import java.util.Map;
 public abstract class VideoTrack implements Track {
     private static final Logger logger = Logger.getLogger(VideoTrack.class);
 
-    private final String trackId;
     private Map<VideoRenderer, org.webrtc.VideoRenderer> videoRenderersMap = new HashMap<>();
     private org.webrtc.VideoTrack webRtcVideoTrack;
     private boolean isEnabled;
@@ -37,7 +36,7 @@ public abstract class VideoTrack implements Track {
      * Constructor is used by LocalVideoTrack because the WebRTC track is available.
      */
     VideoTrack(org.webrtc.VideoTrack webRtcVideoTrack, boolean enabled) {
-        this(webRtcVideoTrack.id(), enabled);
+        this(enabled);
         setWebRtcTrack(webRtcVideoTrack);
     }
 
@@ -45,8 +44,7 @@ public abstract class VideoTrack implements Track {
      * Constructor used by RemoteVideoTrack. The WebRTC track will not be set until the
      * RemoteVideoTrack has been subscribed to.
      */
-    VideoTrack(String trackId, boolean enabled) {
-        this.trackId = trackId;
+    VideoTrack(boolean enabled) {
         this.isEnabled = enabled;
     }
 
@@ -109,16 +107,6 @@ public abstract class VideoTrack implements Track {
      */
     public List<VideoRenderer> getRenderers() {
         return new ArrayList<>(videoRenderersMap.keySet());
-    }
-
-    /**
-     * This video track id.
-     *
-     * @return track id.
-     */
-    @Override
-    public String getTrackId() {
-        return trackId;
     }
 
     /**

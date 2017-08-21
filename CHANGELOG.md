@@ -4,6 +4,7 @@ The Twilio Programmable Video SDKs use [Semantic Versioning](http://www.semver.o
 
 Features
 
+- Moved `getTrackId` from `Track` to `LocalAudioTrack` and `LocalVideoTrack`.
 - Added `AudioCodec` and `VideoCodec` as part of the new codec preferences API. Audio and video
 codec preferences can be set in `ConnectOptions`. The following snippet
 demonstrates how to prefer the iSAC audio codec and VP9 video codec.

@@ -148,7 +148,7 @@ public class VideoTrackTest {
         }
 
         InstrumentationTestVideoTrack(boolean enabled) {
-            super(RandUtils.generateRandomString(TRACK_ID_LENGTH), enabled);
+            super(enabled);
         }
     }
 }

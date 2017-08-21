@@ -25,13 +25,11 @@ import org.mockito.Mockito;
 import java.util.Random;
 
 public class RemoteAudioTrackUnitTest {
-    private Random random = new Random();
     private RemoteAudioTrack remoteAudioTrack;
 
     @Before
     public void setup() {
         remoteAudioTrack = new UnitTestAudioTrack(Constants.MOCK_TRACK_SID,
-                String.valueOf(random.nextInt()),
                 true,
                 true);
     }
@@ -46,8 +44,8 @@ public class RemoteAudioTrackUnitTest {
     }
 
     private static class UnitTestAudioTrack extends RemoteAudioTrack {
-        UnitTestAudioTrack(String sid, String trackId, boolean isEnabled, boolean subscribed) {
-            super(sid, trackId, isEnabled, subscribed);
+        UnitTestAudioTrack(String sid, boolean isEnabled, boolean subscribed) {
+            super(sid, isEnabled, subscribed);
         }
     }
 }

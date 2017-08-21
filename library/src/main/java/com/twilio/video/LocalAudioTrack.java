@@ -28,6 +28,7 @@ import static android.Manifest.permission.RECORD_AUDIO;
 public class LocalAudioTrack extends AudioTrack {
     private static final Logger logger = Logger.getLogger(LocalAudioTrack.class);
 
+    private final String trackId;
     private final MediaFactory mediaFactory;
     private long nativeLocalAudioTrackHandle;
 
@@ -90,6 +91,15 @@ public class LocalAudioTrack extends AudioTrack {
     }
 
     /**
+     * This audio track id.
+     *
+     * @return track id.
+     */
+    public String getTrackId() {
+        return trackId;
+    }
+
+    /**
      * Sets the state of the local audio track. The results of this operation are signaled to other
      * Participants in the same Room. When an audio track is disabled, the audio is muted.
      *
@@ -118,7 +128,8 @@ public class LocalAudioTrack extends AudioTrack {
                     String trackId,
                     boolean enabled,
                     MediaFactory mediaFactory) {
-        super(trackId, enabled);
+        super(enabled);
+        this.trackId = trackId;
         this.nativeLocalAudioTrackHandle = nativeLocalAudioTrackHandle;
         this.mediaFactory = mediaFactory;
     }

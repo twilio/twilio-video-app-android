@@ -176,8 +176,6 @@ jobject createJavaRemoteAudioTrack(JNIEnv *env,
     return env->NewObject(j_remote_audio_track_class,
                           j_remote_audio_track_ctor_id,
                           j_track_sid,
-                          // Using track SID as track ID until we complete GSDK-1286
-                          j_track_sid,
                           j_is_enabled,
                           j_is_subscribed);
 }
@@ -191,11 +189,6 @@ jobject createJavaRemoteVideoTrack(JNIEnv *env,
     jboolean j_is_subscribed = (jboolean) remote_video_track->isSubscribed();
     jobject j_remote_video_track = env->NewObject(j_remote_video_track_class,
                                                   j_remote_video_track_ctor_id,
-                                                  j_track_sid,
-                                                  /*
-                                                   * Using track SID as track ID until we complete
-                                                   * GSDK-1286
-                                                   */
                                                   j_track_sid,
                                                   j_is_enabled,
                                                   j_is_subscribed);

@@ -19,6 +19,7 @@ package com.twilio.video.app.adapter;
 import android.content.Context;
 import android.os.Handler;
 import android.os.Looper;
+import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -26,6 +27,7 @@ import android.view.ViewGroup;
 import android.widget.TableRow;
 import android.widget.TextView;
 
+import com.twilio.video.Camera2Capturer;
 import com.twilio.video.RemoteAudioTrack;
 import com.twilio.video.RemoteAudioTrackStats;
 import com.twilio.video.LocalAudioTrackStats;
@@ -34,15 +36,18 @@ import com.twilio.video.RemoteParticipant;
 import com.twilio.video.RemoteVideoTrack;
 import com.twilio.video.StatsReport;
 import com.twilio.video.RemoteVideoTrackStats;
+import com.twilio.video.VideoTrack;
 import com.twilio.video.app.R;
 import com.twilio.video.app.model.StatsListItem;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import timber.log.Timber;
 
 public class StatsListAdapter extends RecyclerView.Adapter<StatsListAdapter.ViewHolder> {
 
@@ -234,7 +239,8 @@ public class StatsListAdapter extends RecyclerView.Adapter<StatsListAdapter.View
 
     private RemoteAudioTrack getAudioTrack(RemoteParticipant remoteParticipant, String trackId) {
         for (RemoteAudioTrack remoteAudioTrack : remoteParticipant.getRemoteAudioTracks()) {
-            if (remoteAudioTrack.getTrackId().equals(trackId)) {
+            String audioTrackId = getTrackId(remoteAudioTrack);
+            if (audioTrackId != null && audioTrackId.equals(trackId)) {
                 return remoteAudioTrack;
             }
         }
@@ -244,11 +250,53 @@ public class StatsListAdapter extends RecyclerView.Adapter<StatsListAdapter.View
 
     private RemoteVideoTrack getRemoteVideoTrack(RemoteParticipant remoteParticipant, String trackId) {
         for (RemoteVideoTrack remoteVideoTrack : remoteParticipant.getRemoteVideoTracks()) {
-            if (remoteVideoTrack.getTrackId().equals(trackId)) {
+            String videoTrackId = getTrackId(remoteVideoTrack);
+            if (videoTrackId != null && videoTrackId.equals(trackId)) {
                 return remoteVideoTrack;
             }
         }
 
         return null;
+    }
+
+    /*
+     * TODO: Remove this reflection workaround when CSDK-1650 is resolved
+     */
+    private @Nullable String getTrackId(RemoteAudioTrack remoteAudioTrack) {
+        String trackId = null;
+
+        try {
+            Field field = remoteAudioTrack.getClass().getDeclaredField("webRtcAudioTrack");
+            field.setAccessible(true);
+            org.webrtc.AudioTrack webRtcAudioTrack =
+                    (org.webrtc.AudioTrack) field.get(remoteAudioTrack);
+            trackId = webRtcAudioTrack.id();
+        } catch (Exception e) {
+            Timber.e(e.getMessage());
+        }
+
+        return trackId;
+    }
+
+    /*
+     * TODO: Remove this reflection workaround when CSDK-1650 is resolved
+     */
+    private @Nullable String getTrackId(RemoteVideoTrack remoteVideoTrack) {
+        String trackId = null;
+
+        try {
+            Field field = remoteVideoTrack
+                    .getClass()
+                    .getSuperclass()
+                    .getDeclaredField("webRtcVideoTrack");
+            field.setAccessible(true);
+            org.webrtc.VideoTrack webRtcVideoTrack =
+                    (org.webrtc.VideoTrack) field.get(remoteVideoTrack);
+            trackId = webRtcVideoTrack.id();
+        } catch (Exception e) {
+            Timber.e(e.getMessage());
+        }
+
+        return trackId;
     }
 }

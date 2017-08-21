@@ -26,10 +26,9 @@ public class RemoteAudioTrack extends AudioTrack {
     private boolean playbackEnabled;
 
     RemoteAudioTrack(String sid,
-                     String trackId,
                      boolean isEnabled,
                      boolean subscribed) {
-        super(trackId, isEnabled);
+        super(isEnabled);
         this.sid = sid;
         this.subscribed = subscribed;
         this.playbackEnabled = true;
