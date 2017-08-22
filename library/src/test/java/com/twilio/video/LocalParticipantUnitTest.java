@@ -36,9 +36,9 @@ public class LocalParticipantUnitTest {
     private final Random random = new Random();
     private LocalParticipant localParticipant;
     @Mock Handler handler;
-    @Mock PublishedAudioTrack mockPublishedAudioTrack;
+    @Mock LocalAudioTrackPublication mockLocalAudioTrackPublication;
     @Mock LocalAudioTrack mockAudioTrack;
-    @Mock PublishedVideoTrack mockPublishedVideoTrackOne;
+    @Mock LocalVideoTrackPublication mockLocalVideoTrackPublicationOne;
     @Mock LocalVideoTrack mockVideoTrackOne;
     @Mock LocalVideoTrack mockVideoTrackTwo;
 
@@ -49,8 +49,8 @@ public class LocalParticipantUnitTest {
                 String.valueOf(random.nextInt(INT_MAX)),
                 Arrays.asList(mockAudioTrack),
                 Arrays.asList(mockVideoTrackOne, mockVideoTrackTwo),
-                Arrays.asList(mockPublishedAudioTrack),
-                Arrays.asList(mockPublishedVideoTrackOne),
+                Arrays.asList(mockLocalAudioTrackPublication),
+                Arrays.asList(mockLocalVideoTrackPublicationOne),
                 handler);
     }
 
@@ -61,8 +61,8 @@ public class LocalParticipantUnitTest {
                 String.valueOf(random.nextInt(INT_MAX)),
                 Arrays.asList(mockAudioTrack),
                 Arrays.asList(mockVideoTrackOne, mockVideoTrackTwo),
-                Arrays.asList(mockPublishedAudioTrack),
-                Arrays.asList(mockPublishedVideoTrackOne),
+                Arrays.asList(mockLocalAudioTrackPublication),
+                Arrays.asList(mockLocalVideoTrackPublicationOne),
                 handler);
     }
 
@@ -73,8 +73,8 @@ public class LocalParticipantUnitTest {
                 String.valueOf(random.nextInt(INT_MAX)),
                 Arrays.asList(mockAudioTrack),
                 Arrays.asList(mockVideoTrackOne, mockVideoTrackTwo),
-                Arrays.asList(mockPublishedAudioTrack),
-                Arrays.asList(mockPublishedVideoTrackOne),
+                Arrays.asList(mockLocalAudioTrackPublication),
+                Arrays.asList(mockLocalVideoTrackPublicationOne),
                 handler);
     }
 
@@ -85,8 +85,8 @@ public class LocalParticipantUnitTest {
                 null,
                 Arrays.asList(mockAudioTrack),
                 Arrays.asList(mockVideoTrackOne, mockVideoTrackTwo),
-                Arrays.asList(mockPublishedAudioTrack),
-                Arrays.asList(mockPublishedVideoTrackOne),
+                Arrays.asList(mockLocalAudioTrackPublication),
+                Arrays.asList(mockLocalVideoTrackPublicationOne),
                 handler);
     }
 
@@ -97,8 +97,8 @@ public class LocalParticipantUnitTest {
                 String.valueOf(random.nextInt(INT_MAX)),
                 Arrays.asList(mockAudioTrack),
                 Arrays.asList(mockVideoTrackOne, mockVideoTrackTwo),
-                Arrays.asList(mockPublishedAudioTrack),
-                Arrays.asList(mockPublishedVideoTrackOne),
+                Arrays.asList(mockLocalAudioTrackPublication),
+                Arrays.asList(mockLocalVideoTrackPublicationOne),
                 handler);
     }
 
@@ -119,11 +119,11 @@ public class LocalParticipantUnitTest {
 
     @Test(expected = UnsupportedOperationException.class)
     public void shouldNotAllowModifyingPublishedAudioTracks() {
-        localParticipant.getPublishedAudioTracks().add(mockPublishedAudioTrack);
+        localParticipant.getAudioTrackPublications().add(mockLocalAudioTrackPublication);
     }
 
     @Test(expected = UnsupportedOperationException.class)
     public void shouldNotAllowModifyingPublishedVideoTracks() {
-        localParticipant.getPublishedVideoTracks().add(mockPublishedVideoTrackOne);
+        localParticipant.getVideoTrackPublications().add(mockLocalVideoTrackPublicationOne);
     }
 }

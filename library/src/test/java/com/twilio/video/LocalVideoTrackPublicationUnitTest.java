@@ -20,31 +20,32 @@ import com.twilio.video.util.Constants;
 
 import org.junit.Ignore;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
 
-public class PublishedVideoTrackUnitTest {
+@RunWith(MockitoJUnitRunner.class)
+public class LocalVideoTrackPublicationUnitTest {
+    @Mock LocalVideoTrack localVideoTrack;
+
     @Test(expected = NullPointerException.class)
     public void shouldFailWithNullSid() {
-        new PublishedVideoTrack(null, "Fake Id");
+        new LocalVideoTrackPublication(null, localVideoTrack);
     }
 
     @Ignore("TODO: Re-enable once published tracks have sids for group rooms GSDK-1270")
     @Test(expected = IllegalArgumentException.class)
     public void shouldFailWithEmptySid() {
-        new PublishedVideoTrack("", "Fake Id");
+        new LocalVideoTrackPublication("", localVideoTrack);
     }
 
     @Test(expected = NullPointerException.class)
-    public void shouldFailWithNullTrackId() {
-        new PublishedVideoTrack(Constants.MOCK_TRACK_SID, null);
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void shouldFailWithEmptyTrackId() {
-        new PublishedVideoTrack(Constants.MOCK_TRACK_SID, "");
+    public void shouldFailWithNullLocalVideoTrack() {
+        new LocalVideoTrackPublication(Constants.MOCK_TRACK_SID, null);
     }
 
     @Test
     public void shouldSucceedWithValidTrackSid() {
-        new PublishedVideoTrack(Constants.MOCK_TRACK_SID, "Fake Id");
+        new LocalVideoTrackPublication(Constants.MOCK_TRACK_SID, localVideoTrack);
     }
 }

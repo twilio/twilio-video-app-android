@@ -138,7 +138,11 @@ public class LocalAudioTrack extends AudioTrack {
         return nativeLocalAudioTrackHandle == 0;
     }
 
-    long getNativeHandle() {
+    /*
+     * Called by LocalParticipant at JNI level.
+     */
+    @SuppressWarnings("unused")
+    synchronized long getNativeHandle() {
         return nativeLocalAudioTrackHandle;
     }
 

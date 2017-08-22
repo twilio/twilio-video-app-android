@@ -20,31 +20,32 @@ import com.twilio.video.util.Constants;
 
 import org.junit.Ignore;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
 
-public class PublishedAudioTrackUnitTest {
+@RunWith(MockitoJUnitRunner.class)
+public class LocalAudioTrackPublicationUnitTest {
+    @Mock LocalAudioTrack localAudioTrack;
+
     @Test(expected = NullPointerException.class)
     public void shouldFailWithNullSid() {
-        new PublishedAudioTrack(null, "Fake Id");
+        new LocalAudioTrackPublication(null, localAudioTrack);
     }
 
     @Ignore("TODO: Re-enable once published tracks have sids for group rooms GSDK-1270")
     @Test(expected = IllegalArgumentException.class)
     public void shouldFailWithEmptySid() {
-        new PublishedAudioTrack("", "Fake Id");
+        new LocalAudioTrackPublication("", localAudioTrack);
     }
 
     @Test(expected = NullPointerException.class)
-    public void shouldFailWithNullTrackId() {
-        new PublishedAudioTrack(Constants.MOCK_TRACK_SID, null);
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void shouldFailWithEmptyTrackId() {
-        new PublishedAudioTrack(Constants.MOCK_TRACK_SID, "");
+    public void shouldFailWithNullLocalAudioTrack() {
+        new LocalAudioTrackPublication(Constants.MOCK_TRACK_SID, null);
     }
 
     @Test
     public void shouldSucceedWithValidTrackSid() {
-        new PublishedAudioTrack(Constants.MOCK_TRACK_SID, "Fake Id");
+        new LocalAudioTrackPublication(Constants.MOCK_TRACK_SID, localAudioTrack);
     }
 }

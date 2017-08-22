@@ -18,8 +18,8 @@ package com.twilio.video.helper;
 
 
 import com.twilio.video.LocalParticipant;
-import com.twilio.video.PublishedAudioTrack;
-import com.twilio.video.PublishedVideoTrack;
+import com.twilio.video.LocalAudioTrackPublication;
+import com.twilio.video.LocalVideoTrackPublication;
 import com.twilio.video.RemoteAudioTrack;
 import com.twilio.video.RemoteParticipant;
 import com.twilio.video.RemoteVideoTrack;
@@ -286,14 +286,14 @@ public class CallbackHelper {
 
         @Override
         public void onPublishedAudioTrack(LocalParticipant localParticipant,
-                                          PublishedAudioTrack publishedAudioTrack) {
+                                          LocalAudioTrackPublication localAudioTrackPublication) {
             localParticipantEvents.add("onPublishedAudioTrack");
             triggerLatch(onPublishedAudioTrackLatch);
         }
 
         @Override
         public void onPublishedVideoTrack(LocalParticipant localParticipant,
-                                          PublishedVideoTrack publishedVideoTrack) {
+                                          LocalVideoTrackPublication localVideoTrackPublication) {
             localParticipantEvents.add("onPublishedVideoTrack");
             triggerLatch(onPublishedVideoTrackLatch);
         }

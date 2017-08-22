@@ -19,21 +19,20 @@ package com.twilio.video;
 import android.support.annotation.NonNull;
 
 /**
- * A published video track represents a {@link LocalVideoTrack} that has been shared to a
+ * A local video track publication represents a {@link LocalVideoTrack} that has been shared to a
  * {@link Room}.
  */
-public class PublishedVideoTrack implements PublishedTrack {
+public class LocalVideoTrackPublication implements VideoTrackPublication {
     private final String sid;
-    private final String trackId;
+    private final LocalVideoTrack localVideoTrack;
 
-    PublishedVideoTrack(@NonNull String sid, @NonNull String trackId) {
+    LocalVideoTrackPublication(@NonNull String sid, @NonNull LocalVideoTrack localVideoTrack) {
         Preconditions.checkNotNull(sid, "SID must not be null");
         // TODO: Re-enable once published tracks have sids for group rooms GSDK-1270
         // Preconditions.checkArgument(!sid.isEmpty(), "SID must not be empty");
-        Preconditions.checkNotNull(trackId, "Track ID must not be null");
-        Preconditions.checkArgument(!trackId.isEmpty(), "Track ID must not be empty");
+        Preconditions.checkNotNull(localVideoTrack, "Local video track must not be null");
         this.sid = sid;
-        this.trackId = trackId;
+        this.localVideoTrack = localVideoTrack;
     }
 
     /**
@@ -46,10 +45,17 @@ public class PublishedVideoTrack implements PublishedTrack {
     }
 
     /**
-     * Returns the local video track id.
+     * Returns the base video track object of the published local audio track.
      */
     @Override
-    public String getTrackId() {
-        return trackId;
+    public VideoTrack getVideoTrack() {
+        return localVideoTrack;
+    }
+
+    /**
+     * Returns the published local video track.
+     */
+    public LocalVideoTrack getLocalVideoTrack() {
+        return localVideoTrack;
     }
 }

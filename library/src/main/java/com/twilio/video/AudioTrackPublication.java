@@ -17,17 +17,11 @@
 package com.twilio.video;
 
 /**
- * A published track represents a local track that has been shared with a {@link Room}.
+ * A published audio track represents an audio track that has been shared with a {@link Room}.
  */
-public interface PublishedTrack {
+public interface AudioTrackPublication extends TrackPublication {
     /**
-     * Returns the local track's server identifier. This value uniquely identifies the local
-     * track within the scope of a {@link Room}.
+     * Returns the published audio track.
      */
-    String getSid();
-
-    /**
-     * Returns the id associated with the track.
-     */
-    String getTrackId();
+    AudioTrack getAudioTrack();
 }

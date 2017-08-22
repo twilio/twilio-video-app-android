@@ -19,21 +19,20 @@ package com.twilio.video;
 import android.support.annotation.NonNull;
 
 /**
- * A published audio track represents a {@link LocalAudioTrack} that has been shared to a
+ * A local audio track publication represents a {@link LocalAudioTrack} that has been shared to a
  * {@link Room}.
  */
-public class PublishedAudioTrack implements PublishedTrack {
+public class LocalAudioTrackPublication implements AudioTrackPublication {
     private final String sid;
-    private final String trackId;
+    private final LocalAudioTrack localAudioTrack;
 
-    PublishedAudioTrack(@NonNull String sid, @NonNull String trackId) {
+    LocalAudioTrackPublication(@NonNull String sid, @NonNull LocalAudioTrack localAudioTrack) {
         Preconditions.checkNotNull(sid, "SID must not be null");
+        Preconditions.checkNotNull(localAudioTrack, "Local audio track must not be null");
         // TODO: Re-enable once published tracks have sids for group rooms GSDK-1270
         // Preconditions.checkArgument(!sid.isEmpty(), "SID must not be empty");
-        Preconditions.checkNotNull(trackId, "Track ID must not be null");
-        Preconditions.checkArgument(!trackId.isEmpty(), "Track ID must not be empty");
         this.sid = sid;
-        this.trackId = trackId;
+        this.localAudioTrack = localAudioTrack;
     }
 
     /**
@@ -46,10 +45,17 @@ public class PublishedAudioTrack implements PublishedTrack {
     }
 
     /**
-     * Returns the local audio track id.
+     * Returns the base audio track object of the published local audio track.
      */
     @Override
-    public String getTrackId() {
-        return trackId;
+    public AudioTrack getAudioTrack() {
+        return localAudioTrack;
+    }
+
+    /**
+     * Returns the published local audio track.
+     */
+    public LocalAudioTrack getLocalAudioTrack() {
+        return localAudioTrack;
     }
 }

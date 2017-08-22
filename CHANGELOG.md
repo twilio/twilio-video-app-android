@@ -37,7 +37,7 @@ demonstrates how to prefer the iSAC audio codec and VP9 video codec.
   participant's video track.
 - Renamed `TrackStats` to `RemoteTrackStats`, `AudioTrackStats` to `RemoteAudioTrackStats`, and
 `VideoTrackStats` to `RemoteVideoTrackStats`
-- Added `PublishedAudioTrack` and `PublishedVideoTrack` that represent a published 
+- Added `LocalAudioTrackPublication` and `LocalVideoTrackPublication` that represent a published 
 `LocalAudioTrack` and `LocalVideoTrack`. These new classes contain the method `getSid` which returns
 the identifier of a local audio or video track within the scope of a `Room`.
 - Renamed `LocalParticipant#addAudioTrack` and `LocalParticipant#addVideoTrack` to 
@@ -45,7 +45,7 @@ the identifier of a local audio or video track within the scope of a `Room`.
 - Added `LocalParticipant.Listener` which is provides the following callbacks:
   - `onPublishedAudioTrack` - Indicates when a local audio track has been published to a `Room`.
   - `onPublishedVideoTrack` - Indicates when a local video track has been published to a `Room`.
-- Added `LocalParticipant#getPublishedAudioTracks` and `LocalParticipant#getPublishedVideoTracks`.
+- Added `LocalParticipant#getAudioTrackPublications` and `LocalParticipant#getVideoTrackPublications`.
 
 Improvements
 

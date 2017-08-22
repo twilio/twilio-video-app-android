@@ -318,7 +318,11 @@ public class LocalVideoTrack extends VideoTrack {
         return nativeLocalVideoTrackHandle == 0;
     }
 
-    long getNativeHandle() {
+    /*
+     * Called by LocalParticipant at JNI level
+     */
+    @SuppressWarnings("unused")
+    synchronized long getNativeHandle() {
         return nativeLocalVideoTrackHandle;
     }
 

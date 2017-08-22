@@ -131,13 +131,13 @@ public class RoomTopologyParameterizedTest extends BaseClientTest {
         assertNotNull(localParticipant);
         assertEquals(identity, localParticipant.getIdentity());
         assertEquals(localAudioTrack, localParticipant.getAudioTracks().get(0));
-        assertEquals(1, localParticipant.getPublishedAudioTracks().size());
-        assertEquals(localAudioTrack.getTrackId(),
-                localParticipant.getPublishedAudioTracks().get(0).getTrackId());
+        assertEquals(1, localParticipant.getAudioTrackPublications().size());
+        assertEquals(localAudioTrack,
+                localParticipant.getAudioTrackPublications().get(0).getLocalAudioTrack());
         assertEquals(localVideoTrack, localParticipant.getVideoTracks().get(0));
-        assertEquals(1, localParticipant.getPublishedVideoTracks().size());
-        assertEquals(localVideoTrack.getTrackId(),
-                localParticipant.getPublishedVideoTracks().get(0).getTrackId());
+        assertEquals(1, localParticipant.getVideoTrackPublications().size());
+        assertEquals(localVideoTrack,
+                localParticipant.getVideoTrackPublications().get(0).getLocalVideoTrack());
         assertNotNull(localParticipant.getSid());
         assertTrue(!localParticipant.getSid().isEmpty());
         assertIsParticipantSid(localParticipant.getSid());

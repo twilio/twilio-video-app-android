@@ -19,6 +19,7 @@
 
 #include "webrtc/sdk/android/src/jni/jni_helpers.h"
 
+#include "media/track.h"
 #include "video/local_participant_observer.h"
 
 namespace twilio_video_jni {
@@ -27,7 +28,9 @@ class AndroidLocalParticipantObserver : public twilio::video::LocalParticipantOb
 public:
     AndroidLocalParticipantObserver(JNIEnv *env,
                                     jobject j_local_participant,
-                                    jobject j_local_participant_observer);
+                                    jobject j_local_participant_observer,
+                                    std::map<std::string, jobject>& local_audio_track_map,
+                                    std::map<std::string, jobject>& local_video_track_map);
 
     virtual ~AndroidLocalParticipantObserver();
 
@@ -54,6 +57,8 @@ private:
 
     const webrtc_jni::ScopedGlobalRef<jobject> j_local_participant_;
     const webrtc_jni::ScopedGlobalRef<jobject> j_local_participant_observer_;
+    std::map<std::string, jobject>& local_audio_track_map_;
+    std::map<std::string, jobject>& local_video_track_map_;
     const webrtc_jni::ScopedGlobalRef<jclass> j_local_participant_observer_class_;
     const webrtc_jni::ScopedGlobalRef<jclass> j_published_audio_track_class_;
     const webrtc_jni::ScopedGlobalRef<jclass> j_published_video_track_class_;

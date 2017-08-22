@@ -24,33 +24,37 @@ namespace twilio_video_jni {
 
 AndroidLocalParticipantObserver::AndroidLocalParticipantObserver(JNIEnv *env,
                                                                  jobject j_local_participant,
-                                                                 jobject j_local_participant_observer)
+                                                                 jobject j_local_participant_observer,
+                                                                 std::map<std::string, jobject>& local_audio_track_map,
+                                                                 std::map<std::string, jobject>& local_video_track_map)
         : j_local_participant_(env, j_local_participant),
           j_local_participant_observer_(env, j_local_participant_observer),
+          local_audio_track_map_(local_audio_track_map),
+          local_video_track_map_(local_video_track_map),
           j_local_participant_observer_class_(env,
                                               webrtc_jni::GetObjectClass(env, *j_local_participant_observer_)),
           j_published_audio_track_class_(env,
                                          twilio_video_jni::FindClass(env,
-                                                                     "com/twilio/video/PublishedAudioTrack")),
+                                                                     "com/twilio/video/LocalAudioTrackPublication")),
           j_published_video_track_class_(env,
                                          twilio_video_jni::FindClass(env,
-                                                                     "com/twilio/video/PublishedVideoTrack")),
+                                                                     "com/twilio/video/LocalVideoTrackPublication")),
           j_on_published_audio_track_(webrtc_jni::GetMethodID(env,
                                                               *j_local_participant_observer_class_,
                                                               "onPublishedAudioTrack",
-                                                              "(Lcom/twilio/video/LocalParticipant;Lcom/twilio/video/PublishedAudioTrack;)V")),
+                                                              "(Lcom/twilio/video/LocalParticipant;Lcom/twilio/video/LocalAudioTrackPublication;)V")),
           j_on_published_video_track_(webrtc_jni::GetMethodID(env,
                                                               *j_local_participant_observer_class_,
                                                               "onPublishedVideoTrack",
-                                                              "(Lcom/twilio/video/LocalParticipant;Lcom/twilio/video/PublishedVideoTrack;)V")),
+                                                              "(Lcom/twilio/video/LocalParticipant;Lcom/twilio/video/LocalVideoTrackPublication;)V")),
           j_published_audio_track_ctor_id_(webrtc_jni::GetMethodID(env,
                                                                    *j_published_audio_track_class_,
                                                                    "<init>",
-                                                                   "(Ljava/lang/String;Ljava/lang/String;)V")),
+                                                                   "(Ljava/lang/String;Lcom/twilio/video/LocalAudioTrack;)V")),
           j_published_video_track_ctor_id_(webrtc_jni::GetMethodID(env,
                                                                    *j_published_video_track_class_,
                                                                    "<init>",
-                                                                   "(Ljava/lang/String;Ljava/lang/String;)V")) {
+                                                                   "(Ljava/lang/String;Lcom/twilio/video/LocalVideoTrack;)V")) {
     VIDEO_ANDROID_LOG(twilio::video::LogModule::kPlatform,
                       twilio::video::LogLevel::kDebug,
                       "AndroidLocalParticipantObserver");
@@ -85,10 +89,13 @@ void AndroidLocalParticipantObserver::onAudioTrackPublished(twilio::video::Local
             return;
         }
 
-        jobject j_published_audio_track = createJavaPublishedAudioTrack(jni(),
-                                                                        local_audio_track_publication,
-                                                                        *j_published_audio_track_class_,
-                                                                        j_published_audio_track_ctor_id_);
+        jobject j_local_audio_track =
+                local_audio_track_map_[local_audio_track_publication->getLocalTrack()->getTrackId()];
+        jobject j_published_audio_track = createJavaLocalAudioTrackPublication(jni(),
+                                                                               local_audio_track_publication,
+                                                                               j_local_audio_track,
+                                                                               *j_published_audio_track_class_,
+                                                                               j_published_audio_track_ctor_id_);
         jni()->CallVoidMethod(*j_local_participant_observer_,
                               j_on_published_audio_track_,
                               *j_local_participant_,
@@ -111,10 +118,13 @@ void AndroidLocalParticipantObserver::onVideoTrackPublished(twilio::video::Local
             return;
         }
 
-        jobject j_published_video_track = createJavaPublishedVideoTrack(jni(),
-                                                                        local_video_track_publication,
-                                                                        *j_published_video_track_class_,
-                                                                        j_published_video_track_ctor_id_);
+        jobject j_local_video_track =
+                local_video_track_map_[local_video_track_publication->getLocalTrack()->getTrackId()];
+        jobject j_published_video_track = createJavaLocalVideoTrackPublication(jni(),
+                                                                               local_video_track_publication,
+                                                                               j_local_video_track,
+                                                                               *j_published_video_track_class_,
+                                                                               j_published_video_track_ctor_id_);
         jni()->CallVoidMethod(*j_local_participant_observer_,
                               j_on_published_video_track_,
                               *j_local_participant_,
