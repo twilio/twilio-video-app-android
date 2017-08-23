@@ -20,12 +20,17 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v7.preference.ListPreference;
 import android.support.v7.preference.Preference;
 import android.support.v7.preference.PreferenceFragmentCompat;
 import android.support.v7.preference.PreferenceManager;
 import android.view.MenuItem;
 
+import com.google.common.base.Function;
+import com.google.common.collect.FluentIterable;
+import com.twilio.video.AudioCodec;
 import com.twilio.video.Video;
+import com.twilio.video.VideoCodec;
 import com.twilio.video.app.BuildConfig;
 import com.twilio.video.app.R;
 import com.twilio.video.app.auth.Authenticator;
@@ -108,12 +113,57 @@ public class SettingsActivity extends BaseActivity {
             // Add our preference from resources
             addPreferencesFromResource(R.xml.preferences);
 
+            setupListPreference(VideoCodec.class,
+                    Preferences.VIDEO_CODEC,
+                    Preferences.VIDEO_CODEC_DEFAULT,
+                    (ListPreference) findPreference(Preferences.VIDEO_CODEC));
+
+            setupListPreference(AudioCodec.class,
+                    Preferences.AUDIO_CODEC,
+                    Preferences.AUDIO_CODEC_DEFAULT,
+                    (ListPreference) findPreference(Preferences.AUDIO_CODEC));
+
             // Fill out the rest of settings
             String identity = sharedPreferences.getString(Preferences.DISPLAY_NAME, null);
             findPreference(Preferences.IDENTITY).setSummary(identity);
             findPreference(Preferences.VERSION).setSummary(BuildConfig.VERSION_NAME);
             findPreference(Preferences.VIDEO_LIBRARY_VERSION).setSummary(Video.getVersion());
             findPreference(Preferences.LOGOUT).setOnPreferenceClickListener(logoutClickListener);
+        }
+
+        /**
+         * Setup {@link ListPreference} from enums.
+         *
+         * @param enumClass    Enum class to obtain entries and entryValues from.
+         * @param key          key to save with in {@link SharedPreferences}.
+         * @param defaultValue default value of preference.
+         * @param preference   instance of {@link ListPreference} to enum item to.
+         * @param <T>          enum type.
+         */
+        private <T extends Enum<T>> void setupListPreference(Class<T> enumClass,
+                                                             String key,
+                                                             String defaultValue,
+                                                             ListPreference preference) {
+
+            // collection of all available values
+            final String[] codecEntries = FluentIterable
+                    .of(enumClass.getEnumConstants())
+                    .transform(new Function<T, String>() {
+                        @javax.annotation.Nullable
+                        @Override
+                        public String apply(@javax.annotation.Nullable T input) {
+                            return input != null ? input.toString() : "null";
+                        }
+                    })
+                    .toArray(String.class);
+
+            // saved value
+            final String value = sharedPreferences.getString(key, defaultValue);
+
+            // bind values
+            preference.setEntries(codecEntries);
+            preference.setEntryValues(codecEntries);
+            preference.setValue(value);
         }
     }
 }

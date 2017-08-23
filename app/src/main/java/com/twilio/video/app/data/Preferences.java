@@ -16,6 +16,8 @@
 
 package com.twilio.video.app.data;
 
+import com.twilio.video.AudioCodec;
+import com.twilio.video.VideoCodec;
 import com.twilio.video.app.BuildConfig;
 
 public class Preferences {
@@ -37,4 +39,8 @@ public class Preferences {
     public static final String ENABLE_STATS = "pref_enable_stats";
     public static final String ENABLE_INSIGHTS = "pref_enable_insights";
     public static final boolean ENABLE_INSIGHTS_DEFAULT = true;
+    public static final String VIDEO_CODEC = "pref_video_codecs";
+    public static final String VIDEO_CODEC_DEFAULT = VideoCodec.VP8.toString();
+    public static final String AUDIO_CODEC = "pref_audio_codecs";
+    public static final String AUDIO_CODEC_DEFAULT = AudioCodec.OPUS.toString();
 }

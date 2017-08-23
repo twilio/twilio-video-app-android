@@ -47,13 +47,15 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.twilio.video.AspectRatio;
-import com.twilio.video.RemoteAudioTrack;
+import com.twilio.video.AudioCodec;
 import com.twilio.video.CameraCapturer;
 import com.twilio.video.ConnectOptions;
 import com.twilio.video.LocalAudioTrack;
 import com.twilio.video.LocalParticipant;
 import com.twilio.video.LocalVideoTrack;
+import com.twilio.video.RemoteAudioTrack;
 import com.twilio.video.RemoteParticipant;
+import com.twilio.video.RemoteVideoTrack;
 import com.twilio.video.Room;
 import com.twilio.video.RoomState;
 import com.twilio.video.ScreenCapturer;
@@ -61,9 +63,9 @@ import com.twilio.video.StatsListener;
 import com.twilio.video.StatsReport;
 import com.twilio.video.TwilioException;
 import com.twilio.video.Video;
+import com.twilio.video.VideoCodec;
 import com.twilio.video.VideoConstraints;
 import com.twilio.video.VideoDimensions;
-import com.twilio.video.RemoteVideoTrack;
 import com.twilio.video.VideoTrack;
 import com.twilio.video.app.R;
 import com.twilio.video.app.adapter.StatsListAdapter;
@@ -590,6 +592,22 @@ public class RoomActivity extends BaseActivity {
         videoConstraints = builder.build();
     }
 
+    /**
+     * Obtain preferred codec.
+     *
+     * @param key       shared preferences key where set of codecs saved.
+     * @param enumClass codec enum class.
+     * @param <T>       enum type.
+     * @return list of preferred codecs.
+     */
+    private <T extends Enum<T>> T obtainCodecPreferences(String key,
+                                                         String defaultValue,
+                                                         final Class<T> enumClass) {
+
+        final String codec = sharedPreferences.getString(key, defaultValue);
+        return Enum.valueOf(enumClass, codec);
+    }
+
     private void requestPermissions() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if (!permissionsGranted()) {
@@ -900,6 +918,14 @@ public class RoomActivity extends BaseActivity {
                 boolean enableInsights = sharedPreferences.getBoolean(Preferences.ENABLE_INSIGHTS,
                         Preferences.ENABLE_INSIGHTS_DEFAULT);
 
+                VideoCodec preferedVideoCodec = obtainCodecPreferences(Preferences.VIDEO_CODEC,
+                        Preferences.VIDEO_CODEC_DEFAULT,
+                        VideoCodec.class);
+
+                AudioCodec preferredAudioCodec = obtainCodecPreferences(Preferences.AUDIO_CODEC,
+                        Preferences.VIDEO_CODEC_DEFAULT,
+                        AudioCodec.class);
+
                 ConnectOptions.Builder connectOptionsBuilder = new ConnectOptions.Builder(token)
                         .roomName(roomName)
                         .enableInsights(enableInsights);
@@ -921,6 +947,12 @@ public class RoomActivity extends BaseActivity {
                 if (!localVideoTracks.isEmpty()) {
                     connectOptionsBuilder.videoTracks(localVideoTracks);
                 }
+
+                connectOptionsBuilder
+                        .preferVideoCodecs(Collections.singletonList(preferedVideoCodec));
+
+                connectOptionsBuilder
+                        .preferAudioCodecs(Collections.singletonList(preferredAudioCodec));
 
                 room = Video.connect(RoomActivity.this,
                         connectOptionsBuilder.build(),

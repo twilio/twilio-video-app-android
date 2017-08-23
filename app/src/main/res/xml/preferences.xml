@@ -29,6 +29,12 @@
     </PreferenceCategory>
     <PreferenceCategory android:title="@string/media">
         <ListPreference
+            android:key="pref_video_codecs"
+            android:title="@string/video_codecs"/>
+        <ListPreference
+            android:key="pref_audio_codecs"
+            android:title="@string/audio_codecs"/>
+        <ListPreference
             android:defaultValue="0"
             android:entries="@array/aspect_ratio_array"
             android:entryValues="@array/aspect_ratio_array_values"
