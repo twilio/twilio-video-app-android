@@ -55,12 +55,12 @@ library-camera-tests:
         - zerolte
         - condor_umts
         - titan_umts
+        - SH-04H
+        - shamu
+        - hammerhead
         # The following devices have known issues executing camera tests. The bugs and tasks
         # are tracked in epic GSDK-1278.
         #
-        # - SH-04H
-        # - shamu
-        # - hammerhead
         # - j1acevelte
         # - flo
         # - D6503
