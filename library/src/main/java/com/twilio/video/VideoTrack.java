@@ -29,14 +29,15 @@ public abstract class VideoTrack implements Track {
 
     private Map<VideoRenderer, org.webrtc.VideoRenderer> videoRenderersMap = new HashMap<>();
     private org.webrtc.VideoTrack webRtcVideoTrack;
+    private final String name;
     private boolean isEnabled;
     private boolean isReleased = false;
 
     /*
      * Constructor is used by LocalVideoTrack because the WebRTC track is available.
      */
-    VideoTrack(org.webrtc.VideoTrack webRtcVideoTrack, boolean enabled) {
-        this(enabled);
+    VideoTrack(org.webrtc.VideoTrack webRtcVideoTrack, boolean enabled, @NonNull String name) {
+        this(enabled, name);
         setWebRtcTrack(webRtcVideoTrack);
     }
 
@@ -44,8 +45,9 @@ public abstract class VideoTrack implements Track {
      * Constructor used by RemoteVideoTrack. The WebRTC track will not be set until the
      * RemoteVideoTrack has been subscribed to.
      */
-    VideoTrack(boolean enabled) {
+    VideoTrack(boolean enabled, @NonNull String name) {
         this.isEnabled = enabled;
+        this.name = name;
     }
 
     /**
@@ -117,6 +119,14 @@ public abstract class VideoTrack implements Track {
     @Override
     public boolean isEnabled() {
         return isEnabled;
+    }
+
+    /**
+     * Returns the video track name. An empty string is returned if no track name was specified.
+     */
+    @Override
+    public String getName() {
+        return name;
     }
 
     /*

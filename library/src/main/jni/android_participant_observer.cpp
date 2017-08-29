@@ -133,12 +133,12 @@ AndroidParticipantObserver::AndroidParticipantObserver(JNIEnv *env,
                 webrtc_jni::GetMethodID(env,
                                         *j_remote_audio_track_class_,
                                         "<init>",
-                                        "(Ljava/lang/String;ZZ)V")),
+                                        "(Ljava/lang/String;Ljava/lang/String;ZZ)V")),
         j_video_track_ctor_id_(
                 webrtc_jni::GetMethodID(env,
                                         *j_remote_video_track_class_,
                                         "<init>",
-                                        "(Ljava/lang/String;ZZ)V")) {
+                                        "(Ljava/lang/String;Ljava/lang/String;ZZ)V")) {
     VIDEO_ANDROID_LOG(twilio::video::LogModule::kPlatform,
                       twilio::video::LogLevel::kDebug,
                       "AndroidMediaObserver");

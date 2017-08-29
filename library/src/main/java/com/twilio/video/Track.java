@@ -24,4 +24,9 @@ interface Track {
      * Checks if the track is enabled.
      */
     boolean isEnabled();
+
+    /**
+     * Return track name.
+     */
+    String getName();
 }

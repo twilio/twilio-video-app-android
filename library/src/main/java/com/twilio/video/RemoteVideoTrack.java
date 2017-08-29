@@ -24,9 +24,10 @@ public class RemoteVideoTrack extends VideoTrack {
     private boolean subscribed;
 
     RemoteVideoTrack(String sid,
+                     String name,
                      boolean enabled,
                      boolean subscribed) {
-        super(enabled);
+        super(enabled, name);
         this.sid = sid;
         this.subscribed = subscribed;
     }

@@ -141,14 +141,12 @@ public class VideoTrackTest {
      * Concrete video track to test functionality in abstract class.
      */
     private static class InstrumentationTestVideoTrack extends VideoTrack {
-        private static final int TRACK_ID_LENGTH = 10;
-
         InstrumentationTestVideoTrack(org.webrtc.VideoTrack webRtcVideoTrack) {
-            super(webRtcVideoTrack, true);
+            super(webRtcVideoTrack, true, "");
         }
 
         InstrumentationTestVideoTrack(boolean enabled) {
-            super(enabled);
+            super(enabled, "");
         }
     }
 }

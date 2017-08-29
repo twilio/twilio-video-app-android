@@ -236,7 +236,7 @@ public class RoomTopologyParameterizedTest extends BaseClientTest {
 
     @Test
     public void shouldDisconnectDuplicateParticipant() throws InterruptedException {
-        // Connect first remoteParticipant
+        // Connect first bobRemoteParticipant
         ConnectOptions connectOptions = new ConnectOptions.Builder(token)
             .roomName(roomName)
             .build();
@@ -281,7 +281,7 @@ public class RoomTopologyParameterizedTest extends BaseClientTest {
         });
         assertTrue(connectedLatch.await(10, TimeUnit.SECONDS));
 
-        // Connect second remoteParticipant
+        // Connect second bobRemoteParticipant
         connectOptions = new ConnectOptions.Builder(token)
             .roomName(roomName)
             .build();
@@ -290,7 +290,7 @@ public class RoomTopologyParameterizedTest extends BaseClientTest {
         room = Video.connect(mediaTestActivity, connectOptions, roomListener);
         assertTrue(roomListener.onConnectedLatch.await(10, TimeUnit.SECONDS));
 
-        // First remoteParticipant should get disconnected
+        // First bobRemoteParticipant should get disconnected
         assertTrue(disconnectedLatch.await(10, TimeUnit.SECONDS));
     }
 

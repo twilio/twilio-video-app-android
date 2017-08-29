@@ -71,11 +71,23 @@ public class RemoteAudioTrackTopologyParameterizedTest extends BaseParticipantTe
         publishAudioTrack();
 
         // Validate track was added
-        List<RemoteAudioTrack> remoteAudioTracks = remoteParticipant.getRemoteAudioTracks();
+        List<RemoteAudioTrack> remoteAudioTracks = bobRemoteParticipant.getRemoteAudioTracks();
         assertEquals(1, remoteAudioTracks.size());
 
         // Validate track sid
         assertIsTrackSid(remoteAudioTracks.get(0).getSid());
+    }
+
+    @Test
+    public void shouldHaveTrackNameAfterPublished() throws InterruptedException {
+        publishAudioTrack();
+
+        // Validate track was added
+        List<RemoteAudioTrack> remoteAudioTracks = bobRemoteParticipant.getRemoteAudioTracks();
+        assertEquals(1, remoteAudioTracks.size());
+
+        // Validate track name
+        assertEquals(bobAudioTrackName, remoteAudioTracks.get(0).getName());
     }
 
     @Test
@@ -85,7 +97,7 @@ public class RemoteAudioTrackTopologyParameterizedTest extends BaseParticipantTe
         publishAudioTrack();
 
         // Get bobs remote audio track
-        RemoteAudioTrack bobRemoteAudioTrack = remoteParticipant.getRemoteAudioTracks().get(0);
+        RemoteAudioTrack bobRemoteAudioTrack = bobRemoteParticipant.getRemoteAudioTracks().get(0);
 
         // Validate that playback is enabled by default
         assertTrue(bobRemoteAudioTrack.isPlaybackEnabled());
@@ -133,8 +145,8 @@ public class RemoteAudioTrackTopologyParameterizedTest extends BaseParticipantTe
                 new CallbackHelper.FakeParticipantListener();
         participantListener.onAudioTrackAddedLatch = new CountDownLatch(1);
         participantListener.onSubscribedToAudioTrackLatch = new CountDownLatch(1);
-        remoteParticipant.setListener(participantListener);
-        bobLocalAudioTrack = LocalAudioTrack.create(mediaTestActivity, true);
+        bobRemoteParticipant.setListener(participantListener);
+        bobLocalAudioTrack = LocalAudioTrack.create(mediaTestActivity, true, bobAudioTrackName);
         assertTrue(bobLocalParticipant.publishAudioTrack(bobLocalAudioTrack));
         assertTrue(participantListener.onAudioTrackAddedLatch.await(20, TimeUnit.SECONDS));
         assertTrue(participantListener.onSubscribedToAudioTrackLatch.await(20, TimeUnit.SECONDS));

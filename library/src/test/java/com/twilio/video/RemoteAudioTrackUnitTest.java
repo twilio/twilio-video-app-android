@@ -45,7 +45,7 @@ public class RemoteAudioTrackUnitTest {
 
     private static class UnitTestAudioTrack extends RemoteAudioTrack {
         UnitTestAudioTrack(String sid, boolean isEnabled, boolean subscribed) {
-            super(sid, isEnabled, subscribed);
+            super(sid, "", isEnabled, subscribed);
         }
     }
 }

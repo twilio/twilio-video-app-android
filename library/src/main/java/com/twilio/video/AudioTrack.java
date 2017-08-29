@@ -16,11 +16,15 @@
 
 package com.twilio.video;
 
+import android.support.annotation.NonNull;
+
 public abstract class AudioTrack implements Track {
+    private final String name;
     private boolean isEnabled;
 
-    AudioTrack(boolean isEnabled) {
+    AudioTrack(boolean isEnabled, @NonNull String name) {
         this.isEnabled = isEnabled;
+        this.name = name;
     }
 
     /**
@@ -31,6 +35,14 @@ public abstract class AudioTrack implements Track {
     @Override
     public boolean isEnabled() {
         return isEnabled;
+    }
+
+    /**
+     * Returns the audio track name. An empty string is returned if no track name was specified.
+     */
+    @Override
+    public String getName() {
+        return name;
     }
 
     void setEnabled(boolean isEnabled) {

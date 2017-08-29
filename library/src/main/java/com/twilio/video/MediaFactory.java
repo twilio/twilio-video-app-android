@@ -83,7 +83,8 @@ class MediaFactory {
     }
 
     synchronized LocalAudioTrack createAudioTrack(boolean enabled,
-                                                  @Nullable AudioOptions audioOptions) {
+                                                  @Nullable AudioOptions audioOptions,
+                                                  @Nullable String name) {
         Preconditions.checkState(nativeMediaFactoryHandle != 0,
                 RELEASE_MESSAGE_TEMPLATE,
                 "createAudioTrack");
@@ -94,7 +95,8 @@ class MediaFactory {
         addRef();
         LocalAudioTrack localAudioTrack = nativeCreateAudioTrack(nativeMediaFactoryHandle,
                 enabled,
-                audioOptions);
+                audioOptions,
+                name);
 
         if (localAudioTrack != null) {
             return localAudioTrack;
@@ -106,8 +108,9 @@ class MediaFactory {
     }
 
     synchronized LocalVideoTrack createVideoTrack(boolean enabled,
-                                                  VideoCapturer videoCapturer,
-                                                  VideoConstraints videoConstraints) {
+                                                  @NonNull VideoCapturer videoCapturer,
+                                                  @Nullable VideoConstraints videoConstraints,
+                                                  @Nullable String name) {
         Preconditions.checkState(nativeMediaFactoryHandle != 0,
                 RELEASE_MESSAGE_TEMPLATE,
                 "createVideoTrack");
@@ -120,6 +123,7 @@ class MediaFactory {
                 enabled,
                 videoCapturer,
                 videoConstraints,
+                name,
                 eglBaseProvider.getLocalEglBase().getEglBaseContext());
 
         if (localVideoTrack != null) {
@@ -169,12 +173,14 @@ class MediaFactory {
                                             EglBase.Context localEglBase,
                                             EglBase.Context remoteEglBase);
     private native LocalAudioTrack nativeCreateAudioTrack(long nativeMediaFactoryHandle,
-                                                                 boolean enabled,
-                                                                 AudioOptions audioOptions);
+                                                          boolean enabled,
+                                                          AudioOptions audioOptions,
+                                                          String name);
     private native LocalVideoTrack nativeCreateVideoTrack(long nativeMediaFactoryHandle,
-                                                                 boolean enabled,
-                                                                 VideoCapturer videoCapturer,
-                                                                 VideoConstraints videoConstraints,
-                                                                 EglBase.Context rootEglBase);
+                                                          boolean enabled,
+                                                          VideoCapturer videoCapturer,
+                                                          VideoConstraints videoConstraints,
+                                                          String name,
+                                                          EglBase.Context rootEglBase);
     private native void nativeRelease(long mediaFactoryHandle);
 }

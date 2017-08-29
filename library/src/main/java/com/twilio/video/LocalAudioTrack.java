@@ -42,7 +42,7 @@ public class LocalAudioTrack extends AudioTrack {
      */
     public static LocalAudioTrack create(@NonNull Context context,
                                          boolean enabled) {
-        return create(context, enabled, null);
+        return create(context, enabled, null, null);
     }
 
     /**
@@ -57,12 +57,44 @@ public class LocalAudioTrack extends AudioTrack {
     public static LocalAudioTrack create(@NonNull Context context,
                                          boolean enabled,
                                          @Nullable AudioOptions audioOptions) {
+        return create(context, enabled, audioOptions, null);
+    }
+
+    /**
+     * Creates an audio track. Note that the RECORD_AUDIO permission must be granted
+     * in order for this operation to succeed. If RECORD_AUDIO is not granted null is returned.
+     *
+     * @param context application context.
+     * @param enabled initial state of audio track.
+     * @param name audio track name.
+     * @return local audio track if successfully added or null if audio track could not be created.
+     */
+    public static LocalAudioTrack create(@NonNull Context context,
+                                         boolean enabled,
+                                         @Nullable String name) {
+        return create(context, enabled, null, name);
+    }
+
+    /**
+     * Creates an audio track. Note that the RECORD_AUDIO permission must be granted
+     * in order for this operation to succeed. If RECORD_AUDIO is not granted null is returned.
+     *
+     * @param context application context.
+     * @param enabled initial state of audio track.
+     * @param audioOptions audio options to be applied to track.
+     * @param name audio track name.
+     * @return local audio track if successfully added or null if audio track could not be created.
+     */
+    public static LocalAudioTrack create(@NonNull Context context,
+                                         boolean enabled,
+                                         @Nullable AudioOptions audioOptions,
+                                         @Nullable String name) {
         Preconditions.checkNotNull(context);
         Preconditions.checkState(Util.permissionGranted(context, RECORD_AUDIO), "RECORD_AUDIO " +
                 "permission must be granted to create audio track");
 
         LocalAudioTrack localAudioTrack = MediaFactory.instance(context)
-                .createAudioTrack(enabled, audioOptions);
+                .createAudioTrack(enabled, audioOptions, name);
 
         if (localAudioTrack == null) {
             logger.e("Failed to create local audio track");
@@ -125,10 +157,11 @@ public class LocalAudioTrack extends AudioTrack {
     }
 
     LocalAudioTrack(long nativeLocalAudioTrackHandle,
-                    String trackId,
+                    @NonNull String trackId,
+                    @NonNull String name,
                     boolean enabled,
                     MediaFactory mediaFactory) {
-        super(enabled);
+        super(enabled, name);
         this.trackId = trackId;
         this.nativeLocalAudioTrackHandle = nativeLocalAudioTrackHandle;
         this.mediaFactory = mediaFactory;

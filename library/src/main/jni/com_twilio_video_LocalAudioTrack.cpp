@@ -20,6 +20,14 @@
 
 namespace twilio_video_jni {
 
+static const char *const kLocalAudioTrackConstructorSignature = "("
+        "J"
+        "Ljava/lang/String;"
+        "Ljava/lang/String;"
+        "Z"
+        "Lcom/twilio/video/MediaFactory;"
+        ")V";
+
 std::shared_ptr<twilio::media::LocalAudioTrack> getLocalAudioTrack(jlong local_audio_track_handle) {
     LocalAudioTrackContext* local_audio_track_context =
             reinterpret_cast<LocalAudioTrackContext *>(local_audio_track_handle);
@@ -35,14 +43,15 @@ jobject createJavaLocalAudioTrack(jobject j_media_factory,
     jmethodID j_local_audio_track_ctor_id = webrtc_jni::GetMethodID(jni,
                                                                     j_local_audio_track_class,
                                                                     "<init>",
-                                                                    "(JLjava/lang/String;ZLcom/twilio/video/MediaFactory;)V");
+                                                                    kLocalAudioTrackConstructorSignature);
     LocalAudioTrackContext* local_audio_track_context =
             new LocalAudioTrackContext(local_audio_track);
-
+    jstring j_name = webrtc_jni::JavaStringFromStdString(jni, local_audio_track->getName());
     jobject j_local_audio_track = jni->NewObject(j_local_audio_track_class,
                                                  j_local_audio_track_ctor_id,
                                                  webrtc_jni::jlongFromPointer(local_audio_track_context),
                                                  webrtc_jni::JavaStringFromStdString(jni, local_audio_track->getTrackId()),
+                                                 j_name,
                                                  local_audio_track->isEnabled(),
                                                  j_media_factory);
     CHECK_EXCEPTION(jni) << "Failed to create LocalVideoTrack instance";

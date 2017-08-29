@@ -4,6 +4,15 @@ The Twilio Programmable Video SDKs use [Semantic Versioning](http://www.semver.o
 
 Features
 
+- Added two static `create` methods to `LocalAudioTrack` and `LocalVideoTrack` that allow creating
+named tracks. The following snippet demonstrates how to create a video track named "screen".
+
+      LocalVideoTrack screenVideoTrack = LocalVideoTrack.create(context, 
+              true, 
+              screenCapturer, 
+              "screen"); 
+              
+- Added `getName` to `RemoteAudioTrack` and `RemoteVideoTrack`.
 - Moved `getTrackId` from `Track` to `LocalAudioTrack` and `LocalVideoTrack`.
 - Added `AudioCodec` and `VideoCodec` as part of the new codec preferences API. Audio and video
 codec preferences can be set in `ConnectOptions`. The following snippet

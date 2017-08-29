@@ -54,7 +54,7 @@ public class VideoTrackUnitTest {
      */
     private static class UnitTestVideoTrack extends VideoTrack {
         UnitTestVideoTrack(org.webrtc.VideoTrack webRtcVideoTrack, boolean enabled) {
-            super(webRtcVideoTrack, enabled);
+            super(webRtcVideoTrack, enabled, "");
         }
     }
 }

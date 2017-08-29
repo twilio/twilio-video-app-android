@@ -16,6 +16,8 @@
 
 package com.twilio.video;
 
+import android.support.test.filters.LargeTest;
+
 import com.twilio.video.base.BaseStatsTest;
 import com.twilio.video.helper.CallbackHelper;
 import com.twilio.video.util.FakeVideoCapturer;
@@ -41,6 +43,7 @@ import static org.junit.Assume.assumeFalse;
 import static org.junit.Assume.assumeTrue;
 
 @RunWith(JUnitParamsRunner.class)
+@LargeTest
 public class CodecPreferencesTest extends BaseStatsTest {
     @After
     public void teardown() throws InterruptedException {

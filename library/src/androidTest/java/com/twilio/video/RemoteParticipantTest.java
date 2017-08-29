@@ -194,7 +194,7 @@ public class RemoteParticipantTest extends BaseClientTest {
                     fail(e.getMessage());
                 }
 
-                Log.d(TAG, "Alice sets remoteParticipant listener");
+                Log.d(TAG, "Alice sets bobRemoteParticipant listener");
                 testEvents.add("aliceSetsListener");
                 remoteParticipant.setListener(aliceRemoteParticipantListener);
             }

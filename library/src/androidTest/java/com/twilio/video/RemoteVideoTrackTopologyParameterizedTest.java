@@ -76,7 +76,7 @@ public class RemoteVideoTrackTopologyParameterizedTest extends BaseParticipantTe
         publishVideoTrack();
 
         // Validate track was added
-        List<RemoteVideoTrack> remoteVideoTracks = remoteParticipant.getRemoteVideoTracks();
+        List<RemoteVideoTrack> remoteVideoTracks = bobRemoteParticipant.getRemoteVideoTracks();
         assertEquals(1, remoteVideoTracks.size());
 
         // Validate track sid
@@ -85,9 +85,21 @@ public class RemoteVideoTrackTopologyParameterizedTest extends BaseParticipantTe
     }
 
     @Test
+    public void shouldHaveTrackNameAfterPublished() throws InterruptedException {
+        publishVideoTrack();
+
+        // Validate track was added
+        List<RemoteVideoTrack> remoteVideoTracks = bobRemoteParticipant.getRemoteVideoTracks();
+        assertEquals(1, remoteVideoTracks.size());
+
+        // Validate track name
+        assertEquals(bobVideoTrackName, remoteVideoTracks.get(0).getName());
+    }
+
+    @Test
     public void canBeRendered() throws InterruptedException {
         publishVideoTrack();
-        List<RemoteVideoTrack> remoteVideoTracks = remoteParticipant.getRemoteVideoTracks();
+        List<RemoteVideoTrack> remoteVideoTracks = bobRemoteParticipant.getRemoteVideoTracks();
         assertEquals(1, remoteVideoTracks.size());
         FrameCountRenderer frameCountRenderer = new FrameCountRenderer();
         remoteVideoTracks.get(0).addRenderer(frameCountRenderer);
@@ -103,7 +115,7 @@ public class RemoteVideoTrackTopologyParameterizedTest extends BaseParticipantTe
             new CallbackHelper.FakeParticipantListener();
         participantListener.onSubscribedToVideoTrackLatch = new CountDownLatch(1);
         participantListener.onVideoTrackEnabledLatch = new CountDownLatch(1);
-        remoteParticipant.setListener(participantListener);
+        bobRemoteParticipant.setListener(participantListener);
         bobLocalVideoTrack = LocalVideoTrack.create(mediaTestActivity, false,
                 new FakeVideoCapturer());
 
@@ -122,9 +134,11 @@ public class RemoteVideoTrackTopologyParameterizedTest extends BaseParticipantTe
                 new CallbackHelper.FakeParticipantListener();
         participantListener.onSubscribedToVideoTrackLatch = new CountDownLatch(1);
         participantListener.onVideoTrackAddedLatch = new CountDownLatch(1);
-        remoteParticipant.setListener(participantListener);
-        bobLocalVideoTrack = LocalVideoTrack.create(mediaTestActivity, true,
-                new FakeVideoCapturer());
+        bobRemoteParticipant.setListener(participantListener);
+        bobLocalVideoTrack = LocalVideoTrack.create(mediaTestActivity,
+                true,
+                new FakeVideoCapturer(),
+                bobVideoTrackName);
         assertTrue(bobLocalParticipant.publishVideoTrack(bobLocalVideoTrack));
         assertTrue(participantListener.onVideoTrackAddedLatch.await(20, TimeUnit.SECONDS));
         assertTrue(participantListener.onSubscribedToVideoTrackLatch.await(20, TimeUnit.SECONDS));

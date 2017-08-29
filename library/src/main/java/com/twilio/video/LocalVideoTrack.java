@@ -59,7 +59,7 @@ public class LocalVideoTrack extends VideoTrack {
     public static LocalVideoTrack create(@NonNull Context context,
                                          boolean enabled,
                                          @NonNull VideoCapturer videoCapturer) {
-        return create(context, enabled, videoCapturer, null);
+        return create(context, enabled, videoCapturer, null, null);
     }
 
     /**
@@ -94,6 +94,61 @@ public class LocalVideoTrack extends VideoTrack {
                                          boolean enabled,
                                          @NonNull VideoCapturer videoCapturer,
                                          @Nullable VideoConstraints videoConstraints) {
+        return create(context, enabled, videoCapturer, videoConstraints, null);
+    }
+
+    /**
+     * Creates a local video track. Local video track invokes
+     * {@link VideoCapturer#getSupportedFormats()} to find the closest supported
+     * {@link VideoFormat} to 640x480 at 30 frames per second. The closest format is used to apply
+     * default {@link VideoConstraints} to the returned {@link LocalVideoTrack}.
+     *
+     * @param context application context.
+     * @param enabled initial state of video track.
+     * @param videoCapturer capturer that provides video frames.
+     * @param name video track name.
+     * @return local video track if successfully added or null if video track could not be created.
+     */
+    public static LocalVideoTrack create(@NonNull Context context,
+                                         boolean enabled,
+                                         @NonNull VideoCapturer videoCapturer,
+                                         @Nullable String name) {
+        return create(context, enabled, videoCapturer, null, name);
+    }
+
+    /**
+     * Creates a local video track. Local video track will only apply {@code videoConstraints}
+     * compatible with {@code videoCapturer}. Default constraints described in
+     * {@link #create(Context, boolean, VideoCapturer)} will be applied to the returned
+     * {@link LocalVideoTrack} for the following conditions:
+     * <p>
+     * <ol>
+     *     <li>Passing {@code null} as {@code videoConstraints}.</li>
+     *     <li>{@code videoConstraints} are incompatible with {@code videoCapturer}</li>
+     * </ol>
+     * <p>
+     * Video constraints are incompatible with a capturer if there is not at least one supported
+     * {@link VideoFormat} for which all the following conditions true:
+     * <ol>
+     *     <li>{@link VideoConstraints#minFps} and {@link VideoConstraints#maxFps} are both
+     *     less than or equal supported capture format frame rate.</li>
+     *     <li>{@link VideoConstraints#minVideoDimensions} width and height are less than or
+     *     equal to a supported capture format width and height.</li>
+     *     <li>{@link VideoConstraints#maxVideoDimensions} width and height are greater than or
+     *     equal to a supported capture format width and height.</li>
+     * </ol>
+     *
+     * @param context application context.
+     * @param enabled initial state of video track.
+     * @param videoCapturer capturer that provides video frames.
+     * @param name video track name.
+     * @return local video track if successfully added or null if video track could not be created.
+     */
+    public static LocalVideoTrack create(@NonNull Context context,
+                                         boolean enabled,
+                                         @NonNull VideoCapturer videoCapturer,
+                                         @Nullable VideoConstraints videoConstraints,
+                                         @Nullable String name) {
         Preconditions.checkNotNull(context, "Context must not be null");
         Preconditions.checkNotNull(videoCapturer, "VideoCapturer must not be null");
         Preconditions.checkState(videoCapturer.getSupportedFormats() != null &&
@@ -103,7 +158,8 @@ public class LocalVideoTrack extends VideoTrack {
         LocalVideoTrack localVideoTrack = MediaFactory.instance(context)
                 .createVideoTrack(enabled,
                         videoCapturer,
-                        resolveConstraints(videoCapturer, videoConstraints));
+                        resolveConstraints(videoCapturer, videoConstraints),
+                        name);
 
         if (localVideoTrack == null) {
             logger.e("Failed to create local video track");
@@ -202,8 +258,9 @@ public class LocalVideoTrack extends VideoTrack {
                     VideoCapturer videoCapturer,
                     VideoConstraints videoConstraints,
                     org.webrtc.VideoTrack webrtcVideoTrack,
+                    String name,
                     MediaFactory mediaFactory) {
-        super(webrtcVideoTrack, enabled);
+        super(webrtcVideoTrack, enabled, name);
         this.trackId = webrtcVideoTrack.id();
         this.nativeLocalVideoTrackHandle = nativeLocalVideoTrackHandle;
         this.videoCapturer = videoCapturer;

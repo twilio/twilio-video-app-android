@@ -31,7 +31,6 @@ import com.twilio.video.util.Topology;
 
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -168,7 +167,7 @@ public class RemoteParticipantTopologyParameterizedTest extends BaseParticipantT
                 new CallbackHelper.FakeParticipantListener();
         participantListener.onAudioTrackAddedLatch = new CountDownLatch(1);
         participantListener.onSubscribedToAudioTrackLatch = new CountDownLatch(1);
-        remoteParticipant.setListener(participantListener);
+        bobRemoteParticipant.setListener(participantListener);
         bobLocalAudioTrack = LocalAudioTrack.create(mediaTestActivity, true);
         assertTrue(bobRoom.getLocalParticipant().publishAudioTrack(bobLocalAudioTrack));
         assertTrue(participantListener.onAudioTrackAddedLatch.await(20, TimeUnit.SECONDS));
@@ -244,7 +243,7 @@ public class RemoteParticipantTopologyParameterizedTest extends BaseParticipantT
         CallbackHelper.FakeParticipantListener participantListener =
                 new CallbackHelper.FakeParticipantListener();
         participantListener.onSubscribedToAudioTrackLatch = new CountDownLatch(1);
-        this.remoteParticipant.setListener(participantListener);
+        this.bobRemoteParticipant.setListener(participantListener);
         bobLocalAudioTrack = LocalAudioTrack.create(mediaTestActivity, false);
         assertTrue(bobRoom.getLocalParticipant().publishAudioTrack(bobLocalAudioTrack));
         assertTrue(participantListener.onSubscribedToAudioTrackLatch.await(20, TimeUnit.SECONDS));
@@ -254,7 +253,7 @@ public class RemoteParticipantTopologyParameterizedTest extends BaseParticipantT
         assertTrue(bobRoom.getLocalParticipant().publishVideoTrack(bobLocalVideoTrack));
         assertTrue(participantListener.onSubscribedToVideoTrackLatch.await(20, TimeUnit.SECONDS));
 
-        // Cache remoteParticipant two tracks
+        // Cache bobRemoteParticipant two tracks
         List<RemoteAudioTrack> remoteAudioTracks = aliceRoomListener
                 .getRemoteParticipant()
                 .getRemoteAudioTracks();

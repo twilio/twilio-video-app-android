@@ -30,7 +30,6 @@ import com.twilio.video.helper.CallbackHelper;
 import com.twilio.video.ui.MediaTestActivity;
 import com.twilio.video.util.Constants;
 import com.twilio.video.util.CredentialsUtils;
-import com.twilio.video.util.FakeVideoCapturer;
 import com.twilio.video.util.PermissionUtils;
 import com.twilio.video.util.RandUtils;
 import com.twilio.video.util.RoomUtils;
@@ -63,8 +62,10 @@ public abstract class BaseParticipantTest extends BaseClientTest {
     protected LocalParticipant aliceLocalParticipant;
     protected Room bobRoom;
     protected LocalParticipant bobLocalParticipant;
-    protected RemoteParticipant remoteParticipant;
+    protected RemoteParticipant bobRemoteParticipant;
     protected String testRoomName;
+    protected String bobAudioTrackName;
+    protected String bobVideoTrackName;
     protected CallbackHelper.FakeRoomListener aliceRoomListener;
     protected CallbackHelper.FakeParticipantListener aliceParticipantListener;
     protected CallbackHelper.FakeRoomListener bobRoomListener;
@@ -112,6 +113,8 @@ public abstract class BaseParticipantTest extends BaseClientTest {
 
         // Setup bob
         bobToken = CredentialsUtils.getAccessToken(Constants.PARTICIPANT_BOB, topology);
+        bobAudioTrackName = RandUtils.generateRandomString(10);
+        bobVideoTrackName = RandUtils.generateRandomString(10);
         bobRoomListener = new CallbackHelper.FakeRoomListener();
         bobParticipantListener = new CallbackHelper.FakeParticipantListener();
         ConnectOptions bobConnectOptions = new ConnectOptions.Builder(bobToken)
@@ -132,9 +135,9 @@ public abstract class BaseParticipantTest extends BaseClientTest {
         List<RemoteParticipant> remoteParticipantList =
                 new ArrayList<>(aliceRoom.getRemoteParticipants());
         assertEquals(1, remoteParticipantList.size());
-        remoteParticipant = remoteParticipantList.get(0);
-        remoteParticipant.setListener(aliceParticipantListener);
-        assertNotNull(remoteParticipant);
+        bobRemoteParticipant = remoteParticipantList.get(0);
+        bobRemoteParticipant.setListener(aliceParticipantListener);
+        assertNotNull(bobRemoteParticipant);
     }
 
     @After
@@ -144,7 +147,7 @@ public abstract class BaseParticipantTest extends BaseClientTest {
         disconnect(aliceRoom, aliceRoomListener);
         aliceRoom = null;
         aliceRoomListener = null;
-        remoteParticipant = null;
+        bobRemoteParticipant = null;
         if (aliceLocalAudioTrack != null) {
             aliceLocalAudioTrack.release();
         }

@@ -288,7 +288,8 @@ JNIEXPORT jobject JNICALL Java_com_twilio_video_MediaFactory_nativeCreateAudioTr
                                                                                     jobject j_media_factory,
                                                                                     jlong media_factory_handle,
                                                                                     jboolean enabled,
-                                                                                    jobject j_audio_options) {
+                                                                                    jobject j_audio_options,
+                                                                                    jstring j_name) {
     std::string func_name = std::string(__FUNCTION__);
     VIDEO_ANDROID_LOG(twilio::video::LogModule::kPlatform,
                       twilio::video::LogLevel::kDebug,
@@ -296,8 +297,11 @@ JNIEXPORT jobject JNICALL Java_com_twilio_video_MediaFactory_nativeCreateAudioTr
     std::shared_ptr<twilio::media::MediaFactory> media_factory =
             getMediaFactory(media_factory_handle);
     cricket::AudioOptions audio_options = getAudioOptions(j_audio_options);
+    std::string name = webrtc_jni::IsNull(jni, j_name) ?
+                       ("") :
+                       (webrtc_jni::JavaToStdString(jni, j_name));
     std::shared_ptr<twilio::media::LocalAudioTrack> local_audio_track =
-            media_factory->createAudioTrack(enabled, audio_options);
+            media_factory->createAudioTrack(enabled, audio_options, name);
 
     return local_audio_track == nullptr ?
            (nullptr) :
@@ -310,6 +314,7 @@ JNIEXPORT jobject JNICALL Java_com_twilio_video_MediaFactory_nativeCreateVideoTr
                                                                                     jboolean enabled,
                                                                                     jobject j_video_capturer,
                                                                                     jobject j_video_contraints,
+                                                                                    jstring j_name,
                                                                                     jobject j_egl_context) {
     std::string func_name = std::string(__FUNCTION__);
     VIDEO_ANDROID_LOG(twilio::video::LogModule::kPlatform,
@@ -325,15 +330,18 @@ JNIEXPORT jobject JNICALL Java_com_twilio_video_MediaFactory_nativeCreateVideoTr
                                                              j_egl_context,
                                                              is_screencast);
     cricket::VideoCapturer* capturer = new AndroidVideoCapturer(delegate);
+    std::string name = webrtc_jni::IsNull(jni, j_name) ?
+                       ("") :
+                       (webrtc_jni::JavaToStdString(jni, j_name));
     std::shared_ptr<twilio::media::LocalVideoTrack> video_track =
             media_factory->createVideoTrack(enabled,
                                             getVideoConstraints(j_video_contraints),
-                                            capturer);
+                                            capturer,
+                                            name);
 
     return video_track == nullptr ?
            (nullptr) :
            (createJavaLocalVideoTrack(video_track,
-                                      enabled,
                                       j_video_capturer,
                                       j_video_contraints,
                                       j_media_factory));

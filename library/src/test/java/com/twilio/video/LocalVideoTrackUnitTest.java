@@ -24,35 +24,19 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+
+import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 public class LocalVideoTrackUnitTest {
     @Mock Context mockContext;
+    @Mock VideoCapturer videoCapturer;
 
     @Test(expected = NullPointerException.class)
     public void create_shouldFailWithNullContext() {
-        LocalVideoTrack.create(null, true, new VideoCapturer() {
-            @Override
-            public List<VideoFormat> getSupportedFormats() {
-                return null;
-            }
-
-            @Override
-            public boolean isScreencast() {
-                return false;
-            }
-
-            @Override
-            public void startCapture(VideoFormat captureFormat, Listener capturerListener) {
-
-            }
-
-            @Override
-            public void stopCapture() {
-
-            }
-        });
+        LocalVideoTrack.create(null, true, videoCapturer);
     }
 
     @Test(expected = NullPointerException.class)
@@ -62,51 +46,13 @@ public class LocalVideoTrackUnitTest {
 
     @Test(expected = IllegalStateException.class)
     public void create_shouldFailIfVideoCapturerReturnsNullForSupportedFormats() {
-        LocalVideoTrack.create(mockContext, true, new VideoCapturer() {
-            @Override
-            public List<VideoFormat> getSupportedFormats() {
-                return null;
-            }
-
-            @Override
-            public boolean isScreencast() {
-                return false;
-            }
-
-            @Override
-            public void startCapture(VideoFormat captureFormat, Listener capturerListener) {
-
-            }
-
-            @Override
-            public void stopCapture() {
-
-            }
-        });
+        when(videoCapturer.getSupportedFormats()).thenReturn(null);
+        LocalVideoTrack.create(mockContext, true, videoCapturer);
     }
 
     @Test(expected = IllegalStateException.class)
     public void create_shouldFailIfVideoCapturerProvidesNoSupportedFormats() {
-        LocalVideoTrack.create(mockContext, true, new VideoCapturer() {
-            @Override
-            public List<VideoFormat> getSupportedFormats() {
-                return new ArrayList<>();
-            }
-
-            @Override
-            public boolean isScreencast() {
-                return false;
-            }
-
-            @Override
-            public void startCapture(VideoFormat captureFormat, Listener capturerListener) {
-
-            }
-
-            @Override
-            public void stopCapture() {
-
-            }
-        });
+        when(videoCapturer.getSupportedFormats()).thenReturn(Collections.<VideoFormat>emptyList());
+        LocalVideoTrack.create(mockContext, true, videoCapturer);
     }
 }

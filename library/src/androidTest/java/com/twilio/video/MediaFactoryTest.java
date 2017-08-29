@@ -56,7 +56,7 @@ public class MediaFactoryTest {
 
     @Test
     public void canCreateAudioTrack() {
-        LocalAudioTrack localAudioTrack = mediaFactory.createAudioTrack(true, null);
+        LocalAudioTrack localAudioTrack = mediaFactory.createAudioTrack(true, null, null);
 
         assertNotNull(localAudioTrack);
         localAudioTrack.release();
@@ -65,7 +65,9 @@ public class MediaFactoryTest {
     @Test
     public void canCreateVideoTrack() {
         LocalVideoTrack localVideoTrack = mediaFactory.createVideoTrack(true,
-                new FakeVideoCapturer(), LocalVideoTrack.defaultVideoConstraints);
+                new FakeVideoCapturer(),
+                LocalVideoTrack.defaultVideoConstraints,
+                null);
 
         assertNotNull(localVideoTrack);
         localVideoTrack.release();
@@ -73,9 +75,11 @@ public class MediaFactoryTest {
 
     @Test
     public void canCreateAudioAndVideoTracks() {
-        LocalAudioTrack localAudioTrack = mediaFactory.createAudioTrack(true, null);
+        LocalAudioTrack localAudioTrack = mediaFactory.createAudioTrack(true, null, null);
         LocalVideoTrack localVideoTrack = mediaFactory.createVideoTrack(true,
-                new FakeVideoCapturer(), LocalVideoTrack.defaultVideoConstraints);
+                new FakeVideoCapturer(),
+                LocalVideoTrack.defaultVideoConstraints,
+                null);
         assertNotNull(localAudioTrack);
         assertNotNull(localVideoTrack);
         localAudioTrack.release();
@@ -95,9 +99,10 @@ public class MediaFactoryTest {
         // Create random tracks
         for (int i = 0 ; i < NUM_TRACKS ; i++) {
             tracks[i] = random.nextBoolean() ?
-                    (mediaFactory.createAudioTrack(true, null)) :
+                    (mediaFactory.createAudioTrack(true, null, null)) :
                     (mediaFactory.createVideoTrack(true, new FakeVideoCapturer(),
-                            LocalVideoTrack.defaultVideoConstraints));
+                            LocalVideoTrack.defaultVideoConstraints,
+                            null));
         }
 
         // Destroy all tracks
@@ -114,7 +119,7 @@ public class MediaFactoryTest {
         }
 
         // With all tracks released this should raise exception
-        mediaFactory.createAudioTrack(true, null);
+        mediaFactory.createAudioTrack(true, null, null);
     }
 
     @Test(expected = IllegalStateException.class)
@@ -124,9 +129,10 @@ public class MediaFactoryTest {
         // Create random tracks
         for (int i = 0 ; i < NUM_TRACKS ; i++) {
             tracks[i] = random.nextBoolean() ?
-                    (mediaFactory.createAudioTrack(true, null)) :
+                    (mediaFactory.createAudioTrack(true, null, null)) :
                     (mediaFactory.createVideoTrack(true, new FakeVideoCapturer(),
-                            LocalVideoTrack.defaultVideoConstraints));
+                            LocalVideoTrack.defaultVideoConstraints,
+                            null));
         }
 
         // Destroy all tracks
@@ -144,7 +150,8 @@ public class MediaFactoryTest {
 
         // With all tracks released this should raise exception
         mediaFactory.createVideoTrack(true, new FakeVideoCapturer(),
-                LocalVideoTrack.defaultVideoConstraints);
+                LocalVideoTrack.defaultVideoConstraints,
+                null);
     }
 
     @Test

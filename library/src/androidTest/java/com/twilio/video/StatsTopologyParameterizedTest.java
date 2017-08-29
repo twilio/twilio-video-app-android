@@ -196,7 +196,7 @@ public class StatsTopologyParameterizedTest extends BaseStatsTest {
         assertEquals(1, aliceRoom.getRemoteParticipants().size());
 
 
-        // Get alice local remoteParticipant
+        // Get alice local bobRemoteParticipant
         LocalParticipant aliceLocalParticipant = aliceRoom.getLocalParticipant();
 
         // Add audio and video track to alice
