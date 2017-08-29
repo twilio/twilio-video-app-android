@@ -73,8 +73,6 @@ public class RemoteVideoTrackTopologyParameterizedTest extends BaseParticipantTe
 
     @Test
     public void shouldHaveTrackSidAfterPublished() throws InterruptedException {
-        // TODO: GSDK-1249 Re-enable once track sid changes are deployed to prod SFU
-        assumeTrue(topology == Topology.P2P);
         publishVideoTrack();
 
         // Validate track was added

@@ -33,7 +33,6 @@ public class LocalVideoTrackPublicationUnitTest {
         new LocalVideoTrackPublication(null, localVideoTrack);
     }
 
-    @Ignore("TODO: Re-enable once published tracks have sids for group rooms GSDK-1270")
     @Test(expected = IllegalArgumentException.class)
     public void shouldFailWithEmptySid() {
         new LocalVideoTrackPublication("", localVideoTrack);

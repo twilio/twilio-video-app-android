@@ -29,8 +29,7 @@ public class LocalAudioTrackPublication implements AudioTrackPublication {
     LocalAudioTrackPublication(@NonNull String sid, @NonNull LocalAudioTrack localAudioTrack) {
         Preconditions.checkNotNull(sid, "SID must not be null");
         Preconditions.checkNotNull(localAudioTrack, "Local audio track must not be null");
-        // TODO: Re-enable once published tracks have sids for group rooms GSDK-1270
-        // Preconditions.checkArgument(!sid.isEmpty(), "SID must not be empty");
+        Preconditions.checkArgument(!sid.isEmpty(), "SID must not be empty");
         this.sid = sid;
         this.localAudioTrack = localAudioTrack;
     }

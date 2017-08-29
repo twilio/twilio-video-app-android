@@ -28,8 +28,7 @@ public class LocalVideoTrackPublication implements VideoTrackPublication {
 
     LocalVideoTrackPublication(@NonNull String sid, @NonNull LocalVideoTrack localVideoTrack) {
         Preconditions.checkNotNull(sid, "SID must not be null");
-        // TODO: Re-enable once published tracks have sids for group rooms GSDK-1270
-        // Preconditions.checkArgument(!sid.isEmpty(), "SID must not be empty");
+        Preconditions.checkArgument(!sid.isEmpty(), "SID must not be empty");
         Preconditions.checkNotNull(localVideoTrack, "Local video track must not be null");
         this.sid = sid;
         this.localVideoTrack = localVideoTrack;
