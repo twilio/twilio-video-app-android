@@ -33,10 +33,12 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
 import com.twilio.video.test.R;
+import com.twilio.video.util.DeviceUtils;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assume.assumeFalse;
 import static org.junit.Assume.assumeTrue;
 
 @RunWith(Parameterized.class)
@@ -95,6 +97,9 @@ public class CameraCapturerSourceParameterizedTest extends BaseCameraCapturerTes
 
     @Test
     public void shouldCaptureFramesAfterPictureTaken() throws InterruptedException {
+        // TODO: Frames stop after takePicture with front camera on Samsung Galaxy S3 GSDK-1110
+        assumeFalse(DeviceUtils.isSamsungGalaxyS3() &&
+                cameraSource == CameraCapturer.CameraSource.FRONT_CAMERA);
         final CountDownLatch firstFrameReceived = new CountDownLatch(1);
         final CountDownLatch pictureTaken = new CountDownLatch(1);
         cameraCapturer = new CameraCapturer(cameraCapturerActivity, cameraSource,
