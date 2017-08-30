@@ -30,25 +30,25 @@ public:
     AndroidParticipantObserver(JNIEnv *env,
                                jobject j_remote_participant,
                                jobject j_remote_participant_observer,
-                               std::map<std::shared_ptr<twilio::media::RemoteAudioTrack>, jobject>& remote_audio_track_map,
-                               std::map<std::shared_ptr<twilio::media::RemoteVideoTrack>, jobject>& remote_video_track_map);
+                               std::map<std::shared_ptr<twilio::media::RemoteAudioTrackPublication>, jobject>& remote_audio_track_map,
+                               std::map<std::shared_ptr<twilio::media::RemoteVideoTrackPublication>, jobject>& remote_video_track_map);
 
     ~AndroidParticipantObserver();
 
     void setObserverDeleted();
 
 protected:
-    virtual void onAudioTrackAdded(twilio::video::RemoteParticipant *remote_participant,
-                                   std::shared_ptr<twilio::media::RemoteAudioTrack> remote_audio_track);
+    virtual void onAudioTrackPublished(twilio::video::RemoteParticipant *remote_participant,
+                                       std::shared_ptr<twilio::media::RemoteAudioTrackPublication> remote_audio_track_publication);
 
-    virtual void onAudioTrackRemoved(twilio::video::RemoteParticipant *remote_participant,
-                                     std::shared_ptr<twilio::media::RemoteAudioTrack> remote_audio_track);
+    virtual void onAudioTrackUnpublished(twilio::video::RemoteParticipant *remote_participant,
+                                         std::shared_ptr<twilio::media::RemoteAudioTrackPublication> remote_audio_track_publication);
 
-    virtual void onVideoTrackAdded(twilio::video::RemoteParticipant *remote_participant,
-                                   std::shared_ptr<twilio::media::RemoteVideoTrack> remote_video_track);
+    virtual void onVideoTrackPublished(twilio::video::RemoteParticipant *remote_participant,
+                                       std::shared_ptr<twilio::media::RemoteVideoTrackPublication> remote_video_track_publication);
 
-    virtual void onVideoTrackRemoved(twilio::video::RemoteParticipant *remote_participant,
-                                     std::shared_ptr<twilio::media::RemoteVideoTrack> remote_video_track);
+    virtual void onVideoTrackUnpublished(twilio::video::RemoteParticipant *remote_participant,
+                                         std::shared_ptr<twilio::media::RemoteVideoTrackPublication> remote_video_track_publication);
 
     virtual void onDataTrackAdded(twilio::video::RemoteParticipant *remote_participant,
                                   std::shared_ptr<twilio::media::DataTrack> track);
@@ -57,27 +57,31 @@ protected:
                                     std::shared_ptr<twilio::media::DataTrack> track);
 
     virtual void onAudioTrackEnabled(twilio::video::RemoteParticipant *remote_participant,
-                                     std::shared_ptr<twilio::media::RemoteAudioTrack> remote_audio_track);
+                                     std::shared_ptr<twilio::media::RemoteAudioTrackPublication> remote_audio_track_publication);
 
     virtual void onAudioTrackDisabled(twilio::video::RemoteParticipant *remote_participant,
-                                      std::shared_ptr<twilio::media::RemoteAudioTrack> remote_audio_track);
+                                      std::shared_ptr<twilio::media::RemoteAudioTrackPublication> remote_audio_track_publication);
 
     virtual void onVideoTrackEnabled(twilio::video::RemoteParticipant *remote_participant,
-                                     std::shared_ptr<twilio::media::RemoteVideoTrack> remote_video_track);
+                                     std::shared_ptr<twilio::media::RemoteVideoTrackPublication> remote_video_track_publication);
 
     virtual void onVideoTrackDisabled(twilio::video::RemoteParticipant *remote_participant,
-                                      std::shared_ptr<twilio::media::RemoteVideoTrack> remote_video_track);
+                                      std::shared_ptr<twilio::media::RemoteVideoTrackPublication> remote_video_track_publication);
 
     virtual void onAudioTrackSubscribed(twilio::video::RemoteParticipant *participant,
+                                        std::shared_ptr<twilio::media::RemoteAudioTrackPublication> remote_audio_track_publication,
                                         std::shared_ptr<twilio::media::RemoteAudioTrack> remote_audio_track);
 
     virtual void onAudioTrackUnsubscribed(twilio::video::RemoteParticipant *participant,
+                                          std::shared_ptr<twilio::media::RemoteAudioTrackPublication> remote_audio_track_publication,
                                           std::shared_ptr<twilio::media::RemoteAudioTrack> remote_audio_track);
 
     virtual void onVideoTrackSubscribed(twilio::video::RemoteParticipant *participant,
+                                        std::shared_ptr<twilio::media::RemoteVideoTrackPublication> remote_video_track_publication,
                                         std::shared_ptr<twilio::media::RemoteVideoTrack> remote_video_track);
 
     virtual void onVideoTrackUnsubscribed(twilio::video::RemoteParticipant *participant,
+                                          std::shared_ptr<twilio::media::RemoteVideoTrackPublication> remote_video_track_publication,
                                           std::shared_ptr<twilio::media::RemoteVideoTrack> remote_video_track);
 
 private:
@@ -93,8 +97,8 @@ private:
     const webrtc_jni::ScopedGlobalRef<jobject> j_remote_participant_;
     const webrtc_jni::ScopedGlobalRef<jobject> j_remote_participant_observer_;
     const webrtc_jni::ScopedGlobalRef<jclass> j_remote_participant_observer_class_;
-    std::map<std::shared_ptr<twilio::media::RemoteAudioTrack>, jobject>& remote_audio_track_map_;
-    std::map<std::shared_ptr<twilio::media::RemoteVideoTrack>, jobject>& remote_video_track_map_;
+    std::map<std::shared_ptr<twilio::media::RemoteAudioTrackPublication>, jobject>& remote_audio_track_publication_map_;
+    std::map<std::shared_ptr<twilio::media::RemoteVideoTrackPublication>, jobject>& remote_video_track_publication_map_;
     const webrtc_jni::ScopedGlobalRef<jclass> j_remote_audio_track_class_;
     const webrtc_jni::ScopedGlobalRef<jclass> j_remote_video_track_class_;
     jmethodID j_on_audio_track_added_;
