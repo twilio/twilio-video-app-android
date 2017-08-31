@@ -76,12 +76,13 @@ public class RemoteVideoTrackTopologyParameterizedTest extends BaseParticipantTe
         publishVideoTrack();
 
         // Validate track was added
-        List<RemoteVideoTrack> remoteVideoTracks = bobRemoteParticipant.getRemoteVideoTracks();
-        assertEquals(1, remoteVideoTracks.size());
+        List<RemoteVideoTrackPublication> remoteVideoTrackPublications =
+                bobRemoteParticipant.getRemoteVideoTracks();
+        assertEquals(1, remoteVideoTrackPublications.size());
 
         // Validate track sid
-        assertIsTrackSid(remoteVideoTracks.get(0).getSid());
-        assertTrue(remoteVideoTracks.get(0).isSubscribed());
+        assertIsTrackSid(remoteVideoTrackPublications.get(0).getTrackSid());
+        assertTrue(remoteVideoTrackPublications.get(0).isTrackSubscribed());
     }
 
     @Test
@@ -89,24 +90,26 @@ public class RemoteVideoTrackTopologyParameterizedTest extends BaseParticipantTe
         publishVideoTrack();
 
         // Validate track was added
-        List<RemoteVideoTrack> remoteVideoTracks = bobRemoteParticipant.getRemoteVideoTracks();
-        assertEquals(1, remoteVideoTracks.size());
+        List<RemoteVideoTrackPublication> remoteVideoTrackPublications =
+                bobRemoteParticipant.getRemoteVideoTracks();
+        assertEquals(1, remoteVideoTrackPublications.size());
 
         // Validate track name
-        assertEquals(bobVideoTrackName, remoteVideoTracks.get(0).getName());
+        assertEquals(bobVideoTrackName, remoteVideoTrackPublications.get(0).getTrackName());
     }
 
     @Test
     public void canBeRendered() throws InterruptedException {
         publishVideoTrack();
-        List<RemoteVideoTrack> remoteVideoTracks = bobRemoteParticipant.getRemoteVideoTracks();
+        List<RemoteVideoTrackPublication> remoteVideoTracks =
+                bobRemoteParticipant.getRemoteVideoTracks();
         assertEquals(1, remoteVideoTracks.size());
         FrameCountRenderer frameCountRenderer = new FrameCountRenderer();
-        remoteVideoTracks.get(0).addRenderer(frameCountRenderer);
-        assertEquals(1, remoteVideoTracks.get(0).getRenderers().size());
+        remoteVideoTracks.get(0).getRemoteVideoTrack().addRenderer(frameCountRenderer);
+        assertEquals(1, remoteVideoTracks.get(0).getRemoteVideoTrack().getRenderers().size());
         assertFramesRendered(frameCountRenderer, VIDEO_TRACK_TEST_DELAY_MS);
-        remoteVideoTracks.get(0).removeRenderer(frameCountRenderer);
-        assertEquals(0, remoteVideoTracks.get(0).getRenderers().size());
+        remoteVideoTracks.get(0).getRemoteVideoTrack().removeRenderer(frameCountRenderer);
+        assertEquals(0, remoteVideoTracks.get(0).getRemoteVideoTrack().getRenderers().size());
     }
 
     @Test
@@ -119,14 +122,14 @@ public class RemoteVideoTrackTopologyParameterizedTest extends BaseParticipantTe
         bobLocalVideoTrack = LocalVideoTrack.create(mediaTestActivity, false,
                 new FakeVideoCapturer());
 
-        assertTrue(bobLocalParticipant.publishVideoTrack(bobLocalVideoTrack));
+        assertTrue(bobLocalParticipant.publishTrack(bobLocalVideoTrack));
         assertTrue(participantListener.onSubscribedToVideoTrackLatch.await(20, TimeUnit.SECONDS));
         assertFalse(aliceRoom.getRemoteParticipants().get(0).getRemoteVideoTracks().get(0)
-                .isEnabled());
+                .isTrackEnabled());
         bobLocalVideoTrack.enable(true);
         assertTrue(participantListener.onVideoTrackEnabledLatch.await(20, TimeUnit.SECONDS));
         assertTrue(aliceRoom.getRemoteParticipants().get(0).getRemoteVideoTracks().get(0)
-                .isEnabled());
+                .isTrackEnabled());
     }
 
     private void publishVideoTrack() throws InterruptedException {
@@ -139,7 +142,7 @@ public class RemoteVideoTrackTopologyParameterizedTest extends BaseParticipantTe
                 true,
                 new FakeVideoCapturer(),
                 bobVideoTrackName);
-        assertTrue(bobLocalParticipant.publishVideoTrack(bobLocalVideoTrack));
+        assertTrue(bobLocalParticipant.publishTrack(bobLocalVideoTrack));
         assertTrue(participantListener.onVideoTrackAddedLatch.await(20, TimeUnit.SECONDS));
         assertTrue(participantListener.onSubscribedToVideoTrackLatch.await(20, TimeUnit.SECONDS));
     }

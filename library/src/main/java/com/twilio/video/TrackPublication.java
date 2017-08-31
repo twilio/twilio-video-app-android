@@ -24,5 +24,15 @@ public interface TrackPublication {
      * Returns the track's server identifier. This value uniquely identifies the track within the
      * scope of a {@link Room}.
      */
-    String getSid();
+    String getTrackSid();
+
+    /**
+     * Returns the name of the published track.
+     */
+    String getTrackName();
+
+    /**
+     * Returns true of track is enabled and false if not.
+     */
+    boolean isTrackEnabled();
 }

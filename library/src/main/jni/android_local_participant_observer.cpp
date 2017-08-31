@@ -41,11 +41,11 @@ AndroidLocalParticipantObserver::AndroidLocalParticipantObserver(JNIEnv *env,
                                                                      "com/twilio/video/LocalVideoTrackPublication")),
           j_on_published_audio_track_(webrtc_jni::GetMethodID(env,
                                                               *j_local_participant_observer_class_,
-                                                              "onPublishedAudioTrack",
+                                                              "onAudioTrackPublished",
                                                               "(Lcom/twilio/video/LocalParticipant;Lcom/twilio/video/LocalAudioTrackPublication;)V")),
           j_on_published_video_track_(webrtc_jni::GetMethodID(env,
                                                               *j_local_participant_observer_class_,
-                                                              "onPublishedVideoTrack",
+                                                              "onVideoTrackPublished",
                                                               "(Lcom/twilio/video/LocalParticipant;Lcom/twilio/video/LocalVideoTrackPublication;)V")),
           j_published_audio_track_ctor_id_(webrtc_jni::GetMethodID(env,
                                                                    *j_published_audio_track_class_,
@@ -100,7 +100,7 @@ void AndroidLocalParticipantObserver::onAudioTrackPublished(twilio::video::Local
                               j_on_published_audio_track_,
                               *j_local_participant_,
                               j_published_audio_track);
-        CHECK_EXCEPTION(jni()) << "Error calling onPublishedAudioTrack";
+        CHECK_EXCEPTION(jni()) << "Error calling onAudioTrackPublished";
     }
 }
 
@@ -129,7 +129,7 @@ void AndroidLocalParticipantObserver::onVideoTrackPublished(twilio::video::Local
                               j_on_published_video_track_,
                               *j_local_participant_,
                               j_published_video_track);
-        CHECK_EXCEPTION(jni()) << "Error calling onPublishedVideoTrack";
+        CHECK_EXCEPTION(jni()) << "Error calling onVideoTrackPublished";
     }
 }
 

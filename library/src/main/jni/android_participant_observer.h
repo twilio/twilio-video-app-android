@@ -30,8 +30,10 @@ public:
     AndroidParticipantObserver(JNIEnv *env,
                                jobject j_remote_participant,
                                jobject j_remote_participant_observer,
-                               std::map<std::shared_ptr<twilio::media::RemoteAudioTrackPublication>, jobject>& remote_audio_track_map,
-                               std::map<std::shared_ptr<twilio::media::RemoteVideoTrackPublication>, jobject>& remote_video_track_map);
+                               std::map<std::shared_ptr<twilio::media::RemoteAudioTrackPublication>, jobject>& remote_audio_track_publication_map,
+                               std::map<std::shared_ptr<twilio::media::RemoteAudioTrack>, jobject>& remote_audio_track_map,
+                               std::map<std::shared_ptr<twilio::media::RemoteVideoTrackPublication>, jobject>& remote_video_track_publication_map,
+                               std::map<std::shared_ptr<twilio::media::RemoteVideoTrack>, jobject>& remote_video_track_map);
 
     ~AndroidParticipantObserver();
 
@@ -98,23 +100,29 @@ private:
     const webrtc_jni::ScopedGlobalRef<jobject> j_remote_participant_observer_;
     const webrtc_jni::ScopedGlobalRef<jclass> j_remote_participant_observer_class_;
     std::map<std::shared_ptr<twilio::media::RemoteAudioTrackPublication>, jobject>& remote_audio_track_publication_map_;
+    std::map<std::shared_ptr<twilio::media::RemoteAudioTrack>, jobject>& remote_audio_track_map_;
     std::map<std::shared_ptr<twilio::media::RemoteVideoTrackPublication>, jobject>& remote_video_track_publication_map_;
+    std::map<std::shared_ptr<twilio::media::RemoteVideoTrack>, jobject>& remote_video_track_map_;
     const webrtc_jni::ScopedGlobalRef<jclass> j_remote_audio_track_class_;
+    const webrtc_jni::ScopedGlobalRef<jclass> j_remote_audio_track_publication_class_;
     const webrtc_jni::ScopedGlobalRef<jclass> j_remote_video_track_class_;
-    jmethodID j_on_audio_track_added_;
-    jmethodID j_on_audio_track_removed_;
-    jmethodID j_on_subscribed_to_audio_track_;
-    jmethodID j_on_unsubscribed_from_audio_track_;
-    jmethodID j_on_video_track_added_;
-    jmethodID j_on_video_track_removed_;
-    jmethodID j_on_subscribed_to_video_track_;
-    jmethodID j_on_unsubscribed_from_video_track_;
+    const webrtc_jni::ScopedGlobalRef<jclass> j_remote_video_track_publication_class_;
+    jmethodID j_on_audio_track_published_;
+    jmethodID j_on_audio_track_unpublished_;
+    jmethodID j_on_audio_track_subscribed_;
+    jmethodID j_on_audio_track_unsubscribed_;
+    jmethodID j_on_video_track_published_;
+    jmethodID j_on_video_track_unpublished_;
+    jmethodID j_on_video_track_subscribed_;
+    jmethodID j_on_video_track_unsubscribed_;
     jmethodID j_on_audio_track_enabled_;
     jmethodID j_on_audio_track_disabled_;
     jmethodID j_on_video_track_enabled_;
     jmethodID j_on_video_track_disabled_;
     jmethodID j_audio_track_ctor_id_;
+    jmethodID j_audio_track_publication_ctor_id_;
     jmethodID j_video_track_ctor_id_;
+    jmethodID j_video_track_publication_ctor_id_;
 };
 
 }

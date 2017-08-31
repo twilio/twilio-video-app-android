@@ -20,36 +20,13 @@ package com.twilio.video;
  * A remote audio track represents a remote audio source.
  */
 public class RemoteAudioTrack extends AudioTrack {
-    private final String sid;
-    private boolean subscribed;
-    private org.webrtc.AudioTrack webRtcAudioTrack;
+    final org.webrtc.AudioTrack webRtcAudioTrack;
     private boolean playbackEnabled;
 
-    RemoteAudioTrack(String sid,
-                     String name,
-                     boolean isEnabled,
-                     boolean subscribed) {
+    RemoteAudioTrack(org.webrtc.AudioTrack webRtcAudioTrack, String name, boolean isEnabled) {
         super(isEnabled, name);
-        this.sid = sid;
-        this.subscribed = subscribed;
         this.playbackEnabled = true;
-    }
-
-    /**
-     * Returns a string that uniquely identifies the remote audio track within the scope
-     * of a {@link Room}.
-     *
-     * @return sid
-     */
-    public String getSid() {
-        return sid;
-    }
-
-    /**
-     * Check if remote audio track is subscribed to by {@link LocalParticipant}.
-     */
-    public synchronized boolean isSubscribed() {
-        return subscribed;
+        this.webRtcAudioTrack = webRtcAudioTrack;
     }
 
     /**
@@ -75,27 +52,5 @@ public class RemoteAudioTrack extends AudioTrack {
      */
     public synchronized boolean isPlaybackEnabled() {
         return playbackEnabled;
-    }
-
-    /*
-     * Called from JNI layer after a remote audio track has been subscribed to
-     */
-    @SuppressWarnings("unused")
-    synchronized void setWebRtcTrack(org.webrtc.AudioTrack webRtcAudioTrack) {
-        Preconditions.checkState(this.webRtcAudioTrack == null, "Did not invalidate WebRTC track " +
-                "before initializing new track");
-        this.webRtcAudioTrack = webRtcAudioTrack;
-        this.webRtcAudioTrack.setEnabled(playbackEnabled);
-    }
-
-    synchronized void invalidateWebRtcTrack() {
-        this.webRtcAudioTrack = null;
-    }
-
-    /*
-     * State updated by remote participant listener proxy.
-     */
-    synchronized void setSubscribed(boolean subscribed) {
-        this.subscribed = subscribed;
     }
 }

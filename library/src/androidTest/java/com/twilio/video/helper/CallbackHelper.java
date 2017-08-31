@@ -21,8 +21,10 @@ import com.twilio.video.LocalParticipant;
 import com.twilio.video.LocalAudioTrackPublication;
 import com.twilio.video.LocalVideoTrackPublication;
 import com.twilio.video.RemoteAudioTrack;
+import com.twilio.video.RemoteAudioTrackPublication;
 import com.twilio.video.RemoteParticipant;
 import com.twilio.video.RemoteVideoTrack;
+import com.twilio.video.RemoteVideoTrackPublication;
 import com.twilio.video.Room;
 import com.twilio.video.TwilioException;
 import com.twilio.video.StatsListener;
@@ -172,93 +174,97 @@ public class CallbackHelper {
         public final List<String> participantEvents = new ArrayList<>();
 
         @Override
-        public void onAudioTrackAdded(RemoteParticipant remoteParticipant,
-                                      RemoteAudioTrack remoteAudioTrack) {
-            participantEvents.add("onAudioTrackAdded");
+        public void onAudioTrackPublished(RemoteParticipant remoteParticipant,
+                                          RemoteAudioTrackPublication remoteAudioTrackPublication) {
+            participantEvents.add("onAudioTrackPublished");
             triggerLatch(onAudioTrackAddedLatch);
         }
 
         @Override
-        public void onAudioTrackRemoved(RemoteParticipant remoteParticipant,
-                                        RemoteAudioTrack remoteAudioTrack) {
-            participantEvents.add("onAudioTrackRemoved");
+        public void onAudioTrackUnpublished(RemoteParticipant remoteParticipant,
+                                            RemoteAudioTrackPublication remoteAudioTrackPublication) {
+            participantEvents.add("onAudioTrackUnpublished");
             triggerLatch(onAudioTrackRemovedLatch);
         }
 
         @Override
-        public void onSubscribedToAudioTrack(RemoteParticipant remoteParticipant,
-                                             RemoteAudioTrack remoteAudioTrack) {
-            assertTrue(remoteAudioTrack.isSubscribed());
-            participantEvents.add("onSubscribedToAudioTrack");
+        public void onAudioTrackSubscribed(RemoteParticipant remoteParticipant,
+                                           RemoteAudioTrackPublication remoteAudioTrackPublication,
+                                           RemoteAudioTrack remoteAudioTrack) {
+            assertTrue(remoteAudioTrackPublication.isTrackSubscribed());
+            participantEvents.add("onAudioTrackSubscribed");
             triggerLatch(onSubscribedToAudioTrackLatch);
         }
 
         @Override
-        public void onUnsubscribedFromAudioTrack(RemoteParticipant remoteParticipant,
-                                                 RemoteAudioTrack remoteAudioTrack) {
-            assertFalse(remoteAudioTrack.isSubscribed());
-            participantEvents.add("onUnsubscribedFromAudioTrack");
+        public void onAudioTrackUnsubscribed(RemoteParticipant remoteParticipant,
+                                             RemoteAudioTrackPublication remoteAudioTrackPublication,
+                                             RemoteAudioTrack remoteAudioTrack) {
+            assertFalse(remoteAudioTrackPublication.isTrackSubscribed());
+            participantEvents.add("onAudioTrackUnsubscribed");
             triggerLatch(onUnsubscribedFromAudioTrackLatch);
         }
 
         @Override
-        public void onVideoTrackAdded(RemoteParticipant remoteParticipant,
-                                      RemoteVideoTrack remoteVideoTrack) {
-            participantEvents.add("onVideoTrackAdded");
+        public void onVideoTrackPublished(RemoteParticipant remoteParticipant,
+                                          RemoteVideoTrackPublication remoteVideoTrackPublication) {
+            participantEvents.add("onVideoTrackPublished");
             triggerLatch(onVideoTrackAddedLatch);
         }
 
         @Override
-        public void onVideoTrackRemoved(RemoteParticipant remoteParticipant,
-                                        RemoteVideoTrack remoteVideoTrack) {
-            participantEvents.add("onVideoTrackRemoved");
+        public void onVideoTrackUnpublished(RemoteParticipant remoteParticipant,
+                                            RemoteVideoTrackPublication remoteVideoTrackPublication) {
+            participantEvents.add("onVideoTrackUnpublished");
             triggerLatch(onVideoTrackRemovedLatch);
         }
 
         @Override
-        public void onSubscribedToVideoTrack(RemoteParticipant remoteParticipant,
-                                             RemoteVideoTrack remoteVideoTrack) {
-            assertTrue(remoteVideoTrack.isSubscribed());
-            participantEvents.add("onSubscribedToVideoTrack");
+        public void onVideoTrackSubscribed(RemoteParticipant remoteParticipant,
+                                           RemoteVideoTrackPublication remoteVideoTrackPublication,
+                                           RemoteVideoTrack remoteVideoTrack) {
+            assertTrue(remoteVideoTrackPublication.isTrackSubscribed());
+            participantEvents.add("onVideoTrackSubscribed");
             triggerLatch(onSubscribedToVideoTrackLatch);
         }
 
         @Override
-        public void onUnsubscribedFromVideoTrack(RemoteParticipant remoteParticipant,
-                                                 RemoteVideoTrack remoteVideoTrack) {
-            assertFalse(remoteVideoTrack.isSubscribed());
-            participantEvents.add("onUnsubscribedFromVideoTrack");
+        public void onVideoTrackUnsubscribed(RemoteParticipant remoteParticipant,
+                                             RemoteVideoTrackPublication remoteVideoTrackPublication,
+                                             RemoteVideoTrack remoteVideoTrack) {
+            assertFalse(remoteVideoTrackPublication.isTrackSubscribed());
+            participantEvents.add("onVideoTrackUnsubscribed");
             triggerLatch(onUnsubscribedFromVideoTrackLatch);
         }
 
         @Override
         public void onAudioTrackEnabled(RemoteParticipant remoteParticipant,
-                                        RemoteAudioTrack remoteAudioTrack) {
-            assertTrue(remoteAudioTrack.isEnabled());
+                                        RemoteAudioTrackPublication remoteAudioTrackPublication) {
+            assertTrue(remoteAudioTrackPublication.isTrackEnabled());
             participantEvents.add("onAudioTrackEnabled");
             triggerLatch(onAudioTrackEnabledLatch);
         }
 
         @Override
         public void onAudioTrackDisabled(RemoteParticipant remoteParticipant,
-                                         RemoteAudioTrack remoteAudioTrack) {
-            assertFalse(remoteAudioTrack.isEnabled());
+                                         RemoteAudioTrackPublication remoteAudioTrackPublication) {
+            assertFalse(remoteAudioTrackPublication.isTrackEnabled());
             participantEvents.add("onAudioTrackDisabled");
             triggerLatch(onAudioTrackDisabledLatch);
         }
 
         @Override
         public void onVideoTrackEnabled(RemoteParticipant remoteParticipant,
-                                        RemoteVideoTrack remoteVideoTrack) {
-            assertTrue(remoteVideoTrack.isEnabled());
+                                        RemoteVideoTrackPublication remoteVideoTrackPublication) {
+            assertTrue(remoteVideoTrackPublication.isTrackEnabled());
             participantEvents.add("onVideoTrackEnabled");
             triggerLatch(onVideoTrackEnabledLatch);
         }
 
         @Override
         public void onVideoTrackDisabled(RemoteParticipant remoteParticipant,
-                                         RemoteVideoTrack remoteVideoTrack) {
-            assertFalse(remoteVideoTrack.isEnabled());
+                                         RemoteVideoTrackPublication remoteVideoTrackPublication) {
+            assertFalse(remoteVideoTrackPublication.isTrackEnabled());
             participantEvents.add("onVideoTrackDisabled");
             triggerLatch(onVideoTrackDisabledLatch);
         }
@@ -285,16 +291,16 @@ public class CallbackHelper {
         public final List<String> localParticipantEvents = new ArrayList<>();
 
         @Override
-        public void onPublishedAudioTrack(LocalParticipant localParticipant,
+        public void onAudioTrackPublished(LocalParticipant localParticipant,
                                           LocalAudioTrackPublication localAudioTrackPublication) {
-            localParticipantEvents.add("onPublishedAudioTrack");
+            localParticipantEvents.add("onAudioTrackPublished");
             triggerLatch(onPublishedAudioTrackLatch);
         }
 
         @Override
-        public void onPublishedVideoTrack(LocalParticipant localParticipant,
+        public void onVideoTrackPublished(LocalParticipant localParticipant,
                                           LocalVideoTrackPublication localVideoTrackPublication) {
-            localParticipantEvents.add("onPublishedVideoTrack");
+            localParticipantEvents.add("onVideoTrackPublished");
             triggerLatch(onPublishedVideoTrackLatch);
         }
     }

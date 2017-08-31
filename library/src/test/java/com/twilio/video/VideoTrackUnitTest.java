@@ -44,11 +44,6 @@ public class VideoTrackUnitTest {
         videoTrack.removeRenderer(null);
     }
 
-    @Test(expected = IllegalStateException.class)
-    public void setWebRtcTrack_shouldFailIfPreviousTrackNotInvalidated() {
-        videoTrack.setWebRtcTrack(Mockito.mock(org.webrtc.VideoTrack.class));
-    }
-
     /*
      * Simple concrete video track to test functionality in abstract class.
      */

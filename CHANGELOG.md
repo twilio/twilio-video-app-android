@@ -12,7 +12,6 @@ named tracks. The following snippet demonstrates how to create a video track nam
               screenCapturer, 
               "screen"); 
               
-- Added `getName` to `RemoteAudioTrack` and `RemoteVideoTrack`.
 - Moved `getTrackId` from `Track` to `LocalAudioTrack` and `LocalVideoTrack`.
 - Added `AudioCodec` and `VideoCodec` as part of the new codec preferences API. Audio and video
 codec preferences can be set in `ConnectOptions`. The following snippet
@@ -25,36 +24,67 @@ demonstrates how to prefer the iSAC audio codec and VP9 video codec.
               .build();
 
 - Added `RemoteAudioTrack` and `RemoteVideoTrack`. These new objects extend `AudioTrack` and 
-`VideoTrack` respectively and come with the following new methods: 
-  - `getSid` - Returns a unique identifier for the track within the scope of a `Room`
-  - `isSubscribed` - Indicates if the `LocalParticipant` is receiving audio or video.
+`VideoTrack` respectively and come with the following new method: 
+  - `getName` - Returns the name of the track or an empty string if no name is specified.
 - Added `enablePlayback` to new `RemoteAudioTrack` which allows developers to mute the audio 
  received from a `RemoteParticipant`.
+- Added `RemoteAudioTrackPublication` which represents a published `RemoteAudioTrack`. This new 
+class contains the following methods: 
+  - `getTrackSid` - Returns the identifier of a remote video track within the scope of a `Room`.
+  - `getTrackName` - Returns the name of the track or an empty string if no name was specified.
+  - `isTrackEnabled` - Checks if the track is enabled.
+  - `getAudioTrack` - Returns the base class object of the remote audio track published.
+  - `getRemoteAudioTrack` - Returns the remote audio track published.
+- Added `RemoteVideoTrackPublication` which represents a published `RemoteVideoTrack`. This new 
+class contains the following methods: 
+  - `getTrackSid` - Returns the identifier of a remote video track within the scope of a `Room`.
+  - `getTrackName` - Returns the name of the track or an empty string if no name was specified.
+  - `isTrackEnabled` - Checks if the track is enabled.
+  - `getAudioTrack` - Returns the base class object of the remote audio track published.
+  - `getRemoteAudioTrack` - Returns the remote audio track published.
+- Added `LocalAudioTrackPublication` which represents a published `LocalAudioTrack`. This new 
+class contains the following methods: 
+  - `getTrackSid` - Returns the identifier of a local video track within the scope of a `Room`.
+  - `getTrackName` - Returns the name of the track or an empty string if no name was specified.
+  - `isTrackEnabled` - Checks if the track is enabled.
+  - `getAudioTrack` - Returns the base class object of the local audio track published.
+  - `getLocalAudioTrack` - Returns the local audio track published.
+- Added `LocalVideoTrackPublication` which represents a published `LocalVideoTrack`. This new 
+class contains the following methods: 
+  - `getTrackSid` - Returns the identifier of a local video track within the scope of a `Room`.
+  - `getTrackName` - Returns the name of the track or an empty string if no name was specified.
+  - `isTrackEnabled` - Checks if the track is enabled.
+  - `getAudioTrack` - Returns the base class object of the local audio track published.
+  - `getLocalAudioTrack` - Returns the local audio track published.
 - Converted `Participant` to an interface and migrated previous functionality into 
 `RemoteParticipant`. `LocalParticipant` and the new `RemoteParticipant` implement `Participant`.
-- Added `RemoteParticipant#getRemoteAudioTracks` and `RemoteParticipant#getRemoteVideoTracks`.
+- Added `RemoteParticipant#getRemoteAudioTracks` and `RemoteParticipant#getRemoteVideoTracks` which
+return `List<RemoteAudioTrackPublication>` and `List<RemoteVideoTrackPublication>` respectively.
 - Moved `Participant.Listener` to `RemoteParticipant.Listener` and changed the listener to return
-`RemoteParticipant`, `RemoteAudioTrack`, and `RemoteVideoTrack` in callbacks.
+`RemoteParticipant`, `RemoteAudioTrackPublication`, and `RemoteVideoTrackPublication` in callbacks.
+- Renamed the following `RemoteParticipant.Listener` callbacks:
+  - `onAudioTrackAdded` renamed to `onAudioTrackPublished`.
+  - `onAudioTrackRemoved` renamed to `onAudioTrackUnpublished`.
+  - `onVideoTrackAdded` renamed to `onVideoTrackPublished`.
+  - `onVideoTrackRemoved` renamed to `onVideoTrackUnpublished`.
 - Added the following callbacks to `RemoteParticipant.Listener`:
-  - `onSubscribedToAudioTrack` - Indicates when audio is flowing from a remote particpant's audio 
-  track.
-  - `onUnsubscribedFromAudioTrack` - Indicates when audio is no longer flowing from a remote 
-  partipant's audio track.
-  - `onSubscribedToVideoTrack` - Indicates when video is flowing from a remote participant's video 
-  track.
-  - `onUnsubscribedFromVideoTrack` - Inidicates when video is no longer flowing from a remote
-  participant's video track.
+  - `onAudioTrackSubscribed` - Indicates when audio is flowing from a remote particpant's audio 
+  track. This callback includes the `RemoteAudioTrack` that was subscribed to.
+  - `onAudioTrackUnsubscribed` - Indicates when audio is no longer flowing from a remote 
+  partipant's audio track. This callback includes the `RemoteAudioTrack` that was subscribed to.
+  - `onVideoTrackSubscribed` - Indicates when video is flowing from a remote participant's video 
+  track. This callback includes the `RemoteVideoTrack` that was subscribed to.
+  - `onVideoTrackUnsubscribed` - Inidicates when video is no longer flowing from a remote
+  participant's video track. This callback includes the `RemoteVideoTrack` that was subscribed to.
 - Renamed `TrackStats` to `RemoteTrackStats`, `AudioTrackStats` to `RemoteAudioTrackStats`, and
 `VideoTrackStats` to `RemoteVideoTrackStats`
-- Added `LocalAudioTrackPublication` and `LocalVideoTrackPublication` that represent a published 
-`LocalAudioTrack` and `LocalVideoTrack`. These new classes contain the method `getSid` which returns
-the identifier of a local audio or video track within the scope of a `Room`.
 - Renamed `LocalParticipant#addAudioTrack` and `LocalParticipant#addVideoTrack` to 
-`LocalParticipant#publishedAudioTrack` and `LocalParticipant#publishVideoTrack`.
+`LocalParticipant#publishedTrack`.
 - Added `LocalParticipant.Listener` which is provides the following callbacks:
-  - `onPublishedAudioTrack` - Indicates when a local audio track has been published to a `Room`.
-  - `onPublishedVideoTrack` - Indicates when a local video track has been published to a `Room`.
-- Added `LocalParticipant#getAudioTrackPublications` and `LocalParticipant#getVideoTrackPublications`.
+  - `onAudioTrackPublished` - Indicates when a local audio track has been published to a `Room`.
+  - `onVideoTrackPublished` - Indicates when a local video track has been published to a `Room`.
+- Added `LocalParticipant#getLocalAudioTracks` and `LocalParticipant#getLocalVideoTracks` which
+return `List<LocalAudioTrackPublication>` and `List<LocalVideoTrackPublication>` respectively.
 
 Improvements
 

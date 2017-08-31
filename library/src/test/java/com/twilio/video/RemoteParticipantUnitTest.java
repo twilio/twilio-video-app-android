@@ -33,17 +33,18 @@ public class RemoteParticipantUnitTest {
 
     private final Random random = new Random();
     private RemoteParticipant remoteParticipant;
-    @Mock RemoteAudioTrack mockRemoteAudioTrack;
-    @Mock RemoteVideoTrack mockRemoteVideoTrackOne;
-    @Mock RemoteVideoTrack mockRemoteVideoTrackTwo;
+    @Mock RemoteAudioTrackPublication mockRemoteAudioTrackPublication;
+    @Mock RemoteVideoTrackPublication mockRemoteVideoTrackPublicationOne;
+    @Mock RemoteVideoTrackPublication mockRemoteVideoTrackPublicationTwo;
     @Mock Handler handler;
 
     @Before
     public void setup() {
         remoteParticipant = new RemoteParticipant(String.valueOf(random.nextInt(INT_MAX)),
                 String.valueOf(random.nextInt(INT_MAX)),
-                Arrays.asList(mockRemoteAudioTrack),
-                Arrays.asList(mockRemoteVideoTrackOne, mockRemoteVideoTrackTwo),
+                Arrays.asList(mockRemoteAudioTrackPublication),
+                Arrays.asList(mockRemoteVideoTrackPublicationOne,
+                        mockRemoteVideoTrackPublicationTwo),
                 handler,
                 random.nextLong());
     }
@@ -55,21 +56,21 @@ public class RemoteParticipantUnitTest {
 
     @Test(expected = UnsupportedOperationException.class)
     public void shouldNotAllowModifyingAudioTracks() {
-        remoteParticipant.getAudioTracks().add(mockRemoteAudioTrack);
+        remoteParticipant.getAudioTracks().add(mockRemoteAudioTrackPublication);
     }
 
     @Test(expected = UnsupportedOperationException.class)
     public void shouldNotAllowModifyingVideoTracks() {
-        remoteParticipant.getVideoTracks().add(mockRemoteVideoTrackOne);
+        remoteParticipant.getVideoTracks().add(mockRemoteVideoTrackPublicationOne);
     }
 
     @Test(expected = UnsupportedOperationException.class)
     public void shouldNotAllowModifyingSubscribedAudioTracks() {
-        remoteParticipant.getRemoteAudioTracks().add(mockRemoteAudioTrack);
+        remoteParticipant.getRemoteAudioTracks().add(mockRemoteAudioTrackPublication);
     }
 
     @Test(expected = UnsupportedOperationException.class)
     public void shouldNotAllowModifyingSubscribedVideoTracks() {
-        remoteParticipant.getRemoteVideoTracks().add(mockRemoteVideoTrackOne);
+        remoteParticipant.getRemoteVideoTracks().add(mockRemoteVideoTrackPublicationOne);
     }
 }

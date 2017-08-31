@@ -20,40 +20,8 @@ package com.twilio.video;
  * A remote video track represents a remote video source.
  */
 public class RemoteVideoTrack extends VideoTrack {
-    private final String sid;
-    private boolean subscribed;
-
-    RemoteVideoTrack(String sid,
-                     String name,
-                     boolean enabled,
-                     boolean subscribed) {
-        super(enabled, name);
-        this.sid = sid;
-        this.subscribed = subscribed;
-    }
-
-    /**
-     * Returns a string that uniquely identifies the remote video track within the scope
-     * of a {@link Room}.
-     *
-     * @return sid
-     */
-    public String getSid() {
-        return sid;
-    }
-
-    /**
-     * Check if remote video track is subscribed to by {@link LocalParticipant}.
-     */
-    public boolean isSubscribed() {
-        return subscribed;
-    }
-
-    /*
-     * State updated by remote participant listener proxy.
-     */
-    void setSubscribed(boolean subscribed) {
-        this.subscribed = subscribed;
+    RemoteVideoTrack(org.webrtc.VideoTrack webRtcVideoTrack, String name, boolean enabled) {
+        super(webRtcVideoTrack, enabled, name);
     }
 }
 

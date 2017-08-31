@@ -18,7 +18,6 @@ package com.twilio.video;
 
 import android.os.Handler;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -34,9 +33,9 @@ public class LocalParticipant implements Participant {
     private long nativeLocalParticipantHandle;
     private final String sid;
     private final String identity;
-    private final List<AudioTrack> audioTracks;
+    private final List<AudioTrackPublication> audioTrackPublications;
     private final List<LocalAudioTrackPublication> localAudioTrackPublications;
-    private final List<VideoTrack> videoTracks;
+    private final List<VideoTrackPublication> videoTrackPublications;
     private final List<LocalVideoTrackPublication> localVideoTrackPublications;
     private final Handler handler;
 
@@ -52,36 +51,38 @@ public class LocalParticipant implements Participant {
     @SuppressWarnings("unused")
     private final Listener localParticipantListenerProxy = new Listener() {
         @Override
-        public void onPublishedAudioTrack(final LocalParticipant localParticipant,
+        public void onAudioTrackPublished(final LocalParticipant localParticipant,
                                           final LocalAudioTrackPublication localAudioTrackPublication) {
-            checkCallback(localParticipant, localAudioTrackPublication, "onPublishedAudioTrack");
+            checkCallback(localParticipant, localAudioTrackPublication, "onAudioTrackPublished");
             handler.post(new Runnable() {
                 @Override
                 public void run() {
-                    logger.d("onPublishedAudioTrack");
+                    logger.d("onAudioTrackPublished");
+                    audioTrackPublications.add(localAudioTrackPublication);
                     localAudioTrackPublications.add(localAudioTrackPublication);
                     Listener listener = listenerReference.get();
 
                     if (listener != null) {
-                        listener.onPublishedAudioTrack(localParticipant, localAudioTrackPublication);
+                        listener.onAudioTrackPublished(localParticipant, localAudioTrackPublication);
                     }
                 }
             });
         }
 
         @Override
-        public void onPublishedVideoTrack(final LocalParticipant localParticipant,
+        public void onVideoTrackPublished(final LocalParticipant localParticipant,
                                           final LocalVideoTrackPublication localVideoTrackPublication) {
-            checkCallback(localParticipant, localVideoTrackPublication, "onPublishedVideoTrack");
+            checkCallback(localParticipant, localVideoTrackPublication, "onVideoTrackPublished");
             handler.post(new Runnable() {
                 @Override
                 public void run() {
-                    logger.d("onPublishedAudioTrack");
+                    logger.d("onAudioTrackPublished");
+                    videoTrackPublications.add(localVideoTrackPublication);
                     localVideoTrackPublications.add(localVideoTrackPublication);
                     Listener listener = listenerReference.get();
 
                     if (listener != null) {
-                        listener.onPublishedVideoTrack(localParticipant, localVideoTrackPublication);
+                        listener.onVideoTrackPublished(localParticipant, localVideoTrackPublication);
                     }
                 }
             });
@@ -113,32 +114,32 @@ public class LocalParticipant implements Participant {
     }
 
     /**
-     * Returns read-only list of audio tracks.
+     * Returns read-only list of audio track publications.
      */
     @Override
-    public synchronized List<AudioTrack> getAudioTracks() {
-        return Collections.unmodifiableList(audioTracks);
+    public synchronized List<AudioTrackPublication> getAudioTracks() {
+        return Collections.unmodifiableList(audioTrackPublications);
     }
 
     /**
-     * Returns read-only list of video tracks.
+     * Returns read-only list of video track publications.
      */
     @Override
-    public synchronized List<VideoTrack> getVideoTracks() {
-        return Collections.unmodifiableList(videoTracks);
+    public synchronized List<VideoTrackPublication> getVideoTracks() {
+        return Collections.unmodifiableList(videoTrackPublications);
     }
 
     /**
      * Returns read-only list of local audio track publications.
      */
-    public synchronized List<LocalAudioTrackPublication> getAudioTrackPublications() {
+    public synchronized List<LocalAudioTrackPublication> getLocalAudioTracks() {
         return Collections.unmodifiableList(localAudioTrackPublications);
     }
 
     /**
      * Returns read-only list of local video track publications.
      */
-    public synchronized List<LocalVideoTrackPublication> getVideoTrackPublications() {
+    public synchronized List<LocalVideoTrackPublication> getLocalVideoTracks() {
         return Collections.unmodifiableList(localVideoTrackPublications);
     }
 
@@ -148,18 +149,14 @@ public class LocalParticipant implements Participant {
      * @return true if the audio track published or false if the local participant is not connected
      * or the track was already published.
      */
-    public synchronized boolean publishAudioTrack(@NonNull LocalAudioTrack localAudioTrack) {
+    public synchronized boolean publishTrack(@NonNull LocalAudioTrack localAudioTrack) {
         Preconditions.checkNotNull(localAudioTrack, "LocalAudioTrack must not be null");
         if (isReleased()) {
             return false;
         } else {
-            boolean added = nativePublishAudioTrack(nativeLocalParticipantHandle,
+            return nativePublishAudioTrack(nativeLocalParticipantHandle,
                     localAudioTrack,
                     localAudioTrack.getNativeHandle());
-            if (added) {
-                audioTracks.add(localAudioTrack);
-            }
-            return added;
         }
     }
 
@@ -169,18 +166,14 @@ public class LocalParticipant implements Participant {
      * @return true if the video track was published or false if the local participant is
      * not connected or the track was already published.
      */
-    public synchronized boolean publishVideoTrack(@NonNull LocalVideoTrack localVideoTrack) {
+    public synchronized boolean publishTrack(@NonNull LocalVideoTrack localVideoTrack) {
         Preconditions.checkNotNull(localVideoTrack, "LocalVideoTrack must not be null");
         if (isReleased()) {
             return false;
         } else {
-            boolean added = nativePublishVideoTrack(nativeLocalParticipantHandle,
+            return nativePublishVideoTrack(nativeLocalParticipantHandle,
                     localVideoTrack,
                     localVideoTrack.getNativeHandle());
-            if (added) {
-                videoTracks.add(localVideoTrack);
-            }
-            return added;
         }
     }
 
@@ -191,13 +184,12 @@ public class LocalParticipant implements Participant {
      * connected or could not unpublish audio track.
      */
 
-    public synchronized boolean unpublishAudioTrack(@NonNull LocalAudioTrack localAudioTrack) {
+    public synchronized boolean unpublishTrack(@NonNull LocalAudioTrack localAudioTrack) {
         Preconditions.checkNotNull(localAudioTrack, "LocalAudioTrack must not be null");
         if (isReleased()) {
             return false;
         } else {
             removePublishedAudioTrack(localAudioTrack);
-            audioTracks.remove(localAudioTrack);
             return nativeUnpublishAudioTrack(nativeLocalParticipantHandle,
                     localAudioTrack.getNativeHandle());
         }
@@ -209,13 +201,12 @@ public class LocalParticipant implements Participant {
      * @return true if video track was unpublished or false if the local participant is not
      * connected or could not unpublish video track.
      */
-    public synchronized boolean unpublishVideoTrack(@NonNull LocalVideoTrack localVideoTrack) {
+    public synchronized boolean unpublishTrack(@NonNull LocalVideoTrack localVideoTrack) {
         Preconditions.checkNotNull(localVideoTrack, "LocalVideoTrack must not be null");
         if (isReleased()) {
             return false;
         } else {
             removePublishedVideoTrack(localVideoTrack);
-            videoTracks.remove(localVideoTrack);
             return nativeUnpublishVideoTrack(nativeLocalParticipantHandle,
                     localVideoTrack.getNativeHandle());
         }
@@ -235,8 +226,6 @@ public class LocalParticipant implements Participant {
     LocalParticipant(long nativeLocalParticipantHandle,
                      @NonNull String sid,
                      @NonNull String identity,
-                     @Nullable List<LocalAudioTrack> localAudioTracks,
-                     @Nullable List<LocalVideoTrack> localVideoTracks,
                      @NonNull List<LocalAudioTrackPublication> localAudioTrackPublications,
                      @NonNull List<LocalVideoTrackPublication> localVideoTrackPublications,
                      @NonNull Handler handler) {
@@ -246,25 +235,12 @@ public class LocalParticipant implements Participant {
         this.nativeLocalParticipantHandle = nativeLocalParticipantHandle;
         this.sid = sid;
         this.identity = identity;
-
-        // Setup audio tracks
-        if (localAudioTracks == null) {
-            this.audioTracks = new ArrayList<>();
-        } else {
-            this.audioTracks = new ArrayList<>(localAudioTracks.size());
-            addAudioTracks(localAudioTracks);
-        }
-
-        // Setup video tracks
-        if (localVideoTracks == null) {
-            this.videoTracks = new ArrayList<>();
-        } else {
-            this.videoTracks = new ArrayList<>(localVideoTracks.size());
-            addVideoTracks(localVideoTracks);
-        }
-
         this.localAudioTrackPublications = localAudioTrackPublications;
+        this.audioTrackPublications = new ArrayList<>(localAudioTrackPublications.size());
+        addAudioTracks(localAudioTrackPublications);
         this.localVideoTrackPublications = localVideoTrackPublications;
+        this.videoTrackPublications = new ArrayList<>(localVideoTrackPublications.size());
+        addVideoTracks(localVideoTrackPublications);
         this.handler = handler;
     }
 
@@ -282,21 +258,22 @@ public class LocalParticipant implements Participant {
         return nativeLocalParticipantHandle == 0;
     }
 
-    private void addAudioTracks(List<LocalAudioTrack> localAudioTracks) {
-        for (LocalAudioTrack localAudioTrack : localAudioTracks) {
-            this.audioTracks.add(localAudioTrack);
+    private void addAudioTracks(List<LocalAudioTrackPublication> localAudioTrackPublications) {
+        for (LocalAudioTrackPublication localAudioTrackPublication : localAudioTrackPublications) {
+            this.audioTrackPublications.add(localAudioTrackPublication);
         }
     }
 
-    private void addVideoTracks(List<LocalVideoTrack> localVideoTracks) {
-        for (LocalVideoTrack localVideoTrack : localVideoTracks) {
-            this.videoTracks.add(localVideoTrack);
+    private void addVideoTracks(List<LocalVideoTrackPublication> localVideoTrackPublications) {
+        for (LocalVideoTrackPublication localVideoTrackPublication : localVideoTrackPublications) {
+            this.videoTrackPublications.add(localVideoTrackPublication);
         }
     }
 
     private void removePublishedAudioTrack(LocalAudioTrack localAudioTrack) {
         for (LocalAudioTrackPublication localAudioTrackPublication : localAudioTrackPublications) {
             if (localAudioTrack.equals(localAudioTrackPublication.getLocalAudioTrack())) {
+                audioTrackPublications.remove(localAudioTrackPublication);
                 localAudioTrackPublications.remove(localAudioTrackPublication);
                 return;
             }
@@ -306,6 +283,7 @@ public class LocalParticipant implements Participant {
     private void removePublishedVideoTrack(LocalVideoTrack localVideoTrack) {
         for (LocalVideoTrackPublication localVideoTrackPublication : localVideoTrackPublications) {
             if (localVideoTrack.equals(localVideoTrackPublication.getLocalVideoTrack())) {
+                videoTrackPublications.remove(localVideoTrackPublication);
                 localVideoTrackPublications.remove(localVideoTrackPublication);
                 return;
             }
@@ -323,7 +301,7 @@ public class LocalParticipant implements Participant {
          * @param localParticipant The local participant that published the audio track.
          * @param localAudioTrackPublication The published local audio track.
          */
-        void onPublishedAudioTrack(LocalParticipant localParticipant,
+        void onAudioTrackPublished(LocalParticipant localParticipant,
                                    LocalAudioTrackPublication localAudioTrackPublication);
         /**
          * This method notifies the listener that a {@link LocalVideoTrack} has been shared to a
@@ -332,7 +310,7 @@ public class LocalParticipant implements Participant {
          * @param localParticipant The local participant that published the video track.
          * @param localVideoTrackPublication The published local video track.
          */
-        void onPublishedVideoTrack(LocalParticipant localParticipant,
+        void onVideoTrackPublished(LocalParticipant localParticipant,
                                    LocalVideoTrackPublication localVideoTrackPublication);
     }
 

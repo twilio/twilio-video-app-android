@@ -169,7 +169,7 @@ public class RemoteParticipantTopologyParameterizedTest extends BaseParticipantT
         participantListener.onSubscribedToAudioTrackLatch = new CountDownLatch(1);
         bobRemoteParticipant.setListener(participantListener);
         bobLocalAudioTrack = LocalAudioTrack.create(mediaTestActivity, true);
-        assertTrue(bobRoom.getLocalParticipant().publishAudioTrack(bobLocalAudioTrack));
+        assertTrue(bobRoom.getLocalParticipant().publishTrack(bobLocalAudioTrack));
         assertTrue(participantListener.onAudioTrackAddedLatch.await(20, TimeUnit.SECONDS));
         assertTrue(participantListener.onSubscribedToAudioTrackLatch.await(20, TimeUnit.SECONDS));
 
@@ -186,7 +186,7 @@ public class RemoteParticipantTopologyParameterizedTest extends BaseParticipantT
         // Audio track removed and unsubscribed
         participantListener.onAudioTrackRemovedLatch = new CountDownLatch(1);
         participantListener.onUnsubscribedFromAudioTrackLatch = new CountDownLatch(1);
-        bobRoom.getLocalParticipant().unpublishAudioTrack(bobLocalAudioTrack);
+        bobRoom.getLocalParticipant().unpublishTrack(bobLocalAudioTrack);
         assertTrue(participantListener.onUnsubscribedFromAudioTrackLatch.await(20,
                 TimeUnit.SECONDS));
         assertTrue(participantListener.onAudioTrackRemovedLatch.await(20, TimeUnit.SECONDS));
@@ -196,7 +196,7 @@ public class RemoteParticipantTopologyParameterizedTest extends BaseParticipantT
         participantListener.onSubscribedToVideoTrackLatch = new CountDownLatch(1);
         bobLocalVideoTrack = LocalVideoTrack.create(mediaTestActivity, true,
                 new FakeVideoCapturer());
-        assertTrue(bobRoom.getLocalParticipant().publishVideoTrack(bobLocalVideoTrack));
+        assertTrue(bobRoom.getLocalParticipant().publishTrack(bobLocalVideoTrack));
         assertTrue(participantListener.onVideoTrackAddedLatch.await(20, TimeUnit.SECONDS));
         assertTrue(participantListener.onSubscribedToVideoTrackLatch.await(20, TimeUnit.SECONDS));
 
@@ -213,25 +213,25 @@ public class RemoteParticipantTopologyParameterizedTest extends BaseParticipantT
         // Video track removed and unsubscribed
         participantListener.onVideoTrackRemovedLatch = new CountDownLatch(1);
         participantListener.onUnsubscribedFromVideoTrackLatch = new CountDownLatch(1);
-        bobRoom.getLocalParticipant().unpublishVideoTrack(bobLocalVideoTrack);
+        bobRoom.getLocalParticipant().unpublishTrack(bobLocalVideoTrack);
         assertTrue(participantListener.onUnsubscribedFromVideoTrackLatch.await(20,
                 TimeUnit.SECONDS));
         assertTrue(participantListener.onVideoTrackRemovedLatch.await(20, TimeUnit.SECONDS));
 
         // Validate the order of events
         String[] expectedParticipantEvents = new String[] {
-                "onAudioTrackAdded",
-                "onSubscribedToAudioTrack",
+                "onAudioTrackPublished",
+                "onAudioTrackSubscribed",
                 "onAudioTrackDisabled",
                 "onAudioTrackEnabled",
-                "onUnsubscribedFromAudioTrack",
-                "onAudioTrackRemoved",
-                "onVideoTrackAdded",
-                "onSubscribedToVideoTrack",
+                "onAudioTrackUnsubscribed",
+                "onAudioTrackUnpublished",
+                "onVideoTrackPublished",
+                "onVideoTrackSubscribed",
                 "onVideoTrackDisabled",
                 "onVideoTrackEnabled",
-                "onUnsubscribedFromVideoTrack",
-                "onVideoTrackRemoved"
+                "onVideoTrackUnsubscribed",
+                "onVideoTrackUnpublished"
         };
         assertArrayEquals(expectedParticipantEvents,
                 participantListener.participantEvents.toArray());
@@ -245,25 +245,25 @@ public class RemoteParticipantTopologyParameterizedTest extends BaseParticipantT
         participantListener.onSubscribedToAudioTrackLatch = new CountDownLatch(1);
         this.bobRemoteParticipant.setListener(participantListener);
         bobLocalAudioTrack = LocalAudioTrack.create(mediaTestActivity, false);
-        assertTrue(bobRoom.getLocalParticipant().publishAudioTrack(bobLocalAudioTrack));
+        assertTrue(bobRoom.getLocalParticipant().publishTrack(bobLocalAudioTrack));
         assertTrue(participantListener.onSubscribedToAudioTrackLatch.await(20, TimeUnit.SECONDS));
         participantListener.onSubscribedToVideoTrackLatch = new CountDownLatch(1);
         bobLocalVideoTrack = LocalVideoTrack.create(mediaTestActivity, true,
                 new FakeVideoCapturer());
-        assertTrue(bobRoom.getLocalParticipant().publishVideoTrack(bobLocalVideoTrack));
+        assertTrue(bobRoom.getLocalParticipant().publishTrack(bobLocalVideoTrack));
         assertTrue(participantListener.onSubscribedToVideoTrackLatch.await(20, TimeUnit.SECONDS));
 
         // Cache bobRemoteParticipant two tracks
-        List<RemoteAudioTrack> remoteAudioTracks = aliceRoomListener
+        List<RemoteAudioTrackPublication> remoteAudioTrackPublications = aliceRoomListener
                 .getRemoteParticipant()
                 .getRemoteAudioTracks();
-        List<AudioTrack> audioTracks = aliceRoomListener
+        List<AudioTrackPublication> audioTrackPublications = aliceRoomListener
                 .getRemoteParticipant()
                 .getAudioTracks();
-        List<RemoteVideoTrack> remoteVideoTracks = aliceRoomListener
+        List<RemoteVideoTrackPublication> remoteVideoTrackPublications = aliceRoomListener
                 .getRemoteParticipant()
                 .getRemoteVideoTracks();
-        List<VideoTrack> videoTracks = aliceRoomListener
+        List<VideoTrackPublication> videoTrackPublications = aliceRoomListener
                 .getRemoteParticipant()
                 .getVideoTracks();
 
@@ -274,27 +274,29 @@ public class RemoteParticipantTopologyParameterizedTest extends BaseParticipantT
         RemoteParticipant remoteParticipant = aliceRoomListener.getRemoteParticipant();
 
         // Validate enabled matches last known state
-        assertEquals(remoteAudioTracks.get(0).isEnabled(),
-                remoteParticipant.getRemoteAudioTracks().get(0).isEnabled());
-        assertEquals(audioTracks.get(0).isEnabled(),
-                remoteParticipant.getAudioTracks().get(0).isEnabled());
-        assertEquals(remoteVideoTracks.get(0).isEnabled(),
-                remoteParticipant.getRemoteVideoTracks().get(0).isEnabled());
-        assertEquals(videoTracks.get(0).isEnabled(),
-                remoteParticipant.getVideoTracks().get(0).isEnabled());
+        assertEquals(remoteAudioTrackPublications.get(0).isTrackEnabled(),
+                remoteParticipant.getRemoteAudioTracks().get(0).isTrackEnabled());
+        assertEquals(audioTrackPublications.get(0).isTrackEnabled(),
+                remoteParticipant.getAudioTracks().get(0).isTrackEnabled());
+        assertEquals(remoteVideoTrackPublications.get(0).isTrackEnabled(),
+                remoteParticipant.getRemoteVideoTracks().get(0).isTrackEnabled());
+        assertEquals(videoTrackPublications.get(0).isTrackEnabled(),
+                remoteParticipant.getVideoTracks().get(0).isTrackEnabled());
 
         // Validate alice is no longer subscribed to bob tracks
-        assertFalse(remoteParticipant.getRemoteAudioTracks().get(0).isSubscribed());
-        assertEquals(remoteAudioTracks.get(0).isSubscribed(),
-                remoteParticipant.getRemoteAudioTracks().get(0).isSubscribed());
-        assertFalse(remoteParticipant.getRemoteVideoTracks().get(0).isSubscribed());
-        assertEquals(remoteVideoTracks.get(0).isSubscribed(),
-                remoteParticipant.getRemoteVideoTracks().get(0).isSubscribed());
+        assertFalse(remoteParticipant.getRemoteAudioTracks().get(0).isTrackSubscribed());
+        assertEquals(remoteAudioTrackPublications.get(0).isTrackSubscribed(),
+                remoteParticipant.getRemoteAudioTracks().get(0).isTrackSubscribed());
+        assertFalse(remoteParticipant.getRemoteVideoTracks().get(0).isTrackSubscribed());
+        assertEquals(remoteVideoTrackPublications.get(0).isTrackSubscribed(),
+                remoteParticipant.getRemoteVideoTracks().get(0).isTrackSubscribed());
 
         // Validate the track objects are equal
-        assertEquals(remoteAudioTracks.get(0), remoteParticipant.getRemoteAudioTracks().get(0));
-        assertEquals(audioTracks.get(0), remoteParticipant.getAudioTracks().get(0));
-        assertEquals(remoteVideoTracks.get(0), remoteParticipant.getRemoteVideoTracks().get(0));
-        assertEquals(videoTracks.get(0), remoteParticipant.getVideoTracks().get(0));
+        assertEquals(remoteAudioTrackPublications.get(0),
+                remoteParticipant.getRemoteAudioTracks().get(0));
+        assertEquals(audioTrackPublications.get(0), remoteParticipant.getAudioTracks().get(0));
+        assertEquals(remoteVideoTrackPublications.get(0),
+                remoteParticipant.getRemoteVideoTracks().get(0));
+        assertEquals(videoTrackPublications.get(0), remoteParticipant.getVideoTracks().get(0));
     }
 }

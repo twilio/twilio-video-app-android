@@ -32,7 +32,9 @@ extern "C" {
 struct RemoteParticipantContext {
     std::shared_ptr<twilio::video::RemoteParticipant> remote_participant;
     std::map<std::shared_ptr<twilio::media::RemoteAudioTrackPublication>, jobject> remote_audio_track_publication_map;
+    std::map<std::shared_ptr<twilio::media::RemoteAudioTrack>, jobject> remote_audio_track_map;
     std::map<std::shared_ptr<twilio::media::RemoteVideoTrackPublication>, jobject> remote_video_track_publication_map;
+    std::map<std::shared_ptr<twilio::media::RemoteVideoTrack>, jobject> remote_video_track_map;
     std::shared_ptr<AndroidParticipantObserver> android_participant_observer;
 };
 
@@ -44,9 +46,13 @@ jobject createJavaRemoteParticipant(JNIEnv *env,
                                     jmethodID j_array_list_ctor_id,
                                     jmethodID j_array_list_add,
                                     jclass j_remote_audio_track_class,
+                                    jclass j_remote_audio_track_publication_class,
                                     jmethodID j_remote_audio_track_ctor_id,
+                                    jmethodID j_remote_audio_track_publication_ctor_id,
                                     jclass j_remote_video_track_class,
+                                    jclass j_remote_video_track_publication_class,
                                     jmethodID j_remote_video_track_ctor_id,
+                                    jmethodID j_remote_video_track_publication_ctor_id,
                                     jobject j_handler);
 
 jobject createRemoteParticipantAudioTracks(JNIEnv *env,
@@ -55,7 +61,9 @@ jobject createRemoteParticipantAudioTracks(JNIEnv *env,
                                            jmethodID j_array_list_ctor_id,
                                            jmethodID j_array_list_add,
                                            jclass j_remote_audio_track_class,
-                                           jmethodID j_remote_audio_track_ctor_id);
+                                           jclass j_remote_audio_track_publication_class,
+                                           jmethodID j_remote_audio_track_ctor_id,
+                                           jmethodID j_remote_audio_track_publication_ctor_id);
 
 jobject createRemoteParticipantVideoTracks(JNIEnv *env,
                                            RemoteParticipantContext *remote_participant_context,
@@ -63,17 +71,31 @@ jobject createRemoteParticipantVideoTracks(JNIEnv *env,
                                            jmethodID j_array_list_ctor_id,
                                            jmethodID j_array_list_add,
                                            jclass j_remote_video_track_class,
-                                           jmethodID j_remote_video_track_ctor_id);
+                                           jclass j_remote_video_track_publication_class,
+                                           jmethodID j_remote_video_track_ctor_id,
+                                           jmethodID j_remote_video_track_publication_ctor_id);
 
 jobject createJavaRemoteAudioTrack(JNIEnv *env,
-                                   std::shared_ptr<twilio::media::RemoteAudioTrackPublication> remote_audio_track_publication,
+                                   std::shared_ptr<twilio::media::RemoteAudioTrack> remote_audio_track,
+                                   jobject j_webrtc_audio_track,
                                    jclass j_remote_audio_track_class,
                                    jmethodID j_remote_audio_track_ctor_id);
 
 jobject createJavaRemoteVideoTrack(JNIEnv *env,
-                                   std::shared_ptr<twilio::media::RemoteVideoTrackPublication> remote_video_track_publication,
+                                   std::shared_ptr<twilio::media::RemoteVideoTrack> remote_video_track,
+                                   jobject j_webrtc_video_track,
                                    jclass j_remote_video_track_class,
                                    jmethodID j_remote_video_track_ctor_id);
+
+jobject createJavaRemoteAudioTrackPublication(JNIEnv *env,
+                                              std::shared_ptr<twilio::media::RemoteAudioTrackPublication> remote_audio_track_publication,
+                                              jclass j_remote_audio_track_publication_class,
+                                              jmethodID j_remote_audio_track_publication_ctor_id);
+
+jobject createJavaRemoteVideoTrackPublication(JNIEnv *env,
+                                              std::shared_ptr<twilio::media::RemoteVideoTrackPublication> remote_video_track_publication,
+                                              jclass j_remote_video_track_publication_class,
+                                              jmethodID j_remote_video_track_publication_ctor_id);
 
 JNIEXPORT jboolean JNICALL Java_com_twilio_video_RemoteParticipant_nativeIsConnected
         (JNIEnv *, jobject, jlong);

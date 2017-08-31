@@ -39,8 +39,25 @@ public class LocalVideoTrackPublication implements VideoTrackPublication {
      * video track within the scope of a {@link Room}.
      */
     @Override
-    public String getSid() {
+    public String getTrackSid() {
         return sid;
+    }
+
+    /**
+     * Returns the name of the local video track. An empty string is returned if no name was
+     * specified.
+     */
+    @Override
+    public String getTrackName() {
+        return localVideoTrack.getName();
+    }
+
+    /**
+     * Check if local video track is enabled.
+     */
+    @Override
+    public boolean isTrackEnabled() {
+        return localVideoTrack.isEnabled();
     }
 
     /**

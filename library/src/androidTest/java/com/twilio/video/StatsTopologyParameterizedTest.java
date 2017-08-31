@@ -133,7 +133,7 @@ public class StatsTopologyParameterizedTest extends BaseStatsTest {
 
         LocalParticipant bobLocalParticipant = bobRoom.getLocalParticipant();
         bobLocalAudioTrack = LocalAudioTrack.create(mediaTestActivity, true);
-        assertTrue(bobLocalParticipant.publishAudioTrack(bobLocalAudioTrack));
+        assertTrue(bobLocalParticipant.publishTrack(bobLocalAudioTrack));
         assertTrue(participantListener.onSubscribedToAudioTrackLatch.await(20, TimeUnit.SECONDS));
 
         // let's give peer connection some time to get media flowing
@@ -152,7 +152,7 @@ public class StatsTopologyParameterizedTest extends BaseStatsTest {
         // Add video track to bob and check stats
         bobLocalVideoTrack = LocalVideoTrack
                 .create(mediaTestActivity, true, new FakeVideoCapturer());
-        assertTrue(bobLocalParticipant.publishVideoTrack(bobLocalVideoTrack));
+        assertTrue(bobLocalParticipant.publishTrack(bobLocalVideoTrack));
         assertTrue(participantListener.onSubscribedToVideoTrackLatch.await(20, TimeUnit.SECONDS));
 
         // let's give peer connection some time to get media flowing
@@ -168,7 +168,7 @@ public class StatsTopologyParameterizedTest extends BaseStatsTest {
         expectStatsReportTracksSize(statsReport, 1, 0, 1, 1);
 
         // Remove Bob's video track and check the stats
-        bobLocalParticipant.unpublishVideoTrack(bobLocalVideoTrack);
+        bobLocalParticipant.unpublishTrack(bobLocalVideoTrack);
         assertTrue(participantListener.onUnsubscribedFromVideoTrackLatch.await(20, TimeUnit.SECONDS));
 
         // let's give peer connection some time to get media flowing
@@ -202,10 +202,10 @@ public class StatsTopologyParameterizedTest extends BaseStatsTest {
         // Add audio and video track to alice
         aliceLocalVideoTrack = LocalVideoTrack
                 .create(mediaTestActivity, true, new FakeVideoCapturer());
-        assertTrue(aliceLocalParticipant.publishVideoTrack(aliceLocalVideoTrack));
+        assertTrue(aliceLocalParticipant.publishTrack(aliceLocalVideoTrack));
 
         aliceLocalAudioTrack = LocalAudioTrack.create(mediaTestActivity, true);
-        assertTrue(aliceLocalParticipant.publishAudioTrack(aliceLocalAudioTrack));
+        assertTrue(aliceLocalParticipant.publishTrack(aliceLocalAudioTrack));
 
         // let's give peer connection some time to get media flowing
         Thread.sleep(2500);

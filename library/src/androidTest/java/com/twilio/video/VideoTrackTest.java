@@ -35,8 +35,6 @@ import static org.junit.Assert.assertTrue;
 
 @RunWith(AndroidJUnit4.class)
 public class VideoTrackTest {
-    private static final int RENDER_FRAME_DELAY_MS = 3000;
-
     private Context context;
     private final FrameCountRenderer frameCountRenderer = new FrameCountRenderer();
     private LocalVideoTrack localVideoTrack;
@@ -74,79 +72,12 @@ public class VideoTrackTest {
         videoTrack.release();
     }
 
-    @Test
-    public void invalidateWebRtcTrack_shouldBeIdempotent() {
-        videoTrack.invalidateWebRtcTrack();
-        videoTrack.invalidateWebRtcTrack();
-    }
-
-    /*
-     * This test validates the scenario where a developer can add a renderer to a RemoteVideoTrack
-     * after it is added but before it is subscribed to.
-     */
-    @Test
-    public void canAddRendererBeforeWebRtcTrackSet() throws InterruptedException {
-        VideoTrack videoTrack = new InstrumentationTestVideoTrack(true);
-
-        // Add renderer before webrtc track is set
-        videoTrack.addRenderer(frameCountRenderer);
-
-        // Assert that we see no frames
-        assertNoFramesRendered(frameCountRenderer, RENDER_FRAME_DELAY_MS);
-
-        // Set webrtc track
-        videoTrack.setWebRtcTrack(localVideoTrack.getWebRtcTrack());
-
-        // Validate that we now render frames
-        assertFramesRendered(frameCountRenderer, RENDER_FRAME_DELAY_MS);
-    }
-
-    /*
-     * This test validates the scenario where a developer can render frames when the following
-     * sequence occurs:
-     *
-     * 1. Remote track is subscribed to
-     * 2. Rendered added
-     * 2. Remove track is unsubscribed from
-     * 3. Remote track is subscribed to again
-     */
-    @Test
-    public void canRenderFramesAfterWebRtcTrackIsReset() throws InterruptedException {
-        // Add renderer
-        videoTrack.addRenderer(frameCountRenderer);
-
-        // Assert that we see frames
-        assertFramesRendered(frameCountRenderer, RENDER_FRAME_DELAY_MS);
-
-        // Invalidate WebRTC track
-        videoTrack.invalidateWebRtcTrack();
-
-        // Assert that no frames are received
-        assertNoFramesRendered(frameCountRenderer, RENDER_FRAME_DELAY_MS);
-
-        // Set webrtc track
-        LocalVideoTrack newVideoTrack = LocalVideoTrack.create(context, true,
-                new FakeVideoCapturer());
-        videoTrack.setWebRtcTrack(newVideoTrack.getWebRtcTrack());
-
-        // Validate that we render frames again
-        assertFramesRendered(frameCountRenderer, RENDER_FRAME_DELAY_MS);
-
-        // Release tracks
-        videoTrack.release();
-        newVideoTrack.release();
-    }
-
     /*
      * Concrete video track to test functionality in abstract class.
      */
     private static class InstrumentationTestVideoTrack extends VideoTrack {
         InstrumentationTestVideoTrack(org.webrtc.VideoTrack webRtcVideoTrack) {
             super(webRtcVideoTrack, true, "");
-        }
-
-        InstrumentationTestVideoTrack(boolean enabled) {
-            super(enabled, "");
         }
     }
 }

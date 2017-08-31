@@ -151,8 +151,8 @@ public class VideoTopologyParameterizedTest extends BaseClientTest {
         // Validate tracks in local participant
         LocalParticipant localParticipant = room.getLocalParticipant();
         assertNotNull(localParticipant.getAudioTracks().get(0));
-        assertEquals(localAudioTrack, localParticipant.getAudioTracks().get(0));
-        assertTrue(localParticipant.unpublishAudioTrack(localAudioTrack));
+        assertEquals(localAudioTrack, localParticipant.getAudioTracks().get(0).getAudioTrack());
+        assertTrue(localParticipant.unpublishTrack(localAudioTrack));
     }
 
     @Test
@@ -171,9 +171,9 @@ public class VideoTopologyParameterizedTest extends BaseClientTest {
         room = Video.connect(mediaTestActivity, connectOptions, roomListener);
         assertTrue(roomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
         LocalParticipant localParticipant = room.getLocalParticipant();
-        assertNotNull(localParticipant.getVideoTrackPublications().get(0));
-        assertEquals(localVideoTrack, localParticipant.getVideoTracks().get(0));
-        assertTrue(localParticipant.unpublishVideoTrack(localVideoTrack));
+        assertNotNull(localParticipant.getLocalVideoTracks().get(0));
+        assertEquals(localVideoTrack, localParticipant.getVideoTracks().get(0).getVideoTrack());
+        assertTrue(localParticipant.unpublishTrack(localVideoTrack));
     }
 
     @Test
@@ -196,12 +196,12 @@ public class VideoTopologyParameterizedTest extends BaseClientTest {
         room = Video.connect(mediaTestActivity, connectOptions, roomListener);
         assertTrue(roomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
         LocalParticipant localParticipant = room.getLocalParticipant();
-        assertNotNull(localParticipant.getAudioTrackPublications().get(0));
-        assertEquals(localAudioTrack, localParticipant.getAudioTracks().get(0));
-        assertNotNull(localParticipant.getVideoTrackPublications().get(0));
-        assertEquals(localVideoTrack, localParticipant.getVideoTracks().get(0));
-        assertTrue(localParticipant.unpublishAudioTrack(localAudioTrack));
-        assertTrue(localParticipant.unpublishVideoTrack(localVideoTrack));
+        assertNotNull(localParticipant.getLocalAudioTracks().get(0));
+        assertEquals(localAudioTrack, localParticipant.getAudioTracks().get(0).getAudioTrack());
+        assertNotNull(localParticipant.getLocalVideoTracks().get(0));
+        assertEquals(localVideoTrack, localParticipant.getVideoTracks().get(0).getVideoTrack());
+        assertTrue(localParticipant.unpublishTrack(localAudioTrack));
+        assertTrue(localParticipant.unpublishTrack(localVideoTrack));
     }
 
     @Test
@@ -234,8 +234,8 @@ public class VideoTopologyParameterizedTest extends BaseClientTest {
 
         localVideoTrack.release();
         assertTrue(roomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
-        assertEquals(localVideoTrack, room.getLocalParticipant().getVideoTrackPublications().get(0).getLocalVideoTrack());
-        assertTrue(room.getLocalParticipant().getVideoTrackPublications().get(0).getLocalVideoTrack().isReleased());
+        assertEquals(localVideoTrack, room.getLocalParticipant().getLocalVideoTracks().get(0).getLocalVideoTrack());
+        assertTrue(room.getLocalParticipant().getLocalVideoTracks().get(0).getLocalVideoTrack().isReleased());
     }
 
     @Test
@@ -255,8 +255,8 @@ public class VideoTopologyParameterizedTest extends BaseClientTest {
 
         localAudioTrack.release();
         assertTrue(roomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
-        assertEquals(localAudioTrack, room.getLocalParticipant().getAudioTrackPublications().get(0).getLocalAudioTrack());
-        assertTrue(room.getLocalParticipant().getAudioTrackPublications().get(0).getLocalAudioTrack().isReleased());
+        assertEquals(localAudioTrack, room.getLocalParticipant().getLocalAudioTracks().get(0).getLocalAudioTrack());
+        assertTrue(room.getLocalParticipant().getLocalAudioTracks().get(0).getLocalAudioTrack().isReleased());
     }
 
     @Test

@@ -71,11 +71,12 @@ public class RemoteAudioTrackTopologyParameterizedTest extends BaseParticipantTe
         publishAudioTrack();
 
         // Validate track was added
-        List<RemoteAudioTrack> remoteAudioTracks = bobRemoteParticipant.getRemoteAudioTracks();
-        assertEquals(1, remoteAudioTracks.size());
+        List<RemoteAudioTrackPublication> remoteAudioTrackPublications =
+                bobRemoteParticipant.getRemoteAudioTracks();
+        assertEquals(1, remoteAudioTrackPublications.size());
 
         // Validate track sid
-        assertIsTrackSid(remoteAudioTracks.get(0).getSid());
+        assertIsTrackSid(remoteAudioTrackPublications.get(0).getTrackSid());
     }
 
     @Test
@@ -83,11 +84,12 @@ public class RemoteAudioTrackTopologyParameterizedTest extends BaseParticipantTe
         publishAudioTrack();
 
         // Validate track was added
-        List<RemoteAudioTrack> remoteAudioTracks = bobRemoteParticipant.getRemoteAudioTracks();
-        assertEquals(1, remoteAudioTracks.size());
+        List<RemoteAudioTrackPublication> remoteAudioTrackPublications = bobRemoteParticipant
+                .getRemoteAudioTracks();
+        assertEquals(1, remoteAudioTrackPublications.size());
 
         // Validate track name
-        assertEquals(bobAudioTrackName, remoteAudioTracks.get(0).getName());
+        assertEquals(bobAudioTrackName, remoteAudioTrackPublications.get(0).getTrackName());
     }
 
     @Test
@@ -97,14 +99,15 @@ public class RemoteAudioTrackTopologyParameterizedTest extends BaseParticipantTe
         publishAudioTrack();
 
         // Get bobs remote audio track
-        RemoteAudioTrack bobRemoteAudioTrack = bobRemoteParticipant.getRemoteAudioTracks().get(0);
+        RemoteAudioTrackPublication bobRemoteAudioTrackPublication =
+                bobRemoteParticipant.getRemoteAudioTracks().get(0);
 
         // Validate that playback is enabled by default
-        assertTrue(bobRemoteAudioTrack.isPlaybackEnabled());
+        assertTrue(bobRemoteAudioTrackPublication.getRemoteAudioTrack().isPlaybackEnabled());
 
         // Validate that we can disable playback
-        bobRemoteAudioTrack.enablePlayback(false);
-        assertFalse(bobRemoteAudioTrack.isPlaybackEnabled());
+        bobRemoteAudioTrackPublication.getRemoteAudioTrack().enablePlayback(false);
+        assertFalse(bobRemoteAudioTrackPublication.getRemoteAudioTrack().isPlaybackEnabled());
 
         // Wait to allow audio to flow and stats to contain valid values
         Thread.sleep(2000);
@@ -122,7 +125,7 @@ public class RemoteAudioTrackTopologyParameterizedTest extends BaseParticipantTe
         assertEquals(0, remoteAudioTrackStats.audioLevel);
 
         // Now we enable playback
-        bobRemoteAudioTrack.enablePlayback(true);
+        bobRemoteAudioTrackPublication.getRemoteAudioTrack().enablePlayback(true);
 
         // Wait to allow audio to flow and stats to contain valid values
         Thread.sleep(2000);
@@ -147,7 +150,7 @@ public class RemoteAudioTrackTopologyParameterizedTest extends BaseParticipantTe
         participantListener.onSubscribedToAudioTrackLatch = new CountDownLatch(1);
         bobRemoteParticipant.setListener(participantListener);
         bobLocalAudioTrack = LocalAudioTrack.create(mediaTestActivity, true, bobAudioTrackName);
-        assertTrue(bobLocalParticipant.publishAudioTrack(bobLocalAudioTrack));
+        assertTrue(bobLocalParticipant.publishTrack(bobLocalAudioTrack));
         assertTrue(participantListener.onAudioTrackAddedLatch.await(20, TimeUnit.SECONDS));
         assertTrue(participantListener.onSubscribedToAudioTrackLatch.await(20, TimeUnit.SECONDS));
     }

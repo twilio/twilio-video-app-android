@@ -59,8 +59,10 @@ ClassReferenceHolder::ClassReferenceHolder(JNIEnv* jni) {
     LoadClass(jni, "java/util/ArrayList");
     LoadClass(jni, "com/twilio/video/LocalAudioTrackPublication");
     LoadClass(jni, "com/twilio/video/RemoteAudioTrack");
+    LoadClass(jni, "com/twilio/video/RemoteAudioTrackPublication");
     LoadClass(jni, "com/twilio/video/LocalVideoTrackPublication");
     LoadClass(jni, "com/twilio/video/RemoteVideoTrack");
+    LoadClass(jni, "com/twilio/video/RemoteVideoTrackPublication");
     LoadClass(jni, "com/twilio/video/StatsReport");
     LoadClass(jni, "com/twilio/video/LocalAudioTrackStats");
     LoadClass(jni, "com/twilio/video/LocalVideoTrackStats");

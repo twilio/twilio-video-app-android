@@ -169,7 +169,8 @@ jobject createLocalAudioTrackPublications(JNIEnv *env,
             local_participant_context->local_participant->getLocalAudioTracks();
 
     // Map track ids to java LocalAudioTrack
-    std::map<std::string, jobject> local_audio_tracks = getLocalAudioTracksMap(env, j_local_audio_tracks);
+    std::map<std::string, jobject> local_audio_tracks =
+            getLocalAudioTracksMap(env, j_local_audio_tracks);
 
     // Add audio tracks to array list
     for (unsigned int i = 0; i < local_audio_track_publications.size(); i++) {
@@ -206,7 +207,8 @@ jobject createLocalVideoTrackPublications(JNIEnv *env,
             local_participant_context->local_participant->getLocalVideoTracks();
 
     // Map track ids to java LocalVideoTrack
-    std::map<std::string, jobject> local_video_tracks = getLocalVideoTracksMap(env, j_local_video_tracks);
+    std::map<std::string, jobject> local_video_tracks =
+            getLocalVideoTracksMap(env, j_local_video_tracks);
 
     // Add video tracks to array list
     for (unsigned int i = 0; i < local_video_track_publications.size(); i++) {
@@ -272,8 +274,6 @@ jobject createJavaLocalParticipant(JNIEnv *env,
                                                  j_local_participant_context,
                                                  j_sid,
                                                  j_identity,
-                                                 j_local_audio_tracks,
-                                                 j_local_video_tracks,
                                                  j_published_audio_tracks,
                                                  j_published_video_tracks,
                                                  j_handler);

@@ -33,8 +33,6 @@ static const char *const kLocalParticipantConstructorSignature = "("
         "Ljava/lang/String;"
         "Ljava/util/List;"
         "Ljava/util/List;"
-        "Ljava/util/List;"
-        "Ljava/util/List;"
         "Landroid/os/Handler;"
         ")V";
 

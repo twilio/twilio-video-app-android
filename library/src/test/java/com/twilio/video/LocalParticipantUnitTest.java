@@ -37,18 +37,13 @@ public class LocalParticipantUnitTest {
     private LocalParticipant localParticipant;
     @Mock Handler handler;
     @Mock LocalAudioTrackPublication mockLocalAudioTrackPublication;
-    @Mock LocalAudioTrack mockAudioTrack;
     @Mock LocalVideoTrackPublication mockLocalVideoTrackPublicationOne;
-    @Mock LocalVideoTrack mockVideoTrackOne;
-    @Mock LocalVideoTrack mockVideoTrackTwo;
 
     @Before
     public void setup() {
         localParticipant = new LocalParticipant(random.nextLong(),
                 Constants.MOCK_PARTICIPANT_SID,
                 String.valueOf(random.nextInt(INT_MAX)),
-                Arrays.asList(mockAudioTrack),
-                Arrays.asList(mockVideoTrackOne, mockVideoTrackTwo),
                 Arrays.asList(mockLocalAudioTrackPublication),
                 Arrays.asList(mockLocalVideoTrackPublicationOne),
                 handler);
@@ -59,8 +54,6 @@ public class LocalParticipantUnitTest {
         new LocalParticipant(random.nextLong(),
                 null,
                 String.valueOf(random.nextInt(INT_MAX)),
-                Arrays.asList(mockAudioTrack),
-                Arrays.asList(mockVideoTrackOne, mockVideoTrackTwo),
                 Arrays.asList(mockLocalAudioTrackPublication),
                 Arrays.asList(mockLocalVideoTrackPublicationOne),
                 handler);
@@ -71,8 +64,6 @@ public class LocalParticipantUnitTest {
         new LocalParticipant(random.nextLong(),
                 "",
                 String.valueOf(random.nextInt(INT_MAX)),
-                Arrays.asList(mockAudioTrack),
-                Arrays.asList(mockVideoTrackOne, mockVideoTrackTwo),
                 Arrays.asList(mockLocalAudioTrackPublication),
                 Arrays.asList(mockLocalVideoTrackPublicationOne),
                 handler);
@@ -83,8 +74,6 @@ public class LocalParticipantUnitTest {
         new LocalParticipant(random.nextLong(),
                 Constants.MOCK_PARTICIPANT_SID,
                 null,
-                Arrays.asList(mockAudioTrack),
-                Arrays.asList(mockVideoTrackOne, mockVideoTrackTwo),
                 Arrays.asList(mockLocalAudioTrackPublication),
                 Arrays.asList(mockLocalVideoTrackPublicationOne),
                 handler);
@@ -95,8 +84,6 @@ public class LocalParticipantUnitTest {
         new LocalParticipant(random.nextLong(),
                 Constants.MOCK_PARTICIPANT_SID,
                 String.valueOf(random.nextInt(INT_MAX)),
-                Arrays.asList(mockAudioTrack),
-                Arrays.asList(mockVideoTrackOne, mockVideoTrackTwo),
                 Arrays.asList(mockLocalAudioTrackPublication),
                 Arrays.asList(mockLocalVideoTrackPublicationOne),
                 handler);
@@ -109,21 +96,21 @@ public class LocalParticipantUnitTest {
 
     @Test(expected = UnsupportedOperationException.class)
     public void shouldNotAllowModifyingAudioTracks() {
-        localParticipant.getAudioTracks().add(mockAudioTrack);
+        localParticipant.getAudioTracks().add(mockLocalAudioTrackPublication);
     }
 
     @Test(expected = UnsupportedOperationException.class)
     public void shouldNotAllowModifyingVideoTracks() {
-        localParticipant.getVideoTracks().add(mockVideoTrackOne);
+        localParticipant.getVideoTracks().add(mockLocalVideoTrackPublicationOne);
     }
 
     @Test(expected = UnsupportedOperationException.class)
     public void shouldNotAllowModifyingPublishedAudioTracks() {
-        localParticipant.getAudioTrackPublications().add(mockLocalAudioTrackPublication);
+        localParticipant.getLocalAudioTracks().add(mockLocalAudioTrackPublication);
     }
 
     @Test(expected = UnsupportedOperationException.class)
     public void shouldNotAllowModifyingPublishedVideoTracks() {
-        localParticipant.getVideoTrackPublications().add(mockLocalVideoTrackPublicationOne);
+        localParticipant.getLocalVideoTracks().add(mockLocalVideoTrackPublicationOne);
     }
 }

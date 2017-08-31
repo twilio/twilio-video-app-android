@@ -111,56 +111,60 @@ public class RemoteParticipantTest extends BaseClientTest {
         final RemoteParticipant.Listener aliceRemoteParticipantListener =
                 new RemoteParticipant.Listener() {
                     @Override
-                    public void onAudioTrackAdded(RemoteParticipant remoteParticipant,
-                                                  RemoteAudioTrack remoteAudioTrack) {
+                    public void onAudioTrackPublished(RemoteParticipant remoteParticipant,
+                                                      RemoteAudioTrackPublication remoteAudioTrackPublication) {
                         Log.d(TAG, "Alice received bob's audio track");
                         testEvents.add("aliceReceivesBobAudioTrackAdded");
                         aliceReceivedBobAudioTrackAdded.countDown();
                     }
 
                     @Override
-                    public void onAudioTrackRemoved(RemoteParticipant remoteParticipant,
-                                                    RemoteAudioTrack remoteAudioTrack) {}
+                    public void onAudioTrackUnpublished(RemoteParticipant remoteParticipant,
+                                                        RemoteAudioTrackPublication remoteAudioTrackPublication) {}
 
                     @Override
-                    public void onSubscribedToAudioTrack(RemoteParticipant remoteParticipant,
+                    public void onAudioTrackSubscribed(RemoteParticipant remoteParticipant,
+                                                       RemoteAudioTrackPublication remoteAudioTrackPublication,
+                                                       RemoteAudioTrack remoteAudioTrack) {}
+
+                    @Override
+                    public void onAudioTrackUnsubscribed(RemoteParticipant remoteParticipant,
+                                                         RemoteAudioTrackPublication remoteAudioTrackPublication,
                                                          RemoteAudioTrack remoteAudioTrack) {}
 
                     @Override
-                    public void onUnsubscribedFromAudioTrack(RemoteParticipant remoteParticipant,
-                                                             RemoteAudioTrack remoteAudioTrack) {}
+                    public void onVideoTrackPublished(RemoteParticipant remoteParticipant,
+                                                      RemoteVideoTrackPublication remoteVideoTrackPublication) {}
 
                     @Override
-                    public void onVideoTrackAdded(RemoteParticipant remoteParticipant,
-                                                  RemoteVideoTrack remoteVideoTrack) {}
+                    public void onVideoTrackUnpublished(RemoteParticipant remoteParticipant,
+                                                        RemoteVideoTrackPublication remoteVideoTrackPublication) {}
 
                     @Override
-                    public void onVideoTrackRemoved(RemoteParticipant remoteParticipant,
-                                                    RemoteVideoTrack remoteVideoTrack) {}
+                    public void onVideoTrackSubscribed(RemoteParticipant remoteParticipant,
+                                                       RemoteVideoTrackPublication remoteVideoTrackPublication,
+                                                       RemoteVideoTrack remoteVideoTrack) {}
 
                     @Override
-                    public void onSubscribedToVideoTrack(RemoteParticipant remoteParticipant,
+                    public void onVideoTrackUnsubscribed(RemoteParticipant remoteParticipant,
+                                                         RemoteVideoTrackPublication remoteVideoTrackPublicatieon,
                                                          RemoteVideoTrack remoteVideoTrack) {}
 
                     @Override
-                    public void onUnsubscribedFromVideoTrack(RemoteParticipant remoteParticipant,
-                                                             RemoteVideoTrack remoteVideoTrack) {}
-
-                    @Override
                     public void onAudioTrackEnabled(RemoteParticipant remoteParticipant,
-                                                    RemoteAudioTrack remoteAudioTrack) {}
+                                                    RemoteAudioTrackPublication remoteAudioTrackPublication) {}
 
                     @Override
                     public void onAudioTrackDisabled(RemoteParticipant remoteParticipant,
-                                                     RemoteAudioTrack remoteAudioTrack) {}
+                                                     RemoteAudioTrackPublication remoteAudioTrackPublication) {}
 
                     @Override
                     public void onVideoTrackEnabled(RemoteParticipant remoteParticipant,
-                                                    RemoteVideoTrack remoteVideoTrack) {}
+                                                    RemoteVideoTrackPublication remoteVideoTrackPublication) {}
 
                     @Override
                     public void onVideoTrackDisabled(RemoteParticipant remoteParticipant,
-                                                     RemoteVideoTrack remoteVideoTrack) {}
+                                                     RemoteVideoTrackPublication remoteVideoTrackPublication) {}
                 };
         final Room.Listener aliceRoomListener = new Room.Listener() {
             @Override
@@ -259,7 +263,7 @@ public class RemoteParticipantTest extends BaseClientTest {
                 // Publish audio track for bob
                 LocalParticipant bobLocalParticipant = bobRoom.get()
                         .getLocalParticipant();
-                bobLocalParticipant.publishAudioTrack(bobAudioTrack);
+                bobLocalParticipant.publishTrack(bobAudioTrack);
                 testEvents.add("bobPublishesAudioTrack");
                 bobPublishedAudioTrack.countDown();
                 Log.d(TAG, "bob published audio track");

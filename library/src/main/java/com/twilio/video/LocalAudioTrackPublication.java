@@ -39,8 +39,25 @@ public class LocalAudioTrackPublication implements AudioTrackPublication {
      * audio track within the scope of a {@link Room}.
      */
     @Override
-    public String getSid() {
+    public String getTrackSid() {
         return sid;
+    }
+
+    /**
+     * Returns the name of the local audio track. An empty string is returned if not name was
+     * specified.
+     */
+    @Override
+    public String getTrackName() {
+        return localAudioTrack.getName();
+    }
+
+    /**
+     * Check if local audio track is enabled.
+     */
+    @Override
+    public boolean isTrackEnabled() {
+        return localAudioTrack.isEnabled();
     }
 
     /**

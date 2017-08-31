@@ -32,12 +32,12 @@ public interface Participant {
     String getIdentity();
 
     /**
-     * Returns {@link AudioTrack}s of participant.
+     * Returns {@link AudioTrackPublication}s of participant.
      */
-    List<AudioTrack> getAudioTracks();
+    List<AudioTrackPublication> getAudioTracks();
 
     /**
-     * Returns {@link VideoTrack}s of participant.
+     * Returns {@link VideoTrackPublication}s of participant.
      */
-    List<VideoTrack> getVideoTracks();
+    List<VideoTrackPublication> getVideoTracks();
 }

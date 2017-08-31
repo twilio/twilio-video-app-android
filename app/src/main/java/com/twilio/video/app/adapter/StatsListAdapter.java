@@ -29,11 +29,13 @@ import android.widget.TextView;
 
 import com.twilio.video.Camera2Capturer;
 import com.twilio.video.RemoteAudioTrack;
+import com.twilio.video.RemoteAudioTrackPublication;
 import com.twilio.video.RemoteAudioTrackStats;
 import com.twilio.video.LocalAudioTrackStats;
 import com.twilio.video.LocalVideoTrackStats;
 import com.twilio.video.RemoteParticipant;
 import com.twilio.video.RemoteVideoTrack;
+import com.twilio.video.RemoteVideoTrackPublication;
 import com.twilio.video.StatsReport;
 import com.twilio.video.RemoteVideoTrackStats;
 import com.twilio.video.VideoTrack;
@@ -238,10 +240,11 @@ public class StatsListAdapter extends RecyclerView.Adapter<StatsListAdapter.View
     }
 
     private RemoteAudioTrack getAudioTrack(RemoteParticipant remoteParticipant, String trackId) {
-        for (RemoteAudioTrack remoteAudioTrack : remoteParticipant.getRemoteAudioTracks()) {
-            String audioTrackId = getTrackId(remoteAudioTrack);
+        for (RemoteAudioTrackPublication remoteAudioTrackPublication :
+                remoteParticipant.getRemoteAudioTracks()) {
+            String audioTrackId = getTrackId(remoteAudioTrackPublication.getRemoteAudioTrack());
             if (audioTrackId != null && audioTrackId.equals(trackId)) {
-                return remoteAudioTrack;
+                return remoteAudioTrackPublication.getRemoteAudioTrack();
             }
         }
 
@@ -249,10 +252,11 @@ public class StatsListAdapter extends RecyclerView.Adapter<StatsListAdapter.View
     }
 
     private RemoteVideoTrack getRemoteVideoTrack(RemoteParticipant remoteParticipant, String trackId) {
-        for (RemoteVideoTrack remoteVideoTrack : remoteParticipant.getRemoteVideoTracks()) {
-            String videoTrackId = getTrackId(remoteVideoTrack);
+        for (RemoteVideoTrackPublication remoteVideoTrackPublication :
+                remoteParticipant.getRemoteVideoTracks()) {
+            String videoTrackId = getTrackId(remoteVideoTrackPublication.getRemoteVideoTrack());
             if (videoTrackId != null && videoTrackId.equals(trackId)) {
-                return remoteVideoTrack;
+                return remoteVideoTrackPublication.getRemoteVideoTrack();
             }
         }
 
