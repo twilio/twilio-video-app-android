@@ -17,6 +17,7 @@
 package com.twilio.video.twilioapi;
 
 import android.util.Base64;
+import android.util.Log;
 
 import com.google.gson.GsonBuilder;
 import com.twilio.video.twilioapi.model.TwilioServiceToken;
@@ -24,6 +25,7 @@ import com.twilio.video.twilioapi.model.VideoRoom;
 
 import retrofit.Callback;
 import retrofit.RestAdapter;
+import retrofit.RetrofitError;
 import retrofit.converter.GsonConverter;
 import retrofit.http.Field;
 import retrofit.http.FormUrlEncoded;
@@ -31,7 +33,10 @@ import retrofit.http.Header;
 import retrofit.http.POST;
 import retrofit.http.Path;
 
+import static junit.framework.Assert.assertNotNull;
+
 public class VideoApiUtils {
+    private static final int MAX_RETRIES = 5;
     private static final String PROD_BASE_URL = "https://video.twilio.com";
     private static final String STAGE_BASE_URL = "https://video.stage.twilio.com";
     private static final String DEV_BASE_URL = "https://video.dev.twilio.com";
@@ -137,6 +142,29 @@ public class VideoApiUtils {
         String authorization = "Basic " + Base64.encodeToString(authString.getBytes(),
             Base64.NO_WRAP);
 
-        return videoApiService.createRoom(authorization, name, type, enableTurn, enableRecording);
+        /*
+         * Occasionally requests to create a room time out on Firebase Test Lab. Retry a reasonable
+         * amount of times before failing.
+         */
+        int retries = 0;
+        VideoRoom videoRoom = null;
+        do {
+            try {
+                videoRoom = videoApiService.createRoom(authorization,
+                        name,
+                        type,
+                        enableTurn,
+                        enableRecording);
+            } catch (RetrofitError retrofitError) {
+                Log.e("VideoApiUtils", retrofitError.getMessage());
+            }
+        } while (videoRoom == null && retries++ < MAX_RETRIES);
+
+        // Validate the room creation succeeded
+        assertNotNull(String.format("Failed to create a Room after %s attempts",
+                String.valueOf(MAX_RETRIES)),
+                videoRoom);
+
+        return videoRoom;
     }
 }
