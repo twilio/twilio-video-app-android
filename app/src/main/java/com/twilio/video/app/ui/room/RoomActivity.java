@@ -925,7 +925,7 @@ public class RoomActivity extends BaseActivity {
                         VideoCodec.class);
 
                 AudioCodec preferredAudioCodec = obtainCodecPreferences(Preferences.AUDIO_CODEC,
-                        Preferences.VIDEO_CODEC_DEFAULT,
+                        Preferences.AUDIO_CODEC_DEFAULT,
                         AudioCodec.class);
 
                 ConnectOptions.Builder connectOptionsBuilder = new ConnectOptions.Builder(token)
