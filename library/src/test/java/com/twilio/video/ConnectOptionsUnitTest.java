@@ -24,6 +24,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 import java.util.Collections;
 import java.util.List;
 
+import static junit.framework.Assert.assertEquals;
 import static junit.framework.TestCase.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.when;
@@ -85,5 +86,15 @@ public class ConnectOptionsUnitTest {
                 .roomName("room name")
                 .videoTracks(Collections.singletonList(localVideoTrack))
                 .build();
+    }
+
+    @Test
+    public void shouldAllowEncodingParameters() {
+        EncodingParameters encodingParameters = new EncodingParameters(10, 12);
+        ConnectOptions connectOptions = new ConnectOptions.Builder("token")
+                .encodingParameters(encodingParameters)
+                .build();
+
+        assertEquals(encodingParameters, connectOptions.getEncodingParameters());
     }
 }

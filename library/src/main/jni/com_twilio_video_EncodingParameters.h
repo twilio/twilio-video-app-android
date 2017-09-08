@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-#ifndef VIDEO_ANDROID_COM_TWILIO_VIDEO_CONNECT_OPTIONS_H_
-#define VIDEO_ANDROID_COM_TWILIO_VIDEO_CONNECT_OPTIONS_H_
+#ifndef VIDEO_ANDROID_COM_TWILIO_VIDEO_ENCODINGPARAMETERS_H_
+#define VIDEO_ANDROID_COM_TWILIO_VIDEO_ENCODINGPARAMETERS_H_
 
 #include <jni.h>
-#include "video/connect_options.h"
+#include "media/codec.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -26,20 +26,8 @@ extern "C" {
 
 namespace twilio_video_jni {
 
-JNIEXPORT jlong JNICALL Java_com_twilio_video_ConnectOptions_nativeCreate
-        (JNIEnv *,
-         jobject,
-         jstring,
-         jstring,
-         jobjectArray,
-         jobjectArray,
-         jobject,
-         jboolean,
-         jlong,
-         jobjectArray,
-         jobjectArray,
-         jobject);
-
+twilio::media::EncodingParameters getEncodingParameters(JNIEnv *env,
+                                                        jobject j_encoding_parameters);
 
 }
 
@@ -47,4 +35,4 @@ JNIEXPORT jlong JNICALL Java_com_twilio_video_ConnectOptions_nativeCreate
 }
 #endif
 
-#endif //  VIDEO_ANDROID_COM_TWILIO_VIDEO_CONNECT_OPTIONS_H_
+#endif // VIDEO_ANDROID_COM_TWILIO_VIDEO_ENCODINGPARAMETERS_H_

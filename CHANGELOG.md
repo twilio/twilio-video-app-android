@@ -4,6 +4,9 @@ The Twilio Programmable Video SDKs use [Semantic Versioning](http://www.semver.o
 
 Features
 
+- Added `EncodingParameters` which constrains how much bandwidth is used to share audio and 
+video. This object has been added to `ConnectOptions` and can also be set on `LocalParticipant` 
+after joining a `Room`.
 - Added two static `create` methods to `LocalAudioTrack` and `LocalVideoTrack` that allow creating
 named tracks. The following snippet demonstrates how to create a video track named "screen".
 

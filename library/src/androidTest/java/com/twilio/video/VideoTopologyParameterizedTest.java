@@ -288,4 +288,34 @@ public class VideoTopologyParameterizedTest extends BaseClientTest {
         assertTrue(roomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
         localAudioTrack.release();
     }
+
+    @Test
+    public void connect_shouldAllowEncodingParameters() throws InterruptedException {
+        FakeVideoCapturer fakeVideoCapturer = new FakeVideoCapturer();
+        localAudioTrack = LocalAudioTrack.create(mediaTestActivity, true);
+        localVideoTrack = LocalVideoTrack.create(mediaTestActivity, true, fakeVideoCapturer);
+        roomListener.onConnectedLatch = new CountDownLatch(1);
+
+        List<LocalAudioTrack> localAudioTrackList =
+                new ArrayList<LocalAudioTrack>(){{ add(localAudioTrack); }};
+        List<LocalVideoTrack> localVideoTrackList =
+                new ArrayList<LocalVideoTrack>(){{ add(localVideoTrack); }};
+        EncodingParameters encodingParameters = new EncodingParameters(64000, 800000);
+
+        ConnectOptions connectOptions = new ConnectOptions.Builder(token)
+                .roomName(roomName)
+                .audioTracks(localAudioTrackList)
+                .videoTracks(localVideoTrackList)
+                .encodingParameters(encodingParameters)
+                .build();
+        room = Video.connect(mediaTestActivity, connectOptions, roomListener);
+        assertTrue(roomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
+        LocalParticipant localParticipant = room.getLocalParticipant();
+        assertNotNull(localParticipant.getLocalAudioTracks().get(0));
+        assertEquals(localAudioTrack, localParticipant.getAudioTracks().get(0).getAudioTrack());
+        assertNotNull(localParticipant.getLocalVideoTracks().get(0));
+        assertEquals(localVideoTrack, localParticipant.getVideoTracks().get(0).getVideoTrack());
+        assertTrue(localParticipant.unpublishTrack(localAudioTrack));
+        assertTrue(localParticipant.unpublishTrack(localVideoTrack));
+    }
 }

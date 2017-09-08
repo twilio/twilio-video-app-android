@@ -17,6 +17,7 @@
 #include "com_twilio_video_LocalParticipant.h"
 #include "com_twilio_video_LocalAudioTrack.h"
 #include "com_twilio_video_LocalVideoTrack.h"
+#include "com_twilio_video_EncodingParameters.h"
 
 #include "android_local_participant_observer.h"
 #include "class_reference_holder.h"
@@ -358,6 +359,20 @@ JNIEXPORT bool JNICALL Java_com_twilio_video_LocalParticipant_nativeUnpublishVid
     webrtc_jni::DeleteGlobalRef(jni, j_local_video_track);
 
     return result;
+}
+
+JNIEXPORT void JNICALL Java_com_twilio_video_LocalParticipant_nativeSetEncodingParameters(JNIEnv *jni,
+                                                                                          jobject j_local_participant,
+                                                                                          jlong j_local_participant_handle,
+                                                                                          jobject j_encoding_parameters) {
+    LocalParticipantContext* local_participant_context =
+            reinterpret_cast<LocalParticipantContext *>(j_local_participant_handle);
+    twilio::media::EncodingParameters encoding_parameters = webrtc_jni::IsNull(jni, j_encoding_parameters) ?
+            twilio::media::EncodingParameters() :
+            getEncodingParameters(jni, j_encoding_parameters);
+
+    // Set encoding parameters on native local participant
+    local_participant_context->local_participant->setEncodingParameters(encoding_parameters);
 }
 
 JNIEXPORT void JNICALL Java_com_twilio_video_LocalParticipant_nativeRelease(JNIEnv *jni,

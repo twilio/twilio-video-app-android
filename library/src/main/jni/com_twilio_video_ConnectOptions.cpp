@@ -19,6 +19,7 @@
 #include "com_twilio_video_PlatformInfo.h"
 #include "com_twilio_video_LocalAudioTrack.h"
 #include "com_twilio_video_LocalVideoTrack.h"
+#include "com_twilio_video_EncodingParameters.h"
 
 #include "webrtc/sdk/android/src/jni/jni_helpers.h"
 #include "class_reference_holder.h"
@@ -88,7 +89,8 @@ Java_com_twilio_video_ConnectOptions_nativeCreate(JNIEnv *env,
                                                   jboolean j_enable_insights,
                                                   jlong j_platform_info_handle,
                                                   jobjectArray j_preferred_audio_codecs,
-                                                  jobjectArray j_preferred_video_codecs) {
+                                                  jobjectArray j_preferred_video_codecs,
+                                                  jobject j_encoding_parameters) {
 
     std::string access_token = webrtc_jni::JavaToStdString(env, j_access_token);
     twilio::video::ConnectOptions::Builder* builder =
@@ -176,6 +178,12 @@ Java_com_twilio_video_ConnectOptions_nativeCreate(JNIEnv *env,
     if (!webrtc_jni::IsNull(env, j_ice_options)) {
         twilio::media::IceOptions ice_options = IceOptions::getIceOptions(env, j_ice_options);
         builder->setIceOptions(ice_options);
+    }
+
+    if (!webrtc_jni::IsNull(env, j_encoding_parameters)) {
+        twilio::media::EncodingParameters encoding_parameters =
+                getEncodingParameters(env, j_encoding_parameters);
+        builder->setEncodingParameters(encoding_parameters);
     }
 
     PlatformInfoContext *platform_info_context =

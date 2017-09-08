@@ -18,6 +18,7 @@ package com.twilio.video;
 
 import android.os.Handler;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -217,10 +218,24 @@ public class LocalParticipant implements Participant {
      *
      * @param listener of local participant events.
      */
-    public void setListener(LocalParticipant.Listener listener) {
+    public void setListener(@NonNull LocalParticipant.Listener listener) {
         Preconditions.checkNotNull(listener, "Listener must not be null");
 
         this.listenerReference.set(listener);
+    }
+
+    /**
+     *  Updates the {@link EncodingParameters} used to share media in the Room.
+     *
+     *  @param encodingParameters The {@link EncodingParameters} to use or {@code null} for the
+     *                            default values.
+     */
+    public synchronized void setEncodingParameters(@Nullable EncodingParameters encodingParameters) {
+        if (!isReleased()) {
+            nativeSetEncodingParameters(nativeLocalParticipantHandle, encodingParameters);
+        } else {
+            logger.w("Cannot set encoding parameters after disconnected from a room");
+        }
     }
 
     LocalParticipant(long nativeLocalParticipantHandle,
@@ -324,5 +339,7 @@ public class LocalParticipant implements Participant {
                                                      long nativeAudioTrackHandle);
     private native boolean nativeUnpublishVideoTrack(long nativeHandle,
                                                      long nativeVideoTrackHandle);
+    private native void nativeSetEncodingParameters(long nativeHandle,
+                                                    EncodingParameters encodingParameters);
     private native void nativeRelease(long nativeHandle);
 }

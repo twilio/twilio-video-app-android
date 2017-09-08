@@ -329,4 +329,88 @@ public class LocalParticipantTopologyTest extends BaseClientTest {
         assertEquals(videoTrackSize, localParticipant.getLocalVideoTracks().size());
         assertTrue(roomListener.onDisconnectedLatch.await(20, TimeUnit.SECONDS));
     }
+
+    /*
+     * TODO: Add better validation of EncodingParameters scenarios.
+     *
+     * Currently these scenarios are just executed, and there is no way to validate the operation.
+     */
+
+    @Test
+    public void shouldNotSetEncodingParametersAfterDisconnect() throws InterruptedException {
+        CallbackHelper.FakeLocalParticipantListener localParticipantListener =
+                new CallbackHelper.FakeLocalParticipantListener();
+        localParticipantListener.onPublishedVideoTrackLatch = new CountDownLatch(1);
+        roomListener.onConnectedLatch = new CountDownLatch(1);
+        roomListener.onDisconnectedLatch = new CountDownLatch(1);
+
+        ConnectOptions connectOptions = new ConnectOptions.Builder(token)
+                .roomName(roomName)
+                .build();
+        room = Video.connect(mediaTestActivity, connectOptions, roomListener);
+        assertTrue(roomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
+        LocalParticipant localParticipant = room.getLocalParticipant();
+        assertNotNull(localParticipant);
+        localParticipant.setListener(localParticipantListener);
+        FakeVideoCapturer fakeVideoCapturer = new FakeVideoCapturer();
+        localVideoTrack = LocalVideoTrack.create(mediaTestActivity, true, fakeVideoCapturer);
+        localParticipant.publishTrack(localVideoTrack);
+        assertTrue(localParticipantListener.onPublishedVideoTrackLatch.await(20, TimeUnit.SECONDS));
+        room.disconnect();
+        EncodingParameters encodingParameters = new EncodingParameters(64000, 800000);
+        localParticipant.setEncodingParameters(encodingParameters);
+    }
+
+    @Test
+    public void shouldAllowNullEncodingParameters() throws InterruptedException {
+        CallbackHelper.FakeLocalParticipantListener localParticipantListener =
+                new CallbackHelper.FakeLocalParticipantListener();
+        FakeVideoCapturer fakeVideoCapturer = new FakeVideoCapturer();
+        EncodingParameters encodingParameters = new EncodingParameters(64000, 800000);
+        roomListener.onConnectedLatch = new CountDownLatch(1);
+        localParticipantListener.onPublishedAudioTrackLatch = new CountDownLatch(1);
+        localParticipantListener.onPublishedVideoTrackLatch = new CountDownLatch(1);
+
+        localAudioTrack = LocalAudioTrack.create(mediaTestActivity, true);
+        localVideoTrack = LocalVideoTrack.create(mediaTestActivity, true, fakeVideoCapturer);
+
+        ConnectOptions connectOptions = new ConnectOptions.Builder(token)
+                .audioTracks(Collections.singletonList(localAudioTrack))
+                .videoTracks(Collections.singletonList(localVideoTrack))
+                .roomName(roomName)
+                .encodingParameters(encodingParameters)
+                .build();
+        room = Video.connect(mediaTestActivity, connectOptions, roomListener);
+        assertTrue(roomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
+        LocalParticipant localParticipant = room.getLocalParticipant();
+        assertNotNull(localParticipant);
+        localParticipant.setListener(localParticipantListener);
+        localParticipant.setEncodingParameters(null);
+    }
+
+    @Test
+    public void shouldAllowEncodingParameters() throws InterruptedException {
+        CallbackHelper.FakeLocalParticipantListener localParticipantListener =
+                new CallbackHelper.FakeLocalParticipantListener();
+        FakeVideoCapturer fakeVideoCapturer = new FakeVideoCapturer();
+        EncodingParameters encodingParameters = new EncodingParameters(64000, 800000);
+        roomListener.onConnectedLatch = new CountDownLatch(1);
+        localParticipantListener.onPublishedAudioTrackLatch = new CountDownLatch(1);
+        localParticipantListener.onPublishedVideoTrackLatch = new CountDownLatch(1);
+
+        localAudioTrack = LocalAudioTrack.create(mediaTestActivity, true);
+        localVideoTrack = LocalVideoTrack.create(mediaTestActivity, true, fakeVideoCapturer);
+
+        ConnectOptions connectOptions = new ConnectOptions.Builder(token)
+                .audioTracks(Collections.singletonList(localAudioTrack))
+                .videoTracks(Collections.singletonList(localVideoTrack))
+                .roomName(roomName)
+                .build();
+        room = Video.connect(mediaTestActivity, connectOptions, roomListener);
+        assertTrue(roomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
+        LocalParticipant localParticipant = room.getLocalParticipant();
+        assertNotNull(localParticipant);
+        localParticipant.setListener(localParticipantListener);
+        localParticipant.setEncodingParameters(encodingParameters);
+    }
 }

@@ -33,6 +33,7 @@ public class ConnectOptions {
     private final boolean enableInsights;
     private final List<AudioCodec> preferredAudioCodecs;
     private final List<VideoCodec> preferredVideoCodecs;
+    private final EncodingParameters encodingParameters;
 
     static void checkAudioTracksReleased(@Nullable List<LocalAudioTrack> audioTracks) {
         if (audioTracks != null) {
@@ -63,6 +64,7 @@ public class ConnectOptions {
         this.enableInsights = builder.enableInsights;
         this.preferredAudioCodecs = builder.preferredAudioCodecs;
         this.preferredVideoCodecs = builder.preferredVideoCodecs;
+        this.encodingParameters = builder.encodingParameters;
     }
 
     String getAccessToken() {
@@ -125,6 +127,10 @@ public class ConnectOptions {
         return videoCodecsArray;
     }
 
+    public EncodingParameters getEncodingParameters() {
+        return encodingParameters;
+    }
+
     /*
      * Invoked by JNI RoomDelegate to get pointer to twilio::video::ConnectOptions::Builder
      */
@@ -141,7 +147,8 @@ public class ConnectOptions {
                 enableInsights,
                 PlatformInfo.getNativeHandle(),
                 getAudioCodecsArray(),
-                getVideoCodecsArray());
+                getVideoCodecsArray(),
+                encodingParameters);
     }
 
     private native long nativeCreate(String accessToken,
@@ -152,7 +159,8 @@ public class ConnectOptions {
                                      boolean enableInsights,
                                      long platformInfoNativeHandle,
                                      AudioCodec[] preferredAudioCodecs,
-                                     VideoCodec[] preferredVideoCodecs);
+                                     VideoCodec[] preferredVideoCodecs,
+                                     EncodingParameters encodingParameters);
     /**
      * Build new {@link ConnectOptions}.
      *
@@ -167,6 +175,7 @@ public class ConnectOptions {
         private boolean enableInsights = true;
         private List<AudioCodec> preferredAudioCodecs;
         private List<VideoCodec> preferredVideoCodecs;
+        private EncodingParameters encodingParameters;
 
         public Builder(String accessToken) {
             this.accessToken = accessToken;
@@ -282,6 +291,14 @@ public class ConnectOptions {
          */
         public Builder preferVideoCodecs(List<VideoCodec> preferredVideoCodecs) {
             this.preferredVideoCodecs = new ArrayList<>(preferredVideoCodecs);
+            return this;
+        }
+
+        /**
+         * Set {@link EncodingParameters} for audio and video tracks shared to a {@link Room}.
+         */
+        public Builder encodingParameters(@Nullable EncodingParameters encodingParameters) {
+            this.encodingParameters = encodingParameters;
             return this;
         }
 

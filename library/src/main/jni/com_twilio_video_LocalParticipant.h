@@ -84,6 +84,12 @@ JNIEXPORT bool JNICALL Java_com_twilio_video_LocalParticipant_nativeUnpublishVid
                                                                                         jobject,
                                                                                         jlong,
                                                                                         jlong);
+
+JNIEXPORT void JNICALL Java_com_twilio_video_LocalParticipant_nativeSetEncodingParameters(JNIEnv *,
+                                                                                          jobject,
+                                                                                          jlong,
+                                                                                          jobject);
+
 JNIEXPORT void JNICALL Java_com_twilio_video_LocalParticipant_nativeRelease(JNIEnv *,
                                                                             jobject,
                                                                             jlong);
