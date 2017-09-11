@@ -6,6 +6,7 @@ Improvements
 
 - Fixed case on some devices where `CameraCapturer` incorrectly reported a failure to close the 
 camera.
+- Improved echo cancellation on Nexus 6P and Nexus 6 by enabling hardware echo canceller and disabling OpenSL ES.
 
 Known issues
 
