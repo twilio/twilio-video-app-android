@@ -1,5 +1,17 @@
 The Twilio Programmable Video SDKs use [Semantic Versioning](http://www.semver.org).
 
+####2.0.0-preview2
+
+Bug Fixes
+
+- Fixed crash when disconnecting from a Room immediately after unpublishing a local track.
+
+Known issues
+
+- Network handoff, and subsequent connection renegotiation is not supported for IPv6 networks [#72](https://github.com/twilio/video-quickstart-android/issues/72)
+- Participant disconnect event can take up to 120 seconds to occur [#80](https://github.com/twilio/video-quickstart-android/issues/80) [#73](https://github.com/twilio/video-quickstart-android/issues/73)
+- Disconnecting from a `Room` that has not connected sometimes results in a crash [#116](https://github.com/twilio/video-quickstart-android/issues/116)
+
 ####2.0.0-preview1
 
 Features
@@ -77,7 +89,7 @@ return `List<RemoteAudioTrackPublication>` and `List<RemoteVideoTrackPublication
   partipant's audio track. This callback includes the `RemoteAudioTrack` that was subscribed to.
   - `onVideoTrackSubscribed` - Indicates when video is flowing from a remote participant's video 
   track. This callback includes the `RemoteVideoTrack` that was subscribed to.
-  - `onVideoTrackUnsubscribed` - Inidicates when video is no longer flowing from a remote
+  - `onVideoTrackUnsubscribed` - Indicates when video is no longer flowing from a remote
   participant's video track. This callback includes the `RemoteVideoTrack` that was subscribed to.
 - Renamed `TrackStats` to `RemoteTrackStats`, `AudioTrackStats` to `RemoteAudioTrackStats`, and
 `VideoTrackStats` to `RemoteVideoTrackStats`
@@ -102,10 +114,9 @@ Bug Fixes
 Known issues
 
 - Network handoff, and subsequent connection renegotiation is not supported for IPv6 networks [#72](https://github.com/twilio/video-quickstart-android/issues/72)
-- VP8 is the only supported codec [#71](https://github.com/twilio/video-quickstart-android/issues/71)
 - Participant disconnect event can take up to 120 seconds to occur [#80](https://github.com/twilio/video-quickstart-android/issues/80) [#73](https://github.com/twilio/video-quickstart-android/issues/73)
 - Disconnecting from a `Room` that has not connected sometimes results in a crash [#116](https://github.com/twilio/video-quickstart-android/issues/116)
-- LocalParticipant release method is public [#132](https://github.com/twilio/video-quickstart-android/issues/132)
+- Disconnecting from a Room immediately after unpublishing a local track may result in a crash.
 
 ####1.3.0
 
