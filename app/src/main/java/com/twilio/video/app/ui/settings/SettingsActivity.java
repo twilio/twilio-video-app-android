@@ -164,6 +164,14 @@ public class SettingsActivity extends BaseActivity {
             preference.setEntries(codecEntries);
             preference.setEntryValues(codecEntries);
             preference.setValue(value);
+            preference.setSummary(value);
+            preference.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+                @Override
+                public boolean onPreferenceChange(Preference preference, Object newValue) {
+                    preference.setSummary(newValue.toString());
+                    return true;
+                }
+            });
         }
     }
 }
