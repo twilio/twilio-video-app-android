@@ -29,11 +29,23 @@
     </PreferenceCategory>
     <PreferenceCategory android:title="@string/media">
         <ListPreference
-            android:key="pref_video_codecs"
-            android:title="@string/video_codecs"/>
-        <ListPreference
             android:key="pref_audio_codecs"
-            android:title="@string/audio_codecs"/>
+            android:negativeButtonText="@null"
+            android:summary="%s"
+            android:title="@string/audio_codecs" />
+        <com.twilio.video.app.data.NumberPreference
+            style="@style/AppTheme.Preference.DialogPreference"
+            android:key="pref_max_audio_bitrate"
+            android:title="@string/max_audio_bitrate" />
+        <ListPreference
+            android:key="pref_video_codecs"
+            android:negativeButtonText="@null"
+            android:summary="%s"
+            android:title="@string/video_codecs" />
+        <com.twilio.video.app.data.NumberPreference
+            style="@style/AppTheme.Preference.DialogPreference"
+            android:key="pref_max_video_bitrate"
+            android:title="@string/max_video_bitrate" />
         <ListPreference
             android:defaultValue="0"
             android:entries="@array/aspect_ratio_array"

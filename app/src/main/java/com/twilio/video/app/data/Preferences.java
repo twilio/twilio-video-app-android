@@ -43,4 +43,8 @@ public class Preferences {
     public static final String VIDEO_CODEC_DEFAULT = VideoCodec.VP8.toString();
     public static final String AUDIO_CODEC = "pref_audio_codecs";
     public static final String AUDIO_CODEC_DEFAULT = AudioCodec.OPUS.toString();
+    public static final String MAX_AUDIO_BITRATE = "pref_max_audio_bitrate";
+    public static final int MAX_AUDIO_BITRATE_DEFAULT = 0;
+    public static final String MAX_VIDEO_BITRATE = "pref_max_video_bitrate";
+    public static final int MAX_VIDEO_BITRATE_DEFAULT = 0;
 }

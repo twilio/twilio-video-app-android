@@ -20,6 +20,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.app.DialogFragment;
 import android.support.v7.preference.ListPreference;
 import android.support.v7.preference.Preference;
 import android.support.v7.preference.PreferenceFragmentCompat;
@@ -35,6 +36,8 @@ import com.twilio.video.app.BuildConfig;
 import com.twilio.video.app.R;
 import com.twilio.video.app.auth.Authenticator;
 import com.twilio.video.app.base.BaseActivity;
+import com.twilio.video.app.data.NumberPreference;
+import com.twilio.video.app.data.NumberPreferenceDialogFragmentCompat;
 import com.twilio.video.app.data.Preferences;
 import com.twilio.video.app.ui.login.LoginActivity;
 
@@ -95,6 +98,9 @@ public class SettingsActivity extends BaseActivity {
     }
 
     public static class SettingsFragment extends PreferenceFragmentCompat {
+        private static final String PREFERENCE_FRAGMENT_TAG =
+                "android.support.v7.preference.PreferenceFragment.DIALOG";
+
         private SharedPreferences sharedPreferences;
         private Preference.OnPreferenceClickListener logoutClickListener;
 
@@ -129,6 +135,24 @@ public class SettingsActivity extends BaseActivity {
             findPreference(Preferences.VERSION).setSummary(BuildConfig.VERSION_NAME);
             findPreference(Preferences.VIDEO_LIBRARY_VERSION).setSummary(Video.getVersion());
             findPreference(Preferences.LOGOUT).setOnPreferenceClickListener(logoutClickListener);
+        }
+
+        @Override
+        public void onDisplayPreferenceDialog(Preference preference) {
+
+            // show custom dialog preference
+            if (preference instanceof NumberPreference) {
+                DialogFragment dialogFragment;
+                dialogFragment = NumberPreferenceDialogFragmentCompat.newInstance(preference.getKey());
+
+                if (dialogFragment != null) {
+                    dialogFragment.setTargetFragment(this, 0);
+                    dialogFragment.show(getFragmentManager(), PREFERENCE_FRAGMENT_TAG);
+                }
+
+            } else {
+                super.onDisplayPreferenceDialog(preference);
+            }
         }
 
         /**

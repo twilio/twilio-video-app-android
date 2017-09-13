@@ -50,6 +50,7 @@ import com.twilio.video.AspectRatio;
 import com.twilio.video.AudioCodec;
 import com.twilio.video.CameraCapturer;
 import com.twilio.video.ConnectOptions;
+import com.twilio.video.EncodingParameters;
 import com.twilio.video.LocalAudioTrack;
 import com.twilio.video.LocalParticipant;
 import com.twilio.video.LocalVideoTrack;
@@ -932,6 +933,15 @@ public class RoomActivity extends BaseActivity {
                         .roomName(roomName)
                         .enableInsights(enableInsights);
 
+                int maxVideoBitrate = sharedPreferences.getInt(Preferences.MAX_VIDEO_BITRATE,
+                        Preferences.MAX_VIDEO_BITRATE_DEFAULT);
+
+                int maxAudioBitrate = sharedPreferences.getInt(Preferences.MAX_AUDIO_BITRATE,
+                        Preferences.MAX_AUDIO_BITRATE_DEFAULT);
+
+                EncodingParameters encodingParameters =
+                        new EncodingParameters(maxAudioBitrate, maxVideoBitrate);
+
                 if (localAudioTrack != null) {
                     connectOptionsBuilder
                             .audioTracks(Collections.singletonList(localAudioTrack));
@@ -955,6 +965,8 @@ public class RoomActivity extends BaseActivity {
 
                 connectOptionsBuilder
                         .preferAudioCodecs(Collections.singletonList(preferredAudioCodec));
+
+                connectOptionsBuilder.encodingParameters(encodingParameters);
 
                 room = Video.connect(RoomActivity.this,
                         connectOptionsBuilder.build(),
