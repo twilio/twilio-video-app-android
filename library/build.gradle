@@ -125,7 +125,9 @@ dependencies {
     androidTestCompile project(':token')
     androidTestCompile 'com.squareup.retrofit:retrofit:1.9.0'
     androidTestCompile 'pl.pragmatists:JUnitParams:1.1.0'
+    androidTestCompile 'com.android.support:recyclerview-v7:25.0.1'
     androidTestCompile 'com.android.support.test.espresso:espresso-core:3.0.0'
+    androidTestCompile 'com.android.support.test.espresso:espresso-contrib:3.0.0'
     androidTestCompile 'com.android.support.test:runner:1.0.0'
     androidTestCompile 'com.android.support.test:rules:1.0.0'
     androidTestCompile 'com.android.support.test.uiautomator:uiautomator-v18:2.1.2'
