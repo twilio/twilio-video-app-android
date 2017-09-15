@@ -36,5 +36,8 @@
             android:name=".ui.VideoRendererTestActivity">
         </activity>
 
+        <activity
+            android:name=".ui.VideoViewTestActivity">
+        </activity>
     </application>
 </manifest>

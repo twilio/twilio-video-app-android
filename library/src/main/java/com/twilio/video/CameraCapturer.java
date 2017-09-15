@@ -59,7 +59,11 @@ import static java.lang.annotation.RetentionPolicy.SOURCE;
  * {@link LocalVideoTrack}s simultaneously.</p>
  */
 public class CameraCapturer implements VideoCapturer {
-    private static final int CAMERA_CLOSED_TIMEOUT_MS = 1500;
+    /*
+     * Some devices take up to three seconds before the camera resource is released and WebRTC
+     * notifies this class that the camera session is closed.
+     */
+    private static final int CAMERA_CLOSED_TIMEOUT_MS = 3000;
     private static final String CAMERA_CLOSED_FAILED = "Failed to close camera";
     private static final String ERROR_MESSAGE_CAMERA_SERVER_DIED = "Camera server died!";
     private static final String ERROR_MESSAGE_UNKNOWN = "Camera error:";
@@ -401,9 +405,8 @@ public class CameraCapturer implements VideoCapturer {
             webRtcCameraCapturer = null;
 
             /*
-             * We must wait until the camera closed event has been fired. This event indicates
-             * that we have stopped capturing and that the camera resource is freed for more details
-             * see GSDK-1132.
+             * Wait until the camera closed event has been fired. This event indicates
+             * that we have stopped capturing and that the camera resource is released.
              */
             Preconditions.checkState(ThreadUtils.awaitUninterruptibly(cameraClosed,
                     CAMERA_CLOSED_TIMEOUT_MS), CAMERA_CLOSED_FAILED);
