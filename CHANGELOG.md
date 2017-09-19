@@ -2,6 +2,10 @@ The Twilio Programmable Video SDKs use [Semantic Versioning](http://www.semver.o
 
 ####2.0.0-preview3
 
+Improvements
+
+- Upgraded to Android Oreo from Nougat
+
 Bug Fixes
 
 - Fixed case on some devices where `CameraCapturer` incorrectly reported a failure to close the 
@@ -126,7 +130,7 @@ Bug Fixes
 
 Improvements
 
-- Upgraded to Android Oreo from Nougat 
+- Upgraded to Android Oreo from Nougat
 
 Known issues
 
