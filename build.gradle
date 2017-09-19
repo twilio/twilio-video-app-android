@@ -37,3 +37,45 @@ allprojects {
         }
     }
 }
+
+task firebaseTestLabCheckLibrary(type: Exec) {
+    group = 'Test'
+    description = 'Runs library instrumentation tests on Firebase Test Lab'
+    dependsOn 'library:assembleDebugAndroidTest'
+    dependsOn 'app:assembleDebug'
+    commandLine 'gcloud',
+            'firebase',
+            'test',
+            'android',
+            'run',
+            '--project',
+            'video-app-79418',
+            'video-app-args.yaml:library-instrumentation-tests'
+}
+
+task firebaseTestLabCheckLibraryCamera(type: Exec) {
+    group = 'Test'
+    description = 'Runs library instrumentation tests that use camera on Firebase Test Lab'
+    dependsOn 'library:assembleDebugAndroidTest'
+    dependsOn 'app:assembleDebug'
+    commandLine 'gcloud',
+            'firebase',
+            'test',
+            'android',
+            'run',
+            '--project',
+            'video-app-79418',
+            'video-app-args.yaml:library-camera-tests'
+}
+
+task checkLibrary(type: GradleBuild) {
+    group = 'Test'
+    description = 'Runs all tests and checks for the library'
+    tasks = [
+            'clean',
+            'assemble',
+            'library:testDebugUnitTest',
+            'firebaseTestLabCheckLibrary',
+            'firebaseTestLabCheckLibraryCamera'
+    ]
+}
