@@ -130,7 +130,6 @@ public class VideoTest extends BaseClientTest {
     }
 
     @Test
-    @Ignore("Disconnecting while connecting results in native crash. See GSDK-1153")
     public void canConnectAndDisconnectRepeatedly() throws InterruptedException {
         int numIterations = 100;
         for (int i = 0 ; i < numIterations ; i++) {
