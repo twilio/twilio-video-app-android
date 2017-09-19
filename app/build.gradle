@@ -1,6 +1,13 @@
 apply plugin: 'com.android.application'
 apply plugin: 'com.google.firebase.firebase-crash'
 apply plugin: 'com.jakewharton.butterknife'
+apply plugin: 'de.felixschulze.gradle.hockeyapp'
+
+hockeyapp {
+    apiToken = "${getHockeyAppApiToken()}"
+    notify = 1
+    status = 2
+}
 
 android {
     compileSdkVersion 26
@@ -135,6 +142,27 @@ dependencies {
     annotationProcessor 'com.jakewharton:butterknife-compiler:8.4.0'
 
     developmentCompile project(':token')
+}
+
+def getHockeyAppApiToken() {
+    // Attempt to get it from the environment variable
+    def hockeyAppApiToken  = System.getenv("HOCKEY_APP_API_TOKEN");
+
+    if (hockeyAppApiToken == null) {
+        logger.log(LogLevel.INFO, "Could not locate HOCKEY_APP_API_TOKEN environment variable. " +
+                "Trying local.properties")
+        Properties properties = new Properties()
+        if (project.rootProject.file('local.properties').exists()) {
+            properties.load(project.rootProject.file('local.properties').newDataInputStream())
+            hockeyAppApiToken = properties.getProperty('HOCKEY_APP_API_TOKEN')
+        }
+    }
+
+    if (hockeyAppApiToken == null) {
+        logger.log(LogLevel.WARN, "HockeyApp API token unavailable.")
+    }
+
+    return hockeyAppApiToken;
 }
 
 def getHockeyAppId() {
