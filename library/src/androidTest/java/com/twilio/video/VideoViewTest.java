@@ -55,7 +55,7 @@ public class VideoViewTest {
     @Before
     public void setup() {
         videoViewTestActivity = activityRule.getActivity();
-        relativeLayout = (RelativeLayout) videoViewTestActivity.findViewById(R.id.container);
+        relativeLayout = videoViewTestActivity.findViewById(R.id.relative_layout_container);
     }
 
     @After

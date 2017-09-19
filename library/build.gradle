@@ -12,8 +12,8 @@ configurations {
 }
 
 android {
-    compileSdkVersion 25
-    buildToolsVersion "25.0.2"
+    compileSdkVersion 26
+    buildToolsVersion "26.0.1"
 
     // Parameterizing config allows video application to use a debug build of the library
     defaultPublishConfig getPublishConfig()
@@ -24,7 +24,7 @@ android {
 
     defaultConfig {
         minSdkVersion 16
-        targetSdkVersion 25
+        targetSdkVersion 26
 
         versionName generateVersionName()
         versionCode generateVersionCode()
@@ -123,7 +123,8 @@ dependencies {
     androidTestCompile project(':twilioapi')
     androidTestCompile project(':token')
     androidTestCompile 'com.squareup.retrofit:retrofit:1.9.0'
-    androidTestCompile 'com.android.support:recyclerview-v7:25.0.1'
+    androidTestCompile 'com.android.support:design:26.1.0'
+    androidTestCompile 'com.android.support:recyclerview-v7:26.1.0'
     androidTestCompile 'com.android.support.test.espresso:espresso-core:3.0.0'
     androidTestCompile 'com.android.support.test.espresso:espresso-contrib:3.0.0'
     androidTestCompile 'com.android.support.test:runner:1.0.0'
@@ -131,7 +132,7 @@ dependencies {
     androidTestCompile 'com.android.support.test.uiautomator:uiautomator-v18:2.1.2'
     androidTestCompile 'com.google.code.gson:gson:2.7'
 
-    compile 'com.android.support:support-annotations:25.1.0'
+    compile 'com.android.support:support-annotations:26.1.0'
     compile 'com.getkeepsafe.relinker:relinker:1.2.2'
     // TODO this really should be on nexus as a jar and not local
     // TODO we are hardcoding architecture for now,

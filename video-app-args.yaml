@@ -18,6 +18,7 @@ library-instrumentation-tests:
         - 23
         - 24
         - 25
+        - 26
     locales: en
     orientations: portrait
 
@@ -73,6 +74,7 @@ library-camera-tests:
         - 23
         - 24
         - 25
+        - 26
     test-targets:
         - class com.twilio.video.Camera2CapturerIdParameterizedTest
         - class com.twilio.video.Camera2CapturerTest
