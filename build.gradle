@@ -39,6 +39,111 @@ allprojects {
     }
 }
 
+task tagReleaseCandidate {
+    description = 'Tags commit as release candidate'
+    group = 'Git'
+
+    doLast {
+        def rcTag = "${versionMajor}.${versionMinor}.${versionPatch}-rc${versionRc}"
+        def rcTagPath = "tags/${rcTag}"
+        exec {
+            workingDir "${rootDir}"
+            commandLine "git", "tag", "-a", "${rcTag}", "-m", "\"${rcTag} release candidate\""
+        }
+
+        exec {
+            workingDir "${rootDir}"
+            commandLine "git", "push", "origin", "${rcTagPath}"
+        }
+    }
+}
+
+task incrementRc {
+    description = 'Increment the current release candidate version'
+    group = 'Git'
+
+    doLast {
+        def gitBranch = System.getenv("GIT_BRANCH")
+        def nextVersionRc = "${versionRc + 1}"
+        def tmpProjectPropertiesFile = new FileOutputStream("${buildDir}/gradle.properties")
+        exec {
+            workingDir "${rootDir}"
+            commandLine "git", "checkout", "${gitBranch}"
+        }
+
+        exec {
+            workingDir "${rootDir}"
+            commandLine "echo", "Incrementing RC from ${versionRc} to ${nextVersionRc}"
+        }
+
+        exec {
+            workingDir "${rootDir}"
+            commandLine "sed",
+                    "s@versionRc=.*@versionRc=${nextVersionRc}@",
+                    "gradle.properties"
+            standardOutput tmpProjectPropertiesFile
+        }
+
+        exec {
+            workingDir "${rootDir}"
+            commandLine "mv", "${buildDir}/gradle.properties", "gradle.properties"
+        }
+
+        exec {
+            workingDir "${rootDir}"
+            commandLine "git ", "commit", "gradle.properties", "-m", "\"Bump RC version\""
+        }
+
+        exec {
+            workingDir "${rootDir}"
+            commandLine "git ", "push", "origin", "${gitBranch}"
+        }
+    }
+}
+
+task publishReleaseCandidateArtifacts {
+    description = 'Publishes Video Android AAR and javadocs to stage CDN'
+    group = 'Publishing'
+    dependsOn 'library:createJavadocs'
+
+    doLast {
+        // Clean up any previous rc
+        exec {
+            workingDir "${rootDir}"
+            commandLine "rm", "-rf", "target", "||", "true"
+        }
+
+        exec {
+            workingDir "${rootDir}"
+            commandLine "rm", "-rf", "dist", "||", "true"
+        }
+
+        // Copy artifacts where sdk release tool expects them
+        exec {
+            workingDir "${rootDir}"
+            commandLine "mkdir", "target"
+        }
+
+        exec {
+            workingDir "${rootDir}"
+            commandLine "cp",
+                    "library/build/outputs/aar/library-release.aar",
+                    "target/twilio-video-android.aar"
+        }
+
+        exec {
+            workingDir "${rootDir}"
+            commandLine "cp", "-r", "library/build/docs/javadoc", "target/"
+        }
+
+        // Perform rc with sdk release tool
+        exec {
+            workingDir "${rootDir}"
+            commandLine "./scripts/rc-release-script.sh"
+        }
+    }
+}
+
 task firebaseTestLabCheckLibrary(type: Exec) {
     group = 'Test'
     description = 'Runs library instrumentation tests on Firebase Test Lab'
@@ -90,6 +195,32 @@ task nexusLibrarySnapshotUpload(type: GradleBuild) {
     startParameter.projectProperties += gradle.startParameter.projectProperties + [
             'snapshot': true,
             'maven.repo': 'https://nexus.corp.twilio.com/content/repositories/snapshots',
+            'maven.username': null,
+            'maven.password': null
+    ]
+}
+
+task bintrayLibraryReleaseCandidateUpload(type: GradleBuild) {
+    description = 'Publish Video Android AAR release candidate to internal Bintray'
+    group = 'Publishing'
+    buildFile = file('library/build.gradle')
+    tasks = ['clean', 'assemble', 'uploadArchives']
+    startParameter.projectProperties += gradle.startParameter.projectProperties + [
+            'releaseCandidate': true,
+            'maven.repo': 'https://api.bintray.com/maven/twilio/internal-releases/video-android/;publish=1',
+            'maven.username': "${getBintrayUsername()}",
+            'maven.password': "${getBintrayPassword()}"
+    ]
+}
+
+task nexusLibraryReleaseCandidateUpload(type: GradleBuild) {
+    description = 'Publish Video Android AAR release candidate to Nexus'
+    group = 'Publishing'
+    buildFile = file('library/build.gradle')
+    tasks = ['clean', 'assemble', 'uploadArchives']
+    startParameter.projectProperties += gradle.startParameter.projectProperties + [
+            'releaseCandidate': true,
+            'maven.repo': 'https://nexus.corp.twilio.com/content/repositories/releases',
             'maven.username': null,
             'maven.password': null
     ]
