@@ -126,7 +126,6 @@ public class VideoTopologyParameterizedTest extends BaseClientTest {
     }
 
     @Test
-    @Ignore("Disconnecting while connecting results in native crash. See GSDK-1153")
     public void disconnect_canDisconnectBeforeConnectingToRoom() throws InterruptedException {
         ConnectOptions connectOptions = new ConnectOptions.Builder(token)
                 .build();

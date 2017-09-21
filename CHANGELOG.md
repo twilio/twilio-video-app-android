@@ -11,12 +11,12 @@ Bug Fixes
 - Fixed case on some devices where `CameraCapturer` incorrectly reported a failure to close the 
 camera.
 - Improved echo cancellation on Nexus 6P and Nexus 6 by enabling hardware echo canceller and disabling OpenSL ES.
+- Fixed crash disconnecting from `Room` that has not connected [#116](https://github.com/twilio/video-quickstart-android/issues/116)
 
 Known issues
 
 - Network handoff, and subsequent connection renegotiation is not supported for IPv6 networks [#72](https://github.com/twilio/video-quickstart-android/issues/72)
 - Participant disconnect event can take up to 120 seconds to occur [#80](https://github.com/twilio/video-quickstart-android/issues/80) [#73](https://github.com/twilio/video-quickstart-android/issues/73)
-- Disconnecting from a `Room` that has not connected sometimes results in a crash [#116](https://github.com/twilio/video-quickstart-android/issues/116)
 
 ####2.0.0-preview2
 
@@ -130,14 +130,14 @@ Bug Fixes
 
 Improvements
 
-- Upgraded to Android Oreo from Nougat
+- Upgraded to Android Oreo from Nougat 
+- Fixed crash disconnecting from `Room` that has not connected [#116](https://github.com/twilio/video-quickstart-android/issues/116)
 
 Known issues
 
 - Network handoff, and subsequent connection renegotiation is not supported for IPv6 networks [#72](https://github.com/twilio/video-quickstart-android/issues/72)
 - VP8 is the only supported codec [#71](https://github.com/twilio/video-quickstart-android/issues/71)
 - Participant disconnect event can take up to 120 seconds to occur [#80](https://github.com/twilio/video-quickstart-android/issues/80) [#73](https://github.com/twilio/video-quickstart-android/issues/73)
-- Disconnecting from a `Room` that has not connected sometimes results in a crash [#116](https://github.com/twilio/video-quickstart-android/issues/116)
 - LocalParticipant release method is public [#132](https://github.com/twilio/video-quickstart-android/issues/132)
 
 ####1.3.1
