@@ -65,6 +65,10 @@ task incrementRc {
     doLast {
         def gitBranch = System.getenv("GIT_BRANCH")
         def nextVersionRc = "${versionRc + 1}"
+        // Create build directory if not created
+        if (!buildDir.exists()) {
+            buildDir.mkdir()
+        }
         def tmpProjectPropertiesFile = new FileOutputStream("${buildDir}/gradle.properties")
         exec {
             workingDir "${rootDir}"
@@ -91,12 +95,12 @@ task incrementRc {
 
         exec {
             workingDir "${rootDir}"
-            commandLine "git ", "commit", "gradle.properties", "-m", "\"Bump RC version\""
+            commandLine "git", "commit", "gradle.properties", "-m", "\"Bump RC version\""
         }
 
         exec {
             workingDir "${rootDir}"
-            commandLine "git ", "push", "origin", "${gitBranch}"
+            commandLine "git", "push", "origin", "${gitBranch}"
         }
     }
 }
