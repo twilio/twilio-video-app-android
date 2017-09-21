@@ -17,7 +17,6 @@
 package com.twilio.video;
 
 import android.support.test.filters.LargeTest;
-import android.support.test.runner.AndroidJUnit4;
 
 import com.twilio.video.base.BaseStatsTest;
 import com.twilio.video.helper.CallbackHelper;
@@ -25,8 +24,11 @@ import com.twilio.video.util.FakeVideoCapturer;
 import com.twilio.video.util.Topology;
 
 import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.webrtc.MediaCodecVideoDecoder;
 import org.webrtc.MediaCodecVideoEncoder;
 
 import java.util.Arrays;
@@ -36,32 +38,58 @@ import java.util.concurrent.TimeUnit;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assume.assumeFalse;
+import static org.junit.Assume.assumeTrue;
 
-@RunWith(AndroidJUnit4.class)
+
+@RunWith(Parameterized.class)
 @LargeTest
-public class CodecPreferencesTest extends BaseStatsTest {
+public class CodecPreferenceVideoCodecParameterizedTest extends BaseStatsTest {
+    @Parameterized.Parameters(name = "Topology: {0}, VideoCodec: {1}")
+    public static Iterable<Object[]> data() {
+        return Arrays.asList(new Object[][]{
+                {Topology.P2P, VideoCodec.VP8},
+                {Topology.P2P, VideoCodec.H264},
+                {Topology.P2P, VideoCodec.VP9}
+
+                // TODO: Enable codec preferences tests for group rooms GSDK-1291
+                // {Topology.GROUP, VideoCodec.VP8},
+                // {Topology.GROUP, VideoCodec.H264},
+                // {Topology.GROUP, VideoCodec.VP9}
+        });
+    }
+
+    private final Topology topology;
+    private final VideoCodec videoCodec;
+
+    public CodecPreferenceVideoCodecParameterizedTest(Topology topology, VideoCodec videoCodec) {
+        this.topology = topology;
+        this.videoCodec = videoCodec;
+    }
+
+    @Before
+    public void setup() throws InterruptedException {
+        super.setup();
+        baseSetup(topology);
+    }
+
     @After
     public void teardown() throws InterruptedException {
         super.teardown();
     }
 
     @Test
-    public void canPreferVideoCodecs() throws InterruptedException {
-        super.baseSetup(Topology.P2P);
-
-        // Device without H264 support required to test fallback preference
-        assumeFalse(MediaCodecVideoEncoder.isH264HwSupported());
-
-        VideoCodec expectedVideoCodec = VideoCodec.VP9;
-
-        // Connect alice with video track and preferred codecs
+    public void canPreferVideoCodec() throws InterruptedException {
+        if (videoCodec == VideoCodec.H264) {
+            assumeTrue(MediaCodecVideoEncoder.isH264HwSupported());
+            assumeTrue(MediaCodecVideoDecoder.isH264HwSupported());
+        }
+        // Connect alice with video track and preferred codec
         aliceLocalVideoTrack = LocalVideoTrack.create(mediaTestActivity, true,
                 new FakeVideoCapturer());
         ConnectOptions aliceConnectOptions = new ConnectOptions.Builder(aliceToken)
                 .roomName(roomName)
                 .videoTracks(Collections.singletonList(aliceLocalVideoTrack))
-                .preferVideoCodecs(Arrays.asList(VideoCodec.H264, VideoCodec.VP9))
+                .preferVideoCodecs(Collections.singletonList(videoCodec))
                 .build();
         aliceRoom = createRoom(aliceListener, aliceConnectOptions);
         aliceListener.onParticipantConnectedLatch = new CountDownLatch(1);
@@ -92,10 +120,10 @@ public class CodecPreferencesTest extends BaseStatsTest {
         StatsReport aliceStatsReport = aliceStatsListener.getStatsReports().get(0);
         StatsReport bobStatsReport = bobStatsListener.getStatsReports().get(0);
 
-        // Validate that fallback preference
-        assertEquals(expectedVideoCodec.name().toLowerCase(),
+        // Validate that both stats report see the correct codec
+        assertEquals(videoCodec.name().toLowerCase(),
                 aliceStatsReport.getLocalVideoTrackStats().get(0).codec.toLowerCase());
-        assertEquals(expectedVideoCodec.name().toLowerCase(),
+        assertEquals(videoCodec.name().toLowerCase(),
                 bobStatsReport.getRemoteVideoTrackStats().get(0).codec.toLowerCase());
     }
 }

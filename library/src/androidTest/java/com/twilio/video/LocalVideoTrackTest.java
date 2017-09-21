@@ -19,6 +19,7 @@ package com.twilio.video;
 import android.content.Context;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.filters.SmallTest;
+import android.support.test.runner.AndroidJUnit4;
 
 import com.twilio.video.util.FakeVideoCapturer;
 import com.twilio.video.util.FakeVideoRenderer;
@@ -32,9 +33,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 
-import junitparams.JUnitParamsRunner;
-import junitparams.Parameters;
-import junitparams.naming.TestCaseName;
 
 import static com.twilio.video.util.VideoAssert.assertNoFramesRendered;
 import static junit.framework.Assert.assertEquals;
@@ -42,7 +40,7 @@ import static junit.framework.Assert.assertFalse;
 import static junit.framework.TestCase.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-@RunWith(JUnitParamsRunner.class)
+@RunWith(AndroidJUnit4.class)
 @SmallTest
 public class LocalVideoTrackTest {
     private static final int LOCAL_VIDEO_TRACK_TEST_DELAY_MS = 3000;
@@ -68,21 +66,27 @@ public class LocalVideoTrackTest {
     }
 
     @Test
-    @Parameters({ "false", "true" })
-    @TestCaseName("{method}[enabled: {0}]")
-    public void canCreateVideoTrack(boolean enabled) {
-        localVideoTrack = LocalVideoTrack.create(context, enabled, fakeVideoCapturer);
+    public void canCreateDisabledVideoTrack() {
+        localVideoTrack = LocalVideoTrack.create(context, false, fakeVideoCapturer);
 
         assertNotNull(localVideoTrack);
-        assertEquals(enabled, localVideoTrack.isEnabled());
+        assertFalse(localVideoTrack.isEnabled());
         assertTrue(fakeVideoCapturer.isStarted());
     }
 
     @Test
-    @Parameters
-    @TestCaseName("{method}[name: {0}]")
-    public void canCreateVideoTrackWithName(String name, String expectedName) {
-        localVideoTrack = LocalVideoTrack.create(context, true, fakeVideoCapturer, name);
+    public void canCreateEnabledVideoTrack() {
+        localVideoTrack = LocalVideoTrack.create(context, true, fakeVideoCapturer);
+
+        assertNotNull(localVideoTrack);
+        assertTrue(localVideoTrack.isEnabled());
+        assertTrue(fakeVideoCapturer.isStarted());
+    }
+
+    @Test
+    public void canCreateVideoTrackWithName() {
+        String expectedName = RandUtils.generateRandomString(10);
+        localVideoTrack = LocalVideoTrack.create(context, true, fakeVideoCapturer, expectedName);
 
         assertNotNull(localVideoTrack);
         assertEquals(expectedName, localVideoTrack.getName());
@@ -90,69 +94,103 @@ public class LocalVideoTrackTest {
     }
 
     @Test
-    @Parameters({ "false", "true" })
-    @TestCaseName("{method}[enabled: {0}]")
-    public void isEnabled_shouldReturnFalseAfterReleased(boolean enabled) {
-        localVideoTrack = LocalVideoTrack.create(context, enabled, fakeVideoCapturer);
-        assertEquals(enabled, localVideoTrack.isEnabled());
-        localVideoTrack.release();
-        assertFalse(localVideoTrack.isEnabled());
+    public void canCreateVideoTrackWithNullName() {
+        String nullName = null;
+        String expectedName = "";
+        localVideoTrack = LocalVideoTrack.create(context, true, fakeVideoCapturer, nullName);
+
+        assertNotNull(localVideoTrack);
+        assertEquals(expectedName, localVideoTrack.getName());
+        assertTrue(fakeVideoCapturer.isStarted());
     }
 
     @Test
-    @Parameters({ "false", "true" })
-    @TestCaseName("{method}[enabled: {0}]")
-    public void enable_shouldChangeState(boolean enabled) {
-        localVideoTrack = LocalVideoTrack.create(context, enabled, fakeVideoCapturer);
-        boolean updatedEnabled = !enabled;
+    public void canCreateVideoTrackWithEmptyName() {
+        String emptyName = "";
+        String expectedName = "";
+        localVideoTrack = LocalVideoTrack.create(context, true, fakeVideoCapturer, emptyName);
 
-        localVideoTrack.enable(updatedEnabled);
-
-        assertEquals(updatedEnabled, localVideoTrack.isEnabled());
+        assertNotNull(localVideoTrack);
+        assertEquals(expectedName, localVideoTrack.getName());
+        assertTrue(fakeVideoCapturer.isStarted());
     }
 
     @Test
-    @Parameters({ "false", "true" })
-    @TestCaseName("{method}[enabled: {0}]")
-    public void enable_shouldAllowToggling(boolean enabled) {
-        int numIterations = 10;
-        localVideoTrack = LocalVideoTrack.create(context, enabled, fakeVideoCapturer);
+    public void isEnabled_shouldReturnFalseAfterReleased() {
+        boolean[] enabledParameters = new boolean[] {false, true};
 
-        for (int i = 0 ; i < numIterations ; i++) {
+        for (boolean enabled : enabledParameters) {
+            localVideoTrack = LocalVideoTrack.create(context, enabled, fakeVideoCapturer);
+            assertEquals(enabled, localVideoTrack.isEnabled());
+            localVideoTrack.release();
+            assertFalse(localVideoTrack.isEnabled());
+        }
+    }
+
+    @Test
+    public void enable_shouldChangeState() {
+        boolean[] enabledParameters = new boolean[] {false, true};
+
+        for (boolean enabled : enabledParameters) {
+            localVideoTrack = LocalVideoTrack.create(context, enabled, fakeVideoCapturer);
             boolean updatedEnabled = !enabled;
 
             localVideoTrack.enable(updatedEnabled);
-
             assertEquals(updatedEnabled, localVideoTrack.isEnabled());
-            enabled = updatedEnabled;
+            localVideoTrack.release();
         }
     }
 
     @Test
-    @Parameters({ "false", "true" })
-    @TestCaseName("{method}[enabled: {0}]")
-    public void enable_shouldAllowSameState(boolean enabled) {
-        int numIterations = 10;
-        localVideoTrack = LocalVideoTrack.create(context, enabled, fakeVideoCapturer);
+    public void enable_shouldAllowToggling() {
+        boolean[] enabledParameters = new boolean[] {false, true};
 
-        for (int i = 0 ; i < numIterations ; i++) {
-            localVideoTrack.enable(enabled);
+        for (boolean enabled : enabledParameters) {
+            int numIterations = 10;
+            localVideoTrack = LocalVideoTrack.create(context, enabled, fakeVideoCapturer);
 
-            assertEquals(enabled, localVideoTrack.isEnabled());
+            for (int i = 0; i < numIterations; i++) {
+                boolean updatedEnabled = !enabled;
+
+                localVideoTrack.enable(updatedEnabled);
+
+                assertEquals(updatedEnabled, localVideoTrack.isEnabled());
+                enabled = updatedEnabled;
+            }
+            localVideoTrack.release();
         }
     }
 
     @Test
-    @Parameters({ "false", "true" })
-    @TestCaseName("{method}[enabled: {0}]")
-    public void enable_shouldNotBeAllowedAfterReleased(boolean enabled) {
-        boolean updatedEnabled = !enabled;
-        localVideoTrack = LocalVideoTrack.create(context, enabled, fakeVideoCapturer);
+    public void enable_shouldAllowSameState() {
+        boolean[] enabledParameters = new boolean[] {false, true};
 
-        localVideoTrack.release();
-        localVideoTrack.enable(updatedEnabled);
+        for (boolean enabled : enabledParameters) {
+            int numIterations = 10;
+            localVideoTrack = LocalVideoTrack.create(context, enabled, fakeVideoCapturer);
 
-        assertEquals(false, localVideoTrack.isEnabled());
+            for (int i = 0; i < numIterations; i++) {
+                localVideoTrack.enable(enabled);
+
+                assertEquals(enabled, localVideoTrack.isEnabled());
+            }
+            localVideoTrack.release();
+        }
+    }
+
+    @Test
+    public void enable_shouldNotBeAllowedAfterReleased() {
+        boolean[] enabledParameters = new boolean[] {false, true};
+
+        for (boolean enabled : enabledParameters) {
+            boolean updatedEnabled = !enabled;
+            localVideoTrack = LocalVideoTrack.create(context, enabled, fakeVideoCapturer);
+
+            localVideoTrack.release();
+            localVideoTrack.enable(updatedEnabled);
+
+            assertEquals(false, localVideoTrack.isEnabled());
+        }
     }
 
     @Test
@@ -258,15 +296,5 @@ public class LocalVideoTrackTest {
 
         // Validate that eventually frame events stop
         assertNoFramesRendered(frameCountRenderer, LOCAL_VIDEO_TRACK_TEST_DELAY_MS);
-    }
-
-    private Object[] parametersForCanCreateVideoTrackWithName() {
-        String videoTrackName = RandUtils.generateRandomString(10);
-
-        return new Object[]{
-                new Object[]{null, ""},
-                new Object[]{"", ""},
-                new Object[]{videoTrackName, videoTrackName}
-        };
     }
 }

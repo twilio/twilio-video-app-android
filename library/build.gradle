@@ -124,7 +124,6 @@ dependencies {
     androidTestCompile project(':twilioapi')
     androidTestCompile project(':token')
     androidTestCompile 'com.squareup.retrofit:retrofit:1.9.0'
-    androidTestCompile 'pl.pragmatists:JUnitParams:1.1.0'
     androidTestCompile 'com.android.support:design:26.1.0'
     androidTestCompile 'com.android.support:recyclerview-v7:26.1.0'
     androidTestCompile 'com.android.support.test.espresso:espresso-core:3.0.0'

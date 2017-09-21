@@ -17,17 +17,16 @@
 package com.twilio.video;
 
 import android.support.test.filters.LargeTest;
-import android.support.test.runner.AndroidJUnit4;
 
 import com.twilio.video.base.BaseStatsTest;
 import com.twilio.video.helper.CallbackHelper;
-import com.twilio.video.util.FakeVideoCapturer;
 import com.twilio.video.util.Topology;
 
 import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.webrtc.MediaCodecVideoEncoder;
+import org.junit.runners.Parameterized;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -36,32 +35,56 @@ import java.util.concurrent.TimeUnit;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assume.assumeFalse;
 
-@RunWith(AndroidJUnit4.class)
+@RunWith(Parameterized.class)
 @LargeTest
-public class CodecPreferencesTest extends BaseStatsTest {
+public class CodecPreferencesAudioCodecParameterizedTest extends BaseStatsTest {
+    @Parameterized.Parameters(name = "Topology: {0}, AudioCodec: {1}")
+    public static Iterable<Object[]> data() {
+        return Arrays.asList(new Object[][]{
+                {Topology.P2P, AudioCodec.ISAC},
+                {Topology.P2P, AudioCodec.OPUS},
+                {Topology.P2P, AudioCodec.PCMA},
+                {Topology.P2P, AudioCodec.PCMU},
+                {Topology.P2P, AudioCodec.G722}
+
+                // TODO: Enable codec preferences tests for group rooms GSDK-1291
+                // {Topology.GROUP, AudioCodec.ISAC},
+                // {Topology.GROUP, AudioCodec.OPUS},
+                // {Topology.GROUP, AudioCodec.PCMA},
+                // {Topology.GROUP, AudioCodec.PCMU},
+                // {Topology.GROUP, AudioCodec.G722}
+        });
+    }
+
+    private final Topology topology;
+    private final AudioCodec audioCodec;
+
+    public CodecPreferencesAudioCodecParameterizedTest(Topology topology, AudioCodec audioCodec) {
+        this.topology = topology;
+        this.audioCodec = audioCodec;
+    }
+
+    @Before
+    public void setup() throws InterruptedException {
+        super.setup();
+        baseSetup(topology);
+    }
+
     @After
     public void teardown() throws InterruptedException {
         super.teardown();
     }
 
     @Test
-    public void canPreferVideoCodecs() throws InterruptedException {
-        super.baseSetup(Topology.P2P);
-
-        // Device without H264 support required to test fallback preference
-        assumeFalse(MediaCodecVideoEncoder.isH264HwSupported());
-
-        VideoCodec expectedVideoCodec = VideoCodec.VP9;
-
-        // Connect alice with video track and preferred codecs
-        aliceLocalVideoTrack = LocalVideoTrack.create(mediaTestActivity, true,
-                new FakeVideoCapturer());
+    public void canPreferAudioCodec()
+            throws InterruptedException {
+        // Connect alice with audio track and preferred codec
+        aliceLocalAudioTrack = LocalAudioTrack.create(mediaTestActivity, true);
         ConnectOptions aliceConnectOptions = new ConnectOptions.Builder(aliceToken)
                 .roomName(roomName)
-                .videoTracks(Collections.singletonList(aliceLocalVideoTrack))
-                .preferVideoCodecs(Arrays.asList(VideoCodec.H264, VideoCodec.VP9))
+                .audioTracks(Collections.singletonList(aliceLocalAudioTrack))
+                .preferAudioCodecs(Collections.singletonList(audioCodec))
                 .build();
         aliceRoom = createRoom(aliceListener, aliceConnectOptions);
         aliceListener.onParticipantConnectedLatch = new CountDownLatch(1);
@@ -92,10 +115,10 @@ public class CodecPreferencesTest extends BaseStatsTest {
         StatsReport aliceStatsReport = aliceStatsListener.getStatsReports().get(0);
         StatsReport bobStatsReport = bobStatsListener.getStatsReports().get(0);
 
-        // Validate that fallback preference
-        assertEquals(expectedVideoCodec.name().toLowerCase(),
-                aliceStatsReport.getLocalVideoTrackStats().get(0).codec.toLowerCase());
-        assertEquals(expectedVideoCodec.name().toLowerCase(),
-                bobStatsReport.getRemoteVideoTrackStats().get(0).codec.toLowerCase());
+        // Validate that both stats report see the correct codec
+        assertEquals(audioCodec.name().toLowerCase(),
+                aliceStatsReport.getLocalAudioTrackStats().get(0).codec.toLowerCase());
+        assertEquals(audioCodec.name().toLowerCase(),
+                bobStatsReport.getRemoteAudioTrackStats().get(0).codec.toLowerCase());
     }
 }
