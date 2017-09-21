@@ -40,3 +40,43 @@ ext.generateVersionCode = {
 
     return build * 1000
 }
+
+ext.getBintrayUsername = {
+    def bintrayUsername  = System.getenv("BINTRAY_USERNAME");
+
+    if (bintrayUsername == null) {
+        logger.log(LogLevel.INFO, "Could not locate BINTRAY_USERNAME environment variable. " +
+                "Trying local.properties")
+        Properties properties = new Properties()
+        if (project.rootProject.file('local.properties').exists()) {
+            properties.load(project.rootProject.file('local.properties').newDataInputStream())
+            bintrayUsername = properties.getProperty('BINTRAY_USERNAME')
+        }
+    }
+
+    if (bintrayUsername == null) {
+        logger.log(LogLevel.WARN, "Bintray username unavailable.")
+    }
+
+    return bintrayUsername;
+}
+
+ext.getBintrayPassword = {
+    def bintrayPassword  = System.getenv("BINTRAY_PASSWORD");
+
+    if (bintrayPassword == null) {
+        logger.log(LogLevel.INFO, "Could not locate BINTRAY_PASSWORD environment variable. " +
+                "Trying local.properties")
+        Properties properties = new Properties()
+        if (project.rootProject.file('local.properties').exists()) {
+            properties.load(project.rootProject.file('local.properties').newDataInputStream())
+            bintrayPassword = properties.getProperty('BINTRAY_PASSWORD')
+        }
+    }
+
+    if (bintrayPassword == null) {
+        logger.log(LogLevel.WARN, "Bintray password unavailable.")
+    }
+
+    return bintrayPassword;
+}
