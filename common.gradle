@@ -27,7 +27,7 @@ ext.releaseKeyPassword = (project.hasProperty('androidReleaseKeyPassword') ?
 
 ext.generateVersionName = {
     return "${versionMajor}.${versionMinor}.${versionPatch}" +
-           ((project.hasProperty("release") && project.property("release").toBoolean() == true) ?
+           ((project.hasProperty("preRelease") && project.property("preRelease").toBoolean() == true) ?
                    "-${project.property("phase")}${project.property("phaseNumber")}" : '') +
            ((project.hasProperty("releaseCandidate") && project.property("releaseCandidate").toBoolean() == true) ?
                    "-rc${project.property("versionRc")}" : '') +
