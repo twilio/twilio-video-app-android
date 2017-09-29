@@ -15,9 +15,9 @@
  */
 
 #include "com_twilio_video_RemoteParticipant.h"
+#include "com_twilio_video_RemoteDataTrack.h"
 #include "logging.h"
 
-#include "webrtc/sdk/android/src/jni/jni_helpers.h"
 #include "webrtc/sdk/android/src/jni/classreferenceholder.h"
 
 #include "video/video.h"
@@ -43,7 +43,9 @@ void bindRemoteParticipantListenerProxy(JNIEnv *env,
                                                          remote_participant_context->remote_audio_track_publication_map,
                                                          remote_participant_context->remote_audio_track_map,
                                                          remote_participant_context->remote_video_track_publication_map,
-                                                         remote_participant_context->remote_video_track_map);
+                                                         remote_participant_context->remote_video_track_map,
+                                                         remote_participant_context->remote_data_track_publication_map,
+                                                         remote_participant_context->remote_data_track_map);
     remote_participant_context->remote_participant->setObserver(
             remote_participant_context->android_participant_observer);
 }
@@ -63,6 +65,10 @@ jobject createJavaRemoteParticipant(JNIEnv *env,
                                     jclass j_remote_video_track_publication_class,
                                     jmethodID j_remote_video_track_ctor_id,
                                     jmethodID j_remote_video_track_publication_ctor_id,
+                                    jclass j_remote_data_track_class,
+                                    jclass j_remote_data_track_publication_class,
+                                    jmethodID j_remote_data_track_ctor_id,
+                                    jmethodID j_remote_data_track_publication_ctor_id,
                                     jobject j_handler) {
     RemoteParticipantContext *remote_participant_context = new RemoteParticipantContext();
     remote_participant_context->remote_participant = remote_participant;
@@ -87,6 +93,15 @@ jobject createJavaRemoteParticipant(JNIEnv *env,
                                                                        j_remote_video_track_publication_class,
                                                                        j_remote_video_track_ctor_id,
                                                                        j_remote_video_track_publication_ctor_id);
+    jobject j_remote_data_tracks = createRemoteParticipantDataTracks(env,
+                                                                     remote_participant_context,
+                                                                     j_array_list_class,
+                                                                     j_array_list_ctor_id,
+                                                                     j_array_list_add,
+                                                                     j_remote_data_track_class,
+                                                                     j_remote_data_track_publication_class,
+                                                                     j_remote_data_track_ctor_id,
+                                                                     j_remote_data_track_publication_ctor_id);
 
     // Create participant
     jlong j_remote_participant_context = webrtc_jni::jlongFromPointer(remote_participant_context);
@@ -96,6 +111,7 @@ jobject createJavaRemoteParticipant(JNIEnv *env,
                                                    j_sid,
                                                    j_remote_audio_tracks,
                                                    j_remote_video_tracks,
+                                                   j_remote_data_tracks,
                                                    j_handler,
                                                    j_remote_participant_context);
 
@@ -188,6 +204,46 @@ jobject createRemoteParticipantVideoTracks(JNIEnv *env,
     return j_remote_video_tracks;
 }
 
+jobject createRemoteParticipantDataTracks(JNIEnv *env,
+                                          RemoteParticipantContext *remote_participant_context,
+                                          jclass j_array_list_class,
+                                          jmethodID j_array_list_ctor_id,
+                                          jmethodID j_array_list_add,
+                                          jclass j_remote_data_track_class,
+                                          jclass j_remote_data_track_publication_class,
+                                          jmethodID j_remote_data_track_ctor_id,
+                                          jmethodID j_remote_data_track_publication_ctor_id) {
+    jobject j_remote_data_tracks = env->NewObject(j_array_list_class, j_array_list_ctor_id);
+
+    const std::vector<std::shared_ptr<twilio::media::RemoteDataTrackPublication>> remote_data_track_publications =
+            remote_participant_context->remote_participant->getRemoteDataTracks();
+
+    // Add data tracks to array list
+    for (unsigned int i = 0; i < remote_data_track_publications.size(); i++) {
+        std::shared_ptr<twilio::media::RemoteDataTrackPublication> remote_data_track_publication =
+                remote_data_track_publications[i];
+        jobject j_remote_data_track_publication =
+                createJavaRemoteDataTrackPublication(env,
+                                                     remote_data_track_publication,
+                                                     j_remote_data_track_publication_class,
+                                                     j_remote_data_track_publication_ctor_id);
+
+        /*
+         * We create a global reference to the java data track so we can map data track events
+         * to the original java instance.
+         */
+        remote_participant_context->remote_data_track_publication_map
+                .insert(std::make_pair(remote_data_track_publication,
+                                       webrtc_jni::NewGlobalRef(env,
+                                                                j_remote_data_track_publication)));
+        env->CallBooleanMethod(j_remote_data_tracks,
+                               j_array_list_add,
+                               j_remote_data_track_publication);
+    }
+
+    return j_remote_data_tracks;
+}
+
 jobject createJavaRemoteAudioTrack(JNIEnv *env,
                                    std::shared_ptr<twilio::media::RemoteAudioTrack> remote_audio_track,
                                    jobject j_webrtc_audio_track,
@@ -264,6 +320,27 @@ jobject createJavaRemoteVideoTrackPublication(JNIEnv *env,
     return j_remote_video_track_publication;
 }
 
+jobject createJavaRemoteDataTrackPublication(JNIEnv *env,
+                                             std::shared_ptr<twilio::media::RemoteDataTrackPublication> remote_data_track_publication,
+                                             jclass j_remote_data_track_publication_class,
+                                             jmethodID j_remote_data_track_publication_ctor_id) {
+    jstring j_track_sid = webrtc_jni::JavaStringFromStdString(env,
+                                                              remote_data_track_publication->getTrackSid());
+    jstring j_track_name = webrtc_jni::JavaStringFromStdString(env,
+                                                               remote_data_track_publication->getTrackName());
+    jboolean j_is_subscribed = (jboolean) remote_data_track_publication->isTrackSubscribed();
+    jboolean j_is_enabled = (jboolean) remote_data_track_publication->isTrackEnabled();
+    jobject j_remote_data_track_publication = env->NewObject(j_remote_data_track_publication_class,
+                                                             j_remote_data_track_publication_ctor_id,
+                                                             j_is_subscribed,
+                                                             j_is_enabled,
+                                                             j_track_sid,
+                                                             j_track_name);
+    CHECK_EXCEPTION(env) << "Failed to create RemoteDataTrackPublication";
+
+    return j_remote_data_track_publication;
+}
+
 
 
 JNIEXPORT jboolean JNICALL
@@ -320,6 +397,18 @@ Java_com_twilio_video_RemoteParticipant_nativeRelease(JNIEnv *env,
         webrtc_jni::DeleteGlobalRef(env, it->second);
     }
     participant_context->remote_video_track_publication_map.clear();
+
+    // Delete all remaining global references to DataTracks
+    for (auto it = participant_context->remote_data_track_publication_map.begin() ;
+         it != participant_context->remote_data_track_publication_map.end() ; it++) {
+        webrtc_jni::DeleteGlobalRef(env, it->second);
+    }
+    participant_context->remote_data_track_publication_map.clear();
+    for (auto it = participant_context->remote_data_track_map.begin() ;
+         it != participant_context->remote_data_track_map.end() ; it++) {
+        webrtc_jni::DeleteGlobalRef(env, it->second);
+    }
+    participant_context->remote_data_track_publication_map.clear();
 
     // Now that all participant resources are deleted we delete participant context
     delete participant_context;

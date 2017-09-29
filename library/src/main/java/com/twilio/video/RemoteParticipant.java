@@ -35,10 +35,12 @@ public class RemoteParticipant implements Participant {
     private final List<AudioTrackPublication> audioTrackPublications;
     private final List<RemoteVideoTrackPublication> remoteVideoTrackPublications;
     private final List<VideoTrackPublication> videoTrackPublications;
+    private final List<RemoteDataTrackPublication> remoteDataTrackPublications;
+    private final List<DataTrackPublication> dataTrackPublications;
     private final Handler handler;
 
     /*
-     * We pass all native participant callbacks through the listener proxy and atomically
+     * All native participant callbacks are passed through the listener proxy and atomically
      * forward events to the developer listener.
      */
     private final AtomicReference<Listener> listenerReference = new AtomicReference<>(null);
@@ -229,6 +231,91 @@ public class RemoteParticipant implements Participant {
         }
 
         @Override
+        public void onDataTrackPublished(final RemoteParticipant remoteParticipant,
+                                         final RemoteDataTrackPublication remoteDataTrackPublication) {
+            checkCallback(remoteParticipant, remoteDataTrackPublication, "onDataTrackPublished");
+            handler.post(new Runnable() {
+                @Override
+                public void run() {
+                    logger.d("onDataTrackPublished");
+                    dataTrackPublications.add(remoteDataTrackPublication);
+                    remoteDataTrackPublications.add(remoteDataTrackPublication);
+                    Listener listener = listenerReference.get();
+
+                    if (listener != null) {
+                        listener.onDataTrackPublished(remoteParticipant,
+                                remoteDataTrackPublication);
+                    }
+                }
+            });
+        }
+
+        @Override
+        public void onDataTrackUnpublished(final RemoteParticipant remoteParticipant,
+                                           final RemoteDataTrackPublication remoteDataTrackPublication) {
+            checkCallback(remoteParticipant, remoteDataTrackPublication, "onDataTrackUnpublished");
+            handler.post(new Runnable() {
+                @Override
+                public void run() {
+                    logger.d("onDataTrackUnpublished");
+                    dataTrackPublications.remove(remoteDataTrackPublication);
+                    remoteDataTrackPublications.remove(remoteDataTrackPublication);
+                    Listener listener = listenerReference.get();
+
+                    if (listener != null) {
+                        listener.onDataTrackUnpublished(remoteParticipant,
+                                remoteDataTrackPublication);
+                    }
+                }
+            });
+        }
+
+        @Override
+        public void onDataTrackSubscribed(final RemoteParticipant remoteParticipant,
+                                          final RemoteDataTrackPublication remoteDataTrackPublication,
+                                          final RemoteDataTrack remoteDataTrack) {
+            checkCallback(remoteParticipant, remoteDataTrackPublication, "onDataTrackSubscribed");
+            handler.post(new Runnable() {
+                @Override
+                public void run() {
+                    logger.d("onDataTrackSubscribed");
+                    remoteDataTrackPublication.setSubscribed(true);
+                    remoteDataTrackPublication.setRemoteDataTrack(remoteDataTrack);
+                    Listener listener = listenerReference.get();
+
+                    if (listener != null) {
+                        listener.onDataTrackSubscribed(remoteParticipant,
+                                remoteDataTrackPublication,
+                                remoteDataTrack);
+                    }
+                }
+            });
+        }
+
+        @Override
+        public void onDataTrackUnsubscribed(final RemoteParticipant remoteParticipant,
+                                            final RemoteDataTrackPublication remoteDataTrackPublication,
+                                            final RemoteDataTrack remoteDataTrack) {
+            checkCallback(remoteParticipant, remoteDataTrackPublication, "onDataTrackUnsubscribed");
+            handler.post(new Runnable() {
+                @Override
+                public void run() {
+                    logger.d("onDataTrackUnsubscribed");
+                    remoteDataTrack.release();
+                    remoteDataTrackPublication.setRemoteDataTrack(null);
+                    remoteDataTrackPublication.setSubscribed(false);
+                    Listener listener = listenerReference.get();
+
+                    if (listener != null) {
+                        listener.onDataTrackUnsubscribed(remoteParticipant,
+                                remoteDataTrackPublication,
+                                remoteDataTrack);
+                    }
+                }
+            });
+        }
+
+        @Override
         public void onAudioTrackEnabled(final RemoteParticipant remoteParticipant,
                                         final RemoteAudioTrackPublication remoteAudioTrackPublication) {
             checkCallback(remoteParticipant, remoteAudioTrackPublication, "onAudioTrackEnabled");
@@ -319,6 +406,7 @@ public class RemoteParticipant implements Participant {
                       String sid,
                       List<RemoteAudioTrackPublication> remoteAudioTrackPublications,
                       List<RemoteVideoTrackPublication> remoteVideoTrackPublications,
+                      List<RemoteDataTrackPublication> remoteDataTrackPublications,
                       Handler handler,
                       long nativeParticipantContext) {
         this.identity = identity;
@@ -329,6 +417,9 @@ public class RemoteParticipant implements Participant {
         this.remoteVideoTrackPublications = remoteVideoTrackPublications;
         this.videoTrackPublications = new ArrayList<>(remoteVideoTrackPublications.size());
         addVideoTracks(remoteVideoTrackPublications);
+        this.remoteDataTrackPublications = remoteDataTrackPublications;
+        this.dataTrackPublications = new ArrayList<>(remoteDataTrackPublications.size());
+        addDataTracks(remoteDataTrackPublications);
         this.handler = handler;
         this.nativeParticipantContext = nativeParticipantContext;
     }
@@ -366,9 +457,15 @@ public class RemoteParticipant implements Participant {
     }
 
     /**
+     * Returns read-only list of data track publications.
+     */
+    @Override
+    public List<DataTrackPublication> getDataTracks() {
+        return Collections.unmodifiableList(dataTrackPublications);
+    }
+
+    /**
      * Returns read-only list of remote audio track publications.
-     *
-     * @return list of audio tracks.
      */
     public List<RemoteAudioTrackPublication> getRemoteAudioTracks() {
         return Collections.unmodifiableList(remoteAudioTrackPublications);
@@ -376,11 +473,16 @@ public class RemoteParticipant implements Participant {
 
     /**
      * Returns read-only list of remote video track publications.
-     *
-     * @return list of video tracks.
      */
     public List<RemoteVideoTrackPublication> getRemoteVideoTracks() {
         return Collections.unmodifiableList(remoteVideoTrackPublications);
+    }
+
+    /**
+     * Returns a read-only list of remote data track publications.
+     */
+    public List<RemoteDataTrackPublication> getRemoteDataTracks() {
+        return Collections.unmodifiableList(remoteDataTrackPublications);
     }
 
     /**
@@ -435,6 +537,12 @@ public class RemoteParticipant implements Participant {
     private void addVideoTracks(List<RemoteVideoTrackPublication> remoteVideoTracks) {
         for (RemoteVideoTrackPublication remoteVideoTrackPublication : remoteVideoTracks) {
             videoTrackPublications.add(remoteVideoTrackPublication);
+        }
+    }
+
+    private void addDataTracks(List<RemoteDataTrackPublication> remoteDataTracks) {
+        for (RemoteDataTrackPublication remoteDataTrackPublication : remoteDataTracks) {
+            dataTrackPublications.add(remoteDataTrackPublication);
         }
     }
 
@@ -526,6 +634,48 @@ public class RemoteParticipant implements Participant {
         void onVideoTrackUnsubscribed(RemoteParticipant remoteParticipant,
                                       RemoteVideoTrackPublication remoteVideoTrackPublication,
                                       RemoteVideoTrack remoteVideoTrack);
+
+        /**
+         * This method notifies the listener that a {@link RemoteParticipant} has published
+         * a {@link RemoteDataTrack} to this {@link Room}.
+         * @param remoteParticipant The participant object associated with this data track.
+         * @param remoteDataTrackPublication The data track publication.
+         */
+        void onDataTrackPublished(RemoteParticipant remoteParticipant,
+                                  RemoteDataTrackPublication remoteDataTrackPublication);
+
+        /**
+         * This method notifies the listener that a {@link RemoteParticipant} has removed
+         * a {@link RemoteDataTrack} from this {@link Room}.
+         * @param remoteParticipant The participant object associated with this data track.
+         * @param remoteDataTrackPublication The data track publication.
+         */
+        void onDataTrackUnpublished(RemoteParticipant remoteParticipant,
+                                    RemoteDataTrackPublication remoteDataTrackPublication);
+
+        /**
+         * This method notifies the listener the {@link RemoteDataTrack} of the
+         * {@link RemoteParticipant} has been subscribed to. Data track messages can be now be
+         * received.
+         * @param remoteParticipant The remoteParticipant object associated with this data track.
+         * @param remoteDataTrackPublication The data track publication.
+         * @param remoteDataTrack The data track subscribed to.
+         */
+        void onDataTrackSubscribed(RemoteParticipant remoteParticipant,
+                                   RemoteDataTrackPublication remoteDataTrackPublication,
+                                   RemoteDataTrack remoteDataTrack);
+
+        /**
+         * This method notifies the listener that the {@link RemoteDataTrack} of the
+         * {@link RemoteParticipant} has been unsubscribed from. Data track messages will no longer
+         * be received.
+         * @param remoteParticipant The remoteParticipant object associated with this data track.
+         * @param remoteDataTrackPublication The data track publication.
+         * @param remoteDataTrack The data track removed from this room.
+         */
+        void onDataTrackUnsubscribed(RemoteParticipant remoteParticipant,
+                                     RemoteDataTrackPublication remoteDataTrackPublication,
+                                     RemoteDataTrack remoteDataTrack);
 
         /**
          * This method notifies the listener that a {@link RemoteParticipant} audio track

@@ -30,7 +30,8 @@ public:
                                     jobject j_local_participant,
                                     jobject j_local_participant_observer,
                                     std::map<std::string, jobject>& local_audio_track_map,
-                                    std::map<std::string, jobject>& local_video_track_map);
+                                    std::map<std::string, jobject>& local_video_track_map,
+                                    std::map<std::string, jobject>& local_data_track_map);
 
     virtual ~AndroidLocalParticipantObserver();
 
@@ -44,6 +45,9 @@ protected:
 
     virtual void onVideoTrackPublished(twilio::video::LocalParticipant *local_participant,
                                        std::shared_ptr<twilio::media::LocalVideoTrackPublication> local_video_track_publication);
+
+    virtual void onDataTrackPublished(twilio::video::LocalParticipant *local_participant,
+                                      std::shared_ptr<twilio::media::LocalDataTrackPublication> local_data_track_publication);
 
 private:
     JNIEnv *jni() {
@@ -59,14 +63,18 @@ private:
     const webrtc_jni::ScopedGlobalRef<jobject> j_local_participant_observer_;
     std::map<std::string, jobject>& local_audio_track_map_;
     std::map<std::string, jobject>& local_video_track_map_;
+    std::map<std::string, jobject>& local_data_track_map_;
     const webrtc_jni::ScopedGlobalRef<jclass> j_local_participant_observer_class_;
     const webrtc_jni::ScopedGlobalRef<jclass> j_published_audio_track_class_;
     const webrtc_jni::ScopedGlobalRef<jclass> j_published_video_track_class_;
+    const webrtc_jni::ScopedGlobalRef<jclass> j_published_data_track_class_;
 
     jmethodID j_on_published_audio_track_;
     jmethodID j_on_published_video_track_;
+    jmethodID j_on_published_data_track_;
     jmethodID j_published_audio_track_ctor_id_;
     jmethodID j_published_video_track_ctor_id_;
+    jmethodID j_published_data_track_ctor_id_;
 };
 
 }

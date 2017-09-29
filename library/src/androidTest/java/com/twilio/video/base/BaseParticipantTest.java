@@ -20,6 +20,7 @@ import android.support.test.rule.ActivityTestRule;
 
 import com.twilio.video.ConnectOptions;
 import com.twilio.video.LocalAudioTrack;
+import com.twilio.video.LocalDataTrack;
 import com.twilio.video.LocalParticipant;
 import com.twilio.video.LocalVideoTrack;
 import com.twilio.video.RemoteParticipant;
@@ -54,22 +55,30 @@ public abstract class BaseParticipantTest extends BaseClientTest {
 
     protected LocalVideoTrack aliceLocalVideoTrack;
     protected LocalAudioTrack aliceLocalAudioTrack;
+    protected LocalDataTrack aliceLocalDataTrack;
     protected LocalVideoTrack bobLocalVideoTrack;
     protected LocalAudioTrack bobLocalAudioTrack;
+    protected LocalDataTrack bobLocalDataTrack;
     protected String aliceToken;
     protected String bobToken;
     protected Room aliceRoom;
     protected LocalParticipant aliceLocalParticipant;
+    protected RemoteParticipant aliceRemoteParticipant;
     protected Room bobRoom;
     protected LocalParticipant bobLocalParticipant;
     protected RemoteParticipant bobRemoteParticipant;
     protected String testRoomName;
     protected String bobAudioTrackName;
     protected String bobVideoTrackName;
+    protected LocalDataTrack charlieLocalDataTrack;
+    protected Room charlieRoom;
     protected CallbackHelper.FakeRoomListener aliceRoomListener;
     protected CallbackHelper.FakeParticipantListener aliceParticipantListener;
     protected CallbackHelper.FakeRoomListener bobRoomListener;
+    protected CallbackHelper.FakeLocalParticipantListener bobLocalParticipantListener;
     protected CallbackHelper.FakeParticipantListener bobParticipantListener;
+    protected CallbackHelper.FakeRoomListener charlieRoomListener =
+            new CallbackHelper.FakeRoomListener();
 
     protected Room connect(ConnectOptions connectOptions,
                            CallbackHelper.FakeRoomListener roomListener)
@@ -127,7 +136,8 @@ public abstract class BaseParticipantTest extends BaseClientTest {
 
         // Connect bob
         bobRoom = connect(bobConnectOptions, bobRoomListener);
-        bobRoom.getRemoteParticipants().get(0).setListener(bobParticipantListener);
+        aliceRemoteParticipant = bobRoom.getRemoteParticipants().get(0);
+        aliceRemoteParticipant.setListener(bobParticipantListener);
 
         // Alice wait for bob to connect
         assertTrue(aliceRoomListener.onParticipantConnectedLatch.await(20, TimeUnit.SECONDS));
@@ -136,8 +146,8 @@ public abstract class BaseParticipantTest extends BaseClientTest {
                 new ArrayList<>(aliceRoom.getRemoteParticipants());
         assertEquals(1, remoteParticipantList.size());
         bobRemoteParticipant = remoteParticipantList.get(0);
-        bobRemoteParticipant.setListener(aliceParticipantListener);
         assertNotNull(bobRemoteParticipant);
+        bobRemoteParticipant.setListener(aliceParticipantListener);
     }
 
     @After
@@ -147,6 +157,7 @@ public abstract class BaseParticipantTest extends BaseClientTest {
         disconnect(aliceRoom, aliceRoomListener);
         aliceRoom = null;
         aliceRoomListener = null;
+        disconnect(charlieRoom, charlieRoomListener);
         bobRemoteParticipant = null;
         if (aliceLocalAudioTrack != null) {
             aliceLocalAudioTrack.release();
@@ -154,11 +165,20 @@ public abstract class BaseParticipantTest extends BaseClientTest {
         if (aliceLocalVideoTrack != null) {
             aliceLocalVideoTrack.release();
         }
+        if (aliceLocalDataTrack != null) {
+            aliceLocalDataTrack.release();
+        }
         if (bobLocalAudioTrack != null) {
             bobLocalAudioTrack.release();
         }
         if (bobLocalVideoTrack != null) {
             bobLocalVideoTrack.release();
+        }
+        if (bobLocalDataTrack != null) {
+            bobLocalDataTrack.release();
+        }
+        if (charlieLocalDataTrack != null) {
+            charlieLocalDataTrack.release();
         }
     }
 }

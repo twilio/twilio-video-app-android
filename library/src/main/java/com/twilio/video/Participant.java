@@ -40,4 +40,9 @@ public interface Participant {
      * Returns {@link VideoTrackPublication}s of participant.
      */
     List<VideoTrackPublication> getVideoTracks();
+
+    /**
+     * Returns {@link DataTrackPublication}s of participant.
+     */
+    List<DataTrackPublication> getDataTracks();
 }

@@ -68,6 +68,7 @@ public class VideoTopologyParameterizedTest extends BaseClientTest {
     private String roomName;
     private LocalAudioTrack localAudioTrack;
     private LocalVideoTrack localVideoTrack;
+    private LocalDataTrack localDataTrack;
     private CallbackHelper.FakeRoomListener roomListener;
     private final Topology topology;
     private Room room;
@@ -100,6 +101,9 @@ public class VideoTopologyParameterizedTest extends BaseClientTest {
         }
         if (localVideoTrack != null) {
             localVideoTrack.release();
+        }
+        if (localDataTrack != null) {
+            localDataTrack.release();
         }
         assertTrue(MediaFactory.isReleased());
     }
@@ -176,31 +180,69 @@ public class VideoTopologyParameterizedTest extends BaseClientTest {
     }
 
     @Test
-    public void connect_shouldAllowAudioAndVideoTracks() throws InterruptedException {
+    public void connect_shouldAllowDataTracks() throws InterruptedException {
+        // TODO: Enable for group rooms GSDK-1324
+        assumeTrue(topology == Topology.P2P);
+        localDataTrack = LocalDataTrack.create(mediaTestActivity);
+        roomListener.onConnectedLatch = new CountDownLatch(1);
+
+        List<LocalDataTrack> localDataTrackList =
+                new ArrayList<LocalDataTrack>(){{ add(localDataTrack); }};
+
+        ConnectOptions connectOptions = new ConnectOptions.Builder(token)
+                .roomName(roomName)
+                .dataTracks(localDataTrackList)
+                .build();
+        room = Video.connect(mediaTestActivity, connectOptions, roomListener);
+        assertTrue(roomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
+        LocalParticipant localParticipant = room.getLocalParticipant();
+        assertNotNull(localParticipant.getLocalDataTracks().get(0));
+        assertEquals(localDataTrack, localParticipant.getDataTracks().get(0).getDataTrack());
+        assertTrue(localParticipant.unpublishTrack(localDataTrack));
+    }
+
+    @Test
+    public void connect_shouldAllowAudioVideoAndDataTracks() throws InterruptedException {
         FakeVideoCapturer fakeVideoCapturer = new FakeVideoCapturer();
         localAudioTrack = LocalAudioTrack.create(mediaTestActivity, true);
         localVideoTrack = LocalVideoTrack.create(mediaTestActivity, true, fakeVideoCapturer);
+        localDataTrack = LocalDataTrack.create(mediaTestActivity);
         roomListener.onConnectedLatch = new CountDownLatch(1);
 
         List<LocalAudioTrack> localAudioTrackList =
                 new ArrayList<LocalAudioTrack>(){{ add(localAudioTrack); }};
         List<LocalVideoTrack> localVideoTrackList =
                 new ArrayList<LocalVideoTrack>(){{ add(localVideoTrack); }};
+        List<LocalDataTrack> localDataTrackList =
+                new ArrayList<LocalDataTrack>(){{ add(localDataTrack); }};
 
-        ConnectOptions connectOptions = new ConnectOptions.Builder(token)
+        ConnectOptions.Builder connectOptionsBuilder = new ConnectOptions.Builder(token)
                 .roomName(roomName)
                 .audioTracks(localAudioTrackList)
-                .videoTracks(localVideoTrackList)
-                .build();
-        room = Video.connect(mediaTestActivity, connectOptions, roomListener);
+                .videoTracks(localVideoTrackList);
+        // TODO: Enable for group rooms GSDK-1324
+        if (topology == Topology.P2P) {
+            connectOptionsBuilder.dataTracks(localDataTrackList);
+        }
+        room = Video.connect(mediaTestActivity, connectOptionsBuilder.build(), roomListener);
         assertTrue(roomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
         LocalParticipant localParticipant = room.getLocalParticipant();
         assertNotNull(localParticipant.getLocalAudioTracks().get(0));
         assertEquals(localAudioTrack, localParticipant.getAudioTracks().get(0).getAudioTrack());
         assertNotNull(localParticipant.getLocalVideoTracks().get(0));
         assertEquals(localVideoTrack, localParticipant.getVideoTracks().get(0).getVideoTrack());
+        // TODO: Enable for group rooms GSDK-1324
+        if (topology == Topology.P2P) {
+            assertNotNull(localParticipant.getLocalDataTracks().get(0));
+            assertEquals(localDataTrack, localParticipant.getDataTracks().get(0).getDataTrack());
+        }
         assertTrue(localParticipant.unpublishTrack(localAudioTrack));
         assertTrue(localParticipant.unpublishTrack(localVideoTrack));
+
+        // TODO: Enable for group rooms GSDK-1324
+        if (topology == Topology.P2P) {
+            assertTrue(localParticipant.unpublishTrack(localDataTrack));
+        }
     }
 
     @Test
@@ -233,8 +275,35 @@ public class VideoTopologyParameterizedTest extends BaseClientTest {
 
         localVideoTrack.release();
         assertTrue(roomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
-        assertEquals(localVideoTrack, room.getLocalParticipant().getLocalVideoTracks().get(0).getLocalVideoTrack());
-        assertTrue(room.getLocalParticipant().getLocalVideoTracks().get(0).getLocalVideoTrack().isReleased());
+        assertEquals(localVideoTrack,
+                room.getLocalParticipant().getLocalVideoTracks().get(0).getLocalVideoTrack());
+        assertTrue(room.getLocalParticipant()
+                .getLocalVideoTracks().get(0).getLocalVideoTrack().isReleased());
+    }
+
+    @Test
+    public void connect_shouldAllowLocalDataTrackToBeReleasedWhileConnecting()
+            throws InterruptedException {
+        // TODO: Enable for group rooms GSDK-1324
+        assumeTrue(topology == Topology.P2P);
+        roomListener.onConnectedLatch = new CountDownLatch(1);
+        localDataTrack = LocalDataTrack.create(mediaTestActivity);
+        List<LocalDataTrack> localDataTracks = Collections.singletonList(localDataTrack);
+        ConnectOptions connectOptions = new ConnectOptions.Builder(token)
+                .roomName(roomName)
+                .dataTracks(localDataTracks)
+                .build();
+        room = Video.connect(mediaTestActivity, connectOptions, roomListener);
+
+        // Add sleep to ensure that connect has started
+        Thread.sleep(200);
+
+        localDataTrack.release();
+        assertTrue(roomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
+        assertEquals(localDataTrack,
+                room.getLocalParticipant().getLocalDataTracks().get(0).getLocalDataTrack());
+        assertTrue(room.getLocalParticipant()
+                .getLocalDataTracks().get(0).getLocalDataTrack().isReleased());
     }
 
     @Test
@@ -271,6 +340,23 @@ public class VideoTopologyParameterizedTest extends BaseClientTest {
         room = Video.connect(mediaTestActivity, connectOptions, roomListener);
         assertTrue(roomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
         localVideoTrack.release();
+    }
+
+    @Test
+    public void connect_shouldAllowLocalDataTrackToBeReleasedAfterConnect()
+            throws InterruptedException {
+        // TODO: Enable for group rooms GSDK-1324
+        assumeTrue(topology == Topology.P2P);
+        roomListener.onConnectedLatch = new CountDownLatch(1);
+        localDataTrack = LocalDataTrack.create(mediaTestActivity);
+        List<LocalDataTrack> localDataTracks = Collections.singletonList(localDataTrack);
+        ConnectOptions connectOptions = new ConnectOptions.Builder(token)
+                .roomName(roomName)
+                .dataTracks(localDataTracks)
+                .build();
+        room = Video.connect(mediaTestActivity, connectOptions, roomListener);
+        assertTrue(roomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
+        localDataTrack.release();
     }
 
     @Test

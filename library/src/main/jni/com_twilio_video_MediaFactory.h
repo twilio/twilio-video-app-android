@@ -69,6 +69,13 @@ JNIEXPORT jobject JNICALL Java_com_twilio_video_MediaFactory_nativeCreateVideoTr
                                                                                     jobject,
                                                                                     jstring,
                                                                                     jobject);
+JNIEXPORT jobject JNICALL Java_com_twilio_video_MediaFactory_nativeCreateDataTrack(JNIEnv *,
+                                                                                   jobject,
+                                                                                   jlong,
+                                                                                   jboolean,
+                                                                                   jint,
+                                                                                   jint,
+                                                                                   jstring);
 JNIEXPORT void JNICALL Java_com_twilio_video_MediaFactory_nativeRelease(JNIEnv *, jobject, jlong);
 
 }

@@ -59,6 +59,7 @@ private:
 
     jobject getLocalAudioTracks();
     jobject getLocalVideoTracks();
+    jobject getLocalDataTracks();
 
     bool observer_deleted_ = false;
     mutable rtc::CriticalSection deletion_lock_;
@@ -79,6 +80,9 @@ private:
     const webrtc_jni::ScopedGlobalRef<jclass> j_published_video_track_class_;
     const webrtc_jni::ScopedGlobalRef<jclass> j_remote_video_track_class_;
     const webrtc_jni::ScopedGlobalRef<jclass> j_remote_video_track_publication_class_;
+    const webrtc_jni::ScopedGlobalRef<jclass> j_published_data_track_class_;
+    const webrtc_jni::ScopedGlobalRef<jclass> j_remote_data_track_class_;
+    const webrtc_jni::ScopedGlobalRef<jclass> j_remote_data_track_publication_class_;
     jmethodID j_set_connected_;
     jmethodID j_on_connected_;
     jmethodID j_on_disconnected_;
@@ -97,8 +101,12 @@ private:
     jmethodID j_published_video_track_ctor_id_;
     jmethodID j_video_track_ctor_id_;
     jmethodID j_video_track_publication_ctor_id_;
+    jmethodID j_data_track_ctor_id_;
+    jmethodID j_published_data_track_ctor_id_;
+    jmethodID j_data_track_publication_ctor_id_;
     jmethodID j_connect_options_get_audio_tracks_;
     jmethodID j_connect_options_get_video_tracks_;
+    jmethodID j_connect_options_get_data_tracks_;
     jmethodID j_twilio_exception_ctor_id_;
     std::map<std::shared_ptr<twilio::video::RemoteParticipant>, jobject> remote_participants_;
 };

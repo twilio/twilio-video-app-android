@@ -165,12 +165,12 @@ public class RemoteParticipantTopologyParameterizedTest extends BaseParticipantT
         // Audio track added and subscribed
         CallbackHelper.FakeParticipantListener participantListener =
                 new CallbackHelper.FakeParticipantListener();
-        participantListener.onAudioTrackAddedLatch = new CountDownLatch(1);
+        participantListener.onAudioTrackPublishedLatch = new CountDownLatch(1);
         participantListener.onSubscribedToAudioTrackLatch = new CountDownLatch(1);
         bobRemoteParticipant.setListener(participantListener);
         bobLocalAudioTrack = LocalAudioTrack.create(mediaTestActivity, true);
         assertTrue(bobRoom.getLocalParticipant().publishTrack(bobLocalAudioTrack));
-        assertTrue(participantListener.onAudioTrackAddedLatch.await(20, TimeUnit.SECONDS));
+        assertTrue(participantListener.onAudioTrackPublishedLatch.await(20, TimeUnit.SECONDS));
         assertTrue(participantListener.onSubscribedToAudioTrackLatch.await(20, TimeUnit.SECONDS));
 
         // Audio track disabled
@@ -184,20 +184,20 @@ public class RemoteParticipantTopologyParameterizedTest extends BaseParticipantT
         assertTrue(participantListener.onAudioTrackEnabledLatch.await(20, TimeUnit.SECONDS));
 
         // Audio track removed and unsubscribed
-        participantListener.onAudioTrackRemovedLatch = new CountDownLatch(1);
+        participantListener.onAudioTrackUnpublishedLatch = new CountDownLatch(1);
         participantListener.onUnsubscribedFromAudioTrackLatch = new CountDownLatch(1);
         bobRoom.getLocalParticipant().unpublishTrack(bobLocalAudioTrack);
         assertTrue(participantListener.onUnsubscribedFromAudioTrackLatch.await(20,
                 TimeUnit.SECONDS));
-        assertTrue(participantListener.onAudioTrackRemovedLatch.await(20, TimeUnit.SECONDS));
+        assertTrue(participantListener.onAudioTrackUnpublishedLatch.await(20, TimeUnit.SECONDS));
 
         // Video track added and subscribed
-        participantListener.onVideoTrackAddedLatch = new CountDownLatch(1);
+        participantListener.onVideoTrackPublishedLatch = new CountDownLatch(1);
         participantListener.onSubscribedToVideoTrackLatch = new CountDownLatch(1);
         bobLocalVideoTrack = LocalVideoTrack.create(mediaTestActivity, true,
                 new FakeVideoCapturer());
         assertTrue(bobRoom.getLocalParticipant().publishTrack(bobLocalVideoTrack));
-        assertTrue(participantListener.onVideoTrackAddedLatch.await(20, TimeUnit.SECONDS));
+        assertTrue(participantListener.onVideoTrackPublishedLatch.await(20, TimeUnit.SECONDS));
         assertTrue(participantListener.onSubscribedToVideoTrackLatch.await(20, TimeUnit.SECONDS));
 
         // Video track disabled
@@ -211,15 +211,36 @@ public class RemoteParticipantTopologyParameterizedTest extends BaseParticipantT
         assertTrue(participantListener.onVideoTrackEnabledLatch.await(20, TimeUnit.SECONDS));
 
         // Video track removed and unsubscribed
-        participantListener.onVideoTrackRemovedLatch = new CountDownLatch(1);
+        participantListener.onVideoTrackUnpublishedLatch = new CountDownLatch(1);
         participantListener.onUnsubscribedFromVideoTrackLatch = new CountDownLatch(1);
         bobRoom.getLocalParticipant().unpublishTrack(bobLocalVideoTrack);
         assertTrue(participantListener.onUnsubscribedFromVideoTrackLatch.await(20,
                 TimeUnit.SECONDS));
-        assertTrue(participantListener.onVideoTrackRemovedLatch.await(20, TimeUnit.SECONDS));
+        assertTrue(participantListener.onVideoTrackUnpublishedLatch.await(20, TimeUnit.SECONDS));
+
+        /*
+         * TODO: Enable data track events for group rooms GSDK-1324
+         */
+        if (topology == Topology.P2P) {
+            // Data track published and subscribed
+            participantListener.onDataTrackPublishedLatch = new CountDownLatch(1);
+            participantListener.onSubscribedToDataTrackLatch = new CountDownLatch(1);
+            bobLocalDataTrack = LocalDataTrack.create(mediaTestActivity);
+            assertTrue(bobRoom.getLocalParticipant().publishTrack(bobLocalDataTrack));
+            assertTrue(participantListener.onDataTrackPublishedLatch.await(20, TimeUnit.SECONDS));
+            assertTrue(participantListener.onSubscribedToDataTrackLatch.await(20, TimeUnit.SECONDS));
+
+            // Data track unsubscribed and unpublished
+            participantListener.onDataTrackUnpublishedLatch = new CountDownLatch(1);
+            participantListener.onUnsubscribedFromDataTrackLatch = new CountDownLatch(1);
+            bobRoom.getLocalParticipant().unpublishTrack(bobLocalDataTrack);
+            assertTrue(participantListener.onUnsubscribedFromDataTrackLatch.await(20,
+                    TimeUnit.SECONDS));
+            assertTrue(participantListener.onDataTrackUnpublishedLatch.await(20, TimeUnit.SECONDS));
+        }
 
         // Validate the order of events
-        String[] expectedParticipantEvents = new String[] {
+        List<String> expectedParticipantEvents = Arrays.asList(
                 "onAudioTrackPublished",
                 "onAudioTrackSubscribed",
                 "onAudioTrackDisabled",
@@ -232,8 +253,20 @@ public class RemoteParticipantTopologyParameterizedTest extends BaseParticipantT
                 "onVideoTrackEnabled",
                 "onVideoTrackUnsubscribed",
                 "onVideoTrackUnpublished"
-        };
-        assertArrayEquals(expectedParticipantEvents,
+        );
+        List<String> expectedParticipantDataTrackEvents = Arrays.asList(
+                "onDataTrackPublished",
+                "onDataTrackSubscribed",
+                "onDataTrackUnsubscribed",
+                "onDataTrackUnpublished"
+        );
+        if (topology == Topology.P2P) {
+            List<String> tmpList = new ArrayList<>();
+            tmpList.addAll(expectedParticipantEvents);
+            tmpList.addAll(expectedParticipantDataTrackEvents);
+            expectedParticipantEvents = tmpList;
+        }
+        assertArrayEquals(expectedParticipantEvents.toArray(),
                 participantListener.participantEvents.toArray());
     }
 

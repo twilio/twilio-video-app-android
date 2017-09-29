@@ -33,7 +33,9 @@ public:
                                std::map<std::shared_ptr<twilio::media::RemoteAudioTrackPublication>, jobject>& remote_audio_track_publication_map,
                                std::map<std::shared_ptr<twilio::media::RemoteAudioTrack>, jobject>& remote_audio_track_map,
                                std::map<std::shared_ptr<twilio::media::RemoteVideoTrackPublication>, jobject>& remote_video_track_publication_map,
-                               std::map<std::shared_ptr<twilio::media::RemoteVideoTrack>, jobject>& remote_video_track_map);
+                               std::map<std::shared_ptr<twilio::media::RemoteVideoTrack>, jobject>& remote_video_track_map,
+                               std::map<std::shared_ptr<twilio::media::RemoteDataTrackPublication>, jobject>& remote_data_track_publication_map,
+                               std::map<std::shared_ptr<twilio::media::RemoteDataTrack>, jobject>& remote_data_track_map);
 
     ~AndroidParticipantObserver();
 
@@ -52,11 +54,11 @@ protected:
     virtual void onVideoTrackUnpublished(twilio::video::RemoteParticipant *remote_participant,
                                          std::shared_ptr<twilio::media::RemoteVideoTrackPublication> remote_video_track_publication);
 
-    virtual void onDataTrackAdded(twilio::video::RemoteParticipant *remote_participant,
-                                  std::shared_ptr<twilio::media::DataTrack> track);
+    virtual void onDataTrackPublished(twilio::video::RemoteParticipant *remote_participant,
+                                      std::shared_ptr<twilio::media::RemoteDataTrackPublication> remote_data_track_publication);
 
-    virtual void onDataTrackRemoved(twilio::video::RemoteParticipant *remote_participant,
-                                    std::shared_ptr<twilio::media::DataTrack> track);
+    virtual void onDataTrackUnpublished(twilio::video::RemoteParticipant *remote_participant,
+                                        std::shared_ptr<twilio::media::RemoteDataTrackPublication> remote_data_track_publication);
 
     virtual void onAudioTrackEnabled(twilio::video::RemoteParticipant *remote_participant,
                                      std::shared_ptr<twilio::media::RemoteAudioTrackPublication> remote_audio_track_publication);
@@ -86,6 +88,14 @@ protected:
                                           std::shared_ptr<twilio::media::RemoteVideoTrackPublication> remote_video_track_publication,
                                           std::shared_ptr<twilio::media::RemoteVideoTrack> remote_video_track);
 
+    virtual void onDataTrackSubscribed(twilio::video::RemoteParticipant *participant,
+                                       std::shared_ptr<twilio::media::RemoteDataTrackPublication> remote_data_track_publication,
+                                       std::shared_ptr<twilio::media::RemoteDataTrack> remote_data_track);
+
+    virtual void onDataTrackUnsubscribed(twilio::video::RemoteParticipant *participant,
+                                         std::shared_ptr<twilio::media::RemoteDataTrackPublication> remote_data_track_publication,
+                                         std::shared_ptr<twilio::media::RemoteDataTrack> remote_data_track);
+
 private:
     JNIEnv *jni() {
         return webrtc_jni::AttachCurrentThreadIfNeeded();
@@ -103,10 +113,14 @@ private:
     std::map<std::shared_ptr<twilio::media::RemoteAudioTrack>, jobject>& remote_audio_track_map_;
     std::map<std::shared_ptr<twilio::media::RemoteVideoTrackPublication>, jobject>& remote_video_track_publication_map_;
     std::map<std::shared_ptr<twilio::media::RemoteVideoTrack>, jobject>& remote_video_track_map_;
+    std::map<std::shared_ptr<twilio::media::RemoteDataTrackPublication>, jobject>& remote_data_track_publication_map_;
+    std::map<std::shared_ptr<twilio::media::RemoteDataTrack>, jobject>& remote_data_track_map_;
     const webrtc_jni::ScopedGlobalRef<jclass> j_remote_audio_track_class_;
     const webrtc_jni::ScopedGlobalRef<jclass> j_remote_audio_track_publication_class_;
     const webrtc_jni::ScopedGlobalRef<jclass> j_remote_video_track_class_;
     const webrtc_jni::ScopedGlobalRef<jclass> j_remote_video_track_publication_class_;
+    const webrtc_jni::ScopedGlobalRef<jclass> j_remote_data_track_class_;
+    const webrtc_jni::ScopedGlobalRef<jclass> j_remote_data_track_publication_class_;
     jmethodID j_on_audio_track_published_;
     jmethodID j_on_audio_track_unpublished_;
     jmethodID j_on_audio_track_subscribed_;
@@ -115,6 +129,10 @@ private:
     jmethodID j_on_video_track_unpublished_;
     jmethodID j_on_video_track_subscribed_;
     jmethodID j_on_video_track_unsubscribed_;
+    jmethodID j_on_data_track_published_;
+    jmethodID j_on_data_track_unpublished_;
+    jmethodID j_on_data_track_subscribed_;
+    jmethodID j_on_data_track_unsubscribed_;
     jmethodID j_on_audio_track_enabled_;
     jmethodID j_on_audio_track_disabled_;
     jmethodID j_on_video_track_enabled_;
@@ -123,8 +141,10 @@ private:
     jmethodID j_audio_track_publication_ctor_id_;
     jmethodID j_video_track_ctor_id_;
     jmethodID j_video_track_publication_ctor_id_;
+    jmethodID j_data_track_ctor_id_;
+    jmethodID j_data_track_publication_ctor_id_;
 };
 
 }
 
-#endif //VIDEO_ANDROID_INCLUDE_ANDROID_PARTICIPANT_OBSERVER_H_
+#endif // VIDEO_ANDROID_INCLUDE_ANDROID_PARTICIPANT_OBSERVER_H_

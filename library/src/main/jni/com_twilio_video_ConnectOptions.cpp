@@ -23,6 +23,7 @@
 
 #include "webrtc/sdk/android/src/jni/jni_helpers.h"
 #include "class_reference_holder.h"
+#include "com_twilio_video_LocalDataTrack.h"
 
 namespace twilio_video_jni {
 
@@ -85,6 +86,7 @@ Java_com_twilio_video_ConnectOptions_nativeCreate(JNIEnv *env,
                                                   jstring j_room_name,
                                                   jobjectArray j_audio_tracks,
                                                   jobjectArray j_video_tracks,
+                                                  jobjectArray j_data_tracks,
                                                   jobject j_ice_options,
                                                   jboolean j_enable_insights,
                                                   jlong j_platform_info_handle,
@@ -144,6 +146,29 @@ Java_com_twilio_video_ConnectOptions_nativeCreate(JNIEnv *env,
                 video_tracks.push_back(video_track);
             }
             builder->setVideoTracks(video_tracks);
+        }
+    }
+
+    if(!webrtc_jni::IsNull(env, j_data_tracks)) {
+        jclass j_local_data_track_class =
+                twilio_video_jni::FindClass(env, "com/twilio/video/LocalDataTrack");
+        jmethodID j_local_data_track_get_native_handle =
+                webrtc_jni::GetMethodID(env, j_local_data_track_class, "getNativeHandle", "()J");
+
+        std::vector<std::shared_ptr<twilio::media::LocalDataTrack>> data_tracks;
+        int size = env->GetArrayLength(j_data_tracks);
+        if (size > 0) {
+            for (int i = 0; i < size; i++) {
+                // Get local data track handle
+                jobject j_data_track = (jobject) env->GetObjectArrayElement(j_data_tracks, i);
+                jlong j_data_track_handle =
+                        (jlong) env->CallLongMethod(j_data_track,
+                                                    j_local_data_track_get_native_handle);
+                // Get local data track
+                auto data_track = getLocalDataTrack(j_data_track_handle);
+                data_tracks.push_back(data_track);
+            }
+            builder->setDataTracks(data_tracks);
         }
     }
 

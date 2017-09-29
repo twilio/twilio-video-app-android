@@ -26,11 +26,13 @@ AndroidLocalParticipantObserver::AndroidLocalParticipantObserver(JNIEnv *env,
                                                                  jobject j_local_participant,
                                                                  jobject j_local_participant_observer,
                                                                  std::map<std::string, jobject>& local_audio_track_map,
-                                                                 std::map<std::string, jobject>& local_video_track_map)
+                                                                 std::map<std::string, jobject>& local_video_track_map,
+                                                                 std::map<std::string, jobject>& local_data_track_map)
         : j_local_participant_(env, j_local_participant),
           j_local_participant_observer_(env, j_local_participant_observer),
           local_audio_track_map_(local_audio_track_map),
           local_video_track_map_(local_video_track_map),
+          local_data_track_map_(local_data_track_map),
           j_local_participant_observer_class_(env,
                                               webrtc_jni::GetObjectClass(env, *j_local_participant_observer_)),
           j_published_audio_track_class_(env,
@@ -39,6 +41,9 @@ AndroidLocalParticipantObserver::AndroidLocalParticipantObserver(JNIEnv *env,
           j_published_video_track_class_(env,
                                          twilio_video_jni::FindClass(env,
                                                                      "com/twilio/video/LocalVideoTrackPublication")),
+          j_published_data_track_class_(env,
+                                        twilio_video_jni::FindClass(env,
+                                                                    "com/twilio/video/LocalDataTrackPublication")),
           j_on_published_audio_track_(webrtc_jni::GetMethodID(env,
                                                               *j_local_participant_observer_class_,
                                                               "onAudioTrackPublished",
@@ -47,6 +52,10 @@ AndroidLocalParticipantObserver::AndroidLocalParticipantObserver(JNIEnv *env,
                                                               *j_local_participant_observer_class_,
                                                               "onVideoTrackPublished",
                                                               "(Lcom/twilio/video/LocalParticipant;Lcom/twilio/video/LocalVideoTrackPublication;)V")),
+          j_on_published_data_track_(webrtc_jni::GetMethodID(env,
+                                                             *j_local_participant_observer_class_,
+                                                             "onDataTrackPublished",
+                                                             "(Lcom/twilio/video/LocalParticipant;Lcom/twilio/video/LocalDataTrackPublication;)V")),
           j_published_audio_track_ctor_id_(webrtc_jni::GetMethodID(env,
                                                                    *j_published_audio_track_class_,
                                                                    "<init>",
@@ -54,7 +63,11 @@ AndroidLocalParticipantObserver::AndroidLocalParticipantObserver(JNIEnv *env,
           j_published_video_track_ctor_id_(webrtc_jni::GetMethodID(env,
                                                                    *j_published_video_track_class_,
                                                                    "<init>",
-                                                                   "(Ljava/lang/String;Lcom/twilio/video/LocalVideoTrack;)V")) {
+                                                                   "(Ljava/lang/String;Lcom/twilio/video/LocalVideoTrack;)V")),
+          j_published_data_track_ctor_id_(webrtc_jni::GetMethodID(env,
+                                                                  *j_published_data_track_class_,
+                                                                  "<init>",
+                                                                  "(Ljava/lang/String;Lcom/twilio/video/LocalDataTrack;)V")){
     VIDEO_ANDROID_LOG(twilio::video::LogModule::kPlatform,
                       twilio::video::LogLevel::kDebug,
                       "AndroidLocalParticipantObserver");
@@ -130,6 +143,35 @@ void AndroidLocalParticipantObserver::onVideoTrackPublished(twilio::video::Local
                               *j_local_participant_,
                               j_published_video_track);
         CHECK_EXCEPTION(jni()) << "Error calling onVideoTrackPublished";
+    }
+}
+
+void AndroidLocalParticipantObserver::onDataTrackPublished(twilio::video::LocalParticipant *local_participant,
+                                                           std::shared_ptr<twilio::media::LocalDataTrackPublication> local_data_track_publication) {
+    webrtc_jni::ScopedLocalRefFrame local_ref_frame(jni());
+    std::string func_name = std::string(__FUNCTION__);
+    VIDEO_ANDROID_LOG(twilio::video::LogModule::kPlatform,
+                      twilio::video::LogLevel::kDebug,
+                      "%s", func_name.c_str());
+    {
+        rtc::CritScope cs(&deletion_lock_);
+
+        if (!isObserverValid(func_name)) {
+            return;
+        }
+
+        jobject j_local_data_track =
+                local_data_track_map_[local_data_track_publication->getLocalTrack()->getTrackId()];
+        jobject j_published_data_track = createJavaLocalDataTrackPublication(jni(),
+                                                                             local_data_track_publication,
+                                                                             j_local_data_track,
+                                                                             *j_published_data_track_class_,
+                                                                             j_published_data_track_ctor_id_);
+        jni()->CallVoidMethod(*j_local_participant_observer_,
+                              j_on_published_data_track_,
+                              *j_local_participant_,
+                              j_published_data_track);
+        CHECK_EXCEPTION(jni()) << "Error calling onDataTrackPublished";
     }
 }
 

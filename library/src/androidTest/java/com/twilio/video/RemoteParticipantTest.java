@@ -151,6 +151,24 @@ public class RemoteParticipantTest extends BaseClientTest {
                                                          RemoteVideoTrack remoteVideoTrack) {}
 
                     @Override
+                    public void onDataTrackPublished(RemoteParticipant remoteParticipant,
+                                                     RemoteDataTrackPublication remoteDataTrackPublication) {}
+
+                    @Override
+                    public void onDataTrackUnpublished(RemoteParticipant remoteParticipant,
+                                                       RemoteDataTrackPublication remoteDataTrackPublication) {}
+
+                    @Override
+                    public void onDataTrackSubscribed(RemoteParticipant remoteParticipant,
+                                                      RemoteDataTrackPublication remoteDataTrackPublication,
+                                                      RemoteDataTrack remoteDataTrack) {}
+
+                    @Override
+                    public void onDataTrackUnsubscribed(RemoteParticipant remoteParticipant,
+                                                        RemoteDataTrackPublication remoteDataTrackPublication,
+                                                        RemoteDataTrack remoteDataTrack) {}
+
+                    @Override
                     public void onAudioTrackEnabled(RemoteParticipant remoteParticipant,
                                                     RemoteAudioTrackPublication remoteAudioTrackPublication) {}
 

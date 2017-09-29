@@ -34,7 +34,7 @@ public class LocalVideoTrack extends VideoTrack {
     private static final double ASPECT_RATIO_TOLERANCE = 0.05;
     private static final String CAPTURER_MUST_HAVE_ONE_SUPPORTED_FORMAT = "A VideoCapturer " +
             "must provide at least one supported VideoFormat";
-    static final VideoConstraints defaultVideoConstraints = new VideoConstraints.Builder()
+    static final VideoConstraints DEFAULT_VIDEO_CONSTRAINTS = new VideoConstraints.Builder()
             .maxFps(30)
             .maxVideoDimensions(VideoDimensions.VGA_VIDEO_DIMENSIONS)
             .build();
@@ -212,7 +212,7 @@ public class LocalVideoTrack extends VideoTrack {
         if (!isReleased()) {
             return nativeIsEnabled(nativeLocalVideoTrackHandle);
         } else {
-            logger.e("Local video track is not enabled because it has been removed");
+            logger.e("Local video track is not enabled because it has been released");
             return false;
         }
     }
@@ -275,7 +275,7 @@ public class LocalVideoTrack extends VideoTrack {
                                                        VideoConstraints videoConstraints) {
         if (videoConstraints == null || !constraintsCompatible(videoCapturer, videoConstraints)) {
             logger.e("Applying VideoConstraints closest to 640x480@30 FPS.");
-            return getClosestCompatibleVideoConstraints(videoCapturer, defaultVideoConstraints);
+            return getClosestCompatibleVideoConstraints(videoCapturer, DEFAULT_VIDEO_CONSTRAINTS);
         } else {
             return videoConstraints;
         }

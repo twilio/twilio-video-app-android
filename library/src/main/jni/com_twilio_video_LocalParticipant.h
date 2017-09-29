@@ -33,6 +33,7 @@ static const char *const kLocalParticipantConstructorSignature = "("
         "Ljava/lang/String;"
         "Ljava/util/List;"
         "Ljava/util/List;"
+        "Ljava/util/List;"
         "Landroid/os/Handler;"
         ")V";
 
@@ -42,6 +43,7 @@ jobject createJavaLocalParticipant(JNIEnv *env,
                                    jmethodID j_local_participant_ctor_id,
                                    jobject j_local_audio_tracks,
                                    jobject j_local_video_tracks,
+                                   jobject j_local_data_tracks,
                                    jclass j_array_list_class,
                                    jmethodID j_array_list_ctor_id,
                                    jmethodID j_array_list_add,
@@ -49,6 +51,8 @@ jobject createJavaLocalParticipant(JNIEnv *env,
                                    jmethodID j_published_audio_track_ctor_id,
                                    jclass j_published_video_track_class,
                                    jmethodID j_published_video_track_ctor_id,
+                                   jclass j_published_data_track_class,
+                                   jmethodID j_published_data_track_ctor_id,
                                    jobject j_handler);
 
 jobject createJavaLocalAudioTrackPublication(JNIEnv *env,
@@ -63,6 +67,12 @@ jobject createJavaLocalVideoTrackPublication(JNIEnv *env,
                                              jclass j_published_video_track_class,
                                              jmethodID j_published_video_track_ctor_id);
 
+jobject createJavaLocalDataTrackPublication(JNIEnv *env,
+                                            std::shared_ptr<twilio::media::LocalDataTrackPublication> local_data_track_publication,
+                                            jobject j_local_data_track,
+                                            jclass j_published_data_track_class,
+                                            jmethodID j_published_data_track_ctor_id);
+
 JNIEXPORT bool JNICALL Java_com_twilio_video_LocalParticipant_nativePublishAudioTrack(JNIEnv *,
                                                                                       jobject,
                                                                                       jlong,
@@ -75,6 +85,12 @@ JNIEXPORT bool JNICALL Java_com_twilio_video_LocalParticipant_nativePublishVideo
                                                                                       jobject,
                                                                                       jlong);
 
+JNIEXPORT bool JNICALL Java_com_twilio_video_LocalParticipant_nativePublishDataTrack(JNIEnv *,
+                                                                                     jobject,
+                                                                                     jlong,
+                                                                                     jobject,
+                                                                                     jlong);
+
 JNIEXPORT bool JNICALL Java_com_twilio_video_LocalParticipant_nativeUnpublishAudioTrack(JNIEnv *,
                                                                                         jobject,
                                                                                         jlong,
@@ -84,6 +100,11 @@ JNIEXPORT bool JNICALL Java_com_twilio_video_LocalParticipant_nativeUnpublishVid
                                                                                         jobject,
                                                                                         jlong,
                                                                                         jlong);
+
+JNIEXPORT bool JNICALL Java_com_twilio_video_LocalParticipant_nativeUnpublishDataTrack(JNIEnv *,
+                                                                                       jobject,
+                                                                                       jlong,
+                                                                                       jlong);
 
 JNIEXPORT void JNICALL Java_com_twilio_video_LocalParticipant_nativeSetEncodingParameters(JNIEnv *,
                                                                                           jobject,

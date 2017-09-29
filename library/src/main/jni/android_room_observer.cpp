@@ -44,6 +44,9 @@ AndroidRoomObserver::AndroidRoomObserver(JNIEnv *env,
         j_published_video_track_class_(env, twilio_video_jni::FindClass(env, "com/twilio/video/LocalVideoTrackPublication")),
         j_remote_video_track_class_(env, twilio_video_jni::FindClass(env, "com/twilio/video/RemoteVideoTrack")),
         j_remote_video_track_publication_class_(env, twilio_video_jni::FindClass(env, "com/twilio/video/RemoteVideoTrackPublication")),
+        j_published_data_track_class_(env, twilio_video_jni::FindClass(env, "com/twilio/video/LocalDataTrackPublication")),
+        j_remote_data_track_class_(env, twilio_video_jni::FindClass(env, "com/twilio/video/RemoteDataTrack")),
+        j_remote_data_track_publication_class_(env, twilio_video_jni::FindClass(env, "com/twilio/video/RemoteDataTrackPublication")),
         j_set_connected_(
                 webrtc_jni::GetMethodID(env,
                                         *j_room_class_,
@@ -93,7 +96,7 @@ AndroidRoomObserver::AndroidRoomObserver(JNIEnv *env,
                 webrtc_jni::GetMethodID(env,
                                         *j_remote_participant_class_,
                                         "<init>",
-                                        "(Ljava/lang/String;Ljava/lang/String;Ljava/util/List;Ljava/util/List;Landroid/os/Handler;J)V")),
+                                        "(Ljava/lang/String;Ljava/lang/String;Ljava/util/List;Ljava/util/List;Ljava/util/List;Landroid/os/Handler;J)V")),
         j_array_list_ctor_id_(
                 webrtc_jni::GetMethodID(env,
                                         *j_array_list_class_,
@@ -134,6 +137,21 @@ AndroidRoomObserver::AndroidRoomObserver(JNIEnv *env,
                                         *j_remote_video_track_publication_class_,
                                         "<init>",
                                         "(ZZLjava/lang/String;Ljava/lang/String;)V")),
+        j_data_track_ctor_id_(
+                webrtc_jni::GetMethodID(env,
+                                        *j_remote_data_track_class_,
+                                        "<init>",
+                                        "(ZZZIILjava/lang/String;J)V")),
+        j_published_data_track_ctor_id_(
+                webrtc_jni::GetMethodID(env,
+                                        *j_published_data_track_class_,
+                                        "<init>",
+                                        "(Ljava/lang/String;Lcom/twilio/video/LocalDataTrack;)V")),
+        j_data_track_publication_ctor_id_(
+                webrtc_jni::GetMethodID(env,
+                                        *j_remote_data_track_publication_class_,
+                                        "<init>",
+                                        "(ZZLjava/lang/String;Ljava/lang/String;)V")),
         j_connect_options_get_audio_tracks_(
                 webrtc_jni::GetMethodID(env,
                                         webrtc_jni::GetObjectClass(env, *j_connect_options_),
@@ -143,6 +161,11 @@ AndroidRoomObserver::AndroidRoomObserver(JNIEnv *env,
                 webrtc_jni::GetMethodID(env,
                                         webrtc_jni::GetObjectClass(env, *j_connect_options_),
                                         "getVideoTracks",
+                                        "()Ljava/util/List;")),
+        j_connect_options_get_data_tracks_(
+                webrtc_jni::GetMethodID(env,
+                                        webrtc_jni::GetObjectClass(env, *j_connect_options_),
+                                        "getDataTracks",
                                         "()Ljava/util/List;")),
         j_twilio_exception_ctor_id_(
                 webrtc_jni::GetMethodID(env,
@@ -193,12 +216,14 @@ void AndroidRoomObserver::onConnected(twilio::video::Room *room) {
                 room->getLocalParticipant();
         jobject j_local_audio_tracks = getLocalAudioTracks();
         jobject j_local_video_tracks = getLocalVideoTracks();
+        jobject j_local_data_tracks = getLocalDataTracks();
         jobject j_local_participant = createJavaLocalParticipant(jni(),
                                                                  local_participant,
                                                                  *j_local_participant_class_,
                                                                  j_local_participant_ctor_id_,
                                                                  j_local_audio_tracks,
                                                                  j_local_video_tracks,
+                                                                 j_local_data_tracks,
                                                                  *j_array_list_class_,
                                                                  j_array_list_ctor_id_,
                                                                  j_array_list_add_,
@@ -206,6 +231,8 @@ void AndroidRoomObserver::onConnected(twilio::video::Room *room) {
                                                                  j_published_audio_track_ctor_id_,
                                                                  *j_published_video_track_class_,
                                                                  j_published_video_track_ctor_id_,
+                                                                 *j_published_data_track_class_,
+                                                                 j_published_data_track_ctor_id_,
                                                                  *j_handler_);
         jobject j_participants = createJavaParticipantList(room->getRemoteParticipants());
         jni()->CallVoidMethod(*j_room_,
@@ -296,6 +323,10 @@ void AndroidRoomObserver::onParticipantConnected(twilio::video::Room *room,
                                                             *j_remote_video_track_publication_class_,
                                                             j_video_track_ctor_id_,
                                                             j_video_track_publication_ctor_id_,
+                                                            *j_remote_data_track_class_,
+                                                            *j_remote_data_track_publication_class_,
+                                                            j_data_track_ctor_id_,
+                                                            j_data_track_publication_ctor_id_,
                                                             *j_handler_);
         // Add global ref to java participant so we can reference in onParticipantDisconnected
         remote_participants_.insert(std::make_pair(participant,
@@ -440,6 +471,10 @@ jobject AndroidRoomObserver::createJavaParticipantList(
                                                             *j_remote_video_track_publication_class_,
                                                             j_video_track_ctor_id_,
                                                             j_video_track_publication_ctor_id_,
+                                                            *j_remote_data_track_class_,
+                                                            *j_remote_data_track_publication_class_,
+                                                            j_data_track_ctor_id_,
+                                                            j_data_track_publication_ctor_id_,
                                                             *j_handler_);
         // Add global ref to java participant so we can reference in onParticipantDisconnected
         remote_participants_.insert(std::make_pair(participant, webrtc_jni::NewGlobalRef(jni(),
@@ -463,6 +498,14 @@ jobject AndroidRoomObserver::getLocalVideoTracks() {
     CHECK_EXCEPTION(jni()) << "Failed to get local video tracks";
 
     return j_local_video_tracks;
+}
+
+jobject AndroidRoomObserver::getLocalDataTracks() {
+    jobject j_local_data_tracks = jni()->CallObjectMethod(*j_connect_options_,
+                                                           j_connect_options_get_data_tracks_);
+    CHECK_EXCEPTION(jni()) << "Failed to get local data tracks";
+
+    return j_local_data_tracks;
 }
 
 }

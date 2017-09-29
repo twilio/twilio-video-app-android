@@ -36,6 +36,7 @@ public class RemoteParticipantUnitTest {
     @Mock RemoteAudioTrackPublication mockRemoteAudioTrackPublication;
     @Mock RemoteVideoTrackPublication mockRemoteVideoTrackPublicationOne;
     @Mock RemoteVideoTrackPublication mockRemoteVideoTrackPublicationTwo;
+    @Mock RemoteDataTrackPublication mockRemoteDataTrackPublication;
     @Mock Handler handler;
 
     @Before
@@ -45,6 +46,7 @@ public class RemoteParticipantUnitTest {
                 Arrays.asList(mockRemoteAudioTrackPublication),
                 Arrays.asList(mockRemoteVideoTrackPublicationOne,
                         mockRemoteVideoTrackPublicationTwo),
+                Arrays.asList(mockRemoteDataTrackPublication),
                 handler,
                 random.nextLong());
     }

@@ -29,6 +29,7 @@ public class ConnectOptions {
     private final String roomName;
     private final List<LocalAudioTrack> audioTracks;
     private final List<LocalVideoTrack> videoTracks;
+    private final List<LocalDataTrack> dataTracks;
     private final IceOptions iceOptions;
     private final boolean enableInsights;
     private final List<AudioCodec> preferredAudioCodecs;
@@ -60,6 +61,7 @@ public class ConnectOptions {
         this.roomName = builder.roomName;
         this.audioTracks = builder.audioTracks;
         this.videoTracks = builder.videoTracks;
+        this.dataTracks = builder.dataTracks;
         this.iceOptions = builder.iceOptions;
         this.enableInsights = builder.enableInsights;
         this.preferredAudioCodecs = builder.preferredAudioCodecs;
@@ -81,6 +83,10 @@ public class ConnectOptions {
 
     List<LocalVideoTrack> getVideoTracks() {
         return videoTracks;
+    }
+
+    List<LocalDataTrack> getDataTracks() {
+        return dataTracks;
     }
 
     IceOptions getIceOptions() {
@@ -107,6 +113,15 @@ public class ConnectOptions {
             videoTracksArray = videoTracks.toArray(videoTracksArray);
         }
         return videoTracksArray;
+    }
+
+    private LocalDataTrack[] getLocalDataTracksArray() {
+        LocalDataTrack[] dataTracksArray = new LocalDataTrack[0];
+        if (dataTracks != null && dataTracks.size() > 0) {
+            dataTracksArray = new LocalDataTrack[dataTracks.size()];
+            dataTracksArray = dataTracks.toArray(dataTracksArray);
+        }
+        return dataTracksArray;
     }
 
     private AudioCodec[] getAudioCodecsArray() {
@@ -143,6 +158,7 @@ public class ConnectOptions {
                 roomName,
                 getLocalAudioTracksArray(),
                 getLocalVideoTracksArray(),
+                getLocalDataTracksArray(),
                 iceOptions,
                 enableInsights,
                 PlatformInfo.getNativeHandle(),
@@ -155,6 +171,7 @@ public class ConnectOptions {
                                      String roomName,
                                      LocalAudioTrack[] audioTracks,
                                      LocalVideoTrack[] videoTracks,
+                                     LocalDataTrack[] dataTracks,
                                      IceOptions iceOptions,
                                      boolean enableInsights,
                                      long platformInfoNativeHandle,
@@ -172,6 +189,7 @@ public class ConnectOptions {
         private IceOptions iceOptions;
         private List<LocalAudioTrack> audioTracks;
         private List<LocalVideoTrack> videoTracks;
+        private List<LocalDataTrack> dataTracks;
         private boolean enableInsights = true;
         private List<AudioCodec> preferredAudioCodecs;
         private List<VideoCodec> preferredVideoCodecs;
@@ -204,6 +222,14 @@ public class ConnectOptions {
         public Builder videoTracks(List<LocalVideoTrack> videoTracks) {
             Preconditions.checkNotNull(videoTracks, "LocalVideoTrack List must not be null");
             this.videoTracks = new ArrayList<>(videoTracks);
+            return this;
+        }
+
+        /**
+         * Data tracks that will be published upon connection.
+         */
+        public Builder dataTracks(List<LocalDataTrack> dataTracks) {
+            this.dataTracks = dataTracks;
             return this;
         }
 

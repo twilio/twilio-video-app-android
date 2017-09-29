@@ -66,7 +66,7 @@ public class MediaFactoryTest {
     public void canCreateVideoTrack() {
         LocalVideoTrack localVideoTrack = mediaFactory.createVideoTrack(true,
                 new FakeVideoCapturer(),
-                LocalVideoTrack.defaultVideoConstraints,
+                LocalVideoTrack.DEFAULT_VIDEO_CONSTRAINTS,
                 null);
 
         assertNotNull(localVideoTrack);
@@ -74,16 +74,33 @@ public class MediaFactoryTest {
     }
 
     @Test
-    public void canCreateAudioAndVideoTracks() {
+    public void canCreateDataTrack() {
+        LocalDataTrack localDataTrack = mediaFactory.createDataTrack(true,
+                DataTrackOptions.DEFAULT_MAX_PACKET_LIFE_TIME,
+                DataTrackOptions.DEFAULT_MAX_RETRANSMITS,
+                null);
+
+        assertNotNull(localDataTrack);
+        localDataTrack.release();
+    }
+
+    @Test
+    public void canCreateMultipleTracks() {
         LocalAudioTrack localAudioTrack = mediaFactory.createAudioTrack(true, null, null);
         LocalVideoTrack localVideoTrack = mediaFactory.createVideoTrack(true,
                 new FakeVideoCapturer(),
-                LocalVideoTrack.defaultVideoConstraints,
+                LocalVideoTrack.DEFAULT_VIDEO_CONSTRAINTS,
+                null);
+        LocalDataTrack localDataTrack = mediaFactory.createDataTrack(true,
+                DataTrackOptions.DEFAULT_MAX_PACKET_LIFE_TIME,
+                DataTrackOptions.DEFAULT_MAX_RETRANSMITS,
                 null);
         assertNotNull(localAudioTrack);
         assertNotNull(localVideoTrack);
+        assertNotNull(localDataTrack);
         localAudioTrack.release();
         localVideoTrack.release();
+        localDataTrack.release();
     }
 
     @Test
@@ -98,11 +115,25 @@ public class MediaFactoryTest {
 
         // Create random tracks
         for (int i = 0 ; i < NUM_TRACKS ; i++) {
-            tracks[i] = random.nextBoolean() ?
-                    (mediaFactory.createAudioTrack(true, null, null)) :
-                    (mediaFactory.createVideoTrack(true, new FakeVideoCapturer(),
-                            LocalVideoTrack.defaultVideoConstraints,
-                            null));
+            int seed = Math.abs(random.nextInt()) % 3;
+
+            switch (seed) {
+                case 0:
+                    tracks[i] = mediaFactory.createAudioTrack(true, null, null);
+                    break;
+                case 1:
+                    tracks[i] = mediaFactory.createVideoTrack(true, new FakeVideoCapturer(),
+                            LocalVideoTrack.DEFAULT_VIDEO_CONSTRAINTS,
+                            null);
+                    break;
+                case 2:
+                    tracks[i] = mediaFactory.createDataTrack(true,
+                            DataTrackOptions.DEFAULT_MAX_PACKET_LIFE_TIME,
+                            DataTrackOptions.DEFAULT_MAX_RETRANSMITS,
+                            null);
+                    break;
+
+            }
         }
 
         // Destroy all tracks
@@ -113,6 +144,9 @@ public class MediaFactoryTest {
             } else if (tracks[i].getClass() == LocalVideoTrack.class) {
                 LocalVideoTrack localVideoTrack = (LocalVideoTrack) tracks[i];
                 localVideoTrack.release();
+            } else if (tracks[i].getClass() == LocalDataTrack.class) {
+                LocalDataTrack localDataTrack = (LocalDataTrack) tracks[i];
+                localDataTrack.release();
             } else {
                 throw new RuntimeException("Created unexpected track instance");
             }
@@ -128,11 +162,25 @@ public class MediaFactoryTest {
 
         // Create random tracks
         for (int i = 0 ; i < NUM_TRACKS ; i++) {
-            tracks[i] = random.nextBoolean() ?
-                    (mediaFactory.createAudioTrack(true, null, null)) :
-                    (mediaFactory.createVideoTrack(true, new FakeVideoCapturer(),
-                            LocalVideoTrack.defaultVideoConstraints,
-                            null));
+            int seed = Math.abs(random.nextInt()) % 3;
+
+            switch (seed) {
+                case 0:
+                    tracks[i] = mediaFactory.createAudioTrack(true, null, null);
+                    break;
+                case 1:
+                    tracks[i] = mediaFactory.createVideoTrack(true, new FakeVideoCapturer(),
+                            LocalVideoTrack.DEFAULT_VIDEO_CONSTRAINTS,
+                            null);
+                    break;
+                case 2:
+                    tracks[i] = mediaFactory.createDataTrack(true,
+                            DataTrackOptions.DEFAULT_MAX_PACKET_LIFE_TIME,
+                            DataTrackOptions.DEFAULT_MAX_RETRANSMITS,
+                            null);
+                    break;
+
+            }
         }
 
         // Destroy all tracks
@@ -143,6 +191,9 @@ public class MediaFactoryTest {
             } else if (tracks[i].getClass() == LocalVideoTrack.class) {
                 LocalVideoTrack localVideoTrack = (LocalVideoTrack) tracks[i];
                 localVideoTrack.release();
+            } else if (tracks[i].getClass() == LocalDataTrack.class) {
+                LocalDataTrack localDataTrack = (LocalDataTrack) tracks[i];
+                localDataTrack.release();
             } else {
                 throw new RuntimeException("Created unexpected track instance");
             }
@@ -150,7 +201,57 @@ public class MediaFactoryTest {
 
         // With all tracks released this should raise exception
         mediaFactory.createVideoTrack(true, new FakeVideoCapturer(),
-                LocalVideoTrack.defaultVideoConstraints,
+                LocalVideoTrack.DEFAULT_VIDEO_CONSTRAINTS,
+                null);
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void createDataTrack_shouldFailAfterAllTracksHaveBeenReleased() {
+        Track[] tracks = new Track[NUM_TRACKS];
+
+        // Create random tracks
+        for (int i = 0 ; i < NUM_TRACKS ; i++) {
+            int seed = Math.abs(random.nextInt()) % 3;
+
+            switch (seed) {
+                case 0:
+                    tracks[i] = mediaFactory.createAudioTrack(true, null, null);
+                    break;
+                case 1:
+                    tracks[i] = mediaFactory.createVideoTrack(true, new FakeVideoCapturer(),
+                            LocalVideoTrack.DEFAULT_VIDEO_CONSTRAINTS,
+                            null);
+                    break;
+                case 2:
+                    tracks[i] = mediaFactory.createDataTrack(true,
+                            DataTrackOptions.DEFAULT_MAX_PACKET_LIFE_TIME,
+                            DataTrackOptions.DEFAULT_MAX_RETRANSMITS,
+                            null);
+                    break;
+
+            }
+        }
+
+        // Destroy all tracks
+        for (int i = 0 ; i < NUM_TRACKS ; i++) {
+            if (tracks[i].getClass() == LocalAudioTrack.class) {
+                LocalAudioTrack localAudioTrack = (LocalAudioTrack) tracks[i];
+                localAudioTrack.release();
+            } else if (tracks[i].getClass() == LocalVideoTrack.class) {
+                LocalVideoTrack localVideoTrack = (LocalVideoTrack) tracks[i];
+                localVideoTrack.release();
+            } else if (tracks[i].getClass() == LocalDataTrack.class) {
+                LocalDataTrack localDataTrack = (LocalDataTrack) tracks[i];
+                localDataTrack.release();
+            } else {
+                throw new RuntimeException("Created unexpected track instance");
+            }
+        }
+
+        // With all tracks released this should raise exception
+        mediaFactory.createDataTrack(true,
+                DataTrackOptions.DEFAULT_MAX_PACKET_LIFE_TIME,
+                DataTrackOptions.DEFAULT_MAX_RETRANSMITS,
                 null);
     }
 

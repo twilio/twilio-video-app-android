@@ -38,6 +38,8 @@ public class LocalParticipant implements Participant {
     private final List<LocalAudioTrackPublication> localAudioTrackPublications;
     private final List<VideoTrackPublication> videoTrackPublications;
     private final List<LocalVideoTrackPublication> localVideoTrackPublications;
+    private final List<DataTrackPublication> dataTrackPublications;
+    private final List<LocalDataTrackPublication> localDataTrackPublications;
     private final Handler handler;
 
     /*
@@ -89,6 +91,25 @@ public class LocalParticipant implements Participant {
             });
         }
 
+        @Override
+        public void onDataTrackPublished(final LocalParticipant localParticipant,
+                                         final LocalDataTrackPublication localDataTrackPublication) {
+            checkCallback(localParticipant, localDataTrackPublication, "onDataTrackPublished");
+            handler.post(new Runnable() {
+                @Override
+                public void run() {
+                    logger.d("onDataTrackPublished");
+                    dataTrackPublications.add(localDataTrackPublication);
+                    localDataTrackPublications.add(localDataTrackPublication);
+                    Listener listener = listenerReference.get();
+
+                    if (listener != null) {
+                        listener.onDataTrackPublished(localParticipant, localDataTrackPublication);
+                    }
+                }
+            });
+        }
+
         private void checkCallback(LocalParticipant localParticipant,
                                    TrackPublication track,
                                    String callback) {
@@ -131,6 +152,14 @@ public class LocalParticipant implements Participant {
     }
 
     /**
+     * Returns read-only list of data track publications.
+     */
+    @Override
+    public synchronized List<DataTrackPublication> getDataTracks() {
+        return Collections.unmodifiableList(dataTrackPublications);
+    }
+
+    /**
      * Returns read-only list of local audio track publications.
      */
     public synchronized List<LocalAudioTrackPublication> getLocalAudioTracks() {
@@ -142,6 +171,13 @@ public class LocalParticipant implements Participant {
      */
     public synchronized List<LocalVideoTrackPublication> getLocalVideoTracks() {
         return Collections.unmodifiableList(localVideoTrackPublications);
+    }
+
+    /**
+     * Returns read-only list of local data track publications.
+     */
+    public synchronized List<LocalDataTrackPublication> getLocalDataTracks() {
+        return Collections.unmodifiableList(localDataTrackPublications);
     }
 
     /**
@@ -175,6 +211,23 @@ public class LocalParticipant implements Participant {
             return nativePublishVideoTrack(nativeLocalParticipantHandle,
                     localVideoTrack,
                     localVideoTrack.getNativeHandle());
+        }
+    }
+
+    /**
+     * Shared data track to all participants in a {@link Room}.
+     *
+     * @return true if the data track was published or false if the local participant is not
+     * connected or the track was already published.
+     */
+    public synchronized boolean publishTrack(@NonNull LocalDataTrack localDataTrack) {
+        Preconditions.checkNotNull(localDataTrack, "LocalDataTrack must not be null");
+        if (isReleased()) {
+            return false;
+        } else {
+            return nativePublishDataTrack(nativeLocalParticipantHandle,
+                    localDataTrack,
+                    localDataTrack.getNativeHandle());
         }
     }
 
@@ -214,6 +267,23 @@ public class LocalParticipant implements Participant {
     }
 
     /**
+     * Stops the sharing of a data track to all the participants in a {@link Room}.
+     *
+     * @return true if the data track was unpublished or false if the local participant is not
+     * connected or could not unpublish the data track.
+     */
+    public synchronized boolean unpublishTrack(@NonNull LocalDataTrack localDataTrack) {
+        Preconditions.checkNotNull(localDataTrack, "LocalDataTrack must not be null");
+        if (isReleased()) {
+            return false;
+        } else {
+            removePublishedDataTrack(localDataTrack);
+            return nativeUnpublishDataTrack(nativeLocalParticipantHandle,
+                    localDataTrack.getNativeHandle());
+        }
+    }
+
+    /**
      * Set listener for local participant events.
      *
      * @param listener of local participant events.
@@ -243,6 +313,7 @@ public class LocalParticipant implements Participant {
                      @NonNull String identity,
                      @NonNull List<LocalAudioTrackPublication> localAudioTrackPublications,
                      @NonNull List<LocalVideoTrackPublication> localVideoTrackPublications,
+                     @NonNull List<LocalDataTrackPublication> localDataTrackPublications,
                      @NonNull Handler handler) {
         Preconditions.checkNotNull(sid, "SID must not be null");
         Preconditions.checkArgument(!sid.isEmpty(), "SID must not be empty");
@@ -256,6 +327,9 @@ public class LocalParticipant implements Participant {
         this.localVideoTrackPublications = localVideoTrackPublications;
         this.videoTrackPublications = new ArrayList<>(localVideoTrackPublications.size());
         addVideoTracks(localVideoTrackPublications);
+        this.localDataTrackPublications = localDataTrackPublications;
+        this.dataTrackPublications = new ArrayList<>(localDataTrackPublications.size());
+        addDataTracks(localDataTrackPublications);
         this.handler = handler;
     }
 
@@ -285,6 +359,12 @@ public class LocalParticipant implements Participant {
         }
     }
 
+    private void addDataTracks(List<LocalDataTrackPublication> localDataTrackPublications) {
+        for (LocalDataTrackPublication localDataTrackPublication : localDataTrackPublications) {
+            this.dataTrackPublications.add(localDataTrackPublication);
+        }
+    }
+
     private void removePublishedAudioTrack(LocalAudioTrack localAudioTrack) {
         for (LocalAudioTrackPublication localAudioTrackPublication : localAudioTrackPublications) {
             if (localAudioTrack.equals(localAudioTrackPublication.getLocalAudioTrack())) {
@@ -300,6 +380,16 @@ public class LocalParticipant implements Participant {
             if (localVideoTrack.equals(localVideoTrackPublication.getLocalVideoTrack())) {
                 videoTrackPublications.remove(localVideoTrackPublication);
                 localVideoTrackPublications.remove(localVideoTrackPublication);
+                return;
+            }
+        }
+    }
+
+    private void removePublishedDataTrack(LocalDataTrack localDataTrack) {
+        for (LocalDataTrackPublication localDataTrackPublication : localDataTrackPublications) {
+            if (localDataTrack.equals(localDataTrackPublication.getLocalDataTrack())) {
+                dataTrackPublications.remove(localDataTrackPublication);
+                localDataTrackPublications.remove(localDataTrackPublication);
                 return;
             }
         }
@@ -327,6 +417,16 @@ public class LocalParticipant implements Participant {
          */
         void onVideoTrackPublished(LocalParticipant localParticipant,
                                    LocalVideoTrackPublication localVideoTrackPublication);
+
+        /**
+         * This method notifies the listener that a {@link LocalDataTrack} has been shared to a
+         * {@link Room}.
+         *
+         * @param localParticipant The local participant that published the data track.
+         * @param localDataTrackPublication The published local data track.
+         */
+        void onDataTrackPublished(LocalParticipant localParticipant,
+                                  LocalDataTrackPublication localDataTrackPublication);
     }
 
     private native boolean nativePublishAudioTrack(long nativeHandle,
@@ -335,10 +435,15 @@ public class LocalParticipant implements Participant {
     private native boolean nativePublishVideoTrack(long nativeHandle,
                                                    LocalVideoTrack localVideoTrack,
                                                    long nativeVideoTrackHandle);
+    private native boolean nativePublishDataTrack(long nativeHandle,
+                                                  LocalDataTrack localDataTrack,
+                                                  long nativeDataTrackHandle);
     private native boolean nativeUnpublishAudioTrack(long nativeHandle,
                                                      long nativeAudioTrackHandle);
     private native boolean nativeUnpublishVideoTrack(long nativeHandle,
                                                      long nativeVideoTrackHandle);
+    private native boolean nativeUnpublishDataTrack(long nativeHandle,
+                                                  long nativeDataTrackHandle);
     private native void nativeSetEncodingParameters(long nativeHandle,
                                                     EncodingParameters encodingParameters);
     private native void nativeRelease(long nativeHandle);

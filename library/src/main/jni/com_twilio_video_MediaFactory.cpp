@@ -17,6 +17,7 @@
 #include "com_twilio_video_MediaFactory.h"
 #include "com_twilio_video_LocalAudioTrack.h"
 #include "com_twilio_video_LocalVideoTrack.h"
+#include "com_twilio_video_LocalDataTrack.h"
 
 #include "webrtc/sdk/android/src/jni/jni_helpers.h"
 #include "webrtc/voice_engine/include/voe_base.h"
@@ -345,6 +346,34 @@ JNIEXPORT jobject JNICALL Java_com_twilio_video_MediaFactory_nativeCreateVideoTr
                                       j_video_capturer,
                                       j_video_contraints,
                                       j_media_factory));
+}
+
+JNIEXPORT jobject JNICALL Java_com_twilio_video_MediaFactory_nativeCreateDataTrack(JNIEnv *jni,
+                                                                                   jobject j_media_factory,
+                                                                                   jlong media_factory_handle,
+                                                                                   jboolean j_ordered,
+                                                                                   jint j_max_packet_life_time,
+                                                                                   jint j_max_retransmits,
+                                                                                   jstring j_name) {
+    std::string func_name = std::string(__FUNCTION__);
+    VIDEO_ANDROID_LOG(twilio::video::LogModule::kPlatform,
+                      twilio::video::LogLevel::kDebug,
+                      "%s", func_name.c_str());
+    std::shared_ptr<twilio::media::MediaFactory> media_factory =
+            getMediaFactory(media_factory_handle);
+    std::string name = webrtc_jni::IsNull(jni, j_name) ?
+                       ("") :
+                       (webrtc_jni::JavaToStdString(jni, j_name));
+    twilio::media::DataTrackOptions data_track_options = twilio::media::DataTrackOptions::Builder()
+            .setOrdered(j_ordered)
+            .setMaxRetransmits(j_max_retransmits)
+            .setMaxRetransmitTime(j_max_packet_life_time)
+            .setName(name)
+            .build();
+    std::shared_ptr<twilio::media::LocalDataTrack> data_track =
+            media_factory->createDataTrack(&data_track_options, name);
+
+    return createJavaLocalDataTrack(data_track, j_media_factory);
 }
 
 JNIEXPORT void JNICALL Java_com_twilio_video_MediaFactory_nativeRelease(JNIEnv *jni,

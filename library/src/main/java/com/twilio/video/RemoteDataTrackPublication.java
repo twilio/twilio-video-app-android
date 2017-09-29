@@ -20,20 +20,19 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 /**
- * A remote video track publication represents a {@link RemoteVideoTrack} that has been shared
- * to a {@link Room}.
+ * A remote data track publication represents a {@link RemoteDataTrack}.
  */
-public class RemoteVideoTrackPublication implements VideoTrackPublication {
+public class RemoteDataTrackPublication implements DataTrackPublication {
     private final String sid;
     private final String name;
-    private RemoteVideoTrack remoteVideoTrack;
+    private RemoteDataTrack remoteDataTrack;
     private boolean subscribed;
     private boolean enabled;
 
-    RemoteVideoTrackPublication(boolean subscribed,
-                                boolean enabled,
-                                @NonNull String sid,
-                                @NonNull String name) {
+    RemoteDataTrackPublication(boolean subscribed,
+                               boolean enabled,
+                               @NonNull String sid,
+                               @NonNull String name) {
         this.enabled = enabled;
         this.subscribed = subscribed;
         this.sid = sid;
@@ -41,8 +40,8 @@ public class RemoteVideoTrackPublication implements VideoTrackPublication {
     }
 
     /**
-     * Returns the remote video track's server identifier. This value uniquely identifies the remote
-     * video track within the scope of a {@link Room}.
+     * Returns the remote data track's server identifier. This value uniquely identifies the remote
+     * data track within the scope of a {@link Room}.
      */
     @Override
     public String getTrackSid() {
@@ -50,16 +49,16 @@ public class RemoteVideoTrackPublication implements VideoTrackPublication {
     }
 
     /**
-     * Returns the base video track object of the published remote video track. {@code null} is
+     * Returns the base data track object of the published remote data track. {@code null} is
      * returned if the track is not subscribed to.
      */
     @Override
-    public synchronized @Nullable VideoTrack getVideoTrack() {
-        return remoteVideoTrack;
+    public synchronized @Nullable DataTrack getDataTrack() {
+        return remoteDataTrack;
     }
 
     /**
-     * Returns the name of the published video track. An empty string is returned if no track name
+     * Returns the name of the published data track. An empty string is returned if no track name
      * was specified.
      */
     @Override
@@ -68,26 +67,26 @@ public class RemoteVideoTrackPublication implements VideoTrackPublication {
     }
 
     /**
-     * Returns true if the published video track is enabled or false otherwise.
+     * Returns true if the published data track is enabled or false otherwise.
      */
     @Override
-    public synchronized boolean isTrackEnabled() {
+    public boolean isTrackEnabled() {
         return enabled;
     }
 
     /**
-     * Check if the remote video track is subscribed to by the {@link LocalParticipant}.
+     * Check if the remote data track is subscribed to by the {@link LocalParticipant}.
      */
     public synchronized boolean isTrackSubscribed() {
         return subscribed;
     }
 
     /**
-     * Returns the published remote video track. {@code null} is returned if the track is not
+     * Returns the published remote data track. {@code null} is returned if the track is not
      * subscribed to.
      */
-    public synchronized @Nullable RemoteVideoTrack getRemoteVideoTrack() {
-        return remoteVideoTrack;
+    public synchronized @Nullable RemoteDataTrack getRemoteDataTrack() {
+        return remoteDataTrack;
     }
 
     /*
@@ -98,21 +97,10 @@ public class RemoteVideoTrackPublication implements VideoTrackPublication {
     }
 
     /*
-     * Set by remote participant listener proxy.
-     */
-    synchronized void setEnabled(boolean enabled) {
-        this.enabled = enabled;
-
-        if (remoteVideoTrack != null) {
-            remoteVideoTrack.setEnabled(enabled);
-        }
-    }
-
-    /*
      * Called from JNI layer when a track has been subscribed to.
      */
     @SuppressWarnings("unused")
-    synchronized void setRemoteVideoTrack(RemoteVideoTrack remoteVideoTrack) {
-        this.remoteVideoTrack = remoteVideoTrack;
+    synchronized void setRemoteDataTrack(RemoteDataTrack remoteDataTrack) {
+        this.remoteDataTrack = remoteDataTrack;
     }
 }

@@ -58,6 +58,8 @@ import com.twilio.video.LocalParticipant;
 import com.twilio.video.LocalVideoTrack;
 import com.twilio.video.RemoteAudioTrack;
 import com.twilio.video.RemoteAudioTrackPublication;
+import com.twilio.video.RemoteDataTrack;
+import com.twilio.video.RemoteDataTrackPublication;
 import com.twilio.video.RemoteParticipant;
 import com.twilio.video.RemoteVideoTrack;
 import com.twilio.video.RemoteVideoTrackPublication;
@@ -1480,6 +1482,48 @@ public class RoomActivity extends BaseActivity {
                 participantController.removeOrEmptyThumb(remoteParticipant.getSid(),
                         remoteParticipant.getIdentity(), remoteVideoTrack);
             }
+        }
+
+        @Override
+        public void onDataTrackPublished(RemoteParticipant remoteParticipant,
+                                         RemoteDataTrackPublication remoteDataTrackPublication) {
+            Timber.i("onDataTrackPublished: remoteParticipant: %s, data: %s, enabled: %b",
+                    remoteParticipant.getIdentity(),
+                    remoteDataTrackPublication.getTrackSid(),
+                    remoteDataTrackPublication.isTrackEnabled());
+        }
+
+        @Override
+        public void onDataTrackUnpublished(RemoteParticipant remoteParticipant,
+                                           RemoteDataTrackPublication remoteDataTrackPublication) {
+            Timber.i("onDataTrackUnpublished: remoteParticipant: %s, data: %s, enabled: %b",
+                    remoteParticipant.getIdentity(),
+                    remoteDataTrackPublication.getTrackSid(),
+                    remoteDataTrackPublication.isTrackEnabled());
+        }
+
+        @Override
+        public void onDataTrackSubscribed(RemoteParticipant remoteParticipant,
+                                          RemoteDataTrackPublication remoteDataTrackPublication,
+                                          RemoteDataTrack remoteDataTrack) {
+            Timber.i("onDataTrackSubscribed: remoteParticipant: %s, data: %s, enabled: %b, " +
+                            "subscribed: %b",
+                    remoteParticipant.getIdentity(),
+                    remoteDataTrackPublication.getTrackSid(),
+                    remoteDataTrackPublication.isTrackEnabled(),
+                    remoteDataTrackPublication.isTrackSubscribed());
+        }
+
+        @Override
+        public void onDataTrackUnsubscribed(RemoteParticipant remoteParticipant,
+                                            RemoteDataTrackPublication remoteDataTrackPublication,
+                                            RemoteDataTrack remoteDataTrack) {
+            Timber.i("onDataTrackUnsubscribed: remoteParticipant: %s, data: %s, enabled: %b, " +
+                            "subscribed: %b",
+                    remoteParticipant.getIdentity(),
+                    remoteDataTrackPublication.getTrackSid(),
+                    remoteDataTrackPublication.isTrackEnabled(),
+                    remoteDataTrackPublication.isTrackSubscribed());
         }
 
         @Override

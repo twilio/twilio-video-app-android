@@ -1,5 +1,90 @@
 The Twilio Programmable Video SDKs use [Semantic Versioning](http://www.semver.org).
 
+####2.0.0-preview4
+
+Features
+
+- Added new `DataTrack` API. A data track represents a unidirectional source that allow sharing
+string and binary data with all participants of a Room. Data tracks function similarly to audio and
+video tracks and can be provided via `ConnectOptions` and published using 
+`LocalParticipant#publishTrack`. Messages sent on the data track are not guaranteed to be 
+delivered to all the participants. The following snippets demonstrate how to send and receive 
+messages with data tracks.
+
+Creating a `LocalDataTrack`
+
+    LocalDataTrack localDataTrack = LocalDataTrack.create(context);
+    
+Connecting to a `Room` with a `LocalDataTrack`
+
+    ConnectOptions connectOptions = new ConnectOptions.Builder(token)
+            .dataTracks(Collections.singletonList(localDataTrack))
+            .build();
+    Video.connect(context, connectOptions, roomListener);
+    
+Publishing a `LocalDataTrack`
+
+    // ... Connected to room
+    LocalParticipant localParticipant = room.getLocalParticipant();
+    
+    localParticipant.publish(localDataTrack);
+    
+Observing `RemoteDataTrackPublication` and `RemoteDataTrack`
+
+    RemoteParticipant.Listener participantListener = new RemoteParticipant.Listener() {
+            // ... complete interface ellided
+            
+            // Participant has published data track
+            @Override
+            public void onDataTrackPublished(RemoteParticipant remoteParticipant,
+                                             RemoteDataTrackPublication remoteDataTrackPublication);
+    
+            // Participant has unpublished data track
+            @Override
+            public void onDataTrackUnpublished(RemoteParticipant remoteParticipant,
+                                               RemoteDataTrackPublication remoteDataTrackPublication);
+    
+            // Data track has been subscribed to and messages can be observed.
+            @Override
+            public void onDataTrackSubscribed(RemoteParticipant remoteParticipant,
+                                              RemoteDataTrackPublication remoteDataTrackPublication,
+                                              RemoteDataTrack remoteDataTrack);
+    
+            // Data track has been unsubsubscribed from and messages cannot be observed.
+            @Override
+            public void onDataTrackUnsubscribed(RemoteParticipant remoteParticipant,
+                                                RemoteDataTrackPublication remoteDataTrackPublication,
+                                                RemoteDataTrack remoteDataTrack);
+    };
+    
+Sending messages on `LocalDataTrack`
+
+    String message = "Hello DataTrack!";
+    ByteBuffer messageBuffer = ByteByffer.wrap(new byte[]{ 0xf, 0xe });
+    
+    localDataTrack.send(message);
+    localDataTrack.send(messageBuffer);
+    
+Observing messages from data track 
+
+    RemoteDataTrack.Listener dataTrackListener = new RemoteDataTrack.Listener() {
+            @Override
+            public void onMessage(String message) {
+                // Should print "Hello DataTrack!"
+                Log.d(TAG, String.format("Received data track message: %s", message));
+            }
+            
+            @Override
+            public void onMessage(ByteBuffer message) {
+                Log.d(TAG, "Received message buffer on data track!");
+            }
+    };
+
+Known issues
+
+- Network handoff, and subsequent connection renegotiation is not supported for IPv6 networks [#72](https://github.com/twilio/video-quickstart-android/issues/72)
+- Participant disconnect event can take up to 120 seconds to occur [#80](https://github.com/twilio/video-quickstart-android/issues/80) [#73](https://github.com/twilio/video-quickstart-android/issues/73)
+
 ####2.0.0-preview3
 
 Improvements

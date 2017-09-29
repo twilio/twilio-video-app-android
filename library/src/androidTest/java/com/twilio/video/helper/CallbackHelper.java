@@ -17,11 +17,16 @@
 package com.twilio.video.helper;
 
 
+import android.util.Pair;
+
+import com.twilio.video.LocalDataTrackPublication;
 import com.twilio.video.LocalParticipant;
 import com.twilio.video.LocalAudioTrackPublication;
 import com.twilio.video.LocalVideoTrackPublication;
 import com.twilio.video.RemoteAudioTrack;
 import com.twilio.video.RemoteAudioTrackPublication;
+import com.twilio.video.RemoteDataTrack;
+import com.twilio.video.RemoteDataTrackPublication;
 import com.twilio.video.RemoteParticipant;
 import com.twilio.video.RemoteVideoTrack;
 import com.twilio.video.RemoteVideoTrackPublication;
@@ -30,9 +35,14 @@ import com.twilio.video.TwilioException;
 import com.twilio.video.StatsListener;
 import com.twilio.video.StatsReport;
 
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.annotation.Nullable;
 
@@ -159,14 +169,18 @@ public class CallbackHelper {
     }
 
     public static class FakeParticipantListener implements RemoteParticipant.Listener {
-        public CountDownLatch onAudioTrackAddedLatch;
-        public CountDownLatch onAudioTrackRemovedLatch;
+        public CountDownLatch onAudioTrackPublishedLatch;
+        public CountDownLatch onAudioTrackUnpublishedLatch;
         public CountDownLatch onSubscribedToAudioTrackLatch;
         public CountDownLatch onUnsubscribedFromAudioTrackLatch;
-        public CountDownLatch onVideoTrackAddedLatch;
-        public CountDownLatch onVideoTrackRemovedLatch;
+        public CountDownLatch onVideoTrackPublishedLatch;
+        public CountDownLatch onVideoTrackUnpublishedLatch;
         public CountDownLatch onSubscribedToVideoTrackLatch;
         public CountDownLatch onUnsubscribedFromVideoTrackLatch;
+        public CountDownLatch onDataTrackPublishedLatch;
+        public CountDownLatch onDataTrackUnpublishedLatch;
+        public CountDownLatch onSubscribedToDataTrackLatch;
+        public CountDownLatch onUnsubscribedFromDataTrackLatch;
         public CountDownLatch onAudioTrackEnabledLatch;
         public CountDownLatch onAudioTrackDisabledLatch;
         public CountDownLatch onVideoTrackEnabledLatch;
@@ -177,14 +191,14 @@ public class CallbackHelper {
         public void onAudioTrackPublished(RemoteParticipant remoteParticipant,
                                           RemoteAudioTrackPublication remoteAudioTrackPublication) {
             participantEvents.add("onAudioTrackPublished");
-            triggerLatch(onAudioTrackAddedLatch);
+            triggerLatch(onAudioTrackPublishedLatch);
         }
 
         @Override
         public void onAudioTrackUnpublished(RemoteParticipant remoteParticipant,
                                             RemoteAudioTrackPublication remoteAudioTrackPublication) {
             participantEvents.add("onAudioTrackUnpublished");
-            triggerLatch(onAudioTrackRemovedLatch);
+            triggerLatch(onAudioTrackUnpublishedLatch);
         }
 
         @Override
@@ -209,14 +223,14 @@ public class CallbackHelper {
         public void onVideoTrackPublished(RemoteParticipant remoteParticipant,
                                           RemoteVideoTrackPublication remoteVideoTrackPublication) {
             participantEvents.add("onVideoTrackPublished");
-            triggerLatch(onVideoTrackAddedLatch);
+            triggerLatch(onVideoTrackPublishedLatch);
         }
 
         @Override
         public void onVideoTrackUnpublished(RemoteParticipant remoteParticipant,
                                             RemoteVideoTrackPublication remoteVideoTrackPublication) {
             participantEvents.add("onVideoTrackUnpublished");
-            triggerLatch(onVideoTrackRemovedLatch);
+            triggerLatch(onVideoTrackUnpublishedLatch);
         }
 
         @Override
@@ -235,6 +249,38 @@ public class CallbackHelper {
             assertFalse(remoteVideoTrackPublication.isTrackSubscribed());
             participantEvents.add("onVideoTrackUnsubscribed");
             triggerLatch(onUnsubscribedFromVideoTrackLatch);
+        }
+
+        @Override
+        public void onDataTrackPublished(RemoteParticipant remoteParticipant,
+                                         RemoteDataTrackPublication remoteDataTrackPublication) {
+            participantEvents.add("onDataTrackPublished");
+            triggerLatch(onDataTrackPublishedLatch);
+        }
+
+        @Override
+        public void onDataTrackUnpublished(RemoteParticipant remoteParticipant,
+                                           RemoteDataTrackPublication remoteDataTrackPublication) {
+            participantEvents.add("onDataTrackUnpublished");
+            triggerLatch(onDataTrackUnpublishedLatch);
+        }
+
+        @Override
+        public void onDataTrackSubscribed(RemoteParticipant remoteParticipant,
+                                          RemoteDataTrackPublication remoteDataTrackPublication,
+                                          RemoteDataTrack remoteDataTrack) {
+            assertTrue(remoteDataTrackPublication.isTrackSubscribed());
+            participantEvents.add("onDataTrackSubscribed");
+            triggerLatch(onSubscribedToDataTrackLatch);
+        }
+
+        @Override
+        public void onDataTrackUnsubscribed(RemoteParticipant remoteParticipant,
+                                            RemoteDataTrackPublication remoteDataTrackPublication,
+                                            RemoteDataTrack remoteDataTrack) {
+            assertFalse(remoteDataTrackPublication.isTrackSubscribed());
+            participantEvents.add("onDataTrackUnsubscribed");
+            triggerLatch(onUnsubscribedFromDataTrackLatch);
         }
 
         @Override
@@ -288,6 +334,7 @@ public class CallbackHelper {
     public static class FakeLocalParticipantListener implements LocalParticipant.Listener {
         public CountDownLatch onPublishedAudioTrackLatch;
         public CountDownLatch onPublishedVideoTrackLatch;
+        public CountDownLatch onPublishedDataTrackLatch;
         public final List<String> localParticipantEvents = new ArrayList<>();
 
         @Override
@@ -302,6 +349,38 @@ public class CallbackHelper {
                                           LocalVideoTrackPublication localVideoTrackPublication) {
             localParticipantEvents.add("onVideoTrackPublished");
             triggerLatch(onPublishedVideoTrackLatch);
+        }
+
+        @Override
+        public void onDataTrackPublished(LocalParticipant localParticipant,
+                                         LocalDataTrackPublication localDataTrackPublication) {
+            localParticipantEvents.add("onDataTrackPublished");
+            triggerLatch(onPublishedDataTrackLatch);
+        }
+    }
+
+    public static class FakeRemoteDataTrackListener implements RemoteDataTrack.Listener {
+        public CountDownLatch onBufferMessageLatch;
+        public CountDownLatch onStringMessageLatch;
+        public final List<Pair<Integer, ByteBuffer>> bufferMessages = new ArrayList<>();
+        public final List<Pair<Integer, String>> messages = new ArrayList<>();
+        public final Set<String> messagesSet = Collections.synchronizedSet(new HashSet<String>());
+        public final Set<ByteBuffer> bufferMessagesSet = Collections
+                .synchronizedSet(new HashSet<ByteBuffer>());
+        public final AtomicInteger messageCount = new AtomicInteger(1);
+
+        @Override
+        public void onMessage(RemoteDataTrack remoteDataTrack, ByteBuffer messageBuffer) {
+            bufferMessages.add(new Pair<>(messageCount.getAndIncrement(), messageBuffer));
+            bufferMessagesSet.add(messageBuffer);
+            triggerLatch(onBufferMessageLatch);
+        }
+
+        @Override
+        public void onMessage(RemoteDataTrack remoteDataTrack, String message) {
+            messages.add(new Pair<>(messageCount.getAndIncrement(), message));
+            messagesSet.add(message);
+            triggerLatch(onStringMessageLatch);
         }
     }
 }

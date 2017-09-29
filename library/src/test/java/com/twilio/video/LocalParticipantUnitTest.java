@@ -38,6 +38,7 @@ public class LocalParticipantUnitTest {
     @Mock Handler handler;
     @Mock LocalAudioTrackPublication mockLocalAudioTrackPublication;
     @Mock LocalVideoTrackPublication mockLocalVideoTrackPublicationOne;
+    @Mock LocalDataTrackPublication mockLocalDataTrackPublication;
 
     @Before
     public void setup() {
@@ -46,6 +47,7 @@ public class LocalParticipantUnitTest {
                 String.valueOf(random.nextInt(INT_MAX)),
                 Arrays.asList(mockLocalAudioTrackPublication),
                 Arrays.asList(mockLocalVideoTrackPublicationOne),
+                Arrays.asList(mockLocalDataTrackPublication),
                 handler);
     }
 
@@ -56,6 +58,7 @@ public class LocalParticipantUnitTest {
                 String.valueOf(random.nextInt(INT_MAX)),
                 Arrays.asList(mockLocalAudioTrackPublication),
                 Arrays.asList(mockLocalVideoTrackPublicationOne),
+                Arrays.asList(mockLocalDataTrackPublication),
                 handler);
     }
 
@@ -66,6 +69,7 @@ public class LocalParticipantUnitTest {
                 String.valueOf(random.nextInt(INT_MAX)),
                 Arrays.asList(mockLocalAudioTrackPublication),
                 Arrays.asList(mockLocalVideoTrackPublicationOne),
+                Arrays.asList(mockLocalDataTrackPublication),
                 handler);
     }
 
@@ -76,6 +80,7 @@ public class LocalParticipantUnitTest {
                 null,
                 Arrays.asList(mockLocalAudioTrackPublication),
                 Arrays.asList(mockLocalVideoTrackPublicationOne),
+                Arrays.asList(mockLocalDataTrackPublication),
                 handler);
     }
 
@@ -86,6 +91,7 @@ public class LocalParticipantUnitTest {
                 String.valueOf(random.nextInt(INT_MAX)),
                 Arrays.asList(mockLocalAudioTrackPublication),
                 Arrays.asList(mockLocalVideoTrackPublicationOne),
+                Arrays.asList(mockLocalDataTrackPublication),
                 handler);
     }
 

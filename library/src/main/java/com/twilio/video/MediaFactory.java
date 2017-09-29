@@ -135,6 +135,21 @@ class MediaFactory {
         }
     }
 
+    synchronized LocalDataTrack createDataTrack(boolean ordered,
+                                                int maxPacketLifeTime,
+                                                int maxRetransmits,
+                                                String name) {
+        Preconditions.checkState(nativeMediaFactoryHandle != 0,
+                RELEASE_MESSAGE_TEMPLATE,
+                "createDataTrack");
+        addRef();
+        return nativeCreateDataTrack(nativeMediaFactoryHandle,
+                ordered,
+                maxPacketLifeTime,
+                maxRetransmits,
+                name);
+    }
+
     void addRef() {
         synchronized (MediaFactory.class) {
             Preconditions.checkNotNull(instance, "MediaFactory instance must not be null");
@@ -182,5 +197,10 @@ class MediaFactory {
                                                           VideoConstraints videoConstraints,
                                                           String name,
                                                           EglBase.Context rootEglBase);
+    private native LocalDataTrack nativeCreateDataTrack(long nativeMediaFactoryHandle,
+                                                        boolean ordered,
+                                                        int maxPacketLifeTime,
+                                                        int maxRetransmits,
+                                                        String name);
     private native void nativeRelease(long mediaFactoryHandle);
 }
