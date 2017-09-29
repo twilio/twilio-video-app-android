@@ -78,7 +78,7 @@ public class RemoteParticipantTest extends BaseClientTest {
     @Test
     public void shouldReceiveTrackEventsIfListenerSetAfterEventReceived()
             throws InterruptedException {
-        final String roomName = RandUtils.generateRandomString(10);
+        final String roomName = RandUtils.generateRandomString(Constants.ROOM_NAME_LENGTH);
         Topology topology = Topology.P2P;
         Assert.assertNotNull(RoomUtils.createRoom(roomName, topology));
         String aliceToken = CredentialsUtils.getAccessToken(Constants.PARTICIPANT_ALICE, topology);

@@ -76,7 +76,7 @@ public class RoomMultiPartyTopologyParameterizedTest extends BaseClientTest {
     public void setup() throws InterruptedException {
         super.setup();
         context = InstrumentationRegistry.getInstrumentation().getTargetContext();
-        roomName = RandUtils.generateRandomString(20);
+        roomName = RandUtils.generateRandomString(Constants.ROOM_NAME_LENGTH);
         assertNotNull(RoomUtils.createRoom(roomName, topology));
         rooms = new ArrayList<>();
         tokens = new ArrayList<>();

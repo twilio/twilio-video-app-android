@@ -108,7 +108,7 @@ public abstract class BaseParticipantTest extends BaseClientTest {
         PermissionUtils.allowPermissions(mediaTestActivity);
 
         // Setup room
-        testRoomName = RandUtils.generateRandomString(10);
+        testRoomName = RandUtils.generateRandomString(Constants.ROOM_NAME_LENGTH);
         assertNotNull(RoomUtils.createRoom(testRoomName, topology));
 
         // Setup alice

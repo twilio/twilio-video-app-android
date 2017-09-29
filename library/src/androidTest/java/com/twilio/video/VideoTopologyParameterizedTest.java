@@ -83,7 +83,7 @@ public class VideoTopologyParameterizedTest extends BaseClientTest {
         mediaTestActivity = activityRule.getActivity();
         roomListener = new CallbackHelper.FakeRoomListener();
         PermissionUtils.allowPermissions(mediaTestActivity);
-        roomName = RandUtils.generateRandomString(20);
+        roomName = RandUtils.generateRandomString(Constants.ROOM_NAME_LENGTH);
         assertNotNull(RoomUtils.createRoom(roomName, topology));
         token = CredentialsUtils.getAccessToken(Constants.PARTICIPANT_ALICE, topology);
         Video.setLogLevel(LogLevel.ALL);
