@@ -27,6 +27,7 @@ import com.twilio.video.util.Topology;
 
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -357,7 +358,11 @@ public class DataTrackTopologyParameterizedTest extends BaseParticipantTest {
                 bobDataTrackListener.bufferMessages.get(1).second.array());
     }
 
+    /*
+     * TODO: Enable test once CSDK-1792 is resolved
+     */
     @Test
+    @Ignore
     public void canSendAfterUnpublished() throws InterruptedException {
         publishDataTrack();
         String expectedMessage = "Hello";
