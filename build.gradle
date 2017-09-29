@@ -40,7 +40,7 @@ allprojects {
 }
 
 task tagReleaseCandidate {
-    description = 'Tags commit as release candidate'
+    description = 'Tag commit as release candidate'
     group = 'Git'
 
     doLast {
@@ -54,6 +54,35 @@ task tagReleaseCandidate {
         exec {
             workingDir "${rootDir}"
             commandLine "git", "push", "origin", "${rcTagPath}"
+        }
+    }
+}
+
+task tagRelease {
+    description = 'Tag commit as release'
+    group = 'Git'
+
+    doLast {
+        def rcTag = "${versionMajor}.${versionMinor}.${versionPatch}-rc${versionRc}"
+        def releaseVersion = System.getenv("RELEASE_VERSION")
+        exec {
+            workingDir "${rootDir}"
+            commandLine "git", "checkout", "${rcTag}"
+        }
+
+        exec {
+            workingDir "${rootDir}"
+            commandLine "git",
+                    "tag",
+                    "-a",
+                    "${releaseVersion}",
+                    "-m",
+                    "\"${releaseVersion} release\""
+        }
+
+        exec {
+            workingDir "${rootDir}"
+            commandLine "git", "push", "origin", "${releaseVersion}"
         }
     }
 }
@@ -105,8 +134,158 @@ task incrementRc {
     }
 }
 
+task incrementVersionAfterRelease {
+    description = 'Increment the SDK version after a release'
+    group = 'Git'
+
+    doLast {
+        def gitBranch = System.getenv("GIT_BRANCH")
+        def nextVersionPatch = versionPatch + 1
+        // Create build directory if not created
+        if (!buildDir.exists()) {
+            buildDir.mkdir()
+        }
+        exec {
+            workingDir "${rootDir}"
+            commandLine "git", "checkout", "${gitBranch}"
+        }
+
+        exec {
+            workingDir "${rootDir}"
+            commandLine "echo", "Incrementing from versionPatch ${versionPatch} to " +
+                    "${nextVersionPatch}"
+        }
+
+        exec {
+            workingDir "${rootDir}"
+            commandLine "sed",
+                    "s@versionPatch=.*@versionPatch=${nextVersionPatch}@",
+                    "gradle.properties"
+            standardOutput new FileOutputStream("${buildDir}/gradle.properties")
+        }
+
+        exec {
+            workingDir "${rootDir}"
+            commandLine "mv", "${buildDir}/gradle.properties", "gradle.properties"
+        }
+
+        exec {
+            workingDir "${rootDir}"
+            commandLine "echo", "Resetting versionRc to 1"
+        }
+
+        exec {
+            workingDir "${rootDir}"
+            commandLine "sed",
+                    "s@versionRc=.*@versionRc=1@",
+                    "gradle.properties"
+            standardOutput new FileOutputStream("${buildDir}/gradle.properties")
+        }
+
+        exec {
+            workingDir "${rootDir}"
+            commandLine "mv", "${buildDir}/gradle.properties", "gradle.properties"
+        }
+
+        exec {
+            workingDir "${rootDir}"
+            commandLine "echo", "Resetting phaseNumber to 1"
+        }
+
+        exec {
+            workingDir "${rootDir}"
+            commandLine "sed",
+                    "s@phaseNumber=.*@phaseNumber=1@",
+                    "gradle.properties"
+            standardOutput new FileOutputStream("${buildDir}/gradle.properties")
+        }
+
+        exec {
+            workingDir "${rootDir}"
+            commandLine "mv", "${buildDir}/gradle.properties", "gradle.properties"
+        }
+
+        exec {
+            workingDir "${rootDir}"
+            commandLine "git", "commit", "gradle.properties", "-m", "\"Bump patch and reset rc version\""
+        }
+
+        exec {
+            workingDir "${rootDir}"
+            commandLine "git", "push", "origin", "${gitBranch}"
+        }
+    }
+}
+
+task incrementVersionAfterPreRelease {
+    description = 'Increment the SDK version after a pre-release'
+    group = 'Git'
+
+    doLast {
+        def gitBranch = System.getenv("GIT_BRANCH")
+        def nextPhaseNumber = phaseNumber + 1
+        // Create build directory if not created
+        if (!buildDir.exists()) {
+            buildDir.mkdir()
+        }
+        exec {
+            workingDir "${rootDir}"
+            commandLine "git", "checkout", "${gitBranch}"
+        }
+
+        exec {
+            workingDir "${rootDir}"
+            commandLine "echo", "Incrementing from phaseNumber ${phaseNumber} to " +
+                    "${nextPhaseNumber}"
+        }
+
+        exec {
+            workingDir "${rootDir}"
+            commandLine "sed",
+                    "s@phaseNumber=.*@phaseNumber=${nextPhaseNumber}@",
+                    "gradle.properties"
+            standardOutput new FileOutputStream("${buildDir}/gradle.properties")
+        }
+
+        exec {
+            workingDir "${rootDir}"
+            commandLine "mv", "${buildDir}/gradle.properties", "gradle.properties"
+        }
+
+        exec {
+            workingDir "${rootDir}"
+            commandLine "git", "commit", "gradle.properties", "-m", "\"Bump phase number\""
+        }
+
+        exec {
+            workingDir "${rootDir}"
+            commandLine "git", "push", "origin", "${gitBranch}"
+        }
+    }
+}
+
+task incrementVersion(type: GradleBuild) {
+    description = 'Increment the SDK version'
+    group = 'Git'
+    def releaseVersion = System.getenv("RELEASE_VERSION") == null ?
+            ("") :
+            (System.getenv("RELEASE_VERSION"))
+    def incrementVersionTask = releaseVersion.contains("preview") ||
+            releaseVersion.contains("beta") ?
+            ('incrementVersionAfterPreRelease') :
+            ('incrementVersionAfterRelease')
+    tasks = [incrementVersionTask]
+}
+
+task checkoutRelease(type: Exec) {
+    description = 'Checkout tagged release'
+    group = 'Git'
+    def releaseVersion = System.getenv("RELEASE_VERSION")
+    commandLine "git", "checkout", "${releaseVersion}"
+}
+
 task publishReleaseCandidateArtifacts {
-    description = 'Publishes Video Android AAR and javadocs to stage CDN'
+    description = 'Publish Video Android AAR and javadocs to stage CDN'
     group = 'Publishing'
     dependsOn 'library:createJavadocs'
 
@@ -148,9 +327,37 @@ task publishReleaseCandidateArtifacts {
     }
 }
 
+task promoteReleaseCandidateToRelease(type: Exec) {
+    description = 'Promote Video Android AAR and javadocs from stage to prod CDN'
+    group = 'Publishing'
+    def rcVersion = "${versionMajor}.${versionMinor}.${versionPatch}-rc${versionRc}"
+    environment "RC_BUILD_NUMBER", "${versionRc}"
+    environment "SDK_RC_VERSION", "${rcVersion}"
+    commandLine "./scripts/promote-rc-to-release.sh"
+}
+
+task publishReleaseArtifacts(type: Exec) {
+    description = 'Publish Video Android AAR and javadocs prod CDN'
+    group = 'Publishing'
+    dependsOn checkoutRelease
+    dependsOn promoteReleaseCandidateToRelease
+    def rcVersion = "${versionMajor}.${versionMinor}.${versionPatch}-rc${versionRc}"
+    def releaseVersion = System.getenv("RELEASE_VERSION") == null ?
+            ("") :
+            (System.getenv("RELEASE_VERSION"))
+    // Do not pin pre releases
+    def releaseCommand = releaseVersion.contains("preview") || releaseVersion.contains("beta") ?
+            ("true") :
+            ("./scripts/pin-release.sh")
+    environment "RC_BUILD_NUMBER", "${versionRc}"
+    environment "SDK_RC_VERSION", "${rcVersion}"
+
+    commandLine releaseCommand
+}
+
 task firebaseTestLabCheckLibrary(type: Exec) {
-    group = 'Test'
     description = 'Runs library instrumentation tests on Firebase Test Lab'
+    group = 'Test'
     dependsOn 'library:assembleDebugAndroidTest'
     dependsOn 'app:assembleDebug'
     commandLine 'gcloud',
@@ -164,8 +371,8 @@ task firebaseTestLabCheckLibrary(type: Exec) {
 }
 
 task firebaseTestLabCheckLibraryCamera(type: Exec) {
-    group = 'Test'
     description = 'Runs library instrumentation tests that use camera on Firebase Test Lab'
+    group = 'Test'
     dependsOn 'library:assembleDebugAndroidTest'
     dependsOn 'app:assembleDebug'
     commandLine 'gcloud',
@@ -179,8 +386,8 @@ task firebaseTestLabCheckLibraryCamera(type: Exec) {
 }
 
 task checkLibrary(type: GradleBuild) {
-    group = 'Test'
     description = 'Runs all tests and checks for the library'
+    group = 'Test'
     tasks = [
             'clean',
             'assemble',
@@ -212,6 +419,24 @@ task bintrayLibraryReleaseCandidateUpload(type: GradleBuild) {
     startParameter.projectProperties += gradle.startParameter.projectProperties + [
             'releaseCandidate': true,
             'maven.repo': 'https://api.bintray.com/maven/twilio/internal-releases/video-android/;publish=1',
+            'maven.username': "${getBintrayUsername()}",
+            'maven.password': "${getBintrayPassword()}"
+    ]
+}
+
+task bintrayLibraryReleaseUpload(type: GradleBuild) {
+    description = 'Publish Video Android AAR to release Bintray'
+    group = 'Publishing'
+    dependsOn checkoutRelease
+    buildFile = file('library/build.gradle')
+    tasks = ['clean', 'assemble', 'uploadArchives']
+    def releaseVersion = System.getenv("RELEASE_VERSION") == null ?
+            ("") :
+            (System.getenv("RELEASE_VERSION"))
+    boolean preRelease = releaseVersion.contains("preview") || releaseVersion.contains("beta")
+    startParameter.projectProperties += gradle.startParameter.projectProperties + [
+            'preRelease': preRelease,
+            'maven.repo': 'https://api.bintray.com/maven/twilio/releases/video-android/;publish=1',
             'maven.username': "${getBintrayUsername()}",
             'maven.password': "${getBintrayPassword()}"
     ]
