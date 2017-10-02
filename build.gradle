@@ -327,6 +327,59 @@ task publishReleaseCandidateArtifacts {
     }
 }
 
+task publishLibraryJavadocs {
+    description = 'Publish Video Android Javadocs to gh-pages branch'
+    group = 'Publishing'
+    dependsOn 'checkoutRelease'
+    dependsOn 'library:createJavadocs'
+    def gitBranch = System.getenv("GIT_BRANCH")
+    def releaseVersion = System.getenv("RELEASE_VERSION") == null ?
+            ("") :
+            (System.getenv("RELEASE_VERSION"))
+    boolean preRelease = releaseVersion.contains("preview") || releaseVersion.contains("beta")
+    def pinLatestDocsCommand = preRelease ?
+            // Pin command is a no-op for pre releases
+            (["true"]) :
+            (["ln", "-sfn", "${releaseVersion}", "docs/latest"])
+
+    doLast {
+        exec {
+            workingDir "${rootDir}"
+            commandLine "git", "checkout", "gh-pages"
+        }
+
+        exec {
+            workingDir "${rootDir}"
+            commandLine "mv", "library/build/docs/javadoc", "docs/${releaseVersion}"
+        }
+
+        exec {
+            workingDir "${rootDir}"
+            commandLine pinLatestDocsCommand
+        }
+
+        exec {
+            workingDir "${rootDir}"
+            commandLine "git", "add", "docs/${releaseVersion}", "docs/latest"
+        }
+
+        exec {
+            workingDir "${rootDir}"
+            commandLine "git", "commit", "-m", "\"${releaseVersion} release docs\""
+        }
+
+        exec {
+            workingDir "${rootDir}"
+            commandLine "git", "push", "origin", "gh-pages"
+        }
+
+        exec {
+            workingDir "${rootDir}"
+            commandLine "git", "checkout", "${gitBranch}"
+        }
+    }
+}
+
 task promoteReleaseCandidateToRelease(type: Exec) {
     description = 'Promote Video Android AAR and javadocs from stage to prod CDN'
     group = 'Publishing'

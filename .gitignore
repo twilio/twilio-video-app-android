@@ -8,6 +8,7 @@ output
 
 dist/
 target/
+docs/
 
 # Files for the Dalvik VM
 *.dex
