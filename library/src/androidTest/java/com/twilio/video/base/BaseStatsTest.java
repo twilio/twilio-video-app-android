@@ -69,7 +69,7 @@ public abstract class BaseStatsTest extends BaseClientTest {
     protected void baseSetup(Topology topology) {
         mediaTestActivity = activityRule.getActivity();
         PermissionUtils.allowPermissions(mediaTestActivity);
-        roomName = RandUtils.generateRandomString(20);
+        roomName = RandUtils.generateRandomString(Constants.ROOM_NAME_LENGTH);
         assertNotNull(RoomUtils.createRoom(roomName, topology));
         aliceToken = CredentialsUtils.getAccessToken(Constants.PARTICIPANT_ALICE, topology);
         bobToken = CredentialsUtils.getAccessToken(Constants.PARTICIPANT_BOB, topology);

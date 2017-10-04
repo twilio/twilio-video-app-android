@@ -83,7 +83,7 @@ public class IceTopologyParameterizedTest extends BaseClientTest {
         Video.setModuleLogLevel(LogModule.SIGNALING, LogLevel.ALL);
         mediaTestActivity = activityRule.getActivity();
         PermissionUtils.allowPermissions(mediaTestActivity);
-        roomName = RandUtils.generateRandomString(20);
+        roomName = RandUtils.generateRandomString(Constants.ROOM_NAME_LENGTH);
         assertNotNull(RoomUtils.createRoom(roomName, topology));
         aliceToken = CredentialsUtils.getAccessToken(Constants.PARTICIPANT_ALICE, topology);
         bobToken = CredentialsUtils.getAccessToken(Constants.PARTICIPANT_BOB, topology);

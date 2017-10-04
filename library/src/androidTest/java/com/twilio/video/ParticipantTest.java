@@ -59,7 +59,7 @@ public class ParticipantTest extends BaseParticipantTest {
     public void setup() throws InterruptedException {
         topology = Topology.P2P;
         super.baseSetup(topology);
-        roomName = RandUtils.generateRandomString(20);
+        roomName = RandUtils.generateRandomString(Constants.ROOM_NAME_LENGTH);
         assertNotNull(RoomUtils.createRoom(roomName, topology));
         tokenOne = CredentialsUtils.getAccessToken(Constants.PARTICIPANT_ALICE, topology);
         tokenTwo = CredentialsUtils.getAccessToken(Constants.PARTICIPANT_BOB, topology);
@@ -81,7 +81,7 @@ public class ParticipantTest extends BaseParticipantTest {
     @Test
     public void shouldReceiveTrackEventsIfListenerSetAfterEventReceived()
             throws InterruptedException {
-        final String roomName = RandUtils.generateRandomString(10);
+        final String roomName = RandUtils.generateRandomString(Constants.ROOM_NAME_LENGTH);
         Assert.assertNotNull(RoomUtils.createRoom(roomName, topology));
         String aliceToken = CredentialsUtils.getAccessToken(Constants.PARTICIPANT_ALICE, topology);
         final CountDownLatch aliceConnected = new CountDownLatch(1);

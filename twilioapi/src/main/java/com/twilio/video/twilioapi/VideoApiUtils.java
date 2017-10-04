@@ -36,7 +36,7 @@ import retrofit.http.Path;
 import static junit.framework.Assert.assertNotNull;
 
 public class VideoApiUtils {
-    private static final int MAX_RETRIES = 5;
+    private static final int MAX_RETRIES = 20;
     private static final String PROD_BASE_URL = "https://video.twilio.com";
     private static final String STAGE_BASE_URL = "https://video.stage.twilio.com";
     private static final String DEV_BASE_URL = "https://video.dev.twilio.com";

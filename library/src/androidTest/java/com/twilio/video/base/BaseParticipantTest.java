@@ -91,7 +91,7 @@ public abstract class BaseParticipantTest extends BaseClientTest {
         super.setup();
         mediaTestActivity = activityRule.getActivity();
         PermissionUtils.allowPermissions(mediaTestActivity);
-        testRoom = RandUtils.generateRandomString(10);
+        testRoom = RandUtils.generateRandomString(Constants.ROOM_NAME_LENGTH);
         assertNotNull(RoomUtils.createRoom(testRoom, topology));
         fakeVideoCapturer = new FakeVideoCapturer();
         tokenOne = CredentialsUtils.getAccessToken(Constants.PARTICIPANT_ALICE, topology);

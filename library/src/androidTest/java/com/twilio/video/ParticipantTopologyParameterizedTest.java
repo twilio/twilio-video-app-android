@@ -68,7 +68,7 @@ public class ParticipantTopologyParameterizedTest extends BaseParticipantTest {
     @Before
     public void setup() throws InterruptedException {
         super.baseSetup(topology);
-        roomName = RandUtils.generateRandomString(20);
+        roomName = RandUtils.generateRandomString(Constants.ROOM_NAME_LENGTH);
         assertNotNull(RoomUtils.createRoom(roomName, topology));
         context = InstrumentationRegistry.getInstrumentation().getTargetContext();
         tokenOne = CredentialsUtils.getAccessToken(Constants.PARTICIPANT_ALICE, topology);

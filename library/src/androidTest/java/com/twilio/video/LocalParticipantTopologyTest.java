@@ -78,7 +78,7 @@ public class LocalParticipantTopologyTest extends BaseClientTest {
         mediaTestActivity = activityRule.getActivity();
         PermissionUtils.allowPermissions(mediaTestActivity);
         identity = Constants.PARTICIPANT_ALICE;
-        roomName = RandUtils.generateRandomString(20);
+        roomName = RandUtils.generateRandomString(Constants.ROOM_NAME_LENGTH);
         assertNotNull(RoomUtils.createRoom(roomName, topology));
         token = CredentialsUtils.getAccessToken(identity, topology);
     }
