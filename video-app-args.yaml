@@ -6,7 +6,7 @@ library-instrumentation-tests:
     device-ids:
         - m0
         - serranolte
-        - trelte
+        - zeroflte
         - herolte
         - flounder
         - sailfish
