@@ -63,7 +63,8 @@ task tagRelease {
     group = 'Git'
 
     doLast {
-        def rcTag = "${versionMajor}.${versionMinor}.${versionPatch}-rc${versionRc}"
+        // TODO: Add support for releasing any RC. Currently only releases last RC.
+        def rcTag = "${versionMajor}.${versionMinor}.${versionPatch}-rc${versionRc - 1}"
         def releaseVersion = System.getenv("RELEASE_VERSION")
         exec {
             workingDir "${rootDir}"
@@ -383,9 +384,11 @@ task publishLibraryJavadocs {
 task promoteReleaseCandidateToRelease(type: Exec) {
     description = 'Promote Video Android AAR and javadocs from stage to prod CDN'
     group = 'Publishing'
-    def rcVersion = "${versionMajor}.${versionMinor}.${versionPatch}-rc${versionRc}"
-    environment "RC_BUILD_NUMBER", "${versionRc}"
-    environment "SDK_RC_VERSION", "${rcVersion}"
+    // TODO: Add support for releasing any RC. Currently only releases last RC.
+    def lastRc = "${versionRc - 1}"
+    def lastRcVersion = "${versionMajor}.${versionMinor}.${versionPatch}-rc${lastRc}"
+    environment "RC_BUILD_NUMBER", "${lastRc}"
+    environment "SDK_RC_VERSION", "${lastRcVersion}"
     commandLine "./scripts/promote-rc-to-release.sh"
 }
 
