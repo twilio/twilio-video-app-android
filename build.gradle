@@ -63,7 +63,8 @@ task tagRelease {
     group = 'Git'
 
     doLast {
-        def rcTag = "${versionMajor}.${versionMinor}.${versionPatch}-rc${versionRc}"
+        // TODO: Add support for releasing any RC. Currently only releases last RC.
+        def rcTag = "${versionMajor}.${versionMinor}.${versionPatch}-rc${versionRc - 1}"
         def releaseVersion = System.getenv("RELEASE_VERSION")
         exec {
             workingDir "${rootDir}"
