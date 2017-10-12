@@ -84,6 +84,7 @@ Known issues
 
 - Network handoff, and subsequent connection renegotiation is not supported for IPv6 networks [#72](https://github.com/twilio/video-quickstart-android/issues/72)
 - Participant disconnect event can take up to 120 seconds to occur [#80](https://github.com/twilio/video-quickstart-android/issues/80) [#73](https://github.com/twilio/video-quickstart-android/issues/73)
+- Codec preferences do not function correctly in a hybrid codec Group Room.
 
 ####2.0.0-preview3
 
@@ -102,6 +103,7 @@ Known issues
 
 - Network handoff, and subsequent connection renegotiation is not supported for IPv6 networks [#72](https://github.com/twilio/video-quickstart-android/issues/72)
 - Participant disconnect event can take up to 120 seconds to occur [#80](https://github.com/twilio/video-quickstart-android/issues/80) [#73](https://github.com/twilio/video-quickstart-android/issues/73)
+- Codec preferences do not function correctly in a hybrid codec Group Room.
 
 ####2.0.0-preview2
 
@@ -116,6 +118,7 @@ Known issues
 
 - Network handoff, and subsequent connection renegotiation is not supported for IPv6 networks [#72](https://github.com/twilio/video-quickstart-android/issues/72)
 - Participant disconnect event can take up to 120 seconds to occur [#80](https://github.com/twilio/video-quickstart-android/issues/80) [#73](https://github.com/twilio/video-quickstart-android/issues/73)
+- Codec preferences do not function correctly in a hybrid codec Group Room.
 
 ####2.0.0-preview1
 
@@ -215,6 +218,7 @@ Bug Fixes
 
 - Change visibility of `LocalParticipant#release()` from public to package. 
 [#132](https://github.com/twilio/video-quickstart-android/issues/132)
+- Codec preferences do not function correctly in a hybrid codec Group Room.
 
 Known issues
 
