@@ -18,6 +18,7 @@
 #include "webrtc/sdk/android/src/jni/jni_helpers.h"
 #include "webrtc/sdk/android/src/jni/classreferenceholder.h"
 #include "class_reference_holder.h"
+#include "jni_utils.h"
 
 namespace twilio_video_jni {
 
@@ -60,7 +61,7 @@ jobject createJavaLocalVideoTrack(std::shared_ptr<twilio::media::LocalVideoTrack
                                                   j_webrtc_video_track_ctor_id,
                                                   webrtc_jni::jlongFromPointer(local_video_track->getWebRtcTrack()));
     CHECK_EXCEPTION(jni) << "Error creating org.webrtc.VideoTrack";
-    jstring j_name = webrtc_jni::JavaStringFromStdString(jni, local_video_track->getName());
+    jstring j_name = JavaUTF16StringFromStdString(jni, local_video_track->getName());
     jobject j_local_video_track = jni->NewObject(j_video_track_class,
                                                  j_video_track_ctor_id,
                                                  webrtc_jni::jlongFromPointer(video_track_context),

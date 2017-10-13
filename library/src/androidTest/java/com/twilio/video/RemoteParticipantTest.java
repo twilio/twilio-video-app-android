@@ -29,7 +29,6 @@ import com.twilio.video.ui.MediaTestActivity;
 import com.twilio.video.util.Constants;
 import com.twilio.video.util.CredentialsUtils;
 import com.twilio.video.util.PermissionUtils;
-import com.twilio.video.util.RandUtils;
 import com.twilio.video.util.RoomUtils;
 import com.twilio.video.util.Topology;
 
@@ -47,6 +46,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static junit.framework.Assert.fail;
+import static org.apache.commons.lang3.RandomStringUtils.random;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -78,7 +78,7 @@ public class RemoteParticipantTest extends BaseClientTest {
     @Test
     public void shouldReceiveTrackEventsIfListenerSetAfterEventReceived()
             throws InterruptedException {
-        final String roomName = RandUtils.generateRandomString(Constants.ROOM_NAME_LENGTH);
+        final String roomName = random(Constants.ROOM_NAME_LENGTH);
         Topology topology = Topology.P2P;
         Assert.assertNotNull(RoomUtils.createRoom(roomName, topology));
         String aliceToken = CredentialsUtils.getAccessToken(Constants.PARTICIPANT_ALICE, topology);

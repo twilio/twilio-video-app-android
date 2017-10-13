@@ -24,6 +24,7 @@
 #include "webrtc/sdk/android/src/jni/jni_helpers.h"
 #include "class_reference_holder.h"
 #include "com_twilio_video_LocalDataTrack.h"
+#include "jni_utils.h"
 
 namespace twilio_video_jni {
 
@@ -35,7 +36,7 @@ twilio::media::AudioCodec getAudioCodec(JNIEnv *env, jobject j_audio_codec) {
                                                          "()Ljava/lang/String;");
     jstring j_audio_codec_name = (jstring) env->CallObjectMethod(j_audio_codec, j_name_method_id);
     CHECK_EXCEPTION(env) << "Failed to get name of audio codec";
-    std::string audio_codec_name = webrtc_jni::JavaToStdString(env, j_audio_codec_name);
+    std::string audio_codec_name = JavaToUTF8StdString(env, j_audio_codec_name);
     twilio::media::AudioCodec audio_codec;
 
     if (audio_codec_name == "ISAC") {
@@ -63,7 +64,7 @@ twilio::media::VideoCodec getVideoCodec(JNIEnv *env, jobject j_video_codec) {
                                                          "()Ljava/lang/String;");
     jstring j_video_codec_name = (jstring) env->CallObjectMethod(j_video_codec, j_name_method_id);
     CHECK_EXCEPTION(env) << "Failed to get name of video codec";
-    std::string video_codec_name = webrtc_jni::JavaToStdString(env, j_video_codec_name);
+    std::string video_codec_name = JavaToUTF8StdString(env, j_video_codec_name);
     twilio::media::VideoCodec video_codec;
 
     if (video_codec_name == "H264") {
@@ -94,12 +95,12 @@ Java_com_twilio_video_ConnectOptions_nativeCreate(JNIEnv *env,
                                                   jobjectArray j_preferred_video_codecs,
                                                   jobject j_encoding_parameters) {
 
-    std::string access_token = webrtc_jni::JavaToStdString(env, j_access_token);
+    std::string access_token = JavaToUTF8StdString(env, j_access_token);
     twilio::video::ConnectOptions::Builder* builder =
         new twilio::video::ConnectOptions::Builder(access_token);
 
     if (!webrtc_jni::IsNull(env, j_room_name)) {
-        std::string name = webrtc_jni::JavaToStdString(env, j_room_name);
+        std::string name = JavaToUTF8StdString(env, j_room_name);
         builder->setRoomName(name);
     }
 

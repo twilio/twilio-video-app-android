@@ -22,7 +22,6 @@ import android.support.test.runner.AndroidJUnit4;
 
 import com.twilio.video.ui.MediaTestActivity;
 import com.twilio.video.util.PermissionUtils;
-import com.twilio.video.util.RandUtils;
 
 import org.junit.After;
 import org.junit.Assert;
@@ -37,6 +36,7 @@ import java.util.List;
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertFalse;
 import static junit.framework.Assert.assertNotNull;
+import static org.apache.commons.lang3.RandomStringUtils.random;
 import static org.junit.Assert.assertTrue;
 
 @RunWith(AndroidJUnit4.class)
@@ -89,7 +89,7 @@ public class LocalAudioTrackTest {
 
     @Test
     public void canCreateAudioTrackWithName() {
-        String expectedName = RandUtils.generateRandomString(10);
+        String expectedName = random(10);
         localAudioTrack = LocalAudioTrack.create(mediaTestActivity, true, expectedName);
         assertNotNull(localAudioTrack);
         assertEquals(expectedName, localAudioTrack.getName());

@@ -32,7 +32,6 @@ import com.twilio.video.ui.MediaTestActivity;
 import com.twilio.video.util.Constants;
 import com.twilio.video.util.CredentialsUtils;
 import com.twilio.video.util.PermissionUtils;
-import com.twilio.video.util.RandUtils;
 import com.twilio.video.util.RoomUtils;
 import com.twilio.video.util.Topology;
 
@@ -44,6 +43,7 @@ import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
+import static org.apache.commons.lang3.RandomStringUtils.random;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
@@ -108,7 +108,7 @@ public abstract class BaseParticipantTest extends BaseClientTest {
         PermissionUtils.allowPermissions(mediaTestActivity);
 
         // Setup room
-        testRoomName = RandUtils.generateRandomString(Constants.ROOM_NAME_LENGTH);
+        testRoomName = random(Constants.ROOM_NAME_LENGTH);
         assertNotNull(RoomUtils.createRoom(testRoomName, topology));
 
         // Setup alice
@@ -122,8 +122,8 @@ public abstract class BaseParticipantTest extends BaseClientTest {
 
         // Setup bob
         bobToken = CredentialsUtils.getAccessToken(Constants.PARTICIPANT_BOB, topology);
-        bobAudioTrackName = RandUtils.generateRandomString(10);
-        bobVideoTrackName = RandUtils.generateRandomString(10);
+        bobAudioTrackName = random(10);
+        bobVideoTrackName = random(10);
         bobRoomListener = new CallbackHelper.FakeRoomListener();
         bobParticipantListener = new CallbackHelper.FakeParticipantListener();
         ConnectOptions bobConnectOptions = new ConnectOptions.Builder(bobToken)

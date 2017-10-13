@@ -17,6 +17,7 @@
 #include "android_remote_data_track_observer.h"
 #include "logging.h"
 #include "class_reference_holder.h"
+#include "jni_utils.h"
 
 namespace twilio_video_jni {
 
@@ -74,7 +75,7 @@ void twilio_video_jni::AndroidRemoteDataTrackObserver::onMessage(twilio::media::
         jni()->CallVoidMethod(*j_remote_data_track_listener_,
                               j_on_string_message_,
                               *j_remote_data_track_,
-                              webrtc_jni::JavaStringFromStdString(jni(), message));
+                              JavaUTF16StringFromStdString(jni(), message));
         CHECK_EXCEPTION(jni()) << "Error calling onMessage(String)";
     }
 }

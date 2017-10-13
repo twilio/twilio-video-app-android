@@ -19,6 +19,7 @@
 #include "video/room.h"
 #include "class_reference_holder.h"
 #include "logging.h"
+#include "jni_utils.h"
 
 namespace twilio_video_jni {
 
@@ -211,7 +212,7 @@ void AndroidRoomObserver::onConnected(twilio::video::Room *room) {
             return;
         }
 
-        jstring j_room_sid = webrtc_jni::JavaStringFromStdString(jni(), room->getSid());
+        jstring j_room_sid = JavaUTF16StringFromStdString(jni(), room->getSid());
         std::shared_ptr<twilio::video::LocalParticipant> local_participant =
                 room->getLocalParticipant();
         jobject j_local_audio_tracks = getLocalAudioTracks();
@@ -441,9 +442,9 @@ jobject AndroidRoomObserver::createJavaRoomException(
     return jni()->NewObject(*j_twilio_exception_class_,
                             j_twilio_exception_ctor_id_,
                             twilio_error.getCode(),
-                            webrtc_jni::JavaStringFromStdString(jni(),
+                            JavaUTF16StringFromStdString(jni(),
                                                                 twilio_error.getMessage()),
-                            webrtc_jni::JavaStringFromStdString(jni(),
+                            JavaUTF16StringFromStdString(jni(),
                                                                 twilio_error.getExplanation()));
 }
 

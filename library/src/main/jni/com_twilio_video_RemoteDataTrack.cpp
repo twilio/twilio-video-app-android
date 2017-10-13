@@ -17,6 +17,7 @@
 #include "com_twilio_video_RemoteDataTrack.h"
 #include "android_remote_data_track_observer.h"
 #include "webrtc/sdk/android/src/jni/jni_helpers.h"
+#include "jni_utils.h"
 
 namespace twilio_video_jni {
 
@@ -56,7 +57,7 @@ jobject createJavaRemoteDataTrack(JNIEnv *env,
     jboolean j_reliable = (jboolean) remote_data_track->isReliable();
     jint j_max_packet_life_time = (jint) remote_data_track->getMaxRetransmitTime();
     jint j_max_retransmits = (jint) remote_data_track->getMaxRetransmits();
-    jstring j_name = webrtc_jni::JavaStringFromStdString(env, remote_data_track->getName());
+    jstring j_name = JavaUTF16StringFromStdString(env, remote_data_track->getName());
     jlong j_remote_data_track_context = webrtc_jni::jlongFromPointer(remote_data_track_context);
     jobject j_remote_data_track = env->NewObject(j_remote_data_track_class,
                                                  j_remote_data_track_ctor_id,

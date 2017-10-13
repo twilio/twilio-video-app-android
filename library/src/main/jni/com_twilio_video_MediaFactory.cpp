@@ -28,6 +28,7 @@
 #include "com_twilio_video_VideoCapturerDelegate.h"
 #include "class_reference_holder.h"
 #include "logging.h"
+#include "jni_utils.h"
 
 namespace twilio_video_jni {
 
@@ -300,7 +301,7 @@ JNIEXPORT jobject JNICALL Java_com_twilio_video_MediaFactory_nativeCreateAudioTr
     cricket::AudioOptions audio_options = getAudioOptions(j_audio_options);
     std::string name = webrtc_jni::IsNull(jni, j_name) ?
                        ("") :
-                       (webrtc_jni::JavaToStdString(jni, j_name));
+                       (JavaToUTF8StdString(jni, j_name));
     std::shared_ptr<twilio::media::LocalAudioTrack> local_audio_track =
             media_factory->createAudioTrack(enabled, audio_options, name);
 
@@ -333,7 +334,7 @@ JNIEXPORT jobject JNICALL Java_com_twilio_video_MediaFactory_nativeCreateVideoTr
     cricket::VideoCapturer* capturer = new AndroidVideoCapturer(delegate);
     std::string name = webrtc_jni::IsNull(jni, j_name) ?
                        ("") :
-                       (webrtc_jni::JavaToStdString(jni, j_name));
+                       (JavaToUTF8StdString(jni, j_name));
     std::shared_ptr<twilio::media::LocalVideoTrack> video_track =
             media_factory->createVideoTrack(enabled,
                                             getVideoConstraints(j_video_contraints),
@@ -363,7 +364,7 @@ JNIEXPORT jobject JNICALL Java_com_twilio_video_MediaFactory_nativeCreateDataTra
             getMediaFactory(media_factory_handle);
     std::string name = webrtc_jni::IsNull(jni, j_name) ?
                        ("") :
-                       (webrtc_jni::JavaToStdString(jni, j_name));
+                       (JavaToUTF8StdString(jni, j_name));
     twilio::media::DataTrackOptions data_track_options = twilio::media::DataTrackOptions::Builder()
             .setOrdered(j_ordered)
             .setMaxRetransmits(j_max_retransmits)

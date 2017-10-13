@@ -22,6 +22,7 @@
 
 #include "android_local_participant_observer.h"
 #include "class_reference_holder.h"
+#include "jni_utils.h"
 
 namespace twilio_video_jni {
 
@@ -40,7 +41,7 @@ jobject createJavaLocalAudioTrackPublication(JNIEnv *env,
                                              jmethodID j_published_audio_track_ctor_id) {
     jobject j_published_audio_track = env->NewObject(j_published_audio_track_class,
                                                      j_published_audio_track_ctor_id,
-                                                     webrtc_jni::JavaStringFromStdString(env,
+                                                     JavaUTF16StringFromStdString(env,
                                                                                          local_audio_track_publication->getTrackSid()),
                                                      j_local_audio_track);
     CHECK_EXCEPTION(env) << "Failed to create LocalAudioTrackPublication";
@@ -55,7 +56,7 @@ jobject createJavaLocalVideoTrackPublication(JNIEnv *env,
                                              jmethodID j_published_video_track_ctor_id) {
     jobject j_published_video_track = env->NewObject(j_published_video_track_class,
                                                      j_published_video_track_ctor_id,
-                                                     webrtc_jni::JavaStringFromStdString(env,
+                                                     JavaUTF16StringFromStdString(env,
                                                                                          local_video_track_publication->getTrackSid()),
                                                      j_local_video_track);
     CHECK_EXCEPTION(env) << "Failed to create LocalVideoTrackPublication";
@@ -70,7 +71,7 @@ jobject createJavaLocalDataTrackPublication(JNIEnv *env,
                                             jmethodID j_published_data_track_ctor_id) {
     jobject j_published_data_track = env->NewObject(j_published_data_track_class,
                                                     j_published_data_track_ctor_id,
-                                                    webrtc_jni::JavaStringFromStdString(env,
+                                                    JavaUTF16StringFromStdString(env,
                                                                                         local_data_track_publication->getTrackSid()),
                                                     j_local_data_track);
     CHECK_EXCEPTION(env) << "Failed to create LocalDataTrackPublication";
@@ -127,7 +128,7 @@ getLocalAudioTracksMap(JNIEnv *env, jobject j_local_audio_tracks) {
                                                                "getTrackId",
                                                                "()Ljava/lang/String;");
             jstring j_track_id = (jstring) env->CallObjectMethod(j_local_audio_track, j_get_track_id);
-            std::string track_id = webrtc_jni::JavaToStdString(env, j_track_id);
+            std::string track_id = JavaToUTF8StdString(env, j_track_id);
             CHECK_EXCEPTION(env) << "Failed to get local audio track id";
 
             // Add entry to map
@@ -164,7 +165,7 @@ getLocalVideoTracksMap(JNIEnv *env, jobject j_local_video_tracks) {
                                                                "getTrackId",
                                                                "()Ljava/lang/String;");
             jstring j_track_id = (jstring) env->CallObjectMethod(j_local_video_track, j_get_track_id);
-            std::string track_id = webrtc_jni::JavaToStdString(env, j_track_id);
+            std::string track_id = JavaToUTF8StdString(env, j_track_id);
             CHECK_EXCEPTION(env) << "Failed to get local video track id";
 
             // Add entry to map
@@ -201,7 +202,7 @@ getLocalDataTracksMap(JNIEnv *env, jobject j_local_data_tracks) {
                                                                "getTrackId",
                                                                "()Ljava/lang/String;");
             jstring j_track_id = (jstring) env->CallObjectMethod(j_local_data_track, j_get_track_id);
-            std::string track_id = webrtc_jni::JavaToStdString(env, j_track_id);
+            std::string track_id = JavaToUTF8StdString(env, j_track_id);
             CHECK_EXCEPTION(env) << "Failed to get local data track id";
 
             // Add entry to map
@@ -345,8 +346,8 @@ jobject createJavaLocalParticipant(JNIEnv *env,
                                    jobject j_handler) {
     LocalParticipantContext* local_participant_context = new LocalParticipantContext();
     local_participant_context->local_participant = local_participant;
-    jstring j_sid = webrtc_jni::JavaStringFromStdString(env, local_participant->getSid());
-    jstring j_identity = webrtc_jni::JavaStringFromStdString(env, local_participant->getIdentity());
+    jstring j_sid = JavaUTF16StringFromStdString(env, local_participant->getSid());
+    jstring j_identity = JavaUTF16StringFromStdString(env, local_participant->getIdentity());
     jobject j_published_audio_tracks = createLocalAudioTrackPublications(env,
                                                                          local_participant_context,
                                                                          j_array_list_class,

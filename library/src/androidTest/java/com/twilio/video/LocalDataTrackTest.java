@@ -22,8 +22,6 @@ import android.support.test.InstrumentationRegistry;
 import android.support.test.filters.LargeTest;
 import android.support.test.runner.AndroidJUnit4;
 
-import com.twilio.video.util.RandUtils;
-
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -35,6 +33,7 @@ import java.nio.ByteBuffer;
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.TestCase.assertFalse;
 import static junit.framework.TestCase.assertNotNull;
+import static org.apache.commons.lang3.RandomStringUtils.random;
 import static org.junit.Assert.assertTrue;
 
 @RunWith(AndroidJUnit4.class)
@@ -71,7 +70,7 @@ public class LocalDataTrackTest {
 
     @Test
     public void canCreateDataTrackWithName() {
-        String expectedName = RandUtils.generateRandomString(10);
+        String expectedName = random(10);
         localDataTrack = LocalDataTrack.create(context, expectedName);
 
         assertNotNull(localDataTrack);

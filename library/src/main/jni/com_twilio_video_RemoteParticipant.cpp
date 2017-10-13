@@ -21,6 +21,7 @@
 #include "webrtc/sdk/android/src/jni/classreferenceholder.h"
 
 #include "video/video.h"
+#include "jni_utils.h"
 
 namespace twilio_video_jni {
 
@@ -72,9 +73,9 @@ jobject createJavaRemoteParticipant(JNIEnv *env,
                                     jobject j_handler) {
     RemoteParticipantContext *remote_participant_context = new RemoteParticipantContext();
     remote_participant_context->remote_participant = remote_participant;
-    jstring j_sid = webrtc_jni::JavaStringFromStdString(env, remote_participant->getSid());
+    jstring j_sid = JavaUTF16StringFromStdString(env, remote_participant->getSid());
     jstring j_identity =
-            webrtc_jni::JavaStringFromStdString(env, remote_participant->getIdentity());
+            JavaUTF16StringFromStdString(env, remote_participant->getIdentity());
     jobject j_remote_audio_tracks = createRemoteParticipantAudioTracks(env,
                                                                        remote_participant_context,
                                                                        j_array_list_class,
@@ -249,7 +250,7 @@ jobject createJavaRemoteAudioTrack(JNIEnv *env,
                                    jobject j_webrtc_audio_track,
                                    jclass j_remote_audio_track_class,
                                    jmethodID j_remote_audio_track_ctor_id) {
-    jstring j_name = webrtc_jni::JavaStringFromStdString(env, remote_audio_track->getName());
+    jstring j_name = JavaUTF16StringFromStdString(env, remote_audio_track->getName());
     jboolean j_is_enabled = (jboolean) remote_audio_track->isEnabled();
     jobject j_remote_audio_track = env->NewObject(j_remote_audio_track_class,
                                                   j_remote_audio_track_ctor_id,
@@ -266,7 +267,7 @@ jobject createJavaRemoteVideoTrack(JNIEnv *env,
                                    jobject j_webrtc_video_track,
                                    jclass j_remote_video_track_class,
                                    jmethodID j_remote_video_track_ctor_id) {
-    jstring j_name = webrtc_jni::JavaStringFromStdString(env, remote_video_track->getName());
+    jstring j_name = JavaUTF16StringFromStdString(env, remote_video_track->getName());
     jboolean j_is_enabled = (jboolean) remote_video_track->isEnabled();
     jobject j_remote_video_track = env->NewObject(j_remote_video_track_class,
                                                   j_remote_video_track_ctor_id,
@@ -282,9 +283,9 @@ jobject createJavaRemoteAudioTrackPublication(JNIEnv *env,
                                               std::shared_ptr<twilio::media::RemoteAudioTrackPublication> remote_audio_track_publication,
                                               jclass j_remote_audio_track_publication_class,
                                               jmethodID j_remote_audio_track_publication_ctor_id) {
-    jstring j_track_sid = webrtc_jni::JavaStringFromStdString(env,
+    jstring j_track_sid = JavaUTF16StringFromStdString(env,
                                                               remote_audio_track_publication->getTrackSid());
-    jstring j_track_name = webrtc_jni::JavaStringFromStdString(env,
+    jstring j_track_name = JavaUTF16StringFromStdString(env,
                                                                remote_audio_track_publication->getTrackName());
     jboolean j_is_subscribed = (jboolean) remote_audio_track_publication->isTrackSubscribed();
     jboolean j_is_enabled = (jboolean) remote_audio_track_publication->isTrackEnabled();
@@ -303,9 +304,9 @@ jobject createJavaRemoteVideoTrackPublication(JNIEnv *env,
                                               std::shared_ptr<twilio::media::RemoteVideoTrackPublication> remote_video_track_publication,
                                               jclass j_remote_video_track_publication_class,
                                               jmethodID j_remote_video_track_publication_ctor_id) {
-    jstring j_track_sid = webrtc_jni::JavaStringFromStdString(env,
+    jstring j_track_sid = JavaUTF16StringFromStdString(env,
                                                               remote_video_track_publication->getTrackSid());
-    jstring j_track_name = webrtc_jni::JavaStringFromStdString(env,
+    jstring j_track_name = JavaUTF16StringFromStdString(env,
                                                                remote_video_track_publication->getTrackName());
     jboolean j_is_subscribed = (jboolean) remote_video_track_publication->isTrackSubscribed();
     jboolean j_is_enabled = (jboolean) remote_video_track_publication->isTrackEnabled();
@@ -324,9 +325,9 @@ jobject createJavaRemoteDataTrackPublication(JNIEnv *env,
                                              std::shared_ptr<twilio::media::RemoteDataTrackPublication> remote_data_track_publication,
                                              jclass j_remote_data_track_publication_class,
                                              jmethodID j_remote_data_track_publication_ctor_id) {
-    jstring j_track_sid = webrtc_jni::JavaStringFromStdString(env,
+    jstring j_track_sid = JavaUTF16StringFromStdString(env,
                                                               remote_data_track_publication->getTrackSid());
-    jstring j_track_name = webrtc_jni::JavaStringFromStdString(env,
+    jstring j_track_name = JavaUTF16StringFromStdString(env,
                                                                remote_data_track_publication->getTrackName());
     jboolean j_is_subscribed = (jboolean) remote_data_track_publication->isTrackSubscribed();
     jboolean j_is_enabled = (jboolean) remote_data_track_publication->isTrackEnabled();

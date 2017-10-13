@@ -79,6 +79,11 @@ Observing messages from data track
                 Log.d(TAG, "Received message buffer on data track!");
             }
     };
+    
+Bug Fixes
+
+- Fixed issue that caused track and room names with certain UTF-8 characters to be improperly 
+encoded. [#179](https://github.com/twilio/video-quickstart-android/issues/179)
 
 Known issues
 
@@ -103,6 +108,7 @@ Known issues
 
 - Network handoff, and subsequent connection renegotiation is not supported for IPv6 networks [#72](https://github.com/twilio/video-quickstart-android/issues/72)
 - Participant disconnect event can take up to 120 seconds to occur [#80](https://github.com/twilio/video-quickstart-android/issues/80) [#73](https://github.com/twilio/video-quickstart-android/issues/73)
+- Track and room names with certain UTF-8 characters are not encoded properly [#179](https://github.com/twilio/video-quickstart-android/issues/179)
 - Codec preferences do not function correctly in a hybrid codec Group Room.
 
 ####2.0.0-preview2

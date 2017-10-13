@@ -22,15 +22,12 @@ import android.support.test.runner.AndroidJUnit4;
 
 import com.twilio.video.util.FakeVideoCapturer;
 import com.twilio.video.util.FrameCountRenderer;
-import com.twilio.video.util.RandUtils;
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import static com.twilio.video.util.VideoAssert.assertFramesRendered;
-import static com.twilio.video.util.VideoAssert.assertNoFramesRendered;
 import static org.junit.Assert.assertTrue;
 
 @RunWith(AndroidJUnit4.class)

@@ -17,6 +17,7 @@
 #include "com_twilio_video_LocalDataTrack.h"
 #include "webrtc/sdk/android/src/jni/jni_helpers.h"
 #include "class_reference_holder.h"
+#include "jni_utils.h"
 
 namespace twilio_video_jni {
 
@@ -50,8 +51,8 @@ jobject createJavaLocalDataTrack(std::shared_ptr<twilio::media::LocalDataTrack> 
                                                              kLocalDataTrackConstructorSignature);
     LocalDataTrackContext* data_track_context = new LocalDataTrackContext();
     data_track_context->local_data_track = local_data_track;
-    jstring j_track_id = webrtc_jni::JavaStringFromStdString(jni, local_data_track->getTrackId());
-    jstring j_name = webrtc_jni::JavaStringFromStdString(jni, local_data_track->getName());
+    jstring j_track_id = JavaUTF16StringFromStdString(jni, local_data_track->getTrackId());
+    jstring j_name = JavaUTF16StringFromStdString(jni, local_data_track->getName());
     jobject j_local_data_track = jni->NewObject(j_data_track_class,
                                                 j_data_track_ctor_id,
                                                 webrtc_jni::jlongFromPointer(data_track_context),
@@ -95,7 +96,7 @@ JNIEXPORT void JNICALL Java_com_twilio_video_LocalDataTrack_nativeStringSend(JNI
             reinterpret_cast<LocalDataTrackContext *>(local_data_track_handle);
 
     local_data_track_context->
-            local_data_track->send(webrtc_jni::JavaToStdString(jni, j_message));
+            local_data_track->send(JavaToUTF8StdString(jni, j_message));
 }
 
 JNIEXPORT void JNICALL Java_com_twilio_video_LocalDataTrack_nativeRelease(JNIEnv *jni,
