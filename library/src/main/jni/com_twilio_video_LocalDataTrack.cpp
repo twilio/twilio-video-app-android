@@ -59,7 +59,7 @@ jobject createJavaLocalDataTrack(std::shared_ptr<twilio::media::LocalDataTrack> 
                                                 local_data_track->isEnabled(),
                                                 local_data_track->isOrdered(),
                                                 local_data_track->isReliable(),
-                                                local_data_track->getMaxRetransmitTime(),
+                                                local_data_track->getMaxPacketLifeTime(),
                                                 local_data_track->getMaxRetransmits(),
                                                 j_track_id,
                                                 j_name,

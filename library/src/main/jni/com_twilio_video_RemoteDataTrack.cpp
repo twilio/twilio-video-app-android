@@ -43,7 +43,7 @@ void bindRemoteDataTrackListenerProxy(JNIEnv *env,
                                                              j_remote_data_track,
                                                              j_remote_data_track_listener_proxy);
     remote_data_track_context->remote_data_track->setObserver(
-            remote_data_track_context->android_remote_data_track_observer.get());
+            remote_data_track_context->android_remote_data_track_observer);
 }
 
 jobject createJavaRemoteDataTrack(JNIEnv *env,
@@ -55,7 +55,7 @@ jobject createJavaRemoteDataTrack(JNIEnv *env,
     jboolean j_enabled = (jboolean) remote_data_track->isEnabled();
     jboolean j_ordered = (jboolean) remote_data_track->isOrdered();
     jboolean j_reliable = (jboolean) remote_data_track->isReliable();
-    jint j_max_packet_life_time = (jint) remote_data_track->getMaxRetransmitTime();
+    jint j_max_packet_life_time = (jint) remote_data_track->getMaxPacketLifeTime();
     jint j_max_retransmits = (jint) remote_data_track->getMaxRetransmits();
     jstring j_name = JavaUTF16StringFromStdString(env, remote_data_track->getName());
     jlong j_remote_data_track_context = webrtc_jni::jlongFromPointer(remote_data_track_context);

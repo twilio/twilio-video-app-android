@@ -236,11 +236,7 @@ public class DataTrackTopologyParameterizedTest extends BaseParticipantTest {
                 dataTrackListener.bufferMessages.get(1).second.array());
     }
 
-    /*
-     * TODO: Enable test once CSDK-1814 is resolved
-     */
     @Test
-    @Ignore
     public void canSendMessagesOnMultipleDataTracks() throws InterruptedException {
         // Publish multiple data tracks
         LocalDataTrack bobFirstLocalDataTrack = LocalDataTrack.create(mediaTestActivity);
@@ -362,11 +358,7 @@ public class DataTrackTopologyParameterizedTest extends BaseParticipantTest {
                 bobDataTrackListener.bufferMessages.get(1).second.array());
     }
 
-    /*
-     * TODO: Enable test once CSDK-1792 is resolved
-     */
     @Test
-    @Ignore
     public void canSendAfterUnpublished() throws InterruptedException {
         publishDataTrack();
         String expectedMessage = "Hello";

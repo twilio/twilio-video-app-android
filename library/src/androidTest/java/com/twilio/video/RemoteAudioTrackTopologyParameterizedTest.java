@@ -110,7 +110,7 @@ public class RemoteAudioTrackTopologyParameterizedTest extends BaseParticipantTe
         assertFalse(bobRemoteAudioTrackPublication.getRemoteAudioTrack().isPlaybackEnabled());
 
         // Wait to allow audio to flow and stats to contain valid values
-        Thread.sleep(2000);
+        Thread.sleep(2500);
 
         // Request stats report
         statsListener.onStatsLatch = new CountDownLatch(1);
@@ -128,7 +128,7 @@ public class RemoteAudioTrackTopologyParameterizedTest extends BaseParticipantTe
         bobRemoteAudioTrackPublication.getRemoteAudioTrack().enablePlayback(true);
 
         // Wait to allow audio to flow and stats to contain valid values
-        Thread.sleep(2000);
+        Thread.sleep(2500);
 
         // Request stats report
         statsListener.onStatsLatch = new CountDownLatch(1);

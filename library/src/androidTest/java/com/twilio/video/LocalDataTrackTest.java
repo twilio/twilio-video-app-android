@@ -63,9 +63,8 @@ public class LocalDataTrackTest {
         assertFalse(localDataTrack.getTrackId().isEmpty());
         assertEquals(true, localDataTrack.isEnabled());
         assertEquals(true, localDataTrack.isOrdered());
-        assertEquals(DataTrackOptions.DEFAULT_MAX_PACKET_LIFE_TIME,
-                localDataTrack.getMaxPacketLifeTime());
-        assertEquals(DataTrackOptions.DEFAULT_MAX_RETRANSMITS, localDataTrack.getMaxRetransmits());
+        assertEquals(0, localDataTrack.getMaxPacketLifeTime());
+        assertEquals(0, localDataTrack.getMaxRetransmits());
     }
 
     @Test
@@ -111,11 +110,7 @@ public class LocalDataTrackTest {
         assertEquals(expectedMaxPacketLifeTime, localDataTrack.getMaxPacketLifeTime());
     }
 
-    /**
-     * TODO: Enable test once CSDK-1745 is resolved.
-     */
     @Test
-    @Ignore
     public void canCreateReliableDataTrack() {
         DataTrackOptions dataTrackOptions = new DataTrackOptions.Builder()
                 .ordered(true)

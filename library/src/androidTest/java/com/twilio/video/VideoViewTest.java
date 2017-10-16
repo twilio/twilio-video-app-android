@@ -46,11 +46,14 @@ import static org.junit.Assert.assertTrue;
 
 @RunWith(AndroidJUnit4.class)
 public class VideoViewTest {
+    private static final int FRAME_DELAY_MS = 3500;
+
     @Rule
     public ActivityTestRule<VideoViewTestActivity> activityRule =
             new ActivityTestRule<>(VideoViewTestActivity.class);
     private VideoViewTestActivity videoViewTestActivity;
     private RelativeLayout relativeLayout;
+    private LocalVideoTrack localVideoTrack;
 
     @Before
     public void setup() {
@@ -60,6 +63,9 @@ public class VideoViewTest {
 
     @After
     public void teardown() {
+        if (localVideoTrack != null) {
+            localVideoTrack.release();
+        }
         assertTrue(MediaFactory.isReleased());
     }
 
@@ -77,7 +83,7 @@ public class VideoViewTest {
         recyclerView.setLayoutParams(layoutParams);
 
         // Create a list of the same local video track
-        LocalVideoTrack localVideoTrack = LocalVideoTrack.create(videoViewTestActivity,
+        localVideoTrack = LocalVideoTrack.create(videoViewTestActivity,
                 true,
                 new FakeVideoCapturer());
         List<LocalVideoTrack> videoTracks = new ArrayList<>(numItems);
@@ -107,11 +113,9 @@ public class VideoViewTest {
                     (VideoViewRecyclerViewAdapter.VideoViewHolder) recyclerView
                             .findViewHolderForAdapterPosition(i);
 
-            assertTrue(videoViewHolder.frameCountProxyRendererListener.waitForFrame(3000));
+            assertTrue(videoViewHolder
+                    .frameCountProxyRendererListener.waitForFrame(FRAME_DELAY_MS));
         }
-
-        // Release video track
-        localVideoTrack.release();
     }
 
     @Test
@@ -128,7 +132,7 @@ public class VideoViewTest {
         listView.setLayoutParams(layoutParams);
 
         // Create a list of the same local video track
-        LocalVideoTrack localVideoTrack = LocalVideoTrack.create(videoViewTestActivity,
+        localVideoTrack = LocalVideoTrack.create(videoViewTestActivity,
                 true,
                 new FakeVideoCapturer());
         List<LocalVideoTrack> videoTracks = new ArrayList<>(numItems);
@@ -161,10 +165,7 @@ public class VideoViewTest {
             });
             VideoViewListViewAdapter.ViewHolder viewHolder = videoViewListViewAdapter
                     .viewHolderPositionMap.get(position);
-            assertTrue(viewHolder.frameCountProxyRendererListener.waitForFrame(3000));
+            assertTrue(viewHolder.frameCountProxyRendererListener.waitForFrame(FRAME_DELAY_MS));
         }
-
-        // Release video track
-        localVideoTrack.release();
     }
 }

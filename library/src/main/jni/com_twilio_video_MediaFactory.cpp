@@ -368,7 +368,7 @@ JNIEXPORT jobject JNICALL Java_com_twilio_video_MediaFactory_nativeCreateDataTra
     twilio::media::DataTrackOptions data_track_options = twilio::media::DataTrackOptions::Builder()
             .setOrdered(j_ordered)
             .setMaxRetransmits(j_max_retransmits)
-            .setMaxRetransmitTime(j_max_packet_life_time)
+            .setMaxPacketLifeTime(j_max_packet_life_time)
             .setName(name)
             .build();
     std::shared_ptr<twilio::media::LocalDataTrack> data_track =

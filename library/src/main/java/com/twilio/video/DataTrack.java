@@ -78,6 +78,8 @@ public abstract class DataTrack implements Track {
 
     /**
      * Returns the maximum period of time in milliseconds in which retransmissions will be sent.
+     * Returns {@code 0} if {@link DataTrackOptions#DEFAULT_MAX_PACKET_LIFE_TIME} was specified
+     * when building the data track.
      */
     public int getMaxPacketLifeTime() {
         return maxPacketLifeTime;
@@ -85,6 +87,8 @@ public abstract class DataTrack implements Track {
 
     /**
      * Returns the maximum number of times to transmit a message before giving up.
+     * Returns {@code 0} if {@link DataTrackOptions#DEFAULT_MAX_RETRANSMITS} was specified
+     * when building the data track.
      */
     public int getMaxRetransmits() {
         return maxRetransmits;
