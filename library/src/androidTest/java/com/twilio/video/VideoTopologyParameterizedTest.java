@@ -26,7 +26,6 @@ import com.twilio.video.util.CredentialsUtils;
 import com.twilio.video.util.Constants;
 import com.twilio.video.util.FakeVideoCapturer;
 import com.twilio.video.util.PermissionUtils;
-import com.twilio.video.util.RandUtils;
 import com.twilio.video.util.RoomUtils;
 import com.twilio.video.util.Topology;
 
@@ -45,6 +44,7 @@ import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
+import static org.apache.commons.lang3.RandomStringUtils.random;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
@@ -80,7 +80,7 @@ public class VideoTopologyParameterizedTest extends BaseClientTest {
         mediaTestActivity = activityRule.getActivity();
         roomListener = new CallbackHelper.FakeRoomListener();
         PermissionUtils.allowPermissions(mediaTestActivity);
-        roomName = RandUtils.generateRandomString(Constants.ROOM_NAME_LENGTH);
+        roomName = random(Constants.ROOM_NAME_LENGTH);
         assertNotNull(RoomUtils.createRoom(roomName, topology));
         token = CredentialsUtils.getAccessToken(Constants.PARTICIPANT_ALICE, topology);
         Video.setLogLevel(LogLevel.ALL);

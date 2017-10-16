@@ -19,6 +19,7 @@
 #include "webrtc/sdk/android/src/jni/jni_helpers.h"
 
 #include "video/logger.h"
+#include "jni_utils.h"
 
 namespace twilio_video_jni {
 
@@ -56,20 +57,20 @@ twilio::media::IceOptions IceOptions::getIceOptions(JNIEnv *env, jobject j_ice_o
                                                                     j_server_url_field);
                 jstring j_username = (jstring)env->GetObjectField(j_ice_server, j_username_field);
                 jstring j_password = (jstring)env->GetObjectField(j_ice_server, j_password_field);
-                std::string server_url = webrtc_jni::JavaToStdString(env,j_server_url);
+                std::string server_url = JavaToUTF8StdString(env,j_server_url);
                 std::vector<std::string> urls;
                 urls.push_back(server_url);
                 ice_server.urls = urls;
 
                 if (!webrtc_jni::IsNull(env, j_username)) {
-                    std::string username  = webrtc_jni::JavaToStdString(env, j_username);
+                    std::string username  = JavaToUTF8StdString(env, j_username);
                     if (username.length() > 0) {
                         ice_server.username = username;
                     }
                 }
 
                 if (!webrtc_jni::IsNull(env, j_password)) {
-                    std::string password  = webrtc_jni::JavaToStdString(env, j_password);
+                    std::string password  = JavaToUTF8StdString(env, j_password);
                     if (password.length() > 0) {
                         ice_server.password = password;
                     }
@@ -86,7 +87,7 @@ twilio::media::IceOptions IceOptions::getIceOptions(JNIEnv *env, jobject j_ice_o
         jclass ice_policy_class = env->GetObjectClass(j_ice_trans_policy);
         jmethodID name_id = env->GetMethodID(ice_policy_class, "name", "()Ljava/lang/String;");
         jstring j_ice_policy = (jstring)env->CallObjectMethod(j_ice_trans_policy, name_id);
-        std::string ice_policy = webrtc_jni::JavaToStdString(env, j_ice_policy);
+        std::string ice_policy = JavaToUTF8StdString(env, j_ice_policy);
 
         if (ice_policy.compare("ICE_TRANSPORT_POLICY_RELAY") == 0) {
             ice_options.ice_transport_policy =

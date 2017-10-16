@@ -26,7 +26,6 @@ import com.twilio.video.base.BaseParticipantTest;
 import com.twilio.video.helper.CallbackHelper;
 import com.twilio.video.util.Constants;
 import com.twilio.video.util.CredentialsUtils;
-import com.twilio.video.util.RandUtils;
 import com.twilio.video.util.RoomUtils;
 import com.twilio.video.util.Topology;
 
@@ -44,6 +43,7 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import static junit.framework.Assert.assertNotNull;
 import static junit.framework.Assert.fail;
+import static org.apache.commons.lang3.RandomStringUtils.random;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -59,7 +59,7 @@ public class ParticipantTest extends BaseParticipantTest {
     public void setup() throws InterruptedException {
         topology = Topology.P2P;
         super.baseSetup(topology);
-        roomName = RandUtils.generateRandomString(Constants.ROOM_NAME_LENGTH);
+        roomName = random(Constants.ROOM_NAME_LENGTH);
         assertNotNull(RoomUtils.createRoom(roomName, topology));
         tokenOne = CredentialsUtils.getAccessToken(Constants.PARTICIPANT_ALICE, topology);
         tokenTwo = CredentialsUtils.getAccessToken(Constants.PARTICIPANT_BOB, topology);
@@ -81,7 +81,7 @@ public class ParticipantTest extends BaseParticipantTest {
     @Test
     public void shouldReceiveTrackEventsIfListenerSetAfterEventReceived()
             throws InterruptedException {
-        final String roomName = RandUtils.generateRandomString(Constants.ROOM_NAME_LENGTH);
+        final String roomName = random(Constants.ROOM_NAME_LENGTH);
         Assert.assertNotNull(RoomUtils.createRoom(roomName, topology));
         String aliceToken = CredentialsUtils.getAccessToken(Constants.PARTICIPANT_ALICE, topology);
         final CountDownLatch aliceConnected = new CountDownLatch(1);

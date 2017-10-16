@@ -24,7 +24,6 @@ import com.twilio.video.base.BaseParticipantTest;
 import com.twilio.video.helper.CallbackHelper;
 import com.twilio.video.util.CredentialsUtils;
 import com.twilio.video.util.Constants;
-import com.twilio.video.util.RandUtils;
 import com.twilio.video.util.RoomUtils;
 import com.twilio.video.util.Topology;
 
@@ -42,6 +41,7 @@ import java.util.concurrent.TimeUnit;
 
 import static junit.framework.Assert.assertFalse;
 import static junit.framework.Assert.assertNotNull;
+import static org.apache.commons.lang3.RandomStringUtils.random;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -68,7 +68,7 @@ public class ParticipantTopologyParameterizedTest extends BaseParticipantTest {
     @Before
     public void setup() throws InterruptedException {
         super.baseSetup(topology);
-        roomName = RandUtils.generateRandomString(Constants.ROOM_NAME_LENGTH);
+        roomName = random(Constants.ROOM_NAME_LENGTH);
         assertNotNull(RoomUtils.createRoom(roomName, topology));
         context = InstrumentationRegistry.getInstrumentation().getTargetContext();
         tokenOne = CredentialsUtils.getAccessToken(Constants.PARTICIPANT_ALICE, topology);
@@ -156,6 +156,57 @@ public class ParticipantTopologyParameterizedTest extends BaseParticipantTest {
         room.disconnect();
         assertTrue(roomListener.onDisconnectedLatch.await(20, TimeUnit.SECONDS));
         assertFalse(client1Participant.isConnected());
+    }
+
+    @Test
+    public void participantShouldHaveValidIdentity() throws InterruptedException {
+        String expectedIdentity = random(50);
+        tokenOne = CredentialsUtils.getAccessToken(expectedIdentity, topology);
+        CallbackHelper.FakeRoomListener roomListener = new CallbackHelper.FakeRoomListener();
+        roomListener.onConnectedLatch = new CountDownLatch(1);
+        roomListener.onDisconnectedLatch = new CountDownLatch(1);
+        roomListener.onParticipantDisconnectedLatch = new CountDownLatch(1);
+        roomListener.onParticipantConnectedLatch = new CountDownLatch(1);
+        ConnectOptions connectOptions = new ConnectOptions.Builder(tokenOne)
+                .roomName(roomName)
+                .build();
+        Room room = Video.connect(context, connectOptions, roomListener);
+        assertTrue(roomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
+        assertEquals(RoomState.CONNECTED, room.getState());
+
+        ConnectOptions connectOptions2 = new ConnectOptions.Builder(tokenTwo)
+                .roomName(roomName)
+                .build();
+        CallbackHelper.FakeRoomListener roomListener2 = new CallbackHelper.FakeRoomListener();
+        roomListener2.onConnectedLatch = new CountDownLatch(1);
+        roomListener2.onDisconnectedLatch = new CountDownLatch(1);
+        Room client2room = Video.connect(context, connectOptions2, roomListener2);
+
+        assertTrue(roomListener2.onConnectedLatch.await(20, TimeUnit.SECONDS));
+
+        List<Participant> client2RemoteParticipants = new ArrayList<>(client2room.getParticipants());
+        Participant client1RemoteParticipant = client2RemoteParticipants.get(0);
+
+        assertEquals(1, client2RemoteParticipants.size());
+        assertTrue(client1RemoteParticipant.isConnected());
+        assertTrue(roomListener.onParticipantConnectedLatch.await(20, TimeUnit.SECONDS));
+        assertEquals(expectedIdentity, client1RemoteParticipant.getIdentity());
+
+        List<Participant> client1RemoteParticipants = new ArrayList<>(room.getParticipants());
+        Participant client2RemoteParticipant = client1RemoteParticipants.get(0);
+
+        assertEquals(1, client1RemoteParticipants.size());
+        assertTrue(client2RemoteParticipant.isConnected());
+
+        client2room.disconnect();
+        assertTrue(roomListener2.onDisconnectedLatch.await(20, TimeUnit.SECONDS));
+        assertTrue(roomListener.onParticipantDisconnectedLatch.await(20, TimeUnit.SECONDS));
+        assertFalse(client2RemoteParticipant.isConnected());
+        assertTrue(room.getParticipants().isEmpty());
+
+        room.disconnect();
+        assertTrue(roomListener.onDisconnectedLatch.await(20, TimeUnit.SECONDS));
+        assertFalse(client1RemoteParticipant.isConnected());
     }
 
     @Test

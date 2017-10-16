@@ -26,7 +26,6 @@ import com.twilio.video.util.CredentialsUtils;
 import com.twilio.video.util.Constants;
 import com.twilio.video.util.FakeVideoCapturer;
 import com.twilio.video.util.PermissionUtils;
-import com.twilio.video.util.RandUtils;
 import com.twilio.video.util.RoomUtils;
 import com.twilio.video.util.Topology;
 
@@ -47,6 +46,7 @@ import java.util.concurrent.TimeUnit;
 import static junit.framework.Assert.assertFalse;
 import static junit.framework.Assert.assertNull;
 import static junit.framework.Assert.fail;
+import static org.apache.commons.lang3.RandomStringUtils.random;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
@@ -85,7 +85,7 @@ public class RoomTopologyParameterizedTest extends BaseClientTest {
         mediaTestActivity = activityRule.getActivity();
         PermissionUtils.allowPermissions(mediaTestActivity);
         identity = Constants.PARTICIPANT_ALICE;
-        roomName = RandUtils.generateRandomString(Constants.ROOM_NAME_LENGTH);
+        roomName = random(Constants.ROOM_NAME_LENGTH);
         assertNotNull(RoomUtils.createRoom(roomName, topology, enableRecording));
         token = CredentialsUtils.getAccessToken(identity, topology);
     }

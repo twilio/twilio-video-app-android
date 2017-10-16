@@ -32,7 +32,6 @@ import com.twilio.video.util.Constants;
 import com.twilio.video.util.CredentialsUtils;
 import com.twilio.video.util.FakeVideoCapturer;
 import com.twilio.video.util.PermissionUtils;
-import com.twilio.video.util.RandUtils;
 import com.twilio.video.util.RoomUtils;
 import com.twilio.video.util.Topology;
 
@@ -44,6 +43,7 @@ import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
+import static org.apache.commons.lang3.RandomStringUtils.random;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
@@ -91,7 +91,7 @@ public abstract class BaseParticipantTest extends BaseClientTest {
         super.setup();
         mediaTestActivity = activityRule.getActivity();
         PermissionUtils.allowPermissions(mediaTestActivity);
-        testRoom = RandUtils.generateRandomString(Constants.ROOM_NAME_LENGTH);
+        testRoom = random(Constants.ROOM_NAME_LENGTH);
         assertNotNull(RoomUtils.createRoom(testRoom, topology));
         fakeVideoCapturer = new FakeVideoCapturer();
         tokenOne = CredentialsUtils.getAccessToken(Constants.PARTICIPANT_ALICE, topology);

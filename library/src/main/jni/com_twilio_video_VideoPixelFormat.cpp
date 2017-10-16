@@ -20,6 +20,7 @@
 #include "class_reference_holder.h"
 
 #include "webrtc/sdk/android/src/jni/jni_helpers.h"
+#include "jni_utils.h"
 
 namespace twilio_video_jni {
 
@@ -54,7 +55,7 @@ jobject VideoPixelFormat::getJavaVideoPixelFormat(uint32_t fourcc) {
 JNIEXPORT jint JNICALL Java_com_twilio_video_VideoPixelFormat_nativeGetValue(JNIEnv *jni,
                                                                              jobject j_video_pixel_format,
                                                                              jstring j_video_pixel_format_name) {
-    std::string name = webrtc_jni::JavaToStdString(jni, j_video_pixel_format_name);
+    std::string name = JavaToUTF8StdString(jni, j_video_pixel_format_name);
 
     if (name == "NV21") {
         return VideoPixelFormat::kVideoPixelFormatNv21;

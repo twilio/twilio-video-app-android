@@ -18,6 +18,7 @@
 
 #include "video/room.h"
 #include "class_reference_holder.h"
+#include "jni_utils.h"
 
 namespace twilio_video_jni {
 
@@ -147,13 +148,13 @@ void AndroidRoomObserver::onConnected(twilio::video::Room *room) {
             return;
         }
 
-        jstring j_room_sid = webrtc_jni::JavaStringFromStdString(jni(), room->getSid());
+        jstring j_room_sid = JavaUTF16StringFromStdString(jni(), room->getSid());
         std::shared_ptr<twilio::video::LocalParticipant> local_participant =
             room->getLocalParticipant();
         jstring j_local_participant_sid =
-            webrtc_jni::JavaStringFromStdString(jni(), local_participant->getSid());
+            JavaUTF16StringFromStdString(jni(), local_participant->getSid());
         jstring j_local_participant_identity =
-            webrtc_jni::JavaStringFromStdString(jni(), local_participant->getIdentity());
+            JavaUTF16StringFromStdString(jni(), local_participant->getIdentity());
         LocalParticipantContext* local_participant_context =
             new LocalParticipantContext(local_participant);
         jobject j_participants = createJavaParticipantList(room->getParticipants());
@@ -362,9 +363,9 @@ jobject AndroidRoomObserver::createJavaRoomException(
     return jni()->NewObject(*j_twilio_exception_class_,
                             j_twilio_exception_ctor_id_,
                             twilio_error.getCode(),
-                            webrtc_jni::JavaStringFromStdString(jni(),
+                            JavaUTF16StringFromStdString(jni(),
                                                                 twilio_error.getMessage()),
-                            webrtc_jni::JavaStringFromStdString(jni(),
+                            JavaUTF16StringFromStdString(jni(),
                                                                 twilio_error.getExplanation()));
 }
 

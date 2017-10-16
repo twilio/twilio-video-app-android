@@ -17,6 +17,7 @@
 #include "com_twilio_video_LocalAudioTrack.h"
 #include "webrtc/sdk/android/src/jni/jni_helpers.h"
 #include "class_reference_holder.h"
+#include "jni_utils.h"
 
 namespace twilio_video_jni {
 
@@ -42,7 +43,7 @@ jobject createJavaLocalAudioTrack(jobject j_media_factory,
     jobject j_local_audio_track = jni->NewObject(j_local_audio_track_class,
                                                  j_local_audio_track_ctor_id,
                                                  webrtc_jni::jlongFromPointer(local_audio_track_context),
-                                                 webrtc_jni::JavaStringFromStdString(jni, local_audio_track->getTrackId()),
+                                                 JavaUTF16StringFromStdString(jni, local_audio_track->getTrackId()),
                                                  local_audio_track->isEnabled(),
                                                  j_media_factory);
     CHECK_EXCEPTION(jni) << "Failed to create LocalVideoTrack instance";

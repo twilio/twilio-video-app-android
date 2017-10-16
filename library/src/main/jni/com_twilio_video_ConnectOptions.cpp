@@ -22,6 +22,7 @@
 
 #include "webrtc/sdk/android/src/jni/jni_helpers.h"
 #include "class_reference_holder.h"
+#include "jni_utils.h"
 
 namespace twilio_video_jni {
 
@@ -36,12 +37,12 @@ Java_com_twilio_video_ConnectOptions_nativeCreate(JNIEnv *env,
                                                   jboolean j_enable_insights,
                                                   jlong j_platform_info_handle) {
 
-    std::string access_token = webrtc_jni::JavaToStdString(env, j_access_token);
+    std::string access_token = JavaToUTF8StdString(env, j_access_token);
     twilio::video::ConnectOptions::Builder* builder =
         new twilio::video::ConnectOptions::Builder(access_token);
 
     if (!webrtc_jni::IsNull(env, j_room_name)) {
-        std::string name = webrtc_jni::JavaToStdString(env, j_room_name);
+        std::string name = JavaToUTF8StdString(env, j_room_name);
         builder->setRoomName(name);
     }
 

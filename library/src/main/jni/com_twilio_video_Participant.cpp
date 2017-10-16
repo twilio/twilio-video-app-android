@@ -20,6 +20,7 @@
 #include "webrtc/sdk/android/src/jni/classreferenceholder.h"
 
 #include "video/logger.h"
+#include "jni_utils.h"
 
 namespace twilio_video_jni {
 
@@ -37,9 +38,9 @@ jobject createJavaParticipant(JNIEnv *env,
                               jobject j_handler) {
     ParticipantContext *participant_context = new ParticipantContext();
     participant_context->participant = participant;
-    jstring j_sid = webrtc_jni::JavaStringFromStdString(env, participant->getSid());
+    jstring j_sid = JavaUTF16StringFromStdString(env, participant->getSid());
     jstring j_identity =
-            webrtc_jni::JavaStringFromStdString(env, participant->getIdentity());
+            JavaUTF16StringFromStdString(env, participant->getIdentity());
     jobject j_audio_tracks = createParticipantAudioTracks(env,
                                                           participant_context,
                                                           j_array_list_class,
@@ -138,7 +139,7 @@ jobject createJavaAudioTrack(JNIEnv *env,
                              std::shared_ptr<twilio::media::AudioTrack> audio_track,
                              jclass j_audio_track_class,
                              jmethodID j_audio_track_ctor_id) {
-    jstring j_track_id = webrtc_jni::JavaStringFromStdString(env, audio_track->getTrackId());
+    jstring j_track_id = JavaUTF16StringFromStdString(env, audio_track->getTrackId());
     jboolean j_is_enabled = audio_track->isEnabled();
 
     return env->NewObject(j_audio_track_class, j_audio_track_ctor_id, j_track_id, j_is_enabled);

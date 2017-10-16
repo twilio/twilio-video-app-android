@@ -18,6 +18,7 @@
 
 #include "com_twilio_video_MediaFactory.h"
 #include "room_delegate.h"
+#include "jni_utils.h"
 
 namespace twilio_video_jni {
 
@@ -82,7 +83,7 @@ twilio::video::NetworkChangeEvent getNetworkChangeEvent(jobject j_network_change
                                                        "()Ljava/lang/String;");
     jstring connection_event_name = (jstring) jni->CallObjectMethod(j_network_change_event,
                                                                     name_method_id);
-    std::string name = webrtc_jni::JavaToStdString(jni, connection_event_name);
+    std::string name = JavaToUTF8StdString(jni, connection_event_name);
     twilio::video::NetworkChangeEvent network_changed_event = twilio::video::kConnectionChanged;
 
     if (name == "CONNECTION_LOST") {
