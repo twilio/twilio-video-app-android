@@ -26,14 +26,19 @@ import android.os.Bundle;
 
 import com.twilio.video.test.R;
 
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
+
 import static org.junit.Assert.fail;
 
 @TargetApi(21)
 public class ScreenCapturerTestActivity extends Activity {
     private static final int REQUEST_MEDIA_PROJECTION = 100;
+    private static final int PERMISSION_DELAY_MS = 25000;
 
     private int screenCaptureResultCode;
     private Intent screenCaptureIntent;
+    private CountDownLatch screenCapturePermissionGranted = new CountDownLatch(1);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,6 +57,7 @@ public class ScreenCapturerTestActivity extends Activity {
 
             this.screenCaptureResultCode = resultCode;
             this.screenCaptureIntent = data;
+            screenCapturePermissionGranted.countDown();
         }
     }
 
@@ -61,6 +67,14 @@ public class ScreenCapturerTestActivity extends Activity {
 
     public Intent getScreenCaptureIntent() {
         return screenCaptureIntent;
+    }
+
+    public boolean waitForPermissionGranted() {
+        try {
+            return screenCapturePermissionGranted.await(PERMISSION_DELAY_MS, TimeUnit.MILLISECONDS);
+        } catch (InterruptedException e) {
+            return false;
+        }
     }
 
     private void requestScreenCapturePermission() {

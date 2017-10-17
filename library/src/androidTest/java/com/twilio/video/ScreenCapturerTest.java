@@ -22,9 +22,12 @@ import android.os.Build;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
+import android.support.test.uiautomator.UiDevice;
+import android.support.test.uiautomator.UiObject;
+import android.support.test.uiautomator.UiObjectNotFoundException;
+import android.support.test.uiautomator.UiSelector;
 
 import com.twilio.video.ui.ScreenCapturerTestActivity;
-import com.twilio.video.util.PermissionUtils;
 
 import org.junit.After;
 import org.junit.Before;
@@ -39,6 +42,7 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import com.twilio.video.test.R;
 
+import static junit.framework.Assert.fail;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assume.assumeTrue;
@@ -47,6 +51,8 @@ import static org.junit.Assume.assumeTrue;
 @TargetApi(21)
 public class ScreenCapturerTest {
     private static final int SCREEN_CAPTURER_DELAY_MS = 3000;
+    private static final int PERMISSIONS_DIALOG_DELAY_MS = 1000;
+    private static final String START_CAPTURE_BUTTON_ID = "android:id/button1";
 
     @Rule
     public ActivityTestRule<ScreenCapturerTestActivity> activityRule =
@@ -59,7 +65,7 @@ public class ScreenCapturerTest {
     public void setup() {
         assumeTrue(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP);
         screenCapturerActivity = activityRule.getActivity();
-        PermissionUtils.allowScreenCapture(false);
+        allowScreenCapture();
     }
 
     @After
@@ -223,5 +229,18 @@ public class ScreenCapturerTest {
             // Remove video track and wait
             screenVideoTrack.release();
         }
+    }
+
+    private void allowScreenCapture()  {
+        UiDevice uiDevice = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation());
+        UiSelector acceptButtonSelector = new UiSelector().resourceId(START_CAPTURE_BUTTON_ID);
+        UiObject acceptButton = uiDevice.findObject(acceptButtonSelector);
+        assertTrue(acceptButton.waitForExists(PERMISSIONS_DIALOG_DELAY_MS));
+        try {
+            assertTrue(acceptButton.click());
+        } catch (UiObjectNotFoundException e) {
+            fail(e.getMessage());
+        }
+        assertTrue(screenCapturerActivity.waitForPermissionGranted());
     }
 }

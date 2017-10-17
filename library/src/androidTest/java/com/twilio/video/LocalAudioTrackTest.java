@@ -16,12 +16,13 @@
 
 package com.twilio.video;
 
+import android.Manifest;
 import android.support.test.filters.LargeTest;
 import android.support.test.rule.ActivityTestRule;
+import android.support.test.rule.GrantPermissionRule;
 import android.support.test.runner.AndroidJUnit4;
 
 import com.twilio.video.ui.MediaTestActivity;
-import com.twilio.video.util.PermissionUtils;
 
 import org.junit.After;
 import org.junit.Assert;
@@ -51,7 +52,11 @@ public class LocalAudioTrackTest {
     private static final int AUDIO_JITTER_BUFFER_FAST_ACCELERATE_INDEX = 5;
     private static final int TYPING_DETECTION_INDEX = 6;
 
-    @Rule public ActivityTestRule<MediaTestActivity> activityRule =
+    @Rule
+    public GrantPermissionRule recordAudioPermissionRule = GrantPermissionRule
+            .grant(Manifest.permission.RECORD_AUDIO);
+    @Rule
+    public ActivityTestRule<MediaTestActivity> activityRule =
             new ActivityTestRule<>(MediaTestActivity.class);
     private MediaTestActivity mediaTestActivity;
     private LocalAudioTrack localAudioTrack;
@@ -59,7 +64,6 @@ public class LocalAudioTrackTest {
     @Before
     public void setup() {
         mediaTestActivity = activityRule.getActivity();
-        PermissionUtils.allowPermissions(mediaTestActivity);
     }
 
     @After
