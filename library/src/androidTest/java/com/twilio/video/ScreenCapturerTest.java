@@ -50,8 +50,8 @@ import static org.junit.Assume.assumeTrue;
 @RunWith(AndroidJUnit4.class)
 @TargetApi(21)
 public class ScreenCapturerTest {
-    private static final int SCREEN_CAPTURER_DELAY_MS = 3000;
-    private static final int PERMISSIONS_DIALOG_DELAY_MS = 1000;
+    private static final int SCREEN_CAPTURER_DELAY_MS = 4000;
+    private static final int PERMISSIONS_DIALOG_DELAY_MS = 2000;
     private static final String START_CAPTURE_BUTTON_ID = "android:id/button1";
 
     @Rule
@@ -235,9 +235,10 @@ public class ScreenCapturerTest {
         UiDevice uiDevice = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation());
         UiSelector acceptButtonSelector = new UiSelector().resourceId(START_CAPTURE_BUTTON_ID);
         UiObject acceptButton = uiDevice.findObject(acceptButtonSelector);
-        assertTrue(acceptButton.waitForExists(PERMISSIONS_DIALOG_DELAY_MS));
         try {
-            assertTrue(acceptButton.click());
+            if (acceptButton.waitForExists(PERMISSIONS_DIALOG_DELAY_MS)) {
+                assertTrue(acceptButton.click());
+            }
         } catch (UiObjectNotFoundException e) {
             fail(e.getMessage());
         }
