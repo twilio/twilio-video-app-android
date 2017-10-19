@@ -323,15 +323,15 @@ private:
     bool observer_deleted_ = false;
     mutable rtc::CriticalSection deletion_lock_;
 
-    const webrtc_jni::ScopedGlobalRef <jobject> j_stats_observer_;
-    const webrtc_jni::ScopedGlobalRef <jclass> j_stats_observer_class_;
-    const webrtc_jni::ScopedGlobalRef <jclass> j_array_list_class_;
-    const webrtc_jni::ScopedGlobalRef <jclass> j_stats_report_class_;
-    const webrtc_jni::ScopedGlobalRef <jclass> j_local_audio_track_stats_class_;
-    const webrtc_jni::ScopedGlobalRef <jclass> j_local_video_track_stats_class_;
-    const webrtc_jni::ScopedGlobalRef <jclass> j_audio_track_stats_class_;
-    const webrtc_jni::ScopedGlobalRef <jclass> j_video_track_stats_class_;
-    const webrtc_jni::ScopedGlobalRef <jclass> j_video_dimensions_class_;
+    const webrtc_jni::ScopedGlobalRef<jobject> j_stats_observer_;
+    const webrtc_jni::ScopedGlobalRef<jclass> j_stats_observer_class_;
+    const webrtc_jni::ScopedGlobalRef<jclass> j_array_list_class_;
+    const webrtc_jni::ScopedGlobalRef<jclass> j_stats_report_class_;
+    const webrtc_jni::ScopedGlobalRef<jclass> j_local_audio_track_stats_class_;
+    const webrtc_jni::ScopedGlobalRef<jclass> j_local_video_track_stats_class_;
+    const webrtc_jni::ScopedGlobalRef<jclass> j_audio_track_stats_class_;
+    const webrtc_jni::ScopedGlobalRef<jclass> j_video_track_stats_class_;
+    const webrtc_jni::ScopedGlobalRef<jclass> j_video_dimensions_class_;
     jmethodID j_on_stats_id_;
     jmethodID j_array_list_ctor_id_;
     jmethodID j_array_list_add_;
