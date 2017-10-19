@@ -30,6 +30,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
+import static com.twilio.video.AspectRatio.ASPECT_RATIO_16_9;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -270,7 +271,7 @@ public class CameraCapturerTest extends BaseCameraCapturerTest {
                 .maxFps(30)
                 .minVideoDimensions(VideoDimensions.WVGA_VIDEO_DIMENSIONS)
                 .maxVideoDimensions(VideoDimensions.HD_540P_VIDEO_DIMENSIONS)
-                .aspectRatio(VideoConstraints.ASPECT_RATIO_16_9)
+                .aspectRatio(ASPECT_RATIO_16_9)
                 .build();
 
         assumeTrue(LocalVideoTrack.constraintsCompatible(cameraCapturer, videoConstraints));

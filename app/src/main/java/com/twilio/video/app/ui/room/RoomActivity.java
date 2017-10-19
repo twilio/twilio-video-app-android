@@ -114,6 +114,7 @@ import io.reactivex.functions.Action;
 import io.reactivex.functions.Function;
 import timber.log.Timber;
 
+import static com.twilio.video.AspectRatio.*;
 import static com.twilio.video.app.R.drawable.ic_phonelink_ring_white_24dp;
 import static com.twilio.video.app.R.drawable.ic_volume_up_white_24dp;
 
@@ -127,9 +128,9 @@ public class RoomActivity extends BaseActivity {
     private static final String LOCAL_PARTICIPANT_STUB_SID = "";
 
     private AspectRatio[] aspectRatios = new AspectRatio[]{
-            VideoConstraints.ASPECT_RATIO_4_3,
-            VideoConstraints.ASPECT_RATIO_16_9,
-            VideoConstraints.ASPECT_RATIO_11_9
+            ASPECT_RATIO_4_3,
+            ASPECT_RATIO_16_9,
+            ASPECT_RATIO_11_9
     };
 
     private VideoDimensions[] videoDimensions = new VideoDimensions[]{

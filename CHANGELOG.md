@@ -80,6 +80,10 @@ Observing messages from data track
             }
     };
     
+Improvements
+
+- Moved pre-defined aspect ratios from `VideoConstraints` class to `AspectRatio` class.
+    
 Bug Fixes
 
 - Fixed issue that caused track and room names with certain UTF-8 characters to be improperly 
