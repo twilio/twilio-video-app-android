@@ -22,6 +22,8 @@ public class DeviceUtils {
     private static final String SAMSUNG_GALAXY_S3_MODEL = "GT-I9300";
     private static final String SAMSUNG_GALAXY_S3_DEVICE = "m0";
     private static final String SAMSUNG_GALAXY_S7_DEVICE = "herolte";
+    private static final String HTC_NEXUS_9_DEVICE = "flounder";
+    private static final String HTC_NEXUS_9_LTE_DEVICE = "flounder_lte";
 
     public static boolean isSamsungGalaxyS7() {
         return Build.DEVICE.equals(SAMSUNG_GALAXY_S7_DEVICE);
@@ -30,5 +32,10 @@ public class DeviceUtils {
     public static boolean isSamsungGalaxyS3() {
         return Build.MODEL.equals(SAMSUNG_GALAXY_S3_MODEL) &&
                 Build.DEVICE.equals(SAMSUNG_GALAXY_S3_DEVICE);
+    }
+
+    public static boolean isNexus9() {
+        return Build.DEVICE.equals(HTC_NEXUS_9_DEVICE) ||
+                Build.DEVICE.equals(HTC_NEXUS_9_LTE_DEVICE);
     }
 }

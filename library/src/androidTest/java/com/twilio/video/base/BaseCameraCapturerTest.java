@@ -16,9 +16,11 @@
 
 package com.twilio.video.base;
 
+import android.Manifest;
 import android.hardware.Camera;
 import android.support.annotation.Nullable;
 import android.support.test.rule.ActivityTestRule;
+import android.support.test.rule.GrantPermissionRule;
 import android.util.Log;
 
 import com.twilio.video.CameraCapturer;
@@ -27,7 +29,6 @@ import com.twilio.video.LogLevel;
 import com.twilio.video.Video;
 import com.twilio.video.ui.CameraCapturerTestActivity;
 import com.twilio.video.util.FrameCountRenderer;
-import com.twilio.video.util.PermissionUtils;
 
 import org.junit.After;
 import org.junit.Before;
@@ -40,6 +41,9 @@ public abstract class BaseCameraCapturerTest {
     protected static final int CAMERA_CAPTURE_DELAY_MS = 3000;
 
     @Rule
+    public GrantPermissionRule cameraPermissionsRule = GrantPermissionRule
+            .grant(Manifest.permission.CAMERA);
+    @Rule
     public ActivityTestRule<CameraCapturerTestActivity> activityRule =
             new ActivityTestRule<>(CameraCapturerTestActivity.class);
     protected CameraCapturerTestActivity cameraCapturerActivity;
@@ -51,7 +55,6 @@ public abstract class BaseCameraCapturerTest {
     @Before
     public void setup() {
         cameraCapturerActivity = activityRule.getActivity();
-        PermissionUtils.allowPermissions(cameraCapturerActivity);
         Video.setLogLevel(LogLevel.ALL);
         frameCountRenderer = new FrameCountRenderer();
         supportedCameraSource = getSupportedCameraSource();

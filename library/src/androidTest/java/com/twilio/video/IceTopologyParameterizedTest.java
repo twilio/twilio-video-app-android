@@ -16,8 +16,10 @@
 
 package com.twilio.video;
 
+import android.Manifest;
 import android.support.test.filters.LargeTest;
 import android.support.test.rule.ActivityTestRule;
+import android.support.test.rule.GrantPermissionRule;
 
 import com.twilio.video.base.BaseClientTest;
 import com.twilio.video.helper.CallbackHelper;
@@ -25,7 +27,6 @@ import com.twilio.video.ui.MediaTestActivity;
 import com.twilio.video.util.CredentialsUtils;
 import com.twilio.video.util.Constants;
 import com.twilio.video.util.FakeVideoCapturer;
-import com.twilio.video.util.PermissionUtils;
 import com.twilio.video.util.RoomUtils;
 import com.twilio.video.util.ServiceTokenUtil;
 import com.twilio.video.util.Topology;
@@ -60,6 +61,9 @@ public class IceTopologyParameterizedTest extends BaseClientTest {
     }
 
     @Rule
+    public GrantPermissionRule recordAudioPermissionRule = GrantPermissionRule
+            .grant(Manifest.permission.RECORD_AUDIO);
+    @Rule
     public ActivityTestRule<MediaTestActivity> activityRule =
         new ActivityTestRule<>(MediaTestActivity.class);
     private MediaTestActivity mediaTestActivity;
@@ -82,7 +86,6 @@ public class IceTopologyParameterizedTest extends BaseClientTest {
         Video.setLogLevel(LogLevel.ALL);
         Video.setModuleLogLevel(LogModule.SIGNALING, LogLevel.ALL);
         mediaTestActivity = activityRule.getActivity();
-        PermissionUtils.allowPermissions(mediaTestActivity);
         roomName = random(Constants.ROOM_NAME_LENGTH);
         assertNotNull(RoomUtils.createRoom(roomName, topology));
         aliceToken = CredentialsUtils.getAccessToken(Constants.PARTICIPANT_ALICE, topology);

@@ -39,7 +39,6 @@ library-camera-tests:
         - hero2lte
         - herolte
         - hlte
-        - htc_m8
         - j5lte
         - j7xelte
         - lt02wifi
@@ -51,14 +50,11 @@ library-camera-tests:
         - serranolte
         - t03g
         - trelte
-        - victara
         - zeroflte
         - zerolte
         - condor_umts
         - titan_umts
-        - SH-04H
         - shamu
-        - hammerhead
         # The following devices have known issues executing camera tests. The bugs and tasks
         # are tracked in epic GSDK-1278.
         #
@@ -66,6 +62,10 @@ library-camera-tests:
         # - flo
         # - D6503
         # - D6603
+        # - victara
+        # - SH-04H
+        # - htc_m8
+        # - hammerhead
     os-version-ids:
         - 18
         - 19

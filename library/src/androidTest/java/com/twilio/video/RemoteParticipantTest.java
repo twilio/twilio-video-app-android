@@ -28,7 +28,6 @@ import com.twilio.video.helper.CallbackHelper;
 import com.twilio.video.ui.MediaTestActivity;
 import com.twilio.video.util.Constants;
 import com.twilio.video.util.CredentialsUtils;
-import com.twilio.video.util.PermissionUtils;
 import com.twilio.video.util.RoomUtils;
 import com.twilio.video.util.Topology;
 
@@ -64,7 +63,6 @@ public class RemoteParticipantTest extends BaseClientTest {
     public void setup() throws InterruptedException {
         super.setup();
         mediaTestActivity = activityRule.getActivity();
-        PermissionUtils.allowPermissions(mediaTestActivity);
     }
 
     /*
