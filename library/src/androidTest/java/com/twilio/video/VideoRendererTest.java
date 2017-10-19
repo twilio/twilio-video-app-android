@@ -16,21 +16,21 @@
 
 package com.twilio.video;
 
+import android.Manifest;
 import android.graphics.Bitmap;
 import android.support.test.rule.ActivityTestRule;
+import android.support.test.rule.GrantPermissionRule;
 import android.support.test.runner.AndroidJUnit4;
 import android.widget.ImageView;
 
 import com.twilio.video.ui.VideoRendererTestActivity;
 import com.twilio.video.util.FakeVideoCapturer;
-import com.twilio.video.util.PermissionUtils;
 
 import com.twilio.video.test.R;
 import com.twilio.video.util.BitmapVideoRenderer;
 
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -46,6 +46,9 @@ public class VideoRendererTest {
     private static final int BITMAP_TIMEOUT_MS = 10000;
 
     @Rule
+    public GrantPermissionRule cameraPermissionsRule = GrantPermissionRule
+            .grant(Manifest.permission.CAMERA);
+    @Rule
     public ActivityTestRule<VideoRendererTestActivity> activityRule =
             new ActivityTestRule<>(VideoRendererTestActivity.class);
     private VideoRendererTestActivity videoRendererTestActivity;
@@ -59,14 +62,13 @@ public class VideoRendererTest {
     @Before
     public void setup() {
         videoRendererTestActivity = activityRule.getActivity();
-        PermissionUtils.allowPermissions(videoRendererTestActivity);
         cameraCapturer = new CameraCapturer(videoRendererTestActivity,
                 CameraCapturer.CameraSource.FRONT_CAMERA);
         fakeVideoCapturer = new FakeVideoCapturer();
         cameraVideoTrack = LocalVideoTrack.create(videoRendererTestActivity, true, cameraCapturer);
         fakeVideoTrack = LocalVideoTrack.create(videoRendererTestActivity, true, fakeVideoCapturer);
-        videoView = (VideoView) videoRendererTestActivity.findViewById(R.id.video);
-        imageView = (ImageView) videoRendererTestActivity.findViewById(R.id.image_view);
+        videoView = videoRendererTestActivity.findViewById(R.id.video);
+        imageView = videoRendererTestActivity.findViewById(R.id.image_view);
     }
 
     @After

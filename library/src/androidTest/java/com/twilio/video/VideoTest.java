@@ -16,7 +16,9 @@
 
 package com.twilio.video;
 
+import android.Manifest;
 import android.support.test.rule.ActivityTestRule;
+import android.support.test.rule.GrantPermissionRule;
 import android.support.test.runner.AndroidJUnit4;
 
 import com.twilio.video.base.BaseClientTest;
@@ -25,7 +27,6 @@ import com.twilio.video.ui.MediaTestActivity;
 import com.twilio.video.util.Constants;
 import com.twilio.video.util.CredentialsUtils;
 import com.twilio.video.util.FakeVideoCapturer;
-import com.twilio.video.util.PermissionUtils;
 import com.twilio.video.util.RoomUtils;
 import com.twilio.video.util.Topology;
 
@@ -40,13 +41,16 @@ import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
+import static junit.framework.TestCase.assertNotNull;
 import static org.apache.commons.lang3.RandomStringUtils.random;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 @RunWith(AndroidJUnit4.class)
 public class VideoTest extends BaseClientTest {
+    @Rule
+    public GrantPermissionRule recordAudioPermissionRule = GrantPermissionRule
+            .grant(Manifest.permission.RECORD_AUDIO);
     @Rule
     public ActivityTestRule<MediaTestActivity> activityRule =
             new ActivityTestRule<>(MediaTestActivity.class);
@@ -62,7 +66,6 @@ public class VideoTest extends BaseClientTest {
         super.setup();
         mediaTestActivity = activityRule.getActivity();
         roomListener = new CallbackHelper.FakeRoomListener();
-        PermissionUtils.allowPermissions(mediaTestActivity);
         roomName = random(Constants.ROOM_NAME_LENGTH);
         assertNotNull(RoomUtils.createRoom(roomName, Topology.P2P));
         token = CredentialsUtils.getAccessToken(Constants.PARTICIPANT_ALICE, Topology.P2P);

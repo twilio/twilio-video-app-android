@@ -2,15 +2,26 @@ buildscript {
     apply from: "$rootProject.projectDir/common.gradle"
     repositories {
         jcenter()
-        mavenCentral()
-        maven {
-            url "http://nexus.corp.twilio.com/content/repositories/snapshots/"
-        }
-        maven {
-            url "http://nexus.corp.twilio.com/content/repositories/releases/"
-        }
         maven {
             url "https://maven.google.com"
+        }
+        mavenCentral()
+        maven {
+            url  "https://twilio.bintray.com/releases"
+        }
+        maven {
+            url  "https://twilio.bintray.com/internal-releases"
+            credentials {
+                username "${getBintrayUsername()}"
+                password "${getBintrayPassword()}"
+            }
+        }
+        maven {
+            url  "https://twilio.bintray.com/snapshots"
+            credentials {
+                username "${getBintrayUsername()}"
+                password "${getBintrayPassword()}"
+            }
         }
     }
     dependencies {
@@ -26,15 +37,26 @@ allprojects {
     apply from: "$rootProject.projectDir/common.gradle"
     repositories {
         jcenter()
-        mavenCentral()
-        maven {
-            url "http://nexus.corp.twilio.com/content/repositories/snapshots/"
-        }
-        maven {
-            url "http://nexus.corp.twilio.com/content/repositories/releases/"
-        }
         maven {
             url "https://maven.google.com"
+        }
+        mavenCentral()
+        maven {
+            url  "https://twilio.bintray.com/releases"
+        }
+        maven {
+            url  "https://twilio.bintray.com/internal-releases"
+            credentials {
+                username "${getBintrayUsername()}"
+                password "${getBintrayPassword()}"
+            }
+        }
+        maven {
+            url  "https://twilio.bintray.com/snapshots"
+            credentials {
+                username "${getBintrayUsername()}"
+                password "${getBintrayPassword()}"
+            }
         }
     }
 }
@@ -453,17 +475,17 @@ task checkLibrary(type: GradleBuild) {
     ]
 }
 
-task nexusLibrarySnapshotUpload(type: GradleBuild) {
-    description = 'Publish Video Android AAR snapshot to Nexus'
+task bintrayLibrarySnapshotUpload(type: GradleBuild) {
+    description = 'Publish Video Android AAR snapshot to Bintray'
     group = 'Publishing'
     dependsOn checkLibrary
     buildFile = file('library/build.gradle')
     tasks = ['uploadArchives']
     startParameter.projectProperties += gradle.startParameter.projectProperties + [
             'snapshot': true,
-            'maven.repo': 'https://nexus.corp.twilio.com/content/repositories/snapshots',
-            'maven.username': null,
-            'maven.password': null
+            'maven.repo': 'https://api.bintray.com/maven/twilio/snapshots/video-android/;publish=1',
+            'maven.username': "${getBintrayUsername()}",
+            'maven.password': "${getBintrayPassword()}"
     ]
 }
 
@@ -495,18 +517,5 @@ task bintrayLibraryReleaseUpload(type: GradleBuild) {
             'maven.repo': 'https://api.bintray.com/maven/twilio/releases/video-android/;publish=1',
             'maven.username': "${getBintrayUsername()}",
             'maven.password': "${getBintrayPassword()}"
-    ]
-}
-
-task nexusLibraryReleaseCandidateUpload(type: GradleBuild) {
-    description = 'Publish Video Android AAR release candidate to Nexus'
-    group = 'Publishing'
-    buildFile = file('library/build.gradle')
-    tasks = ['clean', 'assemble', 'uploadArchives']
-    startParameter.projectProperties += gradle.startParameter.projectProperties + [
-            'releaseCandidate': true,
-            'maven.repo': 'https://nexus.corp.twilio.com/content/repositories/releases',
-            'maven.username': null,
-            'maven.password': null
     ]
 }

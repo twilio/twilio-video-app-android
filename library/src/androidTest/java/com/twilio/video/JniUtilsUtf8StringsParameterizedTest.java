@@ -46,7 +46,7 @@ public class JniUtilsUtf8StringsParameterizedTest {
         List<String> randomStrings = new ArrayList<>(NUM_RANDOM_STRINGS);
 
         for (int i = 0 ; i < NUM_RANDOM_STRINGS ; i++) {
-             randomStrings.add(i, random(RANDOM_STRING_LENGTH));
+            randomStrings.add(i, random(RANDOM_STRING_LENGTH));
         }
 
         return randomStrings;
