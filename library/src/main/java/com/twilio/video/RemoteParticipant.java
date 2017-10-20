@@ -47,20 +47,21 @@ public class RemoteParticipant implements Participant {
 
     /*
      * This listener proxy is bound at the JNI level.
+     *
+     * The contract for RemoteParticipant JNI callbacks is as follows:
+     *
+     * 1. All event callbacks are done on the same thread the developer used to connect to a room.
+     * 2. Create and release all native memory on the same thread. In the case of a Participant,
+     * VideoTracks are created and released on notifier thread.
+     * 3. All Participant fields must be mutated on the developer's thread.
+     *
+     * Not abiding by this contract, may result in difficult to debug JNI crashes, incorrect return
+     * values in the synchronous API methods, or missed callbacks. There is one test
+     * `shouldReceiveTrackEventsIfListenerSetAfterEventReceived` that validates the scenario where
+     * an audio track event would be missed if the callback is not posted to the developer's thread.
      */
     @SuppressWarnings("unused")
     private final Listener participantListenerProxy = new Listener() {
-
-        /*
-         * All event processing is done on the same thread the developer used to connect to a
-         * room. All operations that modify the state of the participant MUST BE PERFORMED ON THE
-         * DEVELOPER'S THREAD. This is required because we have both an asynchronous and synchronous
-         * API and it is possible that the developer could use the synchronous API before receiving
-         * an asynchronous event. We currently only have one test
-         * `shouldReceiveTrackEventsIfListenerSetAfterEventReceived` that validates this scenario
-         * with the audio track added event.
-         */
-
         @Override
         public void onAudioTrackPublished(final RemoteParticipant remoteParticipant,
                                           final RemoteAudioTrackPublication remoteAudioTrackPublication) {
@@ -68,6 +69,7 @@ public class RemoteParticipant implements Participant {
             handler.post(new Runnable() {
                 @Override
                 public void run() {
+                    ThreadChecker.checkIsValidThread(handler);
                     logger.d("onAudioTrackPublished");
                     audioTrackPublications.add(remoteAudioTrackPublication);
                     remoteAudioTrackPublications.add(remoteAudioTrackPublication);
@@ -88,6 +90,7 @@ public class RemoteParticipant implements Participant {
             handler.post(new Runnable() {
                 @Override
                 public void run() {
+                    ThreadChecker.checkIsValidThread(handler);
                     logger.d("onAudioTrackUnpublished");
                     audioTrackPublications.remove(remoteAudioTrackPublication);
                     remoteAudioTrackPublications.remove(remoteAudioTrackPublication);
@@ -109,6 +112,7 @@ public class RemoteParticipant implements Participant {
             handler.post(new Runnable() {
                 @Override
                 public void run() {
+                    ThreadChecker.checkIsValidThread(handler);
                     logger.d("onAudioTrackSubscribed");
                     remoteAudioTrackPublication.setSubscribed(true);
                     remoteAudioTrackPublication.setRemoteAudioTrack(remoteAudioTrack);
@@ -131,6 +135,7 @@ public class RemoteParticipant implements Participant {
             handler.post(new Runnable() {
                 @Override
                 public void run() {
+                    ThreadChecker.checkIsValidThread(handler);
                     logger.d("onAudioTrackUnsubscribed");
                     remoteAudioTrackPublication.setRemoteAudioTrack(null);
                     remoteAudioTrackPublication.setSubscribed(false);
@@ -152,6 +157,7 @@ public class RemoteParticipant implements Participant {
             handler.post(new Runnable() {
                 @Override
                 public void run() {
+                    ThreadChecker.checkIsValidThread(handler);
                     logger.d("onVideoTrackPublished");
                     videoTrackPublications.add(remoteVideoTrackPublication);
                     remoteVideoTrackPublications.add(remoteVideoTrackPublication);
@@ -172,6 +178,7 @@ public class RemoteParticipant implements Participant {
             handler.post(new Runnable() {
                 @Override
                 public void run() {
+                    ThreadChecker.checkIsValidThread(handler);
                     logger.d("onVideoTrackUnpublished");
                     videoTrackPublications.remove(remoteVideoTrackPublication);
                     remoteVideoTrackPublications.remove(remoteVideoTrackPublication);
@@ -193,6 +200,7 @@ public class RemoteParticipant implements Participant {
             handler.post(new Runnable() {
                 @Override
                 public void run() {
+                    ThreadChecker.checkIsValidThread(handler);
                     logger.d("onVideoTrackSubscribed");
                     remoteVideoTrackPublication.setSubscribed(true);
                     remoteVideoTrackPublication.setRemoteVideoTrack(remoteVideoTrack);
@@ -212,11 +220,15 @@ public class RemoteParticipant implements Participant {
                                              final RemoteVideoTrackPublication remoteVideoTrackPublication,
                                              final RemoteVideoTrack remoteVideoTrack) {
             checkCallback(remoteParticipant, remoteVideoTrackPublication, "onVideoTrackUnsubscribed");
+
+            // Release video track native memory on notifier
+            remoteVideoTrack.release();
+
             handler.post(new Runnable() {
                 @Override
                 public void run() {
+                    ThreadChecker.checkIsValidThread(handler);
                     logger.d("onVideoTrackUnsubscribed");
-                    remoteVideoTrack.release();
                     remoteVideoTrackPublication.setRemoteVideoTrack(null);
                     remoteVideoTrackPublication.setSubscribed(false);
                     Listener listener = listenerReference.get();
@@ -237,6 +249,7 @@ public class RemoteParticipant implements Participant {
             handler.post(new Runnable() {
                 @Override
                 public void run() {
+                    ThreadChecker.checkIsValidThread(handler);
                     logger.d("onDataTrackPublished");
                     dataTrackPublications.add(remoteDataTrackPublication);
                     remoteDataTrackPublications.add(remoteDataTrackPublication);
@@ -257,6 +270,7 @@ public class RemoteParticipant implements Participant {
             handler.post(new Runnable() {
                 @Override
                 public void run() {
+                    ThreadChecker.checkIsValidThread(handler);
                     logger.d("onDataTrackUnpublished");
                     dataTrackPublications.remove(remoteDataTrackPublication);
                     remoteDataTrackPublications.remove(remoteDataTrackPublication);
@@ -278,6 +292,7 @@ public class RemoteParticipant implements Participant {
             handler.post(new Runnable() {
                 @Override
                 public void run() {
+                    ThreadChecker.checkIsValidThread(handler);
                     logger.d("onDataTrackSubscribed");
                     remoteDataTrackPublication.setSubscribed(true);
                     remoteDataTrackPublication.setRemoteDataTrack(remoteDataTrack);
@@ -297,11 +312,15 @@ public class RemoteParticipant implements Participant {
                                             final RemoteDataTrackPublication remoteDataTrackPublication,
                                             final RemoteDataTrack remoteDataTrack) {
             checkCallback(remoteParticipant, remoteDataTrackPublication, "onDataTrackUnsubscribed");
+
+            // Release remote data track on notifier
+            remoteDataTrack.release();
+
             handler.post(new Runnable() {
                 @Override
                 public void run() {
+                    ThreadChecker.checkIsValidThread(handler);
                     logger.d("onDataTrackUnsubscribed");
-                    remoteDataTrack.release();
                     remoteDataTrackPublication.setRemoteDataTrack(null);
                     remoteDataTrackPublication.setSubscribed(false);
                     Listener listener = listenerReference.get();
@@ -322,6 +341,7 @@ public class RemoteParticipant implements Participant {
             handler.post(new Runnable() {
                 @Override
                 public void run() {
+                    ThreadChecker.checkIsValidThread(handler);
                     logger.d("onAudioTrackEnabled");
                     remoteAudioTrackPublication.setEnabled(true);
                     Listener listener = listenerReference.get();
@@ -341,6 +361,7 @@ public class RemoteParticipant implements Participant {
             handler.post(new Runnable() {
                 @Override
                 public void run() {
+                    ThreadChecker.checkIsValidThread(handler);
                     logger.d("onAudioTrackDisabled");
                     remoteAudioTrackPublication.setEnabled(false);
                     Listener listener = listenerReference.get();
@@ -360,6 +381,7 @@ public class RemoteParticipant implements Participant {
             handler.post(new Runnable() {
                 @Override
                 public void run() {
+                    ThreadChecker.checkIsValidThread(handler);
                     logger.d("onVideoTrackEnabled");
                     remoteVideoTrackPublication.setEnabled(true);
                     Listener listener = listenerReference.get();
@@ -379,6 +401,7 @@ public class RemoteParticipant implements Participant {
             handler.post(new Runnable() {
                 @Override
                 public void run() {
+                    ThreadChecker.checkIsValidThread(handler);
                     logger.d("onVideoTrackDisabled");
                     remoteVideoTrackPublication.setEnabled(false);
                     Listener listener = listenerReference.get();
@@ -627,6 +650,8 @@ public class RemoteParticipant implements Participant {
         /**
          * This method notifies the listener that the {@link RemoteVideoTrack} of the
          * {@link RemoteParticipant} has been unsubscribed from. Video frames are no longer flowing.
+         * All {@link VideoRenderer}s of the video track have been removed before receiving this
+         * callback to prevent native memory leaks.
          * @param remoteParticipant The remoteParticipant object associated with this video track.
          * @param remoteVideoTrackPublication The video track publication.
          * @param remoteVideoTrack The video track removed from this room.
