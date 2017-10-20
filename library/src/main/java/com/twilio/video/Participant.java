@@ -39,18 +39,21 @@ public class Participant {
      * forward events to the developer listener.
      */
     private final AtomicReference<Listener> listenerReference = new AtomicReference<>(null);
+
+    /*
+     * The contract for Participant JNI callbacks is as follows:
+     *
+     * 1. All event callbacks are done on the same thread the developer used to connect to a room.
+     * 2. Create and release all native memory on the same thread. In the case of a Participant,
+     * VideoTracks are created and released on notifier thread.
+     * 3. All Participant fields must be mutated on the developer's thread.
+     *
+     * Not abiding by this contract, may result in difficult to debug JNI crashes, incorrect return
+     * values in the synchronous API methods, or missed callbacks. There is one test
+     * `shouldReceiveTrackEventsIfListenerSetAfterEventReceived` that validates the scenario where
+     * an audio track event would be missed if the callback is not posted to the developer's thread.
+     */
     private final Listener participantListenerProxy = new Listener() {
-
-        /*
-         * All event processing is done on the same thread the developer used to connect to a
-         * room. All operations that modify the state of the participant MUST BE PERFORMED ON THE
-         * DEVELOPER'S THREAD. This is required because we have both an asynchronous and synchronous
-         * API and it is possible that the developer could use the synchronous API before receiving
-         * an asynchronous event. We currently only have one test
-         * `shouldReceiveTrackEventsIfListenerSetAfterEventReceived` that validates this scenario
-         * with the audio track added event.
-         */
-
         @Override
         public void onAudioTrackAdded(final Participant participant,
                                       final AudioTrack audioTrack) {
@@ -58,6 +61,7 @@ public class Participant {
             handler.post(new Runnable() {
                 @Override
                 public void run() {
+                    ThreadChecker.checkIsValidThread(handler);
                     logger.d("onAudioTrackAdded");
                     audioTracks.add(audioTrack);
                     Listener listener = listenerReference.get();
@@ -76,6 +80,7 @@ public class Participant {
             handler.post(new Runnable() {
                 @Override
                 public void run() {
+                    ThreadChecker.checkIsValidThread(handler);
                     logger.d("onAudioTrackRemoved");
                     audioTracks.remove(audioTrack);
                     Listener listener = listenerReference.get();
@@ -94,6 +99,7 @@ public class Participant {
             handler.post(new Runnable() {
                 @Override
                 public void run() {
+                    ThreadChecker.checkIsValidThread(handler);
                     logger.d("onVideoTrackAdded");
                     videoTracks.add(videoTrack);
                     Listener listener = listenerReference.get();
@@ -109,12 +115,16 @@ public class Participant {
         public void onVideoTrackRemoved(final Participant participant,
                                         final VideoTrack videoTrack) {
             checkCallback(participant, videoTrack, "onVideoTrackRemoved");
+
+            // Release video track native memory on notifier
+            videoTrack.release();
+
             handler.post(new Runnable() {
                 @Override
                 public void run() {
+                    ThreadChecker.checkIsValidThread(handler);
                     logger.d("onVideoTrackRemoved");
                     videoTracks.remove(videoTrack);
-                    videoTrack.release();
                     Listener listener = listenerReference.get();
 
                     if (listener != null) {
@@ -131,6 +141,7 @@ public class Participant {
             handler.post(new Runnable() {
                 @Override
                 public void run() {
+                    ThreadChecker.checkIsValidThread(handler);
                     logger.d("onAudioTrackEnabled");
                     audioTrack.setEnabled(true);
                     Listener listener = listenerReference.get();
@@ -149,6 +160,7 @@ public class Participant {
             handler.post(new Runnable() {
                 @Override
                 public void run() {
+                    ThreadChecker.checkIsValidThread(handler);
                     logger.d("onAudioTrackDisabled");
                     audioTrack.setEnabled(false);
                     Listener listener = listenerReference.get();
@@ -167,6 +179,7 @@ public class Participant {
             handler.post(new Runnable() {
                 @Override
                 public void run() {
+                    ThreadChecker.checkIsValidThread(handler);
                     logger.d("onVideoTrackEnabled");
                     videoTrack.setEnabled(true);
                     Listener listener = listenerReference.get();
@@ -185,6 +198,7 @@ public class Participant {
             handler.post(new Runnable() {
                 @Override
                 public void run() {
+                    ThreadChecker.checkIsValidThread(handler);
                     logger.d("onVideoTrackDisabled");
                     videoTrack.setEnabled(false);
                     Listener listener = listenerReference.get();
@@ -325,7 +339,9 @@ public class Participant {
 
         /**
          * This method notifies the listener that a {@link Participant} has removed
-         * an {@link VideoTrack} from this {@link Room}.
+         * an {@link VideoTrack} from this {@link Room}. All {@link VideoRenderer}s of the
+         * video track have been removed before receiving this callback prevent native memory
+         * leaks.
          *
          * @param participant The participant object associated with this video track.
          * @param videoTrack The video track removed from this room.
