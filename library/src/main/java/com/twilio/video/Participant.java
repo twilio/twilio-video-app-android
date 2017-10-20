@@ -340,8 +340,8 @@ public class Participant {
         /**
          * This method notifies the listener that a {@link Participant} has removed
          * an {@link VideoTrack} from this {@link Room}. All {@link VideoRenderer}s of the
-         * video track have been removed before receiving this callback prevent native memory
-         * leaks.
+         * video track have been removed before receiving this callback to prevent native
+         * memory leaks.
          *
          * @param participant The participant object associated with this video track.
          * @param videoTrack The video track removed from this room.
