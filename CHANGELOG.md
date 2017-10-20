@@ -84,6 +84,7 @@ Improvements
 
 - Moved pre-defined aspect ratios from `VideoConstraints` class to `AspectRatio` class.
 - Local audio, video, and data tracks return their track IDs for `getName` if no name was specified.
+- Improved threading contract.
     
 Bug Fixes
 
