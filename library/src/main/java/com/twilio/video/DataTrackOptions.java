@@ -94,7 +94,9 @@ public class DataTrackOptions {
          */
         public DataTrackOptions build() {
             Preconditions.checkArgument(maxPacketLifeTime >= DEFAULT_MAX_PACKET_LIFE_TIME);
+            Preconditions.checkArgument(maxPacketLifeTime <= 65535);
             Preconditions.checkArgument(maxRetransmits >= DEFAULT_MAX_RETRANSMITS);
+            Preconditions.checkArgument(maxRetransmits <= 65535);
             Preconditions.checkState(maxRetransmits == DEFAULT_MAX_RETRANSMITS ||
                     maxPacketLifeTime == DEFAULT_MAX_PACKET_LIFE_TIME);
             return new DataTrackOptions(this);

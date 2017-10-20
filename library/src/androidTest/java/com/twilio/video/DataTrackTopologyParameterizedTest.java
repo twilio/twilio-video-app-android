@@ -359,6 +359,121 @@ public class DataTrackTopologyParameterizedTest extends BaseParticipantTest {
     }
 
     @Test
+    public void canSendMessageToParticipantAfterAnotherDisconnects() throws InterruptedException {
+        CallbackHelper.FakeParticipantListener participantListener =
+                new CallbackHelper.FakeParticipantListener();
+        aliceRoomListener.onParticipantConnectedLatch = new CountDownLatch(1);
+        bobRoomListener.onParticipantConnectedLatch = new CountDownLatch(1);
+        participantListener.onSubscribedToDataTrackLatch = new CountDownLatch(2);
+        participantListener.onDataTrackPublishedLatch = new CountDownLatch(2);
+        CallbackHelper.FakeRemoteDataTrackListener aliceDataTrackListener =
+                new CallbackHelper.FakeRemoteDataTrackListener();
+        CallbackHelper.FakeRemoteDataTrackListener bobDataTrackListener =
+                new CallbackHelper.FakeRemoteDataTrackListener();
+
+        // Connect charlie
+        String charlieToken = CredentialsUtils.getAccessToken(Constants.PARTICIPANT_CHARLIE,
+                topology);
+        ConnectOptions charlieConnectOptions = new ConnectOptions.Builder(charlieToken)
+                .roomName(testRoomName)
+                .build();
+        charlieRoom = connect(charlieConnectOptions, charlieRoomListener);
+
+        // Alice and Bob wait to see charlie connected
+        assertTrue(aliceRoomListener.onParticipantConnectedLatch.await(20, TimeUnit.SECONDS));
+        assertTrue(bobRoomListener.onParticipantConnectedLatch.await(20, TimeUnit.SECONDS));
+        RemoteParticipant charlieAliceRemoteParticipant =
+                getRemoteParticipant(Constants.PARTICIPANT_CHARLIE, aliceRoom);
+        charlieAliceRemoteParticipant.setListener(participantListener);
+        RemoteParticipant charlieBobRemoteParticipant =
+                getRemoteParticipant(Constants.PARTICIPANT_CHARLIE, bobRoom);
+        charlieBobRemoteParticipant.setListener(participantListener);
+
+        // Charlie publish data track
+        LocalParticipant charlieLocalParticipant = charlieRoom.getLocalParticipant();
+        charlieLocalDataTrack = LocalDataTrack.create(mediaTestActivity);
+        charlieLocalParticipant.publishTrack(charlieLocalDataTrack);
+        assertTrue(participantListener.onDataTrackPublishedLatch.await(20, TimeUnit.SECONDS));
+        assertTrue(participantListener.onSubscribedToDataTrackLatch.await(20, TimeUnit.SECONDS));
+
+        // Alice and bob observer charlie remote data track
+        charlieAliceRemoteParticipant.getRemoteDataTracks().get(0).getRemoteDataTrack()
+                .setListener(aliceDataTrackListener);
+        charlieBobRemoteParticipant.getRemoteDataTracks().get(0).getRemoteDataTrack()
+                .setListener(bobDataTrackListener);
+
+        String firstExpectedMessage = "Hello";
+        ByteBuffer firstExpectedBufferMessage = ByteBuffer.wrap(new byte[] { 0x0, 0x1, 0x2, 0x3 });
+        String secondExpectedMessage = "DataTrack!";
+        ByteBuffer secondExpectedBufferMessage = ByteBuffer.wrap(new byte[] { 0xa, 0xb, 0xc, 0xd });
+        aliceDataTrackListener.onStringMessageLatch = new CountDownLatch(2);
+        aliceDataTrackListener.onBufferMessageLatch = new CountDownLatch(2);
+        bobDataTrackListener.onStringMessageLatch = new CountDownLatch(2);
+        bobDataTrackListener.onBufferMessageLatch = new CountDownLatch(2);
+
+        // Charlie sends messages
+        charlieLocalDataTrack.send(firstExpectedMessage);
+        charlieLocalDataTrack.send(firstExpectedBufferMessage);
+        charlieLocalDataTrack.send(secondExpectedMessage);
+        charlieLocalDataTrack.send(secondExpectedBufferMessage);
+
+        // Validate all messages were received
+        assertTrue(aliceDataTrackListener.onStringMessageLatch.await(20, TimeUnit.SECONDS));
+        assertTrue(aliceDataTrackListener.onBufferMessageLatch.await(20, TimeUnit.SECONDS));
+        assertTrue(bobDataTrackListener.onStringMessageLatch.await(20, TimeUnit.SECONDS));
+        assertTrue(bobDataTrackListener.onBufferMessageLatch.await(20, TimeUnit.SECONDS));
+
+        // Validate all messages received are correct
+        assertEquals(Integer.valueOf(1), aliceDataTrackListener.messages.get(0).first);
+        assertEquals(firstExpectedMessage, aliceDataTrackListener.messages.get(0).second);
+        assertEquals(Integer.valueOf(2), aliceDataTrackListener.bufferMessages.get(0).first);
+        assertArrayEquals(firstExpectedBufferMessage.array(),
+                aliceDataTrackListener.bufferMessages.get(0).second.array());
+        assertEquals(Integer.valueOf(3), aliceDataTrackListener.messages.get(1).first);
+        assertEquals(secondExpectedMessage, aliceDataTrackListener.messages.get(1).second);
+        assertEquals(Integer.valueOf(4), aliceDataTrackListener.bufferMessages.get(1).first);
+        assertArrayEquals(secondExpectedBufferMessage.array(),
+                aliceDataTrackListener.bufferMessages.get(1).second.array());
+        assertEquals(Integer.valueOf(1), bobDataTrackListener.messages.get(0).first);
+        assertEquals(firstExpectedMessage, bobDataTrackListener.messages.get(0).second);
+        assertEquals(Integer.valueOf(2), bobDataTrackListener.bufferMessages.get(0).first);
+        assertArrayEquals(firstExpectedBufferMessage.array(),
+                bobDataTrackListener.bufferMessages.get(0).second.array());
+        assertEquals(Integer.valueOf(3), bobDataTrackListener.messages.get(1).first);
+        assertEquals(secondExpectedMessage, bobDataTrackListener.messages.get(1).second);
+        assertEquals(Integer.valueOf(4), bobDataTrackListener.bufferMessages.get(1).first);
+        assertArrayEquals(secondExpectedBufferMessage.array(),
+                bobDataTrackListener.bufferMessages.get(1).second.array());
+
+        // Alice disconnects
+        disconnect(aliceRoom, aliceRoomListener);
+
+        // Charlie sends same messages
+        bobDataTrackListener.onStringMessageLatch = new CountDownLatch(2);
+        bobDataTrackListener.onBufferMessageLatch = new CountDownLatch(2);
+        charlieLocalDataTrack.send(firstExpectedMessage);
+        charlieLocalDataTrack.send(firstExpectedBufferMessage);
+        charlieLocalDataTrack.send(secondExpectedMessage);
+        charlieLocalDataTrack.send(secondExpectedBufferMessage);
+
+        // Validate all messages were received by Bob
+        assertTrue(bobDataTrackListener.onStringMessageLatch.await(20, TimeUnit.SECONDS));
+        assertTrue(bobDataTrackListener.onBufferMessageLatch.await(20, TimeUnit.SECONDS));
+
+        // Validate all messages Bob received are correct
+        assertEquals(Integer.valueOf(5), bobDataTrackListener.messages.get(2).first);
+        assertEquals(firstExpectedMessage, bobDataTrackListener.messages.get(2).second);
+        assertEquals(Integer.valueOf(6), bobDataTrackListener.bufferMessages.get(2).first);
+        assertArrayEquals(firstExpectedBufferMessage.array(),
+                bobDataTrackListener.bufferMessages.get(2).second.array());
+        assertEquals(Integer.valueOf(7), bobDataTrackListener.messages.get(3).first);
+        assertEquals(secondExpectedMessage, bobDataTrackListener.messages.get(3).second);
+        assertEquals(Integer.valueOf(8), bobDataTrackListener.bufferMessages.get(3).first);
+        assertArrayEquals(secondExpectedBufferMessage.array(),
+                bobDataTrackListener.bufferMessages.get(3).second.array());
+    }
+
+    @Test
     public void canSendAfterUnpublished() throws InterruptedException {
         publishDataTrack();
         String expectedMessage = "Hello";
@@ -375,8 +490,12 @@ public class DataTrackTopologyParameterizedTest extends BaseParticipantTest {
         assertArrayEquals(expectedBufferMessage.array(),
                 dataTrackListener.bufferMessages.get(0).second.array());
         bobLocalParticipant.unpublishTrack(bobLocalDataTrack);
-        bobLocalDataTrack.send(expectedMessage);
-        bobLocalDataTrack.send(expectedBufferMessage);
+
+        // Try to send messages after unpublishing
+        for (int i = 0 ; i < 5 ; i++) {
+            bobLocalDataTrack.send(expectedMessage);
+            bobLocalDataTrack.send(expectedBufferMessage);
+        }
     }
 
     @Test

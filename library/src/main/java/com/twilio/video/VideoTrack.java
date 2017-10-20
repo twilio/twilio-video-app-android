@@ -111,7 +111,8 @@ public abstract class VideoTrack implements Track {
     }
 
     /**
-     * Returns the video track name. An empty string is returned if no track name was specified.
+     * Returns the video track name. A pseudo random string is returned if no track name was
+     * specified.
      */
     @Override
     public String getName() {

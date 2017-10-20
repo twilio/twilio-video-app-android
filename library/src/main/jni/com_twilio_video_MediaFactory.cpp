@@ -372,7 +372,7 @@ JNIEXPORT jobject JNICALL Java_com_twilio_video_MediaFactory_nativeCreateDataTra
             .setName(name)
             .build();
     std::shared_ptr<twilio::media::LocalDataTrack> data_track =
-            media_factory->createDataTrack(&data_track_options, name);
+            media_factory->createDataTrack(data_track_options, name);
 
     return createJavaLocalDataTrack(data_track, j_media_factory);
 }

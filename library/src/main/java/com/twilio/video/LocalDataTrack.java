@@ -93,9 +93,12 @@ public class LocalDataTrack extends DataTrack {
     }
 
     /**
-     * Send binary message.
+     * Send binary message. The maximum amount of data that can be sent cross-platform in a single
+     * invocation of send() is 16KiB. You could possibly send more when both the sender and the
+     * receiver are on the same platform.
      *
      * @param messageBuffer binary message
+     * @see <a href="https://developer.mozilla.org/en-US/docs/Web/API/WebRTC_API/Using_data_channels#Understanding_message_size_limits">Understanding Message Size Limits</a>
      */
     public synchronized void send(@NonNull ByteBuffer messageBuffer) {
         Preconditions.checkState(!isReleased(), "Cannot send message after data track is released");
@@ -106,9 +109,12 @@ public class LocalDataTrack extends DataTrack {
     }
 
     /**
-     * Send string message.
+     * Send string message. The maximum amount of data that can be sent cross-platform in a single
+     * invocation of send() is 16KiB. You could possibly send more when both the sender and the
+     * receiver are on the same platform.
      *
      * @param message string message.
+     * @see <a href="https://developer.mozilla.org/en-US/docs/Web/API/WebRTC_API/Using_data_channels#Understanding_message_size_limits">Understanding Message Size Limits</a>
      */
     public synchronized void send(@NonNull String message) {
         Preconditions.checkState(!isReleased(), "Cannot send message after data track is released");
@@ -133,6 +139,14 @@ public class LocalDataTrack extends DataTrack {
             logger.e("Local data track is not enabled because it has been released");
             return false;
         }
+    }
+
+    /**
+     * Returns the local data track name. {@link #trackId} is returned if no name was specified.
+     */
+    @Override
+    public String getName() {
+        return super.getName();
     }
 
     /**

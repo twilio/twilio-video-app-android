@@ -54,8 +54,8 @@ public abstract class DataTrack implements Track {
     }
 
     /**
-     * Returns the data track name. An empty string is returned if no track name was specified.
-     * @return
+     * Returns the data track name. A pseudo random string is returned if no track name was
+     * specified.
      */
     @Override
     public String getName() {
@@ -78,7 +78,7 @@ public abstract class DataTrack implements Track {
 
     /**
      * Returns the maximum period of time in milliseconds in which retransmissions will be sent.
-     * Returns {@code 0} if {@link DataTrackOptions#DEFAULT_MAX_PACKET_LIFE_TIME} was specified
+     * Returns {@code 65535} if {@link DataTrackOptions#DEFAULT_MAX_PACKET_LIFE_TIME} was specified
      * when building the data track.
      */
     public int getMaxPacketLifeTime() {
@@ -87,7 +87,7 @@ public abstract class DataTrack implements Track {
 
     /**
      * Returns the maximum number of times to transmit a message before giving up.
-     * Returns {@code 0} if {@link DataTrackOptions#DEFAULT_MAX_RETRANSMITS} was specified
+     * Returns {@code 65535} if {@link DataTrackOptions#DEFAULT_MAX_RETRANSMITS} was specified
      * when building the data track.
      */
     public int getMaxRetransmits() {

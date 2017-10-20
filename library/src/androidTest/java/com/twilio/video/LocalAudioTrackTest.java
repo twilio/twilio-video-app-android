@@ -102,20 +102,18 @@ public class LocalAudioTrackTest {
     @Test
     public void canCreateAudioTrackWithNullName() {
         String nullName = null;
-        String expectedName = "";
         localAudioTrack = LocalAudioTrack.create(mediaTestActivity, true, nullName);
         assertNotNull(localAudioTrack);
-        assertEquals(expectedName, localAudioTrack.getName());
+        assertEquals(localAudioTrack.getTrackId(), localAudioTrack.getName());
     }
 
     @Test
     public void canCreateAudioTrackWithEmptyName() {
         final String emptyName = "";
-        final String expectedName = "";
         localAudioTrack = LocalAudioTrack.create(mediaTestActivity, true, emptyName);
 
         assertNotNull(localAudioTrack);
-        assertEquals(expectedName, localAudioTrack.getName());
+        assertEquals(localAudioTrack.getTrackId(), localAudioTrack.getName());
     }
 
     @Test

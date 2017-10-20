@@ -96,22 +96,20 @@ public class LocalVideoTrackTest {
     @Test
     public void canCreateVideoTrackWithNullName() {
         String nullName = null;
-        String expectedName = "";
         localVideoTrack = LocalVideoTrack.create(context, true, fakeVideoCapturer, nullName);
 
         assertNotNull(localVideoTrack);
-        assertEquals(expectedName, localVideoTrack.getName());
+        assertEquals(localVideoTrack.getTrackId(), localVideoTrack.getName());
         assertTrue(fakeVideoCapturer.isStarted());
     }
 
     @Test
     public void canCreateVideoTrackWithEmptyName() {
         String emptyName = "";
-        String expectedName = "";
         localVideoTrack = LocalVideoTrack.create(context, true, fakeVideoCapturer, emptyName);
 
         assertNotNull(localVideoTrack);
-        assertEquals(expectedName, localVideoTrack.getName());
+        assertEquals(localVideoTrack.getTrackId(), localVideoTrack.getName());
         assertTrue(fakeVideoCapturer.isStarted());
     }
 

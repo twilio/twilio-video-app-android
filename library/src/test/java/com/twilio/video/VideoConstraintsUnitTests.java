@@ -18,6 +18,7 @@ package com.twilio.video;
 
 import org.junit.Test;
 
+import static com.twilio.video.AspectRatio.ASPECT_RATIO_4_3;
 import static junit.framework.Assert.*;
 
 public class VideoConstraintsUnitTests {
@@ -62,14 +63,14 @@ public class VideoConstraintsUnitTests {
                 .maxVideoDimensions(VideoDimensions.HD_720P_VIDEO_DIMENSIONS)
                 .minFps(VideoConstraints.FPS_10)
                 .maxFps(VideoConstraints.FPS_24)
-                .aspectRatio(VideoConstraints.ASPECT_RATIO_4_3)
+                .aspectRatio(ASPECT_RATIO_4_3)
                 .build();
 
         assertEquals(VideoDimensions.CIF_VIDEO_DIMENSIONS, videoConstraints.getMinVideoDimensions());
         assertEquals(VideoDimensions.HD_720P_VIDEO_DIMENSIONS, videoConstraints.getMaxVideoDimensions());
         assertEquals(VideoConstraints.FPS_10, videoConstraints.getMinFps());
         assertEquals(VideoConstraints.FPS_24, videoConstraints.getMaxFps());
-        assertEquals(VideoConstraints.ASPECT_RATIO_4_3, videoConstraints.getAspectRatio());
+        assertEquals(ASPECT_RATIO_4_3, videoConstraints.getAspectRatio());
     }
 
     @Test(expected = NullPointerException.class)

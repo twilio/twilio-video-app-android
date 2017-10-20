@@ -17,21 +17,28 @@
 package com.twilio.video;
 
 import org.junit.Test;
+import org.junit.runner.RunWith;
+
+import junitparams.JUnitParamsRunner;
+import junitparams.Parameters;
 
 import static org.junit.Assert.assertEquals;
 
+@RunWith(JUnitParamsRunner.class)
 public class DataTrackOptionsUnitTest {
     @Test(expected = IllegalArgumentException.class)
-    public void invalidMaxPacketLifeShouldFail() {
+    @Parameters({"-10", "65536"})
+    public void invalidMaxPacketLifeShouldFail(int maxPacketLifeTime) {
         new DataTrackOptions.Builder()
-                .maxPacketLifeTime(-10)
+                .maxPacketLifeTime(maxPacketLifeTime)
                 .build();
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void invalidMaxRetransmitsShouldFail() {
+    @Parameters({"-10", "65536"})
+    public void invalidMaxRetransmitsShouldFail(int maxRetransmits) {
         new DataTrackOptions.Builder()
-                .maxRetransmits(-10)
+                .maxRetransmits(maxRetransmits)
                 .build();
     }
 

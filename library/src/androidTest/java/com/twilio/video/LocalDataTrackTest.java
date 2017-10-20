@@ -24,7 +24,6 @@ import android.support.test.runner.AndroidJUnit4;
 
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -63,8 +62,8 @@ public class LocalDataTrackTest {
         assertFalse(localDataTrack.getTrackId().isEmpty());
         assertEquals(true, localDataTrack.isEnabled());
         assertEquals(true, localDataTrack.isOrdered());
-        assertEquals(0, localDataTrack.getMaxPacketLifeTime());
-        assertEquals(0, localDataTrack.getMaxRetransmits());
+        assertEquals(65535, localDataTrack.getMaxPacketLifeTime());
+        assertEquals(65535, localDataTrack.getMaxRetransmits());
     }
 
     @Test
@@ -79,21 +78,19 @@ public class LocalDataTrackTest {
     @Test
     public void canCreateDataTrackWithNullName() {
         String nullName = null;
-        String expectedName = "";
         localDataTrack = LocalDataTrack.create(context, nullName);
 
         assertNotNull(localDataTrack);
-        assertEquals(expectedName, localDataTrack.getName());
+        assertEquals(localDataTrack.getTrackId(), localDataTrack.getName());
     }
 
     @Test
     public void canCreateDataTrackWithEmptyName() {
         String emptyName = "";
-        String expectedName = "";
         localDataTrack = LocalDataTrack.create(context, emptyName);
 
         assertNotNull(localDataTrack);
-        assertEquals(expectedName, localDataTrack.getName());
+        assertEquals(localDataTrack.getTrackId(), localDataTrack.getName());
     }
 
     @Test

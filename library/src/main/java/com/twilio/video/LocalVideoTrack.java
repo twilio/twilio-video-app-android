@@ -218,6 +218,14 @@ public class LocalVideoTrack extends VideoTrack {
     }
 
     /**
+     * Returns the local video track name. {@link #trackId} is returned if no name was specified.
+     */
+    @Override
+    public String getName() {
+        return super.getName();
+    }
+
+    /**
      * This video track id.
      *
      * @return track id.

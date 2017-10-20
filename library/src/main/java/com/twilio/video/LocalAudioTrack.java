@@ -123,6 +123,14 @@ public class LocalAudioTrack extends AudioTrack {
     }
 
     /**
+     * Returns the local audio track name. {@link #trackId} is returned if no name was specified.
+     */
+    @Override
+    public String getName() {
+        return super.getName();
+    }
+
+    /**
      * This audio track id.
      *
      * @return track id.
