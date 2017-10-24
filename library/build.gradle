@@ -215,6 +215,21 @@ uploadArchives {
     }
 }
 
+task androidJavadocsJar(type: Jar, dependsOn: createJavadocs) {
+    classifier = 'javadoc'
+    from createJavadocs.destinationDir
+}
+
+task androidSourcesJar(type: Jar) {
+    classifier = 'sources'
+    from android.sourceSets.main.java.source
+}
+
+artifacts {
+    archives androidSourcesJar
+    archives androidJavadocsJar
+}
+
 /*
  * Localize the JNI_OnLoad and JNI_OnUnLoad symbol in libwebrtc-jni.a to prevent conflicts with
  * initialization
