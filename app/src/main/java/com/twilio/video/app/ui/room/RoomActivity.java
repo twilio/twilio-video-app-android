@@ -1013,16 +1013,31 @@ public class RoomActivity extends BaseActivity {
         remoteParticipant.setListener(listener);
         boolean muted = remoteParticipant.getRemoteAudioTracks().size() <= 0 ||
                 !remoteParticipant.getRemoteAudioTracks().get(0).isTrackEnabled();
+        List<RemoteVideoTrackPublication> remoteVideoTrackPublications =
+                remoteParticipant.getRemoteVideoTracks();
 
-        for (RemoteVideoTrackPublication remoteVideoTrackPublication :
-                remoteParticipant.getRemoteVideoTracks()) {
+        if (remoteVideoTrackPublications.isEmpty()) {
+            /*
+             * Add placeholder UI by passing null video track for a participant that is not
+             * sharing any video tracks.
+             */
             addParticipantVideoTrack(remoteParticipant.getSid(),
                     remoteParticipant.getIdentity(),
-                    remoteVideoTrackPublication.getRemoteVideoTrack(),
+                    null,
                     muted,
                     renderAsPrimary);
-            renderAsPrimary = false;
+        } else {
+            for (RemoteVideoTrackPublication remoteVideoTrackPublication :
+                    remoteVideoTrackPublications) {
+                addParticipantVideoTrack(remoteParticipant.getSid(),
+                        remoteParticipant.getIdentity(),
+                        remoteVideoTrackPublication.getRemoteVideoTrack(),
+                        muted,
+                        renderAsPrimary);
+                renderAsPrimary = false;
+            }
         }
+
     }
 
     private void addParticipantVideoTrack(String participantSid,
