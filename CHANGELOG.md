@@ -5,6 +5,8 @@ The Twilio Programmable Video SDKs use [Semantic Versioning](http://www.semver.o
 Improvements
 
 - Include javadoc and sources jar with artifacts published to Bintray. 
+- Updated to Build Tools 26.0.2
+- Support annotations and Relinker no longer exposed at compile time
     
 Known issues
 
