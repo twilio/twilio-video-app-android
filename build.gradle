@@ -1,10 +1,8 @@
 buildscript {
     apply from: "$rootProject.projectDir/common.gradle"
     repositories {
+        google()
         jcenter()
-        maven {
-            url "https://maven.google.com"
-        }
         mavenCentral()
         maven {
             url  "https://twilio.bintray.com/releases"
@@ -25,10 +23,12 @@ buildscript {
         }
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:2.3.3'
+        classpath 'com.android.tools.build:gradle:3.0.0'
         classpath 'com.jakewharton:butterknife-gradle-plugin:8.4.0'
-        classpath 'com.google.gms:google-services:3.0.0'
-        classpath 'com.google.firebase:firebase-plugins:1.0.5'
+        classpath 'com.google.gms:google-services:3.1.0'
+        classpath ('com.google.firebase:firebase-plugins:1.1.0-alpha1') {
+            exclude group: 'com.google.guava', module: 'guava-jdk5'
+        }
         classpath 'de.felixschulze.gradle:gradle-hockeyapp-plugin:3.6'
     }
 }
@@ -36,10 +36,8 @@ buildscript {
 allprojects {
     apply from: "$rootProject.projectDir/common.gradle"
     repositories {
+        google()
         jcenter()
-        maven {
-            url "https://maven.google.com"
-        }
         mavenCentral()
         maven {
             url  "https://twilio.bintray.com/releases"
