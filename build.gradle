@@ -56,6 +56,9 @@ allprojects {
                 password "${getBintrayPassword()}"
             }
         }
+        maven {
+            url 'https://jitpack.io'
+        }
     }
 }
 
@@ -458,6 +461,7 @@ task firebaseTestLabCheckLibraryCamera(type: Exec) {
             'run',
             '--project',
             'video-app-79418',
+            '--async',
             'video-app-args.yaml:library-camera-tests'
 }
 

@@ -42,7 +42,7 @@ import static org.junit.Assume.assumeFalse;
 @RunWith(Parameterized.class)
 @LargeTest
 public class VideoTrackTopologyParameterizedTest extends BaseParticipantTest {
-    private static final int VIDEO_TRACK_TEST_DELAY_MS = 3000;
+    private static final int VIDEO_TRACK_TEST_DELAY_MS = 10000;
 
     @Parameterized.Parameters(name = "{0}")
     public static Iterable<Object[]> data() {
@@ -85,11 +85,6 @@ public class VideoTrackTopologyParameterizedTest extends BaseParticipantTest {
 
     @Test
     public void canAddAndRemoveRenderer() throws InterruptedException {
-        /*
-         * TODO: GSDK-1152 skipping test for GROUP only because it is flaky.
-         * Should be investigated after GA.
-         */
-        assumeFalse(topology == Topology.GROUP);
         CallbackHelper.FakeParticipantListener participantListener =
                 new CallbackHelper.FakeParticipantListener();
         participantListener.onVideoTrackAddedLatch = new CountDownLatch(1);

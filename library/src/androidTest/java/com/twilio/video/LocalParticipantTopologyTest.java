@@ -68,6 +68,9 @@ public class LocalParticipantTopologyTest extends BaseClientTest {
     private String identity;
     private String token;
     private String roomName;
+    private Room room;
+    private final CallbackHelper.FakeRoomListener roomListener =
+            new CallbackHelper.FakeRoomListener();
     private LocalAudioTrack localAudioTrack;
     private LocalVideoTrack localVideoTrack;
     private Topology topology;
@@ -87,7 +90,12 @@ public class LocalParticipantTopologyTest extends BaseClientTest {
     }
 
     @After
-    public void teardown() {
+    public void teardown() throws InterruptedException {
+        if (room != null && room.getState() != RoomState.DISCONNECTED) {
+            roomListener.onDisconnectedLatch = new CountDownLatch(1);
+            room.disconnect();
+            assertTrue(roomListener.onDisconnectedLatch.await(20, TimeUnit.SECONDS));
+        }
         if (localAudioTrack != null) {
             localAudioTrack.release();
         }
@@ -99,15 +107,13 @@ public class LocalParticipantTopologyTest extends BaseClientTest {
 
     @Test
     public void shouldAllowAddingAndRemovingTracksWhileConnected() throws InterruptedException {
-        CallbackHelper.FakeRoomListener roomListener = new CallbackHelper.FakeRoomListener();
         FakeVideoCapturer fakeVideoCapturer = new FakeVideoCapturer();
         roomListener.onConnectedLatch = new CountDownLatch(1);
-        roomListener.onDisconnectedLatch = new CountDownLatch(1);
 
         ConnectOptions connectOptions = new ConnectOptions.Builder(token)
                 .roomName(roomName)
                 .build();
-        Room room = Video.connect(mediaTestActivity, connectOptions, roomListener);
+        room = Video.connect(mediaTestActivity, connectOptions, roomListener);
         assertTrue(roomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
         LocalParticipant localParticipant = room.getLocalParticipant();
         assertNotNull(localParticipant);
@@ -121,16 +127,12 @@ public class LocalParticipantTopologyTest extends BaseClientTest {
         // Now remove them
         assertTrue(localParticipant.removeAudioTrack(localAudioTrack));
         assertTrue(localParticipant.removeVideoTrack(localVideoTrack));
-        room.disconnect();
-        assertTrue(roomListener.onDisconnectedLatch.await(20, TimeUnit.SECONDS));
     }
 
     @Test
     public void shouldHaveTracksWhenConnected() throws InterruptedException {
-        CallbackHelper.FakeRoomListener roomListener = new CallbackHelper.FakeRoomListener();
         FakeVideoCapturer fakeVideoCapturer = new FakeVideoCapturer();
         roomListener.onConnectedLatch = new CountDownLatch(1);
-        roomListener.onDisconnectedLatch = new CountDownLatch(1);
 
         localAudioTrack = LocalAudioTrack.create(mediaTestActivity, true);
         localVideoTrack = LocalVideoTrack.create(mediaTestActivity, true, fakeVideoCapturer);
@@ -140,7 +142,7 @@ public class LocalParticipantTopologyTest extends BaseClientTest {
                 .videoTracks(Collections.singletonList(localVideoTrack))
                 .roomName(roomName)
                 .build();
-        Room room = Video.connect(mediaTestActivity, connectOptions, roomListener);
+        room = Video.connect(mediaTestActivity, connectOptions, roomListener);
         assertTrue(roomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
         LocalParticipant localParticipant = room.getLocalParticipant();
         assertNotNull(localParticipant);
@@ -150,42 +152,33 @@ public class LocalParticipantTopologyTest extends BaseClientTest {
 
         assertEquals(localAudioTrack, localParticipant.getAudioTracks().get(0));
         assertEquals(localVideoTrack, localParticipant.getVideoTracks().get(0));
-
-        room.disconnect();
-        assertTrue(roomListener.onDisconnectedLatch.await(20, TimeUnit.SECONDS));
     }
 
     @Test
     public void shouldHaveIdentityAndNonNullSidOnceConnected() throws InterruptedException {
-        CallbackHelper.FakeRoomListener roomListener = new CallbackHelper.FakeRoomListener();
         roomListener.onConnectedLatch = new CountDownLatch(1);
-        roomListener.onDisconnectedLatch = new CountDownLatch(1);
 
         ConnectOptions connectOptions = new ConnectOptions.Builder(token)
                 .roomName(roomName)
                 .build();
-        Room room = Video.connect(mediaTestActivity, connectOptions, roomListener);
+        room = Video.connect(mediaTestActivity, connectOptions, roomListener);
         assertTrue(roomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
         LocalParticipant localParticipant = room.getLocalParticipant();
         assertNotNull(localParticipant);
 
         assertEquals(identity, localParticipant.getIdentity());
         assertNotNull(localParticipant.getSid());
-
-        room.disconnect();
-        assertTrue(roomListener.onDisconnectedLatch.await(20, TimeUnit.SECONDS));
     }
 
     @Test
     public void shouldHaveIdentityAndNonNullSidUponDisconnect() throws InterruptedException {
-        CallbackHelper.FakeRoomListener roomListener = new CallbackHelper.FakeRoomListener();
         roomListener.onConnectedLatch = new CountDownLatch(1);
         roomListener.onDisconnectedLatch = new CountDownLatch(1);
 
         ConnectOptions connectOptions = new ConnectOptions.Builder(token)
                 .roomName(roomName)
                 .build();
-        Room room = Video.connect(mediaTestActivity, connectOptions, roomListener);
+        room = Video.connect(mediaTestActivity, connectOptions, roomListener);
         assertTrue(roomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
         LocalParticipant localParticipant = room.getLocalParticipant();
         assertNotNull(localParticipant);
@@ -198,14 +191,13 @@ public class LocalParticipantTopologyTest extends BaseClientTest {
 
     @Test
     public void shouldHaveIdentityAndNonNullSidOnceDisconnected() throws InterruptedException {
-        CallbackHelper.FakeRoomListener roomListener = new CallbackHelper.FakeRoomListener();
         roomListener.onConnectedLatch = new CountDownLatch(1);
         roomListener.onDisconnectedLatch = new CountDownLatch(1);
 
         ConnectOptions connectOptions = new ConnectOptions.Builder(token)
                 .roomName(roomName)
                 .build();
-        Room room = Video.connect(mediaTestActivity, connectOptions, roomListener);
+        room = Video.connect(mediaTestActivity, connectOptions, roomListener);
         assertTrue(roomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
         LocalParticipant localParticipant = room.getLocalParticipant();
         assertNotNull(localParticipant);
@@ -218,14 +210,13 @@ public class LocalParticipantTopologyTest extends BaseClientTest {
 
     @Test
     public void shouldNotAddAudioTrackAfterDisconnect() throws InterruptedException {
-        CallbackHelper.FakeRoomListener roomListener = new CallbackHelper.FakeRoomListener();
         roomListener.onConnectedLatch = new CountDownLatch(1);
         roomListener.onDisconnectedLatch = new CountDownLatch(1);
 
         ConnectOptions connectOptions = new ConnectOptions.Builder(token)
                 .roomName(roomName)
                 .build();
-        Room room = Video.connect(mediaTestActivity, connectOptions, roomListener);
+        room = Video.connect(mediaTestActivity, connectOptions, roomListener);
         assertTrue(roomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
         LocalParticipant localParticipant = room.getLocalParticipant();
         assertNotNull(localParticipant);
@@ -239,14 +230,13 @@ public class LocalParticipantTopologyTest extends BaseClientTest {
 
     @Test
     public void shouldNotAddVideoTrackAfterDisconnect() throws InterruptedException {
-                CallbackHelper.FakeRoomListener roomListener = new CallbackHelper.FakeRoomListener();
         roomListener.onConnectedLatch = new CountDownLatch(1);
         roomListener.onDisconnectedLatch = new CountDownLatch(1);
 
         ConnectOptions connectOptions = new ConnectOptions.Builder(token)
                 .roomName(roomName)
                 .build();
-        Room room = Video.connect(mediaTestActivity, connectOptions, roomListener);
+        room = Video.connect(mediaTestActivity, connectOptions, roomListener);
         assertTrue(roomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
         LocalParticipant localParticipant = room.getLocalParticipant();
         assertNotNull(localParticipant);
@@ -260,14 +250,13 @@ public class LocalParticipantTopologyTest extends BaseClientTest {
 
     @Test
     public void shouldNotRemoveAudioTrackAfterDisconnect() throws InterruptedException {
-        CallbackHelper.FakeRoomListener roomListener = new CallbackHelper.FakeRoomListener();
         roomListener.onConnectedLatch = new CountDownLatch(1);
         roomListener.onDisconnectedLatch = new CountDownLatch(1);
 
         ConnectOptions connectOptions = new ConnectOptions.Builder(token)
                 .roomName(roomName)
                 .build();
-        Room room = Video.connect(mediaTestActivity, connectOptions, roomListener);
+        room = Video.connect(mediaTestActivity, connectOptions, roomListener);
         assertTrue(roomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
         LocalParticipant localParticipant = room.getLocalParticipant();
         assertNotNull(localParticipant);
@@ -282,14 +271,13 @@ public class LocalParticipantTopologyTest extends BaseClientTest {
 
     @Test
     public void shouldNotRemoveVideoTrackAfterDisconnect() throws InterruptedException {
-                CallbackHelper.FakeRoomListener roomListener = new CallbackHelper.FakeRoomListener();
         roomListener.onConnectedLatch = new CountDownLatch(1);
         roomListener.onDisconnectedLatch = new CountDownLatch(1);
 
         ConnectOptions connectOptions = new ConnectOptions.Builder(token)
                 .roomName(roomName)
                 .build();
-        Room room = Video.connect(mediaTestActivity, connectOptions, roomListener);
+        room = Video.connect(mediaTestActivity, connectOptions, roomListener);
         assertTrue(roomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
         LocalParticipant localParticipant = room.getLocalParticipant();
         assertNotNull(localParticipant);
