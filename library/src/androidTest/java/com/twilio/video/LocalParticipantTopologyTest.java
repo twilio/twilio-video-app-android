@@ -120,7 +120,6 @@ public class LocalParticipantTopologyTest extends BaseClientTest {
         localParticipantListener.onPublishedVideoTrackLatch = new CountDownLatch(1);
         localParticipantListener.onPublishedDataTrackLatch = new CountDownLatch(1);
         roomListener.onConnectedLatch = new CountDownLatch(1);
-        roomListener.onDisconnectedLatch = new CountDownLatch(1);
 
         ConnectOptions connectOptions = new ConnectOptions.Builder(token)
                 .roomName(roomName)
@@ -220,7 +219,6 @@ public class LocalParticipantTopologyTest extends BaseClientTest {
     @Test
     public void shouldHaveIdentityAndNonNullSidOnceConnected() throws InterruptedException {
         roomListener.onConnectedLatch = new CountDownLatch(1);
-        roomListener.onDisconnectedLatch = new CountDownLatch(1);
 
         ConnectOptions connectOptions = new ConnectOptions.Builder(token)
                 .roomName(roomName)

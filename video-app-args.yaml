@@ -23,7 +23,7 @@ library-instrumentation-tests:
     orientations: portrait
 
 library-camera-tests:
-    timeout: 5m
+    timeout: 10m
     type: instrumentation
     app: app/build/outputs/apk/internal/debug/app-internal-debug.apk
     test: library/build/outputs/apk/androidTest/debug/library-debug-androidTest.apk
@@ -43,7 +43,6 @@ library-camera-tests:
         - j7xelte
         - lt02wifi
         - m0
-        - mako
         - osprey_umts
         - p1
         - sailfish
@@ -66,6 +65,7 @@ library-camera-tests:
         # - SH-04H
         # - htc_m8
         # - hammerhead
+        # - mako
     os-version-ids:
         - 18
         - 19

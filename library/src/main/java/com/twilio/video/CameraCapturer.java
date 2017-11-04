@@ -622,36 +622,46 @@ public class CameraCapturer implements VideoCapturer {
      */
     private byte[] alignPicture(Camera.CameraInfo info, byte[] pictureData) {
         Bitmap bitmap = BitmapFactory.decodeByteArray(pictureData, 0, pictureData.length);
-        int degree = getFrameOrientation(info);
-        Matrix matrix = new Matrix();
 
-        // Compensate for front camera mirroring
-        if(cameraSource == CameraSource.FRONT_CAMERA) {
-            switch (degree) {
-                case 0:
-                case 180:
-                    matrix.setScale(-1, 1);
-                    break;
-                case 90:
-                case 270:
-                    matrix.setScale(1, -1);
-                    break;
-                default:
-                    break;
+        /*
+         * Bitmap is not guaranteed to be decoded correctly. In this scenario the original picture
+         * data is returned without being aligned.
+         */
+        if (bitmap != null) {
+            int degree = getFrameOrientation(info);
+            Matrix matrix = new Matrix();
+
+            // Compensate for front camera mirroring
+            if (cameraSource == CameraSource.FRONT_CAMERA) {
+                switch (degree) {
+                    case 0:
+                    case 180:
+                        matrix.setScale(-1, 1);
+                        break;
+                    case 90:
+                    case 270:
+                        matrix.setScale(1, -1);
+                        break;
+                    default:
+                        break;
+                }
+
             }
 
+            // Apply rotation
+            matrix.postRotate(degree);
+            Bitmap rotatedBitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(),
+                    bitmap.getHeight(), matrix, true);
+
+            // Write to byte array
+            ByteArrayOutputStream stream = new ByteArrayOutputStream();
+            rotatedBitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream);
+
+            return stream.toByteArray();
+        } else {
+            logger.e("Failed to align picture data. Returning original image.");
+            return pictureData;
         }
-
-        // Apply rotation
-        matrix.postRotate(degree);
-        Bitmap rotatedBitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(),
-                bitmap.getHeight(), matrix, true);
-
-        // Write to byte array
-        ByteArrayOutputStream stream = new ByteArrayOutputStream();
-        rotatedBitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream);
-
-        return stream.toByteArray();
     }
 
     private int getFrameOrientation(Camera.CameraInfo info) {

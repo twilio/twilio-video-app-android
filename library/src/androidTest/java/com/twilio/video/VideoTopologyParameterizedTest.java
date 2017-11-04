@@ -69,12 +69,12 @@ public class VideoTopologyParameterizedTest extends BaseClientTest {
     private MediaTestActivity mediaTestActivity;
     private String token;
     private String roomName;
+    private Room room;
+    private CallbackHelper.FakeRoomListener roomListener;
     private LocalAudioTrack localAudioTrack;
     private LocalVideoTrack localVideoTrack;
     private LocalDataTrack localDataTrack;
-    private CallbackHelper.FakeRoomListener roomListener;
     private final Topology topology;
-    private Room room;
 
     public VideoTopologyParameterizedTest(Topology topology) {
         this.topology = topology;
