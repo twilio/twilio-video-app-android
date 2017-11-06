@@ -19,7 +19,7 @@ package com.twilio.video;
 /**
  * A representation of a media track.
  */
-interface Track {
+public interface Track {
     /**
      * Checks if the track is enabled.
      */

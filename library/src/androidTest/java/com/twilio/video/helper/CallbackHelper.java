@@ -19,9 +19,12 @@ package com.twilio.video.helper;
 
 import android.util.Pair;
 
+import com.twilio.video.LocalAudioTrack;
+import com.twilio.video.LocalDataTrack;
 import com.twilio.video.LocalDataTrackPublication;
 import com.twilio.video.LocalParticipant;
 import com.twilio.video.LocalAudioTrackPublication;
+import com.twilio.video.LocalVideoTrack;
 import com.twilio.video.LocalVideoTrackPublication;
 import com.twilio.video.RemoteAudioTrack;
 import com.twilio.video.RemoteAudioTrackPublication;
@@ -31,6 +34,7 @@ import com.twilio.video.RemoteParticipant;
 import com.twilio.video.RemoteVideoTrack;
 import com.twilio.video.RemoteVideoTrackPublication;
 import com.twilio.video.Room;
+import com.twilio.video.Track;
 import com.twilio.video.TwilioException;
 import com.twilio.video.StatsListener;
 import com.twilio.video.StatsReport;
@@ -38,8 +42,10 @@ import com.twilio.video.StatsReport;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -333,8 +339,13 @@ public class CallbackHelper {
 
     public static class FakeLocalParticipantListener implements LocalParticipant.Listener {
         public CountDownLatch onPublishedAudioTrackLatch;
+        public CountDownLatch onAudioTrackPublicationFailedLatch;
         public CountDownLatch onPublishedVideoTrackLatch;
+        public CountDownLatch onVideoTrackPublicationFailedLatch;
         public CountDownLatch onPublishedDataTrackLatch;
+        public CountDownLatch onDataTrackPublicationFailedLatch;
+        public final Map<Track, TwilioException> publicationFailures =
+                Collections.synchronizedMap(new HashMap<Track, TwilioException>());
         public final List<String> localParticipantEvents = new ArrayList<>();
 
         @Override
@@ -345,6 +356,15 @@ public class CallbackHelper {
         }
 
         @Override
+        public void onAudioTrackPublicationFailed(LocalParticipant localParticipant,
+                                                  LocalAudioTrack localAudioTrack,
+                                                  TwilioException twilioException) {
+            localParticipantEvents.add("onAudioTrackPublicationFailed");
+            publicationFailures.put(localAudioTrack, twilioException);
+            triggerLatch(onAudioTrackPublicationFailedLatch);
+        }
+
+        @Override
         public void onVideoTrackPublished(LocalParticipant localParticipant,
                                           LocalVideoTrackPublication localVideoTrackPublication) {
             localParticipantEvents.add("onVideoTrackPublished");
@@ -352,10 +372,28 @@ public class CallbackHelper {
         }
 
         @Override
+        public void onVideoTrackPublicationFailed(LocalParticipant localParticipant,
+                                                  LocalVideoTrack localVideoTrack,
+                                                  TwilioException twilioException) {
+            localParticipantEvents.add("onVideoTrackPublicationFailed");
+            publicationFailures.put(localVideoTrack, twilioException);
+            triggerLatch(onVideoTrackPublicationFailedLatch);
+        }
+
+        @Override
         public void onDataTrackPublished(LocalParticipant localParticipant,
                                          LocalDataTrackPublication localDataTrackPublication) {
             localParticipantEvents.add("onDataTrackPublished");
             triggerLatch(onPublishedDataTrackLatch);
+        }
+
+        @Override
+        public void onDataTrackPublicationFailed(LocalParticipant localParticipant,
+                                                 LocalDataTrack localDataTrack,
+                                                 TwilioException twilioException) {
+            localParticipantEvents.add("onDataTrackPublicationFailed");
+            publicationFailures.put(localDataTrack, twilioException);
+            triggerLatch(onDataTrackPublicationFailedLatch);
         }
     }
 

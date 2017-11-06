@@ -52,6 +52,8 @@ import static org.junit.Assume.assumeTrue;
 @RunWith(Parameterized.class)
 @LargeTest
 public class LocalParticipantTopologyTest extends BaseClientTest {
+    private static final int TRACK_NAME_LENGTH_MAX = 128;
+
     @Parameterized.Parameters(name = "{0}")
     public static Iterable<Object[]> data() {
         return Arrays.asList(new Object[][]{
@@ -73,8 +75,11 @@ public class LocalParticipantTopologyTest extends BaseClientTest {
             new CallbackHelper.FakeRoomListener();
     private Room room;
     private LocalAudioTrack localAudioTrack;
+    private LocalAudioTrack localAudioTrackTwo;
     private LocalVideoTrack localVideoTrack;
+    private LocalVideoTrack localVideoTrackTwo;
     private LocalDataTrack localDataTrack;
+    private LocalDataTrack localDataTrackTwo;
     private Topology topology;
 
     public LocalParticipantTopologyTest(Topology topology) {
@@ -101,11 +106,20 @@ public class LocalParticipantTopologyTest extends BaseClientTest {
         if (localAudioTrack != null) {
             localAudioTrack.release();
         }
+        if (localAudioTrackTwo != null) {
+            localAudioTrackTwo.release();
+        }
         if (localVideoTrack != null) {
             localVideoTrack.release();
         }
+        if (localVideoTrackTwo != null) {
+            localVideoTrackTwo.release();
+        }
         if (localDataTrack != null) {
             localDataTrack.release();
+        }
+        if (localDataTrackTwo != null) {
+            localDataTrackTwo.release();
         }
         assertTrue(MediaFactory.isReleased());
     }
@@ -501,5 +515,283 @@ public class LocalParticipantTopologyTest extends BaseClientTest {
         assertNotNull(localParticipant);
         localParticipant.setListener(localParticipantListener);
         localParticipant.setEncodingParameters(encodingParameters);
+    }
+
+    @Test
+    public void shouldFailToPublishTrackWithNameTooLong() throws InterruptedException {
+        CallbackHelper.FakeLocalParticipantListener localParticipantListener =
+                new CallbackHelper.FakeLocalParticipantListener();
+        roomListener.onConnectedLatch = new CountDownLatch(1);
+        localParticipantListener.onAudioTrackPublicationFailedLatch = new CountDownLatch(1);
+        localParticipantListener.onVideoTrackPublicationFailedLatch = new CountDownLatch(1);
+        localParticipantListener.onDataTrackPublicationFailedLatch = new CountDownLatch(1);
+
+        localAudioTrack = LocalAudioTrack.create(mediaTestActivity,
+                true,
+                random(TRACK_NAME_LENGTH_MAX + 1));
+        localVideoTrack = LocalVideoTrack.create(mediaTestActivity,
+                true,
+                new FakeVideoCapturer(),
+                random(TRACK_NAME_LENGTH_MAX + 1));
+        localDataTrack = LocalDataTrack.create(mediaTestActivity,
+                random(TRACK_NAME_LENGTH_MAX + 1));
+
+        ConnectOptions connectOptions = new ConnectOptions.Builder(token)
+                .audioTracks(Collections.singletonList(localAudioTrack))
+                .videoTracks(Collections.singletonList(localVideoTrack))
+                .dataTracks(Collections.singletonList(localDataTrack))
+                .roomName(roomName)
+                .build();
+        room = Video.connect(mediaTestActivity, connectOptions, roomListener);
+        assertTrue(roomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
+        LocalParticipant localParticipant = room.getLocalParticipant();
+        assertNotNull(localParticipant);
+        localParticipant.setListener(localParticipantListener);
+
+        /* FIXME: Callbacks are not received when connecting with tracks GSDK-1398
+        // Validate the callbacks
+        assertTrue(localParticipantListener.onAudioTrackPublicationFailedLatch.await(20,
+                TimeUnit.SECONDS));
+        assertTrue(localParticipantListener.onVideoTrackPublicationFailedLatch.await(20,
+                TimeUnit.SECONDS));
+        assertTrue(localParticipantListener.onDataTrackPublicationFailedLatch.await(20,
+                TimeUnit.SECONDS));
+
+        // Validate the exceptions
+        assertEquals(TwilioException.TRACK_NAME_TOO_LONG_EXCEPTION,
+                localParticipantListener.publicationFailures.get(localAudioTrack).getCode());
+        assertEquals(TwilioException.TRACK_NAME_TOO_LONG_EXCEPTION,
+                localParticipantListener.publicationFailures.get(localVideoTrack).getCode());
+        assertEquals(TwilioException.TRACK_NAME_TOO_LONG_EXCEPTION,
+                localParticipantListener.publicationFailures.get(localDataTrack).getCode());
+        */
+
+        // Validate that none of the track publications are present
+        assertTrue(localParticipant.getAudioTracks().isEmpty());
+        assertTrue(localParticipant.getVideoTracks().isEmpty());
+        assertTrue(localParticipant.getDataTracks().isEmpty());
+    }
+
+    @Test
+    public void shouldFailToPublishTracksWithDuplicatedNames() throws InterruptedException {
+        CallbackHelper.FakeLocalParticipantListener localParticipantListener =
+                new CallbackHelper.FakeLocalParticipantListener();
+        roomListener.onConnectedLatch = new CountDownLatch(1);
+        localParticipantListener.onPublishedAudioTrackLatch = new CountDownLatch(1);
+        localParticipantListener.onAudioTrackPublicationFailedLatch = new CountDownLatch(1);
+        localParticipantListener.onPublishedVideoTrackLatch = new CountDownLatch(1);
+        localParticipantListener.onVideoTrackPublicationFailedLatch = new CountDownLatch(1);
+        localParticipantListener.onPublishedDataTrackLatch = new CountDownLatch(1);
+        localParticipantListener.onDataTrackPublicationFailedLatch = new CountDownLatch(1);
+
+        // Create tracks with duplicated names
+        String localAudioTrackName = random(10);
+        String localVideoTrackName = random(10);
+        String localDataTrackName = random(10);
+        localAudioTrack = LocalAudioTrack.create(mediaTestActivity,
+                true,
+                localAudioTrackName);
+        localAudioTrackTwo = LocalAudioTrack.create(mediaTestActivity,
+                false,
+                localAudioTrackName);
+        localVideoTrack = LocalVideoTrack.create(mediaTestActivity,
+                true,
+                new FakeVideoCapturer(),
+                localVideoTrackName);
+        localVideoTrackTwo = LocalVideoTrack.create(mediaTestActivity,
+                false,
+                new FakeVideoCapturer(),
+                localVideoTrackName);
+        localDataTrack = LocalDataTrack.create(mediaTestActivity,
+                localDataTrackName);
+        localDataTrackTwo = LocalDataTrack.create(mediaTestActivity,
+                localDataTrackName);
+
+        // Connect to Room
+        ConnectOptions connectOptions = new ConnectOptions.Builder(token)
+                .roomName(roomName)
+                .audioTracks(Arrays.asList(localAudioTrack, localAudioTrackTwo))
+                .videoTracks(Arrays.asList(localVideoTrack, localVideoTrackTwo))
+                .dataTracks(Arrays.asList(localDataTrack, localDataTrackTwo))
+                .build();
+        room = Video.connect(mediaTestActivity, connectOptions, roomListener);
+        assertTrue(roomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
+        LocalParticipant localParticipant = room.getLocalParticipant();
+        assertNotNull(localParticipant);
+        localParticipant.setListener(localParticipantListener);
+
+        // Wait for data track published in group room
+        if (topology == Topology.GROUP) {
+            assertTrue(localParticipantListener.onPublishedDataTrackLatch.await(20,
+                    TimeUnit.SECONDS));
+        }
+
+        /* FIXME: Callbacks are not received when connecting with tracks GSDK-1398
+        // Validate callbacks
+        assertTrue(localParticipantListener.onAudioTrackPublicationFailedLatch.await(20,
+                TimeUnit.SECONDS));
+        assertTrue(localParticipantListener.onVideoTrackPublicationFailedLatch.await(20,
+                TimeUnit.SECONDS));
+        assertTrue(localParticipantListener.onDataTrackPublicationFailedLatch.await(20,
+                TimeUnit.SECONDS));
+
+        // Validate the exception
+        assertEquals(TwilioException.TRACK_NAME_IS_DUPLICATED_EXCEPTION,
+                localParticipantListener.publicationFailures.get(localAudioTrackTwo).getCode());
+        assertEquals(TwilioException.TRACK_NAME_IS_DUPLICATED_EXCEPTION,
+                localParticipantListener.publicationFailures.get(localVideoTrackTwo).getCode());
+        assertEquals(TwilioException.TRACK_NAME_IS_DUPLICATED_EXCEPTION,
+                localParticipantListener.publicationFailures.get(localDataTrackTwo).getCode());
+        */
+
+        // Validate that only one track is present
+        assertEquals(1, localParticipant.getAudioTracks().size());
+        assertEquals(1, localParticipant.getVideoTracks().size());
+        assertEquals(1, localParticipant.getDataTracks().size());
+    }
+
+    @Test
+    public void publishTrack_shouldFailWithTrackNameTooLong() throws InterruptedException {
+        CallbackHelper.FakeLocalParticipantListener localParticipantListener =
+                new CallbackHelper.FakeLocalParticipantListener();
+        roomListener.onConnectedLatch = new CountDownLatch(1);
+        localParticipantListener.onAudioTrackPublicationFailedLatch = new CountDownLatch(1);
+        localParticipantListener.onVideoTrackPublicationFailedLatch = new CountDownLatch(1);
+        localParticipantListener.onDataTrackPublicationFailedLatch = new CountDownLatch(1);
+
+        // Create tracks with names too long
+        localAudioTrack = LocalAudioTrack.create(mediaTestActivity,
+                true,
+                random(TRACK_NAME_LENGTH_MAX + 1));
+        localVideoTrack = LocalVideoTrack.create(mediaTestActivity,
+                true,
+                new FakeVideoCapturer(),
+                random(TRACK_NAME_LENGTH_MAX + 1));
+        localDataTrack = LocalDataTrack.create(mediaTestActivity,
+                random(TRACK_NAME_LENGTH_MAX + 1));
+
+        // Connect to room
+        ConnectOptions connectOptions = new ConnectOptions.Builder(token)
+                .roomName(roomName)
+                .build();
+        room = Video.connect(mediaTestActivity, connectOptions, roomListener);
+        assertTrue(roomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
+        LocalParticipant localParticipant = room.getLocalParticipant();
+        assertNotNull(localParticipant);
+        localParticipant.setListener(localParticipantListener);
+
+        // Publish tracks with names too long
+        localParticipant.publishTrack(localAudioTrack);
+        localParticipant.publishTrack(localVideoTrack);
+        localParticipant.publishTrack(localDataTrack);
+
+        // Validate callbacks
+        assertTrue(localParticipantListener.onAudioTrackPublicationFailedLatch.await(20,
+                TimeUnit.SECONDS));
+        assertTrue(localParticipantListener.onVideoTrackPublicationFailedLatch.await(20,
+                TimeUnit.SECONDS));
+        assertTrue(localParticipantListener.onDataTrackPublicationFailedLatch.await(20,
+                TimeUnit.SECONDS));
+
+        // Validate the exception
+        assertEquals(TwilioException.TRACK_NAME_TOO_LONG_EXCEPTION,
+                localParticipantListener.publicationFailures.get(localAudioTrack).getCode());
+        assertEquals(TwilioException.TRACK_NAME_TOO_LONG_EXCEPTION,
+                localParticipantListener.publicationFailures.get(localVideoTrack).getCode());
+        assertEquals(TwilioException.TRACK_NAME_TOO_LONG_EXCEPTION,
+                localParticipantListener.publicationFailures.get(localDataTrack).getCode());
+
+        // Validate that none of the track publications are present
+        assertTrue(localParticipant.getAudioTracks().isEmpty());
+        assertTrue(localParticipant.getVideoTracks().isEmpty());
+        assertTrue(localParticipant.getDataTracks().isEmpty());
+    }
+
+    @Test
+    public void publishTrack_shouldFailWithDuplicatedTrackName() throws InterruptedException {
+        CallbackHelper.FakeLocalParticipantListener localParticipantListener =
+                new CallbackHelper.FakeLocalParticipantListener();
+        roomListener.onConnectedLatch = new CountDownLatch(1);
+        localParticipantListener.onPublishedAudioTrackLatch = new CountDownLatch(1);
+        localParticipantListener.onAudioTrackPublicationFailedLatch = new CountDownLatch(1);
+        localParticipantListener.onPublishedVideoTrackLatch = new CountDownLatch(1);
+        localParticipantListener.onVideoTrackPublicationFailedLatch = new CountDownLatch(1);
+        localParticipantListener.onPublishedDataTrackLatch = new CountDownLatch(1);
+        localParticipantListener.onDataTrackPublicationFailedLatch = new CountDownLatch(1);
+
+        // Create tracks with duplicated names
+        String localAudioTrackName = random(10);
+        String localVideoTrackName = random(10);
+        String localDataTrackName = random(10);
+        localAudioTrack = LocalAudioTrack.create(mediaTestActivity,
+                true,
+                localAudioTrackName);
+        localAudioTrackTwo = LocalAudioTrack.create(mediaTestActivity,
+                false,
+                localAudioTrackName);
+        localVideoTrack = LocalVideoTrack.create(mediaTestActivity,
+                true,
+                new FakeVideoCapturer(),
+                localVideoTrackName);
+        localVideoTrackTwo = LocalVideoTrack.create(mediaTestActivity,
+                false,
+                new FakeVideoCapturer(),
+                localVideoTrackName);
+        localDataTrack = LocalDataTrack.create(mediaTestActivity,
+                localDataTrackName);
+        localDataTrackTwo = LocalDataTrack.create(mediaTestActivity,
+                localDataTrackName);
+
+        // Connect to Room
+        ConnectOptions connectOptions = new ConnectOptions.Builder(token)
+                .roomName(roomName)
+                .build();
+        room = Video.connect(mediaTestActivity, connectOptions, roomListener);
+        assertTrue(roomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
+        LocalParticipant localParticipant = room.getLocalParticipant();
+        assertNotNull(localParticipant);
+        localParticipant.setListener(localParticipantListener);
+
+        // Publish tracks
+        localParticipant.publishTrack(localAudioTrack);
+        localParticipant.publishTrack(localVideoTrack);
+        localParticipant.publishTrack(localDataTrack);
+
+        // Wait for published callbacks
+        assertTrue(localParticipantListener.onPublishedAudioTrackLatch.await(20,
+                TimeUnit.SECONDS));
+        assertTrue(localParticipantListener.onPublishedVideoTrackLatch.await(20,
+                TimeUnit.SECONDS));
+        assertTrue(localParticipantListener.onPublishedDataTrackLatch.await(20,
+                TimeUnit.SECONDS));
+
+        // Publish tracks with duplicated names
+        localParticipant.publishTrack(localAudioTrackTwo);
+        localParticipant.publishTrack(localVideoTrackTwo);
+        localParticipant.publishTrack(localDataTrackTwo);
+
+        // Validate callbacks
+        assertTrue(localParticipantListener.onAudioTrackPublicationFailedLatch.await(20,
+                TimeUnit.SECONDS));
+        assertTrue(localParticipantListener.onVideoTrackPublicationFailedLatch.await(20,
+                TimeUnit.SECONDS));
+        assertTrue(localParticipantListener.onDataTrackPublicationFailedLatch.await(20,
+                TimeUnit.SECONDS));
+
+        // Validate the exception
+        assertEquals(TwilioException.TRACK_NAME_IS_DUPLICATED_EXCEPTION,
+                localParticipantListener.publicationFailures.get(localAudioTrackTwo).getCode());
+        assertEquals(TwilioException.TRACK_NAME_IS_DUPLICATED_EXCEPTION,
+                localParticipantListener.publicationFailures.get(localVideoTrackTwo).getCode());
+        assertEquals(TwilioException.TRACK_NAME_IS_DUPLICATED_EXCEPTION,
+                localParticipantListener.publicationFailures.get(localDataTrackTwo).getCode());
+
+        // Validate that only one track is present
+        assertEquals(1, localParticipant.getAudioTracks().size());
+        assertEquals(localAudioTrack, localParticipant.getAudioTracks().get(0).getAudioTrack());
+        assertEquals(1, localParticipant.getVideoTracks().size());
+        assertEquals(localVideoTrack, localParticipant.getVideoTracks().get(0).getVideoTrack());
+        assertEquals(1, localParticipant.getDataTracks().size());
+        assertEquals(localDataTrack, localParticipant.getDataTracks().get(0).getDataTrack());
     }
 }

@@ -132,7 +132,7 @@ getLocalAudioTracksMap(JNIEnv *env, jobject j_local_audio_tracks) {
             CHECK_EXCEPTION(env) << "Failed to get local audio track id";
 
             // Add entry to map
-            local_audio_track_map[track_id] = j_local_audio_track;
+            local_audio_track_map[track_id] = webrtc_jni::NewGlobalRef(env, j_local_audio_track);
         }
     }
 
@@ -169,7 +169,7 @@ getLocalVideoTracksMap(JNIEnv *env, jobject j_local_video_tracks) {
             CHECK_EXCEPTION(env) << "Failed to get local video track id";
 
             // Add entry to map
-            local_video_track_map[track_id] = j_local_video_track;
+            local_video_track_map[track_id] = webrtc_jni::NewGlobalRef(env, j_local_video_track);
         }
     }
 
@@ -206,7 +206,7 @@ getLocalDataTracksMap(JNIEnv *env, jobject j_local_data_tracks) {
             CHECK_EXCEPTION(env) << "Failed to get local data track id";
 
             // Add entry to map
-            local_data_track_map[track_id] = j_local_data_track;
+            local_data_track_map[track_id] = webrtc_jni::NewGlobalRef(env, j_local_data_track);
         }
     }
 
@@ -226,7 +226,7 @@ jobject createLocalAudioTrackPublications(JNIEnv *env,
             local_participant_context->local_participant->getLocalAudioTracks();
 
     // Map track ids to java LocalAudioTrack
-    std::map<std::string, jobject> local_audio_tracks =
+    local_participant_context->local_audio_tracks_map =
             getLocalAudioTracksMap(env, j_local_audio_tracks);
 
     // Add audio tracks to array list
@@ -234,11 +234,7 @@ jobject createLocalAudioTrackPublications(JNIEnv *env,
         std::shared_ptr<twilio::media::LocalAudioTrackPublication> local_audio_track_publication =
                 local_audio_track_publications[i];
         jobject j_local_audio_track =
-                local_audio_tracks[local_audio_track_publication->getLocalTrack()->getTrackId()];
-
-        local_participant_context->local_audio_tracks_map.insert(std::make_pair(local_audio_track_publication->getLocalTrack()->getTrackId(),
-                                                                                webrtc_jni::NewGlobalRef(env,
-                                                                                                         j_local_audio_track)));
+                local_participant_context->local_audio_tracks_map[local_audio_track_publication->getLocalTrack()->getTrackId()];
         jobject j_local_audio_track_publication =
                 createJavaLocalAudioTrackPublication(env,
                                                      local_audio_track_publication,
@@ -264,7 +260,7 @@ jobject createLocalVideoTrackPublications(JNIEnv *env,
             local_participant_context->local_participant->getLocalVideoTracks();
 
     // Map track ids to java LocalVideoTrack
-    std::map<std::string, jobject> local_video_tracks =
+    local_participant_context->local_video_tracks_map =
             getLocalVideoTracksMap(env, j_local_video_tracks);
 
     // Add video tracks to array list
@@ -272,7 +268,7 @@ jobject createLocalVideoTrackPublications(JNIEnv *env,
         std::shared_ptr<twilio::media::LocalVideoTrackPublication> local_video_track_publication =
                 local_video_track_publications[i];
         jobject j_local_video_track =
-                local_video_tracks[local_video_track_publication->getLocalTrack()->getTrackId()];
+                local_participant_context->local_video_tracks_map[local_video_track_publication->getLocalTrack()->getTrackId()];
 
         local_participant_context->local_video_tracks_map.insert(std::make_pair(local_video_track_publication->getLocalTrack()->getTrackId(),
                                                                                 webrtc_jni::NewGlobalRef(env,
@@ -302,7 +298,7 @@ jobject createLocalDataTrackPublications(JNIEnv *env,
             local_participant_context->local_participant->getLocalDataTracks();
 
     // Map track ids to java LocalDataTrack
-    std::map<std::string, jobject> local_data_tracks =
+    local_participant_context->local_data_tracks_map =
             getLocalDataTracksMap(env, j_local_data_tracks);
 
     // Add data tracks to array list
@@ -310,7 +306,7 @@ jobject createLocalDataTrackPublications(JNIEnv *env,
         std::shared_ptr<twilio::media::LocalDataTrackPublication> local_data_track_publication =
                 local_data_track_publications[i];
         jobject j_local_data_track =
-                local_data_tracks[local_data_track_publication->getLocalTrack()->getTrackId()];
+                local_participant_context->local_data_tracks_map[local_data_track_publication->getLocalTrack()->getTrackId()];
 
         local_participant_context->local_data_tracks_map.insert(std::make_pair(local_data_track_publication->getLocalTrack()->getTrackId(),
                                                                                 webrtc_jni::NewGlobalRef(env,

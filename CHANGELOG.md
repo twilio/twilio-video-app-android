@@ -1,12 +1,24 @@
 The Twilio Programmable Video SDKs use [Semantic Versioning](http://www.semver.org).
 
 ####2.0.0-preview5
-    
+
+Features
+
+- Added the following callbacks to `LocalParticipant.Listener`
+  - `onAudioTrackPublicationFailed` - Notifies listener that local participant failed to publish 
+  audio track.
+  - `onVideoTrackPublicationFailed` - Notifies listener that local participant failed to publish 
+  video track.
+  - `onVideoTrackPublicationFailed` - Notifies listener that local participant failed to publish 
+  video track.    
+  
 Improvements
 
 - Include javadoc and sources jar with artifacts published to Bintray. 
 - Updated to Build Tools 26.0.2
 - Support annotations and Relinker no longer exposed at compile time
+- Made `Track` interface public. `Track` is the common interface for an `AudioTrack`, `VideoTrack`,
+and `DataTrack`.
 
 Bug Fixes
 

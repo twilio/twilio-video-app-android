@@ -43,11 +43,23 @@ protected:
     virtual void onAudioTrackPublished(twilio::video::LocalParticipant *local_participant,
                                        std::shared_ptr<twilio::media::LocalAudioTrackPublication> local_audio_track_publication);
 
+    virtual void onAudioTrackPublicationFailed(twilio::video::LocalParticipant *participant,
+                                               std::shared_ptr<twilio::media::LocalAudioTrack> audio_track,
+                                               const twilio::video::TwilioError twilio_error);
+
     virtual void onVideoTrackPublished(twilio::video::LocalParticipant *local_participant,
                                        std::shared_ptr<twilio::media::LocalVideoTrackPublication> local_video_track_publication);
 
+    virtual void onVideoTrackPublicationFailed(twilio::video::LocalParticipant *participant,
+                                               std::shared_ptr<twilio::media::LocalVideoTrack> video_track,
+                                               const twilio::video::TwilioError twilio_error);
+
     virtual void onDataTrackPublished(twilio::video::LocalParticipant *local_participant,
                                       std::shared_ptr<twilio::media::LocalDataTrackPublication> local_data_track_publication);
+
+    virtual void onDataTrackPublicationFailed(twilio::video::LocalParticipant *participant,
+                                              std::shared_ptr<twilio::media::LocalDataTrack> data_track,
+                                              const twilio::video::TwilioError twilio_error);
 
 private:
     JNIEnv *jni() {
@@ -68,13 +80,18 @@ private:
     const webrtc_jni::ScopedGlobalRef<jclass> j_published_audio_track_class_;
     const webrtc_jni::ScopedGlobalRef<jclass> j_published_video_track_class_;
     const webrtc_jni::ScopedGlobalRef<jclass> j_published_data_track_class_;
+    const webrtc_jni::ScopedGlobalRef<jclass> j_twilio_exception_class_;
 
     jmethodID j_on_published_audio_track_;
+    jmethodID j_on_audio_track_publication_failed_;
     jmethodID j_on_published_video_track_;
+    jmethodID j_on_video_track_publication_failed_;
     jmethodID j_on_published_data_track_;
+    jmethodID j_on_data_track_publication_failed_;
     jmethodID j_published_audio_track_ctor_id_;
     jmethodID j_published_video_track_ctor_id_;
     jmethodID j_published_data_track_ctor_id_;
+    jmethodID j_twilio_exception_ctor_id_;
 };
 
 }

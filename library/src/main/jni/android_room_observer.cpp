@@ -20,6 +20,7 @@
 #include "class_reference_holder.h"
 #include "logging.h"
 #include "jni_utils.h"
+#include "com_twilio_video_TwilioException.h"
 
 namespace twilio_video_jni {
 
@@ -172,7 +173,7 @@ AndroidRoomObserver::AndroidRoomObserver(JNIEnv *env,
                 webrtc_jni::GetMethodID(env,
                                         *j_twilio_exception_class_,
                                         "<init>",
-                                        "(ILjava/lang/String;Ljava/lang/String;)V")) {
+                                        kTwilioExceptionConstructoSignature)) {
     VIDEO_ANDROID_LOG(twilio::video::LogModule::kPlatform,
                       twilio::video::LogLevel::kDebug,
                       "AndroidRoomObserver");
@@ -264,10 +265,12 @@ void AndroidRoomObserver::onDisconnected(const twilio::video::Room *room,
             return;
         }
 
-        jobject j_twilio_exception = nullptr;
-        if (twilio_error != nullptr) {
-            j_twilio_exception = createJavaRoomException(*twilio_error);
-        }
+        jobject j_twilio_exception = (twilio_error == nullptr) ?
+                                     (nullptr) :
+                                     (createJavaTwilioException(jni(),
+                                                                *j_twilio_exception_class_,
+                                                                j_twilio_exception_ctor_id_,
+                                                                *twilio_error));
         jni()->CallVoidMethod(*j_room_observer_, j_on_disconnected_, *j_room_, j_twilio_exception);
         CHECK_EXCEPTION(jni()) << "error during CallVoidMethod";
     }
@@ -287,8 +290,14 @@ void AndroidRoomObserver::onConnectFailure(const twilio::video::Room *room,
             return;
         }
 
-        jobject j_room_exception = createJavaRoomException(twilio_error);
-        jni()->CallVoidMethod(*j_room_observer_, j_on_connect_failure_, *j_room_, j_room_exception);
+        jobject j_twilio_exception = createJavaTwilioException(jni(),
+                                                               *j_twilio_exception_class_,
+                                                               j_twilio_exception_ctor_id_,
+                                                               twilio_error);
+        jni()->CallVoidMethod(*j_room_observer_,
+                              j_on_connect_failure_,
+                              *j_room_,
+                              j_twilio_exception);
         CHECK_EXCEPTION(jni()) << "error during CallVoidMethod";
     }
 }
@@ -434,18 +443,6 @@ bool AndroidRoomObserver::isObserverValid(const std::string &callbackName) {
         return false;
     }
     return true;
-}
-
-jobject AndroidRoomObserver::createJavaRoomException(
-        const twilio::video::TwilioError &twilio_error) {
-
-    return jni()->NewObject(*j_twilio_exception_class_,
-                            j_twilio_exception_ctor_id_,
-                            twilio_error.getCode(),
-                            JavaUTF16StringFromStdString(jni(),
-                                                                twilio_error.getMessage()),
-                            JavaUTF16StringFromStdString(jni(),
-                                                                twilio_error.getExplanation()));
 }
 
 jobject AndroidRoomObserver::createJavaParticipantList(
