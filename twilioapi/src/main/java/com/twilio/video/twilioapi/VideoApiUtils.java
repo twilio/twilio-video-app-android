@@ -29,14 +29,16 @@ import retrofit.RetrofitError;
 import retrofit.converter.GsonConverter;
 import retrofit.http.Field;
 import retrofit.http.FormUrlEncoded;
+import retrofit.http.GET;
 import retrofit.http.Header;
 import retrofit.http.POST;
 import retrofit.http.Path;
 
 import static junit.framework.Assert.assertNotNull;
+import static junit.framework.Assert.assertTrue;
 
 public class VideoApiUtils {
-    private static final int MAX_RETRIES = 20;
+    private static final int MAX_RETRIES = 100;
     private static final String PROD_BASE_URL = "https://video.twilio.com";
     private static final String STAGE_BASE_URL = "https://video.stage.twilio.com";
     private static final String DEV_BASE_URL = "https://video.dev.twilio.com";
@@ -67,6 +69,10 @@ public class VideoApiUtils {
                              @Field("Type") String type,
                              @Field("EnableTurn") boolean enableTurn,
                              @Field("RecordParticipantsOnConnect") boolean enableRecording);
+
+        @GET("/v1/Rooms/{unique_name}")
+        VideoRoom getRoom(@Header("Authorization") String authorization,
+                          @Path("unique_name") String name);
     }
 
     private static VideoApiUtils.VideoApiService videoApiService = createVideoApiService();
@@ -156,8 +162,28 @@ public class VideoApiUtils {
                         type,
                         enableTurn,
                         enableRecording);
-            } catch (RetrofitError retrofitError) {
-                Log.e("VideoApiUtils", retrofitError.getMessage());
+            } catch (RetrofitError createRoomError) {
+                Log.e("VideoApiUtils", createRoomError.getMessage());
+
+                /*
+                 * Sometimes there is a timeout creating a room, but the room resource is still
+                 * created. In this case issue a GET request for the room resource and validate
+                 * that the room resource is configured correctly for the test.
+                 */
+                try {
+                    videoRoom = videoApiService.getRoom(authorization, name);
+                } catch (RetrofitError getRoomError) {
+                    Log.e("VideoApiUtils", getRoomError.getMessage());
+                }
+            }
+
+            // Wait some time before trying again
+            if (videoRoom == null) {
+                try {
+                    Thread.sleep(200);
+                } catch (InterruptedException e) {
+                    Log.e("VideoApiUtils", e.getMessage());
+                }
             }
         } while (videoRoom == null && retries++ < MAX_RETRIES);
 
@@ -165,6 +191,14 @@ public class VideoApiUtils {
         assertNotNull(String.format("Failed to create a Room after %s attempts",
                 String.valueOf(MAX_RETRIES)),
                 videoRoom);
+
+        // Validate the room resource
+        assertTrue("Room resource does not match configuration requested for test",
+                accountSid.equals(videoRoom.getAccountSid()) &&
+                        name.equals(videoRoom.getUniqueName()) &&
+                        type.equals(videoRoom.getType()) &&
+                        enableTurn == videoRoom.isEnableTurn() &&
+                        enableRecording == videoRoom.isRecordParticipantOnConnect());
 
         return videoRoom;
     }

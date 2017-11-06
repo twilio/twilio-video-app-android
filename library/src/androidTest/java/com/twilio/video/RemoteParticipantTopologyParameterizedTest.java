@@ -20,6 +20,8 @@ import android.content.Context;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.filters.LargeTest;
 
+import com.kevinmost.junit_retry_rule.Retry;
+import com.kevinmost.junit_retry_rule.RetryRule;
 import com.twilio.video.base.BaseParticipantTest;
 import com.twilio.video.helper.CallbackHelper;
 import com.twilio.video.util.CredentialsUtils;
@@ -30,6 +32,7 @@ import com.twilio.video.util.Topology;
 
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -57,10 +60,19 @@ public class RemoteParticipantTopologyParameterizedTest extends BaseParticipantT
                 {Topology.GROUP}});
     }
 
+    @Rule
+    public final RetryRule retryRule = new RetryRule();
+
     private Context context;
     private String tokenOne;
     private String tokenTwo;
     private String roomName;
+    private Room room;
+    private final CallbackHelper.FakeRoomListener roomListener =
+            new CallbackHelper.FakeRoomListener();
+    private Room otherRoom;
+    private final CallbackHelper.FakeRoomListener otherRoomListener =
+            new CallbackHelper.FakeRoomListener();
     private final Topology topology;
 
     public RemoteParticipantTopologyParameterizedTest(Topology topology) {
@@ -80,41 +92,34 @@ public class RemoteParticipantTopologyParameterizedTest extends BaseParticipantT
     @After
     public void teardown() throws InterruptedException {
         super.teardown();
+        disconnect(room, roomListener);
+        disconnect(otherRoom, otherRoomListener);
         assertTrue(MediaFactory.isReleased());
     }
 
     @Test
     public void participantCanConnect() throws InterruptedException {
-        CallbackHelper.FakeRoomListener roomListener = new CallbackHelper.FakeRoomListener();
         roomListener.onConnectedLatch = new CountDownLatch(1);
         roomListener.onDisconnectedLatch = new CountDownLatch(1);
         roomListener.onParticipantConnectedLatch = new CountDownLatch(1);
         ConnectOptions connectOptions = new ConnectOptions.Builder(tokenOne)
                 .roomName(roomName)
                 .build();
-        Room room = Video.connect(context, connectOptions, roomListener);
+        room = Video.connect(context, connectOptions, roomListener);
         assertTrue(roomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
         assertEquals(RoomState.CONNECTED, room.getState());
 
         connectOptions = new ConnectOptions.Builder(tokenTwo)
             .roomName(roomName)
             .build();
-        CallbackHelper.FakeRoomListener roomListener2 = new CallbackHelper.FakeRoomListener();
-        roomListener2.onDisconnectedLatch = new CountDownLatch(1);
-        Room room2 = Video.connect(context, connectOptions, roomListener2);
+        otherRoomListener.onDisconnectedLatch = new CountDownLatch(1);
+        otherRoom = Video.connect(context, connectOptions, otherRoomListener);
         assertTrue(roomListener.onParticipantConnectedLatch.await(20, TimeUnit.SECONDS));
         assertEquals(1, room.getRemoteParticipants().size());
-
-        room.disconnect();
-        assertTrue(roomListener.onDisconnectedLatch.await(20, TimeUnit.SECONDS));
-        assertEquals(RoomState.DISCONNECTED, room.getState());
-        room2.disconnect();
-        assertTrue(roomListener2.onDisconnectedLatch.await(20, TimeUnit.SECONDS));
     }
 
     @Test
     public void participantCanDisconnect() throws InterruptedException {
-        CallbackHelper.FakeRoomListener roomListener = new CallbackHelper.FakeRoomListener();
         roomListener.onConnectedLatch = new CountDownLatch(1);
         roomListener.onDisconnectedLatch = new CountDownLatch(1);
         roomListener.onParticipantDisconnectedLatch = new CountDownLatch(1);
@@ -122,21 +127,20 @@ public class RemoteParticipantTopologyParameterizedTest extends BaseParticipantT
         ConnectOptions connectOptions = new ConnectOptions.Builder(tokenOne)
                 .roomName(roomName)
                 .build();
-        Room room = Video.connect(context, connectOptions, roomListener);
+        room = Video.connect(context, connectOptions, roomListener);
         assertTrue(roomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
         assertEquals(RoomState.CONNECTED, room.getState());
 
         ConnectOptions connectOptions2 = new ConnectOptions.Builder(tokenTwo)
             .roomName(roomName)
             .build();
-        CallbackHelper.FakeRoomListener roomListener2 = new CallbackHelper.FakeRoomListener();
-        roomListener2.onConnectedLatch = new CountDownLatch(1);
-        roomListener2.onDisconnectedLatch = new CountDownLatch(1);
-        Room client2room = Video.connect(context, connectOptions2, roomListener2);
+        otherRoomListener.onConnectedLatch = new CountDownLatch(1);
+        otherRoomListener.onDisconnectedLatch = new CountDownLatch(1);
+        otherRoom = Video.connect(context, connectOptions2, otherRoomListener);
 
-        assertTrue(roomListener2.onConnectedLatch.await(20, TimeUnit.SECONDS));
+        assertTrue(otherRoomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
 
-        List<RemoteParticipant> client2RemoteParticipants = new ArrayList<>(client2room.getRemoteParticipants());
+        List<RemoteParticipant> client2RemoteParticipants = new ArrayList<>(otherRoom.getRemoteParticipants());
         RemoteParticipant client1RemoteParticipant = client2RemoteParticipants.get(0);
 
         assertEquals(1, client2RemoteParticipants.size());
@@ -149,8 +153,8 @@ public class RemoteParticipantTopologyParameterizedTest extends BaseParticipantT
         assertEquals(1, client1RemoteParticipants.size());
         assertTrue(client2RemoteParticipant.isConnected());
 
-        client2room.disconnect();
-        assertTrue(roomListener2.onDisconnectedLatch.await(20, TimeUnit.SECONDS));
+        otherRoom.disconnect();
+        assertTrue(otherRoomListener.onDisconnectedLatch.await(20, TimeUnit.SECONDS));
         assertTrue(roomListener.onParticipantDisconnectedLatch.await(20, TimeUnit.SECONDS));
         assertFalse(client2RemoteParticipant.isConnected());
         assertTrue(room.getRemoteParticipants().isEmpty());
@@ -164,7 +168,6 @@ public class RemoteParticipantTopologyParameterizedTest extends BaseParticipantT
     public void participantShouldHaveValidIdentity() throws InterruptedException {
         String expectedIdentity = random(50);
         tokenOne = CredentialsUtils.getAccessToken(expectedIdentity, topology);
-        CallbackHelper.FakeRoomListener roomListener = new CallbackHelper.FakeRoomListener();
         roomListener.onConnectedLatch = new CountDownLatch(1);
         roomListener.onDisconnectedLatch = new CountDownLatch(1);
         roomListener.onParticipantDisconnectedLatch = new CountDownLatch(1);
@@ -172,21 +175,20 @@ public class RemoteParticipantTopologyParameterizedTest extends BaseParticipantT
         ConnectOptions connectOptions = new ConnectOptions.Builder(tokenOne)
                 .roomName(roomName)
                 .build();
-        Room room = Video.connect(context, connectOptions, roomListener);
+        room = Video.connect(context, connectOptions, roomListener);
         assertTrue(roomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
         assertEquals(RoomState.CONNECTED, room.getState());
 
         ConnectOptions connectOptions2 = new ConnectOptions.Builder(tokenTwo)
                 .roomName(roomName)
                 .build();
-        CallbackHelper.FakeRoomListener roomListener2 = new CallbackHelper.FakeRoomListener();
-        roomListener2.onConnectedLatch = new CountDownLatch(1);
-        roomListener2.onDisconnectedLatch = new CountDownLatch(1);
-        Room client2room = Video.connect(context, connectOptions2, roomListener2);
+        otherRoomListener.onConnectedLatch = new CountDownLatch(1);
+        otherRoomListener.onDisconnectedLatch = new CountDownLatch(1);
+        otherRoom = Video.connect(context, connectOptions2, otherRoomListener);
 
-        assertTrue(roomListener2.onConnectedLatch.await(20, TimeUnit.SECONDS));
+        assertTrue(otherRoomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
 
-        List<RemoteParticipant> client2RemoteParticipants = new ArrayList<>(client2room.getRemoteParticipants());
+        List<RemoteParticipant> client2RemoteParticipants = new ArrayList<>(otherRoom.getRemoteParticipants());
         RemoteParticipant client1RemoteParticipant = client2RemoteParticipants.get(0);
 
         assertEquals(1, client2RemoteParticipants.size());
@@ -200,8 +202,8 @@ public class RemoteParticipantTopologyParameterizedTest extends BaseParticipantT
         assertEquals(1, client1RemoteParticipants.size());
         assertTrue(client2RemoteParticipant.isConnected());
 
-        client2room.disconnect();
-        assertTrue(roomListener2.onDisconnectedLatch.await(20, TimeUnit.SECONDS));
+        otherRoom.disconnect();
+        assertTrue(otherRoomListener.onDisconnectedLatch.await(20, TimeUnit.SECONDS));
         assertTrue(roomListener.onParticipantDisconnectedLatch.await(20, TimeUnit.SECONDS));
         assertFalse(client2RemoteParticipant.isConnected());
         assertTrue(room.getRemoteParticipants().isEmpty());
@@ -212,6 +214,7 @@ public class RemoteParticipantTopologyParameterizedTest extends BaseParticipantT
     }
 
     @Test
+    @Retry
     public void shouldReceiveTrackEvents() throws InterruptedException {
         // Audio track added and subscribed
         CallbackHelper.FakeParticipantListener participantListener =

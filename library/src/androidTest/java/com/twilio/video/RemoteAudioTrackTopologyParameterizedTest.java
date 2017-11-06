@@ -18,12 +18,15 @@ package com.twilio.video;
 
 import android.support.test.filters.LargeTest;
 
+import com.kevinmost.junit_retry_rule.Retry;
+import com.kevinmost.junit_retry_rule.RetryRule;
 import com.twilio.video.base.BaseParticipantTest;
 import com.twilio.video.helper.CallbackHelper;
 import com.twilio.video.util.Topology;
 
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -49,6 +52,8 @@ public class RemoteAudioTrackTopologyParameterizedTest extends BaseParticipantTe
                 {Topology.GROUP}});
     }
 
+    @Rule
+    public final RetryRule retryRule = new RetryRule();
     private final Topology topology;
 
     public RemoteAudioTrackTopologyParameterizedTest(Topology topology) {
@@ -93,6 +98,7 @@ public class RemoteAudioTrackTopologyParameterizedTest extends BaseParticipantTe
     }
 
     @Test
+    @Retry
     public void shouldAllowEnablePlayback() throws InterruptedException {
         final CallbackHelper.FakeStatsListener statsListener =
                 new CallbackHelper.FakeStatsListener();
