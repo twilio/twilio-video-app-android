@@ -308,49 +308,6 @@ task checkoutRelease(type: Exec) {
     commandLine "git", "checkout", "${releaseVersion}"
 }
 
-task publishReleaseCandidateArtifacts {
-    description = 'Publish Video Android AAR and javadocs to stage CDN'
-    group = 'Publishing'
-    dependsOn 'library:createJavadocs'
-
-    doLast {
-        // Clean up any previous rc
-        exec {
-            workingDir "${rootDir}"
-            commandLine "rm", "-rf", "target", "||", "true"
-        }
-
-        exec {
-            workingDir "${rootDir}"
-            commandLine "rm", "-rf", "dist", "||", "true"
-        }
-
-        // Copy artifacts where sdk release tool expects them
-        exec {
-            workingDir "${rootDir}"
-            commandLine "mkdir", "target"
-        }
-
-        exec {
-            workingDir "${rootDir}"
-            commandLine "cp",
-                    "library/build/outputs/aar/library-release.aar",
-                    "target/twilio-video-android.aar"
-        }
-
-        exec {
-            workingDir "${rootDir}"
-            commandLine "cp", "-r", "library/build/docs/javadoc", "target/"
-        }
-
-        // Perform rc with sdk release tool
-        exec {
-            workingDir "${rootDir}"
-            commandLine "./scripts/rc-release-script.sh"
-        }
-    }
-}
-
 task publishLibraryJavadocs {
     description = 'Publish Video Android Javadocs to gh-pages branch'
     group = 'Publishing'
@@ -397,41 +354,17 @@ task publishLibraryJavadocs {
             commandLine "git", "push", "origin", "gh-pages"
         }
 
+        // TODO: Remove once source has moved to Github permanently
+        exec {
+            workingDir "${rootDir}"
+            commandLine "git", "push", "git@github.com:twilio/twilio-video-android.git", "gh-pages"
+        }
+
         exec {
             workingDir "${rootDir}"
             commandLine "git", "checkout", "${gitBranch}"
         }
     }
-}
-
-task promoteReleaseCandidateToRelease(type: Exec) {
-    description = 'Promote Video Android AAR and javadocs from stage to prod CDN'
-    group = 'Publishing'
-    // TODO: Add support for releasing any RC. Currently only releases last RC.
-    def lastRc = "${versionRc - 1}"
-    def lastRcVersion = "${versionMajor}.${versionMinor}.${versionPatch}-rc${lastRc}"
-    environment "RC_BUILD_NUMBER", "${lastRc}"
-    environment "SDK_RC_VERSION", "${lastRcVersion}"
-    commandLine "./scripts/promote-rc-to-release.sh"
-}
-
-task publishReleaseArtifacts(type: Exec) {
-    description = 'Publish Video Android AAR and javadocs prod CDN'
-    group = 'Publishing'
-    dependsOn checkoutRelease
-    dependsOn promoteReleaseCandidateToRelease
-    def rcVersion = "${versionMajor}.${versionMinor}.${versionPatch}-rc${versionRc}"
-    def releaseVersion = System.getenv("RELEASE_VERSION") == null ?
-            ("") :
-            (System.getenv("RELEASE_VERSION"))
-    // Do not pin pre releases
-    def releaseCommand = releaseVersion.contains("preview") || releaseVersion.contains("beta") ?
-            ("true") :
-            ("./scripts/pin-release.sh")
-    environment "RC_BUILD_NUMBER", "${versionRc}"
-    environment "SDK_RC_VERSION", "${rcVersion}"
-
-    commandLine releaseCommand
 }
 
 task firebaseTestLabCheckLibrary(type: Exec) {

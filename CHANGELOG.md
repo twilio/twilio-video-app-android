@@ -2,6 +2,24 @@ The Twilio Programmable Video SDKs use [Semantic Versioning](http://www.semver.o
 
 ####1.3.7
 
+Improvements
+
+- Twilio CDN no longer hosts the Video Android aar artifacts or Javadocs
+
+######Accessing Artifacts
+If you are downloading Video Android SDK artifacts from the Twilio CDN then there are two 
+options available moving forward.
+
+1. Follow our [Downloading Video SDKs Guide for Android](https://www.twilio.com/docs/api/video/download-video-sdks#android-sdk).
+2. Download the artifacts [directly from Bintray](https://bintray.com/twilio/releases/video-android#files/com/twilio/video-android).
+
+######Viewing Javadocs
+All Javadocs back to `1.0.0-preview1` are now hosted on [Github Pages](https://pages.github.com/) 
+with the following URL scheme. `https://twilio.github.io/twilio-video-android/docs/{version}`
+
+  - To view `1.3.7` Javadocs go to [https://twilio.github.io/twilio-video-android/docs/1.3.7](https://twilio.github.io/twilio-video-android/docs/1.3.7)
+  - To view the latest Javadocs go to [https://twilio.github.io/twilio-video-android/docs/latest](https://twilio.github.io/twilio-video-android/docs/latest)
+
 Bug Fixes
 
 - Fixed NPE when calling `takePicture` on `CameraCapturer`. 
