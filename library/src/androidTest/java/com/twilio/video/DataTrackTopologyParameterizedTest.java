@@ -27,7 +27,6 @@ import com.twilio.video.util.Topology;
 
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -43,7 +42,6 @@ import static com.twilio.video.util.VideoAssert.assertIsTrackSid;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assume.assumeTrue;
 
 @RunWith(Parameterized.class)
 @LargeTest
@@ -65,8 +63,6 @@ public class DataTrackTopologyParameterizedTest extends BaseParticipantTest {
 
     @Before
     public void setup() throws InterruptedException {
-        // TODO: Enable data track for group rooms GSDK-1234
-        assumeTrue(topology == Topology.P2P);
         super.baseSetup(topology);
     }
 
@@ -314,6 +310,9 @@ public class DataTrackTopologyParameterizedTest extends BaseParticipantTest {
         charlieBobRemoteParticipant.getRemoteDataTracks().get(0).getRemoteDataTrack()
                 .setListener(bobDataTrackListener);
 
+        // Wait to ensure the data channels reach opened state
+        Thread.sleep(1000);
+
         String firstExpectedMessage = "Hello";
         ByteBuffer firstExpectedBufferMessage = ByteBuffer.wrap(new byte[] { 0x0, 0x1, 0x2, 0x3 });
         String secondExpectedMessage = "DataTrack!";
@@ -401,6 +400,9 @@ public class DataTrackTopologyParameterizedTest extends BaseParticipantTest {
                 .setListener(aliceDataTrackListener);
         charlieBobRemoteParticipant.getRemoteDataTracks().get(0).getRemoteDataTrack()
                 .setListener(bobDataTrackListener);
+
+        // Wait to ensure the data channels reach opened state
+        Thread.sleep(1000);
 
         String firstExpectedMessage = "Hello";
         ByteBuffer firstExpectedBufferMessage = ByteBuffer.wrap(new byte[] { 0x0, 0x1, 0x2, 0x3 });
@@ -511,6 +513,8 @@ public class DataTrackTopologyParameterizedTest extends BaseParticipantTest {
         assertTrue(participantListener.onSubscribedToDataTrackLatch.await(20, TimeUnit.SECONDS));
         final RemoteDataTrack remoteDataTrack =
                 bobRemoteParticipant.getRemoteDataTracks().get(0).getRemoteDataTrack();
+        // Wait to ensure the data channels reach opened state
+        Thread.sleep(1000);
 
         /*
          * Set listener on main thread
@@ -579,6 +583,9 @@ public class DataTrackTopologyParameterizedTest extends BaseParticipantTest {
         assertTrue(participantListener.onSubscribedToDataTrackLatch.await(20, TimeUnit.SECONDS));
         getRemoteDataTrack(localDataTrackPublication.getTrackSid(), bobRemoteParticipant)
                 .setListener(dataTrackListener);
+
+        // Wait to ensure the data channels reach opened state
+        Thread.sleep(1000);
     }
 
     private RemoteParticipant getRemoteParticipant(String identity, Room room) {

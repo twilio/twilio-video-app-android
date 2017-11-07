@@ -47,7 +47,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assume.assumeTrue;
 
 @RunWith(Parameterized.class)
 @LargeTest
@@ -154,20 +153,14 @@ public class LocalParticipantTopologyTest extends BaseClientTest {
         assertTrue(localParticipant.publishTrack(localVideoTrack));
         assertEquals(0, localParticipant.getVideoTracks().size());
         assertEquals(0, localParticipant.getLocalVideoTracks().size());
-        // TODO: Enable for group rooms GSDK-1324
-        if (topology == Topology.P2P) {
-            assertTrue(localParticipant.publishTrack(localDataTrack));
-            assertEquals(0, localParticipant.getDataTracks().size());
-            assertEquals(0, localParticipant.getLocalDataTracks().size());
-        }
+        assertTrue(localParticipant.publishTrack(localDataTrack));
+        assertEquals(0, localParticipant.getDataTracks().size());
+        assertEquals(0, localParticipant.getLocalDataTracks().size());
 
         // Validate we received callbacks
         assertTrue(localParticipantListener.onPublishedAudioTrackLatch.await(20, TimeUnit.SECONDS));
         assertTrue(localParticipantListener.onPublishedVideoTrackLatch.await(20, TimeUnit.SECONDS));
-        if (topology == Topology.P2P) {
-            assertTrue(localParticipantListener.onPublishedDataTrackLatch.await(20,
-                    TimeUnit.SECONDS));
-        }
+        assertTrue(localParticipantListener.onPublishedDataTrackLatch.await(20, TimeUnit.SECONDS));
 
         // Now unpublish tracks
         assertTrue(localParticipant.unpublishTrack(localAudioTrack));
@@ -176,18 +169,16 @@ public class LocalParticipantTopologyTest extends BaseClientTest {
         assertTrue(localParticipant.unpublishTrack(localVideoTrack));
         assertEquals(0, localParticipant.getVideoTracks().size());
         assertEquals(0, localParticipant.getLocalVideoTracks().size());
-        // TODO: Enable for group rooms GSDK-1324
-        if (topology == Topology.P2P) {
-            assertTrue(localParticipant.unpublishTrack(localDataTrack));
-            assertEquals(0, localParticipant.getDataTracks().size());
-            assertEquals(0, localParticipant.getLocalDataTracks().size());
-        }
+        assertTrue(localParticipant.unpublishTrack(localDataTrack));
+        assertEquals(0, localParticipant.getDataTracks().size());
+        assertEquals(0, localParticipant.getLocalDataTracks().size());
     }
 
     @Test
     public void shouldHaveTracksWhenConnected() throws InterruptedException {
         CallbackHelper.FakeLocalParticipantListener localParticipantListener =
                 new CallbackHelper.FakeLocalParticipantListener();
+        localParticipantListener.onPublishedDataTrackLatch = new CountDownLatch(1);
         FakeVideoCapturer fakeVideoCapturer = new FakeVideoCapturer();
         roomListener.onConnectedLatch = new CountDownLatch(1);
         localParticipantListener.onPublishedAudioTrackLatch = new CountDownLatch(1);
@@ -201,12 +192,8 @@ public class LocalParticipantTopologyTest extends BaseClientTest {
         ConnectOptions.Builder connectOptionsBuilder = new ConnectOptions.Builder(token)
                 .audioTracks(Collections.singletonList(localAudioTrack))
                 .videoTracks(Collections.singletonList(localVideoTrack))
+                .dataTracks(Collections.singletonList(localDataTrack))
                 .roomName(roomName);
-
-        // TODO: Enable for group rooms GSDK-1324
-        if (topology == Topology.P2P) {
-            connectOptionsBuilder.dataTracks(Collections.singletonList(localDataTrack));
-        }
 
         room = Video.connect(mediaTestActivity, connectOptionsBuilder.build(), roomListener);
         assertTrue(roomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
@@ -219,15 +206,15 @@ public class LocalParticipantTopologyTest extends BaseClientTest {
         assertEquals(1, localParticipant.getLocalAudioTracks().size());
         assertEquals(1, localParticipant.getVideoTracks().size());
         assertEquals(1, localParticipant.getLocalVideoTracks().size());
-        if (topology == Topology.P2P) {
-            assertEquals(1, localParticipant.getDataTracks().size());
-            assertEquals(1, localParticipant.getLocalDataTracks().size());
+        if (topology == Topology.GROUP) {
+            assertTrue(localParticipantListener.onPublishedDataTrackLatch.await(20,
+                    TimeUnit.SECONDS));
         }
+        assertEquals(1, localParticipant.getDataTracks().size());
+        assertEquals(1, localParticipant.getLocalDataTracks().size());
         assertEquals(localAudioTrack, localParticipant.getAudioTracks().get(0).getAudioTrack());
         assertEquals(localVideoTrack, localParticipant.getVideoTracks().get(0).getVideoTrack());
-        if (topology == Topology.P2P) {
-            assertEquals(localDataTrack, localParticipant.getDataTracks().get(0).getDataTrack());
-        }
+        assertEquals(localDataTrack, localParticipant.getDataTracks().get(0).getDataTrack());
     }
 
     @Test
@@ -328,8 +315,6 @@ public class LocalParticipantTopologyTest extends BaseClientTest {
 
     @Test
     public void shouldNotPublishDataTrackAfterDisconnect() throws InterruptedException {
-        // TODO: Enable for group rooms GSDK-1324
-        assumeTrue(topology == Topology.P2P);
         roomListener.onConnectedLatch = new CountDownLatch(1);
         roomListener.onDisconnectedLatch = new CountDownLatch(1);
 
@@ -406,8 +391,6 @@ public class LocalParticipantTopologyTest extends BaseClientTest {
 
     @Test
     public void shouldNotUnpublishDataTrackAfterDisconnect() throws InterruptedException {
-        // TODO: Enable for group rooms GSDK-1324
-        assumeTrue(topology == Topology.P2P);
         CallbackHelper.FakeLocalParticipantListener localParticipantListener =
                 new CallbackHelper.FakeLocalParticipantListener();
         localParticipantListener.onPublishedDataTrackLatch = new CountDownLatch(1);
