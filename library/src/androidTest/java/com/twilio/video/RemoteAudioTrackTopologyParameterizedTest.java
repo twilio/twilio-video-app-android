@@ -150,14 +150,12 @@ public class RemoteAudioTrackTopologyParameterizedTest extends BaseParticipantTe
     }
 
     private void publishAudioTrack() throws InterruptedException {
-        CallbackHelper.FakeParticipantListener participantListener =
-                new CallbackHelper.FakeParticipantListener();
-        participantListener.onAudioTrackPublishedLatch = new CountDownLatch(1);
-        participantListener.onSubscribedToAudioTrackLatch = new CountDownLatch(1);
-        bobRemoteParticipant.setListener(participantListener);
+        aliceParticipantListener.onAudioTrackPublishedLatch = new CountDownLatch(1);
+        aliceParticipantListener.onSubscribedToAudioTrackLatch = new CountDownLatch(1);
+        bobRemoteParticipant.setListener(aliceParticipantListener);
         bobLocalAudioTrack = LocalAudioTrack.create(mediaTestActivity, true, bobAudioTrackName);
         assertTrue(bobLocalParticipant.publishTrack(bobLocalAudioTrack));
-        assertTrue(participantListener.onAudioTrackPublishedLatch.await(20, TimeUnit.SECONDS));
-        assertTrue(participantListener.onSubscribedToAudioTrackLatch.await(20, TimeUnit.SECONDS));
+        assertTrue(aliceParticipantListener.onAudioTrackPublishedLatch.await(20, TimeUnit.SECONDS));
+        assertTrue(aliceParticipantListener.onSubscribedToAudioTrackLatch.await(20, TimeUnit.SECONDS));
     }
 }
