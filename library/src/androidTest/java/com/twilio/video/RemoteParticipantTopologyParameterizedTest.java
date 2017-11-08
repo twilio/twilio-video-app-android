@@ -272,26 +272,21 @@ public class RemoteParticipantTopologyParameterizedTest extends BaseParticipantT
                 TimeUnit.SECONDS));
         assertTrue(participantListener.onVideoTrackUnpublishedLatch.await(20, TimeUnit.SECONDS));
 
-        /*
-         * TODO: Enable data track events for group rooms GSDK-1324
-         */
-        if (topology == Topology.P2P) {
-            // Data track published and subscribed
-            participantListener.onDataTrackPublishedLatch = new CountDownLatch(1);
-            participantListener.onSubscribedToDataTrackLatch = new CountDownLatch(1);
-            bobLocalDataTrack = LocalDataTrack.create(mediaTestActivity);
-            assertTrue(bobRoom.getLocalParticipant().publishTrack(bobLocalDataTrack));
-            assertTrue(participantListener.onDataTrackPublishedLatch.await(20, TimeUnit.SECONDS));
-            assertTrue(participantListener.onSubscribedToDataTrackLatch.await(20, TimeUnit.SECONDS));
+        // Data track published and subscribed
+        participantListener.onDataTrackPublishedLatch = new CountDownLatch(1);
+        participantListener.onSubscribedToDataTrackLatch = new CountDownLatch(1);
+        bobLocalDataTrack = LocalDataTrack.create(mediaTestActivity);
+        assertTrue(bobRoom.getLocalParticipant().publishTrack(bobLocalDataTrack));
+        assertTrue(participantListener.onDataTrackPublishedLatch.await(20, TimeUnit.SECONDS));
+        assertTrue(participantListener.onSubscribedToDataTrackLatch.await(20, TimeUnit.SECONDS));
 
-            // Data track unsubscribed and unpublished
-            participantListener.onDataTrackUnpublishedLatch = new CountDownLatch(1);
-            participantListener.onUnsubscribedFromDataTrackLatch = new CountDownLatch(1);
-            bobRoom.getLocalParticipant().unpublishTrack(bobLocalDataTrack);
-            assertTrue(participantListener.onUnsubscribedFromDataTrackLatch.await(20,
-                    TimeUnit.SECONDS));
-            assertTrue(participantListener.onDataTrackUnpublishedLatch.await(20, TimeUnit.SECONDS));
-        }
+        // Data track unsubscribed and unpublished
+        participantListener.onDataTrackUnpublishedLatch = new CountDownLatch(1);
+        participantListener.onUnsubscribedFromDataTrackLatch = new CountDownLatch(1);
+        bobRoom.getLocalParticipant().unpublishTrack(bobLocalDataTrack);
+        assertTrue(participantListener.onUnsubscribedFromDataTrackLatch.await(20,
+                TimeUnit.SECONDS));
+        assertTrue(participantListener.onDataTrackUnpublishedLatch.await(20, TimeUnit.SECONDS));
 
         // Validate the order of events
         List<String> expectedParticipantEvents = Arrays.asList(
@@ -306,20 +301,12 @@ public class RemoteParticipantTopologyParameterizedTest extends BaseParticipantT
                 "onVideoTrackDisabled",
                 "onVideoTrackEnabled",
                 "onVideoTrackUnsubscribed",
-                "onVideoTrackUnpublished"
-        );
-        List<String> expectedParticipantDataTrackEvents = Arrays.asList(
+                "onVideoTrackUnpublished",
                 "onDataTrackPublished",
                 "onDataTrackSubscribed",
                 "onDataTrackUnsubscribed",
                 "onDataTrackUnpublished"
         );
-        if (topology == Topology.P2P) {
-            List<String> tmpList = new ArrayList<>();
-            tmpList.addAll(expectedParticipantEvents);
-            tmpList.addAll(expectedParticipantDataTrackEvents);
-            expectedParticipantEvents = tmpList;
-        }
         assertArrayEquals(expectedParticipantEvents.toArray(),
                 participantListener.participantEvents.toArray());
     }

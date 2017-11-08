@@ -15,6 +15,7 @@ Features
 Improvements
 
 - Include javadoc and sources jar with artifacts published to Bintray. 
+- Added support for `DataTrack` API with Group rooms.
 - Updated to Build Tools 26.0.2
 - Support annotations and Relinker no longer exposed at compile time
 - Made `Track` interface public. `Track` is the common interface for an `AudioTrack`, `VideoTrack`,
@@ -140,6 +141,8 @@ Known issues
 - Network handoff, and subsequent connection renegotiation is not supported for IPv6 networks [#72](https://github.com/twilio/video-quickstart-android/issues/72)
 - Participant disconnect event can take up to 120 seconds to occur [#80](https://github.com/twilio/video-quickstart-android/issues/80) [#73](https://github.com/twilio/video-quickstart-android/issues/73)
 - Codec preferences do not function correctly in a hybrid codec Group Room.
+- DataTrack support for Group Rooms is currently available only on JavaScript. DataTrack support 
+for Group Rooms will be available on iOS and Android soon.
 
 ####2.0.0-preview3
 
