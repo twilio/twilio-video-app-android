@@ -133,17 +133,14 @@ public class RemoteVideoTrackTopologyParameterizedTest extends BaseParticipantTe
     }
 
     private void publishVideoTrack() throws InterruptedException {
-        CallbackHelper.FakeParticipantListener participantListener =
-                new CallbackHelper.FakeParticipantListener();
-        participantListener.onSubscribedToVideoTrackLatch = new CountDownLatch(1);
-        participantListener.onVideoTrackPublishedLatch = new CountDownLatch(1);
-        bobRemoteParticipant.setListener(participantListener);
+        aliceParticipantListener.onSubscribedToVideoTrackLatch = new CountDownLatch(1);
+        aliceParticipantListener.onVideoTrackPublishedLatch = new CountDownLatch(1);
         bobLocalVideoTrack = LocalVideoTrack.create(mediaTestActivity,
                 true,
                 new FakeVideoCapturer(),
                 bobVideoTrackName);
         assertTrue(bobLocalParticipant.publishTrack(bobLocalVideoTrack));
-        assertTrue(participantListener.onVideoTrackPublishedLatch.await(20, TimeUnit.SECONDS));
-        assertTrue(participantListener.onSubscribedToVideoTrackLatch.await(20, TimeUnit.SECONDS));
+        assertTrue(aliceParticipantListener.onVideoTrackPublishedLatch.await(20, TimeUnit.SECONDS));
+        assertTrue(aliceParticipantListener.onSubscribedToVideoTrackLatch.await(20, TimeUnit.SECONDS));
     }
 }
