@@ -502,15 +502,13 @@ public class DataTrackTopologyParameterizedTest extends BaseParticipantTest {
 
     @Test
     public void onMessageReturnedOnSameThreadThatSetListener() throws InterruptedException {
-        CallbackHelper.FakeParticipantListener participantListener =
-                new CallbackHelper.FakeParticipantListener();
-        participantListener.onSubscribedToDataTrackLatch = new CountDownLatch(1);
-        participantListener.onDataTrackPublishedLatch = new CountDownLatch(1);
-        bobRemoteParticipant.setListener(participantListener);
+        aliceParticipantListener.onSubscribedToDataTrackLatch = new CountDownLatch(1);
+        aliceParticipantListener.onDataTrackPublishedLatch = new CountDownLatch(1);
+        bobRemoteParticipant.setListener(aliceParticipantListener);
         bobLocalDataTrack = LocalDataTrack.create(mediaTestActivity);
         assertTrue(bobLocalParticipant.publishTrack(bobLocalDataTrack));
-        assertTrue(participantListener.onDataTrackPublishedLatch.await(20, TimeUnit.SECONDS));
-        assertTrue(participantListener.onSubscribedToDataTrackLatch.await(20, TimeUnit.SECONDS));
+        assertTrue(aliceParticipantListener.onDataTrackPublishedLatch.await(20, TimeUnit.SECONDS));
+        assertTrue(aliceParticipantListener.onSubscribedToDataTrackLatch.await(20, TimeUnit.SECONDS));
         final RemoteDataTrack remoteDataTrack =
                 bobRemoteParticipant.getRemoteDataTracks().get(0).getRemoteDataTrack();
         // Wait to ensure the data channels reach opened state
@@ -566,11 +564,9 @@ public class DataTrackTopologyParameterizedTest extends BaseParticipantTest {
     }
 
     private void publishDataTrack(LocalDataTrack localDataTrack) throws InterruptedException {
-        CallbackHelper.FakeParticipantListener participantListener =
-                new CallbackHelper.FakeParticipantListener();
-        participantListener.onSubscribedToDataTrackLatch = new CountDownLatch(1);
-        participantListener.onDataTrackPublishedLatch = new CountDownLatch(1);
-        bobRemoteParticipant.setListener(participantListener);
+        aliceParticipantListener.onSubscribedToDataTrackLatch = new CountDownLatch(1);
+        aliceParticipantListener.onDataTrackPublishedLatch = new CountDownLatch(1);
+        bobRemoteParticipant.setListener(aliceParticipantListener);
         bobLocalParticipantListener = new CallbackHelper.FakeLocalParticipantListener();
         bobLocalParticipantListener.onPublishedDataTrackLatch = new CountDownLatch(1);
         bobLocalParticipant.setListener(bobLocalParticipantListener);
@@ -579,8 +575,8 @@ public class DataTrackTopologyParameterizedTest extends BaseParticipantTest {
                 TimeUnit.SECONDS));
         LocalDataTrackPublication localDataTrackPublication =
                 getLocalDataTrackPublication(localDataTrack, bobLocalParticipant);
-        assertTrue(participantListener.onDataTrackPublishedLatch.await(20, TimeUnit.SECONDS));
-        assertTrue(participantListener.onSubscribedToDataTrackLatch.await(20, TimeUnit.SECONDS));
+        assertTrue(aliceParticipantListener.onDataTrackPublishedLatch.await(20, TimeUnit.SECONDS));
+        assertTrue(aliceParticipantListener.onSubscribedToDataTrackLatch.await(20, TimeUnit.SECONDS));
         getRemoteDataTrack(localDataTrackPublication.getTrackSid(), bobRemoteParticipant)
                 .setListener(dataTrackListener);
 

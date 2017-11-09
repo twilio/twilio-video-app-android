@@ -20,6 +20,20 @@ Improvements
 - Support annotations and Relinker no longer exposed at compile time
 - Made `Track` interface public. `Track` is the common interface for an `AudioTrack`, `VideoTrack`,
 and `DataTrack`.
+- Twilio CDN no longer hosts the Video Android aar artifacts or Javadocs
+
+######Accessing Artifacts
+If you are downloading Video Android SDK artifacts from the Twilio CDN then there are two 
+options available moving forward.
+
+1. Follow our [Downloading Video SDKs Guide for Android](https://www.twilio.com/docs/api/video/download-video-sdks#android-sdk).
+2. Download the artifacts [directly from Bintray](https://bintray.com/twilio/releases/video-android#files/com/twilio/video-android).
+
+######Viewing Javadocs
+All Javadocs back to `1.0.0-preview1` are now hosted on [Github Pages](https://pages.github.com/) 
+with the following URL scheme. `https://twilio.github.io/twilio-video-android/docs/{version}`
+
+  - To view `2.0.0-preview5` Javadocs go to [https://twilio.github.io/twilio-video-android/docs/2.0.0-preview5](https://twilio.github.io/twilio-video-android/docs/2.0.0-preview5)
 
 Bug Fixes
 
@@ -271,6 +285,24 @@ Known issues
 - Participant disconnect event can take up to 120 seconds to occur [#80](https://github.com/twilio/video-quickstart-android/issues/80) [#73](https://github.com/twilio/video-quickstart-android/issues/73)
 
 ####1.3.7
+
+Improvements
+
+- Twilio CDN no longer hosts the Video Android aar artifacts or Javadocs
+
+######Accessing Artifacts
+If you are downloading Video Android SDK artifacts from the Twilio CDN then there are two 
+options available moving forward.
+
+1. Follow our [Downloading Video SDKs Guide for Android](https://www.twilio.com/docs/api/video/download-video-sdks#android-sdk).
+2. Download the artifacts [directly from Bintray](https://bintray.com/twilio/releases/video-android#files/com/twilio/video-android).
+
+######Viewing Javadocs
+All Javadocs back to `1.0.0-preview1` are now hosted on [Github Pages](https://pages.github.com/) 
+with the following URL scheme. `https://twilio.github.io/twilio-video-android/docs/{version}`
+
+  - To view `1.3.7` Javadocs go to [https://twilio.github.io/twilio-video-android/docs/1.3.7](https://twilio.github.io/twilio-video-android/docs/1.3.7)
+  - To view the latest Javadocs go to [https://twilio.github.io/twilio-video-android/docs/latest](https://twilio.github.io/twilio-video-android/docs/latest)
 
 Bug Fixes
 

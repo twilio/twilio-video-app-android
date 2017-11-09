@@ -21,6 +21,8 @@ import android.support.test.filters.LargeTest;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.rule.GrantPermissionRule;
 
+import com.kevinmost.junit_retry_rule.Retry;
+import com.kevinmost.junit_retry_rule.RetryRule;
 import com.twilio.video.base.BaseClientTest;
 import com.twilio.video.helper.CallbackHelper;
 import com.twilio.video.ui.MediaTestActivity;
@@ -66,6 +68,8 @@ public class LocalParticipantTopologyTest extends BaseClientTest {
     @Rule
     public ActivityTestRule<MediaTestActivity> activityRule =
             new ActivityTestRule<>(MediaTestActivity.class);
+    @Rule
+    public final RetryRule retryRule = new RetryRule();
     private MediaTestActivity mediaTestActivity;
     private String identity;
     private String token;
@@ -556,6 +560,7 @@ public class LocalParticipantTopologyTest extends BaseClientTest {
     }
 
     @Test
+    @Retry
     public void shouldFailToPublishTracksWithDuplicatedNames() throws InterruptedException {
         CallbackHelper.FakeLocalParticipantListener localParticipantListener =
                 new CallbackHelper.FakeLocalParticipantListener();
@@ -603,7 +608,9 @@ public class LocalParticipantTopologyTest extends BaseClientTest {
         assertNotNull(localParticipant);
         localParticipant.setListener(localParticipantListener);
 
-        // Wait for data track published in group room
+        /*
+         * This test is set to retry because sometimes setListener is called after the event occurs
+         */
         if (topology == Topology.GROUP) {
             assertTrue(localParticipantListener.onPublishedDataTrackLatch.await(20,
                     TimeUnit.SECONDS));
