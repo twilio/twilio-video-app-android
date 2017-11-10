@@ -302,8 +302,12 @@ JNIEXPORT jobject JNICALL Java_com_twilio_video_MediaFactory_nativeCreateAudioTr
     std::string name = webrtc_jni::IsNull(jni, j_name) ?
                        ("") :
                        (JavaToUTF8StdString(jni, j_name));
+    rtc::scoped_refptr<webrtc::AudioSourceInterface> audio_source =
+            media_factory->createAudioSource(audio_options);
+    twilio::media::AudioTrackOptions audio_track_options =
+            twilio::media::AudioTrackOptions(enabled, name);
     std::shared_ptr<twilio::media::LocalAudioTrack> local_audio_track =
-            media_factory->createAudioTrack(enabled, audio_options, name);
+            media_factory->createAudioTrack(audio_source, audio_track_options);
 
     return local_audio_track == nullptr ?
            (nullptr) :
@@ -335,11 +339,13 @@ JNIEXPORT jobject JNICALL Java_com_twilio_video_MediaFactory_nativeCreateVideoTr
     std::string name = webrtc_jni::IsNull(jni, j_name) ?
                        ("") :
                        (JavaToUTF8StdString(jni, j_name));
+    rtc::scoped_refptr<webrtc::VideoTrackSourceInterface> video_track_source =
+            media_factory->createVideoSource(capturer,
+                                             getVideoConstraints(j_video_contraints));
+    twilio::media::VideoTrackOptions video_track_options =
+            twilio::media::VideoTrackOptions(enabled, name);
     std::shared_ptr<twilio::media::LocalVideoTrack> video_track =
-            media_factory->createVideoTrack(enabled,
-                                            getVideoConstraints(j_video_contraints),
-                                            capturer,
-                                            name);
+            media_factory->createVideoTrack(video_track_source, video_track_options);
 
     return video_track == nullptr ?
            (nullptr) :
@@ -372,7 +378,7 @@ JNIEXPORT jobject JNICALL Java_com_twilio_video_MediaFactory_nativeCreateDataTra
             .setName(name)
             .build();
     std::shared_ptr<twilio::media::LocalDataTrack> data_track =
-            media_factory->createDataTrack(data_track_options, name);
+            media_factory->createDataTrack(data_track_options);
 
     return createJavaLocalDataTrack(data_track, j_media_factory);
 }

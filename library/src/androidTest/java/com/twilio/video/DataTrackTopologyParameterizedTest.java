@@ -19,6 +19,8 @@ package com.twilio.video;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.filters.LargeTest;
 
+import com.kevinmost.junit_retry_rule.Retry;
+import com.kevinmost.junit_retry_rule.RetryRule;
 import com.twilio.video.base.BaseParticipantTest;
 import com.twilio.video.helper.CallbackHelper;
 import com.twilio.video.util.Constants;
@@ -27,6 +29,7 @@ import com.twilio.video.util.Topology;
 
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -53,6 +56,8 @@ public class DataTrackTopologyParameterizedTest extends BaseParticipantTest {
                 {Topology.GROUP}});
     }
 
+    @Rule
+    public final RetryRule retryRule = new RetryRule();
     private final Topology topology;
     private final CallbackHelper.FakeRemoteDataTrackListener dataTrackListener =
             new CallbackHelper.FakeRemoteDataTrackListener();
@@ -267,6 +272,7 @@ public class DataTrackTopologyParameterizedTest extends BaseParticipantTest {
     }
 
     @Test
+    @Retry
     public void canSendMessagesToMultipleParticipants() throws InterruptedException {
         CallbackHelper.FakeParticipantListener participantListener =
                 new CallbackHelper.FakeParticipantListener();
