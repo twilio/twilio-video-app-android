@@ -191,12 +191,18 @@ public class VideoApiUtils {
                 String.valueOf(MAX_RETRIES)),
                 videoRoom);
 
-        // Validate the room resource
+        /*
+         * Validate the room resource.
+         *
+         * Note that for a group room the infrastructure will always return enableTurn=true even if
+         * the request was made with enableTurn=false.
+         */
+        boolean expectedEnableTurn = type.equalsIgnoreCase(GROUP) || enableTurn;
         assertTrue("Room resource does not match configuration requested for test",
                 accountSid.equals(videoRoom.getAccountSid()) &&
                         name.equals(videoRoom.getUniqueName()) &&
                         type.equals(videoRoom.getType()) &&
-                        enableTurn == videoRoom.isEnableTurn() &&
+                        expectedEnableTurn == videoRoom.isEnableTurn() &&
                         enableRecording == videoRoom.isRecordParticipantOnConnect());
 
         return videoRoom;
