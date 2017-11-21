@@ -21,19 +21,18 @@ import android.content.res.TypedArray;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.AttributeSet;
+import android.view.ViewGroup;
 
 import org.webrtc.RendererCommon;
 import org.webrtc.SurfaceViewRenderer;
-
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
-import java.nio.ByteBuffer;
 
 /**
  * A VideoView renders frames from a {@link VideoTrack}. This class is an extension of
  * {@link android.view.SurfaceView}, so it can be placed in your XML view hierarchy.
  */
 public class VideoView extends SurfaceViewRenderer implements VideoRenderer {
+    private static final Logger logger = Logger.getLogger(VideoView.class);
+
     // Used to ensure that our renderer has a means to post to main thread for renderer events
     private final Handler uiThreadHandler = new Handler(Looper.getMainLooper());
     private final RendererCommon.RendererEvents internalEventListener =
@@ -124,8 +123,34 @@ public class VideoView extends SurfaceViewRenderer implements VideoRenderer {
 
     /**
      * Sets the current scale type to specified value and updates the video.
+     *
+     * <p><b>Note</b>: The scale type will only be applied to dimensions defined as
+     * {@link android.view.ViewGroup.LayoutParams#WRAP_CONTENT} or a custom value. Setting a width
+     * or height to {@link android.view.ViewGroup.LayoutParams#MATCH_PARENT} results in the
+     * video being scaled to fill the maximum value of the dimension.</p>
      */
     public void setVideoScaleType(VideoScaleType videoScaleType) {
+        ViewGroup.LayoutParams layoutParams = getLayoutParams();
+
+        // Log warning if scale type may not be respected in certain dimensions
+        if (layoutParams != null && (layoutParams.width == ViewGroup.LayoutParams.MATCH_PARENT ||
+                layoutParams.height == ViewGroup.LayoutParams.MATCH_PARENT)) {
+            VideoScaleType widthScaleType = (layoutParams.width ==
+                    ViewGroup.LayoutParams.MATCH_PARENT) ?
+                    (VideoScaleType.ASPECT_FILL) :
+                    (videoScaleType);
+            VideoScaleType heightScaleType = (layoutParams.height ==
+                    ViewGroup.LayoutParams.MATCH_PARENT) ?
+                    (VideoScaleType.ASPECT_FILL) :
+                    (videoScaleType);
+
+            logger.w(String.format("Scale type may not be applied as expected because " +
+                            "video view uses MATCH_PARENT. Scaling will be applied as " +
+                            "follows: width=%s, height=%s",
+                    widthScaleType.name(),
+                    heightScaleType.name()));
+        }
+
         this.videoScaleType = videoScaleType;
         setScalingType(convertToWebRtcScaleType(videoScaleType));
         refreshRenderer();

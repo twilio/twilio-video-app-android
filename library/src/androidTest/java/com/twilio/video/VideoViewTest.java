@@ -19,7 +19,6 @@ package com.twilio.video;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.espresso.contrib.RecyclerViewActions;
 import android.support.test.rule.ActivityTestRule;
-import android.support.test.runner.AndroidJUnit4;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.widget.ListView;
@@ -40,11 +39,15 @@ import org.junit.runner.RunWith;
 import java.util.ArrayList;
 import java.util.List;
 
+import junitparams.JUnitParamsRunner;
+import junitparams.Parameters;
+
 import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.matcher.ViewMatchers.withContentDescription;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-@RunWith(AndroidJUnit4.class)
+@RunWith(JUnitParamsRunner.class)
 public class VideoViewTest {
     @Rule
     public ActivityTestRule<VideoViewTestActivity> activityRule =
@@ -57,6 +60,7 @@ public class VideoViewTest {
     public void setup() {
         videoViewTestActivity = activityRule.getActivity();
         relativeLayout = videoViewTestActivity.findViewById(R.id.relative_layout_container);
+        Video.setLogLevel(LogLevel.WARNING);
     }
 
     @After
@@ -65,6 +69,41 @@ public class VideoViewTest {
             localVideoTrack.release();
         }
         assertTrue(MediaFactory.isReleased());
+    }
+
+    @Test
+    public void setVideoScaleType_canBeCalledBeforeViewInflated() {
+        InstrumentationRegistry.getInstrumentation().runOnMainSync(new Runnable() {
+            @Override
+            public void run() {
+                VideoView videoView = new VideoView(videoViewTestActivity);
+                VideoScaleType expectedVideoScaleType = VideoScaleType.ASPECT_BALANCED;
+
+                videoView.setVideoScaleType(expectedVideoScaleType);
+
+                assertEquals(expectedVideoScaleType, videoView.getVideoScaleType());
+            }
+        });
+    }
+
+    @Test
+    @Parameters
+    public void canSetVideoScaleType(final int width, final int height) {
+        InstrumentationRegistry.getInstrumentation().runOnMainSync(new Runnable() {
+            @Override
+            public void run() {
+                VideoView videoView = new VideoView(videoViewTestActivity);
+                RelativeLayout.LayoutParams layoutParams =
+                        new RelativeLayout.LayoutParams(width, height);
+                VideoScaleType expectedVideoScaleType = VideoScaleType.ASPECT_BALANCED;
+
+                videoView.setLayoutParams(layoutParams);
+                relativeLayout.addView(videoView);
+                videoView.setVideoScaleType(expectedVideoScaleType);
+
+                assertEquals(expectedVideoScaleType, videoView.getVideoScaleType());
+            }
+        });
     }
 
     @Test
@@ -164,5 +203,19 @@ public class VideoViewTest {
                     .viewHolderPositionMap.get(position);
             assertTrue(viewHolder.frameCountProxyRendererListener.waitForFrame(3000));
         }
+    }
+
+    private Object[] parametersForCanSetVideoScaleType() {
+        return new Object[]{
+                new Object[]{ RelativeLayout.LayoutParams.MATCH_PARENT,
+                        RelativeLayout.LayoutParams.WRAP_CONTENT },
+                new Object[]{ RelativeLayout.LayoutParams.WRAP_CONTENT,
+                        RelativeLayout.LayoutParams.MATCH_PARENT },
+                new Object[]{ RelativeLayout.LayoutParams.MATCH_PARENT,
+                        RelativeLayout.LayoutParams.MATCH_PARENT },
+                new Object[]{ RelativeLayout.LayoutParams.WRAP_CONTENT,
+                        RelativeLayout.LayoutParams.WRAP_CONTENT },
+                new Object[]{ 96, 96 }
+        };
     }
 }
