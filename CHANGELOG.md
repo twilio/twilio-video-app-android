@@ -2,6 +2,13 @@ The Twilio Programmable Video SDKs use [Semantic Versioning](http://www.semver.o
 
 ####2.0.0-preview6
 
+Improvements
+
+- Updated javadoc to include note about `VideoView#setVideoScaleType`. Scale type will only
+ be applied to dimensions defined as `WRAP_CONTENT` or a custom value. Setting a width or height to 
+ `MATCH_PARENT` results in the video being scaled to fill the maximum value of the dimension.
+- Add warning log when calling `setVideoScaleType` when width or height is set to `MATCH_PARENT`
+
 Bug Fixes
 
 - Fixed a potential crash when publishing or unpublishing a Data Track.
@@ -295,6 +302,22 @@ Known issues
 
 - Network handoff, and subsequent connection renegotiation is not supported for IPv6 networks [#72](https://github.com/twilio/video-quickstart-android/issues/72)
 - Participant disconnect event can take up to 120 seconds to occur [#80](https://github.com/twilio/video-quickstart-android/issues/80) [#73](https://github.com/twilio/video-quickstart-android/issues/73)
+
+####1.3.8
+
+Improvements
+
+- Updated javadoc to include note about `VideoView#setVideoScaleType`. Scale type will only
+ be applied to dimensions defined as `WRAP_CONTENT` or a custom value. Setting a width or height to 
+ `MATCH_PARENT` results in the video being scaled to fill the maximum value of the dimension.
+- Add warning log when calling `setVideoScaleType` when width or height is set to `MATCH_PARENT`
+
+Known issues
+
+- Network handoff, and subsequent connection renegotiation is not supported for IPv6 networks [#72](https://github.com/twilio/video-quickstart-android/issues/72)
+- VP8 is the only supported codec [#71](https://github.com/twilio/video-quickstart-android/issues/71)
+- Participant disconnect event can take up to 120 seconds to occur [#80](https://github.com/twilio/video-quickstart-android/issues/80) [#73](https://github.com/twilio/video-quickstart-android/issues/73)
+- LocalParticipant release method is public [#132](https://github.com/twilio/video-quickstart-android/issues/132)
 
 ####1.3.7
 

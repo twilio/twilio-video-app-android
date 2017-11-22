@@ -134,6 +134,7 @@ dependencies {
     androidTestImplementation 'com.google.code.gson:gson:2.7'
     androidTestImplementation 'org.apache.commons:commons-lang3:3.6'
     androidTestImplementation 'com.github.kevinmost:junit-retry-rule:master'
+    androidTestImplementation 'pl.pragmatists:JUnitParams:1.1.1'
 
     implementation 'com.android.support:support-annotations:26.1.0'
     implementation 'com.getkeepsafe.relinker:relinker:1.2.2'
