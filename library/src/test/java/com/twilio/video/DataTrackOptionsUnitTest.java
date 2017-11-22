@@ -19,6 +19,8 @@ package com.twilio.video;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import java.util.UUID;
+
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 
@@ -54,13 +56,16 @@ public class DataTrackOptionsUnitTest {
     public void shouldAllowValidOptions() {
         boolean expectedOrdered = false;
         int expectedMaxPacketLifeTime = 10;
+        String expectedName = UUID.randomUUID().toString();
         DataTrackOptions dataTrackOptions = new DataTrackOptions.Builder()
                 .ordered(expectedOrdered)
                 .maxPacketLifeTime(expectedMaxPacketLifeTime)
+                .name(expectedName)
                 .build();
 
         assertEquals(expectedOrdered, dataTrackOptions.ordered);
         assertEquals(expectedMaxPacketLifeTime, dataTrackOptions.maxPacketLifeTime);
         assertEquals(DataTrackOptions.DEFAULT_MAX_RETRANSMITS, dataTrackOptions.maxRetransmits);
+        assertEquals(expectedName, dataTrackOptions.name);
     }
 }

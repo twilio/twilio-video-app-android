@@ -520,8 +520,10 @@ public class LocalParticipantTopologyTest extends BaseClientTest {
                 true,
                 new FakeVideoCapturer(),
                 random(TRACK_NAME_LENGTH_MAX + 1));
-        localDataTrack = LocalDataTrack.create(mediaTestActivity,
-                random(TRACK_NAME_LENGTH_MAX + 1));
+        DataTrackOptions dataTrackOptions = new DataTrackOptions.Builder()
+                .name(random(TRACK_NAME_LENGTH_MAX + 1))
+                .build();
+        localDataTrack = LocalDataTrack.create(mediaTestActivity, dataTrackOptions);
 
         ConnectOptions connectOptions = new ConnectOptions.Builder(token)
                 .audioTracks(Collections.singletonList(localAudioTrack))
@@ -576,6 +578,9 @@ public class LocalParticipantTopologyTest extends BaseClientTest {
         String localAudioTrackName = random(10);
         String localVideoTrackName = random(10);
         String localDataTrackName = random(10);
+        DataTrackOptions dataTrackOptions = new DataTrackOptions.Builder()
+                .name(localDataTrackName)
+                .build();
         localAudioTrack = LocalAudioTrack.create(mediaTestActivity,
                 true,
                 localAudioTrackName);
@@ -590,10 +595,8 @@ public class LocalParticipantTopologyTest extends BaseClientTest {
                 false,
                 new FakeVideoCapturer(),
                 localVideoTrackName);
-        localDataTrack = LocalDataTrack.create(mediaTestActivity,
-                localDataTrackName);
-        localDataTrackTwo = LocalDataTrack.create(mediaTestActivity,
-                localDataTrackName);
+        localDataTrack = LocalDataTrack.create(mediaTestActivity, dataTrackOptions);
+        localDataTrackTwo = LocalDataTrack.create(mediaTestActivity, dataTrackOptions);
 
         // Connect to Room
         ConnectOptions connectOptions = new ConnectOptions.Builder(token)
@@ -650,6 +653,9 @@ public class LocalParticipantTopologyTest extends BaseClientTest {
         localParticipantListener.onDataTrackPublicationFailedLatch = new CountDownLatch(1);
 
         // Create tracks with names too long
+        DataTrackOptions dataTrackOptions = new DataTrackOptions.Builder()
+                .name(random(TRACK_NAME_LENGTH_MAX + 1))
+                .build();
         localAudioTrack = LocalAudioTrack.create(mediaTestActivity,
                 true,
                 random(TRACK_NAME_LENGTH_MAX + 1));
@@ -657,8 +663,7 @@ public class LocalParticipantTopologyTest extends BaseClientTest {
                 true,
                 new FakeVideoCapturer(),
                 random(TRACK_NAME_LENGTH_MAX + 1));
-        localDataTrack = LocalDataTrack.create(mediaTestActivity,
-                random(TRACK_NAME_LENGTH_MAX + 1));
+        localDataTrack = LocalDataTrack.create(mediaTestActivity, dataTrackOptions);
 
         // Connect to room
         ConnectOptions connectOptions = new ConnectOptions.Builder(token)
@@ -713,6 +718,9 @@ public class LocalParticipantTopologyTest extends BaseClientTest {
         String localAudioTrackName = random(10);
         String localVideoTrackName = random(10);
         String localDataTrackName = random(10);
+        DataTrackOptions dataTrackOptions = new DataTrackOptions.Builder()
+                .name(localDataTrackName)
+                .build();
         localAudioTrack = LocalAudioTrack.create(mediaTestActivity,
                 true,
                 localAudioTrackName);
@@ -727,10 +735,8 @@ public class LocalParticipantTopologyTest extends BaseClientTest {
                 false,
                 new FakeVideoCapturer(),
                 localVideoTrackName);
-        localDataTrack = LocalDataTrack.create(mediaTestActivity,
-                localDataTrackName);
-        localDataTrackTwo = LocalDataTrack.create(mediaTestActivity,
-                localDataTrackName);
+        localDataTrack = LocalDataTrack.create(mediaTestActivity, dataTrackOptions);
+        localDataTrackTwo = LocalDataTrack.create(mediaTestActivity, dataTrackOptions);
 
         // Connect to Room
         ConnectOptions connectOptions = new ConnectOptions.Builder(token)

@@ -69,7 +69,10 @@ public class LocalDataTrackTest {
     @Test
     public void canCreateDataTrackWithName() {
         String expectedName = random(10);
-        localDataTrack = LocalDataTrack.create(context, expectedName);
+        DataTrackOptions dataTrackOptions = new DataTrackOptions.Builder()
+                .name(expectedName)
+                .build();
+        localDataTrack = LocalDataTrack.create(context, dataTrackOptions);
 
         assertNotNull(localDataTrack);
         assertEquals(expectedName, localDataTrack.getName());
@@ -77,8 +80,10 @@ public class LocalDataTrackTest {
 
     @Test
     public void canCreateDataTrackWithNullName() {
-        String nullName = null;
-        localDataTrack = LocalDataTrack.create(context, nullName);
+        DataTrackOptions dataTrackOptions = new DataTrackOptions.Builder()
+                .name(null)
+                .build();
+        localDataTrack = LocalDataTrack.create(context, dataTrackOptions);
 
         assertNotNull(localDataTrack);
         assertEquals(localDataTrack.getTrackId(), localDataTrack.getName());
@@ -86,8 +91,10 @@ public class LocalDataTrackTest {
 
     @Test
     public void canCreateDataTrackWithEmptyName() {
-        String emptyName = "";
-        localDataTrack = LocalDataTrack.create(context, emptyName);
+        DataTrackOptions dataTrackOptions = new DataTrackOptions.Builder()
+                .name("")
+                .build();
+        localDataTrack = LocalDataTrack.create(context, dataTrackOptions);
 
         assertNotNull(localDataTrack);
         assertEquals(localDataTrack.getTrackId(), localDataTrack.getName());

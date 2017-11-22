@@ -4,6 +4,22 @@ The Twilio Programmable Video SDKs use [Semantic Versioning](http://www.semver.o
 
 Improvements
 
+- `LocalDataTrack` name is no longer provided via static `create` method argument. DataTrack names
+ are now provided via `DataTrackOptions`. Reference snippets below:
+ 
+    Creating a `LocalDataTrack` with name _before_ `2.0.0-preview6`
+
+        String dataTrackName = "data";
+        LocalDataTrack localDataTrack = LocalDataTrack.create(context, dataTrackName);
+     
+    Creating a `LocalDataTrack` with name _after_ `2.0.0-preview6`
+
+        String dataTrackName = "data";
+        DataTrackOptions dataTrackOptions = new DataTrackOptions.Builder()
+             .name("data")
+             .build();
+        LocalDataTrack localDataTrack = LocalDataTrack.create(context, dataTrackOptions);
+        
 - Updated javadoc to include note about `VideoView#setVideoScaleType`. Scale type will only
  be applied to dimensions defined as `WRAP_CONTENT` or a custom value. Setting a width or height to 
  `MATCH_PARENT` results in the video being scaled to fill the maximum value of the dimension.

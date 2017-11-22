@@ -16,6 +16,8 @@
 
 package com.twilio.video;
 
+import android.support.annotation.Nullable;
+
 /**
  * Represents options when creating {@link LocalDataTrack}s.
  */
@@ -42,11 +44,13 @@ public class DataTrackOptions {
     final boolean ordered;
     final int maxPacketLifeTime;
     final int maxRetransmits;
+    final String name;
 
     private DataTrackOptions(Builder builder) {
         this.ordered = builder.ordered;
         this.maxPacketLifeTime = builder.maxPacketLifeTime;
         this.maxRetransmits = builder.maxRetransmits;
+        this.name = builder.name;
     }
 
     /**
@@ -58,6 +62,7 @@ public class DataTrackOptions {
         private boolean ordered = true;
         private int maxPacketLifeTime = DEFAULT_MAX_PACKET_LIFE_TIME;
         private int maxRetransmits = DEFAULT_MAX_RETRANSMITS;
+        private String name = null;
 
         public Builder() {}
 
@@ -82,6 +87,14 @@ public class DataTrackOptions {
          */
         public Builder maxRetransmits(int maxRetransmits) {
             this.maxRetransmits = maxRetransmits;
+            return this;
+        }
+
+        /**
+         * Data track name.
+         */
+        public Builder name(@Nullable String name) {
+            this.name = name;
             return this;
         }
 

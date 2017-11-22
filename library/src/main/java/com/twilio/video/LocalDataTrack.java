@@ -41,7 +41,7 @@ public class LocalDataTrack extends DataTrack {
      * @return local data track
      */
     public static LocalDataTrack create(@NonNull Context context) {
-        return create(context, DataTrackOptions.DEFAULT_DATA_TRACK_OPTIONS, null);
+        return create(context, DataTrackOptions.DEFAULT_DATA_TRACK_OPTIONS);
     }
 
     /**
@@ -53,33 +53,6 @@ public class LocalDataTrack extends DataTrack {
      */
     public static LocalDataTrack create(@NonNull Context context,
                                         @Nullable DataTrackOptions dataTrackOptions) {
-        return create(context, dataTrackOptions, null);
-    }
-
-    /**
-     * Creates a local data track with provided name and
-     * {@link DataTrackOptions#DEFAULT_DATA_TRACK_OPTIONS}.
-     *
-     * @param context application context.
-     * @param name data track name
-     * @return local data track.
-     */
-    public static LocalDataTrack create(@NonNull Context context,
-                                        @Nullable String name) {
-        return create(context, DataTrackOptions.DEFAULT_DATA_TRACK_OPTIONS, name);
-    }
-
-    /**
-     * Creates a local data track with provided name and data track options.
-     *
-     * @param context application context.
-     * @param dataTrackOptions data track options.
-     * @param name data track name.
-     * @return local data track.
-     */
-    public static LocalDataTrack create(@NonNull Context context,
-                                                  @Nullable DataTrackOptions dataTrackOptions,
-                                                  @Nullable String name) {
         Preconditions.checkNotNull(context, "Context must not be null");
         dataTrackOptions = dataTrackOptions == null ?
                 (DataTrackOptions.DEFAULT_DATA_TRACK_OPTIONS) :
@@ -89,7 +62,7 @@ public class LocalDataTrack extends DataTrack {
                 .createDataTrack(dataTrackOptions.ordered,
                         dataTrackOptions.maxPacketLifeTime,
                         dataTrackOptions.maxRetransmits,
-                        name);
+                        dataTrackOptions.name);
     }
 
     /**
