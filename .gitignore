@@ -63,3 +63,8 @@ sdk/libs/
 
 # Twilio Video App Config
 **/twilio-video-app.json
+
+# CI Secrets
+secrets.tar.gz
+secrets.tar
+secrets/
