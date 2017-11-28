@@ -15,6 +15,17 @@ android:
 jdk:
   - oraclejdk8
 
+branches:
+  only:
+    - master
+    - 2.0
+
+stages:
+  - name: test
+    if: type IN (push, pull_request)
+  - name: snapshot
+    if: type = push AND branch IN (master, 2.0)
+
 before_install:
    # Untar secrets
    - openssl aes-256-cbc -K $encrypted_7f5144414b5d_key -iv $encrypted_7f5144414b5d_iv -in secrets.tar.enc -out secrets.tar -d
@@ -71,11 +82,6 @@ cache:
     - $HOME/.gradle
     - $HOME/google-cloud-sdk
 
-branches:
-  only:
-    - master
-    - 2.0
-
 jobs:
   include:
     - stage: test
@@ -86,3 +92,9 @@ jobs:
       script: ./gradlew -q firebaseTestLabCheckLibraryCamera
     - stage: test
       script: ./gradlew -q assemble
+    - stage: snapshot
+      script: bintrayLibrarySnapshotUpload
+    - stage: snapshot
+      script: -PFirebaseServiceAccountFilePath=secrets/video-app-79418-firebase-crashreporting-4hlba-87d53fc37a.json app:firebaseUploadInternalReleaseProguardMapping
+    - stage: snapshot
+      script: app:uploadInternalReleaseToHockeyApp
