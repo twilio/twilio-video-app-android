@@ -1,0 +1,110 @@
+language: android
+
+android:
+  components:
+    - tools
+    - platform-tools
+    - build-tools-26.0.2
+    - android-26
+    - extra-android-m2repository
+  licenses:
+    - 'android-sdk-license-.+'
+    - 'google-gdk-license-.+'
+    - 'intel-android-extra-license-.+'
+
+jdk:
+  - oraclejdk8
+
+branches:
+  only:
+    - master
+    - 2.0
+
+stages:
+  - name: test
+    if: type IN (push, pull_request) AND tag is blank
+  - name: snapshot
+    if: type = push AND branch IN (master, 2.0)
+  - name: release candidate
+    if: tag =~ ^\d+\.\d+\.\d+-rc\d+$
+
+notifications:
+  slack:
+    secure: RYo4Cc27ncThXlhVOTlFCPmzjB6p+Zcdnh5sKdEb5Nnv4IwAnw3QwjX87oSJwyerwI/C1EKLaeOKFMAycEHCmBXj5C5HTF+PnZrkYJwbMsPOsCcZLn0r/e0yxKmdg+MK7WTNXgt+WOfxvSbjmQ2WfE4OJAjHe+rOAC5OqHn4ukg/RmDN36lfZulhJ1hXjXIvBWOvpqy37AseSjzvS0VWGje9fJOPspTxr286N2kwfdNpoqi5X1f2RWa5BOLzs4sfdZZ7ijVIdGad/3Qf079baJ0Iz4qvruiAY2rUf+Vlj/x4u/BMXtv960D/jNOEWUQw4oZoEtCh6dBWi8n0JKB36yFc0P4Utvl9JTiaqyMUFh2OXAIbzLAFPmJF/3MdnKrGjV8+M8WzH+akjQCsXN2xxgxnIBwq25F4fFaacaxve2Pr7S9mu8k9cd2P2EfM88/JIv6W+3yqnM9GgkweX3h5OUaZI1JpV7/PR8KhjHJp7XgOu7V7gsRHWEhUVTK7pzEwP93w5sh/UZpaTZBViJlHSKma1Ap7c1/+p4vn3WQD2QTHU85Rr0hQFlC08QmlQQt8R1k9U+mMLFkgJpFxL4ba1fVO7ojVMKsxE+sccaWTTLG33XnfEIwI5YDdFE+uOtk3kkhtbi2s6nht4IUHuBJLj5mgacV+9kVu3o6y/izbZQQ=
+
+before_install:
+   # Untar secrets
+   - openssl aes-256-cbc -K $encrypted_7f5144414b5d_key -iv $encrypted_7f5144414b5d_iv -in secrets.tar.enc -out secrets.tar -d
+   - tar -xvf secrets.tar
+
+   # Internal debug google services
+   - mkdir -p app/src/internal/debug || true
+   - cp secrets/internal-debug-google-services.json app/src/internal/debug/google-services.json
+
+   # Internal release google services
+   - mkdir -p app/src/internal/release || true
+   - cp secrets/internal-release-google-services.json app/src/internal/release/google-services.json
+
+   # Production release google services
+   - mkdir -p app/src/production/release || true
+   - cp secrets/production-release-google-services.json app/src/production/release/google-services.json
+
+   # Video Android Twilio Credentials
+   - cp secrets/twilio-video.json library/twilio-video.json
+
+   # Video App Development Variant Credentials
+   - cp secrets/twilio-video-app.json app/twilio-video-app.json
+
+   # Authenticate with gcloud
+   - gcloud auth activate-service-account travis@video-app-79418.iam.gserviceaccount.com --key-file=secrets/video-app-46437ca14fdd.json
+
+before_script:
+   # Gradle
+   - echo "androidKeystore=$TRAVIS_BUILD_DIR/$ANDROID_KEYSTORE" >> $HOME/.gradle/gradle.properties
+   - echo "androidKeystorePassword=$ANDROID_KEYSTORE_PASSWORD" >> $HOME/.gradle/gradle.properties
+   - echo "androidReleaseKeyAlias=$ANDROID_RELEASE_KEY_ALIAS" >> $HOME/.gradle/gradle.properties
+   - echo "androidReleaseKeyPassword=$ANDROID_RELEASE_KEY_PASSWORD" >> $HOME/.gradle/gradle.properties
+   - echo "org.gradle.jvmargs=-Xmx4096M" >> $HOME/.gradle/gradle.properties
+
+   # cmake
+   - wget https://github.com/Commit451/android-cmake-installer/releases/download/1.1.0/install-cmake.sh
+   - chmod +x install-cmake.sh
+   - ./install-cmake.sh > /dev/null
+
+   # Google Cloud SDK
+   - if [ ! -d "$HOME/google-cloud-sdk/bin" ]; then rm -rf $HOME/google-cloud-sdk; export CLOUDSDK_CORE_DISABLE_PROMPTS=1; curl https://sdk.cloud.google.com | bash; fi
+   - source /home/travis/google-cloud-sdk/path.bash.inc
+   - gcloud version
+
+   # Android NDK Setup
+   - pushd ~
+   - wget -q https://dl.google.com/android/repository/android-ndk-r12b-linux-x86_64.zip
+   - unzip -qo android-ndk-r12b-linux-x86_64.zip
+   - export ANDROID_NDK_HOME="$HOME/android-ndk-r12b"
+   - popd
+
+cache:
+  directories:
+    - $HOME/.gradle
+    - $HOME/google-cloud-sdk
+
+jobs:
+  include:
+    - stage: test
+      script: ./gradlew library:testDebugUnitTest
+    - stage: test
+      script: ./gradlew -q firebaseTestLabCheckLibrary
+    - stage: test
+      script: ./gradlew -q firebaseTestLabCheckLibraryCamera
+    - stage: test
+      script: ./gradlew -q assemble
+    - stage: snapshot
+      script: ./gradlew -q bintrayLibrarySnapshotUpload
+    - stage: snapshot
+      script: ./gradlew -q -PFirebaseServiceAccountFilePath=$TRAVIS_BUILD_DIR/$VIDEO_APP_CRASH_REPORTING_FILE app:firebaseUploadInternalReleaseProguardMapping
+    - stage: snapshot
+      script: ./gradlew -q app:uploadInternalReleaseToHockeyApp
+    - stage: release candidate
+      script: ./gradlew bintrayLibraryReleaseCandidateUpload
+    - stage: release candidate
+      script: ./gradlew incrementRc

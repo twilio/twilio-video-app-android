@@ -111,12 +111,35 @@ task tagRelease {
     }
 }
 
+task validateReleaseCandidateTag {
+    description = 'Validate the release candidate tag matches the release candidate version ' +
+            'present on commit'
+    group = 'Git'
+
+    doLast {
+        def rcTag = "${versionMajor}.${versionMinor}.${versionPatch}-rc${versionRc}"
+        def travisTag = System.getenv("TRAVIS_TAG")
+        def tagsMatch = (rcTag == travisTag) ? ("true") : ("false")
+
+        exec {
+            workingDir "${rootDir}"
+            commandLine tagsMatch
+        }
+    }
+}
+
 task incrementRc {
     description = 'Increment the current release candidate version'
     group = 'Git'
 
+    dependsOn 'validateReleaseCandidateTag'
+
     doLast {
-        def gitBranch = System.getenv("GIT_BRANCH")
+        /*
+         * Travis CI is in detached head when this task executes. Use the current version to
+         * determine what branch to increment the RC on.
+         */
+        def gitBranch = (versionMajor == 1) ? ("master") : ("2.0")
         def nextVersionRc = "${versionRc + 1}"
         // Create build directory if not created
         if (!buildDir.exists()) {
@@ -148,7 +171,7 @@ task incrementRc {
 
         exec {
             workingDir "${rootDir}"
-            commandLine "git", "commit", "gradle.properties", "-m", "\"Bump RC version\""
+            commandLine "git", "commit", "gradle.properties", "-m", "\"Bump RC version [skip ci]\""
         }
 
         exec {
@@ -413,9 +436,8 @@ task checkLibrary(type: GradleBuild) {
 task bintrayLibrarySnapshotUpload(type: GradleBuild) {
     description = 'Publish Video Android AAR snapshot to Bintray'
     group = 'Publishing'
-    dependsOn checkLibrary
     buildFile = file('library/build.gradle')
-    tasks = ['uploadArchives']
+    tasks = ['clean', 'assemble', 'uploadArchives']
     startParameter.projectProperties += gradle.startParameter.projectProperties + [
             'snapshot': true,
             'maven.repo': 'https://api.bintray.com/maven/twilio/snapshots/video-android/;publish=1',
@@ -427,6 +449,7 @@ task bintrayLibrarySnapshotUpload(type: GradleBuild) {
 task bintrayLibraryReleaseCandidateUpload(type: GradleBuild) {
     description = 'Publish Video Android AAR release candidate to internal Bintray'
     group = 'Publishing'
+    dependsOn 'validateReleaseCandidateTag'
     buildFile = file('library/build.gradle')
     tasks = ['clean', 'assemble', 'uploadArchives']
     startParameter.projectProperties += gradle.startParameter.projectProperties + [
