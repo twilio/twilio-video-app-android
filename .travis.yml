@@ -19,6 +19,8 @@ branches:
   only:
     - master
     - 2.0
+    # RC Tag Branches
+    - /^\d+\.\d+\.\d+-rc\d+$/
 
 stages:
   - name: test
