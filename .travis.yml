@@ -26,6 +26,10 @@ stages:
   - name: snapshot
     if: type = push AND branch IN (master, 2.0)
 
+notifications:
+  slack:
+    secure: RYo4Cc27ncThXlhVOTlFCPmzjB6p+Zcdnh5sKdEb5Nnv4IwAnw3QwjX87oSJwyerwI/C1EKLaeOKFMAycEHCmBXj5C5HTF+PnZrkYJwbMsPOsCcZLn0r/e0yxKmdg+MK7WTNXgt+WOfxvSbjmQ2WfE4OJAjHe+rOAC5OqHn4ukg/RmDN36lfZulhJ1hXjXIvBWOvpqy37AseSjzvS0VWGje9fJOPspTxr286N2kwfdNpoqi5X1f2RWa5BOLzs4sfdZZ7ijVIdGad/3Qf079baJ0Iz4qvruiAY2rUf+Vlj/x4u/BMXtv960D/jNOEWUQw4oZoEtCh6dBWi8n0JKB36yFc0P4Utvl9JTiaqyMUFh2OXAIbzLAFPmJF/3MdnKrGjV8+M8WzH+akjQCsXN2xxgxnIBwq25F4fFaacaxve2Pr7S9mu8k9cd2P2EfM88/JIv6W+3yqnM9GgkweX3h5OUaZI1JpV7/PR8KhjHJp7XgOu7V7gsRHWEhUVTK7pzEwP93w5sh/UZpaTZBViJlHSKma1Ap7c1/+p4vn3WQD2QTHU85Rr0hQFlC08QmlQQt8R1k9U+mMLFkgJpFxL4ba1fVO7ojVMKsxE+sccaWTTLG33XnfEIwI5YDdFE+uOtk3kkhtbi2s6nht4IUHuBJLj5mgacV+9kVu3o6y/izbZQQ=
+
 before_install:
    # Untar secrets
    - openssl aes-256-cbc -K $encrypted_7f5144414b5d_key -iv $encrypted_7f5144414b5d_iv -in secrets.tar.enc -out secrets.tar -d
