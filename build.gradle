@@ -413,9 +413,8 @@ task checkLibrary(type: GradleBuild) {
 task bintrayLibrarySnapshotUpload(type: GradleBuild) {
     description = 'Publish Video Android AAR snapshot to Bintray'
     group = 'Publishing'
-    dependsOn checkLibrary
     buildFile = file('library/build.gradle')
-    tasks = ['uploadArchives']
+    tasks = ['clean', 'assemble', 'uploadArchives']
     startParameter.projectProperties += gradle.startParameter.projectProperties + [
             'snapshot': true,
             'maven.repo': 'https://api.bintray.com/maven/twilio/snapshots/video-android/;publish=1',
