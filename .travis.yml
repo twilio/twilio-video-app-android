@@ -97,8 +97,8 @@ jobs:
     - stage: test
       script: ./gradlew -q assemble
     - stage: snapshot
-      script: ./gradlew bintrayLibrarySnapshotUpload
+      script: ./gradlew -q bintrayLibrarySnapshotUpload
     - stage: snapshot
-      script: ./gradlew -PFirebaseServiceAccountFilePath=$TRAVIS_BUILD_DIR/secrets/video-app-79418-firebase-crashreporting-4hlba-87d53fc37a.json app:firebaseUploadInternalReleaseProguardMapping
+      script: ./gradlew -q -PFirebaseServiceAccountFilePath=$TRAVIS_BUILD_DIR/$VIDEO_APP_CRASH_REPORTING_FILE app:firebaseUploadInternalReleaseProguardMapping
     - stage: snapshot
-      script: ./gradlew app:uploadInternalReleaseToHockeyApp
+      script: ./gradlew -q app:uploadInternalReleaseToHockeyApp
