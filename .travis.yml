@@ -22,9 +22,11 @@ branches:
 
 stages:
   - name: test
-    if: type IN (push, pull_request)
+    if: type IN (push, pull_request) AND tag is blank
   - name: snapshot
     if: type = push AND branch IN (master, 2.0)
+  - name: release candidate
+    if: tag =~ ^\d+\.\d+\.\d+-rc\d+$
 
 notifications:
   slack:
@@ -102,3 +104,7 @@ jobs:
       script: ./gradlew -q -PFirebaseServiceAccountFilePath=$TRAVIS_BUILD_DIR/$VIDEO_APP_CRASH_REPORTING_FILE app:firebaseUploadInternalReleaseProguardMapping
     - stage: snapshot
       script: ./gradlew -q app:uploadInternalReleaseToHockeyApp
+    - stage: release candidate
+      script: ./gradlew bintrayLibraryReleaseCandidateUpload
+    - stage: release candidate
+      script: ./gradlew incrementRc
