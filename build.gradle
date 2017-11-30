@@ -117,9 +117,8 @@ task validateReleaseCandidateTag {
     group = 'Git'
 
     doLast {
-        def rcTag = "${versionMajor}.${versionMinor}.${versionPatch}-rc${versionRc}"
         def travisTag = System.getenv("TRAVIS_TAG")
-        def tagsMatch = (rcTag == travisTag) ? ("true") : ("false")
+        def tagsMatch = (matchesRcVersion(travisTag)) ? ("true") : ("false")
 
         exec {
             workingDir "${rootDir}"
@@ -140,43 +139,68 @@ task incrementRc {
          * determine what branch to increment the RC on.
          */
         def gitBranch = (versionMajor == 1) ? ("master") : ("2.0")
+        def travisTag = System.getenv("TRAVIS_TAG")
+        def githubToken = System.getenv("GITHUB_TOKEN")
+        def repoSlug = System.getenv("TRAVIS_REPO_SLUG")
+        def gitRef = "https://${githubToken}@github.com/${repoSlug}.git"
+        def remote = "upstream"
+        def pushNullFile = new FileOutputStream("/dev/null")
         def nextVersionRc = "${versionRc + 1}"
         // Create build directory if not created
         if (!buildDir.exists()) {
             buildDir.mkdir()
         }
         def tmpProjectPropertiesFile = new FileOutputStream("${buildDir}/gradle.properties")
+
+        exec {
+            workingDir "${rootDir}"
+            commandLine "git", "remote", "add", "${remote}", "${gitRef}"
+        }
+
+        exec {
+            workingDir "${rootDir}"
+            commandLine "git", "fetch", "${remote}"
+        }
+
         exec {
             workingDir "${rootDir}"
             commandLine "git", "checkout", "${gitBranch}"
         }
 
-        exec {
-            workingDir "${rootDir}"
-            commandLine "echo", "Incrementing RC from ${versionRc} to ${nextVersionRc}"
-        }
+        /*
+         * Only update the RC version on upstream branch if the version matches tag. It is possible
+         * these values do not match if an RC job is performed on an earlier commit and a PR
+         * with a version update occurs later in history.
+         */
+        if (matchesRcVersion(travisTag)) {
+            exec {
+                workingDir "${rootDir}"
+                commandLine "echo", "Incrementing RC from ${versionRc} to ${nextVersionRc}"
+            }
 
-        exec {
-            workingDir "${rootDir}"
-            commandLine "sed",
-                    "s@versionRc=.*@versionRc=${nextVersionRc}@",
-                    "gradle.properties"
-            standardOutput tmpProjectPropertiesFile
-        }
+            exec {
+                workingDir "${rootDir}"
+                commandLine "sed",
+                        "s@versionRc=.*@versionRc=${nextVersionRc}@",
+                        "gradle.properties"
+                standardOutput tmpProjectPropertiesFile
+            }
 
-        exec {
-            workingDir "${rootDir}"
-            commandLine "mv", "${buildDir}/gradle.properties", "gradle.properties"
-        }
+            exec {
+                workingDir "${rootDir}"
+                commandLine "mv", "${buildDir}/gradle.properties", "gradle.properties"
+            }
 
-        exec {
-            workingDir "${rootDir}"
-            commandLine "git", "commit", "gradle.properties", "-m", "\"Bump RC version [skip ci]\""
-        }
+            exec {
+                workingDir "${rootDir}"
+                commandLine "git", "commit", "gradle.properties", "-m", "\"Bump RC version [skip ci]\""
+            }
 
-        exec {
-            workingDir "${rootDir}"
-            commandLine "git", "push", "origin", "${gitBranch}"
+            exec {
+                workingDir "${rootDir}"
+                commandLine "git", "push", "--quiet", "${remote}", "${gitBranch}"
+                standardOutput pushNullFile
+            }
         }
     }
 }
@@ -476,4 +500,18 @@ task bintrayLibraryReleaseUpload(type: GradleBuild) {
             'maven.username': "${getBintrayUsername()}",
             'maven.password': "${getBintrayPassword()}"
     ]
+}
+
+/*
+ * Checks if an RC tag matches version and RC of current commit
+ */
+def matchesRcVersion(versionTag) {
+    def properties = new Properties()
+    file("${rootDir}/gradle.properties").withInputStream { properties.load(it) }
+    def rcTag = "${properties.getProperty("versionMajor")}." +
+            "${properties.getProperty("versionMinor")}." +
+            "${properties.getProperty("versionPatch")}-" +
+            "rc${properties.getProperty("versionRc")}"
+
+    return rcTag == versionTag
 }

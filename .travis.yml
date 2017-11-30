@@ -61,6 +61,10 @@ before_install:
    - gcloud auth activate-service-account travis@video-app-79418.iam.gserviceaccount.com --key-file=secrets/video-app-46437ca14fdd.json
 
 before_script:
+   # Git
+   - git config --global user.email "twilio-sdk-build@twilio.com"
+   - git config --global user.name "twilio-sdk-build"
+
    # Gradle
    - echo "androidKeystore=$TRAVIS_BUILD_DIR/$ANDROID_KEYSTORE" >> $HOME/.gradle/gradle.properties
    - echo "androidKeystorePassword=$ANDROID_KEYSTORE_PASSWORD" >> $HOME/.gradle/gradle.properties
@@ -68,7 +72,7 @@ before_script:
    - echo "androidReleaseKeyPassword=$ANDROID_RELEASE_KEY_PASSWORD" >> $HOME/.gradle/gradle.properties
    - echo "org.gradle.jvmargs=-Xmx4096M" >> $HOME/.gradle/gradle.properties
 
-   # cmake
+   # Cmake
    - wget https://github.com/Commit451/android-cmake-installer/releases/download/1.1.0/install-cmake.sh
    - chmod +x install-cmake.sh
    - ./install-cmake.sh > /dev/null
