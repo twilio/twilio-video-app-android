@@ -111,6 +111,4 @@ jobs:
     - stage: snapshot
       script: ./gradlew -q app:uploadInternalReleaseToHockeyApp
     - stage: release candidate
-      script: ./gradlew bintrayLibraryReleaseCandidateUpload
-    - stage: release candidate
-      script: ./gradlew incrementRc
+      script: ./gradlew bintrayLibraryReleaseCandidateUpload incrementRc
