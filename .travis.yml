@@ -21,6 +21,12 @@ branches:
     - 2.0
     # RC Tag Branches
     - /^\d+\.\d+\.\d+-rc\d+$/
+    # Release Tag Branches
+    - /^\d+\.\d+\.\d+$/
+    # Preview Release Tag Branches
+    - /^\d+\.\d+\.\d+-preview\d+$/
+    # Beta Release Tag Branches
+    - /^\d+\.\d+\.\d+-beta\d+$/
 
 stages:
   - name: test
@@ -29,6 +35,8 @@ stages:
     if: type = push AND branch IN (master, 2.0)
   - name: release candidate
     if: tag =~ ^\d+\.\d+\.\d+-rc\d+$
+  - name: release
+    if: tag =~ ^\d+\.\d+\.\d+$ OR tag =~ ^\d+\.\d+\.\d+-preview\d+$ OR tag =~ ^\d+\.\d+\.\d+-beta\d+$
 
 notifications:
   slack:
@@ -112,3 +120,5 @@ jobs:
       script: ./gradlew -q app:uploadInternalReleaseToHockeyApp
     - stage: release candidate
       script: ./gradlew bintrayLibraryReleaseCandidateUpload incrementRc
+    - stage: release
+      script: ./gradlew bintrayLibraryReleaseUpload publishLibraryJavadocs incrementVersion
