@@ -22,7 +22,7 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.OnTextChanged;
 
-public class DevelopmentLoginActivity extends BaseActivity {
+public class CommunityLoginActivity extends BaseActivity {
     @Inject SharedPreferences sharedPreferences;
 
     @BindView(R.id.name_edittext) EditText nameEditText;

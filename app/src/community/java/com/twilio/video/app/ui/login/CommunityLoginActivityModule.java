@@ -8,11 +8,11 @@ import dagger.android.ActivityKey;
 import dagger.android.AndroidInjector;
 import dagger.multibindings.IntoMap;
 
-@Module(subcomponents = DevelopmentLoginActivitySubcomponent.class)
-public abstract class DevelopmentLoginActivityModule {
+@Module(subcomponents = CommunityLoginActivitySubcomponent.class)
+public abstract class CommunityLoginActivityModule {
     @Binds
     @IntoMap
-    @ActivityKey(DevelopmentLoginActivity.class)
+    @ActivityKey(CommunityLoginActivity.class)
     abstract AndroidInjector.Factory<? extends Activity>
-    bindYourActivityInjectorFactory(DevelopmentLoginActivitySubcomponent.Builder builder);
+    bindYourActivityInjectorFactory(CommunityLoginActivitySubcomponent.Builder builder);
 }

@@ -8,10 +8,10 @@ import dagger.Module;
 import dagger.Provides;
 
 @Module
-public class DevelopmentAuthModule {
+public class CommunityAuthModule {
     @Provides
     @ApplicationScope
     Authenticator providesAuthenticator(SharedPreferences preferences) {
-        return new DevelopmentAuthenticator(preferences);
+        return new CommunityAuthenticator(preferences);
     }
 }

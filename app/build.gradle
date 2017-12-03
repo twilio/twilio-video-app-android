@@ -92,9 +92,9 @@ android {
             buildConfigField 'String', 'ENVIRONMENT_DEFAULT', '"prod"'
         }
 
-        development {
+        community {
             dimension "environment"
-            applicationId "com.twilio.video.app.development"
+            applicationId "com.twilio.video.app.community"
             buildConfigField 'String', 'TOPOLOGY_DEFAULT', '"P2P"'
             buildConfigField 'String', 'ENVIRONMENT_DEFAULT', '"prod"'
             buildConfigField("java.util.Map<String, String>",
@@ -106,9 +106,9 @@ android {
     variantFilter { variant ->
         def names = variant.flavors*.name
 
-        // Ignore production debug and development release builds
+        // Ignore production debug and community release builds
         if ((names.contains("production") && variant.buildType.name == "debug") ||
-                (names.contains("development") && variant.buildType.name == "release")) {
+                (names.contains("community") && variant.buildType.name == "release")) {
             setIgnore(true)
         }
     }
@@ -146,7 +146,7 @@ dependencies {
 
     annotationProcessor 'com.jakewharton:butterknife-compiler:8.4.0'
 
-    developmentImplementation project(':token')
+    communityImplementation project(':token')
 }
 
 def getHockeyAppApiToken() {
@@ -192,7 +192,6 @@ def getTwilioVideoAppConfig() {
         assertCredentialDefined(twilioVideoConfig.credentials, "account_sid");
         assertCredentialDefined(twilioVideoConfig.credentials, "api_key");
         assertCredentialDefined(twilioVideoConfig.credentials, "api_key_secret");
-        assertCredentialDefined(twilioVideoConfig.credentials, "configuration_profile_sid");
 
         // Generate credential HashMap
         def hashMapPrefix = "new java.util.HashMap<String , String>() {{\n";
@@ -208,7 +207,7 @@ def getTwilioVideoAppConfig() {
         return hashMap + hashMapSuffix;
     } else {
         logger.log(LogLevel.WARN, "Could not find twilio-video-app.json in " +
-                project.projectDir.toString() + ". Development variant cannot connect to room" +
+                project.projectDir.toString() + ". Community variant cannot connect to room" +
                 " without credentials")
     }
 }
