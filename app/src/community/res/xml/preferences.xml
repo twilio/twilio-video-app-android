@@ -6,14 +6,6 @@
             android:defaultValue="false"
             android:key="pref_enable_stats"
             android:title="@string/enable_stats"/>
-        <ListPreference
-            android:defaultValue="P2P"
-            android:entries="@array/topology_array"
-            android:entryValues="@array/topology_array"
-            android:key="pref_topology"
-            android:summary="%s"
-            android:title="@string/topology"
-            android:negativeButtonText="@null"/>
     </PreferenceCategory>
     <PreferenceCategory android:title="@string/media">
         <ListPreference

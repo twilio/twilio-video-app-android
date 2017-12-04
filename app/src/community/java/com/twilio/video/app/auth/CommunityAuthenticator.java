@@ -5,18 +5,18 @@ import android.content.SharedPreferences;
 import com.google.common.base.Strings;
 import com.twilio.video.app.base.BaseActivity;
 import com.twilio.video.app.data.Preferences;
-import com.twilio.video.app.ui.login.DevelopmentLoginActivity;
+import com.twilio.video.app.ui.login.CommunityLoginActivity;
 
-public class DevelopmentAuthenticator implements Authenticator {
+public class CommunityAuthenticator implements Authenticator {
     private final SharedPreferences preferences;
 
-    public DevelopmentAuthenticator(SharedPreferences preferences) {
+    public CommunityAuthenticator(SharedPreferences preferences) {
         this.preferences = preferences;
     }
 
     @Override
     public Class<? extends BaseActivity> getLoginActivity() {
-        return DevelopmentLoginActivity.class;
+        return CommunityLoginActivity.class;
     }
 
     @Override
