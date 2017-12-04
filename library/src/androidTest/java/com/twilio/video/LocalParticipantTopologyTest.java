@@ -53,7 +53,7 @@ import static org.junit.Assert.assertTrue;
 @RunWith(Parameterized.class)
 @LargeTest
 public class LocalParticipantTopologyTest extends BaseClientTest {
-    private static final int TRACK_NAME_LENGTH_MAX = 128;
+    private static final int TRACK_NAME_LENGTH_MAX = 256;
 
     @Parameterized.Parameters(name = "{0}")
     public static Iterable<Object[]> data() {
