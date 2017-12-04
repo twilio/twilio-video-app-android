@@ -39,26 +39,17 @@ In order to use our project please make sure you have the following installed:
 1.  Setup your Programmable Video credentials
 
     #### Video Android App
-    These credentials are only required if you intend on using the development variant of the
-    application. See [Building the Development Flavor](#building-the-development-flavor) for more
+    These credentials are only required if you intend on using the community variant of the
+    application. See [Building the Community Flavor](#building-the-community-flavor) for more
     details. Set your credentials in `twilio-video-app.json` located in the `app` directory.
 
     An example json file is provided under [app/twilio-video-app-example.json](app/twilio-video-app-example.json). 
-    The following values MUST be set to build the development variant:
+    The following values MUST be set to build the community variant:
 
     ```
     account_sid
     api_key
     api_key_secret
-    configuration_profile_sid
-    ```
-
-    The following values are allowed if you want to enable the development variant to switch 
-    between topologies:
-
-    ```
-    sfu_configuration_profile_sid
-    sfu_recording_configuration_profile_sid
     ```
 
     #### Video Android SDK
@@ -139,8 +130,8 @@ SDK. The application consists of the following [product flavors](http://tools.an
 1. Production - The canonical application intended for every day use.
 1. Development - Local development version intended for non Twilio developers.
 
-### Building the Development Flavor
-The development flavor of the application is meant for developers who would like to work with the 
+### Building the Community Flavor
+The community flavor of the application is meant for developers who would like to work with the 
 Android SDK in the context of a full-fledged application without needing to bother with implementing 
 authentication and managing a token server. **This variant generates access tokens locally within
 the application. This practice is intended for local development and is not encouraged for your 
@@ -150,17 +141,17 @@ token generation instructions in your application. Putting your Account SID,
 API Key, and API Key Secret inside of an Android application will compromise your Twilio API 
 credentials associated with your Twilio account.**
 
-To get started with the development flavor follow these steps:
+To get started with the community flavor follow these steps:
 
 1. Setup your `app/twilio-video-app.json` according to steps in [Getting Started](#getting-started).
 
 2. In Android Studio navigate to View → Tool Windows → Build Variants.
 
-    <img width="700px" src="images/development-variant/build-variants.png"/>
+    <img width="700px" src="images/community-variant/build-variants.png"/>
   
-3. Select the `developmentDebug` Build Variant under the app module.
+3. Select the `communityDebug` Build Variant under the app module.
 
-    <img width="700px" src="images/development-variant/development-debug-variant.png"/>
+    <img width="700px" src="images/community-variant/community-debug-variant.png"/>
   
 4. Run the application.
 

@@ -7,10 +7,10 @@ import dagger.Module;
 import dagger.Provides;
 
 @Module(includes = DataModule.class)
-public class DevelopmentDataModule {
+public class CommunityDataModule {
     @Provides
     @ApplicationScope
     TokenService providesTokenService() {
-        return new DevelopmentTokenService();
+        return new CommunityTokenService();
     }
 }

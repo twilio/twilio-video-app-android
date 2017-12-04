@@ -1,5 +1,5 @@
 {
-  "comment": "Fake file used to please Google Services gradle plugin for development variant.",
+  "comment": "Fake file used to please Google Services gradle plugin for community variant.",
   "project_info": {
     "project_number": "000000000",
     "firebase_url": "https://fake-app.firebaseio.com",
@@ -11,7 +11,7 @@
       "client_info": {
         "mobilesdk_app_id": "1:000000000:android:000000000",
         "android_client_info": {
-          "package_name": "com.twilio.video.app.development"
+          "package_name": "com.twilio.video.app.community"
         }
       },
       "oauth_client": [
@@ -19,7 +19,7 @@
           "client_id": "000000-00000.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
-            "package_name": "com.twilio.video.app.development",
+            "package_name": "com.twilio.video.app.community",
             "certificate_hash": "00000000000000000000000000"
           }
         },
@@ -62,7 +62,7 @@
       "client_info": {
         "mobilesdk_app_id": "1:00000000:android:00000000",
         "android_client_info": {
-          "package_name": "com.twilio.video.app.development.debug"
+          "package_name": "com.twilio.video.app.community.debug"
         }
       },
       "oauth_client": [
@@ -70,7 +70,7 @@
           "client_id": "0000000-00000000.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
-            "package_name": "com.twilio.video.app.development.debug",
+            "package_name": "com.twilio.video.app.community.debug",
             "certificate_hash": "00000000000"
           }
         },
@@ -113,7 +113,7 @@
       "client_info": {
         "mobilesdk_app_id": "1:00000000:android:0000000000",
         "android_client_info": {
-          "package_name": "com.twilio.video.app.development"
+          "package_name": "com.twilio.video.app.community"
         }
       },
       "oauth_client": [
@@ -121,7 +121,7 @@
           "client_id": "000000-00000000.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
-            "package_name": "com.twilio.video.app.development",
+            "package_name": "com.twilio.video.app.community",
             "certificate_hash": "00000000000000000000"
           }
         },

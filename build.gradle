@@ -117,9 +117,24 @@ task validateReleaseCandidateTag {
     group = 'Git'
 
     doLast {
-        def rcTag = "${versionMajor}.${versionMinor}.${versionPatch}-rc${versionRc}"
         def travisTag = System.getenv("TRAVIS_TAG")
-        def tagsMatch = (rcTag == travisTag) ? ("true") : ("false")
+        def tagsMatch = (matchesRcVersion(travisTag)) ? ("true") : ("false")
+
+        exec {
+            workingDir "${rootDir}"
+            commandLine tagsMatch
+        }
+    }
+}
+
+task validateReleaseTag {
+    description = 'Validate the release tag matches the release version ' +
+            'present on commit'
+    group = 'Git'
+
+    doLast {
+        def travisTag = System.getenv("TRAVIS_TAG")
+        def tagsMatch = (matchesVersion(travisTag)) ? ("true") : ("false")
 
         exec {
             workingDir "${rootDir}"
@@ -140,43 +155,70 @@ task incrementRc {
          * determine what branch to increment the RC on.
          */
         def gitBranch = (versionMajor == 1) ? ("master") : ("2.0")
+        def travisTag = System.getenv("TRAVIS_TAG")
+        def githubToken = System.getenv("GITHUB_TOKEN")
+        def repoSlug = System.getenv("TRAVIS_REPO_SLUG")
+        def gitRef = "https://${githubToken}@github.com/${repoSlug}.git"
+        def remote = "upstream"
+        def pushNullFile = new FileOutputStream("/dev/null")
         def nextVersionRc = "${versionRc + 1}"
         // Create build directory if not created
         if (!buildDir.exists()) {
             buildDir.mkdir()
         }
         def tmpProjectPropertiesFile = new FileOutputStream("${buildDir}/gradle.properties")
+
+        exec {
+            workingDir "${rootDir}"
+            commandLine "git", "remote", "add", "${remote}", "${gitRef}"
+            // Ignore exit value because remote may have been added in previous task
+            ignoreExitValue true
+        }
+
+        exec {
+            workingDir "${rootDir}"
+            commandLine "git", "fetch", "${remote}"
+        }
+
         exec {
             workingDir "${rootDir}"
             commandLine "git", "checkout", "${gitBranch}"
         }
 
-        exec {
-            workingDir "${rootDir}"
-            commandLine "echo", "Incrementing RC from ${versionRc} to ${nextVersionRc}"
-        }
+        /*
+         * Only update the RC version on upstream branch if the version matches tag. It is possible
+         * these values do not match if an RC job is performed on an earlier commit and a PR
+         * with a version update occurs later in history.
+         */
+        if (matchesRcVersion(travisTag)) {
+            exec {
+                workingDir "${rootDir}"
+                commandLine "echo", "Incrementing RC from ${versionRc} to ${nextVersionRc}"
+            }
 
-        exec {
-            workingDir "${rootDir}"
-            commandLine "sed",
-                    "s@versionRc=.*@versionRc=${nextVersionRc}@",
-                    "gradle.properties"
-            standardOutput tmpProjectPropertiesFile
-        }
+            exec {
+                workingDir "${rootDir}"
+                commandLine "sed",
+                        "s@versionRc=.*@versionRc=${nextVersionRc}@",
+                        "gradle.properties"
+                standardOutput tmpProjectPropertiesFile
+            }
 
-        exec {
-            workingDir "${rootDir}"
-            commandLine "mv", "${buildDir}/gradle.properties", "gradle.properties"
-        }
+            exec {
+                workingDir "${rootDir}"
+                commandLine "mv", "${buildDir}/gradle.properties", "gradle.properties"
+            }
 
-        exec {
-            workingDir "${rootDir}"
-            commandLine "git", "commit", "gradle.properties", "-m", "\"Bump RC version [skip ci]\""
-        }
+            exec {
+                workingDir "${rootDir}"
+                commandLine "git", "commit", "gradle.properties", "-m", "\"Bump RC version [skip ci]\""
+            }
 
-        exec {
-            workingDir "${rootDir}"
-            commandLine "git", "push", "origin", "${gitBranch}"
+            exec {
+                workingDir "${rootDir}"
+                commandLine "git", "push", "--quiet", "${remote}", "${gitBranch}"
+                standardOutput pushNullFile
+            }
         }
     }
 }
@@ -186,80 +228,111 @@ task incrementVersionAfterRelease {
     group = 'Git'
 
     doLast {
-        def gitBranch = System.getenv("GIT_BRANCH")
+        /*
+         * Travis CI is in detached head when this task executes. Use the current version to
+         * determine what branch to increment the version on.
+         */
+        def gitBranch = (versionMajor == 1) ? ("master") : ("2.0")
+        def travisTag = System.getenv("TRAVIS_TAG")
+        def githubToken = System.getenv("GITHUB_TOKEN")
+        def repoSlug = System.getenv("TRAVIS_REPO_SLUG")
+        def gitRef = "https://${githubToken}@github.com/${repoSlug}.git"
+        def remote = "upstream"
+        def pushNullFile = new FileOutputStream("/dev/null")
         def nextVersionPatch = versionPatch + 1
         // Create build directory if not created
         if (!buildDir.exists()) {
             buildDir.mkdir()
         }
+
+        exec {
+            workingDir "${rootDir}"
+            commandLine "git", "remote", "add", "${remote}", "${gitRef}"
+            // Ignore exit value because remote may have been added in previous task
+            ignoreExitValue true
+        }
+
+        exec {
+            workingDir "${rootDir}"
+            commandLine "git", "fetch", "${remote}"
+        }
+
         exec {
             workingDir "${rootDir}"
             commandLine "git", "checkout", "${gitBranch}"
         }
 
-        exec {
-            workingDir "${rootDir}"
-            commandLine "echo", "Incrementing from versionPatch ${versionPatch} to " +
-                    "${nextVersionPatch}"
-        }
+        /*
+         * Only update the version on upstream branch if the version matches tag. It is possible
+         * these values do not match if a job is performed on an earlier commit and a PR
+         * with a version update occurs later in history.
+         */
+        if (matchesVersion(travisTag)) {
+            exec {
+                workingDir "${rootDir}"
+                commandLine "echo", "Incrementing from versionPatch ${versionPatch} to " +
+                        "${nextVersionPatch}"
+            }
 
-        exec {
-            workingDir "${rootDir}"
-            commandLine "sed",
-                    "s@versionPatch=.*@versionPatch=${nextVersionPatch}@",
-                    "gradle.properties"
-            standardOutput new FileOutputStream("${buildDir}/gradle.properties")
-        }
+            exec {
+                workingDir "${rootDir}"
+                commandLine "sed",
+                        "s@versionPatch=.*@versionPatch=${nextVersionPatch}@",
+                        "gradle.properties"
+                standardOutput new FileOutputStream("${buildDir}/gradle.properties")
+            }
 
-        exec {
-            workingDir "${rootDir}"
-            commandLine "mv", "${buildDir}/gradle.properties", "gradle.properties"
-        }
+            exec {
+                workingDir "${rootDir}"
+                commandLine "mv", "${buildDir}/gradle.properties", "gradle.properties"
+            }
 
-        exec {
-            workingDir "${rootDir}"
-            commandLine "echo", "Resetting versionRc to 1"
-        }
+            exec {
+                workingDir "${rootDir}"
+                commandLine "echo", "Resetting versionRc to 1"
+            }
 
-        exec {
-            workingDir "${rootDir}"
-            commandLine "sed",
-                    "s@versionRc=.*@versionRc=1@",
-                    "gradle.properties"
-            standardOutput new FileOutputStream("${buildDir}/gradle.properties")
-        }
+            exec {
+                workingDir "${rootDir}"
+                commandLine "sed",
+                        "s@versionRc=.*@versionRc=1@",
+                        "gradle.properties"
+                standardOutput new FileOutputStream("${buildDir}/gradle.properties")
+            }
 
-        exec {
-            workingDir "${rootDir}"
-            commandLine "mv", "${buildDir}/gradle.properties", "gradle.properties"
-        }
+            exec {
+                workingDir "${rootDir}"
+                commandLine "mv", "${buildDir}/gradle.properties", "gradle.properties"
+            }
 
-        exec {
-            workingDir "${rootDir}"
-            commandLine "echo", "Resetting phaseNumber to 1"
-        }
+            exec {
+                workingDir "${rootDir}"
+                commandLine "echo", "Resetting phaseNumber to 1"
+            }
 
-        exec {
-            workingDir "${rootDir}"
-            commandLine "sed",
-                    "s@phaseNumber=.*@phaseNumber=1@",
-                    "gradle.properties"
-            standardOutput new FileOutputStream("${buildDir}/gradle.properties")
-        }
+            exec {
+                workingDir "${rootDir}"
+                commandLine "sed",
+                        "s@phaseNumber=.*@phaseNumber=1@",
+                        "gradle.properties"
+                standardOutput new FileOutputStream("${buildDir}/gradle.properties")
+            }
 
-        exec {
-            workingDir "${rootDir}"
-            commandLine "mv", "${buildDir}/gradle.properties", "gradle.properties"
-        }
+            exec {
+                workingDir "${rootDir}"
+                commandLine "mv", "${buildDir}/gradle.properties", "gradle.properties"
+            }
 
-        exec {
-            workingDir "${rootDir}"
-            commandLine "git", "commit", "gradle.properties", "-m", "\"Bump patch and reset rc version\""
-        }
+            exec {
+                workingDir "${rootDir}"
+                commandLine "git", "commit", "gradle.properties", "-m", "\"Bump patch and reset rc version [skip ci]\""
+            }
 
-        exec {
-            workingDir "${rootDir}"
-            commandLine "git", "push", "origin", "${gitBranch}"
+            exec {
+                workingDir "${rootDir}"
+                commandLine "git", "push", "--quiet", "${remote}", "${gitBranch}"
+                standardOutput pushNullFile
+            }
         }
     }
 }
@@ -269,44 +342,75 @@ task incrementVersionAfterPreRelease {
     group = 'Git'
 
     doLast {
-        def gitBranch = System.getenv("GIT_BRANCH")
+        /*
+         * Travis CI is in detached head when this task executes. Use the current version to
+         * determine what branch to increment the version on.
+         */
+        def gitBranch = (versionMajor == 1) ? ("master") : ("2.0")
+        def travisTag = System.getenv("TRAVIS_TAG")
+        def githubToken = System.getenv("GITHUB_TOKEN")
+        def repoSlug = System.getenv("TRAVIS_REPO_SLUG")
+        def gitRef = "https://${githubToken}@github.com/${repoSlug}.git"
+        def remote = "upstream"
+        def pushNullFile = new FileOutputStream("/dev/null")
         def nextPhaseNumber = phaseNumber + 1
         // Create build directory if not created
         if (!buildDir.exists()) {
             buildDir.mkdir()
         }
+
+        exec {
+            workingDir "${rootDir}"
+            commandLine "git", "remote", "add", "${remote}", "${gitRef}"
+            // Ignore exit value because remote may have been added in previous task
+            ignoreExitValue true
+        }
+
+        exec {
+            workingDir "${rootDir}"
+            commandLine "git", "fetch", "${remote}"
+        }
+
         exec {
             workingDir "${rootDir}"
             commandLine "git", "checkout", "${gitBranch}"
         }
 
-        exec {
-            workingDir "${rootDir}"
-            commandLine "echo", "Incrementing from phaseNumber ${phaseNumber} to " +
-                    "${nextPhaseNumber}"
-        }
+        /*
+         * Only update the phase on upstream branch if the version matches tag. It is possible
+         * these values do not match if a job is performed on an earlier commit and a PR
+         * with a version update occurs later in history.
+         */
+        if (matchesVersion(travisTag)) {
+            exec {
+                workingDir "${rootDir}"
+                commandLine "echo", "Incrementing from phaseNumber ${phaseNumber} to " +
+                        "${nextPhaseNumber}"
+            }
 
-        exec {
-            workingDir "${rootDir}"
-            commandLine "sed",
-                    "s@phaseNumber=.*@phaseNumber=${nextPhaseNumber}@",
-                    "gradle.properties"
-            standardOutput new FileOutputStream("${buildDir}/gradle.properties")
-        }
+            exec {
+                workingDir "${rootDir}"
+                commandLine "sed",
+                        "s@phaseNumber=.*@phaseNumber=${nextPhaseNumber}@",
+                        "gradle.properties"
+                standardOutput new FileOutputStream("${buildDir}/gradle.properties")
+            }
 
-        exec {
-            workingDir "${rootDir}"
-            commandLine "mv", "${buildDir}/gradle.properties", "gradle.properties"
-        }
+            exec {
+                workingDir "${rootDir}"
+                commandLine "mv", "${buildDir}/gradle.properties", "gradle.properties"
+            }
 
-        exec {
-            workingDir "${rootDir}"
-            commandLine "git", "commit", "gradle.properties", "-m", "\"Bump phase number\""
-        }
+            exec {
+                workingDir "${rootDir}"
+                commandLine "git", "commit", "gradle.properties", "-m", "\"Bump phase number [skip ci]\""
+            }
 
-        exec {
-            workingDir "${rootDir}"
-            commandLine "git", "push", "origin", "${gitBranch}"
+            exec {
+                workingDir "${rootDir}"
+                commandLine "git", "push", "--quiet", "${remote}", "${gitBranch}"
+                standardOutput pushNullFile
+            }
         }
     }
 }
@@ -314,9 +418,10 @@ task incrementVersionAfterPreRelease {
 task incrementVersion(type: GradleBuild) {
     description = 'Increment the SDK version'
     group = 'Git'
-    def releaseVersion = System.getenv("RELEASE_VERSION") == null ?
+    dependsOn validateReleaseTag
+    def releaseVersion = System.getenv("TRAVIS_TAG") == null ?
             ("") :
-            (System.getenv("RELEASE_VERSION"))
+            (System.getenv("TRAVIS_TAG"))
     def incrementVersionTask = releaseVersion.contains("preview") ||
             releaseVersion.contains("beta") ?
             ('incrementVersionAfterPreRelease') :
@@ -334,19 +439,35 @@ task checkoutRelease(type: Exec) {
 task publishLibraryJavadocs {
     description = 'Publish Video Android Javadocs to gh-pages branch'
     group = 'Publishing'
-    dependsOn 'checkoutRelease'
+    dependsOn validateReleaseTag
     dependsOn 'library:createJavadocs'
-    def gitBranch = System.getenv("GIT_BRANCH")
-    def releaseVersion = System.getenv("RELEASE_VERSION") == null ?
+    def releaseVersion = System.getenv("TRAVIS_TAG") == null ?
             ("") :
-            (System.getenv("RELEASE_VERSION"))
+            (System.getenv("TRAVIS_TAG"))
     boolean preRelease = releaseVersion.contains("preview") || releaseVersion.contains("beta")
     def pinLatestDocsCommand = preRelease ?
             // Pin command is a no-op for pre releases
             (["true"]) :
             (["ln", "-sfn", "${releaseVersion}", "docs/latest"])
+    def githubToken = System.getenv("GITHUB_TOKEN")
+    def repoSlug = System.getenv("TRAVIS_REPO_SLUG")
+    def gitRef = "https://${githubToken}@github.com/${repoSlug}.git"
+    def remote = "upstream"
+    def pushNullFile = new FileOutputStream("/dev/null")
 
     doLast {
+        exec {
+            workingDir "${rootDir}"
+            commandLine "git", "remote", "add", "${remote}", "${gitRef}"
+            // Ignore exit value because remote may have been added in previous task
+            ignoreExitValue true
+        }
+
+        exec {
+            workingDir "${rootDir}"
+            commandLine "git", "fetch", "${remote}"
+        }
+
         exec {
             workingDir "${rootDir}"
             commandLine "git", "checkout", "gh-pages"
@@ -369,23 +490,18 @@ task publishLibraryJavadocs {
 
         exec {
             workingDir "${rootDir}"
-            commandLine "git", "commit", "-m", "\"${releaseVersion} release docs\""
+            commandLine "git", "commit", "-m", "\"${releaseVersion} release docs [skip ci]\""
         }
 
         exec {
             workingDir "${rootDir}"
-            commandLine "git", "push", "origin", "gh-pages"
-        }
-
-        // TODO: Remove once source has moved to Github permanently
-        exec {
-            workingDir "${rootDir}"
-            commandLine "git", "push", "git@github.com:twilio/twilio-video-android.git", "gh-pages"
+            commandLine "git", "push", "--quiet", "${remote}", "gh-pages"
+            standardOutput pushNullFile
         }
 
         exec {
             workingDir "${rootDir}"
-            commandLine "git", "checkout", "${gitBranch}"
+            commandLine "git", "checkout", "${releaseVersion}"
         }
     }
 }
@@ -463,12 +579,12 @@ task bintrayLibraryReleaseCandidateUpload(type: GradleBuild) {
 task bintrayLibraryReleaseUpload(type: GradleBuild) {
     description = 'Publish Video Android AAR to release Bintray'
     group = 'Publishing'
-    dependsOn checkoutRelease
+    dependsOn validateReleaseTag
     buildFile = file('library/build.gradle')
     tasks = ['clean', 'assemble', 'uploadArchives']
-    def releaseVersion = System.getenv("RELEASE_VERSION") == null ?
+    def releaseVersion = System.getenv("TRAVIS_TAG") == null ?
             ("") :
-            (System.getenv("RELEASE_VERSION"))
+            (System.getenv("TRAVIS_TAG"))
     boolean preRelease = releaseVersion.contains("preview") || releaseVersion.contains("beta")
     startParameter.projectProperties += gradle.startParameter.projectProperties + [
             'preRelease': preRelease,
@@ -476,4 +592,37 @@ task bintrayLibraryReleaseUpload(type: GradleBuild) {
             'maven.username': "${getBintrayUsername()}",
             'maven.password': "${getBintrayPassword()}"
     ]
+}
+
+/*
+ * Checks if a RC tag matches version and RC of current commit
+ */
+def matchesRcVersion(versionTag) {
+    def properties = new Properties()
+    file("${rootDir}/gradle.properties").withInputStream { properties.load(it) }
+    def rcTag = "${properties.getProperty("versionMajor")}." +
+            "${properties.getProperty("versionMinor")}." +
+            "${properties.getProperty("versionPatch")}-" +
+            "rc${properties.getProperty("versionRc")}"
+
+    return rcTag == versionTag
+}
+
+/*
+ * Checks if release tag matches version and current commit
+ */
+def matchesVersion(versionTag) {
+    def properties = new Properties()
+    boolean preRelease = versionTag.contains("preview") || versionTag.contains("beta")
+    file("${rootDir}/gradle.properties").withInputStream { properties.load(it) }
+    def releaseTag = "${properties.getProperty("versionMajor")}." +
+            "${properties.getProperty("versionMinor")}." +
+            "${properties.getProperty("versionPatch")}"
+
+    if (preRelease) {
+        releaseTag += "-${properties.getProperty("phase").replaceAll("\"", "")}" +
+                "${properties.getProperty("phaseNumber")}"
+    }
+
+    return releaseTag == versionTag
 }

@@ -174,10 +174,12 @@ task createJavadocs(type: Javadoc) {
     source android.sourceSets.main.java.srcDirs
     classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
     options {
-        title = "Video Android"
+        title = "Video Android ${generateVersionName()}"
+        header = generateVersionName()
         links "https://docs.oracle.com/javase/7/docs/api/"
         linksOffline "https://developer.android.com/reference/",
                 "${project.android.sdkDirectory}/docs/reference"
+        bottom = generateVersionName()
     }
     failOnError false
     exclude '**/BuildConfig.java'

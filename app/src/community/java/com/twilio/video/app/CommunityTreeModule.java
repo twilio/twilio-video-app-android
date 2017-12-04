@@ -8,7 +8,7 @@ import dagger.Provides;
 import timber.log.Timber;
 
 @Module
-public class DevelopmentTreeModule {
+public class CommunityTreeModule {
     @Provides
     @ApplicationScope
     Timber.Tree providesTree() {

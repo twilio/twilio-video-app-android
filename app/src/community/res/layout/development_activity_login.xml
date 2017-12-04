@@ -33,7 +33,7 @@
         android:paddingTop="@dimen/activity_vertical_margin"
         android:paddingBottom="@dimen/activity_vertical_margin"
         android:background="@color/colorPrimary"
-        tools:context=".ui.login.DevelopmentLoginActivity"
+        tools:context=".ui.login.CommunityLoginActivity"
         android:layout_above="@id/login_linearlayout" >
 
         <LinearLayout

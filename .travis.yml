@@ -19,6 +19,14 @@ branches:
   only:
     - master
     - 2.0
+    # RC Tag Branches
+    - /^\d+\.\d+\.\d+-rc\d+$/
+    # Release Tag Branches
+    - /^\d+\.\d+\.\d+$/
+    # Preview Release Tag Branches
+    - /^\d+\.\d+\.\d+-preview\d+$/
+    # Beta Release Tag Branches
+    - /^\d+\.\d+\.\d+-beta\d+$/
 
 stages:
   - name: test
@@ -27,6 +35,8 @@ stages:
     if: type = push AND branch IN (master, 2.0)
   - name: release candidate
     if: tag =~ ^\d+\.\d+\.\d+-rc\d+$
+  - name: release
+    if: tag =~ ^\d+\.\d+\.\d+$ OR tag =~ ^\d+\.\d+\.\d+-preview\d+$ OR tag =~ ^\d+\.\d+\.\d+-beta\d+$
 
 notifications:
   slack:
@@ -59,6 +69,10 @@ before_install:
    - gcloud auth activate-service-account travis@video-app-79418.iam.gserviceaccount.com --key-file=secrets/video-app-46437ca14fdd.json
 
 before_script:
+   # Git
+   - git config --global user.email "twilio-sdk-build@twilio.com"
+   - git config --global user.name "twilio-sdk-build"
+
    # Gradle
    - echo "androidKeystore=$TRAVIS_BUILD_DIR/$ANDROID_KEYSTORE" >> $HOME/.gradle/gradle.properties
    - echo "androidKeystorePassword=$ANDROID_KEYSTORE_PASSWORD" >> $HOME/.gradle/gradle.properties
@@ -66,7 +80,7 @@ before_script:
    - echo "androidReleaseKeyPassword=$ANDROID_RELEASE_KEY_PASSWORD" >> $HOME/.gradle/gradle.properties
    - echo "org.gradle.jvmargs=-Xmx4096M" >> $HOME/.gradle/gradle.properties
 
-   # cmake
+   # Cmake
    - wget https://github.com/Commit451/android-cmake-installer/releases/download/1.1.0/install-cmake.sh
    - chmod +x install-cmake.sh
    - ./install-cmake.sh > /dev/null
@@ -105,6 +119,6 @@ jobs:
     - stage: snapshot
       script: ./gradlew -q app:uploadInternalReleaseToHockeyApp
     - stage: release candidate
-      script: ./gradlew bintrayLibraryReleaseCandidateUpload
-    - stage: release candidate
-      script: ./gradlew incrementRc
+      script: ./gradlew bintrayLibraryReleaseCandidateUpload incrementRc
+    - stage: release
+      script: ./gradlew bintrayLibraryReleaseUpload publishLibraryJavadocs incrementVersion
