@@ -35,7 +35,7 @@ In order to use our project please make sure you have the following installed:
 1.  **Twilio developers** download the internal google-services.json files here:
       * [Internal Debug (default)](https://console.firebase.google.com/project/video-app-79418/settings/general/android:com.twilio.video.app.internal.debug) - Download to `app/src/internal/debug`
       * [Internal Release](https://console.firebase.google.com/project/video-app-79418/settings/general/android:com.twilio.video.app.internal) - Download to `app/src/internal/release`
-      * [Production Release](https://console.firebase.google.com/project/video-app-79418/settings/general/android:com.twilio.video.app) - Download to `app/src/production/release`
+      * [Twilio Release](https://console.firebase.google.com/project/video-app-79418/settings/general/android:com.twilio.video.app) - Download to `app/src/twilio/release`
 1.  Setup your Programmable Video credentials
 
     #### Video Android App
@@ -126,9 +126,9 @@ generates access tokens locally. Please follow the
 The Video App demonstrates a multi-party voice and video application built with the Android 
 SDK. The application consists of the following [product flavors](http://tools.android.com/tech-docs/new-build-system/user-guide#TOC-Product-flavors):
 
-1. Internal - Provides a set of features intended for internal testing. 
-1. Production - The canonical application intended for every day use.
-1. Development - Local development version intended for non Twilio developers.
+1. Internal - The application intended for internal testing and QA at Twilio
+1. Twilio - The application intended for every day use at Twilio
+1. Community - The application intended for developers interested in using Programmable Video
 
 ### Building the Community Flavor
 The community flavor of the application is meant for developers who would like to work with the 

@@ -9,7 +9,7 @@ import dagger.Provides;
 import retrofit2.Retrofit;
 
 @Module(includes = VideoAppServiceModule.class)
-public class ProductionVideoAppServiceModule {
+public class TwilioVideoAppServiceModule {
     private static final String BASE_URL =
             "https://us-central1-video-app-79418.cloudfunctions.net/production/";
 
