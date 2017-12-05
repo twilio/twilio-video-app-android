@@ -86,7 +86,7 @@ android {
             buildConfigField 'String', 'ENVIRONMENT_DEFAULT', '"prod"'
         }
 
-        production {
+        twilio {
             dimension "environment"
             buildConfigField 'String', 'TOPOLOGY_DEFAULT', '"SFU"'
             buildConfigField 'String', 'ENVIRONMENT_DEFAULT', '"prod"'
@@ -106,8 +106,8 @@ android {
     variantFilter { variant ->
         def names = variant.flavors*.name
 
-        // Ignore production debug and community release builds
-        if ((names.contains("production") && variant.buildType.name == "debug") ||
+        // Ignore twilio debug and community release builds
+        if ((names.contains("twilio") && variant.buildType.name == "debug") ||
                 (names.contains("community") && variant.buildType.name == "release")) {
             setIgnore(true)
         }

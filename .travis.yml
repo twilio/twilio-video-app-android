@@ -55,9 +55,9 @@ before_install:
    - mkdir -p app/src/internal/release || true
    - cp secrets/internal-release-google-services.json app/src/internal/release/google-services.json
 
-   # Production release google services
-   - mkdir -p app/src/production/release || true
-   - cp secrets/production-release-google-services.json app/src/production/release/google-services.json
+   # Twilio release google services
+   - mkdir -p app/src/twilio/release || true
+   - cp secrets/twilio-release-google-services.json app/src/twilio/release/google-services.json
 
    # Video Android Twilio Credentials
    - cp secrets/twilio-video.json library/twilio-video.json
