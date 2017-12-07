@@ -15,9 +15,6 @@ android {
     compileSdkVersion 26
     buildToolsVersion "26.0.2"
 
-    // Parameterizing config allows video application to use a debug build of the library
-    defaultPublishConfig getPublishConfig()
-
     packagingOptions {
         exclude 'META-INF/LICENSE'
     }
@@ -363,30 +360,6 @@ def getEnvironment() {
 
     println "Environment: " + environment
     return environment;
-}
-
-def getPublishConfig() {
-    // Possible values for PUBLISH_CONFIG are 'debug' and 'release'.
-
-    // Attempt to get it from the environment variable
-    def publishConfig = System.getenv("PUBLISH_CONFIG");
-
-    if (publishConfig == null) {
-        println "Could not locate PUBLISH_CONFIG environment variable. Trying local.properties"
-        Properties properties = new Properties()
-        if (project.rootProject.file('local.properties').exists()) {
-            properties.load(project.rootProject.file('local.properties').newDataInputStream())
-            publishConfig = properties.getProperty('PUBLISH_CONFIG')
-        }
-    }
-
-    if (publishConfig == null) {
-        println "Could not locate PUBLISH_CONFIG in local.properties."
-        publishConfig = "release"
-    }
-
-    println "Publish Config: " + publishConfig
-    return publishConfig;
 }
 
 def getTestCoverageEnabled() {

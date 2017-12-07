@@ -173,13 +173,6 @@ demonstrates executing unit and instrumentation tests with code coverage enabled
 
 `./gradlew -PtestCoverageEnabled=true library:clean library:jacocoTestReport`
 
-## Native Debugging 
-
-Enabling native debugging of the Android SDK requires changing the `defaultPublishConfig` of the
-library module. By default, gradle publishes the release version of the Android SDK. To enable 
-native debugging of the Android SDK in the app or library tests add 
-`PUBLISH_CONFIG=debug` to your `local.properties`.
-
 ## Code of Conduct
 
 This project adheres to the Contributor Covenant [Code of Conduct](CODE_OF_CONDUCT.md). By
