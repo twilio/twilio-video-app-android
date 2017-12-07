@@ -28,6 +28,7 @@ import com.twilio.video.LocalVideoTrack;
 import com.twilio.video.Room;
 import com.twilio.video.RoomState;
 import com.twilio.video.Video;
+import com.twilio.video.VideoCodec;
 import com.twilio.video.helper.CallbackHelper;
 import com.twilio.video.ui.MediaTestActivity;
 import com.twilio.video.util.Constants;
@@ -71,9 +72,13 @@ public abstract class BaseStatsTest extends BaseClientTest {
     protected Topology topology;
 
     protected void baseSetup(Topology topology) {
+        baseSetup(topology, null);
+    }
+
+    protected void baseSetup(Topology topology, @Nullable List<VideoCodec> videoCodecs) {
         mediaTestActivity = activityRule.getActivity();
         roomName = random(Constants.ROOM_NAME_LENGTH);
-        assertNotNull(RoomUtils.createRoom(roomName, topology));
+        assertNotNull(RoomUtils.createRoom(roomName, topology, false, videoCodecs));
         aliceToken = CredentialsUtils.getAccessToken(Constants.PARTICIPANT_ALICE, topology);
         bobToken = CredentialsUtils.getAccessToken(Constants.PARTICIPANT_BOB, topology);
         aliceListener = new CallbackHelper.FakeRoomListener();

@@ -23,6 +23,8 @@ import com.google.gson.GsonBuilder;
 import com.twilio.video.twilioapi.model.TwilioServiceToken;
 import com.twilio.video.twilioapi.model.VideoRoom;
 
+import java.util.List;
+
 import retrofit.Callback;
 import retrofit.RestAdapter;
 import retrofit.RetrofitError;
@@ -60,6 +62,7 @@ public class VideoApiUtils {
                         @Field("Type") String type,
                         @Field("EnableTurn") boolean enableTurn,
                         @Field("RecordParticipantsOnConnect") boolean enableRecording,
+                        @Field("VideoCodecs") List<String> videoCodecs,
                         Callback<VideoRoom> videoRoomCallback);
 
         @POST("/v1/Rooms")
@@ -68,7 +71,8 @@ public class VideoApiUtils {
                              @Field("UniqueName") String name,
                              @Field("Type") String type,
                              @Field("EnableTurn") boolean enableTurn,
-                             @Field("RecordParticipantsOnConnect") boolean enableRecording);
+                             @Field("RecordParticipantsOnConnect") boolean enableRecording,
+                             @Field("VideoCodecs") List<String> videoCodecs);
 
         @GET("/v1/Rooms/{unique_name}")
         VideoRoom getRoom(@Header("Authorization") String authorization,
@@ -100,6 +104,7 @@ public class VideoApiUtils {
                                   String environment,
                                   boolean enableTurn,
                                   boolean enableRecording,
+                                  List<String> videoCodecs,
                                   Callback<VideoRoom> callback)
         throws IllegalArgumentException {
         if (!environment.equalsIgnoreCase(PROD) &&
@@ -119,7 +124,7 @@ public class VideoApiUtils {
         String authorization = "Basic " + Base64.encodeToString(authString.getBytes(),
             Base64.NO_WRAP);
         videoApiService.createRoom(authorization, name, type,
-            enableTurn, enableRecording, callback);
+            enableTurn, enableRecording, videoCodecs, callback);
     }
 
     // Provide a synchronous version of createRoom for tests
@@ -130,7 +135,8 @@ public class VideoApiUtils {
                                        String type,
                                        String environment,
                                        boolean enableTurn,
-                                       boolean enableRecording) {
+                                       boolean enableRecording,
+                                       List<String> videoCodecs) {
         if (!environment.equalsIgnoreCase(PROD) &&
             !environment.equalsIgnoreCase(STAGE) &&
             !environment.equalsIgnoreCase(DEV)){
@@ -161,7 +167,8 @@ public class VideoApiUtils {
                         name,
                         type,
                         enableTurn,
-                        enableRecording);
+                        enableRecording,
+                        videoCodecs);
             } catch (RetrofitError createRoomError) {
                 Log.e("VideoApiUtils", createRoomError.getMessage());
 
