@@ -113,7 +113,7 @@ android.testOptions.unitTests.all {
 }
 
 dependencies {
-    preCompile 'com.twilio.sdk:twilio-video:2.0.0-preview7:android@tar.bz2'
+    preCompile 'com.twilio.sdk:twilio-video:2.0.0-preview8-rc37:android@tar.bz2'
 
     testImplementation 'junit:junit:4.12'
     testImplementation 'org.mockito:mockito-core:1.10.19'
