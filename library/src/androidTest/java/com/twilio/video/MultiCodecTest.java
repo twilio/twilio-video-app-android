@@ -18,6 +18,7 @@ package com.twilio.video;
 
 import android.support.test.filters.LargeTest;
 
+import com.twilio.video.base.BaseCodecTest;
 import com.twilio.video.base.BaseStatsTest;
 import com.twilio.video.helper.CallbackHelper;
 import com.twilio.video.util.FakeVideoCapturer;
@@ -47,7 +48,7 @@ import static org.junit.Assume.assumeTrue;
 
 @RunWith(JUnitParamsRunner.class)
 @LargeTest
-public class MultiCodecTest extends BaseStatsTest {
+public class MultiCodecTest extends BaseCodecTest {
 
     @Before
     public void setup() throws InterruptedException {
@@ -133,7 +134,7 @@ public class MultiCodecTest extends BaseStatsTest {
         assertEquals(1, aliceRoom.getRemoteParticipants().size());
 
         // Validate the codec published
-        assertCodecPublished(expectedCodec);
+        assertVideoCodecPublished(expectedCodec);
     }
 
     @Test
@@ -180,42 +181,7 @@ public class MultiCodecTest extends BaseStatsTest {
         assertTrue(participantListener.onSubscribedToVideoTrackLatch.await(20, TimeUnit.SECONDS));
 
         // Validate the codec published
-        assertCodecPublished(expectedCodec);
-    }
-
-    private void assertCodecPublished(VideoCodec expectedCodec) throws InterruptedException {
-        /*
-         * The stats API is not very predictable so retry getting stats and until a non empty
-         * value for codec is available.
-         */
-        String localTrackCodec;
-        String remoteTrackCodec;
-        do {
-            // Give peer connection some time to get media flowing
-            Thread.sleep(1000);
-
-            // Get stats for alice and bob
-            CallbackHelper.FakeStatsListener aliceStatsListener =
-                    new CallbackHelper.FakeStatsListener();
-            CallbackHelper.FakeStatsListener bobStatsListener =
-                    new CallbackHelper.FakeStatsListener();
-            aliceStatsListener.onStatsLatch = new CountDownLatch(1);
-            bobStatsListener.onStatsLatch = new CountDownLatch(1);
-            aliceRoom.getStats(aliceStatsListener);
-            bobRoom.getStats(bobStatsListener);
-            assertTrue(aliceStatsListener.onStatsLatch.await(20, TimeUnit.SECONDS));
-            assertTrue(bobStatsListener.onStatsLatch.await(20, TimeUnit.SECONDS));
-
-            StatsReport aliceStatsReport = aliceStatsListener.getStatsReports().get(0);
-            localTrackCodec = aliceStatsReport.getLocalVideoTrackStats().get(0).codec.toLowerCase();
-            StatsReport bobStatsReport = bobStatsListener.getStatsReports().get(0);
-            remoteTrackCodec = bobStatsReport.getRemoteVideoTrackStats().get(0).codec.toLowerCase();
-        } while (StringUtils.isNullOrEmpty(localTrackCodec) ||
-                StringUtils.isNullOrEmpty(remoteTrackCodec));
-
-        // Validate that both stats report see the correct codec
-        assertEquals(expectedCodec.name().toLowerCase(), localTrackCodec);
-        assertEquals(expectedCodec.name().toLowerCase(), remoteTrackCodec);
+        assertVideoCodecPublished(expectedCodec);
     }
 
     private Object[] supportedVideoCodecs() {
