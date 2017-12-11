@@ -16,6 +16,10 @@ Improvements
 
 - Added version to javadoc title, header, and bottom.
 
+Bug Fixes
+
+- Fixed crash disconnecting from a `Room` before being connected.
+
 Known issues
 
 - Network handoff, and subsequent connection renegotiation is not supported for IPv6 networks [#72](https://github.com/twilio/video-quickstart-android/issues/72)
