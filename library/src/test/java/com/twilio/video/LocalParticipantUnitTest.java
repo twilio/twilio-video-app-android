@@ -29,6 +29,8 @@ import org.mockito.runners.MockitoJUnitRunner;
 import java.util.Arrays;
 import java.util.Random;
 
+import static org.mockito.Mockito.when;
+
 @RunWith(MockitoJUnitRunner.class)
 public class LocalParticipantUnitTest {
     private static final int INT_MAX = 25;
@@ -39,6 +41,9 @@ public class LocalParticipantUnitTest {
     @Mock LocalAudioTrackPublication mockLocalAudioTrackPublication;
     @Mock LocalVideoTrackPublication mockLocalVideoTrackPublicationOne;
     @Mock LocalDataTrackPublication mockLocalDataTrackPublication;
+    @Mock LocalAudioTrack mockLocalAudioTrack;
+    @Mock LocalVideoTrack mockLocalVideoTrack;
+    @Mock LocalDataTrack mockLocalDataTrack;
 
     @Before
     public void setup() {
@@ -118,5 +123,41 @@ public class LocalParticipantUnitTest {
     @Test(expected = UnsupportedOperationException.class)
     public void shouldNotAllowModifyingPublishedVideoTracks() {
         localParticipant.getLocalVideoTracks().add(mockLocalVideoTrackPublicationOne);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void publishTrack_shouldNotAllowReleasedAudioTrack() {
+        when(mockLocalAudioTrack.isReleased()).thenReturn(true);
+        localParticipant.publishTrack(mockLocalAudioTrack);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void publishTrack_shouldNotAllowReleasedVideoTrack() {
+        when(mockLocalVideoTrack.isReleased()).thenReturn(true);
+        localParticipant.publishTrack(mockLocalVideoTrack);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void publishTrack_shouldNotAllowReleasedDataTrack() {
+        when(mockLocalDataTrack.isReleased()).thenReturn(true);
+        localParticipant.publishTrack(mockLocalDataTrack);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void unpublishTrack_shouldNotAllowReleasedAudioTrack() {
+        when(mockLocalAudioTrack.isReleased()).thenReturn(true);
+        localParticipant.unpublishTrack(mockLocalAudioTrack);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void unpublishTrack_shouldNotAllowReleasedVideoTrack() {
+        when(mockLocalVideoTrack.isReleased()).thenReturn(true);
+        localParticipant.unpublishTrack(mockLocalVideoTrack);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void unpublishTrack_shouldNotAllowReleasedDataTrack() {
+        when(mockLocalDataTrack.isReleased()).thenReturn(true);
+        localParticipant.unpublishTrack(mockLocalDataTrack);
     }
 }

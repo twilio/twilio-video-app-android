@@ -273,6 +273,7 @@ public class LocalParticipant implements Participant {
      */
     public synchronized boolean publishTrack(@NonNull LocalAudioTrack localAudioTrack) {
         Preconditions.checkNotNull(localAudioTrack, "LocalAudioTrack must not be null");
+        Preconditions.checkArgument(!localAudioTrack.isReleased(), "LocalAudioTrack must not be released");
         if (isReleased()) {
             return false;
         } else {
@@ -290,6 +291,7 @@ public class LocalParticipant implements Participant {
      */
     public synchronized boolean publishTrack(@NonNull LocalVideoTrack localVideoTrack) {
         Preconditions.checkNotNull(localVideoTrack, "LocalVideoTrack must not be null");
+        Preconditions.checkArgument(!localVideoTrack.isReleased(), "LocalVideoTrack must not be released");
         if (isReleased()) {
             return false;
         } else {
@@ -307,6 +309,7 @@ public class LocalParticipant implements Participant {
      */
     public synchronized boolean publishTrack(@NonNull LocalDataTrack localDataTrack) {
         Preconditions.checkNotNull(localDataTrack, "LocalDataTrack must not be null");
+        Preconditions.checkArgument(!localDataTrack.isReleased(), "LocalDataTrack must not be released");
         if (isReleased()) {
             return false;
         } else {
@@ -325,6 +328,7 @@ public class LocalParticipant implements Participant {
 
     public synchronized boolean unpublishTrack(@NonNull LocalAudioTrack localAudioTrack) {
         Preconditions.checkNotNull(localAudioTrack, "LocalAudioTrack must not be null");
+        Preconditions.checkArgument(!localAudioTrack.isReleased(), "LocalAudioTrack must not be released");
         if (isReleased()) {
             return false;
         } else {
@@ -342,6 +346,7 @@ public class LocalParticipant implements Participant {
      */
     public synchronized boolean unpublishTrack(@NonNull LocalVideoTrack localVideoTrack) {
         Preconditions.checkNotNull(localVideoTrack, "LocalVideoTrack must not be null");
+        Preconditions.checkArgument(!localVideoTrack.isReleased(), "LocalVideoTrack must not be released");
         if (isReleased()) {
             return false;
         } else {
@@ -359,6 +364,7 @@ public class LocalParticipant implements Participant {
      */
     public synchronized boolean unpublishTrack(@NonNull LocalDataTrack localDataTrack) {
         Preconditions.checkNotNull(localDataTrack, "LocalDataTrack must not be null");
+        Preconditions.checkArgument(!localDataTrack.isReleased(), "LocalDataTrack must not be released");
         if (isReleased()) {
             return false;
         } else {

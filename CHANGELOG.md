@@ -15,6 +15,8 @@ Features
 Improvements
 
 - Added version to javadoc title, header, and bottom.
+- `LocalParticipant` throws `IllegalArgumentException` when attempting to publish or unpublish
+ a released `Track`.
 
 Bug Fixes
 

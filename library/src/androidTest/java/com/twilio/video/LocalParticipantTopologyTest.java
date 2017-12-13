@@ -179,6 +179,98 @@ public class LocalParticipantTopologyTest extends BaseClientTest {
     }
 
     @Test
+    public void shouldAllowRepublishingTracksWhileConnected()
+            throws InterruptedException {
+        CallbackHelper.FakeLocalParticipantListener localParticipantListener =
+                new CallbackHelper.FakeLocalParticipantListener();
+        FakeVideoCapturer fakeVideoCapturer = new FakeVideoCapturer();
+        roomListener.onConnectedLatch = new CountDownLatch(1);
+
+        ConnectOptions connectOptions = new ConnectOptions.Builder(token)
+                .roomName(roomName)
+                .build();
+        room = Video.connect(mediaTestActivity, connectOptions, roomListener);
+        assertTrue(roomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
+        LocalParticipant localParticipant = room.getLocalParticipant();
+        assertNotNull(localParticipant);
+        localParticipant.setListener(localParticipantListener);
+
+        // Publish tracks
+        localParticipantListener.onPublishedAudioTrackLatch = new CountDownLatch(1);
+        localParticipantListener.onPublishedVideoTrackLatch = new CountDownLatch(1);
+        localParticipantListener.onPublishedDataTrackLatch = new CountDownLatch(1);
+        localAudioTrack = LocalAudioTrack.create(mediaTestActivity, true);
+        localVideoTrack = LocalVideoTrack.create(mediaTestActivity, true, fakeVideoCapturer);
+        localDataTrack = LocalDataTrack.create(mediaTestActivity);
+        assertTrue(localParticipant.publishTrack(localAudioTrack));
+        assertEquals(0, localParticipant.getAudioTracks().size());
+        assertEquals(0, localParticipant.getLocalAudioTracks().size());
+        assertTrue(localParticipant.publishTrack(localVideoTrack));
+        assertEquals(0, localParticipant.getVideoTracks().size());
+        assertEquals(0, localParticipant.getLocalVideoTracks().size());
+        assertTrue(localParticipant.publishTrack(localDataTrack));
+        assertEquals(0, localParticipant.getDataTracks().size());
+        assertEquals(0, localParticipant.getLocalDataTracks().size());
+
+        // Validate we received callbacks
+        assertTrue(localParticipantListener.onPublishedAudioTrackLatch.await(20,
+                TimeUnit.SECONDS));
+        assertTrue(localParticipantListener.onPublishedVideoTrackLatch.await(20,
+                TimeUnit.SECONDS));
+        assertTrue(localParticipantListener.onPublishedDataTrackLatch.await(20,
+                TimeUnit.SECONDS));
+
+        // Validate collections
+        assertEquals(1, localParticipant.getAudioTracks().size());
+        assertEquals(1, localParticipant.getLocalAudioTracks().size());
+        assertEquals(1, localParticipant.getVideoTracks().size());
+        assertEquals(1, localParticipant.getLocalVideoTracks().size());
+        assertEquals(1, localParticipant.getDataTracks().size());
+        assertEquals(1, localParticipant.getLocalDataTracks().size());
+
+        // Now unpublish tracks
+        assertTrue(localParticipant.unpublishTrack(localAudioTrack));
+        assertEquals(0, localParticipant.getAudioTracks().size());
+        assertEquals(0, localParticipant.getLocalAudioTracks().size());
+        assertTrue(localParticipant.unpublishTrack(localVideoTrack));
+        assertEquals(0, localParticipant.getVideoTracks().size());
+        assertEquals(0, localParticipant.getLocalVideoTracks().size());
+        assertTrue(localParticipant.unpublishTrack(localDataTrack));
+        assertEquals(0, localParticipant.getDataTracks().size());
+        assertEquals(0, localParticipant.getLocalDataTracks().size());
+
+        // Publish same tracks again
+        localParticipantListener.onPublishedAudioTrackLatch = new CountDownLatch(1);
+        localParticipantListener.onPublishedVideoTrackLatch = new CountDownLatch(1);
+        localParticipantListener.onPublishedDataTrackLatch = new CountDownLatch(1);
+        assertTrue(localParticipant.publishTrack(localAudioTrack));
+        assertEquals(0, localParticipant.getAudioTracks().size());
+        assertEquals(0, localParticipant.getLocalAudioTracks().size());
+        assertTrue(localParticipant.publishTrack(localVideoTrack));
+        assertEquals(0, localParticipant.getVideoTracks().size());
+        assertEquals(0, localParticipant.getLocalVideoTracks().size());
+        assertTrue(localParticipant.publishTrack(localDataTrack));
+        assertEquals(0, localParticipant.getDataTracks().size());
+        assertEquals(0, localParticipant.getLocalDataTracks().size());
+
+        // Validate we received callbacks
+        assertTrue(localParticipantListener.onPublishedAudioTrackLatch.await(20,
+                TimeUnit.SECONDS));
+        assertTrue(localParticipantListener.onPublishedVideoTrackLatch.await(20,
+                TimeUnit.SECONDS));
+        assertTrue(localParticipantListener.onPublishedDataTrackLatch.await(20,
+                TimeUnit.SECONDS));
+
+        // Validate collections
+        assertEquals(1, localParticipant.getAudioTracks().size());
+        assertEquals(1, localParticipant.getLocalAudioTracks().size());
+        assertEquals(1, localParticipant.getVideoTracks().size());
+        assertEquals(1, localParticipant.getLocalVideoTracks().size());
+        assertEquals(1, localParticipant.getDataTracks().size());
+        assertEquals(1, localParticipant.getLocalDataTracks().size());
+    }
+
+    @Test
     public void shouldHaveTracksWhenConnected() throws InterruptedException {
         CallbackHelper.FakeLocalParticipantListener localParticipantListener =
                 new CallbackHelper.FakeLocalParticipantListener();
