@@ -19,11 +19,16 @@ package com.twilio.video.base;
 import android.support.annotation.Nullable;
 
 import com.twilio.video.AudioCodec;
+import com.twilio.video.LocalAudioTrackStats;
+import com.twilio.video.LocalVideoTrackStats;
+import com.twilio.video.RemoteAudioTrackStats;
+import com.twilio.video.RemoteVideoTrackStats;
 import com.twilio.video.StatsReport;
 import com.twilio.video.VideoCodec;
 import com.twilio.video.helper.CallbackHelper;
 import com.twilio.video.util.StringUtils;
 
+import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
@@ -72,22 +77,38 @@ public abstract class BaseCodecTest extends BaseStatsTest {
             // Extract local and remote audio and video codecs
             if (expectedAudioCodec != null) {
                 StatsReport aliceStatsReport = aliceStatsListener.getStatsReports().get(0);
-                localAudioTrackCodec = aliceStatsReport.getLocalAudioTrackStats()
-                        .get(0).codec.toLowerCase();
                 StatsReport bobStatsReport = bobStatsListener.getStatsReports()
                         .get(0);
-                remoteAudioTrackCodec = bobStatsReport.getRemoteAudioTrackStats()
-                        .get(0).codec.toLowerCase();
+                List<LocalAudioTrackStats> aliceLocalAudioTrackStats =
+                        aliceStatsReport.getLocalAudioTrackStats();
+                List<RemoteAudioTrackStats> bobRemoteAudioTrackStats =
+                        bobStatsReport.getRemoteAudioTrackStats();
+
+                if (!aliceLocalAudioTrackStats.isEmpty()) {
+                    localAudioTrackCodec = aliceLocalAudioTrackStats.get(0).codec.toLowerCase();
+                }
+
+                if (!bobRemoteAudioTrackStats.isEmpty()) {
+                    remoteAudioTrackCodec = bobRemoteAudioTrackStats.get(0).codec.toLowerCase();
+                }
             }
 
             if (expectedVideoCodec != null) {
                 StatsReport aliceStatsReport = aliceStatsListener.getStatsReports().get(0);
-                localVideoTrackCodec = aliceStatsReport.getLocalVideoTrackStats()
-                        .get(0).codec.toLowerCase();
                 StatsReport bobStatsReport = bobStatsListener.getStatsReports()
                         .get(0);
-                remoteVideoTrackCodec = bobStatsReport.getRemoteVideoTrackStats()
-                        .get(0).codec.toLowerCase();
+                List<LocalVideoTrackStats> aliceLocalVideoTrackStats =
+                        aliceStatsReport.getLocalVideoTrackStats();
+                List<RemoteVideoTrackStats> bobRemoteVideoTrackStats =
+                        bobStatsReport.getRemoteVideoTrackStats();
+
+                if (!aliceLocalVideoTrackStats.isEmpty()) {
+                    localVideoTrackCodec = aliceLocalVideoTrackStats.get(0).codec.toLowerCase();
+                }
+
+                if (!bobRemoteVideoTrackStats.isEmpty()) {
+                    remoteVideoTrackCodec = bobRemoteVideoTrackStats.get(0).codec.toLowerCase();
+                }
             }
 
             // Check if all codecs are set

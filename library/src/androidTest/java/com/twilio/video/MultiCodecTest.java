@@ -19,10 +19,8 @@ package com.twilio.video;
 import android.support.test.filters.LargeTest;
 
 import com.twilio.video.base.BaseCodecTest;
-import com.twilio.video.base.BaseStatsTest;
 import com.twilio.video.helper.CallbackHelper;
 import com.twilio.video.util.FakeVideoCapturer;
-import com.twilio.video.util.StringUtils;
 import com.twilio.video.util.Topology;
 
 import org.junit.After;
@@ -43,6 +41,7 @@ import junitparams.Parameters;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assume.assumeFalse;
 import static org.junit.Assume.assumeTrue;
 
@@ -99,6 +98,103 @@ public class MultiCodecTest extends BaseCodecTest {
         assertTrue(localParticipantListener.onVideoTrackPublicationFailedLatch.await(20, TimeUnit.SECONDS));
         assertEquals(TwilioException.MEDIA_NO_SUPPORTED_CODEC_EXCEPTION,
                 localParticipantListener.publicationFailures.get(aliceLocalVideoTrack).getCode());
+    }
+
+    @Test
+    public void shouldFailToPublishTrackWithUnsupportedVideoCodec() throws InterruptedException {
+        // Select H264 for room
+        baseSetup(Topology.GROUP, Collections.singletonList(VideoCodec.H264));
+
+        // Ensure that device does not support H264
+        assumeFalse(MediaCodecVideoEncoder.isH264HwSupported());
+        assumeFalse(MediaCodecVideoDecoder.isH264HwSupported());
+
+        // Connect alice with VP8 preferred
+        aliceLocalVideoTrack = LocalVideoTrack.create(mediaTestActivity, true,
+                new FakeVideoCapturer());
+        ConnectOptions aliceConnectOptions = new ConnectOptions.Builder(aliceToken)
+                .roomName(roomName)
+                .preferVideoCodecs(Collections.singletonList(VideoCodec.VP8))
+                .videoTracks(Collections.singletonList(aliceLocalVideoTrack))
+                .build();
+        aliceRoom = createRoom(aliceListener, aliceConnectOptions);
+        LocalParticipant aliceLocalParticipant = aliceRoom.getLocalParticipant();
+        CallbackHelper.FakeLocalParticipantListener localParticipantListener =
+                new CallbackHelper.FakeLocalParticipantListener();
+        localParticipantListener.onVideoTrackPublicationFailedLatch = new CountDownLatch(1);
+        aliceLocalParticipant.setListener(localParticipantListener);
+
+        // Connect bob with no tracks
+        aliceListener.onParticipantConnectedLatch = new CountDownLatch(1);
+        ConnectOptions bobConnectOptions = new ConnectOptions.Builder(bobToken)
+                .roomName(roomName)
+                .build();
+        bobRoom = createRoom(bobListener, bobConnectOptions);
+        assertTrue(aliceListener.onParticipantConnectedLatch.await(20, TimeUnit.SECONDS));
+        assertEquals(1, aliceRoom.getRemoteParticipants().size());
+
+        /* FIXME: Callbacks are not received when connecting with tracks GSDK-1398
+        // Validate the callbacks
+        assertTrue(localParticipantListener.onVideoTrackPublicationFailedLatch.await(20,
+                TimeUnit.SECONDS));
+
+        // Validate the exceptions
+        assertEquals(TwilioException.MEDIA_NO_SUPPORTED_CODEC_EXCEPTION,
+                localParticipantListener.publicationFailures.get(aliceLocalVideoTrack).getCode());
+        */
+
+        // Validate the absence of the video track publication
+        assertTrue(aliceLocalParticipant.getVideoTracks().isEmpty());
+    }
+
+    @Test
+    public void canUnpublishTrackWhichFailedToPublish() throws InterruptedException {
+        // Select H264 for room
+        baseSetup(Topology.GROUP, Collections.singletonList(VideoCodec.H264));
+
+        // Ensure that device does not support H264
+        assumeFalse(MediaCodecVideoEncoder.isH264HwSupported());
+        assumeFalse(MediaCodecVideoDecoder.isH264HwSupported());
+
+        // Connect alice with VP8 preferred
+        aliceLocalVideoTrack = LocalVideoTrack.create(mediaTestActivity, true,
+                new FakeVideoCapturer());
+        ConnectOptions aliceConnectOptions = new ConnectOptions.Builder(aliceToken)
+                .roomName(roomName)
+                .preferVideoCodecs(Collections.singletonList(VideoCodec.VP8))
+                .videoTracks(Collections.singletonList(aliceLocalVideoTrack))
+                .build();
+        aliceRoom = createRoom(aliceListener, aliceConnectOptions);
+        LocalParticipant aliceLocalParticipant = aliceRoom.getLocalParticipant();
+        CallbackHelper.FakeLocalParticipantListener localParticipantListener =
+                new CallbackHelper.FakeLocalParticipantListener();
+        localParticipantListener.onVideoTrackPublicationFailedLatch = new CountDownLatch(1);
+        aliceLocalParticipant.setListener(localParticipantListener);
+
+        // Connect bob with no tracks
+        aliceListener.onParticipantConnectedLatch = new CountDownLatch(1);
+        ConnectOptions bobConnectOptions = new ConnectOptions.Builder(bobToken)
+                .roomName(roomName)
+                .build();
+        bobRoom = createRoom(bobListener, bobConnectOptions);
+        assertTrue(aliceListener.onParticipantConnectedLatch.await(20, TimeUnit.SECONDS));
+        assertEquals(1, aliceRoom.getRemoteParticipants().size());
+
+        /* FIXME: Callbacks are not received when connecting with tracks GSDK-1398
+        // Validate the callbacks
+        assertTrue(localParticipantListener.onVideoTrackPublicationFailedLatch.await(20,
+                TimeUnit.SECONDS));
+
+        // Validate the exceptions
+        assertEquals(TwilioException.MEDIA_NO_SUPPORTED_CODEC_EXCEPTION,
+                localParticipantListener.publicationFailures.get(aliceLocalVideoTrack).getCode());
+        */
+
+        // Validate the absence of the video track publication
+        assertTrue(aliceLocalParticipant.getVideoTracks().isEmpty());
+
+        // Unpublish the track that failed to publish
+        assertFalse(aliceLocalParticipant.unpublishTrack(aliceLocalVideoTrack));
     }
 
     @Test
