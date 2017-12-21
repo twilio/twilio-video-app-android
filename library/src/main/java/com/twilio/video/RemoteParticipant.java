@@ -128,28 +128,6 @@ public class RemoteParticipant implements Participant {
         }
 
         @Override
-        public void onAudioTrackSubscriptionFailed(final RemoteParticipant remoteParticipant,
-                                                   final RemoteAudioTrackPublication remoteAudioTrackPublication,
-                                                   final TwilioException twilioException) {
-            checkCallback(remoteParticipant, remoteAudioTrackPublication, "onAudioTrackSubscriptionFailed");
-            handler.post(new Runnable() {
-                @Override
-                public void run() {
-                    ThreadChecker.checkIsValidThread(handler);
-                    logger.d("onAudioTrackSubscriptionFailed");
-                    remoteAudioTrackPublication.setSubscribed(false);
-                    Listener listener = listenerReference.get();
-
-                    if (listener != null) {
-                        listener.onAudioTrackSubscriptionFailed(remoteParticipant,
-                                remoteAudioTrackPublication,
-                                twilioException);
-                    }
-                }
-            });
-        }
-
-        @Override
         public void onAudioTrackUnsubscribed(final RemoteParticipant remoteParticipant,
                                              final RemoteAudioTrackPublication remoteAudioTrackPublication,
                                              final RemoteAudioTrack remoteAudioTrack) {
@@ -232,28 +210,6 @@ public class RemoteParticipant implements Participant {
                         listener.onVideoTrackSubscribed(remoteParticipant,
                                 remoteVideoTrackPublication,
                                 remoteVideoTrack);
-                    }
-                }
-            });
-        }
-
-        @Override
-        public void onVideoTrackSubscriptionFailed(final RemoteParticipant remoteParticipant,
-                                                   final RemoteVideoTrackPublication remoteVideoTrackPublication,
-                                                   final TwilioException twilioException) {
-            checkCallback(remoteParticipant, remoteVideoTrackPublication, "onVideoTrackSubscriptionFailed");
-            handler.post(new Runnable() {
-                @Override
-                public void run() {
-                    ThreadChecker.checkIsValidThread(handler);
-                    logger.d("onVideoTrackSubscriptionFailed");
-                    remoteVideoTrackPublication.setSubscribed(false);
-                    Listener listener = listenerReference.get();
-
-                    if (listener != null) {
-                        listener.onVideoTrackSubscriptionFailed(remoteParticipant,
-                                remoteVideoTrackPublication,
-                                twilioException);
                     }
                 }
             });
@@ -346,28 +302,6 @@ public class RemoteParticipant implements Participant {
                         listener.onDataTrackSubscribed(remoteParticipant,
                                 remoteDataTrackPublication,
                                 remoteDataTrack);
-                    }
-                }
-            });
-        }
-
-        @Override
-        public void onDataTrackSubscriptionFailed(final RemoteParticipant remoteParticipant,
-                                                  final RemoteDataTrackPublication remoteDataTrackPublication,
-                                                  final TwilioException twilioException) {
-            checkCallback(remoteParticipant, remoteDataTrackPublication, "onDataTrackSubscriptionFailed");
-            handler.post(new Runnable() {
-                @Override
-                public void run() {
-                    ThreadChecker.checkIsValidThread(handler);
-                    logger.d("onDataTrackSubscriptionFailed");
-                    remoteDataTrackPublication.setSubscribed(false);
-                    Listener listener = listenerReference.get();
-
-                    if (listener != null) {
-                        listener.onDataTrackSubscriptionFailed(remoteParticipant,
-                                remoteDataTrackPublication,
-                                twilioException);
                     }
                 }
             });
@@ -671,18 +605,6 @@ public class RemoteParticipant implements Participant {
                                     RemoteAudioTrack remoteAudioTrack);
 
         /**
-         * This method notifies the listener that media negotiation for a {@link RemoteAudioTrack}
-         * failed.
-         * @param remoteParticipant The remoteParticipant object associated with the audio track.
-         * @param remoteAudioTrackPublication The audio track publication for which subscription
-         *                                    failed.
-         * @param twilioException Exception that describes failure.
-         */
-        void onAudioTrackSubscriptionFailed(RemoteParticipant remoteParticipant,
-                                            RemoteAudioTrackPublication remoteAudioTrackPublication,
-                                            TwilioException twilioException);
-
-        /**
          * This method notifies the listener that the {@link RemoteAudioTrack} of the
          * {@link RemoteParticipant} has been unsubscribed from. The track is no longer audible
          * after being unsubscribed from the audio track.
@@ -726,18 +648,6 @@ public class RemoteParticipant implements Participant {
                                     RemoteVideoTrack remoteVideoTrack);
 
         /**
-         * This method notifies the listener that media negotiation for a {@link RemoteVideoTrack}
-         * failed.
-         * @param remoteParticipant The remoteParticipant object associated with the video track.
-         * @param remoteVideoTrackPublication The video track publication for which subscription
-         *                                    failed.
-         * @param twilioException Exception that describes failure.
-         */
-        void onVideoTrackSubscriptionFailed(RemoteParticipant remoteParticipant,
-                                            RemoteVideoTrackPublication remoteVideoTrackPublication,
-                                            TwilioException twilioException);
-
-        /**
          * This method notifies the listener that the {@link RemoteVideoTrack} of the
          * {@link RemoteParticipant} has been unsubscribed from. Video frames are no longer flowing.
          * All {@link VideoRenderer}s of the video track have been removed before receiving this
@@ -779,18 +689,6 @@ public class RemoteParticipant implements Participant {
         void onDataTrackSubscribed(RemoteParticipant remoteParticipant,
                                    RemoteDataTrackPublication remoteDataTrackPublication,
                                    RemoteDataTrack remoteDataTrack);
-
-        /**
-         * This method notifies the listener that media negotiation for a {@link RemoteDataTrack}
-         * failed.
-         * @param remoteParticipant The remoteParticipant object associated with the data track.
-         * @param remoteDataTrackPublication The data track publication for which subscription
-         *                                   failed.
-         * @param twilioException Exception that describes failure.
-         */
-        void onDataTrackSubscriptionFailed(RemoteParticipant remoteParticipant,
-                                           RemoteDataTrackPublication remoteDataTrackPublication,
-                                           TwilioException twilioException);
 
         /**
          * This method notifies the listener that the {@link RemoteDataTrack} of the

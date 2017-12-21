@@ -178,17 +178,14 @@ public class CallbackHelper {
         public CountDownLatch onAudioTrackPublishedLatch;
         public CountDownLatch onAudioTrackUnpublishedLatch;
         public CountDownLatch onSubscribedToAudioTrackLatch;
-        public CountDownLatch onAudioTrackSubscriptionFailedLatch;
         public CountDownLatch onUnsubscribedFromAudioTrackLatch;
         public CountDownLatch onVideoTrackPublishedLatch;
         public CountDownLatch onVideoTrackUnpublishedLatch;
         public CountDownLatch onSubscribedToVideoTrackLatch;
-        public CountDownLatch onVideoTrackSubscriptionFailedLatch;
         public CountDownLatch onUnsubscribedFromVideoTrackLatch;
         public CountDownLatch onDataTrackPublishedLatch;
         public CountDownLatch onDataTrackUnpublishedLatch;
         public CountDownLatch onSubscribedToDataTrackLatch;
-        public CountDownLatch onDataTrackSubscriptionFailedLatch;
         public CountDownLatch onUnsubscribedFromDataTrackLatch;
         public CountDownLatch onAudioTrackEnabledLatch;
         public CountDownLatch onAudioTrackDisabledLatch;
@@ -217,15 +214,6 @@ public class CallbackHelper {
             assertTrue(remoteAudioTrackPublication.isTrackSubscribed());
             participantEvents.add("onAudioTrackSubscribed");
             triggerLatch(onSubscribedToAudioTrackLatch);
-        }
-
-        @Override
-        public void onAudioTrackSubscriptionFailed(RemoteParticipant remoteParticipant,
-                                                   RemoteAudioTrackPublication remoteAudioTrackPublication,
-                                                   TwilioException twilioException) {
-            assertFalse(remoteAudioTrackPublication.isTrackSubscribed());
-            participantEvents.add("onAudioTrackSubscriptionFailed");
-            triggerLatch(onAudioTrackSubscriptionFailedLatch);
         }
 
         @Override
@@ -261,15 +249,6 @@ public class CallbackHelper {
         }
 
         @Override
-        public void onVideoTrackSubscriptionFailed(RemoteParticipant remoteParticipant,
-                                                   RemoteVideoTrackPublication remoteVideoTrackPublication,
-                                                   TwilioException twilioException) {
-            assertFalse(remoteVideoTrackPublication.isTrackSubscribed());
-            participantEvents.add("onVideoTrackSubscriptionFailed");
-            triggerLatch(onVideoTrackSubscriptionFailedLatch);
-        }
-
-        @Override
         public void onVideoTrackUnsubscribed(RemoteParticipant remoteParticipant,
                                              RemoteVideoTrackPublication remoteVideoTrackPublication,
                                              RemoteVideoTrack remoteVideoTrack) {
@@ -299,15 +278,6 @@ public class CallbackHelper {
             assertTrue(remoteDataTrackPublication.isTrackSubscribed());
             participantEvents.add("onDataTrackSubscribed");
             triggerLatch(onSubscribedToDataTrackLatch);
-        }
-
-        @Override
-        public void onDataTrackSubscriptionFailed(RemoteParticipant remoteParticipant,
-                                                  RemoteDataTrackPublication remoteDataTrackPublication,
-                                                  TwilioException twilioException) {
-            assertFalse(remoteDataTrackPublication.isTrackSubscribed());
-            participantEvents.add("onDataTrackSubscriptionFailed");
-            triggerLatch(onDataTrackSubscriptionFailedLatch);
         }
 
         @Override

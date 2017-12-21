@@ -76,10 +76,6 @@ protected:
                                         std::shared_ptr<twilio::media::RemoteAudioTrackPublication> remote_audio_track_publication,
                                         std::shared_ptr<twilio::media::RemoteAudioTrack> remote_audio_track);
 
-    virtual void onAudioTrackSubscriptionFailed(twilio::video::RemoteParticipant *participant,
-                                                std::shared_ptr<twilio::media::RemoteAudioTrackPublication> publication,
-                                                const twilio::video::TwilioError twilio_error);
-
     virtual void onAudioTrackUnsubscribed(twilio::video::RemoteParticipant *participant,
                                           std::shared_ptr<twilio::media::RemoteAudioTrackPublication> remote_audio_track_publication,
                                           std::shared_ptr<twilio::media::RemoteAudioTrack> remote_audio_track);
@@ -88,10 +84,6 @@ protected:
                                         std::shared_ptr<twilio::media::RemoteVideoTrackPublication> remote_video_track_publication,
                                         std::shared_ptr<twilio::media::RemoteVideoTrack> remote_video_track);
 
-    virtual void onVideoTrackSubscriptionFailed(twilio::video::RemoteParticipant *participant,
-                                                std::shared_ptr<twilio::media::RemoteVideoTrackPublication> publication,
-                                                const twilio::video::TwilioError twilio_error);
-
     virtual void onVideoTrackUnsubscribed(twilio::video::RemoteParticipant *participant,
                                           std::shared_ptr<twilio::media::RemoteVideoTrackPublication> remote_video_track_publication,
                                           std::shared_ptr<twilio::media::RemoteVideoTrack> remote_video_track);
@@ -99,10 +91,6 @@ protected:
     virtual void onDataTrackSubscribed(twilio::video::RemoteParticipant *participant,
                                        std::shared_ptr<twilio::media::RemoteDataTrackPublication> remote_data_track_publication,
                                        std::shared_ptr<twilio::media::RemoteDataTrack> remote_data_track);
-
-    virtual void onDataTrackSubscriptionFailed(twilio::video::RemoteParticipant *participant,
-                                               std::shared_ptr<twilio::media::RemoteDataTrackPublication> publication,
-                                               const twilio::video::TwilioError twilio_error);
 
     virtual void onDataTrackUnsubscribed(twilio::video::RemoteParticipant *participant,
                                          std::shared_ptr<twilio::media::RemoteDataTrackPublication> remote_data_track_publication,
@@ -133,21 +121,17 @@ private:
     const webrtc_jni::ScopedGlobalRef<jclass> j_remote_video_track_publication_class_;
     const webrtc_jni::ScopedGlobalRef<jclass> j_remote_data_track_class_;
     const webrtc_jni::ScopedGlobalRef<jclass> j_remote_data_track_publication_class_;
-    const webrtc_jni::ScopedGlobalRef<jclass> j_twilio_exception_class_;
     jmethodID j_on_audio_track_published_;
     jmethodID j_on_audio_track_unpublished_;
     jmethodID j_on_audio_track_subscribed_;
-    jmethodID j_on_audio_track_subscription_failed_;
     jmethodID j_on_audio_track_unsubscribed_;
     jmethodID j_on_video_track_published_;
     jmethodID j_on_video_track_unpublished_;
     jmethodID j_on_video_track_subscribed_;
-    jmethodID j_on_video_track_subscription_failed_;
     jmethodID j_on_video_track_unsubscribed_;
     jmethodID j_on_data_track_published_;
     jmethodID j_on_data_track_unpublished_;
     jmethodID j_on_data_track_subscribed_;
-    jmethodID j_on_data_track_subscription_failed_;
     jmethodID j_on_data_track_unsubscribed_;
     jmethodID j_on_audio_track_enabled_;
     jmethodID j_on_audio_track_disabled_;
@@ -159,7 +143,6 @@ private:
     jmethodID j_video_track_publication_ctor_id_;
     jmethodID j_data_track_ctor_id_;
     jmethodID j_data_track_publication_ctor_id_;
-    jmethodID j_twilio_exception_ctor_id_;
 };
 
 }
