@@ -142,7 +142,7 @@ public class ConnectOptions {
         return videoCodecsArray;
     }
 
-    public EncodingParameters getEncodingParameters() {
+    EncodingParameters getEncodingParameters() {
         return encodingParameters;
     }
 
