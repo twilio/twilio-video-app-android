@@ -29,11 +29,10 @@ library-camera-tests:
     test: library/build/outputs/apk/androidTest/debug/library-debug-androidTest.apk
     device-ids:
         - A0001
-        - E5803
-        - F5121
+        - D6503
+        - D6603
         - athene
         - athene_f
-        - falcon_umts
         - flounder
         - g3
         - hero2lte
@@ -47,12 +46,9 @@ library-camera-tests:
         - p1
         - sailfish
         - serranolte
-        - t03g
         - trelte
         - zeroflte
         - zerolte
-        - condor_umts
-        - titan_umts
         - shamu
         # The following devices have known issues executing camera tests. The bugs and tasks
         # are tracked in epic GSDK-1278.
@@ -65,7 +61,6 @@ library-camera-tests:
         # - SH-04H
         # - htc_m8
         # - hammerhead
-        # - mako
     os-version-ids:
         - 18
         - 19
