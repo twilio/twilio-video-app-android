@@ -173,7 +173,7 @@ AndroidRoomObserver::AndroidRoomObserver(JNIEnv *env,
                 webrtc_jni::GetMethodID(env,
                                         *j_twilio_exception_class_,
                                         "<init>",
-                                        kTwilioExceptionConstructoSignature)) {
+                                        kTwilioExceptionConstructorSignature)) {
     VIDEO_ANDROID_LOG(twilio::video::LogModule::kPlatform,
                       twilio::video::LogLevel::kDebug,
                       "AndroidRoomObserver");

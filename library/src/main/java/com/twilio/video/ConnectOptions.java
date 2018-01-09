@@ -17,6 +17,7 @@
 package com.twilio.video;
 
 import android.support.annotation.Nullable;
+import android.support.annotation.VisibleForTesting;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,6 +36,9 @@ public class ConnectOptions {
     private final List<AudioCodec> preferredAudioCodecs;
     private final List<VideoCodec> preferredVideoCodecs;
     private final EncodingParameters encodingParameters;
+
+    @VisibleForTesting(otherwise = VisibleForTesting.NONE)
+    private final MediaFactory mediaFactory;
 
     static void checkAudioTracksReleased(@Nullable List<LocalAudioTrack> audioTracks) {
         if (audioTracks != null) {
@@ -67,6 +71,7 @@ public class ConnectOptions {
         this.preferredAudioCodecs = builder.preferredAudioCodecs;
         this.preferredVideoCodecs = builder.preferredVideoCodecs;
         this.encodingParameters = builder.encodingParameters;
+        this.mediaFactory = builder.mediaFactory;
     }
 
     String getAccessToken() {
@@ -146,6 +151,11 @@ public class ConnectOptions {
         return encodingParameters;
     }
 
+    @VisibleForTesting(otherwise = VisibleForTesting.NONE)
+    @Nullable MediaFactory getMediaFactory() {
+        return this.mediaFactory;
+    }
+
     /*
      * Invoked by JNI RoomDelegate to get pointer to twilio::video::ConnectOptions::Builder
      */
@@ -194,6 +204,7 @@ public class ConnectOptions {
         private List<AudioCodec> preferredAudioCodecs;
         private List<VideoCodec> preferredVideoCodecs;
         private EncodingParameters encodingParameters;
+        private MediaFactory mediaFactory;
 
         public Builder(String accessToken) {
             this.accessToken = accessToken;
@@ -325,6 +336,16 @@ public class ConnectOptions {
          */
         public Builder encodingParameters(@Nullable EncodingParameters encodingParameters) {
             this.encodingParameters = encodingParameters;
+            return this;
+        }
+
+        /*
+         * Private API for connecting to Room with a custom MediaFactory. Used to simulate
+         * participant media scenarios on one device.
+         */
+        @VisibleForTesting(otherwise = VisibleForTesting.NONE)
+        Builder mediaFactory(@Nullable MediaFactory mediaFactory) {
+            this.mediaFactory = mediaFactory;
             return this;
         }
 

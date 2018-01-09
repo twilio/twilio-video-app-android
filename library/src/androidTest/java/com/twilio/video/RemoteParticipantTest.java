@@ -126,6 +126,11 @@ public class RemoteParticipantTest extends BaseClientTest {
                                                        RemoteAudioTrack remoteAudioTrack) {}
 
                     @Override
+                    public void onAudioTrackSubscriptionFailed(RemoteParticipant remoteParticipant,
+                                                               RemoteAudioTrackPublication remoteAudioTrackPublication,
+                                                               TwilioException twilioException) {}
+
+                    @Override
                     public void onAudioTrackUnsubscribed(RemoteParticipant remoteParticipant,
                                                          RemoteAudioTrackPublication remoteAudioTrackPublication,
                                                          RemoteAudioTrack remoteAudioTrack) {}
@@ -144,6 +149,11 @@ public class RemoteParticipantTest extends BaseClientTest {
                                                        RemoteVideoTrack remoteVideoTrack) {}
 
                     @Override
+                    public void onVideoTrackSubscriptionFailed(RemoteParticipant remoteParticipant,
+                                                               RemoteVideoTrackPublication remoteVideoTrackPublication,
+                                                               TwilioException twilioException) {}
+
+                    @Override
                     public void onVideoTrackUnsubscribed(RemoteParticipant remoteParticipant,
                                                          RemoteVideoTrackPublication remoteVideoTrackPublicatieon,
                                                          RemoteVideoTrack remoteVideoTrack) {}
@@ -160,6 +170,11 @@ public class RemoteParticipantTest extends BaseClientTest {
                     public void onDataTrackSubscribed(RemoteParticipant remoteParticipant,
                                                       RemoteDataTrackPublication remoteDataTrackPublication,
                                                       RemoteDataTrack remoteDataTrack) {}
+
+                    @Override
+                    public void onDataTrackSubscriptionFailed(RemoteParticipant remoteParticipant,
+                                                              RemoteDataTrackPublication remoteDataTrackPublication,
+                                                              TwilioException twilioException) {}
 
                     @Override
                     public void onDataTrackUnsubscribed(RemoteParticipant remoteParticipant,

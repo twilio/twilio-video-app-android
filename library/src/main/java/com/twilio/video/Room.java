@@ -16,6 +16,7 @@
 
 package com.twilio.video;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.os.Handler;
 import android.os.Looper;
@@ -296,14 +297,20 @@ public class Room {
      * sure that onConnect() callback won't get called before connect() exits and Room
      * creation is fully completed.
      */
+    @SuppressLint("RestrictedApi")
     void connect(final ConnectOptions connectOptions) {
         // Check if audio or video tracks have been released
         ConnectOptions.checkAudioTracksReleased(connectOptions.getAudioTracks());
         ConnectOptions.checkVideoTracksReleased(connectOptions.getVideoTracks());
 
         synchronized (roomListenerProxy) {
-            // Retain the connect options to provide the audio and video tracks upon connect
-            mediaFactory = MediaFactory.instance(context);
+            /*
+             * Tests are allowed to provide a test MediaFactory to simulate media scenarios on the
+             * same device.
+             */
+            mediaFactory = (connectOptions.getMediaFactory() == null) ?
+                    MediaFactory.instance(context) :
+                    connectOptions.getMediaFactory();
             nativeRoomDelegate = nativeConnect(connectOptions,
                     roomListenerProxy,
                     statsListenerProxy,

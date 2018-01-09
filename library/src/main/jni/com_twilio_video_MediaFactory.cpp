@@ -25,6 +25,8 @@
 #include "webrtc/sdk/android/src/jni/classreferenceholder.h"
 #include "webrtc/sdk/android/src/jni/androidmediadecoder_jni.h"
 #include "webrtc/sdk/android/src/jni/androidmediaencoder_jni.h"
+// TODO: Use header from WebRTC onced unused import is removed GSDK-1450
+#include "fakewebrtcvideoengine.h"
 #include "com_twilio_video_VideoCapturerDelegate.h"
 #include "class_reference_holder.h"
 #include "logging.h"
@@ -34,11 +36,64 @@ namespace twilio_video_jni {
 
 static bool media_jvm_set = false;
 
+static bool initialize(JNIEnv *jni, jobject context) {
+    // Setup media related Android device objects
+    if (!media_jvm_set) {
+        bool failure = false;
+
+        failure |= webrtc::VoiceEngine::SetAndroidObjects(webrtc_jni::GetJVM(), context);
+        failure |= VideoCapturerDelegate::SetAndroidObjects(jni, context);
+
+        if (failure) {
+            return false;
+        } else {
+            media_jvm_set = true;
+        }
+    }
+
+    return true;
+}
+
 std::shared_ptr<twilio::media::MediaFactory> getMediaFactory(jlong media_factory_handle) {
     MediaFactoryContext *media_factory_context =
             reinterpret_cast<MediaFactoryContext *>(media_factory_handle);
 
     return media_factory_context->getMediaFactory();
+}
+
+twilio::media::MediaOptions getMediaOptions(jobject j_media_options) {
+    JNIEnv* jni = webrtc_jni::AttachCurrentThreadIfNeeded();
+    twilio::media::MediaOptions media_options = twilio::media::MediaOptions();
+    cricket::FakeWebRtcVideoEncoderFactory* fake_video_encoder_factory =
+            new cricket::FakeWebRtcVideoEncoderFactory();
+    cricket::FakeWebRtcVideoDecoderFactory* fake_video_decoder_factory =
+            new cricket::FakeWebRtcVideoDecoderFactory();
+
+    // Enable VP8 by default
+    cricket::VideoCodec vp8(webrtc::kVideoCodecVP8, "VP8");
+    fake_video_encoder_factory->AddSupportedVideoCodec(vp8);
+    fake_video_decoder_factory->AddSupportedVideoCodecType(webrtc::VideoCodecType::kVideoCodecVP8);
+
+    // Enable H264 based on media options
+    if (!webrtc_jni::IsNull(jni, j_media_options)) {
+        jclass j_media_options_class = jni->GetObjectClass(j_media_options);
+        jfieldID enable_h264_field =
+                jni->GetFieldID(j_media_options_class, "enableH264", "Z");
+        jboolean enable_h264 = jni->GetBooleanField(j_media_options, enable_h264_field);
+
+        if (enable_h264) {
+            cricket::VideoCodec h264(webrtc::kVideoCodecH264, "H264");
+            fake_video_encoder_factory->AddSupportedVideoCodec(h264);
+            fake_video_decoder_factory->AddSupportedVideoCodecType(
+                    webrtc::VideoCodecType::kVideoCodecH264);
+        }
+    }
+
+    // Set the fake encoder and decoder factories
+    media_options.video_encoder_factory = fake_video_encoder_factory;
+    media_options.video_decoder_factory = fake_video_decoder_factory;
+
+    return media_options;
 }
 
 cricket::AudioOptions getAudioOptions(jobject j_audio_options) {
@@ -254,18 +309,9 @@ JNIEXPORT jlong JNICALL Java_com_twilio_video_MediaFactory_nativeCreate(JNIEnv *
     VIDEO_ANDROID_LOG(twilio::video::LogModule::kPlatform,
                       twilio::video::LogLevel::kDebug,
                       "%s", func_name.c_str());
-    // Setup media related Android device objects
-    if (!media_jvm_set) {
-        bool failure = false;
 
-        failure |= webrtc::VoiceEngine::SetAndroidObjects(webrtc_jni::GetJVM(), context);
-        failure |= VideoCapturerDelegate::SetAndroidObjects(jni, context);
-
-        if (failure) {
-            return 0;
-        } else {
-            media_jvm_set = true;
-        }
+    if (!initialize(jni, context)) {
+        return 0;
     }
 
     twilio::media::MediaOptions media_options;
@@ -396,6 +442,42 @@ JNIEXPORT void JNICALL Java_com_twilio_video_MediaFactory_nativeRelease(JNIEnv *
 
         delete media_factory_context;
     }
+}
+
+/*
+ * Only for testing.
+ */
+JNIEXPORT jlong JNICALL Java_com_twilio_video_MediaFactory_nativeTestCreate(JNIEnv *jni,
+                                                                            jobject j_media_factory,
+                                                                            jobject context,
+                                                                            jobject j_media_options) {
+    std::string func_name = std::string(__FUNCTION__);
+    VIDEO_ANDROID_LOG(twilio::video::LogModule::kPlatform,
+                      twilio::video::LogLevel::kDebug,
+                      "%s", func_name.c_str());
+    if (!initialize(jni, context)) {
+        return 0;
+    }
+
+    twilio::media::MediaOptions media_options = getMediaOptions(j_media_options);
+
+    std::shared_ptr<twilio::media::MediaFactory> media_factory =
+            twilio::media::MediaFactory::create(media_options);
+
+    return webrtc_jni::jlongFromPointer(new MediaFactoryContext(media_options, media_factory));
+}
+
+/*
+ * Only for testing.
+ */
+JNIEXPORT void JNICALL Java_com_twilio_video_MediaFactory_nativeTestRelease(JNIEnv *jni,
+                                                                            jobject j_media_factory,
+                                                                            jlong media_factory_handle) {
+    std::string func_name = std::string(__FUNCTION__);
+    VIDEO_ANDROID_LOG(twilio::video::LogModule::kPlatform,
+                      twilio::video::LogLevel::kDebug,
+                      "%s", func_name.c_str());
+    Java_com_twilio_video_MediaFactory_nativeRelease(jni, j_media_factory, media_factory_handle);
 }
 
 }

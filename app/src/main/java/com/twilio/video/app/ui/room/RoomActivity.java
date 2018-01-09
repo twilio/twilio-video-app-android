@@ -1406,6 +1406,21 @@ public class RoomActivity extends BaseActivity {
         }
 
         @Override
+        public void onAudioTrackSubscriptionFailed(RemoteParticipant remoteParticipant,
+                                                   RemoteAudioTrackPublication remoteAudioTrackPublication,
+                                                   TwilioException twilioException) {
+            Timber.w("onAudioTrackSubscriptionFailed: remoteParticipant: %s, video: %s, " +
+                            "exception: %s",
+                    remoteParticipant.getIdentity(),
+                    remoteAudioTrackPublication.getTrackSid(),
+                    twilioException.getMessage());
+            // TODO: Need design
+            Snackbar.make(primaryVideoView,
+                    "onAudioTrackSubscriptionFailed",
+                    Snackbar.LENGTH_LONG).show();
+        }
+
+        @Override
         public void onAudioTrackUnsubscribed(RemoteParticipant remoteParticipant,
                                              RemoteAudioTrackPublication remoteAudioTrackPublication,
                                              RemoteAudioTrack remoteAudioTrack) {
@@ -1457,6 +1472,21 @@ public class RoomActivity extends BaseActivity {
                         null,
                         remoteVideoTrack);
             }
+        }
+
+        @Override
+        public void onVideoTrackSubscriptionFailed(RemoteParticipant remoteParticipant,
+                                                   RemoteVideoTrackPublication remoteVideoTrackPublication,
+                                                   TwilioException twilioException) {
+            Timber.w("onVideoTrackSubscriptionFailed: remoteParticipant: %s, video: %s, " +
+                            "exception: %s",
+                    remoteParticipant.getIdentity(),
+                    remoteVideoTrackPublication.getTrackSid(),
+                    twilioException.getMessage());
+            // TODO: Need design
+            Snackbar.make(primaryVideoView,
+                    "onVideoTrackSubscriptionFailed",
+                    Snackbar.LENGTH_LONG).show();
         }
 
         @Override
@@ -1528,6 +1558,21 @@ public class RoomActivity extends BaseActivity {
                     remoteDataTrackPublication.getTrackSid(),
                     remoteDataTrackPublication.isTrackEnabled(),
                     remoteDataTrackPublication.isTrackSubscribed());
+        }
+
+        @Override
+        public void onDataTrackSubscriptionFailed(RemoteParticipant remoteParticipant,
+                                                  RemoteDataTrackPublication remoteDataTrackPublication,
+                                                  TwilioException twilioException) {
+            Timber.w("onDataTrackSubscriptionFailed: remoteParticipant: %s, video: %s, " +
+                            "exception: %s",
+                    remoteParticipant.getIdentity(),
+                    remoteDataTrackPublication.getTrackSid(),
+                    twilioException.getMessage());
+            // TODO: Need design
+            Snackbar.make(primaryVideoView,
+                    "onDataTrackSubscriptionFailed",
+                    Snackbar.LENGTH_LONG).show();
         }
 
         @Override

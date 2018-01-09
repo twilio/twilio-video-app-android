@@ -2,6 +2,16 @@ The Twilio Programmable Video SDKs use [Semantic Versioning](http://www.semver.o
 
 ####2.0.0-preview8
 
+Features
+
+- Added the following callbacks to `RemoteParticipant.Listener`
+  - `onAudioTrackSubscriptionFailed` - Notifies listener that an audio track could not be 
+  subscribed to.
+  - `onVideoTrackSubscriptionFailed` - Notifies listener that a video track could not be 
+  subscribed to.
+  - `onDataTrackSubscriptionFailed` - Notifies listener that a data track could not be 
+  subscribed to.
+
 Bug Fixes
 
 - Removed public `getEncodingOptions` method from `ConnectOptions`.
@@ -75,7 +85,7 @@ Features
   - `onVideoTrackPublicationFailed` - Notifies listener that local participant failed to publish 
   video track.
   - `onVideoTrackPublicationFailed` - Notifies listener that local participant failed to publish 
-  video track.    
+  video track.
   
 Improvements
 

@@ -55,6 +55,7 @@ JNIEXPORT jlong JNICALL Java_com_twilio_video_MediaFactory_nativeCreate(JNIEnv *
                                                                         jobject,
                                                                         jobject,
                                                                         jobject);
+
 JNIEXPORT jobject JNICALL Java_com_twilio_video_MediaFactory_nativeCreateAudioTrack(JNIEnv *,
                                                                                     jobject,
                                                                                     jlong,
@@ -77,6 +78,20 @@ JNIEXPORT jobject JNICALL Java_com_twilio_video_MediaFactory_nativeCreateDataTra
                                                                                    jint,
                                                                                    jstring);
 JNIEXPORT void JNICALL Java_com_twilio_video_MediaFactory_nativeRelease(JNIEnv *, jobject, jlong);
+
+/*
+ * Only for testing.
+ */
+JNIEXPORT jlong JNICALL Java_com_twilio_video_MediaFactory_nativeTestCreate(JNIEnv *,
+                                                                            jobject,
+                                                                            jobject,
+                                                                            jobject);
+/*
+ * Only for testing.
+ */
+JNIEXPORT void JNICALL Java_com_twilio_video_MediaFactory_nativeTestRelease(JNIEnv *,
+                                                                            jobject,
+                                                                            jlong);
 
 }
 

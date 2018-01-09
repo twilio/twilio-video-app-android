@@ -60,6 +60,73 @@ public class MultiCodecTest extends BaseCodecTest {
     }
 
     @Test
+    public void shouldFailToSubscribeToVideoTrack() throws InterruptedException {
+        // Select H264 for room
+        baseSetup(Topology.GROUP, Collections.singletonList(VideoCodec.H264));
+
+        // Ensure that device does support H264
+        assumeTrue(MediaCodecVideoEncoder.isH264HwSupported());
+        assumeTrue(MediaCodecVideoDecoder.isH264HwSupported());
+
+        // Connect alice with H264 preferred
+        aliceLocalVideoTrack = LocalVideoTrack.create(mediaTestActivity, true,
+                new FakeVideoCapturer());
+        ConnectOptions aliceConnectOptions = new ConnectOptions.Builder(aliceToken)
+                .roomName(roomName)
+                .preferVideoCodecs(Collections.singletonList(VideoCodec.H264))
+                .build();
+        aliceRoom = createRoom(aliceListener, aliceConnectOptions);
+        aliceListener.onParticipantConnectedLatch = new CountDownLatch(1);
+
+        // Connect bob with no tracks and test media factory with H264 support removed
+        MediaOptions mediaOptions = new MediaOptions.Builder()
+                .enableH264(false)
+                .build();
+        MediaFactory mediaFactory = MediaFactory.testCreate(mediaTestActivity, mediaOptions);
+        ConnectOptions bobConnectOptions = new ConnectOptions.Builder(bobToken)
+                .mediaFactory(mediaFactory)
+                .roomName(roomName)
+                .build();
+        bobRoom = createRoom(bobListener, bobConnectOptions);
+        assertTrue(aliceListener.onParticipantConnectedLatch.await(20, TimeUnit.SECONDS));
+        assertEquals(1, aliceRoom.getRemoteParticipants().size());
+
+        // Set bob participant listener
+        CallbackHelper.FakeParticipantListener bobRemoteParticipantListener =
+                new CallbackHelper.FakeParticipantListener();
+        RemoteParticipant aliceRemoteParticipant = bobRoom.getRemoteParticipants().get(0);
+
+        bobRemoteParticipantListener.onVideoTrackPublishedLatch = new CountDownLatch(1);
+        bobRemoteParticipantListener.onVideoTrackSubscriptionFailedLatch = new CountDownLatch(1);
+        aliceRemoteParticipant.setListener(bobRemoteParticipantListener);
+
+        // Alice publish video track
+        LocalParticipant aliceLocalParticipant = aliceRoom.getLocalParticipant();
+        CallbackHelper.FakeLocalParticipantListener localParticipantListener =
+                new CallbackHelper.FakeLocalParticipantListener();
+        localParticipantListener.onPublishedVideoTrackLatch = new CountDownLatch(1);
+        aliceLocalParticipant.setListener(localParticipantListener);
+        aliceLocalParticipant.publishTrack(aliceLocalVideoTrack);
+
+        // Validate the track published successfully
+        assertTrue(localParticipantListener.onPublishedVideoTrackLatch.await(20, TimeUnit.SECONDS));
+
+        // Validate bob received published track event
+        assertTrue(bobRemoteParticipantListener.onVideoTrackPublishedLatch.await(20, TimeUnit.SECONDS));
+        TrackPublication aliceVideoTrackPublication =
+                aliceRemoteParticipant.getVideoTracks().get(0);
+
+        // Validate that bob received track subscription error
+        assertTrue(bobRemoteParticipantListener.onVideoTrackSubscriptionFailedLatch.await(20, TimeUnit.SECONDS));
+        assertEquals(TwilioException.MEDIA_NO_SUPPORTED_CODEC_EXCEPTION,
+                bobRemoteParticipantListener.subscriptionFailures
+                        .get(aliceVideoTrackPublication).getCode());
+
+        // Release test media factory
+        mediaFactory.testRelease();
+    }
+
+    @Test
     public void publishTrack_shouldFailWithUnsupportedVideoCodec() throws InterruptedException {
         // Select H264 for room
         baseSetup(Topology.GROUP, Collections.singletonList(VideoCodec.H264));

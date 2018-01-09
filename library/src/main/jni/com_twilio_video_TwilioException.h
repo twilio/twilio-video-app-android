@@ -26,7 +26,7 @@ extern "C" {
 
 namespace twilio_video_jni {
 
-static const char *const kTwilioExceptionConstructoSignature = "("
+static const char *const kTwilioExceptionConstructorSignature = "("
         "I"
         "Ljava/lang/String;"
         "Ljava/lang/String;"
