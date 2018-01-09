@@ -11,6 +11,7 @@ Features
   subscribed to.
   - `onDataTrackSubscriptionFailed` - Notifies listener that a data track could not be 
   subscribed to.
+- Added `trackSid` to `BaseTrackStats`.
 
 Bug Fixes
 

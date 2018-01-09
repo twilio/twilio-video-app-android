@@ -27,7 +27,8 @@ public class RemoteAudioTrackStats extends RemoteTrackStats {
      */
     public final int jitter;
 
-    RemoteAudioTrackStats(String trackId,
+    RemoteAudioTrackStats(String trackSid,
+                          String trackId,
                           int packetsLost,
                           String codec,
                           String ssrc,
@@ -36,7 +37,7 @@ public class RemoteAudioTrackStats extends RemoteTrackStats {
                           int packetsReceived,
                           int audioLevel,
                           int jitter) {
-        super(trackId, packetsLost, codec, ssrc,
+        super(trackSid, trackId, packetsLost, codec, ssrc,
                 timestamp, bytesReceived, packetsReceived);
         this.audioLevel = audioLevel;
         this.jitter = jitter;

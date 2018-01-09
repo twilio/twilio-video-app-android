@@ -27,7 +27,8 @@ public class LocalAudioTrackStats extends LocalTrackStats {
      */
     public final int jitter;
 
-    LocalAudioTrackStats(String trackId,
+    LocalAudioTrackStats(String trackSid,
+                         String trackId,
                          int packetsLost,
                          String codec,
                          String ssrc,
@@ -37,7 +38,7 @@ public class LocalAudioTrackStats extends LocalTrackStats {
                          long roundTripTime,
                          int audioLevel,
                          int jitter) {
-        super(trackId, packetsLost, codec, ssrc,
+        super(trackSid, trackId, packetsLost, codec, ssrc,
                 timestamp, bytesSent, packetsSent, roundTripTime);
         this.audioLevel = audioLevel;
         this.jitter = jitter;

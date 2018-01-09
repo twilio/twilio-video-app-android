@@ -18,13 +18,18 @@ package com.twilio.video;
 
 public abstract class BaseTrackStats {
     /**
+     * Track server identifier
+     */
+    public final String trackSid;
+
+    /**
      * Track identifier
      */
     public final String trackId;
 
     /**
      * Total number of RTP packets lost for this SSRC since
-     * the beginning of the reception.
+     * the beginning of the reception
      */
     public final int packetsLost;
 
@@ -43,8 +48,13 @@ public abstract class BaseTrackStats {
      */
     public final double timestamp;
 
-    protected BaseTrackStats(String trackId, int packetsLost,
-                             String codec, String ssrc, double timestamp) {
+    BaseTrackStats(String trackSid,
+                   String trackId,
+                   int packetsLost,
+                   String codec,
+                   String ssrc,
+                   double timestamp) {
+        this.trackSid = trackSid;
         this.trackId = trackId;
         this.packetsLost = packetsLost;
         this.codec = codec;

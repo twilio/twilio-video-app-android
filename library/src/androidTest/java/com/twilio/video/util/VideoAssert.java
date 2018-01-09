@@ -23,6 +23,10 @@ public class VideoAssert extends Assert {
     private static final String TRACK_SID_REGEX = "^MT[a-zA-Z0-9]{32}$";
     private static final String PARTICIPANT_SID_REGEX = "^PA[a-zA-Z0-9]{32}$";
 
+    public static void assertNotNullOrEmpty(String string) {
+        assertTrue("String is null or empty", string != null && !string.isEmpty());
+    }
+
     public static void assertIsParticipantSid(String participantSid) {
         assertTrue(String.format("%s is not participant sid", participantSid),
                 participantSid.matches(PARTICIPANT_SID_REGEX));

@@ -181,7 +181,7 @@ public class StatsListAdapter extends RecyclerView.Adapter<StatsListAdapter.View
             int trackCount = 0;
             for (RemoteAudioTrackStats remoteAudioTrackStats : report.getRemoteAudioTrackStats()) {
                 String trackName =
-                        getParticipantName(remoteAudioTrackStats.trackId, true, remoteParticipants) +
+                        getParticipantName(remoteAudioTrackStats.trackSid, true, remoteParticipants) +
                                 " " + context.getString(R.string.audio_track) + " " + trackCount;
                 StatsListItem item = new StatsListItem.Builder()
                         .baseTrackInfo(remoteAudioTrackStats)
@@ -198,7 +198,7 @@ public class StatsListAdapter extends RecyclerView.Adapter<StatsListAdapter.View
             trackCount = 0;
             for (RemoteVideoTrackStats remoteVideoTrackStats : report.getRemoteVideoTrackStats()) {
                 String trackName =
-                        getParticipantName(remoteVideoTrackStats.trackId, false, remoteParticipants) +
+                        getParticipantName(remoteVideoTrackStats.trackSid, false, remoteParticipants) +
                                 " " + context.getString(R.string.video_track) + " " + trackCount;
                 StatsListItem item = new StatsListItem.Builder()
                         .baseTrackInfo(remoteVideoTrackStats)
@@ -221,16 +221,16 @@ public class StatsListAdapter extends RecyclerView.Adapter<StatsListAdapter.View
         });
     }
 
-    private String getParticipantName(String trackId, boolean isAudioTrack,
+    private String getParticipantName(String trackSid, boolean isAudioTrack,
                                       List<RemoteParticipant> remoteParticipants) {
         for (RemoteParticipant remoteParticipant : remoteParticipants) {
             if (isAudioTrack) {
-                RemoteAudioTrack remoteAudioTrack = getAudioTrack(remoteParticipant, trackId);
+                RemoteAudioTrack remoteAudioTrack = getAudioTrack(remoteParticipant, trackSid);
                 if (remoteAudioTrack != null) {
                     return remoteParticipant.getIdentity();
                 }
             } else {
-                RemoteVideoTrack remoteVideoTrack = getRemoteVideoTrack(remoteParticipant, trackId);
+                RemoteVideoTrack remoteVideoTrack = getRemoteVideoTrack(remoteParticipant, trackSid);
                 if (remoteVideoTrack != null) {
                     return remoteParticipant.getIdentity();
                 }
@@ -239,11 +239,10 @@ public class StatsListAdapter extends RecyclerView.Adapter<StatsListAdapter.View
         return "";
     }
 
-    private RemoteAudioTrack getAudioTrack(RemoteParticipant remoteParticipant, String trackId) {
+    private RemoteAudioTrack getAudioTrack(RemoteParticipant remoteParticipant, String trackSid) {
         for (RemoteAudioTrackPublication remoteAudioTrackPublication :
                 remoteParticipant.getRemoteAudioTracks()) {
-            String audioTrackId = getTrackId(remoteAudioTrackPublication.getRemoteAudioTrack());
-            if (audioTrackId != null && audioTrackId.equals(trackId)) {
+            if (remoteAudioTrackPublication.getTrackSid().equals(trackSid)) {
                 return remoteAudioTrackPublication.getRemoteAudioTrack();
             }
         }
@@ -251,56 +250,14 @@ public class StatsListAdapter extends RecyclerView.Adapter<StatsListAdapter.View
         return null;
     }
 
-    private RemoteVideoTrack getRemoteVideoTrack(RemoteParticipant remoteParticipant, String trackId) {
+    private RemoteVideoTrack getRemoteVideoTrack(RemoteParticipant remoteParticipant, String trackSid) {
         for (RemoteVideoTrackPublication remoteVideoTrackPublication :
                 remoteParticipant.getRemoteVideoTracks()) {
-            String videoTrackId = getTrackId(remoteVideoTrackPublication.getRemoteVideoTrack());
-            if (videoTrackId != null && videoTrackId.equals(trackId)) {
+            if (remoteVideoTrackPublication.getTrackSid().equals(trackSid)) {
                 return remoteVideoTrackPublication.getRemoteVideoTrack();
             }
         }
 
         return null;
-    }
-
-    /*
-     * TODO: Remove this reflection workaround when CSDK-1650 is resolved
-     */
-    private @Nullable String getTrackId(RemoteAudioTrack remoteAudioTrack) {
-        String trackId = null;
-
-        try {
-            Field field = remoteAudioTrack.getClass().getDeclaredField("webRtcAudioTrack");
-            field.setAccessible(true);
-            org.webrtc.AudioTrack webRtcAudioTrack =
-                    (org.webrtc.AudioTrack) field.get(remoteAudioTrack);
-            trackId = webRtcAudioTrack.id();
-        } catch (Exception e) {
-            Timber.e(e.getMessage());
-        }
-
-        return trackId;
-    }
-
-    /*
-     * TODO: Remove this reflection workaround when CSDK-1650 is resolved
-     */
-    private @Nullable String getTrackId(RemoteVideoTrack remoteVideoTrack) {
-        String trackId = null;
-
-        try {
-            Field field = remoteVideoTrack
-                    .getClass()
-                    .getSuperclass()
-                    .getDeclaredField("webRtcVideoTrack");
-            field.setAccessible(true);
-            org.webrtc.VideoTrack webRtcVideoTrack =
-                    (org.webrtc.VideoTrack) field.get(remoteVideoTrack);
-            trackId = webRtcVideoTrack.id();
-        } catch (Exception e) {
-            Timber.e(e.getMessage());
-        }
-
-        return trackId;
     }
 }

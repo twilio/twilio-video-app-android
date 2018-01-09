@@ -37,6 +37,8 @@ import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
+import static com.twilio.video.util.VideoAssert.assertIsTrackSid;
+import static com.twilio.video.util.VideoAssert.assertNotNullOrEmpty;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
@@ -437,9 +439,11 @@ public class StatsTopologyParameterizedTest extends BaseStatsTest {
     }
 
     private void checkBaseTrackStats(BaseTrackStats stats) {
-        assertNotEquals("", stats.codec);
-        assertNotEquals("", stats.ssrc);
-        assertNotEquals("", stats.trackId);
+        assertNotNullOrEmpty(stats.codec);
+        assertNotNullOrEmpty(stats.ssrc);
+        assertNotNullOrEmpty(stats.trackId);
+        assertNotNullOrEmpty(stats.trackSid);
+        assertIsTrackSid(stats.trackSid);
         // TODO: Packets lost is always 0. Find a way to make test that will exercise this
         assertTrue(0 <= stats.packetsLost);
         assertTrue(0.0 < stats.timestamp);
