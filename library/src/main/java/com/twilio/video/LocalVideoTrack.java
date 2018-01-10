@@ -99,14 +99,21 @@ public class LocalVideoTrack extends VideoTrack {
                         !videoCapturer.getSupportedFormats().isEmpty(),
                 CAPTURER_MUST_HAVE_ONE_SUPPORTED_FORMAT);
 
-        LocalVideoTrack localVideoTrack = MediaFactory.instance(context)
-                .createVideoTrack(enabled,
+        // Use temporary media factory owner to create local video track
+        Object temporaryMediaFactoryOwner = new Object();
+        MediaFactory mediaFactory = MediaFactory.instance(temporaryMediaFactoryOwner, context);
+        LocalVideoTrack localVideoTrack = mediaFactory
+                .createVideoTrack(context,
+                        enabled,
                         videoCapturer,
                         resolveConstraints(videoCapturer, videoConstraints));
 
         if (localVideoTrack == null) {
             logger.e("Failed to create local video track");
         }
+
+        // Local video track will obtain media factory instance in constructor so release ownership
+        mediaFactory.release(temporaryMediaFactoryOwner);
 
         return localVideoTrack;
     }
@@ -169,7 +176,7 @@ public class LocalVideoTrack extends VideoTrack {
             super.release();
             nativeRelease(nativeLocalVideoTrackHandle);
             nativeLocalVideoTrackHandle = 0;
-            mediaFactory.release();
+            mediaFactory.release(this);
         }
     }
 
@@ -178,12 +185,12 @@ public class LocalVideoTrack extends VideoTrack {
                     VideoCapturer videoCapturer,
                     VideoConstraints videoConstraints,
                     org.webrtc.VideoTrack webrtcVideoTrack,
-                    MediaFactory mediaFactory) {
+                    Context context) {
         super(webrtcVideoTrack, enabled);
         this.nativeLocalVideoTrackHandle = nativeLocalVideoTrackHandle;
         this.videoCapturer = videoCapturer;
         this.videoConstraints = videoConstraints;
-        this.mediaFactory = mediaFactory;
+        this.mediaFactory = MediaFactory.instance(this, context);
     }
 
     /*

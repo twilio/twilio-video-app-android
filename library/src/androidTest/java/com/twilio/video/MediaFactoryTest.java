@@ -45,18 +45,31 @@ public class MediaFactoryTest {
     @Before
     public void setup() {
         context = InstrumentationRegistry.getInstrumentation().getTargetContext();
-        mediaFactory = MediaFactory.instance(context);
+        mediaFactory = MediaFactory.instance(this, context);
     }
 
     @After
     public void teardown() {
-        mediaFactory.release();
+        mediaFactory.release(this);
         assertTrue(MediaFactory.isReleased());
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void createAudioTrack_shouldNotAllowNullContext() {
+        mediaFactory.createAudioTrack(null, true, null);
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void createVideoTrack_shouldNotAllowNullContext() {
+        mediaFactory.createVideoTrack(null,
+                true,
+                new FakeVideoCapturer(),
+                LocalVideoTrack.defaultVideoConstraints);
     }
 
     @Test
     public void canCreateAudioTrack() {
-        LocalAudioTrack localAudioTrack = mediaFactory.createAudioTrack(true, null);
+        LocalAudioTrack localAudioTrack = mediaFactory.createAudioTrack(context, true, null);
 
         assertNotNull(localAudioTrack);
         localAudioTrack.release();
@@ -64,7 +77,7 @@ public class MediaFactoryTest {
 
     @Test
     public void canCreateVideoTrack() {
-        LocalVideoTrack localVideoTrack = mediaFactory.createVideoTrack(true,
+        LocalVideoTrack localVideoTrack = mediaFactory.createVideoTrack(context, true,
                 new FakeVideoCapturer(), LocalVideoTrack.defaultVideoConstraints);
 
         assertNotNull(localVideoTrack);
@@ -73,8 +86,8 @@ public class MediaFactoryTest {
 
     @Test
     public void canCreateAudioAndVideoTracks() {
-        LocalAudioTrack localAudioTrack = mediaFactory.createAudioTrack(true, null);
-        LocalVideoTrack localVideoTrack = mediaFactory.createVideoTrack(true,
+        LocalAudioTrack localAudioTrack = mediaFactory.createAudioTrack(context, true, null);
+        LocalVideoTrack localVideoTrack = mediaFactory.createVideoTrack(context, true,
                 new FakeVideoCapturer(), LocalVideoTrack.defaultVideoConstraints);
         assertNotNull(localAudioTrack);
         assertNotNull(localVideoTrack);
@@ -84,8 +97,8 @@ public class MediaFactoryTest {
 
     @Test
     public void release_shouldBeIdempotent() {
-        mediaFactory.release();
-        mediaFactory.release();
+        mediaFactory.release(this);
+        mediaFactory.release(this);
     }
 
     @Test(expected = IllegalStateException.class)
@@ -95,8 +108,8 @@ public class MediaFactoryTest {
         // Create random tracks
         for (int i = 0 ; i < NUM_TRACKS ; i++) {
             tracks[i] = random.nextBoolean() ?
-                    (mediaFactory.createAudioTrack(true, null)) :
-                    (mediaFactory.createVideoTrack(true, new FakeVideoCapturer(),
+                    (mediaFactory.createAudioTrack(context, true, null)) :
+                    (mediaFactory.createVideoTrack(context, true, new FakeVideoCapturer(),
                             LocalVideoTrack.defaultVideoConstraints));
         }
 
@@ -113,8 +126,11 @@ public class MediaFactoryTest {
             }
         }
 
-        // With all tracks released this should raise exception
-        mediaFactory.createAudioTrack(true, null);
+        // Test itself is owner so release before trying to create video track
+        mediaFactory.release(this);
+
+        // With all tracks and test owner released this should raise exception
+        mediaFactory.createAudioTrack(context, true, null);
     }
 
     @Test(expected = IllegalStateException.class)
@@ -124,8 +140,8 @@ public class MediaFactoryTest {
         // Create random tracks
         for (int i = 0 ; i < NUM_TRACKS ; i++) {
             tracks[i] = random.nextBoolean() ?
-                    (mediaFactory.createAudioTrack(true, null)) :
-                    (mediaFactory.createVideoTrack(true, new FakeVideoCapturer(),
+                    (mediaFactory.createAudioTrack(context, true, null)) :
+                    (mediaFactory.createVideoTrack(context, true, new FakeVideoCapturer(),
                             LocalVideoTrack.defaultVideoConstraints));
         }
 
@@ -142,8 +158,11 @@ public class MediaFactoryTest {
             }
         }
 
-        // With all tracks released this should raise exception
-        mediaFactory.createVideoTrack(true, new FakeVideoCapturer(),
+        // Test itself is owner so release before trying to create video track
+        mediaFactory.release(this);
+
+        // With all tracks and test owner released this should raise exception
+        mediaFactory.createVideoTrack(context, true, new FakeVideoCapturer(),
                 LocalVideoTrack.defaultVideoConstraints);
     }
 
@@ -151,9 +170,8 @@ public class MediaFactoryTest {
     public void canCreateAndReleaseRepeatedly() {
         int numIterations = 100;
         for (int i = 0 ; i < numIterations ; i++) {
-            MediaFactory mediaFactory = MediaFactory.instance(context);
-            mediaFactory.addRef();
-            mediaFactory.release();
+            MediaFactory mediaFactory = MediaFactory.instance(this, context);
+            mediaFactory.release(this);
         }
     }
 }

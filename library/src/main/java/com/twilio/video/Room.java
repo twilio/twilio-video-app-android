@@ -303,13 +303,12 @@ public class Room {
 
         synchronized (roomListenerProxy) {
             // Retain the connect options to provide the audio and video tracks upon connect
-            mediaFactory = MediaFactory.instance(context);
+            mediaFactory = MediaFactory.instance(this, context);
             cachedConnectOptions = connectOptions;
             nativeRoomDelegate = nativeConnect(connectOptions,
                     roomListenerProxy,
                     statsListenerProxy,
                     mediaFactory.getNativeMediaFactoryHandle());
-            mediaFactory.addRef();
             roomState = RoomState.CONNECTING;
         }
     }
@@ -380,7 +379,7 @@ public class Room {
         if (nativeRoomDelegate != 0) {
             nativeRelease(nativeRoomDelegate);
             nativeRoomDelegate = 0;
-            mediaFactory.release();
+            mediaFactory.release(this);
         }
     }
 

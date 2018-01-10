@@ -32,7 +32,7 @@ jobject createJavaLocalVideoTrack(std::shared_ptr<twilio::media::LocalVideoTrack
                                   jboolean j_enabled,
                                   jobject j_video_capturer,
                                   jobject j_video_constraints,
-                                  jobject j_media_factory) {
+                                  jobject j_context) {
     JNIEnv *jni = webrtc_jni::GetEnv();
     jclass j_video_track_class = twilio_video_jni::FindClass(jni,
                                                              "com/twilio/video/LocalVideoTrack");
@@ -44,7 +44,7 @@ jobject createJavaLocalVideoTrack(std::shared_ptr<twilio::media::LocalVideoTrack
     jmethodID j_video_track_ctor_id = webrtc_jni::GetMethodID(jni,
                                                               j_video_track_class,
                                                               "<init>",
-                                                              "(JZLcom/twilio/video/VideoCapturer;Lcom/twilio/video/VideoConstraints;Lorg/webrtc/VideoTrack;Lcom/twilio/video/MediaFactory;)V");
+                                                              "(JZLcom/twilio/video/VideoCapturer;Lcom/twilio/video/VideoConstraints;Lorg/webrtc/VideoTrack;Landroid/content/Context;)V");
     LocalVideoTrackContext* video_track_context =
             new LocalVideoTrackContext(local_video_track);
     jobject j_webrtc_video_track = jni->NewObject(j_webrtc_video_track_class,
@@ -58,7 +58,7 @@ jobject createJavaLocalVideoTrack(std::shared_ptr<twilio::media::LocalVideoTrack
                                                  j_video_capturer,
                                                  j_video_constraints,
                                                  j_webrtc_video_track,
-                                                 j_media_factory);
+                                                 j_context);
     CHECK_EXCEPTION(jni) << "Error creating LocalVideoTrack";
 
     return j_local_video_track;
