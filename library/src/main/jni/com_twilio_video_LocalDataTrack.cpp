@@ -30,7 +30,7 @@ static const char *const kLocalDataTrackConstructorSignature = "("
         "I"
         "Ljava/lang/String;"
         "Ljava/lang/String;"
-        "Lcom/twilio/video/MediaFactory;"
+        "Landroid/content/Context;"
         ")V";
 
 std::shared_ptr<twilio::media::LocalDataTrack> getLocalDataTrack(jlong local_data_track_handle) {
@@ -41,7 +41,7 @@ std::shared_ptr<twilio::media::LocalDataTrack> getLocalDataTrack(jlong local_dat
 }
 
 jobject createJavaLocalDataTrack(std::shared_ptr<twilio::media::LocalDataTrack> local_data_track,
-                                 jobject j_media_factory) {
+                                 jobject j_context) {
     JNIEnv *jni = webrtc_jni::GetEnv();
     jclass j_data_track_class = twilio_video_jni::FindClass(jni,
                                                             "com/twilio/video/LocalDataTrack");
@@ -63,7 +63,7 @@ jobject createJavaLocalDataTrack(std::shared_ptr<twilio::media::LocalDataTrack> 
                                                 local_data_track->getMaxRetransmits(),
                                                 j_track_id,
                                                 j_name,
-                                                j_media_factory);
+                                                j_context);
     CHECK_EXCEPTION(jni) << "Error creating LocalDataTrack";
 
     return j_local_data_track;

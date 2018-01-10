@@ -33,7 +33,7 @@ struct LocalDataTrackContext {
 std::shared_ptr<twilio::media::LocalDataTrack> getLocalDataTrack(jlong);
 
 jobject createJavaLocalDataTrack(std::shared_ptr<twilio::media::LocalDataTrack> local_data_track,
-                                 jobject j_media_factory);
+                                 jobject j_context);
 
 JNIEXPORT void JNICALL Java_com_twilio_video_LocalDataTrack_nativeBufferSend(JNIEnv *,
                                                                              jobject,

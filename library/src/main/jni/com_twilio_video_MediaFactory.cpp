@@ -335,6 +335,7 @@ JNIEXPORT jlong JNICALL Java_com_twilio_video_MediaFactory_nativeCreate(JNIEnv *
 JNIEXPORT jobject JNICALL Java_com_twilio_video_MediaFactory_nativeCreateAudioTrack(JNIEnv *jni,
                                                                                     jobject j_media_factory,
                                                                                     jlong media_factory_handle,
+                                                                                    jobject j_context,
                                                                                     jboolean enabled,
                                                                                     jobject j_audio_options,
                                                                                     jstring j_name) {
@@ -357,12 +358,13 @@ JNIEXPORT jobject JNICALL Java_com_twilio_video_MediaFactory_nativeCreateAudioTr
 
     return local_audio_track == nullptr ?
            (nullptr) :
-           (createJavaLocalAudioTrack(j_media_factory, local_audio_track));
+           (createJavaLocalAudioTrack(j_context, local_audio_track));
 }
 
 JNIEXPORT jobject JNICALL Java_com_twilio_video_MediaFactory_nativeCreateVideoTrack(JNIEnv *jni,
                                                                                     jobject j_media_factory,
                                                                                     jlong media_factory_handle,
+                                                                                    jobject j_context,
                                                                                     jboolean enabled,
                                                                                     jobject j_video_capturer,
                                                                                     jobject j_video_contraints,
@@ -398,12 +400,13 @@ JNIEXPORT jobject JNICALL Java_com_twilio_video_MediaFactory_nativeCreateVideoTr
            (createJavaLocalVideoTrack(video_track,
                                       j_video_capturer,
                                       j_video_contraints,
-                                      j_media_factory));
+                                      j_context));
 }
 
 JNIEXPORT jobject JNICALL Java_com_twilio_video_MediaFactory_nativeCreateDataTrack(JNIEnv *jni,
                                                                                    jobject j_media_factory,
                                                                                    jlong media_factory_handle,
+                                                                                   jobject j_context,
                                                                                    jboolean j_ordered,
                                                                                    jint j_max_packet_life_time,
                                                                                    jint j_max_retransmits,
@@ -426,7 +429,7 @@ JNIEXPORT jobject JNICALL Java_com_twilio_video_MediaFactory_nativeCreateDataTra
     std::shared_ptr<twilio::media::LocalDataTrack> data_track =
             media_factory->createDataTrack(data_track_options);
 
-    return createJavaLocalDataTrack(data_track, j_media_factory);
+    return createJavaLocalDataTrack(data_track, j_context);
 }
 
 JNIEXPORT void JNICALL Java_com_twilio_video_MediaFactory_nativeRelease(JNIEnv *jni,

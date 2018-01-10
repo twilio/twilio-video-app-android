@@ -309,14 +309,13 @@ public class Room {
              * same device.
              */
             mediaFactory = (connectOptions.getMediaFactory() == null) ?
-                    MediaFactory.instance(context) :
+                    MediaFactory.instance(this, context) :
                     connectOptions.getMediaFactory();
             nativeRoomDelegate = nativeConnect(connectOptions,
                     roomListenerProxy,
                     statsListenerProxy,
                     mediaFactory.getNativeMediaFactoryHandle(),
                     handler);
-            mediaFactory.addRef();
             roomState = RoomState.CONNECTING;
         }
     }
@@ -372,7 +371,7 @@ public class Room {
         if (nativeRoomDelegate != 0) {
             nativeRelease(nativeRoomDelegate);
             nativeRoomDelegate = 0;
-            mediaFactory.release();
+            mediaFactory.release(this);
         }
     }
 

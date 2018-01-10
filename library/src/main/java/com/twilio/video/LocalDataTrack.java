@@ -58,11 +58,19 @@ public class LocalDataTrack extends DataTrack {
                 (DataTrackOptions.DEFAULT_DATA_TRACK_OPTIONS) :
                 dataTrackOptions;
 
-        return MediaFactory.instance(context)
-                .createDataTrack(dataTrackOptions.ordered,
+        // Use temporary media factory owner to create local data track
+        Object temporaryMediaFactoryOwner = new Object();
+        MediaFactory mediaFactory = MediaFactory.instance(temporaryMediaFactoryOwner, context);
+        LocalDataTrack localDataTrack = mediaFactory.createDataTrack(context,
+                        dataTrackOptions.ordered,
                         dataTrackOptions.maxPacketLifeTime,
                         dataTrackOptions.maxRetransmits,
                         dataTrackOptions.name);
+
+        // Local data track will obtain media factory instance in constructor so release ownership
+        mediaFactory.release(temporaryMediaFactoryOwner);
+
+        return localDataTrack;
     }
 
     /**
@@ -129,7 +137,7 @@ public class LocalDataTrack extends DataTrack {
         if (!isReleased()) {
             nativeRelease(nativeLocalDataTrackHandle);
             nativeLocalDataTrackHandle = 0;
-            mediaFactory.release();
+            mediaFactory.release(this);
         }
     }
 
@@ -141,11 +149,11 @@ public class LocalDataTrack extends DataTrack {
                    int maxRetransmits,
                    String trackId,
                    String name,
-                   MediaFactory mediaFactory) {
+                   Context context) {
         super(enabled, ordered, reliable, maxPacketLifeTime, maxRetransmits, name);
         this.nativeLocalDataTrackHandle = nativeLocalDataTrackHandle;
         this.trackId = trackId;
-        this.mediaFactory = mediaFactory;
+        this.mediaFactory = MediaFactory.instance(this, context);
     }
 
     boolean isReleased() {
