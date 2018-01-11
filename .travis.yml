@@ -30,7 +30,9 @@ branches:
 
 stages:
   - name: test
-    if: type IN (push, pull_request) AND tag is blank
+    if: type IN (push, pull_request) AND tag is blank AND fork = false
+  - name: fork test
+    if: type IN (push, pull_request) AND tag is blank AND fork = true
   - name: snapshot
     if: type = push AND branch IN (master, 2.0)
   - name: release candidate
@@ -47,42 +49,54 @@ notifications:
     on_success: always
 
 before_install:
-   # Untar secrets
-   - openssl aes-256-cbc -K $encrypted_7f5144414b5d_key -iv $encrypted_7f5144414b5d_iv -in secrets.tar.enc -out secrets.tar -d
-   - tar -xvf secrets.tar
+  # Ensures commands stop running after the first failed command
+  - set -eo pipefail
 
-   # Internal debug google services
-   - mkdir -p app/src/internal/debug || true
-   - cp secrets/internal-debug-google-services.json app/src/internal/debug/google-services.json
+  # Setup secrets
+  - |
+    if [ $TRAVIS_SECURE_ENV_VARS = true ]; then
+      # Untar secrets
+      openssl aes-256-cbc -K $encrypted_7f5144414b5d_key -iv $encrypted_7f5144414b5d_iv -in secrets.tar.enc -out secrets.tar -d
+      tar -xvf secrets.tar
 
-   # Internal release google services
-   - mkdir -p app/src/internal/release || true
-   - cp secrets/internal-release-google-services.json app/src/internal/release/google-services.json
+      # Internal debug google services
+      mkdir -p app/src/internal/debug || true
+      cp secrets/internal-debug-google-services.json app/src/internal/debug/google-services.json
 
-   # Twilio release google services
-   - mkdir -p app/src/twilio/release || true
-   - cp secrets/twilio-release-google-services.json app/src/twilio/release/google-services.json
+      # Internal release google services
+      mkdir -p app/src/internal/release || true
+      cp secrets/internal-release-google-services.json app/src/internal/release/google-services.json
 
-   # Video Android Twilio Credentials
-   - cp secrets/twilio-video.json library/twilio-video.json
+      # Twilio release google services
+      mkdir -p app/src/twilio/release || true
+      cp secrets/twilio-release-google-services.json app/src/twilio/release/google-services.json
 
-   # Video App Development Variant Credentials
-   - cp secrets/twilio-video-app.json app/twilio-video-app.json
+      # Video Android Twilio Credentials
+      cp secrets/twilio-video.json library/twilio-video.json
 
-   # Authenticate with gcloud
-   - gcloud auth activate-service-account travis@video-app-79418.iam.gserviceaccount.com --key-file=secrets/video-app-46437ca14fdd.json
+      # Video App Development Variant Credentials
+      cp secrets/twilio-video-app.json app/twilio-video-app.json
+
+      # Authenticate with gcloud
+      gcloud auth activate-service-account travis@video-app-79418.iam.gserviceaccount.com --key-file=secrets/video-app-46437ca14fdd.json
+
+      # Android Keystore
+      echo "androidKeystore=$TRAVIS_BUILD_DIR/$ANDROID_KEYSTORE" >> $HOME/.gradle/gradle.properties
+      echo "androidKeystorePassword=$ANDROID_KEYSTORE_PASSWORD" >> $HOME/.gradle/gradle.properties
+      echo "androidReleaseKeyAlias=$ANDROID_RELEASE_KEY_ALIAS" >> $HOME/.gradle/gradle.properties
+      echo "androidReleaseKeyPassword=$ANDROID_RELEASE_KEY_PASSWORD" >> $HOME/.gradle/gradle.properties
+    fi
+
+  # Reset initial pipefail settings
+  - set +eo pipefail
 
 before_script:
+   # Gradle
+   - echo "org.gradle.jvmargs=-Xmx4096M" >> $HOME/.gradle/gradle.properties
+
    # Git
    - git config --global user.email "twilio-sdk-build@twilio.com"
    - git config --global user.name "twilio-sdk-build"
-
-   # Gradle
-   - echo "androidKeystore=$TRAVIS_BUILD_DIR/$ANDROID_KEYSTORE" >> $HOME/.gradle/gradle.properties
-   - echo "androidKeystorePassword=$ANDROID_KEYSTORE_PASSWORD" >> $HOME/.gradle/gradle.properties
-   - echo "androidReleaseKeyAlias=$ANDROID_RELEASE_KEY_ALIAS" >> $HOME/.gradle/gradle.properties
-   - echo "androidReleaseKeyPassword=$ANDROID_RELEASE_KEY_PASSWORD" >> $HOME/.gradle/gradle.properties
-   - echo "org.gradle.jvmargs=-Xmx4096M" >> $HOME/.gradle/gradle.properties
 
    # Cmake
    - wget https://github.com/Commit451/android-cmake-installer/releases/download/1.1.0/install-cmake.sh
@@ -116,6 +130,12 @@ jobs:
       script: ./gradlew -q firebaseTestLabCheckLibraryCamera
     - stage: test
       script: ./gradlew -q assemble
+    - stage: fork test
+      script: ./gradlew library:testDebugUnitTest
+    - stage: fork test
+      script: ./gradlew -q library:assemble
+    - stage: fork test
+      script: ./gradlew -q app:assembleCommunity
     - stage: snapshot
       script: ./gradlew -q bintrayLibrarySnapshotUpload
     - stage: snapshot
