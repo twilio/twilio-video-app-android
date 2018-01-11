@@ -45,18 +45,44 @@ public class MediaFactoryTest {
     @Before
     public void setup() {
         context = InstrumentationRegistry.getInstrumentation().getTargetContext();
-        mediaFactory = MediaFactory.instance(context);
+        mediaFactory = MediaFactory.instance(this, context);
     }
 
     @After
     public void teardown() {
-        mediaFactory.release();
+        mediaFactory.release(this);
         assertTrue(MediaFactory.isReleased());
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void createAudioTrack_shouldNotAllowNullContext() {
+        mediaFactory.createAudioTrack(null, true, null, null);
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void createVideoTrack_shouldNotAllowNullContext() {
+        mediaFactory.createVideoTrack(null,
+                true,
+                new FakeVideoCapturer(),
+                LocalVideoTrack.DEFAULT_VIDEO_CONSTRAINTS,
+                null);
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void createDataTrack_shouldNotAllowNullContext() {
+        mediaFactory.createDataTrack(null,
+                true,
+                DataTrackOptions.DEFAULT_MAX_PACKET_LIFE_TIME,
+                DataTrackOptions.DEFAULT_MAX_RETRANSMITS,
+                null);
     }
 
     @Test
     public void canCreateAudioTrack() {
-        LocalAudioTrack localAudioTrack = mediaFactory.createAudioTrack(true, null, null);
+        LocalAudioTrack localAudioTrack = mediaFactory.createAudioTrack(context,
+                true,
+                null,
+                null);
 
         assertNotNull(localAudioTrack);
         localAudioTrack.release();
@@ -64,10 +90,8 @@ public class MediaFactoryTest {
 
     @Test
     public void canCreateVideoTrack() {
-        LocalVideoTrack localVideoTrack = mediaFactory.createVideoTrack(true,
-                new FakeVideoCapturer(),
-                LocalVideoTrack.DEFAULT_VIDEO_CONSTRAINTS,
-                null);
+        LocalVideoTrack localVideoTrack = mediaFactory.createVideoTrack(context, true,
+                new FakeVideoCapturer(), LocalVideoTrack.DEFAULT_VIDEO_CONSTRAINTS, null);
 
         assertNotNull(localVideoTrack);
         localVideoTrack.release();
@@ -75,7 +99,8 @@ public class MediaFactoryTest {
 
     @Test
     public void canCreateDataTrack() {
-        LocalDataTrack localDataTrack = mediaFactory.createDataTrack(true,
+        LocalDataTrack localDataTrack = mediaFactory.createDataTrack(context,
+                true,
                 DataTrackOptions.DEFAULT_MAX_PACKET_LIFE_TIME,
                 DataTrackOptions.DEFAULT_MAX_RETRANSMITS,
                 null);
@@ -86,12 +111,17 @@ public class MediaFactoryTest {
 
     @Test
     public void canCreateMultipleTracks() {
-        LocalAudioTrack localAudioTrack = mediaFactory.createAudioTrack(true, null, null);
-        LocalVideoTrack localVideoTrack = mediaFactory.createVideoTrack(true,
+        LocalAudioTrack localAudioTrack = mediaFactory.createAudioTrack(context,
+                true,
+                null,
+                null);
+        LocalVideoTrack localVideoTrack = mediaFactory.createVideoTrack(context,
+                true,
                 new FakeVideoCapturer(),
                 LocalVideoTrack.DEFAULT_VIDEO_CONSTRAINTS,
                 null);
-        LocalDataTrack localDataTrack = mediaFactory.createDataTrack(true,
+        LocalDataTrack localDataTrack = mediaFactory.createDataTrack(context,
+                true,
                 DataTrackOptions.DEFAULT_MAX_PACKET_LIFE_TIME,
                 DataTrackOptions.DEFAULT_MAX_RETRANSMITS,
                 null);
@@ -105,8 +135,8 @@ public class MediaFactoryTest {
 
     @Test
     public void release_shouldBeIdempotent() {
-        mediaFactory.release();
-        mediaFactory.release();
+        mediaFactory.release(this);
+        mediaFactory.release(this);
     }
 
     @Test(expected = IllegalStateException.class)
@@ -119,15 +149,21 @@ public class MediaFactoryTest {
 
             switch (seed) {
                 case 0:
-                    tracks[i] = mediaFactory.createAudioTrack(true, null, null);
+                    tracks[i] = mediaFactory.createAudioTrack(context,
+                            true,
+                            null,
+                            null);
                     break;
                 case 1:
-                    tracks[i] = mediaFactory.createVideoTrack(true, new FakeVideoCapturer(),
+                    tracks[i] = mediaFactory.createVideoTrack(context,
+                            true,
+                            new FakeVideoCapturer(),
                             LocalVideoTrack.DEFAULT_VIDEO_CONSTRAINTS,
                             null);
                     break;
                 case 2:
-                    tracks[i] = mediaFactory.createDataTrack(true,
+                    tracks[i] = mediaFactory.createDataTrack(context,
+                            true,
                             DataTrackOptions.DEFAULT_MAX_PACKET_LIFE_TIME,
                             DataTrackOptions.DEFAULT_MAX_RETRANSMITS,
                             null);
@@ -152,8 +188,11 @@ public class MediaFactoryTest {
             }
         }
 
-        // With all tracks released this should raise exception
-        mediaFactory.createAudioTrack(true, null, null);
+        // Test itself is owner so release before trying to create audio track
+        mediaFactory.release(this);
+
+        // With all tracks and test owner released this should raise exception
+        mediaFactory.createAudioTrack(context, true, null, null);
     }
 
     @Test(expected = IllegalStateException.class)
@@ -166,15 +205,21 @@ public class MediaFactoryTest {
 
             switch (seed) {
                 case 0:
-                    tracks[i] = mediaFactory.createAudioTrack(true, null, null);
+                    tracks[i] = mediaFactory.createAudioTrack(context,
+                            true,
+                            null,
+                            null);
                     break;
                 case 1:
-                    tracks[i] = mediaFactory.createVideoTrack(true, new FakeVideoCapturer(),
+                    tracks[i] = mediaFactory.createVideoTrack(context,
+                            true,
+                            new FakeVideoCapturer(),
                             LocalVideoTrack.DEFAULT_VIDEO_CONSTRAINTS,
                             null);
                     break;
                 case 2:
-                    tracks[i] = mediaFactory.createDataTrack(true,
+                    tracks[i] = mediaFactory.createDataTrack(context,
+                            true,
                             DataTrackOptions.DEFAULT_MAX_PACKET_LIFE_TIME,
                             DataTrackOptions.DEFAULT_MAX_RETRANSMITS,
                             null);
@@ -199,8 +244,13 @@ public class MediaFactoryTest {
             }
         }
 
-        // With all tracks released this should raise exception
-        mediaFactory.createVideoTrack(true, new FakeVideoCapturer(),
+        // Test itself is owner so release before trying to create video track
+        mediaFactory.release(this);
+
+        // With all tracks and test itself released this should raise exception
+        mediaFactory.createVideoTrack(context,
+                true,
+                new FakeVideoCapturer(),
                 LocalVideoTrack.DEFAULT_VIDEO_CONSTRAINTS,
                 null);
     }
@@ -215,15 +265,21 @@ public class MediaFactoryTest {
 
             switch (seed) {
                 case 0:
-                    tracks[i] = mediaFactory.createAudioTrack(true, null, null);
+                    tracks[i] = mediaFactory.createAudioTrack(context,
+                            true,
+                            null,
+                            null);
                     break;
                 case 1:
-                    tracks[i] = mediaFactory.createVideoTrack(true, new FakeVideoCapturer(),
+                    tracks[i] = mediaFactory.createVideoTrack(context,
+                            true,
+                            new FakeVideoCapturer(),
                             LocalVideoTrack.DEFAULT_VIDEO_CONSTRAINTS,
                             null);
                     break;
                 case 2:
-                    tracks[i] = mediaFactory.createDataTrack(true,
+                    tracks[i] = mediaFactory.createDataTrack(context,
+                            true,
                             DataTrackOptions.DEFAULT_MAX_PACKET_LIFE_TIME,
                             DataTrackOptions.DEFAULT_MAX_RETRANSMITS,
                             null);
@@ -248,8 +304,12 @@ public class MediaFactoryTest {
             }
         }
 
-        // With all tracks released this should raise exception
-        mediaFactory.createDataTrack(true,
+        // Test itself is owner so release before trying to create data track
+        mediaFactory.release(this);
+
+        // With all tracks and test itself released this should raise exception
+        mediaFactory.createDataTrack(context,
+                true,
                 DataTrackOptions.DEFAULT_MAX_PACKET_LIFE_TIME,
                 DataTrackOptions.DEFAULT_MAX_RETRANSMITS,
                 null);
@@ -259,9 +319,8 @@ public class MediaFactoryTest {
     public void canCreateAndReleaseRepeatedly() {
         int numIterations = 100;
         for (int i = 0 ; i < numIterations ; i++) {
-            MediaFactory mediaFactory = MediaFactory.instance(context);
-            mediaFactory.addRef();
-            mediaFactory.release();
+            MediaFactory mediaFactory = MediaFactory.instance(this, context);
+            mediaFactory.release(this);
         }
     }
 }

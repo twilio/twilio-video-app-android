@@ -93,12 +93,18 @@ public class LocalAudioTrack extends AudioTrack {
         Preconditions.checkState(Util.permissionGranted(context, RECORD_AUDIO), "RECORD_AUDIO " +
                 "permission must be granted to create audio track");
 
-        LocalAudioTrack localAudioTrack = MediaFactory.instance(context)
-                .createAudioTrack(enabled, audioOptions, name);
+        // Use temporary media factory owner to create local audio track
+        Object temporaryMediaFactoryOwner = new Object();
+        MediaFactory mediaFactory = MediaFactory.instance(temporaryMediaFactoryOwner, context);
+        LocalAudioTrack localAudioTrack = mediaFactory
+                .createAudioTrack(context, enabled, audioOptions, name);
 
         if (localAudioTrack == null) {
             logger.e("Failed to create local audio track");
         }
+
+        // Local audio track will obtain media factory instance in constructor so release ownership
+        mediaFactory.release(temporaryMediaFactoryOwner);
 
         return localAudioTrack;
     }
@@ -160,7 +166,7 @@ public class LocalAudioTrack extends AudioTrack {
         if (!isReleased()) {
             nativeRelease(nativeLocalAudioTrackHandle);
             nativeLocalAudioTrackHandle = 0;
-            mediaFactory.release();
+            mediaFactory.release(this);
         }
     }
 
@@ -168,11 +174,11 @@ public class LocalAudioTrack extends AudioTrack {
                     @NonNull String trackId,
                     @NonNull String name,
                     boolean enabled,
-                    MediaFactory mediaFactory) {
+                    Context context) {
         super(enabled, name);
         this.trackId = trackId;
         this.nativeLocalAudioTrackHandle = nativeLocalAudioTrackHandle;
-        this.mediaFactory = mediaFactory;
+        this.mediaFactory = MediaFactory.instance(this, context);
     }
 
     boolean isReleased() {

@@ -26,7 +26,7 @@ static const char *const kLocalAudioTrackConstructorSignature = "("
         "Ljava/lang/String;"
         "Ljava/lang/String;"
         "Z"
-        "Lcom/twilio/video/MediaFactory;"
+        "Landroid/content/Context;"
         ")V";
 
 std::shared_ptr<twilio::media::LocalAudioTrack> getLocalAudioTrack(jlong local_audio_track_handle) {
@@ -36,7 +36,7 @@ std::shared_ptr<twilio::media::LocalAudioTrack> getLocalAudioTrack(jlong local_a
     return local_audio_track_context->getLocalAudioTrack();
 }
 
-jobject createJavaLocalAudioTrack(jobject j_media_factory,
+jobject createJavaLocalAudioTrack(jobject j_context,
                                   std::shared_ptr<twilio::media::LocalAudioTrack> local_audio_track) {
     JNIEnv *jni = webrtc_jni::GetEnv();
     jclass j_local_audio_track_class = twilio_video_jni::FindClass(jni,
@@ -54,8 +54,8 @@ jobject createJavaLocalAudioTrack(jobject j_media_factory,
                                                  JavaUTF16StringFromStdString(jni, local_audio_track->getTrackId()),
                                                  j_name,
                                                  local_audio_track->isEnabled(),
-                                                 j_media_factory);
-    CHECK_EXCEPTION(jni) << "Failed to create LocalVideoTrack instance";
+                                                 j_context);
+    CHECK_EXCEPTION(jni) << "Failed to create LocalAudioTrack instance";
 
     return j_local_audio_track;
 }

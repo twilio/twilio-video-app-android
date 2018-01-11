@@ -29,7 +29,7 @@ static const char *const kLocalVideoTrackConstructorSignature = "("
         "Lcom/twilio/video/VideoConstraints;"
         "Lorg/webrtc/VideoTrack;"
         "Ljava/lang/String;"
-        "Lcom/twilio/video/MediaFactory;"
+        "Landroid/content/Context;"
         ")V";
 
 std::shared_ptr<twilio::media::LocalVideoTrack> getLocalVideoTrack(jlong local_video_track_handle) {
@@ -42,7 +42,7 @@ std::shared_ptr<twilio::media::LocalVideoTrack> getLocalVideoTrack(jlong local_v
 jobject createJavaLocalVideoTrack(std::shared_ptr<twilio::media::LocalVideoTrack> local_video_track,
                                   jobject j_video_capturer,
                                   jobject j_video_constraints,
-                                  jobject j_media_factory) {
+                                  jobject j_context) {
     JNIEnv *jni = webrtc_jni::GetEnv();
     jclass j_video_track_class = twilio_video_jni::FindClass(jni,
                                                              "com/twilio/video/LocalVideoTrack");
@@ -70,7 +70,7 @@ jobject createJavaLocalVideoTrack(std::shared_ptr<twilio::media::LocalVideoTrack
                                                  j_video_constraints,
                                                  j_webrtc_video_track,
                                                  j_name,
-                                                 j_media_factory);
+                                                 j_context);
     CHECK_EXCEPTION(jni) << "Error creating LocalVideoTrack";
 
     return j_local_video_track;

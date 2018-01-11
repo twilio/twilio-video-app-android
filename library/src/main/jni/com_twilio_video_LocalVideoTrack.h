@@ -49,7 +49,7 @@ std::shared_ptr<twilio::media::LocalVideoTrack> getLocalVideoTrack(jlong);
 jobject createJavaLocalVideoTrack(std::shared_ptr<twilio::media::LocalVideoTrack> local_video_track,
                                   jobject j_video_capturer,
                                   jobject j_video_constraints,
-                                  jobject j_media_factory);
+                                  jobject j_context);
 
 JNIEXPORT jboolean JNICALL Java_com_twilio_video_LocalVideoTrack_nativeIsEnabled(JNIEnv *,
                                                                                  jobject,
