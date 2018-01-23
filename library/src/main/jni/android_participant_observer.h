@@ -50,12 +50,6 @@ protected:
     virtual void onVideoTrackRemoved(twilio::video::Participant *participant,
                                      std::shared_ptr<twilio::media::VideoTrack> track);
 
-    virtual void onDataTrackAdded(twilio::video::Participant *participant,
-                                  std::shared_ptr<twilio::media::DataTrack> track);
-
-    virtual void onDataTrackRemoved(twilio::video::Participant *participant,
-                                    std::shared_ptr<twilio::media::DataTrack> track);
-
     virtual void onAudioTrackEnabled(twilio::video::Participant *participant,
                                      std::shared_ptr<twilio::media::AudioTrack> track);
 

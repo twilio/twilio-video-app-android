@@ -6,6 +6,10 @@ Improvements
 
 - Refactor internal reference counting of internal MediaFactory.
 
+Bug Fixes
+
+- Don't publish Ice Candidate stats unless an active pair is present.
+
 Known issues
 
 - Network handoff, and subsequent connection renegotiation is not supported for IPv6 networks [#72](https://github.com/twilio/video-quickstart-android/issues/72)

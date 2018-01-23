@@ -229,16 +229,6 @@ void AndroidParticipantObserver::onVideoTrackRemoved(twilio::video::Participant 
     }
 }
 
-void AndroidParticipantObserver::onDataTrackAdded(twilio::video::Participant *participant,
-                                                  std::shared_ptr<twilio::media::DataTrack> track) {
-    // TODO: Add DataTrack support
-}
-
-void AndroidParticipantObserver::onDataTrackRemoved(twilio::video::Participant *participant,
-                                                    std::shared_ptr<twilio::media::DataTrack> track) {
-    // TODO: Add DataTrack support
-}
-
 void AndroidParticipantObserver::onAudioTrackEnabled(twilio::video::Participant *participant,
                                                      std::shared_ptr<twilio::media::AudioTrack> track) {
     webrtc_jni::ScopedLocalRefFrame local_ref_frame(jni());
