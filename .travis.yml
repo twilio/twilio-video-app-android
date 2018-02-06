@@ -4,8 +4,8 @@ android:
   components:
     - tools
     - platform-tools
-    - build-tools-26.0.2
-    - android-26
+    - build-tools-27.0.3
+    - android-27
     - extra-android-m2repository
   licenses:
     - 'android-sdk-license-.+'
@@ -49,6 +49,11 @@ notifications:
     on_success: always
 
 before_install:
+  # Travis CI has not be setup to install Android 27. This workaround ensures the SDK is properly
+  # installed and the license agreement is accepted. See Stackoverflow post below:
+  # https://stackoverflow.com/questions/47719282/i-cant-build-android-27-tool-27-0-2-with-travis-ci/47726910#47726910
+  - yes | sdkmanager "platforms;android-27"
+
   # Ensures commands stop running after the first failed command
   - set -eo pipefail
 
