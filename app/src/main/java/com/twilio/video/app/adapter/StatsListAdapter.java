@@ -27,6 +27,7 @@ import android.view.ViewGroup;
 import android.widget.TableRow;
 import android.widget.TextView;
 
+import com.google.common.collect.ImmutableList;
 import com.twilio.video.Camera2Capturer;
 import com.twilio.video.RemoteAudioTrack;
 import com.twilio.video.RemoteAudioTrackPublication;
@@ -139,7 +140,12 @@ public class StatsListAdapter extends RecyclerView.Adapter<StatsListAdapter.View
     public void updateStatsData(List<StatsReport> statsReports,
                                 List<RemoteParticipant> remoteParticipants,
                                 Map<String, String> localVideoTrackNames){
-        statsListItems.clear();
+        /*
+         * Generate new items on a separate list to ensure statsListItems changes are only
+         * performed on the UI thread to meet the threading requirement of RecyclerView.Adapter.
+         */
+        ImmutableList.Builder statsListItemsBuilder = new ImmutableList.Builder<StatsListItem>();
+
         // Generate stats items list from reports
         boolean localTracksAdded = false;
         for (StatsReport report : statsReports) {
@@ -156,7 +162,7 @@ public class StatsListAdapter extends RecyclerView.Adapter<StatsListAdapter.View
                             .isAudioTrack(true)
                             .isLocalTrack(true)
                             .build();
-                    statsListItems.add(item);
+                    statsListItemsBuilder.add(item);
                 }
                 for (LocalVideoTrackStats localVideoTrackStats : report.getLocalVideoTrackStats()) {
                     String localVideoTrackName =
@@ -174,7 +180,7 @@ public class StatsListAdapter extends RecyclerView.Adapter<StatsListAdapter.View
                             .isAudioTrack(false)
                             .isLocalTrack(true)
                             .build();
-                    statsListItems.add(item);
+                    statsListItemsBuilder.add(item);
                 }
                 localTracksAdded = true;
             }
@@ -192,7 +198,7 @@ public class StatsListAdapter extends RecyclerView.Adapter<StatsListAdapter.View
                         .isAudioTrack(true)
                         .isLocalTrack(false)
                         .build();
-                statsListItems.add(item);
+                statsListItemsBuilder.add(item);
                 trackCount++;
             }
             trackCount = 0;
@@ -209,13 +215,18 @@ public class StatsListAdapter extends RecyclerView.Adapter<StatsListAdapter.View
                         .isAudioTrack(false)
                         .isLocalTrack(false)
                         .build();
-                statsListItems.add(item);
+                statsListItemsBuilder.add(item);
                 trackCount++;
             }
         }
+
+        final ImmutableList immutableStatsListItems = statsListItemsBuilder.build();
+
         handler.post(new Runnable() {
             @Override
             public void run() {
+                statsListItems.clear();
+                statsListItems.addAll(immutableStatsListItems);
                 notifyDataSetChanged();
             }
         });
