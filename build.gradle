@@ -561,6 +561,7 @@ task firebaseTestLabCheckLibrary(type: Exec) {
             'test',
             'android',
             'run',
+            '--no-record-video',
             '--project',
             'video-app-79418',
             'video-app-args.yaml:library-instrumentation-tests'
@@ -576,6 +577,7 @@ task firebaseTestLabCheckLibraryCamera(type: Exec) {
             'test',
             'android',
             'run',
+            '--no-record-video',
             '--project',
             'video-app-79418',
             '--async',
