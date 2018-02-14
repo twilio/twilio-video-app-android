@@ -159,6 +159,7 @@ public class RoomActivity extends BaseActivity {
     @BindView(R.id.join_status_layout) LinearLayout joinStatusLayout;
     @BindView(R.id.join_status) TextView joinStatusTextView;
     @BindView(R.id.join_room_name) TextView joinRoomNameTextView;
+    @BindView(R.id.recording_notice) TextView recordingNoticeTextView;
 
     @BindView(R.id.stats_recycler_view) RecyclerView statsRecyclerView;
     @BindView(R.id.stats_disabled) LinearLayout statsDisabledLayout;
@@ -707,6 +708,7 @@ public class RoomActivity extends BaseActivity {
         String roomName = displayName;
         String toolbarTitle = displayName;
         String joinStatus = "";
+        int recordingWarningVisibility = View.GONE;
 
         if (room != null) {
             switch (room.getState()) {
@@ -714,6 +716,7 @@ public class RoomActivity extends BaseActivity {
                     disconnectButtonState = View.VISIBLE;
                     joinRoomLayoutState = View.GONE;
                     joinStatusLayoutState = View.VISIBLE;
+                    recordingWarningVisibility = View.VISIBLE;
                     settingsMenuItemState = false;
 
                     connectButtonEnabled = false;
@@ -757,6 +760,7 @@ public class RoomActivity extends BaseActivity {
 
         joinStatusTextView.setText(joinStatus);
         joinRoomNameTextView.setText(roomName);
+        recordingNoticeTextView.setVisibility(recordingWarningVisibility);
 
         // TODO: Remove when we use a Service to obtainTokenAndConnect to a room
         if (settingsMenuItem != null) {

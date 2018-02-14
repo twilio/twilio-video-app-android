@@ -29,8 +29,6 @@ library-camera-tests:
     test: library/build/outputs/apk/androidTest/debug/library-debug-androidTest.apk
     device-ids:
         - A0001
-        - D6503
-        - D6603
         - athene
         - athene_f
         - flounder
@@ -43,7 +41,6 @@ library-camera-tests:
         - lt02wifi
         - m0
         - osprey_umts
-        - p1
         - sailfish
         - serranolte
         - trelte
