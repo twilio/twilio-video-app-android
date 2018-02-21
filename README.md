@@ -4,7 +4,6 @@
 - [Project Modules](#project-modules)
 - [Video App](#video-app)
 - [Tests](#tests)
-- [Native Debugging](#native-debugging)
 - [Code of Conduct](#code-of-conduct)
 - [License](#license)
 
@@ -21,7 +20,7 @@ of how the SDK can be used.
 ## Getting Started
 
 To get started we recommend you use Android Studio for all your development.
-In order to use our project please make sure you have the following installed:
+In order to use our project please perform the following steps:
 
 1.  Install the Android SDK
     * Define `$ANROID_HOME`, `$ANDROID_SDK_HOME`, and `$ANDROID_SDK_ROOT`
@@ -45,31 +44,29 @@ Android SDK contains native C and C++ code that uses the Twilio Video C++ SDK. T
       * [Internal Debug (default)](https://console.firebase.google.com/project/video-app-79418/settings/general/android:com.twilio.video.app.internal.debug) - Download to `app/src/internal/debug`
       * [Internal Release](https://console.firebase.google.com/project/video-app-79418/settings/general/android:com.twilio.video.app.internal) - Download to `app/src/internal/release`
       * [Twilio Release](https://console.firebase.google.com/project/video-app-79418/settings/general/android:com.twilio.video.app) - Download to `app/src/twilio/release`
-1.  Setup your Programmable Video credentials
+1.  Setup your Programmable Video credentials. Credentials are required to run the SDK 
+instrumentation tests and certain app flavors. The credentials in this project are managed 
+using JSON files. The table below provides a short summary of required credentials:
+
+    Credential | JSON Key | Description
+    ---------- | ----------- | -----------
+    Twilio Account SID | `account_sid` | Your main Twilio account identifier - [find it on your dashboard](https://www.twilio.com/console).
+    API Key | `api_key` | Used to authenticate - [generate one here](https://www.twilio.com/console/video/runtime/api-keys).
+    API Secret | `api_key_secret` | Used to authenticate - [just like the above, you'll get one here](https://www.twilio.com/console/video/runtime/api-keys).
 
     #### Video Android App
-    These credentials are only required if you intend on using the community variant of the
-    application. See [Building the Community Flavor](#building-the-community-flavor) for more
-    details. Set your credentials in `twilio-video-app.json` located in the `app` directory.
-
-    An example json file is provided under [app/twilio-video-app-example.json](app/twilio-video-app-example.json). 
-    The following values MUST be set to build the community variant:
-
-    ```
-    account_sid
-    api_key
-    api_key_secret
-    ```
+    Make a copy of `app/twilio-video-app-example.json` to `app/twilio-video-app.json` and use the 
+    table above as reference to fill in your Twilio credentials.
 
     #### Video Android SDK
-    Set your credentials in `twilio-video.json` located in the `library` directory.
-    There are two sets of key/value pairs: mandatory and optional. Mandatory values are
-    required to be set before building the project. Optional values are not required to be set,
-    but as a Twilio developer they are required to run tests across different server
-    environments and topologies.
+    Make a copy of `library/twilio-video-example.json` to `library/twilio-video.json` and use the 
+    table above as reference to fill in your Twilio credentials. There are two sets of key/value 
+    pairs: mandatory and optional. Mandatory values are required to be set before building the 
+    project. Optional values are not required to be set, but as a Twilio developer they are 
+    required to run tests across different server environments and topologies.
 
-    An example json file is provided under [library/twilio-video-example.json](library/twilio-video-example.json).
-    For Twilio developers, these values represent prod credentials and a P2P configuration profile SID.
+    For Twilio developers, these values represent prod credentials and a P2P configuration profile 
+    SID.
 
     ##### Mandatory Credentials
 
