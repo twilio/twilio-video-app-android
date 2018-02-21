@@ -25,8 +25,17 @@ In order to use our project please make sure you have the following installed:
 
 1.  Install the Android SDK
     * Define `$ANROID_HOME`, `$ANDROID_SDK_HOME`, and `$ANDROID_SDK_ROOT`
-1.  Install [Android NDK r12b](https://developer.android.com/ndk/downloads/older_releases.html)
-    * Define `$NDK_ROOT`, `$ANDROID_NDK_HOME`, and `$ANDROID_NDK_ROOT`
+1.  Download Android NDK r12b. The Android NDK is a set of tools that allow developers to implement
+parts of their application or libraries in native code using languages like C and C++. The Video
+Android SDK contains native C and C++ code that uses the Twilio Video C++ SDK. The two SDKs interact using the [Java Native Interface (JNI)](https://docs.oracle.com/javase/7/docs/technotes/guides/jni/).
+    * Direct download links
+        * [Windows 32-bit](https://dl.google.com/android/repository/android-ndk-r12b-windows-x86.zip)
+        * [Windows 64-bit](https://dl.google.com/android/repository/android-ndk-r12b-windows-x86_64.zip)
+        * [Mac OS X](https://dl.google.com/android/repository/android-ndk-r12b-darwin-x86_64.zip)
+        * [Linux 64-bit (x86)](https://dl.google.com/android/repository/android-ndk-r12b-linux-x86_64.zip)
+1. Setup Android NDK r12b.
+    * Set environment variables `$NDK_ROOT`, `$ANDROID_NDK_HOME`, and `$ANDROID_NDK_ROOT` with
+    location of Android NDK r12b.
     * Add line `ndk.dir=/path/to/ndk/r12b` to `local.properties`
 1.  Add the following to your `$PATH`
     * `$ANDROID_HOME/tools`
