@@ -91,6 +91,7 @@
     <string name="bitrate">bps</string>
     <string name="max_video_bitrate">Video Bitrate</string>
     <string name="max_audio_bitrate">Audio Bitrate</string>
+    <string name="recording_notice">Recording may be enabled for quality assurance.</string>
 
     <string-array name="environment_array">
         <item>Production</item>
