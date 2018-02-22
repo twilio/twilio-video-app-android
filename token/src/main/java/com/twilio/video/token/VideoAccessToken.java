@@ -43,7 +43,6 @@ public class VideoAccessToken {
     private final String apiKey;
     private final String apiKeySecret;
     private final SecretKeySpec keySpec;
-    private final String configurationProfileSid;
     private final Date expiration;
     private final String identity;
     private final Date nbf;
@@ -58,7 +57,6 @@ public class VideoAccessToken {
         this.apiKeySecret = builder.apiSecret;
         this.keySpec = new SecretKeySpec(apiKeySecret.getBytes(),
                 SignatureAlgorithm.HS256.getJcaName());
-        this.configurationProfileSid = builder.configurationProfileSid;
         this.expiration = new Date(new Date().getTime() + builder.ttl * 1000);
         this.nbf = builder.nbf;
         this.jwt = buildJwt();
@@ -82,11 +80,7 @@ public class VideoAccessToken {
 
         // Setup grants payload
         grants.put("identity", identity);
-        if (configurationProfileSid != null) {
-            grants.put("rtc", new Payload(configurationProfileSid));
-        } else {
-            grants.put("video", new Video());
-        }
+        grants.put("video", new Video());
         payload.put("grants", grants);
 
         return payload;
@@ -131,7 +125,6 @@ public class VideoAccessToken {
         private String accountSid;
         private String apiKey;
         private String apiSecret;
-        private String configurationProfileSid;
         private String identity = RandUtils.generateRandomString(DEFAULT_IDENTITY_LENGTH);
         private Date nbf = null;
         private int ttl = TTL_DEFAULT;
@@ -159,21 +152,8 @@ public class VideoAccessToken {
             return this;
         }
 
-        public Builder configurationProfileSid(String configurationProfileSid) {
-            this.configurationProfileSid = configurationProfileSid;
-            return this;
-        }
-
         public VideoAccessToken build() {
             return new VideoAccessToken(this);
-        }
-    }
-
-    private static class Payload {
-        public final String configuration_profile_sid;
-
-        Payload(String configurationProfileSid) {
-            this.configuration_profile_sid = configurationProfileSid;
         }
     }
 

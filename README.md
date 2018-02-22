@@ -58,10 +58,7 @@ using JSON files. The table below provides a short summary of required credentia
     table above as reference to fill in your Twilio credentials. There are two sets of key/value 
     pairs: mandatory and optional. Mandatory values are required to be set before building the 
     project. Optional values are not required to be set, but as a Twilio developer they are 
-    required to run tests across different server environments and topologies.
-
-    For Twilio developers, these values represent prod credentials and a P2P configuration profile 
-    SID.
+    required to run tests across different server environments.
 
     ##### Mandatory Credentials
 
@@ -71,39 +68,22 @@ using JSON files. The table below provides a short summary of required credentia
     account_sid
     api_key
     api_key_secret
-    configuration_profile_sid
     ```
 
     ##### Optional Credentials
 
-    The following values are for prod configuration profile SIDs that allow developers to
-    test SFU and SFU Recording. Note these are optional values, but are required
-    to ensure the entire test suite can be executed. The values are not mandatory because not
-    every developer is guaranteed to have configuration profile SIDs for SFU or SFU Recording:
-
-    ```
-    sfu_configuration_profile_sid
-    sfu_recording_configuration_profile_sid
-    ```
-
-    The following values are optional but are needed to run the test suite against dev
+    The following values are for Twilions and are needed to run the test suite against dev
     or stage environments:
 
     ```
     dev_account_sid
     dev_api_key
     dev_api_key_secret
-    dev_p2p_configuration_profile_sid
-    dev_sfu_configuration_profile_sid
-    dev_sfu_recording_configuration_profile_sid
     ```
     ```
     stage_account_sid
     stage_api_key
     stage_api_key_secret
-    stage_p2p_configuration_profile_sid
-    stage_sfu_configuration_profile_sid
-    stage_sfu_recording_configuration_profile_sid
     ```
 
 ## Project Modules
