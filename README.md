@@ -174,6 +174,18 @@ demonstrates executing unit and instrumentation tests with code coverage enabled
 
 `./gradlew -PtestCoverageEnabled=true library:clean library:jacocoTestReport`
 
+### Troubleshooting Tests
+
+All instrumentation tests should pass when executed locally. If you experience test failures
+be sure to check the following:
+
+- Validate that your credentials are setup properly.
+- Ensure that your Twilio account has sufficient funds.
+- Check that your device is connected to the internet.
+
+If you continue to experience test failures please 
+[open an issue](https://github.com/twilio/twilio-video-android/issues).
+
 ## Setup an Emulator
 
 Perform the following steps to setup an emulator that works with the SDK and application.
