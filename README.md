@@ -4,6 +4,7 @@
 - [Project Modules](#project-modules)
 - [Video App](#video-app)
 - [Tests](#tests)
+- [Setup an Emulator](#setup-an-emulator)
 - [Code of Conduct](#code-of-conduct)
 - [License](#license)
 
@@ -172,6 +173,22 @@ Enabling test coverage requires setting project property `testCoverageEnabled`. 
 demonstrates executing unit and instrumentation tests with code coverage enabled.
 
 `./gradlew -PtestCoverageEnabled=true library:clean library:jacocoTestReport`
+
+## Setup an Emulator
+
+Perform the following steps to setup an emulator that works with the SDK and application.
+
+1. Open Android Studio and navigate to Tools → Android → AVD Manager.
+  <img width="700px" src="images/emulator/emulator_navigate.png"/>
+2. Create a virtual device.
+  <img width="700px" src="images/emulator/emulator_virtual_device.png"/>
+3. Select your desired device.
+  <img width="700px" src="images/emulator/emulator_select_hardware.png"/>
+4. Select a system image. We recommend either x86 or x86_64 images.
+  <img width="700px" src="images/emulator/emulator_select_image.png"/>
+5. Click "Show Advanced Settings" and we recommend setting both cameras as "Emulated". Note that other camera configurations will work with the exception of setting both cameras as "webcam()". 
+  <img width="700px" src="images/emulator/emulator_avd_settings.png"/>
+6. Configure the rest of your device accordingly and click "Finish".
 
 ## Code of Conduct
 
