@@ -4,7 +4,7 @@
 - [Project Modules](#project-modules)
 - [Video App](#video-app)
 - [Tests](#tests)
-- [Native Debugging](#native-debugging)
+- [Setup an Emulator](#setup-an-emulator)
 - [Code of Conduct](#code-of-conduct)
 - [License](#license)
 
@@ -18,98 +18,77 @@ Video Quickstart for Android](https://github.com/twilio/video-quickstart-android
 step-by-step instructions for building a simple Android video application along with a few examples 
 of how the SDK can be used.
 
+_Sections of this document pertain only to developers that work at Twilio aka "Twilions". If you are not a Twilion please ignore these sections._
+
 ## Getting Started
 
 To get started we recommend you use Android Studio for all your development.
-In order to use our project please make sure you have the following installed:
+In order to use our project please perform the following steps:
 
-1.  Install the Android SDK
-    * Define `$ANROID_HOME`, `$ANDROID_SDK_HOME`, and `$ANDROID_SDK_ROOT`
-1.  Install [Android NDK r12b](https://developer.android.com/ndk/downloads/older_releases.html)
-    * Define `$NDK_ROOT`, `$ANDROID_NDK_HOME`, and `$ANDROID_NDK_ROOT`
+1.  Install the Android SDK using Android Studio.
+1.  Download Android NDK r12b. The Android NDK is a set of tools that allow developers to implement
+parts of their application or libraries in native code using languages like C and C++. The Video
+Android SDK contains native C and C++ code that uses the Twilio Video C++ SDK. The two SDKs interact using the [Java Native Interface (JNI)](https://docs.oracle.com/javase/7/docs/technotes/guides/jni/).
+    * Direct download links
+        * [Windows 32-bit](https://dl.google.com/android/repository/android-ndk-r12b-windows-x86.zip)
+        * [Windows 64-bit](https://dl.google.com/android/repository/android-ndk-r12b-windows-x86_64.zip)
+        * [Mac OS X](https://dl.google.com/android/repository/android-ndk-r12b-darwin-x86_64.zip)
+        * [Linux 64-bit (x86)](https://dl.google.com/android/repository/android-ndk-r12b-linux-x86_64.zip)
+1. Setup Android NDK r12b.
+    * Set the environment variable `$ANDROID_NDK_HOME` with location of Android NDK r12b.
     * Add line `ndk.dir=/path/to/ndk/r12b` to `local.properties`
-1.  Add the following to your `$PATH`
-    * `$ANDROID_HOME/tools`
-    * `$ANDROID_HOME/platform-tools`
-    * `$ANDROID_NDK_ROOT`
-1.  **Twilio developers** download the internal google-services.json files here:
+1.  **Twilions** download the google-services.json files here:
       * [Internal Debug (default)](https://console.firebase.google.com/project/video-app-79418/settings/general/android:com.twilio.video.app.internal.debug) - Download to `app/src/internal/debug`
       * [Internal Release](https://console.firebase.google.com/project/video-app-79418/settings/general/android:com.twilio.video.app.internal) - Download to `app/src/internal/release`
       * [Twilio Release](https://console.firebase.google.com/project/video-app-79418/settings/general/android:com.twilio.video.app) - Download to `app/src/twilio/release`
-1.  Setup your Programmable Video credentials
+1.  Setup your Programmable Video credentials. Credentials are required to run the SDK 
+instrumentation tests and certain app flavors. The credentials in this project are managed 
+using JSON files. The table below provides a short summary of required credentials:
+
+    Credential | JSON Key | Description
+    ---------- | ----------- | -----------
+    Twilio Account SID | `account_sid` | Your main Twilio account identifier - [find it on your dashboard](https://www.twilio.com/console).
+    API Key | `api_key` | Used to authenticate - [generate one here](https://www.twilio.com/console/video/runtime/api-keys).
+    API Secret | `api_key_secret` | Used to authenticate - [just like the above, you'll get one here](https://www.twilio.com/console/video/runtime/api-keys).
 
     #### Video Android App
-    These credentials are only required if you intend on using the community variant of the
-    application. See [Building the Community Flavor](#building-the-community-flavor) for more
-    details. Set your credentials in `twilio-video-app.json` located in the `app` directory.
-
-    An example json file is provided under [app/twilio-video-app-example.json](app/twilio-video-app-example.json). 
-    The following values MUST be set to build the community variant:
-
+    Copy the JSON snippet below to `app/twilio-video-app.json` and use the 
+    table above as reference to fill in your Twilio credentials. There is an example JSON file at
+    `app/twilio-video-app-example.json`.
+    
     ```
-    account_sid
-    api_key
-    api_key_secret
+    {
+      "credentials": {
+        "account_sid": "AC00000000000000000000000000000000",
+        "api_key": "SK00000000000000000000000000000000",
+        "api_key_secret": "00000000000000000000000000000000"
+      }
+    }
     ```
 
     #### Video Android SDK
-    Set your credentials in `twilio-video.json` located in the `library` directory.
-    There are two sets of key/value pairs: mandatory and optional. Mandatory values are
-    required to be set before building the project. Optional values are not required to be set,
-    but as a Twilio developer they are required to run tests across different server
-    environments and topologies.
+    Copy the JSON snippet below to `library/twilio-video.json` and use the 
+    table above as reference to fill in your Twilio credentials. There is an example JSON file at
+    `library/twilio-video-example.json`.
 
-    An example json file is provided under [library/twilio-video-example.json](library/twilio-video-example.json).
-    For Twilio developers, these values represent prod credentials and a P2P configuration profile SID.
-
-    ##### Mandatory Credentials
-
-    The following values MUST be set to execute tests:
+    The following values MUST be set to execute tests. For Twilions, these values represent 
+    `prod` credentials.
 
     ```
-    account_sid
-    api_key
-    api_key_secret
-    configuration_profile_sid
-    ```
-
-    ##### Optional Credentials
-
-    The following values are for prod configuration profile SIDs that allow developers to
-    test SFU and SFU Recording. Note these are optional values, but are required
-    to ensure the entire test suite can be executed. The values are not mandatory because not
-    every developer is guaranteed to have configuration profile SIDs for SFU or SFU Recording:
-
-    ```
-    sfu_configuration_profile_sid
-    sfu_recording_configuration_profile_sid
-    ```
-
-    The following values are optional but are needed to run the test suite against dev
-    or stage environments:
-
-    ```
-    dev_account_sid
-    dev_api_key
-    dev_api_key_secret
-    dev_p2p_configuration_profile_sid
-    dev_sfu_configuration_profile_sid
-    dev_sfu_recording_configuration_profile_sid
-    ```
-    ```
-    stage_account_sid
-    stage_api_key
-    stage_api_key_secret
-    stage_p2p_configuration_profile_sid
-    stage_sfu_configuration_profile_sid
-    stage_sfu_recording_configuration_profile_sid
+    {
+      "credentials": {
+        "account_sid": "AC00000000000000000000000000000000",
+        "api_key": "SK00000000000000000000000000000000",
+        "api_key_secret": "00000000000000000000000000000000"
+      }
+    }
     ```
 
 ## Project Modules
 
 * **app**: Provides a canonical multi-party voice and video calling application that uses the Android SDK
 * **env**: Allows developers to set environment variables in native C/C++ using JNI.
-This is only applicable for **Twilio developers**. Accessing dev or stage requires VPN.
+This is only applicable for **Twilions**. Accessing dev or stage requires VPN.
 * **library**: The Android SDK that provides the Java classes and interfaces used
 by Android developers to perform multi-party voice and video calling
 * **token**: A utility module for generating Video Access Tokens. **This module is intended to be 
@@ -126,9 +105,9 @@ generates access tokens locally. Please follow the
 The Video App demonstrates a multi-party voice and video application built with the Android 
 SDK. The application consists of the following [product flavors](http://tools.android.com/tech-docs/new-build-system/user-guide#TOC-Product-flavors):
 
-1. Internal - The application intended for internal testing and QA at Twilio
-1. Twilio - The application intended for every day use at Twilio
-1. Community - The application intended for developers interested in using Programmable Video
+1. Internal - The application intended for internal testing and QA at Twilio. _This variant can only be built by Twilions._
+1. Twilio - The application intended for every day use at Twilio. _This variant can only be built by Twilions._
+1. Community - The application intended for developers interested in using Programmable Video. _This variant can be built by all developers._
 
 ### Building the Community Flavor
 The community flavor of the application is meant for developers who would like to work with the 
@@ -172,6 +151,58 @@ Enabling test coverage requires setting project property `testCoverageEnabled`. 
 demonstrates executing unit and instrumentation tests with code coverage enabled.
 
 `./gradlew -PtestCoverageEnabled=true library:clean library:jacocoTestReport`
+
+### Troubleshooting Tests
+
+All instrumentation tests should pass when executed locally. If you experience test failures
+be sure to check the following:
+
+- Validate that your credentials are setup properly.
+- Ensure that your Twilio account has sufficient funds.
+- Check that your device is connected to the internet.
+
+If you continue to experience test failures please 
+[open an issue](https://github.com/twilio/twilio-video-android/issues).
+
+### Switching Server Environments (Twilions only)
+Twilions can execute the tests in different server environments by performing the following steps:
+
+1. Add `ENVIRONMENT` to `local.properties`. Supported values are `dev`, `stage`, or `prod`.
+1. Update `library/twilio-video.json` to include dev and stage values.
+
+    ```
+    {
+      "credentials": {
+        "account_sid": "AC00000000000000000000000000000000",
+        "api_key": "SK00000000000000000000000000000000",
+        "api_key_secret": "00000000000000000000000000000000",
+        
+        "dev_account_sid": "AC00000000000000000000000000000000",
+        "dev_api_key": "SK00000000000000000000000000000000",
+        "dev_api_key_secret": "00000000000000000000000000000000",
+        
+        "stage_account_sid": "AC00000000000000000000000000000000",
+        "stage_api_key": "SK00000000000000000000000000000000",
+        "stage_api_key_secret": "00000000000000000000000000000000"
+      }
+    }
+    ```
+
+## Setup an Emulator
+
+Perform the following steps to setup an emulator that works with the SDK and application.
+
+1. Open Android Studio and navigate to Tools → Android → AVD Manager.
+  <img width="700px" src="images/emulator/emulator_navigate.png"/>
+2. Create a virtual device.
+  <img width="700px" src="images/emulator/emulator_virtual_device.png"/>
+3. Select your desired device.
+  <img width="700px" src="images/emulator/emulator_select_hardware.png"/>
+4. Select a system image. We recommend either x86 or x86_64 images.
+  <img width="700px" src="images/emulator/emulator_select_image.png"/>
+5. Click "Show Advanced Settings" and we recommend setting both cameras as "Emulated". Note that other camera configurations will work with the exception of setting both cameras as "webcam()". 
+  <img width="700px" src="images/emulator/emulator_avd_settings.png"/>
+6. Configure the rest of your device accordingly and click "Finish".
 
 ## Code of Conduct
 
