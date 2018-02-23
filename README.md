@@ -52,9 +52,11 @@ using JSON files. The table below provides a short summary of required credentia
     API Secret | `api_key_secret` | Used to authenticate - [just like the above, you'll get one here](https://www.twilio.com/console/video/runtime/api-keys).
 
     #### Video Android App
-    Copy the JSON snippet below to `app/twilio-video-app.json` and use the 
-    table above as reference to fill in your Twilio credentials. There is an example JSON file at
-    `app/twilio-video-app-example.json`.
+    Copy the JSON snippet below to `app/twilio-video-app.json` and use the
+    table above as reference to fill in your Twilio credentials. **Injecting
+    credentials into a client side app should not be done in production
+    apps. This practice is only acceptable for development and testing
+    purposes.**
     
     ```
     {
@@ -67,11 +69,13 @@ using JSON files. The table below provides a short summary of required credentia
     ```
 
     #### Video Android SDK
-    Copy the JSON snippet below to `library/twilio-video.json` and use the 
-    table above as reference to fill in your Twilio credentials. There is an example JSON file at
-    `library/twilio-video-example.json`.
+    Copy the JSON snippet below to `library/twilio-video.json` and use the
+    table above as reference to fill in your Twilio credentials. **Injecting
+    credentials into a client side app should not be done in production
+    apps. This practice is only acceptable for development and testing
+    purposes.**
 
-    The following values MUST be set to execute tests. For Twilions, these values represent 
+    The following values MUST be set to execute tests. For Twilions, these values represent
     `prod` credentials.
 
     ```
