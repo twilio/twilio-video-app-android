@@ -390,6 +390,21 @@ Known issues
 - Network handoff, and subsequent connection renegotiation is not supported for IPv6 networks [#72](https://github.com/twilio/video-quickstart-android/issues/72)
 - Participant disconnect event can take up to 120 seconds to occur [#80](https://github.com/twilio/video-quickstart-android/issues/80) [#73](https://github.com/twilio/video-quickstart-android/issues/73)
 
+####1.3.12
+
+Bug Fixes
+
+- ICE URIs using the `turns` scheme are now supported. The SDK will now use `turns` by default if turn is enabled for your Room.
+- ICE URIs using the `stuns` scheme are now supported.
+- Resolved a condition where ICE candidates might not be applied in Peer-to-Peer Rooms.
+
+Known issues
+
+- Network handoff, and subsequent connection renegotiation is not supported for IPv6 networks [#72](https://github.com/twilio/video-quickstart-android/issues/72)
+e VP8 is the only supported codec [#71](https://github.com/twilio/video-quickstart-android/issues/71)
+- Participant disconnect event can take up to 120 seconds to occur [#80](https://github.com/twilio/video-quickstart-android/issues/80) [#73](https://github.com/twilio/video-quickstart-android/issues/73)
+- LocalParticipant release method is public [#132](https://github.com/twilio/video-quickstart-android/issues/132)
+
 ####1.3.11
 
 Improvements
