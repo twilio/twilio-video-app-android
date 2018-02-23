@@ -18,6 +18,8 @@ Video Quickstart for Android](https://github.com/twilio/video-quickstart-android
 step-by-step instructions for building a simple Android video application along with a few examples 
 of how the SDK can be used.
 
+_Sections of this document pertain only to developers that work at Twilio aka "Twilions". If you are not a Twilion please ignore these sections._
+
 ## Getting Started
 
 To get started we recommend you use Android Studio for all your development.
@@ -35,7 +37,7 @@ Android SDK contains native C and C++ code that uses the Twilio Video C++ SDK. T
 1. Setup Android NDK r12b.
     * Set the environment variable `$ANDROID_NDK_HOME` with location of Android NDK r12b.
     * Add line `ndk.dir=/path/to/ndk/r12b` to `local.properties`
-1.  **Twilio developers** download the internal google-services.json files here:
+1.  **Twilions** download the google-services.json files here:
       * [Internal Debug (default)](https://console.firebase.google.com/project/video-app-79418/settings/general/android:com.twilio.video.app.internal.debug) - Download to `app/src/internal/debug`
       * [Internal Release](https://console.firebase.google.com/project/video-app-79418/settings/general/android:com.twilio.video.app.internal) - Download to `app/src/internal/release`
       * [Twilio Release](https://console.firebase.google.com/project/video-app-79418/settings/general/android:com.twilio.video.app) - Download to `app/src/twilio/release`
@@ -57,12 +59,12 @@ using JSON files. The table below provides a short summary of required credentia
     Make a copy of `library/twilio-video-example.json` to `library/twilio-video.json` and use the 
     table above as reference to fill in your Twilio credentials. There are two sets of key/value 
     pairs: mandatory and optional. Mandatory values are required to be set before building the 
-    project. Optional values are not required to be set, but as a Twilio developer they are 
+    project. Optional values are not required to be set, but as a Twilion they are 
     required to run tests across different server environments.
 
     ##### Mandatory Credentials
 
-    The following values MUST be set to execute tests:
+    The following values MUST be set to execute tests. For Twilions, these values represent `prod` credentials.
 
     ```
     account_sid
@@ -90,7 +92,7 @@ using JSON files. The table below provides a short summary of required credentia
 
 * **app**: Provides a canonical multi-party voice and video calling application that uses the Android SDK
 * **env**: Allows developers to set environment variables in native C/C++ using JNI.
-This is only applicable for **Twilio developers**. Accessing dev or stage requires VPN.
+This is only applicable for **Twilions**. Accessing dev or stage requires VPN.
 * **library**: The Android SDK that provides the Java classes and interfaces used
 by Android developers to perform multi-party voice and video calling
 * **token**: A utility module for generating Video Access Tokens. **This module is intended to be 
@@ -107,9 +109,9 @@ generates access tokens locally. Please follow the
 The Video App demonstrates a multi-party voice and video application built with the Android 
 SDK. The application consists of the following [product flavors](http://tools.android.com/tech-docs/new-build-system/user-guide#TOC-Product-flavors):
 
-1. Internal - The application intended for internal testing and QA at Twilio
-1. Twilio - The application intended for every day use at Twilio
-1. Community - The application intended for developers interested in using Programmable Video
+1. Internal - The application intended for internal testing and QA at Twilio. _This variant can only be built by Twilions._
+1. Twilio - The application intended for every day use at Twilio. _This variant can only be built by Twilions._
+1. Community - The application intended for developers interested in using Programmable Video. _This variant can be built by all developers._
 
 ### Building the Community Flavor
 The community flavor of the application is meant for developers who would like to work with the 
