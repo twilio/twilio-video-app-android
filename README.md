@@ -52,40 +52,36 @@ using JSON files. The table below provides a short summary of required credentia
     API Secret | `api_key_secret` | Used to authenticate - [just like the above, you'll get one here](https://www.twilio.com/console/video/runtime/api-keys).
 
     #### Video Android App
-    Make a copy of `app/twilio-video-app-example.json` to `app/twilio-video-app.json` and use the 
-    table above as reference to fill in your Twilio credentials.
+    Copy the JSON snippet below to `app/twilio-video-app.json` and use the 
+    table above as reference to fill in your Twilio credentials. There is an example JSON file at
+    `app/twilio-video-app-example.json`.
+    
+    ```
+    {
+      "credentials": {
+        "account_sid": "AC00000000000000000000000000000000",
+        "api_key": "SK00000000000000000000000000000000",
+        "api_key_secret": "00000000000000000000000000000000"
+      }
+    }
+    ```
 
     #### Video Android SDK
-    Make a copy of `library/twilio-video-example.json` to `library/twilio-video.json` and use the 
-    table above as reference to fill in your Twilio credentials. There are two sets of key/value 
-    pairs: mandatory and optional. Mandatory values are required to be set before building the 
-    project. Optional values are not required to be set, but as a Twilion they are 
-    required to run tests across different server environments.
+    Copy the JSON snippet below to `library/twilio-video.json` and use the 
+    table above as reference to fill in your Twilio credentials. There is an example JSON file at
+    `library/twilio-video-example.json`.
 
-    ##### Mandatory Credentials
-
-    The following values MUST be set to execute tests. For Twilions, these values represent `prod` credentials.
+    The following values MUST be set to execute tests. For Twilions, these values represent 
+    `prod` credentials.
 
     ```
-    account_sid
-    api_key
-    api_key_secret
-    ```
-
-    ##### Optional Credentials
-
-    The following values are for Twilions and are needed to run the test suite against dev
-    or stage environments:
-
-    ```
-    dev_account_sid
-    dev_api_key
-    dev_api_key_secret
-    ```
-    ```
-    stage_account_sid
-    stage_api_key
-    stage_api_key_secret
+    {
+      "credentials": {
+        "account_sid": "AC00000000000000000000000000000000",
+        "api_key": "SK00000000000000000000000000000000",
+        "api_key_secret": "00000000000000000000000000000000"
+      }
+    }
     ```
 
 ## Project Modules
@@ -167,6 +163,30 @@ be sure to check the following:
 
 If you continue to experience test failures please 
 [open an issue](https://github.com/twilio/twilio-video-android/issues).
+
+### Switching Server Environments (Twilions only)
+Twilions can execute the tests in different server environments by performing the following steps:
+
+1. Add `ENVIRONMENT` to `local.properties`. Supported values are `dev`, `stage`, or `prod`.
+1. Update `library/twilio-video.json` to include dev and stage values.
+
+    ```
+    {
+      "credentials": {
+        "account_sid": "AC00000000000000000000000000000000",
+        "api_key": "SK00000000000000000000000000000000",
+        "api_key_secret": "00000000000000000000000000000000",
+        
+        "dev_account_sid": "AC00000000000000000000000000000000",
+        "dev_api_key": "SK00000000000000000000000000000000",
+        "dev_api_key_secret": "00000000000000000000000000000000",
+        
+        "stage_account_sid": "AC00000000000000000000000000000000",
+        "stage_api_key": "SK00000000000000000000000000000000",
+        "stage_api_key_secret": "00000000000000000000000000000000"
+      }
+    }
+    ```
 
 ## Setup an Emulator
 
