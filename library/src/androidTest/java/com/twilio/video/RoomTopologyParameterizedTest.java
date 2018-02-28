@@ -289,5 +289,4 @@ public class RoomTopologyParameterizedTest extends BaseClientTest {
         room2.disconnect();
         assertTrue(room2Listener.onDisconnectedLatch.await(10, TimeUnit.SECONDS));
     }
-
 }
