@@ -296,5 +296,4 @@ public class RoomTopologyParameterizedTest extends BaseClientTest {
         // First bobRemoteParticipant should get disconnected
         assertTrue(disconnectedLatch.await(10, TimeUnit.SECONDS));
     }
-
 }

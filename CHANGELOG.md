@@ -1,5 +1,17 @@
 The Twilio Programmable Video SDKs use [Semantic Versioning](http://www.semver.org).
 
+####2.0.0-beta2
+
+Bug Fixes
+
+- Fixed crash when calling `Room#disconnect()` twice. [#255](https://github.com/twilio/video-quickstart-android/issues/255)
+
+Known issues
+
+- Network handoff, and subsequent connection renegotiation is not supported for IPv6 networks [#72](https://github.com/twilio/video-quickstart-android/issues/72)
+- Participant disconnect event can take up to 120 seconds to occur [#80](https://github.com/twilio/video-quickstart-android/issues/80) [#73](https://github.com/twilio/video-quickstart-android/issues/73)
+- Codec preferences do not function correctly in a hybrid codec Group Room.
+
 ####2.0.0-beta1
 
 Improvements
@@ -389,6 +401,19 @@ Known issues
 
 - Network handoff, and subsequent connection renegotiation is not supported for IPv6 networks [#72](https://github.com/twilio/video-quickstart-android/issues/72)
 - Participant disconnect event can take up to 120 seconds to occur [#80](https://github.com/twilio/video-quickstart-android/issues/80) [#73](https://github.com/twilio/video-quickstart-android/issues/73)
+
+####1.3.13
+
+Bug Fixes
+
+- Fixed crash when calling `Room#disconnect()` twice. [#255](https://github.com/twilio/video-quickstart-android/issues/255)
+
+Known issues
+
+- Network handoff, and subsequent connection renegotiation is not supported for IPv6 networks [#72](https://github.com/twilio/video-quickstart-android/issues/72)
+e VP8 is the only supported codec [#71](https://github.com/twilio/video-quickstart-android/issues/71)
+- Participant disconnect event can take up to 120 seconds to occur [#80](https://github.com/twilio/video-quickstart-android/issues/80) [#73](https://github.com/twilio/video-quickstart-android/issues/73)
+- LocalParticipant release method is public [#132](https://github.com/twilio/video-quickstart-android/issues/132)
 
 ####1.3.12
 

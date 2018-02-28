@@ -163,11 +163,18 @@ void RoomDelegate::connectOnNotifier() {
     room_ = twilio::video::connect(connect_options_builder->build(), android_room_observer_);
 }
 
+/*
+ * Operations on room_ must have nullptr checks in case the pointer was released after a disconnect
+ * or connect failure. Checking the room pointer is safe only inside the notifier_thread.
+ */
+
 void RoomDelegate::getStatsOnNotifier() {
     RTC_CHECK(rtc::Thread::Current() == notifier_thread_.get()) << "getStats not called on "
             "notifier thread";
 
-    room_->getStats(stats_observer_);
+    if (room_) {
+        room_->getStats(stats_observer_);
+    }
 }
 
 void RoomDelegate::reportNetworkChangeOnNotifier(
@@ -175,7 +182,9 @@ void RoomDelegate::reportNetworkChangeOnNotifier(
     RTC_CHECK(rtc::Thread::Current() == notifier_thread_.get()) << "onNetworkChange not called on "
             "notifier thread";
 
-    room_->onNetworkChange(network_change_event);
+    if (room_) {
+        room_->onNetworkChange(network_change_event);
+    }
 }
 
 void RoomDelegate::disconnectOnNotifier() {
@@ -185,7 +194,9 @@ void RoomDelegate::disconnectOnNotifier() {
                       twilio::video::LogLevel::kDebug,
                       "disconnectOnNotifier")
 
-    room_->disconnect();
+    if (room_) {
+        room_->disconnect();
+    }
 }
 
 }
