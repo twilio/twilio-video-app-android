@@ -107,55 +107,6 @@ allprojects {
     }
 }
 
-task tagReleaseCandidate {
-    description = 'Tag commit as release candidate'
-    group = 'Git'
-
-    doLast {
-        def rcTag = "${versionMajor}.${versionMinor}.${versionPatch}-rc${versionRc}"
-        def rcTagPath = "tags/${rcTag}"
-        exec {
-            workingDir "${rootDir}"
-            commandLine "git", "tag", "-a", "${rcTag}", "-m", "\"${rcTag} release candidate\""
-        }
-
-        exec {
-            workingDir "${rootDir}"
-            commandLine "git", "push", "origin", "${rcTagPath}"
-        }
-    }
-}
-
-task tagRelease {
-    description = 'Tag commit as release'
-    group = 'Git'
-
-    doLast {
-        // TODO: Add support for releasing any RC. Currently only releases last RC.
-        def rcTag = "${versionMajor}.${versionMinor}.${versionPatch}-rc${versionRc - 1}"
-        def releaseVersion = System.getenv("RELEASE_VERSION")
-        exec {
-            workingDir "${rootDir}"
-            commandLine "git", "checkout", "${rcTag}"
-        }
-
-        exec {
-            workingDir "${rootDir}"
-            commandLine "git",
-                    "tag",
-                    "-a",
-                    "${releaseVersion}",
-                    "-m",
-                    "\"${releaseVersion} release\""
-        }
-
-        exec {
-            workingDir "${rootDir}"
-            commandLine "git", "push", "origin", "${releaseVersion}"
-        }
-    }
-}
-
 task validateReleaseCandidateTag {
     description = 'Validate the release candidate tag matches the release candidate version ' +
             'present on commit'
@@ -474,13 +425,6 @@ task incrementVersion(type: GradleBuild) {
     tasks = [incrementVersionTask]
 }
 
-task checkoutRelease(type: Exec) {
-    description = 'Checkout tagged release'
-    group = 'Git'
-    def releaseVersion = System.getenv("RELEASE_VERSION")
-    commandLine "git", "checkout", "${releaseVersion}"
-}
-
 task publishLibraryJavadocs {
     description = 'Publish Video Android Javadocs to gh-pages branch'
     group = 'Publishing'
@@ -584,23 +528,11 @@ task firebaseTestLabCheckLibraryCamera(type: Exec) {
             'video-app-args.yaml:library-camera-tests'
 }
 
-task checkLibrary(type: GradleBuild) {
-    description = 'Runs all tests and checks for the library'
-    group = 'Test'
-    tasks = [
-            'clean',
-            'assemble',
-            'library:testDebugUnitTest',
-            'firebaseTestLabCheckLibrary',
-            'firebaseTestLabCheckLibraryCamera'
-    ]
-}
-
 task bintrayLibrarySnapshotUpload(type: GradleBuild) {
     description = 'Publish Video Android AAR snapshot to Bintray'
     group = 'Publishing'
     buildFile = file('library/build.gradle')
-    tasks = ['clean', 'assemble', 'uploadArchives']
+    tasks = ['clean', 'assembleRelease', 'uploadArchives']
     startParameter.projectProperties += gradle.startParameter.projectProperties + [
             'snapshot': true,
             'maven.repo': 'https://api.bintray.com/maven/twilio/snapshots/video-android/;publish=1',
@@ -614,7 +546,7 @@ task bintrayLibraryReleaseCandidateUpload(type: GradleBuild) {
     group = 'Publishing'
     dependsOn 'validateReleaseCandidateTag'
     buildFile = file('library/build.gradle')
-    tasks = ['clean', 'assemble', 'uploadArchives']
+    tasks = ['clean', 'assembleRelease', 'uploadArchives']
     startParameter.projectProperties += gradle.startParameter.projectProperties + [
             'releaseCandidate': true,
             'maven.repo': 'https://api.bintray.com/maven/twilio/internal-releases/video-android/;publish=1',
@@ -628,7 +560,7 @@ task bintrayLibraryReleaseUpload(type: GradleBuild) {
     group = 'Publishing'
     dependsOn validateReleaseTag
     buildFile = file('library/build.gradle')
-    tasks = ['clean', 'assemble', 'uploadArchives']
+    tasks = ['clean', 'assembleRelease', 'uploadArchives']
     def releaseVersion = System.getenv("TRAVIS_TAG") == null ?
             ("") :
             (System.getenv("TRAVIS_TAG"))
