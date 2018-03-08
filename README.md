@@ -35,8 +35,11 @@ Android SDK contains native C and C++ code that uses the Twilio Video C++ SDK. T
         * [Mac OS X](https://dl.google.com/android/repository/android-ndk-r12b-darwin-x86_64.zip)
         * [Linux 64-bit (x86)](https://dl.google.com/android/repository/android-ndk-r12b-linux-x86_64.zip)
 1. Setup Android NDK r12b.
-    * Set the environment variable `$ANDROID_NDK_HOME` with location of Android NDK r12b.
-    * Add line `ndk.dir=/path/to/ndk/r12b` to `local.properties`
+    * Set the environment variable `$ANDROID_NDK_HOME` to the path of where you extracted Android NDK r12b.
+    * Set the path in Android Studio by navigating to File → Project Structure → SDK Location → Android NDK location.
+
+        <img width="700px" src="images/community-variant/android-ndk-location.png"/>
+
 1.  **Twilions** download the google-services.json files here:
       * [Internal Debug (default)](https://console.firebase.google.com/project/video-app-79418/settings/general/android:com.twilio.video.app.internal.debug) - Download to `app/src/internal/debug`
       * [Internal Release](https://console.firebase.google.com/project/video-app-79418/settings/general/android:com.twilio.video.app.internal) - Download to `app/src/internal/release`
