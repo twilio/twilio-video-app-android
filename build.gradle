@@ -528,6 +528,80 @@ task firebaseTestLabCheckLibraryCamera(type: Exec) {
             'video-app-args.yaml:library-camera-tests'
 }
 
+task librarySizeReport(type: GradleBuild) {
+    description = 'Calculate Video Android SDK Size Impact'
+    group = 'Analyze'
+
+    buildFile = file('apkscale/build.gradle')
+    tasks = ['clean', 'assembleRelease']
+    startParameter.projectProperties += gradle.startParameter.projectProperties
+
+    doLast {
+        def videoAndroidSizeReport = "Video Android Size Report\n" +
+                "\n" +
+                "| ABI             | APK Size Impact |\n" +
+                "| --------------- | --------------- |\n"
+        def apkSizeImpactMap = [:]
+        ["universal", "armeabi-v7a", "arm64-v8a", "x86", "x86_64"].each { arch ->
+            def outputStream = new ByteArrayOutputStream()
+
+            // Perform diff between APK with and without Video Android SDK
+            exec {
+                workingDir "${rootDir}"
+                commandLine "apkanalyzer",
+                        '--human-readable',
+                        'apk',
+                        'compare',
+                        '--different-only',
+                        "apkscale/build/outputs/apk/withoutVideoSdk/release/apkscale-" +
+                                "withoutVideoSdk-${arch}-release-unsigned.apk",
+                        "apkscale/build/outputs/apk/withVideoSdk/release/apkscale-withVideoSdk-" +
+                                "${arch}-release-unsigned.apk"
+                standardOutput outputStream
+            }
+
+            /*
+             * The line format of apkanalyzer is
+             *
+             * old size / new size / size difference / path
+             *
+             * The first line represents the difference between the entire APKs followed by file
+             * and directory differrences. Extract the total size difference to determine the APK
+             * size impact.
+             */
+            def apkSizeImpact = outputStream.toString().split()[2]
+
+            // Cache impact in table
+            apkSizeImpactMap.put(arch, apkSizeImpact)
+        }
+
+        // Build out the table
+        apkSizeImpactMap.each { arch, apkSizeImpact ->
+            videoAndroidSizeReport += "| ${arch.padRight(16)}| ${apkSizeImpact.padRight(16)}|\n"
+
+        }
+
+        // Print report
+        println(videoAndroidSizeReport)
+
+        // Post PR comment with report
+        if (System.env.TRAVIS_PULL_REQUEST) {
+            def githubPullRequestUrl = new URL("https://api.github.com/repos/" +
+                    "${System.env.TRAVIS_REPO_SLUG}" +
+                    "/issues/${System.env.TRAVIS_PULL_REQUEST}/comments")
+            exec {
+                workingDir "${rootDir}"
+                commandLine "curl",
+                        "-H", "Authorization: token ${System.env.GITHUB_TOKEN}",
+                        "-X", 'POST',
+                        // Escape new lines for json body
+                        "-d", "{\"body\":\"${videoAndroidSizeReport.replace('\n', '\\n')}\"}",
+                        "${githubPullRequestUrl}"
+            }
+        }
+    }
+}
+
 task bintrayLibrarySnapshotUpload(type: GradleBuild) {
     description = 'Publish Video Android AAR snapshot to Bintray'
     group = 'Publishing'

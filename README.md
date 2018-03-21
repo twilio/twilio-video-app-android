@@ -5,6 +5,7 @@
 - [Video App](#video-app)
 - [Tests](#tests)
 - [Setup an Emulator](#setup-an-emulator)
+- [Library Size](#library-size)
 - [Code of Conduct](#code-of-conduct)
 - [License](#license)
 
@@ -106,6 +107,7 @@ generates access tokens locally. Please follow the
  of an Android application will compromise your Twilio API credentials associated with your Twilio 
  account.**
 * **twilioapi**: A utility module for using the Twilio REST API to get ice servers
+* **apkscale**: A utility app module for determining the size impact of the Video Android SDK
 
 ## Video App
 
@@ -210,6 +212,32 @@ Perform the following steps to setup an emulator that works with the SDK and app
 5. Click "Show Advanced Settings" and we recommend setting both cameras as "Emulated". Note that other camera configurations will work with the exception of setting both cameras as "webcam()". 
   <img width="700px" src="images/emulator/emulator_avd_settings.png"/>
 6. Configure the rest of your device accordingly and click "Finish".
+
+## Library Size
+
+This project contains facilities to determine the size impact of the Video Android SDK in an
+application.
+
+### Calculate the Size Report of the Current Project
+`./gradlew librarySizeReport`
+
+The `librarySizeReport` task outputs the size footprint the Video Android SDK adds to an
+application for each ABI. The `universal` ABI represents applications that include support for all
+architectures in one APK.
+
+> Video Android Size Report
+>
+>| ABI             | APK Size Impact |
+>| --------------- | --------------- |
+>| universal       | 22.2MB          |
+>| armeabi-v7a     | 4.8MB           |
+>| arm64-v8a       | 5.8MB           |
+>| x86             | 6.2MB           |
+>| x86_64          | 5.9MB           |
+
+
+### Calculate the Size Report of a Specific Version
+`./gradlew -PapkScaleVideoAndroidVersion=1.3.13 librarySizeReport`
 
 ## Code of Conduct
 

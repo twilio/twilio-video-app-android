@@ -54,6 +54,9 @@ before_install:
   # https://stackoverflow.com/questions/47719282/i-cant-build-android-27-tool-27-0-2-with-travis-ci/47726910#47726910
   - yes | sdkmanager "platforms;android-27"
 
+  # Install all Android SDK tools
+  - yes | sdkmanager "tools"
+
   # Ensures commands stop running after the first failed command
   - set -eo pipefail
 
@@ -135,6 +138,8 @@ jobs:
       script: ./gradlew -q firebaseTestLabCheckLibraryCamera
     - stage: test
       script: ./gradlew -q assemble
+    - stage: test
+      script: ./gradlew -q librarySizeReport
     - stage: fork test
       script: ./gradlew library:testDebugUnitTest
     - stage: fork test
