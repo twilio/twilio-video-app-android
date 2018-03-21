@@ -6,6 +6,11 @@ Improvements
 
 - Improved internal logic for retrieving ice servers and resolving outbound DNS.
 
+Bug Fixes
+
+- Fixed a bug where onDisconnected was not getting invoked due to a race condition between a
+network handover and a user initiated disconnect call.
+
 Known issues
 
 - Network handoff, and subsequent connection renegotiation is not supported for IPv6 networks [#72](https://github.com/twilio/video-quickstart-android/issues/72)
