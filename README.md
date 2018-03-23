@@ -5,6 +5,7 @@
 - [Video App](#video-app)
 - [Tests](#tests)
 - [Setup an Emulator](#setup-an-emulator)
+- [Library Size](#library-size)
 - [Code of Conduct](#code-of-conduct)
 - [License](#license)
 
@@ -35,8 +36,11 @@ Android SDK contains native C and C++ code that uses the Twilio Video C++ SDK. T
         * [Mac OS X](https://dl.google.com/android/repository/android-ndk-r12b-darwin-x86_64.zip)
         * [Linux 64-bit (x86)](https://dl.google.com/android/repository/android-ndk-r12b-linux-x86_64.zip)
 1. Setup Android NDK r12b.
-    * Set the environment variable `$ANDROID_NDK_HOME` with location of Android NDK r12b.
-    * Add line `ndk.dir=/path/to/ndk/r12b` to `local.properties`
+    * Set the environment variable `$ANDROID_NDK_HOME` to the path of where you extracted Android NDK r12b.
+    * Set the path in Android Studio by navigating to File → Project Structure → SDK Location → Android NDK location.
+
+        <img width="700px" src="images/community-variant/android-ndk-location.png"/>
+
 1.  **Twilions** download the google-services.json files here:
       * [Internal Debug (default)](https://console.firebase.google.com/project/video-app-79418/settings/general/android:com.twilio.video.app.internal.debug) - Download to `app/src/internal/debug`
       * [Internal Release](https://console.firebase.google.com/project/video-app-79418/settings/general/android:com.twilio.video.app.internal) - Download to `app/src/internal/release`
@@ -103,6 +107,7 @@ generates access tokens locally. Please follow the
  of an Android application will compromise your Twilio API credentials associated with your Twilio 
  account.**
 * **twilioapi**: A utility module for using the Twilio REST API to get ice servers
+* **apkscale**: A utility app module for determining the size impact of the Video Android SDK
 
 ## Video App
 
@@ -207,6 +212,32 @@ Perform the following steps to setup an emulator that works with the SDK and app
 5. Click "Show Advanced Settings" and we recommend setting both cameras as "Emulated". Note that other camera configurations will work with the exception of setting both cameras as "webcam()". 
   <img width="700px" src="images/emulator/emulator_avd_settings.png"/>
 6. Configure the rest of your device accordingly and click "Finish".
+
+## Library Size
+
+This project contains facilities to determine the size impact of the Video Android SDK in an
+application.
+
+### Calculate the Size Report of the Current Project
+`./gradlew librarySizeReport`
+
+The `librarySizeReport` task outputs the size footprint the Video Android SDK adds to an
+application for each ABI. The `universal` ABI represents applications that include support for all
+architectures in one APK.
+
+> Video Android Size Report
+>
+>| ABI             | APK Size Impact |
+>| --------------- | --------------- |
+>| universal       | 22.2MB          |
+>| armeabi-v7a     | 4.8MB           |
+>| arm64-v8a       | 5.8MB           |
+>| x86             | 6.2MB           |
+>| x86_64          | 5.9MB           |
+
+
+### Calculate the Size Report of a Specific Version
+`./gradlew -PapkScaleVideoAndroidVersion=2.0.0-beta2 librarySizeReport`
 
 ## Code of Conduct
 

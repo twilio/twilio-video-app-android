@@ -1,1 +1,1 @@
-include ':library', ':app', ':env', ':twilioapi', ':token'
+include ':library', ':app', ':env', ':twilioapi', ':token', ':apkscale'
