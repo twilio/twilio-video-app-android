@@ -8,9 +8,8 @@ Improvements
 
 Bug Fixes
 
-- ICE URIs using the turns scheme are now supported. The SDK will now use turns by default if turn
- is enabled for your Room.
-- ICE URIs using the stuns scheme are now supported.
+- ICE URIs using the turns and stuns scheme are now supported.
+ The SDK will now use turns by default if turn is enabled for your Room.
 - Resolved a condition where ICE candidates might not be applied in Peer-to-Peer Rooms.
 - Quieted unnecessary warning logs when preferring codecs.
 - Fixed a bug where onDisconnected was not getting invoked due to a race condition between a
