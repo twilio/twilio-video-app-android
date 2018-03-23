@@ -131,7 +131,7 @@ public class VideoTest extends BaseClientTest {
 
     @Test
     public void canConnectAndDisconnectRepeatedly() throws InterruptedException {
-        int numIterations = 100;
+        int numIterations = 25;
         for (int i = 0 ; i < numIterations ; i++) {
             roomListener.onDisconnectedLatch = new CountDownLatch(1);
             ConnectOptions connectOptions = new ConnectOptions.Builder(token)
