@@ -1,5 +1,18 @@
 The Twilio Programmable Video SDKs use [Semantic Versioning](http://www.semver.org).
 
+####2.0.0-beta4
+
+Improvements
+
+- Removed `trackId` from `BaseTrackStats`. `trackSid` or `trackName` can be used to identify
+track stats in a `StatsReport`.
+
+Known issues
+
+- Network handoff, and subsequent connection renegotiation is not supported for IPv6 networks [#72](https://github.com/twilio/video-quickstart-android/issues/72)
+- Participant disconnect event can take up to 120 seconds to occur [#80](https://github.com/twilio/video-quickstart-android/issues/80) [#73](https://github.com/twilio/video-quickstart-android/issues/73)
+- Codec preferences do not function correctly in a hybrid codec Group Room.
+
 ####2.0.0-beta3
 
 Improvements

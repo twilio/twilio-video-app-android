@@ -92,22 +92,22 @@ public:
                     webrtc_jni::GetMethodID(env,
                                             *j_local_audio_track_stats_class_,
                                             "<init>",
-                                            "(Ljava/lang/String;Ljava/lang/String;ILjava/lang/String;Ljava/lang/String;DJIJII)V")),
+                                            "(Ljava/lang/String;ILjava/lang/String;Ljava/lang/String;DJIJII)V")),
             j_local_video_track_stats_ctor_id_(
                     webrtc_jni::GetMethodID(env,
                                             *j_local_video_track_stats_class_,
                                             "<init>",
-                                            "(Ljava/lang/String;Ljava/lang/String;ILjava/lang/String;Ljava/lang/String;DJIJLcom/twilio/video/VideoDimensions;Lcom/twilio/video/VideoDimensions;II)V")),
+                                            "(Ljava/lang/String;ILjava/lang/String;Ljava/lang/String;DJIJLcom/twilio/video/VideoDimensions;Lcom/twilio/video/VideoDimensions;II)V")),
             j_audio_track_stats_ctor_id_(
                     webrtc_jni::GetMethodID(env,
                                             *j_remote_audio_track_stats_class_,
                                             "<init>",
-                                            "(Ljava/lang/String;Ljava/lang/String;ILjava/lang/String;Ljava/lang/String;DJIII)V")),
+                                            "(Ljava/lang/String;ILjava/lang/String;Ljava/lang/String;DJIII)V")),
             j_video_track_stats_ctor_id_(
                     webrtc_jni::GetMethodID(env,
                                             *j_remote_video_track_stats_class_,
                                             "<init>",
-                                            "(Ljava/lang/String;Ljava/lang/String;ILjava/lang/String;Ljava/lang/String;DJILcom/twilio/video/VideoDimensions;I)V")),
+                                            "(Ljava/lang/String;ILjava/lang/String;Ljava/lang/String;DJILcom/twilio/video/VideoDimensions;I)V")),
             j_video_dimensions_ctor_id_(
                     webrtc_jni::GetMethodID(env,
                                             *j_video_dimensions_class_,
@@ -195,8 +195,6 @@ private:
             webrtc_jni::ScopedLocalRefFrame local_ref_frame(jni());
             jstring j_track_sid =
                     JavaUTF16StringFromStdString(jni(), track_stats.track_sid);
-            jstring j_track_id =
-                    JavaUTF16StringFromStdString(jni(), track_stats.track_id);
             jstring j_codec =
                     JavaUTF16StringFromStdString(jni(), track_stats.codec);
             jstring j_ssrc =
@@ -205,7 +203,6 @@ private:
                     jni()->NewObject(*j_local_audio_track_stats_class_,
                                      j_local_audio_track_stats_ctor_id_,
                                      j_track_sid,
-                                     j_track_id,
                                      track_stats.packets_lost,
                                      j_codec,
                                      j_ssrc,
@@ -227,8 +224,6 @@ private:
             webrtc_jni::ScopedLocalRefFrame local_ref_frame(jni());
             jstring j_track_sid =
                     JavaUTF16StringFromStdString(jni(), track_stats.track_sid);
-            jstring j_track_id =
-                    JavaUTF16StringFromStdString(jni(), track_stats.track_id);
             jstring j_codec =
                     JavaUTF16StringFromStdString(jni(), track_stats.codec);
             jstring j_ssrc =
@@ -247,7 +242,6 @@ private:
                     jni()->NewObject(*j_local_video_track_stats_class_,
                                      j_local_video_track_stats_ctor_id_,
                                      j_track_sid,
-                                     j_track_id,
                                      track_stats.packets_lost,
                                      j_codec,
                                      j_ssrc,
@@ -271,8 +265,6 @@ private:
             webrtc_jni::ScopedLocalRefFrame local_ref_frame(jni());
             jstring j_track_sid =
                     JavaUTF16StringFromStdString(jni(), track_stats.track_sid);
-            jstring j_track_id =
-                    JavaUTF16StringFromStdString(jni(), track_stats.track_id);
             jstring j_codec_name =
                     JavaUTF16StringFromStdString(jni(), track_stats.codec);
             jstring j_ssrc =
@@ -281,7 +273,6 @@ private:
                     jni()->NewObject(*j_remote_audio_track_stats_class_,
                                      j_audio_track_stats_ctor_id_,
                                      j_track_sid,
-                                     j_track_id,
                                      track_stats.packets_lost,
                                      j_codec_name,
                                      j_ssrc,
@@ -302,8 +293,6 @@ private:
             webrtc_jni::ScopedLocalRefFrame local_ref_frame(jni());
             jstring j_track_sid =
                     JavaUTF16StringFromStdString(jni(), track_stats.track_sid);
-            jstring j_track_id =
-                    JavaUTF16StringFromStdString(jni(), track_stats.track_id);
             jstring j_codec_name =
                     JavaUTF16StringFromStdString(jni(), track_stats.codec);
             jstring j_ssrc =
@@ -317,7 +306,6 @@ private:
                     jni()->NewObject(*j_remote_video_track_stats_class_,
                                      j_video_track_stats_ctor_id_,
                                      j_track_sid,
-                                     j_track_id,
                                      track_stats.packets_lost,
                                      j_codec_name,
                                      j_ssrc,

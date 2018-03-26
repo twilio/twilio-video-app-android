@@ -28,7 +28,6 @@ public class RemoteVideoTrackStats extends RemoteTrackStats {
     public final int frameRate;
 
     RemoteVideoTrackStats(String trackSid,
-                          String trackId,
                           int packetsLost,
                           String codec,
                           String ssrc,
@@ -37,7 +36,7 @@ public class RemoteVideoTrackStats extends RemoteTrackStats {
                           int packetsReceived,
                           VideoDimensions dimensions,
                           int frameRate) {
-        super(trackSid, trackId, packetsLost, codec, ssrc,
+        super(trackSid, packetsLost, codec, ssrc,
                 timestamp, bytesReceived, packetsReceived);
         this.dimensions = dimensions;
         this.frameRate = frameRate;

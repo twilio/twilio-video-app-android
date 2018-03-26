@@ -33,10 +33,10 @@ public abstract class LocalTrackStats extends BaseTrackStats {
      */
     public final long roundTripTime;
 
-    protected LocalTrackStats(String trackSid, String trackId, int packetsLost,
+    protected LocalTrackStats(String trackSid, int packetsLost,
                               String codec, String ssrc, double timestamp,
                               long bytesSent, int packetsSent, long roundTripTime) {
-        super(trackSid, trackId, packetsLost, codec, ssrc, timestamp);
+        super(trackSid, packetsLost, codec, ssrc, timestamp);
         this.bytesSent = bytesSent;
         this.packetsSent = packetsSent;
         this.roundTripTime = roundTripTime;

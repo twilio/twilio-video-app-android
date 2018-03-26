@@ -26,14 +26,14 @@
         android:layout_marginTop="5dp"
         android:layout_below="@+id/stats_item_line">
 
-        <TableRow android:id="@+id/stats_track_id_row">
+        <TableRow android:id="@+id/stats_track_sid_row">
             <TextView
-                android:id="@+id/stats_track_id_title"
-                android:text="@string/stats_track_id"
+                android:id="@+id/stats_track_sid_title"
+                android:text="@string/stats_track_sid"
                 android:gravity="left"
                 style="@style/Stats.TextTitle"/>
             <TextView
-                android:id="@+id/stats_track_id_value"
+                android:id="@+id/stats_track_sid_value"
                 android:gravity="left"
                 style="@style/Stats.TextValue"/>
         </TableRow>

@@ -19,8 +19,8 @@ package com.twilio.video.app.model;
 import com.twilio.video.BaseTrackStats;
 
 public class StatsListItem {
+    public final String trackSid;
     public final String trackName;
-    public final String trackId;
     public final String codec;
     public final int packetsLost;
     public final long bytes;
@@ -33,8 +33,8 @@ public class StatsListItem {
     public final boolean isAudioTrack;
 
     private StatsListItem(Builder builder) {
+        this.trackSid = builder.trackSid;
         this.trackName = builder.trackName;
-        this.trackId = builder.trackId;
         this.codec = builder.codec;
         this.packetsLost = builder.packetsLost;
         this.bytes = builder.bytes;
@@ -48,8 +48,8 @@ public class StatsListItem {
     }
 
     public static class Builder {
+        private String trackSid;
         private String trackName;
-        private String trackId;
         private String codec;
         private int packetsLost;
         private long bytes;
@@ -61,16 +61,10 @@ public class StatsListItem {
         private boolean isLocalTrack;
         private boolean isAudioTrack;
 
-        public Builder() {
-        }
+        public Builder() {}
 
         public Builder trackName(String trackName) {
             this.trackName = trackName;
-            return this;
-        }
-
-        public Builder trackId(String trackId) {
-            this.trackId = trackId;
             return this;
         }
 
@@ -125,10 +119,9 @@ public class StatsListItem {
         }
 
         public Builder baseTrackInfo(BaseTrackStats trackStats) {
-            String trackId = trackStats.trackId;
-            this.trackId = trackId.substring(trackId.length() - 6);
             this.codec = trackStats.codec;
             this.packetsLost = trackStats.packetsLost;
+            this.trackSid = trackStats.trackSid;
             return this;
         }
 

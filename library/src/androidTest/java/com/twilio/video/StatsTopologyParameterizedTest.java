@@ -441,7 +441,6 @@ public class StatsTopologyParameterizedTest extends BaseStatsTest {
     private void checkBaseTrackStats(BaseTrackStats stats) {
         assertNotNullOrEmpty(stats.codec);
         assertNotNullOrEmpty(stats.ssrc);
-        assertNotNullOrEmpty(stats.trackId);
         assertNotNullOrEmpty(stats.trackSid);
         assertIsTrackSid(stats.trackSid);
         // TODO: Packets lost is always 0. Find a way to make test that will exercise this

@@ -19,7 +19,6 @@ package com.twilio.video.app.adapter;
 import android.content.Context;
 import android.os.Handler;
 import android.os.Looper;
-import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -28,7 +27,6 @@ import android.widget.TableRow;
 import android.widget.TextView;
 
 import com.google.common.collect.ImmutableList;
-import com.twilio.video.Camera2Capturer;
 import com.twilio.video.RemoteAudioTrack;
 import com.twilio.video.RemoteAudioTrackPublication;
 import com.twilio.video.RemoteAudioTrackStats;
@@ -39,24 +37,21 @@ import com.twilio.video.RemoteVideoTrack;
 import com.twilio.video.RemoteVideoTrackPublication;
 import com.twilio.video.StatsReport;
 import com.twilio.video.RemoteVideoTrackStats;
-import com.twilio.video.VideoTrack;
 import com.twilio.video.app.R;
 import com.twilio.video.app.model.StatsListItem;
 
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import timber.log.Timber;
 
 public class StatsListAdapter extends RecyclerView.Adapter<StatsListAdapter.ViewHolder> {
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
         @BindView(R.id.stats_track_name) TextView trackNameText;
-        @BindView(R.id.stats_track_id_value) TextView trackIdValueText;
+        @BindView(R.id.stats_track_sid_value) TextView trackSidValueText;
         @BindView(R.id.stats_codec_value) TextView codecValueText;
         @BindView(R.id.stats_packets_value) TextView packetsValueText;
         @BindView(R.id.stats_bytes_title) TextView bytesTitleText;
@@ -66,11 +61,6 @@ public class StatsListAdapter extends RecyclerView.Adapter<StatsListAdapter.View
         @BindView(R.id.stats_audio_level_value) TextView audioLevelValueText;
         @BindView(R.id.stats_dimensions_value) TextView dimensionsValueText;
         @BindView(R.id.stats_framerate_value) TextView framerateValueText;
-
-        @BindView(R.id.stats_track_id_row) TableRow trackIdTableRow;
-        @BindView(R.id.stats_codec_row) TableRow codecTableRow;
-        @BindView(R.id.stats_packets_row) TableRow packetsTableRow;
-        @BindView(R.id.stats_bytes_row) TableRow bytesTableRow;
         @BindView(R.id.stats_rtt_row) TableRow rttTableRow;
         @BindView(R.id.stats_jitter_row) TableRow jitterTableRow;
         @BindView(R.id.stats_audio_level_row) TableRow audioLevelTableRow;
@@ -103,7 +93,7 @@ public class StatsListAdapter extends RecyclerView.Adapter<StatsListAdapter.View
     public void onBindViewHolder(ViewHolder holder, int position) {
         StatsListItem item = statsListItems.get(position);
         holder.trackNameText.setText(item.trackName);
-        holder.trackIdValueText.setText(item.trackId);
+        holder.trackSidValueText.setText(item.trackSid);
         holder.codecValueText.setText(item.codec);
         holder.packetsValueText.setText(String.valueOf(item.packetsLost));
         holder.bytesValueText.setText(String.valueOf(item.bytes));
@@ -166,7 +156,7 @@ public class StatsListAdapter extends RecyclerView.Adapter<StatsListAdapter.View
                 }
                 for (LocalVideoTrackStats localVideoTrackStats : report.getLocalVideoTrackStats()) {
                     String localVideoTrackName =
-                            localVideoTrackNames.get(localVideoTrackStats.trackId);
+                            localVideoTrackNames.get(localVideoTrackStats.trackSid);
                     if (localVideoTrackName == null) {
                         localVideoTrackName = context.getString(R.string.local_video_track);
                     }

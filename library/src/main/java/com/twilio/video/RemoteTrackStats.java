@@ -29,14 +29,13 @@ public abstract class RemoteTrackStats extends BaseTrackStats {
 
 
     protected RemoteTrackStats(String trackSid,
-                               String trackId,
                                int packetsLost,
                                String codec,
                                String ssrc,
                                double timestamp,
                                long bytesReceived,
                                int packetsReceived) {
-        super(trackSid, trackId, packetsLost, codec, ssrc, timestamp);
+        super(trackSid, packetsLost, codec, ssrc, timestamp);
         this.bytesReceived = bytesReceived;
         this.packetsReceived = packetsReceived;
     }
