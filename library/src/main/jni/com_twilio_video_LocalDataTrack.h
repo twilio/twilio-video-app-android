@@ -32,6 +32,8 @@ struct LocalDataTrackContext {
 
 std::shared_ptr<twilio::media::LocalDataTrack> getLocalDataTrack(jlong);
 
+std::string getLocalDataTrackHash(std::shared_ptr<twilio::media::LocalDataTrack> local_data_track);
+
 jobject createJavaLocalDataTrack(std::shared_ptr<twilio::media::LocalDataTrack> local_data_track,
                                  jobject j_context);
 

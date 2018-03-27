@@ -46,6 +46,8 @@ private:
 
 std::shared_ptr<twilio::media::LocalVideoTrack> getLocalVideoTrack(jlong);
 
+std::string getLocalVideoTrackHash(std::shared_ptr<twilio::media::LocalVideoTrack> local_video_track);
+
 jobject createJavaLocalVideoTrack(std::shared_ptr<twilio::media::LocalVideoTrack> local_video_track,
                                   jobject j_video_capturer,
                                   jobject j_video_constraints,

@@ -40,6 +40,13 @@ std::shared_ptr<twilio::media::LocalDataTrack> getLocalDataTrack(jlong local_dat
     return data_track_context->local_data_track;
 }
 
+std::string getLocalDataTrackHash(std::shared_ptr<twilio::media::LocalDataTrack> local_data_track) {
+    std::size_t local_data_track_hash =
+            std::hash<twilio::media::LocalDataTrack *>{}(local_data_track.get());
+
+    return std::to_string(local_data_track_hash);
+}
+
 jobject createJavaLocalDataTrack(std::shared_ptr<twilio::media::LocalDataTrack> local_data_track,
                                  jobject j_context) {
     JNIEnv *jni = webrtc_jni::GetEnv();
@@ -51,7 +58,8 @@ jobject createJavaLocalDataTrack(std::shared_ptr<twilio::media::LocalDataTrack> 
                                                              kLocalDataTrackConstructorSignature);
     LocalDataTrackContext* data_track_context = new LocalDataTrackContext();
     data_track_context->local_data_track = local_data_track;
-    jstring j_track_id = JavaUTF16StringFromStdString(jni, local_data_track->getTrackId());
+    jstring j_track_hash = JavaUTF16StringFromStdString(jni,
+                                                        getLocalDataTrackHash(local_data_track));
     jstring j_name = JavaUTF16StringFromStdString(jni, local_data_track->getName());
     jobject j_local_data_track = jni->NewObject(j_data_track_class,
                                                 j_data_track_ctor_id,
@@ -61,7 +69,7 @@ jobject createJavaLocalDataTrack(std::shared_ptr<twilio::media::LocalDataTrack> 
                                                 local_data_track->isReliable(),
                                                 local_data_track->getMaxPacketLifeTime(),
                                                 local_data_track->getMaxRetransmits(),
-                                                j_track_id,
+                                                j_track_hash,
                                                 j_name,
                                                 j_context);
     CHECK_EXCEPTION(jni) << "Error creating LocalDataTrack";

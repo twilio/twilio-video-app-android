@@ -605,8 +605,8 @@ public class DataTrackTopologyParameterizedTest extends BaseParticipantTest {
                                                                    LocalParticipant localParticipant) {
         for (LocalDataTrackPublication localDataTrackPublication :
                 localParticipant.getLocalDataTracks()) {
-            if (localDataTrackPublication.getLocalDataTrack().getTrackId()
-                    .equals(localDataTrack.getTrackId())) {
+            if (localDataTrackPublication.getLocalDataTrack().getName()
+                    .equals(localDataTrack.getName())) {
                 return localDataTrackPublication;
             }
         }

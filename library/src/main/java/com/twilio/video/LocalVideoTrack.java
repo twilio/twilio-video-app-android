@@ -40,7 +40,7 @@ public class LocalVideoTrack extends VideoTrack {
             .build();
 
     private long nativeLocalVideoTrackHandle;
-    private final String trackId;
+    private final String nativeTrackHash;
     private final VideoCapturer videoCapturer;
     private final VideoConstraints videoConstraints;
     private final MediaFactory mediaFactory;
@@ -225,20 +225,12 @@ public class LocalVideoTrack extends VideoTrack {
     }
 
     /**
-     * Returns the local video track name. {@link #trackId} is returned if no name was specified.
+     * Returns the local video track name. A pseudo random string is returned if no track name was
+     * specified.
      */
     @Override
     public String getName() {
         return super.getName();
-    }
-
-    /**
-     * This video track id.
-     *
-     * @return track id.
-     */
-    public String getTrackId() {
-        return trackId;
     }
 
     /**
@@ -273,10 +265,11 @@ public class LocalVideoTrack extends VideoTrack {
                     VideoCapturer videoCapturer,
                     VideoConstraints videoConstraints,
                     org.webrtc.VideoTrack webrtcVideoTrack,
+                    String nativeTrackHash,
                     String name,
                     Context context) {
         super(webrtcVideoTrack, enabled, name);
-        this.trackId = webrtcVideoTrack.id();
+        this.nativeTrackHash = nativeTrackHash;
         this.nativeLocalVideoTrackHandle = nativeLocalVideoTrackHandle;
         this.videoCapturer = videoCapturer;
         this.videoConstraints = videoConstraints;
@@ -388,6 +381,15 @@ public class LocalVideoTrack extends VideoTrack {
 
     boolean isReleased() {
         return nativeLocalVideoTrackHandle == 0;
+    }
+
+    /*
+     * Called by LocalParticipant at JNI level to map twilio::media::LocalVideoTrack to
+     * LocalVideoTrack.
+     */
+    @SuppressWarnings("unused")
+    String getNativeTrackHash() {
+        return nativeTrackHash;
     }
 
     /*

@@ -22,6 +22,8 @@ import android.support.test.InstrumentationRegistry;
 import android.support.test.filters.LargeTest;
 import android.support.test.runner.AndroidJUnit4;
 
+import com.twilio.video.util.StringUtils;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -59,7 +61,6 @@ public class LocalDataTrackTest {
         localDataTrack = LocalDataTrack.create(context);
 
         assertNotNull(localDataTrack);
-        assertFalse(localDataTrack.getTrackId().isEmpty());
         assertEquals(true, localDataTrack.isEnabled());
         assertEquals(true, localDataTrack.isOrdered());
         assertEquals(65535, localDataTrack.getMaxPacketLifeTime());
@@ -86,7 +87,7 @@ public class LocalDataTrackTest {
         localDataTrack = LocalDataTrack.create(context, dataTrackOptions);
 
         assertNotNull(localDataTrack);
-        assertEquals(localDataTrack.getTrackId(), localDataTrack.getName());
+        assertFalse(StringUtils.isNullOrEmpty(localDataTrack.getName()));
     }
 
     @Test
@@ -97,7 +98,7 @@ public class LocalDataTrackTest {
         localDataTrack = LocalDataTrack.create(context, dataTrackOptions);
 
         assertNotNull(localDataTrack);
-        assertEquals(localDataTrack.getTrackId(), localDataTrack.getName());
+        assertFalse(StringUtils.isNullOrEmpty(localDataTrack.getName()));
     }
 
     @Test

@@ -19,6 +19,9 @@
 #include "video/video.h"
 #include "logging.h"
 #include "com_twilio_video_LocalParticipant.h"
+#include "com_twilio_video_LocalAudioTrack.h"
+#include "com_twilio_video_LocalVideoTrack.h"
+#include "com_twilio_video_LocalDataTrack.h"
 #include "com_twilio_video_TwilioException.h"
 
 namespace twilio_video_jni {
@@ -123,7 +126,7 @@ void AndroidLocalParticipantObserver::onAudioTrackPublished(twilio::video::Local
         }
 
         jobject j_local_audio_track =
-                local_audio_track_map_[local_audio_track_publication->getLocalTrack()->getTrackId()];
+                local_audio_track_map_[getLocalAudioTrackHash(local_audio_track_publication->getLocalTrack())];
         jobject j_published_audio_track = createJavaLocalAudioTrackPublication(jni(),
                                                                                local_audio_track_publication,
                                                                                j_local_audio_track,
@@ -153,7 +156,7 @@ void AndroidLocalParticipantObserver::onAudioTrackPublicationFailed(twilio::vide
             return;
         }
 
-        jobject j_local_audio_track = local_audio_track_map_[audio_track->getTrackId()];
+        jobject j_local_audio_track = local_audio_track_map_[getLocalAudioTrackHash(audio_track)];
         jobject j_twilio_exception = createJavaTwilioException(jni(),
                                                                *j_twilio_exception_class_,
                                                                j_twilio_exception_ctor_id_,
@@ -183,7 +186,7 @@ void AndroidLocalParticipantObserver::onVideoTrackPublished(twilio::video::Local
         }
 
         jobject j_local_video_track =
-                local_video_track_map_[local_video_track_publication->getLocalTrack()->getTrackId()];
+                local_video_track_map_[getLocalVideoTrackHash(local_video_track_publication->getLocalTrack())];
         jobject j_published_video_track = createJavaLocalVideoTrackPublication(jni(),
                                                                                local_video_track_publication,
                                                                                j_local_video_track,
@@ -213,7 +216,7 @@ void AndroidLocalParticipantObserver::onVideoTrackPublicationFailed(twilio::vide
             return;
         }
 
-        jobject j_local_video_track = local_video_track_map_[video_track->getTrackId()];
+        jobject j_local_video_track = local_video_track_map_[getLocalVideoTrackHash(video_track)];
         jobject j_twilio_exception = createJavaTwilioException(jni(),
                                                                *j_twilio_exception_class_,
                                                                j_twilio_exception_ctor_id_,
@@ -243,7 +246,7 @@ void AndroidLocalParticipantObserver::onDataTrackPublished(twilio::video::LocalP
         }
 
         jobject j_local_data_track =
-                local_data_track_map_[local_data_track_publication->getLocalTrack()->getTrackId()];
+                local_data_track_map_[getLocalDataTrackHash(local_data_track_publication->getLocalTrack())];
         jobject j_published_data_track = createJavaLocalDataTrackPublication(jni(),
                                                                              local_data_track_publication,
                                                                              j_local_data_track,
@@ -273,7 +276,7 @@ void AndroidLocalParticipantObserver::onDataTrackPublicationFailed(twilio::video
             return;
         }
 
-        jobject j_local_data_track = local_data_track_map_[data_track->getTrackId()];
+        jobject j_local_data_track = local_data_track_map_[getLocalDataTrackHash(data_track)];
         jobject j_twilio_exception = createJavaTwilioException(jni(),
                                                                *j_twilio_exception_class_,
                                                                j_twilio_exception_ctor_id_,

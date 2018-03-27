@@ -667,7 +667,7 @@ public class RoomActivity extends BaseActivity {
                 cameraCapturer.getVideoCapturer(),
                 videoConstraints);
         if (cameraVideoTrack != null) {
-            localVideoTrackNames.put(cameraVideoTrack.getTrackId(),
+            localVideoTrackNames.put(cameraVideoTrack.getName(),
                     getString(R.string.camera_video_track));
 
             // Share camera video track if we are connected to room
@@ -872,7 +872,7 @@ public class RoomActivity extends BaseActivity {
             screenCaptureMenuItem.setIcon(R.drawable.ic_stop_screen_share_white_24dp);
             screenCaptureMenuItem.setTitle(R.string.stop_screen_share);
             localVideoTrackNames.put(
-                    screenVideoTrack.getTrackId(), getString(R.string.screen_video_track));
+                    screenVideoTrack.getName(), getString(R.string.screen_video_track));
 
             if (localParticipant != null) {
                 localParticipant.publishTrack(screenVideoTrack);
@@ -891,7 +891,7 @@ public class RoomActivity extends BaseActivity {
                 localParticipant.unpublishTrack(screenVideoTrack);
             }
             screenVideoTrack.release();
-            localVideoTrackNames.remove(screenVideoTrack.getTrackId());
+            localVideoTrackNames.remove(screenVideoTrack.getName());
             screenVideoTrack = null;
             screenCaptureMenuItem.setIcon(R.drawable.ic_screen_share_white_24dp);
             screenCaptureMenuItem.setTitle(R.string.share_screen);

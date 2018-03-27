@@ -28,7 +28,7 @@ import static android.Manifest.permission.RECORD_AUDIO;
 public class LocalAudioTrack extends AudioTrack {
     private static final Logger logger = Logger.getLogger(LocalAudioTrack.class);
 
-    private final String trackId;
+    private final String nativeTrackHash;
     private final MediaFactory mediaFactory;
     private long nativeLocalAudioTrackHandle;
 
@@ -129,20 +129,12 @@ public class LocalAudioTrack extends AudioTrack {
     }
 
     /**
-     * Returns the local audio track name. {@link #trackId} is returned if no name was specified.
+     * Returns the local audio track name. A pseudo random string is returned if no track name was
+     * specified.
      */
     @Override
     public String getName() {
         return super.getName();
-    }
-
-    /**
-     * This audio track id.
-     *
-     * @return track id.
-     */
-    public String getTrackId() {
-        return trackId;
     }
 
     /**
@@ -171,18 +163,27 @@ public class LocalAudioTrack extends AudioTrack {
     }
 
     LocalAudioTrack(long nativeLocalAudioTrackHandle,
-                    @NonNull String trackId,
+                    @NonNull String nativeTrackHash,
                     @NonNull String name,
                     boolean enabled,
                     Context context) {
         super(enabled, name);
-        this.trackId = trackId;
+        this.nativeTrackHash = nativeTrackHash;
         this.nativeLocalAudioTrackHandle = nativeLocalAudioTrackHandle;
         this.mediaFactory = MediaFactory.instance(this, context);
     }
 
     boolean isReleased() {
         return nativeLocalAudioTrackHandle == 0;
+    }
+
+    /*
+     * Called by LocalParticipant at JNI level to map twilio::media::LocalAudioTrack to
+     * LocalAudioTrack.
+     */
+    @SuppressWarnings("unused")
+    String getNativeTrackHash() {
+        return nativeTrackHash;
     }
 
     /*

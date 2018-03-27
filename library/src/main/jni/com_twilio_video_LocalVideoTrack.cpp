@@ -29,6 +29,7 @@ static const char *const kLocalVideoTrackConstructorSignature = "("
         "Lcom/twilio/video/VideoConstraints;"
         "Lorg/webrtc/VideoTrack;"
         "Ljava/lang/String;"
+        "Ljava/lang/String;"
         "Landroid/content/Context;"
         ")V";
 
@@ -37,6 +38,13 @@ std::shared_ptr<twilio::media::LocalVideoTrack> getLocalVideoTrack(jlong local_v
             reinterpret_cast<LocalVideoTrackContext *>(local_video_track_handle);
 
     return video_track_context->getLocalVideoTrack();
+}
+
+std::string getLocalVideoTrackHash(std::shared_ptr<twilio::media::LocalVideoTrack> local_video_track) {
+    std::size_t local_video_track_hash =
+            std::hash<twilio::media::LocalVideoTrack *>{}(local_video_track.get());
+
+    return std::to_string(local_video_track_hash);
 }
 
 jobject createJavaLocalVideoTrack(std::shared_ptr<twilio::media::LocalVideoTrack> local_video_track,
@@ -62,6 +70,8 @@ jobject createJavaLocalVideoTrack(std::shared_ptr<twilio::media::LocalVideoTrack
                                                   webrtc_jni::jlongFromPointer(local_video_track->getWebRtcTrack()));
     CHECK_EXCEPTION(jni) << "Error creating org.webrtc.VideoTrack";
     jstring j_name = JavaUTF16StringFromStdString(jni, local_video_track->getName());
+    jstring j_track_hash = JavaUTF16StringFromStdString(jni,
+                                                        getLocalVideoTrackHash(local_video_track));
     jobject j_local_video_track = jni->NewObject(j_video_track_class,
                                                  j_video_track_ctor_id,
                                                  webrtc_jni::jlongFromPointer(video_track_context),
@@ -69,6 +79,7 @@ jobject createJavaLocalVideoTrack(std::shared_ptr<twilio::media::LocalVideoTrack
                                                  j_video_capturer,
                                                  j_video_constraints,
                                                  j_webrtc_video_track,
+                                                 j_track_hash,
                                                  j_name,
                                                  j_context);
     CHECK_EXCEPTION(jni) << "Error creating LocalVideoTrack";

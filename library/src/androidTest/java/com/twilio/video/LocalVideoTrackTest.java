@@ -24,6 +24,7 @@ import android.support.test.runner.AndroidJUnit4;
 import com.twilio.video.util.FakeVideoCapturer;
 import com.twilio.video.util.FakeVideoRenderer;
 import com.twilio.video.util.FrameCountRenderer;
+import com.twilio.video.util.StringUtils;
 
 import org.junit.After;
 import org.junit.Assert;
@@ -99,7 +100,7 @@ public class LocalVideoTrackTest {
         localVideoTrack = LocalVideoTrack.create(context, true, fakeVideoCapturer, nullName);
 
         assertNotNull(localVideoTrack);
-        assertEquals(localVideoTrack.getTrackId(), localVideoTrack.getName());
+        assertFalse(StringUtils.isNullOrEmpty(localVideoTrack.getName()));
         assertTrue(fakeVideoCapturer.isStarted());
     }
 
@@ -109,7 +110,7 @@ public class LocalVideoTrackTest {
         localVideoTrack = LocalVideoTrack.create(context, true, fakeVideoCapturer, emptyName);
 
         assertNotNull(localVideoTrack);
-        assertEquals(localVideoTrack.getTrackId(), localVideoTrack.getName());
+        assertFalse(StringUtils.isNullOrEmpty(localVideoTrack.getName()));
         assertTrue(fakeVideoCapturer.isStarted());
     }
 

@@ -23,6 +23,7 @@ import android.support.test.rule.GrantPermissionRule;
 import android.support.test.runner.AndroidJUnit4;
 
 import com.twilio.video.ui.MediaTestActivity;
+import com.twilio.video.util.StringUtils;
 
 import org.junit.After;
 import org.junit.Assert;
@@ -104,7 +105,7 @@ public class LocalAudioTrackTest {
         String nullName = null;
         localAudioTrack = LocalAudioTrack.create(mediaTestActivity, true, nullName);
         assertNotNull(localAudioTrack);
-        assertEquals(localAudioTrack.getTrackId(), localAudioTrack.getName());
+        assertFalse(StringUtils.isNullOrEmpty(localAudioTrack.getName()));
     }
 
     @Test
@@ -113,7 +114,7 @@ public class LocalAudioTrackTest {
         localAudioTrack = LocalAudioTrack.create(mediaTestActivity, true, emptyName);
 
         assertNotNull(localAudioTrack);
-        assertEquals(localAudioTrack.getTrackId(), localAudioTrack.getName());
+        assertFalse(StringUtils.isNullOrEmpty(localAudioTrack.getName()));
     }
 
     @Test

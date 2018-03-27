@@ -30,7 +30,7 @@ public class LocalDataTrack extends DataTrack {
     private static final Logger logger = Logger.getLogger(LocalDataTrack.class);
 
     private long nativeLocalDataTrackHandle;
-    private final String trackId;
+    private final String nativeTrackHash;
     private final MediaFactory mediaFactory;
 
     /**
@@ -103,15 +103,6 @@ public class LocalDataTrack extends DataTrack {
         nativeStringSend(nativeLocalDataTrackHandle, message);
     }
 
-    /**
-     * This data track id.
-     *
-     * @return track id.
-     */
-    public String getTrackId() {
-        return trackId;
-    }
-
     @Override
     public synchronized boolean isEnabled() {
         if (!isReleased()) {
@@ -123,7 +114,8 @@ public class LocalDataTrack extends DataTrack {
     }
 
     /**
-     * Returns the local data track name. {@link #trackId} is returned if no name was specified.
+     * Returns the local data track name. A pseudo random string is returned if no track name was
+     * specified.
      */
     @Override
     public String getName() {
@@ -147,17 +139,26 @@ public class LocalDataTrack extends DataTrack {
                    boolean reliable,
                    int maxPacketLifeTime,
                    int maxRetransmits,
-                   String trackId,
+                   String nativeTrackHash,
                    String name,
                    Context context) {
         super(enabled, ordered, reliable, maxPacketLifeTime, maxRetransmits, name);
         this.nativeLocalDataTrackHandle = nativeLocalDataTrackHandle;
-        this.trackId = trackId;
+        this.nativeTrackHash = nativeTrackHash;
         this.mediaFactory = MediaFactory.instance(this, context);
     }
 
     boolean isReleased() {
         return nativeLocalDataTrackHandle == 0;
+    }
+
+    /*
+     * Called by LocalParticipant at JNI level to map twilio::media::LocalDataTrack to
+     * LocalDataTrack.
+     */
+    @SuppressWarnings("unused")
+    String getNativeTrackHash() {
+        return nativeTrackHash;
     }
 
     /*
