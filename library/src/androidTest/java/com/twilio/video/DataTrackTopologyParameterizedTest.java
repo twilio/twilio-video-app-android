@@ -78,7 +78,7 @@ public class DataTrackTopologyParameterizedTest extends BaseParticipantTest {
     }
 
     @Test
-    public void shouldHaveTrackSidAfterPublished() throws InterruptedException {
+    public void shouldHaveTrackSid() throws InterruptedException {
         publishDataTrack();
 
         // Validate track was added
@@ -87,8 +87,9 @@ public class DataTrackTopologyParameterizedTest extends BaseParticipantTest {
         assertEquals(1, remoteDataTrackPublications.size());
 
         // Validate track sid
-        assertIsTrackSid(remoteDataTrackPublications.get(0).getTrackSid());
         assertTrue(remoteDataTrackPublications.get(0).isTrackSubscribed());
+        assertIsTrackSid(remoteDataTrackPublications.get(0).getTrackSid());
+        assertIsTrackSid(remoteDataTrackPublications.get(0).getRemoteDataTrack().getSid());
     }
 
     @Test

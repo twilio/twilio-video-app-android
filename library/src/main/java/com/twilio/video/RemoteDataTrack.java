@@ -28,6 +28,7 @@ import java.nio.ByteBuffer;
 public class RemoteDataTrack extends DataTrack {
     private static final Logger logger = Logger.getLogger(RemoteDataTrack.class);
 
+    private final String sid;
     private long nativeRemoteDataTrackContext;
     private Handler handler;
 
@@ -100,6 +101,14 @@ public class RemoteDataTrack extends DataTrack {
     };
 
     /**
+     * Returns the remote data track's server identifier. This value uniquely identifies the remote
+     * data track within the scope of a {@link Room}.
+     */
+    public String getSid() {
+        return sid;
+    }
+
+    /**
      * Set the remote data track listener. The thread on which this method is called is the
      * same thread used to notify of received data track messages.
      *
@@ -115,9 +124,11 @@ public class RemoteDataTrack extends DataTrack {
                     boolean reliable,
                     int maxPacketLifeTime,
                     int maxRetransmits,
+                    String sid,
                     String name,
                     long nativeRemoteDataTrackContext) {
         super(enabled, ordered, reliable, maxPacketLifeTime, maxRetransmits, name);
+        this.sid = sid;
         this.nativeRemoteDataTrackContext = nativeRemoteDataTrackContext;
     }
 

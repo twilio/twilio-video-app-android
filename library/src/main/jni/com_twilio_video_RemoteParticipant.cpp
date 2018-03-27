@@ -250,11 +250,13 @@ jobject createJavaRemoteAudioTrack(JNIEnv *env,
                                    jobject j_webrtc_audio_track,
                                    jclass j_remote_audio_track_class,
                                    jmethodID j_remote_audio_track_ctor_id) {
+    jstring j_sid = JavaUTF16StringFromStdString(env, remote_audio_track->getSid());
     jstring j_name = JavaUTF16StringFromStdString(env, remote_audio_track->getName());
     jboolean j_is_enabled = (jboolean) remote_audio_track->isEnabled();
     jobject j_remote_audio_track = env->NewObject(j_remote_audio_track_class,
                                                   j_remote_audio_track_ctor_id,
                                                   j_webrtc_audio_track,
+                                                  j_sid,
                                                   j_name,
                                                   j_is_enabled);
     CHECK_EXCEPTION(env) << "Failed to create RemoteAudioTrack";
@@ -267,11 +269,13 @@ jobject createJavaRemoteVideoTrack(JNIEnv *env,
                                    jobject j_webrtc_video_track,
                                    jclass j_remote_video_track_class,
                                    jmethodID j_remote_video_track_ctor_id) {
+    jstring j_sid = JavaUTF16StringFromStdString(env, remote_video_track->getSid());
     jstring j_name = JavaUTF16StringFromStdString(env, remote_video_track->getName());
     jboolean j_is_enabled = (jboolean) remote_video_track->isEnabled();
     jobject j_remote_video_track = env->NewObject(j_remote_video_track_class,
                                                   j_remote_video_track_ctor_id,
                                                   j_webrtc_video_track,
+                                                  j_sid,
                                                   j_name,
                                                   j_is_enabled);
     CHECK_EXCEPTION(env) << "Failed to create RemoteVideoTrack";
@@ -284,9 +288,9 @@ jobject createJavaRemoteAudioTrackPublication(JNIEnv *env,
                                               jclass j_remote_audio_track_publication_class,
                                               jmethodID j_remote_audio_track_publication_ctor_id) {
     jstring j_track_sid = JavaUTF16StringFromStdString(env,
-                                                              remote_audio_track_publication->getTrackSid());
+                                                       remote_audio_track_publication->getTrackSid());
     jstring j_track_name = JavaUTF16StringFromStdString(env,
-                                                               remote_audio_track_publication->getTrackName());
+                                                        remote_audio_track_publication->getTrackName());
     jboolean j_is_subscribed = (jboolean) remote_audio_track_publication->isTrackSubscribed();
     jboolean j_is_enabled = (jboolean) remote_audio_track_publication->isTrackEnabled();
     jobject j_remote_audio_track_publication = env->NewObject(j_remote_audio_track_publication_class,
@@ -305,9 +309,9 @@ jobject createJavaRemoteVideoTrackPublication(JNIEnv *env,
                                               jclass j_remote_video_track_publication_class,
                                               jmethodID j_remote_video_track_publication_ctor_id) {
     jstring j_track_sid = JavaUTF16StringFromStdString(env,
-                                                              remote_video_track_publication->getTrackSid());
+                                                       remote_video_track_publication->getTrackSid());
     jstring j_track_name = JavaUTF16StringFromStdString(env,
-                                                               remote_video_track_publication->getTrackName());
+                                                        remote_video_track_publication->getTrackName());
     jboolean j_is_subscribed = (jboolean) remote_video_track_publication->isTrackSubscribed();
     jboolean j_is_enabled = (jboolean) remote_video_track_publication->isTrackEnabled();
     jobject j_remote_video_track_publication = env->NewObject(j_remote_video_track_publication_class,
@@ -326,9 +330,9 @@ jobject createJavaRemoteDataTrackPublication(JNIEnv *env,
                                              jclass j_remote_data_track_publication_class,
                                              jmethodID j_remote_data_track_publication_ctor_id) {
     jstring j_track_sid = JavaUTF16StringFromStdString(env,
-                                                              remote_data_track_publication->getTrackSid());
+                                                       remote_data_track_publication->getTrackSid());
     jstring j_track_name = JavaUTF16StringFromStdString(env,
-                                                               remote_data_track_publication->getTrackName());
+                                                        remote_data_track_publication->getTrackName());
     jboolean j_is_subscribed = (jboolean) remote_data_track_publication->isTrackSubscribed();
     jboolean j_is_enabled = (jboolean) remote_data_track_publication->isTrackEnabled();
     jobject j_remote_data_track_publication = env->NewObject(j_remote_data_track_publication_class,

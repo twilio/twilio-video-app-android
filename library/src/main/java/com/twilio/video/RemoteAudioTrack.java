@@ -21,12 +21,25 @@ package com.twilio.video;
  */
 public class RemoteAudioTrack extends AudioTrack {
     final org.webrtc.AudioTrack webRtcAudioTrack;
+    private final String sid;
     private boolean playbackEnabled;
 
-    RemoteAudioTrack(org.webrtc.AudioTrack webRtcAudioTrack, String name, boolean isEnabled) {
+    RemoteAudioTrack(org.webrtc.AudioTrack webRtcAudioTrack,
+                     String sid,
+                     String name,
+                     boolean isEnabled) {
         super(isEnabled, name);
+        this.sid = sid;
         this.playbackEnabled = true;
         this.webRtcAudioTrack = webRtcAudioTrack;
+    }
+
+    /**
+     * Returns the remote audio track's server identifier. This value uniquely identifies the remote
+     * audio track within the scope of a {@link Room}.
+     */
+    public String getSid() {
+        return sid;
     }
 
     /**

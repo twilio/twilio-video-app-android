@@ -57,6 +57,7 @@ jobject createJavaRemoteDataTrack(JNIEnv *env,
     jboolean j_reliable = (jboolean) remote_data_track->isReliable();
     jint j_max_packet_life_time = (jint) remote_data_track->getMaxPacketLifeTime();
     jint j_max_retransmits = (jint) remote_data_track->getMaxRetransmits();
+    jstring j_sid = JavaUTF16StringFromStdString(env, remote_data_track->getSid());
     jstring j_name = JavaUTF16StringFromStdString(env, remote_data_track->getName());
     jlong j_remote_data_track_context = webrtc_jni::jlongFromPointer(remote_data_track_context);
     jobject j_remote_data_track = env->NewObject(j_remote_data_track_class,
@@ -66,6 +67,7 @@ jobject createJavaRemoteDataTrack(JNIEnv *env,
                                                  j_reliable,
                                                  j_max_packet_life_time,
                                                  j_max_retransmits,
+                                                 j_sid,
                                                  j_name,
                                                  j_remote_data_track_context);
     CHECK_EXCEPTION(env) << "Failed to create RemoteDataTrack";

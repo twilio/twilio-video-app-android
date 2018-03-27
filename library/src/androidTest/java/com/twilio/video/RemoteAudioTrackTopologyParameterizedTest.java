@@ -72,7 +72,7 @@ public class RemoteAudioTrackTopologyParameterizedTest extends BaseParticipantTe
     }
 
     @Test
-    public void shouldHaveTrackSidAfterAdded() throws InterruptedException {
+    public void shouldHaveTrackSid() throws InterruptedException {
         publishAudioTrack();
 
         // Validate track was added
@@ -81,11 +81,13 @@ public class RemoteAudioTrackTopologyParameterizedTest extends BaseParticipantTe
         assertEquals(1, remoteAudioTrackPublications.size());
 
         // Validate track sid
+        assertTrue(remoteAudioTrackPublications.get(0).isTrackSubscribed());
         assertIsTrackSid(remoteAudioTrackPublications.get(0).getTrackSid());
+        assertIsTrackSid(remoteAudioTrackPublications.get(0).getRemoteAudioTrack().getSid());
     }
 
     @Test
-    public void shouldHaveTrackNameAfterPublished() throws InterruptedException {
+    public void shouldHaveTrackName() throws InterruptedException {
         publishAudioTrack();
 
         // Validate track was added
@@ -94,7 +96,10 @@ public class RemoteAudioTrackTopologyParameterizedTest extends BaseParticipantTe
         assertEquals(1, remoteAudioTrackPublications.size());
 
         // Validate track name
+        assertTrue(remoteAudioTrackPublications.get(0).isTrackSubscribed());
         assertEquals(bobAudioTrackName, remoteAudioTrackPublications.get(0).getTrackName());
+        assertEquals(bobAudioTrackName,
+                remoteAudioTrackPublications.get(0).getRemoteAudioTrack().getName());
     }
 
     @Test

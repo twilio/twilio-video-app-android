@@ -6,6 +6,7 @@ Improvements
 
 - Removed `trackId` from `BaseTrackStats`. `trackSid` or `trackName` can be used to identify
 track stats in a `StatsReport`.
+- Added `getSid` to `RemoteAudioTrack`, `RemoteVideoTrack`, and `RemoteDataTrack`.
 
 Known issues
 

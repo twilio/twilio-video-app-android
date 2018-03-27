@@ -72,7 +72,7 @@ public class RemoteVideoTrackTopologyParameterizedTest extends BaseParticipantTe
     }
 
     @Test
-    public void shouldHaveTrackSidAfterPublished() throws InterruptedException {
+    public void shouldHaveTrackSid() throws InterruptedException {
         publishVideoTrack();
 
         // Validate track was added
@@ -81,12 +81,13 @@ public class RemoteVideoTrackTopologyParameterizedTest extends BaseParticipantTe
         assertEquals(1, remoteVideoTrackPublications.size());
 
         // Validate track sid
-        assertIsTrackSid(remoteVideoTrackPublications.get(0).getTrackSid());
         assertTrue(remoteVideoTrackPublications.get(0).isTrackSubscribed());
+        assertIsTrackSid(remoteVideoTrackPublications.get(0).getTrackSid());
+        assertIsTrackSid(remoteVideoTrackPublications.get(0).getRemoteVideoTrack().getSid());
     }
 
     @Test
-    public void shouldHaveTrackNameAfterPublished() throws InterruptedException {
+    public void shouldHaveTrackName() throws InterruptedException {
         publishVideoTrack();
 
         // Validate track was added
@@ -96,6 +97,8 @@ public class RemoteVideoTrackTopologyParameterizedTest extends BaseParticipantTe
 
         // Validate track name
         assertEquals(bobVideoTrackName, remoteVideoTrackPublications.get(0).getTrackName());
+        assertEquals(bobVideoTrackName,
+                remoteVideoTrackPublications.get(0).getRemoteVideoTrack().getName());
     }
 
     @Test
