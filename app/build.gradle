@@ -1,6 +1,5 @@
 apply plugin: 'com.android.application'
 apply plugin: 'com.google.firebase.firebase-crash'
-apply plugin: 'com.jakewharton.butterknife'
 apply plugin: 'de.felixschulze.gradle.hockeyapp'
 
 hockeyapp {
