@@ -1,5 +1,18 @@
 The Twilio Programmable Video SDKs use [Semantic Versioning](http://www.semver.org).
 
+####1.3.15
+
+Improvements
+
+- Updated Android Gradle Plugin version to `3.1.0` and Gradle version to `4.4`
+
+Known issues
+
+- Network handoff, and subsequent connection renegotiation is not supported for IPv6 networks [#72](https://github.com/twilio/video-quickstart-android/issues/72)
+e VP8 is the only supported codec [#71](https://github.com/twilio/video-quickstart-android/issues/71)
+- Participant disconnect event can take up to 120 seconds to occur [#80](https://github.com/twilio/video-quickstart-android/issues/80) [#73](https://github.com/twilio/video-quickstart-android/issues/73)
+- LocalParticipant release method is public [#132](https://github.com/twilio/video-quickstart-android/issues/132)
+
 ####1.3.14
 
 Improvements
