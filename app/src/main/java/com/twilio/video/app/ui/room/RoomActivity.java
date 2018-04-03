@@ -53,9 +53,15 @@ import com.twilio.video.AudioCodec;
 import com.twilio.video.CameraCapturer;
 import com.twilio.video.ConnectOptions;
 import com.twilio.video.EncodingParameters;
+import com.twilio.video.G722Codec;
+import com.twilio.video.H264Codec;
+import com.twilio.video.IsacCodec;
 import com.twilio.video.LocalAudioTrack;
 import com.twilio.video.LocalParticipant;
 import com.twilio.video.LocalVideoTrack;
+import com.twilio.video.OpusCodec;
+import com.twilio.video.PcmaCodec;
+import com.twilio.video.PcmuCodec;
 import com.twilio.video.RemoteAudioTrack;
 import com.twilio.video.RemoteAudioTrackPublication;
 import com.twilio.video.RemoteDataTrack;
@@ -74,6 +80,8 @@ import com.twilio.video.VideoCodec;
 import com.twilio.video.VideoConstraints;
 import com.twilio.video.VideoDimensions;
 import com.twilio.video.VideoTrack;
+import com.twilio.video.Vp8Codec;
+import com.twilio.video.Vp9Codec;
 import com.twilio.video.app.R;
 import com.twilio.video.app.adapter.StatsListAdapter;
 import com.twilio.video.app.base.BaseActivity;
@@ -601,20 +609,38 @@ public class RoomActivity extends BaseActivity {
         videoConstraints = builder.build();
     }
 
-    /**
-     * Obtain preferred codec.
-     *
-     * @param key       shared preferences key where set of codecs saved.
-     * @param enumClass codec enum class.
-     * @param <T>       enum type.
-     * @return list of preferred codecs.
-     */
-    private <T extends Enum<T>> T obtainCodecPreferences(String key,
-                                                         String defaultValue,
-                                                         final Class<T> enumClass) {
+    private VideoCodec getVideoCodecPreference(String key, String defaultValue) {
+        final String videoCodecName = sharedPreferences.getString(key, defaultValue);
 
-        final String codec = sharedPreferences.getString(key, defaultValue);
-        return Enum.valueOf(enumClass, codec);
+        switch (videoCodecName) {
+            case Vp8Codec.NAME:
+                return new Vp8Codec();
+            case H264Codec.NAME:
+                return new H264Codec();
+            case Vp9Codec.NAME:
+                return new Vp9Codec();
+            default:
+                return new Vp8Codec();
+        }
+    }
+
+    private AudioCodec getAudioCodecPreference(String key, String defaultValue) {
+        final String audioCodecName = sharedPreferences.getString(key, defaultValue);
+
+        switch (audioCodecName) {
+            case IsacCodec.NAME:
+                return new IsacCodec();
+            case OpusCodec.NAME:
+                return new OpusCodec();
+            case PcmaCodec.NAME:
+                return new PcmaCodec();
+            case PcmuCodec.NAME:
+                return new PcmuCodec();
+            case G722Codec.NAME:
+                return new G722Codec();
+            default:
+                return new OpusCodec();
+        }
     }
 
     private void requestPermissions() {
@@ -952,13 +978,11 @@ public class RoomActivity extends BaseActivity {
                 boolean enableInsights = sharedPreferences.getBoolean(Preferences.ENABLE_INSIGHTS,
                         Preferences.ENABLE_INSIGHTS_DEFAULT);
 
-                VideoCodec preferedVideoCodec = obtainCodecPreferences(Preferences.VIDEO_CODEC,
-                        Preferences.VIDEO_CODEC_DEFAULT,
-                        VideoCodec.class);
+                VideoCodec preferedVideoCodec = getVideoCodecPreference(Preferences.VIDEO_CODEC,
+                        Preferences.VIDEO_CODEC_DEFAULT);
 
-                AudioCodec preferredAudioCodec = obtainCodecPreferences(Preferences.AUDIO_CODEC,
-                        Preferences.AUDIO_CODEC_DEFAULT,
-                        AudioCodec.class);
+                AudioCodec preferredAudioCodec = getAudioCodecPreference(Preferences.AUDIO_CODEC,
+                        Preferences.AUDIO_CODEC_DEFAULT);
 
                 ConnectOptions.Builder connectOptionsBuilder = new ConnectOptions.Builder(token)
                         .roomName(roomName)

@@ -17,41 +17,27 @@
 package com.twilio.video;
 
 /**
- * Definition of supported audio codecs.
+ * Abstract base class for audio codecs.
  */
-public enum AudioCodec {
-    /**
-     * Internet speech audio codec.
-     *
-     * @see <a href="https://en.wikipedia.org/wiki/Internet_Speech_Audio_Codec">iSAC</a>
-     */
-    ISAC,
+public abstract class AudioCodec {
+    private final String name;
+
+    protected AudioCodec(String name) {
+        this.name = name;
+    }
 
     /**
-     * Lossy audio coding format.
-     *
-     * @see <a href="https://en.wikipedia.org/wiki/Opus_(audio_format)">Opus</a>
+     * Returns the string representation of the audio codec.
      */
-    OPUS,
+    public String getName() {
+        return name;
+    }
 
     /**
-     * ITU-T standard for audio companding.
-     *
-     * @see <a href="https://en.wikipedia.org/wiki/G.711">PCMA</a>
+     * Returns the name of the audio codec.
      */
-    PCMA,
-
-    /**
-     * ITU-T standard for audio companding.
-     *
-     * @see <a href="https://en.wikipedia.org/wiki/G.711">PCMU</a>
-     */
-    PCMU,
-
-    /**
-     * ITU-T standard 7 kHz Wideband audio codec.
-     *
-     * @see <a href="https://en.wikipedia.org/wiki/G.722">G.722</a>
-     */
-    G722
+    @Override
+    public String toString() {
+        return name;
+    }
 }

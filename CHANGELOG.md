@@ -15,6 +15,35 @@ track stats in a `StatsReport`.
 - Increased the signaling disconnect timeout interval to 1 second.
 - Enable monotonic clock support in the signaling client.
 - Initial connect message now includes client version metadata.
+- Converted `AudioCodec` and `VideoCodec` from enums to abstract classes with concrete
+implementations. The subclasses of `AudioCodec` and `VideoCodec` are the following:
+  - `AudioCodec`
+     - `IsacCodec`
+     - `OpusCodec`
+     - `PcmaCodec`
+     - `PcmuCodec`
+     - `G722Codec`
+  - `VideoCodec`
+     - `Vp8Codec`
+     - `H264Codec`
+     - `Vp9Codec`
+
+ The following snippets demonstrate the before and after for setting codec preferences.
+
+        // Setting preferences before 2.0.0-beta4
+        ConnectOptions aliceConnectOptions = new ConnectOptions.Builder(aliceToken)
+              .roomName(roomName)
+              .preferAudioCodecs(Collections.singletonList(VideoCodec.ISAC))
+              .preferVideoCodecs(Collections.singletonList(VideoCodec.VP9))
+              .build();
+
+        // Setting preferences with 2.0.0-beta4
+        ConnectOptions aliceConnectOptions = new ConnectOptions.Builder(aliceToken)
+              .roomName(roomName)
+              .preferAudioCodecs(Collections.<AudioCodec>singletonList(new IsacCodec()))
+              .preferVideoCodecs(Collections.<VideoCodec>singletonList(new Vp9Codec()))
+              .build();
+
 
 Bug Fixes
 

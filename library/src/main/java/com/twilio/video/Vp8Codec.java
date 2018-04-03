@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Twilio, Inc.
+ * Copyright (C) 2018 Twilio, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,27 +17,14 @@
 package com.twilio.video;
 
 /**
- * Abstract base class for video codecs.
+ * Traditional block-based transform coding format similar to H264.
+ *
+ * @see <a href="https://en.wikipedia.org/wiki/VP8">VP8</a>
  */
-public abstract class VideoCodec {
-    private final String name;
+public class Vp8Codec extends VideoCodec {
+    public static final String NAME = "VP8";
 
-    protected VideoCodec(String name) {
-        this.name = name;
-    }
-
-    /**
-     * Returns the string representation of the video codec.
-     */
-    public String getName() {
-        return name;
-    }
-
-    /**
-     * Returns the name of the video codec.
-     */
-    @Override
-    public String toString() {
-        return name;
+    public Vp8Codec() {
+        super(NAME);
     }
 }

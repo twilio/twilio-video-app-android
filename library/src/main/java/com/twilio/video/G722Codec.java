@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Twilio, Inc.
+ * Copyright (C) 2018 Twilio, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,27 +17,14 @@
 package com.twilio.video;
 
 /**
- * Abstract base class for video codecs.
+ * ITU-T standard 7 kHz Wideband audio codec.
+ *
+ * @see <a href="https://en.wikipedia.org/wiki/G.722">G.722</a>
  */
-public abstract class VideoCodec {
-    private final String name;
+public class G722Codec extends AudioCodec {
+    public static final String NAME = "G722";
 
-    protected VideoCodec(String name) {
-        this.name = name;
-    }
-
-    /**
-     * Returns the string representation of the video codec.
-     */
-    public String getName() {
-        return name;
-    }
-
-    /**
-     * Returns the name of the video codec.
-     */
-    @Override
-    public String toString() {
-        return name;
+    public G722Codec() {
+        super(NAME);
     }
 }

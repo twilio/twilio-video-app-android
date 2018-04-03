@@ -47,6 +47,18 @@ import static org.junit.Assume.assumeTrue;
 @RunWith(JUnitParamsRunner.class)
 @LargeTest
 public class CodecPreferencesTest extends BaseCodecTest {
+    // Audio codecs
+    private final IsacCodec isacCodec = new IsacCodec();
+    private final OpusCodec opusCodec = new OpusCodec();
+    private final PcmaCodec pcmaCodec = new PcmaCodec();
+    private final PcmuCodec pcmuCodec = new PcmuCodec();
+    private final G722Codec g722Codec = new G722Codec();
+
+    // Video codecs
+    private final Vp8Codec vp8Codec = new Vp8Codec();
+    private final H264Codec h264Codec = new H264Codec();
+    private final Vp9Codec vp9Codec = new Vp9Codec();
+
     @After
     public void teardown() throws InterruptedException {
         super.teardown();
@@ -85,7 +97,7 @@ public class CodecPreferencesTest extends BaseCodecTest {
     public void canPreferVideoCodec(Topology topology, VideoCodec expectedVideoCodec)
             throws InterruptedException {
         super.baseSetup(topology);
-        if (expectedVideoCodec == VideoCodec.H264) {
+        if (expectedVideoCodec instanceof H264Codec) {
             assumeTrue(MediaCodecVideoEncoder.isH264HwSupported());
             assumeTrue(MediaCodecVideoDecoder.isH264HwSupported());
         }
@@ -119,7 +131,7 @@ public class CodecPreferencesTest extends BaseCodecTest {
         // Device without H264 support required to test fallback preference
         assumeFalse(MediaCodecVideoEncoder.isH264HwSupported());
 
-        VideoCodec expectedVideoCodec = VideoCodec.VP9;
+        VideoCodec expectedVideoCodec = new Vp9Codec();
 
         // Connect alice with video track and preferred codecs
         aliceLocalVideoTrack = LocalVideoTrack.create(mediaTestActivity, true,
@@ -127,7 +139,7 @@ public class CodecPreferencesTest extends BaseCodecTest {
         ConnectOptions aliceConnectOptions = new ConnectOptions.Builder(aliceToken)
                 .roomName(roomName)
                 .videoTracks(Collections.singletonList(aliceLocalVideoTrack))
-                .preferVideoCodecs(Arrays.asList(VideoCodec.H264, VideoCodec.VP9))
+                .preferVideoCodecs(Arrays.asList(new H264Codec(), new Vp9Codec()))
                 .build();
         aliceRoom = createRoom(aliceListener, aliceConnectOptions);
         aliceListener.onParticipantConnectedLatch = new CountDownLatch(1);
@@ -146,31 +158,31 @@ public class CodecPreferencesTest extends BaseCodecTest {
 
     private Object[] parametersForCanPreferAudioCodec() {
         return new Object[]{
-                new Object[]{Topology.P2P, AudioCodec.ISAC},
-                new Object[]{Topology.P2P, AudioCodec.OPUS},
-                new Object[]{Topology.P2P, AudioCodec.PCMA},
-                new Object[]{Topology.P2P, AudioCodec.PCMU},
-                new Object[]{Topology.P2P, AudioCodec.G722}
+                new Object[]{Topology.P2P, isacCodec},
+                new Object[]{Topology.P2P, opusCodec},
+                new Object[]{Topology.P2P, pcmaCodec},
+                new Object[]{Topology.P2P, pcmuCodec},
+                new Object[]{Topology.P2P, g722Codec}
 
                 // TODO: Enable codec preferences tests for group rooms GSDK-1291
-                // new Object[]{Topology.GROUP, AudioCodec.ISAC},
-                // new Object[]{Topology.GROUP, AudioCodec.OPUS},
-                // new Object[]{Topology.GROUP, AudioCodec.PCMA},
-                // new Object[]{Topology.GROUP, AudioCodec.PCMU},
-                // new Object[]{Topology.GROUP, AudioCodec.G722}
+                // new Object[]{Topology.GROUP, isacCodec},
+                // new Object[]{Topology.GROUP, opusCodec},
+                // new Object[]{Topology.GROUP, pcmaCodec},
+                // new Object[]{Topology.GROUP, pcmuCodec},
+                // new Object[]{Topology.GROUP, g722Codec}
         };
     }
 
     private Object[] parametersForCanPreferVideoCodec() {
         return new Object[]{
-                new Object[]{Topology.P2P, VideoCodec.VP8},
-                new Object[]{Topology.P2P, VideoCodec.H264},
-                new Object[]{Topology.P2P, VideoCodec.VP9}
+                new Object[]{Topology.P2P, vp8Codec},
+                new Object[]{Topology.P2P, h264Codec},
+                new Object[]{Topology.P2P, vp9Codec}
 
                 // TODO: Enable codec preferences tests for group rooms GSDK-1291
-                // new Object[]{Topology.GROUP, VideoCodec.VP8},
-                // new Object[]{Topology.GROUP, VideoCodec.H264},
-                // new Object[]{Topology.GROUP, VideoCodec.VP9}
+                // new Object[]{Topology.GROUP, vp8Codec},
+                // new Object[]{Topology.GROUP, h264Codec},
+                // new Object[]{Topology.GROUP, vp9Codec}
         };
     }
 }

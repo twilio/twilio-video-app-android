@@ -32,7 +32,7 @@ std::shared_ptr<twilio::media::AudioCodec> getAudioCodec(JNIEnv *env, jobject j_
     jclass j_audio_codec_class = webrtc_jni::GetObjectClass(env, j_audio_codec);
     jmethodID j_name_method_id = webrtc_jni::GetMethodID(env,
                                                          j_audio_codec_class,
-                                                         "name",
+                                                         "getName",
                                                          "()Ljava/lang/String;");
     jstring j_audio_codec_name = (jstring) env->CallObjectMethod(j_audio_codec, j_name_method_id);
     CHECK_EXCEPTION(env) << "Failed to get name of audio codec";
@@ -60,7 +60,7 @@ std::shared_ptr<twilio::media::VideoCodec> getVideoCodec(JNIEnv *env, jobject j_
     jclass j_video_codec_class = webrtc_jni::GetObjectClass(env, j_video_codec);
     jmethodID j_name_method_id = webrtc_jni::GetMethodID(env,
                                                          j_video_codec_class,
-                                                         "name",
+                                                         "getName",
                                                          "()Ljava/lang/String;");
     jstring j_video_codec_name = (jstring) env->CallObjectMethod(j_video_codec, j_name_method_id);
     CHECK_EXCEPTION(env) << "Failed to get name of video codec";

@@ -20,12 +20,29 @@ import android.support.annotation.Nullable;
 import android.support.annotation.VisibleForTesting;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Represents options when connecting to a {@link Room}.
  */
 public class ConnectOptions {
+    private static final Set<Class> SUPPORTED_CODECS = new HashSet<Class>(Arrays.asList(
+            // Audio codecs
+            IsacCodec.class,
+            OpusCodec.class,
+            PcmuCodec.class,
+            PcmaCodec.class,
+            G722Codec.class,
+
+            // Video codecs
+            Vp8Codec.class,
+            H264Codec.class,
+            Vp9Codec.class
+    ));
+
     private final String accessToken;
     private final String roomName;
     private final List<LocalAudioTrack> audioTracks;
@@ -39,6 +56,24 @@ public class ConnectOptions {
 
     @VisibleForTesting(otherwise = VisibleForTesting.NONE)
     private final MediaFactory mediaFactory;
+
+    static void checkAudioCodecs(@Nullable List<AudioCodec> audioCodecs) {
+        if (audioCodecs != null) {
+            for (AudioCodec audioCodec : audioCodecs) {
+                Preconditions.checkArgument(SUPPORTED_CODECS.contains(audioCodec.getClass()),
+                        String.format("Unsupported audio codec %s", audioCodec.getName()));
+            }
+        }
+    }
+
+    static void checkVideoCodecs(@Nullable List<VideoCodec> videoCodecs) {
+        if (videoCodecs != null) {
+            for (VideoCodec videoCodec : videoCodecs) {
+                Preconditions.checkArgument(SUPPORTED_CODECS.contains(videoCodec.getClass()),
+                        String.format("Unsupported video codec %s", videoCodec.getName()));
+            }
+        }
+    }
 
     static void checkAudioTracksReleased(@Nullable List<LocalAudioTrack> audioTracks) {
         if (audioTracks != null) {
@@ -267,7 +302,7 @@ public class ConnectOptions {
          * the order found in the list starting with the most preferred audio codec to the
          * least preferred audio codec. Audio codec preferences are not guaranteed to be satisfied
          * because not all participants are guaranteed to support all audio codecs.
-         * {@link AudioCodec#OPUS} is the default audio codec if no preferences are set.
+         * {@link OpusCodec} is the default audio codec if no preferences are set.
          *
          * <p>
          *     The following snippet demonstrates how to prefer a single audio codec.
@@ -275,7 +310,7 @@ public class ConnectOptions {
          *
          * <pre><code>
          *     ConnectOptions connectOptions = new ConnectOptions.Builder(token)
-         *          .preferAudioCodecs(Collections.singletonList(AudioCodec.ISAC))
+         *          .preferAudioCodecs(Collections.<AudioCodec>singletonList(new IsacCodec()))
          *          .build();
          * </code></pre>
          *
@@ -286,8 +321,8 @@ public class ConnectOptions {
          *
          * <pre><code>
          *     ConnectOptions connectOptions = new ConnectOptions.Builder(token)
-         *          .preferAudioCodecs(Arrays.asList(AudioCodec.ISAC,
-         *                  AudioCodec.G722, AudioCodec.OPUS))
+         *          .preferAudioCodecs(Arrays.asList(new IsacCodec(),
+         *                  new G722Codec(), new OpusCodec()))
          *          .build();
          * </code></pre>
          */
@@ -302,7 +337,7 @@ public class ConnectOptions {
          * the order found in the list starting with the most preferred video codec to the
          * least preferred video codec. Video codec preferences are not guaranteed to be satisfied
          * because not all participants are guaranteed to support all video codecs.
-         * {@link VideoCodec#VP8} is the default video codec if no preferences are set.
+         * {@link Vp8Codec} is the default video codec if no preferences are set.
          *
          * <p>
          *     The following snippet demonstrates how to prefer a single video codec.
@@ -310,7 +345,7 @@ public class ConnectOptions {
          *
          * <pre><code>
          *     ConnectOptions connectOptions = new ConnectOptions.Builder(token)
-         *          .preferVideoCodecs(Collections.singletonList(VideoCodec.H264))
+         *          .preferVideoCodecs(Collections.<VideoCodec>singletonList(new H264Codec()))
          *          .build();
          * </code></pre>
          *
@@ -321,8 +356,8 @@ public class ConnectOptions {
          *
          * <pre><code>
          *     ConnectOptions connectOptions = new ConnectOptions.Builder(token)
-         *          .preferVideoCodecs(Arrays.asList(VideoCodec.H264,
-         *                  VideoCodec.VP8, VideoCodec.VP9))
+         *          .preferVideoCodecs(Arrays.asList(new H264Codec(),
+         *                  new Vp8Codec(), new Vp9Codec()))
          *          .build();
          * </code></pre>
          */
@@ -359,6 +394,8 @@ public class ConnectOptions {
 
             checkAudioTracksReleased(audioTracks);
             checkVideoTracksReleased(videoTracks);
+            checkAudioCodecs(preferredAudioCodecs);
+            checkVideoCodecs(preferredVideoCodecs);
 
             return new ConnectOptions(this);
         }

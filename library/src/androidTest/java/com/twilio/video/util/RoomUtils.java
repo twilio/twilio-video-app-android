@@ -18,6 +18,7 @@ package com.twilio.video.util;
 
 import android.support.annotation.Nullable;
 
+import com.twilio.video.AudioCodec;
 import com.twilio.video.VideoCodec;
 import com.twilio.video.test.BuildConfig;
 import com.twilio.video.twilioapi.VideoApiUtils;
@@ -68,13 +69,13 @@ public class RoomUtils {
                 videoCodecStrings);
     }
 
-    private static <T extends Enum> List<String> codecListToStringList(List<T> enumList) {
-        List<String> enumStrings = new ArrayList<>();
+    private static List<String> codecListToStringList(List<VideoCodec> videoCodecs) {
+        List<String> videoCodecStrings = new ArrayList<>();
 
-        for (T e : enumList) {
-            enumStrings.add(e.name());
+        for (VideoCodec videoCodec : videoCodecs) {
+            videoCodecStrings.add(videoCodec.getName());
         }
 
-        return enumStrings;
+        return videoCodecStrings;
     }
 }

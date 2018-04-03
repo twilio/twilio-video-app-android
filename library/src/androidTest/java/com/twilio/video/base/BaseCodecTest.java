@@ -125,13 +125,13 @@ public abstract class BaseCodecTest extends BaseStatsTest {
 
         // Validate codecs
         if (expectedAudioCodec != null) {
-            assertEquals(expectedAudioCodec.name().toLowerCase(), localAudioTrackCodec);
-            assertEquals(expectedAudioCodec.name().toLowerCase(), remoteAudioTrackCodec);
+            assertEquals(expectedAudioCodec.getName().toLowerCase(), localAudioTrackCodec);
+            assertEquals(expectedAudioCodec.getName().toLowerCase(), remoteAudioTrackCodec);
         }
 
         if (expectedVideoCodec != null) {
-            assertEquals(expectedVideoCodec.name().toLowerCase(), localVideoTrackCodec);
-            assertEquals(expectedVideoCodec.name().toLowerCase(), remoteVideoTrackCodec);
+            assertEquals(expectedVideoCodec.getName().toLowerCase(), localVideoTrackCodec);
+            assertEquals(expectedVideoCodec.getName().toLowerCase(), remoteVideoTrackCodec);
         }
     }
 }

@@ -30,8 +30,16 @@ import android.view.MenuItem;
 import com.google.common.base.Function;
 import com.google.common.collect.FluentIterable;
 import com.twilio.video.AudioCodec;
+import com.twilio.video.G722Codec;
+import com.twilio.video.H264Codec;
+import com.twilio.video.IsacCodec;
+import com.twilio.video.OpusCodec;
+import com.twilio.video.PcmaCodec;
+import com.twilio.video.PcmuCodec;
 import com.twilio.video.Video;
 import com.twilio.video.VideoCodec;
+import com.twilio.video.Vp8Codec;
+import com.twilio.video.Vp9Codec;
 import com.twilio.video.app.BuildConfig;
 import com.twilio.video.app.R;
 import com.twilio.video.app.auth.Authenticator;
@@ -44,6 +52,14 @@ import com.twilio.video.app.ui.login.LoginActivity;
 import javax.inject.Inject;
 
 public class SettingsActivity extends BaseActivity {
+    private static final String[] VIDEO_CODEC_NAMES = new String[] {
+            Vp8Codec.NAME, H264Codec.NAME, Vp9Codec.NAME
+    };
+
+    private static final String[] AUDIO_CODEC_NAMES = new String[] {
+            IsacCodec.NAME, OpusCodec.NAME, PcmaCodec.NAME, PcmuCodec.NAME, G722Codec.NAME
+    };
+
     @Inject SharedPreferences sharedPreferences;
     @Inject Authenticator authenticator;
 
@@ -119,12 +135,12 @@ public class SettingsActivity extends BaseActivity {
             // Add our preference from resources
             addPreferencesFromResource(R.xml.preferences);
 
-            setupListPreference(VideoCodec.class,
+            setupCodecListPreference(VideoCodec.class,
                     Preferences.VIDEO_CODEC,
                     Preferences.VIDEO_CODEC_DEFAULT,
                     (ListPreference) findPreference(Preferences.VIDEO_CODEC));
 
-            setupListPreference(AudioCodec.class,
+            setupCodecListPreference(AudioCodec.class,
                     Preferences.AUDIO_CODEC,
                     Preferences.AUDIO_CODEC_DEFAULT,
                     (ListPreference) findPreference(Preferences.AUDIO_CODEC));
@@ -155,32 +171,13 @@ public class SettingsActivity extends BaseActivity {
             }
         }
 
-        /**
-         * Setup {@link ListPreference} from enums.
-         *
-         * @param enumClass    Enum class to obtain entries and entryValues from.
-         * @param key          key to save with in {@link SharedPreferences}.
-         * @param defaultValue default value of preference.
-         * @param preference   instance of {@link ListPreference} to enum item to.
-         * @param <T>          enum type.
-         */
-        private <T extends Enum<T>> void setupListPreference(Class<T> enumClass,
-                                                             String key,
-                                                             String defaultValue,
-                                                             ListPreference preference) {
-
-            // collection of all available values
-            final String[] codecEntries = FluentIterable
-                    .of(enumClass.getEnumConstants())
-                    .transform(new Function<T, String>() {
-                        @javax.annotation.Nullable
-                        @Override
-                        public String apply(@javax.annotation.Nullable T input) {
-                            return input != null ? input.toString() : "null";
-                        }
-                    })
-                    .toArray(String.class);
-
+        private void setupCodecListPreference(Class codecClass,
+                                              String key,
+                                              String defaultValue,
+                                              ListPreference preference) {
+            String[] codecEntries = (codecClass == AudioCodec.class) ?
+                    AUDIO_CODEC_NAMES :
+                    VIDEO_CODEC_NAMES;
             // saved value
             final String value = sharedPreferences.getString(key, defaultValue);
 

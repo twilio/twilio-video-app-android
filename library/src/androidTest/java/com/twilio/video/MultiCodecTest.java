@@ -48,6 +48,8 @@ import static org.junit.Assume.assumeTrue;
 @RunWith(JUnitParamsRunner.class)
 @LargeTest
 public class MultiCodecTest extends BaseCodecTest {
+    private final Vp8Codec vp8Codec = new Vp8Codec();
+    private final H264Codec h264Codec = new H264Codec();
 
     @Before
     public void setup() throws InterruptedException {
@@ -62,7 +64,7 @@ public class MultiCodecTest extends BaseCodecTest {
     @Test
     public void shouldFailToSubscribeToVideoTrack() throws InterruptedException {
         // Select H264 for room
-        baseSetup(Topology.GROUP, Collections.singletonList(VideoCodec.H264));
+        baseSetup(Topology.GROUP, Collections.<VideoCodec>singletonList(h264Codec));
 
         // Ensure that device does support H264
         assumeTrue(MediaCodecVideoEncoder.isH264HwSupported());
@@ -73,7 +75,7 @@ public class MultiCodecTest extends BaseCodecTest {
                 new FakeVideoCapturer());
         ConnectOptions aliceConnectOptions = new ConnectOptions.Builder(aliceToken)
                 .roomName(roomName)
-                .preferVideoCodecs(Collections.singletonList(VideoCodec.H264))
+                .preferVideoCodecs(Collections.<VideoCodec>singletonList(h264Codec))
                 .build();
         aliceRoom = createRoom(aliceListener, aliceConnectOptions);
         aliceListener.onParticipantConnectedLatch = new CountDownLatch(1);
@@ -129,7 +131,7 @@ public class MultiCodecTest extends BaseCodecTest {
     @Test
     public void publishTrack_shouldFailWithUnsupportedVideoCodec() throws InterruptedException {
         // Select H264 for room
-        baseSetup(Topology.GROUP, Collections.singletonList(VideoCodec.H264));
+        baseSetup(Topology.GROUP, Collections.<VideoCodec>singletonList(h264Codec));
 
         // Ensure that device does not support H264
         assumeFalse(MediaCodecVideoEncoder.isH264HwSupported());
@@ -140,7 +142,7 @@ public class MultiCodecTest extends BaseCodecTest {
                 new FakeVideoCapturer());
         ConnectOptions aliceConnectOptions = new ConnectOptions.Builder(aliceToken)
                 .roomName(roomName)
-                .preferVideoCodecs(Collections.singletonList(VideoCodec.VP8))
+                .preferVideoCodecs(Collections.<VideoCodec>singletonList(vp8Codec))
                 .build();
         aliceRoom = createRoom(aliceListener, aliceConnectOptions);
         aliceListener.onParticipantConnectedLatch = new CountDownLatch(1);
@@ -170,7 +172,7 @@ public class MultiCodecTest extends BaseCodecTest {
     @Test
     public void shouldFailToPublishTrackWithUnsupportedVideoCodec() throws InterruptedException {
         // Select H264 for room
-        baseSetup(Topology.GROUP, Collections.singletonList(VideoCodec.H264));
+        baseSetup(Topology.GROUP, Collections.<VideoCodec>singletonList(h264Codec));
 
         // Ensure that device does not support H264
         assumeFalse(MediaCodecVideoEncoder.isH264HwSupported());
@@ -181,7 +183,7 @@ public class MultiCodecTest extends BaseCodecTest {
                 new FakeVideoCapturer());
         ConnectOptions aliceConnectOptions = new ConnectOptions.Builder(aliceToken)
                 .roomName(roomName)
-                .preferVideoCodecs(Collections.singletonList(VideoCodec.VP8))
+                .preferVideoCodecs(Collections.<VideoCodec>singletonList(vp8Codec))
                 .videoTracks(Collections.singletonList(aliceLocalVideoTrack))
                 .build();
         aliceRoom = createRoom(aliceListener, aliceConnectOptions);
@@ -217,7 +219,7 @@ public class MultiCodecTest extends BaseCodecTest {
     @Test
     public void canUnpublishTrackWhichFailedToPublish() throws InterruptedException {
         // Select H264 for room
-        baseSetup(Topology.GROUP, Collections.singletonList(VideoCodec.H264));
+        baseSetup(Topology.GROUP, Collections.<VideoCodec>singletonList(h264Codec));
 
         // Ensure that device does not support H264
         assumeFalse(MediaCodecVideoEncoder.isH264HwSupported());
@@ -228,7 +230,7 @@ public class MultiCodecTest extends BaseCodecTest {
                 new FakeVideoCapturer());
         ConnectOptions aliceConnectOptions = new ConnectOptions.Builder(aliceToken)
                 .roomName(roomName)
-                .preferVideoCodecs(Collections.singletonList(VideoCodec.VP8))
+                .preferVideoCodecs(Collections.<VideoCodec>singletonList(vp8Codec))
                 .videoTracks(Collections.singletonList(aliceLocalVideoTrack))
                 .build();
         aliceRoom = createRoom(aliceListener, aliceConnectOptions);
@@ -272,7 +274,7 @@ public class MultiCodecTest extends BaseCodecTest {
         baseSetup(Topology.GROUP, selectedVideoCodecs);
 
         // Validate device supported H264
-        if (expectedCodec == VideoCodec.H264) {
+        if (expectedCodec instanceof H264Codec) {
             assumeTrue(MediaCodecVideoEncoder.isH264HwSupported());
             assumeTrue(MediaCodecVideoDecoder.isH264HwSupported());
         }
@@ -306,7 +308,7 @@ public class MultiCodecTest extends BaseCodecTest {
                                                             List<VideoCodec> selectedVideoCodecs,
                                                             VideoCodec expectedCodec) throws InterruptedException {
         baseSetup(Topology.GROUP, selectedVideoCodecs);
-        if (expectedCodec == VideoCodec.H264) {
+        if (expectedCodec instanceof H264Codec) {
             assumeTrue(MediaCodecVideoEncoder.isH264HwSupported());
             assumeTrue(MediaCodecVideoDecoder.isH264HwSupported());
         }
@@ -349,30 +351,30 @@ public class MultiCodecTest extends BaseCodecTest {
 
     private Object[] supportedVideoCodecs() {
         return new Object[]{
-                new Object[]{Collections.singletonList(VideoCodec.VP8),
-                        Collections.singletonList(VideoCodec.VP8),
-                        VideoCodec.VP8},
-                new Object[]{Collections.singletonList(VideoCodec.VP8),
-                        Arrays.asList(VideoCodec.VP8, VideoCodec.H264),
-                        VideoCodec.VP8},
-                new Object[]{Arrays.asList(VideoCodec.VP8, VideoCodec.H264),
-                        Collections.singletonList(VideoCodec.VP8),
-                        VideoCodec.VP8},
-                new Object[]{Arrays.asList(VideoCodec.VP8, VideoCodec.H264),
-                        Collections.singletonList(VideoCodec.H264),
-                        VideoCodec.H264},
-                new Object[]{Arrays.asList(VideoCodec.VP8, VideoCodec.H264),
-                        Arrays.asList(VideoCodec.VP8, VideoCodec.H264),
-                        VideoCodec.VP8},
-                new Object[]{Arrays.asList(VideoCodec.H264, VideoCodec.VP8),
-                        Collections.singletonList(VideoCodec.VP8),
-                        VideoCodec.VP8},
-                new Object[]{Arrays.asList(VideoCodec.H264, VideoCodec.VP8),
-                        Collections.singletonList(VideoCodec.H264),
-                        VideoCodec.H264},
-                new Object[]{Arrays.asList(VideoCodec.H264, VideoCodec.VP8),
-                        Arrays.asList(VideoCodec.VP8, VideoCodec.H264),
-                        VideoCodec.H264}
+                new Object[]{Collections.singletonList(vp8Codec),
+                        Collections.singletonList(vp8Codec),
+                        vp8Codec},
+                new Object[]{Collections.singletonList(vp8Codec),
+                        Arrays.asList(vp8Codec, h264Codec),
+                        vp8Codec},
+                new Object[]{Arrays.asList(vp8Codec, h264Codec),
+                        Collections.singletonList(vp8Codec),
+                        vp8Codec},
+                new Object[]{Arrays.asList(vp8Codec, h264Codec),
+                        Collections.singletonList(h264Codec),
+                        h264Codec},
+                new Object[]{Arrays.asList(vp8Codec, h264Codec),
+                        Arrays.asList(vp8Codec, h264Codec),
+                        vp8Codec},
+                new Object[]{Arrays.asList(h264Codec, vp8Codec),
+                        Collections.singletonList(vp8Codec),
+                        vp8Codec},
+                new Object[]{Arrays.asList(h264Codec, vp8Codec),
+                        Collections.singletonList(h264Codec),
+                        h264Codec},
+                new Object[]{Arrays.asList(h264Codec, vp8Codec),
+                        Arrays.asList(vp8Codec, h264Codec),
+                        h264Codec}
         };
     }
 }

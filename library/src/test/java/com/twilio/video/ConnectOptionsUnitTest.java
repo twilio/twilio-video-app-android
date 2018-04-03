@@ -69,7 +69,7 @@ public class ConnectOptionsUnitTest {
     }
 
     @Test(expected = IllegalStateException.class)
-    public void shouldNotAllowReleasedLocalAudioTrack() throws InterruptedException {
+    public void shouldNotAllowReleasedLocalAudioTrack() {
         when(localAudioTrack.isReleased())
                 .thenReturn(true);
         new ConnectOptions.Builder("token")
@@ -79,12 +79,30 @@ public class ConnectOptionsUnitTest {
     }
 
     @Test(expected = IllegalStateException.class)
-    public void shouldNotAllowReleasedLocalVideoTrack() throws InterruptedException {
+    public void shouldNotAllowReleasedLocalVideoTrack() {
         when(localVideoTrack.isReleased())
                 .thenReturn(true);
         new ConnectOptions.Builder("token")
                 .roomName("room name")
                 .videoTracks(Collections.singletonList(localVideoTrack))
+                .build();
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void shouldNotAllowCustomAudioCodec() {
+        AudioCodec customAudioCodec = new AudioCodec("custom audio codec") {};
+
+        new ConnectOptions.Builder("token")
+                .preferAudioCodecs(Collections.singletonList(customAudioCodec))
+                .build();
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void shouldNotAllowCustomVideoCodec() {
+        VideoCodec customVideoCodec = new VideoCodec("custom video codec") {};
+
+        new ConnectOptions.Builder("token")
+                .preferVideoCodecs(Collections.singletonList(customVideoCodec))
                 .build();
     }
 
