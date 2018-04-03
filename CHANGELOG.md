@@ -9,6 +9,19 @@ track stats in a `StatsReport`.
 - Removed `getTrackId` from `LocalAudioTrack`, `LocalVideoTrack`, and `LocalDataTrack`.
 - Added `getSid` to `RemoteAudioTrack`, `RemoteVideoTrack`, and `RemoteDataTrack`.
 - Updated Android Gradle Plugin version to `3.1.0` and Gradle version to `4.4`.
+- SDK now defers to WebRTC to validate ice servers and returns an error when a connection attempt
+ fails due to invalid servers.
+- Reduced the time needed to shutdown the signaling stack while disconnecting from a Room.
+- Increased the signaling disconnect timeout interval to 1 second.
+- Enable monotonic clock support in the signaling client.
+- Initial connect message now includes client version metadata.
+
+Bug Fixes
+
+- Fixed a bug where the SDK hangs if DNS resolution fails and the user does not initiate disconnect.
+- Resolved an issue with clock rollover in the Room signaling layer that resulted in high CPU usage
+ and disconnects.
+- The signaling client no longer logs access tokens.
 
 Known issues
 
