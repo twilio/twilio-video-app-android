@@ -18,8 +18,8 @@ package com.twilio.video.util;
 
 import android.support.annotation.Nullable;
 
-import com.twilio.video.AudioCodec;
 import com.twilio.video.VideoCodec;
+import com.twilio.video.Room;
 import com.twilio.video.test.BuildConfig;
 import com.twilio.video.twilioapi.VideoApiUtils;
 import com.twilio.video.twilioapi.model.VideoRoom;
@@ -77,5 +77,17 @@ public class RoomUtils {
         }
 
         return videoCodecStrings;
+    }
+
+    public static VideoRoom completeRoom(Room room) {
+        Preconditions.checkNotNull(BuildConfig.twilioCredentials,
+                CredentialsUtils.TWILIO_VIDEO_JSON_NOT_PROVIDED);
+        Map<String, String> credentials = CredentialsUtils.resolveCredentials(
+                Environment.fromString(BuildConfig.ENVIRONMENT));
+
+        return VideoApiUtils.completeRoom(credentials.get(CredentialsUtils.API_KEY),
+                credentials.get(CredentialsUtils.API_KEY_SECRET),
+                room.getSid(),
+                BuildConfig.ENVIRONMENT);
     }
 }
