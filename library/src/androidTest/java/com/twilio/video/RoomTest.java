@@ -23,6 +23,7 @@ import android.support.test.runner.AndroidJUnit4;
 
 import com.twilio.video.base.BaseClientTest;
 import com.twilio.video.helper.CallbackHelper;
+import com.twilio.video.twilioapi.model.VideoRoom;
 import com.twilio.video.util.Constants;
 import com.twilio.video.util.CredentialsUtils;
 import com.twilio.video.util.RoomUtils;
@@ -38,6 +39,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 import static org.apache.commons.lang3.RandomStringUtils.random;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
@@ -96,6 +98,29 @@ public class RoomTest extends BaseClientTest {
                 // Do nothing
             }
         });
+        assertTrue(roomListener.onDisconnectedLatch.await(20, TimeUnit.SECONDS));
+    }
+
+    @Test
+    public void shouldReceiveDisconnectedCallbackWhenCompleted() throws InterruptedException {
+        CallbackHelper.FakeRoomListener roomListener = new CallbackHelper.FakeRoomListener();
+        roomListener.onConnectedLatch = new CountDownLatch(1);
+        roomListener.onDisconnectedLatch = new CountDownLatch(1);
+
+        // Connect to room
+        ConnectOptions connectOptions = new ConnectOptions.Builder(token)
+                .roomName(roomName)
+                .build();
+        Room room = Video.connect(context, connectOptions, roomListener);
+        assertTrue(roomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
+
+        // Complete room via REST API
+        VideoRoom videoRoom = RoomUtils.completeRoom(room);
+
+        // Validate status is completed
+        assertEquals("completed", videoRoom.getStatus());
+
+        // Validate disconnected callback is received
         assertTrue(roomListener.onDisconnectedLatch.await(20, TimeUnit.SECONDS));
     }
 }
