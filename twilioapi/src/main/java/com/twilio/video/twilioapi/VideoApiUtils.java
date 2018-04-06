@@ -77,6 +77,12 @@ public class VideoApiUtils {
         @GET("/v1/Rooms/{unique_name}")
         VideoRoom getRoom(@Header("Authorization") String authorization,
                           @Path("unique_name") String name);
+
+        @POST("/v1/Rooms/{room_sid}")
+        @FormUrlEncoded
+        VideoRoom modifyRoom(@Header("Authorization") String authorization,
+                             @Path("room_sid") String roomSid,
+                             @Field("Status") String status);
     }
 
     private static VideoApiUtils.VideoApiService videoApiService = createVideoApiService();
@@ -214,5 +220,28 @@ public class VideoApiUtils {
                         enableRecording == videoRoom.isRecordParticipantOnConnect());
 
         return videoRoom;
+    }
+
+    public static VideoRoom completeRoom(String signingKeySid,
+                                         String signingKeySecret,
+                                         String roomSid,
+                                         String environment) {
+        if (!environment.equalsIgnoreCase(PROD) &&
+                !environment.equalsIgnoreCase(STAGE) &&
+                !environment.equalsIgnoreCase(DEV)){
+            throw new IllegalArgumentException("Invalid Environment!");
+        }
+        if (!currentEnvironment.equalsIgnoreCase(environment)) {
+            currentEnvironment = environment;
+            videoApiService = createVideoApiService();
+        }
+
+        String authString = signingKeySid + ":" + signingKeySecret;
+        String authorization = "Basic " + Base64.encodeToString(authString.getBytes(),
+                Base64.NO_WRAP);
+
+        return  videoApiService.modifyRoom(authorization,
+                roomSid,
+                "completed");
     }
 }
