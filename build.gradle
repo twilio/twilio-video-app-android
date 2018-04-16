@@ -146,11 +146,7 @@ task incrementRc {
     dependsOn 'validateReleaseCandidateTag'
 
     doLast {
-        /*
-         * Travis CI is in detached head when this task executes. Use the current version to
-         * determine what branch to increment the RC on.
-         */
-        def gitBranch = (versionMajor == 1) ? ("master") : ("2.0")
+        def gitBranch = "master"
         def travisTag = System.getenv("TRAVIS_TAG")
         def githubToken = System.getenv("GITHUB_TOKEN")
         def repoSlug = System.getenv("TRAVIS_REPO_SLUG")
@@ -224,11 +220,7 @@ task incrementVersionAfterRelease {
     group = 'Git'
 
     doLast {
-        /*
-         * Travis CI is in detached head when this task executes. Use the current version to
-         * determine what branch to increment the version on.
-         */
-        def gitBranch = (versionMajor == 1) ? ("master") : ("2.0")
+        def gitBranch = "master"
         def travisTag = System.getenv("TRAVIS_TAG")
         def githubToken = System.getenv("GITHUB_TOKEN")
         def repoSlug = System.getenv("TRAVIS_REPO_SLUG")
@@ -338,11 +330,7 @@ task incrementVersionAfterPreRelease {
     group = 'Git'
 
     doLast {
-        /*
-         * Travis CI is in detached head when this task executes. Use the current version to
-         * determine what branch to increment the version on.
-         */
-        def gitBranch = (versionMajor == 1) ? ("master") : ("2.0")
+        def gitBranch = "master"
         def travisTag = System.getenv("TRAVIS_TAG")
         def githubToken = System.getenv("GITHUB_TOKEN")
         def repoSlug = System.getenv("TRAVIS_REPO_SLUG")
