@@ -237,7 +237,7 @@ architectures in one APK.
 
 
 ### Calculate the Size Report of a Specific Version
-`./gradlew -PapkScaleVideoAndroidVersion=2.0.0-beta2 librarySizeReport`
+`./gradlew -PapkScaleVideoAndroidVersion=2.0.0 librarySizeReport`
 
 ## Code of Conduct
 
