@@ -1,7 +1,7 @@
 The Twilio Programmable Video SDKs use [Semantic Versioning](http://www.semver.org).
 
 ####2.0.0
-We've promoted 2.0.0-beta5 to 2.0.0 as our first General Availability release.
+We've promoted `2.0.0-beta5` to `2.0.0` as our first General Availability release.
 
 Known issues
 
