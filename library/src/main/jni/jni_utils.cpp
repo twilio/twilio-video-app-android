@@ -45,8 +45,8 @@ jstring JavaUTF16StringFromStdString(JNIEnv* jni, std::string const& string) {
 }
 
 JNIEXPORT jstring JNICALL Java_com_twilio_video_JniUtils_nativeJavaUtf16StringToStdString(JNIEnv *env,
-                                                                                          jobject instance,
-                                                                                          jstring j_input_string) {
+                                                                                         jobject instance,
+                                                                                         jstring j_input_string) {
     std::string input_string = JavaToUTF8StdString(env, j_input_string);
 
     return JavaUTF16StringFromStdString(env, input_string);

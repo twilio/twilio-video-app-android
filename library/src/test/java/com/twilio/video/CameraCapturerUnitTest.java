@@ -85,6 +85,7 @@ public class CameraCapturerUnitTest {
         cameraCapturer.getSupportedFormats();
     }
 
+    @Test
     public void switchCamera_shouldReturnEarlyIfCameraSourceNotSupported() {
         when(formatProvider.getCameraId(CameraCapturer.CameraSource.FRONT_CAMERA))
                 .thenReturn(0);

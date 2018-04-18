@@ -22,6 +22,7 @@
 #include "video/stats_observer.h"
 #include "video/stats_report.h"
 #include "class_reference_holder.h"
+#include "logging.h"
 #include "jni_utils.h"
 
 #include <memory>
@@ -41,10 +42,10 @@ public:
                                                                               "com/twilio/video/LocalAudioTrackStats")),
             j_local_video_track_stats_class_(env, twilio_video_jni::FindClass(env,
                                                                               "com/twilio/video/LocalVideoTrackStats")),
-            j_audio_track_stats_class_(env, twilio_video_jni::FindClass(env,
-                                                                        "com/twilio/video/AudioTrackStats")),
-            j_video_track_stats_class_(env, twilio_video_jni::FindClass(env,
-                                                                        "com/twilio/video/VideoTrackStats")),
+            j_remote_audio_track_stats_class_(env, twilio_video_jni::FindClass(env,
+                                                                        "com/twilio/video/RemoteAudioTrackStats")),
+            j_remote_video_track_stats_class_(env, twilio_video_jni::FindClass(env,
+                                                                        "com/twilio/video/RemoteVideoTrackStats")),
             j_video_dimensions_class_(env, twilio_video_jni::FindClass(env,
                                                                        "com/twilio/video/VideoDimensions")),
             j_on_stats_id_(
@@ -81,12 +82,12 @@ public:
                     webrtc_jni::GetMethodID(env,
                                             *j_stats_report_class_,
                                             "addAudioTrackStats",
-                                            "(Lcom/twilio/video/AudioTrackStats;)V")),
+                                            "(Lcom/twilio/video/RemoteAudioTrackStats;)V")),
             j_stats_report_add_video_id_(
                     webrtc_jni::GetMethodID(env,
                                             *j_stats_report_class_,
                                             "addVideoTrackStats",
-                                            "(Lcom/twilio/video/VideoTrackStats;)V")),
+                                            "(Lcom/twilio/video/RemoteVideoTrackStats;)V")),
             j_local_audio_track_stats_ctor_id_(
                     webrtc_jni::GetMethodID(env,
                                             *j_local_audio_track_stats_class_,
@@ -99,12 +100,12 @@ public:
                                             "(Ljava/lang/String;ILjava/lang/String;Ljava/lang/String;DJIJLcom/twilio/video/VideoDimensions;Lcom/twilio/video/VideoDimensions;II)V")),
             j_audio_track_stats_ctor_id_(
                     webrtc_jni::GetMethodID(env,
-                                            *j_audio_track_stats_class_,
+                                            *j_remote_audio_track_stats_class_,
                                             "<init>",
                                             "(Ljava/lang/String;ILjava/lang/String;Ljava/lang/String;DJIII)V")),
             j_video_track_stats_ctor_id_(
                     webrtc_jni::GetMethodID(env,
-                                            *j_video_track_stats_class_,
+                                            *j_remote_video_track_stats_class_,
                                             "<init>",
                                             "(Ljava/lang/String;ILjava/lang/String;Ljava/lang/String;DJILcom/twilio/video/VideoDimensions;I)V")),
             j_video_dimensions_ctor_id_(
@@ -115,17 +116,17 @@ public:
     }
 
     virtual ~AndroidStatsObserver() {
-        TS_CORE_LOG_MODULE(twilio::video::kTSCoreLogModulePlatform,
-                           twilio::video::kTSCoreLogLevelDebug,
-                           "~AndroidStatsObserver");
+        VIDEO_ANDROID_LOG(twilio::video::LogModule::kPlatform,
+                          twilio::video::LogLevel::kDebug,
+                          "~AndroidStatsObserver");
     }
 
     void setObserverDeleted() {
         rtc::CritScope cs(&deletion_lock_);
         observer_deleted_ = true;
-        TS_CORE_LOG_MODULE(twilio::video::kTSCoreLogModulePlatform,
-                           twilio::video::kTSCoreLogLevelDebug,
-                           "android stats observer deleted");
+        VIDEO_ANDROID_LOG(twilio::video::LogModule::kPlatform,
+                          twilio::video::LogLevel::kDebug,
+                          "android stats observer deleted");
     }
 
 protected:
@@ -133,9 +134,9 @@ protected:
             const std::vector<twilio::video::StatsReport> &stats_reports) {
         webrtc_jni::ScopedLocalRefFrame local_ref_frame(jni());
         std::string func_name = std::string(__FUNCTION__);
-        TS_CORE_LOG_MODULE(twilio::video::kTSCoreLogModulePlatform,
-                           twilio::video::kTSCoreLogLevelDebug,
-                           "%s", func_name.c_str());
+        VIDEO_ANDROID_LOG(twilio::video::LogModule::kPlatform,
+                          twilio::video::LogLevel::kDebug,
+                          "%s", func_name.c_str());
 
         {
             rtc::CritScope cs(&deletion_lock_);
@@ -146,8 +147,8 @@ protected:
             jobject j_stats_reports = jni()->NewObject(*j_array_list_class_, j_array_list_ctor_id_);
             for (auto const &stats_report : stats_reports) {
                 webrtc_jni::ScopedLocalRefFrame stats_iteration_ref_frame(jni());
-                jstring j_peerconnection_id =
-                        JavaUTF16StringFromStdString(jni(), stats_report.peer_connection_id);
+                jstring j_peerconnection_id = JavaUTF16StringFromStdString(jni(),
+                                                                           stats_report.peer_connection_id);
                 jobject j_stats_report = jni()->NewObject(*j_stats_report_class_,
                                                           j_stats_report_ctor_id_,
                                                           j_peerconnection_id);
@@ -155,8 +156,8 @@ protected:
                                             stats_report.local_audio_track_stats);
                 processLocalVideoTrackStats(j_stats_report,
                                             stats_report.local_video_track_stats);
-                processAudioTrackStats(j_stats_report, stats_report.audio_track_stats);
-                processVideoTrackStats(j_stats_report, stats_report.video_track_stats);
+                processRemoteAudioTrackStats(j_stats_report, stats_report.remote_audio_track_stats);
+                processRemoteVideoTrackStats(j_stats_report, stats_report.remote_video_track_stats);
 
                 jni()->CallBooleanMethod(j_stats_reports, j_array_list_add_, j_stats_report);
             }
@@ -172,17 +173,17 @@ private:
 
     bool isObserverValid(const std::string &callbackName) {
         if (observer_deleted_) {
-            TS_CORE_LOG_MODULE(twilio::video::kTSCoreLogModulePlatform,
-                               twilio::video::kTSCoreLogLevelWarning,
-                               "android stats observer is marked for deletion, skipping %s callback",
-                               callbackName.c_str());
+            VIDEO_ANDROID_LOG(twilio::video::LogModule::kPlatform,
+                              twilio::video::LogLevel::kWarning,
+                              "android stats observer is marked for deletion, skipping %s callback",
+                              callbackName.c_str());
             return false;
         };
         if (webrtc_jni::IsNull(jni(), *j_stats_observer_)) {
-            TS_CORE_LOG_MODULE(twilio::video::kTSCoreLogModulePlatform,
-                               twilio::video::kTSCoreLogLevelWarning,
-                               "android stats observer reference has been destroyed, skipping %s callback",
-                               callbackName.c_str());
+            VIDEO_ANDROID_LOG(twilio::video::LogModule::kPlatform,
+                              twilio::video::LogLevel::kWarning,
+                              "android stats observer reference has been destroyed, skipping %s callback",
+                              callbackName.c_str());
             return false;
         }
         return true;
@@ -192,8 +193,8 @@ private:
                                      const std::vector<twilio::media::LocalAudioTrackStats> &local_audio_tracks_stats) {
         for (auto const &track_stats : local_audio_tracks_stats) {
             webrtc_jni::ScopedLocalRefFrame local_ref_frame(jni());
-            jstring j_track_id =
-                    JavaUTF16StringFromStdString(jni(), track_stats.track_id);
+            jstring j_track_sid =
+                    JavaUTF16StringFromStdString(jni(), track_stats.track_sid);
             jstring j_codec =
                     JavaUTF16StringFromStdString(jni(), track_stats.codec);
             jstring j_ssrc =
@@ -201,7 +202,7 @@ private:
             jobject j_local_audio_track_stats =
                     jni()->NewObject(*j_local_audio_track_stats_class_,
                                      j_local_audio_track_stats_ctor_id_,
-                                     j_track_id,
+                                     j_track_sid,
                                      track_stats.packets_lost,
                                      j_codec,
                                      j_ssrc,
@@ -221,8 +222,8 @@ private:
                                      const std::vector<twilio::media::LocalVideoTrackStats> &local_video_tracks_stats) {
         for (auto const &track_stats : local_video_tracks_stats) {
             webrtc_jni::ScopedLocalRefFrame local_ref_frame(jni());
-            jstring j_track_id =
-                    JavaUTF16StringFromStdString(jni(), track_stats.track_id);
+            jstring j_track_sid =
+                    JavaUTF16StringFromStdString(jni(), track_stats.track_sid);
             jstring j_codec =
                     JavaUTF16StringFromStdString(jni(), track_stats.codec);
             jstring j_ssrc =
@@ -240,7 +241,7 @@ private:
             jobject j_local_video_track_stats =
                     jni()->NewObject(*j_local_video_track_stats_class_,
                                      j_local_video_track_stats_ctor_id_,
-                                     j_track_id,
+                                     j_track_sid,
                                      track_stats.packets_lost,
                                      j_codec,
                                      j_ssrc,
@@ -258,20 +259,20 @@ private:
         }
     }
 
-    void processAudioTrackStats(jobject j_stats_report,
-                                const std::vector<twilio::media::AudioTrackStats> &audio_tracks_stats) {
+    void processRemoteAudioTrackStats(jobject j_stats_report,
+                                      const std::vector<twilio::media::RemoteAudioTrackStats> &audio_tracks_stats) {
         for (auto const &track_stats : audio_tracks_stats) {
             webrtc_jni::ScopedLocalRefFrame local_ref_frame(jni());
-            jstring j_track_id =
-                    JavaUTF16StringFromStdString(jni(), track_stats.track_id);
+            jstring j_track_sid =
+                    JavaUTF16StringFromStdString(jni(), track_stats.track_sid);
             jstring j_codec_name =
                     JavaUTF16StringFromStdString(jni(), track_stats.codec);
             jstring j_ssrc =
                     JavaUTF16StringFromStdString(jni(), track_stats.ssrc);
             jobject j_audio_track_stats =
-                    jni()->NewObject(*j_audio_track_stats_class_,
+                    jni()->NewObject(*j_remote_audio_track_stats_class_,
                                      j_audio_track_stats_ctor_id_,
-                                     j_track_id,
+                                     j_track_sid,
                                      track_stats.packets_lost,
                                      j_codec_name,
                                      j_ssrc,
@@ -286,12 +287,12 @@ private:
         }
     }
 
-    void processVideoTrackStats(jobject j_stats_report,
-                                const std::vector<twilio::media::VideoTrackStats> &video_tracks_stats) {
+    void processRemoteVideoTrackStats(jobject j_stats_report,
+                                      const std::vector<twilio::media::RemoteVideoTrackStats> &video_tracks_stats) {
         for (auto const &track_stats : video_tracks_stats) {
             webrtc_jni::ScopedLocalRefFrame local_ref_frame(jni());
-            jstring j_track_id =
-                    JavaUTF16StringFromStdString(jni(), track_stats.track_id);
+            jstring j_track_sid =
+                    JavaUTF16StringFromStdString(jni(), track_stats.track_sid);
             jstring j_codec_name =
                     JavaUTF16StringFromStdString(jni(), track_stats.codec);
             jstring j_ssrc =
@@ -302,9 +303,9 @@ private:
                                      track_stats.dimensions.width,
                                      track_stats.dimensions.height);
             jobject j_video_track_stats =
-                    jni()->NewObject(*j_video_track_stats_class_,
+                    jni()->NewObject(*j_remote_video_track_stats_class_,
                                      j_video_track_stats_ctor_id_,
-                                     j_track_id,
+                                     j_track_sid,
                                      track_stats.packets_lost,
                                      j_codec_name,
                                      j_ssrc,
@@ -322,15 +323,15 @@ private:
     bool observer_deleted_ = false;
     mutable rtc::CriticalSection deletion_lock_;
 
-    const webrtc_jni::ScopedGlobalRef <jobject> j_stats_observer_;
-    const webrtc_jni::ScopedGlobalRef <jclass> j_stats_observer_class_;
-    const webrtc_jni::ScopedGlobalRef <jclass> j_array_list_class_;
-    const webrtc_jni::ScopedGlobalRef <jclass> j_stats_report_class_;
-    const webrtc_jni::ScopedGlobalRef <jclass> j_local_audio_track_stats_class_;
-    const webrtc_jni::ScopedGlobalRef <jclass> j_local_video_track_stats_class_;
-    const webrtc_jni::ScopedGlobalRef <jclass> j_audio_track_stats_class_;
-    const webrtc_jni::ScopedGlobalRef <jclass> j_video_track_stats_class_;
-    const webrtc_jni::ScopedGlobalRef <jclass> j_video_dimensions_class_;
+    const webrtc_jni::ScopedGlobalRef<jobject> j_stats_observer_;
+    const webrtc_jni::ScopedGlobalRef<jclass> j_stats_observer_class_;
+    const webrtc_jni::ScopedGlobalRef<jclass> j_array_list_class_;
+    const webrtc_jni::ScopedGlobalRef<jclass> j_stats_report_class_;
+    const webrtc_jni::ScopedGlobalRef<jclass> j_local_audio_track_stats_class_;
+    const webrtc_jni::ScopedGlobalRef<jclass> j_local_video_track_stats_class_;
+    const webrtc_jni::ScopedGlobalRef<jclass> j_remote_audio_track_stats_class_;
+    const webrtc_jni::ScopedGlobalRef<jclass> j_remote_video_track_stats_class_;
+    const webrtc_jni::ScopedGlobalRef<jclass> j_video_dimensions_class_;
     jmethodID j_on_stats_id_;
     jmethodID j_array_list_ctor_id_;
     jmethodID j_array_list_add_;

@@ -18,6 +18,7 @@
 #include "android_stats_observer.h"
 #include "com_twilio_video_ConnectOptions.h"
 #include "com_twilio_video_MediaFactory.h"
+#include "logging.h"
 
 namespace twilio_video_jni {
 
@@ -28,11 +29,13 @@ RoomDelegate::RoomDelegate(JNIEnv *env,
                            jlong j_media_factory_handle,
                            jobject j_room,
                            jobject j_room_observer,
-                           jobject j_stats_observer) :
+                           jobject j_stats_observer,
+                           jobject j_handler) :
         j_connect_options_(env, j_connect_options),
         j_room_(env, j_room),
         j_room_observer_(env, j_room_observer),
         j_stats_observer_(env, j_stats_observer),
+        j_handler_(env, j_handler),
         notifier_thread_(rtc::Thread::Create()) {
     notifier_thread_->SetName(kRoomNotifierThreadName, nullptr);
     notifier_thread_->Start();
@@ -42,9 +45,9 @@ RoomDelegate::RoomDelegate(JNIEnv *env,
 }
 
 RoomDelegate::~RoomDelegate() {
-    TS_CORE_LOG_MODULE(twilio::video::kTSCoreLogModulePlatform,
-                       twilio::video::kTSCoreLogLevelDebug,
-                       "~RoomDelegate");
+    VIDEO_ANDROID_LOG(twilio::video::LogModule::kPlatform,
+                      twilio::video::LogLevel::kDebug,
+                      "~RoomDelegate");
     notifier_thread_->Stop();
 
     // Validate that room memory has been released
@@ -83,18 +86,18 @@ void RoomDelegate::disconnect() {
 void RoomDelegate::release() {
     RTC_CHECK(rtc::Thread::Current() == notifier_thread_.get()) << "release not called on "
             "notifier thread";
-    TS_CORE_LOG_MODULE(twilio::video::kTSCoreLogModulePlatform,
-                       twilio::video::kTSCoreLogLevelDebug,
-                       "release")
+    VIDEO_ANDROID_LOG(twilio::video::LogModule::kPlatform,
+                      twilio::video::LogLevel::kDebug,
+                      "release")
     room_.reset();
     stats_observer_.reset();
     android_room_observer_.reset();
 }
 
 void RoomDelegate::OnMessage(rtc::Message *msg) {
-    TS_CORE_LOG_MODULE(twilio::video::kTSCoreLogModulePlatform,
-                       twilio::video::kTSCoreLogLevelDebug,
-                       "onMessage");
+    VIDEO_ANDROID_LOG(twilio::video::LogModule::kPlatform,
+                      twilio::video::LogLevel::kDebug,
+                      "onMessage");
     switch (msg->message_id) {
         case kMessageTypeConnect: {
             connectOnNotifier();
@@ -125,13 +128,17 @@ void RoomDelegate::OnMessage(rtc::Message *msg) {
 void RoomDelegate::connectOnNotifier() {
     RTC_CHECK(rtc::Thread::Current() == notifier_thread_.get()) << "connect not called on notifier "
             "thread";
-    TS_CORE_LOG_MODULE(twilio::video::kTSCoreLogModulePlatform,
-                       twilio::video::kTSCoreLogLevelDebug,
-                       "connectOnNotifier");
+    VIDEO_ANDROID_LOG(twilio::video::LogModule::kPlatform,
+                      twilio::video::LogLevel::kDebug,
+                      "connectOnNotifier");
     JNIEnv *env = webrtc_jni::AttachCurrentThreadIfNeeded();
 
     // Create the room observer
-    android_room_observer_.reset(new AndroidRoomObserver(env, *j_room_, *j_room_observer_));
+    android_room_observer_.reset(new AndroidRoomObserver(env,
+                                                         *j_room_,
+                                                         *j_room_observer_,
+                                                         *j_connect_options_,
+                                                         *j_handler_));
 
     // Create the stats observer
     stats_observer_.reset(new AndroidStatsObserver(env, *j_stats_observer_));
@@ -183,9 +190,9 @@ void RoomDelegate::reportNetworkChangeOnNotifier(
 void RoomDelegate::disconnectOnNotifier() {
     RTC_CHECK(rtc::Thread::Current() == notifier_thread_.get()) << "disconnect not called on "
             "notifier thread";
-    TS_CORE_LOG_MODULE(twilio::video::kTSCoreLogModulePlatform,
-                       twilio::video::kTSCoreLogLevelDebug,
-                       "disconnectOnNotifier")
+    VIDEO_ANDROID_LOG(twilio::video::LogModule::kPlatform,
+                      twilio::video::LogLevel::kDebug,
+                      "disconnectOnNotifier")
 
     if (room_) {
         room_->disconnect();

@@ -16,7 +16,7 @@
 
 package com.twilio.video;
 
-public class VideoTrackStats extends TrackStats {
+public class RemoteVideoTrackStats extends RemoteTrackStats {
     /**
      * Received frame dimensions
      */
@@ -27,16 +27,16 @@ public class VideoTrackStats extends TrackStats {
      */
     public final int frameRate;
 
-    VideoTrackStats(String trackId,
-                    int packetsLost,
-                    String codec,
-                    String ssrc,
-                    double timestamp,
-                    long bytesReceived,
-                    int packetsReceived,
-                    VideoDimensions dimensions,
-                    int frameRate) {
-        super(trackId, packetsLost, codec, ssrc,
+    RemoteVideoTrackStats(String trackSid,
+                          int packetsLost,
+                          String codec,
+                          String ssrc,
+                          double timestamp,
+                          long bytesReceived,
+                          int packetsReceived,
+                          VideoDimensions dimensions,
+                          int frameRate) {
+        super(trackSid, packetsLost, codec, ssrc,
                 timestamp, bytesReceived, packetsReceived);
         this.dimensions = dimensions;
         this.frameRate = frameRate;

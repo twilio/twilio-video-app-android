@@ -21,11 +21,26 @@
 
 namespace twilio_video_jni {
 
+static const char *const kLocalAudioTrackConstructorSignature = "("
+        "J"
+        "Ljava/lang/String;"
+        "Ljava/lang/String;"
+        "Z"
+        "Landroid/content/Context;"
+        ")V";
+
 std::shared_ptr<twilio::media::LocalAudioTrack> getLocalAudioTrack(jlong local_audio_track_handle) {
     LocalAudioTrackContext* local_audio_track_context =
             reinterpret_cast<LocalAudioTrackContext *>(local_audio_track_handle);
 
     return local_audio_track_context->getLocalAudioTrack();
+}
+
+std::string getLocalAudioTrackHash(std::shared_ptr<twilio::media::LocalAudioTrack> local_audio_track) {
+    std::size_t local_audio_track_hash =
+            std::hash<twilio::media::LocalAudioTrack *>{}(local_audio_track.get());
+
+    return std::to_string(local_audio_track_hash);
 }
 
 jobject createJavaLocalAudioTrack(jobject j_context,
@@ -36,14 +51,17 @@ jobject createJavaLocalAudioTrack(jobject j_context,
     jmethodID j_local_audio_track_ctor_id = webrtc_jni::GetMethodID(jni,
                                                                     j_local_audio_track_class,
                                                                     "<init>",
-                                                                    "(JLjava/lang/String;ZLandroid/content/Context;)V");
+                                                                    kLocalAudioTrackConstructorSignature);
     LocalAudioTrackContext* local_audio_track_context =
             new LocalAudioTrackContext(local_audio_track);
-
+    jstring j_name = JavaUTF16StringFromStdString(jni, local_audio_track->getName());
+    jstring j_track_hash = JavaUTF16StringFromStdString(jni,
+                                                        getLocalAudioTrackHash(local_audio_track));
     jobject j_local_audio_track = jni->NewObject(j_local_audio_track_class,
                                                  j_local_audio_track_ctor_id,
                                                  webrtc_jni::jlongFromPointer(local_audio_track_context),
-                                                 JavaUTF16StringFromStdString(jni, local_audio_track->getTrackId()),
+                                                 j_track_hash,
+                                                 j_name,
                                                  local_audio_track->isEnabled(),
                                                  j_context);
     CHECK_EXCEPTION(jni) << "Failed to create LocalAudioTrack instance";

@@ -34,12 +34,13 @@ public class LocalVideoTrack extends VideoTrack {
     private static final double ASPECT_RATIO_TOLERANCE = 0.05;
     private static final String CAPTURER_MUST_HAVE_ONE_SUPPORTED_FORMAT = "A VideoCapturer " +
             "must provide at least one supported VideoFormat";
-    static final VideoConstraints defaultVideoConstraints = new VideoConstraints.Builder()
+    static final VideoConstraints DEFAULT_VIDEO_CONSTRAINTS = new VideoConstraints.Builder()
             .maxFps(30)
             .maxVideoDimensions(VideoDimensions.VGA_VIDEO_DIMENSIONS)
             .build();
 
     private long nativeLocalVideoTrackHandle;
+    private final String nativeTrackHash;
     private final VideoCapturer videoCapturer;
     private final VideoConstraints videoConstraints;
     private final MediaFactory mediaFactory;
@@ -58,7 +59,7 @@ public class LocalVideoTrack extends VideoTrack {
     public static LocalVideoTrack create(@NonNull Context context,
                                          boolean enabled,
                                          @NonNull VideoCapturer videoCapturer) {
-        return create(context, enabled, videoCapturer, null);
+        return create(context, enabled, videoCapturer, null, null);
     }
 
     /**
@@ -93,6 +94,61 @@ public class LocalVideoTrack extends VideoTrack {
                                          boolean enabled,
                                          @NonNull VideoCapturer videoCapturer,
                                          @Nullable VideoConstraints videoConstraints) {
+        return create(context, enabled, videoCapturer, videoConstraints, null);
+    }
+
+    /**
+     * Creates a local video track. Local video track invokes
+     * {@link VideoCapturer#getSupportedFormats()} to find the closest supported
+     * {@link VideoFormat} to 640x480 at 30 frames per second. The closest format is used to apply
+     * default {@link VideoConstraints} to the returned {@link LocalVideoTrack}.
+     *
+     * @param context application context.
+     * @param enabled initial state of video track.
+     * @param videoCapturer capturer that provides video frames.
+     * @param name video track name.
+     * @return local video track if successfully added or null if video track could not be created.
+     */
+    public static LocalVideoTrack create(@NonNull Context context,
+                                         boolean enabled,
+                                         @NonNull VideoCapturer videoCapturer,
+                                         @Nullable String name) {
+        return create(context, enabled, videoCapturer, null, name);
+    }
+
+    /**
+     * Creates a local video track. Local video track will only apply {@code videoConstraints}
+     * compatible with {@code videoCapturer}. Default constraints described in
+     * {@link #create(Context, boolean, VideoCapturer)} will be applied to the returned
+     * {@link LocalVideoTrack} for the following conditions:
+     * <p>
+     * <ol>
+     *     <li>Passing {@code null} as {@code videoConstraints}.</li>
+     *     <li>{@code videoConstraints} are incompatible with {@code videoCapturer}</li>
+     * </ol>
+     * <p>
+     * Video constraints are incompatible with a capturer if there is not at least one supported
+     * {@link VideoFormat} for which all the following conditions true:
+     * <ol>
+     *     <li>{@link VideoConstraints#minFps} and {@link VideoConstraints#maxFps} are both
+     *     less than or equal supported capture format frame rate.</li>
+     *     <li>{@link VideoConstraints#minVideoDimensions} width and height are less than or
+     *     equal to a supported capture format width and height.</li>
+     *     <li>{@link VideoConstraints#maxVideoDimensions} width and height are greater than or
+     *     equal to a supported capture format width and height.</li>
+     * </ol>
+     *
+     * @param context application context.
+     * @param enabled initial state of video track.
+     * @param videoCapturer capturer that provides video frames.
+     * @param name video track name.
+     * @return local video track if successfully added or null if video track could not be created.
+     */
+    public static LocalVideoTrack create(@NonNull Context context,
+                                         boolean enabled,
+                                         @NonNull VideoCapturer videoCapturer,
+                                         @Nullable VideoConstraints videoConstraints,
+                                         @Nullable String name) {
         Preconditions.checkNotNull(context, "Context must not be null");
         Preconditions.checkNotNull(videoCapturer, "VideoCapturer must not be null");
         Preconditions.checkState(videoCapturer.getSupportedFormats() != null &&
@@ -106,7 +162,8 @@ public class LocalVideoTrack extends VideoTrack {
                 .createVideoTrack(context,
                         enabled,
                         videoCapturer,
-                        resolveConstraints(videoCapturer, videoConstraints));
+                        resolveConstraints(videoCapturer, videoConstraints),
+                        name);
 
         if (localVideoTrack == null) {
             logger.e("Failed to create local video track");
@@ -135,6 +192,20 @@ public class LocalVideoTrack extends VideoTrack {
         return videoConstraints;
     }
 
+    @Override
+    public synchronized void addRenderer(@NonNull VideoRenderer videoRenderer) {
+        Preconditions.checkState(!isReleased(), "Cannot add renderer to video track that has " +
+                "been released");
+        super.addRenderer(videoRenderer);
+    }
+
+    @Override
+    public synchronized void removeRenderer(@NonNull VideoRenderer videoRenderer) {
+        Preconditions.checkState(!isReleased(), "Cannot remove renderer from video track that has " +
+                "been released");
+        super.removeRenderer(videoRenderer);
+    }
+
     /**
      * Check if the local video track is enabled.
      *
@@ -148,9 +219,18 @@ public class LocalVideoTrack extends VideoTrack {
         if (!isReleased()) {
             return nativeIsEnabled(nativeLocalVideoTrackHandle);
         } else {
-            logger.e("Local video track is not enabled because it has been removed");
+            logger.e("Local video track is not enabled because it has been released");
             return false;
         }
+    }
+
+    /**
+     * Returns the local video track name. A pseudo random string is returned if no track name was
+     * specified.
+     */
+    @Override
+    public String getName() {
+        return super.getName();
     }
 
     /**
@@ -185,8 +265,11 @@ public class LocalVideoTrack extends VideoTrack {
                     VideoCapturer videoCapturer,
                     VideoConstraints videoConstraints,
                     org.webrtc.VideoTrack webrtcVideoTrack,
+                    String nativeTrackHash,
+                    String name,
                     Context context) {
-        super(webrtcVideoTrack, enabled);
+        super(webrtcVideoTrack, enabled, name);
+        this.nativeTrackHash = nativeTrackHash;
         this.nativeLocalVideoTrackHandle = nativeLocalVideoTrackHandle;
         this.videoCapturer = videoCapturer;
         this.videoConstraints = videoConstraints;
@@ -200,7 +283,7 @@ public class LocalVideoTrack extends VideoTrack {
                                                        VideoConstraints videoConstraints) {
         if (videoConstraints == null || !constraintsCompatible(videoCapturer, videoConstraints)) {
             logger.e("Applying VideoConstraints closest to 640x480@30 FPS.");
-            return getClosestCompatibleVideoConstraints(videoCapturer, defaultVideoConstraints);
+            return getClosestCompatibleVideoConstraints(videoCapturer, DEFAULT_VIDEO_CONSTRAINTS);
         } else {
             return videoConstraints;
         }
@@ -300,7 +383,20 @@ public class LocalVideoTrack extends VideoTrack {
         return nativeLocalVideoTrackHandle == 0;
     }
 
-    long getNativeHandle() {
+    /*
+     * Called by LocalParticipant at JNI level to map twilio::media::LocalVideoTrack to
+     * LocalVideoTrack.
+     */
+    @SuppressWarnings("unused")
+    String getNativeTrackHash() {
+        return nativeTrackHash;
+    }
+
+    /*
+     * Called by LocalParticipant at JNI level
+     */
+    @SuppressWarnings("unused")
+    synchronized long getNativeHandle() {
         return nativeLocalVideoTrackHandle;
     }
 

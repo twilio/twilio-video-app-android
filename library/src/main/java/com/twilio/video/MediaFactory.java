@@ -76,27 +76,26 @@ class MediaFactory {
         return instance;
     }
 
-    @VisibleForTesting(otherwise = VisibleForTesting.NONE)
-    static boolean isReleased() {
-        synchronized (MediaFactory.class) {
-            return instance == null;
-        }
-    }
-
     synchronized @Nullable LocalAudioTrack createAudioTrack(Context context,
                                                             boolean enabled,
-                                                            @Nullable AudioOptions audioOptions) {
+                                                            @Nullable AudioOptions audioOptions,
+                                                            String name) {
         Preconditions.checkNotNull(context, "Context must not be null");
         Preconditions.checkState(nativeMediaFactoryHandle != 0,
                 RELEASE_MESSAGE_TEMPLATE,
                 "createAudioTrack");
-        return nativeCreateAudioTrack(nativeMediaFactoryHandle, context, enabled, audioOptions);
+        return nativeCreateAudioTrack(nativeMediaFactoryHandle,
+                context,
+                enabled,
+                audioOptions,
+                name);
     }
 
     synchronized @Nullable LocalVideoTrack createVideoTrack(Context context,
                                                             boolean enabled,
                                                             VideoCapturer videoCapturer,
-                                                            VideoConstraints videoConstraints) {
+                                                            VideoConstraints videoConstraints,
+                                                            String name) {
         Preconditions.checkNotNull(context, "Context must not be null");
         Preconditions.checkState(nativeMediaFactoryHandle != 0,
                 RELEASE_MESSAGE_TEMPLATE,
@@ -106,7 +105,24 @@ class MediaFactory {
                 enabled,
                 videoCapturer,
                 videoConstraints,
+                name,
                 eglBaseProvider.getLocalEglBase().getEglBaseContext());
+    }
+    synchronized LocalDataTrack createDataTrack(Context context,
+                                                boolean ordered,
+                                                int maxPacketLifeTime,
+                                                int maxRetransmits,
+                                                String name) {
+        Preconditions.checkNotNull(context, "Context must not be null");
+        Preconditions.checkState(nativeMediaFactoryHandle != 0,
+                RELEASE_MESSAGE_TEMPLATE,
+                "createDataTrack");
+        return nativeCreateDataTrack(nativeMediaFactoryHandle,
+                context,
+                ordered,
+                maxPacketLifeTime,
+                maxRetransmits,
+                name);
     }
 
     void release(Object owner) {
@@ -131,6 +147,45 @@ class MediaFactory {
         return nativeMediaFactoryHandle;
     }
 
+    /*
+     * Provides a way to create another MediaFactory with specific options. The MediaFactory
+     * instance is created with fake encoder/decoder factories and a fake audio device. MediaFactory
+     * instances created with this method are meant to simulate media conditions for a participant
+     * on the same device.
+     */
+    @VisibleForTesting(otherwise = VisibleForTesting.NONE)
+    static MediaFactory testCreate(@NonNull Context context,
+                                   @NonNull MediaOptions mediaOptions) {
+        synchronized (MediaFactory.class) {
+            if (!libraryIsLoaded) {
+                ReLinker.loadLibrary(context, "jingle_peerconnection_so");
+                libraryIsLoaded = true;
+            }
+
+            long nativeMediaFactoryHandle = nativeTestCreate(context, mediaOptions);
+
+            return new MediaFactory(nativeMediaFactoryHandle);
+        }
+    }
+
+    /*
+     * Releases a test media factory instance
+     */
+    @VisibleForTesting(otherwise = VisibleForTesting.NONE)
+    void testRelease() {
+        if (nativeMediaFactoryHandle != 0) {
+            nativeTestRelease(nativeMediaFactoryHandle);
+            nativeMediaFactoryHandle = 0;
+        }
+    }
+
+    @VisibleForTesting(otherwise = VisibleForTesting.NONE)
+    static boolean isReleased() {
+        synchronized (MediaFactory.class) {
+            return instance == null;
+        }
+    }
+
     private MediaFactory(long nativeMediaFactoryHandle) {
         this.nativeMediaFactoryHandle = nativeMediaFactoryHandle;
         this.eglBaseProvider = EglBaseProvider.instance(this);
@@ -142,12 +197,26 @@ class MediaFactory {
     private native LocalAudioTrack nativeCreateAudioTrack(long nativeMediaFactoryHandle,
                                                           Context context,
                                                           boolean enabled,
-                                                          AudioOptions audioOptions);
+                                                          AudioOptions audioOptions,
+                                                          String name);
     private native LocalVideoTrack nativeCreateVideoTrack(long nativeMediaFactoryHandle,
                                                           Context context,
                                                           boolean enabled,
                                                           VideoCapturer videoCapturer,
                                                           VideoConstraints videoConstraints,
+                                                          String name,
                                                           EglBase.Context rootEglBase);
+    private native LocalDataTrack nativeCreateDataTrack(long nativeMediaFactoryHandle,
+                                                        Context context,
+                                                        boolean ordered,
+                                                        int maxPacketLifeTime,
+                                                        int maxRetransmits,
+                                                        String name);
     private native void nativeRelease(long mediaFactoryHandle);
+
+    @VisibleForTesting(otherwise = VisibleForTesting.NONE)
+    private static native long nativeTestCreate(Context context, MediaOptions mediaOptions);
+
+    @VisibleForTesting(otherwise = VisibleForTesting.NONE)
+    private native void nativeTestRelease(long mediaFactoryHandle);
 }

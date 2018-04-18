@@ -7,7 +7,7 @@
     android:layout_marginLeft="4dp"
     android:layout_marginRight="4dp">
 
-    <!-- Participant layout with video track -->
+    <!-- RemoteParticipant layout with video track -->
 
     <FrameLayout
         android:id="@+id/participant_video_layout"
@@ -36,7 +36,7 @@
 
     </FrameLayout>
 
-    <!-- Participant layout without video track -->
+    <!-- RemoteParticipant layout without video track -->
 
     <RelativeLayout
         android:id="@+id/participant_selected_layout"
@@ -63,7 +63,7 @@
 
     </RelativeLayout>
 
-    <!-- Participant audio toggle -->
+    <!-- RemoteParticipant audio toggle -->
 
     <ImageView
         android:id="@+id/participant_no_audio"

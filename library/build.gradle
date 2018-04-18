@@ -124,6 +124,7 @@ dependencies {
     testImplementation "junit:junit:${versions.junit}"
     testImplementation "org.mockito:mockito-core:${versions.mockito}"
     testImplementation "com.google.guava:guava:${versions.guava}"
+    testImplementation "pl.pragmatists:JUnitParams:${versions.junitParams}"
 
     androidTestImplementation project(':env')
     androidTestImplementation project(':twilioapi')

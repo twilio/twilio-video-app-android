@@ -170,13 +170,13 @@ public abstract class Video {
             }
 
             @Override
-            public void onParticipantConnected(Room room, Participant participant) {
-                roomListener.onParticipantConnected(room, participant);
+            public void onParticipantConnected(Room room, RemoteParticipant remoteParticipant) {
+                roomListener.onParticipantConnected(room, remoteParticipant);
             }
 
             @Override
-            public void onParticipantDisconnected(Room room, Participant participant) {
-                roomListener.onParticipantDisconnected(room, participant);
+            public void onParticipantDisconnected(Room room, RemoteParticipant remoteParticipant) {
+                roomListener.onParticipantDisconnected(room, remoteParticipant);
             }
 
             @Override

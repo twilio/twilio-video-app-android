@@ -19,12 +19,66 @@
 #include "com_twilio_video_PlatformInfo.h"
 #include "com_twilio_video_LocalAudioTrack.h"
 #include "com_twilio_video_LocalVideoTrack.h"
+#include "com_twilio_video_EncodingParameters.h"
 
 #include "webrtc/sdk/android/src/jni/jni_helpers.h"
 #include "class_reference_holder.h"
+#include "com_twilio_video_LocalDataTrack.h"
 #include "jni_utils.h"
 
 namespace twilio_video_jni {
+
+std::shared_ptr<twilio::media::AudioCodec> getAudioCodec(JNIEnv *env, jobject j_audio_codec) {
+    jclass j_audio_codec_class = webrtc_jni::GetObjectClass(env, j_audio_codec);
+    jmethodID j_name_method_id = webrtc_jni::GetMethodID(env,
+                                                         j_audio_codec_class,
+                                                         "getName",
+                                                         "()Ljava/lang/String;");
+    jstring j_audio_codec_name = (jstring) env->CallObjectMethod(j_audio_codec, j_name_method_id);
+    CHECK_EXCEPTION(env) << "Failed to get name of audio codec";
+    std::string audio_codec_name = JavaToUTF8StdString(env, j_audio_codec_name);
+    std::shared_ptr<twilio::media::AudioCodec> audio_codec;
+
+    if (audio_codec_name == "ISAC") {
+        audio_codec.reset(new twilio::media::IsacCodec());
+    } else if (audio_codec_name == "OPUS") {
+        audio_codec.reset(new twilio::media::OpusCodec());
+    } else if (audio_codec_name == "PCMA") {
+        audio_codec.reset(new twilio::media::PcmaCodec());
+    } else if (audio_codec_name == "PCMU") {
+        audio_codec.reset(new twilio::media::PcmuCodec());
+    } else if (audio_codec_name == "G722") {
+        audio_codec.reset(new twilio::media::G722Codec());
+    } else {
+        FATAL() << "Failed to get native audio codec for " << audio_codec_name;
+    }
+
+    return audio_codec;
+}
+
+std::shared_ptr<twilio::media::VideoCodec> getVideoCodec(JNIEnv *env, jobject j_video_codec) {
+    jclass j_video_codec_class = webrtc_jni::GetObjectClass(env, j_video_codec);
+    jmethodID j_name_method_id = webrtc_jni::GetMethodID(env,
+                                                         j_video_codec_class,
+                                                         "getName",
+                                                         "()Ljava/lang/String;");
+    jstring j_video_codec_name = (jstring) env->CallObjectMethod(j_video_codec, j_name_method_id);
+    CHECK_EXCEPTION(env) << "Failed to get name of video codec";
+    std::string video_codec_name = JavaToUTF8StdString(env, j_video_codec_name);
+    std::shared_ptr<twilio::media::VideoCodec> video_codec;
+
+    if (video_codec_name == "H264") {
+        video_codec.reset(new twilio::media::H264Codec());
+    } else if (video_codec_name == "VP8") {
+        video_codec.reset(new twilio::media::Vp8Codec());
+    } else if (video_codec_name == "VP9") {
+        video_codec.reset(new twilio::media::Vp9Codec());
+    } else {
+        FATAL() << "Failed to get native video codec for " << video_codec_name;
+    }
+
+    return video_codec;
+}
 
 JNIEXPORT jlong JNICALL
 Java_com_twilio_video_ConnectOptions_nativeCreate(JNIEnv *env,
@@ -33,9 +87,13 @@ Java_com_twilio_video_ConnectOptions_nativeCreate(JNIEnv *env,
                                                   jstring j_room_name,
                                                   jobjectArray j_audio_tracks,
                                                   jobjectArray j_video_tracks,
+                                                  jobjectArray j_data_tracks,
                                                   jobject j_ice_options,
                                                   jboolean j_enable_insights,
-                                                  jlong j_platform_info_handle) {
+                                                  jlong j_platform_info_handle,
+                                                  jobjectArray j_preferred_audio_codecs,
+                                                  jobjectArray j_preferred_video_codecs,
+                                                  jobject j_encoding_parameters) {
 
     std::string access_token = JavaToUTF8StdString(env, j_access_token);
     twilio::video::ConnectOptions::Builder* builder =
@@ -92,9 +150,68 @@ Java_com_twilio_video_ConnectOptions_nativeCreate(JNIEnv *env,
         }
     }
 
+    if(!webrtc_jni::IsNull(env, j_data_tracks)) {
+        jclass j_local_data_track_class =
+                twilio_video_jni::FindClass(env, "com/twilio/video/LocalDataTrack");
+        jmethodID j_local_data_track_get_native_handle =
+                webrtc_jni::GetMethodID(env, j_local_data_track_class, "getNativeHandle", "()J");
+
+        std::vector<std::shared_ptr<twilio::media::LocalDataTrack>> data_tracks;
+        int size = env->GetArrayLength(j_data_tracks);
+        if (size > 0) {
+            for (int i = 0; i < size; i++) {
+                // Get local data track handle
+                jobject j_data_track = (jobject) env->GetObjectArrayElement(j_data_tracks, i);
+                jlong j_data_track_handle =
+                        (jlong) env->CallLongMethod(j_data_track,
+                                                    j_local_data_track_get_native_handle);
+                // Get local data track
+                auto data_track = getLocalDataTrack(j_data_track_handle);
+                data_tracks.push_back(data_track);
+            }
+            builder->setDataTracks(data_tracks);
+        }
+    }
+
+    if (!webrtc_jni::IsNull(env, j_preferred_audio_codecs)) {
+        std::vector<std::shared_ptr<twilio::media::AudioCodec>> preferred_audio_codecs;
+        int size = env->GetArrayLength(j_preferred_audio_codecs);
+        if (size > 0) {
+            for (int i = 0; i < size; i++) {
+                jobject j_audio_codec =
+                        (jobject) env->GetObjectArrayElement(j_preferred_audio_codecs, i);
+                std::shared_ptr<twilio::media::AudioCodec> audio_codec =
+                        getAudioCodec(env, j_audio_codec);
+                preferred_audio_codecs.push_back(audio_codec);
+            }
+            builder->setPreferredAudioCodecs(preferred_audio_codecs);
+        }
+    }
+
+    if (!webrtc_jni::IsNull(env, j_preferred_video_codecs)) {
+        std::vector<std::shared_ptr<twilio::media::VideoCodec>> preferred_video_codecs;
+        int size = env->GetArrayLength(j_preferred_video_codecs);
+        if (size > 0) {
+            for (int i = 0; i < size; i++) {
+                jobject j_video_codec =
+                        (jobject) env->GetObjectArrayElement(j_preferred_video_codecs, i);
+                std::shared_ptr<twilio::media::VideoCodec> video_codec =
+                        getVideoCodec(env, j_video_codec);
+                preferred_video_codecs.push_back(video_codec);
+            }
+            builder->setPreferredVideoCodecs(preferred_video_codecs);
+        }
+    }
+
     if (!webrtc_jni::IsNull(env, j_ice_options)) {
         twilio::media::IceOptions ice_options = IceOptions::getIceOptions(env, j_ice_options);
         builder->setIceOptions(ice_options);
+    }
+
+    if (!webrtc_jni::IsNull(env, j_encoding_parameters)) {
+        twilio::media::EncodingParameters encoding_parameters =
+                getEncodingParameters(env, j_encoding_parameters);
+        builder->setEncodingParameters(encoding_parameters);
     }
 
     PlatformInfoContext *platform_info_context =

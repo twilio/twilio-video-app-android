@@ -19,14 +19,14 @@ package com.twilio.video;
 /**
  * A representation of a media track.
  */
-interface Track {
-    /**
-     * Returns the id associated with the track.
-     */
-    String getTrackId();
-
+public interface Track {
     /**
      * Checks if the track is enabled.
      */
     boolean isEnabled();
+
+    /**
+     * Return track name.
+     */
+    String getName();
 }

@@ -16,33 +16,27 @@
 
 package com.twilio.video;
 
+import android.support.annotation.NonNull;
+import android.support.annotation.VisibleForTesting;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-/**
- * A video track represents a remote video source.
- */
-public class VideoTrack implements Track {
-    private static final String WARNING_NULL_RENDERER = "Attempted to add a null renderer.";
+public abstract class VideoTrack implements Track {
     private static final Logger logger = Logger.getLogger(VideoTrack.class);
 
-    private final org.webrtc.VideoTrack webrtcVideoTrack;
-    private final String trackId;
     private Map<VideoRenderer, org.webrtc.VideoRenderer> videoRenderersMap = new HashMap<>();
+    private final org.webrtc.VideoTrack webRtcVideoTrack;
+    private final String name;
     private boolean isEnabled;
     private boolean isReleased = false;
 
-    /*
-     * NOTE
-     * This class is a wrapper for org.webrtc.VideoTrack. In order to remove the dependency
-     * on this class we would need to re-implement some JNI renderer boilerplate
-     */
-    VideoTrack(org.webrtc.VideoTrack webRtcVideoTrack, boolean enabled) {
-        this.webrtcVideoTrack = webRtcVideoTrack;
-        this.trackId = webRtcVideoTrack.id();
+    VideoTrack(org.webrtc.VideoTrack webRtcVideoTrack, boolean enabled, @NonNull String name) {
         this.isEnabled = enabled;
+        this.name = name;
+        this.webRtcVideoTrack = webRtcVideoTrack;
     }
 
     /**
@@ -50,18 +44,27 @@ public class VideoTrack implements Track {
      *
      * @param videoRenderer video renderer that receives video.
      */
-    public synchronized void addRenderer(VideoRenderer videoRenderer) {
-        if (isReleased) {
-            logger.w("Cannot add renderer. Video track has been removed.");
-            return;
-        }
-        if (videoRenderer != null) {
+    public synchronized void addRenderer(@NonNull VideoRenderer videoRenderer) {
+        Preconditions.checkNotNull(videoRenderer, "Video renderer must not be null");
+
+        /*
+         * We allow for addRenderer to be called after the track has been released to avoid crashes
+         * in cases where a developer mistakenly tries to render a track that has been removed.
+         * This is different from LocalVideoTrack because developers do not control when a remote
+         * video track is released.
+         */
+        if (!isReleased) {
+            // Always create renderer
             org.webrtc.VideoRenderer webrtcVideoRenderer =
                     createWebRtcVideoRenderer(videoRenderer);
             videoRenderersMap.put(videoRenderer, webrtcVideoRenderer);
-            webrtcVideoTrack.addRenderer(webrtcVideoRenderer);
+
+            // WebRTC Track may not be set yet
+            if (webRtcVideoTrack != null) {
+                webRtcVideoTrack.addRenderer(webrtcVideoRenderer);
+            }
         } else {
-            logger.w(WARNING_NULL_RENDERER);
+            logger.w("Attempting to add renderer to track that has been removed");
         }
     }
 
@@ -70,13 +73,23 @@ public class VideoTrack implements Track {
      *
      * @param videoRenderer the video renderer that should no longer receives video.
      */
-    public synchronized void removeRenderer(VideoRenderer videoRenderer) {
-        if (!isReleased && videoRenderer != null) {
+    public synchronized void removeRenderer(@NonNull VideoRenderer videoRenderer) {
+        Preconditions.checkNotNull(videoRenderer, "Video renderer must not be null");
+
+        /*
+         * We allow for removeRenderer to be called after the track has been released to avoid
+         * crashes in cases where a developer mistakenly tries to stop renderering a track that has
+         * been removed. This is different from LocalVideoTrack because developers do not control
+         * when a remote video track is released.
+         */
+        if (!isReleased) {
             org.webrtc.VideoRenderer webrtcVideoRenderer =
                     videoRenderersMap.remove(videoRenderer);
-            if (webrtcVideoTrack != null && webrtcVideoRenderer != null) {
-                webrtcVideoTrack.removeRenderer(webrtcVideoRenderer);
+            if (webRtcVideoTrack != null && webrtcVideoRenderer != null) {
+                webRtcVideoTrack.removeRenderer(webrtcVideoRenderer);
             }
+        } else {
+            logger.w("Attempting to remove renderer from track that has been removed");
         }
     }
 
@@ -89,16 +102,6 @@ public class VideoTrack implements Track {
     }
 
     /**
-     * This video track id.
-     *
-     * @return track id.
-     */
-    @Override
-    public String getTrackId() {
-        return trackId;
-    }
-
-    /**
      * Check if this video track is enabled.
      *
      * @return true if track is enabled.
@@ -108,28 +111,53 @@ public class VideoTrack implements Track {
         return isEnabled;
     }
 
-    private org.webrtc.VideoRenderer createWebRtcVideoRenderer(VideoRenderer videoRenderer) {
-        return new org.webrtc.VideoRenderer(new VideoRendererCallbackAdapter(videoRenderer));
+    /**
+     * Returns the video track name. A pseudo random string is returned if no track name was
+     * specified.
+     */
+    @Override
+    public String getName() {
+        return name;
     }
 
-    void setEnabled(boolean isEnabled) {
+    synchronized void setEnabled(boolean isEnabled) {
         this.isEnabled = isEnabled;
     }
 
     synchronized void release() {
         if (!isReleased) {
-            for (org.webrtc.VideoRenderer videoRenderer : videoRenderersMap.values()) {
-                webrtcVideoTrack.removeRenderer(videoRenderer);
-            }
+            invalidateWebRtcTrack();
             videoRenderersMap.clear();
             isReleased = true;
         }
     }
 
+    synchronized void invalidateWebRtcTrack() {
+        if (webRtcVideoTrack != null) {
+            for (Map.Entry<VideoRenderer, org.webrtc.VideoRenderer> entry :
+                    videoRenderersMap.entrySet()) {
+                // Remove the WebRTC renderer
+                webRtcVideoTrack.removeRenderer(entry.getValue());
+            }
+        }
+    }
+
+    /*
+     * Used in video track tests to emulate behavior of a remote video track
+     */
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+    synchronized org.webrtc.VideoTrack getWebRtcTrack() {
+        return webRtcVideoTrack;
+    }
+
+    private org.webrtc.VideoRenderer createWebRtcVideoRenderer(VideoRenderer videoRenderer) {
+        return new org.webrtc.VideoRenderer(new VideoTrack.VideoRendererCallbackAdapter(videoRenderer));
+    }
+
     private class VideoRendererCallbackAdapter implements org.webrtc.VideoRenderer.Callbacks {
         private final VideoRenderer videoRenderer;
 
-        public VideoRendererCallbackAdapter(VideoRenderer videoRenderer) {
+        VideoRendererCallbackAdapter(VideoRenderer videoRenderer) {
             this.videoRenderer = videoRenderer;
         }
 
@@ -139,4 +167,3 @@ public class VideoTrack implements Track {
         }
     }
 }
-

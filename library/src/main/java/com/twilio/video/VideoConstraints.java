@@ -38,15 +38,6 @@ public class VideoConstraints {
     /** Smooth 30 fps video. */
     public static final int FPS_30 = 30;
 
-    /** Pre-defined aspect ratio 4:3. */
-    public static final AspectRatio ASPECT_RATIO_4_3 = new AspectRatio(4, 3);
-
-    /** Pre-defined aspect ratio 16:9. */
-    public static final AspectRatio ASPECT_RATIO_16_9 = new AspectRatio(16, 9);
-
-    /** Pre-defined aspect ratio 11:9. */
-    public static final AspectRatio ASPECT_RATIO_11_9 = new AspectRatio(11, 9);
-
     private final VideoDimensions minVideoDimensions;
     private final VideoDimensions maxVideoDimensions;
     private final int minFps;

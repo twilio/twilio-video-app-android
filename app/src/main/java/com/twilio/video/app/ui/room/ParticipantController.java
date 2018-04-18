@@ -19,12 +19,10 @@ package com.twilio.video.app.ui.room;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.twilio.video.Participant;
 import com.twilio.video.VideoTrack;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -44,7 +42,7 @@ public class ParticipantController {
     private ParticipantPrimaryView primaryView;
 
     /**
-     * Participant thumb view group, where participants are added or removed from.
+     * RemoteParticipant thumb view group, where participants are added or removed from.
      */
     private ViewGroup thumbsViewContainer;
 
@@ -79,7 +77,6 @@ public class ParticipantController {
 
     /**
      * Create new participant thumb from data.
-     *
      * @param sid        unique participant identifier.
      * @param identity   participant name to display.
      * @param videoTrack participant video to display or NULL for empty thumbs.
@@ -114,7 +111,6 @@ public class ParticipantController {
 
     /**
      * Update participant thumb with video track.
-     *
      * @param sid      unique participant identifier.
      * @param oldVideo video track to replace.
      * @param newVideo new video track to insert.
@@ -139,7 +135,6 @@ public class ParticipantController {
 
     /**
      * Update participant video track thumb with state.
-     *
      * @param sid        unique participant identifier.
      * @param videoTrack target video track.
      * @param state      new thumb state.
@@ -164,7 +159,6 @@ public class ParticipantController {
 
     /**
      * Update participant video track thumb with mirroring.
-     *
      * @param sid        unique participant identifier.
      * @param videoTrack target video track.
      * @param mirror     enable/disable mirror.
@@ -196,7 +190,6 @@ public class ParticipantController {
 
     /**
      * Add new participant thumb or update old instance.
-     *
      * @param sid      unique participant identifier.
      * @param identity participant name to display.
      * @param oldVideo video track to replace.
@@ -220,7 +213,6 @@ public class ParticipantController {
 
     /**
      * Remove participant video track thumb.
-     *
      * @param sid        unique participant identifier.
      * @param videoTrack target video track.
      */
@@ -247,9 +239,9 @@ public class ParticipantController {
             if (entry.getKey().sid.equals(sid)) {
                 deleteKeys.add(entry.getKey());
                 thumbsViewContainer.removeView(entry.getValue());
-                VideoTrack videoTrack = entry.getKey().videoTrack;
-                if (videoTrack != null) {
-                    videoTrack.removeRenderer(entry.getValue());
+                VideoTrack remoteVideoTrack = entry.getKey().videoTrack;
+                if (remoteVideoTrack != null) {
+                    remoteVideoTrack.removeRenderer(entry.getValue());
                 }
             }
         }
@@ -261,14 +253,13 @@ public class ParticipantController {
 
     /**
      * Remove participant thumb or leave empty (no video) thumb if nothing left.
-     *
      * @param sid        unique participant identifier.
      * @param identity   participant name to display.
      * @param videoTrack target video track.
      */
     public void removeOrEmptyThumb(String sid, String identity, VideoTrack videoTrack) {
         int thumbsCount = getThumbs(sid).size();
-        if (thumbsCount > 1 || (thumbsCount == 1 && primaryItem.sid == sid)) {
+        if (thumbsCount > 1 || (thumbsCount == 1 && primaryItem.sid.equals(sid))) {
             removeThumb(sid, videoTrack);
         } else if (thumbsCount == 0) {
             addThumb(sid, identity);
@@ -311,7 +302,6 @@ public class ParticipantController {
 
     /**
      * Render participant as primary participant from data.
-     *
      * @param sid        unique participant identifier.
      * @param identity   participant name to display.
      * @param videoTrack participant video to display or NULL for empty thumbs.
@@ -434,27 +424,27 @@ public class ParticipantController {
     }
 
     /**
-     * Participant information data holder.
+     * RemoteParticipant information data holder.
      */
     public static class Item {
 
         /**
-         * Participant unique identifier.
+         * RemoteParticipant unique identifier.
          */
         String sid;
 
         /**
-         * Participant name.
+         * RemoteParticipant name.
          */
         String identity;
 
         /**
-         * Participant video track.
+         * RemoteParticipant video track.
          */
         VideoTrack videoTrack;
 
         /**
-         * Participant audio state.
+         * RemoteParticipant audio state.
          */
         boolean muted;
 

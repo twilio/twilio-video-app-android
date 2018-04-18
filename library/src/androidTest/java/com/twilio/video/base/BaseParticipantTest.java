@@ -22,9 +22,10 @@ import android.support.test.rule.GrantPermissionRule;
 
 import com.twilio.video.ConnectOptions;
 import com.twilio.video.LocalAudioTrack;
+import com.twilio.video.LocalDataTrack;
 import com.twilio.video.LocalParticipant;
 import com.twilio.video.LocalVideoTrack;
-import com.twilio.video.Participant;
+import com.twilio.video.RemoteParticipant;
 import com.twilio.video.Room;
 import com.twilio.video.RoomState;
 import com.twilio.video.Video;
@@ -57,93 +58,131 @@ public abstract class BaseParticipantTest extends BaseClientTest {
     public ActivityTestRule<MediaTestActivity> activityRule =
             new ActivityTestRule<>(MediaTestActivity.class);
     protected MediaTestActivity mediaTestActivity;
-    protected LocalVideoTrack actor1LocalVideoTrack;
-    protected LocalAudioTrack actor1LocalAudioTrack;
-    protected LocalVideoTrack actor2LocalVideoTrack;
-    protected LocalAudioTrack actor2LocalAudioTrack;
-    protected FakeVideoCapturer fakeVideoCapturer;
-    protected String tokenOne;
-    protected String tokenTwo;
-    protected Room actor1Room;
-    protected LocalParticipant actor1LocalParticipant;
-    protected Room actor2Room;
-    protected LocalParticipant actor2LocalParticipant;
-    protected Participant participant;
-    protected String testRoom;
-    protected CallbackHelper.FakeRoomListener actor1RoomListener;
-    protected CallbackHelper.FakeRoomListener actor2RoomListener;
 
-    protected Room connectClient(String token, Room.Listener roomListener) {
-        ConnectOptions connectOptions = new ConnectOptions.Builder(token)
-                .roomName(testRoom)
-                .build();
+    protected LocalVideoTrack aliceLocalVideoTrack;
+    protected LocalAudioTrack aliceLocalAudioTrack;
+    protected LocalDataTrack aliceLocalDataTrack;
+    protected LocalVideoTrack bobLocalVideoTrack;
+    protected LocalAudioTrack bobLocalAudioTrack;
+    protected LocalDataTrack bobLocalDataTrack;
+    protected String aliceToken;
+    protected String bobToken;
+    protected Room aliceRoom;
+    protected LocalParticipant aliceLocalParticipant;
+    protected RemoteParticipant aliceRemoteParticipant;
+    protected Room bobRoom;
+    protected LocalParticipant bobLocalParticipant;
+    protected RemoteParticipant bobRemoteParticipant;
+    protected String testRoomName;
+    protected String bobAudioTrackName;
+    protected String bobVideoTrackName;
+    protected LocalDataTrack charlieLocalDataTrack;
+    protected Room charlieRoom;
+    protected CallbackHelper.FakeRoomListener aliceRoomListener;
+    protected CallbackHelper.FakeParticipantListener aliceParticipantListener;
+    protected CallbackHelper.FakeRoomListener bobRoomListener;
+    protected CallbackHelper.FakeLocalParticipantListener bobLocalParticipantListener;
+    protected CallbackHelper.FakeParticipantListener bobParticipantListener;
+    protected CallbackHelper.FakeRoomListener charlieRoomListener =
+            new CallbackHelper.FakeRoomListener();
+
+    protected Room connect(ConnectOptions connectOptions,
+                           CallbackHelper.FakeRoomListener roomListener)
+            throws InterruptedException {
+        roomListener.onConnectedLatch = new CountDownLatch(1);
         Room room = Video.connect(mediaTestActivity, connectOptions, roomListener);
+        assertTrue("Failed to connect to room",
+                roomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
         return room;
     }
 
-    protected void disconnectRoom(Room room, CallbackHelper.FakeRoomListener roomListener)
+    protected void disconnect(Room room, CallbackHelper.FakeRoomListener roomListener)
             throws InterruptedException {
         if (room == null || room.getState() == RoomState.DISCONNECTED) {
             return;
         }
         roomListener.onDisconnectedLatch = new CountDownLatch(1);
         room.disconnect();
-        assertTrue(roomListener.onDisconnectedLatch.await(20, TimeUnit.SECONDS));
+        assertTrue("Failed to disconnect from room",
+                roomListener.onDisconnectedLatch.await(20, TimeUnit.SECONDS));
     }
 
     public void baseSetup(Topology topology) throws InterruptedException {
         super.setup();
+        // Setup activity
         mediaTestActivity = activityRule.getActivity();
-        testRoom = random(Constants.ROOM_NAME_LENGTH);
-        assertNotNull(RoomUtils.createRoom(testRoom, topology));
-        fakeVideoCapturer = new FakeVideoCapturer();
-        tokenOne = CredentialsUtils.getAccessToken(Constants.PARTICIPANT_ALICE, topology);
+        // Setup room
+        testRoomName = random(Constants.ROOM_NAME_LENGTH);
+        assertNotNull(RoomUtils.createRoom(testRoomName, topology));
 
-        // Connect actor 1
-        actor1RoomListener = new CallbackHelper.FakeRoomListener();
-        actor1RoomListener.onConnectedLatch = new CountDownLatch(1);
-        actor1RoomListener.onParticipantConnectedLatch = new CountDownLatch(1);
-        actor1Room = connectClient(tokenOne, actor1RoomListener);
-        assertTrue(actor1RoomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
-        actor1LocalParticipant = actor1Room.getLocalParticipant();
+        // Setup alice
+        aliceToken = CredentialsUtils.getAccessToken(Constants.PARTICIPANT_ALICE, topology);
+        aliceRoomListener = new CallbackHelper.FakeRoomListener();
+        aliceParticipantListener = new CallbackHelper.FakeParticipantListener();
+        aliceRoomListener.onParticipantConnectedLatch = new CountDownLatch(1);
+        ConnectOptions aliceConnectOptions = new ConnectOptions.Builder(aliceToken)
+                .roomName(testRoomName)
+                .build();
 
-        // Connect actor 2
-        tokenTwo = CredentialsUtils.getAccessToken(Constants.PARTICIPANT_BOB, topology);
+        // Setup bob
+        bobToken = CredentialsUtils.getAccessToken(Constants.PARTICIPANT_BOB, topology);
+        bobAudioTrackName = random(10);
+        bobVideoTrackName = random(10);
+        bobRoomListener = new CallbackHelper.FakeRoomListener();
+        bobParticipantListener = new CallbackHelper.FakeParticipantListener();
+        ConnectOptions bobConnectOptions = new ConnectOptions.Builder(bobToken)
+                .roomName(testRoomName)
+                .build();
 
-        actor2RoomListener = new CallbackHelper.FakeRoomListener();
-        actor2RoomListener.onConnectedLatch = new CountDownLatch(1);
-        actor2Room = connectClient(tokenTwo, actor2RoomListener);
-        assertTrue(actor2RoomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
+        // Connect alice
+        aliceRoom = connect(aliceConnectOptions, aliceRoomListener);
+        aliceLocalParticipant = aliceRoom.getLocalParticipant();
 
-        // Wait for actor2 to connect
-        assertTrue(actor1RoomListener.onParticipantConnectedLatch.await(20, TimeUnit.SECONDS));
-        actor2LocalParticipant = actor2Room.getLocalParticipant();
-        List<Participant> participantList = new ArrayList<>(actor1Room.getParticipants());
-        assertEquals(1, participantList.size());
-        participant = participantList.get(0);
-        assertNotNull(participant);
+        // Connect bob
+        bobRoom = connect(bobConnectOptions, bobRoomListener);
+        aliceRemoteParticipant = bobRoom.getRemoteParticipants().get(0);
+        aliceRemoteParticipant.setListener(bobParticipantListener);
+
+        // Alice wait for bob to connect
+        assertTrue(aliceRoomListener.onParticipantConnectedLatch.await(20, TimeUnit.SECONDS));
+        bobLocalParticipant = bobRoom.getLocalParticipant();
+        List<RemoteParticipant> remoteParticipantList =
+                new ArrayList<>(aliceRoom.getRemoteParticipants());
+        assertEquals(1, remoteParticipantList.size());
+        bobRemoteParticipant = remoteParticipantList.get(0);
+        assertNotNull(bobRemoteParticipant);
+        bobRemoteParticipant.setListener(aliceParticipantListener);
     }
 
     @After
     public void teardown() throws InterruptedException{
-        disconnectRoom(actor2Room, actor2RoomListener);
-        actor2Room = null;
-        disconnectRoom(actor1Room, actor1RoomListener);
-        actor1Room = null;
-        actor1RoomListener = null;
-        participant = null;
-        if (actor1LocalAudioTrack != null) {
-            actor1LocalAudioTrack.release();
+        disconnect(bobRoom, bobRoomListener);
+        bobRoom = null;
+        disconnect(aliceRoom, aliceRoomListener);
+        aliceRoom = null;
+        aliceRoomListener = null;
+        disconnect(charlieRoom, charlieRoomListener);
+        bobRemoteParticipant = null;
+        if (aliceLocalAudioTrack != null) {
+            aliceLocalAudioTrack.release();
         }
-        if (actor1LocalVideoTrack != null) {
-            actor1LocalVideoTrack.release();
+        if (aliceLocalVideoTrack != null) {
+            aliceLocalVideoTrack.release();
         }
-        if (actor2LocalAudioTrack != null) {
-            actor2LocalAudioTrack.release();
+        if (aliceLocalDataTrack != null) {
+            aliceLocalDataTrack.release();
         }
-        if (actor2LocalVideoTrack != null) {
-            actor2LocalVideoTrack.release();
+        if (bobLocalAudioTrack != null) {
+            bobLocalAudioTrack.release();
         }
-        fakeVideoCapturer = null;
+        if (bobLocalVideoTrack != null) {
+            bobLocalVideoTrack.release();
+        }
+        if (bobLocalDataTrack != null) {
+            bobLocalDataTrack.release();
+        }
+        if (charlieLocalDataTrack != null) {
+            charlieLocalDataTrack.release();
+        }
     }
 }

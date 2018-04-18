@@ -25,9 +25,10 @@ import static android.Manifest.permission.RECORD_AUDIO;
 /**
  * Represents a local audio source.
  */
-public class LocalAudioTrack extends AudioTrack  {
+public class LocalAudioTrack extends AudioTrack {
     private static final Logger logger = Logger.getLogger(LocalAudioTrack.class);
 
+    private final String nativeTrackHash;
     private final MediaFactory mediaFactory;
     private long nativeLocalAudioTrackHandle;
 
@@ -41,7 +42,7 @@ public class LocalAudioTrack extends AudioTrack  {
      */
     public static LocalAudioTrack create(@NonNull Context context,
                                          boolean enabled) {
-        return create(context, enabled, null);
+        return create(context, enabled, null, null);
     }
 
     /**
@@ -56,6 +57,38 @@ public class LocalAudioTrack extends AudioTrack  {
     public static LocalAudioTrack create(@NonNull Context context,
                                          boolean enabled,
                                          @Nullable AudioOptions audioOptions) {
+        return create(context, enabled, audioOptions, null);
+    }
+
+    /**
+     * Creates an audio track. Note that the RECORD_AUDIO permission must be granted
+     * in order for this operation to succeed. If RECORD_AUDIO is not granted null is returned.
+     *
+     * @param context application context.
+     * @param enabled initial state of audio track.
+     * @param name audio track name.
+     * @return local audio track if successfully added or null if audio track could not be created.
+     */
+    public static LocalAudioTrack create(@NonNull Context context,
+                                         boolean enabled,
+                                         @Nullable String name) {
+        return create(context, enabled, null, name);
+    }
+
+    /**
+     * Creates an audio track. Note that the RECORD_AUDIO permission must be granted
+     * in order for this operation to succeed. If RECORD_AUDIO is not granted null is returned.
+     *
+     * @param context application context.
+     * @param enabled initial state of audio track.
+     * @param audioOptions audio options to be applied to track.
+     * @param name audio track name.
+     * @return local audio track if successfully added or null if audio track could not be created.
+     */
+    public static LocalAudioTrack create(@NonNull Context context,
+                                         boolean enabled,
+                                         @Nullable AudioOptions audioOptions,
+                                         @Nullable String name) {
         Preconditions.checkNotNull(context);
         Preconditions.checkState(Util.permissionGranted(context, RECORD_AUDIO), "RECORD_AUDIO " +
                 "permission must be granted to create audio track");
@@ -64,7 +97,7 @@ public class LocalAudioTrack extends AudioTrack  {
         Object temporaryMediaFactoryOwner = new Object();
         MediaFactory mediaFactory = MediaFactory.instance(temporaryMediaFactoryOwner, context);
         LocalAudioTrack localAudioTrack = mediaFactory
-                .createAudioTrack(context, enabled, audioOptions);
+                .createAudioTrack(context, enabled, audioOptions, name);
 
         if (localAudioTrack == null) {
             logger.e("Failed to create local audio track");
@@ -96,6 +129,15 @@ public class LocalAudioTrack extends AudioTrack  {
     }
 
     /**
+     * Returns the local audio track name. A pseudo random string is returned if no track name was
+     * specified.
+     */
+    @Override
+    public String getName() {
+        return super.getName();
+    }
+
+    /**
      * Sets the state of the local audio track. The results of this operation are signaled to other
      * Participants in the same Room. When an audio track is disabled, the audio is muted.
      *
@@ -121,10 +163,12 @@ public class LocalAudioTrack extends AudioTrack  {
     }
 
     LocalAudioTrack(long nativeLocalAudioTrackHandle,
-                    String trackId,
+                    @NonNull String nativeTrackHash,
+                    @NonNull String name,
                     boolean enabled,
                     Context context) {
-        super(trackId, enabled);
+        super(enabled, name);
+        this.nativeTrackHash = nativeTrackHash;
         this.nativeLocalAudioTrackHandle = nativeLocalAudioTrackHandle;
         this.mediaFactory = MediaFactory.instance(this, context);
     }
@@ -133,7 +177,20 @@ public class LocalAudioTrack extends AudioTrack  {
         return nativeLocalAudioTrackHandle == 0;
     }
 
-    long getNativeHandle() {
+    /*
+     * Called by LocalParticipant at JNI level to map twilio::media::LocalAudioTrack to
+     * LocalAudioTrack.
+     */
+    @SuppressWarnings("unused")
+    String getNativeTrackHash() {
+        return nativeTrackHash;
+    }
+
+    /*
+     * Called by LocalParticipant at JNI level.
+     */
+    @SuppressWarnings("unused")
+    synchronized long getNativeHandle() {
         return nativeLocalAudioTrackHandle;
     }
 

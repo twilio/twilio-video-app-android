@@ -37,7 +37,7 @@ public class LocalVideoTrackStats extends LocalTrackStats {
      */
     public final int frameRate;
 
-    LocalVideoTrackStats(String trackId,
+    LocalVideoTrackStats(String trackSid,
                          int packetsLost,
                          String codec,
                          String ssrc,
@@ -49,7 +49,7 @@ public class LocalVideoTrackStats extends LocalTrackStats {
                          VideoDimensions dimensions,
                          int capturedFrameRate,
                          int frameRate) {
-        super(trackId, packetsLost, codec, ssrc, timestamp,
+        super(trackSid, packetsLost, codec, ssrc, timestamp,
                 bytesSent, packetsSent, roundTripTime);
         this.captureDimensions = captureDimensions;
         this.dimensions = dimensions;

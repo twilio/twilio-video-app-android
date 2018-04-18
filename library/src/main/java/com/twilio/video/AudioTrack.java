@@ -16,26 +16,15 @@
 
 package com.twilio.video;
 
-/**
- * An audio track represents a remote audio source.
- */
-public class AudioTrack implements Track {
-    private final String trackId;
+import android.support.annotation.NonNull;
+
+public abstract class AudioTrack implements Track {
+    private final String name;
     private boolean isEnabled;
 
-    AudioTrack(String trackId, boolean isEnabled) {
-        this.trackId = trackId;
+    AudioTrack(boolean isEnabled, @NonNull String name) {
         this.isEnabled = isEnabled;
-    }
-
-    /**
-     * This audio track id.
-     *
-     * @return track id.
-     */
-    @Override
-    public String getTrackId() {
-        return trackId;
+        this.name = name;
     }
 
     /**
@@ -46,6 +35,15 @@ public class AudioTrack implements Track {
     @Override
     public boolean isEnabled() {
         return isEnabled;
+    }
+
+    /**
+     * Returns the audio track name. A pseudo random string is returned if no track name was
+     * specified.
+     */
+    @Override
+    public String getName() {
+        return name;
     }
 
     void setEnabled(boolean isEnabled) {

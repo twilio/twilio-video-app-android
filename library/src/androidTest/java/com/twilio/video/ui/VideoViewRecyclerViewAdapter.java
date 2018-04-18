@@ -84,7 +84,7 @@ public class VideoViewRecyclerViewAdapter extends
         }
 
         // Update view holder
-        holder.trackIdTextView.setText(localVideoTrack.getTrackId());
+        holder.trackNameTextView.setText(localVideoTrack.getName());
         holder.frameCountProxyRendererListener.videoView
                 .setVideoScaleType(VideoScaleType.ASPECT_FILL);
         localVideoTrack.addRenderer(holder.frameCountProxyRendererListener);
@@ -101,7 +101,7 @@ public class VideoViewRecyclerViewAdapter extends
      * View holder that hosts the video view proxy and a text view
      */
     public class VideoViewHolder extends RecyclerView.ViewHolder {
-        public final TextView trackIdTextView;
+        public final TextView trackNameTextView;
         public final FrameCountProxyRendererListener frameCountProxyRendererListener;
 
         VideoViewHolder(View itemView) {
@@ -109,7 +109,7 @@ public class VideoViewRecyclerViewAdapter extends
             this.frameCountProxyRendererListener =
                     new FrameCountProxyRendererListener((VideoView) itemView
                             .findViewById(R.id.video_view));
-            this.trackIdTextView = (TextView) itemView.findViewById(R.id.track_id_text_view);
+            this.trackNameTextView = itemView.findViewById(R.id.track_name_text_view);
         }
     }
 }

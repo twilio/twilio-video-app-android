@@ -33,8 +33,8 @@ std::string JavaToUTF8StdString(JNIEnv *jni, const jstring &j_string);
 jstring JavaUTF16StringFromStdString(JNIEnv* jni, std::string const& string);
 
 JNIEXPORT jstring JNICALL Java_com_twilio_video_JniUtils_nativeJavaUtf16StringToStdString(JNIEnv *,
-                                                                                          jobject,
-                                                                                          jstring);
+                                                                                         jobject,
+                                                                                         jstring);
 
 }
 

@@ -18,8 +18,20 @@
 #include "webrtc/sdk/android/src/jni/jni_helpers.h"
 #include "webrtc/sdk/android/src/jni/classreferenceholder.h"
 #include "class_reference_holder.h"
+#include "jni_utils.h"
 
 namespace twilio_video_jni {
+
+static const char *const kLocalVideoTrackConstructorSignature = "("
+        "J"
+        "Z"
+        "Lcom/twilio/video/VideoCapturer;"
+        "Lcom/twilio/video/VideoConstraints;"
+        "Lorg/webrtc/VideoTrack;"
+        "Ljava/lang/String;"
+        "Ljava/lang/String;"
+        "Landroid/content/Context;"
+        ")V";
 
 std::shared_ptr<twilio::media::LocalVideoTrack> getLocalVideoTrack(jlong local_video_track_handle) {
     LocalVideoTrackContext* video_track_context =
@@ -28,8 +40,14 @@ std::shared_ptr<twilio::media::LocalVideoTrack> getLocalVideoTrack(jlong local_v
     return video_track_context->getLocalVideoTrack();
 }
 
+std::string getLocalVideoTrackHash(std::shared_ptr<twilio::media::LocalVideoTrack> local_video_track) {
+    std::size_t local_video_track_hash =
+            std::hash<twilio::media::LocalVideoTrack *>{}(local_video_track.get());
+
+    return std::to_string(local_video_track_hash);
+}
+
 jobject createJavaLocalVideoTrack(std::shared_ptr<twilio::media::LocalVideoTrack> local_video_track,
-                                  jboolean j_enabled,
                                   jobject j_video_capturer,
                                   jobject j_video_constraints,
                                   jobject j_context) {
@@ -44,20 +62,25 @@ jobject createJavaLocalVideoTrack(std::shared_ptr<twilio::media::LocalVideoTrack
     jmethodID j_video_track_ctor_id = webrtc_jni::GetMethodID(jni,
                                                               j_video_track_class,
                                                               "<init>",
-                                                              "(JZLcom/twilio/video/VideoCapturer;Lcom/twilio/video/VideoConstraints;Lorg/webrtc/VideoTrack;Landroid/content/Context;)V");
+                                                              kLocalVideoTrackConstructorSignature);
     LocalVideoTrackContext* video_track_context =
             new LocalVideoTrackContext(local_video_track);
     jobject j_webrtc_video_track = jni->NewObject(j_webrtc_video_track_class,
                                                   j_webrtc_video_track_ctor_id,
                                                   webrtc_jni::jlongFromPointer(local_video_track->getWebRtcTrack()));
     CHECK_EXCEPTION(jni) << "Error creating org.webrtc.VideoTrack";
+    jstring j_name = JavaUTF16StringFromStdString(jni, local_video_track->getName());
+    jstring j_track_hash = JavaUTF16StringFromStdString(jni,
+                                                        getLocalVideoTrackHash(local_video_track));
     jobject j_local_video_track = jni->NewObject(j_video_track_class,
                                                  j_video_track_ctor_id,
                                                  webrtc_jni::jlongFromPointer(video_track_context),
-                                                 j_enabled,
+                                                 local_video_track->isEnabled(),
                                                  j_video_capturer,
                                                  j_video_constraints,
                                                  j_webrtc_video_track,
+                                                 j_track_hash,
+                                                 j_name,
                                                  j_context);
     CHECK_EXCEPTION(jni) << "Error creating LocalVideoTrack";
 

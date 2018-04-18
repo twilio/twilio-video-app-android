@@ -61,7 +61,7 @@ public class VideoViewListViewAdapter extends BaseAdapter {
     @Override
     public long getItemId(int i) {
         Log.d(TAG, "getItemId");
-        return localVideoTracks.get(i).getTrackId().hashCode();
+        return localVideoTracks.get(i).getName().hashCode();
     }
 
     @Override
@@ -72,12 +72,12 @@ public class VideoViewListViewAdapter extends BaseAdapter {
         if (view == null) {
             LayoutInflater inflater = LayoutInflater.from(viewGroup.getContext());
             view = inflater.inflate(com.twilio.video.test.R.layout.video_view_item, null);
-            TextView trackIdTextView = (TextView) view.findViewById(R.id.track_id_text_view);
-            VideoView videoView = (VideoView) view.findViewById(R.id.video_view);
+            TextView trackNameTextView = view.findViewById(R.id.track_name_text_view);
+            VideoView videoView = view.findViewById(R.id.video_view);
             FrameCountProxyRendererListener frameCountProxyRendererListener =
                     new FrameCountProxyRendererListener(videoView);
 
-            ViewHolder viewHolder = new ViewHolder(trackIdTextView,
+            ViewHolder viewHolder = new ViewHolder(trackNameTextView,
                     frameCountProxyRendererListener);
             view.setTag(viewHolder);
         }
@@ -90,7 +90,7 @@ public class VideoViewListViewAdapter extends BaseAdapter {
         }
 
         // Update view holder
-        holder.trackIdTextView.setText(localVideoTrack.getTrackId());
+        holder.trackNameTextView.setText(localVideoTrack.getName());
         holder.frameCountProxyRendererListener.videoView
                 .setVideoScaleType(VideoScaleType.ASPECT_FILL);
         localVideoTrack.addRenderer(holder.frameCountProxyRendererListener);
@@ -101,12 +101,12 @@ public class VideoViewListViewAdapter extends BaseAdapter {
     }
 
     public static class ViewHolder {
-        private final TextView trackIdTextView;
+        private final TextView trackNameTextView;
         public final FrameCountProxyRendererListener frameCountProxyRendererListener;
 
-        ViewHolder(TextView trackIdTextView,
+        ViewHolder(TextView trackNameTextView,
                    FrameCountProxyRendererListener frameCountProxyRendererListener) {
-            this.trackIdTextView = trackIdTextView;
+            this.trackNameTextView = trackNameTextView;
             this.frameCountProxyRendererListener = frameCountProxyRendererListener;
         }
     }

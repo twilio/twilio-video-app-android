@@ -17,16 +17,13 @@
 package com.twilio.video;
 
 import android.annotation.TargetApi;
-import android.bluetooth.BluetoothClass;
 import android.content.Context;
-import android.content.Intent;
 import android.hardware.camera2.CameraAccessException;
 import android.hardware.camera2.CameraManager;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.runner.AndroidJUnit4;
 
 import com.twilio.video.base.BaseCamera2CapturerTest;
-import com.twilio.video.util.DeviceUtils;
 import com.twilio.video.util.FrameCountRenderer;
 
 import org.junit.After;
@@ -41,7 +38,7 @@ import java.util.concurrent.TimeUnit;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-import static org.junit.Assume.assumeFalse;
+
 import static org.junit.Assume.assumeTrue;
 
 @TargetApi(21)

@@ -19,11 +19,13 @@ package com.twilio.video;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.support.test.filters.LargeTest;
+import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
 import android.util.Log;
 
-import com.twilio.video.base.BaseParticipantTest;
+import com.twilio.video.base.BaseClientTest;
 import com.twilio.video.helper.CallbackHelper;
+import com.twilio.video.ui.MediaTestActivity;
 import com.twilio.video.util.Constants;
 import com.twilio.video.util.CredentialsUtils;
 import com.twilio.video.util.RoomUtils;
@@ -31,6 +33,7 @@ import com.twilio.video.util.Topology;
 
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -41,7 +44,6 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
-import static junit.framework.Assert.assertNotNull;
 import static junit.framework.Assert.fail;
 import static org.apache.commons.lang3.RandomStringUtils.random;
 import static org.junit.Assert.assertArrayEquals;
@@ -49,25 +51,18 @@ import static org.junit.Assert.assertTrue;
 
 @RunWith(AndroidJUnit4.class)
 @LargeTest
-public class ParticipantTest extends BaseParticipantTest {
-    private static final String TAG = "ParticipantTest";
+public class RemoteParticipantTest extends BaseClientTest {
+    private static final String TAG = "RemoteParticipantTest";
 
-    private Topology topology;
-    private String roomName;
+    @Rule
+    public ActivityTestRule<MediaTestActivity> activityRule =
+            new ActivityTestRule<>(MediaTestActivity.class);
+    private MediaTestActivity mediaTestActivity;
 
     @Before
     public void setup() throws InterruptedException {
-        topology = Topology.P2P;
-        super.baseSetup(topology);
-        roomName = random(Constants.ROOM_NAME_LENGTH);
-        assertNotNull(RoomUtils.createRoom(roomName, topology));
-        tokenOne = CredentialsUtils.getAccessToken(Constants.PARTICIPANT_ALICE, topology);
-        tokenTwo = CredentialsUtils.getAccessToken(Constants.PARTICIPANT_BOB, topology);
-    }
-
-    @Test(expected = NullPointerException.class)
-    public void setListener_shouldNotAllowNull() throws Exception {
-        participant.setListener(null);
+        super.setup();
+        mediaTestActivity = activityRule.getActivity();
     }
 
     /*
@@ -82,6 +77,7 @@ public class ParticipantTest extends BaseParticipantTest {
     public void shouldReceiveTrackEventsIfListenerSetAfterEventReceived()
             throws InterruptedException {
         final String roomName = random(Constants.ROOM_NAME_LENGTH);
+        Topology topology = Topology.P2P;
         Assert.assertNotNull(RoomUtils.createRoom(roomName, topology));
         String aliceToken = CredentialsUtils.getAccessToken(Constants.PARTICIPANT_ALICE, topology);
         final CountDownLatch aliceConnected = new CountDownLatch(1);
@@ -110,49 +106,97 @@ public class ParticipantTest extends BaseParticipantTest {
                 .roomName(roomName)
                 .build();
         final List<String> testEvents = Collections.synchronizedList(new ArrayList<String>());
-        final Participant.Listener aliceParticipantListener = new Participant.Listener() {
-            @Override
-            public void onAudioTrackAdded(Participant participant, AudioTrack audioTrack) {
-                Log.d(TAG, "Alice received bob's audio track");
-                testEvents.add("aliceReceivesBobAudioTrackAdded");
-                aliceReceivedBobAudioTrackAdded.countDown();
-            }
+        final RemoteParticipant.Listener aliceRemoteParticipantListener =
+                new RemoteParticipant.Listener() {
+                    @Override
+                    public void onAudioTrackPublished(RemoteParticipant remoteParticipant,
+                                                      RemoteAudioTrackPublication remoteAudioTrackPublication) {
+                        Log.d(TAG, "Alice received bob's audio track");
+                        testEvents.add("aliceReceivesBobAudioTrackAdded");
+                        aliceReceivedBobAudioTrackAdded.countDown();
+                    }
 
-            @Override
-            public void onAudioTrackRemoved(Participant participant, AudioTrack audioTrack) {
+                    @Override
+                    public void onAudioTrackUnpublished(RemoteParticipant remoteParticipant,
+                                                        RemoteAudioTrackPublication remoteAudioTrackPublication) {}
 
-            }
+                    @Override
+                    public void onAudioTrackSubscribed(RemoteParticipant remoteParticipant,
+                                                       RemoteAudioTrackPublication remoteAudioTrackPublication,
+                                                       RemoteAudioTrack remoteAudioTrack) {}
 
-            @Override
-            public void onVideoTrackAdded(Participant participant, VideoTrack videoTrack) {
+                    @Override
+                    public void onAudioTrackSubscriptionFailed(RemoteParticipant remoteParticipant,
+                                                               RemoteAudioTrackPublication remoteAudioTrackPublication,
+                                                               TwilioException twilioException) {}
 
-            }
+                    @Override
+                    public void onAudioTrackUnsubscribed(RemoteParticipant remoteParticipant,
+                                                         RemoteAudioTrackPublication remoteAudioTrackPublication,
+                                                         RemoteAudioTrack remoteAudioTrack) {}
 
-            @Override
-            public void onVideoTrackRemoved(Participant participant, VideoTrack videoTrack) {
+                    @Override
+                    public void onVideoTrackPublished(RemoteParticipant remoteParticipant,
+                                                      RemoteVideoTrackPublication remoteVideoTrackPublication) {}
 
-            }
+                    @Override
+                    public void onVideoTrackUnpublished(RemoteParticipant remoteParticipant,
+                                                        RemoteVideoTrackPublication remoteVideoTrackPublication) {}
 
-            @Override
-            public void onAudioTrackEnabled(Participant participant, AudioTrack audioTrack) {
+                    @Override
+                    public void onVideoTrackSubscribed(RemoteParticipant remoteParticipant,
+                                                       RemoteVideoTrackPublication remoteVideoTrackPublication,
+                                                       RemoteVideoTrack remoteVideoTrack) {}
 
-            }
+                    @Override
+                    public void onVideoTrackSubscriptionFailed(RemoteParticipant remoteParticipant,
+                                                               RemoteVideoTrackPublication remoteVideoTrackPublication,
+                                                               TwilioException twilioException) {}
 
-            @Override
-            public void onAudioTrackDisabled(Participant participant, AudioTrack audioTrack) {
+                    @Override
+                    public void onVideoTrackUnsubscribed(RemoteParticipant remoteParticipant,
+                                                         RemoteVideoTrackPublication remoteVideoTrackPublicatieon,
+                                                         RemoteVideoTrack remoteVideoTrack) {}
 
-            }
+                    @Override
+                    public void onDataTrackPublished(RemoteParticipant remoteParticipant,
+                                                     RemoteDataTrackPublication remoteDataTrackPublication) {}
 
-            @Override
-            public void onVideoTrackEnabled(Participant participant, VideoTrack videoTrack) {
+                    @Override
+                    public void onDataTrackUnpublished(RemoteParticipant remoteParticipant,
+                                                       RemoteDataTrackPublication remoteDataTrackPublication) {}
 
-            }
+                    @Override
+                    public void onDataTrackSubscribed(RemoteParticipant remoteParticipant,
+                                                      RemoteDataTrackPublication remoteDataTrackPublication,
+                                                      RemoteDataTrack remoteDataTrack) {}
 
-            @Override
-            public void onVideoTrackDisabled(Participant participant, VideoTrack videoTrack) {
+                    @Override
+                    public void onDataTrackSubscriptionFailed(RemoteParticipant remoteParticipant,
+                                                              RemoteDataTrackPublication remoteDataTrackPublication,
+                                                              TwilioException twilioException) {}
 
-            }
-        };
+                    @Override
+                    public void onDataTrackUnsubscribed(RemoteParticipant remoteParticipant,
+                                                        RemoteDataTrackPublication remoteDataTrackPublication,
+                                                        RemoteDataTrack remoteDataTrack) {}
+
+                    @Override
+                    public void onAudioTrackEnabled(RemoteParticipant remoteParticipant,
+                                                    RemoteAudioTrackPublication remoteAudioTrackPublication) {}
+
+                    @Override
+                    public void onAudioTrackDisabled(RemoteParticipant remoteParticipant,
+                                                     RemoteAudioTrackPublication remoteAudioTrackPublication) {}
+
+                    @Override
+                    public void onVideoTrackEnabled(RemoteParticipant remoteParticipant,
+                                                    RemoteVideoTrackPublication remoteVideoTrackPublication) {}
+
+                    @Override
+                    public void onVideoTrackDisabled(RemoteParticipant remoteParticipant,
+                                                     RemoteVideoTrackPublication remoteVideoTrackPublication) {}
+                };
         final Room.Listener aliceRoomListener = new Room.Listener() {
             @Override
             public void onConnected(Room room) {
@@ -171,7 +215,7 @@ public class ParticipantTest extends BaseParticipantTest {
             }
 
             @Override
-            public void onParticipantConnected(Room room, Participant participant) {
+            public void onParticipantConnected(Room room, RemoteParticipant remoteParticipant) {
                 Log.d(TAG, "Alice sees bob connected");
                 testEvents.add("aliceSeesBobConnected");
                 aliceSeesBobConnected.countDown();
@@ -185,13 +229,13 @@ public class ParticipantTest extends BaseParticipantTest {
                     fail(e.getMessage());
                 }
 
-                Log.d(TAG, "Alice sets participant listener");
+                Log.d(TAG, "Alice sets bobRemoteParticipant listener");
                 testEvents.add("aliceSetsListener");
-                participant.setListener(aliceParticipantListener);
+                remoteParticipant.setListener(aliceRemoteParticipantListener);
             }
 
             @Override
-            public void onParticipantDisconnected(Room room, Participant participant) {
+            public void onParticipantDisconnected(Room room, RemoteParticipant remoteParticipant) {
 
             }
 
@@ -250,7 +294,7 @@ public class ParticipantTest extends BaseParticipantTest {
                 // Publish audio track for bob
                 LocalParticipant bobLocalParticipant = bobRoom.get()
                         .getLocalParticipant();
-                bobLocalParticipant.addAudioTrack(bobAudioTrack);
+                bobLocalParticipant.publishTrack(bobAudioTrack);
                 testEvents.add("bobPublishesAudioTrack");
                 bobPublishedAudioTrack.countDown();
                 Log.d(TAG, "bob published audio track");

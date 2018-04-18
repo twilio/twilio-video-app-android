@@ -49,6 +49,8 @@ import static org.junit.Assert.assertTrue;
 
 @RunWith(JUnitParamsRunner.class)
 public class VideoViewTest {
+    private static final int FRAME_DELAY_MS = 3500;
+
     @Rule
     public ActivityTestRule<VideoViewTestActivity> activityRule =
             new ActivityTestRule<>(VideoViewTestActivity.class);
@@ -150,7 +152,8 @@ public class VideoViewTest {
                     (VideoViewRecyclerViewAdapter.VideoViewHolder) recyclerView
                             .findViewHolderForAdapterPosition(i);
 
-            assertTrue(videoViewHolder.frameCountProxyRendererListener.waitForFrame(3000));
+            assertTrue(videoViewHolder
+                    .frameCountProxyRendererListener.waitForFrame(FRAME_DELAY_MS));
         }
     }
 
@@ -201,7 +204,7 @@ public class VideoViewTest {
             });
             VideoViewListViewAdapter.ViewHolder viewHolder = videoViewListViewAdapter
                     .viewHolderPositionMap.get(position);
-            assertTrue(viewHolder.frameCountProxyRendererListener.waitForFrame(3000));
+            assertTrue(viewHolder.frameCountProxyRendererListener.waitForFrame(FRAME_DELAY_MS));
         }
     }
 

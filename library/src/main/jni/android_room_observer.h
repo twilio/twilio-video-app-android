@@ -19,15 +19,19 @@
 
 #include "webrtc/sdk/android/src/jni/jni_helpers.h"
 #include "video/room_observer.h"
-#include "video/participant.h"
-#include "com_twilio_video_Participant.h"
+#include "video/remote_participant.h"
+#include "com_twilio_video_RemoteParticipant.h"
 #include "com_twilio_video_LocalParticipant.h"
 
 namespace twilio_video_jni {
 
 class AndroidRoomObserver : public twilio::video::RoomObserver {
 public:
-    AndroidRoomObserver(JNIEnv *env, jobject j_room, jobject j_room_observer);
+    AndroidRoomObserver(JNIEnv *env,
+                        jobject j_room,
+                        jobject j_room_observer,
+                        jobject j_connect_options,
+                        jobject j_handler);
     ~AndroidRoomObserver();
     void setObserverDeleted();
 protected:
@@ -37,9 +41,9 @@ protected:
     virtual void onConnectFailure(const twilio::video::Room *room,
                                   const twilio::video::TwilioError twilio_error);
     virtual void onParticipantConnected(twilio::video::Room *room,
-                                        std::shared_ptr<twilio::video::Participant> participant);
+                                        std::shared_ptr<twilio::video::RemoteParticipant> remote_participant);
     virtual void onParticipantDisconnected(twilio::video::Room *room,
-                                           std::shared_ptr<twilio::video::Participant> participant);
+                                           std::shared_ptr<twilio::video::RemoteParticipant> remote_participant);
     virtual void onRecordingStarted(twilio::video::Room *room);
     virtual void onRecordingStopped(twilio::video::Room *room);
 
@@ -51,20 +55,34 @@ private:
     jobject createJavaRoomException(const twilio::video::TwilioError &twilio_error);
 
     jobject createJavaParticipantList(
-            const std::map<std::string, std::shared_ptr<twilio::video::Participant>> participants);
+            const std::map<std::string, std::shared_ptr<twilio::video::RemoteParticipant>> participants);
+
+    jobject getLocalAudioTracks();
+    jobject getLocalVideoTracks();
+    jobject getLocalDataTracks();
 
     bool observer_deleted_ = false;
     mutable rtc::CriticalSection deletion_lock_;
 
     const webrtc_jni::ScopedGlobalRef<jobject> j_room_;
     const webrtc_jni::ScopedGlobalRef<jobject> j_room_observer_;
+    const webrtc_jni::ScopedGlobalRef<jobject> j_connect_options_;
+    const webrtc_jni::ScopedGlobalRef<jobject> j_handler_;
     const webrtc_jni::ScopedGlobalRef<jclass> j_room_class_;
     const webrtc_jni::ScopedGlobalRef<jclass> j_room_observer_class_;
+    const webrtc_jni::ScopedGlobalRef<jclass> j_local_participant_class_;
     const webrtc_jni::ScopedGlobalRef<jclass> j_twilio_exception_class_;
-    const webrtc_jni::ScopedGlobalRef<jclass> j_participant_class_;
+    const webrtc_jni::ScopedGlobalRef<jclass> j_remote_participant_class_;
     const webrtc_jni::ScopedGlobalRef<jclass> j_array_list_class_;
-    const webrtc_jni::ScopedGlobalRef<jclass> j_audio_track_class_;
-    const webrtc_jni::ScopedGlobalRef<jclass> j_video_track_class_;
+    const webrtc_jni::ScopedGlobalRef<jclass> j_published_audio_track_class_;
+    const webrtc_jni::ScopedGlobalRef<jclass> j_remote_audio_track_class_;
+    const webrtc_jni::ScopedGlobalRef<jclass> j_remote_audio_track_publication_class_;
+    const webrtc_jni::ScopedGlobalRef<jclass> j_published_video_track_class_;
+    const webrtc_jni::ScopedGlobalRef<jclass> j_remote_video_track_class_;
+    const webrtc_jni::ScopedGlobalRef<jclass> j_remote_video_track_publication_class_;
+    const webrtc_jni::ScopedGlobalRef<jclass> j_published_data_track_class_;
+    const webrtc_jni::ScopedGlobalRef<jclass> j_remote_data_track_class_;
+    const webrtc_jni::ScopedGlobalRef<jclass> j_remote_data_track_publication_class_;
     jmethodID j_set_connected_;
     jmethodID j_on_connected_;
     jmethodID j_on_disconnected_;
@@ -73,14 +91,24 @@ private:
     jmethodID j_on_participant_disconnected_;
     jmethodID j_on_recording_started_;
     jmethodID j_on_recording_stopped_;
-    jmethodID j_get_handler_;
+    jmethodID j_local_participant_ctor_id_;
     jmethodID j_participant_ctor_id_;
     jmethodID j_array_list_ctor_id_;
     jmethodID j_array_list_add_;
+    jmethodID j_published_audio_track_ctor_id_;
     jmethodID j_audio_track_ctor_id_;
+    jmethodID j_audio_track_publication_ctor_id_;
+    jmethodID j_published_video_track_ctor_id_;
     jmethodID j_video_track_ctor_id_;
+    jmethodID j_video_track_publication_ctor_id_;
+    jmethodID j_data_track_ctor_id_;
+    jmethodID j_published_data_track_ctor_id_;
+    jmethodID j_data_track_publication_ctor_id_;
+    jmethodID j_connect_options_get_audio_tracks_;
+    jmethodID j_connect_options_get_video_tracks_;
+    jmethodID j_connect_options_get_data_tracks_;
     jmethodID j_twilio_exception_ctor_id_;
-    std::map<std::shared_ptr<twilio::video::Participant>, jobject> participants_;
+    std::map<std::shared_ptr<twilio::video::RemoteParticipant>, jobject> remote_participants_;
 };
 
 }

@@ -1,10 +1,513 @@
 The Twilio Programmable Video SDKs use [Semantic Versioning](http://www.semver.org).
 
+####2.0.0
+
+We've promoted `2.0.0-beta5` to `2.0.0` as our first General Availability release.
+
+Known issues
+
+- Network handoff, and subsequent connection renegotiation is not supported for IPv6 networks [#72](https://github.com/twilio/video-quickstart-android/issues/72)
+- Participant disconnect event can take up to 120 seconds to occur [#80](https://github.com/twilio/video-quickstart-android/issues/80) [#73](https://github.com/twilio/video-quickstart-android/issues/73)
+- Codec preferences do not function correctly in a hybrid codec Group Room.
+
+####2.0.0-beta5
+
+Bug Fixes
+
+- Fixed issue where onDisconnected was not called when completing a Room using the REST API. [#277](https://github.com/twilio/video-quickstart-android/issues/277)
+
+Known issues
+
+- Network handoff, and subsequent connection renegotiation is not supported for IPv6 networks [#72](https://github.com/twilio/video-quickstart-android/issues/72)
+- Participant disconnect event can take up to 120 seconds to occur [#80](https://github.com/twilio/video-quickstart-android/issues/80) [#73](https://github.com/twilio/video-quickstart-android/issues/73)
+- Codec preferences do not function correctly in a hybrid codec Group Room.
+
+####2.0.0-beta4
+
+Improvements
+
+- Removed `trackId` from `BaseTrackStats`. `trackSid` or `trackName` can be used to identify
+track stats in a `StatsReport`.
+- Removed `getTrackId` from `LocalAudioTrack`, `LocalVideoTrack`, and `LocalDataTrack`.
+- Added `getSid` to `RemoteAudioTrack`, `RemoteVideoTrack`, and `RemoteDataTrack`.
+- Updated Android Gradle Plugin version to `3.1.0` and Gradle version to `4.4`.
+- SDK now defers to WebRTC to validate ice servers and returns an error when a connection attempt
+ fails due to invalid servers.
+- Reduced the time needed to shutdown the signaling stack while disconnecting from a Room.
+- Increased the signaling disconnect timeout interval to 1 second.
+- Enable monotonic clock support in the signaling client.
+- Initial connect message now includes client version metadata.
+- Converted `AudioCodec` and `VideoCodec` from enums to abstract classes with concrete
+implementations. The subclasses of `AudioCodec` and `VideoCodec` are the following:
+  - `AudioCodec`
+     - `IsacCodec`
+     - `OpusCodec`
+     - `PcmaCodec`
+     - `PcmuCodec`
+     - `G722Codec`
+  - `VideoCodec`
+     - `Vp8Codec`
+     - `H264Codec`
+     - `Vp9Codec`
+
+ The following snippets demonstrate the before and after for setting codec preferences.
+
+        // Setting preferences before 2.0.0-beta4
+        ConnectOptions aliceConnectOptions = new ConnectOptions.Builder(aliceToken)
+              .roomName(roomName)
+              .preferAudioCodecs(Collections.singletonList(VideoCodec.ISAC))
+              .preferVideoCodecs(Collections.singletonList(VideoCodec.VP9))
+              .build();
+
+        // Setting preferences with 2.0.0-beta4
+        ConnectOptions aliceConnectOptions = new ConnectOptions.Builder(aliceToken)
+              .roomName(roomName)
+              .preferAudioCodecs(Collections.<AudioCodec>singletonList(new IsacCodec()))
+              .preferVideoCodecs(Collections.<VideoCodec>singletonList(new Vp9Codec()))
+              .build();
+
+
+Bug Fixes
+
+- Fixed a bug where the SDK hangs if DNS resolution fails and the user does not initiate disconnect.
+- Resolved an issue with clock rollover in the Room signaling layer that resulted in high CPU usage
+ and disconnects.
+- The signaling client no longer logs access tokens.
+
+Known issues
+
+- Network handoff, and subsequent connection renegotiation is not supported for IPv6 networks [#72](https://github.com/twilio/video-quickstart-android/issues/72)
+- Participant disconnect event can take up to 120 seconds to occur [#80](https://github.com/twilio/video-quickstart-android/issues/80) [#73](https://github.com/twilio/video-quickstart-android/issues/73)
+- Codec preferences do not function correctly in a hybrid codec Group Room.
+
+####2.0.0-beta3
+
+Improvements
+
+- Improved internal logic for retrieving ice servers and resolving outbound DNS.
+
+Bug Fixes
+
+- ICE URIs using the turns and stuns scheme are now supported.
+ The SDK will now use turns by default if turn is enabled for your Room.
+- Resolved a condition where ICE candidates might not be applied in Peer-to-Peer Rooms.
+- Quieted unnecessary warning logs when preferring codecs.
+- Fixed a bug where onDisconnected was not getting invoked due to a race condition between a
+ network handover and a user initiated disconnect call.
+
+Known issues
+
+- Network handoff, and subsequent connection renegotiation is not supported for IPv6 networks [#72](https://github.com/twilio/video-quickstart-android/issues/72)
+- Participant disconnect event can take up to 120 seconds to occur [#80](https://github.com/twilio/video-quickstart-android/issues/80) [#73](https://github.com/twilio/video-quickstart-android/issues/73)
+- Codec preferences do not function correctly in a hybrid codec Group Room.
+
+####2.0.0-beta2
+
+Bug Fixes
+
+- Fixed crash when calling `Room#disconnect()` twice. [#255](https://github.com/twilio/video-quickstart-android/issues/255)
+
+Known issues
+
+- Network handoff, and subsequent connection renegotiation is not supported for IPv6 networks [#72](https://github.com/twilio/video-quickstart-android/issues/72)
+- Participant disconnect event can take up to 120 seconds to occur [#80](https://github.com/twilio/video-quickstart-android/issues/80) [#73](https://github.com/twilio/video-quickstart-android/issues/73)
+- Codec preferences do not function correctly in a hybrid codec Group Room.
+
+####2.0.0-beta1
+
+Improvements
+
+- Updated `targetSdkVersion` to 27
+- Updated `buildToolsVersion` to 27.0.3
+- Updated Android Gradle plugin to to 3.0.1
+
+Known issues
+
+- Network handoff, and subsequent connection renegotiation is not supported for IPv6 networks [#72](https://github.com/twilio/video-quickstart-android/issues/72)
+- Participant disconnect event can take up to 120 seconds to occur [#80](https://github.com/twilio/video-quickstart-android/issues/80) [#73](https://github.com/twilio/video-quickstart-android/issues/73)
+- Codec preferences do not function correctly in a hybrid codec Group Room.
+
+####2.0.0-preview9
+
+Improvements
+
+- Refactor internal reference counting of internal MediaFactory.
+
+Bug Fixes
+
+- Don't publish Ice Candidate stats unless an active pair is present.
+
+Known issues
+
+- Network handoff, and subsequent connection renegotiation is not supported for IPv6 networks [#72](https://github.com/twilio/video-quickstart-android/issues/72)
+- Participant disconnect event can take up to 120 seconds to occur [#80](https://github.com/twilio/video-quickstart-android/issues/80) [#73](https://github.com/twilio/video-quickstart-android/issues/73)
+- Codec preferences do not function correctly in a hybrid codec Group Room.
+
+####2.0.0-preview8
+
+Features
+
+- Added the following callbacks to `RemoteParticipant.Listener`
+  - `onAudioTrackSubscriptionFailed` - Notifies listener that an audio track could not be 
+  subscribed to.
+  - `onVideoTrackSubscriptionFailed` - Notifies listener that a video track could not be 
+  subscribed to.
+  - `onDataTrackSubscriptionFailed` - Notifies listener that a data track could not be 
+  subscribed to.
+- Added `trackSid` to `BaseTrackStats`.
+
+Bug Fixes
+
+- Removed public `getEncodingOptions` method from `ConnectOptions`.
+
+Known issues
+
+- Network handoff, and subsequent connection renegotiation is not supported for IPv6 networks [#72](https://github.com/twilio/video-quickstart-android/issues/72)
+- Participant disconnect event can take up to 120 seconds to occur [#80](https://github.com/twilio/video-quickstart-android/issues/80) [#73](https://github.com/twilio/video-quickstart-android/issues/73)
+- Codec preferences do not function correctly in a hybrid codec Group Room.
+
+####2.0.0-preview7
+
+Improvements
+
+- Added version to javadoc title, header, and bottom.
+- `LocalParticipant` throws `IllegalArgumentException` when attempting to publish or unpublish
+ a released `Track`.
+
+Bug Fixes
+
+- Fixed crash disconnecting from a `Room` before being connected.
+
+Known issues
+
+- Network handoff, and subsequent connection renegotiation is not supported for IPv6 networks [#72](https://github.com/twilio/video-quickstart-android/issues/72)
+- Participant disconnect event can take up to 120 seconds to occur [#80](https://github.com/twilio/video-quickstart-android/issues/80) [#73](https://github.com/twilio/video-quickstart-android/issues/73)
+- Codec preferences do not function correctly in a hybrid codec Group Room.
+
+####2.0.0-preview6
+
+Improvements
+
+- `LocalDataTrack` name is no longer provided via static `create` method argument. DataTrack names
+ are now provided via `DataTrackOptions`. Reference snippets below:
+ 
+    Creating a `LocalDataTrack` with name _before_ `2.0.0-preview6`
+
+        String dataTrackName = "data";
+        LocalDataTrack localDataTrack = LocalDataTrack.create(context, dataTrackName);
+     
+    Creating a `LocalDataTrack` with name _after_ `2.0.0-preview6`
+
+        String dataTrackName = "data";
+        DataTrackOptions dataTrackOptions = new DataTrackOptions.Builder()
+             .name("data")
+             .build();
+        LocalDataTrack localDataTrack = LocalDataTrack.create(context, dataTrackOptions);
+        
+- Updated javadoc to include note about `VideoView#setVideoScaleType`. Scale type will only
+ be applied to dimensions defined as `WRAP_CONTENT` or a custom value. Setting a width or height to 
+ `MATCH_PARENT` results in the video being scaled to fill the maximum value of the dimension.
+- Add warning log when calling `setVideoScaleType` when width or height is set to `MATCH_PARENT`
+
+Bug Fixes
+
+- Fixed a potential crash when publishing or unpublishing a Data Track.
+    
+Known issues
+
+- Network handoff, and subsequent connection renegotiation is not supported for IPv6 networks [#72](https://github.com/twilio/video-quickstart-android/issues/72)
+- Participant disconnect event can take up to 120 seconds to occur [#80](https://github.com/twilio/video-quickstart-android/issues/80) [#73](https://github.com/twilio/video-quickstart-android/issues/73)
+- Codec preferences do not function correctly in a hybrid codec Group Room.
+
+####2.0.0-preview5
+
+Features
+
+- Added the following callbacks to `LocalParticipant.Listener`
+  - `onAudioTrackPublicationFailed` - Notifies listener that local participant failed to publish 
+  audio track.
+  - `onVideoTrackPublicationFailed` - Notifies listener that local participant failed to publish 
+  video track.
+  - `onVideoTrackPublicationFailed` - Notifies listener that local participant failed to publish 
+  video track.
+  
+Improvements
+
+- Include javadoc and sources jar with artifacts published to Bintray. 
+- Added support for `DataTrack` API with Group rooms.
+- Updated to Build Tools 26.0.2
+- Support annotations and Relinker no longer exposed at compile time
+- Made `Track` interface public. `Track` is the common interface for an `AudioTrack`, `VideoTrack`,
+and `DataTrack`.
+- Twilio CDN no longer hosts the Video Android aar artifacts or Javadocs
+
+######Accessing Artifacts
+If you are downloading Video Android SDK artifacts from the Twilio CDN then there are two 
+options available moving forward.
+
+1. Follow our [Downloading Video SDKs Guide for Android](https://www.twilio.com/docs/api/video/download-video-sdks#android-sdk).
+2. Download the artifacts [directly from Bintray](https://bintray.com/twilio/releases/video-android#files/com/twilio/video-android).
+
+######Viewing Javadocs
+All Javadocs back to `1.0.0-preview1` are now hosted on [Github Pages](https://pages.github.com/) 
+with the following URL scheme. `https://twilio.github.io/twilio-video-android/docs/{version}`
+
+  - To view `2.0.0-preview5` Javadocs go to [https://twilio.github.io/twilio-video-android/docs/2.0.0-preview5](https://twilio.github.io/twilio-video-android/docs/2.0.0-preview5)
+
+Bug Fixes
+
+- Fixed NPE when calling `takePicture` on `CameraCapturer`. 
+    
+Known issues
+
+- Network handoff, and subsequent connection renegotiation is not supported for IPv6 networks [#72](https://github.com/twilio/video-quickstart-android/issues/72)
+- Participant disconnect event can take up to 120 seconds to occur [#80](https://github.com/twilio/video-quickstart-android/issues/80) [#73](https://github.com/twilio/video-quickstart-android/issues/73)
+- Codec preferences do not function correctly in a hybrid codec Group Room.
+
+####2.0.0-preview4
+
+Features
+
+- Added new `DataTrack` API. A data track represents a unidirectional source that allow sharing
+string and binary data with all participants of a Room. Data tracks function similarly to audio and
+video tracks and can be provided via `ConnectOptions` and published using 
+`LocalParticipant#publishTrack`. Messages sent on the data track are not guaranteed to be 
+delivered to all the participants. The following snippets demonstrate how to send and receive 
+messages with data tracks.
+
+Creating a `LocalDataTrack`
+
+    LocalDataTrack localDataTrack = LocalDataTrack.create(context);
+    
+Connecting to a `Room` with a `LocalDataTrack`
+
+    ConnectOptions connectOptions = new ConnectOptions.Builder(token)
+            .dataTracks(Collections.singletonList(localDataTrack))
+            .build();
+    Video.connect(context, connectOptions, roomListener);
+    
+Publishing a `LocalDataTrack`
+
+    // ... Connected to room
+    LocalParticipant localParticipant = room.getLocalParticipant();
+    
+    localParticipant.publish(localDataTrack);
+    
+Observing `RemoteDataTrackPublication` and `RemoteDataTrack`
+
+    RemoteParticipant.Listener participantListener = new RemoteParticipant.Listener() {
+            // ... complete interface ellided
+            
+            // Participant has published data track
+            @Override
+            public void onDataTrackPublished(RemoteParticipant remoteParticipant,
+                                             RemoteDataTrackPublication remoteDataTrackPublication);
+    
+            // Participant has unpublished data track
+            @Override
+            public void onDataTrackUnpublished(RemoteParticipant remoteParticipant,
+                                               RemoteDataTrackPublication remoteDataTrackPublication);
+    
+            // Data track has been subscribed to and messages can be observed.
+            @Override
+            public void onDataTrackSubscribed(RemoteParticipant remoteParticipant,
+                                              RemoteDataTrackPublication remoteDataTrackPublication,
+                                              RemoteDataTrack remoteDataTrack);
+    
+            // Data track has been unsubsubscribed from and messages cannot be observed.
+            @Override
+            public void onDataTrackUnsubscribed(RemoteParticipant remoteParticipant,
+                                                RemoteDataTrackPublication remoteDataTrackPublication,
+                                                RemoteDataTrack remoteDataTrack);
+    };
+    
+Sending messages on `LocalDataTrack`
+
+    String message = "Hello DataTrack!";
+    ByteBuffer messageBuffer = ByteByffer.wrap(new byte[]{ 0xf, 0xe });
+    
+    localDataTrack.send(message);
+    localDataTrack.send(messageBuffer);
+    
+Observing messages from data track 
+
+    RemoteDataTrack.Listener dataTrackListener = new RemoteDataTrack.Listener() {
+            @Override
+            public void onMessage(String message) {
+                // Should print "Hello DataTrack!"
+                Log.d(TAG, String.format("Received data track message: %s", message));
+            }
+            
+            @Override
+            public void onMessage(ByteBuffer message) {
+                Log.d(TAG, "Received message buffer on data track!");
+            }
+    };
+    
+Improvements
+
+- Moved pre-defined aspect ratios from `VideoConstraints` class to `AspectRatio` class.
+- Local audio, video, and data tracks return their track IDs for `getName` if no name was specified.
+- Improved threading contract.
+    
+Bug Fixes
+
+- Fixed issue that caused track and room names with certain UTF-8 characters to be improperly 
+encoded. [#179](https://github.com/twilio/video-quickstart-android/issues/179)
+
+Known issues
+
+- Network handoff, and subsequent connection renegotiation is not supported for IPv6 networks [#72](https://github.com/twilio/video-quickstart-android/issues/72)
+- Participant disconnect event can take up to 120 seconds to occur [#80](https://github.com/twilio/video-quickstart-android/issues/80) [#73](https://github.com/twilio/video-quickstart-android/issues/73)
+- Codec preferences do not function correctly in a hybrid codec Group Room.
+- DataTrack support for Group Rooms is currently available only on JavaScript. DataTrack support 
+for Group Rooms will be available on iOS and Android soon.
+
+####2.0.0-preview3
+
+Improvements
+
+- Upgraded to Android Oreo from Nougat
+
+Bug Fixes
+
+- Fixed case on some devices where `CameraCapturer` incorrectly reported a failure to close the 
+camera.
+- Improved echo cancellation on Nexus 6P and Nexus 6 by enabling hardware echo canceller and disabling OpenSL ES.
+- Fixed crash disconnecting from `Room` that has not connected [#116](https://github.com/twilio/video-quickstart-android/issues/116)
+
+Known issues
+
+- Network handoff, and subsequent connection renegotiation is not supported for IPv6 networks [#72](https://github.com/twilio/video-quickstart-android/issues/72)
+- Participant disconnect event can take up to 120 seconds to occur [#80](https://github.com/twilio/video-quickstart-android/issues/80) [#73](https://github.com/twilio/video-quickstart-android/issues/73)
+- Track and room names with certain UTF-8 characters are not encoded properly [#179](https://github.com/twilio/video-quickstart-android/issues/179)
+- Codec preferences do not function correctly in a hybrid codec Group Room.
+
+####2.0.0-preview2
+
+Bug Fixes
+
+- Fixed crash when disconnecting from a Room immediately after unpublishing a local track.
+
+- Participant disconnect event can take up to 120 seconds to occur [#80](https://github.com/twilio/video-quickstart-android/issues/80) [#73](https://github.com/twilio/video-quickstart-android/issues/73)
+- Disconnecting from a `Room` that has not connected sometimes results in a crash [#116](https://github.com/twilio/video-quickstart-android/issues/116)
+
+Known issues
+
+- Network handoff, and subsequent connection renegotiation is not supported for IPv6 networks [#72](https://github.com/twilio/video-quickstart-android/issues/72)
+- Participant disconnect event can take up to 120 seconds to occur [#80](https://github.com/twilio/video-quickstart-android/issues/80) [#73](https://github.com/twilio/video-quickstart-android/issues/73)
+- Codec preferences do not function correctly in a hybrid codec Group Room.
+
+####2.0.0-preview1
+
+Features
+
+- Added `EncodingParameters` which constrains how much bandwidth is used to share audio and 
+video. This object has been added to `ConnectOptions` and can also be set on `LocalParticipant` 
+after joining a `Room`.
+- Added two static `create` methods to `LocalAudioTrack` and `LocalVideoTrack` that allow creating
+named tracks. The following snippet demonstrates how to create a video track named "screen".
+
+      LocalVideoTrack screenVideoTrack = LocalVideoTrack.create(context, 
+              true, 
+              screenCapturer, 
+              "screen"); 
+              
+- Moved `getTrackId` from `Track` to `LocalAudioTrack` and `LocalVideoTrack`.
+- Added `AudioCodec` and `VideoCodec` as part of the new codec preferences API. Audio and video
+codec preferences can be set in `ConnectOptions`. The following snippet
+demonstrates how to prefer the iSAC audio codec and VP9 video codec.
+
+      ConnectOptions aliceConnectOptions = new ConnectOptions.Builder(aliceToken)
+              .roomName(roomName)
+              .preferAudioCodecs(Collections.singletonList(VideoCodec.ISAC))
+              .preferVideoCodecs(Collections.singletonList(VideoCodec.VP9))
+              .build();
+
+- Added `RemoteAudioTrack` and `RemoteVideoTrack`. These new objects extend `AudioTrack` and 
+`VideoTrack` respectively and come with the following new method: 
+  - `getName` - Returns the name of the track or an empty string if no name is specified.
+- Added `enablePlayback` to new `RemoteAudioTrack` which allows developers to mute the audio 
+ received from a `RemoteParticipant`.
+- Added `RemoteAudioTrackPublication` which represents a published `RemoteAudioTrack`. This new 
+class contains the following methods: 
+  - `getTrackSid` - Returns the identifier of a remote video track within the scope of a `Room`.
+  - `getTrackName` - Returns the name of the track or an empty string if no name was specified.
+  - `isTrackEnabled` - Checks if the track is enabled.
+  - `getAudioTrack` - Returns the base class object of the remote audio track published.
+  - `getRemoteAudioTrack` - Returns the remote audio track published.
+- Added `RemoteVideoTrackPublication` which represents a published `RemoteVideoTrack`. This new 
+class contains the following methods: 
+  - `getTrackSid` - Returns the identifier of a remote video track within the scope of a `Room`.
+  - `getTrackName` - Returns the name of the track or an empty string if no name was specified.
+  - `isTrackEnabled` - Checks if the track is enabled.
+  - `getAudioTrack` - Returns the base class object of the remote audio track published.
+  - `getRemoteAudioTrack` - Returns the remote audio track published.
+- Added `LocalAudioTrackPublication` which represents a published `LocalAudioTrack`. This new 
+class contains the following methods: 
+  - `getTrackSid` - Returns the identifier of a local video track within the scope of a `Room`.
+  - `getTrackName` - Returns the name of the track or an empty string if no name was specified.
+  - `isTrackEnabled` - Checks if the track is enabled.
+  - `getAudioTrack` - Returns the base class object of the local audio track published.
+  - `getLocalAudioTrack` - Returns the local audio track published.
+- Added `LocalVideoTrackPublication` which represents a published `LocalVideoTrack`. This new 
+class contains the following methods: 
+  - `getTrackSid` - Returns the identifier of a local video track within the scope of a `Room`.
+  - `getTrackName` - Returns the name of the track or an empty string if no name was specified.
+  - `isTrackEnabled` - Checks if the track is enabled.
+  - `getAudioTrack` - Returns the base class object of the local audio track published.
+  - `getLocalAudioTrack` - Returns the local audio track published.
+- Converted `Participant` to an interface and migrated previous functionality into 
+`RemoteParticipant`. `LocalParticipant` and the new `RemoteParticipant` implement `Participant`.
+- Added `RemoteParticipant#getRemoteAudioTracks` and `RemoteParticipant#getRemoteVideoTracks` which
+return `List<RemoteAudioTrackPublication>` and `List<RemoteVideoTrackPublication>` respectively.
+- Moved `Participant.Listener` to `RemoteParticipant.Listener` and changed the listener to return
+`RemoteParticipant`, `RemoteAudioTrackPublication`, and `RemoteVideoTrackPublication` in callbacks.
+- Renamed the following `RemoteParticipant.Listener` callbacks:
+  - `onAudioTrackAdded` renamed to `onAudioTrackPublished`.
+  - `onAudioTrackRemoved` renamed to `onAudioTrackUnpublished`.
+  - `onVideoTrackAdded` renamed to `onVideoTrackPublished`.
+  - `onVideoTrackRemoved` renamed to `onVideoTrackUnpublished`.
+- Added the following callbacks to `RemoteParticipant.Listener`:
+  - `onAudioTrackSubscribed` - Indicates when audio is flowing from a remote particpant's audio 
+  track. This callback includes the `RemoteAudioTrack` that was subscribed to.
+  - `onAudioTrackUnsubscribed` - Indicates when audio is no longer flowing from a remote 
+  partipant's audio track. This callback includes the `RemoteAudioTrack` that was subscribed to.
+  - `onVideoTrackSubscribed` - Indicates when video is flowing from a remote participant's video 
+  track. This callback includes the `RemoteVideoTrack` that was subscribed to.
+  - `onVideoTrackUnsubscribed` - Indicates when video is no longer flowing from a remote
+  participant's video track. This callback includes the `RemoteVideoTrack` that was subscribed to.
+- Renamed `TrackStats` to `RemoteTrackStats`, `AudioTrackStats` to `RemoteAudioTrackStats`, and
+`VideoTrackStats` to `RemoteVideoTrackStats`
+- Renamed `LocalParticipant#addAudioTrack` and `LocalParticipant#addVideoTrack` to 
+`LocalParticipant#publishedTrack`.
+- Added `LocalParticipant.Listener` which is provides the following callbacks:
+  - `onAudioTrackPublished` - Indicates when a local audio track has been published to a `Room`.
+  - `onVideoTrackPublished` - Indicates when a local video track has been published to a `Room`.
+- Added `LocalParticipant#getLocalAudioTracks` and `LocalParticipant#getLocalVideoTracks` which
+return `List<LocalAudioTrackPublication>` and `List<LocalVideoTrackPublication>` respectively.
+
+Improvements
+
+- Null renderers cannot be added or removed from local or remote video tracks.
+- Renderers cannot be added or removed from a `LocalVideoTrack` that has been released. 
+
+Bug Fixes
+
+- Change visibility of `LocalParticipant#release()` from public to package. 
+[#132](https://github.com/twilio/video-quickstart-android/issues/132)
+- Codec preferences do not function correctly in a hybrid codec Group Room.
+
+Known issues
+
+- Network handoff, and subsequent connection renegotiation is not supported for IPv6 networks [#72](https://github.com/twilio/video-quickstart-android/issues/72)
+- Participant disconnect event can take up to 120 seconds to occur [#80](https://github.com/twilio/video-quickstart-android/issues/80) [#73](https://github.com/twilio/video-quickstart-android/issues/73)
+
 ####1.3.15
 
 Improvements
 
-- Updated Android Gradle Plugin version to `3.1.0` and Gradle version to `4.4`
+- Updated Android Gradle Plugin version to `3.1.0` and Gradle version to `4.4`.
 
 Known issues
 

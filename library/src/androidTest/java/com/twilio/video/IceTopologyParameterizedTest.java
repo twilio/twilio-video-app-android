@@ -203,14 +203,14 @@ public class IceTopologyParameterizedTest extends BaseClientTest {
         bobListener.onConnectedLatch = new CountDownLatch(1);
         CallbackHelper.FakeParticipantListener participantListener =
                 new CallbackHelper.FakeParticipantListener();
-        participantListener.onAudioTrackAddedLatch = new CountDownLatch(1);
-        participantListener.onVideoTrackAddedLatch = new CountDownLatch(1);
+        participantListener.onSubscribedToAudioTrackLatch = new CountDownLatch(1);
+        participantListener.onSubscribedToVideoTrackLatch = new CountDownLatch(1);
         Room bobRoom = Video.connect(mediaTestActivity, connectOptions, bobListener);
         assertTrue(bobListener.onConnectedLatch.await(10, TimeUnit.SECONDS));
         assertTrue(aliceListener.onParticipantConnectedLatch.await(10, TimeUnit.SECONDS));
-        aliceRoom.getParticipants().get(0).setListener(participantListener);
-        assertTrue(participantListener.onAudioTrackAddedLatch.await(10, TimeUnit.SECONDS));
-        assertTrue(participantListener.onVideoTrackAddedLatch.await(10, TimeUnit.SECONDS));
+        aliceRoom.getRemoteParticipants().get(0).setListener(participantListener);
+        assertTrue(participantListener.onSubscribedToAudioTrackLatch.await(10, TimeUnit.SECONDS));
+        assertTrue(participantListener.onSubscribedToVideoTrackLatch.await(10, TimeUnit.SECONDS));
 
         aliceListener.onDisconnectedLatch = new CountDownLatch(1);
         bobListener.onDisconnectedLatch = new CountDownLatch(1);

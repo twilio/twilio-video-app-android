@@ -17,6 +17,7 @@
 #include "com_twilio_video_MediaFactory.h"
 #include "com_twilio_video_LocalAudioTrack.h"
 #include "com_twilio_video_LocalVideoTrack.h"
+#include "com_twilio_video_LocalDataTrack.h"
 
 #include "webrtc/sdk/android/src/jni/jni_helpers.h"
 #include "webrtc/voice_engine/include/voe_base.h"
@@ -24,18 +25,75 @@
 #include "webrtc/sdk/android/src/jni/classreferenceholder.h"
 #include "webrtc/sdk/android/src/jni/androidmediadecoder_jni.h"
 #include "webrtc/sdk/android/src/jni/androidmediaencoder_jni.h"
+// TODO: Use header from WebRTC onced unused import is removed GSDK-1450
+#include "fakewebrtcvideoengine.h"
 #include "com_twilio_video_VideoCapturerDelegate.h"
 #include "class_reference_holder.h"
+#include "logging.h"
+#include "jni_utils.h"
 
 namespace twilio_video_jni {
 
 static bool media_jvm_set = false;
+
+static bool initialize(JNIEnv *jni, jobject context) {
+    // Setup media related Android device objects
+    if (!media_jvm_set) {
+        bool failure = false;
+
+        failure |= webrtc::VoiceEngine::SetAndroidObjects(webrtc_jni::GetJVM(), context);
+        failure |= VideoCapturerDelegate::SetAndroidObjects(jni, context);
+
+        if (failure) {
+            return false;
+        } else {
+            media_jvm_set = true;
+        }
+    }
+
+    return true;
+}
 
 std::shared_ptr<twilio::media::MediaFactory> getMediaFactory(jlong media_factory_handle) {
     MediaFactoryContext *media_factory_context =
             reinterpret_cast<MediaFactoryContext *>(media_factory_handle);
 
     return media_factory_context->getMediaFactory();
+}
+
+twilio::media::MediaOptions getMediaOptions(jobject j_media_options) {
+    JNIEnv* jni = webrtc_jni::AttachCurrentThreadIfNeeded();
+    twilio::media::MediaOptions media_options = twilio::media::MediaOptions();
+    cricket::FakeWebRtcVideoEncoderFactory* fake_video_encoder_factory =
+            new cricket::FakeWebRtcVideoEncoderFactory();
+    cricket::FakeWebRtcVideoDecoderFactory* fake_video_decoder_factory =
+            new cricket::FakeWebRtcVideoDecoderFactory();
+
+    // Enable VP8 by default
+    cricket::VideoCodec vp8(webrtc::kVideoCodecVP8, "VP8");
+    fake_video_encoder_factory->AddSupportedVideoCodec(vp8);
+    fake_video_decoder_factory->AddSupportedVideoCodecType(webrtc::VideoCodecType::kVideoCodecVP8);
+
+    // Enable H264 based on media options
+    if (!webrtc_jni::IsNull(jni, j_media_options)) {
+        jclass j_media_options_class = jni->GetObjectClass(j_media_options);
+        jfieldID enable_h264_field =
+                jni->GetFieldID(j_media_options_class, "enableH264", "Z");
+        jboolean enable_h264 = jni->GetBooleanField(j_media_options, enable_h264_field);
+
+        if (enable_h264) {
+            cricket::VideoCodec h264(webrtc::kVideoCodecH264, "H264");
+            fake_video_encoder_factory->AddSupportedVideoCodec(h264);
+            fake_video_decoder_factory->AddSupportedVideoCodecType(
+                    webrtc::VideoCodecType::kVideoCodecH264);
+        }
+    }
+
+    // Set the fake encoder and decoder factories
+    media_options.video_encoder_factory = fake_video_encoder_factory;
+    media_options.video_decoder_factory = fake_video_decoder_factory;
+
+    return media_options;
 }
 
 cricket::AudioOptions getAudioOptions(jobject j_audio_options) {
@@ -111,9 +169,9 @@ twilio::media::MediaConstraints* convertVideoConstraints(jobject j_video_constra
     twilio::media::MediaConstraints* video_constraints = new twilio::media::MediaConstraints();
     JNIEnv* env = webrtc_jni::GetEnv();
 
-    TS_CORE_LOG_MODULE(twilio::video::kTSCoreLogModulePlatform,
-                       twilio::video::kTSCoreLogLevelDebug,
-                       "Parsing video constraints");
+    VIDEO_ANDROID_LOG(twilio::video::LogModule::kPlatform,
+                      twilio::video::LogLevel::kDebug,
+                      "Parsing video constraints");
 
     jclass video_constraints_class = env->GetObjectClass(j_video_constraints);
     jfieldID min_fps_field =
@@ -125,11 +183,11 @@ twilio::media::MediaConstraints* convertVideoConstraints(jobject j_video_constra
     int max_fps =
             env->GetIntField(j_video_constraints, max_fps_field);
 
-    TS_CORE_LOG_MODULE(twilio::video::kTSCoreLogModulePlatform,
-                       twilio::video::kTSCoreLogLevelDebug,
-                       "Video constraints minFps %d maxFps %d",
-                       min_fps,
-                       max_fps);
+    VIDEO_ANDROID_LOG(twilio::video::LogModule::kPlatform,
+                      twilio::video::LogLevel::kDebug,
+                      "Video constraints minFps %d maxFps %d",
+                      min_fps,
+                      max_fps);
 
     jfieldID min_video_dimensions_field = webrtc_jni::GetFieldID(env,
                                                                  video_constraints_class,
@@ -151,11 +209,11 @@ twilio::media::MediaConstraints* convertVideoConstraints(jobject j_video_constra
     int min_height =
             env->GetIntField(j_min_video_dimensions, min_height_field);
 
-    TS_CORE_LOG_MODULE(twilio::video::kTSCoreLogModulePlatform,
-                       twilio::video::kTSCoreLogLevelDebug,
-                       "Video constraints min width %d min height %d",
-                       min_width,
-                       min_height);
+    VIDEO_ANDROID_LOG(twilio::video::LogModule::kPlatform,
+                      twilio::video::LogLevel::kDebug,
+                      "Video constraints min width %d min height %d",
+                      min_width,
+                      min_height);
 
     jfieldID aspect_ratio_field =
             env->GetFieldID(
@@ -173,11 +231,11 @@ twilio::media::MediaConstraints* convertVideoConstraints(jobject j_video_constra
     int denominator_aspect_ratio =
             env->GetIntField(j_aspect_ratio, denominator_field);
 
-    TS_CORE_LOG_MODULE(twilio::video::kTSCoreLogModulePlatform,
-                       twilio::video::kTSCoreLogLevelDebug,
-                       "Video aspect ratio %d:%d",
-                       numerator_aspect_ratio,
-                       denominator_aspect_ratio);
+    VIDEO_ANDROID_LOG(twilio::video::LogModule::kPlatform,
+                      twilio::video::LogLevel::kDebug,
+                      "Video aspect ratio %d:%d",
+                      numerator_aspect_ratio,
+                      denominator_aspect_ratio);
 
     jobject j_max_video_dimensions = env->GetObjectField(j_video_constraints,
                                                          max_video_dimensions_field);
@@ -191,11 +249,11 @@ twilio::media::MediaConstraints* convertVideoConstraints(jobject j_video_constra
     int max_height =
             env->GetIntField(j_max_video_dimensions, max_height_field);
 
-    TS_CORE_LOG_MODULE(twilio::video::kTSCoreLogModulePlatform,
-                       twilio::video::kTSCoreLogLevelDebug,
-                       "Video constraints max width %d max height %d",
-                       max_width,
-                       max_height);
+    VIDEO_ANDROID_LOG(twilio::video::LogModule::kPlatform,
+                      twilio::video::LogLevel::kDebug,
+                      "Video constraints max width %d max height %d",
+                      max_width,
+                      max_height);
 
 
     if (max_fps > 0) {
@@ -248,21 +306,12 @@ JNIEXPORT jlong JNICALL Java_com_twilio_video_MediaFactory_nativeCreate(JNIEnv *
                                                                         jobject j_egl_local_context,
                                                                         jobject j_egl_remote_context) {
     std::string func_name = std::string(__FUNCTION__);
-    TS_CORE_LOG_MODULE(twilio::video::kTSCoreLogModulePlatform,
-                       twilio::video::kTSCoreLogLevelDebug,
-                       "%s", func_name.c_str());
-    // Setup media related Android device objects
-    if (!media_jvm_set) {
-        bool failure = false;
+    VIDEO_ANDROID_LOG(twilio::video::LogModule::kPlatform,
+                      twilio::video::LogLevel::kDebug,
+                      "%s", func_name.c_str());
 
-        failure |= webrtc::VoiceEngine::SetAndroidObjects(webrtc_jni::GetJVM(), context);
-        failure |= VideoCapturerDelegate::SetAndroidObjects(jni, context);
-
-        if (failure) {
-            return 0;
-        } else {
-            media_jvm_set = true;
-        }
+    if (!initialize(jni, context)) {
+        return 0;
     }
 
     twilio::media::MediaOptions media_options;
@@ -288,16 +337,24 @@ JNIEXPORT jobject JNICALL Java_com_twilio_video_MediaFactory_nativeCreateAudioTr
                                                                                     jlong media_factory_handle,
                                                                                     jobject j_context,
                                                                                     jboolean enabled,
-                                                                                    jobject j_audio_options) {
+                                                                                    jobject j_audio_options,
+                                                                                    jstring j_name) {
     std::string func_name = std::string(__FUNCTION__);
-    TS_CORE_LOG_MODULE(twilio::video::kTSCoreLogModulePlatform,
-                       twilio::video::kTSCoreLogLevelDebug,
-                       "%s", func_name.c_str());
+    VIDEO_ANDROID_LOG(twilio::video::LogModule::kPlatform,
+                      twilio::video::LogLevel::kDebug,
+                      "%s", func_name.c_str());
     std::shared_ptr<twilio::media::MediaFactory> media_factory =
             getMediaFactory(media_factory_handle);
     cricket::AudioOptions audio_options = getAudioOptions(j_audio_options);
+    std::string name = webrtc_jni::IsNull(jni, j_name) ?
+                       ("") :
+                       (JavaToUTF8StdString(jni, j_name));
+    rtc::scoped_refptr<webrtc::AudioSourceInterface> audio_source =
+            media_factory->createAudioSource(audio_options);
+    twilio::media::AudioTrackOptions audio_track_options =
+            twilio::media::AudioTrackOptions(enabled, name);
     std::shared_ptr<twilio::media::LocalAudioTrack> local_audio_track =
-            media_factory->createAudioTrack(enabled, audio_options);
+            media_factory->createAudioTrack(audio_source, audio_track_options);
 
     return local_audio_track == nullptr ?
            (nullptr) :
@@ -311,11 +368,12 @@ JNIEXPORT jobject JNICALL Java_com_twilio_video_MediaFactory_nativeCreateVideoTr
                                                                                     jboolean enabled,
                                                                                     jobject j_video_capturer,
                                                                                     jobject j_video_contraints,
+                                                                                    jstring j_name,
                                                                                     jobject j_egl_context) {
     std::string func_name = std::string(__FUNCTION__);
-    TS_CORE_LOG_MODULE(twilio::video::kTSCoreLogModulePlatform,
-                       twilio::video::kTSCoreLogLevelDebug,
-                       "%s", func_name.c_str());
+    VIDEO_ANDROID_LOG(twilio::video::LogModule::kPlatform,
+                      twilio::video::LogLevel::kDebug,
+                      "%s", func_name.c_str());
     std::shared_ptr<twilio::media::MediaFactory> media_factory =
             getMediaFactory(media_factory_handle);
     jobject j_video_capturer_delegate = createJavaVideoCapturerDelegate(j_video_capturer);
@@ -326,33 +384,103 @@ JNIEXPORT jobject JNICALL Java_com_twilio_video_MediaFactory_nativeCreateVideoTr
                                                              j_egl_context,
                                                              is_screencast);
     cricket::VideoCapturer* capturer = new AndroidVideoCapturer(delegate);
+    std::string name = webrtc_jni::IsNull(jni, j_name) ?
+                       ("") :
+                       (JavaToUTF8StdString(jni, j_name));
+    rtc::scoped_refptr<webrtc::VideoTrackSourceInterface> video_track_source =
+            media_factory->createVideoSource(capturer,
+                                             getVideoConstraints(j_video_contraints));
+    twilio::media::VideoTrackOptions video_track_options =
+            twilio::media::VideoTrackOptions(enabled, name);
     std::shared_ptr<twilio::media::LocalVideoTrack> video_track =
-            media_factory->createVideoTrack(enabled,
-                                            getVideoConstraints(j_video_contraints),
-                                            capturer);
+            media_factory->createVideoTrack(video_track_source, video_track_options);
 
     return video_track == nullptr ?
            (nullptr) :
            (createJavaLocalVideoTrack(video_track,
-                                      enabled,
                                       j_video_capturer,
                                       j_video_contraints,
                                       j_context));
+}
+
+JNIEXPORT jobject JNICALL Java_com_twilio_video_MediaFactory_nativeCreateDataTrack(JNIEnv *jni,
+                                                                                   jobject j_media_factory,
+                                                                                   jlong media_factory_handle,
+                                                                                   jobject j_context,
+                                                                                   jboolean j_ordered,
+                                                                                   jint j_max_packet_life_time,
+                                                                                   jint j_max_retransmits,
+                                                                                   jstring j_name) {
+    std::string func_name = std::string(__FUNCTION__);
+    VIDEO_ANDROID_LOG(twilio::video::LogModule::kPlatform,
+                      twilio::video::LogLevel::kDebug,
+                      "%s", func_name.c_str());
+    std::shared_ptr<twilio::media::MediaFactory> media_factory =
+            getMediaFactory(media_factory_handle);
+    std::string name = webrtc_jni::IsNull(jni, j_name) ?
+                       ("") :
+                       (JavaToUTF8StdString(jni, j_name));
+    twilio::media::DataTrackOptions data_track_options = twilio::media::DataTrackOptions::Builder()
+            .setOrdered(j_ordered)
+            .setMaxRetransmits(j_max_retransmits)
+            .setMaxPacketLifeTime(j_max_packet_life_time)
+            .setName(name)
+            .build();
+    std::shared_ptr<twilio::media::LocalDataTrack> data_track =
+            media_factory->createDataTrack(data_track_options);
+
+    return createJavaLocalDataTrack(data_track, j_context);
 }
 
 JNIEXPORT void JNICALL Java_com_twilio_video_MediaFactory_nativeRelease(JNIEnv *jni,
                                                                         jobject j_media_factory,
                                                                         jlong media_factory_handle) {
     std::string func_name = std::string(__FUNCTION__);
-    TS_CORE_LOG_MODULE(twilio::video::kTSCoreLogModulePlatform,
-                       twilio::video::kTSCoreLogLevelDebug,
-                       "%s", func_name.c_str());
+    VIDEO_ANDROID_LOG(twilio::video::LogModule::kPlatform,
+                      twilio::video::LogLevel::kDebug,
+                      "%s", func_name.c_str());
     if (media_factory_handle != 0) {
         MediaFactoryContext *media_factory_context =
                 reinterpret_cast<MediaFactoryContext *>(media_factory_handle);
 
         delete media_factory_context;
     }
+}
+
+/*
+ * Only for testing.
+ */
+JNIEXPORT jlong JNICALL Java_com_twilio_video_MediaFactory_nativeTestCreate(JNIEnv *jni,
+                                                                            jobject j_media_factory,
+                                                                            jobject context,
+                                                                            jobject j_media_options) {
+    std::string func_name = std::string(__FUNCTION__);
+    VIDEO_ANDROID_LOG(twilio::video::LogModule::kPlatform,
+                      twilio::video::LogLevel::kDebug,
+                      "%s", func_name.c_str());
+    if (!initialize(jni, context)) {
+        return 0;
+    }
+
+    twilio::media::MediaOptions media_options = getMediaOptions(j_media_options);
+
+    std::shared_ptr<twilio::media::MediaFactory> media_factory =
+            twilio::media::MediaFactory::create(media_options);
+
+    return webrtc_jni::jlongFromPointer(new MediaFactoryContext(media_options, media_factory));
+}
+
+/*
+ * Only for testing.
+ */
+JNIEXPORT void JNICALL Java_com_twilio_video_MediaFactory_nativeTestRelease(JNIEnv *jni,
+                                                                            jobject j_media_factory,
+                                                                            jlong media_factory_handle) {
+    std::string func_name = std::string(__FUNCTION__);
+    VIDEO_ANDROID_LOG(twilio::video::LogModule::kPlatform,
+                      twilio::video::LogLevel::kDebug,
+                      "%s", func_name.c_str());
+    Java_com_twilio_video_MediaFactory_nativeRelease(jni, j_media_factory, media_factory_handle);
 }
 
 }

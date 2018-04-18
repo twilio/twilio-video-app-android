@@ -58,7 +58,7 @@
     <string name="permissions_required">Camera, Microphone, and Writing to External Storage permissions are required. Please enable them in App Settings.</string>
     <string name="failed_to_add_camera_video_track">Failed to add camera video track</string>
     <string name="failed_to_add_screen_video_track">Failed to add screen video track</string>
-    <string name="stats_track_id">id</string>
+    <string name="stats_track_sid">sid</string>
     <string name="stats_codec">codec</string>
     <string name="stats_packets">packets lost</string>
     <string name="stats_bytes_sent">bytes sent</string>
@@ -86,6 +86,11 @@
     <string name="unauthorized_title">Unauthorized</string>
     <string name="unauthorized_desc">Only users with a Twilio email address are authorized to use this application.</string>
     <string name="name">Name</string>
+    <string name="video_codecs">Video Codec</string>
+    <string name="audio_codecs">Audio Codec</string>
+    <string name="bitrate">bps</string>
+    <string name="max_video_bitrate">Video Bitrate</string>
+    <string name="max_audio_bitrate">Audio Bitrate</string>
     <string name="recording_notice">Recording may be enabled for quality assurance.</string>
 
     <string-array name="environment_array">

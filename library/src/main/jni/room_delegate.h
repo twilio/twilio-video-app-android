@@ -37,7 +37,8 @@ public:
                  jlong j_media_factory_handle,
                  jobject j_room,
                  jobject j_room_observer,
-                 jobject j_stats_observer);
+                 jobject j_stats_observer,
+                 jobject j_handler);
     ~RoomDelegate();
 
     void connect();
@@ -64,6 +65,7 @@ private:
     const webrtc_jni::ScopedGlobalRef<jobject> j_room_;
     const webrtc_jni::ScopedGlobalRef<jobject> j_room_observer_;
     const webrtc_jni::ScopedGlobalRef<jobject> j_stats_observer_;
+    const webrtc_jni::ScopedGlobalRef<jobject> j_handler_;
     std::unique_ptr<rtc::Thread> notifier_thread_;
     std::unique_ptr<twilio::video::Room> room_;
     std::shared_ptr<AndroidRoomObserver> android_room_observer_;

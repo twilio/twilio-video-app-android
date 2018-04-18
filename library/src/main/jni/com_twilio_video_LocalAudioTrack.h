@@ -46,6 +46,8 @@ private:
 
 std::shared_ptr<twilio::media::LocalAudioTrack> getLocalAudioTrack(jlong);
 
+std::string getLocalAudioTrackHash(std::shared_ptr<twilio::media::LocalAudioTrack> local_audio_track);
+
 jobject createJavaLocalAudioTrack(jobject j_context,
                                   std::shared_ptr<twilio::media::LocalAudioTrack> local_audio_track);
 

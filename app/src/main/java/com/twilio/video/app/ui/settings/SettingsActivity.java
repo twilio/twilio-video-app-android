@@ -20,22 +20,46 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.app.DialogFragment;
+import android.support.v7.preference.ListPreference;
 import android.support.v7.preference.Preference;
 import android.support.v7.preference.PreferenceFragmentCompat;
 import android.support.v7.preference.PreferenceManager;
 import android.view.MenuItem;
 
+import com.google.common.base.Function;
+import com.google.common.collect.FluentIterable;
+import com.twilio.video.AudioCodec;
+import com.twilio.video.G722Codec;
+import com.twilio.video.H264Codec;
+import com.twilio.video.IsacCodec;
+import com.twilio.video.OpusCodec;
+import com.twilio.video.PcmaCodec;
+import com.twilio.video.PcmuCodec;
 import com.twilio.video.Video;
+import com.twilio.video.VideoCodec;
+import com.twilio.video.Vp8Codec;
+import com.twilio.video.Vp9Codec;
 import com.twilio.video.app.BuildConfig;
 import com.twilio.video.app.R;
 import com.twilio.video.app.auth.Authenticator;
 import com.twilio.video.app.base.BaseActivity;
+import com.twilio.video.app.data.NumberPreference;
+import com.twilio.video.app.data.NumberPreferenceDialogFragmentCompat;
 import com.twilio.video.app.data.Preferences;
 import com.twilio.video.app.ui.login.LoginActivity;
 
 import javax.inject.Inject;
 
 public class SettingsActivity extends BaseActivity {
+    private static final String[] VIDEO_CODEC_NAMES = new String[] {
+            Vp8Codec.NAME, H264Codec.NAME, Vp9Codec.NAME
+    };
+
+    private static final String[] AUDIO_CODEC_NAMES = new String[] {
+            IsacCodec.NAME, OpusCodec.NAME, PcmaCodec.NAME, PcmuCodec.NAME, G722Codec.NAME
+    };
+
     @Inject SharedPreferences sharedPreferences;
     @Inject Authenticator authenticator;
 
@@ -90,6 +114,9 @@ public class SettingsActivity extends BaseActivity {
     }
 
     public static class SettingsFragment extends PreferenceFragmentCompat {
+        private static final String PREFERENCE_FRAGMENT_TAG =
+                "android.support.v7.preference.PreferenceFragment.DIALOG";
+
         private SharedPreferences sharedPreferences;
         private Preference.OnPreferenceClickListener logoutClickListener;
 
@@ -108,12 +135,64 @@ public class SettingsActivity extends BaseActivity {
             // Add our preference from resources
             addPreferencesFromResource(R.xml.preferences);
 
+            setupCodecListPreference(VideoCodec.class,
+                    Preferences.VIDEO_CODEC,
+                    Preferences.VIDEO_CODEC_DEFAULT,
+                    (ListPreference) findPreference(Preferences.VIDEO_CODEC));
+
+            setupCodecListPreference(AudioCodec.class,
+                    Preferences.AUDIO_CODEC,
+                    Preferences.AUDIO_CODEC_DEFAULT,
+                    (ListPreference) findPreference(Preferences.AUDIO_CODEC));
+
             // Fill out the rest of settings
             String identity = sharedPreferences.getString(Preferences.DISPLAY_NAME, null);
             findPreference(Preferences.IDENTITY).setSummary(identity);
             findPreference(Preferences.VERSION).setSummary(BuildConfig.VERSION_NAME);
             findPreference(Preferences.VIDEO_LIBRARY_VERSION).setSummary(Video.getVersion());
             findPreference(Preferences.LOGOUT).setOnPreferenceClickListener(logoutClickListener);
+        }
+
+        @Override
+        public void onDisplayPreferenceDialog(Preference preference) {
+
+            // show custom dialog preference
+            if (preference instanceof NumberPreference) {
+                DialogFragment dialogFragment;
+                dialogFragment = NumberPreferenceDialogFragmentCompat.newInstance(preference.getKey());
+
+                if (dialogFragment != null) {
+                    dialogFragment.setTargetFragment(this, 0);
+                    dialogFragment.show(getFragmentManager(), PREFERENCE_FRAGMENT_TAG);
+                }
+
+            } else {
+                super.onDisplayPreferenceDialog(preference);
+            }
+        }
+
+        private void setupCodecListPreference(Class codecClass,
+                                              String key,
+                                              String defaultValue,
+                                              ListPreference preference) {
+            String[] codecEntries = (codecClass == AudioCodec.class) ?
+                    AUDIO_CODEC_NAMES :
+                    VIDEO_CODEC_NAMES;
+            // saved value
+            final String value = sharedPreferences.getString(key, defaultValue);
+
+            // bind values
+            preference.setEntries(codecEntries);
+            preference.setEntryValues(codecEntries);
+            preference.setValue(value);
+            preference.setSummary(value);
+            preference.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+                @Override
+                public boolean onPreferenceChange(Preference preference, Object newValue) {
+                    preference.setSummary(newValue.toString());
+                    return true;
+                }
+            });
         }
     }
 }

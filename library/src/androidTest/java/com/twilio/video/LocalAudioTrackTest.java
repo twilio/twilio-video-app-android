@@ -16,13 +16,14 @@
 
 package com.twilio.video;
 
+import android.support.test.filters.SmallTest;
 import android.Manifest;
-import android.support.test.filters.LargeTest;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.rule.GrantPermissionRule;
 import android.support.test.runner.AndroidJUnit4;
 
 import com.twilio.video.ui.MediaTestActivity;
+import com.twilio.video.util.StringUtils;
 
 import org.junit.After;
 import org.junit.Assert;
@@ -37,10 +38,11 @@ import java.util.List;
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertFalse;
 import static junit.framework.Assert.assertNotNull;
+import static org.apache.commons.lang3.RandomStringUtils.random;
 import static org.junit.Assert.assertTrue;
 
 @RunWith(AndroidJUnit4.class)
-@LargeTest
+@SmallTest
 public class LocalAudioTrackTest {
     private static final int NUM_AUDIO_OPTIONS = 7;
     private static final int NUM_AUDIO_OPTIONS_PERMUTATIONS = (int) Math.pow(2, NUM_AUDIO_OPTIONS);
@@ -75,6 +77,14 @@ public class LocalAudioTrackTest {
     }
 
     @Test
+    public void canCreateDisabledAudioTrack() {
+        localAudioTrack = LocalAudioTrack.create(mediaTestActivity, false);
+
+        assertNotNull(localAudioTrack);
+        assertFalse(localAudioTrack.isEnabled());
+    }
+
+    @Test
     public void canCreateEnabledAudioTrack() {
         localAudioTrack = LocalAudioTrack.create(mediaTestActivity, true);
 
@@ -83,11 +93,28 @@ public class LocalAudioTrackTest {
     }
 
     @Test
-    public void canCreateDisabledAudioTrack() {
-        localAudioTrack = LocalAudioTrack.create(mediaTestActivity, false);
+    public void canCreateAudioTrackWithName() {
+        String expectedName = random(10);
+        localAudioTrack = LocalAudioTrack.create(mediaTestActivity, true, expectedName);
+        assertNotNull(localAudioTrack);
+        assertEquals(expectedName, localAudioTrack.getName());
+    }
+
+    @Test
+    public void canCreateAudioTrackWithNullName() {
+        String nullName = null;
+        localAudioTrack = LocalAudioTrack.create(mediaTestActivity, true, nullName);
+        assertNotNull(localAudioTrack);
+        assertFalse(StringUtils.isNullOrEmpty(localAudioTrack.getName()));
+    }
+
+    @Test
+    public void canCreateAudioTrackWithEmptyName() {
+        final String emptyName = "";
+        localAudioTrack = LocalAudioTrack.create(mediaTestActivity, true, emptyName);
 
         assertNotNull(localAudioTrack);
-        assertFalse(localAudioTrack.isEnabled());
+        assertFalse(StringUtils.isNullOrEmpty(localAudioTrack.getName()));
     }
 
     @Test
@@ -130,9 +157,9 @@ public class LocalAudioTrackTest {
             localAudioTrack = LocalAudioTrack.create(mediaTestActivity, true, audioOptions);
 
             // Validate the audio track was created
-            assertNotNull("Failed to create AudioTrack with options: " + audioOptions,
+            assertNotNull("Failed to create RemoteAudioTrack with options: " + audioOptions,
                     localAudioTrack);
-            assertTrue("AudioTrack created is not enabled with options: " + audioOptions,
+            assertTrue("RemoteAudioTrack created is not enabled with options: " + audioOptions,
                     localAudioTrack.isEnabled());
 
             // Remove the audio track and continue to next audio options configuration
@@ -155,18 +182,6 @@ public class LocalAudioTrackTest {
         localAudioTrack.enable(false);
 
         assertFalse(localAudioTrack.isEnabled());
-    }
-
-    @Test
-    public void isEnabled_shouldReflectConstructedState() {
-        LocalAudioTrack enabledAudioTrack = LocalAudioTrack.create(mediaTestActivity, true);
-        LocalAudioTrack disabledAudioTrack = LocalAudioTrack.create(mediaTestActivity, false);
-
-        assertTrue(enabledAudioTrack.isEnabled());
-        assertFalse(disabledAudioTrack.isEnabled());
-
-        enabledAudioTrack.release();
-        disabledAudioTrack.release();
     }
 
     @Test

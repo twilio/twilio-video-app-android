@@ -18,7 +18,7 @@
 
 #include "webrtc/sdk/android/src/jni/jni_helpers.h"
 
-#include "video/logger.h"
+#include "video/video.h"
 #include "jni_utils.h"
 
 namespace twilio_video_jni {
@@ -57,7 +57,7 @@ twilio::media::IceOptions IceOptions::getIceOptions(JNIEnv *env, jobject j_ice_o
                                                                     j_server_url_field);
                 jstring j_username = (jstring)env->GetObjectField(j_ice_server, j_username_field);
                 jstring j_password = (jstring)env->GetObjectField(j_ice_server, j_password_field);
-                std::string server_url = JavaToUTF8StdString(env,j_server_url);
+                std::string server_url = JavaToUTF8StdString(env, j_server_url);
                 std::vector<std::string> urls;
                 urls.push_back(server_url);
                 ice_server.urls = urls;
@@ -83,7 +83,6 @@ twilio::media::IceOptions IceOptions::getIceOptions(JNIEnv *env, jobject j_ice_o
     }
 
     if (!webrtc_jni::IsNull(env, j_ice_trans_policy)) {
-        //jclass enumClass = env->FindClass("com/twilio/conversations/IceTransportPolicy");
         jclass ice_policy_class = env->GetObjectClass(j_ice_trans_policy);
         jmethodID name_id = env->GetMethodID(ice_policy_class, "name", "()Ljava/lang/String;");
         jstring j_ice_policy = (jstring)env->CallObjectMethod(j_ice_trans_policy, name_id);

@@ -109,12 +109,12 @@ public class RoomMultiPartyTopologyParameterizedTest extends BaseClientTest {
 
             Room room = createRoom(token, roomListener, roomName);
             assertTrue(roomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
-            assertEquals(numberOfParticipants, room.getParticipants().size());
+            assertEquals(numberOfParticipants, room.getRemoteParticipants().size());
 
             // check if all participants got notification
             for (Pair<Room, CallbackHelper.FakeRoomListener> roomPair : rooms) {
                 assertTrue(roomPair.second.onParticipantConnectedLatch.await(10, TimeUnit.SECONDS));
-                assertEquals(numberOfParticipants, roomPair.first.getParticipants().size());
+                assertEquals(numberOfParticipants, roomPair.first.getRemoteParticipants().size());
             }
 
             rooms.add(new Pair<>(room, roomListener));
@@ -131,9 +131,9 @@ public class RoomMultiPartyTopologyParameterizedTest extends BaseClientTest {
             String localIdentity = room.getLocalParticipant().getIdentity();
             String localSid = room.getLocalParticipant().getSid();
 
-            List<Participant> participants = room.getParticipants();
-            for (Participant participant : participants) {
-                assertNotEquals(localSid, participant.getSid());
+            List<RemoteParticipant> remoteParticipants = room.getRemoteParticipants();
+            for (RemoteParticipant remoteParticipant : remoteParticipants) {
+                assertNotEquals(localSid, remoteParticipant.getSid());
             }
             rooms.add(new Pair<>(room, roomListener));
         }
