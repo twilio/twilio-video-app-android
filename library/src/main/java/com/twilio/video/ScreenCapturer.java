@@ -25,6 +25,8 @@ import android.os.Build;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.util.DisplayMetrics;
+import android.view.WindowManager;
 
 import org.webrtc.ScreenCapturerAndroid;
 import org.webrtc.SurfaceTextureHelper;
@@ -170,14 +172,15 @@ public class ScreenCapturer implements VideoCapturer {
      */
     @Override
     public synchronized List<VideoFormat> getSupportedFormats() {
-        // TODO: Add support for more formats based on the size of device screen GSDK-1243
         List<VideoFormat> screencastFormats = new ArrayList<>();
-        VideoDimensions vgaDimensions = new VideoDimensions(640, 480);
-        VideoDimensions hdDimensions = new VideoDimensions(1280, 720);
+        DisplayMetrics displayMetrics = new DisplayMetrics();
+        WindowManager windowManager =
+                (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
+        windowManager.getDefaultDisplay().getRealMetrics(displayMetrics);
+        VideoDimensions screenDimensions = new VideoDimensions(displayMetrics.widthPixels,
+                displayMetrics.heightPixels);
 
-        screencastFormats.add(new VideoFormat(vgaDimensions,
-                SCREENCAPTURE_FRAME_RATE, VideoPixelFormat.RGBA_8888));
-        screencastFormats.add(new VideoFormat(hdDimensions,
+        screencastFormats.add(new VideoFormat(screenDimensions,
                 SCREENCAPTURE_FRAME_RATE, VideoPixelFormat.RGBA_8888));
 
         return screencastFormats;

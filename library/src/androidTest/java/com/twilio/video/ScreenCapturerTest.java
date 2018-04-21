@@ -17,6 +17,7 @@
 package com.twilio.video;
 
 import android.annotation.TargetApi;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 import android.support.test.InstrumentationRegistry;
@@ -26,6 +27,8 @@ import android.support.test.uiautomator.UiDevice;
 import android.support.test.uiautomator.UiObject;
 import android.support.test.uiautomator.UiObjectNotFoundException;
 import android.support.test.uiautomator.UiSelector;
+import android.util.DisplayMetrics;
+import android.view.WindowManager;
 
 import com.twilio.video.ui.ScreenCapturerTestActivity;
 
@@ -76,6 +79,30 @@ public class ScreenCapturerTest {
             screenVideoTrack.release();
         }
         assertTrue(MediaFactory.isReleased());
+    }
+
+    @Test
+    public void getSupportedFormats_shouldReturnDimensionsBasedOnScreenSize() {
+        ScreenCapturer.Listener screenCapturerListener = new ScreenCapturer.Listener() {
+            @Override
+            public void onScreenCaptureError(String errorDescription) {}
+
+            @Override
+            public void onFirstFrameAvailable() {
+            }
+        };
+        DisplayMetrics displayMetrics = new DisplayMetrics();
+        WindowManager windowManager =
+                (WindowManager) screenCapturerActivity.getSystemService(Context.WINDOW_SERVICE);
+        windowManager.getDefaultDisplay().getRealMetrics(displayMetrics);
+        VideoDimensions expectedDimensions = new VideoDimensions(displayMetrics.widthPixels,
+                displayMetrics.heightPixels);
+        screenCapturer = new ScreenCapturer(screenCapturerActivity,
+                screenCapturerActivity.getScreenCaptureResultCode(),
+                screenCapturerActivity.getScreenCaptureIntent(),
+                screenCapturerListener);
+
+        assertEquals(expectedDimensions, screenCapturer.getSupportedFormats().get(0).dimensions);
     }
 
     @Test
