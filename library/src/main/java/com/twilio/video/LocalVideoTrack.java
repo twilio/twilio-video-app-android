@@ -277,6 +277,26 @@ public class LocalVideoTrack extends VideoTrack {
     }
 
     /*
+     * Add and remove renderer with wants are used in VideoCapturerTest to validate cases where
+     * video capturer delegate needs to apply rotation to frames provided by a capturer. Applying
+     * rotation is required for capturers when a VideoSinkInterface specifies with
+     * rtc::VideoSinkWants.
+     */
+    @VisibleForTesting(otherwise = VisibleForTesting.NONE)
+    long addRendererWithWants(@NonNull VideoRenderer videoRenderer, boolean rotationApplied) {
+        long nativeVideoSinkHandle =
+                nativeAddRendererWithWants(nativeLocalVideoTrackHandle, rotationApplied);
+        super.addRenderer(videoRenderer);
+
+        return nativeVideoSinkHandle;
+    }
+
+    @VisibleForTesting(otherwise = VisibleForTesting.NONE)
+    void removeRendererWithWants(long nativeVideoSinkHandle) {
+        nativeRemoveRendererWithWants(nativeLocalVideoTrackHandle, nativeVideoSinkHandle);
+    }
+
+    /*
      * Safely resolves a set of VideoConstraints based on VideoCapturer supported formats
      */
     private static VideoConstraints resolveConstraints(VideoCapturer videoCapturer,
@@ -413,5 +433,11 @@ public class LocalVideoTrack extends VideoTrack {
 
     private native boolean nativeIsEnabled(long nativeLocalVideoTrackHandle);
     private native void nativeEnable(long nativeLocalVideoTrackHandle, boolean enable);
+    @VisibleForTesting(otherwise = VisibleForTesting.NONE)
+    private native long nativeAddRendererWithWants(long nativeLocalVideoTrackHandle,
+                                                   boolean rotationApplied);
+    @VisibleForTesting(otherwise = VisibleForTesting.NONE)
+    private native void nativeRemoveRendererWithWants(long nativeLocalVideoTrackHandle,
+                                                      long nativeVideoSinkHandle);
     private native void nativeRelease(long nativeLocalVideoTrackHandle);
 }

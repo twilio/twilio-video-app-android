@@ -101,6 +101,7 @@ public:
 
     // Used on the Java thread running the camera.
     webrtc::I420BufferPool pre_scale_pool_;
+    webrtc::I420BufferPool pre_rotate_pool_;
     webrtc::I420BufferPool post_scale_pool_;
     rtc::scoped_refptr<webrtc_jni::SurfaceTextureHelper> surface_texture_helper_;
     rtc::ThreadChecker thread_checker_;

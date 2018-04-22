@@ -244,13 +244,30 @@ void VideoCapturerDelegate::OnMemoryBufferFrame(void *video_frame, int length, i
         case cricket::FOURCC_ABGR: {
             const uint8_t *src_rgba = static_cast<uint8_t *>(video_frame);
             int rgba_stride = 4 * width;
+            rtc::scoped_refptr<webrtc::VideoFrameBuffer> pre_rotate_buffer =
+                    pre_rotate_pool_.CreateBuffer(width, height);
 
+            // Convert to I420
             libyuv::ABGRToI420(
                     src_rgba, rgba_stride,
-                    (uint8 *) buffer->DataY(), buffer->StrideY(),
-                    (uint8 *) buffer->DataU(), buffer->StrideU(),
-                    (uint8 *) buffer->DataV(), buffer->StrideV(),
-                    width, height);
+                    (uint8 *) pre_rotate_buffer->DataY(), pre_rotate_buffer->StrideY(),
+                    (uint8 *) pre_rotate_buffer->DataU(), pre_rotate_buffer->StrideU(),
+                    (uint8 *) pre_rotate_buffer->DataV(), pre_rotate_buffer->StrideV(),
+                    crop_width, crop_height);
+
+            // Apply rotation if required
+            if (capturer_->apply_rotation()) {
+                libyuv::I420Rotate((uint8 *) pre_rotate_buffer->DataY(), pre_rotate_buffer->StrideY(),
+                                   (uint8 *) pre_rotate_buffer->DataU(), pre_rotate_buffer->StrideU(),
+                                   (uint8 *) pre_rotate_buffer->DataV(), pre_rotate_buffer->StrideV(),
+                                   (uint8 *) buffer->DataY(), buffer->StrideY(),
+                                   (uint8 *) buffer->DataU(), buffer->StrideU(),
+                                   (uint8 *) buffer->DataV(), buffer->StrideV(),
+                                   crop_width, crop_height,
+                                   static_cast<libyuv::RotationMode>(rotation));
+            } else {
+                buffer = pre_rotate_buffer;
+            }
             break;
         }
         case cricket::FOURCC_NV21: {
@@ -292,10 +309,10 @@ void VideoCapturerDelegate::OnMemoryBufferFrame(void *video_frame, int length, i
 }
 
 void VideoCapturerDelegate::OnTextureFrame(int width,
-                                             int height,
-                                             int rotation,
-                                             int64_t timestamp_ns,
-                                             const webrtc_jni::NativeHandleImpl& handle) {
+                                           int height,
+                                           int rotation,
+                                           int64_t timestamp_ns,
+                                           const webrtc_jni::NativeHandleImpl& handle) {
     RTC_DCHECK(rotation == 0 || rotation == 90 || rotation == 180 ||
                rotation == 270);
     rtc::CritScope cs(&capturer_lock_);

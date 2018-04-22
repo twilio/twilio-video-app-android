@@ -156,6 +156,10 @@ public class CodecPreferencesTest extends BaseCodecTest {
         assertVideoCodecPublished(expectedVideoCodec);
     }
 
+    /*
+     * Used to supply parameters to test
+     */
+    @SuppressWarnings("unused")
     private Object[] parametersForCanPreferAudioCodec() {
         return new Object[]{
                 new Object[]{Topology.P2P, isacCodec},
@@ -173,6 +177,10 @@ public class CodecPreferencesTest extends BaseCodecTest {
         };
     }
 
+    /*
+     * Used to supply parameters to test
+     */
+    @SuppressWarnings("unused")
     private Object[] parametersForCanPreferVideoCodec() {
         return new Object[]{
                 new Object[]{Topology.P2P, vp8Codec},

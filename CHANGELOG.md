@@ -6,6 +6,12 @@ Improvements
 
 - Updated `ScreenCapturer` to capture at resolution based on the device's screen.
 
+Bug Fixes
+
+- Fixed bug in `VideoCapturer` API where `VideoPixelFormat.RGBA_8888` frames were not rotated
+before provided to video broadcaster. This bug would result in frames not being oriented
+properly when rendered by participants.
+
 Known issues
 
 - Network handoff, and subsequent connection renegotiation is not supported for IPv6 networks [#72](https://github.com/twilio/video-quickstart-android/issues/72)

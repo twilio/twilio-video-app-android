@@ -62,6 +62,17 @@ JNIEXPORT void JNICALL Java_com_twilio_video_LocalVideoTrack_nativeEnable(JNIEnv
                                                                           jlong,
                                                                           jboolean);
 
+// Use only for testing
+JNIEXPORT jlong JNICALL Java_com_twilio_video_LocalVideoTrack_nativeAddRendererWithWants(JNIEnv *,
+                                                                                         jobject,
+                                                                                         jlong,
+                                                                                         jboolean);
+// Use only for testing
+JNIEXPORT void JNICALL Java_com_twilio_video_LocalVideoTrack_nativeRemoveRendererWithWants(JNIEnv *,
+                                                                                           jobject,
+                                                                                           jlong,
+                                                                                           jlong);
+
 JNIEXPORT void JNICALL Java_com_twilio_video_LocalVideoTrack_nativeRelease(JNIEnv *,
                                                                            jobject,
                                                                            jlong);

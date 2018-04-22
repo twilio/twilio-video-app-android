@@ -63,28 +63,34 @@ public class FakeVideoCapturer implements VideoCapturer {
             bitmap.copyPixelsToBuffer(buffer);
             final long captureTimeNs =
                     TimeUnit.MILLISECONDS.toNanos(SystemClock.elapsedRealtime());
-
-            VideoFrame rgbVideoFrame = new VideoFrame(buffer.array(),
+            VideoFrame videoFrame = new VideoFrame(buffer.array(),
                     captureFormat.dimensions,
-                    VideoFrame.RotationAngle.ROTATION_90,
+                    rotationAngle,
                     captureTimeNs);
 
             // Only notify the frame listener if we are not stopped
             if (started.get() && fakeVideoCapturerHandler != null) {
-                capturerListener.onFrameCaptured(rgbVideoFrame);
+                capturerListener.onFrameCaptured(videoFrame);
                 fakeVideoCapturerHandler.postDelayed(this, FRAMERATE_MS);
             }
         }
     };
 
     private final List<VideoFormat> supportedFormats;
+    private final VideoFrame.RotationAngle rotationAngle;
 
     public FakeVideoCapturer() {
         this(defaultSupportedFormats());
     }
 
     public FakeVideoCapturer(List<VideoFormat> supportedFormats) {
+        this(supportedFormats, VideoFrame.RotationAngle.ROTATION_90);
+    }
+
+    public FakeVideoCapturer(List<VideoFormat> supportedFormats,
+                             VideoFrame.RotationAngle rotationAngle) {
         this.supportedFormats = supportedFormats;
+        this.rotationAngle = rotationAngle;
     }
 
     public VideoFormat getCaptureFormat() {

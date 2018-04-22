@@ -104,6 +104,43 @@ JNIEXPORT void JNICALL Java_com_twilio_video_LocalVideoTrack_nativeEnable(JNIEnv
 
     local_video_track->setEnabled(enabled);
 }
+
+/*
+ * Stub video sink interface used for testing capturers.
+ */
+class StubVideoSource : public rtc::VideoSinkInterface<webrtc::VideoFrame> {
+    void OnFrame(const webrtc::VideoFrame &frame) override {}
+};
+
+// Use only for testing
+JNIEXPORT jlong JNICALL Java_com_twilio_video_LocalVideoTrack_nativeAddRendererWithWants(JNIEnv *jni,
+                                                                                        jobject j_local_video_track,
+                                                                                        jlong j_local_video_track_handle,
+                                                                                        jboolean j_rotation_applied) {
+    std::shared_ptr<twilio::media::LocalVideoTrack> local_video_track =
+            getLocalVideoTrack(j_local_video_track_handle);
+    StubVideoSource *video_source = new StubVideoSource();
+    rtc::VideoSinkWants video_sink_wants;
+    video_sink_wants.rotation_applied = j_rotation_applied;
+    local_video_track->getWebRtcTrack()->AddOrUpdateSink(video_source, video_sink_wants);
+
+    return webrtc_jni::jlongFromPointer(video_source);
+}
+
+// Use only for testing
+JNIEXPORT void JNICALL Java_com_twilio_video_LocalVideoTrack_nativeRemoveRendererWithWants(JNIEnv *jni,
+                                                                                           jobject j_local_video_track,
+                                                                                           jlong j_local_video_track_handle,
+                                                                                           jlong j_native_video_sink_handle) {
+    std::shared_ptr<twilio::media::LocalVideoTrack> local_video_track =
+            getLocalVideoTrack(j_local_video_track_handle);
+    StubVideoSource *video_source = reinterpret_cast<StubVideoSource *>(j_native_video_sink_handle);
+
+    // Remove and delete sink
+    local_video_track->getWebRtcTrack()->RemoveSink(video_source);
+    delete video_source;
+}
+
 JNIEXPORT void JNICALL Java_com_twilio_video_LocalVideoTrack_nativeRelease(JNIEnv *jni,
                                                                            jobject j_local_video_track,
                                                                            jlong local_video_track_handle) {
