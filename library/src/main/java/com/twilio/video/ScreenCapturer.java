@@ -162,8 +162,7 @@ public class ScreenCapturer implements VideoCapturer {
     }
 
     /**
-     * Returns a list of all supported video formats. This is currently limited to VGA and 720p at
-     * 30 frames per second with a pixel format of RGBA.
+     * Returns a list containing one supported video format derived from the device screen size.
      *
      * <p><b>Note</b>: This method can be invoked for informational purposes, but is primarily used
      * internally.</p>
@@ -187,7 +186,7 @@ public class ScreenCapturer implements VideoCapturer {
     }
 
     /**
-     * Inidicates that the screen capturer is a screencast.
+     * Indicates that the screen capturer is a screencast.
      */
     @Override
     public boolean isScreencast() {
