@@ -244,8 +244,12 @@ void VideoCapturerDelegate::OnMemoryBufferFrame(void *video_frame, int length, i
         case cricket::FOURCC_ABGR: {
             const uint8_t *src_rgba = static_cast<uint8_t *>(video_frame);
             int rgba_stride = 4 * width;
-            rtc::scoped_refptr<webrtc::VideoFrameBuffer> pre_rotate_buffer =
-                    pre_rotate_pool_.CreateBuffer(width, height);
+
+            // Pre rotate buffer allocated only if rotation required to minimize memory footprint
+            rtc::scoped_refptr<webrtc::VideoFrameBuffer> pre_rotate_buffer = buffer;
+            if (capturer_->apply_rotation()) {
+                pre_rotate_buffer = pre_rotate_pool_.CreateBuffer(crop_width, crop_height);
+            }
 
             // Convert to I420
             libyuv::ABGRToI420(
@@ -255,7 +259,10 @@ void VideoCapturerDelegate::OnMemoryBufferFrame(void *video_frame, int length, i
                     (uint8 *) pre_rotate_buffer->DataV(), pre_rotate_buffer->StrideV(),
                     crop_width, crop_height);
 
-            // Apply rotation if required
+            /*
+             * Rotation applied into original buffer if required. If rotation not required then the
+             * pre rotation buffer is set to final buffer.
+             */
             if (capturer_->apply_rotation()) {
                 libyuv::I420Rotate((uint8 *) pre_rotate_buffer->DataY(), pre_rotate_buffer->StrideY(),
                                    (uint8 *) pre_rotate_buffer->DataU(), pre_rotate_buffer->StrideU(),
