@@ -6,6 +6,11 @@ Improvements
 
 - Updated Android Gradle Plugin to `3.1.1`.
 
+Bug Fixes
+
+- Relaxed state check in `CameraCapturer` when stopCature is called and a camera closed event is
+not received.
+
 Known issues
 
 - Network handoff, and subsequent connection renegotiation is not supported for IPv6 networks [#72](https://github.com/twilio/video-quickstart-android/issues/72)

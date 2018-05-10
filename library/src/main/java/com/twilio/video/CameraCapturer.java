@@ -405,11 +405,14 @@ public class CameraCapturer implements VideoCapturer {
             webRtcCameraCapturer = null;
 
             /*
-             * Wait until the camera closed event has been fired. This event indicates
-             * that we have stopped capturing and that the camera resource is released.
+             * Wait until the camera closed event has fired. This event indicates
+             * that CameraCapturer stopped capturing and that the camera resource is released. If
+             * the event is not received then log an error and developer will be notified via
+             * onError callback.
              */
-            Preconditions.checkState(ThreadUtils.awaitUninterruptibly(cameraClosed,
-                    CAMERA_CLOSED_TIMEOUT_MS), CAMERA_CLOSED_FAILED);
+            if (!ThreadUtils.awaitUninterruptibly(cameraClosed, CAMERA_CLOSED_TIMEOUT_MS)) {
+                logger.e("Camera closed event not received");
+            }
             synchronized (stateLock) {
                 cameraClosed = null;
                 state = State.IDLE;
