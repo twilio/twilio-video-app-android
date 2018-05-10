@@ -5,10 +5,10 @@ library-instrumentation-tests:
     test: library/build/outputs/apk/androidTest/debug/library-debug-androidTest.apk
     device-ids:
         - m0
-        - serranolte
+        - hlte
         - zeroflte
         - herolte
-        - flounder
+        - hwALE-H
         - sailfish
     os-version-ids:
         - 18
@@ -31,7 +31,7 @@ library-camera-tests:
         - A0001
         - athene
         - athene_f
-        - flounder
+        - hwALE-H
         - g3
         - hero2lte
         - herolte
@@ -40,10 +40,8 @@ library-camera-tests:
         - j7xelte
         - lt02wifi
         - m0
-        - osprey_umts
+        - A0001
         - sailfish
-        - serranolte
-        - trelte
         - zeroflte
         - zerolte
         - shamu
