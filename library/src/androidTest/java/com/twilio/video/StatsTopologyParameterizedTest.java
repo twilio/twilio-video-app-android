@@ -47,6 +47,8 @@ import static org.junit.Assert.assertTrue;
 @RunWith(Parameterized.class)
 @LargeTest
 public class StatsTopologyParameterizedTest extends BaseStatsTest {
+    private static final int MAX_RETRIES = 10;
+
     @Parameterized.Parameters(name = "{0}")
     public static Iterable<Object[]> data() {
         return Arrays.asList(new Object[][]{
@@ -59,7 +61,7 @@ public class StatsTopologyParameterizedTest extends BaseStatsTest {
     }
 
     @Before
-    public void setup() throws InterruptedException {
+    public void setup() {
         super.baseSetup(topology);
     }
 
@@ -93,19 +95,7 @@ public class StatsTopologyParameterizedTest extends BaseStatsTest {
         assertTrue(aliceListener.onParticipantConnectedLatch.await(20, TimeUnit.SECONDS));
         assertEquals(1, aliceRoom.getRemoteParticipants().size());
 
-        // let's give peer connection some time to get media flowing
-        Thread.sleep(2000);
-
-        CallbackHelper.FakeStatsListener aliceStatsListener =
-                new CallbackHelper.FakeStatsListener();
-        aliceStatsListener.onStatsLatch = new CountDownLatch(1);
-        aliceRoom.getStats(aliceStatsListener);
-        assertTrue(aliceStatsListener.onStatsLatch.await(20, TimeUnit.SECONDS));
-
-        List<StatsReport> statsReportList = aliceStatsListener.getStatsReports();
-        assertEquals(1, statsReportList.size());
-        StatsReport statsReport = statsReportList.get(0);
-        expectStatsReportTracksSize(statsReport, 1, 0, 1, 1);
+        expectStatsReportTracksSize(1, 0, 1, 1);
     }
 
     @Test
@@ -137,52 +127,19 @@ public class StatsTopologyParameterizedTest extends BaseStatsTest {
         assertTrue(bobLocalParticipant.publishTrack(bobLocalAudioTrack));
         assertTrue(participantListener.onSubscribedToAudioTrackLatch.await(20, TimeUnit.SECONDS));
 
-        // let's give peer connection some time to get media flowing
-        Thread.sleep(2000);
-        CallbackHelper.FakeStatsListener aliceStatsListener =
-                new CallbackHelper.FakeStatsListener();
-        aliceStatsListener.onStatsLatch = new CountDownLatch(1);
-        aliceRoom.getStats(aliceStatsListener);
-        assertTrue(aliceStatsListener.onStatsLatch.await(20, TimeUnit.SECONDS));
-
-        List<StatsReport> statsReportList = aliceStatsListener.getStatsReports();
-        assertEquals(1, statsReportList.size());
-        StatsReport statsReport = statsReportList.get(0);
-        expectStatsReportTracksSize(statsReport, 1, 0, 1, 0);
+        expectStatsReportTracksSize(1, 0, 1, 0);
 
         // Add video track to bob and check stats
         bobLocalVideoTrack = LocalVideoTrack
                 .create(mediaTestActivity, true, new FakeVideoCapturer());
         assertTrue(bobLocalParticipant.publishTrack(bobLocalVideoTrack));
         assertTrue(participantListener.onSubscribedToVideoTrackLatch.await(20, TimeUnit.SECONDS));
-
-        // let's give peer connection some time to get media flowing
-        Thread.sleep(2000);
-        aliceStatsListener = new CallbackHelper.FakeStatsListener();
-        aliceStatsListener.onStatsLatch = new CountDownLatch(1);
-        aliceRoom.getStats(aliceStatsListener);
-        assertTrue(aliceStatsListener.onStatsLatch.await(20, TimeUnit.SECONDS));
-
-        statsReportList = aliceStatsListener.getStatsReports();
-        assertEquals(1, statsReportList.size());
-        statsReport = statsReportList.get(0);
-        expectStatsReportTracksSize(statsReport, 1, 0, 1, 1);
+        expectStatsReportTracksSize(1, 0, 1, 1);
 
         // Remove Bob's video track and check the stats
         bobLocalParticipant.unpublishTrack(bobLocalVideoTrack);
         assertTrue(participantListener.onUnsubscribedFromVideoTrackLatch.await(20, TimeUnit.SECONDS));
-
-        // let's give peer connection some time to get media flowing
-        Thread.sleep(2000);
-        aliceStatsListener = new CallbackHelper.FakeStatsListener();
-        aliceStatsListener.onStatsLatch = new CountDownLatch(1);
-        aliceRoom.getStats(aliceStatsListener);
-        assertTrue(aliceStatsListener.onStatsLatch.await(20, TimeUnit.SECONDS));
-
-        statsReportList = aliceStatsListener.getStatsReports();
-        assertEquals(1, statsReportList.size());
-        statsReport = statsReportList.get(0);
-        expectStatsReportTracksSize(statsReport, 1, 0, 1, 0);
+        expectStatsReportTracksSize(1, 0, 1, 0);
     }
 
     @Test
@@ -208,20 +165,7 @@ public class StatsTopologyParameterizedTest extends BaseStatsTest {
         aliceLocalAudioTrack = LocalAudioTrack.create(mediaTestActivity, true);
         assertTrue(aliceLocalParticipant.publishTrack(aliceLocalAudioTrack));
 
-        // let's give peer connection some time to get media flowing
-        Thread.sleep(2500);
-
-        CallbackHelper.FakeStatsListener aliceStatsListener =
-                new CallbackHelper.FakeStatsListener();
-        aliceStatsListener.onStatsLatch = new CountDownLatch(1);
-        aliceRoom.getStats(aliceStatsListener);
-        assertTrue(aliceStatsListener.onStatsLatch.await(20, TimeUnit.SECONDS));
-
-        List<StatsReport> statsReportList = aliceStatsListener.getStatsReports();
-        assertEquals(1, statsReportList.size());
-        StatsReport statsReport = statsReportList.get(0);
-
-        expectStatsReportTracksSize(statsReport, 1, 1, 0, 0);
+        expectStatsReportTracksSize(1, 1, 0, 0);
     }
 
     @Test
@@ -245,22 +189,19 @@ public class StatsTopologyParameterizedTest extends BaseStatsTest {
         assertTrue(aliceListener.onParticipantConnectedLatch.await(20, TimeUnit.SECONDS));
         assertEquals(1, aliceRoom.getRemoteParticipants().size());
 
-        // let's give peer connection some time to get media flowing
-        Thread.sleep(2000);
-
-        // send getStats() requests
+        // Call getStats multiple times
         CallbackHelper.FakeStatsListener aliceStatsListener =
                 new CallbackHelper.FakeStatsListener();
         aliceStatsListener.onStatsLatch = new CountDownLatch(numberOfRequests);
-        for (int i = 0; i < numberOfRequests; i++) {
+        for (int i = 0 ; i < numberOfRequests ; i++) {
             aliceRoom.getStats(aliceStatsListener);
         }
 
+        // Validate all callbacks received
         assertTrue(aliceStatsListener.onStatsLatch.await(20, TimeUnit.SECONDS));
-        // check last stats report
-        List<StatsReport> statsReportList = aliceStatsListener.getStatsReports();
-        assertEquals(1, statsReportList.size());
-        expectStatsReportTracksSize(statsReportList.get(0), 1, 0, 1, 0);
+
+        // Validate size
+        expectStatsReportTracksSize(1, 0, 1, 0);
     }
 
     @Test
@@ -288,19 +229,8 @@ public class StatsTopologyParameterizedTest extends BaseStatsTest {
                 Collections.singletonList(bobLocalVideoTrack));
         assertTrue(aliceListener.onParticipantConnectedLatch.await(20, TimeUnit.SECONDS));
 
-        // let's give peer connection some time to get media flowing
-        // 10 seconds seems enough to create Jitter. It fails every time with 5s.
-        Thread.sleep(10000);
-
-        CallbackHelper.FakeStatsListener aliceStatsListener =
-                new CallbackHelper.FakeStatsListener();
-        aliceStatsListener.onStatsLatch = new CountDownLatch(1);
-        aliceRoom.getStats(aliceStatsListener);
-        assertTrue(aliceStatsListener.onStatsLatch.await(20, TimeUnit.SECONDS));
-        List<StatsReport> statsReportList = aliceStatsListener.getStatsReports();
-        assertEquals(1, statsReportList.size());
-        StatsReport statsReport = statsReportList.get(0);
-        expectStatsReportTracksSize(statsReport, 1, 1, 1, 1);
+        StatsReport statsReport = expectStatsReportTracksSize(1,
+                1, 1, 1);
 
         assertNotEquals("", statsReport.getPeerConnectionId());
 
@@ -410,10 +340,6 @@ public class StatsTopologyParameterizedTest extends BaseStatsTest {
         CallbackHelper.FakeStatsListener aliceStatsListener =
                 new CallbackHelper.FakeStatsListener();
         aliceStatsListener.onStatsLatch = new CountDownLatch(1);
-
-        // let's give peer connection some time to get media flowing
-        Thread.sleep(2000);
-
         aliceListener.onDisconnectedLatch = new CountDownLatch(1);
         aliceRoom.disconnect();
 
@@ -428,14 +354,38 @@ public class StatsTopologyParameterizedTest extends BaseStatsTest {
         assertFalse(aliceStatsListener.onStatsLatch.await(5, TimeUnit.SECONDS));
     }
 
-    private void expectStatsReportTracksSize(StatsReport statsReport, int localAudioTrackSize,
-                                             int localVideoTrackSize, int audioTrackSize,
-                                             int videoTrackSize) {
+    private StatsReport expectStatsReportTracksSize(int localAudioTrackSize,
+                                                    int localVideoTrackSize,
+                                                    int audioTrackSize,
+                                                    int videoTrackSize) throws InterruptedException {
+        boolean expectedStatsReportTrackSizesMet;
+        int retries = 0;
+        StatsReport statsReport;
 
-        assertEquals(localAudioTrackSize, statsReport.getLocalAudioTrackStats().size());
-        assertEquals(localVideoTrackSize, statsReport.getLocalVideoTrackStats().size());
-        assertEquals(audioTrackSize, statsReport.getRemoteAudioTrackStats().size());
-        assertEquals(videoTrackSize, statsReport.getRemoteVideoTrackStats().size());
+        do {
+            // Give peer connection some time to get media flowing
+            Thread.sleep(1000);
+
+            CallbackHelper.FakeStatsListener aliceStatsListener =
+                    new CallbackHelper.FakeStatsListener();
+            aliceStatsListener.onStatsLatch = new CountDownLatch(1);
+            aliceRoom.getStats(aliceStatsListener);
+            assertTrue(aliceStatsListener.onStatsLatch.await(20, TimeUnit.SECONDS));
+
+            List<StatsReport> statsReportList = aliceStatsListener.getStatsReports();
+            assertEquals(1, statsReportList.size());
+            statsReport = statsReportList.get(0);
+
+            expectedStatsReportTrackSizesMet = localAudioTrackSize ==
+                    statsReport.getLocalAudioTrackStats().size() &&
+                    localVideoTrackSize == statsReport.getLocalVideoTrackStats().size() &&
+                    audioTrackSize == statsReport.getRemoteAudioTrackStats().size() &&
+                    videoTrackSize == statsReport.getRemoteVideoTrackStats().size();
+        } while (!expectedStatsReportTrackSizesMet && retries++ < MAX_RETRIES);
+
+        assertTrue(expectedStatsReportTrackSizesMet);
+
+        return statsReport;
     }
 
     private void checkBaseTrackStats(BaseTrackStats stats) {

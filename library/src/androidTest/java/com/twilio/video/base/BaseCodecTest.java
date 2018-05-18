@@ -36,6 +36,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 public abstract class BaseCodecTest extends BaseStatsTest {
+    private static int CODEC_TEST_MAX_RETRIES = 10;
+
     protected void assertAudioCodecPublished(@Nullable AudioCodec expectedAudioCodec)
             throws InterruptedException {
         assertCodecsPublished(expectedAudioCodec, null);
@@ -57,7 +59,8 @@ public abstract class BaseCodecTest extends BaseStatsTest {
         String localVideoTrackCodec = null;
         String remoteAudioTrackCodec = null;
         String remoteVideoTrackCodec = null;
-        boolean failedToGetNeededCodecs = false;
+        boolean failedToGetNeededCodecs;
+        int retries = 0;
         do {
             // Give peer connection some time to get media flowing
             Thread.sleep(1000);
@@ -121,7 +124,7 @@ public abstract class BaseCodecTest extends BaseStatsTest {
                             StringUtils.isNullOrEmpty(localVideoTrackCodec)) ||
                     (expectedVideoCodec != null &&
                             StringUtils.isNullOrEmpty(remoteVideoTrackCodec));
-        } while (failedToGetNeededCodecs);
+        } while (failedToGetNeededCodecs && retries++ < CODEC_TEST_MAX_RETRIES);
 
         // Validate codecs
         if (expectedAudioCodec != null) {

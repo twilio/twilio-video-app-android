@@ -483,8 +483,14 @@ task publishLibraryJavadocs {
     }
 }
 
-task firebaseTestLabCheckLibrary(type: Exec) {
-    description = 'Runs library instrumentation tests on Firebase Test Lab'
+/*
+ * The tests that rely heavily on the Stats API require much more time to execute. These tests
+ * run in a separate test execution to ensure the entire test suite does not exceed the
+ * Firebase Test Lab 30 minute physical device time limit.
+ */
+
+task firebaseTestLabCheckLibraryStats(type: Exec) {
+    description = 'Runs library instrumentation tests that use Stats API on Firebase Test Lab'
     group = 'Test'
     dependsOn 'library:assembleDebugAndroidTest'
     dependsOn 'app:assembleDebug'
@@ -496,7 +502,24 @@ task firebaseTestLabCheckLibrary(type: Exec) {
             '--no-record-video',
             '--project',
             'video-app-79418',
-            'video-app-args.yaml:library-instrumentation-tests'
+            'video-app-args.yaml:library-stats-instrumentation-tests'
+}
+
+task firebaseTestLabCheckLibraryNoStats(type: Exec) {
+    description = 'Runs library instrumentation tests that do not use Stats API on ' +
+            'Firebase Test Lab'
+    group = 'Test'
+    dependsOn 'library:assembleDebugAndroidTest'
+    dependsOn 'app:assembleDebug'
+    commandLine 'gcloud',
+            'firebase',
+            'test',
+            'android',
+            'run',
+            '--no-record-video',
+            '--project',
+            'video-app-79418',
+            'video-app-args.yaml:library-no-stats-instrumentation-tests'
 }
 
 task firebaseTestLabCheckLibraryCamera(type: Exec) {

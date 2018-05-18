@@ -1,4 +1,37 @@
-library-instrumentation-tests:
+# The tests that rely heavily on the Stats API require much more time to execute. These tests
+# run in a separate test execution to ensure the entire test suite does not exceed the Firebase
+# Test Lab 30 minute physical device time limit.
+
+library-stats-instrumentation-tests:
+    timeout: 30m
+    type: instrumentation
+    app: app/build/outputs/apk/internal/debug/app-internal-debug.apk
+    test: library/build/outputs/apk/androidTest/debug/library-debug-androidTest.apk
+    device-ids:
+        - m0
+        - hlte
+        - zeroflte
+        - herolte
+        - hwALE-H
+        - sailfish
+    os-version-ids:
+        - 18
+        - 19
+        - 21
+        - 22
+        - 23
+        - 24
+        - 25
+        - 26
+    test-targets:
+        - class com.twilio.video.StatsTest
+        - class com.twilio.video.StatsTopologyParameterizedTest
+        - class com.twilio.video.CodecPreferencesTest
+        - class com.twilio.video.MultiCodecTest
+    locales: en
+    orientations: portrait
+
+library-no-stats-instrumentation-tests:
     timeout: 30m
     type: instrumentation
     app: app/build/outputs/apk/internal/debug/app-internal-debug.apk
@@ -21,6 +54,8 @@ library-instrumentation-tests:
         - 26
     locales: en
     orientations: portrait
+    environment-variables:
+        notClass: com.twilio.video.StatsTest,com.twilio.video.StatsTopologyParameterizedTest,com.twilio.video.CodecPreferencesTest,com.twilio.video.MultiCodecTest
 
 library-camera-tests:
     timeout: 10m

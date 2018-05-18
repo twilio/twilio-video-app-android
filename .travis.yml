@@ -132,7 +132,9 @@ jobs:
     - stage: test
       script: ./gradlew library:testDebugUnitTest
     - stage: test
-      script: ./gradlew -q firebaseTestLabCheckLibrary
+      script: ./gradlew -q firebaseTestLabCheckLibraryStats
+    - stage: test
+      script: ./gradlew -q firebaseTestLabCheckLibraryNoStats
     - stage: test
       script: ./gradlew -q firebaseTestLabCheckLibraryCamera
     - stage: test
