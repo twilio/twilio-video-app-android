@@ -8,6 +8,12 @@ Features
 multiple spatial and temporal layers for the video that is published. Simulcast should only be
 enabled in a Group Room.
 
+Bug Fixes
+
+- Fixed a bug where the SDK could crash when unsubscribing from a data track and disconnecting from the room at the same time.
+- Fixed a rare crash that occurs when disconnecting from a `Room`.
+- Fixed an issue which could cause DTLS roles to be negotiated incorrectly in a multi-party Peer-to-Peer Room.
+
 Known issues
 
 - Network handoff, and subsequent connection renegotiation is not supported for IPv6 networks [#72](https://github.com/twilio/video-quickstart-android/issues/72)
