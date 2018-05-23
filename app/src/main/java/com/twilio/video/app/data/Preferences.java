@@ -43,6 +43,8 @@ public class Preferences {
     public static final boolean ENABLE_INSIGHTS_DEFAULT = true;
     public static final String VIDEO_CODEC = "pref_video_codecs";
     public static final String VIDEO_CODEC_DEFAULT = Vp8Codec.NAME;
+    public static final String VP8_SIMULCAST = "pref_vp8_simulcast";
+    public static final boolean VP8_SIMULCAST_DEFAULT = false;
     public static final String AUDIO_CODEC = "pref_audio_codecs";
     public static final String AUDIO_CODEC_DEFAULT = OpusCodec.NAME;
     public static final String MAX_AUDIO_BITRATE = "pref_max_audio_bitrate";

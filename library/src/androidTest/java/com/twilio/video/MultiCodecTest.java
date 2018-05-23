@@ -49,6 +49,7 @@ import static org.junit.Assume.assumeTrue;
 @LargeTest
 public class MultiCodecTest extends BaseCodecTest {
     private final Vp8Codec vp8Codec = new Vp8Codec();
+    private final Vp8Codec vp8WithSimulcastCodec = new Vp8Codec(true);
     private final H264Codec h264Codec = new H264Codec();
 
     @Before
@@ -349,31 +350,59 @@ public class MultiCodecTest extends BaseCodecTest {
         assertVideoCodecPublished(expectedCodec);
     }
 
+    /*
+     * Used by test runner to generate test parameters.
+     */
+    @SuppressWarnings("unused")
     private Object[] supportedVideoCodecs() {
         return new Object[]{
                 new Object[]{Collections.singletonList(vp8Codec),
                         Collections.singletonList(vp8Codec),
                         vp8Codec},
+                new Object[]{Collections.singletonList(vp8WithSimulcastCodec),
+                        Collections.singletonList(vp8WithSimulcastCodec),
+                        vp8WithSimulcastCodec},
                 new Object[]{Collections.singletonList(vp8Codec),
                         Arrays.asList(vp8Codec, h264Codec),
                         vp8Codec},
+                new Object[]{Collections.singletonList(vp8WithSimulcastCodec),
+                        Arrays.asList(vp8WithSimulcastCodec, h264Codec),
+                        vp8WithSimulcastCodec},
                 new Object[]{Arrays.asList(vp8Codec, h264Codec),
                         Collections.singletonList(vp8Codec),
                         vp8Codec},
+                new Object[]{Arrays.asList(vp8WithSimulcastCodec, h264Codec),
+                        Collections.singletonList(vp8WithSimulcastCodec),
+                        vp8WithSimulcastCodec},
                 new Object[]{Arrays.asList(vp8Codec, h264Codec),
+                        Collections.singletonList(h264Codec),
+                        h264Codec},
+                new Object[]{Arrays.asList(vp8WithSimulcastCodec, h264Codec),
                         Collections.singletonList(h264Codec),
                         h264Codec},
                 new Object[]{Arrays.asList(vp8Codec, h264Codec),
                         Arrays.asList(vp8Codec, h264Codec),
                         vp8Codec},
+                new Object[]{Arrays.asList(vp8WithSimulcastCodec, h264Codec),
+                        Arrays.asList(vp8WithSimulcastCodec, h264Codec),
+                        vp8WithSimulcastCodec},
                 new Object[]{Arrays.asList(h264Codec, vp8Codec),
                         Collections.singletonList(vp8Codec),
                         vp8Codec},
+                new Object[]{Arrays.asList(h264Codec, vp8WithSimulcastCodec),
+                        Collections.singletonList(vp8WithSimulcastCodec),
+                        vp8WithSimulcastCodec},
                 new Object[]{Arrays.asList(h264Codec, vp8Codec),
+                        Collections.singletonList(h264Codec),
+                        h264Codec},
+                new Object[]{Arrays.asList(h264Codec, vp8WithSimulcastCodec),
                         Collections.singletonList(h264Codec),
                         h264Codec},
                 new Object[]{Arrays.asList(h264Codec, vp8Codec),
                         Arrays.asList(vp8Codec, h264Codec),
+                        h264Codec},
+                new Object[]{Arrays.asList(h264Codec, vp8WithSimulcastCodec),
+                        Arrays.asList(vp8WithSimulcastCodec, h264Codec),
                         h264Codec}
         };
     }

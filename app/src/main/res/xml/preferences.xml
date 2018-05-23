@@ -42,6 +42,10 @@
             android:negativeButtonText="@null"
             android:summary="%s"
             android:title="@string/video_codecs" />
+        <CheckBoxPreference
+            android:key="pref_vp8_simulcast"
+            android:title="@string/vp8_simulcast"
+            android:defaultValue="false"/>
         <com.twilio.video.app.data.NumberPreference
             style="@style/AppTheme.Preference.DialogPreference"
             android:key="pref_max_video_bitrate"

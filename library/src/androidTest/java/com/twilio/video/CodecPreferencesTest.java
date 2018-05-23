@@ -56,6 +56,7 @@ public class CodecPreferencesTest extends BaseCodecTest {
 
     // Video codecs
     private final Vp8Codec vp8Codec = new Vp8Codec();
+    private final Vp8Codec vp8WithSimulcastCodec = new Vp8Codec(true);
     private final H264Codec h264Codec = new H264Codec();
     private final Vp9Codec vp9Codec = new Vp9Codec();
 
@@ -184,11 +185,13 @@ public class CodecPreferencesTest extends BaseCodecTest {
     private Object[] parametersForCanPreferVideoCodec() {
         return new Object[]{
                 new Object[]{Topology.P2P, vp8Codec},
+                new Object[]{Topology.P2P, vp8WithSimulcastCodec},
                 new Object[]{Topology.P2P, h264Codec},
                 new Object[]{Topology.P2P, vp9Codec}
 
                 // TODO: Enable codec preferences tests for group rooms GSDK-1291
                 // new Object[]{Topology.GROUP, vp8Codec},
+                // new Object[]{Topology.GROUP, vp8WithSimulcastCodec},
                 // new Object[]{Topology.GROUP, h264Codec},
                 // new Object[]{Topology.GROUP, vp9Codec}
         };

@@ -70,7 +70,13 @@ std::shared_ptr<twilio::media::VideoCodec> getVideoCodec(JNIEnv *env, jobject j_
     if (video_codec_name == "H264") {
         video_codec.reset(new twilio::media::H264Codec());
     } else if (video_codec_name == "VP8") {
-        video_codec.reset(new twilio::media::Vp8Codec());
+        jfieldID j_simulcast_field_id = webrtc_jni::GetFieldID(env,
+                                                               j_video_codec_class,
+                                                               "simulcast",
+                                                               "Z");
+        jboolean j_simulcast = env->GetBooleanField(j_video_codec, j_simulcast_field_id);
+        CHECK_EXCEPTION(env) << "Failed to get simulcast field from Vp8Codec instance";
+        video_codec.reset(new twilio::media::Vp8Codec(j_simulcast));
     } else if (video_codec_name == "VP9") {
         video_codec.reset(new twilio::media::Vp9Codec());
     } else {

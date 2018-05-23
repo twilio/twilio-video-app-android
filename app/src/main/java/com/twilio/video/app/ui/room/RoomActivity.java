@@ -614,7 +614,9 @@ public class RoomActivity extends BaseActivity {
 
         switch (videoCodecName) {
             case Vp8Codec.NAME:
-                return new Vp8Codec();
+                boolean simulcast = sharedPreferences.getBoolean(Preferences.VP8_SIMULCAST,
+                        Preferences.VP8_SIMULCAST_DEFAULT);
+                return new Vp8Codec(simulcast);
             case H264Codec.NAME:
                 return new H264Codec();
             case Vp9Codec.NAME:
