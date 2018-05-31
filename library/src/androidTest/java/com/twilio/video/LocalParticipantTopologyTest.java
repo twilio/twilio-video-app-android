@@ -25,6 +25,7 @@ import com.kevinmost.junit_retry_rule.Retry;
 import com.kevinmost.junit_retry_rule.RetryRule;
 import com.twilio.video.base.BaseClientTest;
 import com.twilio.video.helper.CallbackHelper;
+import com.twilio.video.test.BuildConfig;
 import com.twilio.video.ui.MediaTestActivity;
 import com.twilio.video.util.Constants;
 import com.twilio.video.util.CredentialsUtils;
@@ -128,6 +129,7 @@ public class LocalParticipantTopologyTest extends BaseClientTest {
     }
 
     @Test
+    @Retry(times = BuildConfig.MAX_TEST_RETRIES)
     public void shouldAllowPublishingAndUnpublishingTracksWhileConnected()
             throws InterruptedException {
         CallbackHelper.FakeLocalParticipantListener localParticipantListener =
@@ -179,6 +181,7 @@ public class LocalParticipantTopologyTest extends BaseClientTest {
     }
 
     @Test
+    @Retry(times = BuildConfig.MAX_TEST_RETRIES)
     public void shouldAllowRepublishingTracksWhileConnected()
             throws InterruptedException {
         CallbackHelper.FakeLocalParticipantListener localParticipantListener =
@@ -271,6 +274,7 @@ public class LocalParticipantTopologyTest extends BaseClientTest {
     }
 
     @Test
+    @Retry(times = BuildConfig.MAX_TEST_RETRIES)
     public void shouldHaveTracksWhenConnected() throws InterruptedException {
         CallbackHelper.FakeLocalParticipantListener localParticipantListener =
                 new CallbackHelper.FakeLocalParticipantListener();
@@ -314,6 +318,7 @@ public class LocalParticipantTopologyTest extends BaseClientTest {
     }
 
     @Test
+    @Retry(times = BuildConfig.MAX_TEST_RETRIES)
     public void shouldHaveIdentityAndNonNullSidOnceConnected() throws InterruptedException {
         roomListener.onConnectedLatch = new CountDownLatch(1);
 
@@ -330,6 +335,7 @@ public class LocalParticipantTopologyTest extends BaseClientTest {
     }
 
     @Test
+    @Retry(times = BuildConfig.MAX_TEST_RETRIES)
     public void shouldHaveIdentityAndNonNullSidUponDisconnect() throws InterruptedException {
         roomListener.onConnectedLatch = new CountDownLatch(1);
         roomListener.onDisconnectedLatch = new CountDownLatch(1);
@@ -349,6 +355,7 @@ public class LocalParticipantTopologyTest extends BaseClientTest {
     }
 
     @Test
+    @Retry(times = BuildConfig.MAX_TEST_RETRIES)
     public void shouldHaveIdentityAndNonNullSidOnceDisconnected() throws InterruptedException {
         roomListener.onConnectedLatch = new CountDownLatch(1);
         roomListener.onDisconnectedLatch = new CountDownLatch(1);
@@ -368,6 +375,7 @@ public class LocalParticipantTopologyTest extends BaseClientTest {
     }
 
     @Test
+    @Retry(times = BuildConfig.MAX_TEST_RETRIES)
     public void shouldNotPublishAudioTrackAfterDisconnect() throws InterruptedException {
         roomListener.onConnectedLatch = new CountDownLatch(1);
         roomListener.onDisconnectedLatch = new CountDownLatch(1);
@@ -389,6 +397,7 @@ public class LocalParticipantTopologyTest extends BaseClientTest {
     }
 
     @Test
+    @Retry(times = BuildConfig.MAX_TEST_RETRIES)
     public void shouldNotPublishVideoTrackAfterDisconnect() throws InterruptedException {
         roomListener.onConnectedLatch = new CountDownLatch(1);
         roomListener.onDisconnectedLatch = new CountDownLatch(1);
@@ -410,6 +419,7 @@ public class LocalParticipantTopologyTest extends BaseClientTest {
     }
 
     @Test
+    @Retry(times = BuildConfig.MAX_TEST_RETRIES)
     public void shouldNotPublishDataTrackAfterDisconnect() throws InterruptedException {
         roomListener.onConnectedLatch = new CountDownLatch(1);
         roomListener.onDisconnectedLatch = new CountDownLatch(1);
@@ -431,6 +441,7 @@ public class LocalParticipantTopologyTest extends BaseClientTest {
     }
 
     @Test
+    @Retry(times = BuildConfig.MAX_TEST_RETRIES)
     public void shouldNotUnpublishAudioTrackAfterDisconnect() throws InterruptedException {
         CallbackHelper.FakeLocalParticipantListener localParticipantListener =
                 new CallbackHelper.FakeLocalParticipantListener();
@@ -458,6 +469,7 @@ public class LocalParticipantTopologyTest extends BaseClientTest {
     }
 
     @Test
+    @Retry(times = BuildConfig.MAX_TEST_RETRIES)
     public void shouldNotUnpublishVideoTrackAfterDisconnect() throws InterruptedException {
         CallbackHelper.FakeLocalParticipantListener localParticipantListener =
                 new CallbackHelper.FakeLocalParticipantListener();
@@ -486,6 +498,7 @@ public class LocalParticipantTopologyTest extends BaseClientTest {
     }
 
     @Test
+    @Retry(times = BuildConfig.MAX_TEST_RETRIES)
     public void shouldNotUnpublishDataTrackAfterDisconnect() throws InterruptedException {
         CallbackHelper.FakeLocalParticipantListener localParticipantListener =
                 new CallbackHelper.FakeLocalParticipantListener();
@@ -519,6 +532,7 @@ public class LocalParticipantTopologyTest extends BaseClientTest {
      */
 
     @Test
+    @Retry(times = BuildConfig.MAX_TEST_RETRIES)
     public void shouldNotSetEncodingParametersAfterDisconnect() throws InterruptedException {
         CallbackHelper.FakeLocalParticipantListener localParticipantListener =
                 new CallbackHelper.FakeLocalParticipantListener();
@@ -544,6 +558,7 @@ public class LocalParticipantTopologyTest extends BaseClientTest {
     }
 
     @Test
+    @Retry(times = BuildConfig.MAX_TEST_RETRIES)
     public void shouldAllowNullEncodingParameters() throws InterruptedException {
         CallbackHelper.FakeLocalParticipantListener localParticipantListener =
                 new CallbackHelper.FakeLocalParticipantListener();
@@ -571,6 +586,7 @@ public class LocalParticipantTopologyTest extends BaseClientTest {
     }
 
     @Test
+    @Retry(times = BuildConfig.MAX_TEST_RETRIES)
     public void shouldAllowEncodingParameters() throws InterruptedException {
         CallbackHelper.FakeLocalParticipantListener localParticipantListener =
                 new CallbackHelper.FakeLocalParticipantListener();
@@ -597,6 +613,7 @@ public class LocalParticipantTopologyTest extends BaseClientTest {
     }
 
     @Test
+    @Retry(times = BuildConfig.MAX_TEST_RETRIES)
     public void shouldFailToPublishTrackWithNameTooLong() throws InterruptedException {
         CallbackHelper.FakeLocalParticipantListener localParticipantListener =
                 new CallbackHelper.FakeLocalParticipantListener();
@@ -654,7 +671,7 @@ public class LocalParticipantTopologyTest extends BaseClientTest {
     }
 
     @Test
-    @Retry
+    @Retry(times = BuildConfig.MAX_TEST_RETRIES)
     public void shouldFailToPublishTracksWithDuplicatedNames() throws InterruptedException {
         CallbackHelper.FakeLocalParticipantListener localParticipantListener =
                 new CallbackHelper.FakeLocalParticipantListener();
@@ -736,6 +753,7 @@ public class LocalParticipantTopologyTest extends BaseClientTest {
     }
 
     @Test
+    @Retry(times = BuildConfig.MAX_TEST_RETRIES)
     public void publishTrack_shouldFailWithTrackNameTooLong() throws InterruptedException {
         CallbackHelper.FakeLocalParticipantListener localParticipantListener =
                 new CallbackHelper.FakeLocalParticipantListener();
@@ -795,6 +813,7 @@ public class LocalParticipantTopologyTest extends BaseClientTest {
     }
 
     @Test
+    @Retry(times = BuildConfig.MAX_TEST_RETRIES)
     public void publishTrack_shouldFailWithDuplicatedTrackName() throws InterruptedException {
         CallbackHelper.FakeLocalParticipantListener localParticipantListener =
                 new CallbackHelper.FakeLocalParticipantListener();

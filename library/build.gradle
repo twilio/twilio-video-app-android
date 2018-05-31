@@ -99,6 +99,7 @@ android {
         testVariant.buildConfigField("java.util.Map<String, String>",
             "twilioCredentials",
             "${getTwilioVideoConfig()}")
+        testVariant.buildConfigField("int", "MAX_TEST_RETRIES", "${getMaxTestRetries()}")
     }
 
     testOptions {
@@ -382,6 +383,22 @@ def getTestCoverageEnabled() {
     println "Test Coverage Enabled: " + testCoverageEnabled
 
     return testCoverageEnabled
+}
+
+def getMaxTestRetries() {
+    def testRetriesEnabled = false
+
+    // Determine if test retries enabled
+    if (project.hasProperty("testRetriesEnabled")) {
+        testRetriesEnabled = project.property("testRetriesEnabled").toBoolean()
+    }
+
+    // Set the max number of retries
+    def testMaxRetries = testRetriesEnabled ? 3 : 1
+
+    println "Max Number of Test Retries: " + testRetriesEnabled
+
+    return testMaxRetries
 }
 
 def getTwilioVideoConfig() {

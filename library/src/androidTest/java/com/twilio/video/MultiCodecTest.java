@@ -17,6 +17,7 @@
 package com.twilio.video;
 
 import android.support.test.filters.LargeTest;
+import android.support.test.runner.AndroidJUnit4;
 
 import com.twilio.video.base.BaseCodecTest;
 import com.twilio.video.helper.CallbackHelper;
@@ -30,14 +31,9 @@ import org.junit.runner.RunWith;
 import org.webrtc.MediaCodecVideoDecoder;
 import org.webrtc.MediaCodecVideoEncoder;
 
-import java.util.Arrays;
 import java.util.Collections;
-import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
-
-import junitparams.JUnitParamsRunner;
-import junitparams.Parameters;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -45,11 +41,10 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assume.assumeFalse;
 import static org.junit.Assume.assumeTrue;
 
-@RunWith(JUnitParamsRunner.class)
+@RunWith(AndroidJUnit4.class)
 @LargeTest
 public class MultiCodecTest extends BaseCodecTest {
     private final Vp8Codec vp8Codec = new Vp8Codec();
-    private final Vp8Codec vp8WithSimulcastCodec = new Vp8Codec(true);
     private final H264Codec h264Codec = new H264Codec();
 
     @Before
@@ -60,6 +55,7 @@ public class MultiCodecTest extends BaseCodecTest {
     @After
     public void teardown() throws InterruptedException {
         super.teardown();
+        assertTrue(MediaFactory.isReleased());
     }
 
     @Test
@@ -265,145 +261,5 @@ public class MultiCodecTest extends BaseCodecTest {
 
         // Unpublish the track that failed to publish
         assertFalse(aliceLocalParticipant.unpublishTrack(aliceLocalVideoTrack));
-    }
-
-    @Test
-    @Parameters(method = "supportedVideoCodecs")
-    public void shouldPublishVideoTrackWhenCodecSupported(List<VideoCodec> preferredVideoCodecs,
-                                                          List<VideoCodec> selectedVideoCodecs,
-                                                          VideoCodec expectedCodec) throws InterruptedException {
-        baseSetup(Topology.GROUP, selectedVideoCodecs);
-
-        // Validate device supported H264
-        if (expectedCodec instanceof H264Codec) {
-            assumeTrue(MediaCodecVideoEncoder.isH264HwSupported());
-            assumeTrue(MediaCodecVideoDecoder.isH264HwSupported());
-        }
-
-        // Connect alice with video track and preferred codecs
-        aliceLocalVideoTrack = LocalVideoTrack.create(mediaTestActivity, true,
-                new FakeVideoCapturer());
-        ConnectOptions aliceConnectOptions = new ConnectOptions.Builder(aliceToken)
-                .roomName(roomName)
-                .videoTracks(Collections.singletonList(aliceLocalVideoTrack))
-                .preferVideoCodecs(preferredVideoCodecs)
-                .build();
-        aliceRoom = createRoom(aliceListener, aliceConnectOptions);
-        aliceListener.onParticipantConnectedLatch = new CountDownLatch(1);
-
-        // Connect bob with no tracks
-        ConnectOptions bobConnectOptions = new ConnectOptions.Builder(bobToken)
-                .roomName(roomName)
-                .build();
-        bobRoom = createRoom(bobListener, bobConnectOptions);
-        assertTrue(aliceListener.onParticipantConnectedLatch.await(20, TimeUnit.SECONDS));
-        assertEquals(1, aliceRoom.getRemoteParticipants().size());
-
-        // Validate the codec published
-        assertVideoCodecPublished(expectedCodec);
-    }
-
-    @Test
-    @Parameters(method = "supportedVideoCodecs")
-    public void publishTrack_shouldAllowSupportedVideoCodec(List<VideoCodec> preferredVideoCodecs,
-                                                            List<VideoCodec> selectedVideoCodecs,
-                                                            VideoCodec expectedCodec) throws InterruptedException {
-        baseSetup(Topology.GROUP, selectedVideoCodecs);
-        if (expectedCodec instanceof H264Codec) {
-            assumeTrue(MediaCodecVideoEncoder.isH264HwSupported());
-            assumeTrue(MediaCodecVideoDecoder.isH264HwSupported());
-        }
-        // Connect alice with preferred codecs
-        aliceLocalVideoTrack = LocalVideoTrack.create(mediaTestActivity, true,
-                new FakeVideoCapturer());
-        ConnectOptions aliceConnectOptions = new ConnectOptions.Builder(aliceToken)
-                .roomName(roomName)
-                .preferVideoCodecs(preferredVideoCodecs)
-                .build();
-        aliceRoom = createRoom(aliceListener, aliceConnectOptions);
-        aliceListener.onParticipantConnectedLatch = new CountDownLatch(1);
-
-        // Connect bob with no tracks
-        ConnectOptions bobConnectOptions = new ConnectOptions.Builder(bobToken)
-                .roomName(roomName)
-                .build();
-        bobRoom = createRoom(bobListener, bobConnectOptions);
-        RemoteParticipant aliceRemoteParticipant = bobRoom.getRemoteParticipants().get(0);
-        assertTrue(aliceListener.onParticipantConnectedLatch.await(20, TimeUnit.SECONDS));
-        assertEquals(1, aliceRoom.getRemoteParticipants().size());
-
-        // Alice publish video track
-        LocalParticipant aliceLocalParticipant = aliceRoom.getLocalParticipant();
-        CallbackHelper.FakeLocalParticipantListener localParticipantListener =
-                new CallbackHelper.FakeLocalParticipantListener();
-        CallbackHelper.FakeParticipantListener participantListener =
-                new CallbackHelper.FakeParticipantListener();
-        participantListener.onSubscribedToVideoTrackLatch = new CountDownLatch(1);
-        localParticipantListener.onPublishedVideoTrackLatch = new CountDownLatch(1);
-        aliceRemoteParticipant.setListener(participantListener);
-        aliceLocalParticipant.setListener(localParticipantListener);
-        aliceLocalParticipant.publishTrack(aliceLocalVideoTrack);
-        assertTrue(localParticipantListener.onPublishedVideoTrackLatch.await(20, TimeUnit.SECONDS));
-        assertTrue(participantListener.onSubscribedToVideoTrackLatch.await(20, TimeUnit.SECONDS));
-
-        // Validate the codec published
-        assertVideoCodecPublished(expectedCodec);
-    }
-
-    /*
-     * Used by test runner to generate test parameters.
-     */
-    @SuppressWarnings("unused")
-    private Object[] supportedVideoCodecs() {
-        return new Object[]{
-                new Object[]{Collections.singletonList(vp8Codec),
-                        Collections.singletonList(vp8Codec),
-                        vp8Codec},
-                new Object[]{Collections.singletonList(vp8WithSimulcastCodec),
-                        Collections.singletonList(vp8WithSimulcastCodec),
-                        vp8WithSimulcastCodec},
-                new Object[]{Collections.singletonList(vp8Codec),
-                        Arrays.asList(vp8Codec, h264Codec),
-                        vp8Codec},
-                new Object[]{Collections.singletonList(vp8WithSimulcastCodec),
-                        Arrays.asList(vp8WithSimulcastCodec, h264Codec),
-                        vp8WithSimulcastCodec},
-                new Object[]{Arrays.asList(vp8Codec, h264Codec),
-                        Collections.singletonList(vp8Codec),
-                        vp8Codec},
-                new Object[]{Arrays.asList(vp8WithSimulcastCodec, h264Codec),
-                        Collections.singletonList(vp8WithSimulcastCodec),
-                        vp8WithSimulcastCodec},
-                new Object[]{Arrays.asList(vp8Codec, h264Codec),
-                        Collections.singletonList(h264Codec),
-                        h264Codec},
-                new Object[]{Arrays.asList(vp8WithSimulcastCodec, h264Codec),
-                        Collections.singletonList(h264Codec),
-                        h264Codec},
-                new Object[]{Arrays.asList(vp8Codec, h264Codec),
-                        Arrays.asList(vp8Codec, h264Codec),
-                        vp8Codec},
-                new Object[]{Arrays.asList(vp8WithSimulcastCodec, h264Codec),
-                        Arrays.asList(vp8WithSimulcastCodec, h264Codec),
-                        vp8WithSimulcastCodec},
-                new Object[]{Arrays.asList(h264Codec, vp8Codec),
-                        Collections.singletonList(vp8Codec),
-                        vp8Codec},
-                new Object[]{Arrays.asList(h264Codec, vp8WithSimulcastCodec),
-                        Collections.singletonList(vp8WithSimulcastCodec),
-                        vp8WithSimulcastCodec},
-                new Object[]{Arrays.asList(h264Codec, vp8Codec),
-                        Collections.singletonList(h264Codec),
-                        h264Codec},
-                new Object[]{Arrays.asList(h264Codec, vp8WithSimulcastCodec),
-                        Collections.singletonList(h264Codec),
-                        h264Codec},
-                new Object[]{Arrays.asList(h264Codec, vp8Codec),
-                        Arrays.asList(vp8Codec, h264Codec),
-                        h264Codec},
-                new Object[]{Arrays.asList(h264Codec, vp8WithSimulcastCodec),
-                        Arrays.asList(vp8WithSimulcastCodec, h264Codec),
-                        h264Codec}
-        };
     }
 }

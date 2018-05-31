@@ -21,8 +21,11 @@ import android.support.test.filters.LargeTest;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.rule.GrantPermissionRule;
 
+import com.kevinmost.junit_retry_rule.Retry;
+import com.kevinmost.junit_retry_rule.RetryRule;
 import com.twilio.video.base.BaseClientTest;
 import com.twilio.video.helper.CallbackHelper;
+import com.twilio.video.test.BuildConfig;
 import com.twilio.video.ui.MediaTestActivity;
 import com.twilio.video.util.CredentialsUtils;
 import com.twilio.video.util.Constants;
@@ -65,6 +68,10 @@ public class VideoTopologyParameterizedTest extends BaseClientTest {
     @Rule
     public ActivityTestRule<MediaTestActivity> activityRule =
             new ActivityTestRule<>(MediaTestActivity.class);
+
+    @Rule
+    public final RetryRule retryRule = new RetryRule();
+
     private MediaTestActivity mediaTestActivity;
     private String token;
     private String roomName;
@@ -110,6 +117,7 @@ public class VideoTopologyParameterizedTest extends BaseClientTest {
     }
 
     @Test
+    @Retry(times = BuildConfig.MAX_TEST_RETRIES)
     public void connect_shouldConnectToRoom() throws InterruptedException {
         roomListener.onConnectedLatch = new CountDownLatch(1);
         ConnectOptions connectOptions = new ConnectOptions.Builder(token)
@@ -120,6 +128,7 @@ public class VideoTopologyParameterizedTest extends BaseClientTest {
     }
 
     @Test
+    @Retry(times = BuildConfig.MAX_TEST_RETRIES)
     public void canConnectWithInsightsDisabled() throws InterruptedException {
         roomListener.onConnectedLatch = new CountDownLatch(1);
         ConnectOptions connectOptions = new ConnectOptions.Builder(token)
@@ -131,6 +140,7 @@ public class VideoTopologyParameterizedTest extends BaseClientTest {
     }
 
     @Test
+    @Retry(times = BuildConfig.MAX_TEST_RETRIES)
     public void disconnect_canDisconnectBeforeConnectingToRoom() throws InterruptedException {
         ConnectOptions connectOptions = new ConnectOptions.Builder(token)
                 .build();
@@ -138,6 +148,7 @@ public class VideoTopologyParameterizedTest extends BaseClientTest {
     }
 
     @Test
+    @Retry(times = BuildConfig.MAX_TEST_RETRIES)
     public void connect_shouldAllowAudioTracks() throws InterruptedException {
         localAudioTrack = LocalAudioTrack.create(mediaTestActivity, true);
         roomListener.onConnectedLatch = new CountDownLatch(1);
@@ -160,6 +171,7 @@ public class VideoTopologyParameterizedTest extends BaseClientTest {
     }
 
     @Test
+    @Retry(times = BuildConfig.MAX_TEST_RETRIES)
     public void connect_shouldAllowVideoTracks() throws InterruptedException {
         FakeVideoCapturer fakeVideoCapturer = new FakeVideoCapturer();
         localVideoTrack = LocalVideoTrack.create(mediaTestActivity, true, fakeVideoCapturer);
@@ -181,6 +193,7 @@ public class VideoTopologyParameterizedTest extends BaseClientTest {
     }
 
     @Test
+    @Retry(times = BuildConfig.MAX_TEST_RETRIES)
     public void connect_shouldAllowDataTracks() throws InterruptedException {
         CallbackHelper.FakeLocalParticipantListener localParticipantListener =
                 new CallbackHelper.FakeLocalParticipantListener();
@@ -211,6 +224,7 @@ public class VideoTopologyParameterizedTest extends BaseClientTest {
     }
 
     @Test
+    @Retry(times = BuildConfig.MAX_TEST_RETRIES)
     public void connect_shouldAllowAudioVideoAndDataTracks() throws InterruptedException {
         CallbackHelper.FakeLocalParticipantListener localParticipantListener =
                 new CallbackHelper.FakeLocalParticipantListener();
@@ -254,6 +268,7 @@ public class VideoTopologyParameterizedTest extends BaseClientTest {
     }
 
     @Test
+    @Retry(times = BuildConfig.MAX_TEST_RETRIES)
     public void connect_shouldFailToConnectWithBadToken() throws InterruptedException {
         roomListener.onConnectFailureLatch = new CountDownLatch(1);
         ConnectOptions connectOptions = new ConnectOptions.Builder("bad token")
@@ -267,6 +282,7 @@ public class VideoTopologyParameterizedTest extends BaseClientTest {
     }
 
     @Test
+    @Retry(times = BuildConfig.MAX_TEST_RETRIES)
     public void connect_shouldAllowLocalVideoTrackToBeReleasedWhileConnecting()
             throws InterruptedException {
         roomListener.onConnectedLatch = new CountDownLatch(1);
@@ -290,6 +306,7 @@ public class VideoTopologyParameterizedTest extends BaseClientTest {
     }
 
     @Test
+    @Retry(times = BuildConfig.MAX_TEST_RETRIES)
     public void connect_shouldAllowLocalDataTrackToBeReleasedWhileConnecting()
             throws InterruptedException {
         CallbackHelper.FakeLocalParticipantListener localParticipantListener =
@@ -321,6 +338,7 @@ public class VideoTopologyParameterizedTest extends BaseClientTest {
     }
 
     @Test
+    @Retry(times = BuildConfig.MAX_TEST_RETRIES)
     public void connect_shouldAllowLocalAudioTrackToBeReleasedWhileConnecting()
             throws InterruptedException {
         roomListener.onConnectedLatch = new CountDownLatch(1);
@@ -342,6 +360,7 @@ public class VideoTopologyParameterizedTest extends BaseClientTest {
     }
 
     @Test
+    @Retry(times = BuildConfig.MAX_TEST_RETRIES)
     public void connect_shouldAllowLocalVideoTrackToBeReleasedAfterConnect()
             throws InterruptedException {
         roomListener.onConnectedLatch = new CountDownLatch(1);
@@ -357,6 +376,7 @@ public class VideoTopologyParameterizedTest extends BaseClientTest {
     }
 
     @Test
+    @Retry(times = BuildConfig.MAX_TEST_RETRIES)
     public void connect_shouldAllowLocalDataTrackToBeReleasedAfterConnect()
             throws InterruptedException {
         roomListener.onConnectedLatch = new CountDownLatch(1);
@@ -372,6 +392,7 @@ public class VideoTopologyParameterizedTest extends BaseClientTest {
     }
 
     @Test
+    @Retry(times = BuildConfig.MAX_TEST_RETRIES)
     public void connect_shouldAllowLocalAudioTrackToBeReleasedAfterConnect()
             throws InterruptedException {
         roomListener.onConnectedLatch = new CountDownLatch(1);
@@ -387,6 +408,7 @@ public class VideoTopologyParameterizedTest extends BaseClientTest {
     }
 
     @Test
+    @Retry(times = BuildConfig.MAX_TEST_RETRIES)
     public void connect_shouldAllowEncodingParameters() throws InterruptedException {
         FakeVideoCapturer fakeVideoCapturer = new FakeVideoCapturer();
         localAudioTrack = LocalAudioTrack.create(mediaTestActivity, true);

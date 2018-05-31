@@ -18,14 +18,18 @@ package com.twilio.video;
 
 import android.support.test.filters.LargeTest;
 
+import com.kevinmost.junit_retry_rule.Retry;
+import com.kevinmost.junit_retry_rule.RetryRule;
 import com.twilio.video.base.BaseParticipantTest;
 import com.twilio.video.helper.CallbackHelper;
+import com.twilio.video.test.BuildConfig;
 import com.twilio.video.util.FakeVideoCapturer;
 import com.twilio.video.util.FrameCountRenderer;
 import com.twilio.video.util.Topology;
 
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -54,6 +58,9 @@ public class RemoteVideoTrackTopologyParameterizedTest extends BaseParticipantTe
                 {Topology.GROUP}});
     }
 
+    @Rule
+    public final RetryRule retryRule = new RetryRule();
+
     private final Topology topology;
 
     public RemoteVideoTrackTopologyParameterizedTest(Topology topology) {
@@ -72,6 +79,7 @@ public class RemoteVideoTrackTopologyParameterizedTest extends BaseParticipantTe
     }
 
     @Test
+    @Retry(times = BuildConfig.MAX_TEST_RETRIES)
     public void shouldHaveTrackSid() throws InterruptedException {
         publishVideoTrack();
 
@@ -87,6 +95,7 @@ public class RemoteVideoTrackTopologyParameterizedTest extends BaseParticipantTe
     }
 
     @Test
+    @Retry(times = BuildConfig.MAX_TEST_RETRIES)
     public void shouldHaveTrackName() throws InterruptedException {
         publishVideoTrack();
 
@@ -102,6 +111,7 @@ public class RemoteVideoTrackTopologyParameterizedTest extends BaseParticipantTe
     }
 
     @Test
+    @Retry(times = BuildConfig.MAX_TEST_RETRIES)
     public void canBeRendered() throws InterruptedException {
         publishVideoTrack();
         List<RemoteVideoTrackPublication> remoteVideoTracks =
@@ -116,6 +126,7 @@ public class RemoteVideoTrackTopologyParameterizedTest extends BaseParticipantTe
     }
 
     @Test
+    @Retry(times = BuildConfig.MAX_TEST_RETRIES)
     public void shouldEnableVideoTrackAfterConnectedToRoom() throws InterruptedException {
         CallbackHelper.FakeParticipantListener participantListener =
             new CallbackHelper.FakeParticipantListener();

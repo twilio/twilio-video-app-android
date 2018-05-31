@@ -9,10 +9,9 @@ library-stats-instrumentation-tests:
     test: library/build/outputs/apk/androidTest/debug/library-debug-androidTest.apk
     device-ids:
         - m0
-        - hlte
         - zeroflte
         - herolte
-        - hwALE-H
+        - flo
         - sailfish
     os-version-ids:
         - 18
@@ -27,7 +26,7 @@ library-stats-instrumentation-tests:
         - class com.twilio.video.StatsTest
         - class com.twilio.video.StatsTopologyParameterizedTest
         - class com.twilio.video.CodecPreferencesTest
-        - class com.twilio.video.MultiCodecTest
+        - class com.twilio.video.MultiCodecParameterizedTest
     locales: en
     orientations: portrait
 
@@ -38,10 +37,9 @@ library-no-stats-instrumentation-tests:
     test: library/build/outputs/apk/androidTest/debug/library-debug-androidTest.apk
     device-ids:
         - m0
-        - hlte
         - zeroflte
         - herolte
-        - hwALE-H
+        - flo
         - sailfish
     os-version-ids:
         - 18
@@ -55,7 +53,7 @@ library-no-stats-instrumentation-tests:
     locales: en
     orientations: portrait
     environment-variables:
-        notClass: com.twilio.video.StatsTest,com.twilio.video.StatsTopologyParameterizedTest,com.twilio.video.CodecPreferencesTest,com.twilio.video.MultiCodecTest
+        notClass: com.twilio.video.StatsTest,com.twilio.video.StatsTopologyParameterizedTest,com.twilio.video.CodecPreferencesTest,com.twilio.video.MultiCodecParameterizedTest
 
 library-camera-tests:
     timeout: 10m

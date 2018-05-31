@@ -22,6 +22,7 @@ import com.kevinmost.junit_retry_rule.Retry;
 import com.kevinmost.junit_retry_rule.RetryRule;
 import com.twilio.video.base.BaseParticipantTest;
 import com.twilio.video.helper.CallbackHelper;
+import com.twilio.video.test.BuildConfig;
 import com.twilio.video.util.Topology;
 
 import org.junit.After;
@@ -40,7 +41,6 @@ import static com.twilio.video.util.VideoAssert.assertIsTrackSid;
 import static junit.framework.TestCase.assertFalse;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assume.assumeTrue;
 
 @RunWith(Parameterized.class)
 @LargeTest
@@ -72,6 +72,7 @@ public class RemoteAudioTrackTopologyParameterizedTest extends BaseParticipantTe
     }
 
     @Test
+    @Retry(times = BuildConfig.MAX_TEST_RETRIES)
     public void shouldHaveTrackSid() throws InterruptedException {
         publishAudioTrack();
 
@@ -87,6 +88,7 @@ public class RemoteAudioTrackTopologyParameterizedTest extends BaseParticipantTe
     }
 
     @Test
+    @Retry(times = BuildConfig.MAX_TEST_RETRIES)
     public void shouldHaveTrackName() throws InterruptedException {
         publishAudioTrack();
 
@@ -103,7 +105,7 @@ public class RemoteAudioTrackTopologyParameterizedTest extends BaseParticipantTe
     }
 
     @Test
-    @Retry
+    @Retry(times = BuildConfig.MAX_TEST_RETRIES)
     public void shouldAllowEnablePlayback() throws InterruptedException {
         final CallbackHelper.FakeStatsListener statsListener =
                 new CallbackHelper.FakeStatsListener();

@@ -21,12 +21,13 @@ import android.os.Build;
 public class DeviceUtils {
     private static final String SAMSUNG_GALAXY_S3_MODEL = "GT-I9300";
     private static final String SAMSUNG_GALAXY_S3_DEVICE = "m0";
-    private static final String SAMSUNG_GALAXY_S7_DEVICE = "herolte";
+    private static final String SAMSUNG_GALAXY_S6_DEVICE = "zeroflte";
     private static final String HTC_NEXUS_9_DEVICE = "flounder";
     private static final String HTC_NEXUS_9_LTE_DEVICE = "flounder_lte";
+    private static final String NEXUS_7_DEVICE = "flo";
 
-    public static boolean isSamsungGalaxyS7() {
-        return Build.DEVICE.equals(SAMSUNG_GALAXY_S7_DEVICE);
+    public static boolean isSamsungGalaxyS6() {
+        return Build.DEVICE.equals(SAMSUNG_GALAXY_S6_DEVICE);
     }
 
     public static boolean isSamsungGalaxyS3() {
@@ -37,5 +38,9 @@ public class DeviceUtils {
     public static boolean isNexus9() {
         return Build.DEVICE.equals(HTC_NEXUS_9_DEVICE) ||
                 Build.DEVICE.equals(HTC_NEXUS_9_LTE_DEVICE);
+    }
+
+    public static boolean isNexus7() {
+        return Build.DEVICE.equals(NEXUS_7_DEVICE);
     }
 }

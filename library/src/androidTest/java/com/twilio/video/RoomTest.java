@@ -31,6 +31,8 @@ import com.twilio.video.util.Topology;
 
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -49,6 +51,9 @@ public class RoomTest extends BaseClientTest {
     private String identity;
     private String roomName;
     private String token;
+    private final CallbackHelper.FakeRoomListener roomListener =
+            new CallbackHelper.FakeRoomListener();
+    private Room room;
 
     @Before
     public void setup() throws InterruptedException {
@@ -62,20 +67,25 @@ public class RoomTest extends BaseClientTest {
     }
 
     @After
-    public void teardown() {
+    public void teardown() throws InterruptedException {
+        if (room != null && room.getState() != RoomState.DISCONNECTED) {
+            roomListener.onDisconnectedLatch = new CountDownLatch(1);
+            room.disconnect();
+            assertTrue("Did not receive disconnect callback",
+                    roomListener.onDisconnectedLatch.await(20, TimeUnit.SECONDS));
+        }
         assertTrue(MediaFactory.isReleased());
     }
 
     @Test
     public void disconnect_shouldBeIdempotent() throws InterruptedException {
-        CallbackHelper.FakeRoomListener roomListener = new CallbackHelper.FakeRoomListener();
         roomListener.onConnectedLatch = new CountDownLatch(1);
         roomListener.onDisconnectedLatch = new CountDownLatch(1);
 
         ConnectOptions connectOptions = new ConnectOptions.Builder(token)
                 .roomName(roomName)
                 .build();
-        Room room = Video.connect(context, connectOptions, roomListener);
+        room = Video.connect(context, connectOptions, roomListener);
         room.disconnect();
         room.disconnect();
         assertTrue(roomListener.onDisconnectedLatch.await(20, TimeUnit.SECONDS));
@@ -83,14 +93,13 @@ public class RoomTest extends BaseClientTest {
 
     @Test
     public void getStats_canBeCalledAfterDisconnect() throws InterruptedException {
-        CallbackHelper.FakeRoomListener roomListener = new CallbackHelper.FakeRoomListener();
         roomListener.onConnectedLatch = new CountDownLatch(1);
         roomListener.onDisconnectedLatch = new CountDownLatch(1);
 
         ConnectOptions connectOptions = new ConnectOptions.Builder(token)
                 .roomName(roomName)
                 .build();
-        Room room = Video.connect(context, connectOptions, roomListener);
+        room = Video.connect(context, connectOptions, roomListener);
         room.disconnect();
         room.getStats(new StatsListener() {
             @Override
@@ -102,8 +111,8 @@ public class RoomTest extends BaseClientTest {
     }
 
     @Test
+    @Ignore("Enable once CSDK-2342 is resolved")
     public void shouldReceiveDisconnectedCallbackWhenCompleted() throws InterruptedException {
-        CallbackHelper.FakeRoomListener roomListener = new CallbackHelper.FakeRoomListener();
         roomListener.onConnectedLatch = new CountDownLatch(1);
         roomListener.onDisconnectedLatch = new CountDownLatch(1);
 
@@ -111,7 +120,7 @@ public class RoomTest extends BaseClientTest {
         ConnectOptions connectOptions = new ConnectOptions.Builder(token)
                 .roomName(roomName)
                 .build();
-        Room room = Video.connect(context, connectOptions, roomListener);
+        room = Video.connect(context, connectOptions, roomListener);
         assertTrue(roomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
 
         // Complete room via REST API

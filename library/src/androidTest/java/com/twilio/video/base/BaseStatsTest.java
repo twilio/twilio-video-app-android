@@ -47,6 +47,7 @@ import java.util.concurrent.TimeUnit;
 import static org.apache.commons.lang3.RandomStringUtils.random;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 public abstract class BaseStatsTest extends BaseClientTest {
     @Rule
@@ -143,7 +144,14 @@ public abstract class BaseStatsTest extends BaseClientTest {
                               ConnectOptions connectOptions) throws InterruptedException {
         listener.onConnectedLatch = new CountDownLatch(1);
         Room room = Video.connect(mediaTestActivity, connectOptions, listener);
-        assertTrue(listener.onConnectedLatch.await(20, TimeUnit.SECONDS));
+        boolean connected = listener.onConnectedLatch.await(20, TimeUnit.SECONDS);
+
+        // Call disconnect before failing to ensure native memory released
+        if (!connected) {
+            room.disconnect();
+
+            fail("Failed to connect to room");
+        }
 
         return room;
     }

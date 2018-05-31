@@ -176,7 +176,8 @@ public class VideoApiUtils {
                         enableRecording,
                         videoCodecs);
             } catch (RetrofitError createRoomError) {
-                Log.e("VideoApiUtils", createRoomError.getMessage());
+                Log.e("VideoApiUtils", String.format("RetrofitError: %s",
+                        createRoomError.getKind().name()));
 
                 /*
                  * Sometimes there is a timeout creating a room, but the room resource is still
@@ -186,7 +187,8 @@ public class VideoApiUtils {
                 try {
                     videoRoom = videoApiService.getRoom(authorization, name);
                 } catch (RetrofitError getRoomError) {
-                    Log.e("VideoApiUtils", getRoomError.getMessage());
+                    Log.e("VideoApiUtils", String.format("RetrofitError: %s",
+                            getRoomError.getKind().name()));
                 }
             }
 

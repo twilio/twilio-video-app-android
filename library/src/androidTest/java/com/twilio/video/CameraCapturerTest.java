@@ -21,6 +21,7 @@ import android.support.test.InstrumentationRegistry;
 import android.support.test.runner.AndroidJUnit4;
 
 import com.twilio.video.base.BaseCameraCapturerTest;
+import com.twilio.video.util.DeviceUtils;
 
 import org.junit.After;
 import org.junit.Test;
@@ -36,6 +37,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static org.junit.Assume.assumeFalse;
 import static org.junit.Assume.assumeNotNull;
 import static org.junit.Assume.assumeTrue;
 
@@ -408,9 +410,12 @@ public class CameraCapturerTest extends BaseCameraCapturerTest {
 
     @Test
     public void shouldAllowUpdatingCameraParametersBeforeCapturing() throws InterruptedException {
-        // We use back camera for tests that require changes to camera paramters
+        // Back camera used for tests that require changes to camera parameters
         CameraCapturer.CameraSource cameraSource = CameraCapturer.CameraSource.BACK_CAMERA;
         assumeTrue(CameraCapturer.isSourceAvailable(cameraSource));
+
+        // TODO: Fix issue setting parameters on Nexus 7 GSDK-1281
+        assumeFalse(DeviceUtils.isNexus7());
 
         CountDownLatch cameraParametersSet = new CountDownLatch(1);
         String expectedFlashMode = Camera.Parameters.FLASH_MODE_TORCH;
@@ -436,9 +441,12 @@ public class CameraCapturerTest extends BaseCameraCapturerTest {
 
     @Test
     public void shouldAllowUpdatingCameraParametersWhileCapturing() throws InterruptedException {
-        // We use back camera for tests that require changes to camera paramters
+        // Back camera used for tests that require changes to camera parameters
         CameraCapturer.CameraSource cameraSource = CameraCapturer.CameraSource.BACK_CAMERA;
         assumeTrue(CameraCapturer.isSourceAvailable(cameraSource));
+
+        // TODO: Fix issue setting parameters on Nexus 7 GSDK-1281
+        assumeFalse(DeviceUtils.isNexus7());
 
         CountDownLatch cameraParametersUpdated = new CountDownLatch(1);
         final CountDownLatch firstFrameAvailable = new CountDownLatch(1);
@@ -485,9 +493,12 @@ public class CameraCapturerTest extends BaseCameraCapturerTest {
 
     @Test
     public void updateCameraParameters_shouldNotCauseCameraFreeze() throws InterruptedException {
-        // We use back camera for tests that require changes to camera paramters
+        // Back camera used for tests that require changes to camera parameters
         CameraCapturer.CameraSource cameraSource = CameraCapturer.CameraSource.BACK_CAMERA;
         assumeTrue(CameraCapturer.isSourceAvailable(cameraSource));
+
+        // TODO: Fix issue setting parameters on Nexus 7 GSDK-1281
+        assumeFalse(DeviceUtils.isNexus7());
 
         CountDownLatch cameraParametersSet = new CountDownLatch(1);
         final CountDownLatch cameraFroze = new CountDownLatch(1);
@@ -542,9 +553,12 @@ public class CameraCapturerTest extends BaseCameraCapturerTest {
     @Test
     public void updateCameraParameters_shouldManifestAfterCaptureCycle()
             throws InterruptedException {
-        // We use back camera for tests that require changes to camera paramters
+        // Back camera used for tests that require changes to camera parameters
         CameraCapturer.CameraSource cameraSource = CameraCapturer.CameraSource.BACK_CAMERA;
         assumeTrue(CameraCapturer.isSourceAvailable(cameraSource));
+
+        // TODO: Fix issue setting parameters on Nexus 7 GSDK-1281
+        assumeFalse(DeviceUtils.isNexus7());
 
         CountDownLatch cameraParametersUpdated = new CountDownLatch(1);
         final CountDownLatch firstFrameAvailable = new CountDownLatch(1);
@@ -609,9 +623,12 @@ public class CameraCapturerTest extends BaseCameraCapturerTest {
     @Test
     public void updateCameraParameters_shouldReturnFalseIfUpdateIsPending()
             throws InterruptedException {
-        // We use back camera for tests that require changes to camera paramters
+        // Back camera used for tests that require changes to camera parameters
         CameraCapturer.CameraSource cameraSource = CameraCapturer.CameraSource.BACK_CAMERA;
         assumeTrue(CameraCapturer.isSourceAvailable(cameraSource));
+
+        // TODO: Fix issue setting parameters on Nexus 7 GSDK-1281
+        assumeFalse(DeviceUtils.isNexus7());
 
         CountDownLatch cameraParametersUpdated = new CountDownLatch(1);
         final CountDownLatch firstFrameAvailable = new CountDownLatch(1);

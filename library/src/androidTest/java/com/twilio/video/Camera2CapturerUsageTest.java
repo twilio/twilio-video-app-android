@@ -24,11 +24,10 @@ import android.support.test.InstrumentationRegistry;
 import android.support.test.runner.AndroidJUnit4;
 
 import com.twilio.video.base.BaseCamera2CapturerTest;
-import com.twilio.video.util.FrameCountRenderer;
+import com.twilio.video.util.DeviceUtils;
 
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -39,6 +38,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import static org.junit.Assume.assumeFalse;
 import static org.junit.Assume.assumeTrue;
 
 @TargetApi(21)
@@ -157,6 +157,8 @@ public class Camera2CapturerUsageTest extends BaseCamera2CapturerTest {
 
     @Test
     public void switchCamera_shouldFailWithSwitchPending() throws InterruptedException {
+        // TODO: Fix crash on S6 GSDK-1561
+        assumeFalse(DeviceUtils.isSamsungGalaxyS6());
         assumeTrue(cameraIds.length > 1);
         final String cameraId = cameraIds[0];
         final String otherCameraId = cameraIds[1];
