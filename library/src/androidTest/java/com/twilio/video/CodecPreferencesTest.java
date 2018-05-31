@@ -97,7 +97,7 @@ public class CodecPreferencesTest extends BaseCodecTest {
     @Parameters
     public void canPreferVideoCodec(Topology topology, VideoCodec expectedVideoCodec)
             throws InterruptedException {
-        super.baseSetup(topology);
+        super.baseSetup(topology, Arrays.asList(vp8Codec, h264Codec));
         if (expectedVideoCodec instanceof H264Codec) {
             assumeTrue(MediaCodecVideoEncoder.isH264HwSupported());
             assumeTrue(MediaCodecVideoDecoder.isH264HwSupported());
@@ -167,13 +167,21 @@ public class CodecPreferencesTest extends BaseCodecTest {
                 new Object[]{Topology.P2P, opusCodec},
                 new Object[]{Topology.P2P, pcmaCodec},
                 new Object[]{Topology.P2P, pcmuCodec},
-                new Object[]{Topology.P2P, g722Codec}
+                new Object[]{Topology.P2P, g722Codec},
+                new Object[]{Topology.GROUP, opusCodec},
+                new Object[]{Topology.GROUP, pcmuCodec}
 
-                // TODO: Enable codec preferences tests for group rooms GSDK-1291
+                /*
+                 * TODO: Enable additional preference tests when Group Rooms support
+                 * preferring all audio codecs. This feature request is tracked in the following
+                 * tickets.
+                 *
+                 * VMS-1223
+                 * VMS-1224
+                 * VMS-1225
+                 */
                 // new Object[]{Topology.GROUP, isacCodec},
-                // new Object[]{Topology.GROUP, opusCodec},
                 // new Object[]{Topology.GROUP, pcmaCodec},
-                // new Object[]{Topology.GROUP, pcmuCodec},
                 // new Object[]{Topology.GROUP, g722Codec}
         };
     }
@@ -187,12 +195,12 @@ public class CodecPreferencesTest extends BaseCodecTest {
                 new Object[]{Topology.P2P, vp8Codec},
                 new Object[]{Topology.P2P, vp8WithSimulcastCodec},
                 new Object[]{Topology.P2P, h264Codec},
-                new Object[]{Topology.P2P, vp9Codec}
+                new Object[]{Topology.P2P, vp9Codec},
+                new Object[]{Topology.GROUP, vp8Codec},
+                new Object[]{Topology.GROUP, vp8WithSimulcastCodec},
+                new Object[]{Topology.GROUP, h264Codec}
 
-                // TODO: Enable codec preferences tests for group rooms GSDK-1291
-                // new Object[]{Topology.GROUP, vp8Codec},
-                // new Object[]{Topology.GROUP, vp8WithSimulcastCodec},
-                // new Object[]{Topology.GROUP, h264Codec},
+                // TODO: Enable preferring VP9 when Group Rooms adds support VMS-1226
                 // new Object[]{Topology.GROUP, vp9Codec}
         };
     }
