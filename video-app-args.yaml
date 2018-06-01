@@ -69,7 +69,6 @@ library-camera-tests:
         - hero2lte
         - herolte
         - hlte
-        - j5lte
         - j7xelte
         - lt02wifi
         - m0
