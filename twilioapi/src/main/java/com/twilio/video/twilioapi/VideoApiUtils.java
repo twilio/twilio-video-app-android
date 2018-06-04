@@ -20,7 +20,6 @@ import android.util.Base64;
 import android.util.Log;
 
 import com.google.gson.GsonBuilder;
-import com.twilio.video.twilioapi.model.TwilioServiceToken;
 import com.twilio.video.twilioapi.model.VideoRoom;
 
 import java.util.List;
@@ -97,7 +96,7 @@ public class VideoApiUtils {
         return new RestAdapter.Builder()
                 .setEndpoint(apiBaseUrl)
                 .setConverter(new GsonConverter(new GsonBuilder().create()))
-                .setLogLevel(RestAdapter.LogLevel.FULL)
+                .setLogLevel(RestAdapter.LogLevel.NONE)
                 .build()
                 .create(VideoApiUtils.VideoApiService.class);
     }
