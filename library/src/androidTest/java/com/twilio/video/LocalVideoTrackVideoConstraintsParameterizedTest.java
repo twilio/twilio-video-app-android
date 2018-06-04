@@ -21,6 +21,7 @@ import android.support.annotation.Nullable;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.filters.LargeTest;
 
+import com.twilio.video.base.BaseVideoTest;
 import com.twilio.video.util.FakeVideoCapturer;
 
 import org.junit.After;
@@ -37,7 +38,7 @@ import static org.junit.Assert.assertEquals;
 
 @RunWith(Parameterized.class)
 @LargeTest
-public class LocalVideoTrackVideoConstraintsParameterizedTest {
+public class LocalVideoTrackVideoConstraintsParameterizedTest extends BaseVideoTest {
     private static final VideoFormat cif30FpsVideoFormat =
             new VideoFormat(VideoDimensions.CIF_VIDEO_DIMENSIONS, 30, VideoPixelFormat.RGBA_8888);
     private static final VideoFormat vga30FpsVideoFormat =
@@ -200,7 +201,8 @@ public class LocalVideoTrackVideoConstraintsParameterizedTest {
     }
 
     @Before
-    public void setup() {
+    public void setup() throws InterruptedException {
+        super.setup();
         context = InstrumentationRegistry.getInstrumentation().getTargetContext();
         localVideoTrack = LocalVideoTrack.create(context, true, videoCapturer,
                 videoConstraints);

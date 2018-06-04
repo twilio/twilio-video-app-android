@@ -100,6 +100,8 @@ android {
             "twilioCredentials",
             "${getTwilioVideoConfig()}")
         testVariant.buildConfigField("int", "MAX_TEST_RETRIES", "${getMaxTestRetries()}")
+        testVariant.buildConfigField("com.twilio.video.LogLevel", "TEST_LOG_LEVEL",
+                "${getTestLogLevel()}")
     }
 
     testOptions {
@@ -399,6 +401,65 @@ def getMaxTestRetries() {
     println "Max Number of Test Retries: " + testRetriesEnabled
 
     return testMaxRetries
+}
+
+/*
+ * Returns proper com.twilio.video.LogLevel set as project property or in local.properties file.
+ * Default value is OFF and valid values are the following:
+ *
+ * OFF
+ * FATAL
+ * ERROR
+ * WARNING
+ * INFO
+ * DEBUG
+ * TRACE
+ * ALL
+ */
+def getTestLogLevel() {
+    // Default to project property
+    def testLogLevel = (project.hasProperty("testLogLevel")) ?
+            (project.property("testLogLevel")) :
+            (null)
+
+    if (testLogLevel == null) {
+        println "testLogLevel not set as project property. Trying local.properties"
+        Properties properties = new Properties()
+        if (project.rootProject.file('local.properties').exists()) {
+            properties.load(project.rootProject.file('local.properties').newDataInputStream())
+            testLogLevel = properties.getProperty('TEST_LOG_LEVEL')
+        }
+    }
+
+    // Set default value
+    if (testLogLevel == null) {
+        println "testLogLevel not set. Setting to OFF"
+        testLogLevel = "OFF"
+    }
+
+
+    // Convert to com.twilio.video.LogLevel
+    switch(testLogLevel.toUpperCase()) {
+        case "OFF":
+        case "FATAL":
+        case "ERROR":
+        case "WARNING":
+        case "INFO":
+        case "DEBUG":
+        case "TRACE":
+        case "ALL":
+            testLogLevel = "com.twilio.video.LogLevel." + testLogLevel
+            break
+        default:
+            println "Unknown test log level " + testLogLevel + ". Setting to OFF"
+            testLogLevel = "com.twilio.video.LogLevel.OFF"
+            break
+
+    }
+
+    println "Test Log Level: " + testLogLevel
+
+    return testLogLevel
 }
 
 def getTwilioVideoConfig() {

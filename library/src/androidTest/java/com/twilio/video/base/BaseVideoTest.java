@@ -18,6 +18,8 @@ package com.twilio.video.base;
 
 import android.support.test.InstrumentationRegistry;
 
+import com.twilio.video.LogLevel;
+import com.twilio.video.Video;
 import com.twilio.video.test.BuildConfig;
 import com.twilio.video.env.Env;
 
@@ -25,7 +27,7 @@ import org.junit.Before;
 
 import static junit.framework.Assert.assertEquals;
 
-public abstract class BaseClientTest {
+public abstract class BaseVideoTest {
     public static final String TWILIO_ENVIRONMENT_KEY = "TWILIO_ENVIRONMENT";
 
     @Before
@@ -50,6 +52,9 @@ public abstract class BaseClientTest {
         assertEquals(twilioEnv,
                 Env.get(InstrumentationRegistry.getContext(),
                 TWILIO_ENVIRONMENT_KEY));
+
+        // Set log level
+        Video.setLogLevel(BuildConfig.TEST_LOG_LEVEL);
     }
 
 }

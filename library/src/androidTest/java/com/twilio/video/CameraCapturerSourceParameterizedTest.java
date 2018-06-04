@@ -58,7 +58,7 @@ public class CameraCapturerSourceParameterizedTest extends BaseCameraCapturerTes
     }
 
     @Before
-    public void setup() {
+    public void setup() throws InterruptedException {
         super.setup();
         assumeTrue(CameraCapturer.isSourceAvailable(cameraSource));
     }

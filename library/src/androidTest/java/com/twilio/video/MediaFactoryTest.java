@@ -21,6 +21,7 @@ import android.support.test.InstrumentationRegistry;
 import android.support.test.filters.LargeTest;
 import android.support.test.runner.AndroidJUnit4;
 
+import com.twilio.video.base.BaseVideoTest;
 import com.twilio.video.util.FakeVideoCapturer;
 
 import org.junit.After;
@@ -35,7 +36,7 @@ import static junit.framework.TestCase.assertNotNull;
 
 @RunWith(AndroidJUnit4.class)
 @LargeTest
-public class MediaFactoryTest {
+public class MediaFactoryTest extends BaseVideoTest {
     private static final int NUM_TRACKS = 10;
 
     private final Random random = new Random();
@@ -43,7 +44,8 @@ public class MediaFactoryTest {
     private MediaFactory mediaFactory;
 
     @Before
-    public void setup() {
+    public void setup() throws InterruptedException {
+        super.setup();
         context = InstrumentationRegistry.getInstrumentation().getTargetContext();
         mediaFactory = MediaFactory.instance(this, context);
     }

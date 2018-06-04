@@ -26,6 +26,7 @@ import com.twilio.video.util.FakeVideoCapturer;
 import com.twilio.video.util.Topology;
 
 import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.webrtc.MediaCodecVideoDecoder;
@@ -59,6 +60,11 @@ public class CodecPreferencesTest extends BaseCodecTest {
     private final Vp8Codec vp8WithSimulcastCodec = new Vp8Codec(true);
     private final H264Codec h264Codec = new H264Codec();
     private final Vp9Codec vp9Codec = new Vp9Codec();
+
+    @Before
+    public void setup() throws InterruptedException {
+        super.setup();
+    }
 
     @After
     public void teardown() throws InterruptedException {

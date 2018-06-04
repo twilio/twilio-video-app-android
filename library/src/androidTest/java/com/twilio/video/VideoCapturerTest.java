@@ -18,10 +18,12 @@ package com.twilio.video;
 
 import android.support.test.InstrumentationRegistry;
 
+import com.twilio.video.base.BaseVideoTest;
 import com.twilio.video.util.FakeVideoCapturer;
 import com.twilio.video.util.Topology;
 
 import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -38,10 +40,15 @@ import static junit.framework.Assert.assertEquals;
 import static junit.framework.TestCase.assertTrue;
 
 @RunWith(JUnitParamsRunner.class)
-public class VideoCapturerTest {
+public class VideoCapturerTest extends BaseVideoTest {
     private LocalVideoTrack localVideoTrack;
     private I420Frame i420Frame;
     private long nativeVideoSinkHandle;
+
+    @Before
+    public void setup() throws InterruptedException {
+        super.setup();
+    }
 
     @After
     public void tearDown() {

@@ -47,7 +47,7 @@ public class Camera2CapturerUsageTest extends BaseCamera2CapturerTest {
     private String[] cameraIds;
 
     @Before
-    public void setup() {
+    public void setup() throws InterruptedException {
         super.setup();
         CameraManager cameraManager = (CameraManager)
                 cameraCapturerActivity.getSystemService(Context.CAMERA_SERVICE);

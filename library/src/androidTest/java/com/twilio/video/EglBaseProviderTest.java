@@ -18,6 +18,8 @@ package com.twilio.video;
 
 import android.support.test.runner.AndroidJUnit4;
 
+import com.twilio.video.base.BaseVideoTest;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -27,7 +29,7 @@ import org.junit.runner.RunWith;
 import static junit.framework.Assert.assertNotNull;
 
 @RunWith(AndroidJUnit4.class)
-public class EglBaseProviderTest {
+public class EglBaseProviderTest extends BaseVideoTest {
     private static final int NUM_EGL_PROVIDERS = 10;
     private EglBaseProvider eglBaseProvider;
 
@@ -38,7 +40,8 @@ public class EglBaseProviderTest {
     }
 
     @Before
-    public void setup() {
+    public void setup() throws InterruptedException {
+        super.setup();
         eglBaseProvider = EglBaseProvider.instance(this);
     }
 

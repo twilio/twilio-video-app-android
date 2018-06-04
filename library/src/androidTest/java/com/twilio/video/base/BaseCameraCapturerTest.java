@@ -37,7 +37,7 @@ import org.junit.Rule;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assume.assumeTrue;
 
-public abstract class BaseCameraCapturerTest {
+public abstract class BaseCameraCapturerTest extends BaseVideoTest {
     protected static final int CAMERA_CAPTURE_DELAY_MS = 3000;
 
     @Rule
@@ -53,9 +53,9 @@ public abstract class BaseCameraCapturerTest {
     protected CameraCapturer.CameraSource supportedCameraSource;
 
     @Before
-    public void setup() {
+    public void setup() throws InterruptedException {
+        super.setup();
         cameraCapturerActivity = activityRule.getActivity();
-        Video.setLogLevel(LogLevel.ALL);
         frameCountRenderer = new FrameCountRenderer();
         supportedCameraSource = getSupportedCameraSource();
         assumeTrue(supportedCameraSource != null);

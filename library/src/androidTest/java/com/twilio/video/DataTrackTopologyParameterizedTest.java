@@ -69,6 +69,7 @@ public class DataTrackTopologyParameterizedTest extends BaseParticipantTest {
 
     @Before
     public void setup() throws InterruptedException {
+        super.setup();
         super.baseSetup(topology);
     }
 

@@ -23,7 +23,7 @@ import android.support.test.rule.GrantPermissionRule;
 
 import com.kevinmost.junit_retry_rule.Retry;
 import com.kevinmost.junit_retry_rule.RetryRule;
-import com.twilio.video.base.BaseClientTest;
+import com.twilio.video.base.BaseVideoTest;
 import com.twilio.video.helper.CallbackHelper;
 import com.twilio.video.test.BuildConfig;
 import com.twilio.video.ui.MediaTestActivity;
@@ -54,7 +54,7 @@ import static org.junit.Assert.assertTrue;
 
 @RunWith(Parameterized.class)
 @LargeTest
-public class VideoTopologyParameterizedTest extends BaseClientTest {
+public class VideoTopologyParameterizedTest extends BaseVideoTest {
     @Parameterized.Parameters(name = "{0}")
     public static Iterable<Object[]> data() {
         return Arrays.asList(new Object[][]{
@@ -94,7 +94,6 @@ public class VideoTopologyParameterizedTest extends BaseClientTest {
         roomName = random(Constants.ROOM_NAME_LENGTH);
         assertNotNull(RoomUtils.createRoom(roomName, topology));
         token = CredentialsUtils.getAccessToken(Constants.PARTICIPANT_ALICE, topology);
-        Video.setLogLevel(LogLevel.ALL);
     }
 
     @After

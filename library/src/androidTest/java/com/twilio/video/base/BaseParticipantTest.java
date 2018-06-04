@@ -51,7 +51,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-public abstract class BaseParticipantTest extends BaseClientTest {
+public abstract class BaseParticipantTest extends BaseVideoTest {
     @Rule
     public GrantPermissionRule recordAudioPermissionRule = GrantPermissionRule
             .grant(Manifest.permission.RECORD_AUDIO);

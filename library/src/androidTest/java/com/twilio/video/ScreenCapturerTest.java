@@ -30,6 +30,7 @@ import android.support.test.uiautomator.UiSelector;
 import android.util.DisplayMetrics;
 import android.view.WindowManager;
 
+import com.twilio.video.base.BaseVideoTest;
 import com.twilio.video.ui.ScreenCapturerTestActivity;
 
 import org.junit.After;
@@ -54,7 +55,7 @@ import static org.junit.Assume.assumeTrue;
 
 @RunWith(AndroidJUnit4.class)
 @TargetApi(21)
-public class ScreenCapturerTest {
+public class ScreenCapturerTest extends BaseVideoTest {
     private static final int SCREEN_CAPTURER_DELAY_MS = 4000;
     private static final int PERMISSIONS_DIALOG_DELAY_MS = 2000;
     private static final String START_CAPTURE_BUTTON_ID = "android:id/button1";
@@ -67,7 +68,8 @@ public class ScreenCapturerTest {
     private ScreenCapturer screenCapturer;
 
     @Before
-    public void setup() {
+    public void setup() throws InterruptedException {
+        super.setup();
         assumeTrue(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP);
         screenCapturerActivity = activityRule.getActivity();
         allowScreenCapture();

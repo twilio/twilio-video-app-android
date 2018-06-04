@@ -21,7 +21,7 @@ import android.content.Context;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.runner.AndroidJUnit4;
 
-import com.twilio.video.base.BaseClientTest;
+import com.twilio.video.base.BaseVideoTest;
 import com.twilio.video.helper.CallbackHelper;
 import com.twilio.video.twilioapi.model.VideoRoom;
 import com.twilio.video.util.Constants;
@@ -46,7 +46,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 @RunWith(AndroidJUnit4.class)
-public class RoomTest extends BaseClientTest {
+public class RoomTest extends BaseVideoTest {
     private Context context;
     private String identity;
     private String roomName;

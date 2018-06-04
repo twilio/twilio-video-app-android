@@ -49,7 +49,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-public abstract class BaseStatsTest extends BaseClientTest {
+public abstract class BaseStatsTest extends BaseVideoTest {
     @Rule
     public GrantPermissionRule recordAudioPermissionRule = GrantPermissionRule
             .grant(Manifest.permission.RECORD_AUDIO);
@@ -72,11 +72,13 @@ public abstract class BaseStatsTest extends BaseClientTest {
     protected CallbackHelper.FakeParticipantListener bobMediaListener;
     protected Topology topology;
 
-    protected void baseSetup(Topology topology) {
+    protected void baseSetup(Topology topology) throws InterruptedException {
         baseSetup(topology, null);
     }
 
-    protected void baseSetup(Topology topology, @Nullable List<VideoCodec> videoCodecs) {
+    protected void baseSetup(Topology topology, @Nullable List<VideoCodec> videoCodecs)
+            throws InterruptedException {
+        super.setup();
         mediaTestActivity = activityRule.getActivity();
         roomName = random(Constants.ROOM_NAME_LENGTH);
         assertNotNull(RoomUtils.createRoom(roomName, topology, false, videoCodecs));

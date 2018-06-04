@@ -19,11 +19,13 @@ package com.twilio.video;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.runner.AndroidJUnit4;
 
+import com.twilio.video.base.BaseVideoTest;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
 @RunWith(AndroidJUnit4.class)
-public class Camera2CapturerTest {
+public class Camera2CapturerTest extends BaseVideoTest {
 
     /*
      * Validates that isSupported can be invoked on all API levels without resulting in a runtime

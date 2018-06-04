@@ -23,7 +23,7 @@ import android.support.test.rule.GrantPermissionRule;
 
 import com.kevinmost.junit_retry_rule.Retry;
 import com.kevinmost.junit_retry_rule.RetryRule;
-import com.twilio.video.base.BaseClientTest;
+import com.twilio.video.base.BaseVideoTest;
 import com.twilio.video.helper.CallbackHelper;
 import com.twilio.video.test.BuildConfig;
 import com.twilio.video.ui.MediaTestActivity;
@@ -55,11 +55,10 @@ import static org.apache.commons.lang3.RandomStringUtils.random;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assume.assumeTrue;
 
 @RunWith(Parameterized.class)
 @LargeTest
-public class RoomTopologyParameterizedTest extends BaseClientTest {
+public class RoomTopologyParameterizedTest extends BaseVideoTest {
     @Parameterized.Parameters(name = "Topology: {0}, enableRecording: {1}")
     public static Iterable<Object[]> data() {
         return Arrays.asList(new Object[][]{

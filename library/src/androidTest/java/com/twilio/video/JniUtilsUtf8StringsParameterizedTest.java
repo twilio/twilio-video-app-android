@@ -19,7 +19,9 @@ package com.twilio.video;
 import android.support.test.InstrumentationRegistry;
 
 import com.getkeepsafe.relinker.ReLinker;
+import com.twilio.video.base.BaseVideoTest;
 
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -32,7 +34,7 @@ import static org.apache.commons.lang3.RandomStringUtils.random;
 import static org.junit.Assert.assertEquals;
 
 @RunWith(Parameterized.class)
-public class JniUtilsUtf8StringsParameterizedTest {
+public class JniUtilsUtf8StringsParameterizedTest extends BaseVideoTest {
     private static final int NUM_RANDOM_STRINGS = 100;
     private static final int RANDOM_STRING_LENGTH = 100;
 
@@ -56,6 +58,11 @@ public class JniUtilsUtf8StringsParameterizedTest {
 
     public JniUtilsUtf8StringsParameterizedTest(String randomString) {
         this.randomString = randomString;
+    }
+
+    @Before
+    public void setup() throws InterruptedException {
+        super.setup();
     }
 
     @Test

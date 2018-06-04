@@ -23,7 +23,7 @@ import android.support.test.rule.GrantPermissionRule;
 
 import com.kevinmost.junit_retry_rule.Retry;
 import com.kevinmost.junit_retry_rule.RetryRule;
-import com.twilio.video.base.BaseClientTest;
+import com.twilio.video.base.BaseVideoTest;
 import com.twilio.video.helper.CallbackHelper;
 import com.twilio.video.test.BuildConfig;
 import com.twilio.video.ui.MediaTestActivity;
@@ -53,7 +53,7 @@ import static org.junit.Assert.assertTrue;
 
 @RunWith(Parameterized.class)
 @LargeTest
-public class LocalParticipantTopologyTest extends BaseClientTest {
+public class LocalParticipantTopologyTest extends BaseVideoTest {
     private static final int TRACK_NAME_LENGTH_MAX = 256;
 
     @Parameterized.Parameters(name = "{0}")

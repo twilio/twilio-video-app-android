@@ -23,6 +23,7 @@ import android.support.test.rule.GrantPermissionRule;
 import android.support.test.runner.AndroidJUnit4;
 import android.widget.ImageView;
 
+import com.twilio.video.base.BaseVideoTest;
 import com.twilio.video.ui.VideoRendererTestActivity;
 import com.twilio.video.util.FakeVideoCapturer;
 
@@ -42,7 +43,7 @@ import static junit.framework.TestCase.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 @RunWith(AndroidJUnit4.class)
-public class VideoRendererTest {
+public class VideoRendererTest extends BaseVideoTest {
     private static final int BITMAP_TIMEOUT_MS = 10000;
 
     @Rule
@@ -60,7 +61,8 @@ public class VideoRendererTest {
     private ImageView imageView;
 
     @Before
-    public void setup() {
+    public void setup() throws InterruptedException {
+        super.setup();
         videoRendererTestActivity = activityRule.getActivity();
         cameraCapturer = new CameraCapturer(videoRendererTestActivity,
                 CameraCapturer.CameraSource.FRONT_CAMERA);

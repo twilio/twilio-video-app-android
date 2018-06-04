@@ -21,7 +21,7 @@ import android.support.test.rule.ActivityTestRule;
 import android.support.test.rule.GrantPermissionRule;
 import android.support.test.runner.AndroidJUnit4;
 
-import com.twilio.video.base.BaseClientTest;
+import com.twilio.video.base.BaseVideoTest;
 import com.twilio.video.helper.CallbackHelper;
 import com.twilio.video.ui.MediaTestActivity;
 import com.twilio.video.util.Constants;
@@ -47,7 +47,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 @RunWith(AndroidJUnit4.class)
-public class VideoTest extends BaseClientTest {
+public class VideoTest extends BaseVideoTest {
     @Rule
     public GrantPermissionRule recordAudioPermissionRule = GrantPermissionRule
             .grant(Manifest.permission.RECORD_AUDIO);
@@ -69,7 +69,6 @@ public class VideoTest extends BaseClientTest {
         roomName = random(Constants.ROOM_NAME_LENGTH);
         assertNotNull(RoomUtils.createRoom(roomName, Topology.P2P));
         token = CredentialsUtils.getAccessToken(Constants.PARTICIPANT_ALICE, Topology.P2P);
-        Video.setLogLevel(LogLevel.ALL);
     }
 
     @After

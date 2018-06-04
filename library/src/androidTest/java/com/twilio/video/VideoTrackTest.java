@@ -20,6 +20,7 @@ import android.content.Context;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.runner.AndroidJUnit4;
 
+import com.twilio.video.base.BaseVideoTest;
 import com.twilio.video.util.FakeVideoCapturer;
 import com.twilio.video.util.FrameCountRenderer;
 
@@ -31,14 +32,15 @@ import org.junit.runner.RunWith;
 import static org.junit.Assert.assertTrue;
 
 @RunWith(AndroidJUnit4.class)
-public class VideoTrackTest {
+public class VideoTrackTest extends BaseVideoTest {
     private Context context;
     private final FrameCountRenderer frameCountRenderer = new FrameCountRenderer();
     private LocalVideoTrack localVideoTrack;
     private VideoTrack videoTrack;
 
     @Before
-    public void setup() {
+    public void setup() throws InterruptedException {
+        super.setup();
         context = InstrumentationRegistry.getContext();
         localVideoTrack = LocalVideoTrack.create(context, true, new FakeVideoCapturer());
         videoTrack = new InstrumentationTestVideoTrack(localVideoTrack.getWebRtcTrack());

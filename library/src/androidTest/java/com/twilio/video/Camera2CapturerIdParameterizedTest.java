@@ -47,7 +47,7 @@ public class Camera2CapturerIdParameterizedTest extends BaseCamera2CapturerTest 
     }
 
     @Before
-    public void setUp() {
+    public void setup() throws InterruptedException {
         super.setup();
     }
 

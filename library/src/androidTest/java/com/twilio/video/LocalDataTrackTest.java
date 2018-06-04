@@ -22,6 +22,7 @@ import android.support.test.InstrumentationRegistry;
 import android.support.test.filters.LargeTest;
 import android.support.test.runner.AndroidJUnit4;
 
+import com.twilio.video.base.BaseVideoTest;
 import com.twilio.video.util.StringUtils;
 
 import org.junit.After;
@@ -39,12 +40,13 @@ import static org.junit.Assert.assertTrue;
 
 @RunWith(AndroidJUnit4.class)
 @LargeTest
-public class LocalDataTrackTest {
+public class LocalDataTrackTest extends BaseVideoTest {
     private Context context;
     private LocalDataTrack localDataTrack;
 
     @Before
-    public void setup() {
+    public void setup() throws InterruptedException {
+        super.setup();
         context = InstrumentationRegistry.getInstrumentation().getTargetContext();
     }
 

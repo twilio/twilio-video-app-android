@@ -61,7 +61,7 @@ public class StatsTopologyParameterizedTest extends BaseStatsTest {
     }
 
     @Before
-    public void setup() {
+    public void setup() throws InterruptedException {
         super.baseSetup(topology);
     }
 

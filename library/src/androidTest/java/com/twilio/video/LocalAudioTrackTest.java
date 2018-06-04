@@ -22,6 +22,7 @@ import android.support.test.rule.ActivityTestRule;
 import android.support.test.rule.GrantPermissionRule;
 import android.support.test.runner.AndroidJUnit4;
 
+import com.twilio.video.base.BaseVideoTest;
 import com.twilio.video.ui.MediaTestActivity;
 import com.twilio.video.util.StringUtils;
 
@@ -43,7 +44,7 @@ import static org.junit.Assert.assertTrue;
 
 @RunWith(AndroidJUnit4.class)
 @SmallTest
-public class LocalAudioTrackTest {
+public class LocalAudioTrackTest extends BaseVideoTest {
     private static final int NUM_AUDIO_OPTIONS = 7;
     private static final int NUM_AUDIO_OPTIONS_PERMUTATIONS = (int) Math.pow(2, NUM_AUDIO_OPTIONS);
     private static final int ECHO_CANCELLATION_INDEX = 0;
@@ -64,7 +65,8 @@ public class LocalAudioTrackTest {
     private LocalAudioTrack localAudioTrack;
 
     @Before
-    public void setup() {
+    public void setup() throws InterruptedException {
+        super.setup();
         mediaTestActivity = activityRule.getActivity();
     }
 

@@ -21,6 +21,7 @@ import android.support.test.InstrumentationRegistry;
 import android.support.test.filters.SmallTest;
 import android.support.test.runner.AndroidJUnit4;
 
+import com.twilio.video.base.BaseVideoTest;
 import com.twilio.video.util.FakeVideoCapturer;
 import com.twilio.video.util.FakeVideoRenderer;
 import com.twilio.video.util.FrameCountRenderer;
@@ -43,7 +44,7 @@ import static org.junit.Assert.assertTrue;
 
 @RunWith(AndroidJUnit4.class)
 @SmallTest
-public class LocalVideoTrackTest {
+public class LocalVideoTrackTest extends BaseVideoTest {
     private static final int LOCAL_VIDEO_TRACK_TEST_DELAY_MS = 3000;
 
     private Context context;
@@ -52,7 +53,8 @@ public class LocalVideoTrackTest {
     private FrameCountRenderer frameCountRenderer;
 
     @Before
-    public void setup() {
+    public void setup() throws InterruptedException {
+        super.setup();
         context = InstrumentationRegistry.getInstrumentation().getTargetContext();
         fakeVideoCapturer = new FakeVideoCapturer();
         frameCountRenderer = new FrameCountRenderer();

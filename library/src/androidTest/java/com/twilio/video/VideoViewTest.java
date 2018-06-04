@@ -24,6 +24,7 @@ import android.support.v7.widget.RecyclerView;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 
+import com.twilio.video.base.BaseVideoTest;
 import com.twilio.video.ui.VideoViewListViewAdapter;
 import com.twilio.video.ui.VideoViewRecyclerViewAdapter;
 import com.twilio.video.ui.VideoViewTestActivity;
@@ -48,7 +49,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 @RunWith(JUnitParamsRunner.class)
-public class VideoViewTest {
+public class VideoViewTest extends BaseVideoTest {
     private static final int FRAME_DELAY_MS = 3500;
 
     @Rule
@@ -59,10 +60,10 @@ public class VideoViewTest {
     private LocalVideoTrack localVideoTrack;
 
     @Before
-    public void setup() {
+    public void setup() throws InterruptedException {
+        super.setup();
         videoViewTestActivity = activityRule.getActivity();
         relativeLayout = videoViewTestActivity.findViewById(R.id.relative_layout_container);
-        Video.setLogLevel(LogLevel.WARNING);
     }
 
     @After
