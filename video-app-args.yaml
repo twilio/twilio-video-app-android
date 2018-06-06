@@ -7,51 +7,37 @@ library-stats-instrumentation-tests:
     type: instrumentation
     app: app/build/outputs/apk/internal/debug/app-internal-debug.apk
     test: library/build/outputs/apk/androidTest/debug/library-debug-androidTest.apk
-    device-ids:
-        - m0
-        - zeroflte
-        - herolte
-        - flo
-        - sailfish
-    os-version-ids:
-        - 18
-        - 19
-        - 21
-        - 22
-        - 23
-        - 24
-        - 25
-        - 26
+    device:
+        - {model: m0, version: 18}
+        - {model: flo, version: 19}
+        - {model: flo, version: 21}
+        - {model: zeroflte, version: 22}
+        - {model: herolte, version: 23}
+        - {model: herolte, version: 24}
+        - {model: sailfish, version: 25}
+        - {model: sailfish, version: 26}
+        - {model: sailfish, version: 27}
     test-targets:
         - class com.twilio.video.StatsTest
         - class com.twilio.video.StatsTopologyParameterizedTest
         - class com.twilio.video.CodecPreferencesTest
         - class com.twilio.video.MultiCodecParameterizedTest
-    locales: en
-    orientations: portrait
 
 library-no-stats-instrumentation-tests:
     timeout: 30m
     type: instrumentation
     app: app/build/outputs/apk/internal/debug/app-internal-debug.apk
     test: library/build/outputs/apk/androidTest/debug/library-debug-androidTest.apk
-    device-ids:
-        - m0
-        - zeroflte
-        - herolte
-        - flo
-        - sailfish
-    os-version-ids:
-        - 18
-        - 19
-        - 21
-        - 22
-        - 23
-        - 24
-        - 25
-        - 26
-    locales: en
-    orientations: portrait
+    device:
+        - {model: m0, version: 18}
+        - {model: flo, version: 19}
+        - {model: flo, version: 21}
+        - {model: zeroflte, version: 22}
+        - {model: herolte, version: 23}
+        - {model: herolte, version: 24}
+        - {model: sailfish, version: 25}
+        - {model: sailfish, version: 26}
+        - {model: sailfish, version: 27}
     environment-variables:
         notClass: com.twilio.video.StatsTest,com.twilio.video.StatsTopologyParameterizedTest,com.twilio.video.CodecPreferencesTest,com.twilio.video.MultiCodecParameterizedTest
 
@@ -60,48 +46,39 @@ library-camera-tests:
     type: instrumentation
     app: app/build/outputs/apk/internal/debug/app-internal-debug.apk
     test: library/build/outputs/apk/androidTest/debug/library-debug-androidTest.apk
-    device-ids:
-        - A0001
-        - athene
-        - athene_f
-        - hwALE-H
-        - g3
-        - hero2lte
-        - herolte
-        - hlte
-        - j7xelte
-        - lt02wifi
-        - m0
-        - A0001
-        - sailfish
-        - zeroflte
-        - zerolte
-        - shamu
-        # The following devices have known issues executing camera tests. The bugs and tasks
-        # are tracked in epic GSDK-1278.
-        #
-        # - j1acevelte
-        # - flo
-        # - D6503
-        # - D6603
-        # - victara
-        # - SH-04H
-        # - htc_m8
-        # - hammerhead
-    os-version-ids:
-        - 18
-        - 19
-        - 21
-        - 22
-        - 23
-        - 24
-        - 25
-        - 26
+    # The following devices have known issues executing camera tests. The bugs and tasks
+    # are tracked in epic GSDK-1278.
+    #
+    # - j1acevelte
+    # - flo
+    # - D6503
+    # - D6603
+    # - victara
+    # - SH-04H
+    # - htc_m8
+    # - hammerhead
+    device:
+        - {model: A0001, version: 22}
+        - {model: athene, version: 23}
+        - {model: athene_f, version: 23}
+        - {model: hwALE-H, version: 21}
+        - {model: g3, version: 19}
+        - {model: hero2lte, version: 23}
+        - {model: herolte, version: 23}
+        - {model: herolte, version: 24}
+        - {model: hlte, version: 19}
+        - {model: j7xelte, version: 23}
+        - {model: lt02wifi, version: 19}
+        - {model: m0, version: 18}
+        - {model: sailfish, version: 25}
+        - {model: sailfish, version: 26}
+        - {model: sailfish, version: 27}
+        - {model: zeroflte, version: 22}
+        - {model: zeroflte, version: 23}
+        - {model: zerolte, version: 22}
     test-targets:
         - class com.twilio.video.Camera2CapturerIdParameterizedTest
         - class com.twilio.video.Camera2CapturerTest
         - class com.twilio.video.Camera2CapturerUsageTest
         - class com.twilio.video.CameraCapturerSourceParameterizedTest
         - class com.twilio.video.CameraCapturerTest
-    locales: en
-    orientations: portrait
