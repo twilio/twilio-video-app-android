@@ -15,8 +15,6 @@
  */
 
 package com.twilio.video;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 
 /**
  *  Rational aspect ratio represented as numerator:denominator.
@@ -24,13 +22,13 @@ import android.support.annotation.Nullable;
  */
 public class AspectRatio {
     /** Pre-defined aspect ratio 4:3. */
-    @NonNull public static final AspectRatio ASPECT_RATIO_4_3 = new AspectRatio(4, 3);
+    public static final AspectRatio ASPECT_RATIO_4_3 = new AspectRatio(4, 3);
 
     /** Pre-defined aspect ratio 16:9. */
-    @NonNull public static final AspectRatio ASPECT_RATIO_16_9 = new AspectRatio(16, 9);
+    public static final AspectRatio ASPECT_RATIO_16_9 = new AspectRatio(16, 9);
 
     /** Pre-defined aspect ratio 11:9. */
-    @NonNull public static final AspectRatio ASPECT_RATIO_11_9 = new AspectRatio(11, 9);
+    public static final AspectRatio ASPECT_RATIO_11_9 = new AspectRatio(11, 9);
 
     public final int numerator;
     public final int denominator;
@@ -41,7 +39,7 @@ public class AspectRatio {
     }
 
     @Override
-    public boolean equals(@Nullable Object o) {
+    public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
