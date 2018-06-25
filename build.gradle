@@ -78,6 +78,27 @@ buildscript {
     }
 }
 
+plugins {
+    id "com.diffplug.gradle.spotless" version "3.13.0"
+}
+apply plugin: "com.diffplug.gradle.spotless"
+spotless {
+    format 'misc', {
+        target '**/*.gradle', '**/*.md', '**/.gitignore'
+
+        trimTrailingWhitespace()
+        indentWithTabs() // or spaces. Takes an integer argument if you don't like 4
+        endWithNewline()
+    }
+    java {
+        target '**/*.java'
+        googleJavaFormat().aosp()
+        indentWithTabs()
+        // optional: you can specify a specific version and/or switch to AOSP style
+        //googleJavaFormat('1.1').aosp()
+    }
+}
+
 allprojects {
     apply from: "$rootProject.projectDir/common.gradle"
     repositories {
