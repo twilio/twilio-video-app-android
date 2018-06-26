@@ -87,13 +87,13 @@ spotless {
         target '**/*.gradle', '**/*.md', '**/.gitignore'
 
         trimTrailingWhitespace()
-        indentWithTabs() // or spaces. Takes an integer argument if you don't like 4
+        indentWithSpaces()
         endWithNewline()
     }
     java {
         target '**/*.java'
-        googleJavaFormat().aosp()
-        indentWithTabs()
+        googleJavaFormat()
+        indentWithSpaces()
         // optional: you can specify a specific version and/or switch to AOSP style
         //googleJavaFormat('1.1').aosp()
         //NOTE: If you need to correct formatting run "./gradlew spotlessApply"
