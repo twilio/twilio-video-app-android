@@ -19,7 +19,6 @@ package com.twilio.video;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.os.Handler;
-import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.util.Pair;
 
