@@ -20,11 +20,11 @@ import android.os.Handler;
 import android.os.Looper;
 
 class ThreadChecker {
-    /*
-     * Check if current thread matches handler thread.
-     */
-    static void checkIsValidThread(Handler handler) {
-        Preconditions.checkState(handler.getLooper().getThread().getId() ==
-                Looper.myLooper().getThread().getId());
-    }
+  /*
+   * Check if current thread matches handler thread.
+   */
+  static void checkIsValidThread(Handler handler) {
+    Preconditions.checkState(
+        handler.getLooper().getThread().getId() == Looper.myLooper().getThread().getId());
+  }
 }

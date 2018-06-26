@@ -17,29 +17,25 @@
 package com.twilio.video;
 
 public class LocalAudioTrackStats extends LocalTrackStats {
-    /**
-     *  Audio input level
-     */
-    public final int audioLevel;
+  /** Audio input level */
+  public final int audioLevel;
 
-    /**
-     * Packet jitter measured in milliseconds
-     */
-    public final int jitter;
+  /** Packet jitter measured in milliseconds */
+  public final int jitter;
 
-    LocalAudioTrackStats(String trackSid,
-                         int packetsLost,
-                         String codec,
-                         String ssrc,
-                         double timestamp,
-                         long bytesSent,
-                         int packetsSent,
-                         long roundTripTime,
-                         int audioLevel,
-                         int jitter) {
-        super(trackSid, packetsLost, codec, ssrc,
-                timestamp, bytesSent, packetsSent, roundTripTime);
-        this.audioLevel = audioLevel;
-        this.jitter = jitter;
-    }
+  LocalAudioTrackStats(
+      String trackSid,
+      int packetsLost,
+      String codec,
+      String ssrc,
+      double timestamp,
+      long bytesSent,
+      int packetsSent,
+      long roundTripTime,
+      int audioLevel,
+      int jitter) {
+    super(trackSid, packetsLost, codec, ssrc, timestamp, bytesSent, packetsSent, roundTripTime);
+    this.audioLevel = audioLevel;
+    this.jitter = jitter;
+  }
 }

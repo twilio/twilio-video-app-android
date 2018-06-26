@@ -22,20 +22,20 @@ package com.twilio.video;
  * @see <a href="https://en.wikipedia.org/wiki/VP8">VP8</a>
  */
 public class Vp8Codec extends VideoCodec {
-    public static final String NAME = "VP8";
+  public static final String NAME = "VP8";
 
-    /**
-     * Enabling simulcast causes the encoder to generate multiple spatial and temporal layers for
-     * the video that is published. This feature should only be enabled in a Group Room.
-     */
-    public final boolean simulcast;
+  /**
+   * Enabling simulcast causes the encoder to generate multiple spatial and temporal layers for the
+   * video that is published. This feature should only be enabled in a Group Room.
+   */
+  public final boolean simulcast;
 
-    public Vp8Codec() {
-        this(false);
-    }
+  public Vp8Codec() {
+    this(false);
+  }
 
-    public Vp8Codec(boolean simulcast) {
-        super(NAME);
-        this.simulcast = simulcast;
-    }
+  public Vp8Codec(boolean simulcast) {
+    super(NAME);
+    this.simulcast = simulcast;
+  }
 }

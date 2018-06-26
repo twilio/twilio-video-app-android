@@ -16,12 +16,8 @@
 
 package com.twilio.video;
 
-/**
- * A published data track represents a data track that has been shared with a {@link Room}.
- */
+/** A published data track represents a data track that has been shared with a {@link Room}. */
 public interface DataTrackPublication extends TrackPublication {
-    /**
-     * Returns the published data track.
-     */
-    DataTrack getDataTrack();
+  /** Returns the published data track. */
+  DataTrack getDataTrack();
 }

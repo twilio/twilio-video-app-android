@@ -16,12 +16,8 @@
 
 package com.twilio.video;
 
-/**
- * A published audio track represents an audio track that has been shared with a {@link Room}.
- */
+/** A published audio track represents an audio track that has been shared with a {@link Room}. */
 public interface AudioTrackPublication extends TrackPublication {
-    /**
-     * Returns the published audio track.
-     */
-    AudioTrack getAudioTrack();
+  /** Returns the published audio track. */
+  AudioTrack getAudioTrack();
 }

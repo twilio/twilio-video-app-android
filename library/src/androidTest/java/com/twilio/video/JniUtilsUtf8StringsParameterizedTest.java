@@ -16,57 +16,54 @@
 
 package com.twilio.video;
 
-import android.support.test.InstrumentationRegistry;
+import static org.apache.commons.lang3.RandomStringUtils.random;
+import static org.junit.Assert.assertEquals;
 
+import android.support.test.InstrumentationRegistry;
 import com.getkeepsafe.relinker.ReLinker;
 import com.twilio.video.base.BaseVideoTest;
-
+import java.util.ArrayList;
+import java.util.List;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import static org.apache.commons.lang3.RandomStringUtils.random;
-import static org.junit.Assert.assertEquals;
-
 @RunWith(Parameterized.class)
 public class JniUtilsUtf8StringsParameterizedTest extends BaseVideoTest {
-    private static final int NUM_RANDOM_STRINGS = 100;
-    private static final int RANDOM_STRING_LENGTH = 100;
+  private static final int NUM_RANDOM_STRINGS = 100;
+  private static final int RANDOM_STRING_LENGTH = 100;
 
-    @BeforeClass
-    public static void classSetup() {
-        ReLinker.loadLibrary(InstrumentationRegistry.getContext(), "jingle_peerconnection_so");
+  @BeforeClass
+  public static void classSetup() {
+    ReLinker.loadLibrary(InstrumentationRegistry.getContext(), "jingle_peerconnection_so");
+  }
+
+  @Parameterized.Parameters
+  public static List<String> data() {
+    List<String> randomStrings = new ArrayList<>(NUM_RANDOM_STRINGS);
+
+    for (int i = 0; i < NUM_RANDOM_STRINGS; i++) {
+      randomStrings.add(i, random(RANDOM_STRING_LENGTH));
     }
 
-    @Parameterized.Parameters
-    public static List<String> data() {
-        List<String> randomStrings = new ArrayList<>(NUM_RANDOM_STRINGS);
+    return randomStrings;
+  }
 
-        for (int i = 0 ; i < NUM_RANDOM_STRINGS ; i++) {
-            randomStrings.add(i, random(RANDOM_STRING_LENGTH));
-        }
+  private final String randomString;
 
-        return randomStrings;
-    }
+  public JniUtilsUtf8StringsParameterizedTest(String randomString) {
+    this.randomString = randomString;
+  }
 
-    private final String randomString;
+  @Before
+  public void setup() throws InterruptedException {
+    super.setup();
+  }
 
-    public JniUtilsUtf8StringsParameterizedTest(String randomString) {
-        this.randomString = randomString;
-    }
-
-    @Before
-    public void setup() throws InterruptedException {
-        super.setup();
-    }
-
-    @Test
-    public void shouldConvertJavaString() {
-        assertEquals(randomString, JniUtils.javaUtf16StringToStdString(randomString));
-    }
+  @Test
+  public void shouldConvertJavaString() {
+    assertEquals(randomString, JniUtils.javaUtf16StringToStdString(randomString));
+  }
 }

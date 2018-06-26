@@ -18,86 +18,84 @@ package com.twilio.video;
 
 import android.support.annotation.Nullable;
 
-/**
- * Represents a video frame provided by a {@link CameraCapturer}.
- */
+/** Represents a video frame provided by a {@link CameraCapturer}. */
 public class VideoFrame {
 
-    public enum RotationAngle {
-        ROTATION_0(0),
-        ROTATION_90(90),
-        ROTATION_180(180),
-        ROTATION_270(270);
+  public enum RotationAngle {
+    ROTATION_0(0),
+    ROTATION_90(90),
+    ROTATION_180(180),
+    ROTATION_270(270);
 
-        private final int rotation;
+    private final int rotation;
 
-        RotationAngle(int rotation) {
-            this.rotation = rotation;
-        }
-
-        public int getValue() {
-            return this.rotation;
-        }
-
-        public static RotationAngle fromInt(int rotation) {
-            if (rotation == 0) {
-                return ROTATION_0;
-            } else if (rotation == 90) {
-                return ROTATION_90;
-            } else if (rotation == 180) {
-                return ROTATION_180;
-            } else if (rotation == 270) {
-                return ROTATION_270;
-            } else {
-                throw new IllegalArgumentException(
-                        "Orientation value must be 0, 90, 180 or 270: " + rotation);
-            }
-        }
+    RotationAngle(int rotation) {
+      this.rotation = rotation;
     }
 
-    final Integer textureId;
-    final float[] transformMatrix;
-
-    /** The bytes of a frame. */
-    public final byte[] imageBuffer;
-    /** The size of a frame. */
-    public final VideoDimensions dimensions;
-    /** The orientation of a frame in degrees (must be multiple of 90). */
-    public final RotationAngle orientation;
-    /** The time in nanoseconds at which this frame was captured. */
-    public final long timestamp;
-
-    public VideoFrame(byte[] imageBuffer,
-                      VideoDimensions dimensions,
-                      RotationAngle orientation,
-                      long timestamp) {
-        this(imageBuffer, null, null, dimensions, orientation, timestamp);
+    public int getValue() {
+      return this.rotation;
     }
 
-    /*
-     * This constructor is currently only used by CameraCapturer for frames captured to a texture.
-     * We will make this constructor public when we support capturing to a texture as part of the
-     * VideoCapturer API.
-     */
-    VideoFrame(int textureId,
-               float[] transformMatrix,
-               VideoDimensions dimensions,
-               RotationAngle orientation,
-               long timestamp) {
-        this(null, textureId, transformMatrix, dimensions, orientation, timestamp);
+    public static RotationAngle fromInt(int rotation) {
+      if (rotation == 0) {
+        return ROTATION_0;
+      } else if (rotation == 90) {
+        return ROTATION_90;
+      } else if (rotation == 180) {
+        return ROTATION_180;
+      } else if (rotation == 270) {
+        return ROTATION_270;
+      } else {
+        throw new IllegalArgumentException(
+            "Orientation value must be 0, 90, 180 or 270: " + rotation);
+      }
     }
+  }
 
-    private VideoFrame(@Nullable byte[] imageBuffer,
-                       @Nullable Integer textureId,
-                       @Nullable float[] transformMatrix,
-                       VideoDimensions dimensions,
-                       RotationAngle orientation,
-                       long timestamp) {
-        this.imageBuffer = imageBuffer;
-        this.textureId = textureId;
-        this.transformMatrix = transformMatrix;
-        this.dimensions = dimensions;
-        this.orientation = orientation;
-        this.timestamp = timestamp;
-    }
+  final Integer textureId;
+  final float[] transformMatrix;
+
+  /** The bytes of a frame. */
+  public final byte[] imageBuffer;
+  /** The size of a frame. */
+  public final VideoDimensions dimensions;
+  /** The orientation of a frame in degrees (must be multiple of 90). */
+  public final RotationAngle orientation;
+  /** The time in nanoseconds at which this frame was captured. */
+  public final long timestamp;
+
+  public VideoFrame(
+      byte[] imageBuffer, VideoDimensions dimensions, RotationAngle orientation, long timestamp) {
+    this(imageBuffer, null, null, dimensions, orientation, timestamp);
+  }
+
+  /*
+   * This constructor is currently only used by CameraCapturer for frames captured to a texture.
+   * We will make this constructor public when we support capturing to a texture as part of the
+   * VideoCapturer API.
+   */
+  VideoFrame(
+      int textureId,
+      float[] transformMatrix,
+      VideoDimensions dimensions,
+      RotationAngle orientation,
+      long timestamp) {
+    this(null, textureId, transformMatrix, dimensions, orientation, timestamp);
+  }
+
+  private VideoFrame(
+      @Nullable byte[] imageBuffer,
+      @Nullable Integer textureId,
+      @Nullable float[] transformMatrix,
+      VideoDimensions dimensions,
+      RotationAngle orientation,
+      long timestamp) {
+    this.imageBuffer = imageBuffer;
+    this.textureId = textureId;
+    this.transformMatrix = transformMatrix;
+    this.dimensions = dimensions;
+    this.orientation = orientation;
+    this.timestamp = timestamp;
+  }
 }

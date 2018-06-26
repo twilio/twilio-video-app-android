@@ -22,9 +22,9 @@ package com.twilio.video;
  * @see <a href="https://en.wikipedia.org/wiki/Internet_Speech_Audio_Codec">iSAC</a>
  */
 public class IsacCodec extends AudioCodec {
-    public static final String NAME = "ISAC";
+  public static final String NAME = "ISAC";
 
-    public IsacCodec() {
-        super(NAME);
-    }
+  public IsacCodec() {
+    super(NAME);
+  }
 }

@@ -21,87 +21,83 @@ import android.support.v7.preference.DialogPreference;
 import android.support.v7.preference.PreferenceDialogFragmentCompat;
 import android.view.View;
 import android.widget.EditText;
-
 import com.twilio.video.app.R;
-
 import java.util.Locale;
 
 /**
- * NumberPreferenceDialogFragmentCompat allows to instantiate custom {@link NumberPreference}
- * dialog and modify preference values.
+ * NumberPreferenceDialogFragmentCompat allows to instantiate custom {@link NumberPreference} dialog
+ * and modify preference values.
  */
 public class NumberPreferenceDialogFragmentCompat extends PreferenceDialogFragmentCompat {
 
-    /**
-     * Input field.
-     */
-    private EditText numberInput;
+  /** Input field. */
+  private EditText numberInput;
 
-    /**
-     * Creates new instance of {@link NumberPreferenceDialogFragmentCompat}.
-     *
-     * @param key preference key.
-     * @return new instance.
-     */
-    public static NumberPreferenceDialogFragmentCompat newInstance(String key) {
-        Bundle bundle = new Bundle();
-        bundle.putString(ARG_KEY, key);
+  /**
+   * Creates new instance of {@link NumberPreferenceDialogFragmentCompat}.
+   *
+   * @param key preference key.
+   * @return new instance.
+   */
+  public static NumberPreferenceDialogFragmentCompat newInstance(String key) {
+    Bundle bundle = new Bundle();
+    bundle.putString(ARG_KEY, key);
 
-        NumberPreferenceDialogFragmentCompat fragment = new NumberPreferenceDialogFragmentCompat();
-        fragment.setArguments(bundle);
+    NumberPreferenceDialogFragmentCompat fragment = new NumberPreferenceDialogFragmentCompat();
+    fragment.setArguments(bundle);
 
-        return fragment;
+    return fragment;
+  }
+
+  @Override
+  protected void onBindDialogView(View view) {
+    super.onBindDialogView(view);
+
+    // init input field
+    numberInput = (EditText) view.findViewById(R.id.edit);
+
+    // obtain reference to preference
+    DialogPreference preference = getPreference();
+
+    // setup saved preference value or fallback to default
+    int value = 0;
+    if (preference instanceof NumberPreference) {
+      value = ((NumberPreference) preference).getNumber();
     }
 
-    @Override
-    protected void onBindDialogView(View view) {
-        super.onBindDialogView(view);
+    // forward value to preference view
+    final String numberValue = String.format(Locale.getDefault(), "%d", value);
+    numberInput.setText(numberValue);
+    numberInput.setSelection(numberValue.length());
+  }
 
-        // init input field
-        numberInput = (EditText) view.findViewById(R.id.edit);
+  @Override
+  public void onDialogClosed(boolean positiveResult) {
+    if (positiveResult) {
+
+      // obtain string version of number
+      final String numberString = numberInput.getText().toString();
+
+      try {
+
+        // convert string to number value
+        final int newValue = Integer.parseInt(numberString);
 
         // obtain reference to preference
         DialogPreference preference = getPreference();
 
-        // setup saved preference value or fallback to default
-        int value = 0;
+        // save number in preferences
         if (preference instanceof NumberPreference) {
-            value = ((NumberPreference) preference).getNumber();
+          NumberPreference numberPreference = (NumberPreference) preference;
+
+          if (numberPreference.callChangeListener(newValue)) {
+            numberPreference.setNumber(newValue);
+          }
         }
 
-        // forward value to preference view
-        final String numberValue = String.format(Locale.getDefault(), "%d", value);
-        numberInput.setText(numberValue);
-        numberInput.setSelection(numberValue.length());
+      } catch (Exception e) {
+        e.printStackTrace();
+      }
     }
-
-    @Override
-    public void onDialogClosed(boolean positiveResult) {
-        if (positiveResult) {
-
-            // obtain string version of number
-            final String numberString = numberInput.getText().toString();
-
-            try {
-
-                // convert string to number value
-                final int newValue = Integer.parseInt(numberString);
-
-                // obtain reference to preference
-                DialogPreference preference = getPreference();
-
-                // save number in preferences
-                if (preference instanceof NumberPreference) {
-                    NumberPreference numberPreference = (NumberPreference) preference;
-
-                    if (numberPreference.callChangeListener(newValue)) {
-                        numberPreference.setNumber(newValue);
-                    }
-                }
-
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-    }
+  }
 }

@@ -16,227 +16,223 @@
 
 package com.twilio.video;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+import static org.junit.Assume.assumeFalse;
+import static org.junit.Assume.assumeTrue;
+
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.hardware.camera2.CameraAccessException;
 import android.hardware.camera2.CameraManager;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.runner.AndroidJUnit4;
-
 import com.twilio.video.base.BaseCamera2CapturerTest;
 import com.twilio.video.util.DeviceUtils;
-
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-
-import static org.junit.Assume.assumeFalse;
-import static org.junit.Assume.assumeTrue;
-
 @TargetApi(21)
 @RunWith(AndroidJUnit4.class)
 public class Camera2CapturerUsageTest extends BaseCamera2CapturerTest {
-    private String[] cameraIds;
+  private String[] cameraIds;
 
-    @Before
-    public void setup() throws InterruptedException {
-        super.setup();
-        CameraManager cameraManager = (CameraManager)
-                cameraCapturerActivity.getSystemService(Context.CAMERA_SERVICE);
-        try {
-            cameraIds = cameraManager.getCameraIdList();
-        } catch (CameraAccessException e) {
-            fail(e.getMessage());
-        }
+  @Before
+  public void setup() throws InterruptedException {
+    super.setup();
+    CameraManager cameraManager =
+        (CameraManager) cameraCapturerActivity.getSystemService(Context.CAMERA_SERVICE);
+    try {
+      cameraIds = cameraManager.getCameraIdList();
+    } catch (CameraAccessException e) {
+      fail(e.getMessage());
     }
+  }
 
-    @After
-    public void teardown() {
-        super.teardown();
-        assertTrue(MediaFactory.isReleased());
-    }
+  @After
+  public void teardown() {
+    super.teardown();
+    assertTrue(MediaFactory.isReleased());
+  }
 
-    @Test
-    public void shouldAllowCameraSwitch() throws InterruptedException {
-        assumeTrue(cameraIds.length > 1);
-        final String cameraId = cameraIds[0];
-        final String expectedCameraId = cameraIds[1];
-        final CountDownLatch cameraSwitched = new CountDownLatch(1);
-        camera2Capturer = new Camera2Capturer(cameraCapturerActivity,
-                cameraId,
-                new Camera2Capturer.Listener() {
-                    @Override
-                    public void onFirstFrameAvailable() {
+  @Test
+  public void shouldAllowCameraSwitch() throws InterruptedException {
+    assumeTrue(cameraIds.length > 1);
+    final String cameraId = cameraIds[0];
+    final String expectedCameraId = cameraIds[1];
+    final CountDownLatch cameraSwitched = new CountDownLatch(1);
+    camera2Capturer =
+        new Camera2Capturer(
+            cameraCapturerActivity,
+            cameraId,
+            new Camera2Capturer.Listener() {
+              @Override
+              public void onFirstFrameAvailable() {}
 
-                    }
+              @Override
+              public void onCameraSwitched(String newCameraId) {
+                assertEquals(expectedCameraId, newCameraId);
+                assertEquals(expectedCameraId, camera2Capturer.getCameraId());
+                cameraSwitched.countDown();
+              }
 
-                    @Override
-                    public void onCameraSwitched(String newCameraId) {
-                        assertEquals(expectedCameraId, newCameraId);
-                        assertEquals(expectedCameraId, camera2Capturer.getCameraId());
-                        cameraSwitched.countDown();
-                    }
+              @Override
+              public void onError(Camera2Capturer.Exception exception) {}
+            });
+    localVideoTrack = LocalVideoTrack.create(cameraCapturerActivity, true, camera2Capturer);
 
-                    @Override
-                    public void onError(Camera2Capturer.Exception exception) {
+    // Add renderer
+    localVideoTrack.addRenderer(frameCountRenderer);
 
-                    }
-                });
-        localVideoTrack = LocalVideoTrack.create(cameraCapturerActivity, true, camera2Capturer);
+    // Validate we get a frame
+    assertTrue(frameCountRenderer.waitForFrame(CAMERA2_CAPTURER_DELAY_MS));
 
-        // Add renderer
-        localVideoTrack.addRenderer(frameCountRenderer);
+    // Validate front camera source
+    assertEquals(cameraId, camera2Capturer.getCameraId());
 
-        // Validate we get a frame
-        assertTrue(frameCountRenderer.waitForFrame(CAMERA2_CAPTURER_DELAY_MS));
+    // Perform camera switch
+    camera2Capturer.switchCamera(expectedCameraId);
 
-        // Validate front camera source
-        assertEquals(cameraId, camera2Capturer.getCameraId());
+    // Validate our switch happened
+    assertTrue(cameraSwitched.await(CAMERA2_CAPTURER_DELAY_MS, TimeUnit.MILLISECONDS));
 
-        // Perform camera switch
-        camera2Capturer.switchCamera(expectedCameraId);
+    // Validate we get a frame after camera switch
+    assertTrue(frameCountRenderer.waitForFrame(CAMERA2_CAPTURER_DELAY_MS));
+  }
 
-        // Validate our switch happened
-        assertTrue(cameraSwitched.await(CAMERA2_CAPTURER_DELAY_MS, TimeUnit.MILLISECONDS));
+  @Test
+  public void shouldAllowCameraSwitchWhileNotCapturing() throws InterruptedException {
+    assumeTrue(cameraIds.length > 1);
+    final String cameraId = cameraIds[0];
+    final String expectedCameraId = cameraIds[1];
+    final CountDownLatch cameraSwitched = new CountDownLatch(1);
+    camera2Capturer =
+        new Camera2Capturer(
+            cameraCapturerActivity,
+            cameraId,
+            new Camera2Capturer.Listener() {
+              @Override
+              public void onFirstFrameAvailable() {}
 
-        // Validate we get a frame after camera switch
-        assertTrue(frameCountRenderer.waitForFrame(CAMERA2_CAPTURER_DELAY_MS));
-    }
+              @Override
+              public void onCameraSwitched(String newCameraId) {
+                assertEquals(expectedCameraId, newCameraId);
+                assertEquals(expectedCameraId, camera2Capturer.getCameraId());
+                cameraSwitched.countDown();
+              }
 
-    @Test
-    public void shouldAllowCameraSwitchWhileNotCapturing() throws InterruptedException {
-        assumeTrue(cameraIds.length > 1);
-        final String cameraId = cameraIds[0];
-        final String expectedCameraId = cameraIds[1];
-        final CountDownLatch cameraSwitched = new CountDownLatch(1);
-        camera2Capturer = new Camera2Capturer(cameraCapturerActivity,
-                cameraId,
-                new Camera2Capturer.Listener() {
-                    @Override
-                    public void onFirstFrameAvailable() {
+              @Override
+              public void onError(Camera2Capturer.Exception exception) {}
+            });
 
-                    }
+    // Switch our camera
+    camera2Capturer.switchCamera(expectedCameraId);
 
-                    @Override
-                    public void onCameraSwitched(String newCameraId) {
-                        assertEquals(expectedCameraId, newCameraId);
-                        assertEquals(expectedCameraId,
-                                camera2Capturer.getCameraId());
-                        cameraSwitched.countDown();
-                    }
+    // Now add our video track
+    localVideoTrack = LocalVideoTrack.create(cameraCapturerActivity, true, camera2Capturer);
 
-                    @Override
-                    public void onError(Camera2Capturer.Exception exception) {
+    // Validate our switch happened
+    assertTrue(cameraSwitched.await(CAMERA2_CAPTURER_DELAY_MS, TimeUnit.MILLISECONDS));
 
-                    }
-                });
+    // Add renderer
+    localVideoTrack.addRenderer(frameCountRenderer);
 
-        // Switch our camera
-        camera2Capturer.switchCamera(expectedCameraId);
+    // Validate we get a frame
+    assertTrue(frameCountRenderer.waitForFrame(CAMERA2_CAPTURER_DELAY_MS));
+  }
 
-        // Now add our video track
-        localVideoTrack = LocalVideoTrack.create(cameraCapturerActivity, true, camera2Capturer);
+  @Test
+  public void switchCamera_shouldFailWithSwitchPending() throws InterruptedException {
+    // TODO: Fix crash on S6 GSDK-1561
+    assumeFalse(DeviceUtils.isSamsungGalaxyS6());
+    assumeTrue(cameraIds.length > 1);
+    final String cameraId = cameraIds[0];
+    final String otherCameraId = cameraIds[1];
+    final CountDownLatch cameraSwitchError = new CountDownLatch(1);
+    camera2Capturer =
+        new Camera2Capturer(
+            cameraCapturerActivity,
+            cameraId,
+            new Camera2Capturer.Listener() {
+              @Override
+              public void onFirstFrameAvailable() {}
 
-        // Validate our switch happened
-        assertTrue(cameraSwitched.await(CAMERA2_CAPTURER_DELAY_MS, TimeUnit.MILLISECONDS));
+              @Override
+              public void onCameraSwitched(String newCameraId) {}
 
-        // Add renderer
-        localVideoTrack.addRenderer(frameCountRenderer);
+              @Override
+              public void onError(Camera2Capturer.Exception exception) {
+                assertEquals(Camera2Capturer.Exception.CAMERA_SWITCH_FAILED, exception.getCode());
+                cameraSwitchError.countDown();
+              }
+            });
+    localVideoTrack = LocalVideoTrack.create(cameraCapturerActivity, true, camera2Capturer);
 
-        // Validate we get a frame
-        assertTrue(frameCountRenderer.waitForFrame(CAMERA2_CAPTURER_DELAY_MS));
-    }
+    // Switch our cameras quickly
+    camera2Capturer.switchCamera(otherCameraId);
+    camera2Capturer.switchCamera(otherCameraId);
 
-    @Test
-    public void switchCamera_shouldFailWithSwitchPending() throws InterruptedException {
-        // TODO: Fix crash on S6 GSDK-1561
-        assumeFalse(DeviceUtils.isSamsungGalaxyS6());
-        assumeTrue(cameraIds.length > 1);
-        final String cameraId = cameraIds[0];
-        final String otherCameraId = cameraIds[1];
-        final CountDownLatch cameraSwitchError = new CountDownLatch(1);
-        camera2Capturer = new Camera2Capturer(cameraCapturerActivity,
-                cameraId,
-                new Camera2Capturer.Listener() {
-                    @Override
-                    public void onFirstFrameAvailable() {}
+    // Wait for callback
+    assertTrue(cameraSwitchError.await(CAMERA2_CAPTURER_DELAY_MS, TimeUnit.MILLISECONDS));
+  }
 
-                    @Override
-                    public void onCameraSwitched(String newCameraId) {
-                    }
-
-                    @Override
-                    public void onError(Camera2Capturer.Exception exception) {
-                        assertEquals(Camera2Capturer.Exception.CAMERA_SWITCH_FAILED,
-                                exception.getCode());
-                        cameraSwitchError.countDown();
-                    }
-                });
-        localVideoTrack = LocalVideoTrack.create(cameraCapturerActivity, true, camera2Capturer);
-
-        // Switch our cameras quickly
-        camera2Capturer.switchCamera(otherCameraId);
-        camera2Capturer.switchCamera(otherCameraId);
-
-        // Wait for callback
-        assertTrue(cameraSwitchError.await(CAMERA2_CAPTURER_DELAY_MS, TimeUnit.MILLISECONDS));
-    }
-
-    @Test
-    public void shouldInvokeListenerCallbacksOnCreationThread() throws InterruptedException {
-        assumeTrue(cameraIds.length > 1);
-        final String cameraId = cameraIds[0];
-        final String otherCameraId = cameraIds[1];
-        final CountDownLatch firstFrameAvailable = new CountDownLatch(1);
-        final CountDownLatch cameraSwitched = new CountDownLatch(1);
-        final CountDownLatch cameraSwitchedFailed = new CountDownLatch(1);
-        /*
-         * Run on UI thread to avoid thread hopping between the test runner thread and the UI
-         * thread.
-         */
-        InstrumentationRegistry.getInstrumentation().runOnMainSync(new Runnable() {
-            @Override
-            public void run() {
+  @Test
+  public void shouldInvokeListenerCallbacksOnCreationThread() throws InterruptedException {
+    assumeTrue(cameraIds.length > 1);
+    final String cameraId = cameraIds[0];
+    final String otherCameraId = cameraIds[1];
+    final CountDownLatch firstFrameAvailable = new CountDownLatch(1);
+    final CountDownLatch cameraSwitched = new CountDownLatch(1);
+    final CountDownLatch cameraSwitchedFailed = new CountDownLatch(1);
+    /*
+     * Run on UI thread to avoid thread hopping between the test runner thread and the UI
+     * thread.
+     */
+    InstrumentationRegistry.getInstrumentation()
+        .runOnMainSync(
+            new Runnable() {
+              @Override
+              public void run() {
                 final long callingThreadId = Thread.currentThread().getId();
 
-                camera2Capturer = new Camera2Capturer(cameraCapturerActivity, cameraId,
+                camera2Capturer =
+                    new Camera2Capturer(
+                        cameraCapturerActivity,
+                        cameraId,
                         new Camera2Capturer.Listener() {
-                            @Override
-                            public void onFirstFrameAvailable() {
-                                assertEquals(callingThreadId, Thread.currentThread().getId());
-                                firstFrameAvailable.countDown();
-                            }
+                          @Override
+                          public void onFirstFrameAvailable() {
+                            assertEquals(callingThreadId, Thread.currentThread().getId());
+                            firstFrameAvailable.countDown();
+                          }
 
-                            @Override
-                            public void onCameraSwitched(String cameraId) {
-                                assertEquals(callingThreadId, Thread.currentThread().getId());
-                                cameraSwitched.countDown();
-                            }
+                          @Override
+                          public void onCameraSwitched(String cameraId) {
+                            assertEquals(callingThreadId, Thread.currentThread().getId());
+                            cameraSwitched.countDown();
+                          }
 
-                            @Override
-                            public void onError(Camera2Capturer.Exception exception) {
-                                assertEquals(callingThreadId, Thread.currentThread().getId());
-                                cameraSwitchedFailed.countDown();
-                            }
+                          @Override
+                          public void onError(Camera2Capturer.Exception exception) {
+                            assertEquals(callingThreadId, Thread.currentThread().getId());
+                            cameraSwitchedFailed.countDown();
+                          }
                         });
-                localVideoTrack = LocalVideoTrack.create(cameraCapturerActivity, true,
-                        camera2Capturer);
-            }
-        });
+                localVideoTrack =
+                    LocalVideoTrack.create(cameraCapturerActivity, true, camera2Capturer);
+              }
+            });
 
-        assertTrue(firstFrameAvailable.await(CAMERA2_CAPTURER_DELAY_MS, TimeUnit.MILLISECONDS));
-        camera2Capturer.switchCamera(otherCameraId);
-        assertTrue(cameraSwitched.await(CAMERA2_CAPTURER_DELAY_MS, TimeUnit.MILLISECONDS));
-        camera2Capturer.switchCamera(cameraId);
-        camera2Capturer.switchCamera(cameraId);
-        assertTrue(cameraSwitchedFailed.await(CAMERA2_CAPTURER_DELAY_MS, TimeUnit.MILLISECONDS));
-    }
+    assertTrue(firstFrameAvailable.await(CAMERA2_CAPTURER_DELAY_MS, TimeUnit.MILLISECONDS));
+    camera2Capturer.switchCamera(otherCameraId);
+    assertTrue(cameraSwitched.await(CAMERA2_CAPTURER_DELAY_MS, TimeUnit.MILLISECONDS));
+    camera2Capturer.switchCamera(cameraId);
+    camera2Capturer.switchCamera(cameraId);
+    assertTrue(cameraSwitchedFailed.await(CAMERA2_CAPTURER_DELAY_MS, TimeUnit.MILLISECONDS));
+  }
 }

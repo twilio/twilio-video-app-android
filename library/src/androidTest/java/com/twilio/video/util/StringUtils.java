@@ -17,7 +17,7 @@
 package com.twilio.video.util;
 
 public class StringUtils {
-    public static boolean isNullOrEmpty(String string) {
-        return string == null || string.isEmpty();
-    }
+  public static boolean isNullOrEmpty(String string) {
+    return string == null || string.isEmpty();
+  }
 }

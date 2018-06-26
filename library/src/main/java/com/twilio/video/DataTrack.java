@@ -18,79 +18,73 @@ package com.twilio.video;
 
 import android.support.annotation.NonNull;
 
-/**
- * Base representation of {@link LocalDataTrack} and {@link RemoteDataTrack}.
- */
+/** Base representation of {@link LocalDataTrack} and {@link RemoteDataTrack}. */
 public abstract class DataTrack implements Track {
-    private final boolean enabled;
-    private final boolean ordered;
-    private final boolean reliable;
-    private final int maxPacketLifeTime;
-    private final int maxRetransmits;
-    private final String name;
+  private final boolean enabled;
+  private final boolean ordered;
+  private final boolean reliable;
+  private final int maxPacketLifeTime;
+  private final int maxRetransmits;
+  private final String name;
 
-    protected DataTrack(boolean enabled,
-                        boolean ordered,
-                        boolean reliable,
-                        int maxPacketLifeTime,
-                        int maxRetransmits,
-                        @NonNull String name) {
-        this.enabled = enabled;
-        this.ordered = ordered;
-        this.reliable = reliable;
-        this.maxPacketLifeTime = maxPacketLifeTime;
-        this.maxRetransmits = maxRetransmits;
-        this.name = name;
-    }
+  protected DataTrack(
+      boolean enabled,
+      boolean ordered,
+      boolean reliable,
+      int maxPacketLifeTime,
+      int maxRetransmits,
+      @NonNull String name) {
+    this.enabled = enabled;
+    this.ordered = ordered;
+    this.reliable = reliable;
+    this.maxPacketLifeTime = maxPacketLifeTime;
+    this.maxRetransmits = maxRetransmits;
+    this.name = name;
+  }
 
-    /**
-     * Check if this data track is enabled.
-     *
-     * @return true if the track is enabled.
-     */
-    @Override
-    public boolean isEnabled() {
-        return enabled;
-    }
+  /**
+   * Check if this data track is enabled.
+   *
+   * @return true if the track is enabled.
+   */
+  @Override
+  public boolean isEnabled() {
+    return enabled;
+  }
 
-    /**
-     * Returns the data track name. A pseudo random string is returned if no track name was
-     * specified.
-     */
-    @Override
-    public String getName() {
-        return name;
-    }
+  /**
+   * Returns the data track name. A pseudo random string is returned if no track name was specified.
+   */
+  @Override
+  public String getName() {
+    return name;
+  }
 
-    /**
-     * Returns true if data track guarantees in-order delivery of messages.
-     */
-    public boolean isOrdered() {
-        return ordered;
-    }
+  /** Returns true if data track guarantees in-order delivery of messages. */
+  public boolean isOrdered() {
+    return ordered;
+  }
 
-    /**
-     * Returns true if the data track guarantees reliable transmission of messages.
-     */
-    public boolean isReliable() {
-        return reliable;
-    }
+  /** Returns true if the data track guarantees reliable transmission of messages. */
+  public boolean isReliable() {
+    return reliable;
+  }
 
-    /**
-     * Returns the maximum period of time in milliseconds in which retransmissions will be sent.
-     * Returns {@code 65535} if {@link DataTrackOptions#DEFAULT_MAX_PACKET_LIFE_TIME} was specified
-     * when building the data track.
-     */
-    public int getMaxPacketLifeTime() {
-        return maxPacketLifeTime;
-    }
+  /**
+   * Returns the maximum period of time in milliseconds in which retransmissions will be sent.
+   * Returns {@code 65535} if {@link DataTrackOptions#DEFAULT_MAX_PACKET_LIFE_TIME} was specified
+   * when building the data track.
+   */
+  public int getMaxPacketLifeTime() {
+    return maxPacketLifeTime;
+  }
 
-    /**
-     * Returns the maximum number of times to transmit a message before giving up.
-     * Returns {@code 65535} if {@link DataTrackOptions#DEFAULT_MAX_RETRANSMITS} was specified
-     * when building the data track.
-     */
-    public int getMaxRetransmits() {
-        return maxRetransmits;
-    }
+  /**
+   * Returns the maximum number of times to transmit a message before giving up. Returns {@code
+   * 65535} if {@link DataTrackOptions#DEFAULT_MAX_RETRANSMITS} was specified when building the data
+   * track.
+   */
+  public int getMaxRetransmits() {
+    return maxRetransmits;
+  }
 }

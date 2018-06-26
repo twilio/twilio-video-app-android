@@ -17,26 +17,22 @@
 package com.twilio.video;
 
 public abstract class RemoteTrackStats extends BaseTrackStats {
-    /**
-     * Total number of bytes received
-     */
-    public final long bytesReceived;
+  /** Total number of bytes received */
+  public final long bytesReceived;
 
-    /**
-     * Total number of packets received
-     */
-    public final int packetsReceived;
+  /** Total number of packets received */
+  public final int packetsReceived;
 
-
-    protected RemoteTrackStats(String trackSid,
-                               int packetsLost,
-                               String codec,
-                               String ssrc,
-                               double timestamp,
-                               long bytesReceived,
-                               int packetsReceived) {
-        super(trackSid, packetsLost, codec, ssrc, timestamp);
-        this.bytesReceived = bytesReceived;
-        this.packetsReceived = packetsReceived;
-    }
+  protected RemoteTrackStats(
+      String trackSid,
+      int packetsLost,
+      String codec,
+      String ssrc,
+      double timestamp,
+      long bytesReceived,
+      int packetsReceived) {
+    super(trackSid, packetsLost, codec, ssrc, timestamp);
+    this.bytesReceived = bytesReceived;
+    this.packetsReceived = packetsReceived;
+  }
 }

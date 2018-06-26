@@ -24,26 +24,26 @@ import android.support.annotation.VisibleForTesting;
  */
 @VisibleForTesting(otherwise = VisibleForTesting.NONE)
 class MediaOptions {
-    /*
-     * Read from native media factory layer.
-     */
-    @SuppressWarnings("unused")
-    private final boolean enableH264;
+  /*
+   * Read from native media factory layer.
+   */
+  @SuppressWarnings("unused")
+  private final boolean enableH264;
 
-    private MediaOptions(Builder builder) {
-        this.enableH264 = builder.enableH264;
+  private MediaOptions(Builder builder) {
+    this.enableH264 = builder.enableH264;
+  }
+
+  static class Builder {
+    private boolean enableH264;
+
+    Builder enableH264(boolean enableH264) {
+      this.enableH264 = enableH264;
+      return this;
     }
 
-    static class Builder {
-        private boolean enableH264;
-
-        Builder enableH264(boolean enableH264) {
-            this.enableH264 = enableH264;
-            return this;
-        }
-
-        MediaOptions build() {
-            return new MediaOptions(this);
-        }
+    MediaOptions build() {
+      return new MediaOptions(this);
     }
+  }
 }

@@ -17,28 +17,24 @@
 package com.twilio.video;
 
 public class RemoteAudioTrackStats extends RemoteTrackStats {
-    /**
-     * Audio output level
-     */
-    public final int audioLevel;
+  /** Audio output level */
+  public final int audioLevel;
 
-    /**
-     * Packet jitter measured in milliseconds
-     */
-    public final int jitter;
+  /** Packet jitter measured in milliseconds */
+  public final int jitter;
 
-    RemoteAudioTrackStats(String trackSid,
-                          int packetsLost,
-                          String codec,
-                          String ssrc,
-                          double timestamp,
-                          long bytesReceived,
-                          int packetsReceived,
-                          int audioLevel,
-                          int jitter) {
-        super(trackSid, packetsLost, codec, ssrc,
-                timestamp, bytesReceived, packetsReceived);
-        this.audioLevel = audioLevel;
-        this.jitter = jitter;
-    }
+  RemoteAudioTrackStats(
+      String trackSid,
+      int packetsLost,
+      String codec,
+      String ssrc,
+      double timestamp,
+      long bytesReceived,
+      int packetsReceived,
+      int audioLevel,
+      int jitter) {
+    super(trackSid, packetsLost, codec, ssrc, timestamp, bytesReceived, packetsReceived);
+    this.audioLevel = audioLevel;
+    this.jitter = jitter;
+  }
 }

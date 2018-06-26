@@ -16,9 +16,7 @@
 
 package com.twilio.video;
 
-
 import android.content.Context;
-
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -26,15 +24,15 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
 public class MediaFactoryUnitTest {
-    @Mock Context mockContext;
+  @Mock Context mockContext;
 
-    @Test(expected = NullPointerException.class)
-    public void instance_shouldFailWithNullOwner() {
-        MediaFactory.instance(null, mockContext);
-    }
+  @Test(expected = NullPointerException.class)
+  public void instance_shouldFailWithNullOwner() {
+    MediaFactory.instance(null, mockContext);
+  }
 
-    @Test(expected = NullPointerException.class)
-    public void instance_shouldFailWithNullContext() {
-        MediaFactory.instance(new Object(),null);
-    }
+  @Test(expected = NullPointerException.class)
+  public void instance_shouldFailWithNullContext() {
+    MediaFactory.instance(new Object(), null);
+  }
 }

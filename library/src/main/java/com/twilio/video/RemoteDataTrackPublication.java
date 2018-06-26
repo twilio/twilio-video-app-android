@@ -19,88 +19,80 @@ package com.twilio.video;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-/**
- * A remote data track publication represents a {@link RemoteDataTrack}.
- */
+/** A remote data track publication represents a {@link RemoteDataTrack}. */
 public class RemoteDataTrackPublication implements DataTrackPublication {
-    private final String sid;
-    private final String name;
-    private RemoteDataTrack remoteDataTrack;
-    private boolean subscribed;
-    private boolean enabled;
+  private final String sid;
+  private final String name;
+  private RemoteDataTrack remoteDataTrack;
+  private boolean subscribed;
+  private boolean enabled;
 
-    RemoteDataTrackPublication(boolean subscribed,
-                               boolean enabled,
-                               @NonNull String sid,
-                               @NonNull String name) {
-        this.enabled = enabled;
-        this.subscribed = subscribed;
-        this.sid = sid;
-        this.name = name;
-    }
+  RemoteDataTrackPublication(
+      boolean subscribed, boolean enabled, @NonNull String sid, @NonNull String name) {
+    this.enabled = enabled;
+    this.subscribed = subscribed;
+    this.sid = sid;
+    this.name = name;
+  }
 
-    /**
-     * Returns the remote data track's server identifier. This value uniquely identifies the remote
-     * data track within the scope of a {@link Room}.
-     */
-    @Override
-    public String getTrackSid() {
-        return sid;
-    }
+  /**
+   * Returns the remote data track's server identifier. This value uniquely identifies the remote
+   * data track within the scope of a {@link Room}.
+   */
+  @Override
+  public String getTrackSid() {
+    return sid;
+  }
 
-    /**
-     * Returns the base data track object of the published remote data track. {@code null} is
-     * returned if the track is not subscribed to.
-     */
-    @Override
-    public synchronized @Nullable DataTrack getDataTrack() {
-        return remoteDataTrack;
-    }
+  /**
+   * Returns the base data track object of the published remote data track. {@code null} is returned
+   * if the track is not subscribed to.
+   */
+  @Override
+  public synchronized @Nullable DataTrack getDataTrack() {
+    return remoteDataTrack;
+  }
 
-    /**
-     * Returns the name of the published data track. An empty string is returned if no track name
-     * was specified.
-     */
-    @Override
-    public String getTrackName() {
-        return name;
-    }
+  /**
+   * Returns the name of the published data track. An empty string is returned if no track name was
+   * specified.
+   */
+  @Override
+  public String getTrackName() {
+    return name;
+  }
 
-    /**
-     * Returns true if the published data track is enabled or false otherwise.
-     */
-    @Override
-    public boolean isTrackEnabled() {
-        return enabled;
-    }
+  /** Returns true if the published data track is enabled or false otherwise. */
+  @Override
+  public boolean isTrackEnabled() {
+    return enabled;
+  }
 
-    /**
-     * Check if the remote data track is subscribed to by the {@link LocalParticipant}.
-     */
-    public synchronized boolean isTrackSubscribed() {
-        return subscribed;
-    }
+  /** Check if the remote data track is subscribed to by the {@link LocalParticipant}. */
+  public synchronized boolean isTrackSubscribed() {
+    return subscribed;
+  }
 
-    /**
-     * Returns the published remote data track. {@code null} is returned if the track is not
-     * subscribed to.
-     */
-    public synchronized @Nullable RemoteDataTrack getRemoteDataTrack() {
-        return remoteDataTrack;
-    }
+  /**
+   * Returns the published remote data track. {@code null} is returned if the track is not
+   * subscribed to.
+   */
+  public synchronized @Nullable RemoteDataTrack getRemoteDataTrack() {
+    return remoteDataTrack;
+  }
 
-    /*
-     * Set by remote participant listener proxy.
-     */
-    synchronized void setSubscribed(boolean subscribed) {
-        this.subscribed = subscribed;
-    }
+  /*
+   * Set by remote participant listener proxy.
+   */
+  synchronized void setSubscribed(boolean subscribed) {
+    this.subscribed = subscribed;
+  }
 
-    /*
-     * Called from JNI layer when a track has been subscribed to.
-     */
-    @SuppressWarnings("unused")
-    synchronized void setRemoteDataTrack(RemoteDataTrack remoteDataTrack) {
-        this.remoteDataTrack = remoteDataTrack;
-    }
+  /*
+   * Called from JNI layer when a track has been subscribed to.
+   */
+  @SuppressWarnings("unused")
+  synchronized void setRemoteDataTrack(RemoteDataTrack remoteDataTrack) {
+    this.remoteDataTrack = remoteDataTrack;
+  }
 }

@@ -28,7 +28,6 @@ import android.text.TextWatcher;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
-
 import com.twilio.video.app.R;
 
 /**
@@ -39,102 +38,98 @@ import com.twilio.video.app.R;
  * @attr name clearIcon - clear action icon to display to the right of EditText input.
  */
 public class ClearableEditText extends AppCompatEditText {
-    /**
-     * Clear icon resource id.
-     */
-    private int clearIconResId;
+  /** Clear icon resource id. */
+  private int clearIconResId;
 
-    /**
-     * Clear icon drawable.
-     */
-    private Drawable clearDrawable;
+  /** Clear icon drawable. */
+  private Drawable clearDrawable;
 
-    public ClearableEditText(Context context) {
-        super(context);
-        init(context, null);
+  public ClearableEditText(Context context) {
+    super(context);
+    init(context, null);
+  }
+
+  public ClearableEditText(Context context, AttributeSet attrs) {
+    super(context, attrs);
+    init(context, attrs);
+  }
+
+  public ClearableEditText(Context context, AttributeSet attrs, int defStyleAttr) {
+    super(context, attrs, defStyleAttr);
+    init(context, attrs);
+  }
+
+  private void init(Context context, AttributeSet attrs) {
+
+    if (attrs != null) {
+      TypedArray stylables =
+          context.getTheme().obtainStyledAttributes(attrs, R.styleable.ClearableEditText, 0, 0);
+
+      // obtain clear icon resource id
+      clearIconResId = stylables.getResourceId(R.styleable.ClearableEditText_clearIcon, -1);
+      if (clearIconResId != -1) {
+        clearDrawable = VectorDrawableCompat.create(getResources(), clearIconResId, null);
+      }
     }
 
-    public ClearableEditText(Context context, AttributeSet attrs) {
-        super(context, attrs);
-        init(context, attrs);
-    }
+    // setup initial clear icon state
+    setCompoundDrawablesWithIntrinsicBounds(null, null, clearDrawable, null);
+    showClearIcon(getText().toString().length() > 0);
 
-    public ClearableEditText(Context context, AttributeSet attrs, int defStyleAttr) {
-        super(context, attrs, defStyleAttr);
-        init(context, attrs);
-    }
+    // update clear icon state after every text change
+    addTextChangedListener(
+        new TextWatcher() {
+          @Override
+          public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
 
-    private void init(Context context, AttributeSet attrs) {
+          @Override
+          public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
 
-        if (attrs != null) {
-            TypedArray stylables = context.getTheme()
-                    .obtainStyledAttributes(attrs, R.styleable.ClearableEditText, 0, 0);
-
-            // obtain clear icon resource id
-            clearIconResId = stylables.getResourceId(R.styleable.ClearableEditText_clearIcon, -1);
-            if (clearIconResId != -1) {
-                clearDrawable = VectorDrawableCompat.create(getResources(), clearIconResId, null);
-            }
-        }
-
-        // setup initial clear icon state
-        setCompoundDrawablesWithIntrinsicBounds(null, null, clearDrawable, null);
-        showClearIcon(getText().toString().length() > 0);
-
-        // update clear icon state after every text change
-        addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-            }
-
-            @Override
-            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-            }
-
-            @Override
-            public void afterTextChanged(Editable editable) {
-                showClearIcon(editable.toString().length() > 0);
-            }
+          @Override
+          public void afterTextChanged(Editable editable) {
+            showClearIcon(editable.toString().length() > 0);
+          }
         });
 
-        // simulate on clear icon click - delete edit text contents
-        setOnTouchListener(new OnTouchListener() {
-            @Override
-            public boolean onTouch(View view, MotionEvent motionEvent) {
+    // simulate on clear icon click - delete edit text contents
+    setOnTouchListener(
+        new OnTouchListener() {
+          @Override
+          public boolean onTouch(View view, MotionEvent motionEvent) {
 
-                if (isClearVisible() && motionEvent.getAction() == MotionEvent.ACTION_UP) {
+            if (isClearVisible() && motionEvent.getAction() == MotionEvent.ACTION_UP) {
 
-                    ClearableEditText editText = (ClearableEditText) view;
-                    Rect bounds = clearDrawable.getBounds();
+              ClearableEditText editText = (ClearableEditText) view;
+              Rect bounds = clearDrawable.getBounds();
 
-                    if (motionEvent.getRawX() >= (view.getRight() - bounds.width())) {
-                        editText.setText("");
-                    }
-                }
-
-                return false;
+              if (motionEvent.getRawX() >= (view.getRight() - bounds.width())) {
+                editText.setText("");
+              }
             }
+
+            return false;
+          }
         });
-    }
+  }
 
-    /**
-     * Displays clear icon in ClearableEditText.
-     *
-     * @param show pass true to display icon, otherwise false to hide.
-     */
-    public void showClearIcon(boolean show) {
-        // TODO: should probably use setVisibility method, but seems to not working.
-        if (clearDrawable != null) {
-            clearDrawable.setAlpha(show ? 255 : 0);
-        }
+  /**
+   * Displays clear icon in ClearableEditText.
+   *
+   * @param show pass true to display icon, otherwise false to hide.
+   */
+  public void showClearIcon(boolean show) {
+    // TODO: should probably use setVisibility method, but seems to not working.
+    if (clearDrawable != null) {
+      clearDrawable.setAlpha(show ? 255 : 0);
     }
+  }
 
-    /**
-     * Reflects current state of clear icon.
-     *
-     * @return true if active, otherwise - false.
-     */
-    public boolean isClearVisible() {
-        return clearDrawable != null && DrawableCompat.getAlpha(clearDrawable) == 255;
-    }
+  /**
+   * Reflects current state of clear icon.
+   *
+   * @return true if active, otherwise - false.
+   */
+  public boolean isClearVisible() {
+    return clearDrawable != null && DrawableCompat.getAlpha(clearDrawable) == 255;
+  }
 }

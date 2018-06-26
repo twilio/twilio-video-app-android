@@ -16,58 +16,56 @@
 
 package com.twilio.video;
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import junitparams.converters.Nullable;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
+import org.junit.Test;
+import org.junit.runner.RunWith;
 
 @RunWith(JUnitParamsRunner.class)
 public class EncodingParametersUnitTest {
-    private static final int MAX_AUDIO_BITRATE = 10;
-    private static final int MAX_VIDEO_BITRATE = 12;
-    private static final EncodingParameters encodingParameters =
-            new EncodingParameters(MAX_AUDIO_BITRATE, MAX_VIDEO_BITRATE);
+  private static final int MAX_AUDIO_BITRATE = 10;
+  private static final int MAX_VIDEO_BITRATE = 12;
+  private static final EncodingParameters encodingParameters =
+      new EncodingParameters(MAX_AUDIO_BITRATE, MAX_VIDEO_BITRATE);
 
-    @Test
-    public void shouldMatchAudioAndVideoBitrates() {
-        assertEquals(MAX_AUDIO_BITRATE, encodingParameters.maxAudioBitrate);
-        assertEquals(MAX_VIDEO_BITRATE, encodingParameters.maxVideoBitrate);
-    }
+  @Test
+  public void shouldMatchAudioAndVideoBitrates() {
+    assertEquals(MAX_AUDIO_BITRATE, encodingParameters.maxAudioBitrate);
+    assertEquals(MAX_VIDEO_BITRATE, encodingParameters.maxVideoBitrate);
+  }
 
-    @Test
-    @Parameters
-    public void equals_returnsTrue(EncodingParameters sameEncodingParameters) {
-        assertEquals(sameEncodingParameters, encodingParameters);
-    }
+  @Test
+  @Parameters
+  public void equals_returnsTrue(EncodingParameters sameEncodingParameters) {
+    assertEquals(sameEncodingParameters, encodingParameters);
+  }
 
-    @Test
-    @Parameters
-    public void equals_returnsFalse(@Nullable Object differentEncodingParameters) {
-        EncodingParameters differentEncodingParamters = new EncodingParameters(1,
-                MAX_VIDEO_BITRATE);
+  @Test
+  @Parameters
+  public void equals_returnsFalse(@Nullable Object differentEncodingParameters) {
+    EncodingParameters differentEncodingParamters = new EncodingParameters(1, MAX_VIDEO_BITRATE);
 
-        assertNotEquals(differentEncodingParamters, encodingParameters);
-    }
+    assertNotEquals(differentEncodingParamters, encodingParameters);
+  }
 
-    private Object[] parametersForEquals_returnsTrue() {
-        return new Object[] {
-                new Object[]{ encodingParameters },
-                new Object[]{ new EncodingParameters(MAX_AUDIO_BITRATE, MAX_VIDEO_BITRATE) }
-        };
-    }
+  private Object[] parametersForEquals_returnsTrue() {
+    return new Object[] {
+      new Object[] {encodingParameters},
+      new Object[] {new EncodingParameters(MAX_AUDIO_BITRATE, MAX_VIDEO_BITRATE)}
+    };
+  }
 
-    private Object[] parametersForEquals_returnsFalse() {
-        return new Object[] {
-                new Object[]{ null },
-                new Object[]{ new Object() },
-                new Object[]{ new EncodingParameters(1, 2) },
-                new Object[]{ new EncodingParameters(MAX_AUDIO_BITRATE, 2) },
-                new Object[]{ new EncodingParameters(1, MAX_VIDEO_BITRATE) }
-        };
-    }
+  private Object[] parametersForEquals_returnsFalse() {
+    return new Object[] {
+      new Object[] {null},
+      new Object[] {new Object()},
+      new Object[] {new EncodingParameters(1, 2)},
+      new Object[] {new EncodingParameters(MAX_AUDIO_BITRATE, 2)},
+      new Object[] {new EncodingParameters(1, MAX_VIDEO_BITRATE)}
+    };
+  }
 }

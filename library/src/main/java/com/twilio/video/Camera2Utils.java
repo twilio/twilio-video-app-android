@@ -24,21 +24,20 @@ import android.support.annotation.NonNull;
 
 @TargetApi(21)
 class Camera2Utils {
-    private static final Logger logger = Logger.getLogger(Camera2Utils.class);
+  private static final Logger logger = Logger.getLogger(Camera2Utils.class);
 
-    static boolean cameraIdSupported(@NonNull Context context, @NonNull String targetCameraId) {
-        CameraManager cameraManager = (CameraManager)
-                context.getSystemService(Context.CAMERA_SERVICE);
-        try {
-            for (String cameraId : cameraManager.getCameraIdList()) {
-                if (targetCameraId.equals(cameraId)) {
-                    return true;
-                }
-            }
-        } catch (CameraAccessException e) {
-            logger.e(e.getMessage());
+  static boolean cameraIdSupported(@NonNull Context context, @NonNull String targetCameraId) {
+    CameraManager cameraManager = (CameraManager) context.getSystemService(Context.CAMERA_SERVICE);
+    try {
+      for (String cameraId : cameraManager.getCameraIdList()) {
+        if (targetCameraId.equals(cameraId)) {
+          return true;
         }
-
-        return false;
+      }
+    } catch (CameraAccessException e) {
+      logger.e(e.getMessage());
     }
+
+    return false;
+  }
 }

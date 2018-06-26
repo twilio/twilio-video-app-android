@@ -16,43 +16,39 @@
 
 package com.twilio.video;
 
-import android.content.Context;
+import static org.mockito.Mockito.when;
 
+import android.content.Context;
+import java.util.Collections;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
-import static org.mockito.Mockito.when;
-
 @RunWith(MockitoJUnitRunner.class)
 public class LocalVideoTrackUnitTest {
-    @Mock Context mockContext;
-    @Mock VideoCapturer videoCapturer;
+  @Mock Context mockContext;
+  @Mock VideoCapturer videoCapturer;
 
-    @Test(expected = NullPointerException.class)
-    public void create_shouldFailWithNullContext() {
-        LocalVideoTrack.create(null, true, videoCapturer);
-    }
+  @Test(expected = NullPointerException.class)
+  public void create_shouldFailWithNullContext() {
+    LocalVideoTrack.create(null, true, videoCapturer);
+  }
 
-    @Test(expected = NullPointerException.class)
-    public void create_shouldFailWithNullCapturer() {
-        LocalVideoTrack.create(mockContext, true, null);
-    }
+  @Test(expected = NullPointerException.class)
+  public void create_shouldFailWithNullCapturer() {
+    LocalVideoTrack.create(mockContext, true, null);
+  }
 
-    @Test(expected = IllegalStateException.class)
-    public void create_shouldFailIfVideoCapturerReturnsNullForSupportedFormats() {
-        when(videoCapturer.getSupportedFormats()).thenReturn(null);
-        LocalVideoTrack.create(mockContext, true, videoCapturer);
-    }
+  @Test(expected = IllegalStateException.class)
+  public void create_shouldFailIfVideoCapturerReturnsNullForSupportedFormats() {
+    when(videoCapturer.getSupportedFormats()).thenReturn(null);
+    LocalVideoTrack.create(mockContext, true, videoCapturer);
+  }
 
-    @Test(expected = IllegalStateException.class)
-    public void create_shouldFailIfVideoCapturerProvidesNoSupportedFormats() {
-        when(videoCapturer.getSupportedFormats()).thenReturn(Collections.<VideoFormat>emptyList());
-        LocalVideoTrack.create(mockContext, true, videoCapturer);
-    }
+  @Test(expected = IllegalStateException.class)
+  public void create_shouldFailIfVideoCapturerProvidesNoSupportedFormats() {
+    when(videoCapturer.getSupportedFormats()).thenReturn(Collections.<VideoFormat>emptyList());
+    LocalVideoTrack.create(mockContext, true, videoCapturer);
+  }
 }

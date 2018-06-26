@@ -26,9 +26,6 @@ import android.support.v7.preference.Preference;
 import android.support.v7.preference.PreferenceFragmentCompat;
 import android.support.v7.preference.PreferenceManager;
 import android.view.MenuItem;
-
-import com.google.common.base.Function;
-import com.google.common.collect.FluentIterable;
 import com.twilio.video.AudioCodec;
 import com.twilio.video.G722Codec;
 import com.twilio.video.H264Codec;
@@ -48,151 +45,149 @@ import com.twilio.video.app.data.NumberPreference;
 import com.twilio.video.app.data.NumberPreferenceDialogFragmentCompat;
 import com.twilio.video.app.data.Preferences;
 import com.twilio.video.app.ui.login.LoginActivity;
-
 import javax.inject.Inject;
 
 public class SettingsActivity extends BaseActivity {
-    private static final String[] VIDEO_CODEC_NAMES = new String[] {
-            Vp8Codec.NAME, H264Codec.NAME, Vp9Codec.NAME
-    };
+  private static final String[] VIDEO_CODEC_NAMES =
+      new String[] {Vp8Codec.NAME, H264Codec.NAME, Vp9Codec.NAME};
 
-    private static final String[] AUDIO_CODEC_NAMES = new String[] {
-            IsacCodec.NAME, OpusCodec.NAME, PcmaCodec.NAME, PcmuCodec.NAME, G722Codec.NAME
-    };
+  private static final String[] AUDIO_CODEC_NAMES =
+      new String[] {IsacCodec.NAME, OpusCodec.NAME, PcmaCodec.NAME, PcmuCodec.NAME, G722Codec.NAME};
 
-    @Inject SharedPreferences sharedPreferences;
-    @Inject Authenticator authenticator;
+  @Inject SharedPreferences sharedPreferences;
+  @Inject Authenticator authenticator;
 
-    private final Preference.OnPreferenceClickListener logoutClickListener =
-            new Preference.OnPreferenceClickListener() {
-                @Override
-                public boolean onPreferenceClick(Preference preference) {
-                    logout();
-                    return true;
-                }
-            };
+  private final Preference.OnPreferenceClickListener logoutClickListener =
+      new Preference.OnPreferenceClickListener() {
+        @Override
+        public boolean onPreferenceClick(Preference preference) {
+          logout();
+          return true;
+        }
+      };
+
+  @Override
+  protected void onCreate(@Nullable Bundle savedInstanceState) {
+    super.onCreate(savedInstanceState);
+
+    // Add the preference fragment
+    SettingsFragment settingsFragment =
+        SettingsFragment.newInstance(sharedPreferences, logoutClickListener);
+    getSupportFragmentManager()
+        .beginTransaction()
+        .replace(android.R.id.content, settingsFragment)
+        .commit();
+  }
+
+  @Override
+  public boolean onOptionsItemSelected(MenuItem item) {
+    switch (item.getItemId()) {
+      case android.R.id.home:
+        finish();
+        return true;
+      default:
+        return super.onOptionsItemSelected(item);
+    }
+  }
+
+  private void logout() {
+    Intent loginIntent = new Intent(this, authenticator.getLoginActivity());
+
+    // Clear all preferences and set defaults
+    sharedPreferences.edit().clear().apply();
+    PreferenceManager.setDefaultValues(this, R.xml.preferences, true);
+
+    // Invoke authenticator logout
+    authenticator.logout();
+
+    // Return to login activity
+    loginIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+    loginIntent.putExtra(LoginActivity.EXTRA_SIGN_OUT, true);
+    startActivity(loginIntent);
+    finishAffinity();
+  }
+
+  public static class SettingsFragment extends PreferenceFragmentCompat {
+    private static final String PREFERENCE_FRAGMENT_TAG =
+        "android.support.v7.preference.PreferenceFragment.DIALOG";
+
+    private SharedPreferences sharedPreferences;
+    private Preference.OnPreferenceClickListener logoutClickListener;
+
+    static SettingsFragment newInstance(
+        SharedPreferences sharedPreferences,
+        Preference.OnPreferenceClickListener logoutClickListener) {
+      SettingsFragment settingsFragment = new SettingsFragment();
+
+      settingsFragment.logoutClickListener = logoutClickListener;
+      settingsFragment.sharedPreferences = sharedPreferences;
+
+      return settingsFragment;
+    }
 
     @Override
-    protected void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+    public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
+      // Add our preference from resources
+      addPreferencesFromResource(R.xml.preferences);
 
-        // Add the preference fragment
-        SettingsFragment settingsFragment = SettingsFragment.newInstance(sharedPreferences,
-                logoutClickListener);
-        getSupportFragmentManager()
-                .beginTransaction()
-                .replace(android.R.id.content, settingsFragment)
-                .commit();
+      setupCodecListPreference(
+          VideoCodec.class,
+          Preferences.VIDEO_CODEC,
+          Preferences.VIDEO_CODEC_DEFAULT,
+          (ListPreference) findPreference(Preferences.VIDEO_CODEC));
+
+      setupCodecListPreference(
+          AudioCodec.class,
+          Preferences.AUDIO_CODEC,
+          Preferences.AUDIO_CODEC_DEFAULT,
+          (ListPreference) findPreference(Preferences.AUDIO_CODEC));
+
+      // Fill out the rest of settings
+      String identity = sharedPreferences.getString(Preferences.DISPLAY_NAME, null);
+      findPreference(Preferences.IDENTITY).setSummary(identity);
+      findPreference(Preferences.VERSION).setSummary(BuildConfig.VERSION_NAME);
+      findPreference(Preferences.VIDEO_LIBRARY_VERSION).setSummary(Video.getVersion());
+      findPreference(Preferences.LOGOUT).setOnPreferenceClickListener(logoutClickListener);
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                finish();
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
+    public void onDisplayPreferenceDialog(Preference preference) {
+
+      // show custom dialog preference
+      if (preference instanceof NumberPreference) {
+        DialogFragment dialogFragment;
+        dialogFragment = NumberPreferenceDialogFragmentCompat.newInstance(preference.getKey());
+
+        if (dialogFragment != null) {
+          dialogFragment.setTargetFragment(this, 0);
+          dialogFragment.show(getFragmentManager(), PREFERENCE_FRAGMENT_TAG);
         }
+
+      } else {
+        super.onDisplayPreferenceDialog(preference);
+      }
     }
 
-    private void logout() {
-        Intent loginIntent = new Intent(this, authenticator.getLoginActivity());
+    private void setupCodecListPreference(
+        Class codecClass, String key, String defaultValue, ListPreference preference) {
+      String[] codecEntries =
+          (codecClass == AudioCodec.class) ? AUDIO_CODEC_NAMES : VIDEO_CODEC_NAMES;
+      // saved value
+      final String value = sharedPreferences.getString(key, defaultValue);
 
-        // Clear all preferences and set defaults
-        sharedPreferences.edit().clear().apply();
-        PreferenceManager.setDefaultValues(this, R.xml.preferences, true);
-
-        // Invoke authenticator logout
-        authenticator.logout();
-
-        // Return to login activity
-        loginIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        loginIntent.putExtra(LoginActivity.EXTRA_SIGN_OUT, true);
-        startActivity(loginIntent);
-        finishAffinity();
-    }
-
-    public static class SettingsFragment extends PreferenceFragmentCompat {
-        private static final String PREFERENCE_FRAGMENT_TAG =
-                "android.support.v7.preference.PreferenceFragment.DIALOG";
-
-        private SharedPreferences sharedPreferences;
-        private Preference.OnPreferenceClickListener logoutClickListener;
-
-        static SettingsFragment newInstance(SharedPreferences sharedPreferences,
-                                            Preference.OnPreferenceClickListener logoutClickListener) {
-            SettingsFragment settingsFragment = new SettingsFragment();
-
-            settingsFragment.logoutClickListener = logoutClickListener;
-            settingsFragment.sharedPreferences = sharedPreferences;
-
-            return settingsFragment;
-        }
-
-        @Override
-        public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
-            // Add our preference from resources
-            addPreferencesFromResource(R.xml.preferences);
-
-            setupCodecListPreference(VideoCodec.class,
-                    Preferences.VIDEO_CODEC,
-                    Preferences.VIDEO_CODEC_DEFAULT,
-                    (ListPreference) findPreference(Preferences.VIDEO_CODEC));
-
-            setupCodecListPreference(AudioCodec.class,
-                    Preferences.AUDIO_CODEC,
-                    Preferences.AUDIO_CODEC_DEFAULT,
-                    (ListPreference) findPreference(Preferences.AUDIO_CODEC));
-
-            // Fill out the rest of settings
-            String identity = sharedPreferences.getString(Preferences.DISPLAY_NAME, null);
-            findPreference(Preferences.IDENTITY).setSummary(identity);
-            findPreference(Preferences.VERSION).setSummary(BuildConfig.VERSION_NAME);
-            findPreference(Preferences.VIDEO_LIBRARY_VERSION).setSummary(Video.getVersion());
-            findPreference(Preferences.LOGOUT).setOnPreferenceClickListener(logoutClickListener);
-        }
-
-        @Override
-        public void onDisplayPreferenceDialog(Preference preference) {
-
-            // show custom dialog preference
-            if (preference instanceof NumberPreference) {
-                DialogFragment dialogFragment;
-                dialogFragment = NumberPreferenceDialogFragmentCompat.newInstance(preference.getKey());
-
-                if (dialogFragment != null) {
-                    dialogFragment.setTargetFragment(this, 0);
-                    dialogFragment.show(getFragmentManager(), PREFERENCE_FRAGMENT_TAG);
-                }
-
-            } else {
-                super.onDisplayPreferenceDialog(preference);
+      // bind values
+      preference.setEntries(codecEntries);
+      preference.setEntryValues(codecEntries);
+      preference.setValue(value);
+      preference.setSummary(value);
+      preference.setOnPreferenceChangeListener(
+          new Preference.OnPreferenceChangeListener() {
+            @Override
+            public boolean onPreferenceChange(Preference preference, Object newValue) {
+              preference.setSummary(newValue.toString());
+              return true;
             }
-        }
-
-        private void setupCodecListPreference(Class codecClass,
-                                              String key,
-                                              String defaultValue,
-                                              ListPreference preference) {
-            String[] codecEntries = (codecClass == AudioCodec.class) ?
-                    AUDIO_CODEC_NAMES :
-                    VIDEO_CODEC_NAMES;
-            // saved value
-            final String value = sharedPreferences.getString(key, defaultValue);
-
-            // bind values
-            preference.setEntries(codecEntries);
-            preference.setEntryValues(codecEntries);
-            preference.setValue(value);
-            preference.setSummary(value);
-            preference.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
-                @Override
-                public boolean onPreferenceChange(Preference preference, Object newValue) {
-                    preference.setSummary(newValue.toString());
-                    return true;
-                }
-            });
-        }
+          });
     }
+  }
 }

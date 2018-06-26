@@ -22,9 +22,9 @@ package com.twilio.video;
  * @see <a href="https://en.wikipedia.org/wiki/G.711">PCMA</a>
  */
 public class PcmaCodec extends AudioCodec {
-    public static final String NAME = "PCMA";
+  public static final String NAME = "PCMA";
 
-    public PcmaCodec() {
-        super(NAME);
-    }
+  public PcmaCodec() {
+    super(NAME);
+  }
 }
