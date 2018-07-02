@@ -52,25 +52,19 @@ public class LocalAudioTrackPublication implements AudioTrackPublication {
         return localAudioTrack.getName();
     }
 
-    /**
-     * Check if local audio track is enabled.
-     */
+    /** Check if local audio track is enabled. */
     @Override
     public boolean isTrackEnabled() {
         return localAudioTrack.isEnabled();
     }
 
-    /**
-     * Returns the base audio track object of the published local audio track.
-     */
+    /** Returns the base audio track object of the published local audio track. */
     @Override
     public AudioTrack getAudioTrack() {
         return localAudioTrack;
     }
 
-    /**
-     * Returns the published local audio track.
-     */
+    /** Returns the published local audio track. */
     public LocalAudioTrack getLocalAudioTrack() {
         return localAudioTrack;
     }

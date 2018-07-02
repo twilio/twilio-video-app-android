@@ -16,9 +16,7 @@
 
 package com.twilio.video;
 
-/**
- * Abstract base class for audio codecs.
- */
+/** Abstract base class for audio codecs. */
 public abstract class AudioCodec {
     private final String name;
 
@@ -26,16 +24,12 @@ public abstract class AudioCodec {
         this.name = name;
     }
 
-    /**
-     * Returns the string representation of the audio codec.
-     */
+    /** Returns the string representation of the audio codec. */
     public String getName() {
         return name;
     }
 
-    /**
-     * Returns the name of the audio codec.
-     */
+    /** Returns the name of the audio codec. */
     @Override
     public String toString() {
         return name;

@@ -16,11 +16,14 @@
 
 package com.twilio.video;
 
+import static org.apache.commons.lang3.RandomStringUtils.random;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import android.content.Context;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.runner.AndroidJUnit4;
-
 import com.twilio.video.base.BaseVideoTest;
 import com.twilio.video.helper.CallbackHelper;
 import com.twilio.video.twilioapi.model.VideoRoom;
@@ -28,22 +31,14 @@ import com.twilio.video.util.Constants;
 import com.twilio.video.util.CredentialsUtils;
 import com.twilio.video.util.RoomUtils;
 import com.twilio.video.util.Topology;
-
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
-
-import static org.apache.commons.lang3.RandomStringUtils.random;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Ignore;
+import org.junit.Test;
+import org.junit.runner.RunWith;
 
 @RunWith(AndroidJUnit4.class)
 public class RoomTest extends BaseVideoTest {
@@ -71,7 +66,8 @@ public class RoomTest extends BaseVideoTest {
         if (room != null && room.getState() != RoomState.DISCONNECTED) {
             roomListener.onDisconnectedLatch = new CountDownLatch(1);
             room.disconnect();
-            assertTrue("Did not receive disconnect callback",
+            assertTrue(
+                    "Did not receive disconnect callback",
                     roomListener.onDisconnectedLatch.await(20, TimeUnit.SECONDS));
         }
         assertTrue(MediaFactory.isReleased());
@@ -82,9 +78,8 @@ public class RoomTest extends BaseVideoTest {
         roomListener.onConnectedLatch = new CountDownLatch(1);
         roomListener.onDisconnectedLatch = new CountDownLatch(1);
 
-        ConnectOptions connectOptions = new ConnectOptions.Builder(token)
-                .roomName(roomName)
-                .build();
+        ConnectOptions connectOptions =
+                new ConnectOptions.Builder(token).roomName(roomName).build();
         room = Video.connect(context, connectOptions, roomListener);
         room.disconnect();
         room.disconnect();
@@ -96,17 +91,17 @@ public class RoomTest extends BaseVideoTest {
         roomListener.onConnectedLatch = new CountDownLatch(1);
         roomListener.onDisconnectedLatch = new CountDownLatch(1);
 
-        ConnectOptions connectOptions = new ConnectOptions.Builder(token)
-                .roomName(roomName)
-                .build();
+        ConnectOptions connectOptions =
+                new ConnectOptions.Builder(token).roomName(roomName).build();
         room = Video.connect(context, connectOptions, roomListener);
         room.disconnect();
-        room.getStats(new StatsListener() {
-            @Override
-            public void onStats(List<StatsReport> statsReports) {
-                // Do nothing
-            }
-        });
+        room.getStats(
+                new StatsListener() {
+                    @Override
+                    public void onStats(List<StatsReport> statsReports) {
+                        // Do nothing
+                    }
+                });
         assertTrue(roomListener.onDisconnectedLatch.await(20, TimeUnit.SECONDS));
     }
 
@@ -117,9 +112,8 @@ public class RoomTest extends BaseVideoTest {
         roomListener.onDisconnectedLatch = new CountDownLatch(1);
 
         // Connect to room
-        ConnectOptions connectOptions = new ConnectOptions.Builder(token)
-                .roomName(roomName)
-                .build();
+        ConnectOptions connectOptions =
+                new ConnectOptions.Builder(token).roomName(roomName).build();
         room = Video.connect(context, connectOptions, roomListener);
         assertTrue(roomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
 

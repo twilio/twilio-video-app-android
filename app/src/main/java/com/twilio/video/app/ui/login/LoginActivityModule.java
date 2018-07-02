@@ -16,9 +16,7 @@
 
 package com.twilio.video.app.ui.login;
 
-
 import android.app.Activity;
-
 import dagger.Binds;
 import dagger.Module;
 import dagger.android.ActivityKey;
@@ -30,6 +28,6 @@ public abstract class LoginActivityModule {
     @Binds
     @IntoMap
     @ActivityKey(LoginActivity.class)
-    abstract AndroidInjector.Factory<? extends Activity>
-    bindYourActivityInjectorFactory(LoginActivitySubcomponent.Builder builder);
+    abstract AndroidInjector.Factory<? extends Activity> bindYourActivityInjectorFactory(
+            LoginActivitySubcomponent.Builder builder);
 }

@@ -21,11 +21,9 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GetTokenResult;
-
 import java.io.IOException;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
-
 import okhttp3.Interceptor;
 import okhttp3.Request;
 import okhttp3.Response;
@@ -38,10 +36,11 @@ public class FirebaseAuthInterceptor implements Interceptor {
 
     @Override
     public Response intercept(Chain chain) throws IOException {
-        Request authorizedRequest = chain.request()
-                .newBuilder()
-                .addHeader(HEADER_AUTHORIZATION, getFirebaseToken())
-                .build();
+        Request authorizedRequest =
+                chain.request()
+                        .newBuilder()
+                        .addHeader(HEADER_AUTHORIZATION, getFirebaseToken())
+                        .build();
 
         return chain.proceed(authorizedRequest);
     }
@@ -58,21 +57,24 @@ public class FirebaseAuthInterceptor implements Interceptor {
             throw new IllegalStateException("Firebase user is not found");
         }
 
-        firebaseUser.getToken(true)
-                .addOnSuccessListener(new OnSuccessListener<GetTokenResult>() {
-                    @Override
-                    public void onSuccess(GetTokenResult getTokenResult) {
-                        tokenBuffer.append(getTokenResult.getToken());
-                        tokenRequestComplete.countDown();
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@android.support.annotation.NonNull Exception e) {
-                        Timber.e(e, FIREBASE_TOKEN_TASK_FAILED);
-                        tokenRequestComplete.countDown();
-                    }
-                });
+        firebaseUser
+                .getToken(true)
+                .addOnSuccessListener(
+                        new OnSuccessListener<GetTokenResult>() {
+                            @Override
+                            public void onSuccess(GetTokenResult getTokenResult) {
+                                tokenBuffer.append(getTokenResult.getToken());
+                                tokenRequestComplete.countDown();
+                            }
+                        })
+                .addOnFailureListener(
+                        new OnFailureListener() {
+                            @Override
+                            public void onFailure(@android.support.annotation.NonNull Exception e) {
+                                Timber.e(e, FIREBASE_TOKEN_TASK_FAILED);
+                                tokenRequestComplete.countDown();
+                            }
+                        });
 
         try {
             tokenRequestComplete.await(FIREBASE_TOKEN_TIMEOUT_MS, TimeUnit.MILLISECONDS);

@@ -16,9 +16,7 @@
 
 package com.twilio.video;
 
-/**
- * Represents options when adding a {@link LocalAudioTrack}.
- */
+/** Represents options when adding a {@link LocalAudioTrack}. */
 public class AudioOptions {
     public final boolean echoCancellation;
     public final boolean autoGainControl;
@@ -40,20 +38,25 @@ public class AudioOptions {
 
     @Override
     public String toString() {
-        return "AudioOptions{" +
-                "echoCancellation=" + echoCancellation +
-                ", autoGainControl=" + autoGainControl +
-                ", noiseSuppression=" + noiseSuppression +
-                ", highpassFilter=" + highpassFilter +
-                ", stereoSwapping=" + stereoSwapping +
-                ", audioJitterBufferFastAccelerate=" + audioJitterBufferFastAccelerate +
-                ", typingDetection=" + typingDetection +
-                '}';
+        return "AudioOptions{"
+                + "echoCancellation="
+                + echoCancellation
+                + ", autoGainControl="
+                + autoGainControl
+                + ", noiseSuppression="
+                + noiseSuppression
+                + ", highpassFilter="
+                + highpassFilter
+                + ", stereoSwapping="
+                + stereoSwapping
+                + ", audioJitterBufferFastAccelerate="
+                + audioJitterBufferFastAccelerate
+                + ", typingDetection="
+                + typingDetection
+                + '}';
     }
 
-    /**
-     * Builds new {@link AudioOptions}.
-     */
+    /** Builds new {@link AudioOptions}. */
     public static final class Builder {
         private boolean echoCancellation;
         private boolean autoGainControl;
@@ -65,57 +68,43 @@ public class AudioOptions {
 
         public Builder() {}
 
-        /**
-         * Attempts to filter away the output signal from later inbound pickup.
-         */
+        /** Attempts to filter away the output signal from later inbound pickup. */
         public Builder echoCancellation(boolean echoCancellation) {
             this.echoCancellation = echoCancellation;
             return this;
         }
 
-        /**
-         * Adjust the sensitivity of the local mic dynamically.
-         */
+        /** Adjust the sensitivity of the local mic dynamically. */
         public Builder autoGainControl(boolean autoGainControl) {
             this.autoGainControl = autoGainControl;
             return this;
         }
 
-        /**
-         * Filter out background noise.
-         */
+        /** Filter out background noise. */
         public Builder noiseSuppression(boolean noiseSuppression) {
             this.noiseSuppression = noiseSuppression;
             return this;
         }
 
-        /**
-         * Remove background noise of lower frequences.
-         */
+        /** Remove background noise of lower frequences. */
         public Builder highpassFilter(boolean highpassFilter) {
             this.highpassFilter = highpassFilter;
             return this;
         }
 
-        /**
-         * Swap left and right audio channels.
-         */
+        /** Swap left and right audio channels. */
         public Builder stereoSwapping(boolean stereoSwapping) {
             this.stereoSwapping = stereoSwapping;
             return this;
         }
 
-        /**
-         * Enables fast accelerate mode of jitter buffer.
-         */
+        /** Enables fast accelerate mode of jitter buffer. */
         public Builder audioJitterBufferFastAccelerate(boolean audioJitterBufferFastAccelerate) {
             this.audioJitterBufferFastAccelerate = audioJitterBufferFastAccelerate;
             return this;
         }
 
-        /**
-         * Enables typing detection.
-         */
+        /** Enables typing detection. */
         public Builder typingDetection(boolean typingDetection) {
             this.typingDetection = typingDetection;
             return this;

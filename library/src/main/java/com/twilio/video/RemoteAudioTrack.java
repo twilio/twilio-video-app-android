@@ -16,18 +16,14 @@
 
 package com.twilio.video;
 
-/**
- * A remote audio track represents a remote audio source.
- */
+/** A remote audio track represents a remote audio source. */
 public class RemoteAudioTrack extends AudioTrack {
     final org.webrtc.AudioTrack webRtcAudioTrack;
     private final String sid;
     private boolean playbackEnabled;
 
-    RemoteAudioTrack(org.webrtc.AudioTrack webRtcAudioTrack,
-                     String sid,
-                     String name,
-                     boolean isEnabled) {
+    RemoteAudioTrack(
+            org.webrtc.AudioTrack webRtcAudioTrack, String sid, String name, boolean isEnabled) {
         super(isEnabled, name);
         this.sid = sid;
         this.playbackEnabled = true;
@@ -58,8 +54,8 @@ public class RemoteAudioTrack extends AudioTrack {
     /**
      * Check if playback on the remote audio track is enabled.
      *
-     * When the value is false, the remote audio track is muted. When the value is true the remote
-     * audio track is playing.
+     * <p>When the value is false, the remote audio track is muted. When the value is true the
+     * remote audio track is playing.
      *
      * @return true if remote audio is enabled.
      */

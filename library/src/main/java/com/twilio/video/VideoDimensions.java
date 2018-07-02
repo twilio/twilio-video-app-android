@@ -69,10 +69,10 @@ public class VideoDimensions {
     public final int height;
 
     public VideoDimensions(int width, int height) {
-        if(width < 0) {
+        if (width < 0) {
             throw new IllegalStateException("Width must not be less than 0");
         }
-        if(height < 0) {
+        if (height < 0) {
             throw new IllegalStateException("Height must not be less than 0");
         }
         this.width = width;

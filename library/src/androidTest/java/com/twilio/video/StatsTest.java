@@ -16,25 +16,22 @@
 
 package com.twilio.video;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 import android.support.test.InstrumentationRegistry;
 import android.support.test.runner.AndroidJUnit4;
-
 import com.twilio.video.base.BaseStatsTest;
 import com.twilio.video.helper.CallbackHelper;
 import com.twilio.video.util.Topology;
-
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
 
 @RunWith(AndroidJUnit4.class)
 public class StatsTest extends BaseStatsTest {
@@ -73,10 +70,12 @@ public class StatsTest extends BaseStatsTest {
     public void shouldInvokeListenerOnCallingThread() throws InterruptedException {
         // Connect Alice to room with local audio track only
         aliceLocalAudioTrack = LocalAudioTrack.create(mediaTestActivity, true);
-        aliceRoom = createRoom(aliceToken,
-                aliceListener,
-                roomName,
-                Collections.singletonList(aliceLocalAudioTrack));
+        aliceRoom =
+                createRoom(
+                        aliceToken,
+                        aliceListener,
+                        roomName,
+                        Collections.singletonList(aliceLocalAudioTrack));
         aliceListener.onParticipantConnectedLatch = new CountDownLatch(1);
         final CountDownLatch statsCallback = new CountDownLatch(1);
 
@@ -84,20 +83,25 @@ public class StatsTest extends BaseStatsTest {
          * Run on UI thread to avoid thread hopping between the test runner thread and the UI
          * thread.
          */
-        InstrumentationRegistry.getInstrumentation().runOnMainSync(new Runnable() {
-            @Override
-            public void run() {
-                final long callingThreadId = Thread.currentThread().getId();
-                StatsListener statsListener = new StatsListener() {
-                    @Override
-                    public void onStats(List<StatsReport> statsReports) {
-                        assertEquals(callingThreadId, Thread.currentThread().getId());
-                        statsCallback.countDown();
-                    }
-                };
-                aliceRoom.getStats(statsListener);
-            }
-        });
+        InstrumentationRegistry.getInstrumentation()
+                .runOnMainSync(
+                        new Runnable() {
+                            @Override
+                            public void run() {
+                                final long callingThreadId = Thread.currentThread().getId();
+                                StatsListener statsListener =
+                                        new StatsListener() {
+                                            @Override
+                                            public void onStats(List<StatsReport> statsReports) {
+                                                assertEquals(
+                                                        callingThreadId,
+                                                        Thread.currentThread().getId());
+                                                statsCallback.countDown();
+                                            }
+                                        };
+                                aliceRoom.getStats(statsListener);
+                            }
+                        });
 
         assertTrue(statsCallback.await(20, TimeUnit.SECONDS));
     }

@@ -16,23 +16,20 @@
 
 package com.twilio.video;
 
+import static junit.framework.Assert.assertTrue;
+import static junit.framework.TestCase.assertNotNull;
+
 import android.content.Context;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.filters.LargeTest;
 import android.support.test.runner.AndroidJUnit4;
-
 import com.twilio.video.base.BaseVideoTest;
 import com.twilio.video.util.FakeVideoCapturer;
-
+import java.util.Random;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-
-import java.util.Random;
-
-import static junit.framework.Assert.assertTrue;
-import static junit.framework.TestCase.assertNotNull;
 
 @RunWith(AndroidJUnit4.class)
 @LargeTest
@@ -63,7 +60,8 @@ public class MediaFactoryTest extends BaseVideoTest {
 
     @Test(expected = NullPointerException.class)
     public void createVideoTrack_shouldNotAllowNullContext() {
-        mediaFactory.createVideoTrack(null,
+        mediaFactory.createVideoTrack(
+                null,
                 true,
                 new FakeVideoCapturer(),
                 LocalVideoTrack.DEFAULT_VIDEO_CONSTRAINTS,
@@ -72,7 +70,8 @@ public class MediaFactoryTest extends BaseVideoTest {
 
     @Test(expected = NullPointerException.class)
     public void createDataTrack_shouldNotAllowNullContext() {
-        mediaFactory.createDataTrack(null,
+        mediaFactory.createDataTrack(
+                null,
                 true,
                 DataTrackOptions.DEFAULT_MAX_PACKET_LIFE_TIME,
                 DataTrackOptions.DEFAULT_MAX_RETRANSMITS,
@@ -81,10 +80,7 @@ public class MediaFactoryTest extends BaseVideoTest {
 
     @Test
     public void canCreateAudioTrack() {
-        LocalAudioTrack localAudioTrack = mediaFactory.createAudioTrack(context,
-                true,
-                null,
-                null);
+        LocalAudioTrack localAudioTrack = mediaFactory.createAudioTrack(context, true, null, null);
 
         assertNotNull(localAudioTrack);
         localAudioTrack.release();
@@ -92,8 +88,13 @@ public class MediaFactoryTest extends BaseVideoTest {
 
     @Test
     public void canCreateVideoTrack() {
-        LocalVideoTrack localVideoTrack = mediaFactory.createVideoTrack(context, true,
-                new FakeVideoCapturer(), LocalVideoTrack.DEFAULT_VIDEO_CONSTRAINTS, null);
+        LocalVideoTrack localVideoTrack =
+                mediaFactory.createVideoTrack(
+                        context,
+                        true,
+                        new FakeVideoCapturer(),
+                        LocalVideoTrack.DEFAULT_VIDEO_CONSTRAINTS,
+                        null);
 
         assertNotNull(localVideoTrack);
         localVideoTrack.release();
@@ -101,11 +102,13 @@ public class MediaFactoryTest extends BaseVideoTest {
 
     @Test
     public void canCreateDataTrack() {
-        LocalDataTrack localDataTrack = mediaFactory.createDataTrack(context,
-                true,
-                DataTrackOptions.DEFAULT_MAX_PACKET_LIFE_TIME,
-                DataTrackOptions.DEFAULT_MAX_RETRANSMITS,
-                null);
+        LocalDataTrack localDataTrack =
+                mediaFactory.createDataTrack(
+                        context,
+                        true,
+                        DataTrackOptions.DEFAULT_MAX_PACKET_LIFE_TIME,
+                        DataTrackOptions.DEFAULT_MAX_RETRANSMITS,
+                        null);
 
         assertNotNull(localDataTrack);
         localDataTrack.release();
@@ -113,20 +116,21 @@ public class MediaFactoryTest extends BaseVideoTest {
 
     @Test
     public void canCreateMultipleTracks() {
-        LocalAudioTrack localAudioTrack = mediaFactory.createAudioTrack(context,
-                true,
-                null,
-                null);
-        LocalVideoTrack localVideoTrack = mediaFactory.createVideoTrack(context,
-                true,
-                new FakeVideoCapturer(),
-                LocalVideoTrack.DEFAULT_VIDEO_CONSTRAINTS,
-                null);
-        LocalDataTrack localDataTrack = mediaFactory.createDataTrack(context,
-                true,
-                DataTrackOptions.DEFAULT_MAX_PACKET_LIFE_TIME,
-                DataTrackOptions.DEFAULT_MAX_RETRANSMITS,
-                null);
+        LocalAudioTrack localAudioTrack = mediaFactory.createAudioTrack(context, true, null, null);
+        LocalVideoTrack localVideoTrack =
+                mediaFactory.createVideoTrack(
+                        context,
+                        true,
+                        new FakeVideoCapturer(),
+                        LocalVideoTrack.DEFAULT_VIDEO_CONSTRAINTS,
+                        null);
+        LocalDataTrack localDataTrack =
+                mediaFactory.createDataTrack(
+                        context,
+                        true,
+                        DataTrackOptions.DEFAULT_MAX_PACKET_LIFE_TIME,
+                        DataTrackOptions.DEFAULT_MAX_RETRANSMITS,
+                        null);
         assertNotNull(localAudioTrack);
         assertNotNull(localVideoTrack);
         assertNotNull(localDataTrack);
@@ -146,36 +150,36 @@ public class MediaFactoryTest extends BaseVideoTest {
         Track[] tracks = new Track[NUM_TRACKS];
 
         // Create random tracks
-        for (int i = 0 ; i < NUM_TRACKS ; i++) {
+        for (int i = 0; i < NUM_TRACKS; i++) {
             int seed = Math.abs(random.nextInt()) % 3;
 
             switch (seed) {
                 case 0:
-                    tracks[i] = mediaFactory.createAudioTrack(context,
-                            true,
-                            null,
-                            null);
+                    tracks[i] = mediaFactory.createAudioTrack(context, true, null, null);
                     break;
                 case 1:
-                    tracks[i] = mediaFactory.createVideoTrack(context,
-                            true,
-                            new FakeVideoCapturer(),
-                            LocalVideoTrack.DEFAULT_VIDEO_CONSTRAINTS,
-                            null);
+                    tracks[i] =
+                            mediaFactory.createVideoTrack(
+                                    context,
+                                    true,
+                                    new FakeVideoCapturer(),
+                                    LocalVideoTrack.DEFAULT_VIDEO_CONSTRAINTS,
+                                    null);
                     break;
                 case 2:
-                    tracks[i] = mediaFactory.createDataTrack(context,
-                            true,
-                            DataTrackOptions.DEFAULT_MAX_PACKET_LIFE_TIME,
-                            DataTrackOptions.DEFAULT_MAX_RETRANSMITS,
-                            null);
+                    tracks[i] =
+                            mediaFactory.createDataTrack(
+                                    context,
+                                    true,
+                                    DataTrackOptions.DEFAULT_MAX_PACKET_LIFE_TIME,
+                                    DataTrackOptions.DEFAULT_MAX_RETRANSMITS,
+                                    null);
                     break;
-
             }
         }
 
         // Destroy all tracks
-        for (int i = 0 ; i < NUM_TRACKS ; i++) {
+        for (int i = 0; i < NUM_TRACKS; i++) {
             if (tracks[i].getClass() == LocalAudioTrack.class) {
                 LocalAudioTrack localAudioTrack = (LocalAudioTrack) tracks[i];
                 localAudioTrack.release();
@@ -202,36 +206,36 @@ public class MediaFactoryTest extends BaseVideoTest {
         Track[] tracks = new Track[NUM_TRACKS];
 
         // Create random tracks
-        for (int i = 0 ; i < NUM_TRACKS ; i++) {
+        for (int i = 0; i < NUM_TRACKS; i++) {
             int seed = Math.abs(random.nextInt()) % 3;
 
             switch (seed) {
                 case 0:
-                    tracks[i] = mediaFactory.createAudioTrack(context,
-                            true,
-                            null,
-                            null);
+                    tracks[i] = mediaFactory.createAudioTrack(context, true, null, null);
                     break;
                 case 1:
-                    tracks[i] = mediaFactory.createVideoTrack(context,
-                            true,
-                            new FakeVideoCapturer(),
-                            LocalVideoTrack.DEFAULT_VIDEO_CONSTRAINTS,
-                            null);
+                    tracks[i] =
+                            mediaFactory.createVideoTrack(
+                                    context,
+                                    true,
+                                    new FakeVideoCapturer(),
+                                    LocalVideoTrack.DEFAULT_VIDEO_CONSTRAINTS,
+                                    null);
                     break;
                 case 2:
-                    tracks[i] = mediaFactory.createDataTrack(context,
-                            true,
-                            DataTrackOptions.DEFAULT_MAX_PACKET_LIFE_TIME,
-                            DataTrackOptions.DEFAULT_MAX_RETRANSMITS,
-                            null);
+                    tracks[i] =
+                            mediaFactory.createDataTrack(
+                                    context,
+                                    true,
+                                    DataTrackOptions.DEFAULT_MAX_PACKET_LIFE_TIME,
+                                    DataTrackOptions.DEFAULT_MAX_RETRANSMITS,
+                                    null);
                     break;
-
             }
         }
 
         // Destroy all tracks
-        for (int i = 0 ; i < NUM_TRACKS ; i++) {
+        for (int i = 0; i < NUM_TRACKS; i++) {
             if (tracks[i].getClass() == LocalAudioTrack.class) {
                 LocalAudioTrack localAudioTrack = (LocalAudioTrack) tracks[i];
                 localAudioTrack.release();
@@ -250,7 +254,8 @@ public class MediaFactoryTest extends BaseVideoTest {
         mediaFactory.release(this);
 
         // With all tracks and test itself released this should raise exception
-        mediaFactory.createVideoTrack(context,
+        mediaFactory.createVideoTrack(
+                context,
                 true,
                 new FakeVideoCapturer(),
                 LocalVideoTrack.DEFAULT_VIDEO_CONSTRAINTS,
@@ -262,36 +267,36 @@ public class MediaFactoryTest extends BaseVideoTest {
         Track[] tracks = new Track[NUM_TRACKS];
 
         // Create random tracks
-        for (int i = 0 ; i < NUM_TRACKS ; i++) {
+        for (int i = 0; i < NUM_TRACKS; i++) {
             int seed = Math.abs(random.nextInt()) % 3;
 
             switch (seed) {
                 case 0:
-                    tracks[i] = mediaFactory.createAudioTrack(context,
-                            true,
-                            null,
-                            null);
+                    tracks[i] = mediaFactory.createAudioTrack(context, true, null, null);
                     break;
                 case 1:
-                    tracks[i] = mediaFactory.createVideoTrack(context,
-                            true,
-                            new FakeVideoCapturer(),
-                            LocalVideoTrack.DEFAULT_VIDEO_CONSTRAINTS,
-                            null);
+                    tracks[i] =
+                            mediaFactory.createVideoTrack(
+                                    context,
+                                    true,
+                                    new FakeVideoCapturer(),
+                                    LocalVideoTrack.DEFAULT_VIDEO_CONSTRAINTS,
+                                    null);
                     break;
                 case 2:
-                    tracks[i] = mediaFactory.createDataTrack(context,
-                            true,
-                            DataTrackOptions.DEFAULT_MAX_PACKET_LIFE_TIME,
-                            DataTrackOptions.DEFAULT_MAX_RETRANSMITS,
-                            null);
+                    tracks[i] =
+                            mediaFactory.createDataTrack(
+                                    context,
+                                    true,
+                                    DataTrackOptions.DEFAULT_MAX_PACKET_LIFE_TIME,
+                                    DataTrackOptions.DEFAULT_MAX_RETRANSMITS,
+                                    null);
                     break;
-
             }
         }
 
         // Destroy all tracks
-        for (int i = 0 ; i < NUM_TRACKS ; i++) {
+        for (int i = 0; i < NUM_TRACKS; i++) {
             if (tracks[i].getClass() == LocalAudioTrack.class) {
                 LocalAudioTrack localAudioTrack = (LocalAudioTrack) tracks[i];
                 localAudioTrack.release();
@@ -310,7 +315,8 @@ public class MediaFactoryTest extends BaseVideoTest {
         mediaFactory.release(this);
 
         // With all tracks and test itself released this should raise exception
-        mediaFactory.createDataTrack(context,
+        mediaFactory.createDataTrack(
+                context,
                 true,
                 DataTrackOptions.DEFAULT_MAX_PACKET_LIFE_TIME,
                 DataTrackOptions.DEFAULT_MAX_RETRANSMITS,
@@ -320,7 +326,7 @@ public class MediaFactoryTest extends BaseVideoTest {
     @Test
     public void canCreateAndReleaseRepeatedly() {
         int numIterations = 100;
-        for (int i = 0 ; i < numIterations ; i++) {
+        for (int i = 0; i < numIterations; i++) {
             MediaFactory mediaFactory = MediaFactory.instance(this, context);
             mediaFactory.release(this);
         }

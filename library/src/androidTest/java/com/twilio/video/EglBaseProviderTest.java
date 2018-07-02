@@ -16,17 +16,15 @@
 
 package com.twilio.video;
 
+import static junit.framework.Assert.assertNotNull;
+
 import android.support.test.runner.AndroidJUnit4;
-
 import com.twilio.video.base.BaseVideoTest;
-
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-
-import static junit.framework.Assert.assertNotNull;
 
 @RunWith(AndroidJUnit4.class)
 public class EglBaseProviderTest extends BaseVideoTest {
@@ -122,11 +120,11 @@ public class EglBaseProviderTest extends BaseVideoTest {
         EglBaseProvider[] eglBaseProviders = getEglBaseProviders(owners);
 
         // Release EGL base providers
-        for (int i = 0 ; i < NUM_EGL_PROVIDERS ; i++) {
+        for (int i = 0; i < NUM_EGL_PROVIDERS; i++) {
             eglBaseProviders[i].release(owners[i]);
 
             // Other egl provider owners should still be able to get root egl base
-            for (int j = i + 1 ; j < NUM_EGL_PROVIDERS ; j++) {
+            for (int j = i + 1; j < NUM_EGL_PROVIDERS; j++) {
                 assertNotNull(eglBaseProviders[j].getRootEglBase());
             }
         }
@@ -138,11 +136,11 @@ public class EglBaseProviderTest extends BaseVideoTest {
         EglBaseProvider[] eglBaseProviders = getEglBaseProviders(owners);
 
         // Release EGL base providers
-        for (int i = 0 ; i < NUM_EGL_PROVIDERS ; i++) {
+        for (int i = 0; i < NUM_EGL_PROVIDERS; i++) {
             eglBaseProviders[i].release(owners[i]);
 
             // Other egl provider owners should still be able to get local egl base
-            for (int j = i + 1 ; j < NUM_EGL_PROVIDERS ; j++) {
+            for (int j = i + 1; j < NUM_EGL_PROVIDERS; j++) {
                 assertNotNull(eglBaseProviders[j].getLocalEglBase());
             }
         }
@@ -154,11 +152,11 @@ public class EglBaseProviderTest extends BaseVideoTest {
         EglBaseProvider[] eglBaseProviders = getEglBaseProviders(owners);
 
         // Release EGL base providers
-        for (int i = 0 ; i < NUM_EGL_PROVIDERS ; i++) {
+        for (int i = 0; i < NUM_EGL_PROVIDERS; i++) {
             eglBaseProviders[i].release(owners[i]);
 
             // Other egl provider owners should still be able to get remote egl base
-            for (int j = i + 1 ; j < NUM_EGL_PROVIDERS ; j++) {
+            for (int j = i + 1; j < NUM_EGL_PROVIDERS; j++) {
                 assertNotNull(eglBaseProviders[j].getRemoteEglBase());
             }
         }
@@ -170,14 +168,14 @@ public class EglBaseProviderTest extends BaseVideoTest {
         EglBaseProvider[] eglBaseProviders = getEglBaseProviders(owners);
 
         // Release EGL base providers
-        for (int i = 0 ; i < NUM_EGL_PROVIDERS ; i++) {
+        for (int i = 0; i < NUM_EGL_PROVIDERS; i++) {
             // Purposefully release egl base provider more than once
-            for (int j = 0 ; j < NUM_EGL_PROVIDERS + 1 ; j++) {
+            for (int j = 0; j < NUM_EGL_PROVIDERS + 1; j++) {
                 eglBaseProviders[i].release(owners[i]);
             }
 
             // Other egl provider owners should still be able to get root egl base
-            for (int j = i + 1 ; j < NUM_EGL_PROVIDERS ; j++) {
+            for (int j = i + 1; j < NUM_EGL_PROVIDERS; j++) {
                 assertNotNull(eglBaseProviders[j].getRootEglBase());
             }
         }
@@ -189,14 +187,14 @@ public class EglBaseProviderTest extends BaseVideoTest {
         EglBaseProvider[] eglBaseProviders = getEglBaseProviders(owners);
 
         // Release EGL base providers
-        for (int i = 0 ; i < NUM_EGL_PROVIDERS ; i++) {
+        for (int i = 0; i < NUM_EGL_PROVIDERS; i++) {
             // Purposefully release egl base provider more than once
-            for (int j = 0 ; j < NUM_EGL_PROVIDERS + 1 ; j++) {
+            for (int j = 0; j < NUM_EGL_PROVIDERS + 1; j++) {
                 eglBaseProviders[i].release(owners[i]);
             }
 
             // Other egl provider owners should still be able to get local egl base
-            for (int j = i + 1 ; j < NUM_EGL_PROVIDERS ; j++) {
+            for (int j = i + 1; j < NUM_EGL_PROVIDERS; j++) {
                 assertNotNull(eglBaseProviders[j].getLocalEglBase());
             }
         }
@@ -208,14 +206,14 @@ public class EglBaseProviderTest extends BaseVideoTest {
         EglBaseProvider[] eglBaseProviders = getEglBaseProviders(owners);
 
         // Release EGL base providers
-        for (int i = 0 ; i < NUM_EGL_PROVIDERS ; i++) {
+        for (int i = 0; i < NUM_EGL_PROVIDERS; i++) {
             // Purposefully release egl base provider more than once
-            for (int j = 0 ; j < NUM_EGL_PROVIDERS + 1 ; j++) {
+            for (int j = 0; j < NUM_EGL_PROVIDERS + 1; j++) {
                 eglBaseProviders[i].release(owners[i]);
             }
 
             // Other egl provider owners should still be able to get remote egl base
-            for (int j = i + 1 ; j < NUM_EGL_PROVIDERS ; j++) {
+            for (int j = i + 1; j < NUM_EGL_PROVIDERS; j++) {
                 assertNotNull(eglBaseProviders[j].getRemoteEglBase());
             }
         }
@@ -224,7 +222,7 @@ public class EglBaseProviderTest extends BaseVideoTest {
     private Object[] getEglBaseProviderOwners(int numEglBaseProviderOwners) {
         Object[] owners = new Object[numEglBaseProviderOwners];
 
-        for (int i = 0 ; i < numEglBaseProviderOwners ; i++) {
+        for (int i = 0; i < numEglBaseProviderOwners; i++) {
             owners[i] = new Object();
         }
 
@@ -234,16 +232,16 @@ public class EglBaseProviderTest extends BaseVideoTest {
     private EglBaseProvider[] getEglBaseProviders(Object[] eglBaseProviderOwners) {
         EglBaseProvider[] eglBaseProviders = new EglBaseProvider[eglBaseProviderOwners.length];
 
-        for (int i = 0 ; i < eglBaseProviderOwners.length ; i++) {
+        for (int i = 0; i < eglBaseProviderOwners.length; i++) {
             eglBaseProviders[i] = EglBaseProvider.instance(eglBaseProviderOwners[i]);
         }
 
         return eglBaseProviders;
     }
 
-    private void releaseEglBaseProviders(Object[] eglBaseProviderOwners,
-                                         EglBaseProvider[] eglBaseProviders) {
-        for (int i = 0; i < eglBaseProviderOwners.length ; i++) {
+    private void releaseEglBaseProviders(
+            Object[] eglBaseProviderOwners, EglBaseProvider[] eglBaseProviders) {
+        for (int i = 0; i < eglBaseProviderOwners.length; i++) {
             eglBaseProviders[i].release(eglBaseProviderOwners[i]);
         }
     }

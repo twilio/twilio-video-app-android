@@ -10,13 +10,13 @@
 - [License](#license)
 
 
-[Programmable Video](https://www.twilio.com/video) provides developers with the infrastructure 
-and APIs to build WebRTC applications. The Android Video SDK allows developers to integrate 
+[Programmable Video](https://www.twilio.com/video) provides developers with the infrastructure
+and APIs to build WebRTC applications. The Android Video SDK allows developers to integrate
 multi-party voice and video calling into an Android app. This project contains the source for the
 SDK along with a canonical app that demonstrates the platform's capabilities. For developers
 interested in an introduction to the Video Android SDK, we recommend visiting the [Twilio
-Video Quickstart for Android](https://github.com/twilio/video-quickstart-android) which contains 
-step-by-step instructions for building a simple Android video application along with a few examples 
+Video Quickstart for Android](https://github.com/twilio/video-quickstart-android) which contains
+step-by-step instructions for building a simple Android video application along with a few examples
 of how the SDK can be used.
 
 _Sections of this document pertain only to developers that work at Twilio aka "Twilions". If you are not a Twilion please ignore these sections._
@@ -45,8 +45,8 @@ Android SDK contains native C and C++ code that uses the Twilio Video C++ SDK. T
       * [Internal Debug (default)](https://console.firebase.google.com/project/video-app-79418/settings/general/android:com.twilio.video.app.internal.debug) - Download to `app/src/internal/debug`
       * [Internal Release](https://console.firebase.google.com/project/video-app-79418/settings/general/android:com.twilio.video.app.internal) - Download to `app/src/internal/release`
       * [Twilio Release](https://console.firebase.google.com/project/video-app-79418/settings/general/android:com.twilio.video.app) - Download to `app/src/twilio/release`
-1.  Setup your Programmable Video credentials. Credentials are required to run the SDK 
-instrumentation tests and certain app flavors. The credentials in this project are managed 
+1.  Setup your Programmable Video credentials. Credentials are required to run the SDK
+instrumentation tests and certain app flavors. The credentials in this project are managed
 using JSON files. The table below provides a short summary of required credentials:
 
     Credential | JSON Key | Description
@@ -61,7 +61,7 @@ using JSON files. The table below provides a short summary of required credentia
     credentials into a client side app should not be done in production
     apps. This practice is only acceptable for development and testing
     purposes.**
-    
+
     ```
     {
       "credentials": {
@@ -92,10 +92,10 @@ using JSON files. The table below provides a short summary of required credentia
     }
     ```
     #### Setting up Bintray for Twilions
-    Building with release candidate or snapshot artifacts requires access to private 
+    Building with release candidate or snapshot artifacts requires access to private
     Bintray repositories. Add the following lines to your local.properties file to enable
-    downloading from private repositories: 
-    
+    downloading from private repositories:
+
     ```
     BINTRAY_USERNAME=your-bintray-username
     BINTRAY_PASSWORD=your-bintray-apikey
@@ -108,19 +108,19 @@ using JSON files. The table below provides a short summary of required credentia
 This is only applicable for **Twilions**. Accessing dev or stage requires VPN.
 * **library**: The Android SDK that provides the Java classes and interfaces used
 by Android developers to perform multi-party voice and video calling
-* **token**: A utility module for generating Video Access Tokens. **This module is intended to be 
-used for testing and local development purposes only. Do not build an application that 
-generates access tokens locally. Please follow the 
+* **token**: A utility module for generating Video Access Tokens. **This module is intended to be
+used for testing and local development purposes only. Do not build an application that
+generates access tokens locally. Please follow the
  [User Identity and Access Tokens guide](https://www.twilio.com/docs/api/video/identity) for proper
- instructions. Putting your Account SID, API Key, and API Key Secret inside 
- of an Android application will compromise your Twilio API credentials associated with your Twilio 
+ instructions. Putting your Account SID, API Key, and API Key Secret inside
+ of an Android application will compromise your Twilio API credentials associated with your Twilio
  account.**
 * **twilioapi**: A utility module for using the Twilio REST API to get ice servers
 * **apkscale**: A utility app module for determining the size impact of the Video Android SDK
 
 ## Video App
 
-The Video App demonstrates a multi-party voice and video application built with the Android 
+The Video App demonstrates a multi-party voice and video application built with the Android
 SDK. The application consists of the following [product flavors](http://tools.android.com/tech-docs/new-build-system/user-guide#TOC-Product-flavors):
 
 1. Internal - The application intended for internal testing and QA at Twilio. _This variant can only be built by Twilions._
@@ -128,14 +128,14 @@ SDK. The application consists of the following [product flavors](http://tools.an
 1. Community - The application intended for developers interested in using Programmable Video. _This variant can be built by all developers._
 
 ### Building the Community Flavor
-The community flavor of the application is meant for developers who would like to work with the 
-Android SDK in the context of a full-fledged application without needing to bother with implementing 
+The community flavor of the application is meant for developers who would like to work with the
+Android SDK in the context of a full-fledged application without needing to bother with implementing
 authentication and managing a token server. **This variant generates access tokens locally within
-the application. This practice is intended for local development and is not encouraged for your 
-applications. Please follow the 
+the application. This practice is intended for local development and is not encouraged for your
+applications. Please follow the
 [User Identity and Access Tokens guide](https://www.twilio.com/docs/api/video/identity) for proper
-token generation instructions in your application. Putting your Account SID, 
-API Key, and API Key Secret inside of an Android application will compromise your Twilio API 
+token generation instructions in your application. Putting your Account SID,
+API Key, and API Key Secret inside of an Android application will compromise your Twilio API
 credentials associated with your Twilio account.**
 
 To get started with the community flavor follow these steps:
@@ -145,16 +145,16 @@ To get started with the community flavor follow these steps:
 2. In Android Studio navigate to View → Tool Windows → Build Variants.
 
     <img width="700px" src="images/community-variant/build-variants.png"/>
-  
+
 3. Select the `communityDebug` Build Variant under the app module.
 
     <img width="700px" src="images/community-variant/community-debug-variant.png"/>
-  
+
 4. Run the application.
 
 ### HockeyApp
-The internal release flavor of the application requires setting the project property `hockeyAppId` 
-to register for application updates. The following snippet demonstrates how to build an internal 
+The internal release flavor of the application requires setting the project property `hockeyAppId`
+to register for application updates. The following snippet demonstrates how to build an internal
 release with a Hockey App ID.
 
 `./gradlew -PhockeyAppId=1234 app:assembleInternalRelease`
@@ -203,7 +203,7 @@ be sure to check the following:
 - Ensure that your Twilio account has sufficient funds.
 - Check that your device is connected to the internet.
 
-If you continue to experience test failures please 
+If you continue to experience test failures please
 [open an issue](https://github.com/twilio/twilio-video-android/issues).
 
 ### Switching Server Environments (Twilions only)
@@ -218,11 +218,11 @@ Twilions can execute the tests in different server environments by performing th
         "account_sid": "AC00000000000000000000000000000000",
         "api_key": "SK00000000000000000000000000000000",
         "api_key_secret": "00000000000000000000000000000000",
-        
+
         "dev_account_sid": "AC00000000000000000000000000000000",
         "dev_api_key": "SK00000000000000000000000000000000",
         "dev_api_key_secret": "00000000000000000000000000000000",
-        
+
         "stage_account_sid": "AC00000000000000000000000000000000",
         "stage_api_key": "SK00000000000000000000000000000000",
         "stage_api_key_secret": "00000000000000000000000000000000"
@@ -242,7 +242,7 @@ Perform the following steps to setup an emulator that works with the SDK and app
   <img width="700px" src="images/emulator/emulator_select_hardware.png"/>
 4. Select a system image. We recommend either x86 or x86_64 images.
   <img width="700px" src="images/emulator/emulator_select_image.png"/>
-5. Click "Show Advanced Settings" and we recommend setting both cameras as "Emulated". Note that other camera configurations will work with the exception of setting both cameras as "webcam()". 
+5. Click "Show Advanced Settings" and we recommend setting both cameras as "Emulated". Note that other camera configurations will work with the exception of setting both cameras as "webcam()".
   <img width="700px" src="images/emulator/emulator_avd_settings.png"/>
 6. Configure the rest of your device accordingly and click "Finish".
 
@@ -278,7 +278,7 @@ This project adheres to the Contributor Covenant [Code of Conduct](CODE_OF_CONDU
 participating, you are expected to uphold this code. Please report unacceptable behavior to
 [video-conduct@twilio.com](mailto:video-conduct@twilio.com).
 
-## License 
+## License
 
     Copyright 2017 Twilio, Inc.
 

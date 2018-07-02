@@ -26,37 +26,39 @@ import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Spinner;
-
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.Unbinder;
 import com.twilio.video.app.R;
 import com.twilio.video.app.adapter.IceServerAdapter;
 import com.twilio.video.app.model.TwilioIceServer;
 import com.twilio.video.app.util.IceOptionsHelper;
-
 import java.util.ArrayList;
 import java.util.List;
 
-import butterknife.BindView;
-import butterknife.ButterKnife;
-import butterknife.Unbinder;
-
-public class IceServersDialogFragment extends AppCompatDialogFragment{
+public class IceServersDialogFragment extends AppCompatDialogFragment {
 
     public interface Listener {
         void onIceOptionsSelected(String iceTransportPolicy, List<TwilioIceServer> selectedServers);
+
         void onIceOptionsCancel();
     }
 
     private List<TwilioIceServer> iceServers;
-    @BindView(R.id.ice_trans_policy_spinner) Spinner iceTransPolicySpinner;
-    @BindView(R.id.ice_servers_list_view) ListView iceServersListView;
+
+    @BindView(R.id.ice_trans_policy_spinner)
+    Spinner iceTransPolicySpinner;
+
+    @BindView(R.id.ice_servers_list_view)
+    ListView iceServersListView;
+
     private List<TwilioIceServer> selectedServers = new ArrayList<>();
     private SparseBooleanArray checkedItems;
     private Listener listener;
     private Unbinder unbinder;
 
-
     public void setIceServers(List<TwilioIceServer> iceServers) {
-       this.iceServers = iceServers;
+        this.iceServers = iceServers;
     }
 
     public void setListener(Listener listener) {
@@ -70,13 +72,14 @@ public class IceServersDialogFragment extends AppCompatDialogFragment{
         View iceOptionsView = inflater.inflate(R.layout.ice_options_layout, null);
         unbinder = ButterKnife.bind(this, iceOptionsView);
 
-        IceServerAdapter iceServerAdapter =
-                new IceServerAdapter(getActivity(), iceServers);
+        IceServerAdapter iceServerAdapter = new IceServerAdapter(getActivity(), iceServers);
         iceServersListView.setAdapter(iceServerAdapter);
 
-
-        ArrayAdapter<CharSequence> iceTransPolicyArrayAdapter = ArrayAdapter.createFromResource(
-                getActivity(), R.array.ice_trans_policy_array, android.R.layout.simple_spinner_item);
+        ArrayAdapter<CharSequence> iceTransPolicyArrayAdapter =
+                ArrayAdapter.createFromResource(
+                        getActivity(),
+                        R.array.ice_trans_policy_array,
+                        android.R.layout.simple_spinner_item);
         iceTransPolicyArrayAdapter.setDropDownViewResource(
                 android.R.layout.simple_spinner_dropdown_item);
         iceTransPolicySpinner.setAdapter(iceTransPolicyArrayAdapter);
@@ -102,12 +105,11 @@ public class IceServersDialogFragment extends AppCompatDialogFragment{
     private void setCheckedItems() {
         if (iceServersListView != null && checkedItems != null) {
             int len = iceServersListView.getCount();
-            for (int i=0; i < len; i++) {
+            for (int i = 0; i < len; i++) {
                 iceServersListView.setItemChecked(i, checkedItems.get(i));
             }
         }
     }
-
 
     private DialogInterface.OnClickListener dialogPositiveButtonClickListener() {
         return new DialogInterface.OnClickListener() {
@@ -139,6 +141,4 @@ public class IceServersDialogFragment extends AppCompatDialogFragment{
             }
         };
     }
-
-
 }

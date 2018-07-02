@@ -206,8 +206,7 @@ final class Preconditions {
      *
      * <p>See {@link #checkArgument(boolean, String, Object...)} for details.
      */
-    static void checkArgument(
-            boolean b, @Nullable String errorMessageTemplate, char p1, char p2) {
+    static void checkArgument(boolean b, @Nullable String errorMessageTemplate, char p1, char p2) {
         if (!b) {
             throw new IllegalArgumentException(format(errorMessageTemplate, p1, p2));
         }
@@ -218,8 +217,7 @@ final class Preconditions {
      *
      * <p>See {@link #checkArgument(boolean, String, Object...)} for details.
      */
-    static void checkArgument(
-            boolean b, @Nullable String errorMessageTemplate, char p1, int p2) {
+    static void checkArgument(boolean b, @Nullable String errorMessageTemplate, char p1, int p2) {
         if (!b) {
             throw new IllegalArgumentException(format(errorMessageTemplate, p1, p2));
         }
@@ -230,8 +228,7 @@ final class Preconditions {
      *
      * <p>See {@link #checkArgument(boolean, String, Object...)} for details.
      */
-    static void checkArgument(
-            boolean b, @Nullable String errorMessageTemplate, char p1, long p2) {
+    static void checkArgument(boolean b, @Nullable String errorMessageTemplate, char p1, long p2) {
         if (!b) {
             throw new IllegalArgumentException(format(errorMessageTemplate, p1, p2));
         }
@@ -254,8 +251,7 @@ final class Preconditions {
      *
      * <p>See {@link #checkArgument(boolean, String, Object...)} for details.
      */
-    static void checkArgument(
-            boolean b, @Nullable String errorMessageTemplate, int p1, char p2) {
+    static void checkArgument(boolean b, @Nullable String errorMessageTemplate, int p1, char p2) {
         if (!b) {
             throw new IllegalArgumentException(format(errorMessageTemplate, p1, p2));
         }
@@ -266,8 +262,7 @@ final class Preconditions {
      *
      * <p>See {@link #checkArgument(boolean, String, Object...)} for details.
      */
-    static void checkArgument(
-            boolean b, @Nullable String errorMessageTemplate, int p1, int p2) {
+    static void checkArgument(boolean b, @Nullable String errorMessageTemplate, int p1, int p2) {
         if (!b) {
             throw new IllegalArgumentException(format(errorMessageTemplate, p1, p2));
         }
@@ -278,8 +273,7 @@ final class Preconditions {
      *
      * <p>See {@link #checkArgument(boolean, String, Object...)} for details.
      */
-    static void checkArgument(
-            boolean b, @Nullable String errorMessageTemplate, int p1, long p2) {
+    static void checkArgument(boolean b, @Nullable String errorMessageTemplate, int p1, long p2) {
         if (!b) {
             throw new IllegalArgumentException(format(errorMessageTemplate, p1, p2));
         }
@@ -302,8 +296,7 @@ final class Preconditions {
      *
      * <p>See {@link #checkArgument(boolean, String, Object...)} for details.
      */
-    static void checkArgument(
-            boolean b, @Nullable String errorMessageTemplate, long p1, char p2) {
+    static void checkArgument(boolean b, @Nullable String errorMessageTemplate, long p1, char p2) {
         if (!b) {
             throw new IllegalArgumentException(format(errorMessageTemplate, p1, p2));
         }
@@ -314,8 +307,7 @@ final class Preconditions {
      *
      * <p>See {@link #checkArgument(boolean, String, Object...)} for details.
      */
-    static void checkArgument(
-            boolean b, @Nullable String errorMessageTemplate, long p1, int p2) {
+    static void checkArgument(boolean b, @Nullable String errorMessageTemplate, long p1, int p2) {
         if (!b) {
             throw new IllegalArgumentException(format(errorMessageTemplate, p1, p2));
         }
@@ -326,8 +318,7 @@ final class Preconditions {
      *
      * <p>See {@link #checkArgument(boolean, String, Object...)} for details.
      */
-    static void checkArgument(
-            boolean b, @Nullable String errorMessageTemplate, long p1, long p2) {
+    static void checkArgument(boolean b, @Nullable String errorMessageTemplate, long p1, long p2) {
         if (!b) {
             throw new IllegalArgumentException(format(errorMessageTemplate, p1, p2));
         }
@@ -387,7 +378,10 @@ final class Preconditions {
      * <p>See {@link #checkArgument(boolean, String, Object...)} for details.
      */
     static void checkArgument(
-            boolean b, @Nullable String errorMessageTemplate, @Nullable Object p1, @Nullable Object p2) {
+            boolean b,
+            @Nullable String errorMessageTemplate,
+            @Nullable Object p1,
+            @Nullable Object p2) {
         if (!b) {
             throw new IllegalArgumentException(format(errorMessageTemplate, p1, p2));
         }
@@ -521,8 +515,7 @@ final class Preconditions {
      *
      * <p>See {@link #checkState(boolean, String, Object...)} for details.
      */
-    static void checkState(
-            boolean b, @Nullable String errorMessageTemplate, @Nullable Object p1) {
+    static void checkState(boolean b, @Nullable String errorMessageTemplate, @Nullable Object p1) {
         if (!b) {
             throw new IllegalStateException(format(errorMessageTemplate, p1));
         }
@@ -534,8 +527,7 @@ final class Preconditions {
      *
      * <p>See {@link #checkState(boolean, String, Object...)} for details.
      */
-    static void checkState(
-            boolean b, @Nullable String errorMessageTemplate, char p1, char p2) {
+    static void checkState(boolean b, @Nullable String errorMessageTemplate, char p1, char p2) {
         if (!b) {
             throw new IllegalStateException(format(errorMessageTemplate, p1, p2));
         }
@@ -559,8 +551,7 @@ final class Preconditions {
      *
      * <p>See {@link #checkState(boolean, String, Object...)} for details.
      */
-    static void checkState(
-            boolean b, @Nullable String errorMessageTemplate, char p1, long p2) {
+    static void checkState(boolean b, @Nullable String errorMessageTemplate, char p1, long p2) {
         if (!b) {
             throw new IllegalStateException(format(errorMessageTemplate, p1, p2));
         }
@@ -634,8 +625,7 @@ final class Preconditions {
      *
      * <p>See {@link #checkState(boolean, String, Object...)} for details.
      */
-    static void checkState(
-            boolean b, @Nullable String errorMessageTemplate, long p1, char p2) {
+    static void checkState(boolean b, @Nullable String errorMessageTemplate, long p1, char p2) {
         if (!b) {
             throw new IllegalStateException(format(errorMessageTemplate, p1, p2));
         }
@@ -659,8 +649,7 @@ final class Preconditions {
      *
      * <p>See {@link #checkState(boolean, String, Object...)} for details.
      */
-    static void checkState(
-            boolean b, @Nullable String errorMessageTemplate, long p1, long p2) {
+    static void checkState(boolean b, @Nullable String errorMessageTemplate, long p1, long p2) {
         if (!b) {
             throw new IllegalStateException(format(errorMessageTemplate, p1, p2));
         }
@@ -725,7 +714,10 @@ final class Preconditions {
      * <p>See {@link #checkState(boolean, String, Object...)} for details.
      */
     static void checkState(
-            boolean b, @Nullable String errorMessageTemplate, @Nullable Object p1, @Nullable Object p2) {
+            boolean b,
+            @Nullable String errorMessageTemplate,
+            @Nullable Object p1,
+            @Nullable Object p2) {
         if (!b) {
             throw new IllegalStateException(format(errorMessageTemplate, p1, p2));
         }
@@ -811,7 +803,9 @@ final class Preconditions {
      * @throws NullPointerException if {@code reference} is null
      */
     static <T> T checkNotNull(
-            T reference, @Nullable String errorMessageTemplate, @Nullable Object... errorMessageArgs) {
+            T reference,
+            @Nullable String errorMessageTemplate,
+            @Nullable Object... errorMessageArgs) {
         if (reference == null) {
             // If either of these parameters is null, the right thing happens anyway
             throw new NullPointerException(format(errorMessageTemplate, errorMessageArgs));
@@ -860,8 +854,7 @@ final class Preconditions {
      *
      * <p>See {@link #checkNotNull(Object, String, Object...)} for details.
      */
-    static <T> T checkNotNull(
-            T obj, @Nullable String errorMessageTemplate, @Nullable Object p1) {
+    static <T> T checkNotNull(T obj, @Nullable String errorMessageTemplate, @Nullable Object p1) {
         if (obj == null) {
             throw new NullPointerException(format(errorMessageTemplate, p1));
         }
@@ -1060,7 +1053,10 @@ final class Preconditions {
      * <p>See {@link #checkNotNull(Object, String, Object...)} for details.
      */
     static <T> T checkNotNull(
-            T obj, @Nullable String errorMessageTemplate, @Nullable Object p1, @Nullable Object p2) {
+            T obj,
+            @Nullable String errorMessageTemplate,
+            @Nullable Object p1,
+            @Nullable Object p2) {
         if (obj == null) {
             throw new NullPointerException(format(errorMessageTemplate, p1, p2));
         }
@@ -1102,31 +1098,31 @@ final class Preconditions {
         return obj;
     }
 
-  /*
-   * All recent hotspots (as of 2009) *really* like to have the natural code
-   *
-   * if (guardExpression) {
-   *    throw new BadException(messageExpression);
-   * }
-   *
-   * refactored so that messageExpression is moved to a separate String-returning method.
-   *
-   * if (guardExpression) {
-   *    throw new BadException(badMsg(...));
-   * }
-   *
-   * The alternative natural refactorings into void or Exception-returning methods are much slower.
-   * This is a big deal - we're talking factors of 2-8 in microbenchmarks, not just 10-20%. (This is
-   * a hotspot optimizer bug, which should be fixed, but that's a separate, big project).
-   *
-   * The coding pattern above is heavily used in java.util, e.g. in ArrayList. There is a
-   * RangeCheckMicroBenchmark in the JDK that was used to test this.
-   *
-   * But the methods in this class want to throw different exceptions, depending on the args, so it
-   * appears that this pattern is not directly applicable. But we can use the ridiculous, devious
-   * trick of throwing an exception in the middle of the construction of another exception. Hotspot
-   * is fine with that.
-   */
+    /*
+     * All recent hotspots (as of 2009) *really* like to have the natural code
+     *
+     * if (guardExpression) {
+     *    throw new BadException(messageExpression);
+     * }
+     *
+     * refactored so that messageExpression is moved to a separate String-returning method.
+     *
+     * if (guardExpression) {
+     *    throw new BadException(badMsg(...));
+     * }
+     *
+     * The alternative natural refactorings into void or Exception-returning methods are much slower.
+     * This is a big deal - we're talking factors of 2-8 in microbenchmarks, not just 10-20%. (This is
+     * a hotspot optimizer bug, which should be fixed, but that's a separate, big project).
+     *
+     * The coding pattern above is heavily used in java.util, e.g. in ArrayList. There is a
+     * RangeCheckMicroBenchmark in the JDK that was used to test this.
+     *
+     * But the methods in this class want to throw different exceptions, depending on the args, so it
+     * appears that this pattern is not directly applicable. But we can use the ridiculous, devious
+     * trick of throwing an exception in the middle of the construction of another exception. Hotspot
+     * is fine with that.
+     */
 
     /*
      * Ensures that {@code index} specifies a valid <i>element</i> in an array, list or string of size

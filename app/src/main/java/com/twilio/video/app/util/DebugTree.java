@@ -17,7 +17,6 @@
 package com.twilio.video.app.util;
 
 import android.util.Log;
-
 import timber.log.Timber;
 
 public class DebugTree extends Timber.DebugTree {

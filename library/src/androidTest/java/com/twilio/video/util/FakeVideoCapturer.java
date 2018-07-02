@@ -16,26 +16,24 @@
 
 package com.twilio.video.util;
 
+import static junit.framework.TestCase.fail;
+
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.SystemClock;
-
+import com.twilio.video.VideoCapturer;
 import com.twilio.video.VideoDimensions;
 import com.twilio.video.VideoFormat;
-import com.twilio.video.VideoCapturer;
 import com.twilio.video.VideoFrame;
 import com.twilio.video.VideoPixelFormat;
-
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
-
-import static junit.framework.TestCase.fail;
 
 public class FakeVideoCapturer implements VideoCapturer {
     private static final long FRAMERATE_MS = 33;
@@ -45,36 +43,37 @@ public class FakeVideoCapturer implements VideoCapturer {
     private VideoCapturer.Listener capturerListener;
     private FakeCapturerThread fakeCapturerThread;
     private Handler fakeVideoCapturerHandler;
-    private final int[] colors = new int[] {
-            Color.RED,
-            Color.GREEN,
-            Color.BLUE
-    };
+    private final int[] colors = new int[] {Color.RED, Color.GREEN, Color.BLUE};
     private int frameCounter = 0;
     private int colorIndex = 0;
-    private final Runnable frameGenerator = new Runnable() {
-        @Override
-        public void run() {
-            Bitmap bitmap = Bitmap.createBitmap(captureFormat.dimensions.width,
-                    captureFormat.dimensions.height,
-                    Bitmap.Config.ARGB_8888);
-            bitmap.eraseColor(getAndUpdateColor());
-            ByteBuffer buffer = ByteBuffer.allocateDirect(bitmap.getByteCount());
-            bitmap.copyPixelsToBuffer(buffer);
-            final long captureTimeNs =
-                    TimeUnit.MILLISECONDS.toNanos(SystemClock.elapsedRealtime());
-            VideoFrame videoFrame = new VideoFrame(buffer.array(),
-                    captureFormat.dimensions,
-                    rotationAngle,
-                    captureTimeNs);
+    private final Runnable frameGenerator =
+            new Runnable() {
+                @Override
+                public void run() {
+                    Bitmap bitmap =
+                            Bitmap.createBitmap(
+                                    captureFormat.dimensions.width,
+                                    captureFormat.dimensions.height,
+                                    Bitmap.Config.ARGB_8888);
+                    bitmap.eraseColor(getAndUpdateColor());
+                    ByteBuffer buffer = ByteBuffer.allocateDirect(bitmap.getByteCount());
+                    bitmap.copyPixelsToBuffer(buffer);
+                    final long captureTimeNs =
+                            TimeUnit.MILLISECONDS.toNanos(SystemClock.elapsedRealtime());
+                    VideoFrame videoFrame =
+                            new VideoFrame(
+                                    buffer.array(),
+                                    captureFormat.dimensions,
+                                    rotationAngle,
+                                    captureTimeNs);
 
-            // Only notify the frame listener if we are not stopped
-            if (started.get() && fakeVideoCapturerHandler != null) {
-                capturerListener.onFrameCaptured(videoFrame);
-                fakeVideoCapturerHandler.postDelayed(this, FRAMERATE_MS);
-            }
-        }
-    };
+                    // Only notify the frame listener if we are not stopped
+                    if (started.get() && fakeVideoCapturerHandler != null) {
+                        capturerListener.onFrameCaptured(videoFrame);
+                        fakeVideoCapturerHandler.postDelayed(this, FRAMERATE_MS);
+                    }
+                }
+            };
 
     private final List<VideoFormat> supportedFormats;
     private final VideoFrame.RotationAngle rotationAngle;
@@ -87,8 +86,8 @@ public class FakeVideoCapturer implements VideoCapturer {
         this(supportedFormats, VideoFrame.RotationAngle.ROTATION_90);
     }
 
-    public FakeVideoCapturer(List<VideoFormat> supportedFormats,
-                             VideoFrame.RotationAngle rotationAngle) {
+    public FakeVideoCapturer(
+            List<VideoFormat> supportedFormats, VideoFrame.RotationAngle rotationAngle) {
         this.supportedFormats = supportedFormats;
         this.rotationAngle = rotationAngle;
     }
@@ -112,8 +111,7 @@ public class FakeVideoCapturer implements VideoCapturer {
     }
 
     @Override
-    public void startCapture(VideoFormat captureFormat,
-                             VideoCapturer.Listener capturerListener) {
+    public void startCapture(VideoFormat captureFormat, VideoCapturer.Listener capturerListener) {
         this.captureFormat = captureFormat;
         this.capturerListener = capturerListener;
         this.started.set(true);
@@ -197,13 +195,14 @@ public class FakeVideoCapturer implements VideoCapturer {
             }
             running = false;
             final CountDownLatch capturerStopped = new CountDownLatch(1);
-            fakeVideoCapturerHandler.post(new Runnable() {
-                @Override
-                public void run() {
-                    Looper.myLooper().quit();
-                    capturerStopped.countDown();
-                }
-            });
+            fakeVideoCapturerHandler.post(
+                    new Runnable() {
+                        @Override
+                        public void run() {
+                            Looper.myLooper().quit();
+                            capturerStopped.countDown();
+                        }
+                    });
             try {
                 capturerStopped.await(10, TimeUnit.SECONDS);
             } catch (InterruptedException e) {

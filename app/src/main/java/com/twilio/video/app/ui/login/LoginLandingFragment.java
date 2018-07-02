@@ -23,28 +23,29 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-
-import com.google.android.gms.common.SignInButton;
-import com.twilio.video.app.R;
-
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import com.google.android.gms.common.SignInButton;
+import com.twilio.video.app.R;
 
 public class LoginLandingFragment extends Fragment {
 
     public interface Listener {
         void onSignInWithGoogle();
+
         void onSignInWithEmail();
     }
 
     private Listener mListener;
 
-    @BindView(R.id.google_sign_in_button) SignInButton googleSignInButton;
-    @BindView(R.id.email_sign_in_button) Button emailSignInButton;
+    @BindView(R.id.google_sign_in_button)
+    SignInButton googleSignInButton;
 
-    public LoginLandingFragment() {
-    }
+    @BindView(R.id.email_sign_in_button)
+    Button emailSignInButton;
+
+    public LoginLandingFragment() {}
 
     public static LoginLandingFragment newInstance() {
         LoginLandingFragment fragment = new LoginLandingFragment();
@@ -57,14 +58,13 @@ public class LoginLandingFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(
+            LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_login_landing, container, false);
         ButterKnife.bind(this, view);
         googleSignInButton.setSize(SignInButton.SIZE_WIDE);
         googleSignInButton.setColorScheme(SignInButton.COLOR_LIGHT);
         return view;
-
     }
 
     @OnClick(R.id.google_sign_in_button)
@@ -87,8 +87,7 @@ public class LoginLandingFragment extends Fragment {
         if (context instanceof Listener) {
             mListener = (Listener) context;
         } else {
-            throw new RuntimeException(context.toString()
-                    + " must implement Listener");
+            throw new RuntimeException(context.toString() + " must implement Listener");
         }
     }
 

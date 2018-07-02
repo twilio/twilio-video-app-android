@@ -20,8 +20,8 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 /**
- * A remote audio track publication represents a {@link RemoteAudioTrack} that has been shared
- * to a {@link Room}.
+ * A remote audio track publication represents a {@link RemoteAudioTrack} that has been shared to a
+ * {@link Room}.
  */
 public class RemoteAudioTrackPublication implements AudioTrackPublication {
     private final String sid;
@@ -30,10 +30,8 @@ public class RemoteAudioTrackPublication implements AudioTrackPublication {
     private boolean subscribed;
     private boolean enabled;
 
-    RemoteAudioTrackPublication(boolean subscribed,
-                                boolean enabled,
-                                @NonNull String sid,
-                                @NonNull String name) {
+    RemoteAudioTrackPublication(
+            boolean subscribed, boolean enabled, @NonNull String sid, @NonNull String name) {
         this.subscribed = subscribed;
         this.sid = sid;
         this.name = name;
@@ -67,17 +65,13 @@ public class RemoteAudioTrackPublication implements AudioTrackPublication {
         return name;
     }
 
-    /**
-     * Check if remote audio track is enabled.
-     */
+    /** Check if remote audio track is enabled. */
     @Override
     public synchronized boolean isTrackEnabled() {
         return enabled;
     }
 
-    /**
-     * Check if the remote audio track is subscribed to by the {@link LocalParticipant}.
-     */
+    /** Check if the remote audio track is subscribed to by the {@link LocalParticipant}. */
     public synchronized boolean isTrackSubscribed() {
         return subscribed;
     }

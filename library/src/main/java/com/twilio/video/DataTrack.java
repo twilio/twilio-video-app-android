@@ -18,9 +18,7 @@ package com.twilio.video;
 
 import android.support.annotation.NonNull;
 
-/**
- * Base representation of {@link LocalDataTrack} and {@link RemoteDataTrack}.
- */
+/** Base representation of {@link LocalDataTrack} and {@link RemoteDataTrack}. */
 public abstract class DataTrack implements Track {
     private final boolean enabled;
     private final boolean ordered;
@@ -29,12 +27,13 @@ public abstract class DataTrack implements Track {
     private final int maxRetransmits;
     private final String name;
 
-    protected DataTrack(boolean enabled,
-                        boolean ordered,
-                        boolean reliable,
-                        int maxPacketLifeTime,
-                        int maxRetransmits,
-                        @NonNull String name) {
+    protected DataTrack(
+            boolean enabled,
+            boolean ordered,
+            boolean reliable,
+            int maxPacketLifeTime,
+            int maxRetransmits,
+            @NonNull String name) {
         this.enabled = enabled;
         this.ordered = ordered;
         this.reliable = reliable;
@@ -62,16 +61,12 @@ public abstract class DataTrack implements Track {
         return name;
     }
 
-    /**
-     * Returns true if data track guarantees in-order delivery of messages.
-     */
+    /** Returns true if data track guarantees in-order delivery of messages. */
     public boolean isOrdered() {
         return ordered;
     }
 
-    /**
-     * Returns true if the data track guarantees reliable transmission of messages.
-     */
+    /** Returns true if the data track guarantees reliable transmission of messages. */
     public boolean isReliable() {
         return reliable;
     }
@@ -86,9 +81,9 @@ public abstract class DataTrack implements Track {
     }
 
     /**
-     * Returns the maximum number of times to transmit a message before giving up.
-     * Returns {@code 65535} if {@link DataTrackOptions#DEFAULT_MAX_RETRANSMITS} was specified
-     * when building the data track.
+     * Returns the maximum number of times to transmit a message before giving up. Returns {@code
+     * 65535} if {@link DataTrackOptions#DEFAULT_MAX_RETRANSMITS} was specified when building the
+     * data track.
      */
     public int getMaxRetransmits() {
         return maxRetransmits;

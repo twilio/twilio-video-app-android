@@ -16,36 +16,34 @@
 
 package com.twilio.video.base;
 
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assume.assumeTrue;
+
 import android.Manifest;
 import android.hardware.Camera;
 import android.support.annotation.Nullable;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.rule.GrantPermissionRule;
 import android.util.Log;
-
 import com.twilio.video.CameraCapturer;
 import com.twilio.video.LocalVideoTrack;
-import com.twilio.video.LogLevel;
-import com.twilio.video.Video;
 import com.twilio.video.ui.CameraCapturerTestActivity;
 import com.twilio.video.util.FrameCountRenderer;
-
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
-
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assume.assumeTrue;
 
 public abstract class BaseCameraCapturerTest extends BaseVideoTest {
     protected static final int CAMERA_CAPTURE_DELAY_MS = 3000;
 
     @Rule
-    public GrantPermissionRule cameraPermissionsRule = GrantPermissionRule
-            .grant(Manifest.permission.CAMERA);
+    public GrantPermissionRule cameraPermissionsRule =
+            GrantPermissionRule.grant(Manifest.permission.CAMERA);
+
     @Rule
     public ActivityTestRule<CameraCapturerTestActivity> activityRule =
             new ActivityTestRule<>(CameraCapturerTestActivity.class);
+
     protected CameraCapturerTestActivity cameraCapturerActivity;
     protected CameraCapturer cameraCapturer;
     protected LocalVideoTrack localVideoTrack;
@@ -70,8 +68,9 @@ public abstract class BaseCameraCapturerTest extends BaseVideoTest {
 
     protected boolean bothCameraSourcesAvailable() {
         boolean bothCamerasSupported =
-                CameraCapturer.isSourceAvailable(CameraCapturer.CameraSource.FRONT_CAMERA) &&
-                CameraCapturer.isSourceAvailable(CameraCapturer.CameraSource.BACK_CAMERA);
+                CameraCapturer.isSourceAvailable(CameraCapturer.CameraSource.FRONT_CAMERA)
+                        && CameraCapturer.isSourceAvailable(
+                                CameraCapturer.CameraSource.BACK_CAMERA);
 
         /*
          * Validate that if both cameras are not supported that there are actually less than

@@ -22,12 +22,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
-
 import com.twilio.video.LocalVideoTrack;
 import com.twilio.video.VideoScaleType;
-import com.twilio.video.test.R;
 import com.twilio.video.VideoView;
-
+import com.twilio.video.test.R;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -77,8 +75,8 @@ public class VideoViewListViewAdapter extends BaseAdapter {
             FrameCountProxyRendererListener frameCountProxyRendererListener =
                     new FrameCountProxyRendererListener(videoView);
 
-            ViewHolder viewHolder = new ViewHolder(trackNameTextView,
-                    frameCountProxyRendererListener);
+            ViewHolder viewHolder =
+                    new ViewHolder(trackNameTextView, frameCountProxyRendererListener);
             view.setTag(viewHolder);
         }
 
@@ -91,8 +89,8 @@ public class VideoViewListViewAdapter extends BaseAdapter {
 
         // Update view holder
         holder.trackNameTextView.setText(localVideoTrack.getName());
-        holder.frameCountProxyRendererListener.videoView
-                .setVideoScaleType(VideoScaleType.ASPECT_FILL);
+        holder.frameCountProxyRendererListener.videoView.setVideoScaleType(
+                VideoScaleType.ASPECT_FILL);
         localVideoTrack.addRenderer(holder.frameCountProxyRendererListener);
         viewHolderMap.put(holder, localVideoTrack);
         viewHolderPositionMap.put(i, holder);
@@ -104,8 +102,9 @@ public class VideoViewListViewAdapter extends BaseAdapter {
         private final TextView trackNameTextView;
         public final FrameCountProxyRendererListener frameCountProxyRendererListener;
 
-        ViewHolder(TextView trackNameTextView,
-                   FrameCountProxyRendererListener frameCountProxyRendererListener) {
+        ViewHolder(
+                TextView trackNameTextView,
+                FrameCountProxyRendererListener frameCountProxyRendererListener) {
             this.trackNameTextView = trackNameTextView;
             this.frameCountProxyRendererListener = frameCountProxyRendererListener;
         }

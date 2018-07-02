@@ -16,17 +16,11 @@
 
 package com.twilio.video;
 
-/**
- * A representation of a media track.
- */
+/** A representation of a media track. */
 public interface Track {
-    /**
-     * Checks if the track is enabled.
-     */
+    /** Checks if the track is enabled. */
     boolean isEnabled();
 
-    /**
-     * Return track name.
-     */
+    /** Return track name. */
     String getName();
 }

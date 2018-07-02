@@ -21,7 +21,6 @@ import com.twilio.video.Video;
 import com.twilio.video.app.util.DebugTree;
 import com.twilio.video.app.util.FirebaseTreeRanger;
 import com.twilio.video.app.util.ReleaseTree;
-
 import dagger.Module;
 import dagger.Provides;
 import timber.log.Timber;
