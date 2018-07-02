@@ -31,7 +31,6 @@ import android.view.Surface;
 import android.view.WindowManager;
 
 import org.webrtc.Camera1Capturer;
-import org.webrtc.Camera1Enumerator;
 import org.webrtc.Camera1Session;
 import org.webrtc.CameraVideoCapturer;
 import org.webrtc.SurfaceTextureHelper;

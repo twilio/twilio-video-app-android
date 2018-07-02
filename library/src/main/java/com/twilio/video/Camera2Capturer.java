@@ -16,8 +16,8 @@
 
 package com.twilio.video;
 
-import android.annotation.TargetApi;
 import android.Manifest;
+import android.annotation.TargetApi;
 import android.content.Context;
 import android.os.Build;
 import android.os.Handler;

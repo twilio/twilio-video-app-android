@@ -16,10 +16,10 @@
 
 package com.twilio.video;
 
+import android.util.Log;
+
 import java.util.HashMap;
 import java.util.Map;
-
-import android.util.Log;
 
 class Logger {
     public static final int INHERIT = Log.ASSERT + 1;

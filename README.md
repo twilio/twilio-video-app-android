@@ -91,6 +91,15 @@ using JSON files. The table below provides a short summary of required credentia
       }
     }
     ```
+    #### Setting up Bintray for Twilions
+    Building with release candidate or snapshot artifacts requires access to private 
+    Bintray repositories. Add the following lines to your local.properties file to enable
+    downloading from private repositories: 
+    
+    ```
+    BINTRAY_USERNAME=your-bintray-username
+    BINTRAY_PASSWORD=your-bintray-apikey
+    ```
 
 ## Project Modules
 
