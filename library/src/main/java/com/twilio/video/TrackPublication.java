@@ -16,17 +16,23 @@
 
 package com.twilio.video;
 
-/** A published track represents a track that has been shared with a {@link Room}. */
+/**
+ * A published track represents a track that has been shared with a {@link Room}.
+ */
 public interface TrackPublication {
-  /**
-   * Returns the track's server identifier. This value uniquely identifies the track within the
-   * scope of a {@link Room}.
-   */
-  String getTrackSid();
+    /**
+     * Returns the track's server identifier. This value uniquely identifies the track within the
+     * scope of a {@link Room}.
+     */
+    String getTrackSid();
 
-  /** Returns the name of the published track. */
-  String getTrackName();
+    /**
+     * Returns the name of the published track.
+     */
+    String getTrackName();
 
-  /** Returns true of track is enabled and false if not. */
-  boolean isTrackEnabled();
+    /**
+     * Returns true of track is enabled and false if not.
+     */
+    boolean isTrackEnabled();
 }

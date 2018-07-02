@@ -22,9 +22,9 @@ package com.twilio.video;
  * @see <a href="https://en.wikipedia.org/wiki/Opus_(audio_format)">Opus</a>
  */
 public class OpusCodec extends AudioCodec {
-  public static final String NAME = "OPUS";
+    public static final String NAME = "OPUS";
 
-  public OpusCodec() {
-    super(NAME);
-  }
+    public OpusCodec() {
+        super(NAME);
+    }
 }

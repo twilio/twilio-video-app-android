@@ -18,12 +18,13 @@ package com.twilio.video.ui;
 
 import android.app.Activity;
 import android.os.Bundle;
+
 import com.twilio.video.test.R;
 
 public class CameraCapturerTestActivity extends Activity {
-  @Override
-  protected void onCreate(Bundle savedInstanceState) {
-    super.onCreate(savedInstanceState);
-    setContentView(R.layout.camera_capturer_test_activity);
-  }
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.camera_capturer_test_activity);
+    }
 }

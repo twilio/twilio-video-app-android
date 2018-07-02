@@ -17,6 +17,8 @@
 package com.twilio.video;
 
 import com.twilio.video.util.Constants;
+
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -24,25 +26,25 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
 public class LocalVideoTrackPublicationUnitTest {
-  @Mock LocalVideoTrack localVideoTrack;
+    @Mock LocalVideoTrack localVideoTrack;
 
-  @Test(expected = NullPointerException.class)
-  public void shouldFailWithNullSid() {
-    new LocalVideoTrackPublication(null, localVideoTrack);
-  }
+    @Test(expected = NullPointerException.class)
+    public void shouldFailWithNullSid() {
+        new LocalVideoTrackPublication(null, localVideoTrack);
+    }
 
-  @Test(expected = IllegalArgumentException.class)
-  public void shouldFailWithEmptySid() {
-    new LocalVideoTrackPublication("", localVideoTrack);
-  }
+    @Test(expected = IllegalArgumentException.class)
+    public void shouldFailWithEmptySid() {
+        new LocalVideoTrackPublication("", localVideoTrack);
+    }
 
-  @Test(expected = NullPointerException.class)
-  public void shouldFailWithNullLocalVideoTrack() {
-    new LocalVideoTrackPublication(Constants.MOCK_TRACK_SID, null);
-  }
+    @Test(expected = NullPointerException.class)
+    public void shouldFailWithNullLocalVideoTrack() {
+        new LocalVideoTrackPublication(Constants.MOCK_TRACK_SID, null);
+    }
 
-  @Test
-  public void shouldSucceedWithValidTrackSid() {
-    new LocalVideoTrackPublication(Constants.MOCK_TRACK_SID, localVideoTrack);
-  }
+    @Test
+    public void shouldSucceedWithValidTrackSid() {
+        new LocalVideoTrackPublication(Constants.MOCK_TRACK_SID, localVideoTrack);
+    }
 }

@@ -19,34 +19,34 @@ package com.twilio.video;
 import android.support.annotation.NonNull;
 
 public abstract class AudioTrack implements Track {
-  private final String name;
-  private boolean isEnabled;
+    private final String name;
+    private boolean isEnabled;
 
-  AudioTrack(boolean isEnabled, @NonNull String name) {
-    this.isEnabled = isEnabled;
-    this.name = name;
-  }
+    AudioTrack(boolean isEnabled, @NonNull String name) {
+        this.isEnabled = isEnabled;
+        this.name = name;
+    }
 
-  /**
-   * Check if this audio track is enabled.
-   *
-   * @return true if track is enabled.
-   */
-  @Override
-  public boolean isEnabled() {
-    return isEnabled;
-  }
+    /**
+     * Check if this audio track is enabled.
+     *
+     * @return true if track is enabled.
+     */
+    @Override
+    public boolean isEnabled() {
+        return isEnabled;
+    }
 
-  /**
-   * Returns the audio track name. A pseudo random string is returned if no track name was
-   * specified.
-   */
-  @Override
-  public String getName() {
-    return name;
-  }
+    /**
+     * Returns the audio track name. A pseudo random string is returned if no track name was
+     * specified.
+     */
+    @Override
+    public String getName() {
+        return name;
+    }
 
-  void setEnabled(boolean isEnabled) {
-    this.isEnabled = isEnabled;
-  }
+    void setEnabled(boolean isEnabled) {
+        this.isEnabled = isEnabled;
+    }
 }

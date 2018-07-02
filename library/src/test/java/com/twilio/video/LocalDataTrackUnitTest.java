@@ -19,8 +19,8 @@ package com.twilio.video;
 import org.junit.Test;
 
 public class LocalDataTrackUnitTest {
-  @Test(expected = NullPointerException.class)
-  public void create_shouldFailWithNullContext() {
-    LocalDataTrack.create(null);
-  }
+    @Test(expected = NullPointerException.class)
+    public void create_shouldFailWithNullContext() {
+        LocalDataTrack.create(null);
+    }
 }

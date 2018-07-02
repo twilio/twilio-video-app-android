@@ -23,49 +23,55 @@ import android.support.annotation.NonNull;
  * {@link Room}.
  */
 public class LocalVideoTrackPublication implements VideoTrackPublication {
-  private final String sid;
-  private final LocalVideoTrack localVideoTrack;
+    private final String sid;
+    private final LocalVideoTrack localVideoTrack;
 
-  LocalVideoTrackPublication(@NonNull String sid, @NonNull LocalVideoTrack localVideoTrack) {
-    Preconditions.checkNotNull(sid, "SID must not be null");
-    Preconditions.checkArgument(!sid.isEmpty(), "SID must not be empty");
-    Preconditions.checkNotNull(localVideoTrack, "Local video track must not be null");
-    this.sid = sid;
-    this.localVideoTrack = localVideoTrack;
-  }
+    LocalVideoTrackPublication(@NonNull String sid, @NonNull LocalVideoTrack localVideoTrack) {
+        Preconditions.checkNotNull(sid, "SID must not be null");
+        Preconditions.checkArgument(!sid.isEmpty(), "SID must not be empty");
+        Preconditions.checkNotNull(localVideoTrack, "Local video track must not be null");
+        this.sid = sid;
+        this.localVideoTrack = localVideoTrack;
+    }
 
-  /**
-   * Returns the local video track's server identifier. This value uniquely identifies the local
-   * video track within the scope of a {@link Room}.
-   */
-  @Override
-  public String getTrackSid() {
-    return sid;
-  }
+    /**
+     * Returns the local video track's server identifier. This value uniquely identifies the local
+     * video track within the scope of a {@link Room}.
+     */
+    @Override
+    public String getTrackSid() {
+        return sid;
+    }
 
-  /**
-   * Returns the name of the local video track. An empty string is returned if no name was
-   * specified.
-   */
-  @Override
-  public String getTrackName() {
-    return localVideoTrack.getName();
-  }
+    /**
+     * Returns the name of the local video track. An empty string is returned if no name was
+     * specified.
+     */
+    @Override
+    public String getTrackName() {
+        return localVideoTrack.getName();
+    }
 
-  /** Check if local video track is enabled. */
-  @Override
-  public boolean isTrackEnabled() {
-    return localVideoTrack.isEnabled();
-  }
+    /**
+     * Check if local video track is enabled.
+     */
+    @Override
+    public boolean isTrackEnabled() {
+        return localVideoTrack.isEnabled();
+    }
 
-  /** Returns the base video track object of the published local video track. */
-  @Override
-  public VideoTrack getVideoTrack() {
-    return localVideoTrack;
-  }
+    /**
+     * Returns the base video track object of the published local video track.
+     */
+    @Override
+    public VideoTrack getVideoTrack() {
+        return localVideoTrack;
+    }
 
-  /** Returns the published local video track. */
-  public LocalVideoTrack getLocalVideoTrack() {
-    return localVideoTrack;
-  }
+    /**
+     * Returns the published local video track.
+     */
+    public LocalVideoTrack getLocalVideoTrack() {
+        return localVideoTrack;
+    }
 }

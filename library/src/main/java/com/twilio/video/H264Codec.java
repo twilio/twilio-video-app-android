@@ -22,9 +22,9 @@ package com.twilio.video;
  * @see <a href="https://en.wikipedia.org/wiki/H.264/MPEG-4_AVC">H.264</a>
  */
 public class H264Codec extends VideoCodec {
-  public static final String NAME = "H264";
+    public static final String NAME = "H264";
 
-  public H264Codec() {
-    super(NAME);
-  }
+    public H264Codec() {
+        super(NAME);
+    }
 }

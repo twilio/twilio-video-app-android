@@ -16,86 +16,90 @@
 
 package com.twilio.video;
 
+import org.webrtc.Camera1Enumerator;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.webrtc.Camera1Enumerator;
 
 class CameraCapturerFormatProvider {
-  private static final Logger logger = Logger.getLogger(CameraCapturerFormatProvider.class);
+    private static final Logger logger = Logger.getLogger(CameraCapturerFormatProvider.class);
 
-  private final Map<CameraCapturer.CameraSource, List<VideoFormat>> supportedFormatsMap =
-      new HashMap<>();
-  private final Camera1Enumerator camera1Enumerator = new Camera1Enumerator(false);
+    private final Map<CameraCapturer.CameraSource, List<VideoFormat>> supportedFormatsMap =
+            new HashMap<>();
+    private final Camera1Enumerator camera1Enumerator = new Camera1Enumerator(false);
 
-  int getCameraId(CameraCapturer.CameraSource cameraSource) {
-    int cameraId = -1;
+    int getCameraId(CameraCapturer.CameraSource cameraSource) {
+        int cameraId = -1;
 
-    String[] deviceNames = camera1Enumerator.getDeviceNames();
-    for (int i = 0; i < deviceNames.length; i++) {
-      if ((camera1Enumerator.isFrontFacing(deviceNames[i])
-              && cameraSource == CameraCapturer.CameraSource.FRONT_CAMERA)
-          || (camera1Enumerator.isBackFacing(deviceNames[i])
-              && cameraSource == CameraCapturer.CameraSource.BACK_CAMERA)) {
-        cameraId = i;
-        break;
-      }
+        String[] deviceNames = camera1Enumerator.getDeviceNames();
+        for(int i = 0; i < deviceNames.length; i++) {
+            if ((camera1Enumerator.isFrontFacing(deviceNames[i]) &&
+                    cameraSource == CameraCapturer.CameraSource.FRONT_CAMERA) ||
+                    (camera1Enumerator.isBackFacing(deviceNames[i]) && cameraSource ==
+                            CameraCapturer.CameraSource.BACK_CAMERA)) {
+                cameraId = i;
+                break;
+            }
+        }
+
+        return cameraId;
     }
 
-    return cameraId;
-  }
+    String getDeviceName(int cameraId) {
+        String[] deviceNames = camera1Enumerator.getDeviceNames();
 
-  String getDeviceName(int cameraId) {
-    String[] deviceNames = camera1Enumerator.getDeviceNames();
+        if (cameraId < 0 || cameraId >= deviceNames.length) {
+            throw new IllegalArgumentException("cameraId not available on this device");
+        }
 
-    if (cameraId < 0 || cameraId >= deviceNames.length) {
-      throw new IllegalArgumentException("cameraId not available on this device");
+        return deviceNames[cameraId];
     }
 
-    return deviceNames[cameraId];
-  }
+    List<VideoFormat> getSupportedFormats(CameraCapturer.CameraSource cameraSource) {
+        List<VideoFormat> supportedFormats = supportedFormatsMap.get(cameraSource);
 
-  List<VideoFormat> getSupportedFormats(CameraCapturer.CameraSource cameraSource) {
-    List<VideoFormat> supportedFormats = supportedFormatsMap.get(cameraSource);
+        if (supportedFormats == null) {
+            supportedFormats = getSupportedFormats(getCameraId(cameraSource));
+            supportedFormatsMap.put(cameraSource, supportedFormats);
+        }
 
-    if (supportedFormats == null) {
-      supportedFormats = getSupportedFormats(getCameraId(cameraSource));
-      supportedFormatsMap.put(cameraSource, supportedFormats);
+        return supportedFormats;
     }
 
-    return supportedFormats;
-  }
+    private List<VideoFormat> getSupportedFormats(int cameraId) {
+        final List<VideoFormat> formatList = new ArrayList<>();
+        final android.hardware.Camera.Parameters parameters;
+        android.hardware.Camera camera = null;
+        try {
+            camera = android.hardware.Camera.open(cameraId);
+            parameters = camera.getParameters();
+        } catch (RuntimeException e) {
+            logger.e(e.getMessage());
+            return formatList;
+        } finally {
+            if (camera != null) {
+                camera.release();
+            }
+        }
 
-  private List<VideoFormat> getSupportedFormats(int cameraId) {
-    final List<VideoFormat> formatList = new ArrayList<>();
-    final android.hardware.Camera.Parameters parameters;
-    android.hardware.Camera camera = null;
-    try {
-      camera = android.hardware.Camera.open(cameraId);
-      parameters = camera.getParameters();
-    } catch (RuntimeException e) {
-      logger.e(e.getMessage());
-      return formatList;
-    } finally {
-      if (camera != null) {
-        camera.release();
-      }
-    }
+        int maxFps = 0;
+        final List<int[]> listFpsRange = parameters.getSupportedPreviewFpsRange();
+        if (listFpsRange != null) {
+            // getSupportedPreviewFpsRange() returns a sorted list. Take the fps range
+            // corresponding to the highest fps.
+            final int[] range = listFpsRange.get(listFpsRange.size() - 1);
+            maxFps = (range[android.hardware.Camera.Parameters.PREVIEW_FPS_MAX_INDEX] + 999)
+                    / 1000;
+        }
+        for (android.hardware.Camera.Size size : parameters.getSupportedPreviewSizes()) {
+            VideoDimensions dimensions = new VideoDimensions(size.width, size.height);
+            formatList.add(new VideoFormat(dimensions,
+                    maxFps,
+                    VideoPixelFormat.NV21));
+        }
 
-    int maxFps = 0;
-    final List<int[]> listFpsRange = parameters.getSupportedPreviewFpsRange();
-    if (listFpsRange != null) {
-      // getSupportedPreviewFpsRange() returns a sorted list. Take the fps range
-      // corresponding to the highest fps.
-      final int[] range = listFpsRange.get(listFpsRange.size() - 1);
-      maxFps = (range[android.hardware.Camera.Parameters.PREVIEW_FPS_MAX_INDEX] + 999) / 1000;
+        return formatList;
     }
-    for (android.hardware.Camera.Size size : parameters.getSupportedPreviewSizes()) {
-      VideoDimensions dimensions = new VideoDimensions(size.width, size.height);
-      formatList.add(new VideoFormat(dimensions, maxFps, VideoPixelFormat.NV21));
-    }
-
-    return formatList;
-  }
 }

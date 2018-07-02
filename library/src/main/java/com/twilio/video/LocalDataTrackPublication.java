@@ -23,48 +23,55 @@ import android.support.annotation.NonNull;
  * {@link Room}.
  */
 public class LocalDataTrackPublication implements DataTrackPublication {
-  private final String sid;
-  private final LocalDataTrack localDataTrack;
+    private final String sid;
+    private final LocalDataTrack localDataTrack;
 
-  LocalDataTrackPublication(@NonNull String sid, @NonNull LocalDataTrack localDataTrack) {
-    Preconditions.checkNotNull(sid, "SID must not be null");
-    Preconditions.checkArgument(!sid.isEmpty(), "SID must not be empty");
-    Preconditions.checkNotNull(localDataTrack, "Local data track must not be null");
-    this.sid = sid;
-    this.localDataTrack = localDataTrack;
-  }
+    LocalDataTrackPublication(@NonNull String sid, @NonNull LocalDataTrack localDataTrack) {
+        Preconditions.checkNotNull(sid, "SID must not be null");
+        Preconditions.checkArgument(!sid.isEmpty(), "SID must not be empty");
+        Preconditions.checkNotNull(localDataTrack, "Local data track must not be null");
+        this.sid = sid;
+        this.localDataTrack = localDataTrack;
+    }
 
-  /**
-   * Returns the local data track's server identifier. This value uniquely identifies the local data
-   * track within the scope of a {@link Room}.
-   */
-  @Override
-  public String getTrackSid() {
-    return sid;
-  }
+    /**
+     * Returns the local data track's server identifier. This value uniquely identifies the local
+     * data track within the scope of a {@link Room}.
+     */
+    @Override
+    public String getTrackSid() {
+        return sid;
+    }
 
-  /**
-   * Returns the name of the local data track. An empty string is returned if no name was specified.
-   */
-  @Override
-  public String getTrackName() {
-    return localDataTrack.getName();
-  }
+    /**
+     * Returns the name of the local data track. An empty string is returned if no name was
+     * specified.
+     */
+    @Override
+    public String getTrackName() {
+        return localDataTrack.getName();
+    }
 
-  /** Check if local data track is enabled. */
-  @Override
-  public boolean isTrackEnabled() {
-    return localDataTrack.isEnabled();
-  }
+    /**
+     * Check if local data track is enabled.
+     */
+    @Override
+    public boolean isTrackEnabled() {
+        return localDataTrack.isEnabled();
+    }
 
-  /** Returns the base data track object of the published local data track. */
-  @Override
-  public DataTrack getDataTrack() {
-    return localDataTrack;
-  }
+    /**
+     * Returns the base data track object of the published local data track.
+     */
+    @Override
+    public DataTrack getDataTrack() {
+        return localDataTrack;
+    }
 
-  /** Returns the published local data track. */
-  public LocalDataTrack getLocalDataTrack() {
-    return localDataTrack;
-  }
+    /**
+     * Returns the published local data track.
+     */
+    public LocalDataTrack getLocalDataTrack() {
+        return localDataTrack;
+    }
 }

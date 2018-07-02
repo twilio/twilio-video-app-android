@@ -22,9 +22,9 @@ package com.twilio.video;
  * @see <a href="https://en.wikipedia.org/wiki/G.722">G.722</a>
  */
 public class G722Codec extends AudioCodec {
-  public static final String NAME = "G722";
+    public static final String NAME = "G722";
 
-  public G722Codec() {
-    super(NAME);
-  }
+    public G722Codec() {
+        super(NAME);
+    }
 }

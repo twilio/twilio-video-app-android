@@ -21,6 +21,6 @@ import dagger.android.AndroidInjector;
 
 @Subcomponent
 public interface SplashActivitySubcomponent extends AndroidInjector<SplashActivity> {
-  @Subcomponent.Builder
-  abstract class Builder extends AndroidInjector.Builder<SplashActivity> {}
+    @Subcomponent.Builder
+    abstract class Builder extends AndroidInjector.Builder<SplashActivity> {}
 }

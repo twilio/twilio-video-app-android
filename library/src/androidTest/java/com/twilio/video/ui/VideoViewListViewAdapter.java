@@ -22,10 +22,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
+
 import com.twilio.video.LocalVideoTrack;
 import com.twilio.video.VideoScaleType;
-import com.twilio.video.VideoView;
 import com.twilio.video.test.R;
+import com.twilio.video.VideoView;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -34,77 +36,78 @@ import java.util.Map;
  * ListView adapter that renders local video tracks to a VideoView and TextView.
  */
 public class VideoViewListViewAdapter extends BaseAdapter {
-  private static final String TAG = "VideoViewListAdapter";
+    private static final String TAG = "VideoViewListAdapter";
 
-  private final List<LocalVideoTrack> localVideoTracks;
-  private final Map<ViewHolder, LocalVideoTrack> viewHolderMap = new HashMap<>();
-  public final Map<Integer, ViewHolder> viewHolderPositionMap = new HashMap<>();
+    private final List<LocalVideoTrack> localVideoTracks;
+    private final Map<ViewHolder, LocalVideoTrack> viewHolderMap = new HashMap<>();
+    public final Map<Integer, ViewHolder> viewHolderPositionMap = new HashMap<>();
 
-  public VideoViewListViewAdapter(List<LocalVideoTrack> localVideoTracks) {
-    this.localVideoTracks = localVideoTracks;
-  }
-
-  @Override
-  public int getCount() {
-    Log.d(TAG, "getCount");
-    return localVideoTracks.size();
-  }
-
-  @Override
-  public Object getItem(int i) {
-    Log.d(TAG, "getItem");
-    return localVideoTracks.get(i);
-  }
-
-  @Override
-  public long getItemId(int i) {
-    Log.d(TAG, "getItemId");
-    return localVideoTracks.get(i).getName().hashCode();
-  }
-
-  @Override
-  public View getView(int i, View view, ViewGroup viewGroup) {
-    Log.d(TAG, "getView");
-
-    // Create view holder if needed
-    if (view == null) {
-      LayoutInflater inflater = LayoutInflater.from(viewGroup.getContext());
-      view = inflater.inflate(com.twilio.video.test.R.layout.video_view_item, null);
-      TextView trackNameTextView = view.findViewById(R.id.track_name_text_view);
-      VideoView videoView = view.findViewById(R.id.video_view);
-      FrameCountProxyRendererListener frameCountProxyRendererListener =
-          new FrameCountProxyRendererListener(videoView);
-
-      ViewHolder viewHolder = new ViewHolder(trackNameTextView, frameCountProxyRendererListener);
-      view.setTag(viewHolder);
+    public VideoViewListViewAdapter(List<LocalVideoTrack> localVideoTracks) {
+        this.localVideoTracks = localVideoTracks;
     }
 
-    // Remove renderer from previous video track
-    ViewHolder holder = (ViewHolder) view.getTag();
-    LocalVideoTrack localVideoTrack = localVideoTracks.get(i);
-    if (viewHolderMap.containsKey(holder)) {
-      viewHolderMap.get(holder).removeRenderer(holder.frameCountProxyRendererListener);
+    @Override
+    public int getCount() {
+        Log.d(TAG, "getCount");
+        return localVideoTracks.size();
     }
 
-    // Update view holder
-    holder.trackNameTextView.setText(localVideoTrack.getName());
-    holder.frameCountProxyRendererListener.videoView.setVideoScaleType(VideoScaleType.ASPECT_FILL);
-    localVideoTrack.addRenderer(holder.frameCountProxyRendererListener);
-    viewHolderMap.put(holder, localVideoTrack);
-    viewHolderPositionMap.put(i, holder);
-
-    return view;
-  }
-
-  public static class ViewHolder {
-    private final TextView trackNameTextView;
-    public final FrameCountProxyRendererListener frameCountProxyRendererListener;
-
-    ViewHolder(
-        TextView trackNameTextView,
-        FrameCountProxyRendererListener frameCountProxyRendererListener) {
-      this.trackNameTextView = trackNameTextView;
-      this.frameCountProxyRendererListener = frameCountProxyRendererListener;
+    @Override
+    public Object getItem(int i) {
+        Log.d(TAG, "getItem");
+        return localVideoTracks.get(i);
     }
-  }
+
+    @Override
+    public long getItemId(int i) {
+        Log.d(TAG, "getItemId");
+        return localVideoTracks.get(i).getName().hashCode();
+    }
+
+    @Override
+    public View getView(int i, View view, ViewGroup viewGroup) {
+        Log.d(TAG, "getView");
+
+        // Create view holder if needed
+        if (view == null) {
+            LayoutInflater inflater = LayoutInflater.from(viewGroup.getContext());
+            view = inflater.inflate(com.twilio.video.test.R.layout.video_view_item, null);
+            TextView trackNameTextView = view.findViewById(R.id.track_name_text_view);
+            VideoView videoView = view.findViewById(R.id.video_view);
+            FrameCountProxyRendererListener frameCountProxyRendererListener =
+                    new FrameCountProxyRendererListener(videoView);
+
+            ViewHolder viewHolder = new ViewHolder(trackNameTextView,
+                    frameCountProxyRendererListener);
+            view.setTag(viewHolder);
+        }
+
+        // Remove renderer from previous video track
+        ViewHolder holder = (ViewHolder) view.getTag();
+        LocalVideoTrack localVideoTrack = localVideoTracks.get(i);
+        if (viewHolderMap.containsKey(holder)) {
+            viewHolderMap.get(holder).removeRenderer(holder.frameCountProxyRendererListener);
+        }
+
+        // Update view holder
+        holder.trackNameTextView.setText(localVideoTrack.getName());
+        holder.frameCountProxyRendererListener.videoView
+                .setVideoScaleType(VideoScaleType.ASPECT_FILL);
+        localVideoTrack.addRenderer(holder.frameCountProxyRendererListener);
+        viewHolderMap.put(holder, localVideoTrack);
+        viewHolderPositionMap.put(i, holder);
+
+        return view;
+    }
+
+    public static class ViewHolder {
+        private final TextView trackNameTextView;
+        public final FrameCountProxyRendererListener frameCountProxyRendererListener;
+
+        ViewHolder(TextView trackNameTextView,
+                   FrameCountProxyRendererListener frameCountProxyRendererListener) {
+            this.trackNameTextView = trackNameTextView;
+            this.frameCountProxyRendererListener = frameCountProxyRendererListener;
+        }
+    }
 }

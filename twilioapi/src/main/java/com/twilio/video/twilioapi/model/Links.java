@@ -17,7 +17,7 @@
 package com.twilio.video.twilioapi.model;
 
 public class Links {
-  private String recordings;
+    private String recordings;
 
-  public Links() {}
+    public Links() {}
 }

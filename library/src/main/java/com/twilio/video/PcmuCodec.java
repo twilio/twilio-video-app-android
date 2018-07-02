@@ -22,9 +22,9 @@ package com.twilio.video;
  * @see <a href="https://en.wikipedia.org/wiki/G.711">PCMU</a>
  */
 public class PcmuCodec extends AudioCodec {
-  public static final String NAME = "PCMU";
+    public static final String NAME = "PCMU";
 
-  public PcmuCodec() {
-    super(NAME);
-  }
+    public PcmuCodec() {
+        super(NAME);
+    }
 }

@@ -16,50 +16,54 @@
 
 package com.twilio.video;
 
-/** A remote audio track represents a remote audio source. */
+/**
+ * A remote audio track represents a remote audio source.
+ */
 public class RemoteAudioTrack extends AudioTrack {
-  final org.webrtc.AudioTrack webRtcAudioTrack;
-  private final String sid;
-  private boolean playbackEnabled;
+    final org.webrtc.AudioTrack webRtcAudioTrack;
+    private final String sid;
+    private boolean playbackEnabled;
 
-  RemoteAudioTrack(
-      org.webrtc.AudioTrack webRtcAudioTrack, String sid, String name, boolean isEnabled) {
-    super(isEnabled, name);
-    this.sid = sid;
-    this.playbackEnabled = true;
-    this.webRtcAudioTrack = webRtcAudioTrack;
-  }
-
-  /**
-   * Returns the remote audio track's server identifier. This value uniquely identifies the remote
-   * audio track within the scope of a {@link Room}.
-   */
-  public String getSid() {
-    return sid;
-  }
-
-  /**
-   * Enables playback of remote audio track. When playback is disabled the audio is muted.
-   *
-   * @param enable the desired playback state of the remote audio track.
-   */
-  public synchronized void enablePlayback(boolean enable) {
-    this.playbackEnabled = enable;
-
-    if (webRtcAudioTrack != null) {
-      webRtcAudioTrack.setEnabled(playbackEnabled);
+    RemoteAudioTrack(org.webrtc.AudioTrack webRtcAudioTrack,
+                     String sid,
+                     String name,
+                     boolean isEnabled) {
+        super(isEnabled, name);
+        this.sid = sid;
+        this.playbackEnabled = true;
+        this.webRtcAudioTrack = webRtcAudioTrack;
     }
-  }
 
-  /**
-   * Check if playback on the remote audio track is enabled.
-   *
-   * <p>When the value is false, the remote audio track is muted. When the value is true the remote
-   * audio track is playing.
-   *
-   * @return true if remote audio is enabled.
-   */
-  public synchronized boolean isPlaybackEnabled() {
-    return playbackEnabled;
-  }
+    /**
+     * Returns the remote audio track's server identifier. This value uniquely identifies the remote
+     * audio track within the scope of a {@link Room}.
+     */
+    public String getSid() {
+        return sid;
+    }
+
+    /**
+     * Enables playback of remote audio track. When playback is disabled the audio is muted.
+     *
+     * @param enable the desired playback state of the remote audio track.
+     */
+    public synchronized void enablePlayback(boolean enable) {
+        this.playbackEnabled = enable;
+
+        if (webRtcAudioTrack != null) {
+            webRtcAudioTrack.setEnabled(playbackEnabled);
+        }
+    }
+
+    /**
+     * Check if playback on the remote audio track is enabled.
+     *
+     * When the value is false, the remote audio track is muted. When the value is true the remote
+     * audio track is playing.
+     *
+     * @return true if remote audio is enabled.
+     */
+    public synchronized boolean isPlaybackEnabled() {
+        return playbackEnabled;
+    }
 }

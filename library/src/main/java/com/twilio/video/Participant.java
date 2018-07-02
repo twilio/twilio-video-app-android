@@ -17,20 +17,32 @@ package com.twilio.video;
 
 import java.util.List;
 
-/** Interface that represents user in a {@link Room}. */
+/**
+ * Interface that represents user in a {@link Room}.
+ */
 public interface Participant {
-  /** Returns unique identifier of a participant. */
-  String getSid();
+    /**
+     * Returns unique identifier of a participant.
+     */
+    String getSid();
 
-  /** Returns participant identity. */
-  String getIdentity();
+    /**
+     * Returns participant identity.
+     */
+    String getIdentity();
 
-  /** Returns {@link AudioTrackPublication}s of participant. */
-  List<AudioTrackPublication> getAudioTracks();
+    /**
+     * Returns {@link AudioTrackPublication}s of participant.
+     */
+    List<AudioTrackPublication> getAudioTracks();
 
-  /** Returns {@link VideoTrackPublication}s of participant. */
-  List<VideoTrackPublication> getVideoTracks();
+    /**
+     * Returns {@link VideoTrackPublication}s of participant.
+     */
+    List<VideoTrackPublication> getVideoTracks();
 
-  /** Returns {@link DataTrackPublication}s of participant. */
-  List<DataTrackPublication> getDataTracks();
+    /**
+     * Returns {@link DataTrackPublication}s of participant.
+     */
+    List<DataTrackPublication> getDataTracks();
 }

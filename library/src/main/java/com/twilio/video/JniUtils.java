@@ -20,9 +20,9 @@ import android.support.annotation.VisibleForTesting;
 
 @VisibleForTesting(otherwise = VisibleForTesting.NONE)
 class JniUtils {
-  static String javaUtf16StringToStdString(String inputString) {
-    return nativeJavaUtf16StringToStdString(inputString);
-  }
+    static String javaUtf16StringToStdString(String inputString) {
+        return nativeJavaUtf16StringToStdString(inputString);
+    }
 
-  private static native String nativeJavaUtf16StringToStdString(String inputString);
+    private static native String nativeJavaUtf16StringToStdString(String inputString);
 }

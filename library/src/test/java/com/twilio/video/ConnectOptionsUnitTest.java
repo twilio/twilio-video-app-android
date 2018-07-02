@@ -16,94 +16,103 @@
 
 package com.twilio.video;
 
-import static junit.framework.Assert.assertEquals;
-import static junit.framework.TestCase.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.when;
-
-import java.util.Collections;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
+import java.util.Collections;
+import java.util.List;
+
+import static junit.framework.Assert.assertEquals;
+import static junit.framework.TestCase.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.when;
+
 @RunWith(MockitoJUnitRunner.class)
 public class ConnectOptionsUnitTest {
-  @Mock LocalAudioTrack localAudioTrack;
-  @Mock LocalVideoTrack localVideoTrack;
+    @Mock LocalAudioTrack localAudioTrack;
+    @Mock LocalVideoTrack localVideoTrack;
 
-  @Test(expected = NullPointerException.class)
-  public void shouldThrowExceptionWhenTokenIsNull() {
-    new ConnectOptions.Builder(null).build();
-  }
+    @Test(expected = NullPointerException.class)
+    public void shouldThrowExceptionWhenTokenIsNull() {
+        new ConnectOptions.Builder(null).build();
+    }
 
-  @Test(expected = IllegalArgumentException.class)
-  public void shouldThrowExceptionWhenTokenEmptyString() {
-    new ConnectOptions.Builder("").build();
-  }
+    @Test(expected = IllegalArgumentException.class)
+    public void shouldThrowExceptionWhenTokenEmptyString() {
+        new ConnectOptions.Builder("").build();
+    }
 
-  @Test
-  public void insightsShouldBeEnabledByDefault() {
-    ConnectOptions connectOptions = new ConnectOptions.Builder("test").build();
+    @Test
+    public void insightsShouldBeEnabledByDefault() {
+        ConnectOptions connectOptions = new ConnectOptions.Builder("test")
+                .build();
 
-    assertTrue(connectOptions.isInsightsEnabled());
-  }
+        assertTrue(connectOptions.isInsightsEnabled());
+    }
 
-  @Test
-  public void shouldEnableInsights() {
-    ConnectOptions connectOptions = new ConnectOptions.Builder("test").enableInsights(true).build();
-    assertTrue(connectOptions.isInsightsEnabled());
-  }
+    @Test
+    public void shouldEnableInsights() {
+        ConnectOptions connectOptions = new ConnectOptions.Builder("test")
+                .enableInsights(true)
+                .build();
+        assertTrue(connectOptions.isInsightsEnabled());
+    }
 
-  @Test
-  public void shouldDisableInsights() {
-    ConnectOptions connectOptions =
-        new ConnectOptions.Builder("test").enableInsights(false).build();
-    assertFalse(connectOptions.isInsightsEnabled());
-  }
+    @Test
+    public void shouldDisableInsights() {
+        ConnectOptions connectOptions = new ConnectOptions.Builder("test")
+                .enableInsights(false)
+                .build();
+        assertFalse(connectOptions.isInsightsEnabled());
+    }
 
-  @Test(expected = IllegalStateException.class)
-  public void shouldNotAllowReleasedLocalAudioTrack() {
-    when(localAudioTrack.isReleased()).thenReturn(true);
-    new ConnectOptions.Builder("token")
-        .roomName("room name")
-        .audioTracks(Collections.singletonList(localAudioTrack))
-        .build();
-  }
+    @Test(expected = IllegalStateException.class)
+    public void shouldNotAllowReleasedLocalAudioTrack() {
+        when(localAudioTrack.isReleased())
+                .thenReturn(true);
+        new ConnectOptions.Builder("token")
+                .roomName("room name")
+                .audioTracks(Collections.singletonList(localAudioTrack))
+                .build();
+    }
 
-  @Test(expected = IllegalStateException.class)
-  public void shouldNotAllowReleasedLocalVideoTrack() {
-    when(localVideoTrack.isReleased()).thenReturn(true);
-    new ConnectOptions.Builder("token")
-        .roomName("room name")
-        .videoTracks(Collections.singletonList(localVideoTrack))
-        .build();
-  }
+    @Test(expected = IllegalStateException.class)
+    public void shouldNotAllowReleasedLocalVideoTrack() {
+        when(localVideoTrack.isReleased())
+                .thenReturn(true);
+        new ConnectOptions.Builder("token")
+                .roomName("room name")
+                .videoTracks(Collections.singletonList(localVideoTrack))
+                .build();
+    }
 
-  @Test(expected = IllegalArgumentException.class)
-  public void shouldNotAllowCustomAudioCodec() {
-    AudioCodec customAudioCodec = new AudioCodec("custom audio codec") {};
+    @Test(expected = IllegalArgumentException.class)
+    public void shouldNotAllowCustomAudioCodec() {
+        AudioCodec customAudioCodec = new AudioCodec("custom audio codec") {};
 
-    new ConnectOptions.Builder("token")
-        .preferAudioCodecs(Collections.singletonList(customAudioCodec))
-        .build();
-  }
+        new ConnectOptions.Builder("token")
+                .preferAudioCodecs(Collections.singletonList(customAudioCodec))
+                .build();
+    }
 
-  @Test(expected = IllegalArgumentException.class)
-  public void shouldNotAllowCustomVideoCodec() {
-    VideoCodec customVideoCodec = new VideoCodec("custom video codec") {};
+    @Test(expected = IllegalArgumentException.class)
+    public void shouldNotAllowCustomVideoCodec() {
+        VideoCodec customVideoCodec = new VideoCodec("custom video codec") {};
 
-    new ConnectOptions.Builder("token")
-        .preferVideoCodecs(Collections.singletonList(customVideoCodec))
-        .build();
-  }
+        new ConnectOptions.Builder("token")
+                .preferVideoCodecs(Collections.singletonList(customVideoCodec))
+                .build();
+    }
 
-  @Test
-  public void shouldAllowEncodingParameters() {
-    EncodingParameters encodingParameters = new EncodingParameters(10, 12);
-    ConnectOptions connectOptions =
-        new ConnectOptions.Builder("token").encodingParameters(encodingParameters).build();
+    @Test
+    public void shouldAllowEncodingParameters() {
+        EncodingParameters encodingParameters = new EncodingParameters(10, 12);
+        ConnectOptions connectOptions = new ConnectOptions.Builder("token")
+                .encodingParameters(encodingParameters)
+                .build();
 
-    assertEquals(encodingParameters, connectOptions.getEncodingParameters());
-  }
+        assertEquals(encodingParameters, connectOptions.getEncodingParameters());
+    }
 }

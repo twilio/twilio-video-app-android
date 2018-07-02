@@ -17,6 +17,6 @@
 package com.twilio.video.util;
 
 public class Constants {
-  public static final String MOCK_PARTICIPANT_SID = "PAthisisavalidparticipnatsid123456";
-  public static final String MOCK_TRACK_SID = "MTithinkthisisavalidtracksid123456";
+    public static final String MOCK_PARTICIPANT_SID = "PAthisisavalidparticipnatsid123456";
+    public static final String MOCK_TRACK_SID = "MTithinkthisisavalidtracksid123456";
 }

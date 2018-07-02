@@ -20,34 +20,35 @@ import android.content.Context;
 import android.content.pm.PackageManager;
 import android.os.Handler;
 import android.os.Looper;
+import android.support.annotation.NonNull;
 
 /*
  * Junk drawer of utility methods needed throughout SDK.
  */
 final class Util {
-  /*
-   * Return a handler on the thread looper, or the main thread looper if the calling thread
-   * does not have a looper. If neither are available this handler will return null.
-   */
-  static Handler createCallbackHandler() {
-    Handler handler = null;
-    Looper looper;
+    /*
+     * Return a handler on the thread looper, or the main thread looper if the calling thread
+     * does not have a looper. If neither are available this handler will return null.
+     */
+    static Handler createCallbackHandler() {
+        Handler handler = null;
+        Looper looper;
 
-    if ((looper = Looper.myLooper()) != null) {
-      handler = new Handler(looper);
-    } else if ((looper = Looper.getMainLooper()) != null) {
-      handler = new Handler(looper);
+        if((looper = Looper.myLooper()) != null) {
+            handler = new Handler(looper);
+        } else if((looper = Looper.getMainLooper()) != null) {
+            handler = new Handler(looper);
+        }
+        if(handler == null) {
+            throw new IllegalThreadStateException("This thread must be able to obtain a Looper");
+        }
+
+        return handler;
     }
-    if (handler == null) {
-      throw new IllegalThreadStateException("This thread must be able to obtain a Looper");
+
+    static boolean permissionGranted(Context context, String permission) {
+        int permissionCheck = context.checkCallingOrSelfPermission(permission);
+
+        return permissionCheck == PackageManager.PERMISSION_GRANTED;
     }
-
-    return handler;
-  }
-
-  static boolean permissionGranted(Context context, String permission) {
-    int permissionCheck = context.checkCallingOrSelfPermission(permission);
-
-    return permissionCheck == PackageManager.PERMISSION_GRANTED;
-  }
 }

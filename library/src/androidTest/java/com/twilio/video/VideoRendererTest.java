@@ -16,129 +16,127 @@
 
 package com.twilio.video;
 
-import static junit.framework.TestCase.assertNotNull;
-import static org.junit.Assert.assertTrue;
-
 import android.Manifest;
 import android.graphics.Bitmap;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.rule.GrantPermissionRule;
 import android.support.test.runner.AndroidJUnit4;
 import android.widget.ImageView;
+
 import com.twilio.video.base.BaseVideoTest;
-import com.twilio.video.test.R;
 import com.twilio.video.ui.VideoRendererTestActivity;
-import com.twilio.video.util.BitmapVideoRenderer;
 import com.twilio.video.util.FakeVideoCapturer;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
+
+import com.twilio.video.test.R;
+import com.twilio.video.util.BitmapVideoRenderer;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
+
+import static junit.framework.TestCase.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 @RunWith(AndroidJUnit4.class)
 public class VideoRendererTest extends BaseVideoTest {
-  private static final int BITMAP_TIMEOUT_MS = 10000;
+    private static final int BITMAP_TIMEOUT_MS = 10000;
 
-  @Rule
-  public GrantPermissionRule cameraPermissionsRule =
-      GrantPermissionRule.grant(Manifest.permission.CAMERA);
+    @Rule
+    public GrantPermissionRule cameraPermissionsRule = GrantPermissionRule
+            .grant(Manifest.permission.CAMERA);
+    @Rule
+    public ActivityTestRule<VideoRendererTestActivity> activityRule =
+            new ActivityTestRule<>(VideoRendererTestActivity.class);
+    private VideoRendererTestActivity videoRendererTestActivity;
+    private CameraCapturer cameraCapturer;
+    private FakeVideoCapturer fakeVideoCapturer;
+    private LocalVideoTrack cameraVideoTrack;
+    private LocalVideoTrack fakeVideoTrack;
+    private VideoView videoView;
+    private ImageView imageView;
 
-  @Rule
-  public ActivityTestRule<VideoRendererTestActivity> activityRule =
-      new ActivityTestRule<>(VideoRendererTestActivity.class);
-
-  private VideoRendererTestActivity videoRendererTestActivity;
-  private CameraCapturer cameraCapturer;
-  private FakeVideoCapturer fakeVideoCapturer;
-  private LocalVideoTrack cameraVideoTrack;
-  private LocalVideoTrack fakeVideoTrack;
-  private VideoView videoView;
-  private ImageView imageView;
-
-  @Before
-  public void setup() throws InterruptedException {
-    super.setup();
-    videoRendererTestActivity = activityRule.getActivity();
-    cameraCapturer =
-        new CameraCapturer(videoRendererTestActivity, CameraCapturer.CameraSource.FRONT_CAMERA);
-    fakeVideoCapturer = new FakeVideoCapturer();
-    cameraVideoTrack = LocalVideoTrack.create(videoRendererTestActivity, true, cameraCapturer);
-    fakeVideoTrack = LocalVideoTrack.create(videoRendererTestActivity, true, fakeVideoCapturer);
-    videoView = videoRendererTestActivity.findViewById(R.id.video);
-    imageView = videoRendererTestActivity.findViewById(R.id.image_view);
-  }
-
-  @After
-  public void teardown() {
-    if (cameraVideoTrack != null) {
-      cameraVideoTrack.release();
+    @Before
+    public void setup() throws InterruptedException {
+        super.setup();
+        videoRendererTestActivity = activityRule.getActivity();
+        cameraCapturer = new CameraCapturer(videoRendererTestActivity,
+                CameraCapturer.CameraSource.FRONT_CAMERA);
+        fakeVideoCapturer = new FakeVideoCapturer();
+        cameraVideoTrack = LocalVideoTrack.create(videoRendererTestActivity, true, cameraCapturer);
+        fakeVideoTrack = LocalVideoTrack.create(videoRendererTestActivity, true, fakeVideoCapturer);
+        videoView = videoRendererTestActivity.findViewById(R.id.video);
+        imageView = videoRendererTestActivity.findViewById(R.id.image_view);
     }
-    if (fakeVideoTrack != null) {
-      fakeVideoTrack.release();
+
+    @After
+    public void teardown() {
+        if (cameraVideoTrack != null) {
+            cameraVideoTrack.release();
+        }
+        if (fakeVideoTrack != null) {
+            fakeVideoTrack.release();
+        }
+        assertTrue(MediaFactory.isReleased());
     }
-    assertTrue(MediaFactory.isReleased());
-  }
 
-  @Test
-  public void canRenderCameraCapturerFrameToBitmap() throws InterruptedException {
-    BitmapVideoRenderer bitmapVideoRenderer = new BitmapVideoRenderer();
-    final CountDownLatch bitmapCaptured = new CountDownLatch(1);
+    @Test
+    public void canRenderCameraCapturerFrameToBitmap() throws InterruptedException {
+        BitmapVideoRenderer bitmapVideoRenderer = new BitmapVideoRenderer();
+        final CountDownLatch bitmapCaptured = new CountDownLatch(1);
 
-    // Add renderers
-    cameraVideoTrack.addRenderer(videoView);
-    cameraVideoTrack.addRenderer(bitmapVideoRenderer);
+        // Add renderers
+        cameraVideoTrack.addRenderer(videoView);
+        cameraVideoTrack.addRenderer(bitmapVideoRenderer);
 
-    // Request bitmap
-    bitmapVideoRenderer.captureBitmap(
-        new BitmapVideoRenderer.BitmapListener() {
-          @Override
-          public void onBitmapCaptured(final Bitmap bitmap) {
-            assertNotNull(bitmap);
-            videoRendererTestActivity.runOnUiThread(
-                new Runnable() {
-                  @Override
-                  public void run() {
-                    imageView.setImageBitmap(bitmap);
-                    bitmapCaptured.countDown();
-                  }
+        // Request bitmap
+        bitmapVideoRenderer.captureBitmap(new BitmapVideoRenderer.BitmapListener() {
+            @Override
+            public void onBitmapCaptured(final Bitmap bitmap) {
+                assertNotNull(bitmap);
+                videoRendererTestActivity.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        imageView.setImageBitmap(bitmap);
+                        bitmapCaptured.countDown();
+                    }
                 });
-          }
+            }
         });
 
-    // Validate we received bitmap
-    assertTrue(bitmapCaptured.await(BITMAP_TIMEOUT_MS, TimeUnit.MILLISECONDS));
-  }
+        // Validate we received bitmap
+        assertTrue(bitmapCaptured.await(BITMAP_TIMEOUT_MS, TimeUnit.MILLISECONDS));
+    }
 
-  @Test
-  public void canRenderFakeVideoCapturerFrameToBitmap() throws InterruptedException {
-    BitmapVideoRenderer bitmapVideoRenderer = new BitmapVideoRenderer();
-    final CountDownLatch bitmapCaptured = new CountDownLatch(1);
+    @Test
+    public void canRenderFakeVideoCapturerFrameToBitmap() throws InterruptedException {
+        BitmapVideoRenderer bitmapVideoRenderer = new BitmapVideoRenderer();
+        final CountDownLatch bitmapCaptured = new CountDownLatch(1);
 
-    // Add renderers
-    fakeVideoTrack.addRenderer(videoView);
-    fakeVideoTrack.addRenderer(bitmapVideoRenderer);
+        // Add renderers
+        fakeVideoTrack.addRenderer(videoView);
+        fakeVideoTrack.addRenderer(bitmapVideoRenderer);
 
-    // Request bitmap
-    bitmapVideoRenderer.captureBitmap(
-        new BitmapVideoRenderer.BitmapListener() {
-          @Override
-          public void onBitmapCaptured(final Bitmap bitmap) {
-            assertNotNull(bitmap);
-            videoRendererTestActivity.runOnUiThread(
-                new Runnable() {
-                  @Override
-                  public void run() {
-                    imageView.setImageBitmap(bitmap);
-                    bitmapCaptured.countDown();
-                  }
+        // Request bitmap
+        bitmapVideoRenderer.captureBitmap(new BitmapVideoRenderer.BitmapListener() {
+            @Override
+            public void onBitmapCaptured(final Bitmap bitmap) {
+                assertNotNull(bitmap);
+                videoRendererTestActivity.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        imageView.setImageBitmap(bitmap);
+                        bitmapCaptured.countDown();
+                    }
                 });
-          }
+            }
         });
 
-    // Validate we received bitmap
-    assertTrue(bitmapCaptured.await(BITMAP_TIMEOUT_MS, TimeUnit.MILLISECONDS));
-  }
+        // Validate we received bitmap
+        assertTrue(bitmapCaptured.await(BITMAP_TIMEOUT_MS, TimeUnit.MILLISECONDS));
+    }
 }

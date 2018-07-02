@@ -16,80 +16,82 @@
 
 package com.twilio.video.base;
 
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assume.assumeTrue;
-
 import android.Manifest;
 import android.hardware.Camera;
 import android.support.annotation.Nullable;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.rule.GrantPermissionRule;
 import android.util.Log;
+
 import com.twilio.video.CameraCapturer;
 import com.twilio.video.LocalVideoTrack;
+import com.twilio.video.LogLevel;
+import com.twilio.video.Video;
 import com.twilio.video.ui.CameraCapturerTestActivity;
 import com.twilio.video.util.FrameCountRenderer;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assume.assumeTrue;
+
 public abstract class BaseCameraCapturerTest extends BaseVideoTest {
-  protected static final int CAMERA_CAPTURE_DELAY_MS = 3000;
+    protected static final int CAMERA_CAPTURE_DELAY_MS = 3000;
 
-  @Rule
-  public GrantPermissionRule cameraPermissionsRule =
-      GrantPermissionRule.grant(Manifest.permission.CAMERA);
+    @Rule
+    public GrantPermissionRule cameraPermissionsRule = GrantPermissionRule
+            .grant(Manifest.permission.CAMERA);
+    @Rule
+    public ActivityTestRule<CameraCapturerTestActivity> activityRule =
+            new ActivityTestRule<>(CameraCapturerTestActivity.class);
+    protected CameraCapturerTestActivity cameraCapturerActivity;
+    protected CameraCapturer cameraCapturer;
+    protected LocalVideoTrack localVideoTrack;
+    protected FrameCountRenderer frameCountRenderer;
+    protected CameraCapturer.CameraSource supportedCameraSource;
 
-  @Rule
-  public ActivityTestRule<CameraCapturerTestActivity> activityRule =
-      new ActivityTestRule<>(CameraCapturerTestActivity.class);
-
-  protected CameraCapturerTestActivity cameraCapturerActivity;
-  protected CameraCapturer cameraCapturer;
-  protected LocalVideoTrack localVideoTrack;
-  protected FrameCountRenderer frameCountRenderer;
-  protected CameraCapturer.CameraSource supportedCameraSource;
-
-  @Before
-  public void setup() throws InterruptedException {
-    super.setup();
-    cameraCapturerActivity = activityRule.getActivity();
-    frameCountRenderer = new FrameCountRenderer();
-    supportedCameraSource = getSupportedCameraSource();
-    assumeTrue(supportedCameraSource != null);
-  }
-
-  @After
-  public void teardown() {
-    if (localVideoTrack != null) {
-      localVideoTrack.release();
-    }
-  }
-
-  protected boolean bothCameraSourcesAvailable() {
-    boolean bothCamerasSupported =
-        CameraCapturer.isSourceAvailable(CameraCapturer.CameraSource.FRONT_CAMERA)
-            && CameraCapturer.isSourceAvailable(CameraCapturer.CameraSource.BACK_CAMERA);
-
-    /*
-     * Validate that if both cameras are not supported that there are actually less than
-     * two cameras reported by framework.
-     */
-    if (!bothCamerasSupported) {
-      assertTrue(Camera.getNumberOfCameras() < 2);
+    @Before
+    public void setup() throws InterruptedException {
+        super.setup();
+        cameraCapturerActivity = activityRule.getActivity();
+        frameCountRenderer = new FrameCountRenderer();
+        supportedCameraSource = getSupportedCameraSource();
+        assumeTrue(supportedCameraSource != null);
     }
 
-    return bothCamerasSupported;
-  }
-
-  private @Nullable CameraCapturer.CameraSource getSupportedCameraSource() {
-    if (CameraCapturer.isSourceAvailable(CameraCapturer.CameraSource.FRONT_CAMERA)) {
-      return CameraCapturer.CameraSource.FRONT_CAMERA;
-    } else if (CameraCapturer.isSourceAvailable(CameraCapturer.CameraSource.BACK_CAMERA)) {
-      return CameraCapturer.CameraSource.BACK_CAMERA;
-    } else {
-      Log.w("BaseCameraCapturerTest", "No supported camera source");
-      return null;
+    @After
+    public void teardown() {
+        if (localVideoTrack != null) {
+            localVideoTrack.release();
+        }
     }
-  }
+
+    protected boolean bothCameraSourcesAvailable() {
+        boolean bothCamerasSupported =
+                CameraCapturer.isSourceAvailable(CameraCapturer.CameraSource.FRONT_CAMERA) &&
+                CameraCapturer.isSourceAvailable(CameraCapturer.CameraSource.BACK_CAMERA);
+
+        /*
+         * Validate that if both cameras are not supported that there are actually less than
+         * two cameras reported by framework.
+         */
+        if (!bothCamerasSupported) {
+            assertTrue(Camera.getNumberOfCameras() < 2);
+        }
+
+        return bothCamerasSupported;
+    }
+
+    private @Nullable CameraCapturer.CameraSource getSupportedCameraSource() {
+        if (CameraCapturer.isSourceAvailable(CameraCapturer.CameraSource.FRONT_CAMERA)) {
+            return CameraCapturer.CameraSource.FRONT_CAMERA;
+        } else if (CameraCapturer.isSourceAvailable(CameraCapturer.CameraSource.BACK_CAMERA)) {
+            return CameraCapturer.CameraSource.BACK_CAMERA;
+        } else {
+            Log.w("BaseCameraCapturerTest", "No supported camera source");
+            return null;
+        }
+    }
 }

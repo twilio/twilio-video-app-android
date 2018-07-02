@@ -17,6 +17,8 @@
 package com.twilio.video;
 
 import com.twilio.video.util.Constants;
+
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -24,25 +26,25 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
 public class LocalAudioTrackPublicationUnitTest {
-  @Mock LocalAudioTrack localAudioTrack;
+    @Mock LocalAudioTrack localAudioTrack;
 
-  @Test(expected = NullPointerException.class)
-  public void shouldFailWithNullSid() {
-    new LocalAudioTrackPublication(null, localAudioTrack);
-  }
+    @Test(expected = NullPointerException.class)
+    public void shouldFailWithNullSid() {
+        new LocalAudioTrackPublication(null, localAudioTrack);
+    }
 
-  @Test(expected = IllegalArgumentException.class)
-  public void shouldFailWithEmptySid() {
-    new LocalAudioTrackPublication("", localAudioTrack);
-  }
+    @Test(expected = IllegalArgumentException.class)
+    public void shouldFailWithEmptySid() {
+        new LocalAudioTrackPublication("", localAudioTrack);
+    }
 
-  @Test(expected = NullPointerException.class)
-  public void shouldFailWithNullLocalAudioTrack() {
-    new LocalAudioTrackPublication(Constants.MOCK_TRACK_SID, null);
-  }
+    @Test(expected = NullPointerException.class)
+    public void shouldFailWithNullLocalAudioTrack() {
+        new LocalAudioTrackPublication(Constants.MOCK_TRACK_SID, null);
+    }
 
-  @Test
-  public void shouldSucceedWithValidTrackSid() {
-    new LocalAudioTrackPublication(Constants.MOCK_TRACK_SID, localAudioTrack);
-  }
+    @Test
+    public void shouldSucceedWithValidTrackSid() {
+        new LocalAudioTrackPublication(Constants.MOCK_TRACK_SID, localAudioTrack);
+    }
 }

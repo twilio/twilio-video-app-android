@@ -20,35 +20,36 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
 public class VideoTrackUnitTest {
-  @Mock org.webrtc.VideoTrack mockWebRtcVideoTrack;
-  @Mock VideoRenderer videoRenderer;
-  private VideoTrack videoTrack;
+    @Mock org.webrtc.VideoTrack mockWebRtcVideoTrack;
+    @Mock VideoRenderer videoRenderer;
+    private VideoTrack videoTrack;
 
-  @Before
-  public void setup() {
-    videoTrack = new UnitTestVideoTrack(mockWebRtcVideoTrack, true);
-  }
-
-  @Test(expected = NullPointerException.class)
-  public void addRenderer_shouldNotAllowNull() {
-    videoTrack.addRenderer(null);
-  }
-
-  @Test(expected = NullPointerException.class)
-  public void removeRenderer_shouldNotAllowNull() {
-    videoTrack.removeRenderer(null);
-  }
-
-  /*
-   * Simple concrete video track to test functionality in abstract class.
-   */
-  private static class UnitTestVideoTrack extends VideoTrack {
-    UnitTestVideoTrack(org.webrtc.VideoTrack webRtcVideoTrack, boolean enabled) {
-      super(webRtcVideoTrack, enabled, "");
+    @Before
+    public void setup() {
+        videoTrack = new UnitTestVideoTrack(mockWebRtcVideoTrack, true);
     }
-  }
+
+    @Test(expected = NullPointerException.class)
+    public void addRenderer_shouldNotAllowNull() {
+        videoTrack.addRenderer(null);
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void removeRenderer_shouldNotAllowNull() {
+        videoTrack.removeRenderer(null);
+    }
+
+    /*
+     * Simple concrete video track to test functionality in abstract class.
+     */
+    private static class UnitTestVideoTrack extends VideoTrack {
+        UnitTestVideoTrack(org.webrtc.VideoTrack webRtcVideoTrack, boolean enabled) {
+            super(webRtcVideoTrack, enabled, "");
+        }
+    }
 }

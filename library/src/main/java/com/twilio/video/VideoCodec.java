@@ -16,22 +16,28 @@
 
 package com.twilio.video;
 
-/** Abstract base class for video codecs. */
+/**
+ * Abstract base class for video codecs.
+ */
 public abstract class VideoCodec {
-  private final String name;
+    private final String name;
 
-  protected VideoCodec(String name) {
-    this.name = name;
-  }
+    protected VideoCodec(String name) {
+        this.name = name;
+    }
 
-  /** Returns the string representation of the video codec. */
-  public String getName() {
-    return name;
-  }
+    /**
+     * Returns the string representation of the video codec.
+     */
+    public String getName() {
+        return name;
+    }
 
-  /** Returns the name of the video codec. */
-  @Override
-  public String toString() {
-    return name;
-  }
+    /**
+     * Returns the name of the video codec.
+     */
+    @Override
+    public String toString() {
+        return name;
+    }
 }

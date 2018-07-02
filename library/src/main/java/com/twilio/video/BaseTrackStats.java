@@ -17,26 +17,41 @@
 package com.twilio.video;
 
 public abstract class BaseTrackStats {
-  /** Track server identifier */
-  public final String trackSid;
+    /**
+     * Track server identifier
+     */
+    public final String trackSid;
 
-  /** Total number of RTP packets lost for this SSRC since the beginning of the reception */
-  public final int packetsLost;
+    /**
+     * Total number of RTP packets lost for this SSRC since
+     * the beginning of the reception
+     */
+    public final int packetsLost;
 
-  /** Name of codec used for this track */
-  public final String codec;
+    /**
+     * Name of codec used for this track
+     */
+    public final String codec;
 
-  /** The SSRC identifier of the source */
-  public final String ssrc;
+    /**
+     * The SSRC identifier of the source
+     */
+    public final String ssrc;
 
-  /** Unix timestamp in milliseconds */
-  public final double timestamp;
+    /**
+     * Unix timestamp in milliseconds
+     */
+    public final double timestamp;
 
-  BaseTrackStats(String trackSid, int packetsLost, String codec, String ssrc, double timestamp) {
-    this.trackSid = trackSid;
-    this.packetsLost = packetsLost;
-    this.codec = codec;
-    this.ssrc = ssrc;
-    this.timestamp = timestamp;
-  }
+    BaseTrackStats(String trackSid,
+                   int packetsLost,
+                   String codec,
+                   String ssrc,
+                   double timestamp) {
+        this.trackSid = trackSid;
+        this.packetsLost = packetsLost;
+        this.codec = codec;
+        this.ssrc = ssrc;
+        this.timestamp = timestamp;
+    }
 }

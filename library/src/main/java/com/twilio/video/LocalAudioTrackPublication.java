@@ -23,49 +23,55 @@ import android.support.annotation.NonNull;
  * {@link Room}.
  */
 public class LocalAudioTrackPublication implements AudioTrackPublication {
-  private final String sid;
-  private final LocalAudioTrack localAudioTrack;
+    private final String sid;
+    private final LocalAudioTrack localAudioTrack;
 
-  LocalAudioTrackPublication(@NonNull String sid, @NonNull LocalAudioTrack localAudioTrack) {
-    Preconditions.checkNotNull(sid, "SID must not be null");
-    Preconditions.checkNotNull(localAudioTrack, "Local audio track must not be null");
-    Preconditions.checkArgument(!sid.isEmpty(), "SID must not be empty");
-    this.sid = sid;
-    this.localAudioTrack = localAudioTrack;
-  }
+    LocalAudioTrackPublication(@NonNull String sid, @NonNull LocalAudioTrack localAudioTrack) {
+        Preconditions.checkNotNull(sid, "SID must not be null");
+        Preconditions.checkNotNull(localAudioTrack, "Local audio track must not be null");
+        Preconditions.checkArgument(!sid.isEmpty(), "SID must not be empty");
+        this.sid = sid;
+        this.localAudioTrack = localAudioTrack;
+    }
 
-  /**
-   * Returns the local audio track's server identifier. This value uniquely identifies the local
-   * audio track within the scope of a {@link Room}.
-   */
-  @Override
-  public String getTrackSid() {
-    return sid;
-  }
+    /**
+     * Returns the local audio track's server identifier. This value uniquely identifies the local
+     * audio track within the scope of a {@link Room}.
+     */
+    @Override
+    public String getTrackSid() {
+        return sid;
+    }
 
-  /**
-   * Returns the name of the local audio track. An empty string is returned if not name was
-   * specified.
-   */
-  @Override
-  public String getTrackName() {
-    return localAudioTrack.getName();
-  }
+    /**
+     * Returns the name of the local audio track. An empty string is returned if not name was
+     * specified.
+     */
+    @Override
+    public String getTrackName() {
+        return localAudioTrack.getName();
+    }
 
-  /** Check if local audio track is enabled. */
-  @Override
-  public boolean isTrackEnabled() {
-    return localAudioTrack.isEnabled();
-  }
+    /**
+     * Check if local audio track is enabled.
+     */
+    @Override
+    public boolean isTrackEnabled() {
+        return localAudioTrack.isEnabled();
+    }
 
-  /** Returns the base audio track object of the published local audio track. */
-  @Override
-  public AudioTrack getAudioTrack() {
-    return localAudioTrack;
-  }
+    /**
+     * Returns the base audio track object of the published local audio track.
+     */
+    @Override
+    public AudioTrack getAudioTrack() {
+        return localAudioTrack;
+    }
 
-  /** Returns the published local audio track. */
-  public LocalAudioTrack getLocalAudioTrack() {
-    return localAudioTrack;
-  }
+    /**
+     * Returns the published local audio track.
+     */
+    public LocalAudioTrack getLocalAudioTrack() {
+        return localAudioTrack;
+    }
 }
