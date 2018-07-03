@@ -25,47 +25,75 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TableRow;
 import android.widget.TextView;
-
+import butterknife.BindView;
+import butterknife.ButterKnife;
 import com.google.common.collect.ImmutableList;
+import com.twilio.video.LocalAudioTrackStats;
+import com.twilio.video.LocalVideoTrackStats;
 import com.twilio.video.RemoteAudioTrack;
 import com.twilio.video.RemoteAudioTrackPublication;
 import com.twilio.video.RemoteAudioTrackStats;
-import com.twilio.video.LocalAudioTrackStats;
-import com.twilio.video.LocalVideoTrackStats;
 import com.twilio.video.RemoteParticipant;
 import com.twilio.video.RemoteVideoTrack;
 import com.twilio.video.RemoteVideoTrackPublication;
-import com.twilio.video.StatsReport;
 import com.twilio.video.RemoteVideoTrackStats;
+import com.twilio.video.StatsReport;
 import com.twilio.video.app.R;
 import com.twilio.video.app.model.StatsListItem;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import butterknife.BindView;
-import butterknife.ButterKnife;
-
 public class StatsListAdapter extends RecyclerView.Adapter<StatsListAdapter.ViewHolder> {
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
-        @BindView(R.id.stats_track_name) TextView trackNameText;
-        @BindView(R.id.stats_track_sid_value) TextView trackSidValueText;
-        @BindView(R.id.stats_codec_value) TextView codecValueText;
-        @BindView(R.id.stats_packets_value) TextView packetsValueText;
-        @BindView(R.id.stats_bytes_title) TextView bytesTitleText;
-        @BindView(R.id.stats_bytes_value) TextView bytesValueText;
-        @BindView(R.id.stats_rtt_value) TextView rttValueText;
-        @BindView(R.id.stats_jitter_value) TextView jitterValueText;
-        @BindView(R.id.stats_audio_level_value) TextView audioLevelValueText;
-        @BindView(R.id.stats_dimensions_value) TextView dimensionsValueText;
-        @BindView(R.id.stats_framerate_value) TextView framerateValueText;
-        @BindView(R.id.stats_rtt_row) TableRow rttTableRow;
-        @BindView(R.id.stats_jitter_row) TableRow jitterTableRow;
-        @BindView(R.id.stats_audio_level_row) TableRow audioLevelTableRow;
-        @BindView(R.id.stats_dimensions_row) TableRow dimensionsTableRow;
-        @BindView(R.id.stats_framerate_row) TableRow framerateTableRow;
+        @BindView(R.id.stats_track_name)
+        TextView trackNameText;
+
+        @BindView(R.id.stats_track_sid_value)
+        TextView trackSidValueText;
+
+        @BindView(R.id.stats_codec_value)
+        TextView codecValueText;
+
+        @BindView(R.id.stats_packets_value)
+        TextView packetsValueText;
+
+        @BindView(R.id.stats_bytes_title)
+        TextView bytesTitleText;
+
+        @BindView(R.id.stats_bytes_value)
+        TextView bytesValueText;
+
+        @BindView(R.id.stats_rtt_value)
+        TextView rttValueText;
+
+        @BindView(R.id.stats_jitter_value)
+        TextView jitterValueText;
+
+        @BindView(R.id.stats_audio_level_value)
+        TextView audioLevelValueText;
+
+        @BindView(R.id.stats_dimensions_value)
+        TextView dimensionsValueText;
+
+        @BindView(R.id.stats_framerate_value)
+        TextView framerateValueText;
+
+        @BindView(R.id.stats_rtt_row)
+        TableRow rttTableRow;
+
+        @BindView(R.id.stats_jitter_row)
+        TableRow jitterTableRow;
+
+        @BindView(R.id.stats_audio_level_row)
+        TableRow audioLevelTableRow;
+
+        @BindView(R.id.stats_dimensions_row)
+        TableRow dimensionsTableRow;
+
+        @BindView(R.id.stats_framerate_row)
+        TableRow framerateTableRow;
 
         public ViewHolder(View itemView) {
             super(itemView);
@@ -82,10 +110,11 @@ public class StatsListAdapter extends RecyclerView.Adapter<StatsListAdapter.View
         handler = new Handler(Looper.getMainLooper());
     }
 
-
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.stats_layout, parent, false);
+        View v =
+                LayoutInflater.from(parent.getContext())
+                        .inflate(R.layout.stats_layout, parent, false);
         return new ViewHolder(v);
     }
 
@@ -127,9 +156,10 @@ public class StatsListAdapter extends RecyclerView.Adapter<StatsListAdapter.View
         return statsListItems.size();
     }
 
-    public void updateStatsData(List<StatsReport> statsReports,
-                                List<RemoteParticipant> remoteParticipants,
-                                Map<String, String> localVideoTrackNames){
+    public void updateStatsData(
+            List<StatsReport> statsReports,
+            List<RemoteParticipant> remoteParticipants,
+            Map<String, String> localVideoTrackNames) {
         /*
          * Generate new items on a separate list to ensure statsListItems changes are only
          * performed on the UI thread to meet the threading requirement of RecyclerView.Adapter.
@@ -142,16 +172,17 @@ public class StatsListAdapter extends RecyclerView.Adapter<StatsListAdapter.View
             if (!localTracksAdded) {
                 // go trough local tracks
                 for (LocalAudioTrackStats localAudioTrackStats : report.getLocalAudioTrackStats()) {
-                    StatsListItem item = new StatsListItem.Builder()
-                            .baseTrackInfo(localAudioTrackStats)
-                            .bytes(localAudioTrackStats.bytesSent)
-                            .rtt(localAudioTrackStats.roundTripTime)
-                            .jitter(localAudioTrackStats.jitter)
-                            .audioLevel(localAudioTrackStats.audioLevel)
-                            .trackName(context.getString(R.string.local_audio_track))
-                            .isAudioTrack(true)
-                            .isLocalTrack(true)
-                            .build();
+                    StatsListItem item =
+                            new StatsListItem.Builder()
+                                    .baseTrackInfo(localAudioTrackStats)
+                                    .bytes(localAudioTrackStats.bytesSent)
+                                    .rtt(localAudioTrackStats.roundTripTime)
+                                    .jitter(localAudioTrackStats.jitter)
+                                    .audioLevel(localAudioTrackStats.audioLevel)
+                                    .trackName(context.getString(R.string.local_audio_track))
+                                    .isAudioTrack(true)
+                                    .isLocalTrack(true)
+                                    .build();
                     statsListItemsBuilder.add(item);
                 }
                 for (LocalVideoTrackStats localVideoTrackStats : report.getLocalVideoTrackStats()) {
@@ -160,16 +191,17 @@ public class StatsListAdapter extends RecyclerView.Adapter<StatsListAdapter.View
                     if (localVideoTrackName == null) {
                         localVideoTrackName = context.getString(R.string.local_video_track);
                     }
-                    StatsListItem item = new StatsListItem.Builder()
-                            .baseTrackInfo(localVideoTrackStats)
-                            .bytes(localVideoTrackStats.bytesSent)
-                            .rtt(localVideoTrackStats.roundTripTime)
-                            .dimensions(localVideoTrackStats.dimensions.toString())
-                            .framerate(localVideoTrackStats.frameRate)
-                            .trackName(localVideoTrackName)
-                            .isAudioTrack(false)
-                            .isLocalTrack(true)
-                            .build();
+                    StatsListItem item =
+                            new StatsListItem.Builder()
+                                    .baseTrackInfo(localVideoTrackStats)
+                                    .bytes(localVideoTrackStats.bytesSent)
+                                    .rtt(localVideoTrackStats.roundTripTime)
+                                    .dimensions(localVideoTrackStats.dimensions.toString())
+                                    .framerate(localVideoTrackStats.frameRate)
+                                    .trackName(localVideoTrackName)
+                                    .isAudioTrack(false)
+                                    .isLocalTrack(true)
+                                    .build();
                     statsListItemsBuilder.add(item);
                 }
                 localTracksAdded = true;
@@ -177,34 +209,43 @@ public class StatsListAdapter extends RecyclerView.Adapter<StatsListAdapter.View
             int trackCount = 0;
             for (RemoteAudioTrackStats remoteAudioTrackStats : report.getRemoteAudioTrackStats()) {
                 String trackName =
-                        getParticipantName(remoteAudioTrackStats.trackSid, true, remoteParticipants) +
-                                " " + context.getString(R.string.audio_track) + " " + trackCount;
-                StatsListItem item = new StatsListItem.Builder()
-                        .baseTrackInfo(remoteAudioTrackStats)
-                        .bytes(remoteAudioTrackStats.bytesReceived)
-                        .jitter(remoteAudioTrackStats.jitter)
-                        .audioLevel(remoteAudioTrackStats.audioLevel)
-                        .trackName(trackName)
-                        .isAudioTrack(true)
-                        .isLocalTrack(false)
-                        .build();
+                        getParticipantName(remoteAudioTrackStats.trackSid, true, remoteParticipants)
+                                + " "
+                                + context.getString(R.string.audio_track)
+                                + " "
+                                + trackCount;
+                StatsListItem item =
+                        new StatsListItem.Builder()
+                                .baseTrackInfo(remoteAudioTrackStats)
+                                .bytes(remoteAudioTrackStats.bytesReceived)
+                                .jitter(remoteAudioTrackStats.jitter)
+                                .audioLevel(remoteAudioTrackStats.audioLevel)
+                                .trackName(trackName)
+                                .isAudioTrack(true)
+                                .isLocalTrack(false)
+                                .build();
                 statsListItemsBuilder.add(item);
                 trackCount++;
             }
             trackCount = 0;
             for (RemoteVideoTrackStats remoteVideoTrackStats : report.getRemoteVideoTrackStats()) {
                 String trackName =
-                        getParticipantName(remoteVideoTrackStats.trackSid, false, remoteParticipants) +
-                                " " + context.getString(R.string.video_track) + " " + trackCount;
-                StatsListItem item = new StatsListItem.Builder()
-                        .baseTrackInfo(remoteVideoTrackStats)
-                        .bytes(remoteVideoTrackStats.bytesReceived)
-                        .dimensions(remoteVideoTrackStats.dimensions.toString())
-                        .framerate(remoteVideoTrackStats.frameRate)
-                        .trackName(trackName)
-                        .isAudioTrack(false)
-                        .isLocalTrack(false)
-                        .build();
+                        getParticipantName(
+                                        remoteVideoTrackStats.trackSid, false, remoteParticipants)
+                                + " "
+                                + context.getString(R.string.video_track)
+                                + " "
+                                + trackCount;
+                StatsListItem item =
+                        new StatsListItem.Builder()
+                                .baseTrackInfo(remoteVideoTrackStats)
+                                .bytes(remoteVideoTrackStats.bytesReceived)
+                                .dimensions(remoteVideoTrackStats.dimensions.toString())
+                                .framerate(remoteVideoTrackStats.frameRate)
+                                .trackName(trackName)
+                                .isAudioTrack(false)
+                                .isLocalTrack(false)
+                                .build();
                 statsListItemsBuilder.add(item);
                 trackCount++;
             }
@@ -212,18 +253,19 @@ public class StatsListAdapter extends RecyclerView.Adapter<StatsListAdapter.View
 
         final ImmutableList immutableStatsListItems = statsListItemsBuilder.build();
 
-        handler.post(new Runnable() {
-            @Override
-            public void run() {
-                statsListItems.clear();
-                statsListItems.addAll(immutableStatsListItems);
-                notifyDataSetChanged();
-            }
-        });
+        handler.post(
+                new Runnable() {
+                    @Override
+                    public void run() {
+                        statsListItems.clear();
+                        statsListItems.addAll(immutableStatsListItems);
+                        notifyDataSetChanged();
+                    }
+                });
     }
 
-    private String getParticipantName(String trackSid, boolean isAudioTrack,
-                                      List<RemoteParticipant> remoteParticipants) {
+    private String getParticipantName(
+            String trackSid, boolean isAudioTrack, List<RemoteParticipant> remoteParticipants) {
         for (RemoteParticipant remoteParticipant : remoteParticipants) {
             if (isAudioTrack) {
                 RemoteAudioTrack remoteAudioTrack = getAudioTrack(remoteParticipant, trackSid);
@@ -231,7 +273,8 @@ public class StatsListAdapter extends RecyclerView.Adapter<StatsListAdapter.View
                     return remoteParticipant.getIdentity();
                 }
             } else {
-                RemoteVideoTrack remoteVideoTrack = getRemoteVideoTrack(remoteParticipant, trackSid);
+                RemoteVideoTrack remoteVideoTrack =
+                        getRemoteVideoTrack(remoteParticipant, trackSid);
                 if (remoteVideoTrack != null) {
                     return remoteParticipant.getIdentity();
                 }
@@ -251,7 +294,8 @@ public class StatsListAdapter extends RecyclerView.Adapter<StatsListAdapter.View
         return null;
     }
 
-    private RemoteVideoTrack getRemoteVideoTrack(RemoteParticipant remoteParticipant, String trackSid) {
+    private RemoteVideoTrack getRemoteVideoTrack(
+            RemoteParticipant remoteParticipant, String trackSid) {
         for (RemoteVideoTrackPublication remoteVideoTrackPublication :
                 remoteParticipant.getRemoteVideoTracks()) {
             if (remoteVideoTrackPublication.getTrackSid().equals(trackSid)) {

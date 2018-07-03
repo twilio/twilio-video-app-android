@@ -18,12 +18,11 @@ package com.twilio.video;
 
 import android.os.Handler;
 import android.support.annotation.Nullable;
-
 import java.nio.ByteBuffer;
 
 /**
- * A remote data track represents a unidirectional remote data source from which messages can
- * be received from a participant.
+ * A remote data track represents a unidirectional remote data source from which messages can be
+ * received from a participant.
  */
 public class RemoteDataTrack extends DataTrack {
     private static final Logger logger = Logger.getLogger(RemoteDataTrack.class);
@@ -42,63 +41,67 @@ public class RemoteDataTrack extends DataTrack {
      * This listener proxy is bound at the JNI level.
      */
     @SuppressWarnings("unused")
-    private final Listener dataTrackListenerProxy = new Listener() {
+    private final Listener dataTrackListenerProxy =
+            new Listener() {
 
-        /*
-         * The onMessage callback is synchronized on the RemoteDataTrack instance in the
-         * notifier and developer thread to ensure the handler and listener are atomically accessed
-         * before notifying the developer.
-         */
+                /*
+                 * The onMessage callback is synchronized on the RemoteDataTrack instance in the
+                 * notifier and developer thread to ensure the handler and listener are atomically accessed
+                 * before notifying the developer.
+                 */
 
-        @Override
-        public void onMessage(final RemoteDataTrack remoteDataTrack,
-                              final ByteBuffer messageBuffer) {
-            checkCallback(messageBuffer, "onMessage(ByteBuffer)");
+                @Override
+                public void onMessage(
+                        final RemoteDataTrack remoteDataTrack, final ByteBuffer messageBuffer) {
+                    checkCallback(messageBuffer, "onMessage(ByteBuffer)");
 
-            synchronized (RemoteDataTrack.this) {
-                if (handler != null) {
-                    handler.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            synchronized (RemoteDataTrack.this) {
-                                logger.d("onMessage(ByteBuffer)");
+                    synchronized (RemoteDataTrack.this) {
+                        if (handler != null) {
+                            handler.post(
+                                    new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            synchronized (RemoteDataTrack.this) {
+                                                logger.d("onMessage(ByteBuffer)");
 
-                                if (listener != null) {
-                                    listener.onMessage(remoteDataTrack, messageBuffer);
-                                }
-                            }
+                                                if (listener != null) {
+                                                    listener.onMessage(
+                                                            remoteDataTrack, messageBuffer);
+                                                }
+                                            }
+                                        }
+                                    });
                         }
-                    });
+                    }
                 }
-            }
-        }
 
-        @Override
-        public void onMessage(final RemoteDataTrack remoteDataTrack, final String message) {
-            checkCallback(message, "onMessage(String)");
+                @Override
+                public void onMessage(final RemoteDataTrack remoteDataTrack, final String message) {
+                    checkCallback(message, "onMessage(String)");
 
-            synchronized (RemoteDataTrack.this) {
-                if (handler != null) {
-                    handler.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            synchronized (RemoteDataTrack.this) {
-                                logger.d("onMessage(String)");
+                    synchronized (RemoteDataTrack.this) {
+                        if (handler != null) {
+                            handler.post(
+                                    new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            synchronized (RemoteDataTrack.this) {
+                                                logger.d("onMessage(String)");
 
-                                if (listener != null) {
-                                    listener.onMessage(remoteDataTrack, message);
-                                }
-                            }
+                                                if (listener != null) {
+                                                    listener.onMessage(remoteDataTrack, message);
+                                                }
+                                            }
+                                        }
+                                    });
                         }
-                    });
+                    }
                 }
-            }
-        }
 
-        private void checkCallback(Object message, String callback) {
-            Preconditions.checkNotNull(message, "Received null message in %s", callback);
-        }
-    };
+                private void checkCallback(Object message, String callback) {
+                    Preconditions.checkNotNull(message, "Received null message in %s", callback);
+                }
+            };
 
     /**
      * Returns the remote data track's server identifier. This value uniquely identifies the remote
@@ -109,8 +112,8 @@ public class RemoteDataTrack extends DataTrack {
     }
 
     /**
-     * Set the remote data track listener. The thread on which this method is called is the
-     * same thread used to notify of received data track messages.
+     * Set the remote data track listener. The thread on which this method is called is the same
+     * thread used to notify of received data track messages.
      *
      * @param listener data track listener
      */
@@ -119,14 +122,15 @@ public class RemoteDataTrack extends DataTrack {
         this.listener = listener;
     }
 
-    RemoteDataTrack(boolean enabled,
-                    boolean ordered,
-                    boolean reliable,
-                    int maxPacketLifeTime,
-                    int maxRetransmits,
-                    String sid,
-                    String name,
-                    long nativeRemoteDataTrackContext) {
+    RemoteDataTrack(
+            boolean enabled,
+            boolean ordered,
+            boolean reliable,
+            int maxPacketLifeTime,
+            int maxRetransmits,
+            String sid,
+            String name,
+            long nativeRemoteDataTrackContext) {
         super(enabled, ordered, reliable, maxPacketLifeTime, maxRetransmits, name);
         this.sid = sid;
         this.nativeRemoteDataTrackContext = nativeRemoteDataTrackContext;
@@ -143,9 +147,7 @@ public class RemoteDataTrack extends DataTrack {
         return nativeRemoteDataTrackContext == 0;
     }
 
-    /**
-     * Interface that provides {@link RemoteDataTrack} events.
-     */
+    /** Interface that provides {@link RemoteDataTrack} events. */
     public interface Listener {
         /**
          * This method notifies the listener that a binary message was received.

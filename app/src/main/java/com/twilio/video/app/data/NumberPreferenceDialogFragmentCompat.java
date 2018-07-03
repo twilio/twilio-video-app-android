@@ -21,20 +21,16 @@ import android.support.v7.preference.DialogPreference;
 import android.support.v7.preference.PreferenceDialogFragmentCompat;
 import android.view.View;
 import android.widget.EditText;
-
 import com.twilio.video.app.R;
-
 import java.util.Locale;
 
 /**
- * NumberPreferenceDialogFragmentCompat allows to instantiate custom {@link NumberPreference}
- * dialog and modify preference values.
+ * NumberPreferenceDialogFragmentCompat allows to instantiate custom {@link NumberPreference} dialog
+ * and modify preference values.
  */
 public class NumberPreferenceDialogFragmentCompat extends PreferenceDialogFragmentCompat {
 
-    /**
-     * Input field.
-     */
+    /** Input field. */
     private EditText numberInput;
 
     /**

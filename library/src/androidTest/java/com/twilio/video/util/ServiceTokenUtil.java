@@ -19,9 +19,8 @@ package com.twilio.video.util;
 import com.twilio.video.IceServer;
 import com.twilio.video.test.BuildConfig;
 import com.twilio.video.twilioapi.TwilioApiUtils;
-import com.twilio.video.twilioapi.model.TwilioServiceToken;
 import com.twilio.video.twilioapi.model.TwilioIceServer;
-
+import com.twilio.video.twilioapi.model.TwilioServiceToken;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -34,11 +33,13 @@ public class ServiceTokenUtil {
     private static TwilioServiceToken twilioServiceToken = null;
 
     public static Set<IceServer> getIceServers() {
-        Map<String, String> credentials = CredentialsUtils.resolveCredentials(
-                Environment.fromString(BuildConfig.ENVIRONMENT));
+        Map<String, String> credentials =
+                CredentialsUtils.resolveCredentials(
+                        Environment.fromString(BuildConfig.ENVIRONMENT));
         if (isExpired(twilioServiceToken)) {
-            twilioServiceToken = TwilioApiUtils
-                    .getServiceToken(credentials.get(CredentialsUtils.ACCOUNT_SID),
+            twilioServiceToken =
+                    TwilioApiUtils.getServiceToken(
+                            credentials.get(CredentialsUtils.ACCOUNT_SID),
                             credentials.get(CredentialsUtils.API_KEY),
                             credentials.get(CredentialsUtils.API_KEY_SECRET),
                             BuildConfig.ENVIRONMENT);
@@ -67,15 +68,15 @@ public class ServiceTokenUtil {
         return false;
     }
 
-    private static Set<IceServer> convertToIceServersSet(
-        List<TwilioIceServer> twilioIceServers) {
+    private static Set<IceServer> convertToIceServersSet(List<TwilioIceServer> twilioIceServers) {
         Set<IceServer> result = new HashSet<>();
         if (twilioIceServers != null && twilioIceServers.size() > 0) {
             for (TwilioIceServer twilioIceServer : twilioIceServers) {
-                IceServer iceServer = new IceServer(
-                    twilioIceServer.getUrl(),
-                    twilioIceServer.getUsername(),
-                    twilioIceServer.getCredential());
+                IceServer iceServer =
+                        new IceServer(
+                                twilioIceServer.getUrl(),
+                                twilioIceServer.getUsername(),
+                                twilioIceServer.getCredential());
                 result.add(iceServer);
             }
         }

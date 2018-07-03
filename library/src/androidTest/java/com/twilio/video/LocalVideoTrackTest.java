@@ -16,31 +16,27 @@
 
 package com.twilio.video;
 
-import android.content.Context;
-import android.support.test.InstrumentationRegistry;
-import android.support.test.filters.SmallTest;
-import android.support.test.runner.AndroidJUnit4;
-
-import com.twilio.video.base.BaseVideoTest;
-import com.twilio.video.util.FakeVideoCapturer;
-import com.twilio.video.util.FakeVideoRenderer;
-import com.twilio.video.util.FrameCountRenderer;
-import com.twilio.video.util.StringUtils;
-
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-
-
-
 import static com.twilio.video.util.VideoAssert.assertNoFramesRendered;
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertFalse;
 import static junit.framework.TestCase.assertNotNull;
 import static org.apache.commons.lang3.RandomStringUtils.random;
 import static org.junit.Assert.assertTrue;
+
+import android.content.Context;
+import android.support.test.InstrumentationRegistry;
+import android.support.test.filters.SmallTest;
+import android.support.test.runner.AndroidJUnit4;
+import com.twilio.video.base.BaseVideoTest;
+import com.twilio.video.util.FakeVideoCapturer;
+import com.twilio.video.util.FakeVideoRenderer;
+import com.twilio.video.util.FrameCountRenderer;
+import com.twilio.video.util.StringUtils;
+import org.junit.After;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
 
 @RunWith(AndroidJUnit4.class)
 @SmallTest
@@ -214,11 +210,11 @@ public class LocalVideoTrackTest extends BaseVideoTest {
     @Test
     public void canCreateMultipleVideoTracks() {
         int numVideoTracks = 5;
-        boolean[] expectedEnabled = new boolean[]{ false, true, true, false, false };
+        boolean[] expectedEnabled = new boolean[] {false, true, true, false, false};
 
-        for (int i = 0 ; i < numVideoTracks ; i++) {
-            LocalVideoTrack localVideoTrack = LocalVideoTrack.create(context, expectedEnabled[i],
-                    fakeVideoCapturer);
+        for (int i = 0; i < numVideoTracks; i++) {
+            LocalVideoTrack localVideoTrack =
+                    LocalVideoTrack.create(context, expectedEnabled[i], fakeVideoCapturer);
 
             assertNotNull(localVideoTrack);
             assertEquals(expectedEnabled[i], localVideoTrack.isEnabled());
@@ -234,14 +230,17 @@ public class LocalVideoTrackTest extends BaseVideoTest {
         Integer expectedMaxHeight = 360;
         Integer expectedMinFps = 5;
         Integer expectedMaxFps = 30;
-        VideoConstraints validVideoConstraints = new VideoConstraints.Builder()
-                .minVideoDimensions(new VideoDimensions(expectedMinWidth, expectedMinHeight))
-                .maxVideoDimensions(new VideoDimensions(expectedMaxWidth, expectedMaxHeight))
-                .minFps(expectedMinFps)
-                .maxFps(expectedMaxFps)
-                .build();
-        localVideoTrack = LocalVideoTrack.create(context,
-                true, fakeVideoCapturer, validVideoConstraints);
+        VideoConstraints validVideoConstraints =
+                new VideoConstraints.Builder()
+                        .minVideoDimensions(
+                                new VideoDimensions(expectedMinWidth, expectedMinHeight))
+                        .maxVideoDimensions(
+                                new VideoDimensions(expectedMaxWidth, expectedMaxHeight))
+                        .minFps(expectedMinFps)
+                        .maxFps(expectedMaxFps)
+                        .build();
+        localVideoTrack =
+                LocalVideoTrack.create(context, true, fakeVideoCapturer, validVideoConstraints);
 
         Assert.assertNotNull(localVideoTrack);
 

@@ -18,13 +18,10 @@ package com.twilio.video.app.util;
 
 import android.content.Context;
 import android.util.Pair;
-
 import com.twilio.video.Camera2Capturer;
 import com.twilio.video.CameraCapturer;
 import com.twilio.video.VideoCapturer;
-
 import org.webrtc.Camera2Enumerator;
-
 import timber.log.Timber;
 
 /*
@@ -35,30 +32,29 @@ public class CameraCapturerCompat {
     private Camera2Capturer camera2Capturer;
     private Pair<CameraCapturer.CameraSource, String> frontCameraPair;
     private Pair<CameraCapturer.CameraSource, String> backCameraPair;
-    private final Camera2Capturer.Listener camera2Listener = new Camera2Capturer.Listener() {
-        @Override
-        public void onFirstFrameAvailable() {
-            Timber.i("onFirstFrameAvailable");
-        }
+    private final Camera2Capturer.Listener camera2Listener =
+            new Camera2Capturer.Listener() {
+                @Override
+                public void onFirstFrameAvailable() {
+                    Timber.i("onFirstFrameAvailable");
+                }
 
-        @Override
-        public void onCameraSwitched(String newCameraId) {
-            Timber.i("onCameraSwitched: newCameraId = %s", newCameraId);
-        }
+                @Override
+                public void onCameraSwitched(String newCameraId) {
+                    Timber.i("onCameraSwitched: newCameraId = %s", newCameraId);
+                }
 
-        @Override
-        public void onError(Camera2Capturer.Exception camera2CapturerException) {
-            Timber.e(camera2CapturerException.getMessage());
-        }
-    };
+                @Override
+                public void onError(Camera2Capturer.Exception camera2CapturerException) {
+                    Timber.e(camera2CapturerException.getMessage());
+                }
+            };
 
-    public CameraCapturerCompat(Context context,
-                                CameraCapturer.CameraSource cameraSource) {
+    public CameraCapturerCompat(Context context, CameraCapturer.CameraSource cameraSource) {
         if (Camera2Capturer.isSupported(context)) {
             setCameraPairs(context);
-            camera2Capturer = new Camera2Capturer(context,
-                    getCameraId(cameraSource),
-                    camera2Listener);
+            camera2Capturer =
+                    new Camera2Capturer(context, getCameraId(cameraSource), camera2Listener);
         } else {
             camera1Capturer = new CameraCapturer(context, cameraSource);
         }
@@ -76,8 +72,8 @@ public class CameraCapturerCompat {
         if (usingCamera1()) {
             camera1Capturer.switchCamera();
         } else {
-            CameraCapturer.CameraSource cameraSource = getCameraSource(camera2Capturer
-                    .getCameraId());
+            CameraCapturer.CameraSource cameraSource =
+                    getCameraSource(camera2Capturer.getCameraId());
 
             if (cameraSource == CameraCapturer.CameraSource.FRONT_CAMERA) {
                 camera2Capturer.switchCamera(backCameraPair.second);

@@ -16,9 +16,13 @@
 
 package com.twilio.video;
 
+import static com.twilio.video.util.VideoAssert.assertIsTrackSid;
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 import android.support.test.InstrumentationRegistry;
 import android.support.test.filters.LargeTest;
-
 import com.kevinmost.junit_retry_rule.Retry;
 import com.kevinmost.junit_retry_rule.RetryRule;
 import com.twilio.video.base.BaseParticipantTest;
@@ -27,7 +31,12 @@ import com.twilio.video.test.BuildConfig;
 import com.twilio.video.util.Constants;
 import com.twilio.video.util.CredentialsUtils;
 import com.twilio.video.util.Topology;
-
+import java.nio.ByteBuffer;
+import java.util.Arrays;
+import java.util.List;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicReference;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -35,30 +44,15 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
-import java.nio.ByteBuffer;
-import java.util.Arrays;
-import java.util.List;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicReference;
-
-import static com.twilio.video.util.VideoAssert.assertIsTrackSid;
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
 @RunWith(Parameterized.class)
 @LargeTest
 public class DataTrackTopologyParameterizedTest extends BaseParticipantTest {
     @Parameterized.Parameters(name = "{0}")
     public static Iterable<Object[]> data() {
-        return Arrays.asList(new Object[][]{
-                {Topology.P2P},
-                {Topology.GROUP}});
+        return Arrays.asList(new Object[][] {{Topology.P2P}, {Topology.GROUP}});
     }
 
-    @Rule
-    public final RetryRule retryRule = new RetryRule();
+    @Rule public final RetryRule retryRule = new RetryRule();
     private final Topology topology;
     private final CallbackHelper.FakeRemoteDataTrackListener dataTrackListener =
             new CallbackHelper.FakeRemoteDataTrackListener();
@@ -110,9 +104,7 @@ public class DataTrackTopologyParameterizedTest extends BaseParticipantTest {
     @Test
     @Retry(times = BuildConfig.MAX_TEST_RETRIES)
     public void canSendMessageWithUnorderedDataTrack() throws InterruptedException {
-        DataTrackOptions dataTrackOptions = new DataTrackOptions.Builder()
-                .ordered(false)
-                .build();
+        DataTrackOptions dataTrackOptions = new DataTrackOptions.Builder().ordered(false).build();
         publishDataTrack(dataTrackOptions);
         String firstExpectedMessage = "Hello";
         String secondExpectedMessage = "DataTrack!";
@@ -127,12 +119,10 @@ public class DataTrackTopologyParameterizedTest extends BaseParticipantTest {
     @Test
     @Retry(times = BuildConfig.MAX_TEST_RETRIES)
     public void canSendBufferMessageWithUnorderedDataTrack() throws InterruptedException {
-        DataTrackOptions dataTrackOptions = new DataTrackOptions.Builder()
-                .ordered(false)
-                .build();
+        DataTrackOptions dataTrackOptions = new DataTrackOptions.Builder().ordered(false).build();
         publishDataTrack(dataTrackOptions);
-        ByteBuffer firstExpectedBufferMessage = ByteBuffer.wrap(new byte[] { 0x1, 0x2 });
-        ByteBuffer secondExpectedBufferMessage = ByteBuffer.wrap(new byte[] { 0xa, 0xb });
+        ByteBuffer firstExpectedBufferMessage = ByteBuffer.wrap(new byte[] {0x1, 0x2});
+        ByteBuffer secondExpectedBufferMessage = ByteBuffer.wrap(new byte[] {0xa, 0xb});
         dataTrackListener.onBufferMessageLatch = new CountDownLatch(2);
         bobLocalDataTrack.send(firstExpectedBufferMessage);
         bobLocalDataTrack.send(secondExpectedBufferMessage);
@@ -144,9 +134,8 @@ public class DataTrackTopologyParameterizedTest extends BaseParticipantTest {
     @Test
     @Retry(times = BuildConfig.MAX_TEST_RETRIES)
     public void canSendMessageWithMaxPacketLifeTime() throws InterruptedException {
-        DataTrackOptions dataTrackOptions = new DataTrackOptions.Builder()
-                .maxPacketLifeTime(1000)
-                .build();
+        DataTrackOptions dataTrackOptions =
+                new DataTrackOptions.Builder().maxPacketLifeTime(1000).build();
         publishDataTrack(dataTrackOptions);
         String firstExpectedMessage = "Hello";
         String secondExpectedMessage = "DataTrack!";
@@ -161,12 +150,11 @@ public class DataTrackTopologyParameterizedTest extends BaseParticipantTest {
     @Test
     @Retry(times = BuildConfig.MAX_TEST_RETRIES)
     public void canSendBufferMessageWithMaxPacketLifeTime() throws InterruptedException {
-        DataTrackOptions dataTrackOptions = new DataTrackOptions.Builder()
-                .maxPacketLifeTime(1000)
-                .build();
+        DataTrackOptions dataTrackOptions =
+                new DataTrackOptions.Builder().maxPacketLifeTime(1000).build();
         publishDataTrack(dataTrackOptions);
-        ByteBuffer firstExpectedBufferMessage = ByteBuffer.wrap(new byte[] { 0x1, 0x2 });
-        ByteBuffer secondExpectedBufferMessage = ByteBuffer.wrap(new byte[] { 0xa, 0xb });
+        ByteBuffer firstExpectedBufferMessage = ByteBuffer.wrap(new byte[] {0x1, 0x2});
+        ByteBuffer secondExpectedBufferMessage = ByteBuffer.wrap(new byte[] {0xa, 0xb});
         dataTrackListener.onBufferMessageLatch = new CountDownLatch(2);
         bobLocalDataTrack.send(firstExpectedBufferMessage);
         bobLocalDataTrack.send(secondExpectedBufferMessage);
@@ -178,9 +166,8 @@ public class DataTrackTopologyParameterizedTest extends BaseParticipantTest {
     @Test
     @Retry(times = BuildConfig.MAX_TEST_RETRIES)
     public void canSendMessageWithMaxRetransmits() throws InterruptedException {
-        DataTrackOptions dataTrackOptions = new DataTrackOptions.Builder()
-                .maxRetransmits(1000)
-                .build();
+        DataTrackOptions dataTrackOptions =
+                new DataTrackOptions.Builder().maxRetransmits(1000).build();
         publishDataTrack(dataTrackOptions);
         String firstExpectedMessage = "Hello";
         String secondExpectedMessage = "DataTrack!";
@@ -195,12 +182,11 @@ public class DataTrackTopologyParameterizedTest extends BaseParticipantTest {
     @Test
     @Retry(times = BuildConfig.MAX_TEST_RETRIES)
     public void canSendBufferMessageWithMaxRetransmits() throws InterruptedException {
-        DataTrackOptions dataTrackOptions = new DataTrackOptions.Builder()
-                .maxRetransmits(1000)
-                .build();
+        DataTrackOptions dataTrackOptions =
+                new DataTrackOptions.Builder().maxRetransmits(1000).build();
         publishDataTrack(dataTrackOptions);
-        ByteBuffer firstExpectedBufferMessage = ByteBuffer.wrap(new byte[] { 0x1, 0x2 });
-        ByteBuffer secondExpectedBufferMessage = ByteBuffer.wrap(new byte[] { 0xa, 0xb });
+        ByteBuffer firstExpectedBufferMessage = ByteBuffer.wrap(new byte[] {0x1, 0x2});
+        ByteBuffer secondExpectedBufferMessage = ByteBuffer.wrap(new byte[] {0xa, 0xb});
         dataTrackListener.onBufferMessageLatch = new CountDownLatch(2);
         bobLocalDataTrack.send(firstExpectedBufferMessage);
         bobLocalDataTrack.send(secondExpectedBufferMessage);
@@ -213,12 +199,13 @@ public class DataTrackTopologyParameterizedTest extends BaseParticipantTest {
     @Retry(times = BuildConfig.MAX_TEST_RETRIES)
     public void canSendBufferMessage() throws InterruptedException {
         publishDataTrack();
-        ByteBuffer expectedMessageBuffer = ByteBuffer.wrap(new byte[] { 0x0, 0x1, 0x2, 0x3 });
+        ByteBuffer expectedMessageBuffer = ByteBuffer.wrap(new byte[] {0x0, 0x1, 0x2, 0x3});
         dataTrackListener.onBufferMessageLatch = new CountDownLatch(1);
         bobLocalDataTrack.send(expectedMessageBuffer);
         assertTrue(dataTrackListener.onBufferMessageLatch.await(20, TimeUnit.SECONDS));
         assertEquals(Integer.valueOf(1), dataTrackListener.bufferMessages.get(0).first);
-        assertArrayEquals(expectedMessageBuffer.array(),
+        assertArrayEquals(
+                expectedMessageBuffer.array(),
                 dataTrackListener.bufferMessages.get(0).second.array());
     }
 
@@ -227,9 +214,9 @@ public class DataTrackTopologyParameterizedTest extends BaseParticipantTest {
     public void canSendMultipleMessages() throws InterruptedException {
         publishDataTrack();
         String firstExpectedMessage = "Hello";
-        ByteBuffer firstExpectedBufferMessage = ByteBuffer.wrap(new byte[] { 0x0, 0x1, 0x2, 0x3 });
+        ByteBuffer firstExpectedBufferMessage = ByteBuffer.wrap(new byte[] {0x0, 0x1, 0x2, 0x3});
         String secondExpectedMessage = "DataTrack!";
-        ByteBuffer secondExpectedBufferMessage = ByteBuffer.wrap(new byte[] { 0xa, 0xb, 0xc, 0xd });
+        ByteBuffer secondExpectedBufferMessage = ByteBuffer.wrap(new byte[] {0xa, 0xb, 0xc, 0xd});
         dataTrackListener.onStringMessageLatch = new CountDownLatch(2);
         dataTrackListener.onBufferMessageLatch = new CountDownLatch(2);
         bobLocalDataTrack.send(firstExpectedMessage);
@@ -241,12 +228,14 @@ public class DataTrackTopologyParameterizedTest extends BaseParticipantTest {
         assertEquals(Integer.valueOf(1), dataTrackListener.messages.get(0).first);
         assertEquals(firstExpectedMessage, dataTrackListener.messages.get(0).second);
         assertEquals(Integer.valueOf(2), dataTrackListener.bufferMessages.get(0).first);
-        assertArrayEquals(firstExpectedBufferMessage.array(),
+        assertArrayEquals(
+                firstExpectedBufferMessage.array(),
                 dataTrackListener.bufferMessages.get(0).second.array());
         assertEquals(Integer.valueOf(3), dataTrackListener.messages.get(1).first);
         assertEquals(secondExpectedMessage, dataTrackListener.messages.get(1).second);
         assertEquals(Integer.valueOf(4), dataTrackListener.bufferMessages.get(1).first);
-        assertArrayEquals(secondExpectedBufferMessage.array(),
+        assertArrayEquals(
+                secondExpectedBufferMessage.array(),
                 dataTrackListener.bufferMessages.get(1).second.array());
     }
 
@@ -260,9 +249,9 @@ public class DataTrackTopologyParameterizedTest extends BaseParticipantTest {
         publishDataTrack(bobSecondLocalDataTrack);
 
         String firstExpectedMessage = "Hello";
-        ByteBuffer firstExpectedBufferMessage = ByteBuffer.wrap(new byte[] { 0x0, 0x1, 0x2, 0x3 });
+        ByteBuffer firstExpectedBufferMessage = ByteBuffer.wrap(new byte[] {0x0, 0x1, 0x2, 0x3});
         String secondExpectedMessage = "DataTrack!";
-        ByteBuffer secondExpectedBufferMessage = ByteBuffer.wrap(new byte[] { 0xa, 0xb, 0xc, 0xd });
+        ByteBuffer secondExpectedBufferMessage = ByteBuffer.wrap(new byte[] {0xa, 0xb, 0xc, 0xd});
         dataTrackListener.onStringMessageLatch = new CountDownLatch(2);
         dataTrackListener.onBufferMessageLatch = new CountDownLatch(2);
 
@@ -300,11 +289,10 @@ public class DataTrackTopologyParameterizedTest extends BaseParticipantTest {
                 new CallbackHelper.FakeRemoteDataTrackListener();
 
         // Connect charlie
-        String charlieToken = CredentialsUtils.getAccessToken(Constants.PARTICIPANT_CHARLIE,
-                topology);
-        ConnectOptions charlieConnectOptions = new ConnectOptions.Builder(charlieToken)
-                .roomName(testRoomName)
-                .build();
+        String charlieToken =
+                CredentialsUtils.getAccessToken(Constants.PARTICIPANT_CHARLIE, topology);
+        ConnectOptions charlieConnectOptions =
+                new ConnectOptions.Builder(charlieToken).roomName(testRoomName).build();
         charlieRoom = connect(charlieConnectOptions, charlieRoomListener);
 
         // Alice and Bob wait to see charlie connected
@@ -325,18 +313,24 @@ public class DataTrackTopologyParameterizedTest extends BaseParticipantTest {
         assertTrue(participantListener.onSubscribedToDataTrackLatch.await(20, TimeUnit.SECONDS));
 
         // Alice and bob observer charlie remote data track
-        charlieAliceRemoteParticipant.getRemoteDataTracks().get(0).getRemoteDataTrack()
+        charlieAliceRemoteParticipant
+                .getRemoteDataTracks()
+                .get(0)
+                .getRemoteDataTrack()
                 .setListener(aliceDataTrackListener);
-        charlieBobRemoteParticipant.getRemoteDataTracks().get(0).getRemoteDataTrack()
+        charlieBobRemoteParticipant
+                .getRemoteDataTracks()
+                .get(0)
+                .getRemoteDataTrack()
                 .setListener(bobDataTrackListener);
 
         // Wait to ensure the data channels reach opened state
         Thread.sleep(1000);
 
         String firstExpectedMessage = "Hello";
-        ByteBuffer firstExpectedBufferMessage = ByteBuffer.wrap(new byte[] { 0x0, 0x1, 0x2, 0x3 });
+        ByteBuffer firstExpectedBufferMessage = ByteBuffer.wrap(new byte[] {0x0, 0x1, 0x2, 0x3});
         String secondExpectedMessage = "DataTrack!";
-        ByteBuffer secondExpectedBufferMessage = ByteBuffer.wrap(new byte[] { 0xa, 0xb, 0xc, 0xd });
+        ByteBuffer secondExpectedBufferMessage = ByteBuffer.wrap(new byte[] {0xa, 0xb, 0xc, 0xd});
         aliceDataTrackListener.onStringMessageLatch = new CountDownLatch(2);
         aliceDataTrackListener.onBufferMessageLatch = new CountDownLatch(2);
         bobDataTrackListener.onStringMessageLatch = new CountDownLatch(2);
@@ -358,22 +352,26 @@ public class DataTrackTopologyParameterizedTest extends BaseParticipantTest {
         assertEquals(Integer.valueOf(1), aliceDataTrackListener.messages.get(0).first);
         assertEquals(firstExpectedMessage, aliceDataTrackListener.messages.get(0).second);
         assertEquals(Integer.valueOf(2), aliceDataTrackListener.bufferMessages.get(0).first);
-        assertArrayEquals(firstExpectedBufferMessage.array(),
+        assertArrayEquals(
+                firstExpectedBufferMessage.array(),
                 aliceDataTrackListener.bufferMessages.get(0).second.array());
         assertEquals(Integer.valueOf(3), aliceDataTrackListener.messages.get(1).first);
         assertEquals(secondExpectedMessage, aliceDataTrackListener.messages.get(1).second);
         assertEquals(Integer.valueOf(4), aliceDataTrackListener.bufferMessages.get(1).first);
-        assertArrayEquals(secondExpectedBufferMessage.array(),
+        assertArrayEquals(
+                secondExpectedBufferMessage.array(),
                 aliceDataTrackListener.bufferMessages.get(1).second.array());
         assertEquals(Integer.valueOf(1), bobDataTrackListener.messages.get(0).first);
         assertEquals(firstExpectedMessage, bobDataTrackListener.messages.get(0).second);
         assertEquals(Integer.valueOf(2), bobDataTrackListener.bufferMessages.get(0).first);
-        assertArrayEquals(firstExpectedBufferMessage.array(),
+        assertArrayEquals(
+                firstExpectedBufferMessage.array(),
                 bobDataTrackListener.bufferMessages.get(0).second.array());
         assertEquals(Integer.valueOf(3), bobDataTrackListener.messages.get(1).first);
         assertEquals(secondExpectedMessage, bobDataTrackListener.messages.get(1).second);
         assertEquals(Integer.valueOf(4), bobDataTrackListener.bufferMessages.get(1).first);
-        assertArrayEquals(secondExpectedBufferMessage.array(),
+        assertArrayEquals(
+                secondExpectedBufferMessage.array(),
                 bobDataTrackListener.bufferMessages.get(1).second.array());
     }
 
@@ -392,11 +390,10 @@ public class DataTrackTopologyParameterizedTest extends BaseParticipantTest {
                 new CallbackHelper.FakeRemoteDataTrackListener();
 
         // Connect charlie
-        String charlieToken = CredentialsUtils.getAccessToken(Constants.PARTICIPANT_CHARLIE,
-                topology);
-        ConnectOptions charlieConnectOptions = new ConnectOptions.Builder(charlieToken)
-                .roomName(testRoomName)
-                .build();
+        String charlieToken =
+                CredentialsUtils.getAccessToken(Constants.PARTICIPANT_CHARLIE, topology);
+        ConnectOptions charlieConnectOptions =
+                new ConnectOptions.Builder(charlieToken).roomName(testRoomName).build();
         charlieRoom = connect(charlieConnectOptions, charlieRoomListener);
 
         // Alice and Bob wait to see charlie connected
@@ -417,18 +414,24 @@ public class DataTrackTopologyParameterizedTest extends BaseParticipantTest {
         assertTrue(participantListener.onSubscribedToDataTrackLatch.await(20, TimeUnit.SECONDS));
 
         // Alice and bob observer charlie remote data track
-        charlieAliceRemoteParticipant.getRemoteDataTracks().get(0).getRemoteDataTrack()
+        charlieAliceRemoteParticipant
+                .getRemoteDataTracks()
+                .get(0)
+                .getRemoteDataTrack()
                 .setListener(aliceDataTrackListener);
-        charlieBobRemoteParticipant.getRemoteDataTracks().get(0).getRemoteDataTrack()
+        charlieBobRemoteParticipant
+                .getRemoteDataTracks()
+                .get(0)
+                .getRemoteDataTrack()
                 .setListener(bobDataTrackListener);
 
         // Wait to ensure the data channels reach opened state
         Thread.sleep(1000);
 
         String firstExpectedMessage = "Hello";
-        ByteBuffer firstExpectedBufferMessage = ByteBuffer.wrap(new byte[] { 0x0, 0x1, 0x2, 0x3 });
+        ByteBuffer firstExpectedBufferMessage = ByteBuffer.wrap(new byte[] {0x0, 0x1, 0x2, 0x3});
         String secondExpectedMessage = "DataTrack!";
-        ByteBuffer secondExpectedBufferMessage = ByteBuffer.wrap(new byte[] { 0xa, 0xb, 0xc, 0xd });
+        ByteBuffer secondExpectedBufferMessage = ByteBuffer.wrap(new byte[] {0xa, 0xb, 0xc, 0xd});
         aliceDataTrackListener.onStringMessageLatch = new CountDownLatch(2);
         aliceDataTrackListener.onBufferMessageLatch = new CountDownLatch(2);
         bobDataTrackListener.onStringMessageLatch = new CountDownLatch(2);
@@ -450,22 +453,26 @@ public class DataTrackTopologyParameterizedTest extends BaseParticipantTest {
         assertEquals(Integer.valueOf(1), aliceDataTrackListener.messages.get(0).first);
         assertEquals(firstExpectedMessage, aliceDataTrackListener.messages.get(0).second);
         assertEquals(Integer.valueOf(2), aliceDataTrackListener.bufferMessages.get(0).first);
-        assertArrayEquals(firstExpectedBufferMessage.array(),
+        assertArrayEquals(
+                firstExpectedBufferMessage.array(),
                 aliceDataTrackListener.bufferMessages.get(0).second.array());
         assertEquals(Integer.valueOf(3), aliceDataTrackListener.messages.get(1).first);
         assertEquals(secondExpectedMessage, aliceDataTrackListener.messages.get(1).second);
         assertEquals(Integer.valueOf(4), aliceDataTrackListener.bufferMessages.get(1).first);
-        assertArrayEquals(secondExpectedBufferMessage.array(),
+        assertArrayEquals(
+                secondExpectedBufferMessage.array(),
                 aliceDataTrackListener.bufferMessages.get(1).second.array());
         assertEquals(Integer.valueOf(1), bobDataTrackListener.messages.get(0).first);
         assertEquals(firstExpectedMessage, bobDataTrackListener.messages.get(0).second);
         assertEquals(Integer.valueOf(2), bobDataTrackListener.bufferMessages.get(0).first);
-        assertArrayEquals(firstExpectedBufferMessage.array(),
+        assertArrayEquals(
+                firstExpectedBufferMessage.array(),
                 bobDataTrackListener.bufferMessages.get(0).second.array());
         assertEquals(Integer.valueOf(3), bobDataTrackListener.messages.get(1).first);
         assertEquals(secondExpectedMessage, bobDataTrackListener.messages.get(1).second);
         assertEquals(Integer.valueOf(4), bobDataTrackListener.bufferMessages.get(1).first);
-        assertArrayEquals(secondExpectedBufferMessage.array(),
+        assertArrayEquals(
+                secondExpectedBufferMessage.array(),
                 bobDataTrackListener.bufferMessages.get(1).second.array());
 
         // Alice disconnects
@@ -487,12 +494,14 @@ public class DataTrackTopologyParameterizedTest extends BaseParticipantTest {
         assertEquals(Integer.valueOf(5), bobDataTrackListener.messages.get(2).first);
         assertEquals(firstExpectedMessage, bobDataTrackListener.messages.get(2).second);
         assertEquals(Integer.valueOf(6), bobDataTrackListener.bufferMessages.get(2).first);
-        assertArrayEquals(firstExpectedBufferMessage.array(),
+        assertArrayEquals(
+                firstExpectedBufferMessage.array(),
                 bobDataTrackListener.bufferMessages.get(2).second.array());
         assertEquals(Integer.valueOf(7), bobDataTrackListener.messages.get(3).first);
         assertEquals(secondExpectedMessage, bobDataTrackListener.messages.get(3).second);
         assertEquals(Integer.valueOf(8), bobDataTrackListener.bufferMessages.get(3).first);
-        assertArrayEquals(secondExpectedBufferMessage.array(),
+        assertArrayEquals(
+                secondExpectedBufferMessage.array(),
                 bobDataTrackListener.bufferMessages.get(3).second.array());
     }
 
@@ -501,7 +510,7 @@ public class DataTrackTopologyParameterizedTest extends BaseParticipantTest {
     public void canSendAfterUnpublished() throws InterruptedException {
         publishDataTrack();
         String expectedMessage = "Hello";
-        ByteBuffer expectedBufferMessage = ByteBuffer.wrap(new byte[] { 0x0, 0x1, 0x2, 0x3 });
+        ByteBuffer expectedBufferMessage = ByteBuffer.wrap(new byte[] {0x0, 0x1, 0x2, 0x3});
         dataTrackListener.onStringMessageLatch = new CountDownLatch(1);
         dataTrackListener.onBufferMessageLatch = new CountDownLatch(1);
         bobLocalDataTrack.send(expectedMessage);
@@ -511,12 +520,13 @@ public class DataTrackTopologyParameterizedTest extends BaseParticipantTest {
         assertEquals(Integer.valueOf(1), dataTrackListener.messages.get(0).first);
         assertEquals(expectedMessage, dataTrackListener.messages.get(0).second);
         assertEquals(Integer.valueOf(2), dataTrackListener.bufferMessages.get(0).first);
-        assertArrayEquals(expectedBufferMessage.array(),
+        assertArrayEquals(
+                expectedBufferMessage.array(),
                 dataTrackListener.bufferMessages.get(0).second.array());
         bobLocalParticipant.unpublishTrack(bobLocalDataTrack);
 
         // Try to send messages after unpublishing
-        for (int i = 0 ; i < 5 ; i++) {
+        for (int i = 0; i < 5; i++) {
             bobLocalDataTrack.send(expectedMessage);
             bobLocalDataTrack.send(expectedBufferMessage);
         }
@@ -531,7 +541,8 @@ public class DataTrackTopologyParameterizedTest extends BaseParticipantTest {
         bobLocalDataTrack = LocalDataTrack.create(mediaTestActivity);
         assertTrue(bobLocalParticipant.publishTrack(bobLocalDataTrack));
         assertTrue(aliceParticipantListener.onDataTrackPublishedLatch.await(20, TimeUnit.SECONDS));
-        assertTrue(aliceParticipantListener.onSubscribedToDataTrackLatch.await(20, TimeUnit.SECONDS));
+        assertTrue(
+                aliceParticipantListener.onSubscribedToDataTrackLatch.await(20, TimeUnit.SECONDS));
         final RemoteDataTrack remoteDataTrack =
                 bobRemoteParticipant.getRemoteDataTracks().get(0).getRemoteDataTrack();
         // Wait to ensure the data channels reach opened state
@@ -544,31 +555,38 @@ public class DataTrackTopologyParameterizedTest extends BaseParticipantTest {
         final AtomicReference<Long> onBufferMessageThreadId = new AtomicReference<>();
         final AtomicReference<Long> onStringMessageThreadId = new AtomicReference<>();
         final CountDownLatch messagesReceived = new CountDownLatch(2);
-        InstrumentationRegistry.getInstrumentation().runOnMainSync(new Runnable() {
-            @Override
-            public void run() {
-                expectedThreadId.set(Thread.currentThread().getId());
-                final RemoteDataTrack.Listener dataTrackListener = new RemoteDataTrack.Listener() {
-                    @Override
-                    public void onMessage(RemoteDataTrack remoteDataTrack,
-                                          ByteBuffer messageBuffer) {
-                        onBufferMessageThreadId.set(Thread.currentThread().getId());
-                        messagesReceived.countDown();
-                    }
+        InstrumentationRegistry.getInstrumentation()
+                .runOnMainSync(
+                        new Runnable() {
+                            @Override
+                            public void run() {
+                                expectedThreadId.set(Thread.currentThread().getId());
+                                final RemoteDataTrack.Listener dataTrackListener =
+                                        new RemoteDataTrack.Listener() {
+                                            @Override
+                                            public void onMessage(
+                                                    RemoteDataTrack remoteDataTrack,
+                                                    ByteBuffer messageBuffer) {
+                                                onBufferMessageThreadId.set(
+                                                        Thread.currentThread().getId());
+                                                messagesReceived.countDown();
+                                            }
 
-                    @Override
-                    public void onMessage(RemoteDataTrack remoteDataTrack,
-                                          String message) {
-                        onStringMessageThreadId.set(Thread.currentThread().getId());
-                        messagesReceived.countDown();
-                    }
-                };
+                                            @Override
+                                            public void onMessage(
+                                                    RemoteDataTrack remoteDataTrack,
+                                                    String message) {
+                                                onStringMessageThreadId.set(
+                                                        Thread.currentThread().getId());
+                                                messagesReceived.countDown();
+                                            }
+                                        };
 
-                remoteDataTrack.setListener(dataTrackListener);
-                bobLocalDataTrack.send("hello data track");
-                bobLocalDataTrack.send(ByteBuffer.wrap(new byte[] { 0xf, 0xe }));
-            }
-        });
+                                remoteDataTrack.setListener(dataTrackListener);
+                                bobLocalDataTrack.send("hello data track");
+                                bobLocalDataTrack.send(ByteBuffer.wrap(new byte[] {0xf, 0xe}));
+                            }
+                        });
 
         assertTrue(messagesReceived.await(10, TimeUnit.SECONDS));
         assertEquals(expectedThreadId.get(), onBufferMessageThreadId.get());
@@ -576,8 +594,9 @@ public class DataTrackTopologyParameterizedTest extends BaseParticipantTest {
     }
 
     private void publishDataTrack() throws InterruptedException {
-        bobLocalDataTrack = LocalDataTrack.create(mediaTestActivity,
-                DataTrackOptions.DEFAULT_DATA_TRACK_OPTIONS);
+        bobLocalDataTrack =
+                LocalDataTrack.create(
+                        mediaTestActivity, DataTrackOptions.DEFAULT_DATA_TRACK_OPTIONS);
         publishDataTrack(bobLocalDataTrack);
     }
 
@@ -594,12 +613,13 @@ public class DataTrackTopologyParameterizedTest extends BaseParticipantTest {
         bobLocalParticipantListener.onPublishedDataTrackLatch = new CountDownLatch(1);
         bobLocalParticipant.setListener(bobLocalParticipantListener);
         assertTrue(bobLocalParticipant.publishTrack(localDataTrack));
-        assertTrue(bobLocalParticipantListener.onPublishedDataTrackLatch.await(20,
-                TimeUnit.SECONDS));
+        assertTrue(
+                bobLocalParticipantListener.onPublishedDataTrackLatch.await(20, TimeUnit.SECONDS));
         LocalDataTrackPublication localDataTrackPublication =
                 getLocalDataTrackPublication(localDataTrack, bobLocalParticipant);
         assertTrue(aliceParticipantListener.onDataTrackPublishedLatch.await(20, TimeUnit.SECONDS));
-        assertTrue(aliceParticipantListener.onSubscribedToDataTrackLatch.await(20, TimeUnit.SECONDS));
+        assertTrue(
+                aliceParticipantListener.onSubscribedToDataTrackLatch.await(20, TimeUnit.SECONDS));
         getRemoteDataTrack(localDataTrackPublication.getTrackSid(), bobRemoteParticipant)
                 .setListener(dataTrackListener);
 
@@ -617,11 +637,13 @@ public class DataTrackTopologyParameterizedTest extends BaseParticipantTest {
         return null;
     }
 
-    private LocalDataTrackPublication getLocalDataTrackPublication(LocalDataTrack localDataTrack,
-                                                                   LocalParticipant localParticipant) {
+    private LocalDataTrackPublication getLocalDataTrackPublication(
+            LocalDataTrack localDataTrack, LocalParticipant localParticipant) {
         for (LocalDataTrackPublication localDataTrackPublication :
                 localParticipant.getLocalDataTracks()) {
-            if (localDataTrackPublication.getLocalDataTrack().getName()
+            if (localDataTrackPublication
+                    .getLocalDataTrack()
+                    .getName()
                     .equals(localDataTrack.getName())) {
                 return localDataTrackPublication;
             }
@@ -630,8 +652,8 @@ public class DataTrackTopologyParameterizedTest extends BaseParticipantTest {
         return null;
     }
 
-    private RemoteDataTrack getRemoteDataTrack(String trackSid,
-                                               RemoteParticipant remoteParticipant) {
+    private RemoteDataTrack getRemoteDataTrack(
+            String trackSid, RemoteParticipant remoteParticipant) {
         for (RemoteDataTrackPublication remoteDataTrackPublication :
                 remoteParticipant.getRemoteDataTracks()) {
             if (remoteDataTrackPublication.getTrackSid().equals(trackSid)) {

@@ -20,8 +20,8 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 /**
- * A remote video track publication represents a {@link RemoteVideoTrack} that has been shared
- * to a {@link Room}.
+ * A remote video track publication represents a {@link RemoteVideoTrack} that has been shared to a
+ * {@link Room}.
  */
 public class RemoteVideoTrackPublication implements VideoTrackPublication {
     private final String sid;
@@ -30,10 +30,8 @@ public class RemoteVideoTrackPublication implements VideoTrackPublication {
     private boolean subscribed;
     private boolean enabled;
 
-    RemoteVideoTrackPublication(boolean subscribed,
-                                boolean enabled,
-                                @NonNull String sid,
-                                @NonNull String name) {
+    RemoteVideoTrackPublication(
+            boolean subscribed, boolean enabled, @NonNull String sid, @NonNull String name) {
         this.enabled = enabled;
         this.subscribed = subscribed;
         this.sid = sid;
@@ -67,17 +65,13 @@ public class RemoteVideoTrackPublication implements VideoTrackPublication {
         return name;
     }
 
-    /**
-     * Returns true if the published video track is enabled or false otherwise.
-     */
+    /** Returns true if the published video track is enabled or false otherwise. */
     @Override
     public synchronized boolean isTrackEnabled() {
         return enabled;
     }
 
-    /**
-     * Check if the remote video track is subscribed to by the {@link LocalParticipant}.
-     */
+    /** Check if the remote video track is subscribed to by the {@link LocalParticipant}. */
     public synchronized boolean isTrackSubscribed() {
         return subscribed;
     }

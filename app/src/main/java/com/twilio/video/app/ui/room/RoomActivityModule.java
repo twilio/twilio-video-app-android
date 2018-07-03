@@ -16,9 +16,7 @@
 
 package com.twilio.video.app.ui.room;
 
-
 import android.app.Activity;
-
 import dagger.Binds;
 import dagger.Module;
 import dagger.android.ActivityKey;
@@ -30,6 +28,6 @@ public abstract class RoomActivityModule {
     @Binds
     @IntoMap
     @ActivityKey(RoomActivity.class)
-    abstract AndroidInjector.Factory<? extends Activity>
-    bindYourActivityInjectorFactory(RoomActivitySubcomponent.Builder builder);
+    abstract AndroidInjector.Factory<? extends Activity> bindYourActivityInjectorFactory(
+            RoomActivitySubcomponent.Builder builder);
 }

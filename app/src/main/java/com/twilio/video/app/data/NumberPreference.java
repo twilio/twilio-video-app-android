@@ -20,28 +20,23 @@ import android.content.Context;
 import android.content.res.TypedArray;
 import android.support.v7.preference.DialogPreference;
 import android.util.AttributeSet;
-
 import com.twilio.video.app.R;
-
 import java.util.Locale;
 
 /**
- * NumberPreference allows to save user input as integer value and limits input type
- * to single one - {@link android.text.InputType#TYPE_CLASS_NUMBER}.
+ * NumberPreference allows to save user input as integer value and limits input type to single one -
+ * {@link android.text.InputType#TYPE_CLASS_NUMBER}.
  */
 public class NumberPreference extends DialogPreference {
 
-    /**
-     * Preference layout resource ID.
-     */
+    /** Preference layout resource ID. */
     private static final int layoutResId = R.layout.number_preference;
 
-    /**
-     * Preference value.
-     */
+    /** Preference value. */
     private int number;
 
-    public NumberPreference(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
+    public NumberPreference(
+            Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
         super(context, attrs, defStyleAttr, defStyleRes);
     }
 

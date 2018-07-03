@@ -16,12 +16,11 @@
 
 package com.twilio.video;
 
-import org.webrtc.Camera1Enumerator;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.webrtc.Camera1Enumerator;
 
 class CameraCapturerFormatProvider {
     private static final Logger logger = Logger.getLogger(CameraCapturerFormatProvider.class);
@@ -34,11 +33,11 @@ class CameraCapturerFormatProvider {
         int cameraId = -1;
 
         String[] deviceNames = camera1Enumerator.getDeviceNames();
-        for(int i = 0; i < deviceNames.length; i++) {
-            if ((camera1Enumerator.isFrontFacing(deviceNames[i]) &&
-                    cameraSource == CameraCapturer.CameraSource.FRONT_CAMERA) ||
-                    (camera1Enumerator.isBackFacing(deviceNames[i]) && cameraSource ==
-                            CameraCapturer.CameraSource.BACK_CAMERA)) {
+        for (int i = 0; i < deviceNames.length; i++) {
+            if ((camera1Enumerator.isFrontFacing(deviceNames[i])
+                            && cameraSource == CameraCapturer.CameraSource.FRONT_CAMERA)
+                    || (camera1Enumerator.isBackFacing(deviceNames[i])
+                            && cameraSource == CameraCapturer.CameraSource.BACK_CAMERA)) {
                 cameraId = i;
                 break;
             }
@@ -90,14 +89,11 @@ class CameraCapturerFormatProvider {
             // getSupportedPreviewFpsRange() returns a sorted list. Take the fps range
             // corresponding to the highest fps.
             final int[] range = listFpsRange.get(listFpsRange.size() - 1);
-            maxFps = (range[android.hardware.Camera.Parameters.PREVIEW_FPS_MAX_INDEX] + 999)
-                    / 1000;
+            maxFps = (range[android.hardware.Camera.Parameters.PREVIEW_FPS_MAX_INDEX] + 999) / 1000;
         }
         for (android.hardware.Camera.Size size : parameters.getSupportedPreviewSizes()) {
             VideoDimensions dimensions = new VideoDimensions(size.width, size.height);
-            formatList.add(new VideoFormat(dimensions,
-                    maxFps,
-                    VideoPixelFormat.NV21));
+            formatList.add(new VideoFormat(dimensions, maxFps, VideoPixelFormat.NV21));
         }
 
         return formatList;

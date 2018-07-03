@@ -16,17 +16,14 @@
 
 package com.twilio.video.app.util;
 
-
 import android.util.SparseBooleanArray;
 import android.widget.ListView;
-
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
-import com.twilio.video.app.model.TwilioIceServer;
 import com.twilio.video.IceServer;
 import com.twilio.video.IceTransportPolicy;
-
+import com.twilio.video.app.model.TwilioIceServer;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -42,8 +39,7 @@ public class IceOptionsHelper {
             return new ArrayList<>();
         }
         Gson gson = new GsonBuilder().create();
-        List<TwilioIceServer> result =
-                gson.fromJson(json, listType);
+        List<TwilioIceServer> result = gson.fromJson(json, listType);
         return result;
     }
 
@@ -52,30 +48,30 @@ public class IceOptionsHelper {
         return gson.toJson(twilioIceServers, listType);
     }
 
-    public static Set<IceServer> convertToIceServersSet(
-            List<TwilioIceServer> twilioIceServers) {
+    public static Set<IceServer> convertToIceServersSet(List<TwilioIceServer> twilioIceServers) {
         Set<IceServer> result = new HashSet<>();
         if (twilioIceServers != null && twilioIceServers.size() > 0) {
             for (TwilioIceServer twilioIceServer : twilioIceServers) {
-                IceServer iceServer = new IceServer(
-                        twilioIceServer.getUrl(),
-                        twilioIceServer.getUsername(),
-                        twilioIceServer.getCredential());
+                IceServer iceServer =
+                        new IceServer(
+                                twilioIceServer.getUrl(),
+                                twilioIceServer.getUsername(),
+                                twilioIceServer.getCredential());
                 result.add(iceServer);
             }
         }
         return result;
     }
 
-    public static List<TwilioIceServer> getSelectedServersFromListView(ListView iceServersListView) {
+    public static List<TwilioIceServer> getSelectedServersFromListView(
+            ListView iceServersListView) {
         List<TwilioIceServer> selectedServers = new ArrayList<>();
         if (iceServersListView != null) {
             int len = iceServersListView.getCount();
             SparseBooleanArray checkedItems = iceServersListView.getCheckedItemPositions();
-            for (int i=0; i<len; i++) {
+            for (int i = 0; i < len; i++) {
                 if (checkedItems.get(i)) {
-                    selectedServers.add(
-                            (TwilioIceServer)iceServersListView.getItemAtPosition(i));
+                    selectedServers.add((TwilioIceServer) iceServersListView.getItemAtPosition(i));
                 }
             }
         }

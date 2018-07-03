@@ -31,13 +31,13 @@ public class DeviceUtils {
     }
 
     public static boolean isSamsungGalaxyS3() {
-        return Build.MODEL.equals(SAMSUNG_GALAXY_S3_MODEL) &&
-                Build.DEVICE.equals(SAMSUNG_GALAXY_S3_DEVICE);
+        return Build.MODEL.equals(SAMSUNG_GALAXY_S3_MODEL)
+                && Build.DEVICE.equals(SAMSUNG_GALAXY_S3_DEVICE);
     }
 
     public static boolean isNexus9() {
-        return Build.DEVICE.equals(HTC_NEXUS_9_DEVICE) ||
-                Build.DEVICE.equals(HTC_NEXUS_9_LTE_DEVICE);
+        return Build.DEVICE.equals(HTC_NEXUS_9_DEVICE)
+                || Build.DEVICE.equals(HTC_NEXUS_9_LTE_DEVICE);
     }
 
     public static boolean isNexus7() {
