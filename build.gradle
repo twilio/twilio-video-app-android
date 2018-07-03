@@ -147,7 +147,7 @@ task incrementRc {
 
     doLast {
         // TODO: Change back to master when feature branch is merged GSDK-1590
-        def gitBranch = "feature/webrtc-67"
+        def gitBranch = "3.0"
         def travisTag = System.getenv("TRAVIS_TAG")
         def githubToken = System.getenv("GITHUB_TOKEN")
         def repoSlug = System.getenv("TRAVIS_REPO_SLUG")
@@ -222,7 +222,7 @@ task incrementVersionAfterRelease {
 
     doLast {
         // TODO: Change back to master when feature branch is merged GSDK-1590
-        def gitBranch = "feature/webrtc-67"
+        def gitBranch = "3.0"
         def travisTag = System.getenv("TRAVIS_TAG")
         def githubToken = System.getenv("GITHUB_TOKEN")
         def repoSlug = System.getenv("TRAVIS_REPO_SLUG")
@@ -333,7 +333,7 @@ task incrementVersionAfterPreRelease {
 
     doLast {
         // TODO: Change back to master when feature branch is merged GSDK-1590
-        def gitBranch = "feature/webrtc-67"
+        def gitBranch = "3.0"
         def travisTag = System.getenv("TRAVIS_TAG")
         def githubToken = System.getenv("GITHUB_TOKEN")
         def repoSlug = System.getenv("TRAVIS_REPO_SLUG")

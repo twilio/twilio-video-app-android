@@ -18,6 +18,7 @@ jdk:
 branches:
   only:
     - master
+    - 3.0
     # Feature Branches
     - /^feature\/.*/
     # RC Tag Branches
@@ -35,7 +36,7 @@ stages:
   - name: fork test
     if: type IN (push, pull_request) AND tag is blank AND fork = true
   - name: snapshot
-    if: type = push AND branch IN (master)
+    if: type = push AND branch IN (master, 3.0)
   - name: release candidate
     if: tag =~ ^\d+\.\d+\.\d+-rc\d+$
   - name: release
