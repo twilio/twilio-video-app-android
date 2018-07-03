@@ -93,9 +93,6 @@ spotless {
     java {
         target '**/*.java'
         googleJavaFormat().aosp()
-        // optional: you can specify a specific version and/or switch to AOSP style
-        //googleJavaFormat('1.1').aosp()
-        //NOTE: If you need to correct formatting run "./gradlew spotlessApply"
     }
 }
 

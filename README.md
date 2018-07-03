@@ -272,6 +272,10 @@ architectures in one APK.
 ### Calculate the Size Report of a Specific Version
 `./gradlew -PapkScaleVideoAndroidVersion=2.0.0 librarySizeReport`
 
+## Code Formatting
+This project maintains Google AOSP formatted code. Before submitting a pull request, make sure to run `./gradlew spotlessApply`
+
+Incorrectly formatted code submitted as a pull request will fail during the build phase.
 ## Code of Conduct
 
 This project adheres to the Contributor Covenant [Code of Conduct](CODE_OF_CONDUCT.md). By
