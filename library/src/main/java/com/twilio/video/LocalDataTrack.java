@@ -40,7 +40,7 @@ public class LocalDataTrack extends DataTrack {
      * @param context application context.
      * @return local data track
      */
-    public static LocalDataTrack create(@NonNull Context context) {
+    @Nullable public static LocalDataTrack create(@NonNull Context context) {
         return create(context, DataTrackOptions.DEFAULT_DATA_TRACK_OPTIONS);
     }
 
@@ -51,7 +51,7 @@ public class LocalDataTrack extends DataTrack {
      * @param dataTrackOptions data track options.
      * @return local data track.
      */
-    public static LocalDataTrack create(@NonNull Context context,
+    @Nullable public static LocalDataTrack create(@NonNull Context context,
                                         @Nullable DataTrackOptions dataTrackOptions) {
         Preconditions.checkNotNull(context, "Context must not be null");
         dataTrackOptions = dataTrackOptions == null ?

@@ -16,7 +16,7 @@
 
 package com.twilio.video;
 
-import android.support.annotation.Nullable;
+import android.support.annotation.NonNull;
 
 /**
  * Represents options when creating {@link LocalDataTrack}s.
@@ -35,7 +35,7 @@ public class DataTrackOptions {
     /**
      * Default data track options.
      */
-    public static final DataTrackOptions DEFAULT_DATA_TRACK_OPTIONS = new Builder()
+    @NonNull public static final DataTrackOptions DEFAULT_DATA_TRACK_OPTIONS = new Builder()
             .ordered(true)
             .maxPacketLifeTime(DEFAULT_MAX_PACKET_LIFE_TIME)
             .maxRetransmits(DEFAULT_MAX_RETRANSMITS)
@@ -69,7 +69,7 @@ public class DataTrackOptions {
         /**
          * Ordered transmission of messages. Default is {@code true}.
          */
-        public Builder ordered(boolean ordered) {
+        @NonNull public Builder ordered(boolean ordered) {
             this.ordered = ordered;
             return this;
         }
@@ -77,7 +77,7 @@ public class DataTrackOptions {
         /**
          * Maximum retransmit time in milliseconds.
          */
-        public Builder maxPacketLifeTime(int maxPacketLifeTime) {
+        @NonNull public Builder maxPacketLifeTime(int maxPacketLifeTime) {
             this.maxPacketLifeTime = maxPacketLifeTime;
             return this;
         }
@@ -85,7 +85,7 @@ public class DataTrackOptions {
         /**
          * Maximum number of retransmitted messages.
          */
-        public Builder maxRetransmits(int maxRetransmits) {
+        @NonNull public Builder maxRetransmits(int maxRetransmits) {
             this.maxRetransmits = maxRetransmits;
             return this;
         }
@@ -93,7 +93,7 @@ public class DataTrackOptions {
         /**
          * Data track name.
          */
-        public Builder name(@Nullable String name) {
+        @NonNull public Builder name(@NonNull String name) {
             this.name = name;
             return this;
         }
@@ -105,6 +105,7 @@ public class DataTrackOptions {
          * that only one of these values can be set to a non default value at a time otherwise
          * a {@link IllegalStateException} occurs.</p>
          */
+        @NonNull
         public DataTrackOptions build() {
             Preconditions.checkArgument(maxPacketLifeTime >= DEFAULT_MAX_PACKET_LIFE_TIME);
             Preconditions.checkArgument(maxPacketLifeTime <= 65535);

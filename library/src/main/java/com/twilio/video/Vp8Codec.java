@@ -16,13 +16,15 @@
 
 package com.twilio.video;
 
+import android.support.annotation.NonNull;
+
 /**
  * Traditional block-based transform coding format similar to H264.
  *
  * @see <a href="https://en.wikipedia.org/wiki/VP8">VP8</a>
  */
 public class Vp8Codec extends VideoCodec {
-    public static final String NAME = "VP8";
+    @NonNull public static final String NAME = "VP8";
 
     /**
      * Enabling simulcast causes the encoder to generate multiple spatial and temporal layers for

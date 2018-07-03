@@ -202,34 +202,31 @@ public class Camera2CapturerUsageTest extends BaseCamera2CapturerTest {
          * Run on UI thread to avoid thread hopping between the test runner thread and the UI
          * thread.
          */
-        InstrumentationRegistry.getInstrumentation().runOnMainSync(new Runnable() {
-            @Override
-            public void run() {
-                final long callingThreadId = Thread.currentThread().getId();
+        InstrumentationRegistry.getInstrumentation().runOnMainSync(() -> {
+            final long callingThreadId = Thread.currentThread().getId();
 
-                camera2Capturer = new Camera2Capturer(cameraCapturerActivity, cameraId,
-                        new Camera2Capturer.Listener() {
-                            @Override
-                            public void onFirstFrameAvailable() {
-                                assertEquals(callingThreadId, Thread.currentThread().getId());
-                                firstFrameAvailable.countDown();
-                            }
+            camera2Capturer = new Camera2Capturer(cameraCapturerActivity, cameraId,
+                    new Camera2Capturer.Listener() {
+                        @Override
+                        public void onFirstFrameAvailable() {
+                            assertEquals(callingThreadId, Thread.currentThread().getId());
+                            firstFrameAvailable.countDown();
+                        }
 
-                            @Override
-                            public void onCameraSwitched(String cameraId) {
-                                assertEquals(callingThreadId, Thread.currentThread().getId());
-                                cameraSwitched.countDown();
-                            }
+                        @Override
+                        public void onCameraSwitched(String cameraId1) {
+                            assertEquals(callingThreadId, Thread.currentThread().getId());
+                            cameraSwitched.countDown();
+                        }
 
-                            @Override
-                            public void onError(Camera2Capturer.Exception exception) {
-                                assertEquals(callingThreadId, Thread.currentThread().getId());
-                                cameraSwitchedFailed.countDown();
-                            }
-                        });
-                localVideoTrack = LocalVideoTrack.create(cameraCapturerActivity, true,
-                        camera2Capturer);
-            }
+                        @Override
+                        public void onError(Camera2Capturer.Exception exception) {
+                            assertEquals(callingThreadId, Thread.currentThread().getId());
+                            cameraSwitchedFailed.countDown();
+                        }
+                    });
+            localVideoTrack = LocalVideoTrack.create(cameraCapturerActivity, true,
+                    camera2Capturer);
         });
 
         assertTrue(firstFrameAvailable.await(CAMERA2_CAPTURER_DELAY_MS, TimeUnit.MILLISECONDS));

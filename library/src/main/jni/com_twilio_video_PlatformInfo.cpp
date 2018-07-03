@@ -23,56 +23,56 @@
 namespace twilio_video_jni {
 
 JNIEXPORT jlong JNICALL Java_com_twilio_video_PlatformInfo_nativeCreate(
-    JNIEnv *env,
-    jobject j_instance,
-    jstring j_platform_name,
-    jstring j_platform_version,
-    jstring j_hw_device_manufacturer,
-    jstring j_hw_device_model,
-    jstring j_sdk_version,
-    jstring j_hw_device_arch) {
+        JNIEnv *env,
+        jobject j_instance,
+        jstring j_platform_name,
+        jstring j_platform_version,
+        jstring j_hw_device_manufacturer,
+        jstring j_hw_device_model,
+        jstring j_sdk_version,
+        jstring j_hw_device_arch) {
 
     VIDEO_ANDROID_LOG(twilio::video::LogModule::kPlatform,
                       twilio::video::LogLevel::kDebug,
                       "Create PlatformInfo");
 
     PlatformInfoContext *context = new PlatformInfoContext();
-    if (!webrtc_jni::IsNull(env, j_platform_name)) {
+    if (!IsNull(env, j_platform_name)) {
         context->platform_info.platformName =
                 JavaToUTF8StdString(env, j_platform_name);
     }
-    if (!webrtc_jni::IsNull(env, j_platform_version)) {
+    if (!IsNull(env, j_platform_version)) {
         context->platform_info.platformVersion =
                 JavaToUTF8StdString(env, j_platform_version);
     }
-    if (!webrtc_jni::IsNull(env, j_hw_device_manufacturer)) {
+    if (!IsNull(env, j_hw_device_manufacturer)) {
         context->platform_info.hwDeviceManufacturer =
                 JavaToUTF8StdString(env, j_hw_device_manufacturer);
     }
-    if (!webrtc_jni::IsNull(env, j_hw_device_model)) {
+    if (!IsNull(env, j_hw_device_model)) {
         context->platform_info.hwDeviceModel =
                 JavaToUTF8StdString(env, j_hw_device_model);
     }
-    if (!webrtc_jni::IsNull(env, j_sdk_version)) {
+    if (!IsNull(env, j_sdk_version)) {
         context->platform_info.sdkVersion =
                 JavaToUTF8StdString(env, j_sdk_version);
     }
-    if (!webrtc_jni::IsNull(env, j_hw_device_arch)) {
+    if (!IsNull(env, j_hw_device_arch)) {
         context->platform_info.hwDeviceArch =
                 JavaToUTF8StdString(env, j_hw_device_arch);
     }
-    return webrtc_jni::jlongFromPointer(context);
+    return webrtc::NativeToJavaPointer(context);
 }
 
 
 JNIEXPORT void JNICALL Java_com_twilio_video_PlatformInfo_nativeRelease
-    (JNIEnv *env, jobject j_instance, jlong j_native_handle) {
+        (JNIEnv *env, jobject j_instance, jlong j_native_handle) {
 
     VIDEO_ANDROID_LOG(twilio::video::LogModule::kPlatform,
                       twilio::video::LogLevel::kDebug,
                       "Free PlatformInfo");
     PlatformInfoContext *platform_info_context =
-        reinterpret_cast<PlatformInfoContext *>(j_native_handle);
+            reinterpret_cast<PlatformInfoContext *>(j_native_handle);
     if (platform_info_context != nullptr) {
         delete platform_info_context;
     }

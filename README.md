@@ -27,16 +27,16 @@ To get started we recommend you use Android Studio for all your development.
 In order to use our project please perform the following steps:
 
 1.  Install the Android SDK using Android Studio.
-1.  Download Android NDK r12b. The Android NDK is a set of tools that allow developers to implement
+1.  Download Android NDK r16b. The Android NDK is a set of tools that allow developers to implement
 parts of their application or libraries in native code using languages like C and C++. The Video
 Android SDK contains native C and C++ code that uses the Twilio Video C++ SDK. The two SDKs interact using the [Java Native Interface (JNI)](https://docs.oracle.com/javase/7/docs/technotes/guides/jni/).
     * Direct download links
-        * [Windows 32-bit](https://dl.google.com/android/repository/android-ndk-r12b-windows-x86.zip)
-        * [Windows 64-bit](https://dl.google.com/android/repository/android-ndk-r12b-windows-x86_64.zip)
-        * [Mac OS X](https://dl.google.com/android/repository/android-ndk-r12b-darwin-x86_64.zip)
-        * [Linux 64-bit (x86)](https://dl.google.com/android/repository/android-ndk-r12b-linux-x86_64.zip)
-1. Setup Android NDK r12b.
-    * Set the environment variable `$ANDROID_NDK_HOME` to the path of where you extracted Android NDK r12b.
+        * [Windows 32-bit](https://dl.google.com/android/repository/android-ndk-r16b-windows-x86.zip)
+        * [Windows 64-bit](https://dl.google.com/android/repository/android-ndk-r16b-windows-x86_64.zip)
+        * [Mac OS X](https://dl.google.com/android/repository/android-ndk-r16b-darwin-x86_64.zip)
+        * [Linux 64-bit (x86)](https://dl.google.com/android/repository/android-ndk-r16b-linux-x86_64.zip)
+1. Setup Android NDK r16b.
+    * Set the environment variable `$ANDROID_NDK_HOME` to the path of where you extracted Android NDK r16b.
     * Set the path in Android Studio by navigating to File → Project Structure → SDK Location → Android NDK location.
 
         <img width="700px" src="images/community-variant/android-ndk-location.png"/>

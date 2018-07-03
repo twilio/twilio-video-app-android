@@ -80,7 +80,6 @@ public class I420Frame {
     public final float[] samplingMatrix;
 
     final org.webrtc.VideoRenderer.I420Frame webRtcI420Frame;
-    long nativeFramePointer;
 
     I420Frame(org.webrtc.VideoRenderer.I420Frame webRtcI420Frame) {
         this.width = webRtcI420Frame.width;
@@ -89,7 +88,6 @@ public class I420Frame {
         this.yuvPlanes = webRtcI420Frame.yuvPlanes;
         this.rotationDegree = webRtcI420Frame.rotationDegree;
         this.webRtcI420Frame = webRtcI420Frame;
-        this.nativeFramePointer = webRtcI420Frame.nativeFramePointer;
         this.textureId = webRtcI420Frame.textureId;
         this.samplingMatrix = webRtcI420Frame.samplingMatrix;
 
@@ -118,10 +116,7 @@ public class I420Frame {
      * for each frame to ensure that resources are not leaked.
      */
     public synchronized void release() {
-        if (nativeFramePointer != 0) {
-            nativeRelease(nativeFramePointer);
-            nativeFramePointer = 0;
-        }
+        org.webrtc.VideoRenderer.renderFrameDone(webRtcI420Frame);
     }
 
     @Override
@@ -129,7 +124,5 @@ public class I420Frame {
         return width + "x" + height + ":" + yuvStrides[0] + ":" + yuvStrides[1] +
                 ":" + yuvStrides[2];
     }
-
-    private native void nativeRelease(long nativeFramePointer);
 }
 

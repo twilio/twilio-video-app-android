@@ -16,14 +16,11 @@
 
 #include "com_twilio_video_Video.h"
 #include "webrtc/sdk/android/src/jni/jni_helpers.h"
-
-#include "webrtc/base/refcount.h"
-#include "webrtc/voice_engine/include/voe_base.h"
-#include "webrtc/modules/audio_device/android/audio_manager.h"
-#include "webrtc/modules/audio_device/android/opensles_player.h"
+#include "webrtc/rtc_base/refcount.h"
+#include "webrtc/sdk/android/native_api/base/init.h"
+#include "webrtc/modules/utility/include/jvm_android.h"
 #include "webrtc/sdk/android/src/jni/classreferenceholder.h"
-#include "webrtc/base/ssladapter.h"
-
+#include "webrtc/rtc_base/ssladapter.h"
 #include "video/video.h"
 #include "android_room_observer.h"
 #include "com_twilio_video_ConnectOptions.h"
@@ -39,18 +36,11 @@ extern "C" jint JNIEXPORT JNICALL JNI_OnLoad(JavaVM *jvm, void *reserved) {
     VIDEO_ANDROID_LOG(twilio::video::LogModule::kPlatform,
                       twilio::video::LogLevel::kDebug,
                       "%s", func_name.c_str());
-    jint ret = webrtc_jni::InitGlobalJniVariables(jvm);
-    if (ret < 0) {
-        VIDEO_ANDROID_LOG(twilio::video::LogModule::kPlatform,
-                           twilio::video::LogLevel::kError,
-                           "InitGlobalJniVariables() failed");
-        return -1;
-    }
-    RTC_CHECK(rtc::InitializeSSL()) << "Failed to InitializeSSL()";
-    webrtc_jni::LoadGlobalClassReferenceHolder();
+    webrtc::InitAndroid(jvm);
     twilio_video_jni::LoadGlobalClassReferenceHolder();
+    RTC_CHECK(rtc::InitializeSSL()) << "Failed to InitializeSSL()";
 
-    return ret;
+    return JNI_VERSION_1_6;
 }
 
 extern "C" void JNIEXPORT JNICALL JNI_OnUnLoad(JavaVM *jvm, void *reserved) {
@@ -58,9 +48,10 @@ extern "C" void JNIEXPORT JNICALL JNI_OnUnLoad(JavaVM *jvm, void *reserved) {
     VIDEO_ANDROID_LOG(twilio::video::LogModule::kPlatform,
                       twilio::video::LogLevel::kDebug,
                       "%s", func_name.c_str());
-    twilio_video_jni::FreeGlobalClassReferenceHolder();
-    webrtc_jni::FreeGlobalClassReferenceHolder();
+    webrtc::JVM::Uninitialize();
     RTC_CHECK(rtc::CleanupSSL()) << "Failed to CleanupSSL()";
+    twilio_video_jni::FreeGlobalClassReferenceHolder();
+    webrtc::jni::FreeGlobalClassReferenceHolder();
 }
 
 JNIEXPORT void JNICALL Java_com_twilio_video_Video_nativeSetCoreLogLevel

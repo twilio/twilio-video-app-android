@@ -40,6 +40,7 @@ public class LocalAudioTrack extends AudioTrack {
      * @param enabled initial state of audio track.
      * @return local audio track if successfully added or null if audio track could not be created.
      */
+    @Nullable
     public static LocalAudioTrack create(@NonNull Context context,
                                          boolean enabled) {
         return create(context, enabled, null, null);
@@ -49,11 +50,12 @@ public class LocalAudioTrack extends AudioTrack {
      * Creates an audio track. Note that the RECORD_AUDIO permission must be granted
      * in order for this operation to succeed. If RECORD_AUDIO is not granted null is returned.
      *
-     * @param context applicatoin context.
-     * @param enabled initial state of audio track.
+     * @param context      applicatoin context.
+     * @param enabled      initial state of audio track.
      * @param audioOptions audio options to be applied to the track.
      * @return local audio track if successfully added or null if audio track could not be created.
      */
+    @Nullable
     public static LocalAudioTrack create(@NonNull Context context,
                                          boolean enabled,
                                          @Nullable AudioOptions audioOptions) {
@@ -66,9 +68,10 @@ public class LocalAudioTrack extends AudioTrack {
      *
      * @param context application context.
      * @param enabled initial state of audio track.
-     * @param name audio track name.
+     * @param name    audio track name.
      * @return local audio track if successfully added or null if audio track could not be created.
      */
+    @Nullable
     public static LocalAudioTrack create(@NonNull Context context,
                                          boolean enabled,
                                          @Nullable String name) {
@@ -79,12 +82,13 @@ public class LocalAudioTrack extends AudioTrack {
      * Creates an audio track. Note that the RECORD_AUDIO permission must be granted
      * in order for this operation to succeed. If RECORD_AUDIO is not granted null is returned.
      *
-     * @param context application context.
-     * @param enabled initial state of audio track.
+     * @param context      application context.
+     * @param enabled      initial state of audio track.
      * @param audioOptions audio options to be applied to track.
-     * @param name audio track name.
+     * @param name         audio track name.
      * @return local audio track if successfully added or null if audio track could not be created.
      */
+    @Nullable
     public static LocalAudioTrack create(@NonNull Context context,
                                          boolean enabled,
                                          @Nullable AudioOptions audioOptions,
@@ -111,7 +115,7 @@ public class LocalAudioTrack extends AudioTrack {
 
     /**
      * Check if the local audio track is enabled.
-     *
+     * <p>
      * When the value is false, the local audio track is muted. When the value is true the
      * local audio track is live.
      *
@@ -195,6 +199,8 @@ public class LocalAudioTrack extends AudioTrack {
     }
 
     private native boolean nativeIsEnabled(long nativeLocalAudioTrackHandle);
+
     private native void nativeEnable(long nativeLocalAudioTrackHandle, boolean enable);
+
     private native void nativeRelease(long nativeLocalAudioTrackHandle);
 }

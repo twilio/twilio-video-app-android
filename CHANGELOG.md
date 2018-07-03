@@ -1,5 +1,35 @@
 The Twilio Programmable Video SDKs use [Semantic Versioning](http://www.semver.org).
 
+####3.0.0-preview1
+
+Improvements
+
+- Upgraded to WebRTC 67.
+- Upgraded to Java 8. Add the following snippet to your `build.gradle` to enable Java 8
+features required to build the 3.x Video Android SDK:
+
+        android {
+            compileOptions {
+                sourceCompatibility 1.8
+                targetCompatibility 1.8
+            }
+        }
+- Added @Nullable and @NonNull to all public API fields, methods, and interfaces.
+- Updated internal capturer pipeline for `CameraCapturer`, `ScreenCapturer`, and `Camera2Capturer`.
+- Upgraded to Android NDK 16.
+
+
+Known issues
+
+- Network handoff, and subsequent connection renegotiation is not supported for IPv6 networks [#72](https://github.com/twilio/video-quickstart-android/issues/72)
+- Participant disconnect event can take up to 120 seconds to occur [#80](https://github.com/twilio/video-quickstart-android/issues/80) [#73](https://github.com/twilio/video-quickstart-android/issues/73)
+- Codec preferences do not function correctly in a hybrid codec Group Room with the following
+codecs:
+    - ISAC
+    - PCMA
+    - G722
+    - VP9
+
 ####2.1.0
 
 Features

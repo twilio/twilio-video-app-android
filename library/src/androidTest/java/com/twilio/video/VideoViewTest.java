@@ -76,36 +76,30 @@ public class VideoViewTest extends BaseVideoTest {
 
     @Test
     public void setVideoScaleType_canBeCalledBeforeViewInflated() {
-        InstrumentationRegistry.getInstrumentation().runOnMainSync(new Runnable() {
-            @Override
-            public void run() {
-                VideoView videoView = new VideoView(videoViewTestActivity);
-                VideoScaleType expectedVideoScaleType = VideoScaleType.ASPECT_BALANCED;
+        InstrumentationRegistry.getInstrumentation().runOnMainSync(() -> {
+            VideoView videoView = new VideoView(videoViewTestActivity);
+            VideoScaleType expectedVideoScaleType = VideoScaleType.ASPECT_BALANCED;
 
-                videoView.setVideoScaleType(expectedVideoScaleType);
+            videoView.setVideoScaleType(expectedVideoScaleType);
 
-                assertEquals(expectedVideoScaleType, videoView.getVideoScaleType());
-            }
+            assertEquals(expectedVideoScaleType, videoView.getVideoScaleType());
         });
     }
 
     @Test
     @Parameters
     public void canSetVideoScaleType(final int width, final int height) {
-        InstrumentationRegistry.getInstrumentation().runOnMainSync(new Runnable() {
-            @Override
-            public void run() {
-                VideoView videoView = new VideoView(videoViewTestActivity);
-                RelativeLayout.LayoutParams layoutParams =
-                        new RelativeLayout.LayoutParams(width, height);
-                VideoScaleType expectedVideoScaleType = VideoScaleType.ASPECT_BALANCED;
+        InstrumentationRegistry.getInstrumentation().runOnMainSync(() -> {
+            VideoView videoView = new VideoView(videoViewTestActivity);
+            RelativeLayout.LayoutParams layoutParams =
+                    new RelativeLayout.LayoutParams(width, height);
+            VideoScaleType expectedVideoScaleType = VideoScaleType.ASPECT_BALANCED;
 
-                videoView.setLayoutParams(layoutParams);
-                relativeLayout.addView(videoView);
-                videoView.setVideoScaleType(expectedVideoScaleType);
+            videoView.setLayoutParams(layoutParams);
+            relativeLayout.addView(videoView);
+            videoView.setVideoScaleType(expectedVideoScaleType);
 
-                assertEquals(expectedVideoScaleType, videoView.getVideoScaleType());
-            }
+            assertEquals(expectedVideoScaleType, videoView.getVideoScaleType());
         });
     }
 
@@ -136,13 +130,10 @@ public class VideoViewTest extends BaseVideoTest {
                 new VideoViewRecyclerViewAdapter(videoTracks);
 
         // Add the recycler view to the layout
-        InstrumentationRegistry.getInstrumentation().runOnMainSync(new Runnable() {
-            @Override
-            public void run() {
-                relativeLayout.addView(recyclerView);
-                recyclerView.setLayoutManager(new LinearLayoutManager(videoViewTestActivity));
-                recyclerView.setAdapter(videoViewRecyclerViewAdapter);
-            }
+        InstrumentationRegistry.getInstrumentation().runOnMainSync(() -> {
+            relativeLayout.addView(recyclerView);
+            recyclerView.setLayoutManager(new LinearLayoutManager(videoViewTestActivity));
+            recyclerView.setAdapter(videoViewRecyclerViewAdapter);
         });
 
         // Scroll through each item and validate a frame was received
@@ -185,23 +176,17 @@ public class VideoViewTest extends BaseVideoTest {
                 new VideoViewListViewAdapter(videoTracks);
 
         // Add the list view to the layout
-        InstrumentationRegistry.getInstrumentation().runOnMainSync(new Runnable() {
-            @Override
-            public void run() {
-                relativeLayout.addView(listView);
-                listView.setAdapter(videoViewListViewAdapter);
-            }
+        InstrumentationRegistry.getInstrumentation().runOnMainSync(() -> {
+            relativeLayout.addView(listView);
+            listView.setAdapter(videoViewListViewAdapter);
         });
 
         // Scroll through each item and validate a frame was received
         for (int i = 0 ; i < numItems ; i++) {
             final int position = i;
-            InstrumentationRegistry.getInstrumentation().runOnMainSync(new Runnable() {
-                @Override
-                public void run() {
-                    listView.smoothScrollToPosition(position);
-                    listView.setSelection(position);
-                }
+            InstrumentationRegistry.getInstrumentation().runOnMainSync(() -> {
+                listView.smoothScrollToPosition(position);
+                listView.setSelection(position);
             });
             VideoViewListViewAdapter.ViewHolder viewHolder = videoViewListViewAdapter
                     .viewHolderPositionMap.get(position);

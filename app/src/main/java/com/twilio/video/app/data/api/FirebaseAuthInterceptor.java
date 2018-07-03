@@ -59,19 +59,13 @@ public class FirebaseAuthInterceptor implements Interceptor {
         }
 
         firebaseUser.getToken(true)
-                .addOnSuccessListener(new OnSuccessListener<GetTokenResult>() {
-                    @Override
-                    public void onSuccess(GetTokenResult getTokenResult) {
-                        tokenBuffer.append(getTokenResult.getToken());
-                        tokenRequestComplete.countDown();
-                    }
+                .addOnSuccessListener(getTokenResult -> {
+                    tokenBuffer.append(getTokenResult.getToken());
+                    tokenRequestComplete.countDown();
                 })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@android.support.annotation.NonNull Exception e) {
-                        Timber.e(e, FIREBASE_TOKEN_TASK_FAILED);
-                        tokenRequestComplete.countDown();
-                    }
+                .addOnFailureListener(e -> {
+                    Timber.e(e, FIREBASE_TOKEN_TASK_FAILED);
+                    tokenRequestComplete.countDown();
                 });
 
         try {

@@ -94,18 +94,12 @@ public class VideoRendererTest extends BaseVideoTest {
         cameraVideoTrack.addRenderer(bitmapVideoRenderer);
 
         // Request bitmap
-        bitmapVideoRenderer.captureBitmap(new BitmapVideoRenderer.BitmapListener() {
-            @Override
-            public void onBitmapCaptured(final Bitmap bitmap) {
-                assertNotNull(bitmap);
-                videoRendererTestActivity.runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        imageView.setImageBitmap(bitmap);
-                        bitmapCaptured.countDown();
-                    }
-                });
-            }
+        bitmapVideoRenderer.captureBitmap(bitmap -> {
+            assertNotNull(bitmap);
+            videoRendererTestActivity.runOnUiThread(() -> {
+                imageView.setImageBitmap(bitmap);
+                bitmapCaptured.countDown();
+            });
         });
 
         // Validate we received bitmap
@@ -122,18 +116,12 @@ public class VideoRendererTest extends BaseVideoTest {
         fakeVideoTrack.addRenderer(bitmapVideoRenderer);
 
         // Request bitmap
-        bitmapVideoRenderer.captureBitmap(new BitmapVideoRenderer.BitmapListener() {
-            @Override
-            public void onBitmapCaptured(final Bitmap bitmap) {
-                assertNotNull(bitmap);
-                videoRendererTestActivity.runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        imageView.setImageBitmap(bitmap);
-                        bitmapCaptured.countDown();
-                    }
-                });
-            }
+        bitmapVideoRenderer.captureBitmap(bitmap -> {
+            assertNotNull(bitmap);
+            videoRendererTestActivity.runOnUiThread(() -> {
+                imageView.setImageBitmap(bitmap);
+                bitmapCaptured.countDown();
+            });
         });
 
         // Validate we received bitmap

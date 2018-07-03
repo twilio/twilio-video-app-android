@@ -79,11 +79,8 @@ public class LoginActivity extends BaseActivity
             if (googleApiClient == null) {
                 googleApiClient = AuthHelper.buildGoogleAPIClient(this, null);
             }
-            AuthHelper.signOut(googleApiClient, new ResultCallback<Status>() {
-                @Override
-                public void onResult(@NonNull Status status) {
-                    // TODO: stop spinning
-                }
+            AuthHelper.signOut(googleApiClient, status -> {
+                // TODO: stop spinning
             });
         }
         super.onResume();
@@ -102,23 +99,17 @@ public class LoginActivity extends BaseActivity
     }
 
     private FirebaseAuth.AuthStateListener fbAuthStateListener =
-        new FirebaseAuth.AuthStateListener() {
-            @Override
-            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
+            firebaseAuth -> {
                 FirebaseUser user = firebaseAuth.getCurrentUser();
                 if (user != null) {
                     saveIdentity(user);
                     onSignInSuccess();
                 }
-            }
-        };
+            };
 
-    private AuthHelper.ErrorListener errorListener = new AuthHelper.ErrorListener() {
-        @Override
-        public void onError(@AuthHelper.Error int errorCode) {
-            processError(errorCode);
-            dismissAuthenticatingDialog();
-        }
+    private AuthHelper.ErrorListener errorListener = errorCode -> {
+        processError(errorCode);
+        dismissAuthenticatingDialog();
     };
 
     @Override

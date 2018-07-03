@@ -57,17 +57,14 @@ public class LocalParticipant implements Participant {
         public void onAudioTrackPublished(final LocalParticipant localParticipant,
                                           final LocalAudioTrackPublication localAudioTrackPublication) {
             checkPublishedCallback(localParticipant, localAudioTrackPublication, "onAudioTrackPublished");
-            handler.post(new Runnable() {
-                @Override
-                public void run() {
-                    logger.d("onAudioTrackPublished");
-                    audioTrackPublications.add(localAudioTrackPublication);
-                    localAudioTrackPublications.add(localAudioTrackPublication);
-                    Listener listener = listenerReference.get();
+            handler.post(() -> {
+                logger.d("onAudioTrackPublished");
+                audioTrackPublications.add(localAudioTrackPublication);
+                localAudioTrackPublications.add(localAudioTrackPublication);
+                Listener listener = listenerReference.get();
 
-                    if (listener != null) {
-                        listener.onAudioTrackPublished(localParticipant, localAudioTrackPublication);
-                    }
+                if (listener != null) {
+                    listener.onAudioTrackPublished(localParticipant, localAudioTrackPublication);
                 }
             });
         }
@@ -81,17 +78,14 @@ public class LocalParticipant implements Participant {
                     twilioException,
                     "onAudioTrackPublicationFailed");
 
-            handler.post(new Runnable() {
-                @Override
-                public void run() {
-                    logger.d("onAudioTrackPublicationFailed");
-                    Listener listener = listenerReference.get();
+            handler.post(() -> {
+                logger.d("onAudioTrackPublicationFailed");
+                Listener listener = listenerReference.get();
 
-                    if (listener != null) {
-                        listener.onAudioTrackPublicationFailed(localParticipant,
-                                localAudioTrack,
-                                twilioException);
-                    }
+                if (listener != null) {
+                    listener.onAudioTrackPublicationFailed(localParticipant,
+                            localAudioTrack,
+                            twilioException);
                 }
             });
         }
@@ -100,17 +94,14 @@ public class LocalParticipant implements Participant {
         public void onVideoTrackPublished(final LocalParticipant localParticipant,
                                           final LocalVideoTrackPublication localVideoTrackPublication) {
             checkPublishedCallback(localParticipant, localVideoTrackPublication, "onVideoTrackPublished");
-            handler.post(new Runnable() {
-                @Override
-                public void run() {
-                    logger.d("onAudioTrackPublished");
-                    videoTrackPublications.add(localVideoTrackPublication);
-                    localVideoTrackPublications.add(localVideoTrackPublication);
-                    Listener listener = listenerReference.get();
+            handler.post(() -> {
+                logger.d("onAudioTrackPublished");
+                videoTrackPublications.add(localVideoTrackPublication);
+                localVideoTrackPublications.add(localVideoTrackPublication);
+                Listener listener = listenerReference.get();
 
-                    if (listener != null) {
-                        listener.onVideoTrackPublished(localParticipant, localVideoTrackPublication);
-                    }
+                if (listener != null) {
+                    listener.onVideoTrackPublished(localParticipant, localVideoTrackPublication);
                 }
             });
         }
@@ -124,17 +115,14 @@ public class LocalParticipant implements Participant {
                     twilioException,
                     "onVideoTrackPublicationFailed");
 
-            handler.post(new Runnable() {
-                @Override
-                public void run() {
-                    logger.d("onVideoTrackPublicationFailed");
-                    Listener listener = listenerReference.get();
+            handler.post(() -> {
+                logger.d("onVideoTrackPublicationFailed");
+                Listener listener = listenerReference.get();
 
-                    if (listener != null) {
-                        listener.onVideoTrackPublicationFailed(localParticipant,
-                                localVideoTrack,
-                                twilioException);
-                    }
+                if (listener != null) {
+                    listener.onVideoTrackPublicationFailed(localParticipant,
+                            localVideoTrack,
+                            twilioException);
                 }
             });
         }
@@ -143,17 +131,14 @@ public class LocalParticipant implements Participant {
         public void onDataTrackPublished(final LocalParticipant localParticipant,
                                          final LocalDataTrackPublication localDataTrackPublication) {
             checkPublishedCallback(localParticipant, localDataTrackPublication, "onDataTrackPublished");
-            handler.post(new Runnable() {
-                @Override
-                public void run() {
-                    logger.d("onDataTrackPublished");
-                    dataTrackPublications.add(localDataTrackPublication);
-                    localDataTrackPublications.add(localDataTrackPublication);
-                    Listener listener = listenerReference.get();
+            handler.post(() -> {
+                logger.d("onDataTrackPublished");
+                dataTrackPublications.add(localDataTrackPublication);
+                localDataTrackPublications.add(localDataTrackPublication);
+                Listener listener = listenerReference.get();
 
-                    if (listener != null) {
-                        listener.onDataTrackPublished(localParticipant, localDataTrackPublication);
-                    }
+                if (listener != null) {
+                    listener.onDataTrackPublished(localParticipant, localDataTrackPublication);
                 }
             });
         }
@@ -167,17 +152,14 @@ public class LocalParticipant implements Participant {
                     twilioException,
                     "onDataTrackPublicationFailed");
 
-            handler.post(new Runnable() {
-                @Override
-                public void run() {
-                    logger.d("onDataTrackPublicationFailed");
-                    Listener listener = listenerReference.get();
+            handler.post(() -> {
+                logger.d("onDataTrackPublicationFailed");
+                Listener listener = listenerReference.get();
 
-                    if (listener != null) {
-                        listener.onDataTrackPublicationFailed(localParticipant,
-                                localDataTrack,
-                                twilioException);
-                    }
+                if (listener != null) {
+                    listener.onDataTrackPublicationFailed(localParticipant,
+                            localDataTrack,
+                            twilioException);
                 }
             });
         }
@@ -247,21 +229,21 @@ public class LocalParticipant implements Participant {
     /**
      * Returns read-only list of local audio track publications.
      */
-    public synchronized List<LocalAudioTrackPublication> getLocalAudioTracks() {
+    @Nullable public synchronized List<LocalAudioTrackPublication> getLocalAudioTracks() {
         return Collections.unmodifiableList(localAudioTrackPublications);
     }
 
     /**
      * Returns read-only list of local video track publications.
      */
-    public synchronized List<LocalVideoTrackPublication> getLocalVideoTracks() {
+    @Nullable public synchronized List<LocalVideoTrackPublication> getLocalVideoTracks() {
         return Collections.unmodifiableList(localVideoTrackPublications);
     }
 
     /**
      * Returns read-only list of local data track publications.
      */
-    public synchronized List<LocalDataTrackPublication> getLocalDataTracks() {
+    @Nullable public synchronized List<LocalDataTrackPublication> getLocalDataTracks() {
         return Collections.unmodifiableList(localDataTrackPublications);
     }
 

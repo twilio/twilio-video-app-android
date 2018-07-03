@@ -73,12 +73,7 @@ public class Camera2Capturer implements VideoCapturer {
             new CameraVideoCapturer.CameraEventsHandler() {
                 @Override
                 public void onCameraError(final String errorMessage) {
-                    handler.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            listener.onError(new Exception(Exception.UNKNOWN, errorMessage));
-                        }
-                    });
+                    handler.post(() -> listener.onError(new Exception(Exception.UNKNOWN, errorMessage)));
                 }
 
                 @Override
@@ -87,12 +82,7 @@ public class Camera2Capturer implements VideoCapturer {
                 @Override
                 public void onCameraFreezed(final String errorMessage) {
                     logger.e("Camera froze.");
-                    handler.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            listener.onError(new Exception(Exception.CAMERA_FROZE, errorMessage));
-                        }
-                    });
+                    handler.post(() -> listener.onError(new Exception(Exception.CAMERA_FROZE, errorMessage)));
                 }
 
                 @Override
@@ -100,12 +90,7 @@ public class Camera2Capturer implements VideoCapturer {
 
                 @Override
                 public void onFirstFrameAvailable() {
-                    handler.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            listener.onFirstFrameAvailable();
-                        }
-                    });
+                    handler.post(listener::onFirstFrameAvailable);
                 }
 
                 @Override
@@ -132,35 +117,15 @@ public class Camera2Capturer implements VideoCapturer {
                 }
 
                 @Override
-                public void onByteBufferFrameCaptured(byte[] bytes,
-                                                      int width,
-                                                      int height,
-                                                      int rotation,
-                                                      long timestamp) {
-                    VideoDimensions frameDimensions = new VideoDimensions(width, height);
-                    VideoFrame frame = new VideoFrame(bytes,
-                            frameDimensions,
-                            VideoFrame.RotationAngle.fromInt(rotation),
-                            timestamp);
+                public void onFrameCaptured(org.webrtc.VideoFrame videoFrame) {
+                    org.webrtc.VideoFrame.Buffer buffer = videoFrame.getBuffer();
+                    VideoDimensions dimensions = new VideoDimensions(buffer.getWidth(),
+                            buffer.getHeight());
+                    VideoFrame.RotationAngle orientation =
+                            VideoFrame.RotationAngle.fromInt(videoFrame.getRotation());
 
-                    videoCapturerListener.onFrameCaptured(frame);
-                }
-
-                @Override
-                public void onTextureFrameCaptured(int width,
-                                                   int height,
-                                                   int oesTextureId,
-                                                   float[] transformMatrix,
-                                                   int rotation,
-                                                   long timestamp) {
-                    VideoDimensions frameDimensions = new VideoDimensions(width, height);
-                    VideoFrame frame = new VideoFrame(oesTextureId,
-                            transformMatrix,
-                            frameDimensions,
-                            VideoFrame.RotationAngle.fromInt(rotation),
-                            timestamp);
-
-                    videoCapturerListener.onFrameCaptured(frame);
+                    videoCapturerListener.onFrameCaptured(new VideoFrame(videoFrame, dimensions,
+                            orientation));
                 }
             };
     private final CameraVideoCapturer.CameraSwitchHandler cameraSwitchHandler =
@@ -171,25 +136,15 @@ public class Camera2Capturer implements VideoCapturer {
                         cameraId = pendingCameraId;
                         pendingCameraId = null;
                     }
-                    handler.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            listener.onCameraSwitched(cameraId);
-                        }
-                    });
+                    handler.post(() -> listener.onCameraSwitched(cameraId));
                 }
 
                 @Override
                 public void onCameraSwitchError(final String errorMessage) {
                     logger.e("Failed to switch to camera with ID: " + pendingCameraId);
                     pendingCameraId = null;
-                    handler.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            listener.onError(new Exception(Exception.CAMERA_SWITCH_FAILED,
-                                    errorMessage));
-                        }
-                    });
+                    handler.post(() -> listener.onError(new Exception(Exception.CAMERA_SWITCH_FAILED,
+                            errorMessage)));
                 }
             };
 
@@ -298,8 +253,8 @@ public class Camera2Capturer implements VideoCapturer {
      * @param videoCapturerListener consumer of available frames.
      */
     @Override
-    public void startCapture(VideoFormat captureFormat,
-                             VideoCapturer.Listener videoCapturerListener) {
+    public void startCapture(@NonNull VideoFormat captureFormat,
+                             @NonNull VideoCapturer.Listener videoCapturerListener) {
         checkCapturerState();
         synchronized (stateLock) {
             state = Camera2Capturer.State.STARTING;
@@ -335,7 +290,7 @@ public class Camera2Capturer implements VideoCapturer {
     /**
      * Returns the currently set camera ID.
      */
-    public synchronized String getCameraId() {
+    @NonNull public synchronized String getCameraId() {
         return cameraId;
     }
 
@@ -362,7 +317,7 @@ public class Camera2Capturer implements VideoCapturer {
         }
     }
 
-    void setSurfaceTextureHelper(SurfaceTextureHelper surfaceTextureHelper) {
+    void setSurfaceTextureHelper(@NonNull SurfaceTextureHelper surfaceTextureHelper) {
         this.surfaceTextureHelper = surfaceTextureHelper;
     }
 
@@ -374,7 +329,7 @@ public class Camera2Capturer implements VideoCapturer {
                 "Camera ID %s is not supported or could not be validated", cameraId);
     }
 
-    private List<VideoFormat> convertToVideoFormats(
+    @NonNull private List<VideoFormat> convertToVideoFormats(
             @NonNull List<CameraEnumerationAndroid.CaptureFormat> captureFormats) {
         final List<VideoFormat> videoFormats = new ArrayList<>(captureFormats.size());
 
@@ -434,13 +389,13 @@ public class Camera2Capturer implements VideoCapturer {
          *
          * @param newCameraId the camera ID after camera switch is complete.
          */
-        void onCameraSwitched(String newCameraId);
+        void onCameraSwitched(@NonNull String newCameraId);
 
         /**
          * Reports an error that occurred in {@link Camera2Capturer}.
          *
          * @param camera2CapturerException the code that describes the error that occurred.
          */
-        void onError(Exception camera2CapturerException);
+        void onError(@NonNull Exception camera2CapturerException);
     }
 }

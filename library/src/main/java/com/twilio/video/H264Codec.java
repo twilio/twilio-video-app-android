@@ -16,13 +16,15 @@
 
 package com.twilio.video;
 
+import android.support.annotation.NonNull;
+
 /**
  * Block-oriented motion-compensation-based video compression standard.
  *
  * @see <a href="https://en.wikipedia.org/wiki/H.264/MPEG-4_AVC">H.264</a>
  */
 public class H264Codec extends VideoCodec {
-    public static final String NAME = "H264";
+    @NonNull public static final String NAME = "H264";
 
     public H264Codec() {
         super(NAME);

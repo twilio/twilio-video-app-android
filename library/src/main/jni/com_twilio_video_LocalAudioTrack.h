@@ -20,10 +20,6 @@
 #include <jni.h>
 #include "media/track.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 namespace twilio_video_jni {
 
 class LocalAudioTrackContext {
@@ -51,14 +47,18 @@ std::string getLocalAudioTrackHash(std::shared_ptr<twilio::media::LocalAudioTrac
 jobject createJavaLocalAudioTrack(jobject j_context,
                                   std::shared_ptr<twilio::media::LocalAudioTrack> local_audio_track);
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 JNIEXPORT jboolean JNICALL Java_com_twilio_video_LocalAudioTrack_nativeIsEnabled(JNIEnv *,
                                                                                  jobject,
                                                                                  jlong);
 
 JNIEXPORT void JNICALL Java_com_twilio_video_LocalAudioTrack_nativeEnable(JNIEnv *,
-                                                                              jobject,
-                                                                              jlong,
-                                                                              jboolean);
+                                                                          jobject,
+                                                                          jlong,
+                                                                          jboolean);
 
 JNIEXPORT void JNICALL Java_com_twilio_video_LocalAudioTrack_nativeRelease(JNIEnv *,
                                                                            jobject,

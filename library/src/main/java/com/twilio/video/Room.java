@@ -20,6 +20,7 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.os.Handler;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.util.Pair;
 
 import java.util.ArrayList;
@@ -63,13 +64,10 @@ public class Room {
     private final Room.Listener roomListenerProxy = new Room.Listener() {
         @Override
         public void onConnected(final Room room) {
-            handler.post(new Runnable() {
-                @Override
-                public void run() {
-                    ThreadChecker.checkIsValidThread(handler);
-                    logger.d("onConnected()");
-                    Room.this.listener.onConnected(room);
-                }
+            handler.post(() -> {
+                ThreadChecker.checkIsValidThread(handler);
+                logger.d("onConnected()");
+                Room.this.listener.onConnected(room);
             });
         }
 
@@ -78,21 +76,18 @@ public class Room {
             // Release native room
             releaseRoom();
 
-            handler.post(new Runnable() {
-                @Override
-                public void run() {
-                    ThreadChecker.checkIsValidThread(handler);
-                    logger.d("onConnectFailure()");
+            handler.post(() -> {
+                ThreadChecker.checkIsValidThread(handler);
+                logger.d("onConnectFailure()");
 
-                    // Update room state
-                    Room.this.roomState = RoomState.DISCONNECTED;
+                // Update room state
+                Room.this.roomState = RoomState.DISCONNECTED;
 
-                    // Release native room delegate
-                    release();
+                // Release native room delegate
+                release();
 
-                    // Notify developer
-                    Room.this.listener.onConnectFailure(room, twilioException);
-                }
+                // Notify developer
+                Room.this.listener.onConnectFailure(room, twilioException);
             });
         }
 
@@ -106,38 +101,32 @@ public class Room {
                 localParticipant.release();
             }
 
-            handler.post(new Runnable() {
-                @Override
-                public void run() {
-                    ThreadChecker.checkIsValidThread(handler);
-                    logger.d("onDisconnected()");
+            handler.post(() -> {
+                ThreadChecker.checkIsValidThread(handler);
+                logger.d("onDisconnected()");
 
-                    // Update room state
-                    Room.this.roomState = RoomState.DISCONNECTED;
+                // Update room state
+                Room.this.roomState = RoomState.DISCONNECTED;
 
-                    // Release native room delegate
-                    release();
+                // Release native room delegate
+                release();
 
-                    // Notify developer
-                    Room.this.listener.onDisconnected(room, twilioException);
-                }
+                // Notify developer
+                Room.this.listener.onDisconnected(room, twilioException);
             });
         }
 
         @Override
         public void onParticipantConnected(final Room room, final RemoteParticipant participant) {
-            handler.post(new Runnable() {
-                @Override
-                public void run() {
-                    ThreadChecker.checkIsValidThread(handler);
-                    logger.d("onParticipantConnected()");
+            handler.post(() -> {
+                ThreadChecker.checkIsValidThread(handler);
+                logger.d("onParticipantConnected()");
 
-                    // Update participants
-                    participantMap.put(participant.getSid(), participant);
+                // Update participants
+                participantMap.put(participant.getSid(), participant);
 
-                    // Notify developer
-                    Room.this.listener.onParticipantConnected(room, participant);
-                }
+                // Notify developer
+                Room.this.listener.onParticipantConnected(room, participant);
             });
         }
 
@@ -147,57 +136,40 @@ public class Room {
             // Release participant
             remoteParticipant.release();
 
-            handler.post(new Runnable() {
-                @Override
-                public void run() {
-                    ThreadChecker.checkIsValidThread(handler);
-                    logger.d("onParticipantDisconnected()");
+            handler.post(() -> {
+                ThreadChecker.checkIsValidThread(handler);
+                logger.d("onParticipantDisconnected()");
 
-                    // Update participants
-                    participantMap.remove(remoteParticipant.getSid());
+                // Update participants
+                participantMap.remove(remoteParticipant.getSid());
 
-                    // Notify developer
-                    Room.this.listener.onParticipantDisconnected(room, remoteParticipant);
-                }
+                // Notify developer
+                Room.this.listener.onParticipantDisconnected(room, remoteParticipant);
             });
         }
 
         @Override
         public void onRecordingStarted(final Room room) {
-            handler.post(new Runnable() {
-                @Override
-                public void run() {
-                    ThreadChecker.checkIsValidThread(handler);
-                    logger.d("onRecordingStarted()");
-                    Room.this.listener.onRecordingStarted(room);
-                }
+            handler.post(() -> {
+                ThreadChecker.checkIsValidThread(handler);
+                logger.d("onRecordingStarted()");
+                Room.this.listener.onRecordingStarted(room);
             });
         }
 
         @Override
         public void onRecordingStopped(final Room room) {
-            handler.post(new Runnable() {
-                @Override
-                public void run() {
-                    ThreadChecker.checkIsValidThread(handler);
-                    logger.d("onRecordingStopped()");
-                    Room.this.listener.onRecordingStopped(room);
-                }
+            handler.post(() -> {
+                ThreadChecker.checkIsValidThread(handler);
+                logger.d("onRecordingStopped()");
+                Room.this.listener.onRecordingStopped(room);
             });
         }
     };
-    private final StatsListener statsListenerProxy = new StatsListener() {
-        @Override
-        public void onStats(final List<StatsReport> statsReports) {
-            final Pair<Handler, StatsListener> statsPair = Room.this.statsListenersQueue.poll();
-            if (statsPair != null) {
-                statsPair.first.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        statsPair.second.onStats(statsReports);
-                    }
-                });
-            }
+    private final StatsListener statsListenerProxy = statsReports -> {
+        final Pair<Handler, StatsListener> statsPair = Room.this.statsListenersQueue.poll();
+        if (statsPair != null) {
+            statsPair.first.post(() -> statsPair.second.onStats(statsReports));
         }
     };
 
@@ -246,7 +218,7 @@ public class Room {
      *
      * @return list of participants.
      */
-    public synchronized List<RemoteParticipant> getRemoteParticipants() {
+    @Nullable public synchronized List<RemoteParticipant> getRemoteParticipants() {
         return new ArrayList<>(participantMap.values());
     }
 
@@ -254,7 +226,7 @@ public class Room {
      * Returns the current local participant. If the room has not reached
      * {@link RoomState#CONNECTED} then this method will return null.
      */
-    public synchronized LocalParticipant getLocalParticipant() {
+    @Nullable public synchronized LocalParticipant getLocalParticipant() {
         return localParticipant;
     }
 
@@ -264,7 +236,7 @@ public class Room {
      *
      * @param statsListener listener that receives stats reports for all media tracks.
      */
-    public synchronized void getStats(@NonNull StatsListener statsListener) {
+    @Nullable public synchronized void getStats(@NonNull StatsListener statsListener) {
         Preconditions.checkNotNull(statsListener, "StatsListener must not be null");
         if (roomState == RoomState.DISCONNECTED) {
             return;
@@ -376,12 +348,7 @@ public class Room {
 
     private void cleanupStatsListenerQueue() {
         for (final Pair<Handler, StatsListener> listenerPair : statsListenersQueue) {
-            listenerPair.first.post(new Runnable() {
-                @Override
-                public void run() {
-                    listenerPair.second.onStats(new ArrayList<StatsReport>());
-                }
-            });
+            listenerPair.first.post(() -> listenerPair.second.onStats(new ArrayList<StatsReport>()));
         }
         statsListenersQueue.clear();
     }

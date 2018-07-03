@@ -20,6 +20,8 @@
 #include "room_delegate.h"
 #include "logging.h"
 #include "jni_utils.h"
+#include "webrtc/sdk/android/src/jni/jni_helpers.h"
+#include "webrtc/sdk/android/native_api/jni/scoped_java_ref.h"
 
 namespace twilio_video_jni {
 
@@ -32,20 +34,20 @@ JNIEXPORT jlong JNICALL Java_com_twilio_video_Room_nativeConnect(
         jlong j_media_factory_handle,
         jobject j_handler) {
     RoomDelegate *room_delegate = new RoomDelegate(env,
-                                                  j_connect_options,
-                                                  j_media_factory_handle,
-                                                  j_room,
-                                                  j_room_listener,
-                                                  j_stats_listener,
-                                                  j_handler);
+                                                   j_connect_options,
+                                                   j_media_factory_handle,
+                                                   j_room,
+                                                   j_room_listener,
+                                                   j_stats_listener,
+                                                   j_handler);
     room_delegate->connect();
 
-    return webrtc_jni::jlongFromPointer(room_delegate);
+    return webrtc::NativeToJavaPointer(room_delegate);
 }
 
 
 JNIEXPORT jboolean JNICALL Java_com_twilio_video_Room_nativeIsRecording
-    (JNIEnv *env, jobject j_instance, jlong j_native_handle) {
+        (JNIEnv *env, jobject j_instance, jlong j_native_handle) {
     std::string func_name = std::string(__FUNCTION__);
     VIDEO_ANDROID_LOG(twilio::video::LogModule::kPlatform,
                       twilio::video::LogLevel::kDebug,
@@ -55,7 +57,7 @@ JNIEXPORT jboolean JNICALL Java_com_twilio_video_Room_nativeIsRecording
 }
 
 JNIEXPORT void JNICALL Java_com_twilio_video_Room_nativeDisconnect
-    (JNIEnv *env, jobject j_instance, jlong j_native_handle) {
+        (JNIEnv *env, jobject j_instance, jlong j_native_handle) {
     std::string func_name = std::string(__FUNCTION__);
     VIDEO_ANDROID_LOG(twilio::video::LogModule::kPlatform,
                       twilio::video::LogLevel::kDebug,
@@ -66,8 +68,8 @@ JNIEXPORT void JNICALL Java_com_twilio_video_Room_nativeDisconnect
 }
 
 JNIEXPORT void JNICALL Java_com_twilio_video_Room_nativeGetStats
-    (JNIEnv *env, jobject j_instance, jlong j_native_room_context,
-     jlong j_native_stats_observer) {
+        (JNIEnv *env, jobject j_instance, jlong j_native_room_context,
+         jlong j_native_stats_observer) {
     std::string func_name = std::string(__FUNCTION__);
     VIDEO_ANDROID_LOG(twilio::video::LogModule::kPlatform,
                       twilio::video::LogLevel::kDebug,
@@ -77,13 +79,13 @@ JNIEXPORT void JNICALL Java_com_twilio_video_Room_nativeGetStats
 }
 
 twilio::video::NetworkChangeEvent getNetworkChangeEvent(jobject j_network_change_event) {
-    JNIEnv *jni = webrtc_jni::AttachCurrentThreadIfNeeded();
+    JNIEnv *jni = webrtc::jni::AttachCurrentThreadIfNeeded();
     jclass j_network_change_event_class =
-        twilio_video_jni::FindClass(jni, "com/twilio/video/Video$NetworkChangeEvent");
-    jmethodID name_method_id = webrtc_jni::GetMethodID(jni,
-                                                       j_network_change_event_class,
-                                                       "name",
-                                                       "()Ljava/lang/String;");
+            twilio_video_jni::FindClass(jni, "com/twilio/video/Video$NetworkChangeEvent");
+    jmethodID name_method_id = webrtc::GetMethodID(jni,
+                                                   j_network_change_event_class,
+                                                   "name",
+                                                   "()Ljava/lang/String;");
     jstring connection_event_name = (jstring) jni->CallObjectMethod(j_network_change_event,
                                                                     name_method_id);
     std::string name = JavaToUTF8StdString(jni, connection_event_name);
@@ -107,7 +109,7 @@ JNIEXPORT void JNICALL Java_com_twilio_video_Room_nativeOnNetworkChange(JNIEnv *
                                                                         jobject j_network_changed_event) {
     RoomDelegate *room_delegate = reinterpret_cast<RoomDelegate *>(j_room_context);
     twilio::video::NetworkChangeEvent network_change_event =
-        getNetworkChangeEvent(j_network_changed_event);
+            getNetworkChangeEvent(j_network_changed_event);
     room_delegate->onNetworkChange(network_change_event);
 }
 
@@ -122,7 +124,7 @@ JNIEXPORT void JNICALL Java_com_twilio_video_Room_nativeReleaseRoom
 }
 
 JNIEXPORT void JNICALL Java_com_twilio_video_Room_nativeRelease
-    (JNIEnv *env, jobject j_instance, jlong j_native_handle) {
+        (JNIEnv *env, jobject j_instance, jlong j_native_handle) {
     std::string func_name = std::string(__FUNCTION__);
     VIDEO_ANDROID_LOG(twilio::video::LogModule::kPlatform,
                       twilio::video::LogLevel::kDebug,

@@ -14,10 +14,10 @@ buildscript {
             'gradleHockeyPlugin': '3.6',
 
             // Java
-            'java': JavaVersion.VERSION_1_7,
+            'java': JavaVersion.VERSION_1_8,
 
             // Dependencies
-            'videoCpp': '2.1.0',
+            'videoCpp': '3.0.0-preview2-rc8',
             'junit': '4.12',
             'mockito': '1.10.19',
             'guava': '19.0',
@@ -146,7 +146,8 @@ task incrementRc {
     dependsOn 'validateReleaseCandidateTag'
 
     doLast {
-        def gitBranch = "master"
+        // TODO: Change back to master when feature branch is merged GSDK-1590
+        def gitBranch = "feature/webrtc-67"
         def travisTag = System.getenv("TRAVIS_TAG")
         def githubToken = System.getenv("GITHUB_TOKEN")
         def repoSlug = System.getenv("TRAVIS_REPO_SLUG")
@@ -220,7 +221,8 @@ task incrementVersionAfterRelease {
     group = 'Git'
 
     doLast {
-        def gitBranch = "master"
+        // TODO: Change back to master when feature branch is merged GSDK-1590
+        def gitBranch = "feature/webrtc-67"
         def travisTag = System.getenv("TRAVIS_TAG")
         def githubToken = System.getenv("GITHUB_TOKEN")
         def repoSlug = System.getenv("TRAVIS_REPO_SLUG")
@@ -330,7 +332,8 @@ task incrementVersionAfterPreRelease {
     group = 'Git'
 
     doLast {
-        def gitBranch = "master"
+        // TODO: Change back to master when feature branch is merged GSDK-1590
+        def gitBranch = "feature/webrtc-67"
         def travisTag = System.getenv("TRAVIS_TAG")
         def githubToken = System.getenv("GITHUB_TOKEN")
         def repoSlug = System.getenv("TRAVIS_REPO_SLUG")

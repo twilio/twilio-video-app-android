@@ -100,4 +100,13 @@ public class CameraCapturerUnitTest {
 
         assertEquals(CameraCapturer.CameraSource.FRONT_CAMERA, cameraCapturer.getCameraSource());
     }
+
+    @Test(expected = NullPointerException.class)
+    public void takePicture_shouldNotAllowNullListener(){
+        CameraCapturer cameraCapturer = new CameraCapturer(context,
+                CameraCapturer.CameraSource.FRONT_CAMERA,
+                null,
+                formatProvider);
+        cameraCapturer.takePicture(null);
+    }
 }

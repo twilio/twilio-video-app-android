@@ -167,35 +167,15 @@ public class CameraCapturer implements VideoCapturer {
                 }
 
                 @Override
-                public void onByteBufferFrameCaptured(byte[] bytes,
-                                                      int width,
-                                                      int height,
-                                                      int rotation,
-                                                      long timestamp) {
-                    VideoDimensions frameDimensions = new VideoDimensions(width, height);
-                    VideoFrame frame = new VideoFrame(bytes,
-                            frameDimensions,
-                            VideoFrame.RotationAngle.fromInt(rotation),
-                            timestamp);
+                public void onFrameCaptured(org.webrtc.VideoFrame videoFrame) {
+                    org.webrtc.VideoFrame.Buffer buffer = videoFrame.getBuffer();
+                    VideoDimensions dimensions = new VideoDimensions(buffer.getWidth(),
+                            buffer.getHeight());
+                    VideoFrame.RotationAngle orientation =
+                            VideoFrame.RotationAngle.fromInt(videoFrame.getRotation());
 
-                    videoCapturerListener.onFrameCaptured(frame);
-                }
-
-                @Override
-                public void onTextureFrameCaptured(int width,
-                                                   int height,
-                                                   int oesTextureId,
-                                                   float[] transformMatrix,
-                                                   int rotation,
-                                                   long timestamp) {
-                    VideoDimensions frameDimensions = new VideoDimensions(width, height);
-                    VideoFrame frame = new VideoFrame(oesTextureId,
-                            transformMatrix,
-                            frameDimensions,
-                            VideoFrame.RotationAngle.fromInt(rotation),
-                            timestamp);
-
-                    videoCapturerListener.onFrameCaptured(frame);
+                    videoCapturerListener.onFrameCaptured(new VideoFrame(videoFrame, dimensions,
+                            orientation));
                 }
             };
     private CameraParameterUpdater cameraParameterUpdater;
@@ -298,7 +278,7 @@ public class CameraCapturer implements VideoCapturer {
         return cameraCapturerFormatProvider.getCameraId(cameraSource) != -1;
     }
 
-    public CameraCapturer(Context context, CameraSource cameraSource) {
+    public CameraCapturer(@NonNull Context context, @NonNull CameraSource cameraSource) {
         this(context, cameraSource, null);
     }
 
@@ -338,7 +318,7 @@ public class CameraCapturer implements VideoCapturer {
      * @return all supported video formats.
      */
     @Override
-    public synchronized List<VideoFormat> getSupportedFormats() {
+    @NonNull public synchronized List<VideoFormat> getSupportedFormats() {
         Preconditions.checkState(Util.permissionGranted(context,
                 Manifest.permission.CAMERA), "CAMERA permission must be granted to create video" +
                 "track with CameraCapturer");
@@ -367,8 +347,8 @@ public class CameraCapturer implements VideoCapturer {
      * @param videoCapturerListener consumer of available frames.
      */
     @Override
-    public void startCapture(VideoFormat captureFormat,
-                             VideoCapturer.Listener videoCapturerListener) {
+    public void startCapture(@NonNull VideoFormat captureFormat,
+                             @NonNull VideoCapturer.Listener videoCapturerListener) {
         boolean capturerCreated = createWebRtcCameraCapturer();
         if (capturerCreated) {
             synchronized (stateLock) {
@@ -422,7 +402,7 @@ public class CameraCapturer implements VideoCapturer {
     /**
      * Returns the currently specified camera source.
      */
-    public synchronized CameraSource getCameraSource() {
+    @NonNull public synchronized CameraSource getCameraSource() {
         return cameraSource;
     }
 
@@ -495,12 +475,8 @@ public class CameraCapturer implements VideoCapturer {
             if (state == State.RUNNING) {
                 if (!parameterUpdatePending.get()) {
                     parameterUpdatePending.set(true);
-                    return camera1Session.cameraThreadHandler.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            updateCameraParametersOnCameraThread(cameraParameterUpdater);
-                        }
-                    });
+                    return camera1Session.cameraThreadHandler.post(() ->
+                            updateCameraParametersOnCameraThread(cameraParameterUpdater));
                 } else {
                     logger.w("Parameters will not be applied with parameter update pending");
                     return false;
@@ -552,18 +528,15 @@ public class CameraCapturer implements VideoCapturer {
      * not be scheduled.
      */
     public synchronized boolean takePicture(@NonNull final PictureListener pictureListener) {
+        Preconditions.checkNotNull(pictureListener);
         synchronized (stateLock) {
             if (state == State.RUNNING) {
                 if (!picturePending.get()) {
                     picturePending.set(true);
                     final Handler pictureListenerHandler = Util.createCallbackHandler();
 
-                    return camera1Session.cameraThreadHandler.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            takePictureOnCameraThread(pictureListenerHandler, pictureListener);
-                        }
-                    });
+                    return camera1Session.cameraThreadHandler.post(() ->
+                            takePictureOnCameraThread(pictureListenerHandler, pictureListener));
                 } else {
                     logger.w("Picture cannot be taken while picture is pending");
 
@@ -579,11 +552,11 @@ public class CameraCapturer implements VideoCapturer {
         }
     }
 
-    void setSurfaceTextureHelper(SurfaceTextureHelper surfaceTextureHelper) {
+    void setSurfaceTextureHelper(@NonNull SurfaceTextureHelper surfaceTextureHelper) {
         this.surfaceTextureHelper = surfaceTextureHelper;
     }
 
-    private List<VideoFormat> defaultFormats() {
+    @NonNull private List<VideoFormat> defaultFormats() {
         List<VideoFormat> defaultFormats = new ArrayList<>();
         VideoDimensions defaultDimensions = new VideoDimensions(640, 480);
         VideoFormat defaultFormat = new VideoFormat(defaultDimensions, 30, VideoPixelFormat.NV21);
@@ -622,7 +595,7 @@ public class CameraCapturer implements VideoCapturer {
     /*
      * Aligns the picture data according to the current device orientation and camera source.
      */
-    private byte[] alignPicture(Camera.CameraInfo info, byte[] pictureData) {
+    private byte[] alignPicture(@NonNull Camera.CameraInfo info, @NonNull byte[] pictureData) {
         Bitmap bitmap = BitmapFactory.decodeByteArray(pictureData, 0, pictureData.length);
 
         /*
@@ -666,7 +639,7 @@ public class CameraCapturer implements VideoCapturer {
         }
     }
 
-    private int getFrameOrientation(Camera.CameraInfo info) {
+    private int getFrameOrientation(@NonNull Camera.CameraInfo info) {
         int rotation = getDeviceOrientation();
 
         if (info.facing == android.hardware.Camera.CameraInfo.CAMERA_FACING_BACK) {
@@ -698,7 +671,7 @@ public class CameraCapturer implements VideoCapturer {
         return orientation;
     }
 
-    private void updateCameraParametersOnCameraThread(final CameraParameterUpdater cameraParameterUpdater) {
+    private void updateCameraParametersOnCameraThread(@NonNull final CameraParameterUpdater cameraParameterUpdater) {
         synchronized (stateLock) {
             if (state == State.RUNNING) {
                 // Validate execution on camera thread
@@ -736,8 +709,8 @@ public class CameraCapturer implements VideoCapturer {
         }
     }
 
-    private void takePictureOnCameraThread(final Handler pictureListenerHandler,
-                                           final PictureListener pictureListener) {
+    private void takePictureOnCameraThread(@NonNull final Handler pictureListenerHandler,
+                                           @NonNull final PictureListener pictureListener) {
         synchronized (stateLock) {
             if (state == State.RUNNING) {
                 // Validate execution on camera thread
@@ -745,35 +718,21 @@ public class CameraCapturer implements VideoCapturer {
 
                 final Camera.CameraInfo info = camera1Session.info;
                 camera1Session.camera
-                        .takePicture(new android.hardware.Camera.ShutterCallback() {
-                            @Override
-                            public void onShutter() {
-                                pictureListenerHandler.post(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        pictureListener.onShutter();
-                                    }
-                                });
-                            }
-                        }, null, new android.hardware.Camera.PictureCallback() {
-                            @Override
-                            public void onPictureTaken(byte[] pictureData,
-                                                       android.hardware.Camera camera) {
-                                final byte[] alignedPictureData = alignPicture(info, pictureData);
-                                pictureListenerHandler.post(new Runnable() {
-                                    @Override
-                                    public void run() {
+                        .takePicture(() -> pictureListenerHandler.post(pictureListener::onShutter),
+                                null,
+                                (pictureData, camera) -> {
+                                    final byte[] alignedPictureData = alignPicture(info,
+                                            pictureData);
+                                    pictureListenerHandler.post(() -> {
                                         pictureListener.onPictureTaken(alignedPictureData);
                                         picturePending.set(false);
+                                    });
+                                    synchronized (stateLock) {
+                                        if (state == State.RUNNING) {
+                                            camera1Session.camera.startPreview();
+                                        }
                                     }
                                 });
-                                synchronized (stateLock) {
-                                    if (state == State.RUNNING) {
-                                        camera1Session.camera.startPreview();
-                                    }
-                                }
-                            }
-                        });
             } else {
                 logger.w("Attempted to take picture while capturing is not running");
             }
@@ -817,6 +776,6 @@ public class CameraCapturer implements VideoCapturer {
          *
          * @param pictureData JPEG picture data.
          */
-        void onPictureTaken(byte[] pictureData);
+        void onPictureTaken(@NonNull byte[] pictureData);
     }
 }

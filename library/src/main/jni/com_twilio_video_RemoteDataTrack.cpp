@@ -30,13 +30,13 @@ void bindRemoteDataTrackListenerProxy(JNIEnv *env,
                                       jobject j_remote_data_track,
                                       jclass j_remote_data_track_class,
                                       RemoteDataTrackContext *remote_data_track_context) {
-    jfieldID j_remote_data_track_listener_proxy_field = webrtc_jni::GetFieldID(env,
-                                                                               j_remote_data_track_class,
-                                                                               "dataTrackListenerProxy",
-                                                                               "Lcom/twilio/video/RemoteDataTrack$Listener;");
-    jobject j_remote_data_track_listener_proxy = webrtc_jni::GetObjectField(env,
-                                                                            j_remote_data_track,
-                                                                            j_remote_data_track_listener_proxy_field);
+    jfieldID j_remote_data_track_listener_proxy_field = GetFieldID(env,
+                                                                   j_remote_data_track_class,
+                                                                   "dataTrackListenerProxy",
+                                                                   "Lcom/twilio/video/RemoteDataTrack$Listener;");
+    jobject j_remote_data_track_listener_proxy = GetObjectField(env,
+                                                                j_remote_data_track,
+                                                                j_remote_data_track_listener_proxy_field);
 
     remote_data_track_context->android_remote_data_track_observer =
             std::make_shared<AndroidRemoteDataTrackObserver>(env,
@@ -59,7 +59,7 @@ jobject createJavaRemoteDataTrack(JNIEnv *env,
     jint j_max_retransmits = (jint) remote_data_track->getMaxRetransmits();
     jstring j_sid = JavaUTF16StringFromStdString(env, remote_data_track->getSid());
     jstring j_name = JavaUTF16StringFromStdString(env, remote_data_track->getName());
-    jlong j_remote_data_track_context = webrtc_jni::jlongFromPointer(remote_data_track_context);
+    jlong j_remote_data_track_context = webrtc::NativeToJavaPointer(remote_data_track_context);
     jobject j_remote_data_track = env->NewObject(j_remote_data_track_class,
                                                  j_remote_data_track_ctor_id,
                                                  j_enabled,

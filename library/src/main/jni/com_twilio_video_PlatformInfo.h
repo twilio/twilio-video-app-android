@@ -31,11 +31,11 @@ struct PlatformInfoContext {
 };
 
 JNIEXPORT jlong JNICALL Java_com_twilio_video_PlatformInfo_nativeCreate
-    (JNIEnv *, jobject, jstring, jstring, jstring, jstring, jstring, jstring);
+        (JNIEnv *, jobject, jstring, jstring, jstring, jstring, jstring, jstring);
 
 
 JNIEXPORT void JNICALL Java_com_twilio_video_PlatformInfo_nativeRelease
-    (JNIEnv *, jobject, jlong);
+        (JNIEnv *, jobject, jlong);
 
 }
 

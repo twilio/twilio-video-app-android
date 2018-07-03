@@ -163,40 +163,37 @@ public class ScreenCapturerTest extends BaseVideoTest {
          * Run on UI thread to avoid thread hopping between the test runner thread and the UI
          * thread.
          */
-        InstrumentationRegistry.getInstrumentation().runOnMainSync(new Runnable() {
-            @Override
-            public void run() {
-                final long callingThreadId = Thread.currentThread().getId();
-                ScreenCapturer.Listener screenCapturerListener = new ScreenCapturer.Listener() {
-                    @Override
-                    public void onScreenCaptureError(String errorDescription) {
-                        assertEquals(callingThreadId, Thread.currentThread().getId());
-                        screenCaptureError.countDown();
-                    }
+        InstrumentationRegistry.getInstrumentation().runOnMainSync(() -> {
+            final long callingThreadId = Thread.currentThread().getId();
+            ScreenCapturer.Listener screenCapturerListener = new ScreenCapturer.Listener() {
+                @Override
+                public void onScreenCaptureError(String errorDescription) {
+                    assertEquals(callingThreadId, Thread.currentThread().getId());
+                    screenCaptureError.countDown();
+                }
 
-                    @Override
-                    public void onFirstFrameAvailable() {
-                        assertEquals(callingThreadId, Thread.currentThread().getId());
-                        firstFrameAvailable.countDown();
-                    }
-                };
+                @Override
+                public void onFirstFrameAvailable() {
+                    assertEquals(callingThreadId, Thread.currentThread().getId());
+                    firstFrameAvailable.countDown();
+                }
+            };
 
-                // Validate error callback is invoked on correct thread
-                screenCapturer = new ScreenCapturer(screenCapturerActivity,
-                        Integer.MIN_VALUE,
-                        new Intent(),
-                        screenCapturerListener);
-                screenVideoTrack = LocalVideoTrack.create(screenCapturerActivity,
-                        true, screenCapturer);
+            // Validate error callback is invoked on correct thread
+            screenCapturer = new ScreenCapturer(screenCapturerActivity,
+                    Integer.MIN_VALUE,
+                    new Intent(),
+                    screenCapturerListener);
+            screenVideoTrack = LocalVideoTrack.create(screenCapturerActivity,
+                    true, screenCapturer);
 
-                // Validate first frame event is invoked on correct thread
-                screenCapturer = new ScreenCapturer(screenCapturerActivity,
-                        screenCapturerActivity.getScreenCaptureResultCode(),
-                        screenCapturerActivity.getScreenCaptureIntent(),
-                        screenCapturerListener);
-                screenVideoTrack = LocalVideoTrack.create(screenCapturerActivity,
-                        true, screenCapturer);
-            }
+            // Validate first frame event is invoked on correct thread
+            screenCapturer = new ScreenCapturer(screenCapturerActivity,
+                    screenCapturerActivity.getScreenCaptureResultCode(),
+                    screenCapturerActivity.getScreenCaptureIntent(),
+                    screenCapturerListener);
+            screenVideoTrack = LocalVideoTrack.create(screenCapturerActivity,
+                    true, screenCapturer);
         });
 
         assertTrue(screenCaptureError.await(SCREEN_CAPTURER_DELAY_MS, TimeUnit.MILLISECONDS));

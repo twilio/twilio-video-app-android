@@ -19,6 +19,7 @@
 #include "webrtc/sdk/android/src/jni/classreferenceholder.h"
 #include "class_reference_holder.h"
 #include "jni_utils.h"
+#include "webrtc/modules/utility/include/helpers_android.h"
 
 namespace twilio_video_jni {
 
@@ -51,30 +52,30 @@ jobject createJavaLocalVideoTrack(std::shared_ptr<twilio::media::LocalVideoTrack
                                   jobject j_video_capturer,
                                   jobject j_video_constraints,
                                   jobject j_context) {
-    JNIEnv *jni = webrtc_jni::GetEnv();
+    JNIEnv *jni = webrtc::jni::GetEnv();
     jclass j_video_track_class = twilio_video_jni::FindClass(jni,
                                                              "com/twilio/video/LocalVideoTrack");
-    jclass j_webrtc_video_track_class = webrtc_jni::FindClass(jni, "org/webrtc/VideoTrack");
-    jmethodID j_webrtc_video_track_ctor_id = webrtc_jni::GetMethodID(jni,
-                                                                     j_webrtc_video_track_class,
-                                                                     "<init>",
-                                                                     "(J)V");
-    jmethodID j_video_track_ctor_id = webrtc_jni::GetMethodID(jni,
-                                                              j_video_track_class,
-                                                              "<init>",
-                                                              kLocalVideoTrackConstructorSignature);
+    jclass j_webrtc_video_track_class = webrtc::FindClass(jni, "org/webrtc/VideoTrack");
+    jmethodID j_webrtc_video_track_ctor_id = webrtc::GetMethodID(jni,
+                                                                 j_webrtc_video_track_class,
+                                                                 "<init>",
+                                                                 "(J)V");
+    jmethodID j_video_track_ctor_id = webrtc::GetMethodID(jni,
+                                                          j_video_track_class,
+                                                          "<init>",
+                                                          kLocalVideoTrackConstructorSignature);
     LocalVideoTrackContext* video_track_context =
             new LocalVideoTrackContext(local_video_track);
     jobject j_webrtc_video_track = jni->NewObject(j_webrtc_video_track_class,
                                                   j_webrtc_video_track_ctor_id,
-                                                  webrtc_jni::jlongFromPointer(local_video_track->getWebRtcTrack()));
+                                                  webrtc::NativeToJavaPointer(local_video_track->getWebRtcTrack()));
     CHECK_EXCEPTION(jni) << "Error creating org.webrtc.VideoTrack";
     jstring j_name = JavaUTF16StringFromStdString(jni, local_video_track->getName());
     jstring j_track_hash = JavaUTF16StringFromStdString(jni,
                                                         getLocalVideoTrackHash(local_video_track));
     jobject j_local_video_track = jni->NewObject(j_video_track_class,
                                                  j_video_track_ctor_id,
-                                                 webrtc_jni::jlongFromPointer(video_track_context),
+                                                 webrtc::NativeToJavaPointer(video_track_context),
                                                  local_video_track->isEnabled(),
                                                  j_video_capturer,
                                                  j_video_constraints,
@@ -114,9 +115,9 @@ class StubVideoSink : public rtc::VideoSinkInterface<webrtc::VideoFrame> {
 
 // Use only for testing
 JNIEXPORT jlong JNICALL Java_com_twilio_video_LocalVideoTrack_nativeAddRendererWithWants(JNIEnv *jni,
-                                                                                        jobject j_local_video_track,
-                                                                                        jlong j_local_video_track_handle,
-                                                                                        jboolean j_rotation_applied) {
+                                                                                         jobject j_local_video_track,
+                                                                                         jlong j_local_video_track_handle,
+                                                                                         jboolean j_rotation_applied) {
     std::shared_ptr<twilio::media::LocalVideoTrack> local_video_track =
             getLocalVideoTrack(j_local_video_track_handle);
     StubVideoSink *video_sink = new StubVideoSink();
@@ -124,7 +125,7 @@ JNIEXPORT jlong JNICALL Java_com_twilio_video_LocalVideoTrack_nativeAddRendererW
     video_sink_wants.rotation_applied = j_rotation_applied;
     local_video_track->getWebRtcTrack()->AddOrUpdateSink(video_sink, video_sink_wants);
 
-    return webrtc_jni::jlongFromPointer(video_sink);
+    return webrtc::NativeToJavaPointer(video_sink);
 }
 
 // Use only for testing

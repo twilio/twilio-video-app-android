@@ -17,6 +17,7 @@
 package com.twilio.video;
 
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 /**
  * A local video track publication represents a {@link LocalVideoTrack} that has been shared to a
@@ -71,7 +72,7 @@ public class LocalVideoTrackPublication implements VideoTrackPublication {
     /**
      * Returns the published local video track.
      */
-    public LocalVideoTrack getLocalVideoTrack() {
+    @Nullable public LocalVideoTrack getLocalVideoTrack() {
         return localVideoTrack;
     }
 }

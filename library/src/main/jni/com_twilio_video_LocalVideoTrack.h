@@ -20,10 +20,6 @@
 #include <jni.h>
 #include "media/track.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 namespace twilio_video_jni {
 
 class LocalVideoTrackContext {
@@ -52,6 +48,10 @@ jobject createJavaLocalVideoTrack(std::shared_ptr<twilio::media::LocalVideoTrack
                                   jobject j_video_capturer,
                                   jobject j_video_constraints,
                                   jobject j_context);
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 JNIEXPORT jboolean JNICALL Java_com_twilio_video_LocalVideoTrack_nativeIsEnabled(JNIEnv *,
                                                                                  jobject,

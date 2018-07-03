@@ -16,6 +16,7 @@
 
 package com.twilio.video;
 
+import android.support.annotation.NonNull;
 import java.util.Set;
 
 /**
@@ -35,11 +36,11 @@ public class IceOptions {
         this.iceTransportPolicy = builder.iceTransportPolicy;
     }
 
-    public Set<IceServer> getIceServers() {
+    @NonNull public Set<IceServer> getIceServers() {
         return iceServers;
     }
 
-    public IceTransportPolicy getIceTransportPolicy() {
+    @NonNull public IceTransportPolicy getIceTransportPolicy() {
         return iceTransportPolicy;
     }
 
@@ -60,7 +61,7 @@ public class IceOptions {
         /**
          * Set of {@link IceServer} objects to be used during connection establishment.
          */
-        public Builder iceServers(Set<IceServer> iceServers) {
+        public Builder iceServers(@NonNull Set<IceServer> iceServers) {
             this.iceServers = iceServers;
             return this;
         }
@@ -68,7 +69,7 @@ public class IceOptions {
         /**
          * The transport policy to use. Defaults to {@link IceTransportPolicy#ALL}.
          */
-        public Builder iceTransportPolicy(IceTransportPolicy iceTransportPolicy) {
+        public Builder iceTransportPolicy(@NonNull IceTransportPolicy iceTransportPolicy) {
             this.iceTransportPolicy = iceTransportPolicy;
             return this;
         }

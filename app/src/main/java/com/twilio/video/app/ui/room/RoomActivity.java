@@ -421,13 +421,7 @@ public class RoomActivity extends BaseActivity {
 
         Single<Room> connection = updateEnv()
                 .andThen(tokenService.getToken(displayName, topology))
-                .flatMap(new Function<String, SingleSource<? extends Room>>() {
-                    @Override
-                    public SingleSource<? extends Room> apply(@NonNull String token)
-                            throws Exception {
-                        return connect(token, roomName);
-                    }
-                });
+                .flatMap(token -> connect(token, roomName));
 
         connection.observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new SingleObserver<Room>() {
@@ -850,10 +844,7 @@ public class RoomActivity extends BaseActivity {
                             .setAudioAttributes(playbackAttributes)
                             .setAcceptsDelayedFocusGain(true)
                             .setOnAudioFocusChangeListener(
-                                    new AudioManager.OnAudioFocusChangeListener() {
-                                        @Override
-                                        public void onAudioFocusChange(int i) { }
-                                    })
+                                    i -> { })
                             .build();
             audioManager.requestAudioFocus(focusRequest);
         } else {
@@ -950,18 +941,15 @@ public class RoomActivity extends BaseActivity {
      * @return Completable
      */
     private Completable updateEnv() {
-        return Completable.fromAction(new Action() {
-            @Override
-            public void run() throws Exception {
-                String env = sharedPreferences.getString(Preferences.ENVIRONMENT,
-                        Preferences.ENVIRONMENT_DEFAULT);
-                String nativeEnvironmentVariableValue = EnvUtil
-                        .getNativeEnvironmentVariableValue(env);
-                Env.set(RoomActivity.this,
-                        EnvUtil.TWILIO_ENV_KEY,
-                        nativeEnvironmentVariableValue,
-                        true);
-            }
+        return Completable.fromAction(() -> {
+            String env = sharedPreferences.getString(Preferences.ENVIRONMENT,
+                    Preferences.ENVIRONMENT_DEFAULT);
+            String nativeEnvironmentVariableValue = EnvUtil
+                    .getNativeEnvironmentVariableValue(env);
+            Env.set(RoomActivity.this,
+                    EnvUtil.TWILIO_ENV_KEY,
+                    nativeEnvironmentVariableValue,
+                    true);
         });
     }
 
@@ -972,64 +960,61 @@ public class RoomActivity extends BaseActivity {
      * @return Single with room reference
      */
     private Single<Room> connect(final String token, final String roomName) {
-        return Single.fromCallable(new Callable<Room>() {
-            @Override
-            public Room call() throws Exception {
-                String env = sharedPreferences.getString(Preferences.ENVIRONMENT,
-                    Preferences.ENVIRONMENT_DEFAULT);
-                boolean enableInsights = sharedPreferences.getBoolean(Preferences.ENABLE_INSIGHTS,
-                        Preferences.ENABLE_INSIGHTS_DEFAULT);
+        return Single.fromCallable(() -> {
+            String env = sharedPreferences.getString(Preferences.ENVIRONMENT,
+                Preferences.ENVIRONMENT_DEFAULT);
+            boolean enableInsights = sharedPreferences.getBoolean(Preferences.ENABLE_INSIGHTS,
+                    Preferences.ENABLE_INSIGHTS_DEFAULT);
 
-                VideoCodec preferedVideoCodec = getVideoCodecPreference(Preferences.VIDEO_CODEC,
-                        Preferences.VIDEO_CODEC_DEFAULT);
+            VideoCodec preferedVideoCodec = getVideoCodecPreference(Preferences.VIDEO_CODEC,
+                    Preferences.VIDEO_CODEC_DEFAULT);
 
-                AudioCodec preferredAudioCodec = getAudioCodecPreference(Preferences.AUDIO_CODEC,
-                        Preferences.AUDIO_CODEC_DEFAULT);
+            AudioCodec preferredAudioCodec = getAudioCodecPreference(Preferences.AUDIO_CODEC,
+                    Preferences.AUDIO_CODEC_DEFAULT);
 
-                ConnectOptions.Builder connectOptionsBuilder = new ConnectOptions.Builder(token)
-                        .roomName(roomName)
-                        .enableInsights(enableInsights);
+            ConnectOptions.Builder connectOptionsBuilder = new ConnectOptions.Builder(token)
+                    .roomName(roomName)
+                    .enableInsights(enableInsights);
 
-                int maxVideoBitrate = sharedPreferences.getInt(Preferences.MAX_VIDEO_BITRATE,
-                        Preferences.MAX_VIDEO_BITRATE_DEFAULT);
+            int maxVideoBitrate = sharedPreferences.getInt(Preferences.MAX_VIDEO_BITRATE,
+                    Preferences.MAX_VIDEO_BITRATE_DEFAULT);
 
-                int maxAudioBitrate = sharedPreferences.getInt(Preferences.MAX_AUDIO_BITRATE,
-                        Preferences.MAX_AUDIO_BITRATE_DEFAULT);
+            int maxAudioBitrate = sharedPreferences.getInt(Preferences.MAX_AUDIO_BITRATE,
+                    Preferences.MAX_AUDIO_BITRATE_DEFAULT);
 
-                EncodingParameters encodingParameters =
-                        new EncodingParameters(maxAudioBitrate, maxVideoBitrate);
+            EncodingParameters encodingParameters =
+                    new EncodingParameters(maxAudioBitrate, maxVideoBitrate);
 
-                if (localAudioTrack != null) {
-                    connectOptionsBuilder
-                            .audioTracks(Collections.singletonList(localAudioTrack));
-                }
-
-                List<LocalVideoTrack> localVideoTracks = new ArrayList<>();
-                if (cameraVideoTrack != null) {
-                    localVideoTracks.add(cameraVideoTrack);
-                }
-
-                if (screenVideoTrack != null) {
-                    localVideoTracks.add(screenVideoTrack);
-                }
-
-                if (!localVideoTracks.isEmpty()) {
-                    connectOptionsBuilder.videoTracks(localVideoTracks);
-                }
-
+            if (localAudioTrack != null) {
                 connectOptionsBuilder
-                        .preferVideoCodecs(Collections.singletonList(preferedVideoCodec));
-
-                connectOptionsBuilder
-                        .preferAudioCodecs(Collections.singletonList(preferredAudioCodec));
-
-                connectOptionsBuilder.encodingParameters(encodingParameters);
-
-                room = Video.connect(RoomActivity.this,
-                        connectOptionsBuilder.build(),
-                        roomListener());
-                return room;
+                        .audioTracks(Collections.singletonList(localAudioTrack));
             }
+
+            List<LocalVideoTrack> localVideoTracks = new ArrayList<>();
+            if (cameraVideoTrack != null) {
+                localVideoTracks.add(cameraVideoTrack);
+            }
+
+            if (screenVideoTrack != null) {
+                localVideoTracks.add(screenVideoTrack);
+            }
+
+            if (!localVideoTracks.isEmpty()) {
+                connectOptionsBuilder.videoTracks(localVideoTracks);
+            }
+
+            connectOptionsBuilder
+                    .preferVideoCodecs(Collections.singletonList(preferedVideoCodec));
+
+            connectOptionsBuilder
+                    .preferAudioCodecs(Collections.singletonList(preferredAudioCodec));
+
+            connectOptionsBuilder.encodingParameters(encodingParameters);
+
+            room = Video.connect(RoomActivity.this,
+                    connectOptionsBuilder.build(),
+                    roomListener());
+            return room;
         });
     }
 
@@ -1228,14 +1213,11 @@ public class RoomActivity extends BaseActivity {
     }
 
     private StatsListener statsListener() {
-        return new StatsListener() {
-            @Override
-            public void onStats(List<StatsReport> statsReports) {
-                // Running on StatsScheduler thread
-                if (room != null) {
-                    statsListAdapter.updateStatsData(
-                            statsReports, room.getRemoteParticipants(), localVideoTrackNames);
-                }
+        return statsReports -> {
+            // Running on StatsScheduler thread
+            if (room != null) {
+                statsListAdapter.updateStatsData(
+                        statsReports, room.getRemoteParticipants(), localVideoTrackNames);
             }
         };
     }
@@ -1248,12 +1230,7 @@ public class RoomActivity extends BaseActivity {
      * @return participant click listener.
      */
     private ParticipantController.ItemClickListener participantClickListener() {
-        return new ParticipantController.ItemClickListener() {
-            @Override
-            public void onThumbClick(ParticipantController.Item item) {
-                renderItemAsPrimary(item);
-            }
-        };
+        return this::renderItemAsPrimary;
     }
 
     private Room.Listener roomListener() {

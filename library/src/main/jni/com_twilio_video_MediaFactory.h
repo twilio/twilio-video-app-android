@@ -20,12 +20,6 @@
 #include <jni.h>
 #include "media/media_factory.h"
 
-
-
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 namespace twilio_video_jni {
 
 class MediaFactoryContext {
@@ -50,6 +44,11 @@ private:
 };
 
 std::shared_ptr<twilio::media::MediaFactory> getMediaFactory(jlong);
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 JNIEXPORT jlong JNICALL Java_com_twilio_video_MediaFactory_nativeCreate(JNIEnv *,
                                                                         jobject,
                                                                         jobject,

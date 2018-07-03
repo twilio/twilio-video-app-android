@@ -63,7 +63,7 @@ protected:
 
 private:
     JNIEnv *jni() {
-        return webrtc_jni::AttachCurrentThreadIfNeeded();
+        return webrtc::jni::AttachCurrentThreadIfNeeded();
     }
 
     bool isObserverValid(const std::string &callback_name);
@@ -71,16 +71,16 @@ private:
     bool observer_deleted_ = false;
     mutable rtc::CriticalSection deletion_lock_;
 
-    const webrtc_jni::ScopedGlobalRef<jobject> j_local_participant_;
-    const webrtc_jni::ScopedGlobalRef<jobject> j_local_participant_observer_;
+    const webrtc::ScopedJavaGlobalRef<jobject> j_local_participant_;
+    const webrtc::ScopedJavaGlobalRef<jobject> j_local_participant_observer_;
     std::map<std::string, jobject>& local_audio_track_map_;
     std::map<std::string, jobject>& local_video_track_map_;
     std::map<std::string, jobject>& local_data_track_map_;
-    const webrtc_jni::ScopedGlobalRef<jclass> j_local_participant_observer_class_;
-    const webrtc_jni::ScopedGlobalRef<jclass> j_published_audio_track_class_;
-    const webrtc_jni::ScopedGlobalRef<jclass> j_published_video_track_class_;
-    const webrtc_jni::ScopedGlobalRef<jclass> j_published_data_track_class_;
-    const webrtc_jni::ScopedGlobalRef<jclass> j_twilio_exception_class_;
+    const webrtc::ScopedJavaGlobalRef<jclass> j_local_participant_observer_class_;
+    const webrtc::ScopedJavaGlobalRef<jclass> j_published_audio_track_class_;
+    const webrtc::ScopedJavaGlobalRef<jclass> j_published_video_track_class_;
+    const webrtc::ScopedJavaGlobalRef<jclass> j_published_data_track_class_;
+    const webrtc::ScopedJavaGlobalRef<jclass> j_twilio_exception_class_;
 
     jmethodID j_on_published_audio_track_;
     jmethodID j_on_audio_track_publication_failed_;

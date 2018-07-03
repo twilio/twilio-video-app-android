@@ -13,14 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.twilio.video;
+
+import android.support.annotation.NonNull;
 
 public abstract class BaseTrackStats {
     /**
      * Track server identifier
      */
-    public final String trackSid;
+    @NonNull public final String trackSid;
 
     /**
      * Total number of RTP packets lost for this SSRC since
@@ -31,22 +32,22 @@ public abstract class BaseTrackStats {
     /**
      * Name of codec used for this track
      */
-    public final String codec;
+    @NonNull public final String codec;
 
     /**
      * The SSRC identifier of the source
      */
-    public final String ssrc;
+    @NonNull public final String ssrc;
 
     /**
      * Unix timestamp in milliseconds
      */
     public final double timestamp;
 
-    BaseTrackStats(String trackSid,
+    BaseTrackStats(@NonNull String trackSid,
                    int packetsLost,
-                   String codec,
-                   String ssrc,
+                   @NonNull String codec,
+                   @NonNull String ssrc,
                    double timestamp) {
         this.trackSid = trackSid;
         this.packetsLost = packetsLost;

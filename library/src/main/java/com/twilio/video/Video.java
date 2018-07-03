@@ -23,6 +23,7 @@ import android.content.IntentFilter;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.util.Log;
 
 import com.getkeepsafe.relinker.ReLinker;
@@ -85,7 +86,7 @@ public abstract class Video {
      * @param roomListener listener of room related events.
      * @return room being connected to.
      */
-    public static synchronized Room connect(@NonNull Context context,
+    @NonNull public static synchronized Room connect(@NonNull Context context,
                                             @NonNull ConnectOptions connectOptions,
                                             @NonNull Room.Listener roomListener) {
         Preconditions.checkNotNull(context, "context must not be null");
@@ -196,7 +197,7 @@ public abstract class Video {
      *
      * @return the version of the SDK
      */
-    public static String getVersion() {
+    @NonNull public static String getVersion() {
         return BuildConfig.VERSION_NAME;
     }
 
@@ -205,7 +206,7 @@ public abstract class Video {
      *
      * @return the logging level
      */
-    public static LogLevel getLogLevel() {
+    @NonNull public static LogLevel getLogLevel() {
         return LogLevel.values()[tryGetCoreLogLevel()];
     }
 

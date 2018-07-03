@@ -670,10 +670,7 @@ public class CameraCapturerTest extends BaseCameraCapturerTest {
         final int updateIterations = 4;
         for (int i = 0 ; i < updateIterations ; i++) {
             parameterUpdateScheduled &=
-                    cameraCapturer.updateCameraParameters(new CameraParameterUpdater() {
-                        @Override
-                        public void apply(Camera.Parameters cameraParameters) {}
-                    });
+                    cameraCapturer.updateCameraParameters(cameraParameters -> {});
         }
 
         // With update pending this should have failed
@@ -724,10 +721,10 @@ public class CameraCapturerTest extends BaseCameraCapturerTest {
             }
         };
 
-        assertTrue(firstFrameAvailable.await(CAMERA_CAPTURE_DELAY_MS, TimeUnit.SECONDS));
+        assertTrue(firstFrameAvailable.await(CAMERA_CAPTURE_DELAY_MS, TimeUnit.MILLISECONDS));
         assertTrue(cameraCapturer.takePicture(pictureListener));
         assertFalse(cameraCapturer.takePicture(pictureListener));
-        assertTrue(onPictureTakenLatch.await(CAMERA_CAPTURE_DELAY_MS, TimeUnit.SECONDS));
+        assertTrue(onPictureTakenLatch.await(CAMERA_CAPTURE_DELAY_MS, TimeUnit.MILLISECONDS));
     }
 
     @Test
@@ -762,26 +759,23 @@ public class CameraCapturerTest extends BaseCameraCapturerTest {
          * Run on UI thread to avoid thread hopping between the test runner thread and the UI
          * thread.
          */
-        InstrumentationRegistry.getInstrumentation().runOnMainSync(new Runnable() {
-            @Override
-            public void run() {
-                final long callingThreadId = Thread.currentThread().getId();
-                CameraCapturer.PictureListener pictureListener =
-                        new CameraCapturer.PictureListener() {
-                            @Override
-                            public void onShutter() {
-                                assertEquals(callingThreadId, Thread.currentThread().getId());
-                                shutterCallback.countDown();
-                            }
+        InstrumentationRegistry.getInstrumentation().runOnMainSync(() -> {
+            final long callingThreadId = Thread.currentThread().getId();
+            CameraCapturer.PictureListener pictureListener =
+                    new CameraCapturer.PictureListener() {
+                        @Override
+                        public void onShutter() {
+                            assertEquals(callingThreadId, Thread.currentThread().getId());
+                            shutterCallback.countDown();
+                        }
 
-                            @Override
-                            public void onPictureTaken(byte[] pictureData) {
-                                assertEquals(callingThreadId, Thread.currentThread().getId());
-                                pictureTaken.countDown();
-                            }
-                        };
-                assertTrue(cameraCapturer.takePicture(pictureListener));
-            }
+                        @Override
+                        public void onPictureTaken(byte[] pictureData) {
+                            assertEquals(callingThreadId, Thread.currentThread().getId());
+                            pictureTaken.countDown();
+                        }
+                    };
+            assertTrue(cameraCapturer.takePicture(pictureListener));
         });
 
         assertTrue(shutterCallback.await(CAMERA_CAPTURE_DELAY_MS, TimeUnit.MILLISECONDS));
@@ -792,18 +786,15 @@ public class CameraCapturerTest extends BaseCameraCapturerTest {
                                                         final String expectedFlashMode,
                                                         final AtomicReference<Camera.Parameters> actualCameraParameters) {
         boolean parameterUpdateScheduled = cameraCapturer
-                .updateCameraParameters(new CameraParameterUpdater() {
-                    @Override
-                    public void apply(Camera.Parameters cameraParameters) {
-                        // Turn the flash only if supported
-                        if (cameraParameters.getFlashMode() != null) {
-                            cameraParameters.setFlashMode(expectedFlashMode);
-                        }
-                        actualCameraParameters.set(cameraParameters);
-
-                        // Continue test
-                        cameraParametersSet.countDown();
+                .updateCameraParameters(cameraParameters -> {
+                    // Turn the flash only if supported
+                    if (cameraParameters.getFlashMode() != null) {
+                        cameraParameters.setFlashMode(expectedFlashMode);
                     }
+                    actualCameraParameters.set(cameraParameters);
+
+                    // Continue test
+                    cameraParametersSet.countDown();
                 });
 
         assertTrue(parameterUpdateScheduled);

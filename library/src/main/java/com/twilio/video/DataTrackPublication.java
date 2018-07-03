@@ -16,6 +16,8 @@
 
 package com.twilio.video;
 
+import android.support.annotation.Nullable;
+
 /**
  * A published data track represents a data track that has been shared with a {@link Room}.
  */
@@ -23,5 +25,5 @@ public interface DataTrackPublication extends TrackPublication {
     /**
      * Returns the published data track.
      */
-    DataTrack getDataTrack();
+    @Nullable DataTrack getDataTrack();
 }

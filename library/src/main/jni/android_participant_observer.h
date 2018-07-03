@@ -110,7 +110,7 @@ protected:
 
 private:
     JNIEnv *jni() {
-        return webrtc_jni::AttachCurrentThreadIfNeeded();
+        return webrtc::jni::AttachCurrentThreadIfNeeded();
     }
 
     bool isObserverValid(const std::string &callback_name);
@@ -118,22 +118,22 @@ private:
     bool observer_deleted_ = false;
     mutable rtc::CriticalSection deletion_lock_;
 
-    const webrtc_jni::ScopedGlobalRef<jobject> j_remote_participant_;
-    const webrtc_jni::ScopedGlobalRef<jobject> j_remote_participant_observer_;
-    const webrtc_jni::ScopedGlobalRef<jclass> j_remote_participant_observer_class_;
+    const webrtc::ScopedJavaGlobalRef<jobject> j_remote_participant_;
+    const webrtc::ScopedJavaGlobalRef<jobject> j_remote_participant_observer_;
+    const webrtc::ScopedJavaGlobalRef<jclass> j_remote_participant_observer_class_;
     std::map<std::shared_ptr<twilio::media::RemoteAudioTrackPublication>, jobject>& remote_audio_track_publication_map_;
     std::map<std::shared_ptr<twilio::media::RemoteAudioTrack>, jobject>& remote_audio_track_map_;
     std::map<std::shared_ptr<twilio::media::RemoteVideoTrackPublication>, jobject>& remote_video_track_publication_map_;
     std::map<std::shared_ptr<twilio::media::RemoteVideoTrack>, jobject>& remote_video_track_map_;
     std::map<std::shared_ptr<twilio::media::RemoteDataTrackPublication>, jobject>& remote_data_track_publication_map_;
     std::map<std::shared_ptr<twilio::media::RemoteDataTrack>, jobject>& remote_data_track_map_;
-    const webrtc_jni::ScopedGlobalRef<jclass> j_remote_audio_track_class_;
-    const webrtc_jni::ScopedGlobalRef<jclass> j_remote_audio_track_publication_class_;
-    const webrtc_jni::ScopedGlobalRef<jclass> j_remote_video_track_class_;
-    const webrtc_jni::ScopedGlobalRef<jclass> j_remote_video_track_publication_class_;
-    const webrtc_jni::ScopedGlobalRef<jclass> j_remote_data_track_class_;
-    const webrtc_jni::ScopedGlobalRef<jclass> j_remote_data_track_publication_class_;
-    const webrtc_jni::ScopedGlobalRef<jclass> j_twilio_exception_class_;
+    const webrtc::ScopedJavaGlobalRef<jclass> j_remote_audio_track_class_;
+    const webrtc::ScopedJavaGlobalRef<jclass> j_remote_audio_track_publication_class_;
+    const webrtc::ScopedJavaGlobalRef<jclass> j_remote_video_track_class_;
+    const webrtc::ScopedJavaGlobalRef<jclass> j_remote_video_track_publication_class_;
+    const webrtc::ScopedJavaGlobalRef<jclass> j_remote_data_track_class_;
+    const webrtc::ScopedJavaGlobalRef<jclass> j_remote_data_track_publication_class_;
+    const webrtc::ScopedJavaGlobalRef<jclass> j_twilio_exception_class_;
     jmethodID j_on_audio_track_published_;
     jmethodID j_on_audio_track_unpublished_;
     jmethodID j_on_audio_track_subscribed_;

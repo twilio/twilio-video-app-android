@@ -544,30 +544,27 @@ public class DataTrackTopologyParameterizedTest extends BaseParticipantTest {
         final AtomicReference<Long> onBufferMessageThreadId = new AtomicReference<>();
         final AtomicReference<Long> onStringMessageThreadId = new AtomicReference<>();
         final CountDownLatch messagesReceived = new CountDownLatch(2);
-        InstrumentationRegistry.getInstrumentation().runOnMainSync(new Runnable() {
-            @Override
-            public void run() {
-                expectedThreadId.set(Thread.currentThread().getId());
-                final RemoteDataTrack.Listener dataTrackListener = new RemoteDataTrack.Listener() {
-                    @Override
-                    public void onMessage(RemoteDataTrack remoteDataTrack,
-                                          ByteBuffer messageBuffer) {
-                        onBufferMessageThreadId.set(Thread.currentThread().getId());
-                        messagesReceived.countDown();
-                    }
+        InstrumentationRegistry.getInstrumentation().runOnMainSync(() -> {
+            expectedThreadId.set(Thread.currentThread().getId());
+            final RemoteDataTrack.Listener dataTrackListener = new RemoteDataTrack.Listener() {
+                @Override
+                public void onMessage(RemoteDataTrack remoteDataTrack1,
+                                      ByteBuffer messageBuffer) {
+                    onBufferMessageThreadId.set(Thread.currentThread().getId());
+                    messagesReceived.countDown();
+                }
 
-                    @Override
-                    public void onMessage(RemoteDataTrack remoteDataTrack,
-                                          String message) {
-                        onStringMessageThreadId.set(Thread.currentThread().getId());
-                        messagesReceived.countDown();
-                    }
-                };
+                @Override
+                public void onMessage(RemoteDataTrack remoteDataTrack1,
+                                      String message) {
+                    onStringMessageThreadId.set(Thread.currentThread().getId());
+                    messagesReceived.countDown();
+                }
+            };
 
-                remoteDataTrack.setListener(dataTrackListener);
-                bobLocalDataTrack.send("hello data track");
-                bobLocalDataTrack.send(ByteBuffer.wrap(new byte[] { 0xf, 0xe }));
-            }
+            remoteDataTrack.setListener(dataTrackListener);
+            bobLocalDataTrack.send("hello data track");
+            bobLocalDataTrack.send(ByteBuffer.wrap(new byte[] { 0xf, 0xe }));
         });
 
         assertTrue(messagesReceived.await(10, TimeUnit.SECONDS));

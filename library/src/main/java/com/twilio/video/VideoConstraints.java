@@ -16,6 +16,8 @@
 
 package com.twilio.video;
 
+import android.support.annotation.NonNull;
+
 /**
  * Use video constraints to apply to a {@link LocalVideoTrack}.
  *
@@ -122,12 +124,12 @@ public class VideoConstraints {
 
         public Builder() { }
 
-        public Builder minVideoDimensions(VideoDimensions minVideoDimensions) {
+        public Builder minVideoDimensions(@NonNull VideoDimensions minVideoDimensions) {
             this.minVideoDimensions = minVideoDimensions;
             return this;
         }
 
-        public Builder maxVideoDimensions(VideoDimensions maxVideoDimensions) {
+        public Builder maxVideoDimensions(@NonNull VideoDimensions maxVideoDimensions) {
             this.maxVideoDimensions = maxVideoDimensions;
             return this;
         }
@@ -149,7 +151,7 @@ public class VideoConstraints {
 
         public VideoConstraints build() {
             if(minVideoDimensions == null) {
-               throw new NullPointerException("MinVideoDimensions must not be null");
+                throw new NullPointerException("MinVideoDimensions must not be null");
             }
             if(maxVideoDimensions == null) {
                 throw new NullPointerException("MaxVideoDimensions must not be null");

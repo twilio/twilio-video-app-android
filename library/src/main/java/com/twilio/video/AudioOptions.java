@@ -16,6 +16,8 @@
 
 package com.twilio.video;
 
+import android.support.annotation.NonNull;
+
 /**
  * Represents options when adding a {@link LocalAudioTrack}.
  */
@@ -28,7 +30,7 @@ public class AudioOptions {
     public final boolean audioJitterBufferFastAccelerate;
     public final boolean typingDetection;
 
-    private AudioOptions(Builder builder) {
+    private AudioOptions(@NonNull Builder builder) {
         echoCancellation = builder.echoCancellation;
         autoGainControl = builder.autoGainControl;
         noiseSuppression = builder.noiseSuppression;
@@ -68,7 +70,7 @@ public class AudioOptions {
         /**
          * Attempts to filter away the output signal from later inbound pickup.
          */
-        public Builder echoCancellation(boolean echoCancellation) {
+        @NonNull public Builder echoCancellation(boolean echoCancellation) {
             this.echoCancellation = echoCancellation;
             return this;
         }
@@ -76,7 +78,7 @@ public class AudioOptions {
         /**
          * Adjust the sensitivity of the local mic dynamically.
          */
-        public Builder autoGainControl(boolean autoGainControl) {
+        @NonNull public Builder autoGainControl(boolean autoGainControl) {
             this.autoGainControl = autoGainControl;
             return this;
         }
@@ -84,7 +86,7 @@ public class AudioOptions {
         /**
          * Filter out background noise.
          */
-        public Builder noiseSuppression(boolean noiseSuppression) {
+        @NonNull public Builder noiseSuppression(boolean noiseSuppression) {
             this.noiseSuppression = noiseSuppression;
             return this;
         }
@@ -92,7 +94,7 @@ public class AudioOptions {
         /**
          * Remove background noise of lower frequences.
          */
-        public Builder highpassFilter(boolean highpassFilter) {
+        @NonNull public Builder highpassFilter(boolean highpassFilter) {
             this.highpassFilter = highpassFilter;
             return this;
         }
@@ -100,7 +102,7 @@ public class AudioOptions {
         /**
          * Swap left and right audio channels.
          */
-        public Builder stereoSwapping(boolean stereoSwapping) {
+        @NonNull public Builder stereoSwapping(boolean stereoSwapping) {
             this.stereoSwapping = stereoSwapping;
             return this;
         }
@@ -108,7 +110,7 @@ public class AudioOptions {
         /**
          * Enables fast accelerate mode of jitter buffer.
          */
-        public Builder audioJitterBufferFastAccelerate(boolean audioJitterBufferFastAccelerate) {
+        @NonNull public Builder audioJitterBufferFastAccelerate(boolean audioJitterBufferFastAccelerate) {
             this.audioJitterBufferFastAccelerate = audioJitterBufferFastAccelerate;
             return this;
         }
@@ -116,12 +118,12 @@ public class AudioOptions {
         /**
          * Enables typing detection.
          */
-        public Builder typingDetection(boolean typingDetection) {
+        @NonNull public Builder typingDetection(boolean typingDetection) {
             this.typingDetection = typingDetection;
             return this;
         }
 
-        public AudioOptions build() {
+        @NonNull public AudioOptions build() {
             return new AudioOptions(this);
         }
     }

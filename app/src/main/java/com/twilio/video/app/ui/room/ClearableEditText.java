@@ -98,22 +98,19 @@ public class ClearableEditText extends AppCompatEditText {
         });
 
         // simulate on clear icon click - delete edit text contents
-        setOnTouchListener(new OnTouchListener() {
-            @Override
-            public boolean onTouch(View view, MotionEvent motionEvent) {
+        setOnTouchListener((view, motionEvent) -> {
 
-                if (isClearVisible() && motionEvent.getAction() == MotionEvent.ACTION_UP) {
+            if (isClearVisible() && motionEvent.getAction() == MotionEvent.ACTION_UP) {
 
-                    ClearableEditText editText = (ClearableEditText) view;
-                    Rect bounds = clearDrawable.getBounds();
+                ClearableEditText editText = (ClearableEditText) view;
+                Rect bounds = clearDrawable.getBounds();
 
-                    if (motionEvent.getRawX() >= (view.getRight() - bounds.width())) {
-                        editText.setText("");
-                    }
+                if (motionEvent.getRawX() >= (view.getRight() - bounds.width())) {
+                    editText.setText("");
                 }
-
-                return false;
             }
+
+            return false;
         });
     }
 

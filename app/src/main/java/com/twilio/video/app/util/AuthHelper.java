@@ -71,13 +71,10 @@ public class AuthHelper {
             AuthCredential credential =
                 GoogleAuthProvider.getCredential(account.getIdToken(), null);
             mAuth.signInWithCredential(credential)
-                .addOnCompleteListener(activity, new OnCompleteListener<AuthResult>() {
-                    @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
-                        if (!task.isSuccessful()) {
-                            errorListener.onError(ERROR_AUTHENTICATION_FAILED);
-                            return;
-                        }
+                .addOnCompleteListener(activity, task -> {
+                    if (!task.isSuccessful()) {
+                        errorListener.onError(ERROR_AUTHENTICATION_FAILED);
+                        return;
                     }
                 });
         } else {
@@ -97,13 +94,10 @@ public class AuthHelper {
         }
         FirebaseAuth mAuth = FirebaseAuth.getInstance();
         mAuth.signInWithEmailAndPassword(email, password)
-            .addOnCompleteListener(activity, new OnCompleteListener<AuthResult>() {
-                @Override
-                public void onComplete(@NonNull Task<AuthResult> task) {
-                    if (!task.isSuccessful()) {
-                        errorListener.onError(ERROR_AUTHENTICATION_FAILED);
-                        return;
-                    }
+            .addOnCompleteListener(activity, task -> {
+                if (!task.isSuccessful()) {
+                    errorListener.onError(ERROR_AUTHENTICATION_FAILED);
+                    return;
                 }
             });
     }
@@ -120,12 +114,7 @@ public class AuthHelper {
                                                         final ErrorListener errorListener) {
         GoogleApiClient client = new GoogleApiClient.Builder(activity)
             .enableAutoManage(activity,
-                new GoogleApiClient.OnConnectionFailedListener() {
-                    @Override
-                    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-                        errorListener.onError(ERROR_GOOGLE_PLAY_SERVICE_ERROR);
-                    }
-                })
+                    connectionResult -> errorListener.onError(ERROR_GOOGLE_PLAY_SERVICE_ERROR))
             .addApi(Auth.GOOGLE_SIGN_IN_API, buildGoogleSignInOptions(activity))
             .build();
         return client;

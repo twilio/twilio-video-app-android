@@ -84,19 +84,13 @@ public class StatsTest extends BaseStatsTest {
          * Run on UI thread to avoid thread hopping between the test runner thread and the UI
          * thread.
          */
-        InstrumentationRegistry.getInstrumentation().runOnMainSync(new Runnable() {
-            @Override
-            public void run() {
-                final long callingThreadId = Thread.currentThread().getId();
-                StatsListener statsListener = new StatsListener() {
-                    @Override
-                    public void onStats(List<StatsReport> statsReports) {
-                        assertEquals(callingThreadId, Thread.currentThread().getId());
-                        statsCallback.countDown();
-                    }
-                };
-                aliceRoom.getStats(statsListener);
-            }
+        InstrumentationRegistry.getInstrumentation().runOnMainSync(() -> {
+            final long callingThreadId = Thread.currentThread().getId();
+            StatsListener statsListener = statsReports -> {
+                assertEquals(callingThreadId, Thread.currentThread().getId());
+                statsCallback.countDown();
+            };
+            aliceRoom.getStats(statsListener);
         });
 
         assertTrue(statsCallback.await(20, TimeUnit.SECONDS));

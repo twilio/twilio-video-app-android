@@ -88,12 +88,9 @@ public class VideoCapturerTest extends BaseVideoTest {
                 rotationAngle;
 
         // Add renderer and wait for frame
-        this.nativeVideoSinkHandle = localVideoTrack.addRendererWithWants(new VideoRenderer() {
-            @Override
-            public void renderFrame(I420Frame frame) {
-                frameReference.set(frame);
-                frameRendered.countDown();
-            }
+        this.nativeVideoSinkHandle = localVideoTrack.addRendererWithWants(frame -> {
+            frameReference.set(frame);
+            frameRendered.countDown();
         }, rotationApplied);
         assertTrue(frameRendered.await(10, TimeUnit.SECONDS));
         this.i420Frame = frameReference.get();

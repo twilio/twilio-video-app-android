@@ -261,14 +261,9 @@ public class RemoteParticipantTest extends BaseVideoTest {
         aliceThread.start();
         Handler aliceHandler = new Handler(aliceThread.getLooper());
 
-        aliceHandler.post(new Runnable() {
-            @Override
-            public void run() {
-                aliceRoom.set(Video.connect(mediaTestActivity,
-                        aliceConnectOptions,
-                        aliceRoomListener));
-            }
-        });
+        aliceHandler.post(() -> aliceRoom.set(Video.connect(mediaTestActivity,
+                aliceConnectOptions,
+                aliceRoomListener)));
         assertTrue(aliceConnected.await(20, TimeUnit.SECONDS));
 
         // Connect bob
@@ -276,29 +271,21 @@ public class RemoteParticipantTest extends BaseVideoTest {
         HandlerThread bobThread = new HandlerThread("BobThread");
         bobThread.start();
         Handler bobHandler = new Handler(bobThread.getLooper());
-        bobHandler.post(new Runnable() {
-            @Override
-            public void run() {
-                bobRoom.set(Video.connect(mediaTestActivity,
-                        bobConnectOptions,
-                        bobRoomListener));
-            }
-        });
+        bobHandler.post(() -> bobRoom.set(Video.connect(mediaTestActivity,
+                bobConnectOptions,
+                bobRoomListener)));
         assertTrue(bobRoomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
         assertTrue(aliceSeesBobConnected.await(20, TimeUnit.SECONDS));
 
         // Publish audio track
-        bobHandler.post(new Runnable() {
-            @Override
-            public void run() {
-                // Publish audio track for bob
-                LocalParticipant bobLocalParticipant = bobRoom.get()
-                        .getLocalParticipant();
-                bobLocalParticipant.publishTrack(bobAudioTrack);
-                testEvents.add("bobPublishesAudioTrack");
-                bobPublishedAudioTrack.countDown();
-                Log.d(TAG, "bob published audio track");
-            }
+        bobHandler.post(() -> {
+            // Publish audio track for bob
+            LocalParticipant bobLocalParticipant = bobRoom.get()
+                    .getLocalParticipant();
+            bobLocalParticipant.publishTrack(bobAudioTrack);
+            testEvents.add("bobPublishesAudioTrack");
+            bobPublishedAudioTrack.countDown();
+            Log.d(TAG, "bob published audio track");
         });
 
         // Validate that alice received bob track event and the events happened as expected

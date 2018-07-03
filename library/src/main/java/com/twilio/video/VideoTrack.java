@@ -97,6 +97,7 @@ public abstract class VideoTrack implements Track {
      * The list of renderers receiving video from this video track. An empty list will be returned
      * if the video track has been released.
      */
+    @NonNull
     public synchronized List<VideoRenderer> getRenderers() {
         return new ArrayList<>(videoRenderersMap.keySet());
     }

@@ -51,11 +51,12 @@ public class LocalVideoTrack extends VideoTrack {
      * {@link VideoFormat} to 640x480 at 30 frames per second. The closest format is used to apply
      * default {@link VideoConstraints} to the returned {@link LocalVideoTrack}.
      *
-     * @param context application context.
-     * @param enabled initial state of video track.
+     * @param context       application context.
+     * @param enabled       initial state of video track.
      * @param videoCapturer capturer that provides video frames.
      * @return local video track if successfully added or null if video track could not be created.
      */
+    @Nullable
     public static LocalVideoTrack create(@NonNull Context context,
                                          boolean enabled,
                                          @NonNull VideoCapturer videoCapturer) {
@@ -69,27 +70,28 @@ public class LocalVideoTrack extends VideoTrack {
      * {@link LocalVideoTrack} for the following conditions:
      * <p>
      * <ol>
-     *     <li>Passing {@code null} as {@code videoConstraints}.</li>
-     *     <li>{@code videoConstraints} are incompatible with {@code videoCapturer}</li>
+     * <li>Passing {@code null} as {@code videoConstraints}.</li>
+     * <li>{@code videoConstraints} are incompatible with {@code videoCapturer}</li>
      * </ol>
      * <p>
      * Video constraints are incompatible with a capturer if there is not at least one supported
      * {@link VideoFormat} for which all the following conditions true:
      * <ol>
-     *     <li>{@link VideoConstraints#minFps} and {@link VideoConstraints#maxFps} are both
-     *     less than or equal supported capture format frame rate.</li>
-     *     <li>{@link VideoConstraints#minVideoDimensions} width and height are less than or
-     *     equal to a supported capture format width and height.</li>
-     *     <li>{@link VideoConstraints#maxVideoDimensions} width and height are greater than or
-     *     equal to a supported capture format width and height.</li>
+     * <li>{@link VideoConstraints#minFps} and {@link VideoConstraints#maxFps} are both
+     * less than or equal supported capture format frame rate.</li>
+     * <li>{@link VideoConstraints#minVideoDimensions} width and height are less than or
+     * equal to a supported capture format width and height.</li>
+     * <li>{@link VideoConstraints#maxVideoDimensions} width and height are greater than or
+     * equal to a supported capture format width and height.</li>
      * </ol>
      *
-     * @param context application context.
-     * @param enabled initial state of video track.
-     * @param videoCapturer capturer that provides video frames.
+     * @param context          application context.
+     * @param enabled          initial state of video track.
+     * @param videoCapturer    capturer that provides video frames.
      * @param videoConstraints constraints to be applied on video track.
      * @return local video track if successfully added or null if video track could not be created.
      */
+    @Nullable
     public static LocalVideoTrack create(@NonNull Context context,
                                          boolean enabled,
                                          @NonNull VideoCapturer videoCapturer,
@@ -103,12 +105,13 @@ public class LocalVideoTrack extends VideoTrack {
      * {@link VideoFormat} to 640x480 at 30 frames per second. The closest format is used to apply
      * default {@link VideoConstraints} to the returned {@link LocalVideoTrack}.
      *
-     * @param context application context.
-     * @param enabled initial state of video track.
+     * @param context       application context.
+     * @param enabled       initial state of video track.
      * @param videoCapturer capturer that provides video frames.
-     * @param name video track name.
+     * @param name          video track name.
      * @return local video track if successfully added or null if video track could not be created.
      */
+    @Nullable
     public static LocalVideoTrack create(@NonNull Context context,
                                          boolean enabled,
                                          @NonNull VideoCapturer videoCapturer,
@@ -123,27 +126,28 @@ public class LocalVideoTrack extends VideoTrack {
      * {@link LocalVideoTrack} for the following conditions:
      * <p>
      * <ol>
-     *     <li>Passing {@code null} as {@code videoConstraints}.</li>
-     *     <li>{@code videoConstraints} are incompatible with {@code videoCapturer}</li>
+     * <li>Passing {@code null} as {@code videoConstraints}.</li>
+     * <li>{@code videoConstraints} are incompatible with {@code videoCapturer}</li>
      * </ol>
      * <p>
      * Video constraints are incompatible with a capturer if there is not at least one supported
      * {@link VideoFormat} for which all the following conditions true:
      * <ol>
-     *     <li>{@link VideoConstraints#minFps} and {@link VideoConstraints#maxFps} are both
-     *     less than or equal supported capture format frame rate.</li>
-     *     <li>{@link VideoConstraints#minVideoDimensions} width and height are less than or
-     *     equal to a supported capture format width and height.</li>
-     *     <li>{@link VideoConstraints#maxVideoDimensions} width and height are greater than or
-     *     equal to a supported capture format width and height.</li>
+     * <li>{@link VideoConstraints#minFps} and {@link VideoConstraints#maxFps} are both
+     * less than or equal supported capture format frame rate.</li>
+     * <li>{@link VideoConstraints#minVideoDimensions} width and height are less than or
+     * equal to a supported capture format width and height.</li>
+     * <li>{@link VideoConstraints#maxVideoDimensions} width and height are greater than or
+     * equal to a supported capture format width and height.</li>
      * </ol>
      *
-     * @param context application context.
-     * @param enabled initial state of video track.
+     * @param context       application context.
+     * @param enabled       initial state of video track.
      * @param videoCapturer capturer that provides video frames.
-     * @param name video track name.
+     * @param name          video track name.
      * @return local video track if successfully added or null if video track could not be created.
      */
+    @Nullable
     public static LocalVideoTrack create(@NonNull Context context,
                                          boolean enabled,
                                          @NonNull VideoCapturer videoCapturer,
@@ -178,16 +182,18 @@ public class LocalVideoTrack extends VideoTrack {
     /**
      * Retrieves the {@link VideoCapturer} associated with this video track.
      */
+    @Nullable
     public VideoCapturer getVideoCapturer() {
         return videoCapturer;
     }
 
     /**
      * Retrieves the video constraints associated with this track.
-     *
+     * <p>
      * <p>If you do not provide any video constraints, the default video constraints are set to a
      * maximum video dimension size of 640x480 at a frame rate of 30 frames per second.</p>
      */
+    @NonNull
     public VideoConstraints getVideoConstraints() {
         return videoConstraints;
     }
@@ -208,7 +214,7 @@ public class LocalVideoTrack extends VideoTrack {
 
     /**
      * Check if the local video track is enabled.
-     *
+     * <p>
      * When the value is false, blank video frames are sent. When the value is true, frames from the
      * video capturer are provided.
      *
@@ -370,7 +376,8 @@ public class LocalVideoTrack extends VideoTrack {
         VideoDimensions closestSupportedVideoDimensions =
                 Collections.min(supportedFormats,
                         new LocalVideoTrack.ClosestComparator<VideoFormat>() {
-                            @Override int diff(VideoFormat videoFormat) {
+                            @Override
+                            int diff(VideoFormat videoFormat) {
                                 return Math.abs(videoConstraints.getMaxVideoDimensions().width -
                                         videoFormat.dimensions.width) +
                                         Math.abs(videoConstraints.getMaxVideoDimensions().height -
@@ -388,7 +395,8 @@ public class LocalVideoTrack extends VideoTrack {
         int closestSupportedFramerate =
                 Collections.min(supportedFramerates,
                         new LocalVideoTrack.ClosestComparator<Integer>() {
-                            @Override int diff(Integer framerate) {
+                            @Override
+                            int diff(Integer framerate) {
                                 return Math.abs(videoConstraints.getMaxFps() - framerate);
                             }
                         });
@@ -432,12 +440,16 @@ public class LocalVideoTrack extends VideoTrack {
     }
 
     private native boolean nativeIsEnabled(long nativeLocalVideoTrackHandle);
+
     private native void nativeEnable(long nativeLocalVideoTrackHandle, boolean enable);
+
     @VisibleForTesting(otherwise = VisibleForTesting.NONE)
     private native long nativeAddRendererWithWants(long nativeLocalVideoTrackHandle,
                                                    boolean rotationApplied);
+
     @VisibleForTesting(otherwise = VisibleForTesting.NONE)
     private native void nativeRemoveRendererWithWants(long nativeLocalVideoTrackHandle,
                                                       long nativeVideoSinkHandle);
+
     private native void nativeRelease(long nativeLocalVideoTrackHandle);
 }

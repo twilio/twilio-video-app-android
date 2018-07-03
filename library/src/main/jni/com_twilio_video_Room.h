@@ -37,22 +37,22 @@ JNIEXPORT jlong JNICALL Java_com_twilio_video_Room_nativeConnect
         (JNIEnv *, jobject, jobject, jobject, jobject, jlong, jobject);
 
 JNIEXPORT jboolean JNICALL Java_com_twilio_video_Room_nativeIsRecording
-    (JNIEnv *, jobject, jlong);
+        (JNIEnv *, jobject, jlong);
 
 JNIEXPORT void JNICALL Java_com_twilio_video_Room_nativeDisconnect
-    (JNIEnv *, jobject, jlong);
+        (JNIEnv *, jobject, jlong);
 
 JNIEXPORT void JNICALL Java_com_twilio_video_Room_nativeGetStats
-    (JNIEnv *, jobject, jlong, jlong);
+        (JNIEnv *, jobject, jlong, jlong);
 
 JNIEXPORT void JNICALL Java_com_twilio_video_Room_nativeOnNetworkChange
-    (JNIEnv *, jobject, jlong, jobject);
+        (JNIEnv *, jobject, jlong, jobject);
 
 JNIEXPORT void JNICALL Java_com_twilio_video_Room_nativeReleaseRoom
         (JNIEnv *, jobject, jlong);
 
 JNIEXPORT void JNICALL Java_com_twilio_video_Room_nativeRelease
-    (JNIEnv *, jobject, jlong);
+        (JNIEnv *, jobject, jlong);
 
 }
 

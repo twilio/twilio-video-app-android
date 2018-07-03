@@ -17,30 +17,31 @@
 #include "com_twilio_video_EncodingParameters.h"
 
 #include "webrtc/sdk/android/src/jni/jni_helpers.h"
+#include "jni_utils.h"
 
 namespace twilio_video_jni {
 
 twilio::media::EncodingParameters getEncodingParameters(JNIEnv *env,
                                                         jobject j_encoding_parameters) {
-    jclass j_encoding_parameters_class = webrtc_jni::GetObjectClass(env, j_encoding_parameters);
-    jfieldID j_max_audio_bitrate_field_id = webrtc_jni::GetFieldID(env,
-                                                                   j_encoding_parameters_class,
-                                                                   "maxAudioBitrate",
-                                                                   "I");
-    jfieldID j_max_video_bitrate_field_id = webrtc_jni::GetFieldID(env,
-                                                                   j_encoding_parameters_class,
-                                                                   "maxVideoBitrate",
-                                                                   "I");
+    jclass j_encoding_parameters_class = GetObjectClass(env, j_encoding_parameters);
+    jfieldID j_max_audio_bitrate_field_id = GetFieldID(env,
+                                                       j_encoding_parameters_class,
+                                                       "maxAudioBitrate",
+                                                       "I");
+    jfieldID j_max_video_bitrate_field_id = GetFieldID(env,
+                                                       j_encoding_parameters_class,
+                                                       "maxVideoBitrate",
+                                                       "I");
     twilio::media::EncodingParameters encoding_parameters;
     encoding_parameters.max_audio_bitrate_ = (unsigned long)
-            webrtc_jni::GetIntField(env,
-                                    j_encoding_parameters,
-                                    j_max_audio_bitrate_field_id);
+            GetIntField(env,
+                        j_encoding_parameters,
+                        j_max_audio_bitrate_field_id);
     CHECK_EXCEPTION(env) << "Failed to get maxAudioBitrate field";
     encoding_parameters.max_video_bitrate_ = (unsigned long)
-            webrtc_jni::GetIntField(env,
-                                    j_encoding_parameters,
-                                    j_max_video_bitrate_field_id);
+            GetIntField(env,
+                        j_encoding_parameters,
+                        j_max_video_bitrate_field_id);
     CHECK_EXCEPTION(env) << "Failed to get maxVideoBitrate field";
 
     return encoding_parameters;

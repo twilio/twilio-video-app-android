@@ -16,13 +16,14 @@
 
 package com.twilio.video;
 
+import android.support.annotation.NonNull;
 /**
  * Internet speech audio codec.
  *
  * @see <a href="https://en.wikipedia.org/wiki/Internet_Speech_Audio_Codec">iSAC</a>
  */
 public class IsacCodec extends AudioCodec {
-    public static final String NAME = "ISAC";
+    @NonNull public static final String NAME = "ISAC";
 
     public IsacCodec() {
         super(NAME);

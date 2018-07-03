@@ -19,6 +19,9 @@
 #include "class_reference_holder.h"
 #include "webrtc/base/logging.h"
 #include "libyuv/convert.h"
+#include "webrtc/modules/utility/include/helpers_android.h"
+#include "jni_utils.h"
+#include "logging.h"
 
 namespace twilio_video_jni {
 
@@ -30,38 +33,46 @@ int VideoCapturerDelegate::SetAndroidObjects(JNIEnv* jni,
     if (application_context_) {
         jni->DeleteGlobalRef(application_context_);
     }
-    application_context_ = webrtc_jni::NewGlobalRef(jni, appliction_context);
+    application_context_ = webrtc::NewGlobalRef(jni, appliction_context);
 
     return 0;
+}
+
+webrtc::VideoRotation jintToVideoRotation(jint rotation) {
+    RTC_DCHECK(rotation == 0 || rotation == 90 || rotation == 180 ||
+               rotation == 270);
+    return static_cast<webrtc::VideoRotation>(rotation);
 }
 
 VideoCapturerDelegate::VideoCapturerDelegate(JNIEnv* jni,
                                              jobject j_video_capturer,
                                              jobject j_egl_context,
                                              jboolean is_screencast)
-        : j_video_capturer_(jni, j_video_capturer),
-          j_video_capturer_class_(jni, twilio_video_jni::FindClass(jni, "com/twilio/video/VideoCapturerDelegate")),
+        : j_video_capturer_(jni, webrtc::JavaParamRef<jobject>(j_video_capturer)),
+          j_video_capturer_class_(jni, webrtc::JavaParamRef<jclass>(twilio_video_jni::FindClass(jni, "com/twilio/video/VideoCapturerDelegate"))),
           j_observer_class_(
                   jni,
-                  twilio_video_jni::FindClass(jni,
-                                              "com/twilio/video/VideoCapturerDelegate$NativeObserver")),
+                  webrtc::JavaParamRef<jclass>(twilio_video_jni::FindClass(jni,
+                                                                           "com/twilio/video/VideoCapturerDelegate$NativeObserver"))),
           is_screencast_(is_screencast),
-          surface_texture_helper_(webrtc_jni::SurfaceTextureHelper::create(
-                  jni, "Camera SurfaceTextureHelper", j_egl_context)),
+          surface_texture_helper_(webrtc::jni::SurfaceTextureHelper::create(
+                  jni, "Camera SurfaceTextureHelper", webrtc::JavaParamRef<jobject>(j_egl_context))),
           capturer_(nullptr) {
-    LOG(LS_INFO) << "VideoCapturerDelegate ctor";
+    VIDEO_ANDROID_LOG(twilio::video::LogModule::kPlatform,
+                      twilio::video::LogLevel::kInfo,
+                      "VideoCapturerDelegate ctor");
     jobject j_frame_observer =
-            jni->NewObject(*j_observer_class_,
-                           webrtc_jni::GetMethodID(jni, *j_observer_class_, "<init>", "(J)V"),
-                           webrtc_jni::jlongFromPointer(this));
+            jni->NewObject(j_observer_class_.obj(),
+                           webrtc::GetMethodID(jni, j_observer_class_.obj(), "<init>", "(J)V"),
+                           webrtc::NativeToJavaPointer(this));
     CHECK_EXCEPTION(jni) << "error during NewObject";
     jni->CallVoidMethod(
-            *j_video_capturer_,
-            webrtc_jni::GetMethodID(jni, *j_video_capturer_class_, "initialize",
-                                    "(Lorg/webrtc/SurfaceTextureHelper;Landroid/content/"
-                                            "Context;Lorg/webrtc/VideoCapturer$CapturerObserver;)V"),
+            j_video_capturer_.obj(),
+            webrtc::GetMethodID(jni, j_video_capturer_class_.obj(), "initialize",
+                                "(Lorg/webrtc/SurfaceTextureHelper;Landroid/content/"
+                                        "Context;Lorg/webrtc/VideoCapturer$CapturerObserver;)V"),
             surface_texture_helper_
-            ? surface_texture_helper_->GetJavaSurfaceTextureHelper()
+            ? surface_texture_helper_->GetJavaSurfaceTextureHelper().obj()
             : nullptr,
             application_context_, j_frame_observer);
     CHECK_EXCEPTION(jni) << "error during VideoCapturer.initialize()";
@@ -69,10 +80,12 @@ VideoCapturerDelegate::VideoCapturerDelegate(JNIEnv* jni,
 }
 
 VideoCapturerDelegate::~VideoCapturerDelegate() {
-    LOG(LS_INFO) << "VideoCapturerDelegate dtor";
+    VIDEO_ANDROID_LOG(twilio::video::LogModule::kPlatform,
+                      twilio::video::LogLevel::kInfo,
+                      "~VideoCapturerDelegate");
     jni()->CallVoidMethod(
-            *j_video_capturer_,
-            webrtc_jni::GetMethodID(jni(), *j_video_capturer_class_, "dispose", "()V"));
+            j_video_capturer_.obj(),
+            webrtc::GetMethodID(jni(), j_video_capturer_class_.obj(), "dispose", "()V"));
     CHECK_EXCEPTION(jni()) << "error during VideoCapturer.dispose()";
 }
 
@@ -82,15 +95,17 @@ void VideoCapturerDelegate::Start(const cricket::VideoFormat& capture_format,
             twilio_video_jni::FindClass(jni(), "com/twilio/video/VideoCapturerDelegate");
     capture_pixel_format_ = capture_format.fourcc;
     jobject j_video_pixel_format =
-            VideoPixelFormat::getJavaVideoPixelFormat(capture_pixel_format_) ;
-    jni()->CallVoidMethod(*j_video_capturer_,
-                        webrtc_jni::GetMethodID(jni(),
-                                                j_video_capturer_delegate_class,
-                                                "setVideoPixelFormat",
-                                                "(Lcom/twilio/video/VideoPixelFormat;)V"),
-                        j_video_pixel_format);
+            VideoPixelFormat::getJavaVideoPixelFormat(cricket::CanonicalFourCC(capture_pixel_format_));
+    jni()->CallVoidMethod(j_video_capturer_.obj(),
+                          webrtc::GetMethodID(jni(),
+                                              j_video_capturer_delegate_class,
+                                              "setVideoPixelFormat",
+                                              "(Lcom/twilio/video/VideoPixelFormat;)V"),
+                          j_video_pixel_format);
 
-    LOG(LS_INFO) << "VideoCapturerDelegate start";
+    VIDEO_ANDROID_LOG(twilio::video::LogModule::kPlatform,
+                      twilio::video::LogLevel::kInfo,
+                      "VideoCapturerDelegate start");
     RTC_DCHECK(thread_checker_.CalledOnValidThread());
     {
         rtc::CritScope cs(&capturer_lock_);
@@ -100,8 +115,8 @@ void VideoCapturerDelegate::Start(const cricket::VideoFormat& capture_format,
         invoker_.reset(new rtc::GuardedAsyncInvoker());
     }
     jmethodID m =
-            webrtc_jni::GetMethodID(jni(), *j_video_capturer_class_, "startCapture", "(III)V");
-    jni()->CallVoidMethod(*j_video_capturer_,
+            webrtc::GetMethodID(jni(), j_video_capturer_class_.obj(), "startCapture", "(III)V");
+    jni()->CallVoidMethod(j_video_capturer_.obj(),
                           m,
                           capture_format.width,
                           capture_format.height,
@@ -110,7 +125,9 @@ void VideoCapturerDelegate::Start(const cricket::VideoFormat& capture_format,
 }
 
 void VideoCapturerDelegate::Stop() {
-    LOG(LS_INFO) << "VideoCapturerDelegate stop";
+    VIDEO_ANDROID_LOG(twilio::video::LogModule::kPlatform,
+                      twilio::video::LogLevel::kInfo,
+                      "VideoCapturerDelegate stop");
     RTC_DCHECK(thread_checker_.CalledOnValidThread());
     {
         /*
@@ -123,11 +140,13 @@ void VideoCapturerDelegate::Stop() {
         invoker_ = nullptr;
         capturer_ = nullptr;
     }
-    jmethodID m = webrtc_jni::GetMethodID(jni(), *j_video_capturer_class_,
-                                          "stopCapture", "()V");
-    jni()->CallVoidMethod(*j_video_capturer_, m);
+    jmethodID m = webrtc::GetMethodID(jni(), j_video_capturer_class_.obj(),
+                                      "stopCapture", "()V");
+    jni()->CallVoidMethod(j_video_capturer_.obj(), m);
     CHECK_EXCEPTION(jni()) << "error during VideoCapturer.stopCapture";
-    LOG(LS_INFO) << "VideoCapturerDelegate stop done";
+    VIDEO_ANDROID_LOG(twilio::video::LogModule::kPlatform,
+                      twilio::video::LogLevel::kInfo,
+                      "VideoCapturerDelegate stop done");
 }
 
 template <typename... Args>
@@ -137,8 +156,9 @@ void VideoCapturerDelegate::AsyncCapturerInvoke(
         typename Identity<Args>::type... args) {
     rtc::CritScope cs(&capturer_lock_);
     if (!invoker_) {
-        LOG(LS_WARNING) << posted_from.function_name()
-                        << "() called for closed capturer.";
+        VIDEO_ANDROID_LOG(twilio::video::LogModule::kPlatform,
+                          twilio::video::LogLevel::kWarning,
+                          "%s() called from closed capturer", posted_from.function_name());
         return;
     }
     invoker_->AsyncInvoke<void>(posted_from,
@@ -150,44 +170,56 @@ bool VideoCapturerDelegate::IsScreencast() {
 }
 
 std::vector<cricket::VideoFormat> VideoCapturerDelegate::GetSupportedFormats() {
-    JNIEnv* jni = webrtc_jni::AttachCurrentThreadIfNeeded();
+    JNIEnv* jni = webrtc::jni::AttachCurrentThreadIfNeeded();
     jobject j_list_of_formats = jni->CallObjectMethod(
-            *j_video_capturer_,
-            webrtc_jni::GetMethodID(jni, *j_video_capturer_class_, "getSupportedFormats",
-                                    "()Ljava/util/List;"));
+            j_video_capturer_.obj(),
+            webrtc::GetMethodID(jni, j_video_capturer_class_.obj(), "getSupportedFormats",
+                                "()Ljava/util/List;"));
     CHECK_EXCEPTION(jni) << "error during getSupportedFormats";
 
     // Extract Java List<CaptureFormat> to std::vector<cricket::VideoFormat>.
     jclass j_list_class = jni->FindClass("java/util/List");
-    jclass j_format_class =
-            jni->FindClass("org/webrtc/CameraEnumerationAndroid$CaptureFormat");
-    jclass j_framerate_class = jni->FindClass(
-            "org/webrtc/CameraEnumerationAndroid$CaptureFormat$FramerateRange");
+    jclass j_video_format_class = twilio_video_jni::FindClass(jni, "com/twilio/video/VideoFormat");
+    jclass j_video_dimensions_class =
+            twilio_video_jni::FindClass(jni, "com/twilio/video/VideoDimensions");
+    jclass j_video_pixel_format_class =
+            twilio_video_jni::FindClass(jni,"com/twilio/video/VideoPixelFormat");
+
     const int size = jni->CallIntMethod(
-            j_list_of_formats, webrtc_jni::GetMethodID(jni, j_list_class, "size", "()I"));
+            j_list_of_formats, webrtc::GetMethodID(jni, j_list_class, "size", "()I"));
     jmethodID j_get =
-            webrtc_jni::GetMethodID(jni, j_list_class, "get", "(I)Ljava/lang/Object;");
-    jfieldID j_framerate_field = webrtc_jni::GetFieldID(
-            jni, j_format_class, "framerate",
-            "Lorg/webrtc/CameraEnumerationAndroid$CaptureFormat$FramerateRange;");
-    jfieldID j_width_field = webrtc_jni::GetFieldID(jni, j_format_class, "width", "I");
-    jfieldID j_height_field = webrtc_jni::GetFieldID(jni, j_format_class, "height", "I");
-    jfieldID j_max_framerate_field =
-            webrtc_jni::GetFieldID(jni, j_framerate_class, "max", "I");
-    jfieldID j_format_field =
-            webrtc_jni::GetFieldID(jni, j_format_class, "imageFormat", "I");
+            webrtc::GetMethodID(jni, j_list_class, "get", "(I)Ljava/lang/Object;");
+    jmethodID j_get_video_pixel_format_value =
+            webrtc::GetMethodID(jni, j_video_pixel_format_class, "getValue", "()I");
+
+    // VideoFormat fields
+    jfieldID j_dimensions_field = GetFieldID(jni,
+                                             j_video_format_class,
+                                             "dimensions",
+                                             "Lcom/twilio/video/VideoDimensions;");
+    jfieldID j_framerate_field = GetFieldID(jni, j_video_format_class, "framerate", "I");
+    jfieldID j_pixel_format_field =
+            GetFieldID(jni, j_video_format_class, "pixelFormat",
+                       "Lcom/twilio/video/VideoPixelFormat;");
+
+    // VideoDimensions fields
+    jfieldID j_width_field = GetFieldID(jni, j_video_dimensions_class, "width", "I");
+    jfieldID j_height_field = GetFieldID(jni, j_video_dimensions_class, "height", "I");
 
     std::vector<cricket::VideoFormat> formats;
     formats.reserve(size);
     for (int i = 0; i < size; ++i) {
         jobject j_format = jni->CallObjectMethod(j_list_of_formats, j_get, i);
-        jobject j_framerate = webrtc_jni::GetObjectField(jni, j_format, j_framerate_field);
-        const int frame_interval = cricket::VideoFormat::FpsToInterval(
-                webrtc_jni::GetIntField(jni, j_framerate, j_max_framerate_field));
-        formats.emplace_back(webrtc_jni::GetIntField(jni, j_format, j_width_field),
-                             webrtc_jni::GetIntField(jni, j_format, j_height_field),
+        jobject j_dimensions = GetObjectField(jni, j_format, j_dimensions_field);
+        jobject j_pixel_format = GetObjectField(jni, j_format, j_pixel_format_field);
+        jint j_framerate = GetIntField(jni, j_format, j_framerate_field);
+        jint pixel_format = jni->CallIntMethod(j_pixel_format, j_get_video_pixel_format_value);
+        int64_t frame_interval = cricket::VideoFormat::FpsToInterval(j_framerate);
+
+        formats.emplace_back(GetIntField(jni, j_dimensions, j_width_field),
+                             GetIntField(jni, j_dimensions, j_height_field),
                              frame_interval,
-                             webrtc_jni::GetIntField(jni, j_format, j_format_field));
+                             pixel_format);
     }
     CHECK_EXCEPTION(jni) << "error while extracting formats";
     return formats;
@@ -195,7 +227,9 @@ std::vector<cricket::VideoFormat> VideoCapturerDelegate::GetSupportedFormats() {
 }
 
 void VideoCapturerDelegate::OnCapturerStarted(bool success) {
-    LOG(LS_INFO) << "VideoCapturerDelegate capture started: " << success;
+    VIDEO_ANDROID_LOG(twilio::video::LogModule::kPlatform,
+                      twilio::video::LogLevel::kInfo,
+                      "VideoCapturerDelegate capture started: %s", (success ? "true" : "false"));
     AsyncCapturerInvoke(RTC_FROM_HERE, &AndroidVideoCapturer::OnCapturerStarted, success);
 }
 
@@ -206,7 +240,9 @@ void VideoCapturerDelegate::OnMemoryBufferFrame(void *video_frame, int length, i
                rotation == 270);
     rtc::CritScope cs(&capturer_lock_);
     if (!capturer_) {
-        LOG(LS_WARNING) << "OnMemoryBufferFrame() called for closed capturer.";
+        VIDEO_ANDROID_LOG(twilio::video::LogModule::kPlatform,
+                          twilio::video::LogLevel::kWarning,
+                          "OnMemoryBufferFrame() called for closed capturer.");
         return;
     }
     int adapted_width;
@@ -254,9 +290,12 @@ void VideoCapturerDelegate::OnMemoryBufferFrame(void *video_frame, int length, i
             // Convert to I420
             libyuv::ABGRToI420(
                     src_rgba, rgba_stride,
-                    (uint8 *) pre_rotate_buffer->DataY(), pre_rotate_buffer->StrideY(),
-                    (uint8 *) pre_rotate_buffer->DataU(), pre_rotate_buffer->StrideU(),
-                    (uint8 *) pre_rotate_buffer->DataV(), pre_rotate_buffer->StrideV(),
+                    (uint8 *) pre_rotate_buffer->GetI420()->DataY(),
+                    pre_rotate_buffer->GetI420()->StrideY(),
+                    (uint8 *) pre_rotate_buffer->GetI420()->DataU(),
+                    pre_rotate_buffer->GetI420()->StrideU(),
+                    (uint8 *) pre_rotate_buffer->GetI420()->DataV(),
+                    pre_rotate_buffer->GetI420()->StrideV(),
                     crop_width, crop_height);
 
             /*
@@ -264,12 +303,18 @@ void VideoCapturerDelegate::OnMemoryBufferFrame(void *video_frame, int length, i
              * pre rotation buffer is set to final buffer.
              */
             if (capturer_->apply_rotation()) {
-                libyuv::I420Rotate((uint8 *) pre_rotate_buffer->DataY(), pre_rotate_buffer->StrideY(),
-                                   (uint8 *) pre_rotate_buffer->DataU(), pre_rotate_buffer->StrideU(),
-                                   (uint8 *) pre_rotate_buffer->DataV(), pre_rotate_buffer->StrideV(),
-                                   (uint8 *) buffer->DataY(), buffer->StrideY(),
-                                   (uint8 *) buffer->DataU(), buffer->StrideU(),
-                                   (uint8 *) buffer->DataV(), buffer->StrideV(),
+                libyuv::I420Rotate((uint8 *) pre_rotate_buffer->GetI420()->DataY(),
+                                   pre_rotate_buffer->GetI420()->StrideY(),
+                                   (uint8 *) pre_rotate_buffer->GetI420()->DataU(),
+                                   pre_rotate_buffer->GetI420()->StrideU(),
+                                   (uint8 *) pre_rotate_buffer->GetI420()->DataV(),
+                                   pre_rotate_buffer->GetI420()->StrideV(),
+                                   (uint8 *) buffer->GetI420()->DataY(),
+                                   buffer->GetI420()->StrideY(),
+                                   (uint8 *) buffer->GetI420()->DataU(),
+                                   buffer->GetI420()->StrideU(),
+                                   (uint8 *) buffer->GetI420()->DataV(),
+                                   buffer->GetI420()->StrideV(),
                                    crop_width, crop_height,
                                    static_cast<libyuv::RotationMode>(rotation));
             } else {
@@ -289,10 +334,10 @@ void VideoCapturerDelegate::OnMemoryBufferFrame(void *video_frame, int length, i
             libyuv::NV12ToI420Rotate(
                     y_plane + width * crop_y + crop_x, width,
                     uv_plane + uv_width * crop_y + crop_x, width,
-                    (uint8 *) buffer->DataY(), buffer->StrideY(),
+                    (uint8 *) buffer->GetI420()->DataY(), buffer->GetI420()->StrideY(),
                     // Swap U and V, since we have NV21, not NV12.
-                    (uint8 *) buffer->DataV(), buffer->StrideV(),
-                    (uint8 *) buffer->DataU(), buffer->StrideU(),
+                    (uint8 *) buffer->GetI420()->DataV(), buffer->GetI420()->StrideV(),
+                    (uint8 *) buffer->GetI420()->DataU(), buffer->GetI420()->StrideU(),
                     crop_width, crop_height, static_cast<libyuv::RotationMode>(
                             capturer_->apply_rotation() ? rotation : 0));
             break;
@@ -304,27 +349,29 @@ void VideoCapturerDelegate::OnMemoryBufferFrame(void *video_frame, int length, i
     if (adapted_width != buffer->width() || adapted_height != buffer->height()) {
         rtc::scoped_refptr<webrtc::I420Buffer> scaled_buffer(
                 post_scale_pool_.CreateBuffer(adapted_width, adapted_height));
-        scaled_buffer->ScaleFrom(*buffer);
+        scaled_buffer->ScaleFrom(*buffer->GetI420());
         buffer = scaled_buffer;
     }
 
     capturer_->OnFrame(webrtc::VideoFrame(buffer,
                                           capturer_->apply_rotation() ?
                                           webrtc::kVideoRotation_0 :
-                                                 static_cast<webrtc::VideoRotation>(rotation),
-                                                 translated_camera_time_us), width, height);
+                                          static_cast<webrtc::VideoRotation>(rotation),
+                                          translated_camera_time_us), width, height);
 }
 
 void VideoCapturerDelegate::OnTextureFrame(int width,
                                            int height,
                                            int rotation,
                                            int64_t timestamp_ns,
-                                           const webrtc_jni::NativeHandleImpl& handle) {
+                                           const webrtc::jni::NativeHandleImpl& handle) {
     RTC_DCHECK(rotation == 0 || rotation == 90 || rotation == 180 ||
                rotation == 270);
     rtc::CritScope cs(&capturer_lock_);
     if (!capturer_) {
-        LOG(LS_WARNING) << "OnTextureFrame() called for closed capturer.";
+        VIDEO_ANDROID_LOG(twilio::video::LogModule::kPlatform,
+                          twilio::video::LogLevel::kWarning,
+                          "OnTextureFrame() called for closed capturer.");
         surface_texture_helper_->ReturnTextureFrame();
         return;
     }
@@ -346,7 +393,7 @@ void VideoCapturerDelegate::OnTextureFrame(int width,
         return;
     }
 
-    webrtc_jni::Matrix matrix = handle.sampling_matrix;
+    webrtc::jni::Matrix matrix = handle.sampling_matrix;
 
     matrix.Crop(crop_width / static_cast<float>(width),
                 crop_height / static_cast<float>(height),
@@ -364,7 +411,7 @@ void VideoCapturerDelegate::OnTextureFrame(int width,
     capturer_->OnFrame(webrtc::VideoFrame(
             surface_texture_helper_->CreateTextureFrame(
                     adapted_width, adapted_height,
-                    webrtc_jni::NativeHandleImpl(handle.oes_texture_id, matrix)),
+                    webrtc::jni::NativeHandleImpl(handle.oes_texture_id, matrix)),
             capturer_->apply_rotation()
             ? webrtc::kVideoRotation_0
             : static_cast<webrtc::VideoRotation>(rotation),
@@ -372,36 +419,86 @@ void VideoCapturerDelegate::OnTextureFrame(int width,
                        width, height);
 }
 
+void VideoCapturerDelegate::OnFrameCaptured(
+        JNIEnv* jni,
+        int width,
+        int height,
+        int64_t timestamp_ns,
+        webrtc::VideoRotation rotation,
+        const webrtc::JavaRef<jobject>& j_video_frame_buffer) {
+    rtc::CritScope cs(&capturer_lock_);
+    if (!capturer_) {
+        VIDEO_ANDROID_LOG(twilio::video::LogModule::kPlatform,
+                          twilio::video::LogLevel::kWarning,
+                          "OnFrameCaptured() called for closed capturer.");
+        return;
+    }
+    int64_t camera_time_us = timestamp_ns / rtc::kNumNanosecsPerMicrosec;
+    int64_t translated_camera_time_us =
+            timestamp_aligner_.TranslateTimestamp(camera_time_us, rtc::TimeMicros());
+
+    int adapted_width;
+    int adapted_height;
+    int crop_width;
+    int crop_height;
+    int crop_x;
+    int crop_y;
+
+    if (!capturer_->AdaptFrame(width, height, camera_time_us, rtc::TimeMicros(), &adapted_width,
+                               &adapted_height, &crop_width, &crop_height, &crop_x,
+                               &crop_y, &translated_camera_time_us)) {
+        return;
+    }
+
+    rtc::scoped_refptr<webrtc::VideoFrameBuffer> buffer =
+            webrtc::jni::AndroidVideoBuffer::Create(jni, j_video_frame_buffer)
+                    ->CropAndScale(jni, crop_x, crop_y, crop_width, crop_height,
+                                   adapted_width, adapted_height);
+
+    // AdaptedVideoTrackSource handles applying rotation for I420 frames.
+    if (capturer_->apply_rotation() && rotation != webrtc::kVideoRotation_0) {
+        buffer = buffer->ToI420();
+    }
+
+    capturer_->OnFrame(webrtc::VideoFrame(buffer,
+                                          capturer_->apply_rotation() ?
+                                          webrtc::kVideoRotation_0 :
+                                          static_cast<webrtc::VideoRotation>(rotation),
+                                          translated_camera_time_us), width, height);
+}
+
 void VideoCapturerDelegate::OnOutputFormatRequest(int width,
-                                                    int height,
-                                                    int fps) {
+                                                  int height,
+                                                  int fps) {
     AsyncCapturerInvoke(RTC_FROM_HERE,
                         &AndroidVideoCapturer::OnOutputFormatRequest,
                         width, height, fps);
 }
 
-JNIEnv* VideoCapturerDelegate::jni() { return webrtc_jni::AttachCurrentThreadIfNeeded(); }
+JNIEnv* VideoCapturerDelegate::jni() { return webrtc::jni::AttachCurrentThreadIfNeeded(); }
 
 JNIEXPORT void JNICALL
 Java_com_twilio_video_VideoCapturerDelegate_00024NativeObserver_nativeCapturerStarted(JNIEnv *env,
-                                                                                 jobject instance,
-                                                                                 jlong j_capturer,
-                                                                                 jboolean j_success) {
-    LOG(LS_INFO) << "NativeObserver_nativeCapturerStarted";
+                                                                                      jobject instance,
+                                                                                      jlong j_capturer,
+                                                                                      jboolean j_success) {
+    VIDEO_ANDROID_LOG(twilio::video::LogModule::kPlatform,
+                      twilio::video::LogLevel::kInfo,
+                      "NativeObserver_nativeCapturerStarted");
     reinterpret_cast<VideoCapturerDelegate*>(j_capturer)->OnCapturerStarted(
             j_success);
 }
 
 JNIEXPORT void JNICALL
 Java_com_twilio_video_VideoCapturerDelegate_00024NativeObserver_nativeOnByteBufferFrameCaptured(JNIEnv *jni,
-                                                                                           jobject instance,
-                                                                                           jlong j_capturer,
-                                                                                           jbyteArray j_frame,
-                                                                                           jint length,
-                                                                                           jint width,
-                                                                                           jint height,
-                                                                                           jint rotation,
-                                                                                           jlong timestamp) {
+                                                                                                jobject instance,
+                                                                                                jlong j_capturer,
+                                                                                                jbyteArray j_frame,
+                                                                                                jint length,
+                                                                                                jint width,
+                                                                                                jint height,
+                                                                                                jint rotation,
+                                                                                                jlong timestamp) {
     jboolean is_copy = true;
     jbyte* bytes = jni->GetByteArrayElements(j_frame, &is_copy);
     reinterpret_cast<VideoCapturerDelegate*>(j_capturer)
@@ -411,18 +508,37 @@ Java_com_twilio_video_VideoCapturerDelegate_00024NativeObserver_nativeOnByteBuff
 
 JNIEXPORT void JNICALL
 Java_com_twilio_video_VideoCapturerDelegate_00024NativeObserver_nativeOnTextureFrameCaptured(JNIEnv *jni,
-                                                                                        jobject instance,
-                                                                                        jlong j_capturer,
-                                                                                        jint width,
-                                                                                        jint height,
-                                                                                        jint oes_texture_id,
-                                                                                        jfloatArray j_transform_matrix,
-                                                                                        jint rotation,
-                                                                                        jlong timestamp) {
+                                                                                             jobject instance,
+                                                                                             jlong j_capturer,
+                                                                                             jint width,
+                                                                                             jint height,
+                                                                                             jint oes_texture_id,
+                                                                                             jfloatArray j_transform_matrix,
+                                                                                             jint rotation,
+                                                                                             jlong timestamp) {
 
     reinterpret_cast<VideoCapturerDelegate*>(j_capturer)
             ->OnTextureFrame(width, height, rotation, timestamp,
-                             webrtc_jni::NativeHandleImpl(jni, oes_texture_id, j_transform_matrix));
+                             webrtc::jni::NativeHandleImpl(jni, oes_texture_id, webrtc::JavaParamRef<jfloatArray>(j_transform_matrix)));
+}
+
+JNIEXPORT void JNICALL
+Java_com_twilio_video_VideoCapturerDelegate_00024NativeObserver_nativeOnFrameCaptured(JNIEnv *env,
+                                                                                      jobject instance,
+                                                                                      jlong native_capturer,
+                                                                                      jint width,
+                                                                                      jint height,
+                                                                                      jlong timestamp_ns,
+                                                                                      jint rotation,
+                                                                                      jobject j_video_frame_buffer) {
+    reinterpret_cast<VideoCapturerDelegate*>(native_capturer)
+            ->OnFrameCaptured(env,
+                              width,
+                              height,
+                              timestamp_ns,
+                              jintToVideoRotation(rotation),
+                              webrtc::JavaParamRef<jobject>(j_video_frame_buffer));
+
 }
 
 }

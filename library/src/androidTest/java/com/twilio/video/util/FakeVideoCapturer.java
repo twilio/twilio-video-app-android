@@ -197,12 +197,9 @@ public class FakeVideoCapturer implements VideoCapturer {
             }
             running = false;
             final CountDownLatch capturerStopped = new CountDownLatch(1);
-            fakeVideoCapturerHandler.post(new Runnable() {
-                @Override
-                public void run() {
-                    Looper.myLooper().quit();
-                    capturerStopped.countDown();
-                }
+            fakeVideoCapturerHandler.post(() -> {
+                Looper.myLooper().quit();
+                capturerStopped.countDown();
             });
             try {
                 capturerStopped.await(10, TimeUnit.SECONDS);

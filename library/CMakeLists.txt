@@ -16,13 +16,14 @@ set(CORE_INCLUDE_DIR ${CORE_HOME_DIR}/include)
 set(CORE_STATIC_LIB_DIR ${CORE_HOME_DIR}/lib)
 
 # Set WebRTC paths
-set(WEBRTC_INCLUDE_DIR ${CORE_INCLUDE_DIR}/third_party/webrtc)
-set(LIBYUV_INCLUDE_DIR ${CORE_INCLUDE_DIR}/third_party/webrtc/third_party/libyuv/include)
+set(WEBRTC_INCLUDE_DIR ${CORE_INCLUDE_DIR}/third_party/webrtc/include)
+set(THIRD_PARTY_INCLUDE_DIR ${CORE_INCLUDE_DIR}/third_party/webrtc/include/webrtc/third_party)
 
 # Include headers
 include_directories(${CORE_INCLUDE_DIR})
 include_directories(${WEBRTC_INCLUDE_DIR})
-include_directories(${LIBYUV_INCLUDE_DIR})
+include_directories(${WEBRTC_INCLUDE_DIR}/webrtc)
+include_directories(${THIRD_PARTY_INCLUDE_DIR}/libyuv/include)
 
 # Set source files
 file(GLOB_RECURSE SOURCE_FILES
@@ -51,22 +52,22 @@ target_link_libraries(${VIDEO_ANDROID_LIBRARY} "-lEGL")
 target_link_libraries(${VIDEO_ANDROID_LIBRARY} "-lGLESv1_CM")
 target_link_libraries(${VIDEO_ANDROID_LIBRARY} "-landroid")
 
-# Link static library dependencies
+# These libraries are purposefully ordered to satisfy the linker. If the linker complains about
+# undefined symbols that are clearly defined in the static libraries then reorder these
+# libraries accordingly.
 target_link_libraries(${VIDEO_ANDROID_LIBRARY} ${CORE_STATIC_LIB_DIR}/libtwilio-video.a
-        ${CORE_STATIC_LIB_DIR}/libwebrtc.a
-        # Several webrtc classes use native webrtc-jni objects that are only
-        # called from Java classes. The compiler will incorrectly strip some
-        # of these native webrtc-jni objects during linking because it believes
-        # they are unused by the native library. Here we tell the linker to keep
-        # the whole archive to prevent this stripping and then we specify in the
-        # dependency after we are not using whole archive anymore because the linker
-        # applies this option to every library after the option is specified.
-        "-Wl,--whole-archive ${CORE_STATIC_LIB_DIR}/libwebrtc-jni.a -Wl,--no-whole-archive"
-        ${CORE_STATIC_LIB_DIR}/libjni-helpers.a
         ${CORE_STATIC_LIB_DIR}/libresiprocate.a
         ${CORE_STATIC_LIB_DIR}/libPocoNet.a
         ${CORE_STATIC_LIB_DIR}/libPocoNetSSL.a
         ${CORE_STATIC_LIB_DIR}/libPocoUtil.a
         ${CORE_STATIC_LIB_DIR}/libPocoCrypto.a
         ${CORE_STATIC_LIB_DIR}/libPocoFoundation.a
-        ${CORE_STATIC_LIB_DIR}/libboringssl.a)
+        # Several WebRTC classes use native JNI code that are only
+        # called from Java classes. The compiler will incorrectly strip some
+        # of these native objects during linking because it believes
+        # they are unused by the native library. Tell the linker to keep
+        # the whole archive to prevent this stripping and then specify in the
+        # dependency after we are not using whole archive anymore because the linker
+        # applies this option to every library after the option is specified.
+        "-Wl,--whole-archive ${CORE_STATIC_LIB_DIR}/libwebrtc.a -Wl,--no-whole-archive"
+        ${CORE_STATIC_LIB_DIR}/libjsoncpp.a)

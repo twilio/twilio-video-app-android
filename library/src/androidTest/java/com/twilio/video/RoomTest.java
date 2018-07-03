@@ -101,11 +101,8 @@ public class RoomTest extends BaseVideoTest {
                 .build();
         room = Video.connect(context, connectOptions, roomListener);
         room.disconnect();
-        room.getStats(new StatsListener() {
-            @Override
-            public void onStats(List<StatsReport> statsReports) {
-                // Do nothing
-            }
+        room.getStats(statsReports -> {
+            // Do nothing
         });
         assertTrue(roomListener.onDisconnectedLatch.await(20, TimeUnit.SECONDS));
     }

@@ -37,24 +37,14 @@ public class InternalDataModule {
     @ApplicationScope
     TokenService providesTokenService(final SharedPreferences sharedPreferences,
                                       final VideoAppService videoAppService) {
-        return new TokenService() {
-            @Override
-            public Single<String> getToken(final String identity, final Topology topology) {
-                final String env = sharedPreferences.getString(Preferences.ENVIRONMENT,
-                        Preferences.ENVIRONMENT_DEFAULT);
+        return (identity, topology) -> {
+            final String env = sharedPreferences.getString(Preferences.ENVIRONMENT,
+                    Preferences.ENVIRONMENT_DEFAULT);
 
-                return videoAppService.getConfiguration(env)
-                        .flatMap(new Function<VideoConfiguration, SingleSource<? extends String>>() {
-                            @Override
-                            public SingleSource<? extends String>
-                            apply(@NonNull VideoConfiguration videoConfiguration)
-                                    throws Exception {
-                                return videoAppService.getToken(env,
-                                        identity,
-                                        videoConfiguration.getSid(topology));
-                            }
-                        });
-            }
+            return videoAppService.getConfiguration(env)
+                    .flatMap(videoConfiguration -> videoAppService.getToken(env,
+                            identity,
+                            videoConfiguration.getSid(topology)));
         };
     }
 }

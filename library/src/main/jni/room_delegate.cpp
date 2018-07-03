@@ -19,6 +19,7 @@
 #include "com_twilio_video_ConnectOptions.h"
 #include "com_twilio_video_MediaFactory.h"
 #include "logging.h"
+#include "jni_utils.h"
 
 namespace twilio_video_jni {
 
@@ -31,12 +32,13 @@ RoomDelegate::RoomDelegate(JNIEnv *env,
                            jobject j_room_observer,
                            jobject j_stats_observer,
                            jobject j_handler) :
-        j_connect_options_(env, j_connect_options),
-        j_room_(env, j_room),
-        j_room_observer_(env, j_room_observer),
-        j_stats_observer_(env, j_stats_observer),
-        j_handler_(env, j_handler),
-        notifier_thread_(rtc::Thread::Create()) {
+        j_connect_options_(env, webrtc::JavaParamRef<jobject>(j_connect_options)),
+        j_room_(env, webrtc::JavaParamRef<jobject>(j_room)),
+        j_room_observer_(env, webrtc::JavaParamRef<jobject>(j_room_observer)),
+        j_stats_observer_(env, webrtc::JavaParamRef<jobject>(j_stats_observer)),
+        j_handler_(env, webrtc::JavaParamRef<jobject>(j_handler)),
+        notifier_thread_(rtc::Thread::Create()),
+        native_objects_released_(false, false) {
     notifier_thread_->SetName(kRoomNotifierThreadName, nullptr);
     notifier_thread_->Start();
     MediaFactoryContext *media_factory_context =
@@ -48,7 +50,8 @@ RoomDelegate::~RoomDelegate() {
     VIDEO_ANDROID_LOG(twilio::video::LogModule::kPlatform,
                       twilio::video::LogLevel::kDebug,
                       "~RoomDelegate");
-    notifier_thread_->Stop();
+    // The native objects have been scheduled for release, but may not have completed executing yet.
+    native_objects_released_.Wait(rtc::Event::kForever);
 
     // Validate that room memory has been released
     RTC_CHECK(room_.get() == nullptr) << "Room not released. Invoke release() "
@@ -83,15 +86,17 @@ void RoomDelegate::disconnect() {
     notifier_thread_->Post(RTC_FROM_HERE, this, kMessageTypeDisconnect);
 }
 
+/*
+ * This function is called from the notifier thread already, but due to changes in WebRTC 67 and a
+ * bug in the C++ SDK (CSDK-2424), twilio::video::Room cannot be deleted inside of a callback.
+ * Deleting the room inside a callback results in a deadlock where the AsyncInvoker destructor is
+ * invoked from the same AsyncClosure it's waiting for to go out of scope.
+ *
+ * The workaround for this issue is to post an additional message on the notifier to clean up
+ * the native objects after the executing AsyncClosure has fallen out of scope.
+ */
 void RoomDelegate::release() {
-    RTC_CHECK(rtc::Thread::Current() == notifier_thread_.get()) << "release not called on "
-            "notifier thread";
-    VIDEO_ANDROID_LOG(twilio::video::LogModule::kPlatform,
-                      twilio::video::LogLevel::kDebug,
-                      "release")
-    room_.reset();
-    stats_observer_.reset();
-    android_room_observer_.reset();
+    notifier_thread_->Post(RTC_FROM_HERE, this, kMessageTypeRelease);
 }
 
 void RoomDelegate::OnMessage(rtc::Message *msg) {
@@ -119,6 +124,10 @@ void RoomDelegate::OnMessage(rtc::Message *msg) {
             disconnectOnNotifier();
             break;
         }
+        case kMessageTypeRelease: {
+            releaseOnNotifier();
+            break;
+        }
         default: {
             FATAL() << "RoomDelegate received unknown message with id " << msg->message_id;
         }
@@ -131,25 +140,25 @@ void RoomDelegate::connectOnNotifier() {
     VIDEO_ANDROID_LOG(twilio::video::LogModule::kPlatform,
                       twilio::video::LogLevel::kDebug,
                       "connectOnNotifier");
-    JNIEnv *env = webrtc_jni::AttachCurrentThreadIfNeeded();
+    JNIEnv *env = webrtc::jni::AttachCurrentThreadIfNeeded();
 
     // Create the room observer
     android_room_observer_.reset(new AndroidRoomObserver(env,
-                                                         *j_room_,
-                                                         *j_room_observer_,
-                                                         *j_connect_options_,
-                                                         *j_handler_));
+                                                         j_room_.obj(),
+                                                         j_room_observer_.obj(),
+                                                         j_connect_options_.obj(),
+                                                         j_handler_.obj()));
 
     // Create the stats observer
-    stats_observer_.reset(new AndroidStatsObserver(env, *j_stats_observer_));
+    stats_observer_.reset(new AndroidStatsObserver(env, j_stats_observer_.obj()));
 
     // Get connect options
-    jclass j_connect_options_class = webrtc_jni::GetObjectClass(env, *j_connect_options_);
+    jclass j_connect_options_class = GetObjectClass(env, j_connect_options_.obj());
     jmethodID j_create_native_connect_options_builder_id =
-            webrtc_jni::GetMethodID(env, j_connect_options_class,
-                                    "createNativeConnectOptionsBuilder", "()J");
+            webrtc::GetMethodID(env, j_connect_options_class,
+                                "createNativeConnectOptionsBuilder", "()J");
     jlong j_connect_options_handle =
-            env->CallLongMethod(*j_connect_options_,
+            env->CallLongMethod(j_connect_options_.obj(),
                                 j_create_native_connect_options_builder_id);
     CHECK_EXCEPTION(env) << "Error creating native connect options builder";
     std::unique_ptr<twilio::video::ConnectOptions::Builder> connect_options_builder(
@@ -197,6 +206,23 @@ void RoomDelegate::disconnectOnNotifier() {
     if (room_) {
         room_->disconnect();
     }
+}
+
+void RoomDelegate::releaseOnNotifier() {
+    RTC_CHECK(rtc::Thread::Current() == notifier_thread_.get()) << "release not called on "
+            "notifier thread";
+    VIDEO_ANDROID_LOG(twilio::video::LogModule::kPlatform,
+                      twilio::video::LogLevel::kDebug,
+                      "release")
+    room_.reset();
+    stats_observer_.reset();
+    android_room_observer_.reset();
+
+    /*
+     * Signal that the native objects have been released so the developer's thread can continue
+     * executing the RoomDelegate destructor.
+     */
+    native_objects_released_.Set();
 }
 
 }

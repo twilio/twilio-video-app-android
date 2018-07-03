@@ -17,10 +17,8 @@
 #include <memory>
 
 #include "android_video_capturer.h"
-#include "webrtc/sdk/android/src/jni/native_handle_impl.h"
-#include "webrtc/base/common.h"
-#include "webrtc/base/timeutils.h"
-#include "webrtc/media/engine/webrtcvideoframe.h"
+#include "webrtc/rtc_base/timeutils.h"
+#include "logging.h"
 
 AndroidVideoCapturer::AndroidVideoCapturer(
         const rtc::scoped_refptr<AndroidVideoCapturerDelegate>& delegate)
@@ -38,8 +36,10 @@ cricket::CaptureState AndroidVideoCapturer::Start(const cricket::VideoFormat& ca
     RTC_CHECK(thread_checker_.CalledOnValidThread());
     RTC_CHECK(!running_);
     const int fps = cricket::VideoFormat::IntervalToFps(capture_format.interval);
-    LOG(LS_INFO) << " AndroidVideoCapturer::Start " << capture_format.width << "x"
-                 << capture_format.height << "@" << fps;
+    VIDEO_ANDROID_LOG(twilio::video::LogModule::kPlatform,
+                      twilio::video::LogLevel::kInfo,
+                      "AndroidVideoCapturer::Start %dx%d@%d", capture_format.width,
+                      capture_format.height, fps);
 
     running_ = true;
     delegate_->Start(capture_format, this);
@@ -48,7 +48,9 @@ cricket::CaptureState AndroidVideoCapturer::Start(const cricket::VideoFormat& ca
 }
 
 void AndroidVideoCapturer::Stop() {
-    LOG(LS_INFO) << " AndroidVideoCapturer::Stop ";
+    VIDEO_ANDROID_LOG(twilio::video::LogModule::kPlatform,
+                      twilio::video::LogLevel::kInfo,
+                      "AndroidVideoCapturer::Stop");
     RTC_CHECK(thread_checker_.CalledOnValidThread());
     RTC_CHECK(running_);
     running_ = false;

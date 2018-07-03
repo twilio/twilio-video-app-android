@@ -101,7 +101,8 @@ public class RangeBarPreference extends Preference {
     private int heightResId;
 
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
-    public RangeBarPreference(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
+    public RangeBarPreference(Context context, AttributeSet attrs, int defStyleAttr,
+                              int defStyleRes) {
         super(context, attrs, defStyleAttr, defStyleRes);
         init(context, attrs);
     }
@@ -171,21 +172,14 @@ public class RangeBarPreference extends Preference {
             }
 
             // save all changes prefs while moving pins
-            rangeBar.setOnRangeBarChangeListener(new RangeBar.OnRangeBarChangeListener() {
-                @Override
-                public void onRangeChangeListener(RangeBar rangeBar,
-                                                  int leftPinIndex,
-                                                  int rightPinIndex,
-                                                  String leftPinValue,
-                                                  String rightPinValue) {
-
-                    sharedPreferences.edit()
-                            .putInt(startKey, leftPinIndex)
-                            .putInt(endKey, rightPinIndex)
-                            .apply();
-
-                }
-            });
+            rangeBar.setOnRangeBarChangeListener((rangeBar,
+                                                  leftPinIndex,
+                                                  rightPinIndex,
+                                                  leftPinValue,
+                                                  rightPinValue) -> sharedPreferences.edit()
+                    .putInt(startKey, leftPinIndex)
+                    .putInt(endKey, rightPinIndex)
+                    .apply());
         }
     }
 
@@ -219,15 +213,12 @@ public class RangeBarPreference extends Preference {
         }
 
         // initialize formatter to use entries array or fall back to entries
-        formatter = new IRangeBarFormatter() {
-            @Override
-            public String format(String value) {
-                try {
-                    int index = Integer.parseInt(value);
-                    return (index >= 0 && index < entries.length) ? entries[index] : value;
-                } catch (Exception e) {
-                    return value;
-                }
+        formatter = value -> {
+            try {
+                int index = Integer.parseInt(value);
+                return (index >= 0 && index < entries.length) ? entries[index] : value;
+            } catch (Exception e) {
+                return value;
             }
         };
 
