@@ -154,12 +154,13 @@ final class VideoCapturerDelegate implements org.webrtc.VideoCapturer {
 
         @Override
         public void onFrameCaptured(VideoFrame videoFrame) {
+            VideoFrame.Buffer buffer = videoFrame.getBuffer();
             nativeOnFrameCaptured(nativeCapturer,
-                    videoFrame.getRotatedWidth(),
-                    videoFrame.getRotatedHeight(),
+                    buffer.getWidth(),
+                    buffer.getHeight(),
                     videoFrame.getTimestampNs(),
                     videoFrame.getRotation(),
-                    videoFrame.getBuffer());
+                    buffer);
         }
 
         private native void nativeCapturerStarted(long nativeCapturer,
