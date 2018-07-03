@@ -123,9 +123,10 @@
         android:fillViewport="true"
         android:backgroundTint="@color/lobbyStatsDrawerBg">
 
-        <RelativeLayout
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
 
             <TextView
                 android:id="@+id/stats_text"
@@ -136,19 +137,19 @@
                 android:textSize="20sp"
                 android:layout_marginTop="@dimen/activity_horizontal_margin"
                 android:layout_marginRight="@dimen/activity_horizontal_margin"
-                android:layout_alignParentRight="true"/>
+                android:layout_gravity="end"
+                android:layout_marginEnd="@dimen/activity_horizontal_margin"/>
 
             <android.support.v7.widget.RecyclerView
                 android:id="@+id/stats_recycler_view"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_below="@id/stats_text"
                 android:layout_marginTop="10dp"/>
             <LinearLayout
                 android:id="@+id/stats_disabled"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_centerInParent="true"
+                android:layout_gravity="center"
                 android:orientation="vertical"
                 android:gravity="center">
                 <ImageView
@@ -173,7 +174,6 @@
                     android:layout_marginTop="@dimen/activity_vertical_margin"
                     android:textSize="14sp"/>
             </LinearLayout>
-        </RelativeLayout>
-
+        </LinearLayout>
     </ScrollView>
 </android.support.v4.widget.DrawerLayout>
