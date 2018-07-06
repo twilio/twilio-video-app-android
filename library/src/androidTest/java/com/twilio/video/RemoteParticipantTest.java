@@ -322,7 +322,6 @@ public class RemoteParticipantTest extends BaseVideoTest {
         bobRoom.get().disconnect();
         assertTrue(aliceDisconnected.await(20, TimeUnit.SECONDS));
         assertTrue(bobRoomListener.onDisconnectedLatch.await(20, TimeUnit.SECONDS));
-        RoomUtils.completeRoom(aliceRoom.get());
         bobAudioTrack.release();
         aliceThread.quit();
         bobThread.quit();

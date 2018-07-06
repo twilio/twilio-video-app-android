@@ -95,7 +95,7 @@ public abstract class BaseParticipantTest extends BaseVideoTest {
         // Call disconnect before failing to ensure native memory released
         if (!connected) {
             room.disconnect();
-            RoomUtils.completeRoom(room);
+
             fail("Failed to connect to room");
         }
 
@@ -112,7 +112,6 @@ public abstract class BaseParticipantTest extends BaseVideoTest {
         assertTrue(
                 "Failed to disconnect from room",
                 roomListener.onDisconnectedLatch.await(20, TimeUnit.SECONDS));
-        RoomUtils.completeRoom(room);
     }
 
     public void baseSetup(Topology topology) throws InterruptedException {

@@ -69,7 +69,6 @@ public class RoomTest extends BaseVideoTest {
             assertTrue(
                     "Did not receive disconnect callback",
                     roomListener.onDisconnectedLatch.await(20, TimeUnit.SECONDS));
-            RoomUtils.completeRoom(room);
         }
         assertTrue(MediaFactory.isReleased());
     }

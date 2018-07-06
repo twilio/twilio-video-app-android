@@ -107,9 +107,7 @@ public class RoomTopologyParameterizedTest extends BaseVideoTest {
         if (room != null && room.getState() != RoomState.DISCONNECTED) {
             roomListener.onDisconnectedLatch = new CountDownLatch(1);
             room.disconnect();
-
             assertTrue(roomListener.onDisconnectedLatch.await(20, TimeUnit.SECONDS));
-            RoomUtils.completeRoom(room);
         }
         if (localAudioTrack != null) {
             localAudioTrack.release();
@@ -246,6 +244,7 @@ public class RoomTopologyParameterizedTest extends BaseVideoTest {
         }
 
         room.disconnect();
+
         // Wait for disconnect and validate recording state
         assertTrue(roomListener.onDisconnectedLatch.await(20, TimeUnit.SECONDS));
         Assert.assertFalse(room.isRecording());
