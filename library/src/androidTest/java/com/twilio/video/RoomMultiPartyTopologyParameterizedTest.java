@@ -85,6 +85,7 @@ public class RoomMultiPartyTopologyParameterizedTest extends BaseVideoTest {
             roomPair.second.onDisconnectedLatch = new CountDownLatch(1);
             roomPair.first.disconnect();
             roomPair.second.onDisconnectedLatch.await(10, TimeUnit.SECONDS);
+            RoomUtils.completeRoom(roomPair.first);
         }
         rooms.clear();
         assertTrue(MediaFactory.isReleased());

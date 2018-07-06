@@ -153,7 +153,7 @@ public abstract class BaseStatsTest extends BaseVideoTest {
         // Call disconnect before failing to ensure native memory released
         if (!connected) {
             room.disconnect();
-
+            RoomUtils.completeRoom(room);
             fail("Failed to connect to room");
         }
 
@@ -166,6 +166,7 @@ public abstract class BaseStatsTest extends BaseVideoTest {
             roomListener.onDisconnectedLatch = new CountDownLatch(1);
             room.disconnect();
             roomListener.onDisconnectedLatch.await(10, TimeUnit.SECONDS);
+            RoomUtils.completeRoom(room);
         }
     }
 }

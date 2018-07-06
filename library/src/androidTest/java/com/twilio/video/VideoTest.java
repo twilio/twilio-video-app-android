@@ -139,6 +139,7 @@ public class VideoTest extends BaseVideoTest {
             Room room = Video.connect(mediaTestActivity, connectOptions, roomListener);
             room.disconnect();
             assertTrue(roomListener.onDisconnectedLatch.await(20, TimeUnit.SECONDS));
+            RoomUtils.completeRoom(room);
         }
     }
 }

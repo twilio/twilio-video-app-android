@@ -128,6 +128,7 @@ public class IceTopologyParameterizedTest extends BaseVideoTest {
         Room room = Video.connect(mediaTestActivity, connectOptions, roomListener);
         assertTrue(roomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
         room.disconnect();
+        RoomUtils.completeRoom(room);
         assertTrue(roomListener.onDisconnectedLatch.await(20, TimeUnit.SECONDS));
     }
 
@@ -162,6 +163,8 @@ public class IceTopologyParameterizedTest extends BaseVideoTest {
 
         aliceRoom.disconnect();
         assertTrue(roomListener.onDisconnectedLatch.await(20, TimeUnit.SECONDS));
+
+        RoomUtils.completeRoom(aliceRoom);
     }
 
     @Ignore
@@ -220,5 +223,8 @@ public class IceTopologyParameterizedTest extends BaseVideoTest {
         bobRoom.disconnect();
         assertTrue(aliceListener.onDisconnectedLatch.await(10, TimeUnit.SECONDS));
         assertTrue(bobListener.onDisconnectedLatch.await(10, TimeUnit.SECONDS));
+
+        RoomUtils.completeRoom(aliceRoom);
+        RoomUtils.completeRoom(bobRoom);
     }
 }

@@ -97,6 +97,7 @@ public class VideoTopologyParameterizedTest extends BaseVideoTest {
             roomListener.onDisconnectedLatch = new CountDownLatch(1);
             room.disconnect();
             assertTrue(roomListener.onDisconnectedLatch.await(20, TimeUnit.SECONDS));
+            RoomUtils.completeRoom(room);
         }
         if (localAudioTrack != null) {
             localAudioTrack.release();
