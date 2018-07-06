@@ -461,8 +461,6 @@ void VideoCapturerDelegate::OnFrameCaptured(
     }
 
     capturer_->OnFrame(webrtc::VideoFrame(buffer,
-                                          capturer_->apply_rotation() ?
-                                          webrtc::kVideoRotation_0 :
                                           static_cast<webrtc::VideoRotation>(rotation),
                                           translated_camera_time_us), width, height);
 }

@@ -84,7 +84,7 @@ public abstract class BaseCameraCapturerTest extends BaseVideoTest {
         return bothCamerasSupported;
     }
 
-    private @Nullable CameraCapturer.CameraSource getSupportedCameraSource() {
+    public static @Nullable CameraCapturer.CameraSource getSupportedCameraSource() {
         if (CameraCapturer.isSourceAvailable(CameraCapturer.CameraSource.FRONT_CAMERA)) {
             return CameraCapturer.CameraSource.FRONT_CAMERA;
         } else if (CameraCapturer.isSourceAvailable(CameraCapturer.CameraSource.BACK_CAMERA)) {

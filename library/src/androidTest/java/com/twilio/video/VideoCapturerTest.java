@@ -16,14 +16,21 @@
 
 package com.twilio.video;
 
+import android.Manifest;
+import android.content.Context;
+import android.support.annotation.NonNull;
 import android.support.test.InstrumentationRegistry;
+import android.support.test.rule.GrantPermissionRule;
 
+import com.twilio.video.base.BaseCameraCapturerTest;
 import com.twilio.video.base.BaseVideoTest;
 import com.twilio.video.util.FakeVideoCapturer;
 import com.twilio.video.util.Topology;
 
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -37,13 +44,19 @@ import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 
 import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.assertNotNull;
 import static junit.framework.TestCase.assertTrue;
+import static org.junit.Assume.assumeTrue;
 
 @RunWith(JUnitParamsRunner.class)
 public class VideoCapturerTest extends BaseVideoTest {
     private LocalVideoTrack localVideoTrack;
     private I420Frame i420Frame;
     private long nativeVideoSinkHandle;
+
+    @Rule
+    public GrantPermissionRule cameraPermissionsRule = GrantPermissionRule
+            .grant(Manifest.permission.CAMERA);
 
     @Before
     public void setup() throws InterruptedException {
@@ -93,6 +106,86 @@ public class VideoCapturerTest extends BaseVideoTest {
             frameRendered.countDown();
         }, rotationApplied);
         assertTrue(frameRendered.await(10, TimeUnit.SECONDS));
+        this.i420Frame = frameReference.get();
+
+        // Validate frame
+        assertEquals(expectedWidth, i420Frame.width);
+        assertEquals(expectedHeight, i420Frame.height);
+        assertEquals(expectedRotation.getValue(), i420Frame.rotationDegree);
+    }
+
+    /*
+     * After WebRTC 67 upgrade, CameraCapturer, Camera2Capturer, and ScreenCapturer execute
+     * a different code path for signaling captured frames. This test validates the same behavior
+     * as shouldCaptureAndRenderFrame using CameraCapturer (GSDK-1632). These two tests should
+     * converge once GSDK-1629 is planned and implemented.
+     */
+    @Test
+    @Parameters({"false", "true"})
+    public void shouldCaptureAndRenderFrame2(final boolean rotationApplied)
+            throws InterruptedException {
+        Context context = InstrumentationRegistry.getContext();
+        CameraCapturer.CameraSource cameraSource =
+                BaseCameraCapturerTest.getSupportedCameraSource();
+        assumeTrue("No camera source available", cameraSource != null);
+        final AtomicReference<VideoFrame.RotationAngle> rotationAngle =
+                new AtomicReference<>(VideoFrame.RotationAngle.ROTATION_0);
+        final CountDownLatch frameRendered = new CountDownLatch(1);
+        final CountDownLatch rotationSet = new CountDownLatch(1);
+        final AtomicReference<I420Frame> frameReference = new AtomicReference<>();
+        final AtomicReference<VideoFormat> videoFormatReference = new AtomicReference<>();
+
+        class CameraCapturerProxy extends CameraCapturer {
+            private CameraCapturerProxy(@NonNull Context context,
+                                        @NonNull CameraSource cameraSource) {
+                super(context, cameraSource);
+            }
+
+            @Override
+            public void startCapture(@NonNull VideoFormat captureFormat,
+                                     @NonNull VideoCapturer.Listener videoCapturerListener) {
+                videoFormatReference.set(captureFormat);
+                super.startCapture(captureFormat, new VideoCapturer.Listener() {
+                    @Override
+                    public void onCapturerStarted(boolean success) {
+                        videoCapturerListener.onCapturerStarted(success);
+                    }
+
+                    @Override
+                    public void onFrameCaptured(VideoFrame videoFrame) {
+                        rotationAngle.set(videoFrame.orientation);
+                        rotationSet.countDown();
+                        videoCapturerListener.onFrameCaptured(videoFrame);
+                    }
+                });
+            }
+        }
+        CameraCapturerProxy cameraCapturerProxy = new CameraCapturerProxy(context, cameraSource);
+        localVideoTrack = LocalVideoTrack.create(context,true, cameraCapturerProxy);
+
+        // Wait for rotation
+        assertTrue(rotationSet.await(10000, TimeUnit.MILLISECONDS));
+
+        // Establish expected dimensions after rotation set by capturer
+        boolean dimensionsSwapped = rotationAngle.get() == VideoFrame.RotationAngle.ROTATION_90 ||
+                rotationAngle.get() == VideoFrame.RotationAngle.ROTATION_270;
+        VideoFormat videoFormat = videoFormatReference.get();
+        int expectedWidth = dimensionsSwapped && rotationApplied ?
+                videoFormat.dimensions.height :
+                videoFormat.dimensions.width;
+        int expectedHeight = dimensionsSwapped && rotationApplied ?
+                videoFormat.dimensions.width :
+                videoFormat.dimensions.height;
+        VideoFrame.RotationAngle expectedRotation = rotationApplied ?
+                VideoFrame.RotationAngle.ROTATION_0 :
+                rotationAngle.get();
+
+        // Add renderer and wait for frame
+        this.nativeVideoSinkHandle = localVideoTrack.addRendererWithWants(frame -> {
+            frameReference.set(frame);
+            frameRendered.countDown();
+        }, rotationApplied);
+        assertTrue(frameRendered.await(10000, TimeUnit.MILLISECONDS));
         this.i420Frame = frameReference.get();
 
         // Validate frame
