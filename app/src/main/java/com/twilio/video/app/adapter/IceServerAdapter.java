@@ -63,7 +63,7 @@ public class IceServerAdapter extends BaseAdapter {
                                     parent,
                                     false);
         }
-        urlTextView = ButterKnife.findById(convertView, android.R.id.text1);
+        urlTextView = convertView.findViewById(android.R.id.text1);
         urlTextView.setText(iceServers.get(position).getUrl());
 
         return convertView;
