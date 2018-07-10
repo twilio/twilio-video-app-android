@@ -16,21 +16,29 @@
 
 package com.twilio.video;
 
+import static org.apache.commons.lang3.RandomStringUtils.random;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import android.Manifest;
 import android.support.test.filters.LargeTest;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.rule.GrantPermissionRule;
-
 import com.twilio.video.base.BaseVideoTest;
 import com.twilio.video.helper.CallbackHelper;
 import com.twilio.video.ui.MediaTestActivity;
-import com.twilio.video.util.CredentialsUtils;
 import com.twilio.video.util.Constants;
+import com.twilio.video.util.CredentialsUtils;
 import com.twilio.video.util.FakeVideoCapturer;
 import com.twilio.video.util.RoomUtils;
 import com.twilio.video.util.ServiceTokenUtil;
 import com.twilio.video.util.Topology;
-
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -39,33 +47,22 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
-
-import static org.apache.commons.lang3.RandomStringUtils.random;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-
 @RunWith(Parameterized.class)
 @LargeTest
 public class IceTopologyParameterizedTest extends BaseVideoTest {
     @Parameterized.Parameters(name = "{0}")
     public static Iterable<Object[]> data() {
-        return Arrays.asList(new Object[][]{
-                {Topology.P2P},
-                {Topology.GROUP}});
+        return Arrays.asList(new Object[][] {{Topology.P2P}, {Topology.GROUP}});
     }
 
     @Rule
-    public GrantPermissionRule recordAudioPermissionRule = GrantPermissionRule
-            .grant(Manifest.permission.RECORD_AUDIO);
+    public GrantPermissionRule recordAudioPermissionRule =
+            GrantPermissionRule.grant(Manifest.permission.RECORD_AUDIO);
+
     @Rule
     public ActivityTestRule<MediaTestActivity> activityRule =
-        new ActivityTestRule<>(MediaTestActivity.class);
+            new ActivityTestRule<>(MediaTestActivity.class);
+
     private MediaTestActivity mediaTestActivity;
     private String aliceToken;
     private String bobToken;
@@ -117,14 +114,16 @@ public class IceTopologyParameterizedTest extends BaseVideoTest {
         iceServers.add(new IceServer("stun:foo.bar.address?transport=udp"));
         iceServers.add(new IceServer("turn:foo.bar.address:3478?transport=udp", "fake", "pass"));
 
-        IceOptions iceOptions = new IceOptions.Builder()
-            .iceServers(iceServers)
-            .iceTransportPolicy(IceTransportPolicy.RELAY)
-            .build();
-        ConnectOptions connectOptions = new ConnectOptions.Builder(aliceToken)
-            .roomName(roomName)
-            .iceOptions(iceOptions)
-            .build();
+        IceOptions iceOptions =
+                new IceOptions.Builder()
+                        .iceServers(iceServers)
+                        .iceTransportPolicy(IceTransportPolicy.RELAY)
+                        .build();
+        ConnectOptions connectOptions =
+                new ConnectOptions.Builder(aliceToken)
+                        .roomName(roomName)
+                        .iceOptions(iceOptions)
+                        .build();
 
         Room room = Video.connect(mediaTestActivity, connectOptions, roomListener);
         assertTrue(roomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
@@ -141,17 +140,19 @@ public class IceTopologyParameterizedTest extends BaseVideoTest {
         iceServers.add(new IceServer("stun:stun2.l.google.com:19302"));
         iceServers.add(new IceServer("stun:stun3.l.google.com:19302"));
         iceServers.add(new IceServer("stun:stun4.l.google.com:19302"));
-        IceOptions iceOptions = new IceOptions.Builder()
-            .iceServers(iceServers)
-            .iceTransportPolicy(IceTransportPolicy.ALL)
-            .build();
+        IceOptions iceOptions =
+                new IceOptions.Builder()
+                        .iceServers(iceServers)
+                        .iceTransportPolicy(IceTransportPolicy.ALL)
+                        .build();
         aliceLocalAudioTrack = LocalAudioTrack.create(mediaTestActivity, true);
 
-        ConnectOptions connectOptions = new ConnectOptions.Builder(aliceToken)
-                .roomName(roomName)
-                .iceOptions(iceOptions)
-                .audioTracks(Collections.singletonList(aliceLocalAudioTrack))
-                .build();
+        ConnectOptions connectOptions =
+                new ConnectOptions.Builder(aliceToken)
+                        .roomName(roomName)
+                        .iceOptions(iceOptions)
+                        .audioTracks(Collections.singletonList(aliceLocalAudioTrack))
+                        .build();
         CallbackHelper.FakeRoomListener roomListener = new CallbackHelper.FakeRoomListener();
         roomListener.onConnectedLatch = new CountDownLatch(1);
         roomListener.onDisconnectedLatch = new CountDownLatch(1);
@@ -173,30 +174,33 @@ public class IceTopologyParameterizedTest extends BaseVideoTest {
         // Get ice servers from Twilio Service Token
         Set<IceServer> iceServers = ServiceTokenUtil.getIceServers();
 
-        IceOptions iceOptions = new IceOptions.Builder()
-            .iceServers(iceServers)
-            .iceTransportPolicy(IceTransportPolicy.RELAY)
-            .build();
+        IceOptions iceOptions =
+                new IceOptions.Builder()
+                        .iceServers(iceServers)
+                        .iceTransportPolicy(IceTransportPolicy.RELAY)
+                        .build();
         aliceLocalAudioTrack = LocalAudioTrack.create(mediaTestActivity, true);
-        ConnectOptions connectOptions = new ConnectOptions.Builder(aliceToken)
-                .roomName(roomName)
-                .iceOptions(iceOptions)
-                .audioTracks(Collections.singletonList(aliceLocalAudioTrack))
-                .build();
+        ConnectOptions connectOptions =
+                new ConnectOptions.Builder(aliceToken)
+                        .roomName(roomName)
+                        .iceOptions(iceOptions)
+                        .audioTracks(Collections.singletonList(aliceLocalAudioTrack))
+                        .build();
 
         Room aliceRoom = Video.connect(mediaTestActivity, connectOptions, aliceListener);
         assertTrue(aliceListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
 
         bobLocalAudioTrack = LocalAudioTrack.create(mediaTestActivity, true);
-        bobLocalVideoTrack = LocalVideoTrack.create(mediaTestActivity,
-                true, new FakeVideoCapturer());
+        bobLocalVideoTrack =
+                LocalVideoTrack.create(mediaTestActivity, true, new FakeVideoCapturer());
 
-        connectOptions = new ConnectOptions.Builder(bobToken)
-                .roomName(roomName)
-                .iceOptions(iceOptions)
-                .audioTracks(Collections.singletonList(bobLocalAudioTrack))
-                .videoTracks(Collections.singletonList(bobLocalVideoTrack))
-                .build();
+        connectOptions =
+                new ConnectOptions.Builder(bobToken)
+                        .roomName(roomName)
+                        .iceOptions(iceOptions)
+                        .audioTracks(Collections.singletonList(bobLocalAudioTrack))
+                        .videoTracks(Collections.singletonList(bobLocalVideoTrack))
+                        .build();
         CallbackHelper.FakeRoomListener bobListener = new CallbackHelper.FakeRoomListener();
         bobListener.onConnectedLatch = new CountDownLatch(1);
         CallbackHelper.FakeParticipantListener participantListener =
@@ -217,5 +221,4 @@ public class IceTopologyParameterizedTest extends BaseVideoTest {
         assertTrue(aliceListener.onDisconnectedLatch.await(10, TimeUnit.SECONDS));
         assertTrue(bobListener.onDisconnectedLatch.await(10, TimeUnit.SECONDS));
     }
-
 }

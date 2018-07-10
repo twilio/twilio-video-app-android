@@ -16,30 +16,26 @@
 
 package com.twilio.video;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+import static org.junit.Assume.assumeFalse;
+import static org.junit.Assume.assumeTrue;
+
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.hardware.camera2.CameraAccessException;
 import android.hardware.camera2.CameraManager;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.runner.AndroidJUnit4;
-
 import com.twilio.video.base.BaseCamera2CapturerTest;
 import com.twilio.video.util.DeviceUtils;
-
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-
-import static org.junit.Assume.assumeFalse;
-import static org.junit.Assume.assumeTrue;
 
 @TargetApi(21)
 @RunWith(AndroidJUnit4.class)
@@ -49,8 +45,8 @@ public class Camera2CapturerUsageTest extends BaseCamera2CapturerTest {
     @Before
     public void setup() throws InterruptedException {
         super.setup();
-        CameraManager cameraManager = (CameraManager)
-                cameraCapturerActivity.getSystemService(Context.CAMERA_SERVICE);
+        CameraManager cameraManager =
+                (CameraManager) cameraCapturerActivity.getSystemService(Context.CAMERA_SERVICE);
         try {
             cameraIds = cameraManager.getCameraIdList();
         } catch (CameraAccessException e) {
@@ -70,26 +66,24 @@ public class Camera2CapturerUsageTest extends BaseCamera2CapturerTest {
         final String cameraId = cameraIds[0];
         final String expectedCameraId = cameraIds[1];
         final CountDownLatch cameraSwitched = new CountDownLatch(1);
-        camera2Capturer = new Camera2Capturer(cameraCapturerActivity,
-                cameraId,
-                new Camera2Capturer.Listener() {
-                    @Override
-                    public void onFirstFrameAvailable() {
+        camera2Capturer =
+                new Camera2Capturer(
+                        cameraCapturerActivity,
+                        cameraId,
+                        new Camera2Capturer.Listener() {
+                            @Override
+                            public void onFirstFrameAvailable() {}
 
-                    }
+                            @Override
+                            public void onCameraSwitched(String newCameraId) {
+                                assertEquals(expectedCameraId, newCameraId);
+                                assertEquals(expectedCameraId, camera2Capturer.getCameraId());
+                                cameraSwitched.countDown();
+                            }
 
-                    @Override
-                    public void onCameraSwitched(String newCameraId) {
-                        assertEquals(expectedCameraId, newCameraId);
-                        assertEquals(expectedCameraId, camera2Capturer.getCameraId());
-                        cameraSwitched.countDown();
-                    }
-
-                    @Override
-                    public void onError(Camera2Capturer.Exception exception) {
-
-                    }
-                });
+                            @Override
+                            public void onError(Camera2Capturer.Exception exception) {}
+                        });
         localVideoTrack = LocalVideoTrack.create(cameraCapturerActivity, true, camera2Capturer);
 
         // Add renderer
@@ -117,27 +111,24 @@ public class Camera2CapturerUsageTest extends BaseCamera2CapturerTest {
         final String cameraId = cameraIds[0];
         final String expectedCameraId = cameraIds[1];
         final CountDownLatch cameraSwitched = new CountDownLatch(1);
-        camera2Capturer = new Camera2Capturer(cameraCapturerActivity,
-                cameraId,
-                new Camera2Capturer.Listener() {
-                    @Override
-                    public void onFirstFrameAvailable() {
+        camera2Capturer =
+                new Camera2Capturer(
+                        cameraCapturerActivity,
+                        cameraId,
+                        new Camera2Capturer.Listener() {
+                            @Override
+                            public void onFirstFrameAvailable() {}
 
-                    }
+                            @Override
+                            public void onCameraSwitched(String newCameraId) {
+                                assertEquals(expectedCameraId, newCameraId);
+                                assertEquals(expectedCameraId, camera2Capturer.getCameraId());
+                                cameraSwitched.countDown();
+                            }
 
-                    @Override
-                    public void onCameraSwitched(String newCameraId) {
-                        assertEquals(expectedCameraId, newCameraId);
-                        assertEquals(expectedCameraId,
-                                camera2Capturer.getCameraId());
-                        cameraSwitched.countDown();
-                    }
-
-                    @Override
-                    public void onError(Camera2Capturer.Exception exception) {
-
-                    }
-                });
+                            @Override
+                            public void onError(Camera2Capturer.Exception exception) {}
+                        });
 
         // Switch our camera
         camera2Capturer.switchCamera(expectedCameraId);
@@ -163,23 +154,25 @@ public class Camera2CapturerUsageTest extends BaseCamera2CapturerTest {
         final String cameraId = cameraIds[0];
         final String otherCameraId = cameraIds[1];
         final CountDownLatch cameraSwitchError = new CountDownLatch(1);
-        camera2Capturer = new Camera2Capturer(cameraCapturerActivity,
-                cameraId,
-                new Camera2Capturer.Listener() {
-                    @Override
-                    public void onFirstFrameAvailable() {}
+        camera2Capturer =
+                new Camera2Capturer(
+                        cameraCapturerActivity,
+                        cameraId,
+                        new Camera2Capturer.Listener() {
+                            @Override
+                            public void onFirstFrameAvailable() {}
 
-                    @Override
-                    public void onCameraSwitched(String newCameraId) {
-                    }
+                            @Override
+                            public void onCameraSwitched(String newCameraId) {}
 
-                    @Override
-                    public void onError(Camera2Capturer.Exception exception) {
-                        assertEquals(Camera2Capturer.Exception.CAMERA_SWITCH_FAILED,
-                                exception.getCode());
-                        cameraSwitchError.countDown();
-                    }
-                });
+                            @Override
+                            public void onError(Camera2Capturer.Exception exception) {
+                                assertEquals(
+                                        Camera2Capturer.Exception.CAMERA_SWITCH_FAILED,
+                                        exception.getCode());
+                                cameraSwitchError.countDown();
+                            }
+                        });
         localVideoTrack = LocalVideoTrack.create(cameraCapturerActivity, true, camera2Capturer);
 
         // Switch our cameras quickly
@@ -202,32 +195,45 @@ public class Camera2CapturerUsageTest extends BaseCamera2CapturerTest {
          * Run on UI thread to avoid thread hopping between the test runner thread and the UI
          * thread.
          */
-        InstrumentationRegistry.getInstrumentation().runOnMainSync(() -> {
-            final long callingThreadId = Thread.currentThread().getId();
+        InstrumentationRegistry.getInstrumentation()
+                .runOnMainSync(
+                        () -> {
+                            final long callingThreadId = Thread.currentThread().getId();
 
-            camera2Capturer = new Camera2Capturer(cameraCapturerActivity, cameraId,
-                    new Camera2Capturer.Listener() {
-                        @Override
-                        public void onFirstFrameAvailable() {
-                            assertEquals(callingThreadId, Thread.currentThread().getId());
-                            firstFrameAvailable.countDown();
-                        }
+                            camera2Capturer =
+                                    new Camera2Capturer(
+                                            cameraCapturerActivity,
+                                            cameraId,
+                                            new Camera2Capturer.Listener() {
+                                                @Override
+                                                public void onFirstFrameAvailable() {
+                                                    assertEquals(
+                                                            callingThreadId,
+                                                            Thread.currentThread().getId());
+                                                    firstFrameAvailable.countDown();
+                                                }
 
-                        @Override
-                        public void onCameraSwitched(String cameraId1) {
-                            assertEquals(callingThreadId, Thread.currentThread().getId());
-                            cameraSwitched.countDown();
-                        }
+                                                @Override
+                                                public void onCameraSwitched(String cameraId1) {
+                                                    assertEquals(
+                                                            callingThreadId,
+                                                            Thread.currentThread().getId());
+                                                    cameraSwitched.countDown();
+                                                }
 
-                        @Override
-                        public void onError(Camera2Capturer.Exception exception) {
-                            assertEquals(callingThreadId, Thread.currentThread().getId());
-                            cameraSwitchedFailed.countDown();
-                        }
-                    });
-            localVideoTrack = LocalVideoTrack.create(cameraCapturerActivity, true,
-                    camera2Capturer);
-        });
+                                                @Override
+                                                public void onError(
+                                                        Camera2Capturer.Exception exception) {
+                                                    assertEquals(
+                                                            callingThreadId,
+                                                            Thread.currentThread().getId());
+                                                    cameraSwitchedFailed.countDown();
+                                                }
+                                            });
+                            localVideoTrack =
+                                    LocalVideoTrack.create(
+                                            cameraCapturerActivity, true, camera2Capturer);
+                        });
 
         assertTrue(firstFrameAvailable.await(CAMERA2_CAPTURER_DELAY_MS, TimeUnit.MILLISECONDS));
         camera2Capturer.switchCamera(otherCameraId);

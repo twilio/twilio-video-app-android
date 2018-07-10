@@ -17,34 +17,29 @@
 package com.twilio.video.app.data;
 
 import android.content.SharedPreferences;
-
 import com.twilio.video.app.ApplicationScope;
 import com.twilio.video.app.data.api.TokenService;
 import com.twilio.video.app.data.api.VideoAppService;
-import com.twilio.video.app.data.api.model.Topology;
-import com.twilio.video.app.data.api.model.VideoConfiguration;
-
 import dagger.Module;
 import dagger.Provides;
-import io.reactivex.Single;
-import io.reactivex.SingleSource;
-import io.reactivex.annotations.NonNull;
-import io.reactivex.functions.Function;
 
 @Module(includes = DataModule.class)
 public class InternalDataModule {
     @Provides
     @ApplicationScope
-    TokenService providesTokenService(final SharedPreferences sharedPreferences,
-                                      final VideoAppService videoAppService) {
+    TokenService providesTokenService(
+            final SharedPreferences sharedPreferences, final VideoAppService videoAppService) {
         return (identity, topology) -> {
-            final String env = sharedPreferences.getString(Preferences.ENVIRONMENT,
-                    Preferences.ENVIRONMENT_DEFAULT);
+            final String env =
+                    sharedPreferences.getString(
+                            Preferences.ENVIRONMENT, Preferences.ENVIRONMENT_DEFAULT);
 
-            return videoAppService.getConfiguration(env)
-                    .flatMap(videoConfiguration -> videoAppService.getToken(env,
-                            identity,
-                            videoConfiguration.getSid(topology)));
+            return videoAppService
+                    .getConfiguration(env)
+                    .flatMap(
+                            videoConfiguration ->
+                                    videoAppService.getToken(
+                                            env, identity, videoConfiguration.getSid(topology)));
         };
     }
 }

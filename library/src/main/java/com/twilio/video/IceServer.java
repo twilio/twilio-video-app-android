@@ -17,9 +17,8 @@
 package com.twilio.video;
 
 import android.support.annotation.NonNull;
-/**
- * IceServer is a single STUN or TURN server.
- */
+
+/** IceServer is a single STUN or TURN server. */
 public class IceServer {
     @NonNull public final String username;
     @NonNull public final String password;
@@ -29,7 +28,8 @@ public class IceServer {
         this(serverUrl, "", "");
     }
 
-    public IceServer(@NonNull  String serverUrl, @NonNull String username, @NonNull String password) {
+    public IceServer(
+            @NonNull String serverUrl, @NonNull String username, @NonNull String password) {
         this.username = username;
         this.password = password;
         this.serverUrl = serverUrl;

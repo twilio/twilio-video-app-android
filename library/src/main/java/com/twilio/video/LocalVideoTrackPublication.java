@@ -53,26 +53,21 @@ public class LocalVideoTrackPublication implements VideoTrackPublication {
         return localVideoTrack.getName();
     }
 
-    /**
-     * Check if local video track is enabled.
-     */
+    /** Check if local video track is enabled. */
     @Override
     public boolean isTrackEnabled() {
         return localVideoTrack.isEnabled();
     }
 
-    /**
-     * Returns the base video track object of the published local video track.
-     */
+    /** Returns the base video track object of the published local video track. */
     @Override
     public VideoTrack getVideoTrack() {
         return localVideoTrack;
     }
 
-    /**
-     * Returns the published local video track.
-     */
-    @Nullable public LocalVideoTrack getLocalVideoTrack() {
+    /** Returns the published local video track. */
+    @Nullable
+    public LocalVideoTrack getLocalVideoTrack() {
         return localVideoTrack;
     }
 }

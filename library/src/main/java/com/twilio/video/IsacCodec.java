@@ -17,6 +17,7 @@
 package com.twilio.video;
 
 import android.support.annotation.NonNull;
+
 /**
  * Internet speech audio codec.
  *

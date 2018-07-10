@@ -27,8 +27,6 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
-import android.view.View;
-
 import com.twilio.video.app.R;
 
 /**
@@ -39,14 +37,10 @@ import com.twilio.video.app.R;
  * @attr name clearIcon - clear action icon to display to the right of EditText input.
  */
 public class ClearableEditText extends AppCompatEditText {
-    /**
-     * Clear icon resource id.
-     */
+    /** Clear icon resource id. */
     private int clearIconResId;
 
-    /**
-     * Clear icon drawable.
-     */
+    /** Clear icon drawable. */
     private Drawable clearDrawable;
 
     public ClearableEditText(Context context) {
@@ -67,8 +61,9 @@ public class ClearableEditText extends AppCompatEditText {
     private void init(Context context, AttributeSet attrs) {
 
         if (attrs != null) {
-            TypedArray stylables = context.getTheme()
-                    .obtainStyledAttributes(attrs, R.styleable.ClearableEditText, 0, 0);
+            TypedArray stylables =
+                    context.getTheme()
+                            .obtainStyledAttributes(attrs, R.styleable.ClearableEditText, 0, 0);
 
             // obtain clear icon resource id
             clearIconResId = stylables.getResourceId(R.styleable.ClearableEditText_clearIcon, -1);
@@ -82,36 +77,36 @@ public class ClearableEditText extends AppCompatEditText {
         showClearIcon(getText().toString().length() > 0);
 
         // update clear icon state after every text change
-        addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-            }
+        addTextChangedListener(
+                new TextWatcher() {
+                    @Override
+                    public void beforeTextChanged(
+                            CharSequence charSequence, int i, int i1, int i2) {}
 
-            @Override
-            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-            }
+                    @Override
+                    public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
 
-            @Override
-            public void afterTextChanged(Editable editable) {
-                showClearIcon(editable.toString().length() > 0);
-            }
-        });
+                    @Override
+                    public void afterTextChanged(Editable editable) {
+                        showClearIcon(editable.toString().length() > 0);
+                    }
+                });
 
         // simulate on clear icon click - delete edit text contents
-        setOnTouchListener((view, motionEvent) -> {
+        setOnTouchListener(
+                (view, motionEvent) -> {
+                    if (isClearVisible() && motionEvent.getAction() == MotionEvent.ACTION_UP) {
 
-            if (isClearVisible() && motionEvent.getAction() == MotionEvent.ACTION_UP) {
+                        ClearableEditText editText = (ClearableEditText) view;
+                        Rect bounds = clearDrawable.getBounds();
 
-                ClearableEditText editText = (ClearableEditText) view;
-                Rect bounds = clearDrawable.getBounds();
+                        if (motionEvent.getRawX() >= (view.getRight() - bounds.width())) {
+                            editText.setText("");
+                        }
+                    }
 
-                if (motionEvent.getRawX() >= (view.getRight() - bounds.width())) {
-                    editText.setText("");
-                }
-            }
-
-            return false;
-        });
+                    return false;
+                });
     }
 
     /**

@@ -18,17 +18,16 @@ package com.twilio.video;
 
 import android.support.annotation.NonNull;
 
-/**
- * Represents the format of a video frame.
- */
+/** Represents the format of a video frame. */
 public class VideoFormat {
     public final VideoDimensions dimensions;
     public final int framerate;
     public final VideoPixelFormat pixelFormat;
 
-    public VideoFormat(@NonNull VideoDimensions dimensions,
-                       int framerate,
-                       @NonNull VideoPixelFormat pixelFormat) {
+    public VideoFormat(
+            @NonNull VideoDimensions dimensions,
+            int framerate,
+            @NonNull VideoPixelFormat pixelFormat) {
         this.dimensions = dimensions;
         this.framerate = framerate;
         this.pixelFormat = pixelFormat;

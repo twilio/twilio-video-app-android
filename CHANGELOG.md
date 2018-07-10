@@ -233,11 +233,11 @@ Known issues
 Features
 
 - Added the following callbacks to `RemoteParticipant.Listener`
-  - `onAudioTrackSubscriptionFailed` - Notifies listener that an audio track could not be 
+  - `onAudioTrackSubscriptionFailed` - Notifies listener that an audio track could not be
   subscribed to.
-  - `onVideoTrackSubscriptionFailed` - Notifies listener that a video track could not be 
+  - `onVideoTrackSubscriptionFailed` - Notifies listener that a video track could not be
   subscribed to.
-  - `onDataTrackSubscriptionFailed` - Notifies listener that a data track could not be 
+  - `onDataTrackSubscriptionFailed` - Notifies listener that a data track could not be
   subscribed to.
 - Added `trackSid` to `BaseTrackStats`.
 
@@ -275,12 +275,12 @@ Improvements
 
 - `LocalDataTrack` name is no longer provided via static `create` method argument. DataTrack names
  are now provided via `DataTrackOptions`. Reference snippets below:
- 
+
     Creating a `LocalDataTrack` with name _before_ `2.0.0-preview6`
 
         String dataTrackName = "data";
         LocalDataTrack localDataTrack = LocalDataTrack.create(context, dataTrackName);
-     
+
     Creating a `LocalDataTrack` with name _after_ `2.0.0-preview6`
 
         String dataTrackName = "data";
@@ -288,16 +288,16 @@ Improvements
              .name("data")
              .build();
         LocalDataTrack localDataTrack = LocalDataTrack.create(context, dataTrackOptions);
-        
+
 - Updated javadoc to include note about `VideoView#setVideoScaleType`. Scale type will only
- be applied to dimensions defined as `WRAP_CONTENT` or a custom value. Setting a width or height to 
+ be applied to dimensions defined as `WRAP_CONTENT` or a custom value. Setting a width or height to
  `MATCH_PARENT` results in the video being scaled to fill the maximum value of the dimension.
 - Add warning log when calling `setVideoScaleType` when width or height is set to `MATCH_PARENT`
 
 Bug Fixes
 
 - Fixed a potential crash when publishing or unpublishing a Data Track.
-    
+
 Known issues
 
 - Network handoff, and subsequent connection renegotiation is not supported for IPv6 networks [#72](https://github.com/twilio/video-quickstart-android/issues/72)
@@ -309,16 +309,16 @@ Known issues
 Features
 
 - Added the following callbacks to `LocalParticipant.Listener`
-  - `onAudioTrackPublicationFailed` - Notifies listener that local participant failed to publish 
+  - `onAudioTrackPublicationFailed` - Notifies listener that local participant failed to publish
   audio track.
-  - `onVideoTrackPublicationFailed` - Notifies listener that local participant failed to publish 
+  - `onVideoTrackPublicationFailed` - Notifies listener that local participant failed to publish
   video track.
-  - `onVideoTrackPublicationFailed` - Notifies listener that local participant failed to publish 
+  - `onVideoTrackPublicationFailed` - Notifies listener that local participant failed to publish
   video track.
-  
+
 Improvements
 
-- Include javadoc and sources jar with artifacts published to Bintray. 
+- Include javadoc and sources jar with artifacts published to Bintray.
 - Added support for `DataTrack` API with Group rooms.
 - Updated to Build Tools 26.0.2
 - Support annotations and Relinker no longer exposed at compile time
@@ -327,22 +327,22 @@ and `DataTrack`.
 - Twilio CDN no longer hosts the Video Android aar artifacts or Javadocs
 
 ######Accessing Artifacts
-If you are downloading Video Android SDK artifacts from the Twilio CDN then there are two 
+If you are downloading Video Android SDK artifacts from the Twilio CDN then there are two
 options available moving forward.
 
 1. Follow our [Downloading Video SDKs Guide for Android](https://www.twilio.com/docs/api/video/download-video-sdks#android-sdk).
 2. Download the artifacts [directly from Bintray](https://bintray.com/twilio/releases/video-android#files/com/twilio/video-android).
 
 ######Viewing Javadocs
-All Javadocs back to `1.0.0-preview1` are now hosted on [Github Pages](https://pages.github.com/) 
+All Javadocs back to `1.0.0-preview1` are now hosted on [Github Pages](https://pages.github.com/)
 with the following URL scheme. `https://twilio.github.io/twilio-video-android/docs/{version}`
 
   - To view `2.0.0-preview5` Javadocs go to [https://twilio.github.io/twilio-video-android/docs/2.0.0-preview5](https://twilio.github.io/twilio-video-android/docs/2.0.0-preview5)
 
 Bug Fixes
 
-- Fixed NPE when calling `takePicture` on `CameraCapturer`. 
-    
+- Fixed NPE when calling `takePicture` on `CameraCapturer`.
+
 Known issues
 
 - Network handoff, and subsequent connection renegotiation is not supported for IPv6 networks [#72](https://github.com/twilio/video-quickstart-android/issues/72)
@@ -355,66 +355,66 @@ Features
 
 - Added new `DataTrack` API. A data track represents a unidirectional source that allow sharing
 string and binary data with all participants of a Room. Data tracks function similarly to audio and
-video tracks and can be provided via `ConnectOptions` and published using 
-`LocalParticipant#publishTrack`. Messages sent on the data track are not guaranteed to be 
-delivered to all the participants. The following snippets demonstrate how to send and receive 
+video tracks and can be provided via `ConnectOptions` and published using
+`LocalParticipant#publishTrack`. Messages sent on the data track are not guaranteed to be
+delivered to all the participants. The following snippets demonstrate how to send and receive
 messages with data tracks.
 
 Creating a `LocalDataTrack`
 
     LocalDataTrack localDataTrack = LocalDataTrack.create(context);
-    
+
 Connecting to a `Room` with a `LocalDataTrack`
 
     ConnectOptions connectOptions = new ConnectOptions.Builder(token)
             .dataTracks(Collections.singletonList(localDataTrack))
             .build();
     Video.connect(context, connectOptions, roomListener);
-    
+
 Publishing a `LocalDataTrack`
 
     // ... Connected to room
     LocalParticipant localParticipant = room.getLocalParticipant();
-    
+
     localParticipant.publish(localDataTrack);
-    
+
 Observing `RemoteDataTrackPublication` and `RemoteDataTrack`
 
     RemoteParticipant.Listener participantListener = new RemoteParticipant.Listener() {
             // ... complete interface ellided
-            
+
             // Participant has published data track
             @Override
             public void onDataTrackPublished(RemoteParticipant remoteParticipant,
                                              RemoteDataTrackPublication remoteDataTrackPublication);
-    
+
             // Participant has unpublished data track
             @Override
             public void onDataTrackUnpublished(RemoteParticipant remoteParticipant,
                                                RemoteDataTrackPublication remoteDataTrackPublication);
-    
+
             // Data track has been subscribed to and messages can be observed.
             @Override
             public void onDataTrackSubscribed(RemoteParticipant remoteParticipant,
                                               RemoteDataTrackPublication remoteDataTrackPublication,
                                               RemoteDataTrack remoteDataTrack);
-    
+
             // Data track has been unsubsubscribed from and messages cannot be observed.
             @Override
             public void onDataTrackUnsubscribed(RemoteParticipant remoteParticipant,
                                                 RemoteDataTrackPublication remoteDataTrackPublication,
                                                 RemoteDataTrack remoteDataTrack);
     };
-    
+
 Sending messages on `LocalDataTrack`
 
     String message = "Hello DataTrack!";
     ByteBuffer messageBuffer = ByteByffer.wrap(new byte[]{ 0xf, 0xe });
-    
+
     localDataTrack.send(message);
     localDataTrack.send(messageBuffer);
-    
-Observing messages from data track 
+
+Observing messages from data track
 
     RemoteDataTrack.Listener dataTrackListener = new RemoteDataTrack.Listener() {
             @Override
@@ -422,22 +422,22 @@ Observing messages from data track
                 // Should print "Hello DataTrack!"
                 Log.d(TAG, String.format("Received data track message: %s", message));
             }
-            
+
             @Override
             public void onMessage(ByteBuffer message) {
                 Log.d(TAG, "Received message buffer on data track!");
             }
     };
-    
+
 Improvements
 
 - Moved pre-defined aspect ratios from `VideoConstraints` class to `AspectRatio` class.
 - Local audio, video, and data tracks return their track IDs for `getName` if no name was specified.
 - Improved threading contract.
-    
+
 Bug Fixes
 
-- Fixed issue that caused track and room names with certain UTF-8 characters to be improperly 
+- Fixed issue that caused track and room names with certain UTF-8 characters to be improperly
 encoded. [#179](https://github.com/twilio/video-quickstart-android/issues/179)
 
 Known issues
@@ -445,7 +445,7 @@ Known issues
 - Network handoff, and subsequent connection renegotiation is not supported for IPv6 networks [#72](https://github.com/twilio/video-quickstart-android/issues/72)
 - Participant disconnect event can take up to 120 seconds to occur [#80](https://github.com/twilio/video-quickstart-android/issues/80) [#73](https://github.com/twilio/video-quickstart-android/issues/73)
 - Codec preferences do not function correctly in a hybrid codec Group Room.
-- DataTrack support for Group Rooms is currently available only on JavaScript. DataTrack support 
+- DataTrack support for Group Rooms is currently available only on JavaScript. DataTrack support
 for Group Rooms will be available on iOS and Android soon.
 
 ####2.0.0-preview3
@@ -456,7 +456,7 @@ Improvements
 
 Bug Fixes
 
-- Fixed case on some devices where `CameraCapturer` incorrectly reported a failure to close the 
+- Fixed case on some devices where `CameraCapturer` incorrectly reported a failure to close the
 camera.
 - Improved echo cancellation on Nexus 6P and Nexus 6 by enabling hardware echo canceller and disabling OpenSL ES.
 - Fixed crash disconnecting from `Room` that has not connected [#116](https://github.com/twilio/video-quickstart-android/issues/116)
@@ -487,17 +487,17 @@ Known issues
 
 Features
 
-- Added `EncodingParameters` which constrains how much bandwidth is used to share audio and 
-video. This object has been added to `ConnectOptions` and can also be set on `LocalParticipant` 
+- Added `EncodingParameters` which constrains how much bandwidth is used to share audio and
+video. This object has been added to `ConnectOptions` and can also be set on `LocalParticipant`
 after joining a `Room`.
 - Added two static `create` methods to `LocalAudioTrack` and `LocalVideoTrack` that allow creating
 named tracks. The following snippet demonstrates how to create a video track named "screen".
 
-      LocalVideoTrack screenVideoTrack = LocalVideoTrack.create(context, 
-              true, 
-              screenCapturer, 
-              "screen"); 
-              
+      LocalVideoTrack screenVideoTrack = LocalVideoTrack.create(context,
+              true,
+              screenCapturer,
+              "screen");
+
 - Moved `getTrackId` from `Track` to `LocalAudioTrack` and `LocalVideoTrack`.
 - Added `AudioCodec` and `VideoCodec` as part of the new codec preferences API. Audio and video
 codec preferences can be set in `ConnectOptions`. The following snippet
@@ -509,40 +509,40 @@ demonstrates how to prefer the iSAC audio codec and VP9 video codec.
               .preferVideoCodecs(Collections.singletonList(VideoCodec.VP9))
               .build();
 
-- Added `RemoteAudioTrack` and `RemoteVideoTrack`. These new objects extend `AudioTrack` and 
-`VideoTrack` respectively and come with the following new method: 
+- Added `RemoteAudioTrack` and `RemoteVideoTrack`. These new objects extend `AudioTrack` and
+`VideoTrack` respectively and come with the following new method:
   - `getName` - Returns the name of the track or an empty string if no name is specified.
-- Added `enablePlayback` to new `RemoteAudioTrack` which allows developers to mute the audio 
+- Added `enablePlayback` to new `RemoteAudioTrack` which allows developers to mute the audio
  received from a `RemoteParticipant`.
-- Added `RemoteAudioTrackPublication` which represents a published `RemoteAudioTrack`. This new 
-class contains the following methods: 
+- Added `RemoteAudioTrackPublication` which represents a published `RemoteAudioTrack`. This new
+class contains the following methods:
   - `getTrackSid` - Returns the identifier of a remote video track within the scope of a `Room`.
   - `getTrackName` - Returns the name of the track or an empty string if no name was specified.
   - `isTrackEnabled` - Checks if the track is enabled.
   - `getAudioTrack` - Returns the base class object of the remote audio track published.
   - `getRemoteAudioTrack` - Returns the remote audio track published.
-- Added `RemoteVideoTrackPublication` which represents a published `RemoteVideoTrack`. This new 
-class contains the following methods: 
+- Added `RemoteVideoTrackPublication` which represents a published `RemoteVideoTrack`. This new
+class contains the following methods:
   - `getTrackSid` - Returns the identifier of a remote video track within the scope of a `Room`.
   - `getTrackName` - Returns the name of the track or an empty string if no name was specified.
   - `isTrackEnabled` - Checks if the track is enabled.
   - `getAudioTrack` - Returns the base class object of the remote audio track published.
   - `getRemoteAudioTrack` - Returns the remote audio track published.
-- Added `LocalAudioTrackPublication` which represents a published `LocalAudioTrack`. This new 
-class contains the following methods: 
+- Added `LocalAudioTrackPublication` which represents a published `LocalAudioTrack`. This new
+class contains the following methods:
   - `getTrackSid` - Returns the identifier of a local video track within the scope of a `Room`.
   - `getTrackName` - Returns the name of the track or an empty string if no name was specified.
   - `isTrackEnabled` - Checks if the track is enabled.
   - `getAudioTrack` - Returns the base class object of the local audio track published.
   - `getLocalAudioTrack` - Returns the local audio track published.
-- Added `LocalVideoTrackPublication` which represents a published `LocalVideoTrack`. This new 
-class contains the following methods: 
+- Added `LocalVideoTrackPublication` which represents a published `LocalVideoTrack`. This new
+class contains the following methods:
   - `getTrackSid` - Returns the identifier of a local video track within the scope of a `Room`.
   - `getTrackName` - Returns the name of the track or an empty string if no name was specified.
   - `isTrackEnabled` - Checks if the track is enabled.
   - `getAudioTrack` - Returns the base class object of the local audio track published.
   - `getLocalAudioTrack` - Returns the local audio track published.
-- Converted `Participant` to an interface and migrated previous functionality into 
+- Converted `Participant` to an interface and migrated previous functionality into
 `RemoteParticipant`. `LocalParticipant` and the new `RemoteParticipant` implement `Participant`.
 - Added `RemoteParticipant#getRemoteAudioTracks` and `RemoteParticipant#getRemoteVideoTracks` which
 return `List<RemoteAudioTrackPublication>` and `List<RemoteVideoTrackPublication>` respectively.
@@ -554,17 +554,17 @@ return `List<RemoteAudioTrackPublication>` and `List<RemoteVideoTrackPublication
   - `onVideoTrackAdded` renamed to `onVideoTrackPublished`.
   - `onVideoTrackRemoved` renamed to `onVideoTrackUnpublished`.
 - Added the following callbacks to `RemoteParticipant.Listener`:
-  - `onAudioTrackSubscribed` - Indicates when audio is flowing from a remote particpant's audio 
+  - `onAudioTrackSubscribed` - Indicates when audio is flowing from a remote particpant's audio
   track. This callback includes the `RemoteAudioTrack` that was subscribed to.
-  - `onAudioTrackUnsubscribed` - Indicates when audio is no longer flowing from a remote 
+  - `onAudioTrackUnsubscribed` - Indicates when audio is no longer flowing from a remote
   partipant's audio track. This callback includes the `RemoteAudioTrack` that was subscribed to.
-  - `onVideoTrackSubscribed` - Indicates when video is flowing from a remote participant's video 
+  - `onVideoTrackSubscribed` - Indicates when video is flowing from a remote participant's video
   track. This callback includes the `RemoteVideoTrack` that was subscribed to.
   - `onVideoTrackUnsubscribed` - Indicates when video is no longer flowing from a remote
   participant's video track. This callback includes the `RemoteVideoTrack` that was subscribed to.
 - Renamed `TrackStats` to `RemoteTrackStats`, `AudioTrackStats` to `RemoteAudioTrackStats`, and
 `VideoTrackStats` to `RemoteVideoTrackStats`
-- Renamed `LocalParticipant#addAudioTrack` and `LocalParticipant#addVideoTrack` to 
+- Renamed `LocalParticipant#addAudioTrack` and `LocalParticipant#addVideoTrack` to
 `LocalParticipant#publishedTrack`.
 - Added `LocalParticipant.Listener` which is provides the following callbacks:
   - `onAudioTrackPublished` - Indicates when a local audio track has been published to a `Room`.
@@ -575,11 +575,11 @@ return `List<LocalAudioTrackPublication>` and `List<LocalVideoTrackPublication>`
 Improvements
 
 - Null renderers cannot be added or removed from local or remote video tracks.
-- Renderers cannot be added or removed from a `LocalVideoTrack` that has been released. 
+- Renderers cannot be added or removed from a `LocalVideoTrack` that has been released.
 
 Bug Fixes
 
-- Change visibility of `LocalParticipant#release()` from public to package. 
+- Change visibility of `LocalParticipant#release()` from public to package.
 [#132](https://github.com/twilio/video-quickstart-android/issues/132)
 - Codec preferences do not function correctly in a hybrid codec Group Room.
 
@@ -653,7 +653,7 @@ Improvements
 
 - Updated `targetSdkVersion` to 27
 - Updated `buildToolsVersion` to 27.0.3
-- Updated Android Gradle plugin to to 3.0.1 
+- Updated Android Gradle plugin to to 3.0.1
 
 Known issues
 
@@ -697,7 +697,7 @@ Known issues
 Improvements
 
 - Updated javadoc to include note about `VideoView#setVideoScaleType`. Scale type will only
- be applied to dimensions defined as `WRAP_CONTENT` or a custom value. Setting a width or height to 
+ be applied to dimensions defined as `WRAP_CONTENT` or a custom value. Setting a width or height to
  `MATCH_PARENT` results in the video being scaled to fill the maximum value of the dimension.
 - Add warning log when calling `setVideoScaleType` when width or height is set to `MATCH_PARENT`
 
@@ -715,14 +715,14 @@ Improvements
 - Twilio CDN no longer hosts the Video Android aar artifacts or Javadocs
 
 ######Accessing Artifacts
-If you are downloading Video Android SDK artifacts from the Twilio CDN then there are two 
+If you are downloading Video Android SDK artifacts from the Twilio CDN then there are two
 options available moving forward.
 
 1. Follow our [Downloading Video SDKs Guide for Android](https://www.twilio.com/docs/api/video/download-video-sdks#android-sdk).
 2. Download the artifacts [directly from Bintray](https://bintray.com/twilio/releases/video-android#files/com/twilio/video-android).
 
 ######Viewing Javadocs
-All Javadocs back to `1.0.0-preview1` are now hosted on [Github Pages](https://pages.github.com/) 
+All Javadocs back to `1.0.0-preview1` are now hosted on [Github Pages](https://pages.github.com/)
 with the following URL scheme. `https://twilio.github.io/twilio-video-android/docs/{version}`
 
   - To view `1.3.7` Javadocs go to [https://twilio.github.io/twilio-video-android/docs/1.3.7](https://twilio.github.io/twilio-video-android/docs/1.3.7)
@@ -730,7 +730,7 @@ with the following URL scheme. `https://twilio.github.io/twilio-video-android/do
 
 Bug Fixes
 
-- Fixed NPE when calling `takePicture` on `CameraCapturer`. 
+- Fixed NPE when calling `takePicture` on `CameraCapturer`.
 
 Known issues
 
@@ -743,7 +743,7 @@ Known issues
 
 Improvements
 
-- Include javadoc and sources jar with artifacts published to Bintray. 
+- Include javadoc and sources jar with artifacts published to Bintray.
 - Updated to Build Tools 26.0.2
 - Support annotations and Relinker no longer exposed at compile time
 
@@ -758,7 +758,7 @@ Known issues
 
 Improvements
 
-- Improved threading contract. 
+- Improved threading contract.
 
 Known issues
 
@@ -771,7 +771,7 @@ Known issues
 
 Bug Fixes
 
-- Fixed issue that caused room names with certain UTF-8 characters to be improperly 
+- Fixed issue that caused room names with certain UTF-8 characters to be improperly
 encoded. [#179](https://github.com/twilio/video-quickstart-android/issues/179)
 
 Known issues
@@ -799,7 +799,7 @@ Known issues
 
 Improvements
 
-- Upgraded to Android Oreo from Nougat 
+- Upgraded to Android Oreo from Nougat
 - Fixed crash disconnecting from `Room` that has not connected [#116](https://github.com/twilio/video-quickstart-android/issues/116)
 
 Known issues
@@ -813,7 +813,7 @@ Known issues
 
 Improvements
 
-- Fixed case on some devices where `CameraCapturer` incorrectly reported a failure to close the 
+- Fixed case on some devices where `CameraCapturer` incorrectly reported a failure to close the
 camera.
 - Improved echo cancellation on Nexus 6P and Nexus 6 by enabling hardware echo canceller and disabling OpenSL ES.
 
@@ -828,18 +828,18 @@ Known issues
 ####1.3.0
 
 Features
-- Added static method `CameraCapturer.isSourceAvailable` that validates if a camera source is 
+- Added static method `CameraCapturer.isSourceAvailable` that validates if a camera source is
 available on the device. This method is used when creating a `CameraCapturer` instance and when
 calling `CameraCapturer#switchCamera` to validate that a source can be used for capturing frames.
 
 Improvements
 
-- Added javadoc to `Participant.Listener`, `ScreenCapturer.Listener`, `VideoCapturer.Listener`, 
-and `VideoRenderer.Listener`. 
+- Added javadoc to `Participant.Listener`, `ScreenCapturer.Listener`, `VideoCapturer.Listener`,
+and `VideoRenderer.Listener`.
 
 Bug Fixes
 
-- Fixed a bug where multiple participants adding/removing tracks at the same time was not handled 
+- Fixed a bug where multiple participants adding/removing tracks at the same time was not handled
 properly.
 
 Known issues
@@ -854,7 +854,7 @@ Known issues
 
 Improvements
 
-- Calling `Participant#setListener` with `null` is no longer allowed. 
+- Calling `Participant#setListener` with `null` is no longer allowed.
 
 Bug Fixes
 
@@ -891,10 +891,10 @@ Features
 
 Improvements
 
-- Deprecated `LocalParticipant#release`. This method is not meant to be called and is now a 
+- Deprecated `LocalParticipant#release`. This method is not meant to be called and is now a
 no-op until it is removed in `2.0.0-preview1` release. [#132](https://github.com/twilio/video-quickstart-android/issues/132)
 - Added more checks and logging to `CameraCapturer` to help identify cases when the camera service cannot be reached. [#126](https://github.com/twilio/video-quickstart-android/issues/126)
-- Changed `getSupportedFormats` for `CameraCapturer`, `ScreenCapturer`, and `Camera2Capturer` to 
+- Changed `getSupportedFormats` for `CameraCapturer`, `ScreenCapturer`, and `Camera2Capturer` to
 be `synchronized`.
 
 Bug Fixes
@@ -914,7 +914,7 @@ Known issues
 Bug Fixes
 
 - Fixed bug in `VideoConstraints` logic where valid VideoCapturer video formats were ignored due to very strict checking of aspect ratios in WebRTC
-- Fixed bug in Logger.java where setting certain LogLevel's did not print error logs 
+- Fixed bug in Logger.java where setting certain LogLevel's did not print error logs
 - Fixed bug in `LocalVideoTrack` where FPS check was incorrectly marking a constraint as incompatible. [#127](https://github.com/twilio/video-quickstart-android/issues/127)
 
 Known issues
@@ -929,15 +929,15 @@ Known issues
 
 Improvements
 
-- Moved signaling network traffic to port 443. 
-- Added `Camera2Capturer`. `Camera2Capturer` uses `android.hardware.camera2` to implement 
-a `VideoCapturer`. `Camera2Capturer` does not yet implement `takePicture` and the ability to modify 
+- Moved signaling network traffic to port 443.
+- Added `Camera2Capturer`. `Camera2Capturer` uses `android.hardware.camera2` to implement
+a `VideoCapturer`. `Camera2Capturer` does not yet implement `takePicture` and the ability to modify
 camera parameters once `Camera2Capturer` is running.
 
 Create `LocalVideoTrack` with `Camera2Capturer`
 
-    
-    // Check if device supports Camera2Capturer 
+
+    // Check if device supports Camera2Capturer
     if (Camera2Capturer.isSupported(context)) {
         // Use CameraManager.getCameraIdList() for a list of all available camera IDs
         String cameraId = "0";
@@ -954,9 +954,9 @@ Create `LocalVideoTrack` with `Camera2Capturer`
         Camera2Capturer camera2Capturer = new Camera2Capturer(context, cameraId, camera2Listener);
         LocalVideoTrack = LocalVideoTrack.create(context, true, camera2Capturer);
     }
-    
-- This release adds Insights statistics collection, which reports RTP quality metrics back to 
-Twilio. In the future, these statistics will be included in customer-facing reports visible in the 
+
+- This release adds Insights statistics collection, which reports RTP quality metrics back to
+Twilio. In the future, these statistics will be included in customer-facing reports visible in the
 Twilio Console. Insights collection is enabled by default, if you wish to disable it reference
 the following snippet.
 
@@ -967,9 +967,9 @@ the following snippet.
 
 Bug Fixes
 
-- Improved signaling connection retry logic. In the case of an error, the SDK will continue 
+- Improved signaling connection retry logic. In the case of an error, the SDK will continue
 to retry with a backoff timer when errors are encountered.
-- Fixed a bug in network handoff scenarios where the SDK was not handling the race condition 
+- Fixed a bug in network handoff scenarios where the SDK was not handling the race condition
 if network lost or network changed event is received when a network changed event is being processed.
 - Fixed bug where audio and video tracks were not available after `onParticipantDisconnected` was
 invoked [#125](https://github.com/twilio/video-quickstart-android/issues/125)
@@ -1002,8 +1002,8 @@ Improvements
 
 - Improved internal native Room operations.
 - Improved `ScreenCapturer` performance by enabling capturing to a texture.
-- Added new error code for case when participant gets disconnected because of duplicate participant 
-joined the room. 
+- Added new error code for case when participant gets disconnected because of duplicate participant
+joined the room.
 
 Bug Fixes
 
@@ -1026,7 +1026,7 @@ Known issues
 - VP8 is the only supported codec [#71](https://github.com/twilio/video-quickstart-android/issues/71)
 - Participant disconnect event can take up to 120 seconds to occur [#80](https://github.com/twilio/video-quickstart-android/issues/80) [#73](https://github.com/twilio/video-quickstart-android/issues/73)
 - Missing media when adding audio/video tracks quickly while connected to room [#90](https://github.com/twilio/video-quickstart-android/issues/90)
-- Disconnecting from a `Room` that has not connected sometimes results in a crash [#116](https://github.com/twilio/video-quickstart-android/issues/116) 
+- Disconnecting from a `Room` that has not connected sometimes results in a crash [#116](https://github.com/twilio/video-quickstart-android/issues/116)
 - LocalParticipant release method is public [#132](https://github.com/twilio/video-quickstart-android/issues/132)
 
 ####1.0.0-beta17
@@ -1119,12 +1119,12 @@ Improvements
 - Added enum `VideoFrame.RotationAngle` to ensure `VideoFrame` objects are constructed with
 valid orientation values.
 - Updated `CameraCapturer` to be powered by latest WebRTC camera capturer.
-- Updated `CameraCapturer` to allow scheduling a picture to be taken while the capturer is not 
+- Updated `CameraCapturer` to allow scheduling a picture to be taken while the capturer is not
 running.
 
 Bug Fixes
 
-- Reverted decoding from surface textures. This revert 
+- Reverted decoding from surface textures. This revert
 should fix problems for custom `VideoRenderer`s receiving `null` YUV data for `VideoTrack`s [#93](https://github.com/twilio/video-quickstart-android/issues/93)
 
 Known issues
@@ -1217,7 +1217,7 @@ Known issues
 Improvements
 
 - Moved `connect` from instance method to static method on `VideoClient` class. Calling the new static `connect` method requires a `Context` in addition to `ConnectOptions` and a `Room.Listener` . `VideoClient` is no longer an object that can be instantiated and an instance is no longer required to connect to a `Room`.
-- Moved access token parameter from `VideoClient` constructor to `ConnectOptions.Builder` constructor. 
+- Moved access token parameter from `VideoClient` constructor to `ConnectOptions.Builder` constructor.
 
 Connecting to a `Room` before 1.0.0-beta11
 
@@ -1229,7 +1229,7 @@ Connecting to a `Room` before 1.0.0-beta11
         .build();
     videoClient.connect(connectOptions, roomListener);
 
-Connecting to a `Room` with static `connect` 
+Connecting to a `Room` with static `connect`
 
     ConnectOptions connectOptions = new ConnectOptions.Builder(accessToken)
         .roomName(roomName)
@@ -1291,7 +1291,7 @@ Features
 Bug Fixes
 
 - Fixed camera freeze when using `CameraCapturer#updateCameraParameters`  API #54
-- Fixed crash when caused by calling `getStats()`  immediately after disconnecting from `Room` 
+- Fixed crash when caused by calling `getStats()`  immediately after disconnecting from `Room`
 - Fixed heap corruption on HTC 10
 - Fixed memory leaks parsing signaling messages
 - Attempt ICE restarts when a PeerConnection fails
@@ -1327,7 +1327,7 @@ Known issues
 Bug Fixes
 
 - Fixed black frames being rendered after device is rotated.
-- Fixed crash in `EglBaseProvider`. 
+- Fixed crash in `EglBaseProvider`.
 
 Known issues
 
@@ -1465,10 +1465,9 @@ Known issues
 
 - IPv6 is not fully supported
 - Network handoff, and subsequent connection renegotiation is not supported
-- Resource leak when implementing custom `VideoRenderer` 
+- Resource leak when implementing custom `VideoRenderer`
 - VP8 is the only supported codec [#71](https://github.com/twilio/video-quickstart-android/issues/71)
 - Using x86 or x86_64 devices results in a crash
 - Participant identities with unicode characters are not supported
 
 **Looking for older changlog entries?** [You can find the changelog for the deprecated Programmable Video Conversations API here](https://www.twilio.com/docs/api/video/conversations-api-deprecated/changelogs/android).
-

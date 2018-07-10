@@ -18,37 +18,27 @@ package com.twilio.video;
 import android.support.annotation.NonNull;
 
 public abstract class BaseTrackStats {
-    /**
-     * Track server identifier
-     */
+    /** Track server identifier */
     @NonNull public final String trackSid;
 
-    /**
-     * Total number of RTP packets lost for this SSRC since
-     * the beginning of the reception
-     */
+    /** Total number of RTP packets lost for this SSRC since the beginning of the reception */
     public final int packetsLost;
 
-    /**
-     * Name of codec used for this track
-     */
+    /** Name of codec used for this track */
     @NonNull public final String codec;
 
-    /**
-     * The SSRC identifier of the source
-     */
+    /** The SSRC identifier of the source */
     @NonNull public final String ssrc;
 
-    /**
-     * Unix timestamp in milliseconds
-     */
+    /** Unix timestamp in milliseconds */
     public final double timestamp;
 
-    BaseTrackStats(@NonNull String trackSid,
-                   int packetsLost,
-                   @NonNull String codec,
-                   @NonNull String ssrc,
-                   double timestamp) {
+    BaseTrackStats(
+            @NonNull String trackSid,
+            int packetsLost,
+            @NonNull String codec,
+            @NonNull String ssrc,
+            double timestamp) {
         this.trackSid = trackSid;
         this.packetsLost = packetsLost;
         this.codec = codec;

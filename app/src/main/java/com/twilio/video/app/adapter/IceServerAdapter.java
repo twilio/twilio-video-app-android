@@ -22,12 +22,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
-
 import com.twilio.video.app.model.TwilioIceServer;
-
 import java.util.List;
-
-import butterknife.ButterKnife;
 
 public class IceServerAdapter extends BaseAdapter {
 
@@ -59,9 +55,12 @@ public class IceServerAdapter extends BaseAdapter {
         TextView urlTextView;
 
         if (convertView == null) {
-            convertView = LayoutInflater
-                    .from(context)
-                    .inflate(android.R.layout.simple_list_item_multiple_choice, parent, false);
+            convertView =
+                    LayoutInflater.from(context)
+                            .inflate(
+                                    android.R.layout.simple_list_item_multiple_choice,
+                                    parent,
+                                    false);
         }
         urlTextView = convertView.findViewById(android.R.id.text1);
         urlTextView.setText(iceServers.get(position).getUrl());

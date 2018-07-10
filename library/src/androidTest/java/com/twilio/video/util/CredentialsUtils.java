@@ -16,15 +16,13 @@
 
 package com.twilio.video.util;
 
+import static junit.framework.TestCase.assertFalse;
+import static junit.framework.TestCase.assertTrue;
 
 import com.twilio.video.test.BuildConfig;
 import com.twilio.video.token.VideoAccessToken;
-
 import java.util.HashMap;
 import java.util.Map;
-
-import static junit.framework.TestCase.assertFalse;
-import static junit.framework.TestCase.assertTrue;
 
 public class CredentialsUtils {
     private static final int TTL_DEFAULT = 1800;
@@ -37,21 +35,22 @@ public class CredentialsUtils {
     public static final String STAGE_ACCOUNT_SID = "stage_account_sid";
     public static final String STAGE_API_KEY = "stage_api_key";
     public static final String STAGE_API_KEY_SECRET = "stage_api_key_secret";
-    public static final String TWILIO_VIDEO_JSON_NOT_PROVIDED = "library/twilio-video.json is " +
-            "required to create tokens for library tests that connect to a Room";
+    public static final String TWILIO_VIDEO_JSON_NOT_PROVIDED =
+            "library/twilio-video.json is "
+                    + "required to create tokens for library tests that connect to a Room";
 
     public static String getAccessToken(String username, Topology topology) {
-        Preconditions.checkNotNull(BuildConfig.twilioCredentials,
-                TWILIO_VIDEO_JSON_NOT_PROVIDED);
-        Map<String, String> credentials = resolveCredentials(
-                Environment.fromString(BuildConfig.ENVIRONMENT));
-        VideoAccessToken videoAccessToken = new VideoAccessToken.Builder(
-                credentials.get(ACCOUNT_SID),
-                credentials.get(API_KEY),
-                credentials.get(API_KEY_SECRET))
-                .identity(username)
-                .ttl(TTL_DEFAULT)
-                .build();
+        Preconditions.checkNotNull(BuildConfig.twilioCredentials, TWILIO_VIDEO_JSON_NOT_PROVIDED);
+        Map<String, String> credentials =
+                resolveCredentials(Environment.fromString(BuildConfig.ENVIRONMENT));
+        VideoAccessToken videoAccessToken =
+                new VideoAccessToken.Builder(
+                                credentials.get(ACCOUNT_SID),
+                                credentials.get(API_KEY),
+                                credentials.get(API_KEY_SECRET))
+                        .identity(username)
+                        .ttl(TTL_DEFAULT)
+                        .build();
 
         return videoAccessToken.getJwt();
     }
@@ -67,8 +66,8 @@ public class CredentialsUtils {
 
                 credentials.put(ACCOUNT_SID, BuildConfig.twilioCredentials.get(DEV_ACCOUNT_SID));
                 credentials.put(API_KEY, BuildConfig.twilioCredentials.get(DEV_API_KEY));
-                credentials.put(API_KEY_SECRET,
-                        BuildConfig.twilioCredentials.get(DEV_API_KEY_SECRET));
+                credentials.put(
+                        API_KEY_SECRET, BuildConfig.twilioCredentials.get(DEV_API_KEY_SECRET));
                 break;
             case STAGE:
                 checkCredentialDefined(STAGE_ACCOUNT_SID);
@@ -77,8 +76,8 @@ public class CredentialsUtils {
 
                 credentials.put(ACCOUNT_SID, BuildConfig.twilioCredentials.get(STAGE_ACCOUNT_SID));
                 credentials.put(API_KEY, BuildConfig.twilioCredentials.get(STAGE_API_KEY));
-                credentials.put(API_KEY_SECRET,
-                        BuildConfig.twilioCredentials.get(STAGE_API_KEY_SECRET));
+                credentials.put(
+                        API_KEY_SECRET, BuildConfig.twilioCredentials.get(STAGE_API_KEY_SECRET));
 
                 break;
             case PROD:
@@ -99,9 +98,11 @@ public class CredentialsUtils {
     }
 
     private static void checkCredentialDefined(String credentialKey) {
-        assertTrue("Credential map does not contain key: " + credentialKey,
-            BuildConfig.twilioCredentials.containsKey(credentialKey));
-        assertFalse("Credential " + credentialKey + " must not be null or empty",
-            StringUtils.isNullOrEmpty(BuildConfig.twilioCredentials.get(credentialKey)));
+        assertTrue(
+                "Credential map does not contain key: " + credentialKey,
+                BuildConfig.twilioCredentials.containsKey(credentialKey));
+        assertFalse(
+                "Credential " + credentialKey + " must not be null or empty",
+                StringUtils.isNullOrEmpty(BuildConfig.twilioCredentials.get(credentialKey)));
     }
 }

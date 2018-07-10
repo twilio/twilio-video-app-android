@@ -16,31 +16,30 @@
 
 package com.twilio.video.base;
 
+import static org.junit.Assume.assumeTrue;
+
 import android.Manifest;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.rule.GrantPermissionRule;
-
 import com.twilio.video.Camera2Capturer;
 import com.twilio.video.LocalVideoTrack;
 import com.twilio.video.ui.CameraCapturerTestActivity;
 import com.twilio.video.util.FrameCountRenderer;
-
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
-
-import static org.junit.Assume.assumeTrue;
 
 public abstract class BaseCamera2CapturerTest extends BaseVideoTest {
     protected static final int CAMERA2_CAPTURER_DELAY_MS = 3500;
 
     @Rule
-    public GrantPermissionRule cameraPermissionsRule = GrantPermissionRule
-            .grant(Manifest.permission.CAMERA);
+    public GrantPermissionRule cameraPermissionsRule =
+            GrantPermissionRule.grant(Manifest.permission.CAMERA);
 
     @Rule
     public ActivityTestRule<CameraCapturerTestActivity> activityRule =
             new ActivityTestRule<>(CameraCapturerTestActivity.class);
+
     protected CameraCapturerTestActivity cameraCapturerActivity;
     protected Camera2Capturer camera2Capturer;
     protected LocalVideoTrack localVideoTrack;

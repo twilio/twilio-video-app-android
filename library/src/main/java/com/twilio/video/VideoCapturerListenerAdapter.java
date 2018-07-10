@@ -19,7 +19,8 @@ package com.twilio.video;
 final class VideoCapturerListenerAdapter implements VideoCapturer.Listener {
     private final org.webrtc.VideoCapturer.CapturerObserver webRtcCapturerObserver;
 
-    public VideoCapturerListenerAdapter(org.webrtc.VideoCapturer.CapturerObserver webRtcCapturerObserver) {
+    public VideoCapturerListenerAdapter(
+            org.webrtc.VideoCapturer.CapturerObserver webRtcCapturerObserver) {
         this.webRtcCapturerObserver = webRtcCapturerObserver;
     }
 
@@ -37,7 +38,8 @@ final class VideoCapturerListenerAdapter implements VideoCapturer.Listener {
         if (videoFrame.webRtcVideoFrame != null) {
             webRtcCapturerObserver.onFrameCaptured(videoFrame.webRtcVideoFrame);
         } else {
-            webRtcCapturerObserver.onByteBufferFrameCaptured(videoFrame.imageBuffer,
+            webRtcCapturerObserver.onByteBufferFrameCaptured(
+                    videoFrame.imageBuffer,
                     videoFrame.dimensions.width,
                     videoFrame.dimensions.height,
                     videoFrame.orientation.getValue(),

@@ -18,9 +18,7 @@ package com.twilio.video;
 
 import android.support.annotation.NonNull;
 
-/**
- * Abstract base class for audio codecs.
- */
+/** Abstract base class for audio codecs. */
 public abstract class AudioCodec {
     private final String name;
 
@@ -28,18 +26,16 @@ public abstract class AudioCodec {
         this.name = name;
     }
 
-    /**
-     * Returns the string representation of the audio codec.
-     */
-    @NonNull public String getName() {
+    /** Returns the string representation of the audio codec. */
+    @NonNull
+    public String getName() {
         return name;
     }
 
-    /**
-     * Returns the name of the audio codec.
-     */
+    /** Returns the name of the audio codec. */
     @Override
-    @NonNull public String toString() {
+    @NonNull
+    public String toString() {
         return name;
     }
 }

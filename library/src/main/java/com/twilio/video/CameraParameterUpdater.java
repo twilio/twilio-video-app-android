@@ -27,7 +27,7 @@ public interface CameraParameterUpdater {
      * Invoked when camera parameters are available for modification.
      *
      * @param cameraParameters the current parameters for the {@link android.hardware.Camera}
-     *                         associated with the {@link CameraCapturer}.
+     *     associated with the {@link CameraCapturer}.
      */
     void apply(@NonNull Camera.Parameters cameraParameters);
 }

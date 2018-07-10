@@ -16,20 +16,17 @@
 
 package com.twilio.video;
 
+import static org.mockito.Mockito.when;
+
 import android.os.Handler;
-
 import com.twilio.video.util.Constants;
-
+import java.util.Arrays;
+import java.util.Random;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-
-import java.util.Arrays;
-import java.util.Random;
-
-import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 public class LocalParticipantUnitTest {
@@ -47,18 +44,21 @@ public class LocalParticipantUnitTest {
 
     @Before
     public void setup() {
-        localParticipant = new LocalParticipant(random.nextLong(),
-                Constants.MOCK_PARTICIPANT_SID,
-                String.valueOf(random.nextInt(INT_MAX)),
-                Arrays.asList(mockLocalAudioTrackPublication),
-                Arrays.asList(mockLocalVideoTrackPublicationOne),
-                Arrays.asList(mockLocalDataTrackPublication),
-                handler);
+        localParticipant =
+                new LocalParticipant(
+                        random.nextLong(),
+                        Constants.MOCK_PARTICIPANT_SID,
+                        String.valueOf(random.nextInt(INT_MAX)),
+                        Arrays.asList(mockLocalAudioTrackPublication),
+                        Arrays.asList(mockLocalVideoTrackPublicationOne),
+                        Arrays.asList(mockLocalDataTrackPublication),
+                        handler);
     }
 
     @Test(expected = NullPointerException.class)
     public void shouldFailWithNullSid() {
-        new LocalParticipant(random.nextLong(),
+        new LocalParticipant(
+                random.nextLong(),
                 null,
                 String.valueOf(random.nextInt(INT_MAX)),
                 Arrays.asList(mockLocalAudioTrackPublication),
@@ -69,7 +69,8 @@ public class LocalParticipantUnitTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void shouldFailWithEmptySid() {
-        new LocalParticipant(random.nextLong(),
+        new LocalParticipant(
+                random.nextLong(),
                 "",
                 String.valueOf(random.nextInt(INT_MAX)),
                 Arrays.asList(mockLocalAudioTrackPublication),
@@ -80,7 +81,8 @@ public class LocalParticipantUnitTest {
 
     @Test(expected = NullPointerException.class)
     public void shouldFailWithNullIdentity() {
-        new LocalParticipant(random.nextLong(),
+        new LocalParticipant(
+                random.nextLong(),
                 Constants.MOCK_PARTICIPANT_SID,
                 null,
                 Arrays.asList(mockLocalAudioTrackPublication),
@@ -91,7 +93,8 @@ public class LocalParticipantUnitTest {
 
     @Test
     public void shouldSucceedWithValidTrackSid() {
-        new LocalParticipant(random.nextLong(),
+        new LocalParticipant(
+                random.nextLong(),
                 Constants.MOCK_PARTICIPANT_SID,
                 String.valueOf(random.nextInt(INT_MAX)),
                 Arrays.asList(mockLocalAudioTrackPublication),
@@ -162,7 +165,7 @@ public class LocalParticipantUnitTest {
     }
 
     @Test(expected = NullPointerException.class)
-    public void publshTrack_shouldNotAllowNull(){
+    public void publshTrack_shouldNotAllowNull() {
         LocalVideoTrack videoTrack = null;
         localParticipant.publishTrack(videoTrack);
 

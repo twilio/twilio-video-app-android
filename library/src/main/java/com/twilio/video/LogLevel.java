@@ -16,9 +16,7 @@
 
 package com.twilio.video;
 
-/**
- * Log levels for the SDK
- */
+/** Log levels for the SDK */
 public enum LogLevel {
     OFF,
     FATAL,

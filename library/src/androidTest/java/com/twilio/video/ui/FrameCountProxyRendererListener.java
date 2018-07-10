@@ -19,7 +19,6 @@ package com.twilio.video.ui;
 import com.twilio.video.I420Frame;
 import com.twilio.video.VideoRenderer;
 import com.twilio.video.VideoView;
-
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;

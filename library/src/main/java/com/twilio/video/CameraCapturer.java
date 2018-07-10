@@ -16,6 +16,8 @@
 
 package com.twilio.video;
 
+import static java.lang.annotation.RetentionPolicy.SOURCE;
+
 import android.Manifest;
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -29,13 +31,6 @@ import android.support.annotation.Nullable;
 import android.support.annotation.VisibleForTesting;
 import android.view.Surface;
 import android.view.WindowManager;
-
-import org.webrtc.Camera1Capturer;
-import org.webrtc.Camera1Session;
-import org.webrtc.CameraVideoCapturer;
-import org.webrtc.SurfaceTextureHelper;
-import org.webrtc.ThreadUtils;
-
 import java.io.ByteArrayOutputStream;
 import java.lang.annotation.Retention;
 import java.nio.ByteBuffer;
@@ -43,19 +38,22 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicBoolean;
-
-import static java.lang.annotation.RetentionPolicy.SOURCE;
+import org.webrtc.Camera1Capturer;
+import org.webrtc.Camera1Session;
+import org.webrtc.CameraVideoCapturer;
+import org.webrtc.SurfaceTextureHelper;
+import org.webrtc.ThreadUtils;
 
 /**
  * The CameraCapturer class is used to provide video frames for a {@link LocalVideoTrack} from a
- * given {@link CameraSource}. The frames are provided via the preview API of
- * {@link android.hardware.Camera}.
+ * given {@link CameraSource}. The frames are provided via the preview API of {@link
+ * android.hardware.Camera}.
  *
- * <p>This class represents an implementation of a {@link VideoCapturer} interface. Although
- * public, these methods are not meant to be invoked directly.</p>
+ * <p>This class represents an implementation of a {@link VideoCapturer} interface. Although public,
+ * these methods are not meant to be invoked directly.
  *
- * <p><b>Note</b>: This capturer can be reused, but cannot be shared across multiple
- * {@link LocalVideoTrack}s simultaneously.</p>
+ * <p><b>Note</b>: This capturer can be reused, but cannot be shared across multiple {@link
+ * LocalVideoTrack}s simultaneously.
  */
 public class CameraCapturer implements VideoCapturer {
     /*
@@ -69,13 +67,16 @@ public class CameraCapturer implements VideoCapturer {
     private static final Logger logger = Logger.getLogger(CameraCapturer.class);
 
     @Retention(SOURCE)
-    @IntDef({ERROR_CAMERA_FREEZE,
-            ERROR_CAMERA_SERVER_STOPPED,
-            ERROR_UNSUPPORTED_SOURCE,
-            ERROR_CAMERA_PERMISSION_NOT_GRANTED,
-            ERROR_CAMERA_SWITCH_FAILED,
-            ERROR_UNKNOWN})
+    @IntDef({
+        ERROR_CAMERA_FREEZE,
+        ERROR_CAMERA_SERVER_STOPPED,
+        ERROR_UNSUPPORTED_SOURCE,
+        ERROR_CAMERA_PERMISSION_NOT_GRANTED,
+        ERROR_CAMERA_SWITCH_FAILED,
+        ERROR_UNKNOWN
+    })
     public @interface Error {}
+
     public static final int ERROR_CAMERA_FREEZE = 0;
     public static final int ERROR_CAMERA_SERVER_STOPPED = 1;
     public static final int ERROR_UNSUPPORTED_SOURCE = 2;
@@ -83,9 +84,7 @@ public class CameraCapturer implements VideoCapturer {
     public static final int ERROR_CAMERA_SWITCH_FAILED = 5;
     public static final int ERROR_UNKNOWN = 6;
 
-    /**
-     * Camera source types.
-     */
+    /** Camera source types. */
     public enum CameraSource {
         FRONT_CAMERA,
         BACK_CAMERA
@@ -122,8 +121,7 @@ public class CameraCapturer implements VideoCapturer {
                     videoCapturerListener.onCapturerStarted(success);
 
                     // Cache camera session immediately
-                    CameraCapturer.this.camera1Session =
-                            webRtcCameraCapturer.getCameraSession();
+                    CameraCapturer.this.camera1Session = webRtcCameraCapturer.getCameraSession();
 
                     // Transition the camera capturer to running state
                     synchronized (stateLock) {
@@ -155,7 +153,6 @@ public class CameraCapturer implements VideoCapturer {
                             logger.w("Attempted to transition from " + state + " to RUNNING");
                         }
                     }
-
                 }
 
                 @Override
@@ -169,13 +166,13 @@ public class CameraCapturer implements VideoCapturer {
                 @Override
                 public void onFrameCaptured(org.webrtc.VideoFrame videoFrame) {
                     org.webrtc.VideoFrame.Buffer buffer = videoFrame.getBuffer();
-                    VideoDimensions dimensions = new VideoDimensions(buffer.getWidth(),
-                            buffer.getHeight());
+                    VideoDimensions dimensions =
+                            new VideoDimensions(buffer.getWidth(), buffer.getHeight());
                     VideoFrame.RotationAngle orientation =
                             VideoFrame.RotationAngle.fromInt(videoFrame.getRotation());
 
-                    videoCapturerListener.onFrameCaptured(new VideoFrame(videoFrame, dimensions,
-                            orientation));
+                    videoCapturerListener.onFrameCaptured(
+                            new VideoFrame(videoFrame, dimensions, orientation));
                 }
             };
     private CameraParameterUpdater cameraParameterUpdater;
@@ -200,7 +197,7 @@ public class CameraCapturer implements VideoCapturer {
                 @Override
                 public void onCameraFreezed(String s) {
                     logger.e("Camera froze.");
-                    if(listener != null) {
+                    if (listener != null) {
                         listener.onError(CameraCapturer.ERROR_CAMERA_FREEZE);
                     }
                 }
@@ -241,9 +238,10 @@ public class CameraCapturer implements VideoCapturer {
                 @Override
                 public void onCameraSwitchDone(boolean isFrontCamera) {
                     synchronized (CameraCapturer.this) {
-                        cameraSource = (cameraSource == CameraSource.FRONT_CAMERA) ?
-                                (CameraSource.BACK_CAMERA) :
-                                (CameraSource.FRONT_CAMERA);
+                        cameraSource =
+                                (cameraSource == CameraSource.FRONT_CAMERA)
+                                        ? (CameraSource.BACK_CAMERA)
+                                        : (CameraSource.FRONT_CAMERA);
                     }
                     if (listener != null) {
                         listener.onCameraSwitched();
@@ -273,8 +271,9 @@ public class CameraCapturer implements VideoCapturer {
         return isSourceAvailable(cameraCapturerFormatProvider, cameraSource);
     }
 
-    static boolean isSourceAvailable(@NonNull CameraCapturerFormatProvider cameraCapturerFormatProvider,
-                                     @NonNull CameraSource cameraSource) {
+    static boolean isSourceAvailable(
+            @NonNull CameraCapturerFormatProvider cameraCapturerFormatProvider,
+            @NonNull CameraSource cameraSource) {
         return cameraCapturerFormatProvider.getCameraId(cameraSource) != -1;
     }
 
@@ -282,9 +281,10 @@ public class CameraCapturer implements VideoCapturer {
         this(context, cameraSource, null);
     }
 
-    public CameraCapturer(@NonNull Context context,
-                          @NonNull CameraSource cameraSource,
-                          @Nullable Listener listener) {
+    public CameraCapturer(
+            @NonNull Context context,
+            @NonNull CameraSource cameraSource,
+            @Nullable Listener listener) {
         this(context, cameraSource, listener, new CameraCapturerFormatProvider());
     }
 
@@ -293,13 +293,15 @@ public class CameraCapturer implements VideoCapturer {
      * an error occurs connecting to camera service.
      */
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
-    CameraCapturer(@NonNull Context context,
-                   @NonNull CameraSource cameraSource,
-                   @Nullable Listener listener,
-                   @NonNull CameraCapturerFormatProvider formatProvider) {
+    CameraCapturer(
+            @NonNull Context context,
+            @NonNull CameraSource cameraSource,
+            @Nullable Listener listener,
+            @NonNull CameraCapturerFormatProvider formatProvider) {
         Preconditions.checkNotNull(context, "Context must not be null");
         Preconditions.checkNotNull(cameraSource, "Camera source must not be null");
-        Preconditions.checkArgument(isSourceAvailable(formatProvider, cameraSource),
+        Preconditions.checkArgument(
+                isSourceAvailable(formatProvider, cameraSource),
                 String.format("%s is not supported on this device", cameraSource));
         this.context = context;
         this.cameraSource = cameraSource;
@@ -313,25 +315,26 @@ public class CameraCapturer implements VideoCapturer {
      * capabilities.
      *
      * <p><b>Note</b>: This method can be invoked for informational purposes, but is primarily used
-     * internally.</p>
+     * internally.
      *
      * @return all supported video formats.
      */
     @Override
-    @NonNull public synchronized List<VideoFormat> getSupportedFormats() {
-        Preconditions.checkState(Util.permissionGranted(context,
-                Manifest.permission.CAMERA), "CAMERA permission must be granted to create video" +
-                "track with CameraCapturer");
+    @NonNull
+    public synchronized List<VideoFormat> getSupportedFormats() {
+        Preconditions.checkState(
+                Util.permissionGranted(context, Manifest.permission.CAMERA),
+                "CAMERA permission must be granted to create video" + "track with CameraCapturer");
         List<VideoFormat> supportedFormats = formatProvider.getSupportedFormats(cameraSource);
-        Preconditions.checkState(!supportedFormats.isEmpty(), "Supported formats could not be " +
-                "retrieved because an error occurred connecting to the camera service");
+        Preconditions.checkState(
+                !supportedFormats.isEmpty(),
+                "Supported formats could not be "
+                        + "retrieved because an error occurred connecting to the camera service");
 
         return supportedFormats;
     }
 
-    /**
-     * Indicates that the camera capturer is not a screen cast.
-     */
+    /** Indicates that the camera capturer is not a screen cast. */
     @Override
     public boolean isScreencast() {
         return false;
@@ -341,14 +344,15 @@ public class CameraCapturer implements VideoCapturer {
      * Starts capturing frames at the specified format. Frames will be provided to the given
      * listener upon availability.
      *
-     * <p><b>Note</b>: This method is not meant to be invoked directly.</p>
+     * <p><b>Note</b>: This method is not meant to be invoked directly.
      *
      * @param captureFormat the format in which to capture frames.
      * @param videoCapturerListener consumer of available frames.
      */
     @Override
-    public void startCapture(@NonNull VideoFormat captureFormat,
-                             @NonNull VideoCapturer.Listener videoCapturerListener) {
+    public void startCapture(
+            @NonNull VideoFormat captureFormat,
+            @NonNull VideoCapturer.Listener videoCapturerListener) {
         boolean capturerCreated = createWebRtcCameraCapturer();
         if (capturerCreated) {
             synchronized (stateLock) {
@@ -357,7 +361,8 @@ public class CameraCapturer implements VideoCapturer {
             this.videoCapturerListener = videoCapturerListener;
 
             webRtcCameraCapturer.initialize(surfaceTextureHelper, context, observerAdapter);
-            webRtcCameraCapturer.startCapture(captureFormat.dimensions.width,
+            webRtcCameraCapturer.startCapture(
+                    captureFormat.dimensions.width,
                     captureFormat.dimensions.height,
                     captureFormat.framerate);
         } else {
@@ -367,10 +372,10 @@ public class CameraCapturer implements VideoCapturer {
     }
 
     /**
-     * Stops all frames being captured. The {@link android.hardware.Camera} interface should
-     * be available for use upon completion.
+     * Stops all frames being captured. The {@link android.hardware.Camera} interface should be
+     * available for use upon completion.
      *
-     * <p><b>Note</b>: This method is not meant to be invoked directly.</p>
+     * <p><b>Note</b>: This method is not meant to be invoked directly.
      */
     @Override
     public void stopCapture() {
@@ -399,10 +404,9 @@ public class CameraCapturer implements VideoCapturer {
         }
     }
 
-    /**
-     * Returns the currently specified camera source.
-     */
-    @NonNull public synchronized CameraSource getCameraSource() {
+    /** Returns the currently specified camera source. */
+    @NonNull
+    public synchronized CameraSource getCameraSource() {
         return cameraSource;
     }
 
@@ -411,14 +415,16 @@ public class CameraCapturer implements VideoCapturer {
      * or not.
      */
     public synchronized void switchCamera() {
-        CameraSource nextCameraSource = cameraSource == CameraSource.FRONT_CAMERA ?
-                CameraSource.BACK_CAMERA :
-                CameraSource.FRONT_CAMERA;
+        CameraSource nextCameraSource =
+                cameraSource == CameraSource.FRONT_CAMERA
+                        ? CameraSource.BACK_CAMERA
+                        : CameraSource.FRONT_CAMERA;
         boolean nextCameraSourceSupported = isSourceAvailable(formatProvider, nextCameraSource);
 
         if (!nextCameraSourceSupported) {
-            logger.w(String.format("Cannot switch to unsupported camera source %s",
-                    nextCameraSource));
+            logger.w(
+                    String.format(
+                            "Cannot switch to unsupported camera source %s", nextCameraSource));
             return;
         }
 
@@ -435,15 +441,13 @@ public class CameraCapturer implements VideoCapturer {
     }
 
     /**
-     * Schedules a camera parameter update. The current camera's
-     * {@link android.hardware.Camera.Parameters} will be provided for modification via
-     * {@link CameraParameterUpdater#apply(Camera.Parameters)}. Any changes
-     * to the parameters will be applied after the invocation of this callback. This method can be
-     * invoked while capturing frames or not.
+     * Schedules a camera parameter update. The current camera's {@link
+     * android.hardware.Camera.Parameters} will be provided for modification via {@link
+     * CameraParameterUpdater#apply(Camera.Parameters)}. Any changes to the parameters will be
+     * applied after the invocation of this callback. This method can be invoked while capturing
+     * frames or not.
      *
-     * <p>
-     *     The following snippet demonstrates how to turn on the flash of a camera while capturing.
-     * </p>
+     * <p>The following snippet demonstrates how to turn on the flash of a camera while capturing.
      *
      * <pre><code>
      *     // Create camera capturer
@@ -466,24 +470,26 @@ public class CameraCapturer implements VideoCapturer {
      * </code></pre>
      *
      * @param cameraParameterUpdater camera parameter updater that receives current camera
-     *                               parameters for modification.
+     *     parameters for modification.
      * @return true if update was scheduled or false if an update is pending or could not be
-     * scheduled.
+     *     scheduled.
      */
-    public synchronized boolean updateCameraParameters(@NonNull final CameraParameterUpdater cameraParameterUpdater) {
+    public synchronized boolean updateCameraParameters(
+            @NonNull final CameraParameterUpdater cameraParameterUpdater) {
         synchronized (stateLock) {
             if (state == State.RUNNING) {
                 if (!parameterUpdatePending.get()) {
                     parameterUpdatePending.set(true);
-                    return camera1Session.cameraThreadHandler.post(() ->
-                            updateCameraParametersOnCameraThread(cameraParameterUpdater));
+                    return camera1Session.cameraThreadHandler.post(
+                            () -> updateCameraParametersOnCameraThread(cameraParameterUpdater));
                 } else {
                     logger.w("Parameters will not be applied with parameter update pending");
                     return false;
                 }
             } else {
-                logger.i("Camera capturer is not running. Parameters will be applied when " +
-                        "camera capturer is resumed");
+                logger.i(
+                        "Camera capturer is not running. Parameters will be applied when "
+                                + "camera capturer is resumed");
                 this.cameraParameterUpdater = cameraParameterUpdater;
 
                 return true;
@@ -494,10 +500,8 @@ public class CameraCapturer implements VideoCapturer {
     /**
      * Schedules an image capture.
      *
-     * <p>
-     *     The following snippet demonstrates how to capture and image and decode to a
-     *     {@link android.graphics.Bitmap}.
-     * </p>
+     * <p>The following snippet demonstrates how to capture and image and decode to a {@link
+     * android.graphics.Bitmap}.
      *
      * <pre><code>
      *     // Create camera capturer
@@ -523,9 +527,9 @@ public class CameraCapturer implements VideoCapturer {
      * </code></pre>
      *
      * @param pictureListener listener that that receives the callback for the shutter and picture
-     *                        taken event.
+     *     taken event.
      * @return true if picture was scheduled to be taken or false if a picture is pending or could
-     * not be scheduled.
+     *     not be scheduled.
      */
     public synchronized boolean takePicture(@NonNull final PictureListener pictureListener) {
         Preconditions.checkNotNull(pictureListener);
@@ -535,16 +539,19 @@ public class CameraCapturer implements VideoCapturer {
                     picturePending.set(true);
                     final Handler pictureListenerHandler = Util.createCallbackHandler();
 
-                    return camera1Session.cameraThreadHandler.post(() ->
-                            takePictureOnCameraThread(pictureListenerHandler, pictureListener));
+                    return camera1Session.cameraThreadHandler.post(
+                            () ->
+                                    takePictureOnCameraThread(
+                                            pictureListenerHandler, pictureListener));
                 } else {
                     logger.w("Picture cannot be taken while picture is pending");
 
                     return false;
                 }
             } else {
-                logger.i("Camera capturer is not running. Picture request will be serviced " +
-                        "when camera capturer is resumed");
+                logger.i(
+                        "Camera capturer is not running. Picture request will be serviced "
+                                + "when camera capturer is resumed");
                 this.pictureListener = pictureListener;
 
                 return true;
@@ -556,7 +563,8 @@ public class CameraCapturer implements VideoCapturer {
         this.surfaceTextureHelper = surfaceTextureHelper;
     }
 
-    @NonNull private List<VideoFormat> defaultFormats() {
+    @NonNull
+    private List<VideoFormat> defaultFormats() {
         List<VideoFormat> defaultFormats = new ArrayList<>();
         VideoDimensions defaultDimensions = new VideoDimensions(640, 480);
         VideoFormat defaultFormat = new VideoFormat(defaultDimensions, 30, VideoPixelFormat.NV21);
@@ -620,13 +628,13 @@ public class CameraCapturer implements VideoCapturer {
                     default:
                         break;
                 }
-
             }
 
             // Apply rotation
             matrix.postRotate(degree);
-            Bitmap rotatedBitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(),
-                    bitmap.getHeight(), matrix, true);
+            Bitmap rotatedBitmap =
+                    Bitmap.createBitmap(
+                            bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
 
             // Write to byte array
             ByteArrayOutputStream stream = new ByteArrayOutputStream();
@@ -653,7 +661,7 @@ public class CameraCapturer implements VideoCapturer {
         int orientation = 0;
 
         WindowManager wm = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
-        switch(wm.getDefaultDisplay().getRotation()) {
+        switch (wm.getDefaultDisplay().getRotation()) {
             case Surface.ROTATION_90:
                 orientation = 90;
                 break;
@@ -671,7 +679,8 @@ public class CameraCapturer implements VideoCapturer {
         return orientation;
     }
 
-    private void updateCameraParametersOnCameraThread(@NonNull final CameraParameterUpdater cameraParameterUpdater) {
+    private void updateCameraParametersOnCameraThread(
+            @NonNull final CameraParameterUpdater cameraParameterUpdater) {
         synchronized (stateLock) {
             if (state == State.RUNNING) {
                 // Validate execution on camera thread
@@ -700,8 +709,9 @@ public class CameraCapturer implements VideoCapturer {
                 // Resume preview
                 camera1Session.camera.startPreview();
             } else {
-                logger.w("Attempted to update camera parameters while camera capturer is " +
-                        "not running");
+                logger.w(
+                        "Attempted to update camera parameters while camera capturer is "
+                                + "not running");
             }
 
             // Clear the parameter updating flag
@@ -709,48 +719,43 @@ public class CameraCapturer implements VideoCapturer {
         }
     }
 
-    private void takePictureOnCameraThread(@NonNull final Handler pictureListenerHandler,
-                                           @NonNull final PictureListener pictureListener) {
+    private void takePictureOnCameraThread(
+            @NonNull final Handler pictureListenerHandler,
+            @NonNull final PictureListener pictureListener) {
         synchronized (stateLock) {
             if (state == State.RUNNING) {
                 // Validate execution on camera thread
                 camera1Session.checkIsOnCameraThread();
 
                 final Camera.CameraInfo info = camera1Session.info;
-                camera1Session.camera
-                        .takePicture(() -> pictureListenerHandler.post(pictureListener::onShutter),
-                                null,
-                                (pictureData, camera) -> {
-                                    final byte[] alignedPictureData = alignPicture(info,
-                                            pictureData);
-                                    pictureListenerHandler.post(() -> {
+                camera1Session.camera.takePicture(
+                        () -> pictureListenerHandler.post(pictureListener::onShutter),
+                        null,
+                        (pictureData, camera) -> {
+                            final byte[] alignedPictureData = alignPicture(info, pictureData);
+                            pictureListenerHandler.post(
+                                    () -> {
                                         pictureListener.onPictureTaken(alignedPictureData);
                                         picturePending.set(false);
                                     });
-                                    synchronized (stateLock) {
-                                        if (state == State.RUNNING) {
-                                            camera1Session.camera.startPreview();
-                                        }
-                                    }
-                                });
+                            synchronized (stateLock) {
+                                if (state == State.RUNNING) {
+                                    camera1Session.camera.startPreview();
+                                }
+                            }
+                        });
             } else {
                 logger.w("Attempted to take picture while capturing is not running");
             }
         }
     }
 
-    /**
-     * Interface that provides events and errors related to {@link CameraCapturer}.
-     */
+    /** Interface that provides events and errors related to {@link CameraCapturer}. */
     public interface Listener {
-        /**
-         * Indicates when the first frame has been captured from the camera.
-         */
+        /** Indicates when the first frame has been captured from the camera. */
         void onFirstFrameAvailable();
 
-        /**
-         * Notifies when a camera switch is complete.
-         */
+        /** Notifies when a camera switch is complete. */
         void onCameraSwitched();
 
         /**
@@ -761,13 +766,11 @@ public class CameraCapturer implements VideoCapturer {
         void onError(@CameraCapturer.Error int errorCode);
     }
 
-    /**
-     * Interface that provides events related to taking a picture while capturing.
-     */
+    /** Interface that provides events related to taking a picture while capturing. */
     public interface PictureListener {
         /**
-         * Invoked when photo is captured from sensor. This callback is a wrapper of
-         * {@link Camera.ShutterCallback#onShutter()}.
+         * Invoked when photo is captured from sensor. This callback is a wrapper of {@link
+         * Camera.ShutterCallback#onShutter()}.
          */
         void onShutter();
 

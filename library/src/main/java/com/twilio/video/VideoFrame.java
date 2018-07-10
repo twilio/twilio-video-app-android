@@ -19,9 +19,7 @@ package com.twilio.video;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-/**
- * Represents a video frame provided by a {@link CameraCapturer}.
- */
+/** Represents a video frame provided by a {@link CameraCapturer}. */
 public class VideoFrame {
 
     public enum RotationAngle {
@@ -67,11 +65,11 @@ public class VideoFrame {
     /** The time in nanoseconds at which this frame was captured. */
     public final long timestamp;
 
-
-    public VideoFrame(byte[] imageBuffer,
-                      @NonNull VideoDimensions dimensions,
-                      @NonNull RotationAngle orientation,
-                      long timestamp) {
+    public VideoFrame(
+            byte[] imageBuffer,
+            @NonNull VideoDimensions dimensions,
+            @NonNull RotationAngle orientation,
+            long timestamp) {
         this(imageBuffer, null, dimensions, orientation, timestamp);
     }
 
@@ -79,18 +77,19 @@ public class VideoFrame {
      * This constructor is currently only used by Twilio capturers because they wrap
      * WebRTC capturers which have access to org.webrtc.VideoFrame.
      */
-    VideoFrame(org.webrtc.VideoFrame webRtcVideoFrame,
-               @NonNull VideoDimensions dimensions,
-               @NonNull RotationAngle orientation) {
-        this(null, webRtcVideoFrame, dimensions, orientation,
-                webRtcVideoFrame.getTimestampNs());
+    VideoFrame(
+            org.webrtc.VideoFrame webRtcVideoFrame,
+            @NonNull VideoDimensions dimensions,
+            @NonNull RotationAngle orientation) {
+        this(null, webRtcVideoFrame, dimensions, orientation, webRtcVideoFrame.getTimestampNs());
     }
 
-    private VideoFrame(@Nullable byte[] imageBuffer,
-                       @Nullable org.webrtc.VideoFrame webRtcVideoFrame,
-                       @NonNull VideoDimensions dimensions,
-                       @NonNull RotationAngle orientation,
-                       long timestamp) {
+    private VideoFrame(
+            @Nullable byte[] imageBuffer,
+            @Nullable org.webrtc.VideoFrame webRtcVideoFrame,
+            @NonNull VideoDimensions dimensions,
+            @NonNull RotationAngle orientation,
+            long timestamp) {
         this.imageBuffer = imageBuffer;
         this.webRtcVideoFrame = webRtcVideoFrame;
         this.dimensions = dimensions;

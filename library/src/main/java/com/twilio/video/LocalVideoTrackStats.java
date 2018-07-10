@@ -17,40 +17,32 @@
 package com.twilio.video;
 
 public class LocalVideoTrackStats extends LocalTrackStats {
-    /**
-     * Captured frame dimensions
-     */
+    /** Captured frame dimensions */
     public final VideoDimensions captureDimensions;
 
-    /**
-     * Captured frame rate
-     */
+    /** Captured frame rate */
     public final int capturedFrameRate;
 
-    /**
-     * Sent frame dimensions
-     */
+    /** Sent frame dimensions */
     public final VideoDimensions dimensions;
 
-    /**
-     * Sent frame rate
-     */
+    /** Sent frame rate */
     public final int frameRate;
 
-    LocalVideoTrackStats(String trackSid,
-                         int packetsLost,
-                         String codec,
-                         String ssrc,
-                         double timestamp,
-                         long bytesSent,
-                         int packetsSent,
-                         long roundTripTime,
-                         VideoDimensions captureDimensions,
-                         VideoDimensions dimensions,
-                         int capturedFrameRate,
-                         int frameRate) {
-        super(trackSid, packetsLost, codec, ssrc, timestamp,
-                bytesSent, packetsSent, roundTripTime);
+    LocalVideoTrackStats(
+            String trackSid,
+            int packetsLost,
+            String codec,
+            String ssrc,
+            double timestamp,
+            long bytesSent,
+            int packetsSent,
+            long roundTripTime,
+            VideoDimensions captureDimensions,
+            VideoDimensions dimensions,
+            int capturedFrameRate,
+            int frameRate) {
+        super(trackSid, packetsLost, codec, ssrc, timestamp, bytesSent, packetsSent, roundTripTime);
         this.captureDimensions = captureDimensions;
         this.dimensions = dimensions;
         this.frameRate = frameRate;
