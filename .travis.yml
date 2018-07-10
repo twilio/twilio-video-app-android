@@ -141,8 +141,6 @@ jobs:
       script: ./gradlew -q assemble
     - stage: test
       script: ./gradlew -q spotlessCheck
-    - stage: test
-      script: ./gradlew -q spotlessCheck
     - stage: fork test
       script: ./gradlew -q librarySizeReport
     - stage: fork test
@@ -151,6 +149,8 @@ jobs:
       script: ./gradlew -q library:assemble
     - stage: fork test
       script: ./gradlew -q app:assembleCommunity
+    - stage: fork test
+      script: ./gradlew -q spotlessCheck
     - stage: snapshot
       script: ./gradlew -q bintrayLibrarySnapshotUpload
     - stage: snapshot
