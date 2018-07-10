@@ -91,6 +91,16 @@ public abstract class BaseStatsTest extends BaseVideoTest {
     protected void teardown() throws InterruptedException {
         roomTearDown(aliceRoom);
         roomTearDown(bobRoom);
+
+        /*
+         * After all participants have disconnected complete the room to clean up backend
+         * resources.
+         */
+        Room room = aliceRoom != null ? aliceRoom : bobRoom;
+        if (room != null) {
+            RoomUtils.completeRoom(room);
+        }
+
         if (aliceLocalAudioTrack != null) {
             aliceLocalAudioTrack.release();
         }

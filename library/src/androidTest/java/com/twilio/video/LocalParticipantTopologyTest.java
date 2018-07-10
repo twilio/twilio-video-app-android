@@ -103,6 +103,13 @@ public class LocalParticipantTopologyTest extends BaseVideoTest {
             room.disconnect();
             assertTrue(roomListener.onDisconnectedLatch.await(20, TimeUnit.SECONDS));
         }
+        /*
+         * After all participants have disconnected complete the room to clean up backend
+         * resources.
+         */
+        if (room != null) {
+            RoomUtils.completeRoom(room);
+        }
         if (localAudioTrack != null) {
             localAudioTrack.release();
         }
