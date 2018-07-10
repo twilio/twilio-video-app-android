@@ -167,6 +167,16 @@ public abstract class BaseParticipantTest extends BaseVideoTest {
         aliceRoom = null;
         aliceRoomListener = null;
         disconnect(charlieRoom, charlieRoomListener);
+
+        /*
+         * After all participants have disconnected complete the room to clean up backend
+         * resources.
+         */
+        Room room = aliceRoom != null ? aliceRoom : bobRoom;
+        if (room != null) {
+            RoomUtils.completeRoom(room);
+        }
+
         bobRemoteParticipant = null;
         if (aliceLocalAudioTrack != null) {
             aliceLocalAudioTrack.release();

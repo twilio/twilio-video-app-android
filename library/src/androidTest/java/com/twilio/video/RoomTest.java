@@ -70,6 +70,13 @@ public class RoomTest extends BaseVideoTest {
                     "Did not receive disconnect callback",
                     roomListener.onDisconnectedLatch.await(20, TimeUnit.SECONDS));
         }
+        /*
+         * After all participants have disconnected complete the room to clean up backend
+         * resources.
+         */
+        if (room != null) {
+            RoomUtils.completeRoom(room);
+        }
         assertTrue(MediaFactory.isReleased());
     }
 

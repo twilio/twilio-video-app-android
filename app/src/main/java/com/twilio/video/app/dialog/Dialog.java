@@ -55,9 +55,12 @@ public class Dialog {
             EditText roomEditText, AlertDialog.Builder alertDialogBuilder, Context context) {
         roomEditText.setHint("Room Name");
 
-        int horizontalPadding = context.getResources().getDimensionPixelOffset(R.dimen.activity_horizontal_margin);
-        int verticalPadding = context.getResources().getDimensionPixelOffset(R.dimen.activity_vertical_margin);
-        roomEditText.setPadding(horizontalPadding, verticalPadding, horizontalPadding, verticalPadding);
+        int horizontalPadding =
+                context.getResources().getDimensionPixelOffset(R.dimen.activity_horizontal_margin);
+        int verticalPadding =
+                context.getResources().getDimensionPixelOffset(R.dimen.activity_vertical_margin);
+        roomEditText.setPadding(
+                horizontalPadding, verticalPadding, horizontalPadding, verticalPadding);
         alertDialogBuilder.setView(roomEditText);
     }
 }

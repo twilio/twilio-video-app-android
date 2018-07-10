@@ -89,6 +89,14 @@ public class RemoteParticipantTopologyParameterizedTest extends BaseParticipantT
         super.teardown();
         disconnect(room, roomListener);
         disconnect(otherRoom, otherRoomListener);
+        /*
+         * After all participants have disconnected complete the room to clean up backend
+         * resources.
+         */
+        Room roomToComplete = room != null ? room : otherRoom;
+        if (roomToComplete != null) {
+            RoomUtils.completeRoom(roomToComplete);
+        }
         assertTrue(MediaFactory.isReleased());
     }
 

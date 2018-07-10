@@ -17,6 +17,7 @@
 package com.twilio.video.util;
 
 import android.support.annotation.Nullable;
+import android.util.Log;
 import com.twilio.video.Room;
 import com.twilio.video.VideoCodec;
 import com.twilio.video.test.BuildConfig;
@@ -25,8 +26,12 @@ import com.twilio.video.twilioapi.model.VideoRoom;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import retrofit.RetrofitError;
+import retrofit.client.Response;
 
 public class RoomUtils {
+
+    private static final String TAG = "RoomUtils";
 
     public static VideoRoom createRoom(String name, Topology topology) {
         return createRoom(name, topology, false, null);
@@ -79,17 +84,29 @@ public class RoomUtils {
         return videoCodecStrings;
     }
 
-    public static VideoRoom completeRoom(Room room) {
+    public static @Nullable VideoRoom completeRoom(Room room) {
         Preconditions.checkNotNull(
                 BuildConfig.twilioCredentials, CredentialsUtils.TWILIO_VIDEO_JSON_NOT_PROVIDED);
         Map<String, String> credentials =
                 CredentialsUtils.resolveCredentials(
                         Environment.fromString(BuildConfig.ENVIRONMENT));
 
-        return VideoApiUtils.completeRoom(
-                credentials.get(CredentialsUtils.API_KEY),
-                credentials.get(CredentialsUtils.API_KEY_SECRET),
-                room.getSid(),
-                BuildConfig.ENVIRONMENT);
+        VideoRoom videoRoom = null;
+        try {
+            videoRoom =
+                    VideoApiUtils.completeRoom(
+                            credentials.get(CredentialsUtils.API_KEY),
+                            credentials.get(CredentialsUtils.API_KEY_SECRET),
+                            room.getSid(),
+                            BuildConfig.ENVIRONMENT);
+        } catch (RetrofitError e) {
+            Response errorResponse = e.getResponse();
+
+            if (errorResponse != null) {
+                Log.w(TAG, "Failed to complete room: " + errorResponse.getReason());
+            }
+        }
+
+        return videoRoom;
     }
 }

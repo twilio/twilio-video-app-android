@@ -22,7 +22,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
-import butterknife.ButterKnife;
 import com.twilio.video.app.model.TwilioIceServer;
 import java.util.List;
 
