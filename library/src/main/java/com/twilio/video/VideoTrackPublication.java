@@ -16,8 +16,12 @@
 
 package com.twilio.video;
 
-/** A published video track represents a video track that has been shared with a {@link Room}. */
+/**
+ * A published video track represents a video track that has been shared with a {@link Room}.
+ */
 public interface VideoTrackPublication extends TrackPublication {
-    /** Returns the published video track. */
+    /**
+     * Returns the published video track.
+     */
     VideoTrack getVideoTrack();
 }

@@ -16,7 +16,9 @@
 
 package com.twilio.video;
 
-/** IceServer is a single STUN or TURN server. */
+/**
+ * IceServer is a single STUN or TURN server.
+ */
 public class IceServer {
     public final String username;
     public final String password;

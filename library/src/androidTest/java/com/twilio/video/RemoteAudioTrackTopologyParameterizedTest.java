@@ -16,22 +16,15 @@
 
 package com.twilio.video;
 
-import static com.twilio.video.util.VideoAssert.assertIsTrackSid;
-import static junit.framework.TestCase.assertFalse;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
 import android.support.test.filters.LargeTest;
+
 import com.kevinmost.junit_retry_rule.Retry;
 import com.kevinmost.junit_retry_rule.RetryRule;
 import com.twilio.video.base.BaseParticipantTest;
 import com.twilio.video.helper.CallbackHelper;
 import com.twilio.video.test.BuildConfig;
 import com.twilio.video.util.Topology;
-import java.util.Arrays;
-import java.util.List;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -39,15 +32,28 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
+import java.util.Arrays;
+import java.util.List;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
+
+import static com.twilio.video.util.VideoAssert.assertIsTrackSid;
+import static junit.framework.TestCase.assertFalse;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 @RunWith(Parameterized.class)
 @LargeTest
 public class RemoteAudioTrackTopologyParameterizedTest extends BaseParticipantTest {
     @Parameterized.Parameters(name = "{0}")
     public static Iterable<Object[]> data() {
-        return Arrays.asList(new Object[][] {{Topology.P2P}, {Topology.GROUP}});
+        return Arrays.asList(new Object[][]{
+                {Topology.P2P},
+                {Topology.GROUP}});
     }
 
-    @Rule public final RetryRule retryRule = new RetryRule();
+    @Rule
+    public final RetryRule retryRule = new RetryRule();
     private final Topology topology;
 
     public RemoteAudioTrackTopologyParameterizedTest(Topology topology) {
@@ -87,15 +93,14 @@ public class RemoteAudioTrackTopologyParameterizedTest extends BaseParticipantTe
         publishAudioTrack();
 
         // Validate track was added
-        List<RemoteAudioTrackPublication> remoteAudioTrackPublications =
-                bobRemoteParticipant.getRemoteAudioTracks();
+        List<RemoteAudioTrackPublication> remoteAudioTrackPublications = bobRemoteParticipant
+                .getRemoteAudioTracks();
         assertEquals(1, remoteAudioTrackPublications.size());
 
         // Validate track name
         assertTrue(remoteAudioTrackPublications.get(0).isTrackSubscribed());
         assertEquals(bobAudioTrackName, remoteAudioTrackPublications.get(0).getTrackName());
-        assertEquals(
-                bobAudioTrackName,
+        assertEquals(bobAudioTrackName,
                 remoteAudioTrackPublications.get(0).getRemoteAudioTrack().getName());
     }
 
@@ -126,8 +131,10 @@ public class RemoteAudioTrackTopologyParameterizedTest extends BaseParticipantTe
         statsListener.onStatsLatch.await(20, TimeUnit.SECONDS);
 
         // Validate that bobs audio level is zero after playback is disabled
-        RemoteAudioTrackStats remoteAudioTrackStats =
-                statsListener.getStatsReports().get(0).getRemoteAudioTrackStats().get(0);
+        RemoteAudioTrackStats remoteAudioTrackStats = statsListener.getStatsReports()
+                .get(0)
+                .getRemoteAudioTrackStats()
+                .get(0);
         assertEquals(0, remoteAudioTrackStats.audioLevel);
 
         // Now we enable playback
@@ -142,8 +149,10 @@ public class RemoteAudioTrackTopologyParameterizedTest extends BaseParticipantTe
         statsListener.onStatsLatch.await(20, TimeUnit.SECONDS);
 
         // Validate that bobs audio level is greater than 0 after playback enabled
-        remoteAudioTrackStats =
-                statsListener.getStatsReports().get(0).getRemoteAudioTrackStats().get(0);
+        remoteAudioTrackStats = statsListener.getStatsReports()
+                .get(0)
+                .getRemoteAudioTrackStats()
+                .get(0);
         assertTrue(remoteAudioTrackStats.audioLevel > 0);
     }
 
@@ -154,7 +163,6 @@ public class RemoteAudioTrackTopologyParameterizedTest extends BaseParticipantTe
         bobLocalAudioTrack = LocalAudioTrack.create(mediaTestActivity, true, bobAudioTrackName);
         assertTrue(bobLocalParticipant.publishTrack(bobLocalAudioTrack));
         assertTrue(aliceParticipantListener.onAudioTrackPublishedLatch.await(20, TimeUnit.SECONDS));
-        assertTrue(
-                aliceParticipantListener.onSubscribedToAudioTrackLatch.await(20, TimeUnit.SECONDS));
+        assertTrue(aliceParticipantListener.onSubscribedToAudioTrackLatch.await(20, TimeUnit.SECONDS));
     }
 }

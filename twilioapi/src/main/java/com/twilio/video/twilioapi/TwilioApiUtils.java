@@ -17,10 +17,17 @@
 package com.twilio.video.twilioapi;
 
 import android.util.Base64;
+
 import com.google.gson.GsonBuilder;
 import com.twilio.video.twilioapi.model.TwilioServiceToken;
+
+import java.util.concurrent.CountDownLatch;
+
 import retrofit.Callback;
+import retrofit.RequestInterceptor;
 import retrofit.RestAdapter;
+import retrofit.RetrofitError;
+import retrofit.client.Response;
 import retrofit.converter.GsonConverter;
 import retrofit.http.Header;
 import retrofit.http.POST;
@@ -39,15 +46,13 @@ public class TwilioApiUtils {
 
     interface TwilioApiService {
         @POST("/2010-04-01/Accounts/{accountSid}/Tokens.json")
-        void getServiceToken(
-                @Header("Authorization") String authorization,
-                @Path("accountSid") String accountSid,
-                Callback<TwilioServiceToken> serviceTokenCallback);
+        void getServiceToken(@Header("Authorization") String authorization,
+                             @Path("accountSid") String accountSid,
+                             Callback<TwilioServiceToken> serviceTokenCallback);
 
         @POST("/2010-04-01/Accounts/{accountSid}/Tokens.json")
-        TwilioServiceToken getServiceToken(
-                @Header("Authorization") String authorization,
-                @Path("accountSid") String accountSid);
+        TwilioServiceToken getServiceToken(@Header("Authorization") String authorization,
+                                           @Path("accountSid") String accountSid);
     }
 
     private static TwilioApiService twilioApiService = createTwilioApiService();
@@ -60,22 +65,21 @@ public class TwilioApiUtils {
             apiBaseUrl = DEV_BASE_URL;
         }
         return new RestAdapter.Builder()
-                .setEndpoint(apiBaseUrl)
-                .setConverter(new GsonConverter(new GsonBuilder().create()))
-                .build()
-                .create(TwilioApiService.class);
+            .setEndpoint(apiBaseUrl)
+            .setConverter(new GsonConverter(new GsonBuilder().create()))
+            .build()
+            .create(TwilioApiService.class);
     }
 
-    public static void getServiceToken(
-            String accountSid,
-            String signingKeySid,
-            String signingKeySecret,
-            String environment,
-            Callback<TwilioServiceToken> callback)
+    public static void getServiceToken(String accountSid,
+                                       String signingKeySid,
+                                       String signingKeySecret,
+                                       String environment,
+                                       Callback<TwilioServiceToken> callback)
             throws IllegalArgumentException {
-        if (!environment.equalsIgnoreCase(PROD)
-                && !environment.equalsIgnoreCase(STAGE)
-                && !environment.equalsIgnoreCase(DEV)) {
+        if (!environment.equalsIgnoreCase(PROD) &&
+            !environment.equalsIgnoreCase(STAGE) &&
+            !environment.equalsIgnoreCase(DEV)){
             throw new IllegalArgumentException("Invalid Environment!");
         }
         if (!currentEnvironment.equalsIgnoreCase(environment)) {
@@ -83,17 +87,19 @@ public class TwilioApiUtils {
             twilioApiService = createTwilioApiService();
         }
         String authString = signingKeySid + ":" + signingKeySecret;
-        String authorization =
-                "Basic " + Base64.encodeToString(authString.getBytes(), Base64.NO_WRAP);
+        String authorization = "Basic " + Base64.encodeToString(authString.getBytes(),
+                Base64.NO_WRAP);
         twilioApiService.getServiceToken(authorization, accountSid, callback);
     }
 
     // Provide a synchronous version of getServiceToken for tests
-    public static TwilioServiceToken getServiceToken(
-            String accountSid, String signingKeySid, String signingKeySecret, String environment) {
-        if (!environment.equalsIgnoreCase(PROD)
-                && !environment.equalsIgnoreCase(STAGE)
-                && !environment.equalsIgnoreCase(DEV)) {
+    public static TwilioServiceToken getServiceToken(String accountSid,
+                                                     String signingKeySid,
+                                                     String signingKeySecret,
+                                                     String environment) {
+        if (!environment.equalsIgnoreCase(PROD) &&
+            !environment.equalsIgnoreCase(STAGE) &&
+            !environment.equalsIgnoreCase(DEV)){
             throw new IllegalArgumentException("Invalid Environment!");
         }
         if (!currentEnvironment.equalsIgnoreCase(environment)) {
@@ -102,8 +108,8 @@ public class TwilioApiUtils {
         }
 
         String authString = signingKeySid + ":" + signingKeySecret;
-        String authorization =
-                "Basic " + Base64.encodeToString(authString.getBytes(), Base64.NO_WRAP);
+        String authorization = "Basic " + Base64.encodeToString(authString.getBytes(),
+                Base64.NO_WRAP);
 
         return twilioApiService.getServiceToken(authorization, accountSid);
     }

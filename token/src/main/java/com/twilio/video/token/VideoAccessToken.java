@@ -16,13 +16,15 @@
 
 package com.twilio.video.token;
 
-import io.jsonwebtoken.JwtBuilder;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+
 import javax.crypto.spec.SecretKeySpec;
+
+import io.jsonwebtoken.JwtBuilder;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
 
 /*
  * Represents a video access token. Loosely based on implementation AccessToken in Twilio Java
@@ -31,13 +33,10 @@ import javax.crypto.spec.SecretKeySpec;
 public class VideoAccessToken {
     private static final String CTY = "twilio-fpa;v=1";
     private static final SignatureAlgorithm ALGORITHM = SignatureAlgorithm.HS256;
-    private static final Map<String, Object> headers =
-            new HashMap<String, Object>() {
-                {
-                    put("cty", CTY);
-                    put("typ", "JWT");
-                }
-            };
+    private static final Map<String, Object> headers = new HashMap<String, Object>() {{
+        put("cty", CTY);
+        put("typ", "JWT");
+    }};
 
     private final String id;
     private final String accountSid;
@@ -51,13 +50,13 @@ public class VideoAccessToken {
 
     private VideoAccessToken(Builder builder) {
         Date now = new Date();
-        this.id = builder.apiKey + "-" + (int) (Math.floor(now.getTime() / 1000.0f));
+        this.id = builder.apiKey + "-" + (int)(Math.floor(now.getTime() / 1000.0f));
         this.accountSid = builder.accountSid;
         this.identity = builder.identity;
         this.apiKey = builder.apiKey;
         this.apiKeySecret = builder.apiSecret;
-        this.keySpec =
-                new SecretKeySpec(apiKeySecret.getBytes(), SignatureAlgorithm.HS256.getJcaName());
+        this.keySpec = new SecretKeySpec(apiKeySecret.getBytes(),
+                SignatureAlgorithm.HS256.getJcaName());
         this.expiration = new Date(new Date().getTime() + builder.ttl * 1000);
         this.nbf = builder.nbf;
         this.jwt = buildJwt();
@@ -89,7 +88,9 @@ public class VideoAccessToken {
 
     @Override
     public String toString() {
-        return Jwts.parser().setSigningKey(keySpec).parseClaimsJws(jwt).toString();
+        return Jwts.parser()
+                .setSigningKey(keySpec)
+                .parseClaimsJws(jwt).toString();
     }
 
     public String getJwt() {
@@ -98,12 +99,11 @@ public class VideoAccessToken {
 
     private String buildJwt() {
         // Initialize jwt builder
-        JwtBuilder builder =
-                new VideoJwtBuilder()
-                        .signWith(ALGORITHM, keySpec)
-                        .setHeaderParams(headers)
-                        .setIssuer(apiKey)
-                        .setExpiration(expiration);
+        JwtBuilder builder = new VideoJwtBuilder()
+                .signWith(ALGORITHM, keySpec)
+                .setHeaderParams(headers)
+                .setIssuer(apiKey)
+                .setExpiration(expiration);
         builder.setId(id);
         builder.setSubject(accountSid);
         if (nbf != null) {
@@ -129,7 +129,9 @@ public class VideoAccessToken {
         private Date nbf = null;
         private int ttl = TTL_DEFAULT;
 
-        public Builder(String accountSid, String apiKeySid, String apiKeySecret) {
+        public Builder(String accountSid,
+                       String apiKeySid,
+                       String apiKeySecret) {
             this.accountSid = accountSid;
             this.apiKey = apiKeySid;
             this.apiSecret = apiKeySecret;

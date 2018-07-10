@@ -17,6 +17,7 @@
 package com.twilio.video.env;
 
 import android.content.Context;
+
 import com.getkeepsafe.relinker.ReLinker;
 
 public class Env {
@@ -34,4 +35,5 @@ public class Env {
     static native void nativeSet(String name, String value, boolean overwrite);
 
     static native String nativeGet(String name);
+
 }

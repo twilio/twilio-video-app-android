@@ -17,11 +17,13 @@
 package com.twilio.video.util;
 
 import android.support.annotation.Nullable;
-import com.twilio.video.Room;
+
 import com.twilio.video.VideoCodec;
+import com.twilio.video.Room;
 import com.twilio.video.test.BuildConfig;
 import com.twilio.video.twilioapi.VideoApiUtils;
 import com.twilio.video.twilioapi.model.VideoRoom;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -32,33 +34,31 @@ public class RoomUtils {
         return createRoom(name, topology, false, null);
     }
 
-    public static VideoRoom createRoom(String name, Topology topology, boolean enableRecording) {
+    public static VideoRoom createRoom(String name,
+                                       Topology topology,
+                                       boolean enableRecording) {
         return createRoom(name, topology, enableRecording, null);
     }
 
-    public static VideoRoom createRoom(
-            String name,
-            Topology topology,
-            boolean enableRecording,
-            @Nullable List<VideoCodec> videoCodecs) {
-        Preconditions.checkNotNull(
-                BuildConfig.twilioCredentials, CredentialsUtils.TWILIO_VIDEO_JSON_NOT_PROVIDED);
-        Map<String, String> credentials =
-                CredentialsUtils.resolveCredentials(
-                        Environment.fromString(BuildConfig.ENVIRONMENT));
+    public static VideoRoom createRoom(String name,
+                                       Topology topology,
+                                       boolean enableRecording,
+                                       @Nullable List<VideoCodec> videoCodecs) {
+        Preconditions.checkNotNull(BuildConfig.twilioCredentials,
+            CredentialsUtils.TWILIO_VIDEO_JSON_NOT_PROVIDED);
+        Map<String, String> credentials = CredentialsUtils.resolveCredentials(
+            Environment.fromString(BuildConfig.ENVIRONMENT));
         String type = VideoApiUtils.P2P;
         boolean enableTurn = false;
-        List<String> videoCodecStrings =
-                (videoCodecs == null || videoCodecs.isEmpty())
-                        ? (null)
-                        : codecListToStringList(videoCodecs);
+        List<String> videoCodecStrings = (videoCodecs == null || videoCodecs.isEmpty()) ?
+                (null) :
+                codecListToStringList(videoCodecs);
         if (topology == Topology.P2P) {
             enableTurn = true;
         } else {
             type = VideoApiUtils.GROUP;
         }
-        return VideoApiUtils.createRoom(
-                credentials.get(CredentialsUtils.ACCOUNT_SID),
+        return VideoApiUtils.createRoom(credentials.get(CredentialsUtils.ACCOUNT_SID),
                 credentials.get(CredentialsUtils.API_KEY),
                 credentials.get(CredentialsUtils.API_KEY_SECRET),
                 name,
@@ -80,14 +80,12 @@ public class RoomUtils {
     }
 
     public static VideoRoom completeRoom(Room room) {
-        Preconditions.checkNotNull(
-                BuildConfig.twilioCredentials, CredentialsUtils.TWILIO_VIDEO_JSON_NOT_PROVIDED);
-        Map<String, String> credentials =
-                CredentialsUtils.resolveCredentials(
-                        Environment.fromString(BuildConfig.ENVIRONMENT));
+        Preconditions.checkNotNull(BuildConfig.twilioCredentials,
+                CredentialsUtils.TWILIO_VIDEO_JSON_NOT_PROVIDED);
+        Map<String, String> credentials = CredentialsUtils.resolveCredentials(
+                Environment.fromString(BuildConfig.ENVIRONMENT));
 
-        return VideoApiUtils.completeRoom(
-                credentials.get(CredentialsUtils.API_KEY),
+        return VideoApiUtils.completeRoom(credentials.get(CredentialsUtils.API_KEY),
                 credentials.get(CredentialsUtils.API_KEY_SECRET),
                 room.getSid(),
                 BuildConfig.ENVIRONMENT);

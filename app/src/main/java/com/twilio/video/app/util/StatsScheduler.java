@@ -19,6 +19,7 @@ package com.twilio.video.app.util;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.support.annotation.NonNull;
+
 import com.twilio.video.Room;
 import com.twilio.video.StatsListener;
 
@@ -29,10 +30,9 @@ public class StatsScheduler {
     public StatsScheduler() {}
 
     // Listener will be called from scheduler thread
-    public void scheduleStatsGathering(
-            final @NonNull Room room,
-            final @NonNull StatsListener listener,
-            final long delayInMilliseconds) {
+    public void scheduleStatsGathering(final @NonNull Room room,
+                                       final @NonNull StatsListener listener,
+                                       final long delayInMilliseconds) {
         if (room == null) {
             throw new NullPointerException("Room must not be null");
         }
@@ -46,14 +46,13 @@ public class StatsScheduler {
         handlerThread.start();
         handler = new Handler(handlerThread.getLooper());
 
-        final Runnable statsRunner =
-                new Runnable() {
-                    @Override
-                    public void run() {
-                        room.getStats(listener);
-                        handler.postDelayed(this, delayInMilliseconds);
-                    }
-                };
+        final Runnable statsRunner = new Runnable() {
+            @Override
+            public void run() {
+                room.getStats(listener);
+                handler.postDelayed(this, delayInMilliseconds);
+            }
+        };
         handler.post(statsRunner);
     }
 

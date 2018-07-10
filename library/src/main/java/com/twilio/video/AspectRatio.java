@@ -17,8 +17,8 @@
 package com.twilio.video;
 
 /**
- * Rational aspect ratio represented as numerator:denominator. For x:y aspect ratio you can set
- * numerator to x and denominator to y.
+ *  Rational aspect ratio represented as numerator:denominator.
+ *  For x:y aspect ratio you can set numerator to x and denominator to y.
  */
 public class AspectRatio {
     /** Pre-defined aspect ratio 4:3. */
@@ -47,6 +47,7 @@ public class AspectRatio {
 
         if (numerator != that.numerator) return false;
         return denominator == that.denominator;
+
     }
 
     @Override

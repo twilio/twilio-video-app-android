@@ -16,18 +16,21 @@
 
 package com.twilio.video;
 
-import static org.mockito.Mockito.when;
 
 import android.Manifest;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.hardware.camera2.CameraAccessException;
 import android.hardware.camera2.CameraCharacteristics;
 import android.hardware.camera2.CameraManager;
 import android.os.Build;
 import android.os.Handler;
+import android.os.Looper;
 import android.support.annotation.RequiresApi;
+
 import com.twilio.video.util.ReflectionUtils;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -35,10 +38,15 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
 
+import static org.mockito.Mockito.when;
+
+
 @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
 @RunWith(MockitoJUnitRunner.class)
 public class Camera2CapturerUnitTest {
-    private static final String[] cameraIds = new String[] {"0", "1"};
+    private static final String[] cameraIds = new String[]{
+        "0", "1"
+    };
     @Mock Context context;
     @Mock Camera2Capturer.Listener listener;
     @Mock CameraManager cameraManager;
@@ -56,8 +64,8 @@ public class Camera2CapturerUnitTest {
         when(cameraManager.getCameraCharacteristics(cameraIds[1]))
                 .thenReturn(cameraCharacteristics);
         when(context.getSystemService(Context.CAMERA_SERVICE)).thenReturn(cameraManager);
-        ReflectionUtils.setFinalStaticField(
-                Build.VERSION.class.getField("SDK_INT"), Build.VERSION_CODES.LOLLIPOP);
+        ReflectionUtils.setFinalStaticField(Build.VERSION.class.getField("SDK_INT"),
+                Build.VERSION_CODES.LOLLIPOP);
     }
 
     @Test(expected = NullPointerException.class)
@@ -79,8 +87,8 @@ public class Camera2CapturerUnitTest {
 
     @Test(expected = IllegalStateException.class)
     public void shouldFailOnDevicesLessThanLollipop() throws Exception {
-        ReflectionUtils.setFinalStaticField(
-                Build.VERSION.class.getField("SDK_INT"), Build.VERSION_CODES.KITKAT);
+        ReflectionUtils.setFinalStaticField(Build.VERSION.class.getField("SDK_INT"),
+                Build.VERSION_CODES.KITKAT);
         new Camera2Capturer(context, "0", listener, handler);
     }
 

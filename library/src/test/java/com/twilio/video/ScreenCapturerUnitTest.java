@@ -19,7 +19,9 @@ package com.twilio.video;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
+
 import com.twilio.video.util.ReflectionUtils;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -32,14 +34,14 @@ public class ScreenCapturerUnitTest {
 
     @Before
     public void setup() throws Exception {
-        ReflectionUtils.setFinalStaticField(
-                Build.VERSION.class.getField("SDK_INT"), Build.VERSION_CODES.LOLLIPOP);
+        ReflectionUtils.setFinalStaticField(Build.VERSION.class.getField("SDK_INT"),
+                Build.VERSION_CODES.LOLLIPOP);
     }
 
     @Test(expected = IllegalStateException.class)
     public void shouldFailOnDevicesLessThanLollipop() throws Exception {
-        ReflectionUtils.setFinalStaticField(
-                Build.VERSION.class.getField("SDK_INT"), Build.VERSION_CODES.KITKAT);
+        ReflectionUtils.setFinalStaticField(Build.VERSION.class.getField("SDK_INT"),
+                Build.VERSION_CODES.KITKAT);
         new ScreenCapturer(context, 2, new Intent(), null);
     }
 

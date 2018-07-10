@@ -18,6 +18,7 @@ package com.twilio.video;
 
 import android.support.annotation.NonNull;
 import android.support.annotation.VisibleForTesting;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -54,7 +55,8 @@ public abstract class VideoTrack implements Track {
          */
         if (!isReleased) {
             // Always create renderer
-            org.webrtc.VideoRenderer webrtcVideoRenderer = createWebRtcVideoRenderer(videoRenderer);
+            org.webrtc.VideoRenderer webrtcVideoRenderer =
+                    createWebRtcVideoRenderer(videoRenderer);
             videoRenderersMap.put(videoRenderer, webrtcVideoRenderer);
 
             // WebRTC Track may not be set yet
@@ -81,7 +83,8 @@ public abstract class VideoTrack implements Track {
          * when a remote video track is released.
          */
         if (!isReleased) {
-            org.webrtc.VideoRenderer webrtcVideoRenderer = videoRenderersMap.remove(videoRenderer);
+            org.webrtc.VideoRenderer webrtcVideoRenderer =
+                    videoRenderersMap.remove(videoRenderer);
             if (webRtcVideoTrack != null && webrtcVideoRenderer != null) {
                 webRtcVideoTrack.removeRenderer(webrtcVideoRenderer);
             }
@@ -148,8 +151,7 @@ public abstract class VideoTrack implements Track {
     }
 
     private org.webrtc.VideoRenderer createWebRtcVideoRenderer(VideoRenderer videoRenderer) {
-        return new org.webrtc.VideoRenderer(
-                new VideoTrack.VideoRendererCallbackAdapter(videoRenderer));
+        return new org.webrtc.VideoRenderer(new VideoTrack.VideoRendererCallbackAdapter(videoRenderer));
     }
 
     private class VideoRendererCallbackAdapter implements org.webrtc.VideoRenderer.Callbacks {

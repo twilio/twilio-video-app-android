@@ -16,10 +16,8 @@
 
 package com.twilio.video.base;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
 import android.support.annotation.Nullable;
+
 import com.twilio.video.AudioCodec;
 import com.twilio.video.LocalAudioTrackStats;
 import com.twilio.video.LocalVideoTrackStats;
@@ -29,9 +27,13 @@ import com.twilio.video.StatsReport;
 import com.twilio.video.VideoCodec;
 import com.twilio.video.helper.CallbackHelper;
 import com.twilio.video.util.StringUtils;
+
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public abstract class BaseCodecTest extends BaseStatsTest {
     private static int CODEC_TEST_MAX_RETRIES = 10;
@@ -46,8 +48,8 @@ public abstract class BaseCodecTest extends BaseStatsTest {
         assertCodecsPublished(null, expectedAudioCodec);
     }
 
-    protected void assertCodecsPublished(
-            @Nullable AudioCodec expectedAudioCodec, @Nullable VideoCodec expectedVideoCodec)
+    protected void assertCodecsPublished(@Nullable AudioCodec expectedAudioCodec,
+                                         @Nullable VideoCodec expectedVideoCodec)
             throws InterruptedException {
         /*
          * The stats API is not very predictable so retry getting stats and until a non empty
@@ -78,7 +80,8 @@ public abstract class BaseCodecTest extends BaseStatsTest {
             // Extract local and remote audio and video codecs
             if (expectedAudioCodec != null) {
                 StatsReport aliceStatsReport = aliceStatsListener.getStatsReports().get(0);
-                StatsReport bobStatsReport = bobStatsListener.getStatsReports().get(0);
+                StatsReport bobStatsReport = bobStatsListener.getStatsReports()
+                        .get(0);
                 List<LocalAudioTrackStats> aliceLocalAudioTrackStats =
                         aliceStatsReport.getLocalAudioTrackStats();
                 List<RemoteAudioTrackStats> bobRemoteAudioTrackStats =
@@ -95,7 +98,8 @@ public abstract class BaseCodecTest extends BaseStatsTest {
 
             if (expectedVideoCodec != null) {
                 StatsReport aliceStatsReport = aliceStatsListener.getStatsReports().get(0);
-                StatsReport bobStatsReport = bobStatsListener.getStatsReports().get(0);
+                StatsReport bobStatsReport = bobStatsListener.getStatsReports()
+                        .get(0);
                 List<LocalVideoTrackStats> aliceLocalVideoTrackStats =
                         aliceStatsReport.getLocalVideoTrackStats();
                 List<RemoteVideoTrackStats> bobRemoteVideoTrackStats =
@@ -112,13 +116,14 @@ public abstract class BaseCodecTest extends BaseStatsTest {
 
             // Check if all codecs are set
             failedToGetNeededCodecs =
-                    (expectedAudioCodec != null && StringUtils.isNullOrEmpty(localAudioTrackCodec))
-                            || (expectedAudioCodec != null
-                                    && StringUtils.isNullOrEmpty(remoteAudioTrackCodec))
-                            || (expectedVideoCodec != null
-                                    && StringUtils.isNullOrEmpty(localVideoTrackCodec))
-                            || (expectedVideoCodec != null
-                                    && StringUtils.isNullOrEmpty(remoteVideoTrackCodec));
+                    (expectedAudioCodec != null &&
+                            StringUtils.isNullOrEmpty(localAudioTrackCodec)) ||
+                    (expectedAudioCodec != null &&
+                            StringUtils.isNullOrEmpty(remoteAudioTrackCodec)) ||
+                    (expectedVideoCodec != null &&
+                            StringUtils.isNullOrEmpty(localVideoTrackCodec)) ||
+                    (expectedVideoCodec != null &&
+                            StringUtils.isNullOrEmpty(remoteVideoTrackCodec));
         } while (failedToGetNeededCodecs && retries++ < CODEC_TEST_MAX_RETRIES);
 
         // Validate codecs

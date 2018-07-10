@@ -16,16 +16,18 @@
 
 package com.twilio.video;
 
-import static junit.framework.Assert.assertEquals;
-import static junit.framework.TestCase.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.when;
-
-import java.util.Collections;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+
+import java.util.Collections;
+import java.util.List;
+
+import static junit.framework.Assert.assertEquals;
+import static junit.framework.TestCase.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ConnectOptionsUnitTest {
@@ -44,28 +46,32 @@ public class ConnectOptionsUnitTest {
 
     @Test
     public void insightsShouldBeEnabledByDefault() {
-        ConnectOptions connectOptions = new ConnectOptions.Builder("test").build();
+        ConnectOptions connectOptions = new ConnectOptions.Builder("test")
+                .build();
 
         assertTrue(connectOptions.isInsightsEnabled());
     }
 
     @Test
     public void shouldEnableInsights() {
-        ConnectOptions connectOptions =
-                new ConnectOptions.Builder("test").enableInsights(true).build();
+        ConnectOptions connectOptions = new ConnectOptions.Builder("test")
+                .enableInsights(true)
+                .build();
         assertTrue(connectOptions.isInsightsEnabled());
     }
 
     @Test
     public void shouldDisableInsights() {
-        ConnectOptions connectOptions =
-                new ConnectOptions.Builder("test").enableInsights(false).build();
+        ConnectOptions connectOptions = new ConnectOptions.Builder("test")
+                .enableInsights(false)
+                .build();
         assertFalse(connectOptions.isInsightsEnabled());
     }
 
     @Test(expected = IllegalStateException.class)
     public void shouldNotAllowReleasedLocalAudioTrack() {
-        when(localAudioTrack.isReleased()).thenReturn(true);
+        when(localAudioTrack.isReleased())
+                .thenReturn(true);
         new ConnectOptions.Builder("token")
                 .roomName("room name")
                 .audioTracks(Collections.singletonList(localAudioTrack))
@@ -74,7 +80,8 @@ public class ConnectOptionsUnitTest {
 
     @Test(expected = IllegalStateException.class)
     public void shouldNotAllowReleasedLocalVideoTrack() {
-        when(localVideoTrack.isReleased()).thenReturn(true);
+        when(localVideoTrack.isReleased())
+                .thenReturn(true);
         new ConnectOptions.Builder("token")
                 .roomName("room name")
                 .videoTracks(Collections.singletonList(localVideoTrack))
@@ -102,8 +109,9 @@ public class ConnectOptionsUnitTest {
     @Test
     public void shouldAllowEncodingParameters() {
         EncodingParameters encodingParameters = new EncodingParameters(10, 12);
-        ConnectOptions connectOptions =
-                new ConnectOptions.Builder("token").encodingParameters(encodingParameters).build();
+        ConnectOptions connectOptions = new ConnectOptions.Builder("token")
+                .encodingParameters(encodingParameters)
+                .build();
 
         assertEquals(encodingParameters, connectOptions.getEncodingParameters());
     }

@@ -19,12 +19,12 @@ package com.twilio.video;
 /**
  * Use video constraints to apply to a {@link LocalVideoTrack}.
  *
- * <p>The default video constraints is a 4:3 aspect ratio with a maximum resolution of 640x480 and a
- * maximum of 30 fps.
+ * <p>The default video constraints is a 4:3 aspect ratio with a maximum resolution of
+ * 640x480 and a maximum of 30 fps.</p>
  *
  * <p><b>Note</b>: {@link VideoConstraints} is used to resolve the capture format, but the actual
- * video sent to Participants may be downscaled temporally or spatially in response to network and
- * device conditions.
+ * video sent to Participants may be downscaled temporally or spatially in response to network
+ * and device conditions.</p>
  */
 public class VideoConstraints {
     /** Battery saving 10 fps video. */
@@ -53,27 +53,37 @@ public class VideoConstraints {
         this.aspectRatio = builder.aspectRatio;
     }
 
-    /** The minimum video size allowed. */
+    /**
+     * The minimum video size allowed.
+     */
     public VideoDimensions getMinVideoDimensions() {
         return minVideoDimensions;
     }
 
-    /** The maximum video size allowed. */
+    /**
+     * The maximum video size allowed.
+     */
     public VideoDimensions getMaxVideoDimensions() {
         return maxVideoDimensions;
     }
 
-    /** The minimum frames per second allowed. */
+    /**
+     * The minimum frames per second allowed.
+     */
     public int getMinFps() {
         return minFps;
     }
 
-    /** The maximum frames per second allowed. */
+    /**
+     * The maximum frames per second allowed.
+     */
     public int getMaxFps() {
         return maxFps;
     }
 
-    /** The aspect ratio. */
+    /**
+     * The aspect ratio.
+     */
     public AspectRatio getAspectRatio() {
         return aspectRatio;
     }
@@ -90,6 +100,7 @@ public class VideoConstraints {
         if (!minVideoDimensions.equals(that.minVideoDimensions)) return false;
         if (!maxVideoDimensions.equals(that.maxVideoDimensions)) return false;
         return aspectRatio.equals(that.aspectRatio);
+
     }
 
     @Override
@@ -103,13 +114,13 @@ public class VideoConstraints {
     }
 
     public static class Builder {
-        private VideoDimensions minVideoDimensions = new VideoDimensions(0, 0);
-        private VideoDimensions maxVideoDimensions = new VideoDimensions(0, 0);
+        private VideoDimensions minVideoDimensions = new VideoDimensions(0,0);
+        private VideoDimensions maxVideoDimensions = new VideoDimensions(0,0);
         private int minFps = 0;
         private int maxFps = 0;
-        private AspectRatio aspectRatio = new AspectRatio(0, 0);
+        private AspectRatio aspectRatio = new AspectRatio(0,0);
 
-        public Builder() {}
+        public Builder() { }
 
         public Builder minVideoDimensions(VideoDimensions minVideoDimensions) {
             this.minVideoDimensions = minVideoDimensions;
@@ -137,38 +148,34 @@ public class VideoConstraints {
         }
 
         public VideoConstraints build() {
-            if (minVideoDimensions == null) {
-                throw new NullPointerException("MinVideoDimensions must not be null");
+            if(minVideoDimensions == null) {
+               throw new NullPointerException("MinVideoDimensions must not be null");
             }
-            if (maxVideoDimensions == null) {
+            if(maxVideoDimensions == null) {
                 throw new NullPointerException("MaxVideoDimensions must not be null");
             }
-            if (minFps > maxFps) {
-                throw new IllegalStateException(
-                        "MinFps " + minFps + " is greater than maxFps " + maxFps);
+            if(minFps > maxFps) {
+                throw new IllegalStateException("MinFps " + minFps + " is greater than maxFps " +
+                        maxFps);
             }
-            if (minFps < 0) {
+            if(minFps < 0) {
                 throw new IllegalStateException("MinFps is less than 0");
             }
-            if (maxFps < 0) {
+            if(maxFps < 0) {
                 throw new IllegalStateException("MaxFps is less than 0");
             }
-            if (minFps > maxFps) {
+            if(minFps > maxFps) {
                 throw new IllegalStateException("MinFps is greater than maxFps");
             }
-            if (minVideoDimensions.width > maxVideoDimensions.width) {
-                throw new IllegalStateException(
-                        "Min video dimensions width "
-                                + minVideoDimensions.width
-                                + " is greater than max video dimensions width "
-                                + maxVideoDimensions.width);
+            if(minVideoDimensions.width > maxVideoDimensions.width) {
+                throw new IllegalStateException("Min video dimensions width " +
+                        minVideoDimensions.width + " is greater than max video dimensions width " +
+                        maxVideoDimensions.width);
             }
-            if (minVideoDimensions.height > maxVideoDimensions.height) {
-                throw new IllegalStateException(
-                        "Min video dimensions height "
-                                + minVideoDimensions.height
-                                + " is greater than max video dimensions height "
-                                + maxVideoDimensions.height);
+            if(minVideoDimensions.height > maxVideoDimensions.height) {
+                throw new IllegalStateException("Min video dimensions height " +
+                        minVideoDimensions.height+ " is greater than max video dimensions height " +
+                        maxVideoDimensions.height);
             }
             if (aspectRatio.numerator < 0) {
                 throw new IllegalStateException("aspectRatio numerator is less than 0");

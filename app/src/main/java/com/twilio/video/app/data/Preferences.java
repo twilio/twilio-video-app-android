@@ -16,7 +16,9 @@
 
 package com.twilio.video.app.data;
 
+import com.twilio.video.AudioCodec;
 import com.twilio.video.OpusCodec;
+import com.twilio.video.VideoCodec;
 import com.twilio.video.Vp8Codec;
 import com.twilio.video.app.BuildConfig;
 

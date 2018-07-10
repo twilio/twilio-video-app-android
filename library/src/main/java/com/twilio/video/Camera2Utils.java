@@ -27,8 +27,8 @@ class Camera2Utils {
     private static final Logger logger = Logger.getLogger(Camera2Utils.class);
 
     static boolean cameraIdSupported(@NonNull Context context, @NonNull String targetCameraId) {
-        CameraManager cameraManager =
-                (CameraManager) context.getSystemService(Context.CAMERA_SERVICE);
+        CameraManager cameraManager = (CameraManager)
+                context.getSystemService(Context.CAMERA_SERVICE);
         try {
             for (String cameraId : cameraManager.getCameraIdList()) {
                 if (targetCameraId.equals(cameraId)) {

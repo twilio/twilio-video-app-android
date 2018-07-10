@@ -18,7 +18,9 @@ package com.twilio.video;
 
 import android.support.annotation.Nullable;
 
-/** Represents a video frame provided by a {@link CameraCapturer}. */
+/**
+ * Represents a video frame provided by a {@link CameraCapturer}.
+ */
 public class VideoFrame {
 
     public enum RotationAngle {
@@ -65,11 +67,10 @@ public class VideoFrame {
     /** The time in nanoseconds at which this frame was captured. */
     public final long timestamp;
 
-    public VideoFrame(
-            byte[] imageBuffer,
-            VideoDimensions dimensions,
-            RotationAngle orientation,
-            long timestamp) {
+    public VideoFrame(byte[] imageBuffer,
+                      VideoDimensions dimensions,
+                      RotationAngle orientation,
+                      long timestamp) {
         this(imageBuffer, null, null, dimensions, orientation, timestamp);
     }
 
@@ -78,22 +79,20 @@ public class VideoFrame {
      * We will make this constructor public when we support capturing to a texture as part of the
      * VideoCapturer API.
      */
-    VideoFrame(
-            int textureId,
-            float[] transformMatrix,
-            VideoDimensions dimensions,
-            RotationAngle orientation,
-            long timestamp) {
+    VideoFrame(int textureId,
+               float[] transformMatrix,
+               VideoDimensions dimensions,
+               RotationAngle orientation,
+               long timestamp) {
         this(null, textureId, transformMatrix, dimensions, orientation, timestamp);
     }
 
-    private VideoFrame(
-            @Nullable byte[] imageBuffer,
-            @Nullable Integer textureId,
-            @Nullable float[] transformMatrix,
-            VideoDimensions dimensions,
-            RotationAngle orientation,
-            long timestamp) {
+    private VideoFrame(@Nullable byte[] imageBuffer,
+                       @Nullable Integer textureId,
+                       @Nullable float[] transformMatrix,
+                       VideoDimensions dimensions,
+                       RotationAngle orientation,
+                       long timestamp) {
         this.imageBuffer = imageBuffer;
         this.textureId = textureId;
         this.transformMatrix = transformMatrix;

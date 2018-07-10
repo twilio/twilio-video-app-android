@@ -16,15 +16,16 @@
 
 package com.twilio.video;
 
-import static android.Manifest.permission.RECORD_AUDIO;
-import static org.mockito.Mockito.when;
-
 import android.content.Context;
 import android.content.pm.PackageManager;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+
+import static android.Manifest.permission.RECORD_AUDIO;
+import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 public class LocalAudioTrackUnitTest {

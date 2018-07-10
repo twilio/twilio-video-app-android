@@ -17,10 +17,12 @@
 package com.twilio.video;
 
 import android.content.Context;
-import java.util.ArrayList;
-import java.util.List;
+
 import org.webrtc.CameraEnumerationAndroid;
 import org.webrtc.SurfaceTextureHelper;
+
+import java.util.ArrayList;
+import java.util.List;
 
 final class VideoCapturerDelegate implements org.webrtc.VideoCapturer {
     private final VideoCapturer videoCapturer;
@@ -44,10 +46,9 @@ final class VideoCapturerDelegate implements org.webrtc.VideoCapturer {
     }
 
     @Override
-    public void initialize(
-            SurfaceTextureHelper surfaceTextureHelper,
-            Context context,
-            CapturerObserver capturerObserver) {
+    public void initialize(SurfaceTextureHelper surfaceTextureHelper,
+                           Context context,
+                           CapturerObserver capturerObserver) {
         this.listenerAdapter = new VideoCapturerListenerAdapter(capturerObserver);
         // FIXME: ugh this is still cheating..need to figure out a way to pass this better
         if (videoCapturer instanceof CameraCapturer) {
@@ -101,8 +102,7 @@ final class VideoCapturerDelegate implements org.webrtc.VideoCapturer {
         this.videoPixelFormat = videoPixelFormat;
     }
 
-    private List<CameraEnumerationAndroid.CaptureFormat> convertToWebRtcFormats(
-            List<VideoFormat> videoFormats) {
+    private List<CameraEnumerationAndroid.CaptureFormat> convertToWebRtcFormats(List<VideoFormat> videoFormats) {
         if (videoFormats != null) {
             List<CameraEnumerationAndroid.CaptureFormat> webRtcCaptureFormats =
                     new ArrayList<>(videoFormats.size());
@@ -115,8 +115,7 @@ final class VideoCapturerDelegate implements org.webrtc.VideoCapturer {
                          * max framerate in JNI layer. We will just set min and max to the same in
                          * this conversion
                          */
-                        new CameraEnumerationAndroid.CaptureFormat(
-                                videoFormat.dimensions.width,
+                        new CameraEnumerationAndroid.CaptureFormat(videoFormat.dimensions.width,
                                 videoFormat.dimensions.height,
                                 videoFormat.framerate,
                                 videoFormat.framerate,
@@ -130,6 +129,7 @@ final class VideoCapturerDelegate implements org.webrtc.VideoCapturer {
 
         return new ArrayList<>();
     }
+
 
     /*
      * An implementation of CapturerObserver that forwards all calls from Java to the C layer.
@@ -152,22 +152,28 @@ final class VideoCapturerDelegate implements org.webrtc.VideoCapturer {
         }
 
         @Override
-        public void onByteBufferFrameCaptured(
-                byte[] data, int width, int height, int rotation, long timeStamp) {
-            nativeOnByteBufferFrameCaptured(
-                    nativeCapturer, data, data.length, width, height, rotation, timeStamp);
+        public void onByteBufferFrameCaptured(byte[] data,
+                                              int width,
+                                              int height,
+                                              int rotation,
+                                              long timeStamp) {
+            nativeOnByteBufferFrameCaptured(nativeCapturer,
+                    data,
+                    data.length,
+                    width,
+                    height,
+                    rotation,
+                    timeStamp);
         }
 
         @Override
-        public void onTextureFrameCaptured(
-                int width,
-                int height,
-                int oesTextureId,
-                float[] transformMatrix,
-                int rotation,
-                long timestamp) {
-            nativeOnTextureFrameCaptured(
-                    nativeCapturer,
+        public void onTextureFrameCaptured(int width,
+                                           int height,
+                                           int oesTextureId,
+                                           float[] transformMatrix,
+                                           int rotation,
+                                           long timestamp) {
+            nativeOnTextureFrameCaptured(nativeCapturer,
                     width,
                     height,
                     oesTextureId,
@@ -176,24 +182,23 @@ final class VideoCapturerDelegate implements org.webrtc.VideoCapturer {
                     timestamp);
         }
 
-        private native void nativeCapturerStarted(long nativeCapturer, boolean success);
+        private native void nativeCapturerStarted(long nativeCapturer,
+                                                  boolean success);
 
-        private native void nativeOnByteBufferFrameCaptured(
-                long nativeCapturer,
-                byte[] data,
-                int length,
-                int width,
-                int height,
-                int rotation,
-                long timeStamp);
+        private native void nativeOnByteBufferFrameCaptured(long nativeCapturer,
+                                                            byte[] data,
+                                                            int length,
+                                                            int width,
+                                                            int height,
+                                                            int rotation,
+                                                            long timeStamp);
 
-        private native void nativeOnTextureFrameCaptured(
-                long nativeCapturer,
-                int width,
-                int height,
-                int oesTextureId,
-                float[] transformMatrix,
-                int rotation,
-                long timestamp);
+        private native void nativeOnTextureFrameCaptured(long nativeCapturer,
+                                                         int width,
+                                                         int height,
+                                                         int oesTextureId,
+                                                         float[] transformMatrix,
+                                                         int rotation,
+                                                         long timestamp);
     }
 }

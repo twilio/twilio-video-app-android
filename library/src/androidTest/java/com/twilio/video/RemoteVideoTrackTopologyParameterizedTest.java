@@ -16,13 +16,8 @@
 
 package com.twilio.video;
 
-import static com.twilio.video.util.VideoAssert.assertFramesRendered;
-import static com.twilio.video.util.VideoAssert.assertIsTrackSid;
-import static junit.framework.TestCase.assertFalse;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
 import android.support.test.filters.LargeTest;
+
 import com.kevinmost.junit_retry_rule.Retry;
 import com.kevinmost.junit_retry_rule.RetryRule;
 import com.twilio.video.base.BaseParticipantTest;
@@ -31,16 +26,24 @@ import com.twilio.video.test.BuildConfig;
 import com.twilio.video.util.FakeVideoCapturer;
 import com.twilio.video.util.FrameCountRenderer;
 import com.twilio.video.util.Topology;
-import java.util.Arrays;
-import java.util.List;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
+
+import static com.twilio.video.util.VideoAssert.assertFramesRendered;
+import static junit.framework.TestCase.assertFalse;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static com.twilio.video.util.VideoAssert.assertIsTrackSid;
 
 @RunWith(Parameterized.class)
 @LargeTest
@@ -49,10 +52,13 @@ public class RemoteVideoTrackTopologyParameterizedTest extends BaseParticipantTe
 
     @Parameterized.Parameters(name = "{0}")
     public static Iterable<Object[]> data() {
-        return Arrays.asList(new Object[][] {{Topology.P2P}, {Topology.GROUP}});
+        return Arrays.asList(new Object[][]{
+                {Topology.P2P},
+                {Topology.GROUP}});
     }
 
-    @Rule public final RetryRule retryRule = new RetryRule();
+    @Rule
+    public final RetryRule retryRule = new RetryRule();
 
     private final Topology topology;
 
@@ -99,8 +105,7 @@ public class RemoteVideoTrackTopologyParameterizedTest extends BaseParticipantTe
 
         // Validate track name
         assertEquals(bobVideoTrackName, remoteVideoTrackPublications.get(0).getTrackName());
-        assertEquals(
-                bobVideoTrackName,
+        assertEquals(bobVideoTrackName,
                 remoteVideoTrackPublications.get(0).getRemoteVideoTrack().getName());
     }
 
@@ -123,42 +128,32 @@ public class RemoteVideoTrackTopologyParameterizedTest extends BaseParticipantTe
     @Retry(times = BuildConfig.MAX_TEST_RETRIES)
     public void shouldEnableVideoTrackAfterConnectedToRoom() throws InterruptedException {
         CallbackHelper.FakeParticipantListener participantListener =
-                new CallbackHelper.FakeParticipantListener();
+            new CallbackHelper.FakeParticipantListener();
         participantListener.onSubscribedToVideoTrackLatch = new CountDownLatch(1);
         participantListener.onVideoTrackEnabledLatch = new CountDownLatch(1);
         bobRemoteParticipant.setListener(participantListener);
-        bobLocalVideoTrack =
-                LocalVideoTrack.create(mediaTestActivity, false, new FakeVideoCapturer());
+        bobLocalVideoTrack = LocalVideoTrack.create(mediaTestActivity, false,
+                new FakeVideoCapturer());
 
         assertTrue(bobLocalParticipant.publishTrack(bobLocalVideoTrack));
         assertTrue(participantListener.onSubscribedToVideoTrackLatch.await(20, TimeUnit.SECONDS));
-        assertFalse(
-                aliceRoom
-                        .getRemoteParticipants()
-                        .get(0)
-                        .getRemoteVideoTracks()
-                        .get(0)
-                        .isTrackEnabled());
+        assertFalse(aliceRoom.getRemoteParticipants().get(0).getRemoteVideoTracks().get(0)
+                .isTrackEnabled());
         bobLocalVideoTrack.enable(true);
         assertTrue(participantListener.onVideoTrackEnabledLatch.await(20, TimeUnit.SECONDS));
-        assertTrue(
-                aliceRoom
-                        .getRemoteParticipants()
-                        .get(0)
-                        .getRemoteVideoTracks()
-                        .get(0)
-                        .isTrackEnabled());
+        assertTrue(aliceRoom.getRemoteParticipants().get(0).getRemoteVideoTracks().get(0)
+                .isTrackEnabled());
     }
 
     private void publishVideoTrack() throws InterruptedException {
         aliceParticipantListener.onSubscribedToVideoTrackLatch = new CountDownLatch(1);
         aliceParticipantListener.onVideoTrackPublishedLatch = new CountDownLatch(1);
-        bobLocalVideoTrack =
-                LocalVideoTrack.create(
-                        mediaTestActivity, true, new FakeVideoCapturer(), bobVideoTrackName);
+        bobLocalVideoTrack = LocalVideoTrack.create(mediaTestActivity,
+                true,
+                new FakeVideoCapturer(),
+                bobVideoTrackName);
         assertTrue(bobLocalParticipant.publishTrack(bobLocalVideoTrack));
         assertTrue(aliceParticipantListener.onVideoTrackPublishedLatch.await(20, TimeUnit.SECONDS));
-        assertTrue(
-                aliceParticipantListener.onSubscribedToVideoTrackLatch.await(20, TimeUnit.SECONDS));
+        assertTrue(aliceParticipantListener.onSubscribedToVideoTrackLatch.await(20, TimeUnit.SECONDS));
     }
 }

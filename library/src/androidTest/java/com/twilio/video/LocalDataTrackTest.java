@@ -16,23 +16,27 @@
 
 package com.twilio.video;
 
-import static junit.framework.Assert.assertEquals;
-import static junit.framework.TestCase.assertFalse;
-import static junit.framework.TestCase.assertNotNull;
-import static org.apache.commons.lang3.RandomStringUtils.random;
-import static org.junit.Assert.assertTrue;
 
 import android.content.Context;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.filters.LargeTest;
 import android.support.test.runner.AndroidJUnit4;
+
 import com.twilio.video.base.BaseVideoTest;
 import com.twilio.video.util.StringUtils;
-import java.nio.ByteBuffer;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+
+import java.nio.ByteBuffer;
+
+import static junit.framework.Assert.assertEquals;
+import static junit.framework.TestCase.assertFalse;
+import static junit.framework.TestCase.assertNotNull;
+import static org.apache.commons.lang3.RandomStringUtils.random;
+import static org.junit.Assert.assertTrue;
 
 @RunWith(AndroidJUnit4.class)
 @LargeTest
@@ -68,8 +72,9 @@ public class LocalDataTrackTest extends BaseVideoTest {
     @Test
     public void canCreateDataTrackWithName() {
         String expectedName = random(10);
-        DataTrackOptions dataTrackOptions =
-                new DataTrackOptions.Builder().name(expectedName).build();
+        DataTrackOptions dataTrackOptions = new DataTrackOptions.Builder()
+                .name(expectedName)
+                .build();
         localDataTrack = LocalDataTrack.create(context, dataTrackOptions);
 
         assertNotNull(localDataTrack);
@@ -78,7 +83,9 @@ public class LocalDataTrackTest extends BaseVideoTest {
 
     @Test
     public void canCreateDataTrackWithNullName() {
-        DataTrackOptions dataTrackOptions = new DataTrackOptions.Builder().name(null).build();
+        DataTrackOptions dataTrackOptions = new DataTrackOptions.Builder()
+                .name(null)
+                .build();
         localDataTrack = LocalDataTrack.create(context, dataTrackOptions);
 
         assertNotNull(localDataTrack);
@@ -87,7 +94,9 @@ public class LocalDataTrackTest extends BaseVideoTest {
 
     @Test
     public void canCreateDataTrackWithEmptyName() {
-        DataTrackOptions dataTrackOptions = new DataTrackOptions.Builder().name("").build();
+        DataTrackOptions dataTrackOptions = new DataTrackOptions.Builder()
+                .name("")
+                .build();
         localDataTrack = LocalDataTrack.create(context, dataTrackOptions);
 
         assertNotNull(localDataTrack);
@@ -97,11 +106,10 @@ public class LocalDataTrackTest extends BaseVideoTest {
     @Test
     public void canCreateUnreliableDataTrack() {
         int expectedMaxPacketLifeTime = 1000;
-        DataTrackOptions dataTrackOptions =
-                new DataTrackOptions.Builder()
-                        .ordered(false)
-                        .maxPacketLifeTime(expectedMaxPacketLifeTime)
-                        .build();
+        DataTrackOptions dataTrackOptions = new DataTrackOptions.Builder()
+                .ordered(false)
+                .maxPacketLifeTime(expectedMaxPacketLifeTime)
+                .build();
         localDataTrack = LocalDataTrack.create(context, dataTrackOptions);
 
         assertFalse(localDataTrack.isOrdered());
@@ -111,12 +119,11 @@ public class LocalDataTrackTest extends BaseVideoTest {
 
     @Test
     public void canCreateReliableDataTrack() {
-        DataTrackOptions dataTrackOptions =
-                new DataTrackOptions.Builder()
-                        .ordered(true)
-                        .maxPacketLifeTime(DataTrackOptions.DEFAULT_MAX_PACKET_LIFE_TIME)
-                        .maxRetransmits(DataTrackOptions.DEFAULT_MAX_RETRANSMITS)
-                        .build();
+        DataTrackOptions dataTrackOptions = new DataTrackOptions.Builder()
+                .ordered(true)
+                .maxPacketLifeTime(DataTrackOptions.DEFAULT_MAX_PACKET_LIFE_TIME)
+                .maxRetransmits(DataTrackOptions.DEFAULT_MAX_RETRANSMITS)
+                .build();
         localDataTrack = LocalDataTrack.create(context, dataTrackOptions);
 
         assertTrue(localDataTrack.isOrdered());
@@ -154,7 +161,7 @@ public class LocalDataTrackTest extends BaseVideoTest {
     public void canCreateMultipleDataTracks() {
         int numDataTracks = 5;
 
-        for (int i = 0; i < numDataTracks; i++) {
+        for (int i = 0 ; i < numDataTracks ; i++) {
             LocalDataTrack localDataTrack = LocalDataTrack.create(context);
 
             assertNotNull(localDataTrack);
@@ -166,7 +173,7 @@ public class LocalDataTrackTest extends BaseVideoTest {
     public void sendBuffer_shouldFailAfterReleased() {
         localDataTrack = LocalDataTrack.create(context);
         localDataTrack.release();
-        ByteBuffer messageBuffer = ByteBuffer.wrap(new byte[] {0x00, 0x11, 0x22, 0x33});
+        ByteBuffer messageBuffer = ByteBuffer.wrap(new byte[]{ 0x00, 0x11, 0x22, 0x33 });
 
         localDataTrack.send(messageBuffer);
     }
@@ -199,7 +206,7 @@ public class LocalDataTrackTest extends BaseVideoTest {
     @Test
     public void canSendBufferIfNotPublished() {
         localDataTrack = LocalDataTrack.create(context);
-        ByteBuffer messageBuffer = ByteBuffer.wrap(new byte[] {0x00, 0x11, 0x22, 0x33});
+        ByteBuffer messageBuffer = ByteBuffer.wrap(new byte[]{ 0x00, 0x11, 0x22, 0x33 });
 
         localDataTrack.send(messageBuffer);
     }

@@ -16,7 +16,9 @@
 
 package com.twilio.video;
 
+
 import android.content.Context;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -33,6 +35,6 @@ public class MediaFactoryUnitTest {
 
     @Test(expected = NullPointerException.class)
     public void instance_shouldFailWithNullContext() {
-        MediaFactory.instance(new Object(), null);
+        MediaFactory.instance(new Object(),null);
     }
 }

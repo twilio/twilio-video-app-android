@@ -16,14 +16,16 @@
 
 package com.twilio.video;
 
-import static org.mockito.Mockito.when;
-
 import android.content.Context;
-import java.util.Collections;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+
+import java.util.Collections;
+
+import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 public class LocalVideoTrackUnitTest {

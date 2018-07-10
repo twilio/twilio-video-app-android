@@ -28,14 +28,13 @@ public class VideoAssert extends Assert {
     }
 
     public static void assertIsParticipantSid(String participantSid) {
-        assertTrue(
-                String.format("%s is not participant sid", participantSid),
+        assertTrue(String.format("%s is not participant sid", participantSid),
                 participantSid.matches(PARTICIPANT_SID_REGEX));
     }
 
     public static void assertIsTrackSid(String trackSid) {
-        assertTrue(
-                String.format("%s is not track sid", trackSid), trackSid.matches(TRACK_SID_REGEX));
+        assertTrue(String.format("%s is not track sid", trackSid),
+                trackSid.matches(TRACK_SID_REGEX));
     }
 
     public static void assertFramesRendered(FrameCountRenderer frameCountRenderer, int timeoutMs)
@@ -45,14 +44,14 @@ public class VideoAssert extends Assert {
         }
     }
 
-    public static void assertNoFramesRendered(FrameCountRenderer frameCountRenderer, int timeoutMs)
-            throws InterruptedException {
+    public static void assertNoFramesRendered(FrameCountRenderer frameCountRenderer,
+                                              int timeoutMs) throws InterruptedException {
         assertNoFramesRendered(frameCountRenderer, timeoutMs, DEFAULT_FRAMES_RENDERED_RETRY_MAX);
     }
 
-    public static void assertNoFramesRendered(
-            FrameCountRenderer frameCountRenderer, int timeoutMs, int maxRetries)
-            throws InterruptedException {
+    public static void assertNoFramesRendered(FrameCountRenderer frameCountRenderer,
+                                              int timeoutMs,
+                                              int maxRetries) throws InterruptedException {
         int retries = 0;
         while (frameCountRenderer.waitForFrame(timeoutMs)) {
             if (retries == maxRetries) {

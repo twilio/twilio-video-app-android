@@ -9,24 +9,24 @@ import android.text.Editable;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import butterknife.BindView;
-import butterknife.ButterKnife;
-import butterknife.OnClick;
-import butterknife.OnTextChanged;
+
 import com.twilio.video.app.R;
 import com.twilio.video.app.base.BaseActivity;
 import com.twilio.video.app.data.Preferences;
 import com.twilio.video.app.ui.room.RoomActivity;
+
 import javax.inject.Inject;
+
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
+import butterknife.OnTextChanged;
 
 public class CommunityLoginActivity extends BaseActivity {
     @Inject SharedPreferences sharedPreferences;
 
-    @BindView(R.id.name_edittext)
-    EditText nameEditText;
-
-    @BindView(R.id.login_button)
-    Button loginButton;
+    @BindView(R.id.name_edittext) EditText nameEditText;
+    @BindView(R.id.login_button) Button loginButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,7 +58,9 @@ public class CommunityLoginActivity extends BaseActivity {
     }
 
     private void saveIdentity(String name) {
-        sharedPreferences.edit().putString(Preferences.DISPLAY_NAME, name).apply();
+        sharedPreferences.edit()
+                .putString(Preferences.DISPLAY_NAME, name)
+                .apply();
     }
 
     private void startLobbyActivity() {

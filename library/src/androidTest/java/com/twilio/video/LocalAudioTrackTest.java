@@ -16,28 +16,31 @@
 
 package com.twilio.video;
 
-import static junit.framework.Assert.assertEquals;
-import static junit.framework.Assert.assertFalse;
-import static junit.framework.Assert.assertNotNull;
-import static org.apache.commons.lang3.RandomStringUtils.random;
-import static org.junit.Assert.assertTrue;
-
-import android.Manifest;
 import android.support.test.filters.SmallTest;
+import android.Manifest;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.rule.GrantPermissionRule;
 import android.support.test.runner.AndroidJUnit4;
+
 import com.twilio.video.base.BaseVideoTest;
 import com.twilio.video.ui.MediaTestActivity;
 import com.twilio.video.util.StringUtils;
-import java.util.ArrayList;
-import java.util.List;
+
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.assertFalse;
+import static junit.framework.Assert.assertNotNull;
+import static org.apache.commons.lang3.RandomStringUtils.random;
+import static org.junit.Assert.assertTrue;
 
 @RunWith(AndroidJUnit4.class)
 @SmallTest
@@ -53,13 +56,11 @@ public class LocalAudioTrackTest extends BaseVideoTest {
     private static final int TYPING_DETECTION_INDEX = 6;
 
     @Rule
-    public GrantPermissionRule recordAudioPermissionRule =
-            GrantPermissionRule.grant(Manifest.permission.RECORD_AUDIO);
-
+    public GrantPermissionRule recordAudioPermissionRule = GrantPermissionRule
+            .grant(Manifest.permission.RECORD_AUDIO);
     @Rule
     public ActivityTestRule<MediaTestActivity> activityRule =
             new ActivityTestRule<>(MediaTestActivity.class);
-
     private MediaTestActivity mediaTestActivity;
     private LocalAudioTrack localAudioTrack;
 
@@ -121,11 +122,11 @@ public class LocalAudioTrackTest extends BaseVideoTest {
     @Test
     public void canCreateMultipleAudioTracks() {
         int numAudioTracks = 5;
-        boolean[] expectedEnabled = new boolean[] {false, true, true, false, false};
+        boolean[] expectedEnabled = new boolean[]{ false, true, true, false, false };
 
-        for (int i = 0; i < numAudioTracks; i++) {
-            LocalAudioTrack localAudioTrack =
-                    LocalAudioTrack.create(mediaTestActivity, expectedEnabled[i]);
+        for (int i = 0 ; i < numAudioTracks ; i++) {
+            LocalAudioTrack localAudioTrack = LocalAudioTrack.create(mediaTestActivity,
+                    expectedEnabled[i]);
 
             Assert.assertNotNull(localAudioTrack);
             assertEquals(expectedEnabled[i], localAudioTrack.isEnabled());
@@ -158,11 +159,9 @@ public class LocalAudioTrackTest extends BaseVideoTest {
             localAudioTrack = LocalAudioTrack.create(mediaTestActivity, true, audioOptions);
 
             // Validate the audio track was created
-            assertNotNull(
-                    "Failed to create RemoteAudioTrack with options: " + audioOptions,
+            assertNotNull("Failed to create RemoteAudioTrack with options: " + audioOptions,
                     localAudioTrack);
-            assertTrue(
-                    "RemoteAudioTrack created is not enabled with options: " + audioOptions,
+            assertTrue("RemoteAudioTrack created is not enabled with options: " + audioOptions,
                     localAudioTrack.isEnabled());
 
             // Remove the audio track and continue to next audio options configuration
@@ -211,19 +210,17 @@ public class LocalAudioTrackTest extends BaseVideoTest {
         boolean[][] audioOptionsMatrix = getAudioOptionsPermutationMatrix();
         List<AudioOptions> audioOptionsList = new ArrayList<>(NUM_AUDIO_OPTIONS_PERMUTATIONS);
 
-        for (int i = 0; i < NUM_AUDIO_OPTIONS_PERMUTATIONS; i++) {
-            AudioOptions audioOptions =
-                    new AudioOptions.Builder()
-                            .echoCancellation(audioOptionsMatrix[i][ECHO_CANCELLATION_INDEX])
-                            .autoGainControl(audioOptionsMatrix[i][AUTO_GAIN_CONTROL_INDEX])
-                            .noiseSuppression(audioOptionsMatrix[i][NOISE_SUPRRESSION_INDEX])
-                            .highpassFilter(audioOptionsMatrix[i][HIGHPASS_FILTER_INDEX])
-                            .stereoSwapping(audioOptionsMatrix[i][STEREO_SWAPPING_INDEX])
-                            .audioJitterBufferFastAccelerate(
-                                    audioOptionsMatrix[i][
-                                            AUDIO_JITTER_BUFFER_FAST_ACCELERATE_INDEX])
-                            .typingDetection(audioOptionsMatrix[i][TYPING_DETECTION_INDEX])
-                            .build();
+        for (int i = 0 ; i < NUM_AUDIO_OPTIONS_PERMUTATIONS ; i++) {
+            AudioOptions audioOptions = new AudioOptions.Builder()
+                    .echoCancellation(audioOptionsMatrix[i][ECHO_CANCELLATION_INDEX])
+                    .autoGainControl(audioOptionsMatrix[i][AUTO_GAIN_CONTROL_INDEX])
+                    .noiseSuppression(audioOptionsMatrix[i][NOISE_SUPRRESSION_INDEX])
+                    .highpassFilter(audioOptionsMatrix[i][HIGHPASS_FILTER_INDEX])
+                    .stereoSwapping(audioOptionsMatrix[i][STEREO_SWAPPING_INDEX])
+                    .audioJitterBufferFastAccelerate(audioOptionsMatrix[i]
+                            [AUDIO_JITTER_BUFFER_FAST_ACCELERATE_INDEX])
+                    .typingDetection(audioOptionsMatrix[i][TYPING_DETECTION_INDEX])
+                    .build();
 
             audioOptionsList.add(i, audioOptions);
         }
@@ -238,9 +235,9 @@ public class LocalAudioTrackTest extends BaseVideoTest {
         boolean[][] audioOptionsMatrix =
                 new boolean[NUM_AUDIO_OPTIONS_PERMUTATIONS][NUM_AUDIO_OPTIONS];
 
-        for (int i = 0x0; i < NUM_AUDIO_OPTIONS_PERMUTATIONS; i++) {
+        for (int i = 0x0 ; i < NUM_AUDIO_OPTIONS_PERMUTATIONS ; i++) {
             boolean[] audioOptions = new boolean[NUM_AUDIO_OPTIONS];
-            for (int j = 0; j < NUM_AUDIO_OPTIONS; j++) {
+            for (int j = 0 ; j < NUM_AUDIO_OPTIONS ; j++) {
                 boolean enableAudioOption = (i & (0x1 << j)) == 0;
                 audioOptions[j] = enableAudioOption;
             }
