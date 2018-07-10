@@ -143,6 +143,10 @@ jobs:
     - stage: test
       script: ./gradlew -q assemble
     - stage: test
+      script: ./gradlew -q spotlessCheck
+    - stage: test
+      script: ./gradlew -q spotlessCheck
+    - stage: fork test
       script: ./gradlew -q librarySizeReport
     - stage: fork test
       script: ./gradlew library:testDebugUnitTest
