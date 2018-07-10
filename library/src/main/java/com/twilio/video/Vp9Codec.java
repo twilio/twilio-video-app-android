@@ -17,8 +17,8 @@
 package com.twilio.video;
 
 /**
- * Traditional block-based transform coding format similar to MPEG's High Efficiency Video Coding
- * (HEVC/H.265).
+ * Traditional block-based transform coding format similar to MPEG's High Efficiency Video
+ * Coding (HEVC/H.265).
  *
  * @see <a href="https://en.wikipedia.org/wiki/VP9">VP9</a>
  */

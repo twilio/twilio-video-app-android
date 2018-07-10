@@ -52,19 +52,25 @@ public class LocalDataTrackPublication implements DataTrackPublication {
         return localDataTrack.getName();
     }
 
-    /** Check if local data track is enabled. */
+    /**
+     * Check if local data track is enabled.
+     */
     @Override
     public boolean isTrackEnabled() {
         return localDataTrack.isEnabled();
     }
 
-    /** Returns the base data track object of the published local data track. */
+    /**
+     * Returns the base data track object of the published local data track.
+     */
     @Override
     public DataTrack getDataTrack() {
         return localDataTrack;
     }
 
-    /** Returns the published local data track. */
+    /**
+     * Returns the published local data track.
+     */
     public LocalDataTrack getLocalDataTrack() {
         return localDataTrack;
     }

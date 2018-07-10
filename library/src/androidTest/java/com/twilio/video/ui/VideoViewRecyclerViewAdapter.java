@@ -23,10 +23,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+
 import com.twilio.video.LocalVideoTrack;
 import com.twilio.video.VideoScaleType;
-import com.twilio.video.VideoView;
 import com.twilio.video.test.R;
+import com.twilio.video.VideoView;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -34,8 +36,8 @@ import java.util.Map;
 /*
  * RecyclerView adapter that renders local video tracks to a VideoView and TextView.
  */
-public class VideoViewRecyclerViewAdapter
-        extends RecyclerView.Adapter<VideoViewRecyclerViewAdapter.VideoViewHolder> {
+public class VideoViewRecyclerViewAdapter extends
+        RecyclerView.Adapter<VideoViewRecyclerViewAdapter.VideoViewHolder> {
     private static final String TAG = "VideoViewRecAdapter";
 
     private final List<LocalVideoTrack> localVideoTracks;
@@ -66,8 +68,8 @@ public class VideoViewRecyclerViewAdapter
     @Override
     public VideoViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         Log.d(TAG, "onCreateViewHolder");
-        View view =
-                LayoutInflater.from(parent.getContext()).inflate(R.layout.video_view_item, null);
+        View view = LayoutInflater.from(parent.getContext())
+                .inflate(R.layout.video_view_item, null);
         return new VideoViewHolder(view);
     }
 
@@ -83,8 +85,8 @@ public class VideoViewRecyclerViewAdapter
 
         // Update view holder
         holder.trackNameTextView.setText(localVideoTrack.getName());
-        holder.frameCountProxyRendererListener.videoView.setVideoScaleType(
-                VideoScaleType.ASPECT_FILL);
+        holder.frameCountProxyRendererListener.videoView
+                .setVideoScaleType(VideoScaleType.ASPECT_FILL);
         localVideoTrack.addRenderer(holder.frameCountProxyRendererListener);
         viewHolderMap.put(holder, localVideoTrack);
     }
@@ -105,8 +107,8 @@ public class VideoViewRecyclerViewAdapter
         VideoViewHolder(View itemView) {
             super(itemView);
             this.frameCountProxyRendererListener =
-                    new FrameCountProxyRendererListener(
-                            (VideoView) itemView.findViewById(R.id.video_view));
+                    new FrameCountProxyRendererListener((VideoView) itemView
+                            .findViewById(R.id.video_view));
             this.trackNameTextView = itemView.findViewById(R.id.track_name_text_view);
         }
     }

@@ -16,12 +16,16 @@
 
 package com.twilio.video;
 
-/** A remote video track represents a remote video source. */
+/**
+ * A remote video track represents a remote video source.
+ */
 public class RemoteVideoTrack extends VideoTrack {
     private final String sid;
 
-    RemoteVideoTrack(
-            org.webrtc.VideoTrack webRtcVideoTrack, String sid, String name, boolean enabled) {
+    RemoteVideoTrack(org.webrtc.VideoTrack webRtcVideoTrack,
+                     String sid,
+                     String name,
+                     boolean enabled) {
         super(webRtcVideoTrack, enabled, name);
         this.sid = sid;
     }
@@ -34,3 +38,4 @@ public class RemoteVideoTrack extends VideoTrack {
         return sid;
     }
 }
+

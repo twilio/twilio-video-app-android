@@ -19,6 +19,7 @@ package com.twilio.video;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+
 import java.nio.ByteBuffer;
 
 /**
@@ -33,8 +34,8 @@ public class LocalDataTrack extends DataTrack {
     private final MediaFactory mediaFactory;
 
     /**
-     * Creates a local data track with no name and {@link
-     * DataTrackOptions#DEFAULT_DATA_TRACK_OPTIONS}.
+     * Creates a local data track with no name and
+     * {@link DataTrackOptions#DEFAULT_DATA_TRACK_OPTIONS}.
      *
      * @param context application context.
      * @return local data track
@@ -50,20 +51,17 @@ public class LocalDataTrack extends DataTrack {
      * @param dataTrackOptions data track options.
      * @return local data track.
      */
-    public static LocalDataTrack create(
-            @NonNull Context context, @Nullable DataTrackOptions dataTrackOptions) {
+    public static LocalDataTrack create(@NonNull Context context,
+                                        @Nullable DataTrackOptions dataTrackOptions) {
         Preconditions.checkNotNull(context, "Context must not be null");
-        dataTrackOptions =
-                dataTrackOptions == null
-                        ? (DataTrackOptions.DEFAULT_DATA_TRACK_OPTIONS)
-                        : dataTrackOptions;
+        dataTrackOptions = dataTrackOptions == null ?
+                (DataTrackOptions.DEFAULT_DATA_TRACK_OPTIONS) :
+                dataTrackOptions;
 
         // Use temporary media factory owner to create local data track
         Object temporaryMediaFactoryOwner = new Object();
         MediaFactory mediaFactory = MediaFactory.instance(temporaryMediaFactoryOwner, context);
-        LocalDataTrack localDataTrack =
-                mediaFactory.createDataTrack(
-                        context,
+        LocalDataTrack localDataTrack = mediaFactory.createDataTrack(context,
                         dataTrackOptions.ordered,
                         dataTrackOptions.maxPacketLifeTime,
                         dataTrackOptions.maxRetransmits,
@@ -81,18 +79,14 @@ public class LocalDataTrack extends DataTrack {
      * receiver are on the same platform.
      *
      * @param messageBuffer binary message
-     * @see <a
-     *     href="https://developer.mozilla.org/en-US/docs/Web/API/WebRTC_API/Using_data_channels#Understanding_message_size_limits">Understanding
-     *     Message Size Limits</a>
+     * @see <a href="https://developer.mozilla.org/en-US/docs/Web/API/WebRTC_API/Using_data_channels#Understanding_message_size_limits">Understanding Message Size Limits</a>
      */
     public synchronized void send(@NonNull ByteBuffer messageBuffer) {
         Preconditions.checkState(!isReleased(), "Cannot send message after data track is released");
         Preconditions.checkNotNull(messageBuffer, "Message buffer must not be null");
-        nativeBufferSend(
-                nativeLocalDataTrackHandle,
-                messageBuffer.hasArray()
-                        ? messageBuffer.array()
-                        : getMessageByteArray(messageBuffer));
+        nativeBufferSend(nativeLocalDataTrackHandle, messageBuffer.hasArray() ?
+                messageBuffer.array() :
+                getMessageByteArray(messageBuffer));
     }
 
     /**
@@ -101,9 +95,7 @@ public class LocalDataTrack extends DataTrack {
      * receiver are on the same platform.
      *
      * @param message string message.
-     * @see <a
-     *     href="https://developer.mozilla.org/en-US/docs/Web/API/WebRTC_API/Using_data_channels#Understanding_message_size_limits">Understanding
-     *     Message Size Limits</a>
+     * @see <a href="https://developer.mozilla.org/en-US/docs/Web/API/WebRTC_API/Using_data_channels#Understanding_message_size_limits">Understanding Message Size Limits</a>
      */
     public synchronized void send(@NonNull String message) {
         Preconditions.checkState(!isReleased(), "Cannot send message after data track is released");
@@ -130,7 +122,9 @@ public class LocalDataTrack extends DataTrack {
         return super.getName();
     }
 
-    /** Releases native memory owned by data track. */
+    /**
+     * Releases native memory owned by data track.
+     */
     public synchronized void release() {
         if (!isReleased()) {
             nativeRelease(nativeLocalDataTrackHandle);
@@ -139,16 +133,15 @@ public class LocalDataTrack extends DataTrack {
         }
     }
 
-    LocalDataTrack(
-            long nativeLocalDataTrackHandle,
-            boolean enabled,
-            boolean ordered,
-            boolean reliable,
-            int maxPacketLifeTime,
-            int maxRetransmits,
-            String nativeTrackHash,
-            String name,
-            Context context) {
+    LocalDataTrack(long nativeLocalDataTrackHandle,
+                   boolean enabled,
+                   boolean ordered,
+                   boolean reliable,
+                   int maxPacketLifeTime,
+                   int maxRetransmits,
+                   String nativeTrackHash,
+                   String name,
+                   Context context) {
         super(enabled, ordered, reliable, maxPacketLifeTime, maxRetransmits, name);
         this.nativeLocalDataTrackHandle = nativeLocalDataTrackHandle;
         this.nativeTrackHash = nativeTrackHash;
@@ -184,8 +177,6 @@ public class LocalDataTrack extends DataTrack {
     }
 
     private native void nativeBufferSend(long nativeLocalDataTrackHandle, byte[] messageBuffer);
-
     private native void nativeStringSend(long nativeLocalDataTrackHandle, String message);
-
     private native void nativeRelease(long nativeLocalVideoTrackHandle);
 }

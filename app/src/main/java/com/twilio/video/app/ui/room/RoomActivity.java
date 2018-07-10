@@ -16,10 +16,6 @@
 
 package com.twilio.video.app.ui.room;
 
-import static com.twilio.video.AspectRatio.*;
-import static com.twilio.video.app.R.drawable.ic_phonelink_ring_white_24dp;
-import static com.twilio.video.app.R.drawable.ic_volume_up_white_24dp;
-
 import android.Manifest;
 import android.annotation.TargetApi;
 import android.app.Activity;
@@ -51,10 +47,7 @@ import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
-import butterknife.BindView;
-import butterknife.ButterKnife;
-import butterknife.OnClick;
-import butterknife.OnTextChanged;
+
 import com.twilio.video.AspectRatio;
 import com.twilio.video.AudioCodec;
 import com.twilio.video.CameraCapturer;
@@ -103,6 +96,20 @@ import com.twilio.video.app.util.EnvUtil;
 import com.twilio.video.app.util.InputUtils;
 import com.twilio.video.app.util.StatsScheduler;
 import com.twilio.video.env.Env;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.Callable;
+
+import javax.inject.Inject;
+
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
+import butterknife.OnTextChanged;
 import io.reactivex.Completable;
 import io.reactivex.Single;
 import io.reactivex.SingleObserver;
@@ -113,14 +120,11 @@ import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Action;
 import io.reactivex.functions.Function;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.Callable;
-import javax.inject.Inject;
 import timber.log.Timber;
+
+import static com.twilio.video.AspectRatio.*;
+import static com.twilio.video.app.R.drawable.ic_phonelink_ring_white_24dp;
+import static com.twilio.video.app.R.drawable.ic_volume_up_white_24dp;
 
 public class RoomActivity extends BaseActivity {
     private static final int PERMISSIONS_REQUEST_CODE = 100;
@@ -131,74 +135,44 @@ public class RoomActivity extends BaseActivity {
     // because that information is unknown until room connection is fully established
     private static final String LOCAL_PARTICIPANT_STUB_SID = "";
 
-    private AspectRatio[] aspectRatios =
-            new AspectRatio[] {ASPECT_RATIO_4_3, ASPECT_RATIO_16_9, ASPECT_RATIO_11_9};
+    private AspectRatio[] aspectRatios = new AspectRatio[]{
+            ASPECT_RATIO_4_3,
+            ASPECT_RATIO_16_9,
+            ASPECT_RATIO_11_9
+    };
 
-    private VideoDimensions[] videoDimensions =
-            new VideoDimensions[] {
-                VideoDimensions.CIF_VIDEO_DIMENSIONS,
-                VideoDimensions.VGA_VIDEO_DIMENSIONS,
-                VideoDimensions.WVGA_VIDEO_DIMENSIONS,
-                VideoDimensions.HD_540P_VIDEO_DIMENSIONS,
-                VideoDimensions.HD_720P_VIDEO_DIMENSIONS,
-                VideoDimensions.HD_960P_VIDEO_DIMENSIONS,
-                VideoDimensions.HD_S1080P_VIDEO_DIMENSIONS,
-                VideoDimensions.HD_1080P_VIDEO_DIMENSIONS
-            };
+    private VideoDimensions[] videoDimensions = new VideoDimensions[]{
+            VideoDimensions.CIF_VIDEO_DIMENSIONS,
+            VideoDimensions.VGA_VIDEO_DIMENSIONS,
+            VideoDimensions.WVGA_VIDEO_DIMENSIONS,
+            VideoDimensions.HD_540P_VIDEO_DIMENSIONS,
+            VideoDimensions.HD_720P_VIDEO_DIMENSIONS,
+            VideoDimensions.HD_960P_VIDEO_DIMENSIONS,
+            VideoDimensions.HD_S1080P_VIDEO_DIMENSIONS,
+            VideoDimensions.HD_1080P_VIDEO_DIMENSIONS
+    };
 
-    @BindView(R.id.toolbar)
-    Toolbar toolbar;
+    @BindView(R.id.toolbar) Toolbar toolbar;
+    @BindView(R.id.connect) Button connect;
+    @BindView(R.id.disconnect) ImageButton disconnectButton;
+    @BindView(R.id.primary_video) ParticipantPrimaryView primaryVideoView;
+    @BindView(R.id.remote_video_thumbnails) LinearLayout thumbnailLinearLayout;
+    @BindView(R.id.local_video_image_button) ImageButton localVideoImageButton;
+    @BindView(R.id.local_audio_image_button) ImageButton localAudioImageButton;
+    @BindView(R.id.video_container) FrameLayout frameLayout;
 
-    @BindView(R.id.connect)
-    Button connect;
+    @BindView(R.id.join_room_layout) LinearLayout joinRoomLayout;
+    @BindView(R.id.room_edit_text) ClearableEditText roomEditText;
 
-    @BindView(R.id.disconnect)
-    ImageButton disconnectButton;
+    @BindView(R.id.join_status_layout) LinearLayout joinStatusLayout;
+    @BindView(R.id.join_status) TextView joinStatusTextView;
+    @BindView(R.id.join_room_name) TextView joinRoomNameTextView;
+    @BindView(R.id.recording_notice) TextView recordingNoticeTextView;
 
-    @BindView(R.id.primary_video)
-    ParticipantPrimaryView primaryVideoView;
-
-    @BindView(R.id.remote_video_thumbnails)
-    LinearLayout thumbnailLinearLayout;
-
-    @BindView(R.id.local_video_image_button)
-    ImageButton localVideoImageButton;
-
-    @BindView(R.id.local_audio_image_button)
-    ImageButton localAudioImageButton;
-
-    @BindView(R.id.video_container)
-    FrameLayout frameLayout;
-
-    @BindView(R.id.join_room_layout)
-    LinearLayout joinRoomLayout;
-
-    @BindView(R.id.room_edit_text)
-    ClearableEditText roomEditText;
-
-    @BindView(R.id.join_status_layout)
-    LinearLayout joinStatusLayout;
-
-    @BindView(R.id.join_status)
-    TextView joinStatusTextView;
-
-    @BindView(R.id.join_room_name)
-    TextView joinRoomNameTextView;
-
-    @BindView(R.id.recording_notice)
-    TextView recordingNoticeTextView;
-
-    @BindView(R.id.stats_recycler_view)
-    RecyclerView statsRecyclerView;
-
-    @BindView(R.id.stats_disabled)
-    LinearLayout statsDisabledLayout;
-
-    @BindView(R.id.stats_disabled_title)
-    TextView statsDisabledTitleTextView;
-
-    @BindView(R.id.stats_disabled_description)
-    TextView statsDisabledDescTextView;
+    @BindView(R.id.stats_recycler_view) RecyclerView statsRecyclerView;
+    @BindView(R.id.stats_disabled) LinearLayout statsDisabledLayout;
+    @BindView(R.id.stats_disabled_title) TextView statsDisabledTitleTextView;
+    @BindView(R.id.stats_disabled_description) TextView statsDisabledDescTextView;
 
     private MenuItem switchCameraMenuItem;
     private MenuItem pauseVideoMenuItem;
@@ -223,24 +197,20 @@ public class RoomActivity extends BaseActivity {
     private LocalVideoTrack screenVideoTrack;
     private CameraCapturerCompat cameraCapturer;
     private ScreenCapturer screenCapturer;
-    private final ScreenCapturer.Listener screenCapturerListener =
-            new ScreenCapturer.Listener() {
-                @Override
-                public void onScreenCaptureError(String errorDescription) {
-                    Timber.e("Screen capturer error: " + errorDescription);
-                    stopScreenCapture();
-                    Toast.makeText(
-                                    RoomActivity.this,
-                                    R.string.screen_capture_error,
-                                    Toast.LENGTH_LONG)
-                            .show();
-                }
+    private final ScreenCapturer.Listener screenCapturerListener = new ScreenCapturer.Listener() {
+        @Override
+        public void onScreenCaptureError(String errorDescription) {
+            Timber.e("Screen capturer error: " + errorDescription);
+            stopScreenCapture();
+            Toast.makeText(RoomActivity.this, R.string.screen_capture_error,
+                    Toast.LENGTH_LONG).show();
+        }
 
-                @Override
-                public void onFirstFrameAvailable() {
-                    Timber.d("First frame from screen capturer available");
-                }
-            };
+        @Override
+        public void onFirstFrameAvailable() {
+            Timber.d("First frame from screen capturer available");
+        }
+    };
 
     private StatsScheduler statsScheduler;
     private StatsListAdapter statsListAdapter;
@@ -249,10 +219,14 @@ public class RoomActivity extends BaseActivity {
     @Inject TokenService tokenService;
     @Inject SharedPreferences sharedPreferences;
 
-    /** Coordinates participant thumbs and primary participant rendering. */
+    /**
+     * Coordinates participant thumbs and primary participant rendering.
+     */
     private ParticipantController participantController;
 
-    /** Disposes {@link VideoAppService} requests when activity is destroyed. */
+    /**
+     * Disposes {@link VideoAppService} requests when activity is destroyed.
+     */
     private final CompositeDisposable rxDisposables = new CompositeDisposable();
 
     @Override
@@ -311,18 +285,19 @@ public class RoomActivity extends BaseActivity {
     }
 
     @Override
-    public void onRequestPermissionsResult(
-            int requestCode, String[] permissions, int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode,
+                                           String[] permissions,
+                                           int[] grantResults) {
         if (requestCode == PERMISSIONS_REQUEST_CODE) {
-            boolean recordAudioPermissionGranted =
-                    grantResults[0] == PackageManager.PERMISSION_GRANTED;
-            boolean cameraPermissionGranted = grantResults[1] == PackageManager.PERMISSION_GRANTED;
-            boolean writeExternalStoragePermissionGranted =
-                    grantResults[2] == PackageManager.PERMISSION_GRANTED;
-            boolean permissionsGranted =
-                    recordAudioPermissionGranted
-                            && cameraPermissionGranted
-                            && writeExternalStoragePermissionGranted;
+            boolean recordAudioPermissionGranted = grantResults[0] ==
+                    PackageManager.PERMISSION_GRANTED;
+            boolean cameraPermissionGranted = grantResults[1] ==
+                    PackageManager.PERMISSION_GRANTED;
+            boolean writeExternalStoragePermissionGranted = grantResults[2] ==
+                    PackageManager.PERMISSION_GRANTED;
+            boolean permissionsGranted = recordAudioPermissionGranted &&
+                    cameraPermissionGranted &&
+                    writeExternalStoragePermissionGranted;
 
             if (permissionsGranted) {
                 setupLocalMedia();
@@ -419,11 +394,8 @@ public class RoomActivity extends BaseActivity {
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == MEDIA_PROJECTION_REQUEST_CODE) {
             if (resultCode != Activity.RESULT_OK) {
-                Toast.makeText(
-                                this,
-                                R.string.screen_capture_permission_not_granted,
-                                Toast.LENGTH_LONG)
-                        .show();
+                Toast.makeText(this, R.string.screen_capture_permission_not_granted,
+                        Toast.LENGTH_LONG).show();
 
                 return;
             }
@@ -432,10 +404,7 @@ public class RoomActivity extends BaseActivity {
         }
     }
 
-    @OnTextChanged(
-        value = R.id.room_edit_text,
-        callback = OnTextChanged.Callback.AFTER_TEXT_CHANGED
-    )
+    @OnTextChanged(value = R.id.room_edit_text, callback = OnTextChanged.Callback.AFTER_TEXT_CHANGED)
     void onTextChanged(CharSequence text) {
         connect.setEnabled(!TextUtils.isEmpty(text));
     }
@@ -447,48 +416,42 @@ public class RoomActivity extends BaseActivity {
         final String roomName = roomEditText.getText().toString();
 
         // obtain latest environment preferences
-        Topology topology =
-                Topology.fromString(
-                        sharedPreferences.getString(
-                                Preferences.TOPOLOGY, Preferences.TOPOLOGY_DEFAULT));
+        Topology topology = Topology.fromString(sharedPreferences.getString(Preferences.TOPOLOGY,
+                Preferences.TOPOLOGY_DEFAULT));
 
-        Single<Room> connection =
-                updateEnv()
-                        .andThen(tokenService.getToken(displayName, topology))
-                        .flatMap(
-                                new Function<String, SingleSource<? extends Room>>() {
-                                    @Override
-                                    public SingleSource<? extends Room> apply(@NonNull String token)
-                                            throws Exception {
-                                        return connect(token, roomName);
-                                    }
-                                });
+        Single<Room> connection = updateEnv()
+                .andThen(tokenService.getToken(displayName, topology))
+                .flatMap(new Function<String, SingleSource<? extends Room>>() {
+                    @Override
+                    public SingleSource<? extends Room> apply(@NonNull String token)
+                            throws Exception {
+                        return connect(token, roomName);
+                    }
+                });
 
-        connection
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(
-                        new SingleObserver<Room>() {
-                            @Override
-                            public void onSubscribe(Disposable disposable) {
-                                InputUtils.hideKeyboard(RoomActivity.this);
-                                rxDisposables.add(disposable);
-                            }
+        connection.observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new SingleObserver<Room>() {
+                    @Override
+                    public void onSubscribe(Disposable disposable) {
+                        InputUtils.hideKeyboard(RoomActivity.this);
+                        rxDisposables.add(disposable);
+                    }
 
-                            @Override
-                            public void onSuccess(Room room) {
-                                RoomActivity.this.room = room;
-                                updateUi(room);
-                            }
+                    @Override
+                    public void onSuccess(Room room) {
+                        RoomActivity.this.room = room;
+                        updateUi(room);
+                    }
 
-                            @Override
-                            public void onError(Throwable e) {
-                                final String message = "Failed to retrieve access token";
-                                Timber.e("%s -> reason: %s", message, e.getMessage());
-                                Snackbar.make(primaryVideoView, message, Snackbar.LENGTH_LONG)
-                                        .show();
-                                connect.setEnabled(true);
-                            }
-                        });
+                    @Override
+                    public void onError(Throwable e) {
+                        final String message = "Failed to retrieve access token";
+                        Timber.e("%s -> reason: %s", message, e.getMessage());
+                        Snackbar.make(primaryVideoView, message, Snackbar.LENGTH_LONG).show();
+                        connect.setEnabled(true);
+                    }
+                });
+
     }
 
     @OnClick(R.id.disconnect)
@@ -509,8 +472,8 @@ public class RoomActivity extends BaseActivity {
             }
             icon = R.drawable.ic_mic_white_24px;
             pauseAudioMenuItem.setVisible(true);
-            pauseAudioMenuItem.setTitle(
-                    localAudioTrack.isEnabled() ? R.string.pause_audio : R.string.resume_audio);
+            pauseAudioMenuItem.setTitle(localAudioTrack.isEnabled() ?
+                    R.string.pause_audio : R.string.resume_audio);
         } else {
             if (localParticipant != null) {
                 localParticipant.unpublishTrack(localAudioTrack);
@@ -532,17 +495,18 @@ public class RoomActivity extends BaseActivity {
         if (cameraVideoTrack == null) {
 
             // add local camera track
-            cameraVideoTrack =
-                    LocalVideoTrack.create(
-                            this, true, cameraCapturer.getVideoCapturer(), videoConstraints);
+            cameraVideoTrack = LocalVideoTrack.create(this,
+                    true,
+                    cameraCapturer.getVideoCapturer(),
+                    videoConstraints);
             if (localParticipant != null) {
                 localParticipant.publishTrack(cameraVideoTrack);
             }
 
             // enable video settings
             switchCameraMenuItem.setVisible(cameraVideoTrack.isEnabled());
-            pauseVideoMenuItem.setTitle(
-                    cameraVideoTrack.isEnabled() ? R.string.pause_video : R.string.resume_video);
+            pauseVideoMenuItem.setTitle(cameraVideoTrack.isEnabled() ?
+                    R.string.pause_video : R.string.resume_video);
             pauseVideoMenuItem.setVisible(true);
 
         } else {
@@ -568,19 +532,18 @@ public class RoomActivity extends BaseActivity {
             if (participantController.getPrimaryItem().sid.equals(localParticipantSid)) {
 
                 // local video was rendered as primary view - refreshing
-                participantController.renderAsPrimary(
-                        localParticipantSid,
+                participantController.renderAsPrimary(localParticipantSid,
                         getString(R.string.you),
                         cameraVideoTrack,
                         localAudioTrack == null,
-                        cameraCapturer.getCameraSource()
-                                == CameraCapturer.CameraSource.FRONT_CAMERA);
+                        cameraCapturer.getCameraSource() == CameraCapturer.CameraSource.FRONT_CAMERA);
 
                 participantController.getPrimaryView().showIdentityBadge(false);
 
                 // update thumb state
-                participantController.updateThumb(
-                        localParticipantSid, cameraVideoTrack, ParticipantView.State.SELECTED);
+                participantController.updateThumb(localParticipantSid,
+                        cameraVideoTrack,
+                        ParticipantView.State.SELECTED);
             }
 
         } else {
@@ -589,10 +552,8 @@ public class RoomActivity extends BaseActivity {
         }
 
         // update toggle button icon
-        localVideoImageButton.setImageResource(
-                cameraVideoTrack != null
-                        ? R.drawable.ic_videocam_white_24px
-                        : R.drawable.ic_videocam_off_gray_24px);
+        localVideoImageButton.setImageResource(cameraVideoTrack != null ?
+                R.drawable.ic_videocam_white_24px : R.drawable.ic_videocam_off_gray_24px);
     }
 
     private String getDisplayName() {
@@ -602,9 +563,9 @@ public class RoomActivity extends BaseActivity {
          * Append serial number for internal or development flavor so the same account can be used
          * across different devices.
          */
-        return BuildConfigUtils.isInternalFlavor() || BuildConfigUtils.isDevelopmentFlavor()
-                ? displayName + String.format(" (%s)", Build.SERIAL)
-                : displayName;
+        return BuildConfigUtils.isInternalFlavor() || BuildConfigUtils.isDevelopmentFlavor() ?
+                displayName + String.format(" (%s)", Build.SERIAL) :
+                displayName;
     }
 
     private void obtainVideoConstraints() {
@@ -617,23 +578,20 @@ public class RoomActivity extends BaseActivity {
         int aspectRatioIndex = Integer.parseInt(aspectRatio);
         builder.aspectRatio(aspectRatios[aspectRatioIndex]);
 
-        Timber.d(
-                "Aspect ratio : %s",
+        Timber.d("Aspect ratio : %s",
                 getResources().getStringArray(R.array.aspect_ratio_array)[aspectRatioIndex]);
 
         // setup video dimensions
         int minVideoDim = sharedPreferences.getInt(Preferences.MIN_VIDEO_DIMENSIONS, 0);
-        int maxVideoDim =
-                sharedPreferences.getInt(
-                        Preferences.MAX_VIDEO_DIMENSIONS, videoDimensions.length - 1);
+        int maxVideoDim = sharedPreferences.getInt(Preferences.MAX_VIDEO_DIMENSIONS,
+                videoDimensions.length - 1);
 
         if (maxVideoDim != -1 && minVideoDim != -1) {
             builder.minVideoDimensions(videoDimensions[minVideoDim]);
             builder.maxVideoDimensions(videoDimensions[maxVideoDim]);
         }
 
-        Timber.d(
-                "Video dimensions: %s - %s",
+        Timber.d("Video dimensions: %s - %s",
                 getResources().getStringArray(R.array.video_dimensions_array)[minVideoDim],
                 getResources().getStringArray(R.array.video_dimensions_array)[maxVideoDim]);
 
@@ -656,9 +614,8 @@ public class RoomActivity extends BaseActivity {
 
         switch (videoCodecName) {
             case Vp8Codec.NAME:
-                boolean simulcast =
-                        sharedPreferences.getBoolean(
-                                Preferences.VP8_SIMULCAST, Preferences.VP8_SIMULCAST_DEFAULT);
+                boolean simulcast = sharedPreferences.getBoolean(Preferences.VP8_SIMULCAST,
+                        Preferences.VP8_SIMULCAST_DEFAULT);
                 return new Vp8Codec(simulcast);
             case H264Codec.NAME:
                 return new H264Codec();
@@ -691,12 +648,9 @@ public class RoomActivity extends BaseActivity {
     private void requestPermissions() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if (!permissionsGranted()) {
-                requestPermissions(
-                        new String[] {
-                            Manifest.permission.RECORD_AUDIO,
-                            Manifest.permission.CAMERA,
-                            Manifest.permission.WRITE_EXTERNAL_STORAGE
-                        },
+                requestPermissions(new String[]{Manifest.permission.RECORD_AUDIO,
+                                Manifest.permission.CAMERA,
+                                Manifest.permission.WRITE_EXTERNAL_STORAGE},
                         PERMISSIONS_REQUEST_CODE);
             } else {
                 setupLocalMedia();
@@ -709,59 +663,59 @@ public class RoomActivity extends BaseActivity {
     private boolean permissionsGranted() {
         int resultCamera = ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA);
         int resultMic = ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO);
-        int resultStorage =
-                ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE);
+        int resultStorage = ContextCompat.checkSelfPermission(this,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE);
 
-        return ((resultCamera == PackageManager.PERMISSION_GRANTED)
-                && (resultMic == PackageManager.PERMISSION_GRANTED)
-                && (resultStorage == PackageManager.PERMISSION_GRANTED));
+        return ((resultCamera == PackageManager.PERMISSION_GRANTED) &&
+                (resultMic == PackageManager.PERMISSION_GRANTED) &&
+                (resultStorage == PackageManager.PERMISSION_GRANTED));
     }
 
-    /** Initialize local media and provide stub participant for primary view. */
+    /**
+     * Initialize local media and provide stub participant for primary view.
+     */
     private void setupLocalMedia() {
         localAudioTrack = LocalAudioTrack.create(this, true);
         setupLocalVideoTrack();
         renderLocalParticipantStub();
     }
 
-    /** Create local video track */
+    /**
+     * Create local video track
+     */
     private void setupLocalVideoTrack() {
 
         // initialize capturer only once if needed
         if (cameraCapturer == null) {
-            cameraCapturer =
-                    new CameraCapturerCompat(this, CameraCapturer.CameraSource.FRONT_CAMERA);
+            cameraCapturer = new CameraCapturerCompat(this, CameraCapturer.CameraSource.FRONT_CAMERA);
         }
 
-        cameraVideoTrack =
-                LocalVideoTrack.create(
-                        this, true, cameraCapturer.getVideoCapturer(), videoConstraints);
+        cameraVideoTrack = LocalVideoTrack.create(this,
+                true,
+                cameraCapturer.getVideoCapturer(),
+                videoConstraints);
         if (cameraVideoTrack != null) {
-            localVideoTrackNames.put(
-                    cameraVideoTrack.getName(), getString(R.string.camera_video_track));
+            localVideoTrackNames.put(cameraVideoTrack.getName(),
+                    getString(R.string.camera_video_track));
 
             // Share camera video track if we are connected to room
             if (localParticipant != null) {
                 localParticipant.publishTrack(cameraVideoTrack);
             }
         } else {
-            Snackbar.make(
-                            primaryVideoView,
-                            R.string.failed_to_add_camera_video_track,
-                            Snackbar.LENGTH_LONG)
-                    .show();
+            Snackbar.make(primaryVideoView, R.string.failed_to_add_camera_video_track,
+                    Snackbar.LENGTH_LONG).show();
         }
     }
 
     /**
      * Render local video track.
      *
-     * <p>NOTE: Stub participant is created in controller. Make sure to remove it when connected to
-     * room.
+     * NOTE: Stub participant is created in controller. Make sure to remove it
+     * when connected to room.
      */
     private void renderLocalParticipantStub() {
-        participantController.renderAsPrimary(
-                localParticipantSid,
+        participantController.renderAsPrimary(localParticipantSid,
                 getString(R.string.you),
                 cameraVideoTrack,
                 localAudioTrack == null,
@@ -853,8 +807,10 @@ public class RoomActivity extends BaseActivity {
             if (participantController.getPrimaryItem().sid.equals(localParticipantSid)) {
                 participantController.updatePrimaryThumb(mirror);
             } else {
-                participantController.updateThumb(localParticipantSid, cameraVideoTrack, mirror);
+                participantController.updateThumb(
+                    localParticipantSid, cameraVideoTrack, mirror);
             }
+
         }
     }
 
@@ -885,11 +841,10 @@ public class RoomActivity extends BaseActivity {
 
     private void requestAudioFocus() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            AudioAttributes playbackAttributes =
-                    new AudioAttributes.Builder()
-                            .setUsage(AudioAttributes.USAGE_VOICE_COMMUNICATION)
-                            .setContentType(AudioAttributes.CONTENT_TYPE_SPEECH)
-                            .build();
+            AudioAttributes playbackAttributes = new AudioAttributes.Builder()
+                    .setUsage(AudioAttributes.USAGE_VOICE_COMMUNICATION)
+                    .setContentType(AudioAttributes.CONTENT_TYPE_SPEECH)
+                    .build();
             AudioFocusRequest focusRequest =
                     new AudioFocusRequest.Builder(AudioManager.AUDIOFOCUS_GAIN_TRANSIENT)
                             .setAudioAttributes(playbackAttributes)
@@ -897,13 +852,13 @@ public class RoomActivity extends BaseActivity {
                             .setOnAudioFocusChangeListener(
                                     new AudioManager.OnAudioFocusChangeListener() {
                                         @Override
-                                        public void onAudioFocusChange(int i) {}
+                                        public void onAudioFocusChange(int i) { }
                                     })
                             .build();
             audioManager.requestAudioFocus(focusRequest);
         } else {
-            audioManager.requestAudioFocus(
-                    null, AudioManager.STREAM_VOICE_CALL, AudioManager.AUDIOFOCUS_GAIN_TRANSIENT);
+            audioManager.requestAudioFocus(null, AudioManager.STREAM_VOICE_CALL,
+                    AudioManager.AUDIOFOCUS_GAIN_TRANSIENT);
         }
     }
 
@@ -917,7 +872,7 @@ public class RoomActivity extends BaseActivity {
     }
 
     private void setVolumeControl(boolean setVolumeControl) {
-        if (setVolumeControl) {
+        if(setVolumeControl) {
             /*
              * Enable changing the volume using the up/down keys during a conversation
              */
@@ -930,12 +885,12 @@ public class RoomActivity extends BaseActivity {
     @TargetApi(21)
     private void requestScreenCapturePermission() {
         Timber.d("Requesting permission to capture screen");
-        MediaProjectionManager mediaProjectionManager =
-                (MediaProjectionManager) getSystemService(Context.MEDIA_PROJECTION_SERVICE);
+        MediaProjectionManager mediaProjectionManager = (MediaProjectionManager)
+                getSystemService(Context.MEDIA_PROJECTION_SERVICE);
 
         // This initiates a prompt dialog for the user to confirm screen projection.
-        startActivityForResult(
-                mediaProjectionManager.createScreenCaptureIntent(), MEDIA_PROJECTION_REQUEST_CODE);
+        startActivityForResult(mediaProjectionManager.createScreenCaptureIntent(),
+                MEDIA_PROJECTION_REQUEST_CODE);
     }
 
     private void startScreenCapture() {
@@ -951,12 +906,10 @@ public class RoomActivity extends BaseActivity {
                 localParticipant.publishTrack(screenVideoTrack);
             }
         } else {
-            Snackbar.make(
-                            primaryVideoView,
-                            R.string.failed_to_add_screen_video_track,
-                            Snackbar.LENGTH_LONG)
-                    .setAction("Action", null)
-                    .show();
+            Snackbar.make(primaryVideoView,
+                    R.string.failed_to_add_screen_video_track,
+                    Snackbar.LENGTH_LONG)
+                    .setAction("Action", null).show();
         }
     }
 
@@ -977,8 +930,8 @@ public class RoomActivity extends BaseActivity {
         if (localAudioTrack != null) {
             boolean enable = !localAudioTrack.isEnabled();
             localAudioTrack.enable(enable);
-            pauseAudioMenuItem.setTitle(
-                    localAudioTrack.isEnabled() ? R.string.pause_audio : R.string.resume_audio);
+            pauseAudioMenuItem.setTitle(localAudioTrack.isEnabled() ?
+                    R.string.pause_audio : R.string.resume_audio);
         }
     }
 
@@ -986,8 +939,8 @@ public class RoomActivity extends BaseActivity {
         if (cameraVideoTrack != null) {
             boolean enable = !cameraVideoTrack.isEnabled();
             cameraVideoTrack.enable(enable);
-            pauseVideoMenuItem.setTitle(
-                    cameraVideoTrack.isEnabled() ? R.string.pause_video : R.string.resume_video);
+            pauseVideoMenuItem.setTitle(cameraVideoTrack.isEnabled() ?
+                    R.string.pause_video : R.string.resume_video);
         }
     }
 
@@ -997,22 +950,19 @@ public class RoomActivity extends BaseActivity {
      * @return Completable
      */
     private Completable updateEnv() {
-        return Completable.fromAction(
-                new Action() {
-                    @Override
-                    public void run() throws Exception {
-                        String env =
-                                sharedPreferences.getString(
-                                        Preferences.ENVIRONMENT, Preferences.ENVIRONMENT_DEFAULT);
-                        String nativeEnvironmentVariableValue =
-                                EnvUtil.getNativeEnvironmentVariableValue(env);
-                        Env.set(
-                                RoomActivity.this,
-                                EnvUtil.TWILIO_ENV_KEY,
-                                nativeEnvironmentVariableValue,
-                                true);
-                    }
-                });
+        return Completable.fromAction(new Action() {
+            @Override
+            public void run() throws Exception {
+                String env = sharedPreferences.getString(Preferences.ENVIRONMENT,
+                        Preferences.ENVIRONMENT_DEFAULT);
+                String nativeEnvironmentVariableValue = EnvUtil
+                        .getNativeEnvironmentVariableValue(env);
+                Env.set(RoomActivity.this,
+                        EnvUtil.TWILIO_ENV_KEY,
+                        nativeEnvironmentVariableValue,
+                        true);
+            }
+        });
     }
 
     /**
@@ -1022,78 +972,65 @@ public class RoomActivity extends BaseActivity {
      * @return Single with room reference
      */
     private Single<Room> connect(final String token, final String roomName) {
-        return Single.fromCallable(
-                new Callable<Room>() {
-                    @Override
-                    public Room call() throws Exception {
-                        String env =
-                                sharedPreferences.getString(
-                                        Preferences.ENVIRONMENT, Preferences.ENVIRONMENT_DEFAULT);
-                        boolean enableInsights =
-                                sharedPreferences.getBoolean(
-                                        Preferences.ENABLE_INSIGHTS,
-                                        Preferences.ENABLE_INSIGHTS_DEFAULT);
+        return Single.fromCallable(new Callable<Room>() {
+            @Override
+            public Room call() throws Exception {
+                String env = sharedPreferences.getString(Preferences.ENVIRONMENT,
+                    Preferences.ENVIRONMENT_DEFAULT);
+                boolean enableInsights = sharedPreferences.getBoolean(Preferences.ENABLE_INSIGHTS,
+                        Preferences.ENABLE_INSIGHTS_DEFAULT);
 
-                        VideoCodec preferedVideoCodec =
-                                getVideoCodecPreference(
-                                        Preferences.VIDEO_CODEC, Preferences.VIDEO_CODEC_DEFAULT);
+                VideoCodec preferedVideoCodec = getVideoCodecPreference(Preferences.VIDEO_CODEC,
+                        Preferences.VIDEO_CODEC_DEFAULT);
 
-                        AudioCodec preferredAudioCodec =
-                                getAudioCodecPreference(
-                                        Preferences.AUDIO_CODEC, Preferences.AUDIO_CODEC_DEFAULT);
+                AudioCodec preferredAudioCodec = getAudioCodecPreference(Preferences.AUDIO_CODEC,
+                        Preferences.AUDIO_CODEC_DEFAULT);
 
-                        ConnectOptions.Builder connectOptionsBuilder =
-                                new ConnectOptions.Builder(token)
-                                        .roomName(roomName)
-                                        .enableInsights(enableInsights);
+                ConnectOptions.Builder connectOptionsBuilder = new ConnectOptions.Builder(token)
+                        .roomName(roomName)
+                        .enableInsights(enableInsights);
 
-                        int maxVideoBitrate =
-                                sharedPreferences.getInt(
-                                        Preferences.MAX_VIDEO_BITRATE,
-                                        Preferences.MAX_VIDEO_BITRATE_DEFAULT);
+                int maxVideoBitrate = sharedPreferences.getInt(Preferences.MAX_VIDEO_BITRATE,
+                        Preferences.MAX_VIDEO_BITRATE_DEFAULT);
 
-                        int maxAudioBitrate =
-                                sharedPreferences.getInt(
-                                        Preferences.MAX_AUDIO_BITRATE,
-                                        Preferences.MAX_AUDIO_BITRATE_DEFAULT);
+                int maxAudioBitrate = sharedPreferences.getInt(Preferences.MAX_AUDIO_BITRATE,
+                        Preferences.MAX_AUDIO_BITRATE_DEFAULT);
 
-                        EncodingParameters encodingParameters =
-                                new EncodingParameters(maxAudioBitrate, maxVideoBitrate);
+                EncodingParameters encodingParameters =
+                        new EncodingParameters(maxAudioBitrate, maxVideoBitrate);
 
-                        if (localAudioTrack != null) {
-                            connectOptionsBuilder.audioTracks(
-                                    Collections.singletonList(localAudioTrack));
-                        }
+                if (localAudioTrack != null) {
+                    connectOptionsBuilder
+                            .audioTracks(Collections.singletonList(localAudioTrack));
+                }
 
-                        List<LocalVideoTrack> localVideoTracks = new ArrayList<>();
-                        if (cameraVideoTrack != null) {
-                            localVideoTracks.add(cameraVideoTrack);
-                        }
+                List<LocalVideoTrack> localVideoTracks = new ArrayList<>();
+                if (cameraVideoTrack != null) {
+                    localVideoTracks.add(cameraVideoTrack);
+                }
 
-                        if (screenVideoTrack != null) {
-                            localVideoTracks.add(screenVideoTrack);
-                        }
+                if (screenVideoTrack != null) {
+                    localVideoTracks.add(screenVideoTrack);
+                }
 
-                        if (!localVideoTracks.isEmpty()) {
-                            connectOptionsBuilder.videoTracks(localVideoTracks);
-                        }
+                if (!localVideoTracks.isEmpty()) {
+                    connectOptionsBuilder.videoTracks(localVideoTracks);
+                }
 
-                        connectOptionsBuilder.preferVideoCodecs(
-                                Collections.singletonList(preferedVideoCodec));
+                connectOptionsBuilder
+                        .preferVideoCodecs(Collections.singletonList(preferedVideoCodec));
 
-                        connectOptionsBuilder.preferAudioCodecs(
-                                Collections.singletonList(preferredAudioCodec));
+                connectOptionsBuilder
+                        .preferAudioCodecs(Collections.singletonList(preferredAudioCodec));
 
-                        connectOptionsBuilder.encodingParameters(encodingParameters);
+                connectOptionsBuilder.encodingParameters(encodingParameters);
 
-                        room =
-                                Video.connect(
-                                        RoomActivity.this,
-                                        connectOptionsBuilder.build(),
-                                        roomListener());
-                        return room;
-                    }
-                });
+                room = Video.connect(RoomActivity.this,
+                        connectOptionsBuilder.build(),
+                        roomListener());
+                return room;
+            }
+        });
     }
 
     /**
@@ -1104,9 +1041,8 @@ public class RoomActivity extends BaseActivity {
     private void addParticipant(RemoteParticipant remoteParticipant, boolean renderAsPrimary) {
         ParticipantListener listener = new ParticipantListener();
         remoteParticipant.setListener(listener);
-        boolean muted =
-                remoteParticipant.getRemoteAudioTracks().size() <= 0
-                        || !remoteParticipant.getRemoteAudioTracks().get(0).isTrackEnabled();
+        boolean muted = remoteParticipant.getRemoteAudioTracks().size() <= 0 ||
+                !remoteParticipant.getRemoteAudioTracks().get(0).isTrackEnabled();
         List<RemoteVideoTrackPublication> remoteVideoTrackPublications =
                 remoteParticipant.getRemoteVideoTracks();
 
@@ -1115,8 +1051,7 @@ public class RoomActivity extends BaseActivity {
              * Add placeholder UI by passing null video track for a participant that is not
              * sharing any video tracks.
              */
-            addParticipantVideoTrack(
-                    remoteParticipant.getSid(),
+            addParticipantVideoTrack(remoteParticipant.getSid(),
                     remoteParticipant.getIdentity(),
                     null,
                     muted,
@@ -1124,8 +1059,7 @@ public class RoomActivity extends BaseActivity {
         } else {
             for (RemoteVideoTrackPublication remoteVideoTrackPublication :
                     remoteVideoTrackPublications) {
-                addParticipantVideoTrack(
-                        remoteParticipant.getSid(),
+                addParticipantVideoTrack(remoteParticipant.getSid(),
                         remoteParticipant.getIdentity(),
                         remoteVideoTrackPublication.getRemoteVideoTrack(),
                         muted,
@@ -1133,27 +1067,26 @@ public class RoomActivity extends BaseActivity {
                 renderAsPrimary = false;
             }
         }
+
     }
 
-    private void addParticipantVideoTrack(
-            String participantSid,
-            String participantIdentity,
-            RemoteVideoTrack remoteVideoTrack,
-            boolean muted,
-            boolean renderAsPrimary) {
+    private void addParticipantVideoTrack(String participantSid,
+                                          String participantIdentity,
+                                          RemoteVideoTrack remoteVideoTrack,
+                                          boolean muted,
+                                          boolean renderAsPrimary) {
         if (renderAsPrimary) {
-            renderItemAsPrimary(
-                    new ParticipantController.Item(
-                            participantSid, participantIdentity, remoteVideoTrack, muted, false));
+            renderItemAsPrimary(new ParticipantController.Item(
+                participantSid, participantIdentity, remoteVideoTrack, muted, false));
         } else {
             participantController.addThumb(
-                    participantSid, participantIdentity, remoteVideoTrack, muted, false);
+                participantSid, participantIdentity, remoteVideoTrack, muted, false);
         }
     }
 
     /**
-     * Sets new item to render as primary view and moves existing primary view item to thumbs view.
-     *
+     * Sets new item to render as primary view and moves existing primary view item
+     * to thumbs view.
      * @param item New item to be rendered in primary view
      */
     private void renderItemAsPrimary(ParticipantController.Item item) {
@@ -1170,10 +1103,8 @@ public class RoomActivity extends BaseActivity {
             if (old.sid.equals(localParticipantSid)) {
 
                 // toggle local participant state
-                int state =
-                        old.videoTrack == null
-                                ? ParticipantView.State.NO_VIDEO
-                                : ParticipantView.State.VIDEO;
+                int state = old.videoTrack == null ?
+                    ParticipantView.State.NO_VIDEO : ParticipantView.State.VIDEO;
                 participantController.updateThumb(old.sid, old.videoTrack, state);
                 participantController.updateThumb(old.sid, old.videoTrack, old.mirror);
 
@@ -1190,8 +1121,7 @@ public class RoomActivity extends BaseActivity {
         if (item.sid.equals(localParticipantSid)) {
 
             // toggle local participant state and hide his badge
-            participantController.updateThumb(
-                    item.sid, item.videoTrack, ParticipantView.State.SELECTED);
+            participantController.updateThumb(item.sid, item.videoTrack, ParticipantView.State.SELECTED);
             participantController.getPrimaryView().showIdentityBadge(false);
         } else {
 
@@ -1200,7 +1130,9 @@ public class RoomActivity extends BaseActivity {
         }
     }
 
-    /** Removes all participant thumbs and push local camera as primary with empty sid. */
+    /**
+     * Removes all participant thumbs and push local camera as primary with empty sid.
+     */
     private void removeAllParticipants() {
         participantController.removeAllThumbs();
         participantController.removePrimary();
@@ -1209,8 +1141,8 @@ public class RoomActivity extends BaseActivity {
     }
 
     /**
-     * Remove single remoteParticipant thumbs and all it associated thumbs. If rendered as primary
-     * remoteParticipant, primary view switches to local video track.
+     * Remove single remoteParticipant thumbs and all it associated thumbs.
+     * If rendered as primary remoteParticipant, primary view switches to local video track.
      *
      * @param remoteParticipant recently disconnected remoteParticipant.¬
      */
@@ -1219,15 +1151,17 @@ public class RoomActivity extends BaseActivity {
         if (participantController.getPrimaryItem().sid.equals(remoteParticipant.getSid())) {
 
             // render local video if primary remoteParticipant has gone
-            participantController.getThumb(localParticipantSid, cameraVideoTrack).callOnClick();
+            participantController
+                    .getThumb(localParticipantSid, cameraVideoTrack)
+                    .callOnClick();
         }
 
         participantController.removeThumbs(remoteParticipant.getSid());
     }
 
     /**
-     * Remove the video track and mark the track to be restored when going to the settings screen or
-     * going to the background
+     * Remove the video track and mark the track to be restored
+     * when going to the settings screen or going to the background
      */
     private void removeCameraTrack() {
         if (cameraVideoTrack != null) {
@@ -1238,9 +1172,12 @@ public class RoomActivity extends BaseActivity {
             restoreLocalVideoCameraTrack = true;
             cameraVideoTrack = null;
         }
+
     }
 
-    /** Try to restore camera video track after going to the settings screen or background */
+    /**
+     * Try to restore camera video track after going to the settings screen or background
+     */
     private void restoreCameraTrack() {
         if (restoreLocalVideoCameraTrack) {
             obtainVideoConstraints();
@@ -1266,7 +1203,8 @@ public class RoomActivity extends BaseActivity {
             } else {
                 // disable stats if there is room but no participants (no media)
                 statsDisabledTitleTextView.setText(getString(R.string.stats_unavailable));
-                statsDisabledDescTextView.setText(getString(R.string.stats_description_join_room));
+                statsDisabledDescTextView.setText(
+                        getString(R.string.stats_description_join_room));
                 statsRecyclerView.setVisibility(View.GONE);
                 statsDisabledLayout.setVisibility(View.VISIBLE);
             }
@@ -1322,9 +1260,10 @@ public class RoomActivity extends BaseActivity {
         return new Room.Listener() {
             @Override
             public void onConnected(final Room room) {
-                Timber.i(
-                        "Connected to room -> name: %s, sid: %s, state: %s",
-                        room.getName(), room.getSid(), room.getState());
+                Timber.i("Connected to room -> name: %s, sid: %s, state: %s",
+                        room.getName(),
+                        room.getSid(),
+                        room.getState());
                 localParticipant = room.getLocalParticipant();
                 localParticipantSid = localParticipant.getSid();
 
@@ -1336,15 +1275,14 @@ public class RoomActivity extends BaseActivity {
                 participantController.removePrimary();
 
                 // add local thumb and "click" on it to make primary
-                participantController.addThumb(
-                        localParticipantSid,
+                participantController.addThumb(localParticipantSid,
                         getString(R.string.you),
                         cameraVideoTrack,
                         localAudioTrack == null,
-                        cameraCapturer.getCameraSource()
-                                == CameraCapturer.CameraSource.FRONT_CAMERA);
+                        cameraCapturer.getCameraSource() == CameraCapturer.CameraSource.FRONT_CAMERA);
 
-                participantController.getThumb(localParticipantSid, cameraVideoTrack).callOnClick();
+                participantController.getThumb(
+                    localParticipantSid, cameraVideoTrack).callOnClick();
 
                 // add existing room participants thumbs
                 boolean isFirstParticipant = true;
@@ -1356,8 +1294,7 @@ public class RoomActivity extends BaseActivity {
 
             @Override
             public void onConnectFailure(Room room, TwilioException twilioException) {
-                Timber.e(
-                        "Failed to connect to room -> sid: %s, state: %s, code: %d, error: %s",
+                Timber.e("Failed to connect to room -> sid: %s, state: %s, code: %d, error: %s",
                         room.getSid(),
                         room.getState(),
                         twilioException.getCode(),
@@ -1373,9 +1310,9 @@ public class RoomActivity extends BaseActivity {
 
             @Override
             public void onDisconnected(Room room, TwilioException twilioException) {
-                Timber.i(
-                        "Disconnected from room -> sid: %s, state: %s",
-                        room.getSid(), room.getState());
+                Timber.i("Disconnected from room -> sid: %s, state: %s",
+                        room.getSid(),
+                        room.getState());
 
                 removeAllParticipants();
                 RoomActivity.this.room = null;
@@ -1390,9 +1327,9 @@ public class RoomActivity extends BaseActivity {
 
             @Override
             public void onParticipantConnected(Room room, RemoteParticipant remoteParticipant) {
-                Timber.i(
-                        "RemoteParticipant connected -> room sid: %s, remoteParticipant: %s",
-                        room.getSid(), remoteParticipant.getSid());
+                Timber.i("RemoteParticipant connected -> room sid: %s, remoteParticipant: %s",
+                        room.getSid(),
+                        remoteParticipant.getSid());
 
                 boolean renderAsPrimary = room.getRemoteParticipants().size() == 1;
                 addParticipant(remoteParticipant, renderAsPrimary);
@@ -1402,9 +1339,9 @@ public class RoomActivity extends BaseActivity {
 
             @Override
             public void onParticipantDisconnected(Room room, RemoteParticipant remoteParticipant) {
-                Timber.i(
-                        "RemoteParticipant disconnected -> room sid: %s, remoteParticipant: %s",
-                        room.getSid(), remoteParticipant.getSid());
+                Timber.i("RemoteParticipant disconnected -> room sid: %s, remoteParticipant: %s",
+                        room.getSid(),
+                        remoteParticipant.getSid());
 
                 removeParticipant(remoteParticipant);
 
@@ -1425,12 +1362,10 @@ public class RoomActivity extends BaseActivity {
 
     private class ParticipantListener implements RemoteParticipant.Listener {
         @Override
-        public void onAudioTrackPublished(
-                RemoteParticipant remoteParticipant,
-                RemoteAudioTrackPublication remoteAudioTrackPublication) {
-            Timber.i(
-                    "onAudioTrackPublished: remoteParticipant: %s, audio: %s, enabled: %b, "
-                            + "subscribed: %b",
+        public void onAudioTrackPublished(RemoteParticipant remoteParticipant,
+                                          RemoteAudioTrackPublication remoteAudioTrackPublication) {
+            Timber.i("onAudioTrackPublished: remoteParticipant: %s, audio: %s, enabled: %b, " +
+                            "subscribed: %b",
                     remoteParticipant.getIdentity(),
                     remoteAudioTrackPublication.getTrackSid(),
                     remoteAudioTrackPublication.isTrackEnabled(),
@@ -1440,12 +1375,10 @@ public class RoomActivity extends BaseActivity {
         }
 
         @Override
-        public void onAudioTrackUnpublished(
-                RemoteParticipant remoteParticipant,
-                RemoteAudioTrackPublication remoteAudioTrackPublication) {
-            Timber.i(
-                    "onAudioTrackUnpublished: remoteParticipant: %s, audio: %s, enabled: %b, "
-                            + "subscribed: %b",
+        public void onAudioTrackUnpublished(RemoteParticipant remoteParticipant,
+                                            RemoteAudioTrackPublication remoteAudioTrackPublication) {
+            Timber.i("onAudioTrackUnpublished: remoteParticipant: %s, audio: %s, enabled: %b, " +
+                            "subscribed: %b",
                     remoteParticipant.getIdentity(),
                     remoteAudioTrackPublication.getTrackSid(),
                     remoteAudioTrackPublication.isTrackEnabled(),
@@ -1454,12 +1387,10 @@ public class RoomActivity extends BaseActivity {
         }
 
         @Override
-        public void onVideoTrackPublished(
-                RemoteParticipant remoteParticipant,
-                RemoteVideoTrackPublication remoteVideoTrackPublication) {
-            Timber.i(
-                    "onVideoTrackPublished: remoteParticipant: %s, video: %s, enabled: %b, "
-                            + "subscribed: %b",
+        public void onVideoTrackPublished(RemoteParticipant remoteParticipant,
+                                          RemoteVideoTrackPublication remoteVideoTrackPublication) {
+            Timber.i("onVideoTrackPublished: remoteParticipant: %s, video: %s, enabled: %b, " +
+                            "subscribed: %b",
                     remoteParticipant.getIdentity(),
                     remoteVideoTrackPublication.getTrackSid(),
                     remoteVideoTrackPublication.isTrackEnabled(),
@@ -1468,12 +1399,10 @@ public class RoomActivity extends BaseActivity {
         }
 
         @Override
-        public void onVideoTrackUnpublished(
-                RemoteParticipant remoteParticipant,
-                RemoteVideoTrackPublication remoteVideoTrackPublication) {
-            Timber.i(
-                    "onVideoTrackUnpublished: remoteParticipant: %s, video: %s, enabled: %b, "
-                            + "subscribed: %b",
+        public void onVideoTrackUnpublished(RemoteParticipant remoteParticipant,
+                                            RemoteVideoTrackPublication remoteVideoTrackPublication) {
+            Timber.i("onVideoTrackUnpublished: remoteParticipant: %s, video: %s, enabled: %b, " +
+                            "subscribed: %b",
                     remoteParticipant.getIdentity(),
                     remoteVideoTrackPublication.getTrackSid(),
                     remoteVideoTrackPublication.isTrackEnabled(),
@@ -1482,13 +1411,11 @@ public class RoomActivity extends BaseActivity {
         }
 
         @Override
-        public void onAudioTrackSubscribed(
-                RemoteParticipant remoteParticipant,
-                RemoteAudioTrackPublication remoteAudioTrackPublication,
-                RemoteAudioTrack remoteAudioTrack) {
-            Timber.i(
-                    "onAudioTrackSubscribed: remoteParticipant: %s, audio: %s, enabled: %b, "
-                            + "subscribed: %b",
+        public void onAudioTrackSubscribed(RemoteParticipant remoteParticipant,
+                                           RemoteAudioTrackPublication remoteAudioTrackPublication,
+                                           RemoteAudioTrack remoteAudioTrack) {
+            Timber.i("onAudioTrackSubscribed: remoteParticipant: %s, audio: %s, enabled: %b, " +
+                            "subscribed: %b",
                     remoteParticipant.getIdentity(),
                     remoteAudioTrackPublication.getTrackSid(),
                     remoteAudioTrackPublication.isTrackEnabled(),
@@ -1509,29 +1436,26 @@ public class RoomActivity extends BaseActivity {
         }
 
         @Override
-        public void onAudioTrackSubscriptionFailed(
-                RemoteParticipant remoteParticipant,
-                RemoteAudioTrackPublication remoteAudioTrackPublication,
-                TwilioException twilioException) {
-            Timber.w(
-                    "onAudioTrackSubscriptionFailed: remoteParticipant: %s, video: %s, "
-                            + "exception: %s",
+        public void onAudioTrackSubscriptionFailed(RemoteParticipant remoteParticipant,
+                                                   RemoteAudioTrackPublication remoteAudioTrackPublication,
+                                                   TwilioException twilioException) {
+            Timber.w("onAudioTrackSubscriptionFailed: remoteParticipant: %s, video: %s, " +
+                            "exception: %s",
                     remoteParticipant.getIdentity(),
                     remoteAudioTrackPublication.getTrackSid(),
                     twilioException.getMessage());
             // TODO: Need design
-            Snackbar.make(primaryVideoView, "onAudioTrackSubscriptionFailed", Snackbar.LENGTH_LONG)
-                    .show();
+            Snackbar.make(primaryVideoView,
+                    "onAudioTrackSubscriptionFailed",
+                    Snackbar.LENGTH_LONG).show();
         }
 
         @Override
-        public void onAudioTrackUnsubscribed(
-                RemoteParticipant remoteParticipant,
-                RemoteAudioTrackPublication remoteAudioTrackPublication,
-                RemoteAudioTrack remoteAudioTrack) {
-            Timber.i(
-                    "onAudioTrackUnsubscribed: remoteParticipant: %s, audio: %s, enabled: %b, "
-                            + "subscribed: %b",
+        public void onAudioTrackUnsubscribed(RemoteParticipant remoteParticipant,
+                                             RemoteAudioTrackPublication remoteAudioTrackPublication,
+                                             RemoteAudioTrack remoteAudioTrack) {
+            Timber.i("onAudioTrackUnsubscribed: remoteParticipant: %s, audio: %s, enabled: %b, " +
+                            "subscribed: %b",
                     remoteParticipant.getIdentity(),
                     remoteAudioTrackPublication.getTrackSid(),
                     remoteAudioTrackPublication.isTrackEnabled(),
@@ -1553,13 +1477,11 @@ public class RoomActivity extends BaseActivity {
         }
 
         @Override
-        public void onVideoTrackSubscribed(
-                RemoteParticipant remoteParticipant,
-                RemoteVideoTrackPublication remoteVideoTrackPublication,
-                RemoteVideoTrack remoteVideoTrack) {
-            Timber.i(
-                    "onVideoTrackSubscribed: remoteParticipant: %s, video: %s, enabled: %b, "
-                            + "subscribed: %b",
+        public void onVideoTrackSubscribed(RemoteParticipant remoteParticipant,
+                                           RemoteVideoTrackPublication remoteVideoTrackPublication,
+                                           RemoteVideoTrack remoteVideoTrack) {
+            Timber.i("onVideoTrackSubscribed: remoteParticipant: %s, video: %s, enabled: %b, " +
+                            "subscribed: %b",
                     remoteParticipant.getIdentity(),
                     remoteVideoTrackPublication.getTrackSid(),
                     remoteVideoTrackPublication.isTrackEnabled(),
@@ -1567,16 +1489,15 @@ public class RoomActivity extends BaseActivity {
 
             ParticipantController.Item primary = participantController.getPrimaryItem();
 
-            if (primary != null
-                    && primary.sid.equals(remoteParticipant.getSid())
-                    && primary.videoTrack == null) {
+            if (primary != null &&
+                    primary.sid.equals(remoteParticipant.getSid()) &&
+                    primary.videoTrack == null) {
                 // no thumb needed - render as primary
                 primary.videoTrack = remoteVideoTrack;
                 participantController.renderAsPrimary(primary);
             } else {
                 // not a primary remoteParticipant requires thumb
-                participantController.addOrUpdateThumb(
-                        remoteParticipant.getSid(),
+                participantController.addOrUpdateThumb(remoteParticipant.getSid(),
                         remoteParticipant.getIdentity(),
                         null,
                         remoteVideoTrack);
@@ -1584,37 +1505,34 @@ public class RoomActivity extends BaseActivity {
         }
 
         @Override
-        public void onVideoTrackSubscriptionFailed(
-                RemoteParticipant remoteParticipant,
-                RemoteVideoTrackPublication remoteVideoTrackPublication,
-                TwilioException twilioException) {
-            Timber.w(
-                    "onVideoTrackSubscriptionFailed: remoteParticipant: %s, video: %s, "
-                            + "exception: %s",
+        public void onVideoTrackSubscriptionFailed(RemoteParticipant remoteParticipant,
+                                                   RemoteVideoTrackPublication remoteVideoTrackPublication,
+                                                   TwilioException twilioException) {
+            Timber.w("onVideoTrackSubscriptionFailed: remoteParticipant: %s, video: %s, " +
+                            "exception: %s",
                     remoteParticipant.getIdentity(),
                     remoteVideoTrackPublication.getTrackSid(),
                     twilioException.getMessage());
             // TODO: Need design
-            Snackbar.make(primaryVideoView, "onVideoTrackSubscriptionFailed", Snackbar.LENGTH_LONG)
-                    .show();
+            Snackbar.make(primaryVideoView,
+                    "onVideoTrackSubscriptionFailed",
+                    Snackbar.LENGTH_LONG).show();
         }
 
         @Override
-        public void onVideoTrackUnsubscribed(
-                RemoteParticipant remoteParticipant,
-                RemoteVideoTrackPublication remoteVideoTrackPublication,
-                RemoteVideoTrack remoteVideoTrack) {
-            Timber.i(
-                    "onVideoTrackUnsubscribed: remoteParticipant: %s, video: %s, enabled: %b",
+        public void onVideoTrackUnsubscribed(RemoteParticipant remoteParticipant,
+                                             RemoteVideoTrackPublication remoteVideoTrackPublication,
+                                             RemoteVideoTrack remoteVideoTrack) {
+            Timber.i("onVideoTrackUnsubscribed: remoteParticipant: %s, video: %s, enabled: %b",
                     remoteParticipant.getIdentity(),
                     remoteVideoTrackPublication.getTrackSid(),
                     remoteVideoTrackPublication.isTrackEnabled());
 
             ParticipantController.Item primary = participantController.getPrimaryItem();
 
-            if (primary != null
-                    && primary.sid.equals(remoteParticipant.getSid())
-                    && primary.videoTrack == remoteVideoTrack) {
+            if (primary != null &&
+                primary.sid.equals(remoteParticipant.getSid()) &&
+                primary.videoTrack == remoteVideoTrack) {
 
                 // Remove primary video track
                 primary.videoTrack = null;
@@ -1627,8 +1545,8 @@ public class RoomActivity extends BaseActivity {
                     RemoteVideoTrack newRemoteVideoTrack =
                             newRemoteVideoTrackPublication.getRemoteVideoTrack();
                     if (newRemoteVideoTrack != remoteVideoTrack) {
-                        participantController.removeThumb(
-                                remoteParticipant.getSid(), newRemoteVideoTrack);
+                        participantController.removeThumb(remoteParticipant.getSid(),
+                                newRemoteVideoTrack);
                         primary.videoTrack = newRemoteVideoTrack;
                         break;
                     }
@@ -1637,43 +1555,35 @@ public class RoomActivity extends BaseActivity {
             } else {
 
                 // remove thumb or leave empty video thumb
-                participantController.removeOrEmptyThumb(
-                        remoteParticipant.getSid(),
-                        remoteParticipant.getIdentity(),
-                        remoteVideoTrack);
+                participantController.removeOrEmptyThumb(remoteParticipant.getSid(),
+                        remoteParticipant.getIdentity(), remoteVideoTrack);
             }
         }
 
         @Override
-        public void onDataTrackPublished(
-                RemoteParticipant remoteParticipant,
-                RemoteDataTrackPublication remoteDataTrackPublication) {
-            Timber.i(
-                    "onDataTrackPublished: remoteParticipant: %s, data: %s, enabled: %b",
+        public void onDataTrackPublished(RemoteParticipant remoteParticipant,
+                                         RemoteDataTrackPublication remoteDataTrackPublication) {
+            Timber.i("onDataTrackPublished: remoteParticipant: %s, data: %s, enabled: %b",
                     remoteParticipant.getIdentity(),
                     remoteDataTrackPublication.getTrackSid(),
                     remoteDataTrackPublication.isTrackEnabled());
         }
 
         @Override
-        public void onDataTrackUnpublished(
-                RemoteParticipant remoteParticipant,
-                RemoteDataTrackPublication remoteDataTrackPublication) {
-            Timber.i(
-                    "onDataTrackUnpublished: remoteParticipant: %s, data: %s, enabled: %b",
+        public void onDataTrackUnpublished(RemoteParticipant remoteParticipant,
+                                           RemoteDataTrackPublication remoteDataTrackPublication) {
+            Timber.i("onDataTrackUnpublished: remoteParticipant: %s, data: %s, enabled: %b",
                     remoteParticipant.getIdentity(),
                     remoteDataTrackPublication.getTrackSid(),
                     remoteDataTrackPublication.isTrackEnabled());
         }
 
         @Override
-        public void onDataTrackSubscribed(
-                RemoteParticipant remoteParticipant,
-                RemoteDataTrackPublication remoteDataTrackPublication,
-                RemoteDataTrack remoteDataTrack) {
-            Timber.i(
-                    "onDataTrackSubscribed: remoteParticipant: %s, data: %s, enabled: %b, "
-                            + "subscribed: %b",
+        public void onDataTrackSubscribed(RemoteParticipant remoteParticipant,
+                                          RemoteDataTrackPublication remoteDataTrackPublication,
+                                          RemoteDataTrack remoteDataTrack) {
+            Timber.i("onDataTrackSubscribed: remoteParticipant: %s, data: %s, enabled: %b, " +
+                            "subscribed: %b",
                     remoteParticipant.getIdentity(),
                     remoteDataTrackPublication.getTrackSid(),
                     remoteDataTrackPublication.isTrackEnabled(),
@@ -1681,29 +1591,26 @@ public class RoomActivity extends BaseActivity {
         }
 
         @Override
-        public void onDataTrackSubscriptionFailed(
-                RemoteParticipant remoteParticipant,
-                RemoteDataTrackPublication remoteDataTrackPublication,
-                TwilioException twilioException) {
-            Timber.w(
-                    "onDataTrackSubscriptionFailed: remoteParticipant: %s, video: %s, "
-                            + "exception: %s",
+        public void onDataTrackSubscriptionFailed(RemoteParticipant remoteParticipant,
+                                                  RemoteDataTrackPublication remoteDataTrackPublication,
+                                                  TwilioException twilioException) {
+            Timber.w("onDataTrackSubscriptionFailed: remoteParticipant: %s, video: %s, " +
+                            "exception: %s",
                     remoteParticipant.getIdentity(),
                     remoteDataTrackPublication.getTrackSid(),
                     twilioException.getMessage());
             // TODO: Need design
-            Snackbar.make(primaryVideoView, "onDataTrackSubscriptionFailed", Snackbar.LENGTH_LONG)
-                    .show();
+            Snackbar.make(primaryVideoView,
+                    "onDataTrackSubscriptionFailed",
+                    Snackbar.LENGTH_LONG).show();
         }
 
         @Override
-        public void onDataTrackUnsubscribed(
-                RemoteParticipant remoteParticipant,
-                RemoteDataTrackPublication remoteDataTrackPublication,
-                RemoteDataTrack remoteDataTrack) {
-            Timber.i(
-                    "onDataTrackUnsubscribed: remoteParticipant: %s, data: %s, enabled: %b, "
-                            + "subscribed: %b",
+        public void onDataTrackUnsubscribed(RemoteParticipant remoteParticipant,
+                                            RemoteDataTrackPublication remoteDataTrackPublication,
+                                            RemoteDataTrack remoteDataTrack) {
+            Timber.i("onDataTrackUnsubscribed: remoteParticipant: %s, data: %s, enabled: %b, " +
+                            "subscribed: %b",
                     remoteParticipant.getIdentity(),
                     remoteDataTrackPublication.getTrackSid(),
                     remoteDataTrackPublication.isTrackEnabled(),
@@ -1711,11 +1618,9 @@ public class RoomActivity extends BaseActivity {
         }
 
         @Override
-        public void onAudioTrackEnabled(
-                RemoteParticipant remoteParticipant,
-                RemoteAudioTrackPublication remoteAudioTrackPublication) {
-            Timber.i(
-                    "onAudioTrackEnabled: remoteParticipant: %s, audio: %s, enabled: %b",
+        public void onAudioTrackEnabled(RemoteParticipant remoteParticipant,
+                                        RemoteAudioTrackPublication remoteAudioTrackPublication) {
+            Timber.i("onAudioTrackEnabled: remoteParticipant: %s, audio: %s, enabled: %b",
                     remoteParticipant.getIdentity(),
                     remoteAudioTrackPublication.getTrackSid(),
                     remoteAudioTrackPublication.isTrackEnabled());
@@ -1724,11 +1629,9 @@ public class RoomActivity extends BaseActivity {
         }
 
         @Override
-        public void onAudioTrackDisabled(
-                RemoteParticipant remoteParticipant,
-                RemoteAudioTrackPublication remoteAudioTrackPublication) {
-            Timber.i(
-                    "onAudioTrackDisabled: remoteParticipant: %s, audio: %s, enabled: %b",
+        public void onAudioTrackDisabled(RemoteParticipant remoteParticipant,
+                                         RemoteAudioTrackPublication remoteAudioTrackPublication) {
+            Timber.i("onAudioTrackDisabled: remoteParticipant: %s, audio: %s, enabled: %b",
                     remoteParticipant.getIdentity(),
                     remoteAudioTrackPublication.getTrackSid(),
                     remoteAudioTrackPublication.isTrackEnabled());
@@ -1737,11 +1640,9 @@ public class RoomActivity extends BaseActivity {
         }
 
         @Override
-        public void onVideoTrackEnabled(
-                RemoteParticipant remoteParticipant,
-                RemoteVideoTrackPublication remoteVideoTrackPublication) {
-            Timber.i(
-                    "onVideoTrackEnabled: remoteParticipant: %s, video: %s, enabled: %b",
+        public void onVideoTrackEnabled(RemoteParticipant remoteParticipant,
+                                        RemoteVideoTrackPublication remoteVideoTrackPublication) {
+            Timber.i("onVideoTrackEnabled: remoteParticipant: %s, video: %s, enabled: %b",
                     remoteParticipant.getIdentity(),
                     remoteVideoTrackPublication.getTrackSid(),
                     remoteVideoTrackPublication.isTrackEnabled());
@@ -1750,11 +1651,9 @@ public class RoomActivity extends BaseActivity {
         }
 
         @Override
-        public void onVideoTrackDisabled(
-                RemoteParticipant remoteParticipant,
-                RemoteVideoTrackPublication remoteVideoTrackPublication) {
-            Timber.i(
-                    "onVideoTrackDisabled: remoteParticipant: %s, video: %s, enabled: %b",
+        public void onVideoTrackDisabled(RemoteParticipant remoteParticipant,
+                                         RemoteVideoTrackPublication remoteVideoTrackPublication) {
+            Timber.i("onVideoTrackDisabled: remoteParticipant: %s, video: %s, enabled: %b",
                     remoteParticipant.getIdentity(),
                     remoteVideoTrackPublication.getTrackSid(),
                     remoteVideoTrackPublication.isTrackEnabled());

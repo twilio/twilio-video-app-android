@@ -33,12 +33,12 @@ final class Util {
         Handler handler = null;
         Looper looper;
 
-        if ((looper = Looper.myLooper()) != null) {
+        if((looper = Looper.myLooper()) != null) {
             handler = new Handler(looper);
-        } else if ((looper = Looper.getMainLooper()) != null) {
+        } else if((looper = Looper.getMainLooper()) != null) {
             handler = new Handler(looper);
         }
-        if (handler == null) {
+        if(handler == null) {
             throw new IllegalThreadStateException("This thread must be able to obtain a Looper");
         }
 

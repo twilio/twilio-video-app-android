@@ -28,15 +28,16 @@ import android.support.v7.preference.Preference;
 import android.support.v7.preference.PreferenceViewHolder;
 import android.util.AttributeSet;
 import android.widget.LinearLayout;
+
 import com.appyvet.rangebar.IRangeBarFormatter;
 import com.appyvet.rangebar.RangeBar;
 import com.twilio.video.app.R;
 
 /**
- * RangeBarPreference allows to save any range in default shared preferences by saving range start
- * and range end values.
- *
- * <p>Customizable options:
+ * RangeBarPreference allows to save any range in default shared preferences
+ * by saving range start and range end values.
+ * <p>
+ * Customizable options:
  *
  * @attr name entries - collection of string to use as display value
  * @attr name heightResId - range bar height
@@ -48,42 +49,59 @@ import com.twilio.video.app.R;
  */
 public class RangeBarPreference extends Preference {
 
-    /** Default shared preferences instance. */
+    /**
+     * Default shared preferences instance.
+     */
     private SharedPreferences sharedPreferences;
 
-    /** Customizable range bar. */
+    /**
+     * Customizable range bar.
+     */
     private RangeBar rangeBar;
 
     /**
-     * RangeBar pin visible text formatter. If entries array is provided utilizes string values from
-     * the provided array, otherwise falls back to integers.
+     * RangeBar pin visible text formatter. If entries array is provided utilizes string values
+     * from the provided array, otherwise falls back to integers.
      */
     private IRangeBarFormatter formatter;
 
-    /** Range of values. */
+    /**
+     * Range of values.
+     */
     private String[] entries;
 
-    /** Range start key - used in shared preferences to save range start point. */
+    /**
+     * Range start key - used in shared preferences to save range start point.
+     */
     private String startKey;
 
-    /** Range end key - used in shared preferences to save range end point. */
+    /**
+     * Range end key - used in shared preferences to save range end point.
+     */
     private String endKey;
 
-    /** RangeBar provided setting. NOTE: uses this value if no entries provided. */
+    /**
+     * RangeBar provided setting. NOTE: uses this value if no entries provided.
+     */
     private int startTick;
 
-    /** RangeBar provided setting. NOTE: uses this value if no entries provided. */
+    /**
+     * RangeBar provided setting. NOTE: uses this value if no entries provided.
+     */
     private int endTick;
 
-    /** RangeBar provided setting. Specifies the size of tick used. */
+    /**
+     * RangeBar provided setting. Specifies the size of tick used.
+     */
     private float pinRadius;
 
-    /** RangeBar height. Applies custom height from xml file. */
+    /**
+     * RangeBar height. Applies custom height from xml file.
+     */
     private int heightResId;
 
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
-    public RangeBarPreference(
-            Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
+    public RangeBarPreference(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
         super(context, attrs, defStyleAttr, defStyleRes);
         init(context, attrs);
     }
@@ -113,10 +131,9 @@ public class RangeBarPreference extends Preference {
         rangeBar = (RangeBar) holder.findViewById(R.id.range_bar);
 
         // apply custom height
-        rangeBar.setLayoutParams(
-                new LinearLayout.LayoutParams(
-                        LinearLayout.LayoutParams.MATCH_PARENT,
-                        resources.getDimensionPixelSize(heightResId)));
+        rangeBar.setLayoutParams(new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                resources.getDimensionPixelSize(heightResId)));
 
         // setup preference range
         if (entries != null) {
@@ -154,23 +171,21 @@ public class RangeBarPreference extends Preference {
             }
 
             // save all changes prefs while moving pins
-            rangeBar.setOnRangeBarChangeListener(
-                    new RangeBar.OnRangeBarChangeListener() {
-                        @Override
-                        public void onRangeChangeListener(
-                                RangeBar rangeBar,
-                                int leftPinIndex,
-                                int rightPinIndex,
-                                String leftPinValue,
-                                String rightPinValue) {
+            rangeBar.setOnRangeBarChangeListener(new RangeBar.OnRangeBarChangeListener() {
+                @Override
+                public void onRangeChangeListener(RangeBar rangeBar,
+                                                  int leftPinIndex,
+                                                  int rightPinIndex,
+                                                  String leftPinValue,
+                                                  String rightPinValue) {
 
-                            sharedPreferences
-                                    .edit()
-                                    .putInt(startKey, leftPinIndex)
-                                    .putInt(endKey, rightPinIndex)
-                                    .apply();
-                        }
-                    });
+                    sharedPreferences.edit()
+                            .putInt(startKey, leftPinIndex)
+                            .putInt(endKey, rightPinIndex)
+                            .apply();
+
+                }
+            });
         }
     }
 
@@ -179,9 +194,8 @@ public class RangeBarPreference extends Preference {
         setLayoutResource(R.layout.range_bar_preference);
 
         if (attrs != null) {
-            TypedArray stylables =
-                    context.getTheme()
-                            .obtainStyledAttributes(attrs, R.styleable.RangeBarPreference, 0, 0);
+            TypedArray stylables = context.getTheme()
+                    .obtainStyledAttributes(attrs, R.styleable.RangeBarPreference, 0, 0);
 
             // range bar height
             heightResId = stylables.getResourceId(R.styleable.RangeBarPreference_height, -1);
@@ -205,18 +219,17 @@ public class RangeBarPreference extends Preference {
         }
 
         // initialize formatter to use entries array or fall back to entries
-        formatter =
-                new IRangeBarFormatter() {
-                    @Override
-                    public String format(String value) {
-                        try {
-                            int index = Integer.parseInt(value);
-                            return (index >= 0 && index < entries.length) ? entries[index] : value;
-                        } catch (Exception e) {
-                            return value;
-                        }
-                    }
-                };
+        formatter = new IRangeBarFormatter() {
+            @Override
+            public String format(String value) {
+                try {
+                    int index = Integer.parseInt(value);
+                    return (index >= 0 && index < entries.length) ? entries[index] : value;
+                } catch (Exception e) {
+                    return value;
+                }
+            }
+        };
 
         // obtain default preferences
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);

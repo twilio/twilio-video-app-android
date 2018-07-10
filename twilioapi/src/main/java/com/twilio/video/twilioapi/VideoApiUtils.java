@@ -16,14 +16,14 @@
 
 package com.twilio.video.twilioapi;
 
-import static junit.framework.Assert.assertNotNull;
-import static junit.framework.Assert.assertTrue;
-
 import android.util.Base64;
 import android.util.Log;
+
 import com.google.gson.GsonBuilder;
 import com.twilio.video.twilioapi.model.VideoRoom;
+
 import java.util.List;
+
 import retrofit.Callback;
 import retrofit.RestAdapter;
 import retrofit.RetrofitError;
@@ -34,6 +34,9 @@ import retrofit.http.GET;
 import retrofit.http.Header;
 import retrofit.http.POST;
 import retrofit.http.Path;
+
+import static junit.framework.Assert.assertNotNull;
+import static junit.framework.Assert.assertTrue;
 
 public class VideoApiUtils {
     private static final int MAX_RETRIES = 100;
@@ -53,35 +56,32 @@ public class VideoApiUtils {
     interface VideoApiService {
         @POST("/v1/Rooms")
         @FormUrlEncoded
-        void createRoom(
-                @Header("Authorization") String authorization,
-                @Field("UniqueName") String name,
-                @Field("Type") String type,
-                @Field("EnableTurn") boolean enableTurn,
-                @Field("RecordParticipantsOnConnect") boolean enableRecording,
-                @Field("VideoCodecs") List<String> videoCodecs,
-                Callback<VideoRoom> videoRoomCallback);
+        void createRoom(@Header("Authorization") String authorization,
+                        @Field("UniqueName") String name,
+                        @Field("Type") String type,
+                        @Field("EnableTurn") boolean enableTurn,
+                        @Field("RecordParticipantsOnConnect") boolean enableRecording,
+                        @Field("VideoCodecs") List<String> videoCodecs,
+                        Callback<VideoRoom> videoRoomCallback);
 
         @POST("/v1/Rooms")
         @FormUrlEncoded
-        VideoRoom createRoom(
-                @Header("Authorization") String authorization,
-                @Field("UniqueName") String name,
-                @Field("Type") String type,
-                @Field("EnableTurn") boolean enableTurn,
-                @Field("RecordParticipantsOnConnect") boolean enableRecording,
-                @Field("VideoCodecs") List<String> videoCodecs);
+        VideoRoom createRoom(@Header("Authorization") String authorization,
+                             @Field("UniqueName") String name,
+                             @Field("Type") String type,
+                             @Field("EnableTurn") boolean enableTurn,
+                             @Field("RecordParticipantsOnConnect") boolean enableRecording,
+                             @Field("VideoCodecs") List<String> videoCodecs);
 
         @GET("/v1/Rooms/{unique_name}")
-        VideoRoom getRoom(
-                @Header("Authorization") String authorization, @Path("unique_name") String name);
+        VideoRoom getRoom(@Header("Authorization") String authorization,
+                          @Path("unique_name") String name);
 
         @POST("/v1/Rooms/{room_sid}")
         @FormUrlEncoded
-        VideoRoom modifyRoom(
-                @Header("Authorization") String authorization,
-                @Path("room_sid") String roomSid,
-                @Field("Status") String status);
+        VideoRoom modifyRoom(@Header("Authorization") String authorization,
+                             @Path("room_sid") String roomSid,
+                             @Field("Status") String status);
     }
 
     private static VideoApiUtils.VideoApiService videoApiService = createVideoApiService();
@@ -101,24 +101,24 @@ public class VideoApiUtils {
                 .create(VideoApiUtils.VideoApiService.class);
     }
 
-    public static void createRoom(
-            String accountSid,
-            String signingKeySid,
-            String signingKeySecret,
-            String name,
-            String type,
-            String environment,
-            boolean enableTurn,
-            boolean enableRecording,
-            List<String> videoCodecs,
-            Callback<VideoRoom> callback)
-            throws IllegalArgumentException {
-        if (!environment.equalsIgnoreCase(PROD)
-                && !environment.equalsIgnoreCase(STAGE)
-                && !environment.equalsIgnoreCase(DEV)) {
+    public static void createRoom(String accountSid,
+                                  String signingKeySid,
+                                  String signingKeySecret,
+                                  String name,
+                                  String type,
+                                  String environment,
+                                  boolean enableTurn,
+                                  boolean enableRecording,
+                                  List<String> videoCodecs,
+                                  Callback<VideoRoom> callback)
+        throws IllegalArgumentException {
+        if (!environment.equalsIgnoreCase(PROD) &&
+            !environment.equalsIgnoreCase(STAGE) &&
+            !environment.equalsIgnoreCase(DEV)){
             throw new IllegalArgumentException("Invalid Environment!");
         }
-        if (!type.equalsIgnoreCase(P2P) && !type.equalsIgnoreCase(GROUP)) {
+        if (!type.equalsIgnoreCase(P2P) &&
+            !type.equalsIgnoreCase(GROUP)) {
             throw new IllegalArgumentException("Invalid Room Type!");
         }
         if (!currentEnvironment.equalsIgnoreCase(environment)) {
@@ -126,29 +126,29 @@ public class VideoApiUtils {
             videoApiService = createVideoApiService();
         }
         String authString = signingKeySid + ":" + signingKeySecret;
-        String authorization =
-                "Basic " + Base64.encodeToString(authString.getBytes(), Base64.NO_WRAP);
-        videoApiService.createRoom(
-                authorization, name, type, enableTurn, enableRecording, videoCodecs, callback);
+        String authorization = "Basic " + Base64.encodeToString(authString.getBytes(),
+            Base64.NO_WRAP);
+        videoApiService.createRoom(authorization, name, type,
+            enableTurn, enableRecording, videoCodecs, callback);
     }
 
     // Provide a synchronous version of createRoom for tests
-    public static VideoRoom createRoom(
-            String accountSid,
-            String signingKeySid,
-            String signingKeySecret,
-            String name,
-            String type,
-            String environment,
-            boolean enableTurn,
-            boolean enableRecording,
-            List<String> videoCodecs) {
-        if (!environment.equalsIgnoreCase(PROD)
-                && !environment.equalsIgnoreCase(STAGE)
-                && !environment.equalsIgnoreCase(DEV)) {
+    public static VideoRoom createRoom(String accountSid,
+                                       String signingKeySid,
+                                       String signingKeySecret,
+                                       String name,
+                                       String type,
+                                       String environment,
+                                       boolean enableTurn,
+                                       boolean enableRecording,
+                                       List<String> videoCodecs) {
+        if (!environment.equalsIgnoreCase(PROD) &&
+            !environment.equalsIgnoreCase(STAGE) &&
+            !environment.equalsIgnoreCase(DEV)){
             throw new IllegalArgumentException("Invalid Environment!");
         }
-        if (!type.equalsIgnoreCase(P2P) && !type.equalsIgnoreCase(GROUP)) {
+        if (!type.equalsIgnoreCase(P2P) &&
+            !type.equalsIgnoreCase(GROUP)) {
             throw new IllegalArgumentException("Invalid Room Type!");
         }
         if (!currentEnvironment.equalsIgnoreCase(environment)) {
@@ -157,8 +157,8 @@ public class VideoApiUtils {
         }
 
         String authString = signingKeySid + ":" + signingKeySecret;
-        String authorization =
-                "Basic " + Base64.encodeToString(authString.getBytes(), Base64.NO_WRAP);
+        String authorization = "Basic " + Base64.encodeToString(authString.getBytes(),
+            Base64.NO_WRAP);
 
         /*
          * Occasionally requests to create a room time out on Firebase Test Lab. Retry a reasonable
@@ -168,18 +168,15 @@ public class VideoApiUtils {
         VideoRoom videoRoom = null;
         do {
             try {
-                videoRoom =
-                        videoApiService.createRoom(
-                                authorization,
-                                name,
-                                type,
-                                enableTurn,
-                                enableRecording,
-                                videoCodecs);
+                videoRoom = videoApiService.createRoom(authorization,
+                        name,
+                        type,
+                        enableTurn,
+                        enableRecording,
+                        videoCodecs);
             } catch (RetrofitError createRoomError) {
-                Log.e(
-                        "VideoApiUtils",
-                        String.format("RetrofitError: %s", createRoomError.getKind().name()));
+                Log.e("VideoApiUtils", String.format("RetrofitError: %s",
+                        createRoomError.getKind().name()));
 
                 /*
                  * Sometimes there is a timeout creating a room, but the room resource is still
@@ -189,9 +186,8 @@ public class VideoApiUtils {
                 try {
                     videoRoom = videoApiService.getRoom(authorization, name);
                 } catch (RetrofitError getRoomError) {
-                    Log.e(
-                            "VideoApiUtils",
-                            String.format("RetrofitError: %s", getRoomError.getKind().name()));
+                    Log.e("VideoApiUtils", String.format("RetrofitError: %s",
+                            getRoomError.getKind().name()));
                 }
             }
 
@@ -206,9 +202,8 @@ public class VideoApiUtils {
         } while (videoRoom == null && retries++ < MAX_RETRIES);
 
         // Validate the room creation succeeded
-        assertNotNull(
-                String.format(
-                        "Failed to create a Room after %s attempts", String.valueOf(MAX_RETRIES)),
+        assertNotNull(String.format("Failed to create a Room after %s attempts",
+                String.valueOf(MAX_RETRIES)),
                 videoRoom);
 
         /*
@@ -218,22 +213,23 @@ public class VideoApiUtils {
          * the request was made with enableTurn=false.
          */
         boolean expectedEnableTurn = type.equalsIgnoreCase(GROUP) || enableTurn;
-        assertTrue(
-                "Room resource does not match configuration requested for test",
-                accountSid.equals(videoRoom.getAccountSid())
-                        && name.equals(videoRoom.getUniqueName())
-                        && type.equals(videoRoom.getType())
-                        && expectedEnableTurn == videoRoom.isEnableTurn()
-                        && enableRecording == videoRoom.isRecordParticipantOnConnect());
+        assertTrue("Room resource does not match configuration requested for test",
+                accountSid.equals(videoRoom.getAccountSid()) &&
+                        name.equals(videoRoom.getUniqueName()) &&
+                        type.equals(videoRoom.getType()) &&
+                        expectedEnableTurn == videoRoom.isEnableTurn() &&
+                        enableRecording == videoRoom.isRecordParticipantOnConnect());
 
         return videoRoom;
     }
 
-    public static VideoRoom completeRoom(
-            String signingKeySid, String signingKeySecret, String roomSid, String environment) {
-        if (!environment.equalsIgnoreCase(PROD)
-                && !environment.equalsIgnoreCase(STAGE)
-                && !environment.equalsIgnoreCase(DEV)) {
+    public static VideoRoom completeRoom(String signingKeySid,
+                                         String signingKeySecret,
+                                         String roomSid,
+                                         String environment) {
+        if (!environment.equalsIgnoreCase(PROD) &&
+                !environment.equalsIgnoreCase(STAGE) &&
+                !environment.equalsIgnoreCase(DEV)){
             throw new IllegalArgumentException("Invalid Environment!");
         }
         if (!currentEnvironment.equalsIgnoreCase(environment)) {
@@ -242,9 +238,11 @@ public class VideoApiUtils {
         }
 
         String authString = signingKeySid + ":" + signingKeySecret;
-        String authorization =
-                "Basic " + Base64.encodeToString(authString.getBytes(), Base64.NO_WRAP);
+        String authorization = "Basic " + Base64.encodeToString(authString.getBytes(),
+                Base64.NO_WRAP);
 
-        return videoApiService.modifyRoom(authorization, roomSid, "completed");
+        return  videoApiService.modifyRoom(authorization,
+                roomSid,
+                "completed");
     }
 }

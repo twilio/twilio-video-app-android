@@ -16,29 +16,33 @@
 
 package com.twilio.video;
 
-import static com.twilio.video.util.VideoAssert.assertIsTrackSid;
-import static com.twilio.video.util.VideoAssert.assertNotNullOrEmpty;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertTrue;
 
 import android.support.test.filters.LargeTest;
+
 import com.twilio.video.base.BaseStatsTest;
 import com.twilio.video.helper.CallbackHelper;
 import com.twilio.video.util.FakeVideoCapturer;
 import com.twilio.video.util.Topology;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
+
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
+
+import static com.twilio.video.util.VideoAssert.assertIsTrackSid;
+import static com.twilio.video.util.VideoAssert.assertNotNullOrEmpty;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertTrue;
 
 @RunWith(Parameterized.class)
 @LargeTest
@@ -47,7 +51,9 @@ public class StatsTopologyParameterizedTest extends BaseStatsTest {
 
     @Parameterized.Parameters(name = "{0}")
     public static Iterable<Object[]> data() {
-        return Arrays.asList(new Object[][] {{Topology.P2P}, {Topology.GROUP}});
+        return Arrays.asList(new Object[][]{
+                {Topology.P2P},
+                {Topology.GROUP}});
     }
 
     public StatsTopologyParameterizedTest(Topology topology) {
@@ -70,25 +76,22 @@ public class StatsTopologyParameterizedTest extends BaseStatsTest {
     public void shouldReceiveStatsForParticipantTracks() throws InterruptedException {
         // Connect Alice to room with local audio track only
         aliceLocalAudioTrack = LocalAudioTrack.create(mediaTestActivity, true);
-        aliceRoom =
-                createRoom(
-                        aliceToken,
-                        aliceListener,
-                        roomName,
-                        Collections.singletonList(aliceLocalAudioTrack));
+        aliceRoom = createRoom(aliceToken,
+                aliceListener,
+                roomName,
+                Collections.singletonList(aliceLocalAudioTrack));
         aliceListener.onParticipantConnectedLatch = new CountDownLatch(1);
 
         // Connect Bob to room with audio and video track
         bobLocalAudioTrack = LocalAudioTrack.create(mediaTestActivity, true);
-        bobLocalVideoTrack =
-                LocalVideoTrack.create(mediaTestActivity, true, new FakeVideoCapturer());
-        bobRoom =
-                createRoom(
-                        bobToken,
-                        bobListener,
-                        roomName,
-                        Collections.singletonList(bobLocalAudioTrack),
-                        Collections.singletonList(bobLocalVideoTrack));
+        bobLocalVideoTrack = LocalVideoTrack.create(mediaTestActivity,
+                true,
+                new FakeVideoCapturer());
+        bobRoom = createRoom(bobToken,
+                bobListener,
+                roomName,
+                Collections.singletonList(bobLocalAudioTrack),
+                Collections.singletonList(bobLocalVideoTrack));
         assertTrue(aliceListener.onParticipantConnectedLatch.await(20, TimeUnit.SECONDS));
         assertEquals(1, aliceRoom.getRemoteParticipants().size());
 
@@ -99,12 +102,10 @@ public class StatsTopologyParameterizedTest extends BaseStatsTest {
     public void shouldReceiveStatsWhenParticipanAddsOrRemovesTrack() throws InterruptedException {
         // Connect Alice to room with local audio track only
         aliceLocalAudioTrack = LocalAudioTrack.create(mediaTestActivity, true);
-        aliceRoom =
-                createRoom(
-                        aliceToken,
-                        aliceListener,
-                        roomName,
-                        Collections.singletonList(aliceLocalAudioTrack));
+        aliceRoom = createRoom(aliceToken,
+                aliceListener,
+                roomName,
+                Collections.singletonList(aliceLocalAudioTrack));
         aliceListener.onParticipantConnectedLatch = new CountDownLatch(1);
 
         // Connect Bob without media
@@ -129,16 +130,15 @@ public class StatsTopologyParameterizedTest extends BaseStatsTest {
         expectStatsReportTracksSize(1, 0, 1, 0);
 
         // Add video track to bob and check stats
-        bobLocalVideoTrack =
-                LocalVideoTrack.create(mediaTestActivity, true, new FakeVideoCapturer());
+        bobLocalVideoTrack = LocalVideoTrack
+                .create(mediaTestActivity, true, new FakeVideoCapturer());
         assertTrue(bobLocalParticipant.publishTrack(bobLocalVideoTrack));
         assertTrue(participantListener.onSubscribedToVideoTrackLatch.await(20, TimeUnit.SECONDS));
         expectStatsReportTracksSize(1, 0, 1, 1);
 
         // Remove Bob's video track and check the stats
         bobLocalParticipant.unpublishTrack(bobLocalVideoTrack);
-        assertTrue(
-                participantListener.onUnsubscribedFromVideoTrackLatch.await(20, TimeUnit.SECONDS));
+        assertTrue(participantListener.onUnsubscribedFromVideoTrackLatch.await(20, TimeUnit.SECONDS));
         expectStatsReportTracksSize(1, 0, 1, 0);
     }
 
@@ -153,12 +153,13 @@ public class StatsTopologyParameterizedTest extends BaseStatsTest {
         assertTrue(aliceListener.onParticipantConnectedLatch.await(20, TimeUnit.SECONDS));
         assertEquals(1, aliceRoom.getRemoteParticipants().size());
 
+
         // Get alice local bobRemoteParticipant
         LocalParticipant aliceLocalParticipant = aliceRoom.getLocalParticipant();
 
         // Add audio and video track to alice
-        aliceLocalVideoTrack =
-                LocalVideoTrack.create(mediaTestActivity, true, new FakeVideoCapturer());
+        aliceLocalVideoTrack = LocalVideoTrack
+                .create(mediaTestActivity, true, new FakeVideoCapturer());
         assertTrue(aliceLocalParticipant.publishTrack(aliceLocalVideoTrack));
 
         aliceLocalAudioTrack = LocalAudioTrack.create(mediaTestActivity, true);
@@ -173,22 +174,18 @@ public class StatsTopologyParameterizedTest extends BaseStatsTest {
 
         // Connect Alice to room with local audio track only
         aliceLocalAudioTrack = LocalAudioTrack.create(mediaTestActivity, true);
-        aliceRoom =
-                createRoom(
-                        aliceToken,
-                        aliceListener,
-                        roomName,
-                        Collections.singletonList(aliceLocalAudioTrack));
+        aliceRoom = createRoom(aliceToken,
+                aliceListener,
+                roomName,
+                Collections.singletonList(aliceLocalAudioTrack));
         aliceListener.onParticipantConnectedLatch = new CountDownLatch(1);
 
         // Connect Bob to room with audio and video track
         bobLocalAudioTrack = LocalAudioTrack.create(mediaTestActivity, true);
-        bobRoom =
-                createRoom(
-                        bobToken,
-                        bobListener,
-                        roomName,
-                        Collections.singletonList(bobLocalAudioTrack));
+        bobRoom = createRoom(bobToken,
+                bobListener,
+                roomName,
+                Collections.singletonList(bobLocalAudioTrack));
         assertTrue(aliceListener.onParticipantConnectedLatch.await(20, TimeUnit.SECONDS));
         assertEquals(1, aliceRoom.getRemoteParticipants().size());
 
@@ -196,7 +193,7 @@ public class StatsTopologyParameterizedTest extends BaseStatsTest {
         CallbackHelper.FakeStatsListener aliceStatsListener =
                 new CallbackHelper.FakeStatsListener();
         aliceStatsListener.onStatsLatch = new CountDownLatch(numberOfRequests);
-        for (int i = 0; i < numberOfRequests; i++) {
+        for (int i = 0 ; i < numberOfRequests ; i++) {
             aliceRoom.getStats(aliceStatsListener);
         }
 
@@ -212,31 +209,28 @@ public class StatsTopologyParameterizedTest extends BaseStatsTest {
     public void reportShouldHaveNonEmptyValues() throws InterruptedException {
         // Connect Alice to room with both video and audio track
         aliceLocalAudioTrack = LocalAudioTrack.create(mediaTestActivity, true);
-        aliceLocalVideoTrack =
-                LocalVideoTrack.create(mediaTestActivity, true, new FakeVideoCapturer());
-        aliceRoom =
-                createRoom(
-                        aliceToken,
-                        aliceListener,
-                        roomName,
-                        Collections.singletonList(aliceLocalAudioTrack),
-                        Collections.singletonList(aliceLocalVideoTrack));
+        aliceLocalVideoTrack = LocalVideoTrack.
+                create(mediaTestActivity, true, new FakeVideoCapturer());
+        aliceRoom = createRoom(aliceToken,
+                aliceListener,
+                roomName,
+                Collections.singletonList(aliceLocalAudioTrack),
+                Collections.singletonList(aliceLocalVideoTrack));
         aliceListener.onParticipantConnectedLatch = new CountDownLatch(1);
 
         // Connect Bob to room with both video and audio track
         bobLocalAudioTrack = LocalAudioTrack.create(mediaTestActivity, true);
-        bobLocalVideoTrack =
-                LocalVideoTrack.create(mediaTestActivity, true, new FakeVideoCapturer());
-        bobRoom =
-                createRoom(
-                        bobToken,
-                        bobListener,
-                        roomName,
-                        Collections.singletonList(bobLocalAudioTrack),
-                        Collections.singletonList(bobLocalVideoTrack));
+        bobLocalVideoTrack = LocalVideoTrack.
+                create(mediaTestActivity, true, new FakeVideoCapturer());
+        bobRoom = createRoom(bobToken,
+                bobListener,
+                roomName,
+                Collections.singletonList(bobLocalAudioTrack),
+                Collections.singletonList(bobLocalVideoTrack));
         assertTrue(aliceListener.onParticipantConnectedLatch.await(20, TimeUnit.SECONDS));
 
-        StatsReport statsReport = expectStatsReportTracksSize(1, 1, 1, 1);
+        StatsReport statsReport = expectStatsReportTracksSize(1,
+                1, 1, 1);
 
         assertNotEquals("", statsReport.getPeerConnectionId());
 
@@ -283,22 +277,18 @@ public class StatsTopologyParameterizedTest extends BaseStatsTest {
 
         // Connect Alice to room with local audio track only
         aliceLocalAudioTrack = LocalAudioTrack.create(mediaTestActivity, true);
-        aliceRoom =
-                createRoom(
-                        aliceToken,
-                        aliceListener,
-                        roomName,
-                        Collections.singletonList(aliceLocalAudioTrack));
+        aliceRoom = createRoom(aliceToken,
+                aliceListener,
+                roomName,
+                Collections.singletonList(aliceLocalAudioTrack));
         aliceListener.onParticipantConnectedLatch = new CountDownLatch(1);
 
         // Connect Bob to room with audio and video track
         bobLocalAudioTrack = LocalAudioTrack.create(mediaTestActivity, true);
-        bobRoom =
-                createRoom(
-                        bobToken,
-                        bobListener,
-                        roomName,
-                        Collections.singletonList(bobLocalAudioTrack));
+        bobRoom = createRoom(bobToken,
+                bobListener,
+                roomName,
+                Collections.singletonList(bobLocalAudioTrack));
         assertTrue(aliceListener.onParticipantConnectedLatch.await(20, TimeUnit.SECONDS));
         assertEquals(1, aliceRoom.getRemoteParticipants().size());
 
@@ -323,32 +313,29 @@ public class StatsTopologyParameterizedTest extends BaseStatsTest {
         assertEquals(0, statsReportList.size());
     }
 
+
     @Test
     public void shouldNotReceiveReportAfterRoomIsDisconnected() throws InterruptedException {
         // Connect Alice to room with both video and audio track
         aliceLocalAudioTrack = LocalAudioTrack.create(mediaTestActivity, true);
-        aliceLocalVideoTrack =
-                LocalVideoTrack.create(mediaTestActivity, true, new FakeVideoCapturer());
-        aliceRoom =
-                createRoom(
-                        aliceToken,
-                        aliceListener,
-                        roomName,
-                        Collections.singletonList(aliceLocalAudioTrack),
-                        Collections.singletonList(aliceLocalVideoTrack));
+        aliceLocalVideoTrack = LocalVideoTrack.
+                create(mediaTestActivity, true, new FakeVideoCapturer());
+        aliceRoom = createRoom(aliceToken,
+                aliceListener,
+                roomName,
+                Collections.singletonList(aliceLocalAudioTrack),
+                Collections.singletonList(aliceLocalVideoTrack));
         aliceListener.onParticipantConnectedLatch = new CountDownLatch(1);
 
         // Connect Bob to room with both video and audio track
         bobLocalAudioTrack = LocalAudioTrack.create(mediaTestActivity, true);
-        bobLocalVideoTrack =
-                LocalVideoTrack.create(mediaTestActivity, true, new FakeVideoCapturer());
-        bobRoom =
-                createRoom(
-                        bobToken,
-                        bobListener,
-                        roomName,
-                        Collections.singletonList(bobLocalAudioTrack),
-                        Collections.singletonList(bobLocalVideoTrack));
+        bobLocalVideoTrack = LocalVideoTrack.
+                create(mediaTestActivity, true, new FakeVideoCapturer());
+        bobRoom = createRoom(bobToken,
+                bobListener,
+                roomName,
+                Collections.singletonList(bobLocalAudioTrack),
+                Collections.singletonList(bobLocalVideoTrack));
         assertTrue(aliceListener.onParticipantConnectedLatch.await(20, TimeUnit.SECONDS));
         CallbackHelper.FakeStatsListener aliceStatsListener =
                 new CallbackHelper.FakeStatsListener();
@@ -360,18 +347,17 @@ public class StatsTopologyParameterizedTest extends BaseStatsTest {
         assertTrue(aliceListener.onDisconnectedLatch.await(20, TimeUnit.SECONDS));
 
         // call get stats after room has been disconnected
-        aliceStatsListener = new CallbackHelper.FakeStatsListener();
+        aliceStatsListener =
+                new CallbackHelper.FakeStatsListener();
         aliceStatsListener.onStatsLatch = new CountDownLatch(1);
         aliceRoom.getStats(aliceStatsListener);
         assertFalse(aliceStatsListener.onStatsLatch.await(5, TimeUnit.SECONDS));
     }
 
-    private StatsReport expectStatsReportTracksSize(
-            int localAudioTrackSize,
-            int localVideoTrackSize,
-            int audioTrackSize,
-            int videoTrackSize)
-            throws InterruptedException {
+    private StatsReport expectStatsReportTracksSize(int localAudioTrackSize,
+                                                    int localVideoTrackSize,
+                                                    int audioTrackSize,
+                                                    int videoTrackSize) throws InterruptedException {
         boolean expectedStatsReportTrackSizesMet;
         int retries = 0;
         StatsReport statsReport;
@@ -390,11 +376,11 @@ public class StatsTopologyParameterizedTest extends BaseStatsTest {
             assertEquals(1, statsReportList.size());
             statsReport = statsReportList.get(0);
 
-            expectedStatsReportTrackSizesMet =
-                    localAudioTrackSize == statsReport.getLocalAudioTrackStats().size()
-                            && localVideoTrackSize == statsReport.getLocalVideoTrackStats().size()
-                            && audioTrackSize == statsReport.getRemoteAudioTrackStats().size()
-                            && videoTrackSize == statsReport.getRemoteVideoTrackStats().size();
+            expectedStatsReportTrackSizesMet = localAudioTrackSize ==
+                    statsReport.getLocalAudioTrackStats().size() &&
+                    localVideoTrackSize == statsReport.getLocalVideoTrackStats().size() &&
+                    audioTrackSize == statsReport.getRemoteAudioTrackStats().size() &&
+                    videoTrackSize == statsReport.getRemoteVideoTrackStats().size();
         } while (!expectedStatsReportTrackSizesMet && retries++ < MAX_RETRIES);
 
         assertTrue(expectedStatsReportTrackSizesMet);

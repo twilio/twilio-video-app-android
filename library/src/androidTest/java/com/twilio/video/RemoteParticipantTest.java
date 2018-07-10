@@ -16,17 +16,13 @@
 
 package com.twilio.video;
 
-import static junit.framework.Assert.fail;
-import static org.apache.commons.lang3.RandomStringUtils.random;
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertTrue;
-
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.support.test.filters.LargeTest;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
 import android.util.Log;
+
 import com.twilio.video.base.BaseVideoTest;
 import com.twilio.video.helper.CallbackHelper;
 import com.twilio.video.ui.MediaTestActivity;
@@ -34,17 +30,24 @@ import com.twilio.video.util.Constants;
 import com.twilio.video.util.CredentialsUtils;
 import com.twilio.video.util.RoomUtils;
 import com.twilio.video.util.Topology;
+
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+
+import static junit.framework.Assert.fail;
+import static org.apache.commons.lang3.RandomStringUtils.random;
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertTrue;
 
 @RunWith(AndroidJUnit4.class)
 @LargeTest
@@ -54,7 +57,6 @@ public class RemoteParticipantTest extends BaseVideoTest {
     @Rule
     public ActivityTestRule<MediaTestActivity> activityRule =
             new ActivityTestRule<>(MediaTestActivity.class);
-
     private MediaTestActivity mediaTestActivity;
 
     @Before
@@ -83,182 +85,170 @@ public class RemoteParticipantTest extends BaseVideoTest {
         final CountDownLatch bobPublishedAudioTrack = new CountDownLatch(1);
         final CountDownLatch aliceReceivedBobAudioTrackAdded = new CountDownLatch(1);
         final CountDownLatch aliceDisconnected = new CountDownLatch(1);
-        final ConnectOptions aliceConnectOptions =
-                new ConnectOptions.Builder(aliceToken).roomName(roomName).build();
-        String[] expectedTestEvents =
-                new String[] {
-                    "aliceConnected",
-                    "aliceSeesBobConnected",
-                    "bobPublishesAudioTrack",
-                    "aliceSetsListener",
-                    "aliceReceivesBobAudioTrackAdded"
-                };
+        final ConnectOptions aliceConnectOptions = new ConnectOptions.Builder(aliceToken)
+                .roomName(roomName)
+                .build();
+        String[] expectedTestEvents = new String[] {
+                "aliceConnected",
+                "aliceSeesBobConnected",
+                "bobPublishesAudioTrack",
+                "aliceSetsListener",
+                "aliceReceivesBobAudioTrackAdded"
+        };
         final CallbackHelper.FakeRoomListener bobRoomListener =
                 new CallbackHelper.FakeRoomListener();
-        String bobToken = CredentialsUtils.getAccessToken(Constants.PARTICIPANT_BOB, topology);
+        String bobToken = CredentialsUtils
+                .getAccessToken(Constants.PARTICIPANT_BOB, topology);
         bobRoomListener.onConnectedLatch = new CountDownLatch(1);
         bobRoomListener.onDisconnectedLatch = new CountDownLatch(1);
         final AtomicReference<Room> bobRoom = new AtomicReference<>(null);
-        final ConnectOptions bobConnectOptions =
-                new ConnectOptions.Builder(bobToken).roomName(roomName).build();
+        final ConnectOptions bobConnectOptions = new ConnectOptions.Builder(bobToken)
+                .roomName(roomName)
+                .build();
         final List<String> testEvents = Collections.synchronizedList(new ArrayList<String>());
         final RemoteParticipant.Listener aliceRemoteParticipantListener =
                 new RemoteParticipant.Listener() {
                     @Override
-                    public void onAudioTrackPublished(
-                            RemoteParticipant remoteParticipant,
-                            RemoteAudioTrackPublication remoteAudioTrackPublication) {
+                    public void onAudioTrackPublished(RemoteParticipant remoteParticipant,
+                                                      RemoteAudioTrackPublication remoteAudioTrackPublication) {
                         Log.d(TAG, "Alice received bob's audio track");
                         testEvents.add("aliceReceivesBobAudioTrackAdded");
                         aliceReceivedBobAudioTrackAdded.countDown();
                     }
 
                     @Override
-                    public void onAudioTrackUnpublished(
-                            RemoteParticipant remoteParticipant,
-                            RemoteAudioTrackPublication remoteAudioTrackPublication) {}
+                    public void onAudioTrackUnpublished(RemoteParticipant remoteParticipant,
+                                                        RemoteAudioTrackPublication remoteAudioTrackPublication) {}
 
                     @Override
-                    public void onAudioTrackSubscribed(
-                            RemoteParticipant remoteParticipant,
-                            RemoteAudioTrackPublication remoteAudioTrackPublication,
-                            RemoteAudioTrack remoteAudioTrack) {}
+                    public void onAudioTrackSubscribed(RemoteParticipant remoteParticipant,
+                                                       RemoteAudioTrackPublication remoteAudioTrackPublication,
+                                                       RemoteAudioTrack remoteAudioTrack) {}
 
                     @Override
-                    public void onAudioTrackSubscriptionFailed(
-                            RemoteParticipant remoteParticipant,
-                            RemoteAudioTrackPublication remoteAudioTrackPublication,
-                            TwilioException twilioException) {}
+                    public void onAudioTrackSubscriptionFailed(RemoteParticipant remoteParticipant,
+                                                               RemoteAudioTrackPublication remoteAudioTrackPublication,
+                                                               TwilioException twilioException) {}
 
                     @Override
-                    public void onAudioTrackUnsubscribed(
-                            RemoteParticipant remoteParticipant,
-                            RemoteAudioTrackPublication remoteAudioTrackPublication,
-                            RemoteAudioTrack remoteAudioTrack) {}
+                    public void onAudioTrackUnsubscribed(RemoteParticipant remoteParticipant,
+                                                         RemoteAudioTrackPublication remoteAudioTrackPublication,
+                                                         RemoteAudioTrack remoteAudioTrack) {}
 
                     @Override
-                    public void onVideoTrackPublished(
-                            RemoteParticipant remoteParticipant,
-                            RemoteVideoTrackPublication remoteVideoTrackPublication) {}
+                    public void onVideoTrackPublished(RemoteParticipant remoteParticipant,
+                                                      RemoteVideoTrackPublication remoteVideoTrackPublication) {}
 
                     @Override
-                    public void onVideoTrackUnpublished(
-                            RemoteParticipant remoteParticipant,
-                            RemoteVideoTrackPublication remoteVideoTrackPublication) {}
+                    public void onVideoTrackUnpublished(RemoteParticipant remoteParticipant,
+                                                        RemoteVideoTrackPublication remoteVideoTrackPublication) {}
 
                     @Override
-                    public void onVideoTrackSubscribed(
-                            RemoteParticipant remoteParticipant,
-                            RemoteVideoTrackPublication remoteVideoTrackPublication,
-                            RemoteVideoTrack remoteVideoTrack) {}
+                    public void onVideoTrackSubscribed(RemoteParticipant remoteParticipant,
+                                                       RemoteVideoTrackPublication remoteVideoTrackPublication,
+                                                       RemoteVideoTrack remoteVideoTrack) {}
 
                     @Override
-                    public void onVideoTrackSubscriptionFailed(
-                            RemoteParticipant remoteParticipant,
-                            RemoteVideoTrackPublication remoteVideoTrackPublication,
-                            TwilioException twilioException) {}
+                    public void onVideoTrackSubscriptionFailed(RemoteParticipant remoteParticipant,
+                                                               RemoteVideoTrackPublication remoteVideoTrackPublication,
+                                                               TwilioException twilioException) {}
 
                     @Override
-                    public void onVideoTrackUnsubscribed(
-                            RemoteParticipant remoteParticipant,
-                            RemoteVideoTrackPublication remoteVideoTrackPublicatieon,
-                            RemoteVideoTrack remoteVideoTrack) {}
+                    public void onVideoTrackUnsubscribed(RemoteParticipant remoteParticipant,
+                                                         RemoteVideoTrackPublication remoteVideoTrackPublicatieon,
+                                                         RemoteVideoTrack remoteVideoTrack) {}
 
                     @Override
-                    public void onDataTrackPublished(
-                            RemoteParticipant remoteParticipant,
-                            RemoteDataTrackPublication remoteDataTrackPublication) {}
+                    public void onDataTrackPublished(RemoteParticipant remoteParticipant,
+                                                     RemoteDataTrackPublication remoteDataTrackPublication) {}
 
                     @Override
-                    public void onDataTrackUnpublished(
-                            RemoteParticipant remoteParticipant,
-                            RemoteDataTrackPublication remoteDataTrackPublication) {}
+                    public void onDataTrackUnpublished(RemoteParticipant remoteParticipant,
+                                                       RemoteDataTrackPublication remoteDataTrackPublication) {}
 
                     @Override
-                    public void onDataTrackSubscribed(
-                            RemoteParticipant remoteParticipant,
-                            RemoteDataTrackPublication remoteDataTrackPublication,
-                            RemoteDataTrack remoteDataTrack) {}
+                    public void onDataTrackSubscribed(RemoteParticipant remoteParticipant,
+                                                      RemoteDataTrackPublication remoteDataTrackPublication,
+                                                      RemoteDataTrack remoteDataTrack) {}
 
                     @Override
-                    public void onDataTrackSubscriptionFailed(
-                            RemoteParticipant remoteParticipant,
-                            RemoteDataTrackPublication remoteDataTrackPublication,
-                            TwilioException twilioException) {}
+                    public void onDataTrackSubscriptionFailed(RemoteParticipant remoteParticipant,
+                                                              RemoteDataTrackPublication remoteDataTrackPublication,
+                                                              TwilioException twilioException) {}
 
                     @Override
-                    public void onDataTrackUnsubscribed(
-                            RemoteParticipant remoteParticipant,
-                            RemoteDataTrackPublication remoteDataTrackPublication,
-                            RemoteDataTrack remoteDataTrack) {}
+                    public void onDataTrackUnsubscribed(RemoteParticipant remoteParticipant,
+                                                        RemoteDataTrackPublication remoteDataTrackPublication,
+                                                        RemoteDataTrack remoteDataTrack) {}
 
                     @Override
-                    public void onAudioTrackEnabled(
-                            RemoteParticipant remoteParticipant,
-                            RemoteAudioTrackPublication remoteAudioTrackPublication) {}
+                    public void onAudioTrackEnabled(RemoteParticipant remoteParticipant,
+                                                    RemoteAudioTrackPublication remoteAudioTrackPublication) {}
 
                     @Override
-                    public void onAudioTrackDisabled(
-                            RemoteParticipant remoteParticipant,
-                            RemoteAudioTrackPublication remoteAudioTrackPublication) {}
+                    public void onAudioTrackDisabled(RemoteParticipant remoteParticipant,
+                                                     RemoteAudioTrackPublication remoteAudioTrackPublication) {}
 
                     @Override
-                    public void onVideoTrackEnabled(
-                            RemoteParticipant remoteParticipant,
-                            RemoteVideoTrackPublication remoteVideoTrackPublication) {}
+                    public void onVideoTrackEnabled(RemoteParticipant remoteParticipant,
+                                                    RemoteVideoTrackPublication remoteVideoTrackPublication) {}
 
                     @Override
-                    public void onVideoTrackDisabled(
-                            RemoteParticipant remoteParticipant,
-                            RemoteVideoTrackPublication remoteVideoTrackPublication) {}
+                    public void onVideoTrackDisabled(RemoteParticipant remoteParticipant,
+                                                     RemoteVideoTrackPublication remoteVideoTrackPublication) {}
                 };
-        final Room.Listener aliceRoomListener =
-                new Room.Listener() {
-                    @Override
-                    public void onConnected(Room room) {
-                        testEvents.add("aliceConnected");
-                        aliceConnected.countDown();
-                    }
+        final Room.Listener aliceRoomListener = new Room.Listener() {
+            @Override
+            public void onConnected(Room room) {
+                testEvents.add("aliceConnected");
+                aliceConnected.countDown();
+            }
 
-                    @Override
-                    public void onConnectFailure(Room room, TwilioException twilioException) {}
+            @Override
+            public void onConnectFailure(Room room, TwilioException twilioException) {
 
-                    @Override
-                    public void onDisconnected(Room room, TwilioException twilioException) {
-                        aliceDisconnected.countDown();
-                    }
+            }
 
-                    @Override
-                    public void onParticipantConnected(
-                            Room room, RemoteParticipant remoteParticipant) {
-                        Log.d(TAG, "Alice sees bob connected");
-                        testEvents.add("aliceSeesBobConnected");
-                        aliceSeesBobConnected.countDown();
+            @Override
+            public void onDisconnected(Room room, TwilioException twilioException) {
+                aliceDisconnected.countDown();
+            }
 
-                        /*
-                         * Sleep to create race condition between receiving events and setting listener
-                         */
-                        try {
-                            Thread.sleep(3000);
-                        } catch (InterruptedException e) {
-                            fail(e.getMessage());
-                        }
+            @Override
+            public void onParticipantConnected(Room room, RemoteParticipant remoteParticipant) {
+                Log.d(TAG, "Alice sees bob connected");
+                testEvents.add("aliceSeesBobConnected");
+                aliceSeesBobConnected.countDown();
 
-                        Log.d(TAG, "Alice sets bobRemoteParticipant listener");
-                        testEvents.add("aliceSetsListener");
-                        remoteParticipant.setListener(aliceRemoteParticipantListener);
-                    }
+                /*
+                 * Sleep to create race condition between receiving events and setting listener
+                 */
+                try {
+                    Thread.sleep(3000);
+                } catch (InterruptedException e) {
+                    fail(e.getMessage());
+                }
 
-                    @Override
-                    public void onParticipantDisconnected(
-                            Room room, RemoteParticipant remoteParticipant) {}
+                Log.d(TAG, "Alice sets bobRemoteParticipant listener");
+                testEvents.add("aliceSetsListener");
+                remoteParticipant.setListener(aliceRemoteParticipantListener);
+            }
 
-                    @Override
-                    public void onRecordingStarted(Room room) {}
+            @Override
+            public void onParticipantDisconnected(Room room, RemoteParticipant remoteParticipant) {
 
-                    @Override
-                    public void onRecordingStopped(Room room) {}
-                };
+            }
+
+            @Override
+            public void onRecordingStarted(Room room) {
+
+            }
+
+            @Override
+            public void onRecordingStopped(Room room) {
+
+            }
+        };
 
         /*
          * Perform alice and bob operations on separate threads so we can correctly replicate
@@ -271,15 +261,14 @@ public class RemoteParticipantTest extends BaseVideoTest {
         aliceThread.start();
         Handler aliceHandler = new Handler(aliceThread.getLooper());
 
-        aliceHandler.post(
-                new Runnable() {
-                    @Override
-                    public void run() {
-                        aliceRoom.set(
-                                Video.connect(
-                                        mediaTestActivity, aliceConnectOptions, aliceRoomListener));
-                    }
-                });
+        aliceHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                aliceRoom.set(Video.connect(mediaTestActivity,
+                        aliceConnectOptions,
+                        aliceRoomListener));
+            }
+        });
         assertTrue(aliceConnected.await(20, TimeUnit.SECONDS));
 
         // Connect bob
@@ -287,31 +276,30 @@ public class RemoteParticipantTest extends BaseVideoTest {
         HandlerThread bobThread = new HandlerThread("BobThread");
         bobThread.start();
         Handler bobHandler = new Handler(bobThread.getLooper());
-        bobHandler.post(
-                new Runnable() {
-                    @Override
-                    public void run() {
-                        bobRoom.set(
-                                Video.connect(
-                                        mediaTestActivity, bobConnectOptions, bobRoomListener));
-                    }
-                });
+        bobHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                bobRoom.set(Video.connect(mediaTestActivity,
+                        bobConnectOptions,
+                        bobRoomListener));
+            }
+        });
         assertTrue(bobRoomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
         assertTrue(aliceSeesBobConnected.await(20, TimeUnit.SECONDS));
 
         // Publish audio track
-        bobHandler.post(
-                new Runnable() {
-                    @Override
-                    public void run() {
-                        // Publish audio track for bob
-                        LocalParticipant bobLocalParticipant = bobRoom.get().getLocalParticipant();
-                        bobLocalParticipant.publishTrack(bobAudioTrack);
-                        testEvents.add("bobPublishesAudioTrack");
-                        bobPublishedAudioTrack.countDown();
-                        Log.d(TAG, "bob published audio track");
-                    }
-                });
+        bobHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                // Publish audio track for bob
+                LocalParticipant bobLocalParticipant = bobRoom.get()
+                        .getLocalParticipant();
+                bobLocalParticipant.publishTrack(bobAudioTrack);
+                testEvents.add("bobPublishesAudioTrack");
+                bobPublishedAudioTrack.countDown();
+                Log.d(TAG, "bob published audio track");
+            }
+        });
 
         // Validate that alice received bob track event and the events happened as expected
         assertTrue(aliceReceivedBobAudioTrackAdded.await(20, TimeUnit.SECONDS));

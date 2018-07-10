@@ -17,15 +17,17 @@
 package com.twilio.video;
 
 import android.support.annotation.VisibleForTesting;
-import java.util.HashSet;
-import java.util.Set;
+
 import org.webrtc.EglBase;
 
+import java.util.HashSet;
+import java.util.Set;
+
 class EglBaseProvider {
-    private static final String RELEASE_MESSAGE_TEMPLATE =
-            "EglBaseProvider released %s " + "unavailable";
-    private static volatile EglBaseProvider instance;
-    private static volatile Set<Object> eglBaseProviderOwners = new HashSet<>();
+    private static final String RELEASE_MESSAGE_TEMPLATE = "EglBaseProvider released %s " +
+            "unavailable";
+    private volatile static EglBaseProvider instance;
+    private volatile static Set<Object> eglBaseProviderOwners = new HashSet<>();
 
     private EglBase rootEglBase;
     private EglBase localEglBase;

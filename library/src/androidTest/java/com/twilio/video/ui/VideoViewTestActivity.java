@@ -19,7 +19,9 @@ package com.twilio.video.ui;
 import android.app.Activity;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+
 import com.twilio.video.test.R;
+
 
 public class VideoViewTestActivity extends Activity {
     @Override

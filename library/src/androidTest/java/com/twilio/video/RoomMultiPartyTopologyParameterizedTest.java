@@ -16,44 +16,49 @@
 
 package com.twilio.video;
 
-import static org.apache.commons.lang3.RandomStringUtils.random;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-
 import android.content.Context;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.filters.LargeTest;
 import android.util.Pair;
+
 import com.twilio.video.base.BaseVideoTest;
 import com.twilio.video.helper.CallbackHelper;
-import com.twilio.video.util.Constants;
 import com.twilio.video.util.CredentialsUtils;
+import com.twilio.video.util.Constants;
 import com.twilio.video.util.RoomUtils;
 import com.twilio.video.util.Topology;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
+
+import static org.apache.commons.lang3.RandomStringUtils.random;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 @RunWith(Parameterized.class)
 @LargeTest
 public class RoomMultiPartyTopologyParameterizedTest extends BaseVideoTest {
     @Parameterized.Parameters(name = "{0}")
     public static Iterable<Object[]> data() {
-        return Arrays.asList(new Object[][] {{Topology.P2P}, {Topology.GROUP}});
+        return Arrays.asList(new Object[][]{
+                {Topology.P2P},
+                {Topology.GROUP}});
     }
 
     private static final int PARTICIPANT_NUM = 3;
     private static final String[] PARTICIPANTS = {
-        Constants.PARTICIPANT_ALICE, Constants.PARTICIPANT_BOB, Constants.PARTICIPANT_CHARLIE
+            Constants.PARTICIPANT_ALICE, Constants.PARTICIPANT_BOB, Constants.PARTICIPANT_CHARLIE
     };
 
     private Context context;
@@ -134,12 +139,13 @@ public class RoomMultiPartyTopologyParameterizedTest extends BaseVideoTest {
         }
     }
 
-    private Room createRoom(String token, CallbackHelper.FakeRoomListener listener, String roomName)
-            throws InterruptedException {
+    private Room createRoom(String token, CallbackHelper.FakeRoomListener listener,
+                            String roomName) throws InterruptedException {
         listener.onConnectedLatch = new CountDownLatch(1);
 
-        ConnectOptions connectOptions =
-                new ConnectOptions.Builder(token).roomName(roomName).build();
+        ConnectOptions connectOptions = new ConnectOptions.Builder(token)
+                .roomName(roomName)
+                .build();
         Room room = Video.connect(context, connectOptions, listener);
         assertTrue(listener.onConnectedLatch.await(20, TimeUnit.SECONDS));
         return room;

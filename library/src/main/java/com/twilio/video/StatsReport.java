@@ -16,10 +16,13 @@
 
 package com.twilio.video;
 
+
 import java.util.ArrayList;
 import java.util.List;
 
-/** Stats report contains stats for all the media tracks that exist in peer connection. */
+/**
+ * Stats report contains stats for all the media tracks that exist in peer connection.
+ */
 public class StatsReport {
     private final String peerConnectionId;
     private List<LocalAudioTrackStats> localAudioTrackStats = new ArrayList<>();
@@ -31,7 +34,9 @@ public class StatsReport {
         this.peerConnectionId = peerConnectionId;
     }
 
-    /** Returns the id of peer connection related to this report. */
+    /**
+     * Returns the id of peer connection related to this report.
+     */
     public String getPeerConnectionId() {
         return peerConnectionId;
     }

@@ -24,7 +24,7 @@ class ThreadChecker {
      * Check if current thread matches handler thread.
      */
     static void checkIsValidThread(Handler handler) {
-        Preconditions.checkState(
-                handler.getLooper().getThread().getId() == Looper.myLooper().getThread().getId());
+        Preconditions.checkState(handler.getLooper().getThread().getId() ==
+                Looper.myLooper().getThread().getId());
     }
 }

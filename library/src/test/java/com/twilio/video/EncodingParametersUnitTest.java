@@ -16,14 +16,15 @@
 
 package com.twilio.video;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
+import org.junit.Test;
+import org.junit.runner.RunWith;
 
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import junitparams.converters.Nullable;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 
 @RunWith(JUnitParamsRunner.class)
 public class EncodingParametersUnitTest {
@@ -47,26 +48,26 @@ public class EncodingParametersUnitTest {
     @Test
     @Parameters
     public void equals_returnsFalse(@Nullable Object differentEncodingParameters) {
-        EncodingParameters differentEncodingParamters =
-                new EncodingParameters(1, MAX_VIDEO_BITRATE);
+        EncodingParameters differentEncodingParamters = new EncodingParameters(1,
+                MAX_VIDEO_BITRATE);
 
         assertNotEquals(differentEncodingParamters, encodingParameters);
     }
 
     private Object[] parametersForEquals_returnsTrue() {
         return new Object[] {
-            new Object[] {encodingParameters},
-            new Object[] {new EncodingParameters(MAX_AUDIO_BITRATE, MAX_VIDEO_BITRATE)}
+                new Object[]{ encodingParameters },
+                new Object[]{ new EncodingParameters(MAX_AUDIO_BITRATE, MAX_VIDEO_BITRATE) }
         };
     }
 
     private Object[] parametersForEquals_returnsFalse() {
         return new Object[] {
-            new Object[] {null},
-            new Object[] {new Object()},
-            new Object[] {new EncodingParameters(1, 2)},
-            new Object[] {new EncodingParameters(MAX_AUDIO_BITRATE, 2)},
-            new Object[] {new EncodingParameters(1, MAX_VIDEO_BITRATE)}
+                new Object[]{ null },
+                new Object[]{ new Object() },
+                new Object[]{ new EncodingParameters(1, 2) },
+                new Object[]{ new EncodingParameters(MAX_AUDIO_BITRATE, 2) },
+                new Object[]{ new EncodingParameters(1, MAX_VIDEO_BITRATE) }
         };
     }
 }

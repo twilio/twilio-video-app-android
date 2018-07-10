@@ -16,27 +16,34 @@
 
 package com.twilio.video;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assume.assumeFalse;
-import static org.junit.Assume.assumeTrue;
-
 import android.support.test.filters.LargeTest;
+import android.support.test.runner.AndroidJUnit4;
+
 import com.twilio.video.base.BaseCodecTest;
+import com.twilio.video.base.BaseStatsTest;
+import com.twilio.video.helper.CallbackHelper;
 import com.twilio.video.util.FakeVideoCapturer;
 import com.twilio.video.util.Topology;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
-import junitparams.JUnitParamsRunner;
-import junitparams.Parameters;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.webrtc.MediaCodecVideoDecoder;
 import org.webrtc.MediaCodecVideoEncoder;
+
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
+
+import junitparams.JUnitParamsRunner;
+import junitparams.Parameters;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assume.assumeFalse;
+import static org.junit.Assume.assumeTrue;
 
 @RunWith(JUnitParamsRunner.class)
 @LargeTest
@@ -72,18 +79,18 @@ public class CodecPreferencesTest extends BaseCodecTest {
 
         // Connect alice with audio track and preferred codec
         aliceLocalAudioTrack = LocalAudioTrack.create(mediaTestActivity, true);
-        ConnectOptions aliceConnectOptions =
-                new ConnectOptions.Builder(aliceToken)
-                        .roomName(roomName)
-                        .audioTracks(Collections.singletonList(aliceLocalAudioTrack))
-                        .preferAudioCodecs(Collections.singletonList(expectedAudioCodec))
-                        .build();
+        ConnectOptions aliceConnectOptions = new ConnectOptions.Builder(aliceToken)
+                .roomName(roomName)
+                .audioTracks(Collections.singletonList(aliceLocalAudioTrack))
+                .preferAudioCodecs(Collections.singletonList(expectedAudioCodec))
+                .build();
         aliceRoom = createRoom(aliceListener, aliceConnectOptions);
         aliceListener.onParticipantConnectedLatch = new CountDownLatch(1);
 
         // Connect bob with no tracks
-        ConnectOptions bobConnectOptions =
-                new ConnectOptions.Builder(bobToken).roomName(roomName).build();
+        ConnectOptions bobConnectOptions = new ConnectOptions.Builder(bobToken)
+                .roomName(roomName)
+                .build();
         bobRoom = createRoom(bobListener, bobConnectOptions);
         assertTrue(aliceListener.onParticipantConnectedLatch.await(20, TimeUnit.SECONDS));
         assertEquals(1, aliceRoom.getRemoteParticipants().size());
@@ -102,20 +109,20 @@ public class CodecPreferencesTest extends BaseCodecTest {
             assumeTrue(MediaCodecVideoDecoder.isH264HwSupported());
         }
         // Connect alice with video track and preferred codec
-        aliceLocalVideoTrack =
-                LocalVideoTrack.create(mediaTestActivity, true, new FakeVideoCapturer());
-        ConnectOptions aliceConnectOptions =
-                new ConnectOptions.Builder(aliceToken)
-                        .roomName(roomName)
-                        .videoTracks(Collections.singletonList(aliceLocalVideoTrack))
-                        .preferVideoCodecs(Collections.singletonList(expectedVideoCodec))
-                        .build();
+        aliceLocalVideoTrack = LocalVideoTrack.create(mediaTestActivity, true,
+                new FakeVideoCapturer());
+        ConnectOptions aliceConnectOptions = new ConnectOptions.Builder(aliceToken)
+                .roomName(roomName)
+                .videoTracks(Collections.singletonList(aliceLocalVideoTrack))
+                .preferVideoCodecs(Collections.singletonList(expectedVideoCodec))
+                .build();
         aliceRoom = createRoom(aliceListener, aliceConnectOptions);
         aliceListener.onParticipantConnectedLatch = new CountDownLatch(1);
 
         // Connect bob with no tracks
-        ConnectOptions bobConnectOptions =
-                new ConnectOptions.Builder(bobToken).roomName(roomName).build();
+        ConnectOptions bobConnectOptions = new ConnectOptions.Builder(bobToken)
+                .roomName(roomName)
+                .build();
         bobRoom = createRoom(bobListener, bobConnectOptions);
         assertTrue(aliceListener.onParticipantConnectedLatch.await(20, TimeUnit.SECONDS));
         assertEquals(1, aliceRoom.getRemoteParticipants().size());
@@ -134,20 +141,20 @@ public class CodecPreferencesTest extends BaseCodecTest {
         VideoCodec expectedVideoCodec = new Vp9Codec();
 
         // Connect alice with video track and preferred codecs
-        aliceLocalVideoTrack =
-                LocalVideoTrack.create(mediaTestActivity, true, new FakeVideoCapturer());
-        ConnectOptions aliceConnectOptions =
-                new ConnectOptions.Builder(aliceToken)
-                        .roomName(roomName)
-                        .videoTracks(Collections.singletonList(aliceLocalVideoTrack))
-                        .preferVideoCodecs(Arrays.asList(new H264Codec(), new Vp9Codec()))
-                        .build();
+        aliceLocalVideoTrack = LocalVideoTrack.create(mediaTestActivity, true,
+                new FakeVideoCapturer());
+        ConnectOptions aliceConnectOptions = new ConnectOptions.Builder(aliceToken)
+                .roomName(roomName)
+                .videoTracks(Collections.singletonList(aliceLocalVideoTrack))
+                .preferVideoCodecs(Arrays.asList(new H264Codec(), new Vp9Codec()))
+                .build();
         aliceRoom = createRoom(aliceListener, aliceConnectOptions);
         aliceListener.onParticipantConnectedLatch = new CountDownLatch(1);
 
         // Connect bob with no tracks
-        ConnectOptions bobConnectOptions =
-                new ConnectOptions.Builder(bobToken).roomName(roomName).build();
+        ConnectOptions bobConnectOptions = new ConnectOptions.Builder(bobToken)
+                .roomName(roomName)
+                .build();
         bobRoom = createRoom(bobListener, bobConnectOptions);
         assertTrue(aliceListener.onParticipantConnectedLatch.await(20, TimeUnit.SECONDS));
         assertEquals(1, aliceRoom.getRemoteParticipants().size());
@@ -161,27 +168,27 @@ public class CodecPreferencesTest extends BaseCodecTest {
      */
     @SuppressWarnings("unused")
     private Object[] parametersForCanPreferAudioCodec() {
-        return new Object[] {
-            new Object[] {Topology.P2P, isacCodec},
-            new Object[] {Topology.P2P, opusCodec},
-            new Object[] {Topology.P2P, pcmaCodec},
-            new Object[] {Topology.P2P, pcmuCodec},
-            new Object[] {Topology.P2P, g722Codec},
-            new Object[] {Topology.GROUP, opusCodec},
-            new Object[] {Topology.GROUP, pcmuCodec}
+        return new Object[]{
+                new Object[]{Topology.P2P, isacCodec},
+                new Object[]{Topology.P2P, opusCodec},
+                new Object[]{Topology.P2P, pcmaCodec},
+                new Object[]{Topology.P2P, pcmuCodec},
+                new Object[]{Topology.P2P, g722Codec},
+                new Object[]{Topology.GROUP, opusCodec},
+                new Object[]{Topology.GROUP, pcmuCodec}
 
-            /*
-             * TODO: Enable additional preference tests when Group Rooms support
-             * preferring all audio codecs. This feature request is tracked in the following
-             * tickets.
-             *
-             * VMS-1223
-             * VMS-1224
-             * VMS-1225
-             */
-            // new Object[]{Topology.GROUP, isacCodec},
-            // new Object[]{Topology.GROUP, pcmaCodec},
-            // new Object[]{Topology.GROUP, g722Codec}
+                /*
+                 * TODO: Enable additional preference tests when Group Rooms support
+                 * preferring all audio codecs. This feature request is tracked in the following
+                 * tickets.
+                 *
+                 * VMS-1223
+                 * VMS-1224
+                 * VMS-1225
+                 */
+                // new Object[]{Topology.GROUP, isacCodec},
+                // new Object[]{Topology.GROUP, pcmaCodec},
+                // new Object[]{Topology.GROUP, g722Codec}
         };
     }
 
@@ -190,17 +197,17 @@ public class CodecPreferencesTest extends BaseCodecTest {
      */
     @SuppressWarnings("unused")
     private Object[] parametersForCanPreferVideoCodec() {
-        return new Object[] {
-            new Object[] {Topology.P2P, vp8Codec},
-            new Object[] {Topology.P2P, vp8WithSimulcastCodec},
-            new Object[] {Topology.P2P, h264Codec},
-            new Object[] {Topology.P2P, vp9Codec},
-            new Object[] {Topology.GROUP, vp8Codec},
-            new Object[] {Topology.GROUP, vp8WithSimulcastCodec},
-            new Object[] {Topology.GROUP, h264Codec}
+        return new Object[]{
+                new Object[]{Topology.P2P, vp8Codec},
+                new Object[]{Topology.P2P, vp8WithSimulcastCodec},
+                new Object[]{Topology.P2P, h264Codec},
+                new Object[]{Topology.P2P, vp9Codec},
+                new Object[]{Topology.GROUP, vp8Codec},
+                new Object[]{Topology.GROUP, vp8WithSimulcastCodec},
+                new Object[]{Topology.GROUP, h264Codec}
 
-            // TODO: Enable preferring VP9 when Group Rooms adds support VMS-1226
-            // new Object[]{Topology.GROUP, vp9Codec}
+                // TODO: Enable preferring VP9 when Group Rooms adds support VMS-1226
+                // new Object[]{Topology.GROUP, vp9Codec}
         };
     }
 }

@@ -18,28 +18,30 @@ package com.twilio.video;
 
 import android.support.annotation.Nullable;
 import android.support.annotation.VisibleForTesting;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-/** Represents options when connecting to a {@link Room}. */
+/**
+ * Represents options when connecting to a {@link Room}.
+ */
 public class ConnectOptions {
-    private static final Set<Class> SUPPORTED_CODECS =
-            new HashSet<Class>(
-                    Arrays.asList(
-                            // Audio codecs
-                            IsacCodec.class,
-                            OpusCodec.class,
-                            PcmuCodec.class,
-                            PcmaCodec.class,
-                            G722Codec.class,
+    private static final Set<Class> SUPPORTED_CODECS = new HashSet<Class>(Arrays.asList(
+            // Audio codecs
+            IsacCodec.class,
+            OpusCodec.class,
+            PcmuCodec.class,
+            PcmaCodec.class,
+            G722Codec.class,
 
-                            // Video codecs
-                            Vp8Codec.class,
-                            H264Codec.class,
-                            Vp9Codec.class));
+            // Video codecs
+            Vp8Codec.class,
+            H264Codec.class,
+            Vp9Codec.class
+    ));
 
     private final String accessToken;
     private final String roomName;
@@ -58,8 +60,7 @@ public class ConnectOptions {
     static void checkAudioCodecs(@Nullable List<AudioCodec> audioCodecs) {
         if (audioCodecs != null) {
             for (AudioCodec audioCodec : audioCodecs) {
-                Preconditions.checkArgument(
-                        SUPPORTED_CODECS.contains(audioCodec.getClass()),
+                Preconditions.checkArgument(SUPPORTED_CODECS.contains(audioCodec.getClass()),
                         String.format("Unsupported audio codec %s", audioCodec.getName()));
             }
         }
@@ -68,8 +69,7 @@ public class ConnectOptions {
     static void checkVideoCodecs(@Nullable List<VideoCodec> videoCodecs) {
         if (videoCodecs != null) {
             for (VideoCodec videoCodec : videoCodecs) {
-                Preconditions.checkArgument(
-                        SUPPORTED_CODECS.contains(videoCodec.getClass()),
+                Preconditions.checkArgument(SUPPORTED_CODECS.contains(videoCodec.getClass()),
                         String.format("Unsupported video codec %s", videoCodec.getName()));
             }
         }
@@ -79,7 +79,8 @@ public class ConnectOptions {
         if (audioTracks != null) {
             for (LocalAudioTrack localAudioTrack : audioTracks) {
                 Preconditions.checkState(
-                        !localAudioTrack.isReleased(), "LocalAudioTrack cannot be released");
+                        !localAudioTrack.isReleased(),
+                        "LocalAudioTrack cannot be released");
             }
         }
     }
@@ -88,7 +89,8 @@ public class ConnectOptions {
         if (videoTracks != null) {
             for (LocalVideoTrack localVideoTrack : videoTracks) {
                 Preconditions.checkState(
-                        !localVideoTrack.isReleased(), "LocalVideoTrack cannot be released");
+                        !localVideoTrack.isReleased(),
+                        "LocalVideoTrack cannot be released");
             }
         }
     }
@@ -185,8 +187,7 @@ public class ConnectOptions {
     }
 
     @VisibleForTesting(otherwise = VisibleForTesting.NONE)
-    @Nullable
-    MediaFactory getMediaFactory() {
+    @Nullable MediaFactory getMediaFactory() {
         return this.mediaFactory;
     }
 
@@ -198,8 +199,7 @@ public class ConnectOptions {
         checkAudioTracksReleased(audioTracks);
         checkVideoTracksReleased(videoTracks);
 
-        return nativeCreate(
-                accessToken,
+        return nativeCreate(accessToken,
                 roomName,
                 getLocalAudioTracksArray(),
                 getLocalVideoTracksArray(),
@@ -212,22 +212,21 @@ public class ConnectOptions {
                 encodingParameters);
     }
 
-    private native long nativeCreate(
-            String accessToken,
-            String roomName,
-            LocalAudioTrack[] audioTracks,
-            LocalVideoTrack[] videoTracks,
-            LocalDataTrack[] dataTracks,
-            IceOptions iceOptions,
-            boolean enableInsights,
-            long platformInfoNativeHandle,
-            AudioCodec[] preferredAudioCodecs,
-            VideoCodec[] preferredVideoCodecs,
-            EncodingParameters encodingParameters);
+    private native long nativeCreate(String accessToken,
+                                     String roomName,
+                                     LocalAudioTrack[] audioTracks,
+                                     LocalVideoTrack[] videoTracks,
+                                     LocalDataTrack[] dataTracks,
+                                     IceOptions iceOptions,
+                                     boolean enableInsights,
+                                     long platformInfoNativeHandle,
+                                     AudioCodec[] preferredAudioCodecs,
+                                     VideoCodec[] preferredVideoCodecs,
+                                     EncodingParameters encodingParameters);
     /**
      * Build new {@link ConnectOptions}.
      *
-     * <p>All methods are optional.
+     * <p>All methods are optional.</p>
      */
     public static class Builder {
         private String accessToken = "";
@@ -246,41 +245,51 @@ public class ConnectOptions {
             this.accessToken = accessToken;
         }
 
-        /** The name of the room. */
+        /**
+         * The name of the room.
+         */
         public Builder roomName(String roomName) {
             this.roomName = roomName;
             return this;
         }
 
-        /** Audio tracks that will be published upon connection. */
+        /**
+         * Audio tracks that will be published upon connection.
+         */
         public Builder audioTracks(List<LocalAudioTrack> audioTracks) {
             Preconditions.checkNotNull(audioTracks, "LocalAudioTrack List must not be null");
             this.audioTracks = new ArrayList<>(audioTracks);
             return this;
         }
 
-        /** Video tracks that will be published upon connection. */
+        /**
+         * Video tracks that will be published upon connection.
+         */
         public Builder videoTracks(List<LocalVideoTrack> videoTracks) {
             Preconditions.checkNotNull(videoTracks, "LocalVideoTrack List must not be null");
             this.videoTracks = new ArrayList<>(videoTracks);
             return this;
         }
 
-        /** Data tracks that will be published upon connection. */
+        /**
+         * Data tracks that will be published upon connection.
+         */
         public Builder dataTracks(List<LocalDataTrack> dataTracks) {
             this.dataTracks = dataTracks;
             return this;
         }
 
-        /** Custom ICE configuration used to connect to a Room. */
+        /**
+         * Custom ICE configuration used to connect to a Room.
+         */
         public Builder iceOptions(IceOptions iceOptions) {
             this.iceOptions = iceOptions;
             return this;
         }
 
         /**
-         * Enable sending stats data to Insights. Sending stats data to Insights is enabled by
-         * default.
+         * Enable sending stats data to Insights. Sending stats data to Insights is enabled
+         * by default.
          */
         public Builder enableInsights(boolean enable) {
             this.enableInsights = enable;
@@ -288,14 +297,16 @@ public class ConnectOptions {
         }
 
         /**
-         * Set preferred audio codecs. The list specifies which audio codecs would be preferred when
-         * negotiating audio between participants. The preferences are applied in the order found in
-         * the list starting with the most preferred audio codec to the least preferred audio codec.
-         * Audio codec preferences are not guaranteed to be satisfied because not all participants
-         * are guaranteed to support all audio codecs. {@link OpusCodec} is the default audio codec
-         * if no preferences are set.
+         * Set preferred audio codecs. The list specifies which audio codecs would be
+         * preferred when negotiating audio between participants. The preferences are applied in
+         * the order found in the list starting with the most preferred audio codec to the
+         * least preferred audio codec. Audio codec preferences are not guaranteed to be satisfied
+         * because not all participants are guaranteed to support all audio codecs.
+         * {@link OpusCodec} is the default audio codec if no preferences are set.
          *
-         * <p>The following snippet demonstrates how to prefer a single audio codec.
+         * <p>
+         *     The following snippet demonstrates how to prefer a single audio codec.
+         * </p>
          *
          * <pre><code>
          *     ConnectOptions connectOptions = new ConnectOptions.Builder(token)
@@ -303,8 +314,10 @@ public class ConnectOptions {
          *          .build();
          * </code></pre>
          *
-         * <p>The following snippet demonstrates how to specify the exact order of codec
-         * preferences.
+         * <p>
+         *     The following snippet demonstrates how to specify the exact order of codec
+         *     preferences.
+         * </p>
          *
          * <pre><code>
          *     ConnectOptions connectOptions = new ConnectOptions.Builder(token)
@@ -319,14 +332,16 @@ public class ConnectOptions {
         }
 
         /**
-         * Set preferred video codecs. The list specifies which video codecs would be preferred when
-         * negotiating video between participants. The preferences are applied in the order found in
-         * the list starting with the most preferred video codec to the least preferred video codec.
-         * Video codec preferences are not guaranteed to be satisfied because not all participants
-         * are guaranteed to support all video codecs. {@link Vp8Codec} is the default video codec
-         * if no preferences are set.
+         * Set preferred video codecs. The list specifies which video codecs would be
+         * preferred when negotiating video between participants. The preferences are applied in
+         * the order found in the list starting with the most preferred video codec to the
+         * least preferred video codec. Video codec preferences are not guaranteed to be satisfied
+         * because not all participants are guaranteed to support all video codecs.
+         * {@link Vp8Codec} is the default video codec if no preferences are set.
          *
-         * <p>The following snippet demonstrates how to prefer a single video codec.
+         * <p>
+         *     The following snippet demonstrates how to prefer a single video codec.
+         * </p>
          *
          * <pre><code>
          *     ConnectOptions connectOptions = new ConnectOptions.Builder(token)
@@ -334,8 +349,10 @@ public class ConnectOptions {
          *          .build();
          * </code></pre>
          *
-         * <p>The following snippet demonstrates how to specify the exact order of codec
-         * preferences.
+         * <p>
+         *     The following snippet demonstrates how to specify the exact order of codec
+         *     preferences.
+         * </p>
          *
          * <pre><code>
          *     ConnectOptions connectOptions = new ConnectOptions.Builder(token)
@@ -349,7 +366,9 @@ public class ConnectOptions {
             return this;
         }
 
-        /** Set {@link EncodingParameters} for audio and video tracks shared to a {@link Room}. */
+        /**
+         * Set {@link EncodingParameters} for audio and video tracks shared to a {@link Room}.
+         */
         public Builder encodingParameters(@Nullable EncodingParameters encodingParameters) {
             this.encodingParameters = encodingParameters;
             return this;
@@ -367,7 +386,6 @@ public class ConnectOptions {
 
         /**
          * Builds {@link ConnectOptions} object.
-         *
          * @throws Exception if accessToken is null or empty.
          */
         public ConnectOptions build() {
