@@ -152,6 +152,9 @@ public class SettingsActivity extends BaseActivity {
 
         @Override
         public void onDisplayPreferenceDialog(Preference preference) {
+            if (preference == null) {
+                return;
+            }
 
             // show custom dialog preference
             if (preference instanceof NumberPreference) {
@@ -168,13 +171,14 @@ public class SettingsActivity extends BaseActivity {
             }
         }
 
-        private void setupCodecListPreference(Class codecClass,
-                                              String key,
-                                              String defaultValue,
-                                              ListPreference preference) {
-            String[] codecEntries = (codecClass == AudioCodec.class) ?
-                    AUDIO_CODEC_NAMES :
-                    VIDEO_CODEC_NAMES;
+        private void setupCodecListPreference(
+                Class codecClass, String key, String defaultValue, ListPreference preference) {
+            if (preference == null) {
+                return;
+            }
+
+            String[] codecEntries =
+                    (codecClass == AudioCodec.class) ? AUDIO_CODEC_NAMES : VIDEO_CODEC_NAMES;
             // saved value
             final String value = sharedPreferences.getString(key, defaultValue);
 

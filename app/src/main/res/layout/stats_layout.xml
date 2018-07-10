@@ -30,11 +30,11 @@
             <TextView
                 android:id="@+id/stats_track_sid_title"
                 android:text="@string/stats_track_sid"
-                android:gravity="left"
+                android:gravity="start"
                 style="@style/Stats.TextTitle"/>
             <TextView
                 android:id="@+id/stats_track_sid_value"
-                android:gravity="left"
+                android:gravity="start"
                 style="@style/Stats.TextValue"/>
         </TableRow>
 
@@ -42,11 +42,11 @@
             <TextView
                 android:id="@+id/stats_codec_title"
                 android:text="@string/stats_codec"
-                android:gravity="left"
+                android:gravity="start"
                 style="@style/Stats.TextTitle"/>
             <TextView
                 android:id="@+id/stats_codec_value"
-                android:gravity="left"
+                android:gravity="start"
                 style="@style/Stats.TextValue"/>
         </TableRow>
 
@@ -54,11 +54,11 @@
             <TextView
                 android:id="@+id/stats_packets_title"
                 android:text="@string/stats_packets"
-                android:gravity="left"
+                android:gravity="start"
                 style="@style/Stats.TextTitle"/>
             <TextView
                 android:id="@+id/stats_packets_value"
-                android:gravity="left"
+                android:gravity="start"
                 style="@style/Stats.TextValue"/>
         </TableRow>
 
@@ -66,74 +66,72 @@
             <TextView
                 android:id="@+id/stats_bytes_title"
                 android:text="@string/stats_bytes_sent"
-                android:gravity="left"
+                android:gravity="start"
                 style="@style/Stats.TextTitle"/>
             <TextView
                 android:id="@+id/stats_bytes_value"
-                android:gravity="left"
+                android:gravity="start"
                 style="@style/Stats.TextValue"/>
         </TableRow>
 
         <TableRow android:id="@+id/stats_rtt_row">
             <TextView
                 android:id="@+id/stats_rtt_title"
-                android:gravity="left"
+                android:gravity="start"
                 android:text="@string/stats_rtt"
                 style="@style/Stats.TextTitle"/>
             <TextView
                 android:id="@+id/stats_rtt_value"
-                android:gravity="left"
+                android:gravity="start"
                 style="@style/Stats.TextValue"/>
         </TableRow>
 
         <TableRow android:id="@+id/stats_jitter_row">
             <TextView
                 android:id="@+id/stats_jitter_title"
-                android:gravity="left"
+                android:gravity="start"
                 android:text="@string/stats_jitter"
                 style="@style/Stats.TextTitle"/>
             <TextView
                 android:id="@+id/stats_jitter_value"
-                android:gravity="left"
+                android:gravity="start"
                 style="@style/Stats.TextValue"/>
         </TableRow>
 
         <TableRow android:id="@+id/stats_audio_level_row">
             <TextView
                 android:id="@+id/stats_audio_level_title"
-                android:gravity="left"
+                android:gravity="start"
                 android:text="@string/stats_audio_level"
                 style="@style/Stats.TextTitle"/>
             <TextView
                 android:id="@+id/stats_audio_level_value"
-                android:gravity="left"
+                android:gravity="start"
                 style="@style/Stats.TextValue"/>
         </TableRow>
 
         <TableRow android:id="@+id/stats_dimensions_row">
             <TextView
                 android:id="@+id/stats_dimensions_title"
-                android:gravity="left"
+                android:gravity="start"
                 android:text="@string/stats_dimensions"
                 style="@style/Stats.TextTitle"/>
             <TextView
                 android:id="@+id/stats_dimensions_value"
-                android:gravity="left"
+                android:gravity="start"
                 style="@style/Stats.TextValue"/>
         </TableRow>
 
         <TableRow android:id="@+id/stats_framerate_row">
             <TextView
                 android:id="@+id/stats_framerate_title"
-                android:gravity="left"
+                android:gravity="start"
                 android:text="@string/stats_framerate"
                 style="@style/Stats.TextTitle"/>
             <TextView
                 android:id="@+id/stats_framerate_value"
-                android:gravity="left"
+                android:gravity="start"
                 style="@style/Stats.TextValue"/>
         </TableRow>
     </TableLayout>
-
-
 </RelativeLayout>
