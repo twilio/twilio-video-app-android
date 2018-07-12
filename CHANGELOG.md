@@ -1,5 +1,11 @@
 The Twilio Programmable Video SDKs use [Semantic Versioning](http://www.semver.org).
 
+####2.1.1
+
+Improvements
+
+- Updated `Room.Listener` documentation to provide more clarity about when `onRecording` callbacks are received.
+
 ####2.1.0
 
 Features
