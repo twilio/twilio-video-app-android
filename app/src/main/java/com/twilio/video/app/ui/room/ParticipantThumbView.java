@@ -23,10 +23,8 @@ import android.support.v4.content.ContextCompat;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
-
-import com.twilio.video.app.R;
-
 import butterknife.ButterKnife;
+import com.twilio.video.app.R;
 
 public class ParticipantThumbView extends ParticipantView {
 
@@ -35,24 +33,19 @@ public class ParticipantThumbView extends ParticipantView {
         init(context, null);
     }
 
-    public ParticipantThumbView(Context context,
-                                AttributeSet attrs) {
+    public ParticipantThumbView(Context context, AttributeSet attrs) {
         super(context, attrs);
         init(context, attrs);
     }
 
-    public ParticipantThumbView(Context context,
-                                AttributeSet attrs,
-                                int defStyleAttr) {
+    public ParticipantThumbView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         init(context, attrs);
     }
 
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
-    public ParticipantThumbView(Context context,
-                                AttributeSet attrs,
-                                int defStyleAttr,
-                                int defStyleRes) {
+    public ParticipantThumbView(
+            Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
         super(context, attrs, defStyleAttr, defStyleRes);
         init(context, attrs);
     }

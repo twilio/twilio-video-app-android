@@ -16,22 +16,19 @@
 
 package com.twilio.video;
 
-import android.support.test.InstrumentationRegistry;
+import static org.apache.commons.lang3.RandomStringUtils.random;
+import static org.junit.Assert.assertEquals;
 
+import android.support.test.InstrumentationRegistry;
 import com.getkeepsafe.relinker.ReLinker;
 import com.twilio.video.base.BaseVideoTest;
-
+import java.util.ArrayList;
+import java.util.List;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import static org.apache.commons.lang3.RandomStringUtils.random;
-import static org.junit.Assert.assertEquals;
 
 @RunWith(Parameterized.class)
 public class JniUtilsUtf8StringsParameterizedTest extends BaseVideoTest {
@@ -47,7 +44,7 @@ public class JniUtilsUtf8StringsParameterizedTest extends BaseVideoTest {
     public static List<String> data() {
         List<String> randomStrings = new ArrayList<>(NUM_RANDOM_STRINGS);
 
-        for (int i = 0 ; i < NUM_RANDOM_STRINGS ; i++) {
+        for (int i = 0; i < NUM_RANDOM_STRINGS; i++) {
             randomStrings.add(i, random(RANDOM_STRING_LENGTH));
         }
 

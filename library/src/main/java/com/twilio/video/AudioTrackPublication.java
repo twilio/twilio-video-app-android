@@ -18,12 +18,9 @@ package com.twilio.video;
 
 import android.support.annotation.Nullable;
 
-/**
- * A published audio track represents an audio track that has been shared with a {@link Room}.
- */
+/** A published audio track represents an audio track that has been shared with a {@link Room}. */
 public interface AudioTrackPublication extends TrackPublication {
-    /**
-     * Returns the published audio track.
-     */
-    @Nullable AudioTrack getAudioTrack();
+    /** Returns the published audio track. */
+    @Nullable
+    AudioTrack getAudioTrack();
 }

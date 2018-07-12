@@ -18,7 +18,6 @@ package com.twilio.video.ui;
 
 import android.app.Activity;
 import android.os.Bundle;
-
 import com.twilio.video.test.R;
 
 public class VideoRendererTestActivity extends Activity {

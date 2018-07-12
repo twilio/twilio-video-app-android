@@ -29,27 +29,26 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
-
-import com.twilio.video.app.R;
-
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.OnTextChanged;
-
+import com.twilio.video.app.R;
 
 public class ExistingAccountLoginFragment extends Fragment {
 
-    @BindView(R.id.email_edittext) EditText emailEditText;
-    @BindView(R.id.password_edittext) EditText passwordEditText;
-    @BindView(R.id.login_button) Button loginButton;
+    @BindView(R.id.email_edittext)
+    EditText emailEditText;
 
+    @BindView(R.id.password_edittext)
+    EditText passwordEditText;
+
+    @BindView(R.id.login_button)
+    Button loginButton;
 
     private Listener mListener;
 
-    public ExistingAccountLoginFragment() {
-    }
-
+    public ExistingAccountLoginFragment() {}
 
     public static ExistingAccountLoginFragment newInstance() {
         ExistingAccountLoginFragment fragment = new ExistingAccountLoginFragment();
@@ -62,8 +61,8 @@ public class ExistingAccountLoginFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(
+            LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_existing_account_login, container, false);
         ButterKnife.bind(this, view);
         return view;
@@ -71,9 +70,9 @@ public class ExistingAccountLoginFragment extends Fragment {
 
     @OnTextChanged({R.id.email_edittext, R.id.password_edittext})
     public void onTextChanged(Editable editable) {
-        if (passwordEditText.length() != 0 &&
-            emailEditText.length() != 0 &&
-            Patterns.EMAIL_ADDRESS.matcher(emailEditText.getText()).matches()) {
+        if (passwordEditText.length() != 0
+                && emailEditText.length() != 0
+                && Patterns.EMAIL_ADDRESS.matcher(emailEditText.getText()).matches()) {
             loginButton.setTextColor(Color.WHITE);
             loginButton.setEnabled(true);
         } else {
@@ -87,9 +86,12 @@ public class ExistingAccountLoginFragment extends Fragment {
     public void onLoginButton(View view) {
         String email = emailEditText.getText().toString();
         String password = passwordEditText.getText().toString();
-        if (email != null && email.length() > 0 &&
-            password != null && password.length() > 0 &&
-            Patterns.EMAIL_ADDRESS.matcher(email).matches() && (mListener != null)) {
+        if (email != null
+                && email.length() > 0
+                && password != null
+                && password.length() > 0
+                && Patterns.EMAIL_ADDRESS.matcher(email).matches()
+                && (mListener != null)) {
             mListener.onExistingAccountCredentials(email, password);
         } else {
             view.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS);
@@ -102,8 +104,7 @@ public class ExistingAccountLoginFragment extends Fragment {
         if (context instanceof Listener) {
             mListener = (Listener) context;
         } else {
-            throw new RuntimeException(context.toString()
-                    + " must implement Listener");
+            throw new RuntimeException(context.toString() + " must implement Listener");
         }
     }
 

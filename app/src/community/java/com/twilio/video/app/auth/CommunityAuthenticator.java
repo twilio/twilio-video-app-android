@@ -1,7 +1,6 @@
 package com.twilio.video.app.auth;
 
 import android.content.SharedPreferences;
-
 import com.google.common.base.Strings;
 import com.twilio.video.app.base.BaseActivity;
 import com.twilio.video.app.data.Preferences;
@@ -26,8 +25,6 @@ public class CommunityAuthenticator implements Authenticator {
 
     @Override
     public void logout() {
-        preferences.edit()
-                .remove(Preferences.DISPLAY_NAME)
-                .apply();
+        preferences.edit().remove(Preferences.DISPLAY_NAME).apply();
     }
 }

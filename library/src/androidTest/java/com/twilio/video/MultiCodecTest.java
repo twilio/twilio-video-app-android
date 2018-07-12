@@ -16,30 +16,27 @@
 
 package com.twilio.video;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assume.assumeFalse;
+import static org.junit.Assume.assumeTrue;
+
 import android.support.test.filters.LargeTest;
 import android.support.test.runner.AndroidJUnit4;
-
 import com.twilio.video.base.BaseCodecTest;
 import com.twilio.video.helper.CallbackHelper;
 import com.twilio.video.util.FakeVideoCapturer;
 import com.twilio.video.util.Topology;
-
+import java.util.Collections;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.webrtc.MediaCodecVideoDecoder;
 import org.webrtc.MediaCodecVideoEncoder;
-
-import java.util.Collections;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assume.assumeFalse;
-import static org.junit.Assume.assumeTrue;
 
 @RunWith(AndroidJUnit4.class)
 @LargeTest
@@ -68,24 +65,24 @@ public class MultiCodecTest extends BaseCodecTest {
         assumeTrue(MediaCodecVideoDecoder.isH264HwSupported());
 
         // Connect alice with H264 preferred
-        aliceLocalVideoTrack = LocalVideoTrack.create(mediaTestActivity, true,
-                new FakeVideoCapturer());
-        ConnectOptions aliceConnectOptions = new ConnectOptions.Builder(aliceToken)
-                .roomName(roomName)
-                .preferVideoCodecs(Collections.<VideoCodec>singletonList(h264Codec))
-                .build();
+        aliceLocalVideoTrack =
+                LocalVideoTrack.create(mediaTestActivity, true, new FakeVideoCapturer());
+        ConnectOptions aliceConnectOptions =
+                new ConnectOptions.Builder(aliceToken)
+                        .roomName(roomName)
+                        .preferVideoCodecs(Collections.<VideoCodec>singletonList(h264Codec))
+                        .build();
         aliceRoom = createRoom(aliceListener, aliceConnectOptions);
         aliceListener.onParticipantConnectedLatch = new CountDownLatch(1);
 
         // Connect bob with no tracks and test media factory with H264 support removed
-        MediaOptions mediaOptions = new MediaOptions.Builder()
-                .enableH264(false)
-                .build();
+        MediaOptions mediaOptions = new MediaOptions.Builder().enableH264(false).build();
         MediaFactory mediaFactory = MediaFactory.testCreate(mediaTestActivity, mediaOptions);
-        ConnectOptions bobConnectOptions = new ConnectOptions.Builder(bobToken)
-                .mediaFactory(mediaFactory)
-                .roomName(roomName)
-                .build();
+        ConnectOptions bobConnectOptions =
+                new ConnectOptions.Builder(bobToken)
+                        .mediaFactory(mediaFactory)
+                        .roomName(roomName)
+                        .build();
         bobRoom = createRoom(bobListener, bobConnectOptions);
         assertTrue(aliceListener.onParticipantConnectedLatch.await(20, TimeUnit.SECONDS));
         assertEquals(1, aliceRoom.getRemoteParticipants().size());
@@ -111,15 +108,22 @@ public class MultiCodecTest extends BaseCodecTest {
         assertTrue(localParticipantListener.onPublishedVideoTrackLatch.await(20, TimeUnit.SECONDS));
 
         // Validate bob received published track event
-        assertTrue(bobRemoteParticipantListener.onVideoTrackPublishedLatch.await(20, TimeUnit.SECONDS));
+        assertTrue(
+                bobRemoteParticipantListener.onVideoTrackPublishedLatch.await(
+                        20, TimeUnit.SECONDS));
         TrackPublication aliceVideoTrackPublication =
                 aliceRemoteParticipant.getVideoTracks().get(0);
 
         // Validate that bob received track subscription error
-        assertTrue(bobRemoteParticipantListener.onVideoTrackSubscriptionFailedLatch.await(20, TimeUnit.SECONDS));
-        assertEquals(TwilioException.MEDIA_NO_SUPPORTED_CODEC_EXCEPTION,
-                bobRemoteParticipantListener.subscriptionFailures
-                        .get(aliceVideoTrackPublication).getCode());
+        assertTrue(
+                bobRemoteParticipantListener.onVideoTrackSubscriptionFailedLatch.await(
+                        20, TimeUnit.SECONDS));
+        assertEquals(
+                TwilioException.MEDIA_NO_SUPPORTED_CODEC_EXCEPTION,
+                bobRemoteParticipantListener
+                        .subscriptionFailures
+                        .get(aliceVideoTrackPublication)
+                        .getCode());
 
         // Release test media factory
         mediaFactory.testRelease();
@@ -135,19 +139,19 @@ public class MultiCodecTest extends BaseCodecTest {
         assumeFalse(MediaCodecVideoDecoder.isH264HwSupported());
 
         // Connect alice with VP8 preferred
-        aliceLocalVideoTrack = LocalVideoTrack.create(mediaTestActivity, true,
-                new FakeVideoCapturer());
-        ConnectOptions aliceConnectOptions = new ConnectOptions.Builder(aliceToken)
-                .roomName(roomName)
-                .preferVideoCodecs(Collections.<VideoCodec>singletonList(vp8Codec))
-                .build();
+        aliceLocalVideoTrack =
+                LocalVideoTrack.create(mediaTestActivity, true, new FakeVideoCapturer());
+        ConnectOptions aliceConnectOptions =
+                new ConnectOptions.Builder(aliceToken)
+                        .roomName(roomName)
+                        .preferVideoCodecs(Collections.<VideoCodec>singletonList(vp8Codec))
+                        .build();
         aliceRoom = createRoom(aliceListener, aliceConnectOptions);
         aliceListener.onParticipantConnectedLatch = new CountDownLatch(1);
 
         // Connect bob with no tracks
-        ConnectOptions bobConnectOptions = new ConnectOptions.Builder(bobToken)
-                .roomName(roomName)
-                .build();
+        ConnectOptions bobConnectOptions =
+                new ConnectOptions.Builder(bobToken).roomName(roomName).build();
         bobRoom = createRoom(bobListener, bobConnectOptions);
         assertTrue(aliceListener.onParticipantConnectedLatch.await(20, TimeUnit.SECONDS));
         assertEquals(1, aliceRoom.getRemoteParticipants().size());
@@ -161,8 +165,11 @@ public class MultiCodecTest extends BaseCodecTest {
         aliceLocalParticipant.publishTrack(aliceLocalVideoTrack);
 
         // Validate the track publication failed
-        assertTrue(localParticipantListener.onVideoTrackPublicationFailedLatch.await(20, TimeUnit.SECONDS));
-        assertEquals(TwilioException.MEDIA_NO_SUPPORTED_CODEC_EXCEPTION,
+        assertTrue(
+                localParticipantListener.onVideoTrackPublicationFailedLatch.await(
+                        20, TimeUnit.SECONDS));
+        assertEquals(
+                TwilioException.MEDIA_NO_SUPPORTED_CODEC_EXCEPTION,
                 localParticipantListener.publicationFailures.get(aliceLocalVideoTrack).getCode());
     }
 
@@ -176,13 +183,14 @@ public class MultiCodecTest extends BaseCodecTest {
         assumeFalse(MediaCodecVideoDecoder.isH264HwSupported());
 
         // Connect alice with VP8 preferred
-        aliceLocalVideoTrack = LocalVideoTrack.create(mediaTestActivity, true,
-                new FakeVideoCapturer());
-        ConnectOptions aliceConnectOptions = new ConnectOptions.Builder(aliceToken)
-                .roomName(roomName)
-                .preferVideoCodecs(Collections.<VideoCodec>singletonList(vp8Codec))
-                .videoTracks(Collections.singletonList(aliceLocalVideoTrack))
-                .build();
+        aliceLocalVideoTrack =
+                LocalVideoTrack.create(mediaTestActivity, true, new FakeVideoCapturer());
+        ConnectOptions aliceConnectOptions =
+                new ConnectOptions.Builder(aliceToken)
+                        .roomName(roomName)
+                        .preferVideoCodecs(Collections.<VideoCodec>singletonList(vp8Codec))
+                        .videoTracks(Collections.singletonList(aliceLocalVideoTrack))
+                        .build();
         aliceRoom = createRoom(aliceListener, aliceConnectOptions);
         LocalParticipant aliceLocalParticipant = aliceRoom.getLocalParticipant();
         CallbackHelper.FakeLocalParticipantListener localParticipantListener =
@@ -192,9 +200,8 @@ public class MultiCodecTest extends BaseCodecTest {
 
         // Connect bob with no tracks
         aliceListener.onParticipantConnectedLatch = new CountDownLatch(1);
-        ConnectOptions bobConnectOptions = new ConnectOptions.Builder(bobToken)
-                .roomName(roomName)
-                .build();
+        ConnectOptions bobConnectOptions =
+                new ConnectOptions.Builder(bobToken).roomName(roomName).build();
         bobRoom = createRoom(bobListener, bobConnectOptions);
         assertTrue(aliceListener.onParticipantConnectedLatch.await(20, TimeUnit.SECONDS));
         assertEquals(1, aliceRoom.getRemoteParticipants().size());
@@ -223,13 +230,14 @@ public class MultiCodecTest extends BaseCodecTest {
         assumeFalse(MediaCodecVideoDecoder.isH264HwSupported());
 
         // Connect alice with VP8 preferred
-        aliceLocalVideoTrack = LocalVideoTrack.create(mediaTestActivity, true,
-                new FakeVideoCapturer());
-        ConnectOptions aliceConnectOptions = new ConnectOptions.Builder(aliceToken)
-                .roomName(roomName)
-                .preferVideoCodecs(Collections.<VideoCodec>singletonList(vp8Codec))
-                .videoTracks(Collections.singletonList(aliceLocalVideoTrack))
-                .build();
+        aliceLocalVideoTrack =
+                LocalVideoTrack.create(mediaTestActivity, true, new FakeVideoCapturer());
+        ConnectOptions aliceConnectOptions =
+                new ConnectOptions.Builder(aliceToken)
+                        .roomName(roomName)
+                        .preferVideoCodecs(Collections.<VideoCodec>singletonList(vp8Codec))
+                        .videoTracks(Collections.singletonList(aliceLocalVideoTrack))
+                        .build();
         aliceRoom = createRoom(aliceListener, aliceConnectOptions);
         LocalParticipant aliceLocalParticipant = aliceRoom.getLocalParticipant();
         CallbackHelper.FakeLocalParticipantListener localParticipantListener =
@@ -239,9 +247,8 @@ public class MultiCodecTest extends BaseCodecTest {
 
         // Connect bob with no tracks
         aliceListener.onParticipantConnectedLatch = new CountDownLatch(1);
-        ConnectOptions bobConnectOptions = new ConnectOptions.Builder(bobToken)
-                .roomName(roomName)
-                .build();
+        ConnectOptions bobConnectOptions =
+                new ConnectOptions.Builder(bobToken).roomName(roomName).build();
         bobRoom = createRoom(bobListener, bobConnectOptions);
         assertTrue(aliceListener.onParticipantConnectedLatch.await(20, TimeUnit.SECONDS));
         assertEquals(1, aliceRoom.getRemoteParticipants().size());

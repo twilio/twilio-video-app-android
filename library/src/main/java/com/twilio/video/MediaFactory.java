@@ -20,20 +20,17 @@ import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.VisibleForTesting;
-
 import com.getkeepsafe.relinker.ReLinker;
-
-import org.webrtc.EglBase;
-
 import java.util.HashSet;
 import java.util.Set;
+import org.webrtc.EglBase;
 
 class MediaFactory {
     private static final String RELEASE_MESSAGE_TEMPLATE = "MediaFactory released %s unavailable";
     private static volatile boolean libraryIsLoaded = false;
     private static final Logger logger = Logger.getLogger(MediaFactory.class);
-    private volatile static MediaFactory instance;
-    private volatile static Set<Object> mediaFactoryOwners = new HashSet<>();
+    private static volatile MediaFactory instance;
+    private static volatile Set<Object> mediaFactoryOwners = new HashSet<>();
 
     private long nativeMediaFactoryHandle;
     private EglBaseProvider eglBaseProvider;
@@ -48,16 +45,17 @@ class MediaFactory {
                     libraryIsLoaded = true;
                 }
 
-
                 // Create a temporary owner of EglBaseProvider to create the native media factory
                 Object temporaryEglOwner = new Object();
                 EglBaseProvider eglBaseProvider = EglBaseProvider.instance(temporaryEglOwner);
                 EglBase localEglBase = eglBaseProvider.getLocalEglBase();
                 EglBase remoteEglBase = eglBaseProvider.getRemoteEglBase();
 
-                long nativeMediaFactoryHandle = nativeCreate(context,
-                        localEglBase.getEglBaseContext(),
-                        remoteEglBase.getEglBaseContext());
+                long nativeMediaFactoryHandle =
+                        nativeCreate(
+                                context,
+                                localEglBase.getEglBaseContext(),
+                                remoteEglBase.getEglBaseContext());
 
                 if (nativeMediaFactoryHandle == 0) {
                     logger.e("Failed to instance MediaFactory");
@@ -76,31 +74,26 @@ class MediaFactory {
         return instance;
     }
 
-    synchronized @Nullable LocalAudioTrack createAudioTrack(Context context,
-                                                            boolean enabled,
-                                                            @Nullable AudioOptions audioOptions,
-                                                            String name) {
+    synchronized @Nullable LocalAudioTrack createAudioTrack(
+            Context context, boolean enabled, @Nullable AudioOptions audioOptions, String name) {
         Preconditions.checkNotNull(context, "Context must not be null");
-        Preconditions.checkState(nativeMediaFactoryHandle != 0,
-                RELEASE_MESSAGE_TEMPLATE,
-                "createAudioTrack");
-        return nativeCreateAudioTrack(nativeMediaFactoryHandle,
-                context,
-                enabled,
-                audioOptions,
-                name);
+        Preconditions.checkState(
+                nativeMediaFactoryHandle != 0, RELEASE_MESSAGE_TEMPLATE, "createAudioTrack");
+        return nativeCreateAudioTrack(
+                nativeMediaFactoryHandle, context, enabled, audioOptions, name);
     }
 
-    synchronized @Nullable LocalVideoTrack createVideoTrack(Context context,
-                                                            boolean enabled,
-                                                            VideoCapturer videoCapturer,
-                                                            VideoConstraints videoConstraints,
-                                                            String name) {
+    synchronized @Nullable LocalVideoTrack createVideoTrack(
+            Context context,
+            boolean enabled,
+            VideoCapturer videoCapturer,
+            VideoConstraints videoConstraints,
+            String name) {
         Preconditions.checkNotNull(context, "Context must not be null");
-        Preconditions.checkState(nativeMediaFactoryHandle != 0,
-                RELEASE_MESSAGE_TEMPLATE,
-                "createVideoTrack");
-        return nativeCreateVideoTrack(nativeMediaFactoryHandle,
+        Preconditions.checkState(
+                nativeMediaFactoryHandle != 0, RELEASE_MESSAGE_TEMPLATE, "createVideoTrack");
+        return nativeCreateVideoTrack(
+                nativeMediaFactoryHandle,
                 context,
                 enabled,
                 videoCapturer,
@@ -108,16 +101,18 @@ class MediaFactory {
                 name,
                 eglBaseProvider.getLocalEglBase().getEglBaseContext());
     }
-    synchronized LocalDataTrack createDataTrack(Context context,
-                                                boolean ordered,
-                                                int maxPacketLifeTime,
-                                                int maxRetransmits,
-                                                String name) {
+
+    synchronized LocalDataTrack createDataTrack(
+            Context context,
+            boolean ordered,
+            int maxPacketLifeTime,
+            int maxRetransmits,
+            String name) {
         Preconditions.checkNotNull(context, "Context must not be null");
-        Preconditions.checkState(nativeMediaFactoryHandle != 0,
-                RELEASE_MESSAGE_TEMPLATE,
-                "createDataTrack");
-        return nativeCreateDataTrack(nativeMediaFactoryHandle,
+        Preconditions.checkState(
+                nativeMediaFactoryHandle != 0, RELEASE_MESSAGE_TEMPLATE, "createDataTrack");
+        return nativeCreateDataTrack(
+                nativeMediaFactoryHandle,
                 context,
                 ordered,
                 maxPacketLifeTime,
@@ -154,8 +149,7 @@ class MediaFactory {
      * on the same device.
      */
     @VisibleForTesting(otherwise = VisibleForTesting.NONE)
-    static MediaFactory testCreate(@NonNull Context context,
-                                   @NonNull MediaOptions mediaOptions) {
+    static MediaFactory testCreate(@NonNull Context context, @NonNull MediaOptions mediaOptions) {
         synchronized (MediaFactory.class) {
             if (!libraryIsLoaded) {
                 ReLinker.loadLibrary(context, "jingle_peerconnection_so");
@@ -191,27 +185,33 @@ class MediaFactory {
         this.eglBaseProvider = EglBaseProvider.instance(this);
     }
 
-    private static native long nativeCreate(Context context,
-                                            EglBase.Context localEglBase,
-                                            EglBase.Context remoteEglBase);
-    private native LocalAudioTrack nativeCreateAudioTrack(long nativeMediaFactoryHandle,
-                                                          Context context,
-                                                          boolean enabled,
-                                                          AudioOptions audioOptions,
-                                                          String name);
-    private native LocalVideoTrack nativeCreateVideoTrack(long nativeMediaFactoryHandle,
-                                                          Context context,
-                                                          boolean enabled,
-                                                          VideoCapturer videoCapturer,
-                                                          VideoConstraints videoConstraints,
-                                                          String name,
-                                                          EglBase.Context rootEglBase);
-    private native LocalDataTrack nativeCreateDataTrack(long nativeMediaFactoryHandle,
-                                                        Context context,
-                                                        boolean ordered,
-                                                        int maxPacketLifeTime,
-                                                        int maxRetransmits,
-                                                        String name);
+    private static native long nativeCreate(
+            Context context, EglBase.Context localEglBase, EglBase.Context remoteEglBase);
+
+    private native LocalAudioTrack nativeCreateAudioTrack(
+            long nativeMediaFactoryHandle,
+            Context context,
+            boolean enabled,
+            AudioOptions audioOptions,
+            String name);
+
+    private native LocalVideoTrack nativeCreateVideoTrack(
+            long nativeMediaFactoryHandle,
+            Context context,
+            boolean enabled,
+            VideoCapturer videoCapturer,
+            VideoConstraints videoConstraints,
+            String name,
+            EglBase.Context rootEglBase);
+
+    private native LocalDataTrack nativeCreateDataTrack(
+            long nativeMediaFactoryHandle,
+            Context context,
+            boolean ordered,
+            int maxPacketLifeTime,
+            int maxRetransmits,
+            String name);
+
     private native void nativeRelease(long mediaFactoryHandle);
 
     @VisibleForTesting(otherwise = VisibleForTesting.NONE)

@@ -17,15 +17,13 @@
 package com.twilio.video;
 
 import android.os.Handler;
-
+import java.util.Arrays;
+import java.util.Random;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-
-import java.util.Arrays;
-import java.util.Random;
 
 @RunWith(MockitoJUnitRunner.class)
 public class RemoteParticipantUnitTest {
@@ -41,14 +39,17 @@ public class RemoteParticipantUnitTest {
 
     @Before
     public void setup() {
-        remoteParticipant = new RemoteParticipant(String.valueOf(random.nextInt(INT_MAX)),
-                String.valueOf(random.nextInt(INT_MAX)),
-                Arrays.asList(mockRemoteAudioTrackPublication),
-                Arrays.asList(mockRemoteVideoTrackPublicationOne,
-                        mockRemoteVideoTrackPublicationTwo),
-                Arrays.asList(mockRemoteDataTrackPublication),
-                handler,
-                random.nextLong());
+        remoteParticipant =
+                new RemoteParticipant(
+                        String.valueOf(random.nextInt(INT_MAX)),
+                        String.valueOf(random.nextInt(INT_MAX)),
+                        Arrays.asList(mockRemoteAudioTrackPublication),
+                        Arrays.asList(
+                                mockRemoteVideoTrackPublicationOne,
+                                mockRemoteVideoTrackPublicationTwo),
+                        Arrays.asList(mockRemoteDataTrackPublication),
+                        handler,
+                        random.nextLong());
     }
 
     @Test(expected = NullPointerException.class)

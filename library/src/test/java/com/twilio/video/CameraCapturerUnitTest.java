@@ -16,19 +16,17 @@
 
 package com.twilio.video;
 
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.when;
+
 import android.Manifest;
 import android.content.Context;
 import android.content.pm.PackageManager;
-
+import java.util.ArrayList;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-
-import java.util.ArrayList;
-
-import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 public class CameraCapturerUnitTest {
@@ -53,8 +51,7 @@ public class CameraCapturerUnitTest {
     @Test(expected = IllegalArgumentException.class)
     public void shouldFailIfSourceNotSupported() {
         CameraCapturer.CameraSource unsupportedSource = CameraCapturer.CameraSource.FRONT_CAMERA;
-        when(formatProvider.getCameraId(unsupportedSource))
-                .thenReturn(-1);
+        when(formatProvider.getCameraId(unsupportedSource)).thenReturn(-1);
 
         new CameraCapturer(context, unsupportedSource, null, formatProvider);
     }
@@ -63,10 +60,10 @@ public class CameraCapturerUnitTest {
     public void getSupportedFormats_shouldFailWhenCameraPermissionNotGranted() {
         when(context.checkCallingOrSelfPermission(Manifest.permission.CAMERA))
                 .thenReturn(PackageManager.PERMISSION_DENIED);
-        when(formatProvider.getCameraId(CameraCapturer.CameraSource.BACK_CAMERA))
-                .thenReturn(0);
-        CameraCapturer cameraCapturer = new CameraCapturer(context,
-                CameraCapturer.CameraSource.BACK_CAMERA, null, formatProvider);
+        when(formatProvider.getCameraId(CameraCapturer.CameraSource.BACK_CAMERA)).thenReturn(0);
+        CameraCapturer cameraCapturer =
+                new CameraCapturer(
+                        context, CameraCapturer.CameraSource.BACK_CAMERA, null, formatProvider);
 
         cameraCapturer.getSupportedFormats();
     }
@@ -77,24 +74,20 @@ public class CameraCapturerUnitTest {
                 .thenReturn(PackageManager.PERMISSION_DENIED);
         when(formatProvider.getSupportedFormats(CameraCapturer.CameraSource.BACK_CAMERA))
                 .thenReturn(new ArrayList<VideoFormat>());
-        CameraCapturer cameraCapturer = new CameraCapturer(context,
-                CameraCapturer.CameraSource.BACK_CAMERA,
-                null,
-                formatProvider);
+        CameraCapturer cameraCapturer =
+                new CameraCapturer(
+                        context, CameraCapturer.CameraSource.BACK_CAMERA, null, formatProvider);
 
         cameraCapturer.getSupportedFormats();
     }
 
     @Test
     public void switchCamera_shouldReturnEarlyIfCameraSourceNotSupported() {
-        when(formatProvider.getCameraId(CameraCapturer.CameraSource.FRONT_CAMERA))
-                .thenReturn(0);
-        when(formatProvider.getCameraId(CameraCapturer.CameraSource.BACK_CAMERA))
-                .thenReturn(-1);
-        CameraCapturer cameraCapturer = new CameraCapturer(context,
-                CameraCapturer.CameraSource.FRONT_CAMERA,
-                null,
-                formatProvider);
+        when(formatProvider.getCameraId(CameraCapturer.CameraSource.FRONT_CAMERA)).thenReturn(0);
+        when(formatProvider.getCameraId(CameraCapturer.CameraSource.BACK_CAMERA)).thenReturn(-1);
+        CameraCapturer cameraCapturer =
+                new CameraCapturer(
+                        context, CameraCapturer.CameraSource.FRONT_CAMERA, null, formatProvider);
 
         cameraCapturer.switchCamera();
 
@@ -102,11 +95,10 @@ public class CameraCapturerUnitTest {
     }
 
     @Test(expected = NullPointerException.class)
-    public void takePicture_shouldNotAllowNullListener(){
-        CameraCapturer cameraCapturer = new CameraCapturer(context,
-                CameraCapturer.CameraSource.FRONT_CAMERA,
-                null,
-                formatProvider);
+    public void takePicture_shouldNotAllowNullListener() {
+        CameraCapturer cameraCapturer =
+                new CameraCapturer(
+                        context, CameraCapturer.CameraSource.FRONT_CAMERA, null, formatProvider);
         cameraCapturer.takePicture(null);
     }
 }

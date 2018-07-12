@@ -2,10 +2,10 @@ apply plugin: 'com.android.library'
 apply plugin: 'maven'
 apply plugin: 'jacoco'
 
-def currentToolchainVersion = "4.9"
+def currentToolchainVersion = "3.8"
 // TODO add back ability for local builds
 def coreHome = "${buildDir}/prebuilt/twilio-video"
-def compilerVersion = "gnu-4.9"
+def compilerVersion = "clang-3.8"
 
 configurations {
     preCompile
@@ -146,7 +146,7 @@ dependencies {
 
     implementation "com.android.support:support-annotations:${versions.supportLibrary}"
     implementation "com.getkeepsafe.relinker:relinker:${versions.relinker}"
-    api files("${coreHome}/armeabi-v7a/clang-3.8/release/lib/" +
+    api files("${coreHome}/armeabi-v7a/${compilerVersion}/debug/lib/" +
             "libwebrtc.jar")
 }
 

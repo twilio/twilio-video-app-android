@@ -16,11 +16,15 @@
 
 package com.twilio.video;
 
+import static junit.framework.TestCase.assertNotNull;
+import static org.apache.commons.lang3.RandomStringUtils.random;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 import android.Manifest;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.rule.GrantPermissionRule;
 import android.support.test.runner.AndroidJUnit4;
-
 import com.twilio.video.base.BaseVideoTest;
 import com.twilio.video.helper.CallbackHelper;
 import com.twilio.video.ui.MediaTestActivity;
@@ -29,31 +33,26 @@ import com.twilio.video.util.CredentialsUtils;
 import com.twilio.video.util.FakeVideoCapturer;
 import com.twilio.video.util.RoomUtils;
 import com.twilio.video.util.Topology;
-
+import java.util.Collections;
+import java.util.List;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
-
-import static junit.framework.TestCase.assertNotNull;
-import static org.apache.commons.lang3.RandomStringUtils.random;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
 @RunWith(AndroidJUnit4.class)
 public class VideoTest extends BaseVideoTest {
     @Rule
-    public GrantPermissionRule recordAudioPermissionRule = GrantPermissionRule
-            .grant(Manifest.permission.RECORD_AUDIO);
+    public GrantPermissionRule recordAudioPermissionRule =
+            GrantPermissionRule.grant(Manifest.permission.RECORD_AUDIO);
+
     @Rule
     public ActivityTestRule<MediaTestActivity> activityRule =
             new ActivityTestRule<>(MediaTestActivity.class);
+
     private MediaTestActivity mediaTestActivity;
     private String token;
     private String roomName;
@@ -90,8 +89,9 @@ public class VideoTest extends BaseVideoTest {
 
     @Test
     public void getVersion_shouldReturnValidSemVerFormattedVersion() {
-        String semVerRegex = "^([0-9]+)\\.([0-9]+)\\.([0-9]+)(?:-([0-9A-" +
-                "Za-z-]+(?:\\.[0-9A-Za-z-]+)*))?(?:\\+[0-9A-Za-z-]+)?$";
+        String semVerRegex =
+                "^([0-9]+)\\.([0-9]+)\\.([0-9]+)(?:-([0-9A-"
+                        + "Za-z-]+(?:\\.[0-9A-Za-z-]+)*))?(?:\\+[0-9A-Za-z-]+)?$";
         String version = Video.getVersion();
 
         assertNotNull(version);
@@ -105,10 +105,11 @@ public class VideoTest extends BaseVideoTest {
         roomListener.onDisconnectedLatch = new CountDownLatch(1);
         localVideoTrack = LocalVideoTrack.create(mediaTestActivity, true, new FakeVideoCapturer());
         List<LocalVideoTrack> localVideoTracks = Collections.singletonList(localVideoTrack);
-        ConnectOptions connectOptions = new ConnectOptions.Builder(token)
-                .roomName(roomName)
-                .videoTracks(localVideoTracks)
-                .build();
+        ConnectOptions connectOptions =
+                new ConnectOptions.Builder(token)
+                        .roomName(roomName)
+                        .videoTracks(localVideoTracks)
+                        .build();
         localVideoTrack.release();
         Video.connect(mediaTestActivity, connectOptions, roomListener);
     }
@@ -120,10 +121,11 @@ public class VideoTest extends BaseVideoTest {
         roomListener.onDisconnectedLatch = new CountDownLatch(1);
         localAudioTrack = LocalAudioTrack.create(mediaTestActivity, true);
         List<LocalAudioTrack> localAudioTracks = Collections.singletonList(localAudioTrack);
-        ConnectOptions connectOptions = new ConnectOptions.Builder(token)
-                .roomName(roomName)
-                .audioTracks(localAudioTracks)
-                .build();
+        ConnectOptions connectOptions =
+                new ConnectOptions.Builder(token)
+                        .roomName(roomName)
+                        .audioTracks(localAudioTracks)
+                        .build();
         localAudioTrack.release();
         Video.connect(mediaTestActivity, connectOptions, roomListener);
     }
@@ -131,13 +133,18 @@ public class VideoTest extends BaseVideoTest {
     @Test
     public void canConnectAndDisconnectRepeatedly() throws InterruptedException {
         int numIterations = 25;
-        for (int i = 0 ; i < numIterations ; i++) {
+        Room room = null;
+        for (int i = 0; i < numIterations; i++) {
             roomListener.onDisconnectedLatch = new CountDownLatch(1);
-            ConnectOptions connectOptions = new ConnectOptions.Builder(token)
-                    .build();
-            Room room = Video.connect(mediaTestActivity, connectOptions, roomListener);
+            ConnectOptions connectOptions = new ConnectOptions.Builder(token).build();
+            room = Video.connect(mediaTestActivity, connectOptions, roomListener);
             room.disconnect();
             assertTrue(roomListener.onDisconnectedLatch.await(20, TimeUnit.SECONDS));
         }
+        /*
+         * After all participants have disconnected complete the room to clean up backend
+         * resources.
+         */
+        RoomUtils.completeRoom(room);
     }
 }

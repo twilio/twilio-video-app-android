@@ -17,7 +17,6 @@
 package com.twilio.video.app.util;
 
 import com.google.firebase.crash.FirebaseCrash;
-
 import javax.inject.Inject;
 
 public class FirebaseTreeRanger implements TreeRanger {

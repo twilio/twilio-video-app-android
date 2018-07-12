@@ -26,9 +26,6 @@ import android.support.v7.preference.Preference;
 import android.support.v7.preference.PreferenceFragmentCompat;
 import android.support.v7.preference.PreferenceManager;
 import android.view.MenuItem;
-
-import com.google.common.base.Function;
-import com.google.common.collect.FluentIterable;
 import com.twilio.video.AudioCodec;
 import com.twilio.video.G722Codec;
 import com.twilio.video.H264Codec;
@@ -48,17 +45,16 @@ import com.twilio.video.app.data.NumberPreference;
 import com.twilio.video.app.data.NumberPreferenceDialogFragmentCompat;
 import com.twilio.video.app.data.Preferences;
 import com.twilio.video.app.ui.login.LoginActivity;
-
 import javax.inject.Inject;
 
 public class SettingsActivity extends BaseActivity {
-    private static final String[] VIDEO_CODEC_NAMES = new String[] {
-            Vp8Codec.NAME, H264Codec.NAME, Vp9Codec.NAME
-    };
+    private static final String[] VIDEO_CODEC_NAMES =
+            new String[] {Vp8Codec.NAME, H264Codec.NAME, Vp9Codec.NAME};
 
-    private static final String[] AUDIO_CODEC_NAMES = new String[] {
-            IsacCodec.NAME, OpusCodec.NAME, PcmaCodec.NAME, PcmuCodec.NAME, G722Codec.NAME
-    };
+    private static final String[] AUDIO_CODEC_NAMES =
+            new String[] {
+                IsacCodec.NAME, OpusCodec.NAME, PcmaCodec.NAME, PcmuCodec.NAME, G722Codec.NAME
+            };
 
     @Inject SharedPreferences sharedPreferences;
     @Inject Authenticator authenticator;
@@ -74,8 +70,8 @@ public class SettingsActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
 
         // Add the preference fragment
-        SettingsFragment settingsFragment = SettingsFragment.newInstance(sharedPreferences,
-                logoutClickListener);
+        SettingsFragment settingsFragment =
+                SettingsFragment.newInstance(sharedPreferences, logoutClickListener);
         getSupportFragmentManager()
                 .beginTransaction()
                 .replace(android.R.id.content, settingsFragment)
@@ -117,8 +113,9 @@ public class SettingsActivity extends BaseActivity {
         private SharedPreferences sharedPreferences;
         private Preference.OnPreferenceClickListener logoutClickListener;
 
-        static SettingsFragment newInstance(SharedPreferences sharedPreferences,
-                                            Preference.OnPreferenceClickListener logoutClickListener) {
+        static SettingsFragment newInstance(
+                SharedPreferences sharedPreferences,
+                Preference.OnPreferenceClickListener logoutClickListener) {
             SettingsFragment settingsFragment = new SettingsFragment();
 
             settingsFragment.logoutClickListener = logoutClickListener;
@@ -132,12 +129,14 @@ public class SettingsActivity extends BaseActivity {
             // Add our preference from resources
             addPreferencesFromResource(R.xml.preferences);
 
-            setupCodecListPreference(VideoCodec.class,
+            setupCodecListPreference(
+                    VideoCodec.class,
                     Preferences.VIDEO_CODEC,
                     Preferences.VIDEO_CODEC_DEFAULT,
                     (ListPreference) findPreference(Preferences.VIDEO_CODEC));
 
-            setupCodecListPreference(AudioCodec.class,
+            setupCodecListPreference(
+                    AudioCodec.class,
                     Preferences.AUDIO_CODEC,
                     Preferences.AUDIO_CODEC_DEFAULT,
                     (ListPreference) findPreference(Preferences.AUDIO_CODEC));
@@ -152,11 +151,15 @@ public class SettingsActivity extends BaseActivity {
 
         @Override
         public void onDisplayPreferenceDialog(Preference preference) {
+            if (preference == null) {
+                return;
+            }
 
             // show custom dialog preference
             if (preference instanceof NumberPreference) {
                 DialogFragment dialogFragment;
-                dialogFragment = NumberPreferenceDialogFragmentCompat.newInstance(preference.getKey());
+                dialogFragment =
+                        NumberPreferenceDialogFragmentCompat.newInstance(preference.getKey());
 
                 if (dialogFragment != null) {
                     dialogFragment.setTargetFragment(this, 0);
@@ -168,13 +171,14 @@ public class SettingsActivity extends BaseActivity {
             }
         }
 
-        private void setupCodecListPreference(Class codecClass,
-                                              String key,
-                                              String defaultValue,
-                                              ListPreference preference) {
-            String[] codecEntries = (codecClass == AudioCodec.class) ?
-                    AUDIO_CODEC_NAMES :
-                    VIDEO_CODEC_NAMES;
+        private void setupCodecListPreference(
+                Class codecClass, String key, String defaultValue, ListPreference preference) {
+            if (preference == null) {
+                return;
+            }
+
+            String[] codecEntries =
+                    (codecClass == AudioCodec.class) ? AUDIO_CODEC_NAMES : VIDEO_CODEC_NAMES;
             // saved value
             final String value = sharedPreferences.getString(key, defaultValue);
 
@@ -183,10 +187,11 @@ public class SettingsActivity extends BaseActivity {
             preference.setEntryValues(codecEntries);
             preference.setValue(value);
             preference.setSummary(value);
-            preference.setOnPreferenceChangeListener((changedPreference, newValue) -> {
-                changedPreference.setSummary(newValue.toString());
-                return true;
-            });
+            preference.setOnPreferenceChangeListener(
+                    (changedPreference, newValue) -> {
+                        changedPreference.setSummary(newValue.toString());
+                        return true;
+                    });
         }
     }
 }

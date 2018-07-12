@@ -18,15 +18,11 @@ package com.twilio.video.app.base;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-
 import com.google.common.base.Strings;
 import com.twilio.video.app.BuildConfig;
-import com.twilio.video.app.VideoApplication;
 import com.twilio.video.app.util.BuildConfigUtils;
-
-import net.hockeyapp.android.UpdateManager;
-
 import dagger.android.AndroidInjection;
+import net.hockeyapp.android.UpdateManager;
 
 public abstract class BaseActivity extends AppCompatActivity {
     @Override
@@ -47,7 +43,7 @@ public abstract class BaseActivity extends AppCompatActivity {
     }
 
     private boolean registerForHockeyAppUpdates() {
-        return BuildConfigUtils.isInternalRelease() &&
-                !Strings.isNullOrEmpty(BuildConfig.HOCKEY_APP_ID);
+        return BuildConfigUtils.isInternalRelease()
+                && !Strings.isNullOrEmpty(BuildConfig.HOCKEY_APP_ID);
     }
 }

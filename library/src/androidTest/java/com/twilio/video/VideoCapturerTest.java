@@ -16,37 +16,30 @@
 
 package com.twilio.video;
 
+import static junit.framework.Assert.assertEquals;
+import static junit.framework.TestCase.assertTrue;
+import static org.junit.Assume.assumeTrue;
+
 import android.Manifest;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.rule.GrantPermissionRule;
-
 import com.twilio.video.base.BaseCameraCapturerTest;
 import com.twilio.video.base.BaseVideoTest;
 import com.twilio.video.util.FakeVideoCapturer;
-import com.twilio.video.util.Topology;
-
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
-
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
-
-import static junit.framework.Assert.assertEquals;
-import static junit.framework.Assert.assertNotNull;
-import static junit.framework.TestCase.assertTrue;
-import static org.junit.Assume.assumeTrue;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.runner.RunWith;
 
 @RunWith(JUnitParamsRunner.class)
 public class VideoCapturerTest extends BaseVideoTest {
@@ -55,8 +48,8 @@ public class VideoCapturerTest extends BaseVideoTest {
     private long nativeVideoSinkHandle;
 
     @Rule
-    public GrantPermissionRule cameraPermissionsRule = GrantPermissionRule
-            .grant(Manifest.permission.CAMERA);
+    public GrantPermissionRule cameraPermissionsRule =
+            GrantPermissionRule.grant(Manifest.permission.CAMERA);
 
     @Before
     public void setup() throws InterruptedException {
@@ -76,35 +69,42 @@ public class VideoCapturerTest extends BaseVideoTest {
 
     @Test
     @Parameters
-    public void shouldCaptureAndRenderFrame(VideoPixelFormat videoPixelFormat,
-                                            VideoFrame.RotationAngle rotationAngle)
+    public void shouldCaptureAndRenderFrame(
+            VideoPixelFormat videoPixelFormat, VideoFrame.RotationAngle rotationAngle)
             throws InterruptedException {
-        List<VideoFormat> videoFormats = Collections
-                .singletonList(new VideoFormat(VideoDimensions.VGA_VIDEO_DIMENSIONS,
-                        30, videoPixelFormat));
+        List<VideoFormat> videoFormats =
+                Collections.singletonList(
+                        new VideoFormat(
+                                VideoDimensions.VGA_VIDEO_DIMENSIONS, 30, videoPixelFormat));
         FakeVideoCapturer fakeVideoCapturer = new FakeVideoCapturer(videoFormats, rotationAngle);
-        localVideoTrack = LocalVideoTrack.create(InstrumentationRegistry.getContext(),
-                true, fakeVideoCapturer);
+        localVideoTrack =
+                LocalVideoTrack.create(
+                        InstrumentationRegistry.getContext(), true, fakeVideoCapturer);
         final CountDownLatch frameRendered = new CountDownLatch(1);
         final AtomicReference<I420Frame> frameReference = new AtomicReference<>();
         boolean rotationApplied = rotationAngle != VideoFrame.RotationAngle.ROTATION_0;
-        boolean dimensionsSwapped = rotationAngle == VideoFrame.RotationAngle.ROTATION_90 ||
-                rotationAngle == VideoFrame.RotationAngle.ROTATION_270;
-        int expectedWidth = dimensionsSwapped ?
-                VideoDimensions.VGA_VIDEO_DIMENSIONS.height :
-                VideoDimensions.VGA_VIDEO_DIMENSIONS.width;
-        int expectedHeight = dimensionsSwapped ?
-                VideoDimensions.VGA_VIDEO_DIMENSIONS.width :
-                VideoDimensions.VGA_VIDEO_DIMENSIONS.height;
-        VideoFrame.RotationAngle expectedRotation = rotationApplied ?
-                VideoFrame.RotationAngle.ROTATION_0 :
-                rotationAngle;
+        boolean dimensionsSwapped =
+                rotationAngle == VideoFrame.RotationAngle.ROTATION_90
+                        || rotationAngle == VideoFrame.RotationAngle.ROTATION_270;
+        int expectedWidth =
+                dimensionsSwapped
+                        ? VideoDimensions.VGA_VIDEO_DIMENSIONS.height
+                        : VideoDimensions.VGA_VIDEO_DIMENSIONS.width;
+        int expectedHeight =
+                dimensionsSwapped
+                        ? VideoDimensions.VGA_VIDEO_DIMENSIONS.width
+                        : VideoDimensions.VGA_VIDEO_DIMENSIONS.height;
+        VideoFrame.RotationAngle expectedRotation =
+                rotationApplied ? VideoFrame.RotationAngle.ROTATION_0 : rotationAngle;
 
         // Add renderer and wait for frame
-        this.nativeVideoSinkHandle = localVideoTrack.addRendererWithWants(frame -> {
-            frameReference.set(frame);
-            frameRendered.countDown();
-        }, rotationApplied);
+        this.nativeVideoSinkHandle =
+                localVideoTrack.addRendererWithWants(
+                        frame -> {
+                            frameReference.set(frame);
+                            frameRendered.countDown();
+                        },
+                        rotationApplied);
         assertTrue(frameRendered.await(10, TimeUnit.SECONDS));
         this.i420Frame = frameReference.get();
 
@@ -136,55 +136,63 @@ public class VideoCapturerTest extends BaseVideoTest {
         final AtomicReference<VideoFormat> videoFormatReference = new AtomicReference<>();
 
         class CameraCapturerProxy extends CameraCapturer {
-            private CameraCapturerProxy(@NonNull Context context,
-                                        @NonNull CameraSource cameraSource) {
+            private CameraCapturerProxy(
+                    @NonNull Context context, @NonNull CameraSource cameraSource) {
                 super(context, cameraSource);
             }
 
             @Override
-            public void startCapture(@NonNull VideoFormat captureFormat,
-                                     @NonNull VideoCapturer.Listener videoCapturerListener) {
+            public void startCapture(
+                    @NonNull VideoFormat captureFormat,
+                    @NonNull VideoCapturer.Listener videoCapturerListener) {
                 videoFormatReference.set(captureFormat);
-                super.startCapture(captureFormat, new VideoCapturer.Listener() {
-                    @Override
-                    public void onCapturerStarted(boolean success) {
-                        videoCapturerListener.onCapturerStarted(success);
-                    }
+                super.startCapture(
+                        captureFormat,
+                        new VideoCapturer.Listener() {
+                            @Override
+                            public void onCapturerStarted(boolean success) {
+                                videoCapturerListener.onCapturerStarted(success);
+                            }
 
-                    @Override
-                    public void onFrameCaptured(VideoFrame videoFrame) {
-                        rotationAngle.set(videoFrame.orientation);
-                        rotationSet.countDown();
-                        videoCapturerListener.onFrameCaptured(videoFrame);
-                    }
-                });
+                            @Override
+                            public void onFrameCaptured(VideoFrame videoFrame) {
+                                rotationAngle.set(videoFrame.orientation);
+                                rotationSet.countDown();
+                                videoCapturerListener.onFrameCaptured(videoFrame);
+                            }
+                        });
             }
         }
         CameraCapturerProxy cameraCapturerProxy = new CameraCapturerProxy(context, cameraSource);
-        localVideoTrack = LocalVideoTrack.create(context,true, cameraCapturerProxy);
+        localVideoTrack = LocalVideoTrack.create(context, true, cameraCapturerProxy);
 
         // Wait for rotation
         assertTrue(rotationSet.await(10000, TimeUnit.MILLISECONDS));
 
         // Establish expected dimensions after rotation set by capturer
-        boolean dimensionsSwapped = rotationAngle.get() == VideoFrame.RotationAngle.ROTATION_90 ||
-                rotationAngle.get() == VideoFrame.RotationAngle.ROTATION_270;
+        boolean dimensionsSwapped =
+                rotationAngle.get() == VideoFrame.RotationAngle.ROTATION_90
+                        || rotationAngle.get() == VideoFrame.RotationAngle.ROTATION_270;
         VideoFormat videoFormat = videoFormatReference.get();
-        int expectedWidth = dimensionsSwapped && rotationApplied ?
-                videoFormat.dimensions.height :
-                videoFormat.dimensions.width;
-        int expectedHeight = dimensionsSwapped && rotationApplied ?
-                videoFormat.dimensions.width :
-                videoFormat.dimensions.height;
-        VideoFrame.RotationAngle expectedRotation = rotationApplied ?
-                VideoFrame.RotationAngle.ROTATION_0 :
-                rotationAngle.get();
+        int expectedWidth =
+                dimensionsSwapped && rotationApplied
+                        ? videoFormat.dimensions.height
+                        : videoFormat.dimensions.width;
+        int expectedHeight =
+                dimensionsSwapped && rotationApplied
+                        ? videoFormat.dimensions.width
+                        : videoFormat.dimensions.height;
+        VideoFrame.RotationAngle expectedRotation =
+                rotationApplied ? VideoFrame.RotationAngle.ROTATION_0 : rotationAngle.get();
 
         // Add renderer and wait for frame
-        this.nativeVideoSinkHandle = localVideoTrack.addRendererWithWants(frame -> {
-            frameReference.set(frame);
-            frameRendered.countDown();
-        }, rotationApplied);
+        this.nativeVideoSinkHandle =
+                localVideoTrack.addRendererWithWants(
+                        frame -> {
+                            frameReference.set(frame);
+                            frameRendered.countDown();
+                        },
+                        rotationApplied);
         assertTrue(frameRendered.await(10000, TimeUnit.MILLISECONDS));
         this.i420Frame = frameReference.get();
 
@@ -199,15 +207,15 @@ public class VideoCapturerTest extends BaseVideoTest {
      */
     @SuppressWarnings("unused")
     private Object[] parametersForShouldCaptureAndRenderFrame() {
-        return new Object[]{
-                new Object[]{VideoPixelFormat.NV21, VideoFrame.RotationAngle.ROTATION_0},
-                new Object[]{VideoPixelFormat.NV21, VideoFrame.RotationAngle.ROTATION_90},
-                new Object[]{VideoPixelFormat.NV21, VideoFrame.RotationAngle.ROTATION_180},
-                new Object[]{VideoPixelFormat.NV21, VideoFrame.RotationAngle.ROTATION_270},
-                new Object[]{VideoPixelFormat.RGBA_8888, VideoFrame.RotationAngle.ROTATION_0},
-                new Object[]{VideoPixelFormat.RGBA_8888, VideoFrame.RotationAngle.ROTATION_90},
-                new Object[]{VideoPixelFormat.RGBA_8888, VideoFrame.RotationAngle.ROTATION_180},
-                new Object[]{VideoPixelFormat.RGBA_8888, VideoFrame.RotationAngle.ROTATION_270}
+        return new Object[] {
+            new Object[] {VideoPixelFormat.NV21, VideoFrame.RotationAngle.ROTATION_0},
+            new Object[] {VideoPixelFormat.NV21, VideoFrame.RotationAngle.ROTATION_90},
+            new Object[] {VideoPixelFormat.NV21, VideoFrame.RotationAngle.ROTATION_180},
+            new Object[] {VideoPixelFormat.NV21, VideoFrame.RotationAngle.ROTATION_270},
+            new Object[] {VideoPixelFormat.RGBA_8888, VideoFrame.RotationAngle.ROTATION_0},
+            new Object[] {VideoPixelFormat.RGBA_8888, VideoFrame.RotationAngle.ROTATION_90},
+            new Object[] {VideoPixelFormat.RGBA_8888, VideoFrame.RotationAngle.ROTATION_180},
+            new Object[] {VideoPixelFormat.RGBA_8888, VideoFrame.RotationAngle.ROTATION_270}
         };
     }
 }

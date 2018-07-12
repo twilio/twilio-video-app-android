@@ -16,15 +16,13 @@
 
 package com.twilio.video;
 
+import static android.Manifest.permission.RECORD_AUDIO;
+
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import static android.Manifest.permission.RECORD_AUDIO;
-
-/**
- * Represents a local audio source.
- */
+/** Represents a local audio source. */
 public class LocalAudioTrack extends AudioTrack {
     private static final Logger logger = Logger.getLogger(LocalAudioTrack.class);
 
@@ -33,75 +31,74 @@ public class LocalAudioTrack extends AudioTrack {
     private long nativeLocalAudioTrackHandle;
 
     /**
-     * Creates an audio track. Note that the RECORD_AUDIO permission must be granted
-     * in order for this operation to succeed. If RECORD_AUDIO is not granted null is returned.
+     * Creates an audio track. Note that the RECORD_AUDIO permission must be granted in order for
+     * this operation to succeed. If RECORD_AUDIO is not granted null is returned.
      *
      * @param context application context.
      * @param enabled initial state of audio track.
      * @return local audio track if successfully added or null if audio track could not be created.
      */
     @Nullable
-    public static LocalAudioTrack create(@NonNull Context context,
-                                         boolean enabled) {
+    public static LocalAudioTrack create(@NonNull Context context, boolean enabled) {
         return create(context, enabled, null, null);
     }
 
     /**
-     * Creates an audio track. Note that the RECORD_AUDIO permission must be granted
-     * in order for this operation to succeed. If RECORD_AUDIO is not granted null is returned.
+     * Creates an audio track. Note that the RECORD_AUDIO permission must be granted in order for
+     * this operation to succeed. If RECORD_AUDIO is not granted null is returned.
      *
-     * @param context      applicatoin context.
-     * @param enabled      initial state of audio track.
+     * @param context applicatoin context.
+     * @param enabled initial state of audio track.
      * @param audioOptions audio options to be applied to the track.
      * @return local audio track if successfully added or null if audio track could not be created.
      */
     @Nullable
-    public static LocalAudioTrack create(@NonNull Context context,
-                                         boolean enabled,
-                                         @Nullable AudioOptions audioOptions) {
+    public static LocalAudioTrack create(
+            @NonNull Context context, boolean enabled, @Nullable AudioOptions audioOptions) {
         return create(context, enabled, audioOptions, null);
     }
 
     /**
-     * Creates an audio track. Note that the RECORD_AUDIO permission must be granted
-     * in order for this operation to succeed. If RECORD_AUDIO is not granted null is returned.
+     * Creates an audio track. Note that the RECORD_AUDIO permission must be granted in order for
+     * this operation to succeed. If RECORD_AUDIO is not granted null is returned.
      *
      * @param context application context.
      * @param enabled initial state of audio track.
-     * @param name    audio track name.
+     * @param name audio track name.
      * @return local audio track if successfully added or null if audio track could not be created.
      */
     @Nullable
-    public static LocalAudioTrack create(@NonNull Context context,
-                                         boolean enabled,
-                                         @Nullable String name) {
+    public static LocalAudioTrack create(
+            @NonNull Context context, boolean enabled, @Nullable String name) {
         return create(context, enabled, null, name);
     }
 
     /**
-     * Creates an audio track. Note that the RECORD_AUDIO permission must be granted
-     * in order for this operation to succeed. If RECORD_AUDIO is not granted null is returned.
+     * Creates an audio track. Note that the RECORD_AUDIO permission must be granted in order for
+     * this operation to succeed. If RECORD_AUDIO is not granted null is returned.
      *
-     * @param context      application context.
-     * @param enabled      initial state of audio track.
+     * @param context application context.
+     * @param enabled initial state of audio track.
      * @param audioOptions audio options to be applied to track.
-     * @param name         audio track name.
+     * @param name audio track name.
      * @return local audio track if successfully added or null if audio track could not be created.
      */
     @Nullable
-    public static LocalAudioTrack create(@NonNull Context context,
-                                         boolean enabled,
-                                         @Nullable AudioOptions audioOptions,
-                                         @Nullable String name) {
+    public static LocalAudioTrack create(
+            @NonNull Context context,
+            boolean enabled,
+            @Nullable AudioOptions audioOptions,
+            @Nullable String name) {
         Preconditions.checkNotNull(context);
-        Preconditions.checkState(Util.permissionGranted(context, RECORD_AUDIO), "RECORD_AUDIO " +
-                "permission must be granted to create audio track");
+        Preconditions.checkState(
+                Util.permissionGranted(context, RECORD_AUDIO),
+                "RECORD_AUDIO " + "permission must be granted to create audio track");
 
         // Use temporary media factory owner to create local audio track
         Object temporaryMediaFactoryOwner = new Object();
         MediaFactory mediaFactory = MediaFactory.instance(temporaryMediaFactoryOwner, context);
-        LocalAudioTrack localAudioTrack = mediaFactory
-                .createAudioTrack(context, enabled, audioOptions, name);
+        LocalAudioTrack localAudioTrack =
+                mediaFactory.createAudioTrack(context, enabled, audioOptions, name);
 
         if (localAudioTrack == null) {
             logger.e("Failed to create local audio track");
@@ -115,9 +112,9 @@ public class LocalAudioTrack extends AudioTrack {
 
     /**
      * Check if the local audio track is enabled.
-     * <p>
-     * When the value is false, the local audio track is muted. When the value is true the
-     * local audio track is live.
+     *
+     * <p>When the value is false, the local audio track is muted. When the value is true the local
+     * audio track is live.
      *
      * @return true if the local audio is enabled.
      */
@@ -155,9 +152,7 @@ public class LocalAudioTrack extends AudioTrack {
         }
     }
 
-    /**
-     * Releases native memory owned by audio track.
-     */
+    /** Releases native memory owned by audio track. */
     public synchronized void release() {
         if (!isReleased()) {
             nativeRelease(nativeLocalAudioTrackHandle);
@@ -166,11 +161,12 @@ public class LocalAudioTrack extends AudioTrack {
         }
     }
 
-    LocalAudioTrack(long nativeLocalAudioTrackHandle,
-                    @NonNull String nativeTrackHash,
-                    @NonNull String name,
-                    boolean enabled,
-                    Context context) {
+    LocalAudioTrack(
+            long nativeLocalAudioTrackHandle,
+            @NonNull String nativeTrackHash,
+            @NonNull String name,
+            boolean enabled,
+            Context context) {
         super(enabled, name);
         this.nativeTrackHash = nativeTrackHash;
         this.nativeLocalAudioTrackHandle = nativeLocalAudioTrackHandle;

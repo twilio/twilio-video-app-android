@@ -16,10 +16,15 @@
 
 package com.twilio.video.base;
 
+import static org.apache.commons.lang3.RandomStringUtils.random;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import android.Manifest;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.rule.GrantPermissionRule;
-
 import com.twilio.video.ConnectOptions;
 import com.twilio.video.LocalAudioTrack;
 import com.twilio.video.LocalDataTrack;
@@ -33,31 +38,24 @@ import com.twilio.video.helper.CallbackHelper;
 import com.twilio.video.ui.MediaTestActivity;
 import com.twilio.video.util.Constants;
 import com.twilio.video.util.CredentialsUtils;
-import com.twilio.video.util.FakeVideoCapturer;
 import com.twilio.video.util.RoomUtils;
 import com.twilio.video.util.Topology;
-
-import org.junit.After;
-import org.junit.Rule;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
-
-import static org.apache.commons.lang3.RandomStringUtils.random;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import org.junit.After;
+import org.junit.Rule;
 
 public abstract class BaseParticipantTest extends BaseVideoTest {
     @Rule
-    public GrantPermissionRule recordAudioPermissionRule = GrantPermissionRule
-            .grant(Manifest.permission.RECORD_AUDIO);
+    public GrantPermissionRule recordAudioPermissionRule =
+            GrantPermissionRule.grant(Manifest.permission.RECORD_AUDIO);
+
     @Rule
     public ActivityTestRule<MediaTestActivity> activityRule =
             new ActivityTestRule<>(MediaTestActivity.class);
+
     protected MediaTestActivity mediaTestActivity;
 
     protected LocalVideoTrack aliceLocalVideoTrack;
@@ -87,8 +85,8 @@ public abstract class BaseParticipantTest extends BaseVideoTest {
     protected CallbackHelper.FakeRoomListener charlieRoomListener =
             new CallbackHelper.FakeRoomListener();
 
-    protected Room connect(ConnectOptions connectOptions,
-                           CallbackHelper.FakeRoomListener roomListener)
+    protected Room connect(
+            ConnectOptions connectOptions, CallbackHelper.FakeRoomListener roomListener)
             throws InterruptedException {
         roomListener.onConnectedLatch = new CountDownLatch(1);
         Room room = Video.connect(mediaTestActivity, connectOptions, roomListener);
@@ -111,7 +109,8 @@ public abstract class BaseParticipantTest extends BaseVideoTest {
         }
         roomListener.onDisconnectedLatch = new CountDownLatch(1);
         room.disconnect();
-        assertTrue("Failed to disconnect from room",
+        assertTrue(
+                "Failed to disconnect from room",
                 roomListener.onDisconnectedLatch.await(20, TimeUnit.SECONDS));
     }
 
@@ -128,9 +127,8 @@ public abstract class BaseParticipantTest extends BaseVideoTest {
         aliceRoomListener = new CallbackHelper.FakeRoomListener();
         aliceParticipantListener = new CallbackHelper.FakeParticipantListener();
         aliceRoomListener.onParticipantConnectedLatch = new CountDownLatch(1);
-        ConnectOptions aliceConnectOptions = new ConnectOptions.Builder(aliceToken)
-                .roomName(testRoomName)
-                .build();
+        ConnectOptions aliceConnectOptions =
+                new ConnectOptions.Builder(aliceToken).roomName(testRoomName).build();
 
         // Setup bob
         bobToken = CredentialsUtils.getAccessToken(Constants.PARTICIPANT_BOB, topology);
@@ -138,9 +136,8 @@ public abstract class BaseParticipantTest extends BaseVideoTest {
         bobVideoTrackName = random(10);
         bobRoomListener = new CallbackHelper.FakeRoomListener();
         bobParticipantListener = new CallbackHelper.FakeParticipantListener();
-        ConnectOptions bobConnectOptions = new ConnectOptions.Builder(bobToken)
-                .roomName(testRoomName)
-                .build();
+        ConnectOptions bobConnectOptions =
+                new ConnectOptions.Builder(bobToken).roomName(testRoomName).build();
 
         // Connect alice
         aliceRoom = connect(aliceConnectOptions, aliceRoomListener);
@@ -163,13 +160,23 @@ public abstract class BaseParticipantTest extends BaseVideoTest {
     }
 
     @After
-    public void teardown() throws InterruptedException{
+    public void teardown() throws InterruptedException {
         disconnect(bobRoom, bobRoomListener);
         bobRoom = null;
         disconnect(aliceRoom, aliceRoomListener);
         aliceRoom = null;
         aliceRoomListener = null;
         disconnect(charlieRoom, charlieRoomListener);
+
+        /*
+         * After all participants have disconnected complete the room to clean up backend
+         * resources.
+         */
+        Room room = aliceRoom != null ? aliceRoom : bobRoom;
+        if (room != null) {
+            RoomUtils.completeRoom(room);
+        }
+
         bobRemoteParticipant = null;
         if (aliceLocalAudioTrack != null) {
             aliceLocalAudioTrack.release();

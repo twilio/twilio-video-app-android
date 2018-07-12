@@ -17,11 +17,9 @@
 package com.twilio.video;
 
 import android.content.Context;
-
-import org.webrtc.VideoFrame;
-import org.webrtc.SurfaceTextureHelper;
-
 import java.util.List;
+import org.webrtc.SurfaceTextureHelper;
+import org.webrtc.VideoFrame;
 
 final class VideoCapturerDelegate implements org.webrtc.VideoCapturer {
     private final VideoCapturer videoCapturer;
@@ -45,9 +43,10 @@ final class VideoCapturerDelegate implements org.webrtc.VideoCapturer {
     }
 
     @Override
-    public void initialize(SurfaceTextureHelper surfaceTextureHelper,
-                           Context context,
-                           CapturerObserver capturerObserver) {
+    public void initialize(
+            SurfaceTextureHelper surfaceTextureHelper,
+            Context context,
+            CapturerObserver capturerObserver) {
         this.listenerAdapter = new VideoCapturerListenerAdapter(capturerObserver);
         // FIXME: ugh this is still cheating..need to figure out a way to pass this better
         if (videoCapturer instanceof CameraCapturer) {
@@ -122,28 +121,22 @@ final class VideoCapturerDelegate implements org.webrtc.VideoCapturer {
         }
 
         @Override
-        public void onByteBufferFrameCaptured(byte[] data,
-                                              int width,
-                                              int height,
-                                              int rotation,
-                                              long timeStamp) {
-            nativeOnByteBufferFrameCaptured(nativeCapturer,
-                    data,
-                    data.length,
-                    width,
-                    height,
-                    rotation,
-                    timeStamp);
+        public void onByteBufferFrameCaptured(
+                byte[] data, int width, int height, int rotation, long timeStamp) {
+            nativeOnByteBufferFrameCaptured(
+                    nativeCapturer, data, data.length, width, height, rotation, timeStamp);
         }
 
         @Override
-        public void onTextureFrameCaptured(int width,
-                                           int height,
-                                           int oesTextureId,
-                                           float[] transformMatrix,
-                                           int rotation,
-                                           long timestamp) {
-            nativeOnTextureFrameCaptured(nativeCapturer,
+        public void onTextureFrameCaptured(
+                int width,
+                int height,
+                int oesTextureId,
+                float[] transformMatrix,
+                int rotation,
+                long timestamp) {
+            nativeOnTextureFrameCaptured(
+                    nativeCapturer,
                     width,
                     height,
                     oesTextureId,
@@ -155,7 +148,8 @@ final class VideoCapturerDelegate implements org.webrtc.VideoCapturer {
         @Override
         public void onFrameCaptured(VideoFrame videoFrame) {
             VideoFrame.Buffer buffer = videoFrame.getBuffer();
-            nativeOnFrameCaptured(nativeCapturer,
+            nativeOnFrameCaptured(
+                    nativeCapturer,
                     buffer.getWidth(),
                     buffer.getHeight(),
                     videoFrame.getTimestampNs(),
@@ -163,30 +157,32 @@ final class VideoCapturerDelegate implements org.webrtc.VideoCapturer {
                     buffer);
         }
 
-        private native void nativeCapturerStarted(long nativeCapturer,
-                                                  boolean success);
+        private native void nativeCapturerStarted(long nativeCapturer, boolean success);
 
-        private native void nativeOnByteBufferFrameCaptured(long nativeCapturer,
-                                                            byte[] data,
-                                                            int length,
-                                                            int width,
-                                                            int height,
-                                                            int rotation,
-                                                            long timeStamp);
+        private native void nativeOnByteBufferFrameCaptured(
+                long nativeCapturer,
+                byte[] data,
+                int length,
+                int width,
+                int height,
+                int rotation,
+                long timeStamp);
 
-        private native void nativeOnTextureFrameCaptured(long nativeCapturer,
-                                                         int width,
-                                                         int height,
-                                                         int oesTextureId,
-                                                         float[] transformMatrix,
-                                                         int rotation,
-                                                         long timestamp);
+        private native void nativeOnTextureFrameCaptured(
+                long nativeCapturer,
+                int width,
+                int height,
+                int oesTextureId,
+                float[] transformMatrix,
+                int rotation,
+                long timestamp);
 
-        private native void nativeOnFrameCaptured(long nativeCapturer,
-                                                  int width,
-                                                  int height,
-                                                  long timeStamp,
-                                                  int rotation,
-                                                  org.webrtc.VideoFrame.Buffer webRtcVideoFrameBuffer);
+        private native void nativeOnFrameCaptured(
+                long nativeCapturer,
+                int width,
+                int height,
+                long timeStamp,
+                int rotation,
+                org.webrtc.VideoFrame.Buffer webRtcVideoFrameBuffer);
     }
 }

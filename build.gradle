@@ -22,7 +22,7 @@ buildscript {
             'mockito': '1.10.19',
             'guava': '19.0',
             'retrofit': '1.9.0',
-            'supportLibrary': '26.1.0',
+            'supportLibrary': '27.1.1',
             'espresso': '3.0.0',
             'testSupportLibrary': '1.0.0',
             'uiAutomator': '2.1.2',
@@ -75,6 +75,24 @@ buildscript {
             exclude group: 'com.google.guava', module: 'guava-jdk5'
         }
         classpath "de.felixschulze.gradle:gradle-hockeyapp-plugin:${versions.gradleHockeyPlugin}"
+    }
+}
+
+plugins {
+    id "com.diffplug.gradle.spotless" version "3.13.0"
+}
+apply plugin: "com.diffplug.gradle.spotless"
+spotless {
+    format 'misc', {
+        target '**/*.gradle', '**/*.md', '**/.gitignore'
+
+        trimTrailingWhitespace()
+        indentWithSpaces()
+        endWithNewline()
+    }
+    java {
+        target '**/*.java'
+        googleJavaFormat().aosp()
     }
 }
 

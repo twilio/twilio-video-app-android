@@ -23,19 +23,14 @@ import android.content.IntentFilter;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.util.Log;
-
 import com.getkeepsafe.relinker.ReLinker;
-
 import java.util.EnumMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-/**
- * This class allows a user to connect to a Room.
- */
+/** This class allows a user to connect to a Room. */
 public abstract class Video {
     private static LogLevel level = LogLevel.OFF;
     private static Map<LogModule, LogLevel> moduleLogLevel = new EnumMap(LogModule.class);
@@ -46,38 +41,44 @@ public abstract class Video {
     private static NetworkInfo currentNetworkInfo = null;
     private static Context applicationContext = null;
 
-    private static final BroadcastReceiver connectivityChangeReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            if (intent.getAction().equalsIgnoreCase(ConnectivityManager.CONNECTIVITY_ACTION)) {
-                if (isInitialStickyBroadcast()) {
-                    logger.d("Ignoring network event, sticky broadcast");
-                    return;
-                }
-                ConnectivityManager conn =  (ConnectivityManager)
-                        context.getSystemService(Context.CONNECTIVITY_SERVICE);
-                NetworkInfo newNetworkInfo = conn.getActiveNetworkInfo();
-                NetworkChangeEvent networkChangeEvent = NetworkChangeEvent.CONNECTION_CHANGED;
+    private static final BroadcastReceiver connectivityChangeReceiver =
+            new BroadcastReceiver() {
+                @Override
+                public void onReceive(Context context, Intent intent) {
+                    if (intent.getAction()
+                            .equalsIgnoreCase(ConnectivityManager.CONNECTIVITY_ACTION)) {
+                        if (isInitialStickyBroadcast()) {
+                            logger.d("Ignoring network event, sticky broadcast");
+                            return;
+                        }
+                        ConnectivityManager conn =
+                                (ConnectivityManager)
+                                        context.getSystemService(Context.CONNECTIVITY_SERVICE);
+                        NetworkInfo newNetworkInfo = conn.getActiveNetworkInfo();
+                        NetworkChangeEvent networkChangeEvent =
+                                NetworkChangeEvent.CONNECTION_CHANGED;
 
-                if ((newNetworkInfo != null) &&
-                    (currentNetworkInfo == null ||
-                     currentNetworkInfo.getDetailedState() != newNetworkInfo.getDetailedState() ||
-                     currentNetworkInfo.getType() != newNetworkInfo.getType() ||
-                     currentNetworkInfo.getSubtype() != newNetworkInfo.getSubtype())){
-                    if (!newNetworkInfo.isConnectedOrConnecting()) {
-                        networkChangeEvent = NetworkChangeEvent.CONNECTION_LOST;
+                        if ((newNetworkInfo != null)
+                                && (currentNetworkInfo == null
+                                        || currentNetworkInfo.getDetailedState()
+                                                != newNetworkInfo.getDetailedState()
+                                        || currentNetworkInfo.getType() != newNetworkInfo.getType()
+                                        || currentNetworkInfo.getSubtype()
+                                                != newNetworkInfo.getSubtype())) {
+                            if (!newNetworkInfo.isConnectedOrConnecting()) {
+                                networkChangeEvent = NetworkChangeEvent.CONNECTION_LOST;
+                            }
+                            logger.d("Network event detected: " + networkChangeEvent.name());
+                            onNetworkChange(networkChangeEvent);
+                        } else if (newNetworkInfo == null) {
+                            networkChangeEvent = NetworkChangeEvent.CONNECTION_LOST;
+                            logger.d("Network connection lost");
+                            onNetworkChange(networkChangeEvent);
+                        }
+                        currentNetworkInfo = newNetworkInfo;
                     }
-                    logger.d("Network event detected: " + networkChangeEvent.name());
-                    onNetworkChange(networkChangeEvent);
-                } else if (newNetworkInfo == null) {
-                    networkChangeEvent = NetworkChangeEvent.CONNECTION_LOST;
-                    logger.d("Network connection lost");
-                    onNetworkChange(networkChangeEvent);
                 }
-                currentNetworkInfo = newNetworkInfo;
-            }
-        }
-    };
+            };
 
     /**
      * Connect to a {@link Room} with specified options.
@@ -86,9 +87,11 @@ public abstract class Video {
      * @param roomListener listener of room related events.
      * @return room being connected to.
      */
-    @NonNull public static synchronized Room connect(@NonNull Context context,
-                                            @NonNull ConnectOptions connectOptions,
-                                            @NonNull Room.Listener roomListener) {
+    @NonNull
+    public static synchronized Room connect(
+            @NonNull Context context,
+            @NonNull ConnectOptions connectOptions,
+            @NonNull Room.Listener roomListener) {
         Preconditions.checkNotNull(context, "context must not be null");
         Preconditions.checkNotNull(connectOptions, "connectOptions must not be null");
         Preconditions.checkNotNull(roomListener, "roomListener must not be null");
@@ -117,25 +120,26 @@ public abstract class Video {
             }
         }
 
-        if(rooms.isEmpty()) {
+        if (rooms.isEmpty()) {
             // Register for connectivity events
-            ConnectivityManager conn =  (ConnectivityManager)
-                applicationContext.getSystemService(Context.CONNECTIVITY_SERVICE);
+            ConnectivityManager conn =
+                    (ConnectivityManager)
+                            applicationContext.getSystemService(Context.CONNECTIVITY_SERVICE);
             currentNetworkInfo = conn.getActiveNetworkInfo();
             registerConnectivityBroadcastReceiver();
         }
-        Room room = new Room(
-                applicationContext,
-                connectOptions.getRoomName(),
-                Util.createCallbackHandler(),
-                roomListenerProxy(roomListener)
-        );
+        Room room =
+                new Room(
+                        applicationContext,
+                        connectOptions.getRoomName(),
+                        Util.createCallbackHandler(),
+                        roomListenerProxy(roomListener));
         rooms.add(room);
         room.connect(connectOptions);
         return room;
     }
 
-    synchronized static void release(Room room) {
+    static synchronized void release(Room room) {
         rooms.remove(room);
         if (rooms.isEmpty()) {
             // With no more room connections we can unregister for connectivity events
@@ -197,7 +201,8 @@ public abstract class Video {
      *
      * @return the version of the SDK
      */
-    @NonNull public static String getVersion() {
+    @NonNull
+    public static String getVersion() {
         return BuildConfig.VERSION_NAME;
     }
 
@@ -206,7 +211,8 @@ public abstract class Video {
      *
      * @return the logging level
      */
-    @NonNull public static LogLevel getLogLevel() {
+    @NonNull
+    public static LogLevel getLogLevel() {
         return LogLevel.values()[tryGetCoreLogLevel()];
     }
 
@@ -226,7 +232,7 @@ public abstract class Video {
      * Sets the logging level for messages logged by a specific module.
      *
      * @param module The module for this log level
-     * @param level  The logging level
+     * @param level The logging level
      */
     public static void setModuleLogLevel(LogModule module, LogLevel level) {
         if (module == LogModule.PLATFORM) {
@@ -238,7 +244,7 @@ public abstract class Video {
     }
 
     private static void setSDKLogLevel(LogLevel level) {
-         /*
+        /*
          * The Log Levels are defined differently in the Logger
          * which is based off android.util.Log.
          */
@@ -304,8 +310,9 @@ public abstract class Video {
 
     private static void registerConnectivityBroadcastReceiver() {
         if (applicationContext != null) {
-            applicationContext.registerReceiver(connectivityChangeReceiver,
-                new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
+            applicationContext.registerReceiver(
+                    connectivityChangeReceiver,
+                    new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
         }
     }
 
@@ -320,7 +327,9 @@ public abstract class Video {
         CONNECTION_CHANGED
     }
 
-    private native static void nativeSetCoreLogLevel(int level);
-    private native static void nativeSetModuleLevel(int module, int level);
-    private native static int nativeGetCoreLogLevel();
+    private static native void nativeSetCoreLogLevel(int level);
+
+    private static native void nativeSetModuleLevel(int module, int level);
+
+    private static native int nativeGetCoreLogLevel();
 }

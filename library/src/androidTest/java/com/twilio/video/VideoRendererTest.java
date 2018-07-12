@@ -16,42 +16,39 @@
 
 package com.twilio.video;
 
+import static junit.framework.TestCase.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import android.Manifest;
-import android.graphics.Bitmap;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.rule.GrantPermissionRule;
 import android.support.test.runner.AndroidJUnit4;
 import android.widget.ImageView;
-
 import com.twilio.video.base.BaseVideoTest;
-import com.twilio.video.ui.VideoRendererTestActivity;
-import com.twilio.video.util.FakeVideoCapturer;
-
 import com.twilio.video.test.R;
+import com.twilio.video.ui.VideoRendererTestActivity;
 import com.twilio.video.util.BitmapVideoRenderer;
-
+import com.twilio.video.util.FakeVideoCapturer;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
-
-import static junit.framework.TestCase.assertNotNull;
-import static org.junit.Assert.assertTrue;
-
 @RunWith(AndroidJUnit4.class)
 public class VideoRendererTest extends BaseVideoTest {
     private static final int BITMAP_TIMEOUT_MS = 10000;
 
     @Rule
-    public GrantPermissionRule cameraPermissionsRule = GrantPermissionRule
-            .grant(Manifest.permission.CAMERA);
+    public GrantPermissionRule cameraPermissionsRule =
+            GrantPermissionRule.grant(Manifest.permission.CAMERA);
+
     @Rule
     public ActivityTestRule<VideoRendererTestActivity> activityRule =
             new ActivityTestRule<>(VideoRendererTestActivity.class);
+
     private VideoRendererTestActivity videoRendererTestActivity;
     private CameraCapturer cameraCapturer;
     private FakeVideoCapturer fakeVideoCapturer;
@@ -64,8 +61,9 @@ public class VideoRendererTest extends BaseVideoTest {
     public void setup() throws InterruptedException {
         super.setup();
         videoRendererTestActivity = activityRule.getActivity();
-        cameraCapturer = new CameraCapturer(videoRendererTestActivity,
-                CameraCapturer.CameraSource.FRONT_CAMERA);
+        cameraCapturer =
+                new CameraCapturer(
+                        videoRendererTestActivity, CameraCapturer.CameraSource.FRONT_CAMERA);
         fakeVideoCapturer = new FakeVideoCapturer();
         cameraVideoTrack = LocalVideoTrack.create(videoRendererTestActivity, true, cameraCapturer);
         fakeVideoTrack = LocalVideoTrack.create(videoRendererTestActivity, true, fakeVideoCapturer);
@@ -94,13 +92,15 @@ public class VideoRendererTest extends BaseVideoTest {
         cameraVideoTrack.addRenderer(bitmapVideoRenderer);
 
         // Request bitmap
-        bitmapVideoRenderer.captureBitmap(bitmap -> {
-            assertNotNull(bitmap);
-            videoRendererTestActivity.runOnUiThread(() -> {
-                imageView.setImageBitmap(bitmap);
-                bitmapCaptured.countDown();
-            });
-        });
+        bitmapVideoRenderer.captureBitmap(
+                bitmap -> {
+                    assertNotNull(bitmap);
+                    videoRendererTestActivity.runOnUiThread(
+                            () -> {
+                                imageView.setImageBitmap(bitmap);
+                                bitmapCaptured.countDown();
+                            });
+                });
 
         // Validate we received bitmap
         assertTrue(bitmapCaptured.await(BITMAP_TIMEOUT_MS, TimeUnit.MILLISECONDS));
@@ -116,13 +116,15 @@ public class VideoRendererTest extends BaseVideoTest {
         fakeVideoTrack.addRenderer(bitmapVideoRenderer);
 
         // Request bitmap
-        bitmapVideoRenderer.captureBitmap(bitmap -> {
-            assertNotNull(bitmap);
-            videoRendererTestActivity.runOnUiThread(() -> {
-                imageView.setImageBitmap(bitmap);
-                bitmapCaptured.countDown();
-            });
-        });
+        bitmapVideoRenderer.captureBitmap(
+                bitmap -> {
+                    assertNotNull(bitmap);
+                    videoRendererTestActivity.runOnUiThread(
+                            () -> {
+                                imageView.setImageBitmap(bitmap);
+                                bitmapCaptured.countDown();
+                            });
+                });
 
         // Validate we received bitmap
         assertTrue(bitmapCaptured.await(BITMAP_TIMEOUT_MS, TimeUnit.MILLISECONDS));

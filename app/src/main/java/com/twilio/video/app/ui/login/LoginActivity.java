@@ -19,19 +19,14 @@ package com.twilio.video.app.ui.login;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.os.Build;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.v7.app.AlertDialog;
-import android.support.v7.preference.PreferenceManager;
 import android.widget.Toast;
-
+import butterknife.ButterKnife;
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInResult;
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.common.api.ResultCallback;
-import com.google.android.gms.common.api.Status;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.twilio.video.app.R;
@@ -39,11 +34,7 @@ import com.twilio.video.app.base.BaseActivity;
 import com.twilio.video.app.data.Preferences;
 import com.twilio.video.app.ui.room.RoomActivity;
 import com.twilio.video.app.util.AuthHelper;
-import com.twilio.video.app.util.BuildConfigUtils;
-
 import javax.inject.Inject;
-
-import butterknife.ButterKnife;
 import timber.log.Timber;
 
 public class LoginActivity extends BaseActivity
@@ -66,9 +57,9 @@ public class LoginActivity extends BaseActivity
 
         if (savedInstanceState == null) {
             getSupportFragmentManager()
-                .beginTransaction()
-                .add(R.id.login_fragment_container, LoginLandingFragment.newInstance())
-                .commit();
+                    .beginTransaction()
+                    .add(R.id.login_fragment_container, LoginLandingFragment.newInstance())
+                    .commit();
         }
     }
 
@@ -79,9 +70,11 @@ public class LoginActivity extends BaseActivity
             if (googleApiClient == null) {
                 googleApiClient = AuthHelper.buildGoogleAPIClient(this, null);
             }
-            AuthHelper.signOut(googleApiClient, status -> {
-                // TODO: stop spinning
-            });
+            AuthHelper.signOut(
+                    googleApiClient,
+                    status -> {
+                        // TODO: stop spinning
+                    });
         }
         super.onResume();
     }
@@ -107,10 +100,11 @@ public class LoginActivity extends BaseActivity
                 }
             };
 
-    private AuthHelper.ErrorListener errorListener = errorCode -> {
-        processError(errorCode);
-        dismissAuthenticatingDialog();
-    };
+    private AuthHelper.ErrorListener errorListener =
+            errorCode -> {
+                processError(errorCode);
+                dismissAuthenticatingDialog();
+            };
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -130,8 +124,7 @@ public class LoginActivity extends BaseActivity
     @Override
     public void onSignInWithGoogle() {
         if (googleApiClient == null) {
-            googleApiClient =
-                AuthHelper.buildGoogleAPIClient(this, errorListener);
+            googleApiClient = AuthHelper.buildGoogleAPIClient(this, errorListener);
         }
         Intent intent = Auth.GoogleSignInApi.getSignInIntent(googleApiClient);
         showAuthenticatingDialog();
@@ -142,10 +135,10 @@ public class LoginActivity extends BaseActivity
     @Override
     public void onSignInWithEmail() {
         getSupportFragmentManager()
-            .beginTransaction()
-            .add(R.id.login_fragment_container, ExistingAccountLoginFragment.newInstance())
-            .addToBackStack(null)
-            .commit();
+                .beginTransaction()
+                .add(R.id.login_fragment_container, ExistingAccountLoginFragment.newInstance())
+                .addToBackStack(null)
+                .commit();
     }
 
     // ExistingAccountLoginFragment
@@ -164,10 +157,11 @@ public class LoginActivity extends BaseActivity
     private void saveIdentity(FirebaseUser user) {
         String email = (user.getEmail() != null) ? user.getEmail() : "";
 
-        sharedPreferences.edit()
-            .putString(Preferences.EMAIL, email)
-            .putString(Preferences.DISPLAY_NAME, getDisplayName(user))
-            .apply();
+        sharedPreferences
+                .edit()
+                .putString(Preferences.EMAIL, email)
+                .putString(Preferences.DISPLAY_NAME, getDisplayName(user))
+                .apply();
     }
 
     private String getDisplayName(FirebaseUser user) {
@@ -184,7 +178,7 @@ public class LoginActivity extends BaseActivity
 
     private void processError(@AuthHelper.Error int errorCode) {
         switch (errorCode) {
-            case AuthHelper.ERROR_UNAUTHORIZED_EMAIL :
+            case AuthHelper.ERROR_UNAUTHORIZED_EMAIL:
                 Timber.e("Unathorized email.");
                 showUnauthorizedEmailDialog();
                 break;
@@ -207,15 +201,16 @@ public class LoginActivity extends BaseActivity
     }
 
     private void showUnauthorizedEmailDialog() {
-        AlertDialog dialog = new AlertDialog.Builder(this, R.style.AppTheme_Dialog)
-            .setTitle(getString(R.string.unauthorized_title))
-            .setMessage(getString(R.string.unauthorized_desc))
-            .setPositiveButton("OK", null)
-            .show();
+        AlertDialog dialog =
+                new AlertDialog.Builder(this, R.style.AppTheme_Dialog)
+                        .setTitle(getString(R.string.unauthorized_title))
+                        .setMessage(getString(R.string.unauthorized_desc))
+                        .setPositiveButton("OK", null)
+                        .show();
     }
 
     private void dismissAuthenticatingDialog() {
-        if( progressDialog != null ) {
+        if (progressDialog != null) {
             progressDialog.dismiss();
         }
     }

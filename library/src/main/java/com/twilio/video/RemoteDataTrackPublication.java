@@ -19,9 +19,7 @@ package com.twilio.video;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-/**
- * A remote data track publication represents a {@link RemoteDataTrack}.
- */
+/** A remote data track publication represents a {@link RemoteDataTrack}. */
 public class RemoteDataTrackPublication implements DataTrackPublication {
     private final String sid;
     private final String name;
@@ -29,10 +27,8 @@ public class RemoteDataTrackPublication implements DataTrackPublication {
     private boolean subscribed;
     private boolean enabled;
 
-    RemoteDataTrackPublication(boolean subscribed,
-                               boolean enabled,
-                               @NonNull String sid,
-                               @NonNull String name) {
+    RemoteDataTrackPublication(
+            boolean subscribed, boolean enabled, @NonNull String sid, @NonNull String name) {
         this.enabled = enabled;
         this.subscribed = subscribed;
         this.sid = sid;
@@ -53,7 +49,8 @@ public class RemoteDataTrackPublication implements DataTrackPublication {
      * returned if the track is not subscribed to.
      */
     @Override
-    @Nullable public synchronized DataTrack getDataTrack() {
+    @Nullable
+    public synchronized DataTrack getDataTrack() {
         return remoteDataTrack;
     }
 
@@ -66,17 +63,13 @@ public class RemoteDataTrackPublication implements DataTrackPublication {
         return name;
     }
 
-    /**
-     * Returns true if the published data track is enabled or false otherwise.
-     */
+    /** Returns true if the published data track is enabled or false otherwise. */
     @Override
     public boolean isTrackEnabled() {
         return enabled;
     }
 
-    /**
-     * Check if the remote data track is subscribed to by the {@link LocalParticipant}.
-     */
+    /** Check if the remote data track is subscribed to by the {@link LocalParticipant}. */
     public synchronized boolean isTrackSubscribed() {
         return subscribed;
     }
@@ -85,7 +78,8 @@ public class RemoteDataTrackPublication implements DataTrackPublication {
      * Returns the published remote data track. {@code null} is returned if the track is not
      * subscribed to.
      */
-    @Nullable public synchronized RemoteDataTrack getRemoteDataTrack() {
+    @Nullable
+    public synchronized RemoteDataTrack getRemoteDataTrack() {
         return remoteDataTrack;
     }
 
