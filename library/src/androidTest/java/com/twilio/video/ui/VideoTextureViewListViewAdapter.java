@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Twilio, Inc.
+ * Copyright (C) 2018 Twilio, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,24 +23,24 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 import com.twilio.video.LocalVideoTrack;
+import com.twilio.video.R;
 import com.twilio.video.VideoScaleType;
-import com.twilio.video.VideoView;
-import com.twilio.video.test.R;
+import com.twilio.video.VideoTextureView;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 /*
- * ListView adapter that renders local video tracks to a VideoView and TextView.
+ * ListView adapter that renders local video tracks to a VideoTextureView and TextView.
  */
-public class VideoViewListViewAdapter extends BaseAdapter {
+public class VideoTextureViewListViewAdapter extends BaseAdapter {
     private static final String TAG = "VideoViewListAdapter";
 
     private final List<LocalVideoTrack> localVideoTracks;
     private final Map<ViewHolder, LocalVideoTrack> viewHolderMap = new HashMap<>();
     public final Map<Integer, ViewHolder> viewHolderPositionMap = new HashMap<>();
 
-    public VideoViewListViewAdapter(List<LocalVideoTrack> localVideoTracks) {
+    public VideoTextureViewListViewAdapter(List<LocalVideoTrack> localVideoTracks) {
         this.localVideoTracks = localVideoTracks;
     }
 
@@ -65,13 +65,12 @@ public class VideoViewListViewAdapter extends BaseAdapter {
     @Override
     public View getView(int i, View view, ViewGroup viewGroup) {
         Log.d(TAG, "getView");
-
         // Create view holder if needed
         if (view == null) {
             LayoutInflater inflater = LayoutInflater.from(viewGroup.getContext());
-            view = inflater.inflate(com.twilio.video.test.R.layout.video_view_item, null);
+            view = inflater.inflate(com.twilio.video.R.layout.video_texture_view_item, null);
             TextView trackNameTextView = view.findViewById(R.id.track_name_text_view);
-            VideoView videoView = view.findViewById(R.id.video_view);
+            VideoTextureView videoView = view.findViewById(R.id.video_texture_view);
             FrameCountProxyRendererListener frameCountProxyRendererListener =
                     new FrameCountProxyRendererListener(videoView);
 
@@ -89,7 +88,7 @@ public class VideoViewListViewAdapter extends BaseAdapter {
 
         // Update view holder
         holder.trackNameTextView.setText(localVideoTrack.getName());
-        ((VideoView) holder.frameCountProxyRendererListener.getVideoRenderer())
+        ((VideoTextureView) holder.frameCountProxyRendererListener.getVideoRenderer())
                 .setVideoScaleType(VideoScaleType.ASPECT_FILL);
         localVideoTrack.addRenderer(holder.frameCountProxyRendererListener);
         viewHolderMap.put(holder, localVideoTrack);

@@ -1,5 +1,10 @@
 The Twilio Programmable Video SDKs use [Semantic Versioning](http://www.semver.org).
 
+####2.2.0
+Features
+
+- Added `VideoTextureView`. `VideoTextureView` is similar to `VideoView` but subclasses `TextureView` instead of `SurfaceView`. Unlike SurfaceView, TextureView does not create a separate window but behaves as a regular View. This key difference allows a TextureView to be moved, transformed, animated, etc. For more see the [TextureView documentation](https://developer.android.com/reference/android/view/TextureView.html). If you were previously using [this gist](https://gist.github.com/aaalaniz/bfbc4891c98ef3b23558ff2260cbcc8e), please update your applications to use the `VideoTextureView` provided with the SDK. **NOTE**: `VideoTextureView` can experience dead locking on API Level 19 or below due to a [WebRTC bug](https://bugs.chromium.org/p/webrtc/issues/detail?id=5702). Use with discretion.
+
 ####2.1.1
 
 Improvements
