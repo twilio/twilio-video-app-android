@@ -117,6 +117,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.Callable;
 import javax.inject.Inject;
@@ -603,7 +604,7 @@ public class RoomActivity extends BaseActivity {
          * across different devices.
          */
         return BuildConfigUtils.isInternalFlavor() || BuildConfigUtils.isDevelopmentFlavor()
-                ? displayName + String.format(" (%s)", Build.SERIAL)
+                ? displayName + String.format(Locale.getDefault(), " %d", System.currentTimeMillis())
                 : displayName;
     }
 
