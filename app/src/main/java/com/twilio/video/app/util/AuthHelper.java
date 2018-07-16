@@ -80,7 +80,6 @@ public class AuthHelper {
                                 public void onComplete(@NonNull Task<AuthResult> task) {
                                     if (!task.isSuccessful()) {
                                         errorListener.onError(ERROR_AUTHENTICATION_FAILED);
-                                        return;
                                     }
                                 }
                             });
@@ -109,7 +108,6 @@ public class AuthHelper {
                             public void onComplete(@NonNull Task<AuthResult> task) {
                                 if (!task.isSuccessful()) {
                                     errorListener.onError(ERROR_AUTHENTICATION_FAILED);
-                                    return;
                                 }
                             }
                         });
