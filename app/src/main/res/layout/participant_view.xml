@@ -14,7 +14,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <com.twilio.video.VideoView
+        <com.twilio.video.VideoTextureView
             android:id="@+id/participant_video"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
