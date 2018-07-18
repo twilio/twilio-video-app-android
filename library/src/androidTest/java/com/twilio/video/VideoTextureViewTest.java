@@ -20,6 +20,7 @@ import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.matcher.ViewMatchers.withContentDescription;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assume.assumeTrue;
 
 import android.os.Build;
 import android.support.test.InstrumentationRegistry;
@@ -39,9 +40,7 @@ import java.util.List;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import org.junit.After;
-import org.junit.Assume;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -49,7 +48,7 @@ import org.junit.runner.RunWith;
 @RunWith(JUnitParamsRunner.class)
 public class VideoTextureViewTest extends BaseVideoTest {
 
-    private static final int FRAME_DELAY_MS = 3500;
+    private static final int FRAME_DELAY_MS = 10000;
 
     @Rule
     public ActivityTestRule<VideoTextureViewTestActivity> activityRule =
@@ -59,24 +58,11 @@ public class VideoTextureViewTest extends BaseVideoTest {
     private RelativeLayout relativeLayout;
     private LocalVideoTrack localVideoTrack;
 
-    @BeforeClass
-    public static void checkIfValidTest() {
-        final Integer[] SDK_LEVEL_BLACK_LIST = {
-            Build.VERSION_CODES.KITKAT,
-        };
-
-        boolean isTestValid = true;
-        for (Integer SDK : SDK_LEVEL_BLACK_LIST) {
-            if (Build.VERSION.SDK_INT == SDK) {
-                isTestValid = false;
-            }
-        }
-        Assume.assumeTrue(isTestValid);
-    }
-
     @Before
     public void setup() throws InterruptedException {
         super.setup();
+        // VideoTextureView is known to occasioncally hang on devices less than Lollipop
+        assumeTrue(Build.VERSION.SDK_INT > Build.VERSION_CODES.KITKAT);
         videoViewTestActivity = activityRule.getActivity();
         relativeLayout =
                 videoViewTestActivity.findViewById(com.twilio.video.R.id.relative_layout_container);

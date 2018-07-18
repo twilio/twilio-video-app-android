@@ -1,45 +1,49 @@
-# The tests that rely heavily on the Stats API require much more time to execute. These tests
-# run in a separate test execution to ensure the entire test suite does not exceed the Firebase
-# Test Lab 30 minute physical device time limit.
-
-library-stats-instrumentation-tests:
-    timeout: 30m
+# Any tests that are network intensive are run on virtual devices because they do not run
+# on the same congested network as physical devices. Running select tests on virtual devices
+# ensures a more stable CI test execution and prevents test runs from exceeding the
+# Firebase Test Lab physical device 30 minute time limit.
+library-virtual-device-tests:
+    timeout: 60m
     type: instrumentation
     app: app/build/outputs/apk/internal/debug/app-internal-debug.apk
     test: library/build/outputs/apk/androidTest/debug/library-debug-androidTest.apk
     device:
-        - {model: m0, version: 18}
-        - {model: flo, version: 19}
-        - {model: flo, version: 21}
-        - {model: shamu, version: 22}
-        - {model: herolte, version: 23}
-        - {model: herolte, version: 24}
-        - {model: sailfish, version: 25}
-        - {model: sailfish, version: 26}
-        - {model: sailfish, version: 27}
+        - {model: Nexus5, version: 19}
+        - {model: Nexus5, version: 21}
+        - {model: Nexus5, version: 22}
+        - {model: Nexus5, version: 23}
+        - {model: Nexus5X, version: 23}
+        - {model: Nexus5X, version: 24}
+        - {model: Nexus5X, version: 25}
+        - {model: Pixel2, version: 26}
+        - {model: Pixel2, version: 27}
     test-targets:
         - class com.twilio.video.StatsTest
         - class com.twilio.video.StatsTopologyParameterizedTest
         - class com.twilio.video.CodecPreferencesTest
         - class com.twilio.video.MultiCodecParameterizedTest
+        - class com.twilio.video.LocalParticipantTopologyTest
+        - class com.twilio.video.DataTrackTopologyParameterizedTest
+        - class com.twilio.video.RemoteAudioTrackTopologyParameterizedTest#shouldAllowEnablePlayback[P2P]
+        - class com.twilio.video.RemoteAudioTrackTopologyParameterizedTest#shouldAllowEnablePlayback[GROUP]
 
-library-no-stats-instrumentation-tests:
+library-physical-device-tests:
     timeout: 30m
     type: instrumentation
     app: app/build/outputs/apk/internal/debug/app-internal-debug.apk
     test: library/build/outputs/apk/androidTest/debug/library-debug-androidTest.apk
     device:
         - {model: m0, version: 18}
-        - {model: flo, version: 19}
+        - {model: g3, version: 19}
         - {model: flo, version: 21}
-        - {model: shamu, version: 22}
+        - {model: A0001, version: 22}
         - {model: herolte, version: 23}
         - {model: herolte, version: 24}
         - {model: sailfish, version: 25}
-        - {model: sailfish, version: 26}
-        - {model: sailfish, version: 27}
+        - {model: walleye, version: 26}
+        - {model: walleye, version: 27}
     environment-variables:
-        notClass: com.twilio.video.StatsTest,com.twilio.video.StatsTopologyParameterizedTest,com.twilio.video.CodecPreferencesTest,com.twilio.video.MultiCodecParameterizedTest
+        notClass: com.twilio.video.LocalParticipantTopologyTest,com.twilio.video.DataTrackTopologyParameterizedTest,com.twilio.video.StatsTest,com.twilio.video.StatsTopologyParameterizedTest,com.twilio.video.CodecPreferencesTest,com.twilio.video.MultiCodecParameterizedTest,com.twilio.video.RemoteAudioTrackTopologyParameterizedTest#shouldAllowEnablePlayback[P2P],com.twilio.video.RemoteAudioTrackTopologyParameterizedTest#shouldAllowEnablePlayback[GROUP]
 
 library-camera-tests:
     timeout: 10m
@@ -71,8 +75,9 @@ library-camera-tests:
         - {model: lt02wifi, version: 19}
         - {model: m0, version: 18}
         - {model: sailfish, version: 25}
-        - {model: sailfish, version: 26}
         - {model: sailfish, version: 27}
+        - {model: walleye, version: 26}
+        - {model: walleye, version: 27}
         - {model: shamu, version: 22}
         - {model: zeroflte, version: 23}
         - {model: shamu, version: 22}

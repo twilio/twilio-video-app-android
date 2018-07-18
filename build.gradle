@@ -502,13 +502,14 @@ task publishLibraryJavadocs {
 }
 
 /*
- * The tests that rely heavily on the Stats API require much more time to execute. These tests
- * run in a separate test execution to ensure the entire test suite does not exceed the
- * Firebase Test Lab 30 minute physical device time limit.
+ * Any tests that are network intensive are run on virtual devices because they do not run
+ * on the same congested network as physical devices. Running select tests on virtual devices
+ * ensures a more stable CI test execution and prevents test runs from exceeding the
+ * Firebase Test Lab physical device 30 minute time limit.
  */
-
-task firebaseTestLabCheckLibraryStats(type: Exec) {
-    description = 'Runs library instrumentation tests that use Stats API on Firebase Test Lab'
+task firebaseTestLabCheckVirtualDevices(type: Exec) {
+    description = 'Runs subset of library instrumentation tests on Firebase Test Lab virtual ' +
+            'devices'
     group = 'Test'
     dependsOn 'library:assembleDebugAndroidTest'
     dependsOn 'app:assembleDebug'
@@ -520,12 +521,12 @@ task firebaseTestLabCheckLibraryStats(type: Exec) {
             '--no-record-video',
             '--project',
             'video-app-79418',
-            'video-app-args.yaml:library-stats-instrumentation-tests'
+            'video-app-args.yaml:library-virtual-device-tests'
 }
 
-task firebaseTestLabCheckLibraryNoStats(type: Exec) {
-    description = 'Runs library instrumentation tests that do not use Stats API on ' +
-            'Firebase Test Lab'
+task firebaseTestLabCheckPhysicalDevices(type: Exec) {
+    description = 'Runs subset of library instrumentation tests on Firebase Test Lab physical ' +
+            'devices'
     group = 'Test'
     dependsOn 'library:assembleDebugAndroidTest'
     dependsOn 'app:assembleDebug'
@@ -537,7 +538,7 @@ task firebaseTestLabCheckLibraryNoStats(type: Exec) {
             '--no-record-video',
             '--project',
             'video-app-79418',
-            'video-app-args.yaml:library-no-stats-instrumentation-tests'
+            'video-app-args.yaml:library-physical-device-tests'
 }
 
 task firebaseTestLabCheckLibraryCamera(type: Exec) {

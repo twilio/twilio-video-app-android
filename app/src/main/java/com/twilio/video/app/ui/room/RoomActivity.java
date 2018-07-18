@@ -604,7 +604,8 @@ public class RoomActivity extends BaseActivity {
          * across different devices.
          */
         return BuildConfigUtils.isInternalFlavor() || BuildConfigUtils.isDevelopmentFlavor()
-                ? displayName + String.format(Locale.getDefault(), " %d", System.currentTimeMillis())
+                ? displayName
+                        + String.format(Locale.getDefault(), " %d", System.currentTimeMillis())
                 : displayName;
     }
 
