@@ -159,5 +159,9 @@ jobs:
       script: ./gradlew -q app:uploadInternalReleaseToHockeyApp
     - stage: release candidate
       script: ./gradlew bintrayLibraryReleaseCandidateUpload incrementRc
+    - stage: release candidate
+      script: ./gradlew -q -PFirebaseServiceAccountFilePath=$TRAVIS_BUILD_DIR/$VIDEO_APP_CRASH_REPORTING_FILE app:firebaseUploadInternalReleaseProguardMapping
+    - stage: release candidate
+      script: ./gradlew -q -PreleaseCandidate=true app:uploadInternalReleaseToHockeyApp
     - stage: release
       script: ./gradlew bintrayLibraryReleaseUpload publishLibraryJavadocs incrementVersion
