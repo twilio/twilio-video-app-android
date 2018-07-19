@@ -188,7 +188,7 @@ public class LocalVideoTrack extends VideoTrack {
     }
 
     /** Retrieves the {@link VideoCapturer} associated with this video track. */
-    @Nullable
+    @NonNull
     public VideoCapturer getVideoCapturer() {
         return videoCapturer;
     }

@@ -223,7 +223,7 @@ public class Room {
      *
      * @return list of participants.
      */
-    @Nullable
+    @NonNull
     public synchronized List<RemoteParticipant> getRemoteParticipants() {
         return new ArrayList<>(participantMap.values());
     }

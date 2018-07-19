@@ -61,17 +61,20 @@ public class IceOptions {
         public Builder() {}
 
         /** Set of {@link IceServer} objects to be used during connection establishment. */
+        @NonNull
         public Builder iceServers(@NonNull Set<IceServer> iceServers) {
             this.iceServers = iceServers;
             return this;
         }
 
         /** The transport policy to use. Defaults to {@link IceTransportPolicy#ALL}. */
+        @NonNull
         public Builder iceTransportPolicy(@NonNull IceTransportPolicy iceTransportPolicy) {
             this.iceTransportPolicy = iceTransportPolicy;
             return this;
         }
 
+        @NonNull
         public IceOptions build() {
             return new IceOptions(this);
         }

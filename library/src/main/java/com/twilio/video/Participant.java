@@ -15,22 +15,28 @@
  */
 package com.twilio.video;
 
+import android.support.annotation.NonNull;
 import java.util.List;
 
 /** Interface that represents user in a {@link Room}. */
 public interface Participant {
     /** Returns unique identifier of a participant. */
+    @NonNull
     String getSid();
 
     /** Returns participant identity. */
+    @NonNull
     String getIdentity();
 
     /** Returns {@link AudioTrackPublication}s of participant. */
+    @NonNull
     List<AudioTrackPublication> getAudioTracks();
 
     /** Returns {@link VideoTrackPublication}s of participant. */
+    @NonNull
     List<VideoTrackPublication> getVideoTracks();
 
     /** Returns {@link DataTrackPublication}s of participant. */
+    @NonNull
     List<DataTrackPublication> getDataTracks();
 }

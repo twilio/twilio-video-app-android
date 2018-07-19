@@ -16,6 +16,7 @@
 
 package com.twilio.video;
 
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.VisibleForTesting;
 import java.util.ArrayList;
@@ -242,17 +243,19 @@ public class ConnectOptions {
         private EncodingParameters encodingParameters;
         private MediaFactory mediaFactory;
 
-        public Builder(String accessToken) {
+        public Builder(@NonNull String accessToken) {
             this.accessToken = accessToken;
         }
 
         /** The name of the room. */
+        @NonNull
         public Builder roomName(String roomName) {
             this.roomName = roomName;
             return this;
         }
 
         /** Audio tracks that will be published upon connection. */
+        @NonNull
         public Builder audioTracks(List<LocalAudioTrack> audioTracks) {
             Preconditions.checkNotNull(audioTracks, "LocalAudioTrack List must not be null");
             this.audioTracks = new ArrayList<>(audioTracks);
@@ -260,6 +263,7 @@ public class ConnectOptions {
         }
 
         /** Video tracks that will be published upon connection. */
+        @NonNull
         public Builder videoTracks(List<LocalVideoTrack> videoTracks) {
             Preconditions.checkNotNull(videoTracks, "LocalVideoTrack List must not be null");
             this.videoTracks = new ArrayList<>(videoTracks);
@@ -267,12 +271,14 @@ public class ConnectOptions {
         }
 
         /** Data tracks that will be published upon connection. */
+        @NonNull
         public Builder dataTracks(List<LocalDataTrack> dataTracks) {
             this.dataTracks = dataTracks;
             return this;
         }
 
         /** Custom ICE configuration used to connect to a Room. */
+        @NonNull
         public Builder iceOptions(IceOptions iceOptions) {
             this.iceOptions = iceOptions;
             return this;
@@ -282,6 +288,7 @@ public class ConnectOptions {
          * Enable sending stats data to Insights. Sending stats data to Insights is enabled by
          * default.
          */
+        @NonNull
         public Builder enableInsights(boolean enable) {
             this.enableInsights = enable;
             return this;
@@ -313,6 +320,7 @@ public class ConnectOptions {
          *          .build();
          * </code></pre>
          */
+        @NonNull
         public Builder preferAudioCodecs(List<AudioCodec> preferredAudioCodecs) {
             this.preferredAudioCodecs = new ArrayList<>(preferredAudioCodecs);
             return this;
@@ -344,12 +352,14 @@ public class ConnectOptions {
          *          .build();
          * </code></pre>
          */
+        @NonNull
         public Builder preferVideoCodecs(List<VideoCodec> preferredVideoCodecs) {
             this.preferredVideoCodecs = new ArrayList<>(preferredVideoCodecs);
             return this;
         }
 
         /** Set {@link EncodingParameters} for audio and video tracks shared to a {@link Room}. */
+        @NonNull
         public Builder encodingParameters(@Nullable EncodingParameters encodingParameters) {
             this.encodingParameters = encodingParameters;
             return this;
@@ -370,6 +380,7 @@ public class ConnectOptions {
          *
          * @throws Exception if accessToken is null or empty.
          */
+        @NonNull
         public ConnectOptions build() {
             Preconditions.checkNotNull(accessToken, "Token must not be null.");
             Preconditions.checkArgument(!accessToken.equals(""), "Token must not be empty.");

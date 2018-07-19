@@ -16,15 +16,19 @@
 
 package com.twilio.video;
 
+import android.support.annotation.NonNull;
+
 /** A published track represents a track that has been shared with a {@link Room}. */
 public interface TrackPublication {
     /**
      * Returns the track's server identifier. This value uniquely identifies the track within the
      * scope of a {@link Room}.
      */
+    @NonNull
     String getTrackSid();
 
     /** Returns the name of the published track. */
+    @NonNull
     String getTrackName();
 
     /** Returns true of track is enabled and false if not. */
