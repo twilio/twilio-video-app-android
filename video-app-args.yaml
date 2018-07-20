@@ -26,6 +26,7 @@ library-virtual-device-tests:
         - class com.twilio.video.DataTrackTopologyParameterizedTest
         - class com.twilio.video.RemoteAudioTrackTopologyParameterizedTest#shouldAllowEnablePlayback[P2P]
         - class com.twilio.video.RemoteAudioTrackTopologyParameterizedTest#shouldAllowEnablePlayback[GROUP]
+        - class com.twilio.video.IceTopologyParameterizedTest
 
 library-physical-device-tests:
     timeout: 30m
@@ -43,7 +44,7 @@ library-physical-device-tests:
         - {model: walleye, version: 26}
         - {model: walleye, version: 27}
     environment-variables:
-        notClass: com.twilio.video.LocalParticipantTopologyTest,com.twilio.video.DataTrackTopologyParameterizedTest,com.twilio.video.StatsTest,com.twilio.video.StatsTopologyParameterizedTest,com.twilio.video.CodecPreferencesTest,com.twilio.video.MultiCodecParameterizedTest,com.twilio.video.RemoteAudioTrackTopologyParameterizedTest#shouldAllowEnablePlayback[P2P],com.twilio.video.RemoteAudioTrackTopologyParameterizedTest#shouldAllowEnablePlayback[GROUP]
+        notClass: com.twilio.video.LocalParticipantTopologyTest,com.twilio.video.DataTrackTopologyParameterizedTest,com.twilio.video.StatsTest,com.twilio.video.StatsTopologyParameterizedTest,com.twilio.video.CodecPreferencesTest,com.twilio.video.MultiCodecParameterizedTest,com.twilio.video.RemoteAudioTrackTopologyParameterizedTest#shouldAllowEnablePlayback[P2P],com.twilio.video.RemoteAudioTrackTopologyParameterizedTest#shouldAllowEnablePlayback[GROUP],com.twilio.video.IceTopologyParameterizedTest
 
 library-camera-tests:
     timeout: 10m

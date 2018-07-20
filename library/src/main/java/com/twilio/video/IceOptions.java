@@ -29,10 +29,12 @@ import java.util.Set;
 public class IceOptions {
     private final Set<IceServer> iceServers;
     private final IceTransportPolicy iceTransportPolicy;
+    private final boolean abortOnIceServersTimeout;
 
     private IceOptions(Builder builder) {
         this.iceServers = builder.iceServers;
         this.iceTransportPolicy = builder.iceTransportPolicy;
+        this.abortOnIceServersTimeout = builder.abortOnIceServersTimeout;
     }
 
     public Set<IceServer> getIceServers() {
@@ -41,6 +43,10 @@ public class IceOptions {
 
     public IceTransportPolicy getIceTransportPolicy() {
         return iceTransportPolicy;
+    }
+
+    public boolean getAbortOnIceServersTimeout() {
+        return abortOnIceServersTimeout;
     }
 
     IceServer[] getIceServersArray() {
@@ -54,6 +60,7 @@ public class IceOptions {
     public static class Builder {
         private Set<IceServer> iceServers;
         private IceTransportPolicy iceTransportPolicy = IceTransportPolicy.ALL;
+        private boolean abortOnIceServersTimeout = false;
 
         public Builder() {}
 
@@ -66,6 +73,11 @@ public class IceOptions {
         /** The transport policy to use. Defaults to {@link IceTransportPolicy#ALL}. */
         public Builder iceTransportPolicy(IceTransportPolicy iceTransportPolicy) {
             this.iceTransportPolicy = iceTransportPolicy;
+            return this;
+        }
+
+        public Builder abortOnIceServersTimeout(boolean abortOnIceServersTimeout) {
+            this.abortOnIceServersTimeout = abortOnIceServersTimeout;
             return this;
         }
 
