@@ -76,6 +76,12 @@ public class IceOptions {
             return this;
         }
 
+        /**
+         * If fetching ICE servers times out (due to a restrictive network or a slow network proxy),
+         * then, by default, the Video SDK will fallback to using hard-coded STUN servers and
+         * continue connecting to the Room. Setting this property to true will instead abort with
+         * error 53500, "Unable to acquire configuration".
+         */
         public Builder abortOnIceServersTimeout(boolean abortOnIceServersTimeout) {
             this.abortOnIceServersTimeout = abortOnIceServersTimeout;
             return this;
