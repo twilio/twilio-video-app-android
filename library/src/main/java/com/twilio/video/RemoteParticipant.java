@@ -676,11 +676,7 @@ public class RemoteParticipant implements Participant {
      * @return true if the participant is connected to a room and false if not.
      */
     public synchronized boolean isConnected() {
-        if (!isReleased()) {
-            return nativeIsConnected(nativeParticipantContext);
-        } else {
-            return false;
-        }
+        return !isReleased() && nativeIsConnected(nativeParticipantContext);
     }
 
     synchronized void release() {

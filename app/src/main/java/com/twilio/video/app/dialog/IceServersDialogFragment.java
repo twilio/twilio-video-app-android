@@ -125,7 +125,7 @@ public class IceServersDialogFragment extends AppCompatDialogFragment {
                                 iceTransPolicySpinner.getSelectedItem().toString().toLowerCase();
                     }
                     listener.onIceOptionsSelected(
-                            transportPolicy, new ArrayList<TwilioIceServer>(selectedServers));
+                            transportPolicy, new ArrayList<>(selectedServers));
                 }
             }
         };
