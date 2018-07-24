@@ -337,12 +337,14 @@ public class RoomActivity extends BaseActivity {
     protected void onResume() {
         super.onResume();
         restoreCameraTrack();
+        initializeRoom();
         updateStats();
     }
 
     @Override
     protected void onPause() {
         removeCameraTrack();
+        removeAllParticipants();
         super.onPause();
     }
 
@@ -1320,40 +1322,44 @@ public class RoomActivity extends BaseActivity {
         };
     }
 
+    private void initializeRoom() {
+        if (room == null) return;
+        Timber.i(
+                "Connected to room -> name: %s, sid: %s, state: %s",
+                room.getName(), room.getSid(), room.getState());
+        localParticipant = room.getLocalParticipant();
+        localParticipantSid = localParticipant.getSid();
+
+        setAudioFocus(true);
+        updateStats();
+        updateUi(room);
+
+        // remove primary view
+        participantController.removePrimary();
+
+        // add local thumb and "click" on it to make primary
+        participantController.addThumb(
+                localParticipantSid,
+                getString(R.string.you),
+                cameraVideoTrack,
+                localAudioTrack == null,
+                cameraCapturer.getCameraSource() == CameraCapturer.CameraSource.FRONT_CAMERA);
+
+        participantController.getThumb(localParticipantSid, cameraVideoTrack).callOnClick();
+
+        // add existing room participants thumbs
+        boolean isFirstParticipant = true;
+        for (RemoteParticipant remoteParticipant : room.getRemoteParticipants()) {
+            addParticipant(remoteParticipant, isFirstParticipant);
+            isFirstParticipant = false;
+        }
+    }
+
     private Room.Listener roomListener() {
         return new Room.Listener() {
             @Override
             public void onConnected(final Room room) {
-                Timber.i(
-                        "Connected to room -> name: %s, sid: %s, state: %s",
-                        room.getName(), room.getSid(), room.getState());
-                localParticipant = room.getLocalParticipant();
-                localParticipantSid = localParticipant.getSid();
-
-                setAudioFocus(true);
-                updateStats();
-                updateUi(room);
-
-                // remove primary view
-                participantController.removePrimary();
-
-                // add local thumb and "click" on it to make primary
-                participantController.addThumb(
-                        localParticipantSid,
-                        getString(R.string.you),
-                        cameraVideoTrack,
-                        localAudioTrack == null,
-                        cameraCapturer.getCameraSource()
-                                == CameraCapturer.CameraSource.FRONT_CAMERA);
-
-                participantController.getThumb(localParticipantSid, cameraVideoTrack).callOnClick();
-
-                // add existing room participants thumbs
-                boolean isFirstParticipant = true;
-                for (RemoteParticipant remoteParticipant : room.getRemoteParticipants()) {
-                    addParticipant(remoteParticipant, isFirstParticipant);
-                    isFirstParticipant = false;
-                }
+                initializeRoom();
             }
 
             @Override
