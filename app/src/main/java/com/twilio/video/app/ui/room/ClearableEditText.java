@@ -16,6 +16,7 @@
 
 package com.twilio.video.app.ui.room;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Rect;
@@ -96,6 +97,7 @@ public class ClearableEditText extends AppCompatEditText {
         // simulate on clear icon click - delete edit text contents
         setOnTouchListener(
                 new OnTouchListener() {
+                    @SuppressLint("ClickableViewAccessibility")
                     @Override
                     public boolean onTouch(View view, MotionEvent motionEvent) {
 

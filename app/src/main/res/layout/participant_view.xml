@@ -49,6 +49,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
+            android:contentDescription="@string/profile_picture"
             app:srcCompat="@drawable/ic_account_circle_white_24dp" />
 
         <TextView
@@ -71,6 +72,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
         android:layout_margin="6dp"
+        android:contentDescription="@string/audio_toggle"
         app:srcCompat="@drawable/ic_thumbnail_no_audio" />
 
 </FrameLayout>

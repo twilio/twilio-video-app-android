@@ -156,6 +156,7 @@
                     android:id="@+id/stats_disabled_image"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:contentDescription="@string/stats_disabled"
                     app:srcCompat="@drawable/ic_stats_disabled_image"/>
                 <TextView
                     android:id="@+id/stats_disabled_title"

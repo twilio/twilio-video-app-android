@@ -50,6 +50,7 @@
                 android:layout_width="74dp"
                 android:layout_height="74dp"
                 android:layout_gravity="center_horizontal"
+                android:contentDescription="@string/video_logo"
                 android:src="@drawable/video_logo_splash"/>
 
             <EditText
