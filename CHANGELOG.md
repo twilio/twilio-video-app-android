@@ -1,5 +1,11 @@
 The Twilio Programmable Video SDKs use [Semantic Versioning](http://www.semver.org).
 
+####3.0.0-preview2
+
+Improvements
+
+- Added `@NonNull` `@Nullable` annotations to a few additional classes.
+
 ####3.0.0-preview1
 
 Improvements
