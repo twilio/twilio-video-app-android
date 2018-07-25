@@ -19,9 +19,9 @@
 
 #include <jni.h>
 
-#include "video/video.h"
-#include "video/stats_observer.h"
-#include "video/room.h"
+#include "twilio/video/video.h"
+#include "twilio/video/stats_observer.h"
+#include "twilio/video/room.h"
 
 #include "webrtc/sdk/android/src/jni/jni_helpers.h"
 

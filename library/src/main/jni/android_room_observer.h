@@ -18,8 +18,8 @@
 #define VIDEO_ANDROID_ANDROID_ROOM_OBSERVER_H_
 
 #include "webrtc/sdk/android/src/jni/jni_helpers.h"
-#include "video/room_observer.h"
-#include "video/remote_participant.h"
+#include "twilio/video/room_observer.h"
+#include "twilio/video/remote_participant.h"
 #include "com_twilio_video_RemoteParticipant.h"
 #include "com_twilio_video_LocalParticipant.h"
 

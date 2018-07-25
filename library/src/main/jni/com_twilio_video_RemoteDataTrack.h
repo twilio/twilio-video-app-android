@@ -18,7 +18,7 @@
 #define VIDEO_ANDROID_COM_TWILIO_VIDEO_REMOTEDATATRACK_H_
 
 #include <jni.h>
-#include "media/track.h"
+#include "twilio/media/track.h"
 
 #ifdef __cplusplus
 extern "C" {

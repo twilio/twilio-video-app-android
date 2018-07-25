@@ -17,7 +17,7 @@
 #ifndef VIDEO_ANDROID_LOGGING_H_
 #define VIDEO_ANDROID_LOGGING_H_
 
-#include "video/video.h"
+#include "twilio/video/video.h"
 
 /*
  * Convenience log macro that inserts the file, function, and line into a log message.

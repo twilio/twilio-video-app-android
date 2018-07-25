@@ -20,7 +20,7 @@
 
 #include "webrtc/sdk/android/src/jni/classreferenceholder.h"
 
-#include "video/video.h"
+#include "twilio/video/video.h"
 #include "jni_utils.h"
 #include "webrtc/modules/utility/include/helpers_android.h"
 

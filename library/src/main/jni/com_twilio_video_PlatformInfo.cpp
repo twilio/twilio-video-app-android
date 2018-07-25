@@ -15,7 +15,7 @@
  */
 
 #include "com_twilio_video_PlatformInfo.h"
-#include "video/video.h"
+#include "twilio/video/video.h"
 #include "webrtc/sdk/android/src/jni/jni_helpers.h"
 #include "logging.h"
 #include "jni_utils.h"

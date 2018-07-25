@@ -90,8 +90,8 @@ twilio::media::MediaOptions getMediaOptions(jobject j_media_options) {
     }
 
     // Set the fake encoder and decoder factories
-    media_options.video_encoder_factory = fake_video_encoder_factory;
-    media_options.video_decoder_factory = fake_video_decoder_factory;
+    media_options.video_encoder_factory = std::unique_ptr<cricket::WebRtcVideoEncoderFactory>(fake_video_encoder_factory);
+    media_options.video_decoder_factory = std::unique_ptr<cricket::WebRtcVideoDecoderFactory>(fake_video_decoder_factory);
 
     return media_options;
 }
@@ -324,12 +324,12 @@ JNIEXPORT jlong JNICALL Java_com_twilio_video_MediaFactory_nativeCreate(JNIEnv *
     // Enable use of textures for decoding
     video_decoder_factory->SetEGLContext(jni, j_egl_remote_context);
 
-    media_options.video_encoder_factory = video_encoder_factory;
-    media_options.video_decoder_factory = video_decoder_factory;
+    media_options.video_encoder_factory = std::unique_ptr<cricket::WebRtcVideoEncoderFactory>(video_encoder_factory);
+    media_options.video_decoder_factory = std::unique_ptr<cricket::WebRtcVideoDecoderFactory>(video_decoder_factory);
     std::shared_ptr<twilio::media::MediaFactory> media_factory =
-            twilio::media::MediaFactory::create(media_options);
+            twilio::media::MediaFactory::create(std::move(media_options));
 
-    return webrtc::NativeToJavaPointer(new MediaFactoryContext(media_options, media_factory));
+    return webrtc::NativeToJavaPointer(new MediaFactoryContext(std::move(media_options), media_factory));
 }
 
 JNIEXPORT jobject JNICALL Java_com_twilio_video_MediaFactory_nativeCreateAudioTrack(JNIEnv *jni,
@@ -388,7 +388,7 @@ JNIEXPORT jobject JNICALL Java_com_twilio_video_MediaFactory_nativeCreateVideoTr
                        ("") :
                        (JavaToUTF8StdString(jni, j_name));
     rtc::scoped_refptr<webrtc::VideoTrackSourceInterface> video_track_source =
-            media_factory->createVideoSource(capturer,
+            media_factory->createVideoSource(std::unique_ptr<cricket::VideoCapturer>(capturer),
                                              getVideoConstraints(j_video_contraints));
     twilio::media::VideoTrackOptions video_track_options =
             twilio::media::VideoTrackOptions(enabled, name);
@@ -465,9 +465,9 @@ JNIEXPORT jlong JNICALL Java_com_twilio_video_MediaFactory_nativeTestCreate(JNIE
     twilio::media::MediaOptions media_options = getMediaOptions(j_media_options);
 
     std::shared_ptr<twilio::media::MediaFactory> media_factory =
-            twilio::media::MediaFactory::create(media_options);
+            twilio::media::MediaFactory::create(std::move(media_options));
 
-    return webrtc::NativeToJavaPointer(new MediaFactoryContext(media_options, media_factory));
+    return webrtc::NativeToJavaPointer(new MediaFactoryContext(std::move(media_options), media_factory));
 }
 
 /*

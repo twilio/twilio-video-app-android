@@ -21,7 +21,7 @@
 #include "webrtc/modules/utility/include/jvm_android.h"
 #include "webrtc/sdk/android/src/jni/classreferenceholder.h"
 #include "webrtc/rtc_base/ssladapter.h"
-#include "video/video.h"
+#include "twilio/video/video.h"
 #include "android_room_observer.h"
 #include "com_twilio_video_ConnectOptions.h"
 #include "com_twilio_video_Room.h"

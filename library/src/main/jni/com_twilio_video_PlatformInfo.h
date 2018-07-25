@@ -15,7 +15,7 @@
  */
 
 #include <jni.h>
-#include "video/platform_info.h"
+#include "twilio/video/platform_info.h"
 
 #ifndef VIDEO_ANDROID_COM_TWILIO_VIDEO_PLATFORMINFO_H_
 #define VIDEO_ANDROID_COM_TWILIO_VIDEO_PLATFORMINFO_H_

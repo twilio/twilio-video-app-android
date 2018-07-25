@@ -20,7 +20,7 @@
 #include <jni.h>
 #include <memory>
 #include <map>
-#include "video/remote_participant.h"
+#include "twilio/video/remote_participant.h"
 #include "android_participant_observer.h"
 
 namespace twilio_video_jni {

@@ -19,8 +19,8 @@
 
 #include "webrtc/sdk/android/src/jni/jni_helpers.h"
 
-#include "video/stats_observer.h"
-#include "video/stats_report.h"
+#include "twilio/video/stats_observer.h"
+#include "twilio/video/stats_report.h"
 #include "class_reference_holder.h"
 #include "logging.h"
 #include "jni_utils.h"

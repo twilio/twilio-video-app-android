@@ -16,7 +16,7 @@
 
 #include "android_room_observer.h"
 
-#include "video/room.h"
+#include "twilio/video/room.h"
 #include "class_reference_holder.h"
 #include "logging.h"
 #include "jni_utils.h"

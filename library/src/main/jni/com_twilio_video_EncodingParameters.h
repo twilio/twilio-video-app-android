@@ -18,7 +18,7 @@
 #define VIDEO_ANDROID_COM_TWILIO_VIDEO_ENCODINGPARAMETERS_H_
 
 #include <jni.h>
-#include "media/codec.h"
+#include "twilio/media/codec.h"
 
 namespace twilio_video_jni {
 

@@ -18,7 +18,7 @@
 #define VIDEO_ANDROID_COM_TWILIO_VIDEO_MEDIAFACTORY_H_
 
 #include <jni.h>
-#include "media/media_factory.h"
+#include "twilio/media/media_factory.h"
 
 namespace twilio_video_jni {
 
@@ -26,7 +26,7 @@ class MediaFactoryContext {
 public:
     MediaFactoryContext(twilio::media::MediaOptions media_options,
                         std::shared_ptr<twilio::media::MediaFactory> media_factory) :
-            media_options_(media_options),
+            media_options_(std::move(media_options)),
             media_factory_(media_factory) {
 
     }

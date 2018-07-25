@@ -16,7 +16,7 @@
 
 #include "android_local_participant_observer.h"
 #include "class_reference_holder.h"
-#include "video/video.h"
+#include "twilio/video/video.h"
 #include "logging.h"
 #include "com_twilio_video_LocalParticipant.h"
 #include "com_twilio_video_LocalAudioTrack.h"

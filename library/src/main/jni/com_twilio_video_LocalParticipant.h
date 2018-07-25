@@ -18,7 +18,7 @@
 #define VIDEO_ANDROID_COM_TWILIO_VIDEO_LOCALPARTICIPANT_H_
 
 #include <jni.h>
-#include "video/local_participant.h"
+#include "twilio/video/local_participant.h"
 #include "android_local_participant_observer.h"
 
 #ifdef __cplusplus

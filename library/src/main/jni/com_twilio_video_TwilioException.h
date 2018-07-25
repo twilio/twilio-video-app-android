@@ -18,7 +18,7 @@
 #define VIDEO_ANDROID_COM_TWILIO_VIDEO_TWILIOEXCEPTION_H_
 
 #include <jni.h>
-#include "video/twilio_error.h"
+#include "twilio/video/twilio_error.h"
 
 #ifdef __cplusplus
 extern "C" {

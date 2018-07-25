@@ -18,8 +18,8 @@
 #define VIDEO_ANDROID_ANDROID_REMOTE_DATA_TRACK_OBSERVER_H_
 
 #include <jni.h>
-#include "media/track.h"
-#include "media/track_observer.h"
+#include "twilio/media/track.h"
+#include "twilio/media/track_observer.h"
 #include "webrtc/sdk/android/src/jni/jni_helpers.h"
 
 namespace twilio_video_jni {

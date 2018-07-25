@@ -19,8 +19,8 @@
 
 #include "webrtc/sdk/android/src/jni/jni_helpers.h"
 
-#include "media/track.h"
-#include "video/local_participant_observer.h"
+#include "twilio/media/track.h"
+#include "twilio/video/local_participant_observer.h"
 
 namespace twilio_video_jni {
 
