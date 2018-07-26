@@ -58,7 +58,7 @@ public class FirebaseAuthInterceptor implements Interceptor {
         }
 
         firebaseUser
-                .getToken(true)
+                .getIdToken(true)
                 .addOnSuccessListener(
                         new OnSuccessListener<GetTokenResult>() {
                             @Override
