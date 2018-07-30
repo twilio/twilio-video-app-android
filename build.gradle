@@ -513,7 +513,6 @@ task firebaseTestLabCheckVirtualDevices(type: Exec) {
             'devices'
     group = 'Test'
     dependsOn 'library:assembleDebugAndroidTest'
-    dependsOn 'app:assembleDebug'
     commandLine 'gcloud',
             'firebase',
             'test',
@@ -530,7 +529,6 @@ task firebaseTestLabCheckPhysicalDevices(type: Exec) {
             'devices'
     group = 'Test'
     dependsOn 'library:assembleDebugAndroidTest'
-    dependsOn 'app:assembleDebug'
     commandLine 'gcloud',
             'firebase',
             'test',
@@ -546,7 +544,6 @@ task firebaseTestLabCheckLibraryCamera(type: Exec) {
     description = 'Runs library instrumentation tests that use camera on Firebase Test Lab'
     group = 'Test'
     dependsOn 'library:assembleDebugAndroidTest'
-    dependsOn 'app:assembleDebug'
     commandLine 'gcloud',
             'firebase',
             'test',
@@ -616,10 +613,12 @@ task librarySizeReport(type: GradleBuild) {
         println(videoAndroidSizeReport)
 
         // Post PR comment with report
-        if (System.env.TRAVIS_PULL_REQUEST) {
+        if (System.env.CIRCLE_PULL_REQUEST) {
+            def githubPullRequestNumber = Arrays.asList(
+                    System.env.CIRCLE_PULL_REQUEST.split("/")).last()
             def githubPullRequestUrl = new URL("https://api.github.com/repos/" +
-                    "${System.env.TRAVIS_REPO_SLUG}" +
-                    "/issues/${System.env.TRAVIS_PULL_REQUEST}/comments")
+                    "${System.env.CIRCLE_PROJECT_USERNAME}/${System.env.CIRCLE_PROJECT_REPONAME}" +
+                    "/issues/${githubPullRequestNumber}/comments")
             exec {
                 workingDir "${rootDir}"
                 commandLine "curl",
@@ -637,7 +636,7 @@ task bintrayLibrarySnapshotUpload(type: GradleBuild) {
     description = 'Publish Video Android AAR snapshot to Bintray'
     group = 'Publishing'
     buildFile = file('library/build.gradle')
-    tasks = ['clean', 'assembleRelease', 'uploadArchives']
+    tasks = ['assembleRelease', 'uploadArchives']
     startParameter.projectProperties += gradle.startParameter.projectProperties + [
             'snapshot': true,
             'maven.repo': 'https://api.bintray.com/maven/twilio/snapshots/video-android/;publish=1',
