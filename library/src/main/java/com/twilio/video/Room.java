@@ -245,7 +245,7 @@ public class Room {
 
     /** Returns whether any media in the Room is being recorded. */
     public synchronized boolean isRecording() {
-        return roomState == RoomState.CONNECTED ? nativeIsRecording(nativeRoomDelegate) : false;
+        return roomState == RoomState.CONNECTED && nativeIsRecording(nativeRoomDelegate);
     }
 
     /**
