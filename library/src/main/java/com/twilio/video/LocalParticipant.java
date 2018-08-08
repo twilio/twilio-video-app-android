@@ -450,21 +450,15 @@ public class LocalParticipant implements Participant {
     }
 
     private void addAudioTracks(List<LocalAudioTrackPublication> localAudioTrackPublications) {
-        for (LocalAudioTrackPublication localAudioTrackPublication : localAudioTrackPublications) {
-            this.audioTrackPublications.add(localAudioTrackPublication);
-        }
+        this.audioTrackPublications.addAll(localAudioTrackPublications);
     }
 
     private void addVideoTracks(List<LocalVideoTrackPublication> localVideoTrackPublications) {
-        for (LocalVideoTrackPublication localVideoTrackPublication : localVideoTrackPublications) {
-            this.videoTrackPublications.add(localVideoTrackPublication);
-        }
+        this.videoTrackPublications.addAll(localVideoTrackPublications);
     }
 
     private void addDataTracks(List<LocalDataTrackPublication> localDataTrackPublications) {
-        for (LocalDataTrackPublication localDataTrackPublication : localDataTrackPublications) {
-            this.dataTrackPublications.add(localDataTrackPublication);
-        }
+        this.dataTrackPublications.addAll(localDataTrackPublications);
     }
 
     private void removePublishedAudioTrack(LocalAudioTrack localAudioTrack) {
