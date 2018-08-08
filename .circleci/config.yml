@@ -1,0 +1,402 @@
+version: 2.0
+
+aliases:
+  # Workspace
+  - &workspace
+    ~/twilio-video-android
+
+  # Cache
+  - &android-ndk-cache-key
+    key: android-ndk-r12b-{{ checksum "scripts/install-android-ndk.sh" }}
+  - &restore-cache-android-ndk
+    <<: *android-ndk-cache-key
+    name: Restore Android NDK
+  - &save-cache-android-ndk
+    <<: *android-ndk-cache-key
+    name: Save Android NDK Cache
+    paths:
+      - /opt/android-ndk
+
+  - &gradle-cache-key
+    key: jars-{{ checksum "build.gradle" }}-{{ checksum "gradle/wrapper/gradle-wrapper.properties" }}
+  - &restore-cache-gradle
+    <<: *gradle-cache-key
+    name: Restore Gradle Cache
+  - &save-cache-gradle
+    <<: *gradle-cache-key
+    name: Save Gradle Cache
+    paths:
+      - ~/.gradle/caches
+      - ~/.gradle/wrapper
+
+  # Dependencies
+  - &create-android-ndk-directory
+    name: Create Android NDK Directory
+    command: |
+      if [[ ! -e /opt/android-ndk ]]; then
+        sudo mkdir /opt/android-ndk
+      fi
+      sudo chown ${USER:=$(/usr/bin/id -run)}:$USER /opt/android-ndk
+
+  - &install-android-ndk
+    name: Install Android NDK
+    command: scripts/install-android-ndk.sh
+
+  - &decrypt-secrets
+    name: Decrypt secrets
+    command: |
+      # Untar secrets
+      openssl aes-256-cbc -K $encrypted_7f5144414b5d_key -iv $encrypted_7f5144414b5d_iv -in secrets.tar.enc -out secrets.tar -d
+      tar -xf secrets.tar
+
+  - &install-secrets
+    name: Install secrets
+    command: |
+      # Internal debug google services
+      mkdir -p app/src/internal/debug || true
+      cp secrets/internal-debug-google-services.json app/src/internal/debug/google-services.json
+
+      # Internal release google services
+      mkdir -p app/src/internal/release || true
+      cp secrets/internal-release-google-services.json app/src/internal/release/google-services.json
+
+      # Twilio release google services
+      mkdir -p app/src/twilio/release || true
+      cp secrets/twilio-release-google-services.json app/src/twilio/release/google-services.json
+
+      # Video Android Twilio Credentials
+      cp secrets/twilio-video.json library/twilio-video.json
+
+      # Video App Development Variant Credentials
+      cp secrets/twilio-video-app.json app/twilio-video-app.json
+
+      # Android Keystore
+      mkdir -p ~/.gradle
+      echo "androidKeystore=$PWD/secrets/android.keystore" >> ~/.gradle/gradle.properties
+      echo "androidKeystorePassword=$ANDROID_KEYSTORE_PASSWORD" >> ~/.gradle/gradle.properties
+      echo "androidReleaseKeyAlias=$ANDROID_RELEASE_KEY_ALIAS" >> ~/.gradle/gradle.properties
+      echo "androidReleaseKeyPassword=$ANDROID_RELEASE_KEY_PASSWORD" >> ~/.gradle/gradle.properties
+
+  - &gcloud-auth
+    name: Google Cloud Auth
+    command: >
+              gcloud auth activate-service-account travis@video-app-79418.iam.gserviceaccount.com
+              --key-file=secrets/video-app-46437ca14fdd.json
+
+  # Filters
+  - &filter-snapshot
+    branches:
+      only:
+        - master
+
+  # Containers
+  - &build-defaults
+    working_directory: *workspace
+    docker:
+      - image: circleci/android:api-27-node8-alpha
+    environment:
+      - _JAVA_OPTIONS: "-XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap"
+      - VIDEO_APP_CRASH_REPORTING_FILE: "secrets/video-app-79418-firebase-crashreporting-4hlba-87d53fc37a.json"
+
+  - &test-defaults
+    working_directory: *workspace
+    docker:
+      - image: google/cloud-sdk:latest
+    environment:
+    resource_class: small
+
+  - &snapshot-defaults
+    filters: *filter-snapshot
+    requires:
+        - check-format
+        - check-library-size
+        - unit-test
+        - integration-virtual-device-test
+        - integration-physical-device-test
+        - integration-camera-test
+
+jobs:
+  setup-workspace:
+    <<: *build-defaults
+    resource_class: small
+    steps:
+      # Setup code and workspace for downstream jobs
+      - checkout
+      - restore-cache: *restore-cache-gradle
+      - run: *create-android-ndk-directory
+      - restore-cache: *restore-cache-android-ndk
+      - run: *install-android-ndk
+      - run: *decrypt-secrets
+      - persist_to_workspace:
+          root: .
+          paths:
+            - secrets
+
+      # Save cache
+      - save-cache: *save-cache-android-ndk
+      - save-cache: *save-cache-gradle
+
+  check-format:
+    <<: *build-defaults
+    resource_class: small
+    steps:
+      # Setup
+      - checkout
+      - restore-cache: *restore-cache-gradle
+      - run: *create-android-ndk-directory
+      - restore-cache: *restore-cache-android-ndk
+      - run: *install-android-ndk
+
+      # Run spotless check
+      - run:
+          name: Spotless Check
+          command: ./gradlew -q spotlessCheck
+
+      # Save cache
+      - save-cache: *save-cache-gradle
+      - save-cache: *save-cache-android-ndk
+
+  build-app:
+    <<: *build-defaults
+    resource_class: xlarge
+    steps:
+      # Setup
+      - checkout
+      - attach_workspace:
+          at: *workspace
+      - restore-cache: *restore-cache-gradle
+      - run: *create-android-ndk-directory
+      - restore-cache: *restore-cache-android-ndk
+      - run: *install-android-ndk
+      - run: *install-secrets
+
+      # Build app
+      - run:
+          name: Build App
+          command: ./gradlew -q app:assemble
+
+      # Save the builds to workspace
+      - persist_to_workspace:
+          root: .
+          paths:
+            - app/build
+
+      # Save cache
+      - save-cache: *save-cache-android-ndk
+      - save-cache: *save-cache-gradle
+
+  build-library:
+    <<: *build-defaults
+    resource_class: xlarge
+    steps:
+      # Setup
+      - checkout
+      - attach_workspace:
+          at: *workspace
+      - restore-cache: *restore-cache-gradle
+      - run: *create-android-ndk-directory
+      - restore-cache: *restore-cache-android-ndk
+      - run: *install-android-ndk
+      - run: *install-secrets
+
+      # Build library and tests
+      - run:
+          name: Build Library and Tests
+          command: ./gradlew -q library:assemble library:assembleAndroidTest
+
+      # Save the builds to workspace
+      - persist_to_workspace:
+          root: .
+          paths:
+            - library/build
+
+      # Save cache
+      - save-cache: *save-cache-android-ndk
+      - save-cache: *save-cache-gradle
+
+  check-library-size:
+    <<: *build-defaults
+    resource_class: large
+    steps:
+      # Setup
+      - checkout
+      - attach_workspace:
+          at: *workspace
+      - restore-cache: *restore-cache-gradle
+      - run: *create-android-ndk-directory
+      - restore-cache: *restore-cache-android-ndk
+      - run: *install-android-ndk
+
+      # Check library size
+      - run:
+          name: Check Library Size
+          command: ./gradlew -q librarySizeReport
+
+      # Save cache
+      - save-cache: *save-cache-android-ndk
+      - save-cache: *save-cache-gradle
+
+  unit-test:
+    <<: *build-defaults
+    resource_class: small
+    steps:
+      # Setup
+      - checkout
+      - attach_workspace:
+          at: *workspace
+      - restore-cache: *restore-cache-gradle
+      - run: *create-android-ndk-directory
+      - restore-cache: *restore-cache-android-ndk
+      - run: *install-android-ndk
+
+      # Run unit tests
+      - run:
+          name: Unit Tests
+          command: ./gradlew library:testDebugUnitTest
+
+      # Save cache
+      - save-cache: *save-cache-gradle
+
+  integration-virtual-device-test:
+    <<: *test-defaults
+    steps:
+      # Setup
+      - checkout
+      - attach_workspace:
+          at: *workspace
+      - run: *gcloud-auth
+
+      # Execute tests
+      - run:
+          name: Integration Virtual Devices Tests
+          command: >
+                    gcloud firebase test android run --no-record-video --project video-app-79418
+                    video-app-args.yaml:library-virtual-device-tests
+
+  integration-physical-device-test:
+    <<: *test-defaults
+    steps:
+      # Setup
+      - checkout
+      - attach_workspace:
+          at: *workspace
+      - run: *gcloud-auth
+
+      # Execute tests
+      - run:
+          name: Integration Physical Devices Tests
+          command: >
+                    gcloud firebase test android run --no-record-video --project video-app-79418
+                    video-app-args.yaml:library-physical-device-tests
+
+  integration-camera-test:
+    <<: *test-defaults
+    steps:
+      # Setup
+      - checkout
+      - attach_workspace:
+          at: *workspace
+      - run: *gcloud-auth
+
+      # Execute tests
+      - run:
+          name: Instrumentation Camera Tests
+          command: >
+                    gcloud firebase test android run --no-record-video --project video-app-79418
+                    --async video-app-args.yaml:library-camera-tests
+
+  publish-library-snapshot:
+    <<: *build-defaults
+    resource_class: large
+    steps:
+      # Setup
+      - checkout
+      - attach_workspace:
+          at: *workspace
+      - restore-cache: *restore-cache-gradle
+      - run: *create-android-ndk-directory
+      - restore-cache: *restore-cache-android-ndk
+      - run: *install-android-ndk
+      - run: *install-secrets
+
+      # Publish library snapshot
+      - run:
+          name: Publish Library Snapshot
+          command: ./gradlew -q -Psnapshot=true bintrayLibrarySnapshotUpload
+
+      # Save cache
+      - save-cache: *save-cache-android-ndk
+      - save-cache: *save-cache-gradle
+
+  publish-app-snapshot:
+    <<: *build-defaults
+    resource_class: large
+    steps:
+      # Setup
+      - checkout
+      - attach_workspace:
+          at: *workspace
+      - restore-cache: *restore-cache-gradle
+      - run: *create-android-ndk-directory
+      - restore-cache: *restore-cache-android-ndk
+      - run: *install-android-ndk
+      - run: *install-secrets
+
+      # Publish app snapshot
+      - run:
+          name: Publish App Snapshot
+          command: >
+                    ./gradlew -q
+                    -Psnapshot=true
+                    -PFirebaseServiceAccountFilePath=$PWD/$VIDEO_APP_CRASH_REPORTING_FILE
+                    app:firebaseUploadInternalReleaseProguardMapping
+                    app:uploadInternalReleaseToHockeyApp
+
+      # Save cache
+      - save-cache: *save-cache-android-ndk
+      - save-cache: *save-cache-gradle
+
+workflows:
+  version: 2
+
+  build-test-publish:
+    jobs:
+      # Setup
+      - setup-workspace
+
+      # Build
+      - build-app:
+          requires:
+              - setup-workspace
+      - build-library:
+          requires:
+              - setup-workspace
+      - check-format:
+          requires:
+              - setup-workspace
+      - check-library-size:
+          requires:
+              - setup-workspace
+
+      # Test
+      - unit-test:
+          requires:
+              - build-library
+      - integration-virtual-device-test:
+          requires:
+              - build-library
+      - integration-physical-device-test:
+          requires:
+              - build-library
+      - integration-camera-test:
+          requires:
+              - build-library
+
+      # Publish
+      - publish-library-snapshot:
+          <<: *snapshot-defaults
+
+      - publish-app-snapshot:
+          <<: *snapshot-defaults
+
+

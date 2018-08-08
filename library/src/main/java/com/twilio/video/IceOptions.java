@@ -30,10 +30,12 @@ import java.util.Set;
 public class IceOptions {
     private final Set<IceServer> iceServers;
     private final IceTransportPolicy iceTransportPolicy;
+    private final boolean abortOnIceServersTimeout;
 
     private IceOptions(Builder builder) {
         this.iceServers = builder.iceServers;
         this.iceTransportPolicy = builder.iceTransportPolicy;
+        this.abortOnIceServersTimeout = builder.abortOnIceServersTimeout;
     }
 
     @NonNull
@@ -44,6 +46,10 @@ public class IceOptions {
     @NonNull
     public IceTransportPolicy getIceTransportPolicy() {
         return iceTransportPolicy;
+    }
+
+    public boolean getAbortOnIceServersTimeout() {
+        return abortOnIceServersTimeout;
     }
 
     IceServer[] getIceServersArray() {
@@ -57,6 +63,7 @@ public class IceOptions {
     public static class Builder {
         private Set<IceServer> iceServers;
         private IceTransportPolicy iceTransportPolicy = IceTransportPolicy.ALL;
+        private boolean abortOnIceServersTimeout = false;
 
         public Builder() {}
 
@@ -75,6 +82,17 @@ public class IceOptions {
         }
 
         @NonNull
+        /**
+         * If fetching ICE servers times out (due to a restrictive network or a slow network proxy),
+         * then, by default, the Video SDK will fallback to using hard-coded STUN servers and
+         * continue connecting to the Room. Setting this property to true will instead abort with
+         * error 53500, "Unable to acquire configuration".
+         */
+        public Builder abortOnIceServersTimeout(boolean abortOnIceServersTimeout) {
+            this.abortOnIceServersTimeout = abortOnIceServersTimeout;
+            return this;
+        }
+
         public IceOptions build() {
             return new IceOptions(this);
         }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Twilio, Inc.
+ * Copyright (C) 2018 Twilio, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,9 @@ import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.matcher.ViewMatchers.withContentDescription;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assume.assumeTrue;
 
+import android.os.Build;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.espresso.contrib.RecyclerViewActions;
 import android.support.test.rule.ActivityTestRule;
@@ -29,10 +31,9 @@ import android.support.v7.widget.RecyclerView;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import com.twilio.video.base.BaseVideoTest;
-import com.twilio.video.test.R;
-import com.twilio.video.ui.VideoViewListViewAdapter;
-import com.twilio.video.ui.VideoViewRecyclerViewAdapter;
-import com.twilio.video.ui.VideoViewTestActivity;
+import com.twilio.video.ui.VideoTextureViewListViewAdapter;
+import com.twilio.video.ui.VideoTextureViewRecyclerViewAdapter;
+import com.twilio.video.ui.VideoTextureViewTestActivity;
 import com.twilio.video.util.FakeVideoCapturer;
 import java.util.ArrayList;
 import java.util.List;
@@ -45,22 +46,26 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 @RunWith(JUnitParamsRunner.class)
-public class VideoViewTest extends BaseVideoTest {
+public class VideoTextureViewTest extends BaseVideoTest {
+
     private static final int FRAME_DELAY_MS = 10000;
 
     @Rule
-    public ActivityTestRule<VideoViewTestActivity> activityRule =
-            new ActivityTestRule<>(VideoViewTestActivity.class);
+    public ActivityTestRule<VideoTextureViewTestActivity> activityRule =
+            new ActivityTestRule<>(VideoTextureViewTestActivity.class);
 
-    private VideoViewTestActivity videoViewTestActivity;
+    private VideoTextureViewTestActivity videoViewTestActivity;
     private RelativeLayout relativeLayout;
     private LocalVideoTrack localVideoTrack;
 
     @Before
     public void setup() throws InterruptedException {
         super.setup();
+        // VideoTextureView is known to occasioncally hang on devices less than Lollipop
+        assumeTrue(Build.VERSION.SDK_INT > Build.VERSION_CODES.KITKAT);
         videoViewTestActivity = activityRule.getActivity();
-        relativeLayout = videoViewTestActivity.findViewById(R.id.relative_layout_container);
+        relativeLayout =
+                videoViewTestActivity.findViewById(com.twilio.video.R.id.relative_layout_container);
     }
 
     @After
@@ -75,13 +80,18 @@ public class VideoViewTest extends BaseVideoTest {
     public void setVideoScaleType_canBeCalledBeforeViewInflated() {
         InstrumentationRegistry.getInstrumentation()
                 .runOnMainSync(
-                        () -> {
-                            VideoView videoView = new VideoView(videoViewTestActivity);
-                            VideoScaleType expectedVideoScaleType = VideoScaleType.ASPECT_BALANCED;
+                        new Runnable() {
+                            @Override
+                            public void run() {
+                                VideoTextureView videoView =
+                                        new VideoTextureView(videoViewTestActivity);
+                                VideoScaleType expectedVideoScaleType =
+                                        VideoScaleType.ASPECT_BALANCED;
 
-                            videoView.setVideoScaleType(expectedVideoScaleType);
+                                videoView.setVideoScaleType(expectedVideoScaleType);
 
-                            assertEquals(expectedVideoScaleType, videoView.getVideoScaleType());
+                                assertEquals(expectedVideoScaleType, videoView.getVideoScaleType());
+                            }
                         });
     }
 
@@ -90,24 +100,29 @@ public class VideoViewTest extends BaseVideoTest {
     public void canSetVideoScaleType(final int width, final int height) {
         InstrumentationRegistry.getInstrumentation()
                 .runOnMainSync(
-                        () -> {
-                            VideoView videoView = new VideoView(videoViewTestActivity);
-                            RelativeLayout.LayoutParams layoutParams =
-                                    new RelativeLayout.LayoutParams(width, height);
-                            VideoScaleType expectedVideoScaleType = VideoScaleType.ASPECT_BALANCED;
+                        new Runnable() {
+                            @Override
+                            public void run() {
+                                VideoTextureView videoView =
+                                        new VideoTextureView(videoViewTestActivity);
+                                RelativeLayout.LayoutParams layoutParams =
+                                        new RelativeLayout.LayoutParams(width, height);
+                                VideoScaleType expectedVideoScaleType =
+                                        VideoScaleType.ASPECT_BALANCED;
 
-                            videoView.setLayoutParams(layoutParams);
-                            relativeLayout.addView(videoView);
-                            videoView.setVideoScaleType(expectedVideoScaleType);
+                                videoView.setLayoutParams(layoutParams);
+                                relativeLayout.addView(videoView);
+                                videoView.setVideoScaleType(expectedVideoScaleType);
 
-                            assertEquals(expectedVideoScaleType, videoView.getVideoScaleType());
+                                assertEquals(expectedVideoScaleType, videoView.getVideoScaleType());
+                            }
                         });
     }
 
     @Test
     public void canBeRenderedInRecyclerView() throws InterruptedException {
         final int numItems = 100;
-        final String recyclerViewContentDescription = "VideoViewRecyclerView";
+        final String recyclerViewContentDescription = "VideoTextureViewRecyclerView";
 
         // Create the recycler view
         final RecyclerView recyclerView = new RecyclerView(videoViewTestActivity);
@@ -127,25 +142,28 @@ public class VideoViewTest extends BaseVideoTest {
         }
 
         // Create the adapter with the generated tracks
-        final VideoViewRecyclerViewAdapter videoViewRecyclerViewAdapter =
-                new VideoViewRecyclerViewAdapter(videoTracks);
+        final VideoTextureViewRecyclerViewAdapter videoViewRecyclerViewAdapter =
+                new VideoTextureViewRecyclerViewAdapter(videoTracks);
 
         // Add the recycler view to the layout
         InstrumentationRegistry.getInstrumentation()
                 .runOnMainSync(
-                        () -> {
-                            relativeLayout.addView(recyclerView);
-                            recyclerView.setLayoutManager(
-                                    new LinearLayoutManager(videoViewTestActivity));
-                            recyclerView.setAdapter(videoViewRecyclerViewAdapter);
+                        new Runnable() {
+                            @Override
+                            public void run() {
+                                relativeLayout.addView(recyclerView);
+                                recyclerView.setLayoutManager(
+                                        new LinearLayoutManager(videoViewTestActivity));
+                                recyclerView.setAdapter(videoViewRecyclerViewAdapter);
+                            }
                         });
 
         // Scroll through each item and validate a frame was received
         for (int i = 0; i < numItems; i++) {
             onView(withContentDescription(recyclerViewContentDescription))
                     .perform(RecyclerViewActions.scrollToPosition(i));
-            VideoViewRecyclerViewAdapter.VideoViewHolder videoViewHolder =
-                    (VideoViewRecyclerViewAdapter.VideoViewHolder)
+            VideoTextureViewRecyclerViewAdapter.VideoViewHolder videoViewHolder =
+                    (VideoTextureViewRecyclerViewAdapter.VideoViewHolder)
                             recyclerView.findViewHolderForAdapterPosition(i);
 
             assertTrue(
@@ -156,7 +174,7 @@ public class VideoViewTest extends BaseVideoTest {
     @Test
     public void canBeRenderedInListView() throws InterruptedException {
         final int numItems = 100;
-        final String listViewContentDescription = "VideoListView";
+        final String listViewContentDescription = "VideoTextureListView";
 
         // Create the list view
         final ListView listView = new ListView(videoViewTestActivity);
@@ -176,15 +194,18 @@ public class VideoViewTest extends BaseVideoTest {
         }
 
         // Create the adapter with the generated tracks
-        final VideoViewListViewAdapter videoViewListViewAdapter =
-                new VideoViewListViewAdapter(videoTracks);
+        final VideoTextureViewListViewAdapter videoViewListViewAdapter =
+                new VideoTextureViewListViewAdapter(videoTracks);
 
         // Add the list view to the layout
         InstrumentationRegistry.getInstrumentation()
                 .runOnMainSync(
-                        () -> {
-                            relativeLayout.addView(listView);
-                            listView.setAdapter(videoViewListViewAdapter);
+                        new Runnable() {
+                            @Override
+                            public void run() {
+                                relativeLayout.addView(listView);
+                                listView.setAdapter(videoViewListViewAdapter);
+                            }
                         });
 
         // Scroll through each item and validate a frame was received
@@ -192,13 +213,18 @@ public class VideoViewTest extends BaseVideoTest {
             final int position = i;
             InstrumentationRegistry.getInstrumentation()
                     .runOnMainSync(
-                            () -> {
-                                listView.smoothScrollToPosition(position);
-                                listView.setSelection(position);
+                            new Runnable() {
+                                @Override
+                                public void run() {
+                                    listView.smoothScrollToPosition(position);
+                                    listView.setSelection(position);
+                                }
                             });
-            VideoViewListViewAdapter.ViewHolder viewHolder =
+            VideoTextureViewListViewAdapter.ViewHolder viewHolder =
                     videoViewListViewAdapter.viewHolderPositionMap.get(position);
-            assertTrue(viewHolder.frameCountProxyRendererListener.waitForFrame(FRAME_DELAY_MS));
+            if (viewHolder.frameCountProxyRendererListener != null) {
+                assertTrue(viewHolder.frameCountProxyRendererListener.waitForFrame(FRAME_DELAY_MS));
+            }
         }
     }
 

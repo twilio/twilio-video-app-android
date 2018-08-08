@@ -39,5 +39,9 @@
         <activity
             android:name=".ui.VideoViewTestActivity">
         </activity>
+
+        <activity
+            android:name=".ui.VideoTextureViewTestActivity">
+        </activity>
     </application>
 </manifest>

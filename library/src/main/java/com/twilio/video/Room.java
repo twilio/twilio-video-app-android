@@ -410,14 +410,18 @@ public class Room {
         void onParticipantDisconnected(Room room, RemoteParticipant remoteParticipant);
 
         /**
-         * Called when the media being shared to a {@link Room} is being recorded.
+         * This method is only called when a {@link Room} which was not previously recording starts
+         * recording. If you've joined a {@link Room} which is already recording this event will not
+         * be fired.
          *
          * @param room
          */
         void onRecordingStarted(Room room);
 
         /**
-         * Called when the media being shared to a {@link Room} is no longer being recorded.
+         * This method is only called when a {@link Room} which was previously recording stops
+         * recording. If you've joined a {@link Room} which is not recording this event will not be
+         * fired.
          *
          * @param room
          */

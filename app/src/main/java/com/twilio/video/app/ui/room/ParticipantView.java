@@ -34,7 +34,7 @@ import butterknife.BindView;
 import com.twilio.video.I420Frame;
 import com.twilio.video.VideoRenderer;
 import com.twilio.video.VideoScaleType;
-import com.twilio.video.VideoView;
+import com.twilio.video.VideoTextureView;
 import com.twilio.video.app.R;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -58,7 +58,7 @@ abstract class ParticipantView extends FrameLayout implements VideoRenderer {
     TextView videoIdentity;
 
     @BindView(R.id.participant_video)
-    VideoView videoView;
+    VideoTextureView videoView;
 
     @BindView(R.id.participant_selected_layout)
     RelativeLayout selectedLayout;

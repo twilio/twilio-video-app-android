@@ -87,11 +87,11 @@ public class VideoConstraints {
 
         VideoConstraints that = (VideoConstraints) o;
 
-        if (minFps != that.minFps) return false;
-        if (maxFps != that.maxFps) return false;
-        if (!minVideoDimensions.equals(that.minVideoDimensions)) return false;
-        if (!maxVideoDimensions.equals(that.maxVideoDimensions)) return false;
-        return aspectRatio.equals(that.aspectRatio);
+        return minFps == that.minFps
+                && maxFps == that.maxFps
+                && minVideoDimensions.equals(that.minVideoDimensions)
+                && maxVideoDimensions.equals(that.maxVideoDimensions)
+                && aspectRatio.equals(that.aspectRatio);
     }
 
     @Override
