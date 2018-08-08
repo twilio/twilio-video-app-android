@@ -89,8 +89,8 @@ public class VideoViewListViewAdapter extends BaseAdapter {
 
         // Update view holder
         holder.trackNameTextView.setText(localVideoTrack.getName());
-        ((VideoView) holder.frameCountProxyRendererListener.getVideoRenderer())
-                .setVideoScaleType(VideoScaleType.ASPECT_FILL);
+        holder.frameCountProxyRendererListener.videoView.setVideoScaleType(
+                VideoScaleType.ASPECT_FILL);
         localVideoTrack.addRenderer(holder.frameCountProxyRendererListener);
         viewHolderMap.put(holder, localVideoTrack);
         viewHolderPositionMap.put(i, holder);

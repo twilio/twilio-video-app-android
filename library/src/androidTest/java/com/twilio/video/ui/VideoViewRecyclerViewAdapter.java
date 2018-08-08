@@ -83,8 +83,8 @@ public class VideoViewRecyclerViewAdapter
 
         // Update view holder
         holder.trackNameTextView.setText(localVideoTrack.getName());
-        ((VideoView) holder.frameCountProxyRendererListener.getVideoRenderer())
-                .setVideoScaleType(VideoScaleType.ASPECT_FILL);
+        holder.frameCountProxyRendererListener.videoView.setVideoScaleType(
+                VideoScaleType.ASPECT_FILL);
         localVideoTrack.addRenderer(holder.frameCountProxyRendererListener);
         viewHolderMap.put(holder, localVideoTrack);
     }

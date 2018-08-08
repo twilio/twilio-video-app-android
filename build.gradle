@@ -36,10 +36,9 @@ buildscript {
             'timber': '4.1.0',
             'materialrangebar': '1.3',
             'butterknife': '8.8.1',
-            'multidex': '1.0.3',
-            'firebase': '16.0.1',
-            'firebaseAuth': '16.0.2',
-            'playServices': '15.0.1',
+            'multidex': '1.0.1',
+            'firebase': '10.0.1',
+            'playServices': '10.0.1',
             'dagger': '2.10',
             'rxJava2': '2.0.6',
             'rxJava2Adapter': '1.0.0',
@@ -506,16 +505,16 @@ task publishLibraryJavadocs {
 }
 
 /*
- * Any tests that are network intensive are run on virtual devices because they do not run
- * on the same congested network as physical devices. Running select tests on virtual devices
- * ensures a more stable CI test execution and prevents test runs from exceeding the
- * Firebase Test Lab physical device 30 minute time limit.
+ * The tests that rely heavily on the Stats API require much more time to execute. These tests
+ * run in a separate test execution to ensure the entire test suite does not exceed the
+ * Firebase Test Lab 30 minute physical device time limit.
  */
-task firebaseTestLabCheckVirtualDevices(type: Exec) {
-    description = 'Runs subset of library instrumentation tests on Firebase Test Lab virtual ' +
-            'devices'
+
+task firebaseTestLabCheckLibraryStats(type: Exec) {
+    description = 'Runs library instrumentation tests that use Stats API on Firebase Test Lab'
     group = 'Test'
     dependsOn 'library:assembleDebugAndroidTest'
+    dependsOn 'app:assembleDebug'
     commandLine 'gcloud',
             'firebase',
             'test',
@@ -524,14 +523,15 @@ task firebaseTestLabCheckVirtualDevices(type: Exec) {
             '--no-record-video',
             '--project',
             'video-app-79418',
-            'video-app-args.yaml:library-virtual-device-tests'
+            'video-app-args.yaml:library-stats-instrumentation-tests'
 }
 
-task firebaseTestLabCheckPhysicalDevices(type: Exec) {
-    description = 'Runs subset of library instrumentation tests on Firebase Test Lab physical ' +
-            'devices'
+task firebaseTestLabCheckLibraryNoStats(type: Exec) {
+    description = 'Runs library instrumentation tests that do not use Stats API on ' +
+            'Firebase Test Lab'
     group = 'Test'
     dependsOn 'library:assembleDebugAndroidTest'
+    dependsOn 'app:assembleDebug'
     commandLine 'gcloud',
             'firebase',
             'test',
@@ -540,13 +540,14 @@ task firebaseTestLabCheckPhysicalDevices(type: Exec) {
             '--no-record-video',
             '--project',
             'video-app-79418',
-            'video-app-args.yaml:library-physical-device-tests'
+            'video-app-args.yaml:library-no-stats-instrumentation-tests'
 }
 
 task firebaseTestLabCheckLibraryCamera(type: Exec) {
     description = 'Runs library instrumentation tests that use camera on Firebase Test Lab'
     group = 'Test'
     dependsOn 'library:assembleDebugAndroidTest'
+    dependsOn 'app:assembleDebug'
     commandLine 'gcloud',
             'firebase',
             'test',
@@ -616,12 +617,10 @@ task librarySizeReport(type: GradleBuild) {
         println(videoAndroidSizeReport)
 
         // Post PR comment with report
-        if (System.env.CIRCLE_PULL_REQUEST) {
-            def githubPullRequestNumber = Arrays.asList(
-                    System.env.CIRCLE_PULL_REQUEST.split("/")).last()
+        if (System.env.TRAVIS_PULL_REQUEST) {
             def githubPullRequestUrl = new URL("https://api.github.com/repos/" +
-                    "${System.env.CIRCLE_PROJECT_USERNAME}/${System.env.CIRCLE_PROJECT_REPONAME}" +
-                    "/issues/${githubPullRequestNumber}/comments")
+                    "${System.env.TRAVIS_REPO_SLUG}" +
+                    "/issues/${System.env.TRAVIS_PULL_REQUEST}/comments")
             exec {
                 workingDir "${rootDir}"
                 commandLine "curl",
@@ -639,7 +638,7 @@ task bintrayLibrarySnapshotUpload(type: GradleBuild) {
     description = 'Publish Video Android AAR snapshot to Bintray'
     group = 'Publishing'
     buildFile = file('library/build.gradle')
-    tasks = ['assembleRelease', 'uploadArchives']
+    tasks = ['clean', 'assembleRelease', 'uploadArchives']
     startParameter.projectProperties += gradle.startParameter.projectProperties + [
             'snapshot': true,
             'maven.repo': 'https://api.bintray.com/maven/twilio/snapshots/video-android/;publish=1',

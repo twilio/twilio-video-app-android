@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:gravity="center_vertical"
@@ -22,9 +21,9 @@
             android:id="@android:id/title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:singleLine="true"
-            android:textAppearance="@style/Preference_TextAppearanceMaterialSubhead"
-            tools:ignore="PrivateResource" />
+            android:ellipsize="marquee"
+            android:maxLines="1"
+            android:textAppearance="@style/Preference_TextAppearanceMaterialSubhead" />
 
         <com.appyvet.rangebar.RangeBar
             android:id="@+id/range_bar"

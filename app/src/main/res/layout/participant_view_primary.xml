@@ -12,7 +12,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <com.twilio.video.VideoTextureView
+        <com.twilio.video.VideoView
             android:id="@+id/participant_video"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -44,7 +44,6 @@
                 android:layout_marginStart="16dp"
                 android:layout_toEndOf="@id/participant_video_identity"
                 android:layout_toRightOf="@id/participant_video_identity"
-                android:contentDescription="@string/audio_toggle"
                 app:srcCompat="@drawable/ic_thumbnail_no_audio_pillbox" />
 
         </RelativeLayout>
@@ -64,7 +63,6 @@
             android:layout_width="107dp"
             android:layout_height="107dp"
             android:layout_centerInParent="true"
-            android:contentDescription="@string/profile_picture"
             app:srcCompat="@drawable/ic_account_circle_white_48px" />
 
         <TextView

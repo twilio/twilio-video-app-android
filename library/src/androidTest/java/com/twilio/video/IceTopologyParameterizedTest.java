@@ -132,36 +132,6 @@ public class IceTopologyParameterizedTest extends BaseVideoTest {
         RoomUtils.completeRoom(room);
     }
 
-    @Test
-    public void shouldAbortIfIceServerTimeoutFlagIsSet() throws InterruptedException {
-        CallbackHelper.FakeRoomListener roomListener = new CallbackHelper.FakeRoomListener();
-        roomListener.onConnectedLatch = new CountDownLatch(1);
-        roomListener.onDisconnectedLatch = new CountDownLatch(1);
-        roomListener.onConnectFailureLatch = new CountDownLatch(1);
-
-        IceOptions iceOptions = new IceOptions.Builder().abortOnIceServersTimeout(true).build();
-        ConnectOptions connectOptions =
-                new ConnectOptions.Builder(aliceToken)
-                        .roomName(roomName)
-                        .iceOptions(iceOptions)
-                        .build();
-
-        Room room = Video.connect(mediaTestActivity, connectOptions, roomListener);
-        boolean isConnected = roomListener.onConnectedLatch.await(20, TimeUnit.SECONDS);
-
-        if (isConnected) {
-            room.disconnect();
-            roomListener.onDisconnectedLatch.await(20, TimeUnit.SECONDS);
-        } else {
-            if (roomListener.getTwilioException() != null) {
-                assertTrue(
-                        roomListener.getTwilioException().getCode()
-                                == TwilioException.CONFIGURATION_ACQUIRE_FAILED_EXCEPTION);
-            }
-        }
-        RoomUtils.completeRoom(room);
-    }
-
     @Ignore
     @Test
     public void shouldConnectWithValidStunServers() throws InterruptedException {

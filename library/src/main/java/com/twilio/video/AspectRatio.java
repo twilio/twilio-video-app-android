@@ -47,7 +47,8 @@ public class AspectRatio {
 
         AspectRatio that = (AspectRatio) o;
 
-        return numerator == that.numerator && denominator == that.denominator;
+        if (numerator != that.numerator) return false;
+        return denominator == that.denominator;
     }
 
     @Override

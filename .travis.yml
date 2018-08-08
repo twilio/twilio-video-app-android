@@ -135,9 +135,9 @@ jobs:
     - stage: test
       script: ./gradlew library:testDebugUnitTest
     - stage: test
-      script: ./gradlew -q -PtestRetriesEnabled=true firebaseTestLabCheckVirtualDevices
+      script: ./gradlew -q -PtestRetriesEnabled=true firebaseTestLabCheckLibraryStats
     - stage: test
-      script: ./gradlew -q -PtestRetriesEnabled=false firebaseTestLabCheckPhysicalDevices
+      script: ./gradlew -q -PtestRetriesEnabled=false firebaseTestLabCheckLibraryNoStats
     - stage: test
       script: ./gradlew -q firebaseTestLabCheckLibraryCamera
     - stage: test

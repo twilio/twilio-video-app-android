@@ -46,7 +46,7 @@ import org.junit.runner.RunWith;
 
 @RunWith(JUnitParamsRunner.class)
 public class VideoViewTest extends BaseVideoTest {
-    private static final int FRAME_DELAY_MS = 10000;
+    private static final int FRAME_DELAY_MS = 3500;
 
     @Rule
     public ActivityTestRule<VideoViewTestActivity> activityRule =

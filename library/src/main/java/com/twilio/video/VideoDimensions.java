@@ -86,7 +86,9 @@ public class VideoDimensions {
 
         VideoDimensions that = (VideoDimensions) o;
 
-        return width == that.width && height == that.height;
+        if (width != that.width) return false;
+
+        return height == that.height;
     }
 
     @Override

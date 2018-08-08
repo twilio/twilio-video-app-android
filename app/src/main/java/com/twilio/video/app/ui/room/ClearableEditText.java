@@ -96,6 +96,7 @@ public class ClearableEditText extends AppCompatEditText {
         setOnTouchListener(
                 (view, motionEvent) -> {
                     if (isClearVisible() && motionEvent.getAction() == MotionEvent.ACTION_UP) {
+
                         ClearableEditText editText = (ClearableEditText) view;
                         Rect bounds = clearDrawable.getBounds();
 

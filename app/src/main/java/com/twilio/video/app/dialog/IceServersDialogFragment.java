@@ -16,7 +16,6 @@
 
 package com.twilio.video.app.dialog;
 
-import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
@@ -70,7 +69,6 @@ public class IceServersDialogFragment extends AppCompatDialogFragment {
     public android.app.Dialog onCreateDialog(Bundle savedInstanceState) {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         LayoutInflater inflater = getActivity().getLayoutInflater();
-        @SuppressLint("InflateParams")
         View iceOptionsView = inflater.inflate(R.layout.ice_options_layout, null);
         unbinder = ButterKnife.bind(this, iceOptionsView);
 

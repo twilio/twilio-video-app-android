@@ -130,7 +130,7 @@ dependencies {
     implementation "com.android.support:support-v4:${versions.supportLibrary}"
     implementation "com.android.support:multidex:${versions.multidex}"
     implementation "com.google.firebase:firebase-crash:${versions.firebase}"
-    implementation "com.google.firebase:firebase-auth:${versions.firebaseAuth}"
+    implementation "com.google.firebase:firebase-auth:${versions.firebase}"
     implementation "com.google.android.gms:play-services-auth:${versions.playServices}"
 
     implementation "com.google.dagger:dagger:${versions.dagger}"

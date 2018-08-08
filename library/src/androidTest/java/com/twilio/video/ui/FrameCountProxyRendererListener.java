@@ -16,9 +16,9 @@
 
 package com.twilio.video.ui;
 
-import android.support.annotation.NonNull;
 import com.twilio.video.I420Frame;
 import com.twilio.video.VideoRenderer;
+import com.twilio.video.VideoView;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
@@ -29,25 +29,20 @@ import java.util.concurrent.atomic.AtomicReference;
 public class FrameCountProxyRendererListener implements VideoRenderer {
     private final AtomicReference<CountDownLatch> frameArrived =
             new AtomicReference<>(new CountDownLatch(1));
-    private VideoRenderer videoRenderer;
+    final VideoView videoView;
 
-    public FrameCountProxyRendererListener(@NonNull VideoRenderer videoRenderer) {
-        this.videoRenderer = videoRenderer;
+    public FrameCountProxyRendererListener(VideoView videoView) {
+        this.videoView = videoView;
     }
 
     @Override
     public void renderFrame(I420Frame frame) {
         frameArrived.get().countDown();
-        videoRenderer.renderFrame(frame);
+        videoView.renderFrame(frame);
     }
 
     public boolean waitForFrame(int timeoutMs) throws InterruptedException {
         frameArrived.set(new CountDownLatch(1));
         return frameArrived.get().await(timeoutMs, TimeUnit.MILLISECONDS);
-    }
-
-    @NonNull
-    public VideoRenderer getVideoRenderer() {
-        return videoRenderer;
     }
 }

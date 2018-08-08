@@ -23,7 +23,7 @@ import java.util.Map;
 class Logger {
     public static final int INHERIT = Log.ASSERT + 1;
 
-    private static final Map<Class<?>, Logger> loggers = new HashMap<>();
+    private static final Map<Class<?>, Logger> loggers = new HashMap<Class<?>, Logger>();
 
     private static int globalLevel = Log.ERROR;
 

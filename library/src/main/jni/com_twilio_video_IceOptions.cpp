@@ -32,15 +32,10 @@ twilio::media::IceOptions IceOptions::getIceOptions(JNIEnv *env, jobject j_ice_o
     jmethodID j_get_ice_transport_policy_id =
             webrtc::GetMethodID(env, j_ice_options_class,
                                 "getIceTransportPolicy", "()Lcom/twilio/video/IceTransportPolicy;");
-    jmethodID j_get_abort_on_ice_servers_timeout_id =
-            webrtc::GetMethodID(env, j_ice_options_class,
-                                "getAbortOnIceServersTimeout", "()Z");
     jobjectArray j_ice_servers =
             (jobjectArray) env->CallObjectMethod(j_ice_options, j_get_ice_servers_array_id);
     jobject j_ice_trans_policy =
-        env->CallObjectMethod(j_ice_options, j_get_ice_transport_policy_id);
-    jboolean j_abort_on_ice_servers =
-        env->CallBooleanMethod(j_ice_options, j_get_abort_on_ice_servers_timeout_id);
+            env->CallObjectMethod(j_ice_options, j_get_ice_transport_policy_id);
 
     twilio::media::IceOptions ice_options;
     twilio::media::IceServers ice_servers;
@@ -85,7 +80,6 @@ twilio::media::IceOptions IceOptions::getIceOptions(JNIEnv *env, jobject j_ice_o
                 ice_servers.push_back(ice_server);
             }
             ice_options.ice_servers = ice_servers;
-            ice_options.abort_on_ice_servers_timeout = j_abort_on_ice_servers;
         }
     }
 

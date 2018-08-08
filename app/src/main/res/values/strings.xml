@@ -93,11 +93,6 @@
     <string name="max_audio_bitrate">Audio Bitrate</string>
     <string name="recording_notice">Recording may be enabled for quality assurance.</string>
     <string name="vp8_simulcast">VP8 Simulcast</string>
-    <string name="audio_toggle">Audio toggle</string>
-    <string name="video_logo">Video Logo</string>
-    <string name="stats_disabled">Stats disabled</string>
-    <string name="profile_picture">Profile picture</string>
-    <string name="number">Number</string>
 
     <string-array name="environment_array">
         <item>Production</item>

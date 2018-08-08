@@ -43,7 +43,6 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -184,7 +183,6 @@ public class LocalParticipantTopologyTest extends BaseVideoTest {
     }
 
     @Test
-    @Ignore("Sometimes tracks do not publish after reconnecting GSDK-1654")
     @Retry(times = BuildConfig.MAX_TEST_RETRIES)
     public void shouldAllowRepublishingTracksWhileConnected() throws InterruptedException {
         CallbackHelper.FakeLocalParticipantListener localParticipantListener =

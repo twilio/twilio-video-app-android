@@ -55,7 +55,8 @@ public class EncodingParameters {
 
         EncodingParameters that = (EncodingParameters) o;
 
-        return maxAudioBitrate == that.maxAudioBitrate && maxVideoBitrate == that.maxVideoBitrate;
+        if (maxAudioBitrate != that.maxAudioBitrate) return false;
+        return maxVideoBitrate == that.maxVideoBitrate;
     }
 
     @Override
