@@ -123,30 +123,26 @@ public class AuthHelper {
 
     public static GoogleApiClient buildGoogleAPIClient(
             final FragmentActivity activity, final ErrorListener errorListener) {
-        GoogleApiClient client =
-                new GoogleApiClient.Builder(activity)
-                        .enableAutoManage(
-                                activity,
-                                new GoogleApiClient.OnConnectionFailedListener() {
-                                    @Override
-                                    public void onConnectionFailed(
-                                            @NonNull ConnectionResult connectionResult) {
-                                        errorListener.onError(ERROR_GOOGLE_PLAY_SERVICE_ERROR);
-                                    }
-                                })
-                        .addApi(Auth.GOOGLE_SIGN_IN_API, buildGoogleSignInOptions(activity))
-                        .build();
-        return client;
+        return new GoogleApiClient.Builder(activity)
+                .enableAutoManage(
+                        activity,
+                        new GoogleApiClient.OnConnectionFailedListener() {
+                            @Override
+                            public void onConnectionFailed(
+                                    @NonNull ConnectionResult connectionResult) {
+                                errorListener.onError(ERROR_GOOGLE_PLAY_SERVICE_ERROR);
+                            }
+                        })
+                .addApi(Auth.GOOGLE_SIGN_IN_API, buildGoogleSignInOptions(activity))
+                .build();
     }
 
     private static GoogleSignInOptions buildGoogleSignInOptions(final FragmentActivity activity) {
         Context context = activity.getBaseContext();
-        GoogleSignInOptions gso =
-                new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                        .requestIdToken(context.getString(R.string.default_web_client_id))
-                        .requestEmail()
-                        .setHostedDomain("twilio.com")
-                        .build();
-        return gso;
+        return new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestIdToken(context.getString(R.string.default_web_client_id))
+                .requestEmail()
+                .setHostedDomain("twilio.com")
+                .build();
     }
 }

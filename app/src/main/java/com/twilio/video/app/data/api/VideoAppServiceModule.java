@@ -33,24 +33,18 @@ public class VideoAppServiceModule {
     @ApplicationScope
     @Named("VideoAppService")
     OkHttpClient providesOkHttpClient() {
-        OkHttpClient okHttpClient =
-                new OkHttpClient.Builder().addInterceptor(new FirebaseAuthInterceptor()).build();
-
-        return okHttpClient;
+        return new OkHttpClient.Builder().addInterceptor(new FirebaseAuthInterceptor()).build();
     }
 
     @Provides
     @ApplicationScope
     @Named("VideoAppService")
     Retrofit.Builder providesRetrofitBuilder(@Named("VideoAppService") OkHttpClient okHttpClient) {
-        Retrofit.Builder retrofitBuilder =
-                new Retrofit.Builder()
-                        .client(okHttpClient)
-                        .addCallAdapterFactory(
-                                RxJava2CallAdapterFactory.createWithScheduler(Schedulers.io()))
-                        .addConverterFactory(ScalarsConverterFactory.create())
-                        .addConverterFactory(GsonConverterFactory.create());
-
-        return retrofitBuilder;
+        return new Retrofit.Builder()
+                .client(okHttpClient)
+                .addCallAdapterFactory(
+                        RxJava2CallAdapterFactory.createWithScheduler(Schedulers.io()))
+                .addConverterFactory(ScalarsConverterFactory.create())
+                .addConverterFactory(GsonConverterFactory.create());
     }
 }
