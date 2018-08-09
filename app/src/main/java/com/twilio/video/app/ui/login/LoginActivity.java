@@ -194,6 +194,14 @@ public class LoginActivity extends BaseActivity
             case AuthHelper.ERROR_UNKNOWN:
                 Toast.makeText(this, "Unknown error occurred.", Toast.LENGTH_LONG).show();
                 Timber.e("Unknown error occurred.");
+            case AuthHelper.ERROR_GOOGLE_SIGNIN_CANCELED:
+                Toast.makeText(this, "Sign in canceled.", Toast.LENGTH_LONG).show();
+                Timber.e("Sign in canceled.");
+                break;
+            case AuthHelper.ERROR_USER_NOT_SIGNED_IN:
+                Toast.makeText(this, "User not signed in.", Toast.LENGTH_LONG).show();
+                Timber.e("User not signed in.");
+                break;
             default:
                 // do nothing
                 break;

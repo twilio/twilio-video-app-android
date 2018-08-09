@@ -267,14 +267,12 @@ public class LocalParticipant implements Participant {
         Preconditions.checkNotNull(localAudioTrack, "LocalAudioTrack must not be null");
         Preconditions.checkArgument(
                 !localAudioTrack.isReleased(), "LocalAudioTrack must not be released");
-        if (isReleased()) {
-            return false;
-        } else {
-            return nativePublishAudioTrack(
-                    nativeLocalParticipantHandle,
-                    localAudioTrack,
-                    localAudioTrack.getNativeHandle());
-        }
+
+        return !isReleased()
+                && nativePublishAudioTrack(
+                        nativeLocalParticipantHandle,
+                        localAudioTrack,
+                        localAudioTrack.getNativeHandle());
     }
 
     /**
@@ -287,14 +285,12 @@ public class LocalParticipant implements Participant {
         Preconditions.checkNotNull(localVideoTrack, "LocalVideoTrack must not be null");
         Preconditions.checkArgument(
                 !localVideoTrack.isReleased(), "LocalVideoTrack must not be released");
-        if (isReleased()) {
-            return false;
-        } else {
-            return nativePublishVideoTrack(
-                    nativeLocalParticipantHandle,
-                    localVideoTrack,
-                    localVideoTrack.getNativeHandle());
-        }
+
+        return !isReleased()
+                && nativePublishVideoTrack(
+                        nativeLocalParticipantHandle,
+                        localVideoTrack,
+                        localVideoTrack.getNativeHandle());
     }
 
     /**
@@ -307,12 +303,12 @@ public class LocalParticipant implements Participant {
         Preconditions.checkNotNull(localDataTrack, "LocalDataTrack must not be null");
         Preconditions.checkArgument(
                 !localDataTrack.isReleased(), "LocalDataTrack must not be released");
-        if (isReleased()) {
-            return false;
-        } else {
-            return nativePublishDataTrack(
-                    nativeLocalParticipantHandle, localDataTrack, localDataTrack.getNativeHandle());
-        }
+
+        return !isReleased()
+                && nativePublishDataTrack(
+                        nativeLocalParticipantHandle,
+                        localDataTrack,
+                        localDataTrack.getNativeHandle());
     }
 
     /**

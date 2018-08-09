@@ -33,6 +33,7 @@ import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.webrtc.MediaCodecVideoDecoder;
@@ -64,6 +65,7 @@ public class CodecPreferencesTest extends BaseCodecTest {
         super.teardown();
     }
 
+    @Ignore
     @Test
     @Parameters
     public void canPreferAudioCodec(Topology topology, AudioCodec expectedAudioCodec)
