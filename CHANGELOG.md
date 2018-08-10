@@ -40,6 +40,7 @@ codecs:
 Features
 
 - Added flag to IceOptions `abortOnIceServerTimeout` that tells the client whether to continue or abort connecting to a Room when Ice fails to connect.
+- Added parameter to IceOptions `iceServersTimeout` that allows control of the timeout period when trying to retrieve Ice servers.
 - Added `VideoTextureView`. `VideoTextureView` is similar to `VideoView` but subclasses `TextureView` instead of `SurfaceView`. Unlike SurfaceView, TextureView does not create a separate window but behaves as a regular View. This key difference allows a TextureView to be moved, transformed, animated, etc. For more see the [TextureView documentation](https://developer.android.com/reference/android/view/TextureView.html). If you were previously using [this gist](https://gist.github.com/aaalaniz/bfbc4891c98ef3b23558ff2260cbcc8e), please update your applications to use the `VideoTextureView` provided with the SDK. **NOTE**: `VideoTextureView` can experience dead locking on API Level 19 or below due to a [WebRTC bug](https://bugs.chromium.org/p/webrtc/issues/detail?id=5702). Use with discretion.
 
 ####2.1.1

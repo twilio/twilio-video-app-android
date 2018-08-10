@@ -39,8 +39,7 @@ public class IceOptionsHelper {
             return new ArrayList<>();
         }
         Gson gson = new GsonBuilder().create();
-        List<TwilioIceServer> result = gson.fromJson(json, listType);
-        return result;
+        return gson.fromJson(json, listType);
     }
 
     public static String convertToJson(List<TwilioIceServer> twilioIceServers) {

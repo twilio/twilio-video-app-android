@@ -639,21 +639,15 @@ public class RemoteParticipant implements Participant {
     }
 
     private void addAudioTracks(List<RemoteAudioTrackPublication> remoteAudioTracks) {
-        for (RemoteAudioTrackPublication remoteAudioTrackPublication : remoteAudioTracks) {
-            audioTrackPublications.add(remoteAudioTrackPublication);
-        }
+        audioTrackPublications.addAll(remoteAudioTracks);
     }
 
     private void addVideoTracks(List<RemoteVideoTrackPublication> remoteVideoTracks) {
-        for (RemoteVideoTrackPublication remoteVideoTrackPublication : remoteVideoTracks) {
-            videoTrackPublications.add(remoteVideoTrackPublication);
-        }
+        videoTrackPublications.addAll(remoteVideoTracks);
     }
 
     private void addDataTracks(List<RemoteDataTrackPublication> remoteDataTracks) {
-        for (RemoteDataTrackPublication remoteDataTrackPublication : remoteDataTracks) {
-            dataTrackPublications.add(remoteDataTrackPublication);
-        }
+        dataTrackPublications.addAll(remoteDataTracks);
     }
 
     /** Interface that provides {@link RemoteParticipant} events. */

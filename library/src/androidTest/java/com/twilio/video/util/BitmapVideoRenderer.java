@@ -107,7 +107,6 @@ public class BitmapVideoRenderer implements VideoRenderer {
         // Now we need to unpack the YUV data into planes
         byte[] data = outputFrameBuffer.array();
         int offset = outputFrameBuffer.arrayOffset();
-        int stride = width;
         ByteBuffer[] yuvPlanes =
                 new ByteBuffer[] {
                     ByteBuffer.allocateDirect(width * height),
@@ -121,12 +120,12 @@ public class BitmapVideoRenderer implements VideoRenderer {
 
         // Write U
         for (int r = height; r < height * 3 / 2; ++r) {
-            yuvPlanes[1].put(data, offset + r * stride, stride / 2);
+            yuvPlanes[1].put(data, offset + r * width, width / 2);
         }
 
         // Write V
         for (int r = height; r < height * 3 / 2; ++r) {
-            yuvPlanes[2].put(data, offset + r * stride + stride / 2, stride / 2);
+            yuvPlanes[2].put(data, offset + r * width + width / 2, width / 2);
         }
 
         // Convert the YuvImage

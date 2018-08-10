@@ -128,12 +128,10 @@ public class AuthHelper {
 
     private static GoogleSignInOptions buildGoogleSignInOptions(final FragmentActivity activity) {
         Context context = activity.getBaseContext();
-        GoogleSignInOptions gso =
-                new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                        .requestIdToken(context.getString(R.string.default_web_client_id))
-                        .requestEmail()
-                        .setHostedDomain("twilio.com")
-                        .build();
-        return gso;
+        return new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestIdToken(context.getString(R.string.default_web_client_id))
+                .requestEmail()
+                .setHostedDomain("twilio.com")
+                .build();
     }
 }

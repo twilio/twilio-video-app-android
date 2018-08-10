@@ -31,11 +31,13 @@ public class IceOptions {
     private final Set<IceServer> iceServers;
     private final IceTransportPolicy iceTransportPolicy;
     private final boolean abortOnIceServersTimeout;
+    private final long iceServersTimeout;
 
     private IceOptions(Builder builder) {
         this.iceServers = builder.iceServers;
         this.iceTransportPolicy = builder.iceTransportPolicy;
         this.abortOnIceServersTimeout = builder.abortOnIceServersTimeout;
+        this.iceServersTimeout = builder.iceServersTimeout;
     }
 
     @NonNull
@@ -60,10 +62,15 @@ public class IceOptions {
         return iceServersArray;
     }
 
+    public long getIceServersTimeout() {
+        return iceServersTimeout;
+    }
+
     public static class Builder {
         private Set<IceServer> iceServers;
         private IceTransportPolicy iceTransportPolicy = IceTransportPolicy.ALL;
         private boolean abortOnIceServersTimeout = false;
+        private long iceServersTimeout = 3000;
 
         public Builder() {}
 
@@ -90,6 +97,15 @@ public class IceOptions {
          */
         public Builder abortOnIceServersTimeout(boolean abortOnIceServersTimeout) {
             this.abortOnIceServersTimeout = abortOnIceServersTimeout;
+            return this;
+        }
+
+        /**
+         * Time in milliseconds to attempt retrieving ICE servers before timing out. The default is
+         * 3000 milliseconds.
+         */
+        public Builder iceServersTimeout(long iceServersTimeout) {
+            this.iceServersTimeout = iceServersTimeout;
             return this;
         }
 

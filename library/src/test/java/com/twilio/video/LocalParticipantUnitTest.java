@@ -20,7 +20,7 @@ import static org.mockito.Mockito.when;
 
 import android.os.Handler;
 import com.twilio.video.util.Constants;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.Random;
 import org.junit.Before;
 import org.junit.Test;
@@ -49,9 +49,9 @@ public class LocalParticipantUnitTest {
                         random.nextLong(),
                         Constants.MOCK_PARTICIPANT_SID,
                         String.valueOf(random.nextInt(INT_MAX)),
-                        Arrays.asList(mockLocalAudioTrackPublication),
-                        Arrays.asList(mockLocalVideoTrackPublicationOne),
-                        Arrays.asList(mockLocalDataTrackPublication),
+                        Collections.singletonList(mockLocalAudioTrackPublication),
+                        Collections.singletonList(mockLocalVideoTrackPublicationOne),
+                        Collections.singletonList(mockLocalDataTrackPublication),
                         handler);
     }
 
@@ -61,9 +61,9 @@ public class LocalParticipantUnitTest {
                 random.nextLong(),
                 null,
                 String.valueOf(random.nextInt(INT_MAX)),
-                Arrays.asList(mockLocalAudioTrackPublication),
-                Arrays.asList(mockLocalVideoTrackPublicationOne),
-                Arrays.asList(mockLocalDataTrackPublication),
+                Collections.singletonList(mockLocalAudioTrackPublication),
+                Collections.singletonList(mockLocalVideoTrackPublicationOne),
+                Collections.singletonList(mockLocalDataTrackPublication),
                 handler);
     }
 
@@ -73,9 +73,9 @@ public class LocalParticipantUnitTest {
                 random.nextLong(),
                 "",
                 String.valueOf(random.nextInt(INT_MAX)),
-                Arrays.asList(mockLocalAudioTrackPublication),
-                Arrays.asList(mockLocalVideoTrackPublicationOne),
-                Arrays.asList(mockLocalDataTrackPublication),
+                Collections.singletonList(mockLocalAudioTrackPublication),
+                Collections.singletonList(mockLocalVideoTrackPublicationOne),
+                Collections.singletonList(mockLocalDataTrackPublication),
                 handler);
     }
 
@@ -85,9 +85,9 @@ public class LocalParticipantUnitTest {
                 random.nextLong(),
                 Constants.MOCK_PARTICIPANT_SID,
                 null,
-                Arrays.asList(mockLocalAudioTrackPublication),
-                Arrays.asList(mockLocalVideoTrackPublicationOne),
-                Arrays.asList(mockLocalDataTrackPublication),
+                Collections.singletonList(mockLocalAudioTrackPublication),
+                Collections.singletonList(mockLocalVideoTrackPublicationOne),
+                Collections.singletonList(mockLocalDataTrackPublication),
                 handler);
     }
 
@@ -97,9 +97,9 @@ public class LocalParticipantUnitTest {
                 random.nextLong(),
                 Constants.MOCK_PARTICIPANT_SID,
                 String.valueOf(random.nextInt(INT_MAX)),
-                Arrays.asList(mockLocalAudioTrackPublication),
-                Arrays.asList(mockLocalVideoTrackPublicationOne),
-                Arrays.asList(mockLocalDataTrackPublication),
+                Collections.singletonList(mockLocalAudioTrackPublication),
+                Collections.singletonList(mockLocalVideoTrackPublicationOne),
+                Collections.singletonList(mockLocalDataTrackPublication),
                 handler);
     }
 

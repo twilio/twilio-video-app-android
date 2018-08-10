@@ -1183,10 +1183,12 @@ public class RoomActivity extends BaseActivity {
 
     /** Removes all participant thumbs and push local camera as primary with empty sid. */
     private void removeAllParticipants() {
-        participantController.removeAllThumbs();
-        participantController.removePrimary();
+        if (room != null) {
+            participantController.removeAllThumbs();
+            participantController.removePrimary();
 
-        renderLocalParticipantStub();
+            renderLocalParticipantStub();
+        }
     }
 
     /**

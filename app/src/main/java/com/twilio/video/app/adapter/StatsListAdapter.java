@@ -164,7 +164,7 @@ public class StatsListAdapter extends RecyclerView.Adapter<StatsListAdapter.View
          * Generate new items on a separate list to ensure statsListItems changes are only
          * performed on the UI thread to meet the threading requirement of RecyclerView.Adapter.
          */
-        ImmutableList.Builder statsListItemsBuilder = new ImmutableList.Builder<StatsListItem>();
+        ImmutableList.Builder<StatsListItem> statsListItemsBuilder = new ImmutableList.Builder<>();
 
         // Generate stats items list from reports
         boolean localTracksAdded = false;
@@ -251,7 +251,7 @@ public class StatsListAdapter extends RecyclerView.Adapter<StatsListAdapter.View
             }
         }
 
-        final ImmutableList immutableStatsListItems = statsListItemsBuilder.build();
+        final ImmutableList<StatsListItem> immutableStatsListItems = statsListItemsBuilder.build();
 
         handler.post(
                 () -> {

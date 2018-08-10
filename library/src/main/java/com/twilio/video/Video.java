@@ -33,7 +33,7 @@ import java.util.Set;
 /** This class allows a user to connect to a Room. */
 public abstract class Video {
     private static LogLevel level = LogLevel.OFF;
-    private static Map<LogModule, LogLevel> moduleLogLevel = new EnumMap(LogModule.class);
+    private static Map<LogModule, LogLevel> moduleLogLevel = new EnumMap<>(LogModule.class);
     private static volatile boolean libraryIsLoaded = false;
     private static final Logger logger = Logger.getLogger(Video.class);
 

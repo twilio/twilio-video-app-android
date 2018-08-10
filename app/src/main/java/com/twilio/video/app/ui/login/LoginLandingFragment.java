@@ -48,8 +48,7 @@ public class LoginLandingFragment extends Fragment {
     public LoginLandingFragment() {}
 
     public static LoginLandingFragment newInstance() {
-        LoginLandingFragment fragment = new LoginLandingFragment();
-        return fragment;
+        return new LoginLandingFragment();
     }
 
     @Override

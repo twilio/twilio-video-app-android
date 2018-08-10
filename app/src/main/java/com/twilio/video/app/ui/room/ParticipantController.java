@@ -266,7 +266,9 @@ public class ParticipantController {
      */
     public ParticipantView getThumb(String sid, VideoTrack videoTrack) {
         for (Map.Entry<Item, ParticipantView> entry : thumbs.entrySet()) {
-            if (entry.getKey().sid.equals(sid) && entry.getKey().videoTrack == videoTrack) {
+            if (entry.getKey() != null
+                    && entry.getKey().sid.equals(sid)
+                    && entry.getKey().videoTrack == videoTrack) {
                 return entry.getValue();
             }
         }
@@ -277,7 +279,9 @@ public class ParticipantController {
     public void removeAllThumbs() {
         for (Map.Entry<Item, ParticipantView> entry : thumbs.entrySet()) {
             thumbsViewContainer.removeView(entry.getValue());
-            removeRender(entry.getKey().videoTrack, entry.getValue());
+            if (entry.getKey() != null) {
+                removeRender(entry.getKey().videoTrack, entry.getValue());
+            }
         }
         thumbs.clear();
     }

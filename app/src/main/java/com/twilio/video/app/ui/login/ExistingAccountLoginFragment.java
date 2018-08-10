@@ -51,8 +51,8 @@ public class ExistingAccountLoginFragment extends Fragment {
     public ExistingAccountLoginFragment() {}
 
     public static ExistingAccountLoginFragment newInstance() {
-        ExistingAccountLoginFragment fragment = new ExistingAccountLoginFragment();
-        return fragment;
+
+        return new ExistingAccountLoginFragment();
     }
 
     @Override

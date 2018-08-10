@@ -16,6 +16,8 @@
 
 package com.twilio.video;
 
+import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.fail;
 import static org.apache.commons.lang3.RandomStringUtils.random;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
@@ -104,6 +106,65 @@ public class IceTopologyParameterizedTest extends BaseVideoTest {
         assertTrue(MediaFactory.isReleased());
     }
 
+    @Test
+    public void doTestConnectWithIceServerAbortInvalidToken() throws InterruptedException {
+        IceOptions iceOptions =
+                new IceOptions.Builder()
+                        .iceServersTimeout(3000)
+                        .abortOnIceServersTimeout(true)
+                        .build();
+
+        String invalidToken = "invalid token";
+        ConnectOptions connectOptions =
+                new ConnectOptions.Builder(invalidToken).iceOptions(iceOptions).build();
+        final CountDownLatch connectFailure = new CountDownLatch(1);
+        Video.connect(
+                mediaTestActivity,
+                connectOptions,
+                new Room.Listener() {
+                    @Override
+                    public void onConnected(Room room) {
+                        fail();
+                    }
+
+                    @Override
+                    public void onConnectFailure(Room room, TwilioException twilioException) {
+                        assertEquals(
+                                TwilioException.CONFIGURATION_ACQUIRE_FAILED_EXCEPTION,
+                                twilioException.getCode());
+                        connectFailure.countDown();
+                    }
+
+                    @Override
+                    public void onDisconnected(Room room, TwilioException twilioException) {
+                        fail();
+                    }
+
+                    @Override
+                    public void onParticipantConnected(
+                            Room room, RemoteParticipant remoteParticipant) {
+                        fail();
+                    }
+
+                    @Override
+                    public void onParticipantDisconnected(
+                            Room room, RemoteParticipant remoteParticipant) {
+                        fail();
+                    }
+
+                    @Override
+                    public void onRecordingStarted(Room room) {
+                        fail();
+                    }
+
+                    @Override
+                    public void onRecordingStopped(Room room) {
+                        fail();
+                    }
+                });
+        assertTrue(connectFailure.await(10, TimeUnit.SECONDS));
+    }
+
     @Ignore
     @Test
     public void shouldConnectWithWrongIceServers() throws InterruptedException {
@@ -139,7 +200,11 @@ public class IceTopologyParameterizedTest extends BaseVideoTest {
         roomListener.onDisconnectedLatch = new CountDownLatch(1);
         roomListener.onConnectFailureLatch = new CountDownLatch(1);
 
-        IceOptions iceOptions = new IceOptions.Builder().abortOnIceServersTimeout(true).build();
+        IceOptions iceOptions =
+                new IceOptions.Builder()
+                        .iceServersTimeout(1)
+                        .abortOnIceServersTimeout(true)
+                        .build();
         ConnectOptions connectOptions =
                 new ConnectOptions.Builder(aliceToken)
                         .roomName(roomName)
@@ -147,11 +212,11 @@ public class IceTopologyParameterizedTest extends BaseVideoTest {
                         .build();
 
         Room room = Video.connect(mediaTestActivity, connectOptions, roomListener);
-        boolean isConnected = roomListener.onConnectedLatch.await(20, TimeUnit.SECONDS);
+        boolean isConnected = roomListener.onConnectedLatch.await(10, TimeUnit.SECONDS);
 
         if (isConnected) {
             room.disconnect();
-            roomListener.onDisconnectedLatch.await(20, TimeUnit.SECONDS);
+            roomListener.onDisconnectedLatch.await(10, TimeUnit.SECONDS);
         } else {
             if (roomListener.getTwilioException() != null) {
                 assertTrue(
@@ -159,6 +224,32 @@ public class IceTopologyParameterizedTest extends BaseVideoTest {
                                 == TwilioException.CONFIGURATION_ACQUIRE_FAILED_EXCEPTION);
             }
         }
+        RoomUtils.completeRoom(room);
+    }
+
+    @Test
+    public void shouldConnectWithLongTimeoutAndAbort() throws InterruptedException {
+        CallbackHelper.FakeRoomListener roomListener = new CallbackHelper.FakeRoomListener();
+        roomListener.onConnectedLatch = new CountDownLatch(1);
+        roomListener.onDisconnectedLatch = new CountDownLatch(1);
+        roomListener.onConnectFailureLatch = new CountDownLatch(1);
+
+        IceOptions iceOptions =
+                new IceOptions.Builder()
+                        .iceServersTimeout(60000)
+                        .abortOnIceServersTimeout(true)
+                        .build();
+        ConnectOptions connectOptions =
+                new ConnectOptions.Builder(aliceToken)
+                        .roomName(roomName)
+                        .iceOptions(iceOptions)
+                        .build();
+
+        Room room = Video.connect(mediaTestActivity, connectOptions, roomListener);
+        boolean isConnected = roomListener.onConnectedLatch.await(60, TimeUnit.SECONDS);
+        assertTrue(isConnected);
+        room.disconnect();
+        assertTrue(roomListener.onDisconnectedLatch.await(20, TimeUnit.SECONDS));
         RoomUtils.completeRoom(room);
     }
 

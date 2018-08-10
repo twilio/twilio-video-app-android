@@ -43,11 +43,11 @@ public class RemoteParticipantUnitTest {
                 new RemoteParticipant(
                         String.valueOf(random.nextInt(INT_MAX)),
                         String.valueOf(random.nextInt(INT_MAX)),
-                        Arrays.asList(mockRemoteAudioTrackPublication),
+                        Arrays.asList(mockRemoteAudioTrackPublication, null),
                         Arrays.asList(
                                 mockRemoteVideoTrackPublicationOne,
                                 mockRemoteVideoTrackPublicationTwo),
-                        Arrays.asList(mockRemoteDataTrackPublication),
+                        Arrays.asList(mockRemoteDataTrackPublication, null),
                         handler,
                         random.nextLong());
     }
