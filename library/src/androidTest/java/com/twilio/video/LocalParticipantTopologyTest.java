@@ -56,7 +56,8 @@ public class LocalParticipantTopologyTest extends BaseVideoTest {
 
     @Parameterized.Parameters(name = "{0}")
     public static Iterable<Object[]> data() {
-        return Arrays.asList(new Object[][] {{Topology.P2P}, {Topology.GROUP}});
+        return Arrays.asList(
+                new Object[][] {{Topology.P2P}, {Topology.GROUP}, {Topology.GROUP_SMALL}});
     }
 
     @Rule
@@ -303,7 +304,7 @@ public class LocalParticipantTopologyTest extends BaseVideoTest {
         assertEquals(1, localParticipant.getLocalAudioTracks().size());
         assertEquals(1, localParticipant.getVideoTracks().size());
         assertEquals(1, localParticipant.getLocalVideoTracks().size());
-        if (topology == Topology.GROUP) {
+        if (topology == Topology.GROUP || topology == Topology.GROUP_SMALL) {
             assertTrue(
                     localParticipantListener.onPublishedDataTrackLatch.await(20, TimeUnit.SECONDS));
         }
@@ -707,7 +708,7 @@ public class LocalParticipantTopologyTest extends BaseVideoTest {
         /*
          * This test is set to retry because sometimes setListener is called after the event occurs
          */
-        if (topology == Topology.GROUP) {
+        if (topology == Topology.GROUP || topology == Topology.GROUP_SMALL) {
             assertTrue(
                     localParticipantListener.onPublishedDataTrackLatch.await(20, TimeUnit.SECONDS));
         }

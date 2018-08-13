@@ -59,8 +59,10 @@ public class RoomUtils {
                         : codecListToStringList(videoCodecs);
         if (topology == Topology.P2P) {
             enableTurn = true;
-        } else {
+        } else if (topology == Topology.GROUP) {
             type = VideoApiUtils.GROUP;
+        } else if (topology == Topology.GROUP_SMALL) {
+            type = VideoApiUtils.GROUP_SMALL;
         }
         return VideoApiUtils.createRoom(
                 credentials.get(CredentialsUtils.ACCOUNT_SID),

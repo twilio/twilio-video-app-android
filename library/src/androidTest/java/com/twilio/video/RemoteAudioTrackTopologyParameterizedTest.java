@@ -44,7 +44,8 @@ import org.junit.runners.Parameterized;
 public class RemoteAudioTrackTopologyParameterizedTest extends BaseParticipantTest {
     @Parameterized.Parameters(name = "{0}")
     public static Iterable<Object[]> data() {
-        return Arrays.asList(new Object[][] {{Topology.P2P}, {Topology.GROUP}});
+        return Arrays.asList(
+                new Object[][] {{Topology.P2P}, {Topology.GROUP}, {Topology.GROUP_SMALL}});
     }
 
     @Rule public final RetryRule retryRule = new RetryRule();

@@ -48,7 +48,8 @@ import org.junit.runners.Parameterized;
 public class RoomMultiPartyTopologyParameterizedTest extends BaseVideoTest {
     @Parameterized.Parameters(name = "{0}")
     public static Iterable<Object[]> data() {
-        return Arrays.asList(new Object[][] {{Topology.P2P}, {Topology.GROUP}});
+        return Arrays.asList(
+                new Object[][] {{Topology.P2P}, {Topology.GROUP}, {Topology.GROUP_SMALL}});
     }
 
     private static final int PARTICIPANT_NUM = 3;

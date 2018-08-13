@@ -244,7 +244,8 @@ public class RoomTopologyParameterizedTest extends BaseVideoTest {
         assertNull(room.getLocalParticipant());
         assertTrue(roomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
 
-        if (topology == Topology.GROUP && enableRecording) {
+        if ((topology == Topology.GROUP && enableRecording)
+                || (topology == Topology.GROUP_SMALL && enableRecording)) {
             Assert.assertTrue(room.isRecording());
         } else {
             assertFalse(room.isRecording());

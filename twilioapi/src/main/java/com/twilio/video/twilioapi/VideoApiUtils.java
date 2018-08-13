@@ -47,6 +47,7 @@ public class VideoApiUtils {
 
     public static final String P2P = "peer-to-peer";
     public static final String GROUP = "group";
+    public static final String GROUP_SMALL = "group-small";
 
     private static String currentEnvironment = PROD;
 
@@ -118,7 +119,9 @@ public class VideoApiUtils {
                 && !environment.equalsIgnoreCase(DEV)) {
             throw new IllegalArgumentException("Invalid Environment!");
         }
-        if (!type.equalsIgnoreCase(P2P) && !type.equalsIgnoreCase(GROUP)) {
+        if (!type.equalsIgnoreCase(P2P)
+                && !type.equalsIgnoreCase(GROUP)
+                && !type.equalsIgnoreCase(GROUP_SMALL)) {
             throw new IllegalArgumentException("Invalid Room Type!");
         }
         if (!currentEnvironment.equalsIgnoreCase(environment)) {
@@ -148,7 +151,9 @@ public class VideoApiUtils {
                 && !environment.equalsIgnoreCase(DEV)) {
             throw new IllegalArgumentException("Invalid Environment!");
         }
-        if (!type.equalsIgnoreCase(P2P) && !type.equalsIgnoreCase(GROUP)) {
+        if (!type.equalsIgnoreCase(P2P)
+                && !type.equalsIgnoreCase(GROUP)
+                && !type.equalsIgnoreCase(GROUP_SMALL)) {
             throw new IllegalArgumentException("Invalid Room Type!");
         }
         if (!currentEnvironment.equalsIgnoreCase(environment)) {
@@ -217,7 +222,8 @@ public class VideoApiUtils {
          * Note that for a group room the infrastructure will always return enableTurn=true even if
          * the request was made with enableTurn=false.
          */
-        boolean expectedEnableTurn = type.equalsIgnoreCase(GROUP) || enableTurn;
+        boolean expectedEnableTurn =
+                type.equalsIgnoreCase(GROUP) || type.equalsIgnoreCase(GROUP_SMALL) || enableTurn;
         assertTrue(
                 "Room resource does not match configuration requested for test",
                 accountSid.equals(videoRoom.getAccountSid())

@@ -55,7 +55,8 @@ import org.junit.runners.Parameterized;
 public class VideoTopologyParameterizedTest extends BaseVideoTest {
     @Parameterized.Parameters(name = "{0}")
     public static Iterable<Object[]> data() {
-        return Arrays.asList(new Object[][] {{Topology.P2P}, {Topology.GROUP}});
+        return Arrays.asList(
+                new Object[][] {{Topology.P2P}, {Topology.GROUP}, {Topology.GROUP_SMALL}});
     }
 
     @Rule
@@ -227,7 +228,7 @@ public class VideoTopologyParameterizedTest extends BaseVideoTest {
         LocalParticipant localParticipant = room.getLocalParticipant();
         localParticipant.setListener(localParticipantListener);
 
-        if (topology == Topology.GROUP) {
+        if (topology == Topology.GROUP || topology == Topology.GROUP_SMALL) {
             assertTrue(
                     localParticipantListener.onPublishedDataTrackLatch.await(20, TimeUnit.SECONDS));
         }
@@ -283,7 +284,7 @@ public class VideoTopologyParameterizedTest extends BaseVideoTest {
         assertEquals(localAudioTrack, localParticipant.getAudioTracks().get(0).getAudioTrack());
         assertNotNull(localParticipant.getLocalVideoTracks().get(0));
         assertEquals(localVideoTrack, localParticipant.getVideoTracks().get(0).getVideoTrack());
-        if (topology == Topology.GROUP) {
+        if (topology == Topology.GROUP || topology == Topology.GROUP_SMALL) {
             assertTrue(
                     localParticipantListener.onPublishedDataTrackLatch.await(20, TimeUnit.SECONDS));
         }
@@ -361,7 +362,7 @@ public class VideoTopologyParameterizedTest extends BaseVideoTest {
         localDataTrack.release();
         assertTrue(roomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
         room.getLocalParticipant().setListener(localParticipantListener);
-        if (topology == Topology.GROUP) {
+        if (topology == Topology.GROUP || topology == Topology.GROUP_SMALL) {
             assertTrue(
                     localParticipantListener.onPublishedDataTrackLatch.await(20, TimeUnit.SECONDS));
         }
