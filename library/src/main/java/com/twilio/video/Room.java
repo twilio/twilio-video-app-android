@@ -359,7 +359,7 @@ public class Room {
      *
      * Thread validation is performed in RoomDelegate.
      */
-    synchronized void releaseRoom() {
+    private synchronized void releaseRoom() {
         if (nativeRoomDelegate != 0) {
             for (RemoteParticipant remoteParticipant : participantMap.values()) {
                 remoteParticipant.release();
@@ -373,7 +373,7 @@ public class Room {
      * Release the native RoomDelegate from developer thread once the native Room memory
      * has been released.
      */
-    synchronized void release() {
+    private synchronized void release() {
         ThreadChecker.checkIsValidThread(handler);
 
         if (nativeRoomDelegate != 0) {
