@@ -16,6 +16,7 @@
 
 package com.twilio.video;
 
+import static com.twilio.video.TestUtils.ICE_TIMEOUT;
 import static junit.framework.Assert.assertFalse;
 import static junit.framework.Assert.assertNotNull;
 import static org.apache.commons.lang3.RandomStringUtils.random;
@@ -58,7 +59,6 @@ public class RemoteParticipantTopologyParameterizedTest extends BaseParticipantT
     }
 
     @Rule public final RetryRule retryRule = new RetryRule();
-
     private Context context;
     private String tokenOne;
     private String tokenTwo;
@@ -107,13 +107,25 @@ public class RemoteParticipantTopologyParameterizedTest extends BaseParticipantT
         roomListener.onConnectedLatch = new CountDownLatch(1);
         roomListener.onDisconnectedLatch = new CountDownLatch(1);
         roomListener.onParticipantConnectedLatch = new CountDownLatch(1);
+        IceOptions iceOptions =
+                new IceOptions.Builder()
+                        .iceServersTimeout(ICE_TIMEOUT)
+                        .abortOnIceServersTimeout(true)
+                        .build();
         ConnectOptions connectOptions =
-                new ConnectOptions.Builder(tokenOne).roomName(roomName).build();
+                new ConnectOptions.Builder(tokenOne)
+                        .roomName(roomName)
+                        .iceOptions(iceOptions)
+                        .build();
         room = Video.connect(context, connectOptions, roomListener);
         assertTrue(roomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
         assertEquals(RoomState.CONNECTED, room.getState());
 
-        connectOptions = new ConnectOptions.Builder(tokenTwo).roomName(roomName).build();
+        connectOptions =
+                new ConnectOptions.Builder(tokenTwo)
+                        .roomName(roomName)
+                        .iceOptions(iceOptions)
+                        .build();
         otherRoomListener.onDisconnectedLatch = new CountDownLatch(1);
         otherRoom = Video.connect(context, connectOptions, otherRoomListener);
         assertTrue(roomListener.onParticipantConnectedLatch.await(20, TimeUnit.SECONDS));
@@ -127,14 +139,25 @@ public class RemoteParticipantTopologyParameterizedTest extends BaseParticipantT
         roomListener.onDisconnectedLatch = new CountDownLatch(1);
         roomListener.onParticipantDisconnectedLatch = new CountDownLatch(1);
         roomListener.onParticipantConnectedLatch = new CountDownLatch(1);
+        IceOptions iceOptions =
+                new IceOptions.Builder()
+                        .iceServersTimeout(ICE_TIMEOUT)
+                        .abortOnIceServersTimeout(true)
+                        .build();
         ConnectOptions connectOptions =
-                new ConnectOptions.Builder(tokenOne).roomName(roomName).build();
+                new ConnectOptions.Builder(tokenOne)
+                        .roomName(roomName)
+                        .iceOptions(iceOptions)
+                        .build();
         room = Video.connect(context, connectOptions, roomListener);
         assertTrue(roomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
         assertEquals(RoomState.CONNECTED, room.getState());
 
         ConnectOptions connectOptions2 =
-                new ConnectOptions.Builder(tokenTwo).roomName(roomName).build();
+                new ConnectOptions.Builder(tokenTwo)
+                        .roomName(roomName)
+                        .iceOptions(iceOptions)
+                        .build();
         otherRoomListener.onConnectedLatch = new CountDownLatch(1);
         otherRoomListener.onDisconnectedLatch = new CountDownLatch(1);
         otherRoom = Video.connect(context, connectOptions2, otherRoomListener);
@@ -176,14 +199,25 @@ public class RemoteParticipantTopologyParameterizedTest extends BaseParticipantT
         roomListener.onDisconnectedLatch = new CountDownLatch(1);
         roomListener.onParticipantDisconnectedLatch = new CountDownLatch(1);
         roomListener.onParticipantConnectedLatch = new CountDownLatch(1);
+        IceOptions iceOptions =
+                new IceOptions.Builder()
+                        .iceServersTimeout(ICE_TIMEOUT)
+                        .abortOnIceServersTimeout(true)
+                        .build();
         ConnectOptions connectOptions =
-                new ConnectOptions.Builder(tokenOne).roomName(roomName).build();
+                new ConnectOptions.Builder(tokenOne)
+                        .roomName(roomName)
+                        .iceOptions(iceOptions)
+                        .build();
         room = Video.connect(context, connectOptions, roomListener);
         assertTrue(roomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
         assertEquals(RoomState.CONNECTED, room.getState());
 
         ConnectOptions connectOptions2 =
-                new ConnectOptions.Builder(tokenTwo).roomName(roomName).build();
+                new ConnectOptions.Builder(tokenTwo)
+                        .roomName(roomName)
+                        .iceOptions(iceOptions)
+                        .build();
         otherRoomListener.onConnectedLatch = new CountDownLatch(1);
         otherRoomListener.onDisconnectedLatch = new CountDownLatch(1);
         otherRoom = Video.connect(context, connectOptions2, otherRoomListener);

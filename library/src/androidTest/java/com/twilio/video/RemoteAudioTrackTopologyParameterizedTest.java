@@ -21,6 +21,7 @@ import static junit.framework.TestCase.assertFalse;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import android.support.test.InstrumentationRegistry;
 import android.support.test.filters.LargeTest;
 import com.kevinmost.junit_retry_rule.Retry;
 import com.kevinmost.junit_retry_rule.RetryRule;
@@ -50,6 +51,7 @@ public class RemoteAudioTrackTopologyParameterizedTest extends BaseParticipantTe
 
     @Rule public final RetryRule retryRule = new RetryRule();
     private final Topology topology;
+    private static final long THREAD_SLEEP = 10000;
 
     public RemoteAudioTrackTopologyParameterizedTest(Topology topology) {
         this.topology = topology;
@@ -119,7 +121,18 @@ public class RemoteAudioTrackTopologyParameterizedTest extends BaseParticipantTe
         assertFalse(bobRemoteAudioTrackPublication.getRemoteAudioTrack().isPlaybackEnabled());
 
         // Wait to allow audio to flow and stats to contain valid values
-        Thread.sleep(3000);
+        InstrumentationRegistry.getInstrumentation()
+                .runOnMainSync(
+                        new Runnable() {
+                            @Override
+                            public void run() {
+                                try {
+                                    Thread.sleep(THREAD_SLEEP);
+                                } catch (InterruptedException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        });
 
         // Request stats report
         statsListener.onStatsLatch = new CountDownLatch(1);
@@ -135,7 +148,18 @@ public class RemoteAudioTrackTopologyParameterizedTest extends BaseParticipantTe
         bobRemoteAudioTrackPublication.getRemoteAudioTrack().enablePlayback(true);
 
         // Wait to allow audio to flow and stats to contain valid values
-        Thread.sleep(3000);
+        InstrumentationRegistry.getInstrumentation()
+                .runOnMainSync(
+                        new Runnable() {
+                            @Override
+                            public void run() {
+                                try {
+                                    Thread.sleep(THREAD_SLEEP);
+                                } catch (InterruptedException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        });
 
         // Request stats report
         statsListener.onStatsLatch = new CountDownLatch(1);

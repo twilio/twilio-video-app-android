@@ -16,6 +16,7 @@
 
 package com.twilio.video;
 
+import static com.twilio.video.TestUtils.ICE_TIMEOUT;
 import static com.twilio.video.util.VideoAssert.assertIsParticipantSid;
 import static junit.framework.Assert.assertFalse;
 import static junit.framework.Assert.assertNull;
@@ -131,12 +132,17 @@ public class RoomTopologyParameterizedTest extends BaseVideoTest {
         roomListener.onDisconnectedLatch = new CountDownLatch(1);
         localAudioTrack = LocalAudioTrack.create(mediaTestActivity, true);
         localVideoTrack = LocalVideoTrack.create(mediaTestActivity, true, new FakeVideoCapturer());
-
+        IceOptions iceOptions =
+                new IceOptions.Builder()
+                        .abortOnIceServersTimeout(true)
+                        .iceServersTimeout(ICE_TIMEOUT)
+                        .build();
         ConnectOptions connectOptions =
                 new ConnectOptions.Builder(token)
                         .roomName(roomName)
                         .audioTracks(Collections.singletonList(localAudioTrack))
                         .videoTracks(Collections.singletonList(localVideoTrack))
+                        .iceOptions(iceOptions)
                         .build();
         room = Video.connect(mediaTestActivity, connectOptions, roomListener);
         assertNull(room.getLocalParticipant());
@@ -163,8 +169,13 @@ public class RoomTopologyParameterizedTest extends BaseVideoTest {
     @Test
     @Retry(times = BuildConfig.MAX_TEST_RETRIES)
     public void shouldReconnect() throws InterruptedException {
+        IceOptions iceOptions =
+                new IceOptions.Builder()
+                        .iceServersTimeout(ICE_TIMEOUT)
+                        .abortOnIceServersTimeout(true)
+                        .build();
         ConnectOptions connectOptions =
-                new ConnectOptions.Builder(token).roomName(roomName).build();
+                new ConnectOptions.Builder(token).roomName(roomName).iceOptions(iceOptions).build();
         for (int i = 0; i < 5; i++) {
             roomListener.onConnectedLatch = new CountDownLatch(1);
             roomListener.onDisconnectedLatch = new CountDownLatch(1);
@@ -237,9 +248,13 @@ public class RoomTopologyParameterizedTest extends BaseVideoTest {
     public void shouldReturnValidRecordingState() throws InterruptedException {
         roomListener.onConnectedLatch = new CountDownLatch(1);
         roomListener.onDisconnectedLatch = new CountDownLatch(1);
-
+        IceOptions iceOptions =
+                new IceOptions.Builder()
+                        .iceServersTimeout(ICE_TIMEOUT)
+                        .abortOnIceServersTimeout(true)
+                        .build();
         ConnectOptions connectOptions =
-                new ConnectOptions.Builder(token).roomName(roomName).build();
+                new ConnectOptions.Builder(token).roomName(roomName).iceOptions(iceOptions).build();
         room = Video.connect(mediaTestActivity, connectOptions, roomListener);
         assertNull(room.getLocalParticipant());
         assertTrue(roomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
@@ -261,8 +276,13 @@ public class RoomTopologyParameterizedTest extends BaseVideoTest {
     @Test
     public void shouldDisconnectDuplicateParticipant() throws InterruptedException {
         // Connect first bobRemoteParticipant
+        IceOptions iceOptions =
+                new IceOptions.Builder()
+                        .iceServersTimeout(ICE_TIMEOUT)
+                        .abortOnIceServersTimeout(true)
+                        .build();
         ConnectOptions connectOptions =
-                new ConnectOptions.Builder(token).roomName(roomName).build();
+                new ConnectOptions.Builder(token).roomName(roomName).iceOptions(iceOptions).build();
         final CountDownLatch connectedLatch = new CountDownLatch(1);
         final CountDownLatch disconnectedLatch = new CountDownLatch(1);
         Video.connect(
@@ -311,7 +331,8 @@ public class RoomTopologyParameterizedTest extends BaseVideoTest {
         assertTrue(connectedLatch.await(10, TimeUnit.SECONDS));
 
         // Connect second bobRemoteParticipant
-        connectOptions = new ConnectOptions.Builder(token).roomName(roomName).build();
+        connectOptions =
+                new ConnectOptions.Builder(token).roomName(roomName).iceOptions(iceOptions).build();
         roomListener.onConnectedLatch = new CountDownLatch(1);
         roomListener.onDisconnectedLatch = new CountDownLatch(1);
         room = Video.connect(mediaTestActivity, connectOptions, roomListener);

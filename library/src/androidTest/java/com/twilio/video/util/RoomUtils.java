@@ -30,7 +30,6 @@ import retrofit.RetrofitError;
 import retrofit.client.Response;
 
 public class RoomUtils {
-
     private static final String TAG = "RoomUtils";
 
     public static VideoRoom createRoom(String name, Topology topology) {
