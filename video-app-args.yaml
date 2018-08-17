@@ -17,6 +17,7 @@ library-virtual-device-tests:
         - {model: Nexus5X, version: 25}
         - {model: Pixel2, version: 26}
         - {model: Pixel2, version: 27}
+        - {model: Pixel2, version: 28}  
     test-targets:
         - class com.twilio.video.StatsTest
         - class com.twilio.video.StatsTopologyParameterizedTest
@@ -43,6 +44,7 @@ library-physical-device-tests:
         - {model: sailfish, version: 25}
         - {model: walleye, version: 26}
         - {model: walleye, version: 27}
+        - {model: walleye, version: 28}
     environment-variables:
         notClass: com.twilio.video.LocalParticipantTopologyTest,com.twilio.video.DataTrackTopologyParameterizedTest,com.twilio.video.StatsTest,com.twilio.video.StatsTopologyParameterizedTest,com.twilio.video.CodecPreferencesTest,com.twilio.video.MultiCodecParameterizedTest,com.twilio.video.RemoteAudioTrackTopologyParameterizedTest#shouldAllowEnablePlayback[P2P],com.twilio.video.RemoteAudioTrackTopologyParameterizedTest#shouldAllowEnablePlayback[GROUP],com.twilio.video.IceTopologyParameterizedTest
 
@@ -79,6 +81,7 @@ library-camera-tests:
         - {model: sailfish, version: 27}
         - {model: walleye, version: 26}
         - {model: walleye, version: 27}
+        - {model: walleye, version: 28}
         - {model: shamu, version: 22}
         - {model: zeroflte, version: 23}
         - {model: shamu, version: 22}
