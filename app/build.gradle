@@ -9,7 +9,7 @@ hockeyapp {
 }
 
 android {
-    compileSdkVersion versions.compileSdk
+    compileSdkVersion versions.compileSdkApp
     buildToolsVersion "${versions.buildTools}"
 
     packagingOptions {
@@ -20,7 +20,7 @@ android {
         applicationId "com.twilio.video.app"
 
         minSdkVersion versions.minSdk
-        targetSdkVersion versions.targetSdk
+        targetSdkVersion versions.targetSdkApp
 
         versionName generateVersionName()
         versionCode generateVersionCode()

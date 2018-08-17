@@ -16,9 +16,6 @@
 
 package com.twilio.video.twilioapi;
 
-import static junit.framework.Assert.assertNotNull;
-import static junit.framework.Assert.assertTrue;
-
 import android.util.Base64;
 import android.util.Log;
 import com.google.gson.GsonBuilder;
@@ -211,11 +208,12 @@ public class VideoApiUtils {
         } while (videoRoom == null && retries++ < MAX_RETRIES);
 
         // Validate the room creation succeeded
-        assertNotNull(
-                String.format(
-                        "Failed to create a Room after %s attempts", String.valueOf(MAX_RETRIES)),
-                videoRoom);
-
+        if (videoRoom == null) {
+            throw new IllegalStateException(
+                    String.format(
+                            "Failed to create a Room after %s attempts",
+                            String.valueOf(MAX_RETRIES)));
+        }
         /*
          * Validate the room resource.
          *
@@ -224,13 +222,17 @@ public class VideoApiUtils {
          */
         boolean expectedEnableTurn =
                 type.equalsIgnoreCase(GROUP) || type.equalsIgnoreCase(GROUP_SMALL) || enableTurn;
-        assertTrue(
-                "Room resource does not match configuration requested for test",
+
+        boolean isRoomResourceMatchingConfig =
                 accountSid.equals(videoRoom.getAccountSid())
                         && name.equals(videoRoom.getUniqueName())
                         && type.equals(videoRoom.getType())
                         && expectedEnableTurn == videoRoom.isEnableTurn()
-                        && enableRecording == videoRoom.isRecordParticipantOnConnect());
+                        && enableRecording == videoRoom.isRecordParticipantOnConnect();
+        if (!isRoomResourceMatchingConfig) {
+            throw new IllegalStateException(
+                    "Room resource does not match configuration requested for test");
+        }
 
         return videoRoom;
     }

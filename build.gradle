@@ -2,9 +2,11 @@ buildscript {
     apply from: "$rootProject.projectDir/common.gradle"
     ext.versions = [
             // Android
+            'compileSdkApp': 28,
             'compileSdk': 27,
-            'buildTools': '27.0.3',
+            'buildTools': '28.0.2',
             'minSdk': 16,
+            'targetSdkApp': 28,
             'targetSdk': 27,
 
             // Plugins
