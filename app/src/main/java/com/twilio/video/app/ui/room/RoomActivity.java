@@ -35,6 +35,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.content.PermissionChecker;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -445,6 +446,10 @@ public class RoomActivity extends BaseActivity {
 
     @OnClick(R.id.connect)
     void connectButtonClick() {
+        if (!didAcceptPermissions()) {
+            Toast.makeText(this, R.string.permissions_required, Toast.LENGTH_SHORT).show();
+            return;
+        }
         connect.setEnabled(false);
         // obtain room name
         final String roomName = roomEditText.getText().toString();
@@ -1771,5 +1776,15 @@ public class RoomActivity extends BaseActivity {
 
             // TODO: need design
         }
+    }
+
+    private boolean didAcceptPermissions() {
+        return PermissionChecker.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO)
+                        == PermissionChecker.PERMISSION_GRANTED
+                && PermissionChecker.checkSelfPermission(this, Manifest.permission.CAMERA)
+                        == PermissionChecker.PERMISSION_GRANTED
+                && PermissionChecker.checkSelfPermission(
+                                this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                        == PermissionChecker.PERMISSION_GRANTED;
     }
 }
