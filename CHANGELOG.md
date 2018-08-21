@@ -1,5 +1,27 @@
 The Twilio Programmable Video SDKs use [Semantic Versioning](http://www.semver.org).
 
+####3.0.0-beta1
+
+Enhancements
+
+- When a Room is completed via the REST API, connected Clients will now receive a `RoomObserver::onDisconnected()` callback with a "RoomCompleted" error (code 53118) instead of no error.
+- The signaling Client has been updated to support version 2 of the Room Signaling Protocol (RSP).
+
+Bug Fixes
+
+- The signaling Client is more lenient when encountering unexpected RSP messages.
+
+Known issues
+
+- Network handoff, and subsequent connection renegotiation is not supported for IPv6 networks [#72](https://github.com/twilio/video-quickstart-android/issues/72)
+- Participant disconnect event can take up to 120 seconds to occur [#80](https://github.com/twilio/video-quickstart-android/issues/80) [#73](https://github.com/twilio/video-quickstart-android/issues/73)
+- Codec preferences do not function correctly in a hybrid codec Group Room with the following
+codecs:
+    - ISAC
+    - PCMA
+    - G722
+    - VP9
+
 ####3.0.0-preview2
 
 Improvements
