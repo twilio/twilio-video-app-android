@@ -23,11 +23,8 @@ import static org.junit.Assert.assertTrue;
 
 import android.support.test.InstrumentationRegistry;
 import android.support.test.filters.LargeTest;
-import com.kevinmost.junit_retry_rule.Retry;
-import com.kevinmost.junit_retry_rule.RetryRule;
 import com.twilio.video.base.BaseParticipantTest;
 import com.twilio.video.helper.CallbackHelper;
-import com.twilio.video.test.BuildConfig;
 import com.twilio.video.util.Topology;
 import java.util.Arrays;
 import java.util.List;
@@ -35,7 +32,6 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -49,7 +45,6 @@ public class RemoteAudioTrackTopologyParameterizedTest extends BaseParticipantTe
                 new Object[][] {{Topology.P2P}, {Topology.GROUP}, {Topology.GROUP_SMALL}});
     }
 
-    @Rule public final RetryRule retryRule = new RetryRule();
     private final Topology topology;
     private static final long THREAD_SLEEP = 10000;
 
@@ -69,7 +64,6 @@ public class RemoteAudioTrackTopologyParameterizedTest extends BaseParticipantTe
     }
 
     @Test
-    @Retry(times = BuildConfig.MAX_TEST_RETRIES)
     public void shouldHaveTrackSid() throws InterruptedException {
         publishAudioTrack();
 
@@ -85,7 +79,6 @@ public class RemoteAudioTrackTopologyParameterizedTest extends BaseParticipantTe
     }
 
     @Test
-    @Retry(times = BuildConfig.MAX_TEST_RETRIES)
     public void shouldHaveTrackName() throws InterruptedException {
         publishAudioTrack();
 
@@ -103,7 +96,6 @@ public class RemoteAudioTrackTopologyParameterizedTest extends BaseParticipantTe
     }
 
     @Test
-    @Retry(times = BuildConfig.MAX_TEST_RETRIES)
     public void shouldAllowEnablePlayback() throws InterruptedException {
         final CallbackHelper.FakeStatsListener statsListener =
                 new CallbackHelper.FakeStatsListener();

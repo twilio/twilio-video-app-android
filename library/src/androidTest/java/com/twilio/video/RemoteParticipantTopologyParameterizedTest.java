@@ -27,11 +27,8 @@ import static org.junit.Assert.assertTrue;
 import android.content.Context;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.filters.LargeTest;
-import com.kevinmost.junit_retry_rule.Retry;
-import com.kevinmost.junit_retry_rule.RetryRule;
 import com.twilio.video.base.BaseParticipantTest;
 import com.twilio.video.helper.CallbackHelper;
-import com.twilio.video.test.BuildConfig;
 import com.twilio.video.util.Constants;
 import com.twilio.video.util.CredentialsUtils;
 import com.twilio.video.util.FakeVideoCapturer;
@@ -44,7 +41,6 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -58,7 +54,6 @@ public class RemoteParticipantTopologyParameterizedTest extends BaseParticipantT
                 new Object[][] {{Topology.P2P}, {Topology.GROUP}, {Topology.GROUP_SMALL}});
     }
 
-    @Rule public final RetryRule retryRule = new RetryRule();
     private Context context;
     private String tokenOne;
     private String tokenTwo;
@@ -102,7 +97,6 @@ public class RemoteParticipantTopologyParameterizedTest extends BaseParticipantT
     }
 
     @Test
-    @Retry(times = BuildConfig.MAX_TEST_RETRIES)
     public void participantCanConnect() throws InterruptedException {
         roomListener.onConnectedLatch = new CountDownLatch(1);
         roomListener.onDisconnectedLatch = new CountDownLatch(1);
@@ -133,7 +127,6 @@ public class RemoteParticipantTopologyParameterizedTest extends BaseParticipantT
     }
 
     @Test
-    @Retry(times = BuildConfig.MAX_TEST_RETRIES)
     public void participantCanDisconnect() throws InterruptedException {
         roomListener.onConnectedLatch = new CountDownLatch(1);
         roomListener.onDisconnectedLatch = new CountDownLatch(1);
@@ -191,7 +184,6 @@ public class RemoteParticipantTopologyParameterizedTest extends BaseParticipantT
     }
 
     @Test
-    @Retry(times = BuildConfig.MAX_TEST_RETRIES)
     public void participantShouldHaveValidIdentity() throws InterruptedException {
         String expectedIdentity = random(50);
         tokenOne = CredentialsUtils.getAccessToken(expectedIdentity, topology);
@@ -252,7 +244,6 @@ public class RemoteParticipantTopologyParameterizedTest extends BaseParticipantT
     }
 
     @Test
-    @Retry(times = BuildConfig.MAX_TEST_RETRIES)
     public void shouldReceiveTrackEvents() throws InterruptedException {
         // Audio track added and subscribed
         CallbackHelper.FakeParticipantListener participantListener =
@@ -351,7 +342,6 @@ public class RemoteParticipantTopologyParameterizedTest extends BaseParticipantT
     }
 
     @Test
-    @Retry(times = BuildConfig.MAX_TEST_RETRIES)
     public void shouldHaveTracksAfterDisconnected() throws InterruptedException {
         // Add audio and video tracks
         CallbackHelper.FakeParticipantListener participantListener =

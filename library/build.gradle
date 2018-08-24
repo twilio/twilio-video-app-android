@@ -142,7 +142,6 @@ dependencies {
     androidTestImplementation "com.android.support.test.uiautomator:uiautomator-v18:${versions.uiAutomator}"
     androidTestImplementation "com.google.code.gson:gson:${versions.gson}"
     androidTestImplementation "org.apache.commons:commons-lang3:${versions.apacheCommons}"
-    androidTestImplementation "com.github.kevinmost:junit-retry-rule:${versions.junitRetryRule}"
     androidTestImplementation "pl.pragmatists:JUnitParams:${versions.junitParams}"
 
     implementation "com.android.support:support-annotations:${versions.supportLibrary}"

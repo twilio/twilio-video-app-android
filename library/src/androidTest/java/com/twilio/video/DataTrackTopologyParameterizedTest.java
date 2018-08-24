@@ -23,11 +23,8 @@ import static org.junit.Assert.assertTrue;
 
 import android.support.test.InstrumentationRegistry;
 import android.support.test.filters.LargeTest;
-import com.kevinmost.junit_retry_rule.Retry;
-import com.kevinmost.junit_retry_rule.RetryRule;
 import com.twilio.video.base.BaseParticipantTest;
 import com.twilio.video.helper.CallbackHelper;
-import com.twilio.video.test.BuildConfig;
 import com.twilio.video.util.Constants;
 import com.twilio.video.util.CredentialsUtils;
 import com.twilio.video.util.Topology;
@@ -39,7 +36,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -53,7 +49,6 @@ public class DataTrackTopologyParameterizedTest extends BaseParticipantTest {
                 new Object[][] {{Topology.P2P}, {Topology.GROUP}, {Topology.GROUP_SMALL}});
     }
 
-    @Rule public final RetryRule retryRule = new RetryRule();
     private final Topology topology;
     private final CallbackHelper.FakeRemoteDataTrackListener dataTrackListener =
             new CallbackHelper.FakeRemoteDataTrackListener();
@@ -75,7 +70,6 @@ public class DataTrackTopologyParameterizedTest extends BaseParticipantTest {
     }
 
     @Test
-    @Retry(times = BuildConfig.MAX_TEST_RETRIES)
     public void shouldHaveTrackSid() throws InterruptedException {
         publishDataTrack();
 
@@ -91,7 +85,6 @@ public class DataTrackTopologyParameterizedTest extends BaseParticipantTest {
     }
 
     @Test
-    @Retry(times = BuildConfig.MAX_TEST_RETRIES)
     public void canSendMessage() throws InterruptedException {
         publishDataTrack();
         String expectedMessage = "Hello DataTrack!";
@@ -103,7 +96,6 @@ public class DataTrackTopologyParameterizedTest extends BaseParticipantTest {
     }
 
     @Test
-    @Retry(times = BuildConfig.MAX_TEST_RETRIES)
     public void canSendMessageWithUnorderedDataTrack() throws InterruptedException {
         DataTrackOptions dataTrackOptions = new DataTrackOptions.Builder().ordered(false).build();
         publishDataTrack(dataTrackOptions);
@@ -118,7 +110,6 @@ public class DataTrackTopologyParameterizedTest extends BaseParticipantTest {
     }
 
     @Test
-    @Retry(times = BuildConfig.MAX_TEST_RETRIES)
     public void canSendBufferMessageWithUnorderedDataTrack() throws InterruptedException {
         DataTrackOptions dataTrackOptions = new DataTrackOptions.Builder().ordered(false).build();
         publishDataTrack(dataTrackOptions);
@@ -133,7 +124,6 @@ public class DataTrackTopologyParameterizedTest extends BaseParticipantTest {
     }
 
     @Test
-    @Retry(times = BuildConfig.MAX_TEST_RETRIES)
     public void canSendMessageWithMaxPacketLifeTime() throws InterruptedException {
         DataTrackOptions dataTrackOptions =
                 new DataTrackOptions.Builder().maxPacketLifeTime(1000).build();
@@ -149,7 +139,6 @@ public class DataTrackTopologyParameterizedTest extends BaseParticipantTest {
     }
 
     @Test
-    @Retry(times = BuildConfig.MAX_TEST_RETRIES)
     public void canSendBufferMessageWithMaxPacketLifeTime() throws InterruptedException {
         DataTrackOptions dataTrackOptions =
                 new DataTrackOptions.Builder().maxPacketLifeTime(1000).build();
@@ -165,7 +154,6 @@ public class DataTrackTopologyParameterizedTest extends BaseParticipantTest {
     }
 
     @Test
-    @Retry(times = BuildConfig.MAX_TEST_RETRIES)
     public void canSendMessageWithMaxRetransmits() throws InterruptedException {
         DataTrackOptions dataTrackOptions =
                 new DataTrackOptions.Builder().maxRetransmits(1000).build();
@@ -181,7 +169,6 @@ public class DataTrackTopologyParameterizedTest extends BaseParticipantTest {
     }
 
     @Test
-    @Retry(times = BuildConfig.MAX_TEST_RETRIES)
     public void canSendBufferMessageWithMaxRetransmits() throws InterruptedException {
         DataTrackOptions dataTrackOptions =
                 new DataTrackOptions.Builder().maxRetransmits(1000).build();
@@ -197,7 +184,6 @@ public class DataTrackTopologyParameterizedTest extends BaseParticipantTest {
     }
 
     @Test
-    @Retry(times = BuildConfig.MAX_TEST_RETRIES)
     public void canSendBufferMessage() throws InterruptedException {
         publishDataTrack();
         ByteBuffer expectedMessageBuffer = ByteBuffer.wrap(new byte[] {0x0, 0x1, 0x2, 0x3});
@@ -211,7 +197,6 @@ public class DataTrackTopologyParameterizedTest extends BaseParticipantTest {
     }
 
     @Test
-    @Retry(times = BuildConfig.MAX_TEST_RETRIES)
     public void canSendMultipleMessages() throws InterruptedException {
         publishDataTrack();
         String firstExpectedMessage = "Hello";
@@ -241,7 +226,6 @@ public class DataTrackTopologyParameterizedTest extends BaseParticipantTest {
     }
 
     @Test
-    @Retry(times = BuildConfig.MAX_TEST_RETRIES)
     public void canSendMessagesOnMultipleDataTracks() throws InterruptedException {
         // Publish multiple data tracks
         LocalDataTrack bobFirstLocalDataTrack = LocalDataTrack.create(mediaTestActivity);
@@ -276,7 +260,6 @@ public class DataTrackTopologyParameterizedTest extends BaseParticipantTest {
     }
 
     @Test
-    @Retry(times = BuildConfig.MAX_TEST_RETRIES)
     public void canSendMessagesToMultipleParticipants() throws InterruptedException {
         CallbackHelper.FakeParticipantListener participantListener =
                 new CallbackHelper.FakeParticipantListener();
@@ -377,7 +360,6 @@ public class DataTrackTopologyParameterizedTest extends BaseParticipantTest {
     }
 
     @Test
-    @Retry(times = BuildConfig.MAX_TEST_RETRIES)
     public void canSendMessageToParticipantAfterAnotherDisconnects() throws InterruptedException {
         CallbackHelper.FakeParticipantListener participantListener =
                 new CallbackHelper.FakeParticipantListener();
@@ -507,7 +489,6 @@ public class DataTrackTopologyParameterizedTest extends BaseParticipantTest {
     }
 
     @Test
-    @Retry(times = BuildConfig.MAX_TEST_RETRIES)
     public void canSendAfterUnpublished() throws InterruptedException {
         publishDataTrack();
         String expectedMessage = "Hello";
@@ -534,7 +515,6 @@ public class DataTrackTopologyParameterizedTest extends BaseParticipantTest {
     }
 
     @Test
-    @Retry(times = BuildConfig.MAX_TEST_RETRIES)
     public void onMessageReturnedOnSameThreadThatSetListener() throws InterruptedException {
         aliceParticipantListener.onSubscribedToDataTrackLatch = new CountDownLatch(1);
         aliceParticipantListener.onDataTrackPublishedLatch = new CountDownLatch(1);

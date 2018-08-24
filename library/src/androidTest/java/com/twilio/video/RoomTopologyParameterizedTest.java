@@ -30,11 +30,8 @@ import android.Manifest;
 import android.support.test.filters.LargeTest;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.rule.GrantPermissionRule;
-import com.kevinmost.junit_retry_rule.Retry;
-import com.kevinmost.junit_retry_rule.RetryRule;
 import com.twilio.video.base.BaseVideoTest;
 import com.twilio.video.helper.CallbackHelper;
-import com.twilio.video.test.BuildConfig;
 import com.twilio.video.ui.MediaTestActivity;
 import com.twilio.video.util.Constants;
 import com.twilio.video.util.CredentialsUtils;
@@ -73,8 +70,6 @@ public class RoomTopologyParameterizedTest extends BaseVideoTest {
     @Rule
     public ActivityTestRule<MediaTestActivity> activityRule =
             new ActivityTestRule<>(MediaTestActivity.class);
-
-    @Rule public final RetryRule retryRule = new RetryRule();
 
     private MediaTestActivity mediaTestActivity;
     private String identity;
@@ -167,7 +162,6 @@ public class RoomTopologyParameterizedTest extends BaseVideoTest {
     }
 
     @Test
-    @Retry(times = BuildConfig.MAX_TEST_RETRIES)
     public void shouldReconnect() throws InterruptedException {
         IceOptions iceOptions =
                 new IceOptions.Builder()

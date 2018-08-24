@@ -22,11 +22,8 @@ import static org.junit.Assert.assertTrue;
 
 import android.support.test.filters.LargeTest;
 import android.util.Log;
-import com.kevinmost.junit_retry_rule.Retry;
-import com.kevinmost.junit_retry_rule.RetryRule;
 import com.twilio.video.base.BaseCodecTest;
 import com.twilio.video.helper.CallbackHelper;
-import com.twilio.video.test.BuildConfig;
 import com.twilio.video.util.FakeVideoCapturer;
 import com.twilio.video.util.Topology;
 import java.util.Arrays;
@@ -36,7 +33,6 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -137,8 +133,6 @@ public class MultiCodecParameterizedTest extends BaseCodecTest {
                 });
     }
 
-    @Rule public final RetryRule retryRule = new RetryRule();
-
     private final List<VideoCodec> preferredVideoCodecs;
     private final List<VideoCodec> selectedVideoCodecs;
     private final VideoCodec expectedCodec;
@@ -164,7 +158,6 @@ public class MultiCodecParameterizedTest extends BaseCodecTest {
     }
 
     @Test
-    @Retry(times = BuildConfig.MAX_TEST_RETRIES)
     public void shouldPublishVideoTrackWhenCodecSupported() throws InterruptedException {
         // Validate device supported H264
         if (expectedCodec instanceof H264Codec
@@ -209,7 +202,6 @@ public class MultiCodecParameterizedTest extends BaseCodecTest {
     }
 
     @Test
-    @Retry(times = BuildConfig.MAX_TEST_RETRIES)
     public void publishTrack_shouldAllowSupportedVideoCodec() throws InterruptedException {
         // Validate device supported H264
         if (expectedCodec instanceof H264Codec

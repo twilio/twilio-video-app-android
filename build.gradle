@@ -28,7 +28,6 @@ buildscript {
             'uiAutomator': '2.1.2',
             'gson': '2.7',
             'apacheCommons': '3.6',
-            'junitRetryRule': 'master',
             'junitParams': '1.1.1',
             'relinker': '1.2.2',
             'jjwt': '0.7.0',
