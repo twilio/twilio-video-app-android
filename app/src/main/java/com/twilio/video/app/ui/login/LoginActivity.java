@@ -21,8 +21,11 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AlertDialog;
-import android.widget.Toast;
+import android.view.ViewGroup;
+
+import butterknife.BindView;
 import butterknife.ButterKnife;
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
@@ -45,6 +48,9 @@ public class LoginActivity extends BaseActivity
 
     public static final String EXTRA_SIGN_OUT = "SignOut";
     private static final int GOOGLE_SIGN_IN = 4615;
+
+    @BindView(R.id.login_fragment_container)
+    ViewGroup rootView;
 
     @Inject SharedPreferences sharedPreferences;
 
@@ -196,22 +202,22 @@ public class LoginActivity extends BaseActivity
                 break;
             case AuthHelper.ERROR_AUTHENTICATION_FAILED:
             case AuthHelper.ERROR_FAILED_TO_GET_TOKEN:
-                Toast.makeText(this, "SignIn Failed.", Toast.LENGTH_LONG).show();
+                Snackbar.make(rootView, "Sign in Failed", Snackbar.LENGTH_LONG).show();
                 Timber.e("Authentication error.");
                 break;
             case AuthHelper.ERROR_GOOGLE_PLAY_SERVICE_ERROR:
-                Toast.makeText(this, "Google play service error.", Toast.LENGTH_LONG).show();
+                Snackbar.make(rootView, "Google play service error", Snackbar.LENGTH_LONG).show();
                 Timber.e("Google play service error.");
                 break;
             case AuthHelper.ERROR_UNKNOWN:
-                Toast.makeText(this, "Unknown error occurred.", Toast.LENGTH_LONG).show();
+                Snackbar.make(rootView, "Unknown error occurred", Snackbar.LENGTH_LONG).show();
                 Timber.e("Unknown error occurred.");
             case AuthHelper.ERROR_GOOGLE_SIGNIN_CANCELED:
-                Toast.makeText(this, "Sign in canceled.", Toast.LENGTH_LONG).show();
+                Snackbar.make(rootView, "Sign in canceled", Snackbar.LENGTH_LONG).show();
                 Timber.e("Sign in canceled.");
                 break;
             case AuthHelper.ERROR_USER_NOT_SIGNED_IN:
-                Toast.makeText(this, "User not signed in.", Toast.LENGTH_LONG).show();
+                Snackbar.make(rootView, "User not signed in", Snackbar.LENGTH_LONG).show();
                 Timber.e("User not signed in.");
                 break;
             default:
