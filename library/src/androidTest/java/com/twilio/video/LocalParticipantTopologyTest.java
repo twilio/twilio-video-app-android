@@ -140,8 +140,13 @@ public class LocalParticipantTopologyTest extends BaseVideoTest {
         localParticipantListener.onPublishedDataTrackLatch = new CountDownLatch(1);
         roomListener.onConnectedLatch = new CountDownLatch(1);
 
+        IceOptions iceOptions =
+                new IceOptions.Builder()
+                        .abortOnIceServersTimeout(true)
+                        .iceServersTimeout(TestUtils.ICE_TIMEOUT)
+                        .build();
         ConnectOptions connectOptions =
-                new ConnectOptions.Builder(token).roomName(roomName).build();
+                new ConnectOptions.Builder(token).roomName(roomName).iceOptions(iceOptions).build();
         room = Video.connect(mediaTestActivity, connectOptions, roomListener);
         assertTrue(roomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
         LocalParticipant localParticipant = room.getLocalParticipant();
@@ -187,8 +192,13 @@ public class LocalParticipantTopologyTest extends BaseVideoTest {
         FakeVideoCapturer fakeVideoCapturer = new FakeVideoCapturer();
         roomListener.onConnectedLatch = new CountDownLatch(1);
 
+        IceOptions iceOptions =
+                new IceOptions.Builder()
+                        .abortOnIceServersTimeout(true)
+                        .iceServersTimeout(TestUtils.ICE_TIMEOUT)
+                        .build();
         ConnectOptions connectOptions =
-                new ConnectOptions.Builder(token).roomName(roomName).build();
+                new ConnectOptions.Builder(token).roomName(roomName).iceOptions(iceOptions).build();
         room = Video.connect(mediaTestActivity, connectOptions, roomListener);
         assertTrue(roomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
         LocalParticipant localParticipant = room.getLocalParticipant();
@@ -279,11 +289,17 @@ public class LocalParticipantTopologyTest extends BaseVideoTest {
         localVideoTrack = LocalVideoTrack.create(mediaTestActivity, true, fakeVideoCapturer);
         localDataTrack = LocalDataTrack.create(mediaTestActivity);
 
+        IceOptions iceOptions =
+                new IceOptions.Builder()
+                        .abortOnIceServersTimeout(true)
+                        .iceServersTimeout(TestUtils.ICE_TIMEOUT)
+                        .build();
         ConnectOptions.Builder connectOptionsBuilder =
                 new ConnectOptions.Builder(token)
                         .audioTracks(Collections.singletonList(localAudioTrack))
                         .videoTracks(Collections.singletonList(localVideoTrack))
                         .dataTracks(Collections.singletonList(localDataTrack))
+                        .iceOptions(iceOptions)
                         .roomName(roomName);
 
         room = Video.connect(mediaTestActivity, connectOptionsBuilder.build(), roomListener);
@@ -311,9 +327,13 @@ public class LocalParticipantTopologyTest extends BaseVideoTest {
     @Test
     public void shouldHaveIdentityAndNonNullSidOnceConnected() throws InterruptedException {
         roomListener.onConnectedLatch = new CountDownLatch(1);
-
+        IceOptions iceOptions =
+                new IceOptions.Builder()
+                        .abortOnIceServersTimeout(true)
+                        .iceServersTimeout(TestUtils.ICE_TIMEOUT)
+                        .build();
         ConnectOptions connectOptions =
-                new ConnectOptions.Builder(token).roomName(roomName).build();
+                new ConnectOptions.Builder(token).roomName(roomName).iceOptions(iceOptions).build();
         room = Video.connect(mediaTestActivity, connectOptions, roomListener);
         assertTrue(roomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
         LocalParticipant localParticipant = room.getLocalParticipant();
@@ -328,8 +348,13 @@ public class LocalParticipantTopologyTest extends BaseVideoTest {
         roomListener.onConnectedLatch = new CountDownLatch(1);
         roomListener.onDisconnectedLatch = new CountDownLatch(1);
 
+        IceOptions iceOptions =
+                new IceOptions.Builder()
+                        .abortOnIceServersTimeout(true)
+                        .iceServersTimeout(TestUtils.ICE_TIMEOUT)
+                        .build();
         ConnectOptions connectOptions =
-                new ConnectOptions.Builder(token).roomName(roomName).build();
+                new ConnectOptions.Builder(token).roomName(roomName).iceOptions(iceOptions).build();
         room = Video.connect(mediaTestActivity, connectOptions, roomListener);
         assertTrue(roomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
         LocalParticipant localParticipant = room.getLocalParticipant();
@@ -346,8 +371,13 @@ public class LocalParticipantTopologyTest extends BaseVideoTest {
         roomListener.onConnectedLatch = new CountDownLatch(1);
         roomListener.onDisconnectedLatch = new CountDownLatch(1);
 
+        IceOptions iceOptions =
+                new IceOptions.Builder()
+                        .abortOnIceServersTimeout(true)
+                        .iceServersTimeout(TestUtils.ICE_TIMEOUT)
+                        .build();
         ConnectOptions connectOptions =
-                new ConnectOptions.Builder(token).roomName(roomName).build();
+                new ConnectOptions.Builder(token).roomName(roomName).iceOptions(iceOptions).build();
         room = Video.connect(mediaTestActivity, connectOptions, roomListener);
         assertTrue(roomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
         LocalParticipant localParticipant = room.getLocalParticipant();
@@ -364,8 +394,13 @@ public class LocalParticipantTopologyTest extends BaseVideoTest {
         roomListener.onConnectedLatch = new CountDownLatch(1);
         roomListener.onDisconnectedLatch = new CountDownLatch(1);
 
+        IceOptions iceOptions =
+                new IceOptions.Builder()
+                        .abortOnIceServersTimeout(true)
+                        .iceServersTimeout(TestUtils.ICE_TIMEOUT)
+                        .build();
         ConnectOptions connectOptions =
-                new ConnectOptions.Builder(token).roomName(roomName).build();
+                new ConnectOptions.Builder(token).roomName(roomName).iceOptions(iceOptions).build();
         room = Video.connect(mediaTestActivity, connectOptions, roomListener);
         assertTrue(roomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
         LocalParticipant localParticipant = room.getLocalParticipant();
@@ -384,8 +419,13 @@ public class LocalParticipantTopologyTest extends BaseVideoTest {
         roomListener.onConnectedLatch = new CountDownLatch(1);
         roomListener.onDisconnectedLatch = new CountDownLatch(1);
 
+        IceOptions iceOptions =
+                new IceOptions.Builder()
+                        .abortOnIceServersTimeout(true)
+                        .iceServersTimeout(TestUtils.ICE_TIMEOUT)
+                        .build();
         ConnectOptions connectOptions =
-                new ConnectOptions.Builder(token).roomName(roomName).build();
+                new ConnectOptions.Builder(token).roomName(roomName).iceOptions(iceOptions).build();
         room = Video.connect(mediaTestActivity, connectOptions, roomListener);
         assertTrue(roomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
         LocalParticipant localParticipant = room.getLocalParticipant();
@@ -404,8 +444,13 @@ public class LocalParticipantTopologyTest extends BaseVideoTest {
         roomListener.onConnectedLatch = new CountDownLatch(1);
         roomListener.onDisconnectedLatch = new CountDownLatch(1);
 
+        IceOptions iceOptions =
+                new IceOptions.Builder()
+                        .abortOnIceServersTimeout(true)
+                        .iceServersTimeout(TestUtils.ICE_TIMEOUT)
+                        .build();
         ConnectOptions connectOptions =
-                new ConnectOptions.Builder(token).roomName(roomName).build();
+                new ConnectOptions.Builder(token).roomName(roomName).iceOptions(iceOptions).build();
         room = Video.connect(mediaTestActivity, connectOptions, roomListener);
         assertTrue(roomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
         LocalParticipant localParticipant = room.getLocalParticipant();
@@ -427,8 +472,13 @@ public class LocalParticipantTopologyTest extends BaseVideoTest {
         roomListener.onConnectedLatch = new CountDownLatch(1);
         roomListener.onDisconnectedLatch = new CountDownLatch(1);
 
+        IceOptions iceOptions =
+                new IceOptions.Builder()
+                        .abortOnIceServersTimeout(true)
+                        .iceServersTimeout(TestUtils.ICE_TIMEOUT)
+                        .build();
         ConnectOptions connectOptions =
-                new ConnectOptions.Builder(token).roomName(roomName).build();
+                new ConnectOptions.Builder(token).roomName(roomName).iceOptions(iceOptions).build();
         room = Video.connect(mediaTestActivity, connectOptions, roomListener);
         assertTrue(roomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
         LocalParticipant localParticipant = room.getLocalParticipant();
@@ -453,8 +503,13 @@ public class LocalParticipantTopologyTest extends BaseVideoTest {
         roomListener.onConnectedLatch = new CountDownLatch(1);
         roomListener.onDisconnectedLatch = new CountDownLatch(1);
 
+        IceOptions iceOptions =
+                new IceOptions.Builder()
+                        .abortOnIceServersTimeout(true)
+                        .iceServersTimeout(TestUtils.ICE_TIMEOUT)
+                        .build();
         ConnectOptions connectOptions =
-                new ConnectOptions.Builder(token).roomName(roomName).build();
+                new ConnectOptions.Builder(token).roomName(roomName).iceOptions(iceOptions).build();
         room = Video.connect(mediaTestActivity, connectOptions, roomListener);
         assertTrue(roomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
         LocalParticipant localParticipant = room.getLocalParticipant();
@@ -480,8 +535,13 @@ public class LocalParticipantTopologyTest extends BaseVideoTest {
         roomListener.onConnectedLatch = new CountDownLatch(1);
         roomListener.onDisconnectedLatch = new CountDownLatch(1);
 
+        IceOptions iceOptions =
+                new IceOptions.Builder()
+                        .abortOnIceServersTimeout(true)
+                        .iceServersTimeout(TestUtils.ICE_TIMEOUT)
+                        .build();
         ConnectOptions connectOptions =
-                new ConnectOptions.Builder(token).roomName(roomName).build();
+                new ConnectOptions.Builder(token).roomName(roomName).iceOptions(iceOptions).build();
         room = Video.connect(mediaTestActivity, connectOptions, roomListener);
         assertTrue(roomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
         LocalParticipant localParticipant = room.getLocalParticipant();
@@ -512,8 +572,13 @@ public class LocalParticipantTopologyTest extends BaseVideoTest {
         roomListener.onConnectedLatch = new CountDownLatch(1);
         roomListener.onDisconnectedLatch = new CountDownLatch(1);
 
+        IceOptions iceOptions =
+                new IceOptions.Builder()
+                        .abortOnIceServersTimeout(true)
+                        .iceServersTimeout(TestUtils.ICE_TIMEOUT)
+                        .build();
         ConnectOptions connectOptions =
-                new ConnectOptions.Builder(token).roomName(roomName).build();
+                new ConnectOptions.Builder(token).roomName(roomName).iceOptions(iceOptions).build();
         room = Video.connect(mediaTestActivity, connectOptions, roomListener);
         assertTrue(roomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
         LocalParticipant localParticipant = room.getLocalParticipant();
@@ -541,12 +606,18 @@ public class LocalParticipantTopologyTest extends BaseVideoTest {
         localAudioTrack = LocalAudioTrack.create(mediaTestActivity, true);
         localVideoTrack = LocalVideoTrack.create(mediaTestActivity, true, fakeVideoCapturer);
 
+        IceOptions iceOptions =
+                new IceOptions.Builder()
+                        .abortOnIceServersTimeout(true)
+                        .iceServersTimeout(TestUtils.ICE_TIMEOUT)
+                        .build();
         ConnectOptions connectOptions =
                 new ConnectOptions.Builder(token)
                         .audioTracks(Collections.singletonList(localAudioTrack))
                         .videoTracks(Collections.singletonList(localVideoTrack))
                         .roomName(roomName)
                         .encodingParameters(encodingParameters)
+                        .iceOptions(iceOptions)
                         .build();
         room = Video.connect(mediaTestActivity, connectOptions, roomListener);
         assertTrue(roomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
@@ -569,11 +640,17 @@ public class LocalParticipantTopologyTest extends BaseVideoTest {
         localAudioTrack = LocalAudioTrack.create(mediaTestActivity, true);
         localVideoTrack = LocalVideoTrack.create(mediaTestActivity, true, fakeVideoCapturer);
 
+        IceOptions iceOptions =
+                new IceOptions.Builder()
+                        .abortOnIceServersTimeout(true)
+                        .iceServersTimeout(TestUtils.ICE_TIMEOUT)
+                        .build();
         ConnectOptions connectOptions =
                 new ConnectOptions.Builder(token)
                         .audioTracks(Collections.singletonList(localAudioTrack))
                         .videoTracks(Collections.singletonList(localVideoTrack))
                         .roomName(roomName)
+                        .iceOptions(iceOptions)
                         .build();
         room = Video.connect(mediaTestActivity, connectOptions, roomListener);
         assertTrue(roomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));

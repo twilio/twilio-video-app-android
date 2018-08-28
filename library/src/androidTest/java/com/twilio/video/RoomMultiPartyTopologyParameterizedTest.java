@@ -143,9 +143,13 @@ public class RoomMultiPartyTopologyParameterizedTest extends BaseVideoTest {
     private Room createRoom(String token, CallbackHelper.FakeRoomListener listener, String roomName)
             throws InterruptedException {
         listener.onConnectedLatch = new CountDownLatch(1);
-
+        IceOptions iceOptions =
+                new IceOptions.Builder()
+                        .iceServersTimeout(TestUtils.ICE_TIMEOUT)
+                        .abortOnIceServersTimeout(true)
+                        .build();
         ConnectOptions connectOptions =
-                new ConnectOptions.Builder(token).roomName(roomName).build();
+                new ConnectOptions.Builder(token).roomName(roomName).iceOptions(iceOptions).build();
         Room room = Video.connect(context, connectOptions, listener);
         assertTrue(listener.onConnectedLatch.await(20, TimeUnit.SECONDS));
         return room;
