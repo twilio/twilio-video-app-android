@@ -230,7 +230,11 @@ public class RoomActivity extends BaseActivity {
                 public void onScreenCaptureError(String errorDescription) {
                     Timber.e("Screen capturer error: " + errorDescription);
                     stopScreenCapture();
-                    Snackbar.make(primaryVideoView, R.string.screen_capture_error, Snackbar.LENGTH_LONG).show();
+                    Snackbar.make(
+                                    primaryVideoView,
+                                    R.string.screen_capture_error,
+                                    Snackbar.LENGTH_LONG)
+                            .show();
                 }
 
                 @Override
@@ -324,7 +328,8 @@ public class RoomActivity extends BaseActivity {
             if (permissionsGranted) {
                 setupLocalMedia();
             } else {
-                Snackbar.make(primaryVideoView, R.string.permissions_required, Snackbar.LENGTH_LONG).show();
+                Snackbar.make(primaryVideoView, R.string.permissions_required, Snackbar.LENGTH_LONG)
+                        .show();
             }
         }
     }
@@ -418,7 +423,11 @@ public class RoomActivity extends BaseActivity {
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == MEDIA_PROJECTION_REQUEST_CODE) {
             if (resultCode != Activity.RESULT_OK) {
-                Snackbar.make(primaryVideoView, R.string.screen_capture_permission_not_granted, Snackbar.LENGTH_LONG).show();
+                Snackbar.make(
+                                primaryVideoView,
+                                R.string.screen_capture_permission_not_granted,
+                                Snackbar.LENGTH_LONG)
+                        .show();
                 return;
             }
             screenCapturer = new ScreenCapturer(this, resultCode, data, screenCapturerListener);
@@ -437,7 +446,8 @@ public class RoomActivity extends BaseActivity {
     @OnClick(R.id.connect)
     void connectButtonClick() {
         if (!didAcceptPermissions()) {
-            Snackbar.make(primaryVideoView, R.string.permissions_required, Snackbar.LENGTH_SHORT).show();
+            Snackbar.make(primaryVideoView, R.string.permissions_required, Snackbar.LENGTH_SHORT)
+                    .show();
             return;
         }
         connect.setEnabled(false);
