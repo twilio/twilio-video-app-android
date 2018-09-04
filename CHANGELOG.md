@@ -1,5 +1,10 @@
 The Twilio Programmable Video SDKs use [Semantic Versioning](http://www.semver.org).
 
+###2.2.1
+Improvements
+
+- Adding a null video/audio codec to `ConnectOptions` will now throw an exception
+
 ####2.2.0
 Features
 

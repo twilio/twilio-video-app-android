@@ -58,6 +58,7 @@ public class ConnectOptions {
     static void checkAudioCodecs(@Nullable List<AudioCodec> audioCodecs) {
         if (audioCodecs != null) {
             for (AudioCodec audioCodec : audioCodecs) {
+                Preconditions.checkNotNull(audioCodec);
                 Preconditions.checkArgument(
                         SUPPORTED_CODECS.contains(audioCodec.getClass()),
                         String.format("Unsupported audio codec %s", audioCodec.getName()));
@@ -68,6 +69,7 @@ public class ConnectOptions {
     static void checkVideoCodecs(@Nullable List<VideoCodec> videoCodecs) {
         if (videoCodecs != null) {
             for (VideoCodec videoCodec : videoCodecs) {
+                Preconditions.checkNotNull(videoCodec);
                 Preconditions.checkArgument(
                         SUPPORTED_CODECS.contains(videoCodec.getClass()),
                         String.format("Unsupported video codec %s", videoCodec.getName()));
