@@ -28,12 +28,6 @@ branches:
     - /^\d+\.\d+\.\d+-beta\d+$/
 
 stages:
-  - name: test
-    if: type IN (push, pull_request) AND tag is blank AND fork = false
-  - name: fork test
-    if: type IN (push, pull_request) AND tag is blank AND fork = true
-  - name: snapshot
-    if: type = push AND branch IN (master)
   - name: release candidate
     if: tag =~ ^\d+\.\d+\.\d+-rc\d+$
   - name: release
@@ -129,32 +123,6 @@ cache:
 
 jobs:
   include:
-    - stage: test
-      script: ./gradlew library:testDebugUnitTest
-    - stage: test
-      script: ./gradlew -q -PtestRetriesEnabled=true firebaseTestLabCheckVirtualDevices
-    - stage: test
-      script: ./gradlew -q -PtestRetriesEnabled=false firebaseTestLabCheckPhysicalDevices
-    - stage: test
-      script: ./gradlew -q firebaseTestLabCheckLibraryCamera
-    - stage: test
-      script: ./gradlew -q assemble
-    - stage: test
-      script: ./gradlew -q spotlessCheck
-    - stage: fork test
-      script: ./gradlew -q librarySizeReport
-    - stage: fork test
-      script: ./gradlew library:testDebugUnitTest
-    - stage: fork test
-      script: ./gradlew -q library:assemble
-    - stage: fork test
-      script: ./gradlew -q app:assembleCommunity
-    - stage: fork test
-      script: ./gradlew -q spotlessCheck
-    - stage: snapshot
-      script: ./gradlew -q bintrayLibrarySnapshotUpload
-    - stage: snapshot
-      script: ./gradlew -q app:uploadInternalReleaseToHockeyApp
     - stage: release candidate
       script: ./gradlew bintrayLibraryReleaseCandidateUpload incrementRc
     - stage: release candidate
