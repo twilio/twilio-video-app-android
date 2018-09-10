@@ -16,6 +16,7 @@
 
 package com.twilio.video;
 
+import static com.twilio.video.TestUtils.ICE_TIMEOUT;
 import static junit.framework.Assert.fail;
 import static org.apache.commons.lang3.RandomStringUtils.random;
 import static org.junit.Assert.assertArrayEquals;
@@ -83,8 +84,16 @@ public class RemoteParticipantTest extends BaseVideoTest {
         final CountDownLatch bobPublishedAudioTrack = new CountDownLatch(1);
         final CountDownLatch aliceReceivedBobAudioTrackAdded = new CountDownLatch(1);
         final CountDownLatch aliceDisconnected = new CountDownLatch(1);
+        IceOptions iceOptions =
+                new IceOptions.Builder()
+                        .iceServersTimeout(ICE_TIMEOUT)
+                        .abortOnIceServersTimeout(true)
+                        .build();
         final ConnectOptions aliceConnectOptions =
-                new ConnectOptions.Builder(aliceToken).roomName(roomName).build();
+                new ConnectOptions.Builder(aliceToken)
+                        .roomName(roomName)
+                        .iceOptions(iceOptions)
+                        .build();
         String[] expectedTestEvents =
                 new String[] {
                     "aliceConnected",
@@ -100,7 +109,10 @@ public class RemoteParticipantTest extends BaseVideoTest {
         bobRoomListener.onDisconnectedLatch = new CountDownLatch(1);
         final AtomicReference<Room> bobRoom = new AtomicReference<>(null);
         final ConnectOptions bobConnectOptions =
-                new ConnectOptions.Builder(bobToken).roomName(roomName).build();
+                new ConnectOptions.Builder(bobToken)
+                        .roomName(roomName)
+                        .iceOptions(iceOptions)
+                        .build();
         final List<String> testEvents = Collections.synchronizedList(new ArrayList<String>());
         final RemoteParticipant.Listener aliceRemoteParticipantListener =
                 new RemoteParticipant.Listener() {

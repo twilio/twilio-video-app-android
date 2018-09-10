@@ -31,12 +31,6 @@ branches:
     - /^\d+\.\d+\.\d+-beta\d+$/
 
 stages:
-  - name: test
-    if: type IN (push, pull_request) AND tag is blank AND fork = false
-  - name: fork test
-    if: type IN (push, pull_request) AND tag is blank AND fork = true
-  - name: snapshot
-    if: type = push AND branch IN (master, 3.0)
   - name: release candidate
     if: tag =~ ^\d+\.\d+\.\d+-rc\d+$
   - name: release
@@ -132,38 +126,8 @@ cache:
 
 jobs:
   include:
-    - stage: test
-      script: ./gradlew library:testDebugUnitTest
-    - stage: test
-      script: ./gradlew -q -PtestRetriesEnabled=true firebaseTestLabCheckVirtualDevices
-    - stage: test
-      script: ./gradlew -q -PtestRetriesEnabled=false firebaseTestLabCheckPhysicalDevices
-    - stage: test
-      script: ./gradlew -q firebaseTestLabCheckLibraryCamera
-    - stage: test
-      script: ./gradlew -q assemble
-    - stage: test
-      script: ./gradlew -q spotlessCheck
-    - stage: fork test
-      script: ./gradlew -q librarySizeReport
-    - stage: fork test
-      script: ./gradlew library:testDebugUnitTest
-    - stage: fork test
-      script: ./gradlew -q library:assemble
-    - stage: fork test
-      script: ./gradlew -q app:assembleCommunity
-    - stage: fork test
-      script: ./gradlew -q spotlessCheck
-    - stage: snapshot
-      script: ./gradlew -q bintrayLibrarySnapshotUpload
-    - stage: snapshot
-      script: ./gradlew -q -PFirebaseServiceAccountFilePath=$TRAVIS_BUILD_DIR/$VIDEO_APP_CRASH_REPORTING_FILE app:firebaseUploadInternalReleaseProguardMapping
-    - stage: snapshot
-      script: ./gradlew -q -Psnapshot=true app:uploadInternalReleaseToHockeyApp
     - stage: release candidate
       script: ./gradlew bintrayLibraryReleaseCandidateUpload incrementRc
-    - stage: release candidate
-      script: ./gradlew -q -PFirebaseServiceAccountFilePath=$TRAVIS_BUILD_DIR/$VIDEO_APP_CRASH_REPORTING_FILE app:firebaseUploadInternalReleaseProguardMapping
     - stage: release candidate
       script: ./gradlew -q -PreleaseCandidate=true app:uploadInternalReleaseToHockeyApp
     - stage: release

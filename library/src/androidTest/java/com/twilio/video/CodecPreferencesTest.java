@@ -16,6 +16,7 @@
 
 package com.twilio.video;
 
+import static com.twilio.video.TestUtils.ICE_TIMEOUT;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assume.assumeFalse;
@@ -42,6 +43,7 @@ import org.webrtc.MediaCodecVideoEncoder;
 @RunWith(JUnitParamsRunner.class)
 @LargeTest
 public class CodecPreferencesTest extends BaseCodecTest {
+
     // Audio codecs
     private final IsacCodec isacCodec = new IsacCodec();
     private final OpusCodec opusCodec = new OpusCodec();
@@ -74,18 +76,27 @@ public class CodecPreferencesTest extends BaseCodecTest {
 
         // Connect alice with audio track and preferred codec
         aliceLocalAudioTrack = LocalAudioTrack.create(mediaTestActivity, true);
+        IceOptions iceOptions =
+                new IceOptions.Builder()
+                        .iceServersTimeout(ICE_TIMEOUT)
+                        .abortOnIceServersTimeout(true)
+                        .build();
         ConnectOptions aliceConnectOptions =
                 new ConnectOptions.Builder(aliceToken)
                         .roomName(roomName)
                         .audioTracks(Collections.singletonList(aliceLocalAudioTrack))
                         .preferAudioCodecs(Collections.singletonList(expectedAudioCodec))
+                        .iceOptions(iceOptions)
                         .build();
         aliceRoom = createRoom(aliceListener, aliceConnectOptions);
         aliceListener.onParticipantConnectedLatch = new CountDownLatch(1);
 
         // Connect bob with no tracks
         ConnectOptions bobConnectOptions =
-                new ConnectOptions.Builder(bobToken).roomName(roomName).build();
+                new ConnectOptions.Builder(bobToken)
+                        .roomName(roomName)
+                        .iceOptions(iceOptions)
+                        .build();
         bobRoom = createRoom(bobListener, bobConnectOptions);
         assertTrue(aliceListener.onParticipantConnectedLatch.await(20, TimeUnit.SECONDS));
         assertEquals(1, aliceRoom.getRemoteParticipants().size());
@@ -106,11 +117,17 @@ public class CodecPreferencesTest extends BaseCodecTest {
         // Connect alice with video track and preferred codec
         aliceLocalVideoTrack =
                 LocalVideoTrack.create(mediaTestActivity, true, new FakeVideoCapturer());
+        IceOptions iceOptions =
+                new IceOptions.Builder()
+                        .iceServersTimeout(ICE_TIMEOUT)
+                        .abortOnIceServersTimeout(true)
+                        .build();
         ConnectOptions aliceConnectOptions =
                 new ConnectOptions.Builder(aliceToken)
                         .roomName(roomName)
                         .videoTracks(Collections.singletonList(aliceLocalVideoTrack))
                         .preferVideoCodecs(Collections.singletonList(expectedVideoCodec))
+                        .iceOptions(iceOptions)
                         .build();
         aliceRoom = createRoom(aliceListener, aliceConnectOptions);
         aliceListener.onParticipantConnectedLatch = new CountDownLatch(1);
@@ -138,18 +155,28 @@ public class CodecPreferencesTest extends BaseCodecTest {
         // Connect alice with video track and preferred codecs
         aliceLocalVideoTrack =
                 LocalVideoTrack.create(mediaTestActivity, true, new FakeVideoCapturer());
+
+        IceOptions iceOptions =
+                new IceOptions.Builder()
+                        .iceServersTimeout(ICE_TIMEOUT)
+                        .abortOnIceServersTimeout(true)
+                        .build();
         ConnectOptions aliceConnectOptions =
                 new ConnectOptions.Builder(aliceToken)
                         .roomName(roomName)
                         .videoTracks(Collections.singletonList(aliceLocalVideoTrack))
                         .preferVideoCodecs(Arrays.asList(new H264Codec(), new Vp9Codec()))
+                        .iceOptions(iceOptions)
                         .build();
         aliceRoom = createRoom(aliceListener, aliceConnectOptions);
         aliceListener.onParticipantConnectedLatch = new CountDownLatch(1);
 
         // Connect bob with no tracks
         ConnectOptions bobConnectOptions =
-                new ConnectOptions.Builder(bobToken).roomName(roomName).build();
+                new ConnectOptions.Builder(bobToken)
+                        .roomName(roomName)
+                        .iceOptions(iceOptions)
+                        .build();
         bobRoom = createRoom(bobListener, bobConnectOptions);
         assertTrue(aliceListener.onParticipantConnectedLatch.await(20, TimeUnit.SECONDS));
         assertEquals(1, aliceRoom.getRemoteParticipants().size());

@@ -22,8 +22,10 @@ import android.Manifest;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.ImageDecoder;
 import android.graphics.Matrix;
 import android.hardware.Camera;
+import android.os.Build;
 import android.os.Handler;
 import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
@@ -32,6 +34,7 @@ import android.support.annotation.VisibleForTesting;
 import android.view.Surface;
 import android.view.WindowManager;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.lang.annotation.Retention;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
@@ -520,8 +523,15 @@ public class CameraCapturer implements VideoCapturer {
      *
      *        {@literal @}Override
      *         public void onPictureTaken(byte[] pictureData) {
-     *             Bitmap bitmap = BitmapFactory.decodeByteArray(pictureData, 0,
-     *                 pictureData.length);
+     *             ByteBuffer buffer = ByteBuffer.wrap(pictureData);
+     *             ImageDecoder.Source src = ImageDecoder.createSource(buffer);
+     *             Bitmap bitmap = null;
+     *             try{
+     *                 bitmap = ImageDecoder.decodeBitmap(src);
+     *             }
+     *             catch(IOException e){
+     *                 e.printStackTrace();
+     *             }
      *         }
      *     });
      * </code></pre>
@@ -604,7 +614,18 @@ public class CameraCapturer implements VideoCapturer {
      * Aligns the picture data according to the current device orientation and camera source.
      */
     private byte[] alignPicture(@NonNull Camera.CameraInfo info, @NonNull byte[] pictureData) {
-        Bitmap bitmap = BitmapFactory.decodeByteArray(pictureData, 0, pictureData.length);
+        Bitmap bitmap = null;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            ByteBuffer buffer = ByteBuffer.wrap(pictureData);
+            ImageDecoder.Source src = ImageDecoder.createSource(buffer);
+            try {
+                bitmap = ImageDecoder.decodeBitmap(src);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        } else {
+            bitmap = BitmapFactory.decodeByteArray(pictureData, 0, pictureData.length);
+        }
 
         /*
          * Bitmap is not guaranteed to be decoded correctly. In this scenario the original picture

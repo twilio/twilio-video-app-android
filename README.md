@@ -177,17 +177,6 @@ during test execution set project property `testLogLevel` or add `TEST_LOG_LEVEL
 
 `TEST_LOG_LEVEL=ALL`
 
-### Enabling Test Retries
-In general, retrying tests is not a practice that is encouraged. However, the instrumentation tests
-rely on a stable network connection so sometimes test flakiness occurs when the suite is
-run on Firebase Test Lab where network conditions vary. Some tests that are known to be flaky are
-annotated with `@Retry(times = BuildConfig.MAX_TEST_RETRIES)`. By default,
-`BuildConfig.MAX_TEST_RETRIES` is set to 1, so the test is executed only once. To retry known flaky tests, set the project property
-`testRetriesEnabled` to `true`. This will result in setting `MAX_TEST_RETRIES` to 3 which results in the test being retried 3 times.
-
-
-`./gradlew -PtestRetriesEnabled=true library:clean firebaseTestLabCheckLibraryNoStats`
-
 ### Test Coverage
 Enabling test coverage requires setting project property `testCoverageEnabled`. The snippet below
 demonstrates executing unit and instrumentation tests with code coverage enabled.

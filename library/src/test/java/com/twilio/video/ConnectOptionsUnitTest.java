@@ -21,7 +21,9 @@ import static junit.framework.TestCase.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.when;
 
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -106,5 +108,21 @@ public class ConnectOptionsUnitTest {
                 new ConnectOptions.Builder("token").encodingParameters(encodingParameters).build();
 
         assertEquals(encodingParameters, connectOptions.getEncodingParameters());
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void shouldNotAllowNullVideoCodecs() {
+        List<VideoCodec> codecs = new ArrayList<>();
+        codecs.add(new Vp8Codec());
+        codecs.add(null);
+        new ConnectOptions.Builder("token").preferVideoCodecs(codecs).build();
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void shouldNotAllowNullAudioCodecs() {
+        List<AudioCodec> codecs = new ArrayList<>();
+        codecs.add(new OpusCodec());
+        codecs.add(null);
+        new ConnectOptions.Builder("token").preferAudioCodecs(codecs).build();
     }
 }

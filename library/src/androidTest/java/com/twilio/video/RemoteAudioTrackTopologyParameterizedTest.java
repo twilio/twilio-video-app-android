@@ -21,12 +21,10 @@ import static junit.framework.TestCase.assertFalse;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import android.support.test.InstrumentationRegistry;
 import android.support.test.filters.LargeTest;
-import com.kevinmost.junit_retry_rule.Retry;
-import com.kevinmost.junit_retry_rule.RetryRule;
 import com.twilio.video.base.BaseParticipantTest;
 import com.twilio.video.helper.CallbackHelper;
-import com.twilio.video.test.BuildConfig;
 import com.twilio.video.util.Topology;
 import java.util.Arrays;
 import java.util.List;
@@ -34,7 +32,6 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -44,11 +41,12 @@ import org.junit.runners.Parameterized;
 public class RemoteAudioTrackTopologyParameterizedTest extends BaseParticipantTest {
     @Parameterized.Parameters(name = "{0}")
     public static Iterable<Object[]> data() {
-        return Arrays.asList(new Object[][] {{Topology.P2P}, {Topology.GROUP}});
+        return Arrays.asList(
+                new Object[][] {{Topology.P2P}, {Topology.GROUP}, {Topology.GROUP_SMALL}});
     }
 
-    @Rule public final RetryRule retryRule = new RetryRule();
     private final Topology topology;
+    private static final long THREAD_SLEEP = 10000;
 
     public RemoteAudioTrackTopologyParameterizedTest(Topology topology) {
         this.topology = topology;
@@ -66,7 +64,6 @@ public class RemoteAudioTrackTopologyParameterizedTest extends BaseParticipantTe
     }
 
     @Test
-    @Retry(times = BuildConfig.MAX_TEST_RETRIES)
     public void shouldHaveTrackSid() throws InterruptedException {
         publishAudioTrack();
 
@@ -82,7 +79,6 @@ public class RemoteAudioTrackTopologyParameterizedTest extends BaseParticipantTe
     }
 
     @Test
-    @Retry(times = BuildConfig.MAX_TEST_RETRIES)
     public void shouldHaveTrackName() throws InterruptedException {
         publishAudioTrack();
 
@@ -100,7 +96,6 @@ public class RemoteAudioTrackTopologyParameterizedTest extends BaseParticipantTe
     }
 
     @Test
-    @Retry(times = BuildConfig.MAX_TEST_RETRIES)
     public void shouldAllowEnablePlayback() throws InterruptedException {
         final CallbackHelper.FakeStatsListener statsListener =
                 new CallbackHelper.FakeStatsListener();
@@ -118,7 +113,18 @@ public class RemoteAudioTrackTopologyParameterizedTest extends BaseParticipantTe
         assertFalse(bobRemoteAudioTrackPublication.getRemoteAudioTrack().isPlaybackEnabled());
 
         // Wait to allow audio to flow and stats to contain valid values
-        Thread.sleep(3000);
+        InstrumentationRegistry.getInstrumentation()
+                .runOnMainSync(
+                        new Runnable() {
+                            @Override
+                            public void run() {
+                                try {
+                                    Thread.sleep(THREAD_SLEEP);
+                                } catch (InterruptedException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        });
 
         // Request stats report
         statsListener.onStatsLatch = new CountDownLatch(1);
@@ -134,7 +140,18 @@ public class RemoteAudioTrackTopologyParameterizedTest extends BaseParticipantTe
         bobRemoteAudioTrackPublication.getRemoteAudioTrack().enablePlayback(true);
 
         // Wait to allow audio to flow and stats to contain valid values
-        Thread.sleep(3000);
+        InstrumentationRegistry.getInstrumentation()
+                .runOnMainSync(
+                        new Runnable() {
+                            @Override
+                            public void run() {
+                                try {
+                                    Thread.sleep(THREAD_SLEEP);
+                                } catch (InterruptedException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        });
 
         // Request stats report
         statsListener.onStatsLatch = new CountDownLatch(1);

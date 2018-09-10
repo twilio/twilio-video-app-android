@@ -16,6 +16,7 @@
 
 package com.twilio.video.base;
 
+import static com.twilio.video.TestUtils.ICE_TIMEOUT;
 import static org.apache.commons.lang3.RandomStringUtils.random;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -26,6 +27,7 @@ import android.Manifest;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.rule.GrantPermissionRule;
 import com.twilio.video.ConnectOptions;
+import com.twilio.video.IceOptions;
 import com.twilio.video.LocalAudioTrack;
 import com.twilio.video.LocalDataTrack;
 import com.twilio.video.LocalParticipant;
@@ -121,6 +123,12 @@ public abstract class BaseParticipantTest extends BaseVideoTest {
         // Setup room
         testRoomName = random(Constants.ROOM_NAME_LENGTH);
         assertNotNull(RoomUtils.createRoom(testRoomName, topology));
+        // Setup IceOptions
+        IceOptions iceOptions =
+                new IceOptions.Builder()
+                        .abortOnIceServersTimeout(true)
+                        .iceServersTimeout(ICE_TIMEOUT)
+                        .build();
 
         // Setup alice
         aliceToken = CredentialsUtils.getAccessToken(Constants.PARTICIPANT_ALICE, topology);
@@ -128,7 +136,10 @@ public abstract class BaseParticipantTest extends BaseVideoTest {
         aliceParticipantListener = new CallbackHelper.FakeParticipantListener();
         aliceRoomListener.onParticipantConnectedLatch = new CountDownLatch(1);
         ConnectOptions aliceConnectOptions =
-                new ConnectOptions.Builder(aliceToken).roomName(testRoomName).build();
+                new ConnectOptions.Builder(aliceToken)
+                        .roomName(testRoomName)
+                        .iceOptions(iceOptions)
+                        .build();
 
         // Setup bob
         bobToken = CredentialsUtils.getAccessToken(Constants.PARTICIPANT_BOB, topology);
@@ -137,7 +148,10 @@ public abstract class BaseParticipantTest extends BaseVideoTest {
         bobRoomListener = new CallbackHelper.FakeRoomListener();
         bobParticipantListener = new CallbackHelper.FakeParticipantListener();
         ConnectOptions bobConnectOptions =
-                new ConnectOptions.Builder(bobToken).roomName(testRoomName).build();
+                new ConnectOptions.Builder(bobToken)
+                        .roomName(testRoomName)
+                        .iceOptions(iceOptions)
+                        .build();
 
         // Connect alice
         aliceRoom = connect(aliceConnectOptions, aliceRoomListener);

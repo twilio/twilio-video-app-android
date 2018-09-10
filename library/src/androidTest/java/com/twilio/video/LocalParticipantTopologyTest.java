@@ -26,11 +26,8 @@ import android.Manifest;
 import android.support.test.filters.LargeTest;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.rule.GrantPermissionRule;
-import com.kevinmost.junit_retry_rule.Retry;
-import com.kevinmost.junit_retry_rule.RetryRule;
 import com.twilio.video.base.BaseVideoTest;
 import com.twilio.video.helper.CallbackHelper;
-import com.twilio.video.test.BuildConfig;
 import com.twilio.video.ui.MediaTestActivity;
 import com.twilio.video.util.Constants;
 import com.twilio.video.util.CredentialsUtils;
@@ -56,7 +53,8 @@ public class LocalParticipantTopologyTest extends BaseVideoTest {
 
     @Parameterized.Parameters(name = "{0}")
     public static Iterable<Object[]> data() {
-        return Arrays.asList(new Object[][] {{Topology.P2P}, {Topology.GROUP}});
+        return Arrays.asList(
+                new Object[][] {{Topology.P2P}, {Topology.GROUP}, {Topology.GROUP_SMALL}});
     }
 
     @Rule
@@ -67,7 +65,6 @@ public class LocalParticipantTopologyTest extends BaseVideoTest {
     public ActivityTestRule<MediaTestActivity> activityRule =
             new ActivityTestRule<>(MediaTestActivity.class);
 
-    @Rule public final RetryRule retryRule = new RetryRule();
     private MediaTestActivity mediaTestActivity;
     private String identity;
     private String token;
@@ -133,7 +130,6 @@ public class LocalParticipantTopologyTest extends BaseVideoTest {
     }
 
     @Test
-    @Retry(times = BuildConfig.MAX_TEST_RETRIES)
     public void shouldAllowPublishingAndUnpublishingTracksWhileConnected()
             throws InterruptedException {
         CallbackHelper.FakeLocalParticipantListener localParticipantListener =
@@ -144,8 +140,13 @@ public class LocalParticipantTopologyTest extends BaseVideoTest {
         localParticipantListener.onPublishedDataTrackLatch = new CountDownLatch(1);
         roomListener.onConnectedLatch = new CountDownLatch(1);
 
+        IceOptions iceOptions =
+                new IceOptions.Builder()
+                        .abortOnIceServersTimeout(true)
+                        .iceServersTimeout(TestUtils.ICE_TIMEOUT)
+                        .build();
         ConnectOptions connectOptions =
-                new ConnectOptions.Builder(token).roomName(roomName).build();
+                new ConnectOptions.Builder(token).roomName(roomName).iceOptions(iceOptions).build();
         room = Video.connect(mediaTestActivity, connectOptions, roomListener);
         assertTrue(roomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
         LocalParticipant localParticipant = room.getLocalParticipant();
@@ -185,15 +186,19 @@ public class LocalParticipantTopologyTest extends BaseVideoTest {
 
     @Test
     @Ignore("Sometimes tracks do not publish after reconnecting GSDK-1654")
-    @Retry(times = BuildConfig.MAX_TEST_RETRIES)
     public void shouldAllowRepublishingTracksWhileConnected() throws InterruptedException {
         CallbackHelper.FakeLocalParticipantListener localParticipantListener =
                 new CallbackHelper.FakeLocalParticipantListener();
         FakeVideoCapturer fakeVideoCapturer = new FakeVideoCapturer();
         roomListener.onConnectedLatch = new CountDownLatch(1);
 
+        IceOptions iceOptions =
+                new IceOptions.Builder()
+                        .abortOnIceServersTimeout(true)
+                        .iceServersTimeout(TestUtils.ICE_TIMEOUT)
+                        .build();
         ConnectOptions connectOptions =
-                new ConnectOptions.Builder(token).roomName(roomName).build();
+                new ConnectOptions.Builder(token).roomName(roomName).iceOptions(iceOptions).build();
         room = Video.connect(mediaTestActivity, connectOptions, roomListener);
         assertTrue(roomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
         LocalParticipant localParticipant = room.getLocalParticipant();
@@ -270,7 +275,6 @@ public class LocalParticipantTopologyTest extends BaseVideoTest {
     }
 
     @Test
-    @Retry(times = BuildConfig.MAX_TEST_RETRIES)
     public void shouldHaveTracksWhenConnected() throws InterruptedException {
         CallbackHelper.FakeLocalParticipantListener localParticipantListener =
                 new CallbackHelper.FakeLocalParticipantListener();
@@ -285,11 +289,17 @@ public class LocalParticipantTopologyTest extends BaseVideoTest {
         localVideoTrack = LocalVideoTrack.create(mediaTestActivity, true, fakeVideoCapturer);
         localDataTrack = LocalDataTrack.create(mediaTestActivity);
 
+        IceOptions iceOptions =
+                new IceOptions.Builder()
+                        .abortOnIceServersTimeout(true)
+                        .iceServersTimeout(TestUtils.ICE_TIMEOUT)
+                        .build();
         ConnectOptions.Builder connectOptionsBuilder =
                 new ConnectOptions.Builder(token)
                         .audioTracks(Collections.singletonList(localAudioTrack))
                         .videoTracks(Collections.singletonList(localVideoTrack))
                         .dataTracks(Collections.singletonList(localDataTrack))
+                        .iceOptions(iceOptions)
                         .roomName(roomName);
 
         room = Video.connect(mediaTestActivity, connectOptionsBuilder.build(), roomListener);
@@ -303,7 +313,7 @@ public class LocalParticipantTopologyTest extends BaseVideoTest {
         assertEquals(1, localParticipant.getLocalAudioTracks().size());
         assertEquals(1, localParticipant.getVideoTracks().size());
         assertEquals(1, localParticipant.getLocalVideoTracks().size());
-        if (topology == Topology.GROUP) {
+        if (topology == Topology.GROUP || topology == Topology.GROUP_SMALL) {
             assertTrue(
                     localParticipantListener.onPublishedDataTrackLatch.await(20, TimeUnit.SECONDS));
         }
@@ -315,12 +325,15 @@ public class LocalParticipantTopologyTest extends BaseVideoTest {
     }
 
     @Test
-    @Retry(times = BuildConfig.MAX_TEST_RETRIES)
     public void shouldHaveIdentityAndNonNullSidOnceConnected() throws InterruptedException {
         roomListener.onConnectedLatch = new CountDownLatch(1);
-
+        IceOptions iceOptions =
+                new IceOptions.Builder()
+                        .abortOnIceServersTimeout(true)
+                        .iceServersTimeout(TestUtils.ICE_TIMEOUT)
+                        .build();
         ConnectOptions connectOptions =
-                new ConnectOptions.Builder(token).roomName(roomName).build();
+                new ConnectOptions.Builder(token).roomName(roomName).iceOptions(iceOptions).build();
         room = Video.connect(mediaTestActivity, connectOptions, roomListener);
         assertTrue(roomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
         LocalParticipant localParticipant = room.getLocalParticipant();
@@ -331,13 +344,17 @@ public class LocalParticipantTopologyTest extends BaseVideoTest {
     }
 
     @Test
-    @Retry(times = BuildConfig.MAX_TEST_RETRIES)
     public void shouldHaveIdentityAndNonNullSidUponDisconnect() throws InterruptedException {
         roomListener.onConnectedLatch = new CountDownLatch(1);
         roomListener.onDisconnectedLatch = new CountDownLatch(1);
 
+        IceOptions iceOptions =
+                new IceOptions.Builder()
+                        .abortOnIceServersTimeout(true)
+                        .iceServersTimeout(TestUtils.ICE_TIMEOUT)
+                        .build();
         ConnectOptions connectOptions =
-                new ConnectOptions.Builder(token).roomName(roomName).build();
+                new ConnectOptions.Builder(token).roomName(roomName).iceOptions(iceOptions).build();
         room = Video.connect(mediaTestActivity, connectOptions, roomListener);
         assertTrue(roomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
         LocalParticipant localParticipant = room.getLocalParticipant();
@@ -350,13 +367,17 @@ public class LocalParticipantTopologyTest extends BaseVideoTest {
     }
 
     @Test
-    @Retry(times = BuildConfig.MAX_TEST_RETRIES)
     public void shouldHaveIdentityAndNonNullSidOnceDisconnected() throws InterruptedException {
         roomListener.onConnectedLatch = new CountDownLatch(1);
         roomListener.onDisconnectedLatch = new CountDownLatch(1);
 
+        IceOptions iceOptions =
+                new IceOptions.Builder()
+                        .abortOnIceServersTimeout(true)
+                        .iceServersTimeout(TestUtils.ICE_TIMEOUT)
+                        .build();
         ConnectOptions connectOptions =
-                new ConnectOptions.Builder(token).roomName(roomName).build();
+                new ConnectOptions.Builder(token).roomName(roomName).iceOptions(iceOptions).build();
         room = Video.connect(mediaTestActivity, connectOptions, roomListener);
         assertTrue(roomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
         LocalParticipant localParticipant = room.getLocalParticipant();
@@ -369,13 +390,17 @@ public class LocalParticipantTopologyTest extends BaseVideoTest {
     }
 
     @Test
-    @Retry(times = BuildConfig.MAX_TEST_RETRIES)
     public void shouldNotPublishAudioTrackAfterDisconnect() throws InterruptedException {
         roomListener.onConnectedLatch = new CountDownLatch(1);
         roomListener.onDisconnectedLatch = new CountDownLatch(1);
 
+        IceOptions iceOptions =
+                new IceOptions.Builder()
+                        .abortOnIceServersTimeout(true)
+                        .iceServersTimeout(TestUtils.ICE_TIMEOUT)
+                        .build();
         ConnectOptions connectOptions =
-                new ConnectOptions.Builder(token).roomName(roomName).build();
+                new ConnectOptions.Builder(token).roomName(roomName).iceOptions(iceOptions).build();
         room = Video.connect(mediaTestActivity, connectOptions, roomListener);
         assertTrue(roomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
         LocalParticipant localParticipant = room.getLocalParticipant();
@@ -390,13 +415,17 @@ public class LocalParticipantTopologyTest extends BaseVideoTest {
     }
 
     @Test
-    @Retry(times = BuildConfig.MAX_TEST_RETRIES)
     public void shouldNotPublishVideoTrackAfterDisconnect() throws InterruptedException {
         roomListener.onConnectedLatch = new CountDownLatch(1);
         roomListener.onDisconnectedLatch = new CountDownLatch(1);
 
+        IceOptions iceOptions =
+                new IceOptions.Builder()
+                        .abortOnIceServersTimeout(true)
+                        .iceServersTimeout(TestUtils.ICE_TIMEOUT)
+                        .build();
         ConnectOptions connectOptions =
-                new ConnectOptions.Builder(token).roomName(roomName).build();
+                new ConnectOptions.Builder(token).roomName(roomName).iceOptions(iceOptions).build();
         room = Video.connect(mediaTestActivity, connectOptions, roomListener);
         assertTrue(roomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
         LocalParticipant localParticipant = room.getLocalParticipant();
@@ -411,13 +440,17 @@ public class LocalParticipantTopologyTest extends BaseVideoTest {
     }
 
     @Test
-    @Retry(times = BuildConfig.MAX_TEST_RETRIES)
     public void shouldNotPublishDataTrackAfterDisconnect() throws InterruptedException {
         roomListener.onConnectedLatch = new CountDownLatch(1);
         roomListener.onDisconnectedLatch = new CountDownLatch(1);
 
+        IceOptions iceOptions =
+                new IceOptions.Builder()
+                        .abortOnIceServersTimeout(true)
+                        .iceServersTimeout(TestUtils.ICE_TIMEOUT)
+                        .build();
         ConnectOptions connectOptions =
-                new ConnectOptions.Builder(token).roomName(roomName).build();
+                new ConnectOptions.Builder(token).roomName(roomName).iceOptions(iceOptions).build();
         room = Video.connect(mediaTestActivity, connectOptions, roomListener);
         assertTrue(roomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
         LocalParticipant localParticipant = room.getLocalParticipant();
@@ -432,7 +465,6 @@ public class LocalParticipantTopologyTest extends BaseVideoTest {
     }
 
     @Test
-    @Retry(times = BuildConfig.MAX_TEST_RETRIES)
     public void shouldNotUnpublishAudioTrackAfterDisconnect() throws InterruptedException {
         CallbackHelper.FakeLocalParticipantListener localParticipantListener =
                 new CallbackHelper.FakeLocalParticipantListener();
@@ -440,8 +472,13 @@ public class LocalParticipantTopologyTest extends BaseVideoTest {
         roomListener.onConnectedLatch = new CountDownLatch(1);
         roomListener.onDisconnectedLatch = new CountDownLatch(1);
 
+        IceOptions iceOptions =
+                new IceOptions.Builder()
+                        .abortOnIceServersTimeout(true)
+                        .iceServersTimeout(TestUtils.ICE_TIMEOUT)
+                        .build();
         ConnectOptions connectOptions =
-                new ConnectOptions.Builder(token).roomName(roomName).build();
+                new ConnectOptions.Builder(token).roomName(roomName).iceOptions(iceOptions).build();
         room = Video.connect(mediaTestActivity, connectOptions, roomListener);
         assertTrue(roomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
         LocalParticipant localParticipant = room.getLocalParticipant();
@@ -459,7 +496,6 @@ public class LocalParticipantTopologyTest extends BaseVideoTest {
     }
 
     @Test
-    @Retry(times = BuildConfig.MAX_TEST_RETRIES)
     public void shouldNotUnpublishVideoTrackAfterDisconnect() throws InterruptedException {
         CallbackHelper.FakeLocalParticipantListener localParticipantListener =
                 new CallbackHelper.FakeLocalParticipantListener();
@@ -467,8 +503,13 @@ public class LocalParticipantTopologyTest extends BaseVideoTest {
         roomListener.onConnectedLatch = new CountDownLatch(1);
         roomListener.onDisconnectedLatch = new CountDownLatch(1);
 
+        IceOptions iceOptions =
+                new IceOptions.Builder()
+                        .abortOnIceServersTimeout(true)
+                        .iceServersTimeout(TestUtils.ICE_TIMEOUT)
+                        .build();
         ConnectOptions connectOptions =
-                new ConnectOptions.Builder(token).roomName(roomName).build();
+                new ConnectOptions.Builder(token).roomName(roomName).iceOptions(iceOptions).build();
         room = Video.connect(mediaTestActivity, connectOptions, roomListener);
         assertTrue(roomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
         LocalParticipant localParticipant = room.getLocalParticipant();
@@ -487,7 +528,6 @@ public class LocalParticipantTopologyTest extends BaseVideoTest {
     }
 
     @Test
-    @Retry(times = BuildConfig.MAX_TEST_RETRIES)
     public void shouldNotUnpublishDataTrackAfterDisconnect() throws InterruptedException {
         CallbackHelper.FakeLocalParticipantListener localParticipantListener =
                 new CallbackHelper.FakeLocalParticipantListener();
@@ -495,8 +535,13 @@ public class LocalParticipantTopologyTest extends BaseVideoTest {
         roomListener.onConnectedLatch = new CountDownLatch(1);
         roomListener.onDisconnectedLatch = new CountDownLatch(1);
 
+        IceOptions iceOptions =
+                new IceOptions.Builder()
+                        .abortOnIceServersTimeout(true)
+                        .iceServersTimeout(TestUtils.ICE_TIMEOUT)
+                        .build();
         ConnectOptions connectOptions =
-                new ConnectOptions.Builder(token).roomName(roomName).build();
+                new ConnectOptions.Builder(token).roomName(roomName).iceOptions(iceOptions).build();
         room = Video.connect(mediaTestActivity, connectOptions, roomListener);
         assertTrue(roomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
         LocalParticipant localParticipant = room.getLocalParticipant();
@@ -520,7 +565,6 @@ public class LocalParticipantTopologyTest extends BaseVideoTest {
      */
 
     @Test
-    @Retry(times = BuildConfig.MAX_TEST_RETRIES)
     public void shouldNotSetEncodingParametersAfterDisconnect() throws InterruptedException {
         CallbackHelper.FakeLocalParticipantListener localParticipantListener =
                 new CallbackHelper.FakeLocalParticipantListener();
@@ -528,8 +572,13 @@ public class LocalParticipantTopologyTest extends BaseVideoTest {
         roomListener.onConnectedLatch = new CountDownLatch(1);
         roomListener.onDisconnectedLatch = new CountDownLatch(1);
 
+        IceOptions iceOptions =
+                new IceOptions.Builder()
+                        .abortOnIceServersTimeout(true)
+                        .iceServersTimeout(TestUtils.ICE_TIMEOUT)
+                        .build();
         ConnectOptions connectOptions =
-                new ConnectOptions.Builder(token).roomName(roomName).build();
+                new ConnectOptions.Builder(token).roomName(roomName).iceOptions(iceOptions).build();
         room = Video.connect(mediaTestActivity, connectOptions, roomListener);
         assertTrue(roomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
         LocalParticipant localParticipant = room.getLocalParticipant();
@@ -545,7 +594,6 @@ public class LocalParticipantTopologyTest extends BaseVideoTest {
     }
 
     @Test
-    @Retry(times = BuildConfig.MAX_TEST_RETRIES)
     public void shouldAllowNullEncodingParameters() throws InterruptedException {
         CallbackHelper.FakeLocalParticipantListener localParticipantListener =
                 new CallbackHelper.FakeLocalParticipantListener();
@@ -558,12 +606,18 @@ public class LocalParticipantTopologyTest extends BaseVideoTest {
         localAudioTrack = LocalAudioTrack.create(mediaTestActivity, true);
         localVideoTrack = LocalVideoTrack.create(mediaTestActivity, true, fakeVideoCapturer);
 
+        IceOptions iceOptions =
+                new IceOptions.Builder()
+                        .abortOnIceServersTimeout(true)
+                        .iceServersTimeout(TestUtils.ICE_TIMEOUT)
+                        .build();
         ConnectOptions connectOptions =
                 new ConnectOptions.Builder(token)
                         .audioTracks(Collections.singletonList(localAudioTrack))
                         .videoTracks(Collections.singletonList(localVideoTrack))
                         .roomName(roomName)
                         .encodingParameters(encodingParameters)
+                        .iceOptions(iceOptions)
                         .build();
         room = Video.connect(mediaTestActivity, connectOptions, roomListener);
         assertTrue(roomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
@@ -574,7 +628,6 @@ public class LocalParticipantTopologyTest extends BaseVideoTest {
     }
 
     @Test
-    @Retry(times = BuildConfig.MAX_TEST_RETRIES)
     public void shouldAllowEncodingParameters() throws InterruptedException {
         CallbackHelper.FakeLocalParticipantListener localParticipantListener =
                 new CallbackHelper.FakeLocalParticipantListener();
@@ -587,11 +640,17 @@ public class LocalParticipantTopologyTest extends BaseVideoTest {
         localAudioTrack = LocalAudioTrack.create(mediaTestActivity, true);
         localVideoTrack = LocalVideoTrack.create(mediaTestActivity, true, fakeVideoCapturer);
 
+        IceOptions iceOptions =
+                new IceOptions.Builder()
+                        .abortOnIceServersTimeout(true)
+                        .iceServersTimeout(TestUtils.ICE_TIMEOUT)
+                        .build();
         ConnectOptions connectOptions =
                 new ConnectOptions.Builder(token)
                         .audioTracks(Collections.singletonList(localAudioTrack))
                         .videoTracks(Collections.singletonList(localVideoTrack))
                         .roomName(roomName)
+                        .iceOptions(iceOptions)
                         .build();
         room = Video.connect(mediaTestActivity, connectOptions, roomListener);
         assertTrue(roomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
@@ -602,7 +661,6 @@ public class LocalParticipantTopologyTest extends BaseVideoTest {
     }
 
     @Test
-    @Retry(times = BuildConfig.MAX_TEST_RETRIES)
     public void shouldFailToPublishTrackWithNameTooLong() throws InterruptedException {
         CallbackHelper.FakeLocalParticipantListener localParticipantListener =
                 new CallbackHelper.FakeLocalParticipantListener();
@@ -661,7 +719,6 @@ public class LocalParticipantTopologyTest extends BaseVideoTest {
     }
 
     @Test
-    @Retry(times = BuildConfig.MAX_TEST_RETRIES)
     public void shouldFailToPublishTracksWithDuplicatedNames() throws InterruptedException {
         CallbackHelper.FakeLocalParticipantListener localParticipantListener =
                 new CallbackHelper.FakeLocalParticipantListener();
@@ -707,7 +764,7 @@ public class LocalParticipantTopologyTest extends BaseVideoTest {
         /*
          * This test is set to retry because sometimes setListener is called after the event occurs
          */
-        if (topology == Topology.GROUP) {
+        if (topology == Topology.GROUP || topology == Topology.GROUP_SMALL) {
             assertTrue(
                     localParticipantListener.onPublishedDataTrackLatch.await(20, TimeUnit.SECONDS));
         }
@@ -737,7 +794,6 @@ public class LocalParticipantTopologyTest extends BaseVideoTest {
     }
 
     @Test
-    @Retry(times = BuildConfig.MAX_TEST_RETRIES)
     public void publishTrack_shouldFailWithTrackNameTooLong() throws InterruptedException {
         CallbackHelper.FakeLocalParticipantListener localParticipantListener =
                 new CallbackHelper.FakeLocalParticipantListener();
@@ -802,7 +858,6 @@ public class LocalParticipantTopologyTest extends BaseVideoTest {
     }
 
     @Test
-    @Retry(times = BuildConfig.MAX_TEST_RETRIES)
     public void publishTrack_shouldFailWithDuplicatedTrackName() throws InterruptedException {
         CallbackHelper.FakeLocalParticipantListener localParticipantListener =
                 new CallbackHelper.FakeLocalParticipantListener();

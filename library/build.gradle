@@ -98,7 +98,6 @@ android {
         testVariant.buildConfigField("java.util.Map<String, String>",
             "twilioCredentials",
             "${getTwilioVideoConfig()}")
-        testVariant.buildConfigField("int", "MAX_TEST_RETRIES", "${getMaxTestRetries()}")
         testVariant.buildConfigField("com.twilio.video.LogLevel", "TEST_LOG_LEVEL",
                 "${getTestLogLevel()}")
     }
@@ -141,7 +140,6 @@ dependencies {
     androidTestImplementation "com.android.support.test.uiautomator:uiautomator-v18:${versions.uiAutomator}"
     androidTestImplementation "com.google.code.gson:gson:${versions.gson}"
     androidTestImplementation "org.apache.commons:commons-lang3:${versions.apacheCommons}"
-    androidTestImplementation "com.github.kevinmost:junit-retry-rule:${versions.junitRetryRule}"
     androidTestImplementation "pl.pragmatists:JUnitParams:${versions.junitParams}"
 
     implementation "com.android.support:support-annotations:${versions.supportLibrary}"
@@ -381,22 +379,6 @@ def getTestCoverageEnabled() {
     println "Test Coverage Enabled: " + testCoverageEnabled
 
     return testCoverageEnabled
-}
-
-def getMaxTestRetries() {
-    def testRetriesEnabled = false
-
-    // Determine if test retries enabled
-    if (project.hasProperty("testRetriesEnabled")) {
-        testRetriesEnabled = project.property("testRetriesEnabled").toBoolean()
-    }
-
-    // Set the max number of retries
-    def testMaxRetries = testRetriesEnabled ? 3 : 1
-
-    println "Max Number of Test Retries: " + testRetriesEnabled
-
-    return testMaxRetries
 }
 
 /*
