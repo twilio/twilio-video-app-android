@@ -7,7 +7,7 @@ aliases:
 
   # Cache
   - &android-ndk-cache-key
-    key: android-ndk-r12b-{{ checksum "scripts/install-android-ndk.sh" }}
+    key: android-ndk-r16b-{{ checksum "scripts/install-android-ndk.sh" }}
   - &restore-cache-android-ndk
     <<: *android-ndk-cache-key
     name: Restore Android NDK
