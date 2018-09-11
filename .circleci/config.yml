@@ -74,6 +74,14 @@ aliases:
     command: >
               gcloud auth activate-service-account travis@video-app-79418.iam.gserviceaccount.com
               --key-file=secrets/video-app-46437ca14fdd.json
+
+  # Configure git user
+  - &configure-git-user
+    name: Configure git user
+    command: |
+      git config --global user.email "twilio-sdk-build@twilio.com"
+      git config --global user.name "twilio-sdk-build"
+
   # Filters
   - &filter-snapshot
     branches:
@@ -365,6 +373,7 @@ jobs:
       - restore-cache: *restore-cache-android-ndk
       - run: *install-android-ndk
       - run: *install-secrets
+      - run: *configure-git-user
 
       # Publish library rc
       - run:
