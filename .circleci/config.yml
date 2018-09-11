@@ -105,6 +105,16 @@ aliases:
         - integration-physical-device-test
         - integration-camera-test
 
+  - &rc-defaults
+    filters:
+      tags:
+        only:
+          - /^\d+\.\d+\.\d+-rc\d+$/
+          - /^\d+\.\d+\.\d+-preview\d+-rc\d+$/
+          - /^\d+\.\d+\.\d+-beta\d+-rc\d+$/
+      branches:
+        ignore: /.*/
+
 jobs:
   setup-workspace:
     <<: *build-defaults
@@ -342,6 +352,60 @@ jobs:
       - save-cache: *save-cache-android-ndk
       - save-cache: *save-cache-gradle
 
+  publish-library-rc:
+    <<: *build-defaults
+    resource_class: xlarge
+    steps:
+      # Setup
+      - checkout
+      - attach_workspace:
+          at: *workspace
+      - restore-cache: *restore-cache-gradle
+      - run: *create-android-ndk-directory
+      - restore-cache: *restore-cache-android-ndk
+      - run: *install-android-ndk
+      - run: *install-secrets
+
+      # Publish library rc
+      - run:
+          name: Publish Library RC
+          command: ./gradlew bintrayLibraryReleaseCandidateUpload incrementRc
+
+      # Send webhook if successful
+      - run:
+          command: ./scripts/send-circleci-webhook.sh
+          when: on_success
+
+      # Save cache
+      - save-cache: *save-cache-android-ndk
+      - save-cache: *save-cache-gradle
+
+  publish-app-rc:
+    <<: *build-defaults
+    resource_class: xlarge
+    steps:
+      # Setup
+      - checkout
+      - attach_workspace:
+          at: *workspace
+      - restore-cache: *restore-cache-gradle
+      - run: *create-android-ndk-directory
+      - restore-cache: *restore-cache-android-ndk
+      - run: *install-android-ndk
+      - run: *install-secrets
+
+      # Publish app snapshot
+      - run:
+          name: Publish App Snapshot
+          command: >
+                    ./gradlew -q
+                    -PreleaseCandidate=true
+                    app:uploadInternalReleaseToHockeyApp
+
+      # Save cache
+      - save-cache: *save-cache-android-ndk
+      - save-cache: *save-cache-gradle
+
 workflows:
   version: 2
 
@@ -384,3 +448,19 @@ workflows:
 
       - publish-app-snapshot:
           <<: *snapshot-defaults
+
+  release-candidate:
+    jobs:
+      # Setup
+      - setup-workspace:
+          <<: *rc-defaults
+
+      # Publish
+      - publish-library-rc:
+          context: sdks
+          requires:
+              - setup-workspace
+
+      - publish-app-rc:
+          requires:
+              - setup-workspace

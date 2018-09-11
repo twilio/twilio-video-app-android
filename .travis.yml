@@ -18,8 +18,6 @@ jdk:
 branches:
   only:
     - master
-    # RC Tag Branches
-    - /^\d+\.\d+\.\d+-rc\d+$/
     # Release Tag Branches
     - /^\d+\.\d+\.\d+$/
     # Preview Release Tag Branches
@@ -28,8 +26,6 @@ branches:
     - /^\d+\.\d+\.\d+-beta\d+$/
 
 stages:
-  - name: release candidate
-    if: tag =~ ^\d+\.\d+\.\d+-rc\d+$
   - name: release
     if: tag =~ ^\d+\.\d+\.\d+$ OR tag =~ ^\d+\.\d+\.\d+-preview\d+$ OR tag =~ ^\d+\.\d+\.\d+-beta\d+$
 
@@ -123,9 +119,5 @@ cache:
 
 jobs:
   include:
-    - stage: release candidate
-      script: ./gradlew bintrayLibraryReleaseCandidateUpload incrementRc
-    - stage: release candidate
-      script: ./gradlew -q -PreleaseCandidate=true app:uploadInternalReleaseToHockeyApp
     - stage: release
       script: ./gradlew bintrayLibraryReleaseUpload publishLibraryJavadocs incrementVersion

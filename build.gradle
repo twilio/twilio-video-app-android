@@ -137,8 +137,8 @@ task validateReleaseCandidateTag {
     group = 'Git'
 
     doLast {
-        def travisTag = System.getenv("TRAVIS_TAG")
-        def tagsMatch = (matchesRcVersion(travisTag)) ? ("true") : ("false")
+        def circleTag = System.getenv("CIRCLE_TAG")
+        def tagsMatch = (matchesRcVersion( circleTag)) ? ("true") : ("false")
 
         exec {
             workingDir "${rootDir}"
@@ -171,9 +171,10 @@ task incrementRc {
 
     doLast {
         def gitBranch = "master"
-        def travisTag = System.getenv("TRAVIS_TAG")
+        def circleTag = System.getenv("CIRCLE_TAG")
         def githubToken = System.getenv("GITHUB_TOKEN")
-        def repoSlug = System.getenv("TRAVIS_REPO_SLUG")
+        def repoSlug = "${System.getenv("$CIRCLE_PROJECT_USERNAME")}/" +
+                "${System.getenv("$CIRCLE_PROJECT_REPONAME")}"
         def gitRef = "https://${githubToken}@github.com/${repoSlug}.git"
         def remote = "upstream"
         def pushNullFile = new FileOutputStream("/dev/null")
@@ -206,7 +207,7 @@ task incrementRc {
          * these values do not match if an RC job is performed on an earlier commit and a PR
          * with a version update occurs later in history.
          */
-        if (matchesRcVersion(travisTag)) {
+        if (matchesRcVersion(circleTag)) {
             exec {
                 workingDir "${rootDir}"
                 commandLine "echo", "Incrementing RC from ${versionRc} to ${nextVersionRc}"
