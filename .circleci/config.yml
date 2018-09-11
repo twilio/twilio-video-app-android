@@ -457,10 +457,12 @@ workflows:
 
       # Publish
       - publish-library-rc:
+          <<: *rc-defaults
           context: sdks
           requires:
               - setup-workspace
 
       - publish-app-rc:
+          <<: *rc-defaults
           requires:
               - setup-workspace
