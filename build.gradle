@@ -173,8 +173,7 @@ task incrementRc {
         def gitBranch = "master"
         def circleTag = System.getenv("CIRCLE_TAG")
         def githubToken = System.getenv("GITHUB_TOKEN")
-        def repoSlug = "${System.getenv("$CIRCLE_PROJECT_USERNAME")}/" +
-                "${System.getenv("$CIRCLE_PROJECT_REPONAME")}"
+        def repoSlug = "${System.env.CIRCLE_PROJECT_USERNAME}/${System.env.CIRCLE_PROJECT_REPONAME}"
         def gitRef = "https://${githubToken}@github.com/${repoSlug}.git"
         def remote = "upstream"
         def pushNullFile = new FileOutputStream("/dev/null")
