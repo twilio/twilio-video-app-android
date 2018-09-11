@@ -78,7 +78,8 @@ aliases:
   - &filter-snapshot
     branches:
       only:
-        - master
+        - "master"
+        - "3.0"
 
   # Containers
   - &build-defaults
