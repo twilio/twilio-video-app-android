@@ -123,6 +123,16 @@ aliases:
       branches:
         ignore: /.*/
 
+  - &release-defaults
+    filters:
+      tags:
+        only:
+          - /^\d+\.\d+\.\d+$/
+          - /^\d+\.\d+\.\d+-preview\d+$/
+          - /^\d+\.\d+\.\d+-beta\d+$/
+      branches:
+        ignore: /.*/
+
 jobs:
   setup-workspace:
     <<: *build-defaults
@@ -403,13 +413,42 @@ jobs:
       - run: *install-android-ndk
       - run: *install-secrets
 
-      # Publish app snapshot
+      # Publish app RC
       - run:
-          name: Publish App Snapshot
+          name: Publish App RC
           command: >
                     ./gradlew -q
                     -PreleaseCandidate=true
                     app:uploadInternalReleaseToHockeyApp
+
+      # Save cache
+      - save-cache: *save-cache-android-ndk
+      - save-cache: *save-cache-gradle
+
+  publish-library:
+    <<: *build-defaults
+    resource_class: xlarge
+    steps:
+      # Setup
+      - checkout
+      - attach_workspace:
+          at: *workspace
+      - restore-cache: *restore-cache-gradle
+      - run: *create-android-ndk-directory
+      - restore-cache: *restore-cache-android-ndk
+      - run: *install-android-ndk
+      - run: *install-secrets
+      - run: *configure-git-user
+
+      # Publish library
+      - run:
+          name: Publish Library
+          command: ./gradlew bintrayLibraryReleaseUpload publishLibraryJavadocs incrementVersion
+
+      # Send webhook if successful
+      - run:
+          command: ./scripts/send-circleci-webhook.sh
+          when: on_success
 
       # Save cache
       - save-cache: *save-cache-android-ndk
@@ -473,5 +512,17 @@ workflows:
 
       - publish-app-rc:
           <<: *rc-defaults
+          requires:
+              - setup-workspace
+  release:
+    jobs:
+      # Setup
+      - setup-workspace:
+          <<: *release-defaults
+
+      # Publish
+      # TODO: Add publishing app to Play Store VIDEOAPP-15
+      - publish-library:
+          <<: *release-defaults
           requires:
               - setup-workspace

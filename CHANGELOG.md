@@ -1,22 +1,49 @@
 The Twilio Programmable Video SDKs use [Semantic Versioning](http://www.semver.org).
 
 ###2.2.1
+
 Improvements
 
 - Adding a null video/audio codec to `ConnectOptions` will now throw an exception
+- Switched CI provider for build, test, and release pipeline.
+
+Known issues
+
+- Network handoff, and subsequent connection renegotiation is not supported for IPv6 networks [#72](https://github.com/twilio/video-quickstart-android/issues/72)
+- Participant disconnect event can take up to 120 seconds to occur [#80](https://github.com/twilio/video-quickstart-android/issues/80) [#73](https://github.com/twilio/video-quickstart-android/issues/73)
+- Codec preferences do not function correctly in a hybrid codec Group Room.
 
 ####2.2.0
+
 Features
 
 - Added flag to IceOptions `abortOnIceServerTimeout` that tells the client whether to continue or abort connecting to a Room when Ice fails to connect.
 - Added parameter to IceOptions `iceServersTimeout` that allows control of the timeout period when trying to retrieve Ice servers.
 - Added `VideoTextureView`. `VideoTextureView` is similar to `VideoView` but subclasses `TextureView` instead of `SurfaceView`. Unlike SurfaceView, TextureView does not create a separate window but behaves as a regular View. This key difference allows a TextureView to be moved, transformed, animated, etc. For more see the [TextureView documentation](https://developer.android.com/reference/android/view/TextureView.html). If you were previously using [this gist](https://gist.github.com/aaalaniz/bfbc4891c98ef3b23558ff2260cbcc8e), please update your applications to use the `VideoTextureView` provided with the SDK. **NOTE**: `VideoTextureView` can experience dead locking on API Level 19 or below due to a [WebRTC bug](https://bugs.chromium.org/p/webrtc/issues/detail?id=5702). Use with discretion.
 
+Known issues
+
+- Network handoff, and subsequent connection renegotiation is not supported for IPv6 networks [#72](https://github.com/twilio/video-quickstart-android/issues/72)
+- Participant disconnect event can take up to 120 seconds to occur [#80](https://github.com/twilio/video-quickstart-android/issues/80) [#73](https://github.com/twilio/video-quickstart-android/issues/73)
+- Codec preferences do not function correctly in a hybrid codec Group Room.
+
 ####2.1.1
 
 Improvements
 
 - Updated `Room.Listener` documentation to provide more clarity about when `onRecording` callbacks are received.
+
+Known issues
+
+- Network handoff, and subsequent connection renegotiation is not supported for IPv6 networks [#72](https://github.com/twilio/video-quickstart-android/issues/72)
+- Participant disconnect event can take up to 120 seconds to occur [#80](https://github.com/twilio/video-quickstart-android/issues/80) [#73](https://github.com/twilio/video-quickstart-android/issues/73)
+- Codec preferences do not function correctly in a hybrid codec Group Room.
+
+Known issues
+
+- Network handoff, and subsequent connection renegotiation is not supported for IPv6 networks [#72](https://github.com/twilio/video-quickstart-android/issues/72)
+- Participant disconnect event can take up to 120 seconds to occur [#80](https://github.com/twilio/video-quickstart-android/issues/80) [#73](https://github.com/twilio/video-quickstart-android/issues/73)
+- Codec preferences do not function correctly in a hybrid codec Group Room.
 
 ####2.1.0
 

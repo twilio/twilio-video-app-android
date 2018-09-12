@@ -153,8 +153,8 @@ task validateReleaseTag {
     group = 'Git'
 
     doLast {
-        def travisTag = System.getenv("TRAVIS_TAG")
-        def tagsMatch = (matchesVersion(travisTag)) ? ("true") : ("false")
+        def circleTag = System.getenv("CIRCLE_TAG")
+        def tagsMatch = (matchesVersion(circleTag)) ? ("true") : ("false")
 
         exec {
             workingDir "${rootDir}"
@@ -245,9 +245,9 @@ task incrementVersionAfterRelease {
 
     doLast {
         def gitBranch = "master"
-        def travisTag = System.getenv("TRAVIS_TAG")
+        def circleTag = System.getenv("CIRCLE_TAG")
         def githubToken = System.getenv("GITHUB_TOKEN")
-        def repoSlug = System.getenv("TRAVIS_REPO_SLUG")
+        def repoSlug = "${System.env.CIRCLE_PROJECT_USERNAME}/${System.env.CIRCLE_PROJECT_REPONAME}"
         def gitRef = "https://${githubToken}@github.com/${repoSlug}.git"
         def remote = "upstream"
         def pushNullFile = new FileOutputStream("/dev/null")
@@ -279,7 +279,7 @@ task incrementVersionAfterRelease {
          * these values do not match if a job is performed on an earlier commit and a PR
          * with a version update occurs later in history.
          */
-        if (matchesVersion(travisTag)) {
+        if (matchesVersion(circleTag)) {
             exec {
                 workingDir "${rootDir}"
                 commandLine "echo", "Incrementing from versionPatch ${versionPatch} to " +
@@ -355,9 +355,9 @@ task incrementVersionAfterPreRelease {
 
     doLast {
         def gitBranch = "master"
-        def travisTag = System.getenv("TRAVIS_TAG")
+        def circleTag = System.getenv("CIRCLE_TAG")
         def githubToken = System.getenv("GITHUB_TOKEN")
-        def repoSlug = System.getenv("TRAVIS_REPO_SLUG")
+        def repoSlug = "${System.env.CIRCLE_PROJECT_USERNAME}/${System.env.CIRCLE_PROJECT_REPONAME}"
         def gitRef = "https://${githubToken}@github.com/${repoSlug}.git"
         def remote = "upstream"
         def pushNullFile = new FileOutputStream("/dev/null")
@@ -389,7 +389,7 @@ task incrementVersionAfterPreRelease {
          * these values do not match if a job is performed on an earlier commit and a PR
          * with a version update occurs later in history.
          */
-        if (matchesVersion(travisTag)) {
+        if (matchesVersion(circleTag)) {
             exec {
                 workingDir "${rootDir}"
                 commandLine "echo", "Incrementing from phaseNumber ${phaseNumber} to " +
@@ -427,9 +427,9 @@ task incrementVersion(type: GradleBuild) {
     description = 'Increment the SDK version'
     group = 'Git'
     dependsOn validateReleaseTag
-    def releaseVersion = System.getenv("TRAVIS_TAG") == null ?
+    def releaseVersion = System.getenv("CIRCLE_TAG") == null ?
             ("") :
-            (System.getenv("TRAVIS_TAG"))
+            (System.getenv("CIRCLE_TAG"))
     def incrementVersionTask = releaseVersion.contains("preview") ||
             releaseVersion.contains("beta") ?
             ('incrementVersionAfterPreRelease') :
@@ -442,16 +442,16 @@ task publishLibraryJavadocs {
     group = 'Publishing'
     dependsOn validateReleaseTag
     dependsOn 'library:createJavadocs'
-    def releaseVersion = System.getenv("TRAVIS_TAG") == null ?
+    def releaseVersion = System.getenv("CIRCLE_TAG") == null ?
             ("") :
-            (System.getenv("TRAVIS_TAG"))
+            (System.getenv("CIRCLE_TAG"))
     boolean preRelease = releaseVersion.contains("preview") || releaseVersion.contains("beta")
     def pinLatestDocsCommand = preRelease ?
             // Pin command is a no-op for pre releases
             (["true"]) :
             (["ln", "-sfn", "${releaseVersion}", "docs/latest"])
     def githubToken = System.getenv("GITHUB_TOKEN")
-    def repoSlug = System.getenv("TRAVIS_REPO_SLUG")
+    def repoSlug = "${System.env.CIRCLE_PROJECT_USERNAME}/${System.env.CIRCLE_PROJECT_REPONAME}"
     def gitRef = "https://${githubToken}@github.com/${repoSlug}.git"
     def remote = "upstream"
     def pushNullFile = new FileOutputStream("/dev/null")
@@ -670,9 +670,9 @@ task bintrayLibraryReleaseUpload(type: GradleBuild) {
     dependsOn validateReleaseTag
     buildFile = file('library/build.gradle')
     tasks = ['clean', 'assembleRelease', 'uploadArchives']
-    def releaseVersion = System.getenv("TRAVIS_TAG") == null ?
+    def releaseVersion = System.getenv("CIRCLE_TAG") == null ?
             ("") :
-            (System.getenv("TRAVIS_TAG"))
+            (System.getenv("CIRCLE_TAG"))
     boolean preRelease = releaseVersion.contains("preview") || releaseVersion.contains("beta")
     startParameter.projectProperties += gradle.startParameter.projectProperties + [
             'preRelease': preRelease,
