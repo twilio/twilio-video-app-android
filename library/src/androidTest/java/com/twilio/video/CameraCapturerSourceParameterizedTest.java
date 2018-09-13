@@ -23,10 +23,14 @@ import static org.junit.Assume.assumeFalse;
 import static org.junit.Assume.assumeTrue;
 
 import android.graphics.BitmapFactory;
+import android.graphics.ImageDecoder;
+import android.os.Build;
 import android.support.test.filters.LargeTest;
 import com.twilio.video.base.BaseCameraCapturerTest;
 import com.twilio.video.test.R;
 import com.twilio.video.util.DeviceUtils;
+import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.util.Arrays;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
@@ -241,9 +245,22 @@ public class CameraCapturerSourceParameterizedTest extends BaseCameraCapturerTes
                     public void onPictureTaken(byte[] pictureData) {
                         // Validate our picture data
                         assertNotNull(pictureData);
-                        assertNotNull(
-                                BitmapFactory.decodeByteArray(pictureData, 0, pictureData.length));
 
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                            ByteBuffer buffer = ByteBuffer.wrap(pictureData);
+                            assertNotNull(ImageDecoder.createSource(buffer));
+                            try {
+                                assertNotNull(
+                                        ImageDecoder.decodeBitmap(
+                                                ImageDecoder.createSource(buffer)));
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                        } else {
+                            assertNotNull(
+                                    BitmapFactory.decodeByteArray(
+                                            pictureData, 0, pictureData.length));
+                        }
                         pictureTaken.countDown();
                     }
                 };
@@ -273,8 +290,21 @@ public class CameraCapturerSourceParameterizedTest extends BaseCameraCapturerTes
                     public void onPictureTaken(byte[] pictureData) {
                         // Validate our picture data
                         assertNotNull(pictureData);
-                        assertNotNull(
-                                BitmapFactory.decodeByteArray(pictureData, 0, pictureData.length));
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                            ByteBuffer buffer = ByteBuffer.wrap(pictureData);
+                            assertNotNull(buffer);
+                            ImageDecoder.Source src = ImageDecoder.createSource(buffer);
+                            assertNotNull(src);
+                            try {
+                                assertNotNull(ImageDecoder.decodeBitmap(src));
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                        } else {
+                            assertNotNull(
+                                    BitmapFactory.decodeByteArray(
+                                            pictureData, 0, pictureData.length));
+                        }
 
                         pictureTaken.countDown();
                     }

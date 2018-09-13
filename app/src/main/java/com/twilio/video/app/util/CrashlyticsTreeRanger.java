@@ -16,13 +16,13 @@
 
 package com.twilio.video.app.util;
 
-import com.google.firebase.crash.FirebaseCrash;
+import com.crashlytics.android.Crashlytics;
 import javax.inject.Inject;
 
-public class FirebaseTreeRanger implements TreeRanger {
+public class CrashlyticsTreeRanger implements TreeRanger {
 
     @Inject
-    public FirebaseTreeRanger() {}
+    public CrashlyticsTreeRanger() {}
 
     @Override
     public void inform(String message) {
@@ -31,11 +31,11 @@ public class FirebaseTreeRanger implements TreeRanger {
 
     @Override
     public void caution(String message) {
-        FirebaseCrash.log(message);
+        Crashlytics.log(message);
     }
 
     @Override
     public void alert(Throwable throwable) {
-        FirebaseCrash.report(throwable);
+        Crashlytics.logException(throwable);
     }
 }

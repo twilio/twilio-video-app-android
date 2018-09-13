@@ -35,6 +35,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.content.PermissionChecker;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -50,7 +51,6 @@ import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
@@ -224,10 +224,10 @@ public class RoomActivity extends BaseActivity {
                 public void onScreenCaptureError(String errorDescription) {
                     Timber.e("Screen capturer error: " + errorDescription);
                     stopScreenCapture();
-                    Toast.makeText(
-                                    RoomActivity.this,
+                    Snackbar.make(
+                                    primaryVideoView,
                                     R.string.screen_capture_error,
-                                    Toast.LENGTH_LONG)
+                                    Snackbar.LENGTH_LONG)
                             .show();
                 }
 
@@ -322,7 +322,8 @@ public class RoomActivity extends BaseActivity {
             if (permissionsGranted) {
                 setupLocalMedia();
             } else {
-                Toast.makeText(this, R.string.permissions_required, Toast.LENGTH_LONG).show();
+                Snackbar.make(primaryVideoView, R.string.permissions_required, Snackbar.LENGTH_LONG)
+                        .show();
             }
         }
     }
@@ -416,12 +417,11 @@ public class RoomActivity extends BaseActivity {
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == MEDIA_PROJECTION_REQUEST_CODE) {
             if (resultCode != Activity.RESULT_OK) {
-                Toast.makeText(
-                                this,
+                Snackbar.make(
+                                primaryVideoView,
                                 R.string.screen_capture_permission_not_granted,
-                                Toast.LENGTH_LONG)
+                                Snackbar.LENGTH_LONG)
                         .show();
-
                 return;
             }
             screenCapturer = new ScreenCapturer(this, resultCode, data, screenCapturerListener);
@@ -439,6 +439,11 @@ public class RoomActivity extends BaseActivity {
 
     @OnClick(R.id.connect)
     void connectButtonClick() {
+        if (!didAcceptPermissions()) {
+            Snackbar.make(primaryVideoView, R.string.permissions_required, Snackbar.LENGTH_SHORT)
+                    .show();
+            return;
+        }
         connect.setEnabled(false);
         // obtain room name
         final String roomName = roomEditText.getText().toString();
@@ -1740,5 +1745,15 @@ public class RoomActivity extends BaseActivity {
 
             // TODO: need design
         }
+    }
+
+    private boolean didAcceptPermissions() {
+        return PermissionChecker.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO)
+                        == PermissionChecker.PERMISSION_GRANTED
+                && PermissionChecker.checkSelfPermission(this, Manifest.permission.CAMERA)
+                        == PermissionChecker.PERMISSION_GRANTED
+                && PermissionChecker.checkSelfPermission(
+                                this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                        == PermissionChecker.PERMISSION_GRANTED;
     }
 }

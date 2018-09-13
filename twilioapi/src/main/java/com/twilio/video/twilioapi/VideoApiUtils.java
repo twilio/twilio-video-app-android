@@ -16,9 +16,6 @@
 
 package com.twilio.video.twilioapi;
 
-import static junit.framework.Assert.assertNotNull;
-import static junit.framework.Assert.assertTrue;
-
 import android.util.Base64;
 import android.util.Log;
 import com.google.gson.GsonBuilder;
@@ -47,6 +44,7 @@ public class VideoApiUtils {
 
     public static final String P2P = "peer-to-peer";
     public static final String GROUP = "group";
+    public static final String GROUP_SMALL = "group-small";
 
     private static String currentEnvironment = PROD;
 
@@ -118,7 +116,9 @@ public class VideoApiUtils {
                 && !environment.equalsIgnoreCase(DEV)) {
             throw new IllegalArgumentException("Invalid Environment!");
         }
-        if (!type.equalsIgnoreCase(P2P) && !type.equalsIgnoreCase(GROUP)) {
+        if (!type.equalsIgnoreCase(P2P)
+                && !type.equalsIgnoreCase(GROUP)
+                && !type.equalsIgnoreCase(GROUP_SMALL)) {
             throw new IllegalArgumentException("Invalid Room Type!");
         }
         if (!currentEnvironment.equalsIgnoreCase(environment)) {
@@ -148,7 +148,9 @@ public class VideoApiUtils {
                 && !environment.equalsIgnoreCase(DEV)) {
             throw new IllegalArgumentException("Invalid Environment!");
         }
-        if (!type.equalsIgnoreCase(P2P) && !type.equalsIgnoreCase(GROUP)) {
+        if (!type.equalsIgnoreCase(P2P)
+                && !type.equalsIgnoreCase(GROUP)
+                && !type.equalsIgnoreCase(GROUP_SMALL)) {
             throw new IllegalArgumentException("Invalid Room Type!");
         }
         if (!currentEnvironment.equalsIgnoreCase(environment)) {
@@ -206,25 +208,31 @@ public class VideoApiUtils {
         } while (videoRoom == null && retries++ < MAX_RETRIES);
 
         // Validate the room creation succeeded
-        assertNotNull(
-                String.format(
-                        "Failed to create a Room after %s attempts", String.valueOf(MAX_RETRIES)),
-                videoRoom);
-
+        if (videoRoom == null) {
+            throw new IllegalStateException(
+                    String.format(
+                            "Failed to create a Room after %s attempts",
+                            String.valueOf(MAX_RETRIES)));
+        }
         /*
          * Validate the room resource.
          *
          * Note that for a group room the infrastructure will always return enableTurn=true even if
          * the request was made with enableTurn=false.
          */
-        boolean expectedEnableTurn = type.equalsIgnoreCase(GROUP) || enableTurn;
-        assertTrue(
-                "Room resource does not match configuration requested for test",
+        boolean expectedEnableTurn =
+                type.equalsIgnoreCase(GROUP) || type.equalsIgnoreCase(GROUP_SMALL) || enableTurn;
+
+        boolean isRoomResourceMatchingConfig =
                 accountSid.equals(videoRoom.getAccountSid())
                         && name.equals(videoRoom.getUniqueName())
                         && type.equals(videoRoom.getType())
                         && expectedEnableTurn == videoRoom.isEnableTurn()
-                        && enableRecording == videoRoom.isRecordParticipantOnConnect());
+                        && enableRecording == videoRoom.isRecordParticipantOnConnect();
+        if (!isRoomResourceMatchingConfig) {
+            throw new IllegalStateException(
+                    "Room resource does not match configuration requested for test");
+        }
 
         return videoRoom;
     }

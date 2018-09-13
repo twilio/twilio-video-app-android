@@ -16,16 +16,14 @@
 
 package com.twilio.video;
 
+import static com.twilio.video.TestUtils.ICE_TIMEOUT;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import android.support.test.filters.LargeTest;
 import android.util.Log;
-import com.kevinmost.junit_retry_rule.Retry;
-import com.kevinmost.junit_retry_rule.RetryRule;
 import com.twilio.video.base.BaseCodecTest;
 import com.twilio.video.helper.CallbackHelper;
-import com.twilio.video.test.BuildConfig;
 import com.twilio.video.util.FakeVideoCapturer;
 import com.twilio.video.util.Topology;
 import java.util.Arrays;
@@ -35,7 +33,6 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -136,8 +133,6 @@ public class MultiCodecParameterizedTest extends BaseCodecTest {
                 });
     }
 
-    @Rule public final RetryRule retryRule = new RetryRule();
-
     private final List<VideoCodec> preferredVideoCodecs;
     private final List<VideoCodec> selectedVideoCodecs;
     private final VideoCodec expectedCodec;
@@ -163,7 +158,6 @@ public class MultiCodecParameterizedTest extends BaseCodecTest {
     }
 
     @Test
-    @Retry(times = BuildConfig.MAX_TEST_RETRIES)
     public void shouldPublishVideoTrackWhenCodecSupported() throws InterruptedException {
         // Validate device supported H264
         if (expectedCodec instanceof H264Codec
@@ -178,18 +172,27 @@ public class MultiCodecParameterizedTest extends BaseCodecTest {
         // Connect alice with video track and preferred codecs
         aliceLocalVideoTrack =
                 LocalVideoTrack.create(mediaTestActivity, true, new FakeVideoCapturer());
+        IceOptions iceOptions =
+                new IceOptions.Builder()
+                        .abortOnIceServersTimeout(true)
+                        .iceServersTimeout(ICE_TIMEOUT)
+                        .build();
         ConnectOptions aliceConnectOptions =
                 new ConnectOptions.Builder(aliceToken)
                         .roomName(roomName)
                         .videoTracks(Collections.singletonList(aliceLocalVideoTrack))
                         .preferVideoCodecs(preferredVideoCodecs)
+                        .iceOptions(iceOptions)
                         .build();
         aliceRoom = createRoom(aliceListener, aliceConnectOptions);
         aliceListener.onParticipantConnectedLatch = new CountDownLatch(1);
 
         // Connect bob with no tracks
         ConnectOptions bobConnectOptions =
-                new ConnectOptions.Builder(bobToken).roomName(roomName).build();
+                new ConnectOptions.Builder(bobToken)
+                        .roomName(roomName)
+                        .iceOptions(iceOptions)
+                        .build();
         bobRoom = createRoom(bobListener, bobConnectOptions);
         assertTrue(aliceListener.onParticipantConnectedLatch.await(20, TimeUnit.SECONDS));
         assertEquals(1, aliceRoom.getRemoteParticipants().size());
@@ -199,7 +202,6 @@ public class MultiCodecParameterizedTest extends BaseCodecTest {
     }
 
     @Test
-    @Retry(times = BuildConfig.MAX_TEST_RETRIES)
     public void publishTrack_shouldAllowSupportedVideoCodec() throws InterruptedException {
         // Validate device supported H264
         if (expectedCodec instanceof H264Codec
@@ -214,17 +216,27 @@ public class MultiCodecParameterizedTest extends BaseCodecTest {
         // Connect alice with preferred codecs
         aliceLocalVideoTrack =
                 LocalVideoTrack.create(mediaTestActivity, true, new FakeVideoCapturer());
+
+        IceOptions iceOptions =
+                new IceOptions.Builder()
+                        .abortOnIceServersTimeout(true)
+                        .iceServersTimeout(ICE_TIMEOUT)
+                        .build();
         ConnectOptions aliceConnectOptions =
                 new ConnectOptions.Builder(aliceToken)
                         .roomName(roomName)
                         .preferVideoCodecs(preferredVideoCodecs)
+                        .iceOptions(iceOptions)
                         .build();
         aliceRoom = createRoom(aliceListener, aliceConnectOptions);
         aliceListener.onParticipantConnectedLatch = new CountDownLatch(1);
 
         // Connect bob with no tracks
         ConnectOptions bobConnectOptions =
-                new ConnectOptions.Builder(bobToken).roomName(roomName).build();
+                new ConnectOptions.Builder(bobToken)
+                        .roomName(roomName)
+                        .iceOptions(iceOptions)
+                        .build();
         bobRoom = createRoom(bobListener, bobConnectOptions);
         RemoteParticipant aliceRemoteParticipant = bobRoom.getRemoteParticipants().get(0);
         assertTrue(aliceListener.onParticipantConnectedLatch.await(20, TimeUnit.SECONDS));

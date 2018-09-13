@@ -20,12 +20,15 @@ import static android.graphics.ImageFormat.NV21;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.ImageDecoder;
 import android.graphics.Matrix;
 import android.graphics.Rect;
 import android.graphics.YuvImage;
+import android.os.Build;
 import com.twilio.video.I420Frame;
 import com.twilio.video.VideoRenderer;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.concurrent.atomic.AtomicBoolean;
 import org.webrtc.RendererCommon;
@@ -69,7 +72,20 @@ public class BitmapVideoRenderer implements VideoRenderer {
 
         // Convert jpeg to Bitmap
         byte[] imageBytes = stream.toByteArray();
-        Bitmap bitmap = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.length);
+        Bitmap bitmap = null;
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            ByteBuffer buffer = ByteBuffer.wrap(imageBytes);
+            ImageDecoder.Source src = ImageDecoder.createSource(buffer);
+            try {
+                bitmap = ImageDecoder.decodeBitmap(src);
+            } catch (IOException e) {
+                e.printStackTrace();
+                return null;
+            }
+        } else {
+            bitmap = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.length);
+        }
         Matrix matrix = new Matrix();
 
         // Apply any needed rotation
@@ -143,7 +159,21 @@ public class BitmapVideoRenderer implements VideoRenderer {
         // Release YUV Converter
         yuvConverter.release();
 
-        return BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.length);
+        Bitmap bitmap = null;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            ByteBuffer buffer = ByteBuffer.wrap(imageBytes);
+            ImageDecoder.Source src = ImageDecoder.createSource(buffer);
+
+            try {
+                bitmap = ImageDecoder.decodeBitmap(src);
+            } catch (IOException e) {
+                e.printStackTrace();
+                return null;
+            }
+        } else {
+            bitmap = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.length);
+        }
+        return bitmap;
     }
 
     private YuvImage i420ToYuvImage(

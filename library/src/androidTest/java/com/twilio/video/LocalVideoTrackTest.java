@@ -22,8 +22,11 @@ import static junit.framework.Assert.assertFalse;
 import static junit.framework.TestCase.assertNotNull;
 import static org.apache.commons.lang3.RandomStringUtils.random;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assume.assumeTrue;
 
+import android.annotation.TargetApi;
 import android.content.Context;
+import android.os.Build;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.filters.SmallTest;
 import android.support.test.runner.AndroidJUnit4;
@@ -32,6 +35,10 @@ import com.twilio.video.util.FakeVideoCapturer;
 import com.twilio.video.util.FakeVideoRenderer;
 import com.twilio.video.util.FrameCountRenderer;
 import com.twilio.video.util.StringUtils;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -296,5 +303,63 @@ public class LocalVideoTrackTest extends BaseVideoTest {
 
         // Validate that eventually frame events stop
         assertNoFramesRendered(frameCountRenderer, LOCAL_VIDEO_TRACK_TEST_DELAY_MS);
+    }
+
+    @Test
+    @TargetApi(28)
+    public void CanSupportMultipleCameraStreams() throws InterruptedException {
+        assumeTrue(Build.VERSION.SDK_INT >= Build.VERSION_CODES.P);
+        final int cameraCount = 2;
+        final CountDownLatch cameraFrameLatch = new CountDownLatch(cameraCount);
+
+        final List<Camera2Capturer> capturers = new ArrayList<>();
+        List<LocalVideoTrack> localVideoTrackList = new ArrayList<>();
+        for (int i = 0; i < cameraCount; i++) {
+            final Camera2Capturer camera =
+                    new Camera2Capturer(
+                            context,
+                            String.valueOf(i),
+                            new Camera2Capturer.Listener() {
+                                @Override
+                                public void onFirstFrameAvailable() {
+                                    cameraFrameLatch.countDown();
+                                }
+
+                                @Override
+                                public void onCameraSwitched(String newCameraId) {}
+
+                                @Override
+                                public void onError(
+                                        Camera2Capturer.Exception camera2CapturerException) {}
+                            });
+            capturers.add(camera);
+            localVideoTrack = LocalVideoTrack.create(context, true, camera);
+            localVideoTrack.addRenderer(frameCountRenderer);
+            localVideoTrackList.add(localVideoTrack);
+        }
+        assertTrue(cameraFrameLatch.await(10, TimeUnit.SECONDS));
+
+        for (VideoTrack videoTrack : localVideoTrackList) {
+            videoTrack.release();
+        }
+        localVideoTrackList.clear();
+
+        for (Camera2Capturer capturer : capturers) {
+            capturer.stopCapture();
+        }
+        capturers.clear();
+
+        InstrumentationRegistry.getInstrumentation()
+                .runOnMainSync(
+                        new Runnable() {
+                            @Override
+                            public void run() {
+                                try {
+                                    Thread.sleep(2000);
+                                } catch (InterruptedException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        });
     }
 }

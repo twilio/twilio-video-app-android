@@ -48,7 +48,8 @@ import org.junit.runners.Parameterized;
 public class RoomMultiPartyTopologyParameterizedTest extends BaseVideoTest {
     @Parameterized.Parameters(name = "{0}")
     public static Iterable<Object[]> data() {
-        return Arrays.asList(new Object[][] {{Topology.P2P}, {Topology.GROUP}});
+        return Arrays.asList(
+                new Object[][] {{Topology.P2P}, {Topology.GROUP}, {Topology.GROUP_SMALL}});
     }
 
     private static final int PARTICIPANT_NUM = 3;
@@ -142,9 +143,13 @@ public class RoomMultiPartyTopologyParameterizedTest extends BaseVideoTest {
     private Room createRoom(String token, CallbackHelper.FakeRoomListener listener, String roomName)
             throws InterruptedException {
         listener.onConnectedLatch = new CountDownLatch(1);
-
+        IceOptions iceOptions =
+                new IceOptions.Builder()
+                        .iceServersTimeout(TestUtils.ICE_TIMEOUT)
+                        .abortOnIceServersTimeout(true)
+                        .build();
         ConnectOptions connectOptions =
-                new ConnectOptions.Builder(token).roomName(roomName).build();
+                new ConnectOptions.Builder(token).roomName(roomName).iceOptions(iceOptions).build();
         Room room = Video.connect(context, connectOptions, listener);
         assertTrue(listener.onConnectedLatch.await(20, TimeUnit.SECONDS));
         return room;

@@ -26,10 +26,12 @@ import android.support.annotation.Nullable;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.rule.GrantPermissionRule;
 import com.twilio.video.ConnectOptions;
+import com.twilio.video.IceOptions;
 import com.twilio.video.LocalAudioTrack;
 import com.twilio.video.LocalVideoTrack;
 import com.twilio.video.Room;
 import com.twilio.video.RoomState;
+import com.twilio.video.TestUtils;
 import com.twilio.video.Video;
 import com.twilio.video.VideoCodec;
 import com.twilio.video.helper.CallbackHelper;
@@ -143,11 +145,18 @@ public abstract class BaseStatsTest extends BaseVideoTest {
         if (videoTracks == null) {
             videoTracks = new ArrayList<>();
         }
+
+        IceOptions iceOptions =
+                new IceOptions.Builder()
+                        .abortOnIceServersTimeout(true)
+                        .iceServersTimeout(TestUtils.ICE_TIMEOUT)
+                        .build();
         ConnectOptions connectOptions =
                 new ConnectOptions.Builder(token)
                         .roomName(roomName)
                         .audioTracks(audioTracks)
                         .videoTracks(videoTracks)
+                        .iceOptions(iceOptions)
                         .build();
 
         return createRoom(listener, connectOptions);

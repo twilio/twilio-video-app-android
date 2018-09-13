@@ -47,7 +47,8 @@ public class StatsTopologyParameterizedTest extends BaseStatsTest {
 
     @Parameterized.Parameters(name = "{0}")
     public static Iterable<Object[]> data() {
-        return Arrays.asList(new Object[][] {{Topology.P2P}, {Topology.GROUP}});
+        return Arrays.asList(
+                new Object[][] {{Topology.P2P}, {Topology.GROUP}, {Topology.GROUP_SMALL}});
     }
 
     public StatsTopologyParameterizedTest(Topology topology) {
