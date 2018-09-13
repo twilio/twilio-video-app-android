@@ -15,6 +15,7 @@ Enhancements
 - Adding a null video/audio codec to `ConnectOptions` will now throw an exception
 - Added `@NonNull` `@Nullable` annotations to a few additional classes.
 - Updated `Room.Listener` documentation to provide more clarity about when `onRecording` callbacks are received.
+- Switched CI provider for build, test, and release pipeline.
 
 Bug Fixes
 
@@ -93,12 +94,6 @@ Known issues
 Improvements
 
 - Updated `Room.Listener` documentation to provide more clarity about when `onRecording` callbacks are received.
-
-Known issues
-
-- Network handoff, and subsequent connection renegotiation is not supported for IPv6 networks [#72](https://github.com/twilio/video-quickstart-android/issues/72)
-- Participant disconnect event can take up to 120 seconds to occur [#80](https://github.com/twilio/video-quickstart-android/issues/80) [#73](https://github.com/twilio/video-quickstart-android/issues/73)
-- Codec preferences do not function correctly in a hybrid codec Group Room.
 
 Known issues
 
