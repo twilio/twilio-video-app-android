@@ -198,7 +198,7 @@ task incrementRc {
 
         exec {
             workingDir "${rootDir}"
-            commandLine "git", "checkout", "${gitBranch}"
+            commandLine "git", "checkout", "-b", "${gitBranch}", "remotes/${remote}/${gitBranch}"
         }
 
         /*
@@ -271,7 +271,7 @@ task incrementVersionAfterRelease {
 
         exec {
             workingDir "${rootDir}"
-            commandLine "git", "checkout", "${gitBranch}"
+            commandLine "git", "checkout", "-b", "${gitBranch}", "remotes/${remote}/${gitBranch}"
         }
 
         /*
@@ -381,7 +381,7 @@ task incrementVersionAfterPreRelease {
 
         exec {
             workingDir "${rootDir}"
-            commandLine "git", "checkout", "${gitBranch}"
+            commandLine "git", "checkout", "-b", "${gitBranch}", "remotes/${remote}/${gitBranch}"
         }
 
         /*
@@ -471,7 +471,7 @@ task publishLibraryJavadocs {
 
         exec {
             workingDir "${rootDir}"
-            commandLine "git", "checkout", "gh-pages"
+            commandLine "git", "checkout", "-b", "gh-pages", "remotes/${remote}/gh-pages"
         }
 
         exec {
