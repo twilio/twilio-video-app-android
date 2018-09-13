@@ -172,7 +172,7 @@ task incrementRc {
     doLast {
         // TODO: Change back to master when feature branch is merged GSDK-1590
         def gitBranch = "3.0"
-        def travisTag = System.getenv("CIRCLE_TAG")
+        def circleTag = System.getenv("CIRCLE_TAG")
         def githubToken = System.getenv("GITHUB_TOKEN")
         def repoSlug = "${System.env.CIRCLE_PROJECT_USERNAME}/${System.env.CIRCLE_PROJECT_REPONAME}"
         def gitRef = "https://${githubToken}@github.com/${repoSlug}.git"
@@ -247,7 +247,7 @@ task incrementVersionAfterRelease {
     doLast {
         // TODO: Change back to master when feature branch is merged GSDK-1590
         def gitBranch = "3.0"
-        def travisTag = System.getenv("CIRCLE_TAG")
+        def circleTag = System.getenv("CIRCLE_TAG")
         def githubToken = System.getenv("GITHUB_TOKEN")
         def repoSlug = "${System.env.CIRCLE_PROJECT_USERNAME}/${System.env.CIRCLE_PROJECT_REPONAME}"
         def gitRef = "https://${githubToken}@github.com/${repoSlug}.git"
@@ -358,7 +358,7 @@ task incrementVersionAfterPreRelease {
     doLast {
         // TODO: Change back to master when feature branch is merged GSDK-1590
         def gitBranch = "3.0"
-        def travisTag = System.getenv("CIRCLE_TAG")
+        def circleTag = System.getenv("CIRCLE_TAG")
         def githubToken = System.getenv("GITHUB_TOKEN")
         def repoSlug = "${System.env.CIRCLE_PROJECT_USERNAME}/${System.env.CIRCLE_PROJECT_REPONAME}"
         def gitRef = "https://${githubToken}@github.com/${repoSlug}.git"
