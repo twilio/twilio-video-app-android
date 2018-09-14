@@ -74,6 +74,14 @@ aliases:
     command: >
               gcloud auth activate-service-account travis@video-app-79418.iam.gserviceaccount.com
               --key-file=secrets/video-app-46437ca14fdd.json
+
+  # Configure git user
+  - &configure-git-user
+    name: Configure git user
+    command: |
+      git config --global user.email "twilio-sdk-build@twilio.com"
+      git config --global user.name "twilio-sdk-build"
+
   # Filters
   - &filter-snapshot
     branches:
@@ -105,6 +113,26 @@ aliases:
         - integration-virtual-device-test
         - integration-physical-device-test
         - integration-camera-test
+
+  - &rc-defaults
+    filters:
+      tags:
+        only:
+          - /^\d+\.\d+\.\d+-rc\d+$/
+          - /^\d+\.\d+\.\d+-preview\d+-rc\d+$/
+          - /^\d+\.\d+\.\d+-beta\d+-rc\d+$/
+      branches:
+        ignore: /.*/
+
+  - &release-defaults
+    filters:
+      tags:
+        only:
+          - /^\d+\.\d+\.\d+$/
+          - /^\d+\.\d+\.\d+-preview\d+$/
+          - /^\d+\.\d+\.\d+-beta\d+$/
+      branches:
+        ignore: /.*/
 
 jobs:
   setup-workspace:
@@ -343,6 +371,90 @@ jobs:
       - save-cache: *save-cache-android-ndk
       - save-cache: *save-cache-gradle
 
+  publish-library-rc:
+    <<: *build-defaults
+    resource_class: xlarge
+    steps:
+      # Setup
+      - checkout
+      - attach_workspace:
+          at: *workspace
+      - restore-cache: *restore-cache-gradle
+      - run: *create-android-ndk-directory
+      - restore-cache: *restore-cache-android-ndk
+      - run: *install-android-ndk
+      - run: *install-secrets
+      - run: *configure-git-user
+
+      # Publish library rc
+      - run:
+          name: Publish Library RC
+          command: ./gradlew bintrayLibraryReleaseCandidateUpload incrementRc
+
+      # Send webhook if successful
+      - run:
+          command: ./scripts/send-circleci-webhook.sh
+          when: on_success
+
+      # Save cache
+      - save-cache: *save-cache-android-ndk
+      - save-cache: *save-cache-gradle
+
+  publish-app-rc:
+    <<: *build-defaults
+    resource_class: xlarge
+    steps:
+      # Setup
+      - checkout
+      - attach_workspace:
+          at: *workspace
+      - restore-cache: *restore-cache-gradle
+      - run: *create-android-ndk-directory
+      - restore-cache: *restore-cache-android-ndk
+      - run: *install-android-ndk
+      - run: *install-secrets
+
+      # Publish app RC
+      - run:
+          name: Publish App RC
+          command: >
+                    ./gradlew -q
+                    -PreleaseCandidate=true
+                    app:uploadInternalReleaseToHockeyApp
+
+      # Save cache
+      - save-cache: *save-cache-android-ndk
+      - save-cache: *save-cache-gradle
+
+  publish-library:
+    <<: *build-defaults
+    resource_class: xlarge
+    steps:
+      # Setup
+      - checkout
+      - attach_workspace:
+          at: *workspace
+      - restore-cache: *restore-cache-gradle
+      - run: *create-android-ndk-directory
+      - restore-cache: *restore-cache-android-ndk
+      - run: *install-android-ndk
+      - run: *install-secrets
+      - run: *configure-git-user
+
+      # Publish library
+      - run:
+          name: Publish Library
+          command: ./gradlew bintrayLibraryReleaseUpload publishLibraryJavadocs incrementVersion
+
+      # Send webhook if successful
+      - run:
+          command: ./scripts/send-circleci-webhook.sh
+          when: on_success
+
+      # Save cache
+      - save-cache: *save-cache-android-ndk
+      - save-cache: *save-cache-gradle
+
 workflows:
   version: 2
 
@@ -385,3 +497,34 @@ workflows:
 
       - publish-app-snapshot:
           <<: *snapshot-defaults
+
+  release-candidate:
+    jobs:
+      # Setup
+      - setup-workspace:
+          <<: *rc-defaults
+
+      # Publish
+      - publish-library-rc:
+          <<: *rc-defaults
+          context: sdks
+          requires:
+              - setup-workspace
+
+      - publish-app-rc:
+          <<: *rc-defaults
+          requires:
+              - setup-workspace
+  release:
+    jobs:
+      # Setup
+      - setup-workspace:
+          <<: *release-defaults
+
+      # Publish
+      # TODO: Add publishing app to Play Store VIDEOAPP-15
+      - publish-library:
+          <<: *release-defaults
+          context: sdks
+          requires:
+              - setup-workspace
