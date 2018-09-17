@@ -46,6 +46,10 @@ public:
                                                                         "com/twilio/video/RemoteAudioTrackStats")),
             j_remote_video_track_stats_class_(env, twilio_video_jni::FindClass(env,
                                                                         "com/twilio/video/RemoteVideoTrackStats")),
+            j_ice_candidate_pair_stats_class_(env, twilio_video_jni::FindClass(env,
+                                                                         "com/twilio/video/IceCandidatePairStats")),
+            j_ice_candidate_pair_state_class_(env, twilio_video_jni::FindClass(env,
+                                                                         "com/twilio/video/IceCandidatePairState")),
             j_video_dimensions_class_(env, twilio_video_jni::FindClass(env,
                                                                        "com/twilio/video/VideoDimensions")),
             j_on_stats_id_(
@@ -88,6 +92,12 @@ public:
                                             *j_stats_report_class_,
                                             "addVideoTrackStats",
                                             "(Lcom/twilio/video/RemoteVideoTrackStats;)V")),
+            j_stats_report_add_ice_candidate_pair_id(
+                    webrtc_jni::GetMethodID(env,
+                                            *j_stats_report_class_,
+                                            "addIceCandidatePairStats",
+                                            "(Lcom/twilio/video/IceCandidatePairStats;)V")
+            ),
             j_local_audio_track_stats_ctor_id_(
                     webrtc_jni::GetMethodID(env,
                                             *j_local_audio_track_stats_class_,
@@ -108,11 +118,18 @@ public:
                                             *j_remote_video_track_stats_class_,
                                             "<init>",
                                             "(Ljava/lang/String;ILjava/lang/String;Ljava/lang/String;DJILcom/twilio/video/VideoDimensions;I)V")),
-            j_video_dimensions_ctor_id_(
+
+             j_video_dimensions_ctor_id_(
                     webrtc_jni::GetMethodID(env,
                                             *j_video_dimensions_class_,
                                             "<init>",
-                                            "(II)V")) {
+                                            "(II)V")),
+            j_ice_candidate_pair_stats_ctor_id_(
+                    webrtc_jni::GetMethodID(env,
+                                            *j_ice_candidate_pair_stats_class_,
+                                            "<init>",
+                                            "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Lcom/twilio/video/IceCandidatePairState;Ljava/lang/String;Ljava/lang/String;JZZZJJDDDDJJJJJJJJJZLjava/lang/String;)V"))
+    {
     }
 
     virtual ~AndroidStatsObserver() {
@@ -158,6 +175,7 @@ protected:
                                             stats_report.local_video_track_stats);
                 processRemoteAudioTrackStats(j_stats_report, stats_report.remote_audio_track_stats);
                 processRemoteVideoTrackStats(j_stats_report, stats_report.remote_video_track_stats);
+                processIceCandidatePairStats(j_stats_report, stats_report.ice_candidate_pair_stats);
 
                 jni()->CallBooleanMethod(j_stats_reports, j_array_list_add_, j_stats_report);
             }
@@ -320,6 +338,73 @@ private:
         }
     }
 
+    void processIceCandidatePairStats(jobject j_stats_report,
+                                     const std::vector<twilio::media::IceCandidatePairStats> &ice_candidate_pair_stats) {
+        for (auto const &stats : ice_candidate_pair_stats) {
+            webrtc_jni::ScopedLocalRefFrame local_ref_frame(jni());
+            jstring j_transport_id =
+                    JavaUTF16StringFromStdString(jni(), stats.transport_id);
+            jstring j_local_candidate_id =
+                    JavaUTF16StringFromStdString(jni(), stats.local_candidate_id);
+            jstring j_remote_candidate_id =
+                    JavaUTF16StringFromStdString(jni(), stats.remote_candidate_id);
+
+            jobject state = NULL;
+            jfieldID j_state_field = NULL;
+            if (stats.state == twilio::media::kStateSucceeded) {
+                j_state_field = jni()->GetStaticFieldID(*j_ice_candidate_pair_state_class_,
+                                                        "kStateSucceeded",
+                                                        "Lcom/twilio/video/IceCandidatePairState;");
+            } else if (stats.state == twilio::media::kStateCancelled) {
+                j_state_field = jni()->GetStaticFieldID(*j_ice_candidate_pair_state_class_,
+                                                        "kStateCancelled",
+                                                        "Lcom/twilio/video/IceCandidatePairState;");
+            } else if (stats.state == twilio::media::kStateFailed) {
+                j_state_field = jni()->GetStaticFieldID(*j_ice_candidate_pair_state_class_,
+                                                        "kStateFailed",
+                                                        "Lcom/twilio/video/IceCandidatePairState;");
+            } else if (stats.state == twilio::media::kStateFrozen) {
+                j_state_field = jni()->GetStaticFieldID(*j_ice_candidate_pair_state_class_,
+                                                        "kStateFrozen",
+                                                        "Lcom/twilio/video/IceCandidatePairState;");
+            } else if (stats.state == twilio::media::kStateInProgress) {
+                j_state_field = jni()->GetStaticFieldID(*j_ice_candidate_pair_state_class_,
+                                                        "kStateInProgress",
+                                                        "Lcom/twilio/video/IceCandidatePairState;");
+            } else if (stats.state == twilio::media::kStateWaiting) {
+                j_state_field = jni()->GetStaticFieldID(*j_ice_candidate_pair_state_class_,
+                                                        "kStateWaiting",
+                                                        "Lcom/twilio/video/IceCandidatePairState;");
+            } else{
+                VIDEO_ANDROID_LOG(twilio::video::LogModule::kPlatform,
+                                  twilio::video::LogLevel::kError,
+                                  "invalid ice candidate pair state received");
+                continue;
+            }
+
+            state = jni()->GetStaticObjectField(*j_ice_candidate_pair_state_class_,
+                                                j_state_field);
+            jstring localCandidateIp = JavaUTF16StringFromStdString(jni(), stats.local_candidate_ip);
+            jstring remoteCandidateIp = JavaUTF16StringFromStdString(jni(), stats.remote_candidate_ip);
+            jstring relayProtocol = JavaUTF16StringFromStdString(jni(), stats.relay_protocol);
+
+
+            jobject j_ice_candidate_pair_stats = jni()->NewObject(*j_ice_candidate_pair_stats_class_, j_ice_candidate_pair_stats_ctor_id_,
+                                                                  j_transport_id, j_local_candidate_id, j_remote_candidate_id,
+                                                                  state, localCandidateIp, remoteCandidateIp,
+                                                                  stats.priority, stats.nominated, stats.writable, stats.readable,
+                                                                  stats.bytes_sent, stats.bytes_received, stats.total_round_trip_time,
+                                                                  stats.current_round_trip_time, stats.available_outgoing_bitrate,
+                                                                  stats.available_incoming_bitrate,
+                                                                  stats.requests_received, stats.requests_sent, stats.responses_received,
+                                                                  stats.retransmissions_received, stats.retransmissions_sent,
+                                                                  stats.consent_requests_received, stats.consent_requests_sent,
+                                                                  stats.consent_responses_received, stats.consent_responses_sent, stats.active_candidate_pair, relayProtocol);
+            jni()->CallVoidMethod(j_stats_report, j_stats_report_add_ice_candidate_pair_id, j_ice_candidate_pair_stats);
+        }
+    }
+
+
     bool observer_deleted_ = false;
     mutable rtc::CriticalSection deletion_lock_;
 
@@ -331,6 +416,8 @@ private:
     const webrtc_jni::ScopedGlobalRef<jclass> j_local_video_track_stats_class_;
     const webrtc_jni::ScopedGlobalRef<jclass> j_remote_audio_track_stats_class_;
     const webrtc_jni::ScopedGlobalRef<jclass> j_remote_video_track_stats_class_;
+    const webrtc_jni::ScopedGlobalRef<jclass> j_ice_candidate_pair_stats_class_;
+    const webrtc_jni::ScopedGlobalRef<jclass> j_ice_candidate_pair_state_class_;
     const webrtc_jni::ScopedGlobalRef<jclass> j_video_dimensions_class_;
     jmethodID j_on_stats_id_;
     jmethodID j_array_list_ctor_id_;
@@ -340,12 +427,13 @@ private:
     jmethodID j_stats_report_add_local_video_id_;
     jmethodID j_stats_report_add_audio_id_;
     jmethodID j_stats_report_add_video_id_;
+    jmethodID j_stats_report_add_ice_candidate_pair_id;
     jmethodID j_local_audio_track_stats_ctor_id_;
     jmethodID j_local_video_track_stats_ctor_id_;
     jmethodID j_audio_track_stats_ctor_id_;
     jmethodID j_video_track_stats_ctor_id_;
     jmethodID j_video_dimensions_ctor_id_;
-
+    jmethodID j_ice_candidate_pair_stats_ctor_id_;
 };
 
 }

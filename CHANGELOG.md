@@ -1,5 +1,16 @@
 The Twilio Programmable Video SDKs use [Semantic Versioning](http://www.semver.org).
 
+###2.3.0
+Improvements
+
+- Added `IceCandidatePairStats` to `StatsReport` which gives insight into local and remote ice candidates
+
+Known issues
+
+- Network handoff, and subsequent connection renegotiation is not supported for IPv6 networks #72
+- Participant disconnect event can take up to 120 seconds to occur #80 #73
+- Codec preferences do not function correctly in a hybrid codec Group Room.
+
 ###2.2.1
 
 Improvements

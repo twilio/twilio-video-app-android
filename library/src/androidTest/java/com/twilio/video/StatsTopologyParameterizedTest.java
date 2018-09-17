@@ -209,6 +209,42 @@ public class StatsTopologyParameterizedTest extends BaseStatsTest {
     }
 
     @Test
+    public void iceCandidatePairStatsShouldNotBeEmpty() throws InterruptedException {
+        // Connect Alice to room with both video and audio track
+        aliceLocalAudioTrack = LocalAudioTrack.create(mediaTestActivity, true);
+        aliceLocalVideoTrack =
+                LocalVideoTrack.create(mediaTestActivity, true, new FakeVideoCapturer());
+        aliceRoom =
+                createRoom(
+                        aliceToken,
+                        aliceListener,
+                        roomName,
+                        Collections.singletonList(aliceLocalAudioTrack),
+                        Collections.singletonList(aliceLocalVideoTrack));
+        aliceListener.onParticipantConnectedLatch = new CountDownLatch(1);
+
+        // Connect Bob to room with both video and audio track
+        bobLocalAudioTrack = LocalAudioTrack.create(mediaTestActivity, true);
+        bobLocalVideoTrack =
+                LocalVideoTrack.create(mediaTestActivity, true, new FakeVideoCapturer());
+        bobRoom =
+                createRoom(
+                        bobToken,
+                        bobListener,
+                        roomName,
+                        Collections.singletonList(bobLocalAudioTrack),
+                        Collections.singletonList(bobLocalVideoTrack));
+        assertTrue(aliceListener.onParticipantConnectedLatch.await(20, TimeUnit.SECONDS));
+
+        StatsReport statsReport = expectStatsReportTracksSize(1, 1, 1, 1);
+
+        assertNotEquals("", statsReport.getPeerConnectionId());
+        // Check IceCandidatePairStats
+        IceCandidatePairStats iceCandidatePairStats = statsReport.getIceCandidatePairStats().get(0);
+        checkIceCandidatePairStats(iceCandidatePairStats);
+    }
+
+    @Test
     @Ignore
     public void reportShouldHaveNonEmptyValues() throws InterruptedException {
         // Connect Alice to room with both video and audio track
@@ -422,5 +458,14 @@ public class StatsTopologyParameterizedTest extends BaseStatsTest {
     private void checkTrackStats(RemoteTrackStats stats) {
         assertTrue(0 < stats.bytesReceived);
         assertTrue(0 < stats.packetsReceived);
+    }
+
+    private void checkIceCandidatePairStats(IceCandidatePairStats stats) {
+        assertNotNullOrEmpty(stats.localCandidateId);
+        assertNotNullOrEmpty(stats.remoteCandidateId);
+        assertNotNullOrEmpty(stats.localCandidateIp);
+        assertNotNullOrEmpty(stats.remoteCandidateIp);
+        assertNotNullOrEmpty(stats.transportId);
+        assertNotNullOrEmpty(stats.relayProtocol);
     }
 }
