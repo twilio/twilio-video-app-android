@@ -196,6 +196,13 @@ task incrementRc {
             commandLine "git", "fetch", "${remote}"
         }
 
+        // Ignore gitBranch checked out by circle and use latest from next command
+        exec {
+            workingDir "${rootDir}"
+            commandLine "git", "branch", "-D", "${gitBranch}"
+            ignoreExitValue true
+        }
+
         exec {
             workingDir "${rootDir}"
             commandLine "git", "checkout", "-b", "${gitBranch}", "remotes/${remote}/${gitBranch}"
@@ -267,6 +274,13 @@ task incrementVersionAfterRelease {
         exec {
             workingDir "${rootDir}"
             commandLine "git", "fetch", "${remote}"
+        }
+
+        // Ignore gitBranch checked out by circle and use latest from next command
+        exec {
+            workingDir "${rootDir}"
+            commandLine "git", "branch", "-D", "${gitBranch}"
+            ignoreExitValue true
         }
 
         exec {
@@ -377,6 +391,13 @@ task incrementVersionAfterPreRelease {
         exec {
             workingDir "${rootDir}"
             commandLine "git", "fetch", "${remote}"
+        }
+
+        // Ignore gitBranch checked out by circle and use latest from following command
+        exec {
+            workingDir "${rootDir}"
+            commandLine "git", "branch", "-D", "${gitBranch}"
+            ignoreExitValue true
         }
 
         exec {
