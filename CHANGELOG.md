@@ -1,6 +1,6 @@
 The Twilio Programmable Video SDKs use [Semantic Versioning](http://www.semver.org).
 
-####3.0.0-beta1
+####3.0.0-preview2
 
 Features
 
@@ -10,8 +10,6 @@ Features
 
 Enhancements
 
-- When a Room is completed via the REST API, connected Clients will now receive a `RoomObserver::onDisconnected()` callback with a "RoomCompleted" error (code 53118) instead of no error.
-- The signaling Client has been updated to support version 2 of the Room Signaling Protocol (RSP).
 - Adding a null video/audio codec to `ConnectOptions` will now throw an exception
 - Added `@NonNull` `@Nullable` annotations to a few additional classes.
 - Updated `Room.Listener` documentation to provide more clarity about when `onRecording` callbacks are received.
@@ -19,7 +17,7 @@ Enhancements
 
 Bug Fixes
 
-- The signaling Client is more lenient when encountering unexpected RSP messages.
+- Fixed crash when disconnecting from a room.
 
 Known issues
 

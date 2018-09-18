@@ -18,7 +18,7 @@ buildscript {
             'java': JavaVersion.VERSION_1_8,
 
             // Dependencies
-            'videoCpp': '3.1.0',
+            'videoCpp': '3.0.0',
             'junit': '4.12',
             'mockito': '1.10.19',
             'guava': '19.0',
@@ -197,6 +197,13 @@ task incrementRc {
             commandLine "git", "fetch", "${remote}"
         }
 
+        // Ignore gitBranch checked out by circle and use latest from next command
+        exec {
+            workingDir "${rootDir}"
+            commandLine "git", "branch", "-D", "${gitBranch}"
+            ignoreExitValue true
+        }
+
         exec {
             workingDir "${rootDir}"
             commandLine "git", "checkout", "-b", "${gitBranch}", "remotes/${remote}/${gitBranch}"
@@ -269,6 +276,13 @@ task incrementVersionAfterRelease {
         exec {
             workingDir "${rootDir}"
             commandLine "git", "fetch", "${remote}"
+        }
+
+        // Ignore gitBranch checked out by circle and use latest from next command
+        exec {
+            workingDir "${rootDir}"
+            commandLine "git", "branch", "-D", "${gitBranch}"
+            ignoreExitValue true
         }
 
         exec {
@@ -380,6 +394,13 @@ task incrementVersionAfterPreRelease {
         exec {
             workingDir "${rootDir}"
             commandLine "git", "fetch", "${remote}"
+        }
+
+        // Ignore gitBranch checked out by circle and use latest from following command
+        exec {
+            workingDir "${rootDir}"
+            commandLine "git", "branch", "-D", "${gitBranch}"
+            ignoreExitValue true
         }
 
         exec {
