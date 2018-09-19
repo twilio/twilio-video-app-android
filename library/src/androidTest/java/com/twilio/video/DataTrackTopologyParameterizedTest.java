@@ -275,8 +275,16 @@ public class DataTrackTopologyParameterizedTest extends BaseParticipantTest {
         // Connect charlie
         String charlieToken =
                 CredentialsUtils.getAccessToken(Constants.PARTICIPANT_CHARLIE, topology);
+        IceOptions iceOptions =
+                new IceOptions.Builder()
+                        .abortOnIceServersTimeout(true)
+                        .iceServersTimeout(TestUtils.ICE_TIMEOUT)
+                        .build();
         ConnectOptions charlieConnectOptions =
-                new ConnectOptions.Builder(charlieToken).roomName(testRoomName).build();
+                new ConnectOptions.Builder(charlieToken)
+                        .roomName(testRoomName)
+                        .iceOptions(iceOptions)
+                        .build();
         charlieRoom = connect(charlieConnectOptions, charlieRoomListener);
 
         // Alice and Bob wait to see charlie connected
@@ -375,8 +383,16 @@ public class DataTrackTopologyParameterizedTest extends BaseParticipantTest {
         // Connect charlie
         String charlieToken =
                 CredentialsUtils.getAccessToken(Constants.PARTICIPANT_CHARLIE, topology);
+        IceOptions iceOptions =
+                new IceOptions.Builder()
+                        .iceServersTimeout(TestUtils.ICE_TIMEOUT)
+                        .abortOnIceServersTimeout(true)
+                        .build();
         ConnectOptions charlieConnectOptions =
-                new ConnectOptions.Builder(charlieToken).roomName(testRoomName).build();
+                new ConnectOptions.Builder(charlieToken)
+                        .roomName(testRoomName)
+                        .iceOptions(iceOptions)
+                        .build();
         charlieRoom = connect(charlieConnectOptions, charlieRoomListener);
 
         // Alice and Bob wait to see charlie connected
