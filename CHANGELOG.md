@@ -1,5 +1,30 @@
 The Twilio Programmable Video SDKs use [Semantic Versioning](http://www.semver.org).
 
+####3.0.0-preview3
+
+Enhancements
+
+- The signaling Client has been updated to support version 2 of the Room Signaling Protocol (RSP).
+- Added ECS debugging support at the signaling layer that will help in troubleshooting ice server related issues.
+- Introduced a safer threading model in the signaling layer that prevents occasional crashes and missing Track subscription events.
+- The SDK no longer waits for pending events when closing a PeerConnection speeding up the teardown process.
+
+Bug Fixes
+
+- The signaling Client is more lenient when encountering unexpected RSP messages.
+- Resolved a scenario where an ICE restart could be ignored after experiencing signaling glare.
+
+Known issues
+
+- Network handoff, and subsequent connection renegotiation is not supported for IPv6 networks [#72](https://github.com/twilio/video-quickstart-android/issues/72)
+- Participant disconnect event can take up to 120 seconds to occur [#80](https://github.com/twilio/video-quickstart-android/issues/80) [#73](https://github.com/twilio/video-quickstart-android/issues/73)
+- Codec preferences do not function correctly in a hybrid codec Group Room with the following
+codecs:
+    - ISAC
+    - PCMA
+    - G722
+    - VP9
+
 ####3.0.0-preview2
 
 Features
