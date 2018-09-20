@@ -353,27 +353,27 @@ private:
             jfieldID j_state_field = NULL;
             if (stats.state == twilio::media::kStateSucceeded) {
                 j_state_field = jni()->GetStaticFieldID(*j_ice_candidate_pair_state_class_,
-                                                        "kStateSucceeded",
+                                                        "STATE_SUCCEEDED",
                                                         "Lcom/twilio/video/IceCandidatePairState;");
             } else if (stats.state == twilio::media::kStateCancelled) {
                 j_state_field = jni()->GetStaticFieldID(*j_ice_candidate_pair_state_class_,
-                                                        "kStateCancelled",
+                                                        "STATE_CANCELED",
                                                         "Lcom/twilio/video/IceCandidatePairState;");
             } else if (stats.state == twilio::media::kStateFailed) {
                 j_state_field = jni()->GetStaticFieldID(*j_ice_candidate_pair_state_class_,
-                                                        "kStateFailed",
+                                                        "STATE_FAILED",
                                                         "Lcom/twilio/video/IceCandidatePairState;");
             } else if (stats.state == twilio::media::kStateFrozen) {
                 j_state_field = jni()->GetStaticFieldID(*j_ice_candidate_pair_state_class_,
-                                                        "kStateFrozen",
+                                                        "STATE_FROZEN",
                                                         "Lcom/twilio/video/IceCandidatePairState;");
             } else if (stats.state == twilio::media::kStateInProgress) {
                 j_state_field = jni()->GetStaticFieldID(*j_ice_candidate_pair_state_class_,
-                                                        "kStateInProgress",
+                                                        "STATE_IN_PROGRESS",
                                                         "Lcom/twilio/video/IceCandidatePairState;");
             } else if (stats.state == twilio::media::kStateWaiting) {
                 j_state_field = jni()->GetStaticFieldID(*j_ice_candidate_pair_state_class_,
-                                                        "kStateWaiting",
+                                                        "STATE_WAITING",
                                                         "Lcom/twilio/video/IceCandidatePairState;");
             } else{
                 VIDEO_ANDROID_LOG(twilio::video::LogModule::kPlatform,
