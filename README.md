@@ -265,6 +265,11 @@ architectures in one APK.
 This project maintains Google AOSP formatted code. Before submitting a pull request, make sure to run `./gradlew spotlessApply`
 
 Incorrectly formatted code submitted as a pull request will fail during the build phase.
+
+
+## Generating TwilioException.java
+Platform specific error codes are housed in `TwilioException.java`. We use an internal repo to keep track of the error codes across all SDK platforms. To update `TwilioException.java`, simply navigate to the `scripts/` directory and run `./gen_errors.sh`.
+
 ## Code of Conduct
 
 This project adheres to the Contributor Covenant [Code of Conduct](CODE_OF_CONDUCT.md). By

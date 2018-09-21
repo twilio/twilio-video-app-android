@@ -8,6 +8,7 @@ Enhancements
 - Added ECS debugging support at the signaling layer that will help in troubleshooting ice server related issues.
 - Introduced a safer threading model in the signaling layer that prevents occasional crashes and missing Track subscription events.
 - The SDK no longer waits for pending events when closing a PeerConnection speeding up the teardown process.
+- `onDisconnected` will now return a unique error code when the Room is completed via the REST API.
 
 Bug Fixes
 

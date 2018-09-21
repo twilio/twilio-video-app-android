@@ -18,7 +18,6 @@ package com.twilio.video;
 
 import static com.twilio.video.TestUtils.ICE_TIMEOUT;
 import static org.apache.commons.lang3.RandomStringUtils.random;
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
@@ -27,7 +26,6 @@ import android.support.test.InstrumentationRegistry;
 import android.support.test.runner.AndroidJUnit4;
 import com.twilio.video.base.BaseVideoTest;
 import com.twilio.video.helper.CallbackHelper;
-import com.twilio.video.twilioapi.model.VideoRoom;
 import com.twilio.video.util.Constants;
 import com.twilio.video.util.CredentialsUtils;
 import com.twilio.video.util.RoomUtils;
@@ -36,7 +34,6 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -116,33 +113,6 @@ public class RoomTest extends BaseVideoTest {
                 statsReports -> {
                     // Do nothing
                 });
-        assertTrue(roomListener.onDisconnectedLatch.await(20, TimeUnit.SECONDS));
-    }
-
-    @Test
-    @Ignore("Enable once CSDK-2342 is resolved")
-    public void shouldReceiveDisconnectedCallbackWhenCompleted() throws InterruptedException {
-        roomListener.onConnectedLatch = new CountDownLatch(1);
-        roomListener.onDisconnectedLatch = new CountDownLatch(1);
-
-        // Connect to room
-        IceOptions iceOptions =
-                new IceOptions.Builder()
-                        .iceServersTimeout(ICE_TIMEOUT)
-                        .abortOnIceServersTimeout(true)
-                        .build();
-        ConnectOptions connectOptions =
-                new ConnectOptions.Builder(token).roomName(roomName).iceOptions(iceOptions).build();
-        room = Video.connect(context, connectOptions, roomListener);
-        assertTrue(roomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
-
-        // Complete room via REST API
-        VideoRoom videoRoom = RoomUtils.completeRoom(room);
-
-        // Validate status is completed
-        assertEquals("completed", videoRoom.getStatus());
-
-        // Validate disconnected callback is received
         assertTrue(roomListener.onDisconnectedLatch.await(20, TimeUnit.SECONDS));
     }
 }
