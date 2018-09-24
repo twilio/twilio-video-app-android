@@ -91,7 +91,7 @@ public class VideoTopologyParameterizedTest extends BaseVideoTest {
 
     @After
     public void teardown() throws InterruptedException {
-        if (room != null && room.getState() != RoomState.DISCONNECTED) {
+        if (room != null && room.getState() != Room.State.DISCONNECTED) {
             roomListener.onDisconnectedLatch = new CountDownLatch(1);
             room.disconnect();
             assertTrue(roomListener.onDisconnectedLatch.await(20, TimeUnit.SECONDS));

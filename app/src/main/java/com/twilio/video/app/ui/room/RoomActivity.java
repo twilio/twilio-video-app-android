@@ -77,7 +77,6 @@ import com.twilio.video.RemoteParticipant;
 import com.twilio.video.RemoteVideoTrack;
 import com.twilio.video.RemoteVideoTrackPublication;
 import com.twilio.video.Room;
-import com.twilio.video.RoomState;
 import com.twilio.video.ScreenCapturer;
 import com.twilio.video.StatsListener;
 import com.twilio.video.TwilioException;
@@ -555,7 +554,7 @@ public class RoomActivity extends BaseActivity {
             pauseVideoMenuItem.setVisible(false);
         }
 
-        if (room != null && room.getState() == RoomState.CONNECTED) {
+        if (room != null && room.getState() == Room.State.CONNECTED) {
 
             // update local participant thumb
             participantController.updateThumb(localParticipantSid, oldVideo, cameraVideoTrack);
@@ -1271,7 +1270,7 @@ public class RoomActivity extends BaseActivity {
             statsScheduler.cancelStatsGathering();
         }
         boolean enableStats = sharedPreferences.getBoolean(Preferences.ENABLE_STATS, false);
-        if (enableStats && (room != null) && (room.getState() == RoomState.CONNECTED)) {
+        if (enableStats && (room != null) && (room.getState() == Room.State.CONNECTED)) {
             statsScheduler.scheduleStatsGathering(room, statsListener(), STATS_DELAY);
         }
         updateStatsUI(enableStats);

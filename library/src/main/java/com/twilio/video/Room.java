@@ -40,7 +40,7 @@ public class Room {
     private Context context;
     private String name;
     private String sid;
-    private RoomState roomState;
+    private Room.State roomState;
     private Map<String, RemoteParticipant> participantMap = new HashMap<>();
     private LocalParticipant localParticipant;
     private final Room.Listener listener;
@@ -84,7 +84,7 @@ public class Room {
                                 logger.d("onConnectFailure()");
 
                                 // Update room state
-                                Room.this.roomState = RoomState.DISCONNECTED;
+                                Room.this.roomState = Room.State.DISCONNECTED;
 
                                 // Release native room delegate
                                 release();
@@ -111,7 +111,7 @@ public class Room {
                                 logger.d("onDisconnected()");
 
                                 // Update room state
-                                Room.this.roomState = RoomState.DISCONNECTED;
+                                Room.this.roomState = Room.State.DISCONNECTED;
 
                                 // Release native room delegate
                                 release();
@@ -189,7 +189,7 @@ public class Room {
         this.context = context;
         this.name = name;
         this.sid = "";
-        this.roomState = RoomState.DISCONNECTED;
+        this.roomState = Room.State.DISCONNECTED;
         this.listener = listener;
         this.handler = handler;
         this.statsListenersQueue = new ConcurrentLinkedQueue<>();
@@ -209,13 +209,13 @@ public class Room {
     }
 
     /** Returns the current room state. */
-    public synchronized RoomState getState() {
+    public synchronized Room.State getState() {
         return roomState;
     }
 
     /** Returns whether any media in the Room is being recorded. */
     public synchronized boolean isRecording() {
-        return roomState == RoomState.CONNECTED && nativeIsRecording(nativeRoomDelegate);
+        return roomState == Room.State.CONNECTED && nativeIsRecording(nativeRoomDelegate);
     }
 
     /**
@@ -230,7 +230,7 @@ public class Room {
 
     /**
      * Returns the current local participant. If the room has not reached {@link
-     * RoomState#CONNECTED} then this method will return null.
+     * Room.State#CONNECTED} then this method will return null.
      */
     @Nullable
     public synchronized LocalParticipant getLocalParticipant() {
@@ -239,14 +239,14 @@ public class Room {
 
     /**
      * Retrieve stats for all media tracks and notify {@link StatsListener} via calling thread. In
-     * case where room is in {@link RoomState#DISCONNECTED} state, reports won't be delivered.
+     * case where room is in {@link Room.State#DISCONNECTED} state, reports won't be delivered.
      *
      * @param statsListener listener that receives stats reports for all media tracks.
      */
     @Nullable
     public synchronized void getStats(@NonNull StatsListener statsListener) {
         Preconditions.checkNotNull(statsListener, "StatsListener must not be null");
-        if (roomState == RoomState.DISCONNECTED) {
+        if (roomState == Room.State.DISCONNECTED) {
             return;
         }
         statsListenersQueue.offer(new Pair<>(Util.createCallbackHandler(), statsListener));
@@ -255,7 +255,7 @@ public class Room {
 
     /** Disconnects from the room. */
     public synchronized void disconnect() {
-        if (roomState != RoomState.DISCONNECTED && nativeRoomDelegate != 0) {
+        if (roomState != Room.State.DISCONNECTED && nativeRoomDelegate != 0) {
             if (localParticipant != null) {
                 localParticipant.release();
             }
@@ -296,7 +296,7 @@ public class Room {
                             statsListenerProxy,
                             mediaFactory.getNativeMediaFactoryHandle(),
                             handler);
-            roomState = RoomState.CONNECTING;
+            roomState = Room.State.CONNECTING;
         }
     }
 
@@ -317,7 +317,7 @@ public class Room {
         for (RemoteParticipant remoteParticipant : remoteParticipants) {
             participantMap.put(remoteParticipant.getSid(), remoteParticipant);
         }
-        this.roomState = RoomState.CONNECTED;
+        this.roomState = Room.State.CONNECTED;
     }
 
     /*
@@ -426,6 +426,13 @@ public class Room {
          * @param room
          */
         void onRecordingStopped(Room room);
+    }
+
+    /** Represents the current state of a {@link Room}. */
+    public enum State {
+        CONNECTING,
+        CONNECTED,
+        DISCONNECTED
     }
 
     private native long nativeConnect(

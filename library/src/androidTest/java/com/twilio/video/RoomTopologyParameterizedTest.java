@@ -101,7 +101,7 @@ public class RoomTopologyParameterizedTest extends BaseVideoTest {
 
     @After
     public void teardown() throws InterruptedException {
-        if (room != null && room.getState() != RoomState.DISCONNECTED) {
+        if (room != null && room.getState() != Room.State.DISCONNECTED) {
             roomListener.onDisconnectedLatch = new CountDownLatch(1);
             room.disconnect();
             assertTrue(roomListener.onDisconnectedLatch.await(20, TimeUnit.SECONDS));
@@ -177,11 +177,11 @@ public class RoomTopologyParameterizedTest extends BaseVideoTest {
 
             room = Video.connect(mediaTestActivity, connectOptions, roomListener);
             assertTrue(roomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
-            assertEquals(RoomState.CONNECTED, room.getState());
+            assertEquals(Room.State.CONNECTED, room.getState());
 
             room.disconnect();
             assertTrue(roomListener.onDisconnectedLatch.await(20, TimeUnit.SECONDS));
-            assertEquals(RoomState.DISCONNECTED, room.getState());
+            assertEquals(Room.State.DISCONNECTED, room.getState());
 
             Thread.sleep(1000);
         }
