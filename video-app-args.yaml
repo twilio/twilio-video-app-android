@@ -5,7 +5,7 @@
 library-virtual-device-tests:
     timeout: 60m
     type: instrumentation
-    app: library/ftl/dummy.apk
+    app: library/ftl/library-dummy-test-app.apk
     test: library/build/outputs/apk/androidTest/debug/library-debug-androidTest.apk
     device:
         - {model: Nexus5, version: 19}
@@ -32,7 +32,7 @@ library-virtual-device-tests:
 library-physical-device-tests:
     timeout: 30m
     type: instrumentation
-    app: library/ftl/dummy.apk
+    app: library/ftl/library-dummy-test-app.apk
     test: library/build/outputs/apk/androidTest/debug/library-debug-androidTest.apk
     device:
         - {model: m0, version: 18}
@@ -51,7 +51,7 @@ library-physical-device-tests:
 library-camera-tests:
     timeout: 10m
     type: instrumentation
-    app: library/ftl/dummy.apk
+    app: library/ftl/library-dummy-test-app.apk
     test: library/build/outputs/apk/androidTest/debug/library-debug-androidTest.apk
     # The following devices have known issues executing camera tests. The bugs and tasks
     # are tracked in epic GSDK-1278.
