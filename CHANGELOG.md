@@ -1,5 +1,20 @@
 The Twilio Programmable Video SDKs use [Semantic Versioning](http://www.semver.org).
 
+###3.0.0-beta1
+
+- `3.0.0-preview3` has been promoted to `3.0.0-beta1`. The `3.0.0` API is now final and will only receive bug fixes and improvements until `3.0.0` is officially released.
+
+Known issues
+
+- Network handoff, and subsequent connection renegotiation is not supported for IPv6 networks [#72](https://github.com/twilio/video-quickstart-android/issues/72)
+- Participant disconnect event can take up to 120 seconds to occur [#80](https://github.com/twilio/video-quickstart-android/issues/80) [#73](https://github.com/twilio/video-quickstart-android/issues/73)
+- Codec preferences do not function correctly in a hybrid codec Group Room with the following
+codecs:
+    - ISAC
+    - PCMA
+    - G722
+    - VP9
+
 ####3.0.0-preview3
 
 Enhancements
