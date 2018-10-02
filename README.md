@@ -165,7 +165,7 @@ The tests are located in the library module and use the AndroidJUnitRunner.
 The tests interact with the backend infrastructure and will result in billing activity on your account.
 
 ### Setting Test Log Level
-By default, the log level is set to `LogLevel.OFF` during test execution. To change the log level
+By default, the log level is set to `LogLevel.INFO` during test execution. To change the log level
 during test execution set project property `testLogLevel` or add `TEST_LOG_LEVEL` entry to
 `local.properties`. The value can be set to any value defined in the enum `LogLevel`.
 
