@@ -388,7 +388,7 @@ jobs:
       # Publish library rc
       - run:
           name: Publish Library RC
-          command: ./gradlew bintrayLibraryReleaseCandidateUpload incrementRc
+          command: ./gradlew bintrayLibraryReleaseCandidateUpload librarySizeReport incrementRc
 
       # Send webhook if successful
       - run:
@@ -443,7 +443,9 @@ jobs:
       # Publish library
       - run:
           name: Publish Library
-          command: ./gradlew bintrayLibraryReleaseUpload publishLibraryJavadocs incrementVersion
+          command: >
+                    ./gradlew bintrayLibraryReleaseUpload librarySizeReport publishLibraryJavadocs
+                    incrementVersion
 
       # Send webhook if successful
       - run:
