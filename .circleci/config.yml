@@ -60,9 +60,9 @@ aliases:
       mkdir -p app/src/twilio/release || true
       cp secrets/twilio-release-google-services.json app/src/twilio/release/google-services.json
       # Video Android Twilio Credentials
-      cp secrets/twilio-video.json library/twilio-video.json
+      echo $TWILIO_VIDEO_ANDROID_FTL_CREDENTIALS | base64 -di > library/twilio-video.json
       # Video App Development Variant Credentials
-      cp secrets/twilio-video-app.json app/twilio-video-app.json
+      echo $TWILIO_VIDEO_ANDROID_FTL_CREDENTIALS | base64 -di > app/twilio-video-app.json
       # Android Keystore
       mkdir -p ~/.gradle
       echo "androidKeystore=$PWD/secrets/android.keystore" >> ~/.gradle/gradle.properties
