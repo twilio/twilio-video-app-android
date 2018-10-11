@@ -125,7 +125,7 @@ public:
                                         "(II)V")),
             j_ice_candidate_pair_stats_ctor_id_(
                     webrtc::GetMethodID(env,
-                                        j_ice_candidate_pair_stats_class_.objc(),
+                                        j_ice_candidate_pair_stats_class_.obj(),
                                         "<init>",
                                         "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Lcom/twilio/video/IceCandidatePairState;Ljava/lang/String;Ljava/lang/String;JZZZJJDDDDJJJJJJJJJZLjava/lang/String;)V")) {
     }
@@ -337,9 +337,9 @@ private:
     }
 
     void processIceCandidatePairStats(jobject j_stats_report,
-                                     const std::vector<twilio::media::IceCandidatePairStats> &ice_candidate_pair_stats) {
+                                      const std::vector<twilio::media::IceCandidatePairStats> &ice_candidate_pair_stats) {
         for (auto const &stats : ice_candidate_pair_stats) {
-            webrtc_jni::ScopedLocalRefFrame local_ref_frame(jni());
+            webrtc::jni::ScopedLocalRefFrame local_ref_frame(jni());
             jstring j_transport_id =
                     JavaUTF16StringFromStdString(jni(), stats.transport_id);
             jstring j_local_candidate_id =
@@ -350,44 +350,44 @@ private:
             jobject state = NULL;
             jfieldID j_state_field = NULL;
             if (stats.state == twilio::media::kStateSucceeded) {
-                j_state_field = jni()->GetStaticFieldID(*j_ice_candidate_pair_state_class_,
+                j_state_field = jni()->GetStaticFieldID(j_ice_candidate_pair_state_class_.obj(),
                                                         "STATE_SUCCEEDED",
                                                         "Lcom/twilio/video/IceCandidatePairState;");
             } else if (stats.state == twilio::media::kStateCancelled) {
-                j_state_field = jni()->GetStaticFieldID(*j_ice_candidate_pair_state_class_,
+                j_state_field = jni()->GetStaticFieldID(j_ice_candidate_pair_state_class_.obj(),
                                                         "STATE_CANCELED",
                                                         "Lcom/twilio/video/IceCandidatePairState;");
             } else if (stats.state == twilio::media::kStateFailed) {
-                j_state_field = jni()->GetStaticFieldID(*j_ice_candidate_pair_state_class_,
+                j_state_field = jni()->GetStaticFieldID(j_ice_candidate_pair_state_class_.obj(),
                                                         "STATE_FAILED",
                                                         "Lcom/twilio/video/IceCandidatePairState;");
             } else if (stats.state == twilio::media::kStateFrozen) {
-                j_state_field = jni()->GetStaticFieldID(*j_ice_candidate_pair_state_class_,
+                j_state_field = jni()->GetStaticFieldID(j_ice_candidate_pair_state_class_.obj(),
                                                         "STATE_FROZEN",
                                                         "Lcom/twilio/video/IceCandidatePairState;");
             } else if (stats.state == twilio::media::kStateInProgress) {
-                j_state_field = jni()->GetStaticFieldID(*j_ice_candidate_pair_state_class_,
+                j_state_field = jni()->GetStaticFieldID(j_ice_candidate_pair_state_class_.obj(),
                                                         "STATE_IN_PROGRESS",
                                                         "Lcom/twilio/video/IceCandidatePairState;");
             } else if (stats.state == twilio::media::kStateWaiting) {
-                j_state_field = jni()->GetStaticFieldID(*j_ice_candidate_pair_state_class_,
+                j_state_field = jni()->GetStaticFieldID(j_ice_candidate_pair_state_class_.obj(),
                                                         "STATE_WAITING",
                                                         "Lcom/twilio/video/IceCandidatePairState;");
-            } else{
+            } else {
                 VIDEO_ANDROID_LOG(twilio::video::LogModule::kPlatform,
                                   twilio::video::LogLevel::kError,
                                   "invalid ice candidate pair state received");
                 continue;
             }
 
-            state = jni()->GetStaticObjectField(*j_ice_candidate_pair_state_class_,
+            state = jni()->GetStaticObjectField(j_ice_candidate_pair_state_class_.obj(),
                                                 j_state_field);
             jstring localCandidateIp = JavaUTF16StringFromStdString(jni(), stats.local_candidate_ip);
             jstring remoteCandidateIp = JavaUTF16StringFromStdString(jni(), stats.remote_candidate_ip);
             jstring relayProtocol = JavaUTF16StringFromStdString(jni(), stats.relay_protocol);
 
 
-            jobject j_ice_candidate_pair_stats = jni()->NewObject(*j_ice_candidate_pair_stats_class_, j_ice_candidate_pair_stats_ctor_id_,
+            jobject j_ice_candidate_pair_stats = jni()->NewObject(j_ice_candidate_pair_stats_class_.obj(), j_ice_candidate_pair_stats_ctor_id_,
                                                                   j_transport_id, j_local_candidate_id, j_remote_candidate_id,
                                                                   state, localCandidateIp, remoteCandidateIp,
                                                                   stats.priority, stats.nominated, stats.writable, stats.readable,
