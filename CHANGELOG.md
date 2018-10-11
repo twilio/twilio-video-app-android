@@ -180,10 +180,7 @@ Known issues
 - Network handoff, and subsequent connection renegotiation is not supported for IPv6 networks [#72](https://github.com/twilio/video-quickstart-android/issues/72)
 - Participant disconnect event can take up to 120 seconds to occur [#80](https://github.com/twilio/video-quickstart-android/issues/80) [#73](https://github.com/twilio/video-quickstart-android/issues/73)
 - Codec preferences do not function correctly in a hybrid codec Group Room.
-<<<<<<< HEAD
-=======
 - The SDK is not side-by-side compatible with other WebRTC based libraries [#340](https://github.com/twilio/video-quickstart-android/issues/340)
->>>>>>> 26ef0c119bc91081f5e60d95bb94da0634a29596
 
 ####2.1.0
 
