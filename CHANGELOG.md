@@ -1,5 +1,23 @@
 The Twilio Programmable Video SDKs use [Semantic Versioning](http://www.semver.org).
 
+###3.1.0
+
+Improvements
+
+- Added `IceCandidatePairStats` to `StatsReport` which gives insight into local and remote ice candidates
+
+Known issues
+
+- Network handoff, and subsequent connection renegotiation is not supported for IPv6 networks [#72](https://github.com/twilio/video-quickstart-android/issues/72)
+- Participant disconnect event can take up to 120 seconds to occur [#80](https://github.com/twilio/video-quickstart-android/issues/80) [#73](https://github.com/twilio/video-quickstart-android/issues/73)
+- The SDK is not side-by-side compatible with other WebRTC based libraries [#340](https://github.com/twilio/video-quickstart-android/issues/340)
+- Codec preferences do not function correctly in a hybrid codec Group Room with the following
+codecs:
+    - ISAC
+    - PCMA
+    - G722
+    - VP9
+
 ###3.0.0
 
 `3.0.0-beta1` has been promoted to `3.0.0`. The `3.x` SDK is now Generally Available (GA). The `1.x` and `2.x` Video Android SDK remain GA but will only receive critical bug fixes moving forward.
@@ -134,6 +152,7 @@ Known issues
 - Network handoff, and subsequent connection renegotiation is not supported for IPv6 networks [#72](https://github.com/twilio/video-quickstart-android/issues/72)
 - Participant disconnect event can take up to 120 seconds to occur [#80](https://github.com/twilio/video-quickstart-android/issues/80) [#73](https://github.com/twilio/video-quickstart-android/issues/73)
 - Codec preferences do not function correctly in a hybrid codec Group Room.
+- The SDK is not side-by-side compatible with other WebRTC based libraries [#340](https://github.com/twilio/video-quickstart-android/issues/340)
 
 ####2.2.0
 
@@ -148,6 +167,7 @@ Known issues
 - Network handoff, and subsequent connection renegotiation is not supported for IPv6 networks [#72](https://github.com/twilio/video-quickstart-android/issues/72)
 - Participant disconnect event can take up to 120 seconds to occur [#80](https://github.com/twilio/video-quickstart-android/issues/80) [#73](https://github.com/twilio/video-quickstart-android/issues/73)
 - Codec preferences do not function correctly in a hybrid codec Group Room.
+- The SDK is not side-by-side compatible with other WebRTC based libraries [#340](https://github.com/twilio/video-quickstart-android/issues/340)
 
 ####2.1.1
 
@@ -160,6 +180,10 @@ Known issues
 - Network handoff, and subsequent connection renegotiation is not supported for IPv6 networks [#72](https://github.com/twilio/video-quickstart-android/issues/72)
 - Participant disconnect event can take up to 120 seconds to occur [#80](https://github.com/twilio/video-quickstart-android/issues/80) [#73](https://github.com/twilio/video-quickstart-android/issues/73)
 - Codec preferences do not function correctly in a hybrid codec Group Room.
+<<<<<<< HEAD
+=======
+- The SDK is not side-by-side compatible with other WebRTC based libraries [#340](https://github.com/twilio/video-quickstart-android/issues/340)
+>>>>>>> 26ef0c119bc91081f5e60d95bb94da0634a29596
 
 ####2.1.0
 
@@ -180,6 +204,7 @@ Known issues
 - Network handoff, and subsequent connection renegotiation is not supported for IPv6 networks [#72](https://github.com/twilio/video-quickstart-android/issues/72)
 - Participant disconnect event can take up to 120 seconds to occur [#80](https://github.com/twilio/video-quickstart-android/issues/80) [#73](https://github.com/twilio/video-quickstart-android/issues/73)
 - Codec preferences do not function correctly in a hybrid codec Group Room.
+- The SDK is not side-by-side compatible with other WebRTC based libraries [#340](https://github.com/twilio/video-quickstart-android/issues/340)
 
 ####2.0.2
 
@@ -197,6 +222,7 @@ Known issues
 - Network handoff, and subsequent connection renegotiation is not supported for IPv6 networks [#72](https://github.com/twilio/video-quickstart-android/issues/72)
 - Participant disconnect event can take up to 120 seconds to occur [#80](https://github.com/twilio/video-quickstart-android/issues/80) [#73](https://github.com/twilio/video-quickstart-android/issues/73)
 - Codec preferences do not function correctly in a hybrid codec Group Room.
+- The SDK is not side-by-side compatible with other WebRTC based libraries [#340](https://github.com/twilio/video-quickstart-android/issues/340)
 
 ####2.0.1
 
@@ -215,6 +241,7 @@ Known issues
 - Network handoff, and subsequent connection renegotiation is not supported for IPv6 networks [#72](https://github.com/twilio/video-quickstart-android/issues/72)
 - Participant disconnect event can take up to 120 seconds to occur [#80](https://github.com/twilio/video-quickstart-android/issues/80) [#73](https://github.com/twilio/video-quickstart-android/issues/73)
 - Codec preferences do not function correctly in a hybrid codec Group Room.
+- The SDK is not side-by-side compatible with other WebRTC based libraries [#340](https://github.com/twilio/video-quickstart-android/issues/340)
 
 ####2.0.0
 
@@ -225,6 +252,7 @@ Known issues
 - Network handoff, and subsequent connection renegotiation is not supported for IPv6 networks [#72](https://github.com/twilio/video-quickstart-android/issues/72)
 - Participant disconnect event can take up to 120 seconds to occur [#80](https://github.com/twilio/video-quickstart-android/issues/80) [#73](https://github.com/twilio/video-quickstart-android/issues/73)
 - Codec preferences do not function correctly in a hybrid codec Group Room.
+- The SDK is not side-by-side compatible with other WebRTC based libraries [#340](https://github.com/twilio/video-quickstart-android/issues/340)
 
 ####2.0.0-beta5
 
@@ -237,6 +265,7 @@ Known issues
 - Network handoff, and subsequent connection renegotiation is not supported for IPv6 networks [#72](https://github.com/twilio/video-quickstart-android/issues/72)
 - Participant disconnect event can take up to 120 seconds to occur [#80](https://github.com/twilio/video-quickstart-android/issues/80) [#73](https://github.com/twilio/video-quickstart-android/issues/73)
 - Codec preferences do not function correctly in a hybrid codec Group Room.
+- The SDK is not side-by-side compatible with other WebRTC based libraries [#340](https://github.com/twilio/video-quickstart-android/issues/340)
 
 ####2.0.0-beta4
 
@@ -295,6 +324,7 @@ Known issues
 - Network handoff, and subsequent connection renegotiation is not supported for IPv6 networks [#72](https://github.com/twilio/video-quickstart-android/issues/72)
 - Participant disconnect event can take up to 120 seconds to occur [#80](https://github.com/twilio/video-quickstart-android/issues/80) [#73](https://github.com/twilio/video-quickstart-android/issues/73)
 - Codec preferences do not function correctly in a hybrid codec Group Room.
+- The SDK is not side-by-side compatible with other WebRTC based libraries [#340](https://github.com/twilio/video-quickstart-android/issues/340)
 
 ####2.0.0-beta3
 
@@ -316,6 +346,7 @@ Known issues
 - Network handoff, and subsequent connection renegotiation is not supported for IPv6 networks [#72](https://github.com/twilio/video-quickstart-android/issues/72)
 - Participant disconnect event can take up to 120 seconds to occur [#80](https://github.com/twilio/video-quickstart-android/issues/80) [#73](https://github.com/twilio/video-quickstart-android/issues/73)
 - Codec preferences do not function correctly in a hybrid codec Group Room.
+- The SDK is not side-by-side compatible with other WebRTC based libraries [#340](https://github.com/twilio/video-quickstart-android/issues/340)
 
 ####2.0.0-beta2
 
@@ -328,6 +359,7 @@ Known issues
 - Network handoff, and subsequent connection renegotiation is not supported for IPv6 networks [#72](https://github.com/twilio/video-quickstart-android/issues/72)
 - Participant disconnect event can take up to 120 seconds to occur [#80](https://github.com/twilio/video-quickstart-android/issues/80) [#73](https://github.com/twilio/video-quickstart-android/issues/73)
 - Codec preferences do not function correctly in a hybrid codec Group Room.
+- The SDK is not side-by-side compatible with other WebRTC based libraries [#340](https://github.com/twilio/video-quickstart-android/issues/340)
 
 ####2.0.0-beta1
 
@@ -342,6 +374,7 @@ Known issues
 - Network handoff, and subsequent connection renegotiation is not supported for IPv6 networks [#72](https://github.com/twilio/video-quickstart-android/issues/72)
 - Participant disconnect event can take up to 120 seconds to occur [#80](https://github.com/twilio/video-quickstart-android/issues/80) [#73](https://github.com/twilio/video-quickstart-android/issues/73)
 - Codec preferences do not function correctly in a hybrid codec Group Room.
+- The SDK is not side-by-side compatible with other WebRTC based libraries [#340](https://github.com/twilio/video-quickstart-android/issues/340)
 
 ####2.0.0-preview9
 
@@ -358,6 +391,7 @@ Known issues
 - Network handoff, and subsequent connection renegotiation is not supported for IPv6 networks [#72](https://github.com/twilio/video-quickstart-android/issues/72)
 - Participant disconnect event can take up to 120 seconds to occur [#80](https://github.com/twilio/video-quickstart-android/issues/80) [#73](https://github.com/twilio/video-quickstart-android/issues/73)
 - Codec preferences do not function correctly in a hybrid codec Group Room.
+- The SDK is not side-by-side compatible with other WebRTC based libraries [#340](https://github.com/twilio/video-quickstart-android/issues/340)
 
 ####2.0.0-preview8
 
@@ -381,6 +415,7 @@ Known issues
 - Network handoff, and subsequent connection renegotiation is not supported for IPv6 networks [#72](https://github.com/twilio/video-quickstart-android/issues/72)
 - Participant disconnect event can take up to 120 seconds to occur [#80](https://github.com/twilio/video-quickstart-android/issues/80) [#73](https://github.com/twilio/video-quickstart-android/issues/73)
 - Codec preferences do not function correctly in a hybrid codec Group Room.
+- The SDK is not side-by-side compatible with other WebRTC based libraries [#340](https://github.com/twilio/video-quickstart-android/issues/340)
 
 ####2.0.0-preview7
 
@@ -399,6 +434,7 @@ Known issues
 - Network handoff, and subsequent connection renegotiation is not supported for IPv6 networks [#72](https://github.com/twilio/video-quickstart-android/issues/72)
 - Participant disconnect event can take up to 120 seconds to occur [#80](https://github.com/twilio/video-quickstart-android/issues/80) [#73](https://github.com/twilio/video-quickstart-android/issues/73)
 - Codec preferences do not function correctly in a hybrid codec Group Room.
+- The SDK is not side-by-side compatible with other WebRTC based libraries [#340](https://github.com/twilio/video-quickstart-android/issues/340)
 
 ####2.0.0-preview6
 
@@ -434,6 +470,7 @@ Known issues
 - Network handoff, and subsequent connection renegotiation is not supported for IPv6 networks [#72](https://github.com/twilio/video-quickstart-android/issues/72)
 - Participant disconnect event can take up to 120 seconds to occur [#80](https://github.com/twilio/video-quickstart-android/issues/80) [#73](https://github.com/twilio/video-quickstart-android/issues/73)
 - Codec preferences do not function correctly in a hybrid codec Group Room.
+- The SDK is not side-by-side compatible with other WebRTC based libraries [#340](https://github.com/twilio/video-quickstart-android/issues/340)
 
 ####2.0.0-preview5
 
@@ -479,6 +516,7 @@ Known issues
 - Network handoff, and subsequent connection renegotiation is not supported for IPv6 networks [#72](https://github.com/twilio/video-quickstart-android/issues/72)
 - Participant disconnect event can take up to 120 seconds to occur [#80](https://github.com/twilio/video-quickstart-android/issues/80) [#73](https://github.com/twilio/video-quickstart-android/issues/73)
 - Codec preferences do not function correctly in a hybrid codec Group Room.
+- The SDK is not side-by-side compatible with other WebRTC based libraries [#340](https://github.com/twilio/video-quickstart-android/issues/340)
 
 ####2.0.0-preview4
 
@@ -578,6 +616,7 @@ Known issues
 - Codec preferences do not function correctly in a hybrid codec Group Room.
 - DataTrack support for Group Rooms is currently available only on JavaScript. DataTrack support
 for Group Rooms will be available on iOS and Android soon.
+- The SDK is not side-by-side compatible with other WebRTC based libraries [#340](https://github.com/twilio/video-quickstart-android/issues/340)
 
 ####2.0.0-preview3
 
@@ -598,6 +637,7 @@ Known issues
 - Participant disconnect event can take up to 120 seconds to occur [#80](https://github.com/twilio/video-quickstart-android/issues/80) [#73](https://github.com/twilio/video-quickstart-android/issues/73)
 - Track and room names with certain UTF-8 characters are not encoded properly [#179](https://github.com/twilio/video-quickstart-android/issues/179)
 - Codec preferences do not function correctly in a hybrid codec Group Room.
+- The SDK is not side-by-side compatible with other WebRTC based libraries [#340](https://github.com/twilio/video-quickstart-android/issues/340)
 
 ####2.0.0-preview2
 
@@ -613,6 +653,7 @@ Known issues
 - Network handoff, and subsequent connection renegotiation is not supported for IPv6 networks [#72](https://github.com/twilio/video-quickstart-android/issues/72)
 - Participant disconnect event can take up to 120 seconds to occur [#80](https://github.com/twilio/video-quickstart-android/issues/80) [#73](https://github.com/twilio/video-quickstart-android/issues/73)
 - Codec preferences do not function correctly in a hybrid codec Group Room.
+- The SDK is not side-by-side compatible with other WebRTC based libraries [#340](https://github.com/twilio/video-quickstart-android/issues/340)
 
 ####2.0.0-preview1
 
@@ -718,6 +759,7 @@ Known issues
 
 - Network handoff, and subsequent connection renegotiation is not supported for IPv6 networks [#72](https://github.com/twilio/video-quickstart-android/issues/72)
 - Participant disconnect event can take up to 120 seconds to occur [#80](https://github.com/twilio/video-quickstart-android/issues/80) [#73](https://github.com/twilio/video-quickstart-android/issues/73)
+- The SDK is not side-by-side compatible with other WebRTC based libraries [#340](https://github.com/twilio/video-quickstart-android/issues/340)
 
 ####1.3.15
 
@@ -731,6 +773,7 @@ Known issues
 e VP8 is the only supported codec [#71](https://github.com/twilio/video-quickstart-android/issues/71)
 - Participant disconnect event can take up to 120 seconds to occur [#80](https://github.com/twilio/video-quickstart-android/issues/80) [#73](https://github.com/twilio/video-quickstart-android/issues/73)
 - LocalParticipant release method is public [#132](https://github.com/twilio/video-quickstart-android/issues/132)
+- The SDK is not side-by-side compatible with other WebRTC based libraries [#340](https://github.com/twilio/video-quickstart-android/issues/340)
 
 ####1.3.14
 
@@ -749,6 +792,7 @@ Known issues
 e VP8 is the only supported codec [#71](https://github.com/twilio/video-quickstart-android/issues/71)
 - Participant disconnect event can take up to 120 seconds to occur [#80](https://github.com/twilio/video-quickstart-android/issues/80) [#73](https://github.com/twilio/video-quickstart-android/issues/73)
 - LocalParticipant release method is public [#132](https://github.com/twilio/video-quickstart-android/issues/132)
+- The SDK is not side-by-side compatible with other WebRTC based libraries [#340](https://github.com/twilio/video-quickstart-android/issues/340)
 
 ####1.3.13
 
@@ -762,6 +806,7 @@ Known issues
 e VP8 is the only supported codec [#71](https://github.com/twilio/video-quickstart-android/issues/71)
 - Participant disconnect event can take up to 120 seconds to occur [#80](https://github.com/twilio/video-quickstart-android/issues/80) [#73](https://github.com/twilio/video-quickstart-android/issues/73)
 - LocalParticipant release method is public [#132](https://github.com/twilio/video-quickstart-android/issues/132)
+- The SDK is not side-by-side compatible with other WebRTC based libraries [#340](https://github.com/twilio/video-quickstart-android/issues/340)
 
 ####1.3.12
 
@@ -777,6 +822,7 @@ Known issues
 e VP8 is the only supported codec [#71](https://github.com/twilio/video-quickstart-android/issues/71)
 - Participant disconnect event can take up to 120 seconds to occur [#80](https://github.com/twilio/video-quickstart-android/issues/80) [#73](https://github.com/twilio/video-quickstart-android/issues/73)
 - LocalParticipant release method is public [#132](https://github.com/twilio/video-quickstart-android/issues/132)
+- The SDK is not side-by-side compatible with other WebRTC based libraries [#340](https://github.com/twilio/video-quickstart-android/issues/340)
 
 ####1.3.11
 
@@ -792,6 +838,7 @@ Known issues
 e VP8 is the only supported codec [#71](https://github.com/twilio/video-quickstart-android/issues/71)
 - Participant disconnect event can take up to 120 seconds to occur [#80](https://github.com/twilio/video-quickstart-android/issues/80) [#73](https://github.com/twilio/video-quickstart-android/issues/73)
 - LocalParticipant release method is public [#132](https://github.com/twilio/video-quickstart-android/issues/132)
+- The SDK is not side-by-side compatible with other WebRTC based libraries [#340](https://github.com/twilio/video-quickstart-android/issues/340)
 
 ####1.3.10
 
@@ -809,6 +856,7 @@ Known issues
 e VP8 is the only supported codec [#71](https://github.com/twilio/video-quickstart-android/issues/71)
 - Participant disconnect event can take up to 120 seconds to occur [#80](https://github.com/twilio/video-quickstart-android/issues/80) [#73](https://github.com/twilio/video-quickstart-android/issues/73)
 - LocalParticipant release method is public [#132](https://github.com/twilio/video-quickstart-android/issues/132)
+- The SDK is not side-by-side compatible with other WebRTC based libraries [#340](https://github.com/twilio/video-quickstart-android/issues/340)
 
 ####1.3.9
 
@@ -822,6 +870,7 @@ Known issues
 - VP8 is the only supported codec [#71](https://github.com/twilio/video-quickstart-android/issues/71)
 - Participant disconnect event can take up to 120 seconds to occur [#80](https://github.com/twilio/video-quickstart-android/issues/80) [#73](https://github.com/twilio/video-quickstart-android/issues/73)
 - LocalParticipant release method is public [#132](https://github.com/twilio/video-quickstart-android/issues/132)
+- The SDK is not side-by-side compatible with other WebRTC based libraries [#340](https://github.com/twilio/video-quickstart-android/issues/340)
 
 ####1.3.8
 
@@ -838,6 +887,7 @@ Known issues
 - VP8 is the only supported codec [#71](https://github.com/twilio/video-quickstart-android/issues/71)
 - Participant disconnect event can take up to 120 seconds to occur [#80](https://github.com/twilio/video-quickstart-android/issues/80) [#73](https://github.com/twilio/video-quickstart-android/issues/73)
 - LocalParticipant release method is public [#132](https://github.com/twilio/video-quickstart-android/issues/132)
+- The SDK is not side-by-side compatible with other WebRTC based libraries [#340](https://github.com/twilio/video-quickstart-android/issues/340)
 
 ####1.3.7
 
@@ -869,6 +919,7 @@ Known issues
 - VP8 is the only supported codec [#71](https://github.com/twilio/video-quickstart-android/issues/71)
 - Participant disconnect event can take up to 120 seconds to occur [#80](https://github.com/twilio/video-quickstart-android/issues/80) [#73](https://github.com/twilio/video-quickstart-android/issues/73)
 - LocalParticipant release method is public [#132](https://github.com/twilio/video-quickstart-android/issues/132)
+- The SDK is not side-by-side compatible with other WebRTC based libraries [#340](https://github.com/twilio/video-quickstart-android/issues/340)
 
 ####1.3.6
 
@@ -884,6 +935,7 @@ Known issues
 - VP8 is the only supported codec [#71](https://github.com/twilio/video-quickstart-android/issues/71)
 - Participant disconnect event can take up to 120 seconds to occur [#80](https://github.com/twilio/video-quickstart-android/issues/80) [#73](https://github.com/twilio/video-quickstart-android/issues/73)
 - LocalParticipant release method is public [#132](https://github.com/twilio/video-quickstart-android/issues/132)
+- The SDK is not side-by-side compatible with other WebRTC based libraries [#340](https://github.com/twilio/video-quickstart-android/issues/340)
 
 ####1.3.5
 
@@ -897,6 +949,7 @@ Known issues
 - VP8 is the only supported codec [#71](https://github.com/twilio/video-quickstart-android/issues/71)
 - Participant disconnect event can take up to 120 seconds to occur [#80](https://github.com/twilio/video-quickstart-android/issues/80) [#73](https://github.com/twilio/video-quickstart-android/issues/73)
 - LocalParticipant release method is public [#132](https://github.com/twilio/video-quickstart-android/issues/132)
+- The SDK is not side-by-side compatible with other WebRTC based libraries [#340](https://github.com/twilio/video-quickstart-android/issues/340)
 
 ####1.3.4
 
@@ -911,6 +964,7 @@ Known issues
 - VP8 is the only supported codec [#71](https://github.com/twilio/video-quickstart-android/issues/71)
 - Participant disconnect event can take up to 120 seconds to occur [#80](https://github.com/twilio/video-quickstart-android/issues/80) [#73](https://github.com/twilio/video-quickstart-android/issues/73)
 - LocalParticipant release method is public [#132](https://github.com/twilio/video-quickstart-android/issues/132)
+- The SDK is not side-by-side compatible with other WebRTC based libraries [#340](https://github.com/twilio/video-quickstart-android/issues/340)
 
 ####1.3.3
 
@@ -925,6 +979,7 @@ Known issues
 - Participant disconnect event can take up to 120 seconds to occur [#80](https://github.com/twilio/video-quickstart-android/issues/80) [#73](https://github.com/twilio/video-quickstart-android/issues/73)
 - LocalParticipant release method is public [#132](https://github.com/twilio/video-quickstart-android/issues/132)
 - Room names with certain UTF-8 characters are not encoded properly [#179](https://github.com/twilio/video-quickstart-android/issues/179)
+- The SDK is not side-by-side compatible with other WebRTC based libraries [#340](https://github.com/twilio/video-quickstart-android/issues/340)
 
 ####1.3.2
 
@@ -939,6 +994,7 @@ Known issues
 - VP8 is the only supported codec [#71](https://github.com/twilio/video-quickstart-android/issues/71)
 - Participant disconnect event can take up to 120 seconds to occur [#80](https://github.com/twilio/video-quickstart-android/issues/80) [#73](https://github.com/twilio/video-quickstart-android/issues/73)
 - LocalParticipant release method is public [#132](https://github.com/twilio/video-quickstart-android/issues/132)
+- The SDK is not side-by-side compatible with other WebRTC based libraries [#340](https://github.com/twilio/video-quickstart-android/issues/340)
 
 ####1.3.1
 
@@ -955,6 +1011,7 @@ Known issues
 - Participant disconnect event can take up to 120 seconds to occur [#80](https://github.com/twilio/video-quickstart-android/issues/80) [#73](https://github.com/twilio/video-quickstart-android/issues/73)
 - Disconnecting from a `Room` that has not connected sometimes results in a crash [#116](https://github.com/twilio/video-quickstart-android/issues/116)
 - LocalParticipant release method is public [#132](https://github.com/twilio/video-quickstart-android/issues/132)
+- The SDK is not side-by-side compatible with other WebRTC based libraries [#340](https://github.com/twilio/video-quickstart-android/issues/340)
 
 ####1.3.0
 
@@ -980,6 +1037,7 @@ Known issues
 - Participant disconnect event can take up to 120 seconds to occur [#80](https://github.com/twilio/video-quickstart-android/issues/80) [#73](https://github.com/twilio/video-quickstart-android/issues/73)
 - Disconnecting from a `Room` that has not connected sometimes results in a crash [#116](https://github.com/twilio/video-quickstart-android/issues/116)
 - LocalParticipant release method is public [#132](https://github.com/twilio/video-quickstart-android/issues/132)
+- The SDK is not side-by-side compatible with other WebRTC based libraries [#340](https://github.com/twilio/video-quickstart-android/issues/340)
 
 ####1.2.2
 
@@ -999,6 +1057,7 @@ Known issues
 - Participant disconnect event can take up to 120 seconds to occur [#80](https://github.com/twilio/video-quickstart-android/issues/80) [#73](https://github.com/twilio/video-quickstart-android/issues/73)
 - Disconnecting from a `Room` that has not connected sometimes results in a crash [#116](https://github.com/twilio/video-quickstart-android/issues/116)
 - LocalParticipant release method is public [#132](https://github.com/twilio/video-quickstart-android/issues/132)
+- The SDK is not side-by-side compatible with other WebRTC based libraries [#340](https://github.com/twilio/video-quickstart-android/issues/340)
 
 ####1.2.1
 
@@ -1013,6 +1072,7 @@ Known issues
 - Participant disconnect event can take up to 120 seconds to occur [#80](https://github.com/twilio/video-quickstart-android/issues/80) [#73](https://github.com/twilio/video-quickstart-android/issues/73)
 - Disconnecting from a `Room` that has not connected sometimes results in a crash [#116](https://github.com/twilio/video-quickstart-android/issues/116)
 - LocalParticipant release method is public [#132](https://github.com/twilio/video-quickstart-android/issues/132)
+- The SDK is not side-by-side compatible with other WebRTC based libraries [#340](https://github.com/twilio/video-quickstart-android/issues/340)
 
 ####1.2.0
 
@@ -1039,6 +1099,7 @@ Known issues
 - Participant disconnect event can take up to 120 seconds to occur [#80](https://github.com/twilio/video-quickstart-android/issues/80) [#73](https://github.com/twilio/video-quickstart-android/issues/73)
 - Disconnecting from a `Room` that has not connected sometimes results in a crash [#116](https://github.com/twilio/video-quickstart-android/issues/116)
 - LocalParticipant release method is public [#132](https://github.com/twilio/video-quickstart-android/issues/132)
+- The SDK is not side-by-side compatible with other WebRTC based libraries [#340](https://github.com/twilio/video-quickstart-android/issues/340)
 
 ####1.1.1
 
@@ -1055,6 +1116,7 @@ Known issues
 - Participant disconnect event can take up to 120 seconds to occur [#80](https://github.com/twilio/video-quickstart-android/issues/80) [#73](https://github.com/twilio/video-quickstart-android/issues/73)
 - Disconnecting from a `Room` that has not connected sometimes results in a crash [#116](https://github.com/twilio/video-quickstart-android/issues/116)
 - LocalParticipant release method is public [#132](https://github.com/twilio/video-quickstart-android/issues/132)
+- The SDK is not side-by-side compatible with other WebRTC based libraries [#340](https://github.com/twilio/video-quickstart-android/issues/340)
 
 ####1.1.0
 
@@ -1112,6 +1174,7 @@ Known issues
 - Participant disconnect event can take up to 120 seconds to occur [#80](https://github.com/twilio/video-quickstart-android/issues/80) [#73](https://github.com/twilio/video-quickstart-android/issues/73)
 - Disconnecting from a `Room` that has not connected sometimes results in a crash [#116](https://github.com/twilio/video-quickstart-android/issues/116)
 - LocalParticipant release method is public [#132](https://github.com/twilio/video-quickstart-android/issues/132)
+- The SDK is not side-by-side compatible with other WebRTC based libraries [#340](https://github.com/twilio/video-quickstart-android/issues/340)
 
 ####1.0.2
 
@@ -1126,6 +1189,7 @@ Known issues
 - Participant disconnect event can take up to 120 seconds to occur [#80](https://github.com/twilio/video-quickstart-android/issues/80) [#73](https://github.com/twilio/video-quickstart-android/issues/73)
 - Disconnecting from a `Room` that has not connected sometimes results in a crash [#116](https://github.com/twilio/video-quickstart-android/issues/116)
 - LocalParticipant release method is public [#132](https://github.com/twilio/video-quickstart-android/issues/132)
+- The SDK is not side-by-side compatible with other WebRTC based libraries [#340](https://github.com/twilio/video-quickstart-android/issues/340)
 
 ####1.0.1
 
@@ -1147,6 +1211,7 @@ Known issues
 - Participant disconnect event can take up to 120 seconds to occur [#80](https://github.com/twilio/video-quickstart-android/issues/80) [#73](https://github.com/twilio/video-quickstart-android/issues/73)
 - Disconnecting from a `Room` that has not connected sometimes results in a crash [#116](https://github.com/twilio/video-quickstart-android/issues/116)
 - LocalParticipant release method is public [#132](https://github.com/twilio/video-quickstart-android/issues/132)
+- The SDK is not side-by-side compatible with other WebRTC based libraries [#340](https://github.com/twilio/video-quickstart-android/issues/340)
 
 ####1.0.0
 We've promoted 1.0.0-beta17 to 1.0.0 as our first General Availability release.
@@ -1159,6 +1224,7 @@ Known issues
 - Missing media when adding audio/video tracks quickly while connected to room [#90](https://github.com/twilio/video-quickstart-android/issues/90)
 - Disconnecting from a `Room` that has not connected sometimes results in a crash [#116](https://github.com/twilio/video-quickstart-android/issues/116)
 - LocalParticipant release method is public [#132](https://github.com/twilio/video-quickstart-android/issues/132)
+- The SDK is not side-by-side compatible with other WebRTC based libraries [#340](https://github.com/twilio/video-quickstart-android/issues/340)
 
 ####1.0.0-beta17
 
@@ -1242,6 +1308,7 @@ Known issues
 - Participant disconnect event can take up to 120 seconds to occur [#80](https://github.com/twilio/video-quickstart-android/issues/80) [#73](https://github.com/twilio/video-quickstart-android/issues/73)
 - Missing media when adding audio/video tracks quickly while connected to room [#90](https://github.com/twilio/video-quickstart-android/issues/90)
 - LocalParticipant release method is public [#132](https://github.com/twilio/video-quickstart-android/issues/132)
+- The SDK is not side-by-side compatible with other WebRTC based libraries [#340](https://github.com/twilio/video-quickstart-android/issues/340)
 
 ####1.0.0-beta16
 
@@ -1267,6 +1334,7 @@ Known issues
 - On Nexus 9 device, intermittent high decoding times results in delayed video. [#95](https://github.com/twilio/video-quickstart-android/issues/95)
 - Unsatisfied link errors for `org.webrtc.voiceengine.WebRtcAudioManager` and `org.webrtc.voiceengine.WebRtcAudioTrack` construction. [#102](https://github.com/twilio/video-quickstart-android/issues/102)
 - VideoTrack isEnabled() returning wrong state [#104](https://github.com/twilio/video-quickstart-android/issues/104)
+- The SDK is not side-by-side compatible with other WebRTC based libraries [#340](https://github.com/twilio/video-quickstart-android/issues/340)
 
 ####1.0.0-beta15
 
@@ -1282,6 +1350,7 @@ Known issues
 - Participant disconnect event can take up to 120 seconds to occur [#80](https://github.com/twilio/video-quickstart-android/issues/80) [#73](https://github.com/twilio/video-quickstart-android/issues/73)
 - Missing media when adding audio/video tracks quickly while connected to room [#90](https://github.com/twilio/video-quickstart-android/issues/90)
 - Missing YUV data when adding a custom `VideoRenderer` to `VideoTrack`s [#93](https://github.com/twilio/video-quickstart-android/issues/93)
+- The SDK is not side-by-side compatible with other WebRTC based libraries [#340](https://github.com/twilio/video-quickstart-android/issues/340)
 
 ####1.0.0-beta14
 
@@ -1300,6 +1369,7 @@ Known issues
 - Participant disconnect event can take up to 120 seconds to occur [#80](https://github.com/twilio/video-quickstart-android/issues/80) [#73](https://github.com/twilio/video-quickstart-android/issues/73)
 - Missing media when adding audio/video tracks quickly while connected to room [#90](https://github.com/twilio/video-quickstart-android/issues/90)
 - Missing YUV data when adding a custom `VideoRenderer` to `VideoTrack`s [#93](https://github.com/twilio/video-quickstart-android/issues/93)
+- The SDK is not side-by-side compatible with other WebRTC based libraries [#340](https://github.com/twilio/video-quickstart-android/issues/340)
 
 ####1.0.0-beta13
 
@@ -1322,6 +1392,7 @@ Known issues
 - Participant disconnect event can take up to 120 seconds to occur [#80](https://github.com/twilio/video-quickstart-android/issues/80) [#73](https://github.com/twilio/video-quickstart-android/issues/73)
 - Missing media when adding audio/video tracks quickly while connected to room [#90](https://github.com/twilio/video-quickstart-android/issues/90)
 - Missing YUV data when adding a custom `VideoRenderer` to `VideoTrack`s [#93](https://github.com/twilio/video-quickstart-android/issues/93)
+- The SDK is not side-by-side compatible with other WebRTC based libraries [#340](https://github.com/twilio/video-quickstart-android/issues/340)
 
 ####1.0.0-beta12
 
@@ -1342,6 +1413,7 @@ Known issues
 - Participant disconnect event can take up to 120 seconds to occur [#80](https://github.com/twilio/video-quickstart-android/issues/80) [#73](https://github.com/twilio/video-quickstart-android/issues/73)
 - Missing media when adding audio/video tracks quickly while connected to room [#90](https://github.com/twilio/video-quickstart-android/issues/90)
 - Missing YUV data when adding a custom `VideoRenderer` to `VideoTrack`s [#93](https://github.com/twilio/video-quickstart-android/issues/93)
+- The SDK is not side-by-side compatible with other WebRTC based libraries [#340](https://github.com/twilio/video-quickstart-android/issues/340)
 
 ####1.0.0-beta11
 
@@ -1381,6 +1453,7 @@ Known issues
 - VP8 is the only supported codec [#71](https://github.com/twilio/video-quickstart-android/issues/71)
 - Missing media when adding audio/video tracks quickly while connected to room [#90](https://github.com/twilio/video-quickstart-android/issues/90)
 - Missing YUV data when adding a custom `VideoRenderer` to `VideoTrack`s [#93](https://github.com/twilio/video-quickstart-android/issues/93)
+- The SDK is not side-by-side compatible with other WebRTC based libraries [#340](https://github.com/twilio/video-quickstart-android/issues/340)
 
 ####1.0.0-beta10
 
@@ -1398,6 +1471,7 @@ Known issues
 - Network handoff, and subsequent connection renegotiation is not supported for IPv6 networks [#72](https://github.com/twilio/video-quickstart-android/issues/72)
 - VP8 is the only supported codec [#71](https://github.com/twilio/video-quickstart-android/issues/71)
 - Missing YUV data when adding a custom `VideoRenderer` to `VideoTrack`s [#93](https://github.com/twilio/video-quickstart-android/issues/93)
+- The SDK is not side-by-side compatible with other WebRTC based libraries [#340](https://github.com/twilio/video-quickstart-android/issues/340)
 
 ####1.0.0-beta9
 
@@ -1412,6 +1486,7 @@ Known issues
 - Tokens with purely numeric identities results in a crash
 - Participant identities with unicode characters are not supported
 - Missing YUV data when adding a custom `VideoRenderer` to `VideoTrack`s [#93](https://github.com/twilio/video-quickstart-android/issues/93)
+- The SDK is not side-by-side compatible with other WebRTC based libraries [#340](https://github.com/twilio/video-quickstart-android/issues/340)
 
 ####1.0.0-beta8
 
@@ -1434,6 +1509,7 @@ Known issues
 - Tokens with purely numeric identities results in a crash
 - Participant identities with unicode characters are not supported
 - Missing YUV data when adding a custom `VideoRenderer` to `VideoTrack`s [#93](https://github.com/twilio/video-quickstart-android/issues/93)
+- The SDK is not side-by-side compatible with other WebRTC based libraries [#340](https://github.com/twilio/video-quickstart-android/issues/340)
 
 ####1.0.0-beta7
 
@@ -1452,6 +1528,7 @@ Known issues
 - Disconnecting from a `Room` immediately after calling `getStats()` results in a crash.
 - Participant identities with unicode characters are not supported
 - Missing YUV data when adding a custom `VideoRenderer` to `VideoTrack`s [#93](https://github.com/twilio/video-quickstart-android/issues/93)
+- The SDK is not side-by-side compatible with other WebRTC based libraries [#340](https://github.com/twilio/video-quickstart-android/issues/340)
 
 ####1.0.0-beta6
 
@@ -1468,6 +1545,7 @@ Known issues
 - Native library fails to load on some devices. [#53](https://github.com/twilio/video-quickstart-android/issues/53)
 - Participant identities with unicode characters are not supported
 - Missing YUV data when adding a custom `VideoRenderer` to `VideoTrack`s [#93](https://github.com/twilio/video-quickstart-android/issues/93)
+- The SDK is not side-by-side compatible with other WebRTC based libraries [#340](https://github.com/twilio/video-quickstart-android/issues/340)
 
 
 ####1.0.0-beta5
@@ -1495,6 +1573,7 @@ Known issues
 - Disconnecting from a `Room` immediately after calling `getStats()` results in a crash.
 - Participant identities with unicode characters are not supported
 - Missing YUV data when adding a custom `VideoRenderer` to `VideoTrack`s [#93](https://github.com/twilio/video-quickstart-android/issues/93)
+- The SDK is not side-by-side compatible with other WebRTC based libraries [#340](https://github.com/twilio/video-quickstart-android/issues/340)
 
 
 ####1.0.0-beta4
@@ -1511,6 +1590,7 @@ Known issues
 - VP8 is the only supported codec [#71](https://github.com/twilio/video-quickstart-android/issues/71)
 - On Nexus 9 device, intermittent high decoding times results in delayed video.
 - Participant identities with unicode characters are not supported
+- The SDK is not side-by-side compatible with other WebRTC based libraries [#340](https://github.com/twilio/video-quickstart-android/issues/340)
 
 ####1.0.0-beta3
 
@@ -1529,6 +1609,7 @@ Known issues
 - Network handoff, and subsequent connection renegotiation is not supported
 - VP8 is the only supported codec [#71](https://github.com/twilio/video-quickstart-android/issues/71)
 - Participant identities with unicode characters are not supported
+- The SDK is not side-by-side compatible with other WebRTC based libraries [#340](https://github.com/twilio/video-quickstart-android/issues/340)
 
 ####1.0.0-beta2
 
@@ -1547,6 +1628,7 @@ Known issues
 - Network handoff, and subsequent connection renegotiation is not supported
 - VP8 is the only supported codec [#71](https://github.com/twilio/video-quickstart-android/issues/71)
 - Participant identities with unicode characters are not supported
+- The SDK is not side-by-side compatible with other WebRTC based libraries [#340](https://github.com/twilio/video-quickstart-android/issues/340)
 
 ####1.0.0-beta1
 
@@ -1565,6 +1647,7 @@ Known issues
 - VP8 is the only supported codec [#71](https://github.com/twilio/video-quickstart-android/issues/71)
 - Using x86 or x86_64 devices results in a crash
 - Participant identities with unicode characters are not supported
+- The SDK is not side-by-side compatible with other WebRTC based libraries [#340](https://github.com/twilio/video-quickstart-android/issues/340)
 
 ####1.0.0-preview2
 
@@ -1581,6 +1664,7 @@ Known issues
 - VP8 is the only supported codec [#71](https://github.com/twilio/video-quickstart-android/issues/71)
 - Using x86 or x86_64 devices results in a crash
 - Participant identities with unicode characters are not supported
+- The SDK is not side-by-side compatible with other WebRTC based libraries [#340](https://github.com/twilio/video-quickstart-android/issues/340)
 
 ####1.0.0-preview1
 
@@ -1600,5 +1684,6 @@ Known issues
 - VP8 is the only supported codec [#71](https://github.com/twilio/video-quickstart-android/issues/71)
 - Using x86 or x86_64 devices results in a crash
 - Participant identities with unicode characters are not supported
+- The SDK is not side-by-side compatible with other WebRTC based libraries [#340](https://github.com/twilio/video-quickstart-android/issues/340)
 
 **Looking for older changlog entries?** [You can find the changelog for the deprecated Programmable Video Conversations API here](https://www.twilio.com/docs/api/video/conversations-api-deprecated/changelogs/android).
