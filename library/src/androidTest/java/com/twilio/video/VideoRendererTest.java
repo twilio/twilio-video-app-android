@@ -20,7 +20,6 @@ import static junit.framework.TestCase.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import android.Manifest;
-import android.graphics.Bitmap;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.rule.GrantPermissionRule;
 import android.support.test.runner.AndroidJUnit4;
@@ -94,19 +93,13 @@ public class VideoRendererTest extends BaseVideoTest {
 
         // Request bitmap
         bitmapVideoRenderer.captureBitmap(
-                new BitmapVideoRenderer.BitmapListener() {
-                    @Override
-                    public void onBitmapCaptured(final Bitmap bitmap) {
-                        assertNotNull(bitmap);
-                        videoRendererTestActivity.runOnUiThread(
-                                new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        imageView.setImageBitmap(bitmap);
-                                        bitmapCaptured.countDown();
-                                    }
-                                });
-                    }
+                bitmap -> {
+                    assertNotNull(bitmap);
+                    videoRendererTestActivity.runOnUiThread(
+                            () -> {
+                                imageView.setImageBitmap(bitmap);
+                                bitmapCaptured.countDown();
+                            });
                 });
 
         // Validate we received bitmap
@@ -124,19 +117,13 @@ public class VideoRendererTest extends BaseVideoTest {
 
         // Request bitmap
         bitmapVideoRenderer.captureBitmap(
-                new BitmapVideoRenderer.BitmapListener() {
-                    @Override
-                    public void onBitmapCaptured(final Bitmap bitmap) {
-                        assertNotNull(bitmap);
-                        videoRendererTestActivity.runOnUiThread(
-                                new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        imageView.setImageBitmap(bitmap);
-                                        bitmapCaptured.countDown();
-                                    }
-                                });
-                    }
+                bitmap -> {
+                    assertNotNull(bitmap);
+                    videoRendererTestActivity.runOnUiThread(
+                            () -> {
+                                imageView.setImageBitmap(bitmap);
+                                bitmapCaptured.countDown();
+                            });
                 });
 
         // Validate we received bitmap

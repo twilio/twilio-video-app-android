@@ -254,13 +254,10 @@ public class StatsListAdapter extends RecyclerView.Adapter<StatsListAdapter.View
         final ImmutableList<StatsListItem> immutableStatsListItems = statsListItemsBuilder.build();
 
         handler.post(
-                new Runnable() {
-                    @Override
-                    public void run() {
-                        statsListItems.clear();
-                        statsListItems.addAll(immutableStatsListItems);
-                        notifyDataSetChanged();
-                    }
+                () -> {
+                    statsListItems.clear();
+                    statsListItems.addAll(immutableStatsListItems);
+                    notifyDataSetChanged();
                 });
     }
 

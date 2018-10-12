@@ -49,7 +49,8 @@ public class RemoteDataTrackPublication implements DataTrackPublication {
      * returned if the track is not subscribed to.
      */
     @Override
-    public synchronized @Nullable DataTrack getDataTrack() {
+    @Nullable
+    public synchronized DataTrack getDataTrack() {
         return remoteDataTrack;
     }
 
@@ -77,7 +78,8 @@ public class RemoteDataTrackPublication implements DataTrackPublication {
      * Returns the published remote data track. {@code null} is returned if the track is not
      * subscribed to.
      */
-    public synchronized @Nullable RemoteDataTrack getRemoteDataTrack() {
+    @Nullable
+    public synchronized RemoteDataTrack getRemoteDataTrack() {
         return remoteDataTrack;
     }
 

@@ -65,6 +65,7 @@ public class LocalVideoTrackPublication implements VideoTrackPublication {
     }
 
     /** Returns the published local video track. */
+    @NonNull
     public LocalVideoTrack getLocalVideoTrack() {
         return localVideoTrack;
     }

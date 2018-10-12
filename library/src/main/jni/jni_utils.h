@@ -20,11 +20,19 @@
 #include <jni.h>
 #include <vector>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 namespace twilio_video_jni {
+
+// Returns true if |obj| == null in Java.
+bool IsNull(JNIEnv* jni, jobject obj);
+
+jclass GetObjectClass(JNIEnv* jni, jobject object);
+
+jfieldID GetFieldID(JNIEnv* jni, jclass c, const char* name, const char* signature);
+
+// Throws an exception if the object field is null.
+jobject GetObjectField(JNIEnv* jni, jobject object, jfieldID id);
+
+jint GetIntField(JNIEnv* jni, jobject object, jfieldID id);
 
 // Given a (UTF-16) jstring return a new UTF-8 native string.
 std::string JavaToUTF8StdString(JNIEnv *jni, const jstring &j_string);
@@ -32,9 +40,13 @@ std::string JavaToUTF8StdString(JNIEnv *jni, const jstring &j_string);
 // Given a UTF-8 encoded |native| string return a new (UTF-16) jstring.
 jstring JavaUTF16StringFromStdString(JNIEnv* jni, std::string const& string);
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 JNIEXPORT jstring JNICALL Java_com_twilio_video_JniUtils_nativeJavaUtf16StringToStdString(JNIEnv *,
-                                                                                         jobject,
-                                                                                         jstring);
+                                                                                          jobject,
+                                                                                          jstring);
 
 }
 

@@ -25,11 +25,12 @@
 namespace twilio_video_jni {
 
 jobject VideoPixelFormat::getJavaVideoPixelFormat(uint32_t fourcc) {
-    JNIEnv* jni = webrtc_jni::AttachCurrentThreadIfNeeded();
+    JNIEnv* jni = webrtc::jni::AttachCurrentThreadIfNeeded();
     const char* j_video_pixel_format_sig = "Lcom/twilio/video/VideoPixelFormat;";
     jclass j_video_pixel_format_class = twilio_video_jni::FindClass(jni,
                                                                     "com/twilio/video/VideoPixelFormat");
-    jfieldID j_video_pixel_format_field_id;
+    jfieldID j_video_pixel_format_field_id = 0;
+    std::string fourcc_string = cricket::GetFourccName(fourcc);
 
     switch(fourcc) {
         case cricket::FOURCC_ABGR:
@@ -45,6 +46,7 @@ jobject VideoPixelFormat::getJavaVideoPixelFormat(uint32_t fourcc) {
             CHECK_EXCEPTION(jni);
             break;
         default:
+            FATAL() << "Received unknown capture format";
             break;
     }
 

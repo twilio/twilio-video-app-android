@@ -25,14 +25,10 @@ import android.support.v4.app.FragmentActivity;
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
-import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Status;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthCredential;
-import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.GoogleAuthProvider;
 import com.twilio.video.app.R;
@@ -75,12 +71,10 @@ public class AuthHelper {
             mAuth.signInWithCredential(credential)
                     .addOnCompleteListener(
                             activity,
-                            new OnCompleteListener<AuthResult>() {
-                                @Override
-                                public void onComplete(@NonNull Task<AuthResult> task) {
-                                    if (!task.isSuccessful()) {
-                                        errorListener.onError(ERROR_AUTHENTICATION_FAILED);
-                                    }
+                            task -> {
+                                if (!task.isSuccessful()) {
+                                    errorListener.onError(ERROR_AUTHENTICATION_FAILED);
+                                    return;
                                 }
                             });
         } else {
@@ -103,12 +97,10 @@ public class AuthHelper {
         mAuth.signInWithEmailAndPassword(email, password)
                 .addOnCompleteListener(
                         activity,
-                        new OnCompleteListener<AuthResult>() {
-                            @Override
-                            public void onComplete(@NonNull Task<AuthResult> task) {
-                                if (!task.isSuccessful()) {
-                                    errorListener.onError(ERROR_AUTHENTICATION_FAILED);
-                                }
+                        task -> {
+                            if (!task.isSuccessful()) {
+                                errorListener.onError(ERROR_AUTHENTICATION_FAILED);
+                                return;
                             }
                         });
     }
@@ -123,18 +115,15 @@ public class AuthHelper {
 
     public static GoogleApiClient buildGoogleAPIClient(
             final FragmentActivity activity, final ErrorListener errorListener) {
-        return new GoogleApiClient.Builder(activity)
-                .enableAutoManage(
-                        activity,
-                        new GoogleApiClient.OnConnectionFailedListener() {
-                            @Override
-                            public void onConnectionFailed(
-                                    @NonNull ConnectionResult connectionResult) {
-                                errorListener.onError(ERROR_GOOGLE_PLAY_SERVICE_ERROR);
-                            }
-                        })
-                .addApi(Auth.GOOGLE_SIGN_IN_API, buildGoogleSignInOptions(activity))
-                .build();
+        GoogleApiClient client =
+                new GoogleApiClient.Builder(activity)
+                        .enableAutoManage(
+                                activity,
+                                connectionResult ->
+                                        errorListener.onError(ERROR_GOOGLE_PLAY_SERVICE_ERROR))
+                        .addApi(Auth.GOOGLE_SIGN_IN_API, buildGoogleSignInOptions(activity))
+                        .build();
+        return client;
     }
 
     private static GoogleSignInOptions buildGoogleSignInOptions(final FragmentActivity activity) {

@@ -20,6 +20,8 @@ import android.content.Context;
 import android.content.res.TypedArray;
 import android.os.Handler;
 import android.os.Looper;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.view.ViewGroup;
 import org.webrtc.RendererCommon;
@@ -109,6 +111,7 @@ public class VideoView extends SurfaceViewRenderer implements VideoRenderer {
     }
 
     /** Returns the current {@link VideoScaleType}. */
+    @NonNull
     public VideoScaleType getVideoScaleType() {
         return videoScaleType;
     }
@@ -121,7 +124,7 @@ public class VideoView extends SurfaceViewRenderer implements VideoRenderer {
      * height to {@link android.view.ViewGroup.LayoutParams#MATCH_PARENT} results in the video being
      * scaled to fill the maximum value of the dimension.
      */
-    public void setVideoScaleType(VideoScaleType videoScaleType) {
+    public void setVideoScaleType(@NonNull VideoScaleType videoScaleType) {
         ViewGroup.LayoutParams layoutParams = getLayoutParams();
 
         // Log warning if scale type may not be respected in certain dimensions
@@ -151,12 +154,12 @@ public class VideoView extends SurfaceViewRenderer implements VideoRenderer {
     }
 
     /** Sets listener of rendering events. */
-    public void setListener(VideoRenderer.Listener listener) {
+    public void setListener(@Nullable VideoRenderer.Listener listener) {
         this.listener = listener;
     }
 
     @Override
-    public void renderFrame(I420Frame frame) {
+    public void renderFrame(@NonNull I420Frame frame) {
         super.renderFrame(frame.webRtcI420Frame);
     }
 
@@ -179,13 +182,7 @@ public class VideoView extends SurfaceViewRenderer implements VideoRenderer {
     }
 
     private void refreshRenderer() {
-        uiThreadHandler.post(
-                new Runnable() {
-                    @Override
-                    public void run() {
-                        requestLayout();
-                    }
-                });
+        uiThreadHandler.post(this::requestLayout);
     }
 
     private RendererCommon.ScalingType convertToWebRtcScaleType(VideoScaleType videoScaleType) {

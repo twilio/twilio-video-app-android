@@ -18,6 +18,7 @@
 #include "webrtc/sdk/android/src/jni/jni_helpers.h"
 #include "class_reference_holder.h"
 #include "jni_utils.h"
+#include "webrtc/modules/utility/include/helpers_android.h"
 
 namespace twilio_video_jni {
 
@@ -49,13 +50,13 @@ std::string getLocalDataTrackHash(std::shared_ptr<twilio::media::LocalDataTrack>
 
 jobject createJavaLocalDataTrack(std::shared_ptr<twilio::media::LocalDataTrack> local_data_track,
                                  jobject j_context) {
-    JNIEnv *jni = webrtc_jni::GetEnv();
+    JNIEnv *jni = webrtc::jni::GetEnv();
     jclass j_data_track_class = twilio_video_jni::FindClass(jni,
                                                             "com/twilio/video/LocalDataTrack");
-    jmethodID j_data_track_ctor_id = webrtc_jni::GetMethodID(jni,
-                                                             j_data_track_class,
-                                                             "<init>",
-                                                             kLocalDataTrackConstructorSignature);
+    jmethodID j_data_track_ctor_id = webrtc::GetMethodID(jni,
+                                                         j_data_track_class,
+                                                         "<init>",
+                                                         kLocalDataTrackConstructorSignature);
     LocalDataTrackContext* data_track_context = new LocalDataTrackContext();
     data_track_context->local_data_track = local_data_track;
     jstring j_track_hash = JavaUTF16StringFromStdString(jni,
@@ -63,7 +64,7 @@ jobject createJavaLocalDataTrack(std::shared_ptr<twilio::media::LocalDataTrack> 
     jstring j_name = JavaUTF16StringFromStdString(jni, local_data_track->getName());
     jobject j_local_data_track = jni->NewObject(j_data_track_class,
                                                 j_data_track_ctor_id,
-                                                webrtc_jni::jlongFromPointer(data_track_context),
+                                                webrtc::NativeToJavaPointer(data_track_context),
                                                 local_data_track->isEnabled(),
                                                 local_data_track->isOrdered(),
                                                 local_data_track->isReliable(),

@@ -80,7 +80,8 @@ public class RemoteAudioTrackPublication implements AudioTrackPublication {
      * Returns the published remote audio track. {@code null} is returned if the track is not
      * subscribed to.
      */
-    public synchronized @Nullable RemoteAudioTrack getRemoteAudioTrack() {
+    @Nullable
+    public synchronized RemoteAudioTrack getRemoteAudioTrack() {
         return remoteAudioTrack;
     }
 

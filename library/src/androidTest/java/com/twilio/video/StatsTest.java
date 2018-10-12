@@ -25,7 +25,6 @@ import com.twilio.video.base.BaseStatsTest;
 import com.twilio.video.helper.CallbackHelper;
 import com.twilio.video.util.Topology;
 import java.util.Collections;
-import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import org.junit.After;
@@ -85,22 +84,15 @@ public class StatsTest extends BaseStatsTest {
          */
         InstrumentationRegistry.getInstrumentation()
                 .runOnMainSync(
-                        new Runnable() {
-                            @Override
-                            public void run() {
-                                final long callingThreadId = Thread.currentThread().getId();
-                                StatsListener statsListener =
-                                        new StatsListener() {
-                                            @Override
-                                            public void onStats(List<StatsReport> statsReports) {
-                                                assertEquals(
-                                                        callingThreadId,
-                                                        Thread.currentThread().getId());
-                                                statsCallback.countDown();
-                                            }
-                                        };
-                                aliceRoom.getStats(statsListener);
-                            }
+                        () -> {
+                            final long callingThreadId = Thread.currentThread().getId();
+                            StatsListener statsListener =
+                                    statsReports -> {
+                                        assertEquals(
+                                                callingThreadId, Thread.currentThread().getId());
+                                        statsCallback.countDown();
+                                    };
+                            aliceRoom.getStats(statsListener);
                         });
 
         assertTrue(statsCallback.await(20, TimeUnit.SECONDS));

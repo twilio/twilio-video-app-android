@@ -114,32 +114,24 @@ public class IceServersDialogFragment extends AppCompatDialogFragment {
     }
 
     private DialogInterface.OnClickListener dialogPositiveButtonClickListener() {
-        return new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                selectedServers =
-                        IceOptionsHelper.getSelectedServersFromListView(iceServersListView);
-                checkedItems = iceServersListView.getCheckedItemPositions();
-                if (listener != null) {
-                    String transportPolicy = "";
-                    if (iceTransPolicySpinner != null) {
-                        transportPolicy =
-                                iceTransPolicySpinner.getSelectedItem().toString().toLowerCase();
-                    }
-                    listener.onIceOptionsSelected(
-                            transportPolicy, new ArrayList<>(selectedServers));
+        return (dialog, which) -> {
+            selectedServers = IceOptionsHelper.getSelectedServersFromListView(iceServersListView);
+            checkedItems = iceServersListView.getCheckedItemPositions();
+            if (listener != null) {
+                String transportPolicy = "";
+                if (iceTransPolicySpinner != null) {
+                    transportPolicy =
+                            iceTransPolicySpinner.getSelectedItem().toString().toLowerCase();
                 }
+                listener.onIceOptionsSelected(transportPolicy, new ArrayList<>(selectedServers));
             }
         };
     }
 
     private DialogInterface.OnClickListener dialogNegativeButtonClickListener() {
-        return new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                if (listener != null) {
-                    listener.onIceOptionsCancel();
-                }
+        return (dialog, which) -> {
+            if (listener != null) {
+                listener.onIceOptionsCancel();
             }
         };
     }

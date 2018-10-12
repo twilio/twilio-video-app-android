@@ -15,7 +15,7 @@
  */
 
 #include <jni.h>
-#include "video/platform_info.h"
+#include "twilio/video/platform_info.h"
 
 #ifndef VIDEO_ANDROID_COM_TWILIO_VIDEO_PLATFORMINFO_H_
 #define VIDEO_ANDROID_COM_TWILIO_VIDEO_PLATFORMINFO_H_
@@ -31,11 +31,11 @@ struct PlatformInfoContext {
 };
 
 JNIEXPORT jlong JNICALL Java_com_twilio_video_PlatformInfo_nativeCreate
-    (JNIEnv *, jobject, jstring, jstring, jstring, jstring, jstring, jstring);
+        (JNIEnv *, jobject, jstring, jstring, jstring, jstring, jstring, jstring);
 
 
 JNIEXPORT void JNICALL Java_com_twilio_video_PlatformInfo_nativeRelease
-    (JNIEnv *, jobject, jlong);
+        (JNIEnv *, jobject, jlong);
 
 }
 

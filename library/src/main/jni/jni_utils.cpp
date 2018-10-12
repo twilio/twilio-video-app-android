@@ -21,6 +21,44 @@
 
 namespace twilio_video_jni {
 
+/*
+ * IsNull, GetObjectClass, GetFieldID, and GetObjectField were removed in WebRTC 67, but are 
+ * still used in the SDK. These functions were ported from WebRTC 57.
+ *
+ * https://code.hq.twilio.com/client/twilio-webrtc/blob/twilio-webrtc-57/webrtc/sdk/android/src/jni/jni_helpers.cc
+ */
+
+bool IsNull(JNIEnv* jni, jobject obj) {
+    return jni->IsSameObject(obj, nullptr);
+}
+
+jclass GetObjectClass(JNIEnv *jni, jobject object) {
+    jclass c = jni->GetObjectClass(object);
+    CHECK_EXCEPTION(jni) << "error during GetObjectClass";
+    RTC_CHECK(c) << "GetObjectClass returned NULL";
+    return c;
+}
+
+jfieldID GetFieldID(JNIEnv *jni, jclass c, const char *name, const char *signature) {
+    jfieldID f = jni->GetFieldID(c, name, signature);
+    CHECK_EXCEPTION(jni) << "error during GetFieldID";
+    RTC_CHECK(f) << name << ", " << signature;
+    return f;
+}
+
+jobject GetObjectField(JNIEnv *jni, jobject object, jfieldID id) {
+    jobject o = jni->GetObjectField(object, id);
+    CHECK_EXCEPTION(jni) << "error during GetObjectField";
+    RTC_CHECK(!IsNull(jni, o)) << "GetObjectField returned NULL";
+    return o;
+}
+
+jint GetIntField(JNIEnv *jni, jobject object, jfieldID id) {
+    jint i = jni->GetIntField(object, id);
+    CHECK_EXCEPTION(jni) << "error during GetIntField";
+    return i;
+}
+
 std::string JavaToUTF8StdString(JNIEnv *jni, const jstring &j_string) {
     std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t> convert;
 
@@ -45,8 +83,8 @@ jstring JavaUTF16StringFromStdString(JNIEnv* jni, std::string const& string) {
 }
 
 JNIEXPORT jstring JNICALL Java_com_twilio_video_JniUtils_nativeJavaUtf16StringToStdString(JNIEnv *env,
-                                                                                         jobject instance,
-                                                                                         jstring j_input_string) {
+                                                                                          jobject instance,
+                                                                                          jstring j_input_string) {
     std::string input_string = JavaToUTF8StdString(env, j_input_string);
 
     return JavaUTF16StringFromStdString(env, input_string);

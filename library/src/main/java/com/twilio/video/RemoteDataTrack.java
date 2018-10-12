@@ -58,16 +58,12 @@ public class RemoteDataTrack extends DataTrack {
                     synchronized (RemoteDataTrack.this) {
                         if (handler != null) {
                             handler.post(
-                                    new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            synchronized (RemoteDataTrack.this) {
-                                                logger.d("onMessage(ByteBuffer)");
+                                    () -> {
+                                        synchronized (RemoteDataTrack.this) {
+                                            logger.d("onMessage(ByteBuffer)");
 
-                                                if (listener != null) {
-                                                    listener.onMessage(
-                                                            remoteDataTrack, messageBuffer);
-                                                }
+                                            if (listener != null) {
+                                                listener.onMessage(remoteDataTrack, messageBuffer);
                                             }
                                         }
                                     });
@@ -82,15 +78,12 @@ public class RemoteDataTrack extends DataTrack {
                     synchronized (RemoteDataTrack.this) {
                         if (handler != null) {
                             handler.post(
-                                    new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            synchronized (RemoteDataTrack.this) {
-                                                logger.d("onMessage(String)");
+                                    () -> {
+                                        synchronized (RemoteDataTrack.this) {
+                                            logger.d("onMessage(String)");
 
-                                                if (listener != null) {
-                                                    listener.onMessage(remoteDataTrack, message);
-                                                }
+                                            if (listener != null) {
+                                                listener.onMessage(remoteDataTrack, message);
                                             }
                                         }
                                     });

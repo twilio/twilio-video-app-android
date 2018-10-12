@@ -17,6 +17,7 @@
 package com.twilio.video;
 
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 /**
  * A local audio track publication represents a {@link LocalAudioTrack} that has been shared to a
@@ -65,6 +66,7 @@ public class LocalAudioTrackPublication implements AudioTrackPublication {
     }
 
     /** Returns the published local audio track. */
+    @Nullable
     public LocalAudioTrack getLocalAudioTrack() {
         return localAudioTrack;
     }

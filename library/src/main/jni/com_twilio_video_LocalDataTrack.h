@@ -18,11 +18,7 @@
 #define VIDEO_ANDROID_COM_TWILIO_VIDEO_LOCALDATATRACK_H_
 
 #include <jni.h>
-#include "media/track.h"
-
-#ifdef __cplusplus
-extern "C" {
-#endif
+#include "twilio/media/track.h"
 
 namespace twilio_video_jni {
 
@@ -36,6 +32,10 @@ std::string getLocalDataTrackHash(std::shared_ptr<twilio::media::LocalDataTrack>
 
 jobject createJavaLocalDataTrack(std::shared_ptr<twilio::media::LocalDataTrack> local_data_track,
                                  jobject j_context);
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 JNIEXPORT void JNICALL Java_com_twilio_video_LocalDataTrack_nativeBufferSend(JNIEnv *,
                                                                              jobject,

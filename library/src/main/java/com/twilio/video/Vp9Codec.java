@@ -16,6 +16,8 @@
 
 package com.twilio.video;
 
+import android.support.annotation.NonNull;
+
 /**
  * Traditional block-based transform coding format similar to MPEG's High Efficiency Video Coding
  * (HEVC/H.265).
@@ -23,7 +25,7 @@ package com.twilio.video;
  * @see <a href="https://en.wikipedia.org/wiki/VP9">VP9</a>
  */
 public class Vp9Codec extends VideoCodec {
-    public static final String NAME = "VP9";
+    @NonNull public static final String NAME = "VP9";
 
     public Vp9Codec() {
         super(NAME);

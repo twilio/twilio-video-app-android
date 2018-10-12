@@ -16,7 +16,6 @@
 
 package com.twilio.video.app.ui.room;
 
-import android.view.View;
 import android.view.ViewGroup;
 import com.twilio.video.VideoTrack;
 import java.util.ArrayList;
@@ -377,12 +376,9 @@ public class ParticipantController {
         view.setMirror(item.mirror);
 
         view.setOnClickListener(
-                new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        if (listener != null) {
-                            listener.onThumbClick(item);
-                        }
+                participantView -> {
+                    if (listener != null) {
+                        listener.onThumbClick(item);
                     }
                 });
 

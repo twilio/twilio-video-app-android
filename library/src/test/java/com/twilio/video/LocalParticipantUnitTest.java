@@ -163,4 +163,16 @@ public class LocalParticipantUnitTest {
         when(mockLocalDataTrack.isReleased()).thenReturn(true);
         localParticipant.unpublishTrack(mockLocalDataTrack);
     }
+
+    @Test(expected = NullPointerException.class)
+    public void publshTrack_shouldNotAllowNull() {
+        LocalVideoTrack videoTrack = null;
+        localParticipant.publishTrack(videoTrack);
+
+        LocalAudioTrack audioTrack = null;
+        localParticipant.publishTrack(audioTrack);
+
+        LocalDataTrack dataTrack = null;
+        localParticipant.publishTrack(dataTrack);
+    }
 }

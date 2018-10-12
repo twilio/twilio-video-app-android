@@ -32,23 +32,16 @@ final class VideoCapturerListenerAdapter implements VideoCapturer.Listener {
     @Override
     public void onFrameCaptured(VideoFrame videoFrame) {
         /*
-         * The imageBuffer field indicates if the frame is captured to a texture or not. Currently,
-         * only the CameraCapturer captures to texture because we have not exposed capturing to
-         * a texture to the VideoCapturer interface.
+         * Currently only Twilio capturers create VideoFrames that wrap org.webrtc.VideoFrame. All
+         * other customer capturers use onByteBufferFrameCaptured.
          */
-        if (videoFrame.imageBuffer != null) {
+        if (videoFrame.webRtcVideoFrame != null) {
+            webRtcCapturerObserver.onFrameCaptured(videoFrame.webRtcVideoFrame);
+        } else {
             webRtcCapturerObserver.onByteBufferFrameCaptured(
                     videoFrame.imageBuffer,
                     videoFrame.dimensions.width,
                     videoFrame.dimensions.height,
-                    videoFrame.orientation.getValue(),
-                    videoFrame.timestamp);
-        } else {
-            webRtcCapturerObserver.onTextureFrameCaptured(
-                    videoFrame.dimensions.width,
-                    videoFrame.dimensions.height,
-                    videoFrame.textureId,
-                    videoFrame.transformMatrix,
                     videoFrame.orientation.getValue(),
                     videoFrame.timestamp);
         }

@@ -1,16 +1,149 @@
 The Twilio Programmable Video SDKs use [Semantic Versioning](http://www.semver.org).
 
-###2.3.0
+###3.1.0
+
 Improvements
 
 - Added `IceCandidatePairStats` to `StatsReport` which gives insight into local and remote ice candidates
+- Reduced signaling traffic in Group Rooms when communicating with an ICE-lite agent.
+
+ Bug Fixes
+
+- Fixed a bug where the client could send additional ICE candidates after signaling the end of candidates, or mark candidates with a username from a future offer.
 
 Known issues
 
-- Network handoff, and subsequent connection renegotiation is not supported for IPv6 networks #72
-- Participant disconnect event can take up to 120 seconds to occur #80 #73
-- Codec preferences do not function correctly in a hybrid codec Group Room.
+- Network handoff, and subsequent connection renegotiation is not supported for IPv6 networks [#72](https://github.com/twilio/video-quickstart-android/issues/72)
+- Participant disconnect event can take up to 120 seconds to occur [#80](https://github.com/twilio/video-quickstart-android/issues/80) [#73](https://github.com/twilio/video-quickstart-android/issues/73)
 - The SDK is not side-by-side compatible with other WebRTC based libraries [#340](https://github.com/twilio/video-quickstart-android/issues/340)
+- Codec preferences do not function correctly in a hybrid codec Group Room with the following
+codecs:
+    - ISAC
+    - PCMA
+    - G722
+    - VP9
+
+###3.0.0
+
+`3.0.0-beta1` has been promoted to `3.0.0`. The `3.x` SDK is now Generally Available (GA). The `1.x` and `2.x` Video Android SDK remain GA but will only receive critical bug fixes moving forward.
+
+Known issues
+
+- Network handoff, and subsequent connection renegotiation is not supported for IPv6 networks [#72](https://github.com/twilio/video-quickstart-android/issues/72)
+- Participant disconnect event can take up to 120 seconds to occur [#80](https://github.com/twilio/video-quickstart-android/issues/80) [#73](https://github.com/twilio/video-quickstart-android/issues/73)
+- The SDK is not side-by-side compatible with other WebRTC based libraries [#340](https://github.com/twilio/video-quickstart-android/issues/340)
+- Codec preferences do not function correctly in a hybrid codec Group Room with the following
+codecs:
+    - ISAC
+    - PCMA
+    - G722
+    - VP9
+
+###3.0.0-beta1
+
+- `3.0.0-preview3` has been promoted to `3.0.0-beta1`. The `3.0.0` API is now final and will only receive bug fixes and improvements until `3.0.0` is officially released.
+
+Known issues
+
+- Network handoff, and subsequent connection renegotiation is not supported for IPv6 networks [#72](https://github.com/twilio/video-quickstart-android/issues/72)
+- Participant disconnect event can take up to 120 seconds to occur [#80](https://github.com/twilio/video-quickstart-android/issues/80) [#73](https://github.com/twilio/video-quickstart-android/issues/73)
+- The SDK is not side-by-side compatible with other WebRTC based libraries [#340](https://github.com/twilio/video-quickstart-android/issues/340)
+- Codec preferences do not function correctly in a hybrid codec Group Room with the following
+codecs:
+    - ISAC
+    - PCMA
+    - G722
+    - VP9
+
+####3.0.0-preview3
+
+Enhancements
+
+- The signaling Client has been updated to support version 2 of the Room Signaling Protocol (RSP).
+- Added ECS debugging support at the signaling layer that will help in troubleshooting ice server related issues.
+- Introduced a safer threading model in the signaling layer that prevents occasional crashes and missing Track subscription events.
+- The SDK no longer waits for pending events when closing a PeerConnection speeding up the teardown process.
+- Moved `RoomState` enum to `Room.State`.
+- `onDisconnected` will now return a unique error code when the Room is completed via the REST API.
+
+Bug Fixes
+
+- The signaling Client is more lenient when encountering unexpected RSP messages.
+- Resolved a scenario where an ICE restart could be ignored after experiencing signaling glare.
+
+Known issues
+
+- Network handoff, and subsequent connection renegotiation is not supported for IPv6 networks [#72](https://github.com/twilio/video-quickstart-android/issues/72)
+- Participant disconnect event can take up to 120 seconds to occur [#80](https://github.com/twilio/video-quickstart-android/issues/80) [#73](https://github.com/twilio/video-quickstart-android/issues/73)
+- The SDK is not side-by-side compatible with other WebRTC based libraries [#340](https://github.com/twilio/video-quickstart-android/issues/340)
+- Codec preferences do not function correctly in a hybrid codec Group Room with the following
+codecs:
+    - ISAC
+    - PCMA
+    - G722
+    - VP9
+
+####3.0.0-preview2
+
+Features
+
+- Added flag to IceOptions `abortOnIceServerTimeout` that tells the client whether to continue or abort connecting to a Room when Ice fails to connect.
+- Added parameter to IceOptions `iceServersTimeout` that allows control of the timeout period when trying to retrieve Ice servers.
+- Added `VideoTextureView`. `VideoTextureView` is similar to `VideoView` but subclasses `TextureView` instead of `SurfaceView`. Unlike SurfaceView, TextureView does not create a separate window but behaves as a regular View. This key difference allows a TextureView to be moved, transformed, animated, etc. For more see the [TextureView documentation](https://developer.android.com/reference/android/view/TextureView.html). If you were previously using [this gist](https://gist.github.com/aaalaniz/bfbc4891c98ef3b23558ff2260cbcc8e), please update your applications to use the `VideoTextureView` provided with the SDK. **NOTE**: `VideoTextureView` can experience dead locking on API Level 19 or below due to a [WebRTC bug](https://bugs.chromium.org/p/webrtc/issues/detail?id=5702). Use with discretion.
+
+Enhancements
+
+- Adding a null video/audio codec to `ConnectOptions` will now throw an exception
+- Added `@NonNull` `@Nullable` annotations to a few additional classes.
+- Updated `Room.Listener` documentation to provide more clarity about when `onRecording` callbacks are received.
+- Switched CI provider for build, test, and release pipeline.
+
+Bug Fixes
+
+- Fixed crash when disconnecting from a room.
+
+Known issues
+
+- Network handoff, and subsequent connection renegotiation is not supported for IPv6 networks [#72](https://github.com/twilio/video-quickstart-android/issues/72)
+- Participant disconnect event can take up to 120 seconds to occur [#80](https://github.com/twilio/video-quickstart-android/issues/80) [#73](https://github.com/twilio/video-quickstart-android/issues/73)
+- The SDK is not side-by-side compatible with other WebRTC based libraries [#340](https://github.com/twilio/video-quickstart-android/issues/340)
+- Codec preferences do not function correctly in a hybrid codec Group Room with the following
+codecs:
+    - ISAC
+    - PCMA
+    - G722
+    - VP9
+
+####3.0.0-preview1
+
+Improvements
+
+- Upgraded to WebRTC 67.
+- Upgraded to Java 8. Add the following snippet to your `build.gradle` to enable Java 8
+features required to build the 3.x Video Android SDK:
+
+        android {
+            compileOptions {
+                sourceCompatibility 1.8
+                targetCompatibility 1.8
+            }
+        }
+- Added @Nullable and @NonNull to all public API fields, methods, and interfaces.
+- Updated internal capturer pipeline for `CameraCapturer`, `ScreenCapturer`, and `Camera2Capturer`.
+- Upgraded to Android NDK 16.
+
+
+Known issues
+
+- Network handoff, and subsequent connection renegotiation is not supported for IPv6 networks [#72](https://github.com/twilio/video-quickstart-android/issues/72)
+- Participant disconnect event can take up to 120 seconds to occur [#80](https://github.com/twilio/video-quickstart-android/issues/80) [#73](https://github.com/twilio/video-quickstart-android/issues/73)
+- The SDK is not side-by-side compatible with other WebRTC based libraries [#340](https://github.com/twilio/video-quickstart-android/issues/340)
+- Codec preferences do not function correctly in a hybrid codec Group Room with the following
+codecs:
+    - ISAC
+    - PCMA
+    - G722
+    - VP9
 
 ###2.2.1
 

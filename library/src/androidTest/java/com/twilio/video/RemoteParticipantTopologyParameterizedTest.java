@@ -113,7 +113,7 @@ public class RemoteParticipantTopologyParameterizedTest extends BaseParticipantT
                         .build();
         room = Video.connect(context, connectOptions, roomListener);
         assertTrue(roomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
-        assertEquals(RoomState.CONNECTED, room.getState());
+        assertEquals(Room.State.CONNECTED, room.getState());
 
         connectOptions =
                 new ConnectOptions.Builder(tokenTwo)
@@ -144,7 +144,7 @@ public class RemoteParticipantTopologyParameterizedTest extends BaseParticipantT
                         .build();
         room = Video.connect(context, connectOptions, roomListener);
         assertTrue(roomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
-        assertEquals(RoomState.CONNECTED, room.getState());
+        assertEquals(Room.State.CONNECTED, room.getState());
 
         ConnectOptions connectOptions2 =
                 new ConnectOptions.Builder(tokenTwo)
@@ -203,7 +203,7 @@ public class RemoteParticipantTopologyParameterizedTest extends BaseParticipantT
                         .build();
         room = Video.connect(context, connectOptions, roomListener);
         assertTrue(roomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
-        assertEquals(RoomState.CONNECTED, room.getState());
+        assertEquals(Room.State.CONNECTED, room.getState());
 
         ConnectOptions connectOptions2 =
                 new ConnectOptions.Builder(tokenTwo)

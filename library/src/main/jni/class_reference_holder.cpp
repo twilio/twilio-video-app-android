@@ -16,6 +16,7 @@
 
 #include "class_reference_holder.h"
 #include "webrtc/sdk/android/src/jni/jni_helpers.h"
+#include "webrtc/modules/utility/include/helpers_android.h"
 
 namespace twilio_video_jni {
 
@@ -37,11 +38,11 @@ static ClassReferenceHolder*class_reference_holder = nullptr;
 
 void LoadGlobalClassReferenceHolder() {
     RTC_CHECK(class_reference_holder == nullptr);
-    class_reference_holder = new ClassReferenceHolder(webrtc_jni::GetEnv());
+    class_reference_holder = new ClassReferenceHolder(webrtc::jni::GetEnv());
 }
 
 void FreeGlobalClassReferenceHolder() {
-    class_reference_holder->FreeReferences(webrtc_jni::AttachCurrentThreadIfNeeded());
+    class_reference_holder->FreeReferences(webrtc::jni::AttachCurrentThreadIfNeeded());
     delete class_reference_holder;
     class_reference_holder = nullptr;
 }
@@ -76,6 +77,7 @@ ClassReferenceHolder::ClassReferenceHolder(JNIEnv* jni) {
     LoadClass(jni, "com/twilio/video/IceCandidatePairStats");
     LoadClass(jni, "com/twilio/video/IceCandidatePairState");
     LoadClass(jni, "com/twilio/video/VideoDimensions");
+    LoadClass(jni, "com/twilio/video/VideoFormat");
 }
 
 ClassReferenceHolder::~ClassReferenceHolder() {

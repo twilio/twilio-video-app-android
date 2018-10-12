@@ -18,11 +18,7 @@
 #define VIDEO_ANDROID_COM_TWILIO_VIDEO_LOCALVIDEOTRACK_H_
 
 #include <jni.h>
-#include "media/track.h"
-
-#ifdef __cplusplus
-extern "C" {
-#endif
+#include "twilio/media/track.h"
 
 namespace twilio_video_jni {
 
@@ -52,6 +48,10 @@ jobject createJavaLocalVideoTrack(std::shared_ptr<twilio::media::LocalVideoTrack
                                   jobject j_video_capturer,
                                   jobject j_video_constraints,
                                   jobject j_context);
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 JNIEXPORT jboolean JNICALL Java_com_twilio_video_LocalVideoTrack_nativeIsEnabled(JNIEnv *,
                                                                                  jobject,

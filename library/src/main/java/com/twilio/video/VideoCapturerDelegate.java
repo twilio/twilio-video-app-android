@@ -17,10 +17,9 @@
 package com.twilio.video;
 
 import android.content.Context;
-import java.util.ArrayList;
 import java.util.List;
-import org.webrtc.CameraEnumerationAndroid;
 import org.webrtc.SurfaceTextureHelper;
+import org.webrtc.VideoFrame;
 
 final class VideoCapturerDelegate implements org.webrtc.VideoCapturer {
     private final VideoCapturer videoCapturer;
@@ -39,8 +38,8 @@ final class VideoCapturerDelegate implements org.webrtc.VideoCapturer {
      * Invoked from JNI
      */
     @SuppressWarnings("unused")
-    public List<CameraEnumerationAndroid.CaptureFormat> getSupportedFormats() {
-        return convertToWebRtcFormats(videoCapturer.getSupportedFormats());
+    public List<VideoFormat> getSupportedFormats() {
+        return videoCapturer.getSupportedFormats();
     }
 
     @Override
@@ -101,36 +100,6 @@ final class VideoCapturerDelegate implements org.webrtc.VideoCapturer {
         this.videoPixelFormat = videoPixelFormat;
     }
 
-    private List<CameraEnumerationAndroid.CaptureFormat> convertToWebRtcFormats(
-            List<VideoFormat> videoFormats) {
-        if (videoFormats != null) {
-            List<CameraEnumerationAndroid.CaptureFormat> webRtcCaptureFormats =
-                    new ArrayList<>(videoFormats.size());
-
-            for (int i = 0; i < videoFormats.size(); i++) {
-                VideoFormat videoFormat = videoFormats.get(i);
-                CameraEnumerationAndroid.CaptureFormat webRtcCaptureFormat =
-                        /*
-                         * WebRTC wants min and max framerates in their format but only uses
-                         * max framerate in JNI layer. We will just set min and max to the same in
-                         * this conversion
-                         */
-                        new CameraEnumerationAndroid.CaptureFormat(
-                                videoFormat.dimensions.width,
-                                videoFormat.dimensions.height,
-                                videoFormat.framerate,
-                                videoFormat.framerate,
-                                videoFormat.pixelFormat.getValue());
-
-                webRtcCaptureFormats.add(i, webRtcCaptureFormat);
-            }
-
-            return webRtcCaptureFormats;
-        }
-
-        return new ArrayList<>();
-    }
-
     /*
      * An implementation of CapturerObserver that forwards all calls from Java to the C layer.
      */
@@ -176,6 +145,18 @@ final class VideoCapturerDelegate implements org.webrtc.VideoCapturer {
                     timestamp);
         }
 
+        @Override
+        public void onFrameCaptured(VideoFrame videoFrame) {
+            VideoFrame.Buffer buffer = videoFrame.getBuffer();
+            nativeOnFrameCaptured(
+                    nativeCapturer,
+                    buffer.getWidth(),
+                    buffer.getHeight(),
+                    videoFrame.getTimestampNs(),
+                    videoFrame.getRotation(),
+                    buffer);
+        }
+
         private native void nativeCapturerStarted(long nativeCapturer, boolean success);
 
         private native void nativeOnByteBufferFrameCaptured(
@@ -195,5 +176,13 @@ final class VideoCapturerDelegate implements org.webrtc.VideoCapturer {
                 float[] transformMatrix,
                 int rotation,
                 long timestamp);
+
+        private native void nativeOnFrameCaptured(
+                long nativeCapturer,
+                int width,
+                int height,
+                long timeStamp,
+                int rotation,
+                org.webrtc.VideoFrame.Buffer webRtcVideoFrameBuffer);
     }
 }

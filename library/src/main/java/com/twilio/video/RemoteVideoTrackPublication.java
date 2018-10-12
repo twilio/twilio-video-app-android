@@ -80,7 +80,8 @@ public class RemoteVideoTrackPublication implements VideoTrackPublication {
      * Returns the published remote video track. {@code null} is returned if the track is not
      * subscribed to.
      */
-    public synchronized @Nullable RemoteVideoTrack getRemoteVideoTrack() {
+    @Nullable
+    public synchronized RemoteVideoTrack getRemoteVideoTrack() {
         return remoteVideoTrack;
     }
 

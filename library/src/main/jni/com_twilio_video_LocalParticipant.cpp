@@ -23,6 +23,7 @@
 #include "android_local_participant_observer.h"
 #include "class_reference_holder.h"
 #include "jni_utils.h"
+#include "webrtc/modules/utility/include/helpers_android.h"
 
 namespace twilio_video_jni {
 
@@ -42,7 +43,7 @@ jobject createJavaLocalAudioTrackPublication(JNIEnv *env,
     jobject j_published_audio_track = env->NewObject(j_published_audio_track_class,
                                                      j_published_audio_track_ctor_id,
                                                      JavaUTF16StringFromStdString(env,
-                                                                                         local_audio_track_publication->getTrackSid()),
+                                                                                  local_audio_track_publication->getTrackSid()),
                                                      j_local_audio_track);
     CHECK_EXCEPTION(env) << "Failed to create LocalAudioTrackPublication";
 
@@ -57,7 +58,7 @@ jobject createJavaLocalVideoTrackPublication(JNIEnv *env,
     jobject j_published_video_track = env->NewObject(j_published_video_track_class,
                                                      j_published_video_track_ctor_id,
                                                      JavaUTF16StringFromStdString(env,
-                                                                                         local_video_track_publication->getTrackSid()),
+                                                                                  local_video_track_publication->getTrackSid()),
                                                      j_local_video_track);
     CHECK_EXCEPTION(env) << "Failed to create LocalVideoTrackPublication";
 
@@ -72,7 +73,7 @@ jobject createJavaLocalDataTrackPublication(JNIEnv *env,
     jobject j_published_data_track = env->NewObject(j_published_data_track_class,
                                                     j_published_data_track_ctor_id,
                                                     JavaUTF16StringFromStdString(env,
-                                                                                        local_data_track_publication->getTrackSid()),
+                                                                                 local_data_track_publication->getTrackSid()),
                                                     j_local_data_track);
     CHECK_EXCEPTION(env) << "Failed to create LocalDataTrackPublication";
 
@@ -83,13 +84,13 @@ void bindLocalParticipantListenerProxy(JNIEnv *env,
                                        jobject j_local_participant,
                                        jclass j_local_participant_class,
                                        LocalParticipantContext *local_participant_context) {
-    jfieldID j_local_participant_listener_proxy_field = webrtc_jni::GetFieldID(env,
-                                                                               j_local_participant_class,
-                                                                               "localParticipantListenerProxy",
-                                                                               "Lcom/twilio/video/LocalParticipant$Listener;");
-    jobject j_local_participant_listener_proxy = webrtc_jni::GetObjectField(env,
-                                                                            j_local_participant,
-                                                                            j_local_participant_listener_proxy_field);
+    jfieldID j_local_participant_listener_proxy_field = GetFieldID(env,
+                                                                   j_local_participant_class,
+                                                                   "localParticipantListenerProxy",
+                                                                   "Lcom/twilio/video/LocalParticipant$Listener;");
+    jobject j_local_participant_listener_proxy = GetObjectField(env,
+                                                                j_local_participant,
+                                                                j_local_participant_listener_proxy_field);
 
     local_participant_context->android_local_participant_observer =
             std::make_shared<AndroidLocalParticipantObserver>(env,
@@ -106,14 +107,14 @@ std::map<std::string, jobject>
 getLocalAudioTracksMap(JNIEnv *env, jobject j_local_audio_tracks) {
     std::map<std::string, jobject> local_audio_track_map;
 
-    if (!webrtc_jni::IsNull(env, j_local_audio_tracks)) {
-        jclass j_array_list_class = webrtc_jni::GetObjectClass(env, j_local_audio_tracks);
-        jmethodID j_array_list_size = webrtc_jni::GetMethodID(env, j_array_list_class, "size",
-                                                              "()I");
-        jmethodID j_array_list_get = webrtc_jni::GetMethodID(env,
-                                                             j_array_list_class,
-                                                             "get",
-                                                             "(I)Ljava/lang/Object;");
+    if (!IsNull(env, j_local_audio_tracks)) {
+        jclass j_array_list_class = GetObjectClass(env, j_local_audio_tracks);
+        jmethodID j_array_list_size = webrtc::GetMethodID(env, j_array_list_class, "size",
+                                                          "()I");
+        jmethodID j_array_list_get = webrtc::GetMethodID(env,
+                                                         j_array_list_class,
+                                                         "get",
+                                                         "(I)Ljava/lang/Object;");
         const int size = env->CallIntMethod(j_local_audio_tracks, j_array_list_size);
         CHECK_EXCEPTION(env) << "Failed to call size() on local audio tracks list";
 
@@ -122,18 +123,18 @@ getLocalAudioTracksMap(JNIEnv *env, jobject j_local_audio_tracks) {
                                                                 j_array_list_get,
                                                                 i);
             CHECK_EXCEPTION(env) << "Failed to get local audio track from list";
-            jclass j_local_audio_track_class = webrtc_jni::GetObjectClass(env, j_local_audio_track);
-            jmethodID j_get_track_hash = webrtc_jni::GetMethodID(env,
-                                                                 j_local_audio_track_class,
-                                                                 "getNativeTrackHash",
-                                                                 "()Ljava/lang/String;");
+            jclass j_local_audio_track_class = GetObjectClass(env, j_local_audio_track);
+            jmethodID j_get_track_hash = webrtc::GetMethodID(env,
+                                                             j_local_audio_track_class,
+                                                             "getNativeTrackHash",
+                                                             "()Ljava/lang/String;");
             jstring j_track_hash = (jstring) env->CallObjectMethod(j_local_audio_track,
-                                                                 j_get_track_hash);
+                                                                   j_get_track_hash);
             std::string track_hash = JavaToUTF8StdString(env, j_track_hash);
             CHECK_EXCEPTION(env) << "Failed to get local audio track hash";
 
             // Add entry to map
-            local_audio_track_map[track_hash] = webrtc_jni::NewGlobalRef(env, j_local_audio_track);
+            local_audio_track_map[track_hash] = webrtc::NewGlobalRef(env, j_local_audio_track);
         }
     }
 
@@ -144,14 +145,14 @@ std::map<std::string, jobject>
 getLocalVideoTracksMap(JNIEnv *env, jobject j_local_video_tracks) {
     std::map<std::string, jobject> local_video_track_map;
 
-    if (!webrtc_jni::IsNull(env, j_local_video_tracks)) {
-        jclass j_array_list_class = webrtc_jni::GetObjectClass(env, j_local_video_tracks);
-        jmethodID j_array_list_size = webrtc_jni::GetMethodID(env, j_array_list_class, "size",
-                                                              "()I");
-        jmethodID j_array_list_get = webrtc_jni::GetMethodID(env,
-                                                             j_array_list_class,
-                                                             "get",
-                                                             "(I)Ljava/lang/Object;");
+    if (!IsNull(env, j_local_video_tracks)) {
+        jclass j_array_list_class = GetObjectClass(env, j_local_video_tracks);
+        jmethodID j_array_list_size = webrtc::GetMethodID(env, j_array_list_class, "size",
+                                                          "()I");
+        jmethodID j_array_list_get = webrtc::GetMethodID(env,
+                                                         j_array_list_class,
+                                                         "get",
+                                                         "(I)Ljava/lang/Object;");
         const int size = env->CallIntMethod(j_local_video_tracks, j_array_list_size);
         CHECK_EXCEPTION(env) << "Failed to call size() on local video tracks list";
 
@@ -160,18 +161,18 @@ getLocalVideoTracksMap(JNIEnv *env, jobject j_local_video_tracks) {
                                                                 j_array_list_get,
                                                                 i);
             CHECK_EXCEPTION(env) << "Failed to get local video track from list";
-            jclass j_local_video_track_class = webrtc_jni::GetObjectClass(env, j_local_video_track);
-            jmethodID j_get_track_hash = webrtc_jni::GetMethodID(env,
-                                                                 j_local_video_track_class,
-                                                                 "getNativeTrackHash",
-                                                                 "()Ljava/lang/String;");
+            jclass j_local_video_track_class = GetObjectClass(env, j_local_video_track);
+            jmethodID j_get_track_hash = webrtc::GetMethodID(env,
+                                                             j_local_video_track_class,
+                                                             "getNativeTrackHash",
+                                                             "()Ljava/lang/String;");
             jstring j_track_hash = (jstring) env->CallObjectMethod(j_local_video_track,
                                                                    j_get_track_hash);
             std::string track_hash = JavaToUTF8StdString(env, j_track_hash);
             CHECK_EXCEPTION(env) << "Failed to get local video track hash";
 
             // Add entry to map
-            local_video_track_map[track_hash] = webrtc_jni::NewGlobalRef(env, j_local_video_track);
+            local_video_track_map[track_hash] = webrtc::NewGlobalRef(env, j_local_video_track);
         }
     }
 
@@ -182,34 +183,34 @@ std::map<std::string, jobject>
 getLocalDataTracksMap(JNIEnv *env, jobject j_local_data_tracks) {
     std::map<std::string, jobject> local_data_track_map;
 
-    if (!webrtc_jni::IsNull(env, j_local_data_tracks)) {
-        jclass j_array_list_class = webrtc_jni::GetObjectClass(env, j_local_data_tracks);
-        jmethodID j_array_list_size = webrtc_jni::GetMethodID(env, j_array_list_class, "size",
-                                                              "()I");
-        jmethodID j_array_list_get = webrtc_jni::GetMethodID(env,
-                                                             j_array_list_class,
-                                                             "get",
-                                                             "(I)Ljava/lang/Object;");
+    if (!IsNull(env, j_local_data_tracks)) {
+        jclass j_array_list_class = GetObjectClass(env, j_local_data_tracks);
+        jmethodID j_array_list_size = webrtc::GetMethodID(env, j_array_list_class, "size",
+                                                          "()I");
+        jmethodID j_array_list_get = webrtc::GetMethodID(env,
+                                                         j_array_list_class,
+                                                         "get",
+                                                         "(I)Ljava/lang/Object;");
         const int size = env->CallIntMethod(j_local_data_tracks, j_array_list_size);
         CHECK_EXCEPTION(env) << "Failed to call size() on local data tracks list";
 
         for (int i = 0; i < size; i++) {
             jobject j_local_data_track = env->CallObjectMethod(j_local_data_tracks,
-                                                                j_array_list_get,
-                                                                i);
+                                                               j_array_list_get,
+                                                               i);
             CHECK_EXCEPTION(env) << "Failed to get local data track from list";
-            jclass j_local_data_track_class = webrtc_jni::GetObjectClass(env, j_local_data_track);
-            jmethodID j_get_track_hash = webrtc_jni::GetMethodID(env,
-                                                                 j_local_data_track_class,
-                                                                 "getNativeTrackHash",
-                                                                 "()Ljava/lang/String;");
+            jclass j_local_data_track_class = GetObjectClass(env, j_local_data_track);
+            jmethodID j_get_track_hash = webrtc::GetMethodID(env,
+                                                             j_local_data_track_class,
+                                                             "getNativeTrackHash",
+                                                             "()Ljava/lang/String;");
             jstring j_track_hash = (jstring) env->CallObjectMethod(j_local_data_track,
                                                                    j_get_track_hash);
             std::string track_hash = JavaToUTF8StdString(env, j_track_hash);
             CHECK_EXCEPTION(env) << "Failed to get local data track hash";
 
             // Add entry to map
-            local_data_track_map[track_hash] = webrtc_jni::NewGlobalRef(env, j_local_data_track);
+            local_data_track_map[track_hash] = webrtc::NewGlobalRef(env, j_local_data_track);
         }
     }
 
@@ -243,7 +244,7 @@ jobject createLocalAudioTrackPublications(JNIEnv *env,
 
         local_participant_context->local_audio_tracks_map.insert(
                 std::make_pair(local_audio_track_hash,
-                               webrtc_jni::NewGlobalRef(env, j_local_audio_track)));
+                               webrtc::NewGlobalRef(env, j_local_audio_track)));
         jobject j_local_audio_track_publication =
                 createJavaLocalAudioTrackPublication(env,
                                                      local_audio_track_publication,
@@ -283,7 +284,7 @@ jobject createLocalVideoTrackPublications(JNIEnv *env,
 
         local_participant_context->local_video_tracks_map.insert(
                 std::make_pair(local_video_track_hash,
-                               webrtc_jni::NewGlobalRef(env, j_local_video_track)));
+                               webrtc::NewGlobalRef(env, j_local_video_track)));
         jobject j_local_video_track_publication =
                 createJavaLocalVideoTrackPublication(env,
                                                      local_video_track_publication,
@@ -297,13 +298,13 @@ jobject createLocalVideoTrackPublications(JNIEnv *env,
 }
 
 jobject createLocalDataTrackPublications(JNIEnv *env,
-                                          LocalParticipantContext *local_participant_context,
-                                          jclass j_array_list_class,
-                                          jmethodID j_array_list_ctor_id,
-                                          jmethodID j_array_list_add,
-                                          jclass j_published_data_track_class,
-                                          jmethodID j_published_data_track_ctor_id,
-                                          jobject j_local_data_tracks) {
+                                         LocalParticipantContext *local_participant_context,
+                                         jclass j_array_list_class,
+                                         jmethodID j_array_list_ctor_id,
+                                         jmethodID j_array_list_add,
+                                         jclass j_published_data_track_class,
+                                         jmethodID j_published_data_track_ctor_id,
+                                         jobject j_local_data_tracks) {
     jobject j_published_data_tracks = env->NewObject(j_array_list_class, j_array_list_ctor_id);
     const std::vector<std::shared_ptr<twilio::media::LocalDataTrackPublication>> local_data_track_publications =
             local_participant_context->local_participant->getLocalDataTracks();
@@ -323,13 +324,13 @@ jobject createLocalDataTrackPublications(JNIEnv *env,
 
         local_participant_context->local_data_tracks_map.insert(
                 std::make_pair(local_data_track_hash,
-                               webrtc_jni::NewGlobalRef(env, j_local_data_track)));
+                               webrtc::NewGlobalRef(env, j_local_data_track)));
         jobject j_local_data_track_publication =
                 createJavaLocalDataTrackPublication(env,
-                                                     local_data_track_publication,
-                                                     j_local_data_track,
-                                                     j_published_data_track_class,
-                                                     j_published_data_track_ctor_id);
+                                                    local_data_track_publication,
+                                                    j_local_data_track,
+                                                    j_published_data_track_class,
+                                                    j_published_data_track_ctor_id);
         env->CallBooleanMethod(j_published_data_tracks, j_array_list_add, j_local_data_track_publication);
     }
 
@@ -383,7 +384,7 @@ jobject createJavaLocalParticipant(JNIEnv *env,
                                                                        j_local_data_tracks);
 
     // Create local participant
-    jlong j_local_participant_context = webrtc_jni::jlongFromPointer(local_participant_context);
+    jlong j_local_participant_context = webrtc::NativeToJavaPointer(local_participant_context);
     jobject j_local_participant = env->NewObject(j_local_participant_class,
                                                  j_local_participant_ctor_id,
                                                  j_local_participant_context,
@@ -416,7 +417,7 @@ JNIEXPORT bool JNICALL Java_com_twilio_video_LocalParticipant_nativePublishAudio
             getLocalAudioTrack(j_audio_track_handle);
     local_participant_context->local_audio_tracks_map.insert(
             std::make_pair(getLocalAudioTrackHash(audio_track),
-                           webrtc_jni::NewGlobalRef(jni, j_local_audio_track)));
+                           webrtc::NewGlobalRef(jni, j_local_audio_track)));
     return local_participant_context->local_participant->publishTrack(audio_track);
 }
 
@@ -431,7 +432,7 @@ JNIEXPORT bool JNICALL Java_com_twilio_video_LocalParticipant_nativePublishVideo
             getLocalVideoTrack(j_video_track_handle);
     local_participant_context->local_video_tracks_map.insert(
             std::make_pair(getLocalVideoTrackHash(video_track),
-                           webrtc_jni::NewGlobalRef(jni, j_local_video_track)));
+                           webrtc::NewGlobalRef(jni, j_local_video_track)));
     return local_participant_context->local_participant->publishTrack(video_track);
 }
 
@@ -446,7 +447,7 @@ JNIEXPORT bool JNICALL Java_com_twilio_video_LocalParticipant_nativePublishDataT
             getLocalDataTrack(j_data_track_handle);
     local_participant_context->local_data_tracks_map.insert(
             std::make_pair(getLocalDataTrackHash(data_track),
-                           webrtc_jni::NewGlobalRef(jni, j_local_data_track)));
+                           webrtc::NewGlobalRef(jni, j_local_data_track)));
     return local_participant_context->local_participant->publishTrack(data_track);
 }
 
@@ -467,7 +468,7 @@ JNIEXPORT bool JNICALL Java_com_twilio_video_LocalParticipant_nativeUnpublishAud
             getLocalAudioTrackHash(audio_track));
     jobject j_local_audio_track = it->second;
     local_participant_context->local_audio_tracks_map.erase(it);
-    webrtc_jni::DeleteGlobalRef(jni, j_local_audio_track);
+    webrtc::DeleteGlobalRef(jni, j_local_audio_track);
 
     return result;
 }
@@ -488,7 +489,7 @@ JNIEXPORT bool JNICALL Java_com_twilio_video_LocalParticipant_nativeUnpublishVid
             getLocalVideoTrackHash(video_track));
     jobject j_local_video_track = it->second;
     local_participant_context->local_video_tracks_map.erase(it);
-    webrtc_jni::DeleteGlobalRef(jni, j_local_video_track);
+    webrtc::DeleteGlobalRef(jni, j_local_video_track);
 
     return result;
 }
@@ -509,7 +510,7 @@ JNIEXPORT bool JNICALL Java_com_twilio_video_LocalParticipant_nativeUnpublishDat
             getLocalDataTrackHash(data_track));
     jobject j_local_video_track = it->second;
     local_participant_context->local_data_tracks_map.erase(it);
-    webrtc_jni::DeleteGlobalRef(jni, j_local_video_track);
+    webrtc::DeleteGlobalRef(jni, j_local_video_track);
 
     return result;
 }
@@ -520,9 +521,9 @@ JNIEXPORT void JNICALL Java_com_twilio_video_LocalParticipant_nativeSetEncodingP
                                                                                           jobject j_encoding_parameters) {
     LocalParticipantContext* local_participant_context =
             reinterpret_cast<LocalParticipantContext *>(j_local_participant_handle);
-    twilio::media::EncodingParameters encoding_parameters = webrtc_jni::IsNull(jni, j_encoding_parameters) ?
-            twilio::media::EncodingParameters() :
-            getEncodingParameters(jni, j_encoding_parameters);
+    twilio::media::EncodingParameters encoding_parameters = IsNull(jni, j_encoding_parameters) ?
+                                                            twilio::media::EncodingParameters() :
+                                                            getEncodingParameters(jni, j_encoding_parameters);
 
     // Set encoding parameters on native local participant
     local_participant_context->local_participant->setEncodingParameters(encoding_parameters);
@@ -532,7 +533,7 @@ JNIEXPORT void JNICALL Java_com_twilio_video_LocalParticipant_nativeRelease(JNIE
                                                                             jobject j_local_participant,
                                                                             jlong j_local_participant_handle) {
     LocalParticipantContext* local_participant_context =
-        reinterpret_cast<LocalParticipantContext *>(j_local_participant_handle);
+            reinterpret_cast<LocalParticipantContext *>(j_local_participant_handle);
 
     // Delete the local participant observer
     local_participant_context->android_local_participant_observer->setObserverDeleted();
@@ -541,21 +542,21 @@ JNIEXPORT void JNICALL Java_com_twilio_video_LocalParticipant_nativeRelease(JNIE
     // Delete all remaining global references to LocalAudioTracks
     for (auto it = local_participant_context->local_audio_tracks_map.begin() ;
          it != local_participant_context->local_audio_tracks_map.end() ; it++) {
-        webrtc_jni::DeleteGlobalRef(jni, it->second);
+        webrtc::DeleteGlobalRef(jni, it->second);
     }
     local_participant_context->local_audio_tracks_map.clear();
 
     // Delete all remaining global references to LocalVideoTracks
     for (auto it = local_participant_context->local_video_tracks_map.begin() ;
          it != local_participant_context->local_video_tracks_map.end() ; it++) {
-        webrtc_jni::DeleteGlobalRef(jni, it->second);
+        webrtc::DeleteGlobalRef(jni, it->second);
     }
     local_participant_context->local_video_tracks_map.clear();
 
     // Delete all remaining global references to LocalDataTracks
     for (auto it = local_participant_context->local_data_tracks_map.begin() ;
          it != local_participant_context->local_data_tracks_map.end() ; it++) {
-        webrtc_jni::DeleteGlobalRef(jni, it->second);
+        webrtc::DeleteGlobalRef(jni, it->second);
     }
     local_participant_context->local_data_tracks_map.clear();
 

@@ -38,6 +38,7 @@ public class LocalAudioTrack extends AudioTrack {
      * @param enabled initial state of audio track.
      * @return local audio track if successfully added or null if audio track could not be created.
      */
+    @Nullable
     public static LocalAudioTrack create(@NonNull Context context, boolean enabled) {
         return create(context, enabled, null, null);
     }
@@ -51,6 +52,7 @@ public class LocalAudioTrack extends AudioTrack {
      * @param audioOptions audio options to be applied to the track.
      * @return local audio track if successfully added or null if audio track could not be created.
      */
+    @Nullable
     public static LocalAudioTrack create(
             @NonNull Context context, boolean enabled, @Nullable AudioOptions audioOptions) {
         return create(context, enabled, audioOptions, null);
@@ -65,6 +67,7 @@ public class LocalAudioTrack extends AudioTrack {
      * @param name audio track name.
      * @return local audio track if successfully added or null if audio track could not be created.
      */
+    @Nullable
     public static LocalAudioTrack create(
             @NonNull Context context, boolean enabled, @Nullable String name) {
         return create(context, enabled, null, name);
@@ -80,6 +83,7 @@ public class LocalAudioTrack extends AudioTrack {
      * @param name audio track name.
      * @return local audio track if successfully added or null if audio track could not be created.
      */
+    @Nullable
     public static LocalAudioTrack create(
             @NonNull Context context,
             boolean enabled,

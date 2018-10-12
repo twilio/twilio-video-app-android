@@ -18,11 +18,7 @@
 #define VIDEO_ANDROID_COM_TWILIO_VIDEO_ENCODINGPARAMETERS_H_
 
 #include <jni.h>
-#include "media/codec.h"
-
-#ifdef __cplusplus
-extern "C" {
-#endif
+#include "twilio/media/codec.h"
 
 namespace twilio_video_jni {
 
@@ -30,9 +26,5 @@ twilio::media::EncodingParameters getEncodingParameters(JNIEnv *env,
                                                         jobject j_encoding_parameters);
 
 }
-
-#ifdef __cplusplus
-}
-#endif
 
 #endif // VIDEO_ANDROID_COM_TWILIO_VIDEO_ENCODINGPARAMETERS_H_

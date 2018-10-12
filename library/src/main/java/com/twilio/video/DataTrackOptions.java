@@ -16,7 +16,7 @@
 
 package com.twilio.video;
 
-import android.support.annotation.Nullable;
+import android.support.annotation.NonNull;
 
 /** Represents options when creating {@link LocalDataTrack}s. */
 public class DataTrackOptions {
@@ -27,6 +27,7 @@ public class DataTrackOptions {
     public static final int DEFAULT_MAX_RETRANSMITS = -1;
 
     /** Default data track options. */
+    @NonNull
     public static final DataTrackOptions DEFAULT_DATA_TRACK_OPTIONS =
             new Builder()
                     .ordered(true)
@@ -60,25 +61,29 @@ public class DataTrackOptions {
         public Builder() {}
 
         /** Ordered transmission of messages. Default is {@code true}. */
+        @NonNull
         public Builder ordered(boolean ordered) {
             this.ordered = ordered;
             return this;
         }
 
         /** Maximum retransmit time in milliseconds. */
+        @NonNull
         public Builder maxPacketLifeTime(int maxPacketLifeTime) {
             this.maxPacketLifeTime = maxPacketLifeTime;
             return this;
         }
 
         /** Maximum number of retransmitted messages. */
+        @NonNull
         public Builder maxRetransmits(int maxRetransmits) {
             this.maxRetransmits = maxRetransmits;
             return this;
         }
 
         /** Data track name. */
-        public Builder name(@Nullable String name) {
+        @NonNull
+        public Builder name(@NonNull String name) {
             this.name = name;
             return this;
         }
@@ -90,6 +95,7 @@ public class DataTrackOptions {
          * one of these values can be set to a non default value at a time otherwise a {@link
          * IllegalStateException} occurs.
          */
+        @NonNull
         public DataTrackOptions build() {
             Preconditions.checkArgument(maxPacketLifeTime >= DEFAULT_MAX_PACKET_LIFE_TIME);
             Preconditions.checkArgument(maxPacketLifeTime <= 65535);

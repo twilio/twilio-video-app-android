@@ -54,6 +54,7 @@ public class LocalVideoTrack extends VideoTrack {
      * @param videoCapturer capturer that provides video frames.
      * @return local video track if successfully added or null if video track could not be created.
      */
+    @Nullable
     public static LocalVideoTrack create(
             @NonNull Context context, boolean enabled, @NonNull VideoCapturer videoCapturer) {
         return create(context, enabled, videoCapturer, null, null);
@@ -90,6 +91,7 @@ public class LocalVideoTrack extends VideoTrack {
      * @param videoConstraints constraints to be applied on video track.
      * @return local video track if successfully added or null if video track could not be created.
      */
+    @Nullable
     public static LocalVideoTrack create(
             @NonNull Context context,
             boolean enabled,
@@ -110,6 +112,7 @@ public class LocalVideoTrack extends VideoTrack {
      * @param name video track name.
      * @return local video track if successfully added or null if video track could not be created.
      */
+    @Nullable
     public static LocalVideoTrack create(
             @NonNull Context context,
             boolean enabled,
@@ -149,6 +152,7 @@ public class LocalVideoTrack extends VideoTrack {
      * @param name video track name.
      * @return local video track if successfully added or null if video track could not be created.
      */
+    @Nullable
     public static LocalVideoTrack create(
             @NonNull Context context,
             boolean enabled,
@@ -184,6 +188,7 @@ public class LocalVideoTrack extends VideoTrack {
     }
 
     /** Retrieves the {@link VideoCapturer} associated with this video track. */
+    @NonNull
     public VideoCapturer getVideoCapturer() {
         return videoCapturer;
     }
@@ -191,9 +196,12 @@ public class LocalVideoTrack extends VideoTrack {
     /**
      * Retrieves the video constraints associated with this track.
      *
+     * <p>
+     *
      * <p>If you do not provide any video constraints, the default video constraints are set to a
      * maximum video dimension size of 640x480 at a frame rate of 30 frames per second.
      */
+    @NonNull
     public VideoConstraints getVideoConstraints() {
         return videoConstraints;
     }

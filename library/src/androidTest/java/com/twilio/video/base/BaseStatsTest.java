@@ -30,7 +30,6 @@ import com.twilio.video.IceOptions;
 import com.twilio.video.LocalAudioTrack;
 import com.twilio.video.LocalVideoTrack;
 import com.twilio.video.Room;
-import com.twilio.video.RoomState;
 import com.twilio.video.TestUtils;
 import com.twilio.video.Video;
 import com.twilio.video.VideoCodec;
@@ -180,7 +179,7 @@ public abstract class BaseStatsTest extends BaseVideoTest {
     }
 
     protected void roomTearDown(Room room) throws InterruptedException {
-        if (room != null && room.getState() != RoomState.DISCONNECTED) {
+        if (room != null && room.getState() != Room.State.DISCONNECTED) {
             CallbackHelper.FakeRoomListener roomListener = new CallbackHelper.FakeRoomListener();
             roomListener.onDisconnectedLatch = new CountDownLatch(1);
             room.disconnect();

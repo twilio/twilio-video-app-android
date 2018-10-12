@@ -20,16 +20,17 @@
 #ifndef VIDEO_ANDROID_COM_TWILIO_VIDEO_VIDEOCAPTURERDELEGATE_H_
 #define VIDEO_ANDROID_COM_TWILIO_VIDEO_VIDEOCAPTURERDELEGATE_H_
 
-#include "webrtc/base/refcount.h"
+#include "webrtc/rtc_base/refcount.h"
 #include "android_video_capturer.h"
-#include "webrtc/sdk/android/src/jni/native_handle_impl.h"
 #include "webrtc/sdk/android/src/jni/jni_helpers.h"
-#include "webrtc/base/asyncinvoker.h"
-#include "webrtc/base/constructormagic.h"
-#include "webrtc/base/criticalsection.h"
-#include "webrtc/base/thread_checker.h"
+#include "webrtc/rtc_base/asyncinvoker.h"
+#include "webrtc/rtc_base/constructormagic.h"
+#include "webrtc/rtc_base/criticalsection.h"
+#include "webrtc/rtc_base/thread_checker.h"
 #include "webrtc/common_video/include/i420_buffer_pool.h"
-#include "webrtc/sdk/android/src/jni/surfacetexturehelper_jni.h"
+#include "webrtc/sdk/android/src/jni/videoframe.h"
+#include "webrtc/sdk/android/src/jni/surfacetexturehelper.h"
+#include "webrtc/base/thread_annotations.h"
 
 
 
@@ -70,7 +71,14 @@ public:
                         int height,
                         int rotation,
                         int64_t timestamp_ns,
-                        const webrtc_jni::NativeHandleImpl &handle);
+                        const webrtc::jni::NativeHandleImpl &handle);
+
+    void OnFrameCaptured(JNIEnv* jni,
+                         int width,
+                         int height,
+                         int64_t timestamp_ns,
+                         webrtc::VideoRotation rotation,
+                         const webrtc::JavaRef<jobject>& j_video_frame_buffer);
 
     void OnOutputFormatRequest(int width, int height, int fps);
 
@@ -94,17 +102,18 @@ public:
             void (AndroidVideoCapturer::*method)(Args...),
             typename Identity<Args>::type... args);
 
-    const webrtc_jni::ScopedGlobalRef<jobject> j_video_capturer_;
-    const webrtc_jni::ScopedGlobalRef<jclass> j_video_capturer_class_;
-    const webrtc_jni::ScopedGlobalRef<jclass> j_observer_class_;
+    const webrtc::ScopedJavaGlobalRef<jobject> j_video_capturer_;
+    const webrtc::ScopedJavaGlobalRef<jclass> j_video_capturer_class_;
+    const webrtc::ScopedJavaGlobalRef<jclass> j_observer_class_;
     const bool is_screencast_;
 
     // Used on the Java thread running the camera.
     webrtc::I420BufferPool pre_scale_pool_;
     webrtc::I420BufferPool pre_rotate_pool_;
     webrtc::I420BufferPool post_scale_pool_;
-    rtc::scoped_refptr<webrtc_jni::SurfaceTextureHelper> surface_texture_helper_;
+    rtc::scoped_refptr<webrtc::jni::SurfaceTextureHelper> surface_texture_helper_;
     rtc::ThreadChecker thread_checker_;
+    rtc::TimestampAligner timestamp_aligner_;
 
     /*
      * |capturer| is a guaranteed to be a valid pointer between a call to
@@ -130,31 +139,42 @@ extern "C" {
 
 JNIEXPORT void JNICALL
 Java_com_twilio_video_VideoCapturerDelegate_00024NativeObserver_nativeCapturerStarted(JNIEnv *env,
-                                                                                 jobject instance,
-                                                                                 jlong nativeCapturer,
-                                                                                 jboolean success);
+                                                                                      jobject instance,
+                                                                                      jlong nativeCapturer,
+                                                                                      jboolean success);
 
 JNIEXPORT void JNICALL
 Java_com_twilio_video_VideoCapturerDelegate_00024NativeObserver_nativeOnByteBufferFrameCaptured(JNIEnv *env,
-                                                                                           jobject instance,
-                                                                                           jlong nativeCapturer,
-                                                                                           jbyteArray data_,
-                                                                                           jint length,
-                                                                                           jint width,
-                                                                                           jint height,
-                                                                                           jint rotation,
-                                                                                           jlong timeStamp);
+                                                                                                jobject instance,
+                                                                                                jlong nativeCapturer,
+                                                                                                jbyteArray data_,
+                                                                                                jint length,
+                                                                                                jint width,
+                                                                                                jint height,
+                                                                                                jint rotation,
+                                                                                                jlong timeStamp);
 
 JNIEXPORT void JNICALL
 Java_com_twilio_video_VideoCapturerDelegate_00024NativeObserver_nativeOnTextureFrameCaptured(JNIEnv *env,
-                                                                                        jobject instance,
-                                                                                        jlong nativeCapturer,
-                                                                                        jint width,
-                                                                                        jint height,
-                                                                                        jint oesTextureId,
-                                                                                        jfloatArray transformMatrix_,
-                                                                                        jint rotation,
-                                                                                        jlong timestamp);
+                                                                                             jobject instance,
+                                                                                             jlong nativeCapturer,
+                                                                                             jint width,
+                                                                                             jint height,
+                                                                                             jint oesTextureId,
+                                                                                             jfloatArray transformMatrix_,
+                                                                                             jint rotation,
+                                                                                             jlong timestamp);
+
+JNIEXPORT void JNICALL
+Java_com_twilio_video_VideoCapturerDelegate_00024NativeObserver_nativeOnFrameCaptured(JNIEnv *env,
+                                                                                      jobject instance,
+                                                                                      jlong native_capturer,
+                                                                                      jint width,
+                                                                                      jint height,
+                                                                                      jlong timestamp_ns,
+                                                                                      jint rotation,
+                                                                                      jobject j_video_frame_buffer);
+
 #ifdef __cplusplus
 }
 #endif

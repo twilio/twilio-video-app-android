@@ -18,6 +18,7 @@
 #include "webrtc/sdk/android/src/jni/jni_helpers.h"
 #include "class_reference_holder.h"
 #include "jni_utils.h"
+#include "webrtc/modules/utility/include/helpers_android.h"
 
 namespace twilio_video_jni {
 
@@ -45,13 +46,13 @@ std::string getLocalAudioTrackHash(std::shared_ptr<twilio::media::LocalAudioTrac
 
 jobject createJavaLocalAudioTrack(jobject j_context,
                                   std::shared_ptr<twilio::media::LocalAudioTrack> local_audio_track) {
-    JNIEnv *jni = webrtc_jni::GetEnv();
+    JNIEnv *jni = webrtc::jni::GetEnv();
     jclass j_local_audio_track_class = twilio_video_jni::FindClass(jni,
                                                                    "com/twilio/video/LocalAudioTrack");
-    jmethodID j_local_audio_track_ctor_id = webrtc_jni::GetMethodID(jni,
-                                                                    j_local_audio_track_class,
-                                                                    "<init>",
-                                                                    kLocalAudioTrackConstructorSignature);
+    jmethodID j_local_audio_track_ctor_id = webrtc::GetMethodID(jni,
+                                                                j_local_audio_track_class,
+                                                                "<init>",
+                                                                kLocalAudioTrackConstructorSignature);
     LocalAudioTrackContext* local_audio_track_context =
             new LocalAudioTrackContext(local_audio_track);
     jstring j_name = JavaUTF16StringFromStdString(jni, local_audio_track->getName());
@@ -59,7 +60,7 @@ jobject createJavaLocalAudioTrack(jobject j_context,
                                                         getLocalAudioTrackHash(local_audio_track));
     jobject j_local_audio_track = jni->NewObject(j_local_audio_track_class,
                                                  j_local_audio_track_ctor_id,
-                                                 webrtc_jni::jlongFromPointer(local_audio_track_context),
+                                                 webrtc::NativeToJavaPointer(local_audio_track_context),
                                                  j_track_hash,
                                                  j_name,
                                                  local_audio_track->isEnabled(),

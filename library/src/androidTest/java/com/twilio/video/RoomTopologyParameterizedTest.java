@@ -32,6 +32,7 @@ import android.support.test.rule.ActivityTestRule;
 import android.support.test.rule.GrantPermissionRule;
 import com.twilio.video.base.BaseVideoTest;
 import com.twilio.video.helper.CallbackHelper;
+import com.twilio.video.twilioapi.model.VideoRoom;
 import com.twilio.video.ui.MediaTestActivity;
 import com.twilio.video.util.Constants;
 import com.twilio.video.util.CredentialsUtils;
@@ -100,7 +101,7 @@ public class RoomTopologyParameterizedTest extends BaseVideoTest {
 
     @After
     public void teardown() throws InterruptedException {
-        if (room != null && room.getState() != RoomState.DISCONNECTED) {
+        if (room != null && room.getState() != Room.State.DISCONNECTED) {
             roomListener.onDisconnectedLatch = new CountDownLatch(1);
             room.disconnect();
             assertTrue(roomListener.onDisconnectedLatch.await(20, TimeUnit.SECONDS));
@@ -176,11 +177,11 @@ public class RoomTopologyParameterizedTest extends BaseVideoTest {
 
             room = Video.connect(mediaTestActivity, connectOptions, roomListener);
             assertTrue(roomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
-            assertEquals(RoomState.CONNECTED, room.getState());
+            assertEquals(Room.State.CONNECTED, room.getState());
 
             room.disconnect();
             assertTrue(roomListener.onDisconnectedLatch.await(20, TimeUnit.SECONDS));
-            assertEquals(RoomState.DISCONNECTED, room.getState());
+            assertEquals(Room.State.DISCONNECTED, room.getState());
 
             Thread.sleep(1000);
         }
@@ -334,5 +335,35 @@ public class RoomTopologyParameterizedTest extends BaseVideoTest {
 
         // First bobRemoteParticipant should get disconnected
         assertTrue(disconnectedLatch.await(10, TimeUnit.SECONDS));
+    }
+
+    @Test
+    public void shouldReceiveDisconnectedCallbackWhenCompleted() throws InterruptedException {
+        roomListener.onConnectedLatch = new CountDownLatch(1);
+        roomListener.onDisconnectedLatch = new CountDownLatch(1);
+
+        // Connect to room
+        IceOptions iceOptions =
+                new IceOptions.Builder()
+                        .iceServersTimeout(ICE_TIMEOUT)
+                        .abortOnIceServersTimeout(true)
+                        .build();
+        ConnectOptions connectOptions =
+                new ConnectOptions.Builder(token).roomName(roomName).iceOptions(iceOptions).build();
+        room = Video.connect(mediaTestActivity, connectOptions, roomListener);
+        assertTrue(roomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
+
+        // Complete room via REST API
+        VideoRoom videoRoom = RoomUtils.completeRoom(room);
+
+        // Validate status is completed
+        assertEquals("completed", videoRoom.getStatus());
+
+        // Validate disconnected callback is received
+        assertTrue(roomListener.onDisconnectedLatch.await(20, TimeUnit.SECONDS));
+        // Validate we receive a distinct error code when the room is completed
+        assertEquals(
+                roomListener.getTwilioException().getCode(),
+                TwilioException.ROOM_ROOM_COMPLETED_EXCEPTION);
     }
 }

@@ -16,13 +16,15 @@
 
 package com.twilio.video;
 
+import android.support.annotation.NonNull;
+
 /**
  * Lossy audio coding format.
  *
  * @see <a href="https://en.wikipedia.org/wiki/Opus_(audio_format)">Opus</a>
  */
 public class OpusCodec extends AudioCodec {
-    public static final String NAME = "OPUS";
+    @NonNull public static final String NAME = "OPUS";
 
     public OpusCodec() {
         super(NAME);

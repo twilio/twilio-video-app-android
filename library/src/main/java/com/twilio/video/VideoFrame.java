@@ -16,6 +16,7 @@
 
 package com.twilio.video;
 
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 /** Represents a video frame provided by a {@link CameraCapturer}. */
@@ -53,8 +54,7 @@ public class VideoFrame {
         }
     }
 
-    final Integer textureId;
-    final float[] transformMatrix;
+    final org.webrtc.VideoFrame webRtcVideoFrame;
 
     /** The bytes of a frame. */
     public final byte[] imageBuffer;
@@ -67,36 +67,31 @@ public class VideoFrame {
 
     public VideoFrame(
             byte[] imageBuffer,
-            VideoDimensions dimensions,
-            RotationAngle orientation,
+            @NonNull VideoDimensions dimensions,
+            @NonNull RotationAngle orientation,
             long timestamp) {
-        this(imageBuffer, null, null, dimensions, orientation, timestamp);
+        this(imageBuffer, null, dimensions, orientation, timestamp);
     }
 
     /*
-     * This constructor is currently only used by CameraCapturer for frames captured to a texture.
-     * We will make this constructor public when we support capturing to a texture as part of the
-     * VideoCapturer API.
+     * This constructor is currently only used by Twilio capturers because they wrap
+     * WebRTC capturers which have access to org.webrtc.VideoFrame.
      */
     VideoFrame(
-            int textureId,
-            float[] transformMatrix,
-            VideoDimensions dimensions,
-            RotationAngle orientation,
-            long timestamp) {
-        this(null, textureId, transformMatrix, dimensions, orientation, timestamp);
+            org.webrtc.VideoFrame webRtcVideoFrame,
+            @NonNull VideoDimensions dimensions,
+            @NonNull RotationAngle orientation) {
+        this(null, webRtcVideoFrame, dimensions, orientation, webRtcVideoFrame.getTimestampNs());
     }
 
     private VideoFrame(
             @Nullable byte[] imageBuffer,
-            @Nullable Integer textureId,
-            @Nullable float[] transformMatrix,
-            VideoDimensions dimensions,
-            RotationAngle orientation,
+            @Nullable org.webrtc.VideoFrame webRtcVideoFrame,
+            @NonNull VideoDimensions dimensions,
+            @NonNull RotationAngle orientation,
             long timestamp) {
         this.imageBuffer = imageBuffer;
-        this.textureId = textureId;
-        this.transformMatrix = transformMatrix;
+        this.webRtcVideoFrame = webRtcVideoFrame;
         this.dimensions = dimensions;
         this.orientation = orientation;
         this.timestamp = timestamp;

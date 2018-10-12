@@ -34,7 +34,6 @@ import com.twilio.video.LocalParticipant;
 import com.twilio.video.LocalVideoTrack;
 import com.twilio.video.RemoteParticipant;
 import com.twilio.video.Room;
-import com.twilio.video.RoomState;
 import com.twilio.video.Video;
 import com.twilio.video.helper.CallbackHelper;
 import com.twilio.video.ui.MediaTestActivity;
@@ -106,7 +105,7 @@ public abstract class BaseParticipantTest extends BaseVideoTest {
 
     protected void disconnect(Room room, CallbackHelper.FakeRoomListener roomListener)
             throws InterruptedException {
-        if (room == null || room.getState() == RoomState.DISCONNECTED) {
+        if (room == null || room.getState() == Room.State.DISCONNECTED) {
             return;
         }
         roomListener.onDisconnectedLatch = new CountDownLatch(1);

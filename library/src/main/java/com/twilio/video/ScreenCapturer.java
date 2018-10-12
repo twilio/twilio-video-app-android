@@ -78,13 +78,9 @@ public class ScreenCapturer implements VideoCapturer {
                     if (!success) {
                         if (screenCapturerListener != null) {
                             listenerHandler.post(
-                                    new Runnable() {
-                                        @Override
-                                        public void run() {
+                                    () ->
                                             screenCapturerListener.onScreenCaptureError(
-                                                    "Failed to start screen capturer");
-                                        }
-                                    });
+                                                    "Failed to start screen capturer"));
                         }
                     }
                     capturerListener.onCapturerStarted(success);
@@ -96,41 +92,21 @@ public class ScreenCapturer implements VideoCapturer {
                 }
 
                 @Override
-                public void onByteBufferFrameCaptured(
-                        byte[] data, int width, int height, int rotation, long timeStamp) {
-                    // Not used in screen capturer
-                }
-
-                @Override
-                public void onTextureFrameCaptured(
-                        int width,
-                        int height,
-                        int oesTextureId,
-                        float[] transformMatrix,
-                        int rotation,
-                        long timestamp) {
+                public void onFrameCaptured(org.webrtc.VideoFrame videoFrame) {
                     if (!firstFrameReported) {
                         if (screenCapturerListener != null) {
-                            listenerHandler.post(
-                                    new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            screenCapturerListener.onFirstFrameAvailable();
-                                        }
-                                    });
+                            listenerHandler.post(screenCapturerListener::onFirstFrameAvailable);
                         }
                         firstFrameReported = true;
                     }
-                    VideoDimensions frameDimensions = new VideoDimensions(width, height);
-                    VideoFrame frame =
-                            new VideoFrame(
-                                    oesTextureId,
-                                    transformMatrix,
-                                    frameDimensions,
-                                    VideoFrame.RotationAngle.fromInt(rotation),
-                                    timestamp);
+                    org.webrtc.VideoFrame.Buffer buffer = videoFrame.getBuffer();
+                    VideoDimensions dimensions =
+                            new VideoDimensions(buffer.getWidth(), buffer.getHeight());
+                    VideoFrame.RotationAngle orientation =
+                            VideoFrame.RotationAngle.fromInt(videoFrame.getRotation());
 
-                    capturerListener.onFrameCaptured(frame);
+                    capturerListener.onFrameCaptured(
+                            new VideoFrame(videoFrame, dimensions, orientation));
                 }
             };
 
@@ -212,13 +188,9 @@ public class ScreenCapturer implements VideoCapturer {
         if (screenCaptureIntentResult != Activity.RESULT_OK) {
             if (screenCapturerListener != null) {
                 listenerHandler.post(
-                        new Runnable() {
-                            @Override
-                            public void run() {
+                        () ->
                                 screenCapturerListener.onScreenCaptureError(
-                                        "MediaProjection permissions must be granted to start ScreenCapturer");
-                            }
-                        });
+                                        "MediaProjection permissions must be granted to start ScreenCapturer"));
             }
             capturerListener.onCapturerStarted(false);
             return;

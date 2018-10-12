@@ -87,6 +87,7 @@ public abstract class Video {
      * @param roomListener listener of room related events.
      * @return room being connected to.
      */
+    @NonNull
     public static synchronized Room connect(
             @NonNull Context context,
             @NonNull ConnectOptions connectOptions,
@@ -200,6 +201,7 @@ public abstract class Video {
      *
      * @return the version of the SDK
      */
+    @NonNull
     public static String getVersion() {
         return BuildConfig.VERSION_NAME;
     }
@@ -209,6 +211,7 @@ public abstract class Video {
      *
      * @return the logging level
      */
+    @NonNull
     public static LogLevel getLogLevel() {
         return LogLevel.values()[tryGetCoreLogLevel()];
     }

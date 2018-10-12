@@ -18,27 +18,28 @@
 
 #include "webrtc/sdk/android/src/jni/jni_helpers.h"
 
-#include "video/video.h"
+#include "twilio/video/video.h"
 #include "jni_utils.h"
+#include "webrtc/modules/utility/include/helpers_android.h"
 
 namespace twilio_video_jni {
 
 twilio::media::IceOptions IceOptions::getIceOptions(JNIEnv *env, jobject j_ice_options) {
-    jclass j_ice_options_class = webrtc_jni::GetObjectClass(env, j_ice_options);
+    jclass j_ice_options_class = GetObjectClass(env, j_ice_options);
     jmethodID j_get_ice_servers_array_id =
-        webrtc_jni::GetMethodID(env, j_ice_options_class,
+            webrtc::GetMethodID(env, j_ice_options_class,
                                 "getIceServersArray", "()[Lcom/twilio/video/IceServer;");
     jmethodID j_get_ice_transport_policy_id =
-        webrtc_jni::GetMethodID(env, j_ice_options_class,
+            webrtc::GetMethodID(env, j_ice_options_class,
                                 "getIceTransportPolicy", "()Lcom/twilio/video/IceTransportPolicy;");
     jmethodID j_get_abort_on_ice_servers_timeout_id =
-            webrtc_jni::GetMethodID(env, j_ice_options_class,
+            webrtc::GetMethodID(env, j_ice_options_class,
                                 "getAbortOnIceServersTimeout", "()Z");
     jmethodID j_get_ice_servers_timeout_id =
-            webrtc_jni::GetMethodID(env, j_ice_options_class,
+            webrtc::GetMethodID(env, j_ice_options_class,
                                     "getIceServersTimeout", "()J");
     jobjectArray j_ice_servers =
-        (jobjectArray) env->CallObjectMethod(j_ice_options, j_get_ice_servers_array_id);
+            (jobjectArray) env->CallObjectMethod(j_ice_options, j_get_ice_servers_array_id);
     jobject j_ice_trans_policy =
         env->CallObjectMethod(j_ice_options, j_get_ice_transport_policy_id);
     jboolean j_abort_on_ice_servers =
@@ -48,7 +49,7 @@ twilio::media::IceOptions IceOptions::getIceOptions(JNIEnv *env, jobject j_ice_o
 
     twilio::media::IceOptions ice_options;
     twilio::media::IceServers ice_servers;
-    if (!webrtc_jni::IsNull(env, j_ice_servers)) {
+    if (!IsNull(env, j_ice_servers)) {
         int size = env->GetArrayLength(j_ice_servers);
         if (size != 0) {
             // Adding IceServers
@@ -72,14 +73,14 @@ twilio::media::IceOptions IceOptions::getIceOptions(JNIEnv *env, jobject j_ice_o
                 urls.push_back(server_url);
                 ice_server.urls = urls;
 
-                if (!webrtc_jni::IsNull(env, j_username)) {
+                if (!IsNull(env, j_username)) {
                     std::string username  = JavaToUTF8StdString(env, j_username);
                     if (username.length() > 0) {
                         ice_server.username = username;
                     }
                 }
 
-                if (!webrtc_jni::IsNull(env, j_password)) {
+                if (!IsNull(env, j_password)) {
                     std::string password  = JavaToUTF8StdString(env, j_password);
                     if (password.length() > 0) {
                         ice_server.password = password;
@@ -95,7 +96,7 @@ twilio::media::IceOptions IceOptions::getIceOptions(JNIEnv *env, jobject j_ice_o
         ice_options.ice_servers_timeout = std::chrono::milliseconds(timeout);
     }
 
-    if (!webrtc_jni::IsNull(env, j_ice_trans_policy)) {
+    if (!IsNull(env, j_ice_trans_policy)) {
         jclass ice_policy_class = env->GetObjectClass(j_ice_trans_policy);
         jmethodID name_id = env->GetMethodID(ice_policy_class, "name", "()Ljava/lang/String;");
         jstring j_ice_policy = (jstring)env->CallObjectMethod(j_ice_trans_policy, name_id);
@@ -103,10 +104,10 @@ twilio::media::IceOptions IceOptions::getIceOptions(JNIEnv *env, jobject j_ice_o
 
         if (ice_policy.compare("ICE_TRANSPORT_POLICY_RELAY") == 0) {
             ice_options.ice_transport_policy =
-                twilio::media::IceTransportPolicy::kIceTransportPolicyRelay;
+                    twilio::media::IceTransportPolicy::kIceTransportPolicyRelay;
         } else {
             ice_options.ice_transport_policy =
-                twilio::media::IceTransportPolicy::kIceTransportPolicyAll;
+                    twilio::media::IceTransportPolicy::kIceTransportPolicyAll;
         }
     }
     return ice_options;

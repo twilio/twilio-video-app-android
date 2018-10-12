@@ -16,13 +16,15 @@
 
 package com.twilio.video;
 
+import android.support.annotation.NonNull;
+
 /**
  * ITU-T standard 7 kHz Wideband audio codec.
  *
  * @see <a href="https://en.wikipedia.org/wiki/G.722">G.722</a>
  */
 public class G722Codec extends AudioCodec {
-    public static final String NAME = "G722";
+    @NonNull public static final String NAME = "G722";
 
     public G722Codec() {
         super(NAME);

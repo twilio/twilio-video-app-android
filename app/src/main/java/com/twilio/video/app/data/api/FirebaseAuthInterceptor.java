@@ -16,11 +16,8 @@
 
 package com.twilio.video.app.data.api;
 
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.auth.GetTokenResult;
 import java.io.IOException;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
@@ -60,20 +57,14 @@ public class FirebaseAuthInterceptor implements Interceptor {
         firebaseUser
                 .getIdToken(true)
                 .addOnSuccessListener(
-                        new OnSuccessListener<GetTokenResult>() {
-                            @Override
-                            public void onSuccess(GetTokenResult getTokenResult) {
-                                tokenBuffer.append(getTokenResult.getToken());
-                                tokenRequestComplete.countDown();
-                            }
+                        getTokenResult -> {
+                            tokenBuffer.append(getTokenResult.getToken());
+                            tokenRequestComplete.countDown();
                         })
                 .addOnFailureListener(
-                        new OnFailureListener() {
-                            @Override
-                            public void onFailure(@android.support.annotation.NonNull Exception e) {
-                                Timber.e(e, FIREBASE_TOKEN_TASK_FAILED);
-                                tokenRequestComplete.countDown();
-                            }
+                        e -> {
+                            Timber.e(e, FIREBASE_TOKEN_TASK_FAILED);
+                            tokenRequestComplete.countDown();
                         });
 
         try {

@@ -69,19 +69,16 @@ public class RemoteParticipant implements Participant {
                             remoteAudioTrackPublication,
                             "onAudioTrackPublished");
                     handler.post(
-                            new Runnable() {
-                                @Override
-                                public void run() {
-                                    ThreadChecker.checkIsValidThread(handler);
-                                    logger.d("onAudioTrackPublished");
-                                    audioTrackPublications.add(remoteAudioTrackPublication);
-                                    remoteAudioTrackPublications.add(remoteAudioTrackPublication);
-                                    Listener listener = listenerReference.get();
+                            () -> {
+                                ThreadChecker.checkIsValidThread(handler);
+                                logger.d("onAudioTrackPublished");
+                                audioTrackPublications.add(remoteAudioTrackPublication);
+                                remoteAudioTrackPublications.add(remoteAudioTrackPublication);
+                                Listener listener = listenerReference.get();
 
-                                    if (listener != null) {
-                                        listener.onAudioTrackPublished(
-                                                remoteParticipant, remoteAudioTrackPublication);
-                                    }
+                                if (listener != null) {
+                                    listener.onAudioTrackPublished(
+                                            remoteParticipant, remoteAudioTrackPublication);
                                 }
                             });
                 }
@@ -95,20 +92,16 @@ public class RemoteParticipant implements Participant {
                             remoteAudioTrackPublication,
                             "onAudioTrackUnpublished");
                     handler.post(
-                            new Runnable() {
-                                @Override
-                                public void run() {
-                                    ThreadChecker.checkIsValidThread(handler);
-                                    logger.d("onAudioTrackUnpublished");
-                                    audioTrackPublications.remove(remoteAudioTrackPublication);
-                                    remoteAudioTrackPublications.remove(
-                                            remoteAudioTrackPublication);
-                                    Listener listener = listenerReference.get();
+                            () -> {
+                                ThreadChecker.checkIsValidThread(handler);
+                                logger.d("onAudioTrackUnpublished");
+                                audioTrackPublications.remove(remoteAudioTrackPublication);
+                                remoteAudioTrackPublications.remove(remoteAudioTrackPublication);
+                                Listener listener = listenerReference.get();
 
-                                    if (listener != null) {
-                                        listener.onAudioTrackUnpublished(
-                                                remoteParticipant, remoteAudioTrackPublication);
-                                    }
+                                if (listener != null) {
+                                    listener.onAudioTrackUnpublished(
+                                            remoteParticipant, remoteAudioTrackPublication);
                                 }
                             });
                 }
@@ -123,22 +116,18 @@ public class RemoteParticipant implements Participant {
                             remoteAudioTrackPublication,
                             "onAudioTrackSubscribed");
                     handler.post(
-                            new Runnable() {
-                                @Override
-                                public void run() {
-                                    ThreadChecker.checkIsValidThread(handler);
-                                    logger.d("onAudioTrackSubscribed");
-                                    remoteAudioTrackPublication.setSubscribed(true);
-                                    remoteAudioTrackPublication.setRemoteAudioTrack(
-                                            remoteAudioTrack);
-                                    Listener listener = listenerReference.get();
+                            () -> {
+                                ThreadChecker.checkIsValidThread(handler);
+                                logger.d("onAudioTrackSubscribed");
+                                remoteAudioTrackPublication.setSubscribed(true);
+                                remoteAudioTrackPublication.setRemoteAudioTrack(remoteAudioTrack);
+                                Listener listener = listenerReference.get();
 
-                                    if (listener != null) {
-                                        listener.onAudioTrackSubscribed(
-                                                remoteParticipant,
-                                                remoteAudioTrackPublication,
-                                                remoteAudioTrack);
-                                    }
+                                if (listener != null) {
+                                    listener.onAudioTrackSubscribed(
+                                            remoteParticipant,
+                                            remoteAudioTrackPublication,
+                                            remoteAudioTrack);
                                 }
                             });
                 }
@@ -153,20 +142,17 @@ public class RemoteParticipant implements Participant {
                             remoteAudioTrackPublication,
                             "onAudioTrackSubscriptionFailed");
                     handler.post(
-                            new Runnable() {
-                                @Override
-                                public void run() {
-                                    ThreadChecker.checkIsValidThread(handler);
-                                    logger.d("onAudioTrackSubscriptionFailed");
-                                    remoteAudioTrackPublication.setSubscribed(false);
-                                    Listener listener = listenerReference.get();
+                            () -> {
+                                ThreadChecker.checkIsValidThread(handler);
+                                logger.d("onAudioTrackSubscriptionFailed");
+                                remoteAudioTrackPublication.setSubscribed(false);
+                                Listener listener = listenerReference.get();
 
-                                    if (listener != null) {
-                                        listener.onAudioTrackSubscriptionFailed(
-                                                remoteParticipant,
-                                                remoteAudioTrackPublication,
-                                                twilioException);
-                                    }
+                                if (listener != null) {
+                                    listener.onAudioTrackSubscriptionFailed(
+                                            remoteParticipant,
+                                            remoteAudioTrackPublication,
+                                            twilioException);
                                 }
                             });
                 }
@@ -181,21 +167,18 @@ public class RemoteParticipant implements Participant {
                             remoteAudioTrackPublication,
                             "onAudioTrackUnsubscribed");
                     handler.post(
-                            new Runnable() {
-                                @Override
-                                public void run() {
-                                    ThreadChecker.checkIsValidThread(handler);
-                                    logger.d("onAudioTrackUnsubscribed");
-                                    remoteAudioTrackPublication.setRemoteAudioTrack(null);
-                                    remoteAudioTrackPublication.setSubscribed(false);
-                                    Listener listener = listenerReference.get();
+                            () -> {
+                                ThreadChecker.checkIsValidThread(handler);
+                                logger.d("onAudioTrackUnsubscribed");
+                                remoteAudioTrackPublication.setRemoteAudioTrack(null);
+                                remoteAudioTrackPublication.setSubscribed(false);
+                                Listener listener = listenerReference.get();
 
-                                    if (listener != null) {
-                                        listener.onAudioTrackUnsubscribed(
-                                                remoteParticipant,
-                                                remoteAudioTrackPublication,
-                                                remoteAudioTrack);
-                                    }
+                                if (listener != null) {
+                                    listener.onAudioTrackUnsubscribed(
+                                            remoteParticipant,
+                                            remoteAudioTrackPublication,
+                                            remoteAudioTrack);
                                 }
                             });
                 }
@@ -209,19 +192,16 @@ public class RemoteParticipant implements Participant {
                             remoteVideoTrackPublication,
                             "onVideoTrackPublished");
                     handler.post(
-                            new Runnable() {
-                                @Override
-                                public void run() {
-                                    ThreadChecker.checkIsValidThread(handler);
-                                    logger.d("onVideoTrackPublished");
-                                    videoTrackPublications.add(remoteVideoTrackPublication);
-                                    remoteVideoTrackPublications.add(remoteVideoTrackPublication);
-                                    Listener listener = listenerReference.get();
+                            () -> {
+                                ThreadChecker.checkIsValidThread(handler);
+                                logger.d("onVideoTrackPublished");
+                                videoTrackPublications.add(remoteVideoTrackPublication);
+                                remoteVideoTrackPublications.add(remoteVideoTrackPublication);
+                                Listener listener = listenerReference.get();
 
-                                    if (listener != null) {
-                                        listener.onVideoTrackPublished(
-                                                remoteParticipant, remoteVideoTrackPublication);
-                                    }
+                                if (listener != null) {
+                                    listener.onVideoTrackPublished(
+                                            remoteParticipant, remoteVideoTrackPublication);
                                 }
                             });
                 }
@@ -235,20 +215,16 @@ public class RemoteParticipant implements Participant {
                             remoteVideoTrackPublication,
                             "onVideoTrackUnpublished");
                     handler.post(
-                            new Runnable() {
-                                @Override
-                                public void run() {
-                                    ThreadChecker.checkIsValidThread(handler);
-                                    logger.d("onVideoTrackUnpublished");
-                                    videoTrackPublications.remove(remoteVideoTrackPublication);
-                                    remoteVideoTrackPublications.remove(
-                                            remoteVideoTrackPublication);
-                                    Listener listener = listenerReference.get();
+                            () -> {
+                                ThreadChecker.checkIsValidThread(handler);
+                                logger.d("onVideoTrackUnpublished");
+                                videoTrackPublications.remove(remoteVideoTrackPublication);
+                                remoteVideoTrackPublications.remove(remoteVideoTrackPublication);
+                                Listener listener = listenerReference.get();
 
-                                    if (listener != null) {
-                                        listener.onVideoTrackUnpublished(
-                                                remoteParticipant, remoteVideoTrackPublication);
-                                    }
+                                if (listener != null) {
+                                    listener.onVideoTrackUnpublished(
+                                            remoteParticipant, remoteVideoTrackPublication);
                                 }
                             });
                 }
@@ -263,22 +239,18 @@ public class RemoteParticipant implements Participant {
                             remoteVideoTrackPublication,
                             "onVideoTrackSubscribed");
                     handler.post(
-                            new Runnable() {
-                                @Override
-                                public void run() {
-                                    ThreadChecker.checkIsValidThread(handler);
-                                    logger.d("onVideoTrackSubscribed");
-                                    remoteVideoTrackPublication.setSubscribed(true);
-                                    remoteVideoTrackPublication.setRemoteVideoTrack(
-                                            remoteVideoTrack);
-                                    Listener listener = listenerReference.get();
+                            () -> {
+                                ThreadChecker.checkIsValidThread(handler);
+                                logger.d("onVideoTrackSubscribed");
+                                remoteVideoTrackPublication.setSubscribed(true);
+                                remoteVideoTrackPublication.setRemoteVideoTrack(remoteVideoTrack);
+                                Listener listener = listenerReference.get();
 
-                                    if (listener != null) {
-                                        listener.onVideoTrackSubscribed(
-                                                remoteParticipant,
-                                                remoteVideoTrackPublication,
-                                                remoteVideoTrack);
-                                    }
+                                if (listener != null) {
+                                    listener.onVideoTrackSubscribed(
+                                            remoteParticipant,
+                                            remoteVideoTrackPublication,
+                                            remoteVideoTrack);
                                 }
                             });
                 }
@@ -293,20 +265,17 @@ public class RemoteParticipant implements Participant {
                             remoteVideoTrackPublication,
                             "onVideoTrackSubscriptionFailed");
                     handler.post(
-                            new Runnable() {
-                                @Override
-                                public void run() {
-                                    ThreadChecker.checkIsValidThread(handler);
-                                    logger.d("onVideoTrackSubscriptionFailed");
-                                    remoteVideoTrackPublication.setSubscribed(false);
-                                    Listener listener = listenerReference.get();
+                            () -> {
+                                ThreadChecker.checkIsValidThread(handler);
+                                logger.d("onVideoTrackSubscriptionFailed");
+                                remoteVideoTrackPublication.setSubscribed(false);
+                                Listener listener = listenerReference.get();
 
-                                    if (listener != null) {
-                                        listener.onVideoTrackSubscriptionFailed(
-                                                remoteParticipant,
-                                                remoteVideoTrackPublication,
-                                                twilioException);
-                                    }
+                                if (listener != null) {
+                                    listener.onVideoTrackSubscriptionFailed(
+                                            remoteParticipant,
+                                            remoteVideoTrackPublication,
+                                            twilioException);
                                 }
                             });
                 }
@@ -325,21 +294,18 @@ public class RemoteParticipant implements Participant {
                     remoteVideoTrack.release();
 
                     handler.post(
-                            new Runnable() {
-                                @Override
-                                public void run() {
-                                    ThreadChecker.checkIsValidThread(handler);
-                                    logger.d("onVideoTrackUnsubscribed");
-                                    remoteVideoTrackPublication.setRemoteVideoTrack(null);
-                                    remoteVideoTrackPublication.setSubscribed(false);
-                                    Listener listener = listenerReference.get();
+                            () -> {
+                                ThreadChecker.checkIsValidThread(handler);
+                                logger.d("onVideoTrackUnsubscribed");
+                                remoteVideoTrackPublication.setRemoteVideoTrack(null);
+                                remoteVideoTrackPublication.setSubscribed(false);
+                                Listener listener = listenerReference.get();
 
-                                    if (listener != null) {
-                                        listener.onVideoTrackUnsubscribed(
-                                                remoteParticipant,
-                                                remoteVideoTrackPublication,
-                                                remoteVideoTrack);
-                                    }
+                                if (listener != null) {
+                                    listener.onVideoTrackUnsubscribed(
+                                            remoteParticipant,
+                                            remoteVideoTrackPublication,
+                                            remoteVideoTrack);
                                 }
                             });
                 }
@@ -351,19 +317,16 @@ public class RemoteParticipant implements Participant {
                     checkCallback(
                             remoteParticipant, remoteDataTrackPublication, "onDataTrackPublished");
                     handler.post(
-                            new Runnable() {
-                                @Override
-                                public void run() {
-                                    ThreadChecker.checkIsValidThread(handler);
-                                    logger.d("onDataTrackPublished");
-                                    dataTrackPublications.add(remoteDataTrackPublication);
-                                    remoteDataTrackPublications.add(remoteDataTrackPublication);
-                                    Listener listener = listenerReference.get();
+                            () -> {
+                                ThreadChecker.checkIsValidThread(handler);
+                                logger.d("onDataTrackPublished");
+                                dataTrackPublications.add(remoteDataTrackPublication);
+                                remoteDataTrackPublications.add(remoteDataTrackPublication);
+                                Listener listener = listenerReference.get();
 
-                                    if (listener != null) {
-                                        listener.onDataTrackPublished(
-                                                remoteParticipant, remoteDataTrackPublication);
-                                    }
+                                if (listener != null) {
+                                    listener.onDataTrackPublished(
+                                            remoteParticipant, remoteDataTrackPublication);
                                 }
                             });
                 }
@@ -377,19 +340,16 @@ public class RemoteParticipant implements Participant {
                             remoteDataTrackPublication,
                             "onDataTrackUnpublished");
                     handler.post(
-                            new Runnable() {
-                                @Override
-                                public void run() {
-                                    ThreadChecker.checkIsValidThread(handler);
-                                    logger.d("onDataTrackUnpublished");
-                                    dataTrackPublications.remove(remoteDataTrackPublication);
-                                    remoteDataTrackPublications.remove(remoteDataTrackPublication);
-                                    Listener listener = listenerReference.get();
+                            () -> {
+                                ThreadChecker.checkIsValidThread(handler);
+                                logger.d("onDataTrackUnpublished");
+                                dataTrackPublications.remove(remoteDataTrackPublication);
+                                remoteDataTrackPublications.remove(remoteDataTrackPublication);
+                                Listener listener = listenerReference.get();
 
-                                    if (listener != null) {
-                                        listener.onDataTrackUnpublished(
-                                                remoteParticipant, remoteDataTrackPublication);
-                                    }
+                                if (listener != null) {
+                                    listener.onDataTrackUnpublished(
+                                            remoteParticipant, remoteDataTrackPublication);
                                 }
                             });
                 }
@@ -402,21 +362,18 @@ public class RemoteParticipant implements Participant {
                     checkCallback(
                             remoteParticipant, remoteDataTrackPublication, "onDataTrackSubscribed");
                     handler.post(
-                            new Runnable() {
-                                @Override
-                                public void run() {
-                                    ThreadChecker.checkIsValidThread(handler);
-                                    logger.d("onDataTrackSubscribed");
-                                    remoteDataTrackPublication.setSubscribed(true);
-                                    remoteDataTrackPublication.setRemoteDataTrack(remoteDataTrack);
-                                    Listener listener = listenerReference.get();
+                            () -> {
+                                ThreadChecker.checkIsValidThread(handler);
+                                logger.d("onDataTrackSubscribed");
+                                remoteDataTrackPublication.setSubscribed(true);
+                                remoteDataTrackPublication.setRemoteDataTrack(remoteDataTrack);
+                                Listener listener = listenerReference.get();
 
-                                    if (listener != null) {
-                                        listener.onDataTrackSubscribed(
-                                                remoteParticipant,
-                                                remoteDataTrackPublication,
-                                                remoteDataTrack);
-                                    }
+                                if (listener != null) {
+                                    listener.onDataTrackSubscribed(
+                                            remoteParticipant,
+                                            remoteDataTrackPublication,
+                                            remoteDataTrack);
                                 }
                             });
                 }
@@ -431,20 +388,17 @@ public class RemoteParticipant implements Participant {
                             remoteDataTrackPublication,
                             "onDataTrackSubscriptionFailed");
                     handler.post(
-                            new Runnable() {
-                                @Override
-                                public void run() {
-                                    ThreadChecker.checkIsValidThread(handler);
-                                    logger.d("onDataTrackSubscriptionFailed");
-                                    remoteDataTrackPublication.setSubscribed(false);
-                                    Listener listener = listenerReference.get();
+                            () -> {
+                                ThreadChecker.checkIsValidThread(handler);
+                                logger.d("onDataTrackSubscriptionFailed");
+                                remoteDataTrackPublication.setSubscribed(false);
+                                Listener listener = listenerReference.get();
 
-                                    if (listener != null) {
-                                        listener.onDataTrackSubscriptionFailed(
-                                                remoteParticipant,
-                                                remoteDataTrackPublication,
-                                                twilioException);
-                                    }
+                                if (listener != null) {
+                                    listener.onDataTrackSubscriptionFailed(
+                                            remoteParticipant,
+                                            remoteDataTrackPublication,
+                                            twilioException);
                                 }
                             });
                 }
@@ -463,21 +417,18 @@ public class RemoteParticipant implements Participant {
                     remoteDataTrack.release();
 
                     handler.post(
-                            new Runnable() {
-                                @Override
-                                public void run() {
-                                    ThreadChecker.checkIsValidThread(handler);
-                                    logger.d("onDataTrackUnsubscribed");
-                                    remoteDataTrackPublication.setRemoteDataTrack(null);
-                                    remoteDataTrackPublication.setSubscribed(false);
-                                    Listener listener = listenerReference.get();
+                            () -> {
+                                ThreadChecker.checkIsValidThread(handler);
+                                logger.d("onDataTrackUnsubscribed");
+                                remoteDataTrackPublication.setRemoteDataTrack(null);
+                                remoteDataTrackPublication.setSubscribed(false);
+                                Listener listener = listenerReference.get();
 
-                                    if (listener != null) {
-                                        listener.onDataTrackUnsubscribed(
-                                                remoteParticipant,
-                                                remoteDataTrackPublication,
-                                                remoteDataTrack);
-                                    }
+                                if (listener != null) {
+                                    listener.onDataTrackUnsubscribed(
+                                            remoteParticipant,
+                                            remoteDataTrackPublication,
+                                            remoteDataTrack);
                                 }
                             });
                 }
@@ -489,18 +440,15 @@ public class RemoteParticipant implements Participant {
                     checkCallback(
                             remoteParticipant, remoteAudioTrackPublication, "onAudioTrackEnabled");
                     handler.post(
-                            new Runnable() {
-                                @Override
-                                public void run() {
-                                    ThreadChecker.checkIsValidThread(handler);
-                                    logger.d("onAudioTrackEnabled");
-                                    remoteAudioTrackPublication.setEnabled(true);
-                                    Listener listener = listenerReference.get();
+                            () -> {
+                                ThreadChecker.checkIsValidThread(handler);
+                                logger.d("onAudioTrackEnabled");
+                                remoteAudioTrackPublication.setEnabled(true);
+                                Listener listener = listenerReference.get();
 
-                                    if (listener != null) {
-                                        listener.onAudioTrackEnabled(
-                                                remoteParticipant, remoteAudioTrackPublication);
-                                    }
+                                if (listener != null) {
+                                    listener.onAudioTrackEnabled(
+                                            remoteParticipant, remoteAudioTrackPublication);
                                 }
                             });
                 }
@@ -512,18 +460,15 @@ public class RemoteParticipant implements Participant {
                     checkCallback(
                             remoteParticipant, remoteAudioTrackPublication, "onAudioTrackDisabled");
                     handler.post(
-                            new Runnable() {
-                                @Override
-                                public void run() {
-                                    ThreadChecker.checkIsValidThread(handler);
-                                    logger.d("onAudioTrackDisabled");
-                                    remoteAudioTrackPublication.setEnabled(false);
-                                    Listener listener = listenerReference.get();
+                            () -> {
+                                ThreadChecker.checkIsValidThread(handler);
+                                logger.d("onAudioTrackDisabled");
+                                remoteAudioTrackPublication.setEnabled(false);
+                                Listener listener = listenerReference.get();
 
-                                    if (listener != null) {
-                                        listener.onAudioTrackDisabled(
-                                                remoteParticipant, remoteAudioTrackPublication);
-                                    }
+                                if (listener != null) {
+                                    listener.onAudioTrackDisabled(
+                                            remoteParticipant, remoteAudioTrackPublication);
                                 }
                             });
                 }
@@ -535,18 +480,15 @@ public class RemoteParticipant implements Participant {
                     checkCallback(
                             remoteParticipant, remoteVideoTrackPublication, "onVideoTrackEnabled");
                     handler.post(
-                            new Runnable() {
-                                @Override
-                                public void run() {
-                                    ThreadChecker.checkIsValidThread(handler);
-                                    logger.d("onVideoTrackEnabled");
-                                    remoteVideoTrackPublication.setEnabled(true);
-                                    Listener listener = listenerReference.get();
+                            () -> {
+                                ThreadChecker.checkIsValidThread(handler);
+                                logger.d("onVideoTrackEnabled");
+                                remoteVideoTrackPublication.setEnabled(true);
+                                Listener listener = listenerReference.get();
 
-                                    if (listener != null) {
-                                        listener.onVideoTrackEnabled(
-                                                remoteParticipant, remoteVideoTrackPublication);
-                                    }
+                                if (listener != null) {
+                                    listener.onVideoTrackEnabled(
+                                            remoteParticipant, remoteVideoTrackPublication);
                                 }
                             });
                 }
@@ -558,18 +500,15 @@ public class RemoteParticipant implements Participant {
                     checkCallback(
                             remoteParticipant, remoteVideoTrackPublication, "onVideoTrackDisabled");
                     handler.post(
-                            new Runnable() {
-                                @Override
-                                public void run() {
-                                    ThreadChecker.checkIsValidThread(handler);
-                                    logger.d("onVideoTrackDisabled");
-                                    remoteVideoTrackPublication.setEnabled(false);
-                                    Listener listener = listenerReference.get();
+                            () -> {
+                                ThreadChecker.checkIsValidThread(handler);
+                                logger.d("onVideoTrackDisabled");
+                                remoteVideoTrackPublication.setEnabled(false);
+                                Listener listener = listenerReference.get();
 
-                                    if (listener != null) {
-                                        listener.onVideoTrackDisabled(
-                                                remoteParticipant, remoteVideoTrackPublication);
-                                    }
+                                if (listener != null) {
+                                    listener.onVideoTrackDisabled(
+                                            remoteParticipant, remoteVideoTrackPublication);
                                 }
                             });
                 }

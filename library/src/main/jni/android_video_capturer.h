@@ -20,10 +20,12 @@
 #include <string>
 #include <vector>
 
-#include "webrtc/base/thread_checker.h"
+#include "webrtc/rtc_base/thread_checker.h"
 #include "webrtc/common_video/include/video_frame_buffer.h"
 #include "webrtc/media/base/videocapturer.h"
-#include "webrtc/base/refcount.h"
+#include "webrtc/media/base/videocommon.h"
+#include "webrtc/rtc_base/refcount.h"
+#include "webrtc/rtc_base/scoped_ref_ptr.h"
 
 /*
  * The androidvideocapturer was removed in WebRTC 55. The delegate and capturer defined below are

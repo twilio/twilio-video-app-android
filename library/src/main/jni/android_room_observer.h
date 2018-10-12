@@ -18,8 +18,8 @@
 #define VIDEO_ANDROID_ANDROID_ROOM_OBSERVER_H_
 
 #include "webrtc/sdk/android/src/jni/jni_helpers.h"
-#include "video/room_observer.h"
-#include "video/remote_participant.h"
+#include "twilio/video/room_observer.h"
+#include "twilio/video/remote_participant.h"
 #include "com_twilio_video_RemoteParticipant.h"
 #include "com_twilio_video_LocalParticipant.h"
 
@@ -52,8 +52,6 @@ private:
 
     bool isObserverValid(const std::string &callbackName);
 
-    jobject createJavaRoomException(const twilio::video::TwilioError &twilio_error);
-
     jobject createJavaParticipantList(
             const std::map<std::string, std::shared_ptr<twilio::video::RemoteParticipant>> participants);
 
@@ -64,25 +62,25 @@ private:
     bool observer_deleted_ = false;
     mutable rtc::CriticalSection deletion_lock_;
 
-    const webrtc_jni::ScopedGlobalRef<jobject> j_room_;
-    const webrtc_jni::ScopedGlobalRef<jobject> j_room_observer_;
-    const webrtc_jni::ScopedGlobalRef<jobject> j_connect_options_;
-    const webrtc_jni::ScopedGlobalRef<jobject> j_handler_;
-    const webrtc_jni::ScopedGlobalRef<jclass> j_room_class_;
-    const webrtc_jni::ScopedGlobalRef<jclass> j_room_observer_class_;
-    const webrtc_jni::ScopedGlobalRef<jclass> j_local_participant_class_;
-    const webrtc_jni::ScopedGlobalRef<jclass> j_twilio_exception_class_;
-    const webrtc_jni::ScopedGlobalRef<jclass> j_remote_participant_class_;
-    const webrtc_jni::ScopedGlobalRef<jclass> j_array_list_class_;
-    const webrtc_jni::ScopedGlobalRef<jclass> j_published_audio_track_class_;
-    const webrtc_jni::ScopedGlobalRef<jclass> j_remote_audio_track_class_;
-    const webrtc_jni::ScopedGlobalRef<jclass> j_remote_audio_track_publication_class_;
-    const webrtc_jni::ScopedGlobalRef<jclass> j_published_video_track_class_;
-    const webrtc_jni::ScopedGlobalRef<jclass> j_remote_video_track_class_;
-    const webrtc_jni::ScopedGlobalRef<jclass> j_remote_video_track_publication_class_;
-    const webrtc_jni::ScopedGlobalRef<jclass> j_published_data_track_class_;
-    const webrtc_jni::ScopedGlobalRef<jclass> j_remote_data_track_class_;
-    const webrtc_jni::ScopedGlobalRef<jclass> j_remote_data_track_publication_class_;
+    const webrtc::ScopedJavaGlobalRef<jobject> j_room_;
+    const webrtc::ScopedJavaGlobalRef<jobject> j_room_observer_;
+    const webrtc::ScopedJavaGlobalRef<jobject> j_connect_options_;
+    const webrtc::ScopedJavaGlobalRef<jobject> j_handler_;
+    const webrtc::ScopedJavaGlobalRef<jclass> j_room_class_;
+    const webrtc::ScopedJavaGlobalRef<jclass> j_room_observer_class_;
+    const webrtc::ScopedJavaGlobalRef<jclass> j_local_participant_class_;
+    const webrtc::ScopedJavaGlobalRef<jclass> j_twilio_exception_class_;
+    const webrtc::ScopedJavaGlobalRef<jclass> j_remote_participant_class_;
+    const webrtc::ScopedJavaGlobalRef<jclass> j_array_list_class_;
+    const webrtc::ScopedJavaGlobalRef<jclass> j_published_audio_track_class_;
+    const webrtc::ScopedJavaGlobalRef<jclass> j_remote_audio_track_class_;
+    const webrtc::ScopedJavaGlobalRef<jclass> j_remote_audio_track_publication_class_;
+    const webrtc::ScopedJavaGlobalRef<jclass> j_published_video_track_class_;
+    const webrtc::ScopedJavaGlobalRef<jclass> j_remote_video_track_class_;
+    const webrtc::ScopedJavaGlobalRef<jclass> j_remote_video_track_publication_class_;
+    const webrtc::ScopedJavaGlobalRef<jclass> j_published_data_track_class_;
+    const webrtc::ScopedJavaGlobalRef<jclass> j_remote_data_track_class_;
+    const webrtc::ScopedJavaGlobalRef<jclass> j_remote_data_track_publication_class_;
     jmethodID j_set_connected_;
     jmethodID j_on_connected_;
     jmethodID j_on_disconnected_;

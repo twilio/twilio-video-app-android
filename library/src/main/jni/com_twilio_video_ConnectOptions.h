@@ -18,7 +18,7 @@
 #define VIDEO_ANDROID_COM_TWILIO_VIDEO_CONNECT_OPTIONS_H_
 
 #include <jni.h>
-#include "video/connect_options.h"
+#include "twilio/video/connect_options.h"
 
 #ifdef __cplusplus
 extern "C" {

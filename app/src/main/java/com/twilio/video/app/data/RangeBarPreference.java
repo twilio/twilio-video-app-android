@@ -155,22 +155,12 @@ public class RangeBarPreference extends Preference {
 
             // save all changes prefs while moving pins
             rangeBar.setOnRangeBarChangeListener(
-                    new RangeBar.OnRangeBarChangeListener() {
-                        @Override
-                        public void onRangeChangeListener(
-                                RangeBar rangeBar,
-                                int leftPinIndex,
-                                int rightPinIndex,
-                                String leftPinValue,
-                                String rightPinValue) {
-
+                    (rangeBar, leftPinIndex, rightPinIndex, leftPinValue, rightPinValue) ->
                             sharedPreferences
                                     .edit()
                                     .putInt(startKey, leftPinIndex)
                                     .putInt(endKey, rightPinIndex)
-                                    .apply();
-                        }
-                    });
+                                    .apply());
         }
     }
 
@@ -206,15 +196,12 @@ public class RangeBarPreference extends Preference {
 
         // initialize formatter to use entries array or fall back to entries
         formatter =
-                new IRangeBarFormatter() {
-                    @Override
-                    public String format(String value) {
-                        try {
-                            int index = Integer.parseInt(value);
-                            return (index >= 0 && index < entries.length) ? entries[index] : value;
-                        } catch (Exception e) {
-                            return value;
-                        }
+                value -> {
+                    try {
+                        int index = Integer.parseInt(value);
+                        return (index >= 0 && index < entries.length) ? entries[index] : value;
+                    } catch (Exception e) {
+                        return value;
                     }
                 };
 

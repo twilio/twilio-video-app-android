@@ -16,13 +16,15 @@
 
 package com.twilio.video;
 
+import android.support.annotation.NonNull;
+
 /**
  * ITU-T standard for audio companding.
  *
  * @see <a href="https://en.wikipedia.org/wiki/G.711">PCMU</a>
  */
 public class PcmuCodec extends AudioCodec {
-    public static final String NAME = "PCMU";
+    @NonNull public static final String NAME = "PCMU";
 
     public PcmuCodec() {
         super(NAME);

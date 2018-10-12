@@ -19,11 +19,10 @@
 
 #include <jni.h>
 
-#include "video/video.h"
-#include "video/stats_observer.h"
-#include "video/room.h"
+#include "twilio/video/video.h"
+#include "twilio/video/stats_observer.h"
+#include "twilio/video/room.h"
 
-#include "webrtc/base/messagehandler.h"
 #include "webrtc/sdk/android/src/jni/jni_helpers.h"
 
 #include "android_room_observer.h"
@@ -54,19 +53,22 @@ private:
     void getStatsOnNotifier();
     void reportNetworkChangeOnNotifier(twilio::video::NetworkChangeEvent network_change_event);
     void disconnectOnNotifier();
+    void releaseOnNotifier();
 
     static const uint32_t kMessageTypeConnect = 0;
     static const uint32_t kMessageTypeGetStats = 1;
     static const uint32_t kMessageTypeNetworkChange = 2;
     static const uint32_t kMessageTypeDisconnect = 3;
+    static const uint32_t kMessageTypeRelease = 4;
 
-    const webrtc_jni::ScopedGlobalRef<jobject> j_connect_options_;
+    const webrtc::ScopedJavaGlobalRef<jobject> j_connect_options_;
     std::shared_ptr<twilio::media::MediaFactory> media_factory_;
-    const webrtc_jni::ScopedGlobalRef<jobject> j_room_;
-    const webrtc_jni::ScopedGlobalRef<jobject> j_room_observer_;
-    const webrtc_jni::ScopedGlobalRef<jobject> j_stats_observer_;
-    const webrtc_jni::ScopedGlobalRef<jobject> j_handler_;
+    const webrtc::ScopedJavaGlobalRef<jobject> j_room_;
+    const webrtc::ScopedJavaGlobalRef<jobject> j_room_observer_;
+    const webrtc::ScopedJavaGlobalRef<jobject> j_stats_observer_;
+    const webrtc::ScopedJavaGlobalRef<jobject> j_handler_;
     std::unique_ptr<rtc::Thread> notifier_thread_;
+    rtc::Event native_objects_released_;
     std::unique_ptr<twilio::video::Room> room_;
     std::shared_ptr<AndroidRoomObserver> android_room_observer_;
     std::shared_ptr<twilio::video::StatsObserver> stats_observer_;

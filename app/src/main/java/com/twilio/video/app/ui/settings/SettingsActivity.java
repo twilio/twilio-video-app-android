@@ -60,12 +60,9 @@ public class SettingsActivity extends BaseActivity {
     @Inject Authenticator authenticator;
 
     private final Preference.OnPreferenceClickListener logoutClickListener =
-            new Preference.OnPreferenceClickListener() {
-                @Override
-                public boolean onPreferenceClick(Preference preference) {
-                    logout();
-                    return true;
-                }
+            preference -> {
+                logout();
+                return true;
             };
 
     @Override
@@ -191,12 +188,9 @@ public class SettingsActivity extends BaseActivity {
             preference.setValue(value);
             preference.setSummary(value);
             preference.setOnPreferenceChangeListener(
-                    new Preference.OnPreferenceChangeListener() {
-                        @Override
-                        public boolean onPreferenceChange(Preference preference, Object newValue) {
-                            preference.setSummary(newValue.toString());
-                            return true;
-                        }
+                    (changedPreference, newValue) -> {
+                        changedPreference.setSummary(newValue.toString());
+                        return true;
                     });
         }
     }

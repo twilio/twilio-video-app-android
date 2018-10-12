@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.twilio.video;
 
 import static java.lang.annotation.RetentionPolicy.SOURCE;
@@ -59,6 +58,8 @@ public class TwilioException extends Exception {
         ROOM_INVALID_PARAMETERS_EXCEPTION,
         ROOM_MEDIA_REGION_INVALID_EXCEPTION,
         ROOM_MEDIA_REGION_UNAVAILABLE_EXCEPTION,
+        ROOM_SUBSCRIPTION_OPERATION_NOT_SUPPORTED_EXCEPTION,
+        ROOM_ROOM_COMPLETED_EXCEPTION,
         PARTICIPANT_IDENTITY_INVALID_EXCEPTION,
         PARTICIPANT_IDENTITY_TOO_LONG_EXCEPTION,
         PARTICIPANT_IDENTITY_CHARS_INVALID_EXCEPTION,
@@ -70,6 +71,7 @@ public class TwilioException extends Exception {
         TRACK_NAME_TOO_LONG_EXCEPTION,
         TRACK_NAME_CHARS_INVALID_EXCEPTION,
         TRACK_NAME_IS_DUPLICATED_EXCEPTION,
+        TRACK_SERVER_TRACK_CAPACITY_REACHED_EXCEPTION,
         MEDIA_CLIENT_LOCAL_DESC_FAILED_EXCEPTION,
         MEDIA_SERVER_LOCAL_DESC_FAILED_EXCEPTION,
         MEDIA_CLIENT_REMOTE_DESC_FAILED_EXCEPTION,
@@ -110,6 +112,8 @@ public class TwilioException extends Exception {
     public static final int ROOM_INVALID_PARAMETERS_EXCEPTION = 53114;
     public static final int ROOM_MEDIA_REGION_INVALID_EXCEPTION = 53115;
     public static final int ROOM_MEDIA_REGION_UNAVAILABLE_EXCEPTION = 53116;
+    public static final int ROOM_SUBSCRIPTION_OPERATION_NOT_SUPPORTED_EXCEPTION = 53117;
+    public static final int ROOM_ROOM_COMPLETED_EXCEPTION = 53118;
     public static final int PARTICIPANT_IDENTITY_INVALID_EXCEPTION = 53200;
     public static final int PARTICIPANT_IDENTITY_TOO_LONG_EXCEPTION = 53201;
     public static final int PARTICIPANT_IDENTITY_CHARS_INVALID_EXCEPTION = 53202;
@@ -121,6 +125,7 @@ public class TwilioException extends Exception {
     public static final int TRACK_NAME_TOO_LONG_EXCEPTION = 53302;
     public static final int TRACK_NAME_CHARS_INVALID_EXCEPTION = 53303;
     public static final int TRACK_NAME_IS_DUPLICATED_EXCEPTION = 53304;
+    public static final int TRACK_SERVER_TRACK_CAPACITY_REACHED_EXCEPTION = 53305;
     public static final int MEDIA_CLIENT_LOCAL_DESC_FAILED_EXCEPTION = 53400;
     public static final int MEDIA_SERVER_LOCAL_DESC_FAILED_EXCEPTION = 53401;
     public static final int MEDIA_CLIENT_REMOTE_DESC_FAILED_EXCEPTION = 53402;
@@ -133,7 +138,8 @@ public class TwilioException extends Exception {
     private final int code;
     private final String explanation;
 
-    TwilioException(@Code int code, @NonNull String message, @Nullable String explanation) {
+    TwilioException(
+            @TwilioException.Code int code, @NonNull String message, @Nullable String explanation) {
         super(message);
         this.code = code;
         this.explanation = explanation;

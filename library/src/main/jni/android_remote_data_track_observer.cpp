@@ -18,29 +18,30 @@
 #include "logging.h"
 #include "class_reference_holder.h"
 #include "jni_utils.h"
+#include "webrtc/modules/utility/include/helpers_android.h"
 
 namespace twilio_video_jni {
 
 AndroidRemoteDataTrackObserver::AndroidRemoteDataTrackObserver(JNIEnv *env,
                                                                jobject j_remote_data_track,
                                                                jobject j_remote_data_track_listener)
-        : j_remote_data_track_(env, j_remote_data_track),
-          j_remote_data_track_listener_(env, j_remote_data_track_listener),
+        : j_remote_data_track_(env, webrtc::JavaParamRef<jobject>(j_remote_data_track)),
+          j_remote_data_track_listener_(env, webrtc::JavaParamRef<jobject>(j_remote_data_track_listener)),
           j_remote_data_track_listener_class_(env,
-                                              webrtc_jni::GetObjectClass(env, j_remote_data_track_listener)),
-          j_byte_buffer_class_(env, twilio_video_jni::FindClass(env, "java/nio/ByteBuffer")),
-          j_on_string_message_(webrtc_jni::GetMethodID(env,
-                                                       *j_remote_data_track_listener_class_,
-                                                       "onMessage",
-                                                       "(Lcom/twilio/video/RemoteDataTrack;Ljava/lang/String;)V")),
-          j_on_buffer_message_(webrtc_jni::GetMethodID(env,
-                                                       *j_remote_data_track_listener_class_,
-                                                       "onMessage",
-                                                       "(Lcom/twilio/video/RemoteDataTrack;Ljava/nio/ByteBuffer;)V")),
-          j_byte_buffer_wrap_id_(webrtc_jni::GetStaticMethodID(env,
-                                                               *j_byte_buffer_class_,
-                                                               "wrap",
-                                                               "([B)Ljava/nio/ByteBuffer;")) {
+                                              webrtc::JavaParamRef<jclass>(GetObjectClass(env, j_remote_data_track_listener))),
+          j_byte_buffer_class_(env, webrtc::JavaParamRef<jclass>(twilio_video_jni::FindClass(env, "java/nio/ByteBuffer"))),
+          j_on_string_message_(webrtc::GetMethodID(env,
+                                                   j_remote_data_track_listener_class_.obj(),
+                                                   "onMessage",
+                                                   "(Lcom/twilio/video/RemoteDataTrack;Ljava/lang/String;)V")),
+          j_on_buffer_message_(webrtc::GetMethodID(env,
+                                                   j_remote_data_track_listener_class_.obj(),
+                                                   "onMessage",
+                                                   "(Lcom/twilio/video/RemoteDataTrack;Ljava/nio/ByteBuffer;)V")),
+          j_byte_buffer_wrap_id_(webrtc::GetStaticMethodID(env,
+                                                           j_byte_buffer_class_.obj(),
+                                                           "wrap",
+                                                           "([B)Ljava/nio/ByteBuffer;")) {
 
 }
 
@@ -60,7 +61,7 @@ void AndroidRemoteDataTrackObserver::setObserverDeleted() {
 
 void twilio_video_jni::AndroidRemoteDataTrackObserver::onMessage(twilio::media::RemoteDataTrack *remote_data_track,
                                                                  const std::string &message) {
-    webrtc_jni::ScopedLocalRefFrame local_ref_frame(jni());
+    webrtc::jni::ScopedLocalRefFrame local_ref_frame(jni());
     std::string func_name = std::string(__FUNCTION__);
     VIDEO_ANDROID_LOG(twilio::video::LogModule::kPlatform,
                       twilio::video::LogLevel::kDebug,
@@ -72,9 +73,9 @@ void twilio_video_jni::AndroidRemoteDataTrackObserver::onMessage(twilio::media::
             return;
         }
 
-        jni()->CallVoidMethod(*j_remote_data_track_listener_,
+        jni()->CallVoidMethod(j_remote_data_track_listener_.obj(),
                               j_on_string_message_,
-                              *j_remote_data_track_,
+                              j_remote_data_track_.obj(),
                               JavaUTF16StringFromStdString(jni(), message));
         CHECK_EXCEPTION(jni()) << "Error calling onMessage(String)";
     }
@@ -83,7 +84,7 @@ void twilio_video_jni::AndroidRemoteDataTrackObserver::onMessage(twilio::media::
 void twilio_video_jni::AndroidRemoteDataTrackObserver::onMessage(twilio::media::RemoteDataTrack *track,
                                                                  const uint8_t *message,
                                                                  size_t size) {
-    webrtc_jni::ScopedLocalRefFrame local_ref_frame(jni());
+    webrtc::jni::ScopedLocalRefFrame local_ref_frame(jni());
     std::string func_name = std::string(__FUNCTION__);
     VIDEO_ANDROID_LOG(twilio::video::LogModule::kPlatform,
                       twilio::video::LogLevel::kDebug,
@@ -100,14 +101,14 @@ void twilio_video_jni::AndroidRemoteDataTrackObserver::onMessage(twilio::media::
         jni()->SetByteArrayRegion(message_bytes, 0,
                                   (jsize) size,
                                   reinterpret_cast<const jbyte*>(message));
-        jobject message_buffer = jni()->CallStaticObjectMethod(*j_byte_buffer_class_,
+        jobject message_buffer = jni()->CallStaticObjectMethod(j_byte_buffer_class_.obj(),
                                                                j_byte_buffer_wrap_id_,
                                                                message_bytes);
 
         // Invoke callback
-        jni()->CallVoidMethod(*j_remote_data_track_listener_,
+        jni()->CallVoidMethod(j_remote_data_track_listener_.obj(),
                               j_on_buffer_message_,
-                              *j_remote_data_track_,
+                              j_remote_data_track_.obj(),
                               message_buffer);
         CHECK_EXCEPTION(jni()) << "Error calling onMessage(Buffer)";
     }
@@ -121,7 +122,7 @@ bool AndroidRemoteDataTrackObserver::isObserverValid(const std::string &callback
                           callback_name.c_str());
         return false;
     };
-    if (webrtc_jni::IsNull(jni(), *j_remote_data_track_listener_)) {
+    if (webrtc::IsNull(jni(), j_remote_data_track_listener_)) {
         VIDEO_ANDROID_LOG(twilio::video::LogModule::kPlatform,
                           twilio::video::LogLevel::kWarning,
                           "remote data track listener reference has been destroyed, "

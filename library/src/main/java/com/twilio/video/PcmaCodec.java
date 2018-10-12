@@ -16,13 +16,15 @@
 
 package com.twilio.video;
 
+import android.support.annotation.NonNull;
+
 /**
  * ITU-T standard for audio companding.
  *
  * @see <a href="https://en.wikipedia.org/wiki/G.711">PCMA</a>
  */
 public class PcmaCodec extends AudioCodec {
-    public static final String NAME = "PCMA";
+    @NonNull public static final String NAME = "PCMA";
 
     public PcmaCodec() {
         super(NAME);

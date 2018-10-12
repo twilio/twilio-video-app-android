@@ -18,8 +18,8 @@
 #define VIDEO_ANDROID_ANDROID_REMOTE_DATA_TRACK_OBSERVER_H_
 
 #include <jni.h>
-#include "media/track.h"
-#include "media/track_observer.h"
+#include "twilio/media/track.h"
+#include "twilio/media/track_observer.h"
 #include "webrtc/sdk/android/src/jni/jni_helpers.h"
 
 namespace twilio_video_jni {
@@ -44,7 +44,7 @@ protected:
 
 private:
     JNIEnv *jni() {
-        return webrtc_jni::AttachCurrentThreadIfNeeded();
+        return webrtc::jni::AttachCurrentThreadIfNeeded();
     }
 
     bool isObserverValid(const std::string &callback_name);
@@ -52,10 +52,10 @@ private:
     bool observer_deleted_ = false;
     mutable rtc::CriticalSection deletion_lock_;
 
-    const webrtc_jni::ScopedGlobalRef<jobject> j_remote_data_track_;
-    const webrtc_jni::ScopedGlobalRef<jobject> j_remote_data_track_listener_;
-    const webrtc_jni::ScopedGlobalRef<jclass> j_remote_data_track_listener_class_;
-    const webrtc_jni::ScopedGlobalRef<jclass> j_byte_buffer_class_;
+    const webrtc::ScopedJavaGlobalRef<jobject> j_remote_data_track_;
+    const webrtc::ScopedJavaGlobalRef<jobject> j_remote_data_track_listener_;
+    const webrtc::ScopedJavaGlobalRef<jclass> j_remote_data_track_listener_class_;
+    const webrtc::ScopedJavaGlobalRef<jclass> j_byte_buffer_class_;
 
     jmethodID j_on_string_message_;
     jmethodID j_on_buffer_message_;

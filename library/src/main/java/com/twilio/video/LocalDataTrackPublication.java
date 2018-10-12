@@ -17,6 +17,7 @@
 package com.twilio.video;
 
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 /**
  * A local data track publication represents a {@link LocalDataTrack} that has been shared to a
@@ -65,6 +66,7 @@ public class LocalDataTrackPublication implements DataTrackPublication {
     }
 
     /** Returns the published local data track. */
+    @Nullable
     public LocalDataTrack getLocalDataTrack() {
         return localDataTrack;
     }

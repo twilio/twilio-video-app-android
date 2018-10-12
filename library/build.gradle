@@ -2,10 +2,10 @@ apply plugin: 'com.android.library'
 apply plugin: 'maven'
 apply plugin: 'jacoco'
 
-def currentToolchainVersion = "4.9"
+def currentToolchainVersion = "3.8"
 // TODO add back ability for local builds
 def coreHome = "${buildDir}/prebuilt/twilio-video"
-def compilerVersion = "gnu-4.9"
+def compilerVersion = "clang-3.8"
 
 configurations {
     preCompile
@@ -35,7 +35,7 @@ android {
         externalNativeBuild {
             cmake {
                 // Using android-16 to prevent load libary bug GSDK-1020
-                arguments '-DANDROID_TOOLCHAIN=gcc',
+                arguments '-DANDROID_TOOLCHAIN=clang',
                         '-DANDROID_PLATFORM=android-16',
                         '-DANDROID_STL=c++_static',
                         "-DVIDEO_DEPS_PREFIX=${coreHome}".toString()
@@ -52,9 +52,8 @@ android {
                         "-DPOCO_ANDROID",
                         "-Werror",
                         "-Wall",
-                        "-std=gnu++11",
-                        "-fexceptions",
-                        "-Wl,--allow-multiple-definition"
+                        "-std=c++14",
+                        "-fexceptions"
             }
         }
     }
@@ -145,11 +144,8 @@ dependencies {
 
     implementation "com.android.support:support-annotations:${versions.supportLibrary}"
     implementation "com.getkeepsafe.relinker:relinker:${versions.relinker}"
-    // TODO this really should be on nexus as a jar and not local
-    // TODO we are hardcoding architecture for now,
-    // because I don't know how to access that information from here
-    api files("${coreHome}/armeabi-v7a/gnu-4.9/release/lib/" +
-            "libjingle_peerconnection_java.jar")
+    api files("${coreHome}/armeabi-v7a/${compilerVersion}/debug/lib/" +
+            "libwebrtc.jar")
 }
 
 task jacocoTestReport(type: JacocoReport,

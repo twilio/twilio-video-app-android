@@ -57,6 +57,7 @@ public abstract class DataTrack implements Track {
      * specified.
      */
     @Override
+    @NonNull
     public String getName() {
         return name;
     }

@@ -20,8 +20,9 @@
 
 #include "webrtc/sdk/android/src/jni/classreferenceholder.h"
 
-#include "video/video.h"
+#include "twilio/video/video.h"
 #include "jni_utils.h"
+#include "webrtc/modules/utility/include/helpers_android.h"
 
 namespace twilio_video_jni {
 
@@ -29,13 +30,13 @@ void bindRemoteParticipantListenerProxy(JNIEnv *env,
                                         jobject j_remote_participant,
                                         jclass j_remote_participant_class,
                                         RemoteParticipantContext *remote_participant_context) {
-    jfieldID j_remote_participant_listener_proxy_field = webrtc_jni::GetFieldID(env,
-                                                                                j_remote_participant_class,
-                                                                                "participantListenerProxy",
-                                                                                "Lcom/twilio/video/RemoteParticipant$Listener;");
-    jobject j_remote_participant_listener_proxy = webrtc_jni::GetObjectField(env,
-                                                                             j_remote_participant,
-                                                                             j_remote_participant_listener_proxy_field);
+    jfieldID j_remote_participant_listener_proxy_field = GetFieldID(env,
+                                                                    j_remote_participant_class,
+                                                                    "participantListenerProxy",
+                                                                    "Lcom/twilio/video/RemoteParticipant$Listener;");
+    jobject j_remote_participant_listener_proxy = GetObjectField(env,
+                                                                 j_remote_participant,
+                                                                 j_remote_participant_listener_proxy_field);
 
     remote_participant_context->android_participant_observer =
             std::make_shared<AndroidParticipantObserver>(env,
@@ -105,7 +106,7 @@ jobject createJavaRemoteParticipant(JNIEnv *env,
                                                                      j_remote_data_track_publication_ctor_id);
 
     // Create participant
-    jlong j_remote_participant_context = webrtc_jni::jlongFromPointer(remote_participant_context);
+    jlong j_remote_participant_context = webrtc::NativeToJavaPointer(remote_participant_context);
     jobject j_remote_participant =  env->NewObject(j_remote_participant_class,
                                                    j_remote_participant_ctor_id,
                                                    j_identity,
@@ -155,8 +156,8 @@ jobject createRemoteParticipantAudioTracks(JNIEnv *env,
          */
         remote_participant_context->remote_audio_track_publication_map
                 .insert(std::make_pair(remote_audio_track_publication,
-                                       webrtc_jni::NewGlobalRef(env,
-                                                                j_remote_audio_track_publication)));
+                                       webrtc::NewGlobalRef(env,
+                                                            j_remote_audio_track_publication)));
         env->CallBooleanMethod(j_remote_audio_tracks,
                                j_array_list_add,
                                j_remote_audio_track_publication);
@@ -195,8 +196,8 @@ jobject createRemoteParticipantVideoTracks(JNIEnv *env,
          */
         remote_participant_context->remote_video_track_publication_map
                 .insert(std::make_pair(remote_video_track_publication,
-                                       webrtc_jni::NewGlobalRef(env,
-                                                                j_remote_video_track_publication)));
+                                       webrtc::NewGlobalRef(env,
+                                                            j_remote_video_track_publication)));
         env->CallBooleanMethod(j_remote_video_tracks,
                                j_array_list_add,
                                j_remote_video_track_publication);
@@ -235,8 +236,8 @@ jobject createRemoteParticipantDataTracks(JNIEnv *env,
          */
         remote_participant_context->remote_data_track_publication_map
                 .insert(std::make_pair(remote_data_track_publication,
-                                       webrtc_jni::NewGlobalRef(env,
-                                                                j_remote_data_track_publication)));
+                                       webrtc::NewGlobalRef(env,
+                                                            j_remote_data_track_publication)));
         env->CallBooleanMethod(j_remote_data_tracks,
                                j_array_list_add,
                                j_remote_data_track_publication);
@@ -382,36 +383,36 @@ Java_com_twilio_video_RemoteParticipant_nativeRelease(JNIEnv *env,
     // Delete all remaining global references to AudioTracks
     for (auto it = participant_context->remote_audio_track_publication_map.begin() ;
          it != participant_context->remote_audio_track_publication_map.end() ; it++) {
-        webrtc_jni::DeleteGlobalRef(env, it->second);
+        webrtc::DeleteGlobalRef(env, it->second);
     }
     participant_context->remote_audio_track_publication_map.clear();
     for (auto it = participant_context->remote_audio_track_map.begin() ;
          it != participant_context->remote_audio_track_map.end() ; it++) {
-        webrtc_jni::DeleteGlobalRef(env, it->second);
+        webrtc::DeleteGlobalRef(env, it->second);
     }
     participant_context->remote_audio_track_publication_map.clear();
 
     // Delete all remaining global references to VideoTracks
     for (auto it = participant_context->remote_video_track_publication_map.begin() ;
          it != participant_context->remote_video_track_publication_map.end() ; it++) {
-        webrtc_jni::DeleteGlobalRef(env, it->second);
+        webrtc::DeleteGlobalRef(env, it->second);
     }
     participant_context->remote_video_track_publication_map.clear();
     for (auto it = participant_context->remote_video_track_map.begin() ;
          it != participant_context->remote_video_track_map.end() ; it++) {
-        webrtc_jni::DeleteGlobalRef(env, it->second);
+        webrtc::DeleteGlobalRef(env, it->second);
     }
     participant_context->remote_video_track_publication_map.clear();
 
     // Delete all remaining global references to DataTracks
     for (auto it = participant_context->remote_data_track_publication_map.begin() ;
          it != participant_context->remote_data_track_publication_map.end() ; it++) {
-        webrtc_jni::DeleteGlobalRef(env, it->second);
+        webrtc::DeleteGlobalRef(env, it->second);
     }
     participant_context->remote_data_track_publication_map.clear();
     for (auto it = participant_context->remote_data_track_map.begin() ;
          it != participant_context->remote_data_track_map.end() ; it++) {
-        webrtc_jni::DeleteGlobalRef(env, it->second);
+        webrtc::DeleteGlobalRef(env, it->second);
     }
     participant_context->remote_data_track_publication_map.clear();
 

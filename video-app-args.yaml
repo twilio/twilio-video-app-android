@@ -17,7 +17,7 @@ library-virtual-device-tests:
         - {model: Nexus5X, version: 25}
         - {model: Pixel2, version: 26}
         - {model: Pixel2, version: 27}
-        - {model: Pixel2, version: 28}  
+        - {model: Pixel2, version: 28}
     test-targets:
         - class com.twilio.video.StatsTest
         - class com.twilio.video.StatsTopologyParameterizedTest
