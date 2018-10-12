@@ -5,6 +5,11 @@ The Twilio Programmable Video SDKs use [Semantic Versioning](http://www.semver.o
 Improvements
 
 - Added `IceCandidatePairStats` to `StatsReport` which gives insight into local and remote ice candidates
+- Reduced signaling traffic in Group Rooms when communicating with an ICE-lite agent.
+
+ Bug Fixes
+
+- Fixed a bug where the client could send additional ICE candidates after signaling the end of candidates, or mark candidates with a username from a future offer.
 
 Known issues
 
