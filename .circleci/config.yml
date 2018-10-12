@@ -87,7 +87,6 @@ aliases:
     branches:
       only:
         - "master"
-        - "3.0"
 
   # Containers
   - &build-defaults
