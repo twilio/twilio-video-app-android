@@ -411,8 +411,8 @@ def getTestLogLevel() {
 
     // Set default value
     if (testLogLevel == null) {
-        println "testLogLevel not set. Setting to OFF"
-        testLogLevel = "OFF"
+        println "testLogLevel not set. Setting to INFO"
+        testLogLevel = "INFO"
     }
 
 
@@ -429,8 +429,8 @@ def getTestLogLevel() {
             testLogLevel = "com.twilio.video.LogLevel." + testLogLevel
             break
         default:
-            println "Unknown test log level " + testLogLevel + ". Setting to OFF"
-            testLogLevel = "com.twilio.video.LogLevel.OFF"
+            println "Unknown test log level " + testLogLevel + ". Setting to INFO"
+            testLogLevel = "com.twilio.video.LogLevel.INFO"
             break
 
     }

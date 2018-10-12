@@ -594,7 +594,7 @@ task librarySizeReport(type: GradleBuild) {
     startParameter.projectProperties += gradle.startParameter.projectProperties
 
     doLast {
-        def videoAndroidSizeReport = "Video Android Size Report\n" +
+        def videoAndroidSizeReport = "Size Report\n" +
                 "\n" +
                 "| ABI             | APK Size Impact |\n" +
                 "| --------------- | --------------- |\n"
@@ -642,12 +642,12 @@ task librarySizeReport(type: GradleBuild) {
         println(videoAndroidSizeReport)
 
         // Post PR comment with report
+        def repoSlug = "${System.env.CIRCLE_PROJECT_USERNAME}/${System.env.CIRCLE_PROJECT_REPONAME}"
         if (System.env.CIRCLE_PULL_REQUEST) {
             def githubPullRequestNumber = Arrays.asList(
                     System.env.CIRCLE_PULL_REQUEST.split("/")).last()
             def githubPullRequestUrl = new URL("https://api.github.com/repos/" +
-                    "${System.env.CIRCLE_PROJECT_USERNAME}/${System.env.CIRCLE_PROJECT_REPONAME}" +
-                    "/issues/${githubPullRequestNumber}/comments")
+                    "${repoSlug}/issues/${githubPullRequestNumber}/comments")
             exec {
                 workingDir "${rootDir}"
                 commandLine "curl",
@@ -656,6 +656,42 @@ task librarySizeReport(type: GradleBuild) {
                         // Escape new lines for json body
                         "-d", "{\"body\":\"${videoAndroidSizeReport.replace('\n', '\\n')}\"}",
                         "${githubPullRequestUrl}"
+            }
+        }
+
+        // Append report to Github Release
+        if (System.env.CIRCLE_TAG) {
+            def githubReleasesTagUrl = new URL("https://api.github.com/repos/" +
+                    "${repoSlug}/releases/tags/${System.env.CIRCLE_TAG}")
+            def githubReleasesUrlString = "https://api.github.com/repos/" +
+                    "${repoSlug}/releases/"
+            def outputStream = new ByteArrayOutputStream()
+
+            // Get the current release body
+            exec {
+                workingDir "${rootDir}"
+                commandLine "curl",
+                        "-H", "Authorization: token ${System.env.GITHUB_TOKEN}",
+                        "-X", 'GET',
+                        "-s",
+                        "${githubReleasesTagUrl}"
+                standardOutput outputStream
+            }
+
+            // Append the size report to the release
+            def slurper = new groovy.json.JsonSlurper()
+            def releaseResponse = slurper.parseText(outputStream.toString())
+            releaseResponse.body += "\n\n" + videoAndroidSizeReport
+            def githubReleasesUrl = new URL(githubReleasesUrlString + releaseResponse.id)
+
+            exec {
+                workingDir "${rootDir}"
+                commandLine "curl",
+                        "-H", "Authorization: token ${System.env.GITHUB_TOKEN}",
+                        "-X", 'PATCH',
+                        "-d", groovy.json.JsonOutput.toJson(releaseResponse),
+                        "-s",
+                        "${githubReleasesUrl}"
             }
         }
     }
