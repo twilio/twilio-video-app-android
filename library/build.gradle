@@ -74,6 +74,9 @@ android {
             }
         }
         debug {
+            // Mutlidex must be enabled when code coverage is enabled.
+            // Code coverage pushes the library above the 64k method limit
+            multiDexEnabled getTestCoverageEnabled()
             testCoverageEnabled getTestCoverageEnabled()
             externalNativeBuild {
                 cmake {
@@ -141,6 +144,7 @@ dependencies {
     androidTestImplementation "com.google.code.gson:gson:${versions.gson}"
     androidTestImplementation "org.apache.commons:commons-lang3:${versions.apacheCommons}"
     androidTestImplementation "pl.pragmatists:JUnitParams:${versions.junitParams}"
+    androidTestImplementation "com.android.support:multidex:${versions.multidex}"
 
     implementation "com.android.support:support-annotations:${versions.supportLibrary}"
     implementation "com.getkeepsafe.relinker:relinker:${versions.relinker}"
