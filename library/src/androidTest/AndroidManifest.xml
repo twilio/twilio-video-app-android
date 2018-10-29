@@ -19,9 +19,7 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
 
-    <application
-        android:name="android.support.multidex.MultiDexApplication"
-        tools:replace="android:name">
+    <application>
         <activity
             android:name=".ui.MediaTestActivity">
         </activity>
