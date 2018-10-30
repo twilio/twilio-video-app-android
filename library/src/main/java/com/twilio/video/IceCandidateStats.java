@@ -15,6 +15,9 @@
  */
 package com.twilio.video;
 
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+
 /**
  * Statistics of ICE candidate as defined in <a
  * href="https://www.w3.org/TR/webrtc-stats/#icecandidate-dict*">Identifiers for WebRTC's Statistics
@@ -22,44 +25,44 @@ package com.twilio.video;
  */
 public class IceCandidateStats {
     /** Unique identifier of the underlying candidate. */
-    public final String transportId;
+    @NonNull public final String transportId;
 
     /** True indicates remote candidate and false indicates local candidate. */
     public final boolean isRemote;
 
     /** IP address of the candidate. */
-    public final String ip;
+    @NonNull public final String ip;
 
     /** Port number of the candidate. */
     public final int port;
 
     /** Transport of the candidate, valid values are udp or tcp. */
-    public final String protocol;
+    @NonNull public final String protocol;
 
     /**
      * Candidate type. It can be host (host candidate), srflx (server reflexive candidate), prflx
      * (peer reflexive candidate) and relay (relay candidate).
      */
-    public final String candidateType;
+    @NonNull public final String candidateType;
 
     /** Priority as defined in <a href="https://tools.ietf.org/html/rfc5245">RFC 5245</a>. */
     public final int priority;
 
     /** The URL of the TURN or STUN server. */
-    public final String url;
+    @Nullable public final String url;
 
     /** The candidate is no longer active. */
     public final boolean deleted;
 
     public IceCandidateStats(
-            final String transportId,
+            @NonNull final String transportId,
             final boolean isRemote,
-            final String ip,
+            @NonNull final String ip,
             final int port,
-            final String protocol,
-            final String candidateType,
+            @NonNull final String protocol,
+            @NonNull final String candidateType,
             final int priority,
-            final String url,
+            @Nullable final String url,
             final boolean deleted) {
         this.transportId = transportId;
         this.isRemote = isRemote;
