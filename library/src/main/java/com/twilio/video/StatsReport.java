@@ -27,6 +27,7 @@ public class StatsReport {
     private List<RemoteAudioTrackStats> remoteAudioTrackStats = new ArrayList<>();
     private List<RemoteVideoTrackStats> remoteVideoTrackStats = new ArrayList<>();
     private List<IceCandidatePairStats> iceCandidatePairStats = new ArrayList<>();
+    private List<IceCandidateStats> iceCandidateStats = new ArrayList<>();
 
     StatsReport(String peerConnectionId) {
         this.peerConnectionId = peerConnectionId;
@@ -82,8 +83,21 @@ public class StatsReport {
         return iceCandidatePairStats;
     }
 
+    /**
+     * Returns stats for individual ice candidates in the peer connection
+     *
+     * @return a list of all ice candidate stats
+     */
+    public List<IceCandidateStats> getIceCandidateStats() {
+        return iceCandidateStats;
+    }
+
     void addIceCandidatePairStats(IceCandidatePairStats iceCandidatePairStats) {
         this.iceCandidatePairStats.add(iceCandidatePairStats);
+    }
+
+    void addIceCandidateStats(IceCandidateStats iceCandidateStats) {
+        this.iceCandidateStats.add(iceCandidateStats);
     }
 
     void addLocalAudioTrackStats(LocalAudioTrackStats localAudioTrackStats) {

@@ -242,6 +242,10 @@ public class StatsTopologyParameterizedTest extends BaseStatsTest {
         // Check IceCandidatePairStats
         IceCandidatePairStats iceCandidatePairStats = statsReport.getIceCandidatePairStats().get(0);
         checkIceCandidatePairStats(iceCandidatePairStats);
+
+        // Check IceCandidateStats
+        IceCandidateStats iceCandidateStats = statsReport.getIceCandidateStats().get(0);
+        checkIceCandidateStats(iceCandidateStats);
     }
 
     @Test
@@ -458,6 +462,13 @@ public class StatsTopologyParameterizedTest extends BaseStatsTest {
     private void checkTrackStats(RemoteTrackStats stats) {
         assertTrue(0 < stats.bytesReceived);
         assertTrue(0 < stats.packetsReceived);
+    }
+
+    private void checkIceCandidateStats(IceCandidateStats stats) {
+        assertNotNullOrEmpty(stats.candidateType);
+        assertNotNullOrEmpty(stats.ip);
+        assertNotNullOrEmpty(stats.protocol);
+        assertNotNullOrEmpty(stats.transportId);
     }
 
     private void checkIceCandidatePairStats(IceCandidatePairStats stats) {

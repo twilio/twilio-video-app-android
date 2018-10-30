@@ -74,6 +74,7 @@ ClassReferenceHolder::ClassReferenceHolder(JNIEnv* jni) {
     LoadClass(jni, "com/twilio/video/LocalVideoTrackStats");
     LoadClass(jni, "com/twilio/video/RemoteAudioTrackStats");
     LoadClass(jni, "com/twilio/video/RemoteVideoTrackStats");
+    LoadClass(jni, "com/twilio/video/IceCandidateStats");
     LoadClass(jni, "com/twilio/video/IceCandidatePairStats");
     LoadClass(jni, "com/twilio/video/IceCandidatePairState");
     LoadClass(jni, "com/twilio/video/VideoDimensions");

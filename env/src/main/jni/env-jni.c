@@ -39,4 +39,3 @@ Java_com_twilio_video_env_Env_nativeGet(JNIEnv *env, jclass type, jstring j_name
 
     return (*env)->NewStringUTF(env, value);
 }
-
