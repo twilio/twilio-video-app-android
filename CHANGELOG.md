@@ -4,6 +4,8 @@ The Twilio Programmable Video SDKs use [Semantic Versioning](http://www.semver.o
 Improvements
 
 - Added `IceCandidateStats` to `StatsReport` which gives insight into individual ice candidates
+- Removed forced ice-restart when synced responses are processed
+- Improved the detection of, and recovery from media connection failures. Worst case recovery times have been reduced by up to 10 seconds.
 
 Known issues
 
