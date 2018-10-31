@@ -33,7 +33,7 @@ import retrofit.http.POST;
 import retrofit.http.Path;
 
 public class VideoApiUtils {
-    private static final int MAX_RETRIES = 100;
+    private static final int MAX_RETRIES = 3;
     private static final String PROD_BASE_URL = "https://video.twilio.com";
     private static final String STAGE_BASE_URL = "https://video.stage.twilio.com";
     private static final String DEV_BASE_URL = "https://video.dev.twilio.com";
@@ -182,18 +182,8 @@ public class VideoApiUtils {
                 Log.e(
                         "VideoApiUtils",
                         String.format("RetrofitError: %s", createRoomError.getKind().name()));
-
-                /*
-                 * Sometimes there is a timeout creating a room, but the room resource is still
-                 * created. In this case issue a GET request for the room resource and validate
-                 * that the room resource is configured correctly for the test.
-                 */
-                try {
-                    videoRoom = videoApiService.getRoom(authorization, name);
-                } catch (RetrofitError getRoomError) {
-                    Log.e(
-                            "VideoApiUtils",
-                            String.format("RetrofitError: %s", getRoomError.getKind().name()));
+                if (createRoomError.getResponse() != null) {
+                    throw createRoomError;
                 }
             }
 
