@@ -162,6 +162,8 @@ public class VideoTextureViewTest extends BaseVideoTest {
         for (int i = 0; i < numItems; i++) {
             onView(withContentDescription(recyclerViewContentDescription))
                     .perform(RecyclerViewActions.scrollToPosition(i));
+            // Sleep to give recycler view time to scroll to position to prevent NPE
+            Thread.sleep(250);
             VideoTextureViewRecyclerViewAdapter.VideoViewHolder videoViewHolder =
                     (VideoTextureViewRecyclerViewAdapter.VideoViewHolder)
                             recyclerView.findViewHolderForAdapterPosition(i);
