@@ -111,7 +111,7 @@ public class IceTopologyParameterizedTest extends BaseVideoTest {
     public void doTestConnectWithIceServerAbortInvalidToken() throws InterruptedException {
         IceOptions iceOptions =
                 new IceOptions.Builder()
-                        .iceServersTimeout(3000)
+                        .iceServersTimeout(TestUtils.ICE_TIMEOUT)
                         .abortOnIceServersTimeout(true)
                         .build();
 
